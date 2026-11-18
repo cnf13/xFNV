@@ -282,7 +282,7 @@ void SummonCreatureEffect::DoSummon(Actor* pOwner) {
     }
     TESBoundObject* pObject = dynamic_cast<TESBoundObject*>(GetAssociatedItem());
     if (!pObject) {
-        FNVD_INLINED_LOCAL(BSStringT<char>, sName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSStringT<char>, sName, std::nullopt, std::nullopt);
         GetEffectSetting()->GetEffectName(&sName);
         Warning("GAME EFFECTS: %s effect has no associated creature.", sName.String());
         sName.~BSStringT<char>();

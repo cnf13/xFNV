@@ -375,7 +375,7 @@ void hkpMoppDefaultAssembler::assemble(hkpMoppTreeNode* a1, hkpMoppNodeMgr* a2, 
     // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::hkArray
     // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
     using terminals_t = hkArray<uint32_t, hkContainerHeapAllocator>;
-    alignas(8) FNVD_INLINED_LOCAL(terminals_t, terminals, std::nullopt, std::nullopt);
+    alignas(8) XFNV_INLINED_LOCAL(terminals_t, terminals, std::nullopt, std::nullopt);
     terminals.m_data = nullptr;
     terminals.m_size = 0;
     terminals.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -1259,7 +1259,7 @@ int32_t hkpMoppDefaultAssembler::calcChunkPoints(
 
     // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::hkArray
     using rightTerminals_t = hkArray<uint32_t, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(rightTerminals_t, rightTerminals, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(rightTerminals_t, rightTerminals, std::nullopt, std::nullopt);
     rightTerminals.m_data = nullptr;
     rightTerminals.m_size = 0;
     rightTerminals.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -1281,7 +1281,7 @@ int32_t hkpMoppDefaultAssembler::calcChunkPoints(
 
     // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::hkArray
     using leftTerminals_t = hkArray<uint32_t, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(leftTerminals_t, leftTerminals, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(leftTerminals_t, leftTerminals, std::nullopt, std::nullopt);
     leftTerminals.m_data = nullptr;
     leftTerminals.m_size = 0;
     leftTerminals.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -1307,7 +1307,7 @@ int32_t hkpMoppDefaultAssembler::calcChunkPoints(
     const int32_t iNodeSize = m_code->m_pos - iStart;
     // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::hkArray
     using allTerminals_t = hkArray<uint32_t, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(allTerminals_t, allTerminals, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(allTerminals_t, allTerminals, std::nullopt, std::nullopt);
     allTerminals.m_data = nullptr;
     allTerminals.m_size = 0;
     allTerminals.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -1394,7 +1394,7 @@ void hkpMoppDefaultAssembler::assembleSubNodeIntoChunks(
         m_code = &chunkCode;
         // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::hkArray
         using chunkTerminals_t = hkArray<uint32_t, hkContainerHeapAllocator>;
-        FNVD_INLINED_LOCAL(chunkTerminals_t, chunkTerminals, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(chunkTerminals_t, chunkTerminals, std::nullopt, std::nullopt);
         chunkTerminals.m_data = nullptr;
         chunkTerminals.m_size = 0;
         chunkTerminals.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;

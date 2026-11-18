@@ -49,12 +49,12 @@ CombatProcedureSearch::~CombatProcedureSearch() {}
 void CombatProcedureSearch::Update() {
     NiPoint3 result;
     BGSWorldLocation v45;
-    FNVD_INLINED_LOCAL(NiPointer<PathingLOSGridMap>, v47, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<PathingLOSGridMap>, v47, std::nullopt, std::nullopt);
     BGSWorldLocation attackerWorldLoc_2;
     using ignoreLocations_t = BSSimpleArray<NiPoint3, 1024>;
     BGSWorldLocation attackerWorldLoc;
     BGSWorldLocation searchCenter;
-    FNVD_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
     Actor* pattacker = GetAttacker();
     Actor* ptarget = GetTarget();
     PROCESS_TYPE eprocessLevel = pattacker->GetCurrentProcessType();

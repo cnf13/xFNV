@@ -196,7 +196,7 @@ void BGSCameraShot::InitItem() {
 
 void BGSCameraShot::Copy(TESForm* apCopy) {
     TESForm* v3 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSCameraShot)(apCopy, RTTI_TESForm, RTTI_BGSCameraShot));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSCameraShot)(apCopy, RTTI_TESForm, RTTI_BGSCameraShot));
     if (v3) {
         CopyAllComponents(v3);
         ourMemcpy(&Data, &v3[2].iFormFlags, sizeof(Data));
@@ -205,7 +205,7 @@ void BGSCameraShot::Copy(TESForm* apCopy) {
 
 bool BGSCameraShot::Compare(TESForm* apCompare) {
     TESForm* v4 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSCameraShot)(apCompare, RTTI_TESForm, RTTI_BGSCameraShot));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSCameraShot)(apCompare, RTTI_TESForm, RTTI_BGSCameraShot));
     if (!v4) {
         return true;
     }
@@ -250,7 +250,7 @@ bool BGSCameraShot::IsStartAtTimeZero() {
 }
 
 void BGSCameraShot::FreeCamera() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     spLocationNode.operator=(static_cast<NiAVObject*>(nullptr));
     spTargetNode.operator=(static_cast<NiAVObject*>(nullptr));
     pTargetRef = nullptr;
@@ -330,8 +330,8 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
 
 void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
     NiCamera* pcamera;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     uint32_t uiNumKeys;
     uint8_t ucSize;
     NiFrustum vatsFrustum;
@@ -491,7 +491,7 @@ void BGSCameraShot::Update(float afTime) {
     NiPoint3 apResult;
     NiFrustum vatsFrustum;
     NiFrustum gameFrustum;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     NiPoint3 targetPos;
     NiPoint3 cameraLocalPos_3;
     NiPoint3 cameraLocalPos_2;

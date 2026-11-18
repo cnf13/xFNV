@@ -26,7 +26,7 @@ bool BGSDehydrationStage::Load(TESFile* apFile) {
         if (uiChunk == DATA_ID) {
             // the data is this form's own component, at this+0x18
             LoadData(apFile, static_cast<char*>(static_cast<void*>(GetData())), 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the sickness's 4-byte form ID at 4.
             TESFile::WidenFormIDRecords(
                 GetData(), 1, 8, sizeof(BGSDehydrationStageData), {{4, offsetof(BGSDehydrationStageData, pSickness)}}

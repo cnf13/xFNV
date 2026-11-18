@@ -835,8 +835,8 @@ bool ActiveEffect::CheckDisplacementSpellOnTarget() {
 
 void ActiveEffect::StartSound() {
     uint32_t isoundFileID;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
     EffectSetting* EffectSetting_ = GetEffectSetting();
     if (EffectSetting_->data.pHitSound) {
         EffectSetting* v2 = GetEffectSetting();

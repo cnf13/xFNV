@@ -248,7 +248,7 @@ namespace hkNativePackfileUtils {
     // Loads packfileData into a buffer of its own: the buffer grows to the size the packfile needs, the contents are
     // loaded into it, the contents' type name comes from the header's map, and the resource takes the buffer over.
     hkResource* load(const void* packfileData, int32_t dataSize, const hkTypeInfoRegistry* userRegistry) {
-        FNVD_INLINED_LOCAL(hkArray<char>, data, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<char>, data, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkArray<char>::hkArray
         data.m_data = nullptr;
         data.m_size = 0;

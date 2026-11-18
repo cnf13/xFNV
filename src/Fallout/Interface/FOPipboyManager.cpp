@@ -94,8 +94,8 @@ bool FOPipboyManager::OnIdle() {
 }
 
 void FOPipboyManager::Initialize() {
-    FNVD_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if ((bUsePipboyMode.Bool() && !GetInitialized()) && (pPlayer) && (pPlayer->Get3D(true))) {
         NiGeometry* p3rdPersonScreenGeom = nullptr;
         NiGeometry* pPipboyScreen = nullptr;
@@ -197,7 +197,7 @@ void FOPipboyManager::Shutdown() {
 }
 
 void FOPipboyManager::OnMenuOpen() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (GetInitialized()) {
         SetRefractive(false);
         ResetColors();
@@ -222,7 +222,7 @@ void FOPipboyManager::OnMenuOpen() {
 }
 
 void FOPipboyManager::OnMenuClose() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool IsRefractive = pPlayer->IsRefractive();
     SetRefractive(IsRefractive);
     Animation* panim = pPlayer->GetAnimation(true);
@@ -454,7 +454,7 @@ void FOPipboyManager::ShowPipboyLightEffect(const bool ab3rdPerson, const bool a
 }
 
 void FOPipboyManager::UpdateLightEffect(float afTime) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (bLightEffectFading) {
         FadeLight(afTime);
         ShowPipboyLightEffect(false, true, false);
@@ -517,7 +517,7 @@ void FOPipboyManager::ResetPipBoyManager() {
 }
 
 void FOPipboyManager::SetTabKnobPosition(uint32_t aiNewPos, bool abPlaySounds) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (fTabKnobPositions[aiNewPos] != fKnobTargets[2]) {
         fKnobTargets[2] = fTabKnobPositions[aiNewPos];
         fKnobRates[2] = fTabKnobMoveRate.Float();
@@ -540,7 +540,7 @@ NiAVObject* FOPipboyManager::Get3rdPersonPipboyRoot() {
 }
 
 void FOPipboyManager::MoveKnob(FOPipboyManager::Knobs aiKnob, float afAmount, float afRate, bool abPlaySound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (abPlaySound && aiKnob == FOPipboyManager::KNOB_SCROLL) {
         BSSoundHandle psoundHand;
         BSAudio* v5 = &BSAudio::QInstance();
@@ -559,16 +559,16 @@ void FOPipboyManager::InitLight() {
     NiPointLight* pLight = this->GetMenuLight();
     if (pLight) {
         NiColor kDiffuse;
-        pLight->SetDiffuseColor(*FNVD_RECONSTRUCT(NiColor)(&kDiffuse, 0.0f, 0.0f, 0.0f));
+        pLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.0f, 0.0f, 0.0f));
         NiColor kAmbient;
-        pLight->SetAmbientColor(*FNVD_RECONSTRUCT(NiColor)(&kAmbient, 0.0f, 0.0f, 0.0f));
+        pLight->SetAmbientColor(*XFNV_RECONSTRUCT(NiColor)(&kAmbient, 0.0f, 0.0f, 0.0f));
         pLight->SetConstantAttenuation(0.0f);
         pLight->SetLinearAttenuation(0.0f);
         pLight->SetQuadraticAttenuation(0.0f);
         pLight->SetDimmer(1.0f);
         // The light radius lives in the specular colour's first channel.
         NiColor kSpecular;
-        pLight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&kSpecular, fScreenLightRadius.Float(), 0.0f, 0.0f));
+        pLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, fScreenLightRadius.Float(), 0.0f, 0.0f));
         alignas(NiColorA) uint8_t aucColor[sizeof(NiColorA)];
         NiColorA& kColor = *::new (aucColor) NiColorA(0.0f, 0.0f, 0.0f, 0.0f);
         // 4 is the pip-boy colour's id.
@@ -756,9 +756,9 @@ char FOPipboyManager::CheckOrangeButtonsClicked(char arg0, char a3, float* a4, f
 
 void FOPipboyManager::InitKnobs() {
     double v3;
-    FNVD_INLINED_LOCAL(NiFixedString, v20, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v20, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 ecx0;
     NiMatrix3 prn;
     NiAVObject* v16 = pPlayer->Get3D(true);

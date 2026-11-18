@@ -17,7 +17,7 @@
 NiRTTI BSTextureData::ms_RTTI("BSTextureData", &NiExtraData::ms_RTTI);
 
 NiAVObject* BSTextureData::GetValue(uint32_t aiIndex) const {
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The exe reads the 4-byte element at pBuffer + 4 * aiIndex: the element, at the pointer's own width.
     return pObjects.pBuffer[static_cast<int32_t>(aiIndex)];
 #else

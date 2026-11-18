@@ -318,7 +318,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
     hkPackedNiTriStripsShape* pShape = this ? static_cast<hkPackedNiTriStripsShape*>(this->phkObject) : nullptr;
     hkPackedNiTriStripsData* pdata = pShape->spTriStripsData.m_pObject;
     // The array starts with no slots and a grow-by of one.
-    FNVD_INLINED_LOCAL(NiTPrimitiveArray<uint16_t>, shapeArray, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiTPrimitiveArray<uint16_t>, shapeArray, std::nullopt, std::nullopt);
     ::new (&shapeArray) NiTPrimitiveArray<uint16_t>(0u, 1u);
     uint16_t usvertCount = 0;
     uint16_t uslastKey = 0;
@@ -409,7 +409,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
         uslastKey = uscurrentKey;
     }
     // The array is destroyed, freeing its buffer, before the memory context is restored.
-    FNVD_DESTRUCT(NiTArray<uint16_t, NiTMallocInterface<uint16_t>>)(&shapeArray);
+    XFNV_DESTRUCT(NiTArray<uint16_t, NiTMallocInterface<uint16_t>>)(&shapeArray);
     GetThreadMemContext() = iOldMemContext;
 }
 

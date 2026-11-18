@@ -21,7 +21,7 @@
 
 #include <new>
 
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
 #include "xfnv/debugheap/SystemAlloc.h"
 #endif
 
@@ -142,11 +142,11 @@ void operator delete[](void* apMem, std::align_val_t, const std::nothrow_t&) noe
 
 void MemoryManager::Initialize() {
     MemoryPool::InitPools();
-#if !FNVD_SYSTEM_ALLOC
+#if !XFNV_SYSTEM_ALLOC
     SpecifyMemoryLayout();
 #endif
     bInitialized = true;
-#if !FNVD_SYSTEM_ALLOC
+#if !XFNV_SYSTEM_ALLOC
     SpecifyPools();
 #endif
     InitializeStackTrace();
@@ -156,7 +156,7 @@ void MemoryManager::Initialize() {
 void MemoryManager::AddPool(uint32_t aiBlockSize, uint32_t aiPoolSize, const char* apDesc) {
     const int32_t eOldContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_POOL;
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The 64-bit program makes only the pools whose blocks are a multiple of 16 bytes, so that every block is aligned
     // as the platform's allocators align (and holds the free list's two pointers); the other sizes go to the next
     // larger pool (GetPoolForSize rounds up to 16) or to the heap (a departure from the exe).
@@ -182,10 +182,10 @@ void MemoryManager::AddPool(uint32_t aiBlockSize, uint32_t aiPoolSize, const cha
 }
 
 void* MemoryManager::Allocate(size_t aSize) {
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
     // No pool or heap, the pass-through only; SpecifyMemoryLayout and SpecifyPools are skipped, so nothing else reaches
     // them.
-    return fnvd::sysalloc::Allocate(aSize);
+    return xfnv::sysalloc::Allocate(aSize);
 #endif
     if (!bInitialized) {
         return DoSystemAllocation(aSize, false);
@@ -232,8 +232,8 @@ void* MemoryManager::Allocate(size_t aSize) {
 }
 
 void MemoryManager::Deallocate(void* apMem) {
-#if FNVD_SYSTEM_ALLOC
-    fnvd::sysalloc::Free(apMem);
+#if XFNV_SYSTEM_ALLOC
+    xfnv::sysalloc::Free(apMem);
     return;
 #endif
     if (!apMem) {
@@ -266,8 +266,8 @@ void MemoryManager::Deallocate(void* apMem) {
 }
 
 void* MemoryManager::Reallocate(void* apMem, size_t aSize) {
-#if FNVD_SYSTEM_ALLOC
-    return fnvd::sysalloc::Reallocate(apMem, aSize);
+#if XFNV_SYSTEM_ALLOC
+    return xfnv::sysalloc::Reallocate(apMem, aSize);
 #endif
     void* pNewMem = nullptr;
     size_t uiSize = Size(apMem);
@@ -286,8 +286,8 @@ void* MemoryManager::Reallocate(void* apMem, size_t aSize) {
 }
 
 size_t MemoryManager::Size(const void* apPtr) {
-#if FNVD_SYSTEM_ALLOC
-    return apPtr ? fnvd::sysalloc::Size(apPtr) : 0;
+#if XFNV_SYSTEM_ALLOC
+    return apPtr ? xfnv::sysalloc::Size(apPtr) : 0;
 #endif
     // The pool lookup keys on the address's top byte, treating the pointer as a raw address.
     const uintptr_t uiTop = reinterpret_cast<uintptr_t>(apPtr) >> 24;
@@ -320,8 +320,8 @@ void* MemoryManager::Reallocate(
     const int32_t aiLine,
     const char* apFunction
 ) {
-#if FNVD_SYSTEM_ALLOC
-    return fnvd::sysalloc::Reallocate(apMem, aSize);
+#if XFNV_SYSTEM_ALLOC
+    return xfnv::sysalloc::Reallocate(apMem, aSize);
 #endif
     uint32_t ioldaSize = Size(apMem);
     if (!ioldaSize) {

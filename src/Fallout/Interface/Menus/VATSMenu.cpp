@@ -125,10 +125,10 @@ void VATSMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 // previous or next target with a body to show, 4 closes the menu, 5 queues the current action, 30 and 31 select the
 // weapon's special attacks.
 void VATSMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kPrevFailSound, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kPrevSelectSound, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kNextFailSound, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kNextSelectSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kPrevFailSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kPrevSelectSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kNextFailSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kNextSelectSound, std::nullopt, std::nullopt);
     BaseProcess* pProcess = pPlayer->pCurrentProcess;
     ItemChange* pWeaponItem = pProcess->GetCurrentWeapon();
     TESObjectWEAP* pWeapon;
@@ -1041,10 +1041,10 @@ void VATSMenu::UpdateQueuedActionList(VATS_COMMAND* apCommand, bool abForcedRelo
     TESObjectWEAP* pweapon;
     BaseProcess* v22;
     BSSoundHandle* SoundHandleByName;
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSimpleList<VATSTarget*>* ptargetList;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     char Dst[268];
     ItemChange* pweaponItem_2;
     char apDest[264];
@@ -2718,7 +2718,7 @@ BSSimpleList<VATSBodyPart*>* VATSMenu::FindTargetPart(ActorValue::Index aeLimb) 
 // fills is destroyed.
 void VATSMenu::SelectNearestTarget(bool abLeft) {
     TESObjectWEAP* pweapon;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle psoundHand;
     BSAudio* v2 = &BSAudio::QInstance();
     BSSoundHandle* arHandle = v2->GetSoundHandleByName(&a1, "UIVATSSelectTarget", 289u);
@@ -2767,9 +2767,9 @@ void VATSMenu::SelectNearestTarget(bool abLeft) {
 }
 
 void VATSMenu::Close() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v15, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v15, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     float fFortune;
     float fStranger;
     if ((VATSMenu::pVatsMenu) && (VATSMenu::pVatsMenu->xFadeState == Interface::FADE_SHOWN)) {
@@ -3413,7 +3413,7 @@ bool VATSMenu::Create() {
     BSAudioManager* pAudioManager = &BSAudioManager::QInstance();
     BSSoundHandle kEnterSound;
     // 0x121: SOUND_FLAG_IS_2D | SOUND_FLAG_SYSTEM_SOUND | SOUND_FLAG_ONE_SHOT.
-    FNVD_INLINED_LOCAL(BSSoundHandle, kLookup, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kLookup, std::nullopt, std::nullopt);
     BSSoundHandle* pFound =
         pAudioManager->GetSoundHandleByName(&kLookup, "UIVATSEnter", static_cast<BSGameSound::SoundFlags>(0x121));
     kEnterSound = *pFound;
@@ -4036,7 +4036,7 @@ Tile* VATSMenu::VatsMenuGetTileByName(Tile* apTarget, const char* apName) {
 
 // VATSBodyPart::eBodyPart and uiLastBodyPart are uint32_t; they are passed on as the LIMB_ENUM the callees take.
 void VATSMenu::ShowTargetLimb(bool abForceShow) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!VATSMenu::pVatsMenu) {
         return;
     }

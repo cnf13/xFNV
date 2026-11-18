@@ -1269,16 +1269,16 @@ namespace audio::ds {
 
 } // namespace audio::ds
 
-// The export the game's import names: on Linux the C function itself; on Windows (FNVD_SDL_AUDIO) the import slot
+// The export the game's import names: on Linux the C function itself; on Windows (XFNV_SDL_AUDIO) the import slot
 // `__imp_` the game's dllimport calls go through, so dsound.lib is never pulled in for it.
 #if defined(_WIN32)
 #if defined(_M_IX86)
 extern "C" {
-decltype(&audio::ds::Create8) fnvd_imp_DirectSoundCreate8 __asm__("__imp__DirectSoundCreate8@12") = &audio::ds::Create8;
+decltype(&audio::ds::Create8) xfnv_imp_DirectSoundCreate8 __asm__("__imp__DirectSoundCreate8@12") = &audio::ds::Create8;
 }
 #else
 extern "C" {
-decltype(&audio::ds::Create8) fnvd_imp_DirectSoundCreate8 __asm__("__imp_DirectSoundCreate8") = &audio::ds::Create8;
+decltype(&audio::ds::Create8) xfnv_imp_DirectSoundCreate8 __asm__("__imp_DirectSoundCreate8") = &audio::ds::Create8;
 }
 #endif
 #else

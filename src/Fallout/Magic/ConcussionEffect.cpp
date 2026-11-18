@@ -111,7 +111,7 @@ void ConcussionEffect::Finish() {
 }
 
 void ConcussionEffect::UpdateSound(Actor* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (fConcussionTimer.Float() < static_cast<double>(fTimer)) {
         fTimer = 0.0;
         if (a2->GetPerceptionCondition() == 0.0 && !a2->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {

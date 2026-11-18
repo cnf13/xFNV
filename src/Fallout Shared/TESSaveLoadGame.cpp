@@ -405,7 +405,7 @@ void TESSaveLoadGame::BuildChangesString(
 
     TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(apForm);
     MobileObject* pmob = dynamic_cast<MobileObject*>(apForm);
-    FNVD_DYNAMIC_CAST_VOID(Actor)(apForm, RTTI_TESForm, RTTI_Actor);
+    XFNV_DYNAMIC_CAST_VOID(Actor)(apForm, RTTI_TESForm, RTTI_Actor);
     if (pmob) {
         PROCESS_TYPE type = PROCESS_TYPE_NONE;
         if (pmob->pCurrentProcess) {
@@ -1436,7 +1436,7 @@ void TESSaveLoadGame::DestroyBuffer(void* apBuffer) {
 void TESSaveLoadGame::DeleteForm(TESForm* apForm) {
     Warning("FORMS: DeleteForm() was called, but the game is not being loaded.");
     m_pChanges->RemoveChanges(apForm, true);
-    char* v4 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESObjectCELL)(apForm, RTTI_TESForm, RTTI_TESObjectCELL));
+    char* v4 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESObjectCELL)(apForm, RTTI_TESForm, RTTI_TESObjectCELL));
     if (apForm->GetTemporary() || v4) {
         uint32_t NextID = pDataHandler->GetNextID();
         apForm->SetFormID(NextID, true);
@@ -1508,7 +1508,7 @@ bool TESSaveLoadGame::LoadForm(TESForm* apForm) {
     uint32_t uiFlags = CheckNewReference(apForm, pChanges->GetFlags());
     SetCurrentVersion(kBufferHeader.cVersion);
     LoadFormHeader kFormHeader;
-    FNVD_RECONSTRUCT(LoadFormHeader)(&kFormHeader, &kBufferHeader, apForm->GetFormID(), uiFlags);
+    XFNV_RECONSTRUCT(LoadFormHeader)(&kFormHeader, &kBufferHeader, apForm->GetFormID(), uiFlags);
     SetCurrentlyLoadingFormHeader(&kFormHeader);
     bool bWasLoading = GetLoading();
     SetLoading(true);
@@ -2675,7 +2675,7 @@ void TESSaveLoadGame::SaveInitialData(TESForm* a1, uint32_t a2) {
         }
     }
     else {
-        FNVD_DYNAMIC_CAST_VOID(TESObjectCELL)(a1, RTTI_TESForm, RTTI_TESObjectCELL);
+        XFNV_DYNAMIC_CAST_VOID(TESObjectCELL)(a1, RTTI_TESForm, RTTI_TESObjectCELL);
     }
 }
 
@@ -3467,7 +3467,7 @@ void TESSaveLoadGame::LoadCharControllers() {
         MobileObject* pmob = dynamic_cast<MobileObject*>(FormByNumericID);
         if (pmob) {
             MiddleHighProcess* phighProcess = static_cast<MiddleHighProcess*>(
-                FNVD_DYNAMIC_CAST_VOID(HighProcess)(pmob->pCurrentProcess, RTTI_BaseProcess, RTTI_HighProcess)
+                XFNV_DYNAMIC_CAST_VOID(HighProcess)(pmob->pCurrentProcess, RTTI_BaseProcess, RTTI_HighProcess)
             );
             if (phighProcess) {
                 char apData[4];
@@ -3755,7 +3755,7 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
     uint32_t* a9,
     uint32_t* a10
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     _SYSTEMTIME result;
     uint32_t auiWidth;
     NiPixelFormat akFormat;

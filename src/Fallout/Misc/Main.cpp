@@ -938,7 +938,7 @@ HWND__* GetActiveWindow_SDL() {
 void Main_ShaderInit() {
     InitializationFlow("Initializing Shader System...");
     BSShaderManager::SetShaderErrorCallback(nullptr);
-    BSShaderManager::SetTimerFunc(&fnvd::callFunction<&BSShaderManager::CalculateTime>);
+    BSShaderManager::SetTimerFunc(&xfnv::callFunction<&BSShaderManager::CalculateTime>);
     BSShaderManager::SetUseHardDriveCache(bUseHardDriveCache.Bool());
     BSShaderManager::bDisplayLODLand = bDisplayLODLandINI.Bool();
     BSShaderManager::fLocalTreeMipMapLODBias = static_cast<float>(fLocalTreeMipMapLODBiasINI);
@@ -1178,8 +1178,8 @@ int32_t MessageBoxA_0(const char* apText, const char* apCaption, uint32_t aiType
 Main::Main(HWND__* ahWnd, HINSTANCE__* ahInstance)
   : bQuitGame(false), bResetGame(false), bGameActive(false), bOnIdle(false), bReloadContent(false), bFlyCamera(false),
     bFreezeTime(false), hWnd(ahWnd), hInstance(ahInstance), uiThreadID(BSGetCurrentThreadID()), hThreadHandle(nullptr),
-    kTaskQueue(&kPackedTaskHeap, &fnvd::callFunction<&TaskQueueInterface::TaskUnpackFunc>),
-    kSecondaryTaskQueue(&kSecondaryPackedTaskHeap, &fnvd::callFunction<&TaskQueueInterface::TaskUnpackFunc>),
+    kTaskQueue(&kPackedTaskHeap, &xfnv::callFunction<&TaskQueueInterface::TaskUnpackFunc>),
+    kSecondaryTaskQueue(&kSecondaryPackedTaskHeap, &xfnv::callFunction<&TaskQueueInterface::TaskUnpackFunc>),
     bRenderingMenuBG(false) {
     Main::spInterfaceFXTex = nullptr;
     spDrawWorldAccum = new BSShaderAccumulator(99, 1u, 759u);
@@ -1300,7 +1300,7 @@ void Main::Main_AudioInit() {
     BSAudio::QInstance().pfnIDCallback = &FalloutAudio::ResolveSoundID;
     BSAudio::QInstance().pfnNameCallback = &FalloutAudio::ResolveSoundName;
     BSAudio::QInstance().pfnRandomFilenameCallback = &TESSound::PickRandomFilename;
-    BSAudio::QInstance().pfnSettingsCallback = &fnvd::callFunction<&FalloutAudio::ApplySettingsFromMasterFile>;
+    BSAudio::QInstance().pfnSettingsCallback = &xfnv::callFunction<&FalloutAudio::ApplySettingsFromMasterFile>;
     BSAudio::QInstance().pfnSynchPausedCallback = &FalloutRadio::RadioSynchPaused;
     BSAudio::QInstance().pfnSynchUnPausedCallback = &FalloutRadio::RadioSynchUnPaused;
     BSAudio* pAudio = &BSAudio::QInstance();
@@ -1471,15 +1471,15 @@ void Main::InitSceneGraph() {
     int32_t v33;
     ShadowSceneNode* pshadowSceneNode;
     SceneGraph* pSceneGraph;
-    FNVD_INLINED_LOCAL(NiFixedString, v41, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v44, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v47, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v50, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v53, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v41, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v44, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v47, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v50, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v53, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WORLD_SG, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 3916
     );
@@ -4075,8 +4075,8 @@ void Main::DrawWorld_MTRender1stPerson(
     BSRenderedTexture* apRenderTexture
 ) {
     FOPipboyManager* v20;
-    FNVD_INLINED_LOCAL(NiPointer<BSShaderAccumulator>, sptempaccum_4, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<BSShaderAccumulator>, sptempaccum_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSShaderAccumulator>, sptempaccum_4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSShaderAccumulator>, sptempaccum_2, std::nullopt, std::nullopt);
     SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
     BSCullingProcess* apCuller = apSceneGraph->pCuller;
     NiAVObject* ap1stPerson3d = pPlayer->Get3D(true);

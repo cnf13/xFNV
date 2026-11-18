@@ -178,7 +178,7 @@ bool NavMesh::Load(TESFile* apFile) {
                     // flag off its triangle and its portal out of the array.
                     int32_t isize = DoorPortals.GetSize();
                     apFile->GetChunkData(&DoorPortals.GetAt(0), 8 * isize);
-#if FNVD_64BIT
+#if XFNV_64BIT
                     // The file's portal records are 8 bytes: the door's 4-byte form ID, then the triangle index.
                     TESFile::WidenFormIDRecords(
                         &DoorPortals.GetAt(0), isize, 8, sizeof(NavMeshTriangleDoorPortal),

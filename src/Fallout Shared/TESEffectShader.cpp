@@ -81,7 +81,7 @@ bool TESEffectShader::Load(TESFile* apFile) {
                     Data.Endian();
                 }
                 LoadData(apFile, reinterpret_cast<char*>(&Data), 0x134);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x134 bytes, the addon models' 4-byte form ID at 0xF4.
                 TESFile::WidenFormIDRecords(
                     &Data, 1, 0x134, sizeof(Data), {{0xF4, offsetof(EffectShaderData, pAddonModels)}}
@@ -223,12 +223,12 @@ bool TESEffectShader::Compare(TESForm* apCompare) {
 }
 
 void TESEffectShader::SetupParticleShader(ParticleShaderProperty* apProperty, NiSourceTexture* apTex) {
-    FNVD_INLINED_LOCAL(NiColorA, v15, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v16, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, color3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, color1, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, color2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v15, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, color3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, color1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, color2, std::nullopt, std::nullopt);
     apProperty->SetTexture(apTex);
     apProperty->SetLifetime(Data.fParticleLifetime);
     apProperty->SetLifetimeVar(Data.fParticleLifeVar);
@@ -513,10 +513,10 @@ float TESEffectShader::AnimateFillEffectAlpha(float afCurrentAlpha, float afTime
 BSShaderPPLightingProperty::TextureEffectData*
 TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* apTex, NiSourceTexture* apBlockOutTex) {
     BSShaderPPLightingProperty::TextureEffectData* pData;
-    FNVD_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v24, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v26, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v24, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v26, std::nullopt, std::nullopt);
     void* apMemory = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty::TextureEffectData));
     if (apMemory) {
         pData = ::new (apMemory) BSShaderPPLightingProperty::TextureEffectData;

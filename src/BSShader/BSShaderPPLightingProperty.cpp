@@ -832,7 +832,7 @@ void BSShaderPPLightingProperty::CopyToMembers(BSShaderPPLightingProperty* pDest
             if (pOld) {
                 rt::eh_vector_destructor_iterator(
                     pOld, sizeof(NiPointer<NiTexture>), static_cast<int32_t>(reinterpret_cast<size_t*>(pOld)[-1]),
-                    &fnvd::destructElement<NiPointer<NiRefObject>>
+                    &xfnv::destructElement<NiPointer<NiRefObject>>
                 );
                 MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pOld) - 1);
             }
@@ -846,7 +846,7 @@ void BSShaderPPLightingProperty::CopyToMembers(BSShaderPPLightingProperty* pDest
                 pNew = reinterpret_cast<NiPointer<NiTexture>*>(piBlock + 1);
                 rt::eh_vector_constructor_iterator(
                     pNew, sizeof(NiPointer<NiTexture>), static_cast<int32_t>(uiCount),
-                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
                 );
             }
             pDest->spTextures[i] = pNew;
@@ -1206,8 +1206,8 @@ void BSShaderPPLightingProperty::FillTextureArray() {
             pBlock[0] = 10;
             pNew = reinterpret_cast<NiPointer<NiTexture>*>(pBlock + 1);
             rt::eh_vector_constructor_iterator(
-                pNew, sizeof(NiPointer<NiTexture>), 10, &fnvd::constructElement<NiPointer<NiRefObject>>,
-                &fnvd::destructElement<NiPointer<NiRefObject>>
+                pNew, sizeof(NiPointer<NiTexture>), 10, &xfnv::constructElement<NiPointer<NiRefObject>>,
+                &xfnv::destructElement<NiPointer<NiRefObject>>
             );
         }
         aspNewTextures[i] = pNew;
@@ -1226,7 +1226,7 @@ void BSShaderPPLightingProperty::FillTextureArray() {
             // memory.
             rt::eh_vector_destructor_iterator(
                 pOld, sizeof(NiPointer<NiTexture>), static_cast<int32_t>(reinterpret_cast<size_t*>(pOld)[-1]),
-                &fnvd::destructElement<NiPointer<NiRefObject>>
+                &xfnv::destructElement<NiPointer<NiRefObject>>
             );
             MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pOld) - 1);
         }

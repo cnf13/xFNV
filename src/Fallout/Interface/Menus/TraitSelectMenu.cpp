@@ -160,8 +160,8 @@ bool TraitSelectMenu::DoGamepad(int32_t aiID, float afValue) {
 }
 
 void TraitSelectMenu::SetBoxAsChecked(int32_t aiID, bool bForceRefresh) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (bForceRefresh || m_CurrentlyCheckedTile != aiID) {
         m_nCheckmarkAnimStartTime = BSGetTickCount();
         if (pTiles[17]) {
@@ -335,7 +335,7 @@ void TraitSelectMenu::Navigate(char a1) {
 }
 
 Tile* TraitSelectMenu::Create() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     InterfaceManager* pInterfaceManager = InterfaceManager::Instance();
     int32_t iClassStatic = TraitSelectMenu::GetClassStatic();
     Tile* pOldMenuTile = Menu::GetMenuByClass(iClassStatic);

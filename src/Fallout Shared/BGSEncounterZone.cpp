@@ -37,7 +37,7 @@ bool BGSEncounterZone::Load(TESFile* apFile) {
         }
         if (eChunk == DATA_ID) {
             apFile->GetChunkData(&Data, 8u);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the owner's 4-byte form ID first.
             TESFile::WidenFormIDRecords(&Data, 1, 8, sizeof(Data), {{0, offsetof(ENCOUNTER_ZONE_DATA, pZoneOwner)}});
 #endif
@@ -172,7 +172,7 @@ void BGSEncounterZone::Copy(TESForm* apCopy) {
 
 bool BGSEncounterZone::Compare(TESForm* apCompare) {
     TESForm* v4 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSEncounterZone)(apCompare, RTTI_TESForm, RTTI_BGSEncounterZone));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSEncounterZone)(apCompare, RTTI_TESForm, RTTI_BGSEncounterZone));
     if (!v4) {
         return true;
     }

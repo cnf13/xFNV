@@ -26,7 +26,7 @@ static hkaTrackAnalysis_reverseBitsArray hkaTrackAnalysis_reverseBits{0x0, 0x8, 
 hkaTrackAnalysis::PerTransformTrackAnalysisInput::~PerTransformTrackAnalysisInput() {}
 
 void hkaTrackAnalysis::AnalysisStats::displayReport() {
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     hkError::s_instance->sectionBegin(0x432434A4, "Track Analysis");
     ::new (&apThis) hkErrStream(buf, 512);
@@ -34,79 +34,79 @@ void hkaTrackAnalysis::AnalysisStats::displayReport() {
     hkOstream* v2 = &apThis.operator<<("Total DOFs ");
     v2->operator<<(afValue);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 47);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuea = m_staticPosDOF;
     hkOstream* v3 = &apThis.operator<<("Static position DOFs ");
     v3->operator<<(afValuea);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 48);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValueb = m_staticRotDOF;
     hkOstream* v4 = &apThis.operator<<("Static rotation DOFs ");
     v4->operator<<(afValueb);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 49);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuec = m_staticSclDOF;
     hkOstream* v5 = &apThis.operator<<("Static scale DOFs ");
     v5->operator<<(afValuec);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 50);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValued = m_staticFloatDOF;
     hkOstream* v6 = &apThis.operator<<("Static float DOFs ");
     v6->operator<<(afValued);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 51);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuee = m_clearPosDOF;
     hkOstream* v7 = &apThis.operator<<("Clear position DOFs ");
     v7->operator<<(afValuee);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 52);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuef = m_clearRotDOF;
     hkOstream* v8 = &apThis.operator<<("Clear rotation DOFs ");
     v8->operator<<(afValuef);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 53);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValueg = m_clearSclDOF;
     hkOstream* v9 = &apThis.operator<<("Clear scale DOFs ");
     v9->operator<<(afValueg);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 54);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValueh = m_dynamicPosDOF;
     hkOstream* v10 = &apThis.operator<<("Dynamic position DOFs ");
     v10->operator<<(afValueh);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 55);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuei = m_dynamicRotDOF;
     hkOstream* v11 = &apThis.operator<<("Dynamic rotation DOFs ");
     v11->operator<<(afValuei);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 56);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuej = m_dynamicSclDOF;
     hkOstream* v12 = &apThis.operator<<("Dynamic scale DOFs ");
     v12->operator<<(afValuej);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 57);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     uint32_t afValuek = m_dynamicFloatDOF;
     hkOstream* v13 = &apThis.operator<<("Dynamic float DOFs ");
     v13->operator<<(afValuek);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 58);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     float afValuel = m_ratio;
     hkOstream* v14 = &apThis.operator<<("Redundancy ");
     v14->operator<<(afValuel);
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 59);
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     hkError::s_instance->sectionEnd();
 }
 
@@ -213,7 +213,7 @@ void hkaTrackAnalysis::analyze(
         pStaticFloatDOFs = staticDOFs + (stats.m_staticSclDOF + stats.m_staticRotDOF + stats.m_staticPosDOF);
     }
 
-    FNVD_INLINED_LOCAL(hkLocalArray<float>, minValues, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<float>, minValues, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numFloatTracks) (hkAllocateStack)
         const int32_t numFloatTracks = static_cast<int32_t>(finput.m_numberOfFloatTracks);
@@ -242,7 +242,7 @@ void hkaTrackAnalysis::analyze(
         }
         minValues.m_size = size;
     }
-    FNVD_INLINED_LOCAL(hkLocalArray<float>, maxValues, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<float>, maxValues, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numFloatTracks) (hkAllocateStack)
         const int32_t numFloatTracks = static_cast<int32_t>(finput.m_numberOfFloatTracks);
@@ -326,7 +326,7 @@ void hkaTrackAnalysis::analyzeQsTransform(
     hkBool displayStatsReport
 ) {
     const int32_t numTracks = static_cast<int32_t>(input.m_numberOfTransformTracks);
-    FNVD_INLINED_LOCAL(hkLocalArray<hkQsTransform>, average, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkQsTransform>, average, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkQsTransform>::hkLocalArray(numTracks) (hkAllocateStack)
         average.m_data = nullptr;

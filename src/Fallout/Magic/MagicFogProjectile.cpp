@@ -238,7 +238,7 @@ void MagicFogProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 }
 
 void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     float ffadeTimer;
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
@@ -609,7 +609,7 @@ void MagicFogProjectile::Collide(
     TESObjectREFR* apCollidee,
     bool abFizzle
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     CFilter filter;
     bhkCharacterController* CharController = GetCharController();
     CharController->GetCollisionFilter(&filter);
@@ -638,8 +638,8 @@ bool MagicFogProjectile::IsActive() {
 }
 
 void MagicFogProjectile::BuildAreaEffectGeometry() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
     char v9 = 0;
     NiAVObject* pav = (NiAVObject*)Get3D();
     bool v6 = true;
@@ -724,8 +724,8 @@ void MagicFogProjectile::ClearTargetList() {
 }
 
 void MagicFogProjectile::Init3D() {
-    FNVD_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pn = Get3D();
     if (pn) {
         NiMatrix3 rot;

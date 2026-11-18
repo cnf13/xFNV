@@ -150,9 +150,9 @@ void RouletteMenu::AttachTileByID(int32_t a1, Tile* a2) {
 }
 
 void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (eRouletteState == RouletteMenu::RO_IDLE) {
         switch (a1) {
             case 3: {
@@ -1023,9 +1023,9 @@ void RouletteMenu::SetBetChip() {
 
 void RouletteMenu::Prepare3DElements() {
     NiNode* v17;
-    FNVD_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v23, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v23, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     char modelPath[252];
     TESModelTextureSwap* Model_ = RouletteMenu::pCasino->GetModel(9);
     const char* v1 = Model_->GetModel();
@@ -1202,7 +1202,7 @@ void RouletteMenu::SpinWheel() {
 
 bool RouletteMenu::SetBet(int32_t aiIndex) {
     RouletteMenu::RouletteBet* newBet_2;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (iNumBetsSet >= 10 || aiIndex >= 159 || aiIndex < 0 || !iCurrentBet) {
         return false;
     }
@@ -1825,10 +1825,10 @@ bool RouletteMenu::RemoveBet(int32_t aiIndex) {
         float a2a = fxTranslate;
         NiAVObject* v4 = RouletteMenu::spModel.m_pObject->GetAt(static_cast<uint32_t>(iNextModelIndex + 10));
         v4->SetTranslate(a2a, a3a, 0.0f);
-        NiUpdateData* a4a = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+        NiUpdateData* a4a = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
         NiAVObject* v5 = RouletteMenu::spModel.m_pObject->GetAt(static_cast<uint32_t>(iNextModelIndex));
         v5->Update(*a4a);
-        NiUpdateData* a4b = FNVD_RECONSTRUCT(NiUpdateData)(&v15, 0.0f, 0, 0);
+        NiUpdateData* a4b = XFNV_RECONSTRUCT(NiUpdateData)(&v15, 0.0f, 0, 0);
         NiAVObject* v6 = RouletteMenu::spModel.m_pObject->GetAt(static_cast<uint32_t>(iNextModelIndex + 10));
         v6->Update(*a4b);
     }
@@ -1847,9 +1847,9 @@ void RouletteMenu::RemoveBetNif(int32_t a1) {
     NiUpdateData apMemory;
     pBetGeometry[a1 - 3]->SetTranslate(0.0f, 0.0f, -5.0f);
     pBetShadowGeometry[a1 - 3]->SetTranslate(0.0f, 0.0f, -5.0f);
-    NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
     pBetGeometry[a1 - 3]->Update(*updated);
-    NiUpdateData* a4 = FNVD_RECONSTRUCT(NiUpdateData)(&v5, 0.0f, 0, 0);
+    NiUpdateData* a4 = XFNV_RECONSTRUCT(NiUpdateData)(&v5, 0.0f, 0, 0);
     pBetShadowGeometry[a1 - 3]->Update(*a4);
 }
 

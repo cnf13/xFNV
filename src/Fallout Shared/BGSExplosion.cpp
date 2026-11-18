@@ -49,7 +49,7 @@ bool BGSExplosion::Load(TESFile* apFile) {
         }
         switch (eChunk) {
             case DATA_ID: this->LoadData(apFile, reinterpret_cast<char*>(&Data), 0x34u);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x34 bytes, with a 4-byte form ID in each pointer field.
                 TESFile::WidenFormIDRecords(
                     &Data, 1, 0x34, sizeof(Data),

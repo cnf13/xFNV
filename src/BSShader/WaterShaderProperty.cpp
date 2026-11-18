@@ -502,7 +502,7 @@ BSShaderProperty::RenderPass* WaterShaderProperty::GetWaterPass(NiGeometry* apGe
 }
 
 void WaterShaderProperty::Copy(WaterShaderProperty* pDest) {
-    FNVD_INLINED_LOCAL(NiCloningProcess, arCloneData, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiCloningProcess, arCloneData, std::nullopt, std::nullopt);
     ::new (&arCloneData) NiCloningProcess(257u);
     CopyMembers(pDest, arCloneData);
     if (arCloneData.m_pkCloneMap) {

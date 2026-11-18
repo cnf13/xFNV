@@ -177,7 +177,7 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
         }
     }
     using EntityArray = hkInplaceArray<hkpEntity*, 10, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(EntityArray, actionEntities, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(EntityArray, actionEntities, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkInplaceArray<hkpEntity*, 10>::hkInplaceArray
     actionEntities.m_data = actionEntities.m_storage;
     actionEntities.m_size = 0;
@@ -332,7 +332,7 @@ void hkpSimulationIsland::isValid() {
 // inline: its constructor sets the reference and island counts to 1 and empties the buffer, the split-island array
 // and the two task lists; its destructor frees the array's storage unless it is flagged not to.
 int32_t calcBufferSizeForSolve(hkpSimulationIsland& island) {
-    alignas(16) FNVD_INLINED_LOCAL(hkpBuildJacobianTaskHeader, taskHeader, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkpBuildJacobianTaskHeader, taskHeader, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkpBuildJacobianTaskHeader::hkpBuildJacobianTaskHeader
     taskHeader.m_referenceCount = 1;
     taskHeader.m_numIslandsAfterSplit = 1;
@@ -371,7 +371,7 @@ void hkCpuSplitSimulationIslandJobImpl(
     island->m_splitCheckRequested = 0;
     // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
     using oldEntities_t = hkArray<hkpEntity*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(oldEntities_t, oldEntities, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(oldEntities_t, oldEntities, std::nullopt, std::nullopt);
     oldEntities.m_data = nullptr;
     oldEntities.m_size = 0;
     oldEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;

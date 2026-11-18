@@ -210,7 +210,7 @@ hkResult hkpFirstPersonGun::sweepSphere(
     kInput.m_maxExtraPenetration = 1.1920929e-07f;
     kInput.m_startPointTolerance = 1.1920929e-07f;
     alignas(16)
-        FNVD_INLINED_LOCAL(hkpClosestCdPointCollector, kCollector, hkpClosestCdPointCollector_vftable, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpClosestCdPointCollector, kCollector, hkpClosestCdPointCollector_vftable, std::nullopt);
     // EXE-INLINED 0xC6D170
     kCollector.m_hitPoint.m_contact.m_separatingNormal.m_quad[3] = 3.40282e+38f;
     kCollector.m_earlyOutDistance = 3.40282e+38f;

@@ -38,7 +38,7 @@ hkDisplayCone::hkDisplayCone(
 
 void hkDisplayCone::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) {
     using VertexArray = hkInplaceArray<hkVector4, 256, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(VertexArray, vertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(VertexArray, vertices, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkInplaceArray<hkVector4, 256>::hkInplaceArray
     vertices.m_data = vertices.m_storage;
     vertices.m_size = 0;

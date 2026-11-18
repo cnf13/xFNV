@@ -74,7 +74,7 @@ void FaderManager::AddRoot(NiNode* apNode, float afOneToOneDistance, bool abBelo
     NiFixedString kLightName("FaderNodeLight");
     pLight->SetName(kLightName);
     NiColor kAmbient;
-    pLight->SetAmbientColor(*FNVD_RECONSTRUCT(NiColor)(&kAmbient, 1.0f, 1.0f, 1.0f));
+    pLight->SetAmbientColor(*XFNV_RECONSTRUCT(NiColor)(&kAmbient, 1.0f, 1.0f, 1.0f));
     pNode->AttachChild(pLight, true);
     float fWidth = static_cast<float>(Renderer::GetScreenWidth());
     float fHeight = static_cast<float>(Renderer::GetScreenHeight());
@@ -101,9 +101,9 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     NiNode* faderNode;
     NiPoint2* ptextures;
     NiPoint3* pvertices;
-    FNVD_INLINED_LOCAL(NiFixedString, v42, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v43, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v42, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v43, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPoint2 v51;
     NiPoint2 v52;
     NiPoint2 v53;

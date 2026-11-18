@@ -87,7 +87,7 @@ PathSmootherPOVSearch::PathEdgeVert* PathSmootherPOVSearch::PathEdgeVert::Assign
     PathSmootherPOVSearch::PathEdgeVert* apThis,
     const PathSmootherPOVSearch::PathEdgeVert& arOther
 ) {
-    FNVD_RECONSTRUCT(FastNavMeshVertHandle)(&apThis->Vert, arOther.Vert);
+    XFNV_RECONSTRUCT(FastNavMeshVertHandle)(&apThis->Vert, arOther.Vert);
     apThis->Edge.Copy(arOther.Edge);
     apThis->iOtherSideIndex = arOther.iOtherSideIndex;
     apThis->iThisSideIndex = arOther.iThisSideIndex;
@@ -556,7 +556,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
                 currentEdge.usTriangle, &end, 3.4028235e+38f, 3.4028235e+38f, &fretz
             );
             end.z = fretz;
-            FastNavMeshEdgeLocation* v6 = FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&apMemory, currentEdge, end);
+            FastNavMeshEdgeLocation* v6 = XFNV_RECONSTRUCT(FastNavMeshEdgeLocation)(&apMemory, currentEdge, end);
             apReturnLocation->Copy(*v6);
             afRetPercentPreferred = static_cast<double>(ipreferredCount) / static_cast<double>(icount);
             return true;
@@ -583,7 +583,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
             NavMeshMath::Find2DIntersectionStable(
                 start, end, verts.Vertices[0]->Location, verts.Vertices[1]->Location, &intersection
             );
-            FastNavMeshEdgeLocation* v11 = FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&v16, thisEdge, intersection);
+            FastNavMeshEdgeLocation* v11 = XFNV_RECONSTRUCT(FastNavMeshEdgeLocation)(&v16, thisEdge, intersection);
             apReturnLocation->Copy(*v11);
             afRetPercentPreferred = static_cast<double>(ipreferredCount) / static_cast<double>(icount);
             return false;
@@ -600,7 +600,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
         }
         currentEdge.Copy(otherEdge);
     }
-    FastNavMeshEdgeLocation* v12 = FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&v15, currentEdge, end);
+    FastNavMeshEdgeLocation* v12 = XFNV_RECONSTRUCT(FastNavMeshEdgeLocation)(&v15, currentEdge, end);
     apReturnLocation->Copy(*v12);
     if (icount <= 0) {
         afRetPercentPreferred = 0.0f;
@@ -1066,8 +1066,8 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
         if (i) {
             AngleSinCos* pPrevEntryAngle = &Links.GetAt(static_cast<int32_t>(i - 1)).EntryAngle;
             AngleSinCos angleDiff = Links.GetAt(static_cast<int32_t>(i)).ExitAngle - *pPrevEntryAngle;
-            AngleSinCos* afMin = FNVD_RECONSTRUCT(AngleSinCos)(&v49, 1.5707964f);
-            AngleSinCos* v5 = FNVD_RECONSTRUCT(AngleSinCos)(&v48, -1.5707964f);
+            AngleSinCos* afMin = XFNV_RECONSTRUCT(AngleSinCos)(&v49, 1.5707964f);
+            AngleSinCos* v5 = XFNV_RECONSTRUCT(AngleSinCos)(&v48, -1.5707964f);
             AngleSinCosArc toleranceArc(*v5, *afMin, 0);
             double Angle = angleDiff.GetAngle();
             if (Nodes.GetAt(static_cast<int32_t>(i)).pPOV->fRadius * Angle < 50.0 &&

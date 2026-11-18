@@ -389,12 +389,12 @@ bool MagicItem::IsLoading() {
 }
 
 void MagicItem::FinishedLoading() {
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_6, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_5, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_4, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_6, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_5, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
     if (IsLoading()) {
         EffectItemList* plist_2;

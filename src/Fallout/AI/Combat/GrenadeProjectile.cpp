@@ -113,7 +113,7 @@ void GrenadeProjectile::Initialize() {
 }
 
 void GrenadeProjectile::UpdateProjectile(float afDelta) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
     if (!GetDelete()) {
         if (!bCollisionGroupReset && GetAge() > 1.0) {
             uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();

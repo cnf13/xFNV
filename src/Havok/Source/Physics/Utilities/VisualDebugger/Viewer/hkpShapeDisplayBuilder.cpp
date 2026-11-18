@@ -623,7 +623,7 @@ void hkpShapeDisplayBuilder::addObjectToDebugDisplay(const hkpShape* shape, hkTr
     alignas(hkpShapeDisplayBuilder) uint8_t aBuilderMemory[sizeof(hkpShapeDisplayBuilder)];
     hkpShapeDisplayBuilder* pBuilder = ::new (aBuilderMemory) hkpShapeDisplayBuilder(env);
     // EXE-INLINED none: hkArray<hkDisplayGeometry*>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
     displayGeometries.m_data = nullptr;
     displayGeometries.m_size = 0;
     displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;

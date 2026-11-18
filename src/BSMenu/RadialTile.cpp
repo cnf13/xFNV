@@ -62,7 +62,7 @@ bool RadialTile::SpecialBoundsCheck(float fx, float fy) {
         fMouseDegree_2 = fMouseDegree_2 + 6.28318;
     }
     if (fMouseDegree_2 >= static_cast<double>(fMinDegree) && fMaxDegree >= static_cast<double>(fMouseDegree_2)) {
-        FNVD_INLINED_LOCAL(BSStringT<char>, text, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSStringT<char>, text, std::nullopt, std::nullopt);
         float v5 = fya * fya + fxa * fxa;
         float fMouseMagnitude = std::sqrt(static_cast<double>(v5));
         // MAYBE-INLINED 0xA218DD: a write opening BSStringT<char>'s uses: may be its inlined constructor

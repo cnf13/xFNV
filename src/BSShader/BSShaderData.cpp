@@ -357,7 +357,7 @@ void BSShaderData::CheckTextureAlphas() {
     if (this->pTextureSet) {
         for (BSShaderProperty::TextureTypeEnum i = BSShaderProperty::TEXTYPE_DIFFUSE;
              i < BSShaderProperty::TEXTYPE_SPECULAR; i = static_cast<BSShaderProperty::TextureTypeEnum>(i + 1)) {
-            FNVD_INLINED_LOCAL(NiPointer<NiTexture>, spTexture, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiPointer<NiTexture>, spTexture, std::nullopt, std::nullopt);
             spTexture.m_pObject = nullptr;
             this->pTextureSet->GetTexture(i, spTexture);
             NiTexture* pTexture = spTexture.m_pObject;

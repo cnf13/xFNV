@@ -96,7 +96,7 @@ hkpMoppCode* hkpMoppUtility::buildCodeInternal(
     char* pBuffer = static_cast<char*>(hkMemoryRouter::getInstance().temp().blockAlloc(iBufferSize));
 
     // EXE-INLINED none: hkpMoppCompilerChunkInfo::hkpMoppCompilerChunkInfo
-    FNVD_INLINED_LOCAL(hkpMoppCompilerChunkInfo, kChunkInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpMoppCompilerChunkInfo, kChunkInfo, std::nullopt, std::nullopt);
     kChunkInfo.m_maxChunkSize = 0x200;
     kChunkInfo.m_reindexInfo.m_data = nullptr;
     kChunkInfo.m_reindexInfo.m_size = 0;

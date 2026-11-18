@@ -60,7 +60,7 @@ void NiAVObjectArray_InsertAt(
 }
 
 void NiAVObjectArray_UpdateSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
-    FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
     while (apArray->m_usSize) {
         NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
         bool v3 = apArray->m_pBase[apArray->m_usSize - 1].operator!=(*pNull);
@@ -1012,7 +1012,7 @@ bool NiNode::IsLeftFacingUp(NiAVObject* apObject, char* apString) {
     }
     NiAVObject* pkObject = nullptr;
     if (apString) {
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.SetHandle(NiGlobalStringTable::AddString(apString));
         pkObject = apObject->GetObjectByName(kName);
         // Releases kName's handle, as kName's destructor does.
@@ -1110,7 +1110,7 @@ LABEL_6:
 // NiTArray<NiPointer<NiAVObject>>::Compact and ::UpdateSize. Each null test builds a null NiPointer<NiAVObject> and
 // destroys it.
 void NiAVObjectArray_Compact(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
-    FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
     if (apArray->m_usESize != apArray->m_usSize) {
         if (apArray->m_usESize) {
             uint16_t v6 = 0;

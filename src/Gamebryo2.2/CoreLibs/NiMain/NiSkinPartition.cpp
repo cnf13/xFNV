@@ -774,7 +774,7 @@ bool NiSkinPartition::MakePartitions(
     bool* apbStateChangeA
 ) {
     // Raw storage: the body frees the set's buffer itself, so no C++ destructor may free it again.
-    FNVD_INLINED_LOCAL(NiBoneSetCollection, kBoneSets, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiBoneSetCollection, kBoneSets, std::nullopt, std::nullopt);
     // EXE-INLINED none: NiBoneSetCollection constructor (three stores)
     kBoneSets.m_pBase = nullptr;
     kBoneSets.m_uiAlloced = 0;
@@ -813,7 +813,7 @@ bool NiSkinPartition::MakePartitions(
         Partition* pkPartitions = new Partition[m_uiPartitions];
 
         // Raw storage: the body frees the set's buffer itself, so no C++ destructor may free it again.
-        FNVD_INLINED_LOCAL(TriangleSet, kTriangles, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(TriangleSet, kTriangles, std::nullopt, std::nullopt);
         // EXE-INLINED none: TriangleSet constructor (three stores)
         kTriangles.m_pBase = nullptr;
         kTriangles.m_uiAlloced = 0;
@@ -995,7 +995,7 @@ NiSkinPartition::CreateVertexInteractions(uint32_t uiVertices, const NiSkinData*
         pkVertexInteraction = reinterpret_cast<VertexInteractions*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
             pkVertexInteraction, sizeof(VertexInteractions), static_cast<int32_t>(uiVertices),
-            &fnvd::constructElement<NiSkinPartition::VertexInteractions>
+            &xfnv::constructElement<NiSkinPartition::VertexInteractions>
         );
     }
 
@@ -1053,7 +1053,7 @@ bool NiSkinPartition::RemoveExcessInteractions(
     NiTPointerMapUIntFloat kMap(37);
 
     // Raw storage: the body frees the set's buffer itself, so no C++ destructor may free it again.
-    FNVD_INLINED_LOCAL(NiTPrimitiveSet<uint32_t>, kCoincidentVerts, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiTPrimitiveSet<uint32_t>, kCoincidentVerts, std::nullopt, std::nullopt);
     kCoincidentVerts.m_pBase = nullptr;
     kCoincidentVerts.m_uiAlloced = 0;
     kCoincidentVerts.m_uiUsed = 0;

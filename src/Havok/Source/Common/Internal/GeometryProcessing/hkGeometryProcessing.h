@@ -387,5 +387,5 @@ extern hkClass hkpCenterOfMassChangerModifierConstraintAtomClass;
 extern hkClass hkpViscousSurfaceModifierConstraintAtomClass;
 extern hkClass hkpMovingSurfaceModifierConstraintAtomClass;
 extern hkClass hkpIgnoreModifierConstraintAtomClass;
-inline constexpr fnvd::Vtable hkGeometryProcessingInternals_NearestFeaturePolicy_vftable{};
+inline constexpr xfnv::Vtable hkGeometryProcessingInternals_NearestFeaturePolicy_vftable{};
 inline float f0_25 = 0.25f;

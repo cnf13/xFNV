@@ -24,4 +24,4 @@ public:
 // steam_api.dll's SteamApps (cdecl), through the exe's import slot: the apps interface, or null when Steam is not
 // running.
 using SteamApps_t = ISteamApps* (*)();
-FNVD_IMPORT(SteamApps_t, SteamApps, 0xFDF494);
+XFNV_IMPORT(SteamApps_t, SteamApps, 0xFDF494);

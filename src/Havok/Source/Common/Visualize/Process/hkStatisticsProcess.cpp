@@ -53,9 +53,9 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     }
     using globalFixups_t = hkArray<hkObjectSerialize::GlobalFixup, hkContainerHeapAllocator>;
     using ptrs_t = hkArray<const char*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(globalFixups_t, globalFixups, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ptrs_t, startPtrs, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ptrs_t, endPtrs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(globalFixups_t, globalFixups, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ptrs_t, startPtrs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ptrs_t, endPtrs, std::nullopt, std::nullopt);
     globalFixups.m_capacityAndFlags = hkArrayBase<hkObjectSerialize::GlobalFixup>::DONT_DEALLOCATE_FLAG;
     startPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
     endPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
@@ -103,7 +103,7 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     int32_t totalMonLen = 0;
     {
         using map_t = hkPointerMap<const void*, const char*, hkContainerHeapAllocator>;
-        FNVD_INLINED_LOCAL(map_t, map, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(map_t, map, std::nullopt, std::nullopt);
         map.m_map.m_elem = nullptr;
         map.m_map.m_numElems = 0;
         map.m_map.m_hashMod = -1;

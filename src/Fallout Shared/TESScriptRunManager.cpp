@@ -295,8 +295,8 @@ bool ScriptRunner::EvaluateLine(
     bool abActionInit
 ) {
     double v23;
-    FNVD_INLINED_LOCAL(CExpression, ce_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(CExpression, ce, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CExpression, ce_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CExpression, ce, std::nullopt, std::nullopt);
     double fVal;
     uint32_t uiCurrentOffset;
     uiCurrentOffset = auiDataOffset;

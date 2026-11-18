@@ -22,7 +22,7 @@ bool BGSDefaultObjectManager::Load(TESFile* apFile) {
         }
         if (uiChunkID == DATA_ID) {
             apFile->GetChunkData(pObjectArray, sizeof(pObjectArray));
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file keeps a 4-byte form ID for each object, resolved by InitItem.
             TESFile::WidenFormIDRecords(
                 pObjectArray, apFile->GetChunkSize() / 4 < DO_COUNT ? apFile->GetChunkSize() / 4 : DO_COUNT, 4,

@@ -73,7 +73,7 @@ void bhkPoseArray::LoadBinary(NiStream& arStream) {
             pBoneNames = reinterpret_cast<NiFixedString*>(puiHeader + 1);
             rt::eh_vector_constructor_iterator(
                 pBoneNames, sizeof(NiFixedString), static_cast<int32_t>(uiNameCount),
-                &fnvd::constructElement<NiFixedString>, &fnvd::destructElement<NiFixedString>
+                &xfnv::constructElement<NiFixedString>, &xfnv::destructElement<NiFixedString>
             );
         }
         BoneNameA = pBoneNames;

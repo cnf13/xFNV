@@ -70,8 +70,8 @@ void ImageSpaceEffect::SetEffect(
     ImageSpaceEffectParam* apParam,
     int32_t aiOutput
 ) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceEffect>, spEffect, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceEffect>, spEffect, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     spEffect.m_pObject = apEffect;
     pEffectList.SetAt(static_cast<uint32_t>(aiEffectIndex), spEffect);
     spParam.m_pObject = static_cast<ImageSpaceShaderParam*>(apParam);

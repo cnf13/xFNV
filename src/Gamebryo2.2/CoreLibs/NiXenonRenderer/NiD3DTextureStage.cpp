@@ -190,7 +190,7 @@ void NiD3DTextureStage::ReturnStageToPool() {
         m_pkTextureStageGroup->RemoveAllSamplerStates();
         NiGlobalConstantEntry* pkGlobalEntry = m_pkGlobalEntry;
         if (pkGlobalEntry) {
-            FNVD_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
             NiGlobalStringTable::AcquireHandle(pkGlobalEntry->m_kKey.GetHandle());
             kKey.m_kHandle = pkGlobalEntry->m_kKey.GetHandle();
             NiShaderFactory::ReleaseGlobalShaderConstant(kKey);

@@ -81,7 +81,7 @@ int32_t au_re_InterlockedExchange(volatile int32_t* apTarget, int32_t aiValue) {
 
 // Each element is copied into the local spObject and released at the end of each pass.
 void MoveQueuedNiAVObjects(NiTObjectArray<NiPointer<NiAVObject>>* a1, NiTObjectArray<NiPointer<NiAVObject>>* a2) {
-    FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, spObject, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spObject, std::nullopt, std::nullopt);
     for (uint32_t uiIndex = 0; uiIndex < a1->m_usSize; ++uiIndex) {
         spObject.SetPointer(&a1->operator[](uiIndex));
         if (spObject.m_pObject) {
@@ -105,7 +105,7 @@ void MoveQueuedTempEffects(
     NiTObjectArray<NiPointer<BSTempEffect>>* apSource,
     NiTObjectArray<NiPointer<BSTempEffect>>* apTarget
 ) {
-    FNVD_INLINED_LOCAL(NiPointer<BSTempEffect>, spEffect, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSTempEffect>, spEffect, std::nullopt, std::nullopt);
     for (uint32_t uiIndex = 0; uiIndex < apSource->m_usSize; ++uiIndex) {
         spEffect.SetPointer(&(*apSource)[uiIndex]);
         if (spEffect.m_pObject) {

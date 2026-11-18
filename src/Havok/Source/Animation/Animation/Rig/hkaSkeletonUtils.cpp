@@ -223,7 +223,7 @@ void hkaSkeletonUtils::getDescendants(
     bool includeStart
 ) {
     const int32_t numBones = skeleton.m_bones.m_size;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkBool>, included, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkBool>, included, std::nullopt, std::nullopt);
     included.m_data = nullptr;
     included.m_size = 0;
     included.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
@@ -284,7 +284,7 @@ void hkaSkeletonUtils::getDescendants(
 // unmarked ones.
 void hkaSkeletonUtils::getLeaves(const hkaSkeleton& skeleton, hkArray<int16_t>& leavesOut) {
     const int32_t numBones = skeleton.m_bones.m_size;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkBool>, isParent, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkBool>, isParent, std::nullopt, std::nullopt);
     isParent.m_data = nullptr;
     isParent.m_size = 0;
     isParent.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
@@ -627,21 +627,21 @@ hkResult hkaSkeletonUtils::bindByName(
     int32_t (*compare)(const char*, const char*),
     hkaAnimationBinding& bindingOut
 ) {
-    FNVD_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char buf[512];
     const int32_t numBindings = bindingOut.m_transformTrackToBoneIndices.m_size;
     if (numBindings == 0 || numBindings != anim.m_numberOfTransformTracks) {
         ::new (&kStream) hkErrStream(buf, 512);
         kStream << "Binding is not initiialized";
         hkError::s_instance->message(hkError::MESSAGE_WARNING, 0x654E3435, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 439);
-        FNVD_DESTRUCT(hkOstream)(&kStream);
+        XFNV_DESTRUCT(hkOstream)(&kStream);
         return HK_FAILURE;
     }
     if (anim.m_annotationTracks.m_size != anim.m_numberOfTransformTracks) {
         ::new (&kStream) hkErrStream(buf, 512);
         kStream << "No track names present in animation";
         hkError::s_instance->message(hkError::MESSAGE_WARNING, 0x654E3437, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 446);
-        FNVD_DESTRUCT(hkOstream)(&kStream);
+        XFNV_DESTRUCT(hkOstream)(&kStream);
         return HK_FAILURE;
     }
     const int32_t numBones = skeleton.m_bones.m_size;
@@ -652,7 +652,7 @@ hkResult hkaSkeletonUtils::bindByName(
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x654E3437, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 456
             );
-            FNVD_DESTRUCT(hkOstream)(&kStream);
+            XFNV_DESTRUCT(hkOstream)(&kStream);
             return HK_FAILURE;
         }
     }
@@ -671,7 +671,7 @@ hkResult hkaSkeletonUtils::bindByName(
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x654E3438, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 478
             );
-            FNVD_DESTRUCT(hkOstream)(&kStream);
+            XFNV_DESTRUCT(hkOstream)(&kStream);
             return HK_FAILURE;
         }
     }

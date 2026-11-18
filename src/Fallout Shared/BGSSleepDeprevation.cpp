@@ -28,7 +28,7 @@ bool BGSSleepDeprevationStage::Load(TESFile* apFile) {
 
         if (eChunk == DATA_ID) {
             LoadData(apFile, GetData(), 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the sickness's 4-byte form ID at 4.
             TESFile::WidenFormIDRecords(
                 GetData(), 1, 8, sizeof(BGSSleepDeprevationStageData),

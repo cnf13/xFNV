@@ -31,4 +31,4 @@ public:
     hkInplaceArray<hkpRootCdPoint, 8> m_hits;
 };
 
-inline constexpr fnvd::Vtable hkpAllCdPointCollector_vftable{};
+inline constexpr xfnv::Vtable hkpAllCdPointCollector_vftable{};

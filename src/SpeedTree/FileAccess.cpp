@@ -45,13 +45,13 @@ int32_t CTreeFileAccess::ParseInt() {
 // Reads the length token, then that many bytes appended one at a time.
 std::string CTreeFileAccess::ParseString() {
     std::string strTemp;
-    FNVD_RECONSTRUCT(std::string)(&strTemp);
+    XFNV_RECONSTRUCT(std::string)(&strTemp);
     int32_t nLength = ParseToken();
     for (int32_t i = 0; i < nLength; ++i) {
         strTemp.append(1, static_cast<char>(m_vMemory[m_nIndex++]));
     }
     std::string strReturn;
-    FNVD_RECONSTRUCT(std::string)(&strReturn);
+    XFNV_RECONSTRUCT(std::string)(&strReturn);
     strReturn.assign(strTemp, 0, std::string::npos);
     return strReturn;
 }

@@ -117,7 +117,7 @@ void bhkCylinderShape::SaveBinary(NiStream& arStream) {
 // The base's strings, this class's name, then the cylinder radius and both end points of a cinfo filled from the
 // wrapped shape; the array grows by its grow-by past its allocated size.
 void bhkCylinderShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    FNVD_INLINED_LOCAL(hkCylinderShapeCinfo, kInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkCylinderShapeCinfo, kInfo, std::nullopt, std::nullopt);
     NiPoint3 kPoint;
     hkVector4 kVertex;
     TLSData* v3 = GetThreadTLSData();
@@ -249,7 +249,7 @@ void bhkCylinderShape::CopyMembers(bhkSerializable* apDest, NiCloningProcess& ar
 }
 
 void bhkCylinderShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
-    FNVD_INLINED_LOCAL(hkCylinderShapeCinfo, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkCylinderShapeCinfo, a1, std::nullopt, std::nullopt);
     hkVector4 top_4;
     hkVector4 v14;
     TLSData* v4 = GetThreadTLSData();

@@ -274,7 +274,7 @@ void bhkConstraintChain::CopyMembers(bhkSerializable* pDest, NiCloningProcess& a
     hkConstraintChainCinfo* pInfo = static_cast<hkConstraintChainCinfo*>(pBaseInfo);
 
     // EXE-INLINED none: hkArray<bhkWorldObject*>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<bhkWorldObject*>, kEntities, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<bhkWorldObject*>, kEntities, std::nullopt, std::nullopt);
     kEntities.m_data = nullptr;
     kEntities.m_size = 0;
     kEntities.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<bhkWorldObject*>::DONT_DEALLOCATE_FLAG);

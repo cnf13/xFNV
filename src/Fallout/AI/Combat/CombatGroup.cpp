@@ -76,7 +76,7 @@ SettingT<INISettingCollection> bDebugCombatSearch("bDebugCombatSearch:Combat", f
 SettingT<INISettingCollection> bEncounterZoneTargetRestrict("bEncounterZoneTargetRestrict:Combat", true);
 
 void CombatGroupCluster::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer, CombatGroup* apGroup) {
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The save holds the exe's 16-byte centre: the point, then the space pointer's 32 bits. A pointer means nothing
     // in another process, so the 64-bit program writes 0 there (LoadGame never reads it back), and saves of both
     // widths keep the same bytes.
@@ -102,7 +102,7 @@ using BSSimpleArray_CombatTarget_1024 = BSSimpleArray<CombatTarget, 1024>;
 using BSSimpleArray_CombatMember_1024 = BSSimpleArray<CombatMember, 1024>;
 
 void CombatGroupCluster::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer, CombatGroup* apGroup) {
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The exe's 16-byte centre: the point and a saved pointer's 32 bits, stale in this process; the space stays null
     // (its users test it).
     uint32_t uiSpace;
@@ -806,11 +806,11 @@ bool CombatGroup::AddMember(Actor* apActor) {
         return false;
     }
 
-    CombatMember* v3 = FNVD_RECONSTRUCT(CombatMember)(&apMemory, apActor);
+    CombatMember* v3 = XFNV_RECONSTRUCT(CombatMember)(&apMemory, apActor);
     MemberArray.Add(*v3);
     pCombatManager->NotifyCombatGroupAddedMember(this, apActor);
     if ((bDebugCombatGroups.Bool()) && (apActor->Get3D())) {
-        FNVD_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
         v8 = BSTestObjects::GetColor(iGroupNum);
         NiColor color(v8.r, v8.g, v8.b);
         NiNode* v4 = apActor->Get3D();
@@ -853,7 +853,7 @@ bool CombatGroup::AddTarget(Actor* apActor) {
         return false;
     }
 
-    CombatTarget* v4 = FNVD_RECONSTRUCT(CombatTarget)(&apMemory, apActor, iSearchCount);
+    CombatTarget* v4 = XFNV_RECONSTRUCT(CombatTarget)(&apMemory, apActor, iSearchCount);
     TargetArray.Add(*v4);
     pCombatManager->NotifyCombatGroupAddedTarget(this, apActor);
     return true;
@@ -887,7 +887,7 @@ void CombatGroup::NotifyMemberHit(Actor* apMember, Actor* apAttacker) {
         CombatTarget* pTarget = GetCombatTargetForActor(apAttacker);
         if (pTarget) {
             CombatTimeStamp kTimeStamp;
-            FNVD_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
+            XFNV_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
             pTarget->fLastAttackedMemberTimeStamp = kTimeStamp;
             BGSWorldLocation kLocation;
             pTarget->LastAttackedMemberLocation = *apAttacker->TESObjectREFR::GetWorldLocation(&kLocation);
@@ -1239,7 +1239,7 @@ void CombatGroup::AddSearchLocation(const BGSWorldLocation& arLocation, float af
     uint32_t uiIndex = SearchLocations.AddUninitialized();
     SearchLocations.GetAt(uiIndex).WorldLoc = arLocation;
     CombatTimeStamp kTimeStamp;
-    FNVD_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
+    XFNV_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
     SearchLocations.GetAt(uiIndex).fTimeStamp = kTimeStamp;
     SearchLocations.GetAt(uiIndex).iTargetID = aiTargetID;
     SearchLocations.GetAt(uiIndex).fScore = afScore;
@@ -1620,7 +1620,7 @@ void CombatGroup::BuildSearchTeleportDoorArray() {
             );
         }
     }
-    doorArray.Sort(&fnvd::callFunction<&CompareUInt>);
+    doorArray.Sort(&xfnv::callFunction<&CompareUInt>);
     for (uint32_t i_2 = 0; i_2 < doorArray.iSize; ++i_2) {
         TESObjectREFR* pdoor = doorArray.operator[](i_2);
         uint32_t inumDuplicates = 0;
@@ -1790,7 +1790,7 @@ PathingAvoidNodeArray* CombatGroup::CreateMovementAvoidNodeArray(
                 }
                 float fScalar = fMovementTargetAvoidCost.Float();
                 float* v11 = &fMovementTargetAvoidRadius.Float();
-                PathingAvoidNode* v12 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v17, arPoint, *v11, fScalar);
+                PathingAvoidNode* v12 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v17, arPoint, *v11, fScalar);
                 v26->Add(*v12);
             }
         }
@@ -1828,7 +1828,7 @@ CombatGroup::CreateFleeAvoidNodeArray(Actor* apActor, PathingAvoidNodeArray* apE
             float afCost = fCombatFleeTargetAvoidCost.Float();
             float afRadius = fCombatFleeTargetAvoidRadius.Float();
             NiPoint3* v5 = ecx0.GetPoint();
-            PathingAvoidNode* v6 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v12, *v5, afRadius, afCost);
+            PathingAvoidNode* v6 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v12, *v5, afRadius, afCost);
             v20->Add(*v6);
         }
     }
@@ -1871,7 +1871,7 @@ void CombatGroup::UpdateClusters() {
             // BSMIN is the int instantiation here, so the compare is signed.
             uint32_t imemberCount_2 = BSMIN(static_cast<int32_t>(GetMemberCount()), 63);
             rt::eh_vector_constructor_iterator(
-                clusterData, sizeof(ClusterData), 64, &fnvd::constructElement<ClusterData>
+                clusterData, sizeof(ClusterData), 64, &xfnv::constructElement<ClusterData>
             );
             ourMemset(clusterData, 0, sizeof(clusterData));
             ourMemset(fdistanceSqrArray, 0, sizeof(fdistanceSqrArray));
@@ -2220,7 +2220,7 @@ PathingAvoidNodeArray* CombatGroup::CreateFlankingAvoidNodeArray(
         pavoidNodeArray = pavoidNodeArray_2;
     }
     float v7 = fMovementTargetAvoidCost.Float() * 4.0;
-    PathingAvoidNode* v5 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v9, targetCenter, fradius, v7);
+    PathingAvoidNode* v5 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v9, targetCenter, fradius, v7);
     pavoidNodeArray->Add(*v5);
     return pavoidNodeArray;
 }
@@ -2456,7 +2456,7 @@ void CombatGroup::StartSearch() {
     SearchUpdateTimer.Reset(0.5f);
     SearchAreaUpdateTimer.Reset(fCombatSearchAreaUpdateTime.Float());
     CombatTimeStamp kStarted;
-    FNVD_RECONSTRUCT(CombatTimeStamp)(&kStarted, CombatTimer::GetTimer());
+    XFNV_RECONSTRUCT(CombatTimeStamp)(&kStarted, CombatTimer::GetTimer());
     fSearchStartedTimeStamp = kStarted;
     CombatTimeStamp flastDetectedTargetTimeStamp;
     flastDetectedTargetTimeStamp.~CombatTimeStamp();
@@ -3159,7 +3159,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             CombatSearchLocation* pSearchLocation = &GetSearchLocation(i);
             if (pSearchLocation->WorldLoc.pSpace == pSpace) {
                 // GetColor fills the whole colour.
-                FNVD_INLINED_LOCAL(NiColorA, kColor, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(NiColorA, kColor, std::nullopt, std::nullopt);
                 pSearchLocation->GetColor(&kColor);
                 NiAVObject* pSphere = BSTestObjects::CreateSphere(32.0f, 10, 10, &kColor);
                 pSphere->SetTranslate(pSearchLocation->WorldLoc.Point);

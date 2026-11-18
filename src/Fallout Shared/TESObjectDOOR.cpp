@@ -289,9 +289,9 @@ bool TESObjectDOOR::Activate(
 ) {
     BaseProcess* pprocess_3;
     BaseProcess* pprocess;
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t fdoPunishment_2;
     int32_t fdoPunishment;
     bool blockpick;
@@ -772,7 +772,7 @@ void TESObjectDOOR::AutoDoorCallback(NiAVObject* apDoor3D) {
 }
 
 void TESObjectDOOR::DoorTeleportPlayerArrivalCallback(uintptr_t aiArrivalData) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, SoundHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, SoundHandle, std::nullopt, std::nullopt);
     // The arrival data is the integer field PLAYER_TARGET_LOC::iArrivalFuncData; Activate stored the door reference in
     // it.
     TESObjectREFR* pdoorref = reinterpret_cast<TESObjectREFR*>(aiArrivalData);

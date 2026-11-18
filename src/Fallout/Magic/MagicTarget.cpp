@@ -708,7 +708,7 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
             pTargetName = "{NULL}";
         }
         // GetEffectName fills kName; the local is destroyed, not the pointer returned.
-        FNVD_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
         BSStringT<char>* pName = apActiveEffect->GetEffectItem()->GetEffectName(&kName);
         const char* pEffectName = pName->String();
         const char* pSpellName = apSpell->GetFullName();
@@ -736,7 +736,7 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
         else {
             pTargetName = "{NULL}";
         }
-        FNVD_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
         BSStringT<char>* pName = apActiveEffect->GetEffectItem()->GetEffectName(&kName);
         const char* pEffectName = pName->String();
         const char* pSpellName = apSpell->GetFullName();
@@ -909,7 +909,7 @@ bool MagicTarget::CheckAddEffect(MagicCaster* apCaster, MagicItem* apSpell, Acti
     int32_t iItemMagnitude = pNewEffect->GetEffectItem()->GetMagnitude();
     double dMagnitude = pNewEffect->GetMagnitude();
     const char* pSpellName = apSpell->GetFullName();
-    FNVD_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kName, std::nullopt, std::nullopt);
     BSStringT<char>* pName = pNewEffect->GetEffectItem()->GetEffectName(&kName);
     const char* pEffectName = pName->String();
     Interface::PrintLine(
@@ -1059,8 +1059,8 @@ int32_t MagicTarget::ActiveEffectListCompareFn(ActiveEffect* apCompare1, ActiveE
     float v5;
     float SequenceWeight;
     float LastTimeProcessed;
-    FNVD_INLINED_LOCAL(BSStringT<char>, v9, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, v9, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     char _String1[260];
     char _String2[260];
     EffectItem* pitem = apCompare1->pEffect;

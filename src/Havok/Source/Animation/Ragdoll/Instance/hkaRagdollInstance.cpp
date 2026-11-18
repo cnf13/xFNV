@@ -143,7 +143,7 @@ hkaRagdollInstance* hkaRagdollInstance::clone(hkpConstraintInstance::CloningMode
     const int32_t numBodies = m_rigidBodies.m_size;
     const int32_t numConstraints = m_constraints.m_size;
 
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, newRigidBodies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, newRigidBodies, std::nullopt, std::nullopt);
     newRigidBodies.m_data = nullptr;
     newRigidBodies.m_size = 0;
     newRigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
@@ -170,7 +170,7 @@ hkaRagdollInstance* hkaRagdollInstance::clone(hkpConstraintInstance::CloningMode
     }
     newRigidBodies.m_size = static_cast<uint32_t>(numBodies);
 
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, newConstraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, newConstraints, std::nullopt, std::nullopt);
     newConstraints.m_data = nullptr;
     newConstraints.m_size = 0;
     newConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;

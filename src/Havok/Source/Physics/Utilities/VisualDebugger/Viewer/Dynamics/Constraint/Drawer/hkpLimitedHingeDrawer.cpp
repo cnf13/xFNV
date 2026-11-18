@@ -79,7 +79,7 @@ void hkpLimitedHingeDrawer::drawConstraint(
             );
 
             // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, geometry, std::nullopt, std::nullopt);
+            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, geometry, std::nullopt, std::nullopt);
             geometry.m_data = nullptr;
             geometry.m_size = 0;
             geometry.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;

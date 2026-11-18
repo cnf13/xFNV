@@ -55,7 +55,7 @@ ImageSpaceEffectDepthRadialBlur::~ImageSpaceEffectDepthRadialBlur() {
 void ImageSpaceEffectDepthRadialBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_2;
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(2);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
@@ -148,7 +148,7 @@ ImageSpaceEffectRadialBlur::~ImageSpaceEffectRadialBlur() {
 // One effect with new shader parameters (2 pixel constants): the manager's radial blur shader of the configured level.
 void ImageSpaceEffectRadialBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(1);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));

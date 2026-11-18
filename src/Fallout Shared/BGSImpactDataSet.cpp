@@ -35,7 +35,7 @@ bool BGSImpactDataSet::Load(TESFile* apFile) {
         }
         switch (eChunk) {
             case DATA_ID: apFile->GetChunkData(ppImpactData, 0x30u);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file keeps a 4-byte form ID for each material, resolved by InitItem.
                 TESFile::WidenFormIDRecords(ppImpactData, IMP_MAT_COUNT, 4, sizeof(BGSImpactData*), {{0, 0}});
 #endif
@@ -71,7 +71,7 @@ void ImpactSwap::Load(TESFile* apFile) {
         if (TESChunk == IMPS_ID) {
             ourMemset(&data, 0, sizeof(data));
             apFile->GetChunkData(&data, 12u);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 12 bytes, with 4-byte form IDs at 4 and 8.
             TESFile::WidenFormIDRecords(
                 &data, 1, 12, sizeof(data),
@@ -144,7 +144,7 @@ void BGSImpactDataSet::InitItem() {
 
 void BGSImpactDataSet::Copy(TESForm* apCopy) {
     TESForm* v3 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCopy, RTTI_TESForm, RTTI_BGSImpactDataSet));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCopy, RTTI_TESForm, RTTI_BGSImpactDataSet));
     if (v3) {
         CopyAllComponents(v3);
         ourMemcpy(ppImpactData, &v3[1].cFormType, sizeof(ppImpactData));
@@ -153,7 +153,7 @@ void BGSImpactDataSet::Copy(TESForm* apCopy) {
 
 bool BGSImpactDataSet::Compare(TESForm* apCompare) {
     TESForm* v4 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCompare, RTTI_TESForm, RTTI_BGSImpactDataSet));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCompare, RTTI_TESForm, RTTI_BGSImpactDataSet));
     if (!v4) {
         return true;
     }

@@ -74,7 +74,7 @@ void ContainerMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void ContainerMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!apTarget && aiID >= 0 && aiID < 19) {
         apTarget = pTiles[aiID];
     }
@@ -546,10 +546,10 @@ int32_t ContainerMenu::GetStolenValue(ItemChange* a1, int32_t a2, bool a3) {
 }
 
 void ContainerMenu::PlayReactivityBark(TESTopic* aRelatedTopic) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
     Actor* pactor;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     TESTopicInfo* pInfo = nullptr;
     Actor* pActionActor = (Actor*)pPlayer;
     if (ContainerMenu::pMe->pContainerRef && ContainerMenu::pMe->pContainerRef->IsActor()) {
@@ -664,9 +664,9 @@ bool ContainerMenu::IsWellFormedMenu() {
 }
 
 void ContainerMenu::PlayContainerSound(TESObjectREFR* apContainer, bool abOpenSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     TESSound* psound = nullptr;
     if (apContainer) {
         int32_t FormType = apContainer->GetObjectReference()->GetFormType();
@@ -702,7 +702,7 @@ void ContainerMenu::PlayContainerSound(TESObjectREFR* apContainer, bool abOpenSo
 }
 
 void ContainerMenu::InitContainerMode() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     switch (eContainerMode) {
         case Interface::CMM_STANDARD:
         case Interface::CMM_PICKPOCKET: {
@@ -753,7 +753,7 @@ void ContainerMenu::UpdateItemInList(
     InventoryChanges* apInventory,
     ListBox<ItemChange*>* apListbox
 ) {
-    FNVD_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
     ::new (&pnewItemGroup) BSSimpleList<void*>;
     if ((apInventory) && (apObj) && (apListbox)) {
         apInventory->GetItemGroup(apObj, &pnewItemGroup);
@@ -1112,7 +1112,7 @@ TileMenu* ContainerMenu::Create(TESObjectREFR* apContainer, Interface::CONTAINER
 }
 
 void ContainerMenu::Close() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (ContainerMenu::pMe) {
         ContainerMenu::pMe->m_hCurrentReactivityBark.FadeOutAndRelease(100u);
         switch (ContainerMenu::pMe->eContainerMode) {

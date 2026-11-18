@@ -244,7 +244,7 @@ hkJobQueue::JobStatus hkCpuKdTreeBuildSetupJob(hkJobQueue& jobQueue, hkJobQueue:
         static_cast<const hkpKdTreeBuildSetupJob&>(static_cast<const hkJob&>(nextJobOut));
     // EXE-INLINED none: hkArray::hkArray(T* buffer, int size, int capacity)
     using collidables_t = hkArray<const hkpCollidable*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(collidables_t, collidables, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(collidables_t, collidables, std::nullopt, std::nullopt);
     collidables.m_data = job.m_collidables;
     collidables.m_size = job.m_endIdx;
     collidables.m_capacityAndFlags = job.m_endIdx | hkArrayBase<const hkpCollidable*>::DONT_DEALLOCATE_FLAG;

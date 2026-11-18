@@ -330,7 +330,7 @@ hkIstream& hkIstream::operator>>(uint64_t& u) {
 // The local string buffer gets no destructor of its own, so that its storage is freed only once, by the destruction
 // code below.
 hkIstream& hkIstream::operator>>(hkStringPtr& str) {
-    FNVD_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
     ::new (&s) hkStringBuf;
     this->operator>>(s);
     str.operator=(s.m_string.begin());

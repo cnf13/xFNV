@@ -26,21 +26,21 @@ void BGSWaterCollisionManager::PlaySplashEffects(float afSplashingBodySize, NiPo
     float fScale = 1.0f;
     BSSoundHandle kSound;
     if (fSplashSoundHeavy.Float() < static_cast<double>(afSplashingBodySize)) {
-        FNVD_INLINED_LOCAL(BSSoundHandle, kLarge, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSSoundHandle, kLarge, std::nullopt, std::nullopt);
         kSound = *BSAudio::QInstance().GetSoundHandleByName(
             &kLarge, "CWaterLarge", BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
         );
         fScale = fSplashScale1.Float();
     }
     if (!kSound.IsValid() && fSplashSoundMedium.Float() < static_cast<double>(afSplashingBodySize)) {
-        FNVD_INLINED_LOCAL(BSSoundHandle, kMedium, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSSoundHandle, kMedium, std::nullopt, std::nullopt);
         kSound = *BSAudio::QInstance().GetSoundHandleByName(
             &kMedium, "CWaterMedium", BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
         );
         fScale = fSplashScale2.Float();
     }
     if (!kSound.IsValid() && fSplashSoundLight.Float() < static_cast<double>(afSplashingBodySize)) {
-        FNVD_INLINED_LOCAL(BSSoundHandle, kSmall, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSSoundHandle, kSmall, std::nullopt, std::nullopt);
         kSound = *BSAudio::QInstance().GetSoundHandleByName(
             &kSmall, "CWaterSmall", BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
         );

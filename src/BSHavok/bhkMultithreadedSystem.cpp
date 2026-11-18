@@ -39,7 +39,7 @@ void bhkMultithreadedSystem::InitMTSystem(const uint32_t& arIdToAcquireFor, int3
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
     QuitMTSystem();
     uiMTResourceOwner = arIdToAcquireFor;
-    FNVD_INLINED_LOCAL(hkCpuJobThreadPoolCinfo, ci, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkCpuJobThreadPoolCinfo, ci, std::nullopt, std::nullopt);
     ::new (&ci) hkCpuJobThreadPoolCinfo;
     ci.m_numThreads = iNumThreads.uValue.i;
     hkCpuJobThreadPool* pPoolMemory =

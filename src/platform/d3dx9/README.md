@@ -2,10 +2,10 @@
 
 Portable C++ for the 25 functions of `d3dx9_38.dll` the game imports (their declarations and thunks are in
 `src/Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h/.cpp`, whose D3D9 types it uses: no Windows SDK header). The
-Linux program compiles it by its folder; on Windows it is CMake option `FNVD_D3DX` (off: the program links
+Linux program compiles it by its folder; on Windows it is CMake option `XFNV_D3DX` (off: the program links
 Microsoft's DLL until parity; on: the program links these objects in place of `d3dx9_38.lib`). Its float code
 is never contracted into fused multiply-adds (`-ffp-contract=off` on its sources). It needs zlib's headers; the
-program supplies zlib (`fnvd_zlib`).
+program supplies zlib (`xfnv_zlib`).
 
 ## What it does
 
@@ -38,7 +38,7 @@ device: math on random input, every DDS of the given BSAs, made-up DDS files of 
 `LoadSurfaceFromSurface` both ways, `SaveTextureToFileA` read back by the DLL, the constant tables of every shader in
 the given `.sdp` packages, the profiles on made-up caps.
 
-Build (32-bit Windows, clang-cl): configure with `-DFNVD_D3DX=ON` and build `fnvd_d3dx9_compare`.
+Build (32-bit Windows, clang-cl): configure with `-DXFNV_D3DX=ON` and build `xfnv_d3dx9_compare`.
 Run it under Wine with a Direct3D device (headless: `gamescope --backend headless -- wine ...`):
 
     D3DX9Compare <d3dx9_38.dll> <scratch dir> [-stride N] [-limit N] [-math N] [-wine dll] [-detail file.dds] \

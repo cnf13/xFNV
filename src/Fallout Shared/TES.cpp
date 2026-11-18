@@ -372,7 +372,7 @@ SettingT<RendererSettingCollection> fLODFadeOutMultObjects("fLODFadeOutMultObjec
 // On x64 the shared model-data getter's class (TESActorBaseData) has its field at another offset than m_usVertices, so
 // the field is read directly.
 uint16_t NiGeometry::GetVertexCount() {
-#if FNVD_64BIT
+#if XFNV_64BIT
     return this->m_spModelData.operator->()->m_usVertices;
 #else
     return static_cast<TESActorBaseData*>(static_cast<void*>(this->m_spModelData.operator->()))
@@ -2827,8 +2827,8 @@ void TES::AddTemporaryParticleObjectToCache(NiAVObject* apObject) {
         pArray[0] = 3;
         pspClones = reinterpret_cast<NiPointer<NiAVObject>*>(pArray + 1);
         rt::eh_vector_constructor_iterator(
-            pspClones, sizeof(NiPointer<NiAVObject>), 3, &fnvd::constructElement<NiPointer<NiRefObject>>,
-            &fnvd::destructElement<NiPointer<NiRefObject>>
+            pspClones, sizeof(NiPointer<NiAVObject>), 3, &xfnv::constructElement<NiPointer<NiRefObject>>,
+            &xfnv::destructElement<NiPointer<NiRefObject>>
         );
     }
 

@@ -187,7 +187,7 @@ bool SleepWaitMenu::UpdateSleeping() {
 
 void SleepWaitMenu::SetCurrentTime() {
     const char* pAMPM;
-    FNVD_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
     char Src[268];
     float fHour = appCalendar.GetHour();
     int32_t v9 = static_cast<int32_t>(fHour);
@@ -242,7 +242,7 @@ int32_t SleepWaitMenu::GetClassStatic() {
 
 Tile* SleepWaitMenu::Create(bool abSleep) {
     int32_t v2;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
     int32_t ClassStatic = SleepWaitMenu::GetClassStatic();
     Tile* pold_menu_tile = Menu::GetMenuByClass(ClassStatic);

@@ -274,27 +274,27 @@ void CaravanMenu::DoClick(int32_t a1, Tile* a2) {
 }
 
 void CaravanMenu::DoIdle() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v113, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v114, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v113, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v114, std::nullopt, std::nullopt);
     NiUpdateData v115;
     NiUpdateData v116;
     NiUpdateData v117;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v118, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v119, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v120, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v121, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v122, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v123, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v124, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v125, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v126, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v127, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v118, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v119, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v120, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v121, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v122, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v123, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v124, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v125, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v126, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v127, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     NiUpdateData v130;
     NiUpdateData v131;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     CaravanAIPackage aiPackage;
     int32_t ielaspedMillis = 0;
     float fxAxisRatio = 1.0f;
@@ -708,7 +708,7 @@ void CaravanMenu::DoIdle() {
                 if (i >= FormFlags) {
                     break;
                 }
-                NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&v131, CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&v131, CaravanMenu::fTimeDelta, 1, 0);
                 pListOfBills.operator[](i)->Update(*updated);
             }
             for (int32_t i_2 = iCoinIndexToAnim;; ++i_2) {
@@ -716,7 +716,7 @@ void CaravanMenu::DoIdle() {
                 if (i_2 >= v23) {
                     break;
                 }
-                NiUpdateData* v24 = FNVD_RECONSTRUCT(NiUpdateData)(&v130, CaravanMenu::fTimeDelta, 1, 0);
+                NiUpdateData* v24 = XFNV_RECONSTRUCT(NiUpdateData)(&v130, CaravanMenu::fTimeDelta, 1, 0);
                 pListOfCoins.operator[](i_2)->Update(*v24);
             }
             if (CaravanMenu::fTimeDelta > 1.0) {
@@ -1360,7 +1360,7 @@ void CaravanMenu::DoIdle() {
                     v91->Play(false);
                 }
                 for (int32_t i_4 = 0; i_4 < 7 && pCardTracks[iSelectedTrack][i_4].iSize; ++i_4) {
-                    NiUpdateData* v60 = FNVD_RECONSTRUCT(NiUpdateData)(&v117, CaravanMenu::fTimeDelta, 1, 0);
+                    NiUpdateData* v60 = XFNV_RECONSTRUCT(NiUpdateData)(&v117, CaravanMenu::fTimeDelta, 1, 0);
                     pTrackGeometry[iSelectedTrack][i_4]->Update(*v60);
                 }
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >
@@ -1424,7 +1424,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 }
                 for (int32_t i_9 = iSelectedRow; i_9 < 7 && pCardTracks[iSelectedTrack][i_9].iSize; ++i_9) {
-                    NiUpdateData* v61 = FNVD_RECONSTRUCT(NiUpdateData)(&v116, CaravanMenu::fTimeDelta, 1, 0);
+                    NiUpdateData* v61 = XFNV_RECONSTRUCT(NiUpdateData)(&v116, CaravanMenu::fTimeDelta, 1, 0);
                     pTrackGeometry[iSelectedTrack][i_9]->Update(*v61);
                 }
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >
@@ -1531,7 +1531,7 @@ void CaravanMenu::DoIdle() {
                 }
                 if (!bexit) {
                     for (int32_t i_15 = iSelectedRow; i_15 < 7 && pCardTracks[iSelectedTrack][i_15].iSize; ++i_15) {
-                        NiUpdateData* v64 = FNVD_RECONSTRUCT(NiUpdateData)(&v115, CaravanMenu::fTimeDelta, 1, 0);
+                        NiUpdateData* v64 = XFNV_RECONSTRUCT(NiUpdateData)(&v115, CaravanMenu::fTimeDelta, 1, 0);
                         pTrackGeometry[iSelectedTrack][i_15]->Update(*v64);
                     }
                 }
@@ -1854,9 +1854,9 @@ int32_t CaravanMenu::GetClass() {
 
 bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
     bool bhandled_2;
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     int32_t i;
     using randomints_t = BSSimpleArray<int32_t, 1024>;
     bool bhandled = false;
@@ -2795,7 +2795,7 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         mat = (*&avobj->m_kLocal).m_Rotate;
         pListOfBills.operator[](i)->SetRotate(mat);
         pListOfBills.operator[](i)->SetTranslate(x, y, z);
-        NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&update2, 0.0f, 0, 0);
+        NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&update2, 0.0f, 0, 0);
         pListOfBills.operator[](i)->Update(*updated);
     }
     for (int32_t i_2 = iCoinIndexToAnim;; ++i_2) {
@@ -2821,7 +2821,7 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         mat_2 = (*&avobj_2->m_kLocal).m_Rotate;
         pListOfCoins.operator[](i_2)->SetRotate(mat_2);
         pListOfCoins.operator[](i_2)->SetTranslate(v33, v34, v35);
-        NiUpdateData* v10 = FNVD_RECONSTRUCT(NiUpdateData)(&update2_2, 0.0f, 0, 0);
+        NiUpdateData* v10 = XFNV_RECONSTRUCT(NiUpdateData)(&update2_2, 0.0f, 0, 0);
         pListOfCoins.operator[](i_2)->Update(*v10);
     }
     if (BSMAX(icoins, ibills) > 0) {
@@ -2917,18 +2917,18 @@ bool CaravanMenu::IsWellFormedMenu() {
 }
 
 void CaravanMenu::LoadNifs() {
-    FNVD_INLINED_LOCAL(NiFixedString, v70, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v71, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v72, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v73, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v74, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v75, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v76, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v77, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v78, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v79, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v80, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v70, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v71, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v72, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v73, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v74, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v75, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v76, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v77, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v78, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v79, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v80, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiUpdateData apMemory;
     char Src[268];
     pActiveDeckGeometry = (NiAVObject*)pModelLoader->LoadFile(
@@ -2943,7 +2943,7 @@ void CaravanMenu::LoadNifs() {
     v67->AttachChild(pActiveDeckGeometry, 1);
     intlistbills.Clear(true);
     intlistcoins.Clear(true);
-    NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
     CaravanMenu::spModel.m_pObject->Update(*updated);
     iAnte = BSMIN(iPlayerAnte, iNPCAnte);
     NiControllerManager* Controller =
@@ -3676,11 +3676,11 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
     NiUpdateData v18;
     NiMatrix3 matrot_90_4;
     NiUpdateData v20;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     NiUpdateData v22;
     NiMatrix3 matrot_90_2;
     NiUpdateData apMemory;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     char texturename[260];
     char blockName[268];
     NiMatrix3 cardrot;
@@ -3703,7 +3703,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             SoundHandleByName->Play(false);
             cursorface = pCursors[0];
             pCursors[1]->SetTranslate(0.0f, 0.0f, -50.0f);
-            NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+            NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
             pCursors[1]->Update(*updated);
             matrot_90.MakeZRotation(1.5707964f);
             cardrot = (*&cursorPoint->m_kLocal).m_Rotate;
@@ -3711,7 +3711,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             cardloc = (&cursorPoint->GetWorldBound())->m_kCenter;
             cursorface->SetRotate(cardrot);
             cursorface->SetTranslate(cardloc);
-            NiUpdateData* v5 = FNVD_RECONSTRUCT(NiUpdateData)(&v22, 0.0f, 0, 0);
+            NiUpdateData* v5 = XFNV_RECONSTRUCT(NiUpdateData)(&v22, 0.0f, 0, 0);
             cursorface->Update(*v5);
             cursorface = BSUtilities::GetObjectByName(cursorface, "Add:3");
         }
@@ -3722,7 +3722,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             v15->Play(false);
             cursorface = pCursors[1];
             pCursors[0]->SetTranslate(0.0f, 0.0f, -50.0f);
-            NiUpdateData* v7 = FNVD_RECONSTRUCT(NiUpdateData)(&v20, 0.0f, 0, 0);
+            NiUpdateData* v7 = XFNV_RECONSTRUCT(NiUpdateData)(&v20, 0.0f, 0, 0);
             pCursors[0]->Update(*v7);
             matrot_90_3.MakeZRotation(1.5707964f);
             cardrot = (*&cursorPoint->m_kLocal).m_Rotate;
@@ -3730,7 +3730,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             cardloc = (&cursorPoint->GetWorldBound())->m_kCenter;
             cursorface->SetRotate(cardrot);
             cursorface->SetTranslate(cardloc);
-            NiUpdateData* v8 = FNVD_RECONSTRUCT(NiUpdateData)(&v18, 0.0f, 0, 0);
+            NiUpdateData* v8 = XFNV_RECONSTRUCT(NiUpdateData)(&v18, 0.0f, 0, 0);
             cursorface->Update(*v8);
             cursorface = BSUtilities::GetObjectByName(cursorface, "Remove:3");
         }
@@ -3773,7 +3773,7 @@ void CaravanMenu::SelectWholeTrack(int32_t a1) {
     NiUpdateData apMemory;
     for (int32_t i = 0; i < 7; ++i) {
         pTrackGeometry[a1][i]->SetTranslate(static_cast<float>(0.0), static_cast<float>(0.0), 3.0f);
-        NiUpdateData* a4 = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0, 0, 0);
+        NiUpdateData* a4 = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0, 0, 0);
         pTrackGeometry[a1][i]->Update(*a4);
     }
 }
@@ -3782,7 +3782,7 @@ void CaravanMenu::DeselectWholeTrack(int32_t a1) {
     NiUpdateData apMemory;
     for (int32_t i = 0; i < 7; ++i) {
         pTrackGeometry[a1][i]->SetTranslate(static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(0.0));
-        NiUpdateData* a4 = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0, 0, 0);
+        NiUpdateData* a4 = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0, 0, 0);
         pTrackGeometry[a1][i]->Update(*a4);
     }
 }
@@ -3849,9 +3849,9 @@ void CaravanMenu::HandleTrackSelection(int32_t aiXShift, int32_t aiYShift) {
 }
 
 void CaravanMenu::LoadNewBill(int32_t a1) {
-    FNVD_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v8, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v8, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiControllerSequence* a2;
     int32_t arg0 = BSMIN(a1, 2);
     NiAVObject* a1a = static_cast<NiAVObject*>(pBillGeometry[arg0]->Clone());
@@ -3894,8 +3894,8 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
 }
 
 void CaravanMenu::LoadNewCoin(int32_t a1) {
-    FNVD_INLINED_LOCAL(NiFixedString, v6, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v6, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiControllerSequence* a2;
     int32_t arg0 = BSMIN(a1, 2);
     NiAVObject* a1a = static_cast<NiAVObject*>(pCoinGeometry[arg0]->Clone());
@@ -3935,9 +3935,9 @@ void CaravanMenu::DeselectTrackCard() {
     NiUpdateData v5;
     pCursors[0]->SetTranslate((float)0.0, (float)0.0, (-100.0f));
     pCursors[1]->SetTranslate((float)0.0, (float)0.0, (-100.0f));
-    NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&v5, 0.0, 0, 0);
+    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&v5, 0.0, 0, 0);
     pCursors[0]->Update(*updated);
-    NiUpdateData* v2 = FNVD_RECONSTRUCT(NiUpdateData)(&v4, 0.0, 0, 0);
+    NiUpdateData* v2 = XFNV_RECONSTRUCT(NiUpdateData)(&v4, 0.0, 0, 0);
     pCursors[1]->Update(*v2);
 }
 
@@ -3951,9 +3951,9 @@ int32_t CaravanMenu::CalculateWinningState(int32_t aivalue) {
 
 uint32_t CaravanMenu::LoadNifs2() {
     NiNode* v11;
-    FNVD_INLINED_LOCAL(NiFixedString, a3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, a3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     pTableGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Table.NIF", LOD_MULT_NONE, true, false, false, false
     );
@@ -4180,28 +4180,28 @@ void CaravanMenu::PrepareBettingCurrency() {
 
 void CaravanMenu::PrepareGameMenu() {
     NiUpdateData v81;
-    FNVD_INLINED_LOCAL(NiFixedString, v82, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v83, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v84, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v85, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v86, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v87, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v88, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v89, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v90, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v91, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v92, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v93, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v94, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v95, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v96, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v97, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v98, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v99, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v100, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v101, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v102, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v82, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v83, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v84, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v85, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v86, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v87, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v88, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v89, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v90, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v91, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v92, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v93, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v94, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v95, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v96, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v97, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v98, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v99, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v100, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v101, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v102, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiUpdateData v104;
     NiUpdateData v105;
     NiUpdateData v106;
@@ -4308,18 +4308,18 @@ void CaravanMenu::PrepareGameMenu() {
     v72->AttachChild(pHandGeometry[1], 1);
     for (int32_t i_8 = 0; i_8 < 6; ++i_8) {
         pTrackGrids[i_8]->SetAppCulled(true);
-        NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+        NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
         pTrackGrids[i_8]->Update(*updated);
     }
-    NiUpdateData* v8 = FNVD_RECONSTRUCT(NiUpdateData)(&v107, 0.0f, 0, 0);
+    NiUpdateData* v8 = XFNV_RECONSTRUCT(NiUpdateData)(&v107, 0.0f, 0, 0);
     pCursors[0]->Update(*v8);
-    NiUpdateData* v9 = FNVD_RECONSTRUCT(NiUpdateData)(&v106, 0.0f, 0, 0);
+    NiUpdateData* v9 = XFNV_RECONSTRUCT(NiUpdateData)(&v106, 0.0f, 0, 0);
     pCursors[1]->Update(*v9);
     pCursors[0]->SetTranslate(0.0f, 0.0f, -5.0f);
     pCursors[1]->SetTranslate(0.0f, 0.0f, -5.0f);
-    NiUpdateData* v10 = FNVD_RECONSTRUCT(NiUpdateData)(&v105, 0.0f, 0, 0);
+    NiUpdateData* v10 = XFNV_RECONSTRUCT(NiUpdateData)(&v105, 0.0f, 0, 0);
     pCursors[0]->Update(*v10);
-    NiUpdateData* v11 = FNVD_RECONSTRUCT(NiUpdateData)(&v104, 0.0f, 0, 0);
+    NiUpdateData* v11 = XFNV_RECONSTRUCT(NiUpdateData)(&v104, 0.0f, 0, 0);
     pCursors[1]->Update(*v11);
     for (int32_t i_9 = 0; i_9 < 2; ++i_9) {
         pTimeController = pHandGeometry[i_9]->GetController(&NiControllerManager::ms_RTTI);
@@ -4432,7 +4432,7 @@ void CaravanMenu::PrepareGameMenu() {
             }
         }
     }
-    NiUpdateData* v34 = FNVD_RECONSTRUCT(NiUpdateData)(&v81, 0.0f, 0, 0);
+    NiUpdateData* v34 = XFNV_RECONSTRUCT(NiUpdateData)(&v81, 0.0f, 0, 0);
     CaravanMenu::spModel.m_pObject->Update(*v34);
     for (int32_t i_11 = 0; i_11 < 6; ++i_11) {
         trackInfo[i_11].iValue = 0;
@@ -4513,8 +4513,8 @@ void CaravanMenu::PrepareGameMenu() {
 
 void CaravanMenu::PrepareResultsMenu() {
     const char* apString;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     char Src[268];
     eGameState = CaravanMenu::CA_CAMERA_TO_RESULTS_ANIM;
     if (this->IsFlagSet(CaravanMenu::CAF_PLAYERWIN)) {
@@ -5874,7 +5874,7 @@ Tile* CaravanMenu::Create(
     float afBetPercentage,
     bool abDebugMode
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Tile* pold_menu_tile = Menu::GetMenuByClass(1083);
     g_caravanMenu_InterfaceManager = InterfaceManager::Instance();
     int32_t v5 = pPlayer->GetCaravanCards1()->ItemsInList();

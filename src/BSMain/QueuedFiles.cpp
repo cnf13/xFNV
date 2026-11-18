@@ -150,7 +150,7 @@ QueuedFile::~QueuedFile() {
 }
 
 void QueuedFile::AddChild(QueuedFile* apChild) {
-    FNVD_INLINED_LOCAL(NiPointer<QueuedFile>, spChild, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<QueuedFile>, spChild, std::nullopt, std::nullopt);
     if (!pChildren) {
         QueuedChildren* pNewChildren;
         void* apMemory = MemoryManager_Singleton.Allocate(sizeof(QueuedChildren));
@@ -173,7 +173,7 @@ void QueuedFile::AddChild(QueuedFile* apChild) {
 }
 
 void QueuedFile::AddAdditionalParent(QueuedFile* apAdditionalParent) {
-    FNVD_INLINED_LOCAL(NiPointer<QueuedFile>, spAdditionalParent, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<QueuedFile>, spAdditionalParent, std::nullopt, std::nullopt);
     if (!pAdditionalParents) {
         QueuedParents* pNewParents;
         void* apMemory = MemoryManager_Singleton.Allocate(sizeof(QueuedParents));

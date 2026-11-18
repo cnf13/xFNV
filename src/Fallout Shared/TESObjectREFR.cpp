@@ -918,7 +918,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* Extra = &m_Extra;
     BSExtraData* ExtraData = Extra->GetExtraData(43);
     BSExtraData* apExtra = static_cast<BSExtraData*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraTeleport)(ExtraData, RTTI_BSExtraData, RTTI_ExtraTeleport)
+        XFNV_DYNAMIC_CAST_VOID(ExtraTeleport)(ExtraData, RTTI_BSExtraData, RTTI_ExtraTeleport)
     );
     if (apExtra) {
         BaseExtraList* v5 = &m_Extra;
@@ -927,7 +927,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v6 = &m_Extra;
     BSExtraData* v7 = v6->GetExtraData(55);
     BSExtraData* v45 = static_cast<BSExtraData*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraEnableStateParent)(v7, RTTI_BSExtraData, RTTI_ExtraEnableStateParent)
+        XFNV_DYNAMIC_CAST_VOID(ExtraEnableStateParent)(v7, RTTI_BSExtraData, RTTI_ExtraEnableStateParent)
     );
     if (v45) {
         BaseExtraList* v8 = &m_Extra;
@@ -936,7 +936,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v9 = &m_Extra;
     BSExtraData* v10 = v9->GetExtraData(59);
     BSExtraData* v40 = static_cast<BSExtraData*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraRandomTeleportMarker)(v10, RTTI_BSExtraData, RTTI_ExtraRandomTeleportMarker)
+        XFNV_DYNAMIC_CAST_VOID(ExtraRandomTeleportMarker)(v10, RTTI_BSExtraData, RTTI_ExtraRandomTeleportMarker)
     );
     if (v40) {
         BaseExtraList* v11 = &m_Extra;
@@ -945,7 +945,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v12 = &m_Extra;
     BSExtraData* v13 = v12->GetExtraData(81);
     BSExtraData* v44 =
-        static_cast<BSExtraData*>(FNVD_DYNAMIC_CAST_VOID(ExtraLinkedRef)(v13, RTTI_BSExtraData, RTTI_ExtraLinkedRef));
+        static_cast<BSExtraData*>(XFNV_DYNAMIC_CAST_VOID(ExtraLinkedRef)(v13, RTTI_BSExtraData, RTTI_ExtraLinkedRef));
     if (v44) {
         BaseExtraList* v14 = &m_Extra;
         v14->RemoveExtra(v44, false);
@@ -953,7 +953,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v15 = &m_Extra;
     BSExtraData* v16 = v15->GetExtraData(81);
     BSExtraData* v42 = static_cast<BSExtraData*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraActivateRef)(v16, RTTI_BSExtraData, RTTI_ExtraActivateRef)
+        XFNV_DYNAMIC_CAST_VOID(ExtraActivateRef)(v16, RTTI_BSExtraData, RTTI_ExtraActivateRef)
     );
     if (v42) {
         BaseExtraList* v17 = &m_Extra;
@@ -962,7 +962,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v18 = &m_Extra;
     BSExtraData* v19 = v18->GetExtraData(87);
     BSExtraData* v46 =
-        static_cast<BSExtraData*>(FNVD_DYNAMIC_CAST_VOID(ExtraDecalRefs)(v19, RTTI_BSExtraData, RTTI_ExtraDecalRefs));
+        static_cast<BSExtraData*>(XFNV_DYNAMIC_CAST_VOID(ExtraDecalRefs)(v19, RTTI_BSExtraData, RTTI_ExtraDecalRefs));
     if (v46) {
         BaseExtraList* v20 = &m_Extra;
         v20->RemoveExtra(v46, false);
@@ -970,7 +970,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v21 = &m_Extra;
     BSExtraData* v22 = v21->GetExtraData(60);
     BSExtraData* v41 = static_cast<BSExtraData*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraMerchantContainer)(v22, RTTI_BSExtraData, RTTI_ExtraMerchantContainer)
+        XFNV_DYNAMIC_CAST_VOID(ExtraMerchantContainer)(v22, RTTI_BSExtraData, RTTI_ExtraMerchantContainer)
     );
     if (v41) {
         BaseExtraList* v23 = &m_Extra;
@@ -979,7 +979,7 @@ TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
     BaseExtraList* v24 = &m_Extra;
     BSExtraData* v25 = v24->GetExtraData(99);
     BSExtraData* v43 = static_cast<BSExtraData*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraMultiBoundRef)(v25, RTTI_BSExtraData, RTTI_ExtraMultiBoundRef)
+        XFNV_DYNAMIC_CAST_VOID(ExtraMultiBoundRef)(v25, RTTI_BSExtraData, RTTI_ExtraMultiBoundRef)
     );
     if (v43) {
         BaseExtraList* v26 = &m_Extra;
@@ -2630,7 +2630,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                 }
                 if (!abPlayerhead && Get3D()) {
                     if (abAlwaysPlay) {
-                        FNVD_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
                         aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
                             &kFileHandle, Dst,
                             ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT),
@@ -2638,7 +2638,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                         ));
                     }
                     else {
-                        FNVD_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
                         aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
                             &kFileHandle, Dst,
                             ivoiceEffectFlag |
@@ -2650,7 +2650,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                 }
                 else {
                     if (abAlwaysPlay) {
-                        FNVD_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
                         aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
                             &kFileHandle, Dst,
                             ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT),
@@ -2658,7 +2658,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                         ));
                     }
                     else {
-                        FNVD_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
                         aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
                             &kFileHandle, Dst,
                             ivoiceEffectFlag |
@@ -2697,7 +2697,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                 }
                 // The position is read before the by-value handle argument is built with operator=.
                 NiPoint3 kSpeakerLoc = GetLocationOnReference();
-                FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
                 kArgument.operator=(aSoundHand);
                 Interface::ShowSubtitle(pResponse->cText.pString, kArgument, kSpeakerLoc, apTarget, abForceSubtitles);
             }
@@ -5059,7 +5059,7 @@ void TESObjectREFR::RemoveOwner() {
 }
 
 void TESObjectREFR::SetLinkLine(bool abShow) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiNode* v6 = Get3D();
     if (v6) {
         NiNode* v5 = v6->IsNode();
@@ -5075,10 +5075,10 @@ void TESObjectREFR::SetLinkLine(bool abShow) {
 }
 
 void TESObjectREFR::SetActivateLine(bool abShow) {
-    FNVD_INLINED_LOCAL(NiFixedString, v10, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v13, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v14, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v10, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v14, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPoint3 aStart;
     NiMatrix3 apResult;
     NiPoint3 result;
@@ -7293,7 +7293,7 @@ void TESObjectREFR::InitAnimation() {
                         pManager->ActivateSequence(pFirst, 0, false, 1.0f, 0.0f, nullptr);
                         pFirst->SetOffset(-3.4028235e+38f);
                         NiUpdateData kFirstData;
-                        FNVD_RECONSTRUCT(NiUpdateData)(&kFirstData, pFirst->GetBeginKeyTime(), true, false);
+                        XFNV_RECONSTRUCT(NiUpdateData)(&kFirstData, pFirst->GetBeginKeyTime(), true, false);
                         pNode->Update(kFirstData);
                     }
                     pManager->DeactivateAll(0.0f);
@@ -7464,7 +7464,7 @@ void TESObjectREFR::ApplyAllDecals(bool /*abSetDecalData*/) {
             float fGreen = static_cast<uint8_t>(static_cast<uint16_t>(pDecalData->GetDecalColor()) >> 8) / 255.0;
             float fRed = static_cast<uint8_t>(pDecalData->GetDecalColor()) / 255.0;
             NiColor kColor;
-            kData.fVertexColor = *FNVD_RECONSTRUCT(NiColor)(&kColor, fRed, fGreen, fBlue);
+            kData.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(&kColor, fRed, fGreen, fBlue);
             kData.fDecalDepth = pDecalData->GetDecalDepth();
             kData.fSpecular = pDecalData->GetDecalShininess();
             kData.bAlphaTesting = pDecalData->GetAlphaTesting();
@@ -8277,7 +8277,7 @@ void TESObjectREFR::AttachSound(bool abAttach) {
                     (pLoopingSound->GetData().iFlags & BSGameSound::SOUND_FLAG_LOOP) ? BSGameSound::SOUND_FLAG_LOOP : 0;
                 if (pPrimitive) {
                     // Plays into a temporary handle and copies it into kSound with operator=.
-                    FNVD_INLINED_LOCAL(BSSoundHandle, kBeamSound, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSSoundHandle, kBeamSound, std::nullopt, std::nullopt);
                     uint32_t uiFormID = pLoopingSound->GetFormID();
                     kSound = *BSAudio::QInstance().PlaySound(
                         &kBeamSound, uiFormID,
@@ -8290,7 +8290,7 @@ void TESObjectREFR::AttachSound(bool abAttach) {
                     kSound.SetBeamEnd(kBeamEnd.x, kBeamEnd.y, kBeamEnd.z);
                 }
                 else if (uiLoopFlag) {
-                    FNVD_INLINED_LOCAL(BSSoundHandle, kLoopSound, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSSoundHandle, kLoopSound, std::nullopt, std::nullopt);
                     const NiPoint3* pLocation = &GetLocationOnReference();
                     uint32_t uiFormID = pLoopingSound->GetFormID();
                     kSound = *BSAudio::QInstance().PlaySound(
@@ -8350,7 +8350,7 @@ void TESObjectREFR::UpdateAddonNodeSounds(bool abDetachAll) {
 }
 
 void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDetachAll) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (apRoot) {
         if (apRoot->GetAppCulled()) {
             abDetachAll = true;
@@ -9910,9 +9910,9 @@ bool TESObjectREFR::GetDismembered(BGSBodyPart::LIMB_ENUM aeLimb) {
 
 void TESObjectREFR::ResetAnimation_Old() {
     NiTimeController* v7;
-    FNVD_INLINED_LOCAL(NiFixedString, v12, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* v28 = TESObjectREFR::Get3D();
     NiControllerManager* v26 = nullptr;
     if (v28) {
@@ -10289,9 +10289,9 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
 
 void TESObjectREFR::ResetAnimation() {
     NiTimeController* po_3;
-    FNVD_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pobj3D = TESObjectREFR::Get3D();
     NiControllerManager* pmanager = nullptr;
     bool v33 = false;
@@ -10606,7 +10606,7 @@ void TESObjectREFR::ShowPrimitive(bool abShow) {
     BGSPrimitive* pprim = (&m_Extra)->GetPrimitive();
     if ((pprim) && (pprim->GetNode())) {
         float fAlpha;
-        FNVD_INLINED_LOCAL(NiColorA, clr, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, clr, std::nullopt, std::nullopt);
         clr = pprim->GetColor();
         if (abShow) {
             fAlpha = 0.2f;
@@ -12429,7 +12429,7 @@ float bhkRigidBody::GethkMaxLinearVelocity() {
         }
         else {
             float f = pb->getMaxLinearVelocity();
-            p_m_maxLinearVelocity = FNVD_RECONSTRUCT(hkUFloat8)(&apMemory, f);
+            p_m_maxLinearVelocity = XFNV_RECONSTRUCT(hkUFloat8)(&apMemory, f);
         }
         return p_m_maxLinearVelocity->operator float();
     }

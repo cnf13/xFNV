@@ -113,7 +113,7 @@ void bhkDashpotAction::SaveBinary(NiStream& arStream) {
 }
 
 void bhkDashpotAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    FNVD_INLINED_LOCAL(hkDashpotActionCinfo, arCinfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDashpotActionCinfo, arCinfo, std::nullopt, std::nullopt);
     TLSData* v2 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v2->eMemContext;
     v2->eMemContext = MEM_CONTEXT_HAVOK;

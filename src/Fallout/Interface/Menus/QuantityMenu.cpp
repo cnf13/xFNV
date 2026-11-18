@@ -152,7 +152,7 @@ void QuantityMenu::Close() {
 }
 
 TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback afpCallback, int32_t aiStartAmount) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
     bool boverMenu = false;
     int32_t iClass = GetClass_007ABDA0();

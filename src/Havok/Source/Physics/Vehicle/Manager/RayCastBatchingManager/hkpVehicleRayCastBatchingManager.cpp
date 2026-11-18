@@ -177,7 +177,7 @@ void hkpVehicleRayCastBatchingManager::stepVehiclesUsingCastResults(
     getRaycastBatchFromBuffer(buffer, numJobs, raycastBatch);
     const hkpShapeRayCastCommand* command = raycastBatch.m_commandStorage;
 
-    FNVD_INLINED_LOCAL(
+    XFNV_INLINED_LOCAL(
         hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>, cdInfo, std::nullopt, std::nullopt
     );
     cdInfo.m_data = nullptr;

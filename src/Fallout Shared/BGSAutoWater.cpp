@@ -37,7 +37,7 @@
 #include <xmmintrin.h>
 
 NiPoint3* NiGeometry::GetVertices() {
-#if FNVD_64BIT
+#if XFNV_64BIT
     return this->m_spModelData.operator->()->m_pkVertex;
 #else
     return static_cast<NiPoint3*>(
@@ -610,8 +610,8 @@ void BGSAutoWater::GeneratePolygons(TESObjectCELL* apCell) {
 // Creates a placeable water reference for each polygon of the list that has its geometry, then removes and deletes the
 // polygon.
 void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
-    FNVD_INLINED_LOCAL(NiFixedString, kWaterName, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, kNodeName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kWaterName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kNodeName, std::nullopt, std::nullopt);
     AutoMemContext kMemContext(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSAutoWater.cpp", 717
     );

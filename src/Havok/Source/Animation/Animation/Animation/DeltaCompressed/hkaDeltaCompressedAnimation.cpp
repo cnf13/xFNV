@@ -237,7 +237,7 @@ void hkaDeltaCompressedAnimation::samplePartialTracks(
     const float oneMinusDelta = 1.0f - delta;
     const int32_t numSampled = static_cast<int32_t>(numDToSample);
     // The stack allocator's bytes are untyped memory; each local array keeps its floats there.
-    FNVD_INLINED_LOCAL(hkLocalArray<float>, sampled, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<float>, sampled, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numDToSample) (hkAllocateStack)
         sampled.m_data = nullptr;
@@ -251,7 +251,7 @@ void hkaDeltaCompressedAnimation::samplePartialTracks(
         sampled.m_localMemory = sampled.m_data;
     }
     sampled.setSize(numSampled);
-    FNVD_INLINED_LOCAL(hkLocalArray<float>, decompressed, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<float>, decompressed, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numDToSample * m_blockSize) (hkAllocateStack)
         const int32_t numDecompressed = numSampled * m_blockSize;

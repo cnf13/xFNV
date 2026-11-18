@@ -188,15 +188,15 @@ NiPixelData* NiTextureCodec::ExpandCompressedData(const NiPixelData& kSrc) {
     switch (kSrc.m_kPixelFormat.m_eFormat) {
         case NiPixelFormat::FORMAT_DXT1:
             m_pfnAlphaBlockDecoder = nullptr;
-            m_pfnColorBlockDecoder = &fnvd::callMember<&NiTextureCodec::DecodeColorAlphaBlock>;
+            m_pfnColorBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeColorAlphaBlock>;
             break;
         case NiPixelFormat::FORMAT_DXT3:
-            m_pfnAlphaBlockDecoder = &fnvd::callMember<&NiTextureCodec::DecodeT3AlphaBlock>;
-            m_pfnColorBlockDecoder = &fnvd::callMember<&NiTextureCodec::DecodeColorBlock>;
+            m_pfnAlphaBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeT3AlphaBlock>;
+            m_pfnColorBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeColorBlock>;
             break;
         case NiPixelFormat::FORMAT_DXT5:
-            m_pfnAlphaBlockDecoder = &fnvd::callMember<&NiTextureCodec::DecodeT5AlphaBlock>;
-            m_pfnColorBlockDecoder = &fnvd::callMember<&NiTextureCodec::DecodeColorBlock>;
+            m_pfnAlphaBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeT5AlphaBlock>;
+            m_pfnColorBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeColorBlock>;
             break;
         default: return nullptr;
     }

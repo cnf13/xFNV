@@ -20,7 +20,7 @@ using FARPROC = int(WINAPI*)();
 // same locked instructions as Windows'). std::atomic_ref takes the object as non-volatile, so the volatile the SDK
 // spells is cast away; every target is naturally aligned, which is atomic_ref's requirement for these sizes. The
 // typed views (UInt32, Int32, SizeT, 32, Ptr) are src's names for the SDK function at the field's type.
-namespace fnvd::sync {
+namespace xfnv::sync {
     template <class T>
     inline std::atomic_ref<T> Atomic(volatile T* apTarget) {
         return std::atomic_ref<T>(*const_cast<T*>(apTarget));
@@ -35,46 +35,46 @@ namespace fnvd::sync {
     inline int32_t Added(int32_t aiOld, int32_t aiDelta) {
         return static_cast<int32_t>(static_cast<uint32_t>(aiOld) + static_cast<uint32_t>(aiDelta));
     }
-} // namespace fnvd::sync
+} // namespace xfnv::sync
 
 // Each increment and decrement returns the new value. There is no `volatile long*` form: `long` is 64 bits on
 // Linux, over the SDK's 32-bit LONG; a count goes through the view of its own type.
 inline int32_t InterlockedIncrementUInt32(volatile uint32_t* lpAddend) {
-    return static_cast<int32_t>(fnvd::sync::Atomic(lpAddend).fetch_add(1) + 1);
+    return static_cast<int32_t>(xfnv::sync::Atomic(lpAddend).fetch_add(1) + 1);
 }
 inline int32_t InterlockedDecrementUInt32(volatile uint32_t* lpAddend) {
-    return static_cast<int32_t>(fnvd::sync::Atomic(lpAddend).fetch_sub(1) - 1);
+    return static_cast<int32_t>(xfnv::sync::Atomic(lpAddend).fetch_sub(1) - 1);
 }
 // Signed counts (BSSemaphore::iCount, the PDB's volatile int).
 inline int32_t InterlockedIncrementInt32(volatile int32_t* lpAddend) {
-    return fnvd::sync::Added(fnvd::sync::Atomic(lpAddend).fetch_add(1), 1);
+    return xfnv::sync::Added(xfnv::sync::Atomic(lpAddend).fetch_add(1), 1);
 }
 inline int32_t InterlockedDecrementInt32(volatile int32_t* lpAddend) {
-    return fnvd::sync::Added(fnvd::sync::Atomic(lpAddend).fetch_sub(1), -1);
+    return xfnv::sync::Added(xfnv::sync::Atomic(lpAddend).fetch_sub(1), -1);
 }
 // NiString's size_t buffer header (its reference count slot).
 inline size_t InterlockedDecrementSizeT(volatile size_t* lpAddend) {
-    return fnvd::sync::Atomic(lpAddend).fetch_sub(1) - 1;
+    return xfnv::sync::Atomic(lpAddend).fetch_sub(1) - 1;
 }
 // The 32-bit compare-and-exchange, typed for state and count fields.
 inline int32_t InterlockedCompareExchange32(volatile int32_t* lpDestination, int32_t lExchange, int32_t lComparand) {
-    return fnvd::sync::CompareExchange(lpDestination, lExchange, lComparand);
+    return xfnv::sync::CompareExchange(lpDestination, lExchange, lComparand);
 }
 // Unsigned lock words (BSReadWriteLock::uiLock, the PDB's unsigned int).
 inline uint32_t
 InterlockedCompareExchangeUInt32(volatile uint32_t* lpDestination, uint32_t lExchange, uint32_t lComparand) {
-    return fnvd::sync::CompareExchange(lpDestination, lExchange, lComparand);
+    return xfnv::sync::CompareExchange(lpDestination, lExchange, lComparand);
 }
 // Node pointers (the lock-free queues' head and tail words): Windows' InterlockedCompareExchangePointer.
 inline void* InterlockedCompareExchangePtr(void* volatile* lpDestination, void* lExchange, void* lComparand) {
-    return fnvd::sync::CompareExchange(lpDestination, lExchange, lComparand);
+    return xfnv::sync::CompareExchange(lpDestination, lExchange, lComparand);
 }
 // Exchanges: each returns the target's old value.
 inline int32_t InterlockedExchange(volatile int32_t* Target, int32_t Value) {
-    return fnvd::sync::Atomic(Target).exchange(Value);
+    return xfnv::sync::Atomic(Target).exchange(Value);
 }
 inline int32_t InterlockedExchangeAdd(volatile int32_t* Addend, int32_t Value) {
-    return fnvd::sync::Atomic(Addend).fetch_add(Value);
+    return xfnv::sync::Atomic(Addend).fetch_add(Value);
 }
 
 // Critical sections: the section's std::recursive_mutex (winnt.h) lives from the initialisation to the deletion.
@@ -106,7 +106,7 @@ inline void LeaveCriticalSection(_RTL_CRITICAL_SECTION* lpCriticalSection) {
 // indices. As on Windows, a newly allocated index reads null in every thread: each index has a generation, bumped
 // when it is freed, and a value stored under an older generation reads as null.
 inline constexpr uint32_t TLS_OUT_OF_INDEXES = 0xFFFFFFFF;
-namespace fnvd::tls {
+namespace xfnv::tls {
     inline constexpr uint32_t kSlotCount = 1088;
     struct Slot {
         void* pValue;
@@ -115,12 +115,12 @@ namespace fnvd::tls {
     inline thread_local Slot tSlots[kSlotCount];
     inline std::atomic<uint32_t> aAllocated[kSlotCount / 32];
     inline std::atomic<uint32_t> aGeneration[kSlotCount];
-} // namespace fnvd::tls
+} // namespace xfnv::tls
 
 // A new index (DWORD), TLS_OUT_OF_INDEXES when all are taken.
 inline uint32_t TlsAlloc() {
-    for (uint32_t uiWord = 0; uiWord < fnvd::tls::kSlotCount / 32; ++uiWord) {
-        std::atomic<uint32_t>& rBits = fnvd::tls::aAllocated[uiWord];
+    for (uint32_t uiWord = 0; uiWord < xfnv::tls::kSlotCount / 32; ++uiWord) {
+        std::atomic<uint32_t>& rBits = xfnv::tls::aAllocated[uiWord];
         uint32_t uiBits = rBits.load(std::memory_order_relaxed);
         while (uiBits != 0xFFFFFFFF) {
             uint32_t uiBit = static_cast<uint32_t>(std::countr_one(uiBits));
@@ -135,34 +135,34 @@ inline uint32_t TlsAlloc() {
 }
 // BOOL: 0 for an index that is not allocated.
 inline int32_t TlsFree(uint32_t dwTlsIndex) {
-    if (dwTlsIndex >= fnvd::tls::kSlotCount) {
+    if (dwTlsIndex >= xfnv::tls::kSlotCount) {
         return 0;
     }
     uint32_t uiMask = 1u << (dwTlsIndex % 32);
-    std::atomic<uint32_t>& rBits = fnvd::tls::aAllocated[dwTlsIndex / 32];
+    std::atomic<uint32_t>& rBits = xfnv::tls::aAllocated[dwTlsIndex / 32];
     if (!(rBits.load(std::memory_order_relaxed) & uiMask)) {
         return 0;
     }
-    fnvd::tls::aGeneration[dwTlsIndex].fetch_add(1, std::memory_order_relaxed);
+    xfnv::tls::aGeneration[dwTlsIndex].fetch_add(1, std::memory_order_relaxed);
     rBits.fetch_and(~uiMask, std::memory_order_release);
     return 1;
 }
 inline void* TlsGetValue(uint32_t dwTlsIndex) {
-    if (dwTlsIndex >= fnvd::tls::kSlotCount) {
+    if (dwTlsIndex >= xfnv::tls::kSlotCount) {
         return nullptr;
     }
-    const fnvd::tls::Slot& rSlot = fnvd::tls::tSlots[dwTlsIndex];
-    if (rSlot.uiGeneration != fnvd::tls::aGeneration[dwTlsIndex].load(std::memory_order_relaxed)) {
+    const xfnv::tls::Slot& rSlot = xfnv::tls::tSlots[dwTlsIndex];
+    if (rSlot.uiGeneration != xfnv::tls::aGeneration[dwTlsIndex].load(std::memory_order_relaxed)) {
         return nullptr;
     }
     return rSlot.pValue;
 }
 // BOOL: 0 for an index out of range.
 inline int32_t TlsSetValue(uint32_t dwTlsIndex, void* lpTlsValue) {
-    if (dwTlsIndex >= fnvd::tls::kSlotCount) {
+    if (dwTlsIndex >= xfnv::tls::kSlotCount) {
         return 0;
     }
-    fnvd::tls::tSlots[dwTlsIndex] = {lpTlsValue, fnvd::tls::aGeneration[dwTlsIndex].load(std::memory_order_relaxed)};
+    xfnv::tls::tSlots[dwTlsIndex] = {lpTlsValue, xfnv::tls::aGeneration[dwTlsIndex].load(std::memory_order_relaxed)};
     return 1;
 }
 

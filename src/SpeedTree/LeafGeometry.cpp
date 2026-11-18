@@ -520,8 +520,8 @@ void CLeafGeometry::InitLods(
             *pCookie = uiCount;
             rt::eh_vector_constructor_iterator(
                 pCookie + 1, sizeof(SLodGeometry), static_cast<int32_t>(uiCount),
-                &fnvd::constructElement<CLeafGeometry::SLodGeometry>,
-                &fnvd::destructElement<CLeafGeometry::SLodGeometry>
+                &xfnv::constructElement<CLeafGeometry::SLodGeometry>,
+                &xfnv::destructElement<CLeafGeometry::SLodGeometry>
             );
             pLods = static_cast<SLodGeometry*>(static_cast<void*>(pCookie + 1));
         }

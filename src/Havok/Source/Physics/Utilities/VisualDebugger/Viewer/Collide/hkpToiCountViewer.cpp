@@ -53,7 +53,7 @@ hkpToiCountViewer::~hkpToiCountViewer() {
 // Stops counting the bodies of the world (collected first, then unhooked and dropped from the map) and stops
 // listening to the world.
 void hkpToiCountViewer::worldRemovedCallback(hkpWorld* w) {
-    FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, entitiesToRemove, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entitiesToRemove, std::nullopt, std::nullopt);
     entitiesToRemove.m_data = nullptr;
     entitiesToRemove.m_size = 0;
     entitiesToRemove.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
@@ -246,7 +246,7 @@ void hkpToiCountViewer::displayCountForBody(hkpRigidBody* body, hkpToiCountViewe
     if (m_toiCounts.isValid(it)) {
         uint32_t value = m_toiCounts.m_map.m_elem[it].val;
         uint32_t numRecent = value >> 24;
-        FNVD_INLINED_LOCAL(hkStringBuf, str, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkStringBuf, str, std::nullopt, std::nullopt);
         ::new (&str) hkStringBuf;
         uint32_t numToi = value & 0xFFFFFF;
         if (numRecent) {

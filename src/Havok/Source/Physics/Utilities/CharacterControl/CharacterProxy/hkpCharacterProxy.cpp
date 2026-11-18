@@ -284,7 +284,7 @@ void hkpCharacterProxy::updateManifold(
 
     // EXE-INLINED none: hkLocalArray<hkpRootCdPoint>::hkLocalArray(numStartHits) (hkAllocateStack)
     const int32_t numStartHits = startPointCollector.m_hits.m_size;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpRootCdPoint>, startPointHits, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpRootCdPoint>, startPointHits, std::nullopt, std::nullopt);
     hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
     void* pBlock = stack.m_next.m_storage;
     stack.m_next.m_storage =
@@ -1262,7 +1262,7 @@ hkpShapePhantom* hkpCharacterProxy::getShapePhantom() {
 // back as bytes.
 void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSurfaceInfoDeprecated& ground) {
     HK_TIMER_BEGIN("checkSupport", nullptr);
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpSurfaceConstraintInfo>, constraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpSurfaceConstraintInfo>, constraints, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInfo>::hkLocalArray (hkAllocateStack)
         const int32_t iCapacity = m_manifold.m_size + m_userPlanes + 10;
@@ -1290,7 +1290,7 @@ void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSu
         }
     }
     // The solver's output per constraint.
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpSurfaceConstraintInteraction>, interactions, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpSurfaceConstraintInteraction>, interactions, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInteraction>::hkLocalArray (hkAllocateStack)
         const int32_t iCapacity = constraints.m_size + m_userPlanes;

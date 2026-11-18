@@ -115,7 +115,7 @@ void NiControllerManager::LinkObject(NiStream& kStream) {
         // The NiPointer temporary's reference is taken and released without the class's null tests, since the owner
         // test above already dereferences pkSequence. The temporary runs no C++ constructor or destructor, so the
         // reference is taken and released once each.
-        FNVD_INLINED_LOCAL(NiPointer<NiControllerSequence>, kElement, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPointer<NiControllerSequence>, kElement, std::nullopt, std::nullopt);
         kElement.m_pObject = pkSequence;
         NiIncRefCount(pkSequence);
         m_kSequenceArray.AddFirstEmpty(kElement);
@@ -310,7 +310,7 @@ NiControllerSequence* NiControllerManager::CreateTempBlendSequence(
     if (!pkTempSequence) {
         void* pvMem = NiMemObject::operator new(sizeof(NiControllerSequence));
         if (pvMem) {
-            FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
             kName.SetHandle(NiGlobalStringTable::AddString("__TempBlendSequence__"));
             pkTempSequence = ::new (pvMem) NiControllerSequence(kName, uiArraySize, 12);
             // EXE-INLINED none: ~NiFixedString of the name temporary

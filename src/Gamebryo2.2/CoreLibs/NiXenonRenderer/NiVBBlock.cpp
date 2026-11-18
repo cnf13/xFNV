@@ -100,7 +100,7 @@ uint32_t NiVBBlock::FreeChip(uint32_t uiChipIndex) {
 }
 
 void NiVBBlock::DestroyChipArray() {
-    FNVD_DESTRUCT_AS(DestructInlined, NiTArray<NiVBChip*, NiTMallocInterface<NiVBChip*>>)(&m_apkChips);
+    XFNV_DESTRUCT_AS(DestructInlined, NiTArray<NiVBChip*, NiTMallocInterface<NiVBChip*>>)(&m_apkChips);
 }
 
 // Each chip's vertex buffer is cleared before the chip is freed.

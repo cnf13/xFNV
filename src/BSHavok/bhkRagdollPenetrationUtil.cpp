@@ -115,7 +115,7 @@ hkBool* bhkRagdollPenetrationUtil::castRay(
     hkVector4& arHitNormalWS
 ) {
     bool bFound = false;
-    FNVD_INLINED_LOCAL(hkpWorldRayCastInput, sinput, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpWorldRayCastInput, sinput, std::nullopt, std::nullopt);
     // EXE-INLINED 0x4A3CC0
     sinput.m_enableShapeCollectionFilter.m_bool = false;
     sinput.m_filterInfo = 0;
@@ -187,7 +187,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
     for (uint32_t ui = 0; ui < systemRoots.iSize; ++ui) {
         // EXE-INLINED none: hkLocalArray<hkpRigidBody *>::hkLocalArray(64) (hkAllocateStack); 64 pointers fill whole
         // 128-byte blocks, so the stack block is not rounded up.
-        FNVD_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rbarray, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rbarray, std::nullopt, std::nullopt);
         rbarray.m_data = nullptr;
         rbarray.m_size = 0;
         rbarray.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
@@ -198,7 +198,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
         rbarray.m_capacityAndFlags = 64 | hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
         rbarray.m_localMemory = rbarray.m_data;
         // EXE-INLINED none: hkLocalArray<hkpConstraintInstance *>::hkLocalArray(64) (hkAllocateStack)
-        FNVD_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constarray, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constarray, std::nullopt, std::nullopt);
         constarray.m_data = nullptr;
         constarray.m_size = 0;
         constarray.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
@@ -289,7 +289,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
 
                         // The bounding phantom, in the ragdoll's system group on the char controller layer.
                         // EXE-INLINED none: hkAabbPhantomCinfo::hkAabbPhantomCinfo
-                        FNVD_INLINED_LOCAL(hkAabbPhantomCinfo, cinfo, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(hkAabbPhantomCinfo, cinfo, std::nullopt, std::nullopt);
                         cinfo.m_properties.m_data = nullptr;
                         cinfo.m_properties.m_size = 0;
                         cinfo.m_properties.m_capacityAndFlags =
@@ -474,7 +474,7 @@ void bhkRagdollPenetrationUtil::Update() {
         }
 
         // EXE-INLINED none: hkaPose::hkaPose(const hkaSkeleton*)
-        FNVD_INLINED_LOCAL(hkaPose, kPose, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkaPose, kPose, std::nullopt, std::nullopt);
         kPose.m_skeleton = ActiveSystems.pBuffer[i]->pRagdollInstance->m_skeleton;
         kPose.m_localPose.m_data = nullptr;
         kPose.m_localPose.m_size = 0;
@@ -846,7 +846,7 @@ void bhkRagdollPenetrationUtil::AddToArrays(
     }
     bool bcontainsBreakable = false;
     using conA_t = hkArray<hkpConstraintInstance*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(conA_t, conA, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(conA_t, conA, std::nullopt, std::nullopt);
     conA.m_data = nullptr;
     conA.m_size = 0;
     conA.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
@@ -1025,7 +1025,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
     int32_t iNumLeaves = static_cast<int32_t>(arLeaves.iSize);
     // EXE-INLINED none: hkArray<int, hkContainerHeapAllocator>::hkArray(int)
     hkMemoryAllocator* pLeafHeap = hkMemoryRouter::getInstance().m_heap;
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, leafIdxA, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, leafIdxA, std::nullopt, std::nullopt);
     leafIdxA.m_data = nullptr;
     if (iNumLeaves) {
         leafIdxA.m_data = pLeafHeap->_bufAlloc<int32_t>(iNumLeaves);
@@ -1074,7 +1074,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
                 pBoneName->operator=(hkString::strDup(rbodyName));
             }
             else {
-                alignas(16) FNVD_INLINED_LOCAL(hkErrStream, ostr, std::nullopt, std::nullopt);
+                alignas(16) XFNV_INLINED_LOCAL(hkErrStream, ostr, std::nullopt, std::nullopt);
                 char assertBuf[512];
                 ::new (&ostr) hkErrStream(assertBuf, 512);
                 ostr.operator<<("Rigid Body name could not be found");
@@ -1082,7 +1082,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBACC14), assertBuf,
                     "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkRagdollPenetrationUtil.cpp", 721
                 );
-                FNVD_DESTRUCT(hkOstream)(&ostr);
+                XFNV_DESTRUCT(hkOstream)(&ostr);
                 pskeleton->m_bones.m_data[b].m_name.operator=(static_cast<const char*>(nullptr));
             }
             const bool bLockTranslation = b != 0;

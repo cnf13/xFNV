@@ -201,10 +201,10 @@ bool CreditsMenu::IsWellFormedMenu() {
 void CreditsMenu::InitCreditsRoot() {
     NiPoint3 dst;
     int32_t iwidth;
-    FNVD_INLINED_LOCAL(BSFile, LangSpecificFile_3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, string, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSFile, DefaultCreditsFile, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSFile, LangSpecificFile_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSFile, LangSpecificFile_3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, string, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSFile, DefaultCreditsFile, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSFile, LangSpecificFile_2, std::nullopt, std::nullopt);
     BSFile* pFileToUse_2;
     char Dst[260];
     Controls* Controls_ = appMain->GetControls();
@@ -496,8 +496,8 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
     NiNode* pnode;
     NiPoint2* ptextures;
     NiPoint3* pvertices;
-    FNVD_INLINED_LOCAL(NiFixedString, textureFilename_3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, textureFilename_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, textureFilename_3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, textureFilename_2, std::nullopt, std::nullopt);
     NiPoint2 v55;
     NiPoint2 v56;
     NiPoint2 v57;

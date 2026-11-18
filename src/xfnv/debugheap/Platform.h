@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-namespace fnvd::debugheap {
+namespace xfnv::debugheap {
 
     // The page size the heap is laid out in.
     constexpr size_t kPage = 0x1000;
@@ -53,7 +53,7 @@ namespace fnvd::debugheap {
         uintptr_t ImageBase();
         const char* ImagePath();
 
-        // fnvd_debugheap.log in the current folder, and standard error.
+        // xfnv_debugheap.log in the current folder, and standard error.
         void OpenLog();
         void WriteLog(const char* apText, size_t aSize);
 
@@ -72,4 +72,4 @@ namespace fnvd::debugheap {
         size_t AlignedSize(void* apMem, size_t aAlign);
 
     } // namespace platform
-} // namespace fnvd::debugheap
+} // namespace xfnv::debugheap

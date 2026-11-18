@@ -334,7 +334,7 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
 
         // Calls the base's constructor, then stores the scale (1, 1, 1) from z to x.
         // EXE-INLINED 0x4AD050
-        FNVD_INLINED_LOCAL(BSCloningProcess, kCloning, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSCloningProcess, kCloning, std::nullopt, std::nullopt);
         ::new (&kCloning) NiCloningProcess(257u);
         kCloning.Scale.z = 1.0f;
         kCloning.Scale.y = 1.0f;

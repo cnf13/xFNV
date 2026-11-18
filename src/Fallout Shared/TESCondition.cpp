@@ -220,7 +220,7 @@ void* TESCondition::DeleteArray(uint32_t auiFlags) {
     if ((auiFlags & 2) != 0) {
         rt::eh_vector_destructor_iterator(
             this, sizeof(TESCondition), static_cast<int32_t>(reinterpret_cast<size_t*>(this)[-1]),
-            &fnvd::destructElement<TESCondition>
+            &xfnv::destructElement<TESCondition>
         );
         if ((auiFlags & 1) != 0) {
             ourFree(reinterpret_cast<size_t*>(this) - 1);

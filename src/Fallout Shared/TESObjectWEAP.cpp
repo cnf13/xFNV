@@ -223,7 +223,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                         data.fSemiAutomaticFireDelayMin = 0.1f;
                         data.fSemiAutomaticFireDelayMax = 0.5f;
                         apFile->GetChunkData(&data, 0xCC);
-#if FNVD_64BIT
+#if XFNV_64BIT
                         // The file's record is 0xCC bytes, the projectile's 4-byte form ID at 0x24.
                         TESFile::WidenFormIDRecords(
                             &data, 1, apFile->GetChunkSize() < 0xCC ? apFile->GetChunkSize() : 0xCC, sizeof(data),
@@ -249,7 +249,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                         }
                     }
                     else {
-#if FNVD_64BIT
+#if XFNV_64BIT
                         ourMemset(&data, 0, sizeof(data));
 #else
                         ourMemset(&data, 0, sizeof(data));
@@ -258,7 +258,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                         data.fSemiAutomaticFireDelayMax = 0.5f;
                         uint32_t uiChunkSize = apFile->GetChunkSize();
                         apFile->GetChunkData(&data, uiChunkSize);
-#if FNVD_64BIT
+#if XFNV_64BIT
                         // The file's record is at most 0xCC bytes, the projectile's 4-byte form ID at 0x24.
                         TESFile::WidenFormIDRecords(
                             &data, 1, uiChunkSize < 0xCC ? uiChunkSize : 0xCC, sizeof(data),
@@ -274,7 +274,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                     }
                 }
                 else {
-#if FNVD_64BIT
+#if XFNV_64BIT
                     ourMemset(&data, 0, sizeof(data));
 #else
                     ourMemset(&data, 0, sizeof(data));
@@ -283,7 +283,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                     data.fSemiAutomaticFireDelayMax = 0.5f;
                     uint32_t uiChunkSize = apFile->GetChunkSize();
                     apFile->GetChunkData(&data, uiChunkSize);
-#if FNVD_64BIT
+#if XFNV_64BIT
                     // The file's record is at most 0xCC bytes, the projectile's 4-byte form ID at 0x24.
                     TESFile::WidenFormIDRecords(
                         &data, 1, uiChunkSize < 0xCC ? uiChunkSize : 0xCC, sizeof(data),
@@ -598,7 +598,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 break;
             }
             case CRDT_ID: apFile->GetChunkData(&criticalData, 0x10);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x10 bytes, the effect's 4-byte form ID at 0xC.
                 TESFile::WidenFormIDRecords(
                     &criticalData, 1, 0x10, sizeof(criticalData), {{0xC, offsetof(OBJ_WEAP_CRITICAL, pEffect)}}
@@ -609,7 +609,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 }
                 break;
             case VATS_ID: apFile->GetChunkData(&specialVATSData, 0x14);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x14 bytes, the effect's 4-byte form ID first.
                 TESFile::WidenFormIDRecords(
                     &specialVATSData, 1, 0x14, sizeof(specialVATSData),
@@ -1862,7 +1862,7 @@ void TESObjectWEAP::Fire(TESObjectREFR* apSource) {
                 }
                 if (pItemReward) {
                     // Casts to TESFullName and drops the result, as the game does.
-                    FNVD_DYNAMIC_CAST_VOID(TESFullName)(pobject, RTTI_TESForm, RTTI_TESFullName);
+                    XFNV_DYNAMIC_CAST_VOID(TESFullName)(pobject, RTTI_TESForm, RTTI_TESFullName);
                     pPlayer->AddObjecttoContainer(static_cast<TESBoundObject*>(pItemReward), nullptr, 1);
                 }
             }

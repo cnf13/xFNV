@@ -577,9 +577,9 @@ bool MediaSet::Update(uint32_t ticks, bool abInCombat, MediaLocationController* 
 
 bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationController* pController) {
     int32_t bInTension;
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool bMusicPlaying = FalloutAudioMedia::MediaIsPlaying(MEDIA_DUNGEON, true);
     bool bReturn = true;
     char cLayer = pController->fCurrentPlayerRadius < 100.0;
@@ -684,8 +684,8 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
 }
 
 bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (bInCombat) {
         bool bShouldPlayIntro = false;
         bool bIsLoaded = FalloutAudioMedia::MediaIsPlaying(mType, false);
@@ -743,8 +743,8 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
 
 bool MediaSet::UpdateIncidentals(uint32_t ticks) {
     char v9;
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (ticks <= MediaSet::uiLastUpdate) {
         return true;
     }

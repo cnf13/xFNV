@@ -432,9 +432,9 @@ void BSShaderLightingProperty::SetDirectionalLight3x(
     if (apLight) {
         int32_t iShaderPropertyType;
         double v9;
-        FNVD_INLINED_LOCAL(NiColorA, pambientColor, std::nullopt, std::nullopt);
-        FNVD_INLINED_LOCAL(NiColorA, kdata, std::nullopt, std::nullopt);
-        FNVD_INLINED_LOCAL(NiColorA, kcolor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, pambientColor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, kdata, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, kcolor, std::nullopt, std::nullopt);
         BSShaderPPLightingProperty* m_pObject = static_cast<BSShaderPPLightingProperty*>(
             BSShaderManager::pCurrentRenderPass->pGeometry->m_PropertyState.m_aspProps[3].m_pObject
         );
@@ -555,7 +555,7 @@ void BSShaderLightingProperty::SetLight1x2x(uint32_t auiLightIndex, ShadowSceneL
     if (bPointLight) {
         if (pLight) {
             // The light's position.
-            FNVD_INLINED_LOCAL(NiColorA, kPosition, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiColorA, kPosition, std::nullopt, std::nullopt);
             kPosition.r = pLight->m_kWorld.m_Translate.x;
             kPosition.g = pLight->m_kWorld.m_Translate.y;
             kPosition.b = pLight->m_kWorld.m_Translate.z;
@@ -575,7 +575,7 @@ void BSShaderLightingProperty::SetLight1x2x(uint32_t auiLightIndex, ShadowSceneL
             else {
                 fSpecularFade = 1.0f;
             }
-            FNVD_INLINED_LOCAL(NiColorA, kDirection, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiColorA, kDirection, std::nullopt, std::nullopt);
             kDirection.r = kDir.x;
             kDirection.g = kDir.y;
             kDirection.b = kDir.z;
@@ -688,8 +688,8 @@ void BSShaderLightingProperty::SetPointLight3x(
             float r;
             float v6;
             float v7;
-            FNVD_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
-            FNVD_INLINED_LOCAL(NiColorA, kdata, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiColorA, v8, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiColorA, kdata, std::nullopt, std::nullopt);
             NiLight* m_pObject = apLight->spLight.m_pObject;
             // MAYBE-INLINED 0xB711A9: a write opening NiColorA's uses: may be its inlined constructor
             kdata.r = m_pObject->m_kWorld.m_Translate.x;

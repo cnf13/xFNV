@@ -411,7 +411,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         pTLSData->eMemContext = eMemContext;
         return nullptr;
     }
-    FNVD_INLINED_LOCAL(NiPointer<CachedGeometry>, spCachedGeom, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<CachedGeometry>, spCachedGeom, std::nullopt, std::nullopt);
     spCachedGeom.m_pObject = nullptr;
     if (!GetCachedGeometryMap()->GetAt(apGrassParam->pcGeomFilename, spCachedGeom)) {
         void* pMemory = NiMemObject::operator new(sizeof(CachedGeometry));
@@ -434,7 +434,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
     }
     CachedGeometry* pCachedGeom = spCachedGeom.m_pObject;
     if (pCachedGeom->bQueued) {
-        FNVD_INLINED_LOCAL(NiPointer<NiObject>, spObject, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPointer<NiObject>, spObject, std::nullopt, std::nullopt);
         spObject.m_pObject = nullptr;
         if (bUseBackgroundLoading && !pCachedGeom->spGrassLoadTask.m_pObject) {
             void* pMemory = MemoryManager_Singleton.Allocate(sizeof(GrassLoadTask));
@@ -534,7 +534,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
                 MemoryManager_Singleton.Allocate(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
             if (pColorMemory) {
                 rt::eh_vector_constructor_iterator(
-                    pColorMemory, sizeof(NiColorA), uiTotalVertices, &fnvd::constructElement<NiColorA>
+                    pColorMemory, sizeof(NiColorA), uiTotalVertices, &xfnv::constructElement<NiColorA>
                 );
                 pkColor = static_cast<NiColorA*>(pColorMemory);
             }
@@ -614,7 +614,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
                 MemoryManager_Singleton.Allocate(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
             if (pColorMemory) {
                 rt::eh_vector_constructor_iterator(
-                    pColorMemory, sizeof(NiColorA), uiTotalVertices, &fnvd::constructElement<NiColorA>
+                    pColorMemory, sizeof(NiColorA), uiTotalVertices, &xfnv::constructElement<NiColorA>
                 );
                 pkColor = static_cast<NiColorA*>(pColorMemory);
             }

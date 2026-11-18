@@ -25,7 +25,7 @@ NiGPUProgramCache::~NiGPUProgramCache() {}
 // is read before the entry's release; the key's handle is released last.
 NiGPUProgram*
 NiGPUProgramCache::FindCachedProgram(const char* pcName, NiTObjectPtrSet<NiPointer<NiMaterialResource>>& kUniforms) {
-    FNVD_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
     // EXE-INLINED 0x438170
     if (pcName) {
         kKey.m_kHandle = NiGlobalStringTable::AddString(pcName);
@@ -207,7 +207,7 @@ bool NiGPUProgramCache::Save() {
     NiTMapItem<NiFixedString, NiPointer<NiGPUProgramDesc>>* pkPos = m_kCachedPrograms.GetFirstPos();
     while (pkPos) {
         NiPointer<NiGPUProgramDesc> spDesc;
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.m_kHandle = NiGlobalStringTable::NULL_STRING;
         m_kCachedPrograms.GetNext(pkPos, kName, spDesc);
         SaveEntry(*pkFile, spDesc.m_pObject, kName);
@@ -385,7 +385,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
         NiStreamLoadBinary<uint8_t>(kStream, reinterpret_cast<uint8_t*>(acBuffer), uiLength);
         acBuffer[uiLength + 1] = '\0';
     }
-    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     // EXE-INLINED 0x438170
     kName.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
 
@@ -441,7 +441,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
             NiMaterialResource* pkRes = pvMemory ? ::new (pvMemory) NiMaterialResource : nullptr;
 
             ReadString();
-            FNVD_INLINED_LOCAL(NiFixedString, kType, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kType, std::nullopt, std::nullopt);
             // EXE-INLINED 0x438170
             kType.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
             pkRes->SetType(kType);
@@ -449,7 +449,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
             NiGlobalStringTable::ReleaseHandle(kType.GetHandle());
 
             ReadString();
-            FNVD_INLINED_LOCAL(NiFixedString, kSemantic, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kSemantic, std::nullopt, std::nullopt);
             // EXE-INLINED 0x438170
             kSemantic.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
             pkRes->SetSemantic(kSemantic);
@@ -457,7 +457,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
             NiGlobalStringTable::ReleaseHandle(kSemantic.GetHandle());
 
             ReadString();
-            FNVD_INLINED_LOCAL(NiFixedString, kLabel, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kLabel, std::nullopt, std::nullopt);
             // EXE-INLINED 0x438170
             kLabel.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
             pkRes->SetLabel(kLabel);
@@ -465,7 +465,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
             NiGlobalStringTable::ReleaseHandle(kLabel.GetHandle());
 
             ReadString();
-            FNVD_INLINED_LOCAL(NiFixedString, kVariable, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kVariable, std::nullopt, std::nullopt);
             // EXE-INLINED 0x438170
             kVariable.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
             pkRes->SetVariable(kVariable);
@@ -473,7 +473,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
             NiGlobalStringTable::ReleaseHandle(kVariable.GetHandle());
 
             ReadString();
-            FNVD_INLINED_LOCAL(NiFixedString, kDefaultValue, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kDefaultValue, std::nullopt, std::nullopt);
             // EXE-INLINED 0x438170
             kDefaultValue.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
             pkRes->SetDefaultValue(kDefaultValue);

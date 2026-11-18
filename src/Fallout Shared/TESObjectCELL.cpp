@@ -1896,7 +1896,7 @@ bool TESObjectCELL::PickWaterDistance(NiPick* apPick, const NiPoint3& aOrigin, c
 }
 
 void TESObjectCELL::FreeLoadedData() {
-    FNVD_INLINED_LOCAL(NiPointer<BSMultiBoundNode>, spnode, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSMultiBoundNode>, spnode, std::nullopt, std::nullopt);
     NiTMapItem<TESObjectREFR*, NiPointer<BSMultiBoundNode>>* iter;
     if (pLoadedData) {
         pLoadedData->ScriptedRefs.RemoveAll();
@@ -2169,7 +2169,7 @@ NiNode* TESObjectCELL::GetLandNode(uint32_t aiQuad) {
 }
 
 void TESObjectCELL::UpdateRefSounds() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, SoundHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, SoundHandle, std::nullopt, std::nullopt);
     CellRefLockEnter();
     if (GetAttached()) {
         for (TESObjectREFR* pobj : GetRefList()->ItemsUntilNull()) {
@@ -6314,8 +6314,8 @@ void TESObjectCELL::ClearReference3D() {
 }
 
 void TESObjectCELL::UnLoadAllTempData() {
-    FNVD_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NavMeshPtr, apCell, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, apCell, std::nullopt, std::nullopt);
     TESObjectREFR* pref;
     CellRefLockEnter();
     this->sNumRefsWithVisibleDistant = 0;
@@ -6391,12 +6391,12 @@ void TESObjectCELL::UnLoadAllTempData() {
             NavMeshPtr* NavMeshByIndex = pNavMeshes->GetNavMeshByIndex(&apResult, aiNavMeshIndex);
             TESForm* Object = NavMeshByIndex->m_pObject;
             TESFile* v12 = Object->GetFile(-1);
-            FNVD_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+            XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
             if (!v12 || v12->GetMaster()) {
                 pNavMeshes->GetNavMeshByIndex(&apCell, aiNavMeshIndex);
                 pSaveLoadGame->UnloadForm(apCell.operator NavMesh*(), false);
                 pNavMeshes->RemoveNavMeshByIndex(aiNavMeshIndex--);
-                FNVD_DESTRUCT(NiPointer<NavMesh>)(&apCell);
+                XFNV_DESTRUCT(NiPointer<NavMesh>)(&apCell);
             }
         }
     }
@@ -6624,7 +6624,7 @@ void TESObjectCELL::BuildLocalMapDoorList(BSSimpleList<TESObjectREFR*>* apOutLis
 }
 
 void TESObjectCELL::GetExteriorLocalMapTexture(NiPointer<NiTexture>& aspTexture) {
-    FNVD_INLINED_LOCAL(NiPointer<BSRenderedTexture>, sprt, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSRenderedTexture>, sprt, std::nullopt, std::nullopt);
     NiPointer<NiTexture> sprettex(static_cast<NiTexture*>(nullptr));
     const char* v5 = "GetExteriorLocalMapTexture";
     if (!GetInterior()) {
@@ -6973,7 +6973,7 @@ uint32_t TESObjectCELL::FindTeleportDoorsForLocation(
 }
 
 void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRenderedTexture>& aspRenderedTexture) {
-    FNVD_INLINED_LOCAL(NiColorA, blackAlpha, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, blackAlpha, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_LOCALMAP, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 0x2251
     );
@@ -7917,7 +7917,7 @@ bool& TESObjectCELL::GetThreadLoadingTempData() {
 void TESObjectCELL::RunQueuedParticleUpdates() {
     QueuedParticleLock.Lock(nullptr);
     while (!QueuedParticleUpdates.IsEmpty()) {
-        FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, spObject, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spObject, std::nullopt, std::nullopt);
         spObject.SetPointer(&QueuedParticleUpdates.GetItem());
         QueuedParticleUpdates.RemoveHead();
         UpdateParticlesOnly(spObject.operator->());
@@ -8278,7 +8278,7 @@ int32_t TESObjectCELL::CreateCanopyShadowMaskForCell(
     NiRenderedTexture*& apOutTex,
     _D3DLOCKED_RECT*& apOutRect
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     apOutTex = nullptr;
     if (!apCell || (apCell->GetInterior() || !Renderer::GetNIRenderer())) {
         return 0;
@@ -8436,8 +8436,8 @@ void TESObjectCELL::RenderTestCell(
     TESObjectCELL::RENDER_TEST_DATA* apTestData,
     bool abtestEntireCell
 ) {
-    FNVD_INLINED_LOCAL(NavMeshPtr, spnavmesh_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NavMeshPtr, spnavmesh, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, spnavmesh_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, spnavmesh, std::nullopt, std::nullopt);
     NiMatrix3 oldrot;
     TESObjectCELL::RENDER_TEST_DATA defaultdata;
     if ((apCell) && (apCell->Get3D())) {
@@ -8462,7 +8462,7 @@ void TESObjectCELL::RenderTestCell(
                     parray->GetNavMeshByIndex(&spnavmesh, static_cast<uint32_t>(i));
                     uint32_t itricount = spnavmesh.m_pObject->GetTriangleCount();
                     itotaltricount += itricount;
-                    FNVD_DESTRUCT(NiPointer<NavMesh>)(&spnavmesh);
+                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&spnavmesh);
                 }
                 Warning("Testing %i NavMesh triangles.", itotaltricount);
                 for (int32_t i_2 = 0;; ++i_2) {
@@ -8481,7 +8481,7 @@ void TESObjectCELL::RenderTestCell(
                             }
                         }
                     }
-                    FNVD_DESTRUCT(NiPointer<NavMesh>)(&spnavmesh_2);
+                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&spnavmesh_2);
                 }
             }
             else {

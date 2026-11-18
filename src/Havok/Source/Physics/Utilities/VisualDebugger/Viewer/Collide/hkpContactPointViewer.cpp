@@ -189,7 +189,7 @@ void hkpContactPointViewer::drawAllContactPointsInIsland(const hkpSimulationIsla
             // The SDK's hkLocalArray<hkContactPointId> contactPoints(HK_MAX_CONTACT_POINT): 256 ids on the thread's
             // stack allocator, flagged DONT_DEALLOCATE. The stack allocator hands out raw memory.
             // EXE-INLINED none: hkLocalArray<uint16_t>::hkLocalArray(int)
-            FNVD_INLINED_LOCAL(hkLocalArray<uint16_t>, contactPoints, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkLocalArray<uint16_t>, contactPoints, std::nullopt, std::nullopt);
             contactPoints.m_data = nullptr;
             contactPoints.m_size = 0;
             contactPoints.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG);

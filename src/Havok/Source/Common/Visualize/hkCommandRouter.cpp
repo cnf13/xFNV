@@ -61,7 +61,7 @@ hkBool* hkCommandRouter::consumeCommands(hkBool* apResult, hkDisplaySerializeISt
                     stream->readQuadVector4(skippedVector);
                 }
                 // EXE-INLINED none: hkStringBuf::hkStringBuf()
-                FNVD_INLINED_LOCAL(hkStringBuf, warning, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkStringBuf, warning, std::nullopt, std::nullopt);
                 warning.m_string.m_data = warning.m_string.m_storage;
                 warning.m_string.m_size = 0;
                 warning.m_string.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG | 128;

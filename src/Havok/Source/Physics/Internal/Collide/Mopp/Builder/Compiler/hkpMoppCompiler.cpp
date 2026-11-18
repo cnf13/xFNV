@@ -128,7 +128,7 @@ hkpMoppCode* hkpMoppCompiler::compile(hkpMoppMediator* mediator, char* buffer, i
         // The chunks' start offsets in the joined code: chunk i starts at chunkOffsets[i], the last entry is the
         // total size.
         // EXE-INLINED none: hkArray<int>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<int32_t>, chunkOffsets, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<int32_t>, chunkOffsets, std::nullopt, std::nullopt);
         chunkOffsets.m_data = nullptr;
         chunkOffsets.m_size = 0;
         chunkOffsets.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;

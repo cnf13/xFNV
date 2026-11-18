@@ -76,14 +76,14 @@ static void* copyObjectsToChunk(
     hkObjectUpdateTracker* a3,
     const hkArrayBase<int32_t>* r_eax
 ) {
-    FNVD_INLINED_LOCAL(hkArray<char>, buffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<char>, buffer, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<char, hkContainerHeapAllocator>::hkArray
     buffer.m_data = nullptr;
     buffer.m_size = 0;
     buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    FNVD_INLINED_LOCAL(hkOstream, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkOstream, out, std::nullopt, std::nullopt);
     ::new (&out) hkOstream(buffer);
-    FNVD_INLINED_LOCAL(hkRelocationInfo, reloc, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkRelocationInfo, reloc, std::nullopt, std::nullopt);
     // EXE-INLINED 0xDBD870: hkRelocationInfo::hkRelocationInfo
     reloc.m_local.m_data = nullptr;
     reloc.m_local.m_size = 0;
@@ -99,7 +99,7 @@ static void* copyObjectsToChunk(
     reloc.m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
     reloc.m_pool = nullptr;
     using offsets_t = hkPointerMap<void*, int32_t, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(offsets_t, offsets, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(offsets_t, offsets, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkPointerMap<void*, int32_t>::hkPointerMap
     offsets.m_map.m_elem = nullptr;
     offsets.m_map.m_numElems = 0;
@@ -335,7 +335,7 @@ void* hkVersionUtil::copyObjects(
     hkObjectUpdateTracker& tracker
 ) {
     using indices_t = hkArray<int32_t, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(indices_t, indices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(indices_t, indices, std::nullopt, std::nullopt);
     int32_t numObjects = objectsIn.m_size;
     // EXE-INLINED none: hkArray<int32_t, hkContainerTempAllocator>::hkArray
     indices.m_data = nullptr;
@@ -412,7 +412,7 @@ void hkVersionUtil::recomputeClassMemberOffsets(hkClass* const* classes, int32_t
     updateMetadataInplace(const_cast<hkClass**>(classes), classVersion);
     hkStructureLayout layout;
     using classesDone_t = hkPointerMap<const hkClass*, int32_t, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(classesDone_t, classesDone, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(classesDone_t, classesDone, std::nullopt, std::nullopt);
     classesDone.m_map.m_elem = nullptr;
     classesDone.m_map.m_numElems = 0;
     classesDone.m_map.m_hashMod = -1;

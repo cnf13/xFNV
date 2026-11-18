@@ -252,7 +252,7 @@ void bhkShape::BuildDisplayFromhkGeometry(
                                            )
                                          : nullptr;
             if (apName) {
-                FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
                 // EXE-INLINED 0x438170: NiFixedString::NiFixedString(const char*)
                 kName.SetHandle(NiGlobalStringTable::AddString(apName));
                 pShape->SetName(kName);

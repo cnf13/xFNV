@@ -147,7 +147,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             // The client's ids are the addresses of the object and its class.
             void* ptr = reinterpret_cast<void*>(static_cast<hkUlong>(id));
             const hkClass* pClass = reinterpret_cast<const hkClass*>(static_cast<hkUlong>(classId));
-            FNVD_INLINED_LOCAL(hkInspectProcessObjectPairArray, recursionStack, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkInspectProcessObjectPairArray, recursionStack, std::nullopt, std::nullopt);
             // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::hkArray
             recursionStack.m_data = nullptr;
             recursionStack.m_size = 0;
@@ -208,7 +208,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             uint16_t numMembers;
             m_inStream->readArrayGeneric(&numMembers, 2, 1);
             const int32_t pathLength = numMembers;
-            FNVD_INLINED_LOCAL(hkInspectProcessUInt16Array, memberPath, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkInspectProcessUInt16Array, memberPath, std::nullopt, std::nullopt);
             {
                 // EXE-INLINED none: hkArray<hkUint16>::hkArray(pathLength)
                 memberPath.m_data = nullptr;
@@ -247,7 +247,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             }
             int32_t dataSize;
             m_inStream->readArrayGeneric(&dataSize, 4, 1);
-            FNVD_INLINED_LOCAL(hkInspectProcessCharArray, data, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkInspectProcessCharArray, data, std::nullopt, std::nullopt);
             {
                 // EXE-INLINED none: hkArray<char>::hkArray(dataSize)
                 data.m_data = nullptr;
@@ -337,7 +337,7 @@ void hkInspectProcess::init() {
 }
 
 void hkInspectProcess::step(float frameTimeInMs) {
-    FNVD_INLINED_LOCAL(hkInspectProcessObjectPairArray, recursionStack, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkInspectProcessObjectPairArray, recursionStack, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::hkArray
     recursionStack.m_data = nullptr;
     recursionStack.m_size = 0;
@@ -412,7 +412,7 @@ int32_t hkInspectProcess::writeObject(
     hkArray<ObjectPair>& recursionStack
 ) {
     hkStructureLayout layout(hkStructureLayout::MsvcWin32LayoutRules);
-    FNVD_INLINED_LOCAL(hkInspectProcessGlobalFixupArray, globalFixups, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkInspectProcessGlobalFixupArray, globalFixups, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkObjectSerialize::GlobalFixup>::hkArray
     globalFixups.m_data = nullptr;
     globalFixups.m_size = 0;
@@ -462,7 +462,7 @@ int32_t hkInspectProcess::writeObject(
         pair.obj = ptr;
         pair.klass = pClass;
     }
-    FNVD_INLINED_LOCAL(hkInspectProcessCharArray, buffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkInspectProcessCharArray, buffer, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<char>::hkArray
     buffer.m_data = nullptr;
     buffer.m_size = 0;

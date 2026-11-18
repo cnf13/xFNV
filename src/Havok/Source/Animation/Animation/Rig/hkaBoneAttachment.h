@@ -33,4 +33,4 @@ public:
 
 extern hkClass hkaBoneAttachmentClass;
 extern hkTypeInfo hkaBoneAttachmentTypeInfo;
-inline constexpr fnvd::Vtable hkaBoneAttachment_vftable{};
+inline constexpr xfnv::Vtable hkaBoneAttachment_vftable{};

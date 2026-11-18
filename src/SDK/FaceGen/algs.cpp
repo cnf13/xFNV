@@ -61,7 +61,7 @@ std::string* futComposeNewFname(std::string* _Result, const std::string& path,
 std::string* futRemoveBadFnameCharacters(std::string* _Result, const std::string& fname)
 {
 	std::string sOut;
-	FNVD_RECONSTRUCT(std::string)(&sOut, "");
+	XFNV_RECONSTRUCT(std::string)(&sOut, "");
 	char acSource[2];
 	acSource[0] = 0;
 	acSource[1] = 0;
@@ -657,7 +657,7 @@ std::string* UncheckedMoveBackward(std::string* _First, std::string* _Last, std:
 // <xmemory>'s _Allocate of strings, out of line.
 std::string* _Allocate(uint32_t _Count)
 {
-	FNVD_INLINED_LOCAL(rt::bad_alloc, kException, std::nullopt, std::nullopt);
+	XFNV_INLINED_LOCAL(rt::bad_alloc, kException, std::nullopt, std::nullopt);
 	if (_Count) {
 		if (static_cast<size_t>(-1) / _Count < sizeof(std::string)) {
 			// EXE-INLINED 0x44D6C0

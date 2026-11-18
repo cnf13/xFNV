@@ -131,8 +131,8 @@ NiPixelData* NiTexture::RendererData::DefaultTextureFailureCallback(
     NiTexture* pkTexture,
     NiTexture::RendererData::CreationFailure eFailure
 ) {
-    FNVD_INLINED_LOCAL(NiColorA, kBottomLeft_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, kTopLeft, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, kBottomLeft_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, kTopLeft, std::nullopt, std::nullopt);
     // A failure value is its index with the top bit set; the top bit is taken off before indexing the table.
     const uint32_t uiIndex = eFailure & 0x7FFFFFFFu;
     if (uiIndex >= 10) {
@@ -148,7 +148,7 @@ NiPixelData* NiTexture::RendererData::DefaultTextureFailureCallback(
         double v9;
         float a;
         float b;
-        FNVD_INLINED_LOCAL(NiColorA, kBottomLeft, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, kBottomLeft, std::nullopt, std::nullopt);
         switch (eFailure) {
             case NiTexture::RendererData::NO2DMATCH: {
                 kTopLeft.r = 0.0f;

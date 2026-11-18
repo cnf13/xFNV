@@ -115,7 +115,7 @@ hkReferencedObject* hkxAttributeHolder::findAttributeObjectByName(const char* na
     if (!name) {
         return nullptr;
     }
-    FNVD_INLINED_LOCAL(hkRefVariant, variant, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkRefVariant, variant, std::nullopt, std::nullopt);
     findAttributeVariantByName(&variant, name);
     if (!variant.m_pntr) {
         return nullptr;
@@ -142,7 +142,7 @@ hkRefVariant* hkxAttributeHolder::findAttributeVariantByName(hkRefVariant* apRes
     int32_t v4;
     hkRefVariant* v7;
     // The variant's reference is released by hand below.
-    FNVD_INLINED_LOCAL(hkRefVariant, apResulta, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkRefVariant, apResulta, std::nullopt, std::nullopt);
     if (!name || (v4 = 0, m_attributeGroups.m_size <= 0)) {
         hkVariant v11;
     LABEL_6:;

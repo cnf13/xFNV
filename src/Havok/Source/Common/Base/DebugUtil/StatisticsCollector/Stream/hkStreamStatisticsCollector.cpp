@@ -207,7 +207,7 @@ void hkStreamStatisticsCollector::makeTree(
     hkArray<hkStringPtr, hkContainerHeapAllocator>* stringTable
 ) {
     using NodeArray = hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(NodeArray, stack, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NodeArray, stack, std::nullopt, std::nullopt);
     stack.m_data = nullptr;
     stack.m_size = 0;
     stack.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
@@ -235,7 +235,7 @@ void hkStreamStatisticsCollector::makeTree(
             do {
                 hkMonitorStreamAnalyzer::Node* pNode = m_nodesOut.m_data[m_nodesOut.m_size - 1];
                 if (pNode) {
-                    FNVD_DESTRUCT(hkMonitorStreamAnalyzer::Node)(pNode);
+                    XFNV_DESTRUCT(hkMonitorStreamAnalyzer::Node)(pNode);
                     hkMemoryRouter::getInstance().heap().blockFree(pNode, sizeof(hkMonitorStreamAnalyzer::Node));
                 }
                 --m_nodesOut.m_size;
@@ -308,7 +308,7 @@ void hkStreamStatisticsCollector::reset() {
 // Builds the node tree and deletes it again: the report output is compiled out, so outstream and reportLevel are
 // unused. The nodes are deleted from the back, popping each.
 void hkStreamStatisticsCollector::writeStatistics(hkOstream& outstream, int32_t reportLevel) {
-    FNVD_INLINED_LOCAL(hkArray<hkMonitorStreamAnalyzer::Node*>, nodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkMonitorStreamAnalyzer::Node*>, nodes, std::nullopt, std::nullopt);
     nodes.m_data = nullptr;
     nodes.m_size = 0;
     nodes.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
@@ -316,7 +316,7 @@ void hkStreamStatisticsCollector::writeStatistics(hkOstream& outstream, int32_t 
     for (; nodes.m_size != 0; --nodes.m_size) {
         hkMonitorStreamAnalyzer::Node* pNode = nodes.m_data[nodes.m_size - 1];
         if (pNode) {
-            FNVD_DESTRUCT(hkMonitorStreamAnalyzer::Node)(pNode);
+            XFNV_DESTRUCT(hkMonitorStreamAnalyzer::Node)(pNode);
             hkMemoryRouter::getInstance().heap().blockFree(pNode, sizeof(hkMonitorStreamAnalyzer::Node));
         }
     }

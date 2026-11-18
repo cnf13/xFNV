@@ -82,7 +82,7 @@ NiObject* NiObject::CreateSharedClone(NiCloningProcess& kCloning) {
 }
 
 NiObject* NiObject::Clone() {
-    FNVD_INLINED_LOCAL(NiCloningProcess, kCloning, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiCloningProcess, kCloning, std::nullopt, std::nullopt);
     ::new (&kCloning) NiCloningProcess(257u);
     NiObject* v2 = CreateClone(kCloning);
     ProcessClone(kCloning);

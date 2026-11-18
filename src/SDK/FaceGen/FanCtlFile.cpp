@@ -37,7 +37,7 @@ bool fanReadCtlFile(const std::basic_string<char, std::char_traits<char>, std::a
 	// Each return's destructor, which the exe inlines.
 	auto fnClose = [&kFile](bool abResult) -> bool { return abResult; };
 	std::string kFileName;
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
 	if (!kFile.BSFaceGenBinaryFile::openForRead(kFileName, true)) {
 		return fnClose(false);
 	}

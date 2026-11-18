@@ -82,7 +82,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
 
     HK_TIMER_BEGIN("CPUSplit", nullptr);
     // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, directions, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, directions, std::nullopt, std::nullopt);
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         if (numRays) {
@@ -100,7 +100,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         directions.m_size = numRays;
     }
     // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, lengthsSquared, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, lengthsSquared, std::nullopt, std::nullopt);
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         if (numRays) {
@@ -119,7 +119,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
     }
     // EXE-INLINED none: hkArray<hkArray<int32_t>>::hkArray(int) (each element's constructor too)
     using octantRays_t = hkArray<hkArray<int32_t>>;
-    FNVD_INLINED_LOCAL(octantRays_t, octantRays, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(octantRays_t, octantRays, std::nullopt, std::nullopt);
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         int32_t numBytes = 8 * static_cast<int32_t>(sizeof(hkArray<int32_t>));
@@ -144,7 +144,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         rayFrom, rayTo, numRays, directions.m_data, lengthsSquared.m_data, octantRays.m_data, octantCounts
     );
     // EXE-INLINED none: hkArray<int32_t>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, unusedA, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, unusedA, std::nullopt, std::nullopt);
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         int32_t numBytes = 8 * static_cast<int32_t>(sizeof(int32_t));
@@ -156,7 +156,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         unusedA.m_size = 8;
     }
     // EXE-INLINED none: hkArray<int32_t>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, unusedB, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, unusedB, std::nullopt, std::nullopt);
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         int32_t numBytes = 8 * static_cast<int32_t>(sizeof(int32_t));

@@ -193,7 +193,7 @@ BSSoundHandle* BSAudio::PlaySound(
     NiPoint3 akPosition,
     int32_t aiUnused
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     BSAudioManager* v6 = &BSAudioManager::QInstance();

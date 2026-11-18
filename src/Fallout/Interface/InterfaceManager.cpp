@@ -2876,7 +2876,7 @@ void InterfaceManager::UpdatePipboy() {
                     pPlayer->ForceTemp1stPerson(false);
                     pAnimation->PlayGroup(ANIM_GROUP_PIPBOY, ACTION_START, -1, AGS_NONE);
                     Interface::GetPipboy()->FadeLightEffect(true);
-                    FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
                     BSAudio::QInstance()
                         .GetSoundHandleByName(
                             &kHandle, "UIPipBoyAccessUp",
@@ -4847,14 +4847,14 @@ int32_t InterfaceManager::GetMenuHeight() {
 }
 
 void InterfaceManager::PlayMenuSound(MENU_SOUNDS aeMenuSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v17, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v18, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v19, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v20, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v21, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v17, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v18, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v19, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v20, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v21, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle psoundHand;
     switch (aeMenuSound) {
         case 1: {

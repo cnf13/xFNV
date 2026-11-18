@@ -172,7 +172,7 @@ const hkpShapeCollection* GetTriCollectionFromShape(const hkpShape* apShape) {
 
 bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRadius, float afStepHeight) {
     using a2_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(a2_t, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(a2_t, a2, std::nullopt, std::nullopt);
     __m128 v27;
     hkVector4 v28;
     TLSData* v4 = GetThreadTLSData();
@@ -341,7 +341,7 @@ void bhkCharacterController::Init(bhkCharacterControllerCinfo& rInfo) {
     InitShapes(rInfo);
     if (!spShapePhantom) {
         // The local's hkArray is freed inline below.
-        FNVD_INLINED_LOCAL(hkShapePhantomCinfo, kCinfo, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkShapePhantomCinfo, kCinfo, std::nullopt, std::nullopt);
         ::new (&kCinfo) hkShapePhantomCinfo;
         kCinfo.m_collisionFilterInfo = rInfo.iColFilter.iFilter;
         bhkShape* pShape = GetShape();
@@ -855,7 +855,7 @@ void bhkCharacterController::BuildDisplayGeometry(NiNode* apNode) {
         NiNode* pchar = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
         pParent->AttachChild(pchar, 1);
         // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.SetHandle(NiGlobalStringTable::AddString("bhkColDisp"));
         pchar->SetName(kName);
         // Destroys kName by releasing its string handle.
@@ -1036,7 +1036,7 @@ void bhkCharacterController::processConstraintsCallback(
                 _mm_cvtss_f32(_mm_shuffle_ps(rpnt.m_contact.m_position.m_quad, rpnt.m_contact.m_position.m_quad, 0xAA));
             const float fstepZ = _mm_cvtss_f32(_mm_shuffle_ps(stepPos.m_quad, stepPos.m_quad, 0xAA));
             if (fstepZ >= fcontactZ) {
-                FNVD_INLINED_LOCAL(
+                XFNV_INLINED_LOCAL(
                     hkpClosestRayHitCollector, theCollector, hkpClosestRayHitCollector_vftable, std::nullopt
                 );
                 // EXE-INLINED 0x62A290
@@ -2509,7 +2509,7 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     bhkWorld* pw;
     CFilter iflt;
     bhkPickData pickRes;
-    FNVD_INLINED_LOCAL(hkpClosestRayHitCollector, v13, hkpClosestRayHitCollector_vftable, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpClosestRayHitCollector, v13, hkpClosestRayHitCollector_vftable, std::nullopt);
     pickRes.m_hitFraction = 1.0f;
     // MAYBE-INLINED 0xC6E6CE: before the vptr store of hkpClosestRayHitCollector's inlined constructor
     v13.m_rayHit.m_hitFraction = 1.0f;
@@ -3049,7 +3049,7 @@ LABEL_108:;
     }
     if (v8->bCollisionBox) {
         float v103;
-        FNVD_INLINED_LOCAL(hkShapePhantomCinfo, sspci, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkShapePhantomCinfo, sspci, std::nullopt, std::nullopt);
         ::new (&sspci) hkShapePhantomCinfo;
         uint32_t iFilter = v8->iColFilter.iFilter;
         NiAVObject* pObject = v8->pObject;
@@ -3283,13 +3283,13 @@ void bhkCharacterController::ClearHurtfulHits() {
 void bhkCharacterController::MoveAsProjectile(float afTimeDelta) {
     if ((iFlags & PROJECTILE) != 0 && spShapePhantom) {
         // EXE-INLINED 0x620FF0
-        FNVD_INLINED_LOCAL(hkpAllCdPointCollector, collector, hkpAllCdPointCollector_vftable, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpAllCdPointCollector, collector, hkpAllCdPointCollector_vftable, std::nullopt);
         collector.m_earlyOutDistance = 3.40282e+38f;
         collector.m_hits.m_data = collector.m_hits.m_storage;
         collector.m_hits.m_capacityAndFlags = 8 | hkArrayBase<hkpRootCdPoint>::DONT_DEALLOCATE_FLAG;
         collector.m_hits.m_size = 0;
         // EXE-INLINED 0x621290
-        FNVD_INLINED_LOCAL(hkpLinearCastInput, castInput, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpLinearCastInput, castInput, std::nullopt, std::nullopt);
         castInput.m_maxExtraPenetration = 1.1920929e-07f;
         castInput.m_startPointTolerance = 1.1920929e-07f;
         hkVector4 startPos;
@@ -3800,7 +3800,7 @@ bool bhkCharacterController::CheckInsideOfObject() {
         theInput.m_filterInfo = 0;
         theInput.m_rayShapeCollectionFilter = nullptr;
         // EXE-INLINED 0x4A3D20
-        FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, theOutput, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, theOutput, std::nullopt, std::nullopt);
         theOutput.m_hitFraction = 1.0f;
         theOutput.m_extraInfo = -1;
         theOutput.m_shapeKeys[0] = 0xFFFFFFFFu;

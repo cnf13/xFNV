@@ -183,7 +183,7 @@ void bhkListShape::SaveBinary(NiStream& arStream) {
     int32_t iShapesCapacityAndFlags = rShapes.m_capacityAndFlags;
     rShapes.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
     // EXE-INLINED none: hkArray<uint32_t>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<uint32_t>, kFilterInfos, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<uint32_t>, kFilterInfos, std::nullopt, std::nullopt);
     kFilterInfos.m_data = nullptr;
     kFilterInfos.m_size = 0;
     kFilterInfos.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;

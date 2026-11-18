@@ -167,7 +167,7 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
     bool bValues[2] = {false, true};
     const int32_t iNumBones = original->m_skeleton->m_bones.m_size;
     // EXE-INLINED none: hkArray<bool>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<bool>, descendants, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<bool>, descendants, std::nullopt, std::nullopt);
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     descendants.m_size = static_cast<uint32_t>(iNumBones);
     if (iNumBones == 0) {
@@ -186,15 +186,15 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
     }
     hkaSkeletonUtils::markDescendants(original->m_skeleton, splitBone, descendants.m_data, true);
     for (int32_t i = 0; i < 2; ++i) {
-        FNVD_INLINED_LOCAL(hkArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
         rigidBodies.m_data = nullptr;
         rigidBodies.m_size = 0;
         rigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-        FNVD_INLINED_LOCAL(hkArray<hkpConstraintInstance*>, constraints, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpConstraintInstance*>, constraints, std::nullopt, std::nullopt);
         constraints.m_data = nullptr;
         constraints.m_size = 0;
         constraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        FNVD_INLINED_LOCAL(hkArray<int32_t>, boneToRigidBody, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<int32_t>, boneToRigidBody, std::nullopt, std::nullopt);
         boneToRigidBody.m_data = nullptr;
         boneToRigidBody.m_size = 0;
         boneToRigidBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
@@ -335,7 +335,7 @@ bool hkaRagdollUtils::isConstraintSupported(const hkpConstraintInstance* apConst
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBABF3B), acBuffer,
                     ".\\Utils\\hkaRagdollUtils.cpp", 0x81
                 );
-                FNVD_DESTRUCT(hkOstream)(pStream);
+                XFNV_DESTRUCT(hkOstream)(pStream);
             }
             return false;
     }
@@ -367,7 +367,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         static_cast<int32_t>(static_cast<uint32_t>(numBodies) | hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
 
     // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<int32_t>, constraintOfBody, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, constraintOfBody, std::nullopt, std::nullopt);
     constraintOfBody.m_data = nullptr;
     constraintOfBody.m_size = 0;
     constraintOfBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
@@ -394,7 +394,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
     constraintOfBody.m_size = numBodies;
 
     // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<int32_t>, order, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, order, std::nullopt, std::nullopt);
     order.m_data = nullptr;
     order.m_size = 0;
     order.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
@@ -407,7 +407,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
     order.m_size = numBodies;
 
     // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<int32_t>, parent, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, parent, std::nullopt, std::nullopt);
     parent.m_data = nullptr;
     parent.m_size = 0;
     parent.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
@@ -470,7 +470,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
 
     {
         // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-        FNVD_INLINED_LOCAL(hkLocalArray<int32_t>, depth, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, depth, std::nullopt, std::nullopt);
         depth.m_data = nullptr;
         depth.m_size = 0;
         depth.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
@@ -520,7 +520,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
     }
 
     // EXE-INLINED none: hkLocalArray<hkpRigidBody*>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, newBodies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, newBodies, std::nullopt, std::nullopt);
     newBodies.m_data = nullptr;
     newBodies.m_size = 0;
     newBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
@@ -533,7 +533,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
     newBodies.m_size = numBodies;
 
     // EXE-INLINED none: hkLocalArray<hkpConstraintInstance*>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, newConstraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, newConstraints, std::nullopt, std::nullopt);
     newConstraints.m_data = nullptr;
     newConstraints.m_size = 0;
     newConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
@@ -641,7 +641,7 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
         static_cast<int32_t>(static_cast<uint32_t>(numBones) | hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
 
     // EXE-INLINED none: hkLocalArray<hkpRigidBody*>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
     rigidBodies.m_data = nullptr;
     rigidBodies.m_size = 0;
     rigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
@@ -653,7 +653,7 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
     rigidBodies.m_localMemory = pBodiesMemory;
 
     // EXE-INLINED none: hkLocalArray<hkpConstraintInstance*>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constraints, std::nullopt, std::nullopt);
     constraints.m_data = nullptr;
     constraints.m_size = 0;
     constraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
@@ -668,7 +668,7 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
     constraints.m_localMemory = pConstraintsMemory;
 
     // EXE-INLINED none: hkLocalArray<int>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkLocalArray<int32_t>, boneToRigidBody, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<int32_t>, boneToRigidBody, std::nullopt, std::nullopt);
     boneToRigidBody.m_data = nullptr;
     boneToRigidBody.m_size = 0;
     boneToRigidBody.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;

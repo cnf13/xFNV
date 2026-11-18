@@ -42,7 +42,7 @@ bool MagicItemObject::Load(TESFile* apFile) {
             uint32_t uiDataSize2 = GetDataSize();
             void* pData2 = GetData();
             apFile->GetChunkData(pData2, uiDataSize2);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // A potion's ENIT record is 0x14 bytes in the file, the addiction's form ID at 8 and the consumption
             // sound's at 0x10; AlchemyItemData's pointers take 8 bytes here, so the record is spread over its fields.
             if (static_cast<TESForm*>(this)->GetFormType() == ALCH_ID) {

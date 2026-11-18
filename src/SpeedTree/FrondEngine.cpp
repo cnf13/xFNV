@@ -94,7 +94,7 @@ std::string IdvFormatString(const char* szFormat, ...) {
     va_start(vlArgs, szFormat);
     std::vsprintf(szBuffer, szFormat, vlArgs);
     std::string strResult;
-    FNVD_RECONSTRUCT(std::string)(&strResult, szBuffer);
+    XFNV_RECONSTRUCT(std::string)(&strResult, szBuffer);
     return strResult;
 }
 
@@ -216,7 +216,7 @@ void CFrondEngine::Parse(CTreeFileAccess& cFile) {
                             case File_FrondTextureFilename: {
                                 std::string strParsed = cFile.ParseString();
                                 std::string strFilename;
-                                FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&strFilename, strParsed);
+                                XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&strFilename, strParsed);
                                 sTexture.m_strFilename.assign(strFilename, 0, std::string::npos);
                                 CIdvFilename strNoPath;
                                 CIdvFilename* pNoPath = sTexture.m_strFilename.NoPath(&strNoPath);
@@ -301,14 +301,14 @@ void CFrondEngine::Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLighti
                 break;
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "default reached in CFrondEngine::Compute()");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "default reached in CFrondEngine::Compute()");
                 throw IdvFileError(strDetails, false);
             }
         }
     }
     if (nVertices > 0xFFFF) {
         std::string strMessage = IdvFormatString("frond vertices exceed %d", 0xFFFF);
-        FNVD_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
         // Natively runtime_error's own constructor: its vtable, then the message string's copy.
         ::new (&cError) rt::runtime_error(strMessage);
         throw cError;
@@ -345,7 +345,7 @@ void CFrondEngine::Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLighti
             break;
         default: {
             std::string strDetails;
-            FNVD_RECONSTRUCT(std::string)(&strDetails, "default reached in CFrondEngine::Compute()");
+            XFNV_RECONSTRUCT(std::string)(&strDetails, "default reached in CFrondEngine::Compute()");
             throw IdvFileError(strDetails, false);
         }
     }

@@ -745,7 +745,7 @@ ShadowSceneLight* ShadowSceneNode::AddQueuedLight(ShadowSceneLight* apLight) {
     }
 
     // The NiPointer is filled in without its constructor's null test, because apLight was dereferenced above.
-    FNVD_INLINED_LOCAL(NiPointer<ShadowSceneLight>, spLight, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ShadowSceneLight>, spLight, std::nullopt, std::nullopt);
     spLight.m_pObject = apLight;
     NiIncRefCount(apLight);
     lLightList.AddTail(spLight);
@@ -1396,7 +1396,7 @@ void ShadowSceneNode::RemoveShadowLight(NiAVObject* apObject) {
         if (pLight && pLight->spShadowCaster.m_pObject == apObject) {
             // The NiPointer is filled in directly, without its constructor's and destructor's null tests (pLight was
             // tested above).
-            FNVD_INLINED_LOCAL(NiPointer<ShadowSceneLight>, spLight, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiPointer<ShadowSceneLight>, spLight, std::nullopt, std::nullopt);
             spLight.m_pObject = pLight;
             NiIncRefCount(pLight);
             RemoveLight(spLight);

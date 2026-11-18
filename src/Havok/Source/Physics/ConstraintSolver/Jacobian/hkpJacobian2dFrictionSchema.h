@@ -16,7 +16,7 @@ public:
     hkpSolverResults* m_solverResults;
     // The 4-byte pointer's padding up to HK_SIZE_OF_JACOBIAN_2D_FRICTION_SCHEMA (112 bytes for both pointer sizes,
     // hkpSolve.h): an 8-byte pointer fills the 16-byte lane alone.
-#if !FNVD_64BIT
+#if !XFNV_64BIT
     float m_padding55;
 #endif
 };

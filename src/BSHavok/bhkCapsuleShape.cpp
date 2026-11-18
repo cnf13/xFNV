@@ -215,7 +215,7 @@ void bhkCapsuleShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefC
     MEM_CONTEXT eMemContext = pTLSData->eMemContext;
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
     // EXE-INLINED 0x66D650
-    FNVD_INLINED_LOCAL(hkCapsuleShapeCinfo, kCinfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkCapsuleShapeCinfo, kCinfo, std::nullopt, std::nullopt);
     kCinfo.m_radius = 0.1f;
     kCinfo.m_vertexA.fX = 0.0f;
     kCinfo.m_vertexA.fY = 0.0f;

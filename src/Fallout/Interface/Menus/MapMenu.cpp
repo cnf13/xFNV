@@ -157,14 +157,14 @@ void MapMenu::DoDownClick(int32_t aiID, Tile* apTarget) {
 }
 
 void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
     NiPoint3 v66;
     NiPoint3 v68;
     NiPoint3 v70;
     NiPoint3 dst;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (!apTarget && aiID >= 0 && aiID < NUM_TILES) {
         apTarget = pTiles[aiID];
     }
@@ -1100,7 +1100,7 @@ void MapMenu::ResetWaveform() {
 }
 
 void MapMenu::HighlightCenterMarker() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (pMapTile) {
         double Float = pTiles[6]->GetFloat(4002);
         float v20 = pTiles[6]->GetFloat(4016) / 2.0 + Float;
@@ -1195,7 +1195,7 @@ void MapMenu::UpdatePlayingSounds() {
             this->iSoundPlayStartTime = appTimer.iLastTime;
             // Copies the location, then builds the by-value handle with operator=, then reads the text.
             NiPoint3 kSpeakerLoc = pPlayer->GetLocationOnReference();
-            FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
             kHandle = this->pCurrentSound->m_item;
             Interface::ShowSubtitle(this->SubtitlesToShow.GetAt(0).pString, kHandle, kSpeakerLoc, pPlayer, false);
             this->SubtitlesToShow.Remove(0, true);
@@ -1224,7 +1224,7 @@ void MapMenu::UpdatePlayingSounds() {
             ispeechEndTime = 0;
             // Copies the location, then builds the by-value handle with operator=, then reads the text.
             NiPoint3 kSpeakerLoc = pPlayer->GetLocationOnReference();
-            FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
             kHandle = this->pCurrentSound->m_item;
             Interface::ShowSubtitle(this->SubtitlesToShow.GetAt(0).pString, kHandle, kSpeakerLoc, pPlayer, true);
             this->SubtitlesToShow.Remove(0, true);
@@ -2015,7 +2015,7 @@ void MapMenu::DeletePlayerMarker() {
 }
 
 TESWorldSpace* MapMenu::CalculatePlayerMarkerSpace(NiPoint3 aWorldPos) {
-    FNVD_INLINED_LOCAL(PathingLocation, destination_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, destination_2, std::nullopt, std::nullopt);
     NiPoint3 adjustedCoord;
     TESWorldSpace* presult = nullptr;
     float fshortestDist = 3.4028235e+38f;
@@ -2056,7 +2056,7 @@ TESWorldSpace* MapMenu::CalculatePlayerMarkerSpace(NiPoint3 aWorldPos) {
 }
 
 void MapMenu::StopNoteSound() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (pCurrentSound) {
         BSSoundHandle* v1 = &pCurrentSound->m_item;
         if (v1->IsPlaying()) {
@@ -2529,8 +2529,8 @@ void MapMenu::Zoom_RefreshCompanions() {
                 double v3;
                 Tile* v8;
                 const char* v9;
-                FNVD_INLINED_LOCAL(NiPlane, afValue, std::nullopt, std::nullopt);
-                FNVD_INLINED_LOCAL(NiPlane, v23, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(NiPlane, afValue, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(NiPlane, v23, std::nullopt, std::nullopt);
                 char apName[68];
                 if (v25) {
                     v9 = v25->GetFullName();
@@ -2635,7 +2635,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
     NiPoint3 v88;
     NiPoint3 dst;
     if ((MapMenu::pMe) && (MapMenu::pMe->pTiles[2]->GetModel()) && (MapMenu::ShouldRenderLocalMap())) {
-        FNVD_INLINED_LOCAL(NiColorA, oldSunColor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, oldSunColor, std::nullopt, std::nullopt);
         NiPoint3 playerLoc;
         const NiPoint3* v1 = &pPlayer->GetLocationOnReference();
         playerLoc.x = v1->x;
@@ -2808,7 +2808,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
             void* v76 = ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * inumVerts : SIZE_MAX);
             if (v76) {
                 rt::eh_vector_constructor_iterator(
-                    v76, sizeof(NiColorA), inumVerts_5, &fnvd::constructElement<NiColorA>
+                    v76, sizeof(NiColorA), inumVerts_5, &xfnv::constructElement<NiColorA>
                 );
                 pcolor = static_cast<NiColorA*>(v76);
             }

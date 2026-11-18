@@ -94,8 +94,8 @@ bool PathManager::BuildPath(
         // The implementation's BuildPath takes both smart pointers by value, and the callee releases them.
         return pImpl->BuildPath(aspRequest, aspMessageQueue);
     }
-    FNVD_INLINED_LOCAL(ActorPathingMessage, kOkMessage, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ActorPathingMessage, kErrorMessage, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ActorPathingMessage, kOkMessage, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ActorPathingMessage, kErrorMessage, std::nullopt, std::nullopt);
     void* pMemory = NiMemObject::operator new(sizeof(PathingSolution));
     PathingSolution* pSolution;
     if (pMemory) {
@@ -665,7 +665,7 @@ void PathManagerImpl::Release() {
 }
 
 void PathManagerImpl::CancelCurrentPathsAndPause() {
-    FNVD_INLINED_LOCAL(ActorPathingMessage, v4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ActorPathingMessage, v4, std::nullopt, std::nullopt);
     PathingMessage msg;
     using it_t = LockFreeMap<PathingRequest*, PathingTaskData*>::LockFreeMapIterator;
     UpdateCriticalSection.Enter("PathManagerImpl::CancelCurrentPathsAndPause");

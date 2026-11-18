@@ -130,7 +130,7 @@ typedef struct _D3DVERTEXBUFFER_DESC {
 
 // d3d9types.h and d3d9caps.h pack to 4 bytes on x86 only (D3DADAPTER_IDENTIFIER9's LARGE_INTEGER sits at 0x420
 // unpadded); on x64 they keep natural alignment (D3DPRESENT_PARAMETERS's window handle at 0x20).
-#if !FNVD_64BIT
+#if !XFNV_64BIT
 #pragma pack(push, 4)
 #endif
 
@@ -404,7 +404,7 @@ typedef struct _D3DADAPTER_IDENTIFIER9 {
     uint32_t WHQLLevel;
 } D3DADAPTER_IDENTIFIER9;
 
-#if !FNVD_64BIT
+#if !XFNV_64BIT
 #pragma pack(pop)
 #endif
 
@@ -1716,7 +1716,7 @@ struct ID3DXInclude {
 using Direct3DCreate9_t = IDirect3D9*(WINAPI*)(uint32_t SDKVersion);
 using Direct3DCreate9Ex_t = HRESULT(WINAPI*)(uint32_t SDKVersion, IDirect3D9Ex** ppD3D9Ex);
 
-// The exe's d3d9.dll and d3dx9_38.dll imports. Each is FNVD_GLOBAL(<pointer to the SDK prototype>, <SDK name>, <import
+// The exe's d3d9.dll and d3dx9_38.dll imports. Each is XFNV_GLOBAL(<pointer to the SDK prototype>, <SDK name>, <import
 // slot>): the hybrid build reads the exe's import slot, so `D3DXCompileShader(...)` compiles to `call [0xFDF408]` as
 // the exe's calls do (the exe also reaches some through a `jmp [slot]` thunk, e.g. D3DXMatrixInverse 0xEE6DDA; the
 // effect is the same). Every one is WINAPI (stdcall).
@@ -1817,32 +1817,32 @@ using D3DXMatrixInverse_t = D3DXMATRIX*(WINAPI*)(D3DXMATRIX * pOut, float* pDete
 using D3DXMatrixTranspose_t = D3DXMATRIX*(WINAPI*)(D3DXMATRIX * pOut, const D3DXMATRIX* pM);
 using D3DXPlaneNormalize_t = D3DXPLANE*(WINAPI*)(D3DXPLANE * pOut, const D3DXPLANE* pP);
 
-FNVD_IMPORT(D3DPERF_SetOptions_t, D3DPERF_SetOptions, 0xFDF3C8);
-FNVD_IMPORT(D3DXLoadSurfaceFromSurface_t, D3DXLoadSurfaceFromSurface, 0xFDF3D0);
-FNVD_IMPORT(D3DXSaveTextureToFileA_t, D3DXSaveTextureToFileA, 0xFDF3D4);
-FNVD_IMPORT(D3DXAssembleShader_t, D3DXAssembleShader, 0xFDF3D8);
-FNVD_IMPORT(D3DXAssembleShaderFromFileA_t, D3DXAssembleShaderFromFileA, 0xFDF3DC);
-FNVD_IMPORT(D3DXCompileShaderFromFileA_t, D3DXCompileShaderFromFileA, 0xFDF3E0);
-FNVD_IMPORT(D3DXGetShaderConstantTable_t, D3DXGetShaderConstantTable, 0xFDF3E4);
-FNVD_IMPORT(D3DXCreateBuffer_t, D3DXCreateBuffer, 0xFDF3E8);
-FNVD_IMPORT(D3DXVec4Transform_t, D3DXVec4Transform, 0xFDF3EC);
-FNVD_IMPORT(D3DXGetVertexShaderProfile_t, D3DXGetVertexShaderProfile, 0xFDF3F0);
-FNVD_IMPORT(D3DXGetPixelShaderProfile_t, D3DXGetPixelShaderProfile, 0xFDF3F4);
-FNVD_IMPORT(D3DXGetImageInfoFromFileInMemory_t, D3DXGetImageInfoFromFileInMemory, 0xFDF3F8);
-FNVD_IMPORT(D3DXCreateTextureFromFileInMemory_t, D3DXCreateTextureFromFileInMemory, 0xFDF3FC);
-FNVD_IMPORT(D3DXCreateCubeTextureFromFileInMemory_t, D3DXCreateCubeTextureFromFileInMemory, 0xFDF400);
-FNVD_IMPORT(D3DXCreateVolumeTextureFromFileInMemory_t, D3DXCreateVolumeTextureFromFileInMemory, 0xFDF404);
-FNVD_IMPORT(D3DXCompileShader_t, D3DXCompileShader, 0xFDF408);
-FNVD_IMPORT(D3DXMatrixRotationYawPitchRoll_t, D3DXMatrixRotationYawPitchRoll, 0xFDF40C);
-FNVD_IMPORT(D3DXMatrixMultiplyTranspose_t, D3DXMatrixMultiplyTranspose, 0xFDF410);
-FNVD_IMPORT(D3DXVec3TransformCoord_t, D3DXVec3TransformCoord, 0xFDF414);
-FNVD_IMPORT(D3DXPlaneTransform_t, D3DXPlaneTransform, 0xFDF418);
-FNVD_IMPORT(D3DXVec3Normalize_t, D3DXVec3Normalize, 0xFDF41C);
-FNVD_IMPORT(D3DXVec3TransformNormal_t, D3DXVec3TransformNormal, 0xFDF420);
-FNVD_IMPORT(D3DXMatrixMultiply_t, D3DXMatrixMultiply, 0xFDF424);
-FNVD_IMPORT(D3DXMatrixInverse_t, D3DXMatrixInverse, 0xFDF428);
-FNVD_IMPORT(D3DXMatrixTranspose_t, D3DXMatrixTranspose, 0xFDF42C);
-FNVD_IMPORT(D3DXPlaneNormalize_t, D3DXPlaneNormalize, 0xFDF430);
+XFNV_IMPORT(D3DPERF_SetOptions_t, D3DPERF_SetOptions, 0xFDF3C8);
+XFNV_IMPORT(D3DXLoadSurfaceFromSurface_t, D3DXLoadSurfaceFromSurface, 0xFDF3D0);
+XFNV_IMPORT(D3DXSaveTextureToFileA_t, D3DXSaveTextureToFileA, 0xFDF3D4);
+XFNV_IMPORT(D3DXAssembleShader_t, D3DXAssembleShader, 0xFDF3D8);
+XFNV_IMPORT(D3DXAssembleShaderFromFileA_t, D3DXAssembleShaderFromFileA, 0xFDF3DC);
+XFNV_IMPORT(D3DXCompileShaderFromFileA_t, D3DXCompileShaderFromFileA, 0xFDF3E0);
+XFNV_IMPORT(D3DXGetShaderConstantTable_t, D3DXGetShaderConstantTable, 0xFDF3E4);
+XFNV_IMPORT(D3DXCreateBuffer_t, D3DXCreateBuffer, 0xFDF3E8);
+XFNV_IMPORT(D3DXVec4Transform_t, D3DXVec4Transform, 0xFDF3EC);
+XFNV_IMPORT(D3DXGetVertexShaderProfile_t, D3DXGetVertexShaderProfile, 0xFDF3F0);
+XFNV_IMPORT(D3DXGetPixelShaderProfile_t, D3DXGetPixelShaderProfile, 0xFDF3F4);
+XFNV_IMPORT(D3DXGetImageInfoFromFileInMemory_t, D3DXGetImageInfoFromFileInMemory, 0xFDF3F8);
+XFNV_IMPORT(D3DXCreateTextureFromFileInMemory_t, D3DXCreateTextureFromFileInMemory, 0xFDF3FC);
+XFNV_IMPORT(D3DXCreateCubeTextureFromFileInMemory_t, D3DXCreateCubeTextureFromFileInMemory, 0xFDF400);
+XFNV_IMPORT(D3DXCreateVolumeTextureFromFileInMemory_t, D3DXCreateVolumeTextureFromFileInMemory, 0xFDF404);
+XFNV_IMPORT(D3DXCompileShader_t, D3DXCompileShader, 0xFDF408);
+XFNV_IMPORT(D3DXMatrixRotationYawPitchRoll_t, D3DXMatrixRotationYawPitchRoll, 0xFDF40C);
+XFNV_IMPORT(D3DXMatrixMultiplyTranspose_t, D3DXMatrixMultiplyTranspose, 0xFDF410);
+XFNV_IMPORT(D3DXVec3TransformCoord_t, D3DXVec3TransformCoord, 0xFDF414);
+XFNV_IMPORT(D3DXPlaneTransform_t, D3DXPlaneTransform, 0xFDF418);
+XFNV_IMPORT(D3DXVec3Normalize_t, D3DXVec3Normalize, 0xFDF41C);
+XFNV_IMPORT(D3DXVec3TransformNormal_t, D3DXVec3TransformNormal, 0xFDF420);
+XFNV_IMPORT(D3DXMatrixMultiply_t, D3DXMatrixMultiply, 0xFDF424);
+XFNV_IMPORT(D3DXMatrixInverse_t, D3DXMatrixInverse, 0xFDF428);
+XFNV_IMPORT(D3DXMatrixTranspose_t, D3DXMatrixTranspose, 0xFDF42C);
+XFNV_IMPORT(D3DXPlaneNormalize_t, D3DXPlaneNormalize, 0xFDF430);
 
 // IDA names; not in the PDB.
 extern GUID CLSID_IAsyncReader;

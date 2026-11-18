@@ -143,7 +143,7 @@ hkBool* hkpHavokSnapshot::save(
     hkPackfileWriter::AddObjectListener* apUserListener
 ) {
     // EXE-INLINED none: hkpHavokSnapshot::ConvertListener's constructor
-    FNVD_INLINED_LOCAL(
+    XFNV_INLINED_LOCAL(
         hkpHavokSnapshot::ConvertListener, kDefaultConvertListener, hkpHavokSnapshot_ConvertListener_vftable,
         std::nullopt
     );

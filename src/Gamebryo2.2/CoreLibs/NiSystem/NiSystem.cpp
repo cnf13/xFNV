@@ -25,7 +25,7 @@ int32_t NiStricmp(const char* s1, const char* s2) {
 }
 
 uint32_t XInputGetState(uint32_t dwUserIndex, _XINPUT_STATE* pXInputState) {
-    return fnvd::imports::XInputGetState(dwUserIndex, pXInputState);
+    return xfnv::imports::XInputGetState(dwUserIndex, pXInputState);
 }
 
 int32_t NiStrnicmp(const char* s1, const char* s2, uint32_t n) {

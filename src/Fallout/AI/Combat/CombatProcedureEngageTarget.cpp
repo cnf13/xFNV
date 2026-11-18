@@ -38,8 +38,8 @@ void CombatProcedureEngageTarget::Update() {
     NiPoint3 optimalLocation;
     CombatLocation dodgeLocation_2;
     NiPoint3 newPoint;
-    FNVD_INLINED_LOCAL(PathingRequest, request_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingRequest, request_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
     BGSWorldLocation attackerWorldLoc;
     BGSWorldLocation targetWorldLoc;
     Actor* pattacker = GetAttacker();
@@ -223,7 +223,7 @@ void CombatProcedureEngageTarget::Update() {
                                       ? fdodgeDistance = RandomFloat(64.0f, 192.0f)
                                       : fdodgeDistance = RandomFloat(128.0f, 384.0f),
                                   (LeftRightDodgeLOSTimer.Clear(),
-                                   (FNVD_RECONSTRUCT(CombatLocation)(&dodgeLocation_2),
+                                   (XFNV_RECONSTRUCT(CombatLocation)(&dodgeLocation_2),
                                     pcombatState
                                         ->FindBestDodgeLocation(&dodgeLocation_2, 3u, 0, fdodgeDistance, 24.0f)))))) {
                                 PathingRequest request_6;

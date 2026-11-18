@@ -48,7 +48,7 @@ void hkpWorldSnapshotViewer::init() {
 void hkpWorldSnapshotViewer::step(float frameTimeInMs) {
     if (m_outStream) {
         // EXE-INLINED none: hkArray<char>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<char>, storage, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<char>, storage, std::nullopt, std::nullopt);
         storage.m_data = nullptr;
         storage.m_size = 0;
         storage.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;

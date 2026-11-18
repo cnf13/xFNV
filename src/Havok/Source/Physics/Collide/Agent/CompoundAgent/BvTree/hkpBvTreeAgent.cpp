@@ -116,7 +116,7 @@ void hkpBvTreeAgent::processCollision(
     hkpConstraintOwner* constraintOwner = result.m_constraintOwner.m_storage;
     // EXE-INLINED none: hkInplaceArray<uint32_t, 128>::hkInplaceArray
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    FNVD_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
     hitList.m_data = hitList.m_storage;
     hitList.m_size = 0;
     hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -381,7 +381,7 @@ void hkpBvTreeAgent::processCollision(
                 reinterpret_cast<uintptr_t>(hitList.m_data) + hitList.m_size * sizeof(uint32_t)
             );
 
-            FNVD_INLINED_LOCAL(hkLocalArray<hkpBvAgentEntryInfo>, newEntries, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkLocalArray<hkpBvAgentEntryInfo>, newEntries, std::nullopt, std::nullopt);
             newEntries.m_data = nullptr;
             newEntries.m_size = 0;
             newEntries.m_capacityAndFlags = hkArrayBase<hkpBvAgentEntryInfo>::DONT_DEALLOCATE_FLAG;
@@ -674,7 +674,7 @@ void hkpBvTreeAgent::prepareCollisionPartners(
 
     // EXE-INLINED none: hkInplaceArray<uint32_t, 128>::hkInplaceArray
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) FNVD_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
     hitList.m_data = hitList.m_storage;
     hitList.m_size = 0;
     hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -804,7 +804,7 @@ void hkpBvTreeAgent::prepareCollisionPartners(
                 reinterpret_cast<uintptr_t>(hitList.m_data) + hitList.m_size * sizeof(uint32_t)
             );
 
-            FNVD_INLINED_LOCAL(hkLocalArray<hkpBvAgentEntryInfo>, newEntries, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkLocalArray<hkpBvAgentEntryInfo>, newEntries, std::nullopt, std::nullopt);
             newEntries.m_data = nullptr;
             newEntries.m_size = 0;
             newEntries.m_capacityAndFlags = hkArrayBase<hkpBvAgentEntryInfo>::DONT_DEALLOCATE_FLAG;
@@ -1017,7 +1017,7 @@ void hkpBvTreeAgent::staticGetPenetrations(
     const hkpBvTreeShape* bvB = static_cast<const hkpBvTreeShape*>(bodyB.m_shape);
     // 16-aligned, as queryAabb receives it. Raw storage: the body frees the keys itself.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) FNVD_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
     hitList.m_data = hitList.m_storage;
     hitList.m_size = 0;
     hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -1075,7 +1075,7 @@ void hkpBvTreeAgent::staticGetClosestPoints(
     const hkpBvTreeShape* bvB = static_cast<const hkpBvTreeShape*>(bodyB.m_shape);
     // 16-aligned, as queryAabb receives it. Raw storage: the body frees the keys itself.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) FNVD_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
     hitList.m_data = hitList.m_storage;
     hitList.m_size = 0;
     hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
@@ -1133,7 +1133,7 @@ void hkpBvTreeAgent::staticLinearCast(
     // 16-aligned, as queryAabb receives it. Raw storage: the body frees the keys itself at the end, so no C++
     // destructor may free them again.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) FNVD_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
     hitList.m_data = hitList.m_storage;
     hitList.m_size = 0;
     hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;

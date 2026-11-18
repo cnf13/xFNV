@@ -45,7 +45,7 @@ bool TESFaction::Load(TESFile* apFile) {
             case XNAM_ID: {
                 GROUP_REACTION* pReaction = static_cast<GROUP_REACTION*>(ourMalloc(sizeof(GROUP_REACTION)));
                 apFile->GetChunkData(pReaction, 0xC);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0xC bytes, the form's 4-byte ID first.
                 TESFile::WidenFormIDRecords(
                     pReaction, 1, 0xC, sizeof(GROUP_REACTION), {{0, offsetof(GROUP_REACTION, pForm)}}

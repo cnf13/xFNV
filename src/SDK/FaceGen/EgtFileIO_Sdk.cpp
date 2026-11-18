@@ -24,7 +24,7 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 	std::vector<FffModeTexS, std::allocator<FffModeTexS>>& asym)
 {
 	FffEgtFileHeaderS header;
-	FNVD_INLINED_LOCAL(BSFaceGenBinaryFile, kFile, std::nullopt, std::nullopt);
+	XFNV_INLINED_LOCAL(BSFaceGenBinaryFile, kFile, std::nullopt, std::nullopt);
 	std::string kFileId("FREGT003");
 	::new (&kFile) BSFaceGenBinaryFile(kFileId);
 	// The early returns' destructor, which the exe inlines.
@@ -34,7 +34,7 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 	};
 	std::string kFileName;
 	// The by-value file name's copy constructor.
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
 	if (!kFile.BSFaceGenBinaryFile::openForRead(kFileName, false)) {
 		return fnFail();
 	}

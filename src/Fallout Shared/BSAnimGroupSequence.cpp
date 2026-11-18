@@ -288,12 +288,12 @@ uint16_t BSAnimGroupSequence::GetSequenceSaveSize() {
 }
 
 bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR* apRef) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v41, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v42, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v41, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v42, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t inumKeys;
     bool bdone = false;
     if ((apSeq) && (apSeq->GetState() == NiControllerSequence::kAnimating)) {
@@ -1024,7 +1024,7 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
     NiPointer<NiControllerSequence>& aspControllerSequence
 ) {
     BSAnimGroupSequence* v3;
-    FNVD_INLINED_LOCAL(NiPointer<NiControllerSequence>, spSequence, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiControllerSequence>, spSequence, std::nullopt, std::nullopt);
     ::new (&spSequence) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
     NiControllerSequence::CreateSequenceFromFile(kStream, uiIndex, spSequence);
     BSAnimGroupSequence* apMemory =

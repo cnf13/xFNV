@@ -62,7 +62,7 @@ static hkReferencedObject* hkpUserConvexRadiusBuildercreate() {
 
 double _getPlaneToSurfaceDistance(const hkpShape* r_eax) {
     using apVertices_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(apVertices_t, apVertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(apVertices_t, apVertices, std::nullopt, std::nullopt);
     // getPlaneEquations, a trivial accessor: the shape's plane equations.
     hkArray<hkVector4, hkContainerHeapAllocator>* v2 =
         &static_cast<const hkpConvexVerticesShape*>(r_eax)->m_planeEquations;
@@ -254,7 +254,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             normal.setCross(edge01, edge02);
 
             // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) FNVD_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
+            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
             planes.m_data = nullptr;
             planes.m_size = 0;
             planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -369,7 +369,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             const float maxDistance = static_cast<float>(_getPlaneToSurfaceDistance(shape));
 
             // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) FNVD_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
+            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
             planes.m_data = nullptr;
             planes.m_size = 0;
             planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -554,7 +554,7 @@ hkDisplayGeometry* hkpConvexRadiusBuilder::getCurrentRawGeometry(
 hkDisplayConvex*
 hkpConvexRadiusBuilder::createConvexDisplayFromPoints(const hkArray<hkVector4>& points, const hkTransform& transform) {
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, hullVertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, hullVertices, std::nullopt, std::nullopt);
     hullVertices.m_data = nullptr;
     hullVertices.m_size = 0;
     hullVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -576,7 +576,7 @@ hkpConvexRadiusBuilder::createConvexDisplayFromPoints(const hkArray<hkVector4>& 
     }
 
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, transformedVertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, transformedVertices, std::nullopt, std::nullopt);
     transformedVertices.m_data = nullptr;
     transformedVertices.m_size = 0;
     transformedVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;

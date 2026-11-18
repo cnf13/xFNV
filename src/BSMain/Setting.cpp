@@ -460,7 +460,7 @@ RegSettingCollection*& SettingT<RegSettingCollection>::pCollection = SettingT_Re
 
 // The members of every collection's settings, instantiated here where all the collections are complete (Setting.h
 // declares them only).
-#define FNVD_SETTINGT_INSTANCE(Collection)                                                                             \
+#define XFNV_SETTINGT_INSTANCE(Collection)                                                                             \
     template SettingT<Collection>::SettingT(const char*, Setting::Info);                                               \
     template SettingT<Collection>::SettingT(const char*, bool);                                                        \
     template SettingT<Collection>::SettingT(const char*, float);                                                       \
@@ -477,10 +477,10 @@ RegSettingCollection*& SettingT<RegSettingCollection>::pCollection = SettingT_Re
     template SettingT<Collection>& SettingT<Collection>::operator=(const char*);                                       \
     template bool SettingT<Collection>::operator==(bool);                                                              \
     template bool SettingT<Collection>::operator==(int32_t)
-FNVD_SETTINGT_INSTANCE(GameSettingCollection);
-FNVD_SETTINGT_INSTANCE(INISettingCollection);
-FNVD_SETTINGT_INSTANCE(INIPrefSettingCollection);
-FNVD_SETTINGT_INSTANCE(RendererSettingCollection);
-FNVD_SETTINGT_INSTANCE(BlendSettingCollection);
-FNVD_SETTINGT_INSTANCE(RegSettingCollection);
-#undef FNVD_SETTINGT_INSTANCE
+XFNV_SETTINGT_INSTANCE(GameSettingCollection);
+XFNV_SETTINGT_INSTANCE(INISettingCollection);
+XFNV_SETTINGT_INSTANCE(INIPrefSettingCollection);
+XFNV_SETTINGT_INSTANCE(RendererSettingCollection);
+XFNV_SETTINGT_INSTANCE(BlendSettingCollection);
+XFNV_SETTINGT_INSTANCE(RegSettingCollection);
+#undef XFNV_SETTINGT_INSTANCE

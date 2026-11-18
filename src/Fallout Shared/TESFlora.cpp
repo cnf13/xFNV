@@ -152,7 +152,7 @@ bool TESFlora::Activate(
     TESBoundObject* apObjectToGet,
     int32_t aiCount
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Actor* pactor = dynamic_cast<Actor*>(apActionRef);
     if ((apItemActivated) && (pactor)) {
         bool bsuccess = false;

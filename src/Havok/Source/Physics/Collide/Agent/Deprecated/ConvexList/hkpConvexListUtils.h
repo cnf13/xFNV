@@ -81,4 +81,4 @@ public:
     hkpContactMgr* m_contactMgr;
     hkBool m_invalidPointHit;
 };
-inline constexpr fnvd::Vtable hkpMapPointsToSubShapeContactMgr_vftable{};
+inline constexpr xfnv::Vtable hkpMapPointsToSubShapeContactMgr_vftable{};

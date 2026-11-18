@@ -56,7 +56,7 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
         return;
     }
     WorldToEntityData* data = m_worldEntities.m_data[index];
-    FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
     displayGeometries.m_data = nullptr;
     displayGeometries.m_size = 0;
     displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
@@ -79,7 +79,7 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
             hkError::s_instance->message(
                 hkError::MESSAGE_REPORT, -1, buf, ".\\VisualDebugger\\Viewer\\Collide\\hkpConvexRadiusViewer.cpp", 0xA7
             );
-            FNVD_DESTRUCT(hkOstream)(pError);
+            XFNV_DESTRUCT(hkOstream)(pError);
             // EXE-INLINED none: hkArray::removeAt
             uint32_t last = --displayGeometries.m_size;
             if (static_cast<int32_t>(last) != i) {

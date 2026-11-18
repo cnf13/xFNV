@@ -20,7 +20,7 @@ void NiMetricsLayer::_SDMShutdown() {
     EnterCriticalSection(&NiMetricsLayer::ms_kMutex);
     uint32_t i = 0;
     if (NiMetricsLayer::ms_kOutputs.m_usSize) {
-        FNVD_INLINED_LOCAL(NiPointer<NiMetricsOutputModule>, spNull, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPointer<NiMetricsOutputModule>, spNull, std::nullopt, std::nullopt);
         spNull.m_pObject = nullptr;
         do {
             NiMetricsLayer::ms_kOutputs.SetAt(i++, spNull);

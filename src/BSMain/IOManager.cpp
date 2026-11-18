@@ -193,7 +193,7 @@ void BSTaskManagerThread::ThreadUpdate() {
                 NiAtomicDecrement(PauseSemaphore.iCount);
                 kIterator.SetBucket(0);
             }
-            FNVD_INLINED_LOCAL(NiPointer<BSTask<int64_t>>, spTask, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiPointer<BSTask<int64_t>>, spTask, std::nullopt, std::nullopt);
             spTask.m_pObject = nullptr;
             int64_t iKey;
             if (pOwner->GetNext(kIterator, iKey, spTask, !bRanTask)) {
@@ -422,7 +422,7 @@ bool IOManager::UpdateQueue() {
     if (pUpdateSecondaryQueueCallback) {
         bqueueResult = pUpdateSecondaryQueueCallback();
     }
-    FNVD_INLINED_LOCAL(NiPointer<IOTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<IOTask>, sptask, std::nullopt, std::nullopt);
     sptask.m_pObject = nullptr;
     pPostProcessQueue->Pop(sptask);
     while (sptask.m_pObject) {

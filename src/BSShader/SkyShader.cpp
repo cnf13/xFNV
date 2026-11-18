@@ -1378,7 +1378,7 @@ void SkyShader::CreateSkyQuad(NiPointer<NiTriShape>& aspTriShape) {
     void* pColorMemory = MemoryManager_Singleton.Allocate(4 * sizeof(NiColorA));
     NiColorA* pColors = nullptr;
     if (pColorMemory) {
-        rt::eh_vector_constructor_iterator(pColorMemory, sizeof(NiColorA), 4, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(pColorMemory, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
         pColors = static_cast<NiColorA*>(pColorMemory);
     }
     pColors[0] = NiColorA_BLACK;

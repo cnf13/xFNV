@@ -169,7 +169,7 @@ public:
     // 0xDBC4D0) take the two registers as the pair: declared as that 64-bit integer, which the usercall form carries
     // (the pointers go through uintptr_t into and out of it).
     // Inferred type: apClass: hkClass* from 0xdbc079 (hkDataArrayNative::m_class (this of hkDataArrayNative::asObject))
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The 64-bit program returns the variant itself: its two pointers do not fit the 64-bit pair.
     static hkVariant DBB140(
         void* apAddress,

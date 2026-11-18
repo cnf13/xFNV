@@ -60,7 +60,7 @@ static void weldGeometryVertices(
     }
     vertexRemapOut.m_size = numVertices;
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, uniqueVerts, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, uniqueVerts, std::nullopt, std::nullopt);
     uniqueVerts.m_data = nullptr;
     uniqueVerts.m_size = 0;
     uniqueVerts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -69,8 +69,8 @@ static void weldGeometryVertices(
     // The source of the new vertices: the unique ones as welded, or in their first-use order.
     hkArray<hkVector4>* pNewVerts = &uniqueVerts;
     // EXE-INLINED none: hkArray<hkVector4>::hkArray, hkArray<int>::hkArray (built only when keepVertexOrder is set)
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, orderedVerts, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, uniqueToOrdered, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, orderedVerts, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, uniqueToOrdered, std::nullopt, std::nullopt);
     if (keepVertexOrder.m_bool) {
         orderedVerts.m_data = nullptr;
         orderedVerts.m_size = 0;
@@ -387,7 +387,7 @@ void hkGeometryUtils::createCapsuleGeometry(
 ) {
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
     using verts_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(verts_t, verts, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(verts_t, verts, std::nullopt, std::nullopt);
     verts.m_data = nullptr;
     verts.m_size = 0;
     verts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -697,8 +697,8 @@ void hkGeometryUtils::createCapsuleGeometry(
 // freed as their destructors do, the triangle remap first.
 void hkGeometryUtils::weldVertices(hkGeometry& meshGeometry, float threshold) {
     // EXE-INLINED none: hkArray<int32_t>::hkArray (twice)
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, vertexRemap, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, triangleRemap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, vertexRemap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, triangleRemap, std::nullopt, std::nullopt);
     vertexRemap.m_data = nullptr;
     vertexRemap.m_size = 0;
     vertexRemap.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;

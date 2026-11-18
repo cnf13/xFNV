@@ -198,7 +198,7 @@ bool PathingCoverLocation::IsStandCover() {
 }
 
 uint32_t PathingCoverLocation::GetKey() {
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     uint16_t arTriangle;
     ::new (&apMemory) NavMeshPtr;
     arTriangle = 0;

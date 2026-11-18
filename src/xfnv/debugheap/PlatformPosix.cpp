@@ -18,7 +18,7 @@
 #include <ucontext.h>
 #include <unistd.h>
 
-namespace fnvd::debugheap::platform {
+namespace xfnv::debugheap::platform {
     namespace {
 
         int giLog = -1;
@@ -162,7 +162,7 @@ namespace fnvd::debugheap::platform {
     }
 
     void OpenLog() {
-        giLog = open("fnvd_debugheap.log", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+        giLog = open("xfnv_debugheap.log", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
     }
 
     void WriteLog(const char* apText, size_t aSize) {
@@ -233,4 +233,4 @@ namespace fnvd::debugheap::platform {
         return (static_cast<AlignedHeader*>(apMem) - 1)->uiSize;
     }
 
-} // namespace fnvd::debugheap::platform
+} // namespace xfnv::debugheap::platform

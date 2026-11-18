@@ -16,7 +16,7 @@
 void ShadowLightShader::PresetADTPasses_2x() {
     NiD3DPass* v32;
     // EXE-INLINED none: NiPointer<NiD3DPass> constructor and destructor
-    FNVD_INLINED_LOCAL(NiPointer<NiD3DPass>, spD3DPass, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiD3DPass>, spD3DPass, std::nullopt, std::nullopt);
     NiD3DPass* m_pObject = nullptr;
     spD3DPass.m_pObject = nullptr;
     {
@@ -1945,7 +1945,7 @@ void ShadowLightShader::PresetADTPasses_2x() {
 void ShadowLightShader::PresetADTSPasses_2x() {
     bool v2;
     NiD3DPass* v19;
-    FNVD_INLINED_LOCAL(NiPointer<NiD3DPass>, spCurrentPass, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiD3DPass>, spCurrentPass, std::nullopt, std::nullopt);
     uint32_t uiValue;
     NiD3DPass* m_pObject = nullptr;
     spCurrentPass.m_pObject = nullptr;

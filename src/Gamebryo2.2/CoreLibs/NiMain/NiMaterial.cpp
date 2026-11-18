@@ -149,7 +149,7 @@ void NiMaterial::UnloadShadersForAllMaterials() {
     }
 
     if (pkItem != nullptr) {
-        FNVD_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
         // EXE-INLINED none: NiFixedString::NiFixedString
         kKey.SetHandle(NiGlobalStringTable::NULL_STRING);
         NiMaterial* pkMaterial = nullptr;

@@ -496,7 +496,7 @@ void hkpSampledHeightFieldShape::castRayInternal(
             static_cast<uint32_t>(cell[2]) >= static_cast<uint32_t>(m_zRes - 1)) {
             goto end;
         }
-        FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
         // EXE-INLINED 0x4A3D20
         output.m_hitFraction = 1.0f;
         output.m_extraInfo = -1;
@@ -853,7 +853,7 @@ void hkpSampledHeightFieldShape::castRayInternal(
                 goto end;
             }
             {
-                FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
                 // EXE-INLINED 0x4A3D20
                 output.m_hitFraction = 1.0f;
                 output.m_normal(3) = 0.0f;

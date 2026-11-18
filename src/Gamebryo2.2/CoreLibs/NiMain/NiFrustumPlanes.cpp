@@ -23,8 +23,8 @@ void NiFrustumPlanes::Set(const NiFrustum& kFrust, const NiTransform& kXform) {
     NiPoint3 v46;
     NiPoint3 kNormal;
     NiPoint3 v48;
-    FNVD_INLINED_LOCAL(NiPlane, v49, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPlane, v50, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v49, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v50, std::nullopt, std::nullopt);
     a2.x = kXform.m_Rotate.m_pEntry[0][0];
     a2.y = kXform.m_Rotate.m_pEntry[1][0];
     float y = kXform.m_Translate.y;

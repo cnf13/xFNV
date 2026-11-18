@@ -87,7 +87,7 @@ void hkLs_collectAgentEntriesToProcess(
     hkLocalArray<hkpAgentNnEntry*>& entriesOut
 ) {
     // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntriesTmp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntriesTmp, std::nullopt, std::nullopt);
     collisionEntriesTmp.m_data = nullptr;
     collisionEntriesTmp.m_size = 0;
     collisionEntriesTmp.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
@@ -825,7 +825,7 @@ hkResult hkLs_localizedSolveToi(
     // EXE-INLINED none: hkInplaceArray<hkpConstraintSchemaInfo,64>::hkInplaceArray
     // Raw storage: the body frees the storage itself on both returns, so no C++ destructor may free it again.
     using constraintStatus_t = hkInplaceArray<hkpConstraintSchemaInfo, 64>;
-    alignas(16) FNVD_INLINED_LOCAL(constraintStatus_t, constraintStatus, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(constraintStatus_t, constraintStatus, std::nullopt, std::nullopt);
     constraintStatus.m_data = constraintStatus.m_storage;
     constraintStatus.m_size = 0;
     constraintStatus.m_capacityAndFlags = hkArrayBase<hkpConstraintSchemaInfo>::DONT_DEALLOCATE_FLAG | 64;
@@ -1450,7 +1450,7 @@ void hkpContinuousSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous_to
 ) {
     hkpSimulationIsland* island = entities[0]->getSimulationIsland();
     const int32_t numEntitiesInIsland = island->m_entities.m_size;
-    FNVD_INLINED_LOCAL(hkLocalArray<uint8_t>, entityVisited, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, entityVisited, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkUchar>::hkLocalArray(numEntitiesInIsland) (hkAllocateStack)
         hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
@@ -1478,7 +1478,7 @@ void hkpContinuousSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous_to
         hkpEntity* entity = entities[i];
         entityVisited.m_data[entity->m_storageIndex] = 1;
         // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, entries, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, entries, std::nullopt, std::nullopt);
         entries.m_data = nullptr;
         entries.m_size = 0;
         entries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
@@ -1558,14 +1558,14 @@ void hkpContinuousSimulation::collideEntitiesNeedingPsiCollisionDetectionNarrowP
     ++m_world->m_criticalOperationsLockCount;
 
     using entriesSet_t = hkPointerMap<hkpAgentNnEntry*, int32_t>;
-    FNVD_INLINED_LOCAL(entriesSet_t, entriesSet, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(entriesSet_t, entriesSet, std::nullopt, std::nullopt);
     // EXE-INLINED 0x626630
     entriesSet.m_map.m_elem = nullptr;
     entriesSet.m_map.m_numElems = 0;
     entriesSet.m_map.m_hashMod = -1;
     // The SDK's inline hkPointerMap constructor's reserve: the map's reserve on the thread's heap.
     entriesSet.m_map.hkUlongMapBase::reserve(hkMemoryRouter::getInstance().heap(), 0);
-    FNVD_INLINED_LOCAL(hkArray<EntryAndIsland>, entriesAndIslands, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<EntryAndIsland>, entriesAndIslands, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<EntryAndIsland>::hkArray
     entriesAndIslands.m_data = nullptr;
     entriesAndIslands.m_size = 0;
@@ -1705,7 +1705,7 @@ void hkpContinuousSimulation::simulateToi(
     // EXE-INLINED none: hkInplaceArray<hkpEntity*,64>::hkInplaceArray
     // Raw storage: the body frees the storage itself at the end, so no C++ destructor may free it again.
     using activeEntities_t = hkInplaceArray<hkpEntity*, 64>;
-    alignas(16) FNVD_INLINED_LOCAL(activeEntities_t, activeEntities, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(activeEntities_t, activeEntities, std::nullopt, std::nullopt);
     activeEntities.m_data = activeEntities.m_storage;
     activeEntities.m_size = 0;
     activeEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG | 64;
@@ -1904,13 +1904,13 @@ void hkpContinuousSimulation::handleSimpleToi(
     // EXE-INLINED none: hkpWorld::lockCriticalOperations
     ++m_world->m_criticalOperationsLockCount;
     using toBeActivated_t = hkInplaceArray<hkpEntity*, 2>;
-    FNVD_INLINED_LOCAL(toBeActivated_t, toBeActivated, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(toBeActivated_t, toBeActivated, std::nullopt, std::nullopt);
     toBeActivated.m_data = toBeActivated.m_storage;
     toBeActivated.m_size = 0;
     toBeActivated.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG | 2;
     event.m_contactMgr->confirmToi(event, rotateNormal, toBeActivated);
     using entitiesToRecollide_t = hkInplaceArray<hkpEntity*, 2>;
-    FNVD_INLINED_LOCAL(entitiesToRecollide_t, entitiesToRecollide, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(entitiesToRecollide_t, entitiesToRecollide, std::nullopt, std::nullopt);
     entitiesToRecollide.m_data = entitiesToRecollide.m_storage;
     entitiesToRecollide.m_size = 0;
     entitiesToRecollide.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG | 2;
@@ -2066,7 +2066,7 @@ void hkpContinuousSimulation::collideEntitiesBroadPhaseContinuous(
     }
     HK_TIMER_BEGIN_LIST("BroadPhase", "GatherAabbs");
     // The stack allocator's bytes are untyped memory; each local array keeps its pairs there.
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(world->m_broadPhaseUpdateSize)
         // (hkAllocateStack)
@@ -2082,7 +2082,7 @@ void hkpContinuousSimulation::collideEntitiesBroadPhaseContinuous(
         newPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
         newPairs.m_localMemory = newPairs.m_data;
     }
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkpBroadPhaseHandlePair>::hkLocalArray(world->m_broadPhaseUpdateSize)
         // (hkAllocateStack)
@@ -2266,7 +2266,7 @@ void hkpContinuousSimulation::collideEntitiesNarrowPhaseDiscrete(
     const hkpProcessCollisionInput& input
 ) {
     processAgentsOfEntities(
-        entities, numEntities, input, &fnvd::callMember<&hkpContinuousSimulation::processAgentCollideContinuous>,
+        entities, numEntities, input, &xfnv::callMember<&hkpContinuousSimulation::processAgentCollideContinuous>,
         hkpSimulation::FIND_CONTACTS_DEFAULT
     );
 }
@@ -2324,7 +2324,7 @@ void hkpContinuousSimulation::removeToiEventsOfEntities(hkpEntity** entities, in
         return;
     }
     using entitiesToRemove_t = hkPointerMap<hkpEntity*, int32_t>;
-    FNVD_INLINED_LOCAL(entitiesToRemove_t, entitiesToRemove, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(entitiesToRemove_t, entitiesToRemove, std::nullopt, std::nullopt);
     // EXE-INLINED 0x626630
     entitiesToRemove.m_map.m_elem = nullptr;
     entitiesToRemove.m_map.m_numElems = 0;

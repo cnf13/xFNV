@@ -565,8 +565,8 @@ NiTriShape* Font::MakeIconsTriShape() {
     NiTriShape* pshape;
     NiPoint2* ptextures;
     NiPoint3* pvertices;
-    FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
     char pcString[268];
     char pcDest[268];
     uint32_t iSize = ButtonIcons.iSize;
@@ -904,7 +904,7 @@ void Font::Load() {
         uiComponentSize = 1;
         // EXE-INLINED 0x462D80
         pTexFile->BinaryRead(auiSize, sizeof(auiSize), &uiComponentSize, 1);
-        FNVD_INLINED_LOCAL(NiTexture::FormatPrefs, kPrefs, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiTexture::FormatPrefs, kPrefs, std::nullopt, std::nullopt);
         // EXE-INLINED 0x4F31D0
         kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PIX_DEFAULT;
         kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
@@ -927,7 +927,7 @@ void Font::Load() {
             // EXE-INLINED 0x438170
             NiGlobalStringTable::GlobalStringHandle kHandle =
                 pFontFile ? NiGlobalStringTable::AddString(pFontFile) : NiGlobalStringTable::NULL_STRING;
-            FNVD_INLINED_LOCAL(NiFixedString, kFilePath, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kFilePath, std::nullopt, std::nullopt);
             kFilePath.SetHandle(kHandle);
             pTexProp = ::new (pMemory) NiTexturingProperty(pPixelData, kFilePath, kPrefs);
             // The reference count is the untyped first word of the string's buffer, 8 bytes before the characters; it
@@ -960,7 +960,7 @@ NiAVObject* Font::MakeString(
     size_t sLen;
     uint32_t itext_count;
     NiPoint3 xpos;
-    FNVD_INLINED_LOCAL(NiColorA, pspecial_color, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, pspecial_color, std::nullopt, std::nullopt);
     float afY[2];
     if (apTextString.sLen == 0xFFFF) {
         sLen = std::strlen(apTextString.pString);
@@ -1613,7 +1613,7 @@ FontManager::TextLine* FontManager::TextLine::AddChar(FontManager::CharData* apC
                     MemoryManager_Singleton.Allocate(sizeof(FontManager::CharData))
                 );
                 if (v20) {
-                    FNVD_INLINED_LOCAL(NiColorA, v5, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(NiColorA, v5, std::nullopt, std::nullopt);
                     // MAYBE-INLINED 0xA1A20F: a write opening NiColorA's uses: may be its inlined constructor
                     v5.r = 0.4588f;
                     // MAYBE-INLINED 0xA1A214: a write opening NiColorA's uses: may be its inlined constructor
@@ -1821,8 +1821,8 @@ FontManager::TextPage* FontManager::TextDoc::CurrentPage() {
 }
 
 void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apData) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, v6, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, axColor, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, v6, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, axColor, std::nullopt, std::nullopt);
     NiTriShape* ptri_2;
     NiTListItem<FontManager::TextPage*>* i;
     NiTList<NiTriShape*> ximages;
@@ -2227,7 +2227,7 @@ BSStringT<char>* FontManager::CollectTo(
     char& acResultChar,
     bool bKeep
 ) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, xString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, xString, std::nullopt, std::nullopt);
     // EXE-INLINED none: BSStringT<char>::Init
     xString.pString = nullptr;
     xString.sLen = 0;
@@ -2369,14 +2369,14 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
 
     // Each CollectTo result is released right after use. Each call site has its own result temporary, which CollectTo
     // fills.
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected0, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected1, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected4, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected5, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected6, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, kCollected7, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected0, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected5, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected6, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kCollected7, std::nullopt, std::nullopt);
     CollectTo(&kCollected0, pcText, iIndex, 0, 4, eMatch, cMatch, false);
     kCollected0.Set(nullptr, 0);
     if (eMatch == 1) {
@@ -2659,10 +2659,10 @@ void FontManager::SetNewFonts(bool a2) {
 }
 
 FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontManager::TextData& axData) {
-    FNVD_INLINED_LOCAL(NiColorA, v5, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v5, std::nullopt, std::nullopt);
     size_t sLen;
     FontManager::TextDoc* pdocument;
-    FNVD_INLINED_LOCAL(FontManager::CharData, xchar, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(FontManager::CharData, xchar, std::nullopt, std::nullopt);
     if (!axTextString.pString) {
         return nullptr;
     }

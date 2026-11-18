@@ -161,8 +161,8 @@ bool ImageSpaceModifierInstanceForm::StartTransition(
 // Removes every active instance of apMod (the list's Remove copies the next node into a removed head, so the scan stays
 // on the same node after a removal) and plays apMod's outro sound once.
 void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
     if (apMod) {
         bool bHasPlayed = false;
         BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* pkList = &TES::pInstance->listActiveImageSpaceModifiers;
@@ -189,8 +189,8 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
 
 ImageSpaceModifierInstanceForm*
 ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afStrength, NiAVObject* apTarget) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
     ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
         ImageSpaceModifierInstanceForm* pNew;
@@ -220,8 +220,8 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
     float afStrength,
     NiAVObject* apTarget
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
     bool bFound = false;
     ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {

@@ -185,7 +185,7 @@ bool NavMeshSearch::GetNodeConnections(
             continue;
         }
         // vert2 is the plane's normal and the 512 edge length its constant.
-        FNVD_INLINED_LOCAL(NiPlane, v46, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPlane, v46, std::nullopt, std::nullopt);
         float fwaterMultiplier = 1.0f;
         bool botherTriInWater = potherMesh->GetTriangle(usotherTri)->IsWater();
         bool bthisTriInWater = parentNodeData->GetTriangle()->IsWater();

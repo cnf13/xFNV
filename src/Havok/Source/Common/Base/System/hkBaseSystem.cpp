@@ -111,7 +111,7 @@ hkResult hkBaseSystem::quitThread() {
 // back in after the last linked node.
 void hkBaseSystem::initSingletons() {
     using failed_t = hkArray<hkSingletonInitNode*, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(failed_t, failed, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(failed_t, failed, std::nullopt, std::nullopt);
     failed.m_data = nullptr;
     failed.m_size = 0;
     failed.m_capacityAndFlags = hkArrayBase<hkSingletonInitNode*>::DONT_DEALLOCATE_FLAG;
@@ -169,7 +169,7 @@ void hkBaseSystem::initSingletons() {
 // Collects the list into an inplace array of 128 (heap allocator), then releases the instances from its end.
 void hkBaseSystem::quitSingletons() {
     using nodes_t = hkInplaceArray<hkSingletonInitNode*, 128>;
-    FNVD_INLINED_LOCAL(nodes_t, nodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(nodes_t, nodes, std::nullopt, std::nullopt);
     nodes.m_data = nodes.m_storage;
     nodes.m_size = 0;
     nodes.m_capacityAndFlags = 128 | hkArrayBase<hkSingletonInitNode*>::DONT_DEALLOCATE_FLAG;
@@ -230,7 +230,7 @@ hkBool* hkBaseSystem::isInitialized(hkBool* apResult) {
 }
 
 hkStreamWriter* hkNativeFileSystem::openWriter(const char* name) {
-    FNVD_INLINED_LOCAL(hkStringBuf, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, apMemory, std::nullopt, std::nullopt);
     ::new (&apMemory) hkStringBuf;
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkStdioStreamWriter* v3 =

@@ -903,7 +903,7 @@ void NavMeshObstacleCutter::CreateSwappedEdgeList(TaskPortalSwap& aPortalSwaps) 
         }
     }
     if (!childSwapsToRemove.IsEmpty()) {
-        childSwapsToRemove.Sort(&fnvd::callFunction<&CompareUInt>);
+        childSwapsToRemove.Sort(&xfnv::callFunction<&CompareUInt>);
         for (int32_t i = childSwapsToRemove.iSize - 1; i >= 0; --i) {
             aPortalSwaps.PotentialChildren.Remove(childSwapsToRemove.GetAt(i), true);
         }
@@ -1080,7 +1080,7 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
     }
     if (!childSwapsToRemove.IsEmpty()) {
         // Removed from the highest index down, so that the lower indices stay valid.
-        childSwapsToRemove.Sort(&fnvd::callFunction<&CompareUInt>);
+        childSwapsToRemove.Sort(&xfnv::callFunction<&CompareUInt>);
         for (int32_t i_2 = static_cast<int32_t>(childSwapsToRemove.iSize) - 1; i_2 >= 0; --i_2) {
             aPortalSwaps.PotentialChildren.Remove(childSwapsToRemove.GetAt(i_2), true);
         }

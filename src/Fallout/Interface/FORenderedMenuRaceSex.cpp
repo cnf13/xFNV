@@ -115,7 +115,7 @@ bool FORenderedMenuRaceSex::OnIdle() {
 }
 
 bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     InterfaceManager* v21 = InterfaceManager::Instance();
     if (a1) {
         char v20 = 1;
@@ -170,15 +170,15 @@ void FORenderedMenuRaceSex::Initialize() {
     NiColor v46;
     NiColor v47;
     NiPoint3 dst;
-    FNVD_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v57, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v58, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v60, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v61, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v63, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v57, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v58, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v60, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v61, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v63, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 mat2;
     NiMatrix3 rot;
     NiMatrix3 mat1;
@@ -350,8 +350,8 @@ void FORenderedMenuRaceSex::Initialize() {
         pgeom->AttachChild(plight, 1);
         NiPoint3* v19 = ::new (&dst) NiPoint3(0.0f, -50.0f, 0.0f);
         plight->SetTranslate(*v19);
-        plight->SetDiffuseColor(*FNVD_RECONSTRUCT(NiColor)(&v47, 0.75f, 0.75f, 0.75f));
-        plight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&v46, 1000.0f, 0.0f, 0.0f));
+        plight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&v47, 0.75f, 0.75f, 0.75f));
+        plight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&v46, 1000.0f, 0.0f, 0.0f));
         plight->SetDimmer(1.0f);
         NiUpdateData ud(0.0f, false, false);
         plight->Update(ud);
@@ -364,7 +364,7 @@ void FORenderedMenuRaceSex::Initialize() {
 
 void FORenderedMenuRaceSex::OnMenuOpen() {
     NiPoint3 v25;
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiRect<float> port;
     appMain->RenderMenuBackground();
     ImageSpaceManager::bEOFEnabled = false;
@@ -473,7 +473,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
 }
 
 void FORenderedMenuRaceSex::OnMenuClose() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     ImageSpaceManager::bEOFEnabled = true;
     if (GetInitialized()) {
         if (GetMenuLight()) {

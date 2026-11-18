@@ -25,7 +25,7 @@ int32_t hkSolveGetToiViolatingConstraintVelocity(
 // the 3D friction and the 2D rolling friction schemas hold pointers and are 16, 144 and 80 bytes for 4-byte pointers,
 // 32, 160 and 96 for 8-byte pointers.
 #define HK_SIZE_OF_JACOBIAN_END_SCHEMA 16
-#if FNVD_64BIT
+#if XFNV_64BIT
 #define HK_SIZE_OF_JACOBIAN_HEADER_SCHEMA 32
 #else
 #define HK_SIZE_OF_JACOBIAN_HEADER_SCHEMA 16
@@ -33,7 +33,7 @@ int32_t hkSolveGetToiViolatingConstraintVelocity(
 #define HK_SIZE_OF_JACOBIAN_SINGLE_CONTACT_SCHEMA 48
 #define HK_SIZE_OF_JACOBIAN_PAIR_CONTACT_SCHEMA 112
 #define HK_SIZE_OF_JACOBIAN_2D_FRICTION_SCHEMA 112
-#if FNVD_64BIT
+#if XFNV_64BIT
 #define HK_SIZE_OF_JACOBIAN_3D_FRICTION_SCHEMA 160
 #define HK_SIZE_OF_JACOBIAN_2D_ROLLING_FRICTION_SCHEMA 96
 #else

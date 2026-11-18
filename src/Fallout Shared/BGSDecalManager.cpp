@@ -707,8 +707,8 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
 
 void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal) {
     BSOcclusionQuery* v18;
-    FNVD_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
     NiMatrix3 rot_2;
     NiPoint3 aVector;
     NiPoint3 normal;
@@ -904,7 +904,7 @@ void BGSDecalManager::RemoveAllDecals() {
 BGSDecalManager* BGSDecalManager::Destroy_() {
     BGSDecalManager* result = BGSDecalManager::pSingleton;
     if (BGSDecalManager::pSingleton) {
-        result = FNVD_DELETE(BGSDecalManager)(BGSDecalManager::pSingleton, 1u);
+        result = XFNV_DELETE(BGSDecalManager)(BGSDecalManager::pSingleton, 1u);
     }
     BGSDecalManager::pSingleton = nullptr;
     return result;
@@ -1094,7 +1094,7 @@ void BGSDecalEmitter::Update() {
         ::new (&kNormal) NiPoint3;
         HK2NINS(kNormal, kPick.GetAllCollector()->getHits().operator[]<hkpWorldRayCastOutput>(i).m_normal);
         CFilter kHitFilter;
-        bool bLand = FNVD_RECONSTRUCT(CFilter)(&kHitFilter, pCollidable->getCollisionFilterInfo())->GetGroup() == 1;
+        bool bLand = XFNV_RECONSTRUCT(CFilter)(&kHitFilter, pCollidable->getCollisionFilterInfo())->GetGroup() == 1;
         NiAVObject* pObject = nullptr;
         if (bLand) {
             pObject = TES::pInstance->GetLandGeometry(kHitPoint);

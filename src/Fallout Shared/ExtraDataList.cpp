@@ -304,7 +304,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
                 pLock = pExtra->pLock;
             }
             apFile->GetChunkData(pLock, 0x14);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 0x14 bytes, the key's 4-byte form ID at 4.
             TESFile::WidenFormIDRecords(pLock, 1, 0x14, sizeof(LockData), {{4, offsetof(LockData, pKey)}});
 #endif
@@ -319,7 +319,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             kRadioData.~RADIO_DATA();
             ::new (&kRadioData) RADIO_DATA;
             apFile->GetChunkData(&kRadioData, 0x10);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 0x10 bytes, the position reference's 4-byte form ID at 0xC.
             TESFile::WidenFormIDRecords(
                 &kRadioData, 1, 0x10, sizeof(kRadioData), {{0xC, offsetof(RADIO_DATA, pPositionRef)}}
@@ -461,7 +461,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             ::new (&kLocation) WORLD_LOCATION;
             ourMemset(&kLocation, 0, sizeof(WORLD_LOCATION));
             apFile->GetChunkData(&kLocation, 0x14);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 0x14 bytes, the location's 4-byte form ID first.
             TESFile::WidenFormIDRecords(
                 &kLocation, 1, 0x14, sizeof(kLocation), {{0, offsetof(WORLD_LOCATION, pLocationForm)}}
@@ -512,7 +512,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             REF_ENABLE_PARENT_DATA kParentData;
             ourMemset(&kParentData, 0, sizeof(REF_ENABLE_PARENT_DATA));
             apFile->GetChunkData(&kParentData, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the parent's 4-byte form ID first.
             TESFile::WidenFormIDRecords(
                 &kParentData, 1, 8, sizeof(kParentData), {{0, offsetof(REF_ENABLE_PARENT_DATA, pParent)}}
@@ -582,7 +582,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             void* pDataMemory = ourMalloc(sizeof(REF_ACTIVATE_DATA));
             REF_ACTIVATE_DATA* pData = pDataMemory ? ::new (pDataMemory) REF_ACTIVATE_DATA : nullptr;
             apFile->GetChunkData(pData, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the parent's 4-byte form ID first.
             TESFile::WidenFormIDRecords(
                 pData, 1, 8, sizeof(REF_ACTIVATE_DATA), {{0, offsetof(REF_ACTIVATE_DATA, pActivateRef)}}
@@ -612,7 +612,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             OLD_ACTIVATE_DATA kOldData;
             ourMemset(&kOldData, 0, sizeof(OLD_ACTIVATE_DATA));
             apFile->GetChunkData(&kOldData, 0xC);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 0xC bytes, the parent's 4-byte form ID first.
             TESFile::WidenFormIDRecords(
                 &kOldData, 1, 0xC, sizeof(kOldData), {{0, offsetof(OLD_ACTIVATE_DATA, pActivateRef)}}
@@ -637,7 +637,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             ::new (&kDecal) REF_DECAL_DATA;
             ourMemset(&kDecal, 0, sizeof(REF_DECAL_DATA));
             apFile->GetChunkData(&kDecal, 0x1C);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 0x1C bytes, the reference's 4-byte form ID first.
             TESFile::WidenFormIDRecords(&kDecal, 1, 0x1C, sizeof(kDecal), {{0, offsetof(REF_DECAL_DATA, pDecalRef)}});
 #endif
@@ -717,7 +717,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             kHandle.~NAVMESH_PORTAL();
             ::new (&kHandle) NAVMESH_PORTAL;
             apFile->GetChunkData(&kHandle, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the navmesh's 4-byte form ID first.
             TESFile::WidenFormIDRecords(&kHandle, 1, 8, sizeof(kHandle), {{0, offsetof(NAVMESH_PORTAL, pNavMesh)}});
 #endif
@@ -757,7 +757,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             ::new (&kReflected) REF_REFLECTED_DATA;
             ourMemset(&kReflected, 0, sizeof(REF_REFLECTED_DATA));
             apFile->GetChunkData(&kReflected, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the reference's 4-byte form ID first.
             TESFile::WidenFormIDRecords(
                 &kReflected, 1, 8, sizeof(kReflected), {{0, offsetof(REF_REFLECTED_DATA, pRef)}}
@@ -856,7 +856,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             OcclusionPlaneLinkedRefData* pLinkedRefData =
                 pMemory ? ::new (pMemory) OcclusionPlaneLinkedRefData : nullptr;
             apFile->GetChunkData(pLinkedRefData, 0x10);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is four 4-byte form IDs.
             TESFile::WidenFormIDRecords(pLinkedRefData->pLinkedRefs, 4, 4, sizeof(TESObjectREFR*), {{0, 0}});
 #endif
@@ -870,7 +870,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             void* pMemory = ourMalloc(sizeof(PortalLinkedRefData));
             PortalLinkedRefData* pLinkedRefData = pMemory ? ::new (pMemory) PortalLinkedRefData : nullptr;
             apFile->GetChunkData(pLinkedRefData, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is two 4-byte form IDs.
             TESFile::WidenFormIDRecords(pLinkedRefData->pLinkedRefs, 2, 4, sizeof(TESObjectREFR*), {{0, 0}});
 #endif
@@ -2086,11 +2086,11 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                 case EXTRA_SECURITRON_FACE: {
                     auto* pFaceExtra = static_cast<ExtraSecuritronFace*>(pExtra);
                     // Each string GetPersonality and GetMood return is destroyed right after it is saved.
-                    FNVD_INLINED_LOCAL(BSStringT<char>, kPersonality, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSStringT<char>, kPersonality, std::nullopt, std::nullopt);
                     BSStringT<char>* pPersonality = pFaceExtra->GetPersonality(&kPersonality);
                     apSaveGameBuffer->SaveString(pPersonality->pString, 0);
                     kPersonality.~BSStringT<char>();
-                    FNVD_INLINED_LOCAL(BSStringT<char>, kMood, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSStringT<char>, kMood, std::nullopt, std::nullopt);
                     BSStringT<char>* pMood = pFaceExtra->GetMood(&kMood);
                     apSaveGameBuffer->SaveString(pMood->pString, 0);
                     kMood.~BSStringT<char>();
@@ -2422,8 +2422,8 @@ void ExtraDataList::Save() {
                 }
                 if (pActivate->ActivateTextOverride.GetLength()) {
                     // Two copies of the text: the length is taken from the first, the characters from the second.
-                    FNVD_INLINED_LOCAL(BSStringT<char>, kLengthText, std::nullopt, std::nullopt);
-                    FNVD_INLINED_LOCAL(BSStringT<char>, kText, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSStringT<char>, kLengthText, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSStringT<char>, kText, std::nullopt, std::nullopt);
                     BSStringT<char>* pLengthText = GetActivateTextOverride(&kLengthText);
                     uint32_t iLength = pLengthText->GetLength() + 1;
                     BSStringT<char>* pText = GetActivateTextOverride(&kText);
@@ -4395,7 +4395,7 @@ uint16_t ExtraDataList::GetSaveSize(uint32_t aiFlags, TESObjectREFR* apRef) {
                 break;
             }
             case EXTRA_PACKAGESTARTLOC: {
-                FNVD_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(
+                XFNV_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(
                     work, RTTI_BSExtraData, RTTI_ExtraPackageStartLocation
                 );
                 isize += 20;
@@ -6651,7 +6651,7 @@ const char* ExtraDataList::GetLastFinishedSequence() {
 
 // KEEP: the exe builds ExtraNavMeshPortal's by-value NAVMESH_PORTAL argument in the
 // outgoing argument slot with NAVMESH_PORTAL's out-of-line copy constructor (0x69A690, which copies 6 of its
-// 8 bytes); a by-value argument through fnvd::original cannot reproduce that call.
+// 8 bytes); a by-value argument through xfnv::original cannot reproduce that call.
 // The exe's cleanup-only C++ EH frame is left out.
 void ExtraDataList::SetNavMeshPortal(ExtraNavMeshPortal* apPortal) {
     NAVMESH_PORTAL v2;
@@ -7484,9 +7484,9 @@ uint8_t ExtraDataList::GetTerminalState() {
 }
 
 void ExtraDataList::SetCreatureAwakeSound(const BSSoundHandle& afSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pExtra = static_cast<ExtraCreatureAwakeSound*>(GetExtraData(EXTRA_CREATURE_AWAKE_SOUND));
     if (pExtra) {
         if (afSound == *::new (&kEmpty) BSSoundHandle) {
@@ -7511,7 +7511,7 @@ void ExtraDataList::SetCreatureAwakeSound(const BSSoundHandle& afSound) {
 
 // As SetCreatureAwakeSound, for the sound extra.
 void ExtraDataList::SetSound(const BSSoundHandle& afSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
     auto* pExtra = static_cast<ExtraSound*>(GetExtraData(EXTRA_SOUND));
     if (pExtra) {
         if (afSound == BSSoundHandle()) {
@@ -8263,9 +8263,9 @@ void ExtraDataList::GetWeaponAttackSound(BSSoundHandle& result) {
 
 // As SetCreatureAwakeSound, for the weapon attack sound extra.
 void ExtraDataList::SetWeaponAttackSound(const BSSoundHandle& afSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pSound = static_cast<ExtraWeaponAttackSound*>(GetExtraData(EXTRA_WEAPON_ATTACK_SOUND));
     if (pSound) {
         if (afSound == *::new (&kEmpty) BSSoundHandle) {
@@ -8322,7 +8322,7 @@ bool ExtraDataList::RestoreSavedAnimation(TESObjectREFR* apRef) {
         return false;
     }
     BGSLoadGameSubBuffer kBuffer;
-    FNVD_RECONSTRUCT(BGSLoadGameSubBuffer)(&kBuffer, pExtra->pAnimationBuffer)->LoadAnimation(apRef);
+    XFNV_RECONSTRUCT(BGSLoadGameSubBuffer)(&kBuffer, pExtra->pAnimationBuffer)->LoadAnimation(apRef);
     pExtra->pAnimationBuffer = nullptr;
     RemoveExtra(EXTRA_SAVED_ANIMATION);
     return true;
@@ -8335,7 +8335,7 @@ bool ExtraDataList::RestoreSavedHavokData(TESObjectREFR* apRef) {
         return false;
     }
     BGSLoadGameSubBuffer kBuffer;
-    FNVD_RECONSTRUCT(BGSLoadGameSubBuffer)(&kBuffer, pExtra->pHavokBuffer)->LoadHavokData(apRef);
+    XFNV_RECONSTRUCT(BGSLoadGameSubBuffer)(&kBuffer, pExtra->pHavokBuffer)->LoadHavokData(apRef);
     pExtra->pHavokBuffer = nullptr;
     RemoveExtra(EXTRA_SAVED_HAVOK_DATA);
     return true;
@@ -8521,9 +8521,9 @@ void ExtraDataList::GetCreatureMovementSound(BSSoundHandle& result) {
 
 // As SetCreatureAwakeSound, for the creature movement sound extra.
 void ExtraDataList::SetCreatureMovementSound(const BSSoundHandle& afSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pSound = static_cast<ExtraCreatureMovementSound*>(GetExtraData(EXTRA_CREATURE_MOVEMENT_SOUND));
     if (pSound) {
         if (afSound == *::new (&kEmpty) BSSoundHandle) {
@@ -11122,9 +11122,9 @@ void ExtraDataList::GetWeaponIdleSound(BSSoundHandle& result) {
 
 // As SetCreatureAwakeSound, for the weapon idle sound extra.
 void ExtraDataList::SetWeaponIdleSound(const BSSoundHandle& afSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kNone, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kEmpty, std::nullopt, std::nullopt);
     auto* pSound = static_cast<ExtraWeaponIdleSound*>(GetExtraData(EXTRA_WEAPON_IDLE_SOUND));
     if (pSound) {
         if (afSound == *::new (&kEmpty) BSSoundHandle) {
@@ -11159,7 +11159,7 @@ void ExtraDataList::GetActivateLoopSound(BSSoundHandle& result) {
 
 // As SetSound, for the activate loop sound extra.
 void ExtraDataList::SetActivateLoopSound(const BSSoundHandle& afSound) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
     auto* pExtra = static_cast<ExtraActivateLoopSound*>(GetExtraData(EXTRA_ACTIVATE_LOOP_SOUND));
     if (pExtra) {
         if (afSound == BSSoundHandle()) {

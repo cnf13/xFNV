@@ -672,8 +672,8 @@ void BarterMenu::RemoveTransactItem(int32_t aiAmountSelected) {
 
 void BarterMenu::CompleteTransaction() {
     TESObjectREFR* pvendorContainer;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if ((&pVendorRef->m_Extra)->GetMerchantContainer()) {
         pvendorContainer = (&pVendorRef->m_Extra)->GetMerchantContainer();
     }

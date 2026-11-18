@@ -350,10 +350,10 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
     if (std::isalpha(*pguess) || BSstrlen(pguess) <= 1) {
         if (inumCommon == iWordLength) {
             const char* ptmp[5];
-            FNVD_INLINED_LOCAL(StringArray5, astrLog, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(StringArray5, astrLog, std::nullopt, std::nullopt);
             rt::eh_vector_constructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 5, &fnvd::constructElement<BSStringT<char>>,
-                &fnvd::destructElement<BSStringT<char>>
+                astrLog, sizeof(BSStringT<char>), 5, &xfnv::constructElement<BSStringT<char>>,
+                &xfnv::destructElement<BSStringT<char>>
             );
             astrLog[0].SPrintF("%s%s", ">", pguess);
             astrLog[1].SPrintF("%s%s", ">", sHackingGranted.String());
@@ -382,14 +382,14 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
             }
             MiscStatManager::Increment(MiscStatManager::MS_COMPUTERS_HACKED);
             rt::eh_vector_destructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 5, &fnvd::destructElement<BSStringT<char>>
+                astrLog, sizeof(BSStringT<char>), 5, &xfnv::destructElement<BSStringT<char>>
             );
         }
         else {
-            FNVD_INLINED_LOCAL(StringArray4, astrLog, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(StringArray4, astrLog, std::nullopt, std::nullopt);
             rt::eh_vector_constructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 4, &fnvd::constructElement<BSStringT<char>>,
-                &fnvd::destructElement<BSStringT<char>>
+                astrLog, sizeof(BSStringT<char>), 4, &xfnv::constructElement<BSStringT<char>>,
+                &xfnv::destructElement<BSStringT<char>>
             );
             astrLog[0].SPrintF("%s%s", ">", pguess);
             astrLog[1].SPrintF("%s%s", ">", sHackingDenied.String());
@@ -428,17 +428,17 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
                 delete pSquare;
             }
             rt::eh_vector_destructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 4, &fnvd::destructElement<BSStringT<char>>
+                astrLog, sizeof(BSStringT<char>), 4, &xfnv::destructElement<BSStringT<char>>
             );
         }
     }
     else {
         uint32_t ilogscroll;
         const char* ptmp[3];
-        FNVD_INLINED_LOCAL(StringArray3, astrLog, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(StringArray3, astrLog, std::nullopt, std::nullopt);
         rt::eh_vector_constructor_iterator(
-            astrLog, sizeof(BSStringT<char>), 3, &fnvd::constructElement<BSStringT<char>>,
-            &fnvd::destructElement<BSStringT<char>>
+            astrLog, sizeof(BSStringT<char>), 3, &xfnv::constructElement<BSStringT<char>>,
+            &xfnv::destructElement<BSStringT<char>>
         );
         astrLog[0].SPrintF("%s%s", ">", pguess);
         if (iWordsHave == 1) {
@@ -480,7 +480,7 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
         ptmp[1] = astrLog[1].String();
         ptmp[2] = astrLog[2].String();
         ScrollLog(ilogscroll, ptmp);
-        rt::eh_vector_destructor_iterator(astrLog, sizeof(BSStringT<char>), 3, &fnvd::destructElement<BSStringT<char>>);
+        rt::eh_vector_destructor_iterator(astrLog, sizeof(BSStringT<char>), 3, &xfnv::destructElement<BSStringT<char>>);
     }
     BSStringT<char> strtmp;
     const char* pHeader3 = sHackingHeader3.String();
@@ -1202,7 +1202,7 @@ uint32_t HackingMenu::GetGuaranteedPossible(const HackingMenu::Grid& aGrid) {
 }
 
 void HackingMenu::DoIntro() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     int32_t i;
     for (i = 0; i < 14; ++i) {
         if (BSGetTickCount() <= HackingMenu::iNextAllowedHackTime) {
@@ -1263,7 +1263,7 @@ void HackingMenu::DoIntro() {
 }
 
 void HackingMenu::DoInGame() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, handle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, handle, std::nullopt, std::nullopt);
     uint32_t ibufferpos;
     int32_t ioffset = GetSelectedTileIndex() - 7;
     if ((ioffset != iLastOffset || HackingMenu::pim->pOverTileTarget != pLastTarget) &&

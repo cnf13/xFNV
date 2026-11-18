@@ -17,7 +17,7 @@ float* sub_DEF550(float a1, float a2, float a3, float a4, float* r_eax);
 // filter (none: enabled). The constructor sets m_type to HK_FILTER_PAIR.
 class hkpPairCollisionFilter : public hkpCollisionFilter {
 public:
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The map key for 8-byte pointers (the SDK's hkpPairCollisionFilter.h): both entities' addresses whole, the
     // smaller first, with the operations the map hashes and compares them with.
     struct PairFilterKey {
@@ -80,7 +80,7 @@ public:
     hkBool isCollisionEnabled(const hkpWorldRayCastInput& inputA, const hkpCollidable& collidableB) const override;
 
     // The disabled entity pairs (a key present: the pair does not collide, 0xDEF3D0).
-#if FNVD_64BIT
+#if XFNV_64BIT
     hkMap<PairFilterKey, uint64_t, PairFilterPointerMapOperations, hkContainerHeapAllocator> m_disabledPairs;
 #else
     hkMap<PairFilterKey, uint64_t, hkMapOperations<uint64_t>, hkContainerHeapAllocator> m_disabledPairs;
@@ -94,7 +94,7 @@ public:
     void calcKey(const hkpEntity* entityA, const hkpEntity* entityB, PairFilterKey& keyOut) const {
         const uint64_t ptrA = static_cast<uint64_t>(static_cast<int64_t>(reinterpret_cast<intptr_t>(entityA)));
         const uint64_t ptrB = static_cast<uint64_t>(static_cast<int64_t>(reinterpret_cast<intptr_t>(entityB)));
-#if FNVD_64BIT
+#if XFNV_64BIT
         if (ptrA < ptrB) {
             keyOut.m_a = ptrA;
             keyOut.m_b = ptrB;

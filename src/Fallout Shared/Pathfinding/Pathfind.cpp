@@ -343,7 +343,7 @@ bool Pathing::BuildLowPath(
 
 bool Pathing::GetNavMeshZForLocation(PathingLocation& aLocation, float& aRetHeight) {
     NiPoint3 v7;
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     uint16_t arTriangle;
     if (aLocation.ResolveNavMeshInfo(nullptr)) {
         if (aLocation.HasNavMeshData()) {
@@ -382,7 +382,7 @@ bool Pathing::GetNavMeshZForLocation(PathingLocation& aLocation, float& aRetHeig
 bool Pathing::GetNavmeshNormalForLocation(PathingLocation& aLocation, NiPoint3& aRetNormal) {
     NiPoint3 result;
     uint16_t arTriangle;
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     if (!aLocation.ResolveNavMeshInfo(nullptr)) {
         return false;
     }
@@ -1345,8 +1345,8 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
     firstTri.hTri.~FastNavMeshTriHandle();
     ::new (&firstTri.hTri) FastNavMeshTriHandle;
     FastNavMeshTriHandle startTri;
-    FNVD_RECONSTRUCT(FastNavMeshTriHandle)(
-        &firstTri.hTri, *FNVD_RECONSTRUCT(FastNavMeshTriHandle)(&startTri, spmesh.operator NavMesh*(), usfirstTri)
+    XFNV_RECONSTRUCT(FastNavMeshTriHandle)(
+        &firstTri.hTri, *XFNV_RECONSTRUCT(FastNavMeshTriHandle)(&startTri, spmesh.operator NavMesh*(), usfirstTri)
     );
     for (int32_t e = 0; e < 3; ++e) {
         NiPoint3 vert1;
@@ -1358,7 +1358,7 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
     allTris.Add(firstTri);
     for (uint32_t i = 0; i < allTris.iSize; ++i) {
         NavmeshTriFan fan;
-        FNVD_RECONSTRUCT(NavmeshTriFan)(&fan, allTris.GetAt(static_cast<int32_t>(i)));
+        XFNV_RECONSTRUCT(NavmeshTriFan)(&fan, allTris.GetAt(static_cast<int32_t>(i)));
         for (int32_t e = 0; e < 3; ++e) {
             if (!fan.bInradius[e]) {
                 continue;
@@ -1406,7 +1406,7 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
         return false;
     }
     FastNavMeshEdgeLocation closestEdge;
-    FNVD_RECONSTRUCT(FastNavMeshEdgeHandle)(&closestEdge);
+    XFNV_RECONSTRUCT(FastNavMeshEdgeHandle)(&closestEdge);
     float fBestSqrDist = 3.4028235e+38f;
     for (uint32_t i = 0; i < foundOpenEdges.iSize; ++i) {
         NiPoint3 vert1;
@@ -1469,7 +1469,7 @@ bool Pathing::FindNavmeshesForLocation(
     BSSimpleArray<NavMeshPtr, 1024>* apRetNavMeshes,
     bool abConnected
 ) {
-    FNVD_INLINED_LOCAL(NavMeshPtr, spnavMesh, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, spnavMesh, std::nullopt, std::nullopt);
     TESObjectCELL* pcell_2;
     TESObjectCELL* padjacentCell;
     using cells_t = BSSimpleArray<TESObjectCELL*, 1024>;
@@ -1523,7 +1523,7 @@ bool Pathing::FindNavmeshesForLocation(
                 for (uint32_t j = 0; j < padjCell->GetNavMeshArray()->GetNavMeshCount(); ++j) {
                     NavMeshPtr* pnavMesh = padjCell->GetNavMeshArray()->GetNavMeshByIndex(&spnavMesh, j);
                     apRetNavMeshes->Add(*pnavMesh);
-                    FNVD_DESTRUCT(NiPointer<NavMesh>)(&spnavMesh);
+                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&spnavMesh);
                 }
             }
         }
@@ -1901,7 +1901,7 @@ Pathing::FIND_CLOSEST_EDGES_RESULT Pathing::FindClosestEdges(
     uint32_t icount = BSMIN(aiMaxCount, FoundEdges.iSize);
     for (uint32_t i = 0; i < icount; ++i) {
         NavMeshEdgeLocation edgeLoc;
-        aRetEdges.Add(*FNVD_RECONSTRUCT(NavMeshEdgeLocation)(&edgeLoc, FoundEdges.GetAt(static_cast<int32_t>(i)).Edge));
+        aRetEdges.Add(*XFNV_RECONSTRUCT(NavMeshEdgeLocation)(&edgeLoc, FoundEdges.GetAt(static_cast<int32_t>(i)).Edge));
     }
     if (icount) {
         return Pathing::FIND_CLOSEST_EDGES_OK;
@@ -1910,8 +1910,8 @@ Pathing::FIND_CLOSEST_EDGES_RESULT Pathing::FindClosestEdges(
 }
 
 char Pathing::FindSafeStraightLinePathPoint(TESObjectREFR* a1, TESObjectREFR* a2, float a3, NiPoint3* a4) {
-    FNVD_INLINED_LOCAL(PathingLocation, v14, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, v14, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     PathingRequestSafeStraightLine straightLineRequest;
     PathingLocation* apOrigin = ::new (&apLocation) PathingLocation(a1);
     straightLineRequest.SetOrigin(*apOrigin);
@@ -2378,8 +2378,8 @@ bool Pathing::FindPotentialNavmeshesForLocation(
 }
 
 bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMeshes) {
-    FNVD_INLINED_LOCAL(NavMeshPtr, apMemory, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     if (TES::pInstance->pInteriorCell) {
         NavMeshArray* parray = TES::pInstance->pInteriorCell->GetNavMeshArray();
         if (parray) {
@@ -2390,7 +2390,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                 }
                 NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apResult, i);
                 apRetNavMeshes->Add(*aItem);
-                FNVD_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+                XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
             }
         }
     }
@@ -2408,7 +2408,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                         }
                         NavMeshPtr* NavMeshByIndex = parray_2->GetNavMeshByIndex(&apMemory, i_3);
                         apRetNavMeshes->Add(*NavMeshByIndex);
-                        FNVD_DESTRUCT(NiPointer<NavMesh>)(&apMemory);
+                        XFNV_DESTRUCT(NiPointer<NavMesh>)(&apMemory);
                     }
                 }
             }
@@ -2474,7 +2474,7 @@ bool Pathing::CheckSphere(PathingLocation& aSphereCenter, float afRadius) {
             }
             uint16_t usTriangle = trisForThisMesh.GetAt(static_cast<int32_t>(j));
             NavMeshInfo* pInfo = navmeshes.GetAt(static_cast<int32_t>(i)).m_pObject->GetNavMeshInfo();
-            potentialTriangles.Add(*FNVD_RECONSTRUCT(NavMeshTriHandle)(&triHandle, pInfo, usTriangle));
+            potentialTriangles.Add(*XFNV_RECONSTRUCT(NavMeshTriHandle)(&triHandle, pInfo, usTriangle));
         }
     }
     openEdges_t openEdges;
@@ -2698,7 +2698,7 @@ NavmeshTriFan::NavmeshTriFan(const NavmeshTriFan& arOther)
   : hTri(arOther.hTri), bInradius{arOther.bInradius[0], arOther.bInradius[1], arOther.bInradius[2]} {}
 
 NavmeshTriFan* NavmeshTriFan::Assign(NavmeshTriFan* apThis, const NavmeshTriFan& arOther) {
-    FNVD_RECONSTRUCT(FastNavMeshTriHandle)(&apThis->hTri, arOther.hTri);
+    XFNV_RECONSTRUCT(FastNavMeshTriHandle)(&apThis->hTri, arOther.hTri);
     for (uint32_t S2 = 0; S2 < 3; ++S2) {
         apThis->bInradius[S2] = arOther.bInradius[S2];
     }

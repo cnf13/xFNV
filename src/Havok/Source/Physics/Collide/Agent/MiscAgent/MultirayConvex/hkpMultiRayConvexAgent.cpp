@@ -102,7 +102,7 @@ void hkpMultiRayConvexAgent::getClosestPoints(
     const __m128 col2 = aTb.m_rotation.m_col2.m_quad;
     const __m128 col3 = aTb.m_translation.m_quad;
     for (; iNumRays > 0; --iNumRays, ++pRay) {
-        FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
         output.m_hitFraction = 1.0f;
         // EXE-INLINED none: hkVector4::setTransformedPos
         __m128 v = pRay->m_start.m_quad;
@@ -295,7 +295,7 @@ void hkpMultiRayConvexAgent::processCollision(
     rayInput.m_rayShapeCollectionFilter = nullptr;
     const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
     for (int32_t i = 0; i < iNumRays; ++i, ++pRay) {
-        FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
         output.m_hitFraction = 1.0f;
         // EXE-INLINED 0xC7F640
         __m128 v = pRay->m_start.m_quad;
@@ -383,7 +383,7 @@ void hkpMultiRayConvexAgent::staticGetPenetrations(
     int32_t iNumRays = pMultiRay->m_rays.m_size;
     const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
 
-    FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
     output.m_hitFraction = 1.0f;
     hkpShapeRayCastInput rayInput;
     rayInput.m_filterInfo = 0;
@@ -463,7 +463,7 @@ void hkpMultiRayConvexAgent::staticGetClosestPoints(
     const __m128 col2 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_rotation.m_col2.m_quad)[0]);
     const __m128 col3 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_translation.m_quad)[0]);
     for (; iNumRays > 0; --iNumRays, ++pRay) {
-        FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
         output.m_hitFraction = 1.0f;
         // EXE-INLINED none: hkVector4::setTransformedPos
         __m128 v = _mm_load_ps(&reinterpret_cast<const float*>(&pRay->m_start.m_quad)[0]);

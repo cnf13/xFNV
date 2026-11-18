@@ -213,7 +213,7 @@ NiAVObject* TESObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
 }
 
 void TESObject::UnClone3D(TESObjectREFR* apRequester) {
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     if (this == pDoorMarker || this == pTravelMarker) {
         apRequester = nullptr;
     }
@@ -302,8 +302,8 @@ bool TESObject::ReplaceModel() {
 }
 
 NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     const char* pworldFilename = GetModelFileName(apRef);
     NiAVObject* pData3D = nullptr;
     if (apRef && (apRef->IsMarker() && apRef->GetObjectReference()->GetFormType() != LIGH_ID)) {
@@ -615,7 +615,7 @@ NiPoint3 TESBoundObject::GetBoundMin() {
     float fZ = BoundData.BoundMin.GetFloatZ();
     float fY = BoundData.BoundMin.GetFloatY();
     float fX = BoundData.BoundMin.GetFloatX();
-    FNVD_INLINED_LOCAL(NiPoint3, kPoint, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPoint3, kPoint, std::nullopt, std::nullopt);
     return *::new (&kPoint) NiPoint3(fX, fY, fZ);
 }
 
@@ -624,7 +624,7 @@ NiPoint3 TESBoundObject::GetBoundMax() {
     float fY = BoundData.BoundMax.GetFloatY();
     float fX = BoundData.BoundMax.GetFloatX();
     // As in GetBoundMin, the point is built in a frame local and copied into the result.
-    FNVD_INLINED_LOCAL(NiPoint3, kPoint, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPoint3, kPoint, std::nullopt, std::nullopt);
     return *::new (&kPoint) NiPoint3(fX, fY, fZ);
 }
 

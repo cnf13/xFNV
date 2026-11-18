@@ -388,7 +388,7 @@ void hkpSimulation::resetCollisionInformationForEntities(
     if (resetInfo & RESET_TIM) {
         processAgentsOfEntities(
             entities, numEntities, *world->m_collisionInput,
-            &fnvd::callMember<&hkpSimulation::processAgentResetCollisionInformation>, FIND_CONTACTS_DEFAULT
+            &xfnv::callMember<&hkpSimulation::processAgentResetCollisionInformation>, FIND_CONTACTS_DEFAULT
         );
     }
     if (resetInfo & RESET_AABB) {
@@ -542,7 +542,7 @@ void hkpSimulation::collideEntitiesNarrowPhaseDiscrete(
     FindContacts findExtraContacts
 ) {
     processAgentsOfEntities(
-        entities, numEntities, input, &fnvd::callMember<&hkpSimulation::processAgentCollideDiscrete>, findExtraContacts
+        entities, numEntities, input, &xfnv::callMember<&hkpSimulation::processAgentCollideDiscrete>, findExtraContacts
     );
 }
 
@@ -804,7 +804,7 @@ void hkpSimulation::processAgentsOfEntities(
 ) {
     // The entities handled so far, by their collidables.
     using entitiesProcessed_t = hkPointerMap<hkpLinkedCollidable*, int32_t>;
-    FNVD_INLINED_LOCAL(entitiesProcessed_t, entitiesProcessed, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(entitiesProcessed_t, entitiesProcessed, std::nullopt, std::nullopt);
     // EXE-INLINED 0x626630
     entitiesProcessed.m_map.m_elem = nullptr;
     entitiesProcessed.m_map.m_numElems = 0;
@@ -816,7 +816,7 @@ void hkpSimulation::processAgentsOfEntities(
     processOutput.m_constraintOwner.m_storage = nullptr;
     processOutput.m_toi.m_properties.m_impulseApplied = 0.0f;
     processOutput.m_toi.m_properties.m_internalSolverData = 0.0f;
-    FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
     collisionEntries.m_data = nullptr;
     collisionEntries.m_size = 0;
@@ -1087,7 +1087,7 @@ void hkpSimulation::collideEntitiesBroadPhaseDiscrete(hkpEntity** delPairs, int3
     HK_TIMER_BEGIN_LIST("BroadPhase", "InitMem");
 
     const int32_t iAddedCapacity = world->m_broadPhaseUpdateSize;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, addedPairs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, addedPairs, std::nullopt, std::nullopt);
     addedPairs.m_data = nullptr;
     addedPairs.m_size = 0;
     addedPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
@@ -1104,7 +1104,7 @@ void hkpSimulation::collideEntitiesBroadPhaseDiscrete(hkpEntity** delPairs, int3
     addedPairs.m_localMemory = pAddedLocal;
 
     const int32_t iRemovedCapacity = world->m_broadPhaseUpdateSize;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, removedPairs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, removedPairs, std::nullopt, std::nullopt);
     removedPairs.m_data = nullptr;
     removedPairs.m_size = 0;
     removedPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;

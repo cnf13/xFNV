@@ -812,7 +812,7 @@ void CSpeedTreeRT::FreeProjectedShadowData() {
     if (m_pProjectedShadow) {
         CProjectedShadow* pProjectedShadow = m_pProjectedShadow;
         if (pProjectedShadow) {
-            FNVD_DESTRUCT(std::string)(&pProjectedShadow->m_strSelfShadowMap);
+            XFNV_DESTRUCT(std::string)(&pProjectedShadow->m_strSelfShadowMap);
             MemoryManager_Singleton.Deallocate(pProjectedShadow);
         }
         m_pProjectedShadow = nullptr;
@@ -1641,7 +1641,7 @@ void CSpeedTreeRT::ParseCollisionObjects(CTreeFileAccess* pFile) {
             case File_CollisionBox: sShape.m_eType = CO_BOX; break;
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed collision object info");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed collision object info");
                 throw IdvFileError(strDetails, false);
             }
         }
@@ -1664,14 +1664,14 @@ void CSpeedTreeRT::ParseCollisionObjects(CTreeFileAccess* pFile) {
                 break;
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "unknown collision object type");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "unknown collision object type");
                 throw IdvFileError(strDetails, false);
             }
         }
         m_pCollisionObjects->m_vObjects.push_back(sShape);
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
             std::string strDetails;
-            FNVD_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing collision object info");
+            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing collision object info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2031,13 +2031,13 @@ void CSpeedTreeRT::ParseLodInfo(CTreeFileAccess* pFile) {
             case File_LeafSizeIncreaseFactor: m_fLeafSizeIncreaseFactor = pFile->ParseFloat(); break;
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed lod info");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed lod info");
                 throw IdvFileError(strDetails, false);
             }
         }
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
             std::string strDetails;
-            FNVD_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing new lod info");
+            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing new lod info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2051,13 +2051,13 @@ void CSpeedTreeRT::ParseWindInfo(CTreeFileAccess* pFile) {
     do {
         if (eToken != File_WindLevel) {
             std::string strDetails;
-            FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed new wind info");
+            XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed new wind info");
             throw IdvFileError(strDetails, false);
         }
         m_pEngine->m_nBranchesWeightLevel = pFile->ParseInt();
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
             std::string strDetails;
-            FNVD_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing new wind info");
+            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing new wind info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2130,7 +2130,7 @@ void CSpeedTreeRT::ParseTextureCoordInfo(CTreeFileAccess* pFile) {
             case File_CompositeFilename: {
                 // The parsed string is built in the by-value argument of CIdvFilename's constructor, which frees it.
                 CIdvFilename cFilename;
-                FNVD_RECONSTRUCT(CIdvFilename)(&cFilename, pFile->ParseString());
+                XFNV_RECONSTRUCT(CIdvFilename)(&cFilename, pFile->ParseString());
                 CIdvFilename cNoPath;
                 m_pEmbeddedTexCoords->m_strCompositeFilename.assign(*cFilename.NoPath(&cNoPath), 0, std::string::npos);
                 break;
@@ -2139,13 +2139,13 @@ void CSpeedTreeRT::ParseTextureCoordInfo(CTreeFileAccess* pFile) {
             case File_360Billboard: m_b360Billboard = pFile->ParseBool(); break;
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed texture coord info");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed texture coord info");
                 throw IdvFileError(strDetails, false);
             }
         }
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
             std::string strDetails;
-            FNVD_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing texture coordinate info");
+            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing texture coordinate info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2163,7 +2163,7 @@ void CSpeedTreeRT::ParseSupplementalTexCoordInfo(CTreeFileAccess* pFile) {
                 case File_SupplementalCompositeFilename: {
                     std::string strFilename = pFile->ParseString();
                     CIdvFilename cFilename;
-                    FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&cFilename, strFilename);
+                    XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&cFilename, strFilename);
                     CIdvFilename cNoPath;
                     m_pEmbeddedTexCoords->m_strCompositeFilename.assign(
                         *cFilename.NoPath(&cNoPath), 0, std::string::npos
@@ -2179,13 +2179,13 @@ void CSpeedTreeRT::ParseSupplementalTexCoordInfo(CTreeFileAccess* pFile) {
                     break;
                 default: {
                     std::string strDetails;
-                    FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed texture coord info");
+                    XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed texture coord info");
                     throw IdvFileError(strDetails, false);
                 }
             }
             if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(
+                XFNV_RECONSTRUCT(std::string)(
                     &strDetails, "premature end of file reached parsing texture coordinate info"
                 );
                 throw IdvFileError(strDetails, false);
@@ -3084,7 +3084,7 @@ CIdvFilename* CIdvFilename::NoPath(CIdvFilename* apResult) {
         }
     }
     std::string strNoPath;
-    FNVD_RECONSTRUCT(std::string)(&strNoPath, szBuffer);
+    XFNV_RECONSTRUCT(std::string)(&strNoPath, szBuffer);
     ::new (apResult) std::string(strNoPath);
     return apResult;
 }
@@ -3171,10 +3171,10 @@ IdvFileError::IdvFileError(const IdvFileError& cThat) : runtime_error(cThat) {}
 // Frees the strings after the runtime_error constructor, the last built first.
 IdvFileError::IdvFileError(const std::string& strDetails, bool bAppendSystemError, MessageStrings&& aStrings)
   : runtime_error(BuildMessage(strDetails, bAppendSystemError, aStrings)) {
-    FNVD_DESTRUCT_IN_PLACE(std::string)(&aStrings[3]);
-    FNVD_DESTRUCT_IN_PLACE(std::string)(&aStrings[2]);
-    FNVD_DESTRUCT_IN_PLACE(std::string)(&aStrings[1]);
-    FNVD_DESTRUCT_IN_PLACE(std::string)(&aStrings[0]);
+    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[3]);
+    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[2]);
+    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[1]);
+    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[0]);
 }
 
 void IdvFileError::operator delete(void* apMemory) {
@@ -3185,10 +3185,10 @@ void IdvFileError::operator delete(void* apMemory) {
 const std::string&
 IdvFileError::BuildMessage(const std::string& strDetails, bool bAppendSystemError, MessageStrings& aStrings) {
     if (bAppendSystemError) {
-        FNVD_RECONSTRUCT(std::string)(&aStrings[0], std::strerror(errno));
+        XFNV_RECONSTRUCT(std::string)(&aStrings[0], std::strerror(errno));
     }
     else {
-        FNVD_RECONSTRUCT(std::string)(&aStrings[0], "");
+        XFNV_RECONSTRUCT(std::string)(&aStrings[0], "");
     }
     aStrings[1] = strDetails + " [";
     aStrings[2] = aStrings[1] + aStrings[0];

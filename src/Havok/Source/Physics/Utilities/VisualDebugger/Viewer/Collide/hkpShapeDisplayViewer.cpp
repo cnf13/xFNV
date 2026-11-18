@@ -224,7 +224,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
     }
     // EXE-INLINED none: hkInplaceArray<hkDisplayGeometry*, 8>::hkInplaceArray
     using displayGeometries_t = hkInplaceArray<hkDisplayGeometry*, 8>;
-    FNVD_INLINED_LOCAL(displayGeometries_t, displayGeometries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(displayGeometries_t, displayGeometries, std::nullopt, std::nullopt);
     displayGeometries.m_data = displayGeometries.m_storage;
     displayGeometries.m_size = 0;
     displayGeometries.m_capacityAndFlags = 8 | hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
@@ -243,14 +243,14 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
                 hkDisplayGeometry* geometry = displayGeometries.m_data[i];
                 if (geometry->m_type == HK_DISPLAY_CONVEX && !geometry->m_geometry) {
                     char buf[512];
-                    FNVD_INLINED_LOCAL(hkErrStream, errStream, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(hkErrStream, errStream, std::nullopt, std::nullopt);
                     ::new (&errStream) hkErrStream(buf, 512);
                     errStream << "Unable to build display geometry from hkpShape geometry data";
                     hkError::s_instance->message(
                         hkError::MESSAGE_REPORT, -1, buf,
                         ".\\VisualDebugger\\Viewer\\Collide\\hkpShapeDisplayViewer.cpp", 316
                     );
-                    FNVD_DESTRUCT(hkOstream)(&errStream);
+                    XFNV_DESTRUCT(hkOstream)(&errStream);
                     // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
                     const int32_t last = --displayGeometries.m_size;
                     if (last != i) {

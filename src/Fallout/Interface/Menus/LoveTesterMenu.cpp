@@ -163,12 +163,12 @@ void LoveTesterMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v31, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v32, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v31, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v32, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     // The page turn's result is kept but never read.
     [[maybe_unused]] bool bPageTurned = false;
     switch (a1) {
@@ -516,11 +516,11 @@ bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
 }
 
 bool LoveTesterMenu::TurnPage(bool bForward) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, psoundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, psoundHand, std::nullopt, std::nullopt);
     bool brunAnim = false;
     if (!bForward) {
         bLoveTesterAnimForward = false;
@@ -792,9 +792,9 @@ void LoveTesterMenu::InitMachine() {
         NiPoint3 kTranslate;
         pLight->SetTranslate(*::new (&kTranslate) NiPoint3(0.0f, 0.0f, 0.0f));
         NiColor kDiffuse;
-        pLight->SetDiffuseColor(*FNVD_RECONSTRUCT(NiColor)(&kDiffuse, 0.85f, 0.85f, 0.85f));
+        pLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.85f, 0.85f, 0.85f));
         NiColor kSpecular;
-        pLight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&kSpecular, fRadius, 0.0f, 0.0f));
+        pLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, fRadius, 0.0f, 0.0f));
         pLight->SetDimmer(1.0f);
         NiUpdateData kLightUpdate;
         kLightUpdate.~NiUpdateData();
@@ -1390,7 +1390,7 @@ void LoveTesterMenu::RefreshPreviousPageButton(LoveTesterMenu::LoveTesterButton*
 }
 
 void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index eActorValue = static_cast<LoveTesterMenu::ActorValueButton*>(apButton)->eActorValue;
         if (eActorValue != ActorValue::VALUE_NONE) {
@@ -1410,7 +1410,7 @@ void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
 }
 
 void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index SelectedSPECIAL = LoveTesterMenu::pInstance->GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE) {
@@ -1431,7 +1431,7 @@ void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
 
 // InitMachine stores this callback only in ActorValueButtons.
 void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index v7 = static_cast<LoveTesterMenu::ActorValueButton*>(apButton)->eActorValue;
         if (v7 != ActorValue::VALUE_NONE) {
@@ -1453,7 +1453,7 @@ void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
 }
 
 void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index SelectedSPECIAL = LoveTesterMenu::pInstance->GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE) {
@@ -1475,8 +1475,8 @@ void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
 }
 
 void LoveTesterMenu::AllDoneButtonClick([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance &&
         PlayerCharacter::GetSumOfSPECIALStats() == LoveTesterMenu::pInstance->iAvailablePoints) {
         BSAudio* v0 = &BSAudio::QInstance();

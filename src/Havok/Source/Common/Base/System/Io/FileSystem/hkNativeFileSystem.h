@@ -25,7 +25,7 @@ public:
     // Opens the file through the platform's path, behind a buffered reader when the file reader cannot mark.
     hkStreamReader* openReader(const char* name) override {
         // Raw storage: the body frees the string itself, so no C++ destructor may free it again.
-        FNVD_INLINED_LOCAL(hkStringBuf, buffer, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkStringBuf, buffer, std::nullopt, std::nullopt);
         ::new (&buffer) hkStringBuf;
         hkStdioStreamReader* pFile = static_cast<hkStdioStreamReader*>(
             hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkStdioStreamReader))

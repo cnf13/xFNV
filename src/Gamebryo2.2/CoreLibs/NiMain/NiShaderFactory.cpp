@@ -49,7 +49,7 @@ bool NiShaderFactory::RegisterGlobalShaderConstant(
     uint32_t uiDataSize,
     const void* pvInitialData
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, kGlobalKey, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kGlobalKey, std::nullopt, std::nullopt);
     NiShaderFactory* pkFactory = NiShaderFactory::ms_pkShaderFactory;
     if (!pkFactory) {
         return false;
@@ -100,7 +100,7 @@ LABEL_6:;
 }
 
 bool NiShaderFactory::ReleaseGlobalShaderConstant(const NiFixedString& kKey) {
-    FNVD_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
     NiShaderFactory* v1 = NiShaderFactory::ms_pkShaderFactory;
     if (!NiShaderFactory::ms_pkShaderFactory) {
         return false;

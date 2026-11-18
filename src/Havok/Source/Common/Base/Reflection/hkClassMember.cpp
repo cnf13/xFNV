@@ -236,7 +236,7 @@ int32_t hkClassMember::getTypeName(char* buf, int32_t bufLen) const {
     Type eType = static_cast<Type>(m_type.m_storage);
     const char* pClassName = m_class ? m_class->getName() : "unknown";
     const char* pEnumName = m_enum ? m_enum->m_name : "unknown";
-    FNVD_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
     ::new (&s) hkStringBuf;
     // EXE-INLINED 0xD868B0
     if ((eType >= TYPE_VOID &&
@@ -383,7 +383,7 @@ const hkClassMember::TypeProperties& hkClassMember::getClassMemberTypeProperties
 hkClassMember::Type hkClassMember::getSubtypeOf(const char* name) {
     if (!hkString::strNcmp(name, "hkArray<", 8)) {
         const char* pInner = name + 8;
-        FNVD_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
         ::new (&s) hkStringBuf(pInner, hkString::strLen(pInner) - 1);
         Type eType = getTypeOf(s.m_string.begin());
         // EXE-INLINED 0xCBBD40
@@ -396,7 +396,7 @@ hkClassMember::Type hkClassMember::getSubtypeOf(const char* name) {
     }
     if (!hkString::strNcmp(name, "hkSimpleArray<", 14)) {
         const char* pInner = name + 14;
-        FNVD_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
         ::new (&s) hkStringBuf(pInner, hkString::strLen(pInner) - 1);
         Type eType = getTypeOf(s.m_string.begin());
         // EXE-INLINED 0xCBBD40

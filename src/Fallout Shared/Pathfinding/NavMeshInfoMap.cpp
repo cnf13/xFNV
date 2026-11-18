@@ -313,7 +313,7 @@ void NavMeshInfoMap::SetAltered(bool abVal) {
 }
 
 void NavMeshInfoMap::DeleteNavMeshInfo(uint32_t auiNavMeshID) {
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     NavMeshInfo* a2;
     if (InfoMap.GetAt(auiNavMeshID, a2)) {
         RemoveInfoFromCellKeyMap(a2);

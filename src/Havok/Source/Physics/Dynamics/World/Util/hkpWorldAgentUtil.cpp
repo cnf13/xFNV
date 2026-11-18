@@ -169,7 +169,7 @@ hkpSimulationIsland* hkpWorldAgentUtil::getIslandFromAgentEntry(
 // The sorted copy of the entity's agent list starts empty (no storage, not ours). Each agent with an update-filter
 // function gets the island of its first entity, or of its second when the first is fixed.
 void hkpWorldAgentUtil::updateEntityShapeCollectionFilter(hkpEntity* entity, hkpCollisionInput& collisionInput) {
-    FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
     collisionEntries.m_data = nullptr;
     collisionEntries.m_size = 0;
     collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;

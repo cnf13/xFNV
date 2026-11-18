@@ -989,7 +989,7 @@ ExtraPackageStartLocation::ExtraPackageStartLocation(
 
 bool ExtraPackageStartLocation::Compare(BSExtraData* apCompare) {
     char* v4 = static_cast<char*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(apCompare, RTTI_BSExtraData, RTTI_ExtraPackageStartLocation)
+        XFNV_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(apCompare, RTTI_BSExtraData, RTTI_ExtraPackageStartLocation)
     );
     if (!v4) {
         return true;
@@ -1054,7 +1054,7 @@ ExtraRadioData::ExtraRadioData() : BSExtraData(0x68u) {
 
 bool ExtraRadioData::Compare(BSExtraData* apCompare) {
     char* v4 =
-        static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(ExtraRadioData)(apCompare, RTTI_BSExtraData, RTTI_ExtraRadioData));
+        static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(ExtraRadioData)(apCompare, RTTI_BSExtraData, RTTI_ExtraRadioData));
     if (!v4) {
         return true;
     }
@@ -1538,7 +1538,7 @@ ExtraStartingPosition::ExtraStartingPosition(TESObjectREFR* apObject) : BSExtraD
 
 bool ExtraStartingPosition::Compare(BSExtraData* apCompare) {
     char* v4 = static_cast<char*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraStartingPosition)(apCompare, RTTI_BSExtraData, RTTI_ExtraStartingPosition)
+        XFNV_DYNAMIC_CAST_VOID(ExtraStartingPosition)(apCompare, RTTI_BSExtraData, RTTI_ExtraStartingPosition)
     );
     if (!v4) {
         return true;
@@ -2329,7 +2329,7 @@ ExtraModdingItem::ExtraModdingItem(bool abFlag)
 
 bool ExtraModdingItem::Compare(BSExtraData* apCompare) {
     char* v4 = static_cast<char*>(
-        FNVD_DYNAMIC_CAST_VOID(ExtraModdingItem)(apCompare, RTTI_BSExtraData, RTTI_ExtraModdingItem)
+        XFNV_DYNAMIC_CAST_VOID(ExtraModdingItem)(apCompare, RTTI_BSExtraData, RTTI_ExtraModdingItem)
     );
     if (!v4) {
         return true;
@@ -2415,9 +2415,9 @@ void ExtraSecuritronFace::SetMood(const char* asMood) {
 }
 
 void ExtraSecuritronFace::ApplyFace(NiAVObject* apMesh) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, Personality, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, Mood, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, Personality, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, Mood, std::nullopt, std::nullopt);
     if (apMesh) {
         NiFixedString* v4 = ::new (static_cast<void*>(&apString)) NiFixedString("Screen01:0");
         NiAVObject* pFace = apMesh->GetObjectByName(*v4);

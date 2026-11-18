@@ -48,12 +48,12 @@ FalloutAudio::CurrentRegionSounds_t FalloutAudio::CurrentRegionSounds;
 void FalloutAudio::UpdateRegionSounds() {
     float ftimeOfDay;
     BGSAcousticSpace* v54;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v55, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v56, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v55, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v56, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle* plookup;
     BSSimpleList<TESRegionSound*>* soundList = pPlayer->GetRegionSounds();
     BSAudio* v0 = &BSAudio::QInstance();
@@ -308,7 +308,7 @@ LABEL_97:;
             prgnSound = plistPtr->m_item;
             // The source keeps the resolved sound in the form ID field (TESRegionDataSound's InitItem); the exe
             // reads it before testing prgnSound.
-#if FNVD_64BIT
+#if XFNV_64BIT
             psoundData = prgnSound->GetSound();
 #else
             psoundData = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(prgnSound->uiSound));
@@ -428,7 +428,7 @@ LABEL_97:;
             FalloutAudio::CurrentRegionSounds.GetNext(pPos, ikey, plookup);
             while (plistPtr && !plistPtr->IsEmpty()) {
                 prgnSound = plistPtr->m_item;
-#if FNVD_64BIT
+#if XFNV_64BIT
                 psoundData = prgnSound->GetSound();
 #else
                 psoundData = reinterpret_cast<TESSound*>(static_cast<uintptr_t>(prgnSound->uiSound));
@@ -455,7 +455,7 @@ LABEL_97:;
 }
 
 void PlayMysteriousStrangerMusic() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSAudio* v0 = &BSAudio::QInstance();
     v0->GetSoundHandleByName(
         &a1, "MUSMysteriousStrangerA01",
@@ -472,7 +472,7 @@ void PlayMysteriousStrangerMusic() {
 }
 
 void PlaySound_MUSMysteriousStrangerA02() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSAudio* v0 = &BSAudio::QInstance();
     v0->GetSoundHandleByName(
         &a1, "MUSMysteriousStrangerA02",

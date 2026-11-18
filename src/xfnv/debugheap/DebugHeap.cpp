@@ -1,4 +1,4 @@
-// The guard-page heap of DebugHeap.h. Built into every program without the exe; only FNVD_GUARD_ALLOC's pass-through
+// The guard-page heap of DebugHeap.h. Built into every program without the exe; only XFNV_GUARD_ALLOC's pass-through
 // (SystemAlloc.cpp) calls it. The system's side (pages, threads, the log, the fault hook) is Platform.h's.
 
 #include "DebugHeap.h"
@@ -13,7 +13,7 @@
 #include <cstring>
 #include <mutex>
 
-namespace fnvd::debugheap {
+namespace xfnv::debugheap {
     namespace {
 
         // The knobs. An allocation of kGuardMinSize bytes or more gets its own pages; so does every
@@ -575,4 +575,4 @@ namespace fnvd::debugheap {
         return pNew;
     }
 
-} // namespace fnvd::debugheap
+} // namespace xfnv::debugheap

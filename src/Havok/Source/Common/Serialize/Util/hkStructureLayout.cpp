@@ -44,7 +44,7 @@ int32_t hkStructureLayout::getMemberSize(
     int32_t result;
     int32_t m_bytesInPointer;
     const hkClassMember* v6;
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     int32_t v3 = 0;
     switch (type) {
         case hkClassMember::TYPE_BOOL:
@@ -125,7 +125,7 @@ int32_t hkStructureLayout::getMemberSize(
                 )) {
                 __builtin_debugtrap();
             }
-            FNVD_DESTRUCT(hkOstream)(&apThis);
+            XFNV_DESTRUCT(hkOstream)(&apThis);
         LABEL_16:;
             result = 0;
             break;

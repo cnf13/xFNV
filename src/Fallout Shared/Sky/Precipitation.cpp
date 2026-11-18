@@ -222,7 +222,7 @@ void Precipitation::FlushAll() {
 void Precipitation::Update(float afSecondsPassed) {
     float fEndPct;
     float fBeginPct;
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     Sky* pSky = Sky::GetInstance();
     bool v25 = pSky->eMode == Sky::SM_INTERIOR || !pSky->eMode;
     bool bcull = v25;

@@ -1459,12 +1459,12 @@ void hkp3AxisSweep::queryBatchAabbSub(
     hkBool addMode
 ) {
     using openQueryNodes_t = hkInplaceArray<uint16_t, 256>;
-    FNVD_INLINED_LOCAL(openQueryNodes_t, openQueryNodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(openQueryNodes_t, openQueryNodes, std::nullopt, std::nullopt);
     openQueryNodes.m_data = openQueryNodes.m_storage;
     openQueryNodes.m_size = 0;
     openQueryNodes.m_capacityAndFlags = 256 | hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
     using openOtherNodes_t = hkInplaceArray<uint16_t, 256>;
-    FNVD_INLINED_LOCAL(openOtherNodes_t, openOtherNodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(openOtherNodes_t, openOtherNodes, std::nullopt, std::nullopt);
     openOtherNodes.m_data = openOtherNodes.m_storage;
     openOtherNodes.m_size = 0;
     openOtherNodes.m_capacityAndFlags = 256 | hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
@@ -2149,7 +2149,7 @@ void hkp3AxisSweep::calcAabbCache(
 ) const {
     const int32_t numCollidables = overlappingCollidables.m_size;
     // The stack allocator's bytes are untyped memory; the local array keeps its node pointers there.
-    FNVD_INLINED_LOCAL(hkLocalArray<const hkpBpNode*>, overlaps, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<const hkpBpNode*>, overlaps, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<const hkpBpNode*>::hkLocalArray(numCollidables) (hkAllocateStack)
         overlaps.m_size = 0;
@@ -3421,7 +3421,7 @@ void hkp3AxisSweep::addObjectBatch(
 
     // The old nodes overlapping the batch's total AABB.
     using overlaps_t = hkArray<const hkpBpNode*, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(overlaps_t, overlaps, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(overlaps_t, overlaps, std::nullopt, std::nullopt);
     overlaps.m_data = nullptr;
     overlaps.m_size = 0;
     overlaps.m_capacityAndFlags = kDontDeallocate;
@@ -4015,7 +4015,7 @@ void hkp3AxisSweep::removeObjectBatch(
     // The kept nodes moved into a removed node's place, for the deterministic order fix at the end.
     // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray
     using TempIntArray = hkArray<int32_t, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(TempIntArray, movedNodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(TempIntArray, movedNodes, std::nullopt, std::nullopt);
     movedNodes.m_data = nullptr;
     movedNodes.m_size = 0;
     movedNodes.m_capacityAndFlags = kDontDeallocate;
@@ -4034,7 +4034,7 @@ void hkp3AxisSweep::removeObjectBatch(
     int32_t numIndices = numNodes;
     int32_t* newIndex = numIndices ? tempIndices._bufAlloc<int32_t>(numIndices) : nullptr;
     const int32_t newIndexCapacity = numIndices ? numIndices : kDontDeallocate;
-    FNVD_INLINED_LOCAL(TempIntArray, newIndices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(TempIntArray, newIndices, std::nullopt, std::nullopt);
     newIndices.m_data = newIndex;
     newIndices.m_size = numIndices;
     newIndices.m_capacityAndFlags = newIndexCapacity;

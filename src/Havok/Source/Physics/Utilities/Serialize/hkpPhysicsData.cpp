@@ -368,7 +368,7 @@ void hkpPhysicsData::splitPhysicsSystems(
                 }
                 for (int32_t a = 0; a < inputSystem->m_actions.m_size;) {
                     // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-                    FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
                     entities.m_data = nullptr;
                     entities.m_size = 0;
                     entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;

@@ -183,7 +183,7 @@ void hkpBvTreeStreamAgent::processCollision(
     // The SDK's inplace list over its own storage (DONT_DEALLOCATE), holding the invalid shape key. Raw storage: the
     // body frees the keys itself at the end, so no C++ destructor may free them again.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) FNVD_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
     hitList.m_data = hitList.m_storage;
     hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
     hitList.m_storage[0] = 0xFFFFFFFF;

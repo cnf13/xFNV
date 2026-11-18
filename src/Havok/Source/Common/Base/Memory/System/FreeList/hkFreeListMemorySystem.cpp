@@ -19,13 +19,13 @@
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "SDK/Windows/winbase.h"
 
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
 // xfnv/debugheap/SystemAlloc.h's aligned pair, declared here: src/Havok includes no header outside Havok and the
 // SDK.
-namespace fnvd::sysalloc {
+namespace xfnv::sysalloc {
     void* AlignedAllocate(size_t aSize, size_t aAlign);
     void AlignedFree(void* apMem);
-} // namespace fnvd::sysalloc
+} // namespace xfnv::sysalloc
 
 // Every allocator of a router threadInit sets up is this one, so blocks and buffers bypass the free lists, the
 // large-block allocator, the thread caches and the solver buffer. 16-aligned, as the free-list allocator's blocks are;
@@ -33,10 +33,10 @@ namespace fnvd::sysalloc {
 class hkPassThroughAllocator : public hkMemoryAllocator {
 public:
     void* blockAlloc(int32_t aiNumBytes) override {
-        return fnvd::sysalloc::AlignedAllocate(static_cast<size_t>(aiNumBytes), 16);
+        return xfnv::sysalloc::AlignedAllocate(static_cast<size_t>(aiNumBytes), 16);
     }
     void blockFree(void* apMem, int32_t) override {
-        fnvd::sysalloc::AlignedFree(apMem);
+        xfnv::sysalloc::AlignedFree(apMem);
     }
     void getMemoryStatistics(MemoryStatistics& arStats) override {
         arStats = MemoryStatistics{};
@@ -100,7 +100,7 @@ void hkFreeListMemorySystem::threadInit(
         router.m_temp = &rThreadData.m_heapThreadMemory;
         router.m_solver = &m_solverAllocator;
     }
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
     aRouter.m_heap = &kPassThroughAllocator;
     aRouter.m_global = &kPassThroughAllocator;
     aRouter.m_debug = &kPassThroughAllocator;

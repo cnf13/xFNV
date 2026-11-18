@@ -1468,8 +1468,8 @@ bool MobileObject::ChangeProcessLevel() {
 }
 
 void MobileObject::UpdateInDialogue(float afDelta, DialogueResponse* pResponse, bool abChangeAnimationEndVoice) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Animation* panim = GetAnimation();
     DialoguePackage* pdia = nullptr;
     BaseProcess* CurrentAIProcess = pCurrentProcess;
@@ -1850,8 +1850,8 @@ float MobileObject::SpeakSoundFunction(
     bool abLip,
     bool abUseIdleManager
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     if (IsTalkingActivator()) {
         float fdelay = 0.0f;
         BSStringT<char> tempstring(apSoundFile);
@@ -2413,7 +2413,7 @@ BSSoundHandle* MobileObject::PlaySoundByEditorName(
     uint32_t aiSoundType,
     bool abAllowCopy
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle soundHand;
     if (Get3D()) {
         TESSound* psnd = pDataHandler->GetSound(apEditorName);
@@ -2445,7 +2445,7 @@ uint32_t* MobileObject::GetCollisionFilter(uint32_t* apResult) {
         pFilter = &pController->GetCollisionFilter(&kControllerFilter)->iFilter;
     }
     else {
-        pFilter = &FNVD_RECONSTRUCT(CFilter)(&kEmptyFilter, 0)->iFilter;
+        pFilter = &XFNV_RECONSTRUCT(CFilter)(&kEmptyFilter, 0)->iFilter;
     }
     *apResult = *pFilter;
     return apResult;
@@ -2827,7 +2827,7 @@ BSSoundHandle* MobileObject::PlaySound(
 
 BSSoundHandle*
 MobileObject::PlaySound_0(BSSoundHandle* apResult, char* apSoundFileName, bool abLoop, uint32_t aiSoundType) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     BSSoundHandle soundHand;
     BSAudio* v5 = &BSAudio::QInstance();
     BSSoundHandle* arHandle = v5->GetSoundHandleByFilename(&out, apSoundFileName, aiSoundType, nullptr);

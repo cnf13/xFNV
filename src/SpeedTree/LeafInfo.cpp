@@ -120,7 +120,7 @@ void SIdvLeafInfo::Parse(CTreeFileAccess& cFile) {
                             case File_Leaf_Filename: {
                                 std::string strParsed = cFile.ParseString();
                                 std::string strFilename;
-                                FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&strFilename, strParsed);
+                                XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&strFilename, strParsed);
                                 sLeaf.m_strFilename.assign(strFilename, 0, std::string::npos);
                                 CIdvFilename strNoPath;
                                 CIdvFilename* pNoPath = sLeaf.m_strFilename.NoPath(&strNoPath);
@@ -154,7 +154,7 @@ void SIdvLeafInfo::Parse(CTreeFileAccess& cFile) {
                             case File_Leaf_Ratio: cFile.ParseFloat(); break;
                             default: {
                                 std::string strDetails;
-                                FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed single leaf information");
+                                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed single leaf information");
                                 throw IdvFileError(strDetails, false);
                             }
                         }
@@ -168,7 +168,7 @@ void SIdvLeafInfo::Parse(CTreeFileAccess& cFile) {
             }
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed general leaf information");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed general leaf information");
                 throw IdvFileError(strDetails, false);
             }
         }

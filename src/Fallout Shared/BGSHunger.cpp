@@ -29,7 +29,7 @@ bool BGSHungerStage::Load(TESFile* apFile) {
         if (eChunk == DATA_ID) {
             // The data is this form's own component.
             LoadData(apFile, static_cast<char*>(static_cast<void*>(GetData())), 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the sickness's 4-byte form ID at 4.
             TESFile::WidenFormIDRecords(
                 GetData(), 1, 8, sizeof(BGSHungerStageData), {{4, offsetof(BGSHungerStageData, pSickness)}}

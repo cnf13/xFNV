@@ -382,7 +382,7 @@ hkpGravityGun::pickBody(const hkTransform& viewTransform, const hkpRigidBody* ch
                             int32_t v11 = 0;
                             // Declared before the branch, so that the else branch's goto to LABEL_17 does not cross its
                             // initialisation.
-                            FNVD_INLINED_LOCAL(
+                            XFNV_INLINED_LOCAL(
                                 hkpClosestRayHitCollector, collector, hkpClosestRayHitCollector_vftable, std::nullopt
                             );
                             if (m_size <= 0) {

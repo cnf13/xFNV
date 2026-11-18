@@ -257,8 +257,8 @@ void FOVATSEffectManager::ClearMultiTargets() {
 }
 
 void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager::VATS_DRAW_MODE aeDrawMode) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, string, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, string, std::nullopt, std::nullopt);
     if (SingleTarget.pRef) {
         if (((bEffectEnabled && !bScanning) || abQueryMode) &&
             aeDrawMode != FOVATSEffectManager::VATS_DRAW_ENTIRE_TARGET) {
@@ -806,7 +806,7 @@ void FOVATSEffectManager::TargetAdditionalLimb(BGSBodyPart::LIMB_ENUM aeLimb) {
 }
 
 void FOVATSEffectManager::IsolateBodyPart() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SingleTarget.pRef->IsActor() && eLimb != BGSBodyPart::LIMB_WEAPON && eLimb != BGSBodyPart::LIMB_COUNT) {
         Actor* pactor = static_cast<Actor*>(SingleTarget.pRef);
         int32_t ilimb = eLimb;
@@ -916,7 +916,7 @@ void FOVATSEffectManager::EnableBodyPartOnSkinInstance(
 }
 
 void FOVATSEffectManager::RestoreBodyParts() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SingleTarget.pRef->IsActor() && eLimb != BGSBodyPart::LIMB_WEAPON && eLimb != BGSBodyPart::LIMB_COUNT) {
         Actor* pactor = static_cast<Actor*>(SingleTarget.pRef);
         ShowBipedObjectOnActor(pactor, BO_LEFT_HAND, true);

@@ -170,17 +170,17 @@ bool BSTempEffectSimpleDecal::ProcessGeometry(NiAVObject* apAVObj) {
     NiPoint2 v34;
     NiPoint2 v35;
     NiPoint3 v36;
-    FNVD_INLINED_LOCAL(NiPlane, v37, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v37, std::nullopt, std::nullopt);
     NiPoint3 v38;
-    FNVD_INLINED_LOCAL(NiPlane, v39, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v39, std::nullopt, std::nullopt);
     NiPoint3 v40;
-    FNVD_INLINED_LOCAL(NiPlane, v41, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v41, std::nullopt, std::nullopt);
     NiPoint3 v42;
-    FNVD_INLINED_LOCAL(NiPlane, v43, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v43, std::nullopt, std::nullopt);
     NiPoint3 v44;
-    FNVD_INLINED_LOCAL(NiPlane, v45, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v45, std::nullopt, std::nullopt);
     NiPoint3 dst;
-    FNVD_INLINED_LOCAL(NiPlane, v47, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPlane, v47, std::nullopt, std::nullopt);
     NiMatrix3 rot_2;
     NiMatrix3 kinvobjrot;
     NiPoint3 kmodelspaceorigin;
@@ -497,8 +497,8 @@ void BSTempEffectSimpleDecal::CleanUpMemory() {
 }
 
 bool BSTempEffectSimpleDecal::FinalizeGeometry() {
-    FNVD_INLINED_LOCAL(NiPointer<NiRefObject>, spDecal_3, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<NiRefObject>, spDecal_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiRefObject>, spDecal_3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiRefObject>, spDecal_2, std::nullopt, std::nullopt);
     // The debug colour, built on each pass.
     bool bForceSolidColor = false;
     if (sp3D.m_pObject) {
@@ -780,10 +780,10 @@ void BSTempEffectSimpleDecal::ClipMesh(NiAVObject* apAVObj) {
 }
 
 void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe) {
-    FNVD_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
     NiMatrix3 kinvobjrot;
     NiMatrix3 kobjrot;
-    FNVD_INLINED_LOCAL(NiPointer<NiObject>, spobj, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiObject>, spobj, std::nullopt, std::nullopt);
     if (!BGSDecalManager::spDebugDecalBox.m_pObject) {
         BSStream stream;
         if (stream.BSStream::Load("Data\\Meshes\\Decals\\DebugDecalBox.NIF", nullptr)) {
@@ -955,7 +955,7 @@ void BSTempEffectSimpleDecal::ResizeDataArrays() {
     void* v7 =
         ourMalloc(iDecalVertexCount <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * iDecalVertexCount : SIZE_MAX);
     if (v7) {
-        rt::eh_vector_constructor_iterator(v7, sizeof(NiColorA), iDecalVertexCount, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(v7, sizeof(NiColorA), iDecalVertexCount, &xfnv::constructElement<NiColorA>);
         v2 = static_cast<NiColorA*>(v7);
     }
     else {

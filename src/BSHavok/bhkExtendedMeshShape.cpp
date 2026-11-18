@@ -33,7 +33,7 @@ NiRTTI bhkExtendedMeshShapeData::ms_RTTI("bhkExtendedMeshShapeData", &NiObject::
 bool bhkExtendedMeshShape::IsEqual(NiObject* apObject) {
     uint8_t result = (uint8_t)bhkShape::IsEqual(apObject);
     if (result) {
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The exe reads the other shape's spData (+0x14) as apObject[2]'s reference count: the field itself here,
         // whose offset that NiObject arithmetic does not give on x64. bhkShape::IsEqual found the same class.
         return (bool)((uint8_t)(spData.m_pObject == static_cast<bhkExtendedMeshShape*>(apObject)->spData.m_pObject));
@@ -193,8 +193,8 @@ void bhkExtendedMeshShapeData::LoadBinary(NiStream& arStream) {
         // The entries follow the count in the untyped block; the constructor iterator builds them there.
         pEntries = reinterpret_cast<bhkExtendedMeshSubPart*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pEntries, sizeof(bhkExtendedMeshSubPart), uiCount, &fnvd::constructElement<bhkExtendedMeshSubPart>,
-            &fnvd::destructElement<bhkExtendedMeshSubPart>
+            pEntries, sizeof(bhkExtendedMeshSubPart), uiCount, &xfnv::constructElement<bhkExtendedMeshSubPart>,
+            &xfnv::destructElement<bhkExtendedMeshSubPart>
         );
     }
     else {
@@ -566,14 +566,14 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
         pParts = reinterpret_cast<bhkExtendedMeshSubPart*>(pCount + 1);
         rt::eh_vector_constructor_iterator(
             pParts, sizeof(bhkExtendedMeshSubPart), static_cast<int32_t>(uiNumParts),
-            &fnvd::constructElement<bhkExtendedMeshSubPart>, &fnvd::destructElement<bhkExtendedMeshSubPart>
+            &xfnv::constructElement<bhkExtendedMeshSubPart>, &xfnv::destructElement<bhkExtendedMeshSubPart>
         );
     }
     pdata->pSubDataA = pParts;
     pdata->uiNumSubParts = pSrcData->usPartCount;
 
     // The array starts with no slots and a grow-by of one.
-    FNVD_INLINED_LOCAL(NiTPrimitiveArray<uint16_t>, kIndices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiTPrimitiveArray<uint16_t>, kIndices, std::nullopt, std::nullopt);
     ::new (&kIndices) NiTPrimitiveArray<uint16_t>(0u, 1u);
 
     bhkExtendedMeshSubPart* currPart = pParts;
@@ -681,7 +681,7 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
         Init(static_cast<const hkSerializableCinfo&>(cinfo));
     }
     // The destructor, which frees the buffer, runs before the memory context is restored.
-    FNVD_DESTRUCT(NiTArray<uint16_t, NiTMallocInterface<uint16_t>>)(&kIndices);
+    XFNV_DESTRUCT(NiTArray<uint16_t, NiTMallocInterface<uint16_t>>)(&kIndices);
     pTLSData->eMemContext = eSavedMemContext;
 }
 

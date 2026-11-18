@@ -80,7 +80,7 @@ bhkCharControllerShape* bhkCharControllerShape::CreateFromHull(hkArray<hkVector4
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkCharControllerShape* pShape = nullptr;
-    FNVD_INLINED_LOCAL(hkConvexVerticesShapeCinfo, kInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkConvexVerticesShapeCinfo, kInfo, std::nullopt, std::nullopt);
     kInfo.m_userData = 0;
     kInfo.m_radius = 0.1f;
     kInfo.m_vertices.m_data = nullptr;

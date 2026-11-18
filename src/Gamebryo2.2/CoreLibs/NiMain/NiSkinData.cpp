@@ -51,7 +51,7 @@ void NiSkinData::LoadBinary(NiStream& kStream) {
     BoneData* pkBoneData = nullptr;
     if (pvMemory) {
         rt::eh_vector_constructor_iterator(
-            pvMemory, sizeof(BoneData), static_cast<int32_t>(uiCount), &fnvd::constructElement<NiSkinData::BoneData>
+            pvMemory, sizeof(BoneData), static_cast<int32_t>(uiCount), &xfnv::constructElement<NiSkinData::BoneData>
         );
         pkBoneData = static_cast<BoneData*>(pvMemory);
     }
@@ -211,7 +211,7 @@ void NiSkinData::FreeBoneVertData() {
 
 void NiSkinData::ComputeBoneBounds(const NiPoint3* pkVerts) {
     using NiPoint3Set_t = NiTSet<NiPoint3, NiTNewInterface<NiPoint3>>;
-    FNVD_INLINED_LOCAL(NiPoint3Set_t, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPoint3Set_t, v13, std::nullopt, std::nullopt);
     uint32_t m_uiUsed = 0;
     NiPoint3* m_pBase = nullptr;
     std::memset(&v13, 0, sizeof(v13));

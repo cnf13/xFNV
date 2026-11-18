@@ -646,7 +646,7 @@ void NiBlendInterpolator::CopyMembers(NiBlendInterpolator* pkDest, NiCloningProc
         pkInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
             pkInterpArray, sizeof(InterpArrayItem), uiCount,
-            &fnvd::constructElement<NiBlendInterpolator::InterpArrayItem>
+            &xfnv::constructElement<NiBlendInterpolator::InterpArrayItem>
         );
     }
     pkDest->m_pkInterpArray = pkInterpArray;

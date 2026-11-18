@@ -162,7 +162,7 @@ bool TESRace::Load(TESFile* apFile) {
             case XNAM_ID: {
                 GROUP_REACTION* pReaction = static_cast<GROUP_REACTION*>(ourMalloc(sizeof(GROUP_REACTION)));
                 apFile->GetChunkData(pReaction, sizeof(GROUP_REACTION));
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0xC bytes, the form's 4-byte ID first.
                 TESFile::WidenFormIDRecords(
                     pReaction, 1, 0xC, sizeof(GROUP_REACTION), {{0, offsetof(GROUP_REACTION, pForm)}}
@@ -1194,9 +1194,9 @@ bool TESRace::GetBodyTexture(
     bool abForceCreate
 ) {
     TESActorBase::SEX esex;
-    FNVD_INLINED_LOCAL(NiFixedString, kFilename, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, fileEGT, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, facecoord, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kFilename, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, fileEGT, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, facecoord, std::nullopt, std::nullopt);
     char path[264];
     char pcString[264];
     char Path[268];
@@ -1205,8 +1205,8 @@ bool TESRace::GetBodyTexture(
     NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
     NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(nullptr));
     rt::eh_vector_constructor_iterator(
-        facecoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-        &fnvd::destructElement<FR2MatrixVTC<float>>
+        facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+        &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     if (apNPC) {
         esex = apNPC->GetSex();
@@ -1299,7 +1299,7 @@ bool TESRace::GetBodyTexture(
 done:
     fileEGT.~BSStringT<char>();
     rt::eh_vector_destructor_iterator(
-        facecoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     return bResult;
 }
@@ -1514,8 +1514,8 @@ bool TESRace::CreateHead(
     BSFaceGenNiNode* v9;
     BSFaceGenNiNode* v11;
     BSFaceGenAnimationData* panimData;
-    FNVD_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_FACEGEN_SYSTEM, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESRace.cpp", 1571
     );

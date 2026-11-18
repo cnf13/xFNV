@@ -19,7 +19,7 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
     const hkpMoppAabbJob& job = static_cast<const hkpMoppAabbJob&>(baseJob);
     // A MOPP code over the job's code bytes: only its info, its data array and its build type are set (no vtable or
     // reference count), and no destructor is run on it.
-    FNVD_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
     code.m_info = job.m_moppCodeInfo;
     code.m_data.m_data = const_cast<uint8_t*>(job.m_moppCodeData);
     code.m_data.m_size = 512;
@@ -32,7 +32,7 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
         // keys, the query writes 4-byte primitive infos into it.
         // EXE-INLINED 0x62E230
         using results_t = hkArray<hkpMoppPrimitiveInfo, hkContainerHeapAllocator>;
-        FNVD_INLINED_LOCAL(results_t, results, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(results_t, results, std::nullopt, std::nullopt);
         results.m_data = reinterpret_cast<hkpMoppPrimitiveInfo*>(command->m_results);
         results.m_size = 0;
         results.m_capacityAndFlags = static_cast<int32_t>(

@@ -1,5 +1,5 @@
 #pragma once
-// The crash log of the programs without the exe (CMake option FNVD_CRASH_LOG): what the platform's capture side
+// The crash log of the programs without the exe (CMake option XFNV_CRASH_LOG): what the platform's capture side
 // (CaptureWindows.cpp: the exception filter, the threads, the stacks, the file; CapturePosix.cpp: the same on
 // signals), the compiler ABI's RTTI side (RttiMsvc.cpp, RttiItanium.cpp) and the shared report (Out.cpp, Report.cpp,
 // Annotate.cpp: what a value points to; Identity.cpp: by src's types) share. CMake picks one file of each pair.
@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
 
     constexpr uint32_t kFaultScanWords = 16384;
     constexpr uint32_t kThreadScanWords = 4096;
@@ -113,4 +113,4 @@ namespace fnvd::crashlog {
     // "2026-11-15 15:02:03"
     void printTime(Out& arOut, const DateTime& arTime);
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

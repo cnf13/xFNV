@@ -611,7 +611,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                     NiColorA* pcolors;
                     void* v55 = ourMalloc(4 * sizeof(NiColorA));
                     if (v55) {
-                        rt::eh_vector_constructor_iterator(v55, sizeof(NiColorA), 4, &fnvd::constructElement<NiColorA>);
+                        rt::eh_vector_constructor_iterator(v55, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
                         pcolors = static_cast<NiColorA*>(v55);
                     }
                     else {
@@ -1462,15 +1462,15 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
 
 void TESWaterSystem::UpdateWaterSounds() {
     static char bWaterSoundPlaying;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v43, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v44, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v43, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v44, std::nullopt, std::nullopt);
     NiPoint2 v45;
     NiPoint3 v46;
-    FNVD_INLINED_LOCAL(NiColorA, v47, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v47, std::nullopt, std::nullopt);
     NiPoint3 v48;
-    FNVD_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
     NiPoint3 v50;
     NiPoint3 dst;
     NiPoint3 playerloc;
@@ -2697,7 +2697,7 @@ void TESWaterSystem::MTRenderSelectiveReflectionTexture(PlaceableWaterGroup* apW
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4226
     );
     if (TESWaterSystem::GetUseWaterShader() && apWaterGroup->spReflectionCamera.m_pObject) {
-        FNVD_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
         NiColorA oldClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         NiDX9Renderer* pRenderer = BSShaderManager::GetRenderer();
         pRenderer->GetBackgroundColor(oldClearColor);
@@ -2750,7 +2750,7 @@ void TESWaterSystem::MTRenderWorldReflectionTexture() {
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4280
     );
     if (TESWaterSystem::GetUseWaterShader() && TESWaterSystem::spWaterHeightCamera.m_pObject) {
-        FNVD_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, newClearColor, std::nullopt, std::nullopt);
         NiColorA oldClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         NiDX9Renderer* Renderer_ = BSShaderManager::GetRenderer();
         Renderer_->GetBackgroundColor(oldClearColor);
@@ -2998,13 +2998,13 @@ void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableW
 }
 
 void TESWaterSystem::MTRenderSelectiveDepthTexture(PlaceableWaterGroup* apWaterGroup, uint16_t auReadMask) {
-    FNVD_INLINED_LOCAL(NiColorA, kPlaneTemp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, kPlaneTemp, std::nullopt, std::nullopt);
     NiPoint2 v27;
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 4617
     );
     if (TESWaterSystem::GetUseWaterShader() && apWaterGroup->spDepthCamera.m_pObject) {
-        FNVD_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, a2, std::nullopt, std::nullopt);
         const NiRect<float>* pViewport = &apWaterGroup->spDepthCamera.m_pObject->m_kPort;
         NiRenderer* Renderer_ = NiRenderer::GetRenderer();
         Renderer_->SetScreenSpaceCameraData(pViewport);
@@ -3268,7 +3268,7 @@ void TESWaterSystem::MTRenderSkyReflectionTexture() {
     float fB = kPlane.GetNormal().y;
     float fA = kPlane.GetNormal().x;
     NiColorA kClipPlane;
-    SetClipPlane(*FNVD_RECONSTRUCT(NiColorA)(&kClipPlane, fA, fB, fC, fD), 0);
+    SetClipPlane(*XFNV_RECONSTRUCT(NiColorA)(&kClipPlane, fA, fB, fC, fD), 0);
     BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
     BSShaderAccumulator* pSorter = PlaceableWaterGroup::spSkyReflectionSorter.operator->();
     pCamera = PlaceableWaterGroup::spSkyReflectionCamera.operator->();
@@ -3291,7 +3291,7 @@ void TESWaterSystem::SetClipPlane(NiColorA afData, int32_t aiPlane) {
 
     // The view matrix with its translation recomputed from the camera position along each axis.
     alignas(16) D3DXMATRIX kView;
-    FNVD_RECONSTRUCT(D3DXMATRIX)(&kView, *BSShaderManager::GetRenderer()->GetD3DView());
+    XFNV_RECONSTRUCT(D3DXMATRIX)(&kView, *BSShaderManager::GetRenderer()->GetD3DView());
     NiPoint3 kAxis0;
     NiPoint3* pAxis0 = ::new (&kAxis0) NiPoint3(kView._11, kView._21, kView._31);
     kView._41 = -BSShader::GetCameraWorldTranslate()->Dot(*pAxis0);
@@ -3303,7 +3303,7 @@ void TESWaterSystem::SetClipPlane(NiColorA afData, int32_t aiPlane) {
     kView._43 = -BSShader::GetCameraWorldTranslate()->Dot(*pAxis2);
 
     alignas(16) D3DXMATRIX kProj;
-    FNVD_RECONSTRUCT(D3DXMATRIX)(&kProj, *BSShaderManager::GetRenderer()->GetD3DProj());
+    XFNV_RECONSTRUCT(D3DXMATRIX)(&kProj, *BSShaderManager::GetRenderer()->GetD3DProj());
     alignas(16) D3DXMATRIX kViewProj = kView * kProj;
     D3DXMatrixInverse_Thunk(&kInverse, nullptr, &kViewProj);
     D3DXMatrixTranspose_Thunk(&kViewProj, &kInverse);
@@ -3796,7 +3796,7 @@ void TESWaterSystem::RenderDisplacementWaterStencil() {
 }
 
 BSRenderedTexture* TESWaterSystem::InitializeGreyTexture() {
-    FNVD_INLINED_LOCAL(NiColorA, v9, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v9, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 0x138A
     );

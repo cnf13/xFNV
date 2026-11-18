@@ -225,7 +225,7 @@ bool NiD3DShaderDeclaration::Initialize(
     if (pkStreams) {
         rt::eh_vector_constructor_iterator(
             pkStreams, sizeof(ShaderRegisterStream), static_cast<int32_t>(uiStreamCount),
-            &fnvd::constructElement<NiD3DShaderDeclaration::ShaderRegisterStream>
+            &xfnv::constructElement<NiD3DShaderDeclaration::ShaderRegisterStream>
         );
     }
     m_pkStreamEntries = pkStreams;
@@ -467,7 +467,7 @@ void NiD3DShaderDeclaration::_SDMShutdown() {
             }
             kArray.m_usSize = 0;
             kArray.m_usESize = 0;
-            FNVD_DESTRUCT_AS(DestructInlined, NiTArray<PackFunction, NiTMallocInterface<PackFunction>>)(&kArray);
+            XFNV_DESTRUCT_AS(DestructInlined, NiTArray<PackFunction, NiTMallocInterface<PackFunction>>)(&kArray);
             NiMemObject::operator delete(pkEntry, sizeof(NiPackerEntry));
             pkPackFunctions = ms_pkPackFunctions;
         }

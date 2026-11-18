@@ -539,7 +539,7 @@ bool BGSTerminal::Activate(
     TESBoundObject* apObjectToGet,
     int32_t aiCount
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (Interface::IsPipBoyOpening()) {
         return false;
     }

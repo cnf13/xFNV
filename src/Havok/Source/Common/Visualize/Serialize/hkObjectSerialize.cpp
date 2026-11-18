@@ -122,7 +122,7 @@ uint64_t hkObjectSerialize::readObject(
         return 0;
     }
     // EXE-INLINED none: hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>::hkArray
-    FNVD_INLINED_LOCAL(LocalFixupArray, localFixups, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(LocalFixupArray, localFixups, std::nullopt, std::nullopt);
     localFixups.m_data = nullptr;
     localFixups.m_size = 0;
     localFixups.m_capacityAndFlags = LocalFixupArray::DONT_DEALLOCATE_FLAG;
@@ -235,8 +235,8 @@ int32_t hkObjectSerialize::writeObject(
     hkArray<hkObjectSerialize::GlobalFixup, hkContainerHeapAllocator>& globalFixups
 ) {
     using buffer_t = hkArray<char, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(buffer_t, buffer, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(hkArrayStreamWriter, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(buffer_t, buffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArrayStreamWriter, apThis, std::nullopt, std::nullopt);
     hkRelocationInfo arReloc_;
     hkPlatformObjectWriter apMemory(destLayout);
     buffer.m_data = nullptr;

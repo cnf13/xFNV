@@ -33,7 +33,7 @@ NiD3DRenderStateGroup* NiTNewInterface<NiD3DRenderStateGroup>::Allocate(uint32_t
     // eh_vector_constructor_iterator takes the element count as an int.
     rt::eh_vector_constructor_iterator(
         pkArray, sizeof(NiD3DRenderStateGroup), static_cast<int32_t>(auiCount),
-        &fnvd::constructElement<NiD3DRenderStateGroup>
+        &xfnv::constructElement<NiD3DRenderStateGroup>
     );
     return pkArray;
 }
@@ -61,7 +61,7 @@ NiD3DRenderStateGroup::NiD3DRSEntry* NiTNewInterface<NiD3DRenderStateGroup::NiD3
     if (pkArray) {
         // eh_vector_constructor_iterator takes the element count as an int.
         rt::eh_vector_constructor_iterator(
-            pkArray, sizeof(NiD3DRSEntry), static_cast<int32_t>(auiCount), &fnvd::constructElement<NiD3DRSEntry>
+            pkArray, sizeof(NiD3DRSEntry), static_cast<int32_t>(auiCount), &xfnv::constructElement<NiD3DRSEntry>
         );
     }
     return pkArray;

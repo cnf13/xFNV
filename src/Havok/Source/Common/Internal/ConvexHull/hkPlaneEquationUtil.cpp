@@ -236,7 +236,7 @@ void visitEdge(
     }
     ++visitedEdges.m_size;
 
-    FNVD_INLINED_LOCAL(hkArray<Point_t>, points, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<Point_t>, points, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkPlaneEquationUtil::IntersectionPoint>::hkArray
     points.m_data = nullptr;
     points.m_size = 0;

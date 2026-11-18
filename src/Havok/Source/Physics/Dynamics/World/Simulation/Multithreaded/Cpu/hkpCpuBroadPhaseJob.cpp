@@ -81,7 +81,7 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
     // Another thread sets the flag: it is read again on each test, and the pointer is tested for null first.
 	volatile int8_t* exportFinished = &job.m_taskHeader->m_exportFinished;
 
-	FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
+	XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
 	newPairs.m_data = nullptr;
 	newPairs.m_size = 0;
 	newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
@@ -97,7 +97,7 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
 			static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
 		newPairs.m_localMemory = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
 	}
-	FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
+	XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
 	delPairs.m_data = nullptr;
 	delPairs.m_size = 0;
 	delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;

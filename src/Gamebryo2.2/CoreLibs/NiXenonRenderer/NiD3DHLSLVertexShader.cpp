@@ -59,7 +59,7 @@ bool NiD3DHLSLVertexShader::SetShaderConstant(
     const void* pvDataSource,
     uint32_t __formal
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
     if (!m_pkConstantTable || !m_pkD3DDevice) {
         return false;
     }
@@ -151,7 +151,7 @@ bool NiD3DHLSLVertexShader::SetShaderConstantArray(
     uint32_t uiRegistersPerEntry,
     uint16_t* pusReorderArray
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
     if (!m_pkConstantTable || !m_pkD3DDevice) {
         return false;
     }

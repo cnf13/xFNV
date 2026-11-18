@@ -71,10 +71,10 @@ void ImageSpaceEffectWaterDisplacement::Render(
     ImageSpaceEffectParam* apParam,
     int32_t abEndFrame
 ) {
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, aTex, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, kGreyTex, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, apTex, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, aTex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, kGreyTex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, apTex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, apThis, std::nullopt, std::nullopt);
     fTimeBetweenSimulations = 0.025f;
     // EXE-INLINED 0x4EBB70
     aTex.bForceAniso = false;
@@ -206,7 +206,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
                     UpdateData.bSceneGraphChange = false;
                     pObject->Update(UpdateData);
                     // EXE-INLINED none: NiFixedString(const char*) and ~NiFixedString
-                    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
                     kName.m_kHandle = NiGlobalStringTable::AddString("Partial Screen Trishape");
                     spPartialScreenTriShape.m_pObject->SetName(kName);
                     NiGlobalStringTable::ReleaseHandle(kName.m_kHandle);

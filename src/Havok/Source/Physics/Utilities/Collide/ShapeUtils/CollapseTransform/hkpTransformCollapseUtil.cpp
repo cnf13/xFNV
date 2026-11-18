@@ -88,7 +88,7 @@ void hkpTransformCollapseUtil::Results::reset() {
 }
 
 void hkpTransformCollapseUtil::Results::report() const {
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numCollapsedShapes = this->m_numCollapsedShapes;
@@ -97,7 +97,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 57
     );
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numIdentityTransformsRemoved = this->m_numIdentityTransformsRemoved;
     hkOstream* v3 = &apThis.operator<<("Number of identity transforms removed : ");
@@ -105,7 +105,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 58
     );
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numSpecializedTransformShapes = this->m_numSpecializedTransformShapes;
     hkOstream* v4 = &apThis.operator<<("Number of specialized transform shapes : ");
@@ -113,7 +113,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 59
     );
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numPropagatedTransformsToLists = this->m_numPropagatedTransformsToLists;
     hkOstream* v5 = &apThis.operator<<("Number of propagated transforms to lists : ");
@@ -121,7 +121,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 60
     );
-    FNVD_DESTRUCT(hkOstream)(&apThis);
+    XFNV_DESTRUCT(hkOstream)(&apThis);
 }
 
 // The transform (a convex translate, convex transform or transform shape's) over a sphere drops its rotation; an
@@ -205,7 +205,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
         const hkpListShape* pList = static_cast<const hkpListShape*>(child);
         const hkpShapeContainer* pContainer = pList;
         // EXE-INLINED none: hkArray<const hkpShape*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<const hkpShape*>, newChildren, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<const hkpShape*>, newChildren, std::nullopt, std::nullopt);
         newChildren.m_data = nullptr;
         newChildren.m_size = 0;
         newChildren.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
@@ -361,7 +361,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
             case HK_SHAPE_CONVEX_VERTICES: {
                 const hkpConvexVerticesShape* pVertices = static_cast<const hkpConvexVerticesShape*>(child);
                 // EXE-INLINED none: hkArray<hkVector4>::hkArray
-                FNVD_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
                 vertices.m_data = nullptr;
                 vertices.m_size = 0;
                 vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -393,7 +393,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                 stridedVertices.m_striding = sizeof(hkVector4);
                 const hkArray<hkVector4>* pPlanes = getPlaneEquations(const_cast<hkpConvexVerticesShape*>(pVertices));
                 // EXE-INLINED none: hkArray<hkVector4>::hkArray
-                FNVD_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
                 planes.m_data = nullptr;
                 planes.m_size = 0;
                 planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -543,7 +543,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseShapesRecursively(
             const hkpShapeContainer* pContainer = pList;
             const int32_t numChildren = pContainer->getNumChildShapes();
             // EXE-INLINED none: hkArray<const hkpShape*>::hkArray
-            FNVD_INLINED_LOCAL(hkArray<const hkpShape*>, newChildren, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkArray<const hkpShape*>, newChildren, std::nullopt, std::nullopt);
             newChildren.m_data = nullptr;
             newChildren.m_size = 0;
             newChildren.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
@@ -671,7 +671,7 @@ hkResult hkpTransformCollapseUtil::collapseTransforms(
     hkpTransformCollapseUtil::Results& resultsOut,
     hkpShape** shapeOut
 ) {
-    FNVD_INLINED_LOCAL(_SharedShapeData, sharedShapes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(_SharedShapeData, sharedShapes, std::nullopt, std::nullopt);
     // EXE-INLINED none: _SharedShapeData::_SharedShapeData (an empty record)
     sharedShapes.m_sharedShapes.m_data = nullptr;
     sharedShapes.m_sharedShapes.m_size = 0;
@@ -686,7 +686,7 @@ hkResult hkpTransformCollapseUtil::collapseTransforms(
 hkResult
 hkpTransformCollapseUtil::collapseTransforms(hkpRigidBody* rigidBody, const Options& options, Results& resultsOut) {
     // EXE-INLINED none: hkArray<hkpRigidBody*>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpRigidBody*>, rigidBodies, std::nullopt, std::nullopt);
     rigidBodies.m_data = nullptr;
     rigidBodies.m_size = 0;
     rigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;

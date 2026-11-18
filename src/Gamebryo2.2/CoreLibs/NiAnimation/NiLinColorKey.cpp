@@ -42,7 +42,7 @@ NiAnimationKey* NiLinColorKey::CreateArray(uint32_t uiNumKeys) {
     *puiCookie = uiNumKeys;
     NiLinColorKey* pkKeys = reinterpret_cast<NiLinColorKey*>(puiCookie + 1);
     rt::eh_vector_constructor_iterator(
-        pkKeys, sizeof(NiLinColorKey), uiNumKeys, &fnvd::constructElement<NiLinColorKey>
+        pkKeys, sizeof(NiLinColorKey), uiNumKeys, &xfnv::constructElement<NiLinColorKey>
     );
     return pkKeys;
 }
@@ -59,7 +59,7 @@ NiAnimationKey* NiLinColorKey::CreateFromStream(NiStream& kStream, uint32_t uiNu
         *puiCookie = uiNumKeys;
         pkLinColorKeys = reinterpret_cast<NiLinColorKey*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pkLinColorKeys, sizeof(NiLinColorKey), uiNumKeys, &fnvd::constructElement<NiLinColorKey>
+            pkLinColorKeys, sizeof(NiLinColorKey), uiNumKeys, &xfnv::constructElement<NiLinColorKey>
         );
     }
     else {
@@ -91,7 +91,7 @@ bool NiLinColorKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNum
         *puiCookie = uiNewNumKeys;
         pkNewKeys = reinterpret_cast<NiLinColorKey*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiLinColorKey), uiNewNumKeys, &fnvd::constructElement<NiLinColorKey>
+            pkNewKeys, sizeof(NiLinColorKey), uiNewNumKeys, &xfnv::constructElement<NiLinColorKey>
         );
     }
     else {

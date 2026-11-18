@@ -785,16 +785,16 @@ namespace {
 } // namespace
 
 // The exports the game's imports name. On Linux, which has no ole32, the C functions themselves. On Windows
-// (FNVD_SDL_AUDIO) only CoCreateInstance's import slot `__imp_`, which the game's dllimport calls go through, so
+// (XFNV_SDL_AUDIO) only CoCreateInstance's import slot `__imp_`, which the game's dllimport calls go through, so
 // ole32.lib (which the program links for the rest of COM) never supplies it.
 #if defined(_WIN32)
 #if defined(_M_IX86)
 extern "C" {
-decltype(&CreateInstance) fnvd_imp_CoCreateInstance __asm__("__imp__CoCreateInstance@20") = &CreateInstance;
+decltype(&CreateInstance) xfnv_imp_CoCreateInstance __asm__("__imp__CoCreateInstance@20") = &CreateInstance;
 }
 #else
 extern "C" {
-decltype(&CreateInstance) fnvd_imp_CoCreateInstance __asm__("__imp_CoCreateInstance") = &CreateInstance;
+decltype(&CreateInstance) xfnv_imp_CoCreateInstance __asm__("__imp_CoCreateInstance") = &CreateInstance;
 }
 #endif
 #else

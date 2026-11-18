@@ -28,5 +28,5 @@ struct SamplerChunk {
 };
 
 inline HRESULT DirectSoundCreate8(const GUID* pcGuidDevice, IDirectSound8** ppDS8, IUnknown* pUnkOuter) {
-    return fnvd::imports::DirectSoundCreate8(pcGuidDevice, ppDS8, pUnkOuter);
+    return xfnv::imports::DirectSoundCreate8(pcGuidDevice, ppDS8, pUnkOuter);
 }

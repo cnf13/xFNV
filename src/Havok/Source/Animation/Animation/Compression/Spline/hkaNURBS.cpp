@@ -409,7 +409,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P
 ) {
     // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkaNURBSFloatArray, ub, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkaNURBSFloatArray, ub, std::nullopt, std::nullopt);
     ub.m_data = nullptr;
     ub.m_size = 0;
     ub.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
@@ -481,7 +481,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
     }
 
     // hkArray<hkReal> ek(m + 1, 0.0f).
-    FNVD_INLINED_LOCAL(hkaNURBSFloatArray, ek, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkaNURBSFloatArray, ek, std::nullopt, std::nullopt);
     int32_t iErrors = m + 1;
     pHeap = hkMemoryRouter::getInstance().m_heap;
     float* pErrors;
@@ -581,7 +581,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P
 ) {
     // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(const hkArray&)
-    FNVD_INLINED_LOCAL(hkaNURBSFloatArray, ub_nonconst, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkaNURBSFloatArray, ub_nonconst, std::nullopt, std::nullopt);
     ub_nonconst.m_data = nullptr;
     ub_nonconst.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -811,12 +811,12 @@ void hkaNURBS::CurveDerivs(
     float nders[4][4];
     int32_t du = d < p ? d : p;
     for (int32_t k = p + 1; k <= d; ++k) {
-        CK[k] = *FNVD_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
+        CK[k] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
     }
     int32_t span = hkaNURBS::FindSpan(n, p, u, U);
     hkaNURBS::DersBasisFuns(span, u, p, du, U, nders);
     for (int32_t k = 0; k <= du; ++k) {
-        CK[k] = *FNVD_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
+        CK[k] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
         for (int32_t j = 0; j <= p; ++j) {
             CK[k] += *mulScalarPoint(&kTerm, nders[k][j], &P.m_data[span - p + j]);
         }
@@ -1242,7 +1242,7 @@ int32_t hkaNURBS::RemoveKnotsBoundCurve(
 
     // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
     using Br_t = hkArray<float, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(Br_t, Br, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Br_t, Br, std::nullopt, std::nullopt);
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iSize = iBounds;
     float* pBrData = nullptr;
@@ -1547,7 +1547,7 @@ hkBool* hkaNURBS::LeastSquaresFit(
 
     // R[0] = R[m] = 0; R[k] = Q[k] - N(0, p)(ub[k]) Q[0] - N(n, p)(ub[k]) Q[m].
     hkaNURBS::Point kSum;
-    hkaNURBS::Point* pZero = FNVD_RECONSTRUCT(hkaNURBS::Point)(&kSum, 0.0f, 0.0f, 0.0f, 0.0f);
+    hkaNURBS::Point* pZero = XFNV_RECONSTRUCT(hkaNURBS::Point)(&kSum, 0.0f, 0.0f, 0.0f, 0.0f);
     hkaNURBS::Point& rLastR = pR[m] = *pZero;
     pR[0] = rLastR;
     for (int32_t k = 1; k < m; ++k) {
@@ -1617,7 +1617,7 @@ hkBool* hkaNURBS::LeastSquaresFit(
         else {
             // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray()
             using Pn_t = hkArray<hkaNURBS::Point, hkContainerHeapAllocator>;
-            FNVD_INLINED_LOCAL(Pn_t, Pn, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(Pn_t, Pn, std::nullopt, std::nullopt);
             Pn.m_data = nullptr;
             Pn.m_size = 0;
             Pn.m_capacityAndFlags = hkArrayBase<hkaNURBS::Point>::DONT_DEALLOCATE_FLAG;
@@ -1747,7 +1747,7 @@ void hkaNURBS::DegreeElevateCurve(
 
     // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
     using Uh_t = hkArray<float, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(Uh_t, Uh, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Uh_t, Uh, std::nullopt, std::nullopt);
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iSize = nh + p + t + 2;
     float* pKnots = nullptr;
@@ -1765,7 +1765,7 @@ void hkaNURBS::DegreeElevateCurve(
 
     // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray(int)
     using Qw_t = hkArray<hkaNURBS::Point, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(Qw_t, Qw, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Qw_t, Qw, std::nullopt, std::nullopt);
     pHeap = hkMemoryRouter::getInstance().m_heap;
     iSize = nh + 1;
     hkaNURBS::Point* pPoints = nullptr;
@@ -1850,7 +1850,7 @@ void hkaNURBS::DegreeElevateCurve(
         }
         // Degree elevate the Bezier segment; only points lbz..ph are used below.
         for (int32_t iE = lbz; iE <= ph; ++iE) {
-            ebpts[iE] = *FNVD_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
+            ebpts[iE] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
             int32_t mpi = p < iE ? p : iE;
             for (int32_t j = iE - t < 0 ? 0 : iE - t; j <= mpi; ++j) {
                 ebpts[iE] = *ebpts[iE].Add(&kSum, *mulScalarPoint(&kMul, bezalfs[iE][j], &bpts[j]));
@@ -2204,7 +2204,7 @@ void approximateNURBSCurveImpl(
 ) {
     // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray(int)
     using Q_t = hkArray<hkaNURBS::Point, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(Q_t, Q, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Q_t, Q, std::nullopt, std::nullopt);
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iSize = numSamples;
     hkaNURBS::Point* pPoints = nullptr;
@@ -2227,7 +2227,7 @@ void approximateNURBSCurveImpl(
 
     // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
     using ub_t = hkArray<float, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(ub_t, ub, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ub_t, ub, std::nullopt, std::nullopt);
     pHeap = hkMemoryRouter::getInstance().m_heap;
     iSize = numSamples;
     float* pTimes = nullptr;
@@ -2254,13 +2254,13 @@ void approximateNURBSCurveImpl(
 
     // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray()
     using U_t = hkArray<float, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(U_t, U, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(U_t, U, std::nullopt, std::nullopt);
     U.m_data = nullptr;
     U.m_size = 0;
     U.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
     // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray()
     using P_t = hkArray<hkaNURBS::Point, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(P_t, P, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(P_t, P, std::nullopt, std::nullopt);
     P.m_data = nullptr;
     P.m_size = 0;
     P.m_capacityAndFlags = hkArrayBase<hkaNURBS::Point>::DONT_DEALLOCATE_FLAG;

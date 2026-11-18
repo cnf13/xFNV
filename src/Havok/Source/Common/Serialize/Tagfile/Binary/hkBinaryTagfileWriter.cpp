@@ -215,14 +215,14 @@ Writer::Writer(hkStreamWriter* a1, hkTagfileWriter::AddDataObjectListener* a2)
 // object are plain locals.
 void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClass::MemberInfo& minfo) {
     if (value.getType() & hkDataObject::TYPE_TUPLE) {
-        FNVD_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
         value.asArray(&array);
         _writeArrayItems(array, array.getSize());
         array.~hkDataArray();
         return;
     }
     if (value.getType() & hkDataObject::TYPE_ARRAY) {
-        FNVD_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
         value.asArray(&array);
         const int32_t numItems = array.getSize();
         writeInt(numItems);
@@ -251,7 +251,7 @@ void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClas
         }
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            FNVD_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
             writeObject(*value.asObject(&object));
             object.~hkDataObject();
             return;
@@ -375,7 +375,7 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
                 // The SDK's hkDataClass(const_cast<hkDataClassImpl*>(mi.m_class)): the constructor takes a non-const
                 // implementation.
                 hkDataClass memberClass;
-                FNVD_RECONSTRUCT(hkDataClass)(&memberClass, const_cast<hkDataClassImpl*>(mi.m_class));
+                XFNV_RECONSTRUCT(hkDataClass)(&memberClass, const_cast<hkDataClassImpl*>(mi.m_class));
                 writeString(memberClass.getName());
             }
             else {
@@ -387,7 +387,7 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
         if (minfo.m_data[i].m_class) {
             // As above: the SDK's const_cast for hkDataClass's constructor.
             hkDataClass memberClass;
-            FNVD_RECONSTRUCT(hkDataClass)(&memberClass, const_cast<hkDataClassImpl*>(minfo.m_data[i].m_class));
+            XFNV_RECONSTRUCT(hkDataClass)(&memberClass, const_cast<hkDataClassImpl*>(minfo.m_data[i].m_class));
             writeClass(memberClass);
         }
     }
@@ -436,7 +436,7 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
     alignas(8) hkDataClass klass;
     obj.getClass(&klass);
     writeClass(klass);
-    FNVD_INLINED_LOCAL(Writer::MemberWriteFlags, flags, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Writer::MemberWriteFlags, flags, std::nullopt, std::nullopt);
     ::new (&flags) Writer::MemberWriteFlags(klass.getNumMembers());
     for (int32_t it = obj.getMemberIterator(); obj.isValid(it); it = obj.getNextMember(it)) {
         hkDataObject::Value value;
@@ -588,7 +588,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::hkArray(int)
             // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
             using minfo_t = hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>;
-            alignas(8) FNVD_INLINED_LOCAL(minfo_t, minfo, std::nullopt, std::nullopt);
+            alignas(8) XFNV_INLINED_LOCAL(minfo_t, minfo, std::nullopt, std::nullopt);
             minfo.m_data = nullptr;
             minfo.m_size = 0;
             minfo.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
@@ -630,7 +630,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
 
             // EXE-INLINED none: hkArray<uint8_t, hkContainerTempAllocator>::hkArray
             using bytes_t = hkArray<uint8_t, hkContainerTempAllocator>;
-            FNVD_INLINED_LOCAL(bytes_t, bytes, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(bytes_t, bytes, std::nullopt, std::nullopt);
             bytes.m_data = nullptr;
             bytes.m_size = 0;
             int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
@@ -736,7 +736,7 @@ void Writer::writeObject(const hkDataObject& objIn) {
     pDetails->wasWritten = 1;
     writeInt(classIndex);
     const int32_t numMembers = klass.getNumMembers();
-    FNVD_INLINED_LOCAL(Writer::MemberWriteFlags, flags, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Writer::MemberWriteFlags, flags, std::nullopt, std::nullopt);
     ::new (&flags) Writer::MemberWriteFlags(numMembers);
 
     // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::hkArray(buffer, size, capacity)

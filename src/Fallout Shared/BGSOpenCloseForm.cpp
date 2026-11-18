@@ -314,8 +314,8 @@ void BGSOpenCloseForm::HandleActivate(
     TESObjectREFR* apActionRef,
     BGSOpenCloseForm* apOpenCloseForm
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (apItemActivated) {
         bool bhasanims = false;
         if ((apItemActivated->Get3D()) && (apItemActivated->Get3D()->GetControllers())) {

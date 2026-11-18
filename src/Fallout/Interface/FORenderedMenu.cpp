@@ -658,8 +658,8 @@ void FORenderedMenu::SetMenuRoot(NiAVObject* apMenuRoot) {
 
 bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNode* apShadowSceneNode) {
     ShadowSceneNode* pSSnode;
-    FNVD_INLINED_LOCAL(NiFixedString, strRenderedMenuLight, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, strRenderedMenuLight, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     bool bsuccess = false;
     if (apShadowSceneNode) {
         pSSnode = apShadowSceneNode;
@@ -813,13 +813,13 @@ void FORenderedMenu::CreateLight() {
     if (CreateMenuLight("Omni01", ShadowSceneNode_)) {
         NiPointLight* MenuLight = GetMenuLight();
         if (MenuLight) {
-            MenuLight->SetDiffuseColor(*FNVD_RECONSTRUCT(NiColor)(&kDiffuse, 0.0f, 0.0f, 0.0f));
-            MenuLight->SetAmbientColor(*FNVD_RECONSTRUCT(NiColor)(&kAmbient, 0.0f, 0.0f, 0.0f));
+            MenuLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.0f, 0.0f, 0.0f));
+            MenuLight->SetAmbientColor(*XFNV_RECONSTRUCT(NiColor)(&kAmbient, 0.0f, 0.0f, 0.0f));
             MenuLight->NiPointLight::SetConstantAttenuation(0.0f);
             MenuLight->NiPointLight::SetLinearAttenuation(0.0f);
             MenuLight->NiPointLight::SetQuadraticAttenuation(0.0f);
             MenuLight->SetDimmer(1.0f);
-            MenuLight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&kSpecular, 10.0f, 0.0f, 0.0f));
+            MenuLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, 10.0f, 0.0f, 0.0f));
             NiColor kScreenColor;
             kScreenColor.~NiColor();
             ::new (&kScreenColor) NiColor(1.0f, 1.0f, 1.0f);

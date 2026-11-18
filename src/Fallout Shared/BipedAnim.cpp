@@ -230,9 +230,9 @@ BipedAnim::~BipedAnim() {
 }
 
 void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<NiObject>, spTempObject, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<NiGeometryData>, spdata, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiObject>, spTempObject, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiGeometryData>, spdata, std::nullopt, std::nullopt);
     FaceGenDatas fgcoord;
     BSCloningProcess cloneData;
     float fzoom;
@@ -358,8 +358,8 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                         static_cast<TESNPC*>(m_pRequester->GetObjectReference());
                                                     rt::eh_vector_constructor_iterator(
                                                         &fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                        &fnvd::constructElement<FR2MatrixVTC<float>>,
-                                                        &fnvd::destructElement<FR2MatrixVTC<float>>
+                                                        &xfnv::constructElement<FR2MatrixVTC<float>>,
+                                                        &xfnv::destructElement<FR2MatrixVTC<float>>
                                                     );
                                                     ::new (&spTempObject)
                                                         NiPointer<NiObject>(static_cast<NiObject*>(nullptr));
@@ -385,7 +385,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                     spTempObject.~NiPointer<NiObject>();
                                                     rt::eh_vector_destructor_iterator(
                                                         &fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                        &fnvd::destructElement<FR2MatrixVTC<float>>
+                                                        &xfnv::destructElement<FR2MatrixVTC<float>>
                                                     );
                                                 }
                                             }
@@ -578,7 +578,7 @@ void BipedAnim::RemoveBipedWeapon() {
 }
 
 void BipedAnim::AttachBipedWeapon(TESObjectWEAP* apWeapon, uint8_t iModSlots) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if ((apWeapon) &&
         (apWeapon->GetFormType() == WEAP_ID && (apWeapon != object[5].pParent || !object[5].pPartClone))) {
         SetBipedWeapon(apWeapon, iModSlots);
@@ -1123,10 +1123,10 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
         if (pGeometry && pGeometry->GetModelData() && pGeometry->GetSkinInstance() && pFaceGenModel && m_pRequester &&
             m_pRequester->GetObjectReference() && m_pRequester->GetObjectReference()->GetFormType() == NPC__ID) {
             TESNPC* pNPC = static_cast<TESNPC*>(m_pRequester->GetObjectReference());
-            FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aFaceCoord, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aFaceCoord, std::nullopt, std::nullopt);
             rt::eh_vector_constructor_iterator(
-                aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                &fnvd::destructElement<FR2MatrixVTC<float>>
+                aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+                &xfnv::destructElement<FR2MatrixVTC<float>>
             );
             {
                 NiPointer<NiGeometryData> spModelData = nullptr;
@@ -1147,7 +1147,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
                 }
             }
             rt::eh_vector_destructor_iterator(
-                aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+                aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
             );
         }
         AdjustSkinComplexion(pGeometry, false);
@@ -1224,10 +1224,10 @@ void BipedAnim::AdjustSkinComplexion(NiAVObject* apObj, bool abForceReadjust) {
     if (ePart == BO_NONE) {
         return;
     }
-    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aFaceCoord, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aFaceCoord, std::nullopt, std::nullopt);
     rt::eh_vector_constructor_iterator(
-        aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-        &fnvd::destructElement<FR2MatrixVTC<float>>
+        aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+        &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     TESNPC* pNPC = dynamic_cast<TESNPC*>(m_pRequester->GetObjectReference());
     {
@@ -1276,7 +1276,7 @@ void BipedAnim::AdjustSkinComplexion(NiAVObject* apObj, bool abForceReadjust) {
         }
     }
     rt::eh_vector_destructor_iterator(
-        aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
     );
 }
 
@@ -1358,7 +1358,7 @@ NiNode* BipedAnim::CloneHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_
 }
 
 void BipedAnim::AttachHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_OBJECT aeBipedObject) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiNode* arg4 = nullptr;
     if ((apfgModel) && (apNode)) {
         BIPED_BONE boneIndex = objToBone[aeBipedObject];
@@ -1526,8 +1526,8 @@ void BipedAnim::RunBiped3DDetach(NiAVObject* ap3D) {
 }
 
 void BipedAnim::AttachToSkeleton(NiNode* apSkeleton, NiAVObject* apSkin, NiNode* apParentNode, bool abShowWarnings) {
-    FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, v15, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiTObjectArray<NiPointer<NiAVObject>>, TempBoneArray, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, v15, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiTObjectArray<NiPointer<NiAVObject>>, TempBoneArray, std::nullopt, std::nullopt);
     if (apSkin) {
         NiNode* pnode = apSkin->IsNode();
         if (apSkin->IsGeometry()) {
@@ -1645,7 +1645,7 @@ void BipedAnim::AttachToParent(
     BSFaceGenModel* apfgModel
 ) {
     CFilter a2;
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiExtraData* pextraData = nullptr;
     NiStringExtraData* pparentName = nullptr;
     NiNode* pparentNode = nullptr;
@@ -1877,7 +1877,7 @@ float NiAVObject::GetScale() {
 }
 
 void NiAVObjectArray_Destruct(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
-    FNVD_DESTRUCT(NiTArray<NiPointer<NiAVObject>, NiTNewInterface<NiPointer<NiAVObject>>>)(apArray);
+    XFNV_DESTRUCT(NiTArray<NiPointer<NiAVObject>, NiTNewInterface<NiPointer<NiAVObject>>>)(apArray);
 }
 
 uint32_t NiAVObjectArray_Add(NiTObjectArray<NiPointer<NiAVObject>>* apArray, const NiPointer<NiAVObject>& arspElement) {

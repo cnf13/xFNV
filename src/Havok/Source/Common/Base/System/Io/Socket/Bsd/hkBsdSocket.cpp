@@ -157,7 +157,7 @@ hkResult hkBsdSocket::listen(int32_t port) {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, acBuffer, ".\\System\\Io\\Socket\\Bsd\\hkBsdSocket.cpp", 364
     );
-    FNVD_DESTRUCT(hkOstream)(pStream);
+    XFNV_DESTRUCT(hkOstream)(pStream);
     pHost->~hkStringBuf();
     return static_cast<hkResult>(0);
 }

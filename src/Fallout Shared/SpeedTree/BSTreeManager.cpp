@@ -163,7 +163,7 @@ void BSTreeManager::RemoveBackgroundLoadedTree(TESObjectREFR* apRef) {
 }
 
 BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TESObjectTREE* apTreeObj) {
-    FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, spbasemodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSTreeModel>, spbasemodel, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_TREEART, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 462
@@ -277,7 +277,7 @@ NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
 }
 
 void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<BSTreeModel>& aspBSTreeModel) {
-    FNVD_INLINED_LOCAL(NiPointer<BSTreeModel>, sprettree, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<BSTreeModel>, sprettree, std::nullopt, std::nullopt);
     BSTreeManager::kModelCriticalSection.Enter(nullptr);
     ::new (&sprettree) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
     if (apTree) {
@@ -500,7 +500,7 @@ float BSTreeManager::GetFarDistance() {
 }
 
 NiTexture* BSTreeManager::GetCanopyShadow() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_TREEART, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 629

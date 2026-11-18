@@ -358,7 +358,7 @@ bool MagicShaderHitEffect::LoadGame() {
     }
     pSaveLoadGameOLD->LoadNumericID(&aiSearchID, 4u);
     TESForm* v3 = TESForm::GetFormByNumericID(aiSearchID);
-    char* v7 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESEffectShader)(v3, RTTI_TESForm, RTTI_TESEffectShader));
+    char* v7 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESEffectShader)(v3, RTTI_TESForm, RTTI_TESEffectShader));
     if (!v7) {
         v9 = false;
     }
@@ -387,12 +387,12 @@ void MagicShaderHitEffect::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 }
 
 bool MagicShaderHitEffect::Init() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     char path_1[260];
     char v47[260];
     char path[260];
-    FNVD_INLINED_LOCAL(BSSoundHandle, handle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, handle, std::nullopt, std::nullopt);
     if (pEffect) {
         this->MagicHitEffect::fAge = pEffect->fElapsedSeconds;
         EffectSetting* EffectSetting_ = pEffect->GetEffectSetting();

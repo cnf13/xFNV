@@ -457,7 +457,7 @@ void hkpConvexVerticesShape::getCentreImpl(hkVector4& centreOut) const {
 // transposed rotation. Both loops are do-whiles: each runs its body once even for an empty array, as the game does.
 void hkpConvexVerticesShape::transformVerticesAndPlaneEquations(const hkTransform& t) {
     const int32_t numVertices = getNumCollisionSpheresImpl();
-    FNVD_INLINED_LOCAL(hkLocalArray<hkVector4>, vertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkVector4>, vertices, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray(numVertices) (hkAllocateStack)
         vertices.m_data = nullptr;
@@ -620,7 +620,7 @@ void hkpConvexVerticesShape::getOriginalVertices(hkArray<hkVector4>& vertices) c
 // from the copy (the last plane moved into its place); a face whose normal has length 0 takes the first plane again,
 // without removing it. The walk stops when the copy is empty; the planes no face took go after the others.
 void hkpConvexVerticesShape::sortPlanes() {
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
     planes.m_data = nullptr;
     planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -640,7 +640,7 @@ void hkpConvexVerticesShape::sortPlanes() {
     // EXE-INLINED none: hkArray<hkVector4>::clear
     m_planeEquations.m_size = 0;
     // The local is 16-aligned; getOriginalVertices gets its address.
-    alignas(16) FNVD_INLINED_LOCAL(hkLocalArray<hkVector4>, vertices, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkLocalArray<hkVector4>, vertices, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray(numVertices) (hkAllocateStack)
         vertices.m_data = nullptr;

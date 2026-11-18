@@ -385,7 +385,7 @@ bool MissileProjectile::AddImpact(
     COL_LAYER eLayer;
     if (apTargetCollidable) {
         CFilter kFilter;
-        eLayer = FNVD_RECONSTRUCT(CFilter)(&kFilter, apTargetCollidable->getCollisionFilterInfo())->GetLayer();
+        eLayer = XFNV_RECONSTRUCT(CFilter)(&kFilter, apTargetCollidable->getCollisionFilterInfo())->GetLayer();
     }
     else {
         eLayer = (COL_LAYER)0;
@@ -523,13 +523,13 @@ void MissileProjectile::ProcessImpale() {
     NiMatrix3 rot2_4;
     NiMatrix3 rot_3;
     NiTransform projectileWorld_2;
-    FNVD_INLINED_LOCAL(hkpAllRayHitCollector, collector, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpAllRayHitCollector, collector, std::nullopt, std::nullopt);
     NiMatrix3 rot2_2;
     NiMatrix3 rot_2;
     NiTransform v103;
     NiTransform projectileWorld;
     NiTransform rot;
-    alignas(16) FNVD_INLINED_LOCAL(NiFixedString, v120, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(NiFixedString, v120, std::nullopt, std::nullopt);
     Projectile::ImpactData* pimpact_2;
     NiNode* p3d;
     NiNode* v131;

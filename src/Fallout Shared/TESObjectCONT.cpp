@@ -278,8 +278,8 @@ bool TESObjectCONT::Activate(
     TESBoundObject* apObjecttoGet,
     int32_t aicount
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     int32_t fdoPunishment;
     Actor* pActionActor = dynamic_cast<Actor*>(apActionRef);
     TESForm* pownership = nullptr;

@@ -330,7 +330,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     pTexturesShadow[3].y = v41;
     NiColorA* v94 = static_cast<NiColorA*>(ourMalloc(4 * sizeof(NiColorA)));
     if (v94) {
-        rt::eh_vector_constructor_iterator(v94, sizeof(NiColorA), 4, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(v94, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
         pColorsMoon = v94;
     }
     else {
@@ -338,7 +338,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     }
     NiColorA* v93 = static_cast<NiColorA*>(ourMalloc(4 * sizeof(NiColorA)));
     if (v93) {
-        rt::eh_vector_constructor_iterator(v93, sizeof(NiColorA), 4, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(v93, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
         pColorsShadow = v93;
     }
     else {

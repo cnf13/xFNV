@@ -243,10 +243,10 @@ bool FlameProjectile::RunTargetPick() {
             NiColorA kReach;
             NiColorA* pColor;
             if (kPickData.GetPickFailed()) {
-                pColor = FNVD_RECONSTRUCT(NiColorA)(&kMiss, 1.0f, 0.0f, 0.0f, 1.0f);
+                pColor = XFNV_RECONSTRUCT(NiColorA)(&kMiss, 1.0f, 0.0f, 0.0f, 1.0f);
             }
             else {
-                pColor = FNVD_RECONSTRUCT(NiColorA)(&kReach, 1.0f, 1.0f, 0.0f, 1.0f);
+                pColor = XFNV_RECONSTRUCT(NiColorA)(&kReach, 1.0f, 1.0f, 0.0f, 1.0f);
             }
             NiColorA kColor = *pColor;
             NiLines* pLine = MakeLine(kOrigin, kColor, akPoints[i], kColor, true);

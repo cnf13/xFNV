@@ -295,7 +295,7 @@ void NiScreenGeometryData::LoadBinary(NiStream& kStream) {
             NiColorA* pkNewColors = NewArray<NiColorA>(usNumVerts);
             if (pkNewColors) {
                 rt::eh_vector_constructor_iterator(
-                    pkNewColors, sizeof(NiColorA), usNumVerts, &fnvd::constructElement<NiColorA>
+                    pkNewColors, sizeof(NiColorA), usNumVerts, &xfnv::constructElement<NiColorA>
                 );
                 pkColors = pkNewColors;
             }
@@ -502,7 +502,7 @@ NiScreenGeometryData::ScreenElement* AllocateScreenElements(uint32_t uiCount) {
         reinterpret_cast<NiScreenGeometryData::ScreenElement*>(puiCookie + 1);
     rt::eh_vector_constructor_iterator(
         pkArray, sizeof(NiScreenGeometryData::ScreenElement), static_cast<int32_t>(uiCount),
-        &fnvd::constructElement<NiScreenGeometryData::ScreenElement>
+        &xfnv::constructElement<NiScreenGeometryData::ScreenElement>
     );
     return pkArray;
 }

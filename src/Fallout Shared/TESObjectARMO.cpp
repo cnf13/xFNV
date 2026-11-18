@@ -299,7 +299,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
                         pFoleySound = ::new (pMemory) FOLEY_SOUND;
                     }
                     LoadData(apFile, reinterpret_cast<char*>(pFoleySound), 0xCu);
-#if FNVD_64BIT
+#if XFNV_64BIT
                     // The file's record is 0xC bytes, the sound's 4-byte form ID first.
                     TESFile::WidenFormIDRecords(
                         pFoleySound, 1, 0xC, sizeof(FOLEY_SOUND), {{0, offsetof(FOLEY_SOUND, pSound)}}

@@ -81,7 +81,7 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
 
         // EXE-INLINED none: hkArray<hkDisplayGeometry*, hkContainerTempAllocator>::hkArray
         using displayGeometries_t = hkArray<hkDisplayGeometry*, hkContainerTempAllocator>;
-        FNVD_INLINED_LOCAL(displayGeometries_t, displayGeometries, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(displayGeometries_t, displayGeometries, std::nullopt, std::nullopt);
         displayGeometries.m_data = nullptr;
         displayGeometries.m_size = 0;
         displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
@@ -101,7 +101,7 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
 
         // EXE-INLINED none: hkArray<hkAabb, hkContainerTempAllocator>::hkArray
         using islandAabbs_t = hkArray<hkAabb, hkContainerTempAllocator>;
-        FNVD_INLINED_LOCAL(islandAabbs_t, islandAabbs, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(islandAabbs_t, islandAabbs, std::nullopt, std::nullopt);
         islandAabbs.m_data = nullptr;
         islandAabbs.m_size = 0;
         islandAabbs.m_capacityAndFlags = hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG;
@@ -198,7 +198,7 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
         }
 
         // EXE-INLINED none: hkArray<hkDisplayGeometry*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
         displayGeometries.m_data = nullptr;
         displayGeometries.m_size = 0;
         displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;

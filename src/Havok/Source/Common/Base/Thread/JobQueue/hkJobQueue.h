@@ -59,7 +59,7 @@ class hkJobQueue {
 public:
     // JOB_QUEUE_ENTRY_SIZE is 128 for 4-byte pointers and 256 for 8-byte pointers.
     enum : int32_t {
-#if FNVD_64BIT
+#if XFNV_64BIT
         JOB_QUEUE_ENTRY_SIZE = 0x100,
 #else
         JOB_QUEUE_ENTRY_SIZE = 0x80,

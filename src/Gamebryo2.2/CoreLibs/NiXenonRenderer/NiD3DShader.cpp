@@ -356,14 +356,14 @@ void NiD3DShader::_SDMInit() {
         }
     }
     ms_apfnDynEffectPackers[NiTextureEffect::WORLD_PARALLEL] =
-        &fnvd::callFunction<&NiD3DShader::PackWorldParallelEffect>;
+        &xfnv::callFunction<&NiD3DShader::PackWorldParallelEffect>;
     ms_apfnDynEffectPackers[NiTextureEffect::WORLD_PERSPECTIVE] =
-        &fnvd::callFunction<&NiD3DShader::PackWorldPerspectiveEffect>;
-    ms_apfnDynEffectPackers[NiTextureEffect::SPHERE_MAP] = &fnvd::callFunction<&NiD3DShader::PackWorldSphereEffect>;
+        &xfnv::callFunction<&NiD3DShader::PackWorldPerspectiveEffect>;
+    ms_apfnDynEffectPackers[NiTextureEffect::SPHERE_MAP] = &xfnv::callFunction<&NiD3DShader::PackWorldSphereEffect>;
     ms_apfnDynEffectPackers[NiTextureEffect::SPECULAR_CUBE_MAP] =
-        &fnvd::callFunction<&NiD3DShader::PackSpecularCubeEffect>;
+        &xfnv::callFunction<&NiD3DShader::PackSpecularCubeEffect>;
     ms_apfnDynEffectPackers[NiTextureEffect::DIFFUSE_CUBE_MAP] =
-        &fnvd::callFunction<&NiD3DShader::PackDiffuseCubeEffect>;
+        &xfnv::callFunction<&NiD3DShader::PackDiffuseCubeEffect>;
 }
 
 // Interns nothing and drops the shader map name's old handle. It skips everything for a null handle, interns null, and

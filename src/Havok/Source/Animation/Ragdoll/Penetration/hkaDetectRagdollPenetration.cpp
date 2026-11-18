@@ -151,7 +151,7 @@ hkBool* hkaDetectRagdollPenetration::detectPenetration(
                 m_boneStates.m_data[boneBeginIdx] = hkaDetectRagdollPenetration::HK_YESP;
             }
             // The array's constructor and destructor, inline.
-            FNVD_INLINED_LOCAL(hkArray<int16_t>, bonesOut, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkArray<int16_t>, bonesOut, std::nullopt, std::nullopt);
             bonesOut.m_data = nullptr;
             bonesOut.m_size = 0;
             bonesOut.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;

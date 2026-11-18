@@ -261,7 +261,7 @@ void BSShaderAccumulator::DoSunOcclusionQuery(NiTriShape* apSunGeometry, uint32_
 bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedTexture* apCurRenderTarget) {
     uint32_t uiFogCount = pVolumetricFogGeometry.m_uiCount;
     if (uiFogCount) {
-        FNVD_INLINED_LOCAL(NiColorA, kOrgColor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, kOrgColor, std::nullopt, std::nullopt);
         if (NiRenderer::ms_pkRenderer->m_eFrameState) {
             BSRenderedTexture::StopOffscreen();
         }
@@ -279,7 +279,7 @@ bool BSShaderAccumulator::RenderVolumetricFog(NiCamera* apCamera, BSRenderedText
         NiCamera* pOldCamera = this->m_pkCamera;
         this->m_pkCamera = apCamera;
         pRenderer->GetBackgroundColor(kOrgColor);
-        FNVD_INLINED_LOCAL(NiColorA, kClearColor, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, kClearColor, std::nullopt, std::nullopt);
         kClearColor.r = 0.0f;
         kClearColor.g = 0.0f;
         kClearColor.b = 0.0f;

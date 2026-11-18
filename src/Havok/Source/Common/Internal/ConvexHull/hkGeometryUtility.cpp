@@ -739,7 +739,7 @@ void calcCovarianceOfTriangles(
     hkVector4 weightedSum;
     weightedSum.setZero4();
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, centroids, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, centroids, std::nullopt, std::nullopt);
     centroids.m_data = nullptr;
     centroids.m_size = 0;
     centroids.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -895,7 +895,7 @@ bool getIsBoxGeometry(
         cornersCapacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
     }
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, onSphere, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, onSphere, std::nullopt, std::nullopt);
     onSphere.m_data = nullptr;
     onSphere.m_size = 0;
     onSphere.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -1106,7 +1106,7 @@ int32_t hkGeometryUtility::calcConvexHullVertices(
         hkgpConvexHull apThis;
         int32_t m_size = points.m_size;
         hkVector4* m_data = points.m_data;
-        hkgpConvexHull::BuildConfig* v4 = FNVD_RECONSTRUCT(hkgpConvexHull::BuildConfig)(&apMemory);
+        hkgpConvexHull::BuildConfig* v4 = XFNV_RECONSTRUCT(hkgpConvexHull::BuildConfig)(&apMemory);
         if (apThis.buildFromPlanes(m_data, m_size, *v4) != -1) {
             apThis.fetchPositions(hkgpConvexHull::INTERNAL_VERTICES, hullVertices);
             return 0;
@@ -1220,7 +1220,7 @@ void hkGeometryUtility::createGeometryFromPlaneEquations(
     hkGeometry& geometryOut
 ) {
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, hullVertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, hullVertices, std::nullopt, std::nullopt);
     hullVertices.m_data = nullptr;
     hullVertices.m_size = 0;
     hullVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -1259,7 +1259,7 @@ void hkGeometryUtility::calcObb(
     hkGeomObbMode mode
 ) {
     // EXE-INLINED none: hkGeometry::hkGeometry
-    FNVD_INLINED_LOCAL(hkGeometry, geometry, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkGeometry, geometry, std::nullopt, std::nullopt);
     geometry.m_vertices.m_data = nullptr;
     geometry.m_vertices.m_size = 0;
     geometry.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -1267,7 +1267,7 @@ void hkGeometryUtility::calcObb(
     geometry.m_triangles.m_size = 0;
     geometry.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
     hkGeometryUtility::createConvexGeometry(stridedVertsIn, geometry);
-    FNVD_INLINED_LOCAL(hkLocalArray<hkVector4>, corners, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkVector4>, corners, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray(3 * numTriangles) (hkAllocateStack)
         const int32_t capacity = 3 * geometry.m_triangles.m_size;

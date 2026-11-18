@@ -363,9 +363,9 @@ void CompanionWheelMenu::SetButtonContextText(int32_t aiID) {
 }
 
 void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     TESTopicInfo* apTopicInfo = nullptr;
     TESObjectREFR* apTarget = (TESObjectREFR*)pPlayer;
     Actor* apSpeaker = m_pRelatedCompanion;
@@ -418,7 +418,7 @@ void CompanionWheelMenu::OpenInventory() {
 }
 
 void CompanionWheelMenu::HandleMouseoverForTile(int32_t aiID, uint8_t a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (a2 || m_CurrentlySelectedTile != aiID) {
         BSAudio* v3 = &BSAudio::QInstance();
         BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIPipBoyScroll", 289u);
@@ -1056,7 +1056,7 @@ void CompanionWheelMenu::Close(bool abClearOutSpeech) {
 
 Tile* CompanionWheelMenu::Create(Actor* apRelatedCompanion) {
     int32_t v2;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
     int32_t v1 = return_1075();
     Tile* pold_menu_tile = Menu::GetMenuByClass(v1);

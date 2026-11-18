@@ -426,7 +426,7 @@ void FleePackage::InitLoadGame() {
     uint32_t iactorRunToID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pRefFleeTo));
     if (iactorRunToID) {
         TESForm* v2 = TESForm::GetFormByNumericID(iactorRunToID);
-        pRefFleeTo = static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
+        pRefFleeTo = static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
     }
     uint32_t iteleportDoorID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTeleportDoor));
     if (iteleportDoorID) {
@@ -549,7 +549,7 @@ PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
             float favoidNodeCost = BSMAX(v6, 100.0f);
             float a2 = favoidNodeCost;
             const NiPoint3* v1 = &pref->GetLocationOnReference();
-            PathingAvoidNode* v2 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v10, *v1, favoidNodeRadius_2, a2);
+            PathingAvoidNode* v2 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v10, *v1, favoidNodeRadius_2, a2);
             pavoidNodeArray->GetAt(nodeArrayIndex) = *v2;
         }
     }

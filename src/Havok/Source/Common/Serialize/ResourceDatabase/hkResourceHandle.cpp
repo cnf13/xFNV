@@ -52,7 +52,7 @@ hkResourceBase::Type hkResourceHandle::getType() const {
 // through the member's accessor and the link removed, both through the vtable. A target that is the handle's own object
 // ends the walk.
 void hkResourceHandle::tryToResolveLinks(hkResourceMap& map) {
-    FNVD_INLINED_LOCAL(hkArray<hkResourceHandle::Link>, links, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkResourceHandle::Link>, links, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkResourceHandle::Link>::hkArray
     links.m_data = nullptr;
     links.m_size = 0;
@@ -220,7 +220,7 @@ void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& l
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xF032EDFE), acMessage,
                     ".\\ResourceDatabase\\hkResourceHandle.cpp", 0x80
                 );
-                FNVD_DESTRUCT(hkOstream)(pStream);
+                XFNV_DESTRUCT(hkOstream)(pStream);
                 bPathFound = false;
                 break;
             }
@@ -234,7 +234,7 @@ void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& l
                 pLink->m_memberName = pcName;
                 hkClassMemberAccessor kAccessor;
                 const hkClassMemberAccessor* pAccessor =
-                    FNVD_RECONSTRUCT(hkClassMemberAccessor)(&kAccessor, pObject, pMember);
+                    XFNV_RECONSTRUCT(hkClassMemberAccessor)(&kAccessor, pObject, pMember);
                 pLink->m_memberAccessor = *pAccessor;
                 pLink->m_externalId = m_references.m_data[i].m_externalId.cString();
                 continue;
@@ -248,7 +248,7 @@ void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& l
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xF032EDF1), acMessage,
             ".\\ResourceDatabase\\hkResourceHandle.cpp", 0x92
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
     }
 }
 
@@ -275,7 +275,7 @@ hkResourceBase::Type hkResourceContainer::getType() const {
 // The handles are collected in a local hkArray (no storage, not ours); each handle's tryToResolveLinks is called
 // through the vtable with the map. The size compare is signed and the size is reloaded after every call.
 void hkResourceContainer::tryToResolveLinks(hkResourceMap& map) {
-    FNVD_INLINED_LOCAL(hkArray<hkResourceHandle*>, handles, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkResourceHandle*>, handles, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkResourceHandle*>::hkArray
     handles.m_data = nullptr;
     handles.m_size = 0;
@@ -334,7 +334,7 @@ void hkResourceContainer::getPath(hkStringBuf& pathOut) {
     if (v3) {
         v3->getPath(pathOut);
     }
-    FNVD_INLINED_LOCAL(hkStringBuf, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, apMemory, std::nullopt, std::nullopt);
     ::new (&apMemory) hkStringBuf;
     const char* v4 = getName(apMemory);
     pathOut.operator+=("/");
@@ -432,7 +432,7 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
 ) const {
     hkMemoryResourceHandle** v6;
     hkBool arResult;
-    FNVD_INLINED_LOCAL(hkStringBuf, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, a2, std::nullopt, std::nullopt);
     int32_t v5 = 0;
     do {
         if (!prevObject) {

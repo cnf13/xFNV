@@ -94,7 +94,7 @@ void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, con
     bundleInput.m_to[2].m_quad = to2;
     bundleInput.m_filterInfo = input->m_filterInfo;
     bundleInput.m_rayShapeCollectionFilter = m_collectionFilter;
-    FNVD_INLINED_LOCAL(hkpShapeRayBundleCastOutput, bundleOutput, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpShapeRayBundleCastOutput, bundleOutput, std::nullopt, std::nullopt);
     // EXE-INLINED 0xD98390
     for (int32_t i = 0; i < 4; ++i) {
         bundleOutput.m_outputs[i].m_hitFraction = 1.0f;
@@ -162,7 +162,7 @@ hkBool* hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkBool* arResult, hkPrimiti
     }
     const hkTransform& transform = *collidable->m_motion.pMotion;
     const hkpWorldRayCastInput* input = m_input;
-    FNVD_INLINED_LOCAL(hkpShapeRayCastInput, shapeInput, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpShapeRayCastInput, shapeInput, std::nullopt, std::nullopt);
     // EXE-INLINED 0x632CA0
     shapeInput.m_filterInfo = 0;
     shapeInput.m_rayShapeCollectionFilter = nullptr;

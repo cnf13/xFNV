@@ -2666,7 +2666,7 @@ DetectionState* HighProcess::InsertIntoDetectionList(
         pState->LastPositionDetected.y = pLocation->y;
         pState->LastPositionDetected.z = pLocation->z;
         CombatTimeStamp TimeStamp;
-        FNVD_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+        XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
         pState->fLastTimeDetected = TimeStamp;
     }
     return pState;
@@ -4517,7 +4517,7 @@ void HighProcess::ProcessGreet(
 
 void HighProcess::ProcessObserveCombat(Actor* apActor) {
     NiPoint3 result;
-    FNVD_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
     NiPoint3 goalPoint;
     using v18_t = BSSimpleArray<Actor*, 1024>;
     TESPackage* pbasepack = GetPackageThatIsRunning();
@@ -5447,7 +5447,7 @@ void HighProcess::RunDetection(Actor* apActor, float fnumber) {
                 pState->LastPositionDetected.y = kLastPosition.y;
                 pState->LastPositionDetected.z = kLastPosition.z;
                 CombatTimeStamp kTimeStamp;
-                FNVD_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
+                XFNV_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
                 pState->fLastTimeDetected.fTimeStamp = kTimeStamp.fTimeStamp;
                 if (bAttack) {
                     pPlayer->SetHostileDetection(true);
@@ -6350,7 +6350,7 @@ void HighProcess::StopSoundHandle(ACTOR_SOUND_HANDLE aeType) {
 }
 
 void HighProcess::StartTorchSound(Actor* apActor) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     if (!SoundHandle[1].IsValid()) {
         TESSound* psound = pDataHandler->GetSound("ITMTorchHeldLP");
         if ((apActor) && (psound)) {
@@ -12209,9 +12209,9 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
 
 void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float afRadius) {
     float forigradius;
-    FNVD_INLINED_LOCAL(PathingLocation, v21, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingLocation, v22, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, v21, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     NiPoint3 apMemory_252;
     NiPoint3 pPackPoint;
     if (bGreetingFlag) {
@@ -13903,7 +13903,7 @@ void HighProcess::DetectDoorsForPathing(Actor* apActor) {
     NiPoint3 v9;
     NiPoint3 dst;
     NiPoint3 apResult;
-    FNVD_INLINED_LOCAL(hkpAllCdBodyPairCollector, collector, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpAllCdBodyPairCollector, collector, std::nullopt, std::nullopt);
     NiTransform actorToWorld;
     NiTransform pextenttemp;
     NiTransform boxToActor;
@@ -14203,7 +14203,7 @@ void HighProcess::ProcessSurfaceOneHour(Actor* apActor) {
 }
 
 bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
-    FNVD_INLINED_LOCAL(PathingLocation, result_1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, result_1, std::nullopt, std::nullopt);
     NiPoint3 apMemory_192;
     if (!apActor->GetParentCell()) {
         return false;
@@ -14876,7 +14876,7 @@ void HighProcess::AddAvoidPathingArea(
         pavoidstruct = nullptr;
     }
     AvoidAreaStruct* pavoidstruct_2 = pavoidstruct;
-    PathingAvoidNode* v8 = FNVD_RECONSTRUCT(PathingAvoidNode)(&v13, aPoint, afRadius, afRadiationLevel);
+    PathingAvoidNode* v8 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v13, aPoint, afRadius, afRadiationLevel);
     (*pavoidstruct_2).pAvoidNode = *v8;
     pavoidstruct_2->afRadiationLevel = afRadiationLevel;
     pavoidstruct_2->fTimeExpire = afTimeToExpire;

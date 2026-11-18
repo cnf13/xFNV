@@ -13,7 +13,7 @@ void DoNothing(int32_t iValue) {
 float Random::Next() {
     if (seed == 0.0) {
         std::string strMessage;
-        FNVD_RECONSTRUCT(std::string)(&strMessage, "Random number generator not initialised");
+        XFNV_RECONSTRUCT(std::string)(&strMessage, "Random number generator not initialised");
         throw std::logic_error(strMessage);
     }
     int32_t iIndex = static_cast<int32_t>(Raw() * 128.0);
@@ -146,7 +146,7 @@ void PosGen::Build(bool sym) {
         if (i >= 60) {
             using _Message_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
             _Message_t strMessage("Newran: area too large");
-            FNVD_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
             ::new (&cError) rt::runtime_error(strMessage);
             throw cError;
             break;
@@ -162,7 +162,7 @@ void PosGen::Build(bool sym) {
     if (i < 50) {
         using _Message_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
         _Message_t strMessage("Newran: area too small");
-        FNVD_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
         ::new (&cError) rt::runtime_error(strMessage);
         throw cError;
     }

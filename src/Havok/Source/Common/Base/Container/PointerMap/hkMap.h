@@ -302,7 +302,7 @@ protected:
     void resizeTable(hkMemoryAllocator& alloc, int32_t newcap);
 
 public:
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The members the pointer map's users call on its storage, which is this map on x64 (the SDK's
     // hkPointerMapStorage<8>). The exe has them on the 32-bit map only; these are the SDK's bodies.
     // The slot of key, adding it with val when it is absent (an existing key keeps its value).

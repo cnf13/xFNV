@@ -95,7 +95,7 @@ void NiTriShapeData::LoadBinary(NiStream& kStream) {
     if (pkArrays) {
         rt::eh_vector_constructor_iterator(
             pkArrays, sizeof(SharedNormalArray), m_usSharedNormalsArraySize,
-            &fnvd::constructElement<NiTriShapeData::SharedNormalArray>
+            &xfnv::constructElement<NiTriShapeData::SharedNormalArray>
         );
     }
     m_pkSharedNormals = pkArrays;

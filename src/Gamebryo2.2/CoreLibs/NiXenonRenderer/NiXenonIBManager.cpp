@@ -273,7 +273,7 @@ void NiDX9IndexBufferManager::DestroyDefaultBuffers() {
                     if (pkIBRes->m_pkIB) {
                         pkIBRes->m_pkIB->Release();
                     }
-                    FNVD_DESTRUCT(NiDX9Resource)(pkIBRes);
+                    XFNV_DESTRUCT(NiDX9Resource)(pkIBRes);
                     NiMemObject::operator delete(pkIBRes, sizeof(NiDX9IBResource));
                 }
             }

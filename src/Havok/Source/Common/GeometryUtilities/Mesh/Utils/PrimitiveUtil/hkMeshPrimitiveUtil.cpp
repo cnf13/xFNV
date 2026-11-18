@@ -319,7 +319,7 @@ void hkMeshPrimitiveUtil::appendTriangleIndices(
             }
             const int32_t numIndices = section.m_numIndices;
             // The stack allocator's bytes are untyped memory; the local array keeps its indices there.
-            FNVD_INLINED_LOCAL(hkLocalArray<uint16_t>, indices16, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkLocalArray<uint16_t>, indices16, std::nullopt, std::nullopt);
             {
                 // EXE-INLINED none: hkLocalArray<hkUint16>::hkLocalArray(section.m_numIndices) (hkAllocateStack)
                 indices16.m_data = nullptr;

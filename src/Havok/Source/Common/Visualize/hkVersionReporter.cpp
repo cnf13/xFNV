@@ -13,11 +13,11 @@
 // compiler strings, each after its 16-bit length), then writes the buffer's size and the buffer to connection.
 hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     using rawData_t = hkArray<char, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(rawData_t, rawData, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(rawData_t, rawData, std::nullopt, std::nullopt);
     rawData.m_data = nullptr;
     rawData.m_size = 0;
     rawData.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    FNVD_INLINED_LOCAL(hkDisplaySerializeOStream, commandStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDisplaySerializeOStream, commandStream, std::nullopt, std::nullopt);
     ::new (&commandStream) hkDisplaySerializeOStream(rawData);
     commandStream.write8u(HK_VERSION_INFORMATION);
     commandStream.write32(m_protocolVersion);
@@ -28,7 +28,7 @@ hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     }
     commandStream.write16u(platformLength);
     commandStream.writeRaw("PC_32", platformLength);
-    FNVD_INLINED_LOCAL(hkStringBuf, compiler, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, compiler, std::nullopt, std::nullopt);
     ::new (&compiler) hkStringBuf;
     compiler.printf("%s:%i", "MSVC", 1500);
     // The string's length: its size less the terminating zero.
@@ -38,11 +38,11 @@ hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     }
     commandStream.write16u(compilerLength);
     commandStream.writeRaw(compiler.m_string.m_data, compilerLength);
-    FNVD_INLINED_LOCAL(hkDisplaySerializeOStream, connectionStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDisplaySerializeOStream, connectionStream, std::nullopt, std::nullopt);
     ::new (&connectionStream) hkDisplaySerializeOStream(connection);
     connectionStream.write32(rawData.m_size);
     connectionStream.writeRaw(rawData.m_data, rawData.m_size);
-    FNVD_DESTRUCT(hkOArchive)(&connectionStream);
+    XFNV_DESTRUCT(hkOArchive)(&connectionStream);
     // EXE-INLINED none: hkStringBuf::~hkStringBuf()
     hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
     compiler.m_string.m_size = 0;
@@ -53,7 +53,7 @@ hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     }
     compiler.m_string.m_data = nullptr;
     compiler.m_string.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    FNVD_DESTRUCT(hkOArchive)(&commandStream);
+    XFNV_DESTRUCT(hkOArchive)(&commandStream);
     // EXE-INLINED none: hkArray<char>::~hkArray()
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     rawData.m_size = 0;

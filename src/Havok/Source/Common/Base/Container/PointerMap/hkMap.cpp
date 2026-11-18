@@ -24,7 +24,7 @@ using hkMapBase_lunsigned_sint_cunsigned_sint_chkMapOperations_lunsigned_sint =
 // hands in, which is why init and requiredBytes are here.
 using hkPairMapBase = hkMapBase<uint64_t, uint64_t, hkMapOperations<uint64_t>>;
 
-#if FNVD_64BIT
+#if XFNV_64BIT
 // The SDK's findOrInsertKey: the table grows first when it is half full; the probe walks from the key's hash to its
 // slot (kept with its value) or the first empty one, where the key goes in with val.
 int32_t hkPairMapBase::findOrInsertKey(hkMemoryAllocator& alloc, uint64_t key, uint64_t val) {

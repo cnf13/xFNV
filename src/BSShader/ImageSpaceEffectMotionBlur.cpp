@@ -51,7 +51,7 @@ void ImageSpaceEffectMotionBlur::Setup(ImageSpaceManager* apManager, ImageSpaceE
     pParam->SetPixelConstant(0, Params.r, 0.0f, 0.0f, 0.0f);
     // The pointer is passed as the array's element with its NiPointer constructor and destructor doing nothing, because
     // the parameter class is not a NiRefObject.
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     spParam.m_pObject = pParam;
     pEffectParamList.SetAt(0, spParam);
     SetEffectInputs(0, 1, 2, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_BILERP);

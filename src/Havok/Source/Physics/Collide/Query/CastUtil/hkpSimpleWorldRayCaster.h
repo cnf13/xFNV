@@ -60,4 +60,4 @@ public:
     hkpWorldRayCastOutput* m_result;
     hkpShapeRayCastInput m_shapeInput;
 };
-inline constexpr fnvd::Vtable hkpSimpleWorldRayCaster_vftable{};
+inline constexpr xfnv::Vtable hkpSimpleWorldRayCaster_vftable{};

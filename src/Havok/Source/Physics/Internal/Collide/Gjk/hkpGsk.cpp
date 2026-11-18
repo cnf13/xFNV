@@ -2000,7 +2000,7 @@ hkBool* hkpGsk::castRay(
     hkpShapeRayCastOutput& output
 ) {
     HK_TIMER_BEGIN("GJK Ray Cast", nullptr);
-    FNVD_INLINED_LOCAL(hkpShapeRayCastOutput, localOutput, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, localOutput, std::nullopt, std::nullopt);
     // EXE-INLINED 0x696C60
     // Plain vectors and integers (no vtable, nothing owned): natively harmless.
     __builtin_memcpy(static_cast<void*>(&localOutput), &output, sizeof(hkpShapeRayCastOutput));

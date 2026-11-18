@@ -269,7 +269,7 @@ void BSStream::LoadShaderTextures(char* apcName) {
         NiPointer<NiTexture> sptexture;
         BSTexturePalette::GetTexture(cPath, sptexture);
         if (!sptexture.m_pObject && NiFile::Access(cPath, NiFile::READ_ONLY)) {
-            FNVD_INLINED_LOCAL(NiFixedString, kFileName, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kFileName, std::nullopt, std::nullopt);
             // The array's address (cPath) is never null.
             kFileName.m_kHandle = NiGlobalStringTable::AddString(cPath);
             sptexture.operator=(static_cast<NiTexture*>(

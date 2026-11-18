@@ -86,7 +86,7 @@ static int32_t walkDependencies(
                 hkArrayUtil::_reserveMore(*cycleRouter.m_heap, &pending, sizeof(int32_t));
             }
             pending.m_data[pending.m_size++] = value;
-            FNVD_INLINED_LOCAL(hkStringBuf, kMessage, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkStringBuf, kMessage, std::nullopt, std::nullopt);
             ::new (&kMessage) hkStringBuf;
             --pending.m_size;
             // EXE-INLINED none: hkStringBuf::~hkStringBuf
@@ -122,7 +122,7 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
         const hkVersionPatchManager::PatchInfo* pPatch = patches->m_data[i];
         const char* pClassName = pPatch->oldName ? pPatch->oldName : pPatch->newName;
         if (pPatch->oldVersion == -1) {
-            FNVD_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
             cinfo.version = pPatch->newVersion;
             // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member>'s constructor
             cinfo.members.m_data = nullptr;
@@ -177,7 +177,7 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
                 case hkVersionPatchManager::PATCH_FUNCTION: {
                     hkVersionPatchManager::Function pFunction =
                         static_cast<const hkVersionPatchManager::FunctionPatch*>(rComponent.patch)->function;
-                    FNVD_INLINED_LOCAL(ObjectArray, objects, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(ObjectArray, objects, std::nullopt, std::nullopt);
                     // EXE-INLINED none: hkArray<hkDataObjectImpl*, hkContainerHeapAllocator>'s constructor
                     objects.m_data = nullptr;
                     objects.m_size = 0;
@@ -206,7 +206,7 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
                     const hkVersionPatchManager::CastPatch* pCast =
                         static_cast<const hkVersionPatchManager::CastPatch*>(rComponent.patch);
                     hkDataClass castClass(pFindWorld->findClass(pCast->name));
-                    FNVD_INLINED_LOCAL(ObjectArray, objects, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(ObjectArray, objects, std::nullopt, std::nullopt);
                     // EXE-INLINED none: hkArray<hkDataObjectImpl*, hkContainerHeapAllocator>'s constructor
                     objects.m_data = nullptr;
                     objects.m_size = 0;
@@ -505,12 +505,12 @@ hkResult hkVersionPatchManager::preparePatches(
     using VersionArray = hkArray<ClassVersion>;
     using UidMap = hkPointerMap<hkUint64, int32_t>;
     using NameMap = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(ClassArray, origClasses, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(VersionArray, origVersions, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(hkDataWorldDict, tempWorld, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(UidMap, uidState, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(UidMap, addedClassPatch, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(HeapArray<UidItem>, toDo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ClassArray, origClasses, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(VersionArray, origVersions, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDataWorldDict, tempWorld, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(UidMap, uidState, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(UidMap, addedClassPatch, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(HeapArray<UidItem>, toDo, std::nullopt, std::nullopt);
 
     // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::hkArray
     origClasses.m_data = nullptr;
@@ -733,7 +733,7 @@ hkResult hkVersionPatchManager::preparePatches(
         hkDataClass klass(tempWorld.hkDataWorldDict::findClass(newName));
         if (klass.isNull()) {
             // The class as the patch leaves it, still at the version the patch starts from (oldVersion is passed).
-            FNVD_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
             // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member, hkContainerHeapAllocator>::hkArray
             cinfo.members.m_data = nullptr;
             cinfo.members.m_size = 0;
@@ -808,15 +808,15 @@ hkResult hkVersionPatchManager::preparePatches(
 
     // Copy into worldToUpdate the classes of the temporary world it does not have. The name map holds the names and
     // classes as hkUlong integers (the SDK's casts).
-    FNVD_INLINED_LOCAL(ClassArray, tempClasses, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ClassArray, tempClasses, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkDataClassImpl*, hkContainerHeapAllocator>::hkArray
     tempClasses.m_data = nullptr;
     tempClasses.m_size = 0;
     tempClasses.m_capacityAndFlags = hkArrayBase<hkDataClassImpl*>::DONT_DEALLOCATE_FLAG;
     tempWorld.hkDataWorldDict::findAllClasses(tempClasses);
-    FNVD_INLINED_LOCAL(NameMap, classFromName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NameMap, classFromName, std::nullopt, std::nullopt);
     ::new (&classFromName) NameMap(0);
-    FNVD_INLINED_LOCAL(NameMap, unusedMap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NameMap, unusedMap, std::nullopt, std::nullopt);
     ::new (&unusedMap) NameMap(0);
     for (int32_t i = 0; i < tempClasses.m_size; ++i) {
         hkDataClassImpl* pClass = tempClasses.m_data[i];
@@ -908,15 +908,15 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
     using NameMap = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
     using PatchArray = hkArray<const PatchInfo*>;
     using IndexArray = hkArray<int32_t>;
-    FNVD_INLINED_LOCAL(UidIndexMap, addedPatchIndex, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(UidMultiMap, newUidPatches, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NameMultiMap, removedNames, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NameMap, addedNames, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(IndexMultiMap, dependencies, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(IndexMultiMap, laterDependencies, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PatchArray, patchInfos, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(IndexArray, order, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(IndexArray, done, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(UidIndexMap, addedPatchIndex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(UidMultiMap, newUidPatches, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NameMultiMap, removedNames, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NameMap, addedNames, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(IndexMultiMap, dependencies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(IndexMultiMap, laterDependencies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PatchArray, patchInfos, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(IndexArray, order, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(IndexArray, done, std::nullopt, std::nullopt);
     hkResult result = HK_FAILURE;
     hkMemoryAllocator* pHeap;
     int32_t numPatches;
@@ -1076,7 +1076,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
          it = laterDependencies.m_indexMap.getNext(it)) {
         int32_t key = laterDependencies.m_indexMap.getKey(it);
         for (int32_t j = laterDependencies.find(key); j != -1; j = laterDependencies.m_valueChain.m_data[j].next) {
-            FNVD_INLINED_LOCAL(IndexMap, visited, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(IndexMap, visited, std::nullopt, std::nullopt);
             // EXE-INLINED none: hkPointerMap<int32_t, int32_t>::hkPointerMap
             visited.m_map.m_elem = nullptr;
             visited.m_map.m_numElems = 0;
@@ -1260,7 +1260,7 @@ hkResult
 hkVersionPatchManager::applyPatches(hkDataWorldDict& worldToUpdate, const hkClassNameRegistry* finalClassesReg) {
     hkResult result;
     using apArray_t = hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(apArray_t, apArray, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(apArray_t, apArray, std::nullopt, std::nullopt);
     const hkClassNameRegistry* v3 = finalClassesReg;
     if (!finalClassesReg) {
         v3 = hkBuiltinTypeRegistry::s_instance->getClassNameRegistry();

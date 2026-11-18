@@ -92,7 +92,7 @@ void hkpTypedBroadPhaseDispatcher::removeDuplicates(
             uiLo = reinterpret_cast<uintptr_t>(pB);
             uiHi = reinterpret_cast<uintptr_t>(pA);
         }
-#if FNVD_64BIT
+#if XFNV_64BIT
         uint64_t uiKey = (uiLo * 0x9E3779B97F4A7C15ull) ^ (uiHi * 0xC2B2AE3D27D4EB4Full);
         // ~0 is the map's empty key.
         if (uiKey == ~0ull) {
@@ -130,7 +130,7 @@ void hkpTypedBroadPhaseDispatcher::removeDuplicates(
             uiLo = reinterpret_cast<uintptr_t>(pB);
             uiHi = reinterpret_cast<uintptr_t>(pA);
         }
-#if FNVD_64BIT
+#if XFNV_64BIT
         uint64_t uiKey = (uiLo * 0x9E3779B97F4A7C15ull) ^ (uiHi * 0xC2B2AE3D27D4EB4Full);
         // ~0 is the map's empty key.
         if (uiKey == ~0ull) {
@@ -158,7 +158,7 @@ void hkpTypedBroadPhaseDispatcher::removeDuplicates(
             uint64_t uiValue = map.m_elem[iSlot].val;
             // The count is the low byte: the last sighting drops the new pair as well.
             if ((static_cast<uint32_t>(uiValue) & 0xFF) <= 1) {
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The 64-bit program keeps the entry: removing it would cut the probe sequence of a pair that shares
                 // its key and sits further on. With its new pair's handle cleared below it matches no pair again.
 #else

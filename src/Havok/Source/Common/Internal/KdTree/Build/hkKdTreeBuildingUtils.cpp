@@ -79,7 +79,7 @@ void hkKdTreeBuildingUtils::buildTree(
 void hkKdTreeBuildingUtils::buildTreeDistributed(hkKdTreeBuildInput::Mediator& mediator, hkKdTree* tree) {
     hkKdTreeNode* nodes = tree->m_nodes.m_data;
     // EXE-INLINED none: hkArray<hkKdTreeProjectedEntry>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<hkKdTreeProjectedEntry>, entriesIn, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkKdTreeProjectedEntry>, entriesIn, std::nullopt, std::nullopt);
     int32_t numPrimitives = mediator.getNumPrimitives();
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     entriesIn.m_data = nullptr;
@@ -93,7 +93,7 @@ void hkKdTreeBuildingUtils::buildTreeDistributed(hkKdTreeBuildInput::Mediator& m
         entriesIn.m_capacityAndFlags = hkArrayBase<hkKdTreeProjectedEntry>::DONT_DEALLOCATE_FLAG;
     }
     // EXE-INLINED none: hkArray<hkKdTreeProjectedEntry>::hkArray(int)
-    FNVD_INLINED_LOCAL(hkArray<hkKdTreeProjectedEntry>, entriesOut, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkKdTreeProjectedEntry>, entriesOut, std::nullopt, std::nullopt);
     numPrimitives = mediator.getNumPrimitives();
     pHeap = hkMemoryRouter::getInstance().m_heap;
     entriesOut.m_data = nullptr;

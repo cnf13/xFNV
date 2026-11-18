@@ -47,7 +47,7 @@ bool BGSPlaceableWater::Load(TESFile* apFile) {
             kData.Initialize();
             // LoadData takes the record as raw bytes; the chunk is read straight into the local copy.
             LoadData(apFile, reinterpret_cast<char*>(&kData), 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the water type's 4-byte form ID at 4.
             TESFile::WidenFormIDRecords(
                 &kData, 1, 8, sizeof(kData), {{4, offsetof(BGSPlaceableWaterData, pWaterType)}}
@@ -80,7 +80,7 @@ bool BGSPlaceableWater::Load(TESFile* apFile) {
         }
         else if (eChunk == DNAM_ID) {
             apFile->GetChunkData(&Data, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the water type's 4-byte form ID at 4.
             TESFile::WidenFormIDRecords(&Data, 1, 8, sizeof(Data), {{4, offsetof(BGSPlaceableWaterData, pWaterType)}});
 #endif

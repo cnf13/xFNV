@@ -3123,8 +3123,8 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESObjectREFR* v20;
     TESObjectREFR* v21;
     DialoguePackage* v23;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Character::InitLoadGame(apLoadGameBuffer);
     uint32_t iclosestConversationID =
         pSaveLoadGame->GetChangedFormID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pClosestConversation)));
@@ -3756,7 +3756,7 @@ BipedAnim* PlayerCharacter::GetCurrentBiped() {
 // regions left and entered. Without a cell, only the region sounds are cleared.
 void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
     // The region name passed to Interface::SetRegionText, which destroys it.
-    FNVD_INLINED_LOCAL(BSStringT<char>, kRegionName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kRegionName, std::nullopt, std::nullopt);
     if (apCell == GetParentCell()) {
         return;
     }
@@ -4047,21 +4047,21 @@ float PlayerCharacter::GetHeading(bool abIgnoreImmobile) {
 }
 
 void PlayerCharacter::Update(float afDelta) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v135, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v157, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v175, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v135, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v157, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v175, std::nullopt, std::nullopt);
     NiPoint3 v187;
     bool bsearch;
     NiPoint3 v230;
     alignas(16) NiMatrix3 currentMatrix;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v238, std::nullopt, std::nullopt);
-    alignas(16) FNVD_INLINED_LOCAL(BSSoundHandle, v241, std::nullopt, std::nullopt);
-    alignas(16) FNVD_INLINED_LOCAL(BSSoundHandle, v257, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v238, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(BSSoundHandle, v241, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(BSSoundHandle, v257, std::nullopt, std::nullopt);
     float v286;
     float v287;
     uint16_t smoveMode;
     TESObjectWEAP* pweapon;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v317, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v317, std::nullopt, std::nullopt);
     Controls* pcontrols = appMain->GetControls();
     time_followerStealthing = time_followerStealthing - afDelta;
     if (bVATSForce1stPerson) {
@@ -6422,8 +6422,8 @@ void PlayerCharacter::PermanentModActorValue(ActorValue::Index aiWhich, float af
 }
 
 void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiValue, Actor* apAttacker) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     float fValue = static_cast<float>(aiValue);
     if (CheckInvulnerable(aiWhich, fValue) && !ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION)) {
         ActorValueOwner* v10;
@@ -6502,8 +6502,8 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiV
 }
 
 void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, float afValue, Actor* apAttacker) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (CheckInvulnerable(aiWhich, afValue) && !ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION)) {
         ActorValueOwner* apActor;
         ActorValueOwner* a5;
@@ -7840,8 +7840,8 @@ bool PlayerCharacter::GetTelekinesisSelected() {
 
 void PlayerCharacter::RewardKarma(int32_t aiAmount) {
     int32_t* v6;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t icurrent = GetActorValue(ActorValue::KARMA);
     GetActorBase();
     float afKarma = GetActorFloatValue(ActorValue::KARMA);
@@ -8000,7 +8000,7 @@ void PlayerCharacter::ExportProgressData(PROGRESS_EVENT aeEvent) {
     InventoryChanges* pInventory = InventoryChanges::GetInventoryChanges(this);
     if (pInventory) {
         pString->Set("\"", 0);
-        pInventory->IterateInventory(&fnvd::callFunction<&apCallback>, pString, 0);
+        pInventory->IterateInventory(&xfnv::callFunction<&apCallback>, pString, 0);
         *pString += "\"\t";
     }
     else {
@@ -10051,8 +10051,8 @@ void PlayerCharacter::PositionPlayerExterior(
 }
 
 void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
-    FNVD_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
     MemoryLevelManager::MEM_FREE_DATA a1;
     float ftotaldist;
     float fCheckPerk;
@@ -11188,8 +11188,8 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
     static int32_t iFlyCameraFrameCount;
     TESObjectWEAP* pweapon;
     NiPoint3 dst;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     NiMatrix3 currentMatrix;
     // Move mode, passed by address to UpdateHeadingAndLooking.
     uint16_t smoveMode;
@@ -11490,7 +11490,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
 
             if ((pactor) && (pactor->IsProjectile())) {
                 TESObjectCONT* parrow = static_cast<TESObjectCONT*>(
-                    FNVD_DYNAMIC_CAST_VOID(ArrowProjectile)(pactor, RTTI_TESObjectREFR, RTTI_ArrowProjectile)
+                    XFNV_DYNAMIC_CAST_VOID(ArrowProjectile)(pactor, RTTI_TESObjectREFR, RTTI_ArrowProjectile)
                 );
                 if ((parrow) && (!parrow->GetOpenSound())) {
                     bskipActivate = true;
@@ -14264,7 +14264,7 @@ void PlayerCharacter::SetActorBaseValue(ActorValue::Index a1, int32_t a2) {
 }
 
 void PlayerCharacter::StartKillcamForActor(TESObjectREFR* a1, float a2, bool a3, int32_t a4) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1a, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1a, std::nullopt, std::nullopt);
     if (eKillCameraSetting && (!GetParentCell() || GetParentCell()->iFormID != 0x161E98)) {
         BSSoundHandle th_s;
         BSAudio* v5 = &BSAudio::QInstance();
@@ -14743,7 +14743,7 @@ void PlayerCharacter::CreateMouseSpring(
 }
 
 void PlayerCharacter::PlayMagicFailureSound(MagicSystem::School aeSchool) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     if (MagicFailureSounds[aeSchool].IsValid()) {
         MagicFailureSounds[aeSchool].Stop();
         NiPoint3 v8 = GetLocationOnReference();
@@ -16537,8 +16537,8 @@ BGSNote* PlayerCharacter::GetNotebyIndex(int32_t aiIndex) {
 }
 
 void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Controls* pcontrols = appMain->GetControls();
     if (bPipboyLightDebounce ||
         (!pcontrols->GetUserAction(Controls::UACTN_MENUMODE, 2) ||
@@ -17259,7 +17259,7 @@ void PlayerCharacter::PoisonWeapon() {
             ItemChange* v2 = CurrentAIProcess->GetCurrentWeapon();
             if (v2) {
                 v0 = static_cast<char*>(
-                    FNVD_DYNAMIC_CAST_VOID(TESObjectWEAP)(v2->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectWEAP)
+                    XFNV_DYNAMIC_CAST_VOID(TESObjectWEAP)(v2->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectWEAP)
                 );
             }
             else {

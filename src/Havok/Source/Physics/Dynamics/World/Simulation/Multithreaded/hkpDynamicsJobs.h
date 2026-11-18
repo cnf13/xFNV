@@ -30,7 +30,7 @@ class hkTransform;
 struct hkpBuildJacobianTask {
     // 144 for 4-byte pointers, 80 for 8-byte pointers.
     enum : int32_t {
-#if FNVD_64BIT
+#if XFNV_64BIT
         MAX_NUM_ATOM_INFOS = 80,
 #else
         MAX_NUM_ATOM_INFOS = 0x90,

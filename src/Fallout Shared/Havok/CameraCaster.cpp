@@ -127,7 +127,7 @@ bool CameraCaster::Pick(NiPoint3& arFrom, NiPoint3& arTo, hkpRootCdPoint& arPoin
             }
             const hkpCollidable* pCollidable = pCollector->getHits()[iIndex].m_rootCollidableB;
             CFilter kFilter;
-            COL_LAYER eLayer = FNVD_RECONSTRUCT(CFilter)(&kFilter, pCollidable->getCollisionFilterInfo())->GetLayer();
+            COL_LAYER eLayer = XFNV_RECONSTRUCT(CFilter)(&kFilter, pCollidable->getCollisionFilterInfo())->GetLayer();
             NiAVObject* pObject = bhkUtilFunctions::GetNiAVObject(const_cast<hkpCollidable*>(pCollidable));
             if (eLayer != L_GROUND && (!pObject || pObject->GetAppCulled())) {
                 ++iIndex;

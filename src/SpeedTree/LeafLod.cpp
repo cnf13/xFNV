@@ -37,7 +37,7 @@ LeafArray* CLeafLodEngine::ComputeNextLevel(LeafArray* apResult, LeafArray vOrig
     LeafArray vNextLevel;
     LeafArray vArgument(vOrigLeafSet);
     FindPairs(vArgument);
-    FNVD_INLINED_LOCAL(LeafArray, vNewLeaves, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(LeafArray, vNewLeaves, std::nullopt, std::nullopt);
     LeafArray* pNewLeaves = BuildNewLeaves(&vNewLeaves);
     // The temporary, raw storage BuildNewLeaves constructed, is destroyed here; the other locals' and the argument's
     // own destructors run at the end of their scope.
@@ -102,7 +102,7 @@ LeafArray* CLeafLodEngine::BuildNewLeaves(LeafArray* apResult) {
 // tests are strict and false for NaN. At the end vFound is destroyed, then vOrigLeafSet.
 void CLeafLodEngine::FindPairs(LeafArray vOrigLeafSet) {
     BoolVector vFound;
-    FNVD_RECONSTRUCT(BoolVector)(&vFound, vOrigLeafSet.size(), false);
+    XFNV_RECONSTRUCT(BoolVector)(&vFound, vOrigLeafSet.size(), false);
     bool bFalse = false;
     BoolVector::iterator kLast = vFound.end();
     BoolVector::iterator kFirst = vFound.begin();

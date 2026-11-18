@@ -190,7 +190,7 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
     ++pWorld->m_criticalOperationsLockCount;
 
     const int32_t iNewCapacity = m_world->m_broadPhaseUpdateSize;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
     newPairs.m_data = nullptr;
     newPairs.m_size = 0;
     newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
@@ -207,7 +207,7 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
     newPairs.m_localMemory = pNewLocal;
 
     const int32_t iRemovedCapacity = m_world->m_broadPhaseUpdateSize;
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, removedPairs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, removedPairs, std::nullopt, std::nullopt);
     removedPairs.m_data = nullptr;
     removedPairs.m_size = 0;
     removedPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;

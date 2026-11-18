@@ -122,11 +122,11 @@ void hkpConstraintViewer::draw(
             break;
         }
         case hkpConstraintData::CONSTRAINT_TYPE_LIMITEDHINGE: {
-            FNVD_INLINED_LOCAL(hkpLimitedHingeDrawer, drawer, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkpLimitedHingeDrawer, drawer, std::nullopt, std::nullopt);
             ::new (&drawer) hkpLimitedHingeDrawer;
             drawer.setScale(m_scale);
             drawer.drawConstraint(constraint, displayHandler, id, m_tag);
-            FNVD_DESTRUCT(hkDisplayGeometry)(&drawer.m_angularLimit);
+            XFNV_DESTRUCT(hkDisplayGeometry)(&drawer.m_angularLimit);
             break;
         }
         case hkpConstraintData::CONSTRAINT_TYPE_POINTTOPATH: {

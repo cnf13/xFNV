@@ -18,7 +18,7 @@ void PackageTarget::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&iValue, 4u);
     apLoadGameBuffer->LoadData(&fAcquireRadius, 4u);
     if (eTargType <= 1u) {
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The ID fills the whole pointer slot until the object is resolved.
         apLoadGameBuffer->LoadFormID(uObject.pObject);
 #else

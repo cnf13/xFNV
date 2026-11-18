@@ -38,7 +38,7 @@ void PackageLocation::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     int8_t eLocType = this->eLocType;
     if ((this->eLocType & 128) == 0) {
         if (eLocType <= 4) {
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The ID fills the whole pointer slot until the object is resolved.
             apLoadGameBuffer->LoadFormID(uObject.pObject);
 #else

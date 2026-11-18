@@ -227,7 +227,7 @@ bool TESCreature::Load(TESFile* apFile) {
                 FACTION_RANK temp;
                 ourMemset(&temp, 0, sizeof(temp));
                 apFile->GetChunkData(&temp, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 8 bytes, the faction's 4-byte form ID first.
                 TESFile::WidenFormIDRecords(&temp, 1, 8, sizeof(temp), {{0, offsetof(FACTION_RANK, pFaction)}});
 #endif

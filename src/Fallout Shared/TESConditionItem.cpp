@@ -22,7 +22,7 @@
 void TESConditionItem::Load(TESFile* apFile) {
     if (apFile != nullptr && apFile->GetTESChunk() == CIDA_ID) {
         apFile->GetChunkData(&Data, sizeof(Data));
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The file's record is 0x1C bytes (or a shorter older one); the comparison value, both function
         // parameters and the reference are 4 bytes there, a form ID or a number.
         TESFile::WidenFormIDRecords(
@@ -73,7 +73,7 @@ void TESConditionItem::Save() {
     if (TESForm::QEndianSwapOnSave()) {
         kData.Endian();
     }
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The file's record is Load's 0x1C bytes: the comparison value, both function parameters and the reference are
     // 4 bytes there, a form ID or a number.
     TESFile::NarrowFormIDRecords(

@@ -102,7 +102,7 @@ void hkaRagdollRigidBodyController::driveToPose(
     }
     else {
         // The stack allocator's bytes are untyped memory; the local array keeps its elements there.
-        FNVD_INLINED_LOCAL(hkLocalArray<hkQsTransform>, poseLocalSpace, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<hkQsTransform>, poseLocalSpace, std::nullopt, std::nullopt);
         {
             // EXE-INLINED none: hkLocalArray<hkQsTransform>::hkLocalArray(numRigidBodies) (hkAllocateStack)
             poseLocalSpace.m_data = nullptr;

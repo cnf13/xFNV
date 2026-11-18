@@ -91,14 +91,14 @@ gskMode:
     {
         // EXE-INLINED none: hkpMapPointsToSubShapeContactMgr's constructor (with hkReferencedObject's, which leaves
         // m_memSizeAndFlags as it is, and hkpContactMgr's); its destructor stores nothing.
-        FNVD_INLINED_LOCAL(
+        XFNV_INLINED_LOCAL(
             hkpMapPointsToSubShapeContactMgr, mgr, hkpMapPointsToSubShapeContactMgr_vftable, std::nullopt
         );
         mgr.m_referenceCount = 1;
         mgr.m_type = hkpContactMgr::TYPE_CONVEX_LIST_CONTACT_MGR;
         mgr.m_contactMgr = input.m_contactMgr;
         mgr.m_invalidPointHit.m_bool = 0;
-        FNVD_INLINED_LOCAL(hkpAgent3ProcessInput, gskInput, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpAgent3ProcessInput, gskInput, std::nullopt, std::nullopt);
         // CopyConstruct copies only the hkpAgent3Input part; the two members after it are copied here.
         hkpAgent3ProcessInput::CopyConstruct(&gskInput, input);
         gskInput.m_distAtT1 = input.m_distAtT1;

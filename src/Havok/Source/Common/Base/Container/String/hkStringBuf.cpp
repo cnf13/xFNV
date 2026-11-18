@@ -267,7 +267,7 @@ void hkStringBuf::printf(const char* fmt, ...) {
 void hkStringBuf::appendPrintf(const char* fmt, ...) {
     va_list arguments;
     va_start(arguments, fmt);
-    FNVD_INLINED_LOCAL(hkStringBuf, kBuffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, kBuffer, std::nullopt, std::nullopt);
     ::new (&kBuffer) hkStringBuf;
     for (;;) {
         const int32_t iCapacity =
@@ -748,7 +748,7 @@ void replace(hkStringBuf* apThis, const char* oldText, const char* newText, int3
         v18[v10] = 0;
     }
     else {
-        FNVD_INLINED_LOCAL(hkStringBuf, v21, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkStringBuf, v21, std::nullopt, std::nullopt);
         ::new (&v21) hkStringBuf(*apThis);
         apThis->clear();
         for (int32_t k = v21.indexOf(oldText, 0, 0x7FFFFFFF); k >= 0; k = v21.indexOf(oldText, k + v5, 0x7FFFFFFF)) {

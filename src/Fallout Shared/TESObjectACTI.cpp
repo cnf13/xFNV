@@ -312,7 +312,7 @@ void TESObjectACTI::Copy(TESForm* apCopy) {
         pSoundActivate = acti->pSoundActivate;
         pWaterForm = acti->GetWaterType();
         pRadioStation = acti->pRadioStation;
-        FNVD_INLINED_LOCAL(BSStringT<char>, sActivation, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSStringT<char>, sActivation, std::nullopt, std::nullopt);
         acti->GetActivationString(&sActivation);
         SetActivationString(sActivation);
         // SetActivationString releases its argument; natively C++ passes it a copy of this raw-storage local, so the
@@ -323,8 +323,8 @@ void TESObjectACTI::Copy(TESForm* apCopy) {
 }
 
 bool TESObjectACTI::Compare(TESForm* apCompare) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, v11, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, v11, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     TESObjectACTI* pComp = dynamic_cast<TESObjectACTI*>(apCompare);
     if (!pComp) {
         return true;
@@ -364,7 +364,7 @@ bool TESObjectACTI::Activate(
     TESBoundObject* apObjecttoGet,
     int32_t aicount
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
     Actor* pActionActor = nullptr;
     bool bstoreSoundLoopOnPlayer = false;
     if ((apActionRef) && (apActionRef->IsActor())) {

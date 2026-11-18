@@ -225,13 +225,13 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
             continue;
         }
         // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
         entities.m_data = nullptr;
         entities.m_size = 0;
         entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
         action->getEntities(entities);
         // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, newEntities, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, newEntities, std::nullopt, std::nullopt);
         newEntities.m_data = nullptr;
         newEntities.m_size = 0;
         newEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
@@ -249,13 +249,13 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
             newEntities.m_data[j] = newSystem->m_rigidBodies.m_data[index];
         }
         // EXE-INLINED none: hkArray<hkpPhantom*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpPhantom*>, phantoms, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpPhantom*>, phantoms, std::nullopt, std::nullopt);
         phantoms.m_data = nullptr;
         phantoms.m_size = 0;
         phantoms.m_capacityAndFlags = hkArrayBase<hkpPhantom*>::DONT_DEALLOCATE_FLAG;
         action->getPhantoms(phantoms);
         // EXE-INLINED none: hkArray<hkpPhantom*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpPhantom*>, newPhantoms, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpPhantom*>, newPhantoms, std::nullopt, std::nullopt);
         newPhantoms.m_data = nullptr;
         newPhantoms.m_size = 0;
         newPhantoms.m_capacityAndFlags = hkArrayBase<hkpPhantom*>::DONT_DEALLOCATE_FLAG;

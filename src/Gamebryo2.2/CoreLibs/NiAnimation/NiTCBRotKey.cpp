@@ -180,7 +180,7 @@ NiAnimationKey* NiTCBRotKey::CreateArray(uint32_t uiNumKeys) {
     *puiCookie = uiNumKeys;
     NiTCBRotKey* pkKeys = reinterpret_cast<NiTCBRotKey*>(puiCookie + 1);
     rt::eh_vector_constructor_iterator(
-        pkKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNumKeys), &fnvd::constructElement<NiBezRotKey>
+        pkKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNumKeys), &xfnv::constructElement<NiBezRotKey>
     );
     return pkKeys;
 }
@@ -203,7 +203,7 @@ bool NiTCBRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKe
         *puiCookie = uiNewNumKeys;
         pkNewKeys = reinterpret_cast<NiTCBRotKey*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNewNumKeys), &fnvd::constructElement<NiBezRotKey>
+            pkNewKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNewNumKeys), &xfnv::constructElement<NiBezRotKey>
         );
     }
     else {
@@ -242,7 +242,7 @@ NiAnimationKey* NiTCBRotKey::CreateFromStream(NiStream& kStream, uint32_t uiNumK
         *puiCookie = uiNumKeys;
         pkKeys = reinterpret_cast<NiTCBRotKey*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pkKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNumKeys), &fnvd::constructElement<NiBezRotKey>
+            pkKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNumKeys), &xfnv::constructElement<NiBezRotKey>
         );
     }
     else {

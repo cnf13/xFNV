@@ -204,7 +204,7 @@ bool Interface::ShowSubtitle(
     TESObjectREFR* apTarget,
     bool abForceShow
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v7, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v7, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\Interface.cpp", 2284
     );
@@ -1252,7 +1252,7 @@ void Interface::PrintLine(const char* apFormat, ...) {
     }
 }
 
-// KEEP: not registered. FNVD_REPLACES has no fnvd::describe overload for a C-variadic function
+// KEEP: not registered. XFNV_REPLACES has no xfnv::describe overload for a C-variadic function
 // (`void (*)(BSStringT<char>, ...)`), so the harness cannot register this body. It follows the asm: the string's
 // text goes to the console when it is open, or when CombatController's verbose messages are on, and the by-value
 // string is released on every path (the exe's single join point at 0x703D23).
@@ -1270,7 +1270,7 @@ void Interface::PrintLine(BSStringT<char> aString, ...) {
     }
 }
 
-// KEEP: not registered. FNVD_REPLACES cannot describe this signature (no matching fnvd::describe), so the harness
+// KEEP: not registered. XFNV_REPLACES cannot describe this signature (no matching xfnv::describe), so the harness
 // cannot register the body; callers reach the exe's through the template forwarder in Interface.h. It follows the
 // asm: the result callback is the fourth argument, the sound name is null (0x703ED6), the box is modal at -1/-1 and
 // the opacity and width come after the first button's text.
@@ -1335,7 +1335,7 @@ bool Interface::CreateMessageMenuSound(
     return bResult;
 }
 
-// KEEP: not registered. FNVD_REPLACES has no fnvd::describe overload for a C-variadic function
+// KEEP: not registered. XFNV_REPLACES has no xfnv::describe overload for a C-variadic function
 // (`char (*)(const char*, int, int, const char*, ...)`), so the harness cannot register this body. It follows the asm:
 // the result byte is cleared to -1 (0x704016), the fade to black is removed at once (0x70402B), the box is queued with
 // ModalMessageMenuCallback, and the USER32 queue is pumped with PM_REMOVE until that callback answers. The exe

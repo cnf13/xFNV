@@ -231,7 +231,7 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
     NiPixelData* pkOptDest,
     bool bMipmap
 ) {
-    FNVD_INLINED_LOCAL(NiPointer<NiPixelData>, spCompressionTmp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spCompressionTmp, std::nullopt, std::nullopt);
     spCompressionTmp.m_pObject = nullptr;
     const NiPixelData* pkSrc = &kSrc;
     // Bit 0 of m_uFlags (NiPixelFormat::GetBit).
@@ -248,7 +248,7 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
         pkSrc = spCompressionTmp.m_pObject;
     }
 
-    FNVD_INLINED_LOCAL(NiPointer<NiPixelData>, spMipmapTmp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spMipmapTmp, std::nullopt, std::nullopt);
     spMipmapTmp.m_pObject = nullptr;
     if (bMipmap && pkSrc->m_uiMipmapLevels <= 1) {
         // EXE-INLINED 0xA77920
@@ -272,7 +272,7 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
         return pkOptDest;
     }
 
-    FNVD_INLINED_LOCAL(NiPointer<NiPixelData>, spBumpTmp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spBumpTmp, std::nullopt, std::nullopt);
     spBumpTmp.m_pObject = nullptr;
     if (kDestFmt.m_eFormat == NiPixelFormat::FORMAT_BUMP || kDestFmt.m_eFormat == NiPixelFormat::FORMAT_BUMPLUMA) {
         spBumpTmp.SetNew(GenerateBumpMap(*pkSrc, kDestFmt));
@@ -617,7 +617,7 @@ NiPixelData* NiDevImageConverter::GenerateMipmapPyramidFromFiles(
     if (!pkDest) {
         return nullptr;
     }
-    FNVD_INLINED_LOCAL(NiPointer<NiPixelData>, spLevel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spLevel, std::nullopt, std::nullopt);
     for (uint32_t i = 0; i < uiNumLevels; ++i) {
         const char* pcFilename = apcFilenames[i];
         if (!pcFilename) {

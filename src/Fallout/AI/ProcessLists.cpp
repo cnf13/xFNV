@@ -1706,7 +1706,7 @@ void ProcessLists::ParallelActorAnimationMovementUpdates() {
     }
     if (kArray.GetSize()) {
         BSParallelArrayTask kTask;
-        FNVD_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateAnimMovement, &kArray, kArray.GetSize());
+        XFNV_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateAnimMovement, &kArray, kArray.GetSize());
         pParallelTaskManager->RunTask(&kTask);
     }
     kArray.~BSScrapArray<Actor*>();
@@ -1971,7 +1971,7 @@ void ProcessLists::ParallelUpdateAnimationScenegraph() {
     }
     if (kArray.GetSize()) {
         BSParallelArrayTask kTask;
-        FNVD_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateAnimSceneGraph, &kArray, kArray.GetSize());
+        XFNV_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateAnimSceneGraph, &kArray, kArray.GetSize());
         pParallelTaskManager->RunTask(&kTask);
     }
     kArray.~BSScrapArray<Animation*>();
@@ -2507,7 +2507,7 @@ void ProcessLists::UpdateTempEffectsParallel(float afDeltaTime) {
 
     if (kTaskArray.GetSize()) {
         BSParallelArrayTask kTask;
-        FNVD_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateTempEffect, &kTaskArray, kTaskArray.GetSize());
+        XFNV_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateTempEffect, &kTaskArray, kTaskArray.GetSize());
         pParallelTaskManager->RunTask(&kTask);
         for (uint32_t i = 0; i < kTaskArray.GetSize(); ++i) {
             EffectTaskData& rData = kTaskArray[i];
@@ -3774,7 +3774,7 @@ void ProcessLists::TurnOffMovementinHigh() {
 
 BSSimpleList<Crime*>* ProcessLists::RemoveCrimesForYieldCheck(float afTime) {
     BSSimpleList<Crime*>* pReturnList;
-    FNVD_INLINED_LOCAL(CombatTimeStamp, kTimeStamp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CombatTimeStamp, kTimeStamp, std::nullopt, std::nullopt);
     BSSimpleList<Crime*>* plist = GlobalCrimeListArray[3];
     BSSimpleList<Crime*>* v7 = static_cast<BSSimpleList<Crime*>*>(ourMalloc(sizeof(BSSimpleList<Crime*>)));
     if (v7) {

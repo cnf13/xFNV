@@ -468,7 +468,7 @@ void StatsMenu::DoEnter(int32_t aiID, Tile* apTarget) {
                         BodyPartController::GetInstance()->SetCurrentBodyPart(eBodyPart, true);
                         // GetSoundHandleByName fills kSound; nothing is constructed there beforehand, and the handle's
                         // destructor is empty.
-                        FNVD_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
                         BSAudio::QInstance()
                             .GetSoundHandleByName(
                                 &kSound, "UIPipBoyHighlight",
@@ -577,9 +577,9 @@ int32_t StatsMenu::GetClass() {
 }
 
 bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     StatsMenu::Page epage_2;
     StatsMenu::Page epage;
     if (!Interface::IsTopMenuID(Interface::eStatsMenu)) {
@@ -824,7 +824,7 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
 }
 
 bool StatsMenu::DoGamepadUpEvent(int32_t aiButton, float afValue) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!bLimbMode || (aiButton != 10 || !pTiles[9]->IsTrue(4015))) {
         return false;
     }
@@ -2226,8 +2226,8 @@ StatsMenu::BodyPartController::BodyPartIndex& operator++(StatsMenu::BodyPartCont
 }
 
 int32_t StatsMenu_sortingFunction(EffectSetting* a1, EffectSetting* a2) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
     BSStringT<char>* EffectName = a2->GetEffectName(&apResult);
     char* v3 = EffectName->pString;
     BSStringT<char>* v4 = a1->GetEffectName(&apString);

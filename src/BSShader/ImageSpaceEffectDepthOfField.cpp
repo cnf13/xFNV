@@ -50,7 +50,7 @@ ImageSpaceEffectDepthOfField::~ImageSpaceEffectDepthOfField() {
 void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_3;
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(4);
     // Each unsigned size is converted as a signed value plus the float 2^32 when negative; that addition rounds at the
     // thread's precision control (24 bits under Direct3D), where a 64-bit conversion of the size would not.

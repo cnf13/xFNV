@@ -97,7 +97,7 @@ public:
     // deliberately differing from the game's 4-byte alignment.
     static constexpr uint32_t kHeader = sizeof(HeapBlock);
     static constexpr uint32_t kMinMemory = sizeof(FreeHeapBlock) - sizeof(HeapBlock);
-#if FNVD_64BIT
+#if XFNV_64BIT
     static constexpr uint32_t kAlignment = 16;
 #else
     static constexpr uint32_t kAlignment = 4;

@@ -36,10 +36,10 @@ extern "C" const DIDATAFORMAT c_dfDIJoystick;
 // DirectInput8Create, dinput8.dll: the exe's import slot. IDA name; not in the PDB.
 using imp_DirectInput8Create_t = HRESULT(WINAPI*)(HINSTANCE__* hinst, uint32_t dwVersion,
 	const GUID* riidltf, void** ppvOut, IUnknown* punkOuter);
-namespace fnvd::imports {
-FNVD_IMPORT(imp_DirectInput8Create_t, DirectInput8Create, 0xFDF02C);
-} // namespace fnvd::imports
-FNVD_IMPORT_AS(imp_DirectInput8Create_t, imp_DirectInput8Create, 0xFDF02C, fnvd::imports::DirectInput8Create);
+namespace xfnv::imports {
+XFNV_IMPORT(imp_DirectInput8Create_t, DirectInput8Create, 0xFDF02C);
+} // namespace xfnv::imports
+XFNV_IMPORT_AS(imp_DirectInput8Create_t, imp_DirectInput8Create, 0xFDF02C, xfnv::imports::DirectInput8Create);
 
 // DirectInput 8 structures the PC Controls embeds (the SDK's dinput.h layouts and field names).
 struct IDirectInputDevice8A;

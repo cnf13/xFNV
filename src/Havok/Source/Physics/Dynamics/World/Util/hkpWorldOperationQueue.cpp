@@ -128,7 +128,7 @@ void hkpWorldOperationQueue::queueBodyOperation(
 // two references each entry holds, and repeats while running them queued more.
 void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
     while (m_pendingBodyOperations.m_size != 0) {
-        FNVD_INLINED_LOCAL(hkArray<hkpBodyOperationEntry>, kOperations, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpBodyOperationEntry>, kOperations, std::nullopt, std::nullopt);
         kOperations.m_data = nullptr;
         kOperations.m_size = 0;
         kOperations.m_capacityAndFlags = hkArrayBase<hkpBodyOperationEntry>::DONT_DEALLOCATE_FLAG;
@@ -190,7 +190,7 @@ void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
 // blocks it allocated, and runs what each operation queued in turn before the next one.
 void hkpWorldOperationQueue::executeAllPending() {
     hkReferencedObject::lockAll();
-    FNVD_INLINED_LOCAL(hkArray<hkWorldOperation::BiggestOperation>, tmpOldPending, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkWorldOperation::BiggestOperation>, tmpOldPending, std::nullopt, std::nullopt);
     tmpOldPending.m_data = nullptr;
     tmpOldPending.m_size = 0;
     tmpOldPending.m_capacityAndFlags = hkArrayBase<hkWorldOperation::BiggestOperation>::DONT_DEALLOCATE_FLAG;
@@ -325,7 +325,7 @@ void hkpWorldOperationQueue::executeAllPending() {
                     hkpAction* pAction = pOp->m_action;
                     if (!pAction->m_world) {
                         // The action is added only while every entity it works on is still in this world.
-                        FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, kEntities, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, kEntities, std::nullopt, std::nullopt);
                         kEntities.m_data = nullptr;
                         kEntities.m_size = 0;
                         kEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;

@@ -334,7 +334,7 @@ void* AlwaysRenderArray_DeleteBase(NiPointer<NiAVObject>* apBase, uint32_t auiFl
         // The element count new[] stores before the array (its cookie), read untyped.
         int32_t iCount = static_cast<int32_t>(reinterpret_cast<size_t*>(apBase)[-1]);
         rt::eh_vector_destructor_iterator(
-            apBase, sizeof(NiPointer<NiAVObject>), iCount, &fnvd::destructElement<NiPointer<NiRefObject>>
+            apBase, sizeof(NiPointer<NiAVObject>), iCount, &xfnv::destructElement<NiPointer<NiRefObject>>
         );
         if ((auiFlags & 1) != 0) {
             ourFree(reinterpret_cast<size_t*>(apBase) - 1);

@@ -11,7 +11,7 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
     namespace {
 
         // A copy of the T at auiAddress, read as the exe lays it out (src's type); null when unreadable. One buffer per
@@ -103,4 +103,4 @@ namespace fnvd::crashlog {
         return true;
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

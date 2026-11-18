@@ -948,8 +948,8 @@ void RaceSexMenu::DoIdle() {
 
 bool RaceSexMenu::DoGamepad(int32_t aiButton, float afValue) {
     bool result;
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Interface::enumMenus v3 = static_cast<Interface::enumMenus>(GetClass());
     if (!Interface::IsTopMenuID(v3)) {
         return false;
@@ -1108,10 +1108,10 @@ void RaceSexMenu::_Create(RaceSexMenuContext aeContext) {
     // The four title strings. C++ runs no constructor or destructor on them; eh_vector_constructor_iterator constructs
     // them.
     using TitleArray = BSStringT<char>[4];
-    FNVD_INLINED_LOCAL(TitleArray, akTitles, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(TitleArray, akTitles, std::nullopt, std::nullopt);
     rt::eh_vector_constructor_iterator(
-        akTitles, sizeof(BSStringT<char>), 4, &fnvd::constructElement<BSStringT<char>>,
-        &fnvd::destructElement<BSStringT<char>>
+        akTitles, sizeof(BSStringT<char>), 4, &xfnv::constructElement<BSStringT<char>>,
+        &xfnv::destructElement<BSStringT<char>>
     );
     if (aeContext < 2 || aeContext > 3) {
         akTitles[0].SPrintF("1. %s", sRSMSex.String());
@@ -1279,7 +1279,7 @@ void RaceSexMenu::_Create(RaceSexMenuContext aeContext) {
     SetActiveList(eActiveList);
     PrepForVisibility(false);
     // SWEEP-INLINE 0x4037D0
-    rt::eh_vector_destructor_iterator(akTitles, sizeof(BSStringT<char>), 4, &fnvd::destructElement<BSStringT<char>>);
+    rt::eh_vector_destructor_iterator(akTitles, sizeof(BSStringT<char>), 4, &xfnv::destructElement<BSStringT<char>>);
 }
 
 bool RaceSexMenu::SetActiveList(RaceSexMenu::ListID aeList) {
@@ -1458,10 +1458,10 @@ void RaceSexMenu::AddFaceSliders() {
         {RaceSexMenu::RSM_TONE, sRSMToneOption26.String(), fRSMFaceSliderDefaultMin, fRSMFaceSliderDefaultMax},
     };
     using FaceCoord = FR2MatrixVTC<float>[2][2];
-    FNVD_INLINED_LOCAL(FaceCoord, tempcoord, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(FaceCoord, tempcoord, std::nullopt, std::nullopt);
     rt::eh_vector_constructor_iterator(
-        tempcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-        &fnvd::destructElement<FR2MatrixVTC<float>>
+        tempcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+        &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     FR2MatrixVTC<float>(*pOffsetFaceCoord)[2][2] = pPlayerBase->GetOffsetFaceCoord();
     TESActorBase::SEX eSex = pPlayerBase->GetSex();
@@ -1616,7 +1616,7 @@ void RaceSexMenu::AddFaceSliders() {
         SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_BODY, false);
     }
     rt::eh_vector_destructor_iterator(
-        tempcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        tempcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
     );
 }
 
@@ -1720,14 +1720,14 @@ void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone)
             pPlayerBase->AttachHead(pPlayer, Biped_0, v10, v11);
         }
         else {
-            FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, currcord, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, currcord, std::nullopt, std::nullopt);
             rt::eh_vector_constructor_iterator(
-                currcord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                &fnvd::destructElement<FR2MatrixVTC<float>>
+                currcord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+                &xfnv::destructElement<FR2MatrixVTC<float>>
             );
             rt::eh_vector_constructor_iterator(
-                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                &fnvd::destructElement<FR2MatrixVTC<float>>
+                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+                &xfnv::destructElement<FR2MatrixVTC<float>>
             );
             pPlayerBase->GetFaceCoord(currcord);
             if (abShape) {
@@ -1800,10 +1800,10 @@ void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone)
                 pfacenode = pPlayer->GetFaceNodeSkinned(nullptr);
             }
             rt::eh_vector_destructor_iterator(
-                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
             );
             rt::eh_vector_destructor_iterator(
-                currcord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+                currcord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
             );
         }
         NiUpdatePlayer3D();
@@ -2171,10 +2171,10 @@ void RaceSexMenu::UpdateScrollArrows() {
 }
 
 void RaceSexMenu::OnFaceSliderChange(RaceSexMenu::Entry* apChangedSlider) {
-    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, addr, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, addr, std::nullopt, std::nullopt);
     rt::eh_vector_constructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-        &fnvd::destructElement<FR2MatrixVTC<float>>
+        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+        &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     pPlayerBase->GetFaceCoord(addr);
     float ffacevalue = static_cast<double>(apChangedSlider->GetValue_007B3740()) / 10.0;
@@ -2195,7 +2195,7 @@ void RaceSexMenu::OnFaceSliderChange(RaceSexMenu::Entry* apChangedSlider) {
         SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_BODY, true);
     }
     rt::eh_vector_destructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
     );
 }
 
@@ -2260,10 +2260,10 @@ char RaceSexMenu::UpdateEntriesBetween(int32_t aiStart, int32_t aiEnd, FanTypeE 
             if ((popt) && (popt->id == 34 || popt->id == 35)) {
                 int32_t aiLow;
                 int32_t aiHigh;
-                FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, a1, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, a1, std::nullopt, std::nullopt);
                 rt::eh_vector_constructor_iterator(
-                    a1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                    &fnvd::destructElement<FR2MatrixVTC<float>>
+                    a1, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+                    &xfnv::destructElement<FR2MatrixVTC<float>>
                 );
                 FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = pPlayerBase->GetOffsetFaceCoord();
                 TESActorBase::SEX Sex = pPlayerBase->GetSex();
@@ -2291,7 +2291,7 @@ char RaceSexMenu::UpdateEntriesBetween(int32_t aiStart, int32_t aiEnd, FanTypeE 
                     bChanged = 1;
                 }
                 rt::eh_vector_destructor_iterator(
-                    a1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+                    a1, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
                 );
             }
         }
@@ -2537,19 +2537,19 @@ void RaceSexMenu::SliderRelease() {
         float v11;
         float v12;
         float v14;
-        FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aOffsetCoord, std::nullopt, std::nullopt);
-        FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aCoord, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aOffsetCoord, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aCoord, std::nullopt, std::nullopt);
         // iAge holds the age, then the clamped geometry age.
         int32_t iAge = static_cast<int32_t>(
             static_cast<double>(pSliderOpt->GetValue_007B3740()) * 5.550000190734863 + 9.449999809265137
         );
         rt::eh_vector_constructor_iterator(
-            aCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-            &fnvd::destructElement<FR2MatrixVTC<float>>
+            aCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+            &xfnv::destructElement<FR2MatrixVTC<float>>
         );
         rt::eh_vector_constructor_iterator(
-            aOffsetCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-            &fnvd::destructElement<FR2MatrixVTC<float>>
+            aOffsetCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+            &xfnv::destructElement<FR2MatrixVTC<float>>
         );
         BSFaceGenManager::InitFaceGenCoord(&aOffsetCoord);
         pPlayerBase->GetFaceCoord(aCoord);
@@ -2611,10 +2611,10 @@ void RaceSexMenu::SliderRelease() {
         RaceSexMenu::pMe->SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_HEAD, false);
         RaceSexMenu::pMe->SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_BODY, true);
         rt::eh_vector_destructor_iterator(
-            aOffsetCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+            aOffsetCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
         );
         rt::eh_vector_destructor_iterator(
-            aCoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+            aCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
         );
     }
     else {

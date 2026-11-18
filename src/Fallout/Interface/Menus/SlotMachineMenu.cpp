@@ -122,9 +122,9 @@ void SlotMachineMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (eSlotState == SlotMachineMenu::SL_IDLE) {
         switch (a1) {
             case 3: {
@@ -297,12 +297,12 @@ void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
 }
 
 void SlotMachineMenu::DoIdle() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v50, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v51, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v50, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v51, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t v76 = 0;
     float v80 = 1.0f;
     Interface::enumMenus v1 = static_cast<Interface::enumMenus>(GetClass());
@@ -761,7 +761,7 @@ char SlotMachineMenu::IsWellFormedMenu() {
 }
 
 char SlotMachineMenu::SetupActiveReels() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t v13[7];
     int32_t v12 = 0;
     for (int32_t i = 0; i < 28; ++i) {
@@ -825,11 +825,11 @@ char SlotMachineMenu::SetupActiveReels() {
 
 void SlotMachineMenu::Prepare3DElements() {
     NiNode* v18;
-    FNVD_INLINED_LOCAL(NiFixedString, v20, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v21, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v23, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v20, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v21, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v23, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 mat;
     NiMatrix3 ecx0;
     NiControllerManager* v34[3];
@@ -1680,11 +1680,11 @@ Tile* SlotMachineMenu::Create(
     int32_t aiMinWinnings,
     bool abDebugMode
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v36, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v36, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSimpleList<CasinoData*>* cl;
     Tile* pold_menu_tile = Menu::GetMenuByClass(1080);
     InterfaceManager* pin = InterfaceManager::Instance();

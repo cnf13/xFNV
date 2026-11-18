@@ -337,6 +337,6 @@ public:
 
 // dsound.dll's DirectSoundCreate8 (imported by ordinal 11 into the exe's slot 0xFDF034).
 using DirectSoundCreate8_t = HRESULT(WINAPI*)(const GUID* pcGuidDevice, IDirectSound8** ppDS8, IUnknown* pUnkOuter);
-namespace fnvd::imports {
-    FNVD_IMPORT(DirectSoundCreate8_t, DirectSoundCreate8, 0xFDF034);
-} // namespace fnvd::imports
+namespace xfnv::imports {
+    XFNV_IMPORT(DirectSoundCreate8_t, DirectSoundCreate8, 0xFDF034);
+} // namespace xfnv::imports

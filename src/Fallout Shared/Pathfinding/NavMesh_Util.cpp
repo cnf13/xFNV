@@ -194,7 +194,7 @@ NavMesh::GetUndoDataIndexForObstacle(const NiPointer<ObstacleData>& apObstacle, 
 }
 
 bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps) {
-    FNVD_INLINED_LOCAL(NavMeshObstacleCutter, cutter_3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshObstacleCutter, cutter_3, std::nullopt, std::nullopt);
     ObstacleUndoData* pundoData = (&Obstacles.GetAt(static_cast<int32_t>(aiUndoIndex)))->m_pObject;
     if (aiUndoIndex == Obstacles.iSize - 1) {
         NavMeshObstacleCutter cutter;
@@ -208,10 +208,10 @@ bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps)
         if (GetUndoDataMaxObstacleCount(pundoData)) {
             uint32_t iobstacleIndex;
             using obstaclesToReAdd_t = NiPointer<ObstacleData>[100];
-            FNVD_INLINED_LOCAL(obstaclesToReAdd_t, obstaclesToReAdd, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(obstaclesToReAdd_t, obstaclesToReAdd, std::nullopt, std::nullopt);
             rt::eh_vector_constructor_iterator(
-                obstaclesToReAdd, sizeof(NiPointer<ObstacleData>), 100, &fnvd::constructElement<NiPointer<NiRefObject>>,
-                &fnvd::destructElement<NiPointer<NiRefObject>>
+                obstaclesToReAdd, sizeof(NiPointer<ObstacleData>), 100, &xfnv::constructElement<NiPointer<NiRefObject>>,
+                &xfnv::destructElement<NiPointer<NiRefObject>>
             );
             uint32_t iobstacleToReAddCount = 0;
             ::new (&cutter_3) NavMeshObstacleCutter;
@@ -245,7 +245,7 @@ bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps)
             }
             cutter_3.~NavMeshObstacleCutter();
             rt::eh_vector_destructor_iterator(
-                obstaclesToReAdd, sizeof(NiPointer<ObstacleData>), 100, &fnvd::destructElement<NiPointer<NiRefObject>>
+                obstaclesToReAdd, sizeof(NiPointer<ObstacleData>), 100, &xfnv::destructElement<NiPointer<NiRefObject>>
             );
         }
         else {
@@ -808,7 +808,7 @@ NiPoint3 NavMesh::GetCircumCenter(uint16_t apTriangle) {
     }
     float fY = (fX2 * fLength3 - fX3 * fLength2) * fScale + kVert1.y;
     float fX = kVert1.x - (fY2 * fLength3 - fY3 * fLength2) * fScale;
-    FNVD_INLINED_LOCAL(NiPoint3, kCenter, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPoint3, kCenter, std::nullopt, std::nullopt);
     return *::new (&kCenter) NiPoint3(fX, fY, fZ);
 }
 
@@ -1712,7 +1712,7 @@ bool NavMesh::GetPOVForVertex(uint16_t ausVertex, NavMeshPOVData& aRetData) {
 }
 
 void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
-    FNVD_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     if (apNavmeshInfo) {
         using connectedInfos_t = BSSimpleArray<NavMeshInfo*, 1024>;
         connectedInfos_t connectedInfos;
@@ -1742,7 +1742,7 @@ void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
                         NavMesh* pnavmesh = dynamic_cast<NavMesh*>(pnavmeshForm);
                         NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pnavmesh);
                         spnavmesh.operator=(*ptr);
-                        FNVD_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+                        XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
                     }
                     if (spnavmesh.operator NavMesh*()) {
                         NavMesh* Object = spnavmesh.m_pObject;

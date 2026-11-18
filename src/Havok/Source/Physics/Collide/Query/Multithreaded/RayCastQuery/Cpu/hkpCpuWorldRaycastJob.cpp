@@ -132,7 +132,7 @@ static void castRayBundleAabbTreeFp(
         &command->m_rayInput[3].m_from.m_quad, &command->m_rayInput[3].m_to.m_quad, hkVector4Comparison::MASK_XYZW
     );
     hkpWorldRayCastCommand commands[4];
-    FNVD_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
     Collector* collectorPtrs[4];
     for (int32_t i = 0; i < 4; ++i) {
         hkCpuWorldRayCastCollector& collector = collectors[i];
@@ -197,7 +197,7 @@ static void castRayBundleAabbTree16(
         &command->m_rayInput[3].m_from.m_quad, &command->m_rayInput[3].m_to.m_quad, hkVector4Comparison::MASK_XYZW
     );
     hkpWorldRayCastCommand commands[4];
-    FNVD_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
     Collector16* collectorPtrs[4];
     for (int32_t i = 0; i < 4; ++i) {
         hkCpuWorldRayCastCollector& collector = collectors[i];
@@ -554,7 +554,7 @@ hkBool* hkCpuWorldRayCastCollector::testCollidable(hkBool* arResult, const hkpCo
     }
 
     const hkTransform& kTransform = *apCollidable->m_motion.pMotion;
-    FNVD_INLINED_LOCAL(hkpWorldRayCastOutput, output, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpWorldRayCastOutput, output, std::nullopt, std::nullopt);
     // EXE-INLINED 0x4A3D20
     output.m_hitFraction = m_hitFraction;
     m_workInput.m_from.m_quad = transformedInversePos(kTransform, m_originalInput->m_from);
@@ -689,7 +689,7 @@ hkJobQueue::JobStatus hkCpuWorldRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
 
         // The rays' start points and inverse directions. The stack allocator's bytes are untyped memory; the local
         // array keeps its elements there.
-        FNVD_INLINED_LOCAL(hkLocalArray<hkAabbTreeData::Ray>, rays, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<hkAabbTreeData::Ray>, rays, std::nullopt, std::nullopt);
         {
             // EXE-INLINED none: hkLocalArray<hkAabbTreeData::Ray>::hkLocalArray(numRays) (hkAllocateStack)
             rays.m_data = nullptr;
@@ -720,7 +720,7 @@ hkJobQueue::JobStatus hkCpuWorldRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
 
         // One collector per lane of a ray bundle; castRayFiltering steps through them.
         using CollectorArray = hkCpuWorldRayCastCollector[4];
-        FNVD_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
         for (hkCpuWorldRayCastCollector& c : collectors) {
             ::new (&c) hkCpuWorldRayCastCollector;
         }

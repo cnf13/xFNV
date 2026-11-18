@@ -25,4 +25,4 @@ public:
 // steam_api.dll's SteamUtils (cdecl), through the exe's import slot: the utilities interface, or null when Steam is
 // not running.
 using SteamUtils_t = ISteamUtils* (*)();
-FNVD_IMPORT(SteamUtils_t, SteamUtils, 0xFDF49C);
+XFNV_IMPORT(SteamUtils_t, SteamUtils, 0xFDF49C);

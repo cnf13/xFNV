@@ -39,7 +39,7 @@ void queryClosestPoint(
     }
     float closest = 3.40282e+38f;
     using NodeStack = hkInplaceArray<const Node*, 128, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(NodeStack, stack, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NodeStack, stack, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkInplaceArray<const Node*, 128>::hkInplaceArray
     stack.m_data = stack.m_storage;
     stack.m_size = 0;

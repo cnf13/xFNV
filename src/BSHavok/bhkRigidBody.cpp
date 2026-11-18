@@ -340,7 +340,7 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(uiIndex, pcString);
-    FNVD_INLINED_LOCAL(bhkRigidBodyCinfo, ci, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(bhkRigidBodyCinfo, ci, std::nullopt, std::nullopt);
     ::new (&ci) bhkRigidBodyCinfo;
     CopyCinfo(ci);
     HK2NI(pnt, ci.hk.m_position);
@@ -522,7 +522,7 @@ int32_t bhkRigidBody::LoadCInfo(NiStream& arStream) {
     bool bCreated;
     bhkRigidBodyCinfo* pInfo = static_cast<bhkRigidBodyCinfo*>(&CreateCinfo(bCreated));
     if (arStream.m_BSStreamHeader.uiVersion < 35) {
-        FNVD_INLINED_LOCAL(bhkRigidBody551Cinfo, kOldCInfo, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(bhkRigidBody551Cinfo, kOldCInfo, std::nullopt, std::nullopt);
         bhkRigidBody551Cinfo::Serialized kForm{};
         arStream.Istr()->BinaryRead(&kForm, sizeof(kForm), nullptr, 0);
         kOldCInfo.ReadSerialized(kForm);

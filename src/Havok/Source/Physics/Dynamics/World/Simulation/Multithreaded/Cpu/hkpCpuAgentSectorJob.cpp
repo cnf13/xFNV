@@ -42,13 +42,13 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
 
     // Copies the input's hkpCollisionInput part, clears the spare sector and then runs hkpProcessCollisionInput's copy
     // constructor over the same local, at a 16-byte boundary.
-    alignas(16) FNVD_INLINED_LOCAL(hkpProcessCollisionInput, input, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkpProcessCollisionInput, input, std::nullopt, std::nullopt);
     static_cast<hkpCollisionInput&>(input) = tl.m_collisionInput;
     input.m_spareAgentSector = nullptr;
     ::new (&input) hkpProcessCollisionInput(tl.m_collisionInput);
     input.m_stepInfo = job.m_stepInfo;
 
-    FNVD_INLINED_LOCAL(
+    XFNV_INLINED_LOCAL(
         hkpDeferredConstraintOwner, constraintOwner, hkpDeferredConstraintOwner_vftable, hkBaseObject_vftable
     );
     // EXE-INLINED none: hkpDeferredConstraintOwner::hkpDeferredConstraintOwner

@@ -73,7 +73,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
     }
     WorldToEntityData* data = m_worldEntities.m_data[index];
     // EXE-INLINED none: hkArray<hkDisplayGeometry*> constructor
-    FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
     displayGeometries.m_data = nullptr;
     displayGeometries.m_size = 0;
     displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
@@ -87,14 +87,14 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         if (geometry->m_type == HK_DISPLAY_CONVEX && !geometry->m_geometry) {
             // EXE-INLINED none: HK_REPORT
             alignas(16) char buf[512];
-            FNVD_INLINED_LOCAL(hkErrStream, errStream, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkErrStream, errStream, std::nullopt, std::nullopt);
             ::new (&errStream) hkErrStream(buf, 512);
             errStream << "Unable to build display geometry from hkpShape geometry data";
             hkError::s_instance->message(
                 hkError::MESSAGE_REPORT, -1, buf,
                 ".\\VisualDebugger\\Viewer\\Dynamics\\hkpSweptTransformDisplayViewer.cpp", 168
             );
-            FNVD_DESTRUCT(hkOstream)(&errStream);
+            XFNV_DESTRUCT(hkOstream)(&errStream);
             // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
             displayGeometries.m_size--;
             if (displayGeometries.m_size != i) {

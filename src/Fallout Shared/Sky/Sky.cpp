@@ -155,7 +155,7 @@ void SkySound::FlagToKill() {
 }
 
 void SkySound::Play(float afVol) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, tmpHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, tmpHandle, std::nullopt, std::nullopt);
     if (!Interface::IsInMenuMode() && !Interface::IsInGameLoadingMenuOpen()) {
         if (!SndHandle.IsValid()) {
             uint32_t v3 = SndHandle.iSoundID;
@@ -401,9 +401,9 @@ void Sky::Update(float afSecondsPassed) {
 void Sky::UpdateColors() {
     if (eMode == SM_NONE) {
         NiColor kTemp;
-        SkyColor[4] = *FNVD_RECONSTRUCT(NiColor)(&kTemp, 0.95f, 0.85f, 0.85f);
+        SkyColor[4] = *XFNV_RECONSTRUCT(NiColor)(&kTemp, 0.95f, 0.85f, 0.85f);
         NiColor kTemp2;
-        SkyColor[3] = *FNVD_RECONSTRUCT(NiColor)(&kTemp2, 0.35f, 0.35f, 0.43f);
+        SkyColor[3] = *XFNV_RECONSTRUCT(NiColor)(&kTemp2, 0.35f, 0.35f, 0.43f);
         if (pClouds) {
             for (int32_t uiLayer = 0; uiLayer < pClouds->GetNumLayers(); ++uiLayer) {
                 NiColor kLayerColor;
@@ -1667,7 +1667,7 @@ void Sky::SetColor(NiColor& aColor, COLOR_BLEND* apColorBlend, float afAddFlash)
     afAddFlash = BSMIN(1.0f, afAddFlash);
     if (afAddFlash > 0.0) {
         NiColor kFlash;
-        aColor += *FNVD_RECONSTRUCT(NiColor)(&kFlash, afAddFlash, afAddFlash, afAddFlash);
+        aColor += *XFNV_RECONSTRUCT(NiColor)(&kFlash, afAddFlash, afAddFlash, afAddFlash);
         if (pCurrentWeather) {
             BSClamp(aColor.r, 0.0f, pCurrentWeather->GetWeatherData(TESWeather::WD_LIGHTNING_R, 1.0f, 0.0f));
             BSClamp(aColor.g, 0.0f, pCurrentWeather->GetWeatherData(TESWeather::WD_LIGHTNING_G, 1.0f, 0.0f));
@@ -1913,8 +1913,8 @@ void Sky::SetFastTravel(bool abOn) {
 }
 
 void Sky::ActivateWeatherSounds(const TESWeather* apWeather) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kHandleArg, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kFoundHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kHandleArg, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kFoundHandle, std::nullopt, std::nullopt);
     if (!apWeather) {
         return;
     }

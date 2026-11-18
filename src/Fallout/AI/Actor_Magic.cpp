@@ -110,7 +110,7 @@ void Actor::TransferDisease(SpellItem* apSpell, MagicTarget* apDesiredTarget, bo
 
 // CheckCast and GetCurrentSpell are MagicCaster virtuals, called through the MagicCaster subobject.
 void Actor::StartCast() {
-    FNVD_INLINED_LOCAL(BSStringT<char>, sMessage, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, sMessage, std::nullopt, std::nullopt);
     MagicItem::CannotCastReason eReason;
     MagicCaster* pCaster = static_cast<MagicCaster*>(this);
     if (pCaster->CheckCast(pCaster->GetCurrentSpell(), nullptr, &eReason, false)) {
@@ -338,7 +338,7 @@ float Actor::CheckResistance(MagicCaster* apCaster, MagicItem* apSpell, ActiveEf
             return 1.0f;
         }
     }
-    FNVD_DYNAMIC_CAST_VOID(Actor)(apCaster, RTTI_MagicCaster, RTTI_Actor);
+    XFNV_DYNAMIC_CAST_VOID(Actor)(apCaster, RTTI_MagicCaster, RTTI_Actor);
     Actor* pActor = this;
     float fMagicTypeResistance = 0.0f;
     if (bPoison || apSpell->GetSpellType() == MagicSystem::POISON) {

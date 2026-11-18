@@ -228,7 +228,7 @@ BSSoundHandle*
 BSAudioManager::GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiFormID, uint32_t aiTypeFlags) {
     char apFilename[268];
     void* pSettingsContext;
-    FNVD_INLINED_LOCAL(BSSoundHandle, returnHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, returnHandle, std::nullopt, std::nullopt);
     uint32_t isoundTypeFlags;
     bool (*pfncallback)(uint32_t, char*, uint32_t*, void**);
     isoundTypeFlags = 0;
@@ -282,7 +282,7 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
     uint32_t aeTypeFlags,
     TESSound* apSound
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
     if (!BSAudio::pAudioInstance->bAudioEnabled) {
         apResult->iSoundID = -1;
         apResult->bAssumeSuccess = false;
@@ -499,7 +499,7 @@ BSSoundHandle*
 BSAudioManager::GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEditorID, uint32_t aiTypeFlags) {
     char apFilename[268];
     void* pSettingsContext;
-    FNVD_INLINED_LOCAL(BSSoundHandle, returnHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, returnHandle, std::nullopt, std::nullopt);
     uint32_t isoundTypeFlags;
     bool (*pfncallback)(const char*, char*, uint32_t*, void**);
     isoundTypeFlags = 0;
@@ -816,7 +816,7 @@ void BSAudioManager::SetAttenuationCurve(
         BSSoundMessage* pMsg = GetFreeMessage();
         {
             // The message constructor's smart-pointer and vector arguments are copies.
-            FNVD_INLINED_LOCAL(BSSoundMessage, kMsg, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundMessage, kMsg, std::nullopt, std::nullopt);
             {
                 NiPointer<NiAVObject> spData;
                 NiPoint3 kVector = NiPoint3_ZERO;
@@ -1036,7 +1036,7 @@ void BSAudioManager::PrecacheSound(char* a1, uint32_t a2, TESSound* a3) {
     uint32_t ibegin;
     uint32_t imodFlags;
     uint32_t iend;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
     if ((a1) && (BSAudio::pAudioInstance->bAudioEnabled)) {
         char pcDest[268];
         uint32_t ithisSoundID = uiSoundCacheIndex++;

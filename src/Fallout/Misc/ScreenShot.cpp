@@ -35,7 +35,7 @@ SettingT<INISettingCollection> g_sScreenShotBaseName_Display("sScreenShotBaseNam
 SettingT<INIPrefSettingCollection> g_iScreenShotIndex_Display("iScreenShotIndex:Display", 0);
 
 NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHeight, const char* apScreenshotFileName) {
-    FNVD_INLINED_LOCAL(NiFixedString, TextureName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, TextureName, std::nullopt, std::nullopt);
     IDirect3DSurface9* pLocalSurf;
     IDirect3DSurface9* prenderedTextureCopy;
     D3DSURFACE_DESC d3dTextureSurfaceDesc;

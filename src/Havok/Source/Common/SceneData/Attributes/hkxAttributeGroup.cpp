@@ -226,7 +226,7 @@ hkResult hkxAttributeGroup::getIntValue_00E5C8A0(const char* name, bool warnIfNo
 // Writes `index >= 0 ? m_attributes[index].m_value : HK_NULL` into apResult with a new reference. The null alternative
 // is a temporary variant built from a null hkVariant and destroyed after the copy.
 hkRefVariant* hkxAttributeGroup::findAttributeVariantByName(hkRefVariant* apResult, const char* name) const {
-    FNVD_INLINED_LOCAL(hkRefVariant, nullValue, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkRefVariant, nullValue, std::nullopt, std::nullopt);
     bool bNullValueBuilt = false;
     const int32_t index = findAttributeIndexByName(name);
     hkVariant nullVariant = {nullptr, nullptr};
@@ -255,7 +255,7 @@ hkRefVariant* hkxAttributeGroup::findAttributeVariantByName(hkRefVariant* apResu
 // The attribute's object when type is null or its class has type's name, else null. The variant's reference is released
 // before the object is returned.
 hkReferencedObject* hkxAttributeGroup::findAttributeObjectByName(const char* name, const hkClass* type) const {
-    FNVD_INLINED_LOCAL(hkRefVariant, variant, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkRefVariant, variant, std::nullopt, std::nullopt);
     findAttributeVariantByName(&variant, name);
     if (!variant.m_pntr) {
         return nullptr;

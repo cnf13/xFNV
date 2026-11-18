@@ -187,8 +187,8 @@ void AbsorbEffect::Start3D() {
     TESObjectREFR* pcaster;
     TESObjectREFR* ptarget;
     NiNode* v29;
-    FNVD_INLINED_LOCAL(NiFixedString, v33, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v33, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         v29 = ::new (apMemory) NiNode(0);

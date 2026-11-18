@@ -87,7 +87,7 @@ void LipSyncBackgroundManager::RemoveTask(MobileObject* apActor) {
 }
 
 void LipSyncBackgroundManager::CancelLipFile(MobileObject* apActor) {
-    FNVD_INLINED_LOCAL(NiPointer<LipTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<LipTask>, sptask, std::nullopt, std::nullopt);
     ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     if (LipMap.GetAt(apActor, sptask)) {
         RemoveTask(apActor);
@@ -99,7 +99,7 @@ void LipSyncBackgroundManager::CancelLipFile(MobileObject* apActor) {
 
 void LipSyncBackgroundManager::BuildLipSynicFile(MobileObject* apActor, const char* apFilename) {
     LipTask* pnewtask;
-    FNVD_INLINED_LOCAL(NiPointer<LipTask>, v6, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<LipTask>, v6, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_DIALOGUE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Ai\\LipSyncBackgroundManager.cpp",
         97

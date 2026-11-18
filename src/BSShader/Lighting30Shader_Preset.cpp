@@ -20,7 +20,7 @@
 void Lighting30Shader::PresetStages() {
     float fDepthBias = BSShaderProperty::fDepthBiasUnit;
     // EXE-INLINED none: NiPointer<NiD3DPass>::NiPointer
-    FNVD_INLINED_LOCAL(NiPointer<NiD3DPass>, spD3DPass, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiD3DPass>, spD3DPass, std::nullopt, std::nullopt);
     spD3DPass.m_pObject = spPass[0].m_pObject;
     if (spD3DPass.m_pObject) {
         spD3DPass.m_pObject->IncRefCount();

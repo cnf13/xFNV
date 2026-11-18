@@ -1,14 +1,14 @@
 // SystemAlloc.h's pass-through: the C runtime's aligned heap (Platform.h), or the guard-page heap under
-// FNVD_GUARD_ALLOC (CMakeLists.txt defines it on this file).
+// XFNV_GUARD_ALLOC (CMakeLists.txt defines it on this file).
 
 #include "SystemAlloc.h"
 
 #include "DebugHeap.h"
 #include "Platform.h"
 
-namespace fnvd::sysalloc {
+namespace xfnv::sysalloc {
 
-#if FNVD_GUARD_ALLOC
+#if XFNV_GUARD_ALLOC
     // The game heap's alignment: 16 (bodies keep hkVector4s in game-heap blocks and read them with movaps).
     constexpr size_t kAlign = 16;
 
@@ -64,4 +64,4 @@ namespace fnvd::sysalloc {
     }
 #endif
 
-} // namespace fnvd::sysalloc
+} // namespace xfnv::sysalloc

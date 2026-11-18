@@ -95,7 +95,7 @@ const NiRTTI* MagicModelHitEffect::GetRTTI() const {
 }
 
 bool MagicModelHitEffect::Update(float a1) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (!pTarget || (!pTarget->Get3D() || !MagicHitEffect::Update(a1))) {
         return false;
     }
@@ -380,7 +380,7 @@ void MagicModelHitEffect::FinishLoadGame(BGSLoadGameBuffer* a1) {
 }
 
 bool MagicModelHitEffect::Init() {
-    FNVD_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
     if (pEffect) {
         this->MagicHitEffect::fAge = pEffect->fElapsedSeconds;
         EffectSetting* EffectSetting_ = pEffect->GetEffectSetting();

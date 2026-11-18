@@ -403,7 +403,7 @@ int32_t hkpConstraintSolverSetup::solve(
     uintptr_t uiSchemasLimit = reinterpret_cast<uintptr_t>(schemasLimit);
     // The constraints of priority TOI_HIGHER and above, built after all others.
     using deferred_t = hkInplaceArray<hkConstraintInternal*, 256>;
-    FNVD_INLINED_LOCAL(deferred_t, deferred, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(deferred_t, deferred, std::nullopt, std::nullopt);
     deferred.m_data = deferred.m_storage;
     deferred.m_size = 0;
     deferred.m_capacityAndFlags = 256 | hkArrayBase<hkConstraintInternal*>::DONT_DEALLOCATE_FLAG;
@@ -712,7 +712,7 @@ int32_t hkpConstraintSolverSetup::calcBufferOffsetsForSolve(
 // and empties the buffer, the split-island array and the two task lists; its destructor frees the array's storage
 // unless it is flagged not to.
 int32_t hkpConstraintSolverSetup::calcBufferSize(hkpSimulationIsland& island) {
-    alignas(16) FNVD_INLINED_LOCAL(hkpBuildJacobianTaskHeader, taskHeader, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkpBuildJacobianTaskHeader, taskHeader, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkpBuildJacobianTaskHeader::hkpBuildJacobianTaskHeader
     taskHeader.m_referenceCount = 1;
     taskHeader.m_numIslandsAfterSplit = 1;

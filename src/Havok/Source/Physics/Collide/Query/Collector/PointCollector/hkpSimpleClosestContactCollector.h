@@ -26,4 +26,4 @@ public:
     hkContactPoint m_hitPoint;
 };
 
-inline constexpr fnvd::Vtable hkpSimpleClosestContactCollector_vftable{};
+inline constexpr xfnv::Vtable hkpSimpleClosestContactCollector_vftable{};

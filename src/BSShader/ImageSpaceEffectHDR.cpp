@@ -27,10 +27,10 @@ void ImageSpaceEffectHDR::Render(
     ImageSpaceEffectParam* apParam,
     int32_t abEndFrame
 ) {
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, psrc, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, pdst, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, pblursrc, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(ImageSpaceTexture, blurswap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, psrc, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, pdst, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, pblursrc, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ImageSpaceTexture, blurswap, std::nullopt, std::nullopt);
     // EXE-INLINED 0x4EBB70
     psrc.bForceAniso = false;
     psrc.bIsRenderedTexture = false;
@@ -69,7 +69,7 @@ void ImageSpaceEffectHDR::Render(
     NiTexturingProperty::FilterMode eFilterMode =
         BSShaderManager::bFPFiltering ? NiTexturingProperty::FILTER_BILERP : NiTexturingProperty::FILTER_NEAREST;
     if (bUseAnisoDownsample) {
-        FNVD_INLINED_LOCAL(ImageSpaceTexture, kAnisoTex, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(ImageSpaceTexture, kAnisoTex, std::nullopt, std::nullopt);
         // EXE-INLINED 0x4EBB70
         kAnisoTex.bForceAniso = false;
         kAnisoTex.bIsRenderedTexture = false;

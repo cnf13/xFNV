@@ -82,7 +82,7 @@
 NiPointer<NiCamera> SPECIALBookMenu::sp3DCamera;
 
 void SPECIALBookDoneCallback() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (SPECIALBookMenu::pSPECIALBookMenu &&
         PlayerCharacter::GetSumOfSPECIALStats() == SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints) {
         SPECIALBookMenu::pSPECIALBookMenu->Exit();
@@ -167,10 +167,10 @@ void SPECIALBookMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v25, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v25, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     bool bPageTurned = false;
     switch (a1) {
         case 0:
@@ -449,8 +449,8 @@ ActorValue::Index SPECIALBookMenu::GetSelectedSPECIAL() {
 }
 
 bool SPECIALBookMenu::TurnPage(bool bForward) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool brunAnim = false;
     if (bForward) {
         bAnimForward = 1;
@@ -526,7 +526,7 @@ void SPECIALBookMenu::CallPageCallbacks() {
 // look-inside button, a page per SPECIAL (its value, message and points-remaining items, the decrease and increase
 // buttons on them, the page arrows) and the index page, and runs every page's refresh callbacks once.
 void SPECIALBookMenu::InitBook() {
-    FNVD_INLINED_LOCAL(NiFixedString, kForward, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kForward, std::nullopt, std::nullopt);
     SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\Babybook02.NIF", LOD_MULT_NONE, true, false, false, false
     );
@@ -579,10 +579,10 @@ void SPECIALBookMenu::InitBook() {
         NiPoint3 kTranslate;
         pLight->SetTranslate(*::new (&kTranslate) NiPoint3(0.0f, 0.0f, 0.0f));
         NiColor kDiffuse;
-        pLight->SetDiffuseColor(*FNVD_RECONSTRUCT(NiColor)(&kDiffuse, 0.85f, 0.85f, 0.85f));
+        pLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.85f, 0.85f, 0.85f));
         // The specular colour's red channel is given the light radius, deliberately, as the game does.
         NiColor kSpecular;
-        pLight->SetSpecularColor(*FNVD_RECONSTRUCT(NiColor)(&kSpecular, fLightRadius, 0.0f, 0.0f));
+        pLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, fLightRadius, 0.0f, 0.0f));
         pLight->SetDimmer(1.0f);
         NiUpdateData kLightData(0.0f, false, false);
         pLight->Update(kLightData);
@@ -1464,7 +1464,7 @@ void SPECIALBookMenu::RefreshAllDoneButton(SPECIALBookMenu::SpecialBookButton* a
 }
 
 void SPECIALBookMenu::IncreaseActorValue(SPECIALBookMenu::ActorValueButton* apButton) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (SPECIALBookMenu::pSPECIALBookMenu) {
         ActorValue::Index eActorValue = apButton->eActorValue;
         if (eActorValue != ActorValue::VALUE_NONE) {
@@ -1486,7 +1486,7 @@ void SPECIALBookMenu::IncreaseActorValue(SPECIALBookMenu::ActorValueButton* apBu
 }
 
 void SPECIALBookMenu::DecreaseActorValue(SPECIALBookMenu::ActorValueButton* apButton) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (SPECIALBookMenu::pSPECIALBookMenu) {
         ActorValue::Index eActorValue = apButton->eActorValue;
         if (eActorValue != ActorValue::VALUE_NONE) {

@@ -26,7 +26,7 @@ static void heapSortTextureStages(hkxMaterial::TextureStage* a1, int32_t a2, con
     hkxMaterial::TextureStage* pLast = &a1[n - 1];
     while (n >= 1) {
         // EXE-INLINED none: hkxMaterial::TextureStage's copy constructor
-        FNVD_INLINED_LOCAL(hkxMaterial::TextureStage, kTemp, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkxMaterial::TextureStage, kTemp, std::nullopt, std::nullopt);
         if (a1->m_texture.m_pntr) {
             a1->m_texture.m_pntr->addReference();
         }
@@ -74,7 +74,7 @@ static void heapSortTextureStages(hkxMaterial::TextureStage* a1, int32_t a2, con
 static void downHeap(hkxMaterial::TextureStage* apArray, int32_t k, int32_t n, const hkxMaterial* x0) {
     hkxMaterial::TextureStage* pStage = &apArray[k - 1];
     // EXE-INLINED none: hkxMaterial::TextureStage's copy constructor
-    FNVD_INLINED_LOCAL(hkxMaterial::TextureStage, kTemp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkxMaterial::TextureStage, kTemp, std::nullopt, std::nullopt);
     if (pStage->m_texture.m_pntr) {
         pStage->m_texture.m_pntr->addReference();
     }

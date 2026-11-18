@@ -72,7 +72,7 @@ void ImageSpaceShaderMenuUnpack::Render(
                 do {
                     uint32_t m_uiWidth;
                     uint32_t m_uiHeight;
-                    FNVD_INLINED_LOCAL(NiFixedString, a2, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(NiFixedString, a2, std::nullopt, std::nullopt);
                     NiRenderTargetGroup* v13 = apRenderer->GetDefaultRenderTargetGroup();
                     if (v13) {
                         Ni2DBuffer* v15 = v13->GetBuffer(0);

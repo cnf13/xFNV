@@ -141,7 +141,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
     NavMeshCellMap.SetAt(apCell, spCellNode);
     NavMeshPtr spNavMesh;
     for (uint32_t i = 0; i < uiNavMeshes; ++i) {
-        FNVD_INLINED_LOCAL(NavMeshPtr, kNavMeshAt, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NavMeshPtr, kNavMeshAt, std::nullopt, std::nullopt);
         NavMeshPtr* pNavMeshAt = pNavMeshes->GetNavMeshByIndex(&kNavMeshAt, i);
         spNavMesh = *pNavMeshAt;
         kNavMeshAt.~NavMeshPtr();
@@ -379,7 +379,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             if (pEdgeColorMemory) {
                 rt::eh_vector_constructor_iterator(
                     pEdgeColorMemory, sizeof(NiColorA), static_cast<int32_t>(iEdgeCopy),
-                    &fnvd::constructElement<NiColorA>
+                    &xfnv::constructElement<NiColorA>
                 );
                 pEdgeColors = static_cast<NiColorA*>(pEdgeColorMemory);
             }
@@ -427,7 +427,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
                 if (pConColorMemory) {
                     rt::eh_vector_constructor_iterator(
                         pConColorMemory, sizeof(NiColorA), static_cast<int32_t>(iConnectionCopy),
-                        &fnvd::constructElement<NiColorA>
+                        &xfnv::constructElement<NiColorA>
                     );
                     pConColors = static_cast<NiColorA*>(pConColorMemory);
                 }
@@ -474,7 +474,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             if (pTriColorMemory) {
                 rt::eh_vector_constructor_iterator(
                     pTriColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiTotalSize),
-                    &fnvd::constructElement<NiColorA>
+                    &xfnv::constructElement<NiColorA>
                 );
                 pTriColors = static_cast<NiColorA*>(pTriColorMemory);
             }

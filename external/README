@@ -39,7 +39,7 @@ Kept, unchanged: from libogg, AUTHORS, COPYING, README.md, include/ogg/{ogg.h,os
 src/{bitwise.c,framing.c,crctable.h}; from libvorbis, AUTHORS, COPYING, include/vorbis/{codec.h,vorbisfile.h},
 lib/*.h and the sources of upstream's libvorbis and libvorbisfile (lib/*.c without vorbisenc.c, barkmel.c, psytune.c
 and tone.c). Left out: the encoder library (vorbisenc.c, vorbisenc.h, lib/modes, lib/books), the tools, docs,
-examples, tests and build scripts. CMake builds them as the static library fnvd_vorbis (CMakeLists.txt), writing
+examples, tests and build scripts. CMake builds them as the static library xfnv_vorbis (CMakeLists.txt), writing
 libogg's config_types.h from config_types.h.in as upstream's configure does; the game includes
 <vorbis/vorbisfile.h> (src/BSAudio/BSWin32GameSound.h).
 

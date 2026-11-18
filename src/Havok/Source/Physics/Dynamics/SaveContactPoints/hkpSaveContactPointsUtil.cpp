@@ -90,7 +90,7 @@ namespace {
         hkPointerMap<const hkpEntity*, int32_t> m_map;
     };
 
-    inline constexpr fnvd::Vtable hkEntitySelectorAll_vftable{};
+    inline constexpr xfnv::Vtable hkEntitySelectorAll_vftable{};
 
     int32_t hkEntitySelectorListed::isEntityOk(const hkpEntity* entity) {
         return m_map.getWithDefault(entity, 0);
@@ -139,7 +139,7 @@ void hkpSaveContactPointsUtil::saveContactPoints(
     const hkpWorld* world,
     hkpPhysicsSystemWithContacts* sys
 ) {
-    FNVD_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, islands, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, islands, std::nullopt, std::nullopt);
     islands.m_data = nullptr;
     islands.m_size = 0;
     islands.m_capacityAndFlags = 0x80000000u;
@@ -557,7 +557,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
                         pTrack, pSubTrack
                     ) != 0) {
                     if (pSubTrack) {
-                        FNVD_DESTRUCT(hkpSerializedTrack1nInfo)(pSubTrack);
+                        XFNV_DESTRUCT(hkpSerializedTrack1nInfo)(pSubTrack);
                         hkMemoryRouter::getInstance().m_heap->blockFree(
                             pSubTrack, static_cast<int32_t>(sizeof(hkpSerializedSubTrack1nInfo))
                         );
@@ -579,7 +579,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
                     ++subTracks.m_size;
                 }
                 else {
-                    FNVD_DESTRUCT(hkpSerializedTrack1nInfo)(pSubTrack);
+                    XFNV_DESTRUCT(hkpSerializedTrack1nInfo)(pSubTrack);
                     hkMemoryRouter::getInstance().m_heap->blockFree(
                         pSubTrack, static_cast<int32_t>(sizeof(hkpSerializedSubTrack1nInfo))
                     );
@@ -794,7 +794,7 @@ hkResult hkpSaveContactPointsUtil::deserializeCollisionEntry(
         }
     }
 
-    FNVD_INLINED_LOCAL(hkArray<uint16_t>, kPointIds, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<uint16_t>, kPointIds, std::nullopt, std::nullopt);
     kPointIds.m_data = nullptr;
     kPointIds.m_size = 0;
     kPointIds.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
@@ -899,7 +899,7 @@ void hkpSaveContactPointsUtil::loadContactPoints(
     hkpPhysicsSystemWithContacts* sys,
     hkpWorld* world
 ) {
-    FNVD_INLINED_LOCAL(hkEntitySelectorAll, selector, hkEntitySelectorAll_vftable, std::nullopt);
+    XFNV_INLINED_LOCAL(hkEntitySelectorAll, selector, hkEntitySelectorAll_vftable, std::nullopt);
     loadContactPointsInternal(input, sys, world, selector);
 }
 
@@ -909,7 +909,7 @@ void hkpSaveContactPointsUtil::loadContactPoints(
     hkpEntity** entities,
     int32_t numEntities
 ) {
-    FNVD_INLINED_LOCAL(hkEntitySelectorListed, a4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkEntitySelectorListed, a4, std::nullopt, std::nullopt);
     hkpWorld* m_world = (*entities)->m_world;
     ::new (&a4) hkEntitySelectorListed(entities, numEntities);
     hkpSaveContactPointsUtil::loadContactPointsInternal(input, sys, m_world, a4);
@@ -957,7 +957,7 @@ void hkpSaveContactPointsUtil::saveContactPoints_00DCDC00(
     hkpPhysicsSystemWithContacts* sys
 ) {
     hkpWorld* world = entities[0]->m_world;
-    FNVD_INLINED_LOCAL(hkpSaveContactPointsCollidableMap, processedCollidables, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpSaveContactPointsCollidableMap, processedCollidables, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkPointerMap<const hkpLinkedCollidable*, int>::hkPointerMap
     processedCollidables.m_map.m_elem = nullptr;
     processedCollidables.m_map.m_numElems = 0;
@@ -967,7 +967,7 @@ void hkpSaveContactPointsUtil::saveContactPoints_00DCDC00(
     );
     for (int32_t i = 0; i < numEntities; ++i) {
         processedCollidables.insert(&entities[i]->m_collidable, 0);
-        FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, entries, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, entries, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
         entries.m_data = nullptr;
         entries.m_size = 0;

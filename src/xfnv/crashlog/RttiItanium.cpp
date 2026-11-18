@@ -8,7 +8,7 @@
 #include <cstring>
 #include <typeinfo>
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
     namespace {
 
         // The ABI's type_info records of classes (cxxabi.h): the vtable pointer and the mangled name first; a single
@@ -195,4 +195,4 @@ namespace fnvd::crashlog {
         arOut.str(pName);
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

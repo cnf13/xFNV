@@ -148,7 +148,7 @@ void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
     }
     if (pMatProp) {
         apObject->DetachProperty(pMatProp);
-        FNVD_INLINED_LOCAL(NiCloningProcess, kCloneProc, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiCloningProcess, kCloneProc, std::nullopt, std::nullopt);
         ::new (&kCloneProc) NiCloningProcess(257);
         NiMaterialProperty* pNewMatProp;
         if (pMatProp->m_spControllers) {
@@ -357,7 +357,7 @@ void BSShaderManager::Initialize() {
         pAccumulators = reinterpret_cast<NiPointer<BSShaderAccumulator>*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
             pAccumulators, sizeof(NiPointer<BSShaderAccumulator>), static_cast<int32_t>(uiCount),
-            &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+            &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
         );
     }
     spShadowAccumulators = pAccumulators;
@@ -454,7 +454,7 @@ BSShaderPPLightingProperty::TangentSpaceData* BSShaderManager::CreateTangentSpac
     if (pMemory) {
         pTangentSpaceData = ::new (pMemory) BSShaderPPLightingProperty::TangentSpaceData(true);
     }
-    FNVD_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
     kKey.m_kHandle = NiGlobalStringTable::AddString("Tangent space (binormal & tangent vectors)");
     NiExtraData* pExtraData = apGeom->GetExtraData(kKey);
     // Destroys kKey.
@@ -474,7 +474,7 @@ BSShaderPPLightingProperty::TangentSpaceData* BSShaderManager::CreateTangentSpac
         ));
         rt::memcpy(pTangentSpaceData->pTangentExtraData, pkTangents, sizeof(NiPoint3) * uiVertices);
         rt::memcpy(pTangentSpaceData->pBinormalExtraData, pkBinormals, sizeof(NiPoint3) * uiVertices);
-        FNVD_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
         kRemoveKey.m_kHandle = NiGlobalStringTable::AddString("Tangent space (binormal & tangent vectors)");
         apGeom->RemoveExtraData(kRemoveKey);
         // The destructor of kRemoveKey.
@@ -1805,7 +1805,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
 
     // The reflection cube maps: each face is the same file.
     char acFilename[260];
-    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     BSsprintf(acFilename, sizeof(acFilename), "%seyereflection.dds", "Data\\Textures\\Effects\\");
     kName.SetHandle(NiGlobalStringTable::AddString("EyeReflectionCubeMap"));
     NiSourceCubeMap* pCubeMap = NiSourceCubeMap::Create(
@@ -5203,7 +5203,7 @@ void BSShaderManager::Free(eBool abFinal) {
         rt::eh_vector_destructor_iterator(
             pAccumulators, sizeof(NiPointer<BSShaderAccumulator>),
             static_cast<int32_t>(reinterpret_cast<size_t*>(pAccumulators)[-1]),
-            &fnvd::destructElement<NiPointer<NiRefObject>>
+            &xfnv::destructElement<NiPointer<NiRefObject>>
         );
         MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pAccumulators) - 1);
     }

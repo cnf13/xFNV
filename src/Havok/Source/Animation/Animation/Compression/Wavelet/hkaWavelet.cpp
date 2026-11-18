@@ -107,7 +107,7 @@ void hkZeroSmallWaveletCoefficients(
         if (1.0 / fN > tolerance) {
             return;
         }
-        FNVD_INLINED_LOCAL(hkLocalArray<float>, sortedCoefs, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<float>, sortedCoefs, std::nullopt, std::nullopt);
         {
             // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(n) (hkAllocateStack)
             sortedCoefs.m_data = nullptr;

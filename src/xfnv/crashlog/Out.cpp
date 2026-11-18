@@ -1,6 +1,6 @@
 #include "xfnv/crashlog/CrashLog.hpp"
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
 
     Out& Out::chr(char acChar) {
         if (uiUsed == sizeof(acBuffer)) {
@@ -77,4 +77,4 @@ namespace fnvd::crashlog {
         }
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

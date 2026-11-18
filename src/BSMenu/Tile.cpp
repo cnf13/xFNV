@@ -151,7 +151,7 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
     GetThreadMemContext() = MEM_CONTEXT_INTERFACE;
     Action* pAction = static_cast<Action*>(this->pActionListA);
     float fOldValue = this->fValue;
-    FNVD_INLINED_LOCAL(FloatArray, kStack, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(FloatArray, kStack, std::nullopt, std::nullopt);
     ::new (&kStack) FloatArray;
     uint8_t bChanged = 0;
     while (pAction) {
@@ -2156,7 +2156,7 @@ void Tile::DeleteModel() {
 
 void Tile::PlayTileSound(int32_t aiSoundType) {
     // EXE-INLINED 0x41A250
-    FNVD_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
     sound.iSoundID = -1;
     sound.bAssumeSuccess = false;
     sound.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
@@ -2165,7 +2165,7 @@ void Tile::PlayTileSound(int32_t aiSoundType) {
     // Only while the menu's fade state is 1.
     if (menu && menu->xFadeState == 1 && name && *name) {
         // GetSoundHandleByName fills result; nothing constructs it beforehand.
-        FNVD_INLINED_LOCAL(BSSoundHandle, result, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSSoundHandle, result, std::nullopt, std::nullopt);
         // The returned handle is copied field by field here rather than through BSSoundHandle::operator=, as the game
         // does.
         BSSoundHandle* handle = BSAudio::pAudioInstance->GetSoundHandleByName(
@@ -3545,7 +3545,7 @@ Tile::BuildStorage* Tile::ParseFile(const char* apName, char* apData, uint32_t a
 
 bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     char* ptokenContext;
-    FNVD_INLINED_LOCAL(BSStringT<char>, strfinalVersion, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, strfinalVersion, std::nullopt, std::nullopt);
     char* pstartIndex = apFile->pXMLData;
     const char* pincludeIndex = std::strstr(pstartIndex, "<include");
     if (!pincludeIndex) {
@@ -3565,7 +3565,7 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     strfinalVersion.Set(strtemp, 0x4000);
     bool bdone = false;
     while (!bdone) {
-        FNVD_INLINED_LOCAL(BSStringT<char>, strincludeFilename, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSStringT<char>, strincludeFilename, std::nullopt, std::nullopt);
         strincludeFilename.pString = nullptr;
         strincludeFilename.sLen = 0;
         strincludeFilename.sMaxLen = 0;
@@ -3655,7 +3655,7 @@ void Tile::GetTextureAtlasInfo(
         char acLine[0x400];
         while (pFile->GetLine(acLine, 0x400, '\n')) {
             std::string kName;
-            FNVD_RECONSTRUCT(std::string)(&kName);
+            XFNV_RECONSTRUCT(std::string)(&kName);
             TextureAtlasEntry* pEntry = nullptr;
             std::strtok(acLine, " ,\t");
             if (acLine[0] == '#' || acLine[0] == '\n' || acLine[0] == '\t' || acLine[0] == '\r' || acLine[0] == ' ') {

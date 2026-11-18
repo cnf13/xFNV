@@ -435,7 +435,7 @@ bool NiDDSReader::ReadHeader(
         }
 
         // One stack temporary holds both results.
-        FNVD_INLINED_LOCAL(NiPixelFormat, kTemp, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPixelFormat, kTemp, std::nullopt, std::nullopt);
         NiPixelFormat* pkCreated =
             NiPixelFormat::CreateFromRGBAMasks(&kTemp, uiBitsPerPixel, uiRedMask, uiGreenMask, uiBlueMask, uiAlphaMask);
         kFormat = *pkCreated;

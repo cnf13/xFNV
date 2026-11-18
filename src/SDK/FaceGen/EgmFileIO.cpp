@@ -25,7 +25,7 @@ bool fffReadEgmFile(const std::basic_string<char, std::char_traits<char>, std::a
 	uint32_t& basisKey, std::vector<FffModeGS, std::allocator<FffModeGS>>& symm,
 	std::vector<FffModeGS, std::allocator<FffModeGS>>& asym) {
 	FffEgmFileHeaderS hdr;
-	FNVD_INLINED_LOCAL(BSFaceGenBinaryFile, bfile, std::nullopt, std::nullopt);
+	XFNV_INLINED_LOCAL(BSFaceGenBinaryFile, bfile, std::nullopt, std::nullopt);
 	float scale;
 	std::string kFileId("FREGM002");
 	::new (&bfile) BSFaceGenBinaryFile(kFileId);
@@ -36,7 +36,7 @@ bool fffReadEgmFile(const std::basic_string<char, std::char_traits<char>, std::a
 	};
 	std::string kFileName;
 	// The by-value file name's copy constructor.
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
 	if (!bfile.BSFaceGenBinaryFile::openForRead(kFileName, false)) {
 		return fnClose(false);
 	}

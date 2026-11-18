@@ -217,7 +217,7 @@ uint32_t hkMoppBvTreeShapeBase::queryAabbImpl(const hkAabb& aAabb, uint32_t* hit
     alignas(16) hkpMoppObbVirtualMachine machine;
     // A MOPP code over this shape's code bytes: only its info, its data array and its build type are set (no vtable or
     // reference count), and no destructor runs on it.
-    FNVD_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
     code.m_info.m_offset = m_codeInfoCopy;
     code.m_data.m_data = const_cast<uint8_t*>(m_moppData);
     code.m_data.m_size = m_moppDataSize;
@@ -300,7 +300,7 @@ hkBool hkpMoppBvTreeShape::castRayImpl(const hkpShapeRayCastInput& input, hkpSha
     ++results.m_shapeKeyIndex;
     // A MOPP code over this shape's code bytes: only its info, its data array and its build type are set (no vtable or
     // reference count), and no destructor runs on it.
-    FNVD_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
     code.m_info.m_offset = m_codeInfoCopy;
     code.m_data.m_data = const_cast<uint8_t*>(m_moppData);
     code.m_data.m_size = m_moppDataSize;
@@ -339,7 +339,7 @@ void hkpMoppBvTreeShape::castRayWithCollectorImpl(
     body.m_motion = cdBody.m_motion;
     // A MOPP code over this shape's code bytes: only its info, its data array and its build type are set (no vtable or
     // reference count), and no destructor runs on it.
-    FNVD_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
     code.m_info.m_offset = m_codeInfoCopy;
     code.m_data.m_data = const_cast<uint8_t*>(m_moppData);
     code.m_data.m_size = m_moppDataSize;
@@ -376,7 +376,7 @@ hkVector4Comparison* hkpMoppBvTreeShape::castRayBundleImpl(
     ++output.m_outputs[3].m_shapeKeyIndex;
     // A MOPP code over this shape's code bytes: only its info, its data array and its build type are set (no vtable or
     // reference count), and no destructor runs on it.
-    FNVD_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
     code.m_info.m_offset = m_codeInfoCopy;
     code.m_data.m_data = const_cast<uint8_t*>(m_moppData);
     code.m_data.m_size = m_moppDataSize;

@@ -256,7 +256,7 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
         int32_t iNumObjs = m_usVertices;
         pkColor = static_cast<NiColorA*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiColorA)));
         if (pkColor) {
-            rt::eh_vector_constructor_iterator(pkColor, sizeof(NiColorA), iNumObjs, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(pkColor, sizeof(NiColorA), iNumObjs, &xfnv::constructElement<NiColorA>);
         }
         else {
             pkColor = nullptr;
@@ -305,7 +305,7 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
             static_cast<NiParticleInfo*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiParticleInfo)));
         if (pkParticleInfo) {
             rt::eh_vector_constructor_iterator(
-                pkParticleInfo, sizeof(NiParticleInfo), iNumInfos, &fnvd::constructElement<NiParticleInfo>
+                pkParticleInfo, sizeof(NiParticleInfo), iNumInfos, &xfnv::constructElement<NiParticleInfo>
             );
         }
         else {

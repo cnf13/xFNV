@@ -546,8 +546,8 @@ void FalloutRadio::ClearInactiveReceivers(bool bRemoveAll) {
 }
 
 void FalloutRadio::UpdateStations(bool abUpdateSignals) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, alertSound_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, alertSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, alertSound_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, alertSound, std::nullopt, std::nullopt);
     BSSimpleList<TESObjectREFR*> stationlist;
     BSSimpleList<float> stationDistances;
     if (FalloutRadio::bShutdown) {}
@@ -1044,9 +1044,9 @@ bool FalloutRadio::PipboyRadioEnable(bool abEnable) {
 }
 
 void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     NiPoint3 listenerLocation;
     bool bsong = false;
     bool bleadIn = false;
@@ -1720,13 +1720,13 @@ bool FalloutRadio::TunePipboyToStation(TESObjectREFR* apTargetStation, bool abFo
 }
 
 void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
     double v33;
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a4, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, alertSound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, alertSound, std::nullopt, std::nullopt);
     if (FalloutRadio::pCurrentPipboyStation) {
         int32_t StationPower = FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower();
         v33 = static_cast<double>(StationPower) / 100.0;
@@ -2068,12 +2068,12 @@ void FalloutRadio::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     uint32_t FormID_0 = apLoadGameBuffer->LoadFormID();
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
     FalloutRadio::pCurrentPipboyStation = static_cast<FalloutRadio::FORadioStation*>(
-        FNVD_DYNAMIC_CAST_VOID(TESBoundObject)(FormByNumericID, RTTI_TESForm, RTTI_TESBoundObject)
+        XFNV_DYNAMIC_CAST_VOID(TESBoundObject)(FormByNumericID, RTTI_TESForm, RTTI_TESBoundObject)
     );
     uint32_t v3 = apLoadGameBuffer->LoadFormID();
     TESForm* v4 = TESForm::GetFormByNumericID(v3);
     FalloutRadio::pLostPipboyStation = static_cast<FalloutRadio::FORadioStation*>(
-        FNVD_DYNAMIC_CAST_VOID(TESBoundObject)(v4, RTTI_TESForm, RTTI_TESBoundObject)
+        XFNV_DYNAMIC_CAST_VOID(TESBoundObject)(v4, RTTI_TESForm, RTTI_TESBoundObject)
     );
     if (apLoadGameBuffer->GetVersion() >= 10u) {
         uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();

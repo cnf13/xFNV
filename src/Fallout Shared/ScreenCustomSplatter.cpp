@@ -224,7 +224,7 @@ void ScreenCustomSplatter::Activate(
     float fSplatScale,
     float fOpacityScale
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, sName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, sName, std::nullopt, std::nullopt);
     BSSplatterData splatterData;
     if ((ScreenCustomSplatter::bEnabled) && (auiCount)) {
         BSCustomSplatterExtraData* ped;

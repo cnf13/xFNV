@@ -20,7 +20,7 @@ void ContainerItemExtra::AddToExtraDataList(ExtraDataList* apExtra, TESHealthFor
             }
             else {
                 if (FormType == 42) {
-#if FNVD_64BIT
+#if XFNV_64BIT
                     // The exe tests the union's dword, the whole global pointer here.
                     if (this->pOwnerGlobal) {
 #else
@@ -43,7 +43,7 @@ void ContainerItemExtra::AddToExtraDataList(ExtraDataList* apExtra, TESHealthFor
 
 TESGlobal* ContainerItemExtra::GetOwnerGlobal() {
     if (pOwnerForm && (((int32_t)pOwnerForm->GetFormType()) == 42)) {
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The exe returns the union's dword: the whole global pointer here.
         return pOwnerGlobal;
 #else
@@ -55,7 +55,7 @@ TESGlobal* ContainerItemExtra::GetOwnerGlobal() {
     }
 }
 
-#if FNVD_64BIT
+#if XFNV_64BIT
 // The whole union, the global pointer's high half included.
 ContainerItemExtra::ContainerItemExtra() : pOwnerForm(nullptr), pOwnerGlobal(nullptr), fHealthMult(1.0f) {}
 #else

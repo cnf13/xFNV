@@ -1,13 +1,13 @@
 #pragma once
 
-// FNVD_SYSTEM_ALLOC's pass-through (docs/ENVIRONMENT.md): the program's game allocators (MemoryManager,
+// XFNV_SYSTEM_ALLOC's pass-through (docs/ENVIRONMENT.md): the program's game allocators (MemoryManager,
 // ScrapHeap, Havok's router allocators) call these in place of their pools, heaps and arenas. The C runtime's heap,
-// or with FNVD_GUARD_ALLOC the guard-page heap of DebugHeap.h. Declarations only, so that src files include no
+// or with XFNV_GUARD_ALLOC the guard-page heap of DebugHeap.h. Declarations only, so that src files include no
 // Windows header through it.
 
 #include <stddef.h>
 
-namespace fnvd::sysalloc {
+namespace xfnv::sysalloc {
 
     // malloc, free, realloc, _msize.
     void* Allocate(size_t aSize);
@@ -19,4 +19,4 @@ namespace fnvd::sysalloc {
     void* AlignedAllocate(size_t aSize, size_t aAlign);
     void AlignedFree(void* apMem);
 
-} // namespace fnvd::sysalloc
+} // namespace xfnv::sysalloc

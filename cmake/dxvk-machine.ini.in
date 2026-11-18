@@ -5,15 +5,15 @@
 c = '@CMAKE_C_COMPILER@'
 cpp = '@CMAKE_CXX_COMPILER@'
 ar = '@CMAKE_AR@'
-glslang = '@FNVD_GLSLANG@'
+glslang = '@XFNV_GLSLANG@'
 touch = ['@CMAKE_COMMAND@', '-E', 'touch']
 
 [built-in options]
-c_args = [@FNVD_DXVK_TARGET_ARGS@]
-cpp_args = [@FNVD_DXVK_TARGET_ARGS@'-I@FNVD_DXVK_SOURCE@/subprojects/dxbc-spirv/submodules/spirv_headers/include']
-c_link_args = [@FNVD_DXVK_TARGET_ARGS@]
-cpp_link_args = [@FNVD_DXVK_TARGET_ARGS@]
-pkg_config_path = '@FNVD_DXVK_BUILD@-config'
+c_args = [@XFNV_DXVK_TARGET_ARGS@]
+cpp_args = [@XFNV_DXVK_TARGET_ARGS@'-I@XFNV_DXVK_SOURCE@/subprojects/dxbc-spirv/submodules/spirv_headers/include']
+c_link_args = [@XFNV_DXVK_TARGET_ARGS@]
+cpp_link_args = [@XFNV_DXVK_TARGET_ARGS@]
+pkg_config_path = '@XFNV_DXVK_BUILD@-config'
 cmake_prefix_path = '@CMAKE_BINARY_DIR@/sdl3'
 
-@FNVD_DXVK_HOST_MACHINE@
+@XFNV_DXVK_HOST_MACHINE@

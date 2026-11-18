@@ -762,7 +762,7 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
     uint16_t slevels;
     CSpeedTreeRT::SGeometry geom;
     uint16_t smaps;
-    FNVD_INLINED_LOCAL(NiPointer<STSPData>, spshaderData, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<STSPData>, spshaderData, std::nullopt, std::nullopt);
     geom.Init_00B029F0();
     textures.~STextures();
     ::new (&textures) CSpeedTreeRT::STextures;
@@ -1000,8 +1000,8 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
 void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
     float pDirection[3];
     CSpeedTreeRT::SGeometry v16;
-    FNVD_INLINED_LOCAL(NiPointer<NiTriShapeData>, spBillboardData, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<NiAlphaProperty>, ppropAlpha, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiTriShapeData>, spBillboardData, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAlphaProperty>, ppropAlpha, std::nullopt, std::nullopt);
     float fcameraPos[3];
     v16.Init_00B029F0();
     fcameraPos[0] = 0.0f;
@@ -1127,7 +1127,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
                 pNewData = reinterpret_cast<NiPointer<NiTriStripsData>*>(pDataBlock + 1);
                 rt::eh_vector_constructor_iterator(
                     pNewData, sizeof(NiPointer<NiTriStripsData>), slevels,
-                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
                 );
             }
             pspBranchData = pNewData;
@@ -1141,7 +1141,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
                 pNewProperties = reinterpret_cast<NiPointer<SpeedTreeBranchShaderProperty>*>(pPropertyBlock + 1);
                 rt::eh_vector_constructor_iterator(
                     pNewProperties, sizeof(NiPointer<SpeedTreeBranchShaderProperty>), slevels,
-                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
                 );
             }
             pspBranchShaderProperties = pNewProperties;
@@ -1172,7 +1172,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
                 pNewData = reinterpret_cast<NiPointer<NiTriShapeData>*>(pDataBlock + 1);
                 rt::eh_vector_constructor_iterator(
                     pNewData, sizeof(NiPointer<NiTriShapeData>), slevels,
-                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
                 );
             }
             pspLeafData = pNewData;
@@ -1186,7 +1186,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
                 pNewProperties = reinterpret_cast<NiPointer<SpeedTreeLeafShaderProperty>*>(pPropertyBlock + 1);
                 rt::eh_vector_constructor_iterator(
                     pNewProperties, sizeof(NiPointer<SpeedTreeLeafShaderProperty>), slevels,
-                    &fnvd::constructElement<NiPointer<NiRefObject>>, &fnvd::destructElement<NiPointer<NiRefObject>>
+                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
                 );
             }
             pspLeafShaderProperties = pNewProperties;

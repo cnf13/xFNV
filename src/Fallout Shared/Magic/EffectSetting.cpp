@@ -53,7 +53,7 @@ bool EffectSetting::Load(TESFile* apFile) {
             }
             case OBND_ID: static_cast<TESForm*>(this)->LoadObjectBound(apFile); break;
             case DATA_ID:
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The whole record: the file's 0x48 bytes are the 32-bit record.
                 ourMemset(&data, 0, sizeof(data));
 #else
@@ -61,7 +61,7 @@ bool EffectSetting::Load(TESFile* apFile) {
 #endif
                 data.fSpeed = 1.0f;
                 apFile->GetChunkData(&data, 0x48);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x48 bytes (fewer in older files), with a 4-byte form ID in each pointer field.
                 TESFile::WidenFormIDRecords(
                     &data, 1, apFile->GetChunkSize() < 0x48 ? apFile->GetChunkSize() : 0x48, sizeof(data),
@@ -637,7 +637,7 @@ void EffectSetting::SetEffectArchetype(int32_t a2) {
 }
 
 void EffectSetting::SetEffectName(const char* apEffectName) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apResult, std::nullopt, std::nullopt);
     BSStringT<char>* EffectName = GetEffectName(&apResult);
     int32_t v5 = EffectName->StrCmp(apEffectName, true);
     apResult.~BSStringT<char>();

@@ -62,7 +62,7 @@ float EffectItemList::GetCost(Actor* apActor) {
 }
 
 void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, apString, std::nullopt, std::nullopt);
     bool bDispositionFailure = false;
     StatsMenu::StatusDataList kStatusList;
     bool bMedicine = IsMedicine();
@@ -259,7 +259,7 @@ void EffectItemList::Save() {
 // The effect ID is set to 0 before the EFID chunk is read: GetChunkData writes at most the chunk's bytes, so a
 // zero-size chunk would otherwise leave it unwritten.
 void EffectItemList::Load(TESFile* apFile, const char* apSpellName) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, kEffectName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, kEffectName, std::nullopt, std::nullopt);
     CHUNK_ID eChunk = apFile->GetTESChunk();
     if (eChunk == CIDA_ID) {
         if (pLastEffect) {

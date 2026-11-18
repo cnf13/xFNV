@@ -293,7 +293,7 @@ void PathingRequest::SetRetryCount(int32_t aiRetryCount) {
 }
 
 void PathingRequest::Initialize(Actor* apActor) {
-    FNVD_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     PathingLocation* aLoc = ::new (&apLocation) PathingLocation(apActor);
     Origin.operator=(*aLoc);
     apLocation.~PathingLocation();
@@ -372,7 +372,7 @@ void PathingRequest::SetActorLockData(const ActorLockData& aLockData) {
 
 void PathingRequest::SetActorLockData(Actor* apActor) {
     ActorLockData kLockData;
-    LockData = *FNVD_RECONSTRUCT(ActorLockData)(&kLockData, apActor);
+    LockData = *XFNV_RECONSTRUCT(ActorLockData)(&kLockData, apActor);
 }
 
 void PathingRequest::SetCanSwim(bool abCanSwim) {

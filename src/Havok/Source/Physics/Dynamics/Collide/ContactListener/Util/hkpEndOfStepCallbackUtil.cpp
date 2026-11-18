@@ -174,7 +174,7 @@ void hkpEndOfStepCallbackUtil::removeCollisions(hkArray<Collision>& removedColli
     }
     const int32_t kElementSize = static_cast<int32_t>(sizeof(T));
     const int32_t kOriginalRemovedSize = removedCollisions.m_size;
-    FNVD_INLINED_LOCAL(hkArray<T>, filtered, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<T>, filtered, std::nullopt, std::nullopt);
     filtered.m_data = nullptr;
     filtered.m_size = 0;
     filtered.m_capacityAndFlags = hkArrayBase<T>::DONT_DEALLOCATE_FLAG;
@@ -258,7 +258,7 @@ void hkpEndOfStepCallbackUtil::mergeCollisions(hkArray<NewCollision>& newCollisi
     }
     const int32_t kElementSize = static_cast<int32_t>(sizeof(Collision));
     int32_t numElements = newCollisions.m_size + collisions.m_size;
-    FNVD_INLINED_LOCAL(hkArray<Collision>, merged, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<Collision>, merged, std::nullopt, std::nullopt);
     merged.m_data = nullptr;
     merged.m_size = 0;
     merged.m_capacityAndFlags = hkArrayBase<Collision>::DONT_DEALLOCATE_FLAG;

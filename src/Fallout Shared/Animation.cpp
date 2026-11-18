@@ -3133,7 +3133,7 @@ bool Animation::ShouldQueueSequenceCloning() {
 }
 
 bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
-    FNVD_INLINED_LOCAL(NiFixedString, v18, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v18, std::nullopt, std::nullopt);
     ANIM_GROUP_ENUM eanimGroup;
     uint16_t sanimGroup;
     NiPointer<TESAnimGroup> spanimGroup(apKFModel->GetAnimGroup());

@@ -125,7 +125,7 @@ void TESArrowTargetListener::AddArrowTarget(hkVector4& aArrowCenterOfMassWorld, 
     kBodyInverse.~hkTransform();
     ::new (&kBodyInverse) hkTransform;
     alignas(16) hkTransform kArrowTransform;
-    FNVD_RECONSTRUCT(hkTransform)(&kArrowTransform, hkQuaternion::getIdentity(), aArrowCenterOfMassWorld);
+    XFNV_RECONSTRUCT(hkTransform)(&kArrowTransform, hkQuaternion::getIdentity(), aArrowCenterOfMassWorld);
     alignas(16) hkTransform kArrowLocal;
     kArrowLocal.~hkTransform();
     ::new (&kArrowLocal) hkTransform;
@@ -133,9 +133,9 @@ void TESArrowTargetListener::AddArrowTarget(hkVector4& aArrowCenterOfMassWorld, 
     kBodyInverse.setInverse(kBodyTransform);
     kArrowLocal.setMul(kBodyInverse, kArrowTransform);
     alignas(16) hkVector4 kArrowMoment;
-    FNVD_RECONSTRUCT(hkVector4)(&kArrowMoment, kArrowLocal.getTranslation());
+    XFNV_RECONSTRUCT(hkVector4)(&kArrowMoment, kArrowLocal.getTranslation());
     alignas(16) hkSimdReal kFakeMass;
-    FNVD_RECONSTRUCT(hkSimdReal)(&kFakeMass, fArrowFakeMass.Float());
+    XFNV_RECONSTRUCT(hkSimdReal)(&kFakeMass, fArrowFakeMass.Float());
     kArrowMoment.mul4(kFakeMass);
     alignas(16) hkVector4 kCenterOfMass;
     kCenterOfMass.~hkVector4();
@@ -188,7 +188,7 @@ void TESArrowTargetListener::RemoveArrowTarget(hkVector4& aArrowCenterOfMassWorl
     kBodyInverse.~hkTransform();
     ::new (&kBodyInverse) hkTransform;
     alignas(16) hkTransform kArrowTransform;
-    FNVD_RECONSTRUCT(hkTransform)(&kArrowTransform, hkQuaternion::getIdentity(), aArrowCenterOfMassWorld);
+    XFNV_RECONSTRUCT(hkTransform)(&kArrowTransform, hkQuaternion::getIdentity(), aArrowCenterOfMassWorld);
     alignas(16) hkTransform kArrowLocal;
     kArrowLocal.~hkTransform();
     ::new (&kArrowLocal) hkTransform;
@@ -196,9 +196,9 @@ void TESArrowTargetListener::RemoveArrowTarget(hkVector4& aArrowCenterOfMassWorl
     kBodyInverse.setInverse(kBodyTransform);
     kArrowLocal.setMul(kBodyInverse, kArrowTransform);
     alignas(16) hkVector4 kArrowMoment;
-    FNVD_RECONSTRUCT(hkVector4)(&kArrowMoment, kArrowLocal.getTranslation());
+    XFNV_RECONSTRUCT(hkVector4)(&kArrowMoment, kArrowLocal.getTranslation());
     alignas(16) hkSimdReal kFakeMass;
-    FNVD_RECONSTRUCT(hkSimdReal)(&kFakeMass, fArrowFakeMass.Float());
+    XFNV_RECONSTRUCT(hkSimdReal)(&kFakeMass, fArrowFakeMass.Float());
     kArrowMoment.mul4(kFakeMass);
     alignas(16) hkVector4 kCenterOfMass;
     kCenterOfMass.~hkVector4();

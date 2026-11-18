@@ -222,7 +222,7 @@ INITIAL_DATA_TYPE BGSSaveLoadInitialData::SaveInitialData(
     if (apForm->IsReference() && aiChangeFlags.CheckFlags(CHANGE_REFR_HAVOK_MOVE)) {
         TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
         BGSLoadGameSubBuffer kSavedHavokData;
-        FNVD_RECONSTRUCT(BGSLoadGameSubBuffer)(&kSavedHavokData, pRef->m_Extra.GetSavedHavokData());
+        XFNV_RECONSTRUCT(BGSLoadGameSubBuffer)(&kSavedHavokData, pRef->m_Extra.GetSavedHavokData());
         if (!pRef->Get3D() && kSavedHavokData.pBuffer) {
             kSavedHavokData.SaveGame(apSaveGameBuffer);
         }

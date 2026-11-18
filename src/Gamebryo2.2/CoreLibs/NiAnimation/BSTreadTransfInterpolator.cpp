@@ -74,7 +74,7 @@ void BSTreadTransfInterpolator::LoadBinary(NiStream& arStream) {
         pLinks = reinterpret_cast<BSTreadTransfInterpolator::LinkInfo*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
             pLinks, sizeof(BSTreadTransfInterpolator::LinkInfo), static_cast<int32_t>(uiCount),
-            &fnvd::constructElement<BSTreadTransfInterpolator::LinkInfo>
+            &xfnv::constructElement<BSTreadTransfInterpolator::LinkInfo>
         );
     }
     else {
@@ -223,7 +223,7 @@ void BSTreadTransfInterpolator::CopyMembers(BSTreadTransfInterpolator* pkDest, N
         *puiNewCookie = uiNumLinks;
         rt::eh_vector_constructor_iterator(
             pNewLinks, sizeof(BSTreadTransfInterpolator::LinkInfo), static_cast<int32_t>(uiNumLinks),
-            &fnvd::constructElement<BSTreadTransfInterpolator::LinkInfo>
+            &xfnv::constructElement<BSTreadTransfInterpolator::LinkInfo>
         );
     }
     else {

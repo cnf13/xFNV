@@ -136,7 +136,7 @@ void hkpAabbTreeWorldManager::castRay(
     HK_TIMER_BEGIN_LIST("CastRay", "ActiveTree");
     hkKdTree* kdTree = m_kdTree;
     if (kdTree) {
-        FNVD_INLINED_LOCAL(hkpKdTreeCollidableRaycaster, collector, hkpKdTreeCollidableRaycaster_vftable, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpKdTreeCollidableRaycaster, collector, hkpKdTreeCollidableRaycaster_vftable, std::nullopt);
         collector.m_collector = nullptr;
         collector.m_output = &output;
         collector.m_input = &input;
@@ -220,7 +220,7 @@ void hkpAabbTreeWorldManager::linearCast(
 ) {
     hkKdTree* kdTree = m_kdTree;
     if (kdTree) {
-        FNVD_INLINED_LOCAL(hkpKdTreeWorldLinearCaster, kdCaster, hkpKdTreeWorldLinearCaster_vftable, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpKdTreeWorldLinearCaster, kdCaster, hkpKdTreeWorldLinearCaster_vftable, std::nullopt);
         kdCaster.m_shapeInput.m_maxExtraPenetration = 1.1920929e-07f;
         kdCaster.m_shapeInput.m_weldClosestPoints.m_storage = 0;
         kdCaster.linearCast(kdTree, collA, input, filter, collInput, config, castCollector, startPointCollector);
@@ -318,7 +318,7 @@ void hkpAabbTreeWorldManager::inactiveEntityMovedCallback(hkpEntity* entity) {
 // HK_TIMER_BEGIN_LIST, HK_TIMER_SPLIT_LIST and HK_TIMER_END_LIST write into the stream's raw buffer, which is treated
 // as untyped (hence the casts). The inactive list starts empty (no storage, not ours). 0xFFFF is s_invalidIdx.
 void hkpAabbTreeWorldManager::fullBuild(hkJobQueue* jobQueue, hkJobThreadPool* jobThreadPool) {
-    FNVD_INLINED_LOCAL(hkArray<const hkpCollidable*>, inactiveList, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<const hkpCollidable*>, inactiveList, std::nullopt, std::nullopt);
     inactiveList.m_data = nullptr;
     inactiveList.m_size = 0;
     inactiveList.m_capacityAndFlags = hkArrayBase<const hkpCollidable*>::DONT_DEALLOCATE_FLAG;
@@ -458,7 +458,7 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
 
     // EXE-INLINED none: hkArray<unsigned short>::hkArray
     using leafIdx_t = hkArray<uint16_t, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(leafIdx_t, leafIdx, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(leafIdx_t, leafIdx, std::nullopt, std::nullopt);
     leafIdx.m_data = nullptr;
     leafIdx.m_size = 0;
     leafIdx.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
@@ -592,7 +592,7 @@ void hkpAabbTreeWorldManager::buildKdTree(
         m_kdTreeJobpHeader->m_openJobs = 4;
 
         // EXE-INLINED none: hkArray<int>::hkArray(int)
-        FNVD_INLINED_LOCAL(hkArray<int32_t>, branchDepths, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<int32_t>, branchDepths, std::nullopt, std::nullopt);
         int32_t numBranchDepths = 4;
         branchDepths.m_data = hkMemoryRouter::getInstance().heap()._bufAlloc<int32_t>(numBranchDepths);
         branchDepths.m_size = numBranchDepths;
@@ -603,7 +603,7 @@ void hkpAabbTreeWorldManager::buildKdTree(
             branchDepths.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
         }
         // EXE-INLINED none: hkArray<int>::hkArray(int)
-        FNVD_INLINED_LOCAL(hkArray<int32_t>, subJobSizes, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<int32_t>, subJobSizes, std::nullopt, std::nullopt);
         int32_t numSubJobSizes = 4;
         subJobSizes.m_data = hkMemoryRouter::getInstance().heap()._bufAlloc<int32_t>(numSubJobSizes);
         subJobSizes.m_size = numSubJobSizes;

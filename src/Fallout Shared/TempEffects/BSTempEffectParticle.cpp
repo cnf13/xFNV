@@ -254,7 +254,7 @@ void BSTempEffectParticle::SaveGame() {
 }
 
 bool BSTempEffectParticle::LoadGame() {
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     uint32_t iblockHeader;
     char modelPath[260];
     NiPoint3 loc;
@@ -480,8 +480,8 @@ void BSTempEffectParticle::Init(
 }
 
 void BSTempEffectParticle::StartSounds() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kHandle2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, kHandle1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle1, std::nullopt, std::nullopt);
     StopSounds();
     if (spParticleObject.m_pObject && pDecalImpactData) {
         if (pDecalImpactData->pSound1) {

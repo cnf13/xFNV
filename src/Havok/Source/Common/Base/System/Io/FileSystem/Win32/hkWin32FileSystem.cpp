@@ -14,8 +14,8 @@
 // Lists a directory, appending an entry per file and subdirectory; 0 when the path is a directory, 1 when it is not.
 // Uses std::filesystem and platform::FindFiles, in the same order as the game's attribute check and find calls.
 hkResult hkWin32ListDirectory(const char* pathIn, hkFileSystem::DirectoryListing& directoryListingOut) {
-    FNVD_INLINED_LOCAL(hkStringBuf, pathBuffer, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(hkStringBuf, nameBuffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, pathBuffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, nameBuffer, std::nullopt, std::nullopt);
 
     ::new (&pathBuffer) hkStringBuf;
     ::new (&nameBuffer) hkStringBuf(pathIn);

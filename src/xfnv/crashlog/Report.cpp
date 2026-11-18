@@ -3,7 +3,7 @@
 
 #include "xfnv/crashlog/CrashLog.hpp"
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
 
     void
     registers(Out& arOut, const Register* apRegisters, size_t auiCount, uintptr_t auiStackLow, uintptr_t auiStackHigh) {
@@ -72,4 +72,4 @@ namespace fnvd::crashlog {
         }
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

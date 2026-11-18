@@ -163,7 +163,7 @@
 #include <bit>
 #include <xmmintrin.h>
 
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
 #include "xfnv/debugheap/SystemAlloc.h"
 #endif
 
@@ -224,11 +224,11 @@ void bhkWorld::InitSystem() {
         // The stack is the address of the static buffer pStack, moved up to the next 16-byte boundary with its size cut
         // to match. The address's low bits are tested as an integer.
         char* pStackStart = bhkWorld::pStack;
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
         // The stack is a pass-through allocation (never freed, as the static buffer is not), so that with guarded
         // allocation a guard page follows its end. Its blocks are bumped and popped inline in ~70 files, so they are
         // not tracked one by one.
-        pStackStart = static_cast<char*>(fnvd::sysalloc::AlignedAllocate(0x60000, 16));
+        pStackStart = static_cast<char*>(xfnv::sysalloc::AlignedAllocate(0x60000, 16));
 #endif
         int32_t iStackSize = 0x60000;
         uint32_t uiMisalign = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pStackStart)) & 0xF;
@@ -682,7 +682,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
         if (pAllCollector) {
             char* pCache = arPickData.pCache;
             if (pCache) {
-                FNVD_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
+                XFNV_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
                 kCaster.m_shapeInput.m_filterInfo = 0;
                 kCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
                 kCaster.castRay(*pWorld->m_broadPhase, arPickData, pWorld->m_collisionFilter, pCache, *pAllCollector);
@@ -713,7 +713,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
                 char* pCache = arPickData.pCache;
                 if (pCache) {
                     // As above: the caster's constructor and destructor are inline.
-                    FNVD_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
+                    XFNV_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
                     kCaster.m_shapeInput.m_filterInfo = 0;
                     kCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
                     kCaster.castRay(
@@ -1366,7 +1366,7 @@ void bhkWorld::SetVisualDebugger(bool abTF) {
     if (pDebugger) {
         return;
     }
-    FNVD_INLINED_LOCAL(hkArray<hkProcessContext*>, contexts, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkProcessContext*>, contexts, std::nullopt, std::nullopt);
     contexts.m_data = nullptr;
     contexts.m_size = 0;
     contexts.m_capacityAndFlags = hkArrayBase<hkProcessContext*>::DONT_DEALLOCATE_FLAG;
@@ -1604,7 +1604,7 @@ void bhkWorld::AddBatchedActions() {
             for (uint32_t i = 0; i < iActionBatchCount; ++i) {
                 hkpAction* pAction = pActionBatch[i];
                 if (pAction && !pAction->m_world) {
-                    FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
                     entities.m_data = nullptr;
                     entities.m_size = 0;
                     entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
@@ -1931,7 +1931,7 @@ void bhkWorld::DeactivateAllIslands() {
         hkpWorldOperationUtil::cleanupDirtyIslands(pWorld);
         GethkWorld();
         // EXE-INLINED none: hkArray<hkpSimulationIsland*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, kIslands, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, kIslands, std::nullopt, std::nullopt);
         kIslands.m_data = nullptr;
         kIslands.m_size = 0;
         kIslands.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG);
@@ -2884,7 +2884,7 @@ void bhkTaskletManagerCallback::bhkThreadState::CreateThreadMemory() {
 void bhkTaskletManagerCallback::bhkThreadState::Destruct(bhkThreadState* apThis) {
     rt::eh_vector_destructor_iterator(
         apThis->Elem, sizeof(bhkThreadStateElem), 16,
-        &fnvd::destructElement<bhkTaskletManagerCallback::bhkThreadStateElem>
+        &xfnv::destructElement<bhkTaskletManagerCallback::bhkThreadStateElem>
     );
     DeleteCriticalSection(&apThis->StateLock);
 }

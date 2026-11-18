@@ -461,9 +461,9 @@ bool NiShaderConstantMap::ParseKeyName(
 // Allocates arrays of 136 predefined and 25 object mappings with NiNew, each entry assigned a temporary
 // PredefinedMapping(ID, NiFixedString(name)) whose name and string are then released.
 void NiShaderConstantMap::_SDMInit() {
-    FNVD_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, kConstructedString, std::nullopt, std::nullopt);
-    alignas(8) FNVD_INLINED_LOCAL(PredefinedMapping, kTemp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kConstructedString, std::nullopt, std::nullopt);
+    alignas(8) XFNV_INLINED_LOCAL(PredefinedMapping, kTemp, std::nullopt, std::nullopt);
 
     ms_uiPredefinedMappingCount = SCM_DEF_COUNT + 20;
     size_t* puiBlock = static_cast<size_t*>(
@@ -476,7 +476,7 @@ void NiShaderConstantMap::_SDMInit() {
         pkMappings = reinterpret_cast<PredefinedMapping*>(puiBlock + 1);
         rt::eh_vector_constructor_iterator(
             pkMappings, sizeof(PredefinedMapping), SCM_DEF_COUNT + 20,
-            &fnvd::constructElement<NiShaderConstantMap::PredefinedMapping>
+            &xfnv::constructElement<NiShaderConstantMap::PredefinedMapping>
         );
     }
     ms_pkPredefinedMappings = pkMappings;
@@ -1527,7 +1527,7 @@ void NiShaderConstantMap::_SDMInit() {
         pkMappings = reinterpret_cast<PredefinedMapping*>(puiBlock + 1);
         rt::eh_vector_constructor_iterator(
             pkMappings, sizeof(PredefinedMapping), SCM_OBJ_COUNT,
-            &fnvd::constructElement<NiShaderConstantMap::PredefinedMapping>
+            &xfnv::constructElement<NiShaderConstantMap::PredefinedMapping>
         );
     }
     ms_pkObjectMappings = pkMappings;

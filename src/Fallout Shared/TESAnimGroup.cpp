@@ -1018,13 +1018,13 @@ void TESAnimGroup::PlaySounds(
     float afStopTime,
     BSAnimGroupSequence* apSequence
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t inumKeys_2;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand_4, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand_4, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand_2, std::nullopt, std::nullopt);
     uint32_t inumKeys;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     float v86 = 1.0f;
     Animation* v87 = apRef->GetAnimation();
     bool v85 = afStartTime > static_cast<double>(afStopTime);

@@ -45,7 +45,7 @@ hkDataObjectImpl* hkDataObjectNative::asObject(const char* name) {
             // A pointer member: the pointer it holds is the object.
             void* pAddress = &kMember.asPointer(0);
             const hkClass* pClass = kClassMember.getClass();
-#if FNVD_64BIT
+#if XFNV_64BIT
             kVariant = DBB140(*static_cast<void**>(pAddress), pClass, m_world->m_vtable, m_world->m_reg);
 #else
             // DBB140's variant comes back as edx:eax: the object in the low word, its class in the high word.
@@ -60,7 +60,7 @@ hkDataObjectImpl* hkDataObjectNative::asObject(const char* name) {
             // A struct member: the member's own address is the object.
             void* pAddress = kMember.getAddress();
             const hkClass* pClass = kClassMember.getClass();
-#if FNVD_64BIT
+#if XFNV_64BIT
             kVariant = DBB140(pAddress, pClass, m_world->m_vtable, m_world->m_reg);
 #else
             uint64_t uiVariant = DBB140(pAddress, pClass, m_world->m_vtable, m_world->m_reg);
@@ -81,7 +81,7 @@ hkDataObjectImpl* hkDataObjectNative::asObject(const char* name) {
 
 const char* hkDataArrayNative::asString(int32_t index) const {
     int32_t v2 = m_nativeType;
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The element is the string pointer (29), or the pointer with its low bit as a flag (33), read at its own width.
     const void* pElement = static_cast<const char*>(m_address) + (index * m_elementStride);
     if (v2 == 29) {
@@ -110,7 +110,7 @@ const char* hkDataArrayNative::asString(int32_t index) const {
 
 // The variant comes back as edx:eax (the declaration's comment): the object in the low word, its class in the high
 // word, both zero for no object. The 64-bit program returns the hkVariant itself.
-#if FNVD_64BIT
+#if XFNV_64BIT
 hkVariant hkDataObjectNative::DBB140(
     void* apAddress,
     const hkClass* apClass,
@@ -127,9 +127,9 @@ uint64_t hkDataObjectNative::DBB140(
 #endif
 {
     hkBool kHasVtable;
-    FNVD_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char buf[512];
-#if FNVD_64BIT
+#if XFNV_64BIT
     hkVariant kResult;
     kResult.m_object = nullptr;
     kResult.m_class = nullptr;
@@ -174,8 +174,8 @@ uint64_t hkDataObjectNative::DBB140(
     hkError::s_instance->message(
         hkError::MESSAGE_WARNING, 0x3476D70F, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 55
     );
-    FNVD_DESTRUCT(hkOstream)(&kStream);
-#if FNVD_64BIT
+    XFNV_DESTRUCT(hkOstream)(&kStream);
+#if XFNV_64BIT
     return kResult;
 #else
     return 0;
@@ -191,7 +191,7 @@ hkDataObjectImpl* hkDataArrayNative::asObject(int32_t index) const {
     kVariant.m_class = nullptr;
     switch (m_nativeType) {
         case hkClassMember::TYPE_POINTER: {
-#if FNVD_64BIT
+#if XFNV_64BIT
             // A pointer element: the pointer it holds is the object.
             kVariant = hkDataObjectNative::DBB140(
                 *static_cast<void* const*>(
@@ -216,7 +216,7 @@ hkDataObjectImpl* hkDataArrayNative::asObject(int32_t index) const {
         }
         case hkClassMember::TYPE_STRUCT: {
             // A struct element: the element is the object. The source's const_cast: a variant's object is not const.
-#if FNVD_64BIT
+#if XFNV_64BIT
             kVariant = hkDataObjectNative::DBB140(
                 const_cast<char*>(static_cast<const char*>(m_address)) + m_elementStride * index, m_class,
                 m_world->m_vtable, m_world->m_reg
@@ -344,7 +344,7 @@ void hkDataWorldNative::findAllClasses(hkArray<hkDataClassImpl*>& classesOut) co
     if (!m_reg) {
         return;
     }
-    FNVD_INLINED_LOCAL(hkArray<const hkClass*>, kClasses, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<const hkClass*>, kClasses, std::nullopt, std::nullopt);
     kClasses.m_data = nullptr;
     kClasses.m_size = 0;
     kClasses.m_capacityAndFlags = hkArrayBase<const hkClass*>::DONT_DEALLOCATE_FLAG;
@@ -449,7 +449,7 @@ void hkDataWorldNative::setClassRegistry(const hkClassNameRegistry* r) {
 // The contents variant: object, of the registered class of its most derived type for a class with a vtable, else of
 // klass's name. A class the registry does not know is reported and the contents emptied.
 void hkDataWorldNative::setContents(void* object, const hkClass& klass) {
-    FNVD_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     hkBool bHasVtable;
     const hkClass* pClass;
     m_contents.m_object = object;
@@ -475,7 +475,7 @@ void hkDataWorldNative::setContents(void* object, const hkClass& klass) {
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, 0x1800473B, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 764
         );
-        FNVD_DESTRUCT(hkOstream)(&kStream);
+        XFNV_DESTRUCT(hkOstream)(&kStream);
         m_contents.m_object = nullptr;
     }
 }
@@ -964,7 +964,7 @@ float hkDataObjectNative::asReal(const char* name) {
 // The native object of the variant in apWorld: the variant's class becomes the class record of the world's class of
 // that name; a class the world does not know is reported and the variant emptied.
 hkDataObjectImpl* hkDataObjectNative::DBB260(const hkDataWorldNative* apWorld, hkVariant* apVariant) {
-    FNVD_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     if (apVariant->m_class) {
         // The source's cast: a native world's classes are hkDataClassNative records.
         const hkDataClassNative* pClass =
@@ -981,7 +981,7 @@ hkDataObjectImpl* hkDataObjectNative::DBB260(const hkDataWorldNative* apWorld, h
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x1800473A, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 711
             );
-            FNVD_DESTRUCT(hkOstream)(&kStream);
+            XFNV_DESTRUCT(hkOstream)(&kStream);
             apVariant->m_object = nullptr;
             apVariant->m_class = nullptr;
         }

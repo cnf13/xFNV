@@ -104,7 +104,7 @@ bool inRange(int32_t num, int32_t lo, int32_t hi) {
 // tell() comes first, then an hkLocalArray<char> of pad bytes supplies the zeros written.
 void objectCopierPadUp(hkStreamWriter* w, int32_t pad) {
     const int32_t pos = w->tell();
-    FNVD_INLINED_LOCAL(hkLocalArray<char>, zeros, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<char>, zeros, std::nullopt, std::nullopt);
     zeros.m_data = nullptr;
     zeros.m_size = 0;
     zeros.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
@@ -272,7 +272,7 @@ void hkObjectCopier::writeZero(hkOArchive& oa, const hkClassMember& memberOut) {
     }
 
     // EXE-INLINED none: hkLocalArray<char>::hkLocalArray
-    FNVD_INLINED_LOCAL(hkArray<char>, kZeroes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<char>, kZeroes, std::nullopt, std::nullopt);
     kZeroes.m_data = nullptr;
     kZeroes.m_size = 0;
     kZeroes.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
@@ -495,7 +495,7 @@ int32_t hkObjectCopier::saveBody(const void* dataIn, const hkClass& klassIn, hkO
                     for (int32_t i = 0; i < count; ++i) {
                         int32_t srcValue = srcMember.getEnumValue(srcAddress);
                         using bitNames_t = hkArray<const char*, hkContainerHeapAllocator>;
-                        FNVD_INLINED_LOCAL(bitNames_t, bitNames, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(bitNames_t, bitNames, std::nullopt, std::nullopt);
                         bitNames.m_data = nullptr;
                         bitNames.m_size = 0;
                         bitNames.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;

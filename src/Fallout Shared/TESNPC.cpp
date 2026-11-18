@@ -369,7 +369,7 @@ bool TESNPC::Load(TESFile* apFile) {
                 FACTION_RANK temp;
                 ourMemset(&temp, 0, sizeof(temp));
                 apFile->GetChunkData(&temp, 8);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 8 bytes, the faction's 4-byte form ID first.
                 TESFile::WidenFormIDRecords(&temp, 1, 8, sizeof(temp), {{0, offsetof(FACTION_RANK, pFaction)}});
 #endif
@@ -894,8 +894,8 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     // new[]'s cookie: the element count stored just before the array.
                     pBlock[0] = 4;
                     rt::eh_vector_constructor_iterator(
-                        pBlock + 1, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                        &fnvd::destructElement<FR2MatrixVTC<float>>
+                        pBlock + 1, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+                        &xfnv::destructElement<FR2MatrixVTC<float>>
                     );
                     // The matrices follow the cookie: raw new[] memory treated as the array.
                     pNew = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(pBlock + 1);
@@ -1873,8 +1873,8 @@ int32_t TESNPC::GetActorValue(ActorValue::Index aiWhich) {
 }
 
 void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
-    FNVD_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPointer<NiTriBasedGeom> spLeftEye(static_cast<NiTriBasedGeom*>(nullptr));
     NiPointer<NiTriBasedGeom> spRightEye(static_cast<NiTriBasedGeom*>(nullptr));
     if (spHeadBiped.m_pObject) {
@@ -3040,16 +3040,16 @@ void TESNPC::LoadFaceGen(Character* apCharacter) {
 }
 
 void TESNPC::RandomizeHead(bool a2, bool a3, bool a4) {
-    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, v21, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, addr, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, v21, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, addr, std::nullopt, std::nullopt);
     float v24;
     rt::eh_vector_constructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-        &fnvd::destructElement<FR2MatrixVTC<float>>
+        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+        &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     rt::eh_vector_constructor_iterator(
-        v21, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-        &fnvd::destructElement<FR2MatrixVTC<float>>
+        v21, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+        &xfnv::destructElement<FR2MatrixVTC<float>>
     );
     BSFaceGenManager::InitFaceGenCoord(&v21);
     TESActorBase::SEX Sex = GetSex();
@@ -3100,9 +3100,9 @@ void TESNPC::RandomizeHead(bool a2, bool a3, bool a4) {
         BSFaceGenManager::CopyFaceGenCoord(&v21, v9, false, false);
         spBodyModTexture.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
     }
-    rt::eh_vector_destructor_iterator(v21, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>);
+    rt::eh_vector_destructor_iterator(v21, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>);
     rt::eh_vector_destructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
     );
 }
 

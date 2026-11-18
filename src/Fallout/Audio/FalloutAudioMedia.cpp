@@ -82,7 +82,7 @@ void FalloutAudioMedia::MediaOpen(
     float afAttenuation,
     uint32_t auiSynchTime
 ) {
-    FNVD_INLINED_LOCAL(BSFile, fileCheck, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSFile, fileCheck, std::nullopt, std::nullopt);
     FalloutAudioMedia::MediaAccessEnter();
     if (aeMediaType == MEDIA_NONE) {
         FalloutAudioMedia::MediaClear();

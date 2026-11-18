@@ -432,7 +432,7 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                             float v10 = RandomFloat0To1();
                             hkVector4 normal(v10, a3, a4, 0.0f);
                             normal.fastNormalize3();
-                            FNVD_RECONSTRUCT(hkVector4)(
+                            XFNV_RECONSTRUCT(hkVector4)(
                                 &vLocation,
                                 (&collArray->operator[]<hkpRootCdBodyPair>(i))
                                     ->m_rootCollidableB->m_motion.pState->m_transform.m_translation
@@ -466,8 +466,8 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                         if (v54 >= static_cast<double>(v41)) {
                             HavokMaterialType Material;
                             alignas(16) NiPoint3 dum_2;
-                            FNVD_RECONSTRUCT(hkVector4)(&vLV, pRigidBody->getLinearVelocity());
-                            FNVD_RECONSTRUCT(hkVector4)(&vAV, pRigidBody->getAngularVelocity());
+                            XFNV_RECONSTRUCT(hkVector4)(&vLV, pRigidBody->getLinearVelocity());
+                            XFNV_RECONSTRUCT(hkVector4)(&vAV, pRigidBody->getAngularVelocity());
                             if (vLV.lengthSquared3().operator float() > 1.0) {
                                 double v36 = vLV.length3().operator float();
                                 int32_t v35 = RandomInt(iLowDamp.Int(), gs_iHighDamp.Int());

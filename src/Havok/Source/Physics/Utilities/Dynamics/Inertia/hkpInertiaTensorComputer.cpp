@@ -255,7 +255,7 @@ void computeRecursiveShapeVolumeMassProperties(
         case HK_SHAPE_CONVEX_VERTICES: {
             const hkpConvexShape* convex = static_cast<const hkpConvexShape*>(shape);
             // EXE-INLINED none: hkArray<hkVector4>::hkArray
-            FNVD_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
             vertices.m_data = nullptr;
             vertices.m_size = 0;
             vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -387,7 +387,7 @@ void computeRecursiveShapeVolumeMassProperties(
 
         // EXE-INLINED none: hkInplaceArrayAligned16<hkpMassElement, 2>::hkInplaceArrayAligned16
         using elements_t = hkInplaceArrayAligned16<hkpMassElement, 2>;
-        FNVD_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
         // The inline storage is raw bytes until the elements are constructed in it.
         elements.m_data = reinterpret_cast<hkpMassElement*>(elements.m_storage);
         elements.m_size = 0;
@@ -532,7 +532,7 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
     using ChildArray = hkInplaceArray<const hkpConstraintInstance*, 16>;
     using ChildArrayBase = hkArrayBase<const hkpConstraintInstance*>;
     // EXE-INLINED none: hkInplaceArray<const hkpConstraintInstance*, 16>::hkInplaceArray
-    alignas(16) FNVD_INLINED_LOCAL(ChildArray, childConstraints, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(ChildArray, childConstraints, std::nullopt, std::nullopt);
     childConstraints.m_data = childConstraints.m_storage;
     childConstraints.m_size = 0;
     childConstraints.m_capacityAndFlags = 16 | ChildArrayBase::DONT_DEALLOCATE_FLAG;
@@ -1185,7 +1185,7 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
         normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), normal.m_quad);
 
         using VertexArray = hkInplaceArray<hkVector4, 6, hkContainerHeapAllocator>;
-        FNVD_INLINED_LOCAL(VertexArray, vertices, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(VertexArray, vertices, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkInplaceArray<hkVector4, 6>::hkInplaceArray
         vertices.m_data = vertices.m_storage;
         vertices.m_size = 0;
@@ -1401,7 +1401,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
 
     // EXE-INLINED none: hkInplaceArray<hkpMassElement, 3>::hkInplaceArray
     using elements_t = hkInplaceArray<hkpMassElement, 3>;
-    FNVD_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
     elements.m_data = elements.m_storage;
     elements.m_size = 0;
     elements.m_capacityAndFlags = hkArrayBase<hkpMassElement>::DONT_DEALLOCATE_FLAG | 3;
@@ -1689,7 +1689,7 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
 
     // EXE-INLINED none: hkInplaceArray<hkpMassElement, 1>::hkInplaceArray
     using elements_t = hkInplaceArray<hkpMassElement, 1>;
-    FNVD_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
     elements.m_data = elements.m_storage;
     elements.m_size = 0;
     elements.m_capacityAndFlags = hkArrayBase<hkpMassElement>::DONT_DEALLOCATE_FLAG | 1;
@@ -2302,7 +2302,7 @@ hkResult hkpInertiaTensorComputer::computeVertexCloudMassProperties(
         return HK_FAILURE;
     }
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, verts, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, verts, std::nullopt, std::nullopt);
     verts.m_data = nullptr;
     verts.m_size = 0;
     verts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -2391,7 +2391,7 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
     const int32_t numTriangles = geom->m_triangles.m_size;
     // EXE-INLINED none: hkArray<float>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<float>, triArea, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<float>, triArea, std::nullopt, std::nullopt);
     triArea.m_data = nullptr;
     triArea.m_size = 0;
     triArea.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
@@ -2599,7 +2599,7 @@ void hkpInertiaTensorComputer::optimizeInertiasOfConstraintTree(
     hkpRigidBody* rootBody,
     float inertiaFactorHint
 ) {
-    FNVD_INLINED_LOCAL(hkLocalArray<const hkpConstraintInstance*>, constrs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<const hkpConstraintInstance*>, constrs, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<const hkpConstraintInstance*>::hkLocalArray(numConstraints)
         constrs.m_data = nullptr;

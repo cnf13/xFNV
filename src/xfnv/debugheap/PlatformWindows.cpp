@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <malloc.h>
 
-namespace fnvd::debugheap::platform {
+namespace xfnv::debugheap::platform {
     namespace {
 
         HANDLE gLog = INVALID_HANDLE_VALUE;
@@ -102,7 +102,7 @@ namespace fnvd::debugheap::platform {
 
     void OpenLog() {
         gLog = CreateFileA(
-            "fnvd_debugheap.log", GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr
+            "xfnv_debugheap.log", GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr
         );
     }
 
@@ -143,4 +143,4 @@ namespace fnvd::debugheap::platform {
         return _aligned_msize(apMem, aAlign, 0);
     }
 
-} // namespace fnvd::debugheap::platform
+} // namespace xfnv::debugheap::platform

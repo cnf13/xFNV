@@ -19,7 +19,7 @@ void hkpShapeRayCastOutput::reset() {
 }
 
 void hkpShapeRayCastOutput::reset_0() {
-    FNVD_RECONSTRUCT(hkpShapeRayCastCollectorOutput)(this);
+    XFNV_RECONSTRUCT(hkpShapeRayCastCollectorOutput)(this);
     reset();
 }
 

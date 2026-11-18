@@ -8,7 +8,7 @@
 #include "SDK/MSVC/iosfwd.h"
 
 // rt: runtime support the game relies on. Here the VC9 CRT's runtime_error (<stdexcept>, statically linked) with the
-// exe's layout: the base of SpeedTree's IdvFileError, built in place by FNVD_INLINED_LOCAL sites, which std's has
+// exe's layout: the base of SpeedTree's IdvFileError, built in place by XFNV_INLINED_LOCAL sites, which std's has
 // not (no default constructor). logic_error and the classes derived from it are std's.
 namespace rt {
 

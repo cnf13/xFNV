@@ -109,7 +109,7 @@ bool RagDollData::Load(TESFile* apFile) {
             RagDollBone* pBones = nullptr;
             if (pMemory) {
                 rt::eh_vector_constructor_iterator(
-                    pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &fnvd::constructElement<REF_DECAL_DATA>
+                    pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
                 );
                 pBones = static_cast<RagDollBone*>(pMemory);
             }
@@ -146,7 +146,7 @@ void RagDollData::Copy(RagDollData* apCopy) {
         RagDollBone* pBones = nullptr;
         if (pMemory) {
             rt::eh_vector_constructor_iterator(
-                pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &fnvd::constructElement<REF_DECAL_DATA>
+                pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
             );
             pBones = static_cast<RagDollBone*>(pMemory);
         }
@@ -170,7 +170,7 @@ void RagDollData::CreateRagDollBoneArray(TESObjectREFR* apRef) {
             RagDollBone* pBones = nullptr;
             if (pMemory) {
                 rt::eh_vector_constructor_iterator(
-                    pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &fnvd::constructElement<REF_DECAL_DATA>
+                    pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
                 );
                 pBones = static_cast<RagDollBone*>(pMemory);
             }
@@ -234,7 +234,7 @@ void RagDollData::LoadGame() {
     RagDollBone* pBones = nullptr;
     if (pMemory) {
         rt::eh_vector_constructor_iterator(
-            pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &fnvd::constructElement<REF_DECAL_DATA>
+            pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
         );
         pBones = static_cast<RagDollBone*>(pMemory);
     }

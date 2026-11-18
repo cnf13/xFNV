@@ -908,7 +908,7 @@ void hkpVehicleInstance::stepVehicle(const hkStepInfo& stepInfo) {
 
     using WheelOutput = hkpVehicleWheelCollide::CollisionDetectionWheelOutput;
     const int32_t numWheels = m_data->m_numWheels;
-    FNVD_INLINED_LOCAL(hkLocalArray<WheelOutput>, cdInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<WheelOutput>, cdInfo, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkAllocateStack<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>
     hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
     void* pBlock = stack.m_next.m_storage;
@@ -987,7 +987,7 @@ void hkpVehicleInstance::updateSteering(
     const hkpVehicleDriverInput::FilteredDriverInputOutput& filteredDriverInputInfo
 ) {
     const int32_t numWheels = m_wheelsSteeringAngle.m_size;
-    FNVD_INLINED_LOCAL(hkpVehicleSteering::SteeringAnglesOutput, steeringOutput, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpVehicleSteering::SteeringAnglesOutput, steeringOutput, std::nullopt, std::nullopt);
     steeringOutput.m_mainSteeringAngle = m_mainSteeringAngle;
     steeringOutput.m_wheelsSteeringAngle.m_data = nullptr;
     steeringOutput.m_wheelsSteeringAngle.m_size = 0;
@@ -1387,7 +1387,7 @@ void hkpVehicleInstance::updateComponents(
     hkpVehicleDriverInput::FilteredDriverInputOutput filteredDriverInputInfo;
     hkpVehicleTransmission::TransmissionOutput transmissionInfo;
     // EXE-INLINED none: hkpVehicleBrake::WheelBreakingOutput::WheelBreakingOutput
-    FNVD_INLINED_LOCAL(hkpVehicleBrake::WheelBreakingOutput, wheelBreakingInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpVehicleBrake::WheelBreakingOutput, wheelBreakingInfo, std::nullopt, std::nullopt);
     wheelBreakingInfo.m_brakingTorque.m_data = nullptr;
     wheelBreakingInfo.m_brakingTorque.m_size = 0;
     wheelBreakingInfo.m_brakingTorque.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;

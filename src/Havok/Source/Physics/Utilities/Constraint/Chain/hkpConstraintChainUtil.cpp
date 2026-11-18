@@ -65,14 +65,14 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
         hkVector4 pivotInA;
         hkVector4 pivotInB;
         if (hkpConstraintUtils::getConstraintPivots(constraints.m_data[c], pivotInA, pivotInB) == HK_FAILURE) {
-            alignas(16) FNVD_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
+            alignas(16) XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
             ::new (&stream) hkErrStream(buf, 512);
             stream << "Not supported types of constraints used to build a chain!";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAD88Du), buf,
                 ".\\Constraint\\Chain\\hkpConstraintChainUtil.cpp", 183
             );
-            FNVD_DESTRUCT(hkOstream)(&stream);
+            XFNV_DESTRUCT(hkOstream)(&stream);
             pChainData->removeReference();
             pChainInstance->removeReference();
             return nullptr;
@@ -86,7 +86,7 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
             pivotInB = pivotTmp;
             if ((*ppInstance)->m_entities[1] !=
                 pChainInstance->m_chainedEntities.m_data[pChainInstance->m_chainedEntities.m_size - 1]) {
-                alignas(16) FNVD_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
+                alignas(16) XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
                 ::new (&stream) hkErrStream(buf, 512);
                 stream << "Constraints are not ordered properly ! Two consecutive constraint share no common "
                           "hkpEntity.";
@@ -94,7 +94,7 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAD88Du), buf,
                     ".\\Constraint\\Chain\\hkpConstraintChainUtil.cpp", 194
                 );
-                FNVD_DESTRUCT(hkOstream)(&stream);
+                XFNV_DESTRUCT(hkOstream)(&stream);
                 pChainData->removeReference();
                 pChainInstance->removeReference();
                 return nullptr;
@@ -110,14 +110,14 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
         hkpConstraintMotor* pMotor2;
         hkpConstraintUtils::getConstraintMotors((*ppInstance)->getData(), pMotor0, pMotor1, pMotor2);
         if (!pMotor0) {
-            FNVD_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
             ::new (&stream) hkErrStream(buf, 512);
             stream << "No motors extracted from the original constraint.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA88D3u), buf,
                 ".\\Constraint\\Chain\\hkpConstraintChainUtil.cpp", 207
             );
-            FNVD_DESTRUCT(hkOstream)(&stream);
+            XFNV_DESTRUCT(hkOstream)(&stream);
             pChainData->removeReference();
             pChainInstance->removeReference();
             return nullptr;
@@ -286,12 +286,12 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
     using AdjointConstraints = hkInplaceArray<hkpConstraintInstance*, 32>;
 
     // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
     entities.m_data = nullptr;
     entities.m_size = 0;
     entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
     // EXE-INLINED 0x626560: hkMap<hkUlong, hkUlong>::hkMap(0), with its reserve (0x626600) inlined too
-    FNVD_INLINED_LOCAL(EntityIndexMap, entityToIndex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(EntityIndexMap, entityToIndex, std::nullopt, std::nullopt);
     entityToIndex.m_map.m_elem = nullptr;
     entityToIndex.m_map.m_numElems = 0;
     entityToIndex.m_map.m_hashMod = -1;
@@ -315,7 +315,7 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
 
     const int32_t numEntities = entities.m_size;
     // EXE-INLINED none: hkInplaceArray<EntityInfo, 32>::hkInplaceArray
-    FNVD_INLINED_LOCAL(EntityInfoArray, info, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(EntityInfoArray, info, std::nullopt, std::nullopt);
     info.m_data = info.m_storage;
     info.m_size = 0;
     info.m_capacityAndFlags = static_cast<int32_t>(32 | hkArrayBase<EntityInfo>::DONT_DEALLOCATE_FLAG);
@@ -329,7 +329,7 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
         info.m_data[i].m_side = -1;
     }
     // The two sides' queues of body indices (side 0 searches from entityA, side 1 from entityB).
-    FNVD_INLINED_LOCAL(EntityQueues, queues, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(EntityQueues, queues, std::nullopt, std::nullopt);
     for (int32_t k = 0; k < 2; ++k) {
         // EXE-INLINED none: hkInplaceArray<int, 32>::hkInplaceArray
         queues[k].m_data = queues[k].m_storage;
@@ -374,12 +374,12 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
     int32_t pathLength[2];
     int32_t meetIndex[2];
     // EXE-INLINED none: hkInplaceArray<hkpEntity*, 32>::hkInplaceArray
-    FNVD_INLINED_LOCAL(AdjointEntities, adjEntities, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(AdjointEntities, adjEntities, std::nullopt, std::nullopt);
     adjEntities.m_data = adjEntities.m_storage;
     adjEntities.m_size = 0;
     adjEntities.m_capacityAndFlags = static_cast<int32_t>(32 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG);
     // EXE-INLINED none: hkInplaceArray<hkpConstraintInstance*, 32>::hkInplaceArray
-    FNVD_INLINED_LOCAL(AdjointConstraints, adjConstraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(AdjointConstraints, adjConstraints, std::nullopt, std::nullopt);
     adjConstraints.m_data = adjConstraints.m_storage;
     adjConstraints.m_size = 0;
     adjConstraints.m_capacityAndFlags =

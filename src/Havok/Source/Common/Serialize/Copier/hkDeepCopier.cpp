@@ -44,7 +44,7 @@ void* hkDeepCopier::deepCopy(
     hkFlags<hkObjectCopier::ObjectCopierFlagBits, uint32_t> flags
 ) {
     // hkArray<char> buffer; hkOstream out(buffer): the lines below are the array's constructor.
-    FNVD_INLINED_LOCAL(hkArray<char>, buffer, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<char>, buffer, std::nullopt, std::nullopt);
     buffer.m_data = nullptr;
     buffer.m_size = 0;
     buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
@@ -67,7 +67,7 @@ void* hkDeepCopier::deepCopy(
     reloc.m_pool = nullptr;
 
     // The objects still to copy, with their classes; dataIn first.
-    FNVD_INLINED_LOCAL(hkArray<hkVariant>, todo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVariant>, todo, std::nullopt, std::nullopt);
     todo.m_data = nullptr;
     todo.m_size = 0;
     todo.m_capacityAndFlags = hkArrayBase<hkVariant>::DONT_DEALLOCATE_FLAG;
@@ -84,14 +84,14 @@ void* hkDeepCopier::deepCopy(
 
     // The offset in buffer of each original object copied.
     using done_t = hkPointerMap<const void*, int32_t>;
-    FNVD_INLINED_LOCAL(done_t, done, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(done_t, done, std::nullopt, std::nullopt);
     // EXE-INLINED 0x626560
     done.m_map.m_elem = nullptr;
     done.m_map.m_numElems = 0;
     done.m_map.m_hashMod = -1;
     done.m_map.hkUlongMapBase::reserve(hkMemoryRouter::getInstance().heap(), 0);
 
-    FNVD_INLINED_LOCAL(hkArray<Copy>, copies, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<Copy>, copies, std::nullopt, std::nullopt);
     copies.m_data = nullptr;
     copies.m_size = 0;
     copies.m_capacityAndFlags = hkArrayBase<Copy>::DONT_DEALLOCATE_FLAG;

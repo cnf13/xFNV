@@ -49,7 +49,7 @@ void SIdvWindInfo::Parse(CTreeFileAccess& cFile) {
             case File_Wind_Enabled: cFile.ParseBool(); break;
             default: {
                 std::string strDetails;
-                FNVD_RECONSTRUCT(std::string)(&strDetails, "malformed general wind information");
+                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed general wind information");
                 throw IdvFileError(strDetails, false);
             }
         }

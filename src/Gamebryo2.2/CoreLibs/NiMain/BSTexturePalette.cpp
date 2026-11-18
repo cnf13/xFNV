@@ -338,7 +338,7 @@ void BSTexturePalette::Init() {
     if (pPathMap) {
         pPathMap->uiSize = 7;
         rt::eh_vector_constructor_iterator(
-            pPathMap->kGroups, sizeof(BSTexMap), 7, &fnvd::callMember<&BSTexMap::Create>
+            pPathMap->kGroups, sizeof(BSTexMap), 7, &xfnv::callMember<&BSTexMap::Create>
         );
         BSTexturePalette::pTexMap = pPathMap->kGroups;
         pTLSData->eMemContext = eMemContext;

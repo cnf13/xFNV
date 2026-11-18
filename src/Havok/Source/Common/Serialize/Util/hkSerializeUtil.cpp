@@ -126,7 +126,7 @@ int32_t hkSerializeUtil::isLoadable(hkStreamReader* sr) {
         return 1;
     }
     // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    FNVD_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
     ::new (&details.m_version) hkStringPtr;
     detectFormat(sr, details);
     if (details.m_formatType.m_storage == FORMAT_PACKFILE_BINARY) {
@@ -183,7 +183,7 @@ hkResult hkSerializeUtil::saveTagfile(
 
 hkResult
 _saveTagfile(const hkDataObject& obj, hkStreamWriter* stream, hkTagfileWriter::AddDataObjectListener* listener) {
-    FNVD_INLINED_LOCAL(hkBinaryTagfileWriter, v4, hkBinaryTagfileWriter_vftable, std::nullopt);
+    XFNV_INLINED_LOCAL(hkBinaryTagfileWriter, v4, hkBinaryTagfileWriter_vftable, std::nullopt);
     if (!stream) {
         return HK_FAILURE;
     }
@@ -278,7 +278,7 @@ hkResource* loadPackfile(
         if (details->m_version == hkVersionUtil::getCurrentVersion()) {
             using TempCharArray = hkArray<char, hkContainerTempAllocator>;
             // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::hkArray
-            FNVD_INLINED_LOCAL(TempCharArray, buf, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(TempCharArray, buf, std::nullopt, std::nullopt);
             buf.m_data = nullptr;
             buf.m_size = 0;
             buf.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
@@ -304,13 +304,13 @@ hkObjectResource* loadNewPackfileOnHeap(
     const hkClassNameRegistry* classReg
 ) {
     // EXE-INLINED none: hkTypeInfoRegistry::hkTypeInfoRegistry
-    FNVD_INLINED_LOCAL(hkTypeInfoRegistry, registry, hkTypeInfoRegistry_vftable, std::nullopt);
+    XFNV_INLINED_LOCAL(hkTypeInfoRegistry, registry, hkTypeInfoRegistry_vftable, std::nullopt);
     registry.m_referenceCount = 1;
     ::new (&registry.m_map.m_map) hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>(0u);
     registry.m_finishFlag.m_finishing = 0;
     registry.hkTypeInfoRegistry::merge(*typeReg);
     hkResource* resource = loadPackfile(details, stream, &registry, errorOut);
-    FNVD_INLINED_LOCAL(hkDataWorldNative, world, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDataWorldNative, world, std::nullopt, std::nullopt);
     ::new (&world) hkDataWorldNative;
     world.setClassRegistry(classReg);
     const hkClass* klass = classReg->getClassByName(resource->getContentsTypeName());
@@ -336,7 +336,7 @@ int32_t checkTagfileWorld(
 ) {
     manager->recomputePatchDependencies();
     // EXE-INLINED none: hkArray<hkDataClassImpl*>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkDataClassImpl*>, classes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDataClassImpl*>, classes, std::nullopt, std::nullopt);
     classes.m_data = nullptr;
     classes.m_size = 0;
     classes.m_capacityAndFlags = hkArrayBase<hkDataClassImpl*>::DONT_DEALLOCATE_FLAG;
@@ -380,7 +380,7 @@ hkResult loadTagfileIntoWorld(
     hkDataWorldDict* world,
     const hkClassNameRegistry* classReg
 ) {
-    FNVD_INLINED_LOCAL(hkBinaryTagfileReader, reader, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkBinaryTagfileReader, reader, std::nullopt, std::nullopt);
     ::new (&reader) hkBinaryTagfileReader;
     hkDataObject contents = reader.hkBinaryTagfileReader::load(stream, *world);
     if (errorOut && !checkTagfileWorld(errorOut, hkVersionPatchManager::s_instance, classReg, world)) {
@@ -483,7 +483,7 @@ hkResource* hkSerializeUtil::load(
         classReg = hkBuiltinTypeRegistry::s_instance->getClassNameRegistry();
     }
     // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    FNVD_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
     ::new (&details.m_version) hkStringPtr;
     detectFormat(stream, details);
     int32_t format = details.m_formatType.m_storage;
@@ -496,7 +496,7 @@ hkResource* hkSerializeUtil::load(
             return resource;
         }
         if (format == FORMAT_TAGFILE_BINARY) {
-            FNVD_INLINED_LOCAL(hkDataWorldDict, world, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataWorldDict, world, std::nullopt, std::nullopt);
             ::new (&world) hkDataWorldDict;
             if (loadTagfileIntoWorld(stream, detailsOut, &world, classReg) != HK_SUCCESS) {
                 world.~hkDataWorldDict();
@@ -553,7 +553,7 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
         typeReg = hkBuiltinTypeRegistry::s_instance->getTypeInfoRegistry();
     }
     // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    FNVD_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
     ::new (&details.m_version) hkStringPtr;
     detectFormat(stream, details);
     hkObjectResource* resource = nullptr;
@@ -622,7 +622,7 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
 hkEnum<hkSerializeUtil::FormatType, int32_t>*
 hkSerializeUtil::detectFormat(hkEnum<hkSerializeUtil::FormatType, int32_t>* apResult, hkStreamReader* reader) {
     // EXE-INLINED none: hkSerializeUtil::FormatDetails::FormatDetails
-    FNVD_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkSerializeUtil::FormatDetails, details, std::nullopt, std::nullopt);
     ::new (&details.m_version) hkStringPtr;
     detectFormat(reader, details);
     apResult->m_storage = details.m_formatType.m_storage;
@@ -669,9 +669,9 @@ void hkSerializeUtil::detectFormat(hkStreamReader* reader, hkSerializeUtil::Form
     }
     // EXE-INLINED none: hkEnum<hkSerializeUtil::FormatType, int32_t>::operator=
     details.m_formatType.m_storage = FORMAT_PACKFILE_XML;
-    FNVD_INLINED_LOCAL(hkStringBuf, tag, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, tag, std::nullopt, std::nullopt);
     ::new (&tag) hkStringBuf(hkString::strStr(buf, "<hkpackfile"));
-    FNVD_INLINED_LOCAL(hkStringPtr, classVersion, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringPtr, classVersion, std::nullopt, std::nullopt);
     ::new (&classVersion) hkStringPtr;
     int32_t version;
     if (!findTextValue(&classVersion, tag.m_string.m_data, "classversion") ||

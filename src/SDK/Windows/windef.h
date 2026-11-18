@@ -17,8 +17,8 @@
 #endif
 #define APIENTRY WINAPI
 
-// FNVD_IMPORT_AS's callable (Reconstruction.hpp) for an import slot of the SDK's WINAPI pointer type.
-namespace fnvd {
+// XFNV_IMPORT_AS's callable (Reconstruction.hpp) for an import slot of the SDK's WINAPI pointer type.
+namespace xfnv {
     template <class R, class... A>
     struct ImportAs<R(WINAPI*)(A...)> {
         using Type = R(WINAPI*)(A...);
@@ -27,7 +27,7 @@ namespace fnvd {
             return target()(aArgs...);
         }
     };
-} // namespace fnvd
+} // namespace xfnv
 
 // HWND's type, without windows.h (the same as windows.h declares it)
 struct HWND__ {

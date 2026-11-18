@@ -27,7 +27,7 @@ hkSingletonInitNode* hkSingletonInitNode::findByName(const char* name) {
 // casts.
 void hkSingletonInitNode::populate(hkSingletonInitNode* dstBase, const hkSingletonInitNode* srcBase) {
     using SrcMap_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(SrcMap_t, srcMap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(SrcMap_t, srcMap, std::nullopt, std::nullopt);
     ::new (&srcMap) SrcMap_t(0u);
     for (const hkSingletonInitNode* s = srcBase; s; s = s->m_next) {
         srcMap.insert(reinterpret_cast<hkUlong>(s->m_name), reinterpret_cast<hkUlong>(s));
@@ -51,7 +51,7 @@ void hkSingletonInitNode::populate(hkSingletonInitNode* dstBase, const hkSinglet
 // same name has.
 void hkSingletonInitNode::depopulate(hkSingletonInitNode* dstBase, const hkSingletonInitNode* srcBase) {
     using SrcMap_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(SrcMap_t, srcMap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(SrcMap_t, srcMap, std::nullopt, std::nullopt);
     ::new (&srcMap) SrcMap_t(0u);
     for (const hkSingletonInitNode* s = srcBase; s; s = s->m_next) {
         srcMap.insert(reinterpret_cast<hkUlong>(s->m_name), reinterpret_cast<hkUlong>(s));

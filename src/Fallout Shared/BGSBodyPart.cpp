@@ -109,7 +109,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         Data.Endian();
     }
     apFile->GetChunkData(&Data, 0x54u);
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The file's record is 0x54 bytes, with a 4-byte form ID in each pointer field.
     TESFile::WidenFormIDRecords(
         &Data, 1, 0x54, sizeof(Data),

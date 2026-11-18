@@ -129,7 +129,7 @@ void Sun::Initialize(NiNode* apSkyRoot) {
         pMemory = ourMalloc(4 * sizeof(NiColorA));
         NiColorA* psunColors = nullptr;
         if (pMemory) {
-            rt::eh_vector_constructor_iterator(pMemory, sizeof(NiColorA), 4, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(pMemory, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
             psunColors = static_cast<NiColorA*>(pMemory);
         }
         psunColors[0] = defaultColor;
@@ -140,7 +140,7 @@ void Sun::Initialize(NiNode* apSkyRoot) {
         pMemory = ourMalloc(4 * sizeof(NiColorA));
         NiColorA* pglareColors = nullptr;
         if (pMemory) {
-            rt::eh_vector_constructor_iterator(pMemory, sizeof(NiColorA), 4, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(pMemory, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
             pglareColors = static_cast<NiColorA*>(pMemory);
         }
         pglareColors[0] = defaultColor;

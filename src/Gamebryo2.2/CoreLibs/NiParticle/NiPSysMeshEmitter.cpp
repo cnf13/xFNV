@@ -58,7 +58,7 @@ float FastSqrt(float afValue) {
 
 // The NiPointer<NiGeometry> arrays' new[]: the count cookie, then each element through NiPointer's default constructor.
 // The size saturates on overflow, so the allocation fails rather than comes back short. The block is raw MemoryManager
-// memory: the cookie (one size_t, fnvd::arrayCount's layout), then the elements.
+// memory: the cookie (one size_t, xfnv::arrayCount's layout), then the elements.
 NiPointer<NiGeometry>* NewGeometryPointerArray(uint32_t numObjs) {
     size_t stSize =
         numObjs > SIZE_MAX / sizeof(NiPointer<NiGeometry>) ? SIZE_MAX : sizeof(NiPointer<NiGeometry>) * numObjs;
@@ -71,7 +71,7 @@ NiPointer<NiGeometry>* NewGeometryPointerArray(uint32_t numObjs) {
     *puiCookie = numObjs;
     rt::eh_vector_constructor_iterator(
         pArray, sizeof(NiPointer<NiGeometry>), static_cast<int32_t>(numObjs),
-        &fnvd::constructElement<NiPointer<NiRefObject>>
+        &xfnv::constructElement<NiPointer<NiRefObject>>
     );
     return pArray;
 }
@@ -89,7 +89,7 @@ NiPointer<NiObject>* NewObjectPointerArray(uint32_t numObjs) {
     *puiCookie = numObjs;
     rt::eh_vector_constructor_iterator(
         pArray, sizeof(NiPointer<NiObject>), static_cast<int32_t>(numObjs),
-        &fnvd::constructElement<NiPointer<NiRefObject>>
+        &xfnv::constructElement<NiPointer<NiRefObject>>
     );
     return pArray;
 }

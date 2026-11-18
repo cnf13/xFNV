@@ -87,7 +87,7 @@ void NiSingleShaderMaterial::UnloadShaders() {
 // The NiFixedString temporaries built from the name are written out explicitly: AddString, or the null handle for a
 // null name, then the release.
 NiSingleShaderMaterial* NiSingleShaderMaterial::Create(const char* materialname, int32_t a2) {
-    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
     kName.SetHandle(materialname ? NiGlobalStringTable::AddString(materialname) : NiGlobalStringTable::NULL_STRING);
     NiSingleShaderMaterial* pkMaterial = static_cast<NiSingleShaderMaterial*>(NiMaterial::GetMaterial(kName));

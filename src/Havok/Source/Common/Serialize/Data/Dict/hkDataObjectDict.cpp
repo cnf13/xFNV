@@ -89,7 +89,7 @@ hkDataClassImpl* hkDataWorldDict::newClass(const hkDataClass::Cinfo& cinfo) {
     for (int32_t i = 0; i < cinfo.members.m_size; ++i) {
         const hkDataClass::Cinfo::Member& rMember = cinfo.members.m_data[i];
         InternedString kName = m_tracker->intern(rMember.name);
-        FNVD_INLINED_LOCAL(InternedStringHandle, kTypeName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(InternedStringHandle, kTypeName, std::nullopt, std::nullopt);
         // addMember is handed the pointer the handle's maker returns.
         InternedStringHandle* pTypeName = m_tracker->internClassNameHandle(&kTypeName, rMember.className);
         pClass->addMember(kName, rMember.type, *pTypeName, rMember.tupleCount);
@@ -175,7 +175,7 @@ hkDataClassImpl* hkDataWorldDict::findClass(const char* name) const {
 // The object a handle names: a dictionary handle holds the implementation in p0.
 hkDataObject hkDataWorldDict::findObject(const hkDataObject::Handle& handle) const {
     hkDataObject kResult;
-    FNVD_RECONSTRUCT(hkDataObject)(&kResult, static_cast<hkDataObjectImpl*>(handle.p0));
+    XFNV_RECONSTRUCT(hkDataObject)(&kResult, static_cast<hkDataObjectImpl*>(handle.p0));
     return kResult;
 }
 
@@ -189,7 +189,7 @@ void hkDataWorldDict::renameClassMember(hkDataClass& klass, const char* oldName,
     const char* internedOldName = m_tracker->intern(oldName).getString();
     const char* internedNewName = m_tracker->intern(newName).getString();
 
-    FNVD_INLINED_LOCAL(hkArray<hkDataObjectImpl*>, objs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDataObjectImpl*>, objs, std::nullopt, std::nullopt);
     objs.m_data = nullptr;
     objs.m_size = 0;
     objs.m_capacityAndFlags = hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG;
@@ -210,7 +210,7 @@ void hkDataWorldDict::renameClassMember(hkDataClass& klass, const char* oldName,
         }
     }
 
-    FNVD_INLINED_LOCAL(hkArray<hkDataArrayImpl*>, arrays, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDataArrayImpl*>, arrays, std::nullopt, std::nullopt);
     arrays.m_data = nullptr;
     arrays.m_size = 0;
     arrays.m_capacityAndFlags = hkArrayBase<hkDataArrayImpl*>::DONT_DEALLOCATE_FLAG;
@@ -268,7 +268,7 @@ void hkDataWorldDict::removeClassMember(hkDataClass& klass, const char* name) {
     hkDataClassDict* pClass = static_cast<hkDataClassDict*>(klass.m_impl);
     const char* internedName = m_tracker->intern(name).getString();
 
-    FNVD_INLINED_LOCAL(hkArray<hkDataObjectImpl*>, objs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDataObjectImpl*>, objs, std::nullopt, std::nullopt);
     objs.m_data = nullptr;
     objs.m_size = 0;
     objs.m_capacityAndFlags = hkArrayBase<hkDataObjectImpl*>::DONT_DEALLOCATE_FLAG;
@@ -280,7 +280,7 @@ void hkDataWorldDict::removeClassMember(hkDataClass& klass, const char* name) {
         static_cast<hkDataObjectDict*>(objs.m_data[i])->removeMember(internedName);
     }
 
-    FNVD_INLINED_LOCAL(hkArray<hkDataArrayImpl*>, arrays, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDataArrayImpl*>, arrays, std::nullopt, std::nullopt);
     arrays.m_data = nullptr;
     arrays.m_size = 0;
     arrays.m_capacityAndFlags = hkArrayBase<hkDataArrayImpl*>::DONT_DEALLOCATE_FLAG;
@@ -324,7 +324,7 @@ hkDataClassImpl* hkDataWorldDict::copyClassFromWorld(const char* name, const hkD
         return pFound;
     }
     hkDataClass srcClass(worldFrom.findClass(name));
-    FNVD_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDataClass::Cinfo, cinfo, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member>'s constructor
     cinfo.members.m_data = nullptr;
     cinfo.members.m_size = 0;
@@ -502,7 +502,7 @@ void hkDataWorldDict::addClassMember(
     if (pClass->getDeclaredMemberIndexByName(name) != -1) {
         pClass->removeMember(kName);
     }
-    FNVD_INLINED_LOCAL(InternedStringHandle, kTypeName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(InternedStringHandle, kTypeName, std::nullopt, std::nullopt);
     // addMember is handed the pointer the handle's maker returns.
     InternedStringHandle* pTypeName = m_tracker->internClassNameHandle(&kTypeName, typeName);
     pClass->addMember(kName, type, *pTypeName, tupleCount);
@@ -547,7 +547,7 @@ hkDataClassImpl* hkDataWorldDict::wrapClass(const hkClass& klass) {
     for (int32_t i = 0; i < klass.getNumDeclaredMembers(); ++i) {
         const hkClassMember& rMember = klass.getDeclaredMember(i);
         hkDataObject::Type eType = hkDataObject::TYPE_VOID;
-        FNVD_INLINED_LOCAL(InternedStringHandle, kTypeName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(InternedStringHandle, kTypeName, std::nullopt, std::nullopt);
         // EXE-INLINED none: InternedStringHandle's constructor (the shared empty handle)
         InternedNullRefCounted.addReference();
         InternedStringRefCounted* pTypeName = &InternedNullRefCounted;
@@ -563,7 +563,7 @@ hkDataClassImpl* hkDataWorldDict::wrapClass(const hkClass& klass) {
                 if (!pAttribute) {
                     pAttribute = rMember.getClass()->getAttribute(hkDataWorldDict_s_hkDataObjectTupeAttributeID);
                 }
-                FNVD_INLINED_LOCAL(InternedStringHandle, kHandle, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(InternedStringHandle, kHandle, std::nullopt, std::nullopt);
                 InternedStringHandle* pHandle;
                 if (pAttribute) {
                     hkClassMemberAccessor kAccessor(*pAttribute, "typeName");
@@ -1173,7 +1173,7 @@ void hkDataWorldDict::ObjectTracker::removeClassContent(hkDataClassDict* klass) 
         return;
     }
     // EXE-INLINED none: hkLocalArray<hkDataObjectDict*>::hkLocalArray(512)
-    FNVD_INLINED_LOCAL(hkLocalArray<hkDataObjectDict*>, objects, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkDataObjectDict*>, objects, std::nullopt, std::nullopt);
     objects.m_data = nullptr;
     objects.m_size = 0;
     objects.m_capacityAndFlags = hkArrayBase<hkDataObjectDict*>::DONT_DEALLOCATE_FLAG;
@@ -1213,7 +1213,7 @@ void hkDataWorldDict::ObjectTracker::removeClassContent(hkDataClassDict* klass) 
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0x760D3794u), acBuffer,
                 ".\\Data\\Dict\\hkDataObjectDict.cpp", 1977
             );
-            FNVD_DESTRUCT(hkOstream)(pStream);
+            XFNV_DESTRUCT(hkOstream)(pStream);
         }
         pObject->selfDestruct();
     }
@@ -1343,7 +1343,7 @@ void hkDataWorldDict::ObjectTracker::untrackClass(hkDataClassDict* klass) {
         m_derivedFromParent.removeByValue(static_cast<hkDataClassDict*>(parent), klass);
     }
     klass->selfDestruct();
-    FNVD_INLINED_LOCAL(hkLocalArray<hkDataClassDict*>, children, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkDataClassDict*>, children, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkDataClassDict*>::hkLocalArray(64) (hkAllocateStack)
         children.m_data = nullptr;
@@ -2738,7 +2738,7 @@ void hkDataObjectDict::releaseValue(hkDataObject::Type type, Union* value, int32
 // through the setter of the array's element type (the vectors with 4 * type - 12 reals).
 void hkDataArrayImpl::set(int32_t index, hkDataObject::Value val) {
     if (getType() & hkDataObject::TYPE_TUPLE) {
-        FNVD_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
         setArray(index, val.asArray(&array)->m_impl);
         array.~hkDataArray();
         return;
@@ -2753,7 +2753,7 @@ void hkDataArrayImpl::set(int32_t index, hkDataObject::Value val) {
         case hkDataObject::TYPE_VEC_16: setVec(index, val.asVec(4 * static_cast<int32_t>(getType()) - 12)); break;
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            FNVD_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
             setObject(index, val.asObject(&object)->m_impl);
             object.~hkDataObject();
             break;

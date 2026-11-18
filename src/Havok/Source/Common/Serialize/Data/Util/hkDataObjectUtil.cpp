@@ -147,9 +147,9 @@ void Cloner::copySimpleValue<hkDataObject::Value>(hkDataObject::Value dst, const
         }
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            FNVD_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
             hkDataObject* pObject = src.asObject(&object);
-            FNVD_INLINED_LOCAL(hkDataObject, copy, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataObject, copy, std::nullopt, std::nullopt);
             dst.setObject(*copyObject(copy, *pObject));
             copy.~hkDataObject();
             object.~hkDataObject();
@@ -1629,7 +1629,7 @@ void Cloner::copyValue(hkDataObject& dstObj, const hkDataObject& srcObj, const h
     hkDataObject::Value value;
     value.m_impl = nullptr;
     if (minfo.m_type & hkDataObject::TYPE_TUPLE) {
-        FNVD_INLINED_LOCAL(hkDataArray, srcArray, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkDataArray, srcArray, std::nullopt, std::nullopt);
         srcObj.access(&value, minfo.m_name)->asArray(&srcArray);
         hkDataClass dstClass;
         hkDataArrayImpl* pImpl = dstObj.getClass(&dstClass)->getWorld()->newArray(dstObj, minfo);
@@ -1639,7 +1639,7 @@ void Cloner::copyValue(hkDataObject& dstObj, const hkDataObject& srcObj, const h
         srcArray.~hkDataArray();
     }
     else if (minfo.m_type & hkDataObject::TYPE_ARRAY) {
-        FNVD_INLINED_LOCAL(hkDataArray, srcArray, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkDataArray, srcArray, std::nullopt, std::nullopt);
         srcObj.access(&value, minfo.m_name)->asArray(&srcArray);
         hkDataClass dstClass;
         hkDataArrayImpl* pImpl = dstObj.getClass(&dstClass)->getWorld()->newArray(dstObj, minfo);
@@ -1694,10 +1694,10 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
         case hkDataObject::TYPE_OBJECT:
             dst.setSize(arraySize);
             for (int32_t i = 0; i < arraySize; ++i) {
-                alignas(8) FNVD_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
+                alignas(8) XFNV_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
                 alignas(8) hkDataArray::Value srcValue;
                 hkDataObject* pObject = src.access(&srcValue, i)->asObject(&object);
-                alignas(8) FNVD_INLINED_LOCAL(hkDataObject, copy, std::nullopt, std::nullopt);
+                alignas(8) XFNV_INLINED_LOCAL(hkDataObject, copy, std::nullopt, std::nullopt);
                 hkDataObject* pCopy = copyObject(copy, *pObject);
                 alignas(8) hkDataArray::Value dstValue;
                 *dst.access(&dstValue, i) = *pCopy;
@@ -1740,15 +1740,15 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
                 if (!(mi.m_type & hkDataObject::TYPE_MASK_BASIC_TYPES)) {
                     continue;
                 }
-                alignas(8) FNVD_INLINED_LOCAL(hkDataArray, dstMembers, std::nullopt, std::nullopt);
+                alignas(8) XFNV_INLINED_LOCAL(hkDataArray, dstMembers, std::nullopt, std::nullopt);
                 dst.swizzleObjectMember(&dstMembers, mi.m_name);
-                alignas(8) FNVD_INLINED_LOCAL(hkDataArray, srcMembers, std::nullopt, std::nullopt);
+                alignas(8) XFNV_INLINED_LOCAL(hkDataArray, srcMembers, std::nullopt, std::nullopt);
                 src.swizzleObjectMember(&srcMembers, mi.m_name);
                 if (mi.m_type & (hkDataObject::TYPE_ARRAY | hkDataObject::TYPE_TUPLE)) {
                     for (int32_t i = 0; i < arraySize; ++i) {
                         int32_t iSize;
                         if (mi.m_type & hkDataObject::TYPE_ARRAY) {
-                            alignas(8) FNVD_INLINED_LOCAL(hkDataArray, sizeArray, std::nullopt, std::nullopt);
+                            alignas(8) XFNV_INLINED_LOCAL(hkDataArray, sizeArray, std::nullopt, std::nullopt);
                             alignas(8) hkDataArray::Value sizeValue;
                             iSize = dstMembers.access(&sizeValue, i)->asArray(&sizeArray)->getSize();
                             sizeArray.~hkDataArray();
@@ -1756,10 +1756,10 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
                         else {
                             iSize = mi.m_tupleCount;
                         }
-                        alignas(8) FNVD_INLINED_LOCAL(hkDataArray, dstArray, std::nullopt, std::nullopt);
+                        alignas(8) XFNV_INLINED_LOCAL(hkDataArray, dstArray, std::nullopt, std::nullopt);
                         alignas(8) hkDataArray::Value dstValue;
                         dstMembers.access(&dstValue, i)->asArray(&dstArray);
-                        alignas(8) FNVD_INLINED_LOCAL(hkDataArray, srcArray, std::nullopt, std::nullopt);
+                        alignas(8) XFNV_INLINED_LOCAL(hkDataArray, srcArray, std::nullopt, std::nullopt);
                         alignas(8) hkDataArray::Value srcValue;
                         hkDataArray* pSrcArray = srcMembers.access(&srcValue, i)->asArray(&srcArray);
                         copyArray(dstArray, *pSrcArray, iSize);
@@ -1873,7 +1873,7 @@ void Cloner::copyObjectMembers(hkDataObject& a1, const hkDataObject& a2) {
     hkDataClass dstClass;
     a1.getClass(&dstClass);
     using MemberInfoArray = hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(MemberInfoArray, infos, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(MemberInfoArray, infos, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray::hkArray
     infos.m_data = nullptr;
     infos.m_size = 0;
@@ -1971,7 +1971,7 @@ hkResult hkDataObjectUtil::deepCopyWorld(hkDataWorld& dst, const hkDataWorld& sr
     cloner.m_copied.m_hashMod = -1;
     cloner.m_copied.reserve(*hkMemoryRouter::getInstance().m_heap, 0);
     hkDataObject contents = src.getContents();
-    FNVD_INLINED_LOCAL(hkDataObject, copy, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDataObject, copy, std::nullopt, std::nullopt);
     cloner.copyObject(copy, contents);
     copy.~hkDataObject();
     // EXE-INLINED none: hkMap::~hkMap

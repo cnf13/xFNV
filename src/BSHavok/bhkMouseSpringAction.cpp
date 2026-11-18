@@ -148,7 +148,7 @@ void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
 }
 
 void bhkMouseSpringAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    FNVD_INLINED_LOCAL(hkMouseSpringActionCinfo, arInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkMouseSpringActionCinfo, arInfo, std::nullopt, std::nullopt);
     TLSData* v3 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;

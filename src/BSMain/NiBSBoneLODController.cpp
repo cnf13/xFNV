@@ -461,7 +461,7 @@ NiObject* NiBSBoneLODController::CreateObject() {
 
 bool NiBSBoneLODController::ProcessScene(NiNode* pkSceneRoot) {
     // Raw storage: the body frees the set's buffer itself on every return, so no C++ destructor may free it again.
-    FNVD_INLINED_LOCAL(NiTPrimitiveSet<NiNode*>, kBoneRootNodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiTPrimitiveSet<NiNode*>, kBoneRootNodes, std::nullopt, std::nullopt);
     std::memset(&kBoneRootNodes, 0, sizeof(kBoneRootNodes));
     NiBSBoneLODController::FindBoneRootNodes(pkSceneRoot, kBoneRootNodes);
     if (kBoneRootNodes.m_uiUsed) {

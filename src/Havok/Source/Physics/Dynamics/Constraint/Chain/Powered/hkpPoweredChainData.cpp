@@ -223,7 +223,7 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
     hkpConstraintQueryIn in2 = inNotValid;
     // EXE-INLINED none: hkInplaceArray<hkpVelocityAccumulatorOffset, 32>::hkInplaceArray
     using accumulators_t = hkInplaceArray<hkpVelocityAccumulatorOffset, 32>;
-    FNVD_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
     accumulators.m_data = accumulators.m_storage;
     in2.m_constraintInstance = nullptr;
     in2.m_constraintRuntime.m_storage = nullptr;
@@ -239,7 +239,7 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
 
     // EXE-INLINED none: hkInplaceArray<hkp3dAngularMotorSolverInfo, 32>::hkInplaceArray
     using motorsState_t = hkInplaceArray<hkp3dAngularMotorSolverInfo, 32>;
-    FNVD_INLINED_LOCAL(motorsState_t, motorsState, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(motorsState_t, motorsState, std::nullopt, std::nullopt);
     motorsState.m_data = motorsState.m_storage;
     motorsState.m_size = 0;
     motorsState.m_capacityAndFlags = 32 | hkArrayBase<hkp3dAngularMotorSolverInfo>::DONT_DEALLOCATE_FLAG;

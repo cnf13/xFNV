@@ -47,7 +47,7 @@ bool BGSQuestPerkEntry::Load(TESFile* apFile) {
                 return false;
             }
             apFile->GetChunkData(&Data, uiSize);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is 8 bytes, the quest's 4-byte form ID first.
             TESFile::WidenFormIDRecords(&Data, 1, 8, sizeof(Data), {{0, offsetof(QuestPerkEntryData, pQuest)}});
 #endif
@@ -775,8 +775,8 @@ BGSPerkEntry* BGSEntryPointPerkEntry::Duplicate() {
         if (v6) {
             *v6 = cNumConditions;
             rt::eh_vector_constructor_iterator(
-                v6 + 1, sizeof(TESCondition), cNumConditions, &fnvd::constructElement<TESCondition>,
-                &fnvd::destructElement<TESCondition>
+                v6 + 1, sizeof(TESCondition), cNumConditions, &xfnv::constructElement<TESCondition>,
+                &xfnv::destructElement<TESCondition>
             );
             // new[]'s array cookie: the count is in the 4 bytes before the elements.
             v3 = reinterpret_cast<TESCondition*>(v6 + 1);
@@ -921,8 +921,8 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                         if (v6) {
                             *v6 = cNumConditions;
                             rt::eh_vector_constructor_iterator(
-                                v6 + 1, sizeof(TESCondition), cNumConditions, &fnvd::constructElement<TESCondition>,
-                                &fnvd::destructElement<TESCondition>
+                                v6 + 1, sizeof(TESCondition), cNumConditions, &xfnv::constructElement<TESCondition>,
+                                &xfnv::destructElement<TESCondition>
                             );
                             // new[]'s array cookie: the count is in the 4 bytes before the elements.
                             v4 = reinterpret_cast<TESCondition*>(v6 + 1);

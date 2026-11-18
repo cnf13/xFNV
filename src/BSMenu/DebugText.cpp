@@ -237,8 +237,8 @@ void DebugText::HandleQueuedPrints() {
         if (eType) {
             if (eType == DebugText::DTPT_SPECIFIED) {
                 size_t sLen;
-                FNVD_INLINED_LOCAL(BSStringT<char>, string, std::nullopt, std::nullopt);
-                FNVD_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSStringT<char>, string, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
                 int32_t a_2;
                 tempMemContext.iOldMemContext = GetThreadTLSData()->eMemContext;
                 GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
@@ -367,7 +367,7 @@ void DebugText::HandleQueuedPrints() {
                         pDebugTextList[a_2].spNode.operator=(DebugText_);
                     }
                     if (pDebugTextList[a_2].spNode.m_pObject) {
-                        FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
                         pDebugTextList[a_2].pText.Set(string);
                         if (string.pString) {
                             v13.m_kHandle = NiGlobalStringTable::AddString(string.pString);
@@ -436,7 +436,7 @@ void DebugText::HandleQueuedPrints() {
     for (uint32_t iprintCt = 0; iprintCt < xPrintData.iSize; ++iprintCt) {
         DebugText::DebugTextData* Block = xPrintData.pBuffer[iprintCt]->pTextData;
         if (Block) {
-            FNVD_DESTRUCT(DebugText::DebugTextData)(Block);
+            XFNV_DESTRUCT(DebugText::DebugTextData)(Block);
             MemoryManager_Singleton.Deallocate(Block);
         }
         MemoryManager_Singleton.Deallocate(xPrintData.pBuffer[iprintCt]);
@@ -573,8 +573,8 @@ NiNode* DebugText::CreateDebugText(
     const NiColorA* apColor
 ) {
     int32_t iwidth;
-    FNVD_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, xcolor_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, xcolor_2, std::nullopt, std::nullopt);
     tempMemContext.iOldMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
     if (*apText && (Interface::IsConsoleVisible() || Interface::IsDebugTextVisible())) {
@@ -618,7 +618,7 @@ NiNode* DebugText::CreateDebugText(
         }
         else {
             Setting::Info* p_uValue;
-            FNVD_INLINED_LOCAL(NiColorA, v32, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiColorA, v32, std::nullopt, std::nullopt);
             // The setting's address is never null.
             p_uValue = &xDebugTextColor.uValue;
             // MAYBE-INLINED 0xA100CB: a write opening NiColorA's uses: may be its inlined constructor
@@ -805,7 +805,7 @@ void DebugText::Idle() {
                         DebugText::Unlock();
                         DebugText::DebugTextData* apThis = pme->xFloatingTextList.Remove(pitem);
                         if (apThis) {
-                            FNVD_DESTRUCT(DebugText::DebugTextData)(apThis);
+                            XFNV_DESTRUCT(DebugText::DebugTextData)(apThis);
                             MemoryManager_Singleton.Deallocate(apThis);
                         }
                     }
@@ -814,7 +814,7 @@ void DebugText::Idle() {
             else {
                 DebugText::DebugTextData* Block = pme->xFloatingTextList.Remove(pitem);
                 if (Block) {
-                    FNVD_DESTRUCT(DebugText::DebugTextData)(Block);
+                    XFNV_DESTRUCT(DebugText::DebugTextData)(Block);
                     MemoryManager_Singleton.Deallocate(Block);
                 }
             }
@@ -889,7 +889,7 @@ bool DebugText::AddFloatingText(NiNode* apObject, const char* apText, int32_t ai
         void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
         pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
         // EXE-INLINED none: the NiFixedString(const char*) constructor and destructor of the name temporary
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.SetHandle(NiGlobalStringTable::AddString("FloatingText"));
         pNode->SetName(kName);
         // EXE-INLINED 0x4381D0
@@ -900,7 +900,7 @@ bool DebugText::AddFloatingText(NiNode* apObject, const char* apText, int32_t ai
         void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
         pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
         // EXE-INLINED none: the NiFixedString(const char*) constructor and destructor of the name temporary
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.SetHandle(NiGlobalStringTable::AddString("FloatingText"));
         pNode->SetName(kName);
         // Destructor of kName.

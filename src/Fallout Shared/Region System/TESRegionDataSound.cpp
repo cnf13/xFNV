@@ -16,7 +16,7 @@
 #include <cmath>
 
 TESSound* TESRegionSound::GetSound() const {
-#if FNVD_64BIT
+#if XFNV_64BIT
     return pDataHandler->GetSound(uiSound);
 #else
     return reinterpret_cast<TESSound*>(static_cast<uintptr_t>(uiSound));
@@ -70,7 +70,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                 ));
                 if (tmpArray) {
                     rt::eh_vector_constructor_iterator(
-                        tmpArray, sizeof(TESRegionSound), uicount, &fnvd::constructElement<TESRegionSound>
+                        tmpArray, sizeof(TESRegionSound), uicount, &xfnv::constructElement<TESRegionSound>
                     );
                     tmpArray_2 = tmpArray;
                 }
@@ -97,7 +97,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                     }
                     TESForm::AddCompileIndex(tmpSound_2->uiSound, a1);
                     if (tmpSound_2 && (tmpSound_2->uiSound && pDataHandler->GetSound(tmpSound_2->uiSound))) {
-#if !FNVD_64BIT
+#if !XFNV_64BIT
                         TESSound* ptmpSound = pDataHandler->GetSound(tmpSound_2->uiSound);
                         tmpSound_2->uiSound = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptmpSound));
 #endif
@@ -188,7 +188,7 @@ void TESRegionDataSound::Save() {
         if (tmpArray) {
             rt::eh_vector_constructor_iterator(
                 tmpArray, sizeof(TESRegionSound), static_cast<int32_t>(uicount_2),
-                &fnvd::constructElement<TESRegionSound>
+                &xfnv::constructElement<TESRegionSound>
             );
             tmpArray_2 = tmpArray;
         }

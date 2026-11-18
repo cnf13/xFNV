@@ -478,12 +478,12 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
     PathingLocation lastLoc;
     uint32_t icurrentNodeCount;
     using nodes_t = BSSimpleArray<NavMeshSearchNode, 1024>;
-    FNVD_INLINED_LOCAL(nodes_t, nodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(nodes_t, nodes, std::nullopt, std::nullopt);
     // The nodes are read through the const GetAt.
     const nodes_t& rconstNodes = nodes;
     PathingLocation smoothingGoalLocation;
     using BadNodes_t = BSSimpleArray<NavMeshSearchLink, 1024>;
-    FNVD_INLINED_LOCAL(BadNodes_t, links, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BadNodes_t, links, std::nullopt, std::nullopt);
     PathingLocation smoothingStartLocation;
     int32_t pass;
     if (bUseStraightLineCheckFirst.Bool() &&
@@ -564,7 +564,7 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         lastNode = &nodes.GetLast();
         a1 = lastNode->sTriangle;
         NavMeshInfo_ = lastNode->pNavMesh->GetNavMeshInfo();
-        FNVD_RECONSTRUCT(PathingLocation)(&lastLoc, *lastNode->GetCenter(&v31), NavMeshInfo_, a1);
+        XFNV_RECONSTRUCT(PathingLocation)(&lastLoc, *lastNode->GetCenter(&v31), NavMeshInfo_, a1);
         if (pSolution.m_pObject->iLastLoadedVirtualNodeIndex != aiLastVirtualNodeIndex) {
             goto LABEL_41;
         }
@@ -1015,7 +1015,7 @@ bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLoc
     }
 
     PathingLocation* aLoc =
-        FNVD_RECONSTRUCT(PathingLocation)(&v15, arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
+        XFNV_RECONSTRUCT(PathingLocation)(&v15, arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
     aRetLocation.operator=(*aLoc);
     return true;
 }
@@ -1256,7 +1256,7 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathToValidNavMeshTriangle(
         return eReturn;
     }
     PathingLocation goalLoc;
-    FNVD_INLINED_LOCAL(PathingLocation, startArgument, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, startArgument, std::nullopt, std::nullopt);
     ::new (&startArgument) PathingLocation(aStartLocation);
     RAYCASTPATH_RESULT eReturn = RCP_FAILED;
     if (FindClosestOpenEdge(startArgument, goalLoc, abStart)) {
@@ -1461,10 +1461,10 @@ bool PathBuilder::RunNavMeshSearch_006CD670(
     uint32_t aiFirstVirtualNodeIndex,
     uint32_t aiLastVirtualNodeIndex
 ) {
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, v11, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, v11, std::nullopt, std::nullopt);
     uint16_t apusTriangle;
-    FNVD_INLINED_LOCAL(NavMeshSearch, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshSearch, apThis, std::nullopt, std::nullopt);
     uint16_t arTriangle;
     ::new (&apMemory) NavMeshPtr;
     if (aStartLocation.GetNavMeshAndTriangle(static_cast<NavMeshPtr&>(apMemory), arTriangle)) {
@@ -1522,7 +1522,7 @@ bool PathBuilder::RunPathSmoother(
                 break;
             }
             uint16_t sTriangle = (&aNodes.GetAt(static_cast<int32_t>(i)))->sTriangle;
-            FastNavMeshTriHandle* v8 = FNVD_RECONSTRUCT(FastNavMeshTriHandle)(
+            FastNavMeshTriHandle* v8 = XFNV_RECONSTRUCT(FastNavMeshTriHandle)(
                 &kTriHandle, (&aNodes.GetAt(static_cast<int32_t>(i)))->pNavMesh, sTriangle
             );
             kTriangles.Add(*v8);

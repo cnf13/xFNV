@@ -530,7 +530,7 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
 }
 
 NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel, bool abForceDynamic) {
-    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     if (!pModel) {
         return nullptr;
     }

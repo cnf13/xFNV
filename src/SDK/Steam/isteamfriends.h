@@ -45,4 +45,4 @@ public:
 // steam_api.dll's SteamFriends (cdecl), through the exe's import slot: the friends interface, or null when Steam is
 // not running.
 using SteamFriends_t = ISteamFriends* (*)();
-FNVD_IMPORT(SteamFriends_t, SteamFriends, 0xFDF474);
+XFNV_IMPORT(SteamFriends_t, SteamFriends, 0xFDF474);

@@ -4,7 +4,7 @@
 
 #include "xfnv/crashlog/CrashLog.hpp"
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
     namespace {
 
         // The MSVC RTTI records (rttidata.h). On x86 their links are 32-bit addresses; on x64 they are offsets from the
@@ -155,4 +155,4 @@ namespace fnvd::crashlog {
         }
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

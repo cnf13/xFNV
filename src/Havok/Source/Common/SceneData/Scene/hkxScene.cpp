@@ -65,7 +65,7 @@ hkxScene::getFullPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkCo
 // The product of the key frames (key, clamped to each node's last) along the path from the root to theNode.
 hkResult hkxScene::getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& worldFromNodeOut, int32_t key) {
     using NodePathArray = hkInplaceArray<const hkxNode*, 32>;
-    alignas(16) FNVD_INLINED_LOCAL(NodePathArray, pathOut, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(NodePathArray, pathOut, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkInplaceArray<const hkxNode*, 32>::hkInplaceArray
     pathOut.m_data = pathOut.m_storage;
     pathOut.m_size = 0;

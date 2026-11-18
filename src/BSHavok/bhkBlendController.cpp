@@ -84,8 +84,8 @@ void bhkBlendController::DoKnockDown(
                     // The two keys are built with BLENDKEY::BLENDKEY through the eh vector constructor iterator, in a
                     // 16-aligned slot: typed storage for which C++ runs no constructor.
                     using BLENDKEYArray2 = BLENDKEY[2];
-                    alignas(16) FNVD_INLINED_LOCAL(BLENDKEYArray2, akKeys, std::nullopt, std::nullopt);
-                    rt::eh_vector_constructor_iterator(akKeys, sizeof(BLENDKEY), 2, &fnvd::constructElement<BLENDKEY>);
+                    alignas(16) XFNV_INLINED_LOCAL(BLENDKEYArray2, akKeys, std::nullopt, std::nullopt);
+                    rt::eh_vector_constructor_iterator(akKeys, sizeof(BLENDKEY), 2, &xfnv::constructElement<BLENDKEY>);
                     akKeys[0].fGain = fHeirGain;
                     akKeys[0].fVelGain = fVelGain;
                     akKeys[0].fTime = 0.0f;
@@ -319,7 +319,7 @@ void bhkBlendController::DoGetUpRecursive(NiAVObject* apObject, float afTime) {
             pkController->iPriority = 2;
             if (pkController->pBlendKeyA.m_uiESize == 0) {
                 alignas(BLENDKEY) uint8_t aKeyStorage[2 * sizeof(BLENDKEY)];
-                rt::eh_vector_constructor_iterator(aKeyStorage, sizeof(BLENDKEY), 2, &fnvd::constructElement<BLENDKEY>);
+                rt::eh_vector_constructor_iterator(aKeyStorage, sizeof(BLENDKEY), 2, &xfnv::constructElement<BLENDKEY>);
                 // Raw memory the constructor has just built into two keys.
                 BLENDKEY* akKeys = reinterpret_cast<BLENDKEY*>(aKeyStorage);
                 akKeys[0].fGain = 0.0f;
@@ -750,9 +750,9 @@ void bhkBlendController::DoHit(NiAVObject* apObject, float afTime, int32_t abQua
                         // The three keys are built with BLENDKEY::BLENDKEY through the eh vector constructor
                         // iterator, because keys is typed storage for which C++ runs no constructor.
                         using BLENDKEYArray3 = BLENDKEY[3];
-                        FNVD_INLINED_LOCAL(BLENDKEYArray3, keys, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BLENDKEYArray3, keys, std::nullopt, std::nullopt);
                         rt::eh_vector_constructor_iterator(
-                            keys, sizeof(BLENDKEY), 3, &fnvd::constructElement<BLENDKEY>
+                            keys, sizeof(BLENDKEY), 3, &xfnv::constructElement<BLENDKEY>
                         );
                         keys[0].fGain = v26;
                         float v27 = v13;

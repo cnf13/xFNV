@@ -742,7 +742,7 @@ bool HUDMainMenu::ShowMessage(
     float afShowSeconds,
     bool abMoveToHead
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool bresult = false;
     if (apString) {
         HUDMainMenu::MessageData* newMessage_2 =
@@ -1479,9 +1479,9 @@ void HUDMainMenu::UpdateSneak() {
 }
 
 void HUDMainMenu::UpdateQuestText() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     NiPoint3 textDimensions_2;
     NiPoint3 pos_4;
     NiPoint3 subtitleDimensions;
@@ -1726,8 +1726,8 @@ void HUDMainMenu::UpdateQuestText() {
 }
 
 void HUDMainMenu::UpdateXPMeter() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     static int32_t HUDXPMeter_trait_x_min = Tile::AddUserTrait("_x_min", -1);
     static int32_t HUDXPMeter_trait_x_max = Tile::AddUserTrait("_x_max", -1);
     bool bplayerInCombat = pPlayer->GetNumberActorsInCombat() > 0;
@@ -2359,7 +2359,7 @@ HUDMainMenu::SubtitleData* HUDMainMenu::GetNextSubtitle() {
 }
 
 void HUDMainMenu::HideMessage() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
     if (!xMessages.IsEmpty()) {
         for (HUDMainMenu::MessageData* item : xMessages) {
             if (item) {
@@ -2551,7 +2551,7 @@ void HUDMainMenu::StatusModeTileEffects(Tile* apTile, float afCurrValue, bool bR
 }
 
 void HUDMainMenu::HandleReminderFade(Tile* apTile) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     NiPoint3 textDimensions;
     int32_t iScreenWidth = static_cast<int32_t>(InterfaceManager::GetScreenWidth());
     bool bShowedObjective = false;
@@ -3331,7 +3331,7 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
             auto* pActivator = dynamic_cast<TESObjectACTI*>(apObject->GetObjectReference());
             if (pActivator) {
                 // GetActivationString constructs its result in kActivation.
-                FNVD_INLINED_LOCAL(BSStringT<char>, kActivation, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSStringT<char>, kActivation, std::nullopt, std::nullopt);
                 BSStringT<char>* pActivation = pActivator->GetActivationString(&kActivation);
                 pPrompt->Copy(*pActivation);
                 kActivation.~BSStringT<char>();
@@ -3487,7 +3487,7 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
             }
         }
         // kPrompt is a C++ local, destroyed where its scope ends.
-        FNVD_DESTRUCT_IN_PLACE(BSStringT<char>)(pPrompt);
+        XFNV_DESTRUCT_IN_PLACE(BSStringT<char>)(pPrompt);
     }
 
     // The item the info lines describe: a projectile's carried item, else a change for the thrown weapon or the base
@@ -3504,14 +3504,14 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
     }
     else {
         TESBoundObject* pItemObject = pThrownWeapon ? pThrownWeapon : apObject->GetObjectReference();
-        pSourceItem = FNVD_RECONSTRUCT(ItemChange)(&kTempItem, pItemObject, 0);
+        pSourceItem = XFNV_RECONSTRUCT(ItemChange)(&kTempItem, pItemObject, 0);
         bTempItemBuilt = true;
     }
     ItemChange kItem;
     kItem.~ItemChange();
     ::new (&kItem) ItemChange(pSourceItem);
     if (bTempItemBuilt) {
-        FNVD_DESTRUCT_IN_PLACE(ItemChange)(&kTempItem);
+        XFNV_DESTRUCT_IN_PLACE(ItemChange)(&kTempItem);
     }
     if (!kItem.pExtraObjectList) {
         void* pMemory = ourMalloc(sizeof(BSSimpleList<ExtraDataList*>));
@@ -3714,7 +3714,7 @@ void HUDMainMenu::SetBrightness(Tile* apTile, HUD_BRIGHTNESS aeBrightness) {
 }
 
 void HUDMainMenu::SetRadiationLevel(float afDrinkinRads, float afStandinRads) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     float ftotalRads = afDrinkinRads + afStandinRads;
     if (HUDMainMenu::pme) {
         if (!(ftotalRads > 0.0)) {

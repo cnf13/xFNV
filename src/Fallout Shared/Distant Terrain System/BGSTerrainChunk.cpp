@@ -581,10 +581,10 @@ void BGSTerrainChunkLoadTask::Run() {
 }
 
 void BGSTerrainChunkLoadTask::Finish() {
-    FNVD_INLINED_LOCAL(NiFixedString, v25, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v27, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v28, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v25, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v27, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v28, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (spMesh.m_pObject) {
         if (this->bCanceled) {
             int32_t bCanceled = this->bCanceled;

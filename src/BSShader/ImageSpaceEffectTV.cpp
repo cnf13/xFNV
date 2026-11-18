@@ -45,7 +45,7 @@ bool ImageSpaceEffectTV::IsActive() {
 }
 
 void ImageSpaceEffectTV::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(1);
     NiTPrimitiveArray<ImageSpaceTexture*>* pTextureList = &pTextures;
     pTextures.SetSize(4u);

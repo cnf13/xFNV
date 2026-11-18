@@ -122,7 +122,7 @@ void DialoguePackage::LoadGame() {
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() < 32u) {
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The save keeps 4 bytes: they fill the low half of the zeroed pointer.
         v18 = nullptr;
 #endif
@@ -536,11 +536,11 @@ void DialoguePackage::InitLoadGame() {
     TESForm* FormByNumericID =
         TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTalkingActor)));
     pTalkingActor =
-        static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(FormByNumericID, RTTI_TESForm, RTTI_Actor));
+        static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(FormByNumericID, RTTI_TESForm, RTTI_Actor));
     TESForm* v2 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pActor)));
-    pActor = static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
+    pActor = static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
     TESForm* v3 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTargetActor)));
-    pTargetActor = static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(v3, RTTI_TESForm, RTTI_Actor));
+    pTargetActor = static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(v3, RTTI_TESForm, RTTI_Actor));
     if ((pSaveLoadGameOLD->GetCurrentVersion() >= 32u) && (pConversation)) {
         pConversation->InitLoadGameTES();
     }
@@ -715,7 +715,7 @@ void DialoguePackage::Speak(bool abUseSound) {
             bool bnosound = true;
             if (pCurrentResponse->pVoiceSound && bSoundFile) {
                 uint32_t isoundFileID = pCurrentResponse->pVoiceSound->iFormID;
-                FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
                 pact->PlaySound(
                     &soundHandle, isoundFileID, false,
                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN | BSGameSound::SOUND_FLAG_ONE_SHOT |
@@ -864,7 +864,7 @@ void DialoguePackage::Speak(bool abUseSound) {
             else {
                 uint32_t audioFlags =
                     BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_VOICE | BSGameSound::SOUND_FLAG_IS_3D;
-                FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
                 handle = *BSAudio::QInstance().GetSoundHandleByFilename(&soundHandle, acAudioFile, audioFlags, nullptr);
                 NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
                 // Reads the maximum distance first.
@@ -886,7 +886,7 @@ void DialoguePackage::Speak(bool abUseSound) {
         {
             // Copies the location, then the handle with operator=, then reads the text.
             NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
-            FNVD_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
             subtitleHandle = handle;
             const char* pText = pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
             Interface::ShowSubtitle(pText, subtitleHandle, kSpeakerLoc, pTargetActor, false);

@@ -146,7 +146,7 @@ void hkpMultiRayShape::calcContentStatistics(hkStatisticsCollector* collector, c
 void hkpMultiRayShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
     // EXE-INLINED none: hkInplaceArrayAligned16<hkpMultiRayShape::Ray, 16>::hkInplaceArrayAligned16
     using worldRays_t = hkInplaceArrayAligned16<Ray, 16>;
-    FNVD_INLINED_LOCAL(worldRays_t, worldRays, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(worldRays_t, worldRays, std::nullopt, std::nullopt);
     // The inline storage is raw bytes until the rays are written into it.
     worldRays.m_data = reinterpret_cast<Ray*>(worldRays.m_storage);
     worldRays.m_size = 0;

@@ -607,7 +607,7 @@ int32_t
 TESWaterListener::ProcessRigidBody(hkpRigidBody* phkBody, float fwaterHeight, float afTime, bool abPlaceableWater) {
     int32_t iResult = 0;
     alignas(16) hkVector4 kPosition;
-    FNVD_RECONSTRUCT(hkVector4)(&kPosition, phkBody->getTranslation());
+    XFNV_RECONSTRUCT(hkVector4)(&kPosition, phkBody->getTranslation());
     bhkRigidBody* pBody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(phkBody));
     alignas(16) hkAabb kAabb;
     pBody->GetAabb(kAabb);
@@ -628,9 +628,9 @@ TESWaterListener::ProcessRigidBody(hkpRigidBody* phkBody, float fwaterHeight, fl
         if (pWorld) {
             pWorld->markForRead();
             alignas(16) hkVector4 kGravity;
-            FNVD_RECONSTRUCT(hkVector4)(&kGravity, pWorld->getGravity());
+            XFNV_RECONSTRUCT(hkVector4)(&kGravity, pWorld->getGravity());
             alignas(16) hkVector4 kVelocity;
-            FNVD_RECONSTRUCT(hkVector4)(&kVelocity, phkBody->getLinearVelocity());
+            XFNV_RECONSTRUCT(hkVector4)(&kVelocity, phkBody->getLinearVelocity());
             float fMass = phkBody->getMass();
             float& rTop = kAabb.m_max(2);
             float& rMin = kAabb.m_min(2);
@@ -744,7 +744,7 @@ TESWaterListener::ProcessRigidBody(hkpRigidBody* phkBody, float fwaterHeight, fl
             phkBody->applyForce(afTime, kGravityForce);
             pWorld->markForWrite();
             alignas(16) hkVector4 kLinear;
-            FNVD_RECONSTRUCT(hkVector4)(&kLinear, phkBody->getLinearVelocity());
+            XFNV_RECONSTRUCT(hkVector4)(&kLinear, phkBody->getLinearVelocity());
             float fVertical = kLinear(2);
             kLinear(2) = 0.0f;
             if (bDampVertical) {
@@ -755,16 +755,16 @@ TESWaterListener::ProcessRigidBody(hkpRigidBody* phkBody, float fwaterHeight, fl
             if (fSubmergedMaxSpeed.Float() < dSpeed) {
                 float fDampH = static_cast<float>(fSubmergedLinearDampingH.Float() * -1.0 * afTime);
                 alignas(16) hkSimdReal kDampH;
-                FNVD_RECONSTRUCT(hkSimdReal)(&kDampH, std::exp(fDampH));
+                XFNV_RECONSTRUCT(hkSimdReal)(&kDampH, std::exp(fDampH));
                 kLinear.mul4(kDampH);
             }
             kLinear(2) = fVertical;
             phkBody->setLinearVelocity(kLinear);
             alignas(16) hkVector4 kAngular;
-            FNVD_RECONSTRUCT(hkVector4)(&kAngular, phkBody->getAngularVelocity());
+            XFNV_RECONSTRUCT(hkVector4)(&kAngular, phkBody->getAngularVelocity());
             float fDampA = static_cast<float>(fSubmergedAngularDamping.Float() * -1.0 * afTime);
             alignas(16) hkSimdReal kDampA;
-            FNVD_RECONSTRUCT(hkSimdReal)(&kDampA, std::exp(fDampA));
+            XFNV_RECONSTRUCT(hkSimdReal)(&kDampA, std::exp(fDampA));
             kAngular.mul4(kDampA);
             phkBody->setAngularVelocity(kAngular);
             pWorld->unmarkForWrite();

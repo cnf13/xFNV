@@ -233,7 +233,7 @@ void NiGeometryData::LoadBinary(NiStream& kStream) {
             NiColorA* v40 = v39;
             if (v39) {
                 rt::eh_vector_constructor_iterator(
-                    v39, sizeof(NiColorA), static_cast<int32_t>(uiNumberOfNormals), &fnvd::constructElement<NiColorA>
+                    v39, sizeof(NiColorA), static_cast<int32_t>(uiNumberOfNormals), &xfnv::constructElement<NiColorA>
                 );
             }
             else {

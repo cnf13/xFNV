@@ -54,60 +54,60 @@ void FormComponentCollection::InitFormComponentArray(TESForm* apForm) {
     pFCArray[5] = dynamic_cast<TESAttributes*>(apForm);
     pFCArray[6] = dynamic_cast<TESBipedModelForm*>(apForm);
     pFCArray[7] =
-        static_cast<BaseFormComponent*>(FNVD_DYNAMIC_CAST_VOID(TESContainer)(apForm, RTTI_TESForm, RTTI_TESContainer));
+        static_cast<BaseFormComponent*>(XFNV_DYNAMIC_CAST_VOID(TESContainer)(apForm, RTTI_TESForm, RTTI_TESContainer));
     pFCArray[8] = dynamic_cast<TESDescription*>(apForm);
     pFCArray[9] = dynamic_cast<TESEnchantableForm*>(apForm);
     pFCArray[10] = dynamic_cast<TESFullName*>(apForm);
     pFCArray[11] = dynamic_cast<TESHealthForm*>(apForm);
     pFCArray[12] = dynamic_cast<TESTexture*>(apForm);
     pFCArray[13] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(TESLeveledList)(apForm, RTTI_TESForm, RTTI_TESLeveledList)
+        XFNV_DYNAMIC_CAST_VOID(TESLeveledList)(apForm, RTTI_TESForm, RTTI_TESLeveledList)
     );
     pFCArray[14] = dynamic_cast<TESModel*>(apForm);
     pFCArray[15] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(TESProduceForm)(apForm, RTTI_TESForm, RTTI_TESProduceForm)
+        XFNV_DYNAMIC_CAST_VOID(TESProduceForm)(apForm, RTTI_TESForm, RTTI_TESProduceForm)
     );
     pFCArray[16] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(TESQualityForm)(apForm, RTTI_TESForm, RTTI_TESQualityForm)
+        XFNV_DYNAMIC_CAST_VOID(TESQualityForm)(apForm, RTTI_TESForm, RTTI_TESQualityForm)
     );
     pFCArray[17] = dynamic_cast<TESRaceForm*>(apForm);
     pFCArray[18] = dynamic_cast<TESScriptableForm*>(apForm);
     pFCArray[19] =
-        static_cast<BaseFormComponent*>(FNVD_DYNAMIC_CAST_VOID(TESSpellList)(apForm, RTTI_TESForm, RTTI_TESSpellList));
+        static_cast<BaseFormComponent*>(XFNV_DYNAMIC_CAST_VOID(TESSpellList)(apForm, RTTI_TESForm, RTTI_TESSpellList));
     pFCArray[20] =
-        static_cast<BaseFormComponent*>(FNVD_DYNAMIC_CAST_VOID(TESUsesForm)(apForm, RTTI_TESForm, RTTI_TESUsesForm));
+        static_cast<BaseFormComponent*>(XFNV_DYNAMIC_CAST_VOID(TESUsesForm)(apForm, RTTI_TESForm, RTTI_TESUsesForm));
     pFCArray[21] = dynamic_cast<TESValueForm*>(apForm);
     pFCArray[22] = dynamic_cast<TESWeightForm*>(apForm);
     pFCArray[23] = dynamic_cast<TESSoundFile*>(apForm);
     pFCArray[24] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(TESReactionForm)(apForm, RTTI_TESForm, RTTI_TESReactionForm)
+        XFNV_DYNAMIC_CAST_VOID(TESReactionForm)(apForm, RTTI_TESForm, RTTI_TESReactionForm)
     );
     pFCArray[2] = dynamic_cast<TESAnimation*>(apForm);
     pFCArray[25] = dynamic_cast<TESModelList*>(apForm);
     pFCArray[26] = dynamic_cast<BGSClipRoundsForm*>(apForm);
     pFCArray[27] = dynamic_cast<BGSAmmoForm*>(apForm);
     pFCArray[28] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(BGSIdleCollection)(apForm, RTTI_TESForm, RTTI_BGSIdleCollection)
+        XFNV_DYNAMIC_CAST_VOID(BGSIdleCollection)(apForm, RTTI_TESForm, RTTI_BGSIdleCollection)
     );
     pFCArray[29] = dynamic_cast<BGSDestructibleObjectForm*>(apForm);
     pFCArray[30] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(BGSRepairItemList)(apForm, RTTI_TESForm, RTTI_BGSRepairItemList)
+        XFNV_DYNAMIC_CAST_VOID(BGSRepairItemList)(apForm, RTTI_TESForm, RTTI_BGSRepairItemList)
     );
     pFCArray[31] =
-        static_cast<BaseFormComponent*>(FNVD_DYNAMIC_CAST_VOID(BGSEquipType)(apForm, RTTI_TESForm, RTTI_BGSEquipType));
+        static_cast<BaseFormComponent*>(XFNV_DYNAMIC_CAST_VOID(BGSEquipType)(apForm, RTTI_TESForm, RTTI_BGSEquipType));
     pFCArray[32] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(BGSBipedModelList)(apForm, RTTI_TESForm, RTTI_BGSBipedModelList)
+        XFNV_DYNAMIC_CAST_VOID(BGSBipedModelList)(apForm, RTTI_TESForm, RTTI_BGSBipedModelList)
     );
     pFCArray[33] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(TESImageSpaceModifiableForm)(apForm, RTTI_TESForm, RTTI_TESImageSpaceModifiableForm)
+        XFNV_DYNAMIC_CAST_VOID(TESImageSpaceModifiableForm)(apForm, RTTI_TESForm, RTTI_TESImageSpaceModifiableForm)
     );
     pFCArray[34] = dynamic_cast<TESImageSpaceModifiableCountForm<6>*>(apForm);
     pFCArray[35] = dynamic_cast<BGSMessageIcon*>(apForm);
     pFCArray[36] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(BGSTouchSpellForm)(apForm, RTTI_TESForm, RTTI_BGSTouchSpellForm)
+        XFNV_DYNAMIC_CAST_VOID(BGSTouchSpellForm)(apForm, RTTI_TESForm, RTTI_BGSTouchSpellForm)
     );
     pFCArray[37] = static_cast<BaseFormComponent*>(
-        FNVD_DYNAMIC_CAST_VOID(BGSPickupPutdownSounds)(apForm, RTTI_TESForm, RTTI_BGSPickupPutdownSounds)
+        XFNV_DYNAMIC_CAST_VOID(BGSPickupPutdownSounds)(apForm, RTTI_TESForm, RTTI_BGSPickupPutdownSounds)
     );
 }
 

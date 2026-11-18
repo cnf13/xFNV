@@ -65,7 +65,7 @@ void RepairMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void RepairMenu::DoClick(int32_t a1, Tile* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     char v13 = 0;
     if (!a2 && a1 >= 0 && a1 < 13) {
         a2 = pTiles[a1];
@@ -598,7 +598,7 @@ int32_t RepairMenu::SortFunc(ListBoxItem<ItemChange*>* apItem1, ListBoxItem<Item
 }
 
 void RepairMenu::Update() {
-    FNVD_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
     if (RepairMenu::pBrokenItem) {
         ::new (&pnewItemGroup) BSSimpleList<void*>;
         InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(pPlayer);

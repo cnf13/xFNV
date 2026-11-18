@@ -109,7 +109,7 @@ int32_t TESObjectLAND::iGrassEvalSize = gs_iGrassDensityEvalSize_Grass.Int();
 
 // On x64 the m_kBound field is read directly from the model data.
 NiBound& NiGeometry::GetModelBound() {
-#if FNVD_64BIT
+#if XFNV_64BIT
     return this->m_spModelData.operator->()->m_kBound;
 #else
     return *static_cast<NiBound*>(
@@ -413,7 +413,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     float v29 = static_cast<double>(v48[3 * curvert_2 + 2]) / 255.0;
                                     float v28 = static_cast<double>(v48[3 * curvert_2 + 1]) / 255.0;
                                     float fR = static_cast<double>(v48[3 * curvert_2]) / 255.0;
-                                    NiColorA* v7 = FNVD_RECONSTRUCT(NiColorA)(&kColor, fR, v28, v29, 1.0f);
+                                    NiColorA* v7 = XFNV_RECONSTRUCT(NiColorA)(&kColor, fR, v28, v29, 1.0f);
                                     NiColorA* v8 = &this->pLoadedData->ppColorsA[i][j];
                                     v8->r = v7->r;
                                     v8->g = v7->g;
@@ -1091,7 +1091,7 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
         pLoadedData->ppVertices[iblock] = v5;
         void* v9 = ourMalloc(289 * sizeof(NiColorA));
         if (v9) {
-            rt::eh_vector_constructor_iterator(v9, sizeof(NiColorA), 289, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(v9, sizeof(NiColorA), 289, &xfnv::constructElement<NiColorA>);
             v4 = static_cast<NiColorA*>(v9);
         }
         else {
@@ -1134,8 +1134,8 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
 
 void TESObjectLAND::DrawLandBorder(bool bShow) {
     NiPoint3 dst;
-    FNVD_INLINED_LOCAL(NiColorA, v28, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v29, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v28, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v29, std::nullopt, std::nullopt);
     int32_t tcount = 32;
     int32_t vcount = 128;
     int32_t lineidx = 0;
@@ -1162,7 +1162,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                 }
                 void* v31 = ourMalloc(128 * sizeof(NiColorA));
                 if (v31) {
-                    rt::eh_vector_constructor_iterator(v31, sizeof(NiColorA), 128, &fnvd::constructElement<NiColorA>);
+                    rt::eh_vector_constructor_iterator(v31, sizeof(NiColorA), 128, &xfnv::constructElement<NiColorA>);
                     lineclr = static_cast<NiColorA*>(v31);
                 }
                 else {
@@ -1635,18 +1635,18 @@ bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, Ni
 }
 
 bool TESObjectLAND::GetLandColor(const NiPoint3& aCoord, NiColorA& aColor) {
-    FNVD_INLINED_LOCAL(NiColorA, v36, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v39, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v40, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v45, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v46, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v48, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v51, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v52, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v57, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v58, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v36, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v39, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v40, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v45, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v46, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v48, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v51, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v52, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v57, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v58, std::nullopt, std::nullopt);
     COORD_DATA cdata;
     cdata.~COORD_DATA();
     ::new (&cdata) COORD_DATA;
@@ -1734,7 +1734,7 @@ void TESObjectLAND::InitDistantTextureBlending() {
             }
             BSShaderPPLightingProperty* pshprop = v13 ? static_cast<BSShaderPPLightingProperty*>(pprop) : nullptr;
             if ((pshprop) && (!pshprop->GetDiffuseTextures(9) || !pshprop->GetNormalTexture(9u))) {
-                FNVD_INLINED_LOCAL(NiColorA, kbaseCoord, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(NiColorA, kbaseCoord, std::nullopt, std::nullopt);
                 NiTexture* pdiffuse = pterrainManager->GetDiffuseTextureForPoint(kcellcenter);
                 NiTexture* pnormal = pterrainManager->GetNormalTextureForPoint(kcellcenter);
                 pshprop->SetDiffuseTexture(9u, pdiffuse);
@@ -2364,7 +2364,7 @@ void TESObjectLAND::MergeSameFileTextures() {
         float apDest[289];
         TESLandTexture* DefaultTexture_0 = GetDefaultTexture(i);
         BaseFormComponent* v20 = static_cast<BaseFormComponent*>(
-            FNVD_DYNAMIC_CAST_VOID(TESTexture)(DefaultTexture_0, RTTI_TESLandTexture, RTTI_TESTexture)
+            XFNV_DYNAMIC_CAST_VOID(TESTexture)(DefaultTexture_0, RTTI_TESLandTexture, RTTI_TESTexture)
         );
         ourMemset(apDest, 0, sizeof(apDest));
         for (int32_t j = 0; j < 6; ++j) {
@@ -2375,7 +2375,7 @@ void TESObjectLAND::MergeSameFileTextures() {
                     if (j != k) {
                         TESLandTexture* v14 = GetQuadTexture(i, k);
                         BaseFormComponent* apCompareFC = static_cast<BaseFormComponent*>(
-                            FNVD_DYNAMIC_CAST_VOID(TESTexture)(v14, RTTI_TESLandTexture, RTTI_TESTexture)
+                            XFNV_DYNAMIC_CAST_VOID(TESTexture)(v14, RTTI_TESLandTexture, RTTI_TESTexture)
                         );
                         if ((apCompareFC) && (!v17->TESTexture::CompareComponent(apCompareFC))) {
                             for (int32_t m = 0; m < 289; ++m) {
@@ -3119,7 +3119,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                     float v35 = static_cast<double>(v55[3 * curvert_2 + 2]) / 255.0;
                                     float v34 = static_cast<double>(v55[3 * curvert_2 + 1]) / 255.0;
                                     float fR = static_cast<double>(v55[3 * curvert_2]) / 255.0;
-                                    NiColorA* v8 = FNVD_RECONSTRUCT(NiColorA)(&kColor, fR, v34, v35, 1.0f);
+                                    NiColorA* v8 = XFNV_RECONSTRUCT(NiColorA)(&kColor, fR, v34, v35, 1.0f);
                                     NiColorA* v9 = &this->pLoadedData->ppColorsA[i][j];
                                     v9->r = v8->r;
                                     v9->g = v8->g;
@@ -3994,7 +3994,7 @@ void TESObjectLAND::InitializeStatics() {
     // The vertex blocks hold 17x17 = 289 vertices.
     void* ptr = ourMalloc(289 * sizeof(NiColorA));
     if (ptr) {
-        rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 289, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 289, &xfnv::constructElement<NiColorA>);
         pColorBlock = static_cast<NiColorA*>(ptr);
     }
     else {

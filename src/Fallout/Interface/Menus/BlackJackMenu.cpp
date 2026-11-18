@@ -168,8 +168,8 @@ void BlackJackMenu::AttachTileByID(int32_t a1, Tile* a2) {
 }
 
 void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (eBlackJackState == BlackJackMenu::BL_IDLE || eBlackJackState == BlackJackMenu::BL_PLAYER_TURN) {
         switch (a1) {
             case 3: {
@@ -510,18 +510,18 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
 void BlackJackMenu::DoIdle() {
     static int32_t eprevBlackJackState;
     static float fStateSecs;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v93, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v94, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v95, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v96, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v97, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v98, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v99, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v100, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v93, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v94, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v95, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v96, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v97, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v98, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v99, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v100, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t v173 = 0;
     float v176 = 1.0f;
     [[maybe_unused]] static BSSoundHandle spinningReelSound;
@@ -1727,33 +1727,33 @@ void BlackJackMenu::LoadNifs() {
     NiProperty* v9;
     int32_t v11;
     NiNode* v45;
-    FNVD_INLINED_LOCAL(NiFixedString, v47, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v48, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v49, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v50, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v51, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v52, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v53, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v54, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v55, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v57, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v58, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v60, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v61, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v63, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v64, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v65, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v66, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v67, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v68, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v69, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v70, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v71, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v72, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v47, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v48, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v49, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v50, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v51, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v52, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v53, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v54, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v55, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v57, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v58, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v60, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v61, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v63, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v64, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v65, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v66, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v67, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v68, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v69, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v70, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v71, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v72, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     pHandGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Hand1.NIF", LOD_MULT_NONE, true, false, false, false
     );
@@ -2011,7 +2011,7 @@ void BlackJackMenu::UpdateHandCardVisibility() {
             ObjectByName->SetAppCulled(true);
         }
     }
-    NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
     BlackJackMenu::spSceneRoot.m_pObject->Update(*updated);
 }
 
@@ -2054,7 +2054,7 @@ void BlackJackMenu::ShowAllHandCards() {
         ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, apName);
         ObjectByName->SetAppCulled(false);
     }
-    NiUpdateData* updated = FNVD_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
     NiAVObject* v1 = BlackJackMenu::spSceneRoot.m_pObject;
     v1->Update(*updated);
 }
@@ -2656,11 +2656,11 @@ Tile* BlackJackMenu::Create(
     int32_t aiMinWinnings,
     bool abDebugMode
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v31, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v31, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSimpleList<CasinoData*>* cl;
     Tile* pold_menu_tile = Menu::GetMenuByClass(1081);
     InterfaceManager* pin = InterfaceManager::Instance();

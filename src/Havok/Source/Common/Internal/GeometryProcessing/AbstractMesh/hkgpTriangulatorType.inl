@@ -28,14 +28,14 @@ hkgpTriangulatorBase::DefaultEdgeData<ALLOCATOR>::operator=(const DefaultEdgeDat
     return *this;
 }
 
-#define FNVD_TRIANGULATOR_HDR                                                                                          \
+#define XFNV_TRIANGULATOR_HDR                                                                                          \
     template <typename VERTEX_BASE, typename TRIANGLE_BASE, typename EDGE_DATA, typename ALLOCATOR, int32_t N>
-#define FNVD_TRIANGULATOR_TYP hkgpTriangulatorType<VERTEX_BASE, TRIANGLE_BASE, EDGE_DATA, ALLOCATOR, N>
+#define XFNV_TRIANGULATOR_TYP hkgpTriangulatorType<VERTEX_BASE, TRIANGLE_BASE, EDGE_DATA, ALLOCATOR, N>
 
 // The SDK's setDomain: the margin, then the local-to-world frame (the rectangle dmin..dmax over the quantized extent,
 // rotated by angle) and its inverse; the mesh reset to the domain's two triangles.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::setDomain(const hkVector4& dmin, const hkVector4& dmax, float angle, bool margin) {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::setDomain(const hkVector4& dmin, const hkVector4& dmax, float angle, bool margin) {
     const int32_t iMargin = margin ? 1 : 0;
     m_margin = iMargin;
     const float fExt = static_cast<float>(32767.0 - (static_cast<double>(iMargin) + iMargin));
@@ -55,8 +55,8 @@ void FNVD_TRIANGULATOR_TYP::setDomain(const hkVector4& dmin, const hkVector4& dm
 }
 
 // The SDK's getEdgeData: for a valid edge and an existing table, the data of the edge's box, else null.
-FNVD_TRIANGULATOR_HDR
-const EDGE_DATA* FNVD_TRIANGULATOR_TYP::getEdgeData(const Edge& edge) const {
+XFNV_TRIANGULATOR_HDR
+const EDGE_DATA* XFNV_TRIANGULATOR_TYP::getEdgeData(const Edge& edge) const {
     if (!edge.m_triangle || !m_edgeData) {
         return nullptr;
     }
@@ -79,8 +79,8 @@ const EDGE_DATA* FNVD_TRIANGULATOR_TYP::getEdgeData(const Edge& edge) const {
 // The SDK's getEdgeDataOrientation: over the edges of the triangles of region bit 0, whether more edges have data of
 // their own than through their twin (an open edge without data counts for the twin); the twin's data is read only
 // when the edge has none.
-FNVD_TRIANGULATOR_HDR
-int32_t FNVD_TRIANGULATOR_TYP::getEdgeDataOrientation() const {
+XFNV_TRIANGULATOR_HDR
+int32_t XFNV_TRIANGULATOR_TYP::getEdgeDataOrientation() const {
     Edge edge;
     Edge link;
     int32_t iCountIn = 0;
@@ -116,8 +116,8 @@ int32_t FNVD_TRIANGULATOR_TYP::getEdgeDataOrientation() const {
 // Equivalent to locateVertex(Edge(getRoot(x, y), 0), x, y). From the root of the point's grid cell, turn
 // counter-clockwise until the point is not right of the edge, then step towards it at most once per triangle,
 // restarting from each triangle's first edge in turn; a walk that never ends is reported as a cycle.
-FNVD_TRIANGULATOR_HDR
-auto FNVD_TRIANGULATOR_TYP::locateVertex(Location* apResult, int32_t x, int32_t y) const -> Location* {
+XFNV_TRIANGULATOR_HDR
+auto XFNV_TRIANGULATOR_TYP::locateVertex(Location* apResult, int32_t x, int32_t y) const -> Location* {
     // orientation(const Edge&, int, int): the edge's start-to-end vector crossed with start to (x, y), in wrapping
     // 32-bit arithmetic.
     auto orientation = [x, y](const Triangle* pTriangle, uint32_t uiIndex) -> int32_t {
@@ -219,8 +219,8 @@ auto FNVD_TRIANGULATOR_TYP::locateVertex(Location* apResult, int32_t x, int32_t 
 
 // Returns root when it starts at v, else the edge of the location locateVertex(root, v->m_x, v->m_y) finds (written out
 // as in locateVertex above; a cycle or no location gives the null edge).
-FNVD_TRIANGULATOR_HDR
-auto FNVD_TRIANGULATOR_TYP::locateExistingVertex(Edge* apResult, Edge root, const Vertex* v) const -> Edge* {
+XFNV_TRIANGULATOR_HDR
+auto XFNV_TRIANGULATOR_TYP::locateExistingVertex(Edge* apResult, Edge root, const Vertex* v) const -> Edge* {
     if (root.m_triangle->m_vertices[root.m_index] == v) {
         *apResult = root;
         return apResult;
@@ -298,8 +298,8 @@ auto FNVD_TRIANGULATOR_TYP::locateExistingVertex(Edge* apResult, Edge root, cons
 
 // Finds the edge from v0 to v1, starting from locateExistingVertex's edge at v0: on the domain's boundary it is first
 // turned counter-clockwise to the naked edge, then turned clockwise until it ends at v1.
-FNVD_TRIANGULATOR_HDR
-auto FNVD_TRIANGULATOR_TYP::locateExistingEdge(Edge* apResult, Edge root, const Vertex* v0, const Vertex* v1) const
+XFNV_TRIANGULATOR_HDR
+auto XFNV_TRIANGULATOR_TYP::locateExistingEdge(Edge* apResult, Edge root, const Vertex* v0, const Vertex* v1) const
     -> Edge* {
     Edge located;
     locateExistingVertex(&located, root, v0);
@@ -330,8 +330,8 @@ auto FNVD_TRIANGULATOR_TYP::locateExistingEdge(Edge* apResult, Edge root, const 
 
 // When both points are vertices, returns the edge between them (locateExistingEdge from the first location's edge),
 // else the null edge.
-FNVD_TRIANGULATOR_HDR
-auto FNVD_TRIANGULATOR_TYP::locateEdge(Edge* apResult, int32_t a1, int32_t a2, int32_t a3, int32_t a4) const -> Edge* {
+XFNV_TRIANGULATOR_HDR
+auto XFNV_TRIANGULATOR_TYP::locateEdge(Edge* apResult, int32_t a1, int32_t a2, int32_t a3, int32_t a4) const -> Edge* {
     Location location0;
     Location location1;
     locateVertex(&location0, a1, a2);
@@ -353,8 +353,8 @@ auto FNVD_TRIANGULATOR_TYP::locateEdge(Edge* apResult, int32_t a1, int32_t a2, i
 // triangle at (0, 0): a region's triangles are reached over unconstrained edges (the current stack), its neighbours
 // over constrained ones start the next region (the next stack); m_stack and a local 64-edge inplace stack take turns.
 // Returns the number of regions.
-FNVD_TRIANGULATOR_HDR
-int32_t FNVD_TRIANGULATOR_TYP::partition() {
+XFNV_TRIANGULATOR_HDR
+int32_t XFNV_TRIANGULATOR_TYP::partition() {
     using tEdgeStack = hkInplaceArray<Edge, 64, ALLOCATOR>;
     const uint32_t uiNullRegion = (1 << 12) - 1;
     for (Triangle* pTriangle = m_mesh.m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
@@ -430,8 +430,8 @@ int32_t FNVD_TRIANGULATOR_TYP::partition() {
 
 // The SDK's conformEdges: passes over every triangle's edges, flipping each non-conform edge that can flip, until a
 // pass flips none. The determinants wrap as 32- and 64-bit integer arithmetic does.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::conformEdges() {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::conformEdges() {
     const auto linkOf = [](const Edge& e) {
         const uintptr_t uid = e.m_triangle->m_links[e.m_index];
         Edge l;
@@ -562,8 +562,8 @@ void FNVD_TRIANGULATOR_TYP::conformEdges() {
 
 // The SDK's createEdgeDataHashTable: the table constructed on a heap block with cfgEdgeDataHashSize (1031) empty
 // buckets; null when the block is.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::createEdgeDataTable() {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::createEdgeDataTable() {
     using tTable = hkGeometryProcessing::HashTable<EdgeDataBox, ALLOCATOR>;
     using tBucket = hkArray<EdgeDataBox, ALLOCATOR>;
     void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(sizeof(tTable)));
@@ -585,8 +585,8 @@ void FNVD_TRIANGULATOR_TYP::createEdgeDataTable() {
 
 // The SDK's setEdgeData: the table created when missing; the edge's box looked up, else inserted with a new edge data
 // item from the pools; then each tag of data the item's list lacks appended (DefaultEdgeData::appendOrReplace).
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::appendOrReplaceEdgeData(const Edge& edge, const EDGE_DATA& data) {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::appendOrReplaceEdgeData(const Edge& edge, const EDGE_DATA& data) {
     using tBucket = hkArray<EdgeDataBox, ALLOCATOR>;
     using tEdgeDataPools = hkGeometryProcessing::PoolAllocator<EDGE_DATA, 32, ALLOCATOR>;
     if (!m_edgeData) {
@@ -650,8 +650,8 @@ void FNVD_TRIANGULATOR_TYP::appendOrReplaceEdgeData(const Edge& edge, const EDGE
 }
 
 // The SDK's restoreBothEdgeData: for the edge and then its twin, the value's data set back where it has any.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::setEdgeDataValues(Edge edge, const EdgeDataValue* const data) {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::setEdgeDataValues(Edge edge, const EdgeDataValue* const data) {
     for (int32_t i = 0; i < 2; ++i) {
         if (data[i].m_hasData) {
             appendOrReplaceEdgeData(edge, data[i].m_data);
@@ -667,8 +667,8 @@ void FNVD_TRIANGULATOR_TYP::setEdgeDataValues(Edge edge, const EdgeDataValue* co
 }
 
 // The SDK's destroyEdgeDataHashTable: the table destroyed and its heap block freed.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::releaseEdgeData() {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::releaseEdgeData() {
     if (m_edgeData) {
         delete m_edgeData;
         m_edgeData = nullptr;
@@ -677,8 +677,8 @@ void FNVD_TRIANGULATOR_TYP::releaseEdgeData() {
 
 // The SDK's clearEdgeData: the edge's box looked up, its data handed back to the edge data pools and the box removed
 // (swapped with its bucket's last); the table destroyed once it holds no edge.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::removeEdgeData(const Edge& edge) {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::removeEdgeData(const Edge& edge) {
     if (!m_edgeData) {
         return;
     }
@@ -706,8 +706,8 @@ void FNVD_TRIANGULATOR_TYP::removeEdgeData(const Edge& edge) {
 
 // The SDK's backupBothEdgeData: both values emptied, then for the edge and its twin, the edge's data copied into its
 // value and cleared from the table.
-FNVD_TRIANGULATOR_HDR
-void FNVD_TRIANGULATOR_TYP::extractEdgeDataValues(Edge edge, EdgeDataValue* const data) {
+XFNV_TRIANGULATOR_HDR
+void XFNV_TRIANGULATOR_TYP::extractEdgeDataValues(Edge edge, EdgeDataValue* const data) {
     data[0].m_hasData = false;
     data[1].m_hasData = false;
     for (int32_t i = 0; i < 2; ++i) {
@@ -729,8 +729,8 @@ void FNVD_TRIANGULATOR_TYP::extractEdgeDataValues(Edge edge, EdgeDataValue* cons
 // The SDK's insertEdge(int, int, int, int, bool, const EdgeData*): the origin located as a vertex, the fan around it
 // turned towards (x1, y1), then the destination walked to across the triangles, refusing constrained crossings; the
 // edge forced in by flips, constrained, given data, conformed and set as its triangle's root.
-FNVD_TRIANGULATOR_HDR
-auto FNVD_TRIANGULATOR_TYP::insertEdge(
+XFNV_TRIANGULATOR_HDR
+auto XFNV_TRIANGULATOR_TYP::insertEdge(
     Insertion* apResult,
     int32_t x0,
     int32_t y0,
@@ -1049,8 +1049,8 @@ auto FNVD_TRIANGULATOR_TYP::insertEdge(
 // triangle into three around the new vertex; ON_EDGE (refused on a constrained edge unless edgeSplit) splits the
 // edge's triangle and its twin into two each, edgeSplit carrying the edge's constraint and data over to both halves;
 // ON_VERTEX marks the vertex there constrained; any other kind is FAILED with Edge::null().
-FNVD_TRIANGULATOR_HDR
-auto FNVD_TRIANGULATOR_TYP::insertVertex(
+XFNV_TRIANGULATOR_HDR
+auto XFNV_TRIANGULATOR_TYP::insertVertex(
     Insertion* apResult,
     int32_t x,
     int32_t y,
@@ -1285,5 +1285,5 @@ auto FNVD_TRIANGULATOR_TYP::insertVertex(
     return result(Insertion::FAILED, makeEdge(nullptr, 0));
 }
 
-#undef FNVD_TRIANGULATOR_TYP
-#undef FNVD_TRIANGULATOR_HDR
+#undef XFNV_TRIANGULATOR_TYP
+#undef XFNV_TRIANGULATOR_HDR

@@ -667,14 +667,14 @@ struct hkgpMeshInternals : public hkgpMesh {
     static hkgpMeshInternals::Ring* createRing(hkgpMeshBase::Edge edge);
 };
 
-inline constexpr fnvd::Vtable hkgpMesh_CollideShapeTriangle_vftable{};
-inline constexpr fnvd::Vtable hkgpMesh_TriangleShape_vftable{};
-inline constexpr fnvd::Vtable hkgpMesh_NearestFeaturePolicy_vftable{};
-inline constexpr fnvd::Vtable hkgpMeshInternals_TriangleOverlap_vftable{};
-inline constexpr fnvd::Vtable hkgpMeshInternals_SimpleCollector_vftable{};
-inline constexpr fnvd::Vtable hkgpMesh_PrismShape_1_vftable{};
-inline constexpr fnvd::Vtable hkgpMesh_WeldingPolicy_vftable{};
-inline constexpr fnvd::Vtable hkgpMeshInternals_RayCaster_vftable{};
+inline constexpr xfnv::Vtable hkgpMesh_CollideShapeTriangle_vftable{};
+inline constexpr xfnv::Vtable hkgpMesh_TriangleShape_vftable{};
+inline constexpr xfnv::Vtable hkgpMesh_NearestFeaturePolicy_vftable{};
+inline constexpr xfnv::Vtable hkgpMeshInternals_TriangleOverlap_vftable{};
+inline constexpr xfnv::Vtable hkgpMeshInternals_SimpleCollector_vftable{};
+inline constexpr xfnv::Vtable hkgpMesh_PrismShape_1_vftable{};
+inline constexpr xfnv::Vtable hkgpMesh_WeldingPolicy_vftable{};
+inline constexpr xfnv::Vtable hkgpMeshInternals_RayCaster_vftable{};
 
 // The empty edge hkgpTopology::Edge::null() returns: a function-local
 // static (null triangle, index 0) behind bit 1 of its guard, shared by hkgpMesh's code.

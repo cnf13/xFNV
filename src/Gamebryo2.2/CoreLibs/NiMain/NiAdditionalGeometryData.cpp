@@ -755,7 +755,7 @@ void NiAdditionalGeometryData::LoadBinary(NiStream& kStream) {
         if (pvMemory) {
             rt::eh_vector_constructor_iterator(
                 pvMemory, sizeof(NiAGDDataStream), static_cast<int32_t>(uiCount),
-                &fnvd::constructElement<NiAdditionalGeometryData::NiAGDDataStream>
+                &xfnv::constructElement<NiAdditionalGeometryData::NiAGDDataStream>
             );
             pkEntries = static_cast<NiAGDDataStream*>(pvMemory);
         }
@@ -896,7 +896,7 @@ void NiAdditionalGeometryData::SetDataStreamCount(uint32_t uiCount) {
     if (v4) {
         rt::eh_vector_constructor_iterator(
             v4, sizeof(NiAGDDataStream), static_cast<int32_t>(uiCount),
-            &fnvd::constructElement<NiAdditionalGeometryData::NiAGDDataStream>
+            &xfnv::constructElement<NiAdditionalGeometryData::NiAGDDataStream>
         );
     }
     else {

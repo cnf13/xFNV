@@ -98,12 +98,12 @@ bool NavMeshPOVSearch::GetNodeConnections(
                     parentAnglePlusPI = parentPOVLink->EntryAngle;
                     if (parentPOVNode->Direction == AD_CCW) {
                         AngleSinCos kTurn;
-                        AngleSinCos* pTurn = FNVD_RECONSTRUCT(AngleSinCos)(&kTurn, 4.712389f);
+                        AngleSinCos* pTurn = XFNV_RECONSTRUCT(AngleSinCos)(&kTurn, 4.712389f);
                         parentAnglePlusPI.operator+=(*pTurn);
                     }
                     else {
                         AngleSinCos kTurn;
-                        AngleSinCos* pTurn = FNVD_RECONSTRUCT(AngleSinCos)(&kTurn, 4.712389f);
+                        AngleSinCos* pTurn = XFNV_RECONSTRUCT(AngleSinCos)(&kTurn, 4.712389f);
                         parentAnglePlusPI.operator-=(*pTurn);
                     }
                     AngleSinCosArc arc;
@@ -297,7 +297,7 @@ bool NavMeshPOVSearch::CheckSegmentAgainstNavMesh(
         kHandle.pNavMesh->FindInterectingEdge2(&kResult, kHandle.usTriangle, kHandle.iEdgeIndex, kCurrent, kEnd);
         if (kResult.eType == NavMesh::FIE_NONE) {
             FastNavMeshEdgeLocation kLocation;
-            apReturnLocation->Copy(*FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&kLocation, kHandle, kEnd));
+            apReturnLocation->Copy(*XFNV_RECONSTRUCT(FastNavMeshEdgeLocation)(&kLocation, kHandle, kEnd));
             return true;
         }
         FastNavMeshEdgeHandle kEdge;
@@ -320,7 +320,7 @@ bool NavMeshPOVSearch::CheckSegmentAgainstNavMesh(
         }
         if (!bCrossed) {
             FastNavMeshEdgeLocation kLocation;
-            apReturnLocation->Copy(*FNVD_RECONSTRUCT(FastNavMeshEdgeLocation)(&kLocation, kEdge, kResult.Intersection));
+            apReturnLocation->Copy(*XFNV_RECONSTRUCT(FastNavMeshEdgeLocation)(&kLocation, kEdge, kResult.Intersection));
             return false;
         }
         if (kHandle.pNavMesh != kOtherEdge.pNavMesh) {

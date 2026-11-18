@@ -148,7 +148,7 @@ bool TESRegionDataLandscape::SetCanopyShadowTexture(BSStringT<char>* a1) {
 NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
     NiTexturingProperty* v1;
     NiPixelData* ppixeldata;
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiTexture::FormatPrefs myPrefs;
     char v4 = 0;
     if (TESRegionDataLandscape::spDefaultFullMaskTextureProp.m_pObject) {

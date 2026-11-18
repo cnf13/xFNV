@@ -132,7 +132,7 @@ void hkxMesh::appendGeometry(
                 materialsInOut->m_data[materialsInOut->m_size++] = pMaterial;
             }
         }
-        FNVD_INLINED_LOCAL(hkGeometry, geometry, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkGeometry, geometry, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkGeometry::hkGeometry
         geometry.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
         geometry.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;

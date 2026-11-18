@@ -281,7 +281,7 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                 continue;
             default: {
                 // HK_ERROR; the same command is then read again.
-                FNVD_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
                 alignas(16) char buf[512];
                 ::new (&kStream) hkErrStream(buf, 512);
                 kStream.operator<<(
@@ -296,7 +296,7 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                     )) {
                     __builtin_debugtrap();
                 }
-                FNVD_DESTRUCT(hkOstream)(&kStream);
+                XFNV_DESTRUCT(hkOstream)(&kStream);
                 continue;
             }
         }

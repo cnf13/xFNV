@@ -168,8 +168,8 @@ void MagicBallProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 }
 
 void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
     float ffadeTimer;
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
@@ -468,7 +468,7 @@ void MagicBallProjectile::InitHavok() {
 }
 
 void MagicBallProjectile::Update(float afDelta) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (afDelta >= 60.0) {
         SetDelete(true);
     }
@@ -552,9 +552,9 @@ void MagicBallProjectile::Collide(
     bool abFizzle
 ) {
     Actor* v20;
-    FNVD_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     CFilter filter;
     if (apCollidee && apCollidee->IsActor()) {
         v20 = static_cast<Actor*>(apCollidee);
@@ -655,8 +655,8 @@ bool MagicBallProjectile::IsActive() {
 }
 
 void MagicBallProjectile::BuildAreaEffectGeometry() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
     char v9 = 0;
     NiAVObject* pav = (NiAVObject*)Get3D();
     bool v6 = true;
@@ -703,7 +703,7 @@ void MagicBallProjectile::BuildAreaEffectGeometry() {
 }
 
 void MagicBallProjectile::Init3D() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pn = Get3D();
     if (pn) {
         NiMatrix3 rot;

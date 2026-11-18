@@ -40,7 +40,7 @@ hkDisplaySemiCircle::hkDisplaySemiCircle(
 // Two line points per segment, from the semicircle's points: segment i runs from point i to point i + 1.
 void hkDisplaySemiCircle::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) {
     using points_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
     points.m_data = nullptr;
     points.m_size = 0;
     points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;

@@ -296,7 +296,7 @@ NiAVObject* bhkWorldObject::CreateDisplayGeometry(NiNode* apNode) {
     }
     if (!pNode->m_kName.GetHandle()) {
         // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         NiGlobalStringTable::GlobalStringHandle kHandle = NiGlobalStringTable::AddString(bhkWorldObject_Name);
         kName.SetHandle(kHandle);
         pNode->SetName(kName);

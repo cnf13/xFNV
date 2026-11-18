@@ -87,7 +87,7 @@ void bhkNiTriStripsShape::LoadBinary(NiStream& arStream) {
             );
         }
         NiObject::LoadBinary(arStream);
-        FNVD_INLINED_LOCAL(hkpMeshShapeCinfo, kCinfo, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkpMeshShapeCinfo, kCinfo, std::nullopt, std::nullopt);
         ::new (&kCinfo) hkpMeshShapeCinfo;
         {
             hkpMeshShapeCinfo::Serialized kForm{};
@@ -183,7 +183,7 @@ void bhkNiTriStripsShape::LinkObject(NiStream& arStream) {
         pShapes->SetSize(uiLinks);
         if (uiLinks) {
             // The empty sub part.
-            FNVD_INLINED_LOCAL(hkNiTriStripsData, kEmpty, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkNiTriStripsData, kEmpty, std::nullopt, std::nullopt);
             kEmpty.spGeom.m_pObject = nullptr;
             kEmpty.iFilter = 0;
             for (uint32_t uiLeft = uiLinks; uiLeft != 0; --uiLeft) {
@@ -236,7 +236,7 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
     // CreateCinfo is called virtually, as the game does.
     hkNiTriStripsShapeCinfo* pCinfo =
         &static_cast<hkNiTriStripsShapeCinfo&>(static_cast<bhkSerializable*>(this)->CreateCinfo(bCreated));
-    FNVD_INLINED_LOCAL(NiTLargePrimitiveArray<hkNiTriStripsData>, kShapes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiTLargePrimitiveArray<hkNiTriStripsData>, kShapes, std::nullopt, std::nullopt);
     ::new (&kShapes) NiTLargePrimitiveArray<hkNiTriStripsData>(0u, 1u);
     int32_t iSubparts = static_cast<int32_t>(pCinfo->pShapesA.m_uiSize);
     for (int32_t i = 0; i < iSubparts; ++i) {
@@ -285,7 +285,7 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
         pScale[3] = __builtin_bswap32(pScale[3]);
     }
     static_cast<bhkSerializable*>(this)->KillCinfo(bCreated);
-    FNVD_DESTRUCT(NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>)(&kShapes);
+    XFNV_DESTRUCT(NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>)(&kShapes);
     pTLS->eMemContext = eMemContext;
 }
 
@@ -463,7 +463,7 @@ void bhkNiTriStripsShape::KillCinfo(bool abCreated) {
     if (abCreated) {
         hkNiTriStripsShapeCinfo* pCinfo = static_cast<hkNiTriStripsShapeCinfo*>(this->pInfo);
         if (pCinfo) {
-            FNVD_DESTRUCT(NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>)(&pCinfo->pShapesA);
+            XFNV_DESTRUCT(NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>)(&pCinfo->pShapesA);
             // The block's padding byte sits just before the cinfo the alignment produced.
             uint8_t* pBytes = static_cast<uint8_t*>(static_cast<void*>(pCinfo));
             uint8_t uiPad = pBytes[-1];
@@ -616,7 +616,7 @@ void bhkNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& ar
         }
         void* pMemory = NiMemObject::operator new(sizeof(NiTriStrips));
         NiTriStrips* pStrips = pMemory ? ::new (pMemory) NiTriStrips(pData) : nullptr;
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
         kName.SetHandle(NiGlobalStringTable::AddString("bhkNiTriStripsShape"));
         pStrips->SetName(kName);

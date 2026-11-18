@@ -467,7 +467,7 @@ void Explosion::InitHavok() {
         info.m_shape = pshape->operator*();
         uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
         CFilter v8;
-        info.m_collisionFilterInfo = FNVD_RECONSTRUCT(CFilter)(&v8, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
+        info.m_collisionFilterInfo = XFNV_RECONSTRUCT(CFilter)(&v8, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
         if (this->Get3D()) {
             NiNode* v2 = this->Get3D();
             info.m_transform.NI2HK(v2->GetWorldTransform());
@@ -637,7 +637,7 @@ void Explosion::Initialize() {
                 pPlayer->GetParentCell(), 1.0f, pParticles, rotation, splashLocation, fScale, 7, nullptr
             );
             BSSoundHandle underWaterSound;
-            FNVD_INLINED_LOCAL(BSSoundHandle, soundResult, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundHandle, soundResult, std::nullopt, std::nullopt);
             underWaterSound = *BSAudio::QInstance().GetSoundHandleByName(
                 &soundResult, "CWaterExplosionSplash",
                 static_cast<uint32_t>(BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT)
@@ -665,8 +665,8 @@ void Explosion::Initialize() {
 }
 
 void Explosion::ApplyImpactDecals() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
     NiColor kVertexColor;
     hkpPropertyValue v64;
     CFilter v68;
@@ -674,7 +674,7 @@ void Explosion::ApplyImpactDecals() {
     CFilter v96;
     alignas(16) CFilter v107;
     alignas(16) NiPoint3 v109;
-    FNVD_INLINED_LOCAL(hkpAllRayHitCollector, pickCollector, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpAllRayHitCollector, pickCollector, std::nullopt, std::nullopt);
     hkpRootCdPoint point_2;
     NiPoint3 v122;
     NiPoint3 location;
@@ -793,7 +793,7 @@ void Explosion::ApplyImpactDecals() {
                                 key = pickPoint.m_shapeKeys[j_2];
                             }
                             uint32_t iNumExplosionDecalCDPoint_ = pickPoint.m_rootCollidable->getCollisionFilterInfo();
-                            uint32_t Group = FNVD_RECONSTRUCT(CFilter)(&v96, iNumExplosionDecalCDPoint_)->GetGroup();
+                            uint32_t Group = XFNV_RECONSTRUCT(CFilter)(&v96, iNumExplosionDecalCDPoint_)->GetGroup();
                             bool v95 = Group == 1;
                             if (Group == 1) {
                                 emat = TES::pInstance->GetLandMaterialType(contactPoint);
@@ -896,7 +896,7 @@ void Explosion::ApplyImpactDecals() {
                             }
                             if (Material == emat) {
                                 uint32_t iNumExplosionDecalCDPoint_c = m_rootCollidableB->getCollisionFilterInfo();
-                                uint32_t v21 = FNVD_RECONSTRUCT(CFilter)(&v68, iNumExplosionDecalCDPoint_c)->GetGroup();
+                                uint32_t v21 = XFNV_RECONSTRUCT(CFilter)(&v68, iNumExplosionDecalCDPoint_c)->GetGroup();
                                 bool v67 = v21 == 1;
                                 NiAVObject* Count = nullptr;
                                 if (v21 == 1) {
@@ -949,7 +949,7 @@ void Explosion::ApplyImpactDecals() {
                                     float x_4a = v57;
                                     int32_t DecalColor = static_cast<uint8_t>(pimpactData->GetDecalColor());
                                     float v55 = static_cast<double>(DecalColor) / 255.0;
-                                    data.fVertexColor = *FNVD_RECONSTRUCT(NiColor)(
+                                    data.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(
                                         &kVertexColor, v55, x_4a, iNumExplosionDecalCDPoint_d
                                     );
                                     pcell_2->AddDecal(data, BGSDecalManager::DECAL_TYPE_SIMPLE, false);
@@ -1277,7 +1277,7 @@ void Explosion::Init3D() {
                 cinfo.SetMotionType(hkpMotion::MOTION_DYNAMIC);
                 cinfo.SetFriction(1.0f);
                 uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-                CFilter* v8 = FNVD_RECONSTRUCT(CFilter)(&v39, L_CLUTTER, NewSystemGroup, P_OTHER);
+                CFilter* v8 = XFNV_RECONSTRUCT(CFilter)(&v39, L_CLUTTER, NewSystemGroup, P_OTHER);
                 cinfo.SetCollisionFilter(v8->iFilter);
                 cinfo.SetShape(pshape_2);
                 bhkRigidBody* v38 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
@@ -1631,8 +1631,8 @@ void Explosion::PushActor(Actor* apTargetActor, float afExplosionPower) {
 }
 
 void Explosion::StartSounds() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     StopSounds();
     if (GetExplosionBase()->Data.pSound1) {
         int32_t refID = GetExplosionBase()->Data.pSound1->iFormID;
@@ -1678,9 +1678,9 @@ void Explosion::UpdateRadiation() {
 }
 
 bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
-    FNVD_INLINED_LOCAL(NiColorA, v35, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v37, std::nullopt, std::nullopt);
-    alignas(16) FNVD_INLINED_LOCAL(NiColorA, v39, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v35, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v37, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(NiColorA, v39, std::nullopt, std::nullopt);
     NiPoint3 v47;
     CFilter fltr;
     NiPoint3 targetLocation[7];

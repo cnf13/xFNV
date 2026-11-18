@@ -299,7 +299,7 @@ ActiveEffect* ReanimateEffect::Copy() {
 }
 
 void ReanimateEffect::FinishInitLoadGame(Actor* apActor) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     ActiveEffect::FinishInitLoadGame(apActor);
     NiAVObject* pav = apActor->Get3D();
     if (pav) {

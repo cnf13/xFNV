@@ -14,17 +14,17 @@ void* DestroySteamAPICallbacks();
 
 // steam_api.dll's SteamAPI_RunCallbacks.
 using SteamAPI_RunCallbacks_t = void (*)();
-FNVD_IMPORT(SteamAPI_RunCallbacks_t, SteamAPI_RunCallbacks, 0xFDF488);
+XFNV_IMPORT(SteamAPI_RunCallbacks_t, SteamAPI_RunCallbacks, 0xFDF488);
 
 using SteamAPI_Shutdown_t = void (*)();
-FNVD_IMPORT(SteamAPI_Shutdown_t, SteamAPI_Shutdown, 0xFDF480);
+XFNV_IMPORT(SteamAPI_Shutdown_t, SteamAPI_Shutdown, 0xFDF480);
 
 using SteamAPI_IsSteamRunning_t = bool (*)();
-FNVD_IMPORT(SteamAPI_IsSteamRunning_t, SteamAPI_IsSteamRunning, 0xFDF498);
+XFNV_IMPORT(SteamAPI_IsSteamRunning_t, SteamAPI_IsSteamRunning, 0xFDF498);
 
 // steam_api.dll's SteamAPI_Init (steam_api.h).
 using SteamAPI_Init_t = bool (*)();
-FNVD_IMPORT(SteamAPI_Init_t, SteamAPI_Init, 0xFDF478);
+XFNV_IMPORT(SteamAPI_Init_t, SteamAPI_Init, 0xFDF478);
 
 // The Steam user-stats callbacks and the Steam state WinMain configures, allocated by GetSingleton.
 class SteamAPICallbacks {

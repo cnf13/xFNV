@@ -181,21 +181,21 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
 
     // EXE-INLINED none: hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>::hkArray
     using normalPriorityConstraints_t = hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(normalPriorityConstraints_t, normalPriorityConstraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(normalPriorityConstraints_t, normalPriorityConstraints, std::nullopt, std::nullopt);
     normalPriorityConstraints.m_data = nullptr;
     normalPriorityConstraints.m_size = 0;
     normalPriorityConstraints.m_capacityAndFlags = hkArrayBase<hkConstraintInternalInfo>::DONT_DEALLOCATE_FLAG;
     normalPriorityConstraints._reserve(hkMemoryRouter::getInstance().temp(), island->m_numConstraints);
     // EXE-INLINED none: hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>::hkArray
     using highPriorityConstraints_t = hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(highPriorityConstraints_t, highPriorityConstraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(highPriorityConstraints_t, highPriorityConstraints, std::nullopt, std::nullopt);
     highPriorityConstraints.m_data = nullptr;
     highPriorityConstraints.m_size = 0;
     highPriorityConstraints.m_capacityAndFlags = hkArrayBase<hkConstraintInternalInfo>::DONT_DEALLOCATE_FLAG;
     highPriorityConstraints._reserve(hkMemoryRouter::getInstance().temp(), island->m_numConstraints);
 
     // The stack allocator's bytes are untyped memory; each local array keeps its elements there.
-    FNVD_INLINED_LOCAL(hkLocalArray<hkConstraintInternalCallbackInfo>, callbackConstraints, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkConstraintInternalCallbackInfo>, callbackConstraints, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkConstraintInternalCallbackInfo>::hkLocalArray(island->m_numConstraints)
         // (hkAllocateStack)
@@ -224,7 +224,7 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
         const int32_t pointerBufferSize = 4 * numSlots;
         hkUlong* pointerBuffer = hkMemoryRouter::getInstance().temp()._blockAlloc<hkUlong>(pointerBufferSize);
         using entityPtrToIndex_t = hkUlongMapBase;
-        FNVD_INLINED_LOCAL(entityPtrToIndex_t, entityPtrToIndex, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(entityPtrToIndex_t, entityPtrToIndex, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkMap<hkUlong, hkUlong>::hkMap(pointerBuffer, size)
         entityPtrToIndex.init(pointerBuffer, pointerBufferSize * static_cast<int32_t>(sizeof(hkUlong)));
         // The map keys an entity by its address converted to the map's 32-bit storage integer (hkPointerMap::ToMapInt's
@@ -310,7 +310,7 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
     hkpSolveConstraintBatchTask* firstTaskOfPreviousBatch = nullptr;
     hkpSolveConstraintBatchTask* firstTaskOfCurrentBatch = nullptr;
 
-    FNVD_INLINED_LOCAL(hkLocalArray<hkConstraintInternalInfo>, constraintsForThisTask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkConstraintInternalInfo>, constraintsForThisTask, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkConstraintInternalInfo>::hkLocalArray(MAX_NUM_ATOM_INFOS) (hkAllocateStack)
         const int32_t capacity = hkpBuildJacobianTask::MAX_NUM_ATOM_INFOS;

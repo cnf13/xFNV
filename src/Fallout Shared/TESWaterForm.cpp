@@ -149,7 +149,7 @@ bool TESWaterForm::Load(TESFile* apFile) {
         if (uiChunk > FNAM_ID) {
             if (uiChunk == GNAM_ID) {
                 apFile->GetChunkData(pWaterWeatherControl, 0xC);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file keeps a 4-byte form ID for each water form, resolved by InitItem.
                 TESFile::WidenFormIDRecords(pWaterWeatherControl, 3, 4, sizeof(TESWaterForm*), {{0, 0}});
 #endif

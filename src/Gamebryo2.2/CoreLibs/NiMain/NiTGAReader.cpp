@@ -252,16 +252,16 @@ bool NiTGAReader::ReadHeader(
                     if (!m_bColormapped) {
                         goto LABEL_34;
                     }
-                    m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack4BitSourceRowPal>;
+                    m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack4BitSourceRowPal>;
                     break;
                 }
                 case 8: {
                     m_uiBytesPerPixel = 1;
                     if (m_bColormapped) {
-                        m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack8BitSourceRowPal>;
+                        m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack8BitSourceRowPal>;
                     }
                     else {
-                        m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack8BitSourceRowGray>;
+                        m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack8BitSourceRowGray>;
                     }
                     break;
                 }
@@ -270,25 +270,25 @@ bool NiTGAReader::ReadHeader(
                     m_uiBytesPerPixel = 2;
                     if (m_bColormapped) {
                         if (m_ucCoSize == 32) {
-                            m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack16BitSourceRowIndexedAlpha>;
+                            m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack16BitSourceRowIndexedAlpha>;
                         }
                         else {
-                            m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack16BitSourceRowIndexed>;
+                            m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack16BitSourceRowIndexed>;
                         }
                     }
                     else {
-                        m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack16BitSourceRowRGB>;
+                        m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack16BitSourceRowRGB>;
                     }
                     break;
                 }
                 case 24: {
                     m_uiBytesPerPixel = 3;
-                    m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack24BitSourceRow>;
+                    m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack24BitSourceRow>;
                     break;
                 }
                 case 32: {
                     m_uiBytesPerPixel = 4;
-                    m_pfnUnpacker = &fnvd::callMember<&NiTGAReader::Unpack32BitSourceRow>;
+                    m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack32BitSourceRow>;
                     break;
                 }
                 default: {

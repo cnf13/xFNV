@@ -176,7 +176,7 @@ void hkpVehicleLinearCastBatchingManager::stepVehiclesUsingCastResults(
     getLinearCastBatchFromBuffer(buffer, numJobs, linearCastBatch);
     const hkpPairLinearCastCommand* command = linearCastBatch.m_commandStorage;
 
-    FNVD_INLINED_LOCAL(
+    XFNV_INLINED_LOCAL(
         hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>, cdInfo, std::nullopt, std::nullopt
     );
     cdInfo.m_data = nullptr;

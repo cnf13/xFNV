@@ -359,7 +359,7 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
                 NiAVObject* pFound;
                 if (pChild) {
                     // EXE-INLINED 0x438170
-                    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
                     kName.SetHandle(NiGlobalStringTable::AddString("bhkColDisp"));
                     // Calls the base implementation directly, not virtually: it answers for a child whose own name is
                     // the display node's.
@@ -502,7 +502,7 @@ bool bhkNiCollisionObject::GetFaceUp(NiAVObject* apRoot, const char* apName) {
     NiAVObject* pObject = nullptr;
     if (apName) {
         // EXE-INLINED 0x438170
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.SetHandle(NiGlobalStringTable::AddString(apName));
         pObject = apRoot->GetObjectByName(kName);
         // EXE-INLINED 0x4381B0

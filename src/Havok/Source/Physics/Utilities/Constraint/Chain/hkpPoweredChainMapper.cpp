@@ -82,7 +82,7 @@ void hkpPoweredChainMapper::getMotors(
 // converted to a float; every motor is a limited force motor and gets both. The count is tested against zero, then
 // signed, and reloaded after each motor.
 void hkpPoweredChainMapper::setForceLimits(int32_t linkIndex, int32_t coordinageIndex, float minForce, float maxForce) {
-    FNVD_INLINED_LOCAL(hkArray<hkpConstraintMotor*>, motors, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpConstraintMotor*>, motors, std::nullopt, std::nullopt);
     motors.m_data = nullptr;
     motors.m_size = 0;
     motors.m_capacityAndFlags = hkArrayBase<hkpConstraintMotor*>::DONT_DEALLOCATE_FLAG;
@@ -178,13 +178,13 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
     pMemory->m_memSizeAndFlags = sizeof(hkpPoweredChainMapper);
     hkpPoweredChainMapper* pMapper = ::new (pMemory) hkpPoweredChainMapper;
     // EXE-INLINED none: hkArray<ChainTarget>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<ChainTarget>, targets, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<ChainTarget>, targets, std::nullopt, std::nullopt);
     targets.m_data = nullptr;
     targets.m_size = 0;
     targets.m_capacityAndFlags = hkArrayBase<ChainTarget>::DONT_DEALLOCATE_FLAG;
     // The number of chain links made from each constraint.
     // EXE-INLINED none: hkArray<int>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<int32_t>, numTargets, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<int32_t>, numTargets, std::nullopt, std::nullopt);
     numTargets.m_data = nullptr;
     numTargets.m_size = 0;
     numTargets.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
@@ -197,7 +197,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
         hkString::memSet(numTargets.m_data, 0, numConstraints * static_cast<int32_t>(sizeof(int32_t)));
     }
     // EXE-INLINED 0x626560: hkMap<hkUlong, hkUlong>::hkMap(0), with its reserve (0x626600) inlined too
-    FNVD_INLINED_LOCAL(ConstraintIndexMap, constraintToIndex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ConstraintIndexMap, constraintToIndex, std::nullopt, std::nullopt);
     constraintToIndex.m_map.m_elem = nullptr;
     constraintToIndex.m_map.m_numElems = 0;
     constraintToIndex.m_map.m_hashMod = -1;
@@ -227,12 +227,12 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
     for (int32_t i = 0; i < pairs.m_size; ++i) {
         const ChainEndpoints& rPair = pairs.m_data[i];
         // EXE-INLINED none: hkArray<hkpConstraintInstance*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpConstraintInstance*>, chainConstraints, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpConstraintInstance*>, chainConstraints, std::nullopt, std::nullopt);
         chainConstraints.m_data = nullptr;
         chainConstraints.m_size = 0;
         chainConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
         // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        FNVD_INLINED_LOCAL(hkArray<hkpEntity*>, chainEntities, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, chainEntities, std::nullopt, std::nullopt);
         chainEntities.m_data = nullptr;
         chainEntities.m_size = 0;
         chainEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
@@ -276,14 +276,14 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                     const int32_t it = constraintToIndex.findKey(chainConstraints.m_data[j]);
                     if (!constraintToIndex.isValid(it)) {
                         char buf[512];
-                        FNVD_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
                         ::new (&stream) hkErrStream(buf, 512);
                         stream << "Internal error.";
                         hkError::s_instance->message(
                             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA99DDu), buf,
                             ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 93
                         );
-                        FNVD_DESTRUCT(hkOstream)(&stream);
+                        XFNV_DESTRUCT(hkOstream)(&stream);
                         pChain->removeReference();
                         failed = true;
                         break;
@@ -301,14 +301,14 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                     numTargets.m_data[linkIndex]++;
                     if (pChain->m_data->getType() != hkpConstraintData::CONSTRAINT_TYPE_POWERED_CHAIN) {
                         char buf[512];
-                        FNVD_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
                         ::new (&stream) hkErrStream(buf, 512);
                         stream << "Internal error; invalid chain type.";
                         hkError::s_instance->message(
                             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9D6Du), buf,
                             ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 108
                         );
-                        FNVD_DESTRUCT(hkOstream)(&stream);
+                        XFNV_DESTRUCT(hkOstream)(&stream);
                         pChain->removeReference();
                         failed = true;
                         break;

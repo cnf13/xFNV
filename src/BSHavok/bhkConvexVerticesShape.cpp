@@ -86,12 +86,12 @@ void bhkConvexVerticesShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkConvexVerticesShapeCinfo* pCinfo = static_cast<hkConvexVerticesShapeCinfo*>(&CreateCinfo(bCreated));
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, kVertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, kVertices, std::nullopt, std::nullopt);
     kVertices.m_data = nullptr;
     kVertices.m_size = 0;
     kVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, kPlanes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, kPlanes, std::nullopt, std::nullopt);
     kPlanes.m_data = nullptr;
     kPlanes.m_size = 0;
     kPlanes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -255,7 +255,7 @@ void bhkConvexVerticesShape::BuildDisplayGeometry(NiNode* apNode, const NiColor&
     const hkpConvexVerticesShape* pShape = this ? static_cast<const hkpConvexVerticesShape*>(phkObject) : nullptr;
     int32_t iNumSpheres = pShape->getNumCollisionSpheresImpl();
     // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-    alignas(16) FNVD_INLINED_LOCAL(hkArray<hkSphere>, kSphereBuffer, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkSphere>, kSphereBuffer, std::nullopt, std::nullopt);
     kSphereBuffer.m_data = nullptr;
     kSphereBuffer.m_size = 0;
     kSphereBuffer.m_capacityAndFlags = hkArrayBase<hkSphere>::DONT_DEALLOCATE_FLAG;
@@ -264,7 +264,7 @@ void bhkConvexVerticesShape::BuildDisplayGeometry(NiNode* apNode, const NiColor&
     kSphereBuffer.setSizeUnchecked(iNumSpheres);
     const hkSphere* pSpheres = pShape->getCollisionSpheresImpl(kSphereBuffer.m_data);
     // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkVector4>, kVertices, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkVector4>, kVertices, std::nullopt, std::nullopt);
     kVertices.m_data = nullptr;
     kVertices.m_size = 0;
     kVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
@@ -278,7 +278,7 @@ void bhkConvexVerticesShape::BuildDisplayGeometry(NiNode* apNode, const NiColor&
     kStridedVertices.m_numVertices = kVertices.getSize();
     kStridedVertices.m_striding = sizeof(hkVector4);
     // EXE-INLINED 0xCCE5E0: hkGeometry::hkGeometry
-    FNVD_INLINED_LOCAL(hkGeometry, kGeometry, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkGeometry, kGeometry, std::nullopt, std::nullopt);
     kGeometry.m_vertices.m_data = nullptr;
     kGeometry.m_vertices.m_size = 0;
     kGeometry.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;

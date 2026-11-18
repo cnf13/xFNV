@@ -6,13 +6,13 @@ It tests that part of the game without the rest of it, and without the game's da
 
 ## Building and running
 
-The tests are built with the program when `FNVD_TESTS` is on (the default). They are not built under MSVC, because
+The tests are built with the program when `XFNV_TESTS` is on (the default). They are not built under MSVC, because
 the fakes are written for the Itanium C++ ABI that clang uses on Linux.
 
-    cmake --build build --target fnvd_test                  # build every test program and run them all
+    cmake --build build --target xfnv_test                  # build every test program and run them all
     ctest --test-dir build                                  # run them all, already built
-    build/tests/fnvd_test_scriptcompiler                    # one program, with doctest's options:
-    build/tests/fnvd_test_scriptcompiler -tc="*GetNextLine*" -s   # matching cases, showing every check
+    build/tests/xfnv_test_scriptcompiler                    # one program, with doctest's options:
+    build/tests/xfnv_test_scriptcompiler -tc="*GetNextLine*" -s   # matching cases, showing every check
 
 ## How a program is put together
 
@@ -36,8 +36,8 @@ A call that no fake covers stops the program with a message naming it. Add the f
 
 ## Adding a program
 
-1. Pick the game files to test, and compile them as part of a new `fnvd_add_test(...)` in tests/CMakeLists.txt.
-   That registers the program with ctest and adds it to `fnvd_test`.
+1. Pick the game files to test, and compile them as part of a new `xfnv_add_test(...)` in tests/CMakeLists.txt.
+   That registers the program with ctest and adds it to `xfnv_test`.
    Build the real files a fake would only copy: scriptcompiler builds the real compile data, expression parser and
    script variables.
 2. Link it. Every undefined symbol needs a fake, either in support/ (for a function many files call) or in the

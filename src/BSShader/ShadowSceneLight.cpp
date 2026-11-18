@@ -513,7 +513,7 @@ void ShadowSceneLight::TestFrustumCull(NiCullingProcess& arCuller) {
     float v56;
     float v57;
     float v58;
-    FNVD_INLINED_LOCAL(NiFrustumPlanes, frustumPlanes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFrustumPlanes, frustumPlanes, std::nullopt, std::nullopt);
     NiLight* m_pObject = spLight.m_pObject;
     kbound.m_fRadius = m_pObject->m_kSpec.r;
     bool bCastShadow = this->bCastShadow;
@@ -1513,9 +1513,9 @@ bool ShadowSceneLight::FrustumFrustumIntersection(NiCamera* apCamera1, NiCamera*
     // Each camera's frustum points: the eye, then the four far corners (x, y, z each).
     alignas(8) float v258[15];
     float v259[15];
-    alignas(8) FNVD_INLINED_LOCAL(NiFrustumPlanes, v260, std::nullopt, std::nullopt);
-    alignas(8) FNVD_INLINED_LOCAL(NiFrustumPlanes, v262, std::nullopt, std::nullopt);
-    alignas(8) FNVD_INLINED_LOCAL(NiFrustumPlanes, v263, std::nullopt, std::nullopt);
+    alignas(8) XFNV_INLINED_LOCAL(NiFrustumPlanes, v260, std::nullopt, std::nullopt);
+    alignas(8) XFNV_INLINED_LOCAL(NiFrustumPlanes, v262, std::nullopt, std::nullopt);
+    alignas(8) XFNV_INLINED_LOCAL(NiFrustumPlanes, v263, std::nullopt, std::nullopt);
     // The frustum's eight edges as pairs of point indices, stored byte by byte.
     uint8_t aucEdges[8][2];
     aucEdges[0][0] = 0;
@@ -1947,7 +1947,7 @@ bool ShadowSceneLight::CubeFaceFrustumFrustumIntersection(
     uint16_t ausCubeFace
 ) {
     NiUpdateData updateData;
-    FNVD_INLINED_LOCAL(BSCubeMapCamera, kCamera, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSCubeMapCamera, kCamera, std::nullopt, std::nullopt);
     TLSData* v5 = GetThreadTLSData();
     NiCamera* m_pkCamera = arCuller.m_pkCamera;
     MEM_CONTEXT eMemContext = v5->eMemContext;

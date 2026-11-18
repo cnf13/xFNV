@@ -37,7 +37,7 @@ bool FutBinaryFileC::isCorrectFileId(const std::string& aFname)
 	if (pStream != 0) {
 		// vector<char>(fileId.size() + 1): the iterator proxy, then _Construct_n with a zero byte.
 		CharVector buf;
-		FNVD_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
+		XFNV_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
 		if (std::fread(&buf[0], fileId.size(), 1, pStream) == 1) {
 			buf[fileId.size()] = 0;
 			std::fclose(pStream);
@@ -51,12 +51,12 @@ bool FutBinaryFileC::isCorrectFileId(const std::string& aFname)
 			std::fclose(pStream);
 			pStream = 0;
 			std::string sMessage;
-			FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+			XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 			futSetLastError(FUTERR_FILE_CORRUPT, sMessage);
 		}
 	} else {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 	}
 	if (pStream != 0) {
@@ -77,13 +77,13 @@ bool FutBinaryFileC::openForRead(std::string aFname)
 	fptr = rt::fopen(pcName, "rb");
 	if (fptr == 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 		return false;
 	}
 	// vector<char>(fileId.size() + 1): the iterator proxy, then _Construct_n with a zero byte.
 	CharVector buf;
-	FNVD_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
+	XFNV_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
 	if (!readHeader(&buf[0], fileId.size(), 1)) {
 		return false;
 	}
@@ -93,7 +93,7 @@ bool FutBinaryFileC::openForRead(std::string aFname)
 	copy[5] = fileId[5];
 	if (fileId.compare(0, fileId.size(), &copy[0], std::strlen(&copy[0])) != 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_INCORRECT_TYPE, sMessage);
 		close();
 		return false;
@@ -101,7 +101,7 @@ bool FutBinaryFileC::openForRead(std::string aFname)
 	// The sixth character is the file's version digit: a later one is an error, an earlier or equal one is accepted.
 	if (buf[5] > '0' && fileId[5] != buf[5]) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 		close();
 		return false;
@@ -121,13 +121,13 @@ bool FutBinaryFileC::openForUpdate(const std::string& aFname)
 	fptr = rt::fopen(pcName, "r+b");
 	if (fptr == 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 		return false;
 	}
 	// vector<char>(fileId.size() + 1): the iterator proxy, then _Construct_n with a zero byte.
 	CharVector buf;
-	FNVD_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
+	XFNV_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
 	if (!readHeader(&buf[0], fileId.size(), 1)) {
 		return false;
 	}
@@ -137,7 +137,7 @@ bool FutBinaryFileC::openForUpdate(const std::string& aFname)
 	copy[5] = fileId[5];
 	if (fileId.compare(0, fileId.size(), &copy[0], std::strlen(&copy[0])) != 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_INCORRECT_TYPE, sMessage);
 		close();
 		return false;
@@ -157,20 +157,20 @@ bool FutBinaryFileC::openForAppend(const std::string& aFname)
 	fptr = rt::fopen(pcName, "a+b");
 	if (fptr == 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 		return false;
 	}
 	// vector<char>(fileId.size() + 1): the iterator proxy, then _Construct_n with a zero byte.
 	CharVector buf;
-	FNVD_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
+	XFNV_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
 	if (!readHeader(&buf[0], fileId.size(), 1)) {
 		return false;
 	}
 	buf[5] = fileId[5];
 	if (fileId.compare(0, fileId.size(), &buf[0], std::strlen(&buf[0])) != 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_INCORRECT_TYPE, sMessage);
 		close();
 		return false;
@@ -227,7 +227,7 @@ bool BSFaceGenBinaryFile::openForRead(std::string apFileName, bool abCTLFile)
 	}
 	if (!pFile) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, apFileName);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, apFileName);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 		if (pFileFromMap) {
 			pFileFromMap->DecRefCount();
@@ -236,7 +236,7 @@ bool BSFaceGenBinaryFile::openForRead(std::string apFileName, bool abCTLFile)
 	}
 	// vector<char>(fileId.size() + 1): the iterator proxy, then _Construct_n with a zero byte.
 	CharVector buf;
-	FNVD_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
+	XFNV_RECONSTRUCT(CharVector)(&buf, fileId.size() + 1);
 	if (!readHeader(&buf[0], fileId.size(), 1)) {
 		if (pFileFromMap) {
 			pFileFromMap->DecRefCount();
@@ -251,7 +251,7 @@ bool BSFaceGenBinaryFile::openForRead(std::string apFileName, bool abCTLFile)
 	const char* pcCopy = &copy[0];
 	if (fileId.compare(0, fileId.size(), pcCopy, std::strlen(pcCopy)) != 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, apFileName);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, apFileName);
 		futSetLastError(FUTERR_FILE_INCORRECT_TYPE, sMessage);
 		close();
 		if (pFileFromMap) {
@@ -262,7 +262,7 @@ bool BSFaceGenBinaryFile::openForRead(std::string apFileName, bool abCTLFile)
 	// The sixth character is the file's version digit: a later one is an error, an earlier or equal one is accepted.
 	if (buf[5] > '0' && fileId[5] != buf[5]) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, apFileName);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, apFileName);
 		futSetLastError(FUTERR_FILE_NOT_READABLE, sMessage);
 		close();
 		if (pFileFromMap) {
@@ -317,7 +317,7 @@ bool BSFaceGenBinaryFile::readHeader(void* data, uint32_t size, uint32_t num)
 		return true;
 	}
 	std::string sMessage;
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
 	futSetLastError(FUTERR_FILE_CORRUPT, sMessage);
 	close();
 	return false;
@@ -353,7 +353,7 @@ bool FutBinaryFileC::openForOverwrite(std::string aFname) {
 	fptr = rt::fopen(pcName, "wb");
 	if (fptr == 0) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_WRITEABLE, sMessage);
 		return false;
 	}
@@ -361,7 +361,7 @@ bool FutBinaryFileC::openForOverwrite(std::string aFname) {
 	const char* pcId = fileId.c_str();
 	if (!writeHeader(pcId, uiSize, 1)) {
 		std::string sMessage;
-		FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
+		XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, aFname);
 		futSetLastError(FUTERR_FILE_NOT_WRITEABLE, sMessage);
 		close();
 		return false;
@@ -378,7 +378,7 @@ bool FutBinaryFileC::seek(int32_t offsetFromBeginning) {
 		return true;
 	}
 	std::string sMessage;
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
 	futSetLastError(FUTERR_FILE_SEEK_ERROR, sMessage);
 	close();
 	return false;
@@ -418,7 +418,7 @@ bool FutBinaryFileC::writeHeader(const void* data, uint32_t size, uint32_t num) 
 		return true;
 	}
 	std::string sMessage;
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
 	futSetLastError(FUTERR_FILE_WRITE_ERROR, sMessage);
 	close();
 	return false;
@@ -432,7 +432,7 @@ bool FutBinaryFileC::readHeader(void* data, uint32_t size, uint32_t num) {
 		return true;
 	}
 	std::string sMessage;
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&sMessage, m_fname);
 	futSetLastError(FUTERR_FILE_CORRUPT, sMessage);
 	close();
 	return false;

@@ -42,7 +42,7 @@ ImageSpaceEffectBlur::~ImageSpaceEffectBlur() {
 
 // The parameter list's SetAt stores the pointer without reference counting.
 void ImageSpaceEffectBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(2);
     pTextures.SetSize(bBrightPass ? 4u : 3u);
     int32_t iblurRadius = iRadius - 1;
@@ -229,7 +229,7 @@ void ImageSpaceEffectFullScreenBlur::Render(
 
 void ImageSpaceEffectFullScreenBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(11);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));

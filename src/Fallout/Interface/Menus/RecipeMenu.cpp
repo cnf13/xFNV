@@ -815,7 +815,7 @@ int32_t RecipeMenu::FilterSortFunction(const void* apPtr1, const void* apPtr2) {
 }
 
 void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
-    FNVD_INLINED_LOCAL(BSStringT<char>, pstring, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSStringT<char>, pstring, std::nullopt, std::nullopt);
     Tile* pcurrTiple = RecipeMenu::pMe->plbCurrListbox->GetTileFor(RecipeMenu::pCurrItem);
     BSSimpleList<TESRecipeComponent*>* pCompList = &RecipeMenu::pCurrItem->ingredientlist;
     TESForm* apObj = nullptr;

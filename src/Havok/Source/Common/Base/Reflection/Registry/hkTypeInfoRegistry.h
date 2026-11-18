@@ -31,4 +31,4 @@ public:
     // hkSingleton<hkTypeInfoRegistry>::s_instance.
     static inline hkTypeInfoRegistry* s_instance;
 };
-inline constexpr fnvd::Vtable hkTypeInfoRegistry_vftable{};
+inline constexpr xfnv::Vtable hkTypeInfoRegistry_vftable{};

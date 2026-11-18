@@ -276,7 +276,7 @@ void MagicBoltProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 }
 
 void MagicBoltProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     uint32_t itargetID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTarget));
     if (itargetID) {
@@ -744,7 +744,7 @@ void MagicBoltProjectile::Collide(
 ) {
     Actor* v23;
     NiPoint3 v25;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     CFilter filter;
     if (apCollidee && apCollidee->IsActor()) {
         v23 = static_cast<Actor*>(apCollidee);
@@ -832,7 +832,7 @@ void MagicBoltProjectile::Collide(
 
 void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apActiveEffect) {
     EffectItem* EffectItem_;
-    FNVD_INLINED_LOCAL(NiFixedString, v29, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v29, std::nullopt, std::nullopt);
     if (!apActiveEffect ||
         ((EffectItem_ = apActiveEffect->pEffect, EffectItem_ == GetDominantEffect()) &&
          pTarget != apTarget->GetTargetStatsObject())) {

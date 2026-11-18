@@ -37,7 +37,7 @@ SettingT<GameSettingCollection> gs_iStandardEmotionValue("iStandardEmotionValue"
 void TESResponse::Load(TESFile* apFile) {
     if ((apFile) && (((int32_t)apFile->GetTESChunk()) == 1413763668)) {
         apFile->GetChunkData(this, 0x18u);
-#if FNVD_64BIT
+#if XFNV_64BIT
             // The file's record is the 0x18-byte RESPONSE_DATA, with 4-byte form IDs at 8 and 0x10.
             TESFile::WidenFormIDRecords(
                 &Data, 1, 0x18, sizeof(Data),

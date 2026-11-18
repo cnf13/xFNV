@@ -533,15 +533,15 @@ void BSOcclusionPlane::MakeDebugGeom(
     bool abWithinFrustum
 ) {
     bool v39;
-    FNVD_INLINED_LOCAL(NiColorA, v50, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v51, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v52, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v55, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v56, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, v57, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v50, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v51, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v52, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v55, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v56, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v57, std::nullopt, std::nullopt);
     NiPoint3 akPoints[8];
     uint16_t j;
-    FNVD_INLINED_LOCAL(NiColorA, kcolor, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, kcolor, std::nullopt, std::nullopt);
     int32_t v103 = 4;
     int32_t v73 = 2;
     GetVertices(akPoints);

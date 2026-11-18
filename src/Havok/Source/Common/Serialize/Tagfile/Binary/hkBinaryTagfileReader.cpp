@@ -116,7 +116,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
     switch (arr.getType()) {
         case hkDataObject::TYPE_BYTE: {
             // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::hkArray(int)
-            FNVD_INLINED_LOCAL(hkArray<uint8_t>, buf, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkArray<uint8_t>, buf, std::nullopt, std::nullopt);
             buf.m_data = nullptr;
             buf.m_size = 0;
             buf.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
@@ -164,7 +164,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
         }
         case hkDataObject::TYPE_REAL: {
             // EXE-INLINED none: hkArray<hkReal, hkContainerTempAllocator>::hkArray(int)
-            FNVD_INLINED_LOCAL(hkArray<float>, buf, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkArray<float>, buf, std::nullopt, std::nullopt);
             buf.m_data = nullptr;
             buf.m_size = 0;
             buf.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
@@ -237,7 +237,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
         }
         case hkDataObject::TYPE_OBJECT: {
             for (int32_t i = 0; i < nelem; ++i) {
-                FNVD_INLINED_LOCAL(hkDataObject, obj, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkDataObject, obj, std::nullopt, std::nullopt);
                 hkDataObject* pObj = readObject(&obj, -1);
                 hkDataArray::Value value;
                 arr.access(&value, i)->operator=(*pObj);
@@ -251,7 +251,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             arr.getClass(&klass);
             const int32_t iNumMembers = klass.getNumMembers();
 
-            alignas(8) FNVD_INLINED_LOCAL(hkLocalArray<uint8_t>, bitfield, std::nullopt, std::nullopt);
+            alignas(8) XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, bitfield, std::nullopt, std::nullopt);
             bitfield.m_data = nullptr;
             bitfield.m_size = 0;
             bitfield.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
@@ -264,7 +264,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             bitfield.m_capacityAndFlags = static_cast<int32_t>(128 | hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
             readBitfield(iNumMembers, bitfield);
 
-            FNVD_INLINED_LOCAL(hkLocalArray<hkDataClass::MemberInfo>, minfo, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkLocalArray<hkDataClass::MemberInfo>, minfo, std::nullopt, std::nullopt);
             minfo.m_data = nullptr;
             minfo.m_size = 0;
             minfo.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG);
@@ -298,14 +298,14 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
                 if (bitfield.m_data[m] == 0) {
                     continue;
                 }
-                FNVD_INLINED_LOCAL(hkDataArray, members, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkDataArray, members, std::nullopt, std::nullopt);
                 arr.swizzleObjectMember(&members, mi.m_name);
                 if (mi.m_tupleCount == 0) {
                     _readArrayItems(members, nelem);
                 }
                 else {
                     for (int32_t i = 0; i < nelem; ++i) {
-                        alignas(8) FNVD_INLINED_LOCAL(hkDataArray, tuple, std::nullopt, std::nullopt);
+                        alignas(8) XFNV_INLINED_LOCAL(hkDataArray, tuple, std::nullopt, std::nullopt);
                         hkDataArray::Value value;
                         members.access(&value, i)->asArray(&tuple);
                         _readArrayItems(tuple, mi.m_tupleCount);
@@ -418,7 +418,7 @@ void Reader::readBinaryValue(hkDataObject::Value value, const hkDataClass::Membe
         }
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            FNVD_INLINED_LOCAL(hkDataObject, obj, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkDataObject, obj, std::nullopt, std::nullopt);
             readObject(&obj, -1);
             value.setObject(obj);
             obj.~hkDataObject();
@@ -480,7 +480,7 @@ hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
     }
 
     // EXE-INLINED none: hkLocalArray<uint8_t>::hkLocalArray(128)
-    FNVD_INLINED_LOCAL(hkLocalArray<uint8_t>, bitfield, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, bitfield, std::nullopt, std::nullopt);
     bitfield.m_data = nullptr;
     bitfield.m_size = 0;
     bitfield.m_capacityAndFlags = hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
@@ -496,7 +496,7 @@ hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
     readBitfield(numMembers, bitfield);
 
     // EXE-INLINED none: hkLocalArray<hkDataClass::MemberInfo>::hkLocalArray(numMembers)
-    FNVD_INLINED_LOCAL(hkLocalArray<hkDataClass::MemberInfo>, members, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkDataClass::MemberInfo>, members, std::nullopt, std::nullopt);
     members.m_data = nullptr;
     members.m_size = 0;
     members.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
@@ -543,7 +543,7 @@ hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
 // class under the next class tag; fails, reading no more, when the world is a native one (type 0).
 hkResult Reader::readClass() {
     // EXE-INLINED none: hkDataClass::Cinfo::Cinfo
-    FNVD_INLINED_LOCAL(hkDataClass::Cinfo, info, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkDataClass::Cinfo, info, std::nullopt, std::nullopt);
     info.members.m_data = nullptr;
     info.members.m_size = 0;
     info.members.m_capacityAndFlags = hkArrayBase<hkDataClass::Cinfo::Member>::DONT_DEALLOCATE_FLAG;
@@ -620,7 +620,7 @@ hkResult Reader::readClass() {
 
 hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
     uint32_t v5;
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     uint32_t array;
     char buf[512];
     m_ia.readArrayGeneric(&array, 4, 1);
@@ -674,7 +674,7 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
             hkError::MESSAGE_WARNING, 0x2AB6036F, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 453
         );
     LABEL_12:;
-        FNVD_DESTRUCT(hkOstream)(&apThis);
+        XFNV_DESTRUCT(hkOstream)(&apThis);
     }
 LABEL_13:;
     ::new (apResult) hkDataObject(nullptr);

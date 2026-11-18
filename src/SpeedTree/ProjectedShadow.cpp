@@ -116,7 +116,7 @@ void CProjectedShadow::Parse(CTreeFileAccess& cFile) {
             case File_ShadowMap: {
                 // The parsed string is built in the by-value argument of CIdvFilename's constructor, which frees it.
                 CIdvFilename cFilename;
-                FNVD_RECONSTRUCT(CIdvFilename)(&cFilename, cFile.ParseString());
+                XFNV_RECONSTRUCT(CIdvFilename)(&cFilename, cFile.ParseString());
                 CIdvFilename cNoPath;
                 m_strSelfShadowMap.assign(*cFilename.NoPath(&cNoPath), 0, std::string::npos);
                 break;

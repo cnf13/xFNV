@@ -32,7 +32,7 @@ void BGSIdleCollection::Load(TESFile* apFile) {
                         uint32_t isize = 4 * cIdleCount;
                         if (apFile->GetChunkSize() == isize) {
                             apFile->GetChunkData(pIdleArray, isize);
-#if FNVD_64BIT
+#if XFNV_64BIT
                             // The file keeps a 4-byte form ID for each idle, resolved by InitItem.
                             TESFile::WidenFormIDRecords(pIdleArray, cIdleCount, 4, sizeof(TESIdleForm*), {{0, 0}});
 #endif

@@ -495,7 +495,7 @@ bool CombatState::FindBestDodgeLocation(
     uint32_t uiPick = RandomUnsignedInt(uiCount);
     cLastDodgeDirection = acDirection[uiPick];
     CombatTimeStamp kNow;
-    FNVD_RECONSTRUCT(CombatTimeStamp)(&kNow, CombatTimer::GetTimer());
+    XFNV_RECONSTRUCT(CombatTimeStamp)(&kNow, CombatTimer::GetTimer());
     fLastDodgeSearch = kNow;
     apRetLocation->SetPoint(akPoints[acPointIndex[cLastDodgeDirection]], nullptr);
     return true;
@@ -687,7 +687,7 @@ bool CombatState::CheckCoverLocation(
         PathingLocation* pCoverLocation = &kCoverLocation;
         if (!pCoverLocation->IsValidLocation(pCombatant->GetRadius())) {
             eState = COVER_STATE_COVER_INVALID;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (bCheckFirePosition) {
@@ -695,27 +695,27 @@ bool CombatState::CheckCoverLocation(
             PathingLocation* pFireLocation = &kFireLocation;
             if (!pFireLocation->IsValidLocation(pCombatant->GetRadius())) {
                 eState = COVER_STATE_FIRE_INVALID;
-                FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pFireLocation);
-                FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+                XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pFireLocation);
+                XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
                 continue;
             }
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pFireLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pFireLocation);
         }
         if (!CheckMovement(kCoverPosition, static_cast<TESObjectCELL*>(apAttacker->GetSpace()), true, false)) {
             eState = COVER_STATE_CHECK_MOVEMENT_FAILED;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         arfSquaredDistance = (arCoverSearchTargetLocation - kCoverPosition).SqrLength();
         // An unordered (NaN) distance passes both range checks.
         if (arfSquaredDistance > afMaxRange * afMaxRange) {
             eState = COVER_STATE_TOO_FAR;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (arfSquaredDistance < afMinRange * afMinRange) {
             eState = COVER_STATE_TOO_CLOSE;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         BGSWorldLocation kWorldLocation;
@@ -724,7 +724,7 @@ bool CombatState::CheckCoverLocation(
         kWorldLocation.SetLocation(kCoverPosition, static_cast<TESObjectCELL*>(apAttacker->GetSpace()));
         if (pCombatController->GetCombatGroup()->FindTargetNearLocation(kWorldLocation, fTargetSearchRadius, false)) {
             eState = COVER_STATE_HOSTILES_NEAR;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (fTravelTime == -1.0) {
@@ -739,7 +739,7 @@ bool CombatState::CheckCoverLocation(
                 kCoverPosition, apAttacker, fTravelTime, 0.0f, kSkipOlderThreats, 0.0f
             ) > 0.0) {
             eState = COVER_STATE_COVER_THREATENED;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (bCheckFirePosition) {
@@ -750,7 +750,7 @@ bool CombatState::CheckCoverLocation(
                     kFirePosition, apAttacker, fTravelTime, 0.0f, kFireSkipOlderThreats, 0.0f
                 ) > 0.0) {
                 eState = COVER_STATE_FIRE_THREATENED;
-                FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+                XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
                 continue;
             }
         }
@@ -760,7 +760,7 @@ bool CombatState::CheckCoverLocation(
         }
         if (bSeen) {
             eState = COVER_STATE_COVER_LOS;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         bool bCheckFireLOS = true;
@@ -779,11 +779,11 @@ bool CombatState::CheckCoverLocation(
                 apAttacker, apTarget, kFirePosition, arCoverSearchTargetLocation, true, -1
             )) {
             eState = COVER_STATE_FIRE_LOS;
-            FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         apRetLocation->SetPoint(kCoverPosition, nullptr);
-        FNVD_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
+        XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
         return true;
     }
     if (ePreviousState > eState) {
@@ -1667,7 +1667,7 @@ TESObjectWEAP* CombatState::GetWeaponByCombatType(COMBAT_WEAPON_TYPE aeType) {
 
 void CombatState::PerformedMeleeAttack(Actor* apTarget) {
     CombatTimeStamp TimeStamp;
-    FNVD_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+    XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
     fLastAttackTimeStamp = TimeStamp;
 }
 
@@ -1675,11 +1675,11 @@ void CombatState::PerformedMeleeAttack(Actor* apTarget) {
 // sentinel; the window starts only on an exact match with -FLT_MAX.
 void CombatState::FiredProjectile(Projectile* apProjectile) {
     CombatTimeStamp TimeStamp;
-    FNVD_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+    XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
     fLastAttackTimeStamp = TimeStamp;
     if (static_cast<float>(fFiringStartedTimeStamp) == -3.4028234663852886e+38f) {
         CombatTimeStamp StartTimeStamp;
-        FNVD_RECONSTRUCT(CombatTimeStamp)(&StartTimeStamp, CombatTimer::GetTimer());
+        XFNV_RECONSTRUCT(CombatTimeStamp)(&StartTimeStamp, CombatTimer::GetTimer());
         fFiringStartedTimeStamp = StartTimeStamp;
     }
 }
@@ -1785,7 +1785,7 @@ bool CombatState::CheckMovement(
 ) {
     BGSWorldLocation WorldLocation;
     return CheckMovement(
-        *FNVD_RECONSTRUCT(BGSWorldLocation)(&WorldLocation, arPoint, static_cast<TESObjectCELL*>(apSpace)),
+        *XFNV_RECONSTRUCT(BGSWorldLocation)(&WorldLocation, arPoint, static_cast<TESObjectCELL*>(apSpace)),
         abCheckLocationReachable, abIgnoreCombatAreaCheck
     );
 }
@@ -1931,7 +1931,7 @@ void CombatState::AddUnreachableLocation(const BGSWorldLocation& arWorldLocation
     uint32_t uiIndex = UnreachableLocations.AddUninitialized();
     UnreachableLocations.GetAt(uiIndex).Location = arWorldLocation;
     CombatTimeStamp TimeStamp;
-    FNVD_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+    XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
     UnreachableLocations.GetAt(uiIndex).fTimeStamp = TimeStamp;
 }
 
@@ -2598,7 +2598,7 @@ bool CombatState::FindOptimalLocation(
     NiPoint3 result;
     NiPoint3 arLocation;
     // Filled by Pathing::FindClosestReachableLocation; nothing stores into it before.
-    FNVD_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     NiPoint3 arTargetPos;
     NiPoint3 ecx0;
     NiPoint3 v30;
@@ -3591,7 +3591,7 @@ void CombatState::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                     static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCombatItems[i]->pRef))
                 );
                 v5 = static_cast<TESForm*>(
-                    FNVD_DYNAMIC_CAST_VOID(TESObjectREFR)(FormByNumericID, RTTI_TESForm, RTTI_TESObjectREFR)
+                    XFNV_DYNAMIC_CAST_VOID(TESObjectREFR)(FormByNumericID, RTTI_TESForm, RTTI_TESObjectREFR)
                 );
             }
             else {

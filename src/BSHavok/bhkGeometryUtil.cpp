@@ -16,7 +16,7 @@ void bhkGeometryUtil::ComputePlanesFromVertices(
     vertData.m_numVertices = arVerts.m_size;
     vertData.m_striding = sizeof(hkVector4);
     // EXE-INLINED 0xCCE5E0: hkGeometry::hkGeometry
-    FNVD_INLINED_LOCAL(hkGeometry, outGeom, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkGeometry, outGeom, std::nullopt, std::nullopt);
     outGeom.m_vertices.m_data = nullptr;
     outGeom.m_vertices.m_size = 0;
     outGeom.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;

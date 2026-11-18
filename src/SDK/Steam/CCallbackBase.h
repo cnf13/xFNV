@@ -26,9 +26,9 @@ public:
 // steam_api.dll's SteamAPI_RegisterCallback(pCallback, iCallback) (cdecl; the Steam SDK's steam_api.h, void), through
 // the exe's import slot. CCallbackBase's registration helpers (0x6FFB20, 0x6FFB90, 0x6FFC20) call it.
 using SteamAPI_RegisterCallback_t = void (*)(CCallbackBase* pCallback, int32_t iCallback);
-FNVD_IMPORT(SteamAPI_RegisterCallback_t, SteamAPI_RegisterCallback, 0xFDF48C);
+XFNV_IMPORT(SteamAPI_RegisterCallback_t, SteamAPI_RegisterCallback, 0xFDF48C);
 
 // steam_api.dll's SteamAPI_UnregisterCallback(pCallback) (cdecl; steam_api.h, void), through the exe's import slot;
 // 0x6FFC00 calls it.
 using SteamAPI_UnregisterCallback_t = void (*)(CCallbackBase* pCallback);
-FNVD_IMPORT(SteamAPI_UnregisterCallback_t, SteamAPI_UnregisterCallback, 0xFDF47C);
+XFNV_IMPORT(SteamAPI_UnregisterCallback_t, SteamAPI_UnregisterCallback, 0xFDF47C);

@@ -42,7 +42,7 @@ NiPointer<NiNode> ScreenSplatter::spRoot;
 ScreenSplatter::spTextures_t ScreenSplatter::spTextures;
 
 void ScreenSplatter::Activate(uint32_t auiCount, float afDuration, ScreenSplatterType aeType) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     BSSplatterData splatterData;
     if (ScreenSplatter::bEnabled) {
         int32_t* v3 = &iBloodSplatterMaxCount.Int();

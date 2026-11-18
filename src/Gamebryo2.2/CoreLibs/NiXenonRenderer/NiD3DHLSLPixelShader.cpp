@@ -171,7 +171,7 @@ bool NiD3DHLSLPixelShader::SetShaderConstantArray(
     uint32_t uiRegistersPerEntry,
     uint16_t* pusReorderArray
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
     if (!m_pkConstantTable || !m_pkD3DDevice) {
         return false;
     }

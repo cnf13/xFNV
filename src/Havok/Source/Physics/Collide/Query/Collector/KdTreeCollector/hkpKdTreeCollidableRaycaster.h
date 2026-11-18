@@ -53,4 +53,4 @@ public:
     hkpRayHitCollector* m_collector;
 };
 
-inline constexpr fnvd::Vtable hkpKdTreeCollidableRaycaster_vftable{};
+inline constexpr xfnv::Vtable hkpKdTreeCollidableRaycaster_vftable{};

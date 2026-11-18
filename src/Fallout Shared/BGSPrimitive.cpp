@@ -70,14 +70,14 @@ BGSPrimitive* BGSPrimitive::CreateAbstract(PRIMITIVE_TYPE eType, NiPoint3& aRadi
 BGSPrimitive* BGSPrimitive::Copy(BGSPrimitive* apCopy) {
     NiPoint3 v10;
     NiPoint3 v11;
-    FNVD_INLINED_LOCAL(NiColorA, color_3, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, color_3, std::nullopt, std::nullopt);
     NiPoint3 radii_2;
-    FNVD_INLINED_LOCAL(NiColorA, color_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiColorA, colorTmp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, color_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, colorTmp, std::nullopt, std::nullopt);
     BGSPrimitive* pprimitive = nullptr;
     if (apCopy->eType == BGSPrimitive::PRIMITIVE_PLANE) {
         NiPoint3 radii;
-        FNVD_INLINED_LOCAL(NiColorA, color, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiColorA, color, std::nullopt, std::nullopt);
         radii = apCopy->GetRadii() * 2.0f;
         color = apCopy->GetColor();
         NiPoint3* v2 = &(v11 = apCopy->GetRadii());
@@ -617,8 +617,8 @@ BGSPrimitiveSphere::BGSPrimitiveSphere() {
 BGSPrimitiveSphere::~BGSPrimitiveSphere() {}
 
 void BGSPrimitiveSphere::Build() {
-    FNVD_INLINED_LOCAL(NiFixedString, v17, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v17, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (spGeometry.m_pObject) {
         float* v3 = &Radii.operator[](0);
         SetRadius(*v3);
@@ -633,7 +633,7 @@ void BGSPrimitiveSphere::Build() {
         NiColorA* pcolors;
         void* ptr = ourMalloc(112 * sizeof(NiColorA));
         if (ptr) {
-            rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 112, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 112, &xfnv::constructElement<NiColorA>);
             pcolors = static_cast<NiColorA*>(ptr);
         }
         else {

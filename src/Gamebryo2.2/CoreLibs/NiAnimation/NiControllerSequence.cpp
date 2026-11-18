@@ -374,7 +374,7 @@ void NiControllerSequence::IDTag::HandleDeprecatedExtraData(NiStringPalette* pkP
     uint32_t uiCtlrID = *reinterpret_cast<const uint32_t*>(&m_kCtlrID);
     uint32_t uiInterpolatorID = *reinterpret_cast<const uint32_t*>(&m_kInterpolatorID);
 
-    FNVD_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
     // EXE-INLINED none: NiFixedString::NiFixedString
     kString.SetHandle(NiGlobalStringTable::NULL_STRING);
     m_kAVObjectName.SetHandle(kString.GetHandle());
@@ -513,7 +513,7 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
         pkInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
             pkInterpArray, sizeof(InterpArrayItem), uiCount,
-            &fnvd::constructElement<NiControllerSequence::InterpArrayItem>
+            &xfnv::constructElement<NiControllerSequence::InterpArrayItem>
         );
     }
     m_pkInterpArray = pkInterpArray;
@@ -528,14 +528,14 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkIDTagArray = reinterpret_cast<IDTag*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
-            pkIDTagArray, sizeof(IDTag), uiCount, &fnvd::constructElement<NiControllerSequence::IDTag>
+            pkIDTagArray, sizeof(IDTag), uiCount, &xfnv::constructElement<NiControllerSequence::IDTag>
         );
     }
     m_pkIDTagArray = pkIDTagArray;
 
     if (bOldFormat) {
         for (uint32_t ui = 0; ui < m_uiArraySize; ++ui) {
-            FNVD_INLINED_LOCAL(NiFixedString, kStr, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kStr, std::nullopt, std::nullopt);
             // EXE-INLINED none: NiFixedString::NiFixedString
             kStr.SetHandle(NiGlobalStringTable::NULL_STRING);
             kStream.LoadCStringAsFixedString(kStr);
@@ -612,7 +612,7 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
                 *static_cast<size_t*>(pvMemory) = uiCount;
                 pspAnimNotes = reinterpret_cast<NiPointer<BSAnimNote>*>(static_cast<size_t*>(pvMemory) + 1);
                 rt::eh_vector_constructor_iterator(
-                    pspAnimNotes, sizeof(NiPointer<BSAnimNote>), uiCount, &fnvd::constructElement<NiPointer<BSAnimNote>>
+                    pspAnimNotes, sizeof(NiPointer<BSAnimNote>), uiCount, &xfnv::constructElement<NiPointer<BSAnimNote>>
                 );
             }
             spAnimNotesA = pspAnimNotes;
@@ -923,7 +923,7 @@ void NiControllerSequence::PostLinkObject(NiStream& kStream) {
             m_fBeginKeyTime = 0.0f;
         }
 
-        FNVD_INLINED_LOCAL(NiTPrimitiveArray<char*>, kNames, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiTPrimitiveArray<char*>, kNames, std::nullopt, std::nullopt);
         kNames.m_usSize = 0;
         if (static_cast<uint16_t>(uiArraySize)) {
             // EXE-INLINED 0x96AFC0
@@ -932,7 +932,7 @@ void NiControllerSequence::PostLinkObject(NiStream& kStream) {
         else {
             kNames.m_pBase = nullptr;
         }
-        FNVD_INLINED_LOCAL(NiTObjectArray<NiPointer<NiInterpController>>, kCtlrs, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiTObjectArray<NiPointer<NiInterpController>>, kCtlrs, std::nullopt, std::nullopt);
         ::new (&kCtlrs) NiTObjectArray<NiPointer<NiInterpController>>(static_cast<uint16_t>(m_uiArraySize), 1u);
 
         for (uint32_t ui = 0; ui < m_uiArraySize; ui++) {
@@ -974,10 +974,10 @@ void NiControllerSequence::PostLinkObject(NiStream& kStream) {
         for (uint32_t ui = 0; ui < uiNames; ui++) {
             _NiFree(kNames.m_pBase[ui]);
         }
-        FNVD_DESTRUCT_AS(DestructInlined, NiTArray<NiPointer<NiInterpController>, NiTNewInterface<NiPointer<NiInterpController>>>)(
+        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<NiPointer<NiInterpController>, NiTNewInterface<NiPointer<NiInterpController>>>)(
             &kCtlrs
         );
-        FNVD_DESTRUCT_AS(DestructInlined, NiTArray<char*, NiTMallocInterface<char*>>)(&kNames);
+        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<char*, NiTMallocInterface<char*>>)(&kNames);
     }
 }
 
@@ -1102,7 +1102,7 @@ void NiControllerSequence::CopyMembers(NiControllerSequence* pkDest, NiCloningPr
         pkInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
             pkInterpArray, sizeof(InterpArrayItem), uiCount,
-            &fnvd::constructElement<NiControllerSequence::InterpArrayItem>
+            &xfnv::constructElement<NiControllerSequence::InterpArrayItem>
         );
     }
     pkDest->m_pkInterpArray = pkInterpArray;
@@ -1117,7 +1117,7 @@ void NiControllerSequence::CopyMembers(NiControllerSequence* pkDest, NiCloningPr
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkIDTagArray = reinterpret_cast<IDTag*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
-            pkIDTagArray, sizeof(IDTag), uiCount, &fnvd::constructElement<NiControllerSequence::IDTag>
+            pkIDTagArray, sizeof(IDTag), uiCount, &xfnv::constructElement<NiControllerSequence::IDTag>
         );
     }
     pkDest->m_pkIDTagArray = pkIDTagArray;
@@ -1357,7 +1357,7 @@ bool NiControllerSequence::ReallocateArrays() {
         pkNewInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
             pkNewInterpArray, sizeof(InterpArrayItem), uiNewSize,
-            &fnvd::constructElement<NiControllerSequence::InterpArrayItem>
+            &xfnv::constructElement<NiControllerSequence::InterpArrayItem>
         );
     }
 
@@ -1370,7 +1370,7 @@ bool NiControllerSequence::ReallocateArrays() {
         *static_cast<size_t*>(pvMemory) = uiNewSize;
         pkNewIDTagArray = reinterpret_cast<IDTag*>(static_cast<size_t*>(pvMemory) + 1);
         rt::eh_vector_constructor_iterator(
-            pkNewIDTagArray, sizeof(IDTag), uiNewSize, &fnvd::constructElement<NiControllerSequence::IDTag>
+            pkNewIDTagArray, sizeof(IDTag), uiNewSize, &xfnv::constructElement<NiControllerSequence::IDTag>
         );
     }
 
@@ -1538,7 +1538,7 @@ bool NiControllerSequence::ConvertOldNameControllerPair(const char* pcObjectName
         return true;
     }
     do {
-        FNVD_INLINED_LOCAL(IDTag, kIDTag, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(IDTag, kIDTag, std::nullopt, std::nullopt);
         ::new (&kIDTag) IDTag(EmptyFS, EmptyFS, EmptyFS, EmptyFS, EmptyFS);
 
         // EXE-INLINED none: IDTag::SetAVObjectName
@@ -2577,7 +2577,7 @@ void NiControllerSequence::ConvertOldSequence(
         uint32_t uiCount = pkOldSequence->m_kObjectName.m_usSize;
         const char* pcSequenceName = pkOldSequence->m_pcName;
         // EXE-INLINED none: NiFixedString(const char*) of the name temporary
-        FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
         kName.SetHandle(
             pcSequenceName ? NiGlobalStringTable::AddString(pcSequenceName) : NiGlobalStringTable::NULL_STRING
         );

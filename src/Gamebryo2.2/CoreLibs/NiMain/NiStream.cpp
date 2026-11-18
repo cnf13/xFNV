@@ -55,7 +55,7 @@ bool NiStream::LoadRTTI() {
     m_pkIstr->BinaryRead(&usRTTICount, 2, &uiSize, 1);
     CreateFunction* ppfnCreate = static_cast<CreateFunction*>(_NiMalloc(sizeof(CreateFunction) * usRTTICount));
     CreateFunction* ppfnEntry = ppfnCreate;
-#if FNVD_64BIT
+#if XFNV_64BIT
     // x64 departure: a Havok block (class name starting "bhk") holds its creation info as the 32-bit program's
     // structure, which the 64-bit layouts do not match. The classes below read it through its serialized form
     // (BSHavok/bhkSerialized.h) or read nothing width-dependent: every bhk class the game's own model files use. The
@@ -103,7 +103,7 @@ bool NiStream::LoadRTTI() {
         if (m_uiNifFileVersion < GetVersion(20, 1, 0, 1) && !strcmp(aucRTTI, "NiControllerManager")) {
             m_uiLastError = OLDER_VERSION;
             strcpy_s(m_acLastErrorMessage, 0x104, "Older files may not contain animation data. Reexport required.");
-#if FNVD_64BIT
+#if XFNV_64BIT
             _NiFree(pbHavokClass);
 #endif
             return false;
@@ -117,7 +117,7 @@ bool NiStream::LoadRTTI() {
         if (aucRTTI[0] == 'b' && aucRTTI[1] == 'h' && !strcmp(aucRTTI, "bhkConvexListShape")) {
             *ppfnEntry = nullptr;
         }
-#if FNVD_64BIT
+#if XFNV_64BIT
         pbHavokClass[i] = aucRTTI[0] == 'b' && aucRTTI[1] == 'h' && aucRTTI[2] == 'k';
         for (const char* pcRead : s_apcHavokClassesRead) {
             if (pbHavokClass[i] && !strcmp(aucRTTI, pcRead)) {
@@ -139,7 +139,7 @@ bool NiStream::LoadRTTI() {
             usRTTI &= 0x7FFF;
             bSkippable = true;
         }
-#if FNVD_64BIT
+#if XFNV_64BIT
         // Skipping needs the object size table (files from 20.2.0.5 on, every file the game ships).
         bSkippable = bSkippable || (pbHavokClass[usRTTI] && m_uiNifFileVersion >= GetVersion(20, 2, 0, 5));
 #endif
@@ -151,7 +151,7 @@ bool NiStream::LoadRTTI() {
         else {
             if (!bSkippable) {
                 _NiFree(ppfnCreate);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 _NiFree(pbHavokClass);
 #endif
                 return false;
@@ -161,7 +161,7 @@ bool NiStream::LoadRTTI() {
         }
     }
     _NiFree(ppfnCreate);
-#if FNVD_64BIT
+#if XFNV_64BIT
     _NiFree(pbHavokClass);
 #endif
     return true;
@@ -1192,7 +1192,7 @@ bool NiStream::LoadFixedStringTable() {
         m_pkIstr->BinaryRead(pcString, uiLength, &uiSize, 1);
         pcString[uiLength] = 0;
         const char* pcHandle = pcString ? NiGlobalStringTable::AddString(pcString) : NiGlobalStringTable::NULL_STRING;
-        FNVD_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
         kString.m_kHandle = pcHandle;
         m_kFixedStrings.SetAt(us, kString);
         NiGlobalStringTable::ReleaseHandle(pcHandle);

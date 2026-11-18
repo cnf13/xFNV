@@ -435,7 +435,7 @@ const char* ItemChange::GetIconOne(TESObjectREFR* apRef) {
     TESBipedModelForm* v7 = dynamic_cast<TESBipedModelForm*>(pContainerObj);
     if ((ExtraOwnership_) && (v7)) {
         TESActorBase* v5 =
-            static_cast<TESActorBase*>(FNVD_DYNAMIC_CAST_VOID(TESNPC)(ExtraOwnership_, RTTI_TESForm, RTTI_TESNPC));
+            static_cast<TESActorBase*>(XFNV_DYNAMIC_CAST_VOID(TESNPC)(ExtraOwnership_, RTTI_TESForm, RTTI_TESNPC));
         if (v5) {
             TESActorBase::SEX Sex = v5->GetSex();
             Icon = v7->GetIcon(Sex);
@@ -3805,7 +3805,7 @@ ItemChange* InventoryChanges::GetBestAmmo(TESActorBase* apActorBase, bool abUseC
         TESBoundObject* pAmmo = nullptr;
         if (pEntry) {
             pAmmo = static_cast<TESBoundObject*>(
-                FNVD_DYNAMIC_CAST_VOID(TESAmmo)(pEntry->pObj, RTTI_TESBoundObject, RTTI_TESAmmo)
+                XFNV_DYNAMIC_CAST_VOID(TESAmmo)(pEntry->pObj, RTTI_TESBoundObject, RTTI_TESAmmo)
             );
         }
         if (!pAmmo) {
@@ -3826,7 +3826,7 @@ ItemChange* InventoryChanges::GetBestAmmo(TESActorBase* apActorBase, bool abUseC
         TESBoundObject* pAmmo = nullptr;
         if (pItem) {
             pAmmo = static_cast<TESBoundObject*>(
-                FNVD_DYNAMIC_CAST_VOID(TESAmmo)(pItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESAmmo)
+                XFNV_DYNAMIC_CAST_VOID(TESAmmo)(pItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESAmmo)
             );
         }
         if (!pAmmo) {
@@ -8721,7 +8721,7 @@ float InventoryChanges::GetEquippedWeight(Actor* apOwner) {
             }
             int32_t icount = GetObjectCount(pitem->pContainerObj);
             if (pObj->GetFormType() == ARMO_ID) {
-                FNVD_DYNAMIC_CAST_VOID(TESObjectARMO)(pObj, RTTI_TESObject, RTTI_TESObjectARMO);
+                XFNV_DYNAMIC_CAST_VOID(TESObjectARMO)(pObj, RTTI_TESObject, RTTI_TESObjectARMO);
             }
             else {
                 if (pObj->GetFormType() == WEAP_ID) {

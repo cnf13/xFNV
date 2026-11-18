@@ -28,7 +28,7 @@ ImageSpaceEffectBloom::~ImageSpaceEffectBloom() {
 }
 
 void ImageSpaceEffectBloom::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(3);
     pTextures.SetSize(4u);
     ImageSpaceShaderParam* pParam;

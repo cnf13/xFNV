@@ -105,7 +105,7 @@ bool MobileObjectTaskletData::SendMessageTo(const MobileObjectMessage& aMessage)
 
 bool MobileObjectTaskletData::SendEndMessage() {
     MobileObjectMessage kMessage;
-    MobileObjectMessage* pMessage = FNVD_RECONSTRUCT(MobileObjectMessage)(&kMessage);
+    MobileObjectMessage* pMessage = XFNV_RECONSTRUCT(MobileObjectMessage)(&kMessage);
     return msgqueue.Push(pMessage);
 }
 
@@ -550,31 +550,31 @@ void AITaskManager::UpdateTasks() {
         int32_t i = 0;
         do {
             if (!bRunDetectionDuringRendering.Bool()) {
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                     &kObjMsg, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
                 TaskDataDetection.SendMessageTo(kObjMsg);
             }
-            FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+            XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                 &v8, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
             );
             TaskDataPackagesUpdate.SendMessageTo(v8);
             if (iNumHWThreads.UInt() == 1) {
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                     &v7, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
                 TaskDataActorUpdate.SendMessageTo(v7);
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                     &v6, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
                 TaskAnimationUpdate.SendMessageTo(v6);
             }
-            FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+            XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                 &v5, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
             );
             TaskDataActorsScript.SendMessageTo(v5);
             if (!bRunActorMovementDuringRendering.Bool()) {
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                     &a2, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
                 TaskDataActorMovement.SendMessageTo(a2);
@@ -663,13 +663,13 @@ void AITaskManager::StartTasksDuringRendering() {
         }
         for (uint32_t i = 0; i < uiItems; ++i) {
             if (bRunDetectionDuringRendering.Bool()) {
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                     &kObjMsg, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
                 TaskDataDetection.SendMessageTo(kObjMsg);
             }
             if (bRunActorMovementDuringRendering.Bool()) {
-                FNVD_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
+                XFNV_RECONSTRUCT_AS(Construct_008C9A50, MobileObjectMessage)(
                     &a2, (&ReferenceProcessLists.MobProcessArray)->GetItem(i)
                 );
                 TaskDataActorMovement.SendMessageTo(a2);

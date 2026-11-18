@@ -260,7 +260,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
 }
 
 std::vector<BSFaceGenRGBA, std::allocator<BSFaceGenRGBA>>* BSFaceGenImage::GetUncompressedImage() {
-    FNVD_INLINED_LOCAL(NiPointer<NiSourceTexture>, spUncompressedTex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiSourceTexture>, spUncompressedTex, std::nullopt, std::nullopt);
     if (UncompressedImage.empty() && spCompressedImage.m_pObject) {
         BSFaceGenRGBA emtpyRGBA;
         ::new (&spUncompressedTex)

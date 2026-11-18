@@ -746,7 +746,7 @@ public:
     // Reads the current chunk into arData.
     template <class T>
     bool GetChunkData(T& arData);
-#if FNVD_64BIT
+#if XFNV_64BIT
     // A pointer field of a record read from a file, which the file keeps as a 4-byte form ID until InitItem
     // resolves it: its offset in the file's record and in memory.
     struct FormIDField {
@@ -856,7 +856,7 @@ bool TESFile::GetChunkData(T& arData) {
     }
     return bResult;
 }
-#if FNVD_64BIT
+#if XFNV_64BIT
 template <size_t N>
 void TESFile::WidenFormIDRecords(
     void* apRecords,

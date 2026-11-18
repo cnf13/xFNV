@@ -631,9 +631,9 @@ void SurgeryMenu::UpdateToolLocation(bool abBurning) {
 }
 
 void SurgeryMenu::BurnFlesh() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     char tmp[256];
     // The result of UpdateFlesh is stored but never read, as the game does.
     [[maybe_unused]] float ffleshBurnPercent = UpdateFlesh();
@@ -688,8 +688,8 @@ void SurgeryMenu::BurnFlesh() {
 }
 
 bool SurgeryMenu::IsCursorInFlesh() {
-    FNVD_INLINED_LOCAL(NiFixedString, v12, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v12, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     int32_t icenterX;
     int32_t icenterY;
     int32_t radius;
@@ -735,7 +735,7 @@ bool SurgeryMenu::IsCursorInFlesh() {
 }
 
 void SurgeryMenu::UpdateFace() {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SurgeryMenu::spPlayer3D.m_pObject) {
         NiAVObject* v5 = SurgeryMenu::spPlayer3D.m_pObject;
         NiFixedString* v4 = ::new (static_cast<void*>(&apString)) NiFixedString("BSFaceGenNiNodeSkinned");
@@ -1029,8 +1029,8 @@ float SurgeryMenu::UpdateFlesh() {
 }
 
 void SurgeryMenu::PlaceToolInWindow(int32_t aiX, int32_t aiY) {
-    FNVD_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     int32_t icenterX;
     int32_t icenterY;
     int32_t radius;
@@ -1117,7 +1117,7 @@ void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
     pdecalData.fDecalHeight = 0.5f;
     pdecalData.fDecalDepth = 20.0f;
     pdecalData.fPlacementRadius = 0.0f;
-    pdecalData.fVertexColor = *FNVD_RECONSTRUCT(NiColor)(&kColor, 1.0f, 0.0f, 0.0f);
+    pdecalData.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(&kColor, 1.0f, 0.0f, 0.0f);
     pdecalData.fDecalEpsilon = 75.0f;
     pdecalData.bAlphaTesting = true;
     pdecalData.bAlphaBlending = true;
@@ -1209,7 +1209,7 @@ void SurgeryMenu::ResetLimb(ActorValue::Index aeLimb) {
 }
 
 void SurgeryMenu::Close() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t ClassStatic = SurgeryMenu::GetClassStatic();
     Tile* ptile = Menu::GetMenuByClass(ClassStatic);
     if (ptile) {

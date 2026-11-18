@@ -44,7 +44,7 @@ void hkpBroadphaseViewer::postSimulationCallback(hkpWorld* world) {
     // The SDK's hkArray<hkAabb> allAabbs(1024): heap storage for 1024 boxes, the size set to it; a zero-sized
     // buffer leaves the array flagged DONT_DEALLOCATE.
     // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-    alignas(16) FNVD_INLINED_LOCAL(hkArray<hkAabb>, allAabbs, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkAabb>, allAabbs, std::nullopt, std::nullopt);
     allAabbs.m_data = nullptr;
     allAabbs.m_size = 0;
     allAabbs.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG);

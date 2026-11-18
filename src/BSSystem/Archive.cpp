@@ -74,7 +74,7 @@ Archive::Archive(
             pDirectories[i].pFiles = nullptr;
         }
         uiComponentSize = 1;
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The file's records are 16 bytes (the hash, the file count and a 32-bit pointer slot); the 64-bit record's
         // pointer takes 8. They are read at the start of the array in the file's layout and spread over the records,
         // last first; the file's pointer slot is dropped, as the read below fills pFiles.

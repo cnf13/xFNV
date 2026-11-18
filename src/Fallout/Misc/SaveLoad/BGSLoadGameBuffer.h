@@ -38,7 +38,7 @@ public:
     // 32-bit builds the field holds the ID directly; on 64-bit builds the ID is widened to fill the pointer.
     template <class T>
     bool LoadFormID(T*& arpForm) {
-#if FNVD_64BIT
+#if XFNV_64BIT
         uint32_t uiFormID;
         bool bResult = LoadFormID(uiFormID);
         arpForm = reinterpret_cast<T*>(static_cast<uintptr_t>(uiFormID));

@@ -63,4 +63,4 @@ public:
     // Declared as hkpConstraintInfo rather than hkpConstraintInfoSpu2, which holds the same four counts on PC.
     hkpConstraintInfo m_constraintInfo;
 };
-inline constexpr fnvd::Vtable hkpConstraintOwner_vftable{};
+inline constexpr xfnv::Vtable hkpConstraintOwner_vftable{};

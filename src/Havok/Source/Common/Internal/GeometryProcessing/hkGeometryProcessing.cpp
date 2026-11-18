@@ -1389,7 +1389,7 @@ bool hkGeometryProcessing::generateUniformDistribution(
                     break;
                 }
                 for (int32_t j = 0; j < probes.m_size; ++j) {
-                    FNVD_INLINED_LOCAL(
+                    XFNV_INLINED_LOCAL(
                         hkGeometryProcessingInternals::NearestFeaturePolicy, policy,
                         hkGeometryProcessingInternals_NearestFeaturePolicy_vftable, std::nullopt
                     );

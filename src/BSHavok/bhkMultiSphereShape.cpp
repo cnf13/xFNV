@@ -95,7 +95,7 @@ void bhkMultiSphereShape::SaveBinary(NiStream& arStream) {
     bhkSerializable* pThis = this;
     hkMultiSphereShapeCinfo* pCinfo = &static_cast<hkMultiSphereShapeCinfo&>(pThis->CreateCinfo(bCreated));
     using kSpheres_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(kSpheres_t, kSpheres, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(kSpheres_t, kSpheres, std::nullopt, std::nullopt);
     // EXE-INLINED 0x6299A0
     kSpheres.m_data = nullptr;
     kSpheres.m_size = 0;
@@ -134,8 +134,8 @@ bool bhkMultiSphereShape::IsEqual(NiObject* apObject) {
         return false;
     }
 
-    FNVD_INLINED_LOCAL(hkMultiSphereShapeCinfo, infoThis, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(hkMultiSphereShapeCinfo, infoOther, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkMultiSphereShapeCinfo, infoThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkMultiSphereShapeCinfo, infoOther, std::nullopt, std::nullopt);
     infoThis.m_userData = 0;
     infoThis.m_spheres.m_data = nullptr;
     infoThis.m_spheres.m_size = 0;

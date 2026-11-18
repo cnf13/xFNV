@@ -5,7 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "platform/Memory.h"
 
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
 #include "xfnv/debugheap/SystemAlloc.h"
 
 // Each block is an aligned allocation of the pass-through, laid out as [the allocation's start][Header][block], so that
@@ -15,7 +15,7 @@
 static void* ScrapPassAllocate(ScrapHeap::Header*& arLastBlock, uint32_t aSize, uint32_t aAlignment) {
     const size_t uiAlign = aAlignment > 4 ? aAlignment : 4;
     const size_t uiOffset = (sizeof(ScrapHeap::Header) + sizeof(void*) + uiAlign - 1) & ~(uiAlign - 1);
-    char* pStart = static_cast<char*>(fnvd::sysalloc::AlignedAllocate(aSize + uiOffset, uiAlign));
+    char* pStart = static_cast<char*>(xfnv::sysalloc::AlignedAllocate(aSize + uiOffset, uiAlign));
     char* pMem = pStart + uiOffset;
     ScrapHeap::Header* pHeader = reinterpret_cast<ScrapHeap::Header*>(pMem) - 1;
     reinterpret_cast<char**>(pHeader)[-1] = pStart;
@@ -26,14 +26,14 @@ static void* ScrapPassAllocate(ScrapHeap::Header*& arLastBlock, uint32_t aSize, 
 }
 
 static void ScrapPassFree(ScrapHeap::Header* apHeader) {
-    fnvd::sysalloc::AlignedFree(reinterpret_cast<char**>(apHeader)[-1]);
+    xfnv::sysalloc::AlignedFree(reinterpret_cast<char**>(apHeader)[-1]);
 }
 #endif
 
 // Carves aSize bytes, aligned to aAlignment, off the top of the stack, its header right below the memory; grows the
 // committed buffer (by doubling, up to 8 MB in use) when the block would pass its end. Null when it still does not fit.
 void* ScrapHeap::Allocate(uint32_t aSize, uint32_t aAlignment) {
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
     return ScrapPassAllocate(pLastBlock, aSize, aAlignment);
 #endif
     void* pResult = nullptr;
@@ -88,7 +88,7 @@ void ScrapHeap::Deallocate(void* apMem) {
     if (!apMem) {
         return;
     }
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
     Header* pFreed = static_cast<Header*>(apMem) - 1;
     for (Header** ppLink = &pLastBlock; *ppLink; ppLink = &(*ppLink)->pPrevious) {
         if (*ppLink == pFreed) {
@@ -129,7 +129,7 @@ void ScrapHeap::Deallocate(void* apMem) {
 }
 
 void ScrapHeap::Clean(bool abCheck) {
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
     while (Header* pHeader = pLastBlock) {
         pLastBlock = pHeader->pPrevious;
         ScrapPassFree(pHeader);
@@ -141,7 +141,7 @@ void ScrapHeap::Clean(bool abCheck) {
 
 // Hands the buffer back to the manager.
 ScrapHeap::~ScrapHeap() {
-#if FNVD_SYSTEM_ALLOC
+#if XFNV_SYSTEM_ALLOC
     Clean(false);
 #endif
     ScrapHeapManager::GetSingleton()->ReleaseBuffer(pMemHeap, static_cast<uint32_t>(pEndHeap - pMemHeap));

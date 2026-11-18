@@ -97,7 +97,7 @@ void TESWeatherList::Save(CHUNK_ID aeChunkID) {
         if (pMemory) {
             rt::eh_vector_constructor_iterator(
                 pMemory, sizeof(tmpWeatherEntry), static_cast<int32_t>(uiCount),
-                &fnvd::constructElement<tmpWeatherEntry>
+                &xfnv::constructElement<tmpWeatherEntry>
             );
             tmpArray = static_cast<tmpWeatherEntry*>(pMemory);
         }
@@ -186,7 +186,7 @@ void TESWeatherList::LoadWeatherListChunk(TESWeatherList* apWeatherList, TESFile
             if (pMemory) {
                 rt::eh_vector_constructor_iterator(
                     pMemory, sizeof(tmpWeatherEntry), static_cast<int32_t>(uiCount),
-                    &fnvd::constructElement<tmpWeatherEntry>
+                    &xfnv::constructElement<tmpWeatherEntry>
                 );
                 tmpArray = static_cast<tmpWeatherEntry*>(pMemory);
             }

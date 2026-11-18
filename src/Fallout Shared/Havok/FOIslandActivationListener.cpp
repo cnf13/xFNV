@@ -175,7 +175,7 @@ void FOIslandActivationListener::entityAddedCallback(hkpEntity* apEntity) {
         return;
     }
     CFilter kFilter;
-    if (FNVD_RECONSTRUCT(CFilter)(&kFilter, apEntity->getCollidable()->getCollisionFilterInfo())->GetLayer() !=
+    if (XFNV_RECONSTRUCT(CFilter)(&kFilter, apEntity->getCollidable()->getCollisionFilterInfo())->GetLayer() !=
         L_DEBRIS_LARGE) {
         return;
     }

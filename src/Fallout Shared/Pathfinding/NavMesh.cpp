@@ -771,7 +771,7 @@ bool NavMesh::GetMatchingEdge_0(
     uint16_t* apOtherTriangleIndex,
     int32_t* apOtherEdgeIndex
 ) {
-    FNVD_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     NavMesh* pOtherNavMesh;
     pOtherNavMesh = nullptr;
     if (!GetMatchingEdge(ausTriangleIndex, aiEdgeIndex, &pOtherNavMesh, apOtherTriangleIndex, apOtherEdgeIndex)) {
@@ -779,7 +779,7 @@ bool NavMesh::GetMatchingEdge_0(
     }
     NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pOtherNavMesh);
     apReturnNavMesh->operator=(*ptr);
-    FNVD_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+    XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
     return true;
 }
 
@@ -849,7 +849,7 @@ bool NavMesh::CheckUnconnectedBorderEdges(
 }
 
 bool NavMesh::SetDisableNavMesh(uint32_t aiID, bool abDisable) {
-    FNVD_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
     NavMeshInfo* NavMeshInfo_ = NavMeshInfoMap_->GetNavMeshInfo(aiID);
     if (NavMeshInfo_) {

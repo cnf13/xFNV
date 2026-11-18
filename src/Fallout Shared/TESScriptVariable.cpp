@@ -6,7 +6,7 @@
 void ScriptVariable::Load(TESFile* apFile) {
     if (apFile != nullptr && apFile->GetTESChunk() == SLSD_ID) {
         apFile->GetChunkData(&data, sizeof(data));
-#if FNVD_64BIT
+#if XFNV_64BIT
         // The file's record is the 32-bit SCRIPT_LOCAL (0x18 bytes), its list link a 4-byte slot at 4.
         TESFile::WidenFormIDRecords(&data, 1, 0x18, sizeof(data), {{4, offsetof(SCRIPT_LOCAL, pNext)}});
 #endif

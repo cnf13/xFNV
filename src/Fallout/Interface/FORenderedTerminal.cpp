@@ -71,7 +71,7 @@ SettingT<INISettingCollection> gs_fScreenLightColorB_RenderedTerminal("fScreenLi
 NiPointer<BSFadeNode> FORenderedTerminal::spGeometry;
 
 void PlayTerminalShutdownSound() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     BSAudioManager* v0 = &BSAudioManager::QInstance();
     BSSoundHandle* SoundHandleByName = v0->GetSoundHandleByName(
         &th_s, "OBJComputerTerminalPowerDown",
@@ -176,8 +176,8 @@ void FORenderedTerminal::Initialize() {
     NiAlphaProperty* v17;
     int32_t ScreenHeight;
     NiCamera* pcam;
-    FNVD_INLINED_LOCAL(NiFixedString, v30, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v30, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 mat2;
     NiMatrix3 rot;
     NiMatrix3 mat1;
@@ -365,14 +365,14 @@ void FORenderedTerminal::InitLight() {
     if (CreateMenuLight("Omni01", ShadowSceneNode_)) {
         NiPointLight* plight = GetMenuLight();
         if (plight) {
-            NiColor* v2 = FNVD_RECONSTRUCT(NiColor)(&dst, 0.0f, 0.0f, 0.0f);
+            NiColor* v2 = XFNV_RECONSTRUCT(NiColor)(&dst, 0.0f, 0.0f, 0.0f);
             plight->SetAmbientColor(*v2);
             plight->SetConstantAttenuation(0.0f);
             plight->SetLinearAttenuation(0.0f);
             plight->SetQuadraticAttenuation(0.0f);
             plight->SetDimmer(1.0f);
             float* v3 = &gs_fScreenLightRadius_RenderedTerminal.Float();
-            NiColor* v4 = FNVD_RECONSTRUCT(NiColor)(&v9, *v3, 0.0f, 0.0f);
+            NiColor* v4 = XFNV_RECONSTRUCT(NiColor)(&v9, *v3, 0.0f, 0.0f);
             plight->SetSpecularColor(*v4);
             float fScreenLightColorB = gs_fScreenLightColorB_RenderedTerminal.Float();
             float fScreenLightColorG = gs_fScreenLightColorG_RenderedTerminal.Float();

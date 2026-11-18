@@ -155,7 +155,7 @@ bool StartMenu::MainMenuIdle() {
     if (this->IsFlagSet(FLAG_INGAME)) {
         return false;
     }
-#if FNVD_FIX_FAST_MAIN_MENU
+#if XFNV_FIX_FAST_MAIN_MENU
     // lStewieAl's Tweaks and Engine Fixes, Faster Main Menu (bFasterTitleMenu; also the standalone "Faster Main Menu",
     // Nexus 67811, and its option to skip the delay till the last load screen): the start-up's welcome screens
     // (legal, Bethesda, Obsidian, "Please stand by") each stay up for fLoadingInitUpdateInterval plus a cross-fade,
@@ -755,7 +755,7 @@ bool StartMenu::DoGamepad(int32_t aiButton, float afValue) {
             if (!this->lbOptions.IsEnabled()) {
                 return false;
             }
-            UserOption* pOption = static_cast<UserOption*>(FNVD_DYNAMIC_CAST_VOID(StartMenu::UserOption)(
+            UserOption* pOption = static_cast<UserOption*>(XFNV_DYNAMIC_CAST_VOID(StartMenu::UserOption)(
                 this->lbOptions.GetHighlightedData(), RTTI_StartMenu_Option, RTTI_StartMenu_UserOption
             ));
             if (!pOption || pOption->eType != UserOption::UOPT_METER) {

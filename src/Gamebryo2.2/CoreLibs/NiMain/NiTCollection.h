@@ -76,7 +76,7 @@ public:
         uint8_t* pucMemory = reinterpret_cast<uint8_t*>(pArray);
         if constexpr (!std::is_trivially_destructible_v<T>) {
             uint32_t uiNumElements = static_cast<uint32_t>(reinterpret_cast<size_t*>(pArray)[-1]);
-            pucMemory = static_cast<uint8_t*>(fnvd::arrayBlock(pArray));
+            pucMemory = static_cast<uint8_t*>(xfnv::arrayBlock(pArray));
             while (uiNumElements > 0) {
                 pArray[--uiNumElements].~T();
             }

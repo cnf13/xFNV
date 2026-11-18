@@ -518,8 +518,8 @@ hkBool bhkRagdollController::castRay(
         else {
             hkpCachingShapePhantomRay* pPhantom = pControllerPhantom;
             if (pPhantom) {
-                FNVD_INLINED_LOCAL(hkpWorldRayCastInput, kInput, std::nullopt, std::nullopt);
-                FNVD_INLINED_LOCAL(hkpWorldRayCastOutput, kOutput, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkpWorldRayCastInput, kInput, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkpWorldRayCastOutput, kOutput, std::nullopt, std::nullopt);
                 // EXE-INLINED 0x4A3CC0
                 kInput.m_enableShapeCollectionFilter.m_bool = false;
                 kInput.m_filterInfo = (uiGroup << 16) | L_CUSTOMPICK1;
@@ -810,7 +810,7 @@ void bhkRagdollController::InitFootIK(BSSimpleArray<const char*, 1024>& arboneNa
     for (uint32_t i = 0; i < iNumFeet; ++i) {
         const char* pBoneName = arboneNameA.pBuffer[i];
         NiAVObject* pcalfObj = nullptr;
-        FNVD_INLINED_LOCAL(NiFixedString, boneName, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiFixedString, boneName, std::nullopt, std::nullopt);
         if (pBoneName) {
             boneName.m_kHandle = NiGlobalStringTable::AddString(pBoneName);
         }
@@ -1716,7 +1716,7 @@ void bhkRagdollController::UpdateDebugLines(bhkRagdollController::DEBUG_SKEL aeS
         aeSkeleton == bhkRagdollController::SKEL_RAGDOLL ? pShareData->pLowSkel : pShareData->pHighSkel;
     int32_t inumBones = pskel->m_bones.m_size;
     // EXE-INLINED none: hkArray<hkQsTransform>::hkArray
-    FNVD_INLINED_LOCAL(hkArray<hkQsTransform>, posMSRag, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkQsTransform>, posMSRag, std::nullopt, std::nullopt);
     int32_t iNumAlloc = inumBones;
     hkMemoryAllocator& kHeap = *hkMemoryRouter::getInstance().m_heap;
     posMSRag.m_data = iNumAlloc ? kHeap._bufAlloc<hkQsTransform>(iNumAlloc) : nullptr;
@@ -3080,7 +3080,7 @@ void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkelet
         pRagdollRoot = pcol->m_pkSceneObject->m_pkParent;
         // EXE-INLINED none: hkLocalArray<hkpRigidBody *>::hkLocalArray(64) (hkAllocateStack); 64 pointers fill whole
         // 128-byte blocks, so the stack block is not rounded up.
-        FNVD_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rbarray, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rbarray, std::nullopt, std::nullopt);
         rbarray.m_data = nullptr;
         rbarray.m_size = 0;
         rbarray.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
@@ -3091,7 +3091,7 @@ void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkelet
         rbarray.m_capacityAndFlags = 64 | hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
         rbarray.m_localMemory = rbarray.m_data;
         // EXE-INLINED none: hkLocalArray<hkpConstraintInstance *>::hkLocalArray(64) (hkAllocateStack)
-        FNVD_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constarray, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constarray, std::nullopt, std::nullopt);
         constarray.m_data = nullptr;
         constarray.m_size = 0;
         constarray.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
@@ -3256,7 +3256,7 @@ bool bhkRagdollController::ExtractBipedSetupData(
     hkaFootPlacementIkSolver::Setup& arSetupData,
     BSSimpleArray<const char*, 1024>& arboneNameA
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, apName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apName, std::nullopt, std::nullopt);
     const char* pcThighName = arboneNameA.pBuffer[0];
     // EXE-INLINED 0x438170
     if (pcThighName) {
@@ -3619,7 +3619,7 @@ void bhkRagdollController::CopyPoseTo3DRec(
     NiAVObject* apPose,
     BSSimpleArray<BoneTransf, 1024>& arPoseA
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, poseBoneName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, poseBoneName, std::nullopt, std::nullopt);
     BoneTransf bone;
     const char* pHandle = apPose->m_kName.GetHandle();
     NiGlobalStringTable::AcquireHandle(pHandle);

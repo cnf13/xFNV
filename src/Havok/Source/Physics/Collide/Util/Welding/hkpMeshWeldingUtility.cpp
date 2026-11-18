@@ -471,7 +471,7 @@ hkResult hkpMeshWeldingUtility::calcBitcodeForTriangleEdge(
     aabb.m_min.m_quad = _mm_add_ps(_mm_setr_ps(fNegTolerance, fNegTolerance, fNegTolerance, 0.0f), kVertex);
     aabb.m_max.m_quad = _mm_add_ps(_mm_setr_ps(kTolerance, kTolerance, kTolerance, 0.0f), kVertex);
     using KeyArray = hkInplaceArray<uint32_t, 128>;
-    alignas(16) FNVD_INLINED_LOCAL(KeyArray, hits, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(KeyArray, hits, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkInplaceArray<hkpShapeKey, 128>::hkInplaceArray
     hits.m_data = hits.m_storage;
     hits.m_size = 0;
@@ -623,7 +623,7 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
             uint16_t combinedBitcode = 0;
             const hkVector4* pVertices = &pTriangle->m_vertexA;
             for (int32_t edge = 0; edge < 3; ++edge) {
-                FNVD_INLINED_LOCAL(hkHistogram, histogram, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkHistogram, histogram, std::nullopt, std::nullopt);
                 // EXE-INLINED none: hkHistogram::hkHistogram
                 histogram.m_freeAngle = weldOpenEdges ? 0.0f : 3.1415927f;
                 histogram.m_entries.m_data = nullptr;
@@ -694,7 +694,7 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
                     aabb.m_min.m_quad = _mm_min_ps(_mm_min_ps(_mm_set1_ps(3.40282e+38f), start.m_quad), end.m_quad);
                     aabb.m_max.m_quad = _mm_max_ps(_mm_max_ps(_mm_set1_ps(-3.40282e+38f), start.m_quad), end.m_quad);
                     using KeyArray = hkInplaceArray<uint32_t, 128>;
-                    alignas(16) FNVD_INLINED_LOCAL(KeyArray, hits, std::nullopt, std::nullopt);
+                    alignas(16) XFNV_INLINED_LOCAL(KeyArray, hits, std::nullopt, std::nullopt);
                     // EXE-INLINED none: hkInplaceArray<hkpShapeKey, 128>::hkInplaceArray
                     hits.m_data = hits.m_storage;
                     hits.m_size = 0;
@@ -818,7 +818,7 @@ void hkpMeshWeldingUtility::computeWeldingInfo(
     info.m_transform = hkTransformIdentity;
     info.m_shape = bvTree;
     // The stack allocator's bytes are untyped memory; the local array keeps its shape infos there.
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpMeshWeldingUtility::ShapeInfo>, shapes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpMeshWeldingUtility::ShapeInfo>, shapes, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkpMeshWeldingUtility::ShapeInfo>::hkLocalArray(1) (hkAllocateStack)
         shapes.m_data = nullptr;
@@ -1032,7 +1032,7 @@ float hkHistogram::evaluate() {
             m_entries.m_data, 0, iNumEntries - 1, hkAlgorithm::less<hkEntry>()
         );
     }
-    FNVD_INLINED_LOCAL(hkArray<hkEntry>, ranges, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkEntry>, ranges, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkEntry>::hkArray
     ranges.m_data = nullptr;
     ranges.m_size = 0;

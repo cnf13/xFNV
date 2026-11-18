@@ -190,7 +190,7 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 	alignas(BSFaceGenBinaryFile) uint8_t aucFile[sizeof(BSFaceGenBinaryFile)];
 	BSFaceGenBinaryFile* pFile = static_cast<BSFaceGenBinaryFile*>(static_cast<void*>(aucFile));
 	std::string kFileId;
-	FNVD_RECONSTRUCT(std::string)(&kFileId, "FRTRI003");
+	XFNV_RECONSTRUCT(std::string)(&kFileId, "FRTRI003");
 	::new (aucFile) BSFaceGenBinaryFile(kFileId);
 	// The early returns' destructor (the exe inlines it here).
 	auto fnFail = [pFile]() -> bool {
@@ -199,7 +199,7 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 	};
 	std::string kFileName;
 	// The by-value file name's copy constructor.
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
 	if (!pFile->BSFaceGenBinaryFile::openForRead(kFileName, false)) {
 		return fnFail();
 	}
@@ -259,7 +259,7 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 			}
 			if (uiLen <= 1) {
 				std::string kEmpty;
-				FNVD_RECONSTRUCT(std::string)(&kEmpty, "");
+				XFNV_RECONSTRUCT(std::string)(&kEmpty, "");
 				// EXE-INLINED none: basic_string::operator=
 				triData.vtxLabelList[i].label.assign(kEmpty, 0, std::string::npos);
 			} else {
@@ -295,7 +295,7 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 			}
 			if (uiLen <= 1) {
 				std::string kEmpty;
-				FNVD_RECONSTRUCT(std::string)(&kEmpty, "");
+				XFNV_RECONSTRUCT(std::string)(&kEmpty, "");
 				// EXE-INLINED none: basic_string::operator=
 				triData.surfLabelList[i].label.assign(kEmpty, 0, std::string::npos);
 			} else {
@@ -359,7 +359,7 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 			}
 			if (uiLen <= 1) {
 				std::string kEmpty;
-				FNVD_RECONSTRUCT(std::string)(&kEmpty, "");
+				XFNV_RECONSTRUCT(std::string)(&kEmpty, "");
 				// EXE-INLINED none: basic_string::operator=
 				triData.diffMorphList[i].label.assign(kEmpty, 0, std::string::npos);
 			} else {
@@ -408,7 +408,7 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 			}
 			if (uiCount <= 1) {
 				std::string kEmpty;
-				FNVD_RECONSTRUCT(std::string)(&kEmpty, "");
+				XFNV_RECONSTRUCT(std::string)(&kEmpty, "");
 				// EXE-INLINED none: basic_string::operator=
 				triData.statMorphList[i].label.assign(kEmpty, 0, std::string::npos);
 			} else {
@@ -453,11 +453,11 @@ bool fffReadTriFile(const std::string& fname, FffTriFileDataS& triData) {
 // and copied; their callees own and destroy them, as in the exe. The exe's cleanup-only EH frame is left out.
 bool fffWriteTriFile(const std::string& fname, const FffTriFileDataS& triData) {
 	std::string kFileId;
-	FNVD_RECONSTRUCT(std::string)(&kFileId, "FRTRI003");
+	XFNV_RECONSTRUCT(std::string)(&kFileId, "FRTRI003");
 	FutBinaryFileC kFile(kFileId);
 	std::string kFileName;
 	// The by-value file name's copy constructor.
-	FNVD_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
+	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
 	if (!kFile.FutBinaryFileC::openForOverwrite(kFileName)) {
 		return false;
 	}
@@ -666,7 +666,7 @@ bool fffWriteTriFile(FutBinaryFileC& file, const FffTriFileDataS& triData) {
 		return true;
 	}
 	std::string kText;
-	FNVD_RECONSTRUCT(std::string)(&kText, "Invalid morph data during TRI file save.");
+	XFNV_RECONSTRUCT(std::string)(&kText, "Invalid morph data during TRI file save.");
 	futSetLastError(FUTERR_SEE_TEXT, kText);
 	return false;
 }

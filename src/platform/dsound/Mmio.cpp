@@ -260,28 +260,28 @@ namespace audio::mmio {
 
 } // namespace audio::mmio
 
-// The exports the game's imports name: on Linux the C functions themselves; on Windows (FNVD_SDL_AUDIO) the import
+// The exports the game's imports name: on Linux the C functions themselves; on Windows (XFNV_SDL_AUDIO) the import
 // slots `__imp_` the game's dllimport calls go through, so winmm.lib (which the program links for its other
 // functions) never supplies these.
 #if defined(_WIN32)
 #if defined(_M_IX86)
-#define FNVD_MMIO_SLOT(name, bytes, impl)                                                                              \
+#define XFNV_MMIO_SLOT(name, bytes, impl)                                                                              \
     extern "C" {                                                                                                       \
-    decltype(&audio::mmio::impl) fnvd_imp_##name __asm__("__imp__" #name "@" #bytes) = &audio::mmio::impl;             \
+    decltype(&audio::mmio::impl) xfnv_imp_##name __asm__("__imp__" #name "@" #bytes) = &audio::mmio::impl;             \
     }
 #else
-#define FNVD_MMIO_SLOT(name, bytes, impl)                                                                              \
+#define XFNV_MMIO_SLOT(name, bytes, impl)                                                                              \
     extern "C" {                                                                                                       \
-    decltype(&audio::mmio::impl) fnvd_imp_##name __asm__("__imp_" #name) = &audio::mmio::impl;                         \
+    decltype(&audio::mmio::impl) xfnv_imp_##name __asm__("__imp_" #name) = &audio::mmio::impl;                         \
     }
 #endif
-FNVD_MMIO_SLOT(mmioOpenA, 12, Open)
-FNVD_MMIO_SLOT(mmioClose, 8, Close)
-FNVD_MMIO_SLOT(mmioRead, 12, ReadBytes)
-FNVD_MMIO_SLOT(mmioDescend, 16, Descend)
-FNVD_MMIO_SLOT(mmioAscend, 12, Ascend)
-FNVD_MMIO_SLOT(mmioGetInfo, 12, GetInfo)
-FNVD_MMIO_SLOT(mmioAdvance, 12, Advance)
+XFNV_MMIO_SLOT(mmioOpenA, 12, Open)
+XFNV_MMIO_SLOT(mmioClose, 8, Close)
+XFNV_MMIO_SLOT(mmioRead, 12, ReadBytes)
+XFNV_MMIO_SLOT(mmioDescend, 16, Descend)
+XFNV_MMIO_SLOT(mmioAscend, 12, Ascend)
+XFNV_MMIO_SLOT(mmioGetInfo, 12, GetInfo)
+XFNV_MMIO_SLOT(mmioAdvance, 12, Advance)
 #else
 extern "C" {
 

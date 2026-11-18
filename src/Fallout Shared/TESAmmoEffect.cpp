@@ -89,7 +89,7 @@ void TESAmmoEffect::Copy(TESForm* apCopy) {
 
 bool TESAmmoEffect::Compare(TESForm* apCompare) {
     TESForm* v4 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(TESAmmoEffect)(apCompare, RTTI_TESForm, RTTI_TESAmmoEffect));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(TESAmmoEffect)(apCompare, RTTI_TESForm, RTTI_TESAmmoEffect));
     if (!v4) {
         return true;
     }

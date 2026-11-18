@@ -347,7 +347,7 @@ NiLines* MakeLine(
     pverts_2[1] = aEnd;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(2 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 2, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 2, &xfnv::constructElement<NiColorA>);
         pcolors_2 = pcolors;
     }
     else {
@@ -416,7 +416,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
     pverts[5] = *v8;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(6 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 6, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 6, &xfnv::constructElement<NiColorA>);
         pcolors_2 = pcolors;
     }
     else {
@@ -1042,7 +1042,7 @@ bool BoundInFrustum(const NiBound& aBound, NiCamera* apCamera) {
         pLastCamera = apCamera;
     }
     for (uint32_t uiplane = 0; uiplane < 6; ++uiplane) {
-        FNVD_INLINED_LOCAL(NiPlane, plane, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(NiPlane, plane, std::nullopt, std::nullopt);
         plane = cullPlanes.GetPlane(uiplane);
         if (aBound.WhichSide(plane) == 2) {
             return false;
@@ -1947,7 +1947,7 @@ NiTriShape* MakeQuadBox(
     pverts_2[7] = aPoint8;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(8 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 8, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 8, &xfnv::constructElement<NiColorA>);
         pcolors_2 = pcolors;
     }
     else {
@@ -2076,7 +2076,7 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
     pverts_2[2] = aPt3;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(3 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 3, &fnvd::constructElement<NiColorA>);
+        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 3, &xfnv::constructElement<NiColorA>);
         pcolors_2 = pcolors;
     }
     else {
@@ -2220,7 +2220,7 @@ bool RemoveEditorMarkers(NiNode* apNode) {
 }
 
 float FindTimeForNoteKey(NiAVObject* pObject, const char* pcSequenceName, const char* pcKeyName) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     uint32_t inumKeys;
     if (pObject) {
         NiControllerManager* pmanager = static_cast<NiControllerManager*>(

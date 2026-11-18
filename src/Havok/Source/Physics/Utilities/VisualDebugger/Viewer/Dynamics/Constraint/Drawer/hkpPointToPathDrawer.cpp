@@ -39,7 +39,7 @@ void hkpPointToPathDrawer::drawConstraint(
         hkpParametricCurve* pPath = pData->m_path;
         if (pPath) {
             // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) FNVD_INLINED_LOCAL(hkArray<hkVector4>, pathPoints, std::nullopt, std::nullopt);
+            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, pathPoints, std::nullopt, std::nullopt);
             // EXE-INLINED none: hkArray<hkVector4>::hkArray
             pathPoints.m_data = nullptr;
             pathPoints.m_size = 0;

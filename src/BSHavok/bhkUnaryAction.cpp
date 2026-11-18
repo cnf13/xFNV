@@ -132,7 +132,7 @@ bool bhkUnaryAction::Add(bhkWorld* apWorld) {
 // Adds the action's entity to apWorld when it is in no world yet and the world adds no batch; an entity whose flags do
 // not mark it as added anyway gets a warning and is forced in.
 void bhkUnaryAction::ProcessEntity(bhkWorld* apWorld) {
-    FNVD_INLINED_LOCAL(hkOstream, kStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkOstream, kStream, std::nullopt, std::nullopt);
     TLSData* pTLSData = GetThreadTLSData();
     MEM_CONTEXT eMemContext = pTLSData->eMemContext;
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;

@@ -254,16 +254,16 @@ void LockPickMenu::DoLeave(int32_t aiID, Tile* apTarget) {
 
 void LockPickMenu::DoIdle() {
     static int32_t iLockShakeDirection = 1;
-    FNVD_INLINED_LOCAL(BSSoundHandle, v72, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v73, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v74, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v75, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v76, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v77, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v78, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v79, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v72, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v73, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v74, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v75, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v76, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v77, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v78, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v79, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     int32_t ielaspedMillis = 0;
     float fxAxisRatio = 1.0f;
     static BSSoundHandle lockpickSound;
@@ -740,11 +740,11 @@ void LockPickMenu::RotateLock(float afAngleOffset) {
 
 void LockPickMenu::Prepare3DElements() {
     NiNode* v14;
-    FNVD_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v17, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v18, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, v19, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v17, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v18, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v19, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPoint3 dst;
     NiMatrix3 matZ;
     NiMatrix3 matX;
@@ -873,8 +873,8 @@ NiCamera* LockPickMenu::Create3DCamera() {
 
 void LockPickMenu::RotateLockpick() {
     BSRandom* Singleton;
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     float fxDelta = 0.0f;
     int32_t ixAxis = 0;
     float cfmaxAxisValue = 32767.0f;
@@ -982,7 +982,7 @@ void LockPickMenu::RotateLockpickModel(float a2) {
 }
 
 void LockPickMenu::SetupLockLevelSweetSpots() {
-    FNVD_INLINED_LOCAL(NiColorA, v32, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v32, std::nullopt, std::nullopt);
     int32_t v28 = LockLevelMaxVeryEasy[eLockLevel + 1] - LockLevelMaxVeryEasy[eLockLevel];
     float v19 = static_cast<double>(iLockpickSkill - LockLevelMaxVeryEasy[eLockLevel]) /
         (static_cast<double>(v28) + static_cast<double>(v28));
@@ -1038,7 +1038,7 @@ void LockPickMenu::SetupLockLevelSweetSpots() {
 
 Tile* LockPickMenu::Create(TESObjectREFR* apTarget, int32_t aiLockLevel, bool abDebugMode) {
     int32_t ilockLevel;
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Tile* pold_menu_tile = Menu::GetMenuByClass(1014);
     InterfaceManager* pin = InterfaceManager::Instance();
     if (apTarget) {

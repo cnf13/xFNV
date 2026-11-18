@@ -961,10 +961,10 @@ float Character::GetClothingValue() {
         for (BIPED_OBJECT part = BO_HEAD; part < BIPED_OBJECT_COUNT; part = static_cast<BIPED_OBJECT>(part + 1)) {
             ItemChange* WornItem = ContainerChanges->GetWornItem(part, false);
             if (WornItem) {
-                char* v8 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESObjectARMO)(
+                char* v8 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESObjectARMO)(
                     WornItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectARMO
                 ));
-                char* v7 = static_cast<char*>(FNVD_DYNAMIC_CAST_VOID(TESObjectCLOT)(
+                char* v7 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESObjectCLOT)(
                     WornItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectCLOT
                 ));
                 if (v8) {

@@ -85,7 +85,7 @@ uint32_t ExteriorCellLoader::QueuedCellCount() {
 
 void ExteriorCellLoader::ClearData() {
     uint32_t ikey;
-    FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     using iterator_t = LockFreeMap<uint32_t, NiPointer<ExteriorCellLoaderTask>>::LockFreeMapIterator;
     iterator_t iterator;
     while (!iterator.GetFinished()) {
@@ -100,7 +100,7 @@ void ExteriorCellLoader::ClearData() {
 }
 
 bool ExteriorCellLoader::CellIsQueued(int32_t aiCellX, int32_t aiCellY) {
-    FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     uint32_t ikey = TESObjectCELL::GetCoord(static_cast<uint16_t>(aiCellX), static_cast<uint16_t>(aiCellY));
     ::new (&sptask) NiPointer<QueuedFile>(static_cast<QueuedFile*>(nullptr));
     bool v5 = QueuedCellMap.GetAt(ikey, sptask);
@@ -111,7 +111,7 @@ bool ExteriorCellLoader::CellIsQueued(int32_t aiCellX, int32_t aiCellY) {
 
 void ExteriorCellLoader::PostProcessCompletedTasks() {
     uint32_t ikey;
-    FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     using iterator_t = LockFreeMap<uint32_t, NiPointer<ExteriorCellLoaderTask>>::LockFreeMapIterator;
     iterator_t iterator;
     while (!iterator.GetFinished()) {
@@ -127,7 +127,7 @@ void ExteriorCellLoader::PostProcessCompletedTasks() {
 
 uint32_t ExteriorCellLoader::TryCancelTasks() {
     uint32_t ikey;
-    FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     using iterator_t = LockFreeMap<uint32_t, NiPointer<ExteriorCellLoaderTask>>::LockFreeMapIterator;
     uint32_t iuncanceledTasks = 0;
     iterator_t iterator;
@@ -147,7 +147,7 @@ uint32_t ExteriorCellLoader::TryCancelTasks() {
 
 void ExteriorCellLoader::WaitForTasks() {
     uint32_t ikey;
-    FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     using iterator_t = LockFreeMap<uint32_t, NiPointer<ExteriorCellLoaderTask>>::LockFreeMapIterator;
     iterator_t iterator;
     while (!iterator.GetFinished()) {
@@ -166,7 +166,7 @@ void ExteriorCellLoader::WaitForTasks() {
 }
 
 void ExteriorCellLoader::QueueCellLoad(TESWorldSpace* apWorld, int32_t aiCellX, int32_t aiCellY) {
-    FNVD_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ExteriorCellLoaderTask>, sptask, std::nullopt, std::nullopt);
     if (apWorld) {
         TESObjectCELL* pcell = apWorld->GetCellFromCellCoord(aiCellX, aiCellY);
         if (pcell && TES::pInstance->IsBuffered(pcell)) {

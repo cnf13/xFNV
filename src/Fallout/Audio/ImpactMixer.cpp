@@ -81,11 +81,11 @@ ImpactMixer::GunshotHandleArray ImpactMixer::GunshotHandles;
 ImpactMixer::COLLISION_SOUND::COLLISION_SOUND() {}
 
 void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v46, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v47, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v46, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v47, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     AutoMemContext kContext(
         MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 941
     );
@@ -308,8 +308,8 @@ void ImpactMixer::PlayGunshot(
     NiAVObject* aOriginNode,
     bool abPlayer
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     NiPoint3 v27;
     if (ImpactMixer::GetGunshotsInitialized()) {
         BSSoundHandle handl;
@@ -606,8 +606,8 @@ void ImpactMixer::PlayHitSound(
 }
 
 void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     CFilter v19;
     CFilter apResult;
     uint32_t val;
@@ -794,11 +794,11 @@ void ImpactMixer::SetAltMaterialSoundName(int32_t aiMat, const char* apAltName) 
 }
 
 void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v48, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v49, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v48, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v49, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 735
     );
@@ -828,7 +828,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     }
     if (apRef->IsActor()) {
         MobileObject* pmob;
-        pmob = static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRef, RTTI_TESObjectREFR, RTTI_Actor));
+        pmob = static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRef, RTTI_TESObjectREFR, RTTI_Actor));
         if (pmob->IsDead(false)) {
         LABEL_7:;
             return;
@@ -1047,9 +1047,9 @@ void ImpactMixer::PlayWeaponBlock(
     NiPoint3 aDefender,
     bool bEnchantedWeapon
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     BSSoundHandle SoundHand;
     if (apDefWeapon && apDefWeapon->GetBlockSound()) {
         TESSound* arPos_8 = apDefWeapon->GetBlockSound();
@@ -1460,8 +1460,8 @@ int32_t ImpactMixer::GetFootstepIndexForType(HavokMaterialType aiType) {
 }
 
 void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 1699
     );

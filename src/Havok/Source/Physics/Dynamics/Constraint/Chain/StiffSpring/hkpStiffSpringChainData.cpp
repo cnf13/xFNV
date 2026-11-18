@@ -164,7 +164,7 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
 
     // EXE-INLINED none: hkInplaceArray<hkpVelocityAccumulatorOffset, 32>::hkInplaceArray
     using accumulators_t = hkInplaceArray<hkpVelocityAccumulatorOffset, 32>;
-    FNVD_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
     accumulators.m_data = accumulators.m_storage;
     accumulators.m_size = 0;
     accumulators.m_capacityAndFlags = 32 | hkArrayBase<hkpVelocityAccumulatorOffset>::DONT_DEALLOCATE_FLAG;

@@ -251,7 +251,7 @@ void TESObjectARMA::Copy(TESForm* apCopy) {
 
 bool TESObjectARMA::Compare(TESForm* apCompare) {
     TESForm* v4 =
-        static_cast<TESForm*>(FNVD_DYNAMIC_CAST_VOID(TESObjectARMA)(apCompare, RTTI_TESForm, RTTI_TESObjectARMA));
+        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(TESObjectARMA)(apCompare, RTTI_TESForm, RTTI_TESObjectARMA));
     if (!v4) {
         return true;
     }

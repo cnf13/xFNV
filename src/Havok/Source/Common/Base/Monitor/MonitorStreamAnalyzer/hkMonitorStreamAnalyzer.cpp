@@ -450,7 +450,7 @@ static void drawStatistics(
     using MapBase_t = hkUlongMapBase;
     using Samples_t = hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>;
     // EXE-INLINED none: hkPointerMap<const char*, hkUint32>::hkPointerMap
-    FNVD_INLINED_LOCAL(ColorMap_t, knownColors, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ColorMap_t, knownColors, std::nullopt, std::nullopt);
     knownColors.m_map.m_elem = nullptr;
     knownColors.m_map.m_numElems = 0;
     knownColors.m_map.m_hashMod = -1;
@@ -458,7 +458,7 @@ static void drawStatistics(
     knownColors.m_map.MapBase_t::reserve(*hkMemoryRouter::getInstance().m_heap, 0);
     const float sampleWidth = afFrameTime / static_cast<double>(aiWidth);
     // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*>::hkArray
-    FNVD_INLINED_LOCAL(Samples_t, samples, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Samples_t, samples, std::nullopt, std::nullopt);
     samples.m_data = nullptr;
     samples.m_size = 0;
     samples.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
@@ -716,7 +716,7 @@ void hkMonitorStreamAnalyzer::drawThreadsToTga(
     hkOstream& outStream
 ) {
     using NodeArray = hkInplaceArray<Node*, 6, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(NodeArray, nodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NodeArray, nodes, std::nullopt, std::nullopt);
     const int32_t numThreads = m_frameInfos.m_size;
     // EXE-INLINED none: hkInplaceArray<hkMonitorStreamAnalyzer::Node*, 6, hkContainerHeapAllocator>::hkInplaceArray
     nodes.m_data = nodes.m_storage;
@@ -801,7 +801,7 @@ hkBool* hkMonitorStreamAnalyzer::captureFrameDetails(
 // command ends the dump.
 void hkMonitorStreamAnalyzer::writeRawStatistics(hkOstream& os) {
     using PrefixArray = hkArray<char, hkContainerDebugAllocator>;
-    FNVD_INLINED_LOCAL(PrefixArray, prefix, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PrefixArray, prefix, std::nullopt, std::nullopt);
     hkInitIndentString(&prefix);
     // EXE-INLINED none: hkArray<char, hkContainerDebugAllocator>::pushBack
     auto pushBack = [&prefix](char c) {
@@ -957,7 +957,7 @@ hkMonitorStreamAnalyzer::makeStatisticsTreeForMultipleFrames(int32_t threadId, h
 // multithreaded summary, then freed.
 void hkMonitorStreamAnalyzer::writeStatistics(hkOstream& outStream, int32_t reportLevel) {
     using NodeArray = hkArray<Node*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(NodeArray, nodes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NodeArray, nodes, std::nullopt, std::nullopt);
     nodes.m_data = nullptr;
     nodes.m_size = 0;
     nodes.m_capacityAndFlags = hkArrayBase<Node*>::DONT_DEALLOCATE_FLAG;
@@ -1059,7 +1059,7 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryRec(
     int32_t numSpus,
     const CombinedThreadSummaryOptions& options
 ) {
-    FNVD_INLINED_LOCAL(hkArray<char>, textLine, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<char>, textLine, std::nullopt, std::nullopt);
     textLine.m_data = nullptr;
     textLine.m_size = 0;
     textLine.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
@@ -1190,8 +1190,8 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryForSingleFrame(
     hkMonitorStreamAnalyzer::CombinedThreadSummaryOptions& options
 ) {
     using CharArray = hkArray<char, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(hkOstream, lineOs, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(CharArray, textLine, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkOstream, lineOs, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CharArray, textLine, std::nullopt, std::nullopt);
     // The hkBool is zero-extended into the integer parameter findMaxTimerNameIndent takes.
     options.m_indentationToFirstTimerValue = findMaxTimerNameIndent(
         node, 0, options.m_tabSpacingForTimerNames, static_cast<uint8_t>(options.m_displayPartialTree.m_bool)
@@ -1459,7 +1459,7 @@ hkMonitorStreamAnalyzer::Node* hkMonitorStreamAnalyzer::reverseLookupNodeAtTgaSa
     }
     float maxFrameTime = -1.0f;
     using FloatArray = hkArray<float, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(FloatArray, startTimes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(FloatArray, startTimes, std::nullopt, std::nullopt);
     startTimes.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
     const int32_t frame = (height - y - 1) / frameHeight;
     const int32_t thread = (height - y - 1) % frameHeight / threadHeight;
@@ -1602,7 +1602,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetails(
                 outstream.printf("****** Summary Frame:%i ******\n", frame);
                 outstream.printf("****************************************\n");
 
-                FNVD_INLINED_LOCAL(hkLocalArray<Node*>, trees, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(hkLocalArray<Node*>, trees, std::nullopt, std::nullopt);
                 const int32_t iNumThreads = nodes.m_size;
                 trees.m_data = nullptr;
                 trees.m_size = 0;
@@ -1905,12 +1905,12 @@ hkMonitorStreamAnalyzer::Node* hkMonitorStreamAnalyzer::makeStatisticsTreeForSin
     Node* currentNode = memory ? ::new (memory) Node(nullptr, rootNodeName, Node::NODE_TYPE_DIRECTORY) : nullptr;
     Node* const rootNode = currentNode;
     // EXE-INLINED none: hkInplaceArray<hkMonitorStream::TimerCommand, 16, hkContainerHeapAllocator>::hkInplaceArray
-    FNVD_INLINED_LOCAL(TimerStack, timerStack, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(TimerStack, timerStack, std::nullopt, std::nullopt);
     timerStack.m_data = timerStack.m_storage;
     timerStack.m_size = 0;
     timerStack.m_capacityAndFlags = 16 | hkArrayBase<TimerCommand>::DONT_DEALLOCATE_FLAG;
     // EXE-INLINED none: hkInplaceArray<hkMonitorStream::TimerCommand, 16, hkContainerHeapAllocator>::hkInplaceArray
-    FNVD_INLINED_LOCAL(TimerStack, timerStackCopy, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(TimerStack, timerStackCopy, std::nullopt, std::nullopt);
     timerStackCopy.m_data = timerStackCopy.m_storage;
     timerStackCopy.m_size = 0;
     timerStackCopy.m_capacityAndFlags = 16 | hkArrayBase<TimerCommand>::DONT_DEALLOCATE_FLAG;
@@ -2139,7 +2139,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetailsToTexture(
     }
     float fMaxFrameTime = -1.0f;
     // EXE-INLINED none: hkArray<float>::hkArray
-    FNVD_INLINED_LOCAL(StartTimes_t, startTimes, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(StartTimes_t, startTimes, std::nullopt, std::nullopt);
     startTimes.m_data = nullptr;
     startTimes.m_size = 0;
     startTimes.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
@@ -2160,7 +2160,7 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetailsToTexture(
         sampleInfo->m_maxSampleTime = fMax;
     }
     // EXE-INLINED none: hkPointerMap<const char*, hkUint32>::hkPointerMap
-    FNVD_INLINED_LOCAL(ColorMap_t, unknownColors, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ColorMap_t, unknownColors, std::nullopt, std::nullopt);
     unknownColors.m_map.m_elem = nullptr;
     unknownColors.m_map.m_numElems = 0;
     unknownColors.m_map.m_hashMod = -1;
@@ -2550,12 +2550,12 @@ void printStatisticsByType(hkOstream& outstream, hkMonitorStreamAnalyzer::Node* 
     using Map_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
     using StringMap_t = hkStringMap<Info_t*, hkContainerHeapAllocator>;
     using Sorted_t = hkArray<Info_t*, hkContainerTempAllocator>;
-    FNVD_INLINED_LOCAL(Sorted_t, sortedInfos, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(Sorted_t, sortedInfos, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*, hkContainerTempAllocator>::hkArray
     sortedInfos.m_data = nullptr;
     sortedInfos.m_size = 0;
     sortedInfos.m_capacityAndFlags = hkArrayBase<Info_t*>::DONT_DEALLOCATE_FLAG;
-    FNVD_INLINED_LOCAL(StringMap_t, nameToInfoMap, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(StringMap_t, nameToInfoMap, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkStringMap<hkMonitorStreamAnalyzerPrintByTypeInfo*>::hkStringMap
     ::new (&nameToInfoMap.m_map) hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>(0u);
     hkBuildSizePerName(rootNode, nameToInfoMap);
@@ -2855,7 +2855,7 @@ hkMonitorStreamAnalyzer::Node* getNodeSampledAtTick(
     const hkMonitorStreamFrameInfo* apInfo
 ) {
     using NodeArray = hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(NodeArray, samples, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NodeArray, samples, std::nullopt, std::nullopt);
     const float sampleWidth = static_cast<float>(afMaxFrameTime / static_cast<double>(aiWidth));
     samples.m_data = nullptr;
     samples.m_size = 0;

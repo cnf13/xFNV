@@ -66,7 +66,7 @@ void Clouds::Initialize(NiNode* apSkyRoot) {
 }
 
 void Clouds::Update(Sky* apSky, float afSecondsPassed) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     SkyObject::Update(apSky, afSecondsPassed);
     TESWeather* pCurrentWeather = apSky->pCurrentWeather;
     TESWeather* pLastWeather = apSky->pLastWeather;

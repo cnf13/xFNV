@@ -75,7 +75,7 @@ void hkpPhantomDisplayViewer::init() {
 void hkpPhantomDisplayViewer::phantomAddedCallback(hkpPhantom* phantom) {
     const hkpShape* shape = phantom->m_collidable.m_shape;
     const int32_t type = phantom->getType();
-    FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
     displayGeometries.m_data = nullptr;
     displayGeometries.m_size = 0;
     displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
@@ -113,7 +113,7 @@ void hkpPhantomDisplayViewer::phantomAddedCallback(hkpPhantom* phantom) {
                     hkError::MESSAGE_REPORT, -1, acBuffer,
                     ".\\VisualDebugger\\Viewer\\Dynamics\\hkpPhantomDisplayViewer.cpp", 0x91
                 );
-                FNVD_DESTRUCT(hkOstream)(pStream);
+                XFNV_DESTRUCT(hkOstream)(pStream);
                 const int32_t last = displayGeometries.m_size - 1;
                 displayGeometries.m_size = static_cast<uint32_t>(last);
                 if (last != i) {

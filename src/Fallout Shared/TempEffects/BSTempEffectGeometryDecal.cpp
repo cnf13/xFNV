@@ -414,11 +414,11 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     NiGeometryDataIteratorNiPoint2 kTextureIter;
     NiGeometryDataIteratorNiBlendWeights kWeightIter;
     NiGeometryDataIteratorNiBlendIndices kIndexIter;
-    FNVD_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kVertexIter);
-    FNVD_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kNormalIter);
-    FNVD_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint2>)(&kTextureIter);
-    FNVD_RECONSTRUCT(NiTConvertingStrideIterator<NiBlendWeights>)(&kWeightIter);
-    FNVD_RECONSTRUCT(NiTConvertingStrideIterator<NiBlendIndices>)(&kIndexIter);
+    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kVertexIter);
+    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kNormalIter);
+    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint2>)(&kTextureIter);
+    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiBlendWeights>)(&kWeightIter);
+    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiBlendIndices>)(&kIndexIter);
     NiAdditionalGeometryData* pAdditionalData = spTargetGeom.operator->()->GetModelData()->GetAdditionalGeometryData();
     int32_t iBones = 0;
     NiSkinData::BoneData* pSkinBoneData = nullptr;
@@ -500,7 +500,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     pvMemory = ourMalloc(uiVertexCount * sizeof(NiBlendWeights));
     if (pvMemory) {
         rt::eh_vector_constructor_iterator(
-            pvMemory, sizeof(NiBlendWeights), iVertexCount, &fnvd::constructElement<NiBlendWeights>
+            pvMemory, sizeof(NiBlendWeights), iVertexCount, &xfnv::constructElement<NiBlendWeights>
         );
         pWeights = static_cast<NiBlendWeights*>(pvMemory);
     }
@@ -532,7 +532,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     );
     if (pvMemory) {
         rt::eh_vector_constructor_iterator(
-            pvMemory, sizeof(NiSkinData::BoneData), iBones, &fnvd::constructElement<NiSkinData::BoneData>
+            pvMemory, sizeof(NiSkinData::BoneData), iBones, &xfnv::constructElement<NiSkinData::BoneData>
         );
         pBoneData = static_cast<NiSkinData::BoneData*>(pvMemory);
     }
@@ -549,7 +549,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
             if (pvMemory) {
                 rt::eh_vector_constructor_iterator(
                     pvMemory, sizeof(NiSkinData::BoneVertData), static_cast<int32_t>(uiCount),
-                    &fnvd::constructElement<NiSkinData::BoneVertData>
+                    &xfnv::constructElement<NiSkinData::BoneVertData>
                 );
                 pBoneVertData = static_cast<NiSkinData::BoneVertData*>(pvMemory);
             }
@@ -559,7 +559,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
             if (pvMemory) {
                 rt::eh_vector_constructor_iterator(
                     pvMemory, sizeof(NiSkinData::BoneVertData), iVertexCount,
-                    &fnvd::constructElement<NiSkinData::BoneVertData>
+                    &xfnv::constructElement<NiSkinData::BoneVertData>
                 );
                 pBoneVertData = static_cast<NiSkinData::BoneVertData*>(pvMemory);
             }
@@ -802,7 +802,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
             if (pvMemory) {
                 rt::eh_vector_constructor_iterator(
                     pvMemory, sizeof(NiSkinData::BoneVertData), static_cast<int32_t>(uiVerts),
-                    &fnvd::constructElement<NiSkinData::BoneVertData>
+                    &xfnv::constructElement<NiSkinData::BoneVertData>
                 );
                 pBoneVertData = static_cast<NiSkinData::BoneVertData*>(pvMemory);
             }
@@ -1008,7 +1008,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
     if (pMemory) {
         rt::eh_vector_constructor_iterator(
             pMemory, sizeof(NiSkinData::BoneData), static_cast<int32_t>(uiBones),
-            &fnvd::constructElement<NiSkinData::BoneData>
+            &xfnv::constructElement<NiSkinData::BoneData>
         );
         pNewBones = static_cast<NiSkinData::BoneData*>(pMemory);
     }
@@ -1025,7 +1025,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
         if (pMemory) {
             rt::eh_vector_constructor_iterator(
                 pMemory, sizeof(NiSkinData::BoneVertData), static_cast<int32_t>(uiCount),
-                &fnvd::constructElement<NiSkinData::BoneVertData>
+                &xfnv::constructElement<NiSkinData::BoneVertData>
             );
             pVertData = static_cast<NiSkinData::BoneVertData*>(pMemory);
         }
@@ -1256,7 +1256,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
             if (pMemory) {
                 rt::eh_vector_constructor_iterator(
                     pMemory, sizeof(NiSkinData::BoneVertData), static_cast<int32_t>(uiVerts),
-                    &fnvd::constructElement<NiSkinData::BoneVertData>
+                    &xfnv::constructElement<NiSkinData::BoneVertData>
                 );
                 pVertData = static_cast<NiSkinData::BoneVertData*>(pMemory);
             }

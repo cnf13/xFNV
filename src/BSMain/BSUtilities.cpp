@@ -165,7 +165,7 @@ NiMatrix3 BSUtilities::GetRotationZToVector(NiPoint3 apVector) {
 
 NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName, bool bTestScenegraph) {
     NiAVObject* pres;
-    FNVD_INLINED_LOCAL(NiFixedString, name, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, name, std::nullopt, std::nullopt);
     if (!apScene || !apName) {
         return nullptr;
     }
@@ -361,7 +361,7 @@ void BSUtilities::ProcessSelectiveUpdate(NiAVObject* apObject) {
 }
 
 void BSUtilities::SetSequenceFileName(NiControllerSequence* apSequence, const char* apName) {
-    FNVD_INLINED_LOCAL(NiFixedString, v2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v2, std::nullopt, std::nullopt);
     char pcDest[260];
     const char* pcSrc = apSequence->m_kName.GetHandle();
     NiFilename apMemory(apName);

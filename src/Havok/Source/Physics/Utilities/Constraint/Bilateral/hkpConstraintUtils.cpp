@@ -159,7 +159,7 @@ hkpConstraintInstance* hkpConstraintUtils::convertToPowered(
             break;
         }
         default: {
-            FNVD_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
             char buf[512];
             ::new (&stream) hkErrStream(buf, 512);
             stream << "Cannot convert constraint \"" << originalConstraint->getName() << "\" to a powered constraint.";
@@ -167,14 +167,14 @@ hkpConstraintInstance* hkpConstraintUtils::convertToPowered(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
                 ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 111
             );
-            FNVD_DESTRUCT(hkOstream)(&stream);
+            XFNV_DESTRUCT(hkOstream)(&stream);
             ::new (&stream) hkErrStream(buf, 512);
             stream << "Only limited hinges and ragdoll constraints can be powered.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
                 ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 112
             );
-            FNVD_DESTRUCT(hkOstream)(&stream);
+            XFNV_DESTRUCT(hkOstream)(&stream);
             return nullptr;
         }
     }

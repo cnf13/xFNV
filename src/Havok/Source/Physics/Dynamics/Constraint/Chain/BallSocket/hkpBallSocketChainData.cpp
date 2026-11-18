@@ -136,7 +136,7 @@ void hkpBallSocketChainData::buildJacobian(const hkpConstraintQueryIn& inChain, 
 
     // EXE-INLINED none: hkInplaceArray<hkpVelocityAccumulatorOffset, 32>::hkInplaceArray
     using accumulators_t = hkInplaceArray<hkpVelocityAccumulatorOffset, 32>;
-    FNVD_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
     accumulators.m_size = 0;
     hkpConstraintQueryIn in2 = inChain;
     in2.m_constraintInstance = nullptr;

@@ -252,7 +252,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                 NiColorA* pgcolor = nullptr;
                 if (pColorMemory) {
                     rt::eh_vector_constructor_iterator(
-                        pColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiCount), &fnvd::constructElement<NiColorA>
+                        pColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiCount), &xfnv::constructElement<NiColorA>
                     );
                     pgcolor = static_cast<NiColorA*>(pColorMemory);
                 }
@@ -344,7 +344,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                 NiColorA* pgcolor = nullptr;
                 if (pColorMemory) {
                     rt::eh_vector_constructor_iterator(
-                        pColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiCount), &fnvd::constructElement<NiColorA>
+                        pColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiCount), &xfnv::constructElement<NiColorA>
                     );
                     pgcolor = static_cast<NiColorA*>(pColorMemory);
                 }
@@ -627,7 +627,7 @@ void DistantLODShaderProperty::ClearStaticMaps() {
         }
     }
     DistantLODShaderProperty::CachedGeometry* pCachedGeom = nullptr;
-    FNVD_INLINED_LOCAL(NiPointer<DistantLODShaderProperty::CachedGeometry>, spCachedGeom, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<DistantLODShaderProperty::CachedGeometry>, spCachedGeom, std::nullopt, std::nullopt);
     spCachedGeom.m_pObject = nullptr;
     if (DistantLODShaderProperty::GetCachedGeometryMap()->m_kAllocator.m_uiCount) {
         if (pPos) {

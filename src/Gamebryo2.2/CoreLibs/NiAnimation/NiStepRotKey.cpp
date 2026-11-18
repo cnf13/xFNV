@@ -39,7 +39,7 @@ bool NiStepRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumK
         *puiCookie = uiNewNumKeys;
         pkNewKeys = reinterpret_cast<NiRotKey*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiRotKey), uiNewNumKeys, &fnvd::constructElement<NiBezRotKey>
+            pkNewKeys, sizeof(NiRotKey), uiNewNumKeys, &xfnv::constructElement<NiBezRotKey>
         );
     }
     else {

@@ -126,7 +126,7 @@ void hkpRagdollLimitsDrawer::drawConstraint(
     m_planeCone2.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);
 
     // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-    alignas(16) FNVD_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, twistGeometry, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, twistGeometry, std::nullopt, std::nullopt);
     twistGeometry.m_data = nullptr;
     twistGeometry.m_size = 0;
     twistGeometry.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;

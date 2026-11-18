@@ -15,7 +15,7 @@ class hkWorldObjectCinfo;
 class NiAVObject;
 class NiNode;
 
-#if FNVD_64BIT
+#if XFNV_64BIT
 // The module's base address, from the linker (the start of the image).
 extern "C" const char __ImageBase;
 #endif
@@ -24,7 +24,7 @@ extern "C" const char __ImageBase;
 // Havok's keys are 32 bits (hkpProperty::m_key), so where an address has 64 bits the key is the RTTI object's offset
 // from the module's base, unique per RTTI object.
 inline uint32_t bhkPropertyKey(const NiRTTI& arRTTI) {
-#if FNVD_64BIT
+#if XFNV_64BIT
     return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&arRTTI) - reinterpret_cast<uintptr_t>(&__ImageBase));
 #else
     return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&arRTTI));

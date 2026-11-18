@@ -9,11 +9,11 @@
 
 // Assumes CCallback's native constructor CCallback(T* apObj, func_t aFunc).
 SteamAPICallbacks::SteamAPICallbacks()
-  : unk00(this, &fnvd::callMember<&SteamAPICallbacks::OnUserStatsReceived>),
-    unk14(this, &fnvd::callMember<&SteamAPICallbacks::OnUserStatsStored>),
-    unk28(this, &fnvd::callMember<&SteamAPICallbacks::OnUserStatsStored_Achievement>), bSteamInitialized(false),
+  : unk00(this, &xfnv::callMember<&SteamAPICallbacks::OnUserStatsReceived>),
+    unk14(this, &xfnv::callMember<&SteamAPICallbacks::OnUserStatsStored>),
+    unk28(this, &xfnv::callMember<&SteamAPICallbacks::OnUserStatsStored_Achievement>), bSteamInitialized(false),
     unk3D(0), bUseCloud(true), uiAppID(0) {
-#if FNVD_NO_STEAM
+#if XFNV_NO_STEAM
     // With Steam switched off, SteamAPI_Init is not called, so the game runs as it does when Steam is not there (no
     // stats, achievements or callbacks).
 #else

@@ -1658,7 +1658,7 @@ bool Actor::GetEditorLocation(
 }
 
 NiPoint3 Actor::GetStartingAngle() {
-    FNVD_INLINED_LOCAL(NiPoint3, kAngle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPoint3, kAngle, std::nullopt, std::nullopt);
     return *::new (&kAngle) NiPoint3(0.0f, 0.0f, fEditorLocZRot);
 }
 
@@ -1966,7 +1966,7 @@ void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
                         collisionData.cMaterialType1 = BHK_MATERIAL_MAX;
                         collisionData.cMaterialType2 = static_cast<int8_t>(apTarget->eMaterialAtHit);
                         collisionData.Location = location;
-                        hkSimdReal* a3_4a = FNVD_RECONSTRUCT(hkSimdReal)(&v37, 3.0f);
+                        hkSimdReal* a3_4a = XFNV_RECONSTRUCT(hkSimdReal)(&v37, 3.0f);
                         collisionData.fVelocity = (trapVel.length3() * *a3_4a).operator float();
                         // The sound ID is the sum of the actor's and the body's (32-bit) addresses.
                         collisionData.iID =
@@ -2899,8 +2899,8 @@ bool Actor::MovetoMiddleHigh() {
 }
 
 bhkCharacterController* Actor::Move(float afDeltaTime, NiPoint3& arDeltaMove, uint32_t aiMoveDir) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (IsInDialoguewithPlayer() && (aiMoveDir & 63) == 0) {
         return nullptr;
     }
@@ -3765,9 +3765,9 @@ float Actor::SpeakSoundFunction(
     bool abLip,
     bool abUseIdleManager
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
     double dDistanceFromPlayer;
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     char Dst[516];
     float fdelay = 0.0f;
     BSStringT<char> tempstring(apSoundFile);
@@ -6809,7 +6809,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
         if (pResponse) {
             bool bPlayVoiceFile = true;
             if (pResponse->pVoiceSound && bSoundFileDone) {
-                FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
                 MobileObject::PlaySound(
                     &soundHandle, pResponse->pVoiceSound->iFormID, false,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
@@ -6829,7 +6829,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                     char cVoiceFile[512];
                     BSstrcpy(cVoiceFile, 512, pResponse->cVoice.pString);
                     if (abIs2D) {
-                        FNVD_INLINED_LOCAL(BSSoundHandle, fileHandle, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, fileHandle, std::nullopt, std::nullopt);
                         handle = *BSAudio::QInstance().GetSoundHandleByFilename(
                             &fileHandle, cVoiceFile,
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_VOICE |
@@ -6838,7 +6838,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                         );
                     }
                     else {
-                        FNVD_INLINED_LOCAL(BSSoundHandle, fileHandle, std::nullopt, std::nullopt);
+                        XFNV_INLINED_LOCAL(BSSoundHandle, fileHandle, std::nullopt, std::nullopt);
                         handle = *BSAudio::QInstance().GetSoundHandleByFilename(
                             &fileHandle, cVoiceFile,
                             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_VOICE |
@@ -6862,7 +6862,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                     }
                     bVoiceFileDone = false;
                     // The by-value handle argument is deliberately built with operator=, as the game does.
-                    FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+                    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
                     kArgument.operator=(handle);
                     pCurrentProcess->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, kArgument);
                     fDuration = static_cast<float>(handle.GetDuration());
@@ -6875,7 +6875,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                 !abNeverSubtitle) {
                 // Reads the position before it builds the by-value handle argument with operator=.
                 NiPoint3 kSpeakerLoc = pRef->GetLocationOnReference();
-                FNVD_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
                 kArgument.operator=(handle);
                 Interface::ShowSubtitle(pResponse->cText.pString, kArgument, kSpeakerLoc, apTarget, true);
             }
@@ -7589,10 +7589,10 @@ void Actor::HitMe(
             NiColorA kArrowColor;
             // The attacker's hit vectors are blue for the player, else red.
             if (apAttacker->IsPc()) {
-                kColor = *FNVD_RECONSTRUCT(NiColorA)(&kArrowColor, 0.0f, 0.0f, 1.0f, 1.0f);
+                kColor = *XFNV_RECONSTRUCT(NiColorA)(&kArrowColor, 0.0f, 0.0f, 1.0f, 1.0f);
             }
             else {
-                kColor = *FNVD_RECONSTRUCT(NiColorA)(&kArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
+                kColor = *XFNV_RECONSTRUCT(NiColorA)(&kArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
             }
             NiPoint3 kArrow = kForce * 0.1f;
             NiNode* pArrow = static_cast<NiNode*>(BSTestObjects::CreateDirArrow(kArrow, &kColor));
@@ -9022,7 +9022,7 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
                                 bhkCharacterController* pController = pProcess->GetCharController();
                                 // The support normal is copied and the copy is never read, as the game does.
                                 alignas(16) hkVector4 kSupportNormal;
-                                FNVD_RECONSTRUCT(hkVector4)(&kSupportNormal, pController->GetSupportNormal());
+                                XFNV_RECONSTRUCT(hkVector4)(&kSupportNormal, pController->GetSupportNormal());
                                 NiPoint3 kUp(0.0f, 0.0f, 1.0f);
                                 pExplosion->SetClosestPointNormal(kUp);
                                 BaseProcess* pAggressorProcess = apData->pAggressor->GetCurrentAIProcess();
@@ -9411,7 +9411,7 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
                                 uiImpulse = pRagdollController->QFeedbackImpulseStrong();
                             }
                             alignas(16) hkSimdReal kImpulse;
-                            FNVD_RECONSTRUCT(hkSimdReal)(
+                            XFNV_RECONSTRUCT(hkSimdReal)(
                                 &kImpulse, static_cast<float>(static_cast<int64_t>(uiImpulse))
                             );
                             kDirection.mul4(kImpulse);
@@ -9556,8 +9556,8 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
 
 void Actor::Kill(Actor* apAttacker, float afDamage) {
     uint32_t iplayerCombatantLostCount;
-    alignas(16) FNVD_INLINED_LOCAL(BSSoundHandle, v76, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    alignas(16) XFNV_INLINED_LOCAL(BSSoundHandle, v76, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     if (!IsDead(false) && (!this->IsChild(false) || this == pPlayer)) {
         BSSoundHandle hweapLoop;
         (&this->m_Extra)->GetWeaponAttackSound(hweapLoop);
@@ -11215,8 +11215,8 @@ bool Actor::ConditionalFree(bool abArg) {
 }
 
 void Actor::PlayPickUpSound(TESBoundObject* apobjREFR, bool abPickUp, bool abUse) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (apobjREFR) {
         BSSoundHandle soundHand;
         char* a2 = nullptr;
@@ -12039,8 +12039,8 @@ void Actor::EquipObject(
     bool abForceEquip,
     bool abPlayPickUpSounds
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     float fhealth = 0.0f;
     ExtraHealth* pHealth = nullptr;
     bool bdefault = false;
@@ -13504,11 +13504,11 @@ void Actor::MeleeAttack(bool abPowerAttack, bool abInCombatAttack) {
         ::new (&kColor) NiColorA(0.0f, 0.0f, 0.0f, 0.0f);
         if (IsPc()) {
             NiColorA kBlue;
-            kColor = *FNVD_RECONSTRUCT(NiColorA)(&kBlue, 0.0f, 0.0f, 1.0f, 1.0f);
+            kColor = *XFNV_RECONSTRUCT(NiColorA)(&kBlue, 0.0f, 0.0f, 1.0f, 1.0f);
         }
         else {
             NiColorA kRed;
-            kColor = *FNVD_RECONSTRUCT(NiColorA)(&kRed, 1.0f, 0.0f, 0.0f, 1.0f);
+            kColor = *XFNV_RECONSTRUCT(NiColorA)(&kRed, 1.0f, 0.0f, 0.0f, 1.0f);
         }
         NiPoint3 kStart;
         kStart.~NiPoint3();
@@ -13596,7 +13596,7 @@ void Actor::MeleeAttack(bool abPowerAttack, bool abInCombatAttack) {
         if (pSound) {
             // Takes the file name before the audio singleton.
             const char* pFilename = pSound->GetFilename();
-            FNVD_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
             BSAudio::QInstance().GetSoundHandleByFilename(
                 &kHandle, pFilename, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT, pSound
             );
@@ -13931,7 +13931,7 @@ bool Actor::ObjectHit(bool abPowerAttack) {
                         continue;
                     }
                     CFilter kHitFilter;
-                    CFilter* pHitFilter = FNVD_RECONSTRUCT(CFilter)(&kHitFilter, pCollidable->getCollisionFilterInfo());
+                    CFilter* pHitFilter = XFNV_RECONSTRUCT(CFilter)(&kHitFilter, pCollidable->getCollisionFilterInfo());
                     bool bLand = pHitFilter->GetGroup() == 1;
                     NiAVObject* pDecalObject = nullptr;
                     if (bLand) {
@@ -14174,7 +14174,7 @@ void Actor::FakeWeaponHitSound(
 }
 
 void Actor::PickAnimations(float afMoveScale, float afTurnScale) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
     float fSpeed;
     if (!IsDead(false) && !IsKnockedOut()) {
         if (this == pPlayer && !pPlayer->Is3rdPerson()) {
@@ -15226,7 +15226,7 @@ void Actor::PickpocketAlarm(TESObjectREFR* apRef, TESBoundObject* apObj, int32_t
             else {
                 pvictim->pCurrentProcess->InsertIntoDetectionArray(pvictim, elevel);
             }
-            FNVD_DYNAMIC_CAST_VOID(TESNPC)(apRef->GetObjectReference(), RTTI_TESBoundObject, RTTI_TESNPC);
+            XFNV_DYNAMIC_CAST_VOID(TESNPC)(apRef->GetObjectReference(), RTTI_TESBoundObject, RTTI_TESNPC);
             BaseProcess* v7 = ptargactor->pCurrentProcess;
             v7->SetPickpocketed(true);
             float afTimeStamp = appCalendar.GetHour();
@@ -16416,8 +16416,8 @@ void Actor::SetWantWeaponDrawn(bool abTF) {
 
 bool Actor::StartAttack(ANIM_GROUP_ENUM aeAttack) {
     TESObjectWEAP* pweapon;
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     float fSpeed;
     bool bnoammo;
     if (pCurrentProcess->GetCurrentWeapon()) {
@@ -17112,7 +17112,7 @@ void Actor::DismemberLimb(
     pactorRoot->AttachChild(pclonedLimbRoot, 1);
     NiUpdateData UpdateData(0.0f, false, false);
     pclonedLimbRoot->UpdateWorldData(UpdateData);
-    FNVD_INLINED_LOCAL(NiFixedString, goreObjectName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, goreObjectName, std::nullopt, std::nullopt);
     NiFixedString* pgoreObjectName =
         ::new (static_cast<void*>(&goreObjectName)) NiFixedString(pbodyPart->GetGoreObjectName());
     NiAVObject* pgoreObject = pactorRoot->GetObjectByName(*pgoreObjectName);
@@ -17557,7 +17557,7 @@ void Actor::MoveActorAndFollowers(
     float ffollowerSpacing;
     float fdummy;
     NiPoint3 farEnoughPt;
-    FNVD_INLINED_LOCAL(PathingLocation, kDestination, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, kDestination, std::nullopt, std::nullopt);
     NiPoint3 location = aLocation;
     float y = -std::cos(afAngle);
     float x = -std::sin(afAngle);
@@ -18471,7 +18471,7 @@ float Actor::GetVATSAreaFree(TESObjectREFR* apTarget, float afAngle) {
     }
     float fResult = fDistance;
     // The local's own destructor runs at the scope's end; a second destruction freed its hit array twice.
-    FNVD_DESTRUCT_IN_PLACE(hkpAllRayHitCollector)(pCollector);
+    XFNV_DESTRUCT_IN_PLACE(hkpAllRayHitCollector)(pCollector);
     return fResult;
 }
 
@@ -18557,7 +18557,7 @@ float Actor::GetVATSTargetVisible(TESObjectREFR* apTarget, float afAngle) {
             fDistance = fVATSSmartCameraCheckStepDistance.Float() * dReached;
         }
         // The local's own destructor runs at the loop body's end; a second destruction freed its hit array twice.
-        FNVD_DESTRUCT_IN_PLACE(hkpAllRayHitCollector)(pCollector);
+        XFNV_DESTRUCT_IN_PLACE(hkpAllRayHitCollector)(pCollector);
     }
     return fDistance;
 }
@@ -19621,11 +19621,11 @@ void Actor::SetLastAttackHitData(HitData* apData) {
 }
 
 void Actor::PlayHitSound(HitData* apHitData) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v35, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v37, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, v39, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v35, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v37, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v39, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     bool bpowerArmor = IsPowerBodyArmorWorn();
     NiPoint3 damageLocation = apHitData->kHitLocation;
     NiPoint3 distanceDelta = NiPoint3_ZERO;
@@ -22730,7 +22730,7 @@ void Actor::InitiateUseWeaponPackage(
 }
 
 void Actor::AddBackCrime(Crime* apCrime) {
-    FNVD_INLINED_LOCAL(CombatTimeStamp, kTimeStamp, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CombatTimeStamp, kTimeStamp, std::nullopt, std::nullopt);
     CombatTimeStamp* pTimeStamp = apCrime->GetTimeStamp(&kTimeStamp);
     float afTimeStamp = pTimeStamp->fTimeStamp;
     (&m_Extra)->AddToPlayerCrimeList(apCrime, afTimeStamp);
@@ -23679,10 +23679,10 @@ void Actor::MobilityConditionModifiedCallback(
 }
 
 void Actor::PlayLandJumpSound(PlayerCharacter* arg0, HavokMaterialType a2) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, v29, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, v29, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle th_s;
     IOTask* v41 = nullptr;
     TESSound* v46 = nullptr;

@@ -1477,7 +1477,7 @@ Animation* MiddleHighProcess::GetAnimation() {
 }
 
 void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBiped, Animation* apAnim, Actor* apActor) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     ForceBoneScale();
     NiNode* pweaponBone = GetWeaponBone(apBiped);
     // The biped's root, else the actor's 3D.
@@ -3923,7 +3923,7 @@ void MiddleHighProcess::RemoveAndAttachItems(MobileObject* apMob) {
     }
     apMob->AttachAmmo(nullptr);
     apMob->RemoveAmmo();
-    FNVD_DYNAMIC_CAST_VOID(Actor)(apMob, RTTI_MobileObject, RTTI_Actor);
+    XFNV_DYNAMIC_CAST_VOID(Actor)(apMob, RTTI_MobileObject, RTTI_Actor);
 }
 
 uint16_t MiddleHighProcess::GetSaveSize(uint32_t aiFlags, MobileObject* pmob) {
@@ -5514,7 +5514,7 @@ bool MiddleHighProcess::HasBackPackWorn() {
 }
 
 void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     if ((!spReserveProjectileClones.m_pObject) && (spWeaponPreload.m_pObject) &&
         (static_cast<QueuedFile*>(spWeaponPreload.m_pObject)->QueuedFile::GetAllChildrenFinished())) {
         TESBoundObject* FormFlags;

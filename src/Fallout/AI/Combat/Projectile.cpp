@@ -1313,7 +1313,7 @@ bool Projectile::IsMine() {
 }
 
 bool Projectile::TurnOff(Actor* apActionActor, bool abSilent) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
     bool bresult = false;
     if (GetProjectileBase()->GetCanTurnOff() && !IsFlagSet(Projectile::TURNED_OFF)) {
         StopCountdownSound();
@@ -1513,10 +1513,10 @@ bool Projectile::RunTargetPick() {
         NiColorA kReach;
         NiColorA* pColor;
         if (kPickData.GetPickFailed()) {
-            pColor = FNVD_RECONSTRUCT(NiColorA)(&kMiss, 1.0f, 0.0f, 0.0f, 1.0f);
+            pColor = XFNV_RECONSTRUCT(NiColorA)(&kMiss, 1.0f, 0.0f, 0.0f, 1.0f);
         }
         else {
-            pColor = FNVD_RECONSTRUCT(NiColorA)(&kReach, 1.0f, 1.0f, 0.0f, 1.0f);
+            pColor = XFNV_RECONSTRUCT(NiColorA)(&kReach, 1.0f, 1.0f, 0.0f, 1.0f);
         }
         NiColorA kColor = *pColor;
         NiPoint3 kLineEnd = kPosition + kLength;
@@ -1601,7 +1601,7 @@ bool Projectile::AddImpact(
             pdata_2->pTargetWorldObject->addReference();
             if ((apCollidee) && (apCollidee->IsActor() && apTargetCollidable->getType() == 1)) {
                 uint32_t afSize = apTargetCollidable->getCollisionFilterInfo();
-                if (FNVD_RECONSTRUCT(CFilter)(&v45, afSize)->QBipLayer()) {
+                if (XFNV_RECONSTRUCT(CFilter)(&v45, afSize)->QBipLayer()) {
                     NiAVObject* phitAVObject = GetAVObjectForCollidable(apTargetCollidable);
                     Actor* pactor_2 = static_cast<Actor*>(apCollidee);
                     NiNode* pclosestBone_2 = phitAVObject->IsNode();
@@ -1613,7 +1613,7 @@ bool Projectile::AddImpact(
         HavokMaterialType emat = aeForceMaterial;
         if ((apTargetCollidable) && (aeForceMaterial == BHK_MATERIAL_MAX)) {
             uint32_t afSizea = apTargetCollidable->getCollisionFilterInfo();
-            uint32_t Group = FNVD_RECONSTRUCT(CFilter)(&v44, afSizea)->GetGroup();
+            uint32_t Group = XFNV_RECONSTRUCT(CFilter)(&v44, afSizea)->GetGroup();
             bool bhitLandHeightField = Group == 1;
             if (Group == 1) {
                 emat = TES::pInstance->GetLandMaterialType(aContactPoint);
@@ -1625,7 +1625,7 @@ bool Projectile::AddImpact(
                 }
             }
             uint32_t afSizeb = apTargetCollidable->getCollisionFilterInfo();
-            if (FNVD_RECONSTRUCT(CFilter)(&v43, afSizeb)->GetLayer() == L_WATER) {
+            if (XFNV_RECONSTRUCT(CFilter)(&v43, afSizeb)->GetLayer() == L_WATER) {
                 emat = BHK_MATERIAL_WATER;
             }
         }
@@ -2527,8 +2527,8 @@ void Projectile::SpawnCollisionEffects(
     NiColor kVertexColor;
     hkpPropertyValue arResult;
     CFilter v39;
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
     bool bcreateParticles = true;
     NiCamera* v6 = Main::WorldRootCamera();
     NiPoint3 distance = aContactPoint - v6->GetWorldTranslate();
@@ -2611,7 +2611,7 @@ void Projectile::SpawnCollisionEffects(
                             if (ematerialB == aeMaterial && pcol != plastCol) {
                                 plastCol = pcol;
                                 uint32_t a1b = pcol->getCollisionFilterInfo();
-                                uint32_t Group = FNVD_RECONSTRUCT(CFilter)(&v39, a1b)->GetGroup();
+                                uint32_t Group = XFNV_RECONSTRUCT(CFilter)(&v39, a1b)->GetGroup();
                                 bool bcasterHitLandHeightField = Group == 1;
                                 NiAVObject* pavobj = nullptr;
                                 if (Group == 1) {
@@ -2662,7 +2662,7 @@ void Projectile::SpawnCollisionEffects(
                                         255.0;
                                     float v27 =
                                         static_cast<double>(static_cast<uint8_t>(pimpactData->GetDecalColor())) / 255.0;
-                                    data.fVertexColor = *FNVD_RECONSTRUCT(NiColor)(&kVertexColor, v27, v28, v29);
+                                    data.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(&kVertexColor, v27, v28, v29);
                                     if (ematerialB == BHK_MATERIAL_GLASS) {
                                         data.bTwoSided = true;
                                     }
@@ -2922,7 +2922,7 @@ void Projectile::CheckRefDeleted(TESObjectREFR* apDeletedRef) {
 }
 
 void Projectile::StartCountdownSound() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     if ((!sndCountdown.IsValid()) && (GetProjectileBase()->Data.pCountdownSound)) {
         int32_t refID = GetProjectileBase()->Data.pCountdownSound->iFormID;
         BSSoundHandle* arHandle = PlaySound(
@@ -3018,7 +3018,7 @@ Projectile* Projectile::Launch(
     NiPoint3 v50;
     NiPoint3 result;
     NiPoint3 dst;
-    FNVD_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     float fEntrySpeed;
     Projectile* pprojectile = nullptr;
     bool binitialize = true;
@@ -3391,9 +3391,9 @@ bool Projectile::IsValidImpact(
     if ((apProjectileBase) && (apTargetCollidable)) {
         uint32_t v8;
         uint32_t CollisionFilterInfo = apTargetCollidable->getCollisionFilterInfo();
-        if (FNVD_RECONSTRUCT(CFilter)(&v14, CollisionFilterInfo)->GetLayer() == L_TRANSPARENT_SMALL ||
+        if (XFNV_RECONSTRUCT(CFilter)(&v14, CollisionFilterInfo)->GetLayer() == L_TRANSPARENT_SMALL ||
             (v8 = apTargetCollidable->getCollisionFilterInfo(),
-             FNVD_RECONSTRUCT(CFilter)(&v13, v8)->GetLayer() == L_TRANSPARENT_SMALL_ANIM)) {
+             XFNV_RECONSTRUCT(CFilter)(&v13, v8)->GetLayer() == L_TRANSPARENT_SMALL_ANIM)) {
             BGSProjectile::BGSProjectileFlags emotion = apProjectileBase->GetMotionType();
             if (emotion != BGSProjectile::MOTION_GRENADE &&
                 (emotion != BGSProjectile::MOTION_MISSILE ||
@@ -3414,8 +3414,8 @@ NiAVObject* Projectile::ProcessTargetPick(
     bool bUseCharacterController,
     float afWaterHitRatio
 ) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, sound_2, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, sound_2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
     CFilter kPickFilter;
     CFilter v65;
     CFilter v69;

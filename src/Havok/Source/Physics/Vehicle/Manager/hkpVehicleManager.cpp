@@ -115,7 +115,7 @@ void hkpVehicleManager::removeVehicle(hkpVehicleInstance* vehicle) {
 // allocator, sized to the vehicle's wheel count, then the vehicle is prepared, its wheels collided (collideWheels,
 // through the vtable) and simulated.
 void hkpVehicleManager::stepVehicles(const hkStepInfo& stepInfo) {
-    FNVD_INLINED_LOCAL(
+    XFNV_INLINED_LOCAL(
         hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>, cdInfo, std::nullopt, std::nullopt
     );
     cdInfo.m_data = nullptr;

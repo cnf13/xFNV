@@ -103,7 +103,7 @@ void hkVisualDebugger::step(float frameTimeInMs) {
             hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
             *pStream << "Client has died, cleaning up (host name not available at present)";
             hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 288);
-            FNVD_DESTRUCT(hkOstream)(pStream);
+            XFNV_DESTRUCT(hkOstream)(pStream);
             hkError::s_instance->sectionEnd();
             deleteClient(i);
         }
@@ -116,7 +116,7 @@ void hkVisualDebugger::step(float frameTimeInMs) {
 }
 
 void hkVisualDebugger::pollForNewClients() {
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     if (!s_SuppressPollForNewClients) {
         if ((m_amTimingFrame.m_bool) && (m_frameTimer.m_running_flag.m_bool)) {
             m_frameTimer.m_running_flag.m_bool = 0;
@@ -133,7 +133,7 @@ void hkVisualDebugger::pollForNewClients() {
                 ::new (&apThis) hkErrStream(buf, 512);
                 apThis.operator<<("A new network client has been received (host name not available at present)");
                 hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 232);
-                FNVD_DESTRUCT(hkOstream)(&apThis);
+                XFNV_DESTRUCT(hkOstream)(&apThis);
                 createClient(v3, &v3->m_reader, &v3->m_writer);
             }
         }
@@ -160,7 +160,7 @@ void hkVisualDebugger::pollForNewClients() {
 
 // Creates the server socket through the platform's factory and listens on the port; one report on every path.
 void hkVisualDebugger::serve(int32_t listenPort) {
-    FNVD_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char description[512];
     hkError::s_instance->sectionBegin(0x1293ADE8, "Serving");
     if (m_server) {
@@ -183,7 +183,7 @@ void hkVisualDebugger::serve(int32_t listenPort) {
             hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, description, ".\\hkVisualDebugger.cpp", 107);
         }
     }
-    FNVD_DESTRUCT(hkOstream)(&kStream);
+    XFNV_DESTRUCT(hkOstream)(&kStream);
     hkError::s_instance->sectionEnd();
 }
 
@@ -201,11 +201,11 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
         *pStream << "Capturing simulation state to '" << captureFilename << "'";
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 125);
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
         createClient(nullptr, nullptr, pWriter);
         pWriter->removeReference();
         hkVisualDebuggerClient* pClient = &m_clients.m_data[m_clients.m_size - 1];
-        FNVD_INLINED_LOCAL(hkStringBuf, kViewers, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkStringBuf, kViewers, std::nullopt, std::nullopt);
         ::new (&kViewers) hkStringBuf;
         kViewers = "Turning on the following viewers: [";
         for (int32_t i = 0; i < m_defaultProcesses.m_size; ++i) {
@@ -220,7 +220,7 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
         *pStream << kViewers.m_string.m_data;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 147);
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
         // EXE-INLINED 0xCBBD40
         hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
         kViewers.m_string.m_size = 0;
@@ -234,7 +234,7 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
         *pStream << "Capture file '" << captureFilename << "' could not be opened for writing";
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 151);
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
     }
     hkError::s_instance->sectionEnd();
 }
@@ -387,7 +387,7 @@ void hkVisualDebugger::SupressPollForNewClient(bool val) {
 }
 
 void hkVisualDebugger::shutdown() {
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     hkError::s_instance->sectionBegin(0x1293ADEF, "Shuting down Visual Debugger..");
     for (int32_t i = m_clients.m_size - 1; i >= 0; --i) {
@@ -396,7 +396,7 @@ void hkVisualDebugger::shutdown() {
         ::new (&apThis) hkErrStream(buf, 512);
         apThis.operator<<("Client deleted.");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 81);
-        FNVD_DESTRUCT(hkOstream)(&apThis);
+        XFNV_DESTRUCT(hkOstream)(&apThis);
     }
     hkSocket* m_server = this->m_server;
     if (m_server) {
@@ -405,7 +405,7 @@ void hkVisualDebugger::shutdown() {
         ::new (&apThis) hkErrStream(buf, 512);
         apThis.operator<<("Server deleted.");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 88);
-        FNVD_DESTRUCT(hkOstream)(&apThis);
+        XFNV_DESTRUCT(hkOstream)(&apThis);
     }
     hkError::s_instance->sectionEnd();
 }
@@ -447,7 +447,7 @@ void hkVisualDebugger::addTrackedObject(void* obj, const hkClass& klass, const c
 }
 
 void hkVisualDebugger::removeDefaultProcess(const char* processName) {
-    FNVD_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     int32_t v3 = 0;
     if (m_defaultProcesses.m_size <= 0) {
         char buf[512];
@@ -458,7 +458,7 @@ void hkVisualDebugger::removeDefaultProcess(const char* processName) {
         hkOstream* v5 = &v4->operator<<(processName);
         v5->operator<<("', cannot not be removed from the default process list as it cannot be found!");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 318);
-        FNVD_DESTRUCT(hkOstream)(&apThis);
+        XFNV_DESTRUCT(hkOstream)(&apThis);
         hkError::s_instance->sectionEnd();
     }
     else {

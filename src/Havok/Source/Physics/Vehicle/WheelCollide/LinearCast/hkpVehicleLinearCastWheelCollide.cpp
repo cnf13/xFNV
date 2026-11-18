@@ -519,7 +519,7 @@ hkBool* hkpVehicleLinearCastWheelCollide::castSingleWheel(
 ) const {
     hkVector4 v6;
     hkpLinearCastInput v8;
-    FNVD_INLINED_LOCAL(hkpClosestCdPointCollector, a3, hkpClosestCdPointCollector_vftable, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpClosestCdPointCollector, a3, hkpClosestCdPointCollector_vftable, std::nullopt);
     hkpVehicleLinearCastWheelCollide::WheelState* v5 = &m_wheelStates.m_data[wheelNum];
     // The collidable over the wheel's transform.
     alignas(16) hkpCollidable v10(v5->m_shape, &v5->m_transform, 0);

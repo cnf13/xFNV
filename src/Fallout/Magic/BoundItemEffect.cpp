@@ -631,7 +631,7 @@ void BoundItemEffect::Start() {
 
 void BoundItemEffect::Finish() {
     Actor* pactor;
-    FNVD_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
     if (pTarget) {
         pactor = pTarget->GetTargetAsActor();
     }

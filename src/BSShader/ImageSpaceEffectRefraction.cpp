@@ -56,7 +56,7 @@ void ImageSpaceEffectRefraction::Render(
 }
 
 void ImageSpaceEffectRefraction::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     ImageSpaceShaderParam* pparam;
     SetEffectCount(1);
     pTextures.SetSize(3u);

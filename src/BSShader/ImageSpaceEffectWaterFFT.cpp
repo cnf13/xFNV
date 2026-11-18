@@ -283,7 +283,7 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     ImageSpaceShaderParam* pparam_5;
     ImageSpaceShaderParam* pparam_6;
     ImageSpaceShaderParam* pparam_7;
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(12);
     pTextures.SetSize(10u);
     ImageSpaceShaderParam* v4 =

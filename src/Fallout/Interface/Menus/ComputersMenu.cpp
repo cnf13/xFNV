@@ -52,7 +52,7 @@ ComputersMenu::AnimatingTextManager::~AnimatingTextManager() {
 }
 
 void ComputersMenu::AnimatingTextManager::Update() {
-    FNVD_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     bool btextwraps = false;
     while (!xAnimatingText.IsEmpty() && BSGetTickCount() > g_computersNextMainMenuTextDisplayTime) {
         if (!xAnimatingText.GetHead()->bIsTextRemaining) {
@@ -569,7 +569,7 @@ void ComputersMenu::DisplayIntro() {
 }
 
 void ComputersMenu::PlayNoteSound(BGSNote* apNote) {
-    FNVD_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     TESSound* NoteSound = apNote->GetNoteSound();
     uint32_t CastingType = NoteSound->iFormID;
     BSAudio* v3 = &BSAudio::QInstance();

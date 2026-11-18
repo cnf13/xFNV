@@ -60,7 +60,7 @@ bool BGSProjectile::Load(TESFile* apFile) {
             case DATA_ID:
                 // LoadData takes the record as raw bytes; the chunk is read straight into the DATA member.
                 LoadData(apFile, reinterpret_cast<char*>(&Data), 0x54);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x54 bytes, with a 4-byte form ID in each pointer field.
                 TESFile::WidenFormIDRecords(
                     &Data, 1, 0x54, sizeof(Data),

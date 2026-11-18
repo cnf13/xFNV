@@ -182,7 +182,7 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
     }
     NiRefObject* v23 = static_cast<NiRefObject*>(v15);
     NiPointer<NiMaterialProperty> spmat(static_cast<NiMaterialProperty*>(v15));
-    NiColor* v1 = FNVD_RECONSTRUCT(NiColor)(&dst, 1.0f, 1.0f, 1.0f);
+    NiColor* v1 = XFNV_RECONSTRUCT(NiColor)(&dst, 1.0f, 1.0f, 1.0f);
     spmat.m_pObject->SetEmittance(*v1);
     spmat.m_pObject->SetAlpha(0.75f);
     NiAlphaProperty* a4 = spAlphaProp.m_pObject;
@@ -291,8 +291,8 @@ bool PathingLOSMap::IsNavMeshInMap(uint32_t aiNavMeshID) {
 }
 
 void NiAVObjectArray_SetSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray, uint32_t auiSize) {
-    FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, v6, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<NiAVObject>, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, v6, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, apMemory, std::nullopt, std::nullopt);
     if (auiSize != apArray->m_usMaxSize) {
         uint16_t i;
         if (auiSize < apArray->m_usSize) {

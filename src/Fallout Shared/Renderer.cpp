@@ -679,7 +679,7 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
     const float fTintB = fInterfaceTintB.Float();
     const float fTintG = fInterfaceTintG.Float();
     const float fTintR = fInterfaceTintR.Float();
-    FNVD_INLINED_LOCAL(NiColorA, kTint, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, kTint, std::nullopt, std::nullopt);
     BSShaderManager::fpInterfaceTint = *::new (&kTint) NiColorA(fTintR, fTintG, fTintB, 1.0f);
     BSShaderManager::SetShadowFilter(static_cast<int32_t>(iShadowFilter.UInt()));
     BSShaderManager::b30GrassVS = b30GrassVS.Bool();

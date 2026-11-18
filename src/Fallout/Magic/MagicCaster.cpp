@@ -212,14 +212,14 @@ MagicTarget* MagicCaster::GetTouchTarget() {
 
             if (ptempfollower && ptempfollower->m_item) {
                 ptargetActor = static_cast<Actor*>(
-                    FNVD_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
+                    XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
                 );
                 ptempfollower = ptempfollower->m_pkNext;
                 while (ptargetActor && (!ptargetActor->pCurrentProcess || ptargetActor->pCurrentProcess->eLevel)) {
                     ptargetActor = nullptr;
                     if (ptempfollower) {
                         ptargetActor = static_cast<Actor*>(
-                            FNVD_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
+                            XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
                         );
                     }
                     if (ptempfollower) {
@@ -668,7 +668,7 @@ void MagicCaster::DoExplosion(
             NI2HK(info.aabb.m_max, *v12);
             uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
             info.m_collisionFilterInfo =
-                FNVD_RECONSTRUCT(CFilter)(&v34, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
+                XFNV_RECONSTRUCT(CFilter)(&v34, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
             bhkAabbPhantom pphantom(info);
             bhkWorld* pw = apCell->GetbhkWorld();
             pphantom.bhkWorldObject::Add(pw);
@@ -751,7 +751,7 @@ void MagicCaster::ExplodeRigidBody(
         alignas(16) hkVector4 kImpulse;
         NI2HK(kImpulse, kImpulseNi);
         alignas(16) hkSimdReal kMass;
-        FNVD_RECONSTRUCT(hkSimdReal)(&kMass, apRigidBody->getMass());
+        XFNV_RECONSTRUCT(hkSimdReal)(&kMass, apRigidBody->getMass());
         kImpulse.mul4(kMass);
         apRigidBody->activate();
         apRigidBody->applyLinearImpulse(kImpulse);
@@ -1203,13 +1203,13 @@ void MagicCaster::FindExplosionLOS(
 
                     if (ptempfollower && ptempfollower->m_item) {
                         pitem = static_cast<MobileObject*>(
-                            FNVD_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
+                            XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
                         );
                         ptempfollower = ptempfollower->m_pkNext;
                         while (pitem && (!pitem->pCurrentProcess || pitem->pCurrentProcess->eLevel)) {
                             if (ptempfollower) {
                                 pitem = static_cast<MobileObject*>(
-                                    FNVD_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
+                                    XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
                                 );
                             }
                             else {

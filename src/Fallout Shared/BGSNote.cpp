@@ -465,7 +465,7 @@ bool BGSNote::Activate(
     TESBoundObject* apObjectToGet,
     int32_t aiCount
 ) {
-    FNVD_DYNAMIC_CAST_VOID(Actor)(apActionRef, RTTI_TESObjectREFR, RTTI_Actor);
+    XFNV_DYNAMIC_CAST_VOID(Actor)(apActionRef, RTTI_TESObjectREFR, RTTI_Actor);
     bool v12 = false;
     if (apActionRef != pPlayer) {
         return false;

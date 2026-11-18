@@ -2,9 +2,9 @@
 # minimp3 is header-only; lib/ holds import libraries for the Microsoft and Steam DLLs the Windows program still uses.
 
 # zlib (C): the game includes <zlib.h>.
-add_library(fnvd_zlib STATIC zlib/adler32.c zlib/compress.c zlib/crc32.c zlib/deflate.c zlib/inffast.c
+add_library(xfnv_zlib STATIC zlib/adler32.c zlib/compress.c zlib/crc32.c zlib/deflate.c zlib/inffast.c
     zlib/inflate.c zlib/inftrees.c zlib/trees.c zlib/uncompr.c zlib/zutil.c)
-target_include_directories(fnvd_zlib PUBLIC zlib)
+target_include_directories(xfnv_zlib PUBLIC zlib)
 
 # Ogg Vorbis (C): the game calls vorbisfile; libvorbis's decoder and libogg are what that needs.
 # libogg's config_types.h as its configure script writes it, from the fixed-width types.
@@ -18,24 +18,24 @@ set(USIZE32 uint32_t)
 set(SIZE64 int64_t)
 set(USIZE64 uint64_t)
 configure_file(ogg/include/ogg/config_types.h.in "${CMAKE_BINARY_DIR}/ogg/include/ogg/config_types.h" @ONLY)
-add_library(fnvd_vorbis STATIC ogg/src/bitwise.c ogg/src/framing.c vorbis/lib/analysis.c vorbis/lib/bitrate.c
+add_library(xfnv_vorbis STATIC ogg/src/bitwise.c ogg/src/framing.c vorbis/lib/analysis.c vorbis/lib/bitrate.c
     vorbis/lib/block.c vorbis/lib/codebook.c vorbis/lib/envelope.c vorbis/lib/floor0.c vorbis/lib/floor1.c
     vorbis/lib/info.c vorbis/lib/lookup.c vorbis/lib/lpc.c vorbis/lib/lsp.c vorbis/lib/mapping0.c vorbis/lib/mdct.c
     vorbis/lib/psy.c vorbis/lib/registry.c vorbis/lib/res0.c vorbis/lib/sharedbook.c vorbis/lib/smallft.c
     vorbis/lib/synthesis.c vorbis/lib/window.c vorbis/lib/vorbisfile.c)
-target_include_directories(fnvd_vorbis PUBLIC ogg/include vorbis/include "${CMAKE_BINARY_DIR}/ogg/include"
+target_include_directories(xfnv_vorbis PUBLIC ogg/include vorbis/include "${CMAKE_BINARY_DIR}/ogg/include"
     PRIVATE vorbis/lib)
 # The game reads through its own callbacks: vorbisfile.h's static stdio ones are left out, as the header offers.
-target_compile_definitions(fnvd_vorbis INTERFACE OV_EXCLUDE_STATIC_CALLBACKS)
+target_compile_definitions(xfnv_vorbis INTERFACE OV_EXCLUDE_STATIC_CALLBACKS)
 if(NOT MSVC)
-    target_compile_definitions(fnvd_vorbis PRIVATE HAVE_ALLOCA_H)
-    target_link_libraries(fnvd_vorbis PUBLIC m)
+    target_compile_definitions(xfnv_vorbis PRIVATE HAVE_ALLOCA_H)
+    target_link_libraries(xfnv_vorbis PUBLIC m)
 endif()
 
 # The C runtime's deprecation warnings say nothing about upstream's code.
 if(MSVC)
-    target_compile_definitions(fnvd_zlib PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE)
-    target_compile_definitions(fnvd_vorbis PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE)
+    target_compile_definitions(xfnv_zlib PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE)
+    target_compile_definitions(xfnv_vorbis PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
 # SDL3: the game's window and input on every target. Static on Windows (one exe), shared elsewhere (the root

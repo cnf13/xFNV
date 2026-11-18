@@ -1,10 +1,10 @@
 src/platform: what the game needs from the operating system beyond the standard library
 ================================================================================================
 
-Four headers in include/platform/ (namespace platform), two implementations chosen by CMake (`fnvd_platform`, a
+Four headers in include/platform/ (namespace platform), two implementations chosen by CMake (`xfnv_platform`, a
 static library): Win32/ holds the Win32 calls the exe makes, unchanged; Posix/ the POSIX side (Linux: /proc is read
 where noted), SDL3 where SDL covers it. No `#if` in either. Everything compiled against the game's headers gets
-these headers and the library through `fnvd_game_options`.
+these headers and the library through `xfnv_game_options`.
 
 Paths.h
 -------

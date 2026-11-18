@@ -14,7 +14,7 @@
 // with EFAULT on an unreadable page instead of faulting. The modules come from dl_iterate_phdr, taken before the
 // other threads are stopped (it takes the loader's lock).
 //
-// It installs itself from a static initialiser. Self-test: FNVD_CRASHLOG_SELFTEST=<seconds> in the environment starts
+// It installs itself from a static initialiser. Self-test: XFNV_CRASHLOG_SELFTEST=<seconds> in the environment starts
 // a thread that reads a null pointer that many seconds after start.
 
 #include "crashlog/BuildInfo.h"
@@ -39,7 +39,7 @@
 #include <unistd.h>
 #include <unwind.h>
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
     namespace {
 
         constexpr int kCrashSignals[] = {SIGSEGV, SIGBUS, SIGILL, SIGFPE, SIGABRT};
@@ -430,7 +430,7 @@ namespace fnvd::crashlog {
             const uintptr_t uiPc = static_cast<uintptr_t>(pRegisters[REG_RIP]);
             arOut.str("Fallout: New Vegas (fnv_decomp native program) crash log").nl();
             // the link time is the program file's own modification time
-            arOut.str("Build: commit " FNVD_CRASHLOG_COMMIT ", linked ");
+            arOut.str("Build: commit " XFNV_CRASHLOG_COMMIT ", linked ");
             printTime(arOut, gLinked);
             arOut.str(" UTC").nl();
             arOut.str("Image: ").str(gcExe).str(" at ").hex(kImage.uiBegin).str("..").hex(kImage.uiEnd).nl();
@@ -714,7 +714,7 @@ namespace fnvd::crashlog {
             sigemptyset(&kDump.sa_mask);
             sigaction(dumpSignal(), &kDump, nullptr);
 
-            if (const char* pSeconds = getenv("FNVD_CRASHLOG_SELFTEST")) {
+            if (const char* pSeconds = getenv("XFNV_CRASHLOG_SELFTEST")) {
                 uintptr_t uiSeconds = 0;
                 for (const char* p = pSeconds; *p >= '0' && *p <= '9'; ++p) {
                     uiSeconds = uiSeconds * 10 + static_cast<uintptr_t>(*p - '0');
@@ -775,4 +775,4 @@ namespace fnvd::crashlog {
         }
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

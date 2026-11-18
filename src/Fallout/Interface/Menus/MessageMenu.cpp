@@ -183,9 +183,9 @@ void MessageMenu::LoadNextMessage() {
     NiPoint3 v67;
     std::basic_string<char, std::char_traits<char>, std::allocator<char>> _Result;
     NiPoint3 v69;
-    FNVD_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     std::basic_string<char, std::char_traits<char>, std::allocator<char>> apMemory;
     NiPoint3 textDims;
     char v66 = 0;

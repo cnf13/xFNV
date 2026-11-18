@@ -29,8 +29,8 @@ ImageSpaceEffectSunbeams::~ImageSpaceEffectSunbeams() {
 }
 
 void ImageSpaceEffectSunbeams::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam2, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam2, std::nullopt, std::nullopt);
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_2;
     SetEffectCount(2);

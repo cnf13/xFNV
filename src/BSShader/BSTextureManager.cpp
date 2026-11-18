@@ -321,7 +321,7 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
     uint32_t uisafeWidth;
     uint32_t uisafeHeight;
     NiTexture::FormatPrefs pformat;
-    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     Ni2DBuffer::MultiSamplePreference emultiSamplePreference = Ni2DBuffer::MULTISAMPLE_NONE;
     NiDepthStencilBuffer* psharedDepthBuffer = nullptr;
     BSRenderedTexture* prenTexture = nullptr;

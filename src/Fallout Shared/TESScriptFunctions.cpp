@@ -1042,7 +1042,7 @@ bool Cmd_RemoveMe_Execute(
         return true;
     }
     TESObjectREFR* v11 =
-        static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apContainer, RTTI_TESObjectREFR, RTTI_Actor));
+        static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apContainer, RTTI_TESObjectREFR, RTTI_Actor));
     ExtraDataList* v10 = nullptr;
     if ((v11) && (v11->WearingObject(apRefObject->GetObjectReference()))) {
         InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apContainer);
@@ -1630,7 +1630,7 @@ bool Cmd_DisableAllActors(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* v11 =
-        static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+        static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
     for (uint32_t uiIndex = 0;
          uiIndex < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_LOW); ++uiIndex) {
         MobileObject* Item = (&ReferenceProcessLists.MobProcessArray)->GetItem(uiIndex);
@@ -2024,7 +2024,7 @@ bool Cmd_ShowPivot(
         }
         void* v44 = ourMalloc(6 * sizeof(NiColorA));
         if (v44) {
-            rt::eh_vector_constructor_iterator(v44, sizeof(NiColorA), 6, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(v44, sizeof(NiColorA), 6, &xfnv::constructElement<NiColorA>);
             pkColor = static_cast<NiColorA*>(v44);
         }
         else {
@@ -2781,7 +2781,7 @@ bool Cmd_WaterReflectionColor(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FNVD_INLINED_LOCAL(NiColorA, v16, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, v16, std::nullopt, std::nullopt);
     int32_t a8;
     int32_t v22;
     int32_t v23;
@@ -4374,7 +4374,7 @@ bool Cmd_NonDefault_Parse(
         if (a5) {
             SCRIPT_WORD aButtons[10];
             int32_t v12 = 0;
-            rt::eh_vector_constructor_iterator(aButtons, sizeof(SCRIPT_WORD), 10, &fnvd::constructElement<SCRIPT_WORD>);
+            rt::eh_vector_constructor_iterator(aButtons, sizeof(SCRIPT_WORD), 10, &xfnv::constructElement<SCRIPT_WORD>);
             do {
                 aCount = ScriptCompiler::GetNextWord(
                     apCompileData, &aButtons[v12], apScriptLine->pLine, apScriptLine->uiOffset, false, false
@@ -4921,7 +4921,7 @@ bool Cmd_ShowHeadTrackTarget(
     uint32_t& auiOffset
 ) {
     TESObjectREFR* v9 =
-        static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+        static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
     if (v9) {
         ExtraDataList* Extra = v9->GetExtra();
         TESObjectREFR* HeadTrackTargetExtra = Extra->GetHeadTrackTargetExtra();
@@ -5397,7 +5397,7 @@ bool Cmd_SetSize(
         return false;
     }
     MobileObject* v10 =
-        static_cast<MobileObject*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+        static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
     if (v10) {
         bhkCharacterController* CharController = v10->GetCharController();
         if (CharController) {
@@ -5427,7 +5427,7 @@ bool Cmd_KillActor_Execute(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &killer, &a3, &a2
     );
     PlayerCharacter* a1 =
-        static_cast<PlayerCharacter*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+        static_cast<PlayerCharacter*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
     if (a1) {
         if (a1->IsInvulnerable()) {
             return true;
@@ -6161,10 +6161,10 @@ bool Cmd_DumpTexturePalette(
     BSFile apMemory(Destination, NiFile::WRITE_ONLY, 0x4000u, false);
     apMemory.BSFile::Open(false, false);
     using TextureArray = NiPointer<NiTexture>[2048];
-    FNVD_INLINED_LOCAL(TextureArray, aspTextures, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(TextureArray, aspTextures, std::nullopt, std::nullopt);
     rt::eh_vector_constructor_iterator(
-        aspTextures, sizeof(NiPointer<NiTexture>), 2048, &fnvd::constructElement<NiPointer<NiRefObject>>,
-        &fnvd::destructElement<NiPointer<NiRefObject>>
+        aspTextures, sizeof(NiPointer<NiTexture>), 2048, &xfnv::constructElement<NiPointer<NiRefObject>>,
+        &xfnv::destructElement<NiPointer<NiRefObject>>
     );
     ourMemset(aspTextures, 0, sizeof(aspTextures));
     uint32_t uiTotalSize = 0;
@@ -6296,7 +6296,7 @@ bool Cmd_DumpTexturePalette(
     Warning("TEXTURES: >>> DUMPTEXTUREPALETTE results");
     MessageHandler::IncDisableWarningCount(false);
     rt::eh_vector_destructor_iterator(
-        aspTextures, sizeof(NiPointer<NiTexture>), 2048, &fnvd::destructElement<NiPointer<NiRefObject>>
+        aspTextures, sizeof(NiPointer<NiTexture>), 2048, &xfnv::destructElement<NiPointer<NiRefObject>>
     );
     return true;
 }
@@ -9414,7 +9414,7 @@ bool Cmd_PreloadMagicEffect(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FNVD_INLINED_LOCAL(NiPointer<Model>, spModel, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<Model>, spModel, std::nullopt, std::nullopt);
     EffectSetting* pEffectSetting;
     pEffectSetting = nullptr;
     if (!Script::ParseParameters(
@@ -10324,7 +10324,7 @@ bool Cmd_SetActorsAI(
             return false;
         }
         TESObjectREFR* v10 =
-            static_cast<TESObjectREFR*>(FNVD_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+            static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
         if (v10) {
             if (a8) {
                 v10[1].m_Extra.iFlags[8] = 1;
@@ -12018,22 +12018,22 @@ void Script::DamageObjectBase(TESObjectREFR* apRef, float afValue) {
 }
 
 void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchActor, int32_t aiValue) {
-    FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, blendedcoord, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, blendedcoord, std::nullopt, std::nullopt);
     using xPresetHeads_t = BSSimpleArray<TESNPC*, 1024>;
-    FNVD_INLINED_LOCAL(xPresetHeads_t, xPresetHeads, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(xPresetHeads_t, xPresetHeads, std::nullopt, std::nullopt);
     if ((apRef) && (apMatchActor)) {
         FR2MatrixVTC<float>(*pNewCoord)[2][2];
-        FNVD_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, chargenoffset, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, chargenoffset, std::nullopt, std::nullopt);
         float fval = static_cast<double>(aiValue) / 100.0;
         TESNPC* pnpcToMatch = dynamic_cast<TESNPC*>(apMatchActor->GetObjectReference());
         TESNPC* pnpcToChange = dynamic_cast<TESNPC*>(apRef->GetObjectReference());
         rt::eh_vector_constructor_iterator(
-            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-            &fnvd::destructElement<FR2MatrixVTC<float>>
+            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+            &xfnv::destructElement<FR2MatrixVTC<float>>
         );
         rt::eh_vector_constructor_iterator(
-            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-            &fnvd::destructElement<FR2MatrixVTC<float>>
+            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+            &xfnv::destructElement<FR2MatrixVTC<float>>
         );
         ::new (&xPresetHeads) BSSimpleArray<TESNPC*, 1024>;
         TESActorBase::SEX Sex = pnpcToMatch->GetSex();
@@ -12064,8 +12064,8 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
         if (pCookie) {
             *pCookie = 4;
             rt::eh_vector_constructor_iterator(
-                &pCookie[1], sizeof(FR2MatrixVTC<float>), 4, &fnvd::constructElement<FR2MatrixVTC<float>>,
-                &fnvd::destructElement<FR2MatrixVTC<float>>
+                &pCookie[1], sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
+                &xfnv::destructElement<FR2MatrixVTC<float>>
             );
             pNewCoord = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(&pCookie[1]);
         }
@@ -12086,10 +12086,10 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
         }
         xPresetHeads.~BSSimpleArray<TESNPC*, 1024>();
         rt::eh_vector_destructor_iterator(
-            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
         );
         rt::eh_vector_destructor_iterator(
-            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &fnvd::destructElement<FR2MatrixVTC<float>>
+            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
         );
     }
 }
@@ -14330,7 +14330,7 @@ bool Script::PlaySoundFunction(
         uiFlags |= BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_2D;
         uint32_t uiFormID = pSound->GetFormID();
         BSAudio* pAudio = &BSAudio::QInstance();
-        FNVD_INLINED_LOCAL(BSSoundHandle, kTemp, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(BSSoundHandle, kTemp, std::nullopt, std::nullopt);
         BSSoundHandle* pResult = pAudio->GetSoundHandleByNumericID(&kTemp, uiFormID, uiFlags);
         kHandle = *pResult;
         kTemp.~BSSoundHandle();
@@ -14711,7 +14711,7 @@ bool Script::PlaySound3DFunction(
         if (apRefObject != nullptr && apRefObject->Get3D() != nullptr) {
             uint32_t uiFormID = pSound->GetFormID();
             BSAudio* pAudio = &BSAudio::QInstance();
-            FNVD_INLINED_LOCAL(BSSoundHandle, kTemp, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(BSSoundHandle, kTemp, std::nullopt, std::nullopt);
             BSSoundHandle* pResult = pAudio->GetSoundHandleByNumericID(
                 &kTemp, uiFormID, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
             );
@@ -17452,7 +17452,7 @@ bool Script::OutputMemStats(
 ) {
     char input[512];
     using LargestTextureArray = NiPointer<NiTexture>[2048];
-    FNVD_INLINED_LOCAL(LargestTextureArray, pLargestTex, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(LargestTextureArray, pLargestTex, std::nullopt, std::nullopt);
     char apString1[268];
     input[0] = 0;
     std::memset(input + 1, 0, 511);
@@ -17484,8 +17484,8 @@ bool Script::OutputMemStats(
     outfile2.BSFile::Open(false, false);
     int32_t imaxtex = 2048;
     rt::eh_vector_constructor_iterator(
-        pLargestTex, sizeof(NiPointer<NiTexture>), imaxtex, &fnvd::constructElement<NiPointer<NiRefObject>>,
-        &fnvd::destructElement<NiPointer<NiRefObject>>
+        pLargestTex, sizeof(NiPointer<NiTexture>), imaxtex, &xfnv::constructElement<NiPointer<NiRefObject>>,
+        &xfnv::destructElement<NiPointer<NiRefObject>>
     );
     ourMemset(pLargestTex, 0, sizeof(pLargestTex));
     uint32_t ultotalMemory = 0;
@@ -17615,7 +17615,7 @@ bool Script::OutputMemStats(
     }
     outfile2.Close();
     rt::eh_vector_destructor_iterator(
-        pLargestTex, sizeof(NiPointer<NiTexture>), 2048, &fnvd::destructElement<NiPointer<NiRefObject>>
+        pLargestTex, sizeof(NiPointer<NiTexture>), 2048, &xfnv::destructElement<NiPointer<NiRefObject>>
     );
     return true;
 }
@@ -17910,7 +17910,7 @@ bool Script::TestLocalMap(
         int32_t iarraysize_5 = iarraysize;
         void* v63 = ourMalloc(iarraysize <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * iarraysize : SIZE_MAX);
         if (v63) {
-            rt::eh_vector_constructor_iterator(v63, sizeof(NiColorA), iarraysize_5, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(v63, sizeof(NiColorA), iarraysize_5, &xfnv::constructElement<NiColorA>);
             pcolor = static_cast<NiColorA*>(v63);
         }
         else {
@@ -19418,7 +19418,7 @@ bool Script::HairTint(
     float fB = static_cast<double>(iB) / 256.0;
     float fG = static_cast<double>(iG) / 256.0;
     float fR = static_cast<double>(iR) / 256.0;
-    FNVD_INLINED_LOCAL(NiColorA, kTint, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiColorA, kTint, std::nullopt, std::nullopt);
     BSShaderLightingProperty::kHairTint = *::new (&kTint) NiColorA(fR, fG, fB, 1.0f);
     return true;
 }
@@ -19547,7 +19547,7 @@ bool Script::PlayGroupFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     ANIM_GROUP_ENUM eAnimGroup;
     int32_t aeFlags;
     aeFlags = 0;
@@ -19695,7 +19695,7 @@ bool Script::IsAnimPlayingFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     int32_t uiGroup[2];
     uiGroup[0] = 255;
     uiGroup[1] = 0;
@@ -19903,13 +19903,13 @@ bool Script::CalcLowPathToPointFunction(
 ) {
     NiPoint3 v81;
     // Each of these is built only through the Construct calls below.
-    FNVD_INLINED_LOCAL(PathingLocation, v82, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingLocation, v83, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, v82, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, v83, std::nullopt, std::nullopt);
     NiPoint3 v85;
     NiPoint3 v86;
     NiPoint3 result;
-    FNVD_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
-    FNVD_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
     using apNavMeshInfoArray_t = BSSimpleArray<const NavMeshInfo*, 1024>;
     using a8_t = BSSimpleArray<TESObjectREFR*, 1024>;
     using a7_t = BSSimpleArray<const NavMeshInfo*, 1024>;
@@ -22169,7 +22169,7 @@ bool Script::SwapTextureOnRef(
         if (pRef) {
             NiAVObject* pMesh = (NiAVObject*)pRef->Get3D();
             if (pMesh) {
-                FNVD_INLINED_LOCAL(NiFixedString, kGeometryName, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(NiFixedString, kGeometryName, std::nullopt, std::nullopt);
                 NiFixedString* pName =
                     ::new (static_cast<void*>(&kGeometryName)) NiFixedString(static_cast<const char*>(GeometryName));
                 NiAVObject* pGeom = pMesh->GetObjectByName(*pName);
@@ -23864,7 +23864,7 @@ bool Script::IsImageSpaceActive(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    FNVD_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
     TESImageSpaceModifier* pImageSpace;
     float fStrength;
     pImageSpace = nullptr;

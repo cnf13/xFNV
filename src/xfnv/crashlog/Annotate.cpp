@@ -4,7 +4,7 @@
 
 #include "xfnv/crashlog/CrashLog.hpp"
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
 
     Image kImage = {};
 
@@ -92,4 +92,4 @@ namespace fnvd::crashlog {
         }
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

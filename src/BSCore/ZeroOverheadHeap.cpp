@@ -10,7 +10,7 @@ void* ZeroOverheadHeap::Allocate(uint32_t aiSize, uint32_t aiAlignment) {
         return nullptr;
     }
     void* pmem = nullptr;
-#if FNVD_64BIT
+#if XFNV_64BIT
     // The 64-bit program aligns each block to 16 bytes, as the platform's allocators do (a departure: the exe's
     // blocks follow each other with only the size word between them); the size word stays right before the block.
     char* pBlock = reinterpret_cast<char*>((reinterpret_cast<uintptr_t>(pCurrentFree) + 4 + 15) & ~uintptr_t(15));

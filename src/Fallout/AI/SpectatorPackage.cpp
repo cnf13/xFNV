@@ -187,16 +187,16 @@ void SpectatorThreatInfo::GetAvoidNode(PathingAvoidNode& nodeOut) const {
     PathingAvoidNode kNode;
     if (bHasSource) {
         if (bHasTarget) {
-            nodeOut = *FNVD_RECONSTRUCT(PathingAvoidNode)(
+            nodeOut = *XFNV_RECONSTRUCT(PathingAvoidNode)(
                 &kNode, GetLastKnownPosSource(), GetLastKnownPosTarget(), fRadius, 100.0f
             );
         }
         else {
-            nodeOut = *FNVD_RECONSTRUCT(PathingAvoidNode)(&kNode, GetLastKnownPosSource(), fRadius, 100.0f);
+            nodeOut = *XFNV_RECONSTRUCT(PathingAvoidNode)(&kNode, GetLastKnownPosSource(), fRadius, 100.0f);
         }
     }
     else if (bHasTarget) {
-        nodeOut = *FNVD_RECONSTRUCT(PathingAvoidNode)(&kNode, GetLastKnownPosTarget(), fRadius, 100.0f);
+        nodeOut = *XFNV_RECONSTRUCT(PathingAvoidNode)(&kNode, GetLastKnownPosTarget(), fRadius, 100.0f);
     }
 }
 
@@ -213,20 +213,20 @@ void SpectatorThreatInfo::GetAvoidNode(PathingAvoidNode* apPathingAvoidNode) con
         if (bHasTarget) {
             NiPoint3* LastKnownPosTarget = &(result = GetLastKnownPosTarget());
             NiPoint3* LastKnownPosSource = &(v13 = GetLastKnownPosSource());
-            *apPathingAvoidNode = *FNVD_RECONSTRUCT(PathingAvoidNode)(
+            *apPathingAvoidNode = *XFNV_RECONSTRUCT(PathingAvoidNode)(
                 &apMemory, *LastKnownPosSource, *LastKnownPosTarget, afRadius, 100.0f
             );
         }
         else {
             NiPoint3* v3 = &(v11 = GetLastKnownPosSource());
-            *apPathingAvoidNode = *FNVD_RECONSTRUCT(PathingAvoidNode)(&v12, *v3, afRadius, 100.0f);
+            *apPathingAvoidNode = *XFNV_RECONSTRUCT(PathingAvoidNode)(&v12, *v3, afRadius, 100.0f);
         }
     }
     else {
         if (bHasTarget) {
             float afRadiusa = fRadius;
             NiPoint3* v4 = &(v9 = GetLastKnownPosTarget());
-            *apPathingAvoidNode = *FNVD_RECONSTRUCT(PathingAvoidNode)(&v10, *v4, afRadiusa, 100.0f);
+            *apPathingAvoidNode = *XFNV_RECONSTRUCT(PathingAvoidNode)(&v10, *v4, afRadiusa, 100.0f);
         }
     }
 }

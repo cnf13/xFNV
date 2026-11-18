@@ -82,7 +82,7 @@ int32_t sectionTableSize(const hkArray<hkPackfileSectionHeader, hkContainerHeapA
 void padUp(int32_t r_eax, hkStreamWriter* r_edi) {
     using CharInplaceArray32 = hkInplaceArray<char, 32>;
     int32_t v3 = r_edi->tell();
-    FNVD_INLINED_LOCAL(CharInplaceArray32, buf, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(CharInplaceArray32, buf, std::nullopt, std::nullopt);
     buf.m_data = buf.m_storage;
     buf.m_size = 0;
     buf.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<char>::DONT_DEALLOCATE_FLAG | 32);
@@ -197,7 +197,7 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
     hkPackfileSectionHeader* pTypesHeader = context.m_sectionHeaders.m_data;
     pTypesHeader->m_absoluteDataStart = context.m_stream->tell();
     using ClassNameMap_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
-    FNVD_INLINED_LOCAL(ClassNameMap_t, doneClasses, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(ClassNameMap_t, doneClasses, std::nullopt, std::nullopt);
     ::new (&doneClasses) ClassNameMap_t(0u);
     const hkClass* const apClasses[4] = {&hkClassClass, &hkClassMemberClass, &hkClassEnumClass, &hkClassEnumItemClass};
     for (int32_t i = 0; i < 4; ++i) {
@@ -281,7 +281,7 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
         hkPackfileSectionHeader* pHeader = context.m_sectionHeaders.m_data + iSection;
         pHeader->m_absoluteDataStart = context.m_stream->tell();
         // EXE-INLINED 0xDBD870: hkRelocationInfo::hkRelocationInfo
-        FNVD_INLINED_LOCAL(hkRelocationInfo, relocs, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkRelocationInfo, relocs, std::nullopt, std::nullopt);
         relocs.m_local.m_data = nullptr;
         relocs.m_local.m_size = 0;
         relocs.m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
@@ -516,7 +516,7 @@ void hkBinaryPackfileWriter::doDeferredWrites(
     }
     context.m_stream->seek(sectionHeadersStart, hkStreamWriter::STREAM_SET);
     for (int32_t i = 0; i < context.m_sectionHeaders.m_size; ++i) {
-        FNVD_INLINED_LOCAL(hkRelocationInfo, reloc, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkRelocationInfo, reloc, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkRelocationInfo::hkRelocationInfo
         reloc.m_local.m_data = nullptr;
         reloc.m_local.m_size = 0;

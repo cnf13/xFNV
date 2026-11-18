@@ -80,7 +80,7 @@ float separatingDistanceUsingCapsuleRepresentations(
     hkpAgentEntry* entry,
     void* agentData
 ) {
-    FNVD_INLINED_LOCAL(hkpAgent3ProcessInput, inputLocal, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkpAgent3ProcessInput, inputLocal, std::nullopt, std::nullopt);
     // CopyConstruct copies only the hkpAgent3Input part; the two members after it are copied here.
     hkpAgent3ProcessInput::CopyConstruct(&inputLocal, input);
     inputLocal.m_distAtT1 = input.m_distAtT1;

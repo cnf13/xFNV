@@ -210,7 +210,7 @@ NiAnimationKey* NiEulerRotKey::CreateArray(uint32_t uiNumKeys) {
     *puiCookie = uiNumKeys;
     NiEulerRotKey* pkKeys = reinterpret_cast<NiEulerRotKey*>(puiCookie + 1);
     rt::eh_vector_constructor_iterator(
-        pkKeys, sizeof(NiEulerRotKey), uiNumKeys, &fnvd::constructElement<NiEulerRotKey>
+        pkKeys, sizeof(NiEulerRotKey), uiNumKeys, &xfnv::constructElement<NiEulerRotKey>
     );
     return pkKeys;
 }
@@ -228,7 +228,7 @@ bool NiEulerRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNum
             *puiCookie = 1;
             pkNewKeys = reinterpret_cast<NiEulerRotKey*>(puiCookie + 1);
             rt::eh_vector_constructor_iterator(
-                pkNewKeys, sizeof(NiEulerRotKey), 1, &fnvd::constructElement<NiEulerRotKey>
+                pkNewKeys, sizeof(NiEulerRotKey), 1, &xfnv::constructElement<NiEulerRotKey>
             );
         }
         else {
@@ -273,7 +273,7 @@ NiAnimationKey* NiEulerRotKey::CreateFromStream(NiStream& stream, uint32_t uiNum
         *puiCookie = uiNumKeys;
         pkEulerRotKeys = reinterpret_cast<NiEulerRotKey*>(puiCookie + 1);
         rt::eh_vector_constructor_iterator(
-            pkEulerRotKeys, sizeof(NiEulerRotKey), uiNumKeys, &fnvd::constructElement<NiEulerRotKey>
+            pkEulerRotKeys, sizeof(NiEulerRotKey), uiNumKeys, &xfnv::constructElement<NiEulerRotKey>
         );
     }
     else {

@@ -152,7 +152,7 @@ NvAPI_Status NvAPI_Initialize()
 	if (g_NvAPI_Initialized) {
 		return NVAPI_OK;
 	}
-	void* hModule = platform::LibraryLoad(FNVD_64BIT ? "nvapi64.dll" : "nvapi.dll");
+	void* hModule = platform::LibraryLoad(XFNV_64BIT ? "nvapi64.dll" : "nvapi.dll");
 	g_NvAPI_InitStatus = -2;
 	if (hModule) {
 		// GetProcAddress and nvapi_QueryInterface hand back untyped entry points; cast to the SDK's types.

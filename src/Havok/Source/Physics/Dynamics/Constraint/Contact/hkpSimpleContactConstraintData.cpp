@@ -145,7 +145,7 @@ void hkpSimpleContactConstraintData::collisionResponseEndCallback(
         return;
     }
     using modifiers_t = hkInplaceArray<hkpModifierConstraintAtom*, 16>;
-    FNVD_INLINED_LOCAL(modifiers_t, modifiers, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(modifiers_t, modifiers, std::nullopt, std::nullopt);
     modifiers.m_data = modifiers.m_storage;
     modifiers.m_size = 0;
     modifiers.m_capacityAndFlags = 0x80000010u;

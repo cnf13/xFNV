@@ -296,7 +296,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
     alignas(hkErrStream) uint8_t aStream[sizeof(hkErrStream)];
     // The heading is constructed at the top of each row and released at its end; nothing constructs or destroys it
     // otherwise.
-    FNVD_INLINED_LOCAL(hkStringBuf, kHeading, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkStringBuf, kHeading, std::nullopt, std::nullopt);
     for (int32_t i = 0; i < HK_MAX_SHAPE_TYPE; i++) {
         ::new (&kHeading) hkStringBuf(
             "\nEntries for (continuous)", hkGetShapeTypeName(hkpShapeType(i)), nullptr, nullptr, nullptr, nullptr
@@ -306,7 +306,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 547
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
         for (int32_t j = 1; j < HK_MAX_SHAPE_TYPE; j++) {
             const DebugEntry& rEntry = (*m_debugAgent2TablePred)[i][j];
             if (rEntry.m_priority < 100) {
@@ -321,7 +321,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
                 hkError::s_instance->message(
                     hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 562
                 );
-                FNVD_DESTRUCT(hkOstream)(pStream);
+                XFNV_DESTRUCT(hkOstream)(pStream);
             }
         }
         // EXE-INLINED 0xCBBD40
@@ -340,7 +340,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 570
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
         for (int32_t j = 1; j < HK_MAX_SHAPE_TYPE; j++) {
             const DebugEntry& rEntry = (*m_debugAgent2Table)[i][j];
             if (rEntry.m_priority < 100) {
@@ -355,7 +355,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
                 hkError::s_instance->message(
                     hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 585
                 );
-                FNVD_DESTRUCT(hkOstream)(pStream);
+                XFNV_DESTRUCT(hkOstream)(pStream);
             }
         }
         // EXE-INLINED 0xCBBD40

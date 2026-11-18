@@ -525,7 +525,7 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
 
     // The stack allocator's bytes are untyped memory (char* in hkStackMemory); each local array keeps its elements
     // there and gives the block back through the same char*.
-    FNVD_INLINED_LOCAL(hkLocalArray<uint8_t>, entityInfo, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, entityInfo, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkUchar>::hkLocalArray(numIslandEntities) (hkAllocateStack)
         entityInfo.m_data = nullptr;
@@ -540,7 +540,7 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
     }
     hkString::memSet(entityInfo.m_data, 0, numIslandEntities);
 
-    FNVD_INLINED_LOCAL(hkLocalArray<hkpAgentNnEntry*>, agentEntries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkLocalArray<hkpAgentNnEntry*>, agentEntries, std::nullopt, std::nullopt);
     {
         // EXE-INLINED none: hkLocalArray<hkpAgentNnEntry*>::hkLocalArray(1000) (hkAllocateStack)
         agentEntries.m_data = nullptr;
@@ -554,7 +554,7 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
         agentEntries.m_localMemory = agentEntries.m_data;
     }
 
-    FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
     collisionEntries.m_data = nullptr;
     collisionEntries.m_size = 0;
     collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
@@ -630,19 +630,19 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
     ++m_world->m_criticalOperationsLockCount;
 
     using entriesSet_t = hkPointerMap<hkpAgentNnEntry*, int32_t>;
-    FNVD_INLINED_LOCAL(entriesSet_t, entriesSet, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(entriesSet_t, entriesSet, std::nullopt, std::nullopt);
     // EXE-INLINED 0x626630
     entriesSet.m_map.m_elem = nullptr;
     entriesSet.m_map.m_numElems = 0;
     entriesSet.m_map.m_hashMod = -1;
     // The SDK's inline hkPointerMap constructor's reserve: the map's reserve on the thread's heap.
     entriesSet.m_map.hkUlongMapBase::reserve(hkMemoryRouter::getInstance().heap(), 0);
-    FNVD_INLINED_LOCAL(hkArray<EntryAndIsland>, entriesAndIslands, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<EntryAndIsland>, entriesAndIslands, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<EntryAndIsland>::hkArray
     entriesAndIslands.m_data = nullptr;
     entriesAndIslands.m_size = 0;
     entriesAndIslands.m_capacityAndFlags = hkArrayBase<EntryAndIsland>::DONT_DEALLOCATE_FLAG;
-    FNVD_INLINED_LOCAL(hkArray<hkpIslandsAgentEntriesInfo>, islandEntriesInfos, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpIslandsAgentEntriesInfo>, islandEntriesInfos, std::nullopt, std::nullopt);
     // EXE-INLINED none: hkArray<hkpIslandsAgentEntriesInfo>::hkArray
     islandEntriesInfos.m_data = nullptr;
     islandEntriesInfos.m_size = 0;
@@ -652,7 +652,7 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
     for (int32_t it = entitiesNeedingPsiCollisionDetection.getIterator();
          entitiesNeedingPsiCollisionDetection.isValid(it); it = entitiesNeedingPsiCollisionDetection.getNext(it)) {
         hkpEntity* entity = entitiesNeedingPsiCollisionDetection.getValue(it);
-        FNVD_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
+        XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
         // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
         collisionEntries.m_data = nullptr;
         collisionEntries.m_size = 0;
@@ -900,7 +900,7 @@ hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, floa
     m_world->m_violatedConstraintArray->m_nextFreeElement = 0;
     hkpMtThreadStructure* threadStructure = m_world->m_multithreadedSimulationJobData;
     threadStructure->m_dynamicsStepInfo = &m_world->m_dynamicsStepInfo;
-    FNVD_RECONSTRUCT(hkpProcessCollisionInput)(&threadStructure->m_collisionInput, *m_world->m_collisionInput);
+    XFNV_RECONSTRUCT(hkpProcessCollisionInput)(&threadStructure->m_collisionInput, *m_world->m_collisionInput);
     threadStructure->m_constraintQueryIn.set(
         m_world->m_dynamicsStepInfo.m_solverInfo, m_world->m_dynamicsStepInfo.m_stepInfo,
         m_world->m_violatedConstraintArray
@@ -1102,7 +1102,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntriesFromMultipleIslands(
             postCollideJob.m_header = job->m_header;
             tl.m_collisionInput.m_spareAgentSector = nullptr;
             tl.m_collisionInput.m_weldClosestPoints.m_storage = 0;
-            FNVD_RECONSTRUCT(hkpProcessCollisionInput)(&tl.m_collisionInput, *m_world->m_collisionInput);
+            XFNV_RECONSTRUCT(hkpProcessCollisionInput)(&tl.m_collisionInput, *m_world->m_collisionInput);
             tl.m_constraintQueryIn.set(
                 m_world->m_dynamicsStepInfo.m_solverInfo, m_world->m_dynamicsStepInfo.m_stepInfo,
                 m_world->m_violatedConstraintArray
@@ -1357,7 +1357,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntries(
     }
     const int32_t numAgentNnEntriesPerTask = m_world->m_maxEntriesPerToiCollideTask;
     // EXE-INLINED 0x62E230
-    FNVD_INLINED_LOCAL(hkArray<hkpAgentNnEntry*>, entriesArray, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpAgentNnEntry*>, entriesArray, std::nullopt, std::nullopt);
     entriesArray.m_data = entries;
     entriesArray.m_size = numEntries;
     entriesArray.m_capacityAndFlags = numEntries | hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG;
@@ -1408,7 +1408,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntries(
         tl.m_collisionInput.m_spareAgentSector = nullptr;
         tl.m_collisionInput.m_weldClosestPoints.m_storage = 0;
         tl.m_dynamicsStepInfo = &m_world->m_dynamicsStepInfo;
-        FNVD_RECONSTRUCT(hkpProcessCollisionInput)(&tl.m_collisionInput, *m_world->m_collisionInput);
+        XFNV_RECONSTRUCT(hkpProcessCollisionInput)(&tl.m_collisionInput, *m_world->m_collisionInput);
         tl.m_constraintQueryIn.set(
             m_world->m_dynamicsStepInfo.m_solverInfo, m_world->m_dynamicsStepInfo.m_stepInfo,
             m_world->m_violatedConstraintArray

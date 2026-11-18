@@ -21,7 +21,7 @@ struct IConvexOverlapImpl : hkgpMesh::IConvexOverlap {
     // DeletingDestruct's free (ourFree).
     static void operator delete(void* apMemory);
 };
-inline constexpr fnvd::Vtable IConvexOverlapImpl_ShapeBridge_vftable{};
-inline constexpr fnvd::Vtable IConvexOverlapImpl_vftable{};
+inline constexpr xfnv::Vtable IConvexOverlapImpl_ShapeBridge_vftable{};
+inline constexpr xfnv::Vtable IConvexOverlapImpl_vftable{};
 // File-local static of hkgpMesh.cpp, the overlap tester hkgpMesh::Construct installs.
 extern IConvexOverlapImpl gIConvexOverlapImpl;

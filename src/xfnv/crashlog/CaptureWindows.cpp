@@ -5,7 +5,7 @@
 // from the process heap, a risk taken for in-process symbols (the faulting thread gives up waiting after 3 minutes).
 //
 // It installs itself from a static initialiser and re-asserts its filter every second, should anything replace it
-// (the replacement is then chained to). Self-test: FNVD_CRASHLOG_SELFTEST=<seconds> in the environment starts a
+// (the replacement is then chained to). Self-test: XFNV_CRASHLOG_SELFTEST=<seconds> in the environment starts a
 // thread that reads a null pointer that many seconds after start.
 
 #include "crashlog/BuildInfo.h"
@@ -20,7 +20,7 @@
 #include <dbghelp.h>
 #include <tlhelp32.h>
 
-namespace fnvd::crashlog {
+namespace xfnv::crashlog {
     namespace {
 
         // Ours, raised so that a pure virtual call or abort() reaches the filter like any other fatal exception.
@@ -44,7 +44,7 @@ namespace fnvd::crashlog {
         uintptr_t fpOf(const CONTEXT& arContext) {
             return arContext.Rbp;
         }
-#define FNVD_CRASHLOG_REGISTERS(c)                                                                                     \
+#define XFNV_CRASHLOG_REGISTERS(c)                                                                                     \
     {"RAX", (c).Rax}, {"RBX", (c).Rbx}, {"RCX", (c).Rcx}, {"RDX", (c).Rdx}, {"RSI", (c).Rsi}, {"RDI", (c).Rdi},        \
         {"RBP", (c).Rbp}, {"RSP", (c).Rsp}, {"R8", (c).R8}, {"R9", (c).R9}, {"R10", (c).R10}, {"R11", (c).R11},        \
         {"R12", (c).R12}, {"R13", (c).R13}, {"R14", (c).R14}, {"R15", (c).R15}, {                                      \
@@ -61,7 +61,7 @@ namespace fnvd::crashlog {
         uintptr_t fpOf(const CONTEXT& arContext) {
             return arContext.Ebp;
         }
-#define FNVD_CRASHLOG_REGISTERS(c)                                                                                     \
+#define XFNV_CRASHLOG_REGISTERS(c)                                                                                     \
     {"EAX", (c).Eax}, {"EBX", (c).Ebx}, {"ECX", (c).Ecx}, {"EDX", (c).Edx}, {"ESI", (c).Esi}, {"EDI", (c).Edi},        \
         {"EBP", (c).Ebp}, {"ESP", (c).Esp}, {                                                                          \
         "EIP", (c).Eip                                                                                                 \
@@ -250,7 +250,7 @@ namespace fnvd::crashlog {
         }
 
         void contextRegisters(Out& arOut, const CONTEXT& arContext, uintptr_t auiStackLow, uintptr_t auiStackHigh) {
-            const Register akRegisters[] = {FNVD_CRASHLOG_REGISTERS(arContext)};
+            const Register akRegisters[] = {XFNV_CRASHLOG_REGISTERS(arContext)};
             registers(arOut, akRegisters, sizeof(akRegisters) / sizeof(akRegisters[0]), auiStackLow, auiStackHigh);
             arOut.str("  EFLAGS ")
                 .hex(arContext.EFlags)
@@ -447,7 +447,7 @@ namespace fnvd::crashlog {
             FILETIME kLinkedFile = {kLinked.LowPart, kLinked.HighPart};
             SYSTEMTIME kLinkedTime;
             FileTimeToSystemTime(&kLinkedFile, &kLinkedTime);
-            arOut.str("Build: commit " FNVD_CRASHLOG_COMMIT ", linked ");
+            arOut.str("Build: commit " XFNV_CRASHLOG_COMMIT ", linked ");
             printTime(arOut, dateTime(kLinkedTime));
             arOut.str(" UTC").nl();
             arOut.str("Image: ").str(gcExe).str(" at ").hex(kImage.uiBegin).str("..").hex(kImage.uiEnd).nl();
@@ -861,7 +861,7 @@ namespace fnvd::crashlog {
 #endif
 
             char acSeconds[16];
-            if (GetEnvironmentVariableA("FNVD_CRASHLOG_SELFTEST", acSeconds, sizeof(acSeconds))) {
+            if (GetEnvironmentVariableA("XFNV_CRASHLOG_SELFTEST", acSeconds, sizeof(acSeconds))) {
                 uintptr_t uiSeconds = 0;
                 for (const char* p = acSeconds; *p >= '0' && *p <= '9'; ++p) {
                     uiSeconds = uiSeconds * 10 + (*p - '0');
@@ -953,4 +953,4 @@ namespace fnvd::crashlog {
         }
     }
 
-} // namespace fnvd::crashlog
+} // namespace xfnv::crashlog

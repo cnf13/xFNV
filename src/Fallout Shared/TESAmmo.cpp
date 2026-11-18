@@ -95,7 +95,7 @@ bool TESAmmo::Load(TESFile* apFile) {
             case DAT2_ID:
                 // The chunk's raw bytes are the AMMO_DATA_NV struct.
                 apFile->GetChunkData(reinterpret_cast<char*>(&NVdata), 0x14);
-#if FNVD_64BIT
+#if XFNV_64BIT
                 // The file's record is 0x14 bytes, with 4-byte form IDs at 4 and 0xC.
                 TESFile::WidenFormIDRecords(
                     &NVdata, 1, 0x14, sizeof(NVdata),
@@ -390,7 +390,7 @@ bool TESAmmo::Compare(TESForm* apCompare) {
 
 NiAVObject* TESAmmo::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
     int32_t icount;
-    FNVD_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pobj = TESBoundObject::Clone3D(pRequester, deepCopy);
     if (pRequester) {
         icount = (&pRequester->m_Extra)->GetCount();

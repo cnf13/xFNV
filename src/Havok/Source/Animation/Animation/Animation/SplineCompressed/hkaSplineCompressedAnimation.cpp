@@ -412,7 +412,7 @@ hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::isOk(hkBool* arRes
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA5A61u), acBuffer,
             ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimation.cpp", 0x4F
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
     }
 
     if (approximateQuantizationAccuracy(static_cast<ScalarQuantization>(m_scaleQuantizationType.m_storage)) >
@@ -426,7 +426,7 @@ hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::isOk(hkBool* arRes
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA5A61u), acBuffer,
             ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimation.cpp", 0x54
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
     }
 
     if (approximateQuantizationAccuracy(static_cast<ScalarQuantization>(m_floatQuantizationType.m_storage)) >
@@ -440,7 +440,7 @@ hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::isOk(hkBool* arRes
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA5A61u), acBuffer,
             ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimation.cpp", 0x59
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
     }
 
     if (approximateQuantizationAccuracy(static_cast<RotationQuantization>(m_rotationQuantizationType.m_storage)) *
@@ -455,7 +455,7 @@ hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::isOk(hkBool* arRes
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA5A61u), acBuffer,
             ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimation.cpp", 0x64
         );
-        FNVD_DESTRUCT(hkOstream)(pStream);
+        XFNV_DESTRUCT(hkOstream)(pStream);
     }
 
     arResult->m_bool = (bQuantizationValid && bTolerancesValid) ? 1 : 0;
@@ -965,8 +965,8 @@ void hkaSplineCompressedAnimation::initialize(
                     &trackParams.m_parameterPalette.m_data[paletteIndices[track]];
 
                 // The samples of each component and their times.
-                alignas(16) FNVD_INLINED_LOCAL(VectorArrays, samples, std::nullopt, std::nullopt);
-                FNVD_INLINED_LOCAL(FloatArrays, times, std::nullopt, std::nullopt);
+                alignas(16) XFNV_INLINED_LOCAL(VectorArrays, samples, std::nullopt, std::nullopt);
+                XFNV_INLINED_LOCAL(FloatArrays, times, std::nullopt, std::nullopt);
                 for (int32_t k = 0; k < 3; ++k) {
                     // EXE-INLINED none: hkArray<hkVector4>::hkArray
                     samples[k].m_data = nullptr;
@@ -1079,7 +1079,7 @@ void hkaSplineCompressedAnimation::initialize(
                     }
 
                     // The fitted curve's knots and control points.
-                    alignas(16) FNVD_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
+                    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, points, std::nullopt, std::nullopt);
                     {
                         // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
                         points.m_data = nullptr;
@@ -1092,7 +1092,7 @@ void hkaSplineCompressedAnimation::initialize(
                         points.m_capacityAndFlags = count ? count : hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
                         points.m_data = pData;
                     }
-                    alignas(16) FNVD_INLINED_LOCAL(hkArray<float>, knots, std::nullopt, std::nullopt);
+                    alignas(16) XFNV_INLINED_LOCAL(hkArray<float>, knots, std::nullopt, std::nullopt);
                     {
                         // EXE-INLINED none: hkArray<hkReal>::hkArray(int)
                         knots.m_data = nullptr;
@@ -1255,7 +1255,7 @@ void hkaSplineCompressedAnimation::initialize(
     }
 
     // The report, each line through an hkErrStream on buf (the SDK's HK_REPORT).
-    FNVD_INLINED_LOCAL(hkErrStream, os, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkErrStream, os, std::nullopt, std::nullopt);
     alignas(16) char buf[512];
     hkError::s_instance->sectionBegin(0x36118E94, "Compression");
     ::new (&os) hkErrStream(buf, 512);
@@ -1263,14 +1263,14 @@ void hkaSplineCompressedAnimation::initialize(
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimationCtor.cpp", 366
     );
-    FNVD_DESTRUCT(hkOstream)(&os);
+    XFNV_DESTRUCT(hkOstream)(&os);
     ::new (&os) hkErrStream(buf, 512);
     const int32_t maxChunkSize = static_cast<const hkaAnimation*>(this)->getMaxSizeOfCombinedDataChunks();
     os << "Size of largest block (PS3 SPU): " << maxChunkSize << " bytes.";
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimationCtor.cpp", 367
     );
-    FNVD_DESTRUCT(hkOstream)(&os);
+    XFNV_DESTRUCT(hkOstream)(&os);
     // The raw size counts 16 floats per transform.
     const uint32_t originalSize = static_cast<uint32_t>(
         (raw.m_transforms.m_size * 16 + raw.m_floats.m_size) * static_cast<int32_t>(sizeof(float))
@@ -1281,7 +1281,7 @@ void hkaSplineCompressedAnimation::initialize(
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimationCtor.cpp", 372
     );
-    FNVD_DESTRUCT(hkOstream)(&os);
+    XFNV_DESTRUCT(hkOstream)(&os);
     ::new (&os) hkErrStream(buf, 512);
     float fOriginalSize = static_cast<float>(originalSize);
     const float ratio = fOriginalSize / static_cast<double>(hkaSplineCompressedAnimation::getSizeInBytes());
@@ -1289,7 +1289,7 @@ void hkaSplineCompressedAnimation::initialize(
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\SplineCompressed\\hkaSplineCompressedAnimationCtor.cpp", 373
     );
-    FNVD_DESTRUCT(hkOstream)(&os);
+    XFNV_DESTRUCT(hkOstream)(&os);
     hkError::s_instance->sectionEnd();
 }
 

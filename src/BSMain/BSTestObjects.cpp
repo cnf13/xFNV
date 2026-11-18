@@ -42,7 +42,7 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
     NiLines* lines;
     NiColorA* color_2;
     NiPoint3* vertex;
-    FNVD_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
     NiPoint3 apResult;
     NiPoint3 dir_2;
     NiPoint3 v70;
@@ -188,7 +188,7 @@ NiAVObject* BSTestObjects::CreateCylinder(
     NiColorA* colors;
     NiPoint3* normals;
     NiPoint3* vertices;
-    FNVD_INLINED_LOCAL(NiFixedString, v34, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v34, std::nullopt, std::nullopt);
     uint16_t numVerticesPerStrip = 2 * aiSlices + 2;
     uint32_t arraySize = numVerticesPerStrip * aiStacks;
     NiPoint3* v64 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
@@ -469,7 +469,7 @@ NiAVObject* BSTestObjects::CreateTorus(
         );
     }
     // EXE-INLINED none: NiFixedString(const char*), which interns a non-null string
-    FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     kName.SetHandle(NiGlobalStringTable::AddString("BSTestObjects Torus"));
     pkStrips->SetName(kName);
     // EXE-INLINED none: ~NiFixedString, which drops the reference unless the handle is the null string. The count is
@@ -654,7 +654,7 @@ NiAVObject* BSTestObjects::CreateBox(
         NiColorA* colors;
         void* ptr = MemoryManager_Singleton.Allocate(8 * sizeof(NiColorA));
         if (ptr) {
-            rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 8, &fnvd::constructElement<NiColorA>);
+            rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 8, &xfnv::constructElement<NiColorA>);
             colors = static_cast<NiColorA*>(ptr);
         }
         else {
@@ -703,7 +703,7 @@ NiAVObject* BSTestObjects::CreateCoordinateJack(float afScale) {
     NiLines* lines;
     NiColorA* color;
     NiPoint3* vertex;
-    FNVD_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
     NiPoint3* v38 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(6 * sizeof(NiPoint3)));
     if (v38) {
         int32_t v12 = 6;
@@ -1178,7 +1178,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
     NiPoint3* normals;
     NiPoint3* vertices;
     NiNode* sphere;
-    FNVD_INLINED_LOCAL(NiFixedString, v131, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v131, std::nullopt, std::nullopt);
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         sphere = ::new (apMemory) NiNode(0);
@@ -1671,7 +1671,7 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
     NiLines* lines;
     NiColorA* color_2;
     NiPoint3* vertex;
-    FNVD_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
     NiPoint3 v19;
     float fsize = afLength / 6.0;
     NiPoint3* v32 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(5 * sizeof(NiPoint3)));

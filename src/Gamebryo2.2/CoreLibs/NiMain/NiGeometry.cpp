@@ -59,7 +59,7 @@ void NiGeometry::LoadBinary(NiStream& kStream) {
         kStream.Istr()->BinaryRead(&uiNumShaders, 4, &uiSize, 1);
         for (uint32_t i = 0; i < uiNumShaders; ++i) {
             uint32_t uiExtraData;
-            FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
             kName.m_kHandle = NiGlobalStringTable::NULL_STRING;
             kStream.LoadFixedString(kName);
             uiSize = 4;
@@ -78,7 +78,7 @@ void NiGeometry::LoadBinary(NiStream& kStream) {
         kStream.Istr()->BinaryRead(&ucHasShader, 1, &uiSize, 1);
         if (ucHasShader) {
             bool bCString = kStream.GetFileVersion() < NiStream::GetVersion(20, 1, 0, 1);
-            FNVD_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
+            XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
             kName.m_kHandle = NiGlobalStringTable::NULL_STRING;
             if (bCString) {
                 kStream.LoadCStringAsFixedString(kName);

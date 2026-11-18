@@ -70,23 +70,23 @@ void NiCollisionSDM::Init() {
         NiBVFindIntersectFunction* pfnFindTable = static_cast<NiBVFindIntersectFunction*>(
             _NiMalloc(sizeof(NiBVFindIntersectFunction) * MAXTYPE_BV * MAXTYPE_BV)
         );
-        pfnFindTable[SPHERE_BV * MAXTYPE_BV + SPHERE_BV] = &fnvd::callFunction<&NiSphereBV::SphereSphereFindIntersect>;
+        pfnFindTable[SPHERE_BV * MAXTYPE_BV + SPHERE_BV] = &xfnv::callFunction<&NiSphereBV::SphereSphereFindIntersect>;
         pfnFindTable[SPHERE_BV * MAXTYPE_BV + BOX_BV] = nullptr;
         pfnFindTable[SPHERE_BV * MAXTYPE_BV + CAPSULE_BV] = nullptr;
         pfnFindTable[SPHERE_BV * MAXTYPE_BV + LOZENGE_BV] = nullptr;
         pfnFindTable[SPHERE_BV * MAXTYPE_BV + UNION_BV] = nullptr;
         pfnFindTable[SPHERE_BV * MAXTYPE_BV + HALFSPACE_BV] = nullptr;
-        pfnFindTable[BOX_BV * MAXTYPE_BV + SPHERE_BV] = &fnvd::callFunction<&NiBoxBV::BoxSphereFindIntersect>;
-        pfnFindTable[BOX_BV * MAXTYPE_BV + BOX_BV] = &fnvd::callFunction<&NiBoxBV::BoxBoxFindIntersect>;
-        pfnFindTable[BOX_BV * MAXTYPE_BV + CAPSULE_BV] = &fnvd::callFunction<&NiBoxBV::BoxCapsuleFindIntersect>;
+        pfnFindTable[BOX_BV * MAXTYPE_BV + SPHERE_BV] = &xfnv::callFunction<&NiBoxBV::BoxSphereFindIntersect>;
+        pfnFindTable[BOX_BV * MAXTYPE_BV + BOX_BV] = &xfnv::callFunction<&NiBoxBV::BoxBoxFindIntersect>;
+        pfnFindTable[BOX_BV * MAXTYPE_BV + CAPSULE_BV] = &xfnv::callFunction<&NiBoxBV::BoxCapsuleFindIntersect>;
         pfnFindTable[BOX_BV * MAXTYPE_BV + LOZENGE_BV] = nullptr;
         pfnFindTable[BOX_BV * MAXTYPE_BV + UNION_BV] = nullptr;
         pfnFindTable[BOX_BV * MAXTYPE_BV + HALFSPACE_BV] = nullptr;
         pfnFindTable[CAPSULE_BV * MAXTYPE_BV + SPHERE_BV] =
-            &fnvd::callFunction<&NiCapsuleBV::CapsuleSphereFindIntersect>;
+            &xfnv::callFunction<&NiCapsuleBV::CapsuleSphereFindIntersect>;
         pfnFindTable[CAPSULE_BV * MAXTYPE_BV + BOX_BV] = nullptr;
         pfnFindTable[CAPSULE_BV * MAXTYPE_BV + CAPSULE_BV] =
-            &fnvd::callFunction<&NiCapsuleBV::CapsuleCapsuleFindIntersect>;
+            &xfnv::callFunction<&NiCapsuleBV::CapsuleCapsuleFindIntersect>;
         pfnFindTable[CAPSULE_BV * MAXTYPE_BV + LOZENGE_BV] = nullptr;
         pfnFindTable[CAPSULE_BV * MAXTYPE_BV + UNION_BV] = nullptr;
         pfnFindTable[CAPSULE_BV * MAXTYPE_BV + HALFSPACE_BV] = nullptr;
@@ -104,15 +104,15 @@ void NiCollisionSDM::Init() {
         pfnFindTable[UNION_BV * MAXTYPE_BV + UNION_BV] = &NiUnionBV::UnionUnionFindIntersect;
         pfnFindTable[UNION_BV * MAXTYPE_BV + HALFSPACE_BV] = &NiUnionBV::UnionOtherFindIntersect;
         pfnFindTable[HALFSPACE_BV * MAXTYPE_BV + SPHERE_BV] =
-            &fnvd::callFunction<&NiHalfSpaceBV::HalfSpaceSphereFindIntersect>;
+            &xfnv::callFunction<&NiHalfSpaceBV::HalfSpaceSphereFindIntersect>;
         pfnFindTable[HALFSPACE_BV * MAXTYPE_BV + BOX_BV] =
-            &fnvd::callFunction<&NiHalfSpaceBV::HalfSpaceBoxFindIntersect>;
+            &xfnv::callFunction<&NiHalfSpaceBV::HalfSpaceBoxFindIntersect>;
         pfnFindTable[HALFSPACE_BV * MAXTYPE_BV + CAPSULE_BV] =
-            &fnvd::callFunction<&NiHalfSpaceBV::HalfSpaceCapsuleFindIntersect>;
+            &xfnv::callFunction<&NiHalfSpaceBV::HalfSpaceCapsuleFindIntersect>;
         pfnFindTable[HALFSPACE_BV * MAXTYPE_BV + LOZENGE_BV] = nullptr;
         pfnFindTable[HALFSPACE_BV * MAXTYPE_BV + UNION_BV] = nullptr;
         pfnFindTable[HALFSPACE_BV * MAXTYPE_BV + HALFSPACE_BV] =
-            &fnvd::callFunction<&NiHalfSpaceBV::HalfSpaceHalfSpaceFindIntersect>;
+            &xfnv::callFunction<&NiHalfSpaceBV::HalfSpaceHalfSpaceFindIntersect>;
 
         NiBVTriTestIntersectFunction* pfnTriTestTable =
             static_cast<NiBVTriTestIntersectFunction*>(_NiMalloc(sizeof(NiBVTriTestIntersectFunction) * MAXTYPE_BV));
@@ -125,12 +125,12 @@ void NiCollisionSDM::Init() {
 
         NiBVTriFindIntersectFunction* pfnTriFindTable =
             static_cast<NiBVTriFindIntersectFunction*>(_NiMalloc(sizeof(NiBVTriFindIntersectFunction) * MAXTYPE_BV));
-        pfnTriFindTable[SPHERE_BV] = &fnvd::callFunction<&NiSphereBV::SphereTriFindIntersect>;
-        pfnTriFindTable[BOX_BV] = &fnvd::callFunction<&NiBoxBV::BoxTriFindIntersect>;
-        pfnTriFindTable[CAPSULE_BV] = &fnvd::callFunction<&NiCapsuleBV::CapsuleTriFindIntersect>;
+        pfnTriFindTable[SPHERE_BV] = &xfnv::callFunction<&NiSphereBV::SphereTriFindIntersect>;
+        pfnTriFindTable[BOX_BV] = &xfnv::callFunction<&NiBoxBV::BoxTriFindIntersect>;
+        pfnTriFindTable[CAPSULE_BV] = &xfnv::callFunction<&NiCapsuleBV::CapsuleTriFindIntersect>;
         pfnTriFindTable[LOZENGE_BV] = nullptr;
         pfnTriFindTable[UNION_BV] = &NiUnionBV::UnionTriFindIntersect;
-        pfnTriFindTable[HALFSPACE_BV] = &fnvd::callFunction<&NiHalfSpaceBV::HalfSpaceTriFindIntersect>;
+        pfnTriFindTable[HALFSPACE_BV] = &xfnv::callFunction<&NiHalfSpaceBV::HalfSpaceTriFindIntersect>;
 
         NiBoundingVolume::ms_pfnFindFuncTable = pfnFindTable;
         NiBoundingVolume::ms_pfnTestFuncTable = pfnTestTable;

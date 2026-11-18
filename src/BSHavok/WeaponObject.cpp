@@ -117,7 +117,7 @@ void WeaponObject::UpdateChildRB3D() {
     if (pkNextCollisionObject) {
         pkWorldObject = pkNextCollisionObject->spWorldObject;
     }
-    FNVD_INLINED_LOCAL(hkArray<hkpRigidBody*>, kBodyA, std::nullopt, std::nullopt);
+    XFNV_INLINED_LOCAL(hkArray<hkpRigidBody*>, kBodyA, std::nullopt, std::nullopt);
     kBodyA.m_data = nullptr;
     kBodyA.m_size = 0;
     kBodyA.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
