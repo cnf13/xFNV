@@ -8277,7 +8277,6 @@ int32_t TESObjectCELL::CreateCanopyShadowMaskForCell(
     NiRenderedTexture*& apOutTex,
     _D3DLOCKED_RECT*& apOutRect
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     apOutTex = nullptr;
     if (!apCell || (apCell->GetInterior() || !Renderer::GetNIRenderer())) {
         return 0;
@@ -8286,11 +8285,10 @@ int32_t TESObjectCELL::CreateCanopyShadowMaskForCell(
     NiRenderedTexture::iStaticForcedD3DFormat = D3DFMT_L8;
     NiRenderedTexture::bStaticRenderedTexture = false;
     NiRenderer* Renderer_ = NiRenderer::GetRenderer();
-    NiFixedString* name = ::new (static_cast<void*>(&apString)) NiFixedString("Canopy Shadow Mask");
     apOutTex = NiRenderedTexture::Create(
-        *name, 64u, 64u, Renderer_, NiRenderedTexture::ms_kDefaultPrefs, Ni2DBuffer::MULTISAMPLE_NONE, nullptr, 0
+        "Canopy Shadow Mask", 64u, 64u, Renderer_, NiRenderedTexture::ms_kDefaultPrefs, Ni2DBuffer::MULTISAMPLE_NONE,
+        nullptr, 0
     );
-    apString.~NiFixedString();
     NiRenderedTexture::bStaticForceD3DFormat = false;
     NiRenderedTexture::bStaticRenderedTexture = true;
     apCell->GetExtra()->SetCanopyShadowMask(1, apOutTex, apOutRect);

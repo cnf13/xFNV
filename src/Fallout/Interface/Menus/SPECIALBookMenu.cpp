@@ -512,7 +512,6 @@ void SPECIALBookMenu::CallPageCallbacks() {
 // look-inside button, a page per SPECIAL (its value, message and points-remaining items, the decrease and increase
 // buttons on them, the page arrows) and the index page, and runs every page's refresh callbacks once.
 void SPECIALBookMenu::InitBook() {
-    XFNV_INLINED_LOCAL(NiFixedString, kForward, std::nullopt, std::nullopt);
     SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\Babybook02.NIF", LOD_MULT_NONE, true, false, false, false
     );
@@ -528,9 +527,7 @@ void SPECIALBookMenu::InitBook() {
         SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry->GetController(&NiControllerManager::ms_RTTI);
     if (pController) {
         NiControllerManager* pManager = static_cast<NiControllerManager*>(pController);
-        NiFixedString* pName = ::new (static_cast<void*>(&kForward)) NiFixedString("Forward");
-        NiControllerSequence* pkSequence = pManager->GetSequenceByName(*pName);
-        kForward.~NiFixedString();
+        NiControllerSequence* pkSequence = pManager->GetSequenceByName("Forward");
         if (pkSequence) {
             pManager->DeactivateAll(0.0f);
             pManager->ActivateSequence(pkSequence, 0, true, 1.0f, 0.0f, nullptr);

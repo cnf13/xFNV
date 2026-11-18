@@ -295,13 +295,7 @@ NiAVObject* bhkWorldObject::CreateDisplayGeometry(NiNode* apNode) {
         pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
     }
     if (!pNode->m_kName.GetHandle()) {
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        NiGlobalStringTable::GlobalStringHandle kHandle = NiGlobalStringTable::AddString(bhkWorldObject_Name);
-        kName.SetHandle(kHandle);
-        pNode->SetName(kName);
-        // EXE-INLINED 0x4381B0
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        pNode->SetName(bhkWorldObject_Name);
     }
     NiColor kColor;
     kColor.r = 0.0f;

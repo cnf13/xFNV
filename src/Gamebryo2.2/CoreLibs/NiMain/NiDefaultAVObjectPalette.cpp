@@ -140,8 +140,7 @@ void NiDefaultAVObjectPalette::LinkObject(NiStream& stream) {
         kRenames.GetNext(pkRenamePos, kOldName, pcNewName);
         const char* pcOldName = kOldName.GetHandle();
         if (pcOldName && pcNewName) {
-            XFNV_INLINED_LOCAL(NiFixedString, kNewName, std::nullopt, std::nullopt);
-            kNewName.SetHandle(NiGlobalStringTable::AddString(pcNewName));
+            NiFixedString kNewName(pcNewName);
             // EXE-INLINED none: NiTFixedStringMapBase::GetAt
             // The bucket is the string handle's address modulo the table size (Gamebryo's KeyToHashIndex).
             uint32_t uiIndex = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pcOldName) % m_kHash.m_uiHashSize);
@@ -153,7 +152,6 @@ void NiDefaultAVObjectPalette::LinkObject(NiStream& stream) {
             }
             m_kHash.SetAt(kNewName, pkObject);
             m_kHash.RemoveAt(kOldName);
-            NiGlobalStringTable::ReleaseHandle(kNewName.GetHandle());
         }
     }
 }

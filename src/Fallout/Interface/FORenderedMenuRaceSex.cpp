@@ -168,15 +168,6 @@ void FORenderedMenuRaceSex::Initialize() {
     NiColor v46;
     NiColor v47;
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v57, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v58, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v60, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v61, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v63, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 mat2;
     NiMatrix3 rot;
     NiMatrix3 mat1;
@@ -205,37 +196,19 @@ void FORenderedMenuRaceSex::Initialize() {
     float* v5 = &fRaceSexMenuScale.Float();
     pgeom->SetScale(*v5);
     SetScreenParent(pgeom);
-    NiFixedString* a10 = ::new (static_cast<void*>(&apString)) NiFixedString("Screen");
-    NiAVObject* pscreen = pgeom->GetObjectByName(*a10);
-    apString.~NiFixedString();
+    NiAVObject* pscreen = pgeom->GetObjectByName("Screen");
     SetScreenTexture(nullptr);
     bPulseAffectsLight = 0;
     spPlayer3D.operator=(static_cast<NiNode*>(nullptr));
     spClonedPlayerCamera.operator=(static_cast<NiCamera*>(nullptr));
-    NiFixedString* a9 = ::new (static_cast<void*>(&v63)) NiFixedString("SexBtn:0");
-    spButtons->operator=(pgeom->GetObjectByName(*a9));
-    v63.~NiFixedString();
-    NiFixedString* a8 = ::new (static_cast<void*>(&v62)) NiFixedString("RaceBtn:0");
-    spButtons[1].operator=(pgeom->GetObjectByName(*a8));
-    v62.~NiFixedString();
-    NiFixedString* v40 = ::new (static_cast<void*>(&v61)) NiFixedString("FaceBtn:0");
-    spButtons[2].operator=(pgeom->GetObjectByName(*v40));
-    v61.~NiFixedString();
-    NiFixedString* a7_8 = ::new (static_cast<void*>(&v60)) NiFixedString("BodyBtn:0");
-    spButtons[3].operator=(pgeom->GetObjectByName(*a7_8));
-    v60.~NiFixedString();
-    NiFixedString* a7 = ::new (static_cast<void*>(&v59)) NiFixedString("SexGlow:0");
-    spBtnGlow->operator=(pgeom->GetObjectByName(*a7));
-    v59.~NiFixedString();
-    NiFixedString* a6 = ::new (static_cast<void*>(&v58)) NiFixedString("RaceGlow:0");
-    spBtnGlow[1].operator=(pgeom->GetObjectByName(*a6));
-    v58.~NiFixedString();
-    NiFixedString* a5 = ::new (static_cast<void*>(&v57)) NiFixedString("FaceGlow:0");
-    spBtnGlow[2].operator=(pgeom->GetObjectByName(*a5));
-    v57.~NiFixedString();
-    NiFixedString* v35 = ::new (static_cast<void*>(&v56)) NiFixedString("BodyGlow:0");
-    spBtnGlow[3].operator=(pgeom->GetObjectByName(*v35));
-    v56.~NiFixedString();
+    spButtons->operator=(pgeom->GetObjectByName("SexBtn:0"));
+    spButtons[1].operator=(pgeom->GetObjectByName("RaceBtn:0"));
+    spButtons[2].operator=(pgeom->GetObjectByName("FaceBtn:0"));
+    spButtons[3].operator=(pgeom->GetObjectByName("BodyBtn:0"));
+    spBtnGlow->operator=(pgeom->GetObjectByName("SexGlow:0"));
+    spBtnGlow[1].operator=(pgeom->GetObjectByName("RaceGlow:0"));
+    spBtnGlow[2].operator=(pgeom->GetObjectByName("FaceGlow:0"));
+    spBtnGlow[3].operator=(pgeom->GetObjectByName("BodyGlow:0"));
     fDistortStart = 0.0f;
     fDistortPos = 0.0f;
     SetNextDistortTime(0.0f);
@@ -362,7 +335,6 @@ void FORenderedMenuRaceSex::Initialize() {
 
 void FORenderedMenuRaceSex::OnMenuOpen() {
     NiPoint3 v25;
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiRect<float> port;
     appMain->RenderMenuBackground();
     ImageSpaceManager::bEOFEnabled = false;
@@ -396,9 +368,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         ptSavedPlayerTranslation = spPlayer3D.m_pObject->GetTranslate();
         mtxSavedPlayerRotation = (*&spPlayer3D.m_pObject->m_kLocal).m_Rotate;
         NiNode* v22 = spPlayer3D.m_pObject;
-        NiFixedString* a8 = ::new (static_cast<void*>(&apString)) NiFixedString("Bip01");
-        ptSavedBip01Translation = v22->GetObjectByName(*a8)->GetTranslate();
-        apString.~NiFixedString();
+        ptSavedBip01Translation = v22->GetObjectByName("Bip01")->GetTranslate();
         spPlayer3DParent.operator=(spPlayer3D.m_pObject->m_pkParent);
         bPlayer3DCulled = spPlayer3D.m_pObject->GetAppCulled();
         void* apMemory = NiMemObject::operator new(sizeof(NiNode));
@@ -471,7 +441,6 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
 }
 
 void FORenderedMenuRaceSex::OnMenuClose() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     ImageSpaceManager::bEOFEnabled = true;
     if (GetInitialized()) {
         if (GetMenuLight()) {
@@ -491,10 +460,8 @@ void FORenderedMenuRaceSex::OnMenuClose() {
         NiNode* v8 = spPlayer3DParent.m_pObject;
         v8->AttachChild(spPlayer3D.m_pObject, 1);
         NiNode* v7 = spPlayer3D.m_pObject;
-        NiFixedString* v6 = ::new (static_cast<void*>(&apString)) NiFixedString("Bip01");
-        NiAVObject* v3 = v7->GetObjectByName(*v6);
+        NiAVObject* v3 = v7->GetObjectByName("Bip01");
         v3->SetTranslate(ptSavedBip01Translation);
-        apString.~NiFixedString();
         spPlayer3D.m_pObject->SetRotate(mtxSavedPlayerRotation);
         spPlayer3D.m_pObject->SetTranslate(ptSavedPlayerTranslation);
         spPlayer3D.m_pObject->SetAppCulled(bPlayer3DCulled);

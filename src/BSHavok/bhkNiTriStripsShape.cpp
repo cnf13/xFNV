@@ -616,15 +616,7 @@ void bhkNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& ar
         }
         void* pMemory = NiMemObject::operator new(sizeof(NiTriStrips));
         NiTriStrips* pStrips = pMemory ? ::new (pMemory) NiTriStrips(pData) : nullptr;
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        kName.SetHandle(NiGlobalStringTable::AddString("bhkNiTriStripsShape"));
-        pStrips->SetName(kName);
-        // EXE-INLINED none: NiFixedString::~NiFixedString. The handle's reference count is the dword 8 bytes before
-        // its characters, raw memory the exe treats as untyped.
-        if (kName.GetHandle() != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kName.GetHandle()) - 8));
-        }
+        pStrips->SetName("bhkNiTriStripsShape");
         float fScale = __builtin_fabsf(GetScale());
         pStrips->m_kLocal.m_fScale = fScale;
         uint32_t uiMaterial = pSubpart->spGeom.m_pObject ? (pSubpart->spGeom.m_pObject->m_usDataFlags >> 6) & 0x1F : 0;

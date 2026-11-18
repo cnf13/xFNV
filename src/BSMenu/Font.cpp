@@ -565,8 +565,6 @@ NiTriShape* Font::MakeIconsTriShape() {
     NiTriShape* pshape;
     NiPoint2* ptextures;
     NiPoint3* pvertices;
-    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
     char pcString[268];
     char pcDest[268];
     uint32_t iSize = ButtonIcons.iSize;
@@ -612,15 +610,7 @@ NiTriShape* Font::MakeIconsTriShape() {
     NiTriShapeData* pd = static_cast<NiTriShapeData*>(pshape->m_spModelData.m_pObject);
     pd->m_ucKeepFlags = 0;
     pd->m_ucCompressFlags = NiGeometryData::VERTEX_MASK;
-    if ("Interface: TextIcons") {
-        v16.m_kHandle = NiGlobalStringTable::AddString("Interface: TextIcons");
-    }
-    else {
-        v16.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    pshape->SetName(v16);
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v16.GetHandle());
+    pshape->SetName("Interface: TextIcons");
     pshape->m_spModelData.m_pObject->SetConsistency(NiGeometryData::STATIC);
     TileShaderProperty* v14 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
     if (v14) {
@@ -634,13 +624,8 @@ NiTriShape* Font::MakeIconsTriShape() {
     BSShaderManager::PrepareObject(pshape, 0, 0);
     strncpy_s(pcDest, 260u, IconAtlasTextureName.pString, 259u);
     BSsprintf(pcString, 260, "Data\\Textures\\%s", pcDest);
-    // pcString is an array, so its address is never null.
-    v13.m_kHandle = NiGlobalStringTable::AddString(pcString);
-    NiSourceTexture* v1 = NiSourceTexture::Create(v13, NiSourceTexture::ms_kDefaultPrefs, true, false);
+    NiSourceTexture* v1 = NiSourceTexture::Create(pcString, NiSourceTexture::ms_kDefaultPrefs, true, false);
     ptsp->SetTileTexture(v1);
-    // The destructor of v13.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v13.GetHandle());
     pshape->UpdateProperties();
     Interface::AddAlphaProperty(pshape);
     return pshape;
@@ -924,20 +909,7 @@ void Font::Load() {
         pMemory = NiMemObject::operator new(sizeof(NiTexturingProperty));
         NiTexturingProperty* pTexProp = nullptr;
         if (pMemory) {
-            // EXE-INLINED 0x438170
-            NiGlobalStringTable::GlobalStringHandle kHandle =
-                pFontFile ? NiGlobalStringTable::AddString(pFontFile) : NiGlobalStringTable::NULL_STRING;
-            XFNV_INLINED_LOCAL(NiFixedString, kFilePath, std::nullopt, std::nullopt);
-            kFilePath.SetHandle(kHandle);
-            pTexProp = ::new (pMemory) NiTexturingProperty(pPixelData, kFilePath, kPrefs);
-            // The reference count is the untyped first word of the string's buffer, 8 bytes before the characters; it
-            // is decremented as raw memory.
-            // EXE-INLINED 0x4381B0
-            if (kFilePath.GetHandle() != NiGlobalStringTable::NULL_STRING) {
-                InterlockedDecrementUInt32(
-                    reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kFilePath.GetHandle()) - 8)
-                );
-            }
+            pTexProp = ::new (pMemory) NiTexturingProperty(pPixelData, pFontFile, kPrefs);
         }
         delete pTexFile;
         pTexProp->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);

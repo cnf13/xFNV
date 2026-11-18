@@ -149,9 +149,7 @@ void NiMaterial::UnloadShadersForAllMaterials() {
     }
 
     if (pkItem != nullptr) {
-        XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-        // EXE-INLINED none: NiFixedString::NiFixedString
-        kKey.SetHandle(NiGlobalStringTable::NULL_STRING);
+        NiFixedString kKey;
         NiMaterial* pkMaterial = nullptr;
         do {
             ms_pkMaterials->GetNext(pkItem, kKey, pkMaterial);
@@ -160,9 +158,6 @@ void NiMaterial::UnloadShadersForAllMaterials() {
             }
         }
         while (pkItem != nullptr);
-        // Drops the key's reference, as the string's destructor would.
-        // EXE-INLINED 0x4381B0
-        NiGlobalStringTable::ReleaseHandle(kKey.GetHandle());
     }
 }
 

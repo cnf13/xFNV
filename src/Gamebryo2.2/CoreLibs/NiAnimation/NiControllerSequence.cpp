@@ -374,9 +374,7 @@ void NiControllerSequence::IDTag::HandleDeprecatedExtraData(NiStringPalette* pkP
     uint32_t uiCtlrID = *reinterpret_cast<const uint32_t*>(&m_kCtlrID);
     uint32_t uiInterpolatorID = *reinterpret_cast<const uint32_t*>(&m_kInterpolatorID);
 
-    XFNV_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
-    // EXE-INLINED none: NiFixedString::NiFixedString
-    kString.SetHandle(NiGlobalStringTable::NULL_STRING);
+    NiFixedString kString;
     m_kAVObjectName.SetHandle(kString.GetHandle());
     m_kPropertyType.SetHandle(kString.GetHandle());
     m_kCtlrType.SetHandle(kString.GetHandle());
@@ -423,9 +421,6 @@ void NiControllerSequence::IDTag::HandleDeprecatedExtraData(NiStringPalette* pkP
             NiGlobalStringTable::ReleaseHandle(pcOld);
         }
     }
-    // Does what kString's destructor would do.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
 }
 
 NiControllerSequence::NiControllerSequence()
@@ -535,21 +530,10 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
 
     if (bOldFormat) {
         for (uint32_t ui = 0; ui < m_uiArraySize; ++ui) {
-            XFNV_INLINED_LOCAL(NiFixedString, kStr, std::nullopt, std::nullopt);
-            // EXE-INLINED none: NiFixedString::NiFixedString
-            kStr.SetHandle(NiGlobalStringTable::NULL_STRING);
+            NiFixedString kStr;
             kStream.LoadCStringAsFixedString(kStr);
-            NiFixedString& rkName = m_pkIDTagArray[ui].m_kAVObjectName;
-            if (rkName.m_kHandle != kStr.m_kHandle) {
-                NiGlobalStringTable::GlobalStringHandle kHandle = kStr.m_kHandle;
-                NiGlobalStringTable::AcquireHandle(kHandle);
-                NiGlobalStringTable::ReleaseHandle(rkName.m_kHandle);
-                rkName.m_kHandle = kHandle;
-            }
+            m_pkIDTagArray[ui].m_kAVObjectName = kStr;
             kStream.ReadLinkID();
-            // The local's reference is dropped here, as its destructor would.
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(kStr.m_kHandle);
         }
         return;
     }
@@ -2574,14 +2558,7 @@ void NiControllerSequence::ConvertOldSequence(
     if (pvMemory) {
         uint32_t uiCount = pkOldSequence->m_kObjectName.m_usSize;
         const char* pcSequenceName = pkOldSequence->m_pcName;
-        // EXE-INLINED none: NiFixedString(const char*) of the name temporary
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.SetHandle(
-            pcSequenceName ? NiGlobalStringTable::AddString(pcSequenceName) : NiGlobalStringTable::NULL_STRING
-        );
-        spNewSequence = ::new (pvMemory) NiControllerSequence(kName, uiCount, uiCount);
-        // EXE-INLINED none: ~NiFixedString of the name temporary
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        spNewSequence = ::new (pvMemory) NiControllerSequence(pcSequenceName, uiCount, uiCount);
     }
 
     bool bFirstTime = true;

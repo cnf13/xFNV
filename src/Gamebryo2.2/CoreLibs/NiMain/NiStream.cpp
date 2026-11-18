@@ -1191,11 +1191,7 @@ bool NiStream::LoadFixedStringTable() {
         uiSize = 1;
         m_pkIstr->BinaryRead(pcString, uiLength, &uiSize, 1);
         pcString[uiLength] = 0;
-        const char* pcHandle = pcString ? NiGlobalStringTable::AddString(pcString) : NiGlobalStringTable::NULL_STRING;
-        XFNV_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
-        kString.m_kHandle = pcHandle;
-        m_kFixedStrings.SetAt(us, kString);
-        NiGlobalStringTable::ReleaseHandle(pcHandle);
+        m_kFixedStrings.SetAt(us, pcString);
     }
     _NiFree(pcString);
     return true;

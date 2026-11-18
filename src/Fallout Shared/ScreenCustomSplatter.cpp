@@ -224,7 +224,6 @@ void ScreenCustomSplatter::Activate(
     float fSplatScale,
     float fOpacityScale
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, sName, std::nullopt, std::nullopt);
     BSSplatterData splatterData;
     if ((ScreenCustomSplatter::bEnabled) && (auiCount)) {
         BSCustomSplatterExtraData* ped;
@@ -247,9 +246,7 @@ void ScreenCustomSplatter::Activate(
             ped = nullptr;
         }
         pnode->AddExtraData(ped);
-        NiFixedString* pName = ::new (static_cast<void*>(&sName)) NiFixedString("ScreenSplatterRoot");
-        pnode->SetName(*pName);
-        sName.~NiFixedString();
+        pnode->SetName("ScreenSplatterRoot");
         NiNode* pRootNode = ScreenCustomSplatter::spRoot.m_pObject;
         pRootNode->AttachChild(pnode, 1);
         float* BroadPhaseHandle = &ped->SplatterData.fAlpha;

@@ -716,11 +716,6 @@ void LockPickMenu::RotateLock(float afAngleOffset) {
 
 void LockPickMenu::Prepare3DElements() {
     NiNode* v14;
-    XFNV_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v17, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v18, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v19, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPoint3 dst;
     NiMatrix3 matZ;
     NiMatrix3 matX;
@@ -754,12 +749,8 @@ void LockPickMenu::Prepare3DElements() {
     NiTimeController* plockAnimController = plockGeometry->GetController(&NiControllerManager::ms_RTTI);
     if (plockAnimController) {
         NiControllerManager* plockAnimManager = static_cast<NiControllerManager*>(plockAnimController);
-        NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Forward");
-        pIntroAnim = plockAnimManager->GetSequenceByName(*kName);
-        apString.~NiFixedString();
-        NiFixedString* v10 = ::new (static_cast<void*>(&v19)) NiFixedString("Backward");
-        pLockRotateAnim = plockAnimManager->GetSequenceByName(*v10);
-        v19.~NiFixedString();
+        pIntroAnim = plockAnimManager->GetSequenceByName("Forward");
+        pLockRotateAnim = plockAnimManager->GetSequenceByName("Backward");
         plockAnimManager->DeactivateAll(0.0f);
         if (pIntroAnim) {
             plockAnimManager->ActivateSequence(pIntroAnim, 0, true, 1.0f, 0.0f, nullptr);
@@ -772,15 +763,9 @@ void LockPickMenu::Prepare3DElements() {
     NiTimeController* ppickAnimController = ppickGeometry->GetController(&NiControllerManager::ms_RTTI);
     if (ppickAnimController) {
         ppickAnimManager = static_cast<NiControllerManager*>(ppickAnimController);
-        NiFixedString* v9 = ::new (static_cast<void*>(&v18)) NiFixedString("Forward");
-        pPickIntroAnim = ppickAnimManager->GetSequenceByName(*v9);
-        v18.~NiFixedString();
-        NiFixedString* v8 = ::new (static_cast<void*>(&v17)) NiFixedString("Backward");
-        pPickBendAnim = ppickAnimManager->GetSequenceByName(*v8);
-        v17.~NiFixedString();
-        NiFixedString* v5 = ::new (static_cast<void*>(&v16)) NiFixedString("Left");
-        pPickBreakAnim = ppickAnimManager->GetSequenceByName(*v5);
-        v16.~NiFixedString();
+        pPickIntroAnim = ppickAnimManager->GetSequenceByName("Forward");
+        pPickBendAnim = ppickAnimManager->GetSequenceByName("Backward");
+        pPickBreakAnim = ppickAnimManager->GetSequenceByName("Left");
         ppickAnimManager->DeactivateAll(0.0f);
         if (pPickIntroAnim) {
             ppickAnimManager->ActivateSequence(pPickIntroAnim, 0, true, 1.0f, 0.0f, nullptr);

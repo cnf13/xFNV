@@ -1012,12 +1012,7 @@ bool NiNode::IsLeftFacingUp(NiAVObject* apObject, char* apString) {
     }
     NiAVObject* pkObject = nullptr;
     if (apString) {
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.SetHandle(NiGlobalStringTable::AddString(apString));
-        pkObject = apObject->GetObjectByName(kName);
-        // Releases kName's handle, as kName's destructor does.
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        pkObject = apObject->GetObjectByName(apString);
     }
     if (!pkObject) {
         pkObject = apObject;

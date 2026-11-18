@@ -634,20 +634,13 @@ bool MagicFogProjectile::IsActive() {
 }
 
 void MagicFogProjectile::BuildAreaEffectGeometry() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
-    char v9 = 0;
     NiAVObject* pav = (NiAVObject*)Get3D();
     bool v6 = true;
     if (pav) {
-        NiFixedString* v7 = ::new (static_cast<void*>(&v13)) NiFixedString("MagicAreaDisplay");
-        v9 = 1;
-        if (!pav->GetObjectByName(*v7)) {
+        NiFixedString v13("MagicAreaDisplay");
+        if (!pav->GetObjectByName(v13)) {
             v6 = false;
         }
-    }
-    if ((v9 & 1) != 0) {
-        v13.~NiFixedString();
     }
     if (!v6) {
         NiNode* pnode = pav->IsNode();
@@ -658,9 +651,7 @@ void MagicFogProjectile::BuildAreaEffectGeometry() {
             double v4 = fMagicUnitsPerFoot.Float() * Area;
             float farea = v4 / pav->m_kLocal.m_fScale;
             NiAVObject* pdebugSphere = BSTestObjects::CreateSphere(farea, 10, 10, nullptr);
-            NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("MagicAreaDisplay");
-            pdebugSphere->SetName(*a2);
-            apString.~NiFixedString();
+            pdebugSphere->SetName("MagicAreaDisplay");
             pdebugSphere->SetTranslate(NiPoint3_ZERO);
             NiColor clr(0.0f, 0.0f, 0.0f);
             GetCollisionFilter(&kFilter.iFilter);
@@ -720,8 +711,6 @@ void MagicFogProjectile::ClearTargetList() {
 }
 
 void MagicFogProjectile::Init3D() {
-    XFNV_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pn = Get3D();
     if (pn) {
         NiMatrix3 rot;
@@ -732,9 +721,7 @@ void MagicFogProjectile::Init3D() {
         rot.FromEulerAnglesZXY(v12.z, v12.x, v12.y);
         pn->SetRotate(rot);
         BSUtilities::ProcessSelectiveUpdate(pn);
-        NiFixedString* v5 = ::new (static_cast<void*>(&apString)) NiFixedString("AreaEffect");
-        NiAVObject* pareaParticles = pn->GetObjectByName(*v5);
-        apString.~NiFixedString();
+        NiAVObject* pareaParticles = pn->GetObjectByName("AreaEffect");
         if (pareaParticles) {
             AdjustParticles(pareaParticles);
         }
@@ -742,9 +729,7 @@ void MagicFogProjectile::Init3D() {
             NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pn->GetControllers())
         );
         if (pmanager) {
-            NiFixedString* kName = ::new (static_cast<void*>(&v7)) NiFixedString("SpecialIdle_Projectile");
-            NiControllerSequence* pseq = pmanager->GetSequenceByName(*kName);
-            v7.~NiFixedString();
+            NiControllerSequence* pseq = pmanager->GetSequenceByName("SpecialIdle_Projectile");
             if (pseq) {
                 pmanager->DeactivateAll(0.0f);
                 pmanager->ActivateSequence(pseq, 0, false, 1.0f, 0.0f, nullptr);

@@ -35,7 +35,6 @@ SettingT<INISettingCollection> g_sScreenShotBaseName_Display("sScreenShotBaseNam
 SettingT<INIPrefSettingCollection> g_iScreenShotIndex_Display("iScreenShotIndex:Display", 0);
 
 NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHeight, const char* apScreenshotFileName) {
-    XFNV_INLINED_LOCAL(NiFixedString, TextureName, std::nullopt, std::nullopt);
     IDirect3DSurface9* pLocalSurf;
     IDirect3DSurface9* prenderedTextureCopy;
     D3DSURFACE_DESC d3dTextureSurfaceDesc;
@@ -54,11 +53,9 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
     kprefs.m_eAlphaFmt = NiTexture::FormatPrefs::NONE;
     uint32_t v8 = aiHeight;
     uint32_t v7 = aiWidth;
-    NiFixedString* pTextureName = ::new (static_cast<void*>(&TextureName)) NiFixedString("Screenshot RT");
     NiPointer<BSRenderedTexture> sptexture(
-        BSRenderedTexture::Create(*pTextureName, v7, v8, kprefs, Ni2DBuffer::MULTISAMPLE_NONE, 1, nullptr, nullptr, 0)
+        BSRenderedTexture::Create("Screenshot RT", v7, v8, kprefs, Ni2DBuffer::MULTISAMPLE_NONE, 1, nullptr, nullptr, 0)
     );
-    TextureName.~NiFixedString();
     if (sptexture.m_pObject) {
         double uiScreenWidth = static_cast<double>(Renderer::GetScreenHeight());
         float aspectRatio = uiScreenWidth / static_cast<double>(Renderer::GetScreenWidth());

@@ -171,7 +171,6 @@ bool NiD3DHLSLPixelShader::SetShaderConstantArray(
     uint32_t uiRegistersPerEntry,
     uint16_t* pusReorderArray
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
     if (!m_pkConstantTable || !m_pkD3DDevice) {
         return false;
     }
@@ -184,9 +183,8 @@ bool NiD3DHLSLPixelShader::SetShaderConstantArray(
         pvDataSource = pkEntry->m_pvDataSource;
     }
     if (!pkEntry->m_bVariableHookupValid) {
-        NiGlobalStringTable::AcquireHandle(pkEntry->m_kVariableName.GetHandle());
+        NiFixedString kVariableName(pkEntry->m_kVariableName);
         const char* kHandle = pkEntry->m_kVariableName.GetHandle();
-        kVariableName.m_kHandle = kHandle;
         if (kHandle == NiGlobalStringTable::NULL_STRING) {
             kVariableName.Assign(pkEntry->m_kKey);
             pkEntry->SetVariableName(kVariableName);
@@ -197,8 +195,6 @@ bool NiD3DHLSLPixelShader::SetShaderConstantArray(
             NiRenderer::Error(
                 "NiD3DHLSLPixelShader::SetShaderConstantArray - %s - variable %s not found\n", m_pszName, kHandle
             );
-            // Releases kVariableName's handle, as its destructor would.
-            NiGlobalStringTable::ReleaseHandle(kHandle);
             return false;
         }
         D3DXCONSTANT_DESC kDesc;
@@ -207,8 +203,6 @@ bool NiD3DHLSLPixelShader::SetShaderConstantArray(
         pkEntry->m_uiShaderRegister = kDesc.RegisterIndex;
         pkEntry->m_uiRegisterCount = kDesc.RegisterCount;
         pkEntry->m_bVariableHookupValid = true;
-        // Releases kVariableName's handle, as its destructor would.
-        NiGlobalStringTable::ReleaseHandle(kHandle);
     }
     // Each entry is uiRegistersPerEntry four-float registers of the source.
     const float* pfData = static_cast<const float*>(pvDataSource);

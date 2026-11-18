@@ -496,8 +496,6 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
     NiNode* pnode;
     NiPoint2* ptextures;
     NiPoint3* pvertices;
-    XFNV_INLINED_LOCAL(NiFixedString, textureFilename_3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, textureFilename_2, std::nullopt, std::nullopt);
     NiPoint2 v55;
     NiPoint2 v56;
     NiPoint2 v57;
@@ -596,14 +594,9 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
     pnode->AttachChild(ptri, 1);
     NiFixedString textureFilename;
     BSsprintf(apDest, 260, "Textures\\Interface\\Credits\\%s", apImageFilename->pString);
-    NiFixedString* kName =
-        ::new (static_cast<void*>(&textureFilename_2)) NiFixedString(static_cast<const char*>(apDest));
-    ptri->SetName(*kName);
-    textureFilename_2.~NiFixedString();
-    NiFixedString* kFilename =
-        ::new (static_cast<void*>(&textureFilename_3)) NiFixedString(static_cast<const char*>(apDest));
-    NiSourceTexture* ptexture = NiSourceTexture::Create(*kFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
-    textureFilename_3.~NiFixedString();
+    ptri->SetName(static_cast<const char*>(apDest));
+    NiSourceTexture* ptexture =
+        NiSourceTexture::Create(static_cast<const char*>(apDest), NiSourceTexture::ms_kDefaultPrefs, true, false);
     TileShaderProperty* v46 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
     if (v46) {
         ptprop = ::new (v46) TileShaderProperty(false);

@@ -310,14 +310,7 @@ NiControllerSequence* NiControllerManager::CreateTempBlendSequence(
     if (!pkTempSequence) {
         void* pvMem = NiMemObject::operator new(sizeof(NiControllerSequence));
         if (pvMem) {
-            XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-            kName.SetHandle(NiGlobalStringTable::AddString("__TempBlendSequence__"));
-            pkTempSequence = ::new (pvMem) NiControllerSequence(kName, uiArraySize, 12);
-            // EXE-INLINED none: ~NiFixedString of the name temporary
-            const char* pcName = kName.GetHandle();
-            if (pcName != NiGlobalStringTable::NULL_STRING) {
-                InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pcName) - 8));
-            }
+            pkTempSequence = ::new (pvMem) NiControllerSequence("__TempBlendSequence__", uiArraySize, 12);
         }
 
         // The set receives a smart-pointer temporary.

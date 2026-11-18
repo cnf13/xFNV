@@ -2877,18 +2877,6 @@ bool CaravanMenu::IsWellFormedMenu() {
 }
 
 void CaravanMenu::LoadNifs() {
-    XFNV_INLINED_LOCAL(NiFixedString, v70, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v71, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v72, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v73, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v74, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v75, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v76, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v77, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v78, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v79, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v80, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiUpdateData apMemory;
     char Src[268];
     pActiveDeckGeometry = (NiAVObject*)pModelLoader->LoadFile(
@@ -2910,48 +2898,24 @@ void CaravanMenu::LoadNifs() {
         static_cast<NiControllerManager*>(pActiveDeckGeometry->GetController(&NiControllerManager::ms_RTTI));
     if (Controller) {
         pActiveDeckAnimManager = Controller;
-        NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("Deck_Step-Forward");
-        pActiveDeckAnimations[0] = pActiveDeckAnimManager->GetSequenceByName(*a2);
-        apString.~NiFixedString();
-        NiFixedString* kName = ::new (static_cast<void*>(&v80)) NiFixedString("Deck_Step-Reverse");
-        pActiveDeckAnimations[1] = pActiveDeckAnimManager->GetSequenceByName(*kName);
-        v80.~NiFixedString();
-        NiFixedString* v64 = ::new (static_cast<void*>(&v79)) NiFixedString("Deck_Modify");
-        pActiveDeckAnimations[2] = pActiveDeckAnimManager->GetSequenceByName(*v64);
-        v79.~NiFixedString();
-        NiFixedString* v63 = ::new (static_cast<void*>(&v78)) NiFixedString("Deck_Fast-Forward");
-        pActiveDeckAnimations[3] = pActiveDeckAnimManager->GetSequenceByName(*v63);
-        v78.~NiFixedString();
-        NiFixedString* v62 = ::new (static_cast<void*>(&v77)) NiFixedString("Deck_Fast-Reverse");
-        pActiveDeckAnimations[4] = pActiveDeckAnimManager->GetSequenceByName(*v62);
-        v77.~NiFixedString();
-        NiFixedString* v61 = ::new (static_cast<void*>(&v76)) NiFixedString("Deck_Wipe");
-        pActiveDeckAnimations[5] = pActiveDeckAnimManager->GetSequenceByName(*v61);
-        v76.~NiFixedString();
+        pActiveDeckAnimations[0] = pActiveDeckAnimManager->GetSequenceByName("Deck_Step-Forward");
+        pActiveDeckAnimations[1] = pActiveDeckAnimManager->GetSequenceByName("Deck_Step-Reverse");
+        pActiveDeckAnimations[2] = pActiveDeckAnimManager->GetSequenceByName("Deck_Modify");
+        pActiveDeckAnimations[3] = pActiveDeckAnimManager->GetSequenceByName("Deck_Fast-Forward");
+        pActiveDeckAnimations[4] = pActiveDeckAnimManager->GetSequenceByName("Deck_Fast-Reverse");
+        pActiveDeckAnimations[5] = pActiveDeckAnimManager->GetSequenceByName("Deck_Wipe");
         pActiveDeckAnimManager->DeactivateAll(0.0f);
         NiTimeController::StartAnimations(pActiveDeckGeometry);
     }
     Controller = static_cast<NiControllerManager*>(pInactiveDeckGeometry->GetController(&NiControllerManager::ms_RTTI));
     if (Controller) {
         pInactiveDeckAnimManager = Controller;
-        NiFixedString* v60 = ::new (static_cast<void*>(&v75)) NiFixedString("Available_Step-Forward");
-        pInactiveDeckAnimations[0] = pInactiveDeckAnimManager->GetSequenceByName(*v60);
-        v75.~NiFixedString();
-        NiFixedString* v59 = ::new (static_cast<void*>(&v74)) NiFixedString("Available_Step-Reverse");
-        pInactiveDeckAnimations[1] = pInactiveDeckAnimManager->GetSequenceByName(*v59);
-        v74.~NiFixedString();
-        NiFixedString* v58 = ::new (static_cast<void*>(&v73)) NiFixedString("Available_Modify");
-        pInactiveDeckAnimations[2] = pInactiveDeckAnimManager->GetSequenceByName(*v58);
-        v73.~NiFixedString();
-        NiFixedString* v57 = ::new (static_cast<void*>(&v72)) NiFixedString("Available_Fast-Forward");
-        pInactiveDeckAnimations[3] = pInactiveDeckAnimManager->GetSequenceByName(*v57);
-        v72.~NiFixedString();
-        NiFixedString* v56 = ::new (static_cast<void*>(&v71)) NiFixedString("Available_Fast-Reverse");
-        pInactiveDeckAnimations[4] = pInactiveDeckAnimManager->GetSequenceByName(*v56);
-        v71.~NiFixedString();
-        NiFixedString* v55 = ::new (static_cast<void*>(&v70)) NiFixedString("Available_Wipe");
-        pInactiveDeckAnimations[5] = pInactiveDeckAnimManager->GetSequenceByName(*v55);
-        v70.~NiFixedString();
+        pInactiveDeckAnimations[0] = pInactiveDeckAnimManager->GetSequenceByName("Available_Step-Forward");
+        pInactiveDeckAnimations[1] = pInactiveDeckAnimManager->GetSequenceByName("Available_Step-Reverse");
+        pInactiveDeckAnimations[2] = pInactiveDeckAnimManager->GetSequenceByName("Available_Modify");
+        pInactiveDeckAnimations[3] = pInactiveDeckAnimManager->GetSequenceByName("Available_Fast-Forward");
+        pInactiveDeckAnimations[4] = pInactiveDeckAnimManager->GetSequenceByName("Available_Fast-Reverse");
+        pInactiveDeckAnimations[5] = pInactiveDeckAnimManager->GetSequenceByName("Available_Wipe");
         pInactiveDeckAnimManager->DeactivateAll(0.0f);
         NiTimeController::StartAnimations(pInactiveDeckGeometry);
     }
@@ -3805,9 +3769,6 @@ void CaravanMenu::HandleTrackSelection(int32_t aiXShift, int32_t aiYShift) {
 }
 
 void CaravanMenu::LoadNewBill(int32_t a1) {
-    XFNV_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v8, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiControllerSequence* a2;
     int32_t arg0 = BSMIN(a1, 2);
     NiAVObject* a1a = static_cast<NiAVObject*>(pBillGeometry[arg0]->Clone());
@@ -3817,18 +3778,14 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
     if (v16) {
         if (v16 == 1) {
             if (Controller) {
-                NiFixedString* v4 = ::new (static_cast<void*>(&v8)) NiFixedString("Bottom_Place");
-                a2 = Controller->GetSequenceByName(*v4);
-                v8.~NiFixedString();
+                a2 = Controller->GetSequenceByName("Bottom_Place");
                 Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
                 NiTimeController::StartAnimations(a1a);
             }
         }
         else {
             if ((v16 == 2) && (Controller)) {
-                NiFixedString* v3 = ::new (static_cast<void*>(&v7)) NiFixedString("Alt_Place");
-                a2 = Controller->GetSequenceByName(*v3);
-                v7.~NiFixedString();
+                a2 = Controller->GetSequenceByName("Alt_Place");
                 Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
                 NiTimeController::StartAnimations(a1a);
             }
@@ -3836,9 +3793,7 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
     }
     else {
         if (Controller) {
-            NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Top_Place");
-            a2 = Controller->GetSequenceByName(*kName);
-            apString.~NiFixedString();
+            a2 = Controller->GetSequenceByName("Top_Place");
             Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
             NiTimeController::StartAnimations(a1a);
         }
@@ -3850,8 +3805,6 @@ void CaravanMenu::LoadNewBill(int32_t a1) {
 }
 
 void CaravanMenu::LoadNewCoin(int32_t a1) {
-    XFNV_INLINED_LOCAL(NiFixedString, v6, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiControllerSequence* a2;
     int32_t arg0 = BSMIN(a1, 2);
     NiAVObject* a1a = static_cast<NiAVObject*>(pCoinGeometry[arg0]->Clone());
@@ -3860,18 +3813,14 @@ void CaravanMenu::LoadNewCoin(int32_t a1) {
         static_cast<NiControllerManager*>(a1a->GetController(&NiControllerManager::ms_RTTI));
     if (v13) {
         if ((v13 == 1) && (Controller)) {
-            NiFixedString* v3 = ::new (static_cast<void*>(&v6)) NiFixedString("Bottom_Place");
-            a2 = Controller->GetSequenceByName(*v3);
-            v6.~NiFixedString();
+            a2 = Controller->GetSequenceByName("Bottom_Place");
             Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
             NiTimeController::StartAnimations(a1a);
         }
     }
     else {
         if (Controller) {
-            NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Top_Place");
-            a2 = Controller->GetSequenceByName(*kName);
-            apString.~NiFixedString();
+            a2 = Controller->GetSequenceByName("Top_Place");
             Controller->ActivateSequence(a2, 0, false, 1.0f, 0.0f, nullptr);
             NiTimeController::StartAnimations(a1a);
         }
@@ -3907,9 +3856,6 @@ int32_t CaravanMenu::CalculateWinningState(int32_t aivalue) {
 
 uint32_t CaravanMenu::LoadNifs2() {
     NiNode* v11;
-    XFNV_INLINED_LOCAL(NiFixedString, a3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     pTableGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Table.NIF", LOD_MULT_NONE, true, false, false, false
     );
@@ -3930,15 +3876,9 @@ uint32_t CaravanMenu::LoadNifs2() {
         static_cast<NiControllerManager*>(pTableGeometry->GetController(&NiControllerManager::ms_RTTI));
     if (Controller) {
         pCameraAnimManager = Controller;
-        NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("Bet_to_Deck");
-        pCameraAnimations[0] = pCameraAnimManager->GetSequenceByName(*a2);
-        apString.~NiFixedString();
-        NiFixedString* kName = ::new (static_cast<void*>(&v14)) NiFixedString("Deck_to_Play");
-        pCameraAnimations[1] = pCameraAnimManager->GetSequenceByName(*kName);
-        v14.~NiFixedString();
-        NiFixedString* v7 = ::new (static_cast<void*>(&a3)) NiFixedString("Play_to_Bet");
-        pCameraAnimations[2] = pCameraAnimManager->GetSequenceByName(*v7);
-        a3.~NiFixedString();
+        pCameraAnimations[0] = pCameraAnimManager->GetSequenceByName("Bet_to_Deck");
+        pCameraAnimations[1] = pCameraAnimManager->GetSequenceByName("Deck_to_Play");
+        pCameraAnimations[2] = pCameraAnimManager->GetSequenceByName("Play_to_Bet");
         pCameraAnimManager->DeactivateAll(0.0f);
         NiTimeController::StartAnimations(pTableGeometry);
     }
@@ -4136,28 +4076,6 @@ void CaravanMenu::PrepareBettingCurrency() {
 
 void CaravanMenu::PrepareGameMenu() {
     NiUpdateData v81;
-    XFNV_INLINED_LOCAL(NiFixedString, v82, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v83, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v84, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v85, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v86, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v87, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v88, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v89, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v90, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v91, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v92, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v93, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v94, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v95, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v96, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v97, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v98, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v99, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v100, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v101, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v102, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiUpdateData v104;
     NiUpdateData v105;
     NiUpdateData v106;
@@ -4281,62 +4199,20 @@ void CaravanMenu::PrepareGameMenu() {
         pTimeController = pHandGeometry[i_9]->GetController(&NiControllerManager::ms_RTTI);
         if (pTimeController) {
             pHandAnimManager[i_9] = static_cast<NiControllerManager*>(pTimeController);
-            NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Deck-Cards_In");
-            NiControllerSequence* SequenceByName = pHandAnimManager[i_9]->GetSequenceByName(*kName);
-            pHandAnimations[i_9][0] = SequenceByName;
-            apString.~NiFixedString();
-            NiFixedString* v70 = ::new (static_cast<void*>(&v102)) NiFixedString("Deck-Card1_Out");
-            NiControllerSequence* v13 = pHandAnimManager[i_9]->GetSequenceByName(*v70);
-            pHandAnimations[i_9][1] = v13;
-            v102.~NiFixedString();
-            NiFixedString* v69 = ::new (static_cast<void*>(&v101)) NiFixedString("Deck-Card2_Out");
-            NiControllerSequence* v14 = pHandAnimManager[i_9]->GetSequenceByName(*v69);
-            pHandAnimations[i_9][2] = v14;
-            v101.~NiFixedString();
-            NiFixedString* v68 = ::new (static_cast<void*>(&v100)) NiFixedString("Deck-Card3_Out");
-            NiControllerSequence* v15 = pHandAnimManager[i_9]->GetSequenceByName(*v68);
-            pHandAnimations[i_9][3] = v15;
-            v100.~NiFixedString();
-            NiFixedString* v67 = ::new (static_cast<void*>(&v99)) NiFixedString("Deck-Card4_Out");
-            NiControllerSequence* v16 = pHandAnimManager[i_9]->GetSequenceByName(*v67);
-            pHandAnimations[i_9][4] = v16;
-            v99.~NiFixedString();
-            NiFixedString* v66 = ::new (static_cast<void*>(&v98)) NiFixedString("Deck-Card5_Out");
-            NiControllerSequence* v17 = pHandAnimManager[i_9]->GetSequenceByName(*v66);
-            pHandAnimations[i_9][5] = v17;
-            v98.~NiFixedString();
-            NiFixedString* v65 = ::new (static_cast<void*>(&v97)) NiFixedString("Deck8-Card1_Out");
-            NiControllerSequence* v18 = pHandAnimManager[i_9]->GetSequenceByName(*v65);
-            pStartAnimations[i_9][0] = v18;
-            v97.~NiFixedString();
-            NiFixedString* v64 = ::new (static_cast<void*>(&v96)) NiFixedString("Deck8-Card2_Out");
-            NiControllerSequence* v19 = pHandAnimManager[i_9]->GetSequenceByName(*v64);
-            pStartAnimations[i_9][1] = v19;
-            v96.~NiFixedString();
-            NiFixedString* v63 = ::new (static_cast<void*>(&v95)) NiFixedString("Deck8-Card3_Out");
-            NiControllerSequence* v20 = pHandAnimManager[i_9]->GetSequenceByName(*v63);
-            pStartAnimations[i_9][2] = v20;
-            v95.~NiFixedString();
-            NiFixedString* v62 = ::new (static_cast<void*>(&v94)) NiFixedString("Deck8-Card4_Out");
-            NiControllerSequence* v21 = pHandAnimManager[i_9]->GetSequenceByName(*v62);
-            pStartAnimations[i_9][3] = v21;
-            v94.~NiFixedString();
-            NiFixedString* v61 = ::new (static_cast<void*>(&v93)) NiFixedString("Deck8-Card5_Out");
-            NiControllerSequence* v22 = pHandAnimManager[i_9]->GetSequenceByName(*v61);
-            pStartAnimations[i_9][4] = v22;
-            v93.~NiFixedString();
-            NiFixedString* v60 = ::new (static_cast<void*>(&v92)) NiFixedString("Deck8-Card6_Out");
-            NiControllerSequence* v23 = pHandAnimManager[i_9]->GetSequenceByName(*v60);
-            pStartAnimations[i_9][5] = v23;
-            v92.~NiFixedString();
-            NiFixedString* v59 = ::new (static_cast<void*>(&v91)) NiFixedString("Deck8-Card7_Out");
-            NiControllerSequence* v24 = pHandAnimManager[i_9]->GetSequenceByName(*v59);
-            pStartAnimations[i_9][6] = v24;
-            v91.~NiFixedString();
-            NiFixedString* v58 = ::new (static_cast<void*>(&v90)) NiFixedString("Deck8-Card8_Out");
-            NiControllerSequence* v25 = pHandAnimManager[i_9]->GetSequenceByName(*v58);
-            pStartAnimations[i_9][7] = v25;
-            v90.~NiFixedString();
+            pHandAnimations[i_9][0] = pHandAnimManager[i_9]->GetSequenceByName("Deck-Cards_In");
+            pHandAnimations[i_9][1] = pHandAnimManager[i_9]->GetSequenceByName("Deck-Card1_Out");
+            pHandAnimations[i_9][2] = pHandAnimManager[i_9]->GetSequenceByName("Deck-Card2_Out");
+            pHandAnimations[i_9][3] = pHandAnimManager[i_9]->GetSequenceByName("Deck-Card3_Out");
+            pHandAnimations[i_9][4] = pHandAnimManager[i_9]->GetSequenceByName("Deck-Card4_Out");
+            pHandAnimations[i_9][5] = pHandAnimManager[i_9]->GetSequenceByName("Deck-Card5_Out");
+            pStartAnimations[i_9][0] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card1_Out");
+            pStartAnimations[i_9][1] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card2_Out");
+            pStartAnimations[i_9][2] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card3_Out");
+            pStartAnimations[i_9][3] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card4_Out");
+            pStartAnimations[i_9][4] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card5_Out");
+            pStartAnimations[i_9][5] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card6_Out");
+            pStartAnimations[i_9][6] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card7_Out");
+            pStartAnimations[i_9][7] = pHandAnimManager[i_9]->GetSequenceByName("Deck8-Card8_Out");
             pHandAnimManager[i_9]->DeactivateAll(0.0f);
             NiTimeController::StartAnimations(pHandGeometry[i_9]);
         }
@@ -4346,38 +4222,14 @@ void CaravanMenu::PrepareGameMenu() {
             pTimeController = pTrackGeometry[i_10][j_2]->GetController(&NiControllerManager::ms_RTTI);
             if (pTimeController) {
                 pTrackAnimManager[i_10][j_2] = static_cast<NiControllerManager*>(pTimeController);
-                NiFixedString* v57 = ::new (static_cast<void*>(&v89)) NiFixedString("Card1_In");
-                NiControllerSequence* v26 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v57);
-                pTrackAnimations[i_10][j_2][0][0] = v26;
-                v89.~NiFixedString();
-                NiFixedString* v56 = ::new (static_cast<void*>(&v88)) NiFixedString("Card2_In");
-                NiControllerSequence* v27 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v56);
-                pTrackAnimations[i_10][j_2][1][0] = v27;
-                v88.~NiFixedString();
-                NiFixedString* v55 = ::new (static_cast<void*>(&v87)) NiFixedString("Card3_In");
-                NiControllerSequence* v28 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v55);
-                pTrackAnimations[i_10][j_2][2][0] = v28;
-                v87.~NiFixedString();
-                NiFixedString* v54 = ::new (static_cast<void*>(&v86)) NiFixedString("Card4_In");
-                NiControllerSequence* v29 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v54);
-                pTrackAnimations[i_10][j_2][3][0] = v29;
-                v86.~NiFixedString();
-                NiFixedString* v53 = ::new (static_cast<void*>(&v85)) NiFixedString("Card1_Out");
-                NiControllerSequence* v30 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v53);
-                pTrackAnimations[i_10][j_2][0][1] = v30;
-                v85.~NiFixedString();
-                NiFixedString* v52 = ::new (static_cast<void*>(&v84)) NiFixedString("Card2_Out");
-                NiControllerSequence* v31 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v52);
-                pTrackAnimations[i_10][j_2][1][1] = v31;
-                v84.~NiFixedString();
-                NiFixedString* v51 = ::new (static_cast<void*>(&v83)) NiFixedString("Card3_Out");
-                NiControllerSequence* v32 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v51);
-                pTrackAnimations[i_10][j_2][2][1] = v32;
-                v83.~NiFixedString();
-                NiFixedString* v50 = ::new (static_cast<void*>(&v82)) NiFixedString("Card4_Out");
-                NiControllerSequence* v33 = pTrackAnimManager[i_10][j_2]->GetSequenceByName(*v50);
-                pTrackAnimations[i_10][j_2][3][1] = v33;
-                v82.~NiFixedString();
+                pTrackAnimations[i_10][j_2][0][0] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card1_In");
+                pTrackAnimations[i_10][j_2][1][0] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card2_In");
+                pTrackAnimations[i_10][j_2][2][0] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card3_In");
+                pTrackAnimations[i_10][j_2][3][0] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card4_In");
+                pTrackAnimations[i_10][j_2][0][1] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card1_Out");
+                pTrackAnimations[i_10][j_2][1][1] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card2_Out");
+                pTrackAnimations[i_10][j_2][2][1] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card3_Out");
+                pTrackAnimations[i_10][j_2][3][1] = pTrackAnimManager[i_10][j_2]->GetSequenceByName("Card4_Out");
                 pTrackAnimManager[i_10][j_2]->DeactivateAll(0.0f);
                 for (int32_t k = 0; k < 4; ++k) {
                     pTrackAnimations[i_10][j_2][k][0]->SetCycleType(NiTimeController::CLAMP);

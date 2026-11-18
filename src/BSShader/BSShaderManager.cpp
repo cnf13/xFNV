@@ -454,12 +454,7 @@ BSShaderPPLightingProperty::TangentSpaceData* BSShaderManager::CreateTangentSpac
     if (pMemory) {
         pTangentSpaceData = ::new (pMemory) BSShaderPPLightingProperty::TangentSpaceData(true);
     }
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.m_kHandle = NiGlobalStringTable::AddString("Tangent space (binormal & tangent vectors)");
-    NiExtraData* pExtraData = apGeom->GetExtraData(kKey);
-    // Destroys kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    NiExtraData* pExtraData = apGeom->GetExtraData("Tangent space (binormal & tangent vectors)");
     if (pExtraData) {
         uint32_t uiVertices = apGeom->m_spModelData.m_pObject->m_usVertices;
         // The extra data's untyped byte block holds the binormals, then the tangents.
@@ -474,12 +469,7 @@ BSShaderPPLightingProperty::TangentSpaceData* BSShaderManager::CreateTangentSpac
         ));
         rt::memcpy(pTangentSpaceData->pTangentExtraData, pkTangents, sizeof(NiPoint3) * uiVertices);
         rt::memcpy(pTangentSpaceData->pBinormalExtraData, pkBinormals, sizeof(NiPoint3) * uiVertices);
-        XFNV_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
-        kRemoveKey.m_kHandle = NiGlobalStringTable::AddString("Tangent space (binormal & tangent vectors)");
-        apGeom->RemoveExtraData(kRemoveKey);
-        // The destructor of kRemoveKey.
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(kRemoveKey.m_kHandle);
+        apGeom->RemoveExtraData("Tangent space (binormal & tangent vectors)");
         return pTangentSpaceData;
     }
     if (!apGeom->IsTriBasedGeom()) {
@@ -1805,39 +1795,26 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
 
     // The reflection cube maps: each face is the same file.
     char acFilename[260];
-    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     BSsprintf(acFilename, sizeof(acFilename), "%seyereflection.dds", "Data\\Textures\\Effects\\");
-    kName.SetHandle(NiGlobalStringTable::AddString("EyeReflectionCubeMap"));
     NiSourceCubeMap* pCubeMap = NiSourceCubeMap::Create(
-        acFilename, acFilename, acFilename, acFilename, acFilename, acFilename, pRenderer.m_pObject, kName,
-        NiSourceTexture::ms_kDefaultPrefs
+        acFilename, acFilename, acFilename, acFilename, acFilename, acFilename, pRenderer.m_pObject,
+        "EyeReflectionCubeMap", NiSourceTexture::ms_kDefaultPrefs
     );
     spEyeReflectionCubeMap = pCubeMap;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
     BSsprintf(acFilename, sizeof(acFilename), "%sreflection.dds", "Data\\Textures\\Effects\\");
-    kName.SetHandle(NiGlobalStringTable::AddString("ArmorReflectionCubeMap"));
     pCubeMap = NiSourceCubeMap::Create(
-        acFilename, acFilename, acFilename, acFilename, acFilename, acFilename, pRenderer.m_pObject, kName,
-        NiSourceTexture::ms_kDefaultPrefs
+        acFilename, acFilename, acFilename, acFilename, acFilename, acFilename, pRenderer.m_pObject,
+        "ArmorReflectionCubeMap", NiSourceTexture::ms_kDefaultPrefs
     );
     spArmorReflectionCubeMap = pCubeMap;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
 
     // The anisotropic and noise maps, loaded from their files.
     BSsprintf(acFilename, sizeof(acFilename), "%saniso.dds", "Data\\Textures\\Effects\\");
-    kName.SetHandle(NiGlobalStringTable::AddString(acFilename));
-    pTexture = NiSourceTexture::Create(kName, NiSourceTexture::ms_kDefaultPrefs, true, false);
+    pTexture = NiSourceTexture::Create(acFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
     spAnisotropicMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
     BSsprintf(acFilename, sizeof(acFilename), "%sNoiseMap.dds", "Data\\Textures\\Effects\\");
-    kName.SetHandle(NiGlobalStringTable::AddString(acFilename));
-    pTexture = NiSourceTexture::Create(kName, NiSourceTexture::ms_kDefaultPrefs, true, false);
+    pTexture = NiSourceTexture::Create(acFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
     pNoiseMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
 
     // Empty noise map: opaque grey 0x8F.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));

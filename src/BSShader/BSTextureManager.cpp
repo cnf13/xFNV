@@ -321,7 +321,6 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
     uint32_t uisafeWidth;
     uint32_t uisafeHeight;
     NiTexture::FormatPrefs pformat;
-    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     Ni2DBuffer::MultiSamplePreference emultiSamplePreference = Ni2DBuffer::MULTISAMPLE_NONE;
     NiDepthStencilBuffer* psharedDepthBuffer = nullptr;
     BSRenderedTexture* prenTexture = nullptr;
@@ -397,15 +396,12 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
         }
     }
     else {
-        kName.m_kHandle = NiGlobalStringTable::AddString("");
         // Deliberately passes auiHeight's whole 32-bit value, its low byte replaced by the depth-buffer flag above, as
         // the game does.
         prenTexture = BSRenderedTexture::Create(
-            kName, uisafeWidth, uisafeHeight, pformat, emultiSamplePreference, static_cast<int32_t>(auiHeight),
+            "", uisafeWidth, uisafeHeight, pformat, emultiSamplePreference, static_cast<int32_t>(auiHeight),
             psharedDepthBuffer, apAliasTex, uiAliasOffset
         );
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(kName.m_kHandle);
     }
     if (aiD3DFormat) {
         NiRenderedTexture::bStaticForceD3DFormat = false;

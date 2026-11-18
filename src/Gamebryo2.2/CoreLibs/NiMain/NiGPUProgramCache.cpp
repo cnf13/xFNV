@@ -25,14 +25,7 @@ NiGPUProgramCache::~NiGPUProgramCache() {}
 // is read before the entry's release; the key's handle is released last.
 NiGPUProgram*
 NiGPUProgramCache::FindCachedProgram(const char* pcName, NiTObjectPtrSet<NiPointer<NiMaterialResource>>& kUniforms) {
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x438170
-    if (pcName) {
-        kKey.m_kHandle = NiGlobalStringTable::AddString(pcName);
-    }
-    else {
-        kKey.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
+    NiFixedString kKey(pcName);
     NiGPUProgram* pkProgram = nullptr;
     {
         NiPointer<NiGPUProgramDesc> spDesc;
@@ -44,9 +37,6 @@ NiGPUProgramCache::FindCachedProgram(const char* pcName, NiTObjectPtrSet<NiPoint
             pkProgram = pkDesc->m_spProgram.m_pObject;
         }
     }
-    // The destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.GetHandle());
     return pkProgram;
 }
 
@@ -207,12 +197,9 @@ bool NiGPUProgramCache::Save() {
     NiTMapItem<NiFixedString, NiPointer<NiGPUProgramDesc>>* pkPos = m_kCachedPrograms.GetFirstPos();
     while (pkPos) {
         NiPointer<NiGPUProgramDesc> spDesc;
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.m_kHandle = NiGlobalStringTable::NULL_STRING;
+        NiFixedString kName;
         m_kCachedPrograms.GetNext(pkPos, kName, spDesc);
         SaveEntry(*pkFile, spDesc.m_pObject, kName);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
     }
     delete pkStream;
     return true;
@@ -385,9 +372,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
         NiStreamLoadBinary<uint8_t>(kStream, reinterpret_cast<uint8_t*>(acBuffer), uiLength);
         acBuffer[uiLength + 1] = '\0';
     }
-    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x438170
-    kName.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
+    NiFixedString kName(acBuffer);
 
     bool bSkip = false;
     if (uiVersion != m_uiVersion) {
@@ -408,9 +393,6 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
 
     NiGPUProgram* pkProgram = nullptr;
     if (!LoadGPUProgram(kStream, kName, pkProgram, bSkip)) {
-        // The destructor of kName, run by hand on each return.
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
         return false;
     }
     if (!bSkip) {
@@ -441,44 +423,19 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
             NiMaterialResource* pkRes = pvMemory ? ::new (pvMemory) NiMaterialResource : nullptr;
 
             ReadString();
-            XFNV_INLINED_LOCAL(NiFixedString, kType, std::nullopt, std::nullopt);
-            // EXE-INLINED 0x438170
-            kType.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
-            pkRes->SetType(kType);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(kType.GetHandle());
+            pkRes->SetType(acBuffer);
 
             ReadString();
-            XFNV_INLINED_LOCAL(NiFixedString, kSemantic, std::nullopt, std::nullopt);
-            // EXE-INLINED 0x438170
-            kSemantic.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
-            pkRes->SetSemantic(kSemantic);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(kSemantic.GetHandle());
+            pkRes->SetSemantic(acBuffer);
 
             ReadString();
-            XFNV_INLINED_LOCAL(NiFixedString, kLabel, std::nullopt, std::nullopt);
-            // EXE-INLINED 0x438170
-            kLabel.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
-            pkRes->SetLabel(kLabel);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(kLabel.GetHandle());
+            pkRes->SetLabel(acBuffer);
 
             ReadString();
-            XFNV_INLINED_LOCAL(NiFixedString, kVariable, std::nullopt, std::nullopt);
-            // EXE-INLINED 0x438170
-            kVariable.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
-            pkRes->SetVariable(kVariable);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(kVariable.GetHandle());
+            pkRes->SetVariable(acBuffer);
 
             ReadString();
-            XFNV_INLINED_LOCAL(NiFixedString, kDefaultValue, std::nullopt, std::nullopt);
-            // EXE-INLINED 0x438170
-            kDefaultValue.m_kHandle = NiGlobalStringTable::AddString(acBuffer);
-            pkRes->SetDefaultValue(kDefaultValue);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-            NiGlobalStringTable::ReleaseHandle(kDefaultValue.GetHandle());
+            pkRes->SetDefaultValue(acBuffer);
 
             uiSize = 4;
             kStream.BinaryRead(&uiValue, 4, &uiSize, 1);
@@ -516,8 +473,6 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
     if (!bSkip && pkDesc->m_spProgram.m_pObject) {
         m_kCachedPrograms.SetAt(kName, pkDesc);
     }
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
     return true;
 }
 

@@ -205,11 +205,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
                     UpdateData.bFoundMorphController = false;
                     UpdateData.bSceneGraphChange = false;
                     pObject->Update(UpdateData);
-                    // EXE-INLINED none: NiFixedString(const char*) and ~NiFixedString
-                    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-                    kName.m_kHandle = NiGlobalStringTable::AddString("Partial Screen Trishape");
-                    spPartialScreenTriShape.m_pObject->SetName(kName);
-                    NiGlobalStringTable::ReleaseHandle(kName.m_kHandle);
+                    spPartialScreenTriShape.m_pObject->SetName("Partial Screen Trishape");
                     if (pData) {
                         NiDecRefCount(pData);
                     }

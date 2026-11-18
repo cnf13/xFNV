@@ -42,7 +42,6 @@ NiPointer<NiNode> ScreenSplatter::spRoot;
 ScreenSplatter::spTextures_t ScreenSplatter::spTextures;
 
 void ScreenSplatter::Activate(uint32_t auiCount, float afDuration, ScreenSplatterType aeType) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     BSSplatterData splatterData;
     if (ScreenSplatter::bEnabled) {
         int32_t* v3 = &iBloodSplatterMaxCount.Int();
@@ -69,9 +68,7 @@ void ScreenSplatter::Activate(uint32_t auiCount, float afDuration, ScreenSplatte
             }
             BSSplatterExtraData* v14 = static_cast<BSSplatterExtraData*>(ped);
             pnode->AddExtraData(ped);
-            NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("ScreenSplatterRoot");
-            pnode->SetName(*a2);
-            apString.~NiFixedString();
+            pnode->SetName("ScreenSplatterRoot");
             NiNode* v5 = ScreenSplatter::spRoot.m_pObject;
             v5->AttachChild(pnode, 1);
             float* BroadPhaseHandle = &v14->SplatterData.fAlpha;

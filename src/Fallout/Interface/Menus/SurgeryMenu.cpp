@@ -682,8 +682,6 @@ void SurgeryMenu::BurnFlesh() {
 }
 
 bool SurgeryMenu::IsCursorInFlesh() {
-    XFNV_INLINED_LOCAL(NiFixedString, v12, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     int32_t icenterX;
     int32_t icenterY;
     int32_t radius;
@@ -692,12 +690,8 @@ bool SurgeryMenu::IsCursorInFlesh() {
     if (InterfaceManager::Has360Controller()) {
         return true;
     }
-    NiFixedString* v9 = ::new (static_cast<void*>(&apString)) NiFixedString("CenterNode");
-    NiAVObject* pcenter = pFrameGeometry->GetObjectByName(*v9);
-    apString.~NiFixedString();
-    NiFixedString* a1 = ::new (static_cast<void*>(&v12)) NiFixedString("FrameNode");
-    NiAVObject* pouterEdge = pFrameGeometry->GetObjectByName(*a1);
-    v12.~NiFixedString();
+    NiAVObject* pcenter = pFrameGeometry->GetObjectByName("CenterNode");
+    NiAVObject* pouterEdge = pFrameGeometry->GetObjectByName("FrameNode");
     if (pcenter && pouterEdge) {
         NiPoint2 outerEdge;
         NiPoint2 center;
@@ -729,13 +723,10 @@ bool SurgeryMenu::IsCursorInFlesh() {
 }
 
 void SurgeryMenu::UpdateFace() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SurgeryMenu::spPlayer3D.m_pObject) {
         NiAVObject* v5 = SurgeryMenu::spPlayer3D.m_pObject;
-        NiFixedString* v4 = ::new (static_cast<void*>(&apString)) NiFixedString("BSFaceGenNiNodeSkinned");
-        BSFaceGenNiNode* v3 = static_cast<BSFaceGenNiNode*>(v5->GetObjectByName(*v4));
-        BSFaceGenAnimationData* bface_2 = v3->GetAnimationData();
-        apString.~NiFixedString();
+        BSFaceGenAnimationData* bface_2 =
+            static_cast<BSFaceGenNiNode*>(v5->GetObjectByName("BSFaceGenNiNodeSkinned"))->GetAnimationData();
         float bface = FLerp(0.0f, 1.0f, 0.0f, 100.0f, fPainPercent);
         bface_2->SetExpressionTarget(BS_FG_EXPRESSION_MOOD_PAINED, bface);
         float afTime = static_cast<double>(appTimer.iLastTime) / 1000.0;
@@ -1023,18 +1014,12 @@ float SurgeryMenu::UpdateFlesh() {
 }
 
 void SurgeryMenu::PlaceToolInWindow(int32_t aiX, int32_t aiY) {
-    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     int32_t icenterX;
     int32_t icenterY;
     int32_t radius;
     NiPoint2 Vector;
-    NiFixedString* v11 = ::new (static_cast<void*>(&apString)) NiFixedString("CenterNode");
-    NiAVObject* pcenter = pFrameGeometry->GetObjectByName(*v11);
-    apString.~NiFixedString();
-    NiFixedString* a1 = ::new (static_cast<void*>(&v14)) NiFixedString("FrameNode");
-    NiAVObject* pouterEdge = pFrameGeometry->GetObjectByName(*a1);
-    v14.~NiFixedString();
+    NiAVObject* pcenter = pFrameGeometry->GetObjectByName("CenterNode");
+    NiAVObject* pouterEdge = pFrameGeometry->GetObjectByName("FrameNode");
     if (pcenter && pouterEdge) {
         NiPoint2 outerEdge;
         NiPoint2 center;

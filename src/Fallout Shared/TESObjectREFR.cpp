@@ -5039,14 +5039,11 @@ void TESObjectREFR::RemoveOwner() {
 }
 
 void TESObjectREFR::SetLinkLine(bool abShow) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiNode* v6 = Get3D();
     if (v6) {
         NiNode* v5 = v6->IsNode();
         if (v5) {
-            NiFixedString* v2 = ::new (static_cast<void*>(&apString)) NiFixedString("LinkLine");
-            NiAVObject* v4 = v5->GetObjectByName(*v2);
-            apString.~NiFixedString();
+            NiAVObject* v4 = v5->GetObjectByName("LinkLine");
             if (v4) {
                 v5->DetachChild(v4);
             }
@@ -5055,10 +5052,8 @@ void TESObjectREFR::SetLinkLine(bool abShow) {
 }
 
 void TESObjectREFR::SetActivateLine(bool abShow) {
-    XFNV_INLINED_LOCAL(NiFixedString, v10, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiColorA, v13, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiColorA, v14, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPoint3 aStart;
     NiMatrix3 apResult;
     NiPoint3 result;
@@ -5068,9 +5063,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
         if (v30) {
             NiNode* v7;
             char v27 = 0;
-            NiFixedString* v8 = ::new (static_cast<void*>(&apString)) NiFixedString("ActivateLine");
-            NiAVObject* v28 = v30->GetObjectByName(*v8);
-            apString.~NiFixedString();
+            NiAVObject* v28 = v30->GetObjectByName("ActivateLine");
             if (v28) {
                 v7 = v28->IsNode();
             }
@@ -5116,9 +5109,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
                         }
                         NiNode* v12 = v5;
                         v29 = v5;
-                        NiFixedString* a2 = ::new (static_cast<void*>(&v10)) NiFixedString("ActivateLine");
-                        v29->SetName(*a2);
-                        v10.~NiFixedString();
+                        v29->SetName("ActivateLine");
                         v30->AttachChild(v29, 1);
                     }
                     v29->AttachChild(Line, 1);
@@ -9885,9 +9876,6 @@ bool TESObjectREFR::GetDismembered(BGSBodyPart::LIMB_ENUM aeLimb) {
 
 void TESObjectREFR::ResetAnimation_Old() {
     NiTimeController* v7;
-    XFNV_INLINED_LOCAL(NiFixedString, v12, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* v28 = TESObjectREFR::Get3D();
     NiControllerManager* v26 = nullptr;
     if (v28) {
@@ -9901,9 +9889,8 @@ void TESObjectREFR::ResetAnimation_Old() {
             v26 =
                 static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pkObject));
             if (v26) {
-                NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[25].pName);
-                BSAnimGroupSequence* SequenceByName = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*kName));
-                apString.~NiFixedString();
+                BSAnimGroupSequence* SequenceByName =
+                    static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(animGroupInfo[25].pName));
                 if ((SequenceByName) && (SequenceByName->GetState())) {
                     v25 = true;
                 }
@@ -9925,12 +9912,10 @@ void TESObjectREFR::ResetAnimation_Old() {
         v26 =
             static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, Controllers));
         if (v26) {
-            NiFixedString* v9 = ::new (static_cast<void*>(&v13)) NiFixedString(animGroupInfo[0].pName);
-            BSAnimGroupSequence* SequenceAt = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*v9));
-            v13.~NiFixedString();
-            NiFixedString* v8 = ::new (static_cast<void*>(&v12)) NiFixedString(animGroupInfo[2].pName);
-            BSAnimGroupSequence* v18 = static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(*v8));
-            v12.~NiFixedString();
+            BSAnimGroupSequence* SequenceAt =
+                static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(animGroupInfo[0].pName));
+            BSAnimGroupSequence* v18 =
+                static_cast<BSAnimGroupSequence*>(v26->GetSequenceByName(animGroupInfo[2].pName));
             v26->DeactivateAll(0.0f);
             if (SequenceAt || v18) {
                 v26->SetActive(true);
@@ -10264,9 +10249,6 @@ void TESObjectREFR::LoadHavokDataPreVersion81(uint16_t aiSaveSize) {
 
 void TESObjectREFR::ResetAnimation() {
     NiTimeController* po_3;
-    XFNV_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v16, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pobj3D = TESObjectREFR::Get3D();
     NiControllerManager* pmanager = nullptr;
     bool v33 = false;
@@ -10280,9 +10262,7 @@ void TESObjectREFR::ResetAnimation() {
             pmanager =
                 static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, po));
             if (pmanager) {
-                NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[25].pName);
-                NiControllerSequence* punequipSeq = pmanager->GetSequenceByName(*kName);
-                apString.~NiFixedString();
+                NiControllerSequence* punequipSeq = pmanager->GetSequenceByName(animGroupInfo[25].pName);
                 if ((punequipSeq) && (punequipSeq->GetState())) {
                     v33 = true;
                 }
@@ -10328,12 +10308,8 @@ void TESObjectREFR::ResetAnimation() {
             }
             pmanager->DeactivateAll(0.0f);
             pmanager->SetActive(false);
-            NiFixedString* v12 = ::new (static_cast<void*>(&v16)) NiFixedString(animGroupInfo[0].pName);
-            NiControllerSequence* pdefaultSeq1 = pmanager->GetSequenceByName(*v12);
-            v16.~NiFixedString();
-            NiFixedString* v11 = ::new (static_cast<void*>(&v15)) NiFixedString(animGroupInfo[2].pName);
-            NiControllerSequence* pdefaultSeq2 = pmanager->GetSequenceByName(*v11);
-            v15.~NiFixedString();
+            NiControllerSequence* pdefaultSeq1 = pmanager->GetSequenceByName(animGroupInfo[0].pName);
+            NiControllerSequence* pdefaultSeq2 = pmanager->GetSequenceByName(animGroupInfo[2].pName);
             if (pdefaultSeq1 || pdefaultSeq2) {
                 pmanager->SetActive(true);
                 if (pdefaultSeq1) {

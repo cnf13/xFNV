@@ -66,7 +66,6 @@ void Clouds::Initialize(NiNode* apSkyRoot) {
 }
 
 void Clouds::Update(Sky* apSky, float afSecondsPassed) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     SkyObject::Update(apSky, afSecondsPassed);
     TESWeather* pCurrentWeather = apSky->pCurrentWeather;
     TESWeather* pLastWeather = apSky->pLastWeather;
@@ -163,10 +162,7 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                             NiTexture* ptex = spTex.m_pObject;
                             if (ptex) {
                                 pprop_2->SetTexture(static_cast<NiSourceTexture*>(ptex));
-                                NiFixedString* aFilename = ::new (static_cast<void*>(&apString))
-                                    NiFixedString(static_cast<const char*>(strfilename_2.pString));
-                                pprop_2->SetTextureFile(*aFilename);
-                                apString.~NiFixedString();
+                                pprop_2->SetTextureFile(strfilename_2.pString);
                                 pprop_2->SetBlendValue(0.0f);
                             }
                         }

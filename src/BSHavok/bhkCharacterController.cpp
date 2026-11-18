@@ -854,13 +854,7 @@ void bhkCharacterController::BuildDisplayGeometry(NiNode* apNode) {
         NiNode* pMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
         NiNode* pchar = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
         pParent->AttachChild(pchar, 1);
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.SetHandle(NiGlobalStringTable::AddString("bhkColDisp"));
-        pchar->SetName(kName);
-        // Destroys kName by releasing its string handle.
-        // EXE-INLINED 0x4381B0
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        pchar->SetName("bhkColDisp");
         const float fInvScale = 1.0 / pParent->m_kWorld.m_fScale;
         NiPoint3 nip;
         const NiPoint3& rCenter = HK2NI(nip, RotCenter);

@@ -101,9 +101,6 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     NiNode* faderNode;
     NiPoint2* ptextures;
     NiPoint3* pvertices;
-    XFNV_INLINED_LOCAL(NiFixedString, v42, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v43, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPoint2 v51;
     NiPoint2 v52;
     NiPoint2 v53;
@@ -182,10 +179,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
         faderNode = nullptr;
     }
     FaderData[aeFader].pRoot = faderNode;
-    NiFixedString* kName = ::new (static_cast<void*>(&apString))
-        NiFixedString(static_cast<const char*>(FaderData[aeFader].pFaderTextureFilename));
-    FaderData[aeFader].pRoot->SetName(*kName);
-    apString.~NiFixedString();
+    FaderData[aeFader].pRoot->SetName(static_cast<const char*>(FaderData[aeFader].pFaderTextureFilename));
     NiAlphaProperty* v46 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
     if (v46) {
         palphaProp = ::new (v46) NiAlphaProperty;
@@ -206,16 +200,12 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     FaderData[aeFader].pRoot->AttachChild(ptri, 1);
     BSStringT<char> textureFilename;
     textureFilename.SPrintF("Data\\Textures\\Interface\\Faders\\%s", FaderData[aeFader].pFaderTextureFilename);
-    NiFixedString* v33 =
-        ::new (static_cast<void*>(&v43)) NiFixedString(static_cast<const char*>(textureFilename.pString));
-    ptri->SetName(*v33);
-    v43.~NiFixedString();
-    NiFixedString* kFilename =
-        ::new (static_cast<void*>(&v42)) NiFixedString(static_cast<const char*>(textureFilename.pString));
+    ptri->SetName(static_cast<const char*>(textureFilename.pString));
     NiPointer<NiSourceTexture> ptexture(
-        NiSourceTexture::Create(*kFilename, NiSourceTexture::ms_kDefaultPrefs, true, false)
+        NiSourceTexture::Create(
+            static_cast<const char*>(textureFilename.pString), NiSourceTexture::ms_kDefaultPrefs, true, false
+        )
     );
-    v42.~NiFixedString();
     float falpha = 0.0f;
     if (abBeginBlack || afFadeSpeed == 0.0) {
         falpha = 1.0f;

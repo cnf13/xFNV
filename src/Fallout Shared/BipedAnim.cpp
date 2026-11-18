@@ -230,7 +230,6 @@ BipedAnim::~BipedAnim() {
 }
 
 void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<NiObject>, spTempObject, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<NiGeometryData>, spdata, std::nullopt, std::nullopt);
     FaceGenDatas fgcoord;
@@ -421,10 +420,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                 int32_t fScalec = object[n].pParent->iFormID;
                                 const char* v11 = object[n].pParent->GetFormEditorID();
                                 newName.SPrintF("%s %s (%08X)", bipedObjectName[n], v11, fScalec);
-                                NiFixedString* a2 = ::new (static_cast<void*>(&apString))
-                                    NiFixedString(static_cast<const char*>(newName.pString));
-                                ppartClone->SetName(*a2);
-                                apString.~NiFixedString();
+                                ppartClone->SetName(newName.pString);
                                 BipedAnim::AddAddonNodes(pNode, pcloneNode, n, m_pRequester);
                                 if ((!object[n].bSkinned) && (ppartClone->IsNode())) {
                                     NiNode* pparent = ppartClone->m_pkParent;
@@ -578,7 +574,6 @@ void BipedAnim::RemoveBipedWeapon() {
 }
 
 void BipedAnim::AttachBipedWeapon(TESObjectWEAP* apWeapon, uint8_t iModSlots) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if ((apWeapon) &&
         (apWeapon->GetFormType() == WEAP_ID && (apWeapon != object[5].pParent || !object[5].pPartClone))) {
         SetBipedWeapon(apWeapon, iModSlots);
@@ -597,10 +592,7 @@ void BipedAnim::AttachBipedWeapon(TESObjectWEAP* apWeapon, uint8_t iModSlots) {
             BSStringT<char> newName;
             int32_t CastingType = object[5].pParent->iFormID;
             newName.SPrintF("%s %s (%08X)", bipedObjectName[5], object[5].pParent->GetFormEditorID(), CastingType);
-            NiFixedString* a2 =
-                ::new (static_cast<void*>(&apString)) NiFixedString(static_cast<const char*>(newName.pString));
-            object[5].pPartClone->SetName(*a2);
-            apString.~NiFixedString();
+            object[5].pPartClone->SetName(newName.pString);
             if ((apWeapon->GetHideBackpack()) && (object[7].pPartClone)) {
                 object[7].pPartClone->SetAppCulled(true);
             }
@@ -1358,7 +1350,6 @@ NiNode* BipedAnim::CloneHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_
 }
 
 void BipedAnim::AttachHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_OBJECT aeBipedObject) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiNode* arg4 = nullptr;
     if ((apfgModel) && (apNode)) {
         BIPED_BONE boneIndex = objToBone[aeBipedObject];
@@ -1382,9 +1373,7 @@ void BipedAnim::AttachHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_OB
             "%s %s (%08X)", bipedObjectName[aeBipedObject], object[aeBipedObject].pParent->GetFormEditorID(),
             CastingType
         );
-        NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString(newName.pString);
-        ppartClone->SetName(*a2);
-        apString.~NiFixedString();
+        ppartClone->SetName(newName.pString);
         BipedAnim::AddAddonNodes(apNode, apNode, aeBipedObject, m_pRequester);
         if ((!object[aeBipedObject].bSkinned) && (ppartClone->IsNode())) {
             NiNode* pparent = ppartClone->m_pkParent;
@@ -1645,7 +1634,6 @@ void BipedAnim::AttachToParent(
     BSFaceGenModel* apfgModel
 ) {
     CFilter a2;
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiExtraData* pextraData = nullptr;
     NiStringExtraData* pparentName = nullptr;
     NiNode* pparentNode = nullptr;
@@ -1709,9 +1697,7 @@ void BipedAnim::AttachToParent(
         }
         else {
             pbackpackObj->SetScale(fbackpackScale);
-            NiFixedString* pUPB = ::new (static_cast<void*>(&apString)) NiFixedString("UPB");
-            pextraData = pbackpackObj->GetExtraData(*pUPB);
-            apString.~NiFixedString();
+            pextraData = pbackpackObj->GetExtraData("UPB");
             if (pextraData) {
                 pparentName = static_cast<NiStringExtraData*>(
                     NiObject::DynamicCastStatic(&NiStringExtraData::ms_RTTI, pextraData)

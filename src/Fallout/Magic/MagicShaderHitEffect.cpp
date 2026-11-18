@@ -387,7 +387,6 @@ void MagicShaderHitEffect::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 }
 
 bool MagicShaderHitEffect::Init() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     char path_1[260];
     char v47[260];
@@ -466,9 +465,7 @@ bool MagicShaderHitEffect::Init() {
                 v29 = nullptr;
             }
             spParticleNode.operator=(v29);
-            NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("ParticleShader Geometry");
-            spParticleNode.m_pObject->SetName(*kName);
-            apString.~NiFixedString();
+            spParticleNode.m_pObject->SetName("ParticleShader Geometry");
             spParticleNode.m_pObject->SetRotate(NiMatrix3_IDENTITY);
         }
         if (!ParticlePropertyArray.iSize) {

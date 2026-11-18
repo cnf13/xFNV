@@ -165,29 +165,21 @@ NiMatrix3 BSUtilities::GetRotationZToVector(NiPoint3 apVector) {
 
 NiAVObject* BSUtilities::GetObjectByName(NiAVObject* apScene, const char* apName, bool bTestScenegraph) {
     NiAVObject* pres;
-    XFNV_INLINED_LOCAL(NiFixedString, name, std::nullopt, std::nullopt);
     if (!apScene || !apName) {
         return nullptr;
     }
     NiControllerManager* pcontrollerManager =
         static_cast<NiControllerManager*>(apScene->GetController(&NiControllerManager::ms_RTTI));
-    // MAYBE-INLINED 0xC4B374: a write opening NiFixedString's uses: may be its inlined constructor
-    name.m_kHandle = NiGlobalStringTable::AddString(apName);
+    NiFixedString name(apName);
     if (pcontrollerManager && (pres = pcontrollerManager->m_spObjectPalette.m_pObject->GetAVObject(name)) != nullptr) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(name.GetHandle());
         return pres;
     }
 
     if (bTestScenegraph) {
         NiAVObject* v4 = apScene->GetObjectByName(name);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(name.GetHandle());
         return v4;
     }
 
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(name.GetHandle());
     return nullptr;
 }
 
@@ -361,7 +353,6 @@ void BSUtilities::ProcessSelectiveUpdate(NiAVObject* apObject) {
 }
 
 void BSUtilities::SetSequenceFileName(NiControllerSequence* apSequence, const char* apName) {
-    XFNV_INLINED_LOCAL(NiFixedString, v2, std::nullopt, std::nullopt);
     char pcDest[260];
     const char* pcSrc = apSequence->m_kName.GetHandle();
     NiFilename apMemory(apName);
@@ -373,11 +364,7 @@ void BSUtilities::SetSequenceFileName(NiControllerSequence* apSequence, const ch
     }
     strcat_s(pcDest, 256, rdata_10C21E0);
     strcat_s(pcDest, 256, apMemory.m_acFname);
-    v2.m_kHandle = NiGlobalStringTable::AddString(pcDest);
-    apSequence->m_kName.Assign(v2);
-    // Destructor of v2.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v2.GetHandle());
+    apSequence->m_kName.Assign(pcDest);
 }
 
 void BSUtilities::FindAnimatedTextures(NiAVObject* apObject, NiTPrimitiveArray<NiTexture*>& arTextureArray) {

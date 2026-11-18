@@ -367,18 +367,8 @@ void DebugText::HandleQueuedPrints() {
                         pDebugTextList[a_2].spNode.operator=(DebugText_);
                     }
                     if (pDebugTextList[a_2].spNode.m_pObject) {
-                        XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
                         pDebugTextList[a_2].pText.Set(string);
-                        if (string.pString) {
-                            v13.m_kHandle = NiGlobalStringTable::AddString(string.pString);
-                        }
-                        else {
-                            v13.m_kHandle = NiGlobalStringTable::NULL_STRING;
-                        }
-                        pDebugTextList[a_2].spNode.m_pObject->SetName(v13);
-                        // Releases v13's string handle, as its destructor would.
-                        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-                        NiGlobalStringTable::ReleaseHandle(v13.GetHandle());
+                        pDebugTextList[a_2].spNode.m_pObject->SetName(string.pString);
                         pDebugTextList[a_2].fX = xPrintData.pBuffer[i]->pTextData->fX;
                         pDebugTextList[a_2].fY = xPrintData.pBuffer[i]->pTextData->fY;
                         pDebugTextList[a_2].iJustify = xPrintData.pBuffer[i]->pTextData->iJustify;
@@ -888,24 +878,13 @@ bool DebugText::AddFloatingText(NiNode* apObject, const char* apText, int32_t ai
         apObject->DetachChild(pExtra->pBillboard);
         void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
         pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
-        // EXE-INLINED none: the NiFixedString(const char*) constructor and destructor of the name temporary
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.SetHandle(NiGlobalStringTable::AddString("FloatingText"));
-        pNode->SetName(kName);
-        // EXE-INLINED 0x4381D0
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        pNode->SetName("FloatingText");
         bHadText = true;
     }
     else {
         void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
         pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
-        // EXE-INLINED none: the NiFixedString(const char*) constructor and destructor of the name temporary
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.SetHandle(NiGlobalStringTable::AddString("FloatingText"));
-        pNode->SetName(kName);
-        // Destructor of kName.
-        // EXE-INLINED 0x4381D0
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        pNode->SetName("FloatingText");
         void* pExtraMemory = NiMemObject::operator new(sizeof(DebugTextExtraData));
         pExtra = pExtraMemory ? ::new (pExtraMemory) DebugTextExtraData(pNode, apText, aiHeight, iCenter) : nullptr;
     }

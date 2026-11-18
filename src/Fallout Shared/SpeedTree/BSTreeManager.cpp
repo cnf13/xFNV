@@ -500,7 +500,6 @@ float BSTreeManager::GetFarDistance() {
 }
 
 NiTexture* BSTreeManager::GetCanopyShadow() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_TREEART, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 629
@@ -536,11 +535,10 @@ NiTexture* BSTreeManager::GetCanopyShadow() {
             }
         }
         ppixeldata->MarkAsChanged();
-        NiFixedString* v6 = ::new (static_cast<void*>(&apString)) NiFixedString("CanopyShadowTexture");
-        const char* HandleString = v6->GetHandleString();
+        NiFixedString apString("CanopyShadowTexture");
+        const char* HandleString = apString.GetHandleString();
         NiSourceTexture* v5 = NiSourceTexture::Create(ppixeldata, HandleString, NiSourceTexture::ms_kDefaultPrefs);
         BSTreeManager::GetInstance(true)->spCanopyShadow.operator=(v5);
-        apString.~NiFixedString();
         BSTreeManager* v3 = BSTreeManager::GetInstance(true);
         BSShaderManager::SetProjectedShadowTexture(v3->spCanopyShadow.m_pObject);
     }

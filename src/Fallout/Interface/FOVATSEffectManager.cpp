@@ -257,8 +257,6 @@ void FOVATSEffectManager::ClearMultiTargets() {
 }
 
 void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager::VATS_DRAW_MODE aeDrawMode) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, string, std::nullopt, std::nullopt);
     if (SingleTarget.pRef) {
         if (((bEffectEnabled && !bScanning) || abQueryMode) &&
             aeDrawMode != FOVATSEffectManager::VATS_DRAW_ENTIRE_TARGET) {
@@ -300,9 +298,7 @@ void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager
                 BGSBodyPart* ppart = pbodyPartData->GetBodyPart(eLimb);
                 if (ppart) {
                     NiNode* pTargetRootNode = pactor_2->Get3D();
-                    NiFixedString* v8 = ::new (static_cast<void*>(&string)) NiFixedString(ppart->GetNodeName());
-                    NiAVObject* plimbNode = pTargetRootNode->GetObjectByName(*v8);
-                    string.~NiFixedString();
+                    NiAVObject* plimbNode = pTargetRootNode->GetObjectByName(ppart->GetNodeName());
                     if (plimbNode) {
                         BSShaderUtil::AccumulateScene(pcam, plimbNode, *pculler);
                     }
@@ -314,10 +310,7 @@ void FOVATSEffectManager::DrawSingleTarget(bool abQueryMode, FOVATSEffectManager
                         BGSBodyPart* ppart_2 = pbodyPartData_2->GetBodyPart(pAdditionalLimbs[i]);
                         if (ppart_2) {
                             NiNode* v6 = pactor_2->Get3D();
-                            NiFixedString* pBodyPartName =
-                                ::new (static_cast<void*>(&apString)) NiFixedString(ppart_2->GetNodeName());
-                            NiAVObject* plimbNode_2 = v6->GetObjectByName(*pBodyPartName);
-                            apString.~NiFixedString();
+                            NiAVObject* plimbNode_2 = v6->GetObjectByName(ppart_2->GetNodeName());
                             if (plimbNode_2) {
                                 BSShaderUtil::AccumulateScene(pcam, plimbNode_2, *pculler);
                             }
@@ -806,7 +799,6 @@ void FOVATSEffectManager::TargetAdditionalLimb(BGSBodyPart::LIMB_ENUM aeLimb) {
 }
 
 void FOVATSEffectManager::IsolateBodyPart() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SingleTarget.pRef->IsActor() && eLimb != BGSBodyPart::LIMB_WEAPON && eLimb != BGSBodyPart::LIMB_COUNT) {
         Actor* pactor = static_cast<Actor*>(SingleTarget.pRef);
         int32_t ilimb = eLimb;
@@ -870,9 +862,7 @@ void FOVATSEffectManager::IsolateBodyPart() {
                 BGSBodyPart* ppart = pbodyPartData->GetBodyPart(eLimb);
                 if (ppart) {
                     NiNode* v2 = pactor->Get3D();
-                    NiFixedString* v1 = ::new (static_cast<void*>(&apString)) NiFixedString(ppart->GetNodeName());
-                    NiAVObject* plimbNode = v2->GetObjectByName(*v1);
-                    apString.~NiFixedString();
+                    NiAVObject* plimbNode = v2->GetObjectByName(ppart->GetNodeName());
                     if (plimbNode && eindex_2 == eLimb) {
                         plimbNode->SetAppCulled(false);
                     }
@@ -916,7 +906,6 @@ void FOVATSEffectManager::EnableBodyPartOnSkinInstance(
 }
 
 void FOVATSEffectManager::RestoreBodyParts() {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (SingleTarget.pRef->IsActor() && eLimb != BGSBodyPart::LIMB_WEAPON && eLimb != BGSBodyPart::LIMB_COUNT) {
         Actor* pactor = static_cast<Actor*>(SingleTarget.pRef);
         ShowBipedObjectOnActor(pactor, BO_LEFT_HAND, true);
@@ -990,9 +979,7 @@ void FOVATSEffectManager::RestoreBodyParts() {
                 BGSBodyPart* ppart = pbodyPartData->GetBodyPart(eLimb);
                 if (ppart) {
                     NiNode* v2 = pactor->Get3D();
-                    NiFixedString* v1 = ::new (static_cast<void*>(&apString)) NiFixedString(ppart->GetNodeName());
-                    NiAVObject* plimbNode = v2->GetObjectByName(*v1);
-                    apString.~NiFixedString();
+                    NiAVObject* plimbNode = v2->GetObjectByName(ppart->GetNodeName());
                     if (plimbNode) {
                         plimbNode->SetAppCulled(false);
                     }

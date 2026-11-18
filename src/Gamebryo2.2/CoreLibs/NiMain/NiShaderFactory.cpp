@@ -49,7 +49,6 @@ bool NiShaderFactory::RegisterGlobalShaderConstant(
     uint32_t uiDataSize,
     const void* pvInitialData
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, kGlobalKey, std::nullopt, std::nullopt);
     NiShaderFactory* pkFactory = NiShaderFactory::ms_pkShaderFactory;
     if (!pkFactory) {
         return false;
@@ -89,18 +88,12 @@ LABEL_6:;
     }
     // The map holds a raw pointer: the factory takes its reference by hand.
     NiIncRefCount(pkEntry);
-    NiGlobalStringTable::AcquireHandle(kKey.GetHandle());
-    // MAYBE-INLINED 0xAA04BC: a write opening NiFixedString's uses: may be its inlined constructor
-    kGlobalKey.m_kHandle = kKey.GetHandle();
-    const char* m_kHandle = kGlobalKey.GetHandle();
+    NiFixedString kGlobalKey(kKey);
     NiShaderFactory::ms_pkShaderFactory->m_kGlobalConstantMap.SetAt(kGlobalKey, pkEntry);
-    // Destructor of kGlobalKey.
-    NiGlobalStringTable::ReleaseHandle(m_kHandle);
     return true;
 }
 
 bool NiShaderFactory::ReleaseGlobalShaderConstant(const NiFixedString& kKey) {
-    XFNV_INLINED_LOCAL(NiFixedString, kRemoveKey, std::nullopt, std::nullopt);
     NiShaderFactory* v1 = NiShaderFactory::ms_pkShaderFactory;
     if (!NiShaderFactory::ms_pkShaderFactory) {
         return false;
@@ -124,21 +117,12 @@ bool NiShaderFactory::ReleaseGlobalShaderConstant(const NiFixedString& kKey) {
     if (!m_pObject) {
         return false;
     }
-    // The copy of akKey into kRemoveKey takes its reference through the first load of the handle and stores a second
-    // load; the factory is reloaded only on the path that takes the reference.
-    if (m_kHandle != NiGlobalStringTable::NULL_STRING) {
-        NiGlobalStringTable::AcquireHandle(m_kHandle);
-        v1 = NiShaderFactory::ms_pkShaderFactory;
-    }
+    NiFixedString kRemoveKey(kKey);
     bool v6 = m_pObject->m_uiRefCount == 1;
-    const char* v7 = kKey.GetHandle();
-    // MAYBE-INLINED 0xAA0552: a write opening NiFixedString's uses: may be its inlined constructor
-    kRemoveKey.m_kHandle = v7;
     if (v6) {
         v1->m_kGlobalConstantMap.RemoveAt(kRemoveKey);
     }
     NiDecRefCount(m_pObject);
-    NiGlobalStringTable::ReleaseHandle(v7);
     return true;
 }
 

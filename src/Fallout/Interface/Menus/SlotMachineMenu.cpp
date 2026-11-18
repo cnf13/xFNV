@@ -805,11 +805,6 @@ char SlotMachineMenu::SetupActiveReels() {
 
 void SlotMachineMenu::Prepare3DElements() {
     NiNode* v18;
-    XFNV_INLINED_LOCAL(NiFixedString, v20, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v21, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v23, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 mat;
     NiMatrix3 ecx0;
     NiControllerManager* v34[3];
@@ -840,18 +835,10 @@ void SlotMachineMenu::Prepare3DElements() {
         static_cast<NiControllerManager*>(pSlotMachineGeometry->GetController(&NiControllerManager::ms_RTTI));
     if (Controller) {
         pSlotAnimManager = Controller;
-        NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Forward");
-        pSlotLeverAnim = pSlotAnimManager->GetSequenceByName(*kName);
-        apString.~NiFixedString();
-        NiFixedString* v12 = ::new (static_cast<void*>(&v23)) NiFixedString("Backward");
-        pSlotCoinAnim = pSlotAnimManager->GetSequenceByName(*v12);
-        v23.~NiFixedString();
-        NiFixedString* v11 = ::new (static_cast<void*>(&v22)) NiFixedString("Payout_In");
-        pSlotPayoutListAnim[0] = pSlotAnimManager->GetSequenceByName(*v11);
-        v22.~NiFixedString();
-        NiFixedString* v10 = ::new (static_cast<void*>(&v21)) NiFixedString("Payout_Out");
-        pSlotPayoutListAnim[1] = pSlotAnimManager->GetSequenceByName(*v10);
-        v21.~NiFixedString();
+        pSlotLeverAnim = pSlotAnimManager->GetSequenceByName("Forward");
+        pSlotCoinAnim = pSlotAnimManager->GetSequenceByName("Backward");
+        pSlotPayoutListAnim[0] = pSlotAnimManager->GetSequenceByName("Payout_In");
+        pSlotPayoutListAnim[1] = pSlotAnimManager->GetSequenceByName("Payout_Out");
         pSlotAnimManager->DeactivateAll(0.0f);
         if (pSlotLeverAnim) {
             pSlotAnimManager->ActivateSequence(pSlotLeverAnim, 0, true, 1.0f, 0.0f, nullptr);
@@ -867,10 +854,8 @@ void SlotMachineMenu::Prepare3DElements() {
         if (v34[j]) {
             NiControllerManager* v36[3];
             v36[j] = v34[j];
-            NiFixedString* v9 = ::new (static_cast<void*>(&v20)) NiFixedString("Forward");
-            NiControllerSequence* SequenceByName = v36[j]->GetSequenceByName(*v9);
+            NiControllerSequence* SequenceByName = v36[j]->GetSequenceByName("Forward");
             pSlotReelAnim[j] = SequenceByName;
-            v20.~NiFixedString();
             v36[j]->DeactivateAll(0.0f);
             if (pSlotReelAnim[j]) {
                 v36[j]->ActivateSequence(pSlotReelAnim[j], 0, true, 1.0f, 0.0f, nullptr);

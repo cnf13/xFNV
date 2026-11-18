@@ -3133,7 +3133,6 @@ bool Animation::ShouldQueueSequenceCloning() {
 }
 
 bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
-    XFNV_INLINED_LOCAL(NiFixedString, v18, std::nullopt, std::nullopt);
     ANIM_GROUP_ENUM eanimGroup;
     uint16_t sanimGroup;
     NiPointer<TESAnimGroup> spanimGroup(apKFModel->GetAnimGroup());
@@ -3291,9 +3290,7 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
         char* pname = nullptr;
         pagSeq->GetObjectNameAt(n_2, nullptr);
         NiNode* v13 = pAnimRoot.m_pObject;
-        NiFixedString* v12 = ::new (static_cast<void*>(&v18)) NiFixedString(static_cast<const char*>(pname));
-        bool v19 = v13->GetObjectByName(*v12) == nullptr;
-        v18.~NiFixedString();
+        bool v19 = v13->GetObjectByName(pname) == nullptr;
         if (v19) {
             Warning("ANIMATION: Object '%s' in sequence but not skeleton.", pname);
         }

@@ -1873,8 +1873,6 @@ int32_t TESNPC::GetActorValue(ActorValue::Index aiWhich) {
 }
 
 void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
-    XFNV_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiPointer<NiTriBasedGeom> spLeftEye(static_cast<NiTriBasedGeom*>(nullptr));
     NiPointer<NiTriBasedGeom> spRightEye(static_cast<NiTriBasedGeom*>(nullptr));
     if (spHeadBiped.m_pObject) {
@@ -1959,16 +1957,12 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
             }
         }
         BSFaceGenNiNode* v8 = spHeadBiped.m_pObject;
-        NiFixedString* v7 = ::new (static_cast<void*>(&apString)) NiFixedString("FaceGenEyeLeft");
-        pobj = v8->GetObjectByName(*v7);
-        apString.~NiFixedString();
+        pobj = v8->GetObjectByName("FaceGenEyeLeft");
         if (pobj) {
             BSShaderManager::PrepareObject(pobj, 0, 0);
         }
         BSFaceGenNiNode* v6 = spHeadBiped.m_pObject;
-        NiFixedString* v5 = ::new (static_cast<void*>(&v15)) NiFixedString("FaceGenEyeRight");
-        pobj = v6->GetObjectByName(*v5);
-        v15.~NiFixedString();
+        pobj = v6->GetObjectByName("FaceGenEyeRight");
         if (pobj) {
             BSShaderManager::PrepareObject(pobj, 0, 0);
         }

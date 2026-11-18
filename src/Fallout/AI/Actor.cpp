@@ -17043,11 +17043,7 @@ void Actor::DismemberLimb(
     pactorRoot->AttachChild(pclonedLimbRoot, 1);
     NiUpdateData UpdateData(0.0f, false, false);
     pclonedLimbRoot->UpdateWorldData(UpdateData);
-    XFNV_INLINED_LOCAL(NiFixedString, goreObjectName, std::nullopt, std::nullopt);
-    NiFixedString* pgoreObjectName =
-        ::new (static_cast<void*>(&goreObjectName)) NiFixedString(pbodyPart->GetGoreObjectName());
-    NiAVObject* pgoreObject = pactorRoot->GetObjectByName(*pgoreObjectName);
-    goreObjectName.~NiFixedString();
+    NiAVObject* pgoreObject = pactorRoot->GetObjectByName(pbodyPart->GetGoreObjectName());
     if (!pgoreObject) {
         pgoreObject = plimbRoot;
     }

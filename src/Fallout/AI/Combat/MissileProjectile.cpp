@@ -526,13 +526,11 @@ void MissileProjectile::ProcessImpale() {
     NiTransform v103;
     NiTransform projectileWorld;
     NiTransform rot;
-    alignas(16) XFNV_INLINED_LOCAL(NiFixedString, v120, std::nullopt, std::nullopt);
     Projectile::ImpactData* pimpact_2;
     NiNode* p3d;
     NiNode* v131;
     int32_t v140;
     int32_t* v135 = &v140;
-    int32_t v133 = 0;
     static float fpinLimDepth = fCombatMissileImpaleDepth.Float();
     bool bloading = pSaveLoadGame->GetSaveGameLoading();
     if (this->ImpactList.IsEmpty()) {
@@ -574,21 +572,8 @@ void MissileProjectile::ProcessImpale() {
             ptarget3D = pimpact_2->pCollidee ? pimpact_2->pCollidee->Get3D() : nullptr;
             ptarget3D_2 = (NiAVObject*)ptarget3D;
             if (ptarget3D && !v125) {
-                NiAVObject* pdismemberedLimb;
                 const char* plimbNodeName = pLimbEnumNames[pimpact_2->eDamageLimb];
-                if (ptarget3D_2) {
-                    NiFixedString* v119 = ::new (static_cast<void*>(&v120)) NiFixedString(plimbNodeName);
-                    v133 |= 1u;
-                    pdismemberedLimb = ptarget3D_2->GetObjectByName(*v119);
-                }
-                else {
-                    pdismemberedLimb = nullptr;
-                }
-                NiAVObject* pdismemberedLimb_2 = pdismemberedLimb;
-                if ((v133 & 1) != 0) {
-                    v133 &= ~1u;
-                    v120.~NiFixedString();
-                }
+                NiAVObject* pdismemberedLimb_2 = ptarget3D_2 ? ptarget3D_2->GetObjectByName(plimbNodeName) : nullptr;
                 float f3dScale = pdismemberedLimb_2->m_kWorld.m_fScale;
                 if (pdismemberedLimb_2) {
                     alignas(16) BSCloningProcess cloneProcess(1.0f);

@@ -459,12 +459,8 @@ bool NiShaderConstantMap::ParseKeyName(
 }
 
 // Allocates arrays of 136 predefined and 25 object mappings with NiNew, each entry assigned a temporary
-// PredefinedMapping(ID, NiFixedString(name)) whose name and string are then released.
+// PredefinedMapping(ID, name).
 void NiShaderConstantMap::_SDMInit() {
-    XFNV_INLINED_LOCAL(NiFixedString, kString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, kConstructedString, std::nullopt, std::nullopt);
-    alignas(8) XFNV_INLINED_LOCAL(PredefinedMapping, kTemp, std::nullopt, std::nullopt);
-
     ms_uiPredefinedMappingCount = SCM_DEF_COUNT + 20;
     size_t* puiBlock = static_cast<size_t*>(
         MemoryManager_Singleton.Allocate(sizeof(size_t) + (SCM_DEF_COUNT + 20) * sizeof(PredefinedMapping))
@@ -481,1040 +477,144 @@ void NiShaderConstantMap::_SDMInit() {
     }
     ms_pkPredefinedMappings = pkMappings;
 
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Invalid");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVALID;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[0] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Proj");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_PROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[1] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Projection");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_PROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[2] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvProj");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[3] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvProjection");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[4] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("View");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_VIEW;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[5] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvView");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVVIEW;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[6] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("World");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_WORLD;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[7] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorld");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVWORLD;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[8] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldView");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_WORLDVIEW;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[9] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldView");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVWORLDVIEW;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[10] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ViewProj");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_VIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[11] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ViewProjection");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_VIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[12] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvViewProj");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVVIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[13] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvViewProjection");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVVIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[14] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldViewProj");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_WORLDVIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[15] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldViewProjection");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_WORLDVIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[16] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldViewProj");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVWORLDVIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[17] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldViewProjection");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_INVWORLDVIEWPROJ;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[18] = kTemp;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ProjTranspose");
-    // EXE-INLINED 0xA9BDA0
-    kTemp.m_uiMappingID = SCM_DEF_PROJ_T;
-    kTemp.m_kMappingName.m_kHandle = kString.GetHandle();
-    NiGlobalStringTable::AcquireHandle(kString.GetHandle());
-    ms_pkPredefinedMappings[19] = kTemp;
-    // kTemp's mapping name is released before each placement construction, standing in for its destructor.
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ProjectionTranspose");
-    ms_pkPredefinedMappings[20] = *::new (&kTemp) PredefinedMapping(SCM_DEF_PROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvProjTranspose");
-    ms_pkPredefinedMappings[21] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvProjectionTranspose");
-    ms_pkPredefinedMappings[22] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ViewTranspose");
-    ms_pkPredefinedMappings[23] = *::new (&kTemp) PredefinedMapping(SCM_DEF_VIEW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvViewTranspose");
-    ms_pkPredefinedMappings[24] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVVIEW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldTranspose");
-    ms_pkPredefinedMappings[25] = *::new (&kTemp) PredefinedMapping(SCM_DEF_WORLD_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldTranspose");
-    ms_pkPredefinedMappings[26] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVWORLD_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldViewTranspose");
-    ms_pkPredefinedMappings[27] = *::new (&kTemp) PredefinedMapping(SCM_DEF_WORLDVIEW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldViewTranspose");
-    ms_pkPredefinedMappings[28] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVWORLDVIEW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ViewProjTranspose");
-    ms_pkPredefinedMappings[29] = *::new (&kTemp) PredefinedMapping(SCM_DEF_VIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ViewProjectionTranspose");
-    ms_pkPredefinedMappings[30] = *::new (&kTemp) PredefinedMapping(SCM_DEF_VIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvViewProjTranspose");
-    ms_pkPredefinedMappings[31] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvViewProjectionTranspose");
-    ms_pkPredefinedMappings[32] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldViewProjTranspose");
-    ms_pkPredefinedMappings[33] = *::new (&kTemp) PredefinedMapping(SCM_DEF_WORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldViewProjectionTranspose");
-    ms_pkPredefinedMappings[34] = *::new (&kTemp) PredefinedMapping(SCM_DEF_WORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldViewProjTranspose");
-    ms_pkPredefinedMappings[35] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVWORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvWorldViewProjectionTranspose");
-    ms_pkPredefinedMappings[36] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVWORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldView");
-    ms_pkPredefinedMappings[37] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLDVIEW, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldView");
-    ms_pkPredefinedMappings[38] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLDVIEW, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldViewTranspose");
-    ms_pkPredefinedMappings[39] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLDVIEW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldViewTranspose");
-    ms_pkPredefinedMappings[40] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLDVIEW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldViewProj");
-    ms_pkPredefinedMappings[41] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldViewProjection");
-    ms_pkPredefinedMappings[42] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldViewProj");
-    ms_pkPredefinedMappings[43] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldViewProjection");
-    ms_pkPredefinedMappings[44] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldViewProjTranspose");
-    ms_pkPredefinedMappings[45] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldViewProjectionTranspose");
-    ms_pkPredefinedMappings[46] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldViewProjTranspose");
-    ms_pkPredefinedMappings[47] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldViewProjectionTranspose");
-    ms_pkPredefinedMappings[48] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("BoneMatrix3");
-    ms_pkPredefinedMappings[49] = *::new (&kTemp) PredefinedMapping(SCM_DEF_BONE_MATRIX_3, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("BoneMatrix4");
-    ms_pkPredefinedMappings[50] = *::new (&kTemp) PredefinedMapping(SCM_DEF_BONE_MATRIX_4, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinBoneMatrix3");
-    ms_pkPredefinedMappings[51] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINBONE_MATRIX_3, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinBoneMatrix4");
-    ms_pkPredefinedMappings[52] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINBONE_MATRIX_4, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformBase");
-    ms_pkPredefinedMappings[53] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMBASE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformBase");
-    ms_pkPredefinedMappings[54] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBASE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformBaseTranspose");
-    ms_pkPredefinedMappings[55] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMBASE_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformBaseTranspose");
-    ms_pkPredefinedMappings[56] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBASE_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformDark");
-    ms_pkPredefinedMappings[57] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMDARK, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformDark");
-    ms_pkPredefinedMappings[58] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDARK, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformDarkTranspose");
-    ms_pkPredefinedMappings[59] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMDARK_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformDarkTranspose");
-    ms_pkPredefinedMappings[60] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDARK_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformDetail");
-    ms_pkPredefinedMappings[61] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMDETAIL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformDetail");
-    ms_pkPredefinedMappings[62] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDETAIL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformDetailTranspose");
-    ms_pkPredefinedMappings[63] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMDETAIL_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformDetailTranspose");
-    ms_pkPredefinedMappings[64] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDETAIL_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformGloss");
-    ms_pkPredefinedMappings[65] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOSS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformGloss");
-    ms_pkPredefinedMappings[66] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOSS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformGlossTranspose");
-    ms_pkPredefinedMappings[67] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOSS_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformGlossTranspose");
-    ms_pkPredefinedMappings[68] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOSS_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformGlow");
-    ms_pkPredefinedMappings[69] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOW, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformGlow");
-    ms_pkPredefinedMappings[70] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOW, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformGlowTranspose");
-    ms_pkPredefinedMappings[71] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformGlowTranspose");
-    ms_pkPredefinedMappings[72] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOW_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformBump");
-    ms_pkPredefinedMappings[73] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMBUMP, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformBump");
-    ms_pkPredefinedMappings[74] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBUMP, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformBumpTranspose");
-    ms_pkPredefinedMappings[75] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMBUMP_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformBumpTranspose");
-    ms_pkPredefinedMappings[76] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBUMP_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformDecal");
-    ms_pkPredefinedMappings[77] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMDECAL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformDecal");
-    ms_pkPredefinedMappings[78] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDECAL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformDecalTranspose");
-    ms_pkPredefinedMappings[79] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMDECAL_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformDecalTranspose");
-    ms_pkPredefinedMappings[80] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDECAL_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformShader");
-    ms_pkPredefinedMappings[81] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMSHADER, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformShader");
-    ms_pkPredefinedMappings[82] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMSHADER, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformShaderTranspose");
-    ms_pkPredefinedMappings[83] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMSHADER_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformShaderTranspose");
-    ms_pkPredefinedMappings[84] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMSHADER_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("LightPosWS");
-    ms_pkPredefinedMappings[85] = *::new (&kTemp) PredefinedMapping(SCM_DEF_LIGHT_POS_WS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("LightDirWS");
-    ms_pkPredefinedMappings[86] = *::new (&kTemp) PredefinedMapping(SCM_DEF_LIGHT_DIR_WS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("LightPosOS");
-    ms_pkPredefinedMappings[87] = *::new (&kTemp) PredefinedMapping(SCM_DEF_LIGHT_POS_OS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("LightDirOS");
-    ms_pkPredefinedMappings[88] = *::new (&kTemp) PredefinedMapping(SCM_DEF_LIGHT_DIR_OS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("MaterialDiffuse");
-    ms_pkPredefinedMappings[89] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_DIFFUSE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Diffuse");
-    ms_pkPredefinedMappings[90] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_DIFFUSE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("MaterialAmbient");
-    ms_pkPredefinedMappings[91] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_AMBIENT, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Ambient");
-    ms_pkPredefinedMappings[92] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_AMBIENT, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("MaterialSpecular");
-    ms_pkPredefinedMappings[93] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_SPECULAR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Specular");
-    ms_pkPredefinedMappings[94] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_SPECULAR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("MaterialEmissive");
-    ms_pkPredefinedMappings[95] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_EMISSIVE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("MaterialPower");
-    ms_pkPredefinedMappings[96] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_POWER, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SpecularPower");
-    ms_pkPredefinedMappings[97] = *::new (&kTemp) PredefinedMapping(SCM_DEF_MATERIAL_POWER, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("EyePos");
-    ms_pkPredefinedMappings[98] = *::new (&kTemp) PredefinedMapping(SCM_DEF_EYE_POS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("EyeDir");
-    ms_pkPredefinedMappings[99] = *::new (&kTemp) PredefinedMapping(SCM_DEF_EYE_DIR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TaylorSin");
-    ms_pkPredefinedMappings[100] = *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_TAYLOR_SIN, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TaylorCos");
-    ms_pkPredefinedMappings[101] = *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_TAYLOR_COS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("time");
-    ms_pkPredefinedMappings[102] = *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_TIME, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("sin_time");
-    ms_pkPredefinedMappings[103] = *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_SINTIME, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("cos_time");
-    ms_pkPredefinedMappings[104] = *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_COSTIME, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("tan_time");
-    ms_pkPredefinedMappings[105] = *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_TANTIME, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("time_sin_cos_tan");
-    ms_pkPredefinedMappings[106] =
-        *::new (&kTemp) PredefinedMapping(SCM_DEF_CONSTS_TIME_SINTIME_COSTIME_TANTIME, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("AmbientLight");
-    ms_pkPredefinedMappings[107] = *::new (&kTemp) PredefinedMapping(SCM_DEF_AMBIENTLIGHT, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformParallax");
-    ms_pkPredefinedMappings[108] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMPARALLAX, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformParallax");
-    ms_pkPredefinedMappings[109] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMPARALLAX, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformParallaxTranspose");
-    ms_pkPredefinedMappings[110] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMPARALLAX_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformParallaxTranspose");
-    ms_pkPredefinedMappings[111] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMPARALLAX_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformNormal");
-    ms_pkPredefinedMappings[112] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMNORMAL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformNormal");
-    ms_pkPredefinedMappings[113] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMNORMAL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexTransformNormalTranspose");
-    ms_pkPredefinedMappings[114] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXTRANSFORMNORMAL_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvTexTransformNormalTranspose");
-    ms_pkPredefinedMappings[115] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVTEXTRANSFORMNORMAL_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorld");
-    ms_pkPredefinedMappings[116] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLD, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorld");
-    ms_pkPredefinedMappings[117] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLD, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("SkinWorldTranspose");
-    ms_pkPredefinedMappings[118] = *::new (&kTemp) PredefinedMapping(SCM_DEF_SKINWORLD_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("InvSkinWorldTranspose");
-    ms_pkPredefinedMappings[119] = *::new (&kTemp) PredefinedMapping(SCM_DEF_INVSKINWORLD_T, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("FogDensity");
-    ms_pkPredefinedMappings[120] = *::new (&kTemp) PredefinedMapping(SCM_DEF_FOG_DENSITY, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("FogNearFar");
-    ms_pkPredefinedMappings[121] = *::new (&kTemp) PredefinedMapping(SCM_DEF_FOG_NEARFAR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("FogColor");
-    ms_pkPredefinedMappings[122] = *::new (&kTemp) PredefinedMapping(SCM_DEF_FOG_COLOR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("BumpMatrix");
-    ms_pkPredefinedMappings[123] = *::new (&kTemp) PredefinedMapping(SCM_DEF_BUMP_MATRIX, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("BumpLumaAndScale");
-    ms_pkPredefinedMappings[124] = *::new (&kTemp) PredefinedMapping(SCM_DEF_BUMP_LUMA_OFFSET_AND_SCALE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ParallaxOffset");
-    ms_pkPredefinedMappings[125] = *::new (&kTemp) PredefinedMapping(SCM_DEF_PARALLAX_OFFSET, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeBase");
-    ms_pkPredefinedMappings[126] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEBASE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeDark");
-    ms_pkPredefinedMappings[127] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEDARK, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeDetail");
-    ms_pkPredefinedMappings[128] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEDETAIL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeGloss");
-    ms_pkPredefinedMappings[129] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEGLOSS, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeGlow");
-    ms_pkPredefinedMappings[130] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEGLOW, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeBump");
-    ms_pkPredefinedMappings[131] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEBUMP, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeNormal");
-    ms_pkPredefinedMappings[132] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEBUMP, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeParallax");
-    ms_pkPredefinedMappings[133] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEBUMP, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeDecal");
-    ms_pkPredefinedMappings[134] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZEDECAL, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("TexSizeShader");
-    ms_pkPredefinedMappings[135] = *::new (&kTemp) PredefinedMapping(SCM_DEF_TEXSIZESHADER, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
+    ms_pkPredefinedMappings[0] = PredefinedMapping(SCM_DEF_INVALID, "Invalid");
+    ms_pkPredefinedMappings[1] = PredefinedMapping(SCM_DEF_PROJ, "Proj");
+    ms_pkPredefinedMappings[2] = PredefinedMapping(SCM_DEF_PROJ, "Projection");
+    ms_pkPredefinedMappings[3] = PredefinedMapping(SCM_DEF_INVPROJ, "InvProj");
+    ms_pkPredefinedMappings[4] = PredefinedMapping(SCM_DEF_INVPROJ, "InvProjection");
+    ms_pkPredefinedMappings[5] = PredefinedMapping(SCM_DEF_VIEW, "View");
+    ms_pkPredefinedMappings[6] = PredefinedMapping(SCM_DEF_INVVIEW, "InvView");
+    ms_pkPredefinedMappings[7] = PredefinedMapping(SCM_DEF_WORLD, "World");
+    ms_pkPredefinedMappings[8] = PredefinedMapping(SCM_DEF_INVWORLD, "InvWorld");
+    ms_pkPredefinedMappings[9] = PredefinedMapping(SCM_DEF_WORLDVIEW, "WorldView");
+    ms_pkPredefinedMappings[10] = PredefinedMapping(SCM_DEF_INVWORLDVIEW, "InvWorldView");
+    ms_pkPredefinedMappings[11] = PredefinedMapping(SCM_DEF_VIEWPROJ, "ViewProj");
+    ms_pkPredefinedMappings[12] = PredefinedMapping(SCM_DEF_VIEWPROJ, "ViewProjection");
+    ms_pkPredefinedMappings[13] = PredefinedMapping(SCM_DEF_INVVIEWPROJ, "InvViewProj");
+    ms_pkPredefinedMappings[14] = PredefinedMapping(SCM_DEF_INVVIEWPROJ, "InvViewProjection");
+    ms_pkPredefinedMappings[15] = PredefinedMapping(SCM_DEF_WORLDVIEWPROJ, "WorldViewProj");
+    ms_pkPredefinedMappings[16] = PredefinedMapping(SCM_DEF_WORLDVIEWPROJ, "WorldViewProjection");
+    ms_pkPredefinedMappings[17] = PredefinedMapping(SCM_DEF_INVWORLDVIEWPROJ, "InvWorldViewProj");
+    ms_pkPredefinedMappings[18] = PredefinedMapping(SCM_DEF_INVWORLDVIEWPROJ, "InvWorldViewProjection");
+    ms_pkPredefinedMappings[19] = PredefinedMapping(SCM_DEF_PROJ_T, "ProjTranspose");
+    ms_pkPredefinedMappings[20] = PredefinedMapping(SCM_DEF_PROJ_T, "ProjectionTranspose");
+    ms_pkPredefinedMappings[21] = PredefinedMapping(SCM_DEF_INVPROJ_T, "InvProjTranspose");
+    ms_pkPredefinedMappings[22] = PredefinedMapping(SCM_DEF_INVPROJ_T, "InvProjectionTranspose");
+    ms_pkPredefinedMappings[23] = PredefinedMapping(SCM_DEF_VIEW_T, "ViewTranspose");
+    ms_pkPredefinedMappings[24] = PredefinedMapping(SCM_DEF_INVVIEW_T, "InvViewTranspose");
+    ms_pkPredefinedMappings[25] = PredefinedMapping(SCM_DEF_WORLD_T, "WorldTranspose");
+    ms_pkPredefinedMappings[26] = PredefinedMapping(SCM_DEF_INVWORLD_T, "InvWorldTranspose");
+    ms_pkPredefinedMappings[27] = PredefinedMapping(SCM_DEF_WORLDVIEW_T, "WorldViewTranspose");
+    ms_pkPredefinedMappings[28] = PredefinedMapping(SCM_DEF_INVWORLDVIEW_T, "InvWorldViewTranspose");
+    ms_pkPredefinedMappings[29] = PredefinedMapping(SCM_DEF_VIEWPROJ_T, "ViewProjTranspose");
+    ms_pkPredefinedMappings[30] = PredefinedMapping(SCM_DEF_VIEWPROJ_T, "ViewProjectionTranspose");
+    ms_pkPredefinedMappings[31] = PredefinedMapping(SCM_DEF_INVVIEWPROJ_T, "InvViewProjTranspose");
+    ms_pkPredefinedMappings[32] = PredefinedMapping(SCM_DEF_INVVIEWPROJ_T, "InvViewProjectionTranspose");
+    ms_pkPredefinedMappings[33] = PredefinedMapping(SCM_DEF_WORLDVIEWPROJ_T, "WorldViewProjTranspose");
+    ms_pkPredefinedMappings[34] = PredefinedMapping(SCM_DEF_WORLDVIEWPROJ_T, "WorldViewProjectionTranspose");
+    ms_pkPredefinedMappings[35] = PredefinedMapping(SCM_DEF_INVWORLDVIEWPROJ_T, "InvWorldViewProjTranspose");
+    ms_pkPredefinedMappings[36] = PredefinedMapping(SCM_DEF_INVWORLDVIEWPROJ_T, "InvWorldViewProjectionTranspose");
+    ms_pkPredefinedMappings[37] = PredefinedMapping(SCM_DEF_SKINWORLDVIEW, "SkinWorldView");
+    ms_pkPredefinedMappings[38] = PredefinedMapping(SCM_DEF_INVSKINWORLDVIEW, "InvSkinWorldView");
+    ms_pkPredefinedMappings[39] = PredefinedMapping(SCM_DEF_SKINWORLDVIEW_T, "SkinWorldViewTranspose");
+    ms_pkPredefinedMappings[40] = PredefinedMapping(SCM_DEF_INVSKINWORLDVIEW_T, "InvSkinWorldViewTranspose");
+    ms_pkPredefinedMappings[41] = PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ, "SkinWorldViewProj");
+    ms_pkPredefinedMappings[42] = PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ, "SkinWorldViewProjection");
+    ms_pkPredefinedMappings[43] = PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ, "InvSkinWorldViewProj");
+    ms_pkPredefinedMappings[44] = PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ, "InvSkinWorldViewProjection");
+    ms_pkPredefinedMappings[45] = PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ_T, "SkinWorldViewProjTranspose");
+    ms_pkPredefinedMappings[46] = PredefinedMapping(SCM_DEF_SKINWORLDVIEWPROJ_T, "SkinWorldViewProjectionTranspose");
+    ms_pkPredefinedMappings[47] = PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ_T, "InvSkinWorldViewProjTranspose");
+    ms_pkPredefinedMappings[48] =
+        PredefinedMapping(SCM_DEF_INVSKINWORLDVIEWPROJ_T, "InvSkinWorldViewProjectionTranspose");
+    ms_pkPredefinedMappings[49] = PredefinedMapping(SCM_DEF_BONE_MATRIX_3, "BoneMatrix3");
+    ms_pkPredefinedMappings[50] = PredefinedMapping(SCM_DEF_BONE_MATRIX_4, "BoneMatrix4");
+    ms_pkPredefinedMappings[51] = PredefinedMapping(SCM_DEF_SKINBONE_MATRIX_3, "SkinBoneMatrix3");
+    ms_pkPredefinedMappings[52] = PredefinedMapping(SCM_DEF_SKINBONE_MATRIX_4, "SkinBoneMatrix4");
+    ms_pkPredefinedMappings[53] = PredefinedMapping(SCM_DEF_TEXTRANSFORMBASE, "TexTransformBase");
+    ms_pkPredefinedMappings[54] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBASE, "InvTexTransformBase");
+    ms_pkPredefinedMappings[55] = PredefinedMapping(SCM_DEF_TEXTRANSFORMBASE_T, "TexTransformBaseTranspose");
+    ms_pkPredefinedMappings[56] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBASE_T, "InvTexTransformBaseTranspose");
+    ms_pkPredefinedMappings[57] = PredefinedMapping(SCM_DEF_TEXTRANSFORMDARK, "TexTransformDark");
+    ms_pkPredefinedMappings[58] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDARK, "InvTexTransformDark");
+    ms_pkPredefinedMappings[59] = PredefinedMapping(SCM_DEF_TEXTRANSFORMDARK_T, "TexTransformDarkTranspose");
+    ms_pkPredefinedMappings[60] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDARK_T, "InvTexTransformDarkTranspose");
+    ms_pkPredefinedMappings[61] = PredefinedMapping(SCM_DEF_TEXTRANSFORMDETAIL, "TexTransformDetail");
+    ms_pkPredefinedMappings[62] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDETAIL, "InvTexTransformDetail");
+    ms_pkPredefinedMappings[63] = PredefinedMapping(SCM_DEF_TEXTRANSFORMDETAIL_T, "TexTransformDetailTranspose");
+    ms_pkPredefinedMappings[64] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDETAIL_T, "InvTexTransformDetailTranspose");
+    ms_pkPredefinedMappings[65] = PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOSS, "TexTransformGloss");
+    ms_pkPredefinedMappings[66] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOSS, "InvTexTransformGloss");
+    ms_pkPredefinedMappings[67] = PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOSS_T, "TexTransformGlossTranspose");
+    ms_pkPredefinedMappings[68] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOSS_T, "InvTexTransformGlossTranspose");
+    ms_pkPredefinedMappings[69] = PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOW, "TexTransformGlow");
+    ms_pkPredefinedMappings[70] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOW, "InvTexTransformGlow");
+    ms_pkPredefinedMappings[71] = PredefinedMapping(SCM_DEF_TEXTRANSFORMGLOW_T, "TexTransformGlowTranspose");
+    ms_pkPredefinedMappings[72] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMGLOW_T, "InvTexTransformGlowTranspose");
+    ms_pkPredefinedMappings[73] = PredefinedMapping(SCM_DEF_TEXTRANSFORMBUMP, "TexTransformBump");
+    ms_pkPredefinedMappings[74] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBUMP, "InvTexTransformBump");
+    ms_pkPredefinedMappings[75] = PredefinedMapping(SCM_DEF_TEXTRANSFORMBUMP_T, "TexTransformBumpTranspose");
+    ms_pkPredefinedMappings[76] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMBUMP_T, "InvTexTransformBumpTranspose");
+    ms_pkPredefinedMappings[77] = PredefinedMapping(SCM_DEF_TEXTRANSFORMDECAL, "TexTransformDecal");
+    ms_pkPredefinedMappings[78] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDECAL, "InvTexTransformDecal");
+    ms_pkPredefinedMappings[79] = PredefinedMapping(SCM_DEF_TEXTRANSFORMDECAL_T, "TexTransformDecalTranspose");
+    ms_pkPredefinedMappings[80] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMDECAL_T, "InvTexTransformDecalTranspose");
+    ms_pkPredefinedMappings[81] = PredefinedMapping(SCM_DEF_TEXTRANSFORMSHADER, "TexTransformShader");
+    ms_pkPredefinedMappings[82] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMSHADER, "InvTexTransformShader");
+    ms_pkPredefinedMappings[83] = PredefinedMapping(SCM_DEF_TEXTRANSFORMSHADER_T, "TexTransformShaderTranspose");
+    ms_pkPredefinedMappings[84] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMSHADER_T, "InvTexTransformShaderTranspose");
+    ms_pkPredefinedMappings[85] = PredefinedMapping(SCM_DEF_LIGHT_POS_WS, "LightPosWS");
+    ms_pkPredefinedMappings[86] = PredefinedMapping(SCM_DEF_LIGHT_DIR_WS, "LightDirWS");
+    ms_pkPredefinedMappings[87] = PredefinedMapping(SCM_DEF_LIGHT_POS_OS, "LightPosOS");
+    ms_pkPredefinedMappings[88] = PredefinedMapping(SCM_DEF_LIGHT_DIR_OS, "LightDirOS");
+    ms_pkPredefinedMappings[89] = PredefinedMapping(SCM_DEF_MATERIAL_DIFFUSE, "MaterialDiffuse");
+    ms_pkPredefinedMappings[90] = PredefinedMapping(SCM_DEF_MATERIAL_DIFFUSE, "Diffuse");
+    ms_pkPredefinedMappings[91] = PredefinedMapping(SCM_DEF_MATERIAL_AMBIENT, "MaterialAmbient");
+    ms_pkPredefinedMappings[92] = PredefinedMapping(SCM_DEF_MATERIAL_AMBIENT, "Ambient");
+    ms_pkPredefinedMappings[93] = PredefinedMapping(SCM_DEF_MATERIAL_SPECULAR, "MaterialSpecular");
+    ms_pkPredefinedMappings[94] = PredefinedMapping(SCM_DEF_MATERIAL_SPECULAR, "Specular");
+    ms_pkPredefinedMappings[95] = PredefinedMapping(SCM_DEF_MATERIAL_EMISSIVE, "MaterialEmissive");
+    ms_pkPredefinedMappings[96] = PredefinedMapping(SCM_DEF_MATERIAL_POWER, "MaterialPower");
+    ms_pkPredefinedMappings[97] = PredefinedMapping(SCM_DEF_MATERIAL_POWER, "SpecularPower");
+    ms_pkPredefinedMappings[98] = PredefinedMapping(SCM_DEF_EYE_POS, "EyePos");
+    ms_pkPredefinedMappings[99] = PredefinedMapping(SCM_DEF_EYE_DIR, "EyeDir");
+    ms_pkPredefinedMappings[100] = PredefinedMapping(SCM_DEF_CONSTS_TAYLOR_SIN, "TaylorSin");
+    ms_pkPredefinedMappings[101] = PredefinedMapping(SCM_DEF_CONSTS_TAYLOR_COS, "TaylorCos");
+    ms_pkPredefinedMappings[102] = PredefinedMapping(SCM_DEF_CONSTS_TIME, "time");
+    ms_pkPredefinedMappings[103] = PredefinedMapping(SCM_DEF_CONSTS_SINTIME, "sin_time");
+    ms_pkPredefinedMappings[104] = PredefinedMapping(SCM_DEF_CONSTS_COSTIME, "cos_time");
+    ms_pkPredefinedMappings[105] = PredefinedMapping(SCM_DEF_CONSTS_TANTIME, "tan_time");
+    ms_pkPredefinedMappings[106] = PredefinedMapping(SCM_DEF_CONSTS_TIME_SINTIME_COSTIME_TANTIME, "time_sin_cos_tan");
+    ms_pkPredefinedMappings[107] = PredefinedMapping(SCM_DEF_AMBIENTLIGHT, "AmbientLight");
+    ms_pkPredefinedMappings[108] = PredefinedMapping(SCM_DEF_TEXTRANSFORMPARALLAX, "TexTransformParallax");
+    ms_pkPredefinedMappings[109] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMPARALLAX, "InvTexTransformParallax");
+    ms_pkPredefinedMappings[110] = PredefinedMapping(SCM_DEF_TEXTRANSFORMPARALLAX_T, "TexTransformParallaxTranspose");
+    ms_pkPredefinedMappings[111] =
+        PredefinedMapping(SCM_DEF_INVTEXTRANSFORMPARALLAX_T, "InvTexTransformParallaxTranspose");
+    ms_pkPredefinedMappings[112] = PredefinedMapping(SCM_DEF_TEXTRANSFORMNORMAL, "TexTransformNormal");
+    ms_pkPredefinedMappings[113] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMNORMAL, "InvTexTransformNormal");
+    ms_pkPredefinedMappings[114] = PredefinedMapping(SCM_DEF_TEXTRANSFORMNORMAL_T, "TexTransformNormalTranspose");
+    ms_pkPredefinedMappings[115] = PredefinedMapping(SCM_DEF_INVTEXTRANSFORMNORMAL_T, "InvTexTransformNormalTranspose");
+    ms_pkPredefinedMappings[116] = PredefinedMapping(SCM_DEF_SKINWORLD, "SkinWorld");
+    ms_pkPredefinedMappings[117] = PredefinedMapping(SCM_DEF_INVSKINWORLD, "InvSkinWorld");
+    ms_pkPredefinedMappings[118] = PredefinedMapping(SCM_DEF_SKINWORLD_T, "SkinWorldTranspose");
+    ms_pkPredefinedMappings[119] = PredefinedMapping(SCM_DEF_INVSKINWORLD_T, "InvSkinWorldTranspose");
+    ms_pkPredefinedMappings[120] = PredefinedMapping(SCM_DEF_FOG_DENSITY, "FogDensity");
+    ms_pkPredefinedMappings[121] = PredefinedMapping(SCM_DEF_FOG_NEARFAR, "FogNearFar");
+    ms_pkPredefinedMappings[122] = PredefinedMapping(SCM_DEF_FOG_COLOR, "FogColor");
+    ms_pkPredefinedMappings[123] = PredefinedMapping(SCM_DEF_BUMP_MATRIX, "BumpMatrix");
+    ms_pkPredefinedMappings[124] = PredefinedMapping(SCM_DEF_BUMP_LUMA_OFFSET_AND_SCALE, "BumpLumaAndScale");
+    ms_pkPredefinedMappings[125] = PredefinedMapping(SCM_DEF_PARALLAX_OFFSET, "ParallaxOffset");
+    ms_pkPredefinedMappings[126] = PredefinedMapping(SCM_DEF_TEXSIZEBASE, "TexSizeBase");
+    ms_pkPredefinedMappings[127] = PredefinedMapping(SCM_DEF_TEXSIZEDARK, "TexSizeDark");
+    ms_pkPredefinedMappings[128] = PredefinedMapping(SCM_DEF_TEXSIZEDETAIL, "TexSizeDetail");
+    ms_pkPredefinedMappings[129] = PredefinedMapping(SCM_DEF_TEXSIZEGLOSS, "TexSizeGloss");
+    ms_pkPredefinedMappings[130] = PredefinedMapping(SCM_DEF_TEXSIZEGLOW, "TexSizeGlow");
+    ms_pkPredefinedMappings[131] = PredefinedMapping(SCM_DEF_TEXSIZEBUMP, "TexSizeBump");
+    ms_pkPredefinedMappings[132] = PredefinedMapping(SCM_DEF_TEXSIZEBUMP, "TexSizeNormal");
+    ms_pkPredefinedMappings[133] = PredefinedMapping(SCM_DEF_TEXSIZEBUMP, "TexSizeParallax");
+    ms_pkPredefinedMappings[134] = PredefinedMapping(SCM_DEF_TEXSIZEDECAL, "TexSizeDecal");
+    ms_pkPredefinedMappings[135] = PredefinedMapping(SCM_DEF_TEXSIZESHADER, "TexSizeShader");
 
     ms_uiObjectMappingCount = SCM_OBJ_COUNT;
     puiBlock = static_cast<size_t*>(
@@ -1532,170 +632,29 @@ void NiShaderConstantMap::_SDMInit() {
     }
     ms_pkObjectMappings = pkMappings;
 
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Invalid");
-    ms_pkObjectMappings[0] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_INVALID, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Dimmer");
-    ms_pkObjectMappings[1] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_DIMMER, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("UndimmedAmbient");
-    ms_pkObjectMappings[2] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_UNDIMMEDAMBIENT, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("UndimmedDiffuse");
-    ms_pkObjectMappings[3] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_UNDIMMEDDIFFUSE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("UndimmedSpecular");
-    ms_pkObjectMappings[4] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_UNDIMMEDSPECULAR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Ambient");
-    ms_pkObjectMappings[5] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_AMBIENT, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Diffuse");
-    ms_pkObjectMappings[6] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_DIFFUSE, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("Specular");
-    ms_pkObjectMappings[7] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_SPECULAR, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldPosition");
-    ms_pkObjectMappings[8] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDPOSITION, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ModelPosition");
-    ms_pkObjectMappings[9] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELPOSITION, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldDirection");
-    ms_pkObjectMappings[10] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDDIRECTION, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("ModelDirection");
-    ms_pkObjectMappings[11] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELDIRECTION, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    // EXE-INLINED 0x438170
-    kString.m_kHandle = NiGlobalStringTable::AddString("WorldTransform");
-    ms_pkObjectMappings[12] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDTRANSFORM, kString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // This is kString's last release, standing in for its destructor. Each earlier release followed by a new handle's
-    // store is the assignment of the next name.
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("ModelTransform");
-    ms_pkObjectMappings[13] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELTRANSFORM, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("SpotAttenuation");
-    ms_pkObjectMappings[14] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_SPOTATTENUATION, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("Attenuation");
-    ms_pkObjectMappings[15] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_ATTENUATION, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("WorldProjectionMatrix");
-    ms_pkObjectMappings[16] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDPROJECTIONMATRIX, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("ModelProjectionMatrix");
-    ms_pkObjectMappings[17] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELPROJECTIONMATRIX, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("WorldProjectionTranslation");
-    ms_pkObjectMappings[18] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDPROJECTIONTRANSLATION, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("ModelProjectionTranslation");
-    ms_pkObjectMappings[19] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELPROJECTIONTRANSLATION, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("WorldClippingPlane");
-    ms_pkObjectMappings[20] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDCLIPPINGPLANE, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("ModelClippingPlane");
-    ms_pkObjectMappings[21] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELCLIPPINGPLANE, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("TexCoordGen");
-    ms_pkObjectMappings[22] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_TEXCOORDGEN, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("WorldProjectionTransform");
-    ms_pkObjectMappings[23] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_WORLDPROJECTIONTRANSFORM, kConstructedString);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
-    ::new (static_cast<void*>(&kConstructedString)) NiFixedString("ModelProjectionTransform");
-    ms_pkObjectMappings[24] = *::new (&kTemp) PredefinedMapping(SCM_OBJ_MODELPROJECTIONTRANSFORM, kConstructedString);
-    // The last releases stand in for the destructors of kTemp and kConstructedString.
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kTemp.m_kMappingName.GetHandle());
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kConstructedString.GetHandle());
+    ms_pkObjectMappings[0] = PredefinedMapping(SCM_OBJ_INVALID, "Invalid");
+    ms_pkObjectMappings[1] = PredefinedMapping(SCM_OBJ_DIMMER, "Dimmer");
+    ms_pkObjectMappings[2] = PredefinedMapping(SCM_OBJ_UNDIMMEDAMBIENT, "UndimmedAmbient");
+    ms_pkObjectMappings[3] = PredefinedMapping(SCM_OBJ_UNDIMMEDDIFFUSE, "UndimmedDiffuse");
+    ms_pkObjectMappings[4] = PredefinedMapping(SCM_OBJ_UNDIMMEDSPECULAR, "UndimmedSpecular");
+    ms_pkObjectMappings[5] = PredefinedMapping(SCM_OBJ_AMBIENT, "Ambient");
+    ms_pkObjectMappings[6] = PredefinedMapping(SCM_OBJ_DIFFUSE, "Diffuse");
+    ms_pkObjectMappings[7] = PredefinedMapping(SCM_OBJ_SPECULAR, "Specular");
+    ms_pkObjectMappings[8] = PredefinedMapping(SCM_OBJ_WORLDPOSITION, "WorldPosition");
+    ms_pkObjectMappings[9] = PredefinedMapping(SCM_OBJ_MODELPOSITION, "ModelPosition");
+    ms_pkObjectMappings[10] = PredefinedMapping(SCM_OBJ_WORLDDIRECTION, "WorldDirection");
+    ms_pkObjectMappings[11] = PredefinedMapping(SCM_OBJ_MODELDIRECTION, "ModelDirection");
+    ms_pkObjectMappings[12] = PredefinedMapping(SCM_OBJ_WORLDTRANSFORM, "WorldTransform");
+    ms_pkObjectMappings[13] = PredefinedMapping(SCM_OBJ_MODELTRANSFORM, "ModelTransform");
+    ms_pkObjectMappings[14] = PredefinedMapping(SCM_OBJ_SPOTATTENUATION, "SpotAttenuation");
+    ms_pkObjectMappings[15] = PredefinedMapping(SCM_OBJ_ATTENUATION, "Attenuation");
+    ms_pkObjectMappings[16] = PredefinedMapping(SCM_OBJ_WORLDPROJECTIONMATRIX, "WorldProjectionMatrix");
+    ms_pkObjectMappings[17] = PredefinedMapping(SCM_OBJ_MODELPROJECTIONMATRIX, "ModelProjectionMatrix");
+    ms_pkObjectMappings[18] = PredefinedMapping(SCM_OBJ_WORLDPROJECTIONTRANSLATION, "WorldProjectionTranslation");
+    ms_pkObjectMappings[19] = PredefinedMapping(SCM_OBJ_MODELPROJECTIONTRANSLATION, "ModelProjectionTranslation");
+    ms_pkObjectMappings[20] = PredefinedMapping(SCM_OBJ_WORLDCLIPPINGPLANE, "WorldClippingPlane");
+    ms_pkObjectMappings[21] = PredefinedMapping(SCM_OBJ_MODELCLIPPINGPLANE, "ModelClippingPlane");
+    ms_pkObjectMappings[22] = PredefinedMapping(SCM_OBJ_TEXCOORDGEN, "TexCoordGen");
+    ms_pkObjectMappings[23] = PredefinedMapping(SCM_OBJ_WORLDPROJECTIONTRANSFORM, "WorldProjectionTransform");
+    ms_pkObjectMappings[24] = PredefinedMapping(SCM_OBJ_MODELPROJECTIONTRANSFORM, "ModelProjectionTransform");
 }

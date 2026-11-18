@@ -530,7 +530,6 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
 }
 
 NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel, bool abForceDynamic) {
-    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
     if (!pModel) {
         return nullptr;
     }
@@ -579,9 +578,7 @@ NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel
             pnewLight = nullptr;
         }
         plight = pnewLight;
-        NiFixedString* pname = ::new (static_cast<void*>(&kName)) NiFixedString(static_cast<const char*>(acName));
-        plight->SetName(*pname);
-        kName.~NiFixedString();
+        plight->SetName(acName);
         pattachnode->AttachChild(plight, 1);
     }
     if (pRequester) {

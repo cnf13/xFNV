@@ -256,28 +256,13 @@ uint32_t NiD3DShaderConstantMap::AddAttributeEntry(
     void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
     NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
 
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    pkEntry->m_kKey = kKey;
-    // Destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiFlags = (uiFlags & 0x0FFFFFFF) | 0x30000000;
     pkEntry->m_uiExtra = uiExtra;
     pkEntry->m_uiShaderRegister = uiShaderRegister;
     pkEntry->m_uiRegisterCount = uiRegisterCount;
 
-    // The variable name, as above.
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
-    kVariableName.SetHandle(
-        pszVariableName ? NiGlobalStringTable::AddString(pszVariableName) : NiGlobalStringTable::NULL_STRING
-    );
-    pkEntry->m_kVariableName = kVariableName;
-    // The destructor of kVariableName.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kVariableName.m_kHandle);
+    pkEntry->m_kVariableName = NiFixedString(pszVariableName);
 
     if (pvDataSource) {
         pkEntry->SetData(uiDataSize, uiDataStride, const_cast<void*>(pvDataSource), bCopyData);
@@ -308,13 +293,7 @@ uint32_t NiD3DShaderConstantMap::AddConstantEntry(
     void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
     NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
 
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    pkEntry->m_kKey = kKey;
-    // Destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    pkEntry->m_kKey = NiFixedString(pszKey);
 
     uint32_t uiFlags = (auiFlags & 0x0FFFFFFF) | 0x10000000;
     if (uiDataSize == 8) {
@@ -354,16 +333,7 @@ uint32_t NiD3DShaderConstantMap::AddConstantEntry(
     pkEntry->m_uiRegisterCount = uiRegisterCount;
     pkEntry->m_uiShaderRegister = uiShaderRegister;
 
-    // The variable name, as above.
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
-    kVariableName.SetHandle(
-        pszVariableName ? NiGlobalStringTable::AddString(pszVariableName) : NiGlobalStringTable::NULL_STRING
-    );
-    pkEntry->m_kVariableName = kVariableName;
-    // The destructor of kVariableName.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kVariableName.m_kHandle);
+    pkEntry->m_kVariableName = NiFixedString(pszVariableName);
 
     pkEntry->m_uiDataStride = uiDataStride;
     pkEntry->m_uiDataSize = uiDataSize;
@@ -402,29 +372,14 @@ uint32_t NiD3DShaderConstantMap::AddGlobalEntry(
     void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
     NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
 
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    pkEntry->m_kKey = kKey;
-    // Destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    pkEntry->m_kKey = NiFixedString(pszKey);
     uint32_t uiFlags = (auiFlags & 0x0FFFFFFF) | 0x40000000;
     pkEntry->m_uiRegisterCount = uiRegisterCount;
     pkEntry->m_uiFlags = uiFlags;
     pkEntry->m_uiExtra = uiExtra;
     pkEntry->m_uiShaderRegister = uiShaderRegister;
 
-    // The variable name, as above.
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
-    kVariableName.SetHandle(
-        pszVariableName ? NiGlobalStringTable::AddString(pszVariableName) : NiGlobalStringTable::NULL_STRING
-    );
-    pkEntry->m_kVariableName = kVariableName;
-    // The destructor of kVariableName.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kVariableName.m_kHandle);
+    pkEntry->m_kVariableName = NiFixedString(pszVariableName);
 
     pkEntry->m_uiDataSize = uiDataSize;
     pkEntry->m_uiDataStride = uiDataStride;
@@ -446,13 +401,7 @@ uint32_t NiD3DShaderConstantMap::AddGlobalEntry(
     }
 
     NiShaderAttributeDesc::AttributeType eType = NiShaderConstantMapEntry::ms_aeAttribType[uiFlags & 0xFF];
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kGlobalKey, std::nullopt, std::nullopt);
-    kGlobalKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    NiShaderFactory::RegisterGlobalShaderConstant(kGlobalKey, eType, uiDataSize, pvDataSource);
-    // The destructor of kGlobalKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kGlobalKey.m_kHandle);
+    NiShaderFactory::RegisterGlobalShaderConstant(pszKey, eType, uiDataSize, pvDataSource);
     return m_eLastError;
 }
 
@@ -468,28 +417,13 @@ uint32_t NiD3DShaderConstantMap::AddOperatorEntry(
     void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
     NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
 
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    pkEntry->m_kKey = kKey;
-    // Destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiShaderRegister = uiShaderRegister;
     pkEntry->m_uiFlags = (uiFlags & 0x0FFFFFFF) | 0x50000000;
     pkEntry->m_uiExtra = uiExtra;
     pkEntry->m_uiRegisterCount = uiRegisterCount;
 
-    // The variable name, as above.
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
-    kVariableName.SetHandle(
-        pszVariableName ? NiGlobalStringTable::AddString(pszVariableName) : NiGlobalStringTable::NULL_STRING
-    );
-    pkEntry->m_kVariableName = kVariableName;
-    // The destructor of kVariableName.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kVariableName.m_kHandle);
+    pkEntry->m_kVariableName = NiFixedString(pszVariableName);
 
     m_eLastError = InsertEntry(pkEntry);
     if (m_eLastError != 0) {
@@ -510,25 +444,10 @@ uint32_t NiD3DShaderConstantMap::AddObjectEntry(
     void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
     NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
 
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    pkEntry->m_kKey = kKey;
-    // Destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiShaderRegister = uiShaderRegister;
 
-    // The variable name, as above.
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
-    kVariableName.SetHandle(
-        pszVariableName ? NiGlobalStringTable::AddString(pszVariableName) : NiGlobalStringTable::NULL_STRING
-    );
-    pkEntry->m_kVariableName = kVariableName;
-    // The destructor of kVariableName.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kVariableName.m_kHandle);
+    pkEntry->m_kVariableName = NiFixedString(pszVariableName);
 
     pkEntry->m_uiExtra = uiObjectIndex;
     pkEntry->m_uiFlags = NiShaderConstantMapEntry::ms_ausObjectFlags[eObjectType] | 0x60000000;
@@ -563,26 +482,11 @@ uint32_t NiD3DShaderConstantMap::AddPredefinedEntry(
     void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
     NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
 
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-    kKey.SetHandle(pszKey ? NiGlobalStringTable::AddString(pszKey) : NiGlobalStringTable::NULL_STRING);
-    pkEntry->m_kKey = kKey;
-    // Destructor of kKey.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+    pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiExtra = uiExtra;
     pkEntry->m_uiShaderRegister = uiShaderRegister;
 
-    // The variable name, as above.
-    // EXE-INLINED 0x438170
-    XFNV_INLINED_LOCAL(NiFixedString, kVariableName, std::nullopt, std::nullopt);
-    kVariableName.SetHandle(
-        pszVariableName ? NiGlobalStringTable::AddString(pszVariableName) : NiGlobalStringTable::NULL_STRING
-    );
-    pkEntry->m_kVariableName = kVariableName;
-    // The destructor of kVariableName.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(kVariableName.m_kHandle);
+    pkEntry->m_kVariableName = NiFixedString(pszVariableName);
 
     pkEntry->m_uiDataSize = uiDataSize;
     pkEntry->m_uiDataStride = uiDataStride;
@@ -619,14 +523,7 @@ uint32_t NiD3DShaderConstantMap::RemoveEntry(const char* pszKey) {
 
     NiShaderConstantMapEntry* pkEntry = m_aspEntries.m_pBase[iIndex];
     if (pkEntry && (pkEntry->m_uiFlags & 0xF0000000) == 0x40000000) {
-        NiGlobalStringTable::AcquireHandle(pkEntry->m_kKey.m_kHandle);
-        // EXE-INLINED 0x48AF40
-        XFNV_INLINED_LOCAL(NiFixedString, kKey, std::nullopt, std::nullopt);
-        kKey.SetHandle(pkEntry->m_kKey.m_kHandle);
-        NiShaderFactory::ReleaseGlobalShaderConstant(kKey);
-        // Destructor of kKey.
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(kKey.m_kHandle);
+        NiShaderFactory::ReleaseGlobalShaderConstant(NiFixedString(pkEntry->m_kKey));
     }
     ShaderConstantMapEntryArray_SetAt(&m_aspEntries, iIndex, NiPointer<NiShaderConstantMapEntry>(nullptr));
     return m_eLastError;

@@ -1192,7 +1192,6 @@ void BSFaceGenManager::QueueHeadParts(TESNPC* apNPC, IO_TASK_PRIORITY aePriority
 }
 
 void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpcData& arNpcData) {
-    XFNV_INLINED_LOCAL(NiFixedString, v36, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_FACEGEN_SYSTEM, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\FaceGen\\BSFaceGenManager.cpp", 3114
@@ -1226,10 +1225,7 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                     ishaderindex = 14;
                 }
                 if ((arNpcData.pModel.operator[](ipart)) && (arNpcData.pTexture.operator[](ipart))) {
-                    NiFixedString* v33 =
-                        ::new (static_cast<void*>(&v36)) NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
-                    NiAVObject* pobj = apNode->GetObjectByName(*v33);
-                    v36.~NiFixedString();
+                    NiAVObject* pobj = apNode->GetObjectByName(arNpcData.pHeadPartNodeName.operator[](ipart));
                     if (pobj) {
                         NiTriBasedGeom* pgeom = pobj->IsTriBasedGeom();
                         if (pgeom) {
@@ -1732,7 +1728,6 @@ void BSFaceGenManager::AttachHairToHead(
     FaceGenNpcData& aNpcData,
     bool abForceNoSkinning
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     BSHash arDirectoryHash;
     BSHash arFileNameHash;
     XFNV_INLINED_LOCAL(NiPointer<NiTriBasedGeom>, spshape, std::nullopt, std::nullopt);
@@ -1786,10 +1781,7 @@ void BSFaceGenManager::AttachHairToHead(
                     spshape.m_pObject->SetAppCulled(true);
                 }
                 char* HairName = BSFaceGenManager::GetHairName(tempHairName, ehairPart);
-                NiFixedString* a2 =
-                    ::new (static_cast<void*>(&apString)) NiFixedString(static_cast<const char*>(HairName));
-                spshape.m_pObject->SetName(*a2);
-                apString.~NiFixedString();
+                spshape.m_pObject->SetName(HairName);
                 BSFaceGenManager::ApplyHairMorph(spshape.m_pObject, aNpcData.fHairLength);
                 filename.SPrintF("Textures\\%s", aNpcData.pHair->GetTextureName());
                 char* v11 = filename.pString;
@@ -2317,7 +2309,6 @@ void BSFaceGenManager::ApplyHairMorph(NiTriBasedGeom* apGeom, float afModifierVa
 }
 
 void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDetail) {
-    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
     NiGeometryDataIteratorNiPoint3 spNewFaceGeo;
     XFNV_INLINED_LOCAL(NiPointer<BSFaceGenModel>, pmodelFG, std::nullopt, std::nullopt);
     NiCloningProcess v20;
@@ -2388,9 +2379,7 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                     );
                     return;
                 }
-                NiFixedString* v13 = ::new (static_cast<void*>(&v14)) NiFixedString("FaceGenFace");
-                spshape.m_pObject->SetName(*v13);
-                v14.~NiFixedString();
+                spshape.m_pObject->SetName("FaceGenFace");
                 pshapeHead = spshape.m_pObject;
                 const NiPoint3* Translate = &pchild->GetTranslate();
                 pshapeHead->SetTranslate(*Translate);
@@ -2620,7 +2609,6 @@ bool BSFaceGenManager::CreateFaceGenHead(
     FaceGenNpcData& arNpcData,
     bool abForceNoSkinning
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     BSHash v43;
     BSHash v44;
     NiMatrix3 matrot;
@@ -2698,10 +2686,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
             if ((pmodelFG) && (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) &&
                 (spshape.m_pObject)) {
                 int32_t v27;
-                NiFixedString* a2 =
-                    ::new (static_cast<void*>(&apString)) NiFixedString(arNpcData.pHeadPartNodeName.operator[](ipart));
-                spshape.m_pObject->SetName(*a2);
-                apString.~NiFixedString();
+                spshape.m_pObject->SetName(arNpcData.pHeadPartNodeName.operator[](ipart));
                 if (!ipart) {
                     pshapeHead = spshape.m_pObject;
                 }
@@ -2838,8 +2823,6 @@ void BSFaceGenManager::AttachEyesToHead(
     FaceGenNpcData& aNpcData,
     bool abForceNoSkinning
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, v21, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<NiTriBasedGeom>, spshape, std::nullopt, std::nullopt);
     NiMatrix3 matrot;
     AutoMemContext tempMemContext(
@@ -2865,9 +2848,7 @@ void BSFaceGenManager::AttachEyesToHead(
             pmodelFG->ApplyCoordinateToNewMesh(&(&aNpcData)->FaceCoord, spshape);
         }
         if (spshape.m_pObject) {
-            NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("FaceGenEyeLeft");
-            spshape.m_pObject->SetName(*a2);
-            apString.~NiFixedString();
+            spshape.m_pObject->SetName("FaceGenEyeLeft");
             if (aNpcData.pEyes) {
                 filename.SPrintF("Textures\\%s", aNpcData.pEyes->GetTextureName());
                 char* v11 = filename.pString;
@@ -2926,9 +2907,7 @@ void BSFaceGenManager::AttachEyesToHead(
             pmodelFG->ApplyCoordinateToNewMesh(&(&aNpcData)->FaceCoord, spshape);
         }
         if (spshape.m_pObject) {
-            NiFixedString* kName = ::new (static_cast<void*>(&v21)) NiFixedString("FaceGenEyeRight");
-            spshape.m_pObject->SetName(*kName);
-            v21.~NiFixedString();
+            spshape.m_pObject->SetName("FaceGenEyeRight");
             if (aNpcData.pEyes) {
                 filename.SPrintF("Textures\\%s", aNpcData.pEyes->GetTextureName());
                 char* v12 = filename.pString;

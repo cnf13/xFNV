@@ -299,7 +299,6 @@ ActiveEffect* ReanimateEffect::Copy() {
 }
 
 void ReanimateEffect::FinishInitLoadGame(Actor* apActor) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     ActiveEffect::FinishInitLoadGame(apActor);
     NiAVObject* pav = apActor->Get3D();
     if (pav) {
@@ -315,9 +314,7 @@ void ReanimateEffect::FinishInitLoadGame(Actor* apActor) {
         if (iState < 30) {
             bhkWorld::SetMotion(pav, hkpMotion::MOTION_DYNAMIC, true, false, true);
         }
-        NiFixedString* v2 = ::new (static_cast<void*>(&apString)) NiFixedString("Bip01 Spine2");
-        NiAVObject* pmove = pav->GetObjectByName(*v2);
-        apString.~NiFixedString();
+        NiAVObject* pmove = pav->GetObjectByName("Bip01 Spine2");
         if (pmove) {
             bhkCollisionObject* pcol = bhkCollisionObject::GetbhkCollisionObject(pmove);
             if (pcol) {

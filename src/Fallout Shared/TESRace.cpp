@@ -1194,7 +1194,6 @@ bool TESRace::GetBodyTexture(
     bool abForceCreate
 ) {
     TESActorBase::SEX esex;
-    XFNV_INLINED_LOCAL(NiFixedString, kFilename, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(BSStringT<char>, fileEGT, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, facecoord, std::nullopt, std::nullopt);
     char path[264];
@@ -1289,10 +1288,7 @@ bool TESRace::GetBodyTexture(
         if (!aspOutModTexture.m_pObject) {
             goto done;
         }
-        NiFixedString* pFilename =
-            ::new (static_cast<void*>(&kFilename)) NiFixedString(static_cast<const char*>(pcString));
-        static_cast<NiSourceTexture*>(aspOutModTexture.m_pObject)->NiSourceTexture::SetFilename(*pFilename);
-        kFilename.~NiFixedString();
+        static_cast<NiSourceTexture*>(aspOutModTexture.m_pObject)->NiSourceTexture::SetFilename(pcString);
         BSTexturePalette::SetTexture(aspOutModTexture.m_pObject, nullptr);
     }
     bResult = true;
@@ -1514,8 +1510,6 @@ bool TESRace::CreateHead(
     BSFaceGenNiNode* v9;
     BSFaceGenNiNode* v11;
     BSFaceGenAnimationData* panimData;
-    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_FACEGEN_SYSTEM, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESRace.cpp", 1571
     );
@@ -1537,9 +1531,7 @@ bool TESRace::CreateHead(
         v11 = nullptr;
     }
     apOutNodeBiped = v11;
-    NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("BSFaceGenNiNodeBiped");
-    apOutNodeBiped->SetName(*a2);
-    apString.~NiFixedString();
+    apOutNodeBiped->SetName("BSFaceGenNiNodeBiped");
     apOutNodeBiped->SetAnimationData(panimData);
     apOutNodeBiped->SetAnimationUpdate(true);
     apOutNodeBiped->SetApplyRotToParent(true);
@@ -1551,9 +1543,7 @@ bool TESRace::CreateHead(
         v9 = nullptr;
     }
     apOutNodeSkinned = v9;
-    NiFixedString* kName = ::new (static_cast<void*>(&v14)) NiFixedString("BSFaceGenNiNodeSkinned");
-    apOutNodeSkinned->SetName(*kName);
-    v14.~NiFixedString();
+    apOutNodeSkinned->SetName("BSFaceGenNiNodeSkinned");
     apOutNodeSkinned->SetAnimationData(panimData);
     apOutNodeSkinned->SetAnimationUpdate(false);
     apOutNodeSkinned->SetApplyRotToParent(false);

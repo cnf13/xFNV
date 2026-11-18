@@ -94,17 +94,13 @@ bool FOPipboyManager::OnIdle() {
 }
 
 void FOPipboyManager::Initialize() {
-    XFNV_INLINED_LOCAL(NiFixedString, v15, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if ((bUsePipboyMode.Bool() && !GetInitialized()) && (pPlayer) && (pPlayer->Get3D(true))) {
         NiGeometry* p3rdPersonScreenGeom = nullptr;
         NiGeometry* pPipboyScreen = nullptr;
         NiNode* v23 = nullptr;
         NiAVObject* v13 = pPlayer->Get3D(true);
-        NiFixedString* v12 = ::new (static_cast<void*>(&apString)) NiFixedString("pipboyscreen");
-        NiAVObject* v1 = v13->GetObjectByName(*v12);
-        NiNode* pPipboyNode = static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v1));
-        apString.~NiFixedString();
+        NiNode* pPipboyNode =
+            static_cast<NiNode*>(NiObject::DynamicCastStatic(&NiNode::ms_RTTI, v13->GetObjectByName("pipboyscreen")));
         if (!pPipboyNode) {
             NiAVObject* v11 = pPlayer->Get3D(true);
             NiFixedString v16("pipboyscreen:0");
@@ -120,10 +116,8 @@ void FOPipboyManager::Initialize() {
         }
         else {
             NiAVObject* v9 = pPlayer->Get3D(true);
-            NiFixedString* v8 = ::new (static_cast<void*>(&v15)) NiFixedString("pipboyscreen:0");
-            NiAVObject* v3 = v9->GetObjectByName(*v8);
+            NiAVObject* v3 = v9->GetObjectByName("pipboyscreen:0");
             pPipboyScreen = static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, v3));
-            v15.~NiFixedString();
             if (pPipboyScreen) {
                 spPipboyRoot.operator=(pPipboyScreen->m_pkParent);
             }
@@ -450,7 +444,6 @@ void FOPipboyManager::ShowPipboyLightEffect(const bool ab3rdPerson, const bool a
 }
 
 void FOPipboyManager::UpdateLightEffect(float afTime) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (bLightEffectFading) {
         FadeLight(afTime);
         ShowPipboyLightEffect(false, true, false);
@@ -462,9 +455,7 @@ void FOPipboyManager::UpdateLightEffect(float afTime) {
         if (fLightEffectFadeTarget == 0.0) {
             ffade = 1.0 - ffade;
         }
-        NiFixedString* PipboyLightEffect = ::new (static_cast<void*>(&apString)) NiFixedString("PipboyLightEffect");
-        NiAVObject* pLightEffect = proot->GetObjectByName(*PipboyLightEffect);
-        apString.~NiFixedString();
+        NiAVObject* pLightEffect = proot->GetObjectByName("PipboyLightEffect");
         if (!pLightEffect) {
             NiFixedString v9("PipboyLightEffect:0");
             NiFixedString* PipboyLightEffect_0 = &v9;
@@ -748,15 +739,10 @@ char FOPipboyManager::CheckOrangeButtonsClicked(char arg0, char a3, float* a4, f
 
 void FOPipboyManager::InitKnobs() {
     double v3;
-    XFNV_INLINED_LOCAL(NiFixedString, v20, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 ecx0;
     NiMatrix3 prn;
     NiAVObject* v16 = pPlayer->Get3D(true);
-    NiFixedString* v15 = ::new (static_cast<void*>(&apString)) NiFixedString("ScrollKnob");
-    NiAVObject* pGeometry = v16->GetObjectByName(*v15);
-    apString.~NiFixedString();
+    NiAVObject* pGeometry = v16->GetObjectByName("ScrollKnob");
     if (!pGeometry) {
         NiAVObject* v14 = pPlayer->Get3D(true);
         NiFixedString v23("ScrollKnob:0");
@@ -769,9 +755,7 @@ void FOPipboyManager::InitKnobs() {
     }
 
     NiAVObject* v12 = pPlayer->Get3D(true);
-    NiFixedString* v11 = ::new (static_cast<void*>(&v22)) NiFixedString("RadNeedle");
-    spKnobs[1].operator=(static_cast<NiGeometry*>(v12->GetObjectByName(*v11)));
-    v22.~NiFixedString();
+    spKnobs[1].operator=(static_cast<NiGeometry*>(v12->GetObjectByName("RadNeedle")));
     if (!spKnobs[1].m_pObject) {
         NiAVObject* v10 = pPlayer->Get3D(true);
         NiFixedString v21("RadNeedle:0");
@@ -779,9 +763,7 @@ void FOPipboyManager::InitKnobs() {
         spKnobs[1].operator=(static_cast<NiGeometry*>(v10->GetObjectByName(*v9)));
     }
     NiAVObject* v8 = pPlayer->Get3D(true);
-    NiFixedString* v7 = ::new (static_cast<void*>(&v20)) NiFixedString("TabKnob");
-    spKnobs[2].operator=(static_cast<NiGeometry*>(v8->GetObjectByName(*v7)));
-    v20.~NiFixedString();
+    spKnobs[2].operator=(static_cast<NiGeometry*>(v8->GetObjectByName("TabKnob")));
     if (!spKnobs[2].m_pObject) {
         NiAVObject* v6 = pPlayer->Get3D(true);
         NiFixedString v19("TabKnob:0");

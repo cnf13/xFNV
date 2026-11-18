@@ -617,8 +617,6 @@ BGSPrimitiveSphere::BGSPrimitiveSphere() {
 BGSPrimitiveSphere::~BGSPrimitiveSphere() {}
 
 void BGSPrimitiveSphere::Build() {
-    XFNV_INLINED_LOCAL(NiFixedString, v17, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (spGeometry.m_pObject) {
         float* v3 = &Radii.operator[](0);
         SetRadius(*v3);
@@ -693,9 +691,7 @@ void BGSPrimitiveSphere::Build() {
         }
         NiRefObject* v22 = static_cast<NiRefObject*>(NiAlphaProperty_);
         NiPointer<NiAlphaProperty> alpha(static_cast<NiAlphaProperty*>(NiAlphaProperty_));
-        NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("primitive: alpha");
-        alpha.m_pObject->SetName(*a2);
-        apString.~NiFixedString();
+        alpha.m_pObject->SetName("primitive: alpha");
         alpha.m_pObject->SetAlphaBlending(true);
         spGeometry.m_pObject->AttachProperty(alpha.m_pObject);
         BSShaderProperty* Property = static_cast<BSShaderProperty*>(spGeometry.m_pObject->GetProperty(3));
@@ -711,9 +707,7 @@ void BGSPrimitiveSphere::Build() {
         spNode.operator=(BSFadeNode_);
         BSFadeNode* v5 = spNode.m_pObject;
         v5->AttachChild(spGeometry.m_pObject, 1);
-        NiFixedString* kName = ::new (static_cast<void*>(&v17)) NiFixedString("Sphere");
-        spNode.m_pObject->SetName(*kName);
-        v17.~NiFixedString();
+        spNode.m_pObject->SetName("Sphere");
         spNode.m_pObject->UpdateProperties();
         spGeometry.m_pObject->UpdateProperties();
     }

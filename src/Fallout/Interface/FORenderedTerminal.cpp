@@ -175,8 +175,6 @@ void FORenderedTerminal::Initialize() {
     NiAlphaProperty* v17;
     int32_t ScreenHeight;
     NiCamera* pcam;
-    XFNV_INLINED_LOCAL(NiFixedString, v30, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiMatrix3 mat2;
     NiMatrix3 rot;
     NiMatrix3 mat1;
@@ -195,18 +193,14 @@ void FORenderedTerminal::Initialize() {
         SwapPlatformLanguageTextures(pgeom);
         bloaded = true;
     }
-    NiFixedString* a5 = ::new (static_cast<void*>(&apString)) NiFixedString("screen");
-    NiAVObject* pscreenObj = pgeom->GetObjectByName(*a5);
-    apString.~NiFixedString();
+    NiAVObject* pscreenObj = pgeom->GetObjectByName("screen");
     NiGeometry* pscreen = pscreenObj->IsGeometry();
     if (!pscreen) {
         NiNode* v2 = pscreenObj->IsNode();
         NiAVObject* v24 = v2->GetAt(0);
         pscreen = v24->IsGeometry();
     }
-    NiFixedString* a4 = ::new (static_cast<void*>(&v30)) NiFixedString("PowerButton");
-    NiAVObject* pexitButtonObj = pgeom->GetObjectByName(*a4);
-    v30.~NiFixedString();
+    NiAVObject* pexitButtonObj = pgeom->GetObjectByName("PowerButton");
     if (pexitButtonObj->IsGeometry()) {
         spExitButton.operator=(static_cast<NiTriStrips*>(pexitButtonObj));
     }

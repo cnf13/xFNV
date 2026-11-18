@@ -72,7 +72,6 @@ void ImageSpaceShaderMenuUnpack::Render(
                 do {
                     uint32_t m_uiWidth;
                     uint32_t m_uiHeight;
-                    XFNV_INLINED_LOCAL(NiFixedString, a2, std::nullopt, std::nullopt);
                     NiRenderTargetGroup* v13 = apRenderer->GetDefaultRenderTargetGroup();
                     if (v13) {
                         Ni2DBuffer* v15 = v13->GetBuffer(0);
@@ -126,12 +125,7 @@ void ImageSpaceShaderMenuUnpack::Render(
                     static_cast<NiScreenElementsData*>(v11->m_spModelData.m_pObject)
                         ->NiScreenElementsData::SetTextures(v12, 0, v31, apParamc, v41, v39);
                     v11->m_spModelData.m_pObject->SetConsistency(NiGeometryData::MUTABLE);
-                    // MAYBE-INLINED 0xBB7858: a write opening NiFixedString's uses: may be its inlined constructor
-                    a2.m_kHandle = NiGlobalStringTable::AddString("Interface: HUD Unpack Geometry");
-                    v11->SetName(a2);
-                    // Destroys a2.
-                    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-                    NiGlobalStringTable::ReleaseHandle(a2.GetHandle());
+                    v11->SetName("Interface: HUD Unpack Geometry");
                     ++v12;
                 }
                 while (v12 < ImageSpaceShaderMenuUnpack::kPackedRegions.m_usSize);

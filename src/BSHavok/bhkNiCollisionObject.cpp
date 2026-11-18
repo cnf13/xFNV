@@ -358,14 +358,9 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
                 NiAVObject* pChild = pNode->m_kChildren.m_pBase[uiChild];
                 NiAVObject* pFound;
                 if (pChild) {
-                    // EXE-INLINED 0x438170
-                    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-                    kName.SetHandle(NiGlobalStringTable::AddString("bhkColDisp"));
                     // Calls the base implementation directly, not virtually: it answers for a child whose own name is
                     // the display node's.
-                    pFound = pChild->NiAVObject::GetObjectByName(kName);
-                    // EXE-INLINED 0x4381B0
-                    NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+                    pFound = pChild->NiAVObject::GetObjectByName("bhkColDisp");
                 }
                 else {
                     pFound = nullptr;
@@ -501,12 +496,7 @@ bool bhkNiCollisionObject::GetFaceUp(NiAVObject* apRoot, const char* apName) {
     }
     NiAVObject* pObject = nullptr;
     if (apName) {
-        // EXE-INLINED 0x438170
-        XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-        kName.SetHandle(NiGlobalStringTable::AddString(apName));
-        pObject = apRoot->GetObjectByName(kName);
-        // EXE-INLINED 0x4381B0
-        NiGlobalStringTable::ReleaseHandle(kName.GetHandle());
+        pObject = apRoot->GetObjectByName(apName);
     }
     if (!pObject) {
         pObject = apRoot;

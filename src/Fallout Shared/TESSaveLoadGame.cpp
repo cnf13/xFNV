@@ -3749,7 +3749,6 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
     uint32_t* a9,
     uint32_t* a10
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     _SYSTEMTIME result;
     uint32_t auiWidth;
     NiPixelFormat akFormat;
@@ -3847,10 +3846,7 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
             arPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
             arPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
             arPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::NONE;
-            NiFixedString* v14 = ::new (static_cast<void*>(&apString)) NiFixedString("SaveGameTexture");
-            const char* HandleString = v14->GetHandleString();
-            v29 = NiSourceTexture::Create(v15, HandleString, arPrefs);
-            apString.~NiFixedString();
+            v29 = NiSourceTexture::Create(v15, NiFixedString("SaveGameTexture").GetHandleString(), arPrefs);
             v29->IncRefCount();
         }
         else {

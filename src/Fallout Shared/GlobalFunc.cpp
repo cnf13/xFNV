@@ -2220,16 +2220,13 @@ bool RemoveEditorMarkers(NiNode* apNode) {
 }
 
 float FindTimeForNoteKey(NiAVObject* pObject, const char* pcSequenceName, const char* pcKeyName) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     uint32_t inumKeys;
     if (pObject) {
         NiControllerManager* pmanager = static_cast<NiControllerManager*>(
             NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pObject->GetControllers())
         );
         if (pmanager) {
-            NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString(pcSequenceName);
-            NiControllerSequence* psequence = pmanager->GetSequenceByName(*a2);
-            apString.~NiFixedString();
+            NiControllerSequence* psequence = pmanager->GetSequenceByName(pcSequenceName);
             if (psequence) {
                 NiTextKeyExtraData* ptext = psequence->GetTextKeys();
                 NiTextKey* pkeys = ptext->GetKeys(inumKeys);

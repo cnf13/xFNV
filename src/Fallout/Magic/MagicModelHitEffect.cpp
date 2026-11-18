@@ -95,7 +95,6 @@ const NiRTTI* MagicModelHitEffect::GetRTTI() const {
 }
 
 bool MagicModelHitEffect::Update(float a1) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (!pTarget || (!pTarget->Get3D() || !MagicHitEffect::Update(a1))) {
         return false;
     }
@@ -105,9 +104,7 @@ bool MagicModelHitEffect::Update(float a1) {
             NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, spObject.m_pObject->GetControllers())
         );
         if (pmanager) {
-            NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString("SpecialIdle_HitEffect");
-            NiControllerSequence* pseq = pmanager->GetSequenceByName(*a2);
-            apString.~NiFixedString();
+            NiControllerSequence* pseq = pmanager->GetSequenceByName("SpecialIdle_HitEffect");
             if (pseq) {
                 double v3 = pseq->m_fLastTime;
                 if ((pseq->m_fEndKeyTime < v3) && (pseq->GetState()) &&
@@ -380,7 +377,6 @@ void MagicModelHitEffect::FinishLoadGame(BGSLoadGameBuffer* a1) {
 }
 
 bool MagicModelHitEffect::Init() {
-    XFNV_INLINED_LOCAL(NiFixedString, v7, std::nullopt, std::nullopt);
     if (pEffect) {
         this->MagicHitEffect::fAge = pEffect->fElapsedSeconds;
         EffectSetting* EffectSetting_ = pEffect->GetEffectSetting();
@@ -431,9 +427,7 @@ bool MagicModelHitEffect::Init() {
     if (!pmanager_2) {
         return false;
     }
-    NiFixedString* v3 = ::new (static_cast<void*>(&v7)) NiFixedString("SpecialIdle_HitEffect");
-    NiControllerSequence* pseq_2 = pmanager_2->GetSequenceByName(*v3);
-    v7.~NiFixedString();
+    NiControllerSequence* pseq_2 = pmanager_2->GetSequenceByName("SpecialIdle_HitEffect");
     if (!pseq_2) {
         return false;
     }

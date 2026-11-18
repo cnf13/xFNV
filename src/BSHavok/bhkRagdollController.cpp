@@ -810,16 +810,7 @@ void bhkRagdollController::InitFootIK(BSSimpleArray<const char*, 1024>& arboneNa
     for (uint32_t i = 0; i < iNumFeet; ++i) {
         const char* pBoneName = arboneNameA.pBuffer[i];
         NiAVObject* pcalfObj = nullptr;
-        XFNV_INLINED_LOCAL(NiFixedString, boneName, std::nullopt, std::nullopt);
-        if (pBoneName) {
-            boneName.m_kHandle = NiGlobalStringTable::AddString(pBoneName);
-        }
-        else {
-            boneName.m_kHandle = NiGlobalStringTable::NULL_STRING;
-        }
-        NiAVObject* pthighObj = BSUtilities::GetObjectByName(pRagdollRoot, boneName, true);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-        NiGlobalStringTable::ReleaseHandle(boneName.GetHandle());
+        NiAVObject* pthighObj = BSUtilities::GetObjectByName(pRagdollRoot, NiFixedString(pBoneName), true);
         // The children are read through the object tested with IsNode, not through IsNode's result.
         if (pthighObj && pthighObj->IsNode() && static_cast<NiNode*>(pthighObj)->m_kChildren.m_usSize) {
             pcalfObj = static_cast<NiNode*>(pthighObj)->m_kChildren.m_pBase[0].m_pObject;
@@ -3252,19 +3243,8 @@ bool bhkRagdollController::ExtractBipedSetupData(
     hkaFootPlacementIkSolver::Setup& arSetupData,
     BSSimpleArray<const char*, 1024>& arboneNameA
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apName, std::nullopt, std::nullopt);
     const char* pcThighName = arboneNameA.pBuffer[0];
-    // EXE-INLINED 0x438170
-    if (pcThighName) {
-        apName.m_kHandle = NiGlobalStringTable::AddString(pcThighName);
-    }
-    else {
-        apName.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    NiAVObject* pthighObj = BSUtilities::GetObjectByName(pRagdollRoot, apName, true);
-    // Releases apName's handle, as its destructor would.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(apName.GetHandle());
+    NiAVObject* pthighObj = BSUtilities::GetObjectByName(pRagdollRoot, NiFixedString(pcThighName), true);
     NiAVObject* pcalfObj = nullptr;
     if (pthighObj && pthighObj->IsNode() && static_cast<NiNode*>(pthighObj)->m_kChildren.m_usSize > 0) {
         pcalfObj = static_cast<NiNode*>(pthighObj)->m_kChildren.m_pBase[0].m_pObject;
@@ -3615,11 +3595,8 @@ void bhkRagdollController::CopyPoseTo3DRec(
     NiAVObject* apPose,
     BSSimpleArray<BoneTransf, 1024>& arPoseA
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, poseBoneName, std::nullopt, std::nullopt);
     BoneTransf bone;
-    const char* pHandle = apPose->m_kName.GetHandle();
-    NiGlobalStringTable::AcquireHandle(pHandle);
-    poseBoneName.m_kHandle = apPose->m_kName.GetHandle();
+    NiFixedString poseBoneName(apPose->m_kName);
     NiAVObject* pbonePose = apPose;
     if (poseBoneName.Equals("Bip01 NonAccum")) {
         pbonePose = apPose->m_pkParent;
@@ -3644,8 +3621,6 @@ void bhkRagdollController::CopyPoseTo3DRec(
             }
         }
     }
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(poseBoneName.GetHandle());
 }
 
 void bhkRagdollController::CopyPoseTo3D(

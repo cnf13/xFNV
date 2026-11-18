@@ -778,7 +778,6 @@ void BSTempEffectSimpleDecal::ClipMesh(NiAVObject* apAVObj) {
 }
 
 void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe) {
-    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
     NiMatrix3 kinvobjrot;
     NiMatrix3 kobjrot;
     XFNV_INLINED_LOCAL(NiPointer<NiObject>, spobj, std::nullopt, std::nullopt);
@@ -800,9 +799,7 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
         ::new (&spobj) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
         BGSDecalManager::spDebugDecalBox.m_pObject->CreateDeepCopy(spobj);
         NiNode* ptmp = static_cast<NiNode*>(spobj.m_pObject);
-        NiFixedString* v14 = ::new (static_cast<void*>(&v22)) NiFixedString("DebugDecalBox01:0");
-        NiAVObject* pavobj = ptmp->GetObjectByName(*v14);
-        v22.~NiFixedString();
+        NiAVObject* pavobj = ptmp->GetObjectByName("DebugDecalBox01:0");
         NiGeometry* spdata = static_cast<NiGeometry*>(pavobj);
         TESHavokUtilities::RemoveHavokFromSceneGraph(ptmp);
         NiPoint3* pverts = spdata->GetVertices();

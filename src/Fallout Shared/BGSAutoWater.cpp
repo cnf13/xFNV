@@ -610,8 +610,6 @@ void BGSAutoWater::GeneratePolygons(TESObjectCELL* apCell) {
 // Creates a placeable water reference for each polygon of the list that has its geometry, then removes and deletes the
 // polygon.
 void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
-    XFNV_INLINED_LOCAL(NiFixedString, kWaterName, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, kNodeName, std::nullopt, std::nullopt);
     AutoMemContext kMemContext(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\BGSAutoWater.cpp", 717
     );
@@ -635,12 +633,8 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                     NiStencilProperty* pstencilprop;
                     WaterShaderProperty* pwatershadprop;
                     TESObjectREFR* pwaterRef;
-                    ::new (static_cast<void*>(&kNodeName)) NiFixedString("AutoWaterNode");
-                    ppoly->GetRootNode()->SetName(kNodeName);
-                    kNodeName.~NiFixedString();
-                    ::new (static_cast<void*>(&kWaterName)) NiFixedString("AutoWater");
-                    ppoly->Get3D()->SetName(kWaterName);
-                    kWaterName.~NiFixedString();
+                    ppoly->GetRootNode()->SetName("AutoWaterNode");
+                    ppoly->Get3D()->SetName("AutoWater");
                     TESObjectREFR* v41 = static_cast<TESObjectREFR*>(ourMalloc(sizeof(TESObjectREFR)));
                     if (v41) {
                         pwaterRef = ::new (v41) TESObjectREFR;

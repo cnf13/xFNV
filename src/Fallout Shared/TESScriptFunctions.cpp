@@ -19534,7 +19534,6 @@ bool Script::PlayGroupFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     ANIM_GROUP_ENUM eAnimGroup;
     int32_t aeFlags;
     aeFlags = 0;
@@ -19582,10 +19581,7 @@ bool Script::PlayGroupFunction(
                         );
                     }
                     if (pmanager) {
-                        NiFixedString* a2 =
-                            ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[eAnimGroup].pName);
-                        NiControllerSequence* pseq = pmanager->GetSequenceByName(*a2);
-                        apString.~NiFixedString();
+                        NiControllerSequence* pseq = pmanager->GetSequenceByName(animGroupInfo[eAnimGroup].pName);
                         if (pseq) {
                             for (uint32_t n = 0;; ++n) {
                                 uint32_t SequenceCount = pmanager->GetSequenceCount();
@@ -19682,7 +19678,6 @@ bool Script::IsAnimPlayingFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     int32_t uiGroup[2];
     uiGroup[0] = 255;
     uiGroup[1] = 0;
@@ -19731,10 +19726,7 @@ bool Script::IsAnimPlayingFunction(
                         }
                     }
                     else {
-                        NiFixedString* a2 =
-                            ::new (static_cast<void*>(&apString)) NiFixedString(animGroupInfo[uiGroup[0]].pName);
-                        NiControllerSequence* pseq_2 = pmanager->GetSequenceByName(*a2);
-                        apString.~NiFixedString();
+                        NiControllerSequence* pseq_2 = pmanager->GetSequenceByName(animGroupInfo[uiGroup[0]].pName);
                         if ((pseq_2) && (pseq_2->GetState())) {
                             afReturnValue = 1.0;
                         }
@@ -22156,11 +22148,7 @@ bool Script::SwapTextureOnRef(
         if (pRef) {
             NiAVObject* pMesh = (NiAVObject*)pRef->Get3D();
             if (pMesh) {
-                XFNV_INLINED_LOCAL(NiFixedString, kGeometryName, std::nullopt, std::nullopt);
-                NiFixedString* pName =
-                    ::new (static_cast<void*>(&kGeometryName)) NiFixedString(static_cast<const char*>(GeometryName));
-                NiAVObject* pGeom = pMesh->GetObjectByName(*pName);
-                kGeometryName.~NiFixedString();
+                NiAVObject* pGeom = pMesh->GetObjectByName(GeometryName);
                 if (pGeom) {
                     BSShaderPPLightingProperty* pLightShader;
                     int32_t v21;

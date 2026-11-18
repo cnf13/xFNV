@@ -42,7 +42,6 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
     NiLines* lines;
     NiColorA* color_2;
     NiPoint3* vertex;
-    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
     NiPoint3 dir_2;
     NiPoint3 v70;
     NiPoint3 v71;
@@ -162,15 +161,7 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
     }
     lines->m_kLocal.m_Translate = NiPoint3_ZERO;
     lines->m_kLocal.m_Rotate = NiMatrix3_IDENTITY;
-    if ("BSTestObjects DirArrow") {
-        v22.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects DirArrow");
-    }
-    else {
-        v22.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    lines->SetName(v22);
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v22.GetHandle());
+    lines->SetName("BSTestObjects DirArrow");
     return lines;
 }
 
@@ -187,7 +178,6 @@ NiAVObject* BSTestObjects::CreateCylinder(
     NiColorA* colors;
     NiPoint3* normals;
     NiPoint3* vertices;
-    XFNV_INLINED_LOCAL(NiFixedString, v34, std::nullopt, std::nullopt);
     uint16_t numVerticesPerStrip = 2 * aiSlices + 2;
     uint32_t arraySize = numVerticesPerStrip * aiStacks;
     NiPoint3* v64 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(
@@ -352,15 +342,7 @@ NiAVObject* BSTestObjects::CreateCylinder(
     else {
         cylinder = nullptr;
     }
-    if ("BSTestObjects Cylinder") {
-        v34.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects Cylinder");
-    }
-    else {
-        v34.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    cylinder->SetName(v34);
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v34.GetHandle());
+    cylinder->SetName("BSTestObjects Cylinder");
     cylinder->CalculateNormals();
     return (NiAVObject*)cylinder;
 }
@@ -467,16 +449,7 @@ NiAVObject* BSTestObjects::CreateTorus(
             aiSlices, pusStripLengths, pusStripLists
         );
     }
-    // EXE-INLINED none: NiFixedString(const char*), which interns a non-null string
-    XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-    kName.SetHandle(NiGlobalStringTable::AddString("BSTestObjects Torus"));
-    pkStrips->SetName(kName);
-    // EXE-INLINED none: ~NiFixedString, which drops the reference unless the handle is the null string. The count is
-    // the first word of the interned buffer, 8 bytes before the characters (raw string-table memory).
-    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-    if (kHandle != NiGlobalStringTable::NULL_STRING) {
-        InterlockedDecrementUInt32(reinterpret_cast<uint32_t*>(const_cast<char*>(kHandle) - 8));
-    }
+    pkStrips->SetName("BSTestObjects Torus");
     NiGeometry* pkGeometry = pkStrips;
     pkGeometry->CalculateNormals();
     return pkStrips;
@@ -702,7 +675,6 @@ NiAVObject* BSTestObjects::CreateCoordinateJack(float afScale) {
     NiLines* lines;
     NiColorA* color;
     NiPoint3* vertex;
-    XFNV_INLINED_LOCAL(NiFixedString, v14, std::nullopt, std::nullopt);
     NiPoint3* v38 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(6 * sizeof(NiPoint3)));
     if (v38) {
         int32_t v12 = 6;
@@ -788,16 +760,7 @@ NiAVObject* BSTestObjects::CreateCoordinateJack(float afScale) {
     }
     lines->m_kLocal.m_Translate = NiPoint3_ZERO;
     lines->m_kLocal.m_Rotate = NiMatrix3_IDENTITY;
-    if ("BSTestObjects Coordinate Jack") {
-        v14.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects Coordinate Jack");
-    }
-    else {
-        v14.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    lines->SetName(v14);
-    // Releases the string handle of v14, as its destructor would.
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v14.GetHandle());
+    lines->SetName("BSTestObjects Coordinate Jack");
     return lines;
 }
 
@@ -1177,7 +1140,6 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
     NiPoint3* normals;
     NiPoint3* vertices;
     NiNode* sphere;
-    XFNV_INLINED_LOCAL(NiFixedString, v131, std::nullopt, std::nullopt);
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         sphere = ::new (apMemory) NiNode(0);
@@ -1185,15 +1147,7 @@ NiAVObject* BSTestObjects::CreateSphere(float afRadius, uint16_t aiSlices, uint1
     else {
         sphere = nullptr;
     }
-    if ("BSTestObjects Sphere") {
-        v131.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects Sphere");
-    }
-    else {
-        v131.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    sphere->SetName(v131);
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v131.GetHandle());
+    sphere->SetName("BSTestObjects Sphere");
     float nsign_2 = 1.0f;
     float drho = 3.1415927f / static_cast<double>(aiStacks);
     float dtheta = 3.1415927f * 2.0 / static_cast<double>(aiSlices);
@@ -1670,7 +1624,6 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
     NiLines* lines;
     NiColorA* color_2;
     NiPoint3* vertex;
-    XFNV_INLINED_LOCAL(NiFixedString, v13, std::nullopt, std::nullopt);
     NiPoint3 v19;
     float fsize = afLength / 6.0;
     NiPoint3* v32 = static_cast<NiPoint3*>(MemoryManager_Singleton.Allocate(5 * sizeof(NiPoint3)));
@@ -1749,15 +1702,7 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
     }
     lines->m_kLocal.m_Translate = NiPoint3_ZERO;
     lines->m_kLocal.m_Rotate = NiMatrix3_IDENTITY;
-    if ("BSTestObjects Arrow") {
-        v13.m_kHandle = NiGlobalStringTable::AddString("BSTestObjects Arrow");
-    }
-    else {
-        v13.m_kHandle = NiGlobalStringTable::NULL_STRING;
-    }
-    lines->SetName(v13);
-    // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
-    NiGlobalStringTable::ReleaseHandle(v13.GetHandle());
+    lines->SetName("BSTestObjects Arrow");
     return lines;
 }
 

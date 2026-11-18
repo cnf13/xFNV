@@ -1471,15 +1471,6 @@ void Main::InitSceneGraph() {
     int32_t v33;
     ShadowSceneNode* pshadowSceneNode;
     SceneGraph* pSceneGraph;
-    XFNV_INLINED_LOCAL(NiFixedString, v41, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v44, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v47, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v50, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v53, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v56, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v59, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v62, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WORLD_SG, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 3916
     );
@@ -1558,9 +1549,7 @@ void Main::InitSceneGraph() {
     static_cast<BSMultiBoundNode*>(Main::spSkyRoot.m_pObject)
         ->BSMultiBoundNode::SetCullingMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     Main::spSkyRoot.m_pObject->SetFixedBound(true);
-    NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Sky");
-    Main::spSkyRoot.m_pObject->SetName(*kName);
-    apString.~NiFixedString();
+    Main::spSkyRoot.m_pObject->SetName("Sky");
     NiNode* a4 = Main::spSkyRoot.m_pObject;
     pshadowSceneNode->SetAt(0, a4);
     NiNode* v63 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
@@ -1574,9 +1563,7 @@ void Main::InitSceneGraph() {
     Main::spWeatherRoot.operator=(v28);
     Main::spWeatherRoot.m_pObject->SetAlwaysDraw(true);
     Main::spWeatherRoot.m_pObject->SetFixedBound(true);
-    NiFixedString* v27 = ::new (static_cast<void*>(&v62)) NiFixedString("Weather");
-    Main::spWeatherRoot.m_pObject->SetName(*v27);
-    v62.~NiFixedString();
+    Main::spWeatherRoot.m_pObject->SetName("Weather");
     NiNode* a4a = Main::spWeatherRoot.m_pObject;
     pshadowSceneNode->SetAt(1u, a4a);
     Main::CreateMenuRootNode();
@@ -1589,9 +1576,7 @@ void Main::InitSceneGraph() {
         BSClearZNode_ = nullptr;
     }
     Main::pLandLOD = (NiNode*)BSClearZNode_;
-    NiFixedString* LODRoot = ::new (static_cast<void*>(&v59)) NiFixedString("LODRoot");
-    Main::pLandLOD->SetName(*LODRoot);
-    v59.~NiFixedString();
+    Main::pLandLOD->SetName("LODRoot");
     pshadowSceneNode->SetAt(2u, Main::pLandLOD);
     NiNode* v57 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
     if (v57) {
@@ -1603,9 +1588,7 @@ void Main::InitSceneGraph() {
     NiNode* plodnode_3 = plodnode;
     plodnode->SetAlwaysDraw(true);
     plodnode_3->SetFixedBound(true);
-    NiFixedString* name = ::new (static_cast<void*>(&v56)) NiFixedString("LandLOD");
-    plodnode_3->SetName(*name);
-    v56.~NiFixedString();
+    plodnode_3->SetName("LandLOD");
     Main::pLandLOD->AttachChild(plodnode_3, 1);
     BSShaderManager::fLODLandDrop = fLODLandDropAmount.Float();
     NiNode* v54 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
@@ -1618,9 +1601,7 @@ void Main::InitSceneGraph() {
     plodnode_3 = plodnode_2;
     plodnode_2->SetAlwaysDraw(true);
     plodnode_3->SetFixedBound(true);
-    NiFixedString* v21 = ::new (static_cast<void*>(&v53)) NiFixedString("DistantRefLOD");
-    plodnode_3->SetName(*v21);
-    v53.~NiFixedString();
+    plodnode_3->SetName("DistantRefLOD");
     Main::pLandLOD->AttachChild(plodnode_3, 1);
     NiNode* v51 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
     if (v51) {
@@ -1632,9 +1613,7 @@ void Main::InitSceneGraph() {
     Main::pWaterLOD = WaterLOD;
     WaterLOD->SetAlwaysDraw(true);
     Main::pWaterLOD->SetFixedBound(true);
-    NiFixedString* v19 = ::new (static_cast<void*>(&v50)) NiFixedString("WaterLOD");
-    Main::pWaterLOD->SetName(*v19);
-    v50.~NiFixedString();
+    Main::pWaterLOD->SetName("WaterLOD");
     Main::pLandLOD->AttachChild(Main::pWaterLOD, 1);
     NiNode* v48 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
     if (v48) {
@@ -1645,9 +1624,7 @@ void Main::InitSceneGraph() {
     }
     plodtreenode->SetAlwaysDraw(true);
     plodtreenode->SetFixedBound(true);
-    NiFixedString* v17 = ::new (static_cast<void*>(&v47)) NiFixedString("LOD Trees");
-    plodtreenode->SetName(*v17);
-    v47.~NiFixedString();
+    plodtreenode->SetName("LOD Trees");
     plodnode_3->AttachChild(plodtreenode, 1);
     DistantLODShaderProperty::SetLODTreeParent(plodtreenode);
     BGSTerrainManager::SetTreeNode(plodtreenode);
@@ -1661,9 +1638,7 @@ void Main::InitSceneGraph() {
     Main::pObjectLOD = ObjectLODRoot;
     ObjectLODRoot->SetAlwaysDraw(true);
     Main::pObjectLOD->SetFixedBound(true);
-    NiFixedString* v15 = ::new (static_cast<void*>(&v44)) NiFixedString("ObjectLODRoot");
-    Main::pObjectLOD->SetName(*v15);
-    v44.~NiFixedString();
+    Main::pObjectLOD->SetName("ObjectLODRoot");
     pshadowSceneNode->SetAt(3u, Main::pObjectLOD);
     BSParticleSystemManager* v42 =
         static_cast<BSParticleSystemManager*>(NiMemObject::operator new(sizeof(BSParticleSystemManager)));
@@ -1675,9 +1650,7 @@ void Main::InitSceneGraph() {
     }
     NiRefObject* v43 = (NiRefObject*)BSParticleSystemManager_;
     Main::spParticleSystemManager.operator=(BSParticleSystemManager_);
-    NiFixedString* v13 = ::new (static_cast<void*>(&v41)) NiFixedString("Master Particle Systems");
-    Main::spParticleSystemManager.m_pObject->SetName(*v13);
-    v41.~NiFixedString();
+    Main::spParticleSystemManager.m_pObject->SetName("Master Particle Systems");
     BSParticleSystemManager* a4b = Main::spParticleSystemManager.m_pObject;
     pshadowSceneNode->SetAt(5u, a4b);
     NiNode* CameraRoot = Main::spWorldRoot.m_pObject->GetCameraRoot();

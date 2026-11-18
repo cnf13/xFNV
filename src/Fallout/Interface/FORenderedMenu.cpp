@@ -654,8 +654,6 @@ void FORenderedMenu::SetMenuRoot(NiAVObject* apMenuRoot) {
 
 bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNode* apShadowSceneNode) {
     ShadowSceneNode* pSSnode;
-    XFNV_INLINED_LOCAL(NiFixedString, strRenderedMenuLight, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     bool bsuccess = false;
     if (apShadowSceneNode) {
         pSSnode = apShadowSceneNode;
@@ -666,9 +664,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
     if (FORenderedMenu::GetParentNodeToRender()) {
         ClearLight();
         NiAVObject* pSceneRoot = FORenderedMenu::GetParentNodeToRender();
-        NiFixedString* v10 = ::new (static_cast<void*>(&apString)) NiFixedString(apLightNodeName);
-        NiAVObject* plightObject = pSceneRoot->GetObjectByName(*v10);
-        apString.~NiFixedString();
+        NiAVObject* plightObject = pSceneRoot->GetObjectByName(apLightNodeName);
         NiNode* plightNode = nullptr;
         if (plightObject) {
             plightNode = plightObject->IsNode();
@@ -700,10 +696,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
         }
 
         NiAVObject* pMenuNode = FORenderedMenu::GetParentNodeToRender();
-        NiFixedString* cRenderedMenuLight =
-            ::new (static_cast<void*>(&strRenderedMenuLight)) NiFixedString("RenderedMenuLight");
-        NiAVObject* plight = pMenuNode->GetObjectByName(*cRenderedMenuLight);
-        strRenderedMenuLight.~NiFixedString();
+        NiAVObject* plight = pMenuNode->GetObjectByName("RenderedMenuLight");
         if (plight) {
             spLight.operator=(static_cast<NiRefObject*>(NiObject::DynamicCastStatic(&NiPointLight::ms_RTTI, plight)));
             if (spLight.m_pObject) {

@@ -996,9 +996,6 @@ void RouletteMenu::SetBetChip() {
 
 void RouletteMenu::Prepare3DElements() {
     NiNode* v17;
-    XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v23, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     char modelPath[252];
     TESModelTextureSwap* Model_ = RouletteMenu::pCasino->GetModel(9);
     const char* v1 = Model_->GetModel();
@@ -1069,15 +1066,9 @@ void RouletteMenu::Prepare3DElements() {
     NiTimeController* pTableAnimController = pRouletteTableGeometry->GetController(&NiControllerManager::ms_RTTI);
     if (pTableAnimController) {
         pTableAnimManager = static_cast<NiControllerManager*>(pTableAnimController);
-        NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("Spin_1");
-        pTableAnimations[0] = pTableAnimManager->GetSequenceByName(*kName);
-        apString.~NiFixedString();
-        NiFixedString* v10 = ::new (static_cast<void*>(&v23)) NiFixedString("Spin_2");
-        pTableAnimations[1] = pTableAnimManager->GetSequenceByName(*v10);
-        v23.~NiFixedString();
-        NiFixedString* v9 = ::new (static_cast<void*>(&v22)) NiFixedString("Spin_3");
-        pTableAnimations[2] = pTableAnimManager->GetSequenceByName(*v9);
-        v22.~NiFixedString();
+        pTableAnimations[0] = pTableAnimManager->GetSequenceByName("Spin_1");
+        pTableAnimations[1] = pTableAnimManager->GetSequenceByName("Spin_2");
+        pTableAnimations[2] = pTableAnimManager->GetSequenceByName("Spin_3");
         pTableAnimManager->DeactivateAll(0.0f);
         NiTimeController::StartAnimations(pRouletteTableGeometry);
     }

@@ -187,8 +187,6 @@ void AbsorbEffect::Start3D() {
     TESObjectREFR* pcaster;
     TESObjectREFR* ptarget;
     NiNode* v29;
-    XFNV_INLINED_LOCAL(NiFixedString, v33, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         v29 = ::new (apMemory) NiNode(0);
@@ -236,9 +234,7 @@ void AbsorbEffect::Start3D() {
         if (panim) {
             NiControllerManager* ControllerManager = panim->GetControllerManager();
             NiAVObjectPalette* ObjectPalette = ControllerManager->GetObjectPalette();
-            NiFixedString* v22 = ::new (static_cast<void*>(&apString)) NiFixedString("Bip01 Spine1");
-            spSource.operator=(static_cast<NiNode*>(ObjectPalette->GetAVObject(*v22)));
-            apString.~NiFixedString();
+            spSource.operator=(static_cast<NiNode*>(ObjectPalette->GetAVObject("Bip01 Spine1")));
             if (spSource.operator==(static_cast<NiNode*>(nullptr))) {
                 spSource.operator=(ptarget->Get3D());
             }
@@ -247,9 +243,7 @@ void AbsorbEffect::Start3D() {
         if (v40) {
             NiControllerManager* v4 = v40->GetControllerManager();
             NiAVObjectPalette* v21 = v4->GetObjectPalette();
-            NiFixedString* v20 = ::new (static_cast<void*>(&v33)) NiFixedString("Bip01 Spine1");
-            spTarget.operator=(static_cast<NiNode*>(v21->GetAVObject(*v20)));
-            v33.~NiFixedString();
+            spTarget.operator=(static_cast<NiNode*>(v21->GetAVObject("Bip01 Spine1")));
             if (spTarget.operator==(static_cast<NiNode*>(nullptr))) {
                 spTarget.operator=(pcaster->Get3D());
             }

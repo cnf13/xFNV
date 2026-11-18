@@ -581,10 +581,6 @@ void BGSTerrainChunkLoadTask::Run() {
 }
 
 void BGSTerrainChunkLoadTask::Finish() {
-    XFNV_INLINED_LOCAL(NiFixedString, v25, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v27, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, v28, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     if (spMesh.m_pObject) {
         if (this->bCanceled) {
             int32_t bCanceled = this->bCanceled;
@@ -599,23 +595,21 @@ void BGSTerrainChunkLoadTask::Finish() {
             int32_t iY = this->iY;
             int32_t iX = this->iX;
             int32_t iLevel = this->iLevel;
-            NiFixedString* v22 =
-                ::new (static_cast<void*>(&apString)) NiFixedString("Terrain LOD | Level %i | Cells (%i,%i)-(%i,%i)");
-            std::sprintf(pcString, v22->GetHandleString(), iLevel, iX, iY, v11, v14);
-            apString.~NiFixedString();
-            NiFixedString* a2 = ::new (static_cast<void*>(&v28)) NiFixedString(static_cast<const char*>(pcString));
-            spMesh.m_pObject->SetName(*a2);
-            v28.~NiFixedString();
+            std::sprintf(
+                pcString, NiFixedString("Terrain LOD | Level %i | Cells (%i,%i)-(%i,%i)").GetHandleString(), iLevel, iX,
+                iY, v11, v14
+            );
+            spMesh.m_pObject->SetName(pcString);
             if (spWater.m_pObject) {
                 int32_t v15 = this->iY + this->iLevel - 1;
                 int32_t v12 = this->iX + this->iLevel - 1;
                 int32_t v9 = this->iY;
                 int32_t v6 = this->iX;
                 int32_t v3 = this->iLevel;
-                NiFixedString* v20 =
-                    ::new (static_cast<void*>(&v27)) NiFixedString("Water LOD | Level %i | Cells (%i,%i)-(%i,%i)");
-                std::sprintf(pcString, v20->GetHandleString(), v3, v6, v9, v12, v15);
-                v27.~NiFixedString();
+                std::sprintf(
+                    pcString, NiFixedString("Water LOD | Level %i | Cells (%i,%i)-(%i,%i)").GetHandleString(), v3, v6,
+                    v9, v12, v15
+                );
                 NiFixedString v26(static_cast<const char*>(pcString));
                 NiFixedString* kName = &v26;
                 spWater.m_pObject->SetName(*kName);
@@ -626,10 +620,10 @@ void BGSTerrainChunkLoadTask::Finish() {
                 int32_t v10 = this->iY;
                 int32_t v7 = this->iX;
                 int32_t v4 = this->iLevel;
-                NiFixedString* v18 = ::new (static_cast<void*>(&v25))
-                    NiFixedString("Water LOD w/ refl.) | Level %i | Cells (%i,%i)-(%i,%i)");
-                std::sprintf(pcString, v18->GetHandleString(), v4, v7, v10, v13, v16);
-                v25.~NiFixedString();
+                std::sprintf(
+                    pcString, NiFixedString("Water LOD w/ refl.) | Level %i | Cells (%i,%i)-(%i,%i)").GetHandleString(),
+                    v4, v7, v10, v13, v16
+                );
                 NiFixedString v24(static_cast<const char*>(pcString));
                 NiFixedString* v17 = &v24;
                 spWaterAtReflectionHeight.m_pObject->SetName(*v17);

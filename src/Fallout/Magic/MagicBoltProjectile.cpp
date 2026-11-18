@@ -828,7 +828,6 @@ void MagicBoltProjectile::Collide(
 
 void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apActiveEffect) {
     EffectItem* EffectItem_;
-    XFNV_INLINED_LOCAL(NiFixedString, v29, std::nullopt, std::nullopt);
     if (!apActiveEffect ||
         ((EffectItem_ = apActiveEffect->pEffect, EffectItem_ == GetDominantEffect()) &&
          pTarget != apTarget->GetTargetStatsObject())) {
@@ -898,9 +897,7 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
         pav_2 = (NiAVObject*)v24->Get3D();
         if (pav_2) {
             MagicBoltProjectile::AreaBolt* pnewBolt;
-            NiFixedString* v23 = ::new (static_cast<void*>(&v29)) NiFixedString("Bip01 Spine2");
-            NiAVObject* ptarget = pav_2->GetObjectByName(*v23);
-            v29.~NiFixedString();
+            NiAVObject* ptarget = pav_2->GetObjectByName("Bip01 Spine2");
             if (!ptarget) {
                 ptarget = pav_2;
             }

@@ -390,7 +390,6 @@ bool TESAmmo::Compare(TESForm* apCompare) {
 
 NiAVObject* TESAmmo::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
     int32_t icount;
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiAVObject* pobj = TESBoundObject::Clone3D(pRequester, deepCopy);
     if (pRequester) {
         icount = (&pRequester->m_Extra)->GetCount();
@@ -417,10 +416,7 @@ NiAVObject* TESAmmo::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
                 }
                 BSStringT<char> arrowName;
                 arrowName.SPrintF("Arrow%d", n_2);
-                NiFixedString* v7 =
-                    ::new (static_cast<void*>(&apString)) NiFixedString(static_cast<const char*>(arrowName.pString));
-                pchild = pobj->GetObjectByName(*v7);
-                apString.~NiFixedString();
+                pchild = pobj->GetObjectByName(static_cast<const char*>(arrowName.pString));
                 if (pchild) {
                     NiNode* v6 = pchild->m_pkParent;
                     v6->DetachChild(pchild);
