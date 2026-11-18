@@ -494,8 +494,7 @@ bool CombatState::FindBestDodgeLocation(
     }
     uint32_t uiPick = RandomUnsignedInt(uiCount);
     cLastDodgeDirection = acDirection[uiPick];
-    CombatTimeStamp kNow;
-    XFNV_RECONSTRUCT(CombatTimeStamp)(&kNow, CombatTimer::GetTimer());
+    CombatTimeStamp kNow(CombatTimer::GetTimer());
     fLastDodgeSearch = kNow;
     apRetLocation->SetPoint(akPoints[acPointIndex[cLastDodgeDirection]], nullptr);
     return true;
@@ -1653,20 +1652,17 @@ TESObjectWEAP* CombatState::GetWeaponByCombatType(COMBAT_WEAPON_TYPE aeType) {
 }
 
 void CombatState::PerformedMeleeAttack(Actor* apTarget) {
-    CombatTimeStamp TimeStamp;
-    XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+    CombatTimeStamp TimeStamp(CombatTimer::GetTimer());
     fLastAttackTimeStamp = TimeStamp;
 }
 
 // Records the projectile's attack time, then starts the firing window if fFiringStartedTimeStamp is still the -FLT_MAX
 // sentinel; the window starts only on an exact match with -FLT_MAX.
 void CombatState::FiredProjectile(Projectile* apProjectile) {
-    CombatTimeStamp TimeStamp;
-    XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+    CombatTimeStamp TimeStamp(CombatTimer::GetTimer());
     fLastAttackTimeStamp = TimeStamp;
     if (static_cast<float>(fFiringStartedTimeStamp) == -3.4028234663852886e+38f) {
-        CombatTimeStamp StartTimeStamp;
-        XFNV_RECONSTRUCT(CombatTimeStamp)(&StartTimeStamp, CombatTimer::GetTimer());
+        CombatTimeStamp StartTimeStamp(CombatTimer::GetTimer());
         fFiringStartedTimeStamp = StartTimeStamp;
     }
 }
@@ -1770,10 +1766,9 @@ bool CombatState::CheckMovement(
     bool abCheckLocationReachable,
     bool abIgnoreCombatAreaCheck
 ) {
-    BGSWorldLocation WorldLocation;
     return CheckMovement(
-        *XFNV_RECONSTRUCT(BGSWorldLocation)(&WorldLocation, arPoint, static_cast<TESObjectCELL*>(apSpace)),
-        abCheckLocationReachable, abIgnoreCombatAreaCheck
+        BGSWorldLocation(arPoint, static_cast<TESObjectCELL*>(apSpace)), abCheckLocationReachable,
+        abIgnoreCombatAreaCheck
     );
 }
 
@@ -1917,8 +1912,7 @@ void CombatState::SetSecondaryCoverLocation(CombatCoverLocation* apCombatCoverLo
 void CombatState::AddUnreachableLocation(const BGSWorldLocation& arWorldLocation) {
     uint32_t uiIndex = UnreachableLocations.AddUninitialized();
     UnreachableLocations.GetAt(uiIndex).Location = arWorldLocation;
-    CombatTimeStamp TimeStamp;
-    XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+    CombatTimeStamp TimeStamp(CombatTimer::GetTimer());
     UnreachableLocations.GetAt(uiIndex).fTimeStamp = TimeStamp;
 }
 

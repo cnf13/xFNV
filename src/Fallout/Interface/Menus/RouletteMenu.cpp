@@ -1758,8 +1758,6 @@ void RouletteMenu::SetupPossibleBets() {
 }
 
 bool RouletteMenu::RemoveBet(int32_t aiIndex) {
-    NiUpdateData v15;
-    NiUpdateData apMemory;
     BSSimpleList<RouletteMenu::RouletteBet*>* blist;
     if (aiIndex >= 159 || aiIndex < 0) {
         return false;
@@ -1787,12 +1785,12 @@ bool RouletteMenu::RemoveBet(int32_t aiIndex) {
         float a2a = fxTranslate;
         NiAVObject* v4 = RouletteMenu::spModel.m_pObject->GetAt(static_cast<uint32_t>(iNextModelIndex + 10));
         v4->SetTranslate(a2a, a3a, 0.0f);
-        NiUpdateData* a4a = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+        NiUpdateData apMemory(0.0f, 0, 0);
         NiAVObject* v5 = RouletteMenu::spModel.m_pObject->GetAt(static_cast<uint32_t>(iNextModelIndex));
-        v5->Update(*a4a);
-        NiUpdateData* a4b = XFNV_RECONSTRUCT(NiUpdateData)(&v15, 0.0f, 0, 0);
+        v5->Update(apMemory);
+        NiUpdateData v15(0.0f, 0, 0);
         NiAVObject* v6 = RouletteMenu::spModel.m_pObject->GetAt(static_cast<uint32_t>(iNextModelIndex + 10));
-        v6->Update(*a4b);
+        v6->Update(v15);
     }
     --iNumBetsSet;
     RouletteMenu::RouletteBet* delBet = blist->m_item;
@@ -1805,14 +1803,12 @@ bool RouletteMenu::RemoveBet(int32_t aiIndex) {
 // Geometry pointers are indexed from pRouletteTableGeometry by model index: model a1 is pBetGeometry[a1 - 3] and its
 // shadow pBetShadowGeometry[a1 - 3].
 void RouletteMenu::RemoveBetNif(int32_t a1) {
-    NiUpdateData v5;
-    NiUpdateData apMemory;
     pBetGeometry[a1 - 3]->SetTranslate(0.0f, 0.0f, -5.0f);
     pBetShadowGeometry[a1 - 3]->SetTranslate(0.0f, 0.0f, -5.0f);
-    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
-    pBetGeometry[a1 - 3]->Update(*updated);
-    NiUpdateData* a4 = XFNV_RECONSTRUCT(NiUpdateData)(&v5, 0.0f, 0, 0);
-    pBetShadowGeometry[a1 - 3]->Update(*a4);
+    NiUpdateData apMemory(0.0f, 0, 0);
+    pBetGeometry[a1 - 3]->Update(apMemory);
+    NiUpdateData v5(0.0f, 0, 0);
+    pBetShadowGeometry[a1 - 3]->Update(v5);
 }
 
 void RouletteMenu::SetWinningSlotLuckyAndAnimToPlay() {

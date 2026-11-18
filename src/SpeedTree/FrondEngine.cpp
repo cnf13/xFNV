@@ -93,8 +93,7 @@ std::string IdvFormatString(const char* szFormat, ...) {
     va_list vlArgs;
     va_start(vlArgs, szFormat);
     std::vsprintf(szBuffer, szFormat, vlArgs);
-    std::string strResult;
-    XFNV_RECONSTRUCT(std::string)(&strResult, szBuffer);
+    std::string strResult(szBuffer);
     return strResult;
 }
 
@@ -215,8 +214,7 @@ void CFrondEngine::Parse(CTreeFileAccess& cFile) {
                         switch (nToken) {
                             case File_FrondTextureFilename: {
                                 std::string strParsed = cFile.ParseString();
-                                std::string strFilename;
-                                XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&strFilename, strParsed);
+                                std::string strFilename(strParsed);
                                 sTexture.m_strFilename.assign(strFilename, 0, std::string::npos);
                                 CIdvFilename strNoPath;
                                 CIdvFilename* pNoPath = sTexture.m_strFilename.NoPath(&strNoPath);
@@ -300,8 +298,7 @@ void CFrondEngine::Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLighti
                 nVertices += (2 * m_nProfileSegments - 1) * m_vGuideLods[0][i].m_vVertices.size();
                 break;
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "default reached in CFrondEngine::Compute()");
+                std::string strDetails("default reached in CFrondEngine::Compute()");
                 throw IdvFileError(strDetails, false);
             }
         }
@@ -344,8 +341,7 @@ void CFrondEngine::Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLighti
             }
             break;
         default: {
-            std::string strDetails;
-            XFNV_RECONSTRUCT(std::string)(&strDetails, "default reached in CFrondEngine::Compute()");
+            std::string strDetails("default reached in CFrondEngine::Compute()");
             throw IdvFileError(strDetails, false);
         }
     }

@@ -760,16 +760,15 @@ void hkaNURBS::CurveDerivs(
     int32_t d,
     hkaNURBS::Point* CK
 ) {
-    hkaNURBS::Point kZero;
     float nders[4][4];
     int32_t du = d < p ? d : p;
     for (int32_t k = p + 1; k <= d; ++k) {
-        CK[k] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
+        CK[k] = hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
     }
     int32_t span = hkaNURBS::FindSpan(n, p, u, U);
     hkaNURBS::DersBasisFuns(span, u, p, du, U, nders);
     for (int32_t k = 0; k <= du; ++k) {
-        CK[k] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
+        CK[k] = hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
         for (int32_t j = 0; j <= p; ++j) {
             CK[k] += mulScalarPoint(nders[k][j], &P.m_data[span - p + j]);
         }
@@ -1482,8 +1481,7 @@ hkBool hkaNURBS::LeastSquaresFit(
 
     // R[0] = R[m] = 0; R[k] = Q[k] - N(0, p)(ub[k]) Q[0] - N(n, p)(ub[k]) Q[m].
     hkaNURBS::Point kSum;
-    hkaNURBS::Point* pZero = XFNV_RECONSTRUCT(hkaNURBS::Point)(&kSum, 0.0f, 0.0f, 0.0f, 0.0f);
-    hkaNURBS::Point& rLastR = pR[m] = *pZero;
+    hkaNURBS::Point& rLastR = pR[m] = hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
     pR[0] = rLastR;
     for (int32_t k = 1; k < m; ++k) {
         const hkaNURBS::Point* pQ = Q.m_data;
@@ -1652,7 +1650,6 @@ void hkaNURBS::DegreeElevateCurve(
     hkaNURBS::Point bpts[4];
     hkaNURBS::Point ebpts[4];
     hkaNURBS::Point Nextbpts[4];
-    hkaNURBS::Point kZero;
     hkaNURBS::Point kMulPrev;
     float bezalfs[4][4];
     float alfs[4];
@@ -1775,7 +1772,7 @@ void hkaNURBS::DegreeElevateCurve(
         }
         // Degree elevate the Bezier segment; only points lbz..ph are used below.
         for (int32_t iE = lbz; iE <= ph; ++iE) {
-            ebpts[iE] = *XFNV_RECONSTRUCT(hkaNURBS::Point)(&kZero, 0.0f, 0.0f, 0.0f, 0.0f);
+            ebpts[iE] = hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
             int32_t mpi = p < iE ? p : iE;
             for (int32_t j = iE - t < 0 ? 0 : iE - t; j <= mpi; ++j) {
                 ebpts[iE] = ebpts[iE].Add(mulScalarPoint(bezalfs[iE][j], &bpts[j]));

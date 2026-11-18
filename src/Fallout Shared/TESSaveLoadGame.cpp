@@ -1506,8 +1506,7 @@ bool TESSaveLoadGame::LoadForm(TESForm* apForm) {
     }
     uint32_t uiFlags = CheckNewReference(apForm, pChanges->GetFlags());
     SetCurrentVersion(kBufferHeader.cVersion);
-    LoadFormHeader kFormHeader;
-    XFNV_RECONSTRUCT(LoadFormHeader)(&kFormHeader, &kBufferHeader, apForm->GetFormID(), uiFlags);
+    LoadFormHeader kFormHeader(&kBufferHeader, apForm->GetFormID(), uiFlags);
     SetCurrentlyLoadingFormHeader(&kFormHeader);
     bool bWasLoading = GetLoading();
     SetLoading(true);

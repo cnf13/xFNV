@@ -1334,15 +1334,10 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
     if (!aLocation.GetNavMeshAndTriangle(spmesh, usfirstTri)) {
         return false;
     }
-    // The fan's handle is built with its empty constructor, then copy-constructed from a temporary handle to the start
-    // triangle.
     NavmeshTriFan firstTri;
     firstTri.hTri.~FastNavMeshTriHandle();
     ::new (&firstTri.hTri) FastNavMeshTriHandle;
-    FastNavMeshTriHandle startTri;
-    XFNV_RECONSTRUCT(FastNavMeshTriHandle)(
-        &firstTri.hTri, *XFNV_RECONSTRUCT(FastNavMeshTriHandle)(&startTri, spmesh.operator NavMesh*(), usfirstTri)
-    );
+    firstTri.hTri = FastNavMeshTriHandle(spmesh.operator NavMesh*(), usfirstTri);
     for (int32_t e = 0; e < 3; ++e) {
         NiPoint3 vert1;
         NiPoint3 vert2;
@@ -1352,8 +1347,7 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
     }
     allTris.Add(firstTri);
     for (uint32_t i = 0; i < allTris.iSize; ++i) {
-        NavmeshTriFan fan;
-        XFNV_RECONSTRUCT(NavmeshTriFan)(&fan, allTris.GetAt(static_cast<int32_t>(i)));
+        NavmeshTriFan fan(allTris.GetAt(static_cast<int32_t>(i)));
         for (int32_t e = 0; e < 3; ++e) {
             if (!fan.bInradius[e]) {
                 continue;
@@ -1401,7 +1395,6 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
         return false;
     }
     FastNavMeshEdgeLocation closestEdge;
-    XFNV_RECONSTRUCT(FastNavMeshEdgeHandle)(&closestEdge);
     float fBestSqrDist = 3.4028235e+38f;
     for (uint32_t i = 0; i < foundOpenEdges.iSize; ++i) {
         NiPoint3 vert1;
@@ -1889,8 +1882,7 @@ Pathing::FIND_CLOSEST_EDGES_RESULT Pathing::FindClosestEdges(
     std::qsort(&FoundEdges.GetAt(0), FoundEdges.iSize, sizeof(FastNavMeshEdgeLocationProxy), &EdgeSortFunction);
     uint32_t icount = BSMIN(aiMaxCount, FoundEdges.iSize);
     for (uint32_t i = 0; i < icount; ++i) {
-        NavMeshEdgeLocation edgeLoc;
-        aRetEdges.Add(*XFNV_RECONSTRUCT(NavMeshEdgeLocation)(&edgeLoc, FoundEdges.GetAt(static_cast<int32_t>(i)).Edge));
+        aRetEdges.Add(NavMeshEdgeLocation(FoundEdges.GetAt(static_cast<int32_t>(i)).Edge));
     }
     if (icount) {
         return Pathing::FIND_CLOSEST_EDGES_OK;
@@ -2432,7 +2424,6 @@ uint32_t Pathing::FindTeleportDoorsForLocation(
 }
 
 bool Pathing::CheckSphere(PathingLocation& aSphereCenter, float afRadius) {
-    NavMeshTriHandle triHandle;
     NiPoint3 v22;
     NiPoint3 v23;
     NiPoint3 v25;
@@ -2462,7 +2453,7 @@ bool Pathing::CheckSphere(PathingLocation& aSphereCenter, float afRadius) {
             }
             uint16_t usTriangle = trisForThisMesh.GetAt(static_cast<int32_t>(j));
             NavMeshInfo* pInfo = navmeshes.GetAt(static_cast<int32_t>(i)).m_pObject->GetNavMeshInfo();
-            potentialTriangles.Add(*XFNV_RECONSTRUCT(NavMeshTriHandle)(&triHandle, pInfo, usTriangle));
+            potentialTriangles.Add(NavMeshTriHandle(pInfo, usTriangle));
         }
     }
     openEdges_t openEdges;
@@ -2675,7 +2666,7 @@ NavmeshTriFan::NavmeshTriFan(const NavmeshTriFan& arOther)
   : hTri(arOther.hTri), bInradius{arOther.bInradius[0], arOther.bInradius[1], arOther.bInradius[2]} {}
 
 NavmeshTriFan* NavmeshTriFan::Assign(NavmeshTriFan* apThis, const NavmeshTriFan& arOther) {
-    XFNV_RECONSTRUCT(FastNavMeshTriHandle)(&apThis->hTri, arOther.hTri);
+    apThis->hTri = arOther.hTri;
     for (uint32_t S2 = 0; S2 < 3; ++S2) {
         apThis->bInradius[S2] = arOther.bInradius[S2];
     }

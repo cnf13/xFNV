@@ -1101,13 +1101,11 @@ int32_t hkGeometryUtility::calcConvexHullVertices(
     const hkArray<hkVector4, hkContainerHeapAllocator>& points,
     hkArray<hkVector4, hkContainerHeapAllocator>& hullVertices
 ) {
-    hkgpConvexHull::BuildConfig apMemory;
     if (points.m_size >= 4) {
         hkgpConvexHull apThis;
         int32_t m_size = points.m_size;
         hkVector4* m_data = points.m_data;
-        hkgpConvexHull::BuildConfig* v4 = XFNV_RECONSTRUCT(hkgpConvexHull::BuildConfig)(&apMemory);
-        if (apThis.buildFromPlanes(m_data, m_size, *v4) != -1) {
+        if (apThis.buildFromPlanes(m_data, m_size, hkgpConvexHull::BuildConfig()) != -1) {
             apThis.fetchPositions(hkgpConvexHull::INTERNAL_VERTICES, hullVertices);
             return 0;
         }

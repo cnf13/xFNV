@@ -338,7 +338,6 @@ void LoadedAreaBound::Update(TESObjectCELL* apCell, GridCellArray* apCellGrid) {
 // It realigns its frame to 16: the filter, the creation info, the box and both extents sit at 16-aligned slots. Each
 // corner component goes through hkVector4::operator() and is rounded to a float before hkVector4::set takes it.
 void LoadedAreaBound::Create(TESObjectCELL* apCell, const hkAabb& arboundAABB) {
-    alignas(16) CFilter kFilter;
     bhkWorld* pworld = apCell->GetbhkWorld();
     for (uint32_t ui = 0; ui < 6; ++ui) {
         float fheightOffset;
@@ -429,7 +428,7 @@ void LoadedAreaBound::Create(TESObjectCELL* apCell, const hkAabb& arboundAABB) {
         bound.m_min.operator=(minExtent);
         hkAabb_operator_assign(&ci.aabb, bound);
         uint32_t uiSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-        ci.m_collisionFilterInfo = XFNV_RECONSTRUCT(CFilter)(&kFilter, L_UNIDENTIFIED, uiSystemGroup, P_OTHER)->iFilter;
+        ci.m_collisionFilterInfo = CFilter(L_UNIDENTIFIED, uiSystemGroup, P_OTHER).iFilter;
         void* pMemory = NiMemObject::operator new(sizeof(bhkAabbPhantom));
         bhkAabbPhantom* pPhantom = pMemory ? ::new (pMemory) bhkAabbPhantom(ci) : nullptr;
         this->spPhantomA[ui].operator=(pPhantom);

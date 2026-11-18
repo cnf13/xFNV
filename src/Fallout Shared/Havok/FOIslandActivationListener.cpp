@@ -174,9 +174,7 @@ void FOIslandActivationListener::entityAddedCallback(hkpEntity* apEntity) {
         }
         return;
     }
-    CFilter kFilter;
-    if (XFNV_RECONSTRUCT(CFilter)(&kFilter, apEntity->getCollidable()->getCollisionFilterInfo())->GetLayer() !=
-        L_DEBRIS_LARGE) {
+    if (CFilter(apEntity->getCollidable()->getCollisionFilterInfo()).GetLayer() != L_DEBRIS_LARGE) {
         return;
     }
     bhkNiCollisionObject* pColObj = bhkNiCollisionObject::Getbhk(apEntity);

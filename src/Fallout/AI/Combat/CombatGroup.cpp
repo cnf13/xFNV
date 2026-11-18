@@ -781,7 +781,6 @@ CombatTarget* CombatGroup::GetCombatTargetForActor(Actor* apActor) {
 }
 
 bool CombatGroup::AddMember(Actor* apActor) {
-    CombatMember apMemory;
     if (!apActor) {
         return false;
     }
@@ -806,8 +805,7 @@ bool CombatGroup::AddMember(Actor* apActor) {
         return false;
     }
 
-    CombatMember* v3 = XFNV_RECONSTRUCT(CombatMember)(&apMemory, apActor);
-    MemberArray.Add(*v3);
+    MemberArray.Add(CombatMember(apActor));
     pCombatManager->NotifyCombatGroupAddedMember(this, apActor);
     if ((bDebugCombatGroups.Bool()) && (apActor->Get3D())) {
         NiColorA v8 = BSTestObjects::GetColor(iGroupNum);
@@ -826,7 +824,6 @@ CombatMember* CombatGroup::GetCombatMemberForActor(Actor* apActor) {
 }
 
 bool CombatGroup::AddTarget(Actor* apActor) {
-    CombatTarget apMemory;
     if (!apActor) {
         return false;
     }
@@ -852,8 +849,7 @@ bool CombatGroup::AddTarget(Actor* apActor) {
         return false;
     }
 
-    CombatTarget* v4 = XFNV_RECONSTRUCT(CombatTarget)(&apMemory, apActor, iSearchCount);
-    TargetArray.Add(*v4);
+    TargetArray.Add(CombatTarget(apActor, iSearchCount));
     pCombatManager->NotifyCombatGroupAddedTarget(this, apActor);
     return true;
 }
@@ -885,8 +881,7 @@ void CombatGroup::NotifyMemberHit(Actor* apMember, Actor* apAttacker) {
     if (apAttacker) {
         CombatTarget* pTarget = GetCombatTargetForActor(apAttacker);
         if (pTarget) {
-            CombatTimeStamp kTimeStamp;
-            XFNV_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
+            CombatTimeStamp kTimeStamp(CombatTimer::GetTimer());
             pTarget->fLastAttackedMemberTimeStamp = kTimeStamp;
             BGSWorldLocation kLocation;
             pTarget->LastAttackedMemberLocation = *apAttacker->TESObjectREFR::GetWorldLocation(&kLocation);
@@ -1237,8 +1232,7 @@ void CombatGroup::ClearGroupStrategyAssignments() {
 void CombatGroup::AddSearchLocation(const BGSWorldLocation& arLocation, float afScore, uint32_t aiTargetID) {
     uint32_t uiIndex = SearchLocations.AddUninitialized();
     SearchLocations.GetAt(uiIndex).WorldLoc = arLocation;
-    CombatTimeStamp kTimeStamp;
-    XFNV_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
+    CombatTimeStamp kTimeStamp(CombatTimer::GetTimer());
     SearchLocations.GetAt(uiIndex).fTimeStamp = kTimeStamp;
     SearchLocations.GetAt(uiIndex).iTargetID = aiTargetID;
     SearchLocations.GetAt(uiIndex).fScore = afScore;
@@ -1752,7 +1746,6 @@ PathingAvoidNodeArray* CombatGroup::CreateMovementAvoidNodeArray(
     PathingAvoidNodeArray* apExistingAvoidNodeArray,
     Actor* apIgnoreActor
 ) {
-    PathingAvoidNode v17;
     NiPoint3 result;
     NiPoint3 arPoint;
     NiPoint3 v25;
@@ -1789,8 +1782,7 @@ PathingAvoidNodeArray* CombatGroup::CreateMovementAvoidNodeArray(
                 }
                 float fScalar = fMovementTargetAvoidCost.Float();
                 float* v11 = &fMovementTargetAvoidRadius.Float();
-                PathingAvoidNode* v12 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v17, arPoint, *v11, fScalar);
-                v26->Add(*v12);
+                v26->Add(PathingAvoidNode(arPoint, *v11, fScalar));
             }
         }
     }
@@ -1799,7 +1791,6 @@ PathingAvoidNodeArray* CombatGroup::CreateMovementAvoidNodeArray(
 
 PathingAvoidNodeArray*
 CombatGroup::CreateFleeAvoidNodeArray(Actor* apActor, PathingAvoidNodeArray* apExistingAvoidNodeArray) {
-    PathingAvoidNode v12;
     BGSWorldLocation ecx0;
     BGSWorldLocation apLocation;
     BSSimpleArray<PathingAvoidNode, 1024>* v20 = apExistingAvoidNodeArray;
@@ -1827,8 +1818,7 @@ CombatGroup::CreateFleeAvoidNodeArray(Actor* apActor, PathingAvoidNodeArray* apE
             float afCost = fCombatFleeTargetAvoidCost.Float();
             float afRadius = fCombatFleeTargetAvoidRadius.Float();
             NiPoint3* v5 = ecx0.GetPoint();
-            PathingAvoidNode* v6 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v12, *v5, afRadius, afCost);
-            v20->Add(*v6);
+            v20->Add(PathingAvoidNode(*v5, afRadius, afCost));
         }
     }
     return static_cast<PathingAvoidNodeArray*>(v20);
@@ -2199,7 +2189,6 @@ PathingAvoidNodeArray* CombatGroup::CreateFlankingAvoidNodeArray(
     float afExtraRadius,
     PathingAvoidNodeArray* apExistingAvoidNodeArray
 ) {
-    PathingAvoidNode v9;
     NiPoint3 targetCenter;
     float fradius = 1024.0f;
     float fboundingSphereRadiusSquared = ComputeTargetBoundingSphere(targetCenter);
@@ -2219,8 +2208,7 @@ PathingAvoidNodeArray* CombatGroup::CreateFlankingAvoidNodeArray(
         pavoidNodeArray = pavoidNodeArray_2;
     }
     float v7 = fMovementTargetAvoidCost.Float() * 4.0;
-    PathingAvoidNode* v5 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v9, targetCenter, fradius, v7);
-    pavoidNodeArray->Add(*v5);
+    pavoidNodeArray->Add(PathingAvoidNode(targetCenter, fradius, v7));
     return pavoidNodeArray;
 }
 
@@ -2454,8 +2442,7 @@ void CombatGroup::StartSearch() {
     iSearchCount = 1;
     SearchUpdateTimer.Reset(0.5f);
     SearchAreaUpdateTimer.Reset(fCombatSearchAreaUpdateTime.Float());
-    CombatTimeStamp kStarted;
-    XFNV_RECONSTRUCT(CombatTimeStamp)(&kStarted, CombatTimer::GetTimer());
+    CombatTimeStamp kStarted(CombatTimer::GetTimer());
     fSearchStartedTimeStamp = kStarted;
     CombatTimeStamp flastDetectedTargetTimeStamp;
     flastDetectedTargetTimeStamp.~CombatTimeStamp();

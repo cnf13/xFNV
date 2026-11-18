@@ -2431,7 +2431,8 @@ uint32_t* MobileObject::GetCollisionFilter(uint32_t* apResult) {
         pFilter = &pController->GetCollisionFilter(&kControllerFilter)->iFilter;
     }
     else {
-        pFilter = &XFNV_RECONSTRUCT(CFilter)(&kEmptyFilter, 0)->iFilter;
+        kEmptyFilter = CFilter(0);
+        pFilter = &kEmptyFilter.iFilter;
     }
     *apResult = *pFilter;
     return apResult;

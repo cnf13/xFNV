@@ -1350,14 +1350,8 @@ void CombatUtilities::AddLOSDebugGeomtry(
     NiColorA* apLOSColor,
     NiColorA* apHitColor
 ) {
-    NiColorA kDefaultHitColor;
-    const NiColorA* pHitColor =
-        apHitColor ? apHitColor : XFNV_RECONSTRUCT(NiColorA)(&kDefaultHitColor, 1.0f, 0.0f, 0.0f, 1.0f);
-    NiColorA kHitColor = *pHitColor;
-    NiColorA kDefaultLOSColor;
-    const NiColorA* pLOSColor =
-        apLOSColor ? apLOSColor : XFNV_RECONSTRUCT(NiColorA)(&kDefaultLOSColor, 1.0f, 1.0f, 0.0f, 1.0f);
-    NiColorA kLOSColor = *pLOSColor;
+    NiColorA kHitColor = apHitColor ? *apHitColor : NiColorA(1.0f, 0.0f, 0.0f, 1.0f);
+    NiColorA kLOSColor = apLOSColor ? *apLOSColor : NiColorA(1.0f, 1.0f, 0.0f, 1.0f);
     NiPoint3 kHitPoint = apHitObj ? (arEndLocation - arStartLocation) * afHitFraction + arStartLocation : arEndLocation;
     NiLines* pLine = MakeLine(arStartLocation, kLOSColor, kHitPoint, kLOSColor, true);
     TES::pInstance->AddTempDebugObject(pLine, fDebugCombatProjectileLOSTime.Float());

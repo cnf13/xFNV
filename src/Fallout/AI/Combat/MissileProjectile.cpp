@@ -381,8 +381,7 @@ bool MissileProjectile::AddImpact(
     bCanAdd = ImpactList.IsEmpty() || ImpactList.GetItem()->bProcessed;
     COL_LAYER eLayer;
     if (apTargetCollidable) {
-        CFilter kFilter;
-        eLayer = XFNV_RECONSTRUCT(CFilter)(&kFilter, apTargetCollidable->getCollisionFilterInfo())->GetLayer();
+        eLayer = CFilter(apTargetCollidable->getCollisionFilterInfo()).GetLayer();
     }
     else {
         eLayer = (COL_LAYER)0;

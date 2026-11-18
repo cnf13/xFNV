@@ -385,10 +385,7 @@ bool BSTreeNode::SetTexturePropOnBillboard(NiTexturingProperty* apProp) {
 
 void BSTreeNode::UpdateBSTreeNode(float afTime) {
     ImpactMixer::COLLISION_SOUND csdata_2;
-    hkVector4 vAV;
-    hkVector4 vLV;
     ImpactMixer::COLLISION_SOUND csdata;
-    hkVector4 vLocation;
     if (spModel.m_pObject) {
         BSTreeModel* v59 = this->spModel.m_pObject;
         v59->Update(this);
@@ -432,11 +429,8 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                             float v10 = RandomFloat0To1();
                             hkVector4 normal(v10, a3, a4, 0.0f);
                             normal.fastNormalize3();
-                            XFNV_RECONSTRUCT(hkVector4)(
-                                &vLocation,
-                                (&collArray->operator[]<hkpRootCdBodyPair>(i))
-                                    ->m_rootCollidableB->m_motion.pState->m_transform.m_translation
-                            );
+                            hkVector4 vLocation((&collArray->operator[]<hkpRootCdBodyPair>(i))
+                                                    ->m_rootCollidableB->m_motion.pState->m_transform.m_translation);
                             point.m_contact.set(vLocation, normal, 0.0f);
                             point.m_rootCollidableA = pTree->GetCollidable();
                             point.m_rootCollidableB = (&collArray->operator[]<hkpRootCdBodyPair>(i))->m_rootCollidableB;
@@ -466,8 +460,8 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                         if (v54 >= static_cast<double>(v41)) {
                             HavokMaterialType Material;
                             alignas(16) NiPoint3 dum_2;
-                            XFNV_RECONSTRUCT(hkVector4)(&vLV, pRigidBody->getLinearVelocity());
-                            XFNV_RECONSTRUCT(hkVector4)(&vAV, pRigidBody->getAngularVelocity());
+                            hkVector4 vLV(pRigidBody->getLinearVelocity());
+                            hkVector4 vAV(pRigidBody->getAngularVelocity());
                             if (vLV.lengthSquared3().operator float() > 1.0) {
                                 double v36 = vLV.length3().operator float();
                                 int32_t v35 = RandomInt(iLowDamp.Int(), gs_iHighDamp.Int());

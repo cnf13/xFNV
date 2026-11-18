@@ -164,8 +164,7 @@ SIdvBranchInfo* SIdvBranchInfo::Parse(CTreeFileAccess& cFile) {
     }
     int32_t eToken = cFile.ParseToken();
     if (eToken != File_BeginBranchLevel) {
-        std::string strDetails;
-        XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed branch data");
+        std::string strDetails("malformed branch data");
         throw IdvFileError(strDetails, false);
     }
     eToken = cFile.ParseToken();
@@ -202,8 +201,7 @@ SIdvBranchInfo* SIdvBranchInfo::Parse(CTreeFileAccess& cFile) {
                 break;
             }
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed general branch information");
+                std::string strDetails("malformed general branch information");
                 throw IdvFileError(strDetails, false);
             }
         }

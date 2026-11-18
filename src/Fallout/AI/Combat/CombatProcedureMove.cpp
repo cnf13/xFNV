@@ -573,7 +573,6 @@ void CombatProcedureMove::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 }
 
 bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoidNodeArray) {
-    PathingAvoidNode v20;
     NiPoint3 faceTargetLocation;
     Actor* pattacker = GetAttacker();
     Actor* ptarget = GetTarget();
@@ -638,8 +637,7 @@ bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoid
                 float a3a = fMovementNearTargetAvoidCost.Float();
                 float afRadiusa = fMovementNearTargetAvoidRadius.Float();
                 const NiPoint3* v5 = &pTargetRef->GetLocationOnReference();
-                PathingAvoidNode* v6 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v20, *v5, afRadiusa, a3a);
-                arspAvoidNodeArray.m_pObject->Add(*v6);
+                arspAvoidNodeArray.m_pObject->Add(PathingAvoidNode(*v5, afRadiusa, a3a));
             }
         }
     }

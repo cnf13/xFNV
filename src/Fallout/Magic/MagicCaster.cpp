@@ -634,7 +634,6 @@ void MagicCaster::DoExplosion(
     float afPowerScale,
     float afAreaScale
 ) {
-    CFilter v34;
     alignas(16) NiPoint3 v35;
     NiPoint3 v36;
     NiPoint3 v37;
@@ -663,8 +662,7 @@ void MagicCaster::DoExplosion(
             NiPoint3* v12 = ::new (&v35) NiPoint3(aSourceLoc + *v11);
             NI2HK(info.aabb.m_max, *v12);
             uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
-            info.m_collisionFilterInfo =
-                XFNV_RECONSTRUCT(CFilter)(&v34, L_SPELLEXPLOSION, NewSystemGroup, P_OTHER)->iFilter;
+            info.m_collisionFilterInfo = CFilter(L_SPELLEXPLOSION, NewSystemGroup, P_OTHER).iFilter;
             bhkAabbPhantom pphantom(info);
             bhkWorld* pw = apCell->GetbhkWorld();
             pphantom.bhkWorldObject::Add(pw);
@@ -746,8 +744,7 @@ void MagicCaster::ExplodeRigidBody(
         NiPoint3 kImpulseNi = kOffset * fPower;
         alignas(16) hkVector4 kImpulse;
         NI2HK(kImpulse, kImpulseNi);
-        alignas(16) hkSimdReal kMass;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kMass, apRigidBody->getMass());
+        alignas(16) hkSimdReal kMass(apRigidBody->getMass());
         kImpulse.mul4(kMass);
         apRigidBody->activate();
         apRigidBody->applyLinearImpulse(kImpulse);

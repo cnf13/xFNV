@@ -1056,7 +1056,6 @@ void SurgeryMenu::PlaceToolInWindow(int32_t aiX, int32_t aiY) {
 
 void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
     TESForm* FormByEditorID;
-    NiColor kColor;
     NiPoint3 dst;
     NiPoint3 korigin;
     NiPoint3 kdir;
@@ -1096,7 +1095,7 @@ void SurgeryMenu::PlaceDecal(NiPoint2 aToolLocation, bool abInWound) {
     pdecalData.fDecalHeight = 0.5f;
     pdecalData.fDecalDepth = 20.0f;
     pdecalData.fPlacementRadius = 0.0f;
-    pdecalData.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(&kColor, 1.0f, 0.0f, 0.0f);
+    pdecalData.fVertexColor = NiColor(1.0f, 0.0f, 0.0f);
     pdecalData.fDecalEpsilon = 75.0f;
     pdecalData.bAlphaTesting = true;
     pdecalData.bAlphaBlending = true;

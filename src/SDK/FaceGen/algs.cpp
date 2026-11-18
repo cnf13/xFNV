@@ -60,8 +60,7 @@ std::string* futComposeNewFname(std::string* _Result, const std::string& path,
 // The exe's cleanup-only EH frame is left out.
 std::string* futRemoveBadFnameCharacters(std::string* _Result, const std::string& fname)
 {
-	std::string sOut;
-	XFNV_RECONSTRUCT(std::string)(&sOut, "");
+	std::string sOut("");
 	char acSource[2];
 	acSource[0] = 0;
 	acSource[1] = 0;

@@ -414,11 +414,6 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     NiGeometryDataIteratorNiPoint2 kTextureIter;
     NiGeometryDataIteratorNiBlendWeights kWeightIter;
     NiGeometryDataIteratorNiBlendIndices kIndexIter;
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kVertexIter);
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kNormalIter);
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint2>)(&kTextureIter);
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiBlendWeights>)(&kWeightIter);
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiBlendIndices>)(&kIndexIter);
     NiAdditionalGeometryData* pAdditionalData = spTargetGeom.operator->()->GetModelData()->GetAdditionalGeometryData();
     int32_t iBones = 0;
     NiSkinData::BoneData* pSkinBoneData = nullptr;

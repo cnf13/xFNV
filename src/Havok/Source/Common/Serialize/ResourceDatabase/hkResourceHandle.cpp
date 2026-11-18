@@ -231,10 +231,7 @@ void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& l
             const hkClassMember* pMember = pClass->getMemberByName(pcName);
             if (pMember) {
                 pLink->m_memberName = pcName;
-                hkClassMemberAccessor kAccessor;
-                const hkClassMemberAccessor* pAccessor =
-                    XFNV_RECONSTRUCT(hkClassMemberAccessor)(&kAccessor, pObject, pMember);
-                pLink->m_memberAccessor = *pAccessor;
+                pLink->m_memberAccessor = hkClassMemberAccessor(pObject, pMember);
                 pLink->m_externalId = m_references.m_data[i].m_externalId.cString();
                 continue;
             }

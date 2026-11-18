@@ -1011,7 +1011,6 @@ void ArrowProjectile::ApplyCollisionForce(NiPoint3 aContactPoint, NiPoint3 aDire
 }
 
 char ArrowProjectile::ProcessCollisionTerrain(bhkRigidBody* apBody) {
-    CFilter v8;
     CFilter a2a;
     DetachCharController();
     NiPoint3* p_kPoint = &psCollisionData->kPoint;
@@ -1023,8 +1022,7 @@ char ArrowProjectile::ProcessCollisionTerrain(bhkRigidBody* apBody) {
     (&a2a)->SetDisabled(0);
     apBody->SetCollisionFilter(a2a);
     int32_t arrowGroup = ArrowProjectile::GetArrowGroup();
-    CFilter* v4 = XFNV_RECONSTRUCT(CFilter)(&v8, L_NONCOLLIDABLE, arrowGroup, P_OTHER);
-    apBody->SetCollisionFilter(*v4);
+    apBody->SetCollisionFilter(CFilter(L_NONCOLLIDABLE, arrowGroup, P_OTHER));
     return 1;
 }
 
@@ -1070,11 +1068,7 @@ bool ArrowProjectile::ProcessCollisionActor(bhkRigidBody* apArrowRB) {
 bool ArrowProjectile::ProcessSimulate(bhkRigidBody* apArrowRB) {
     bhkCharacterController* charController;
     uint32_t filterGroup;
-    CFilter* v5;
     int32_t arrowGroup;
-    CFilter* v7;
-    CFilter v11;
-    CFilter v12;
     DetachCharController();
     NiNode* v2 = Get3D();
     bhkWorld::SetMotion(v2, hkpMotion::MOTION_DYNAMIC, true, false, true);
@@ -1082,13 +1076,11 @@ bool ArrowProjectile::ProcessSimulate(bhkRigidBody* apArrowRB) {
     if (v14 && v14->GetCharController()) {
         charController = v14->GetCharController();
         filterGroup = charController->GetFilterGroup();
-        v5 = XFNV_RECONSTRUCT(CFilter)(&v12, L_CLUTTER, filterGroup, P_OTHER);
-        apArrowRB->SetCollisionFilter(*v5);
+        apArrowRB->SetCollisionFilter(CFilter(L_CLUTTER, filterGroup, P_OTHER));
     }
     else {
         arrowGroup = (int32_t)ArrowProjectile::GetArrowGroup();
-        v7 = XFNV_RECONSTRUCT(CFilter)(&v11, L_CLUTTER, (uint32_t)arrowGroup, P_OTHER);
-        apArrowRB->SetCollisionFilter(*v7);
+        apArrowRB->SetCollisionFilter(CFilter(L_CLUTTER, (uint32_t)arrowGroup, P_OTHER));
     }
     apArrowRB->SetLinearVelocity(psCollisionData->kVelocity);
     hkpRigidBody* v8 = apArrowRB->Gethk();
@@ -1109,7 +1101,6 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
     float fpickLength;
     NiPoint3 v71;
     NiPoint3 v79;
-    hkVector4 velocity;
     ArrowProjectile::CollisionData* v83;
     ArrowProjectile::CollisionData* v84 =
         static_cast<ArrowProjectile::CollisionData*>(ourMalloc(sizeof(ArrowProjectile::CollisionData)));
@@ -1132,7 +1123,7 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
     this->psCollisionData->kVelocity = NiPoint3_ZERO;
     if (this->GetCharController()) {
         bhkCharacterController* CharController = this->GetCharController();
-        XFNV_RECONSTRUCT(hkVector4)(&velocity, CharController->GethkLinearVelocity());
+        hkVector4 velocity(CharController->GethkLinearVelocity());
         if (-3.4028235e+38f == velocity.hkVector4::getSimdAt(0).operator float()) {
             if (this->Get3D()) {
                 NiPoint3* fScalar = ::new (&v79) NiPoint3(NiPoint3_UNIT_Y * this->fSpeed);
@@ -1320,7 +1311,6 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
 
 void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoint3& aContactNormal) {
     NiPoint3 v18;
-    hkVector4 velocity;
     ArrowProjectile::CollisionData* v24;
     ArrowProjectile::CollisionData* v25 =
         static_cast<ArrowProjectile::CollisionData*>(ourMalloc(sizeof(ArrowProjectile::CollisionData)));
@@ -1343,7 +1333,7 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
     this->psCollisionData->kVelocity = NiPoint3_ZERO;
     if (this->GetCharController()) {
         bhkCharacterController* CharController = this->GetCharController();
-        XFNV_RECONSTRUCT(hkVector4)(&velocity, CharController->GethkLinearVelocity());
+        hkVector4 velocity(CharController->GethkLinearVelocity());
         if (-3.4028235e+38f == velocity.hkVector4::getSimdAt(0).operator float()) {
             if (this->Get3D()) {
                 NiPoint3* a2 = ::new (&v18) NiPoint3(NiPoint3_UNIT_Y * this->fSpeed);
@@ -1424,7 +1414,6 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
 
 void ArrowProjectile::Bounce(const NiPoint3& aContactPoint, const NiPoint3& aContactNormal) {
     NiPoint3 v11;
-    hkVector4 velocity;
     if (psCollisionData) {
         if (aContactNormal.operator!=(NiPoint3_ZERO)) {
             float* p_x = &this->psCollisionData->kNormal.x;
@@ -1461,7 +1450,7 @@ void ArrowProjectile::Bounce(const NiPoint3& aContactPoint, const NiPoint3& aCon
         this->psCollisionData->kVelocity = NiPoint3_ZERO;
         if (this->GetCharController()) {
             bhkCharacterController* CharController = this->GetCharController();
-            XFNV_RECONSTRUCT(hkVector4)(&velocity, CharController->GethkLinearVelocity());
+            hkVector4 velocity(CharController->GethkLinearVelocity());
             if (-3.4028235e+38f == velocity.hkVector4::getSimdAt(0).operator float()) {
                 if (this->Get3D()) {
                     NiPoint3* fScalar = ::new (&v11) NiPoint3(NiPoint3_UNIT_Y * this->fSpeed);
@@ -1479,7 +1468,6 @@ void ArrowProjectile::Bounce(const NiPoint3& aContactPoint, const NiPoint3& aCon
 
 void ArrowProjectile::Simulate(Actor* apCollidee) {
     NiPoint3 v9;
-    hkVector4 velocity;
     if (psCollisionData) {
         this->psCollisionData->eCollisionType = 4;
     }
@@ -1506,7 +1494,7 @@ void ArrowProjectile::Simulate(Actor* apCollidee) {
         this->psCollisionData->kVelocity = NiPoint3_ZERO;
         if (this->GetCharController()) {
             bhkCharacterController* CharController = this->GetCharController();
-            XFNV_RECONSTRUCT(hkVector4)(&velocity, CharController->GethkLinearVelocity());
+            hkVector4 velocity(CharController->GethkLinearVelocity());
             if (-3.4028235e+38f == velocity.hkVector4::getSimdAt(0).operator float()) {
                 if (this->Get3D()) {
                     NiPoint3* fScalar = ::new (&v9) NiPoint3(NiPoint3_UNIT_Y * this->fSpeed);
@@ -1621,7 +1609,6 @@ bool ArrowProjectile::ProcessCollisionReference(bhkRigidBody* apArrowRB) {
 
 // The filter is passed by value.
 bool ArrowProjectile::ProcessBounce(bhkRigidBody* apArrowRB) {
-    CFilter apMemory;
     DetachCharController();
     if (!pSaveLoadGameOLD->GetLoading()) {
         NiPoint3* X = &psCollisionData->kPoint;
@@ -1634,8 +1621,7 @@ bool ArrowProjectile::ProcessBounce(bhkRigidBody* apArrowRB) {
     NiNode* v4 = Get3D();
     bhkWorld::SetMotion(v4, hkpMotion::MOTION_DYNAMIC, true, false, true);
     uint32_t ArrowGroup = ArrowProjectile::GetArrowGroup();
-    CFilter* v6 = XFNV_RECONSTRUCT(CFilter)(&apMemory, L_CLUTTER, ArrowGroup, P_OTHER);
-    apArrowRB->SetCollisionFilter(*v6);
+    apArrowRB->SetCollisionFilter(CFilter(L_CLUTTER, ArrowGroup, P_OTHER));
     if (!pSaveLoadGameOLD->GetLoading()) {
         NiMatrix3 invrot;
         NiPoint3 accum = -1.0f * DeltaS;

@@ -2369,11 +2369,9 @@ void hkgpConvexHull::createVoronoiFeatures(
     hkArray<hkgpConvexHull*, hkContainerHeapAllocator>& edges,
     float margin
 ) {
-    hkgpConvexHull::AbsoluteScaleConfig apMemory;
     hkgpConvexHull::createVoronoiCells(domain, points, cells, margin);
     hkgpConvexHull* v5 = domain->clone();
-    hkgpConvexHull::AbsoluteScaleConfig* v6 = XFNV_RECONSTRUCT(hkgpConvexHull::AbsoluteScaleConfig)(&apMemory);
-    v5->absoluteScale(-margin, *v6);
+    v5->absoluteScale(-margin, hkgpConvexHull::AbsoluteScaleConfig());
     hkgpConvexHull::booleanSubtraction(v5, cells, edges, 1e-07f);
     if (v5) {
         delete v5;

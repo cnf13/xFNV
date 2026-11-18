@@ -32,9 +32,7 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 		kFile.~BSFaceGenBinaryFile();
 		return false;
 	};
-	std::string kFileName;
-	// The by-value file name's copy constructor.
-	XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&kFileName, fname);
+	std::string kFileName(fname);
 	if (!kFile.BSFaceGenBinaryFile::openForRead(kFileName, false)) {
 		return fnFail();
 	}

@@ -526,7 +526,6 @@ bool FleePackage::FindTeleportDoor(Actor* apActor, TESObjectREFR* apThreat) {
 PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
     float favoidNodeRadius;
     PathingAvoidNodeArray* pavoidNodeArray;
-    PathingAvoidNode v10;
     void* apMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
     if (apMemory) {
         pavoidNodeArray = ::new (apMemory) PathingAvoidNodeArray;
@@ -549,8 +548,7 @@ PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
             float favoidNodeCost = BSMAX(v6, 100.0f);
             float a2 = favoidNodeCost;
             const NiPoint3* v1 = &pref->GetLocationOnReference();
-            PathingAvoidNode* v2 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v10, *v1, favoidNodeRadius_2, a2);
-            pavoidNodeArray->GetAt(nodeArrayIndex) = *v2;
+            pavoidNodeArray->GetAt(nodeArrayIndex) = PathingAvoidNode(*v1, favoidNodeRadius_2, a2);
         }
     }
     return pavoidNodeArray;

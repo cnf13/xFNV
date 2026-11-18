@@ -1839,7 +1839,6 @@ void BlackJackMenu::LoadNifs() {
 }
 
 void BlackJackMenu::UpdateHandCardVisibility() {
-    NiUpdateData apMemory;
     char apDest[32];
     NiAVObject* ObjectByName;
     char blockName[32];
@@ -1904,12 +1903,11 @@ void BlackJackMenu::UpdateHandCardVisibility() {
             ObjectByName->SetAppCulled(true);
         }
     }
-    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
-    BlackJackMenu::spSceneRoot.m_pObject->Update(*updated);
+    NiUpdateData apMemory(0.0f, 0, 0);
+    BlackJackMenu::spSceneRoot.m_pObject->Update(apMemory);
 }
 
 void BlackJackMenu::ShowAllHandCards() {
-    NiUpdateData apMemory;
     char apDest[32];
     NiAVObject* ObjectByName;
     char blockName[32];
@@ -1947,9 +1945,9 @@ void BlackJackMenu::ShowAllHandCards() {
         ObjectByName = BSUtilities::GetObjectByName(pHandSplitGeometry, apName);
         ObjectByName->SetAppCulled(false);
     }
-    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
+    NiUpdateData apMemory(0.0f, 0, 0);
     NiAVObject* v1 = BlackJackMenu::spSceneRoot.m_pObject;
-    v1->Update(*updated);
+    v1->Update(apMemory);
 }
 
 void* BlackJackMenu::SetTileAlphasForStage(int32_t a1) {

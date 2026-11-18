@@ -274,11 +274,6 @@ void CaravanMenu::DoClick(int32_t a1, Tile* a2) {
 }
 
 void CaravanMenu::DoIdle() {
-    NiUpdateData v115;
-    NiUpdateData v116;
-    NiUpdateData v117;
-    NiUpdateData v130;
-    NiUpdateData v131;
     CaravanAIPackage aiPackage;
     int32_t ielaspedMillis = 0;
     float fxAxisRatio = 1.0f;
@@ -687,16 +682,16 @@ void CaravanMenu::DoIdle() {
                 if (i >= FormFlags) {
                     break;
                 }
-                NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&v131, CaravanMenu::fTimeDelta, 1, 0);
-                pListOfBills.operator[](i)->Update(*updated);
+                NiUpdateData v131(CaravanMenu::fTimeDelta, 1, 0);
+                pListOfBills.operator[](i)->Update(v131);
             }
             for (int32_t i_2 = iCoinIndexToAnim;; ++i_2) {
                 uint32_t v23 = pListOfCoins.iSize;
                 if (i_2 >= v23) {
                     break;
                 }
-                NiUpdateData* v24 = XFNV_RECONSTRUCT(NiUpdateData)(&v130, CaravanMenu::fTimeDelta, 1, 0);
-                pListOfCoins.operator[](i_2)->Update(*v24);
+                NiUpdateData v130(CaravanMenu::fTimeDelta, 1, 0);
+                pListOfCoins.operator[](i_2)->Update(v130);
             }
             if (CaravanMenu::fTimeDelta > 1.0) {
                 SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
@@ -1327,8 +1322,8 @@ void CaravanMenu::DoIdle() {
                     v59->GetSoundHandleByName("GAMECaravanRemoveCard", 289u).Play(false);
                 }
                 for (int32_t i_4 = 0; i_4 < 7 && pCardTracks[iSelectedTrack][i_4].iSize; ++i_4) {
-                    NiUpdateData* v60 = XFNV_RECONSTRUCT(NiUpdateData)(&v117, CaravanMenu::fTimeDelta, 1, 0);
-                    pTrackGeometry[iSelectedTrack][i_4]->Update(*v60);
+                    NiUpdateData v117(CaravanMenu::fTimeDelta, 1, 0);
+                    pTrackGeometry[iSelectedTrack][i_4]->Update(v117);
                 }
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >
                     pTrackAnimations[iSelectedTrack][0][iSelectedColumn][1]->m_fEndKeyTime) {
@@ -1391,8 +1386,8 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 }
                 for (int32_t i_9 = iSelectedRow; i_9 < 7 && pCardTracks[iSelectedTrack][i_9].iSize; ++i_9) {
-                    NiUpdateData* v61 = XFNV_RECONSTRUCT(NiUpdateData)(&v116, CaravanMenu::fTimeDelta, 1, 0);
-                    pTrackGeometry[iSelectedTrack][i_9]->Update(*v61);
+                    NiUpdateData v116(CaravanMenu::fTimeDelta, 1, 0);
+                    pTrackGeometry[iSelectedTrack][i_9]->Update(v116);
                 }
                 if (static_cast<double>(CaravanMenu::fTimeDelta) >
                     pTrackAnimations[iSelectedTrack][iSelectedRow][iSelectedColumn][1]->m_fEndKeyTime) {
@@ -1498,8 +1493,8 @@ void CaravanMenu::DoIdle() {
                 }
                 if (!bexit) {
                     for (int32_t i_15 = iSelectedRow; i_15 < 7 && pCardTracks[iSelectedTrack][i_15].iSize; ++i_15) {
-                        NiUpdateData* v64 = XFNV_RECONSTRUCT(NiUpdateData)(&v115, CaravanMenu::fTimeDelta, 1, 0);
-                        pTrackGeometry[iSelectedTrack][i_15]->Update(*v64);
+                        NiUpdateData v115(CaravanMenu::fTimeDelta, 1, 0);
+                        pTrackGeometry[iSelectedTrack][i_15]->Update(v115);
                     }
                 }
                 if (bexit ||
@@ -2533,8 +2528,6 @@ void CaravanMenu::UpdateCaravanFlags() {
 }
 
 void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
-    NiUpdateData update2_2;
-    NiUpdateData update2;
     NiMatrix3 mat_2;
     NiMatrix3 mat;
     char blockName[264];
@@ -2755,8 +2748,8 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         mat = (*&avobj->m_kLocal).m_Rotate;
         pListOfBills.operator[](i)->SetRotate(mat);
         pListOfBills.operator[](i)->SetTranslate(x, y, z);
-        NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&update2, 0.0f, 0, 0);
-        pListOfBills.operator[](i)->Update(*updated);
+        NiUpdateData update2(0.0f, 0, 0);
+        pListOfBills.operator[](i)->Update(update2);
     }
     for (int32_t i_2 = iCoinIndexToAnim;; ++i_2) {
         uint32_t v7 = pListOfCoins.iSize;
@@ -2781,8 +2774,8 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         mat_2 = (*&avobj_2->m_kLocal).m_Rotate;
         pListOfCoins.operator[](i_2)->SetRotate(mat_2);
         pListOfCoins.operator[](i_2)->SetTranslate(v33, v34, v35);
-        NiUpdateData* v10 = XFNV_RECONSTRUCT(NiUpdateData)(&update2_2, 0.0f, 0, 0);
-        pListOfCoins.operator[](i_2)->Update(*v10);
+        NiUpdateData update2_2(0.0f, 0, 0);
+        pListOfCoins.operator[](i_2)->Update(update2_2);
     }
     if (BSMAX(icoins, ibills) > 0) {
         eGameState = CaravanMenu::CA_ANTE_MONEYIN_ANIM;
@@ -2877,7 +2870,6 @@ bool CaravanMenu::IsWellFormedMenu() {
 }
 
 void CaravanMenu::LoadNifs() {
-    NiUpdateData apMemory;
     char Src[268];
     pActiveDeckGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Deck.NIF", LOD_MULT_NONE, true, false, false, false
@@ -2891,8 +2883,8 @@ void CaravanMenu::LoadNifs() {
     v67->AttachChild(pActiveDeckGeometry, 1);
     intlistbills.Clear(true);
     intlistcoins.Clear(true);
-    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
-    CaravanMenu::spModel.m_pObject->Update(*updated);
+    NiUpdateData apMemory(0.0f, 0, 0);
+    CaravanMenu::spModel.m_pObject->Update(apMemory);
     iAnte = BSMIN(iPlayerAnte, iNPCAnte);
     NiControllerManager* Controller =
         static_cast<NiControllerManager*>(pActiveDeckGeometry->GetController(&NiControllerManager::ms_RTTI));
@@ -3597,12 +3589,8 @@ void CaravanMenu::SelectDeckCard(bool abUnselectOnly) {
 }
 
 void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
-    NiUpdateData v18;
     NiMatrix3 matrot_90_4;
-    NiUpdateData v20;
-    NiUpdateData v22;
     NiMatrix3 matrot_90_2;
-    NiUpdateData apMemory;
     char texturename[260];
     char blockName[268];
     NiMatrix3 cardrot;
@@ -3624,16 +3612,16 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             v3->GetSoundHandleByName("GAMECaravanToggleTrack", 289u).Play(false);
             cursorface = pCursors[0];
             pCursors[1]->SetTranslate(0.0f, 0.0f, -50.0f);
-            NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
-            pCursors[1]->Update(*updated);
+            NiUpdateData apMemory(0.0f, 0, 0);
+            pCursors[1]->Update(apMemory);
             matrot_90.MakeZRotation(1.5707964f);
             cardrot = (*&cursorPoint->m_kLocal).m_Rotate;
             cardrot = *::new (&matrot_90_2) NiMatrix3(cardrot * matrot_90);
             cardloc = (&cursorPoint->GetWorldBound())->m_kCenter;
             cursorface->SetRotate(cardrot);
             cursorface->SetTranslate(cardloc);
-            NiUpdateData* v5 = XFNV_RECONSTRUCT(NiUpdateData)(&v22, 0.0f, 0, 0);
-            cursorface->Update(*v5);
+            NiUpdateData v22(0.0f, 0, 0);
+            cursorface->Update(v22);
             cursorface = BSUtilities::GetObjectByName(cursorface, "Add:3");
         }
         else {
@@ -3642,16 +3630,16 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
             v6->GetSoundHandleByName("GAMECaravanInvalidStackLocation", 289u).Play(false);
             cursorface = pCursors[1];
             pCursors[0]->SetTranslate(0.0f, 0.0f, -50.0f);
-            NiUpdateData* v7 = XFNV_RECONSTRUCT(NiUpdateData)(&v20, 0.0f, 0, 0);
-            pCursors[0]->Update(*v7);
+            NiUpdateData v20(0.0f, 0, 0);
+            pCursors[0]->Update(v20);
             matrot_90_3.MakeZRotation(1.5707964f);
             cardrot = (*&cursorPoint->m_kLocal).m_Rotate;
             cardrot = *::new (&matrot_90_4) NiMatrix3(cardrot * matrot_90_3);
             cardloc = (&cursorPoint->GetWorldBound())->m_kCenter;
             cursorface->SetRotate(cardrot);
             cursorface->SetTranslate(cardloc);
-            NiUpdateData* v8 = XFNV_RECONSTRUCT(NiUpdateData)(&v18, 0.0f, 0, 0);
-            cursorface->Update(*v8);
+            NiUpdateData v18(0.0f, 0, 0);
+            cursorface->Update(v18);
             cursorface = BSUtilities::GetObjectByName(cursorface, "Remove:3");
         }
         if (cursorface->GetProperty(3)) {
@@ -3690,20 +3678,18 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
 }
 
 void CaravanMenu::SelectWholeTrack(int32_t a1) {
-    NiUpdateData apMemory;
     for (int32_t i = 0; i < 7; ++i) {
         pTrackGeometry[a1][i]->SetTranslate(static_cast<float>(0.0), static_cast<float>(0.0), 3.0f);
-        NiUpdateData* a4 = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0, 0, 0);
-        pTrackGeometry[a1][i]->Update(*a4);
+        NiUpdateData apMemory(0.0, 0, 0);
+        pTrackGeometry[a1][i]->Update(apMemory);
     }
 }
 
 void CaravanMenu::DeselectWholeTrack(int32_t a1) {
-    NiUpdateData apMemory;
     for (int32_t i = 0; i < 7; ++i) {
         pTrackGeometry[a1][i]->SetTranslate(static_cast<float>(0.0), static_cast<float>(0.0), static_cast<float>(0.0));
-        NiUpdateData* a4 = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0, 0, 0);
-        pTrackGeometry[a1][i]->Update(*a4);
+        NiUpdateData apMemory(0.0, 0, 0);
+        pTrackGeometry[a1][i]->Update(apMemory);
     }
 }
 
@@ -3836,14 +3822,12 @@ void CaravanMenu::ZeroFlags() {
 }
 
 void CaravanMenu::DeselectTrackCard() {
-    NiUpdateData v4;
-    NiUpdateData v5;
     pCursors[0]->SetTranslate((float)0.0, (float)0.0, (-100.0f));
     pCursors[1]->SetTranslate((float)0.0, (float)0.0, (-100.0f));
-    NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&v5, 0.0, 0, 0);
-    pCursors[0]->Update(*updated);
-    NiUpdateData* v2 = XFNV_RECONSTRUCT(NiUpdateData)(&v4, 0.0, 0, 0);
-    pCursors[1]->Update(*v2);
+    NiUpdateData v5(0.0, 0, 0);
+    pCursors[0]->Update(v5);
+    NiUpdateData v4(0.0, 0, 0);
+    pCursors[1]->Update(v4);
 }
 
 int32_t CaravanMenu::CalculateWinningState(int32_t aivalue) {
@@ -4075,12 +4059,6 @@ void CaravanMenu::PrepareBettingCurrency() {
 }
 
 void CaravanMenu::PrepareGameMenu() {
-    NiUpdateData v81;
-    NiUpdateData v104;
-    NiUpdateData v105;
-    NiUpdateData v106;
-    NiUpdateData v107;
-    NiUpdateData apMemory;
     NiTimeController* pTimeController;
     char modelPath[268];
     char Src[268];
@@ -4182,19 +4160,19 @@ void CaravanMenu::PrepareGameMenu() {
     v72->AttachChild(pHandGeometry[1], 1);
     for (int32_t i_8 = 0; i_8 < 6; ++i_8) {
         pTrackGrids[i_8]->SetAppCulled(true);
-        NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
-        pTrackGrids[i_8]->Update(*updated);
+        NiUpdateData apMemory(0.0f, 0, 0);
+        pTrackGrids[i_8]->Update(apMemory);
     }
-    NiUpdateData* v8 = XFNV_RECONSTRUCT(NiUpdateData)(&v107, 0.0f, 0, 0);
-    pCursors[0]->Update(*v8);
-    NiUpdateData* v9 = XFNV_RECONSTRUCT(NiUpdateData)(&v106, 0.0f, 0, 0);
-    pCursors[1]->Update(*v9);
+    NiUpdateData v107(0.0f, 0, 0);
+    pCursors[0]->Update(v107);
+    NiUpdateData v106(0.0f, 0, 0);
+    pCursors[1]->Update(v106);
     pCursors[0]->SetTranslate(0.0f, 0.0f, -5.0f);
     pCursors[1]->SetTranslate(0.0f, 0.0f, -5.0f);
-    NiUpdateData* v10 = XFNV_RECONSTRUCT(NiUpdateData)(&v105, 0.0f, 0, 0);
-    pCursors[0]->Update(*v10);
-    NiUpdateData* v11 = XFNV_RECONSTRUCT(NiUpdateData)(&v104, 0.0f, 0, 0);
-    pCursors[1]->Update(*v11);
+    NiUpdateData v105(0.0f, 0, 0);
+    pCursors[0]->Update(v105);
+    NiUpdateData v104(0.0f, 0, 0);
+    pCursors[1]->Update(v104);
     for (int32_t i_9 = 0; i_9 < 2; ++i_9) {
         pTimeController = pHandGeometry[i_9]->GetController(&NiControllerManager::ms_RTTI);
         if (pTimeController) {
@@ -4240,8 +4218,8 @@ void CaravanMenu::PrepareGameMenu() {
             }
         }
     }
-    NiUpdateData* v34 = XFNV_RECONSTRUCT(NiUpdateData)(&v81, 0.0f, 0, 0);
-    CaravanMenu::spModel.m_pObject->Update(*v34);
+    NiUpdateData v81(0.0f, 0, 0);
+    CaravanMenu::spModel.m_pObject->Update(v81);
     for (int32_t i_11 = 0; i_11 < 6; ++i_11) {
         trackInfo[i_11].iValue = 0;
         trackInfo[i_11].eCardSuit = 5;

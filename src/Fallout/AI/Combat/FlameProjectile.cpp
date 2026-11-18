@@ -239,16 +239,8 @@ bool FlameProjectile::RunTargetPick() {
             bHit = true;
         }
         if (bProjectileDebug.Bool()) {
-            NiColorA kMiss;
-            NiColorA kReach;
-            NiColorA* pColor;
-            if (kPickData.GetPickFailed()) {
-                pColor = XFNV_RECONSTRUCT(NiColorA)(&kMiss, 1.0f, 0.0f, 0.0f, 1.0f);
-            }
-            else {
-                pColor = XFNV_RECONSTRUCT(NiColorA)(&kReach, 1.0f, 1.0f, 0.0f, 1.0f);
-            }
-            NiColorA kColor = *pColor;
+            NiColorA kColor =
+                kPickData.GetPickFailed() ? NiColorA(1.0f, 0.0f, 0.0f, 1.0f) : NiColorA(1.0f, 1.0f, 0.0f, 1.0f);
             NiLines* pLine = MakeLine(kOrigin, kColor, akPoints[i], kColor, true);
             TES::pInstance->AddTempDebugObject(pLine, fProjectileDebugDuration.Float());
         }

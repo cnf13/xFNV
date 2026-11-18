@@ -51,7 +51,6 @@ void BSFaceGenMorphDifferential::ApplyMorph(
     }
     NiGeometryData* pModelData = apGeom->GetModelData();
     NiGeometryDataIteratorNiPoint3 kIterator;
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kIterator);
     pModelData->GetVerticesIterator(kIterator);
     NiPoint3 kVertex;
     kVertex.~NiPoint3();
@@ -101,7 +100,6 @@ void BSFaceGenMorphStatistical::ApplyMorph(
     NiPoint3* pBaseVerts = apExtraData->GetVertices();
     NiGeometryData* pModelData = apGeom->GetModelData();
     NiGeometryDataIteratorNiPoint3 kIterator;
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kIterator);
     pModelData->GetVerticesIterator(kIterator);
     NiPoint3 kVertex;
     kVertex.~NiPoint3();

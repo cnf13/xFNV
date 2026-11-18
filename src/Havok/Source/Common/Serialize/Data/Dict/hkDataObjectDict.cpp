@@ -174,8 +174,7 @@ hkDataClassImpl* hkDataWorldDict::findClass(const char* name) const {
 
 // The object a handle names: a dictionary handle holds the implementation in p0.
 hkDataObject hkDataWorldDict::findObject(const hkDataObject::Handle& handle) const {
-    hkDataObject kResult;
-    XFNV_RECONSTRUCT(hkDataObject)(&kResult, static_cast<hkDataObjectImpl*>(handle.p0));
+    hkDataObject kResult(static_cast<hkDataObjectImpl*>(handle.p0));
     return kResult;
 }
 

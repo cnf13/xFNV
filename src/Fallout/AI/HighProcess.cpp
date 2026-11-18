@@ -2665,8 +2665,7 @@ DetectionState* HighProcess::InsertIntoDetectionList(
         pState->LastPositionDetected.x = pLocation->x;
         pState->LastPositionDetected.y = pLocation->y;
         pState->LastPositionDetected.z = pLocation->z;
-        CombatTimeStamp TimeStamp;
-        XFNV_RECONSTRUCT(CombatTimeStamp)(&TimeStamp, CombatTimer::GetTimer());
+        CombatTimeStamp TimeStamp(CombatTimer::GetTimer());
         pState->fLastTimeDetected = TimeStamp;
     }
     return pState;
@@ -5433,8 +5432,7 @@ void HighProcess::RunDetection(Actor* apActor, float fnumber) {
                 pState->LastPositionDetected.x = kLastPosition.x;
                 pState->LastPositionDetected.y = kLastPosition.y;
                 pState->LastPositionDetected.z = kLastPosition.z;
-                CombatTimeStamp kTimeStamp;
-                XFNV_RECONSTRUCT(CombatTimeStamp)(&kTimeStamp, CombatTimer::GetTimer());
+                CombatTimeStamp kTimeStamp(CombatTimer::GetTimer());
                 pState->fLastTimeDetected.fTimeStamp = kTimeStamp.fTimeStamp;
                 if (bAttack) {
                     pPlayer->SetHostileDetection(true);
@@ -14844,7 +14842,6 @@ void HighProcess::AddAvoidPathingArea(
     TESObjectSTAT* apMarker
 ) {
     AvoidAreaStruct* pavoidstruct;
-    PathingAvoidNode v13;
     void* apMemory = ourMalloc(sizeof(AvoidAreaStruct));
     if (apMemory) {
         pavoidstruct = ::new (apMemory) AvoidAreaStruct;
@@ -14853,8 +14850,7 @@ void HighProcess::AddAvoidPathingArea(
         pavoidstruct = nullptr;
     }
     AvoidAreaStruct* pavoidstruct_2 = pavoidstruct;
-    PathingAvoidNode* v8 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v13, aPoint, afRadius, afRadiationLevel);
-    (*pavoidstruct_2).pAvoidNode = *v8;
+    (*pavoidstruct_2).pAvoidNode = PathingAvoidNode(aPoint, afRadius, afRadiationLevel);
     pavoidstruct_2->afRadiationLevel = afRadiationLevel;
     pavoidstruct_2->fTimeExpire = afTimeToExpire;
     pavoidstruct_2->pRadiationMarker = apMarker;

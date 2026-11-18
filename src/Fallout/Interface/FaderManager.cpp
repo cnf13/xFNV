@@ -73,8 +73,7 @@ void FaderManager::AddRoot(NiNode* apNode, float afOneToOneDistance, bool abBelo
     NiDirectionalLight* pLight = pLightMemory ? ::new (pLightMemory) NiDirectionalLight : nullptr;
     NiFixedString kLightName("FaderNodeLight");
     pLight->SetName(kLightName);
-    NiColor kAmbient;
-    pLight->SetAmbientColor(*XFNV_RECONSTRUCT(NiColor)(&kAmbient, 1.0f, 1.0f, 1.0f));
+    pLight->SetAmbientColor(NiColor(1.0f, 1.0f, 1.0f));
     pNode->AttachChild(pLight, true);
     float fWidth = static_cast<float>(Renderer::GetScreenWidth());
     float fHeight = static_cast<float>(Renderer::GetScreenHeight());

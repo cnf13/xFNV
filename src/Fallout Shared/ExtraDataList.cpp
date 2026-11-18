@@ -8307,8 +8307,7 @@ bool ExtraDataList::RestoreSavedAnimation(TESObjectREFR* apRef) {
     if (!pExtra) {
         return false;
     }
-    BGSLoadGameSubBuffer kBuffer;
-    XFNV_RECONSTRUCT(BGSLoadGameSubBuffer)(&kBuffer, pExtra->pAnimationBuffer)->LoadAnimation(apRef);
+    BGSLoadGameSubBuffer(pExtra->pAnimationBuffer).LoadAnimation(apRef);
     pExtra->pAnimationBuffer = nullptr;
     RemoveExtra(EXTRA_SAVED_ANIMATION);
     return true;
@@ -8320,8 +8319,7 @@ bool ExtraDataList::RestoreSavedHavokData(TESObjectREFR* apRef) {
     if (!pExtra) {
         return false;
     }
-    BGSLoadGameSubBuffer kBuffer;
-    XFNV_RECONSTRUCT(BGSLoadGameSubBuffer)(&kBuffer, pExtra->pHavokBuffer)->LoadHavokData(apRef);
+    BGSLoadGameSubBuffer(pExtra->pHavokBuffer).LoadHavokData(apRef);
     pExtra->pHavokBuffer = nullptr;
     RemoveExtra(EXTRA_SAVED_HAVOK_DATA);
     return true;

@@ -1228,7 +1228,6 @@ void NavMeshObstacleManager::ProcessDeactivatedObstacles() {
 }
 
 void NavMeshObstacleManager::DrawObstacles(bool abDraw) {
-    NiColor dst;
     XFNV_INLINED_LOCAL(NiPointer<NiTriShape>, spobsNode, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<ObstacleData>, spObstacle, std::nullopt, std::nullopt);
     NiTMapItem<uint32_t, NiPointer<ReferenceObstacleArray>>* it;
@@ -1269,8 +1268,7 @@ void NavMeshObstacleManager::DrawObstacles(bool abDraw) {
             }
             NiRefObject* v12 = static_cast<NiRefObject*>(v6);
             NiPointer<NiMaterialProperty> spmat(static_cast<NiMaterialProperty*>(v6));
-            NiColor* v2 = XFNV_RECONSTRUCT(NiColor)(&dst, 1.0f, 0.0f, 1.0f);
-            spmat.m_pObject->SetEmittance(*v2);
+            spmat.m_pObject->SetEmittance(NiColor(1.0f, 0.0f, 1.0f));
             spmat.m_pObject->SetAlpha(0.25f);
             spObstacleRootNode.m_pObject->AttachProperty(spAlphaProp.m_pObject);
             spObstacleRootNode.m_pObject->AttachProperty(spmat.m_pObject);
@@ -1490,8 +1488,7 @@ bool NavMeshObstacleManager::UpdateObstacleData(ObstacleData* apObstacle) {
     if (!phkRigidBody) {
         return false;
     }
-    hkTransform kHavokTransform;
-    XFNV_RECONSTRUCT(hkTransform)(&kHavokTransform, phkRigidBody->getTransform());
+    hkTransform kHavokTransform(phkRigidBody->getTransform());
     NiTransform kTransform;
     kTransform.~NiTransform();
     ::new (&kTransform) NiTransform;

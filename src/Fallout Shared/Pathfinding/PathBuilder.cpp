@@ -562,7 +562,7 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         lastNode = &nodes.GetLast();
         a1 = lastNode->sTriangle;
         NavMeshInfo_ = lastNode->pNavMesh->GetNavMeshInfo();
-        XFNV_RECONSTRUCT(PathingLocation)(&lastLoc, lastNode->GetCenter(), NavMeshInfo_, a1);
+        lastLoc = PathingLocation(lastNode->GetCenter(), NavMeshInfo_, a1);
         if (pSolution.m_pObject->iLastLoadedVirtualNodeIndex != aiLastVirtualNodeIndex) {
             goto LABEL_41;
         }
@@ -962,7 +962,6 @@ bool PathBuilder::TryBuildStraightPath(PathingLocation& aStartLocation, PathingL
 // The location is passed by value as a bitwise copy: the destructor of the by-value location only stores the vtable, so
 // the copy leaves nothing to release twice.
 bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLocation& aRetLocation, bool abStart) {
-    PathingLocation v15;
     NiPoint3 v21;
     NiPoint3 pt;
     int32_t apRetEdgeIndex;
@@ -1010,9 +1009,7 @@ bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLoc
         return false;
     }
 
-    PathingLocation* aLoc =
-        XFNV_RECONSTRUCT(PathingLocation)(&v15, arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
-    aRetLocation.operator=(*aLoc);
+    aRetLocation.operator=(PathingLocation(arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35));
     return true;
 }
 
@@ -1506,7 +1503,6 @@ bool PathBuilder::RunPathSmoother(
 ) {
     NiPoint3 v20;
     NiPoint3 result;
-    FastNavMeshTriHandle kTriHandle;
     using triangles_t = BSScrapArray<FastNavMeshTriHandle, 1024>;
     if (bUseAlternateSmoothingForPrime.Bool() && pRequest.m_pObject->fActorRadius > 150.0) {
         ScrapHeap* pScrapHeap = this->pScrapHeap;
@@ -1518,10 +1514,7 @@ bool PathBuilder::RunPathSmoother(
                 break;
             }
             uint16_t sTriangle = (&aNodes.GetAt(static_cast<int32_t>(i)))->sTriangle;
-            FastNavMeshTriHandle* v8 = XFNV_RECONSTRUCT(FastNavMeshTriHandle)(
-                &kTriHandle, (&aNodes.GetAt(static_cast<int32_t>(i)))->pNavMesh, sTriangle
-            );
-            kTriangles.Add(*v8);
+            kTriangles.Add(FastNavMeshTriHandle((&aNodes.GetAt(static_cast<int32_t>(i)))->pNavMesh, sTriangle));
         }
         NavMeshPOVSearch povSearch;
         bool v25 =

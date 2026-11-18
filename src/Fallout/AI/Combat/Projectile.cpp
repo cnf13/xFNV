@@ -1508,16 +1508,8 @@ bool Projectile::RunTargetPick() {
         bHit = ProcessTargetPick(&kPickData, this, GetProjectileBase(), nullptr, true, fWaterHitRatio) != nullptr;
     }
     if (bProjectileDebug.Bool()) {
-        NiColorA kMiss;
-        NiColorA kReach;
-        NiColorA* pColor;
-        if (kPickData.GetPickFailed()) {
-            pColor = XFNV_RECONSTRUCT(NiColorA)(&kMiss, 1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        else {
-            pColor = XFNV_RECONSTRUCT(NiColorA)(&kReach, 1.0f, 1.0f, 0.0f, 1.0f);
-        }
-        NiColorA kColor = *pColor;
+        NiColorA kColor =
+            kPickData.GetPickFailed() ? NiColorA(1.0f, 0.0f, 0.0f, 1.0f) : NiColorA(1.0f, 1.0f, 0.0f, 1.0f);
         NiPoint3 kLineEnd = kPosition + kLength;
         NiLines* pLine = MakeLine(kPosition, kColor, kLineEnd, kColor, true);
         TES::pInstance->AddTempDebugObject(pLine, fProjectileDebugDuration.Float());
@@ -1540,9 +1532,6 @@ bool Projectile::AddImpact(
 ) {
     Projectile::ImpactData* pdata;
     NiPoint3 v38;
-    CFilter v43;
-    CFilter v44;
-    CFilter v45;
     Projectile::ImpactData* pImpactData =
         static_cast<Projectile::ImpactData*>(ourMalloc(sizeof(Projectile::ImpactData)));
     if (pImpactData) {
@@ -1600,7 +1589,7 @@ bool Projectile::AddImpact(
             pdata_2->pTargetWorldObject->addReference();
             if ((apCollidee) && (apCollidee->IsActor() && apTargetCollidable->getType() == 1)) {
                 uint32_t afSize = apTargetCollidable->getCollisionFilterInfo();
-                if (XFNV_RECONSTRUCT(CFilter)(&v45, afSize)->QBipLayer()) {
+                if (CFilter(afSize).QBipLayer()) {
                     NiAVObject* phitAVObject = GetAVObjectForCollidable(apTargetCollidable);
                     Actor* pactor_2 = static_cast<Actor*>(apCollidee);
                     NiNode* pclosestBone_2 = phitAVObject->IsNode();
@@ -1612,7 +1601,7 @@ bool Projectile::AddImpact(
         HavokMaterialType emat = aeForceMaterial;
         if ((apTargetCollidable) && (aeForceMaterial == BHK_MATERIAL_MAX)) {
             uint32_t afSizea = apTargetCollidable->getCollisionFilterInfo();
-            uint32_t Group = XFNV_RECONSTRUCT(CFilter)(&v44, afSizea)->GetGroup();
+            uint32_t Group = CFilter(afSizea).GetGroup();
             bool bhitLandHeightField = Group == 1;
             if (Group == 1) {
                 emat = TES::pInstance->GetLandMaterialType(aContactPoint);
@@ -1624,7 +1613,7 @@ bool Projectile::AddImpact(
                 }
             }
             uint32_t afSizeb = apTargetCollidable->getCollisionFilterInfo();
-            if (XFNV_RECONSTRUCT(CFilter)(&v43, afSizeb)->GetLayer() == L_WATER) {
+            if (CFilter(afSizeb).GetLayer() == L_WATER) {
                 emat = BHK_MATERIAL_WATER;
             }
         }
@@ -2523,9 +2512,7 @@ void Projectile::SpawnCollisionEffects(
 ) {
     NiCamera* v7;
     double v32;
-    NiColor kVertexColor;
     hkpPropertyValue arResult;
-    CFilter v39;
     bool bcreateParticles = true;
     NiCamera* v6 = Main::WorldRootCamera();
     NiPoint3 distance = aContactPoint - v6->GetWorldTranslate();
@@ -2608,7 +2595,7 @@ void Projectile::SpawnCollisionEffects(
                             if (ematerialB == aeMaterial && pcol != plastCol) {
                                 plastCol = pcol;
                                 uint32_t a1b = pcol->getCollisionFilterInfo();
-                                uint32_t Group = XFNV_RECONSTRUCT(CFilter)(&v39, a1b)->GetGroup();
+                                uint32_t Group = CFilter(a1b).GetGroup();
                                 bool bcasterHitLandHeightField = Group == 1;
                                 NiAVObject* pavobj = nullptr;
                                 if (Group == 1) {
@@ -2659,7 +2646,7 @@ void Projectile::SpawnCollisionEffects(
                                         255.0;
                                     float v27 =
                                         static_cast<double>(static_cast<uint8_t>(pimpactData->GetDecalColor())) / 255.0;
-                                    data.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(&kVertexColor, v27, v28, v29);
+                                    data.fVertexColor = NiColor(v27, v28, v29);
                                     if (ematerialB == BHK_MATERIAL_GLASS) {
                                         data.bTwoSided = true;
                                     }
@@ -3330,8 +3317,6 @@ bool Projectile::IsValidImpact(
 ) {
     bhkPhantom* pbp;
     hkpPhantom* pph;
-    CFilter v13;
-    CFilter v14;
     CFilter apResult;
     CFilter a2;
     if (apTargetCollidable) {
@@ -3384,9 +3369,8 @@ bool Projectile::IsValidImpact(
     if ((apProjectileBase) && (apTargetCollidable)) {
         uint32_t v8;
         uint32_t CollisionFilterInfo = apTargetCollidable->getCollisionFilterInfo();
-        if (XFNV_RECONSTRUCT(CFilter)(&v14, CollisionFilterInfo)->GetLayer() == L_TRANSPARENT_SMALL ||
-            (v8 = apTargetCollidable->getCollisionFilterInfo(),
-             XFNV_RECONSTRUCT(CFilter)(&v13, v8)->GetLayer() == L_TRANSPARENT_SMALL_ANIM)) {
+        if (CFilter(CollisionFilterInfo).GetLayer() == L_TRANSPARENT_SMALL ||
+            (v8 = apTargetCollidable->getCollisionFilterInfo(), CFilter(v8).GetLayer() == L_TRANSPARENT_SMALL_ANIM)) {
             BGSProjectile::BGSProjectileFlags emotion = apProjectileBase->GetMotionType();
             if (emotion != BGSProjectile::MOTION_GRENADE &&
                 (emotion != BGSProjectile::MOTION_MISSILE ||

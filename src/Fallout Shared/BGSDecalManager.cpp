@@ -1084,8 +1084,7 @@ void BGSDecalEmitter::Update() {
         kNormal.~NiPoint3();
         ::new (&kNormal) NiPoint3;
         HK2NINS(kNormal, kPick.GetAllCollector()->getHits().operator[]<hkpWorldRayCastOutput>(i).m_normal);
-        CFilter kHitFilter;
-        bool bLand = XFNV_RECONSTRUCT(CFilter)(&kHitFilter, pCollidable->getCollisionFilterInfo())->GetGroup() == 1;
+        bool bLand = CFilter(pCollidable->getCollisionFilterInfo()).GetGroup() == 1;
         NiAVObject* pObject = nullptr;
         if (bLand) {
             pObject = TES::pInstance->GetLandGeometry(kHitPoint);

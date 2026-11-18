@@ -36,7 +36,6 @@ CombatProcedureEngageTarget::~CombatProcedureEngageTarget() {}
 
 void CombatProcedureEngageTarget::Update() {
     NiPoint3 optimalLocation;
-    CombatLocation dodgeLocation_2;
     NiPoint3 newPoint;
     XFNV_INLINED_LOCAL(PathingRequest, request_2, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
@@ -216,6 +215,7 @@ void CombatProcedureEngageTarget::Update() {
                                 (v26 = pattacker->pCurrentProcess, !v26->HasMovementAnim(ANIM_GROUP_MOVE_RIGHT))) {
                                 bcanDodge = false;
                             }
+                            CombatLocation dodgeLocation_2;
                             if (bcanDodge &&
                                 (!RandomBool(0.25f) &&
                                  ((fdodgeDistance = 0.0f,
@@ -223,9 +223,8 @@ void CombatProcedureEngageTarget::Update() {
                                       ? fdodgeDistance = RandomFloat(64.0f, 192.0f)
                                       : fdodgeDistance = RandomFloat(128.0f, 384.0f),
                                   (LeftRightDodgeLOSTimer.Clear(),
-                                   (XFNV_RECONSTRUCT(CombatLocation)(&dodgeLocation_2),
-                                    pcombatState
-                                        ->FindBestDodgeLocation(&dodgeLocation_2, 3u, 0, fdodgeDistance, 24.0f)))))) {
+                                   pcombatState
+                                       ->FindBestDodgeLocation(&dodgeLocation_2, 3u, 0, fdodgeDistance, 24.0f))))) {
                                 PathingRequest request_6;
                                 TESWorldSpace* v16 = pattacker->GetWorldSpace();
                                 TESObjectCELL* v10 = pattacker->GetParentCell();

@@ -854,8 +854,6 @@ PROCEDURE SandBoxActorPackageData::GetProcedure() {
 }
 
 void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
-    SandBoxChoiceListItem v6;
-    SandBoxChoiceListItem apMemory;
     PotentialTargets.Clear(true);
     bBed = false;
     bChair = false;
@@ -889,14 +887,12 @@ void SandBoxActorPackageData::ScanWorld(Actor* apActor) {
     if (ppack->SandboxGetAllowEating()) {
         ItemChange* pfood = apActor->GetBestFoodItem();
         if ((pfood) && (pfood->pContainerObj)) {
-            SandBoxChoiceListItem* v2 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&apMemory, nullptr, 2, 1u);
-            PotentialTargets.Add(*v2);
+            PotentialTargets.Add(SandBoxChoiceListItem(nullptr, 2, 1u));
             bFood = true;
         }
     }
     if (ppack->SandboxGetAllowWandering()) {
-        SandBoxChoiceListItem* v3 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&v6, nullptr, 3, 1u);
-        PotentialTargets.Add(*v3);
+        PotentialTargets.Add(SandBoxChoiceListItem(nullptr, 3, 1u));
     }
 }
 
@@ -1007,12 +1003,6 @@ void SandBoxActorPackageData::operator delete(void* apMemory) {
 }
 
 bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void* aiFilterData) {
-    SandBoxChoiceListItem v9;
-    SandBoxChoiceListItem v10;
-    SandBoxChoiceListItem v11;
-    SandBoxChoiceListItem v12;
-    SandBoxChoiceListItem v13;
-    SandBoxChoiceListItem apMemory;
     SandBoxRefEvalFilter* pfilter = static_cast<SandBoxRefEvalFilter*>(aiFilterData);
     SandBoxActorPackageData* ppackData = pfilter->pPackData;
     Actor* pactor = pfilter->pActor;
@@ -1039,8 +1029,7 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
         case INGR_ID:
         case ALCH_ID: {
             if (ppack->SandboxGetAllowEating() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true))) {
-                SandBoxChoiceListItem* v8 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&v9, apRef, 2, 1u);
-                ppackData->PotentialTargets.Add(*v8);
+                ppackData->PotentialTargets.Add(SandBoxChoiceListItem(apRef, 2, 1u));
                 ppackData->bFood = true;
             }
             break;
@@ -1057,24 +1046,21 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
             TESFurniture* pfurn = static_cast<TESFurniture*>(apRef->GetObjectReference());
             if (ppack->SandboxGetAllowSleeping() &&
                 (pfurn->CanSleepOn() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true)))) {
-                SandBoxChoiceListItem* v5 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&v12, apRef, 1, 1u);
-                ppackData->PotentialTargets.Add(*v5);
+                ppackData->PotentialTargets.Add(SandBoxChoiceListItem(apRef, 1, 1u));
                 ppackData->bBed = true;
             }
             else if (
                 ppack->SandboxGetAllowFurniture() &&
                 (pfurn->CanSitOn() && (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true)))
             ) {
-                SandBoxChoiceListItem* v6 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&v11, apRef, 0, 1u);
-                ppackData->PotentialTargets.Add(*v6);
+                ppackData->PotentialTargets.Add(SandBoxChoiceListItem(apRef, 0, 1u));
                 ppackData->bChair = true;
             }
             else if (
                 ppack->SandboxGetAllowFurniture() && !pfurn->CanSitOn() && !pfurn->CanSleepOn() &&
                 (!apRef->GetOwner() || apRef->IsAnOwner(pactor, true))
             ) {
-                SandBoxChoiceListItem* v7 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&v10, apRef, 0, 1u);
-                ppackData->PotentialTargets.Add(*v7);
+                ppackData->PotentialTargets.Add(SandBoxChoiceListItem(apRef, 0, 1u));
                 ppackData->bChair = true;
             }
             break;
@@ -1082,8 +1068,7 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
         case NPC__ID:
         case CREA_ID: {
             if (ppack->SandboxGetAllowConversation() && apRef->IsActor() && apRef != pPlayer && apRef != pactor) {
-                SandBoxChoiceListItem* v4 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&v13, apRef, 5, 1u);
-                ppackData->PotentialTargets.Add(*v4);
+                ppackData->PotentialTargets.Add(SandBoxChoiceListItem(apRef, 5, 1u));
             }
             break;
         }
@@ -1094,8 +1079,7 @@ bool SandBoxActorPackageData::EvaluateReferenceforUse(TESObjectREFR* apRef, void
                 BGSIdleCollection::PICK_TYPE etype = pIdleMark->GetPickType();
                 bool badd = false;
                 if (pIdleMark->HasIdleForActor(pactor, apRef)) {
-                    SandBoxChoiceListItem* v3 = XFNV_RECONSTRUCT(SandBoxChoiceListItem)(&apMemory, apRef, 4, 1u);
-                    ppackData->PotentialTargets.Add(*v3);
+                    ppackData->PotentialTargets.Add(SandBoxChoiceListItem(apRef, 4, 1u));
                 }
             }
             break;

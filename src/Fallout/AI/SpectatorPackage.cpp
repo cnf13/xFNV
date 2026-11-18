@@ -184,49 +184,41 @@ NiPoint3 SpectatorThreatInfo::GetLastKnownPosTarget() const {
 
 // Builds the node in a temporary and copies it into nodeOut.
 void SpectatorThreatInfo::GetAvoidNode(PathingAvoidNode& nodeOut) const {
-    PathingAvoidNode kNode;
     if (bHasSource) {
         if (bHasTarget) {
-            nodeOut = *XFNV_RECONSTRUCT(PathingAvoidNode)(
-                &kNode, GetLastKnownPosSource(), GetLastKnownPosTarget(), fRadius, 100.0f
-            );
+            nodeOut = PathingAvoidNode(GetLastKnownPosSource(), GetLastKnownPosTarget(), fRadius, 100.0f);
         }
         else {
-            nodeOut = *XFNV_RECONSTRUCT(PathingAvoidNode)(&kNode, GetLastKnownPosSource(), fRadius, 100.0f);
+            nodeOut = PathingAvoidNode(GetLastKnownPosSource(), fRadius, 100.0f);
         }
     }
     else if (bHasTarget) {
-        nodeOut = *XFNV_RECONSTRUCT(PathingAvoidNode)(&kNode, GetLastKnownPosTarget(), fRadius, 100.0f);
+        nodeOut = PathingAvoidNode(GetLastKnownPosTarget(), fRadius, 100.0f);
     }
 }
 
 void SpectatorThreatInfo::GetAvoidNode(PathingAvoidNode* apPathingAvoidNode) const {
     NiPoint3 v9;
-    PathingAvoidNode v10;
     NiPoint3 v11;
-    PathingAvoidNode v12;
     NiPoint3 v13;
     NiPoint3 result;
-    PathingAvoidNode apMemory;
     if (bHasSource) {
         float afRadius = fRadius;
         if (bHasTarget) {
             NiPoint3* LastKnownPosTarget = &(result = GetLastKnownPosTarget());
             NiPoint3* LastKnownPosSource = &(v13 = GetLastKnownPosSource());
-            *apPathingAvoidNode = *XFNV_RECONSTRUCT(PathingAvoidNode)(
-                &apMemory, *LastKnownPosSource, *LastKnownPosTarget, afRadius, 100.0f
-            );
+            *apPathingAvoidNode = PathingAvoidNode(*LastKnownPosSource, *LastKnownPosTarget, afRadius, 100.0f);
         }
         else {
             NiPoint3* v3 = &(v11 = GetLastKnownPosSource());
-            *apPathingAvoidNode = *XFNV_RECONSTRUCT(PathingAvoidNode)(&v12, *v3, afRadius, 100.0f);
+            *apPathingAvoidNode = PathingAvoidNode(*v3, afRadius, 100.0f);
         }
     }
     else {
         if (bHasTarget) {
             float afRadiusa = fRadius;
             NiPoint3* v4 = &(v9 = GetLastKnownPosTarget());
-            *apPathingAvoidNode = *XFNV_RECONSTRUCT(PathingAvoidNode)(&v10, *v4, afRadiusa, 100.0f);
+            *apPathingAvoidNode = PathingAvoidNode(*v4, afRadiusa, 100.0f);
         }
     }
 }

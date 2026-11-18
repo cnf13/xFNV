@@ -1705,8 +1705,7 @@ void ProcessLists::ParallelActorAnimationMovementUpdates() {
         }
     }
     if (kArray.GetSize()) {
-        BSParallelArrayTask kTask;
-        XFNV_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateAnimMovement, &kArray, kArray.GetSize());
+        BSParallelArrayTask kTask(&UpdateAnimMovement, &kArray, kArray.GetSize());
         pParallelTaskManager->RunTask(&kTask);
     }
     kArray.~BSScrapArray<Actor*>();
@@ -1970,8 +1969,7 @@ void ProcessLists::ParallelUpdateAnimationScenegraph() {
         }
     }
     if (kArray.GetSize()) {
-        BSParallelArrayTask kTask;
-        XFNV_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateAnimSceneGraph, &kArray, kArray.GetSize());
+        BSParallelArrayTask kTask(&UpdateAnimSceneGraph, &kArray, kArray.GetSize());
         pParallelTaskManager->RunTask(&kTask);
     }
     kArray.~BSScrapArray<Animation*>();
@@ -2506,8 +2504,7 @@ void ProcessLists::UpdateTempEffectsParallel(float afDeltaTime) {
     }
 
     if (kTaskArray.GetSize()) {
-        BSParallelArrayTask kTask;
-        XFNV_RECONSTRUCT(BSParallelArrayTask)(&kTask, &UpdateTempEffect, &kTaskArray, kTaskArray.GetSize());
+        BSParallelArrayTask kTask(&UpdateTempEffect, &kTaskArray, kTaskArray.GetSize());
         pParallelTaskManager->RunTask(&kTask);
         for (uint32_t i = 0; i < kTaskArray.GetSize(); ++i) {
             EffectTaskData& rData = kTaskArray[i];

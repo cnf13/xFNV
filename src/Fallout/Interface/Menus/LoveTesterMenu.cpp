@@ -770,10 +770,8 @@ void LoveTesterMenu::InitMachine() {
         NiPointLight* pLight = pLightMemory ? ::new (pLightMemory) NiPointLight : nullptr;
         NiPoint3 kTranslate;
         pLight->SetTranslate(*::new (&kTranslate) NiPoint3(0.0f, 0.0f, 0.0f));
-        NiColor kDiffuse;
-        pLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.85f, 0.85f, 0.85f));
-        NiColor kSpecular;
-        pLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, fRadius, 0.0f, 0.0f));
+        pLight->SetDiffuseColor(NiColor(0.85f, 0.85f, 0.85f));
+        pLight->SetSpecularColor(NiColor(fRadius, 0.0f, 0.0f));
         pLight->SetDimmer(1.0f);
         NiUpdateData kLightUpdate;
         kLightUpdate.~NiUpdateData();

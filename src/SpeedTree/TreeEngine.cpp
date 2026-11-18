@@ -437,9 +437,8 @@ void CTreeEngine::ParseTreeInfo(CTreeFileAccess& cFile) {
             }
         }
         if (nSeed == 2000) {
-            std::basic_string<char, std::char_traits<char>, std::allocator<char>> a2;
             std::basic_string<char, std::char_traits<char>, std::allocator<char>> result = cFile.ParseString();
-            XFNV_RECONSTRUCT(std::string)(&a2);
+            std::basic_string<char, std::char_traits<char>, std::allocator<char>> a2;
             a2.assign(result, 0, std::string::npos);
             m_sTreeInfo.m_strBranchTextureFilename.assign(a2, 0, std::string::npos);
             CIdvFilename* _Right = m_sTreeInfo.m_strBranchTextureFilename.NoPath(&v7);

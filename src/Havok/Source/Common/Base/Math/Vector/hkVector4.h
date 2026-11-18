@@ -178,7 +178,7 @@ public:
     hkSimdReal getSimdAt(int32_t i) const {
         hkSimdReal kResult;
         switch (i) {
-            case 0: XFNV_RECONSTRUCT(hkSimdReal)(&kResult, m_quad); break;
+            case 0: kResult = hkSimdReal(m_quad); break;
             case 1: {
                 hkQuadReal kLane = _mm_shuffle_ps(m_quad, m_quad, _MM_SHUFFLE(1, 1, 1, 1));
                 kResult.~hkSimdReal();
@@ -211,8 +211,7 @@ public:
         const hkQuadReal approx = _mm_rsqrt_ss(len2);
         const hkQuadReal refined =
             _mm_mul_ss(_mm_mul_ss(half, approx), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(len2, approx), approx)));
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_andnot_ps(len2EqualsZero, refined));
+        hkSimdReal kResult(_mm_andnot_ps(len2EqualsZero, refined));
         return kResult;
     }
 
@@ -226,8 +225,7 @@ public:
         const hkQuadReal approx = _mm_rsqrt_ss(len2);
         const hkQuadReal refined =
             _mm_mul_ss(_mm_mul_ss(half, approx), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(len2, approx), approx)));
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_andnot_ps(len2EqualsZero, refined));
+        hkSimdReal kResult(_mm_andnot_ps(len2EqualsZero, refined));
         return kResult;
     }
 
@@ -235,14 +233,12 @@ public:
     hkSimdReal dot3(const hkVector4& x) const {
         hkQuadReal x2 = _mm_mul_ps(m_quad, x.m_quad);
         hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(1, 1, 1, 1)), x2);
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(2, 2, 2, 2)), xySum));
+        hkSimdReal kResult(_mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(2, 2, 2, 2)), xySum));
         return kResult;
     }
 
     hkSimdReal length3() const {
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_sqrt_ss(dot3(*this).getQuad()));
+        hkSimdReal kResult(_mm_sqrt_ss(dot3(*this).getQuad()));
         return kResult;
     }
 
@@ -434,8 +430,7 @@ public:
         hkQuadReal x2 = _mm_mul_ps(m_quad, x.m_quad);
         hkQuadReal sum0 = _mm_add_ps(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(1, 0, 3, 2)), x2);
         hkQuadReal sum1 = _mm_shuffle_ps(sum0, sum0, _MM_SHUFFLE(2, 3, 0, 1));
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_add_ps(sum0, sum1));
+        hkSimdReal kResult(_mm_add_ps(sum0, sum1));
         return kResult;
     }
 
@@ -446,25 +441,20 @@ public:
         hkQuadReal zwSum = _mm_add_ss(
             _mm_shuffle_ps(x2, x2, _MM_SHUFFLE(2, 2, 2, 2)), _mm_shuffle_ps(m_quad, m_quad, _MM_SHUFFLE(3, 3, 3, 3))
         );
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_add_ps(xySum, zwSum));
+        hkSimdReal kResult(_mm_add_ps(xySum, zwSum));
         return kResult;
     }
 
     hkSimdReal horizontalAdd3() const {
         hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(m_quad, m_quad, _MM_SHUFFLE(1, 1, 1, 1)), m_quad);
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(
-            &kResult, _mm_add_ss(_mm_shuffle_ps(m_quad, m_quad, _MM_SHUFFLE(2, 2, 2, 2)), xySum)
-        );
+        hkSimdReal kResult(_mm_add_ss(_mm_shuffle_ps(m_quad, m_quad, _MM_SHUFFLE(2, 2, 2, 2)), xySum));
         return kResult;
     }
 
     hkSimdReal horizontalAdd4() const {
         hkQuadReal sum0 = _mm_add_ps(_mm_shuffle_ps(m_quad, m_quad, _MM_SHUFFLE(1, 0, 3, 2)), m_quad);
         hkQuadReal sum1 = _mm_shuffle_ps(sum0, sum0, _MM_SHUFFLE(2, 3, 0, 1));
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_add_ps(sum0, sum1));
+        hkSimdReal kResult(_mm_add_ps(sum0, sum1));
         return kResult;
     }
 
@@ -476,8 +466,7 @@ public:
     }
 
     hkSimdReal length4() const {
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_sqrt_ss(dot4(*this).getQuad()));
+        hkSimdReal kResult(_mm_sqrt_ss(dot4(*this).getQuad()));
         return kResult;
     }
 
@@ -498,8 +487,7 @@ public:
         hkQuadReal len2 = dot3(*this).getQuad();
         hkQuadReal lenInv = lengthInverse3().broadcast().m_quad;
         m_quad = _mm_mul_ps(lenInv, m_quad);
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_mul_ss(len2, lenInv));
+        hkSimdReal kResult(_mm_mul_ss(len2, lenInv));
         return kResult;
     }
 
@@ -507,16 +495,14 @@ public:
         hkQuadReal len2 = dot4(*this).getQuad();
         hkQuadReal lenInv = lengthInverse4().broadcast().m_quad;
         m_quad = _mm_mul_ps(lenInv, m_quad);
-        hkSimdReal kResult;
-        XFNV_RECONSTRUCT(hkSimdReal)(&kResult, _mm_mul_ss(len2, lenInv));
+        hkSimdReal kResult(_mm_mul_ss(len2, lenInv));
         return kResult;
     }
 
     // Scales the vector by the rsqrtss estimate of 1 / |xyz|, unrefined.
     void fastNormalize3() {
         hkQuadReal len2 = dot3(*this).getQuad();
-        hkSimdReal approx;
-        XFNV_RECONSTRUCT(hkSimdReal)(&approx, _mm_rsqrt_ss(len2));
+        hkSimdReal approx(_mm_rsqrt_ss(len2));
         m_quad = _mm_mul_ps(m_quad, approx.broadcast().m_quad);
     }
 
@@ -525,8 +511,7 @@ public:
     hkResult normalize3IfNotZero() {
         const float lengthSqrd3 = lengthSquared3();
         if (lengthSqrd3 != 0.0f) {
-            hkSimdReal kInverse;
-            XFNV_RECONSTRUCT(hkSimdReal)(&kInverse, 1.0f / std::sqrtf(lengthSqrd3));
+            hkSimdReal kInverse(1.0f / std::sqrtf(lengthSqrd3));
             mul4(kInverse);
             return HK_SUCCESS;
         }

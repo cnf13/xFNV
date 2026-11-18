@@ -12,8 +12,7 @@ void DoNothing(int32_t iValue) {
 // a float local before Raw refills the slot.
 float Random::Next() {
     if (seed == 0.0) {
-        std::string strMessage;
-        XFNV_RECONSTRUCT(std::string)(&strMessage, "Random number generator not initialised");
+        std::string strMessage("Random number generator not initialised");
         throw std::logic_error(strMessage);
     }
     int32_t iIndex = static_cast<int32_t>(Raw() * 128.0);

@@ -176,7 +176,6 @@ TESObjectLAND::~TESObjectLAND() {
 // size). The three buffers are zeroed once, at entry, so that an empty or short chunk (malformed data) does not leave
 // them uninitialised, as GetChunkData writes only the chunk's bytes.
 bool TESObjectLAND::Load(TESFile* pFile) {
-    NiColorA kColor;
     NiPoint2 v35;
     FILE_TEX_DATA texdata_2;
     FILE_TEX_DATA texdata;
@@ -413,12 +412,12 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     float v29 = static_cast<double>(v48[3 * curvert_2 + 2]) / 255.0;
                                     float v28 = static_cast<double>(v48[3 * curvert_2 + 1]) / 255.0;
                                     float fR = static_cast<double>(v48[3 * curvert_2]) / 255.0;
-                                    NiColorA* v7 = XFNV_RECONSTRUCT(NiColorA)(&kColor, fR, v28, v29, 1.0f);
+                                    NiColorA kColor(fR, v28, v29, 1.0f);
                                     NiColorA* v8 = &this->pLoadedData->ppColorsA[i][j];
-                                    v8->r = v7->r;
-                                    v8->g = v7->g;
-                                    v8->b = v7->b;
-                                    v8->a = v7->a;
+                                    v8->r = kColor.r;
+                                    v8->g = kColor.g;
+                                    v8->b = kColor.b;
+                                    v8->a = kColor.a;
                                 }
                             }
                         }
@@ -2812,7 +2811,6 @@ void TESObjectLAND::GetNormal(int32_t iblock, int32_t index, NiPoint3& norm) {
 // The height, normal, colour and DATA buffers are zeroed once, at entry, because GetChunkData writes only the chunk's
 // bytes and they would otherwise be read uninitialised when a chunk is empty or short (malformed data).
 bool TESObjectLAND::LoadVerticesIntoArrays() {
-    NiColorA kColor;
     NiPoint2 v42;
     FILE_TEX_DATA texdata_2;
     FILE_TEX_DATA texdata;
@@ -3092,12 +3090,12 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                     float v35 = static_cast<double>(v55[3 * curvert_2 + 2]) / 255.0;
                                     float v34 = static_cast<double>(v55[3 * curvert_2 + 1]) / 255.0;
                                     float fR = static_cast<double>(v55[3 * curvert_2]) / 255.0;
-                                    NiColorA* v8 = XFNV_RECONSTRUCT(NiColorA)(&kColor, fR, v34, v35, 1.0f);
+                                    NiColorA kColor(fR, v34, v35, 1.0f);
                                     NiColorA* v9 = &this->pLoadedData->ppColorsA[i][j];
-                                    v9->r = v8->r;
-                                    v9->g = v8->g;
-                                    v9->b = v8->b;
-                                    v9->a = v8->a;
+                                    v9->r = kColor.r;
+                                    v9->g = kColor.g;
+                                    v9->b = kColor.b;
+                                    v9->a = kColor.a;
                                 }
                             }
                         }

@@ -2299,7 +2299,6 @@ void BSFaceGenManager::ApplyHairMorph(NiTriBasedGeom* apGeom, float afModifierVa
         return;
     }
     NiGeometryDataIteratorNiPoint3 kIterator;
-    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&kIterator);
     apGeom->GetModelData()->GetVerticesIterator(kIterator);
     BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(apGeom, kIterator);
     if (kIterator.GetCurrentPosition()) {
@@ -2309,7 +2308,6 @@ void BSFaceGenManager::ApplyHairMorph(NiTriBasedGeom* apGeom, float afModifierVa
 }
 
 void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDetail) {
-    NiGeometryDataIteratorNiPoint3 spNewFaceGeo;
     XFNV_INLINED_LOCAL(NiPointer<BSFaceGenModel>, pmodelFG, std::nullopt, std::nullopt);
     NiCloningProcess v20;
     BSHash kDirHash;
@@ -2407,7 +2405,7 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 pshapeHead->SetShader(Shader);
                 uint16_t usVertices = pshapeHead->GetActiveVertexCount();
                 if (pshapeHead->GetModelData()->LockPackedVertexData(true)) {
-                    XFNV_RECONSTRUCT(NiTConvertingStrideIterator<NiPoint3>)(&spNewFaceGeo);
+                    NiGeometryDataIteratorNiPoint3 spNewFaceGeo;
                     pshapeHead->GetModelData()->GetVerticesIterator(spNewFaceGeo);
                     if (spNewFaceGeo.m_pvCurrentPosition) {
                         BSFaceGenManager::ComputeModelBound(

@@ -3247,8 +3247,7 @@ void TESWaterSystem::MTRenderSkyReflectionTexture() {
     float fC = kPlane.GetNormal().z;
     float fB = kPlane.GetNormal().y;
     float fA = kPlane.GetNormal().x;
-    NiColorA kClipPlane;
-    SetClipPlane(*XFNV_RECONSTRUCT(NiColorA)(&kClipPlane, fA, fB, fC, fD), 0);
+    SetClipPlane(NiColorA(fA, fB, fC, fD), 0);
     BSRenderState::SetUserClipPlaneEnables(true, false, false, false, false, false, BSRS_NOLOCK);
     BSShaderAccumulator* pSorter = PlaceableWaterGroup::spSkyReflectionSorter.operator->();
     pCamera = PlaceableWaterGroup::spSkyReflectionCamera.operator->();
@@ -3270,8 +3269,7 @@ void TESWaterSystem::SetClipPlane(NiColorA afData, int32_t aiPlane) {
     D3DXMATRIX kInverse;
 
     // The view matrix with its translation recomputed from the camera position along each axis.
-    alignas(16) D3DXMATRIX kView;
-    XFNV_RECONSTRUCT(D3DXMATRIX)(&kView, *BSShaderManager::GetRenderer()->GetD3DView());
+    alignas(16) D3DXMATRIX kView(*BSShaderManager::GetRenderer()->GetD3DView());
     NiPoint3 kAxis0;
     NiPoint3* pAxis0 = ::new (&kAxis0) NiPoint3(kView._11, kView._21, kView._31);
     kView._41 = -BSShader::GetCameraWorldTranslate()->Dot(*pAxis0);
@@ -3282,8 +3280,7 @@ void TESWaterSystem::SetClipPlane(NiColorA afData, int32_t aiPlane) {
     NiPoint3* pAxis2 = ::new (&kAxis2) NiPoint3(kView._13, kView._23, kView._33);
     kView._43 = -BSShader::GetCameraWorldTranslate()->Dot(*pAxis2);
 
-    alignas(16) D3DXMATRIX kProj;
-    XFNV_RECONSTRUCT(D3DXMATRIX)(&kProj, *BSShaderManager::GetRenderer()->GetD3DProj());
+    alignas(16) D3DXMATRIX kProj(*BSShaderManager::GetRenderer()->GetD3DProj());
     alignas(16) D3DXMATRIX kViewProj = kView * kProj;
     D3DXMatrixInverse_Thunk(&kInverse, nullptr, &kViewProj);
     D3DXMatrixTranspose_Thunk(&kViewProj, &kInverse);

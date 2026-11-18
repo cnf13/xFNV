@@ -165,8 +165,6 @@ void FORenderedMenuRaceSex::Initialize() {
     NiAlphaProperty* v28;
     int32_t ScreenHeight;
     NiCamera* pcam;
-    NiColor v46;
-    NiColor v47;
     NiPoint3 dst;
     NiMatrix3 mat2;
     NiMatrix3 rot;
@@ -321,8 +319,8 @@ void FORenderedMenuRaceSex::Initialize() {
         pgeom->AttachChild(plight, 1);
         NiPoint3* v19 = ::new (&dst) NiPoint3(0.0f, -50.0f, 0.0f);
         plight->SetTranslate(*v19);
-        plight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&v47, 0.75f, 0.75f, 0.75f));
-        plight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&v46, 1000.0f, 0.0f, 0.0f));
+        plight->SetDiffuseColor(NiColor(0.75f, 0.75f, 0.75f));
+        plight->SetSpecularColor(NiColor(1000.0f, 0.0f, 0.0f));
         plight->SetDimmer(1.0f);
         NiUpdateData ud(0.0f, false, false);
         plight->Update(ud);

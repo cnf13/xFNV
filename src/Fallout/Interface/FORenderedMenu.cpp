@@ -795,20 +795,17 @@ void FORenderedMenu::HideMessageQuantityTutorialMenus() {
 }
 
 void FORenderedMenu::CreateLight() {
-    NiColor kSpecular;
-    NiColor kAmbient;
-    NiColor kDiffuse;
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     if (CreateMenuLight("Omni01", ShadowSceneNode_)) {
         NiPointLight* MenuLight = GetMenuLight();
         if (MenuLight) {
-            MenuLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.0f, 0.0f, 0.0f));
-            MenuLight->SetAmbientColor(*XFNV_RECONSTRUCT(NiColor)(&kAmbient, 0.0f, 0.0f, 0.0f));
+            MenuLight->SetDiffuseColor(NiColor(0.0f, 0.0f, 0.0f));
+            MenuLight->SetAmbientColor(NiColor(0.0f, 0.0f, 0.0f));
             MenuLight->NiPointLight::SetConstantAttenuation(0.0f);
             MenuLight->NiPointLight::SetLinearAttenuation(0.0f);
             MenuLight->NiPointLight::SetQuadraticAttenuation(0.0f);
             MenuLight->SetDimmer(1.0f);
-            MenuLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, 10.0f, 0.0f, 0.0f));
+            MenuLight->SetSpecularColor(NiColor(10.0f, 0.0f, 0.0f));
             NiColor kScreenColor;
             kScreenColor.~NiColor();
             ::new (&kScreenColor) NiColor(1.0f, 1.0f, 1.0f);

@@ -1640,8 +1640,7 @@ void CSpeedTreeRT::ParseCollisionObjects(CTreeFileAccess* pFile) {
             case File_CollisionCylinder: sShape.m_eType = CO_CYLINDER; break;
             case File_CollisionBox: sShape.m_eType = CO_BOX; break;
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed collision object info");
+                std::string strDetails("malformed collision object info");
                 throw IdvFileError(strDetails, false);
             }
         }
@@ -1663,15 +1662,13 @@ void CSpeedTreeRT::ParseCollisionObjects(CTreeFileAccess* pFile) {
                 sShape.m_afDimensions[2] = pFile->ParseFloat();
                 break;
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "unknown collision object type");
+                std::string strDetails("unknown collision object type");
                 throw IdvFileError(strDetails, false);
             }
         }
         m_pCollisionObjects->m_vObjects.push_back(sShape);
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
-            std::string strDetails;
-            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing collision object info");
+            std::string strDetails("premature end of file reached parsing collision object info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2030,14 +2027,12 @@ void CSpeedTreeRT::ParseLodInfo(CTreeFileAccess* pFile) {
             case File_BeginEngineLodInfo: m_pEngine->ParseLodInfo(*pFile); break;
             case File_LeafSizeIncreaseFactor: m_fLeafSizeIncreaseFactor = pFile->ParseFloat(); break;
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed lod info");
+                std::string strDetails("malformed lod info");
                 throw IdvFileError(strDetails, false);
             }
         }
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
-            std::string strDetails;
-            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing new lod info");
+            std::string strDetails("premature end of file reached parsing new lod info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2050,14 +2045,12 @@ void CSpeedTreeRT::ParseWindInfo(CTreeFileAccess* pFile) {
     EFileToken eToken = pFile->ParseToken();
     do {
         if (eToken != File_WindLevel) {
-            std::string strDetails;
-            XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed new wind info");
+            std::string strDetails("malformed new wind info");
             throw IdvFileError(strDetails, false);
         }
         m_pEngine->m_nBranchesWeightLevel = pFile->ParseInt();
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
-            std::string strDetails;
-            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing new wind info");
+            std::string strDetails("premature end of file reached parsing new wind info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2129,8 +2122,7 @@ void CSpeedTreeRT::ParseTextureCoordInfo(CTreeFileAccess* pFile) {
                 break;
             case File_CompositeFilename: {
                 // The parsed string is built in the by-value argument of CIdvFilename's constructor, which frees it.
-                CIdvFilename cFilename;
-                XFNV_RECONSTRUCT(CIdvFilename)(&cFilename, pFile->ParseString());
+                CIdvFilename cFilename(pFile->ParseString());
                 CIdvFilename cNoPath;
                 m_pEmbeddedTexCoords->m_strCompositeFilename.assign(*cFilename.NoPath(&cNoPath), 0, std::string::npos);
                 break;
@@ -2138,14 +2130,12 @@ void CSpeedTreeRT::ParseTextureCoordInfo(CTreeFileAccess* pFile) {
             case File_HorizontalBillboard: m_bHorizontalBillboard = pFile->ParseBool(); break;
             case File_360Billboard: m_b360Billboard = pFile->ParseBool(); break;
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed texture coord info");
+                std::string strDetails("malformed texture coord info");
                 throw IdvFileError(strDetails, false);
             }
         }
         if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
-            std::string strDetails;
-            XFNV_RECONSTRUCT(std::string)(&strDetails, "premature end of file reached parsing texture coordinate info");
+            std::string strDetails("premature end of file reached parsing texture coordinate info");
             throw IdvFileError(strDetails, false);
         }
         eToken = pFile->ParseToken();
@@ -2178,16 +2168,12 @@ void CSpeedTreeRT::ParseSupplementalTexCoordInfo(CTreeFileAccess* pFile) {
                     }
                     break;
                 default: {
-                    std::string strDetails;
-                    XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed texture coord info");
+                    std::string strDetails("malformed texture coord info");
                     throw IdvFileError(strDetails, false);
                 }
             }
             if (static_cast<uint32_t>(pFile->m_nIndex) >= pFile->m_vMemory.size()) {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(
-                    &strDetails, "premature end of file reached parsing texture coordinate info"
-                );
+                std::string strDetails("premature end of file reached parsing texture coordinate info");
                 throw IdvFileError(strDetails, false);
             }
             eToken = pFile->ParseToken();
@@ -3083,8 +3069,7 @@ CIdvFilename* CIdvFilename::NoPath(CIdvFilename* apResult) {
             break;
         }
     }
-    std::string strNoPath;
-    XFNV_RECONSTRUCT(std::string)(&strNoPath, szBuffer);
+    std::string strNoPath(szBuffer);
     ::new (apResult) std::string(strNoPath);
     return apResult;
 }
@@ -3179,10 +3164,10 @@ void IdvFileError::operator delete(void* apMemory) {
 const std::string&
 IdvFileError::BuildMessage(const std::string& strDetails, bool bAppendSystemError, MessageStrings& aStrings) {
     if (bAppendSystemError) {
-        XFNV_RECONSTRUCT(std::string)(&aStrings[0], std::strerror(errno));
+        aStrings[0] = std::strerror(errno);
     }
     else {
-        XFNV_RECONSTRUCT(std::string)(&aStrings[0], "");
+        aStrings[0] = "";
     }
     aStrings[1] = strDetails + " [";
     aStrings[2] = aStrings[1] + aStrings[0];

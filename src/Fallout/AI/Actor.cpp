@@ -1805,7 +1805,6 @@ bool Actor::AddWornItem(TESBoundObject* apObject, int32_t aiNumber, ExtraDataLis
 
 void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
     uint32_t itrapHasHitID;
-    hkSimdReal v37;
     alignas(16) ImpactMixer::COLLISION_SOUND collisionData;
     NiPoint3 v46;
     CFilter ifilt;
@@ -1965,8 +1964,7 @@ void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
                         collisionData.cMaterialType1 = BHK_MATERIAL_MAX;
                         collisionData.cMaterialType2 = static_cast<int8_t>(apTarget->eMaterialAtHit);
                         collisionData.Location = location;
-                        hkSimdReal* a3_4a = XFNV_RECONSTRUCT(hkSimdReal)(&v37, 3.0f);
-                        collisionData.fVelocity = (trapVel.length3() * *a3_4a).operator float();
+                        collisionData.fVelocity = (trapVel.length3() * hkSimdReal(3.0f)).operator float();
                         // The sound ID is the sum of the actor's and the body's (32-bit) addresses.
                         collisionData.iID =
                             static_cast<int32_t>(reinterpret_cast<uintptr_t>(this) + reinterpret_cast<uintptr_t>(v39));
@@ -7548,13 +7546,12 @@ void Actor::HitMe(
             NiColorA kColor;
             kColor.~NiColorA();
             ::new (&kColor) NiColorA(0.0f, 0.0f, 0.0f, 0.0f);
-            NiColorA kArrowColor;
             // The attacker's hit vectors are blue for the player, else red.
             if (apAttacker->IsPc()) {
-                kColor = *XFNV_RECONSTRUCT(NiColorA)(&kArrowColor, 0.0f, 0.0f, 1.0f, 1.0f);
+                kColor = NiColorA(0.0f, 0.0f, 1.0f, 1.0f);
             }
             else {
-                kColor = *XFNV_RECONSTRUCT(NiColorA)(&kArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
+                kColor = NiColorA(1.0f, 0.0f, 0.0f, 1.0f);
             }
             NiPoint3 kArrow = kForce * 0.1f;
             NiNode* pArrow = static_cast<NiNode*>(BSTestObjects::CreateDirArrow(kArrow, &kColor));
@@ -8982,8 +8979,7 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
                                 BaseProcess* pProcess = GetCurrentAIProcess();
                                 bhkCharacterController* pController = pProcess->GetCharController();
                                 // The support normal is copied and the copy is never read, as the game does.
-                                alignas(16) hkVector4 kSupportNormal;
-                                XFNV_RECONSTRUCT(hkVector4)(&kSupportNormal, pController->GetSupportNormal());
+                                [[maybe_unused]] alignas(16) hkVector4 kSupportNormal(pController->GetSupportNormal());
                                 NiPoint3 kUp(0.0f, 0.0f, 1.0f);
                                 pExplosion->SetClosestPointNormal(kUp);
                                 BaseProcess* pAggressorProcess = apData->pAggressor->GetCurrentAIProcess();
@@ -9371,10 +9367,7 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
                             if (bMeleeKnockdown || (apData->pWeapon && apData->pWeapon->IsMeleeWeapon())) {
                                 uiImpulse = pRagdollController->QFeedbackImpulseStrong();
                             }
-                            alignas(16) hkSimdReal kImpulse;
-                            XFNV_RECONSTRUCT(hkSimdReal)(
-                                &kImpulse, static_cast<float>(static_cast<int64_t>(uiImpulse))
-                            );
+                            alignas(16) hkSimdReal kImpulse(static_cast<float>(static_cast<int64_t>(uiImpulse)));
                             kDirection.mul4(kImpulse);
                             pWorld->operator*()->markForWrite();
                             pBody->applyLinearImpulse(kDirection);
@@ -13450,12 +13443,10 @@ void Actor::MeleeAttack(bool abPowerAttack, bool abInCombatAttack) {
         kColor.~NiColorA();
         ::new (&kColor) NiColorA(0.0f, 0.0f, 0.0f, 0.0f);
         if (IsPc()) {
-            NiColorA kBlue;
-            kColor = *XFNV_RECONSTRUCT(NiColorA)(&kBlue, 0.0f, 0.0f, 1.0f, 1.0f);
+            kColor = NiColorA(0.0f, 0.0f, 1.0f, 1.0f);
         }
         else {
-            NiColorA kRed;
-            kColor = *XFNV_RECONSTRUCT(NiColorA)(&kRed, 1.0f, 0.0f, 0.0f, 1.0f);
+            kColor = NiColorA(1.0f, 0.0f, 0.0f, 1.0f);
         }
         NiPoint3 kStart;
         kStart.~NiPoint3();
@@ -13875,9 +13866,7 @@ bool Actor::ObjectHit(bool abPowerAttack) {
                     if (eBodyMaterial != eMaterial) {
                         continue;
                     }
-                    CFilter kHitFilter;
-                    CFilter* pHitFilter = XFNV_RECONSTRUCT(CFilter)(&kHitFilter, pCollidable->getCollisionFilterInfo());
-                    bool bLand = pHitFilter->GetGroup() == 1;
+                    bool bLand = CFilter(pCollidable->getCollisionFilterInfo()).GetGroup() == 1;
                     NiAVObject* pDecalObject = nullptr;
                     if (bLand) {
                         pDecalObject = TES::pInstance->GetLandGeometry(kHitPos);

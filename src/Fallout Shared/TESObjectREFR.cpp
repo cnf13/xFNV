@@ -7260,8 +7260,7 @@ void TESObjectREFR::InitAnimation() {
                         NiControllerSequence* pFirst = pManager->GetSequenceAt(0);
                         pManager->ActivateSequence(pFirst, 0, false, 1.0f, 0.0f, nullptr);
                         pFirst->SetOffset(-3.4028235e+38f);
-                        NiUpdateData kFirstData;
-                        XFNV_RECONSTRUCT(NiUpdateData)(&kFirstData, pFirst->GetBeginKeyTime(), true, false);
+                        NiUpdateData kFirstData(pFirst->GetBeginKeyTime(), true, false);
                         pNode->Update(kFirstData);
                     }
                     pManager->DeactivateAll(0.0f);
@@ -7431,8 +7430,7 @@ void TESObjectREFR::ApplyAllDecals(bool /*abSetDecalData*/) {
             float fBlue = static_cast<uint8_t>(pDecalData->GetDecalColor() >> 16) / 255.0;
             float fGreen = static_cast<uint8_t>(static_cast<uint16_t>(pDecalData->GetDecalColor()) >> 8) / 255.0;
             float fRed = static_cast<uint8_t>(pDecalData->GetDecalColor()) / 255.0;
-            NiColor kColor;
-            kData.fVertexColor = *XFNV_RECONSTRUCT(NiColor)(&kColor, fRed, fGreen, fBlue);
+            kData.fVertexColor = NiColor(fRed, fGreen, fBlue);
             kData.fDecalDepth = pDecalData->GetDecalDepth();
             kData.fSpecular = pDecalData->GetDecalShininess();
             kData.bAlphaTesting = pDecalData->GetAlphaTesting();
@@ -12373,7 +12371,8 @@ float bhkRigidBody::GethkMaxLinearVelocity() {
         }
         else {
             float f = pb->getMaxLinearVelocity();
-            p_m_maxLinearVelocity = XFNV_RECONSTRUCT(hkUFloat8)(&apMemory, f);
+            apMemory = hkUFloat8(f);
+            p_m_maxLinearVelocity = &apMemory;
         }
         return p_m_maxLinearVelocity->operator float();
     }

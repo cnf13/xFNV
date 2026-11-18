@@ -22,8 +22,7 @@ SpecificItemCollector::SpecificItemCollector(COL_LAYER aePick, MobileObject* arF
 void SpecificItemCollector::addRayHit(const hkpCdBody& arBody, const hkpShapeRayCastCollectorOutput& arHitInfo) {
     const hkpCollidable* pRoot = arBody.getRootCollidable();
     if (pRoot) {
-        CFilter kFilter;
-        XFNV_RECONSTRUCT(CFilter)(&kFilter, pRoot->getCollisionFilterInfo());
+        CFilter kFilter(pRoot->getCollisionFilterInfo());
         if ((kFilter.GetLayer() != iFilter.GetLayer() || kFilter.GetGroup() == iFilter.GetGroup()) &&
             (arHitInfo.m_hitFraction >= fMinHitFraction)) {
             hkpClosestRayHitCollector::addRayHit(arBody, arHitInfo);

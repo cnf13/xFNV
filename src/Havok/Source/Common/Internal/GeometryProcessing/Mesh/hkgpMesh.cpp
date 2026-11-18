@@ -7498,12 +7498,9 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                     }
                 }
                 // The crossing point of each edge: t = d0 / (d0 - d1), (1 - t) * start + t * end.
-                hkSimdReal t0;
-                XFNV_RECONSTRUCT(hkSimdReal)(&t0, _mm_div_ss(side[0], _mm_sub_ss(side[0], side[1])));
-                hkSimdReal t1;
-                XFNV_RECONSTRUCT(hkSimdReal)(&t1, _mm_div_ss(side[1], _mm_sub_ss(side[1], side[2])));
-                hkSimdReal t2;
-                XFNV_RECONSTRUCT(hkSimdReal)(&t2, _mm_div_ss(side[2], _mm_sub_ss(side[2], side[0])));
+                hkSimdReal t0(_mm_div_ss(side[0], _mm_sub_ss(side[0], side[1])));
+                hkSimdReal t1(_mm_div_ss(side[1], _mm_sub_ss(side[1], side[2])));
+                hkSimdReal t2(_mm_div_ss(side[2], _mm_sub_ss(side[2], side[0])));
                 hkVector4 cut[3];
                 cut[0].setInterpolate4(kA, kB, t0);
                 cut[1].setInterpolate4(kB, kC, t1);

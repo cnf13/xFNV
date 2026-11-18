@@ -352,21 +352,17 @@ void FORenderedTerminal::FadeOut() {
 }
 
 void FORenderedTerminal::InitLight() {
-    NiColor v9;
-    NiColor dst;
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     if (CreateMenuLight("Omni01", ShadowSceneNode_)) {
         NiPointLight* plight = GetMenuLight();
         if (plight) {
-            NiColor* v2 = XFNV_RECONSTRUCT(NiColor)(&dst, 0.0f, 0.0f, 0.0f);
-            plight->SetAmbientColor(*v2);
+            plight->SetAmbientColor(NiColor(0.0f, 0.0f, 0.0f));
             plight->SetConstantAttenuation(0.0f);
             plight->SetLinearAttenuation(0.0f);
             plight->SetQuadraticAttenuation(0.0f);
             plight->SetDimmer(1.0f);
             float* v3 = &gs_fScreenLightRadius_RenderedTerminal.Float();
-            NiColor* v4 = XFNV_RECONSTRUCT(NiColor)(&v9, *v3, 0.0f, 0.0f);
-            plight->SetSpecularColor(*v4);
+            plight->SetSpecularColor(NiColor(*v3, 0.0f, 0.0f));
             float fScreenLightColorB = gs_fScreenLightColorB_RenderedTerminal.Float();
             float fScreenLightColorG = gs_fScreenLightColorG_RenderedTerminal.Float();
             float* v5 = &gs_fScreenLightColorR_RenderedTerminal.Float();

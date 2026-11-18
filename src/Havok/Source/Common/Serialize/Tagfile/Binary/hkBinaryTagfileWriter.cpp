@@ -374,8 +374,7 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
             if (mi.m_class) {
                 // The SDK's hkDataClass(const_cast<hkDataClassImpl*>(mi.m_class)): the constructor takes a non-const
                 // implementation.
-                hkDataClass memberClass;
-                XFNV_RECONSTRUCT(hkDataClass)(&memberClass, const_cast<hkDataClassImpl*>(mi.m_class));
+                hkDataClass memberClass(const_cast<hkDataClassImpl*>(mi.m_class));
                 writeString(memberClass.getName());
             }
             else {
@@ -386,8 +385,7 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
     for (int32_t i = 0; i < numMembers; ++i) {
         if (minfo.m_data[i].m_class) {
             // As above: the SDK's const_cast for hkDataClass's constructor.
-            hkDataClass memberClass;
-            XFNV_RECONSTRUCT(hkDataClass)(&memberClass, const_cast<hkDataClassImpl*>(minfo.m_data[i].m_class));
+            hkDataClass memberClass(const_cast<hkDataClassImpl*>(minfo.m_data[i].m_class));
             writeClass(memberClass);
         }
     }

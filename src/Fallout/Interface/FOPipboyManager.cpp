@@ -541,17 +541,14 @@ void FOPipboyManager::InitLight() {
     }
     NiPointLight* pLight = this->GetMenuLight();
     if (pLight) {
-        NiColor kDiffuse;
-        pLight->SetDiffuseColor(*XFNV_RECONSTRUCT(NiColor)(&kDiffuse, 0.0f, 0.0f, 0.0f));
-        NiColor kAmbient;
-        pLight->SetAmbientColor(*XFNV_RECONSTRUCT(NiColor)(&kAmbient, 0.0f, 0.0f, 0.0f));
+        pLight->SetDiffuseColor(NiColor(0.0f, 0.0f, 0.0f));
+        pLight->SetAmbientColor(NiColor(0.0f, 0.0f, 0.0f));
         pLight->SetConstantAttenuation(0.0f);
         pLight->SetLinearAttenuation(0.0f);
         pLight->SetQuadraticAttenuation(0.0f);
         pLight->SetDimmer(1.0f);
         // The light radius lives in the specular colour's first channel.
-        NiColor kSpecular;
-        pLight->SetSpecularColor(*XFNV_RECONSTRUCT(NiColor)(&kSpecular, fScreenLightRadius.Float(), 0.0f, 0.0f));
+        pLight->SetSpecularColor(NiColor(fScreenLightRadius.Float(), 0.0f, 0.0f));
         alignas(NiColorA) uint8_t aucColor[sizeof(NiColorA)];
         NiColorA& kColor = *::new (aucColor) NiColorA(0.0f, 0.0f, 0.0f, 0.0f);
         // 4 is the pip-boy colour's id.

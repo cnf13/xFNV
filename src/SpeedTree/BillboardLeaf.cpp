@@ -153,8 +153,7 @@ CBillboardLeaf* CBillboardLeaf::Parse(CTreeFileAccess& cFile) {
             }
             case File_BillboardLeaf_TimeOffset: cFile.ParseFloat(); break;
             default: {
-                std::string strDetails;
-                XFNV_RECONSTRUCT(std::string)(&strDetails, "malformed billboard leaf");
+                std::string strDetails("malformed billboard leaf");
                 throw IdvFileError(strDetails, false);
             }
         }

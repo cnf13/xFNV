@@ -154,9 +154,7 @@ void CIdvBezierSpline::CreateEvenlySpacedPoints(uint32_t nNumPoints) {
     std::vector<CVec, std::allocator<CVec>> vRawPoints;
     vRawPoints.~vector<CVec, std::allocator<CVec>>();
     ::new (&vRawPoints) std::vector<CVec, std::allocator<CVec>>;
-    CVec cRawDefault;
-    CVec* pRawDefault = XFNV_RECONSTRUCT(CVec)(&cRawDefault);
-    vRawPoints.resize(nNumPoints, *pRawDefault);
+    vRawPoints.resize(nNumPoints, CVec());
 
     uint32_t i = 0;
     for (i = 0; i < nNumPoints; ++i) {
@@ -166,9 +164,7 @@ void CIdvBezierSpline::CreateEvenlySpacedPoints(uint32_t nNumPoints) {
     }
 
     m_vEvenlySpacedPoints.clear();
-    CVec cEvenDefault;
-    CVec* pEvenDefault = XFNV_RECONSTRUCT(CVec)(&cEvenDefault);
-    m_vEvenlySpacedPoints.resize(nNumPoints, *pEvenDefault);
+    m_vEvenlySpacedPoints.resize(nNumPoints, CVec());
     uint32_t nIndex = 0;
     m_vEvenlySpacedPoints[0] = m_vControlPoints[0];
 

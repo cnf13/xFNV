@@ -1367,7 +1367,7 @@ PathSmoother::UniqueVert* PathSmoother::DuplicateVert(
     PathSmoother::UniqueVert* pOriginalVert = *ppOriginalVert;
     PathSmoother::UniqueVert* pNewVert = CreateVert();
     pNewVert->Location = pOriginalVert->Location;
-    XFNV_RECONSTRUCT(NavMeshTriHandle)(&pNewVert->hNavMeshTri, pOriginalVert->hNavMeshTri);
+    pNewVert->hNavMeshTri = pOriginalVert->hNavMeshTri;
     uint32_t iEdgeCount = pOriginalVert->EdgeList.iSize;
     pOriginalVert->ShrunkLocation = aPreviousVertNewLocation;
     pOriginalVert->PushDelta = pOriginalVert->ShrunkLocation - pOriginalVert->Location;
@@ -1487,7 +1487,7 @@ PathSmoother::UniqueVert* PathSmoother::SplitBoundsEdge(uint32_t aiEdgeIndex, bo
     }
     PathSmoother::UniqueVert* pNewVert = CreateVert();
     pNewVert->Location = pStartVert->Location;
-    XFNV_RECONSTRUCT(NavMeshTriHandle)(&pNewVert->hNavMeshTri, pStartVert->hNavMeshTri);
+    pNewVert->hNavMeshTri = pStartVert->hNavMeshTri;
     if (abLeft) {
         LeftVerts.Insert(aiEdgeIndex + 1, pNewVert);
     }

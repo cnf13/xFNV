@@ -370,8 +370,7 @@ void PathingRequest::SetActorLockData(const ActorLockData& aLockData) {
 }
 
 void PathingRequest::SetActorLockData(Actor* apActor) {
-    ActorLockData kLockData;
-    LockData = *XFNV_RECONSTRUCT(ActorLockData)(&kLockData, apActor);
+    LockData = ActorLockData(apActor);
 }
 
 void PathingRequest::SetCanSwim(bool abCanSwim) {

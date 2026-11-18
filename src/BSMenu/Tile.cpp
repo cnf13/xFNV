@@ -3644,7 +3644,6 @@ void Tile::GetTextureAtlasInfo(
         char acLine[0x400];
         while (pFile->GetLine(acLine, 0x400, '\n')) {
             std::string kName;
-            XFNV_RECONSTRUCT(std::string)(&kName);
             TextureAtlasEntry* pEntry = nullptr;
             std::strtok(acLine, " ,\t");
             if (acLine[0] == '#' || acLine[0] == '\n' || acLine[0] == '\t' || acLine[0] == '\r' || acLine[0] == ' ') {

@@ -1721,10 +1721,7 @@ DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::Upda
                 double dSpeedSqr = kVelocity.SqrLength();
                 if (pAvoidActor->GetRadius() < dSpeedSqr) {
                     NiPoint3 kAhead = pAvoidActor->GetLocationOnReference() + kVelocity;
-                    PathingAvoidNode kAheadNode;
-                    pAvoidNodes->Add(
-                        *XFNV_RECONSTRUCT(PathingAvoidNode)(&kAheadNode, kAhead, fAvoidRadius, 2.0f, eType)
-                    );
+                    pAvoidNodes->Add(PathingAvoidNode(kAhead, fAvoidRadius, 2.0f, eType));
                 }
                 // The node sits at the character proxy's position when the actor collides with characters.
                 NiPoint3 kPosition = pAvoidActor->GetLocationOnReference();
@@ -1741,10 +1738,7 @@ DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::Upda
                     kPosition.x = kNiPosition.x;
                     kPosition.y = kNiPosition.y;
                 }
-                PathingAvoidNode kNode;
-                pAvoidNodes->Add(*XFNV_RECONSTRUCT(PathingAvoidNode)(
-                    &kNode, kPosition, fAvoidRadius, fAvoidanceAvoidNodeCost.Float(), eType
-                ));
+                pAvoidNodes->Add(PathingAvoidNode(kPosition, fAvoidRadius, fAvoidanceAvoidNodeCost.Float(), eType));
             }
             {
                 PathingLocation kOrigin(pActor);
@@ -2773,8 +2767,6 @@ void DetailedActorPathHandler::BuildAvoidanceList(
     DetailedActorPathHandler* apHandler,
     BSSimpleArray<DetailedActorPathHandler::ActorAvoidanceData, 1024>& aRetCandidates
 ) {
-    DetailedActorPathHandler::ActorAvoidanceData v15;
-    DetailedActorPathHandler::ActorAvoidanceData apMemory;
     float fdetection;
     NiMatrix3 rot;
     float fAngle = apActor->GetHeading(false);
@@ -2836,11 +2828,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
                                 apActor, apHandler, pact, currentPos, relativeMoveDir, fcheckDistance, favoidConeAngle,
                                 fdetection, false
                             )) {
-                            DetailedActorPathHandler::ActorAvoidanceData* v11 =
-                                XFNV_RECONSTRUCT_AS(Construct_009E5AB0, DetailedActorPathHandler::ActorAvoidanceData)(
-                                    &apMemory, pact, fdetection
-                                );
-                            aRetCandidates.Add(*v11);
+                            aRetCandidates.Add(DetailedActorPathHandler::ActorAvoidanceData(pact, fdetection));
                         }
                     }
                 }
@@ -2851,11 +2839,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
             apActor, apHandler, pPlayer, currentPos, worldSpaceMoveDir, fabsoluteAvoidDistance, favoidConeAngle,
             fdetection, false
         )) {
-        DetailedActorPathHandler::ActorAvoidanceData* v12 =
-            XFNV_RECONSTRUCT_AS(Construct_009E5AB0, DetailedActorPathHandler::ActorAvoidanceData)(
-                &v15, pPlayer, fdetection
-            );
-        aRetCandidates.Add(*v12);
+        aRetCandidates.Add(DetailedActorPathHandler::ActorAvoidanceData(pPlayer, fdetection));
     }
 }
 
@@ -2888,10 +2872,7 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
     PathingRequest* apRequest,
     DetailedActorPathHandler* apHandler
 ) {
-    alignas(16) PathingAvoidNode v16;
-    hkVector4 pconPos;
     NiPoint3 avoidCenter;
-    PathingAvoidNode v21;
     NiPoint3 v22;
     using avoidActors_t = BSSimpleArray<DetailedActorPathHandler::ActorAvoidanceData, 1024>;
     if (!apHandler || apHandler->eAvoidState != DetailedActorPathHandler::PATH_AVOID_REPATH) {
@@ -2950,22 +2931,19 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
                     float afRadius = fnodeRadius_2;
                     const NiPoint3* v8 = &pavoidActor->GetLocationOnReference();
                     NiPoint3* v9 = ::new (&v22) NiPoint3(*v8 + OneSecondDelta);
-                    PathingAvoidNode* v10 = XFNV_RECONSTRUCT(PathingAvoidNode)(&v21, *v9, afRadius, 2.0f, fAngleb);
-                    pavoidNodes->Add(*v10);
+                    pavoidNodes->Add(PathingAvoidNode(*v9, afRadius, 2.0f, fAngleb));
                 }
                 avoidCenter = pavoidActor->GetLocationOnReference();
                 bhkCharacterController* pavoidCon = pavoidActor->GetCharController();
                 if ((pavoidCon) && (!pavoidCon->GetFlag(bhkCharacterController::NO_CHARACTER_COLLISIONS))) {
                     NiPoint3 pconPosNi;
-                    XFNV_RECONSTRUCT(hkVector4)(&pconPos, pavoidCon->GethkPosition());
+                    hkVector4 pconPos(pavoidCon->GethkPosition());
                     HK2NI(pconPosNi, pconPos);
                     avoidCenter.x = pconPosNi.x;
                     avoidCenter.y = pconPosNi.y;
                 }
 
-                PathingAvoidNode* v11 =
-                    XFNV_RECONSTRUCT(PathingAvoidNode)(&v16, avoidCenter, fnodeRadius_2, 2.0f, nodeType);
-                pavoidNodes->Add(*v11);
+                pavoidNodes->Add(PathingAvoidNode(avoidCenter, fnodeRadius_2, 2.0f, nodeType));
                 if (apHandler) {
                     apHandler->eAvoidState = DetailedActorPathHandler::PATH_AVOID_REPATH;
                 }

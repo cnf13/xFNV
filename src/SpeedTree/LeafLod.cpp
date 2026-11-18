@@ -101,8 +101,7 @@ LeafArray* CLeafLodEngine::BuildNewLeaves(LeafArray* apResult) {
 // The inner loop tests vFound[nSearchIndex] in its condition and again in its body, as speedtree-2 does. Both distance
 // tests are strict and false for NaN. At the end vFound is destroyed, then vOrigLeafSet.
 void CLeafLodEngine::FindPairs(LeafArray vOrigLeafSet) {
-    BoolVector vFound;
-    XFNV_RECONSTRUCT(BoolVector)(&vFound, vOrigLeafSet.size(), false);
+    BoolVector vFound(vOrigLeafSet.size(), false);
     bool bFalse = false;
     BoolVector::iterator kLast = vFound.end();
     BoolVector::iterator kFirst = vFound.begin();

@@ -155,7 +155,6 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
     void* v15;
     void* v16;
     NiNode* pLOSGeometry;
-    NiColor dst;
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         pLOSGeometry = ::new (apMemory) NiNode(0);
@@ -182,8 +181,7 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
     }
     NiRefObject* v23 = static_cast<NiRefObject*>(v15);
     NiPointer<NiMaterialProperty> spmat(static_cast<NiMaterialProperty*>(v15));
-    NiColor* v1 = XFNV_RECONSTRUCT(NiColor)(&dst, 1.0f, 1.0f, 1.0f);
-    spmat.m_pObject->SetEmittance(*v1);
+    spmat.m_pObject->SetEmittance(NiColor(1.0f, 1.0f, 1.0f));
     spmat.m_pObject->SetAlpha(0.75f);
     NiAlphaProperty* a4 = spAlphaProp.m_pObject;
     pLOSGeometry->AttachProperty(a4);

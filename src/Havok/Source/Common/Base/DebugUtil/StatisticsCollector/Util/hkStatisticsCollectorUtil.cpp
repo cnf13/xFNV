@@ -107,8 +107,7 @@ void hkStatisticsCollectorUtil::addClassContents(
                 _addObjectContents(mem.m_name, pucMember, mem.getStructClass(), collector);
                 break;
             case hkClassMember::TYPE_SIMPLEARRAY: {
-                hkClassMemberAccessor accessor;
-                XFNV_RECONSTRUCT(hkClassMemberAccessor)(&accessor, const_cast<void*>(obj), &mem);
+                hkClassMemberAccessor accessor(const_cast<void*>(obj), &mem);
                 hkClassMemberAccessor::SimpleArray& simpleArray = accessor.asSimpleArray(0);
                 void* pData = simpleArray.data;
                 int32_t iSize = simpleArray.size;
@@ -123,8 +122,7 @@ void hkStatisticsCollectorUtil::addClassContents(
                 break;
             }
             case hkClassMember::TYPE_HOMOGENEOUSARRAY: {
-                hkClassMemberAccessor accessor;
-                XFNV_RECONSTRUCT(hkClassMemberAccessor)(&accessor, const_cast<void*>(obj), &mem);
+                hkClassMemberAccessor accessor(const_cast<void*>(obj), &mem);
                 hkClassMemberAccessor::HomogeneousArray& homogeneousArray = accessor.asHomogeneousArray(0);
                 int32_t iSize = homogeneousArray.size;
                 const hkClass* pClass = homogeneousArray.klass;
@@ -147,8 +145,7 @@ void hkStatisticsCollectorUtil::addClassContents(
                 break;
             }
             case hkClassMember::TYPE_CSTRING: {
-                hkClassMemberAccessor accessor;
-                XFNV_RECONSTRUCT(hkClassMemberAccessor)(&accessor, const_cast<void*>(obj), &mem);
+                hkClassMemberAccessor accessor(const_cast<void*>(obj), &mem);
                 int32_t iCount = mem.getCstyleArraySize();
                 if (iCount > 1) {
                     for (int32_t j = 0; j < iCount; j++) {
@@ -161,8 +158,7 @@ void hkStatisticsCollectorUtil::addClassContents(
                 break;
             }
             case hkClassMember::TYPE_STRINGPTR: {
-                hkClassMemberAccessor accessor;
-                XFNV_RECONSTRUCT(hkClassMemberAccessor)(&accessor, const_cast<void*>(obj), &mem);
+                hkClassMemberAccessor accessor(const_cast<void*>(obj), &mem);
                 int32_t iCount = mem.getCstyleArraySize();
                 if (iCount > 1) {
                     for (int32_t j = 0; j < iCount; j++) {
