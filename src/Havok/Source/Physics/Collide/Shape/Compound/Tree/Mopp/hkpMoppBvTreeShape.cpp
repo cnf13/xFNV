@@ -361,8 +361,7 @@ void hkpMoppBvTreeShape::castRayWithCollectorImpl(
 
 // The SDK's: the bundle's rays are walked through the MOPP code over the child collection, each ray's output one
 // level down its shape key path; a ray's hit key at this level is 0. The lanes hit come back through apResult.
-hkVector4Comparison* hkpMoppBvTreeShape::castRayBundleImpl(
-    hkVector4Comparison* apResult,
+hkVector4Comparison hkpMoppBvTreeShape::castRayBundleImpl(
     const hkpShapeRayBundleCastInput& input,
     hkpShapeRayBundleCastOutput& output,
     const hkVector4Comparison& mask
@@ -385,19 +384,19 @@ hkVector4Comparison* hkpMoppBvTreeShape::castRayBundleImpl(
     // The child is the shape collection the code was built over; the SDK casts it down.
     const hkpShapeCollection* collection = static_cast<const hkpShapeCollection*>(m_child.m_childShape);
     hkpMoppRayBundleVirtualMachine machine;
-    machine.queryRayBundle(apResult, collection, &code, input, output, mask);
+    hkVector4Comparison result = machine.queryRayBundle(collection, &code, input, output, mask);
     for (int32_t i = 0; i < 4; i++) {
         hkpShapeRayCastOutput& rayOutput = output.m_outputs[i];
         // EXE-INLINED none: hkpShapeRayCastOutput::changeLevel
         --rayOutput.m_shapeKeyIndex;
         // Equivalent to anyIsSet(hkVector4Comparison::getMaskForComponent(i)): tests the lane's bit from
         // axisMaskBits_10C92E0.
-        if ((_mm_movemask_ps(apResult->m_mask) & axisMaskBits_10C92E0[i]) != 0) {
+        if ((_mm_movemask_ps(result.m_mask) & axisMaskBits_10C92E0[i]) != 0) {
             rayOutput.m_shapeKeys[rayOutput.m_shapeKeyIndex] = 0;
         }
     }
     HK_TIMER_END();
-    return apResult;
+    return result;
 }
 
 const hkClass& hkpMoppBvTreeShape::staticClass() {

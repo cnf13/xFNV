@@ -125,8 +125,7 @@ hkpMoppRayBundleVirtualMachine::QueryBundle* hkpMoppRayBundleVirtualMachine::Que
 // Stores the collection, the result array, the input rays and the code, converts the rays into the code's integer space
 // as the root bundle under the caller's mask, walks the tree from the code's start and returns the lanes hit through
 // apResult.
-hkVector4Comparison* hkpMoppRayBundleVirtualMachine::queryRayBundle(
-    hkVector4Comparison* apResult,
+hkVector4Comparison hkpMoppRayBundleVirtualMachine::queryRayBundle(
     const hkpShapeContainer* collection,
     const hkpMoppCode* code,
     const hkpShapeRayBundleCastInput& input,
@@ -171,8 +170,7 @@ hkVector4Comparison* hkpMoppRayBundleVirtualMachine::queryRayBundle(
     // A code that starts with DATA_OFFSET puts the chunk id into its shape keys.
     m_reindexingMask = (*pCommands == HK_MOPP_DATA_OFFSET) ? -1 : 0;
     queryRayOnTree(&kScaledQuery, pCommands, &kQueryBundle, 0);
-    *apResult = m_hitsFound;
-    return apResult;
+    return m_hitsFound;
 }
 
 // Interprets the MOPP code for the bundle, rescaling the query on the scale commands, narrowing the bundle's lanes at
@@ -722,8 +720,8 @@ void hkpMoppRayBundleVirtualMachine::queryRayOnTree(
                     m_rayResultPtr->m_outputs[1].m_shapeKeyIndex++;
                     m_rayResultPtr->m_outputs[2].m_shapeKeyIndex++;
                     m_rayResultPtr->m_outputs[3].m_shapeKeyIndex++;
-                    hkVector4Comparison kHits;
-                    pShape->castRayBundleImpl(&kHits, *m_rays, *m_rayResultPtr, fQuery->m_activeMask);
+                    hkVector4Comparison kHits =
+                        pShape->castRayBundleImpl(*m_rays, *m_rayResultPtr, fQuery->m_activeMask);
                     for (int32_t i = 0; i < 4; ++i) {
                         m_rayResultPtr->m_outputs[i].m_shapeKeyIndex--;
                         if (_mm_movemask_ps(kHits.m_mask) & axisMaskBits_10C92E0[i]) {

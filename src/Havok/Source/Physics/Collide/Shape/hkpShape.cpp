@@ -77,12 +77,12 @@ int32_t hkpShape::calcSizeForSpu(const CalcSizeForSpuInput& input, int32_t spuBu
 
 // The SDK's castRayBundleImpl: the bundle's coordinates are transposed into one point per ray (w zero), each ray the
 // mask selects is cast on its own through castRayImpl, and the result holds the lanes whose ray hit.
-hkVector4Comparison* hkpShape::castRayBundleImpl(
-    hkVector4Comparison* apResult,
+hkVector4Comparison hkpShape::castRayBundleImpl(
     const hkpShapeRayBundleCastInput& input,
     hkpShapeRayBundleCastOutput& output,
     const hkVector4Comparison& mask
 ) const {
+    hkVector4Comparison result;
     const hkQuadReal kZero = _mm_setzero_ps();
     hkQuadReal from[4];
     hkQuadReal to[4];
@@ -119,8 +119,8 @@ hkVector4Comparison* hkpShape::castRayBundleImpl(
             }
         }
     }
-    apResult->m_mask = hkVector4Comparison_s_maskFromBits[uiHitMask];
-    return apResult;
+    result.m_mask = hkVector4Comparison_s_maskFromBits[uiHitMask];
+    return result;
 }
 
 // The class registry's finish callback for hkpMeshShape: runs the

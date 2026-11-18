@@ -42,8 +42,7 @@ public:
     int32_t calcSizeForSpu(const CalcSizeForSpuInput&, int32_t) const override;
     void getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const override;
     hkBool castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const override;
-    hkVector4Comparison* castRayBundleImpl(
-        hkVector4Comparison* apResult,
+    hkVector4Comparison castRayBundleImpl(
         const hkpShapeRayBundleCastInput& input,
         hkpShapeRayBundleCastOutput& output,
         const hkVector4Comparison& mask

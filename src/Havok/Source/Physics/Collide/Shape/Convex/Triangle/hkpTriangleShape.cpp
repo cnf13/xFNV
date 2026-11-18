@@ -306,14 +306,13 @@ hkBool hkpTriangleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShape
 // The SDK's castRayBundleImpl: the four rays against the triangle's plane, then each hit point against the three
 // edges, with a tolerance scaled by the normal's squared length. The lanes that hit nearer than their output's hit
 // fraction get the fraction and the normal turned against the ray; the result is the mask of those lanes.
-hkVector4Comparison* hkpTriangleShape::castRayBundleImpl(
-    hkVector4Comparison* apResult,
+hkVector4Comparison hkpTriangleShape::castRayBundleImpl(
     const hkpShapeRayBundleCastInput& input,
     hkpShapeRayBundleCastOutput& output,
     const hkVector4Comparison& mask
 ) const {
     HK_TIMER_BEGIN("rayBundleTriangle", nullptr);
-    *apResult = mask;
+    hkVector4Comparison result = mask;
     hkVector4 edge0;
     edge0.setSub4(m_vertexB, m_vertexA);
     hkVector4 edge1;
@@ -376,8 +375,8 @@ hkVector4Comparison* hkpTriangleShape::castRayBundleImpl(
         _mm_unpacklo_ps(_mm_set_ss(output.m_outputs[0].m_hitFraction), _mm_set_ss(output.m_outputs[2].m_hitFraction)),
         _mm_unpacklo_ps(_mm_set_ss(output.m_outputs[1].m_hitFraction), _mm_set_ss(output.m_outputs[3].m_hitFraction))
     );
-    apResult->m_mask = _mm_and_ps(
-        _mm_and_ps(_mm_andnot_ps(missesPlane, rdata_10CE1C0), apResult->m_mask),
+    result.m_mask = _mm_and_ps(
+        _mm_and_ps(_mm_andnot_ps(missesPlane, rdata_10CE1C0), result.m_mask),
         _mm_cmplt_ps(hitFractions.m_quad, outputFractions)
     );
     // The hit points, transposed as the rays are.
@@ -390,12 +389,12 @@ hkVector4Comparison* hkpTriangleShape::castRayBundleImpl(
     }
     hkVector4 edgeSides;
     calcEdgeSides(&m_vertexA, &m_vertexB, &normal, &edgeSides, hitPoints);
-    apResult->m_mask = _mm_and_ps(_mm_cmple_ps(tolerance, edgeSides.m_quad), apResult->m_mask);
+    result.m_mask = _mm_and_ps(_mm_cmple_ps(tolerance, edgeSides.m_quad), result.m_mask);
     calcEdgeSides(&m_vertexB, &m_vertexC, &normal, &edgeSides, hitPoints);
-    apResult->m_mask = _mm_and_ps(_mm_cmple_ps(tolerance, edgeSides.m_quad), apResult->m_mask);
+    result.m_mask = _mm_and_ps(_mm_cmple_ps(tolerance, edgeSides.m_quad), result.m_mask);
     calcEdgeSides(&m_vertexC, &m_vertexA, &normal, &edgeSides, hitPoints);
-    apResult->m_mask = _mm_and_ps(_mm_cmple_ps(tolerance, edgeSides.m_quad), apResult->m_mask);
-    const int32_t iHitBits = _mm_movemask_ps(apResult->m_mask);
+    result.m_mask = _mm_and_ps(_mm_cmple_ps(tolerance, edgeSides.m_quad), result.m_mask);
+    const int32_t iHitBits = _mm_movemask_ps(result.m_mask);
     hkVector4 hitNormal = normal;
     hkVector4 startSide = hitFractions;
     for (int32_t i = 0; i < 4; ++i) {
@@ -423,7 +422,7 @@ hkVector4Comparison* hkpTriangleShape::castRayBundleImpl(
         }
     }
     HK_TIMER_END();
-    return apResult;
+    return result;
 }
 
 int32_t hkpTriangleShape::getNumCollisionSpheresImpl() const {

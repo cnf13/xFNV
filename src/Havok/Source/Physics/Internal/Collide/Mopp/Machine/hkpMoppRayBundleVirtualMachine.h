@@ -63,8 +63,7 @@ public:
     // Stores the collection, the code, the input and the result array, copies the rays' ends, walks the tree under the
     // caller's lane mask and returns the lanes hit through apResult. Its caller is
     // hkpMoppBvTreeShape::castRayBundleImpl.
-    hkVector4Comparison* queryRayBundle(
-        hkVector4Comparison* apResult,
+    hkVector4Comparison queryRayBundle(
         const hkpShapeContainer* collection,
         const hkpMoppCode* code,
         const hkpShapeRayBundleCastInput& input,

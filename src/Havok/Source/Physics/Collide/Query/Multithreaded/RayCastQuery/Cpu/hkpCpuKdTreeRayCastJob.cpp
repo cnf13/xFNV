@@ -77,11 +77,10 @@ void hkKdTreeCpuBroadphaseBundleCastCollector::addMidPhaseHit(hkPrimitiveId prim
     m_workInput.m_to[1].m_quad = kTo1;
     m_workInput.m_to[2].m_quad = kTo2;
 
-    // The lanes the shape hit: unused.
-    hkVector4Comparison kHitLanes;
     hkpShapeRayBundleCastOutput kOutput;
     kOutput.reset();
-    pShape->castRayBundleImpl(&kHitLanes, m_workInput, kOutput, mask);
+    // The lanes the shape hit go unused.
+    pShape->castRayBundleImpl(m_workInput, kOutput, mask);
 
     int32_t* pNumHits = m_numHits;
     for (int32_t i = 0; i < 4; ++i, ++pNumHits) {

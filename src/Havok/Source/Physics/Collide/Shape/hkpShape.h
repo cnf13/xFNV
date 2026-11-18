@@ -109,8 +109,7 @@ public:
         const hkpCdBody& cdBody,
         hkpRayHitCollector& collector
     ) const = 0;
-    virtual hkVector4Comparison* castRayBundleImpl(
-        hkVector4Comparison* apResult,
+    virtual hkVector4Comparison castRayBundleImpl(
         const hkpShapeRayBundleCastInput& input,
         hkpShapeRayBundleCastOutput& output,
         const hkVector4Comparison& mask

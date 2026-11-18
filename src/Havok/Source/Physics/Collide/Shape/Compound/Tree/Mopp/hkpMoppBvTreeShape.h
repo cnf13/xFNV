@@ -56,8 +56,7 @@ public:
         const hkpCdBody& cdBody,
         hkpRayHitCollector& collector
     ) const override;
-    hkVector4Comparison* castRayBundleImpl(
-        hkVector4Comparison* apResult,
+    hkVector4Comparison castRayBundleImpl(
         const hkpShapeRayBundleCastInput& input,
         hkpShapeRayBundleCastOutput& output,
         const hkVector4Comparison& mask

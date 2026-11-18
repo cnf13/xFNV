@@ -102,9 +102,8 @@ void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, con
         bundleOutput.m_outputs[i].m_extraInfo = -1;
         bundleOutput.m_outputs[i].m_shapeKeys[0] = -1;
     }
-    // The lanes the shape hit: unused.
-    hkVector4Comparison hitLanes;
-    shape->castRayBundleImpl(&hitLanes, bundleInput, bundleOutput, activeMask);
+    // The lanes the shape hit go unused.
+    shape->castRayBundleImpl(bundleInput, bundleOutput, activeMask);
     for (int32_t i = 0; i < 4; ++i) {
         const hkpShapeRayCastOutput& rayOutput = bundleOutput.m_outputs[i];
         if (rayOutput.m_hitFraction < 1.0f && m_output[i].m_hitFraction > rayOutput.m_hitFraction) {

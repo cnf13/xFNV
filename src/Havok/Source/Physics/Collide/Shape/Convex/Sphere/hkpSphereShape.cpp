@@ -100,19 +100,19 @@ hkBool hkpSphereShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRa
 // result is the mask of the rays that hit before their output's hit fraction; for each, the hit fraction, the
 // normal (the hit point over the radius) and an invalid key at the output's key index are written.
 // x87 copies: the four 100.0f lanes and each hit fraction.
-hkVector4Comparison* hkpSphereShape::castRayBundleImpl(
-    hkVector4Comparison* apResult,
+hkVector4Comparison hkpSphereShape::castRayBundleImpl(
     const hkpShapeRayBundleCastInput& input,
     hkpShapeRayBundleCastOutput& output,
     const hkVector4Comparison& mask
 ) const {
+    hkVector4Comparison result;
     HK_TIMER_BEGIN("rcSphereBundle", nullptr);
     __m128 kHundred;
     kHundred[0] = 100.0f;
     kHundred[1] = 100.0f;
     kHundred[2] = 100.0f;
     kHundred[3] = 100.0f;
-    apResult->m_mask = mask.m_mask;
+    result.m_mask = mask.m_mask;
     const __m128 kRadiusLow = _mm_set_ss(m_radius);
     const __m128 kRadius = _mm_shuffle_ps(kRadiusLow, kRadiusLow, 0);
     const __m128 kRadius2 = _mm_mul_ps(kRadius, kRadius);
@@ -152,8 +152,8 @@ hkVector4Comparison* hkpSphereShape::castRayBundleImpl(
     const __m128 kDisc =
         _mm_add_ps(_mm_mul_ps(_mm_sub_ps(kStartLen2, kRadius2), _mm_xor_ps(kDirLen2, hkQuadRealNegateMask)), kNearFd2);
     const __m128 kHasRoot = _mm_cmplt_ps(kZero, kDisc);
-    const __m128 kRootMask = _mm_and_ps(apResult->m_mask, kHasRoot);
-    apResult->m_mask = kRootMask;
+    const __m128 kRootMask = _mm_and_ps(result.m_mask, kHasRoot);
+    result.m_mask = kRootMask;
     // sqrt(disc) as disc * rsqrt(disc), one Newton step on the estimate (zero where there is no root).
     const __m128 kRsqrt = _mm_rsqrt_ps(kDisc);
     const __m128 kSqrt = _mm_or_ps(
@@ -181,7 +181,7 @@ hkVector4Comparison* hkpSphereShape::castRayBundleImpl(
     const __m128 kRcpRadius = _mm_rcp_ps(kRadius);
     const __m128 kInvRadius =
         _mm_sub_ps(_mm_add_ps(kRcpRadius, kRcpRadius), _mm_mul_ps(_mm_mul_ps(kRcpRadius, kRadius), kRcpRadius));
-    apResult->m_mask = kHit;
+    result.m_mask = kHit;
     // The hit points over the radius: the normals, coordinate by coordinate.
     const __m128 kOneMinusHit = _mm_sub_ps(hkQuadReal1111, hitT.m_quad);
     for (int32_t i = 0; i < 3; ++i) {
@@ -207,7 +207,7 @@ hkVector4Comparison* hkpSphereShape::castRayBundleImpl(
         }
     }
     HK_TIMER_END();
-    return apResult;
+    return result;
 }
 
 int32_t hkpSphereShape::getNumCollisionSpheresImpl() const {
