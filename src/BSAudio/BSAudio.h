@@ -64,28 +64,16 @@ public:
     void SetEnvironment(uint32_t aiEnviroType);
     void SetListenerUnderwater(bool abIsUnderwater);
     void PositionListener(NiPoint3 aNewPosition);
-    // Builds and returns in apResult a handle for the sound with this editor name and the given flags.
-    BSSoundHandle* GetSoundHandleByName(BSSoundHandle* apResult, const char* apSoundName, uint32_t aiTypeFlags);
-    // Builds in apResult a handle for the sound file apFilename with the given flags, with
-    // apSettingsContext's settings; returns apResult.
-    BSSoundHandle* GetSoundHandleByFilename(
-        BSSoundHandle* apResult,
-        const char* apFilename,
-        uint32_t aiTypeFlags,
-        void* apSettingsContext
-    );
-    // Builds in apResult a handle for the sound form aiFormID with the given flags; returns
-    // apResult.
-    BSSoundHandle* GetSoundHandleByNumericID(BSSoundHandle* apResult, uint32_t aiFormID, uint32_t aiTypeFlags);
+    // A handle for the sound with this editor name and the given flags.
+    BSSoundHandle GetSoundHandleByName(const char* apSoundName, uint32_t aiTypeFlags);
+    // A handle for the sound file apFilename with the given flags, with apSettingsContext's settings.
+    BSSoundHandle GetSoundHandleByFilename(const char* apFilename, uint32_t aiTypeFlags, void* apSettingsContext);
+    // A handle for the sound form aiFormID with the given flags.
+    BSSoundHandle GetSoundHandleByNumericID(uint32_t aiFormID, uint32_t aiTypeFlags);
     // A handle for the sound form auiFormID with the given flags, placed at akPosition and played looping, under the
-    // audio memory context; aiUnused is ignored. Writes the handle into the caller's apResult and returns it.
-    BSSoundHandle* PlaySound(
-        BSSoundHandle* apResult,
-        uint32_t auiFormID,
-        BSGameSound::SoundFlags aeAudioFlags,
-        NiPoint3 akPosition,
-        int32_t aiUnused
-    );
+    // audio memory context; aiUnused is ignored.
+    BSSoundHandle
+    PlaySound(uint32_t auiFormID, BSGameSound::SoundFlags aeAudioFlags, NiPoint3 akPosition, int32_t aiUnused);
     void SetConditions(float afCurrentGamehour, uint32_t aiWeatherConditions);
     // The per-frame audio update.
     void Update(bool abPlayGameWorldSounds);

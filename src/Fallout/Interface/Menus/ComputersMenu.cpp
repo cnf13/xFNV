@@ -52,7 +52,6 @@ ComputersMenu::AnimatingTextManager::~AnimatingTextManager() {
 }
 
 void ComputersMenu::AnimatingTextManager::Update() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     bool btextwraps = false;
     while (!xAnimatingText.IsEmpty() && BSGetTickCount() > g_computersNextMainMenuTextDisplayTime) {
         if (!xAnimatingText.GetHead()->bIsTextRemaining) {
@@ -71,8 +70,7 @@ void ComputersMenu::AnimatingTextManager::Update() {
                     int32_t itime = j * v1 / (inewlen - ioldlen);
                     uint32_t afValue = itime;
                     BSAudioManager* v2 = &BSAudioManager::QInstance();
-                    BSSoundHandle* SoundHandleByName = v2->GetSoundHandleByName(&apHandle, "UIHackingCharSingle", 289u);
-                    SoundHandleByName->PlayAfter(afValue, 0);
+                    v2->GetSoundHandleByName("UIHackingCharSingle", 289u).PlayAfter(afValue, 0);
                 }
             }
             int32_t ix = 0;
@@ -229,10 +227,9 @@ ComputersMenu::ComputersMenu()
     NoteActivationFn[2] = [](ComputersMenu* apThis, BGSNote* apNote) { apThis->ShowImage(apNote); };
     NoteActivationFn[3] = nullptr;
     BSAudioManager* pManager = &BSAudioManager::QInstance();
-    BSSoundHandle kHandle;
-    Sounds[0] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingFanHumLP", 49u);
-    Sounds[1] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingCharScroll", 33u);
-    Sounds[2] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingCharEnter", 33u);
+    Sounds[0] = pManager->GetSoundHandleByName("UIHackingFanHumLP", 49u);
+    Sounds[1] = pManager->GetSoundHandleByName("UIHackingCharScroll", 33u);
+    Sounds[2] = pManager->GetSoundHandleByName("UIHackingCharEnter", 33u);
 }
 
 ComputersMenu::~ComputersMenu() {
@@ -569,12 +566,10 @@ void ComputersMenu::DisplayIntro() {
 }
 
 void ComputersMenu::PlayNoteSound(BGSNote* apNote) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     TESSound* NoteSound = apNote->GetNoteSound();
     uint32_t CastingType = NoteSound->iFormID;
     BSAudio* v3 = &BSAudio::QInstance();
-    BSSoundHandle* SoundHandleByNumericID = v3->GetSoundHandleByNumericID(&a1, CastingType, 257u);
-    SoundHandleByNumericID->Play(false);
+    v3->GetSoundHandleByNumericID(CastingType, 257u).Play(false);
 }
 
 void ComputersMenu::DisplayNoteText(BGSNote* apNote) {

@@ -365,7 +365,6 @@ void CompanionWheelMenu::SetButtonContextText(int32_t aiID) {
 void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
     XFNV_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     TESTopicInfo* apTopicInfo = nullptr;
     TESObjectREFR* apTarget = (TESObjectREFR*)pPlayer;
     Actor* apSpeaker = m_pRelatedCompanion;
@@ -379,8 +378,7 @@ void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
         if (pResponse) {
             if (pResponse->pVoiceSound) {
                 int32_t refID = pResponse->pVoiceSound->iFormID;
-                BSSoundHandle* v16 = apSpeaker->PlaySound(&a2, refID, false, 258u, true);
-                this->m_hCurrentReactivityBark.operator=(*v16);
+                this->m_hCurrentReactivityBark = apSpeaker->PlaySound(refID, false, 258u, true);
             }
             else {
                 PlayerCharacter* v9 = pPlayer;
@@ -418,11 +416,9 @@ void CompanionWheelMenu::OpenInventory() {
 }
 
 void CompanionWheelMenu::HandleMouseoverForTile(int32_t aiID, uint8_t a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (a2 || m_CurrentlySelectedTile != aiID) {
         BSAudio* v3 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIPipBoyScroll", 289u);
-        SoundHandleByName->Play(false);
+        v3->GetSoundHandleByName("UIPipBoyScroll", 289u).Play(false);
         if ((m_CurrentlySelectedTile != CompanionWheelMenu::TI_NO_TILE) && (pTiles[m_CurrentlySelectedTile])) {
             pTiles[m_CurrentlySelectedTile]->Set(Tile::kTileValue_User10, 0);
         }
@@ -1056,7 +1052,6 @@ void CompanionWheelMenu::Close(bool abClearOutSpeech) {
 
 Tile* CompanionWheelMenu::Create(Actor* apRelatedCompanion) {
     int32_t v2;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
     int32_t v1 = return_1075();
     Tile* pold_menu_tile = Menu::GetMenuByClass(v1);
@@ -1120,8 +1115,7 @@ Tile* CompanionWheelMenu::Create(Actor* apRelatedCompanion) {
         CompanionWheelMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (CompanionWheelMenu::pMe->IsWellFormedMenu()) {
             BSAudio* v8 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v8->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(false);
+            v8->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
                 ptile->Set(4013, afValue, true);

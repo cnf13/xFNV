@@ -2155,26 +2155,15 @@ void Tile::DeleteModel() {
 }
 
 void Tile::PlayTileSound(int32_t aiSoundType) {
-    // EXE-INLINED 0x41A250
-    XFNV_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
-    sound.iSoundID = -1;
-    sound.bAssumeSuccess = false;
-    sound.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
+    BSSoundHandle sound;
     const char* name = this->GetString(aiSoundType);
     Menu* menu = this->GetMenu();
     // Only while the menu's fade state is 1.
     if (menu && menu->xFadeState == 1 && name && *name) {
-        // GetSoundHandleByName fills result; nothing constructs it beforehand.
-        XFNV_INLINED_LOCAL(BSSoundHandle, result, std::nullopt, std::nullopt);
-        // The returned handle is copied field by field here rather than through BSSoundHandle::operator=, as the game
-        // does.
-        BSSoundHandle* handle = BSAudio::pAudioInstance->GetSoundHandleByName(
-            &result, name,
+        sound = BSAudio::pAudioInstance->GetSoundHandleByName(
+            name,
             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
         );
-        sound.iSoundID = handle->iSoundID;
-        sound.bAssumeSuccess = handle->bAssumeSuccess;
-        sound.eState = handle->eState;
         sound.Play(false);
     }
 }

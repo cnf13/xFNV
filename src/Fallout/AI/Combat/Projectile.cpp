@@ -1313,7 +1313,6 @@ bool Projectile::IsMine() {
 }
 
 bool Projectile::TurnOff(Actor* apActionActor, bool abSilent) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
     bool bresult = false;
     if (GetProjectileBase()->GetCanTurnOff() && !IsFlagSet(Projectile::TURNED_OFF)) {
         StopCountdownSound();
@@ -1322,8 +1321,8 @@ bool Projectile::TurnOff(Actor* apActionActor, bool abSilent) {
             if (pdeactivateSound) {
                 const char* Filename = pdeactivateSound->GetFilename();
                 BSAudio* v3 = &BSAudio::QInstance();
-                v3->GetSoundHandleByFilename(
-                    &soundHandle, Filename,
+                BSSoundHandle soundHandle = v3->GetSoundHandleByFilename(
+                    Filename,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                     pdeactivateSound
                 );
@@ -2527,8 +2526,6 @@ void Projectile::SpawnCollisionEffects(
     NiColor kVertexColor;
     hkpPropertyValue arResult;
     CFilter v39;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
     bool bcreateParticles = true;
     NiCamera* v6 = Main::WorldRootCamera();
     NiPoint3 distance = aContactPoint - v6->GetWorldTranslate();
@@ -2720,8 +2717,8 @@ void Projectile::SpawnCollisionEffects(
             if (pimpactSound1) {
                 const char* x = pimpactSound1->GetFilename();
                 BSAudio* v12 = &BSAudio::QInstance();
-                v12->GetSoundHandleByFilename(
-                    &soundHandle, x,
+                BSSoundHandle soundHandle = v12->GetSoundHandleByFilename(
+                    x,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                     pimpactSound1
                 );
@@ -2732,8 +2729,8 @@ void Projectile::SpawnCollisionEffects(
             if (pimpactSound2) {
                 const char* xa = pimpactSound2->GetFilename();
                 BSAudio* v13 = &BSAudio::QInstance();
-                v13->GetSoundHandleByFilename(
-                    &soundHandle_2, xa,
+                BSSoundHandle soundHandle_2 = v13->GetSoundHandleByFilename(
+                    xa,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                     pimpactSound2
                 );
@@ -2922,15 +2919,13 @@ void Projectile::CheckRefDeleted(TESObjectREFR* apDeletedRef) {
 }
 
 void Projectile::StartCountdownSound() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     if ((!sndCountdown.IsValid()) && (GetProjectileBase()->Data.pCountdownSound)) {
         int32_t refID = GetProjectileBase()->Data.pCountdownSound->iFormID;
-        BSSoundHandle* arHandle = PlaySound(
-            &a2, refID, false,
+        sndCountdown = PlaySound(
+            refID, false,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
-        sndCountdown.operator=(*arHandle);
     }
 }
 
@@ -3018,7 +3013,6 @@ Projectile* Projectile::Launch(
     NiPoint3 v50;
     NiPoint3 result;
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     float fEntrySpeed;
     Projectile* pprojectile = nullptr;
     bool binitialize = true;
@@ -3198,8 +3192,7 @@ Projectile* Projectile::Launch(
             TESSound* x = apProjectileBase->Data.pActiveSoundLoop;
             const char* afScale = apProjectileBase->Data.pActiveSoundLoop->GetFilename();
             BSAudio* v17 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v17->GetSoundHandleByFilename(&out, afScale, 0x40000012u, x);
-            pprojectile->sndHandle.operator=(*arHandle);
+            pprojectile->sndHandle = v17->GetSoundHandleByFilename(afScale, 0x40000012u, x);
             const NiPoint3* v18 = &apShooter->GetLocationOnReference();
             pprojectile->sndHandle.SetPosition(*v18);
             NiNode* v19 = pprojectile->Get3D();
@@ -3414,8 +3407,6 @@ NiAVObject* Projectile::ProcessTargetPick(
     bool bUseCharacterController,
     float afWaterHitRatio
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, sound_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, sound, std::nullopt, std::nullopt);
     CFilter kPickFilter;
     CFilter v65;
     CFilter v69;
@@ -3592,7 +3583,7 @@ NiAVObject* Projectile::ProcessTargetPick(
                         TESSound* arPos_8c = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop;
                         const char* arPosa = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop->GetFilename();
                         BSAudio* v19 = &BSAudio::QInstance();
-                        v19->GetSoundHandleByFilename(&sound_2, arPosa, uiFlags_2, arPos_8c);
+                        BSSoundHandle sound_2 = v19->GetSoundHandleByFilename(arPosa, uiFlags_2, arPos_8c);
                         sound_2.SetPosition(pointOnLine.x, pointOnLine.y, pointOnLine.z);
                         sound_2.Play(false);
                         if (bIsProjectileDebug) {
@@ -3616,7 +3607,7 @@ NiAVObject* Projectile::ProcessTargetPick(
                         TESSound* arPos_8b = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop;
                         const char* arPos = apProjectile->GetProjectileBase()->Data.pActiveSoundLoop->GetFilename();
                         BSAudio* v14 = &BSAudio::QInstance();
-                        v14->GetSoundHandleByFilename(&sound, arPos, uiFlags, arPos_8b);
+                        BSSoundHandle sound = v14->GetSoundHandleByFilename(arPos, uiFlags, arPos_8b);
                         sound.SetPosition(hitPt.x, hitPt.y, hitPt.z);
                         sound.Play(false);
                         if ((bIsProjectileDebug) && (apProjectile->Get3D())) {

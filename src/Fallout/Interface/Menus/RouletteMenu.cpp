@@ -150,9 +150,6 @@ void RouletteMenu::AttachTileByID(int32_t a1, Tile* a2) {
 }
 
 void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (eRouletteState == RouletteMenu::RO_IDLE) {
         switch (a1) {
             case 3: {
@@ -189,8 +186,7 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 int32_t i_2 = GetBetIndex();
                 if (i_2 < 159 && RemoveBet(i_2)) {
                     BSAudio* v3 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a12, "GAMERouletteDecreaseBet", 289u);
-                    SoundHandleByName->Play(false);
+                    v3->GetSoundHandleByName("GAMERouletteDecreaseBet", 289u).Play(false);
                     RouletteMenu::pMe->pTiles[10]->Poke(RouletteMenu::iUT_X, 1.0f);
                     RouletteMenu::pMe->pTiles[10]->Set(RouletteMenu::iUT_X, iTotalBet);
                     RouletteMenu::pMe->SetTileTextAlpha(RouletteMenu::TI_INCREASEBET_CNTRL, 255.0f);
@@ -264,8 +260,7 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 }
                 if (iTempBet != iCurrentBet) {
                     BSAudio* v5 = &BSAudio::QInstance();
-                    BSSoundHandle* v12 = v5->GetSoundHandleByName(&arHandle, "GAMERouletteValidBet", 289u);
-                    v12->Play(false);
+                    v5->GetSoundHandleByName("GAMERouletteValidBet", 289u).Play(false);
                 }
                 RouletteMenu::pMe->pTiles[0]->Poke(RouletteMenu::iUT_X, 1.0f);
                 RouletteMenu::pMe->pTiles[0]->Set(RouletteMenu::iUT_X, iCurrentBet);
@@ -336,8 +331,7 @@ void RouletteMenu::DoClick(int32_t a1, Tile* a2) {
                 }
                 if (iTempBet_2 != iCurrentBet) {
                     BSAudio* v6 = &BSAudio::QInstance();
-                    BSSoundHandle* v7 = v6->GetSoundHandleByName(&th_s, "GAMERouletteValidBet", 289u);
-                    v7->Play(false);
+                    v6->GetSoundHandleByName("GAMERouletteValidBet", 289u).Play(false);
                 }
                 RouletteMenu::pMe->pTiles[0]->Poke(RouletteMenu::iUT_X, 1.0f);
                 RouletteMenu::pMe->pTiles[0]->Set(RouletteMenu::iUT_X, iCurrentBet);
@@ -434,17 +428,13 @@ void RouletteMenu::DoIdle() {
             }
             // Only an exact zero (not NaN) starts the spin.
             if (ftotalStateSecs == 0.0) {
-                // GetSoundHandleByName is handed unconstructed storage for its result, as the game does.
-                alignas(BSSoundHandle) uint8_t aucSpinSound[sizeof(BSSoundHandle)];
-                BSSoundHandle* pSpinSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucSpinSound));
                 BSAudio::QInstance()
                     .GetSoundHandleByName(
-                        pSpinSound, "GAMERouletteSpin",
+                        "GAMERouletteSpin",
                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                             BSGameSound::SOUND_FLAG_ONE_SHOT
                     )
-                    ->Play(false);
-                pSpinSound->~BSSoundHandle();
+                    .Play(false);
                 this->pTiles[9]->Set(Tile::kTileValue_Visible, 0);
                 this->pTableAnimManager->ActivateSequence(
                     this->pTableAnimations[this->iSpinAnimIndex], 0, false, 1.0f, 0.0f, nullptr
@@ -602,17 +592,13 @@ void RouletteMenu::DoIdle() {
                     const char* pWin = sYouWinText.String();
                     BSsprintf(winmsg, 0x104, "%s %d %s%s", pWin, iCurrentWinnings, pChips, pPlural);
                 }
-                // Unconstructed storage, as for the spin sound.
-                alignas(BSSoundHandle) uint8_t aucWinSound[sizeof(BSSoundHandle)];
-                BSSoundHandle* pWinSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucWinSound));
                 BSAudio::QInstance()
                     .GetSoundHandleByName(
-                        pWinSound, "GAMERouletteWin",
+                        "GAMERouletteWin",
                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                             BSGameSound::SOUND_FLAG_ONE_SHOT
                     )
-                    ->Play(false);
-                pWinSound->~BSSoundHandle();
+                    .Play(false);
                 RouletteMenu::pMe->pTiles[9]->Poke(Tile::kTileValue_String, 1.0f);
                 RouletteMenu::pMe->pTiles[9]->Set(Tile::kTileValue_String, winmsg, true);
                 RouletteMenu::pMe->pTiles[9]->Set(Tile::kTileValue_Visible, 1);
@@ -723,17 +709,13 @@ void RouletteMenu::DoIdle() {
                     if (this->pValidBetFace->GetAppCulled()) {
                         if (bInvalidBet) {
                             bInvalidBet = !bInvalidBet;
-                            // Unconstructed storage, as for the spin sound.
-                            alignas(BSSoundHandle) uint8_t aucValidSound[sizeof(BSSoundHandle)];
-                            BSSoundHandle* pValidSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucValidSound));
                             BSAudio::QInstance()
                                 .GetSoundHandleByName(
-                                    pValidSound, "GAMERouletteValidBet",
+                                    "GAMERouletteValidBet",
                                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                         BSGameSound::SOUND_FLAG_ONE_SHOT
                                 )
-                                ->Play(false);
-                            pValidSound->~BSSoundHandle();
+                                .Play(false);
                         }
                         this->pValidBetFace->SetAppCulled(false);
                         this->pInvalidBetFace->SetAppCulled(true);
@@ -749,18 +731,13 @@ void RouletteMenu::DoIdle() {
                     if (this->pInvalidBetFace->GetAppCulled()) {
                         if (!bInvalidBet) {
                             bInvalidBet = !bInvalidBet;
-                            // Unconstructed storage, as for the spin sound.
-                            alignas(BSSoundHandle) uint8_t aucInvalidSound[sizeof(BSSoundHandle)];
-                            BSSoundHandle* pInvalidSound =
-                                static_cast<BSSoundHandle*>(static_cast<void*>(aucInvalidSound));
                             BSAudio::QInstance()
                                 .GetSoundHandleByName(
-                                    pInvalidSound, "GAMERouletteInvalidBet",
+                                    "GAMERouletteInvalidBet",
                                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                         BSGameSound::SOUND_FLAG_ONE_SHOT
                                 )
-                                ->Play(false);
-                            pInvalidSound->~BSSoundHandle();
+                                .Play(false);
                         }
                         this->pValidBetFace->SetAppCulled(true);
                         this->pInvalidBetFace->SetAppCulled(false);
@@ -784,17 +761,13 @@ void RouletteMenu::DoIdle() {
                     strMessage, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr,
                     2.0f, false
                 );
-                // Unconstructed storage, as for the spin sound.
-                alignas(BSSoundHandle) uint8_t aucBrokeSound[sizeof(BSSoundHandle)];
-                BSSoundHandle* pBrokeSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucBrokeSound));
                 BSAudio::QInstance()
                     .GetSoundHandleByName(
-                        pBrokeSound, "UIPopUpMessageGeneral",
+                        "UIPopUpMessageGeneral",
                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                             BSGameSound::SOUND_FLAG_ONE_SHOT
                     )
-                    ->Play(false);
-                pBrokeSound->~BSSoundHandle();
+                    .Play(false);
                 RouletteMenu::Close();
             }
             break;
@@ -1202,7 +1175,6 @@ void RouletteMenu::SpinWheel() {
 
 bool RouletteMenu::SetBet(int32_t aiIndex) {
     RouletteMenu::RouletteBet* newBet_2;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (iNumBetsSet >= 10 || aiIndex >= 159 || aiIndex < 0 || !iCurrentBet) {
         return false;
     }
@@ -1240,8 +1212,7 @@ bool RouletteMenu::SetBet(int32_t aiIndex) {
     ++iNextModelIndex;
     iTotalBet += iCurrentBet;
     BSAudio* v3 = &BSAudio::QInstance();
-    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "GAMERouletteIncreaseBet", 289u);
-    SoundHandleByName->Play(false);
+    v3->GetSoundHandleByName("GAMERouletteIncreaseBet", 289u).Play(false);
     if (iNextModelIndex >= 13) {
         iNextModelIndex = 3;
     }
@@ -1912,9 +1883,8 @@ void RouletteMenu::Close() {
 
 // Finds (or adds at the head of the player's list) the casino's record, refuses a barred, broke or under-winning player
 // with a HUD message and a sound, then builds the menu from roulette_menu.xml and fills its tiles. With no casino list
-// at all, SetItem is called on null, as the game does. Each message's sound handle is unconstructed storage handed to
-// GetSoundHandleByName, as the game does. abDebugMode is not read. The settings and the remaining time are read in
-// right-to-left order.
+// at all, SetItem is called on null, as the game does. abDebugMode is not read. The settings and the remaining time are
+// read in right-to-left order.
 Tile* RouletteMenu::Create(
     TESCasino* apCasino,
     int32_t aiMinBet,
@@ -1960,15 +1930,12 @@ Tile* RouletteMenu::Create(
         Interface::ShowMessage(
             acMessage, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
-        alignas(BSSoundHandle) uint8_t aucSound[sizeof(BSSoundHandle)];
-        BSSoundHandle* pSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucSound));
         BSAudio::QInstance()
             .GetSoundHandleByName(
-                pSound, "UIPopUpMessageGeneral",
+                "UIPopUpMessageGeneral",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
             )
-            ->Play(false);
-        pSound->~BSSoundHandle();
+            .Play(false);
         return nullptr;
     }
     // Takes the casino's data before it reads the record.
@@ -1980,15 +1947,12 @@ Tile* RouletteMenu::Create(
         Interface::ShowMessage(
             acMessage, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
-        alignas(BSSoundHandle) uint8_t aucSound[sizeof(BSSoundHandle)];
-        BSSoundHandle* pSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucSound));
         BSAudio::QInstance()
             .GetSoundHandleByName(
-                pSound, "UIPopUpMessageGeneral",
+                "UIPopUpMessageGeneral",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
             )
-            ->Play(false);
-        pSound->~BSSoundHandle();
+            .Play(false);
         return nullptr;
     }
     if (pPlayer->GetInventoryObjectCount(pCasino->GetChipType()) < aiMinBet) {
@@ -1997,15 +1961,12 @@ Tile* RouletteMenu::Create(
         Interface::ShowMessage(
             acMessage, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
-        alignas(BSSoundHandle) uint8_t aucSound[sizeof(BSSoundHandle)];
-        BSSoundHandle* pSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucSound));
         BSAudio::QInstance()
             .GetSoundHandleByName(
-                pSound, "UIPopUpMessageGeneral",
+                "UIPopUpMessageGeneral",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
             )
-            ->Play(false);
-        pSound->~BSSoundHandle();
+            .Play(false);
         return nullptr;
     }
     if (pCasinoData->iTotalWinnings < aiMinWinnings && aiMinWinnings) {
@@ -2014,15 +1975,12 @@ Tile* RouletteMenu::Create(
         Interface::ShowMessage(
             acMessage, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
-        alignas(BSSoundHandle) uint8_t aucSound[sizeof(BSSoundHandle)];
-        BSSoundHandle* pSound = static_cast<BSSoundHandle*>(static_cast<void*>(aucSound));
         BSAudio::QInstance()
             .GetSoundHandleByName(
-                pSound, "UIPopUpMessageGeneral",
+                "UIPopUpMessageGeneral",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
             )
-            ->Play(false);
-        pSound->~BSSoundHandle();
+            .Play(false);
         return nullptr;
     }
     if (pOldMenu) {

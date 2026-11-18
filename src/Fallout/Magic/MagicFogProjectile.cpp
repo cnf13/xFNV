@@ -104,9 +104,8 @@ MagicFogProjectile::MagicFogProjectile(
         if (Sound.IsValid()) {
             Sound.Release();
         }
-        BSSoundHandle kSound;
-        Sound = *PlaySound(
-            &kSound, uiSoundID, true,
+        Sound = PlaySound(
+            uiSoundID, true,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
@@ -238,7 +237,6 @@ void MagicFogProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 }
 
 void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     float ffadeTimer;
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
@@ -248,12 +246,11 @@ void MagicFogProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
         if (Sound.IsValid()) {
             Sound.Release();
         }
-        BSSoundHandle* arHandle = PlaySound(
-            &a2, isoundFileID, true,
+        Sound = PlaySound(
+            isoundFileID, true,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
-        Sound.operator=(*arHandle);
     }
 
     ourMemcpy(&ffadeTimer, &pLight, sizeof(ffadeTimer));
@@ -609,7 +606,6 @@ void MagicFogProjectile::Collide(
     TESObjectREFR* apCollidee,
     bool abFizzle
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     CFilter filter;
     bhkCharacterController* CharController = GetCharController();
     CharController->GetCollisionFilter(&filter);
@@ -626,7 +622,7 @@ void MagicFogProjectile::Collide(
         TESSound* OpenSound = pAVEffect->data.pAreaSound;
         uint32_t a3 = OpenSound->iFormID;
         BSAudio* v8 = &BSAudio::QInstance();
-        v8->GetSoundHandleByNumericID(&soundHand, a3, 258u);
+        BSSoundHandle soundHand = v8->GetSoundHandleByNumericID(a3, 258u);
         NiPoint3 v13 = GetLocationOnReference();
         soundHand.SetPosition(v13.x, v13.y, v13.z);
         soundHand.Play(false);

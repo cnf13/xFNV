@@ -288,12 +288,6 @@ uint16_t BSAnimGroupSequence::GetSequenceSaveSize() {
 }
 
 bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR* apRef) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v41, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v42, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t inumKeys;
     bool bdone = false;
     if ((apSeq) && (apSeq->GetState() == NiControllerSequence::kAnimating)) {
@@ -436,8 +430,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                      BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                 uint32_t aPosition_8 = psound->iFormID;
                                 BSAudio* v8 = &BSAudio::QInstance();
-                                BSSoundHandle* arHandle = v8->GetSoundHandleByNumericID(&a1, aPosition_8, a4);
-                                soundHand.operator=(*arHandle);
+                                soundHand = v8->GetSoundHandleByNumericID(aPosition_8, a4);
                             }
                             else {
                                 if ((psound->GetData().iFlags & 64) != 0) {
@@ -447,9 +440,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                          BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                     uint32_t aPosition_8a = psound->iFormID;
                                     BSAudio* v9 = &BSAudio::QInstance();
-                                    BSSoundHandle* SoundHandleByNumericID =
-                                        v9->GetSoundHandleByNumericID(&apHandle, aPosition_8a, a4a);
-                                    soundHand.operator=(*SoundHandleByNumericID);
+                                    soundHand = v9->GetSoundHandleByNumericID(aPosition_8a, a4a);
                                 }
                                 else {
                                     uint32_t a4b = iFlags |
@@ -458,8 +449,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                          BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                     uint32_t aPosition_8b = psound->iFormID;
                                     BSAudio* v10 = &BSAudio::QInstance();
-                                    BSSoundHandle* v31 = v10->GetSoundHandleByNumericID(&th_s, aPosition_8b, a4b);
-                                    soundHand.operator=(*v31);
+                                    soundHand = v10->GetSoundHandleByNumericID(aPosition_8b, a4b);
                                 }
                             }
                         }
@@ -471,8 +461,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                          BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                     uint32_t aPosition_8c = psound->iFormID;
                                     BSAudio* v11 = &BSAudio::QInstance();
-                                    BSSoundHandle* v30 = v11->GetSoundHandleByNumericID(&apResult, aPosition_8c, a4c);
-                                    soundHand.operator=(*v30);
+                                    soundHand = v11->GetSoundHandleByNumericID(aPosition_8c, a4c);
                                 }
                                 else {
                                     if ((psound->GetData().iFlags & 64) != 0) {
@@ -482,8 +471,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                              BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                         uint32_t aPosition_8d = psound->iFormID;
                                         BSAudio* v12 = &BSAudio::QInstance();
-                                        BSSoundHandle* v29 = v12->GetSoundHandleByNumericID(&v42, aPosition_8d, a4d);
-                                        soundHand.operator=(*v29);
+                                        soundHand = v12->GetSoundHandleByNumericID(aPosition_8d, a4d);
                                     }
                                     else {
                                         uint32_t a4e = iFlags |
@@ -492,8 +480,7 @@ bool BSAnimGroupSequence::PlaySounds(NiControllerSequence* apSeq, TESObjectREFR*
                                              BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                         uint32_t aPosition_8e = psound->iFormID;
                                         BSAudio* v13 = &BSAudio::QInstance();
-                                        BSSoundHandle* v28 = v13->GetSoundHandleByNumericID(&v41, aPosition_8e, a4e);
-                                        soundHand.operator=(*v28);
+                                        soundHand = v13->GetSoundHandleByNumericID(aPosition_8e, a4e);
                                     }
                                 }
                             }

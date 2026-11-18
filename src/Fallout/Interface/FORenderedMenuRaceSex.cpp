@@ -115,7 +115,6 @@ bool FORenderedMenuRaceSex::OnIdle() {
 }
 
 bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     InterfaceManager* v21 = InterfaceManager::Instance();
     if (a1) {
         char v20 = 1;
@@ -144,8 +143,7 @@ bool FORenderedMenuRaceSex::Pick(bool a1, float* a2, float* a3) {
             }
             if (v18 >= 0) {
                 BSAudio* v5 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&arHandle, "UIMenuMode", 289u);
-                SoundHandleByName->Play(false);
+                v5->GetSoundHandleByName("UIMenuMode", 289u).Play(false);
                 RaceSexMenu* Menu_ = static_cast<RaceSexMenu*>(pMenuTile->GetMenu());
                 Menu_->SetActiveList(static_cast<RaceSexMenu::ListID>(v18));
                 return true;

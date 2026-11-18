@@ -714,9 +714,8 @@ void DialoguePackage::Speak(bool abUseSound) {
             bool bnosound = true;
             if (pCurrentResponse->pVoiceSound && bSoundFile) {
                 uint32_t isoundFileID = pCurrentResponse->pVoiceSound->iFormID;
-                XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
-                pact->PlaySound(
-                    &soundHandle, isoundFileID, false,
+                BSSoundHandle soundHandle = pact->PlaySound(
+                    isoundFileID, false,
                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN | BSGameSound::SOUND_FLAG_ONE_SHOT |
                         BSGameSound::SOUND_FLAG_IS_3D,
                     true
@@ -863,8 +862,7 @@ void DialoguePackage::Speak(bool abUseSound) {
             else {
                 uint32_t audioFlags =
                     BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_VOICE | BSGameSound::SOUND_FLAG_IS_3D;
-                XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
-                handle = *BSAudio::QInstance().GetSoundHandleByFilename(&soundHandle, acAudioFile, audioFlags, nullptr);
+                handle = BSAudio::QInstance().GetSoundHandleByFilename(acAudioFile, audioFlags, nullptr);
                 NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
                 // Reads the maximum distance first.
                 float fMaxDist = BSAudio::GetMaxDialogDist();

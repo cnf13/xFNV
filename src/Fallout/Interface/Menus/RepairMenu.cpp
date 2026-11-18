@@ -65,7 +65,6 @@ void RepairMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void RepairMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     char v13 = 0;
     if (!a2 && a1 >= 0 && a1 < 13) {
         a2 = pTiles[a1];
@@ -90,8 +89,7 @@ void RepairMenu::DoClick(int32_t a1, Tile* a2) {
                 TESBoundObject* FormFlags = psparePart->pContainerObj;
                 pPlayer->RemoveItem(FormFlags, pspareExtra, 1, false, false, nullptr, nullptr, nullptr, true, false);
                 BSAudio* v4 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a12, "UIRepairWeapon", 289u);
-                SoundHandleByName->Play(false);
+                v4->GetSoundHandleByName("UIRepairWeapon", 289u).Play(false);
                 Tile* v5 = static_cast<Tile*>(lbRepairList.GetHighlightedItem());
                 lbRepairList.RemoveItem(v5);
                 if (lbRepairList.NumUnfiltered() == 1 || RepairMenu::pBrokenItem->GetItemHealth(true) >= 99.0) {

@@ -364,7 +364,6 @@ bool TESObjectACTI::Activate(
     TESBoundObject* apObjecttoGet,
     int32_t aicount
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
     Actor* pActionActor = nullptr;
     bool bstoreSoundLoopOnPlayer = false;
     if ((apActionRef) && (apActionRef->IsActor())) {
@@ -435,7 +434,7 @@ bool TESObjectACTI::Activate(
         TESSound* v12 = pSoundActivate;
         const char* a2 = v12->GetFilename();
         BSAudio* v13 = &BSAudio::QInstance();
-        v13->GetSoundHandleByFilename(&sndHandle, a2, pOwnerFactiona, blendAmount);
+        BSSoundHandle sndHandle = v13->GetSoundHandleByFilename(a2, pOwnerFactiona, blendAmount);
         if (bstoreSoundLoopOnPlayer) {
             (&pPlayer->m_Extra)->SetActivateLoopSound(sndHandle);
         }

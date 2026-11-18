@@ -742,7 +742,6 @@ bool HUDMainMenu::ShowMessage(
     float afShowSeconds,
     bool abMoveToHead
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool bresult = false;
     if (apString) {
         HUDMainMenu::MessageData* newMessage_2 =
@@ -801,8 +800,7 @@ bool HUDMainMenu::ShowMessage(
             HUDMainMenu::pme->pTiles[25]->Set(4044, IconFilename, true);
             if (apSoundName) {
                 BSAudio* v7 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, apSoundName, 289u);
-                SoundHandleByName->Play(false);
+                v7->GetSoundHandleByName(apSoundName, 289u).Play(false);
             }
         }
         else {
@@ -1479,9 +1477,6 @@ void HUDMainMenu::UpdateSneak() {
 }
 
 void HUDMainMenu::UpdateQuestText() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     NiPoint3 textDimensions_2;
     NiPoint3 pos_4;
     NiPoint3 subtitleDimensions;
@@ -1504,19 +1499,16 @@ void HUDMainMenu::UpdateQuestText() {
                         QuestUpdateManager::HQUT_CUSTOM) {
                         char* a1 = HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->CustomSoundHandleName;
                         BSAudio* v3 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&th_s, a1, 289u);
-                        psoundHand.operator=(*SoundHandleByName);
+                        psoundHand = v3->GetSoundHandleByName(a1, 289u);
                     }
                     else {
                         BSAudio* v4 = &BSAudio::QInstance();
-                        BSSoundHandle* v34 = v4->GetSoundHandleByName(&apResult, "UIPopUpQuestComplete", 289u);
-                        psoundHand.operator=(*v34);
+                        psoundHand = v4->GetSoundHandleByName("UIPopUpQuestComplete", 289u);
                     }
                 }
                 else {
                     BSAudio* v2 = &BSAudio::QInstance();
-                    BSSoundHandle* v36 = v2->GetSoundHandleByName(&arHandle, "UIPopUpQuestNew", 289u);
-                    psoundHand.operator=(*v36);
+                    psoundHand = v2->GetSoundHandleByName("UIPopUpQuestNew", 289u);
                 }
                 psoundHand.Play(false);
                 int32_t iWidth = 0;
@@ -1726,8 +1718,6 @@ void HUDMainMenu::UpdateQuestText() {
 }
 
 void HUDMainMenu::UpdateXPMeter() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     static int32_t HUDXPMeter_trait_x_min = Tile::AddUserTrait("_x_min", -1);
     static int32_t HUDXPMeter_trait_x_max = Tile::AddUserTrait("_x_max", -1);
     bool bplayerInCombat = pPlayer->GetNumberActorsInCombat() > 0;
@@ -1872,9 +1862,7 @@ void HUDMainMenu::UpdateXPMeter() {
                         char Src[16];
                         BSSoundHandle psoundHand;
                         BSAudio* v2 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName =
-                            v2->GetSoundHandleByName(&arHandle, "UIPopUpExperienceUp", 289u);
-                        psoundHand.operator=(*SoundHandleByName);
+                        psoundHand = v2->GetSoundHandleByName("UIPopUpExperienceUp", 289u);
                         psoundHand.Play(false);
                         float fxp = 0.0f;
                         int32_t v60 = 0;
@@ -1993,8 +1981,7 @@ void HUDMainMenu::UpdateXPMeter() {
                     }
                     else {
                         BSAudio* v7 = &BSAudio::QInstance();
-                        BSSoundHandle* v36 = v7->GetSoundHandleByName(&apResult, "UILevelUpText", 289u);
-                        v36->Play(false);
+                        v7->GetSoundHandleByName("UILevelUpText", 289u).Play(false);
                         pTiles[50]->Set(4009, 0.0f, true);
                         pTiles[50]->AddFadeControl(4009, 0.0f, fCurrentHUDOpacity, 0.5f, Tile::TFCT_STANDARD);
                         const char* v8 = sLevelUp.String();
@@ -2359,7 +2346,6 @@ HUDMainMenu::SubtitleData* HUDMainMenu::GetNextSubtitle() {
 }
 
 void HUDMainMenu::HideMessage() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
     if (!xMessages.IsEmpty()) {
         for (HUDMainMenu::MessageData* item : xMessages) {
             if (item) {
@@ -2384,7 +2370,7 @@ void HUDMainMenu::HideMessage() {
                     else {
                         if ((&xMessages)->m_item->SoundName[0]) {
                             char* afStart = (&xMessages)->m_item->SoundName;
-                            pPlayer->PlaySoundByEditorName(&dst, afStart, false, 289u, false);
+                            pPlayer->PlaySoundByEditorName(afStart, false, 289u, false);
                         }
                         HUDMainMenu::MessageData* afLength = (&xMessages)->m_item;
                         HUDMainMenu::pme->pTiles[26]->Set(4036, afLength->strText, true);
@@ -2551,7 +2537,6 @@ void HUDMainMenu::StatusModeTileEffects(Tile* apTile, float afCurrValue, bool bR
 }
 
 void HUDMainMenu::HandleReminderFade(Tile* apTile) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     NiPoint3 textDimensions;
     int32_t iScreenWidth = static_cast<int32_t>(InterfaceManager::GetScreenWidth());
     bool bShowedObjective = false;
@@ -2617,7 +2602,7 @@ void HUDMainMenu::HandleReminderFade(Tile* apTile) {
             ++iObjective;
             pQuest->SetName(acName);
             HUDMainMenu::SetBrightness(pQuest, HUDMainMenu::HB_HUD_TEXT);
-            BSAudio::QInstance().GetSoundHandleByName(&arHandle, "UIQuestUpdate", 0x121u)->Play(false);
+            BSAudio::QInstance().GetSoundHandleByName("UIQuestUpdate", 0x121u).Play(false);
             plist->Remove(plist->m_item);
         }
     }
@@ -3707,7 +3692,6 @@ void HUDMainMenu::SetBrightness(Tile* apTile, HUD_BRIGHTNESS aeBrightness) {
 }
 
 void HUDMainMenu::SetRadiationLevel(float afDrinkinRads, float afStandinRads) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     float ftotalRads = afDrinkinRads + afStandinRads;
     if (HUDMainMenu::pme) {
         if (!(ftotalRads > 0.0)) {
@@ -3718,8 +3702,7 @@ void HUDMainMenu::SetRadiationLevel(float afDrinkinRads, float afStandinRads) {
         else {
             if (!HUDMainMenu::pme->GeigerSound.IsValid() && afStandinRads > 0.0) {
                 BSAudio* v2 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v2->GetSoundHandleByName(&a1, "UIPipBoyRadiationTestLP", 17u);
-                HUDMainMenu::pme->GeigerSound.operator=(*arHandle);
+                HUDMainMenu::pme->GeigerSound = v2->GetSoundHandleByName("UIPipBoyRadiationTestLP", 17u);
                 HUDMainMenu::pme->GeigerSound.Play(false);
             }
             HUDMainMenu::pme->UpdateRadiationMeterConditions(afDrinkinRads, afStandinRads);

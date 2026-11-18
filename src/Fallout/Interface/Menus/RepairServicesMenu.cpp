@@ -52,9 +52,6 @@ void RepairServicesMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void RepairServicesMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (!a2 && a1 >= 0 && a1 < 16) {
         a2 = pTiles[a1];
     }
@@ -63,8 +60,7 @@ void RepairServicesMenu::DoClick(int32_t a1, Tile* a2) {
             lbRepairList.Traverse(&RepairServicesMenu::RepairAllFunc, 0, 0x7FFFFFFF);
             pPlayer->PayGoldToActor(RepairServicesMenu::pRepairVendor, iRepairAllCost);
             BSAudio* v6 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&th_s, "UIRepairWeapon", 289u);
-            SoundHandleByName->Play(false);
+            v6->GetSoundHandleByName("UIRepairWeapon", 289u).Play(false);
             InitEntries();
             break;
         }
@@ -78,14 +74,12 @@ void RepairServicesMenu::DoClick(int32_t a1, Tile* a2) {
                 double Float = a2->GetFloat(g_repairServicesMenu_trait_RepairCost);
                 pPlayer->PayGoldToActor(RepairServicesMenu::pRepairVendor, static_cast<int32_t>(Float));
                 BSAudio* v4 = &BSAudio::QInstance();
-                BSSoundHandle* v9 = v4->GetSoundHandleByName(&a12, "UIRepairWeapon", 289u);
-                v9->Play(false);
+                v4->GetSoundHandleByName("UIRepairWeapon", 289u).Play(false);
                 InitEntries();
             }
             else {
                 BSAudio* v5 = &BSAudio::QInstance();
-                BSSoundHandle* v8 = v5->GetSoundHandleByName(&arHandle, "UIVATSInsufficientAP", 289u);
-                v8->Play(false);
+                v5->GetSoundHandleByName("UIVATSInsufficientAP", 289u).Play(false);
             }
             break;
         }

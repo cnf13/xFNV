@@ -615,17 +615,14 @@ NiPoint3 TESBoundObject::GetBoundMin() {
     float fZ = BoundData.BoundMin.GetFloatZ();
     float fY = BoundData.BoundMin.GetFloatY();
     float fX = BoundData.BoundMin.GetFloatX();
-    XFNV_INLINED_LOCAL(NiPoint3, kPoint, std::nullopt, std::nullopt);
-    return *::new (&kPoint) NiPoint3(fX, fY, fZ);
+    return NiPoint3(fX, fY, fZ);
 }
 
 NiPoint3 TESBoundObject::GetBoundMax() {
     float fZ = BoundData.BoundMax.GetFloatZ();
     float fY = BoundData.BoundMax.GetFloatY();
     float fX = BoundData.BoundMax.GetFloatX();
-    // As in GetBoundMin, the point is built in a frame local and copied into the result.
-    XFNV_INLINED_LOCAL(NiPoint3, kPoint, std::nullopt, std::nullopt);
-    return *::new (&kPoint) NiPoint3(fX, fY, fZ);
+    return NiPoint3(fX, fY, fZ);
 }
 
 void TESBoundObject::CopyBoundData(TESBoundObject* apCopy) {

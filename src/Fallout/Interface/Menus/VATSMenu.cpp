@@ -125,10 +125,6 @@ void VATSMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 // previous or next target with a body to show, 4 closes the menu, 5 queues the current action, 30 and 31 select the
 // weapon's special attacks.
 void VATSMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kPrevFailSound, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kPrevSelectSound, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kNextFailSound, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kNextSelectSound, std::nullopt, std::nullopt);
     BaseProcess* pProcess = pPlayer->pCurrentProcess;
     ItemChange* pWeaponItem = pProcess->GetCurrentWeapon();
     TESObjectWEAP* pWeapon;
@@ -163,11 +159,11 @@ void VATSMenu::DoClick(int32_t aiID, Tile* apTarget) {
         case 2: {
             // The count is compared unsigned; ItemsInList returns int.
             if (static_cast<uint32_t>(VATSMenu::xTargetList.ItemsInList()) <= 1) {
-                kSound = *BSAudio::QInstance().GetSoundHandleByName(&kPrevFailSound, "UIVATSEnterFail", 289u);
+                kSound = BSAudio::QInstance().GetSoundHandleByName("UIVATSEnterFail", 289u);
                 kSound.Play(false);
                 return;
             }
-            kSound = *BSAudio::QInstance().GetSoundHandleByName(&kPrevSelectSound, "UIVATSSelectTarget", 289u);
+            kSound = BSAudio::QInstance().GetSoundHandleByName("UIVATSSelectTarget", 289u);
             kSound.Play(false);
             // Puts every target's meters back to full alpha.
             for (BSSimpleList<VATSTarget*>* pIter = &VATSMenu::xTargetList; pIter && !pIter->IsEmpty();
@@ -223,11 +219,11 @@ void VATSMenu::DoClick(int32_t aiID, Tile* apTarget) {
         case 3: {
             // The count is compared unsigned; ItemsInList returns int.
             if (static_cast<uint32_t>(VATSMenu::xTargetList.ItemsInList()) <= 1) {
-                kSound = *BSAudio::QInstance().GetSoundHandleByName(&kNextFailSound, "UIVATSEnterFail", 289u);
+                kSound = BSAudio::QInstance().GetSoundHandleByName("UIVATSEnterFail", 289u);
                 kSound.Play(false);
                 return;
             }
-            kSound = *BSAudio::QInstance().GetSoundHandleByName(&kNextSelectSound, "UIVATSSelectTarget", 289u);
+            kSound = BSAudio::QInstance().GetSoundHandleByName("UIVATSSelectTarget", 289u);
             kSound.Play(false);
             // Puts every target's meters back to full alpha.
             for (BSSimpleList<VATSTarget*>* pIter = &VATSMenu::xTargetList; pIter && !pIter->IsEmpty();
@@ -730,18 +726,13 @@ void VATSMenu::DoIdle() {
             this->bHeadingReached) {
             BSAudioManager* mgr = &BSAudioManager::QInstance();
             BSSoundHandle soundHand;
-            // GetSoundHandleByName is handed unconstructed storage for its result, as the game does.
-            alignas(BSSoundHandle) uint8_t aucLookup[sizeof(BSSoundHandle)];
-            BSSoundHandle* pLookup = static_cast<BSSoundHandle*>(static_cast<void*>(aucLookup));
-            BSSoundHandle* psoundHand = mgr->GetSoundHandleByName(
-                pLookup, "UIVATSInsufficientAP",
+            soundHand = mgr->GetSoundHandleByName(
+                "UIVATSInsufficientAP",
                 static_cast<BSGameSound::SoundFlags>(
                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                     BSGameSound::SOUND_FLAG_ONE_SHOT
                 )
             );
-            soundHand = *psoundHand;
-            pLookup->~BSSoundHandle();
             soundHand.Play(false);
             // Only an exact zero chance (not NaN) shows the message.
             if (this->pCurrentLimb->fChance == 0.0) {
@@ -810,14 +801,10 @@ void VATSMenu::DoIdle() {
             static_cast<int32_t>(static_cast<double>(this->GetTargetPart()->GetItem()->fChance) * 100.0) <= 0 &&
             pVATS.GetMode() == VATS::VATS_MENU_MODE && this->bHeadingReached) {
             BSSoundHandle psoundHand;
-            alignas(BSSoundHandle) uint8_t aucLookup[sizeof(BSSoundHandle)];
-            BSSoundHandle* pLookup = static_cast<BSSoundHandle*>(static_cast<void*>(aucLookup));
-            BSSoundHandle* pFound = BSAudio::QInstance().GetSoundHandleByName(
-                pLookup, "UIVATSEnterFail",
+            psoundHand = BSAudio::QInstance().GetSoundHandleByName(
+                "UIVATSEnterFail",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
             );
-            psoundHand = *pFound;
-            pLookup->~BSSoundHandle();
             psoundHand.Play(false);
             HUDMainMenu::pme->ShowMessage(
                 sVATSMessageZeroChance.String(), HUDMainMenu::HME_SAD, nullptr, nullptr, 2.0f, false
@@ -827,17 +814,13 @@ void VATSMenu::DoIdle() {
             // Only a cost above the AP total (not NaN) plays the insufficient AP sound.
             BSAudioManager* mgr = &BSAudioManager::QInstance();
             BSSoundHandle psoundHand;
-            alignas(BSSoundHandle) uint8_t aucLookup[sizeof(BSSoundHandle)];
-            BSSoundHandle* pLookup = static_cast<BSSoundHandle*>(static_cast<void*>(aucLookup));
-            BSSoundHandle* pFound = mgr->GetSoundHandleByName(
-                pLookup, "UIVATSInsufficientAP",
+            psoundHand = mgr->GetSoundHandleByName(
+                "UIVATSInsufficientAP",
                 static_cast<BSGameSound::SoundFlags>(
                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                     BSGameSound::SOUND_FLAG_ONE_SHOT
                 )
             );
-            psoundHand = *pFound;
-            pLookup->~BSSoundHandle();
             psoundHand.Play(false);
             this->pTiles[12]->Set(Tile::kTileValue_Visible, 1);
         }
@@ -847,14 +830,10 @@ void VATSMenu::DoIdle() {
                 sVATSMessageNoAmmo.String(), HUDMainMenu::HME_SAD, nullptr, nullptr, 2.0f, false
             );
             BSSoundHandle soundHand;
-            alignas(BSSoundHandle) uint8_t aucLookup[sizeof(BSSoundHandle)];
-            BSSoundHandle* pLookup = static_cast<BSSoundHandle*>(static_cast<void*>(aucLookup));
-            BSSoundHandle* pFound = BSAudio::QInstance().GetSoundHandleByName(
-                pLookup, "UIVATSEnterFail",
+            soundHand = BSAudio::QInstance().GetSoundHandleByName(
+                "UIVATSEnterFail",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
             );
-            soundHand = *pFound;
-            pLookup->~BSSoundHandle();
             soundHand.Play(false);
         }
     }
@@ -1040,9 +1019,6 @@ void VATSMenu::UpdateQueuedActionList(VATS_COMMAND* apCommand, bool abForcedRelo
     const char* v17;
     TESObjectWEAP* pweapon;
     BaseProcess* v22;
-    BSSoundHandle* SoundHandleByName;
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSimpleList<VATSTarget*>* ptargetList;
     XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     char Dst[268];
@@ -1095,15 +1071,13 @@ void VATSMenu::UpdateQueuedActionList(VATS_COMMAND* apCommand, bool abForcedRelo
         lbActions.RemoveAt(lbActions.NumItems() - 1, false);
         BSSoundHandle psoundHand;
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1, "UIMenuCancel", 289u);
-        psoundHand.operator=(*arHandle);
+        psoundHand = v5->GetSoundHandleByName("UIMenuCancel", 289u);
         psoundHand.Play(false);
         goto LABEL_58;
     }
     mgr = &BSAudioManager::QInstance();
     ::new (&soundHand) BSSoundHandle;
-    SoundHandleByName = mgr->GetSoundHandleByName(&apHandle, "UIVATSMove", 289u);
-    soundHand.operator=(*SoundHandleByName);
+    soundHand = mgr->GetSoundHandleByName("UIVATSMove", 289u);
     soundHand.Play(false);
     ptargetList = VATSMenu::pVatsMenu->GetVatsTarget(pVATSTarget);
     v22 = pPlayer->pCurrentProcess;
@@ -2714,15 +2688,11 @@ BSSimpleList<VATSBodyPart*>* VATSMenu::FindTargetPart(ActorValue::Index aeLimb) 
     return nullptr;
 }
 
-// BSSoundHandle's destructor is an empty function, so neither the sound handle nor the temporary GetSoundHandleByName
-// fills is destroyed.
 void VATSMenu::SelectNearestTarget(bool abLeft) {
     TESObjectWEAP* pweapon;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle psoundHand;
     BSAudio* v2 = &BSAudio::QInstance();
-    BSSoundHandle* arHandle = v2->GetSoundHandleByName(&a1, "UIVATSSelectTarget", 289u);
-    psoundHand.operator=(*arHandle);
+    psoundHand = v2->GetSoundHandleByName("UIVATSSelectTarget", 289u);
     psoundHand.Play(false);
     BSSimpleList<VATSTarget*>* ptargetIter = &VATSMenu::xTargetList;
     float fplayerHeading = pPlayer->GetHeading(false) * 57.2957763671875;
@@ -2767,9 +2737,6 @@ void VATSMenu::SelectNearestTarget(bool abLeft) {
 }
 
 void VATSMenu::Close() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v15, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     float fFortune;
     float fStranger;
     if ((VATSMenu::pVatsMenu) && (VATSMenu::pVatsMenu->xFadeState == Interface::FADE_SHOWN)) {
@@ -2793,12 +2760,10 @@ void VATSMenu::Close() {
                     BSAudioManager* mgr = &BSAudioManager::QInstance();
                     BSSoundHandle soundHand;
                     if (VATSMenu::xTargetList.IsEmpty()) {
-                        BSSoundHandle* arHandle = mgr->GetSoundHandleByName(&th_s, "UIVATSEnterFail", 289u);
-                        soundHand.operator=(*arHandle);
+                        soundHand = mgr->GetSoundHandleByName("UIVATSEnterFail", 289u);
                     }
                     else {
-                        BSSoundHandle* SoundHandleByName = mgr->GetSoundHandleByName(&apHandle, "UIVATSExit", 289u);
-                        soundHand.operator=(*SoundHandleByName);
+                        soundHand = mgr->GetSoundHandleByName("UIVATSExit", 289u);
                     }
                     soundHand.Play(false);
                 }
@@ -2808,8 +2773,7 @@ void VATSMenu::Close() {
             if (pVATS.GetCount()) {
                 BSAudioManager* mgr_2 = &BSAudioManager::QInstance();
                 BSSoundHandle soundHand_2;
-                BSSoundHandle* v10 = mgr_2->GetSoundHandleByName(&v15, "UIVATSReady", 289u);
-                soundHand_2.operator=(*v10);
+                soundHand_2 = mgr_2->GetSoundHandleByName("UIVATSReady", 289u);
                 soundHand_2.Play(false);
                 fFortune = fVATSFortuneOdds.Float();
                 fStranger = fVATSStrangerOdds.Float();
@@ -3413,11 +3377,7 @@ bool VATSMenu::Create() {
     BSAudioManager* pAudioManager = &BSAudioManager::QInstance();
     BSSoundHandle kEnterSound;
     // 0x121: SOUND_FLAG_IS_2D | SOUND_FLAG_SYSTEM_SOUND | SOUND_FLAG_ONE_SHOT.
-    XFNV_INLINED_LOCAL(BSSoundHandle, kLookup, std::nullopt, std::nullopt);
-    BSSoundHandle* pFound =
-        pAudioManager->GetSoundHandleByName(&kLookup, "UIVATSEnter", static_cast<BSGameSound::SoundFlags>(0x121));
-    kEnterSound = *pFound;
-    kLookup.~BSSoundHandle();
+    kEnterSound = pAudioManager->GetSoundHandleByName("UIVATSEnter", static_cast<BSGameSound::SoundFlags>(0x121));
     kEnterSound.Play(false);
     VATSMenu::pVatsMenu->bStickReset = 0;
     VATSMenu::pVatsMenu->bTargetStickReset = 0;
@@ -4036,7 +3996,6 @@ Tile* VATSMenu::VatsMenuGetTileByName(Tile* apTarget, const char* apName) {
 
 // VATSBodyPart::eBodyPart and uiLastBodyPart are uint32_t; they are passed on as the LIMB_ENUM the callees take.
 void VATSMenu::ShowTargetLimb(bool abForceShow) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!VATSMenu::pVatsMenu) {
         return;
     }
@@ -4061,8 +4020,7 @@ void VATSMenu::ShowTargetLimb(bool abForceShow) {
         if (!pProcess->IsCurrentWeaponGrenade()) {
             BSSoundHandle psoundHand;
             BSAudio* pAudio = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = pAudio->GetSoundHandleByName(&a1, "UIVATSSelectTargetPart", 289u);
-            psoundHand.operator=(*arHandle);
+            psoundHand = pAudio->GetSoundHandleByName("UIVATSSelectTargetPart", 289u);
             psoundHand.Play(false);
         }
     }

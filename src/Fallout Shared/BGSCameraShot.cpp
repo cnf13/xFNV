@@ -248,7 +248,6 @@ bool BGSCameraShot::IsStartAtTimeZero() {
 }
 
 void BGSCameraShot::FreeCamera() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     spLocationNode.operator=(static_cast<NiAVObject*>(nullptr));
     spTargetNode.operator=(static_cast<NiAVObject*>(nullptr));
     pTargetRef = nullptr;
@@ -262,7 +261,7 @@ void BGSCameraShot::FreeCamera() {
     if (bPlayCameraZoomSounds && !pVATS.GetCount()) {
         bPlayCameraZoomSounds = false;
         BSAudio* v2 = &BSAudio::QInstance();
-        v2->GetSoundHandleByName(&soundHand, "UIVATSCameraOut", 289u);
+        BSSoundHandle soundHand = v2->GetSoundHandleByName("UIVATSCameraOut", 289u);
         soundHand.Play(false);
     }
 }
@@ -328,8 +327,6 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
 
 void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
     NiCamera* pcamera;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     uint32_t uiNumKeys;
     uint8_t ucSize;
     NiFrustum vatsFrustum;
@@ -435,7 +432,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
         if (Data.eCameraAction == BGSCameraShot::CA_HIT) {
             bPlayCameraZoomSounds = true;
             BSAudio* v6 = &BSAudio::QInstance();
-            v6->GetSoundHandleByName(&soundHand, "UIVATSCameraIn", 289u);
+            BSSoundHandle soundHand = v6->GetSoundHandleByName("UIVATSCameraIn", 289u);
             soundHand.Play(false);
         }
     }
@@ -443,7 +440,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
         if (bPlayCameraZoomSounds && Data.eCameraAction != BGSCameraShot::CA_HIT) {
             bPlayCameraZoomSounds = false;
             BSAudio* v7 = &BSAudio::QInstance();
-            v7->GetSoundHandleByName(&soundHand_2, "UIVATSCameraOut", 289u);
+            BSSoundHandle soundHand_2 = v7->GetSoundHandleByName("UIVATSCameraOut", 289u);
             soundHand_2.Play(false);
         }
     }
@@ -489,7 +486,6 @@ void BGSCameraShot::Update(float afTime) {
     NiPoint3 apResult;
     NiFrustum vatsFrustum;
     NiFrustum gameFrustum;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     NiPoint3 targetPos;
     NiPoint3 cameraLocalPos_3;
     NiPoint3 cameraLocalPos_2;
@@ -541,7 +537,7 @@ void BGSCameraShot::Update(float afTime) {
                         if (Data.eCameraAction) {
                             if (bplayZoomSound && !bPlayCameraZoomSounds) {
                                 BSAudio* v4 = &BSAudio::QInstance();
-                                v4->GetSoundHandleByName(&soundHand, "UIVATSCameraIn", 289u);
+                                BSSoundHandle soundHand = v4->GetSoundHandleByName("UIVATSCameraIn", 289u);
                                 soundHand.Play(false);
                             }
                             fDollyPercentage = 1.0 / g_fVATSCameraDollyTime * (afTime - fDollyStartTime);

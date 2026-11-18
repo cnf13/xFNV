@@ -163,12 +163,6 @@ void LoveTesterMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v31, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v32, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     // The page turn's result is kept but never read.
     [[maybe_unused]] bool bPageTurned = false;
     switch (a1) {
@@ -226,13 +220,11 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
             }
             if (ioldValue > inewValue) {
                 BSAudio* v12 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v12->GetSoundHandleByName(&th_s, "OBJBookSpecialNumberDown", 289u);
-                SoundHandleByName->Play(false);
+                v12->GetSoundHandleByName("OBJBookSpecialNumberDown", 289u).Play(false);
             }
             if (ioldValue < inewValue) {
                 BSAudio* v13 = &BSAudio::QInstance();
-                BSSoundHandle* v26 = v13->GetSoundHandleByName(&apResult, "OBJBookSpecialNumber", 289u);
-                v26->Play(false);
+                v13->GetSoundHandleByName("OBJBookSpecialNumber", 289u).Play(false);
             }
             RefreshPage();
             break;
@@ -240,14 +232,12 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
         case 4: {
             if (PlayerCharacter::GetSumOfSPECIALStats() == iAvailablePoints) {
                 BSAudio* v3 = &BSAudio::QInstance();
-                BSSoundHandle* v29 = v3->GetSoundHandleByName(&a12, "OBJBookSpecialNumberFinished", 289u);
-                v29->Play(false);
+                v3->GetSoundHandleByName("OBJBookSpecialNumberFinished", 289u).Play(false);
                 Close();
             }
             else {
                 BSAudio* v5 = &BSAudio::QInstance();
-                BSSoundHandle* v28 = v5->GetSoundHandleByName(&arHandle, "UIActivateNothing", 289u);
-                v28->Play(false);
+                v5->GetSoundHandleByName("UIActivateNothing", 289u).Play(false);
             }
             break;
         }
@@ -320,8 +310,7 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
             if (eState == LoveTesterMenu::LTMS_SUMMARY && eXBoxIndexState > LoveTesterMenu::LTMS_STRENGTH) {
                 eXBoxIndexState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eXBoxIndexState - 1);
                 BSAudio* v16 = &BSAudio::QInstance();
-                BSSoundHandle* v23 = v16->GetSoundHandleByName(&v32, "OBJBookSpecialFocus", 289u);
-                v23->Play(false);
+                v16->GetSoundHandleByName("OBJBookSpecialFocus", 289u).Play(false);
             }
             RefreshPage();
             break;
@@ -330,8 +319,7 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
             if (eState == LoveTesterMenu::LTMS_SUMMARY && eXBoxIndexState < LoveTesterMenu::LTMS_LUCK) {
                 eXBoxIndexState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eXBoxIndexState + 1);
                 BSAudio* v17 = &BSAudio::QInstance();
-                BSSoundHandle* v22 = v17->GetSoundHandleByName(&v31, "OBJBookSpecialFocus", 289u);
-                v22->Play(false);
+                v17->GetSoundHandleByName("OBJBookSpecialFocus", 289u).Play(false);
             }
             RefreshPage();
             break;
@@ -516,10 +504,6 @@ bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
 }
 
 bool LoveTesterMenu::TurnPage(bool bForward) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(BSSoundHandle, psoundHand, std::nullopt, std::nullopt);
     bool brunAnim = false;
     if (!bForward) {
@@ -531,21 +515,18 @@ bool LoveTesterMenu::TurnPage(bool bForward) {
         brunAnim = true;
         BSSoundHandle psoundHand_2;
         BSAudio* v7 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&v16, "OBJBookSpecialPageTurn", 289u);
-        psoundHand_2.operator=(*SoundHandleByName);
+        psoundHand_2 = v7->GetSoundHandleByName("OBJBookSpecialPageTurn", 289u);
         psoundHand_2.Play(false);
         goto LABEL_11;
     }
     bLoveTesterAnimForward = true;
     if (eState < LoveTesterMenu::LTMS_SUMMARY) {
         BSAudio* v2;
-        BSSoundHandle* v13;
         eState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eState + 1);
         brunAnim = true;
         ::new (&psoundHand) BSSoundHandle;
         v2 = &BSAudio::QInstance();
-        v13 = v2->GetSoundHandleByName(&a1, "OBJBookSpecialPageTurn", 289u);
-        psoundHand.operator=(*v13);
+        psoundHand = v2->GetSoundHandleByName("OBJBookSpecialPageTurn", 289u);
         psoundHand.Play(false);
     LABEL_11:;
         if (brunAnim) {
@@ -579,14 +560,12 @@ bool LoveTesterMenu::TurnPage(bool bForward) {
     }
     if (PlayerCharacter::GetSumOfSPECIALStats() == iAvailablePoints) {
         BSAudio* v3 = &BSAudio::QInstance();
-        BSSoundHandle* v12 = v3->GetSoundHandleByName(&arHandle, "OBJBookSpecialNumberFinished", 289u);
-        v12->Play(false);
+        v3->GetSoundHandleByName("OBJBookSpecialNumberFinished", 289u).Play(false);
         Close();
     }
     else {
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* v11 = v5->GetSoundHandleByName(&apResult, "UIActivateNothing", 289u);
-        v11->Play(false);
+        v5->GetSoundHandleByName("UIActivateNothing", 289u).Play(false);
     }
     return false;
 }
@@ -1390,7 +1369,6 @@ void LoveTesterMenu::RefreshPreviousPageButton(LoveTesterMenu::LoveTesterButton*
 }
 
 void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index eActorValue = static_cast<LoveTesterMenu::ActorValueButton*>(apButton)->eActorValue;
         if (eActorValue != ActorValue::VALUE_NONE) {
@@ -1398,8 +1376,7 @@ void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
             if (v6 > 1) {
                 BSSoundHandle th_s;
                 BSAudio* v1 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumberDown", 289u);
-                th_s.operator=(*arHandle);
+                th_s = v1->GetSoundHandleByName("OBJBookSpecialNumberDown", 289u);
                 th_s.Play(false);
             }
             int32_t v2 = BSMAX(v6 - 1, 1);
@@ -1410,7 +1387,6 @@ void LoveTesterMenu::DecreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
 }
 
 void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index SelectedSPECIAL = LoveTesterMenu::pInstance->GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE) {
@@ -1418,8 +1394,7 @@ void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
             if (v5 > 1) {
                 BSSoundHandle th_s;
                 BSAudio* v0 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v0->GetSoundHandleByName(&a1, "OBJBookSpecialNumberDown", 289u);
-                th_s.operator=(*arHandle);
+                th_s = v0->GetSoundHandleByName("OBJBookSpecialNumberDown", 289u);
                 th_s.Play(false);
             }
             int32_t v1 = BSMAX(v5 - 1, 1);
@@ -1431,7 +1406,6 @@ void LoveTesterMenu::DecreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
 
 // InitMachine stores this callback only in ActorValueButtons.
 void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index v7 = static_cast<LoveTesterMenu::ActorValueButton*>(apButton)->eActorValue;
         if (v7 != ActorValue::VALUE_NONE) {
@@ -1439,8 +1413,7 @@ void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
             if (v6 < 10) {
                 BSSoundHandle th_s;
                 BSAudio* v1 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
-                th_s.operator=(*arHandle);
+                th_s = v1->GetSoundHandleByName("OBJBookSpecialNumber", 289u);
                 th_s.Play(false);
             }
             if (PlayerCharacter::GetSumOfSPECIALStats() < LoveTesterMenu::pInstance->iAvailablePoints) {
@@ -1453,7 +1426,6 @@ void LoveTesterMenu::IncreaseActorValue(LoveTesterMenu::LoveTesterButton* apButt
 }
 
 void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance) {
         ActorValue::Index SelectedSPECIAL = LoveTesterMenu::pInstance->GetSelectedSPECIAL();
         if (SelectedSPECIAL != ActorValue::VALUE_NONE) {
@@ -1461,8 +1433,7 @@ void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
             if (v5 < 10) {
                 BSSoundHandle th_s;
                 BSAudio* v0 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v0->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
-                th_s.operator=(*arHandle);
+                th_s = v0->GetSoundHandleByName("OBJBookSpecialNumber", 289u);
                 th_s.Play(false);
             }
             if (PlayerCharacter::GetSumOfSPECIALStats() < LoveTesterMenu::pInstance->iAvailablePoints) {
@@ -1475,18 +1446,14 @@ void LoveTesterMenu::IncreaseCurrentActorValue([[maybe_unused]] LoveTesterMenu::
 }
 
 void LoveTesterMenu::AllDoneButtonClick([[maybe_unused]] LoveTesterMenu::LoveTesterButton* apButton, ...) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (LoveTesterMenu::pInstance &&
         PlayerCharacter::GetSumOfSPECIALStats() == LoveTesterMenu::pInstance->iAvailablePoints) {
         BSAudio* v0 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v0->GetSoundHandleByName(&a1, "OBJBookSpecialNumberFinished", 289u);
-        SoundHandleByName->Play(false);
+        v0->GetSoundHandleByName("OBJBookSpecialNumberFinished", 289u).Play(false);
         LoveTesterMenu::Close();
     }
     else {
         BSAudio* v2 = &BSAudio::QInstance();
-        BSSoundHandle* v3 = v2->GetSoundHandleByName(&arHandle, "UIActivateNothing", 289u);
-        v3->Play(false);
+        v2->GetSoundHandleByName("UIActivateNothing", 289u).Play(false);
     }
 }

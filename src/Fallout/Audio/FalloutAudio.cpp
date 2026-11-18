@@ -48,12 +48,6 @@ FalloutAudio::CurrentRegionSounds_t FalloutAudio::CurrentRegionSounds;
 void FalloutAudio::UpdateRegionSounds() {
     float ftimeOfDay;
     BGSAcousticSpace* v54;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v55, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v56, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle* plookup;
     BSSimpleList<TESRegionSound*>* soundList = pPlayer->GetRegionSounds();
     BSAudio* v0 = &BSAudio::QInstance();
@@ -125,8 +119,7 @@ void FalloutAudio::UpdateRegionSounds() {
     }
     if (blistenerUnderwater && (pPlayer->GetParentCell() && !FalloutAudio::UnderwaterLoop.IsPlaying())) {
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1, "AMBUnderwaterLP", 0x2101u);
-        FalloutAudio::UnderwaterLoop.operator=(*arHandle);
+        FalloutAudio::UnderwaterLoop = v5->GetSoundHandleByName("AMBUnderwaterLP", 0x2101u);
         FalloutAudio::UnderwaterLoop.bAssumeSuccess = true;
         FalloutAudio::UnderwaterLoop.Play(false);
     }
@@ -199,9 +192,7 @@ void FalloutAudio::UpdateRegionSounds() {
                 if (pambSound) {
                     const char* aPositiona = pambSound->GetFilename();
                     BSAudio* v9 = &BSAudio::QInstance();
-                    BSSoundHandle* kDawnSoundHandle =
-                        v9->GetSoundHandleByFilename(&out, aPositiona, 0x11011u, pambSound);
-                    FalloutAudio::kAmbientLoop.operator=(*kDawnSoundHandle);
+                    FalloutAudio::kAmbientLoop = v9->GetSoundHandleByFilename(aPositiona, 0x11011u, pambSound);
                     FalloutAudio::kAmbientLoop.FadeInPlay(static_cast<int64_t>(fFadeInTime * 1000.0));
                 }
             }
@@ -286,8 +277,7 @@ void FalloutAudio::UpdateRegionSounds() {
         if (pambSound_2) {
             const char* aPositionb = pambSound_2->GetFilename();
             BSAudio* v20 = &BSAudio::QInstance();
-            BSSoundHandle* pTODSoundHandle = v20->GetSoundHandleByFilename(&th_s, aPositionb, 0x11011u, pambSound_2);
-            FalloutAudio::kAmbientLoop.operator=(*pTODSoundHandle);
+            FalloutAudio::kAmbientLoop = v20->GetSoundHandleByFilename(aPositionb, 0x11011u, pambSound_2);
             FalloutAudio::kAmbientLoop.FadeInPlay(static_cast<int64_t>(fFadeInTime * 1000.0));
         }
         goto LABEL_97;
@@ -349,9 +339,7 @@ LABEL_97:;
                     TESSound* pSoundForm = psoundData;
                     const char* pFilename = psoundData->GetFilename();
                     BSAudio* pAudio = &BSAudio::QInstance();
-                    BSSoundHandle* pSoundHandle =
-                        pAudio->GetSoundHandleByFilename(&apResult, pFilename, 0x11011u, pSoundForm);
-                    phndle->operator=(*pSoundHandle);
+                    *phndle = pAudio->GetSoundHandleByFilename(pFilename, 0x11011u, pSoundForm);
                     phndle->bAssumeSuccess = true;
                     FalloutAudio::CurrentRegionSounds.SetAt(psoundData->iFormID, phndle);
                     float* pfFadeIn = &gs_fRegionLoopFadeInTime_Audio.Float();
@@ -382,17 +370,13 @@ LABEL_97:;
                                     TESSound* pSoundForm = psoundData;
                                     const char* pFilename = psoundData->GetFilename();
                                     BSAudio* pAudio = &BSAudio::QInstance();
-                                    BSSoundHandle* pSoundHandle =
-                                        pAudio->GetSoundHandleByFilename(&v56, pFilename, 0x11101u, pSoundForm);
-                                    hndle.operator=(*pSoundHandle);
+                                    hndle = pAudio->GetSoundHandleByFilename(pFilename, 0x11101u, pSoundForm);
                                 }
                                 else {
                                     TESSound* pSoundForm = psoundData;
                                     const char* pFilename = psoundData->GetFilename();
                                     BSAudio* pAudio = &BSAudio::QInstance();
-                                    BSSoundHandle* pSoundHandle =
-                                        pAudio->GetSoundHandleByFilename(&v55, pFilename, 0x11102u, pSoundForm);
-                                    hndle.operator=(*pSoundHandle);
+                                    hndle = pAudio->GetSoundHandleByFilename(pFilename, 0x11102u, pSoundForm);
                                 }
                                 NiPoint3 loc = pPlayer->GetLocationOnReference();
                                 if (plstnr) {
@@ -455,10 +439,9 @@ LABEL_97:;
 }
 
 void PlayMysteriousStrangerMusic() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSAudio* v0 = &BSAudio::QInstance();
-    v0->GetSoundHandleByName(
-        &a1, "MUSMysteriousStrangerA01",
+    BSSoundHandle a1 = v0->GetSoundHandleByName(
+        "MUSMysteriousStrangerA01",
         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_DONT_CACHE |
             BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE
     );
@@ -472,10 +455,9 @@ void PlayMysteriousStrangerMusic() {
 }
 
 void PlaySound_MUSMysteriousStrangerA02() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSAudio* v0 = &BSAudio::QInstance();
-    v0->GetSoundHandleByName(
-        &a1, "MUSMysteriousStrangerA02",
+    BSSoundHandle a1 = v0->GetSoundHandleByName(
+        "MUSMysteriousStrangerA02",
         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE
     );
     a1.Play(false);

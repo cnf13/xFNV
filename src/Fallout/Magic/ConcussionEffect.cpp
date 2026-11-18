@@ -111,7 +111,6 @@ void ConcussionEffect::Finish() {
 }
 
 void ConcussionEffect::UpdateSound(Actor* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (fConcussionTimer.Float() < static_cast<double>(fTimer)) {
         fTimer = 0.0;
         if (a2->GetPerceptionCondition() == 0.0 && !a2->GetActorValue(ActorValue::IGNORE_CRIPPLED_LIMBS)) {
@@ -121,8 +120,7 @@ void ConcussionEffect::UpdateSound(Actor* a2) {
                 TESImageSpaceModifier* ConcussionIMOD = GetConcussionIMOD();
                 ImageSpaceModifierInstanceForm::Trigger(ConcussionIMOD, afStrength, nullptr);
                 BSAudio* v3 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "FXCrippleHead", 257u);
-                SoundHandleByName->Play(false);
+                v3->GetSoundHandleByName("FXCrippleHead", 257u).Play(false);
             }
             BaseProcess* CurrentAIProcess = a2->pCurrentProcess;
             CurrentAIProcess->SetupSpecialIdle(a2, nullptr, AnimIdle::PLAY_TYPE_AUTO, true, false, true);

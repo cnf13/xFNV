@@ -672,8 +672,6 @@ void BarterMenu::RemoveTransactItem(int32_t aiAmountSelected) {
 
 void BarterMenu::CompleteTransaction() {
     TESObjectREFR* pvendorContainer;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if ((&pVendorRef->m_Extra)->GetMerchantContainer()) {
         pvendorContainer = (&pVendorRef->m_Extra)->GetMerchantContainer();
     }
@@ -738,8 +736,7 @@ void BarterMenu::CompleteTransaction() {
                 pinventory->RemoveGold(pPlayer, -iwholeAmount, pvendorContainer);
             }
             BSAudio* v6 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&arHandle, "ITMBottlecapsDown", 257u);
-            SoundHandleByName->Play(false);
+            v6->GetSoundHandleByName("ITMBottlecapsDown", 257u).Play(false);
         }
     }
     else {
@@ -752,8 +749,7 @@ void BarterMenu::CompleteTransaction() {
             pDataHandler->RemoveItemBarterContainer(&tempGold, v4, Xb);
         }
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* v16 = v5->GetSoundHandleByName(&a1, "ITMBottlecapsUp", 257u);
-        v16->Play(false);
+        v5->GetSoundHandleByName("ITMBottlecapsUp", 257u).Play(false);
     }
     fTransactionAmount = 0.0f;
     ItemsToBuy.RemoveAll();

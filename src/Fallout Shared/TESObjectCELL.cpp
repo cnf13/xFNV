@@ -2169,7 +2169,6 @@ NiNode* TESObjectCELL::GetLandNode(uint32_t aiQuad) {
 }
 
 void TESObjectCELL::UpdateRefSounds() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, SoundHandle, std::nullopt, std::nullopt);
     CellRefLockEnter();
     if (GetAttached()) {
         for (TESObjectREFR* pobj : GetRefList()->ItemsUntilNull()) {
@@ -2185,8 +2184,8 @@ void TESObjectCELL::UpdateRefSounds() {
                         if (iMax > static_cast<uint32_t>(static_cast<int64_t>(fdist))) {
                             uint32_t a3 = pSound->iFormID;
                             BSAudio* v1 = &BSAudio::QInstance();
-                            v1->GetSoundHandleByNumericID(
-                                &SoundHandle, a3,
+                            BSSoundHandle SoundHandle = v1->GetSoundHandleByNumericID(
+                                a3,
                                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                     BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER
                             );

@@ -274,27 +274,11 @@ void CaravanMenu::DoClick(int32_t a1, Tile* a2) {
 }
 
 void CaravanMenu::DoIdle() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v113, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v114, std::nullopt, std::nullopt);
     NiUpdateData v115;
     NiUpdateData v116;
     NiUpdateData v117;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v118, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v119, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v120, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v121, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v122, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v123, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v124, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v125, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v126, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v127, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     NiUpdateData v130;
     NiUpdateData v131;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     CaravanAIPackage aiPackage;
     int32_t ielaspedMillis = 0;
     float fxAxisRatio = 1.0f;
@@ -526,9 +510,7 @@ void CaravanMenu::DoIdle() {
                                     int32_t v71 = BSMAX(0, iSelectedTrack);
                                     iSelectedTrack = BSMIN(v71, 2);
                                     BSAudio* v72 = &BSAudio::QInstance();
-                                    BSSoundHandle* SoundHandleByName =
-                                        v72->GetSoundHandleByName(&v113, "GAMECaravanToggleTrack", 289u);
-                                    SoundHandleByName->Play(false);
+                                    v72->GetSoundHandleByName("GAMECaravanToggleTrack", 289u).Play(false);
                                     SelectWholeTrack(iSelectedTrack);
                                 }
                                 else {
@@ -550,8 +532,7 @@ void CaravanMenu::DoIdle() {
                                 iSelectedDeckCard = 0;
                             }
                             BSAudio* v70 = &BSAudio::QInstance();
-                            BSSoundHandle* v88 = v70->GetSoundHandleByName(&v114, "GAMECaravanSwitchCard", 289u);
-                            v88->Play(false);
+                            v70->GetSoundHandleByName("GAMECaravanSwitchCard", 289u).Play(false);
                             SelectDeckCard(false);
                             if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
                                 pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
@@ -618,8 +599,7 @@ void CaravanMenu::DoIdle() {
                     pHandAnimManager[1]->ActivateSequence(pHandAnimations[1][0], 0, false, 1.0f, 0.0f, nullptr);
                     fSelectionDelay = 0.0f;
                     BSAudio* v11 = &BSAudio::QInstance();
-                    BSSoundHandle* v111 = v11->GetSoundHandleByName(&a1, "GAMECaravanStartMatch", 289u);
-                    v111->Play(false);
+                    v11->GetSoundHandleByName("GAMECaravanStartMatch", 289u).Play(false);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 }
                 NiUpdateData UpdateData1_2(CaravanMenu::fTimeDelta, true, false);
@@ -700,8 +680,7 @@ void CaravanMenu::DoIdle() {
             if (CaravanMenu::fTimeDelta == 0.0) {
                 SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 BSAudio* v20 = &BSAudio::QInstance();
-                BSSoundHandle* v110 = v20->GetSoundHandleByName(&arHandle, "GAMECaravanFundsDrop", 289u);
-                v110->Play(false);
+                v20->GetSoundHandleByName("GAMECaravanFundsDrop", 289u).Play(false);
             }
             for (int32_t i = iBillIndexToAnim;; ++i) {
                 uint32_t FormFlags = pListOfBills.iSize;
@@ -738,8 +717,7 @@ void CaravanMenu::DoIdle() {
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     --iNumSteps;
                     BSAudio* v25 = &BSAudio::QInstance();
-                    BSSoundHandle* v109 = v25->GetSoundHandleByName(&th_s, "GAMECaravanNavigate", 289u);
-                    v109->Play(false);
+                    v25->GetSoundHandleByName("GAMECaravanNavigate", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_4(CaravanMenu::fTimeDelta, true, false);
                 NiUpdateData UpdateData2_2(CaravanMenu::fTimeDelta, true, false);
@@ -788,8 +766,7 @@ void CaravanMenu::DoIdle() {
                     double v29 = pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue) + static_cast<double>(iNumSteps);
                     SwapDeckBuildingTextures(static_cast<int32_t>(v29), false);
                     BSAudio* v30 = &BSAudio::QInstance();
-                    BSSoundHandle* v108 = v30->GetSoundHandleByName(&apResult, "GAMECaravanNavigate", 289u);
-                    v108->Play(false);
+                    v30->GetSoundHandleByName("GAMECaravanNavigate", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_6(CaravanMenu::fTimeDelta, true, false);
                 NiUpdateData UpdateData2_4(CaravanMenu::fTimeDelta, true, false);
@@ -837,8 +814,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v38 = &BSAudio::QInstance();
-                    BSSoundHandle* v105 = v38->GetSoundHandleByName(&v125, "GAMECaravanAddRemove", 289u);
-                    v105->Play(false);
+                    v38->GetSoundHandleByName("GAMECaravanAddRemove", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_9(CaravanMenu::fTimeDelta, true, false);
                 NiUpdateData UpdateData2_7(CaravanMenu::fTimeDelta, true, false);
@@ -878,8 +854,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v33 = &BSAudio::QInstance();
-                    BSSoundHandle* v107 = v33->GetSoundHandleByName(&v127, "GAMECaravanChangeDeck", 289u);
-                    v107->Play(false);
+                    v33->GetSoundHandleByName("GAMECaravanChangeDeck", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_7(CaravanMenu::fTimeDelta, true, false);
                 NiUpdateData UpdateData2_5(CaravanMenu::fTimeDelta, true, false);
@@ -910,8 +885,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v35 = &BSAudio::QInstance();
-                    BSSoundHandle* v106 = v35->GetSoundHandleByName(&v126, "GAMECaravanChangeDeck", 289u);
-                    v106->Play(false);
+                    v35->GetSoundHandleByName("GAMECaravanChangeDeck", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_8(CaravanMenu::fTimeDelta, true, false);
                 NiUpdateData UpdateData2_6(CaravanMenu::fTimeDelta, true, false);
@@ -944,8 +918,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                     BSAudio* v41 = &BSAudio::QInstance();
-                    BSSoundHandle* v104 = v41->GetSoundHandleByName(&v124, "GAMECaravanChangeDeck", 289u);
-                    v104->Play(false);
+                    v41->GetSoundHandleByName("GAMECaravanChangeDeck", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_11(CaravanMenu::fTimeDelta, true, false);
                 NiUpdateData UpdateData2_9(CaravanMenu::fTimeDelta, true, false);
@@ -994,8 +967,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     fSelectionDelay = 0.0f;
                     BSAudio* v44 = &BSAudio::QInstance();
-                    BSSoundHandle* v103 = v44->GetSoundHandleByName(&v123, "GAMECaravanConfirmAddtoDeck", 289u);
-                    v103->Play(false);
+                    v44->GetSoundHandleByName("GAMECaravanConfirmAddtoDeck", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_13(CaravanMenu::fTimeDelta, true, false);
                 pHandGeometry[isAI]->Update(UpdateData1_13);
@@ -1085,8 +1057,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     fSelectionDelay = 0.0f;
                     BSAudio* v50 = &BSAudio::QInstance();
-                    BSSoundHandle* v101 = v50->GetSoundHandleByName(&v122, "GAMECaravanRemoveCard", 289u);
-                    v101->Play(false);
+                    v50->GetSoundHandleByName("GAMECaravanRemoveCard", 289u).Play(false);
                 }
                 NiUpdateData UpdateData1_16(CaravanMenu::fTimeDelta, true, false);
                 pHandGeometry[isAI_2]->Update(UpdateData1_16);
@@ -1183,8 +1154,7 @@ void CaravanMenu::DoIdle() {
                 SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                 fSelectionDelay = 0.0f;
                 BSAudio* v53 = &BSAudio::QInstance();
-                BSSoundHandle* v98 = v53->GetSoundHandleByName(&v121, "GAMECaravanConfirmAddToTrack", 289u);
-                v98->Play(false);
+                v53->GetSoundHandleByName("GAMECaravanConfirmAddToTrack", 289u).Play(false);
             }
             NiUpdateData UpdateData1_19(CaravanMenu::fTimeDelta, true, false);
             pHandGeometry[isAI_3]->Update(UpdateData1_19);
@@ -1281,16 +1251,14 @@ void CaravanMenu::DoIdle() {
                             pStartAnimations[isAI_4][iSelectedDeckCard], 0, false, 1.0f, 0.0f, nullptr
                         );
                         BSAudio* v57 = &BSAudio::QInstance();
-                        BSSoundHandle* v94 = v57->GetSoundHandleByName(&v120, "GAMECaravanRemoveCard", 289u);
-                        v94->Play(false);
+                        v57->GetSoundHandleByName("GAMECaravanRemoveCard", 289u).Play(false);
                     }
                     else {
                         pHandAnimManager[isAI_4]->ActivateSequence(
                             pHandAnimations[isAI_4][iSelectedDeckCard + 1], 0, false, 1.0f, 0.0f, nullptr
                         );
                         BSAudio* v58 = &BSAudio::QInstance();
-                        BSSoundHandle* v93 = v58->GetSoundHandleByName(&v119, "GAMECaravanAddRemoveCard", 289u);
-                        v93->Play(false);
+                        v58->GetSoundHandleByName("GAMECaravanAddRemoveCard", 289u).Play(false);
                     }
                     if (!isAI_4) {
                         SelectDeckCard(true);
@@ -1356,8 +1324,7 @@ void CaravanMenu::DoIdle() {
                     SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, true);
                     fSelectionDelay = 0.0f;
                     BSAudio* v59 = &BSAudio::QInstance();
-                    BSSoundHandle* v91 = v59->GetSoundHandleByName(&v118, "GAMECaravanRemoveCard", 289u);
-                    v91->Play(false);
+                    v59->GetSoundHandleByName("GAMECaravanRemoveCard", 289u).Play(false);
                 }
                 for (int32_t i_4 = 0; i_4 < 7 && pCardTracks[iSelectedTrack][i_4].iSize; ++i_4) {
                     NiUpdateData* v60 = XFNV_RECONSTRUCT(NiUpdateData)(&v117, CaravanMenu::fTimeDelta, 1, 0);
@@ -1854,9 +1821,6 @@ int32_t CaravanMenu::GetClass() {
 
 bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
     bool bhandled_2;
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     int32_t i;
     using randomints_t = BSSimpleArray<int32_t, 1024>;
     bool bhandled = false;
@@ -1923,9 +1887,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
             if (!IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) || IsFlagSet(CaravanMenu::CAF_SELECT_TRACK)) {
                 if (!IsFlagSet(CaravanMenu::CAF_SELECT_TRACK)) {
                     BSAudio* v7 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName =
-                        v7->GetSoundHandleByName(&arHandle, "GAMECaravanAddToTrack", 289u);
-                    SoundHandleByName->Play(false);
+                    v7->GetSoundHandleByName("GAMECaravanAddToTrack", 289u).Play(false);
                     SetFlag(CaravanMenu::CAF_SELECT_TRACK, true);
                     iSelectedTrack = 0;
                     iSelectedRow = 0;
@@ -2022,8 +1984,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                 }
                 SelectDeckCard(true);
                 BSAudio* v6 = &BSAudio::QInstance();
-                BSSoundHandle* v24 = v6->GetSoundHandleByName(&a12, "GAMECaravanAddToTrack", 289u);
-                v24->Play(false);
+                v6->GetSoundHandleByName("GAMECaravanAddToTrack", 289u).Play(false);
                 UpdateTileAlpha(CaravanMenu::TI_NO_TILE);
                 SetFlag(CaravanMenu::CAF_SELECT_TRACK, true);
                 bhandled = true;
@@ -2086,8 +2047,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                 if (iPlayerAnte > 0 || !iNPCAnte) {
                     LoadNifs();
                     BSAudio* v11 = &BSAudio::QInstance();
-                    BSSoundHandle* v22 = v11->GetSoundHandleByName(&th_s, "UIMenuOK", 289u);
-                    v22->Play(false);
+                    v11->GetSoundHandleByName("UIMenuOK", 289u).Play(false);
                 }
                 bhandled = true;
             }
@@ -3676,11 +3636,9 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
     NiUpdateData v18;
     NiMatrix3 matrot_90_4;
     NiUpdateData v20;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     NiUpdateData v22;
     NiMatrix3 matrot_90_2;
     NiUpdateData apMemory;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     char texturename[260];
     char blockName[268];
     NiMatrix3 cardrot;
@@ -3699,8 +3657,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
         if (bIsValidPlacement) {
             NiMatrix3 matrot_90;
             BSAudio* v3 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "GAMECaravanToggleTrack", 289u);
-            SoundHandleByName->Play(false);
+            v3->GetSoundHandleByName("GAMECaravanToggleTrack", 289u).Play(false);
             cursorface = pCursors[0];
             pCursors[1]->SetTranslate(0.0f, 0.0f, -50.0f);
             NiUpdateData* updated = XFNV_RECONSTRUCT(NiUpdateData)(&apMemory, 0.0f, 0, 0);
@@ -3718,8 +3675,7 @@ void CaravanMenu::SelectTrackCard(int32_t aiTrack, int32_t aiRow) {
         else {
             NiMatrix3 matrot_90_3;
             BSAudio* v6 = &BSAudio::QInstance();
-            BSSoundHandle* v15 = v6->GetSoundHandleByName(&arHandle, "GAMECaravanInvalidStackLocation", 289u);
-            v15->Play(false);
+            v6->GetSoundHandleByName("GAMECaravanInvalidStackLocation", 289u).Play(false);
             cursorface = pCursors[1];
             pCursors[0]->SetTranslate(0.0f, 0.0f, -50.0f);
             NiUpdateData* v7 = XFNV_RECONSTRUCT(NiUpdateData)(&v20, 0.0f, 0, 0);
@@ -4513,8 +4469,6 @@ void CaravanMenu::PrepareGameMenu() {
 
 void CaravanMenu::PrepareResultsMenu() {
     const char* apString;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     char Src[268];
     eGameState = CaravanMenu::CA_CAMERA_TO_RESULTS_ANIM;
     if (this->IsFlagSet(CaravanMenu::CAF_PLAYERWIN)) {
@@ -4527,8 +4481,7 @@ void CaravanMenu::PrepareResultsMenu() {
         }
         MiscStatManager::Increment(MiscStatManager::MS_CARAVAN_GAMES_WON);
         BSAudio* v3 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "GAMECaravanWin", 289u);
-        SoundHandleByName->Play(false);
+        v3->GetSoundHandleByName("GAMECaravanWin", 289u).Play(false);
     }
     else {
         uint32_t CaravanCapLosses = pPlayer->GetCaravanCapLosses();
@@ -4537,8 +4490,7 @@ void CaravanMenu::PrepareResultsMenu() {
         pPlayer->SetCaravanLosses(CaravanLosses + 1);
         MiscStatManager::Increment(MiscStatManager::MS_CARAVAN_GAMES_LOST);
         BSAudio* v6 = &BSAudio::QInstance();
-        BSSoundHandle* v18 = v6->GetSoundHandleByName(&arHandle, "GAMECaravanLose", 289u);
-        v18->Play(false);
+        v6->GetSoundHandleByName("GAMECaravanLose", 289u).Play(false);
     }
     Tile* th_s = pTiles[3]->GetChildByName("CRM_InfoRect");
     if (th_s) {
@@ -5874,7 +5826,6 @@ Tile* CaravanMenu::Create(
     float afBetPercentage,
     bool abDebugMode
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Tile* pold_menu_tile = Menu::GetMenuByClass(1083);
     g_caravanMenu_InterfaceManager = InterfaceManager::Instance();
     int32_t v5 = pPlayer->GetCaravanCards1()->ItemsInList();
@@ -5942,8 +5893,7 @@ Tile* CaravanMenu::Create(
         msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
     );
     BSAudio* v6 = &BSAudio::QInstance();
-    BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-    SoundHandleByName->Play(false);
+    v6->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
     return nullptr;
 }
 

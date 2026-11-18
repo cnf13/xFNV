@@ -356,18 +356,13 @@ void InventoryMenu::DoClick(int32_t aiID, Tile* apTarget) {
                     pExtra = nullptr;
                 }
                 if (GetMenuTile()->IsTrue(iUT_KeyringOpen)) {
-                    // GetSoundHandleByName is handed uninitialised storage and constructs the handle there; the handle
-                    // is destroyed through the empty ~BSSoundHandle.
-                    alignas(BSSoundHandle) uint8_t aucSound[sizeof(BSSoundHandle)];
-                    BSSoundHandle* pSound = reinterpret_cast<BSSoundHandle*>(aucSound);
                     BSAudio::QInstance()
                         .GetSoundHandleByName(
-                            pSound, "UIVATSInsufficientAP",
+                            "UIVATSInsufficientAP",
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT
                         )
-                        ->Play(false);
-                    pSound->~BSSoundHandle();
+                        .Play(false);
                 }
                 else if (pObject->GetQuestObject()) {
                     Interface::ShowMessage(sDropQuestItemWarning.String(), 2, nullptr, nullptr, 2.0f, false);

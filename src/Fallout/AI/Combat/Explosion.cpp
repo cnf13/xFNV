@@ -637,9 +637,8 @@ void Explosion::Initialize() {
                 pPlayer->GetParentCell(), 1.0f, pParticles, rotation, splashLocation, fScale, 7, nullptr
             );
             BSSoundHandle underWaterSound;
-            XFNV_INLINED_LOCAL(BSSoundHandle, soundResult, std::nullopt, std::nullopt);
-            underWaterSound = *BSAudio::QInstance().GetSoundHandleByName(
-                &soundResult, "CWaterExplosionSplash",
+            underWaterSound = BSAudio::QInstance().GetSoundHandleByName(
+                "CWaterExplosionSplash",
                 static_cast<uint32_t>(BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT)
             );
             if (underWaterSound.IsValid()) {
@@ -665,8 +664,6 @@ void Explosion::Initialize() {
 }
 
 void Explosion::ApplyImpactDecals() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
     NiColor kVertexColor;
     hkpPropertyValue v64;
     CFilter v68;
@@ -965,8 +962,8 @@ void Explosion::ApplyImpactDecals() {
                 if (pimpactSound1) {
                     const char* x = pimpactSound1->GetFilename();
                     BSAudio* v26 = &BSAudio::QInstance();
-                    v26->GetSoundHandleByFilename(
-                        &soundHandle, x,
+                    BSSoundHandle soundHandle = v26->GetSoundHandleByFilename(
+                        x,
                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                             BSGameSound::SOUND_FLAG_IMPACT,
                         pimpactSound1
@@ -978,8 +975,8 @@ void Explosion::ApplyImpactDecals() {
                 if (pimpactSound2) {
                     const char* xa = pimpactSound2->GetFilename();
                     BSAudio* v27 = &BSAudio::QInstance();
-                    v27->GetSoundHandleByFilename(
-                        &soundHandle_2, xa,
+                    BSSoundHandle soundHandle_2 = v27->GetSoundHandleByFilename(
+                        xa,
                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                             BSGameSound::SOUND_FLAG_IMPACT,
                         pimpactSound2
@@ -1631,28 +1628,24 @@ void Explosion::PushActor(Actor* apTargetActor, float afExplosionPower) {
 }
 
 void Explosion::StartSounds() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     StopSounds();
     if (GetExplosionBase()->Data.pSound1) {
         int32_t refID = GetExplosionBase()->Data.pSound1->iFormID;
-        BSSoundHandle* arHandle = PlaySound(
-            &a2, refID, false,
+        Sound1 = PlaySound(
+            refID, false,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_BATTLE_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT |
                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
-        Sound1.operator=(*arHandle);
     }
     if (GetExplosionBase()->Data.pSound2) {
         int32_t uiFormID = GetExplosionBase()->Data.pSound2->iFormID;
-        BSSoundHandle* v1 = PlaySound(
-            &arHandleOut, uiFormID, false,
+        Sound2 = PlaySound(
+            uiFormID, false,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_BATTLE_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT |
                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
-        Sound2.operator=(*v1);
     }
 }
 

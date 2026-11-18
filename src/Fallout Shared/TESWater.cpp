@@ -1462,7 +1462,6 @@ void TESWaterSystem::UpdateWaterDisplacementSimulation() {
 
 void TESWaterSystem::UpdateWaterSounds() {
     static char bWaterSoundPlaying;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiColorA, v42, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiColorA, v43, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiColorA, v44, std::nullopt, std::nullopt);
@@ -1642,8 +1641,7 @@ void TESWaterSystem::UpdateWaterSounds() {
                 TESWaterForm* WaterType = pPlayer->GetParentCell()->GetWaterType();
                 uint32_t exteriorWaterHeightb = WaterType->pWaterSound->iFormID;
                 BSAudio* v17 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v17->GetSoundHandleByNumericID(&a1, exteriorWaterHeightb, iflags);
-                WaterSound.operator=(*arHandle);
+                WaterSound = v17->GetSoundHandleByNumericID(exteriorWaterHeightb, iflags);
             }
         }
     }

@@ -252,17 +252,8 @@ void bhkShape::BuildDisplayFromhkGeometry(
                                            )
                                          : nullptr;
             if (apName) {
-                XFNV_INLINED_LOCAL(NiFixedString, kName, std::nullopt, std::nullopt);
-                // EXE-INLINED 0x438170: NiFixedString::NiFixedString(const char*)
-                kName.SetHandle(NiGlobalStringTable::AddString(apName));
+                NiFixedString kName(apName);
                 pShape->SetName(kName);
-                // EXE-INLINED 0x4381B0: NiFixedString::~NiFixedString. The handle's reference count is the dword 8
-                // bytes before its characters, raw memory the exe treats as untyped.
-                if (kName.GetHandle() != NiGlobalStringTable::NULL_STRING) {
-                    InterlockedDecrementUInt32(
-                        reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kName.GetHandle()) - 8)
-                    );
-                }
             }
             pShape->m_spModelData.m_pObject->CreateNormals(true);
             bhkMigrationUtilFunctions::PrepareDebugGeom(

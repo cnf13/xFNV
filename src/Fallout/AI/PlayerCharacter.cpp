@@ -3123,8 +3123,6 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESObjectREFR* v20;
     TESObjectREFR* v21;
     DialoguePackage* v23;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Character::InitLoadGame(apLoadGameBuffer);
     uint32_t iclosestConversationID =
         pSaveLoadGame->GetChangedFormID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pClosestConversation)));
@@ -3258,15 +3256,13 @@ void PlayerCharacter::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         !(fPlayerHealthHeartbeatFast.Float() < static_cast<double>(fhealthRatio))) {
         if (fPlayerHealthHeartbeatFast.Float() >= static_cast<double>(fhealthRatio)) {
             BSAudio* v11 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v11->GetSoundHandleByName(&arHandle, "UIHealthHeartbeatBLP", 49u);
-            StatusSoundHandle.operator=(*SoundHandleByName);
+            StatusSoundHandle = v11->GetSoundHandleByName("UIHealthHeartbeatBLP", 49u);
             StatusSoundHandle.Play(true);
         }
     }
     else {
         BSAudio* v10 = &BSAudio::QInstance();
-        BSSoundHandle* v14 = v10->GetSoundHandleByName(&a1, "UIHealthHeartbeatALP", 49u);
-        StatusSoundHandle.operator=(*v14);
+        StatusSoundHandle = v10->GetSoundHandleByName("UIHealthHeartbeatALP", 49u);
         StatusSoundHandle.Play(true);
     }
     if ((Get3D()) &&
@@ -4047,21 +4043,14 @@ float PlayerCharacter::GetHeading(bool abIgnoreImmobile) {
 }
 
 void PlayerCharacter::Update(float afDelta) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v135, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v157, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v175, std::nullopt, std::nullopt);
     NiPoint3 v187;
     bool bsearch;
     NiPoint3 v230;
     alignas(16) NiMatrix3 currentMatrix;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v238, std::nullopt, std::nullopt);
-    alignas(16) XFNV_INLINED_LOCAL(BSSoundHandle, v241, std::nullopt, std::nullopt);
-    alignas(16) XFNV_INLINED_LOCAL(BSSoundHandle, v257, std::nullopt, std::nullopt);
     float v286;
     float v287;
     uint16_t smoveMode;
     TESObjectWEAP* pweapon;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v317, std::nullopt, std::nullopt);
     Controls* pcontrols = appMain->GetControls();
     time_followerStealthing = time_followerStealthing - afDelta;
     if (bVATSForce1stPerson) {
@@ -4082,8 +4071,7 @@ void PlayerCharacter::Update(float afDelta) {
             v5->SetMasterSecondaryVolume(fValue);
             if (!BSAudio::kVatsLoopHandle.IsValid()) {
                 BSAudio* v6 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&v317, "UIVATSLOOP", 49u);
-                BSAudio::kVatsLoopHandle.operator=(*SoundHandleByName);
+                BSAudio::kVatsLoopHandle = v6->GetSoundHandleByName("UIVATSLOOP", 49u);
             }
             BSAudio::kVatsLoopHandle.Play(false);
         }
@@ -4704,13 +4692,12 @@ void PlayerCharacter::Update(float afDelta) {
                                 if ((!hndl.IsValid()) && (pnoactSound)) {
                                     const char* Filename = pnoactSound->GetFilename();
                                     BSAudio* v39 = &BSAudio::QInstance();
-                                    BSSoundHandle* SoundHandleByFilename = v39->GetSoundHandleByFilename(
-                                        &v257, Filename,
+                                    hndl = v39->GetSoundHandleByFilename(
+                                        Filename,
                                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                             BSGameSound::SOUND_FLAG_ONE_SHOT,
                                         pnoactSound
                                     );
-                                    hndl.operator=(*SoundHandleByFilename);
                                 }
 
                                 if (!hndl.IsPlaying()) {
@@ -4844,12 +4831,11 @@ void PlayerCharacter::Update(float afDelta) {
                                         (static_cast<uint32_t>(static_cast<uint16_t>((smoveMode & 0xFBFF))))
                                     );
                                     BSAudio* v41 = &BSAudio::QInstance();
-                                    BSSoundHandle* v240 = v41->GetSoundHandleByName(
-                                        &v241, "NPCHumanCrouchUp",
+                                    hndl = v41->GetSoundHandleByName(
+                                        "NPCHumanCrouchUp",
                                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                             BSGameSound::SOUND_FLAG_FIRST_PERSON
                                     );
-                                    hndl.operator=(*v240);
                                     const NiPoint3* v42 = &this->GetLocationOnReference();
                                     hndl.SetPosition(*v42);
                                     hndl.Play(false);
@@ -4861,12 +4847,11 @@ void PlayerCharacter::Update(float afDelta) {
                                         (static_cast<uint32_t>(static_cast<uint16_t>((smoveMode | 1024))))
                                     );
                                     BSAudio* v43 = &BSAudio::QInstance();
-                                    BSSoundHandle* v237 = v43->GetSoundHandleByName(
-                                        &v238, "NPCHumanCrouchDown",
+                                    hndl = v43->GetSoundHandleByName(
+                                        "NPCHumanCrouchDown",
                                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                             BSGameSound::SOUND_FLAG_FIRST_PERSON
                                     );
-                                    hndl.operator=(*v237);
                                     const NiPoint3* v44 = &this->GetLocationOnReference();
                                     hndl.SetPosition(*v44);
                                     hndl.Play(false);
@@ -5559,8 +5544,7 @@ void PlayerCharacter::Update(float afDelta) {
                     }
                     else {
                         BSAudio* v72 = &BSAudio::QInstance();
-                        BSSoundHandle* v174 = v72->GetSoundHandleByName(&v175, "UIVATSEnterFail", 289u);
-                        v174->Play(false);
+                        v72->GetSoundHandleByName("UIVATSEnterFail", 289u).Play(false);
                         bDelayVATSMenu = false;
                     }
                     v302 = true;
@@ -5734,13 +5718,12 @@ void PlayerCharacter::Update(float afDelta) {
                         if ((!hndl_2.IsValid()) && (pnoactSound_3)) {
                             const char* v111 = pnoactSound_3->GetFilename();
                             BSAudio* v77 = &BSAudio::QInstance();
-                            BSSoundHandle* v156 = v77->GetSoundHandleByFilename(
-                                &v157, v111,
+                            hndl_2 = v77->GetSoundHandleByFilename(
+                                v111,
                                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                     BSGameSound::SOUND_FLAG_ONE_SHOT,
                                 pnoactSound_3
                             );
-                            hndl_2.operator=(*v156);
                         }
 
                         if (!hndl_2.IsPlaying()) {
@@ -5964,9 +5947,7 @@ void PlayerCharacter::Update(float afDelta) {
                                                 if (NthBrushPassthroughSound) {
                                                     uint32_t CastingType = NthBrushPassthroughSound->iFormID;
                                                     BSAudio* v103 = &BSAudio::QInstance();
-                                                    BSSoundHandle* SoundHandleByNumericID =
-                                                        v103->GetSoundHandleByNumericID(&v135, CastingType, 257u);
-                                                    SoundHandleByNumericID->Play(false);
+                                                    v103->GetSoundHandleByNumericID(CastingType, 257u).Play(false);
                                                     uint32_t v104 = BSGetTickCount();
                                                     time_11E0BA8 = RandomInt(1500, 2000) + v104;
                                                 }
@@ -6422,8 +6403,6 @@ void PlayerCharacter::PermanentModActorValue(ActorValue::Index aiWhich, float af
 }
 
 void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiValue, Actor* apAttacker) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     float fValue = static_cast<float>(aiValue);
     if (CheckInvulnerable(aiWhich, fValue) && !ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION)) {
         ActorValueOwner* v10;
@@ -6465,9 +6444,7 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiV
                         StatusSoundHandle.Stop();
                         StatusSoundHandle.Release();
                         BSAudio* v5 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName =
-                            v5->GetSoundHandleByName(&arHandle, "UIHealthHeartbeatBLP", 49u);
-                        StatusSoundHandle.operator=(*SoundHandleByName);
+                        StatusSoundHandle = v5->GetSoundHandleByName("UIHealthHeartbeatBLP", 49u);
                         StatusSoundHandle.Play(true);
                     }
                 }
@@ -6475,8 +6452,7 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiV
                     StatusSoundHandle.Stop();
                     StatusSoundHandle.Release();
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* v13 = v4->GetSoundHandleByName(&a1, "UIHealthHeartbeatALP", 49u);
-                    StatusSoundHandle.operator=(*v13);
+                    StatusSoundHandle = v4->GetSoundHandleByName("UIHealthHeartbeatALP", 49u);
                     StatusSoundHandle.Play(true);
                 }
             }
@@ -6502,8 +6478,6 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, int32_t aiV
 }
 
 void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, float afValue, Actor* apAttacker) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (CheckInvulnerable(aiWhich, afValue) && !ActorValue::IsFlagSet(aiWhich, ActorValue::ENUMERATION)) {
         ActorValueOwner* apActor;
         ActorValueOwner* a5;
@@ -6544,9 +6518,7 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, float afVal
                         StatusSoundHandle.Stop();
                         StatusSoundHandle.Release();
                         BSAudio* v5 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName =
-                            v5->GetSoundHandleByName(&arHandle, "UIHealthHeartbeatBLP", 49u);
-                        StatusSoundHandle.operator=(*SoundHandleByName);
+                        StatusSoundHandle = v5->GetSoundHandleByName("UIHealthHeartbeatBLP", 49u);
                         StatusSoundHandle.Play(true);
                     }
                 }
@@ -6554,8 +6526,7 @@ void PlayerCharacter::DamageModActorValue(ActorValue::Index aiWhich, float afVal
                     StatusSoundHandle.Stop();
                     StatusSoundHandle.Release();
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* v9 = v4->GetSoundHandleByName(&a1, "UIHealthHeartbeatALP", 49u);
-                    StatusSoundHandle.operator=(*v9);
+                    StatusSoundHandle = v4->GetSoundHandleByName("UIHealthHeartbeatALP", 49u);
                     StatusSoundHandle.Play(true);
                 }
             }
@@ -7840,8 +7811,6 @@ bool PlayerCharacter::GetTelekinesisSelected() {
 
 void PlayerCharacter::RewardKarma(int32_t aiAmount) {
     int32_t* v6;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t icurrent = GetActorValue(ActorValue::KARMA);
     GetActorBase();
     float afKarma = GetActorFloatValue(ActorValue::KARMA);
@@ -7863,8 +7832,7 @@ void PlayerCharacter::RewardKarma(int32_t aiAmount) {
         Interface::ShowMessage(v4, 0, v9, nullptr, 2.0f, false);
         BSSoundHandle psoundHand_2;
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&arHandle, "UIKarmaUp", 289u);
-        psoundHand_2.operator=(*SoundHandleByName);
+        psoundHand_2 = v5->GetSoundHandleByName("UIKarmaUp", 289u);
         psoundHand_2.Play(false);
     }
     else {
@@ -7884,8 +7852,7 @@ void PlayerCharacter::RewardKarma(int32_t aiAmount) {
         Interface::ShowMessage(v2, 0, v8, nullptr, 2.0f, false);
         BSSoundHandle psoundHand;
         BSAudio* v3 = &BSAudio::QInstance();
-        BSSoundHandle* v12 = v3->GetSoundHandleByName(&a1, "UIKarmaDown", 289u);
-        psoundHand.operator=(*v12);
+        psoundHand = v3->GetSoundHandleByName("UIKarmaDown", 289u);
         psoundHand.Play(false);
     }
     if (aiAmount <= 0 || (v6 = &iKarmaMax.Int(), icurrent < *v6)) {
@@ -11188,8 +11155,6 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
     static int32_t iFlyCameraFrameCount;
     TESObjectWEAP* pweapon;
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     NiMatrix3 currentMatrix;
     // Move mode, passed by address to UpdateHeadingAndLooking.
     uint16_t smoveMode;
@@ -11292,23 +11257,23 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
                 if ((smoveMode & 1024) != 0) {
                     smoveMode = smoveMode & 0xFBFF;
                     BSAudio* v3 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(
-                        &a1, "NPCHumanCrouchUp",
-                        BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                            BSGameSound::SOUND_FLAG_FIRST_PERSON
-                    );
-                    SoundHandleByName->Play(false);
+                    v3->GetSoundHandleByName(
+                          "NPCHumanCrouchUp",
+                          BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                              BSGameSound::SOUND_FLAG_FIRST_PERSON
+                    )
+                        .Play(false);
                 }
                 else {
                     smoveMode = smoveMode | 1024;
                     eaction = ActionPoints::ACTION_CROUCH;
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* v23 = v4->GetSoundHandleByName(
-                        &arHandle, "NPCHumanCrouchDown",
-                        BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
-                            BSGameSound::SOUND_FLAG_FIRST_PERSON
-                    );
-                    v23->Play(false);
+                    v4->GetSoundHandleByName(
+                          "NPCHumanCrouchDown",
+                          BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
+                              BSGameSound::SOUND_FLAG_FIRST_PERSON
+                    )
+                        .Play(false);
                 }
                 UseActionPoints(eaction);
             }
@@ -14262,12 +14227,10 @@ void PlayerCharacter::SetActorBaseValue(ActorValue::Index a1, int32_t a2) {
 }
 
 void PlayerCharacter::StartKillcamForActor(TESObjectREFR* a1, float a2, bool a3, int32_t a4) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1a, std::nullopt, std::nullopt);
     if (eKillCameraSetting && (!GetParentCell() || GetParentCell()->iFormID != 0x161E98)) {
         BSSoundHandle th_s;
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1a, "UIPopUpQuestNew", 289u);
-        th_s.operator=(*arHandle);
+        th_s = v5->GetSoundHandleByName("UIPopUpQuestNew", 289u);
         th_s.Play(false);
         if (!a1 || pVATS.eMode) {
             goto LABEL_21;
@@ -14741,7 +14704,6 @@ void PlayerCharacter::CreateMouseSpring(
 }
 
 void PlayerCharacter::PlayMagicFailureSound(MagicSystem::School aeSchool) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     if (MagicFailureSounds[aeSchool].IsValid()) {
         MagicFailureSounds[aeSchool].Stop();
         NiPoint3 v8 = GetLocationOnReference();
@@ -14754,8 +14716,7 @@ void PlayerCharacter::PlayMagicFailureSound(MagicSystem::School aeSchool) {
         TESSound* psound = MagicSystem::GetMagicFailureSound(aeSchool);
         if (psound) {
             uint32_t CastingType = psound->iFormID;
-            BSSoundHandle* arHandle = PlaySound(&a2, CastingType, false, 2u, true);
-            MagicFailureSounds[aeSchool].operator=(*arHandle);
+            MagicFailureSounds[aeSchool] = PlaySound(CastingType, false, 2u, true);
         }
     }
 }
@@ -16535,8 +16496,6 @@ BGSNote* PlayerCharacter::GetNotebyIndex(int32_t aiIndex) {
 }
 
 void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Controls* pcontrols = appMain->GetControls();
     if (bPipboyLightDebounce ||
         (!pcontrols->GetUserAction(Controls::UACTN_MENUMODE, 2) ||
@@ -16561,8 +16520,7 @@ void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
                     FOPipboyManager* v3 = Interface::GetPipboy();
                     v3->ShowPipboyLightEffect(false, false, true);
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPipBoyLightOff", 289u);
-                    SoundHandleByName->Play(false);
+                    v4->GetSoundHandleByName("UIPipBoyLightOff", 289u).Play(false);
                     SpellItem* v15 = MagicSystem::GetPipBoyLightSpell();
                     if (v15) {
                         apSpell = &static_cast<MagicItem&>(static_cast<MagicItemForm&>(*v15));
@@ -16579,8 +16537,7 @@ void PlayerCharacter::UpdateMenuModeButton(float afTimeDelta) {
                         FOPipboyManager* v6 = Interface::GetPipboy();
                         v6->ShowPipboyLightEffect(false, true, true);
                         BSAudio* v7 = &BSAudio::QInstance();
-                        BSSoundHandle* v13 = v7->GetSoundHandleByName(&arHandle, "UIPipBoyLightOn", 289u);
-                        v13->Play(false);
+                        v7->GetSoundHandleByName("UIPipBoyLightOn", 289u).Play(false);
                         SpellItem* v8 = MagicSystem::GetPipBoyLightSpell();
                         CastAbility(v8, false);
                     }

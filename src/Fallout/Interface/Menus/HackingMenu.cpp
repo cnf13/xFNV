@@ -266,12 +266,11 @@ HackingMenu::HackingMenu()
     pOverTile(nullptr), iCursorX(0), dwAccessTime(0), pCursorVis(nullptr), bSuppressEntry(false), bUsedReset(false),
     bTutorial(false) {
     BSAudioManager* pManager = &BSAudioManager::QInstance();
-    BSSoundHandle kHandle;
-    Sounds[0] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingFanHumLP", 49u);
-    Sounds[1] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingPassGood", 33u);
-    Sounds[2] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingPassBad", 33u);
-    Sounds[3] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingCharScroll", 33u);
-    Sounds[4] = *pManager->GetSoundHandleByName(&kHandle, "UIHackingCharEnter", 33u);
+    Sounds[0] = pManager->GetSoundHandleByName("UIHackingFanHumLP", 49u);
+    Sounds[1] = pManager->GetSoundHandleByName("UIHackingPassGood", 33u);
+    Sounds[2] = pManager->GetSoundHandleByName("UIHackingPassBad", 33u);
+    Sounds[3] = pManager->GetSoundHandleByName("UIHackingCharScroll", 33u);
+    Sounds[4] = pManager->GetSoundHandleByName("UIHackingCharEnter", 33u);
 }
 
 // The members' own destructors empty the tile lists and destroy xEntryText; the words, the buffer and the IO lines
@@ -1202,7 +1201,6 @@ uint32_t HackingMenu::GetGuaranteedPossible(const HackingMenu::Grid& aGrid) {
 }
 
 void HackingMenu::DoIntro() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     int32_t i;
     for (i = 0; i < 14; ++i) {
         if (BSGetTickCount() <= HackingMenu::iNextAllowedHackTime) {
@@ -1238,8 +1236,7 @@ void HackingMenu::DoIntro() {
                         int32_t itime = iinterval * j / (inewlen - ioldlen);
                         uint32_t afVal = itime;
                         BSAudioManager* v3 = &BSAudioManager::QInstance();
-                        BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&th_s, "UIHackingCharSingle", 289u);
-                        SoundHandleByName->PlayAfter(afVal, 0);
+                        v3->GetSoundHandleByName("UIHackingCharSingle", 289u).PlayAfter(afVal, 0);
                     }
                     if (IOLines[i]->Animation.bIsTextRemaining) {
                         Sounds[4].Play(false);
@@ -1263,7 +1260,6 @@ void HackingMenu::DoIntro() {
 }
 
 void HackingMenu::DoInGame() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, handle, std::nullopt, std::nullopt);
     uint32_t ibufferpos;
     int32_t ioffset = GetSelectedTileIndex() - 7;
     if ((ioffset != iLastOffset || HackingMenu::pim->pOverTileTarget != pLastTarget) &&
@@ -1317,7 +1313,7 @@ void HackingMenu::DoInGame() {
                     uint32_t i_2 = BSstrlen(floatingText);
                     while (i_2--) {
                         BSAudioManager* v6 = &BSAudioManager::QInstance();
-                        v6->GetSoundHandleByName(&handle, "UIHackingCharSingle", 289u);
+                        BSSoundHandle handle = v6->GetSoundHandleByName("UIHackingCharSingle", 289u);
                         HackingMenu::listSoundsToPlay.AddHead(handle);
                         if (i_2) {
                             uint32_t v7 = xEntryText.uiDisplayRate;

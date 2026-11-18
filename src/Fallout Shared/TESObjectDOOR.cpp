@@ -289,9 +289,6 @@ bool TESObjectDOOR::Activate(
 ) {
     BaseProcess* pprocess_3;
     BaseProcess* pprocess;
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t fdoPunishment_2;
     int32_t fdoPunishment;
     bool blockpick;
@@ -393,20 +390,17 @@ bool TESObjectDOOR::Activate(
                             TESForm* FormTwo = pOpenSound;
                             uint32_t arPos_4 = FormTwo->iFormID;
                             BSAudio* v12 = &BSAudio::QInstance();
-                            BSSoundHandle* arHandle = v12->GetSoundHandleByNumericID(
-                                &apHandle, arPos_4,
+                            SoundHandle = v12->GetSoundHandleByNumericID(
+                                arPos_4,
                                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                     BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_UNKBIT31
                             );
-                            SoundHandle.operator=(*arHandle);
                         }
                         else {
                             TESForm* v13 = pOpenSound;
                             uint32_t arPos_4a = v13->iFormID;
                             BSAudio* v14 = &BSAudio::QInstance();
-                            BSSoundHandle* SoundHandleByNumericID =
-                                v14->GetSoundHandleByNumericID(&th_s, arPos_4a, 258u);
-                            SoundHandle.operator=(*SoundHandleByNumericID);
+                            SoundHandle = v14->GetSoundHandleByNumericID(arPos_4a, 258u);
                         }
                         if (pActionActor != pPlayer) {
                             NiPoint3 v33 = apItemActivated->GetLocationOnReference();
@@ -482,8 +476,7 @@ bool TESObjectDOOR::Activate(
             apItemActivated->AddLockChange();
         }
         BSAudio* v9 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v9->GetSoundHandleByName(&a1, "UILockpickingUnlock", 289u);
-        SoundHandleByName->Play(false);
+        v9->GetSoundHandleByName("UILockpickingUnlock", 289u).Play(false);
         BSsprintf(msg, 255, sOpenWithKey.String(), pLock->pKey->GetFullName());
         Interface::ShowMessage(msg, 0, "Interface\\Icons\\Message Icons\\glow_message_key.dds", nullptr, 2.0f, false);
         pstaticdoor->Activate(pPlayer, false, nullptr, 1);
@@ -772,7 +765,6 @@ void TESObjectDOOR::AutoDoorCallback(NiAVObject* apDoor3D) {
 }
 
 void TESObjectDOOR::DoorTeleportPlayerArrivalCallback(uintptr_t aiArrivalData) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, SoundHandle, std::nullopt, std::nullopt);
     // The arrival data is the integer field PLAYER_TARGET_LOC::iArrivalFuncData; Activate stored the door reference in
     // it.
     TESObjectREFR* pdoorref = reinterpret_cast<TESObjectREFR*>(aiArrivalData);
@@ -788,7 +780,7 @@ void TESObjectDOOR::DoorTeleportPlayerArrivalCallback(uintptr_t aiArrivalData) {
             if (LinkedDoor->Get3D()) {
                 uint32_t CastingType = pdoor->pCloseSound->iFormID;
                 BSAudio* v1 = &BSAudio::QInstance();
-                v1->GetSoundHandleByNumericID(&SoundHandle, CastingType, 289u);
+                BSSoundHandle SoundHandle = v1->GetSoundHandleByNumericID(CastingType, 289u);
                 SoundHandle.Play(false);
             }
         }

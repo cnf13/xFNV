@@ -546,8 +546,6 @@ void FalloutRadio::ClearInactiveReceivers(bool bRemoveAll) {
 }
 
 void FalloutRadio::UpdateStations(bool abUpdateSignals) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, alertSound_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, alertSound, std::nullopt, std::nullopt);
     BSSimpleList<TESObjectREFR*> stationlist;
     BSSimpleList<float> stationDistances;
     if (FalloutRadio::bShutdown) {}
@@ -560,8 +558,8 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
                     if (!FalloutRadio::bFirstUpdate) {
                         BSStringT<char> strtemp;
                         BSAudio* v1 = &BSAudio::QInstance();
-                        v1->GetSoundHandleByName(
-                            &alertSound, "UIRadioSignalFound",
+                        BSSoundHandle alertSound = v1->GetSoundHandleByName(
+                            "UIRadioSignalFound",
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO
                         );
@@ -631,8 +629,8 @@ void FalloutRadio::UpdateStations(bool abUpdateSignals) {
                 if (bmatch && FalloutRadio::pLostPipboyStation == pstation) {
                     BSStringT<char> strtemp_2;
                     BSAudio* v3 = &BSAudio::QInstance();
-                    v3->GetSoundHandleByName(
-                        &alertSound_2, "UIRadioSignalFound",
+                    BSSoundHandle alertSound_2 = v3->GetSoundHandleByName(
+                        "UIRadioSignalFound",
                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                             BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO
                     );
@@ -1044,9 +1042,6 @@ bool FalloutRadio::PipboyRadioEnable(bool abEnable) {
 }
 
 void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     NiPoint3 listenerLocation;
     bool bsong = false;
     bool bleadIn = false;
@@ -1318,11 +1313,10 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                         pusers->m_item->StaticHndl.Stop();
                         pusers->m_item->StaticHndl.Release();
                         BSAudio* v5 = &BSAudio::QInstance();
-                        BSSoundHandle* arHandle = v5->GetSoundHandleByName(
-                            &a1, "UIRadioStaticLP",
+                        pusers->m_item->StaticHndl = v5->GetSoundHandleByName(
+                            "UIRadioStaticLP",
                             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_LOOP | BSGameSound::SOUND_FLAG_RADIO
                         );
-                        pusers->m_item->StaticHndl.operator=(*arHandle);
                         pusers->m_item->StaticHndl.bAssumeSuccess = true;
                         pusers->m_item->StaticHndl.SetPosition(loc.x, loc.y, loc.z);
                         float v31 = static_cast<double>(100 - isignalStrength) / 100.0;
@@ -1426,9 +1420,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                         (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                          BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
                                     BSAudio* v10 = &BSAudio::QInstance();
-                                    BSSoundHandle* SoundHandleByFilename =
-                                        v10->GetSoundHandleByFilename(&out, Str, X, nullptr);
-                                    pusers->m_item->Hndl.operator=(*SoundHandleByFilename);
+                                    pusers->m_item->Hndl = v10->GetSoundHandleByFilename(Str, X, nullptr);
                                     float Yb = fCreatureRadioMax.Float();
                                     float* v11 = &fCreatureRadioMin.Float();
                                     pusers->m_item->Hndl.SetMinMax(*v11, Yb);
@@ -1438,8 +1430,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
                                         (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                          BSGameSound::SOUND_FLAG_RADIO | BSGameSound::SOUND_FLAG_UNKBIT22);
                                     BSAudio* v12 = &BSAudio::QInstance();
-                                    BSSoundHandle* v26 = v12->GetSoundHandleByFilename(&th_s, Str, Xa, pTemplate);
-                                    pusers->m_item->Hndl.operator=(*v26);
+                                    pusers->m_item->Hndl = v12->GetSoundHandleByFilename(Str, Xa, pTemplate);
                                 }
                                 pusers->m_item->Hndl.SetCompletionCallback(
                                     &FalloutRadio::SoundCompletionCallback, pStation
@@ -1722,11 +1713,6 @@ bool FalloutRadio::TunePipboyToStation(TESObjectREFR* apTargetStation, bool abFo
 void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
     XFNV_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
     double v33;
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a4, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, alertSound, std::nullopt, std::nullopt);
     if (FalloutRadio::pCurrentPipboyStation) {
         int32_t StationPower = FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower();
         v33 = static_cast<double>(StationPower) / 100.0;
@@ -1739,8 +1725,8 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
     if (FalloutRadio::pCurrentPipboyStation && FalloutRadio::pCurrentPipboyStation->CurrentState.OutOfPBRange()) {
         BSStringT<char> strtemp;
         BSAudio* v1 = &BSAudio::QInstance();
-        v1->GetSoundHandleByName(
-            &alertSound, "UIRadioSignalLost",
+        BSSoundHandle alertSound = v1->GetSoundHandleByName(
+            "UIRadioSignalLost",
             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT |
                 BSGameSound::SOUND_FLAG_RADIO
         );
@@ -1763,12 +1749,11 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             FalloutRadio::PipboyStaticHndl.Stop();
             FalloutRadio::PipboyStaticHndl.Release();
             BSAudio* v2 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v2->GetSoundHandleByName(
-                &arHandle, "UIRadioStaticLP",
+            FalloutRadio::PipboyStaticHndl = v2->GetSoundHandleByName(
+                "UIRadioStaticLP",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_LOOP | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                     BSGameSound::SOUND_FLAG_RADIO
             );
-            FalloutRadio::PipboyStaticHndl.operator=(*SoundHandleByName);
             FalloutRadio::PipboyStaticHndl.Play(false);
         }
         int32_t v30 = 100 - FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower();
@@ -1841,22 +1826,20 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
                 TESSound* pvoiceSound = pcurrentItem->GetCurrentResponse()->pVoiceSound;
                 const char* pfilename = pcurrentItem->GetCurrentResponse()->pVoiceSound->GetFilename();
                 BSAudio* v4 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByFilename = v4->GetSoundHandleByFilename(
-                    &out, pfilename,
+                FalloutRadio::PipboyVoiceHndl = v4->GetSoundHandleByFilename(
+                    pfilename,
                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO,
                     pvoiceSound
                 );
-                FalloutRadio::PipboyVoiceHndl.operator=(*SoundHandleByFilename);
             }
             else {
                 const char* pvoiceFilename = pcurrentItem->GetCurrentResponse()->GetVoice()->String();
                 BSAudio* v5 = &BSAudio::QInstance();
-                BSSoundHandle* v25 = v5->GetSoundHandleByFilename(
-                    &a4, pvoiceFilename,
+                FalloutRadio::PipboyVoiceHndl = v5->GetSoundHandleByFilename(
+                    pvoiceFilename,
                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_RADIO,
                     nullptr
                 );
-                FalloutRadio::PipboyVoiceHndl.operator=(*v25);
             }
             FalloutRadio::PipboyVoiceHndl.SetCompletionCallback(
                 &FalloutRadio::SoundCompletionCallback, FalloutRadio::pCurrentPipboyStation
@@ -1915,12 +1898,11 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             FalloutRadio::PipboyVoiceHndl.Stop();
             FalloutRadio::PipboyVoiceHndl.Release();
             BSAudio* v8 = &BSAudio::QInstance();
-            BSSoundHandle* v19 = v8->GetSoundHandleByName(
-                &th_s, "UIRadioStaticLP",
+            FalloutRadio::PipboyVoiceHndl = v8->GetSoundHandleByName(
+                "UIRadioStaticLP",
                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_LOOP | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                     BSGameSound::SOUND_FLAG_RADIO
             );
-            FalloutRadio::PipboyVoiceHndl.operator=(*v19);
             FalloutRadio::PipboyVoiceHndl.bAssumeSuccess = true;
             FalloutRadio::PipboyVoiceHndl.Play(false);
             FalloutRadio::pCurrentPipboyStation->CurrentState.SetPlayingStatic(true);

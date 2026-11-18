@@ -572,8 +572,7 @@ RaceSexMenu::RaceSexMenu()
     BSAudioManager& kManager = BSAudioManager::QInstance();
     const char* apSoundNames[4] = {"OBJComputerTerminal01LP", "QSTBirthRoomLP", "UIFaceGenZoomLP", "UIFaceGenRotateLP"};
     for (int32_t i = 0; i < 4; ++i) {
-        BSSoundHandle kHandle;
-        Sounds[i] = *kManager.GetSoundHandleByName(&kHandle, apSoundNames[i], 49u);
+        Sounds[i] = kManager.GetSoundHandleByName(apSoundNames[i], 49u);
         Sounds[i].bAssumeSuccess = true;
     }
 }
@@ -948,8 +947,6 @@ void RaceSexMenu::DoIdle() {
 
 bool RaceSexMenu::DoGamepad(int32_t aiButton, float afValue) {
     bool result;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Interface::enumMenus v3 = static_cast<Interface::enumMenus>(GetClass());
     if (!Interface::IsTopMenuID(v3)) {
         return false;
@@ -1048,8 +1045,7 @@ bool RaceSexMenu::DoGamepad(int32_t aiButton, float afValue) {
                 static_cast<RaceSexMenu::ListID>(pOptionListsA[GetActiveList()]->parentID);
             if (SetActiveList(CastingType)) {
                 BSAudio* v6 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIMenuOK", 289u);
-                SoundHandleByName->Play(false);
+                v6->GetSoundHandleByName("UIMenuOK", 289u).Play(false);
             }
             return true;
         }
@@ -1069,8 +1065,7 @@ bool RaceSexMenu::DoGamepad(int32_t aiButton, float afValue) {
             }
             if (SetActiveList(v8)) {
                 BSAudio* v9 = &BSAudio::QInstance();
-                BSSoundHandle* v12 = v9->GetSoundHandleByName(&arHandle, "UIPipBoyMode", 289u);
-                v12->Play(false);
+                v9->GetSoundHandleByName("UIPipBoyMode", 289u).Play(false);
             }
             else {
                 if (aiButton == 14) {

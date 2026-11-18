@@ -392,7 +392,6 @@ bool MagicShaderHitEffect::Init() {
     char path_1[260];
     char v47[260];
     char path[260];
-    XFNV_INLINED_LOCAL(BSSoundHandle, handle, std::nullopt, std::nullopt);
     if (pEffect) {
         this->MagicHitEffect::fAge = pEffect->fElapsedSeconds;
         EffectSetting* EffectSetting_ = pEffect->GetEffectSetting();
@@ -422,7 +421,7 @@ bool MagicShaderHitEffect::Init() {
     // The form IDs of two effect shaders that play the fire loop.
     if (pEffectData->iFormID == 0x852FE || pEffectData->iFormID == 0x84A51) {
         BSAudio* v3 = &BSAudio::QInstance();
-        v3->GetSoundHandleByName(&handle, "AMBFireMediumLP", 18u);
+        BSSoundHandle handle = v3->GetSoundHandleByName("AMBFireMediumLP", 18u);
         NiPoint3 v61 = pTarget->GetLocationOnReference();
         handle.SetPosition(v61.x, v61.y, v61.z);
         handle.SetVolume(1.0f);

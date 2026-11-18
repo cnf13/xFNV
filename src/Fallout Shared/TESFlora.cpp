@@ -152,7 +152,6 @@ bool TESFlora::Activate(
     TESBoundObject* apObjectToGet,
     int32_t aiCount
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Actor* pactor = dynamic_cast<Actor*>(apActionRef);
     if ((apItemActivated) && (pactor)) {
         bool bsuccess = false;
@@ -206,8 +205,7 @@ bool TESFlora::Activate(
                 Interface::ShowMessage(v23.pString, 0, nullptr, nullptr, 2.0f, false);
                 BSSoundHandle soundHand;
                 BSAudio* v10 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v10->GetSoundHandleByName(&a1, "ITMPickupOrganic", 288u);
-                soundHand.operator=(*arHandle);
+                soundHand = v10->GetSoundHandleByName("ITMPickupOrganic", 288u);
                 soundHand.Play(false);
             }
         }

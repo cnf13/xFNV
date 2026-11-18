@@ -71,15 +71,14 @@ SettingT<INISettingCollection> gs_fScreenLightColorB_RenderedTerminal("fScreenLi
 NiPointer<BSFadeNode> FORenderedTerminal::spGeometry;
 
 void PlayTerminalShutdownSound() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
     BSAudioManager* v0 = &BSAudioManager::QInstance();
-    BSSoundHandle* SoundHandleByName = v0->GetSoundHandleByName(
-        &th_s, "OBJComputerTerminalPowerDown",
-        static_cast<BSGameSound::SoundFlags>(
-            BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
-        )
-    );
-    SoundHandleByName->Play(false);
+    v0->GetSoundHandleByName(
+          "OBJComputerTerminalPowerDown",
+          static_cast<BSGameSound::SoundFlags>(
+              BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
+          )
+    )
+        .Play(false);
 }
 
 FORenderedTerminal::FORenderedTerminal() : FORenderedMenu(), spExitButton(nullptr) {}

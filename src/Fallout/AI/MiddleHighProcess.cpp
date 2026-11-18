@@ -1477,7 +1477,6 @@ Animation* MiddleHighProcess::GetAnimation() {
 }
 
 void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBiped, Animation* apAnim, Actor* apActor) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     ForceBoneScale();
     NiNode* pweaponBone = GetWeaponBone(apBiped);
     // The biped's root, else the actor's 3D.
@@ -1628,8 +1627,7 @@ void MiddleHighProcess::ForceWeaponDrawnSheathed(bool abDrawn, BipedAnim* apBipe
                 TESSound* v14 = pweapon->GetIdleSound();
                 const char* Filename = v14->GetFilename();
                 BSAudio* v15 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v15->GetSoundHandleByFilename(&out, Filename, v19, v20);
-                hweapIdle.operator=(*arHandle);
+                hweapIdle = v15->GetSoundHandleByFilename(Filename, v19, v20);
                 hweapIdle.bAssumeSuccess = true;
                 NiNode* v16 = apActor->Get3D();
                 hweapIdle.SetObjectToFollow(v16);

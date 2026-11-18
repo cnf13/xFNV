@@ -152,7 +152,6 @@ void QuantityMenu::Close() {
 }
 
 TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback afpCallback, int32_t aiStartAmount) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
     bool boverMenu = false;
     int32_t iClass = GetClass_007ABDA0();
@@ -169,8 +168,7 @@ TileMenu* QuantityMenu::Create(int32_t aiMaxAmount, QuantityMenu::ResultCallback
         QuantityMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (QuantityMenu::pMe->IsWellFormedMenu()) {
             BSAudio* v8 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v8->GetSoundHandleByName(&a1, "UIPopUpMessageWindow", 289u);
-            SoundHandleByName->Play(false);
+            v8->GetSoundHandleByName("UIPopUpMessageWindow", 289u).Play(false);
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
                 ptile->Set(4013, afValue, true);

@@ -4045,13 +4045,10 @@ void HighProcess::ProcessGreet(
                     bool bSpeak = true;
                     if (pResponse->GetVoiceSound() && apActor->bSoundFileDone) {
                         uint32_t uiSoundFormID = pResponse->GetVoiceSound()->GetFormID();
-                        // PlaySound constructs the returned handle in place: untyped memory until then. This path keeps
-                        // the handle local (the voice handle is not assigned). The callbacks' context is the actor's
-                        // form ID, passed as the untyped context pointer.
-                        alignas(BSSoundHandle) uint8_t aucVoiceSound[sizeof(BSSoundHandle)];
-                        BSSoundHandle* pVoiceSound = reinterpret_cast<BSSoundHandle*>(aucVoiceSound);
+                        // The voice handle is not assigned on this path. The callbacks' context is the actor's form
+                        // ID, passed as the untyped context pointer.
                         apActor->PlaySound(
-                            pVoiceSound, uiSoundFormID, false,
+                            uiSoundFormID, false,
                             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
                             true
@@ -4080,7 +4077,6 @@ void HighProcess::ProcessGreet(
                         apActor->SetSayToTopic(nullptr);
                         apActor->GetExtra()->RemoveSayToInfoExtra();
                         SetDoingSayTo(false);
-                        pVoiceSound->~BSSoundHandle();
                     }
                     apActor->SetShouldUseEmotionAnimation(pResponse->GetUseEmotion());
                     if (bSpeak && apActor->bSoundFileDone) {
@@ -4192,17 +4188,13 @@ void HighProcess::ProcessGreet(
                             }
                         }
                         uint32_t uiSoundFormID = pResponse->GetVoiceSound()->GetFormID();
-                        // PlaySound constructs the returned handle in place: untyped stack memory until then. The
-                        // callbacks' context is the actor's form ID, passed as the untyped context pointer.
-                        alignas(BSSoundHandle) uint8_t aucVoiceSound[sizeof(BSSoundHandle)];
-                        BSSoundHandle* pVoiceSound = reinterpret_cast<BSSoundHandle*>(aucVoiceSound);
-                        SoundHandle[0] = *apActor->PlaySound(
-                            pVoiceSound, uiSoundFormID, false,
+                        // The callbacks' context is the actor's form ID, passed as the untyped context pointer.
+                        SoundHandle[0] = apActor->PlaySound(
+                            uiSoundFormID, false,
                             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                 BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
                             true
                         );
-                        pVoiceSound->~BSSoundHandle();
                         if (abSayCallBack) {
                             apActor->SetSayToTopic(apGreetTopic);
                             apActor->SetSayToTopicInfo(m_pSayToDialogueTopic->GetInfo());
@@ -4392,17 +4384,13 @@ void HighProcess::ProcessGreet(
                                 }
                             }
                             uint32_t uiSoundFormID = pResponse->GetVoiceSound()->GetFormID();
-                            // PlaySound constructs the returned handle in place: untyped stack memory until then. The
-                            // callbacks' context is the actor's form ID, passed as the untyped context pointer.
-                            alignas(BSSoundHandle) uint8_t aucVoiceSound[sizeof(BSSoundHandle)];
-                            BSSoundHandle* pVoiceSound = reinterpret_cast<BSSoundHandle*>(aucVoiceSound);
-                            SoundHandle[0] = *apActor->PlaySound(
-                                pVoiceSound, uiSoundFormID, false,
+                            // The callbacks' context is the actor's form ID, passed as the untyped context pointer.
+                            SoundHandle[0] = apActor->PlaySound(
+                                uiSoundFormID, false,
                                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
                                 true
                             );
-                            pVoiceSound->~BSSoundHandle();
                             if (abSayCallBack) {
                                 apActor->SetSayToTopic(apGreetTopic);
                                 apActor->SetSayToTopicInfo(m_pSayToDialogueTopic->GetInfo());
@@ -6350,13 +6338,11 @@ void HighProcess::StopSoundHandle(ACTOR_SOUND_HANDLE aeType) {
 }
 
 void HighProcess::StartTorchSound(Actor* apActor) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     if (!SoundHandle[1].IsValid()) {
         TESSound* psound = pDataHandler->GetSound("ITMTorchHeldLP");
         if ((apActor) && (psound)) {
             uint32_t CastingType = psound->iFormID;
-            BSSoundHandle* arHandle = apActor->PlaySound(&a2, CastingType, true, 2u, true);
-            SoundHandle[1].operator=(*arHandle);
+            SoundHandle[1] = apActor->PlaySound(CastingType, true, 2u, true);
         }
     }
 }

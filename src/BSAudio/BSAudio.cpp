@@ -156,56 +156,40 @@ void BSAudio::PositionListener(NiPoint3 aNewPosition) {
     BSAudioManager::QInstance().PositionListener(aNewPosition);
 }
 
-// Builds a handle for the named sound and returns the caller's result object.
-BSSoundHandle* BSAudio::GetSoundHandleByName(BSSoundHandle* apResult, const char* apSoundName, uint32_t aiTypeFlags) {
+BSSoundHandle BSAudio::GetSoundHandleByName(const char* apSoundName, uint32_t aiTypeFlags) {
     AutoMemContext eMemContext(MEM_CONTEXT_AUDIO);
-    BSAudioManager::QInstance().GetSoundHandleByName(apResult, apSoundName, aiTypeFlags);
-    return apResult;
+    return BSAudioManager::QInstance().GetSoundHandleByName(apSoundName, aiTypeFlags);
 }
 
-BSSoundHandle* BSAudio::GetSoundHandleByFilename(
-    BSSoundHandle* apResult,
-    const char* apFilename,
-    uint32_t aiTypeFlags,
-    void* apSettingsContext
-) {
+BSSoundHandle BSAudio::GetSoundHandleByFilename(const char* apFilename, uint32_t aiTypeFlags, void* apSettingsContext) {
     int32_t eMemContext = GetThreadMemContext();
     GetThreadMemContext() = 11;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
-    singleton->GetSoundHandleByFilePath(apResult, apFilename, aiTypeFlags, static_cast<TESSound*>(apSettingsContext));
+    BSSoundHandle kHandle =
+        singleton->GetSoundHandleByFilePath(apFilename, aiTypeFlags, static_cast<TESSound*>(apSettingsContext));
     GetThreadMemContext() = eMemContext;
-    return apResult;
+    return kHandle;
 }
 
-BSSoundHandle* BSAudio::GetSoundHandleByNumericID(BSSoundHandle* apResult, uint32_t aiFormID, uint32_t aiTypeFlags) {
+BSSoundHandle BSAudio::GetSoundHandleByNumericID(uint32_t aiFormID, uint32_t aiTypeFlags) {
     int32_t uiHeapIndex = GetThreadMemContext();
     GetThreadMemContext() = 11;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
-    singleton->GetSoundHandleByNumericID(apResult, aiFormID, aiTypeFlags);
+    BSSoundHandle kHandle = singleton->GetSoundHandleByNumericID(aiFormID, aiTypeFlags);
     GetThreadMemContext() = uiHeapIndex;
-    return apResult;
+    return kHandle;
 }
 
-BSSoundHandle* BSAudio::PlaySound(
-    BSSoundHandle* apResult,
-    uint32_t auiFormID,
-    BSGameSound::SoundFlags aeAudioFlags,
-    NiPoint3 akPosition,
-    int32_t aiUnused
-) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
+BSSoundHandle
+BSAudio::PlaySound(uint32_t auiFormID, BSGameSound::SoundFlags aeAudioFlags, NiPoint3 akPosition, int32_t aiUnused) {
     MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     BSAudioManager* v6 = &BSAudioManager::QInstance();
-    v6->GetSoundHandleByNumericID(&apHandle, auiFormID, aeAudioFlags);
-    apHandle.SetPosition(akPosition.x, akPosition.y, akPosition.z);
-    apHandle.Play(true);
-    // Copies the handle's three fields into the caller's buffer, leaving the padding after bAssumeSuccess alone.
-    apResult->iSoundID = apHandle.iSoundID;
-    apResult->bAssumeSuccess = apHandle.bAssumeSuccess;
-    apResult->eState = apHandle.eState;
+    BSSoundHandle kHandle = v6->GetSoundHandleByNumericID(auiFormID, aeAudioFlags);
+    kHandle.SetPosition(akPosition.x, akPosition.y, akPosition.z);
+    kHandle.Play(true);
     GetThreadTLSData()->eMemContext = eMemContext;
-    return apResult;
+    return kHandle;
 }
 
 void BSAudio::SetConditions(float afCurrentGamehour, uint32_t aiWeatherConditions) {

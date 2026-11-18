@@ -278,8 +278,6 @@ bool TESObjectCONT::Activate(
     TESBoundObject* apObjecttoGet,
     int32_t aicount
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     int32_t fdoPunishment;
     Actor* pActionActor = dynamic_cast<Actor*>(apActionRef);
     TESForm* pownership = nullptr;
@@ -304,8 +302,7 @@ bool TESObjectCONT::Activate(
                     apItemActivated->AddLockChange();
                 }
                 BSAudio* v6 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UILockpickingUnlock", 289u);
-                SoundHandleByName->Play(false);
+                v6->GetSoundHandleByName("UILockpickingUnlock", 289u).Play(false);
                 BSsprintf(msg, 255u, sOpenWithKey.String(), pLock->pKey->GetFullName());
                 Interface::ShowMessage(
                     msg, 0, "Interface\\Icons\\Message Icons\\glow_message_key.dds", nullptr, 2.0f, false
@@ -361,7 +358,7 @@ bool TESObjectCONT::Activate(
         TESSound* OpenSound = GetOpenSound();
         uint32_t time = OpenSound->iFormID;
         BSAudio* v10 = &BSAudio::QInstance();
-        v10->GetSoundHandleByNumericID(&soundHand, time, 258u);
+        BSSoundHandle soundHand = v10->GetSoundHandleByNumericID(time, 258u);
         NiPoint3 v17 = apItemActivated->GetLocationOnReference();
         soundHand.SetPosition(v17.x, v17.y, v17.z);
         soundHand.Play(false);

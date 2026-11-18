@@ -14324,10 +14324,7 @@ bool Script::PlaySoundFunction(
         uiFlags |= BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_2D;
         uint32_t uiFormID = pSound->GetFormID();
         BSAudio* pAudio = &BSAudio::QInstance();
-        XFNV_INLINED_LOCAL(BSSoundHandle, kTemp, std::nullopt, std::nullopt);
-        BSSoundHandle* pResult = pAudio->GetSoundHandleByNumericID(&kTemp, uiFormID, uiFlags);
-        kHandle = *pResult;
-        kTemp.~BSSoundHandle();
+        kHandle = pAudio->GetSoundHandleByNumericID(uiFormID, uiFlags);
         kHandle.Play(false);
     }
     return true;
@@ -14705,12 +14702,9 @@ bool Script::PlaySound3DFunction(
         if (apRefObject != nullptr && apRefObject->Get3D() != nullptr) {
             uint32_t uiFormID = pSound->GetFormID();
             BSAudio* pAudio = &BSAudio::QInstance();
-            XFNV_INLINED_LOCAL(BSSoundHandle, kTemp, std::nullopt, std::nullopt);
-            BSSoundHandle* pResult = pAudio->GetSoundHandleByNumericID(
-                &kTemp, uiFormID, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
+            kHandle = pAudio->GetSoundHandleByNumericID(
+                uiFormID, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
             );
-            kHandle = *pResult;
-            kTemp.~BSSoundHandle();
             const NiPoint3* pLocation = &apRefObject->GetLocationOnReference();
             kHandle.SetPosition(pLocation->x, pLocation->y, pLocation->z);
             kHandle.SetObjectToFollow(apRefObject->Get3D());

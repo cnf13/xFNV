@@ -314,8 +314,6 @@ void BGSOpenCloseForm::HandleActivate(
     TESObjectREFR* apActionRef,
     BGSOpenCloseForm* apOpenCloseForm
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (apItemActivated) {
         bool bhasanims = false;
         if ((apItemActivated->Get3D()) && (apItemActivated->Get3D()->GetControllers())) {
@@ -377,18 +375,16 @@ void BGSOpenCloseForm::HandleActivate(
                             if (apActionRef == pPlayer) {
                                 uint32_t a3 = soundThisSeq->iFormID;
                                 BSAudio* v6 = &BSAudio::QInstance();
-                                BSSoundHandle* arHandle = v6->GetSoundHandleByNumericID(
-                                    &apHandle, a3,
+                                SoundHandle = v6->GetSoundHandleByNumericID(
+                                    a3,
                                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                         BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_UNKBIT31
                                 );
-                                SoundHandle.operator=(*arHandle);
                             }
                             else {
                                 uint32_t a3a = soundThisSeq->iFormID;
                                 BSAudio* v7 = &BSAudio::QInstance();
-                                BSSoundHandle* SoundHandleByNumericID = v7->GetSoundHandleByNumericID(&th_s, a3a, 258u);
-                                SoundHandle.operator=(*SoundHandleByNumericID);
+                                SoundHandle = v7->GetSoundHandleByNumericID(a3a, 258u);
                                 NiPoint3 v19 = apItemActivated->GetLocationOnReference();
                                 SoundHandle.SetPosition(v19.x, v19.y, v19.z);
                             }

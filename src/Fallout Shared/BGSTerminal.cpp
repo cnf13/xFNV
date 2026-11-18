@@ -539,7 +539,6 @@ bool BGSTerminal::Activate(
     TESBoundObject* apObjectToGet,
     int32_t aiCount
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (Interface::IsPipBoyOpening()) {
         return false;
     }
@@ -559,8 +558,7 @@ bool BGSTerminal::Activate(
                 false
             );
             BSAudio* v7 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(false);
+            v7->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
         }
         else {
             if (apActionRef == pPlayer && BGSTerminal::IsTerminalRefInUse(apItemActivated)) {

@@ -113,7 +113,6 @@ void GrenadeProjectile::Initialize() {
 }
 
 void GrenadeProjectile::UpdateProjectile(float afDelta) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, sndHandle, std::nullopt, std::nullopt);
     if (!GetDelete()) {
         if (!bCollisionGroupReset && GetAge() > 1.0) {
             uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
@@ -127,7 +126,7 @@ void GrenadeProjectile::UpdateProjectile(float afDelta) {
                     TESSound* v5 = GetProjectileBase()->Data.pActiveSoundLoop;
                     const char* Filename = v5->GetFilename();
                     BSAudio* v6 = &BSAudio::QInstance();
-                    v6->GetSoundHandleByFilename(&sndHandle, Filename, 258u, afDelta);
+                    BSSoundHandle sndHandle = v6->GetSoundHandleByFilename(Filename, 258u, afDelta);
                     const NiPoint3* v7 = &GetLocationOnReference();
                     sndHandle.SetPosition(*v7);
                     sndHandle.Play(false);

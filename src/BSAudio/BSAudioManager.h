@@ -128,21 +128,12 @@ public:
     void Shutdown();
     // Stops the audio thread.
     void StopAudioThread();
-    // Makes apHandle refer to the sound of form auiFormID.
-    BSSoundHandle* GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiFormID, uint32_t aiTypeFlags);
-    // Makes apResult refer to the sound of the file apFilename.
-    BSSoundHandle*
-    GetSoundHandleByFilePath(BSSoundHandle* apResult, const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound);
-    // Returns an empty handle through apResult.
-    BSSoundHandle* SpawnSoundReference(
-        BSSoundHandle* apResult,
-        int32_t a2,
-        int32_t a3,
-        int32_t a4,
-        int32_t a5,
-        int32_t a6,
-        int32_t a7
-    );
+    // A handle for the sound of form auiFormID.
+    BSSoundHandle GetSoundHandleByNumericID(uint32_t auiFormID, uint32_t aiTypeFlags);
+    // A handle for the sound of the file apFilename.
+    BSSoundHandle GetSoundHandleByFilePath(const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound);
+    // An empty handle.
+    BSSoundHandle SpawnSoundReference(int32_t a2, int32_t a3, int32_t a4, int32_t a5, int32_t a6, int32_t a7);
     // Loads the sound of form auiFormID ahead of use.
     void PrecacheSoundFromID(uint32_t auiFormID, int32_t aiFlags);
     // Moves the end of the beam sound aiSoundID.
@@ -159,7 +150,7 @@ public:
     uint32_t GetSoundType(uint32_t aiSoundID);
     void StartAudioThread();
     void SetIgnoreGlobalTimeMultiplier(bool bIgnore);
-    BSSoundHandle* GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEditorID, uint32_t aiTypeFlags);
+    BSSoundHandle GetSoundHandleByName(const char* apEditorID, uint32_t aiTypeFlags);
     void Precache(const char* apToCache, uint32_t aiFlags);
     void Update(bool abPlayGameWorldSounds);
     void SynchVoiceStates();

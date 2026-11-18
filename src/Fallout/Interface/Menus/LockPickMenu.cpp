@@ -254,16 +254,6 @@ void LockPickMenu::DoLeave(int32_t aiID, Tile* apTarget) {
 
 void LockPickMenu::DoIdle() {
     static int32_t iLockShakeDirection = 1;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v72, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v73, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v74, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v75, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v76, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v77, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v78, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v79, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     int32_t ielaspedMillis = 0;
     float fxAxisRatio = 1.0f;
     static BSSoundHandle lockpickSound;
@@ -326,9 +316,7 @@ void LockPickMenu::DoIdle() {
                         if ((ftotalStateSecs_1 == 0.0) && (pLockTarget)) {
                             if (!(pTiles[1]->GetFloat(LockPickMenu::iUT_Value) <= 0.0)) {
                                 BSAudio* v8 = &BSAudio::QInstance();
-                                BSSoundHandle* SoundHandleByName =
-                                    v8->GetSoundHandleByName(&arHandle, "UILockpickingEnter", 289u);
-                                SoundHandleByName->Play(false);
+                                v8->GetSoundHandleByName("UILockpickingEnter", 289u).Play(false);
                             }
                             else {
                                 const char* v7 = sOutOfLockpicks.String();
@@ -381,9 +369,7 @@ void LockPickMenu::DoIdle() {
                                 if ((InterfaceManager::Has360Controller() && fxAxisRatio > 0.0) ||
                                     (!InterfaceManager::Has360Controller() && GetPCInput(1))) {
                                     BSAudio* v15 = &BSAudio::QInstance();
-                                    BSSoundHandle* v69 =
-                                        v15->GetSoundHandleByName(&apResult, "UILockpickingCylinderTurn", 289u);
-                                    v69->Play(false);
+                                    v15->GetSoundHandleByName("UILockpickingCylinderTurn", 289u).Play(false);
                                     eLockState = LockPickMenu::LS_TURNING_LOCK;
                                 }
                                 RotateLockpick();
@@ -395,15 +381,11 @@ void LockPickMenu::DoIdle() {
                                 RotateLock(0.0f);
                                 if (fLockAngle < 30.0 && fprevLockAngle > 30.0) {
                                     BSAudio* v16 = &BSAudio::QInstance();
-                                    BSSoundHandle* v68 =
-                                        v16->GetSoundHandleByName(&v79, "UILockpickingCylinderSqueakA", 257u);
-                                    v68->Play(false);
+                                    v16->GetSoundHandleByName("UILockpickingCylinderSqueakA", 257u).Play(false);
                                 }
                                 if (fLockAngle < 60.0 && fprevLockAngle > 60.0) {
                                     BSAudio* v17 = &BSAudio::QInstance();
-                                    BSSoundHandle* v67 =
-                                        v17->GetSoundHandleByName(&v78, "UILockpickingCylinderSqueakB", 257u);
-                                    v67->Play(false);
+                                    v17->GetSoundHandleByName("UILockpickingCylinderSqueakB", 257u).Play(false);
                                 }
                             }
                         }
@@ -436,22 +418,18 @@ void LockPickMenu::DoIdle() {
                         }
                         if (fprevLockAngle_2 < 30.0 && fLockAngle > 30.0) {
                             BSAudio* v20 = &BSAudio::QInstance();
-                            BSSoundHandle* v66 = v20->GetSoundHandleByName(&v77, "UILockpickingCylinderSqueakA", 257u);
-                            v66->Play(false);
+                            v20->GetSoundHandleByName("UILockpickingCylinderSqueakA", 257u).Play(false);
                         }
                         if (fprevLockAngle_2 < 60.0 && fLockAngle > 60.0) {
                             BSAudio* v21 = &BSAudio::QInstance();
-                            BSSoundHandle* v65 = v21->GetSoundHandleByName(&v76, "UILockpickingCylinderSqueakB", 257u);
-                            v65->Play(false);
+                            v21->GetSoundHandleByName("UILockpickingCylinderSqueakB", 257u).Play(false);
                         }
                         if (fMaxLockAngle <= static_cast<double>(fLockAngle)) {
                             if (!(fLockAngle >= 90.0)) {
                                 BSAudio* v25 = &BSAudio::QInstance();
-                                BSSoundHandle* v62 = v25->GetSoundHandleByName(&v74, "UILockpickingCylinderStop", 257u);
-                                v62->Play(false);
+                                v25->GetSoundHandleByName("UILockpickingCylinderStop", 257u).Play(false);
                                 BSAudio* v26 = &BSAudio::QInstance();
-                                BSSoundHandle* v61 = v26->GetSoundHandleByName(&v73, "UILockpickingPickTensionLPM", 1u);
-                                lockpickSound.operator=(*v61);
+                                lockpickSound = v26->GetSoundHandleByName("UILockpickingPickTensionLPM", 1u);
                                 lockpickSound.Play(true);
                                 eLockState = LockPickMenu::LS_DAMAGING_PICK;
                             }
@@ -512,8 +490,7 @@ void LockPickMenu::DoIdle() {
                                         }
                                     }
                                     BSAudio* v24 = &BSAudio::QInstance();
-                                    BSSoundHandle* v63 = v24->GetSoundHandleByName(&v75, "UILockpickingUnlock", 257u);
-                                    v63->Play(false);
+                                    v24->GetSoundHandleByName("UILockpickingUnlock", 257u).Play(false);
                                     pLockTarget->UnLock();
                                     if (pLockTarget->GetFormType() == DOOR_ID) {
                                         pPlayer->btransporting = true;
@@ -589,8 +566,7 @@ void LockPickMenu::DoIdle() {
                         if (fPickHealth <= 0.0) {
                             lockpickSound.FadeOutAndRelease(100u);
                             BSAudio* v31 = &BSAudio::QInstance();
-                            BSSoundHandle* v52 = v31->GetSoundHandleByName(&v72, "UILockpickingPickBreak", 257u);
-                            v52->Play(false);
+                            v31->GetSoundHandleByName("UILockpickingPickBreak", 257u).Play(false);
                             if (pLockTarget) {
                                 pPlayer->RemoveItem(
                                     pLockpick, nullptr, 1, false, false, nullptr, nullptr, nullptr, true, false
@@ -873,8 +849,6 @@ NiCamera* LockPickMenu::Create3DCamera() {
 
 void LockPickMenu::RotateLockpick() {
     BSRandom* Singleton;
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     float fxDelta = 0.0f;
     int32_t ixAxis = 0;
     float cfmaxAxisValue = 32767.0f;
@@ -903,14 +877,12 @@ void LockPickMenu::RotateLockpick() {
         (Singleton = BSRandom::GetSingleton(), Singleton->UnsignedInt(10u))) {
         if (fxDelta != 0.0 && LockPickMenu::PreviousAngleDelta == 0.0) {
             BSAudio* v5 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&th_s, "UILockpickingPickMovement", 257u);
-            SoundHandleByName->Play(false);
+            v5->GetSoundHandleByName("UILockpickingPickMovement", 257u).Play(false);
         }
     }
     else {
         BSAudio* v4 = &BSAudio::QInstance();
-        BSSoundHandle* v19 = v4->GetSoundHandleByName(&arHandle, "UILockpickingPickMovement", 257u);
-        v19->Play(false);
+        v4->GetSoundHandleByName("UILockpickingPickMovement", 257u).Play(false);
     }
     pTiles[15]->Set(LockPickMenu::iUT_X, fnewX, true);
     LockPickMenu::PreviousAngleDelta = fxDelta;
@@ -1038,7 +1010,6 @@ void LockPickMenu::SetupLockLevelSweetSpots() {
 
 Tile* LockPickMenu::Create(TESObjectREFR* apTarget, int32_t aiLockLevel, bool abDebugMode) {
     int32_t ilockLevel;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Tile* pold_menu_tile = Menu::GetMenuByClass(1014);
     InterfaceManager* pin = InterfaceManager::Instance();
     if (apTarget) {
@@ -1057,8 +1028,7 @@ Tile* LockPickMenu::Create(TESObjectREFR* apTarget, int32_t aiLockLevel, bool ab
             msg, 0, "Interface\\Icons\\Message Icons\\glow_message_padlock.dds", nullptr, 2.0f, false
         );
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-        SoundHandleByName->Play(false);
+        v5->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
         return nullptr;
     }
 

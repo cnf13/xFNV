@@ -82,15 +82,13 @@
 NiPointer<NiCamera> SPECIALBookMenu::sp3DCamera;
 
 void SPECIALBookDoneCallback() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (SPECIALBookMenu::pSPECIALBookMenu &&
         PlayerCharacter::GetSumOfSPECIALStats() == SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints) {
         SPECIALBookMenu::pSPECIALBookMenu->Exit();
     }
     else {
         BSAudio* v0 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v0->GetSoundHandleByName(&a1, "UIActivateNothing", 289u);
-        SoundHandleByName->Play(false);
+        v0->GetSoundHandleByName("UIActivateNothing", 289u).Play(false);
     }
 }
 
@@ -167,10 +165,6 @@ void SPECIALBookMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v25, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     bool bPageTurned = false;
     switch (a1) {
         case 0:
@@ -228,8 +222,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
             if (ioldValue != inewValue) {
                 BSSoundHandle psoundHand;
                 BSAudio* v11 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v11->GetSoundHandleByName(&arHandle, "OBJBookSpecialNumber", 289u);
-                psoundHand.operator=(*SoundHandleByName);
+                psoundHand = v11->GetSoundHandleByName("OBJBookSpecialNumber", 289u);
                 psoundHand.Play(false);
             }
             CallPageCallbacks();
@@ -241,8 +234,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
             }
             else {
                 BSAudio* v4 = &BSAudio::QInstance();
-                BSSoundHandle* v23 = v4->GetSoundHandleByName(&a12, "UIActivateNothing", 289u);
-                v23->Play(false);
+                v4->GetSoundHandleByName("UIActivateNothing", 289u).Play(false);
             }
             break;
         }
@@ -290,8 +282,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
             if (eState == SPECIALBookMenu::SBMS_SPECIAL && eXBoxIndexState > SPECIALBookMenu::SBMS_STRENGTH) {
                 eXBoxIndexState = static_cast<SPECIALBookMenu::SPECIAL_BOOK_MENU_STATE>(eXBoxIndexState - 1);
                 BSAudio* v13 = &BSAudio::QInstance();
-                BSSoundHandle* v19 = v13->GetSoundHandleByName(&apResult, "OBJBookSpecialFocus", 289u);
-                v19->Play(false);
+                v13->GetSoundHandleByName("OBJBookSpecialFocus", 289u).Play(false);
             }
             CallPageCallbacks();
             break;
@@ -300,8 +291,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
             if (eState == SPECIALBookMenu::SBMS_SPECIAL && eXBoxIndexState < SPECIALBookMenu::SBMS_LUCK) {
                 eXBoxIndexState = static_cast<SPECIALBookMenu::SPECIAL_BOOK_MENU_STATE>(eXBoxIndexState + 1);
                 BSAudio* v14 = &BSAudio::QInstance();
-                BSSoundHandle* v18 = v14->GetSoundHandleByName(&v25, "OBJBookSpecialFocus", 289u);
-                v18->Play(false);
+                v14->GetSoundHandleByName("OBJBookSpecialFocus", 289u).Play(false);
             }
             CallPageCallbacks();
             break;
@@ -449,8 +439,6 @@ ActorValue::Index SPECIALBookMenu::GetSelectedSPECIAL() {
 }
 
 bool SPECIALBookMenu::TurnPage(bool bForward) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool brunAnim = false;
     if (bForward) {
         bAnimForward = 1;
@@ -461,8 +449,7 @@ bool SPECIALBookMenu::TurnPage(bool bForward) {
         brunAnim = true;
         BSSoundHandle psoundHand;
         BSAudio* v2 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v2->GetSoundHandleByName(&a1, "OBJBookSpecialPageTurn", 289u);
-        psoundHand.operator=(*SoundHandleByName);
+        psoundHand = v2->GetSoundHandleByName("OBJBookSpecialPageTurn", 289u);
         psoundHand.Play(false);
     }
     else {
@@ -474,8 +461,7 @@ bool SPECIALBookMenu::TurnPage(bool bForward) {
         brunAnim = true;
         BSSoundHandle psoundHand_2;
         BSAudio* v4 = &BSAudio::QInstance();
-        BSSoundHandle* v7 = v4->GetSoundHandleByName(&arHandle, "OBJBookSpecialPageTurn", 289u);
-        psoundHand_2.operator=(*v7);
+        psoundHand_2 = v4->GetSoundHandleByName("OBJBookSpecialPageTurn", 289u);
         psoundHand_2.Play(false);
     }
     if (brunAnim) {
@@ -1464,7 +1450,6 @@ void SPECIALBookMenu::RefreshAllDoneButton(SPECIALBookMenu::SpecialBookButton* a
 }
 
 void SPECIALBookMenu::IncreaseActorValue(SPECIALBookMenu::ActorValueButton* apButton) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (SPECIALBookMenu::pSPECIALBookMenu) {
         ActorValue::Index eActorValue = apButton->eActorValue;
         if (eActorValue != ActorValue::VALUE_NONE) {
@@ -1472,8 +1457,7 @@ void SPECIALBookMenu::IncreaseActorValue(SPECIALBookMenu::ActorValueButton* apBu
             if (v6 < 10) {
                 BSSoundHandle th_s;
                 BSAudio* v1 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
-                th_s.operator=(*arHandle);
+                th_s = v1->GetSoundHandleByName("OBJBookSpecialNumber", 289u);
                 th_s.Play(false);
             }
             if (PlayerCharacter::GetSumOfSPECIALStats() < SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints) {
@@ -1486,7 +1470,6 @@ void SPECIALBookMenu::IncreaseActorValue(SPECIALBookMenu::ActorValueButton* apBu
 }
 
 void SPECIALBookMenu::DecreaseActorValue(SPECIALBookMenu::ActorValueButton* apButton) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (SPECIALBookMenu::pSPECIALBookMenu) {
         ActorValue::Index eActorValue = apButton->eActorValue;
         if (eActorValue != ActorValue::VALUE_NONE) {
@@ -1494,8 +1477,7 @@ void SPECIALBookMenu::DecreaseActorValue(SPECIALBookMenu::ActorValueButton* apBu
             if (v6 > 1) {
                 BSSoundHandle th_s;
                 BSAudio* v1 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "OBJBookSpecialNumber", 289u);
-                th_s.operator=(*arHandle);
+                th_s = v1->GetSoundHandleByName("OBJBookSpecialNumber", 289u);
                 th_s.Play(false);
             }
             int32_t v2 = BSMAX(v6 - 1, 1);

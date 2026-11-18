@@ -480,20 +480,18 @@ void BSTempEffectParticle::Init(
 }
 
 void BSTempEffectParticle::StartSounds() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle1, std::nullopt, std::nullopt);
     StopSounds();
     if (spParticleObject.m_pObject && pDecalImpactData) {
         if (pDecalImpactData->pSound1) {
             uint32_t isoundFileID = pDecalImpactData->pSound1->iFormID;
-            Sound1 = *BSAudio::QInstance().GetSoundHandleByNumericID(&kHandle1, isoundFileID, 258u);
+            Sound1 = BSAudio::QInstance().GetSoundHandleByNumericID(isoundFileID, 258u);
             Sound1.SetPosition(static_cast<NiAVObject*>(spParticleObject.m_pObject)->GetWorldTranslate());
             Sound1.SetObjectToFollow(static_cast<NiAVObject*>(spParticleObject.m_pObject));
             Sound1.Play(false);
         }
         if (pDecalImpactData->pSound2) {
             uint32_t isoundFileID_2 = pDecalImpactData->pSound2->iFormID;
-            Sound2 = *BSAudio::QInstance().GetSoundHandleByNumericID(&kHandle2, isoundFileID_2, 258u);
+            Sound2 = BSAudio::QInstance().GetSoundHandleByNumericID(isoundFileID_2, 258u);
             Sound2.SetPosition(static_cast<NiAVObject*>(spParticleObject.m_pObject)->GetWorldTranslate());
             Sound2.SetObjectToFollow(static_cast<NiAVObject*>(spParticleObject.m_pObject));
             Sound2.Play(false);

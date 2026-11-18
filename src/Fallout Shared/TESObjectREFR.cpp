@@ -2616,42 +2616,36 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                 }
                 if (!abPlayerhead && Get3D()) {
                     if (abAlwaysPlay) {
-                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
-                        aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
-                            &kFileHandle, Dst,
-                            ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT),
+                        aSoundHand = BSAudio::QInstance().GetSoundHandleByFilename(
+                            Dst, ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT),
                             nullptr
-                        ));
+                        );
                     }
                     else {
-                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
-                        aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
-                            &kFileHandle, Dst,
+                        aSoundHand = BSAudio::QInstance().GetSoundHandleByFilename(
+                            Dst,
                             ivoiceEffectFlag |
                                 (BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_VOICE |
                                  BSGameSound::SOUND_FLAG_ONE_SHOT),
                             nullptr
-                        ));
+                        );
                     }
                 }
                 else {
                     if (abAlwaysPlay) {
-                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
-                        aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
-                            &kFileHandle, Dst,
-                            ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT),
+                        aSoundHand = BSAudio::QInstance().GetSoundHandleByFilename(
+                            Dst, ivoiceEffectFlag | (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT),
                             nullptr
-                        ));
+                        );
                     }
                     else {
-                        XFNV_INLINED_LOCAL(BSSoundHandle, kFileHandle, std::nullopt, std::nullopt);
-                        aSoundHand.operator=(*BSAudio::QInstance().GetSoundHandleByFilename(
-                            &kFileHandle, Dst,
+                        aSoundHand = BSAudio::QInstance().GetSoundHandleByFilename(
+                            Dst,
                             ivoiceEffectFlag |
                                 (BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_VOICE |
                                  BSGameSound::SOUND_FLAG_ONE_SHOT),
                             nullptr
-                        ));
+                        );
                     }
                 }
                 if (!abPlayerhead && Get3D()) {
@@ -8262,11 +8256,9 @@ void TESObjectREFR::AttachSound(bool abAttach) {
                 uint32_t uiLoopFlag =
                     (pLoopingSound->GetData().iFlags & BSGameSound::SOUND_FLAG_LOOP) ? BSGameSound::SOUND_FLAG_LOOP : 0;
                 if (pPrimitive) {
-                    // Plays into a temporary handle and copies it into kSound with operator=.
-                    XFNV_INLINED_LOCAL(BSSoundHandle, kBeamSound, std::nullopt, std::nullopt);
                     uint32_t uiFormID = pLoopingSound->GetFormID();
-                    kSound = *BSAudio::QInstance().PlaySound(
-                        &kBeamSound, uiFormID,
+                    kSound = BSAudio::QInstance().PlaySound(
+                        uiFormID,
                         static_cast<BSGameSound::SoundFlags>(
                             uiBeamFlag | BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_LOOP |
                             BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER
@@ -8276,11 +8268,10 @@ void TESObjectREFR::AttachSound(bool abAttach) {
                     kSound.SetBeamEnd(kBeamEnd.x, kBeamEnd.y, kBeamEnd.z);
                 }
                 else if (uiLoopFlag) {
-                    XFNV_INLINED_LOCAL(BSSoundHandle, kLoopSound, std::nullopt, std::nullopt);
                     const NiPoint3* pLocation = &GetLocationOnReference();
                     uint32_t uiFormID = pLoopingSound->GetFormID();
-                    kSound = *BSAudio::QInstance().PlaySound(
-                        &kLoopSound, uiFormID,
+                    kSound = BSAudio::QInstance().PlaySound(
+                        uiFormID,
                         static_cast<BSGameSound::SoundFlags>(
                             uiLoopFlag | BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_MAYBE_UNDERWATER
                         ),
@@ -8336,7 +8327,6 @@ void TESObjectREFR::UpdateAddonNodeSounds(bool abDetachAll) {
 }
 
 void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDetachAll) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (apRoot) {
         if (apRoot->GetAppCulled()) {
             abDetachAll = true;
@@ -8379,8 +8369,7 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
                         }
                         uint32_t arPos_4 = paddonNode->pSound->iFormID;
                         BSAudio* v8 = &BSAudio::QInstance();
-                        BSSoundHandle* arHandle = v8->GetSoundHandleByNumericID(&apHandle, arPos_4, isoundFlags);
-                        spsoundHandleExtra.m_pObject->SoundHandle.operator=(*arHandle);
+                        spsoundHandleExtra.m_pObject->SoundHandle = v8->GetSoundHandleByNumericID(arPos_4, isoundFlags);
                         spsoundHandleExtra.m_pObject->SoundHandle.SetObjectToFollow(apRoot);
                         NiPoint3 v22 = apRoot->GetWorldTranslate();
                         spsoundHandleExtra.m_pObject->SoundHandle.SetPosition(v22.x, v22.y, v22.z);

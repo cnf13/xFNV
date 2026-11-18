@@ -1018,13 +1018,8 @@ void TESAnimGroup::PlaySounds(
     float afStopTime,
     BSAnimGroupSequence* apSequence
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t inumKeys_2;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand_4, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand_2, std::nullopt, std::nullopt);
     uint32_t inumKeys;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     float v86 = 1.0f;
     Animation* v87 = apRef->GetAnimation();
     bool v85 = afStartTime > static_cast<double>(afStopTime);
@@ -1071,7 +1066,7 @@ void TESAnimGroup::PlaySounds(
                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN;
                     const char* a2 = a4->GetFilename();
                     BSAudio* v9 = &BSAudio::QInstance();
-                    v9->GetSoundHandleByFilename(&soundHand, a2, a3, a4);
+                    BSSoundHandle soundHand = v9->GetSoundHandleByFilename(a2, a3, a4);
                     soundHand.SetPosition(loc.x, loc.y, loc.z);
                     float v43 = static_cast<double>(pgroupSound->eType) / 255.0;
                     soundHand.SetVolume(v43);
@@ -1125,7 +1120,7 @@ void TESAnimGroup::PlaySounds(
                                      BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN);
                                 uint32_t a3b = pcreatureSound_2->iFormID;
                                 BSAudio* v15 = &BSAudio::QInstance();
-                                v15->GetSoundHandleByNumericID(&soundHand_2, a3b, a4a);
+                                BSSoundHandle soundHand_2 = v15->GetSoundHandleByNumericID(a3b, a4a);
                                 if ((v87) &&
                                     (GetType() >= ANIM_GROUP_RELOAD_START && GetType() <= ANIM_GROUP_RELOAD_Z)) {
                                     Animation* v16 = apRef->GetAnimation();
@@ -1202,7 +1197,7 @@ void TESAnimGroup::PlaySounds(
                                          BSGameSound::SOUND_FLAG_IS_3D);
                                     uint32_t a3e = psound->iFormID;
                                     BSAudio* v22 = &BSAudio::QInstance();
-                                    v22->GetSoundHandleByNumericID(&soundHand_4, a3e, a4b);
+                                    BSSoundHandle soundHand_4 = v22->GetSoundHandleByNumericID(a3e, a4b);
                                     NiPoint3 v57 = apRef->GetLocationOnReference();
                                     soundHand_4.SetPosition(v57.x, v57.y, v57.z);
                                     NiNode* v23 = apRef->Get3D();
@@ -1235,23 +1230,21 @@ void TESAnimGroup::PlaySounds(
                                     if (apRef == pPlayer) {
                                         uint32_t a3c = pFoleySound->iFormID;
                                         BSAudio* v19 = &BSAudio::QInstance();
-                                        BSSoundHandle* arHandle = v19->GetSoundHandleByNumericID(
-                                            &a1, a3c,
+                                        soundHand_3 = v19->GetSoundHandleByNumericID(
+                                            a3c,
                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN |
                                                 BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE |
                                                 BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_2D
                                         );
-                                        soundHand_3.operator=(*arHandle);
                                     }
                                     else {
                                         uint32_t a3d = pFoleySound->iFormID;
                                         BSAudio* v20 = &BSAudio::QInstance();
-                                        BSSoundHandle* SoundHandleByNumericID = v20->GetSoundHandleByNumericID(
-                                            &th_s, a3d,
+                                        soundHand_3 = v20->GetSoundHandleByNumericID(
+                                            a3d,
                                             BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN |
                                                 BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IS_3D
                                         );
-                                        soundHand_3.operator=(*SoundHandleByNumericID);
                                         soundHand_3.SetPosition(loc_3.x, loc_3.y, loc_3.z);
                                         NiNode* v21 = apRef->Get3D();
                                         soundHand_3.SetObjectToFollow(v21);

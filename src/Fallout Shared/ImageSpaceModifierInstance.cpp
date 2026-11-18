@@ -161,7 +161,6 @@ bool ImageSpaceModifierInstanceForm::StartTransition(
 // Removes every active instance of apMod (the list's Remove copies the next node into a removed head, so the scan stays
 // on the same node after a removal) and plays apMod's outro sound once.
 void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
     if (apMod) {
         bool bHasPlayed = false;
@@ -176,8 +175,7 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
                     bHasPlayed = true;
                     uint32_t uiSoundID = apMod->pOutroSound->iFormID;
                     BSAudio* pAudio = &BSAudio::QInstance();
-                    BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-                    pSound->Play(false);
+                    pAudio->GetSoundHandleByNumericID(uiSoundID, 0x200000u).Play(false);
                 }
             }
             else {
@@ -189,7 +187,6 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
 
 ImageSpaceModifierInstanceForm*
 ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afStrength, NiAVObject* apTarget) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
     ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
@@ -208,8 +205,7 @@ ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afSt
         if (apMod->pIntroSound) {
             uint32_t uiSoundID = apMod->pIntroSound->iFormID;
             BSAudio* pAudio = &BSAudio::QInstance();
-            BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-            pSound->Play(false);
+            pAudio->GetSoundHandleByNumericID(uiSoundID, 0x200000u).Play(false);
         }
     }
     return pMod;
@@ -220,7 +216,6 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
     float afStrength,
     NiAVObject* apTarget
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
     bool bFound = false;
     ImageSpaceModifierInstanceForm* pMod = nullptr;
@@ -250,8 +245,7 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
             if (apMod->pIntroSound) {
                 uint32_t uiSoundID = apMod->pIntroSound->iFormID;
                 BSAudio* pAudio = &BSAudio::QInstance();
-                BSSoundHandle* pSound = pAudio->GetSoundHandleByNumericID(&kSound, uiSoundID, 0x200000u);
-                pSound->Play(false);
+                pAudio->GetSoundHandleByNumericID(uiSoundID, 0x200000u).Play(false);
             }
         }
     }

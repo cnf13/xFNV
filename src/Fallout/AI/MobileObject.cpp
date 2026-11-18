@@ -1468,8 +1468,6 @@ bool MobileObject::ChangeProcessLevel() {
 }
 
 void MobileObject::UpdateInDialogue(float afDelta, DialogueResponse* pResponse, bool abChangeAnimationEndVoice) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     Animation* panim = GetAnimation();
     DialoguePackage* pdia = nullptr;
     BaseProcess* CurrentAIProcess = pCurrentProcess;
@@ -1492,13 +1490,11 @@ void MobileObject::UpdateInDialogue(float afDelta, DialogueResponse* pResponse, 
             if (GetTalkingActivator()) {
                 TESObjectREFR* pref = GetTalkingActivator();
                 BSAudio* v4 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, isoundFileID, 261u);
-                handle.operator=(*arHandle);
+                handle = v4->GetSoundHandleByNumericID(isoundFileID, 261u);
                 handle.Play(false);
             }
             else {
-                BSSoundHandle* v17 = PlaySound(&a2, isoundFileID, false, 0x40000102u, true);
-                handle.operator=(*v17);
+                handle = PlaySound(isoundFileID, false, 0x40000102u, true);
             }
             BSAudioManager* mgr = &BSAudioManager::QInstance();
             // The callback's context is the speaker's form ID.
@@ -1851,7 +1847,6 @@ float MobileObject::SpeakSoundFunction(
     bool abUseIdleManager
 ) {
     XFNV_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     if (IsTalkingActivator()) {
         float fdelay = 0.0f;
         BSStringT<char> tempstring(apSoundFile);
@@ -1959,8 +1954,7 @@ float MobileObject::SpeakSoundFunction(
                 isoundFlags |= BSGameSound::SOUND_FLAG_IS_3D;
             }
             BSAudio* v16 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByFilename = v16->GetSoundHandleByFilename(&out, Dst, isoundFlags, nullptr);
-            aSoundHand.operator=(*SoundHandleByFilename);
+            aSoundHand = v16->GetSoundHandleByFilename(Dst, isoundFlags, nullptr);
             BSAudioManager* mgr = &BSAudioManager::QInstance();
             MobileObject* pact = this;
             if ((apTarget) && (apTarget->IsActor())) {
@@ -2406,22 +2400,15 @@ bool MobileObject::IsInAir() {
     return bInAir;
 }
 
-BSSoundHandle* MobileObject::PlaySoundByEditorName(
-    BSSoundHandle* apResult,
-    const char* apEditorName,
-    bool abLoop,
-    uint32_t aiSoundType,
-    bool abAllowCopy
-) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
+BSSoundHandle
+MobileObject::PlaySoundByEditorName(const char* apEditorName, bool abLoop, uint32_t aiSoundType, bool abAllowCopy) {
     BSSoundHandle soundHand;
     if (Get3D()) {
         TESSound* psnd = pDataHandler->GetSound(apEditorName);
         if (psnd) {
             uint32_t a3 = psnd->iFormID;
             BSAudio* v6 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v6->GetSoundHandleByNumericID(&a1, a3, aiSoundType);
-            soundHand.operator=(*arHandle);
+            soundHand = v6->GetSoundHandleByNumericID(a3, aiSoundType);
             if ((aiSoundType & 2) != 0) {
                 NiPoint3 v13 = GetLocationOnReference();
                 soundHand.SetPosition(v13.x, v13.y, v13.z);
@@ -2432,8 +2419,7 @@ BSSoundHandle* MobileObject::PlaySoundByEditorName(
             soundHand.Play(abLoop);
         }
     }
-    apResult->operator=(soundHand);
-    return apResult;
+    return soundHand;
 }
 
 uint32_t* MobileObject::GetCollisionFilter(uint32_t* apResult) {
@@ -2798,40 +2784,24 @@ bool MobileObject::SetProcessLevel(PROCESS_TYPE aeLevel) {
     return v7;
 }
 
-// The handle GetSoundHandleByNumericID fills is a temporary constructed in place (no constructor call), then assigned
-// and destroyed; the result is assigned into the caller's memory. abAllowCopy is unused.
-BSSoundHandle* MobileObject::PlaySound(
-    BSSoundHandle* apResult,
-    uint32_t aiSoundFormID,
-    bool abLoop,
-    uint32_t aiSoundType,
-    bool abAllowCopy
-) {
+// abAllowCopy is unused.
+BSSoundHandle MobileObject::PlaySound(uint32_t aiSoundFormID, bool abLoop, uint32_t aiSoundType, bool abAllowCopy) {
     BSSoundHandle kSound;
-    // Raw storage: the callee constructs the handle there.
-    alignas(BSSoundHandle) uint8_t aucTemp[sizeof(BSSoundHandle)];
-    BSSoundHandle* pTemp = reinterpret_cast<BSSoundHandle*>(aucTemp);
     BSAudio* pAudio = &BSAudio::QInstance();
-    BSSoundHandle* pFound = pAudio->GetSoundHandleByNumericID(pTemp, aiSoundFormID, aiSoundType);
-    kSound = *pFound;
-    pTemp->~BSSoundHandle();
+    kSound = pAudio->GetSoundHandleByNumericID(aiSoundFormID, aiSoundType);
     if (TESObjectREFR::Get3D() && (aiSoundType & 2)) {
         NiPoint3 kPosition = GetLocationOnReference();
         kSound.SetPosition(kPosition.x, kPosition.y, kPosition.z);
         kSound.SetObjectToFollow(TESObjectREFR::Get3D());
     }
     kSound.Play(abLoop);
-    *apResult = kSound;
-    return apResult;
+    return kSound;
 }
 
-BSSoundHandle*
-MobileObject::PlaySound_0(BSSoundHandle* apResult, char* apSoundFileName, bool abLoop, uint32_t aiSoundType) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
+BSSoundHandle MobileObject::PlaySound_0(char* apSoundFileName, bool abLoop, uint32_t aiSoundType) {
     BSSoundHandle soundHand;
     BSAudio* v5 = &BSAudio::QInstance();
-    BSSoundHandle* arHandle = v5->GetSoundHandleByFilename(&out, apSoundFileName, aiSoundType, nullptr);
-    soundHand.operator=(*arHandle);
+    soundHand = v5->GetSoundHandleByFilename(apSoundFileName, aiSoundType, nullptr);
     if ((Get3D()) && ((aiSoundType & 2) != 0)) {
         NiPoint3 v11 = GetLocationOnReference();
         soundHand.SetPosition(v11.x, v11.y, v11.z);
@@ -2840,8 +2810,7 @@ MobileObject::PlaySound_0(BSSoundHandle* apResult, char* apSoundFileName, bool a
     }
 
     soundHand.Play(abLoop);
-    apResult->operator=(soundHand);
-    return apResult;
+    return soundHand;
 }
 
 float MobileObject::GetActualHeading() {

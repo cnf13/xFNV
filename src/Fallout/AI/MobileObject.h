@@ -183,14 +183,8 @@ public:
     // Whether the character controller's current state is the in-air state.
     bool IsInAir();
     // Plays the sound form whose editor ID is apEditorName on the reference, placed at and following it for 3D sounds,
-    // and writes its handle to apResult.
-    BSSoundHandle* PlaySoundByEditorName(
-        BSSoundHandle* apResult,
-        const char* apEditorName,
-        bool abLoop,
-        uint32_t aiSoundType,
-        bool abAllowCopy
-    );
+    // and returns its handle.
+    BSSoundHandle PlaySoundByEditorName(const char* apEditorName, bool abLoop, uint32_t aiSoundType, bool abAllowCopy);
     // Writes the character controller's collision filter (an empty filter without one) to apResult.
     uint32_t* GetCollisionFilter(uint32_t* apResult);
     bool GetRunsInLow();
@@ -242,11 +236,10 @@ public:
     bool IsinDialogue();
     // Moves the object to process level aeLevel.
     bool SetProcessLevel(PROCESS_TYPE aeLevel);
-    // Plays sound form aiSoundFormID with aiSoundType's flags, following the 3D when flag 2 is set; the handle is
-    // written to apResult, and abAllowCopy is unused.
-    BSSoundHandle*
-    PlaySound(BSSoundHandle* apResult, uint32_t aiSoundFormID, bool abLoop, uint32_t aiSoundType, bool abAllowCopy);
-    BSSoundHandle* PlaySound_0(BSSoundHandle* apResult, char* apSoundFileName, bool abLoop, uint32_t aiSoundType);
+    // Plays sound form aiSoundFormID with aiSoundType's flags, following the 3D when flag 2 is set, and returns its
+    // handle; abAllowCopy is unused.
+    BSSoundHandle PlaySound(uint32_t aiSoundFormID, bool abLoop, uint32_t aiSoundType, bool abAllowCopy);
+    BSSoundHandle PlaySound_0(char* apSoundFileName, bool abLoop, uint32_t aiSoundType);
     float GetActualHeading();
 
     static void operator delete(void* apMemory) {

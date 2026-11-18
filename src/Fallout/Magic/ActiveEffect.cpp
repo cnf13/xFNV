@@ -835,8 +835,6 @@ bool ActiveEffect::CheckDisplacementSpellOnTarget() {
 
 void ActiveEffect::StartSound() {
     uint32_t isoundFileID;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle_2, std::nullopt, std::nullopt);
     EffectSetting* EffectSetting_ = GetEffectSetting();
     if (EffectSetting_->data.pHitSound) {
         EffectSetting* v2 = GetEffectSetting();
@@ -866,15 +864,14 @@ void ActiveEffect::StartSound() {
             }
             if (ptargetActor) {
                 uint32_t uiflags = bpersistent ? 274 : 258;
-                BSSoundHandle* arHandle = ptargetActor->PlaySound(&a2, isoundFileID, bpersistent, uiflags, false);
-                soundHandle.operator=(*arHandle);
+                soundHandle = ptargetActor->PlaySound(isoundFileID, bpersistent, uiflags, false);
             }
             else {
                 MagicTarget* Target = pTarget;
                 TESObjectREFR* ptargetObject = Target->GetTargetStatsObject();
                 if (ptargetObject) {
                     BSAudio* v9 = &BSAudio::QInstance();
-                    v9->GetSoundHandleByNumericID(&soundHandle_2, isoundFileID, 258u);
+                    BSSoundHandle soundHandle_2 = v9->GetSoundHandleByNumericID(isoundFileID, 258u);
                     NiPoint3 v20 = ptargetObject->GetLocationOnReference();
                     soundHandle_2.SetPosition(v20.x, v20.y, v20.z);
                     soundHandle_2.Play(bpersistent);

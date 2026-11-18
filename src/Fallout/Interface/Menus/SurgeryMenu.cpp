@@ -631,9 +631,6 @@ void SurgeryMenu::UpdateToolLocation(bool abBurning) {
 }
 
 void SurgeryMenu::BurnFlesh() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     char tmp[256];
     // The result of UpdateFlesh is stored but never read, as the game does.
     [[maybe_unused]] float ffleshBurnPercent = UpdateFlesh();
@@ -650,24 +647,21 @@ void SurgeryMenu::BurnFlesh() {
                 if (foldPain < 100.0 && fPainPercent == 100.0) {
                     BSSoundHandle soundHand_3;
                     BSAudio* v3 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&apResult, "UISurgeryPain03", 289u);
-                    soundHand_3.operator=(*SoundHandleByName);
+                    soundHand_3 = v3->GetSoundHandleByName("UISurgeryPain03", 289u);
                     soundHand_3.Play(false);
                 }
             }
             else {
                 BSSoundHandle soundHand_2;
                 BSAudio* v2 = &BSAudio::QInstance();
-                BSSoundHandle* v12 = v2->GetSoundHandleByName(&arHandle, "UISurgeryPain02", 289u);
-                soundHand_2.operator=(*v12);
+                soundHand_2 = v2->GetSoundHandleByName("UISurgeryPain02", 289u);
                 soundHand_2.Play(false);
             }
         }
         else {
             BSSoundHandle soundHand;
             BSAudio* v1 = &BSAudio::QInstance();
-            BSSoundHandle* v13 = v1->GetSoundHandleByName(&a1, "UISurgeryPain01", 289u);
-            soundHand.operator=(*v13);
+            soundHand = v1->GetSoundHandleByName("UISurgeryPain01", 289u);
             soundHand.Play(false);
         }
     }
@@ -1209,15 +1203,13 @@ void SurgeryMenu::ResetLimb(ActorValue::Index aeLimb) {
 }
 
 void SurgeryMenu::Close() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t ClassStatic = SurgeryMenu::GetClassStatic();
     Tile* ptile = Menu::GetMenuByClass(ClassStatic);
     if (ptile) {
         if (SurgeryMenu::pSurgeryMenu) {
             BSSoundHandle soundHand;
             BSAudio* v1 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "UISurgeryExit", 289u);
-            soundHand.operator=(*arHandle);
+            soundHand = v1->GetSoundHandleByName("UISurgeryExit", 289u);
             soundHand.Play(false);
             ptile->Set(Tile::kTileValue_DeleteOnFade, 1);
             SurgeryMenu::pSurgeryMenu->StartFadeOut();

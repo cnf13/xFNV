@@ -635,15 +635,11 @@ void FORenderedMenu::TriggerBurst(float afBurstDuration, float afBurstIntensity,
 
     if (FORenderedMenu::bSoundsActive && RandomBool(afSoundChance)) {
         BSSoundHandle soundHandle;
-        alignas(BSSoundHandle) uint8_t lookupStorage[sizeof(BSSoundHandle)];
-        auto* lookupResult = static_cast<BSSoundHandle*>(static_cast<void*>(lookupStorage));
         BSAudio* audio = &BSAudio::QInstance();
-        BSSoundHandle* soundResult = audio->GetSoundHandleByName(
-            lookupResult, "UIPipBoyStatic",
+        soundHandle = audio->GetSoundHandleByName(
+            "UIPipBoyStatic",
             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND | BSGameSound::SOUND_FLAG_ONE_SHOT
         );
-        soundHandle = *soundResult;
-        lookupResult->~BSSoundHandle();
         soundHandle.Play(false);
     }
 }

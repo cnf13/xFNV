@@ -1074,15 +1074,15 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
                 pBoneName->operator=(hkString::strDup(rbodyName));
             }
             else {
-                alignas(16) XFNV_INLINED_LOCAL(hkErrStream, ostr, std::nullopt, std::nullopt);
-                char assertBuf[512];
-                ::new (&ostr) hkErrStream(assertBuf, 512);
-                ostr.operator<<("Rigid Body name could not be found");
-                hkError::s_instance->message(
-                    hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBACC14), assertBuf,
-                    "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkRagdollPenetrationUtil.cpp", 721
-                );
-                ostr.~hkErrStream();
+                {
+                    char assertBuf[512];
+                    hkErrStream ostr(assertBuf, 512);
+                    ostr << "Rigid Body name could not be found";
+                    hkError::s_instance->message(
+                        hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBACC14), assertBuf,
+                        "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkRagdollPenetrationUtil.cpp", 721
+                    );
+                }
                 pskeleton->m_bones.m_data[b].m_name.operator=(static_cast<const char*>(nullptr));
             }
             const bool bLockTranslation = b != 0;

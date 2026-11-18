@@ -160,16 +160,13 @@ bool TraitSelectMenu::DoGamepad(int32_t aiID, float afValue) {
 }
 
 void TraitSelectMenu::SetBoxAsChecked(int32_t aiID, bool bForceRefresh) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (bForceRefresh || m_CurrentlyCheckedTile != aiID) {
         m_nCheckmarkAnimStartTime = BSGetTickCount();
         if (pTiles[17]) {
             if (aiID == -1) {
                 pTiles[17]->Set(4003, 0);
                 BSAudio* v3 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UITraitSelectErase", 289u);
-                SoundHandleByName->Play(false);
+                v3->GetSoundHandleByName("UITraitSelectErase", 289u).Play(false);
             }
             else {
                 if (pTiles[aiID]) {
@@ -177,8 +174,7 @@ void TraitSelectMenu::SetBoxAsChecked(int32_t aiID, bool bForceRefresh) {
                     float afValue = pTiles[aiID]->GetFloat(4002) - 8.0;
                     pTiles[17]->Set(4002, afValue, true);
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* v5 = v4->GetSoundHandleByName(&arHandle, "UITraitSelectCheckmark", 289u);
-                    v5->Play(false);
+                    v4->GetSoundHandleByName("UITraitSelectCheckmark", 289u).Play(false);
                 }
             }
         }
@@ -335,7 +331,6 @@ void TraitSelectMenu::Navigate(char a1) {
 }
 
 Tile* TraitSelectMenu::Create() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
     InterfaceManager* pInterfaceManager = InterfaceManager::Instance();
     int32_t iClassStatic = TraitSelectMenu::GetClassStatic();
     Tile* pOldMenuTile = Menu::GetMenuByClass(iClassStatic);
@@ -356,8 +351,7 @@ Tile* TraitSelectMenu::Create() {
             pMe->m_fDesiredYScroll = 0.0f;
             pMe->SetButtonAsHighlighted(0, 0);
             pMe->m_nLastMenuUpdateTime = BSGetTickCount();
-            BSSoundHandle* pSound = BSAudio::QInstance().GetSoundHandleByName(&kSound, "UIPopUpMessageGeneral", 289u);
-            pSound->Play(false);
+            BSAudio::QInstance().GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
             if (pTile->GetFloat(4007) == 6006.0 || pTile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
                 pTile->Set(4013, afValue, true);

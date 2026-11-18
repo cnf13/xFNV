@@ -577,9 +577,6 @@ bool MediaSet::Update(uint32_t ticks, bool abInCombat, MediaLocationController* 
 
 bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationController* pController) {
     int32_t bInTension;
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool bMusicPlaying = FalloutAudioMedia::MediaIsPlaying(MEDIA_DUNGEON, true);
     bool bReturn = true;
     char cLayer = pController->fCurrentPlayerRadius < 100.0;
@@ -616,8 +613,7 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
             if ((pSoundOne) && (!bStarted)) {
                 uint32_t CastingType = pSoundOne->iFormID;
                 BSAudio* v6 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByNumericID = v6->GetSoundHandleByNumericID(&a1, CastingType, 2305u);
-                SoundHandleByNumericID->Play(false);
+                v6->GetSoundHandleByNumericID(CastingType, 2305u).Play(false);
             }
 
             newLayer = &pMLOne;
@@ -628,8 +624,7 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
                 if ((bStarted) && (pSoundTwo)) {
                     uint32_t v10 = pSoundTwo->iFormID;
                     BSAudio* v7 = &BSAudio::QInstance();
-                    BSSoundHandle* v13 = v7->GetSoundHandleByNumericID(&apHandle, v10, 2305u);
-                    v13->Play(false);
+                    v7->GetSoundHandleByNumericID(v10, 2305u).Play(false);
                 }
 
                 newLayer = &pMLThree;
@@ -639,8 +634,7 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
                 if ((bStarted) && (pSoundTwo)) {
                     uint32_t v11 = pSoundTwo->iFormID;
                     BSAudio* v8 = &BSAudio::QInstance();
-                    BSSoundHandle* v12 = v8->GetSoundHandleByNumericID(&th_s, v11, 2305u);
-                    v12->Play(false);
+                    v8->GetSoundHandleByNumericID(v11, 2305u).Play(false);
                 }
 
                 newLayer = &pMLTwo;
@@ -684,8 +678,6 @@ bool MediaSet::UpdateDungeon(uint32_t ticks, bool abInCombat, MediaLocationContr
 }
 
 bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (bInCombat) {
         bool bShouldPlayIntro = false;
         bool bIsLoaded = FalloutAudioMedia::MediaIsPlaying(mType, false);
@@ -693,8 +685,7 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
             if ((pSoundOne) && (!bStarted)) {
                 uint32_t CastingType = pSoundOne->iFormID;
                 BSAudio* v4 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByNumericID = v4->GetSoundHandleByNumericID(&apHandle, CastingType, 2305u);
-                SoundHandleByNumericID->Play(false);
+                v4->GetSoundHandleByNumericID(CastingType, 2305u).Play(false);
             }
 
             MediaSet::uiLastUpdate = ticks - 1;
@@ -728,8 +719,7 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
             if (pSoundTwo) {
                 uint32_t v8 = pSoundTwo->iFormID;
                 BSAudio* v5 = &BSAudio::QInstance();
-                BSSoundHandle* v9 = v5->GetSoundHandleByNumericID(&th_s, v8, 2305u);
-                v9->Play(false);
+                v5->GetSoundHandleByNumericID(v8, 2305u).Play(false);
             }
             MediaSet::uiLastUpdate = static_cast<int64_t>(static_cast<double>(ticks) + fThree * 1000.0);
             if (FalloutAudioMedia::pCurrentMediaController) {
@@ -743,8 +733,6 @@ bool MediaSet::UpdateBattle(bool bInCombat, uint32_t ticks, MEDIATYPE mType) {
 
 bool MediaSet::UpdateIncidentals(uint32_t ticks) {
     char v9;
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (ticks <= MediaSet::uiLastUpdate) {
         return true;
     }
@@ -766,16 +754,14 @@ bool MediaSet::UpdateIncidentals(uint32_t ticks) {
     if (v9) {
         uint32_t CastingType = pSoundOne->iFormID;
         BSAudio* v3 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByNumericID = v3->GetSoundHandleByNumericID(&a1, CastingType, 2305u);
-        SoundHandleByNumericID->Play(false);
+        v3->GetSoundHandleByNumericID(CastingType, 2305u).Play(false);
         MediaSet::uiLastUpdate =
             ticks + RandomInt(static_cast<int32_t>(fOne * 1000.0), static_cast<int32_t>(fThree * 1000.0));
     }
     else {
         uint32_t v6 = pSoundTwo->iFormID;
         BSAudio* v4 = &BSAudio::QInstance();
-        BSSoundHandle* v7 = v4->GetSoundHandleByNumericID(&apHandle, v6, 2305u);
-        v7->Play(false);
+        v4->GetSoundHandleByNumericID(v6, 2305u).Play(false);
         MediaSet::uiLastUpdate =
             ticks + RandomInt(static_cast<int32_t>(fTwo * 1000.0), static_cast<int32_t>(fFour * 1000.0));
     }

@@ -466,16 +466,13 @@ void StatsMenu::DoEnter(int32_t aiID, Tile* apTarget) {
                     BodyPartController::BodyPartIndex eBodyPart = BodyPartController::GetInstance()->Find(apTarget);
                     if (eBodyPart != BodyPartController::SM_BODYPART_COUNT) {
                         BodyPartController::GetInstance()->SetCurrentBodyPart(eBodyPart, true);
-                        // GetSoundHandleByName fills kSound; nothing is constructed there beforehand, and the handle's
-                        // destructor is empty.
-                        XFNV_INLINED_LOCAL(BSSoundHandle, kSound, std::nullopt, std::nullopt);
                         BSAudio::QInstance()
                             .GetSoundHandleByName(
-                                &kSound, "UIPipBoyHighlight",
+                                "UIPipBoyHighlight",
                                 BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                     BSGameSound::SOUND_FLAG_ONE_SHOT
                             )
-                            ->Play(false);
+                            .Play(false);
                         if (!bLimbMode) {
                             ToggleHealingMode();
                         }
@@ -577,9 +574,6 @@ int32_t StatsMenu::GetClass() {
 }
 
 bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     StatsMenu::Page epage_2;
     StatsMenu::Page epage;
     if (!Interface::IsTopMenuID(Interface::eStatsMenu)) {
@@ -625,8 +619,7 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
             bool v9 = DrBagTargetConditionCallback(pHealingOptionsA[3]);
             pHealingOptionsA[3].pTile->Set(4015, static_cast<int32_t>(v9));
             BSAudio* v10 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v10->GetSoundHandleByName(&a1, "UIPipBoyHighlight", 289u);
-            SoundHandleByName->Play(false);
+            v10->GetSoundHandleByName("UIPipBoyHighlight", 289u).Play(false);
         }
         return true;
     }
@@ -792,8 +785,7 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
 
             DoClick(9, nullptr);
             BSAudio* v14 = &BSAudio::QInstance();
-            BSSoundHandle* v26 = v14->GetSoundHandleByName(&arHandle, "UIMenuOK", 289u);
-            v26->Play(false);
+            v14->GetSoundHandleByName("UIMenuOK", 289u).Play(false);
             return true;
         }
         case 12: {
@@ -810,8 +802,7 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
             if (pTiles[9]->IsTrue(4015)) {
                 DoClick(59, nullptr);
                 BSAudio* v15 = &BSAudio::QInstance();
-                BSSoundHandle* v24 = v15->GetSoundHandleByName(&th_s, "UIMenuOK", 289u);
-                v24->Play(false);
+                v15->GetSoundHandleByName("UIMenuOK", 289u).Play(false);
                 return true;
             }
 
@@ -824,14 +815,12 @@ bool StatsMenu::DoGamepad(int32_t aiButton, float afValue) {
 }
 
 bool StatsMenu::DoGamepadUpEvent(int32_t aiButton, float afValue) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!bLimbMode || (aiButton != 10 || !pTiles[9]->IsTrue(4015))) {
         return false;
     }
     DoClick(9, nullptr);
     BSAudio* v3 = &BSAudio::QInstance();
-    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIMenuOK", 289u);
-    SoundHandleByName->Play(false);
+    v3->GetSoundHandleByName("UIMenuOK", 289u).Play(false);
     return true;
 }
 

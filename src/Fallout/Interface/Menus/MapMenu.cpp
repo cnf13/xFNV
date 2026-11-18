@@ -157,14 +157,10 @@ void MapMenu::DoDownClick(int32_t aiID, Tile* apTarget) {
 }
 
 void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
     NiPoint3 v66;
     NiPoint3 v68;
     NiPoint3 v70;
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
     if (!apTarget && aiID >= 0 && aiID < NUM_TILES) {
         apTarget = pTiles[aiID];
     }
@@ -230,9 +226,7 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                         }
                         pTiles[6]->Set(4003, 0);
                         BSAudio* v14 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName =
-                            v14->GetSoundHandleByName(&apResult, "UIPopUpMapMarkerAdded ", 289u);
-                        SoundHandleByName->Play(false);
+                        v14->GetSoundHandleByName("UIPopUpMapMarkerAdded ", 289u).Play(false);
                         if (pPlayer->QPlayerMapMarker()) {
                             const char* yd = sLeaveMarker.String();
                             const char* xb = sRemoveMarker.String();
@@ -390,9 +384,7 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                                                       ->GetVoice()
                                                       ->pString;
                                         BSAudio* v7 = &BSAudio::QInstance();
-                                        BSSoundHandle* SoundHandleByFilename =
-                                            v7->GetSoundHandleByFilename(&out, x, 261u, nullptr);
-                                        hsndHandle.operator=(*SoundHandleByFilename);
+                                        hsndHandle = v7->GetSoundHandleByFilename(x, 261u, nullptr);
                                         hsndHandle.SetVolume(0.9f);
                                         SoundsToPlay.AddTail(hsndHandle);
                                         pVoiceNoteConvo_2->GetCurrentItem()->pInfo->RunResult(TIRS_END, pVoiceNoteNPC);
@@ -413,14 +405,13 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                             TESSound* NoteSound = pnote->GetNoteSound();
                             uint32_t y = NoteSound->iFormID;
                             BSAudio* v4 = &BSAudio::QInstance();
-                            BSSoundHandle* a2 = v4->GetSoundHandleByNumericID(&apHandle, y, 257u);
-                            SoundsToPlay.AddTail(*a2);
+                            BSSoundHandle apHandle = v4->GetSoundHandleByNumericID(y, 257u);
+                            SoundsToPlay.AddTail(apHandle);
                             bSoundsLoading = true;
                         }
                         if (bSoundsLoading) {
                             BSAudio* v8 = &BSAudio::QInstance();
-                            BSSoundHandle* v58 = v8->GetSoundHandleByName(&arHandle, "UIPipBoyHolotapeStart", 289u);
-                            v58->Play(false);
+                            v8->GetSoundHandleByName("UIPipBoyHolotapeStart", 289u).Play(false);
                             FalloutAudio::MuteRadio();
                             BSAudio* v9 = &BSAudio::QInstance();
                             v9->EnterDialogue();
@@ -1100,7 +1091,6 @@ void MapMenu::ResetWaveform() {
 }
 
 void MapMenu::HighlightCenterMarker() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (pMapTile) {
         double Float = pTiles[6]->GetFloat(4002);
         float v20 = pTiles[6]->GetFloat(4016) / 2.0 + Float;
@@ -1137,8 +1127,7 @@ void MapMenu::HighlightCenterMarker() {
             pclosestTile->Set(MapMenu::iUT_Selected, 1);
             if (pclosestTile != pHighlightedMapMarker) {
                 BSAudio* v6 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPipBoyHighlight", 289u);
-                SoundHandleByName->Play(false);
+                v6->GetSoundHandleByName("UIPipBoyHighlight", 289u).Play(false);
                 int32_t v7 = Tile::AddUserTrait("_LocationName", -1);
                 const char* String = pclosestTile->GetString(v7);
                 if (_stricmp(String, "Companion")) {
@@ -2056,7 +2045,6 @@ TESWorldSpace* MapMenu::CalculatePlayerMarkerSpace(NiPoint3 aWorldPos) {
 }
 
 void MapMenu::StopNoteSound() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (pCurrentSound) {
         BSSoundHandle* v1 = &pCurrentSound->m_item;
         if (v1->IsPlaying()) {
@@ -2071,8 +2059,7 @@ void MapMenu::StopNoteSound() {
     iSoundPlayStartTime = 0;
     bSoundsLoading = false;
     BSAudio* v3 = &BSAudio::QInstance();
-    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "UIPipBoyHolotapeStop", 289u);
-    SoundHandleByName->Play(false);
+    v3->GetSoundHandleByName("UIPipBoyHolotapeStop", 289u).Play(false);
     BSAudio* v4 = &BSAudio::QInstance();
     v4->ExitDialogue();
     FalloutAudio::UnMuteRadio();

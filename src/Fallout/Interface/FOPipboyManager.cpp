@@ -197,7 +197,6 @@ void FOPipboyManager::Shutdown() {
 }
 
 void FOPipboyManager::OnMenuOpen() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (GetInitialized()) {
         SetRefractive(false);
         ResetColors();
@@ -207,8 +206,7 @@ void FOPipboyManager::OnMenuOpen() {
         pBackgroundHum.Stop();
         pBackgroundHum.Release();
         BSAudio* v1 = &BSAudio::QInstance();
-        BSSoundHandle* arHandle = v1->GetSoundHandleByName(&a1, "UIPipBoyHumLP", 49u);
-        pBackgroundHum.operator=(*arHandle);
+        pBackgroundHum = v1->GetSoundHandleByName("UIPipBoyHumLP", 49u);
         pBackgroundHum.Play(false);
         float fDefaultBurstIntensity = ::fDefaultBurstIntensity.Float();
         float* v2 = &fDefaultBurstDuration.Float();
@@ -222,7 +220,6 @@ void FOPipboyManager::OnMenuOpen() {
 }
 
 void FOPipboyManager::OnMenuClose() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     bool IsRefractive = pPlayer->IsRefractive();
     SetRefractive(IsRefractive);
     Animation* panim = pPlayer->GetAnimation(true);
@@ -241,8 +238,7 @@ void FOPipboyManager::OnMenuClose() {
     }
     if (GetInitialized()) {
         BSAudio* v4 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPipBoyAccessDown", 289u);
-        SoundHandleByName->Play(false);
+        v4->GetSoundHandleByName("UIPipBoyAccessDown", 289u).Play(false);
         pBackgroundHum.Stop();
         pBackgroundHum.Release();
         ActivateButton(0);
@@ -517,15 +513,13 @@ void FOPipboyManager::ResetPipBoyManager() {
 }
 
 void FOPipboyManager::SetTabKnobPosition(uint32_t aiNewPos, bool abPlaySounds) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (fTabKnobPositions[aiNewPos] != fKnobTargets[2]) {
         fKnobTargets[2] = fTabKnobPositions[aiNewPos];
         fKnobRates[2] = fTabKnobMoveRate.Float();
         if ((FORenderedMenu::bSoundsActive) && (abPlaySounds)) {
             BSSoundHandle psoundHand;
             BSAudio* v3 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v3->GetSoundHandleByName(&a1, "UIPipBoyTab", 289u);
-            psoundHand.operator=(*arHandle);
+            psoundHand = v3->GetSoundHandleByName("UIPipBoyTab", 289u);
             psoundHand.Play(false);
         }
     }
@@ -540,12 +534,10 @@ NiAVObject* FOPipboyManager::Get3rdPersonPipboyRoot() {
 }
 
 void FOPipboyManager::MoveKnob(FOPipboyManager::Knobs aiKnob, float afAmount, float afRate, bool abPlaySound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (abPlaySound && aiKnob == FOPipboyManager::KNOB_SCROLL) {
         BSSoundHandle psoundHand;
         BSAudio* v5 = &BSAudio::QInstance();
-        BSSoundHandle* arHandle = v5->GetSoundHandleByName(&a1, "UIPipBoyScroll", 289u);
-        psoundHand.operator=(*arHandle);
+        psoundHand = v5->GetSoundHandleByName("UIPipBoyScroll", 289u);
         psoundHand.Play(false);
     }
     fKnobTargets[aiKnob] = fKnobTargets[aiKnob] + afAmount;

@@ -74,7 +74,6 @@ void ContainerMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void ContainerMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (!apTarget && aiID >= 0 && aiID < 19) {
         apTarget = pTiles[aiID];
     }
@@ -123,8 +122,7 @@ void ContainerMenu::DoClick(int32_t aiID, Tile* apTarget) {
         case 10: {
             lbContainer.Traverse(&ContainerMenu::TakeAllFn, 0, 0x7FFFFFFF);
             BSAudio* v7 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, "UIItemTakeAll", 289u);
-            SoundHandleByName->Play(false);
+            v7->GetSoundHandleByName("UIItemTakeAll", 289u).Play(false);
             ContainerMenu::Close();
             break;
         }
@@ -549,7 +547,6 @@ void ContainerMenu::PlayReactivityBark(TESTopic* aRelatedTopic) {
     XFNV_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
     Actor* pactor;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     TESTopicInfo* pInfo = nullptr;
     Actor* pActionActor = (Actor*)pPlayer;
     if (ContainerMenu::pMe->pContainerRef && ContainerMenu::pMe->pContainerRef->IsActor()) {
@@ -568,8 +565,7 @@ void ContainerMenu::PlayReactivityBark(TESTopic* aRelatedTopic) {
         if (pResponse) {
             if (pResponse->pVoiceSound) {
                 uint32_t isoundFileID = pResponse->pVoiceSound->iFormID;
-                BSSoundHandle* v16 = pactor->PlaySound(&a2, isoundFileID, false, 258u, true);
-                this->m_hCurrentReactivityBark.operator=(*v16);
+                this->m_hCurrentReactivityBark = pactor->PlaySound(isoundFileID, false, 258u, true);
             }
             else {
                 PlayerCharacter* v9 = pPlayer;
@@ -664,9 +660,6 @@ bool ContainerMenu::IsWellFormedMenu() {
 }
 
 void ContainerMenu::PlayContainerSound(TESObjectREFR* apContainer, bool abOpenSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     TESSound* psound = nullptr;
     if (apContainer) {
         int32_t FormType = apContainer->GetObjectReference()->GetFormType();
@@ -682,27 +675,24 @@ void ContainerMenu::PlayContainerSound(TESObjectREFR* apContainer, bool abOpenSo
             if (FormType > 41 && FormType <= 43) {
                 if (abOpenSound) {
                     BSAudio* v3 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "DRSBodyGenericOpen", 289u);
-                    SoundHandleByName->Play(false);
+                    v3->GetSoundHandleByName("DRSBodyGenericOpen", 289u).Play(false);
                 }
                 else {
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* v9 = v4->GetSoundHandleByName(&arHandle, "DRSBodyGenericClose", 289u);
-                    v9->Play(false);
+                    v4->GetSoundHandleByName("DRSBodyGenericClose", 289u).Play(false);
                 }
             }
         }
         if (psound) {
             const char* Filename = psound->GetFilename();
             BSAudio* v5 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByFilename = v5->GetSoundHandleByFilename(&out, Filename, 289u, psound);
-            SoundHandleByFilename->Play(false);
+            BSSoundHandle out = v5->GetSoundHandleByFilename(Filename, 289u, psound);
+            out.Play(false);
         }
     }
 }
 
 void ContainerMenu::InitContainerMode() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     switch (eContainerMode) {
         case Interface::CMM_STANDARD:
         case Interface::CMM_PICKPOCKET: {
@@ -718,8 +708,7 @@ void ContainerMenu::InitContainerMode() {
                 const char* v2 = pContainerRef->GetFullName();
                 SetContainerTitle(v2);
                 BSAudio* v3 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v3->GetSoundHandleByName(&a1, "DRSTraderOpen", 289u);
-                SoundHandleByName->Play(false);
+                v3->GetSoundHandleByName("DRSTraderOpen", 289u).Play(false);
                 DialogMenu::ServiceStart();
                 TESForm* FormByEditorID = TESForm::GetFormByEditorID("FollowersTrade");
                 TESTopic* pTopic = dynamic_cast<TESTopic*>(FormByEditorID);
@@ -1112,7 +1101,6 @@ TileMenu* ContainerMenu::Create(TESObjectREFR* apContainer, Interface::CONTAINER
 }
 
 void ContainerMenu::Close() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (ContainerMenu::pMe) {
         ContainerMenu::pMe->m_hCurrentReactivityBark.FadeOutAndRelease(100u);
         switch (ContainerMenu::pMe->eContainerMode) {
@@ -1169,8 +1157,7 @@ void ContainerMenu::Close() {
                     }
                 }
                 BSAudio* v2 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v2->GetSoundHandleByName(&a1, "DRSTraderClose", 289u);
-                SoundHandleByName->Play(false);
+                v2->GetSoundHandleByName("DRSTraderClose", 289u).Play(false);
                 DialogMenu::ServiceEnd(nullptr);
                 break;
             }

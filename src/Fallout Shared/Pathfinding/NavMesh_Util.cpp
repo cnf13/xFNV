@@ -808,8 +808,7 @@ NiPoint3 NavMesh::GetCircumCenter(uint16_t apTriangle) {
     }
     float fY = (fX2 * fLength3 - fX3 * fLength2) * fScale + kVert1.y;
     float fX = kVert1.x - (fY2 * fLength3 - fY3 * fLength2) * fScale;
-    XFNV_INLINED_LOCAL(NiPoint3, kCenter, std::nullopt, std::nullopt);
-    return *::new (&kCenter) NiPoint3(fX, fY, fZ);
+    return NiPoint3(fX, fY, fZ);
 }
 
 // Triangles under water level + 50 are accepted however far below the location they lie; others only down to 180 units

@@ -1658,8 +1658,7 @@ bool Actor::GetEditorLocation(
 }
 
 NiPoint3 Actor::GetStartingAngle() {
-    XFNV_INLINED_LOCAL(NiPoint3, kAngle, std::nullopt, std::nullopt);
-    return *::new (&kAngle) NiPoint3(0.0f, 0.0f, fEditorLocZRot);
+    return NiPoint3(0.0f, 0.0f, fEditorLocZRot);
 }
 
 NiPoint3 Actor::GetStartingLocation() {
@@ -2899,8 +2898,6 @@ bool Actor::MovetoMiddleHigh() {
 }
 
 bhkCharacterController* Actor::Move(float afDeltaTime, NiPoint3& arDeltaMove, uint32_t aiMoveDir) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (IsInDialoguewithPlayer() && (aiMoveDir & 63) == 0) {
         return nullptr;
     }
@@ -2939,14 +2936,11 @@ bhkCharacterController* Actor::Move(float afDeltaTime, NiPoint3& arDeltaMove, ui
                     float* v8 = &fHardLandingDamageThreshold.Float();
                     if (!(ffallingDamage > static_cast<double>(*v8))) {
                         BSAudio* v10 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName =
-                            v10->GetSoundHandleByName(&arHandle, "FSTLandHardLight", 257u);
-                        fallHandle.operator=(*SoundHandleByName);
+                        fallHandle = v10->GetSoundHandleByName("FSTLandHardLight", 257u);
                     }
                     else {
                         BSAudio* v9 = &BSAudio::QInstance();
-                        BSSoundHandle* v17 = v9->GetSoundHandleByName(&a1, "FSTLandHardHeavy", 257u);
-                        fallHandle.operator=(*v17);
+                        fallHandle = v9->GetSoundHandleByName("FSTLandHardHeavy", 257u);
                     }
                     fallHandle.Play(false);
                     pcc->ClearHitDamage();
@@ -3218,22 +3212,16 @@ void Actor::UpdateInDialogue(float afDelta, DialogueResponse* pResponse, bool ab
         bool bSpeakLine = true;
         if (pResponse->GetVoiceSound()) {
             uint32_t uiSoundFormID = pResponse->GetVoiceSound()->GetFormID();
-            // PlaySound constructs the returned handle in place: untyped memory until then. The callbacks' context is
-            // the actor's form ID, passed as the untyped context pointer.
-            alignas(BSSoundHandle) uint8_t kVoiceSoundMemory[sizeof(BSSoundHandle)];
-            BSSoundHandle* pVoiceSound = reinterpret_cast<BSSoundHandle*>(kVoiceSoundMemory);
-            PlaySound(
-                pVoiceSound, uiSoundFormID, false, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT,
-                true
-            );
+            // The callbacks' context is the actor's form ID, passed as the untyped context pointer.
+            BSSoundHandle kVoiceSound =
+                PlaySound(uiSoundFormID, false, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT, true);
             BSAudioManager* pManager = &BSAudioManager::QInstance();
             void* pContext = reinterpret_cast<void*>(static_cast<uintptr_t>(GetFormID()));
-            uint32_t uiSoundID = pVoiceSound->GetID();
+            uint32_t uiSoundID = kVoiceSound.GetID();
             pManager->SetCompletionCallback(uiSoundID, &MobileObject::SoundFileCallBack, pContext);
             bSoundFileDone = false;
             bSpeakLine = false;
             bSpeakingDone = false;
-            pVoiceSound->~BSSoundHandle();
         }
         SetShouldUseEmotionAnimation(pResponse->GetUseEmotion());
         if (bSpeakLine && bSoundFileDone) {
@@ -3767,7 +3755,6 @@ float Actor::SpeakSoundFunction(
 ) {
     XFNV_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
     double dDistanceFromPlayer;
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     char Dst[516];
     float fdelay = 0.0f;
     BSStringT<char> tempstring(apSoundFile);
@@ -3891,8 +3878,7 @@ float Actor::SpeakSoundFunction(
         isoundFlags |= BSGameSound::SOUND_FLAG_IS_3D;
     }
     BSAudio* v20 = &BSAudio::QInstance();
-    BSSoundHandle* SoundHandleByFilename = v20->GetSoundHandleByFilename(&out, Dst, isoundFlags, nullptr);
-    aSoundHand.operator=(*SoundHandleByFilename);
+    aSoundHand = v20->GetSoundHandleByFilename(Dst, isoundFlags, nullptr);
     aSoundHand.SetPriority(64u);
     if (v57) {
         double v22 = fDBVoiceAttenuationIn2D.Float() * 100.0;
@@ -4495,13 +4481,7 @@ void Actor::Update(float afDelta) {
                         TESSound* pSettings = pWeapon->Get3DLoopingShotSound();
                         uint32_t uiTypeFlags = uiLoopFlag | uiFlags | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN;
                         const char* pFilename = pWeapon->Get3DLoopingShotSound()->GetFilename();
-                        // GetSoundHandleByFilename is handed unconstructed storage for its result.
-                        alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-                        BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
-                        kAttackSound = *BSAudio::QInstance().GetSoundHandleByFilename(
-                            pNewSound, pFilename, uiTypeFlags, pSettings
-                        );
-                        pNewSound->~BSSoundHandle();
+                        kAttackSound = BSAudio::QInstance().GetSoundHandleByFilename(pFilename, uiTypeFlags, pSettings);
                         kAttackSound.SetAssumeSuccess(true);
                         kAttackSound.SetObjectToFollow(pFollow);
                         kAttackSound.SetPosition(GetLocationOnReference());
@@ -4600,15 +4580,10 @@ void Actor::Update(float afDelta) {
                                 BSSoundHandle kDrownSound;
                                 GetExtra()->GetSound(kDrownSound);
                                 if (!kDrownSound.IsValid()) {
-                                    // PlaySoundByEditorName is handed unconstructed storage for its result, as the game
-                                    // does.
-                                    alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-                                    BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
-                                    kDrownSound = *PlaySoundByEditorName(
-                                        pNewSound, "NPCHumanDrowning", false,
+                                    kDrownSound = PlaySoundByEditorName(
+                                        "NPCHumanDrowning", false,
                                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT, false
                                     );
-                                    pNewSound->~BSSoundHandle();
                                     GetExtra()->SetSound(kDrownSound);
                                 }
                                 TriggerPain(false, true);
@@ -4643,16 +4618,11 @@ void Actor::Update(float afDelta) {
                             GetExtra()->GetCreatureAwakeSound(kAwakeSound);
                             if (bAwake && !kAwakeSound.IsPlaying()) {
                                 if (!kAwakeSound.IsValid()) {
-                                    // GetSoundHandleByFilename is handed unconstructed storage for its result.
-                                    alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-                                    BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
                                     uint32_t uiFlags = TESSound::ConvertLoopFlag(pAwakeSound->GetData().iFlags) |
                                         BSGameSound::SOUND_FLAG_IS_3D;
                                     const char* pFilename = pAwakeSound->GetFilename();
-                                    kAwakeSound = *BSAudio::QInstance().GetSoundHandleByFilename(
-                                        pNewSound, pFilename, uiFlags, pAwakeSound
-                                    );
-                                    pNewSound->~BSSoundHandle();
+                                    kAwakeSound =
+                                        BSAudio::QInstance().GetSoundHandleByFilename(pFilename, uiFlags, pAwakeSound);
                                     GetExtra()->SetCreatureAwakeSound(kAwakeSound);
                                     kAwakeSound.SetObjectToFollow(Get3D());
                                 }
@@ -4770,14 +4740,9 @@ void Actor::Update(float afDelta) {
                         fVolume = std::powf(fVolume, 3.0f);
                         BSSoundHandle kSplashSound;
                         if (Get3D()) {
-                            // GetSoundHandleByName is handed unconstructed storage for its result, as the game does.
-                            alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-                            BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
-                            kSplashSound = *BSAudio::QInstance().GetSoundHandleByName(
-                                pNewSound, "CWaterHumanoid",
-                                BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
+                            kSplashSound = BSAudio::QInstance().GetSoundHandleByName(
+                                "CWaterHumanoid", BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
                             );
-                            pNewSound->~BSSoundHandle();
                             if (!kSplashSound.IsPlaying()) {
                                 NiPoint3 kSplashPos = GetLocationOnReference();
                                 kSplashSound.SetPosition(kSplashPos.x, kSplashPos.y, kSplashPos.z);
@@ -6809,9 +6774,8 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
         if (pResponse) {
             bool bPlayVoiceFile = true;
             if (pResponse->pVoiceSound && bSoundFileDone) {
-                XFNV_INLINED_LOCAL(BSSoundHandle, soundHandle, std::nullopt, std::nullopt);
-                MobileObject::PlaySound(
-                    &soundHandle, pResponse->pVoiceSound->iFormID, false,
+                BSSoundHandle soundHandle = MobileObject::PlaySound(
+                    pResponse->pVoiceSound->iFormID, false,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
                     true
@@ -6829,18 +6793,16 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                     char cVoiceFile[512];
                     BSstrcpy(cVoiceFile, 512, pResponse->cVoice.pString);
                     if (abIs2D) {
-                        XFNV_INLINED_LOCAL(BSSoundHandle, fileHandle, std::nullopt, std::nullopt);
-                        handle = *BSAudio::QInstance().GetSoundHandleByFilename(
-                            &fileHandle, cVoiceFile,
+                        handle = BSAudio::QInstance().GetSoundHandleByFilename(
+                            cVoiceFile,
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_VOICE |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT,
                             nullptr
                         );
                     }
                     else {
-                        XFNV_INLINED_LOCAL(BSSoundHandle, fileHandle, std::nullopt, std::nullopt);
-                        handle = *BSAudio::QInstance().GetSoundHandleByFilename(
-                            &fileHandle, cVoiceFile,
+                        handle = BSAudio::QInstance().GetSoundHandleByFilename(
+                            cVoiceFile,
                             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_VOICE |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT,
                             nullptr
@@ -9556,8 +9518,6 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
 
 void Actor::Kill(Actor* apAttacker, float afDamage) {
     uint32_t iplayerCombatantLostCount;
-    alignas(16) XFNV_INLINED_LOCAL(BSSoundHandle, v76, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     if (!IsDead(false) && (!this->IsChild(false) || this == pPlayer)) {
         BSSoundHandle hweapLoop;
         (&this->m_Extra)->GetWeaponAttackSound(hweapLoop);
@@ -9900,7 +9860,7 @@ void Actor::Kill(Actor* apAttacker, float afDamage) {
                         if (psound) {
                             uint32_t afTime_8b = psound->iFormID;
                             BSAudio* v14 = &BSAudio::QInstance();
-                            v14->GetSoundHandleByNumericID(&soundHand, afTime_8b, 258u);
+                            BSSoundHandle soundHand = v14->GetSoundHandleByNumericID(afTime_8b, 258u);
                             NiPoint3 loc = this->GetLocationOnReference();
                             soundHand.SetPosition(loc.x, loc.y, loc.z);
                             NiNode* v15 = this->Get3D();
@@ -9920,8 +9880,7 @@ void Actor::Kill(Actor* apAttacker, float afDamage) {
                 FalloutRadio::PipboyRadioEnable(false);
                 FalloutAudioMedia::MediaFadeOut(1000, MEDIA_STANDBY);
                 BSAudio* v16 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByName = v16->GetSoundHandleByName(&v76, "MUSDeath", 2305u);
-                SoundHandleByName->Play(false);
+                v16->GetSoundHandleByName("MUSDeath", 2305u).Play(false);
                 pVATS.QuitVATSPlayback(false, false);
                 if (this->pCurrentProcess) {
                     BaseProcess* v73 = this->pCurrentProcess;
@@ -11215,23 +11174,19 @@ bool Actor::ConditionalFree(bool abArg) {
 }
 
 void Actor::PlayPickUpSound(TESBoundObject* apobjREFR, bool abPickUp, bool abUse) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (apobjREFR) {
         BSSoundHandle soundHand;
         char* a2 = nullptr;
         const char* soundname = GetPickUpSoundName(apobjREFR, abPickUp, abUse);
         if (this == pPlayer) {
             BSAudio* v4 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v4->GetSoundHandleByName(&a1, soundname, 289u);
-            soundHand.operator=(*arHandle);
+            soundHand = v4->GetSoundHandleByName(soundname, 289u);
             if (!soundHand.IsPlaying()) {
                 soundHand.Play(false);
             }
         }
         else {
-            BSSoundHandle* v6 = PlaySoundByEditorName(&dst, soundname, false, 258u, true);
-            soundHand.operator=(*v6);
+            soundHand = PlaySoundByEditorName(soundname, false, 258u, true);
         }
     }
 }
@@ -11996,15 +11951,10 @@ void Actor::UpdateActorMover(float afDelta) {
                     GetExtra()->GetCreatureMovementSound(kSound);
                     if (bIsMoving && !kSound.IsPlaying()) {
                         if (!kSound.IsValid()) {
-                            // GetSoundHandleByFilename is handed unconstructed storage for its result.
-                            alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-                            BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
                             TESSound::SOUND_DATA kData = pSound->GetData();
                             uint32_t uiFlags = TESSound::ConvertLoopFlag(kData.iFlags) | BSGameSound::SOUND_FLAG_IS_3D;
                             const char* pFilename = pSound->GetFilename();
-                            kSound =
-                                *BSAudio::QInstance().GetSoundHandleByFilename(pNewSound, pFilename, uiFlags, pSound);
-                            pNewSound->~BSSoundHandle();
+                            kSound = BSAudio::QInstance().GetSoundHandleByFilename(pFilename, uiFlags, pSound);
                             kSound.SetAssumeSuccess(true);
                             GetExtra()->SetCreatureMovementSound(kSound);
                             kSound.SetObjectToFollow(Get3D());
@@ -12039,8 +11989,6 @@ void Actor::EquipObject(
     bool abForceEquip,
     bool abPlayPickUpSounds
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a2, std::nullopt, std::nullopt);
     float fhealth = 0.0f;
     ExtraHealth* pHealth = nullptr;
     bool bdefault = false;
@@ -12147,11 +12095,11 @@ void Actor::EquipObject(
                                         BSSoundHandle handle;
                                         if (this == pPlayer && Interface::IsInMenuMode()) {
                                             uint32_t CastingType = psound->iFormID;
-                                            PlaySound(&a2, CastingType, false, 288u, true);
+                                            PlaySound(CastingType, false, 288u, true);
                                         }
                                         else {
                                             uint32_t v12 = psound->iFormID;
-                                            PlaySound(&arHandleOut, v12, false, 258u, true);
+                                            PlaySound(v12, false, 258u, true);
                                         }
                                     }
                                 }
@@ -13596,15 +13544,13 @@ void Actor::MeleeAttack(bool abPowerAttack, bool abInCombatAttack) {
         if (pSound) {
             // Takes the file name before the audio singleton.
             const char* pFilename = pSound->GetFilename();
-            XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
-            BSAudio::QInstance().GetSoundHandleByFilename(
-                &kHandle, pFilename, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT, pSound
+            BSSoundHandle kHandle = BSAudio::QInstance().GetSoundHandleByFilename(
+                pFilename, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT, pSound
             );
             NiPoint3 kLocation = GetLocationOnReference();
             kHandle.SetPosition(kLocation.x, kLocation.y, kLocation.z);
             kHandle.SetObjectToFollow(Get3D());
             kHandle.Play(false);
-            kHandle.~BSSoundHandle();
         }
         TESForm* pTouchSpell = GetActorBase()->GetFormTouchSpell();
         MagicItem* pSpell = pTouchSpell ? static_cast<MagicItemForm*>(pTouchSpell) : nullptr;
@@ -14012,30 +13958,22 @@ bool Actor::ObjectHit(bool abPowerAttack) {
         if (pImpact && pImpact->GetSound1()) {
             TESSound* pSettings = pImpact->GetSound1();
             const char* pFilename = pImpact->GetSound1()->GetFilename();
-            // GetSoundHandleByFilename is handed unconstructed storage for its result.
-            alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-            BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
-            kSound = *BSAudio::QInstance().GetSoundHandleByFilename(
-                pNewSound, pFilename,
+            kSound = BSAudio::QInstance().GetSoundHandleByFilename(
+                pFilename,
                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                 pSettings
             );
-            pNewSound->~BSSoundHandle();
             kSound.SetPosition(kHitPos.x, kHitPos.y, kHitPos.z);
             kSound.Play(false);
         }
         if (pImpact && pImpact->GetSound2()) {
             TESSound* pSettings = pImpact->GetSound2();
             const char* pFilename = pImpact->GetSound2()->GetFilename();
-            // GetSoundHandleByFilename is handed unconstructed storage for its result.
-            alignas(BSSoundHandle) uint8_t aucNewSound[sizeof(BSSoundHandle)];
-            BSSoundHandle* pNewSound = reinterpret_cast<BSSoundHandle*>(aucNewSound);
-            kSound = *BSAudio::QInstance().GetSoundHandleByFilename(
-                pNewSound, pFilename,
+            kSound = BSAudio::QInstance().GetSoundHandleByFilename(
+                pFilename,
                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                 pSettings
             );
-            pNewSound->~BSSoundHandle();
             kSound.SetPosition(kHitPos.x, kHitPos.y, kHitPos.z);
             kSound.Play(false);
         }
@@ -14174,7 +14112,6 @@ void Actor::FakeWeaponHitSound(
 }
 
 void Actor::PickAnimations(float afMoveScale, float afTurnScale) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
     float fSpeed;
     if (!IsDead(false) && !IsKnockedOut()) {
         if (this == pPlayer && !pPlayer->Is3rdPerson()) {
@@ -14357,7 +14294,7 @@ void Actor::PickAnimations(float afMoveScale, float afTurnScale) {
                                         }
                                         if (penchant) {
                                             PlaySoundByEditorName(
-                                                &dst, "WPNBlade1HandEquipEnchanted", false,
+                                                "WPNBlade1HandEquipEnchanted", false,
                                                 BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                                     BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
                                                 true
@@ -16415,8 +16352,6 @@ void Actor::SetWantWeaponDrawn(bool abTF) {
 
 bool Actor::StartAttack(ANIM_GROUP_ENUM aeAttack) {
     TESObjectWEAP* pweapon;
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     float fSpeed;
     bool bnoammo;
     if (pCurrentProcess->GetCurrentWeapon()) {
@@ -16484,8 +16419,7 @@ bool Actor::StartAttack(ANIM_GROUP_ENUM aeAttack) {
                         TESSound* AttackFailSound = pweapon->GetAttackFailSound();
                         const char* Filename = AttackFailSound->GetFilename();
                         BSAudio* v5 = &BSAudio::QInstance();
-                        BSSoundHandle* arHandle = v5->GetSoundHandleByFilename(&out, Filename, 258u, a2);
-                        hfailSound.operator=(*arHandle);
+                        hfailSound = v5->GetSoundHandleByFilename(Filename, 258u, a2);
                         const NiPoint3* v6 = &GetLocationOnReference();
                         hfailSound.SetPosition(*v6);
                     }
@@ -16494,13 +16428,12 @@ bool Actor::StartAttack(ANIM_GROUP_ENUM aeAttack) {
                         TESSound* v7 = pweapon->GetAttackFailSound();
                         const char* v24 = v7->GetFilename();
                         BSAudio* v8 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByFilename = v8->GetSoundHandleByFilename(
-                            &th_s, v24,
+                        hfailSound = v8->GetSoundHandleByFilename(
+                            v24,
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                                 BSGameSound::SOUND_FLAG_IGNORE_TIMESCALE,
                             a2a
                         );
-                        hfailSound.operator=(*SoundHandleByFilename);
                     }
                     hfailSound.Play(false);
                     (&m_Extra)->SetSound(hfailSound);
@@ -19616,11 +19549,6 @@ void Actor::SetLastAttackHitData(HitData* apData) {
 }
 
 void Actor::PlayHitSound(HitData* apHitData) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v35, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v37, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v39, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     bool bpowerArmor = IsPowerBodyArmorWorn();
     NiPoint3 damageLocation = apHitData->kHitLocation;
     NiPoint3 distanceDelta = NiPoint3_ZERO;
@@ -19706,11 +19634,9 @@ void Actor::PlayHitSound(HitData* apHitData) {
         TESSound* a4 = pimpactSound1;
         const char* a2 = pimpactSound1->GetFilename();
         BSAudio* v4 = &BSAudio::QInstance();
-        BSSoundHandle* arHandle = v4->GetSoundHandleByFilename(
-            &out, a2, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
-            a4
+        soundHandle = v4->GetSoundHandleByFilename(
+            a2, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT, a4
         );
-        soundHandle.operator=(*arHandle);
         soundHandle.SetPosition(damageLocation.x, damageLocation.y, damageLocation.z);
         soundHandle.Play(false);
     }
@@ -19719,11 +19645,9 @@ void Actor::PlayHitSound(HitData* apHitData) {
         TESSound* a4a = pimpactSound2;
         const char* a2a = pimpactSound2->GetFilename();
         BSAudio* v6 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByFilename = v6->GetSoundHandleByFilename(
-            &apResult, a2a,
-            BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT, a4a
+        soundHandle = v6->GetSoundHandleByFilename(
+            a2a, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT, a4a
         );
-        soundHandle.operator=(*SoundHandleByFilename);
         soundHandle.SetPosition(damageLocation.x, damageLocation.y, damageLocation.z);
         soundHandle.Play(false);
     }
@@ -19731,12 +19655,10 @@ void Actor::PlayHitSound(HitData* apHitData) {
     if ((pcreatureAttackSound) && (distance < static_cast<double>(100 * pcreatureAttackSound->GetData().iMax))) {
         const char* a2b = pcreatureAttackSound->GetFilename();
         BSAudio* v8 = &BSAudio::QInstance();
-        BSSoundHandle* v26 = v8->GetSoundHandleByFilename(
-            &v39, a2b,
-            BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
+        soundHandle = v8->GetSoundHandleByFilename(
+            a2b, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
             pcreatureAttackSound
         );
-        soundHandle.operator=(*v26);
         soundHandle.SetPosition(damageLocation.x, damageLocation.y, damageLocation.z);
         soundHandle.Play(false);
     }
@@ -19755,12 +19677,11 @@ void Actor::PlayHitSound(HitData* apHitData) {
             if ((pimpactSound1) && (distance < static_cast<double>(100 * pimpactSound1->GetData().iMax))) {
                 const char* a2c = pimpactSound1->GetFilename();
                 BSAudio* v10 = &BSAudio::QInstance();
-                BSSoundHandle* v24 = v10->GetSoundHandleByFilename(
-                    &v37, a2c,
+                soundHandle = v10->GetSoundHandleByFilename(
+                    a2c,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                     pimpactSound1
                 );
-                soundHandle.operator=(*v24);
                 soundHandle.SetPosition(damageLocation.x, damageLocation.y, damageLocation.z);
                 soundHandle.Play(false);
             }
@@ -19769,12 +19690,11 @@ void Actor::PlayHitSound(HitData* apHitData) {
             if ((pimpactSound2) && (distance < static_cast<double>(100 * pimpactSound2->GetData().iMax))) {
                 const char* a2d = pimpactSound2->GetFilename();
                 BSAudio* v12 = &BSAudio::QInstance();
-                BSSoundHandle* v23 = v12->GetSoundHandleByFilename(
-                    &v35, a2d,
+                soundHandle = v12->GetSoundHandleByFilename(
+                    a2d,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                     pimpactSound2
                 );
-                soundHandle.operator=(*v23);
                 soundHandle.SetPosition(damageLocation.x, damageLocation.y, damageLocation.z);
                 soundHandle.Play(false);
             }
@@ -23674,10 +23594,6 @@ void Actor::MobilityConditionModifiedCallback(
 }
 
 void Actor::PlayLandJumpSound(PlayerCharacter* arg0, HavokMaterialType a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v29, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle th_s;
     IOTask* v41 = nullptr;
     TESSound* v46 = nullptr;
@@ -23731,8 +23647,7 @@ void Actor::PlayLandJumpSound(PlayerCharacter* arg0, HavokMaterialType a2) {
         if (Sound) {
             uint32_t arPos_4b = Sound->iFormID;
             BSAudio* v4 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, arPos_4b, v34);
-            th_s.operator=(*arHandle);
+            th_s = v4->GetSoundHandleByNumericID(arPos_4b, v34);
             float v27 = 0.949999988079071 - RandomFloat(0.0f, 0.1f);
             th_s.SetVolume(v27);
             th_s.Play(false);
@@ -23740,8 +23655,7 @@ void Actor::PlayLandJumpSound(PlayerCharacter* arg0, HavokMaterialType a2) {
         if (v46) {
             uint32_t arPos_4c = v46->iFormID;
             BSAudio* v5 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByNumericID = v5->GetSoundHandleByNumericID(&apHandle, arPos_4c, v34);
-            th_s.operator=(*SoundHandleByNumericID);
+            th_s = v5->GetSoundHandleByNumericID(arPos_4c, v34);
             float v25 = 0.949999988079071 - RandomFloat(0.0f, 0.1f);
             th_s.SetVolume(v25);
             th_s.Play(false);
@@ -23756,8 +23670,7 @@ void Actor::PlayLandJumpSound(PlayerCharacter* arg0, HavokMaterialType a2) {
         if (Sound) {
             uint32_t arPos_4d = Sound->iFormID;
             BSAudio* v6 = &BSAudio::QInstance();
-            BSSoundHandle* v24 = v6->GetSoundHandleByNumericID(&apResult, arPos_4d, v33);
-            th_s.operator=(*v24);
+            th_s = v6->GetSoundHandleByNumericID(arPos_4d, v33);
             th_s.SetPosition(a3.x, a3.y, a3.z);
             NiNode* v7 = arg0->Get3D();
             th_s.SetObjectToFollow(v7);
@@ -23768,8 +23681,7 @@ void Actor::PlayLandJumpSound(PlayerCharacter* arg0, HavokMaterialType a2) {
         if (v46) {
             uint32_t arPos_4e = v46->iFormID;
             BSAudio* v8 = &BSAudio::QInstance();
-            BSSoundHandle* v22 = v8->GetSoundHandleByNumericID(&v29, arPos_4e, v33);
-            th_s.operator=(*v22);
+            th_s = v8->GetSoundHandleByNumericID(arPos_4e, v33);
             th_s.SetPosition(a3.x, a3.y, a3.z);
             NiNode* v9 = arg0->Get3D();
             th_s.SetObjectToFollow(v9);

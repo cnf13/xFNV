@@ -168,8 +168,6 @@ void BlackJackMenu::AttachTileByID(int32_t a1, Tile* a2) {
 }
 
 void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (eBlackJackState == BlackJackMenu::BL_IDLE || eBlackJackState == BlackJackMenu::BL_PLAYER_TURN) {
         switch (a1) {
             case 3: {
@@ -317,12 +315,12 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                     }
                     if (previousBet < iCurrentBet) {
                         BSAudio* v4 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(
-                            &a12, "GAMEBlackJackIncreaseBet",
-                            BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                BSGameSound::SOUND_FLAG_ONE_SHOT
-                        );
-                        SoundHandleByName->Play(false);
+                        v4->GetSoundHandleByName(
+                              "GAMEBlackJackIncreaseBet",
+                              BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                  BSGameSound::SOUND_FLAG_ONE_SHOT
+                        )
+                            .Play(false);
                     }
                     SetCorrectChipMeshesVisibleForCurrentBet();
                     BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
@@ -442,12 +440,12 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
                     }
                     if (iPreviousBet > iCurrentBet) {
                         BSAudio* v5 = &BSAudio::QInstance();
-                        BSSoundHandle* v6 = v5->GetSoundHandleByName(
-                            &arHandle, "GAMEBlackJackDecreaseBet",
-                            BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
-                                BSGameSound::SOUND_FLAG_ONE_SHOT
-                        );
-                        v6->Play(false);
+                        v5->GetSoundHandleByName(
+                              "GAMEBlackJackDecreaseBet",
+                              BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
+                                  BSGameSound::SOUND_FLAG_ONE_SHOT
+                        )
+                            .Play(false);
                     }
                     SetCorrectChipMeshesVisibleForCurrentBet();
                     BlackJackMenu::pMe->pTiles[0]->Poke(BlackJackMenu::iUT_X, 1.0f);
@@ -510,18 +508,6 @@ void BlackJackMenu::DoClick(int32_t a1, Tile* a2) {
 void BlackJackMenu::DoIdle() {
     static int32_t eprevBlackJackState;
     static float fStateSecs;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v93, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v94, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v95, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v96, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v97, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v98, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v99, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v100, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t v173 = 0;
     float v176 = 1.0f;
     [[maybe_unused]] static BSSoundHandle spinningReelSound;
@@ -601,8 +587,7 @@ void BlackJackMenu::DoIdle() {
                     NiUpdateData UpdateData0(0.0f, true, false);
                     BlackJackMenu::spSceneRoot.m_pObject->Update(UpdateData0);
                     BSAudio* v16 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v16->GetSoundHandleByName(&a1, "GAMEBlackJackCardDeal", 289u);
-                    SoundHandleByName->Play(false);
+                    v16->GetSoundHandleByName("GAMEBlackJackCardDeal", 289u).Play(false);
                     bCleanDealerHand = 1;
                     BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl = pPlayerHand;
                     BSSimpleList<BlackJackMenu::BlackJackCard*>* pD = pDealerHand;
@@ -625,8 +610,7 @@ void BlackJackMenu::DoIdle() {
                     if ((bCleanDealerHand) && (static_cast<double>(fStateSecs) < pPlayerAnimations[1]->m_fEndKeyTime)) {
                         bCleanDealerHand = 0;
                         BSAudio* v20 = &BSAudio::QInstance();
-                        BSSoundHandle* v87 = v20->GetSoundHandleByName(&arHandle, "GAMEBlackJackCardDeal", 289u);
-                        v87->Play(false);
+                        v20->GetSoundHandleByName("GAMEBlackJackCardDeal", 289u).Play(false);
                     }
 
                     float v86 = fStateSecs - animOffset;
@@ -640,8 +624,7 @@ void BlackJackMenu::DoIdle() {
                         if (fStateSecs < EndKeyTime + animOffset) {
                             bCleanDealerHand = 1;
                             BSAudio* v23 = &BSAudio::QInstance();
-                            BSSoundHandle* v85 = v23->GetSoundHandleByName(&th_s, "GAMEBlackJackCardDeal", 289u);
-                            v85->Play(false);
+                            v23->GetSoundHandleByName("GAMEBlackJackCardDeal", 289u).Play(false);
                         }
                     }
                     float v84 = fStateSecs - pPlayerAnimations[i_3]->m_fEndKeyTime;
@@ -655,8 +638,7 @@ void BlackJackMenu::DoIdle() {
                         if (bCleanDealerHand) {
                             bCleanDealerHand = 0;
                             BSAudio* v26 = &BSAudio::QInstance();
-                            BSSoundHandle* v83 = v26->GetSoundHandleByName(&apResult, "GAMEBlackJackCardFlip", 289u);
-                            v83->Play(false);
+                            v26->GetSoundHandleByName("GAMEBlackJackCardFlip", 289u).Play(false);
                         }
                         double v27 = pPlayerAnimations[1]->m_fEndKeyTime;
                         float v82 = fStateSecs - (v27 + animOffset);
@@ -763,8 +745,7 @@ void BlackJackMenu::DoIdle() {
             v31->Update(UpdateData1_2);
             if (fStateSecs == 0.0) {
                 BSAudio* v32 = &BSAudio::QInstance();
-                BSSoundHandle* v79 = v32->GetSoundHandleByName(&v100, "GAMEBlackJackCardDeal", 289u);
-                v79->Play(false);
+                v32->GetSoundHandleByName("GAMEBlackJackCardDeal", 289u).Play(false);
                 BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl_2 = nullptr;
                 BlackJackMenu::BlackJackCard* cd = nullptr;
                 int32_t counter = 0;
@@ -914,8 +895,7 @@ void BlackJackMenu::DoIdle() {
                 }
                 if (fStateSecs == 0.0 && !bCleanDealerHand) {
                     BSAudio* v36 = &BSAudio::QInstance();
-                    BSSoundHandle* v78 = v36->GetSoundHandleByName(&v99, "GAMEBlackJackCardCollect", 289u);
-                    v78->Play(false);
+                    v36->GetSoundHandleByName("GAMEBlackJackCardCollect", 289u).Play(false);
                     NiUpdateData UpdateData0_2(0.0f, true, false);
                     BlackJackMenu::spSceneRoot.m_pObject->Update(UpdateData0_2);
                     pTableAnimManager->ActivateSequence(pTableAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
@@ -994,8 +974,7 @@ void BlackJackMenu::DoIdle() {
                     pTableAnimManager->ActivateSequence(pTableAnimations[1], 0, false, 1.0f, 0.0f, nullptr);
                     pDealerAnimManager->ActivateSequence(pDealerAnimations[0], 0, false, 1.0f, 0.0f, nullptr);
                     BSAudio* v42 = &BSAudio::QInstance();
-                    BSSoundHandle* v74 = v42->GetSoundHandleByName(&v98, "GAMEBlackJackCardCollectDealer", 289u);
-                    v74->Play(false);
+                    v42->GetSoundHandleByName("GAMEBlackJackCardCollectDealer", 289u).Play(false);
                     bCleanDealerHand = 1;
                     fStartKeyTime = fStateSecs;
                     NiUpdateData UpdateData1_5(0.0f, true, false);
@@ -1024,8 +1003,7 @@ void BlackJackMenu::DoIdle() {
                     SetFlag(BlackJackMenu::BLF_DISABLEHAND_SPLIT, true);
                     ClearDeckHighlight();
                     BSAudio* v46 = &BSAudio::QInstance();
-                    BSSoundHandle* v72 = v46->GetSoundHandleByName(&v97, "GAMEBlackJackCardFlip", 289u);
-                    v72->Play(false);
+                    v46->GetSoundHandleByName("GAMEBlackJackCardFlip", 289u).Play(false);
                     pDealerAnimManager->ActivateSequence(pDealerReveal, 0, false, 1.0f, 0.0f, nullptr);
                 }
                 if (static_cast<double>(fStateSecs) < pDealerReveal->m_fEndKeyTime) {
@@ -1053,8 +1031,7 @@ void BlackJackMenu::DoIdle() {
                 v48->Update(UpdateData1_7);
                 if (fStateSecs == 0.0) {
                     BSAudio* v49 = &BSAudio::QInstance();
-                    BSSoundHandle* v71 = v49->GetSoundHandleByName(&v96, "GAMEBlackJackCardFlip", 289u);
-                    v71->Play(false);
+                    v49->GetSoundHandleByName("GAMEBlackJackCardFlip", 289u).Play(false);
                     ClearDeckHighlight();
                     BSSimpleList<BlackJackMenu::BlackJackCard*>* pPl_3 = pDealerHand;
                     BlackJackMenu::BlackJackCard* cd_2 = nullptr;
@@ -1116,8 +1093,7 @@ void BlackJackMenu::DoIdle() {
                     msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
                 );
                 BSAudio* v53 = &BSAudio::QInstance();
-                BSSoundHandle* v68 = v53->GetSoundHandleByName(&v93, "UIPopUpMessageGeneral", 289u);
-                v68->Play(false);
+                v53->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
                 BlackJackMenu::SetShouldExit();
             }
             return;
@@ -1264,8 +1240,7 @@ void BlackJackMenu::DoIdle() {
                         BSsprintf(Src, 260, "%s %d %s%s", sYouLoseText.String(), -winnings, timee, fEaseOutTimee);
                     }
                     BSAudio* v52 = &BSAudio::QInstance();
-                    BSSoundHandle* v69 = v52->GetSoundHandleByName(&v94, "GAMEBlackJackLose", 289u);
-                    v69->Play(false);
+                    v52->GetSoundHandleByName("GAMEBlackJackLose", 289u).Play(false);
                     BlackJackMenu::pMe->pTiles[9]->Poke(4036, 1.0f);
                     BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, true);
                     BlackJackMenu::pMe->pTiles[9]->Set(4003, 1);
@@ -1283,8 +1258,7 @@ void BlackJackMenu::DoIdle() {
                     BSsprintf(Src, 260, "%s %d %s%s", sYouWinText.String(), winnings, timec, fEaseOutTimec);
                 }
                 BSAudio* v51 = &BSAudio::QInstance();
-                BSSoundHandle* v70 = v51->GetSoundHandleByName(&v95, "GAMEBlackJackWin", 289u);
-                v70->Play(false);
+                v51->GetSoundHandleByName("GAMEBlackJackWin", 289u).Play(false);
                 BlackJackMenu::pMe->pTiles[9]->Poke(4036, 1.0f);
                 BlackJackMenu::pMe->pTiles[9]->Set(4036, Src, true);
                 BlackJackMenu::pMe->pTiles[9]->Set(4003, 1);
@@ -2656,11 +2630,6 @@ Tile* BlackJackMenu::Create(
     int32_t aiMinWinnings,
     bool abDebugMode
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v31, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSimpleList<CasinoData*>* cl;
     Tile* pold_menu_tile = Menu::GetMenuByClass(1081);
     InterfaceManager* pin = InterfaceManager::Instance();
@@ -2707,8 +2676,7 @@ Tile* BlackJackMenu::Create(
             msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
         BSAudio* v6 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v6->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-        SoundHandleByName->Play(false);
+        v6->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
         return nullptr;
     }
 
@@ -2724,8 +2692,7 @@ Tile* BlackJackMenu::Create(
                     false
                 );
                 BSAudio* v12 = &BSAudio::QInstance();
-                BSSoundHandle* v26 = v12->GetSoundHandleByName(&apResult, "UIPopUpMessageGeneral", 289u);
-                v26->Play(false);
+                v12->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
                 return nullptr;
             }
 
@@ -2744,8 +2711,7 @@ Tile* BlackJackMenu::Create(
                         ptile->Set(4013, time, true);
                     }
                     BSAudio* v14 = &BSAudio::QInstance();
-                    BSSoundHandle* v25 = v14->GetSoundHandleByName(&v31, "GAMEBlackJackCardShuffle", 289u);
-                    v25->Play(false);
+                    v14->GetSoundHandleByName("GAMEBlackJackCardShuffle", 289u).Play(false);
                     BlackJackMenu::pMe->iLuckSkill = pPlayer->GetClampedActorValue(ActorValue::LUCK);
                     BlackJackMenu::pMe->iCurrentBet = g_blackJackMinChipsToPlay;
                     const char* v15 = sCurrentBetText.String();
@@ -2807,8 +2773,7 @@ Tile* BlackJackMenu::Create(
             apText, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
         BSAudio* v11 = &BSAudio::QInstance();
-        BSSoundHandle* v27 = v11->GetSoundHandleByName(&th_s, "UIPopUpMessageGeneral", 289u);
-        v27->Play(false);
+        v11->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
         return nullptr;
     }
 
@@ -2818,8 +2783,7 @@ Tile* BlackJackMenu::Create(
         apDest, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
     );
     BSAudio* v9 = &BSAudio::QInstance();
-    BSSoundHandle* v28 = v9->GetSoundHandleByName(&arHandle, "UIPopUpMessageGeneral", 289u);
-    v28->Play(false);
+    v9->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
     return nullptr;
 }
 

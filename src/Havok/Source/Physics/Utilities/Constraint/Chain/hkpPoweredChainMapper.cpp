@@ -275,15 +275,15 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                 for (int32_t j = 0; j < chainConstraints.m_size; ++j) {
                     const int32_t it = constraintToIndex.findKey(chainConstraints.m_data[j]);
                     if (!constraintToIndex.isValid(it)) {
-                        char buf[512];
-                        XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
-                        ::new (&stream) hkErrStream(buf, 512);
-                        stream << "Internal error.";
-                        hkError::s_instance->message(
-                            hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA99DDu), buf,
-                            ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 93
-                        );
-                        stream.~hkErrStream();
+                        {
+                            char buf[512];
+                            hkErrStream stream(buf, 512);
+                            stream << "Internal error.";
+                            hkError::s_instance->message(
+                                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA99DDu), buf,
+                                ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 93
+                            );
+                        }
                         pChain->removeReference();
                         failed = true;
                         break;
@@ -300,15 +300,15 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                     pTarget->m_linkIndex = linkIndex;
                     numTargets.m_data[linkIndex]++;
                     if (pChain->m_data->getType() != hkpConstraintData::CONSTRAINT_TYPE_POWERED_CHAIN) {
-                        char buf[512];
-                        XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
-                        ::new (&stream) hkErrStream(buf, 512);
-                        stream << "Internal error; invalid chain type.";
-                        hkError::s_instance->message(
-                            hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9D6Du), buf,
-                            ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 108
-                        );
-                        stream.~hkErrStream();
+                        {
+                            char buf[512];
+                            hkErrStream stream(buf, 512);
+                            stream << "Internal error; invalid chain type.";
+                            hkError::s_instance->message(
+                                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9D6Du), buf,
+                                ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 108
+                            );
+                        }
                         pChain->removeReference();
                         failed = true;
                         break;

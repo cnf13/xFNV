@@ -122,9 +122,6 @@ void SlotMachineMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 }
 
 void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a12, std::nullopt, std::nullopt);
     if (eSlotState == SlotMachineMenu::SL_IDLE) {
         switch (a1) {
             case 3: {
@@ -176,8 +173,7 @@ void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
                     char a22[264];
                     BSsprintf(a22, 260, "GAMESlotsIncreaseBet0%i", iNextSoundIndex);
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a12, a22, 289u);
-                    SoundHandleByName->Play(false);
+                    v4->GetSoundHandleByName(a22, 289u).Play(false);
                     if (iNextSoundIndex + 1 <= 3) {
                         v14 = iNextSoundIndex + 1;
                     }
@@ -246,8 +242,7 @@ void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
                 SlotMachineMenu::pMe->pTiles[0]->Set(SlotMachineMenu::iUT_X, this->iCurrentBet);
                 if (v21 != this->iCurrentBet) {
                     BSAudio* v5 = &BSAudio::QInstance();
-                    BSSoundHandle* v9 = v5->GetSoundHandleByName(&arHandle, "GAMESlotsDecreaseBet", 289u);
-                    v9->Play(false);
+                    v5->GetSoundHandleByName("GAMESlotsDecreaseBet", 289u).Play(false);
                     iNextSoundIndex = 1;
                 }
                 break;
@@ -268,8 +263,7 @@ void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
                     SlotMachineMenu::pMe->pTiles[0]->Set(SlotMachineMenu::iUT_X, this->iCurrentBet);
                     BSsprintf(apDest, 260, "GAMESlotsIncreaseBet0%i", iNextSoundIndex);
                     BSAudio* v6 = &BSAudio::QInstance();
-                    BSSoundHandle* v8 = v6->GetSoundHandleByName(&th_s, apDest, 289u);
-                    v8->Play(false);
+                    v6->GetSoundHandleByName(apDest, 289u).Play(false);
                     if (iNextSoundIndex + 1 <= 3) {
                         v7 = iNextSoundIndex + 1;
                     }
@@ -297,12 +291,6 @@ void SlotMachineMenu::DoClick(int32_t a1, Tile* a2) {
 }
 
 void SlotMachineMenu::DoIdle() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v50, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v51, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     int32_t v76 = 0;
     float v80 = 1.0f;
     Interface::enumMenus v1 = static_cast<Interface::enumMenus>(GetClass());
@@ -352,8 +340,7 @@ void SlotMachineMenu::DoIdle() {
                 v15->Update(UpdateData1);
                 if (SlotMachineMenu::fTimeDelta == 0.0 && pTiles[1]->GetFloat(SlotMachineMenu::iUT_X) > 0.0) {
                     BSAudio* v16 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByName = v16->GetSoundHandleByName(&a1, "GameSlotsPullLever", 289u);
-                    SoundHandleByName->Play(false);
+                    v16->GetSoundHandleByName("GameSlotsPullLever", 289u).Play(false);
                     bSwapTextures = true;
                 }
                 if (SlotMachineMenu::fTimeDelta == 0.0 || pTiles[1]->GetFloat(SlotMachineMenu::iUT_X) > 0.0) {
@@ -447,8 +434,7 @@ void SlotMachineMenu::DoIdle() {
                 char apDest[264];
                 if (bLucky) {
                     BSAudio* v27 = &BSAudio::QInstance();
-                    BSSoundHandle* v44 = v27->GetSoundHandleByName(&v51, "GAMESlotsLose", 289u);
-                    v44->Play(false);
+                    v27->GetSoundHandleByName("GAMESlotsLose", 289u).Play(false);
                     const char* fEaseOutTimed = sPlural.String();
                     const char* timed = sCasinoChipText.String();
                     BSsprintf(apDest, 260, "%s %d %s%s", sUnluckyLoseText.String(), -winnings, timed, fEaseOutTimed);
@@ -495,20 +481,17 @@ void SlotMachineMenu::DoIdle() {
                     switch (eSpinResult) {
                         case SlotMachineMenu::SL_WILD_SYM_: {
                             BSAudio* v21 = &BSAudio::QInstance();
-                            BSSoundHandle* v47 = v21->GetSoundHandleByName(&arHandle, "GAMESlotsWinSmall", 289u);
-                            v47->Play(false);
+                            v21->GetSoundHandleByName("GAMESlotsWinSmall", 289u).Play(false);
                             break;
                         }
                         case SlotMachineMenu::SL_WILD_PAIR: {
                             BSAudio* v22 = &BSAudio::QInstance();
-                            BSSoundHandle* v46 = v22->GetSoundHandleByName(&th_s, "GAMESlotsWinMed", 289u);
-                            v46->Play(false);
+                            v22->GetSoundHandleByName("GAMESlotsWinMed", 289u).Play(false);
                             break;
                         }
                         case SlotMachineMenu::SL_THREE_MATCH: {
                             BSAudio* v23 = &BSAudio::QInstance();
-                            BSSoundHandle* v45 = v23->GetSoundHandleByName(&apResult, "GAMESlotsWinJackpot", 289u);
-                            v45->Play(false);
+                            v23->GetSoundHandleByName("GAMESlotsWinJackpot", 289u).Play(false);
                             break;
                         }
                     }
@@ -605,8 +588,7 @@ void SlotMachineMenu::DoIdle() {
                     msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
                 );
                 BSAudio* v28 = &BSAudio::QInstance();
-                BSSoundHandle* v43 = v28->GetSoundHandleByName(&v50, "UIPopUpMessageGeneral", 289u);
-                v43->Play(false);
+                v28->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
                 SlotMachineMenu::Close();
             }
             break;
@@ -761,7 +743,6 @@ char SlotMachineMenu::IsWellFormedMenu() {
 }
 
 char SlotMachineMenu::SetupActiveReels() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     uint32_t v13[7];
     int32_t v12 = 0;
     for (int32_t i = 0; i < 28; ++i) {
@@ -810,8 +791,7 @@ char SlotMachineMenu::SetupActiveReels() {
                 msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
             );
             BSAudio* v1 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v1->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(false);
+            v1->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
             SlotMachineMenu::Close();
             return 0;
         }
@@ -1680,11 +1660,6 @@ Tile* SlotMachineMenu::Create(
     int32_t aiMinWinnings,
     bool abDebugMode
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v36, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSimpleList<CasinoData*>* cl;
     Tile* pold_menu_tile = Menu::GetMenuByClass(1080);
     InterfaceManager* pin = InterfaceManager::Instance();
@@ -1738,8 +1713,7 @@ Tile* SlotMachineMenu::Create(
             msg, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
         BSAudio* v7 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-        SoundHandleByName->Play(false);
+        v7->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
         return nullptr;
     }
 
@@ -1755,8 +1729,7 @@ Tile* SlotMachineMenu::Create(
                     false
                 );
                 BSAudio* v12 = &BSAudio::QInstance();
-                BSSoundHandle* v31 = v12->GetSoundHandleByName(&apResult, "UIPopUpMessageGeneral", 289u);
-                v31->Play(false);
+                v12->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
                 return nullptr;
             }
 
@@ -1777,8 +1750,7 @@ Tile* SlotMachineMenu::Create(
                         ptile->Set(4013, time, true);
                     }
                     BSAudio* v14 = &BSAudio::QInstance();
-                    BSSoundHandle* v30 = v14->GetSoundHandleByName(&v36, "GAMESlotsActivate", 289u);
-                    v30->Play(false);
+                    v14->GetSoundHandleByName("GAMESlotsActivate", 289u).Play(false);
                     SlotMachineMenu::pMe->iLuckSkill = pPlayer->GetClampedActorValue(ActorValue::LUCK);
                     SlotMachineMenu::pMe->iCurrentBet = g_slotMachineMinBet;
                     const char* v15 = sCurrentBetText.String();
@@ -1848,8 +1820,7 @@ Tile* SlotMachineMenu::Create(
             apText, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
         );
         BSAudio* v11 = &BSAudio::QInstance();
-        BSSoundHandle* v32 = v11->GetSoundHandleByName(&th_s, "UIPopUpMessageGeneral", 289u);
-        v32->Play(false);
+        v11->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
         return nullptr;
     }
 
@@ -1859,7 +1830,6 @@ Tile* SlotMachineMenu::Create(
         apDest, 0, "Interface\\Icons\\Message Icons\\glow_message_vaultboy_surprised.dds", nullptr, 2.0f, false
     );
     BSAudio* v9 = &BSAudio::QInstance();
-    BSSoundHandle* v33 = v9->GetSoundHandleByName(&arHandle, "UIPopUpMessageGeneral", 289u);
-    v33->Play(false);
+    v9->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
     return nullptr;
 }

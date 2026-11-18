@@ -108,9 +108,8 @@ MagicBoltProjectile::MagicBoltProjectile(
             Sound.Release();
         }
         if (spSoundNode) {
-            BSSoundHandle kSound;
-            Sound = *BSAudio::QInstance().GetSoundHandleByNumericID(
-                &kSound, uiSoundID, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
+            Sound = BSAudio::QInstance().GetSoundHandleByNumericID(
+                uiSoundID, BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT
             );
             NiPoint3 kPosition = *QLocationOnReference();
             Sound.SetPosition(kPosition.x, kPosition.y, kPosition.z);
@@ -276,7 +275,6 @@ void MagicBoltProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 }
 
 void MagicBoltProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     uint32_t itargetID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTarget));
     if (itargetID) {
@@ -301,8 +299,7 @@ void MagicBoltProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
         }
         if (Get3D()) {
             BSAudio* v4 = &BSAudio::QInstance();
-            BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, isoundFileID, 258u);
-            Sound.operator=(*arHandle);
+            Sound = v4->GetSoundHandleByNumericID(isoundFileID, 258u);
             NiPoint3 v11 = GetLocationOnReference();
             Sound.SetPosition(v11.x, v11.y, v11.z);
             Sound.SetObjectToFollow(spSoundNode.m_pObject);
@@ -744,7 +741,6 @@ void MagicBoltProjectile::Collide(
 ) {
     Actor* v23;
     NiPoint3 v25;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     CFilter filter;
     if (apCollidee && apCollidee->IsActor()) {
         v23 = static_cast<Actor*>(apCollidee);
@@ -822,7 +818,7 @@ void MagicBoltProjectile::Collide(
             TESSound* OpenSound = pAVEffect->data.pAreaSound;
             uint32_t isoundFileID = OpenSound->iFormID;
             BSAudio* v13 = &BSAudio::QInstance();
-            v13->GetSoundHandleByNumericID(&soundHand, isoundFileID, 258u);
+            BSSoundHandle soundHand = v13->GetSoundHandleByNumericID(isoundFileID, 258u);
             NiPoint3 v32 = GetLocationOnReference();
             soundHand.SetPosition(v32.x, v32.y, v32.z);
             soundHand.Play(false);

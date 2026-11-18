@@ -83,9 +83,8 @@ MagicBallProjectile::MagicBallProjectile(
         if (Sound.IsValid()) {
             Sound.Release();
         }
-        BSSoundHandle kSound;
-        Sound = *PlaySound(
-            &kSound, CastingType, true,
+        Sound = PlaySound(
+            CastingType, true,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
@@ -169,7 +168,6 @@ void MagicBallProjectile::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
 
 void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
     XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandleOut, std::nullopt, std::nullopt);
     float ffadeTimer;
     MagicProjectile::InitLoadGame(aiFlags, aiOldFlags);
     Init3D();
@@ -179,12 +177,11 @@ void MagicBallProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
         if (Sound.IsValid()) {
             Sound.Release();
         }
-        BSSoundHandle* arHandle = PlaySound(
-            &arHandleOut, isoundFileID, true,
+        Sound = PlaySound(
+            isoundFileID, true,
             BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
             true
         );
-        Sound.operator=(*arHandle);
     }
 
     if (Get3D()) {
@@ -554,7 +551,6 @@ void MagicBallProjectile::Collide(
     Actor* v20;
     XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
     CFilter filter;
     if (apCollidee && apCollidee->IsActor()) {
         v20 = static_cast<Actor*>(apCollidee);
@@ -642,7 +638,7 @@ void MagicBallProjectile::Collide(
             int32_t auiFormID = OpenSound->iFormID;
             uint32_t arPos_4 = auiFormID;
             BSAudio* v9 = &BSAudio::QInstance();
-            v9->GetSoundHandleByNumericID(&soundHand, arPos_4, 258u);
+            BSSoundHandle soundHand = v9->GetSoundHandleByNumericID(arPos_4, 258u);
             NiPoint3 v27 = GetLocationOnReference();
             soundHand.SetPosition(v27.x, v27.y, v27.z);
             soundHand.Play(false);

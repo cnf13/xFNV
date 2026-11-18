@@ -155,13 +155,11 @@ void SkySound::FlagToKill() {
 }
 
 void SkySound::Play(float afVol) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, tmpHandle, std::nullopt, std::nullopt);
     if (!Interface::IsInMenuMode() && !Interface::IsInGameLoadingMenuOpen()) {
         if (!SndHandle.IsValid()) {
             uint32_t v3 = SndHandle.iSoundID;
             BSAudio* v2 = &BSAudio::QInstance();
-            v2->GetSoundHandleByNumericID(&tmpHandle, v3, 32u);
-            SndHandle.operator=(tmpHandle);
+            SndHandle = v2->GetSoundHandleByNumericID(v3, 32u);
         }
         if (eSoundType == TESWeather::WST_THUNDER) {
             if (!SndHandle.IsPlaying()) {
@@ -1914,7 +1912,6 @@ void Sky::SetFastTravel(bool abOn) {
 
 void Sky::ActivateWeatherSounds(const TESWeather* apWeather) {
     XFNV_INLINED_LOCAL(BSSoundHandle, kHandleArg, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, kFoundHandle, std::nullopt, std::nullopt);
     if (!apWeather) {
         return;
     }
@@ -1930,9 +1927,7 @@ void Sky::ActivateWeatherSounds(const TESWeather* apWeather) {
             if (pSoundData->eType != TESWeather::WST_THUNDER) {
                 uisoundFlags |= BSGameSound::SOUND_FLAG_LOOP;
             }
-            BSSoundHandle* pFound =
-                BSAudio::QInstance().GetSoundHandleByNumericID(&kFoundHandle, pSoundData->uiSoundFormID, uisoundFlags);
-            soundHand.operator=(*pFound);
+            soundHand = BSAudio::QInstance().GetSoundHandleByNumericID(pSoundData->uiSoundFormID, uisoundFlags);
         }
         bool bdup = false;
         for (BSSimpleList<SkySound*>* plistNode = this->pSkySoundList; !bdup; plistNode = plistNode->m_pkNext) {

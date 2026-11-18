@@ -81,11 +81,6 @@ ImpactMixer::GunshotHandleArray ImpactMixer::GunshotHandles;
 ImpactMixer::COLLISION_SOUND::COLLISION_SOUND() {}
 
 void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v46, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v47, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     AutoMemContext kContext(
         MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 941
     );
@@ -130,12 +125,11 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (fListenerDistance <= static_cast<double>(100 * MaxDistance)) {
                     uint32_t pSoundName_8 = a5->iFormID;
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* pSound = v4->GetSoundHandleByNumericID(
-                        &a1, pSoundName_8,
+                    kSound = v4->GetSoundHandleByNumericID(
+                        pSoundName_8,
                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_FOOTSTEPS |
                             BSGameSound::SOUND_FLAG_ONE_SHOT
                     );
-                    kSound.operator=(*pSound);
                 }
             }
             kSound.SetPosition(kRefPos.x, kRefPos.y, kRefPos.z);
@@ -235,8 +229,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (a5) {
                     const char* pSoundName_4 = a5->GetFilename();
                     BSAudio* v10 = &BSAudio::QInstance();
-                    BSSoundHandle* arHandle = v10->GetSoundHandleByFilename(&out, pSoundName_4, eAudioFlags, a5);
-                    kSound.operator=(*arHandle);
+                    kSound = v10->GetSoundHandleByFilename(pSoundName_4, eAudioFlags, a5);
                     float* v11 = &gs_fPlayerFootVolume_Audio.Float();
                     kSound.SetVolume(*v11);
                     kSound.Play(false);
@@ -244,9 +237,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (pArmorSound) {
                     const char* pSoundName_4a = pArmorSound->GetFilename();
                     BSAudio* v12 = &BSAudio::QInstance();
-                    BSSoundHandle* pSoud =
-                        v12->GetSoundHandleByFilename(&apResult, pSoundName_4a, eAudioFlags, pArmorSound);
-                    th_s.operator=(*pSoud);
+                    th_s = v12->GetSoundHandleByFilename(pSoundName_4a, eAudioFlags, pArmorSound);
                     float* v13 = &gs_fPlayerFootVolume_Audio.Float();
                     th_s.SetVolume(*v13);
                     th_s.Play(false);
@@ -264,9 +255,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                     if (fListenerDistance <= static_cast<double>(100 * v14)) {
                         const char* pSoundName_4b = a5->GetFilename();
                         BSAudio* v15 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByFilename =
-                            v15->GetSoundHandleByFilename(&v47, pSoundName_4b, aeAudioFlags, a5);
-                        kSound.operator=(*SoundHandleByFilename);
+                        kSound = v15->GetSoundHandleByFilename(pSoundName_4b, aeAudioFlags, a5);
                         float v40 = kRefPos.z - 128.0;
                         kSound.SetPosition(kRefPos.x, kRefPos.y, v40);
                         if (apRef->Get3D()) {
@@ -283,9 +272,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                     if (fListenerDistance <= static_cast<double>(100 * v17)) {
                         const char* pSoundName_4c = pArmorSound->GetFilename();
                         BSAudio* v18 = &BSAudio::QInstance();
-                        BSSoundHandle* v39 =
-                            v18->GetSoundHandleByFilename(&v46, pSoundName_4c, aeAudioFlags, pArmorSound);
-                        th_s.operator=(*v39);
+                        th_s = v18->GetSoundHandleByFilename(pSoundName_4c, aeAudioFlags, pArmorSound);
                         float v38 = kRefPos.z - 128.0;
                         th_s.SetPosition(kRefPos.x, kRefPos.y, v38);
                         if (apRef->Get3D()) {
@@ -308,8 +295,6 @@ void ImpactMixer::PlayGunshot(
     NiAVObject* aOriginNode,
     bool abPlayer
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     NiPoint3 v27;
     if (ImpactMixer::GetGunshotsInitialized()) {
         BSSoundHandle handl;
@@ -469,8 +454,7 @@ void ImpactMixer::PlayGunshot(
                         pcurrImpactHandle->soundNear.Stop();
                         const char* arPos = psound->GetFilename();
                         BSAudio* v6 = &BSAudio::QInstance();
-                        BSSoundHandle* arHandle = v6->GetSoundHandleByFilename(&out, arPos, iflags, psound);
-                        pcurrImpactHandle->soundNear.operator=(*arHandle);
+                        pcurrImpactHandle->soundNear = v6->GetSoundHandleByFilename(arPos, iflags, psound);
                         ucMinN = psound->GetMinDistance();
                         ucMaxN = psound->GetMaxDistance();
                     }
@@ -479,9 +463,7 @@ void ImpactMixer::PlayGunshot(
                         pcurrImpactHandle->soundFar.Stop();
                         const char* arPosa = psound2->GetFilename();
                         BSAudio* v7 = &BSAudio::QInstance();
-                        BSSoundHandle* SoundHandleByFilename =
-                            v7->GetSoundHandleByFilename(&apResult, arPosa, iflags, psound2);
-                        pcurrImpactHandle->soundFar.operator=(*SoundHandleByFilename);
+                        pcurrImpactHandle->soundFar = v7->GetSoundHandleByFilename(arPosa, iflags, psound2);
                         ucMinF = psound2->GetMinDistance();
                         ucMaxF = psound2->GetMaxDistance();
                     }
@@ -606,8 +588,6 @@ void ImpactMixer::PlayHitSound(
 }
 
 void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     CFilter v19;
     CFilter apResult;
     uint32_t val;
@@ -702,8 +682,7 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
                          BSGameSound::SOUND_FLAG_IMPACT);
                     uint32_t arPos_4 = info->iFormID;
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(&a1, arPos_4, arPos_8);
-                    SoundHand.operator=(*arHandle);
+                    SoundHand = v4->GetSoundHandleByNumericID(arPos_4, arPos_8);
                 }
 
                 if ((info2) &&
@@ -713,9 +692,7 @@ void ImpactMixer::PlayCollisionSound(ImpactMixer::COLLISION_SOUND& arDataIn) {
                          BSGameSound::SOUND_FLAG_IMPACT);
                     uint32_t arPos_4a = info2->iFormID;
                     BSAudio* v5 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByNumericID =
-                        v5->GetSoundHandleByNumericID(&apHandle, arPos_4a, arPos_8a);
-                    SoundHand2.operator=(*SoundHandleByNumericID);
+                    SoundHand2 = v5->GetSoundHandleByNumericID(arPos_4a, arPos_8a);
                 }
 
                 if (!(arDataIn.fVelocity / 400.0 > 1.0)) {
@@ -794,11 +771,6 @@ void ImpactMixer::SetAltMaterialSoundName(int32_t aiMat, const char* apAltName) 
 }
 
 void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v48, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v49, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 735
     );
@@ -843,12 +815,11 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (fdistance <= static_cast<double>(100 * MaxDistance)) {
                     uint32_t aPosition_8 = infoGround->iFormID;
                     BSAudio* v4 = &BSAudio::QInstance();
-                    BSSoundHandle* arHandle = v4->GetSoundHandleByNumericID(
-                        &a1, aPosition_8,
+                    SoundHand = v4->GetSoundHandleByNumericID(
+                        aPosition_8,
                         BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_FOOTSTEPS |
                             BSGameSound::SOUND_FLAG_ONE_SHOT
                     );
-                    SoundHand.operator=(*arHandle);
                 }
             }
             SoundHand.SetPosition(loc.x, loc.y, loc.z);
@@ -979,9 +950,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (infoGround) {
                     const char* aPosition_4 = infoGround->GetFilename();
                     BSAudio* v10 = &BSAudio::QInstance();
-                    BSSoundHandle* SoundHandleByFilename =
-                        v10->GetSoundHandleByFilename(&out, aPosition_4, iflags, infoGround);
-                    SoundHand.operator=(*SoundHandleByFilename);
+                    SoundHand = v10->GetSoundHandleByFilename(aPosition_4, iflags, infoGround);
                     float* v11 = &gs_fPlayerFootVolume_Audio.Float();
                     SoundHand.SetVolume(*v11);
                     SoundHand.Play(false);
@@ -989,8 +958,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (infoShoe_3) {
                     const char* aPosition_4a = infoShoe_3->GetFilename();
                     BSAudio* v12 = &BSAudio::QInstance();
-                    BSSoundHandle* v42 = v12->GetSoundHandleByFilename(&apResult, aPosition_4a, iflags, infoShoe_3);
-                    SoundHand2.operator=(*v42);
+                    SoundHand2 = v12->GetSoundHandleByFilename(aPosition_4a, iflags, infoShoe_3);
                     float* v13 = &gs_fPlayerFootVolume_Audio.Float();
                     SoundHand2.SetVolume(*v13);
                     SoundHand2.Play(false);
@@ -1004,8 +972,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                     if (fdistance <= static_cast<double>(100 * v14)) {
                         const char* aPosition_4b = infoGround->GetFilename();
                         BSAudio* v15 = &BSAudio::QInstance();
-                        BSSoundHandle* v41 = v15->GetSoundHandleByFilename(&v49, aPosition_4b, iflags_2, infoGround);
-                        SoundHand.operator=(*v41);
+                        SoundHand = v15->GetSoundHandleByFilename(aPosition_4b, iflags_2, infoGround);
                         float v40 = loc.z - 128.0;
                         SoundHand.SetPosition(loc.x, loc.y, v40);
                         if (apRef->Get3D()) {
@@ -1022,8 +989,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                     if (fdistance <= static_cast<double>(100 * v17)) {
                         const char* aPosition_4c = infoShoe_3->GetFilename();
                         BSAudio* v18 = &BSAudio::QInstance();
-                        BSSoundHandle* v39 = v18->GetSoundHandleByFilename(&v48, aPosition_4c, iflags_2, infoShoe_3);
-                        SoundHand2.operator=(*v39);
+                        SoundHand2 = v18->GetSoundHandleByFilename(aPosition_4c, iflags_2, infoShoe_3);
                         float v38 = loc.z - 128.0;
                         SoundHand2.SetPosition(loc.x, loc.y, v38);
                         if (apRef->Get3D()) {
@@ -1047,17 +1013,13 @@ void ImpactMixer::PlayWeaponBlock(
     NiPoint3 aDefender,
     bool bEnchantedWeapon
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     BSSoundHandle SoundHand;
     if (apDefWeapon && apDefWeapon->GetBlockSound()) {
         TESSound* arPos_8 = apDefWeapon->GetBlockSound();
         TESSound* BlockSound = apDefWeapon->GetBlockSound();
         const char* arPos = BlockSound->GetFilename();
         BSAudio* v6 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByFilename = v6->GetSoundHandleByFilename(&out, arPos, 386u, arPos_8);
-        SoundHand.operator=(*SoundHandleByFilename);
+        SoundHand = v6->GetSoundHandleByFilename(arPos, 386u, arPos_8);
     }
     else {
         int32_t idefWeaponType;
@@ -1069,13 +1031,11 @@ void ImpactMixer::PlayWeaponBlock(
         }
         if (idefWeaponType == -1) {
             BSAudio* v7 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v7->GetSoundHandleByName(&a1, "WPNBlockHand", 386u);
-            SoundHand.operator=(*SoundHandleByName);
+            SoundHand = v7->GetSoundHandleByName("WPNBlockHand", 386u);
         }
         else {
             BSAudio* v8 = &BSAudio::QInstance();
-            BSSoundHandle* v17 = v8->GetSoundHandleByName(&arHandle, "WPNBlockMelee", 386u);
-            SoundHand.operator=(*v17);
+            SoundHand = v8->GetSoundHandleByName("WPNBlockMelee", 386u);
         }
     }
     double v16 = BSMIN(aAttacker.x, aDefender.x);
@@ -1460,8 +1420,6 @@ int32_t ImpactMixer::GetFootstepIndexForType(HavokMaterialType aiType) {
 }
 
 void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, out, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_AUDIO, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Audio\\ImpactMixer.cpp", 1699
     );
@@ -1504,23 +1462,21 @@ void ImpactMixer::PlayEquipSound(TESObjectREFR* apRef, int32_t aiType) {
             if (pactor == pPlayer) {
                 const char* a2 = pactionSound->GetFilename();
                 BSAudio* v2 = &BSAudio::QInstance();
-                BSSoundHandle* arHandle = v2->GetSoundHandleByFilename(
-                    &out, a2,
+                SoundHand = v2->GetSoundHandleByFilename(
+                    a2,
                     BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT |
                         BSGameSound::SOUND_FLAG_UNKBIT31,
                     pactionSound
                 );
-                SoundHand.operator=(*arHandle);
             }
             else {
                 const char* a2a = pactionSound->GetFilename();
                 BSAudio* v3 = &BSAudio::QInstance();
-                BSSoundHandle* SoundHandleByFilename = v3->GetSoundHandleByFilename(
-                    &apResult, a2a,
+                SoundHand = v3->GetSoundHandleByFilename(
+                    a2a,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT | BSGameSound::SOUND_FLAG_IMPACT,
                     pactionSound
                 );
-                SoundHand.operator=(*SoundHandleByFilename);
                 SoundHand.SetPosition(loc.x, loc.y, loc.z);
                 NiNode* v4 = apRef->Get3D();
                 SoundHand.SetObjectToFollow(v4);

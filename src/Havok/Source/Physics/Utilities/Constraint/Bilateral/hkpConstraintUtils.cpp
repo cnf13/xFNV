@@ -159,22 +159,25 @@ hkpConstraintInstance* hkpConstraintUtils::convertToPowered(
             break;
         }
         default: {
-            XFNV_INLINED_LOCAL(hkErrStream, stream, std::nullopt, std::nullopt);
-            char buf[512];
-            ::new (&stream) hkErrStream(buf, 512);
-            stream << "Cannot convert constraint \"" << originalConstraint->getName() << "\" to a powered constraint.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
-                ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 111
-            );
-            stream.~hkErrStream();
-            ::new (&stream) hkErrStream(buf, 512);
-            stream << "Only limited hinges and ragdoll constraints can be powered.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
-                ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 112
-            );
-            stream.~hkErrStream();
+            {
+                char buf[512];
+                hkErrStream stream(buf, 512);
+                stream << "Cannot convert constraint \"" << originalConstraint->getName()
+                       << "\" to a powered constraint.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
+                    ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 111
+                );
+            }
+            {
+                char buf[512];
+                hkErrStream stream(buf, 512);
+                stream << "Only limited hinges and ragdoll constraints can be powered.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
+                    ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 112
+                );
+            }
             return nullptr;
         }
     }

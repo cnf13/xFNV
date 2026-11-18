@@ -2280,16 +2280,11 @@ void InterfaceManager::Idle() {
                 this->bMouseOverRenderedMenu = bOver;
                 if (this->iPipboyMenuToSet > 0) {
                     BSSoundHandle kSound;
-                    // Raw stack storage GetSoundHandleByName builds its result in; no C++ constructor runs.
-                    alignas(BSSoundHandle) uint8_t aucLookup[sizeof(BSSoundHandle)];
-                    BSSoundHandle* pLookup = static_cast<BSSoundHandle*>(static_cast<void*>(aucLookup));
-                    BSSoundHandle* pResult = BSAudio::QInstance().GetSoundHandleByName(
-                        pLookup, "UIMenuMode",
+                    kSound = BSAudio::QInstance().GetSoundHandleByName(
+                        "UIMenuMode",
                         BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                             BSGameSound::SOUND_FLAG_ONE_SHOT
                     );
-                    kSound = *pResult;
-                    pLookup->~BSSoundHandle();
                     switch (this->iPipboyMenuToSet) {
                         case 1:
                             kSound.Play(false);
@@ -2876,16 +2871,13 @@ void InterfaceManager::UpdatePipboy() {
                     pPlayer->ForceTemp1stPerson(false);
                     pAnimation->PlayGroup(ANIM_GROUP_PIPBOY, ACTION_START, -1, AGS_NONE);
                     Interface::GetPipboy()->FadeLightEffect(true);
-                    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
                     BSAudio::QInstance()
                         .GetSoundHandleByName(
-                            &kHandle, "UIPipBoyAccessUp",
+                            "UIPipBoyAccessUp",
                             BSGameSound::SOUND_FLAG_IS_2D | BSGameSound::SOUND_FLAG_SYSTEM_SOUND |
                                 BSGameSound::SOUND_FLAG_ONE_SHOT
                         )
-                        ->Play(false);
-                    // The handle is destroyed right after Play, as the game does.
-                    kHandle.~BSSoundHandle();
+                        .Play(false);
                     ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier::GetGetHit());
                     ++InterfaceManager::Instance()->iSoundPauses;
                     BSAudio::QInstance().PauseAnimationSounds();
@@ -4847,66 +4839,49 @@ int32_t InterfaceManager::GetMenuHeight() {
 }
 
 void InterfaceManager::PlayMenuSound(MENU_SOUNDS aeMenuSound) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v17, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v18, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v19, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v20, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v21, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     BSSoundHandle psoundHand;
     switch (aeMenuSound) {
         case 1: {
             BSAudio* v5 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v5->GetSoundHandleByName(&v20, "UIMenuOK", 289u);
-            psoundHand.operator=(*SoundHandleByName);
+            psoundHand = v5->GetSoundHandleByName("UIMenuOK", 289u);
             goto LABEL_11;
         }
         case 2:
         case 20: {
             BSAudio* v7 = &BSAudio::QInstance();
-            BSSoundHandle* v10 = v7->GetSoundHandleByName(&v18, "UIMenuCancel", 289u);
-            psoundHand.operator=(*v10);
+            psoundHand = v7->GetSoundHandleByName("UIMenuCancel", 289u);
             goto LABEL_11;
         }
         case 3: {
             BSAudio* v4 = &BSAudio::QInstance();
-            BSSoundHandle* v13 = v4->GetSoundHandleByName(&v21, "UIMenuPrevNext", 289u);
-            psoundHand.operator=(*v13);
+            psoundHand = v4->GetSoundHandleByName("UIMenuPrevNext", 289u);
             goto LABEL_11;
         }
         case 4: {
             BSAudio* v2 = &BSAudio::QInstance();
-            BSSoundHandle* v15 = v2->GetSoundHandleByName(&arHandle, "UIMenuFocus", 289u);
-            psoundHand.operator=(*v15);
+            psoundHand = v2->GetSoundHandleByName("UIMenuFocus", 289u);
             goto LABEL_11;
         }
         case 8: {
             BSAudio* v6 = &BSAudio::QInstance();
-            BSSoundHandle* v11 = v6->GetSoundHandleByName(&v19, "UIPopUpQuestNew", 289u);
-            psoundHand.operator=(*v11);
+            psoundHand = v6->GetSoundHandleByName("UIPopUpQuestNew", 289u);
             goto LABEL_11;
         }
         case 10:
         case 19: {
             BSAudio* v3 = &BSAudio::QInstance();
-            BSSoundHandle* v14 = v3->GetSoundHandleByName(&apResult, "UIPopUpMessageGeneral", 289u);
-            psoundHand.operator=(*v14);
+            psoundHand = v3->GetSoundHandleByName("UIPopUpMessageGeneral", 289u);
             goto LABEL_11;
         }
         case 21: {
             BSAudio* v8 = &BSAudio::QInstance();
-            BSSoundHandle* v9 = v8->GetSoundHandleByName(&v17, "UILevelUp", 289u);
-            psoundHand.operator=(*v9);
+            psoundHand = v8->GetSoundHandleByName("UILevelUp", 289u);
             goto LABEL_11;
         }
         case 36: {
             BSAudio* v1;
-            BSSoundHandle* v16;
             v1 = &BSAudio::QInstance();
-            v16 = v1->GetSoundHandleByName(&a1, "UIMenuMode", 289u);
-            psoundHand.operator=(*v16);
+            psoundHand = v1->GetSoundHandleByName("UIMenuMode", 289u);
         LABEL_11:;
             psoundHand.Play(false);
             break;

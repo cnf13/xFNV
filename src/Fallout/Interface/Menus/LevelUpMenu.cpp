@@ -208,11 +208,9 @@ void LevelUpMenu::DoEnter(int32_t a1, Tile* a2) {
 }
 
 void LevelUpMenu::DoIdle() {
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     if (xFadeState == 4 && !pVATS.IsInVats() && !StartMenu::PauseMenuIsActive()) {
         BSAudio* v1 = &BSAudio::QInstance();
-        BSSoundHandle* SoundHandleByName = v1->GetSoundHandleByName(&a1, "MUSSuccess", 2305u);
-        SoundHandleByName->Play(false);
+        v1->GetSoundHandleByName("MUSSuccess", 2305u).Play(false);
         PrepForVisibility(false);
     }
 }

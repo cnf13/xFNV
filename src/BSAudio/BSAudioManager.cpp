@@ -224,11 +224,9 @@ void BSAudioManager::StopAudioThread() {
     }
 }
 
-BSSoundHandle*
-BSAudioManager::GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiFormID, uint32_t aiTypeFlags) {
+BSSoundHandle BSAudioManager::GetSoundHandleByNumericID(uint32_t auiFormID, uint32_t aiTypeFlags) {
     char apFilename[268];
     void* pSettingsContext;
-    XFNV_INLINED_LOCAL(BSSoundHandle, returnHandle, std::nullopt, std::nullopt);
     uint32_t isoundTypeFlags;
     bool (*pfncallback)(uint32_t, char*, uint32_t*, void**);
     isoundTypeFlags = 0;
@@ -262,40 +260,20 @@ BSAudioManager::GetSoundHandleByNumericID(BSSoundHandle* apHandle, uint32_t auiF
                     BSGameSound::SOUND_FLAG_ENVELOPE_SLOW;
             }
         }
-        GetSoundHandleByFilePath(&returnHandle, apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
-        // EXE-INLINED 0x418900
-        apHandle->iSoundID = returnHandle.iSoundID;
-        apHandle->bAssumeSuccess = returnHandle.bAssumeSuccess;
-        apHandle->eState = returnHandle.eState;
-        return apHandle;
+        return GetSoundHandleByFilePath(apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
     }
-
-    apHandle->iSoundID = -1;
-    apHandle->bAssumeSuccess = false;
-    apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-    return apHandle;
+    return BSSoundHandle();
 }
 
-BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
-    BSSoundHandle* apResult,
-    const char* apFilename,
-    uint32_t aeTypeFlags,
-    TESSound* apSound
-) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+BSSoundHandle
+BSAudioManager::GetSoundHandleByFilePath(const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound) {
     if (!BSAudio::pAudioInstance->bAudioEnabled) {
-        apResult->iSoundID = -1;
-        apResult->bAssumeSuccess = false;
-        apResult->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-        return apResult;
+        return BSSoundHandle();
     }
     int32_t uiSoundID = this->uiSoundCacheIndex++;
     if (!*apFilename) {
         Warning("Trying to create a sound with no filename\n");
-        apResult->iSoundID = -1;
-        apResult->bAssumeSuccess = false;
-        apResult->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-        return apResult;
+        return BSSoundHandle();
     }
     if ((aeTypeFlags & BSGameSound::SOUND_FLAG_IS_2D) == 0 && (aeTypeFlags & BSGameSound::SOUND_FLAG_IS_3D) == 0) {
         Warning("Audio: Attempting to init %s without defining it as a 2D or 3D sound.", apFilename);
@@ -313,9 +291,7 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
         BSAudioListener* pListener = BSAudio::pAudioInstance->pListener;
         pGameSound->SetEnvironmentType(pListener->GetEnvironmentType());
     }
-    kHandle.iSoundID = uiSoundID;
-    kHandle.bAssumeSuccess = false;
-    kHandle.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
+    BSSoundHandle kHandle(uiSoundID);
     EnterCriticalSection(&this->StateCritSection);
     BSSoundInfo* pInfo;
     BSSoundInfo* pNewInfo = static_cast<BSSoundInfo*>(MemoryManager_Singleton.Allocate(sizeof(BSSoundInfo)));
@@ -373,26 +349,12 @@ BSSoundHandle* BSAudioManager::GetSoundHandleByFilePath(
         pGameSound->iLoopStart = uiLoopStart;
         pGameSound->iLoopEnd = uiLoopEnd;
     }
-    // EXE-INLINED 0x418900
-    apResult->iSoundID = kHandle.iSoundID;
-    apResult->bAssumeSuccess = kHandle.bAssumeSuccess;
-    apResult->eState = kHandle.eState;
-    return apResult;
+    return kHandle;
 }
 
-BSSoundHandle* BSAudioManager::SpawnSoundReference(
-    BSSoundHandle* apResult,
-    int32_t a2,
-    int32_t a3,
-    int32_t a4,
-    int32_t a5,
-    int32_t a6,
-    int32_t a7
-) {
-    apResult->iSoundID = -1;
-    apResult->bAssumeSuccess = false;
-    apResult->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-    return apResult;
+BSSoundHandle
+BSAudioManager::SpawnSoundReference(int32_t a2, int32_t a3, int32_t a4, int32_t a5, int32_t a6, int32_t a7) {
+    return BSSoundHandle();
 }
 
 void BSAudioManager::PrecacheSoundFromID(uint32_t auiFormID, int32_t aiFlags) {
@@ -495,11 +457,9 @@ void BSAudioManager::StartAudioThread() {
     }
 }
 
-BSSoundHandle*
-BSAudioManager::GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEditorID, uint32_t aiTypeFlags) {
+BSSoundHandle BSAudioManager::GetSoundHandleByName(const char* apEditorID, uint32_t aiTypeFlags) {
     char apFilename[268];
     void* pSettingsContext;
-    XFNV_INLINED_LOCAL(BSSoundHandle, returnHandle, std::nullopt, std::nullopt);
     uint32_t isoundTypeFlags;
     bool (*pfncallback)(const char*, char*, uint32_t*, void**);
     isoundTypeFlags = 0;
@@ -528,24 +488,10 @@ BSAudioManager::GetSoundHandleByName(BSSoundHandle* apHandle, const char* apEdit
             }
         }
         if (apFilename[0]) {
-            GetSoundHandleByFilePath(&returnHandle, apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
-            // The handle is copied field by field here, not through BSSoundHandle::operator=.
-            apHandle->iSoundID = returnHandle.iSoundID;
-            apHandle->bAssumeSuccess = returnHandle.bAssumeSuccess;
-            apHandle->eState = returnHandle.eState;
+            return GetSoundHandleByFilePath(apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
         }
-        else {
-            apHandle->iSoundID = -1;
-            apHandle->bAssumeSuccess = false;
-            apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-        }
-        return apHandle;
     }
-
-    apHandle->iSoundID = -1;
-    apHandle->bAssumeSuccess = false;
-    apHandle->eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
-    return apHandle;
+    return BSSoundHandle();
 }
 
 void BSAudioManager::Precache(const char* apToCache, uint32_t aiFlags) {

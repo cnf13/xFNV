@@ -183,9 +183,6 @@ void MessageMenu::LoadNextMessage() {
     NiPoint3 v67;
     std::basic_string<char, std::char_traits<char>, std::allocator<char>> _Result;
     NiPoint3 v69;
-    XFNV_INLINED_LOCAL(BSSoundHandle, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, th_s, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, arHandle, std::nullopt, std::nullopt);
     std::basic_string<char, std::char_traits<char>, std::allocator<char>> apMemory;
     NiPoint3 textDims;
     char v66 = 0;
@@ -201,9 +198,9 @@ void MessageMenu::LoadNextMessage() {
         if (pcurrMessage->strAudioOverride.GetLength()) {
             char* v26 = pcurrMessage->strAudioOverride.pString;
             BSAudio* v2 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v2->GetSoundHandleByName(&arHandle, v26, 289u);
+            BSSoundHandle arHandle = v2->GetSoundHandleByName(v26, 289u);
             v66 = 1;
-            if (SoundHandleByName->operator!=(0xFFFFFFFFu)) {
+            if (arHandle != 0xFFFFFFFFu) {
                 v63 = true;
             }
         }
@@ -211,13 +208,11 @@ void MessageMenu::LoadNextMessage() {
         if (v63) {
             char* v27 = pcurrMessage->strAudioOverride.pString;
             BSAudio* v3 = &BSAudio::QInstance();
-            BSSoundHandle* v62 = v3->GetSoundHandleByName(&th_s, v27, 289u);
-            v62->Play(false);
+            v3->GetSoundHandleByName(v27, 289u).Play(false);
         }
         else {
             BSAudio* v4 = &BSAudio::QInstance();
-            BSSoundHandle* v61 = v4->GetSoundHandleByName(&apResult, "UIPopUpMessageWindow", 289u);
-            v61->Play(false);
+            v4->GetSoundHandleByName("UIPopUpMessageWindow", 289u).Play(false);
         }
         char* a1 = pcurrMessage->strMessageText.pString;
         MessageMenu::pMe->pTiles[3]->Set(4036, a1, true);

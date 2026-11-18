@@ -631,7 +631,6 @@ void BoundItemEffect::Start() {
 
 void BoundItemEffect::Finish() {
     Actor* pactor;
-    XFNV_INLINED_LOCAL(BSSoundHandle, dst, std::nullopt, std::nullopt);
     if (pTarget) {
         pactor = pTarget->GetTargetAsActor();
     }
@@ -781,7 +780,7 @@ void BoundItemEffect::Finish() {
                     }
                 }
                 pactor->PlaySoundByEditorName(
-                    &dst, "ITMBoundDisappear", false,
+                    "ITMBoundDisappear", false,
                     BSGameSound::SOUND_FLAG_IS_3D | BSGameSound::SOUND_FLAG_ONE_SHOT |
                         BSGameSound::SOUND_FLAG_ANIMATION_DRIVEN,
                     true

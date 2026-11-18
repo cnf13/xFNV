@@ -242,7 +242,6 @@ int32_t SleepWaitMenu::GetClassStatic() {
 
 Tile* SleepWaitMenu::Create(bool abSleep) {
     int32_t v2;
-    XFNV_INLINED_LOCAL(BSSoundHandle, a1, std::nullopt, std::nullopt);
     InterfaceManager* pin = InterfaceManager::Instance();
     int32_t ClassStatic = SleepWaitMenu::GetClassStatic();
     Tile* pold_menu_tile = Menu::GetMenuByClass(ClassStatic);
@@ -258,8 +257,7 @@ Tile* SleepWaitMenu::Create(bool abSleep) {
             char Dst[264];
             char Src[264];
             BSAudio* v4 = &BSAudio::QInstance();
-            BSSoundHandle* SoundHandleByName = v4->GetSoundHandleByName(&a1, "UIPopUpMessageGeneral", 289u);
-            SoundHandleByName->Play(false);
+            v4->GetSoundHandleByName("UIPopUpMessageGeneral", 289u).Play(false);
             if (ptile->GetFloat(4007) == 6006.0 || ptile->GetFloat(4007) == 102.0) {
                 float afValue = Tile::GetMaximumDepth();
                 ptile->Set(4013, afValue, true);
