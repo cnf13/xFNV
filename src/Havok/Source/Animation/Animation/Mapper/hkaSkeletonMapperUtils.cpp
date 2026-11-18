@@ -188,7 +188,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA39C3u), buf,
                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 846
             );
-            XFNV_DESTRUCT(hkOstream)(&kErrStream);
+            kErrStream.~hkErrStream();
         }
         __m128 lengthSqA = _mm_mul_ps(a.m_translation.m_quad, a.m_translation.m_quad);
         const float fLengthA = _mm_cvtss_f32(_mm_sqrt_ss(_mm_add_ss(
@@ -212,7 +212,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA2B94u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 860
                 );
-                XFNV_DESTRUCT(hkOstream)(&kErrStream);
+                kErrStream.~hkErrStream();
             }
             fScale = defaultScale;
         }
@@ -235,7 +235,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAEF91u), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             876
         );
-        XFNV_DESTRUCT(hkOstream)(&kErrStream);
+        kErrStream.~hkErrStream();
     }
     hkBool bOk;
     if (!mapOut.isOk(&bOk)->m_bool) {
@@ -245,7 +245,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA10FCu), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             881
         );
-        XFNV_DESTRUCT(hkOstream)(&kErrStream);
+        kErrStream.~hkErrStream();
     }
 }
 
@@ -459,7 +459,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C64u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 127
                 );
-                XFNV_DESTRUCT(hkOstream)(&kStream);
+                kStream.~hkErrStream();
                 continue;
             }
             hkaSkeletonMapperData::SimpleMapping kMapping;
@@ -507,7 +507,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C64u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 158
                 );
-                XFNV_DESTRUCT(hkOstream)(&kStream);
+                kStream.~hkErrStream();
                 continue;
             }
             hkaSkeletonMapperData::SimpleMapping kMapping;
@@ -560,7 +560,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAA938u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 325
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                     continue;
                 }
                 if (startB < 0 || endB < 0) {
@@ -571,7 +571,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAA938u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 331
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                     continue;
                 }
                 XFNV_INLINED_LOCAL(hkArray<int16_t>, chainA, std::nullopt, std::nullopt);
@@ -593,7 +593,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C63u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 343
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
                 else if (!foundB.m_bool) {
                     ::new (&kStream) hkErrStream(buf, 512);
@@ -602,7 +602,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C63u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 349
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
                 else if (chainA.m_size < 2) {
                     ::new (&kStream) hkErrStream(buf, 512);
@@ -611,7 +611,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D64u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 359
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
                 else if (chainB.m_size < 2) {
                     ::new (&kStream) hkErrStream(buf, 512);
@@ -620,7 +620,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D64u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 366
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
                 else {
                     for (int32_t i = 0; i < chainA.m_size; ++i) {
@@ -632,7 +632,7 @@ void hkaSkeletonMapperUtils::createMapping(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D65u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 376
                             );
-                            XFNV_DESTRUCT(hkOstream)(&kStream);
+                            kStream.~hkErrStream();
                         }
                     }
                     for (int32_t i = 0; i < chainB.m_size; ++i) {
@@ -644,7 +644,7 @@ void hkaSkeletonMapperUtils::createMapping(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1D66u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 385
                             );
-                            XFNV_DESTRUCT(hkOstream)(&kStream);
+                            kStream.~hkErrStream();
                         }
                     }
                     ::new (&kStream) hkErrStream(buf, 512);
@@ -653,7 +653,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     hkError::s_instance->message(
                         hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 397
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                     hkaSkeletonMapperData::ChainMapping kChainAToB;
                     kChainAToB.~ChainMapping();
                     ::new (&kChainAToB) hkaSkeletonMapperData::ChainMapping;
@@ -725,7 +725,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, 0x38521C64, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 185
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                     continue;
                 }
                 if (endA < 0 && endB < 0) {
@@ -735,7 +735,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, 0x38521C64, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 191
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                     continue;
                 }
                 if (startA < 0) {
@@ -769,7 +769,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C63u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 210
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
                 else if (chainA.m_size < 2 || chainB.m_size < 2) {
                     ::new (&kStream) hkErrStream(buf, 512);
@@ -778,7 +778,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C64u), buf,
                         ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 220
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
                 else {
                     for (int32_t i = 1; i < chainA.m_size - 1; ++i) {
@@ -789,7 +789,7 @@ void hkaSkeletonMapperUtils::createMapping(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C65u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 230
                             );
-                            XFNV_DESTRUCT(hkOstream)(&kStream);
+                            kStream.~hkErrStream();
                         }
                     }
                     for (int32_t i = 1; i < chainB.m_size - 1; ++i) {
@@ -800,7 +800,7 @@ void hkaSkeletonMapperUtils::createMapping(
                                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1C66u), buf,
                                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 239
                             );
-                            XFNV_DESTRUCT(hkOstream)(&kStream);
+                            kStream.~hkErrStream();
                         }
                     }
                     ::new (&kStream) hkErrStream(buf, 512);
@@ -809,7 +809,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     hkError::s_instance->message(
                         hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 249
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                     hkaSkeletonMapperData::ChainMapping kChainMapping;
                     kChainMapping.m_startBoneA = startA;
                     kChainMapping.m_endBoneA = endA;
@@ -1002,7 +1002,7 @@ void hkaSkeletonMapperUtils::createMapping(
                 hkError::s_instance->message(
                     hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 561
                 );
-                XFNV_DESTRUCT(hkOstream)(&kStream);
+                kStream.~hkErrStream();
             }
             pairs.clearAndDeallocate();
         }
@@ -1059,7 +1059,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         hkError::s_instance->message(
                             hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 637
                         );
-                        XFNV_DESTRUCT(hkOstream)(&kStream);
+                        kStream.~hkErrStream();
                         hkaSkeletonMapperData::ChainMapping kChainMapping;
                         kChainMapping.~ChainMapping();
                         ::new (&kChainMapping) hkaSkeletonMapperData::ChainMapping;
@@ -1308,7 +1308,7 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba782a), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 767
                 );
-                XFNV_DESTRUCT(hkOstream)(&kStream);
+                kStream.~hkErrStream();
                 return HK_FAILURE;
             }
             rootA = rSimple.m_boneA;
@@ -1322,7 +1322,7 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba782a), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             776
         );
-        XFNV_DESTRUCT(hkOstream)(&kStream);
+        kStream.~hkErrStream();
         return HK_FAILURE;
     }
 
@@ -1331,7 +1331,7 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
     kStream << "Locking translations in skeleton " << pSkeletonA->m_name << " from bone "
             << pSkeletonA->m_bones.m_data[rootA].m_name;
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 784);
-    XFNV_DESTRUCT(hkOstream)(&kStream);
+    kStream.~hkErrStream();
     for (int32_t i = 0; i < pSkeletonA->m_bones.m_size; ++i) {
         pSkeletonA->m_bones.m_data[i].m_lockTranslation.m_bool = i > rootA;
     }
@@ -1339,7 +1339,7 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
     kStream << "Locking translations in skeleton " << pSkeletonB->m_name << " from bone "
             << pSkeletonB->m_bones.m_data[rootB].m_name;
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 793);
-    XFNV_DESTRUCT(hkOstream)(&kStream);
+    kStream.~hkErrStream();
     for (int32_t i = 0; i < pSkeletonB->m_bones.m_size; ++i) {
         pSkeletonB->m_bones.m_data[i].m_lockTranslation.m_bool = i > rootB;
     }

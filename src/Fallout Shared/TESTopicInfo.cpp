@@ -419,13 +419,12 @@ void TESTopicInfo::InitItem() {
         uint32_t uiStatID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pPerkSkillStat));
         TESForm::AddCompileIndex(uiStatID, GetFile(-1));
         TESForm* pStat = TESForm::GetFormByNumericID(uiStatID);
-        TESForm* pPerk = static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSPerk)(pStat, RTTI_TESForm, RTTI_BGSPerk));
+        TESForm* pPerk = dynamic_cast<BGSPerk*>(pStat);
         if (pPerk) {
             pPerkSkillStat = pPerk;
         }
         else {
-            pPerkSkillStat =
-                static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(ActorValueInfo)(pStat, RTTI_TESForm, RTTI_ActorValueInfo));
+            pPerkSkillStat = dynamic_cast<ActorValueInfo*>(pStat);
         }
     }
     SetInitialized(true);

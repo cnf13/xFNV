@@ -755,9 +755,7 @@ bool StartMenu::DoGamepad(int32_t aiButton, float afValue) {
             if (!this->lbOptions.IsEnabled()) {
                 return false;
             }
-            UserOption* pOption = static_cast<UserOption*>(XFNV_DYNAMIC_CAST_VOID(StartMenu::UserOption)(
-                this->lbOptions.GetHighlightedData(), RTTI_StartMenu_Option, RTTI_StartMenu_UserOption
-            ));
+            UserOption* pOption = dynamic_cast<StartMenu::UserOption*>(this->lbOptions.GetHighlightedData());
             if (!pOption || pOption->eType != UserOption::UOPT_METER) {
                 return false;
             }

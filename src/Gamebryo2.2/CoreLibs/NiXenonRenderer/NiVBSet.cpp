@@ -215,7 +215,7 @@ void NiVBSet::E943C0() {
         this->m_pkD3DDevice->Release();
     }
     this->m_pkD3DDevice = nullptr;
-    XFNV_DESTRUCT_AS(DestructInlined, NiTArray<NiVBBlock*, NiTMallocInterface<NiVBBlock*>>)(&m_apkBlocks);
+    m_apkBlocks.~NiTPrimitiveArray();
 }
 
 NiVBBlock* NiVBSet::FindBlockWithFreeSpace(uint32_t uiFreeSize) {

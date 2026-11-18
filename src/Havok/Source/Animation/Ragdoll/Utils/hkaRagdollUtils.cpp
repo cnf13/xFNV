@@ -335,7 +335,7 @@ bool hkaRagdollUtils::isConstraintSupported(const hkpConstraintInstance* apConst
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBABF3B), acBuffer,
                     ".\\Utils\\hkaRagdollUtils.cpp", 0x81
                 );
-                XFNV_DESTRUCT(hkOstream)(pStream);
+                pStream->~hkErrStream();
             }
             return false;
     }

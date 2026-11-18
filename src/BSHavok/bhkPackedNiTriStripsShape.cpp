@@ -409,7 +409,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
         uslastKey = uscurrentKey;
     }
     // The array is destroyed, freeing its buffer, before the memory context is restored.
-    XFNV_DESTRUCT(NiTArray<uint16_t, NiTMallocInterface<uint16_t>>)(&shapeArray);
+    shapeArray.~NiTPrimitiveArray();
     GetThreadMemContext() = iOldMemContext;
 }
 

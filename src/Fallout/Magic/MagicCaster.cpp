@@ -211,16 +211,12 @@ MagicTarget* MagicCaster::GetTouchTarget() {
             }
 
             if (ptempfollower && ptempfollower->m_item) {
-                ptargetActor = static_cast<Actor*>(
-                    XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
-                );
+                ptargetActor = dynamic_cast<Character*>(ptempfollower->m_item);
                 ptempfollower = ptempfollower->m_pkNext;
                 while (ptargetActor && (!ptargetActor->pCurrentProcess || ptargetActor->pCurrentProcess->eLevel)) {
                     ptargetActor = nullptr;
                     if (ptempfollower) {
-                        ptargetActor = static_cast<Actor*>(
-                            XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
-                        );
+                        ptargetActor = dynamic_cast<Character*>(ptempfollower->m_item);
                     }
                     if (ptempfollower) {
                         ptempfollower = ptempfollower->m_pkNext;
@@ -1202,15 +1198,11 @@ void MagicCaster::FindExplosionLOS(
                     }
 
                     if (ptempfollower && ptempfollower->m_item) {
-                        pitem = static_cast<MobileObject*>(
-                            XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
-                        );
+                        pitem = dynamic_cast<Character*>(ptempfollower->m_item);
                         ptempfollower = ptempfollower->m_pkNext;
                         while (pitem && (!pitem->pCurrentProcess || pitem->pCurrentProcess->eLevel)) {
                             if (ptempfollower) {
-                                pitem = static_cast<MobileObject*>(
-                                    XFNV_DYNAMIC_CAST_VOID(Character)(ptempfollower->m_item, RTTI_Actor, RTTI_Character)
-                                );
+                                pitem = dynamic_cast<Character*>(ptempfollower->m_item);
                             }
                             else {
                                 pitem = nullptr;

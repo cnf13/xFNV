@@ -296,7 +296,7 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                     )) {
                     __builtin_debugtrap();
                 }
-                XFNV_DESTRUCT(hkOstream)(&kStream);
+                kStream.~hkErrStream();
                 continue;
             }
         }

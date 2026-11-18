@@ -126,7 +126,7 @@ void hkpConstraintViewer::draw(
             ::new (&drawer) hkpLimitedHingeDrawer;
             drawer.setScale(m_scale);
             drawer.drawConstraint(constraint, displayHandler, id, m_tag);
-            XFNV_DESTRUCT(hkDisplayGeometry)(&drawer.m_angularLimit);
+            drawer.m_angularLimit.~hkDisplaySemiCircle();
             break;
         }
         case hkpConstraintData::CONSTRAINT_TYPE_POINTTOPATH: {

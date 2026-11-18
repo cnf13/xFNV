@@ -773,7 +773,7 @@ void hkaSkeletonMapper::checkMapping(const hkaSkeletonMapperData& m_mapping) {
                         hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabbaefbf), buf,
                         ".\\Mapper\\hkaSkeletonMapper.cpp", 499
                     );
-                    XFNV_DESTRUCT(hkOstream)(&kStream);
+                    kStream.~hkErrStream();
                 }
             }
         }
@@ -790,7 +790,7 @@ void hkaSkeletonMapper::checkMapping(const hkaSkeletonMapperData& m_mapping) {
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba77a5), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 521
         );
-        XFNV_DESTRUCT(hkOstream)(&kStream);
+        kStream.~hkErrStream();
     }
 }
 
@@ -823,7 +823,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabbabac1), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 551
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rSimple.m_boneA < 0 || rSimple.m_boneA >= m_mapping.m_skeletonA->m_bones.m_size) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -831,7 +831,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba3f01), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 556
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rSimple.m_boneB < 0 || rSimple.m_boneB >= m_mapping.m_skeletonB->m_bones.m_size) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -839,7 +839,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabbaeab2), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 561
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         ++boneCounts.m_data[rSimple.m_boneB];
         if (boneCounts.m_data[rSimple.m_boneB] > 1) {
@@ -848,7 +848,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba819f), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 569
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
     }
 
@@ -860,7 +860,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabbabac1), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 582
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (!checkTransform(m_mapping.m_mappingType, rChain.m_endAFromBTransform)) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -868,7 +868,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabbabac1), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 587
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rChain.m_endBoneA <= rChain.m_startBoneA) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -876,7 +876,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba819f), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 592
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rChain.m_endBoneB <= rChain.m_startBoneB) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -884,7 +884,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba819f), buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 597
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rChain.m_endBoneA < 0 || rChain.m_endBoneA >= m_mapping.m_skeletonA->m_bones.m_size) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -892,7 +892,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x17626ee1, buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 602
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rChain.m_startBoneA < 0 || rChain.m_startBoneA >= m_mapping.m_skeletonA->m_bones.m_size) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -900,7 +900,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x6073fdc, buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 607
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rChain.m_endBoneB < 0 || rChain.m_endBoneB >= m_mapping.m_skeletonB->m_bones.m_size) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -908,7 +908,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x19a18bfd, buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 612
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         if (rChain.m_startBoneB < 0 || rChain.m_startBoneB >= m_mapping.m_skeletonB->m_bones.m_size) {
             ::new (&kStream) hkErrStream(buf, 512);
@@ -916,7 +916,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0xfb695b1, buf, ".\\Mapper\\hkaSkeletonMapper.cpp", 617
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
         }
         for (int32_t bone = rChain.m_endBoneB; bone >= rChain.m_startBoneB;
              bone = m_mapping.m_skeletonB->m_parentIndices.m_data[bone]) {
@@ -929,7 +929,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xabba819f), buf, ".\\Mapper\\hkaSkeletonMapper.cpp",
                     629
                 );
-                XFNV_DESTRUCT(hkOstream)(&kStream);
+                kStream.~hkErrStream();
             }
         }
     }

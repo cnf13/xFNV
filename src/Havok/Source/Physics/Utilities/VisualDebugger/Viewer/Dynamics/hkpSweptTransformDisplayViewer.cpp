@@ -94,7 +94,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
                 hkError::MESSAGE_REPORT, -1, buf,
                 ".\\VisualDebugger\\Viewer\\Dynamics\\hkpSweptTransformDisplayViewer.cpp", 168
             );
-            XFNV_DESTRUCT(hkOstream)(&errStream);
+            errStream.~hkErrStream();
             // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
             displayGeometries.m_size--;
             if (displayGeometries.m_size != i) {

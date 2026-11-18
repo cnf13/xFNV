@@ -2363,9 +2363,7 @@ void TESObjectLAND::MergeSameFileTextures() {
     for (int32_t i = 0; i < 4; ++i) {
         float apDest[289];
         TESLandTexture* DefaultTexture_0 = GetDefaultTexture(i);
-        BaseFormComponent* v20 = static_cast<BaseFormComponent*>(
-            XFNV_DYNAMIC_CAST_VOID(TESTexture)(DefaultTexture_0, RTTI_TESLandTexture, RTTI_TESTexture)
-        );
+        BaseFormComponent* v20 = dynamic_cast<TESTexture*>(DefaultTexture_0);
         ourMemset(apDest, 0, sizeof(apDest));
         for (int32_t j = 0; j < 6; ++j) {
             TESLandTexture* QuadTexture = GetQuadTexture(i, j);
@@ -2374,9 +2372,7 @@ void TESObjectLAND::MergeSameFileTextures() {
                 for (int32_t k = 0; k < 6; ++k) {
                     if (j != k) {
                         TESLandTexture* v14 = GetQuadTexture(i, k);
-                        BaseFormComponent* apCompareFC = static_cast<BaseFormComponent*>(
-                            XFNV_DYNAMIC_CAST_VOID(TESTexture)(v14, RTTI_TESLandTexture, RTTI_TESTexture)
-                        );
+                        BaseFormComponent* apCompareFC = dynamic_cast<TESTexture*>(v14);
                         if ((apCompareFC) && (!v17->TESTexture::CompareComponent(apCompareFC))) {
                             for (int32_t m = 0; m < 289; ++m) {
                                 pLoadedData->ppPercentArrays[i][m][j] =

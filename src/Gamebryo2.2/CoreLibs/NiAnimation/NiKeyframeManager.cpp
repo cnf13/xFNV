@@ -181,14 +181,10 @@ void NiKeyframeManager::LinkObject(NiStream& kStream) {
     if (pkRecord) {
         // EXE-INLINED none: NiKeyframeManager::LinkRecord::~LinkRecord, the four NiTArray destructors (inlined too) in
         // reverse member order.
-        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<char*, NiTMallocInterface<char*>>)(&pkRecord->m_kObjectName);
-        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<uint32_t, NiTMallocInterface<uint32_t>>)(
-            &pkRecord->m_kNumSequenceKeys
-        );
-        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<char*, NiTMallocInterface<char*>>)(&pkRecord->m_kSequenceNames);
-        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<uint32_t, NiTMallocInterface<uint32_t>>)(
-            &pkRecord->m_kTextKeyReferences
-        );
+        pkRecord->m_kObjectName.~NiTPrimitiveArray();
+        pkRecord->m_kNumSequenceKeys.~NiTPrimitiveArray();
+        pkRecord->m_kSequenceNames.~NiTPrimitiveArray();
+        pkRecord->m_kTextKeyReferences.~NiTPrimitiveArray();
         MemoryManager_Singleton.Deallocate(pkRecord);
     }
     ms_pkLinkRecord = nullptr;

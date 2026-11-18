@@ -1041,8 +1041,7 @@ bool Cmd_RemoveMe_Execute(
     if (!apRefObject || !apContainer) {
         return true;
     }
-    TESObjectREFR* v11 =
-        static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apContainer, RTTI_TESObjectREFR, RTTI_Actor));
+    TESObjectREFR* v11 = dynamic_cast<Actor*>(apContainer);
     ExtraDataList* v10 = nullptr;
     if ((v11) && (v11->WearingObject(apRefObject->GetObjectReference()))) {
         InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(apContainer);
@@ -1629,8 +1628,7 @@ bool Cmd_DisableAllActors(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    TESObjectREFR* v11 =
-        static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+    TESObjectREFR* v11 = dynamic_cast<Actor*>(apRefObject);
     for (uint32_t uiIndex = 0;
          uiIndex < (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_LOW); ++uiIndex) {
         MobileObject* Item = (&ReferenceProcessLists.MobProcessArray)->GetItem(uiIndex);
@@ -4920,8 +4918,7 @@ bool Cmd_ShowHeadTrackTarget(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    TESObjectREFR* v9 =
-        static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+    TESObjectREFR* v9 = dynamic_cast<Actor*>(apRefObject);
     if (v9) {
         ExtraDataList* Extra = v9->GetExtra();
         TESObjectREFR* HeadTrackTargetExtra = Extra->GetHeadTrackTargetExtra();
@@ -5396,8 +5393,7 @@ bool Cmd_SetSize(
         )) {
         return false;
     }
-    MobileObject* v10 =
-        static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+    MobileObject* v10 = dynamic_cast<Actor*>(apRefObject);
     if (v10) {
         bhkCharacterController* CharController = v10->GetCharController();
         if (CharController) {
@@ -5426,8 +5422,7 @@ bool Cmd_KillActor_Execute(
     Script::ParseParameters(
         apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &killer, &a3, &a2
     );
-    PlayerCharacter* a1 =
-        static_cast<PlayerCharacter*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+    PlayerCharacter* a1 = static_cast<PlayerCharacter*>(dynamic_cast<Actor*>(apRefObject));
     if (a1) {
         if (a1->IsInvulnerable()) {
             return true;
@@ -10323,8 +10318,7 @@ bool Cmd_SetActorsAI(
             )) {
             return false;
         }
-        TESObjectREFR* v10 =
-            static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRefObject, RTTI_TESObjectREFR, RTTI_Actor));
+        TESObjectREFR* v10 = dynamic_cast<Actor*>(apRefObject);
         if (v10) {
             if (a8) {
                 v10[1].m_Extra.iFlags[8] = 1;

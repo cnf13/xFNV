@@ -72,7 +72,7 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAD88Du), buf,
                 ".\\Constraint\\Chain\\hkpConstraintChainUtil.cpp", 183
             );
-            XFNV_DESTRUCT(hkOstream)(&stream);
+            stream.~hkErrStream();
             pChainData->removeReference();
             pChainInstance->removeReference();
             return nullptr;
@@ -94,7 +94,7 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAD88Du), buf,
                     ".\\Constraint\\Chain\\hkpConstraintChainUtil.cpp", 194
                 );
-                XFNV_DESTRUCT(hkOstream)(&stream);
+                stream.~hkErrStream();
                 pChainData->removeReference();
                 pChainInstance->removeReference();
                 return nullptr;
@@ -117,7 +117,7 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA88D3u), buf,
                 ".\\Constraint\\Chain\\hkpConstraintChainUtil.cpp", 207
             );
-            XFNV_DESTRUCT(hkOstream)(&stream);
+            stream.~hkErrStream();
             pChainData->removeReference();
             pChainInstance->removeReference();
             return nullptr;

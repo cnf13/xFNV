@@ -1213,7 +1213,7 @@ void hkDataWorldDict::ObjectTracker::removeClassContent(hkDataClassDict* klass) 
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0x760D3794u), acBuffer,
                 ".\\Data\\Dict\\hkDataObjectDict.cpp", 1977
             );
-            XFNV_DESTRUCT(hkOstream)(pStream);
+            pStream->~hkErrStream();
         }
         pObject->selfDestruct();
     }

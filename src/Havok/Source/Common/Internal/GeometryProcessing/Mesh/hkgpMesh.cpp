@@ -2430,7 +2430,7 @@ void hkgpMesh::fixBindings() {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 0xCC2
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
     m_hasPerVertexNormals.m_bool = 0;
 
@@ -2568,7 +2568,7 @@ int32_t hkgpMesh::removeButterflies(int32_t tag) {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 0xB0D
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
     return iNumFound;
 }
@@ -2795,7 +2795,7 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
                     hkError::s_instance->message(
                         hkError::MESSAGE_REPORT, -1, acBuffer, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 0xD06
                     );
-                    XFNV_DESTRUCT(hkOstream)(pStream);
+                    pStream->~hkErrStream();
                     break;
                 }
             }
@@ -2964,7 +2964,7 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 0x8FD
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
 
     XFNV_INLINED_LOCAL(hkArray<QueryUtils::NodePair>, pairs, std::nullopt, std::nullopt);
@@ -3018,7 +3018,7 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 0x918
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
     XFNV_INLINED_LOCAL(hkArray<QueryUtils::NodePair>, overlaps, std::nullopt, std::nullopt);
     overlaps.m_data = nullptr;
@@ -3111,7 +3111,7 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 0x939
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
     rebuildTrianglesTree();
     return pMesh;
@@ -8007,7 +8007,7 @@ void hkgpMesh::fixTJunctions(float a1, bool a2) {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3232
         );
-        XFNV_DESTRUCT(hkOstream)(&kStream);
+        kStream.~hkErrStream();
         fixBindings();
         m_hasPerVertexNormals.m_bool = 0;
     }
@@ -9151,16 +9151,16 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
     ::new (&stream) hkErrStream(buf, 512);
     stream << "HOLE FILLING STATS:";
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3170);
-    XFNV_DESTRUCT(hkOstream)(&stream);
+    stream.~hkErrStream();
     ::new (&stream) hkErrStream(buf, 512);
     stream << "\tCreated: " << m_triangles.m_numUsed - numTriangles << " triangles and "
            << m_vertices.m_numUsed - numVertices << " vertices";
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3171);
-    XFNV_DESTRUCT(hkOstream)(&stream);
+    stream.~hkErrStream();
     ::new (&stream) hkErrStream(buf, 512);
     stream << "\tRings: " << ringsFilled << " AFM: " << afmTriangles;
     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 3172);
-    XFNV_DESTRUCT(hkOstream)(&stream);
+    stream.~hkErrStream();
     // EXE-INLINED none: hkArray<hkVector4>::~hkArray
     hkMemoryAllocator& normalsHeap = hkMemoryRouter::getInstance().heap();
     normals.m_size = 0;

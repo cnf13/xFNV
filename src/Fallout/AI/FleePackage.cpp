@@ -426,7 +426,7 @@ void FleePackage::InitLoadGame() {
     uint32_t iactorRunToID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pRefFleeTo));
     if (iactorRunToID) {
         TESForm* v2 = TESForm::GetFormByNumericID(iactorRunToID);
-        pRefFleeTo = static_cast<TESObjectREFR*>(XFNV_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
+        pRefFleeTo = dynamic_cast<Actor*>(v2);
     }
     uint32_t iteleportDoorID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTeleportDoor));
     if (iteleportDoorID) {

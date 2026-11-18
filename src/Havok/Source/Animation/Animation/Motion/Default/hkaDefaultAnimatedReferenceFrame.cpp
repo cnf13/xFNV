@@ -173,21 +173,21 @@ hkaDefaultAnimatedReferenceFrame::hkaDefaultAnimatedReferenceFrame(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
                 ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 88
             );
-            XFNV_DESTRUCT(hkOstream)(&ostr);
+            ostr.~hkErrStream();
             ::new (&ostr) hkErrStream(buf, 512);
             ostr << "Some misalignment (" << forwardError << ", " << rightError << ") found.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
                 ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 89
             );
-            XFNV_DESTRUCT(hkOstream)(&ostr);
+            ostr.~hkErrStream();
             ::new (&ostr) hkErrStream(buf, 512);
             ostr << "For best results, try moving the animation to the origin in the Create Animations filter.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
                 ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 90
             );
-            XFNV_DESTRUCT(hkOstream)(&ostr);
+            ostr.~hkErrStream();
         }
     }
     // The heap is fetched before the capacity test.

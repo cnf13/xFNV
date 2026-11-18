@@ -988,9 +988,7 @@ ExtraPackageStartLocation::ExtraPackageStartLocation(
 }
 
 bool ExtraPackageStartLocation::Compare(BSExtraData* apCompare) {
-    char* v4 = static_cast<char*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(apCompare, RTTI_BSExtraData, RTTI_ExtraPackageStartLocation)
-    );
+    char* v4 = reinterpret_cast<char*>(dynamic_cast<ExtraPackageStartLocation*>(apCompare));
     if (!v4) {
         return true;
     }
@@ -1053,8 +1051,7 @@ ExtraRadioData::ExtraRadioData() : BSExtraData(0x68u) {
 }
 
 bool ExtraRadioData::Compare(BSExtraData* apCompare) {
-    char* v4 =
-        static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(ExtraRadioData)(apCompare, RTTI_BSExtraData, RTTI_ExtraRadioData));
+    char* v4 = reinterpret_cast<char*>(dynamic_cast<ExtraRadioData*>(apCompare));
     if (!v4) {
         return true;
     }
@@ -1537,9 +1534,7 @@ ExtraStartingPosition::ExtraStartingPosition(TESObjectREFR* apObject) : BSExtraD
 }
 
 bool ExtraStartingPosition::Compare(BSExtraData* apCompare) {
-    char* v4 = static_cast<char*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraStartingPosition)(apCompare, RTTI_BSExtraData, RTTI_ExtraStartingPosition)
-    );
+    char* v4 = reinterpret_cast<char*>(dynamic_cast<ExtraStartingPosition*>(apCompare));
     if (!v4) {
         return true;
     }
@@ -2328,9 +2323,7 @@ ExtraModdingItem::ExtraModdingItem(bool abFlag)
   : BSExtraData(EXTRA_WEAPON_IS_MODDING), bIsModding((bool)((int8_t)abFlag)) {}
 
 bool ExtraModdingItem::Compare(BSExtraData* apCompare) {
-    char* v4 = static_cast<char*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraModdingItem)(apCompare, RTTI_BSExtraData, RTTI_ExtraModdingItem)
-    );
+    char* v4 = reinterpret_cast<char*>(dynamic_cast<ExtraModdingItem*>(apCompare));
     if (!v4) {
         return true;
     }

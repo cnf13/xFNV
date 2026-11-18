@@ -6391,12 +6391,12 @@ void TESObjectCELL::UnLoadAllTempData() {
             NavMeshPtr* NavMeshByIndex = pNavMeshes->GetNavMeshByIndex(&apResult, aiNavMeshIndex);
             TESForm* Object = NavMeshByIndex->m_pObject;
             TESFile* v12 = Object->GetFile(-1);
-            XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+            apResult.~NavMeshPtr();
             if (!v12 || v12->GetMaster()) {
                 pNavMeshes->GetNavMeshByIndex(&apCell, aiNavMeshIndex);
                 pSaveLoadGame->UnloadForm(apCell.operator NavMesh*(), false);
                 pNavMeshes->RemoveNavMeshByIndex(aiNavMeshIndex--);
-                XFNV_DESTRUCT(NiPointer<NavMesh>)(&apCell);
+                apCell.~NavMeshPtr();
             }
         }
     }
@@ -8462,7 +8462,7 @@ void TESObjectCELL::RenderTestCell(
                     parray->GetNavMeshByIndex(&spnavmesh, static_cast<uint32_t>(i));
                     uint32_t itricount = spnavmesh.m_pObject->GetTriangleCount();
                     itotaltricount += itricount;
-                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&spnavmesh);
+                    spnavmesh.~NavMeshPtr();
                 }
                 Warning("Testing %i NavMesh triangles.", itotaltricount);
                 for (int32_t i_2 = 0;; ++i_2) {
@@ -8481,7 +8481,7 @@ void TESObjectCELL::RenderTestCell(
                             }
                         }
                     }
-                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&spnavmesh_2);
+                    spnavmesh_2.~NavMeshPtr();
                 }
             }
             else {

@@ -197,9 +197,7 @@ const NiFixedString& BGSAddonNodeSoundHandleExtra::Tag() {
 
 NiFixedString* BGSAddonNodeSoundHandleExtra::KillSDM() {
     NiFixedString* result = BGSAddonNodeSoundHandleExtra::pTag;
-    if (BGSAddonNodeSoundHandleExtra::pTag) {
-        result = XFNV_DELETE(NiFixedString)(BGSAddonNodeSoundHandleExtra::pTag, 1u);
-    }
+    delete BGSAddonNodeSoundHandleExtra::pTag;
     BGSAddonNodeSoundHandleExtra::pTag = nullptr;
     return result;
 }

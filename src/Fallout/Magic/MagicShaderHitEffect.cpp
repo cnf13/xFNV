@@ -358,7 +358,7 @@ bool MagicShaderHitEffect::LoadGame() {
     }
     pSaveLoadGameOLD->LoadNumericID(&aiSearchID, 4u);
     TESForm* v3 = TESForm::GetFormByNumericID(aiSearchID);
-    char* v7 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESEffectShader)(v3, RTTI_TESForm, RTTI_TESEffectShader));
+    char* v7 = reinterpret_cast<char*>(dynamic_cast<TESEffectShader*>(v3));
     if (!v7) {
         v9 = false;
     }

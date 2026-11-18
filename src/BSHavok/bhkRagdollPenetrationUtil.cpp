@@ -1082,7 +1082,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBACC14), assertBuf,
                     "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkRagdollPenetrationUtil.cpp", 721
                 );
-                XFNV_DESTRUCT(hkOstream)(&ostr);
+                ostr.~hkErrStream();
                 pskeleton->m_bones.m_data[b].m_name.operator=(static_cast<const char*>(nullptr));
             }
             const bool bLockTranslation = b != 0;

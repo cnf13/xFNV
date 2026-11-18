@@ -220,7 +220,7 @@ void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& l
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xF032EDFE), acMessage,
                     ".\\ResourceDatabase\\hkResourceHandle.cpp", 0x80
                 );
-                XFNV_DESTRUCT(hkOstream)(pStream);
+                pStream->~hkErrStream();
                 bPathFound = false;
                 break;
             }
@@ -248,7 +248,7 @@ void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& l
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xF032EDF1), acMessage,
             ".\\ResourceDatabase\\hkResourceHandle.cpp", 0x92
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
 }
 

@@ -4395,9 +4395,6 @@ uint16_t ExtraDataList::GetSaveSize(uint32_t aiFlags, TESObjectREFR* apRef) {
                 break;
             }
             case EXTRA_PACKAGESTARTLOC: {
-                XFNV_DYNAMIC_CAST_VOID(ExtraPackageStartLocation)(
-                    work, RTTI_BSExtraData, RTTI_ExtraPackageStartLocation
-                );
                 isize += 20;
                 break;
             }

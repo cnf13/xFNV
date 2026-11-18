@@ -903,9 +903,7 @@ void BGSDecalManager::RemoveAllDecals() {
 
 BGSDecalManager* BGSDecalManager::Destroy_() {
     BGSDecalManager* result = BGSDecalManager::pSingleton;
-    if (BGSDecalManager::pSingleton) {
-        result = XFNV_DELETE(BGSDecalManager)(BGSDecalManager::pSingleton, 1u);
-    }
+    delete BGSDecalManager::pSingleton;
     BGSDecalManager::pSingleton = nullptr;
     return result;
 }

@@ -917,70 +917,56 @@ bool TESObjectREFR::SavesBefore(FORM* apGroupFORM) {
 TESForm* TESObjectREFR::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<TESForm*, TESForm*>* apCopyMap) {
     BaseExtraList* Extra = &m_Extra;
     BSExtraData* ExtraData = Extra->GetExtraData(43);
-    BSExtraData* apExtra = static_cast<BSExtraData*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraTeleport)(ExtraData, RTTI_BSExtraData, RTTI_ExtraTeleport)
-    );
+    BSExtraData* apExtra = dynamic_cast<ExtraTeleport*>(ExtraData);
     if (apExtra) {
         BaseExtraList* v5 = &m_Extra;
         v5->RemoveExtra(apExtra, false);
     }
     BaseExtraList* v6 = &m_Extra;
     BSExtraData* v7 = v6->GetExtraData(55);
-    BSExtraData* v45 = static_cast<BSExtraData*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraEnableStateParent)(v7, RTTI_BSExtraData, RTTI_ExtraEnableStateParent)
-    );
+    BSExtraData* v45 = dynamic_cast<ExtraEnableStateParent*>(v7);
     if (v45) {
         BaseExtraList* v8 = &m_Extra;
         v8->RemoveExtra(v45, false);
     }
     BaseExtraList* v9 = &m_Extra;
     BSExtraData* v10 = v9->GetExtraData(59);
-    BSExtraData* v40 = static_cast<BSExtraData*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraRandomTeleportMarker)(v10, RTTI_BSExtraData, RTTI_ExtraRandomTeleportMarker)
-    );
+    BSExtraData* v40 = dynamic_cast<ExtraRandomTeleportMarker*>(v10);
     if (v40) {
         BaseExtraList* v11 = &m_Extra;
         v11->RemoveExtra(v40, false);
     }
     BaseExtraList* v12 = &m_Extra;
     BSExtraData* v13 = v12->GetExtraData(81);
-    BSExtraData* v44 =
-        static_cast<BSExtraData*>(XFNV_DYNAMIC_CAST_VOID(ExtraLinkedRef)(v13, RTTI_BSExtraData, RTTI_ExtraLinkedRef));
+    BSExtraData* v44 = dynamic_cast<ExtraLinkedRef*>(v13);
     if (v44) {
         BaseExtraList* v14 = &m_Extra;
         v14->RemoveExtra(v44, false);
     }
     BaseExtraList* v15 = &m_Extra;
     BSExtraData* v16 = v15->GetExtraData(81);
-    BSExtraData* v42 = static_cast<BSExtraData*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraActivateRef)(v16, RTTI_BSExtraData, RTTI_ExtraActivateRef)
-    );
+    BSExtraData* v42 = dynamic_cast<ExtraActivateRef*>(v16);
     if (v42) {
         BaseExtraList* v17 = &m_Extra;
         v17->RemoveExtra(v42, false);
     }
     BaseExtraList* v18 = &m_Extra;
     BSExtraData* v19 = v18->GetExtraData(87);
-    BSExtraData* v46 =
-        static_cast<BSExtraData*>(XFNV_DYNAMIC_CAST_VOID(ExtraDecalRefs)(v19, RTTI_BSExtraData, RTTI_ExtraDecalRefs));
+    BSExtraData* v46 = dynamic_cast<ExtraDecalRefs*>(v19);
     if (v46) {
         BaseExtraList* v20 = &m_Extra;
         v20->RemoveExtra(v46, false);
     }
     BaseExtraList* v21 = &m_Extra;
     BSExtraData* v22 = v21->GetExtraData(60);
-    BSExtraData* v41 = static_cast<BSExtraData*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraMerchantContainer)(v22, RTTI_BSExtraData, RTTI_ExtraMerchantContainer)
-    );
+    BSExtraData* v41 = dynamic_cast<ExtraMerchantContainer*>(v22);
     if (v41) {
         BaseExtraList* v23 = &m_Extra;
         v23->RemoveExtra(v41, false);
     }
     BaseExtraList* v24 = &m_Extra;
     BSExtraData* v25 = v24->GetExtraData(99);
-    BSExtraData* v43 = static_cast<BSExtraData*>(
-        XFNV_DYNAMIC_CAST_VOID(ExtraMultiBoundRef)(v25, RTTI_BSExtraData, RTTI_ExtraMultiBoundRef)
-    );
+    BSExtraData* v43 = dynamic_cast<ExtraMultiBoundRef*>(v25);
     if (v43) {
         BaseExtraList* v26 = &m_Extra;
         v26->RemoveExtra(v43, false);

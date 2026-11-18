@@ -82,9 +82,7 @@ void BGSLightingTemplate::Copy(TESForm* apCopy) {
 }
 
 bool BGSLightingTemplate::Compare(TESForm* apCompare) {
-    TESForm* v4 = static_cast<TESForm*>(
-        XFNV_DYNAMIC_CAST_VOID(BGSLightingTemplate)(apCompare, RTTI_TESForm, RTTI_BGSLightingTemplate)
-    );
+    TESForm* v4 = dynamic_cast<BGSLightingTemplate*>(apCompare);
     if (!v4) {
         return true;
     }

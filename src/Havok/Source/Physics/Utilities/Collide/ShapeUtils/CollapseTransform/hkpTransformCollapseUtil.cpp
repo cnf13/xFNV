@@ -97,7 +97,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 57
     );
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numIdentityTransformsRemoved = this->m_numIdentityTransformsRemoved;
     hkOstream* v3 = &apThis.operator<<("Number of identity transforms removed : ");
@@ -105,7 +105,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 58
     );
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numSpecializedTransformShapes = this->m_numSpecializedTransformShapes;
     hkOstream* v4 = &apThis.operator<<("Number of specialized transform shapes : ");
@@ -113,7 +113,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 59
     );
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     ::new (&apThis) hkErrStream(buf, 512);
     int32_t m_numPropagatedTransformsToLists = this->m_numPropagatedTransformsToLists;
     hkOstream* v5 = &apThis.operator<<("Number of propagated transforms to lists : ");
@@ -121,7 +121,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     hkError::s_instance->message(
         hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp", 60
     );
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
 }
 
 // The transform (a convex translate, convex transform or transform shape's) over a sphere drops its rotation; an

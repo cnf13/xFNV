@@ -202,7 +202,7 @@ void hkPackfileWriter::addObject(
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAABBA), acBuf, ".\\Packfile\\hkPackfileWriter.cpp", 289
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
         m_knownObjects.insert(pointerIn, -1);
         // EXE-INLINED none: hkArray<hkVariant>::pushBack (the router is fetched before the capacity test).
         hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();

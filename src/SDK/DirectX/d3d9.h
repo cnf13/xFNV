@@ -1716,10 +1716,9 @@ struct ID3DXInclude {
 using Direct3DCreate9_t = IDirect3D9*(WINAPI*)(uint32_t SDKVersion);
 using Direct3DCreate9Ex_t = HRESULT(WINAPI*)(uint32_t SDKVersion, IDirect3D9Ex** ppD3D9Ex);
 
-// The exe's d3d9.dll and d3dx9_38.dll imports. Each is XFNV_GLOBAL(<pointer to the SDK prototype>, <SDK name>, <import
-// slot>): the hybrid build reads the exe's import slot, so `D3DXCompileShader(...)` compiles to `call [0xFDF408]` as
-// the exe's calls do (the exe also reaches some through a `jmp [slot]` thunk, e.g. D3DXMatrixInverse 0xEE6DDA; the
-// effect is the same). Every one is WINAPI (stdcall).
+// The exe's d3d9.dll and d3dx9_38.dll imports. Each is XFNV_IMPORT(<pointer to the SDK prototype>, <SDK name>, <import
+// slot>): the export itself, with the address of the exe's import slot it was called through (the exe also reaches
+// some through a `jmp [slot]` thunk, e.g. D3DXMatrixInverse 0xEE6DDA). Every one is WINAPI (stdcall).
 using D3DPERF_SetOptions_t = void(WINAPI*)(uint32_t dwOptions);
 using D3DXLoadSurfaceFromSurface_t = HRESULT(WINAPI*)(
     IDirect3DSurface9* pDestSurface,

@@ -364,11 +364,6 @@ void TESTopic::InitItem() {
                     }
                 }
                 else {
-                    // Looks the quest up and leaves the result unused, as the game does.
-                    uint32_t uiQuestID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pInfo->pQuest));
-                    XFNV_DYNAMIC_CAST_VOID(TESQuest)(
-                        TESForm::GetFormByNumericID(uiQuestID), RTTI_TESForm, RTTI_TESQuest
-                    );
                     pInfo->infoLinkArray.Remove(i, true);
                     --iLinkCount;
                     --i;

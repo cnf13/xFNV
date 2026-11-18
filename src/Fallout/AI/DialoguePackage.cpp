@@ -535,12 +535,11 @@ void DialoguePackage::InitLoadGame() {
     TESPackage::InitLoadGame();
     TESForm* FormByNumericID =
         TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTalkingActor)));
-    pTalkingActor =
-        static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(FormByNumericID, RTTI_TESForm, RTTI_Actor));
+    pTalkingActor = dynamic_cast<Actor*>(FormByNumericID);
     TESForm* v2 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pActor)));
-    pActor = static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(v2, RTTI_TESForm, RTTI_Actor));
+    pActor = dynamic_cast<Actor*>(v2);
     TESForm* v3 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTargetActor)));
-    pTargetActor = static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(v3, RTTI_TESForm, RTTI_Actor));
+    pTargetActor = dynamic_cast<Actor*>(v3);
     if ((pSaveLoadGameOLD->GetCurrentVersion() >= 32u) && (pConversation)) {
         pConversation->InitLoadGameTES();
     }

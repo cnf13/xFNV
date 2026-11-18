@@ -434,8 +434,7 @@ const char* ItemChange::GetIconOne(TESObjectREFR* apRef) {
     TESForm* ExtraOwnership_ = GetItemOwnership();
     TESBipedModelForm* v7 = dynamic_cast<TESBipedModelForm*>(pContainerObj);
     if ((ExtraOwnership_) && (v7)) {
-        TESActorBase* v5 =
-            static_cast<TESActorBase*>(XFNV_DYNAMIC_CAST_VOID(TESNPC)(ExtraOwnership_, RTTI_TESForm, RTTI_TESNPC));
+        TESActorBase* v5 = dynamic_cast<TESNPC*>(ExtraOwnership_);
         if (v5) {
             TESActorBase::SEX Sex = v5->GetSex();
             Icon = v7->GetIcon(Sex);
@@ -3804,9 +3803,7 @@ ItemChange* InventoryChanges::GetBestAmmo(TESActorBase* apActorBase, bool abUseC
         ContainerObject* pEntry = pNode->GetItem();
         TESBoundObject* pAmmo = nullptr;
         if (pEntry) {
-            pAmmo = static_cast<TESBoundObject*>(
-                XFNV_DYNAMIC_CAST_VOID(TESAmmo)(pEntry->pObj, RTTI_TESBoundObject, RTTI_TESAmmo)
-            );
+            pAmmo = dynamic_cast<TESAmmo*>(pEntry->pObj);
         }
         if (!pAmmo) {
             continue;
@@ -3825,9 +3822,7 @@ ItemChange* InventoryChanges::GetBestAmmo(TESActorBase* apActorBase, bool abUseC
         ItemChange* pItem = pNode->GetItem();
         TESBoundObject* pAmmo = nullptr;
         if (pItem) {
-            pAmmo = static_cast<TESBoundObject*>(
-                XFNV_DYNAMIC_CAST_VOID(TESAmmo)(pItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESAmmo)
-            );
+            pAmmo = dynamic_cast<TESAmmo*>(pItem->pContainerObj);
         }
         if (!pAmmo) {
             continue;
@@ -8720,10 +8715,7 @@ float InventoryChanges::GetEquippedWeight(Actor* apOwner) {
                 fweight = TESWeightForm::GetFormWeight(pObj, IsHardcore);
             }
             int32_t icount = GetObjectCount(pitem->pContainerObj);
-            if (pObj->GetFormType() == ARMO_ID) {
-                XFNV_DYNAMIC_CAST_VOID(TESObjectARMO)(pObj, RTTI_TESObject, RTTI_TESObjectARMO);
-            }
-            else {
+            if (pObj->GetFormType() != ARMO_ID) {
                 if (pObj->GetFormType() == WEAP_ID) {
                     BaseProcess* pprocess = apOwner->pCurrentProcess;
                     if (pprocess) {

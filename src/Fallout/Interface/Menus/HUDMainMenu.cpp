@@ -3486,8 +3486,6 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
                 default: break;
             }
         }
-        // kPrompt is a C++ local, destroyed where its scope ends.
-        XFNV_DESTRUCT_IN_PLACE(BSStringT<char>)(pPrompt);
     }
 
     // The item the info lines describe: a projectile's carried item, else a change for the thrown weapon or the base
@@ -3497,7 +3495,6 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
     TESObjectWEAP* pSourceWeapon = pProjectile ? pProjectile->GetWeaponSource() : nullptr;
     TESObjectWEAP* pThrownWeapon = pSourceWeapon && pSourceWeapon->IsThrownWeapon() ? pSourceWeapon : nullptr;
     ItemChange kTempItem;
-    bool bTempItemBuilt = false;
     ItemChange* pSourceItem;
     if (bHasSecondaryItem) {
         pSourceItem = pProjectile->GetSecondaryItemChange();
@@ -3505,14 +3502,10 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
     else {
         TESBoundObject* pItemObject = pThrownWeapon ? pThrownWeapon : apObject->GetObjectReference();
         pSourceItem = XFNV_RECONSTRUCT(ItemChange)(&kTempItem, pItemObject, 0);
-        bTempItemBuilt = true;
     }
     ItemChange kItem;
     kItem.~ItemChange();
     ::new (&kItem) ItemChange(pSourceItem);
-    if (bTempItemBuilt) {
-        XFNV_DESTRUCT_IN_PLACE(ItemChange)(&kTempItem);
-    }
     if (!kItem.pExtraObjectList) {
         void* pMemory = ourMalloc(sizeof(BSSimpleList<ExtraDataList*>));
         kItem.pExtraObjectList = pMemory ? ::new (pMemory) BSSimpleList<ExtraDataList*> : nullptr;

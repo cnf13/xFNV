@@ -235,7 +235,7 @@ void hkStreamStatisticsCollector::makeTree(
             do {
                 hkMonitorStreamAnalyzer::Node* pNode = m_nodesOut.m_data[m_nodesOut.m_size - 1];
                 if (pNode) {
-                    XFNV_DESTRUCT(hkMonitorStreamAnalyzer::Node)(pNode);
+                    pNode->~Node();
                     hkMemoryRouter::getInstance().heap().blockFree(pNode, sizeof(hkMonitorStreamAnalyzer::Node));
                 }
                 --m_nodesOut.m_size;
@@ -316,7 +316,7 @@ void hkStreamStatisticsCollector::writeStatistics(hkOstream& outstream, int32_t 
     for (; nodes.m_size != 0; --nodes.m_size) {
         hkMonitorStreamAnalyzer::Node* pNode = nodes.m_data[nodes.m_size - 1];
         if (pNode) {
-            XFNV_DESTRUCT(hkMonitorStreamAnalyzer::Node)(pNode);
+            pNode->~Node();
             hkMemoryRouter::getInstance().heap().blockFree(pNode, sizeof(hkMonitorStreamAnalyzer::Node));
         }
     }

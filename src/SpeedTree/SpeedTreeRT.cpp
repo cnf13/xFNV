@@ -812,7 +812,7 @@ void CSpeedTreeRT::FreeProjectedShadowData() {
     if (m_pProjectedShadow) {
         CProjectedShadow* pProjectedShadow = m_pProjectedShadow;
         if (pProjectedShadow) {
-            XFNV_DESTRUCT(std::string)(&pProjectedShadow->m_strSelfShadowMap);
+            pProjectedShadow->m_strSelfShadowMap.~basic_string();
             MemoryManager_Singleton.Deallocate(pProjectedShadow);
         }
         m_pProjectedShadow = nullptr;
@@ -3168,14 +3168,8 @@ IdvFileError::IdvFileError(const std::string& strDetails, bool bAppendSystemErro
 
 IdvFileError::IdvFileError(const IdvFileError& cThat) : runtime_error(cThat) {}
 
-// Frees the strings after the runtime_error constructor, the last built first.
 IdvFileError::IdvFileError(const std::string& strDetails, bool bAppendSystemError, MessageStrings&& aStrings)
-  : runtime_error(BuildMessage(strDetails, bAppendSystemError, aStrings)) {
-    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[3]);
-    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[2]);
-    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[1]);
-    XFNV_DESTRUCT_IN_PLACE(std::string)(&aStrings[0]);
-}
+  : runtime_error(BuildMessage(strDetails, bAppendSystemError, aStrings)) {}
 
 void IdvFileError::operator delete(void* apMemory) {
     MemoryManager_Singleton.Deallocate(apMemory);

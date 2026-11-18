@@ -11489,9 +11489,7 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
             }
 
             if ((pactor) && (pactor->IsProjectile())) {
-                TESObjectCONT* parrow = static_cast<TESObjectCONT*>(
-                    XFNV_DYNAMIC_CAST_VOID(ArrowProjectile)(pactor, RTTI_TESObjectREFR, RTTI_ArrowProjectile)
-                );
+                TESObjectCONT* parrow = reinterpret_cast<TESObjectCONT*>(dynamic_cast<ArrowProjectile*>(pactor));
                 if ((parrow) && (!parrow->GetOpenSound())) {
                     bskipActivate = true;
                 }
@@ -17258,9 +17256,7 @@ void PlayerCharacter::PoisonWeapon() {
             BaseProcess* CurrentAIProcess = pPlayer->pCurrentProcess;
             ItemChange* v2 = CurrentAIProcess->GetCurrentWeapon();
             if (v2) {
-                v0 = static_cast<char*>(
-                    XFNV_DYNAMIC_CAST_VOID(TESObjectWEAP)(v2->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectWEAP)
-                );
+                v0 = reinterpret_cast<char*>(dynamic_cast<TESObjectWEAP*>(v2->pContainerObj));
             }
             else {
                 v0 = nullptr;

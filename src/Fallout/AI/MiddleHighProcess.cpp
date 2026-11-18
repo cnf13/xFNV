@@ -3923,7 +3923,6 @@ void MiddleHighProcess::RemoveAndAttachItems(MobileObject* apMob) {
     }
     apMob->AttachAmmo(nullptr);
     apMob->RemoveAmmo();
-    XFNV_DYNAMIC_CAST_VOID(Actor)(apMob, RTTI_MobileObject, RTTI_Actor);
 }
 
 uint16_t MiddleHighProcess::GetSaveSize(uint32_t aiFlags, MobileObject* pmob) {

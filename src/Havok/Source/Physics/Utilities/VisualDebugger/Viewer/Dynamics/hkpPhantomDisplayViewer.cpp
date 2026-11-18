@@ -113,7 +113,7 @@ void hkpPhantomDisplayViewer::phantomAddedCallback(hkpPhantom* phantom) {
                     hkError::MESSAGE_REPORT, -1, acBuffer,
                     ".\\VisualDebugger\\Viewer\\Dynamics\\hkpPhantomDisplayViewer.cpp", 0x91
                 );
-                XFNV_DESTRUCT(hkOstream)(pStream);
+                pStream->~hkErrStream();
                 const int32_t last = displayGeometries.m_size - 1;
                 displayGeometries.m_size = static_cast<uint32_t>(last);
                 if (last != i) {

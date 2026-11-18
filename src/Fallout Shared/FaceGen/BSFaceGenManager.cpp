@@ -542,13 +542,14 @@ void* Destroy(void* a1) {
     return ::ExceptionPtrDestroy_0(static_cast<FanFgResidualS*>(a1));
 }
 
-// This is `_Ptr->~FanLinCtlS()`, called as the scalar deleting destructor with flags 0.
 FanLinCtlS* DestroyFanLinCtl(FanLinCtlS* apThis) {
-    return XFNV_DELETE(FanLinCtlS)(apThis, 0);
+    apThis->~FanLinCtlS();
+    return apThis;
 }
 
 FanFgResidualS* ExceptionPtrDestroy_0(FanFgResidualS* apThis) {
-    return XFNV_DELETE(FanFgResidualS)(apThis, 0);
+    apThis->~FanFgResidualS();
+    return apThis;
 }
 
 FR2MatrixVTC<float>* ConcatRows(FR2MatrixVTC<float>* a1, FR2MatrixVTC<float>* hProcess, FR2MatrixVTC<float>* arg8) {
@@ -749,7 +750,6 @@ FanGenCtlsGrpC::getCaricature(FanRaceE race, FanTypeE type, FanSymmE symm, const
     float v7 = static_cast<double>(apThis.nrows) - 2.0;
     float v6 = std::sqrt(static_cast<double>(v7));
     float v18 = v8 / v6;
-    XFNV_DESTRUCT_IN_PLACE(FR2MatrixVTC<float>)(&apThis);
     return v18;
 }
 

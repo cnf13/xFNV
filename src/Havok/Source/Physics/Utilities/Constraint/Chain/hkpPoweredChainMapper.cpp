@@ -283,7 +283,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA99DDu), buf,
                             ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 93
                         );
-                        XFNV_DESTRUCT(hkOstream)(&stream);
+                        stream.~hkErrStream();
                         pChain->removeReference();
                         failed = true;
                         break;
@@ -308,7 +308,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9D6Du), buf,
                             ".\\Constraint\\Chain\\hkpPoweredChainMapper.cpp", 108
                         );
-                        XFNV_DESTRUCT(hkOstream)(&stream);
+                        stream.~hkErrStream();
                         pChain->removeReference();
                         failed = true;
                         break;

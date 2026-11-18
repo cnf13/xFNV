@@ -167,14 +167,14 @@ hkpConstraintInstance* hkpConstraintUtils::convertToPowered(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
                 ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 111
             );
-            XFNV_DESTRUCT(hkOstream)(&stream);
+            stream.~hkErrStream();
             ::new (&stream) hkErrStream(buf, 512);
             stream << "Only limited hinges and ragdoll constraints can be powered.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA1B34u), buf,
                 ".\\Constraint\\Bilateral\\hkpConstraintUtils.cpp", 112
             );
-            XFNV_DESTRUCT(hkOstream)(&stream);
+            stream.~hkErrStream();
             return nullptr;
         }
     }

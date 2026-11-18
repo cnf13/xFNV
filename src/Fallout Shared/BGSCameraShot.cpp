@@ -195,8 +195,7 @@ void BGSCameraShot::InitItem() {
 }
 
 void BGSCameraShot::Copy(TESForm* apCopy) {
-    TESForm* v3 =
-        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSCameraShot)(apCopy, RTTI_TESForm, RTTI_BGSCameraShot));
+    TESForm* v3 = dynamic_cast<BGSCameraShot*>(apCopy);
     if (v3) {
         CopyAllComponents(v3);
         ourMemcpy(&Data, &v3[2].iFormFlags, sizeof(Data));
@@ -204,8 +203,7 @@ void BGSCameraShot::Copy(TESForm* apCopy) {
 }
 
 bool BGSCameraShot::Compare(TESForm* apCompare) {
-    TESForm* v4 =
-        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSCameraShot)(apCompare, RTTI_TESForm, RTTI_BGSCameraShot));
+    TESForm* v4 = dynamic_cast<BGSCameraShot*>(apCompare);
     if (!v4) {
         return true;
     }

@@ -171,8 +171,7 @@ void BGSEncounterZone::Copy(TESForm* apCopy) {
 }
 
 bool BGSEncounterZone::Compare(TESForm* apCompare) {
-    TESForm* v4 =
-        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSEncounterZone)(apCompare, RTTI_TESForm, RTTI_BGSEncounterZone));
+    TESForm* v4 = dynamic_cast<BGSEncounterZone*>(apCompare);
     if (!v4) {
         return true;
     }

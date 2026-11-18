@@ -681,7 +681,7 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
         Init(static_cast<const hkSerializableCinfo&>(cinfo));
     }
     // The destructor, which frees the buffer, runs before the memory context is restored.
-    XFNV_DESTRUCT(NiTArray<uint16_t, NiTMallocInterface<uint16_t>>)(&kIndices);
+    kIndices.~NiTPrimitiveArray();
     pTLSData->eMemContext = eSavedMemContext;
 }
 

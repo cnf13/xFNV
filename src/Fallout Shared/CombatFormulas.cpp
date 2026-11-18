@@ -1864,9 +1864,7 @@ float CombatFormulas::GetWeaponRateOfFire(ActorValueOwner* apActor, TESObjectWEA
         frateOfFire = apWeapon->GetSpeed();
     }
     else {
-        Actor* v3 = static_cast<Actor*>(
-            XFNV_DYNAMIC_CAST_VOID(TESObjectREFR)(apActor, RTTI_ActorValueOwner, RTTI_TESObjectREFR)
-        );
+        Actor* v3 = static_cast<Actor*>(dynamic_cast<TESObjectREFR*>(apActor));
         frateOfFire = Actor::GetAttackSpeedMult(v3, apWeapon, 1, apItem);
     }
     bool bUseSplit = false;

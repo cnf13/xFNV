@@ -1384,7 +1384,7 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
                 for (uint32_t j = 0; j < parray->GetNavMeshCount(); ++j) {
                     NavMeshPtr* NavMeshByIndex = parray->GetNavMeshByIndex(&apResult, j);
                     bool Bounds = NavMeshByIndex->m_pObject->NavMesh::GetBounds(navmeshMin, navmeshMax);
-                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+                    apResult.~NavMeshPtr();
                     if (Bounds) {
                         navmeshMax.z = navmeshMax.z + 128.0;
                         if (Pathing::DoAABBsOverlap(
@@ -1392,7 +1392,7 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
                             )) {
                             NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apMemory, j);
                             apReturnNavMeshArray->Add(*aItem);
-                            XFNV_DESTRUCT(NiPointer<NavMesh>)(&apMemory);
+                            apMemory.~NavMeshPtr();
                         }
                     }
                 }

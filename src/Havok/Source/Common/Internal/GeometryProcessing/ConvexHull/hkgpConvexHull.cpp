@@ -215,7 +215,7 @@ float hkgpConvexHull::getVolume() const {
         )) {
         __builtin_debugtrap();
     }
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     return this->m_data->m_volume;
 }
 
@@ -238,7 +238,7 @@ float hkgpConvexHull::getSurfaceArea() const {
         )) {
         __builtin_debugtrap();
     }
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     return this->m_data->m_surface;
 }
 
@@ -270,7 +270,7 @@ int32_t hkgpConvexHull::getNumPlanes() const {
         )) {
         __builtin_debugtrap();
     }
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     return this->m_data->m_planes.m_size;
 }
 
@@ -1498,7 +1498,7 @@ int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Vertex* a1) const {
         )) {
         __builtin_debugtrap();
     }
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     return static_cast<const hkgpConvexHullImpl::Vertex*>(a1)->m_index;
 }
 
@@ -1522,7 +1522,7 @@ int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Triangle* a1) const {
         )) {
         __builtin_debugtrap();
     }
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     return static_cast<const hkgpConvexHullImpl::Triangle*>(a1)->m_index;
 }
 
@@ -1546,7 +1546,7 @@ int32_t hkgpConvexHull::getPlaneIndex(const hkgpConvexHull::Triangle* triangle) 
         )) {
         __builtin_debugtrap();
     }
-    XFNV_DESTRUCT(hkOstream)(&apThis);
+    apThis.~hkErrStream();
     return static_cast<const hkgpConvexHullImpl::Triangle*>(triangle)->m_plane.m_index;
 }
 
@@ -2774,7 +2774,7 @@ bool hkgpConvexHullImpl::isPointInside(const hkVector4& point, bool usePlanes, f
         hkError::s_instance->message(
             hkError::MESSAGE_ERROR, 2046417030, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
     const int32_t iNumPlanes = m_planes.m_size;
     if (iNumPlanes <= 0) {

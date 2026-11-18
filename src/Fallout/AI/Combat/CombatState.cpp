@@ -687,7 +687,6 @@ bool CombatState::CheckCoverLocation(
         PathingLocation* pCoverLocation = &kCoverLocation;
         if (!pCoverLocation->IsValidLocation(pCombatant->GetRadius())) {
             eState = COVER_STATE_COVER_INVALID;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (bCheckFirePosition) {
@@ -695,27 +694,21 @@ bool CombatState::CheckCoverLocation(
             PathingLocation* pFireLocation = &kFireLocation;
             if (!pFireLocation->IsValidLocation(pCombatant->GetRadius())) {
                 eState = COVER_STATE_FIRE_INVALID;
-                XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pFireLocation);
-                XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
                 continue;
             }
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pFireLocation);
         }
         if (!CheckMovement(kCoverPosition, static_cast<TESObjectCELL*>(apAttacker->GetSpace()), true, false)) {
             eState = COVER_STATE_CHECK_MOVEMENT_FAILED;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         arfSquaredDistance = (arCoverSearchTargetLocation - kCoverPosition).SqrLength();
         // An unordered (NaN) distance passes both range checks.
         if (arfSquaredDistance > afMaxRange * afMaxRange) {
             eState = COVER_STATE_TOO_FAR;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (arfSquaredDistance < afMinRange * afMinRange) {
             eState = COVER_STATE_TOO_CLOSE;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         BGSWorldLocation kWorldLocation;
@@ -724,7 +717,6 @@ bool CombatState::CheckCoverLocation(
         kWorldLocation.SetLocation(kCoverPosition, static_cast<TESObjectCELL*>(apAttacker->GetSpace()));
         if (pCombatController->GetCombatGroup()->FindTargetNearLocation(kWorldLocation, fTargetSearchRadius, false)) {
             eState = COVER_STATE_HOSTILES_NEAR;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (fTravelTime == -1.0) {
@@ -739,7 +731,6 @@ bool CombatState::CheckCoverLocation(
                 kCoverPosition, apAttacker, fTravelTime, 0.0f, kSkipOlderThreats, 0.0f
             ) > 0.0) {
             eState = COVER_STATE_COVER_THREATENED;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         if (bCheckFirePosition) {
@@ -750,7 +741,6 @@ bool CombatState::CheckCoverLocation(
                     kFirePosition, apAttacker, fTravelTime, 0.0f, kFireSkipOlderThreats, 0.0f
                 ) > 0.0) {
                 eState = COVER_STATE_FIRE_THREATENED;
-                XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
                 continue;
             }
         }
@@ -760,7 +750,6 @@ bool CombatState::CheckCoverLocation(
         }
         if (bSeen) {
             eState = COVER_STATE_COVER_LOS;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         bool bCheckFireLOS = true;
@@ -779,11 +768,9 @@ bool CombatState::CheckCoverLocation(
                 apAttacker, apTarget, kFirePosition, arCoverSearchTargetLocation, true, -1
             )) {
             eState = COVER_STATE_FIRE_LOS;
-            XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
             continue;
         }
         apRetLocation->SetPoint(kCoverPosition, nullptr);
-        XFNV_DESTRUCT_IN_PLACE(PathingLocation)(pCoverLocation);
         return true;
     }
     if (ePreviousState > eState) {
@@ -3590,9 +3577,7 @@ void CombatState::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 TESForm* FormByNumericID = TESForm::GetFormByNumericID(
                     static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCombatItems[i]->pRef))
                 );
-                v5 = static_cast<TESForm*>(
-                    XFNV_DYNAMIC_CAST_VOID(TESObjectREFR)(FormByNumericID, RTTI_TESForm, RTTI_TESObjectREFR)
-                );
+                v5 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
             }
             else {
                 v5 = nullptr;

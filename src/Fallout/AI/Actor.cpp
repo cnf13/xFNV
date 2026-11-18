@@ -15226,7 +15226,6 @@ void Actor::PickpocketAlarm(TESObjectREFR* apRef, TESBoundObject* apObj, int32_t
             else {
                 pvictim->pCurrentProcess->InsertIntoDetectionArray(pvictim, elevel);
             }
-            XFNV_DYNAMIC_CAST_VOID(TESNPC)(apRef->GetObjectReference(), RTTI_TESBoundObject, RTTI_TESNPC);
             BaseProcess* v7 = ptargactor->pCurrentProcess;
             v7->SetPickpocketed(true);
             float afTimeStamp = appCalendar.GetHour();
@@ -18470,8 +18469,6 @@ float Actor::GetVATSAreaFree(TESObjectREFR* apTarget, float afAngle) {
         TES::pInstance->AddTempDebugObject(pLine, 10.0f);
     }
     float fResult = fDistance;
-    // The local's own destructor runs at the scope's end; a second destruction freed its hit array twice.
-    XFNV_DESTRUCT_IN_PLACE(hkpAllRayHitCollector)(pCollector);
     return fResult;
 }
 
@@ -18556,8 +18553,6 @@ float Actor::GetVATSTargetVisible(TESObjectREFR* apTarget, float afAngle) {
             double dReached = i + 1;
             fDistance = fVATSSmartCameraCheckStepDistance.Float() * dReached;
         }
-        // The local's own destructor runs at the loop body's end; a second destruction freed its hit array twice.
-        XFNV_DESTRUCT_IN_PLACE(hkpAllRayHitCollector)(pCollector);
     }
     return fDistance;
 }

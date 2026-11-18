@@ -2067,14 +2067,12 @@ void FalloutRadio::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     // Each station's TESBoundObject is kept in the FORadioStation* slot until InitLoadGame resolves it.
     uint32_t FormID_0 = apLoadGameBuffer->LoadFormID();
     TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
-    FalloutRadio::pCurrentPipboyStation = static_cast<FalloutRadio::FORadioStation*>(
-        XFNV_DYNAMIC_CAST_VOID(TESBoundObject)(FormByNumericID, RTTI_TESForm, RTTI_TESBoundObject)
-    );
+    FalloutRadio::pCurrentPipboyStation =
+        reinterpret_cast<FalloutRadio::FORadioStation*>(dynamic_cast<TESBoundObject*>(FormByNumericID));
     uint32_t v3 = apLoadGameBuffer->LoadFormID();
     TESForm* v4 = TESForm::GetFormByNumericID(v3);
-    FalloutRadio::pLostPipboyStation = static_cast<FalloutRadio::FORadioStation*>(
-        XFNV_DYNAMIC_CAST_VOID(TESBoundObject)(v4, RTTI_TESForm, RTTI_TESBoundObject)
-    );
+    FalloutRadio::pLostPipboyStation =
+        reinterpret_cast<FalloutRadio::FORadioStation*>(dynamic_cast<TESBoundObject*>(v4));
     if (apLoadGameBuffer->GetVersion() >= 10u) {
         uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
         for (uint32_t iloop_3 = 0; iloop_3 < isaveGameCount_3; ++iloop_3) {

@@ -974,10 +974,8 @@ void NiControllerSequence::PostLinkObject(NiStream& kStream) {
         for (uint32_t ui = 0; ui < uiNames; ui++) {
             _NiFree(kNames.m_pBase[ui]);
         }
-        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<NiPointer<NiInterpController>, NiTNewInterface<NiPointer<NiInterpController>>>)(
-            &kCtlrs
-        );
-        XFNV_DESTRUCT_AS(DestructInlined, NiTArray<char*, NiTMallocInterface<char*>>)(&kNames);
+        kCtlrs.~NiTObjectArray();
+        kNames.~NiTPrimitiveArray();
     }
 }
 

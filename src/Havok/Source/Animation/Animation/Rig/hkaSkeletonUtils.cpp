@@ -634,14 +634,14 @@ hkResult hkaSkeletonUtils::bindByName(
         ::new (&kStream) hkErrStream(buf, 512);
         kStream << "Binding is not initiialized";
         hkError::s_instance->message(hkError::MESSAGE_WARNING, 0x654E3435, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 439);
-        XFNV_DESTRUCT(hkOstream)(&kStream);
+        kStream.~hkErrStream();
         return HK_FAILURE;
     }
     if (anim.m_annotationTracks.m_size != anim.m_numberOfTransformTracks) {
         ::new (&kStream) hkErrStream(buf, 512);
         kStream << "No track names present in animation";
         hkError::s_instance->message(hkError::MESSAGE_WARNING, 0x654E3437, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 446);
-        XFNV_DESTRUCT(hkOstream)(&kStream);
+        kStream.~hkErrStream();
         return HK_FAILURE;
     }
     const int32_t numBones = skeleton.m_bones.m_size;
@@ -652,7 +652,7 @@ hkResult hkaSkeletonUtils::bindByName(
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x654E3437, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 456
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
             return HK_FAILURE;
         }
     }
@@ -671,7 +671,7 @@ hkResult hkaSkeletonUtils::bindByName(
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x654E3438, buf, ".\\Rig\\hkaSkeletonUtils.cpp", 478
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
             return HK_FAILURE;
         }
     }

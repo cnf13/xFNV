@@ -352,7 +352,7 @@ bool BSFaceGenModel::LoadModelMesh(
                 bLoaded = true;
             }
         }
-        XFNV_DESTRUCT(std::string)(pTriName);
+        pTriName->~basic_string();
         if (bLoaded) {
             if (aeHairPart != HAIR_PART_NONE) {
                 void* pHairMemory = NiMemObject::operator new(sizeof(BSFaceGenMorphDataHair));
@@ -1066,7 +1066,8 @@ void* DestroyTriSurfLabel(void* a1) {
 }
 
 FffTriSurfLabelS* Destroy(FffTriSurfLabelS* _Ptr) {
-    return XFNV_DELETE(FffTriSurfLabelS)(_Ptr, 0);
+    _Ptr->~FffTriSurfLabelS();
+    return _Ptr;
 }
 
 FffModeTexS* CopyOpt(const FffModeTexS* a1, const FffModeTexS* a2, FffModeTexS* a3) {

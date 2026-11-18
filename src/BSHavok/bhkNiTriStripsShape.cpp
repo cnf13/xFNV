@@ -285,7 +285,7 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
         pScale[3] = __builtin_bswap32(pScale[3]);
     }
     static_cast<bhkSerializable*>(this)->KillCinfo(bCreated);
-    XFNV_DESTRUCT(NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>)(&kShapes);
+    kShapes.~NiTLargePrimitiveArray();
     pTLS->eMemContext = eMemContext;
 }
 
@@ -463,7 +463,7 @@ void bhkNiTriStripsShape::KillCinfo(bool abCreated) {
     if (abCreated) {
         hkNiTriStripsShapeCinfo* pCinfo = static_cast<hkNiTriStripsShapeCinfo*>(this->pInfo);
         if (pCinfo) {
-            XFNV_DESTRUCT(NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>)(&pCinfo->pShapesA);
+            pCinfo->pShapesA.~NiTLargePrimitiveArray();
             // The block's padding byte sits just before the cinfo the alignment produced.
             uint8_t* pBytes = static_cast<uint8_t*>(static_cast<void*>(pCinfo));
             uint8_t uiPad = pBytes[-1];

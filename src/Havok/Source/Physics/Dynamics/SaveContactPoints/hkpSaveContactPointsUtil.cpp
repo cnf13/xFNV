@@ -557,7 +557,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
                         pTrack, pSubTrack
                     ) != 0) {
                     if (pSubTrack) {
-                        XFNV_DESTRUCT(hkpSerializedTrack1nInfo)(pSubTrack);
+                        pSubTrack->hkpSerializedTrack1nInfo::~hkpSerializedTrack1nInfo();
                         hkMemoryRouter::getInstance().m_heap->blockFree(
                             pSubTrack, static_cast<int32_t>(sizeof(hkpSerializedSubTrack1nInfo))
                         );
@@ -579,7 +579,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
                     ++subTracks.m_size;
                 }
                 else {
-                    XFNV_DESTRUCT(hkpSerializedTrack1nInfo)(pSubTrack);
+                    pSubTrack->hkpSerializedTrack1nInfo::~hkpSerializedTrack1nInfo();
                     hkMemoryRouter::getInstance().m_heap->blockFree(
                         pSubTrack, static_cast<int32_t>(sizeof(hkpSerializedSubTrack1nInfo))
                     );

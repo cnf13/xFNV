@@ -103,7 +103,7 @@ void hkVisualDebugger::step(float frameTimeInMs) {
             hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
             *pStream << "Client has died, cleaning up (host name not available at present)";
             hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 288);
-            XFNV_DESTRUCT(hkOstream)(pStream);
+            pStream->~hkErrStream();
             hkError::s_instance->sectionEnd();
             deleteClient(i);
         }
@@ -133,7 +133,7 @@ void hkVisualDebugger::pollForNewClients() {
                 ::new (&apThis) hkErrStream(buf, 512);
                 apThis.operator<<("A new network client has been received (host name not available at present)");
                 hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 232);
-                XFNV_DESTRUCT(hkOstream)(&apThis);
+                apThis.~hkErrStream();
                 createClient(v3, &v3->m_reader, &v3->m_writer);
             }
         }
@@ -183,7 +183,7 @@ void hkVisualDebugger::serve(int32_t listenPort) {
             hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, description, ".\\hkVisualDebugger.cpp", 107);
         }
     }
-    XFNV_DESTRUCT(hkOstream)(&kStream);
+    kStream.~hkErrStream();
     hkError::s_instance->sectionEnd();
 }
 
@@ -201,7 +201,7 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
         *pStream << "Capturing simulation state to '" << captureFilename << "'";
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 125);
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
         createClient(nullptr, nullptr, pWriter);
         pWriter->removeReference();
         hkVisualDebuggerClient* pClient = &m_clients.m_data[m_clients.m_size - 1];
@@ -220,7 +220,7 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
         *pStream << kViewers.m_string.m_data;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 147);
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
         // EXE-INLINED 0xCBBD40
         hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
         kViewers.m_string.m_size = 0;
@@ -234,7 +234,7 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);
         *pStream << "Capture file '" << captureFilename << "' could not be opened for writing";
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, acBuffer, ".\\hkVisualDebugger.cpp", 151);
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
     }
     hkError::s_instance->sectionEnd();
 }
@@ -396,7 +396,7 @@ void hkVisualDebugger::shutdown() {
         ::new (&apThis) hkErrStream(buf, 512);
         apThis.operator<<("Client deleted.");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 81);
-        XFNV_DESTRUCT(hkOstream)(&apThis);
+        apThis.~hkErrStream();
     }
     hkSocket* m_server = this->m_server;
     if (m_server) {
@@ -405,7 +405,7 @@ void hkVisualDebugger::shutdown() {
         ::new (&apThis) hkErrStream(buf, 512);
         apThis.operator<<("Server deleted.");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 88);
-        XFNV_DESTRUCT(hkOstream)(&apThis);
+        apThis.~hkErrStream();
     }
     hkError::s_instance->sectionEnd();
 }
@@ -458,7 +458,7 @@ void hkVisualDebugger::removeDefaultProcess(const char* processName) {
         hkOstream* v5 = &v4->operator<<(processName);
         v5->operator<<("', cannot not be removed from the default process list as it cannot be found!");
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 318);
-        XFNV_DESTRUCT(hkOstream)(&apThis);
+        apThis.~hkErrStream();
         hkError::s_instance->sectionEnd();
     }
     else {

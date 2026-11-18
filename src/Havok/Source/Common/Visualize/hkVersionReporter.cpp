@@ -42,7 +42,7 @@ hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     ::new (&connectionStream) hkDisplaySerializeOStream(connection);
     connectionStream.write32(rawData.m_size);
     connectionStream.writeRaw(rawData.m_data, rawData.m_size);
-    XFNV_DESTRUCT(hkOArchive)(&connectionStream);
+    connectionStream.~hkDisplaySerializeOStream();
     // EXE-INLINED none: hkStringBuf::~hkStringBuf()
     hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
     compiler.m_string.m_size = 0;
@@ -53,7 +53,7 @@ hkResult hkVersionReporter::sendVersionInformation(hkStreamWriter* connection) {
     }
     compiler.m_string.m_data = nullptr;
     compiler.m_string.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    XFNV_DESTRUCT(hkOArchive)(&commandStream);
+    commandStream.~hkDisplaySerializeOStream();
     // EXE-INLINED none: hkArray<char>::~hkArray()
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     rawData.m_size = 0;

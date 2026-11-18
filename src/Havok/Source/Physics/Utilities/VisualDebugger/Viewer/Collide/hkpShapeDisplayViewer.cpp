@@ -250,7 +250,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
                         hkError::MESSAGE_REPORT, -1, buf,
                         ".\\VisualDebugger\\Viewer\\Collide\\hkpShapeDisplayViewer.cpp", 316
                     );
-                    XFNV_DESTRUCT(hkOstream)(&errStream);
+                    errStream.~hkErrStream();
                     // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
                     const int32_t last = --displayGeometries.m_size;
                     if (last != i) {

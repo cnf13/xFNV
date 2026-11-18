@@ -961,12 +961,8 @@ float Character::GetClothingValue() {
         for (BIPED_OBJECT part = BO_HEAD; part < BIPED_OBJECT_COUNT; part = static_cast<BIPED_OBJECT>(part + 1)) {
             ItemChange* WornItem = ContainerChanges->GetWornItem(part, false);
             if (WornItem) {
-                char* v8 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESObjectARMO)(
-                    WornItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectARMO
-                ));
-                char* v7 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESObjectCLOT)(
-                    WornItem->pContainerObj, RTTI_TESBoundObject, RTTI_TESObjectCLOT
-                ));
+                char* v8 = reinterpret_cast<char*>(dynamic_cast<TESObjectARMO*>(WornItem->pContainerObj));
+                char* v7 = reinterpret_cast<char*>(dynamic_cast<TESObjectCLOT*>(WornItem->pContainerObj));
                 if (v8) {
                     double ItemValue = WornItem->GetItemValue();
                     double v5 = fClothingArmorScale.Float() * ItemValue;

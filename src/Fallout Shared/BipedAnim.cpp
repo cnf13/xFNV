@@ -1877,7 +1877,7 @@ float NiAVObject::GetScale() {
 }
 
 void NiAVObjectArray_Destruct(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
-    XFNV_DESTRUCT(NiTArray<NiPointer<NiAVObject>, NiTNewInterface<NiPointer<NiAVObject>>>)(apArray);
+    apArray->~NiTObjectArray();
 }
 
 uint32_t NiAVObjectArray_Add(NiTObjectArray<NiPointer<NiAVObject>>* apArray, const NiPointer<NiAVObject>& arspElement) {

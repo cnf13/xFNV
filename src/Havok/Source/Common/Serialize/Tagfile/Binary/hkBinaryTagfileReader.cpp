@@ -674,7 +674,7 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
             hkError::MESSAGE_WARNING, 0x2AB6036F, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 453
         );
     LABEL_12:;
-        XFNV_DESTRUCT(hkOstream)(&apThis);
+        apThis.~hkErrStream();
     }
 LABEL_13:;
     ::new (apResult) hkDataObject(nullptr);

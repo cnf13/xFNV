@@ -405,7 +405,6 @@ void TESSaveLoadGame::BuildChangesString(
 
     TESObjectREFR* pref = dynamic_cast<TESObjectREFR*>(apForm);
     MobileObject* pmob = dynamic_cast<MobileObject*>(apForm);
-    XFNV_DYNAMIC_CAST_VOID(Actor)(apForm, RTTI_TESForm, RTTI_Actor);
     if (pmob) {
         PROCESS_TYPE type = PROCESS_TYPE_NONE;
         if (pmob->pCurrentProcess) {
@@ -1436,7 +1435,7 @@ void TESSaveLoadGame::DestroyBuffer(void* apBuffer) {
 void TESSaveLoadGame::DeleteForm(TESForm* apForm) {
     Warning("FORMS: DeleteForm() was called, but the game is not being loaded.");
     m_pChanges->RemoveChanges(apForm, true);
-    char* v4 = static_cast<char*>(XFNV_DYNAMIC_CAST_VOID(TESObjectCELL)(apForm, RTTI_TESForm, RTTI_TESObjectCELL));
+    char* v4 = reinterpret_cast<char*>(dynamic_cast<TESObjectCELL*>(apForm));
     if (apForm->GetTemporary() || v4) {
         uint32_t NextID = pDataHandler->GetNextID();
         apForm->SetFormID(NextID, true);
@@ -2674,9 +2673,6 @@ void TESSaveLoadGame::SaveInitialData(TESForm* a1, uint32_t a2) {
             pSaveLoadGameOLD->SaveGameDataOLD(&apMemory, 28u);
         }
     }
-    else {
-        XFNV_DYNAMIC_CAST_VOID(TESObjectCELL)(a1, RTTI_TESForm, RTTI_TESObjectCELL);
-    }
 }
 
 int32_t TESSaveLoadGame::GetInitialDataSaveSize(TESForm* a1, uint32_t a2) {
@@ -3466,9 +3462,7 @@ void TESSaveLoadGame::LoadCharControllers() {
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(iformID);
         MobileObject* pmob = dynamic_cast<MobileObject*>(FormByNumericID);
         if (pmob) {
-            MiddleHighProcess* phighProcess = static_cast<MiddleHighProcess*>(
-                XFNV_DYNAMIC_CAST_VOID(HighProcess)(pmob->pCurrentProcess, RTTI_BaseProcess, RTTI_HighProcess)
-            );
+            MiddleHighProcess* phighProcess = dynamic_cast<HighProcess*>(pmob->pCurrentProcess);
             if (phighProcess) {
                 char apData[4];
                 void* ptempBuffer = m_pBuffer;

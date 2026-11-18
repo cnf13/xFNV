@@ -1861,8 +1861,6 @@ void TESObjectWEAP::Fire(TESObjectREFR* apSource) {
                     pItemReward = pobject;
                 }
                 if (pItemReward) {
-                    // Casts to TESFullName and drops the result, as the game does.
-                    XFNV_DYNAMIC_CAST_VOID(TESFullName)(pobject, RTTI_TESForm, RTTI_TESFullName);
                     pPlayer->AddObjecttoContainer(static_cast<TESBoundObject*>(pItemReward), nullptr, 1);
                 }
             }

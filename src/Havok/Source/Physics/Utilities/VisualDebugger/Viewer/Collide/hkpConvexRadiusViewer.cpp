@@ -79,7 +79,7 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
             hkError::s_instance->message(
                 hkError::MESSAGE_REPORT, -1, buf, ".\\VisualDebugger\\Viewer\\Collide\\hkpConvexRadiusViewer.cpp", 0xA7
             );
-            XFNV_DESTRUCT(hkOstream)(pError);
+            pError->~hkErrStream();
             // EXE-INLINED none: hkArray::removeAt
             uint32_t last = --displayGeometries.m_size;
             if (static_cast<int32_t>(last) != i) {

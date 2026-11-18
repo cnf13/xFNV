@@ -467,7 +467,7 @@ void NiD3DShaderDeclaration::_SDMShutdown() {
             }
             kArray.m_usSize = 0;
             kArray.m_usESize = 0;
-            XFNV_DESTRUCT_AS(DestructInlined, NiTArray<PackFunction, NiTMallocInterface<PackFunction>>)(&kArray);
+            kArray.~NiTPrimitiveArray();
             NiMemObject::operator delete(pkEntry, sizeof(NiPackerEntry));
             pkPackFunctions = ms_pkPackFunctions;
         }

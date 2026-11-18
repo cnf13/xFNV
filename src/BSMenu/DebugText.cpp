@@ -436,7 +436,7 @@ void DebugText::HandleQueuedPrints() {
     for (uint32_t iprintCt = 0; iprintCt < xPrintData.iSize; ++iprintCt) {
         DebugText::DebugTextData* Block = xPrintData.pBuffer[iprintCt]->pTextData;
         if (Block) {
-            XFNV_DESTRUCT(DebugText::DebugTextData)(Block);
+            Block->~DebugTextData();
             MemoryManager_Singleton.Deallocate(Block);
         }
         MemoryManager_Singleton.Deallocate(xPrintData.pBuffer[iprintCt]);
@@ -805,7 +805,7 @@ void DebugText::Idle() {
                         DebugText::Unlock();
                         DebugText::DebugTextData* apThis = pme->xFloatingTextList.Remove(pitem);
                         if (apThis) {
-                            XFNV_DESTRUCT(DebugText::DebugTextData)(apThis);
+                            apThis->~DebugTextData();
                             MemoryManager_Singleton.Deallocate(apThis);
                         }
                     }
@@ -814,7 +814,7 @@ void DebugText::Idle() {
             else {
                 DebugText::DebugTextData* Block = pme->xFloatingTextList.Remove(pitem);
                 if (Block) {
-                    XFNV_DESTRUCT(DebugText::DebugTextData)(Block);
+                    Block->~DebugTextData();
                     MemoryManager_Singleton.Deallocate(Block);
                 }
             }

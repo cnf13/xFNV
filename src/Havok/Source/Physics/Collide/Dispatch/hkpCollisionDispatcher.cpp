@@ -306,7 +306,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 547
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
         for (int32_t j = 1; j < HK_MAX_SHAPE_TYPE; j++) {
             const DebugEntry& rEntry = (*m_debugAgent2TablePred)[i][j];
             if (rEntry.m_priority < 100) {
@@ -321,7 +321,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
                 hkError::s_instance->message(
                     hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 562
                 );
-                XFNV_DESTRUCT(hkOstream)(pStream);
+                pStream->~hkErrStream();
             }
         }
         // EXE-INLINED 0xCBBD40
@@ -340,7 +340,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 570
         );
-        XFNV_DESTRUCT(hkOstream)(pStream);
+        pStream->~hkErrStream();
         for (int32_t j = 1; j < HK_MAX_SHAPE_TYPE; j++) {
             const DebugEntry& rEntry = (*m_debugAgent2Table)[i][j];
             if (rEntry.m_priority < 100) {
@@ -355,7 +355,7 @@ void hkpCollisionDispatcher::debugPrintTable() {
                 hkError::s_instance->message(
                     hkError::MESSAGE_REPORT, -1, acBuffer, ".\\Dispatch\\hkpCollisionDispatcher.cpp", 585
                 );
-                XFNV_DESTRUCT(hkOstream)(pStream);
+                pStream->~hkErrStream();
             }
         }
         // EXE-INLINED 0xCBBD40

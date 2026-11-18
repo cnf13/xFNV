@@ -143,8 +143,7 @@ void BGSImpactDataSet::InitItem() {
 }
 
 void BGSImpactDataSet::Copy(TESForm* apCopy) {
-    TESForm* v3 =
-        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCopy, RTTI_TESForm, RTTI_BGSImpactDataSet));
+    TESForm* v3 = dynamic_cast<BGSImpactDataSet*>(apCopy);
     if (v3) {
         CopyAllComponents(v3);
         ourMemcpy(ppImpactData, &v3[1].cFormType, sizeof(ppImpactData));
@@ -152,8 +151,7 @@ void BGSImpactDataSet::Copy(TESForm* apCopy) {
 }
 
 bool BGSImpactDataSet::Compare(TESForm* apCompare) {
-    TESForm* v4 =
-        static_cast<TESForm*>(XFNV_DYNAMIC_CAST_VOID(BGSImpactDataSet)(apCompare, RTTI_TESForm, RTTI_BGSImpactDataSet));
+    TESForm* v4 = dynamic_cast<BGSImpactDataSet*>(apCompare);
     if (!v4) {
         return true;
     }

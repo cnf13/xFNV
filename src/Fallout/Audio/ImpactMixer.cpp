@@ -828,7 +828,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     }
     if (apRef->IsActor()) {
         MobileObject* pmob;
-        pmob = static_cast<MobileObject*>(XFNV_DYNAMIC_CAST_VOID(Actor)(apRef, RTTI_TESObjectREFR, RTTI_Actor));
+        pmob = dynamic_cast<Actor*>(apRef);
         if (pmob->IsDead(false)) {
         LABEL_7:;
             return;

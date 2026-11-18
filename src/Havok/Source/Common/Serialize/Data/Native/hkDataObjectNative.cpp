@@ -174,7 +174,7 @@ uint64_t hkDataObjectNative::DBB140(
     hkError::s_instance->message(
         hkError::MESSAGE_WARNING, 0x3476D70F, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 55
     );
-    XFNV_DESTRUCT(hkOstream)(&kStream);
+    kStream.~hkErrStream();
 #if XFNV_64BIT
     return kResult;
 #else
@@ -475,7 +475,7 @@ void hkDataWorldNative::setContents(void* object, const hkClass& klass) {
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, 0x1800473B, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 764
         );
-        XFNV_DESTRUCT(hkOstream)(&kStream);
+        kStream.~hkErrStream();
         m_contents.m_object = nullptr;
     }
 }
@@ -981,7 +981,7 @@ hkDataObjectImpl* hkDataObjectNative::DBB260(const hkDataWorldNative* apWorld, h
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, 0x1800473A, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 711
             );
-            XFNV_DESTRUCT(hkOstream)(&kStream);
+            kStream.~hkErrStream();
             apVariant->m_object = nullptr;
             apVariant->m_class = nullptr;
         }

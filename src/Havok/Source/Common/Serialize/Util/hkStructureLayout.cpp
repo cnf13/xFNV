@@ -125,7 +125,7 @@ int32_t hkStructureLayout::getMemberSize(
                 )) {
                 __builtin_debugtrap();
             }
-            XFNV_DESTRUCT(hkOstream)(&apThis);
+            apThis.~hkErrStream();
         LABEL_16:;
             result = 0;
             break;

@@ -338,7 +338,6 @@ float Actor::CheckResistance(MagicCaster* apCaster, MagicItem* apSpell, ActiveEf
             return 1.0f;
         }
     }
-    XFNV_DYNAMIC_CAST_VOID(Actor)(apCaster, RTTI_MagicCaster, RTTI_Actor);
     Actor* pActor = this;
     float fMagicTypeResistance = 0.0f;
     if (bPoison || apSpell->GetSpellType() == MagicSystem::POISON) {

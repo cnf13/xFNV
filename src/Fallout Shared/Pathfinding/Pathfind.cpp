@@ -1523,7 +1523,7 @@ bool Pathing::FindNavmeshesForLocation(
                 for (uint32_t j = 0; j < padjCell->GetNavMeshArray()->GetNavMeshCount(); ++j) {
                     NavMeshPtr* pnavMesh = padjCell->GetNavMeshArray()->GetNavMeshByIndex(&spnavMesh, j);
                     apRetNavMeshes->Add(*pnavMesh);
-                    XFNV_DESTRUCT(NiPointer<NavMesh>)(&spnavMesh);
+                    spnavMesh.~NavMeshPtr();
                 }
             }
         }
@@ -2390,7 +2390,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                 }
                 NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apResult, i);
                 apRetNavMeshes->Add(*aItem);
-                XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+                apResult.~NavMeshPtr();
             }
         }
     }
@@ -2408,7 +2408,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                         }
                         NavMeshPtr* NavMeshByIndex = parray_2->GetNavMeshByIndex(&apMemory, i_3);
                         apRetNavMeshes->Add(*NavMeshByIndex);
-                        XFNV_DESTRUCT(NiPointer<NavMesh>)(&apMemory);
+                        apMemory.~NavMeshPtr();
                     }
                 }
             }

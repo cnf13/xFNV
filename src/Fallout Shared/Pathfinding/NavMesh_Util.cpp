@@ -1742,7 +1742,7 @@ void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
                         NavMesh* pnavmesh = dynamic_cast<NavMesh*>(pnavmeshForm);
                         NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pnavmesh);
                         spnavmesh.operator=(*ptr);
-                        XFNV_DESTRUCT(NiPointer<NavMesh>)(&apResult);
+                        apResult.~NavMeshPtr();
                     }
                     if (spnavmesh.operator NavMesh*()) {
                         NavMesh* Object = spnavmesh.m_pObject;
