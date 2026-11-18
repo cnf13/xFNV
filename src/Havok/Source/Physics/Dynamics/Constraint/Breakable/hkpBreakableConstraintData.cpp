@@ -55,9 +55,8 @@ hkpBreakableConstraintData::~hkpBreakableConstraintData() {
     m_constraintData->removeReference();
 }
 
-hkBool* hkpBreakableConstraintData::isValid(hkBool* arResult) const {
-    m_constraintData->isValid(arResult);
-    return arResult;
+hkBool hkpBreakableConstraintData::isValid() const {
+    return m_constraintData->isValid();
 }
 
 int32_t hkpBreakableConstraintData::getType() const {
@@ -80,8 +79,7 @@ void hkpBreakableConstraintData::buildJacobian(const hkpConstraintQueryIn& in, h
     if (runtime->m_isBroken.m_bool) {
         buildNopJacobian(in, out);
         if (m_removeWhenBroken.m_bool) {
-            hkBool result;
-            in.m_constraintInstance->m_entities[0]->m_world->removeConstraint(&result, in.m_constraintInstance);
+            in.m_constraintInstance->m_entities[0]->m_world->removeConstraint(in.m_constraintInstance);
         }
         return;
     }
@@ -112,9 +110,8 @@ void hkpBreakableConstraintData::buildJacobian(const hkpConstraintQueryIn& in, h
     }
 }
 
-hkBool* hkpBreakableConstraintData::isBuildJacobianCallbackRequired(hkBool* arResult) const {
-    arResult->m_bool = true;
-    return arResult;
+hkBool hkpBreakableConstraintData::isBuildJacobianCallbackRequired() const {
+    return true;
 }
 
 // The wrapped constraint's solver results head the runtime, this class's Runtime follows m_childRuntimeSize bytes in.

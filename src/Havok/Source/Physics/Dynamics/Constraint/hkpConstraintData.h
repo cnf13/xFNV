@@ -68,7 +68,7 @@ public:
         return 0xff;
     }
     // Whether the constraint's atoms are consistent.
-    virtual hkBool* isValid(hkBool* arResult) const = 0;
+    virtual hkBool isValid() const = 0;
     // The ConstraintType.
     virtual int32_t getType() const = 0;
     // Fills infoOut with the runtime this constraint needs.
@@ -80,9 +80,8 @@ public:
     virtual void buildJacobian(const hkpConstraintQueryIn& in, hkpConstraintQueryOut& out) {}
 
     // Whether buildJacobianCallback must run; the base writes false into arResult.
-    virtual hkBool* isBuildJacobianCallbackRequired(hkBool* arResult) const {
-        arResult->m_bool = false;
-        return arResult;
+    virtual hkBool isBuildJacobianCallbackRequired() const {
+        return false;
     }
 
     virtual void buildJacobianCallback(const hkpConstraintQueryIn& in) {}

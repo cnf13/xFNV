@@ -53,8 +53,7 @@ public:
     static const hkClass& staticClass();
     // Grows aabb by the collection's radius, clips it to the height field and returns its sample ranges; false when
     // nothing is left.
-    static hkBool* getExtentsForQueryAabb(
-        hkBool* apResult,
+    static hkBool getExtentsForQueryAabb(
         hkAabb& aabb,
         const hkpTriSampledHeightFieldCollection* collection,
         uint32_t& minX,

@@ -114,9 +114,8 @@ static hkpProjectileGunClass_MembersArray hkpProjectileGunClass_Members{
 };
 
 static void removeFromWorld(hkpGunProjectile* apThis, [[maybe_unused]] void* apEdx) {
-    hkBool result;
     if (apThis->m_body) {
-        apThis->m_body->m_world->removeEntity(&result, apThis->m_body);
+        apThis->m_body->m_world->removeEntity(apThis->m_body);
         if (apThis->m_flags.anyIsSet(hkpGunProjectile::HIT_LISTENING)) {
             apThis->m_body->removeContactListener(static_cast<hkpContactListener*>(apThis));
         }

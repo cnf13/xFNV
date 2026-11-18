@@ -153,8 +153,7 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
         hkArray<hkpLinkedCollidable::CollisionEntry>& collisionEntries = entity->m_collidable.m_collisionEntries;
         for (int32_t i = 0; i < collisionEntries.m_size; i++) {
             hkpEntity* otherEntity = static_cast<hkpEntity*>(collisionEntries.m_data[i].m_partner->getOwner());
-            hkBool bFixed;
-            if (!otherEntity->isFixed(&bFixed)->m_bool) {
+            if (!otherEntity->isFixed().m_bool) {
                 checkConnectivityOut.addEdge(e, otherEntity->m_storageIndex);
                 if (checkConnectivityOut.isOneGroup().m_bool) {
                     return true;
@@ -166,9 +165,7 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
         hkpEntity* entity = m_entities.m_data[e];
         for (int32_t i = 0; i < entity->m_constraintsMaster.m_size; i++) {
             hkConstraintInternal* con = &entity->m_constraintsMaster.begin()[i];
-            hkBool bFixed0;
-            hkBool bFixed1;
-            if (!con->m_entities[0]->isFixed(&bFixed0)->m_bool && !con->m_entities[1]->isFixed(&bFixed1)->m_bool) {
+            if (!con->m_entities[0]->isFixed().m_bool && !con->m_entities[1]->isFixed().m_bool) {
                 checkConnectivityOut.addEdge(con->m_entities[0]->m_storageIndex, con->m_entities[1]->m_storageIndex);
                 if (checkConnectivityOut.isOneGroup().m_bool) {
                     return true;
@@ -191,14 +188,12 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
             int32_t firstUnfixed = -1;
             int32_t k;
             for (k = 0; k < actionEntities.m_size && firstUnfixed == -1; k++) {
-                hkBool bFixed;
-                if (!actionEntities.m_data[k]->isFixed(&bFixed)->m_bool) {
+                if (!actionEntities.m_data[k]->isFixed().m_bool) {
                     firstUnfixed = k;
                 }
             }
             for (; k < actionEntities.m_size; k++) {
-                hkBool bFixed;
-                if (!actionEntities.m_data[k]->isFixed(&bFixed)->m_bool) {
+                if (!actionEntities.m_data[k]->isFixed().m_bool) {
                     checkConnectivityOut.addEdge(
                         actionEntities.m_data[firstUnfixed]->m_storageIndex, actionEntities.m_data[k]->m_storageIndex
                     );

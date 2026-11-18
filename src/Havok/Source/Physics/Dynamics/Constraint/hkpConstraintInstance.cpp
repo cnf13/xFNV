@@ -218,8 +218,7 @@ hkpConstraintInstance* hkpConstraintInstance::clone(
         );
         goto LABEL_11;
     }
-    hkBool bConstrainedToWorld;
-    if (!isConstrainedToWorld(&bConstrainedToWorld)->m_bool) {
+    if (!isConstrainedToWorld().m_bool) {
         goto LABEL_10;
     }
     m_data = hkpConstraintDataCloningUtil::deepClone(this->getDataRw());
@@ -249,18 +248,17 @@ void hkpConstraintInstance::replaceEntity(hkpEntity* oldEntity, hkpEntity* newEn
 }
 
 // Whether entity B is missing or is entity A's world's fixed rigid body.
-hkBool* hkpConstraintInstance::isConstrainedToWorld(hkBool* arResult) const {
+hkBool hkpConstraintInstance::isConstrainedToWorld() const {
     hkpWorld* pWorld;
     hkpEntity* pEntityB = m_entities[1];
     if (!pEntityB ||
         ((pWorld = m_entities[0]->m_world) != nullptr &&
          static_cast<const void*>(pEntityB) == static_cast<const void*>(pWorld->m_fixedRigidBody))) {
-        arResult->m_bool = 1;
+        return 1;
     }
     else {
-        arResult->m_bool = 0;
+        return 0;
     }
-    return arResult;
 }
 
 // The master entity's island: entity A, or entity B when A is fixed. getMasterEntity's test is written out inline (a
@@ -417,8 +415,7 @@ bool* hkpConstraintInstance::isEnabled(bool* a1) {
 // local first; a ball and socket's pivot B and a ragdoll's axes in B are transformed in place in the data, as they are
 // taken by reference.
 void hkpConstraintInstance::transform(const hkTransform& transformation) {
-    hkBool bConstrainedToWorld;
-    if (!isConstrainedToWorld(&bConstrainedToWorld)->m_bool) {
+    if (!isConstrainedToWorld().m_bool) {
         return;
     }
     hkpConstraintData* data = getDataRw();

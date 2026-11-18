@@ -51,7 +51,7 @@ public:
     void disableCollisionGroups(uint32_t groupBitsA, uint32_t groupBitsB);
     // Whether the groups of two filter infos collide; the five filter interfaces call it with this as the filter's
     // primary base and read m_noGroupCollisionEnabled and m_collisionGroups.
-    hkBool* isCollisionEnabled(hkBool* apResult, uint32_t infoA, uint32_t infoB) const;
+    hkBool isCollisionEnabled(uint32_t infoA, uint32_t infoB) const;
 
     static const hkClass& staticClass();
 

@@ -252,8 +252,7 @@ void hkpVehicleViewer::actionAddedCallback(hkpAction* action) {
     hkpVehicleInstance* v7 = static_cast<hkpVehicleInstance*>(action);
     const hkClass* v8 = v6->getClassFromVirtualInstance(action);
     if ((v5) && (v8)) {
-        hkBool isVehicle;
-        if (v5->isSuperClass(&isVehicle, *v8)->m_bool) {
+        if (v5->isSuperClass(*v8).m_bool) {
             v7->addReference();
             hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
             if (m_vehicles.m_size ==

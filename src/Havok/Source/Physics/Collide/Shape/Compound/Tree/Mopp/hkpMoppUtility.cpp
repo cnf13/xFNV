@@ -111,8 +111,7 @@ hkpMoppCode* hkpMoppUtility::buildCodeInternal(
     }
 
     // Warning id 0x7DD65995 is switched off around the compile and restored after.
-    hkBool bWasEnabled;
-    hkError::s_instance->isEnabled(&bWasEnabled, 0x7DD65995);
+    hkBool bWasEnabled = hkError::s_instance->isEnabled(0x7DD65995);
     hkBool kDisabled;
     kDisabled.m_bool = 0;
     hkError::s_instance->setEnabled(0x7DD65995, kDisabled);

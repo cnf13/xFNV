@@ -199,8 +199,7 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
         }
         hkpRigidBody* newBodyA = newSystem->m_rigidBodies.m_data[indexA];
         hkpRigidBody* newBodyB;
-        hkBool bConstrainedToWorld;
-        if (constraint->isConstrainedToWorld(&bConstrainedToWorld)->m_bool) {
+        if (constraint->isConstrainedToWorld().m_bool) {
             newBodyB = nullptr;
         }
         else {
@@ -285,9 +284,8 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
     return newSystem;
 }
 
-hkBool* hkpPhysicsSystem::hasContacts(hkBool* arResult) {
-    arResult->m_bool = false;
-    return arResult;
+hkBool hkpPhysicsSystem::hasContacts() {
+    return false;
 }
 
 // Drops the system's reference to each of its rigid bodies, phantoms, constraints and actions, and empties the arrays.

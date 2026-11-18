@@ -40,13 +40,8 @@ public:
     // hkpProcessFlyingColors), stores the code, builds the query from the box and walks the tree; returns m_hitFound
     // through apResult. The parameters are in the order they are passed on to generateQueryFromNode; the radius is read
     // through a reference.
-    hkBool* queryObb(
-        hkBool* apResult,
-        const hkpMoppCode* code,
-        const hkTransform& BvToWorld,
-        const hkVector4& extent,
-        const float& radius
-    );
+    hkBool
+    queryObb(const hkpMoppCode* code, const hkTransform& BvToWorld, const hkVector4& extent, const float& radius);
 
 protected:
     // Walks the code under the query, narrowing the box at each node, until a terminal sets m_hitFound. Not const,

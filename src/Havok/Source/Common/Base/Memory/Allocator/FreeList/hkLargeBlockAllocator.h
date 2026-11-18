@@ -157,7 +157,7 @@ public:
     void _unlinkLargeChunk(hkMemTreeChunk* x);
     // Havok SDK signature (hkBase.lib, tied by bytes,reloc).
     void _makeTopValid() const;
-    hkBool* _resizeSingleBlockServerPage(hkBool* apResult, uint32_t newSize);
+    hkBool _resizeSingleBlockServerPage(uint32_t newSize);
     // Havok SDK signature (hkBase.lib, tied by bytes,reloc).
     void* _allocLarge(uint32_t nb);
     // Havok SDK signature (hkBase.lib, tied by bytes,reloc).
@@ -169,14 +169,14 @@ public:
     // Returns the first block of the first page in apResult; a null chunk when there are no pages.
     Iterator* getIterator(Iterator* apResult);
     // Steps iter to the next block; false at the end.
-    hkBool* nextBlock(hkBool* apResult, Iterator& arIter);
+    hkBool nextBlock(Iterator& arIter);
     // The bytes of all used blocks.
     uint32_t _calculateUsed();
     // Whether mem is a live allocation.
     bool _checkUsedAlloc(const void* mem);
     // Whether p is a well-formed free chunk.
-    hkBool* _checkFreeChunk(hkBool* apResult, hkMemChunk* p);
-    hkBool* checkAllocations(hkBool* apResult, void** allocs, int32_t size);
+    hkBool _checkFreeChunk(hkMemChunk* p);
+    hkBool checkAllocations(void** allocs, int32_t size);
     // Calls callback(payload, payload size, param) for every used block.
     void forAllAllocs(void (*callback)(void*, uint32_t, void*), void* param);
 

@@ -512,7 +512,6 @@ void HitData::Copy(HitData* apSource) {
 
 void HitData::SetTargetedLimb(Projectile* apProjectile) {
     hkSphere hitSphere;
-    hkBool v53;
     NiPoint3 v65;
     int32_t v79;
     void* retaddr;
@@ -587,8 +586,8 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
                 phitCaster->Add(v3);
                 phitCaster->CastShape(origin, viewdir, fdistance);
                 hkpAllCdPointCollector* pcollector = phitCaster;
-                hkBool* v4 = pcollector->hasHit(&v53);
-                if (v4->operator bool()) {
+                hkBool v53 = pcollector->hasHit();
+                if (v53.operator bool()) {
                     for (int32_t i = 0;; ++i) {
                         int32_t FormHealth_0 = (&pcollector->getHits())->m_size;
                         if (i >= FormHealth_0) {

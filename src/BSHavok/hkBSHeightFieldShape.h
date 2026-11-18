@@ -26,7 +26,7 @@ public:
 
     void collideSpheres(const CollideSpheresInput& arInput, hkVector4* apOutputArray) const override;
     float getHeightAtImpl(int32_t aX, int32_t aZ) const override;
-    hkBool* getTriangleFlipImpl(hkBool* arResult) const override;
+    hkBool getTriangleFlipImpl() const override;
 
     NiPoint3* pData;
     int32_t invZRes;

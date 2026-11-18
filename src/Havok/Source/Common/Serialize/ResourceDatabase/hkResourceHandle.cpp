@@ -67,8 +67,7 @@ void hkResourceHandle::tryToResolveLinks(hkResourceMap& map) {
         }
         const hkClassMember& rMember = rLink.m_memberAccessor.getClassMember();
         const hkClass* pMemberClass = rMember.getClass();
-        hkBool bSuper;
-        if (pMemberClass->isSuperClass(&bSuper, *pTargetClass)->m_bool || pTargetClass == pMemberClass) {
+        if (pMemberClass->isSuperClass(*pTargetClass).m_bool || pTargetClass == pMemberClass) {
             if (pTarget == getObject()) {
                 break;
             }
@@ -431,7 +430,6 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
     const hkResourceHandle* prevObject
 ) const {
     hkMemoryResourceHandle** v6;
-    hkBool arResult;
     XFNV_INLINED_LOCAL(hkStringBuf, a2, std::nullopt, std::nullopt);
     int32_t v5 = 0;
     do {
@@ -486,7 +484,7 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
         }
         v13 = v8->getClass();
         v14 = v13;
-        if (klass == v13 || klass->isSuperClass(&arResult, *v13)->m_bool) {
+        if (klass == v13 || klass->isSuperClass(*v13).m_bool) {
             return v8;
         }
         if (objectName) {

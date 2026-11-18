@@ -231,7 +231,7 @@ public:
         hkpEntityActivation preferredActivationState,
         hkpUpdateCollisionFilterOnEntityMode collisionFilterUpdateMode
     );
-    hkBool* checkPerformance(hkBool* arResult) const;
+    hkBool checkPerformance() const;
     hkpMotion* getStoredDynamicMotion_0();
     char* checkPerformance(char* apResult);
 

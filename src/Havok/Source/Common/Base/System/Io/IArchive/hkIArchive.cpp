@@ -114,7 +114,6 @@ float hkIArchive::readFloat32() {
     return f;
 }
 
-hkBool* hkIArchive::isOk(hkBool* apResult) const {
-    m_streamReader->isOk(apResult);
-    return apResult;
+hkBool hkIArchive::isOk() const {
+    return m_streamReader->isOk();
 }

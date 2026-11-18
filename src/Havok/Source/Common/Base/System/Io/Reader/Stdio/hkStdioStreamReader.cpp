@@ -29,19 +29,16 @@ int32_t hkStdioStreamReader::read(void* buf, int32_t nbytes) {
     return result;
 }
 
-hkBool* hkStdioStreamReader::isOk(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)m_isOk.m_bool);
-    return arResult;
+hkBool hkStdioStreamReader::isOk() const {
+    return (int8_t)((uint8_t)m_isOk.m_bool);
 }
 
-hkBool* hkStdioStreamReader::markSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkStdioStreamReader::markSupported() const {
+    return 1;
 }
 
-hkBool* hkStdioStreamReader::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkStdioStreamReader::seekTellSupported() const {
+    return 1;
 }
 
 hkResult hkStdioStreamReader::seek(int32_t offset, hkStreamReader::SeekWhence whence) {
@@ -52,9 +49,8 @@ int32_t hkStdioStreamReader::tell() const {
     return std::ftell(m_handle);
 }
 
-hkBool* hkSeekableStreamReader::markSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkSeekableStreamReader::markSupported() const {
+    return 1;
 }
 
 hkResult hkSeekableStreamReader::setMark(int32_t markLimit) {
@@ -67,7 +63,6 @@ hkResult hkSeekableStreamReader::rewindToMark() {
     return seek(m_markPos, hkStreamReader::STREAM_SET);
 }
 
-hkBool* hkSeekableStreamReader::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkSeekableStreamReader::seekTellSupported() const {
+    return 1;
 }

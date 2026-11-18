@@ -185,8 +185,7 @@ hkMemoryTrackStreamReader::~hkMemoryTrackStreamReader() {
 // The SDK's read: at most the bytes left after m_offset, through the track's read; the offset moves by the count
 // asked for, as in the SDK.
 int32_t hkMemoryTrackStreamReader::read(void* buf, int32_t nbytes) {
-    hkBool bOk;
-    if (!isOk(&bOk)->m_bool) {
+    if (!isOk().m_bool) {
         return 0;
     }
     int32_t iOffset = m_offset;
@@ -197,9 +196,8 @@ int32_t hkMemoryTrackStreamReader::read(void* buf, int32_t nbytes) {
     return iNumBytes;
 }
 
-hkBool* hkMemoryTrackStreamReader::markSupported(hkBool* arResult) const {
-    arResult->m_bool = 0;
-    return arResult;
+hkBool hkMemoryTrackStreamReader::markSupported() const {
+    return 0;
 }
 
 hkResult hkMemoryTrackStreamReader::setMark(int32_t markLimit) {
@@ -210,9 +208,8 @@ hkResult hkMemoryTrackStreamReader::rewindToMark() {
     return HK_FAILURE;
 }
 
-hkBool* hkMemoryTrackStreamReader::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 0;
-    return arResult;
+hkBool hkMemoryTrackStreamReader::seekTellSupported() const {
+    return 0;
 }
 
 hkResult hkMemoryTrackStreamReader::seek(int32_t offset, hkStreamReader::SeekWhence whence) {
@@ -243,9 +240,8 @@ hkArrayStreamWriter::~hkArrayStreamWriter() {
     }
 }
 
-hkBool* hkArrayStreamWriter::isOk(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkArrayStreamWriter::isOk() const {
+    return 1;
 }
 
 int32_t hkArrayStreamWriter::write(const void* mem, int32_t size) {
@@ -278,9 +274,8 @@ int32_t hkArrayStreamWriter::write(const void* mem, int32_t size) {
     return v3;
 }
 
-hkBool* hkArrayStreamWriter::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkArrayStreamWriter::seekTellSupported() const {
+    return 1;
 }
 
 hkResult hkArrayStreamWriter::seek(int32_t offset, hkStreamWriter::SeekWhence whence) {

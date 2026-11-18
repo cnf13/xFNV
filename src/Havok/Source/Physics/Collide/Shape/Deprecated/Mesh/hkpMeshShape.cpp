@@ -456,12 +456,11 @@ uint32_t hkpMeshShape::getFirstKey() const {
     }
     alignas(16) char buffer[512];
     const hkpTriangleShape* pTriangle = static_cast<const hkpTriangleShape*>(pContainer->getChildShape(0, buffer));
-    hkBool result;
     if (!hkpTriangleUtil::isDegenerate(
-             &result, pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
+             pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
              hkDefaultTriangleDegeneracyTolerance
         )
-             ->m_bool) {
+             .m_bool) {
         return 0;
     }
     return pContainer->getNextKey(0);
@@ -486,10 +485,10 @@ uint32_t hkpMeshShape::getNextKey(uint32_t initialKey) const {
         const hkpTriangleShape* pTriangle =
             static_cast<const hkpTriangleShape*>(pContainer->getChildShape(key, buffer));
         if (!hkpTriangleUtil::isDegenerate(
-                 &result, pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
+                 pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
                  hkDefaultTriangleDegeneracyTolerance
             )
-                 ->m_bool) {
+                 .m_bool) {
             return key;
         }
     }

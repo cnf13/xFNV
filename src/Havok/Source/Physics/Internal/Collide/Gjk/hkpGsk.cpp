@@ -1055,8 +1055,7 @@ void hkpGsk::exitAndExportCacheImpl(hkpGskCache& cache) const {
 // case step then gives the next direction. The loop ends when the closest vertex distance falls within the radius (plus
 // 0.001) or the direction stops changing on three passes; a fraction below output's is a hit, written with the plane's
 // normal. The fraction is stored as a float.
-hkBool* hkpGsk::linearCast(
-    hkBool* arResult,
+hkBool hkpGsk::linearCast(
     const hkpConvexShape* shapeA,
     const hkpConvexShape* shapeB,
     const hkRotation& aRb,
@@ -1147,13 +1146,11 @@ known:
         if (fDist > 0.0f) {
             const float fApproach = _mm_cvtss_f32(m_support.dot3(rayDir).getQuad());
             if (fApproach >= 0.0f) {
-                arResult->m_bool = 0;
-                return arResult;
+                return 0;
             }
             fLambda = static_cast<float>(fLambda - static_cast<double>(fDist) / fApproach);
             if (fLambda >= 1.0f) {
-                arResult->m_bool = 0;
-                return arResult;
+                return 0;
             }
             position.m_quad = _mm_add_ps(input.m_from.m_quad, _mm_mul_ps(_mm_set1_ps(fLambda), rayDir.m_quad));
             normal = dir;
@@ -1451,11 +1448,9 @@ done:
     if (output.m_hitFraction > fLambda) {
         output.m_hitFraction = fLambda;
         output.m_normal = normal;
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 // The edge tests of the triangle of B's vertices (in A's space) against the point dots: three triple products in SSE,
@@ -1993,12 +1988,7 @@ void hkpGsk::handlePenetration(const hkpConvexShape* shapeA, const hkpConvexShap
 
 // Copies the output whole into a local, casts against an identity rotation and copies the local back only on a hit at a
 // nonzero fraction.
-hkBool* hkpGsk::castRay(
-    hkBool* apResult,
-    const hkpConvexShape* shape,
-    const hkpShapeRayCastInput& input,
-    hkpShapeRayCastOutput& output
-) {
+hkBool hkpGsk::castRay(const hkpConvexShape* shape, const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) {
     HK_TIMER_BEGIN("GJK Ray Cast", nullptr);
     XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, localOutput, std::nullopt, std::nullopt);
     // EXE-INLINED 0x696C60
@@ -2012,16 +2002,13 @@ hkBool* hkpGsk::castRay(
     identity.m_col1.m_quad[1] = 1.0f;
     identity.m_col2.m_quad = _mm_setzero_ps();
     identity.m_col2.m_quad[2] = 1.0f;
-    hkBool hit;
-    linearCast(&hit, shape, nullptr, identity, input, localOutput);
+    hkBool hit = linearCast(shape, nullptr, identity, input, localOutput);
     HK_TIMER_END();
     if (hit.m_bool && !(0.0f == localOutput.m_hitFraction)) {
         output = localOutput;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 void hkpGsk::print() {}

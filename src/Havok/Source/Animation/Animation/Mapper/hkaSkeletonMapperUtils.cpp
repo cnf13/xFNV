@@ -237,8 +237,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         );
         kErrStream.~hkErrStream();
     }
-    hkBool bOk;
-    if (!mapOut.isOk(&bOk)->m_bool) {
+    if (!mapOut.isOk().m_bool) {
         ::new (&kErrStream) hkErrStream(buf, 512);
         kErrStream.operator<<("Mapping is invalid");
         hkError::s_instance->message(
@@ -582,10 +581,8 @@ void hkaSkeletonMapperUtils::createMapping(
                 chainB.m_data = nullptr;
                 chainB.m_size = 0;
                 chainB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-                hkBool foundA;
-                hkaSkeletonUtils::getBoneChain(&foundA, *params.m_skeletonA, startA, endA, chainA);
-                hkBool foundB;
-                hkaSkeletonUtils::getBoneChain(&foundB, *params.m_skeletonB, startB, endB, chainB);
+                hkBool foundA = hkaSkeletonUtils::getBoneChain(*params.m_skeletonA, startA, endA, chainA);
+                hkBool foundB = hkaSkeletonUtils::getBoneChain(*params.m_skeletonB, startB, endB, chainB);
                 if (!foundA.m_bool) {
                     ::new (&kStream) hkErrStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChainA.m_start << " - " << kChainA.m_end << ")";
@@ -758,10 +755,8 @@ void hkaSkeletonMapperUtils::createMapping(
                 chainB.m_data = nullptr;
                 chainB.m_size = 0;
                 chainB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-                hkBool foundA;
-                hkaSkeletonUtils::getBoneChain(&foundA, *params.m_skeletonA, startA, endA, chainA);
-                hkBool foundB;
-                hkaSkeletonUtils::getBoneChain(&foundB, *params.m_skeletonB, startB, endB, chainB);
+                hkBool foundA = hkaSkeletonUtils::getBoneChain(*params.m_skeletonA, startA, endA, chainA);
+                hkBool foundB = hkaSkeletonUtils::getBoneChain(*params.m_skeletonB, startB, endB, chainB);
                 if (!foundA.m_bool || !foundB.m_bool) {
                     ::new (&kStream) hkErrStream(buf, 512);
                     kStream << "Couldn't make a chain (" << kChain.m_start << " - " << kChain.m_end << ")";
@@ -1041,10 +1036,9 @@ void hkaSkeletonMapperUtils::createMapping(
                 chainB.m_data = nullptr;
                 chainB.m_size = 0;
                 chainB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-                hkBool foundA;
-                hkaSkeletonUtils::getBoneChain(&foundA, *params.m_skeletonA, parentA, static_cast<int16_t>(a), chainA);
-                hkBool foundB;
-                hkaSkeletonUtils::getBoneChain(&foundB, *params.m_skeletonB, parentB, b, chainB);
+                hkBool foundA =
+                    hkaSkeletonUtils::getBoneChain(*params.m_skeletonA, parentA, static_cast<int16_t>(a), chainA);
+                hkBool foundB = hkaSkeletonUtils::getBoneChain(*params.m_skeletonB, parentB, b, chainB);
                 if (foundA.m_bool && foundB.m_bool && (chainA.m_size != 2 || chainB.m_size != 2)) {
                     bool bFree = true;
                     for (int32_t i = 1; i < chainB.m_size - 1; ++i) {

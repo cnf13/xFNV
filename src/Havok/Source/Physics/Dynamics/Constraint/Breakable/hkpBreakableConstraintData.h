@@ -28,11 +28,11 @@ public:
 
     ~hkpBreakableConstraintData() override;
 
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
     void buildJacobian(const hkpConstraintQueryIn& in, hkpConstraintQueryOut& out) override;
-    hkBool* isBuildJacobianCallbackRequired(hkBool* arResult) const override;
+    hkBool isBuildJacobianCallbackRequired() const override;
     void buildJacobianCallback(const hkpConstraintQueryIn& in) override;
     void getConstraintInfo(hkpConstraintData::ConstraintInfo& info) const override;
 

@@ -271,7 +271,6 @@ void hkpVehicleLinearCastWheelCollide::collideWheels(
     const hkpVehicleInstance* vehicle,
     hkpVehicleWheelCollide::CollisionDetectionWheelOutput* cdInfoOut
 ) {
-    hkBool v7;
     int32_t v8;
     uint8_t m_numWheels = vehicle->m_data->m_numWheels;
     v8 = static_cast<int32_t>(
@@ -280,7 +279,7 @@ void hkpVehicleLinearCastWheelCollide::collideWheels(
     if (m_numWheels) {
         do {
             hkpRootCdPoint v9;
-            if (castSingleWheel(&v7, vehicle, v8, v9)->m_bool) {
+            if (castSingleWheel(vehicle, v8, v9).m_bool) {
                 getCollisionOutputFromCastResult(vehicle, v8, v9, *cdInfoOut);
             }
             else {
@@ -511,8 +510,7 @@ const hkpRootCdPoint* hkpVehicleLinearCastWheelCollide::determineNearestHit(
     return nearest;
 }
 
-hkBool* hkpVehicleLinearCastWheelCollide::castSingleWheel(
-    hkBool* arResult,
+hkBool hkpVehicleLinearCastWheelCollide::castSingleWheel(
     const hkpVehicleInstance* vehicle,
     uint8_t wheelNum,
     hkpRootCdPoint& linearCastOutput
@@ -539,12 +537,10 @@ hkBool* hkpVehicleLinearCastWheelCollide::castSingleWheel(
     v5->m_phantom->linearCast(&v10, v8, a3, nullptr);
     if (a3.m_hitPoint.m_rootCollidableA) {
         linearCastOutput.Assign(a3.m_hitPoint);
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 // The wheel's contact from the cast hit: the contact point, the body hit (when it is an entity) and its friction, the

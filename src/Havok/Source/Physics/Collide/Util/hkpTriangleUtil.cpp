@@ -1,9 +1,7 @@
 #include "Havok/Source/Physics/Collide/Util/hkpTriangleUtil.h"
 
-hkBool*
-hkpTriangleUtil::isDegenerate(hkBool* a1, const hkVector4& a2, const hkVector4& a3, const hkVector4& a4, float a5) {
+hkBool hkpTriangleUtil::isDegenerate(const hkVector4& a2, const hkVector4& a3, const hkVector4& a4, float a5) {
     __m128 v12;
-    hkBool* result;
     __m128 v5 = _mm_sub_ps(a2.m_quad, a4.m_quad);
     __m128 v6 = _mm_sub_ps(a2.m_quad, a3.m_quad);
     __m128 v7 = _mm_sub_ps(
@@ -20,7 +18,7 @@ hkpTriangleUtil::isDegenerate(hkBool* a1, const hkVector4& a2, const hkVector4& 
     if (a5 > static_cast<double>((_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]))) ||
         (v12 = _mm_mul_ps(v11, v11),
          (_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0])) < static_cast<double>(a5))) {
-        result = a1;
+        return 1;
     }
     else {
         __m128 v13 = _mm_mul_ps(v6, v6);
@@ -33,14 +31,11 @@ hkpTriangleUtil::isDegenerate(hkBool* a1, const hkVector4& a2, const hkVector4& 
         double v18 = v21;
         float v22 = v17 * v17;
         float v23 = v18 - v22;
-        result = a1;
         if (v23 != 0.0f) {
-            a1->m_bool = 0;
-            return result;
+            return 0;
         }
     }
-    result->m_bool = 1;
-    return result;
+    return 1;
 }
 
 uint8_t* hkpTriangleUtil::rayIntersect(

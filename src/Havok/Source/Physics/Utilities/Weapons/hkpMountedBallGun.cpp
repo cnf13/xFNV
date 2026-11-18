@@ -172,8 +172,7 @@ void hkpMountedBallGun::fireGun(hkpWorld* world, const hkTransform& viewTransfor
             m_listeners.m_data[i]->bulletDeletedCallback(pOldest);
         }
         if (pOldest->m_world) {
-            hkBool bRemoved;
-            pOldest->m_world->removeEntity(&bRemoved, pOldest);
+            pOldest->m_world->removeEntity(pOldest);
         }
         pOldest->removeReference();
     }

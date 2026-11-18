@@ -28,7 +28,7 @@ public:
     hkpPulleyConstraintData(hkFinishLoadedObjectFlag aFlag) : hkpConstraintData(aFlag) {}
 
     // False when the rope length or the leverage is not positive.
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
     // The atoms' info, m_atoms over 0x70 bytes.

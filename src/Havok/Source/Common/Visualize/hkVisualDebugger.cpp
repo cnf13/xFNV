@@ -193,9 +193,8 @@ void hkVisualDebugger::serve(int32_t listenPort) {
 void hkVisualDebugger::capture(const char* captureFilename) {
     hkError::s_instance->sectionBegin(0x1293ADE7, "Capturing");
     hkStreamWriter* pWriter = hkFileSystem::s_instance->openWriter(captureFilename);
-    hkBool bOk;
-    // Tests the byte isOk's result points at rather than using hkBool's conversion operator.
-    if (pWriter && pWriter->isOk(&bOk)->m_bool) {
+    // Tests isOk's result byte rather than using hkBool's conversion operator.
+    if (pWriter && pWriter->isOk().m_bool) {
         alignas(4) uint8_t kStreamStorage[sizeof(hkErrStream)];
         char acBuffer[0x200];
         hkErrStream* pStream = ::new (kStreamStorage) hkErrStream(acBuffer, 0x200);

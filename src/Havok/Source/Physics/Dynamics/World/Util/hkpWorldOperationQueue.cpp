@@ -27,8 +27,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
 // Orders island merges by the storage index of the first entity's island, then of the second's (unsigned).
-static hkBool*
-islandLess(hkBool* result, const hkWorldOperation::BiggestOperation& a, const hkWorldOperation::BiggestOperation& b) {
+static hkBool islandLess(const hkWorldOperation::BiggestOperation& a, const hkWorldOperation::BiggestOperation& b) {
     // The pending island merges are kept as BiggestOperation storage holding MergeIslands operations.
     const hkWorldOperation::MergeIslands& mergeA = reinterpret_cast<const hkWorldOperation::MergeIslands&>(a);
     const hkWorldOperation::MergeIslands& mergeB = reinterpret_cast<const hkWorldOperation::MergeIslands&>(b);
@@ -38,30 +37,26 @@ islandLess(hkBool* result, const hkWorldOperation::BiggestOperation& a, const hk
         (uiA == uiB &&
          mergeA.m_entities[1]->m_simulationIsland->m_storageIndex <
              mergeB.m_entities[1]->m_simulationIsland->m_storageIndex)) {
-        result->m_bool = 1;
-        return result;
+        return 1;
     }
-    result->m_bool = 0;
-    return result;
+    return 0;
 }
 
 int32_t hkAlgorithm::quickSortRecursive(
     hkWorldOperation::BiggestOperation* apArr,
     int32_t aiLow,
     int32_t aiHigh,
-    hkBool* (*cmpLess)(hkBool*, const hkWorldOperation::BiggestOperation&, const hkWorldOperation::BiggestOperation&)
+    hkBool (*cmpLess)(const hkWorldOperation::BiggestOperation&, const hkWorldOperation::BiggestOperation&)
 ) {
     for (;;) {
         int32_t i = aiLow;
         int32_t j = aiHigh;
-        hkBool resultLow;
-        hkBool resultHigh;
         alignas(16) const hkWorldOperation::BiggestOperation str = apArr[(aiLow + aiHigh) >> 1];
         do {
-            while (cmpLess(&resultLow, apArr[i], str)->m_bool) {
+            while (cmpLess(apArr[i], str).m_bool) {
                 i++;
             }
-            while (cmpLess(&resultHigh, str, apArr[j])->m_bool) {
+            while (cmpLess(str, apArr[j]).m_bool) {
                 j--;
             }
             if (i > j) {
@@ -240,8 +235,7 @@ void hkpWorldOperationQueue::executeAllPending() {
                         reinterpret_cast<const hkWorldOperation::RemoveEntity*>(pOperation);
                     hkpWorld* pWorld = m_world;
                     if (pOp->m_entity->m_world == pWorld) {
-                        hkBool kResult;
-                        pWorld->removeEntity(&kResult, pOp->m_entity);
+                        pWorld->removeEntity(pOp->m_entity);
                     }
                     pOp->m_entity->removeReference();
                     break;
@@ -313,8 +307,7 @@ void hkpWorldOperationQueue::executeAllPending() {
                     const hkWorldOperation::RemoveConstraint* pOp =
                         reinterpret_cast<const hkWorldOperation::RemoveConstraint*>(pOperation);
                     if (pOp->m_constraint->m_owner) {
-                        hkBool kResult;
-                        m_world->removeConstraint(&kResult, pOp->m_constraint);
+                        m_world->removeConstraint(pOp->m_constraint);
                     }
                     pOp->m_constraint->removeReference();
                     break;

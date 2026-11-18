@@ -40,8 +40,7 @@ public:
     ~bhkRagdollPenetrationUtil() override;
 
     // Casts a ray through the world from arFromWS to arToWS, skipping apPhantomIn.
-    hkBool* castRay(
-        hkBool* arResult,
+    hkBool castRay(
         const hkpAabbPhantom* apPhantomIn,
         const hkVector4& arFromWS,
         const hkVector4& arToWS,

@@ -52,7 +52,7 @@ public:
     hkClass* getParent();
 
     // Whether this class is k or one of k's ancestors.
-    hkBool* isSuperClass(hkBool* arResult, const hkClass& k) const;
+    hkBool isSuperClass(const hkClass& k) const;
 
     // The number of members, the parents' included.
     int32_t getNumMembers() const;
@@ -84,7 +84,7 @@ public:
 
     // Whether the class or an ancestor is virtual. The hkBool is returned through arResult, which hasVtable takes as
     // its argument.
-    hkBool* hasVtable(hkBool* arResult) const;
+    hkBool hasVtable() const;
 
     // The remaining hkClass members are declared only. hkResult is an int (0 is success) and the hkBool32 results are
     // plain ints.

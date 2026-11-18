@@ -152,13 +152,12 @@ hkpKdTreeCollidableRaycaster::~hkpKdTreeCollidableRaycaster() {}
 // The SDK's addMidPhaseHit: the primitive is a collidable. Unless it has no shape or m_filter rejects it, the ray is
 // taken into the collidable's space and cast against its shape: into m_collector when there is one (no hit is
 // reported back), else into m_output, whose hit then gets the collidable and its normal turned back to world space.
-hkBool* hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) {
+hkBool hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkPrimitiveId primitiveId) {
     // The kd tree keeps each collidable's address as an untyped hkPrimitiveId (hkUlong); the SDK casts it back here.
     hkpCollidable* collidable = reinterpret_cast<hkpCollidable*>(primitiveId);
     const hkpShape* shape = collidable->m_shape;
     if (!shape || (m_filter && !m_filter->isCollisionEnabled(*m_input, *collidable).m_bool)) {
-        arResult->m_bool = false;
-        return arResult;
+        return false;
     }
     const hkTransform& transform = *collidable->m_motion.pMotion;
     const hkpWorldRayCastInput* input = m_input;
@@ -178,12 +177,10 @@ hkBool* hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkBool* arResult, hkPrimiti
     shapeInput.m_rayShapeCollectionFilter = m_collectionFilter;
     if (m_collector) {
         shape->castRayWithCollectorImpl(shapeInput, *collidable, *m_collector);
-        arResult->m_bool = false;
-        return arResult;
+        return false;
     }
     if (!shape->castRay(shapeInput, *m_output).m_bool) {
-        arResult->m_bool = false;
-        return arResult;
+        return false;
     }
     m_output->m_rootCollidable = collidable;
     hkpWorldRayCastOutput* output = m_output;
@@ -196,13 +193,11 @@ hkBool* hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkBool* arResult, hkPrimiti
         ),
         _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0xAA), transform.m_rotation.m_col2.m_quad)
     );
-    arResult->m_bool = true;
-    return arResult;
+    return true;
 }
 
-hkBool* hkpKdTreeCollidableRaycaster::hasHit(hkBool* arResult) {
-    arResult->m_bool = m_output->m_rootCollidable != nullptr;
-    return arResult;
+hkBool hkpKdTreeCollidableRaycaster::hasHit() {
+    return m_output->m_rootCollidable != nullptr;
 }
 
 float hkpKdTreeCollidableRaycaster::getHitFraction() {
@@ -211,8 +206,7 @@ float hkpKdTreeCollidableRaycaster::getHitFraction() {
 
 // The SDK's castRayIterative: this caster collects one ray's hits into output while the kd tree utility walks the
 // tree from input's start to its end; the result is whether output has a hit (hasHit, called through the vtable).
-hkBool* hkpKdTreeCollidableRaycaster::castRayIterative(
-    hkBool* apResult,
+hkBool hkpKdTreeCollidableRaycaster::castRayIterative(
     const hkKdTree* tree,
     const hkpWorldRayCastInput& input,
     hkpWorldRayCastOutput& output
@@ -220,12 +214,11 @@ hkBool* hkpKdTreeCollidableRaycaster::castRayIterative(
     HK_TIMER_BEGIN("KdTreeCastRayIter", nullptr);
     m_input = &input;
     m_output = &output;
-    hkBool kCastResult;
-    hkKdTreeUtils::castRayIterative(&kCastResult, tree, input.m_from, input.m_to, this);
+    hkKdTreeUtils::castRayIterative(tree, input.m_from, input.m_to, this);
     hkKdTreeCastCollector* pCollector = this;
-    pCollector->hasHit(apResult);
+    hkBool result = pCollector->hasHit();
     HK_TIMER_END();
-    return apResult;
+    return result;
 }
 
 void hkpKdTreeCollidableRaycaster::operator delete(void* apMemory) {

@@ -44,12 +44,12 @@ public:
 
         // Whether every quantization type is valid and no tolerance is negative, reporting each quantization that
         // is coarser than its tolerance.
-        hkBool* isOk(hkBool* arResult) const;
+        hkBool isOk() const;
 
         // Whether the scalar quantization is one of BITS8 and BITS16.
-        static hkBool* validQuantization(hkBool* arResult, ScalarQuantization aeType);
+        static hkBool validQuantization(ScalarQuantization aeType);
         // Whether the rotation quantization is one of the six values; the hkBool result is written through arResult.
-        static hkBool* validQuantization(hkBool* arResult, RotationQuantization aeType);
+        static hkBool validQuantization(RotationQuantization aeType);
         // The accuracy BITS8 or BITS16 loses: 0.0078125f, 3.0517578125e-05f, or 0.0f for anything else.
         static float approximateQuantizationAccuracy(ScalarQuantization aeType);
         // The accuracy the rotation quantization loses.
@@ -88,7 +88,7 @@ public:
         ~PerTrackCompressionParams();
 
         // Whether every palette entry isOk, with the result written through arResult.
-        hkBool* isOk(hkBool* arResult) const;
+        hkBool isOk() const;
 
         hkArray<TrackCompressionParams> m_parameterPalette;
         hkArray<int32_t> m_trackIndexToPaletteIndex;

@@ -106,9 +106,9 @@ void hkpConvexVerticesConnectivity::addFace(int32_t* indices, int32_t numIndices
     }
 }
 
-hkBool* hkpConvexVerticesConnectivity::isClosed(hkBool* apResult) {
+hkBool hkpConvexVerticesConnectivity::isClosed() {
     int32_t i;
-    hkBool* v18;
+    hkBool result;
     hkUlongMapBase ErrorMessage;
     hkpConvexVerticesConnectivity* v2 = this;
     int32_t v3 = 0;
@@ -171,8 +171,7 @@ hkBool* hkpConvexVerticesConnectivity::isClosed(hkBool* apResult) {
     }
     if (i > ErrorMessage.m_hashMod) {
     LABEL_24:;
-        v18 = apResult;
-        apResult->m_bool = 1;
+        result.m_bool = 1;
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
         ErrorMessage.clearAndDeallocate(*m_heap);
     }
@@ -193,12 +192,11 @@ hkBool* hkpConvexVerticesConnectivity::isClosed(hkBool* apResult) {
             goto LABEL_24;
         }
     LABEL_26:;
-        v18 = apResult;
-        apResult->m_bool = 0;
+        result.m_bool = 0;
         hkMemoryAllocator* v21 = (&hkMemoryRouter::getInstance())->m_heap;
         ErrorMessage.clearAndDeallocate(*v21);
     }
-    return v18;
+    return result;
 }
 
 const hkClass& hkpConvexVerticesConnectivity::staticClass() {

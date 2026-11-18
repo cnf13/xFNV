@@ -33,7 +33,7 @@ public:
     ~hkpPhysicsSystem() override;
 
     virtual hkpPhysicsSystem* clone() const;
-    virtual hkBool* hasContacts(hkBool* arResult);
+    virtual hkBool hasContacts();
 
     // Havok SDK signature (hkpDynamics.lib, tied by bytes,reloc).
     void removeAll();

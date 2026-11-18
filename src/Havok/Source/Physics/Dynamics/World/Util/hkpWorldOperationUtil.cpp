@@ -364,24 +364,18 @@ void identifyDeactivatedSubgroups(
         static_cast<char*>(static_cast<void*>(isActive.m_data.m_storage));
 }
 
-hkBool* worldOperationUtil_less_hkSimulationIslandPtr(
-    hkBool* apResult,
-    const hkpSimulationIsland* a,
-    const hkpSimulationIsland* b
-) {
+hkBool worldOperationUtil_less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulationIsland* b) {
     if (b) {
         if (a) {
-            apResult->m_bool = (*a->m_entities.begin())->getUid() < (*b->m_entities.begin())->getUid();
+            return (*a->m_entities.begin())->getUid() < (*b->m_entities.begin())->getUid();
         }
         else {
-            apResult->m_bool = 1;
+            return 1;
         }
     }
     else {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
-    return apResult;
 }
 
 // A full sector is sizeof(hkpAgentNnSector) bytes (512 on 32-bit, 960 on x64).
@@ -1259,8 +1253,7 @@ void hkpWorldOperationUtil::removeAttachedAgentsConnectingTheEntityAndAFixedPart
     for (int32_t i = 0; i < collisionEntries.m_size; ++i) {
         const hkpLinkedCollidable::CollisionEntry& entry = collisionEntries.m_data[i];
         hkpEntity* partner = static_cast<hkpEntity*>(entry.m_partner->getOwner());
-        hkBool partnerFixed;
-        if (partner->isFixed(&partnerFixed)->m_bool) {
+        if (partner->isFixed().m_bool) {
             hkpAgentNnEntry* agentEntry = entry.m_agentEntry;
             hkAgentNnMachine_CopyAndRelinkAgentEntry(agentsRemoved, agentEntry);
             hkAgentNnMachine_InternalDeallocateEntry(trackToScan, agentEntry);
@@ -1859,8 +1852,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                     for (hkpAgentNnEntry* entry = sector->getBegin(); entry < end;) {
                         hkpSimulationIsland* island =
                             static_cast<hkpEntity*>(entry->m_collidable[0]->getOwner())->m_simulationIsland;
-                        hkBool kFixed;
-                        if (island->isFixed(&kFixed)->m_bool) {
+                        if (island->isFixed().m_bool) {
                             island = static_cast<hkpEntity*>(entry->m_collidable[1]->getOwner())->m_simulationIsland;
                         }
                         hkAgentNnMachine_CopyAndRelinkAgentEntry(island->m_agentTrack, entry);
@@ -1881,8 +1873,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                            reinterpret_cast<hkpAgentNnEntry*>(&sector->m_data[getSectorSize(&track, nullptr, s)])) {
                         hkpSimulationIsland* island =
                             static_cast<hkpEntity*>(entry->m_collidable[0]->getOwner())->m_simulationIsland;
-                        hkBool kFixed;
-                        if (island->isFixed(&kFixed)->m_bool) {
+                        if (island->isFixed().m_bool) {
                             island = static_cast<hkpEntity*>(entry->m_collidable[1]->getOwner())->m_simulationIsland;
                         }
                         if (island == currentIsland) {

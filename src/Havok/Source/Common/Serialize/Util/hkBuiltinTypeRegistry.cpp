@@ -1202,13 +1202,13 @@ void hkTypeInfoRegistry::merge(const hkTypeInfoRegistry& mergeFrom) {
     const hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>& kFrom = mergeFrom.m_map.m_map;
     hkBool bValid;
     Dummy* it = kFrom.getIterator();
-    kFrom.isValid(&bValid, it);
+    bValid = kFrom.isValid(it);
     while (bValid.m_bool) {
         hkUlong value = kFrom.getValue(it);
         hkUlong key = kFrom.getKey(it);
         m_map.m_map.insert(key, value);
         it = kFrom.getNext(it);
-        kFrom.isValid(&bValid, it);
+        bValid = kFrom.isValid(it);
     }
 }
 
@@ -1271,7 +1271,7 @@ const hkClass* hkDynamicClassNameRegistry::getClassByName(const char* className)
 void hkDynamicClassNameRegistry::getClasses(hkArray<const hkClass*, hkContainerHeapAllocator>& classes) const {
     hkBool bValid;
     Dummy* it = m_map.m_map.getIterator();
-    m_map.m_map.isValid(&bValid, it);
+    bValid = m_map.m_map.isValid(it);
     while (bValid.m_bool) {
         const hkClass* pClass = m_map.getValue(it);
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -1283,7 +1283,7 @@ void hkDynamicClassNameRegistry::getClasses(hkArray<const hkClass*, hkContainerH
         classes.m_size = m_size + 1;
         *ppSlot = pClass;
         it = m_map.m_map.getNext(it);
-        m_map.m_map.isValid(&bValid, it);
+        bValid = m_map.m_map.isValid(it);
     }
 }
 
@@ -1306,11 +1306,11 @@ void hkDynamicClassNameRegistry::registerList(const hkClass* const* classes) {
 void hkDynamicClassNameRegistry::merge(const hkStringMap<const hkClass*, hkContainerHeapAllocator>& classes) {
     hkBool bValid;
     Dummy* it = classes.m_map.getIterator();
-    classes.m_map.isValid(&bValid, it);
+    bValid = classes.m_map.isValid(it);
     while (bValid.m_bool) {
         registerClass(classes.getValue(it), nullptr);
         it = classes.m_map.getNext(it);
-        classes.m_map.isValid(&bValid, it);
+        bValid = classes.m_map.isValid(it);
     }
 }
 

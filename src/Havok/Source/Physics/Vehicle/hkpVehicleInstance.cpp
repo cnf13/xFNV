@@ -823,9 +823,8 @@ void hkpVehicleInstance::addToWorld(hkpWorld* world) {
 }
 
 void hkpVehicleInstance::removeFromWorld() {
-    hkBool result;
     m_wheelCollide->removeFromWorld();
-    m_entity->m_world->removeEntity(&result, m_entity);
+    m_entity->m_world->removeEntity(m_entity);
 }
 
 // The SDK's body: the wheel's rotation is the chassis's, then the wheel's steering, then its spin about its axle;
@@ -2157,8 +2156,7 @@ void hkVehicleFrictionApplyVehicleFriction(
     inverse[3] = 1.0f;
     inverse[1] = 0.0f;
     inverse[2] = 0.0f;
-    hkBool bInverted;
-    invert2x2(&bInverted, matrix, inverse, 0.0f);
+    invert2x2(matrix, inverse, 0.0f);
     const float fSideSlip0 = axisTmp[0].m_sideSlipVel;
     const float fSideSlip1 = axisTmp[1].m_sideSlipVel;
     axisTmp[0].m_sideImpulse = -(fSideSlip1 * inverse[1] + fSideSlip0 * inverse[0]);

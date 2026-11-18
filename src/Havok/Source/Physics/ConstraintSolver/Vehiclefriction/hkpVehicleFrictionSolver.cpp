@@ -122,7 +122,7 @@ void hkVehicleFrictionDescriptionInitValues(
     }
 }
 
-hkBool* invert2x2(hkBool* apResult, const float* apMatrix, float* apInverse, float afTolerance) {
+hkBool invert2x2(const float* apMatrix, float* apInverse, float afTolerance) {
     float fDet = apMatrix[0] * apMatrix[3] - apMatrix[2] * apMatrix[1];
     if (!(afTolerance * afTolerance > fDet * fDet)) {
         float fInvDet = 1.0 / fDet;
@@ -134,12 +134,10 @@ hkBool* invert2x2(hkBool* apResult, const float* apMatrix, float* apInverse, flo
         apInverse[2] = fInv2;
         apInverse[1] = fInv1;
         apInverse[3] = fInv3;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 void hkVehicleFrictionSolverCalcRelativeForces(

@@ -30,7 +30,7 @@ public:
     void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
 
     // Whether the event is handled: always. A private non-virtual member.
-    hkBool* shouldHandleGivenToi(hkBool* apResult, const hkpToiEvent& event);
+    hkBool shouldHandleGivenToi(const hkpToiEvent& event);
 
     int32_t m_scratchPadCapacity;
     int32_t m_defaultScratchpadSize;

@@ -25,8 +25,7 @@ int32_t hkpBoxBoxManifold::addPoint(const hkpCdBody& bodyA, const hkpCdBody& bod
         return -1;
     }
     hkpFeatureContactPoint* v7 = pFcp;
-    hkBool bFound;
-    if (findInManifold(&bFound, *pFcp)->m_bool) {
+    if (findInManifold(*pFcp).m_bool) {
         return -1;
     }
     int32_t result = m_numPoints;
@@ -38,12 +37,11 @@ int32_t hkpBoxBoxManifold::addPoint(const hkpCdBody& bodyA, const hkpCdBody& bod
     return result;
 }
 
-hkBool* hkpBoxBoxManifold::findInManifold(hkBool* apResult, const hkpFeatureContactPoint& fcp) {
+hkBool hkpBoxBoxManifold::findInManifold(const hkpFeatureContactPoint& fcp) {
     int32_t v3 = m_numPoints - 1;
     if (v3 < 0) {
     LABEL_5:;
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
 
     while (m_contactPoints[v3].m_featureIdA != fcp.m_featureIdA ||
@@ -52,6 +50,5 @@ hkBool* hkpBoxBoxManifold::findInManifold(hkBool* apResult, const hkpFeatureCont
             goto LABEL_5;
         }
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }

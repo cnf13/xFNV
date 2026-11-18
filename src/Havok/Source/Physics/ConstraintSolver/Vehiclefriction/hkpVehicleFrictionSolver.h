@@ -41,7 +41,7 @@ void hkVehicleFrictionDescriptionInitValues(
 );
 // A helper of hkVehicleFrictionApplyVehicleFriction: inverts the 2x2 matrix apMatrix (four floats) into apInverse when
 // its determinant's square is at least afTolerance's; whether it did is written to apResult.
-hkBool* invert2x2(hkBool* apResult, const float* apMatrix, float* apInverse, float afTolerance);
+hkBool invert2x2(const float* apMatrix, float* apInverse, float afTolerance);
 // Computes one axle's relative side and forward forces, each impulse times the inverse of its limit.
 void hkVehicleFrictionSolverCalcRelativeForces(
     hkpVehicleFrictionStatus::AxisStatus* axis,

@@ -166,13 +166,12 @@ void hkpSimpleShapePhantom::addOverlappingCollidable(hkpCollidable* collidable) 
     }
 }
 
-hkBool* hkpSimpleShapePhantom::isOverlappingCollidableAdded(hkBool* arResult, const hkpCollidable* apCollidable) {
+hkBool hkpSimpleShapePhantom::isOverlappingCollidableAdded(const hkpCollidable* apCollidable) {
     int32_t m_size = m_collisionDetails.m_size;
     int32_t v4 = 0;
     if (m_size <= 0) {
     LABEL_5:;
-        arResult->m_bool = 0;
-        return arResult;
+        return 0;
     }
 
     hkpSimpleShapePhantom::CollisionDetail* m_data =
@@ -184,8 +183,7 @@ hkBool* hkpSimpleShapePhantom::isOverlappingCollidableAdded(hkBool* arResult, co
             goto LABEL_5;
         }
     }
-    arResult->m_bool = 1;
-    return arResult;
+    return 1;
 }
 
 void hkpSimpleShapePhantom::removeOverlappingCollidable(hkpCollidable* collidable) {

@@ -67,7 +67,7 @@ public:
     void setInverse(const hkQuaternion& q);
     // Whether the quaternion is valid: its components are valid and its length is 1 within 0.001. The hkBool is
     // returned through apResult. Const, as callers use it on a const pose's rotation.
-    hkBool* isOk(hkBool* apResult) const;
+    hkBool isOk() const;
     // An estimate of the rotation from this to `to` as an angle vector, 2 * (imag x to.imag - to.w * imag + w *
     // to.imag), negated when the 4-lane dot product is negative.
     void estimateAngleTo(const hkQuaternion& to, hkVector4& angleOut) const;

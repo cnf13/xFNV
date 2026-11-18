@@ -59,7 +59,7 @@ public:
     // defined per instantiation: each instantiation used gets an explicit specialization.
     Iterator findKey(hkUlong key) const;
     // Whether it is a slot findKey found.
-    hkBool* isValid(hkBool* arResult, Iterator it) const;
+    hkBool isValid(Iterator it) const;
     // The value in slot it.
     hkUlong getValue(Iterator it) const;
     // The value of key into *out: HK_SUCCESS when the map has key, else HK_FAILURE and *out untouched.
@@ -138,9 +138,8 @@ hkCachedHashMap<Operations, Allocator>::Iterator hkCachedHashMap<Operations, All
 }
 
 template <typename Operations, typename Allocator>
-hkBool* hkCachedHashMap<Operations, Allocator>::isValid(hkBool* arResult, Iterator it) const {
-    arResult->m_bool = static_cast<int32_t>(reinterpret_cast<hkUlong>(it)) <= m_hashMod;
-    return arResult;
+hkBool hkCachedHashMap<Operations, Allocator>::isValid(Iterator it) const {
+    return static_cast<int32_t>(reinterpret_cast<hkUlong>(it)) <= m_hashMod;
 }
 
 template <typename Operations, typename Allocator>
@@ -182,8 +181,7 @@ hkCachedHashMap<Operations, Allocator>::Iterator hkCachedHashMap<Operations, All
 template <typename Operations, typename Allocator>
 hkResult hkCachedHashMap<Operations, Allocator>::get(hkUlong key, hkUlong* out) const {
     Iterator it = findKey(key);
-    hkBool valid;
-    if (isValid(&valid, it)->m_bool) {
+    if (isValid(it).m_bool) {
         *out = getValue(it);
         return HK_SUCCESS;
     }
@@ -193,8 +191,7 @@ hkResult hkCachedHashMap<Operations, Allocator>::get(hkUlong key, hkUlong* out) 
 template <typename Operations, typename Allocator>
 hkUlong hkCachedHashMap<Operations, Allocator>::getOrInsert(hkUlong key, hkUlong ifNotFound) {
     Iterator it = findKey(key);
-    hkBool valid;
-    if (isValid(&valid, it)->m_bool) {
+    if (isValid(it).m_bool) {
         return getValue(it);
     }
     insert(key, ifNotFound);
@@ -244,8 +241,7 @@ void hkCachedHashMap<Operations, Allocator>::remove(Iterator it) {
 template <typename Operations, typename Allocator>
 hkResult hkCachedHashMap<Operations, Allocator>::remove(hkUlong key) {
     Iterator it = findKey(key);
-    hkBool valid;
-    if (isValid(&valid, it)->m_bool) {
+    if (isValid(it).m_bool) {
         remove(it);
         return HK_SUCCESS;
     }

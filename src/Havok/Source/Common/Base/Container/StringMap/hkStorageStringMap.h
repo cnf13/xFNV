@@ -17,9 +17,7 @@ public:
 template <typename V, typename Allocator>
 void hkStorageStringMap<V, Allocator>::clear() {
     using Iterator = hkCachedHashMap<hkStringMapOperations, Allocator>::Iterator;
-    hkBool valid;
-    for (Iterator it = this->m_map.getIterator(); this->m_map.isValid(&valid, it)->m_bool;
-         it = this->m_map.getNext(it)) {
+    for (Iterator it = this->m_map.getIterator(); this->m_map.isValid(it).m_bool; it = this->m_map.getNext(it)) {
         // The map holds the key's address as an untyped hkUlong.
         char* k = reinterpret_cast<char*>(this->m_map.getKey(it));
         hkString::strFree_00CB1190(k, *hkMemoryRouter::getInstance().m_heap);

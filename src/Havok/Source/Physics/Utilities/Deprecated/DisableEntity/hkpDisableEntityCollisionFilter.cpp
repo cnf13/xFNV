@@ -42,13 +42,11 @@ hkpDisableEntityCollisionFilter::~hkpDisableEntityCollisionFilter() {
     }
 }
 
-// A removed entity leaves the filter, and the filter stops listening to it. The entity's own argument is handed to
-// removeEntityFromFilter as the result buffer, so the entity is copied first and the result's byte overwrites the
-// argument after the entity is read.
+// A removed entity leaves the filter, and the filter stops listening to it.
 void hkpDisableEntityCollisionFilter::entityRemovedCallback(hkpEntity* entity) {
     hkpEntity* pEntity = entity;
     if (pEntity) {
-        removeEntityFromFilter(reinterpret_cast<hkBool*>(&entity), pEntity);
+        removeEntityFromFilter(pEntity);
         pEntity->removeEntityListener(this);
     }
 }
@@ -120,14 +118,13 @@ hkBool hkpDisableEntityCollisionFilter::isCollisionEnabled(
     return result;
 }
 
-hkBool* hkpDisableEntityCollisionFilter::removeEntityFromFilter(hkBool* arResult, hkpEntity* entity) {
+hkBool hkpDisableEntityCollisionFilter::removeEntityFromFilter(hkpEntity* entity) {
     if (entity) {
         int32_t m_size = m_disabledEntities.m_size;
         int32_t v5 = 0;
         if (m_size <= 0) {
         LABEL_7:;
-            arResult->m_bool = 0;
-            return arResult;
+            return 0;
         }
 
         hkpEntity** m_data = static_cast<hkArrayBase<hkpEntity*>&>(m_disabledEntities).begin();
@@ -142,19 +139,16 @@ hkBool* hkpDisableEntityCollisionFilter::removeEntityFromFilter(hkBool* arResult
         if (v7 != v5) {
             m_disabledEntities.m_data[v5] = m_disabledEntities.m_data[v7];
         }
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
-hkBool* hkpDisableEntityCollisionFilter::addEntityToFilter(hkBool* apResult, hkpEntity* new_entity) {
+hkBool hkpDisableEntityCollisionFilter::addEntityToFilter(hkpEntity* new_entity) {
     if (!new_entity) {
     LABEL_2:;
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
     int32_t m_size = m_disabledEntities.m_size;
     int32_t v6 = 0;
@@ -204,16 +198,14 @@ LABEL_7:;
     for (hkpEntityListener** i = p_m_entityListeners->begin(); *i != v9; ++i) {
         if (++v15 >= v13) {
             new_entity->addEntityListener(v9);
-            apResult->m_bool = 1;
-            return apResult;
+            return 1;
         }
     }
     if (v15 < 0) {
     LABEL_20:;
         new_entity->addEntityListener(v9);
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 const hkClass& hkpDisableEntityCollisionFilter::staticClass() {

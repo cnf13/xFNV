@@ -262,8 +262,7 @@ uint32_t hkKdTreeAabbQueryUtils::queryAabbInternal(
                 }
                 const hkPrimitiveId uiPrimitiveId = pEntry->getPrimitiveId();
                 if (collector) {
-                    hkBool kDone;
-                    if (collector->addMidPhaseHit(&kDone, uiPrimitiveId)->m_bool) {
+                    if (collector->addMidPhaseHit(uiPrimitiveId).m_bool) {
                         goto done;
                     }
                 }
@@ -372,8 +371,7 @@ void castRayRecursive(
             continue;
         }
         // Asks the collector whether it has a hit and leaves the answer unread, as the game does.
-        hkBool kHasHit;
-        a11->hasHit(&kHasHit);
+        a11->hasHit();
         float fSecondStart = hkMath::max2<float>(fT1, a8);
         castRayRecursive(a1, pFirst, a3, a4, a5, a6, a7, a8, hkMath::min2(a9, fT2), a10, a11);
         float fHitAfter = a11->getHitFraction() * a10;
@@ -451,8 +449,7 @@ void castRayRecursive(
             _mm_and_ps(_mm_and_ps(_mm_cmple_ps(vBoxMin, vFrom), _mm_cmple_ps(vFrom, vBoxMax)), vInvZero)
         );
         if ((_mm_movemask_ps(vHit) & 7) == 7) {
-            hkBool kAdded;
-            a11->addMidPhaseHit(&kAdded, primId);
+            a11->addMidPhaseHit(primId);
         }
         ++pEntry;
     }

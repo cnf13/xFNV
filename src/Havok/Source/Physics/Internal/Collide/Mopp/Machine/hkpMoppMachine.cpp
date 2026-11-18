@@ -630,9 +630,8 @@ int32_t hkMoppEarlyExitObbVirtualMachine_queryObb(
     const hkVector4& extent,
     const float& radius
 ) {
-    hkBool hitFound;
     alignas(16) hkpMoppEarlyExitObbVirtualMachine machine;
-    return machine.queryObb(&hitFound, code, BvToWorld, extent, radius)->m_bool != 0;
+    return machine.queryObb(code, BvToWorld, extent, radius).m_bool != 0;
 }
 
 void hkMoppObbVirtualMachine_queryObb(

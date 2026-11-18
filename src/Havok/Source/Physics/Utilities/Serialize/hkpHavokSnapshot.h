@@ -34,8 +34,7 @@ public:
     // Writes apWorld through apWriter; the hkBool result is written to apResult, which is returned. abSaveContactPoints
     // is an int32_t, not a bool, because the caller's whole value is passed on to hkpPhysicsData::populateFromWorld; a
     // bool would be zero-extended.
-    static hkBool* save(
-        hkBool* apResult,
+    static hkBool save(
         const hkpWorld* apWorld,
         hkStreamWriter* apWriter,
         hkBool abBinaryFormat,
@@ -44,8 +43,7 @@ public:
     );
     // Writes apData of class arDataClass as a tagfile, through a local defaultConvertListener when apUserListener is
     // null. apTargetLayout is not read.
-    static hkBool* save(
-        hkBool* apResult,
+    static hkBool save(
         const void* apData,
         const hkClass& arDataClass,
         hkStreamWriter* apWriter,
@@ -54,8 +52,7 @@ public:
         hkPackfileWriter::AddObjectListener* apUserListener
     );
     // Wraps apData in a one-entry hkRootLevelContainer and saves that.
-    static hkBool* saveUnderRootLevel(
-        hkBool* apResult,
+    static hkBool saveUnderRootLevel(
         const void* apData,
         const hkClass& arDataClass,
         hkStreamWriter* apWriter,
@@ -63,8 +60,7 @@ public:
         const hkStructureLayout::LayoutRules* apTargetLayout
     );
     // Saves apData under the root level with hkpPhysicsDataClass.
-    static hkBool* save(
-        hkBool* apResult,
+    static hkBool save(
         const hkpPhysicsData* apData,
         hkStreamWriter* apWriter,
         hkBool abBinaryFormat,

@@ -367,8 +367,7 @@ int32_t hkInspectProcess::addTopLevelObject(void* ptr, const hkClass& klass, hkU
     // The most derived class from the debugger's registry when the class is virtual.
     const hkClass* pClass = &klass;
     if (m_vdb->m_classReg) {
-        hkBool bHasVtable;
-        if (klass.hasVtable(&bHasVtable)->m_bool) {
+        if (klass.hasVtable().m_bool) {
             pClass = m_vdb->m_classReg->getClassFromVirtualInstance(ptr);
             if (!pClass) {
                 pClass = &klass;
@@ -420,8 +419,7 @@ int32_t hkInspectProcess::writeObject(
     // The most derived class from the debugger's registry when the class is virtual.
     const hkClass* pClass = &klass;
     if (m_vdb->m_classReg) {
-        hkBool bHasVtable;
-        if (klass.hasVtable(&bHasVtable)->m_bool) {
+        if (klass.hasVtable().m_bool) {
             pClass = m_vdb->m_classReg->getClassFromVirtualInstance(ptr);
             if (!pClass) {
                 pClass = &klass;

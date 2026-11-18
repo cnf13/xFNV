@@ -35,7 +35,7 @@ public:
     // two global referenced objects, quits the calling thread. Returns HK_SUCCESS (0).
     static hkResult quit();
     // Whether hkBaseSystem::init has run: writes the flag into apResult and returns it.
-    static hkBool* isInitialized(hkBool* apResult);
+    static hkBool isInitialized();
 };
 
 // A singleton of hkBaseSystem.cpp that holds nothing: a bare hkReferencedObject with its

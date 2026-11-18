@@ -171,16 +171,14 @@ void hkMatrix4::mul(const hkSimdReal& scale) {
     m_col3.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale.m_real, scale.m_real, 0), m_col3.m_quad);
 }
 
-hkBool* hkMatrix4::isOk(hkBool* apResult) {
+hkBool hkMatrix4::isOk() {
     int32_t v2 = 0;
     while ((std::bit_cast<uint32_t>(m_col0.m_quad[v2]) & 0x7F800000) != 0x7F800000) {
         if (++v2 >= 16) {
-            apResult->m_bool = 1;
-            return apResult;
+            return 1;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 void hkMatrix4::setTranspose(const hkMatrix4& s) {

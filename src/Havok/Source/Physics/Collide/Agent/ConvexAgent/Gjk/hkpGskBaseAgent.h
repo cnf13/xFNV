@@ -61,8 +61,7 @@ public:
 protected:
     // Computes the closest points of the two convex bodies from the cached simplex into output; the result is true when
     // they are within input's tolerance.
-    hkBool* _getClosestPoint(
-        hkBool* apResult,
+    hkBool _getClosestPoint(
         const hkpCdBody& bodyA,
         const hkpCdBody& bodyB,
         const hkpCollisionInput& input,

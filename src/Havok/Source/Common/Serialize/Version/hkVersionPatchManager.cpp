@@ -396,7 +396,7 @@ hkReferencedObject* hkVersionPatchManagercreate() {
 hkVersionPatchManager::UidFromClassVersion::~UidFromClassVersion() {
     hkBool valid;
     auto it = m_cachedNames.m_map.getIterator();
-    for (m_cachedNames.m_map.isValid(&valid, it); valid.m_bool; m_cachedNames.m_map.isValid(&valid, it)) {
+    for (valid = m_cachedNames.m_map.isValid(it); valid.m_bool; valid = m_cachedNames.m_map.isValid(it)) {
         hkMemoryRouter::easyFree(*hkMemoryRouter::getInstance().m_heap, const_cast<char*>(m_cachedNames.getValue(it)));
         it = m_cachedNames.m_map.getNext(it);
     }
@@ -830,7 +830,7 @@ hkResult hkVersionPatchManager::preparePatches(
     {
         hkBool valid;
         NameMap::Iterator it = classFromName.getIterator();
-        for (classFromName.isValid(&valid, it); valid.m_bool; classFromName.isValid(&valid, it)) {
+        for (valid = classFromName.isValid(it); valid.m_bool; valid = classFromName.isValid(it)) {
             hkDataClassImpl* pClass = reinterpret_cast<hkDataClassImpl*>(classFromName.getValue(it));
             worldToUpdate.copyClassFromWorld(pClass->getName(), tempWorld);
             it = classFromName.getNext(it);

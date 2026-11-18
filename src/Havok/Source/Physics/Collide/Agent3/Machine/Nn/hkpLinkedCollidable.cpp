@@ -116,8 +116,7 @@ void hkpLinkedCollidable::getCollisionEntriesSorted(hkArray<CollisionEntry>& ent
 
     // EXE-INLINED none: hkpEntity::isFixed
     const hkpEntity* pOwner = static_cast<const hkpEntity*>(getOwner());
-    hkBool bFixed;
-    if (pOwner->isFixed(&bFixed)->m_bool && iNewSize > 1) {
+    if (pOwner->isFixed().m_bool && iNewSize > 1) {
         // EXE-INLINED none: hkAlgorithm::quickSort
         hkAlgorithm::quickSortRecursive<CollisionEntry, bool (*)(const CollisionEntry&, const CollisionEntry&)>(
             entries.m_data, 0, iNewSize - 1, &cmpLessCollisionEntries

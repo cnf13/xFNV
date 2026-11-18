@@ -30,8 +30,7 @@ public:
 
     // Rotates neckModelSpaceInOut towards targetMS by gain; the hkBool written to apResult is true when the target was
     // reached without clamping.
-    static hkBool* solve(
-        hkBool* apResult,
+    static hkBool solve(
         const Setup& setup,
         const hkVector4& targetMS,
         float gain,

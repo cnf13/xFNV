@@ -50,7 +50,7 @@ void hkFreeList::Free() {
 }
 
 // m_lastIncrementalBlock is the block before the next one to check, or null to start from m_blocks.
-hkBool* hkFreeList::incrementalFindGarbage(hkBool* arResult, int32_t aiNumBlocks, int32_t& aiNumBlocksOut) {
+hkBool hkFreeList::incrementalFindGarbage(int32_t aiNumBlocks, int32_t& aiNumBlocksOut) {
     int32_t i = 0;
     for (; i < aiNumBlocks; ++i) {
         Block* pBlock;
@@ -59,8 +59,7 @@ hkBool* hkFreeList::incrementalFindGarbage(hkBool* arResult, int32_t aiNumBlocks
             if (!pBlock) {
                 aiNumBlocksOut = i;
                 m_lastIncrementalBlock = nullptr;
-                arResult->m_bool = 1;
-                return arResult;
+                return 1;
             }
             if (_calcBlockFree(pBlock)) {
                 m_lastIncrementalBlock->m_next = pBlock->m_next;
@@ -74,8 +73,7 @@ hkBool* hkFreeList::incrementalFindGarbage(hkBool* arResult, int32_t aiNumBlocks
             if (!pBlock) {
                 aiNumBlocksOut = i;
                 m_lastIncrementalBlock = nullptr;
-                arResult->m_bool = 1;
-                return arResult;
+                return 1;
             }
             if (_calcBlockFree(pBlock)) {
                 m_blocks = pBlock->m_next;
@@ -87,8 +85,7 @@ hkBool* hkFreeList::incrementalFindGarbage(hkBool* arResult, int32_t aiNumBlocks
         m_lastIncrementalBlock = pBlock;
     }
     aiNumBlocksOut = i;
-    arResult->m_bool = m_lastIncrementalBlock == nullptr;
-    return arResult;
+    return m_lastIncrementalBlock == nullptr;
 }
 
 // Takes apBlock's elements off the free list into a stack buffer. When they are all free (counting the unused space
@@ -142,7 +139,7 @@ int32_t hkFreeList::_calcBlockFree(hkFreeList::Block* block) {
 
     if (numFound > 0) {
         if (numFound > 1) {
-            hkAlgorithm::quickSortRecursive<void*, hkBool* (*)(hkBool*, const void*, const void*)>(
+            hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
                 ppElements, 0, numFound - 1, &hkFreeListAllocator::_comparePointers
             );
         }
@@ -306,32 +303,28 @@ int32_t hkFreeList::_freeBlocks(hkFreeList::Block* cur) {
 
 // The SDK's consistency check: every free element is aligned and sits on an element boundary of a used block the
 // memory server holds as valid. The blocks are searched in list order, each tested with isValidAlloc first.
-hkBool* hkFreeList::_checkFreeBlocks(hkBool* apResult) {
+hkBool hkFreeList::_checkFreeBlocks() {
     for (Element* pElement = m_free; pElement; pElement = pElement->m_next) {
         if (reinterpret_cast<uintptr_t>(pElement) & (m_align - 1)) {
-            apResult->m_bool = 0;
-            return apResult;
+            return 0;
         }
         // A free element is untyped block memory with its link overlaid: compared as the block's bytes.
         uint8_t* pElementBytes = reinterpret_cast<uint8_t*>(pElement);
         for (Block* pBlock = m_blocks;; pBlock = pBlock->m_next) {
             if (!pBlock || !m_memoryServer->isValidAlloc(pBlock).m_bool) {
-                apResult->m_bool = 0;
-                return apResult;
+                return 0;
             }
             uint8_t* pStart = pBlock->m_start;
             if (pElementBytes >= pStart && pElementBytes < pStart + m_elementSize * pBlock->m_numElements) {
                 // The division is unsigned.
                 if (static_cast<uint32_t>(pElementBytes - pStart) % m_elementSize) {
-                    apResult->m_bool = 0;
-                    return apResult;
+                    return 0;
                 }
                 break;
             }
         }
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 uint32_t hkFreeList::_calcNumFreeElements() {
@@ -421,7 +414,7 @@ void hkFreeList::walkMemory(void (*callback)(void*, uint32_t, hkBool, int32_t, v
         *ppBlockOut++ = pBlock;
     }
     if (numBlocks > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool* (*)(hkBool*, const void*, const void*)>(
+        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
             ppBlocks, 0, numBlocks - 1, &hkFreeListAllocator::_comparePointers
         );
     }
@@ -444,7 +437,7 @@ void hkFreeList::walkMemory(void (*callback)(void*, uint32_t, hkBool, int32_t, v
         ppFree[iFree++] = pTop;
     }
     if (numFree > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool* (*)(hkBool*, const void*, const void*)>(
+        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
             ppFree, 0, numFree - 1, &hkFreeListAllocator::_comparePointers
         );
     }
@@ -528,7 +521,7 @@ __attribute__((no_builtin("memset"))) int32_t hkFreeList::findGarbage() {
         *ppBlockOut++ = pBlock;
     }
     if (iNumBlocks > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool* (*)(hkBool*, const void*, const void*)>(
+        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
             ppBlocks, 0, iNumBlocks - 1, &hkFreeListAllocator::_comparePointers
         );
     }
@@ -554,7 +547,7 @@ __attribute__((no_builtin("memset"))) int32_t hkFreeList::findGarbage() {
     m_blockEnd = nullptr;
     m_top = nullptr;
     if (iNumElements > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool* (*)(hkBool*, const void*, const void*)>(
+        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
             ppElements, 0, iNumElements - 1, &hkFreeListAllocator::_comparePointers
         );
     }

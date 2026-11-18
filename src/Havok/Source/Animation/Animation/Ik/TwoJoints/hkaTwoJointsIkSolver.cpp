@@ -41,7 +41,7 @@ hkaTwoJointsIkSolver::Setup::Setup()
 // helpers are written out with a fixed operation order: dot products sum z + (y + x); normalize3 is a reciprocal square
 // root estimate with one Newton step, zero for a zero vector; setReciprocal3 is a reciprocal estimate with one Newton
 // step. The intermediates are double, rounded to float or double where the game stores them.
-hkBool* hkaTwoJointsIkSolver::solve(hkBool* apResult, const Setup& setup, hkaPose& poseInOut) {
+hkBool hkaTwoJointsIkSolver::solve(const Setup& setup, hkaPose& poseInOut) {
     auto load = [](const hkVector4& v) { return _mm_load_ps(&reinterpret_cast<const float*>(&v.m_quad)[0]); };
     auto loadQuad = [](const hkQuadReal& q) { return _mm_load_ps(&reinterpret_cast<const float*>(&q)[0]); };
     auto store = [](hkVector4& v, __m128 x) { _mm_store_ps(&reinterpret_cast<float*>(&v.m_quad)[0], x); };
@@ -340,6 +340,5 @@ hkBool* hkaTwoJointsIkSolver::solve(hkBool* apResult, const Setup& setup, hkaPos
 
         timer(s_szTwoJointsEndListTimer);
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }

@@ -21,7 +21,7 @@ public:
     ~hkpPhysicsSystemWithContacts() override;
 
     hkpPhysicsSystem* clone() const override;
-    hkBool* hasContacts(hkBool* arResult) override;
+    hkBool hasContacts() override;
 
     // Adds the contact to m_contacts.
     void addContact(hkpSerializedAgentNnEntry* c);

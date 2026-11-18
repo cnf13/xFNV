@@ -117,8 +117,7 @@ int32_t hkSerializeUtil::isLoadable(hkStreamReader* sr) {
     if (!sr) {
         return 0;
     }
-    hkBool isOk;
-    if (!sr->isOk(&isOk)->m_bool) {
+    if (!sr->isOk().m_bool) {
         return 0;
     }
     hkEnum<hkTagfileReader::FormatType, int32_t> tagfileFormat;
@@ -225,8 +224,7 @@ int32_t findTextValue(hkStringPtr* a1, const char* r_eax, const char* r_edi) {
 }
 
 int32_t readStreamToBuffer(hkStreamReader* reader, hkArray<char, hkContainerTempAllocator>* buf) {
-    hkBool canSeek;
-    if (reader->seekTellSupported(&canSeek)->m_bool) {
+    if (reader->seekTellSupported().m_bool) {
         reader->seek(0, hkStreamReader::STREAM_END);
         int32_t size = reader->tell();
         // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::setSize
@@ -470,8 +468,7 @@ hkResource* hkSerializeUtil::load(
         }
         return nullptr;
     }
-    hkBool isOk;
-    if (!stream->isOk(&isOk)->m_bool) {
+    if (!stream->isOk().m_bool) {
         if (detailsOut) {
             // EXE-INLINED none: hkSerializeUtil::ErrorDetails::set
             detailsOut->id.m_storage = ErrorDetails::ERRORID_READ_FAILED;
@@ -537,8 +534,7 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
         }
         return nullptr;
     }
-    hkBool isOk;
-    if (!stream->isOk(&isOk)->m_bool) {
+    if (!stream->isOk().m_bool) {
         if (errorOut) {
             // EXE-INLINED none: hkSerializeUtil::ErrorDetails::set
             errorOut->id.m_storage = ErrorDetails::ERRORID_READ_FAILED;
@@ -559,8 +555,7 @@ hkObjectResource* hkSerializeUtil::loadOnHeap(
     hkObjectResource* resource = nullptr;
     switch (details.m_formatType.m_storage) {
         case FORMAT_PACKFILE_BINARY: {
-            hkBool sameLayout;
-            if (details.m_layoutRules.IsEqual(&sameLayout, hkStructureLayout::HostLayoutRules)->m_bool &&
+            if (details.m_layoutRules.IsEqual(hkStructureLayout::HostLayoutRules).m_bool &&
                 details.m_version == "Havok-7.1.0-r1") {
                 resource = loadNewPackfileOnHeap(stream, &details, errorOut, typeReg, classReg);
                 break;
@@ -733,15 +728,13 @@ uint8_t* hkBinaryTagfile::isBinaryMagic(uint8_t* a1, int32_t a2, int32_t a3) {
     return a1;
 }
 
-hkBool* hkStructureLayout::LayoutRules::IsEqual(hkBool* apResult, const hkStructureLayout::LayoutRules& other) const {
+hkBool hkStructureLayout::LayoutRules::IsEqual(const hkStructureLayout::LayoutRules& other) const {
     if (m_bytesInPointer == other.m_bytesInPointer &&
         (m_littleEndian == other.m_littleEndian &&
          (m_reusePaddingOptimization == other.m_reusePaddingOptimization &&
           m_emptyBaseClassOptimization == other.m_emptyBaseClassOptimization))) {
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }

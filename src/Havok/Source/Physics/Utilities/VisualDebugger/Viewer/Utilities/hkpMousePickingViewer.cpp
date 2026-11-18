@@ -45,18 +45,15 @@ void hkpMousePickingViewer::consumeCommand(uint8_t command) {
             // EXE-INLINED none: hkIArchive::read64u
             alignas(16) uint64_t id;
             m_inStream->readArrayGeneric(&id, 8, 1);
-            hkBool isOk;
-            if (m_inStream->isOk(&isOk)->m_bool) {
-                hkBool picked;
-                pickObject(&picked, id, worldPosition);
+            if (m_inStream->isOk().m_bool) {
+                pickObject(id, worldPosition);
             }
             break;
         }
         case HK_DRAG_OBJECT: {
             hkVector4 newWorldSpacePoint;
             m_inStream->readQuadVector4(newWorldSpacePoint);
-            hkBool isOk;
-            if (m_inStream->isOk(&isOk)->m_bool) {
+            if (m_inStream->isOk().m_bool) {
                 dragObject(newWorldSpacePoint);
             }
             break;
@@ -83,14 +80,13 @@ void hkpMousePickingViewer::dragObject(const hkVector4& newWorldSpacePoint) {
 
 // The id is a collidable's address with its low two bits as a tag: 3 is a collidable, 0 is taken as one too, any
 // other tag picks nothing.
-hkBool* hkpMousePickingViewer::pickObject(hkBool* apResult, uint64_t id, const hkVector4& worldPosition) {
+hkBool hkpMousePickingViewer::pickObject(uint64_t id, const hkVector4& worldPosition) {
     uintptr_t address = static_cast<uintptr_t>(id);
     if ((id & 3) == 3) {
         address &= ~static_cast<uintptr_t>(3);
     }
     else if ((id & 3) != 0) {
-        apResult->m_bool = false;
-        return apResult;
+        return false;
     }
     // The id is the collidable's address as an integer, and the collidable is read through it.
     hkpCollidable* collidable = reinterpret_cast<hkpCollidable*>(address);
@@ -117,8 +113,7 @@ hkBool* hkpMousePickingViewer::pickObject(hkBool* apResult, uint64_t id, const h
             }
         }
     }
-    apResult->m_bool = true;
-    return apResult;
+    return true;
 }
 
 void hkpMousePickingViewer::releaseObject() {

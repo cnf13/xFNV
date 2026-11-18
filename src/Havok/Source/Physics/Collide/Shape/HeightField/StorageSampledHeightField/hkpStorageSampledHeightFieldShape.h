@@ -31,7 +31,7 @@ public:
     int32_t calcSizeForSpu(const hkpShape::CalcSizeForSpuInput& input, int32_t spuBufferSizeLeft) const override;
     void collideSpheres(const CollideSpheresInput& input, hkVector4* outputArray) const override;
     float getHeightAtImpl(int32_t x, int32_t z) const override;
-    hkBool* getTriangleFlipImpl(hkBool* arResult) const override;
+    hkBool getTriangleFlipImpl() const override;
 
     static const hkClass& staticClass();
 

@@ -172,27 +172,20 @@ hkpWheelConstraintData::hkpWheelConstraintData() {
 // The suspension frames and both steering rotations must be orthonormal and the suspension limits ordered. Each
 // steering rotation is copied into an hkTransform whose translation is hkVector4::getZero() before it is tested; the
 // tests stop at the first failure.
-hkBool* hkpWheelConstraintData::isValid(hkBool* arResult) const {
+hkBool hkpWheelConstraintData::isValid() const {
     hkTransform kSteeringA;
     kSteeringA.m_rotation = m_atoms.m_steeringBase.m_rotationA;
     kSteeringA.m_translation = hkVector4::getZero();
     hkTransform kSteeringB;
     kSteeringB.m_rotation = m_atoms.m_steeringBase.m_rotationB;
     kSteeringB.m_translation = hkVector4::getZero();
-    hkBool bSuspensionA;
-    hkBool bSuspensionB;
-    hkBool bSteeringA;
-    hkBool bSteeringB;
-    if (m_atoms.m_suspensionBase.m_transformA.m_rotation.isOrthonormal(&bSuspensionA, 0.001f)->m_bool &&
-        m_atoms.m_suspensionBase.m_transformB.m_rotation.isOrthonormal(&bSuspensionB, 0.001f)->m_bool &&
-        kSteeringA.m_rotation.isOrthonormal(&bSteeringA, 0.001f)->m_bool &&
-        kSteeringB.m_rotation.isOrthonormal(&bSteeringB, 0.001f)->m_bool &&
+    if (m_atoms.m_suspensionBase.m_transformA.m_rotation.isOrthonormal(0.001f).m_bool &&
+        m_atoms.m_suspensionBase.m_transformB.m_rotation.isOrthonormal(0.001f).m_bool &&
+        kSteeringA.m_rotation.isOrthonormal(0.001f).m_bool && kSteeringB.m_rotation.isOrthonormal(0.001f).m_bool &&
         m_atoms.m_lin0Limit.m_max >= m_atoms.m_lin0Limit.m_min) {
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpWheelConstraintData::getType() const {

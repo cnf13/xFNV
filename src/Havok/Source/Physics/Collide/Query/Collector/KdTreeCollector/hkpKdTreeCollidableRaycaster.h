@@ -32,16 +32,11 @@ class hkpKdTreeCollidableRaycaster : public hkKdTreeCastCollector {
 public:
     ~hkpKdTreeCollidableRaycaster() override;
 
-    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
-    hkBool* hasHit(hkBool* arResult) override;
+    hkBool addMidPhaseHit(hkPrimitiveId primitiveId) override;
+    hkBool hasHit() override;
     float getHitFraction() override;
 
-    hkBool* castRayIterative(
-        hkBool* apResult,
-        const hkKdTree* tree,
-        const hkpWorldRayCastInput& input,
-        hkpWorldRayCastOutput& output
-    );
+    hkBool castRayIterative(const hkKdTree* tree, const hkpWorldRayCastInput& input, hkpWorldRayCastOutput& output);
 
     // DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size).
     static void operator delete(void* apMemory);

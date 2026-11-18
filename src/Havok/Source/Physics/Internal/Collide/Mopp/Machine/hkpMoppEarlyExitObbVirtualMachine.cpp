@@ -16,8 +16,7 @@
 #include <bit>
 #include <xmmintrin.h>
 
-hkBool* hkpMoppEarlyExitObbVirtualMachine::queryObb(
-    hkBool* apResult,
+hkBool hkpMoppEarlyExitObbVirtualMachine::queryObb(
     const hkpMoppCode* code,
     const hkTransform& BvToWorld,
     const hkVector4& extent,
@@ -33,12 +32,10 @@ hkBool* hkpMoppEarlyExitObbVirtualMachine::queryObb(
         scaledQuery.m_properties[0] = 0;
         m_hitFound.m_bool = 0;
         queryOBBOnTree(&scaledQuery, m_data);
-        apResult->m_bool = m_hitFound.m_bool;
-        return apResult;
+        return m_hitFound.m_bool;
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 // Walks the MOPP code from PC until a terminal under the box sets m_hitFound. scaledQuery holds the box in the current

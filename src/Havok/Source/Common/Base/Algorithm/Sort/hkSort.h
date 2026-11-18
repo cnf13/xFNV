@@ -27,14 +27,6 @@ namespace hkAlgorithm {
         return cmpLess(a, b);
     }
 
-    // Comparators that return their hkBool through a result pointer (the free-list allocator's _comparePointers, the
-    // island and entity comparators): the sort passes one and reads the result it points to.
-    template <typename R, typename P, typename A, typename B>
-    inline R lessThan(R* (*&cmpLess)(R*, P, P), A& a, B& b) {
-        R result;
-        return *cmpLess(&result, a, b);
-    }
-
     // Sorts pArr[d..h] in place (inclusive bounds): Hoare partition around the middle element, recursing on the left
     // part and looping on the right one.
     template <typename T, typename L>

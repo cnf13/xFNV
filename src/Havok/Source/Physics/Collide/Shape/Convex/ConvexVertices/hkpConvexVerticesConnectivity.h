@@ -16,7 +16,7 @@ public:
     ~hkpConvexVerticesConnectivity() override;
 
     void addFace(int32_t* indices, int32_t numIndices);
-    hkBool* isClosed(hkBool* apResult);
+    hkBool isClosed();
 
     // Havok SDK signature (hkpCollide.lib, tied by target).
     static const hkClass& staticClass();

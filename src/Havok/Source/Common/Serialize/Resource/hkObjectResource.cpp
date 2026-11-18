@@ -31,8 +31,7 @@ hkObjectResource::hkObjectResource(const hkVariant& v) : m_topLevelObject(v) {
 // registry pointers release their references themselves.
 hkObjectResource::~hkObjectResource() {
     if (m_topLevelObject.m_class) {
-        hkBool isSuper;
-        if (hkReferencedObjectClass.isSuperClass(&isSuper, *m_topLevelObject.m_class)->m_bool) {
+        if (hkReferencedObjectClass.isSuperClass(*m_topLevelObject.m_class).m_bool) {
             static_cast<hkReferencedObject*>(m_topLevelObject.m_object)->removeReference();
         }
         else {
@@ -67,8 +66,7 @@ void* hkObjectResource::getContentsPointer(const char* typeName, const hkTypeInf
     const char* Name = m_topLevelObject.m_class->getName();
     const hkClass* v7 = m_pntr->getClassByName(Name);
     const hkClass* v8 = m_pntr->getClassByName(v3);
-    hkBool isSuper;
-    if (v8->isSuperClass(&isSuper, *v7)->m_bool) {
+    if (v8->isSuperClass(*v7).m_bool) {
         return m_topLevelObject.m_object;
     }
 

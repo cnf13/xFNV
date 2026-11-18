@@ -75,10 +75,9 @@ void hkpAllCdPointCollector::addRootCdPoint(const hkpRootCdPoint& a1) {
     v4->Assign(a1);
 }
 
-hkBool* hkpAllCdPointCollector::hasHit(hkBool* apResult) {
+hkBool hkpAllCdPointCollector::hasHit() {
     int32_t v2 = (&m_hits)->m_size;
-    ::new (apResult) hkBool(v2 > 0);
-    return apResult;
+    return v2 > 0;
 }
 
 // Sorts the hits by distance (hkpRootCdPoint's operator<) with a quick sort for root points.

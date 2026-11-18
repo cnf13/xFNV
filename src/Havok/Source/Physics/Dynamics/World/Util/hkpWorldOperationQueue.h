@@ -300,11 +300,7 @@ namespace hkAlgorithm {
         hkWorldOperation::BiggestOperation* apArr,
         int32_t aiLow,
         int32_t aiHigh,
-        hkBool* (*cmpLess)(
-            hkBool*,
-            const hkWorldOperation::BiggestOperation&,
-            const hkWorldOperation::BiggestOperation&
-        )
+        hkBool (*cmpLess)(const hkWorldOperation::BiggestOperation&, const hkWorldOperation::BiggestOperation&)
     );
 } // namespace hkAlgorithm
 

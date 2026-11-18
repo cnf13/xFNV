@@ -37,9 +37,8 @@ void hkBsdNetworkQuit() {
 // Whether c is a decimal digit: one unsigned compare of c - '0' against 9.
 // KEEP: the exe body writes only ecx, and connect keeps the server name in edx across the call, which clang does not
 // guarantee: it pushes edx at 0xDA2F03 for inet_addr or gethostbyname after the call at 0xDA2EFB.
-hkBool* hkIsDigit(hkBool* apResult, int32_t c) {
-    apResult->m_bool = static_cast<uint32_t>(c) - 0x30u <= 9u;
-    return apResult;
+hkBool hkIsDigit(int32_t c) {
+    return static_cast<uint32_t>(c) - 0x30u <= 9u;
 }
 
 // a1 is an open socket, or -1 for a new one.
@@ -53,9 +52,8 @@ hkBsdSocket::~hkBsdSocket() {
     hkBsdSocket::close();
 }
 
-hkBool* hkBsdSocket::isOk(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)(m_socket != (-1)));
-    return arResult;
+hkBool hkBsdSocket::isOk() const {
+    return (int8_t)((uint8_t)(m_socket != (-1)));
 }
 
 // Closes the socket unless it is already closed, then forgets the handle.
@@ -102,8 +100,7 @@ hkResult hkBsdSocket::connect(const char* servername, int32_t portNumber) {
     // AF_INET.
     kAddr.sin_family = 2;
     kAddr.sin_port = htons_0(portNumber);
-    hkBool bDigit;
-    if (hkIsDigit(&bDigit, *servername)->m_bool) {
+    if (hkIsDigit(*servername).m_bool) {
         kAddr.sin_addr.S_un.S_addr = inet_addr(servername);
     }
     else {

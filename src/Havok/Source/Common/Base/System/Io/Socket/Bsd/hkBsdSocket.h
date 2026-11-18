@@ -9,7 +9,7 @@
 void hkBsdNetworkInit();
 void hkBsdNetworkQuit();
 // Whether c is a decimal digit.
-hkBool* hkIsDigit(hkBool* apResult, int32_t c);
+hkBool hkIsDigit(int32_t c);
 
 // A BSD (Winsock) socket. As in hkSocket, hkResult is returned as an int (0 is success).
 class hkBsdSocket : public hkSocket {
@@ -21,7 +21,7 @@ public:
     hkBsdSocket(socket_t a1);
     ~hkBsdSocket() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     void close() override;
     int32_t read(void* buf, int32_t nbytes) override;
     int32_t write(const void* buf, int32_t nbytes) override;

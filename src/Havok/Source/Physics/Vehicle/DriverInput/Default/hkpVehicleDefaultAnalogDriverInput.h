@@ -52,8 +52,7 @@ public:
         const hkpVehicleDriverInputAnalogStatus* deviceStatus,
         FilteredDriverInputOutput& FilteredDriverInputOutputOut
     ) const;
-    virtual hkBool* calcTryingToReverse(
-        hkBool* arResult,
+    virtual hkBool calcTryingToReverse(
         float deltaTime,
         const hkpVehicleInstance* vehicle,
         const hkpVehicleDriverInputAnalogStatus* deviceStatus,

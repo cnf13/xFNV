@@ -150,7 +150,6 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
     CFilter v57;
     hkpShapeRayCastInput rci;
     alignas(16) CFilter fltr;
-    hkBool v84;
     AutoMemContext tempMemContext(
         MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 155
     );
@@ -177,8 +176,7 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
         input.m_to.operator=(hkto);
         SetCustomPickCollisions();
         static_cast<bhkShapePhantom*>(GetObject())->SetPositionAndLinearCast(hkfrom, input, PointCollector, nullptr);
-        hkBool* pHasHit = PointCollector.hasHit(&v84);
-        if (pHasHit->operator bool()) {
+        if (PointCollector.hasHit().operator bool()) {
             PointCollector.sortHits();
             bhits = true;
         }

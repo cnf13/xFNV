@@ -10,8 +10,8 @@ public:
     virtual ~hkKdTreeCastCollector();
 
     // The primitive id is the SDK's hkPrimitiveId (pointer-sized): the overrides use it as the hkpCollidable*.
-    virtual hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) = 0;
-    virtual hkBool* hasHit(hkBool* arResult) = 0;
+    virtual hkBool addMidPhaseHit(hkPrimitiveId primitiveId) = 0;
+    virtual hkBool hasHit() = 0;
     virtual float getHitFraction() = 0;
 
     // DeletingDestruct's free (ourFree).

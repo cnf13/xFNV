@@ -11,13 +11,13 @@ public:
     hkStdioStreamWriter(const char* nameIn);
     ~hkStdioStreamWriter() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t write(const void* buf, int32_t nbytes) override;
     void flush() override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t offset, hkStreamWriter::SeekWhence whence) override;
     int32_t tell() const override;
-    virtual hkBool* markSupported(hkBool* arResult) const;
+    virtual hkBool markSupported() const;
 
     // Closes the handle when the writer owns it and forgets it.
     void close();

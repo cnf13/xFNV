@@ -186,9 +186,8 @@ void hkpVehicleDefaultAnalogDriverInput::calcDriverInput(
     filteredInputOut.m_brakePedalInput = calcBrakeInput(deltaTime, vehicle, analogStatus, filteredInputOut);
     filteredInputOut.m_steeringWheelInput = calcSteeringInput(deltaTime, vehicle, analogStatus, filteredInputOut);
     filteredInputOut.m_handbrakeOn.m_bool = analogStatus->m_handbrakeButtonPressed.m_bool;
-    hkBool tryingToReverse;
     filteredInputOut.m_tryingToReverse.m_bool =
-        calcTryingToReverse(&tryingToReverse, deltaTime, vehicle, analogStatus, filteredInputOut)->m_bool;
+        calcTryingToReverse(deltaTime, vehicle, analogStatus, filteredInputOut).m_bool;
 }
 
 // The pedal is the stick's y negated where it is not positive (y flipped while auto-reversing), and full while
@@ -237,16 +236,14 @@ float hkpVehicleDefaultAnalogDriverInput::calcBrakeInput(
     return result;
 }
 
-hkBool* hkpVehicleDefaultAnalogDriverInput::calcTryingToReverse(
-    hkBool* arResult,
+hkBool hkpVehicleDefaultAnalogDriverInput::calcTryingToReverse(
     float deltaTime,
     const hkpVehicleInstance* vehicle,
     const hkpVehicleDriverInputAnalogStatus* deviceStatus,
     hkpVehicleDriverInput::FilteredDriverInputOutput& filteredDriverInputOutputOut
 ) {
     if (!m_autoReverse.m_bool) {
-        arResult->m_bool = deviceStatus->m_reverseButtonPressed.m_bool;
-        return arResult;
+        return deviceStatus->m_reverseButtonPressed.m_bool;
     }
     const hkpEntity* entity = vehicle->m_entity;
     const __m128 velocity = entity->m_motion.m_linearVelocity.m_quad;
@@ -310,18 +307,16 @@ hkBool* hkpVehicleDefaultAnalogDriverInput::calcTryingToReverse(
             ));
             // Braking while moving sideways or backwards against the chassis' forward axis: trying to reverse.
             if (dot < 1.1920929e-07f) {
-                arResult->m_bool = 1;
-                return arResult;
+                return 1;
             }
         }
     }
     if (isReversing) {
-        arResult->m_bool = isSlow ? wantsReverse : 1;
+        return isSlow ? wantsReverse : 1;
     }
     else {
-        arResult->m_bool = (isSlow && wantsReverse) ? 1 : 0;
+        return (isSlow && wantsReverse) ? 1 : 0;
     }
-    return arResult;
 }
 
 float hkpVehicleDefaultAnalogDriverInput::calcSteeringInput(

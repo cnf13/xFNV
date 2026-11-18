@@ -27,7 +27,7 @@ public:
     const hkpRootCdPoint* getHits() const;
     // The number of points collected.
     int32_t getNumHits() const;
-    hkBool* hasHit(hkBool* a1);
+    hkBool hasHit();
 
     static void registerDefaultAddCdPointFunction();
     // Frees the block to the calling thread's router heap allocator (blockFree) with the object's size; does nothing

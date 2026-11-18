@@ -193,8 +193,7 @@ void hkpEndOfStepCallbackUtil::removeCollisions(hkArray<Collision>& removedColli
             const T& kEntry = list.m_data[i];
             int32_t iFound = -1;
             for (uint32_t j = 0; j < removedCollisions.m_size; ++j) {
-                hkBool kEqual;
-                if (removedCollisions.m_data[j].equals(&kEqual, kEntry)->m_bool) {
+                if (removedCollisions.m_data[j].equals(kEntry).m_bool) {
                     iFound = static_cast<int32_t>(j);
                     break;
                 }
@@ -358,9 +357,8 @@ void hkpEndOfStepCallbackUtil::postSimulationCallback(hkpWorld* world) {
 hkpEndOfStepCallbackUtil::~hkpEndOfStepCallbackUtil() {}
 
 // The same manager, listener and source, stored in apResult.
-hkBool* hkpEndOfStepCallbackUtil::Collision::equals(hkBool* apResult, const Collision& other) const {
-    apResult->m_bool = m_mgr == other.m_mgr && m_listener == other.m_listener && m_source == other.m_source;
-    return apResult;
+hkBool hkpEndOfStepCallbackUtil::Collision::equals(const Collision& other) const {
+    return m_mgr == other.m_mgr && m_listener == other.m_listener && m_source == other.m_source;
 }
 
 // The three arrays start empty through their own constructors.

@@ -65,9 +65,8 @@ static uint32_t calcPermute(uint32_t a1) {
 
 hkCrc32StreamWriter::hkCrc32StreamWriter(uint32_t startCrc) : m_crc32(~startCrc) {}
 
-hkBool* hkCrc32StreamWriter::isOk(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkCrc32StreamWriter::isOk() const {
+    return 1;
 }
 
 // Each byte's table entry comes from calcPermute (the CRC-32 step), not from a table.

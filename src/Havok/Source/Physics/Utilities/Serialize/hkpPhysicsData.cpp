@@ -236,7 +236,6 @@ void hkpPhysicsData::populateFromWorld(const hkpWorld* world, int32_t saveContac
 hkpWorld* hkpPhysicsData::createWorld(hkBool registerAllAgents) {
     hkpWorld* v4;
     hkpWorldCinfo* m_worldCinfo;
-    hkBool hasContactsResult;
     hkpWorldCinfo info;
     if (this->m_worldCinfo) {
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -257,7 +256,7 @@ hkpWorld* hkpPhysicsData::createWorld(hkBool registerAllAgents) {
     for (int32_t i = 0; i < m_systems.m_size; ++i) {
         v7->addPhysicsSystem(m_systems.m_data[i]);
         hkpPhysicsSystem* v10 = m_systems.m_data[i];
-        if (v10->hasContacts(&hasContactsResult)->m_bool) {
+        if (v10->hasContacts().m_bool) {
             hkpSaveContactPointsUtil::LoadPointsInput input;
             hkpPhysicsSystem** m_data = m_systems.begin();
             input.m_removeSerializedAgentsWhenLoaded = false;
@@ -483,7 +482,6 @@ void hkpPhysicsData::splitPhysicsSystems(
     delete inputSystem;
 }
 
-hkBool* hkpPhysicsSystemWithContacts::hasContacts(hkBool* arResult) {
-    arResult->m_bool = true;
-    return arResult;
+hkBool hkpPhysicsSystemWithContacts::hasContacts() {
+    return true;
 }

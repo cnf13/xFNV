@@ -30,7 +30,7 @@ public:
         int32_t aiLine
     ) = 0;
     virtual void setEnabled(int32_t aiId, hkBool abEnabled) = 0;
-    virtual hkBool* isEnabled(hkBool* arResult, int32_t aiId) = 0;
+    virtual hkBool isEnabled(int32_t aiId) = 0;
     virtual void enableAll() = 0;
     virtual void sectionBegin(int32_t, const char*) {}
     virtual void sectionEnd() {}

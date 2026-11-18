@@ -135,9 +135,8 @@ uint8_t hkpBallAndSocketConstraintData::getNotifiedBodyIndex() const {
     return (uint8_t)((int32_t)(((uint32_t)((int32_t)m_atoms.m_ballSocket.m_bodiesToNotify)) >> 1));
 }
 
-hkBool* hkpBallAndSocketConstraintData::isValid(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkpBallAndSocketConstraintData::isValid() const {
+    return 1;
 }
 
 int32_t hkpBallAndSocketConstraintData::getType() const {

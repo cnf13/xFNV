@@ -224,9 +224,8 @@ hkResult hkBaseSystem::quit() {
 }
 
 // Copies the initialised flag into apResult and returns it.
-hkBool* hkBaseSystem::isInitialized(hkBool* apResult) {
-    apResult->m_bool = hkBaseSystemIsInitialized.m_bool;
-    return apResult;
+hkBool hkBaseSystem::isInitialized() {
+    return hkBaseSystemIsInitialized.m_bool;
 }
 
 hkStreamWriter* hkNativeFileSystem::openWriter(const char* name) {

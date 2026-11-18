@@ -33,8 +33,7 @@ public:
         pFile->m_memSizeAndFlags = sizeof(hkStdioStreamReader);
         hkStreamReader* s = ::new (pFile) hkStdioStreamReader(s_havokToPlatformConvert(name, buffer));
         hkStreamReader* pResult = s;
-        hkBool bMarkSupported;
-        if (!s->markSupported(&bMarkSupported)->m_bool) {
+        if (!s->markSupported().m_bool) {
             hkBufferedStreamReader* pBuffered = static_cast<hkBufferedStreamReader*>(
                 hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkBufferedStreamReader))
             );

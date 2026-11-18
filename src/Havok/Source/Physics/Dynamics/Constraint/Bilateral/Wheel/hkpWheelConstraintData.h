@@ -52,7 +52,7 @@ public:
     hkpWheelConstraintData();
     hkpWheelConstraintData(hkFinishLoadedObjectFlag aFlag) : hkpConstraintData(aFlag), m_atoms(aFlag) {}
 
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
     void getConstraintInfo(hkpConstraintData::ConstraintInfo& infoOut) const override;

@@ -34,10 +34,9 @@
 #include <new>
 
 // The SDK's getExactClass: klass itself when it has no vtable, else the registry's class of the instance (null
-// without a registry). The hkBool result slot is the byte hasVtable fills.
+// without a registry).
 const hkClass* getExactClass(const void* instance, const hkClass& base, const hkVtableClassRegistry* reg) {
-    hkBool kHasVtable;
-    if (!base.hasVtable(&kHasVtable)->m_bool) {
+    if (!base.hasVtable().m_bool) {
         return &base;
     }
     if (reg) {
@@ -81,9 +80,8 @@ void hkPackfileWriter::setContentsWithRegistry(
     if (!pRegistry) {
         pRegistry = hkBuiltinTypeRegistry::s_instance->getVtableClassRegistry();
     }
-    hkBool kHasVtable;
     const hkClass* pClass;
-    if (klass.hasVtable(&kHasVtable)->m_bool) {
+    if (klass.hasVtable().m_bool) {
         pClass = pRegistry->getClassFromVirtualInstance(pointer);
     }
     else {

@@ -23,7 +23,7 @@ public:
     virtual float getEnd() const = 0;
     virtual float getLengthFromStart(float t) const = 0;
     virtual void getBinormal(float t, hkVector4& up) const = 0;
-    virtual hkBool* isClosedLoop(hkBool* arResult) const = 0;
+    virtual hkBool isClosedLoop() const = 0;
     virtual void getPointsToDraw(hkArray<hkVector4>& pathPoints) const = 0;
     virtual void transformPoints(const hkTransform& transformation) = 0;
     virtual hkpParametricCurve* clone() = 0;

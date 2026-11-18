@@ -213,8 +213,7 @@ hkJobQueue::JobStatus hkCpuWorldLinearCastJob(hkJobQueue& jobQueue, hkJobQueue::
                 castInput.m_from.m_quad = from;
                 castInput.m_to.m_quad = to;
                 castInput.m_halfExtents.m_quad = halfExtents;
-                hkBool result;
-                hkKdTreeAabbCastUtils::castAabb(&result, kdTree, castInput, &collector, 0.0f);
+                hkKdTreeAabbCastUtils::castAabb(kdTree, castInput, &collector, 0.0f);
             }
         }
         command.m_numResultsOut = castCollector.m_numPoints.m_storage;
@@ -238,18 +237,16 @@ float hkCpuWorldLinearCastCollector::addBroadPhaseHandle(
 }
 
 // The k-d tree primitive id is the collidable; the cast always reports a hit.
-hkBool* hkCpuWorldLinearCastCollector::addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) {
+hkBool hkCpuWorldLinearCastCollector::addMidPhaseHit(hkPrimitiveId primitiveId) {
     testCollidable(reinterpret_cast<const hkpCollidable*>(primitiveId));
-    arResult->m_bool = 1;
-    return arResult;
+    return 1;
 }
 
-hkBool* hkCpuWorldLinearCastCollector::hasHit(hkBool* arResult) {
+hkBool hkCpuWorldLinearCastCollector::hasHit() {
     hkpFixedBufferCdPointCollector* m_castCollector = this->m_castCollector;
     bool v3 = m_castCollector->m_numPoints.m_storage == 0;
     bool v4 = m_castCollector->m_numPoints.m_storage < 0;
-    arResult->m_bool = !v4 && !v3;
-    return arResult;
+    return !v4 && !v3;
 }
 
 // The point collector's early-out distance: the fraction of the cast still to search.

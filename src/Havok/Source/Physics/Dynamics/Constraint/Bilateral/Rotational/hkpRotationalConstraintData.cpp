@@ -127,17 +127,13 @@ hkpRotationalConstraintData::hkpRotationalConstraintData() {
     m_atoms.m_ang.m_numConstrainedAxes = 3;
 }
 
-hkBool* hkpRotationalConstraintData::isValid(hkBool* arResult) const {
-    hkBool a2;
-    hkBool apResult;
-    if (m_atoms.m_rotations.m_rotationA.isOrthonormal(&a2, 0.001f)->m_bool &&
-        m_atoms.m_rotations.m_rotationB.isOrthonormal(&apResult, 0.001f)->m_bool) {
-        arResult->m_bool = 1;
-        return arResult;
+hkBool hkpRotationalConstraintData::isValid() const {
+    if (m_atoms.m_rotations.m_rotationA.isOrthonormal(0.001f).m_bool &&
+        m_atoms.m_rotations.m_rotationB.isOrthonormal(0.001f).m_bool) {
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpRotationalConstraintData::getType() const {

@@ -399,20 +399,21 @@ hkaKeyFrameHierarchyUtility::ControlData::ControlData()
     m_snapMaxLinearVelocity(0.3f), m_snapMaxAngularVelocity(0.3f), m_snapMaxLinearDistance(0.03f),
     m_snapMaxAngularDistance(0.1f) {}
 
-hkBool* hkaKeyFrameHierarchyUtility::ControlData::isValid(hkBool* apResult) {
+hkBool hkaKeyFrameHierarchyUtility::ControlData::isValid() {
+    hkBool result;
     char v9;
     double v2 = 0.0;
     bool v3 = m_hierarchyGain > 0.0f;
     bool v4 = 0.0f == m_hierarchyGain;
-    apResult->m_bool = 1;
+    result.m_bool = 1;
     char v5 = (v3 || v4) && m_hierarchyGain <= 1.0f;
-    apResult->m_bool = v5;
+    result.m_bool = v5;
     char v6 = v5 && (m_velocityDamping >= 0.0f && m_velocityDamping <= 1.0f);
-    apResult->m_bool = v6;
+    result.m_bool = v6;
     char v7 = v6 && (m_accelerationGain >= 0.0f && m_accelerationGain <= 1.0f);
-    apResult->m_bool = v7;
+    result.m_bool = v7;
     char v8 = v7 && (m_velocityGain >= 0.0f && m_velocityGain <= 1.0f);
-    apResult->m_bool = v8;
+    result.m_bool = v8;
     if (!v8) {
         goto LABEL_26;
     }
@@ -428,26 +429,21 @@ hkBool* hkaKeyFrameHierarchyUtility::ControlData::isValid(hkBool* apResult) {
     }
     v9 = 1;
 LABEL_27:;
-    apResult->m_bool = v9;
+    result.m_bool = v9;
     char v10 = v9 && v2 <= m_positionMaxLinearVelocity;
-    apResult->m_bool = v10;
+    result.m_bool = v10;
     char v11 = v10 && v2 <= m_positionMaxAngularVelocity;
-    apResult->m_bool = v11;
+    result.m_bool = v11;
     char v12 = v11 && v2 <= m_snapGain;
-    apResult->m_bool = v12;
+    result.m_bool = v12;
     char v13 = v12 && v2 <= m_snapMaxLinearVelocity;
-    apResult->m_bool = v13;
+    result.m_bool = v13;
     char v14 = v13 && v2 <= m_snapMaxAngularVelocity;
-    apResult->m_bool = v14;
+    result.m_bool = v14;
     char v15 = v14 && v2 <= m_snapMaxLinearDistance;
-    apResult->m_bool = v15;
-    if (v15 && v2 <= m_snapMaxAngularDistance) {
-        apResult->m_bool = 1;
-        return apResult;
-    }
-
-    apResult->m_bool = 0;
-    return apResult;
+    result.m_bool = v15;
+    result.m_bool = v15 && v2 <= m_snapMaxAngularDistance;
+    return result;
 }
 
 const hkClass& hkaKeyFrameHierarchyUtility::ControlData::staticClass() {

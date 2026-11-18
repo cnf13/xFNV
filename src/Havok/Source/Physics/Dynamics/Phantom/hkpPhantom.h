@@ -30,7 +30,7 @@ public:
     virtual hkpPhantomType getType() const = 0;
     virtual void calcAabb(hkAabb& aAabb) = 0;
     virtual void addOverlappingCollidable(hkpCollidable* apCollidable) = 0;
-    virtual hkBool* isOverlappingCollidableAdded(hkBool* arResult, const hkpCollidable* apCollidable) = 0;
+    virtual hkBool isOverlappingCollidableAdded(const hkpCollidable* apCollidable) = 0;
     virtual void removeOverlappingCollidable(hkpCollidable* apCollidable) = 0;
     virtual void ensureDeterministicOrder() = 0;
     virtual hkpPhantom* clone() const = 0;

@@ -1543,8 +1543,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
         if (body == nullptr) {
             continue;
         }
-        hkBool bFixedOrKeyframed;
-        if (body->isFixedOrKeyframed(&bFixedOrKeyframed)->m_bool) {
+        if (body->isFixedOrKeyframed().m_bool) {
             continue;
         }
         const hkpRootCdPoint& point = m_manifold.m_data[s];

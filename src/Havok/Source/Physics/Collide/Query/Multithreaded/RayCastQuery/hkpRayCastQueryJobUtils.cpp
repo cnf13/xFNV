@@ -97,7 +97,6 @@ void hkTreeRayCastJobUtil::castRayKdTree(
     hkSpu4WayCache* transformCache,
     hkpWorldRayCastOutput* resultLocalArray
 ) {
-    hkBool arResult;
     if (kdTree) {
         // The collector is not destroyed, as the game does.
         hkCpuWorldRayCastCollector v13;
@@ -131,7 +130,7 @@ void hkTreeRayCastJobUtil::castRayKdTree(
         else {
             v13.m_fixedBufferRayHitCollector = nullptr;
         }
-        hkKdTreeUtils::castRayIterative(&arResult, kdTree, command->m_rayInput.m_from, command->m_rayInput.m_to, &v13);
+        hkKdTreeUtils::castRayIterative(kdTree, command->m_rayInput.m_from, command->m_rayInput.m_to, &v13);
     }
 }
 
@@ -207,9 +206,8 @@ void hkTreeRayCastJobUtil::castRayBundleKdTree(
     hkKdTreeUtils::RayBundle kdFromBundle;
     hkKdTreeUtils::RayBundle kdToBundle;
     hkKdTreeRayCastJobUtil::makeBundleFromInputs(command->m_rayInput, kdFromBundle, kdToBundle);
-    hkBool bResult;
     hkKdTreeUtils::castRayBundleIterative(
-        &bResult, kdTree, kdFromBundle, kdToBundle, &kBundleCollector,
+        kdTree, kdFromBundle, kdToBundle, &kBundleCollector,
         hkAabbTreeQueryUtilsData::s_numRaysToMask[command->m_numActiveRays]
     );
 

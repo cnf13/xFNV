@@ -20,8 +20,7 @@ public:
     virtual float
     calcMainTransmittedTorque(const hkpVehicleInstance* vehicle, TransmissionOutput& transmissionOut) const;
     virtual float calcTransmissionRPM(const hkpVehicleInstance* vehicle, TransmissionOutput& transmissionOut) const;
-    virtual hkBool*
-    calcIsReversing(hkBool* arResult, const hkpVehicleInstance* vehicle, TransmissionOutput& transmissionOut) const;
+    virtual hkBool calcIsReversing(const hkpVehicleInstance* vehicle, TransmissionOutput& transmissionOut) const;
     virtual void
     updateCurrentGear(float deltaTime, const hkpVehicleInstance* vehicle, TransmissionOutput& transmissionOut);
     virtual float getCurrentRatio(const hkpVehicleInstance* vehicle, TransmissionOutput& transmissionOut) const;

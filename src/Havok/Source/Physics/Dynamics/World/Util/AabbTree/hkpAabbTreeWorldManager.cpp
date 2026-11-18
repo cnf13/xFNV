@@ -148,8 +148,7 @@ void hkpAabbTreeWorldManager::castRay(
             collector.m_filter = nullptr;
             collector.m_collectionFilter = nullptr;
         }
-        hkBool result;
-        hkKdTreeUtils::castRayIterative(&result, kdTree, input.m_from, input.m_to, &collector);
+        hkKdTreeUtils::castRayIterative(kdTree, input.m_from, input.m_to, &collector);
     }
     HK_TIMER_SPLIT_LIST("InactiveTree");
     if (m_useInactiveTree) {
@@ -173,7 +172,6 @@ void hkpAabbTreeWorldManager::castRay(
     // Raw storage: the AABB raycaster is constructed in place and its destructor is deliberately never called, as the
     // game does. The storage is 16-byte aligned.
     alignas(16) uint8_t aAabbStorage[sizeof(hkpAabbTreeCollidableRaycaster)];
-    hkBool kResult;
     ::new (aAabbStorage) hkpAabbTreeCollidableRaycaster;
     hkpAabbTreeCollidableRaycaster& kAabbRaycaster = *reinterpret_cast<hkpAabbTreeCollidableRaycaster*>(aAabbStorage);
     kAabbRaycaster.m_input = &input;
@@ -199,7 +197,7 @@ void hkpAabbTreeWorldManager::castRay(
         kKdRaycaster.m_output = &kKdOutput;
         kKdOutput.m_shapeKeyIndex = 0;
         kKdOutput.m_rootCollidable = nullptr;
-        hkKdTreeUtils::castRayIterative(&kResult, m_kdTree, input.m_from, input.m_to, &kKdRaycaster);
+        hkKdTreeUtils::castRayIterative(m_kdTree, input.m_from, input.m_to, &kKdRaycaster);
     }
     if (m_useInactiveTree) {
         hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::castRay(

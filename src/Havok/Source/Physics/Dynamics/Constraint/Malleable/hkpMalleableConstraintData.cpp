@@ -110,9 +110,8 @@ hkpMalleableConstraintData::~hkpMalleableConstraintData() {
     m_constraintData->removeReference();
 }
 
-hkBool* hkpMalleableConstraintData::isValid(hkBool* arResult) const {
-    m_constraintData->isValid(arResult);
-    return arResult;
+hkBool hkpMalleableConstraintData::isValid() const {
+    return m_constraintData->isValid();
 }
 
 int32_t hkpMalleableConstraintData::getType() const {

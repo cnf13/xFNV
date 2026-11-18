@@ -976,8 +976,7 @@ hkDataWorldDict::ObjectTracker::~ObjectTracker() {
     hkArray<hkDataClassDict*> classes;
     m_derivedFromParent.clear();
     m_topLevelObject = nullptr;
-    hkBool valid;
-    for (auto it = m_classes.m_map.getIterator(); m_classes.m_map.isValid(&valid, it)->m_bool;
+    for (auto it = m_classes.m_map.getIterator(); m_classes.m_map.isValid(it).m_bool;
          it = m_classes.m_map.getNext(it)) {
         hkDataClassDict* pClass = reinterpret_cast<hkDataClassDict*>(m_classes.m_map.getValue(it));
         if (classes.m_size == (classes.m_capacityAndFlags & hkArrayBase<hkDataClassDict*>::CAPACITY_MASK)) {
@@ -1028,11 +1027,11 @@ hkDataWorldDict::ObjectTracker::~ObjectTracker() {
             delete pClass;
         }
     }
-    for (auto it = m_internedClassNames.m_map.getIterator(); m_internedClassNames.m_map.isValid(&valid, it)->m_bool;
+    for (auto it = m_internedClassNames.m_map.getIterator(); m_internedClassNames.m_map.isValid(it).m_bool;
          it = m_internedClassNames.m_map.getNext(it)) {
         reinterpret_cast<InternedStringRefCounted*>(m_internedClassNames.m_map.getValue(it))->removeReference();
     }
-    for (auto it = m_interns.m_map.getIterator(); m_interns.m_map.isValid(&valid, it)->m_bool;
+    for (auto it = m_interns.m_map.getIterator(); m_interns.m_map.isValid(it).m_bool;
          it = m_interns.m_map.getNext(it)) {
         hkString::strFree(reinterpret_cast<char*>(m_interns.m_map.getValue(it)));
     }
@@ -1041,9 +1040,8 @@ hkDataWorldDict::ObjectTracker::~ObjectTracker() {
 void hkDataWorldDict::ObjectTracker::findTrackedClasses(
     hkArray<hkDataClassImpl*, hkContainerHeapAllocator>& classesOut
 ) const {
-    hkBool arResult;
     hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>::Iterator Iterator = m_classes.m_map.getIterator();
-    m_classes.m_map.isValid(&arResult, Iterator);
+    hkBool arResult = m_classes.m_map.isValid(Iterator);
     while (arResult.m_bool) {
         hkDataClassImpl* Value = m_classes.getValue(Iterator);
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
@@ -1052,7 +1050,7 @@ void hkDataWorldDict::ObjectTracker::findTrackedClasses(
         }
         classesOut.m_data[classesOut.m_size++] = Value;
         Iterator = m_classes.m_map.getNext(Iterator);
-        m_classes.m_map.isValid(&arResult, Iterator);
+        arResult = m_classes.m_map.isValid(Iterator);
     }
 }
 
@@ -1302,15 +1300,14 @@ void hkDataWorldDict::ObjectTracker::retrackDerivedClass(hkDataClassDict* oldPar
 
 // The class names are the tracker's own copies (keys of m_classes), freed one by one before the map is emptied.
 void hkDataWorldDict::ObjectTracker::clear() {
-    hkBool bValid;
     hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>::Iterator it = m_classes.m_map.getIterator();
-    m_classes.m_map.isValid(&bValid, it);
+    hkBool bValid = m_classes.m_map.isValid(it);
     while (bValid.m_bool) {
         char* pcKey = reinterpret_cast<char*>(m_classes.m_map.getKey(it));
         hkMemoryAllocator& rHeap = *hkMemoryRouter::getInstance().m_heap;
         hkString::strFree_00CB1190(pcKey, rHeap);
         it = m_classes.m_map.getNext(it);
-        m_classes.m_map.isValid(&bValid, it);
+        bValid = m_classes.m_map.isValid(it);
     }
     m_classes.m_map.clear();
 }
@@ -1320,8 +1317,7 @@ void hkDataWorldDict::ObjectTracker::trackClass(hkDataClassDict* klass) {
     hkDataClassImpl* pClass = klass;
     hkDataClassImpl* pParent = pClass->getParent();
     auto it = m_classes.m_map.findKey(hkUlong(pClass->getName()));
-    hkBool kValid;
-    m_classes.m_map.isValid(&kValid, it);
+    hkBool kValid = m_classes.m_map.isValid(it);
     if (!kValid.m_bool) {
         m_classes.insert(pClass->getName(), klass);
         if (pParent) {

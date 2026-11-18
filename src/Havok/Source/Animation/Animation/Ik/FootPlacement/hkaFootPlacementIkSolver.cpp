@@ -763,7 +763,7 @@ LABEL_49:;
         apMemory.m_hingeAxisLS.m_quad = v133.m_quad;
         apMemory.m_endBoneIdx = m_ankleIndex_2;
         apMemory.m_endTargetMS.m_quad = footEndWS.m_quad;
-        hkaTwoJointsIkSolver::solve(&apResult, apMemory, poseInOut);
+        hkaTwoJointsIkSolver::solve(apMemory, poseInOut);
         v137.m_quad = m_setup.m_worldUpDirectionWS.m_quad;
         __m128 v138 = _mm_mul_ps(v173, v137.m_quad);
         __m128 v139 = _mm_shuffle_ps(v138, v138, 170);

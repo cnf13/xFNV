@@ -719,8 +719,7 @@ void hkpBoxBoxCollisionDetection::addAdditionalEdgeHelper(
     hkpFeatureContactPoint& fcp,
     float closestPointDist
 ) const {
-    hkBool result;
-    if (manifold.findInManifold(&result, fcp)->m_bool) {
+    if (manifold.findInManifold(fcp).m_bool) {
         return;
     }
     alignas(16) hkpFeaturePointCache fpp;
@@ -1429,8 +1428,7 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
         hkpFeatureContactPoint fcpTry = fcpFaceB;
         fcpTry.m_featureIdB =
             static_cast<uint8_t>((fcpFaceB.m_featureIdB & 0xF) | (static_cast<uint8_t>(flip) ^ fcpFaceB.m_featureIdB));
-        hkBool inManifold;
-        if (manifold.findInManifold(&inManifold, fcpTry)->m_bool) {
+        if (manifold.findInManifold(fcpTry).m_bool) {
             continue;
         }
         // isValidFaceBVertexA: A's vertex in B's space, within B's keep radii and the distance limit above.

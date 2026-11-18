@@ -95,7 +95,7 @@ public:
     // Points the accessor at member of object: m_address is object plus the member's offset.
     void connect(void* object, const hkClassMember* member);
     // Whether the accessor found its member: m_address is not null. The result is written to apResult.
-    hkBool* isOk(hkBool* apResult) const;
+    hkBool isOk() const;
     // Havok SDK signature (hkBase.lib, tied by reloc).
     void* asRaw() const;
     hkBool& asBool(int32_t index);

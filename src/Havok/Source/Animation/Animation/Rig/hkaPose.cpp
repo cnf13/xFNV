@@ -379,33 +379,29 @@ const hkArray<hkQsTransform>& hkaPose::getSyncedPoseLocalSpace() const {
 }
 
 // The bone count comes from the skeleton, read once; each loop walks the bone flags directly.
-hkBool* hkaPose::checkPoseValidity(hkBool* apResult) const {
+hkBool hkaPose::checkPoseValidity() const {
     const int32_t iNumBones = m_skeleton->m_bones.m_size;
     for (int32_t i = 0; i < iNumBones; ++i) {
         const uint32_t uiFlags = m_boneFlags.m_data[i];
         if ((uiFlags & F_BONE_LOCAL_DIRTY) && (uiFlags & F_BONE_MODEL_DIRTY)) {
-            apResult->m_bool = 0;
-            return apResult;
+            return 0;
         }
     }
     if (m_localInSync.m_bool) {
         for (int32_t i = 0; i < iNumBones; ++i) {
             if (m_boneFlags.m_data[i] & F_BONE_LOCAL_DIRTY) {
-                apResult->m_bool = 0;
-                return apResult;
+                return 0;
             }
         }
     }
     if (m_modelInSync.m_bool) {
         for (int32_t i = 0; i < iNumBones; ++i) {
             if (m_boneFlags.m_data[i] & F_BONE_MODEL_DIRTY) {
-                apResult->m_bool = 0;
-                return apResult;
+                return 0;
             }
         }
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 void hkaPose::setToReferencePose() {
@@ -778,8 +774,6 @@ int32_t hkaPose::setPoseModelSpace(const hkArrayBase<hkQsTransform>& poseModel) 
 }
 
 uint8_t* hkaPose::checkPoseTransformsValidity(uint8_t* a1) {
-    uint8_t v8;
-    uint8_t v9;
     int32_t m_size = m_skeleton->m_bones.m_size;
     int32_t v4 = 0;
     if (m_size <= 0) {
@@ -795,10 +789,10 @@ uint8_t* hkaPose::checkPoseTransformsValidity(uint8_t* a1) {
             break;
         }
         m_boneFlags.m_data[v4];
-        if ((m_boneFlags.m_data[v4] & 2) == 0 && !m_modelPose.m_data[v5].isOk(reinterpret_cast<hkBool*>(&v8))->m_bool) {
+        if ((m_boneFlags.m_data[v4] & 2) == 0 && !m_modelPose.m_data[v5].isOk().m_bool) {
             break;
         }
-        if ((m_boneFlags.m_data[v4] & 1) == 0 && !m_localPose.m_data[v5].isOk(reinterpret_cast<hkBool*>(&v9))->m_bool) {
+        if ((m_boneFlags.m_data[v4] & 1) == 0 && !m_localPose.m_data[v5].isOk().m_bool) {
             break;
         }
         ++v4;

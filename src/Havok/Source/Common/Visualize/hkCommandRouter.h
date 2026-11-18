@@ -24,7 +24,7 @@ public:
     void unregisterProcess(hkProcess* handler);
     // Reads commands off stream and hands each to the process registered for it until the
     // stream ends or a COMMAND_ACK; sets *apResult to true.
-    hkBool* consumeCommands(hkBool* apResult, hkDisplaySerializeIStream* stream);
+    hkBool consumeCommands(hkDisplaySerializeIStream* stream);
 
     hkPointerMap<uint8_t, hkProcess*> m_commandMap;
 };

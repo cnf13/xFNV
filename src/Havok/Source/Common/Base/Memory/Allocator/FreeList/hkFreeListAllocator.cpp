@@ -366,10 +366,8 @@ void hkFreeListAllocator::incrementalGarbageCollect(int32_t numBlocks) {
     do {
         hkFreeList* pFreeList = m_freeLists[iIndex];
         const uint32_t uiNumFreeElementsBefore = pFreeList->m_numFreeElements;
-        hkBool kFound;
         int32_t iNumBlocksOut;
-        if ((pFreeList->incrementalFindGarbage(&kFound, iNumBlocks, iNumBlocksOut)->m_bool) &&
-            (++iIndex >= m_numFreeLists)) {
+        if ((pFreeList->incrementalFindGarbage(iNumBlocks, iNumBlocksOut).m_bool) && (++iIndex >= m_numFreeLists)) {
             iIndex = 0;
         }
 
@@ -424,11 +422,10 @@ void hkFreeListAllocator::releaseUnusedPagesToSystemMemory() {
 // the walk and cleared on a failure.
 hkBool hkFreeListAllocator::isOk() const {
     hkBool result;
-    hkBool bListOk;
     EnterCriticalSection(&m_criticalSection.m_section);
     result.m_bool = 1;
     for (int32_t i = 0; i < m_numFreeLists; ++i) {
-        m_freeLists[i]->_checkFreeBlocks(&bListOk);
+        hkBool bListOk = m_freeLists[i]->_checkFreeBlocks();
         if (!bListOk.m_bool) {
             result.m_bool = 0;
             break;
@@ -477,7 +474,7 @@ hkResult hkFreeListAllocator::walkMemory(hkFreeListAllocator::MemoryWalkCallback
         ppDest += iNumBlocks;
     }
     if (iTotalBlocks > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool* (*)(hkBool*, const void*, const void*)>(
+        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
             ppBlocks, 0, iTotalBlocks - 1, &hkFreeListAllocator::_comparePointers
         );
     }
@@ -492,8 +489,7 @@ hkResult hkFreeListAllocator::walkMemory(hkFreeListAllocator::MemoryWalkCallback
         else {
             callback(pPayload, iter.m_chunk->getChunkSize(), hkBool(iter.m_chunk->isInuse()), 0, param);
         }
-        hkBool bMore;
-        m_largeAllocator.nextBlock(&bMore, iter);
+        m_largeAllocator.nextBlock(iter);
     }
     m_server->criticalFree(ppBlocks, uiSize);
     for (int32_t i = 0; i < m_numFreeLists; ++i) {
@@ -542,7 +538,6 @@ void hkFreeListAllocator::_deleteFreeList(hkFreeList* freeList) {
 }
 
 // The two addresses are compared as unsigned integers; the pointees are never read.
-hkBool* hkFreeListAllocator::_comparePointers(hkBool* arResult, const void* a, const void* b) {
-    arResult->m_bool = reinterpret_cast<uintptr_t>(a) < reinterpret_cast<uintptr_t>(b);
-    return arResult;
+hkBool hkFreeListAllocator::_comparePointers(const void* a, const void* b) {
+    return reinterpret_cast<uintptr_t>(a) < reinterpret_cast<uintptr_t>(b);
 }

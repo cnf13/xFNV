@@ -35,7 +35,7 @@ public:
     hkpPhantomType getType() const override;
     void calcAabb(hkAabb& aabb) override;
     void addOverlappingCollidable(hkpCollidable* collidable) override;
-    hkBool* isOverlappingCollidableAdded(hkBool* arResult, const hkpCollidable* apCollidable) override;
+    hkBool isOverlappingCollidableAdded(const hkpCollidable* apCollidable) override;
     void removeOverlappingCollidable(hkpCollidable* collidable) override;
     void ensureDeterministicOrder() override;
     hkpPhantom* clone() const override;

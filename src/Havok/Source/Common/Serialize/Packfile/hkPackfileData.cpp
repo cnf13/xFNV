@@ -25,17 +25,15 @@
 #include <new>
 
 bool baseOrSameClass(const char* typeName, const char* topLevelClassName, const hkClassNameRegistry* classReg) {
-    hkBool arResult;
     const hkClass* pTypeClass = classReg->getClassByName(typeName);
     const hkClass* pTopLevelClass = classReg->getClassByName(topLevelClassName);
-    return pTopLevelClass->isSuperClass(&arResult, *pTypeClass)->m_bool != 0;
+    return pTopLevelClass->isSuperClass(*pTypeClass).m_bool != 0;
 }
 
 bool baseOrSameClass_E050C0(const char* name, const char* baseName, const hkClassNameRegistry* reg) {
-    hkBool arResult;
     const hkClass* v3 = reg->getClassByName(name);
     const hkClass* v4 = reg->getClassByName(baseName);
-    return v4->isSuperClass(&arResult, *v3)->m_bool != 0;
+    return v4->isSuperClass(*v3).m_bool != 0;
 }
 
 hkPackfileData::hkPackfileData() : m_topLevelObject(nullptr), m_name(nullptr), m_destructorsEnabled(1) {
@@ -155,8 +153,7 @@ void* hkPackfileData::getContentsPointer(const char* typeName, const hkTypeInfoR
         const hkClassNameRegistry* pRegistry = m_packfileClassRegistry.val();
         const hkClass* pTopLevelClass = pRegistry->getClassByName(topLevelClassName);
         const hkClass* pTypeClass = pRegistry->getClassByName(typeName);
-        hkBool kIsSuperClass;
-        if (!pTypeClass->isSuperClass(&kIsSuperClass, *pTopLevelClass)->m_bool) {
+        if (!pTypeClass->isSuperClass(*pTopLevelClass).m_bool) {
             return nullptr;
         }
     }

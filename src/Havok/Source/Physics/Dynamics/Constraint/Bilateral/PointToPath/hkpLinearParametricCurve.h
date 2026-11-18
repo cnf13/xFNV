@@ -22,7 +22,7 @@ public:
     float getEnd() const override;
     float getLengthFromStart(float t) const override;
     void getBinormal(float t, hkVector4& up) const override;
-    hkBool* isClosedLoop(hkBool* arResult) const override;
+    hkBool isClosedLoop() const override;
     void getPointsToDraw(hkArray<hkVector4>& pathPoints) const override;
     void transformPoints(const hkTransform& transformation) override;
     hkpParametricCurve* clone() override;

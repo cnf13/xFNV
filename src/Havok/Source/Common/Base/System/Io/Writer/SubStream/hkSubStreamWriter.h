@@ -9,9 +9,8 @@ public:
     hkSubStreamWriter(hkStreamWriter* apChildStream)
       : m_childStream(apChildStream), m_startOffset(apChildStream->tell()) {}
 
-    hkBool* isOk(hkBool* arResult) const override {
-        m_childStream->isOk(arResult);
-        return arResult;
+    hkBool isOk() const override {
+        return m_childStream->isOk();
     }
 
     int32_t write(const void* buf, int32_t nbytes) override {
@@ -22,9 +21,8 @@ public:
         m_childStream->flush();
     }
 
-    hkBool* seekTellSupported(hkBool* arResult) const override {
-        m_childStream->seekTellSupported(arResult);
-        return arResult;
+    hkBool seekTellSupported() const override {
+        return m_childStream->seekTellSupported();
     }
 
     // A seek from the start is moved by m_startOffset.

@@ -126,7 +126,6 @@ uint64_t hkDataObjectNative::DBB140(
 )
 #endif
 {
-    hkBool kHasVtable;
     XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char buf[512];
 #if XFNV_64BIT
@@ -137,7 +136,7 @@ uint64_t hkDataObjectNative::DBB140(
         return kResult;
     }
     kResult.m_object = apAddress;
-    if (!apClass->hasVtable(&kHasVtable)->m_bool) {
+    if (!apClass->hasVtable().m_bool) {
         kResult.m_class = apClass;
         return kResult;
     }
@@ -154,7 +153,7 @@ uint64_t hkDataObjectNative::DBB140(
     if (!apClass || !apAddress) {
         return 0;
     }
-    if (!apClass->hasVtable(&kHasVtable)->m_bool) {
+    if (!apClass->hasVtable().m_bool) {
         return (static_cast<uint64_t>(reinterpret_cast<uintptr_t>(apClass)) << 32) |
             reinterpret_cast<uintptr_t>(apAddress);
     }
@@ -273,14 +272,14 @@ hkDataWorldNative::hkDataWorldNative() : m_reg(nullptr), m_vtable(nullptr) {
 hkDataWorldNative::~hkDataWorldNative() {
     hkBool kValid;
     hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>::Iterator it = m_classes.m_map.getIterator();
-    m_classes.m_map.isValid(&kValid, it);
+    kValid = m_classes.m_map.isValid(it);
     while (kValid.m_bool) {
         hkDataClassNative* pClass = m_classes.getValue(it);
         if (pClass) {
             delete pClass;
         }
         it = m_classes.m_map.getNext(it);
-        m_classes.m_map.isValid(&kValid, it);
+        kValid = m_classes.m_map.isValid(it);
     }
     if (m_vtable) {
         m_vtable->removeReference();
@@ -450,10 +449,9 @@ void hkDataWorldNative::setClassRegistry(const hkClassNameRegistry* r) {
 // klass's name. A class the registry does not know is reported and the contents emptied.
 void hkDataWorldNative::setContents(void* object, const hkClass& klass) {
     XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
-    hkBool bHasVtable;
     const hkClass* pClass;
     m_contents.m_object = object;
-    if (klass.hasVtable(&bHasVtable)->m_bool) {
+    if (klass.hasVtable().m_bool) {
         // EXE-INLINED 0xDBB100
         // The exe loads m_reg before the vtable registry's call and keeps it.
         const hkClassNameRegistry* pReg = m_reg;
@@ -713,8 +711,7 @@ hkDataObject::Handle hkDataObjectNative::getHandle() const {
     hkDataObject::Handle kHandle;
     kHandle.p0 = m_object.m_object;
     hkClass* pClass = const_cast<hkClass*>(m_object.m_class);
-    hkBool kHasVtable;
-    kHandle.p1 = pClass->hasVtable(&kHasVtable)->m_bool != 0 ? nullptr : pClass;
+    kHandle.p1 = pClass->hasVtable().m_bool != 0 ? nullptr : pClass;
     return kHandle;
 }
 
@@ -741,8 +738,7 @@ hkDataObject::Value hkDataObjectNative::accessByName(const char* name) {
 // Whether the class has a member called name: the accessor found its address.
 int32_t hkDataObjectNative::hasMember(const char* name) const {
     hkClassMemberAccessor kMember(m_object, name);
-    hkBool bOk;
-    return kMember.isOk(&bOk)->m_bool != 0;
+    return kMember.isOk().m_bool != 0;
 }
 
 // A signed compare with the class's member count, the parents' included.

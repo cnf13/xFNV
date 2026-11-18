@@ -236,8 +236,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             const hkVector4& v0 = triangle->m_vertexA;
             const hkVector4& v1 = triangle->m_vertexB;
             const hkVector4& v2 = triangle->m_vertexC;
-            hkBool degenerate;
-            if (hkpTriangleUtil::isDegenerate(&degenerate, v0, v1, v2, 0.001f)->m_bool) {
+            if (hkpTriangleUtil::isDegenerate(v0, v1, v2, 0.001f).m_bool) {
                 break;
             }
             // The edge directions and the face normal.

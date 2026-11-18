@@ -64,9 +64,8 @@ hkpSimpleContactConstraintData::~hkpSimpleContactConstraintData() {
     }
 }
 
-hkBool* hkpSimpleContactConstraintData::isValid(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkpSimpleContactConstraintData::isValid() const {
+    return 1;
 }
 
 int32_t hkpSimpleContactConstraintData::getType() const {

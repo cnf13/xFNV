@@ -11,9 +11,9 @@ public:
     ~hkStdioStreamReader() override;
 
     int32_t read(void* buf, int32_t nbytes) override;
-    hkBool* isOk(hkBool* arResult) const override;
-    hkBool* markSupported(hkBool* arResult) const override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool isOk() const override;
+    hkBool markSupported() const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t offset, hkStreamReader::SeekWhence whence) override;
     int32_t tell() const override;
 

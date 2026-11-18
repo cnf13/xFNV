@@ -39,7 +39,6 @@ float hkBSHeightFieldShape::getHeightAtImpl(int32_t aX, int32_t aZ) const {
 }
 
 // The heightfield's triangles are never flipped.
-hkBool* hkBSHeightFieldShape::getTriangleFlipImpl(hkBool* arResult) const {
-    arResult->m_bool = false;
-    return arResult;
+hkBool hkBSHeightFieldShape::getTriangleFlipImpl() const {
+    return false;
 }

@@ -81,8 +81,7 @@ hkpStorageSampledHeightFieldShape::hkpStorageSampledHeightFieldShape(const hkpSa
     m_heightfieldType.m_storage = HEIGHTFIELD_STORAGE;
     m_xRes = hf->m_xRes;
     m_zRes = hf->m_zRes;
-    hkBool triangleFlip;
-    hf->getTriangleFlipImpl(&triangleFlip);
+    hkBool triangleFlip = hf->getTriangleFlipImpl();
     m_triangleFlip = triangleFlip;
     m_heightCenter = hf->m_heightCenter;
     m_intToFloatScale = hf->m_intToFloatScale;
@@ -280,9 +279,8 @@ float hkpStorageSampledHeightFieldShape::getHeightAtImpl(int32_t x, int32_t z) c
 }
 
 // The shape never flips its triangles: the result is false whatever m_triangleFlip holds, as the game does.
-hkBool* hkpStorageSampledHeightFieldShape::getTriangleFlipImpl(hkBool* arResult) const {
-    arResult->m_bool = false;
-    return arResult;
+hkBool hkpStorageSampledHeightFieldShape::getTriangleFlipImpl() const {
+    return false;
 }
 
 const hkClass& hkpStorageSampledHeightFieldShape::staticClass() {

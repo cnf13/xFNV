@@ -39,8 +39,7 @@ hkResult hkpDefaultToiResourceMgr::beginToiAndSetupResources(
     const hkArray<hkpToiEvent, hkContainerHeapAllocator>& otherEvents,
     hkpToiResources& resourcesOut
 ) {
-    hkBool shouldHandle;
-    if (!shouldHandleGivenToi(&shouldHandle, event)->m_bool) {
+    if (!shouldHandleGivenToi(event).m_bool) {
         return HK_FAILURE;
     }
     resourcesOut.m_scratchpadSize = m_defaultScratchpadSize;
@@ -87,7 +86,6 @@ void hkpDefaultToiResourceMgr::calcContentStatistics(hkStatisticsCollector* coll
     collector->popDir();
 }
 
-hkBool* hkpDefaultToiResourceMgr::shouldHandleGivenToi(hkBool* apResult, const hkpToiEvent& event) {
-    apResult->m_bool = true;
-    return apResult;
+hkBool hkpDefaultToiResourceMgr::shouldHandleGivenToi(const hkpToiEvent& event) {
+    return true;
 }

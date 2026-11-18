@@ -65,9 +65,9 @@ void hkLs_doSimpleCollisionResponse(
     hkArray<hkpEntity*>& toBeActivated
 );
 // A quickSort comparator of hkLs_toiActivateEntitiesAndCheckConstraints: orders entities by uid.
-hkBool* less_EntityPtr(hkBool* apResult, const hkpEntity* a, const hkpEntity* b);
+hkBool less_EntityPtr(const hkpEntity* a, const hkpEntity* b);
 // A quickSort comparator of hkLs_toiActivateEntitiesAndCheckConstraints: orders constraints by master entity uid.
-hkBool* less_ConstraintPtr(hkBool* apResult, const hkpConstraintInstance* a, const hkpConstraintInstance* b);
+hkBool less_ConstraintPtr(const hkpConstraintInstance* a, const hkpConstraintInstance* b);
 // Havok SDK signature (hkpDynamics.lib, tied by bytes,reloc).
 int32_t hkLs_areVelocitiesOk(
     float a1,
@@ -106,8 +106,7 @@ void hkLs_toiCheckValidityOfConstraints(
 // A static of hkpContinuousSimulation.cpp: whether no forced (PRIORITY_TOI_FORCED) constraint is violated by its
 // solved velocities. Without violatedConstraints it stops at the first violation; with it, each violation is
 // appended there, with its contact point and properties for a contact constraint.
-hkBool* hkLs_toiCheckFinalValidityOfCriticalConstraints(
-    hkBool* apResult,
+hkBool hkLs_toiCheckFinalValidityOfCriticalConstraints(
     hkpConstraintSolverResources& solverResources,
     const hkArray<hkpConstraintSchemaInfo, hkContainerHeapAllocator>& constraintStatus,
     hkpProcessCollisionInput& processInput,
@@ -224,7 +223,7 @@ protected:
     void handleSimpleToi(hkpWorld* world, hkpToiEvent& event, float physicsDeltaTime, float rotateNormal);
     // Marks the event's contact point new, lets its contact manager fire the earliest-TOI callbacks and returns whether
     // the point is still enabled.
-    hkBool* fireEarliestToiCallbacksAndCheckEnabled(hkBool* result, hkpToiEvent& event, float& rotateNormal);
+    hkBool fireEarliestToiCallbacksAndCheckEnabled(hkpToiEvent& event, float& rotateNormal);
 
     // Runs the continuous narrow phase over the island's agents;
     // the parameter names are the SDK's.

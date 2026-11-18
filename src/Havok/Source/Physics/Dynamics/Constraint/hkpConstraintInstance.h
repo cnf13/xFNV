@@ -163,7 +163,7 @@ public:
     }
     hkpConstraintInstance* clone(hkpEntity* newEntityA, hkpEntity* newEntityB, CloningMode mode) const;
     void replaceEntity(hkpEntity* oldEntity, hkpEntity* newEntity);
-    hkBool* isConstrainedToWorld(hkBool* arResult) const;
+    hkBool isConstrainedToWorld() const;
     hkpSimulationIsland* getSimulationIsland();
     void getPivotsInWorld(hkVector4& pivotAinW, hkVector4& pivotBinW) const;
     void addConstraintListener(hkpConstraintListener* listener);
@@ -180,7 +180,7 @@ public:
     }
     void setVirtualMassInverse(const hkVector4& invMassA, const hkVector4& invMassB);
     void setEnabled(hkBool state);
-    hkBool* isEnabled(hkBool* arResult);
+    hkBool isEnabled();
     void pointNullsToFixedRigidBody();
     void setFixedRigidBodyPointersToZero(hkpWorld* world);
     hkpConstraintData* getDataCalled() const {

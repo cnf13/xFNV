@@ -61,7 +61,7 @@ void hkDebugMemorySnapshot::ascendingOrder() {
     }
     // EXE-INLINED none: hkAlgorithm::quickSort<void**, hkBool (*)(void**, void**)>
     if (m_numPointers > 1) {
-        hkAlgorithm::quickSortRecursive<void**, hkBool* (*)(hkBool*, void**, void**)>(
+        hkAlgorithm::quickSortRecursive<void**, hkBool (*)(void**, void**)>(
             pppSorted, 0, m_numPointers - 1, &hkDebugMemorySnapshot::_comparePointers
         );
     }
@@ -81,7 +81,6 @@ void hkDebugMemorySnapshot::ascendingOrder() {
     m_info = pInfo;
 }
 
-hkBool* hkDebugMemorySnapshot::_comparePointers(hkBool* apResult, void** a, void** b) {
-    apResult->m_bool = *a < *b;
-    return apResult;
+hkBool hkDebugMemorySnapshot::_comparePointers(void** a, void** b) {
+    return *a < *b;
 }

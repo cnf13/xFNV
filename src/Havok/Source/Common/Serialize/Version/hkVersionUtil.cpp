@@ -312,10 +312,9 @@ static void updateConstraintInstance300(hkClass* r_eax, hkUlongMapBase* r_edi) {
 }
 
 void hkVersionUtil::renameMember(hkVariant& oldObj, const char* oldName, hkVariant& newObj, const char* newName) {
-    hkBool a1;
     hkClassMemberAccessor apMemory(oldObj, oldName);
     hkClassMemberAccessor v9(newObj, newName);
-    if (apMemory.isOk(&a1)->m_bool && v9.isOk(&a1)->m_bool) {
+    if (apMemory.isOk().m_bool && v9.isOk().m_bool) {
         const hkClassMember* ClassMember = &v9.getClassMember();
         int32_t SizeInBytes = ClassMember->getSizeInBytes();
         void* v6 = apMemory.asRaw();

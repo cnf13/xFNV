@@ -158,9 +158,8 @@ void hkOArchive::write64(int64_t a1) {
     writeArrayGeneric(&a1, 8, 1);
 }
 
-hkBool* hkOArchive::getByteSwap(hkBool* apResult) {
-    apResult->m_bool = static_cast<char>(m_byteSwap);
-    return apResult;
+hkBool hkOArchive::getByteSwap() {
+    return static_cast<char>(m_byteSwap);
 }
 
 void hkOArchive::writeArray8(const char* array, int32_t nelem) {
@@ -181,9 +180,8 @@ void hkOArchive::write8u(int32_t u) {
     m_writer->write(&u, 1);
 }
 
-hkBool* hkOArchive::isOk(hkBool* apResult) {
-    m_writer->isOk(apResult);
-    return apResult;
+hkBool hkOArchive::isOk() {
+    return m_writer->isOk();
 }
 
 hkStreamWriter* hkOArchive::getStreamWriter() {

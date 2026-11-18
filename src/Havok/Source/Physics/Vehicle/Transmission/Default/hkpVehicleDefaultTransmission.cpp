@@ -118,8 +118,7 @@ void hkpVehicleDefaultTransmission::calcTransmission(
     const hkpVehicleInstance* vehicle,
     hkpVehicleTransmission::TransmissionOutput& transmissionOut
 ) {
-    hkBool isReversing;
-    transmissionOut.m_isReversing.m_bool = calcIsReversing(&isReversing, vehicle, transmissionOut)->m_bool;
+    transmissionOut.m_isReversing.m_bool = calcIsReversing(vehicle, transmissionOut).m_bool;
     transmissionOut.m_mainTransmittedTorque = calcMainTransmittedTorque(vehicle, transmissionOut);
     transmissionOut.m_transmissionRPM = calcTransmissionRPM(vehicle, transmissionOut);
     for (int32_t i = 0; i < m_wheelsTorqueRatio.m_size; ++i) {
@@ -165,13 +164,11 @@ float hkpVehicleDefaultTransmission::calcTransmissionRPM(
     return fResult;
 }
 
-hkBool* hkpVehicleDefaultTransmission::calcIsReversing(
-    hkBool* arResult,
+hkBool hkpVehicleDefaultTransmission::calcIsReversing(
     const hkpVehicleInstance* vehicle,
     hkpVehicleTransmission::TransmissionOutput& transmissionOut
 ) const {
-    arResult->m_bool = vehicle->m_tryingToReverse.m_bool && transmissionOut.m_currentGear <= 0;
-    return arResult;
+    return vehicle->m_tryingToReverse.m_bool && transmissionOut.m_currentGear <= 0;
 }
 
 void hkpVehicleDefaultTransmission::updateCurrentGear(

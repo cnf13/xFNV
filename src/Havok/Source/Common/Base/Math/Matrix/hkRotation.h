@@ -25,7 +25,7 @@ public:
     // Whether the matrix is valid, as hkMatrix3::isOk judges it.
     hkBool isOk() const;
     // Whether each column has unit length and the third is the cross product of the first two, within epsilon.
-    hkBool* isOrthonormal(hkBool* apResult, float epsilon) const;
+    hkBool isOrthonormal(float epsilon) const;
 };
 
 inline hkQuadReal rdata_10C8770{-0.0f, 0.0f, -0.0f, -0.0f};

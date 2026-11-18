@@ -122,12 +122,11 @@ void hkpTriSampledHeightFieldBvTreeShape::queryAabb(
     hkAabb kAabb;
     kAabb.m_min = aabbIn.m_min;
     kAabb.m_max = aabbIn.m_max;
-    hkBool kOverlaps;
     alignas(16) uint32_t uiMinX;
     uint32_t uiMaxX;
     uint32_t uiMinZ;
     alignas(16) uint32_t uiMaxZ;
-    getExtentsForQueryAabb(&kOverlaps, kAabb, getShapeCollection(), uiMinX, uiMaxX, uiMinZ, uiMaxZ);
+    hkBool kOverlaps = getExtentsForQueryAabb(kAabb, getShapeCollection(), uiMinX, uiMaxX, uiMinZ, uiMaxZ);
     if (!kOverlaps.m_bool) {
         return;
     }
@@ -230,12 +229,11 @@ hkpTriSampledHeightFieldBvTreeShape::queryAabbImpl(const hkAabb& aabbIn, uint32_
     kAabb.m_min = aabbIn.m_min;
     const hkpTriSampledHeightFieldCollection* pCollection = getShapeCollection();
     kAabb.m_max = aabbIn.m_max;
-    hkBool kOverlaps;
     uint32_t uiMinX;
     alignas(16) uint32_t uiMaxX;
     uint32_t uiMinZ;
     uint32_t uiMaxZ;
-    getExtentsForQueryAabb(&kOverlaps, kAabb, pCollection, uiMinX, uiMaxX, uiMinZ, uiMaxZ);
+    hkBool kOverlaps = getExtentsForQueryAabb(kAabb, pCollection, uiMinX, uiMaxX, uiMinZ, uiMaxZ);
     if (!kOverlaps.m_bool) {
         return 0;
     }
@@ -357,8 +355,7 @@ const hkClass& hkpTriSampledHeightFieldBvTreeShape::staticClass() {
 // Grows aabb by the collection's radius, clips its x and z to the heightfield's own box (aabb keeps the result) and
 // turns it into sample ranges, each clamped to [0, res - 2] and converted by adding 65536.0f and taking bits 7-22;
 // false when the clipped box is empty in any of x, y, z.
-hkBool* hkpTriSampledHeightFieldBvTreeShape::getExtentsForQueryAabb(
-    hkBool* apResult,
+hkBool hkpTriSampledHeightFieldBvTreeShape::getExtentsForQueryAabb(
     hkAabb& aabb,
     const hkpTriSampledHeightFieldCollection* collection,
     uint32_t& minX,
@@ -384,8 +381,7 @@ hkBool* hkpTriSampledHeightFieldBvTreeShape::getExtentsForQueryAabb(
     aabb.m_max.m_quad = kMax;
     aabb.m_min.m_quad = kMin;
     if ((_mm_movemask_ps(_mm_cmple_ps(kMax, kMin)) & hkVector4Comparison::MASK_XYZ) != 0) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
 
     // The largest cell index per axis in x and z; y and w are clamped to 0.
@@ -423,6 +419,5 @@ hkBool* hkpTriSampledHeightFieldBvTreeShape::getExtentsForQueryAabb(
     );
     maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(kHigh[0]) >> 7);
     maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(kHigh[2]) >> 7);
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }

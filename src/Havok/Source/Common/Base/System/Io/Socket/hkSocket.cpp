@@ -14,9 +14,8 @@ hkSocket::ReaderAdapter::ReaderAdapter(hkSocket* apSocket) : m_socket(apSocket) 
 
 hkSocket::ReaderAdapter::~ReaderAdapter() {}
 
-hkBool* hkSocket::ReaderAdapter::isOk(hkBool* arResult) const {
-    m_socket->isOk(arResult);
-    return arResult;
+hkBool hkSocket::ReaderAdapter::isOk() const {
+    return m_socket->isOk();
 }
 
 int32_t hkSocket::ReaderAdapter::read(void* buf, int32_t nbytes) {
@@ -41,9 +40,8 @@ hkSocket::WriterAdapter::WriterAdapter(hkSocket* apSocket) : m_socket(apSocket) 
 
 hkSocket::WriterAdapter::~WriterAdapter() {}
 
-hkBool* hkSocket::WriterAdapter::isOk(hkBool* arResult) const {
-    m_socket->isOk(arResult);
-    return arResult;
+hkBool hkSocket::WriterAdapter::isOk() const {
+    return m_socket->isOk();
 }
 
 // Writes all aiNumBytes to the socket, stopping at a write of 0 bytes.

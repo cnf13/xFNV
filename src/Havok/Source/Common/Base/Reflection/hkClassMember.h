@@ -100,7 +100,7 @@ public:
     // Havok SDK signature (hkBase.lib, tied by reloc).
     const hkClassEnum& getEnumClass() const;
     const hkClassEnum& getEnumType();
-    hkBool* isNotOwner(hkBool* apResult);
+    hkBool isNotOwner();
     // The member's alignment: its type's (a struct's: its widest member's), raised to 8 or 16 by the align flags.
     int32_t getAlignment() const;
     // Havok SDK signature (hkBase.lib, tied by bytes,reloc).

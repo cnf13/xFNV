@@ -19,9 +19,8 @@ int32_t hkStreamReader::skip(int32_t nbytes) {
     return nbytes - i;
 }
 
-hkBool* hkStreamReader::markSupported(hkBool* arResult) const {
-    arResult->m_bool = 0;
-    return arResult;
+hkBool hkStreamReader::markSupported() const {
+    return 0;
 }
 
 hkResult hkStreamReader::setMark(int32_t markLimit) {
@@ -32,9 +31,8 @@ hkResult hkStreamReader::rewindToMark() {
     return static_cast<hkResult>(1);
 }
 
-hkBool* hkStreamReader::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 0;
-    return arResult;
+hkBool hkStreamReader::seekTellSupported() const {
+    return 0;
 }
 
 hkResult hkStreamReader::seek(int32_t offset, SeekWhence whence) {

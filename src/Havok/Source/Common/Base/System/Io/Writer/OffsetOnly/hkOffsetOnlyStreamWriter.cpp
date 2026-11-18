@@ -8,9 +8,8 @@ hkOffsetOnlyStreamWriter::hkOffsetOnlyStreamWriter() : m_offset(0), m_eofOffset(
 
 hkOffsetOnlyStreamWriter::~hkOffsetOnlyStreamWriter() {}
 
-hkBool* hkOffsetOnlyStreamWriter::isOk(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkOffsetOnlyStreamWriter::isOk() const {
+    return 1;
 }
 
 int32_t hkOffsetOnlyStreamWriter::write(const void* apBuffer, int32_t n) {
@@ -27,9 +26,8 @@ int32_t hkOffsetOnlyStreamWriter::write(const void* apBuffer, int32_t n) {
     return result;
 }
 
-hkBool* hkOffsetOnlyStreamWriter::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkOffsetOnlyStreamWriter::seekTellSupported() const {
+    return 1;
 }
 
 // Moves the write offset.

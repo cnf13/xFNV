@@ -35,9 +35,9 @@ public:
 
     float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) override;
     // hkKdTreeCastCollector's vtable at +0x4.
-    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
+    hkBool addMidPhaseHit(hkPrimitiveId primitiveId) override;
     // hkKdTreeCastCollector's vtable at +0x4.
-    hkBool* hasHit(hkBool* arResult) override;
+    hkBool hasHit() override;
     // hkKdTreeCastCollector's vtable at +0x4.
     float getHitFraction() override;
     // hkAabbTreeQueryUtils<hkAabbTreeAabb, uint16_t>::Collector's vtable at +0x8.
@@ -49,7 +49,7 @@ public:
     // m_originalInput: the work input in the collidable's space, the hits into m_fixedBufferRayHitCollector or the next
     // free result, m_earlyOutHitFraction refreshed. The hkBool result is written through arResult, which is returned;
     // addMidPhaseHit passes its own result pointer on. addBroadPhaseHandle, addMidPhaseHit and both addLeaf call it.
-    hkBool* testCollidable(hkBool* arResult, const hkpCollidable* apCollidable);
+    hkBool testCollidable(const hkpCollidable* apCollidable);
 
     // DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size); it also settles the four
     // bases' own.

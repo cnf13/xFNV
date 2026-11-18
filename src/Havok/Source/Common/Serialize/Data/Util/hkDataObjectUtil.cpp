@@ -946,10 +946,8 @@ hkVariant* Copier::findOrCopy(hkVariant* apResult, const hkDataObject& obj, int3
         }
     }
     if (pObject && trackCopy) {
-        hkBool hasVtable;
-        if (pClass->hasVtable(&hasVtable)->m_bool) {
-            hkBool isReferenced;
-            if (hkReferencedObjectClass.isSuperClass(&isReferenced, *pClass)->m_bool) {
+        if (pClass->hasVtable().m_bool) {
+            if (hkReferencedObjectClass.isSuperClass(*pClass).m_bool) {
                 int32_t refIndex = m_refCount.m_map.findOrInsertKey(
                     *hkMemoryRouter::getInstance().m_heap, m_refCount.ToMapInt(pObject), 0
                 );
@@ -1027,8 +1025,7 @@ hkObjectResource* Copier::toObject(const hkDataObject& obj, const hkTypeInfoRegi
         const hkClass* pClass = m_classReg->getClassByName(object.getClass(&copyClass)->getName());
         void* pCopy = m_copies.m_elem[i].val;
         const hkTypeInfo* pTypeInfo = typeReg->finishLoadedObject(pCopy, pClass->getName());
-        hkBool hasVtable;
-        if (pClass->hasVtable(&hasVtable)->m_bool && !pTypeInfo) {
+        if (pClass->hasVtable().m_bool && !pTypeInfo) {
             char acBuffer[0x200];
             hkErrStream kStream(acBuffer, 0x200);
             kStream << "Cannot finish virtual object of class " << pClass->getName()
@@ -1388,8 +1385,7 @@ const hkClass* Copier::getMemberClassAndCheck(const hkClassMember& member, const
     if (hkString::strCmp(pMemberClass->getName(), pClassName) == 0) {
         return pMemberClass;
     }
-    hkBool isSuper;
-    if (pMemberClass->isSuperClass(&isSuper, *pObjectClass)->m_bool) {
+    if (pMemberClass->isSuperClass(*pObjectClass).m_bool) {
         return pObjectClass;
     }
     const hkVariant* pAttribute = member.getAttribute("hk.DataObjectType");
@@ -1398,8 +1394,7 @@ const hkClass* Copier::getMemberClassAndCheck(const hkClassMember& member, const
     }
     const hkClass* pTypeClass =
         m_classReg->getClassByName(static_cast<const hkDataObjectTypeAttribute*>(pAttribute->m_object)->m_typeName);
-    hkBool isTypeSuper;
-    return pTypeClass->isSuperClass(&isTypeSuper, *pObjectClass)->m_bool ? pObjectClass : pTypeClass;
+    return pTypeClass->isSuperClass(*pObjectClass).m_bool ? pObjectClass : pTypeClass;
 }
 
 int32_t hkMapBase<hkDataObject::Handle, hkDataObject::Handle, Copier::HandleOps>::insert(

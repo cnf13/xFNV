@@ -19,14 +19,12 @@ hkMemoryStreamReader::hkMemoryStreamReader(const void* mem, int32_t memSize, hkM
     }
 }
 
-hkBool* hkMemoryStreamReader::isOk(hkBool* arResult) const {
-    arResult->m_bool = m_bufCurrent != m_bufSize + 1;
-    return arResult;
+hkBool hkMemoryStreamReader::isOk() const {
+    return m_bufCurrent != m_bufSize + 1;
 }
 
 int32_t hkMemoryStreamReader::read(void* buf, int32_t nbytes) {
-    hkBool v7;
-    if (!isOk(&v7)->m_bool) {
+    if (!isOk().m_bool) {
         return 0;
     }
     int32_t m_bufCurrent = this->m_bufCurrent;
@@ -44,8 +42,7 @@ int32_t hkMemoryStreamReader::read(void* buf, int32_t nbytes) {
 }
 
 int32_t hkMemoryStreamReader::skip(int32_t nbytes) {
-    hkBool v6;
-    if (!isOk(&v6)->m_bool) {
+    if (!isOk().m_bool) {
         return 0;
     }
     int32_t m_bufSize = this->m_bufSize;
@@ -62,9 +59,8 @@ int32_t hkMemoryStreamReader::skip(int32_t nbytes) {
     return result;
 }
 
-hkBool* hkMemoryStreamReader::markSupported(hkBool* arResult) const {
-    arResult->m_bool = m_bufSize != 0;
-    return arResult;
+hkBool hkMemoryStreamReader::markSupported() const {
+    return m_bufSize != 0;
 }
 
 hkResult hkMemoryStreamReader::setMark(int32_t markLimit) {
@@ -81,9 +77,8 @@ hkResult hkMemoryStreamReader::rewindToMark() {
     return HK_SUCCESS;
 }
 
-hkBool* hkMemoryStreamReader::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkMemoryStreamReader::seekTellSupported() const {
+    return 1;
 }
 
 hkResult hkMemoryStreamReader::seek(int32_t relOffset, SeekWhence whence) {

@@ -46,16 +46,14 @@ public:
     hkMemoryTrackStreamWriter(hkMemoryTrack* apTrack, TrackOwnership aeOwnership)
       : m_track(apTrack), m_ownerShip(aeOwnership) {}
 
-    hkBool* isOk(hkBool* arResult) const override {
-        arResult->m_bool = 1;
-        return arResult;
+    hkBool isOk() const override {
+        return 1;
     }
 
     int32_t write(const void* mem, int32_t size) override;
 
-    hkBool* seekTellSupported(hkBool* arResult) const override {
-        arResult->m_bool = 0;
-        return arResult;
+    hkBool seekTellSupported() const override {
+        return 0;
     }
 
     hkResult seek(int32_t offset, hkStreamWriter::SeekWhence whence) override {
@@ -84,9 +82,8 @@ public:
     ~hkMemoryTrackStreamReader() override;
 
     // Whether the offset is within the track.
-    hkBool* isOk(hkBool* arResult) const override {
-        arResult->m_bool = m_offset <= m_track->getSize();
-        return arResult;
+    hkBool isOk() const override {
+        return m_offset <= m_track->getSize();
     }
 
     int32_t read(void* buf, int32_t nbytes) override;
@@ -98,10 +95,10 @@ public:
     }
 
     // The next four are fixed answers in the SDK: no marks, no seeking (the failures return 1).
-    hkBool* markSupported(hkBool* arResult) const override;
+    hkBool markSupported() const override;
     hkResult setMark(int32_t markLimit) override;
     hkResult rewindToMark() override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t offset, hkStreamReader::SeekWhence whence) override;
     int32_t tell() const override {
         return m_offset;
@@ -125,9 +122,9 @@ public:
     hkArrayStreamWriter(hkArray<char, hkContainerHeapAllocator>* arr, hkArrayStreamWriter::ArrayOwnership o);
     ~hkArrayStreamWriter() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t write(const void* mem, int32_t size) override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t offset, hkStreamWriter::SeekWhence whence) override;
     int32_t tell() const override {
         return m_offset;

@@ -53,8 +53,7 @@ public:
 void removeNearDuplicateSortedVertices(float threshold, hkArray<hkVector4>* vertices, int32_t* numOut);
 // dir is the edge's line direction, planes the plane array findTriPlaneIntersectionPoint gets, vertex the edge's point
 // (its w is set), pointsOut an array of 32-byte IntersectionPoints.
-hkBool* findNextIntersectionPoints(
-    hkBool* arResult,
+hkBool findNextIntersectionPoints(
     const hkVector4& dir,
     const hkArray<hkVector4>& planes,
     int32_t planeA,

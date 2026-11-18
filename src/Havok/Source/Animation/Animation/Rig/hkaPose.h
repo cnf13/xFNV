@@ -59,7 +59,7 @@ public:
     // The local-space pose, synchronized first (const as in the SDK).
     const hkArray<hkQsTransform>& getSyncedPoseLocalSpace() const;
     // Whether no bone is dirty in both spaces, and no bone is dirty in a space marked in sync.
-    hkBool* checkPoseValidity(hkBool* apResult) const;
+    hkBool checkPoseValidity() const;
     void setToReferencePose();
     hkQsTransform& accessBoneLocalSpace(int32_t a1);
     // The translation-locked bones take the reference pose's translation in model space (from their parent's model

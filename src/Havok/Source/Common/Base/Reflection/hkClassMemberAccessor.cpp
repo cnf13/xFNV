@@ -84,9 +84,8 @@ void hkClassMemberAccessor::connect(void* object, const hkClassMember* member) {
     m_address = static_cast<char*>(object) + m_offset;
 }
 
-hkBool* hkClassMemberAccessor::isOk(hkBool* apResult) const {
-    apResult->m_bool = m_address != nullptr;
-    return apResult;
+hkBool hkClassMemberAccessor::isOk() const {
+    return m_address != nullptr;
 }
 
 void* hkClassMemberAccessor::asRaw() const {

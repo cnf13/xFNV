@@ -157,9 +157,8 @@ bool pairLessThan(const hkpTypedBroadPhaseHandlePair& a1, const hkpTypedBroadPha
         static_cast<int32_t>(static_cast<const hkpEntity*>(pCollidableB2->getOwner())->getUid());
 }
 
-hkBool* less_hkSimulationIslandPtr(hkBool* apResult, const hkpSimulationIsland* a, const hkpSimulationIsland* b) {
-    apResult->m_bool = (*a->m_entities.begin())->getUid() < (*b->m_entities.begin())->getUid();
-    return apResult;
+hkBool less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulationIsland* b) {
+    return (*a->m_entities.begin())->getUid() < (*b->m_entities.begin())->getUid();
 }
 
 // Puts each pair's lower broad phase id first, then sorts the pairs with pairLessThan. The handle's owner is
@@ -1162,7 +1161,7 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
         const int32_t numNew = world->m_activeSimulationIslands.m_size - first;
         if (numNew > 1) {
             hkAlgorithm::quickSortRecursive<
-                hkpSimulationIsland*, hkBool* (*)(hkBool*, const hkpSimulationIsland*, const hkpSimulationIsland*)>(
+                hkpSimulationIsland*, hkBool (*)(const hkpSimulationIsland*, const hkpSimulationIsland*)>(
                 &world->m_activeSimulationIslands.m_data[first], 0, numNew - 1, &less_hkSimulationIslandPtr
             );
         }

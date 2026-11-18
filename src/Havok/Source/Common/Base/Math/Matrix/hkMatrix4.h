@@ -31,7 +31,7 @@ public:
         m_col3 = a.m_col3;
     }
 
-    hkBool* isOk(hkBool* apResult);
+    hkBool isOk();
     void setTranspose(const hkMatrix4& s);
     void add(const hkMatrix4& a);
     void sub(const hkMatrix4& a);

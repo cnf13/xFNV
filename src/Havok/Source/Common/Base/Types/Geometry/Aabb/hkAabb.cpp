@@ -71,18 +71,16 @@ hkAabb::hkAabb() {}
 
 hkAabb::hkAabb(const hkVector4& min, const hkVector4& max) : m_min(min), m_max(max) {}
 
-hkBool* hkAabb::isValid(hkBool* apResult) {
+hkBool hkAabb::isValid() {
     int32_t v2 = 0;
     while ((std::bit_cast<uint32_t>(m_min.m_quad[v2]) & 0x7F800000) != 0x7F800000 &&
            ((std::bit_cast<uint32_t>(m_max.m_quad[v2]) & 0x7F800000) != 0x7F800000 &&
             !(m_max.m_quad[v2] < static_cast<double>(m_min.m_quad[v2])))) {
         if (++v2 >= 3) {
-            apResult->m_bool = 1;
-            return apResult;
+            return 1;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 const hkClass& hkAabb::staticClass() {

@@ -69,7 +69,7 @@ public:
     // Pointer less-than used to sort pointer arrays (the quickSortRecursive calls of hkFreeList.cpp and
     // hkFreeListAllocator.cpp pass it): *arResult = a < b, compared as unsigned addresses, and arResult is also
     // returned.
-    static hkBool* _comparePointers(hkBool* arResult, const void* a, const void* b);
+    static hkBool _comparePointers(const void* a, const void* b);
 
     // Held by every method that touches the free lists and the large-block allocator; mutable as in the Havok SDK,
     // since the const isOk takes it too.

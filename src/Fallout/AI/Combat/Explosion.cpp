@@ -675,7 +675,6 @@ void Explosion::ApplyImpactDecals() {
     hkpRootCdPoint point_2;
     NiPoint3 v122;
     NiPoint3 location;
-    hkBool v130;
     int32_t v139;
     int32_t* v134 = &v139;
     if (spPhantom.m_pObject) {
@@ -699,8 +698,8 @@ void Explosion::ApplyImpactDecals() {
             alignas(16) hkpFixedBufferCdPointCollector fixedCollector(cdPointA.m_data, iNumExplosionDecalCDPoint.Int());
             hkpFixedBufferCdPointCollector::registerDefaultAddCdPointFunction();
             this->spPhantom.m_pObject->GetFixedClosestPoints(fixedCollector);
-            hkBool* v1 = fixedCollector.hasHit(&v130);
-            if (v1->operator bool()) {
+            hkBool v130 = fixedCollector.hasHit();
+            if (v130.operator bool()) {
                 int32_t NumHits = fixedCollector.getNumHits();
                 hkAlgorithm::quickSort(cdPointA.m_data, NumHits);
             }
@@ -2225,9 +2224,8 @@ int32_t hkpFixedBufferCdPointCollector::getNumHits() const {
     return m_numPoints;
 }
 
-hkBool* hkpFixedBufferCdPointCollector::hasHit(hkBool* a1) {
-    ::new (a1) hkBool(m_numPoints.operator int32_t() > 0);
-    return a1;
+hkBool hkpFixedBufferCdPointCollector::hasHit() {
+    return m_numPoints.operator int32_t() > 0;
 }
 
 void hkpFixedBufferCdPointCollector::operator delete(void* p) {

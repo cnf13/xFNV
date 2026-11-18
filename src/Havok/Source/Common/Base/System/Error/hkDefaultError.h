@@ -15,7 +15,7 @@ public:
 
     int32_t message(hkError::Message msg, int32_t id, const char* description, const char* file, int32_t line) override;
     void setEnabled(int32_t id, hkBool enabled) override;
-    hkBool* isEnabled(hkBool* arResult, int32_t aiId) override;
+    hkBool isEnabled(int32_t aiId) override;
     void enableAll() override;
     void sectionBegin(int32_t id, const char* sectionName) override;
     void sectionEnd() override;

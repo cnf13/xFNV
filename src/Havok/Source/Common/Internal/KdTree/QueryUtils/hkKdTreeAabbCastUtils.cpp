@@ -28,8 +28,7 @@ __m128 hkGetOneOver65K() {
 // below tMax. A leaf's entries are tested four lanes at a time, with the 16-bit words converted directly to floats
 // (exact). Along an axis the cast does not move the slab is -3.40282e38f to 3.40282e38f and the start must lie inside
 // the box. addMidPhaseHit's id is the entry's words at +6 and +0xE.
-hkBool* hkKdTreeAabbCastUtils::castAabb(
-    hkBool* arResult,
+hkBool hkKdTreeAabbCastUtils::castAabb(
     const hkKdTree* root,
     hkCastAabbInput& castInput,
     hkKdTreeCastCollector* collector,
@@ -251,8 +250,7 @@ hkBool* hkKdTreeAabbCastUtils::castAabb(
                         _mm_or_ps(_mm_andnot_ps(kParallel, _mm_cmplt_ps(kEnterMax, kLeaveMin)), kInside);
                     if ((_mm_movemask_ps(kHit) & 7) == 7) {
                         const hkPrimitiveId uiPrimitiveId = pEntry->getPrimitiveId();
-                        hkBool kAdded;
-                        collector->addMidPhaseHit(&kAdded, uiPrimitiveId);
+                        collector->addMidPhaseHit(uiPrimitiveId);
                     }
                     ++pEntry;
                 }
@@ -281,6 +279,5 @@ hkBool* hkKdTreeAabbCastUtils::castAabb(
 
     // EXE-INLINED none: hkDeallocateStack<hkKdTreeAabbCastUtils::NodeState>
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pStackMemory;
-    collector->hasHit(arResult);
-    return arResult;
+    return collector->hasHit();
 }

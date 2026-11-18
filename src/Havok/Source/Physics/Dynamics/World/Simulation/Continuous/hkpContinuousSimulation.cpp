@@ -215,8 +215,7 @@ void hkLs_doSimpleCollisionResponse(
         }
     }
     else if ((fVelocityA >= 0.0f) && (fVelocityB < 0.0f)) {
-        hkBool bFixedOrKeyframed;
-        hkpEntity* pActivate = pEntityB->isFixedOrKeyframed(&bFixedOrKeyframed)->m_bool ? pEntityA : pEntityB;
+        hkpEntity* pActivate = pEntityB->isFixedOrKeyframed().m_bool ? pEntityA : pEntityB;
         // EXE-INLINED none: hkArray::pushBackUnchecked
         toBeActivated.m_data[toBeActivated.m_size] = pActivate;
         toBeActivated.m_size++;
@@ -248,23 +247,19 @@ void hkLs_doSimpleCollisionResponse(
     toBeActivated.m_size++;
 }
 
-hkBool* less_EntityPtr(hkBool* apResult, const hkpEntity* a, const hkpEntity* b) {
-    apResult->m_bool = a->getUid() < b->getUid();
-    return apResult;
+hkBool less_EntityPtr(const hkpEntity* a, const hkpEntity* b) {
+    return a->getUid() < b->getUid();
 }
 
 // Orders constraints by their master entity's uid, then by their internal's address.
-hkBool* less_ConstraintPtr(hkBool* apResult, const hkpConstraintInstance* a, const hkpConstraintInstance* b) {
+hkBool less_ConstraintPtr(const hkpConstraintInstance* a, const hkpConstraintInstance* b) {
     if (a->getMasterEntity()->getUid() < b->getMasterEntity()->getUid()) {
-        apResult->m_bool = true;
-        return apResult;
+        return true;
     }
     if (a->getMasterEntity()->getUid() == b->getMasterEntity()->getUid()) {
-        apResult->m_bool = a->m_internal < b->m_internal;
-        return apResult;
+        return a->m_internal < b->m_internal;
     }
-    apResult->m_bool = false;
-    return apResult;
+    return false;
 }
 
 // The collision quality index is a signed byte (hkpCollisionDispatcher's hkChar index): the constraint's priority is
@@ -335,10 +330,8 @@ void hkLs_toiActivateConstraintsLinkingToFixedAndKeyframedEntities(
     for (int32_t i = constraintStatus.m_size - numOfConstraintsToCheckAtTheEndOfTheList; i < constraintStatus.m_size;
          ++i) {
         hkConstraintInternal* internal = constraintStatus.m_data[i].m_constraint->getInternal();
-        hkBool fixedOrKeyframed0;
-        hkBool fixedOrKeyframed1;
-        if (internal->m_entities[0]->isFixedOrKeyframed(&fixedOrKeyframed0)->m_bool ||
-            internal->m_entities[1]->isFixedOrKeyframed(&fixedOrKeyframed1)->m_bool) {
+        if (internal->m_entities[0]->isFixedOrKeyframed().m_bool ||
+            internal->m_entities[1]->isFixedOrKeyframed().m_bool) {
             int32_t j = firstNonActiveConstraintStatus++;
             hkpConstraintSchemaInfo tmp = constraintStatus.m_data[j];
             constraintStatus.m_data[j] = constraintStatus.m_data[i];
@@ -451,8 +444,7 @@ void hkLs_toiCheckValidityOfConstraints(
 
 // A contact constraint's violation names the violating contact point and its properties (the SDK's atom accessors;
 // the properties index is taken as 16 bits, as the SDK's HK_HINT_SIZE16 makes it).
-hkBool* hkLs_toiCheckFinalValidityOfCriticalConstraints(
-    hkBool* apResult,
+hkBool hkLs_toiCheckFinalValidityOfCriticalConstraints(
     hkpConstraintSolverResources& solverResources,
     const hkArray<hkpConstraintSchemaInfo, hkContainerHeapAllocator>& constraintStatus,
     hkpProcessCollisionInput& processInput,
@@ -475,8 +467,7 @@ hkBool* hkLs_toiCheckFinalValidityOfCriticalConstraints(
             continue;
         }
         if (!violatedConstraints) {
-            apResult->m_bool = false;
-            return apResult;
+            return false;
         }
         allOk = false;
         // EXE-INLINED none: hkArray<hkpToiResourceMgr::ConstraintViolationInfo>::expandOne (the router is fetched
@@ -508,8 +499,7 @@ hkBool* hkLs_toiCheckFinalValidityOfCriticalConstraints(
             violation.m_contactPointProperties = nullptr;
         }
     }
-    apResult->m_bool = allOk;
-    return apResult;
+    return allOk;
 }
 
 // Activates the entities of a time of impact solve: each is moved to its transform at time (if not yet moved), marked
@@ -686,15 +676,14 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
         const int32_t numNewConstraints = newTouchedConstraints.m_size - firstNewConstraint;
         if (numNewConstraints > 1) {
             hkAlgorithm::quickSortRecursive<
-                hkpConstraintInstance*,
-                hkBool* (*)(hkBool*, const hkpConstraintInstance*, const hkpConstraintInstance*)>(
+                hkpConstraintInstance*, hkBool (*)(const hkpConstraintInstance*, const hkpConstraintInstance*)>(
                 newTouchedConstraints.m_data + firstNewConstraint, 0, numNewConstraints - 1, &less_ConstraintPtr
             );
         }
         // EXE-INLINED none: hkAlgorithm::quickSort (only more than one element is sorted)
         const int32_t numNewEntities = newTouchedEntities.m_size - firstNewEntity;
         if (numNewEntities > 1) {
-            hkAlgorithm::quickSortRecursive<hkpEntity*, hkBool* (*)(hkBool*, const hkpEntity*, const hkpEntity*)>(
+            hkAlgorithm::quickSortRecursive<hkpEntity*, hkBool (*)(const hkpEntity*, const hkpEntity*)>(
                 newTouchedEntities.m_data + firstNewEntity, 0, numNewEntities - 1, &less_EntityPtr
             );
         }
@@ -969,16 +958,14 @@ hkResult hkLs_localizedSolveToi(
                 newTouchedEntities, newTouchedConstraints
             );
             firstIteration = false;
-            hkBool accumulatorsFit;
-            hkBool schemasFit;
             if (hkpConstraintSolverSetup::internalIsMemoryOkForNewAccumulators(
-                    &accumulatorsFit, solverResources, newTouchedEntities.m_data, newTouchedEntities.m_size
+                    solverResources, newTouchedEntities.m_data, newTouchedEntities.m_size
                 )
-                    ->m_bool &&
+                    .m_bool &&
                 hkpConstraintSolverSetup::internalIsMemoryOkForNewJacobianSchemas(
-                    &schemasFit, solverResources, newTouchedConstraints.m_data, newTouchedConstraints.m_size
+                    solverResources, newTouchedConstraints.m_data, newTouchedConstraints.m_size
                 )
-                    ->m_bool &&
+                    .m_bool &&
                 toiResources.m_maxNumConstraints >= constraintStatus.m_size + newTouchedConstraints.m_size &&
                 toiResources.m_maxNumEntities >=
                     newTouchedEntities.m_size + activeEntities.m_size + touchedEntities.m_size &&
@@ -1049,9 +1036,8 @@ hkResult hkLs_localizedSolveToi(
     {
         if (solverResources.m_schemas[1].m_begin != solverResources.m_schemas[1].m_current) {
             hkLs_toiResetVelocityAccumulatorsForEntities(solverResources, touchedEntities);
-            hkBool criticalOk;
-            hkLs_toiCheckFinalValidityOfCriticalConstraints(
-                &criticalOk, solverResources, constraintStatus, *world->m_collisionInput, nullptr
+            hkBool criticalOk = hkLs_toiCheckFinalValidityOfCriticalConstraints(
+                solverResources, constraintStatus, *world->m_collisionInput, nullptr
             );
             if (!criticalOk.m_bool) {
                 bool solved = false;
@@ -1061,11 +1047,10 @@ hkResult hkLs_localizedSolveToi(
                         solverResources.m_accumulators, solverResources.m_elemTemp
                     );
                     hkLs_toiResetVelocityAccumulatorsForEntities(solverResources, touchedEntities);
-                    hkBool stepOk;
                     if (hkLs_toiCheckFinalValidityOfCriticalConstraints(
-                            &stepOk, solverResources, constraintStatus, *world->m_collisionInput, nullptr
+                            solverResources, constraintStatus, *world->m_collisionInput, nullptr
                         )
-                            ->m_bool) {
+                            .m_bool) {
                         solved = true;
                         break;
                     }
@@ -1076,9 +1061,8 @@ hkResult hkLs_localizedSolveToi(
                     violatedConstraints.m_size = 0;
                     violatedConstraints.m_capacityAndFlags =
                         hkArrayBase<hkpToiResourceMgr::ConstraintViolationInfo>::DONT_DEALLOCATE_FLAG | 32;
-                    hkBool violationsOk;
                     hkLs_toiCheckFinalValidityOfCriticalConstraints(
-                        &violationsOk, solverResources, constraintStatus, *world->m_collisionInput, &violatedConstraints
+                        solverResources, constraintStatus, *world->m_collisionInput, &violatedConstraints
                     );
                     const bool backstep =
                         toiResourceMgr.cannotSolve(violatedConstraints) == HK_TOI_RESOURCE_MGR_RESPONSE_BACKSTEP;
@@ -1981,15 +1965,10 @@ void hkpContinuousSimulation::handleSimpleToi(
     HK_TIMER_END();
 }
 
-hkBool* hkpContinuousSimulation::fireEarliestToiCallbacksAndCheckEnabled(
-    hkBool* result,
-    hkpToiEvent& event,
-    float& rotateNormal
-) {
+hkBool hkpContinuousSimulation::fireEarliestToiCallbacksAndCheckEnabled(hkpToiEvent& event, float& rotateNormal) {
     event.m_properties.m_flags |= hkContactPointMaterial::CONTACT_IS_NEW;
     event.m_contactMgr->fireCallbacksForEarliestToi(event, rotateNormal);
-    *result = (event.m_properties.m_flags & hkContactPointMaterial::CONTACT_IS_DISABLED) == 0;
-    return result;
+    return (event.m_properties.m_flags & hkContactPointMaterial::CONTACT_IS_DISABLED) == 0;
 }
 
 // Runs every agent of the island's track with continuous collision detection (the island as the output's constraint
@@ -2437,9 +2416,7 @@ hkpStepResult hkpContinuousSimulation::handleAllToisTill(float minTime) {
                 world->attemptToExecutePendingOperations();
                 return HK_STEP_RESULT_SUCCESS;
             }
-            hkBool enabled;
-            if (fireEarliestToiCallbacksAndCheckEnabled(&enabled, m_toiEvents.m_data[earliestIndex], rotateNormal)
-                    ->m_bool) {
+            if (fireEarliestToiCallbacksAndCheckEnabled(m_toiEvents.m_data[earliestIndex], rotateNormal).m_bool) {
                 break;
             }
             // EXE-INLINED none: hkArrayBase<hkpToiEvent>::removeAt

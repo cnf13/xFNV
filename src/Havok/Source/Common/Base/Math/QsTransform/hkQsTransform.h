@@ -48,7 +48,7 @@ public:
     void setMul(const hkQsTransform& aTb, const hkQsTransform& bTc);
     void setMulInverseMul(const hkQsTransform& a, const hkQsTransform& b);
     void setInterpolate4(const hkQsTransform& a, const hkQsTransform& b, const hkSimdReal& t);
-    hkBool* isOk(hkBool* apResult) const;
+    hkBool isOk() const;
     bool* isApproximatelyEqual(bool* a1, __m128* a2, uint32_t a3);
 
     hkVector4 m_translation;

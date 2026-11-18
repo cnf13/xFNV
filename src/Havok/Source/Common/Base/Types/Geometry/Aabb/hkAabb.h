@@ -60,7 +60,7 @@ public:
         return co.allAreSet(hkVector4Comparison::MASK_XYZ);
     }
 
-    hkBool* isValid(hkBool* apResult);
+    hkBool isValid();
 
     // Havok SDK signature (hkBase.lib, tied by target).
     static const hkClass& staticClass();

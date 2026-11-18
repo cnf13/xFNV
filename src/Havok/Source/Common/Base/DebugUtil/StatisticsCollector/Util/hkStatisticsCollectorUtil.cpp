@@ -188,8 +188,7 @@ void hkStatisticsCollectorUtil::_addObject(
     hkStatisticsCollector* collector
 ) {
     if (obj) {
-        hkBool bHasVtable;
-        if (cls.hasVtable(&bHasVtable)->m_bool) {
+        if (cls.hasVtable().m_bool) {
             collector->addReferencedObject(fieldName, static_cast<const hkReferencedObject*>(obj), 0);
         }
         else {
@@ -205,8 +204,7 @@ void hkStatisticsCollectorUtil::_addObjectContents(
     hkStatisticsCollector* collector
 ) {
     if (obj) {
-        hkBool bHasVtable;
-        if (cls.hasVtable(&bHasVtable)->m_bool) {
+        if (cls.hasVtable().m_bool) {
             collector->addReferencedObject(fieldName, static_cast<const hkReferencedObject*>(obj), 1);
         }
         else {
@@ -307,10 +305,9 @@ void hkStatisticsCollectorUtil::_addHomogeneousArrayContents(
     hkStatisticsCollector* collector
 ) {
     if (size) {
-        hkBool bResult;
-        if (!hkStatisticsCollectorUtil::isClassSimple(&bResult, cls)->m_bool) {
+        if (!hkStatisticsCollectorUtil::isClassSimple(cls).m_bool) {
             int32_t ObjectSize = cls.getObjectSize();
-            if (cls.hasVtable(&bResult)->m_bool) {
+            if (cls.hasVtable().m_bool) {
                 for (int32_t i = 0; i < size; i++) {
                     collector->addReferencedObject(fieldName, static_cast<hkReferencedObject*>(data), 1);
                     data = static_cast<char*>(data) + ObjectSize;
@@ -376,14 +373,13 @@ void hkStatisticsCollectorUtil::addClassContentsAll(
     }
 }
 
-hkBool* hkStatisticsCollectorUtil::hasContents(hkBool* a1, const hkClass& arCls) {
+hkBool hkStatisticsCollectorUtil::hasContents(const hkClass& arCls) {
     hkClass* a2 = const_cast<hkClass*>(&arCls);
     hkClass* parent = a2;
     if (a2) {
         while (parent != (&hkReferencedObjectClass)) {
             if (parent->getNumDeclaredMembers() > 0) {
-                a1->m_bool = 1;
-                return a1;
+                return 1;
             }
             parent = const_cast<hkClass*>(parent->getParent());
             if (!parent) {
@@ -391,16 +387,13 @@ hkBool* hkStatisticsCollectorUtil::hasContents(hkBool* a1, const hkClass& arCls)
             }
         }
     }
-    a1->m_bool = 0;
-    return a1;
+    return 0;
 }
 
-hkBool* hkStatisticsCollectorUtil::isMemberSimple(hkBool* apResult, const hkClassMember& mem) {
-    hkBool* result;
+hkBool hkStatisticsCollectorUtil::isMemberSimple(const hkClassMember& mem) {
     if ((mem.m_flags.get() & 512) != 0) {
     LABEL_3:;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
     switch (mem.m_type.m_storage) {
@@ -431,53 +424,41 @@ hkBool* hkStatisticsCollectorUtil::isMemberSimple(hkBool* apResult, const hkClas
         }
         case 25: {
             const hkClass* StructClass = &mem.getStructClass();
-            hkStatisticsCollectorUtil::isClassSimple(apResult, *StructClass);
-            result = apResult;
-            break;
+            return hkStatisticsCollectorUtil::isClassSimple(*StructClass);
         }
         default: {
-            apResult->m_bool = 0;
-            result = apResult;
-            break;
+            return 0;
         }
     }
-
-    return result;
 }
 
-hkBool* hkStatisticsCollectorUtil::_isClassSimple(hkBool* apResult, const hkClass& clsIn) {
-    hkBool v6;
+hkBool hkStatisticsCollectorUtil::_isClassSimple(const hkClass& clsIn) {
     int32_t NumDeclaredMembers = clsIn.getNumDeclaredMembers();
     int32_t v3 = 0;
     if (NumDeclaredMembers <= 0) {
     LABEL_4:;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
     while (true) {
         const hkClassMember* DeclaredMember = &clsIn.getDeclaredMember(v3);
-        if (!hkStatisticsCollectorUtil::isMemberSimple(&v6, *DeclaredMember)->m_bool) {
+        if (!hkStatisticsCollectorUtil::isMemberSimple(*DeclaredMember).m_bool) {
             break;
         }
         if (++v3 >= NumDeclaredMembers) {
             goto LABEL_4;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
-hkBool* hkStatisticsCollectorUtil::isClassSimple(hkBool* apResult, const hkClass& clsIn) {
+hkBool hkStatisticsCollectorUtil::isClassSimple(const hkClass& clsIn) {
     const hkClass* Parent = &clsIn;
-    hkBool bSimple;
-    while (hkStatisticsCollectorUtil::_isClassSimple(&bSimple, *Parent)->m_bool) {
+    while (hkStatisticsCollectorUtil::_isClassSimple(*Parent).m_bool) {
         Parent = Parent->getParent();
         if (!Parent) {
-            apResult->m_bool = 1;
-            return apResult;
+            return 1;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }

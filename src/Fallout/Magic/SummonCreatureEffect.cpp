@@ -376,10 +376,9 @@ bool SummonCreatureEffect::CheckSummonLocation(Actor* apSummoned, NiPoint3& loca
     ::new (&kToOffset) NiPoint3(0.0f, 0.0f, fToHeight);
     NI2HK(input.m_to, location + kToOffset);
     spShapePhantom.SetPositionAndLinearCast(hkFrom, input, col, &startCol);
-    hkBool bStartHit;
-    hkBool* pStartHit = startCol.hasHit(&bStartHit);
+    hkBool bStartHit = startCol.hasHit();
     bool bResult;
-    if (pStartHit->operator bool()) {
+    if (bStartHit.operator bool()) {
         spShapePhantom.bhkPhantom::Remove();
         delete pshape;
         bResult = false;
@@ -404,9 +403,8 @@ bool SummonCreatureEffect::CheckSummonLocation(Actor* apSummoned, NiPoint3& loca
             pd.NiSetFrom(from);
             pd.NiSetTo(to);
             TES::pInstance->Pick(pd);
-            hkBool bHit;
-            hkBool* pHit = pd.hasHit(&bHit);
-            bResult = !pHit->operator bool();
+            hkBool bHit = pd.hasHit();
+            bResult = !bHit.operator bool();
         }
     }
     return bResult;

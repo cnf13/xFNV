@@ -81,7 +81,7 @@ public:
     float getMaxLinearImpulse() const override;
     void setBodyToNotify(int32_t bodyIdx) override;
     uint8_t getNotifiedBodyIndex() const override;
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
     void getConstraintInfo(hkpConstraintData::ConstraintInfo& infoOut) const override;
@@ -91,10 +91,9 @@ public:
     void setMotorActive(hkpConstraintInstance* instance, hkBool toBeEnabled);
 
     // Whether the angular motor is enabled.
-    hkBool* isMotorActive(hkBool* apResult) const {
+    hkBool isMotorActive() const {
         // hkBool's copy: the stored byte as it is.
-        apResult->m_bool = m_atoms.m_angMotor.m_isEnabled.m_bool;
-        return apResult;
+        return m_atoms.m_angMotor.m_isEnabled.m_bool;
     }
 
     void setInWorldSpace(

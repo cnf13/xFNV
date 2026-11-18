@@ -20,8 +20,8 @@ __m128 hkGetOneOver65K_D98620();
 // Performs world linear casts using the KD-tree candidate collector.
 class hkpKdTreeWorldLinearCaster : public hkKdTreeCastCollector {
 public:
-    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
-    hkBool* hasHit(hkBool* arResult) override;
+    hkBool addMidPhaseHit(hkPrimitiveId primitiveId) override;
+    hkBool hasHit() override;
     float getHitFraction() override;
 
     void linearCast(

@@ -21,7 +21,7 @@ public:
     int32_t readRaw(void* buf, int32_t nbytes);
     float readFloat32();
     // Whether the stream reader is ok: asks m_streamReader->isOk and returns apResult.
-    hkBool* isOk(hkBool* apResult) const;
+    hkBool isOk() const;
 
     hkStreamReader* m_streamReader;
     hkBool m_byteSwap;

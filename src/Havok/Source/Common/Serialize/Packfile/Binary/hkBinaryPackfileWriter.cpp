@@ -206,9 +206,8 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
         writeClassName(context, *apClasses[i], pTypesHeader->m_absoluteDataStart);
     }
     for (int32_t i = 0; i < m_pendingWrites.m_size; ++i) {
-        hkBool bDone;
-        doneClasses.isValid(
-            &bDone, doneClasses.findKey(reinterpret_cast<hkUlong>(m_pendingWrites.m_data[i].m_klass->getName()))
+        hkBool bDone = doneClasses.isValid(
+            doneClasses.findKey(reinterpret_cast<hkUlong>(m_pendingWrites.m_data[i].m_klass->getName()))
         );
         if (!bDone.m_bool) {
             doneClasses.insert(reinterpret_cast<hkUlong>(m_pendingWrites.m_data[i].m_klass->getName()), 1);

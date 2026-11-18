@@ -96,8 +96,7 @@ static void cleanupLoadedObjecthkReferencedObject(void* p) {
 // contents.
 void hkReferencedObject::calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const {
     if (cls && cls != &hkReferencedObjectClass) {
-        hkBool bHasContents;
-        if (hkStatisticsCollectorUtil::hasContents(&bHasContents, *cls)->m_bool) {
+        if (hkStatisticsCollectorUtil::hasContents(*cls).m_bool) {
             hkStatisticsCollectorUtil::addClassContentsAll(this, *cls, collector);
         }
     }

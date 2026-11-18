@@ -185,7 +185,7 @@ public:
     hkDataClass& getParent(hkDataClass& arResult) const;
     // Whether the class is null.
     int32_t isNull() const;
-    hkBool* isSuperClass(hkBool* apResult, const hkDataClass& k);
+    hkBool isSuperClass(const hkDataClass& k);
     int32_t getDeclaredMemberIndexByName(const char* name);
     void getDeclaredMemberInfo(int32_t i, hkDataClass::MemberInfo& info);
     void getMemberInfo(int32_t i, hkDataClass::MemberInfo& info);

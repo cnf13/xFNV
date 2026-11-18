@@ -20,7 +20,7 @@ public:
     // Sorts the pointers by address, their records with them.
     void ascendingOrder();
 
-    static hkBool* _comparePointers(hkBool* apResult, void** a, void** b);
+    static hkBool _comparePointers(void** a, void** b);
 
     void** m_pointers;
     hkMemoryPointerInfo* m_info;

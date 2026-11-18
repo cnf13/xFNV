@@ -46,18 +46,16 @@ float hkCpuWorldGetClosestPointsCollector::addLeaf(
 
 // The primitive id is an integer holding the collidable's address (the mediator's getPrimitiveId), so it is cast back
 // from the integer to the collidable's pointer. The distance is dropped.
-hkBool* hkCpuWorldGetClosestPointsCollector::addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) {
+hkBool hkCpuWorldGetClosestPointsCollector::addMidPhaseHit(hkPrimitiveId primitiveId) {
     testCollidable(reinterpret_cast<const hkpCollidable*>(primitiveId));
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
-hkBool* hkCpuWorldGetClosestPointsCollector::hasHit(hkBool* arResult) {
+hkBool hkCpuWorldGetClosestPointsCollector::hasHit() {
     hkpFixedBufferCdPointCollector* m_castCollector = this->m_castCollector;
     bool v3 = m_castCollector->m_numPoints.m_storage == 0;
     bool v4 = m_castCollector->m_numPoints.m_storage < 0;
-    arResult->m_bool = !v4 && !v3;
-    return arResult;
+    return !v4 && !v3;
 }
 
 float hkCpuWorldGetClosestPointsCollector::getHitFraction() {

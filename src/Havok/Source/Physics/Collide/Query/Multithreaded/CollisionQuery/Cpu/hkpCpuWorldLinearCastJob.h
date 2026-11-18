@@ -30,9 +30,9 @@ public:
 
     float addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) override;
     // hkKdTreeCastCollector's vtable at +0x4. Casts against the collidable primitiveId and reports a hit.
-    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
+    hkBool addMidPhaseHit(hkPrimitiveId primitiveId) override;
     // hkKdTreeCastCollector's vtable at +0x4.
-    hkBool* hasHit(hkBool* arResult) override;
+    hkBool hasHit() override;
     // hkKdTreeCastCollector's vtable at +0x4.
     float getHitFraction() override;
     // hkAabbTreeQueryUtils<hkAabbTreeAabb, uint16_t>::Collector's vtable at +0x8.

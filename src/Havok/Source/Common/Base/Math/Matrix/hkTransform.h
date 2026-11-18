@@ -85,7 +85,6 @@ public:
     void get4x4ColumnMajor(float* d) const;
     void set4x4ColumnMajor(const float* p);
     hkBool isApproximatelyEqual(const hkTransform& t, float zero = 1e-3f) const;
-    hkBool* isOk(hkBool* apResult) const;
     __m128* get4x4ColumnMajorQuads(__m128* a1);
     // Sets this from the 4x4 matrix at a1, which it only reads, and
     // returns a1.

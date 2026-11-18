@@ -103,10 +103,9 @@ uint32_t DecalCaster::Pick(const NiPoint3& arFrom, const NiPoint3& arTo, float a
     NI2HK(kInput.m_to, arTo);
     bhkShapePhantom* pPhantom = spShapePhantom.operator->();
     pPhantom->SetPositionAndLinearCast(kStart, kInput, PointCollector, nullptr);
-    hkBool kHit;
-    hkBool* pHit = PointCollector.hasHit(&kHit);
+    hkBool kHit = PointCollector.hasHit();
     // The result is deliberately discarded, as the game does.
-    pHit->operator bool();
+    kHit.operator bool();
     return QNumCollisions();
 }
 

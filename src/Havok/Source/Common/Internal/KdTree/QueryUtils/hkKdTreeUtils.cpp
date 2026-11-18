@@ -24,15 +24,15 @@
 // minimum.
 static hkQuadReal x{1.5259022e-05f, 1.5259022e-05f, 1.5259022e-05f, 1.5259022e-05f};
 
-// isSameSignDiff's test, its hkBool returned by value through apResult.
-hkBool* isSameSignDiffWrapper(hkBool* apResult, const hkVector4* apA, const hkVector4* apB, int32_t aiMask) {
-    isSameSignDiff(apResult, apA, apB, aiMask);
-    return apResult;
+// isSameSignDiff's test, its hkBool returned by value.
+hkBool isSameSignDiffWrapper(const hkVector4* apA, const hkVector4* apB, int32_t aiMask) {
+    return isSameSignDiff(apA, apB, aiMask);
 }
 
 // The result is set first, then replaced by whether every difference has its x3 lanes of one sign.
-hkBool* isSameSignDiff(hkBool* x0, const hkVector4* x1, const hkVector4* x2, int32_t x3) {
-    x0->m_bool = true;
+hkBool isSameSignDiff(const hkVector4* x1, const hkVector4* x2, int32_t x3) {
+    hkBool result;
+    result.m_bool = true;
     bool bOneSign = true;
     for (int32_t i = 0; i < 3; ++i) {
         __m128 diff = _mm_sub_ps(x2[i].m_quad, x1[i].m_quad);
@@ -41,8 +41,8 @@ hkBool* isSameSignDiff(hkBool* x0, const hkVector4* x1, const hkVector4* x2, int
             (x3 & _mm_movemask_ps(_mm_cmplt_ps(_mm_setzero_ps(), diff))) == x3;
         bOneSign = bOneSign && bLanes;
     }
-    x0->m_bool = bOneSign;
-    return x0;
+    result.m_bool = bOneSign;
+    return result;
 }
 
 // Walks the ray from from to to down tree front to back with a stack of the far children still to visit (on the
@@ -50,8 +50,7 @@ hkBool* isSameSignDiff(hkBool* x0, const hkVector4* x1, const hkVector4* x2, int
 // fraction; the collector's hasHit is the result. Along an axis the ray does not move, a split is tested against from's
 // coordinate instead. tNear is always the float last stored in nodeTNear. Each compare is written so that a NaN takes
 // the same branch as in the game.
-hkBool* hkKdTreeUtils::castRayIterative(
-    hkBool* arResult,
+hkBool hkKdTreeUtils::castRayIterative(
     const hkKdTree* tree,
     const hkVector4& from,
     const hkVector4& to,
@@ -289,8 +288,7 @@ leaf:
                 _mm_and_ps(_mm_and_ps(_mm_cmple_ps(origin, boxMax), _mm_cmple_ps(boxMin, origin)), invDirIsZero);
             if ((_mm_movemask_ps(_mm_or_ps(_mm_andnot_ps(invDirIsZero, _mm_cmplt_ps(enter, leave)), inside)) & 7) ==
                 7) {
-                hkBool hitResult;
-                collector->addMidPhaseHit(&hitResult, primitiveId);
+                collector->addMidPhaseHit(primitiveId);
             }
             ++entry;
         }
@@ -317,14 +315,12 @@ popStack:
     }
 done:
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackStorage;
-    collector->hasHit(arResult);
-    return arResult;
+    return collector->hasHit();
 }
 
 // The node stack lives in the thread's hkStackMemory (maxDepth entries, the block rounded up to 128 bytes) and is given
 // back at the end. A split is divided by 65535.0 as a double expression.
-hkBool* hkKdTreeUtils::castRayBundleIterative(
-    hkBool* arResult,
+hkBool hkKdTreeUtils::castRayBundleIterative(
     const hkKdTree* tree,
     const RayBundle& fromBundle,
     const RayBundle& toBundle,
@@ -600,8 +596,7 @@ hkBool* hkKdTreeUtils::castRayBundleIterative(
         for (;;) {
             if (stack == stackStart) {
                 hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackBase;
-                arResult->m_bool = true;
-                return arResult;
+                return true;
             }
             --stack;
             node = stack->node.m_storage;
@@ -619,22 +614,21 @@ hkBool* hkKdTreeUtils::castRayBundleIterative(
 }
 
 // The SDK's: whether a ray cast hits any of the non-empty trees, each cast in turn into collector.
-hkBool* hkKdTreeUtils::castRayMultiTree(
-    hkBool* apResult,
+hkBool hkKdTreeUtils::castRayMultiTree(
     int32_t numTrees,
     hkKdTree* const* trees,
     const hkVector4& start,
     const hkVector4& end,
     hkKdTreeCastCollector* collector
 ) {
-    apResult->m_bool = false;
+    hkBool result;
+    result.m_bool = false;
     for (int32_t i = 0; i < numTrees; ++i) {
         const hkKdTree* pTree = trees[i];
         if (pTree && pTree->m_nodes.m_size) {
-            hkBool castHit;
-            hkKdTreeUtils::castRayIterative(&castHit, pTree, start, end, collector);
-            apResult->m_bool = apResult->m_bool || castHit.m_bool;
+            hkBool castHit = hkKdTreeUtils::castRayIterative(pTree, start, end, collector);
+            result.m_bool = result.m_bool || castHit.m_bool;
         }
     }
-    return apResult;
+    return result;
 }

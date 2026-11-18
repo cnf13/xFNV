@@ -76,12 +76,8 @@ public:
     ) const;
     virtual const hkpRootCdPoint*
     determineNearestHit(uint8_t numWheel, const hkpPairLinearCastCommand* commandStorageOutput) const;
-    virtual hkBool* castSingleWheel(
-        hkBool* arResult,
-        const hkpVehicleInstance* vehicle,
-        uint8_t wheelNum,
-        hkpRootCdPoint& linearCastOutput
-    ) const;
+    virtual hkBool
+    castSingleWheel(const hkpVehicleInstance* vehicle, uint8_t wheelNum, hkpRootCdPoint& linearCastOutput) const;
     virtual void getCollisionOutputFromCastResult(
         const hkpVehicleInstance* vehicle,
         uint8_t wheelNum,

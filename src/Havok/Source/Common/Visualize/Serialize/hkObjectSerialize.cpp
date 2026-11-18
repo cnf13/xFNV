@@ -42,16 +42,15 @@ static int32_t writePacketWithRelocations(
     uint32_t m_size;
     int32_t v11;
     uint32_t m_size_3;
-    hkBool arResult_;
     int32_t n20;
     uint32_t m_size_1;
     hkOArchive apMemory(r_esi, byteSwap);
     apMemory.write64u(dataID);
-    if (!r_esi->isOk(&arResult_)->m_bool) {
+    if (!r_esi->isOk().m_bool) {
         goto LABEL_2;
     }
     apMemory.write64u(classID);
-    if (!r_esi->isOk(&arResult_)->m_bool) {
+    if (!r_esi->isOk().m_bool) {
         goto LABEL_2;
     }
     m_size = r_ebx->m_local.m_size;
@@ -62,7 +61,7 @@ static int32_t writePacketWithRelocations(
         do {
             apMemory.write32(r_ebx->m_local.m_data[v11].m_fromOffset);
             apMemory.write32(r_ebx->m_local.m_data[v11].m_toOffset);
-            if (!r_esi->isOk(&arResult_)->m_bool) {
+            if (!r_esi->isOk().m_bool) {
                 goto LABEL_2;
             }
             n20 += 8;
@@ -80,7 +79,7 @@ static int32_t writePacketWithRelocations(
             // Each address is written as a 64-bit id (hkUlong widened).
             apMemory.write64u(reinterpret_cast<uintptr_t>(r_ebx->m_global.m_data[v14].m_toAddress));
             apMemory.write64u(reinterpret_cast<uintptr_t>(r_ebx->m_global.m_data[v14].m_toClass));
-            if (!r_esi->isOk(&arResult_)->m_bool) {
+            if (!r_esi->isOk().m_bool) {
                 goto LABEL_2;
             }
             n20 += 20;
@@ -90,7 +89,7 @@ static int32_t writePacketWithRelocations(
         while (m_size_3 < m_size_1);
     }
     apMemory.write32u(dataSize);
-    if (!r_esi->isOk(&arResult_)->m_bool || (r_esi->write(data, dataSize), !r_esi->isOk(&arResult_)->m_bool)) {
+    if (!r_esi->isOk().m_bool || (r_esi->write(data, dataSize), !r_esi->isOk().m_bool)) {
     LABEL_2:;
         return -1;
     }
@@ -108,17 +107,16 @@ uint64_t hkObjectSerialize::readObject(
     uint64_t& klassID
 ) {
     using LocalFixupArray = hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>;
-    hkBool ok;
     uint64_t id;
     uint32_t numLocalFixups;
     uint32_t numGlobalFixups;
     char* buffer;
     s->read(&id, 8);
-    if (!s->isOk(&ok)->m_bool) {
+    if (!s->isOk().m_bool) {
         return 0;
     }
     s->read(&klassID, 8);
-    if (!s->isOk(&ok)->m_bool) {
+    if (!s->isOk().m_bool) {
         return 0;
     }
     // EXE-INLINED none: hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>::hkArray
@@ -127,7 +125,7 @@ uint64_t hkObjectSerialize::readObject(
     localFixups.m_size = 0;
     localFixups.m_capacityAndFlags = LocalFixupArray::DONT_DEALLOCATE_FLAG;
     s->read(&numLocalFixups, 4);
-    if (!s->isOk(&ok)->m_bool) {
+    if (!s->isOk().m_bool) {
         goto fail;
     }
     {
@@ -147,12 +145,12 @@ uint64_t hkObjectSerialize::readObject(
         hkObjectSerialize::LocalFixup* pFixup = &localFixups.m_data[i];
         s->read(&pFixup->fromOffset, 4);
         s->read(&pFixup->toOffset, 4);
-        if (!s->isOk(&ok)->m_bool) {
+        if (!s->isOk().m_bool) {
             goto fail;
         }
     }
     s->read(&numGlobalFixups, 4);
-    if (!s->isOk(&ok)->m_bool) {
+    if (!s->isOk().m_bool) {
         goto fail;
     }
     {
@@ -173,17 +171,17 @@ uint64_t hkObjectSerialize::readObject(
         s->read(&pFixup->fromOffset, 4);
         s->read(&pFixup->toID, 8);
         s->read(&pFixup->toClassID, 8);
-        if (!s->isOk(&ok)->m_bool) {
+        if (!s->isOk().m_bool) {
             goto fail;
         }
     }
     s->read(&dataSize, 4);
-    if (!s->isOk(&ok)->m_bool) {
+    if (!s->isOk().m_bool) {
         goto fail;
     }
     buffer = static_cast<char*>(hkMemoryRouter::easyAlloc(*hkMemoryRouter::getInstance().m_heap, dataSize));
     s->read(buffer, dataSize);
-    if (!s->isOk(&ok)->m_bool) {
+    if (!s->isOk().m_bool) {
         hkMemoryRouter::easyFree(*hkMemoryRouter::getInstance().m_heap, buffer);
         goto fail;
     }

@@ -36,5 +36,5 @@ public:
     };
 
     // Poses the setup's chain on its target inside poseInOut.
-    static hkBool* solve(hkBool* apResult, const Setup& setup, hkaPose& poseInOut);
+    static hkBool solve(const Setup& setup, hkaPose& poseInOut);
 };

@@ -62,15 +62,11 @@ void identifyDeactivatedSubgroups(
     hkArray<int32_t, hkContainerHeapAllocator>& groupsSizes,
     hkFixedArray<int8_t>& groupSparse
 );
-hkBool* worldOperationUtil_less_hkSimulationIslandPtr(
-    hkBool* apResult,
-    const hkpSimulationIsland* a,
-    const hkpSimulationIsland* b
-);
+hkBool worldOperationUtil_less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulationIsland* b);
 int32_t getSectorSize(hkpAgentNnTrack* apThis, [[maybe_unused]] void* apEdx, int32_t a2);
 
 // The dirty islands' comparator. The sort that takes it is hkAlgorithm::quickSortRecursive.
-using hkpSimulationIslandLess = hkBool* (*)(hkBool*, const hkpSimulationIsland*, const hkpSimulationIsland*);
+using hkpSimulationIslandLess = hkBool (*)(const hkpSimulationIsland*, const hkpSimulationIsland*);
 namespace hkAlgorithm {}
 
 // The world's island and entity bookkeeping.

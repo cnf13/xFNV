@@ -10,7 +10,7 @@ class hkStructureLayout {
 public:
     struct LayoutRules {
         // Whether all four bytes equal other's, built in apResult.
-        hkBool* IsEqual(hkBool* apResult, const hkStructureLayout::LayoutRules& other) const;
+        hkBool IsEqual(const hkStructureLayout::LayoutRules& other) const;
 
         uint8_t m_bytesInPointer;
         uint8_t m_littleEndian;

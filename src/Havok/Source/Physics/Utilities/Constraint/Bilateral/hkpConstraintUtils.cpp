@@ -49,8 +49,7 @@ CopyAtomsAddMotorRef(hkpLimitedHingeConstraintData::Atoms* r_esi, const hkpLimit
 // the point relativeDisplacementTowardsParent of the way from the parent's (B) pivot to the parent's centre and given
 // the parent's velocities; a child pivot off the body's origin only warns. The hkBool result goes through apResult,
 // which is returned.
-hkBool* hkpConstraintUtils::checkAndFixConstraint(
-    hkBool* apResult,
+hkBool hkpConstraintUtils::checkAndFixConstraint(
     const hkpConstraintInstance* constraint,
     float maxAllowedError,
     float relativeDisplacementTowardsParent
@@ -58,8 +57,7 @@ hkBool* hkpConstraintUtils::checkAndFixConstraint(
     hkVector4 pivotA;
     hkVector4 pivotB;
     if (getConstraintPivots(constraint, pivotA, pivotB) != HK_SUCCESS) {
-        apResult->m_bool = false;
-        return apResult;
+        return false;
     }
     // EXE-INLINED 0x630100: hkVector4::lengthSquared3
     const __m128 pivotSq = _mm_mul_ps(pivotA.m_quad, pivotA.m_quad);
@@ -89,8 +87,7 @@ hkBool* hkpConstraintUtils::checkAndFixConstraint(
     );
     // The squared error stays on the x87 stack.
     if (!(fDistSq > maxAllowedError * maxAllowedError)) {
-        apResult->m_bool = false;
-        return apResult;
+        return false;
     }
     const __m128 t = _mm_set1_ps(relativeDisplacementTowardsParent);
     hkVector4 newPosition;
@@ -101,8 +98,7 @@ hkBool* hkpConstraintUtils::checkAndFixConstraint(
     pChild->setPosition(newPosition);
     pChild->setLinearVelocity(pParent->m_motion.m_linearVelocity);
     pChild->setAngularVelocity(pParent->m_motion.m_angularVelocity);
-    apResult->m_bool = true;
-    return apResult;
+    return true;
 }
 
 // A limited hinge's or ragdoll's data is copied into new data of its type, with constraintMotor set on its motors and

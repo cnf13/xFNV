@@ -108,8 +108,7 @@ void* hkDeepCopier::deepCopy(
         const hkClass* pKlass = todo.m_data[todoIndex].m_class;
         done.insert(pOriginal, buffer.getSize());
         const int32_t globalsBefore = reloc.m_global.getSize();
-        hkBool result;
-        if (pKlass->hasVtable(&result)->m_bool) {
+        if (pKlass->hasVtable().m_bool) {
             pKlass = vtableClassRegistry->getClassFromVirtualInstance(pOriginal);
         }
         const int32_t copyOffset = buffer.getSize();

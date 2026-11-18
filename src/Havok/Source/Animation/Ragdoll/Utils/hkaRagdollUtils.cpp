@@ -98,8 +98,7 @@ static int32_t moveRigidBodyPivot(hkQsTransform* r_eax, hkpRigidBody* r_esi) {
     inverse.setInverse(*r_eax);
     const hkVector4 oldCenterOfMass = r_esi->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1;
 
-    hkBool bEnabled;
-    hkError::s_instance->isEnabled(&bEnabled, 0x2FF8C16F);
+    hkBool bEnabled = hkError::s_instance->isEnabled(0x2FF8C16F);
     hkError::s_instance->setEnabled(0x2FF8C16F, false);
     const hkpShape* pShape = r_esi->m_collidable.m_shape;
     hkTransform transform;

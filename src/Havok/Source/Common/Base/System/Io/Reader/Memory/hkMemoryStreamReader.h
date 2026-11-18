@@ -17,15 +17,15 @@ public:
     hkMemoryStreamReader(const void* mem, int32_t memSize, hkMemoryStreamReader::MemoryType t);
 
     // Not at end of stream: a read past the end sets m_bufCurrent to m_bufSize + 1.
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t read(void* buf, int32_t nbytes) override;
     int32_t skip(int32_t nbytes) override;
     // Marks are supported on a non-empty buffer.
-    hkBool* markSupported(hkBool* arResult) const override;
+    hkBool markSupported() const override;
     hkResult setMark(int32_t markLimit) override;
     // Returns to m_markPos; fails when no mark is set.
     hkResult rewindToMark() override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t relOffset, SeekWhence whence) override;
     int32_t tell() const override;
     ~hkMemoryStreamReader() override;

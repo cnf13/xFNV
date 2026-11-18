@@ -959,7 +959,6 @@ integrateJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::JobQueu
     return hkJobQueue::GOT_NEXT_JOB;
 }
 
-hkBool* canSolveOnSingleProcessor(hkBool* result) {
-    result->m_bool = 0;
-    return result;
+hkBool canSolveOnSingleProcessor() {
+    return 0;
 }

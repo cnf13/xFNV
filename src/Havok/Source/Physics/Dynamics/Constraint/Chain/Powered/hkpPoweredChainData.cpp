@@ -196,9 +196,8 @@ hkpPoweredChainData::~hkpPoweredChainData() {
     }
 }
 
-hkBool* hkpPoweredChainData::isValid(hkBool* arResult) const {
-    arResult->m_bool = true;
-    return arResult;
+hkBool hkpPoweredChainData::isValid() const {
+    return true;
 }
 
 int32_t hkpPoweredChainData::getType() const {

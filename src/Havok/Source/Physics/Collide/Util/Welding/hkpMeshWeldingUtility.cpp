@@ -47,8 +47,7 @@
 
 // Only x, y and z of the clipped ends reach the result, so only those lanes are computed, each product and sum rounded
 // to a float. The dot products add y to x, then z. Each plane distance and final quotient is stored as a float.
-hkBool* hkClipEdgeAgainstPlanes(
-    hkBool* apResult,
+hkBool hkClipEdgeAgainstPlanes(
     const hkVector4& edgeStart,
     const hkVector4& edgeEnd,
     int32_t numPlanes,
@@ -82,8 +81,7 @@ hkBool* hkClipEdgeAgainstPlanes(
 
         // Both ends at or above the plane (neither NaN) leave nothing of the edge.
         if (fDistStart >= 0.0f && fDistEnd >= 0.0f) {
-            apResult->m_bool = 0;
-            return apResult;
+            return 0;
         }
 
         // The ends straddle the plane only when the product is below zero (not for NaN).
@@ -143,10 +141,11 @@ hkBool* hkClipEdgeAgainstPlanes(
     const float fEndProjXY = fEndProjY + fEndProjX;
     const float fEndProj = fEndProjZ + fEndProjXY;
 
-    apResult->m_bool = 1;
+    hkBool result;
+    result.m_bool = 1;
     tStart = fStartProj / fLengthSq;
     tEnd = fEndProj / fLengthSq;
-    return apResult;
+    return result;
 }
 
 int32_t getSectorFromWeldingInfo(uint16_t a1, char a2) {
@@ -757,10 +756,9 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
                             hkpMeshWeldingUtility::calcAngleForEdge(edgeNormal, edgeOrtho, otherNormal);
                         hkVector4 planes[5];
                         hkBuildClipPlanesForTriangle(planes, pOther, 0.05f);
-                        hkBool bClipped;
                         float tStart;
                         float tEnd;
-                        if (hkClipEdgeAgainstPlanes(&bClipped, start, end, 5, planes, tStart, tEnd)->m_bool) {
+                        if (hkClipEdgeAgainstPlanes(start, end, 5, planes, tStart, tEnd).m_bool) {
                             histogram.addEntry(tStart, tEnd, fAngle);
                         }
                     }
@@ -919,12 +917,10 @@ hkResult hkpMeshWeldingUtility::calcWeldingInfoForTriangle(
     // The container's child shapes are triangles.
     const hkpTriangleShape* pTriangle =
         static_cast<const hkpTriangleShape*>(pContainer->getChildShape(shapeKey, buffer));
-    hkBool bDegenerate;
     if (hkpTriangleUtil::isDegenerate(
-            &bDegenerate, pTriangle->m_vertexA, pTriangle->m_vertexB, pTriangle->m_vertexC,
-            hkDefaultTriangleDegeneracyTolerance
+            pTriangle->m_vertexA, pTriangle->m_vertexB, pTriangle->m_vertexC, hkDefaultTriangleDegeneracyTolerance
         )
-            ->m_bool) {
+            .m_bool) {
         info = 0;
         return HK_FAILURE;
     }
@@ -944,32 +940,31 @@ hkResult hkpMeshWeldingUtility::calcWeldingInfoForTriangle(
 // Whether the triangle's winding agrees with its neighbours': each of its three edges' bitcodes computed with the
 // winding test off, the warning hkpMeshWeldingUtility.cpp:713 raises (0xFE98751E) switched off for the time if it was
 // on.
-hkBool*
-hkpMeshWeldingUtility::isTriangleWindingValid(hkBool* apResult, uint32_t shapeKey, const hkpBvTreeShape* bvTreeShape) {
+hkBool hkpMeshWeldingUtility::isTriangleWindingValid(uint32_t shapeKey, const hkpBvTreeShape* bvTreeShape) {
     alignas(16) char buffer[512];
     const hkpShapeContainer* pContainer = bvTreeShape->getContainer();
     // The container's child shapes are triangles.
     const hkpTriangleShape* pTriangle =
         static_cast<const hkpTriangleShape*>(pContainer->getChildShape(shapeKey, buffer));
-    hkBool bWasEnabled;
-    hkError::s_instance->isEnabled(&bWasEnabled, static_cast<int32_t>(0xFE98751E));
+    hkBool bWasEnabled = hkError::s_instance->isEnabled(static_cast<int32_t>(0xFE98751E));
     if (bWasEnabled.m_bool) {
         hkError::s_instance->setEnabled(static_cast<int32_t>(0xFE98751E), hkBool(false));
     }
-    apResult->m_bool = 1;
+    hkBool result;
+    result.m_bool = 1;
     uint16_t sBitcode = 0;
     for (int32_t i = 0; i < 3; ++i) {
         if (hkpMeshWeldingUtility::calcBitcodeForTriangleEdge(
                 bvTreeShape, pTriangle, shapeKey, i, hkpMeshWeldingUtility::WINDING_IGNORE_CONSISTENCY, sBitcode
             ) == HK_FAILURE) {
-            apResult->m_bool = 0;
+            result.m_bool = 0;
             break;
         }
     }
     if (bWasEnabled.m_bool) {
         hkError::s_instance->setEnabled(static_cast<int32_t>(0xFE98751E), hkBool(true));
     }
-    return apResult;
+    return result;
 }
 
 int32_t hkpMeshWeldingUtility::calcEdgeAngleBitcode(hkVector4* a1) {

@@ -17,7 +17,7 @@
 #include <cmath>
 #include <xmmintrin.h>
 
-static hkBool* isTriangleDegenerate(hkBool* result, const hkGeometry::Triangle* triangle);
+static hkBool isTriangleDegenerate(const hkGeometry::Triangle* triangle);
 // Welds the vertices, producing the unique vertices and the remap.
 static void weldVertexArray(
     const hkArray<hkVector4>& vertices,
@@ -197,9 +197,8 @@ static void weldGeometryVertices(
     hkGeometry::Triangle* pOut = geom.m_triangles.m_data;
     for (int32_t i = 0; i < numTriangles; ++i) {
         const hkGeometry::Triangle* pTriangle = &geom.m_triangles.m_data[i];
-        hkBool degenerate;
         int32_t newIndex = -1;
-        if (!isTriangleDegenerate(&degenerate, pTriangle)->m_bool) {
+        if (!isTriangleDegenerate(pTriangle).m_bool) {
             newIndex = static_cast<int32_t>(pOut - geom.m_triangles.m_data);
             pOut->m_a = pTriangle->m_a;
             pOut->m_b = pTriangle->m_b;
@@ -224,14 +223,12 @@ static void weldGeometryVertices(
 }
 
 // Whether the triangle is degenerate: two of its vertex indices are the same.
-static hkBool* isTriangleDegenerate(hkBool* result, const hkGeometry::Triangle* triangle) {
+static hkBool isTriangleDegenerate(const hkGeometry::Triangle* triangle) {
     const int32_t b = triangle->m_b;
     if (triangle->m_a == b || triangle->m_a == triangle->m_c || b == triangle->m_c) {
-        result->m_bool = 1;
-        return result;
+        return 1;
     }
-    result->m_bool = 0;
-    return result;
+    return 0;
 }
 
 // Each vertex's AABB grown by half the threshold goes into a sweep array sorted along x; each vertex not yet welded

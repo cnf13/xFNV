@@ -18,8 +18,7 @@ class hkpTriangleShape;
 // Clips the edge from edgeStart to edgeEnd against numPlanes planes (xyz the normal, w the offset): false when both
 // ends lie on the positive side of one plane, else true with tStart and tEnd the clipped ends' parameters along the
 // edge. The hkBool is written to apResult, which is returned.
-hkBool* hkClipEdgeAgainstPlanes(
-    hkBool* apResult,
+hkBool hkClipEdgeAgainstPlanes(
     const hkVector4& edgeStart,
     const hkVector4& edgeEnd,
     int32_t numPlanes,
@@ -109,6 +108,6 @@ public:
         hkpMeshWeldingUtility::WindingConsistency testConsistency,
         uint16_t& info
     );
-    static hkBool* isTriangleWindingValid(hkBool* apResult, uint32_t shapeKey, const hkpBvTreeShape* bvTreeShape);
+    static hkBool isTriangleWindingValid(uint32_t shapeKey, const hkpBvTreeShape* bvTreeShape);
     static int32_t calcEdgeAngleBitcode(hkVector4* a1);
 };

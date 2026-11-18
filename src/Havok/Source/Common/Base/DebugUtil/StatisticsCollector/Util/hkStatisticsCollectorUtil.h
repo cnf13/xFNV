@@ -55,8 +55,8 @@ public:
     // Reports the contents of obj as cls and as each of cls's parents.
     static void addClassContentsAll(const void* obj, const hkClass& cls, hkStatisticsCollector* collector);
     // Whether cls or a parent below hkReferencedObject declares members.
-    static hkBool* hasContents(hkBool* apResult, const hkClass& cls);
-    static hkBool* isMemberSimple(hkBool* apResult, const hkClassMember& mem);
-    static hkBool* _isClassSimple(hkBool* apResult, const hkClass& clsIn);
-    static hkBool* isClassSimple(hkBool* apResult, const hkClass& clsIn);
+    static hkBool hasContents(const hkClass& cls);
+    static hkBool isMemberSimple(const hkClassMember& mem);
+    static hkBool _isClassSimple(const hkClass& clsIn);
+    static hkBool isClassSimple(const hkClass& clsIn);
 };

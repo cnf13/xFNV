@@ -15,9 +15,8 @@ struct hkpWorldRayCastOutput : hkpShapeRayCastOutput {
     hkpWorldRayCastOutput& operator=(const hkpWorldRayCastOutput& __that);
 
     // Whether the cast hit anything.
-    hkBool* hasHit(hkBool* arResult) const {
-        ::new (arResult) hkBool(m_rootCollidable != nullptr);
-        return arResult;
+    hkBool hasHit() const {
+        return m_rootCollidable != nullptr;
     }
 
     // Clears m_rootCollidable and resets the shape-level output.

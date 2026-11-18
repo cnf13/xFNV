@@ -382,22 +382,16 @@ hkaSplineCompressedAnimation::TrackCompressionParams::TrackCompressionParams()
 }
 
 // Every quantization type must be valid and no tolerance may be negative; each accuracy check only reports. The four
-// validity calls short-circuit in the order translation, rotation, scale, float, and each writes its own hkBool; the
+// validity calls short-circuit in the order translation, rotation, scale, float; the
 // accuracy checks run whatever they returned, in the order translation, scale, float, rotation. The tolerance is
 // widened to double for the compare and the rotation accuracy is multiplied by the double 0.16260161995887756 first.
 // Each report goes through a local hkErrStream (0x200 byte buffer, id 0xABBA5A61).
-hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::isOk(hkBool* arResult) const {
-    hkBool translationValid;
-    hkBool rotationValid;
-    hkBool scaleValid;
-    hkBool floatValid;
+hkBool hkaSplineCompressedAnimation::TrackCompressionParams::isOk() const {
     const bool bQuantizationValid =
-        validQuantization(&translationValid, static_cast<ScalarQuantization>(m_translationQuantizationType.m_storage))
-            ->m_bool &&
-        validQuantization(&rotationValid, static_cast<RotationQuantization>(m_rotationQuantizationType.m_storage))
-            ->m_bool &&
-        validQuantization(&scaleValid, static_cast<ScalarQuantization>(m_scaleQuantizationType.m_storage))->m_bool &&
-        validQuantization(&floatValid, static_cast<ScalarQuantization>(m_floatQuantizationType.m_storage))->m_bool;
+        validQuantization(static_cast<ScalarQuantization>(m_translationQuantizationType.m_storage)).m_bool &&
+        validQuantization(static_cast<RotationQuantization>(m_rotationQuantizationType.m_storage)).m_bool &&
+        validQuantization(static_cast<ScalarQuantization>(m_scaleQuantizationType.m_storage)).m_bool &&
+        validQuantization(static_cast<ScalarQuantization>(m_floatQuantizationType.m_storage)).m_bool;
     const bool bTolerancesValid = m_translationTolerance >= 0.0f && m_rotationTolerance >= 0.0f &&
         m_scaleTolerance >= 0.0f && m_floatingTolerance >= 0.0f;
 
@@ -458,31 +452,26 @@ hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::isOk(hkBool* arRes
         pStream->~hkErrStream();
     }
 
-    arResult->m_bool = (bQuantizationValid && bTolerancesValid) ? 1 : 0;
-    return arResult;
+    return (bQuantizationValid && bTolerancesValid) ? 1 : 0;
 }
 
 // Whether the scalar quantization is BITS8 or BITS16.
 // KEEP: unregistered. The exe body touches only eax and ecx, and a caller relies on edx surviving the call
 // (checkbody: "caller relies on preserved edx"), which clang does not guarantee.
-hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::validQuantization(
-    hkBool* arResult,
+hkBool hkaSplineCompressedAnimation::TrackCompressionParams::validQuantization(
     hkaSplineCompressedAnimation::TrackCompressionParams::ScalarQuantization aeType
 ) {
-    arResult->m_bool = aeType == BITS8 || aeType == BITS16;
-    return arResult;
+    return aeType == BITS8 || aeType == BITS16;
 }
 
 // KEEP: unregistered. Whether the rotation quantization is one of the six types (cdecl, 0xE32DF0). The exe body
 // touches only eax and ecx, and its caller isOk (0xE330B0) pushes edx at 0xE33154, loaded at 0xE330BA before this
 // call, which clang does not guarantee to keep.
-hkBool* hkaSplineCompressedAnimation::TrackCompressionParams::validQuantization(
-    hkBool* arResult,
+hkBool hkaSplineCompressedAnimation::TrackCompressionParams::validQuantization(
     hkaSplineCompressedAnimation::TrackCompressionParams::RotationQuantization aeType
 ) {
-    arResult->m_bool = aeType == POLAR32 || aeType == THREECOMP40 || aeType == THREECOMP48 || aeType == THREECOMP24 ||
+    return aeType == POLAR32 || aeType == THREECOMP40 || aeType == THREECOMP48 || aeType == THREECOMP24 ||
         aeType == STRAIGHT16 || aeType == UNCOMPRESSED;
-    return arResult;
 }
 
 // BITS8 returns 0.0078125 and BITS16 returns 3.0517578125e-05; any other value returns zero.
@@ -538,25 +527,22 @@ const hkClass& hkaSplineCompressedAnimation::TrackCompressionParams::staticClass
     return hkaSplineCompressedAnimationTrackCompressionParamsClass;
 }
 
-hkBool* hkaSplineCompressedAnimation::PerTrackCompressionParams::isOk(hkBool* arResult) const {
-    hkBool arResulta;
+hkBool hkaSplineCompressedAnimation::PerTrackCompressionParams::isOk() const {
     int32_t v3 = 0;
     if (m_parameterPalette.m_size <= 0) {
     LABEL_5:;
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
     int32_t v4 = 0;
-    while (m_parameterPalette.m_data[v4].isOk(&arResulta)->m_bool) {
+    while (m_parameterPalette.m_data[v4].isOk().m_bool) {
         ++v3;
         ++v4;
         if (v3 >= m_parameterPalette.m_size) {
             goto LABEL_5;
         }
     }
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 // A palette of trackParams alone, every transform and float track indexing it.

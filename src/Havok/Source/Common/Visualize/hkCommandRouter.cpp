@@ -37,10 +37,9 @@ void hkCommandRouter::unregisterProcess(hkProcess* handler) {
     }
 }
 
-hkBool* hkCommandRouter::consumeCommands(hkBool* apResult, hkDisplaySerializeIStream* stream) {
+hkBool hkCommandRouter::consumeCommands(hkDisplaySerializeIStream* stream) {
     uint8_t commandRead;
     uint8_t command;
-    hkBool isOk;
     do {
         stream->readArrayGeneric(&commandRead, 1, 1);
         command = commandRead;
@@ -89,7 +88,6 @@ hkBool* hkCommandRouter::consumeCommands(hkBool* apResult, hkDisplaySerializeISt
             }
         }
     }
-    while (stream->isOk(&isOk)->m_bool && command != COMMAND_ACK);
-    apResult->m_bool = 1;
-    return apResult;
+    while (stream->isOk().m_bool && command != COMMAND_ACK);
+    return 1;
 }

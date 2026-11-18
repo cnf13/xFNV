@@ -22,7 +22,7 @@ public:
 
     int32_t message(hkError::Message m, int32_t id, const char* description, const char* file, int32_t line) override;
     void setEnabled(int32_t id, hkBool enabled) override;
-    hkBool* isEnabled(hkBool* arResult, int32_t aiId) override;
+    hkBool isEnabled(int32_t aiId) override;
     void enableAll() override;
     // The report's file is passed as a case-folded base name, and a copy of it is kept.
     virtual void disableReport(const char* apFile, int32_t aiLine);

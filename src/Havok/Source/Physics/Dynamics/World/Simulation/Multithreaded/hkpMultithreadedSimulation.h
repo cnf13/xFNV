@@ -32,7 +32,7 @@ struct hkpIslandsAgentEntriesInfo {
 
 // Havok SDK signature (hkpDynamics.lib, tied by bytes,reloc).
 bool pairLessThan(const hkpTypedBroadPhaseHandlePair& a1, const hkpTypedBroadPhaseHandlePair& a2);
-hkBool* less_hkSimulationIslandPtr(hkBool* apResult, const hkpSimulationIsland* a, const hkpSimulationIsland* b);
+hkBool less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulationIsland* b);
 void sortPairList(hkArray<hkpTypedBroadPhaseHandlePair, hkContainerHeapAllocator>& pairs);
 // Finds the entry of island in the array, appending a zeroed one keyed by island when there is none, and returns it.
 hkpIslandsAgentEntriesInfo*

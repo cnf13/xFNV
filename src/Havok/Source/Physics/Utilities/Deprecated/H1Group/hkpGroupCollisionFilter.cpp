@@ -76,9 +76,7 @@ hkpGroupCollisionFilter::hkpGroupCollisionFilter() : m_collisionGroups{} {
 hkpGroupCollisionFilter::~hkpGroupCollisionFilter() {}
 
 hkBool hkpGroupCollisionFilter::isCollisionEnabled(const hkpCollidable& a, const hkpCollidable& b) const {
-    hkBool result;
-    isCollisionEnabled(&result, a.m_broadPhaseHandle.m_collisionFilterInfo, b.m_broadPhaseHandle.m_collisionFilterInfo);
-    return result;
+    return isCollisionEnabled(a.m_broadPhaseHandle.m_collisionFilterInfo, b.m_broadPhaseHandle.m_collisionFilterInfo);
 }
 
 hkBool hkpGroupCollisionFilter::isCollisionEnabled(
@@ -88,7 +86,6 @@ hkBool hkpGroupCollisionFilter::isCollisionEnabled(
     const hkpShapeContainer& bContainer,
     uint32_t bKey
 ) const {
-    hkBool apResult;
     uint32_t CollisionFilterInfo = bContainer.getCollisionFilterInfo(bKey);
     // EXE-INLINED 0x624020
     const hkpCdBody* root = &a;
@@ -96,8 +93,7 @@ hkBool hkpGroupCollisionFilter::isCollisionEnabled(
         root = root->m_parent;
     }
     const hkpCollidable* rootCollidable = static_cast<const hkpCollidable*>(root);
-    isCollisionEnabled(&apResult, rootCollidable->m_broadPhaseHandle.m_collisionFilterInfo, CollisionFilterInfo);
-    return apResult;
+    return isCollisionEnabled(rootCollidable->m_broadPhaseHandle.m_collisionFilterInfo, CollisionFilterInfo);
 }
 
 hkBool hkpGroupCollisionFilter::isCollisionEnabled(
@@ -109,11 +105,9 @@ hkBool hkpGroupCollisionFilter::isCollisionEnabled(
     uint32_t keyA,
     uint32_t keyB
 ) const {
-    hkBool result;
     uint32_t v10 = containerShapeA.getCollisionFilterInfo(keyA);
     uint32_t v11 = containerShapeB.getCollisionFilterInfo(keyB);
-    isCollisionEnabled(&result, v10, v11);
-    return result;
+    return isCollisionEnabled(v10, v11);
 }
 
 hkBool hkpGroupCollisionFilter::isCollisionEnabled(
@@ -122,17 +116,13 @@ hkBool hkpGroupCollisionFilter::isCollisionEnabled(
     const hkpShapeContainer& bContainer,
     uint32_t bKey
 ) const {
-    hkBool result;
     uint32_t v7 = bContainer.getCollisionFilterInfo(bKey);
-    isCollisionEnabled(&result, aInput.m_filterInfo, v7);
-    return result;
+    return isCollisionEnabled(aInput.m_filterInfo, v7);
 }
 
 hkBool
 hkpGroupCollisionFilter::isCollisionEnabled(const hkpWorldRayCastInput& a, const hkpCollidable& collidableB) const {
-    hkBool result;
-    isCollisionEnabled(&result, a.m_filterInfo, collidableB.m_broadPhaseHandle.m_collisionFilterInfo);
-    return result;
+    return isCollisionEnabled(a.m_filterInfo, collidableB.m_broadPhaseHandle.m_collisionFilterInfo);
 }
 
 // Walks the 32 group bits with a left shift; the bit never wraps within the loop.
@@ -183,7 +173,7 @@ void hkpGroupCollisionFilter::disableCollisionGroups(uint32_t groupBitsA, uint32
     }
 }
 
-hkBool* hkpGroupCollisionFilter::isCollisionEnabled(hkBool* apResult, uint32_t infoA, uint32_t infoB) const {
+hkBool hkpGroupCollisionFilter::isCollisionEnabled(uint32_t infoA, uint32_t infoB) const {
     if (infoA && infoB) {
         uint32_t v49;
         int32_t v50;
@@ -405,16 +395,13 @@ hkBool* hkpGroupCollisionFilter::isCollisionEnabled(hkBool* apResult, uint32_t i
                  ((v58 = v57 | v56, (infoA & 0x20000000) == 0) ? v59 = 0 : v59 = m_collisionGroups[29],
                   ((v60 = v59 | v58, (infoA & 0x40000000) == 0) ? v61 = 0 : v61 = m_collisionGroups[30],
                    (v4 = v61 | v60, (infoA & 0x80000000u) != 0))))))))) {
-            apResult->m_bool = ((m_collisionGroups[31] | v4) & infoB) != 0;
-            return apResult;
+            return ((m_collisionGroups[31] | v4) & infoB) != 0;
         }
 
-        apResult->m_bool = (v4 & infoB) != 0;
-        return apResult;
+        return (v4 & infoB) != 0;
     }
 
-    apResult->m_bool = m_noGroupCollisionEnabled.m_bool;
-    return apResult;
+    return m_noGroupCollisionEnabled.m_bool;
 }
 
 const hkClass& hkpGroupCollisionFilter::staticClass() {

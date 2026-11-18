@@ -12,7 +12,7 @@ public:
     HavokFileStreambufReader(const char* apPath);
     ~HavokFileStreambufReader() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t read(void* apBuf, int32_t aiBytes) override;
     // These take different parameter types from the base's (seek) and drop the const (tell), so they are new virtual
     // functions rather than overrides. The whence is uint32_t rather than the base's type so that seek does not become

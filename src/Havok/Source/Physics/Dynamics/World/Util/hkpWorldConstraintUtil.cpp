@@ -103,8 +103,7 @@ void hkpWorldConstraintUtil::addConstraint(hkpWorld* world, hkpConstraintInstanc
     intern.m_callbackRequest = hkpConstraintAtom::CALLBACK_REQUEST_NONE;
     if (atomType == hkpConstraintAtom::TYPE_BRIDGE) {
         intern.m_callbackRequest = hkpConstraintAtom::CALLBACK_REQUEST_SETUP_PPU_ONLY;
-        hkBool callbackRequired;
-        if (constraint->getDataRw()->isBuildJacobianCallbackRequired(&callbackRequired)->m_bool) {
+        if (constraint->getDataRw()->isBuildJacobianCallbackRequired().m_bool) {
             intern.m_callbackRequest |= hkpConstraintAtom::CALLBACK_REQUEST_SETUP_CALLBACK;
         }
         intern.m_isNormalType.m_bool = constraint->getType() == hkpConstraintInstance::TYPE_NORMAL;

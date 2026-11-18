@@ -20,7 +20,7 @@ public:
     }
 
     // Whether the collector holds any hit; the result hkBool is written through apResult, which is also returned.
-    hkBool* hasHit(hkBool* apResult);
+    hkBool hasHit();
     // Sorts the collected hits by their hit fraction.
     void sortHits();
 

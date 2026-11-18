@@ -50,8 +50,7 @@ void hkaDetectRagdollPenetration::resetBoneStates() {
 // The box and the penetration a ray finds share one 16-aligned storage area, since their lifetimes do not overlap. The
 // penetration's padding after its two bone indices still holds the box's m_min y, z and w, and the copy into arOutput
 // carries them along, as the game does. The union is that storage.
-hkBool* hkaDetectRagdollPenetration::detectPenetration(
-    hkBool* arResult,
+hkBool hkaDetectRagdollPenetration::detectPenetration(
     const hkaPose& arRagdollPoseIn,
     hkaDetectRagdollPenetration::Output& arOutput
 ) {
@@ -61,7 +60,6 @@ hkBool* hkaDetectRagdollPenetration::detectPenetration(
         hkAabb aabb;
         BonePenetration pen;
     };
-    hkBool apResult;
     arOutput.m_penetrations.m_size = 0;
     if (!m_ragdollIsOut.m_bool) {
         Slot slot;
@@ -90,7 +88,7 @@ hkBool* hkaDetectRagdollPenetration::detectPenetration(
                 slot.aabb.includePoint(pBone->m_translation);
             }
         }
-        if (slot.aabb.isValid(&apResult)->m_bool) {
+        if (slot.aabb.isValid().m_bool) {
             m_setup.m_ragdollPhantom->setAabb(slot.aabb);
         }
         for (int16_t boneIdx = 1; boneIdx < m_numBones; ++boneIdx) {
@@ -116,8 +114,8 @@ hkBool* hkaDetectRagdollPenetration::detectPenetration(
                     pBone = &arRagdollPoseIn.m_modelPose.m_data[boneIdx];
                 }
                 arToWS_ = pBone->m_translation;
-                m_setup.m_raycastInterface->castRay(
-                    &apResult, m_setup.m_ragdollPhantom, arFromWS_, arToWS_, arHitPointWS_, arHitNormalWS_
+                hkBool apResult = m_setup.m_raycastInterface->castRay(
+                    m_setup.m_ragdollPhantom, arFromWS_, arToWS_, arHitPointWS_, arHitNormalWS_
                 );
                 if (apResult.m_bool) {
                     slot.pen.~BonePenetration();
@@ -163,11 +161,9 @@ hkBool* hkaDetectRagdollPenetration::detectPenetration(
             }
             bonesOut.clearAndDeallocate();
         }
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
     m_ragdollIsOut.m_bool = 1;
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }

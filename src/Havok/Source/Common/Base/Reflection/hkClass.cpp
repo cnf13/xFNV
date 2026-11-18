@@ -140,17 +140,15 @@ hkClass* hkClass::getParent() {
 }
 
 // Walks up from k comparing class names, so that records loaded from different files still match.
-hkBool* hkClass::isSuperClass(hkBool* arResult, const hkClass& k) const {
+hkBool hkClass::isSuperClass(const hkClass& k) const {
     const hkClass* c = &k;
     while (c) {
         if (hkString::strCmp(c->getName(), getName()) == 0) {
-            arResult->m_bool = true;
-            return arResult;
+            return true;
         }
         c = c->getParent();
     }
-    arResult->m_bool = false;
-    return arResult;
+    return false;
 }
 
 int32_t hkClass::getNumMembers() const {
@@ -249,13 +247,12 @@ int32_t hkClass::getMemberIndexByName(const char* name) const {
 }
 
 // Whether the class or an ancestor is virtual: the root class's field decides.
-hkBool* hkClass::hasVtable(hkBool* arResult) const {
+hkBool hkClass::hasVtable() const {
     const hkClass* c = this;
     while (const hkClass* pParent = c->getParent()) {
         c = pParent;
     }
-    arResult->m_bool = c->m_numImplementedInterfaces != 0;
-    return arResult;
+    return c->m_numImplementedInterfaces != 0;
 }
 
 int32_t hkClass::getInheritanceDepth() const {

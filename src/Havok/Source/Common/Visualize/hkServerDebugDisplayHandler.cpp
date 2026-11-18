@@ -60,8 +60,7 @@ hkResult hkServerDebugDisplayHandler::addGeometry(
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v10 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v10 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v10);
 }
@@ -73,10 +72,9 @@ hkResult hkServerDebugDisplayHandler::addGeometryInstance(
     int32_t a4,
     hkUlong a5
 ) {
-    hkBool apResult;
     EnterCriticalSection(&m_outstreamLock->m_section);
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    bool v8 = m_outStream && m_outStream->isOk(&apResult)->m_bool;
+    bool v8 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v8);
 }
@@ -92,8 +90,7 @@ hkResult hkServerDebugDisplayHandler::setGeometryColor(int32_t a1, hkUlong a2, i
         this->m_outStream->write32(a3);
     }
     hkDisplaySerializeOStream* m_outStream_1 = this->m_outStream;
-    hkBool bOk;
-    bool v7 = m_outStream_1 && m_outStream_1->isOk(&bOk)->m_bool;
+    bool v7 = m_outStream_1 && m_outStream_1->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v7);
 }
@@ -109,8 +106,7 @@ hkResult hkServerDebugDisplayHandler::updateGeometry(const hkTransform& a1, hkUl
         this->m_outStream->write32(a3);
     }
     hkDisplaySerializeOStream* v6 = this->m_outStream;
-    hkBool ok;
-    bool v7 = v6 && v6->isOk(&ok)->m_bool;
+    bool v7 = v6 && v6->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v7);
 }
@@ -125,8 +121,7 @@ hkResult hkServerDebugDisplayHandler::removeGeometry(hkUlong a1, int32_t a2, hkU
         this->m_outStream->write32(a2);
     }
     hkDisplaySerializeOStream* v6 = this->m_outStream;
-    hkBool bOk;
-    bool v7 = v6 && v6->isOk(&bOk)->m_bool;
+    bool v7 = v6 && v6->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v7);
 }
@@ -155,8 +150,7 @@ hkResult hkServerDebugDisplayHandler::updateCamera(
         this->m_outStream->writeRaw(name, length);
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v12 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v12 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v12);
 }
@@ -171,7 +165,6 @@ hkResult hkServerDebugDisplayHandler::updateBehavior(
     const hkArrayBase<int32_t>& activeTransitions,
     const hkArrayBase<hkQsTransform>& transforms
 ) {
-    hkBool bOk;
     // The node names' lengths, 0 for a null name: the SDK's local hkArray<int>, freed by hand at the end.
     hkArrayBase<int32_t> nameLengths;
     EnterCriticalSection(&m_outstreamLock->m_section);
@@ -247,7 +240,7 @@ hkResult hkServerDebugDisplayHandler::updateBehavior(
         }
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    bool v30 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v30 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v30);
 }
@@ -265,8 +258,7 @@ hkResult hkServerDebugDisplayHandler::displayPoint(const hkVector4& position, in
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream_1 = this->m_outStream;
-    hkBool bOk;
-    bool v8 = m_outStream_1 && m_outStream_1->isOk(&bOk)->m_bool;
+    bool v8 = m_outStream_1 && m_outStream_1->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v8);
 }
@@ -291,8 +283,7 @@ hkResult hkServerDebugDisplayHandler::displayLine(
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream_1 = this->m_outStream;
-    hkBool bOk;
-    bool v9 = m_outStream_1 && m_outStream_1->isOk(&bOk)->m_bool;
+    bool v9 = m_outStream_1 && m_outStream_1->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v9);
 }
@@ -327,8 +318,7 @@ hkResult hkServerDebugDisplayHandler::displayTriangle(
         }
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v13 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v13 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v13);
 }
@@ -351,8 +341,7 @@ hkResult hkServerDebugDisplayHandler::displayText(const char* text, int32_t colo
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v9 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v9 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v9);
 }
@@ -384,8 +373,7 @@ hkResult hkServerDebugDisplayHandler::display3dText(
         this->m_outStream->writeFloat32(pos(2));
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v11 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v11 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v11);
 }
@@ -407,8 +395,7 @@ hkResult hkServerDebugDisplayHandler::displayAnnotation(const char* text, int32_
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v8 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v8 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v8);
 }
@@ -433,8 +420,7 @@ hkResult hkServerDebugDisplayHandler::displayGeometry(
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v10 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v10 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v10);
 }
@@ -457,8 +443,7 @@ hkResult hkServerDebugDisplayHandler::displayGeometry(
         this->m_outStream->write32(tag);
     }
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
-    hkBool bOk;
-    bool v9 = m_outStream && m_outStream->isOk(&bOk)->m_bool;
+    bool v9 = m_outStream && m_outStream->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v9);
 }
@@ -474,14 +459,12 @@ hkResult hkServerDebugDisplayHandler::sendMemStatsDump(const char* data, int32_t
         this->m_outStream->writeRaw(data, length);
     }
     hkDisplaySerializeOStream* m_outStream_1 = this->m_outStream;
-    hkBool bOk;
-    bool v7 = m_outStream_1 && m_outStream_1->isOk(&bOk)->m_bool;
+    bool v7 = m_outStream_1 && m_outStream_1->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v7);
 }
 
 hkResult hkServerDebugDisplayHandler::holdImmediate() {
-    hkBool apResult;
     EnterCriticalSection(&m_outstreamLock->m_section);
     hkDisplaySerializeOStream* m_outStream = this->m_outStream;
     if (m_outStream) {
@@ -489,7 +472,7 @@ hkResult hkServerDebugDisplayHandler::holdImmediate() {
         this->m_outStream->write8u(11);
     }
     hkDisplaySerializeOStream* v3 = this->m_outStream;
-    bool v4 = v3 && v3->isOk(&apResult)->m_bool;
+    bool v4 = v3 && v3->isOk().m_bool;
     LeaveCriticalSection(&m_outstreamLock->m_section);
     return static_cast<hkResult>(!v4);
 }

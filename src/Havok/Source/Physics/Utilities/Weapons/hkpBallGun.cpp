@@ -216,8 +216,7 @@ hkpBallGun::~hkpBallGun() {
             m_listeners.m_data[i]->bulletDeletedCallback(pBody);
         }
         if (pBody->m_world) {
-            hkBool result;
-            pBody->m_world->removeEntity(&result, pBody);
+            pBody->m_world->removeEntity(pBody);
         }
         pBody->removeReference();
     }
@@ -305,8 +304,7 @@ void hkpBallGun::fireGun(hkpWorld* world, const hkTransform& viewTransform) {
             m_listeners.m_data[i]->bulletDeletedCallback(pOldest);
         }
         if (pOldest->m_world) {
-            hkBool bRemoved;
-            world->removeEntity(&bRemoved, pOldest);
+            world->removeEntity(pOldest);
         }
         pOldest->removeReference();
     }
@@ -329,8 +327,7 @@ void hkpBallGun::reset(hkpWorld* world) {
                 v8->bulletDeletedCallback(static_cast<hkpRigidBody*>(v6));
             }
             if (v6->m_world == v4) {
-                hkBool result;
-                v4->removeEntity(&result, v6);
+                v4->removeEntity(v6);
             }
             v6->removeReference();
             m_addedBodies = this->m_addedBodies;

@@ -18,12 +18,12 @@ public:
     hkStreamWriter();
     ~hkStreamWriter() override;
 
-    virtual hkBool* isOk(hkBool* arResult) const = 0;
+    virtual hkBool isOk() const = 0;
     // Writes the bytes; returns how many were written.
     virtual int32_t write(const void* apBuffer, int32_t aiNumBytes) = 0;
     virtual void flush() {}
     // The base says no.
-    virtual hkBool* seekTellSupported(hkBool* arResult) const;
+    virtual hkBool seekTellSupported() const;
     // The base fails (returns 1).
     virtual hkResult seek(int32_t offset, hkStreamWriter::SeekWhence whence);
     // The base returns -1.

@@ -205,17 +205,13 @@ uint8_t hkpHingeConstraintData::getNotifiedBodyIndex() const {
     return (uint8_t)((int32_t)(((uint32_t)((int32_t)m_atoms.m_ballSocket.m_bodiesToNotify)) >> 1));
 }
 
-hkBool* hkpHingeConstraintData::isValid(hkBool* arResult) const {
-    hkBool a2;
-    hkBool apResult;
-    if (m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(&a2, 0.001f)->m_bool &&
-        m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(&apResult, 0.001f)->m_bool) {
-        arResult->m_bool = 1;
-        return arResult;
+hkBool hkpHingeConstraintData::isValid() const {
+    if (m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(0.001f).m_bool &&
+        m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(0.001f).m_bool) {
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpHingeConstraintData::getType() const {

@@ -30,7 +30,7 @@ public:
     hkpStiffSpringChainData(hkFinishLoadedObjectFlag aFlag);
     ~hkpStiffSpringChainData() override;
 
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     int32_t getNumConstraintInfos() override {
         return m_infos.m_size;

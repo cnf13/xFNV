@@ -224,18 +224,14 @@ hkpPrismaticConstraintData::~hkpPrismaticConstraintData() {
     }
 }
 
-hkBool* hkpPrismaticConstraintData::isValid(hkBool* arResult) const {
-    hkBool a2;
-    hkBool apResult;
-    if (m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(&a2, 0.001f)->m_bool &&
-        (m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(&apResult, 0.001f)->m_bool &&
+hkBool hkpPrismaticConstraintData::isValid() const {
+    if (m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(0.001f).m_bool &&
+        (m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(0.001f).m_bool &&
          m_atoms.m_linLimit.m_max >= static_cast<double>(m_atoms.m_linLimit.m_min))) {
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpPrismaticConstraintData::getType() const {

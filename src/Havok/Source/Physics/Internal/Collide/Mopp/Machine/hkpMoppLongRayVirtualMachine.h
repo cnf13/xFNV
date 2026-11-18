@@ -47,8 +47,7 @@ public:
     );
     // The other queryLongRay, filling one ray result: stores the result pointer, the collection and the code, the ray,
     // walks the tree and returns m_hitFound. Its caller is hkpMoppBvTreeShape::castRayImpl.
-    hkBool* queryLongRay_00DD2DF0(
-        hkBool* apResult,
+    hkBool queryLongRay_00DD2DF0(
         const hkpShapeContainer* collection,
         const hkpMoppCode* code,
         const hkpShapeRayCastInput& input,

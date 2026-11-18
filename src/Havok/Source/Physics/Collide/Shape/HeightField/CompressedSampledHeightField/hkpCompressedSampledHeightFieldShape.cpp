@@ -29,8 +29,7 @@ hkpCompressedSampledHeightFieldShape::hkpCompressedSampledHeightFieldShape(const
     m_heightfieldType.m_storage = HEIGHTFIELD_COMPRESSED;
     m_xRes = hf->m_xRes;
     m_zRes = hf->m_zRes;
-    hkBool triangleFlip;
-    hf->getTriangleFlipImpl(&triangleFlip);
+    hkBool triangleFlip = hf->getTriangleFlipImpl();
     m_triangleFlip = triangleFlip;
     m_heightCenter = hf->m_heightCenter;
     m_intToFloatScale = hf->m_intToFloatScale;
@@ -114,8 +113,7 @@ void hkpCompressedSampledHeightFieldShape::collideSpheres(
         int32_t vertX;
         float dx;
         float dz;
-        hkBool flip;
-        getTriangleFlipImpl(&flip);
+        hkBool flip = getTriangleFlipImpl();
         if (flip.m_bool) {
             float h00 = getHeightAtImpl(x, z);
             vertHeight = h00;
@@ -193,9 +191,8 @@ void hkpCompressedSampledHeightFieldShape::collideSpheres(
     }
 }
 
-hkBool* hkpCompressedSampledHeightFieldShape::getTriangleFlipImpl(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)m_triangleFlip.m_bool);
-    return arResult;
+hkBool hkpCompressedSampledHeightFieldShape::getTriangleFlipImpl() const {
+    return (int8_t)((uint8_t)m_triangleFlip.m_bool);
 }
 
 const hkClass& hkpCompressedSampledHeightFieldShape::staticClass() {

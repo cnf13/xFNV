@@ -188,14 +188,12 @@ hkIstream::~hkIstream() {
     }
 }
 
-hkBool* hkIstream::isOk(hkBool* apResult) {
+hkBool hkIstream::isOk() {
     if (m_streamReader) {
-        m_streamReader->isOk(apResult);
-        return apResult;
+        return m_streamReader->isOk();
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 int32_t hkIstream::getline(char* str, int32_t maxlen, char delim) {

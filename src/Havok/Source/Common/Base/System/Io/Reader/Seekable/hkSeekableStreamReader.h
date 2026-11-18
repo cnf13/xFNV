@@ -7,13 +7,13 @@
 class hkSeekableStreamReader : public hkStreamReader {
 public:
     // Says yes.
-    hkBool* markSupported(hkBool* arResult) const override;
+    hkBool markSupported() const override;
     // Takes the current position as the mark; fails (returns 1) when tell gives -1. The limit is not used.
     hkResult setMark(int32_t markLimit) override;
     // Seeks to the mark, from the start.
     hkResult rewindToMark() override;
     // Says yes.
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
 
     int32_t m_markPos;
 };

@@ -43,7 +43,7 @@ public:
         return float(m_storage.m_data[index]) * m_scale + m_offset;
     }
 
-    hkBool* getTriangleFlipImpl(hkBool* arResult) const override;
+    hkBool getTriangleFlipImpl() const override;
 
     static const hkClass& staticClass();
 

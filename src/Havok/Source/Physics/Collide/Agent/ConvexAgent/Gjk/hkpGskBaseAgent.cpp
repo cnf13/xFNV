@@ -284,8 +284,7 @@ void hkpGskBaseAgent::warpTime(float oldTime, float newTime, const hkpCollisionI
 // GSK from the cached simplex, the cache written back on a feature change. Within the tolerance the closest points move
 // onto the shapes' surfaces: A's by its radius along the normal, B's (in B's space) by the distance from A's. The
 // distance is stored as a float.
-hkBool* hkpGskBaseAgent::_getClosestPoint(
-    hkBool* apResult,
+hkBool hkpGskBaseAgent::_getClosestPoint(
     const hkpCdBody& bodyA,
     const hkpCdBody& bodyB,
     const hkpCollisionInput& input,
@@ -327,8 +326,7 @@ hkBool* hkpGskBaseAgent::_getClosestPoint(
     const float fDistance = fGskDistance - shapeA->m_radius - shapeB->m_radius;
     output.m_distance.m_storage = fDistance;
     if (!(input.m_tolerance > fDistance)) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
     const float fRadiusA = shapeA->m_radius;
     const float fNegDistance = -fDistance;
@@ -346,8 +344,7 @@ hkBool* hkpGskBaseAgent::_getClosestPoint(
         aTb.m_translation.m_quad
     );
     output.m_pointBinB._setRotatedInverseDir(aTb.getRotation(), pointBinA);
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 // Havok SDK: builds a GSK cache for the pair (aTb places B in A's space), runs GSK from it and reports the pair when

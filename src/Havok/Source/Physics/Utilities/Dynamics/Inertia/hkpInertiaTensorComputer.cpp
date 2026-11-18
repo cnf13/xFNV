@@ -579,8 +579,7 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
             maxInertia = childInertia;
         }
     }
-    hkBool isFixedOrKeyframed;
-    body->isFixedOrKeyframed(&isFixedOrKeyframed);
+    hkBool isFixedOrKeyframed = body->isFixedOrKeyframed();
     if (isFixedOrKeyframed.m_bool) {
         // EXE-INLINED none: hkInplaceArray<const hkpConstraintInstance*, 16>::~hkInplaceArray
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;

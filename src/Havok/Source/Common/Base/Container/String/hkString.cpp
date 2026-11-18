@@ -148,22 +148,19 @@ void hkString::memSet(void* dst, int32_t c, int32_t n) {
 }
 
 // Whether apcString ends with apcEnding; the lengths compare signed.
-hkBool* hkString::endsWith(hkBool* arResult, const char* apcString, const char* apcEnding) {
+hkBool hkString::endsWith(const char* apcString, const char* apcEnding) {
     const int32_t iStringLen = strLen(apcString);
     const int32_t iEndingLen = strLen(apcEnding);
     if (iStringLen < iEndingLen) {
-        arResult->m_bool = 0;
-        return arResult;
+        return 0;
     }
     const char* pcTail = apcString + (iStringLen - iEndingLen);
     for (int32_t i = 0; i < iEndingLen; ++i) {
         if (pcTail[i] != apcEnding[i]) {
-            arResult->m_bool = 0;
-            return arResult;
+            return 0;
         }
     }
-    arResult->m_bool = 1;
-    return arResult;
+    return 1;
 }
 
 int32_t hkString::strNcmp(const char* a, const char* b, int32_t a3) {
@@ -239,10 +236,9 @@ const char* hkString::strStr(const char* haystack, const char* needle) {
 }
 
 // Appends the index of every occurrence of apcSubString in apcString to arOffsets, growing the array through the
-// calling thread's heap: the first occurrence always, the later ones only for REPLACE_ALL. arResult says whether there
-// was one at all; the search goes on from the character after the match's start.
-hkBool* hkString::findAllOccurrences(
-    hkBool* arResult,
+// calling thread's heap: the first occurrence always, the later ones only for REPLACE_ALL. The result says whether
+// there was one at all; the search goes on from the character after the match's start.
+hkBool hkString::findAllOccurrences(
     const char* apcString,
     const char* apcSubString,
     hkArray<int32_t>& arOffsets,
@@ -250,12 +246,13 @@ hkBool* hkString::findAllOccurrences(
 ) {
     const int32_t iSubLength = strLen(apcSubString);
     const char* pcFound = strStr(apcString, apcSubString);
-    arResult->m_bool = 0;
+    hkBool result;
+    result.m_bool = 0;
     if (pcFound == nullptr) {
-        return arResult;
+        return result;
     }
     for (;;) {
-        arResult->m_bool = 1;
+        result.m_bool = 1;
         hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
         if (arOffsets.m_size == (arOffsets.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
             hkArrayUtil::_reserveMore(*kRouter.m_heap, &arOffsets, sizeof(int32_t));
@@ -263,11 +260,11 @@ hkBool* hkString::findAllOccurrences(
         arOffsets.m_data[arOffsets.m_size] = static_cast<int32_t>(pcFound - apcString);
         ++arOffsets.m_size;
         if (eReplaceType == REPLACE_ONE) {
-            return arResult;
+            return result;
         }
         pcFound = strStr(pcFound + iSubLength, apcSubString);
         if (pcFound == nullptr) {
-            return arResult;
+            return result;
         }
     }
 }
@@ -276,7 +273,7 @@ void hkString::strFree_00CB1190(char* s, hkMemoryAllocator& alloc) {
     hkMemoryRouter::easyFree(alloc, s);
 }
 
-hkBool* hkString::beginsWith(hkBool* apResult, const char* a, const char* b) {
+hkBool hkString::beginsWith(const char* a, const char* b) {
     const char* v3 = b;
     char v4 = *b;
     if (*b) {
@@ -286,13 +283,11 @@ hkBool* hkString::beginsWith(hkBool* apResult, const char* a, const char* b) {
                 goto LABEL_4;
             }
         }
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
 
 LABEL_4:;
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 int32_t hkString::lastIndexOf(const char* str, char c) {

@@ -307,9 +307,8 @@ const hkClassEnum& hkClassMember::getEnumType() {
     return *m_enum;
 }
 
-hkBool* hkClassMember::isNotOwner(hkBool* apResult) {
-    apResult->m_bool = m_flags.allAreSet(NOT_OWNED);
-    return apResult;
+hkBool hkClassMember::isNotOwner() {
+    return m_flags.allAreSet(NOT_OWNED);
 }
 
 int32_t hkClassMember::getAlignment() const {

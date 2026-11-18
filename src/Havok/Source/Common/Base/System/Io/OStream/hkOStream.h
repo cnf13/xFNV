@@ -37,7 +37,7 @@ public:
     void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;
     const hkClass* getClassType() const override;
 
-    hkBool* isOk(hkBool* arResult) const;
+    hkBool isOk() const;
     hkOstream& operator<<(const void* apPointer);
     hkOstream& operator<<(hkBool abValue);
     hkOstream& operator<<(char acValue);

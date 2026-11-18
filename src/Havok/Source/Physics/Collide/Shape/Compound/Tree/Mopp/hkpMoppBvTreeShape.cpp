@@ -314,8 +314,7 @@ hkBool hkpMoppBvTreeShape::castRayImpl(const hkpShapeRayCastInput& input, hkpSha
     code.m_buildType.m_storage = static_cast<int8_t>(hkpMoppCode::BUILD_NOT_SET);
     // The child is the shape collection the code was built over; the SDK casts it down.
     const hkpShapeCollection* collection = static_cast<const hkpShapeCollection*>(m_child.m_childShape);
-    hkBool result;
-    machine.queryLongRay_00DD2DF0(&result, collection, &code, input, results);
+    hkBool result = machine.queryLongRay_00DD2DF0(collection, &code, input, results);
     // EXE-INLINED none: hkpShapeRayCastOutput::changeLevel
     --results.m_shapeKeyIndex;
     if (result.m_bool) {

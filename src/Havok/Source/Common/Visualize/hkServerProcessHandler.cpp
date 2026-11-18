@@ -60,16 +60,15 @@ void hkServerProcessHandler::getConsumableCommands(uint8_t*& commands, int32_t& 
 void hkServerProcessHandler::consumeCommand(uint8_t command) {
     // The SDK's read32: one 4-byte element.
     int32_t id;
-    hkBool bOk;
     if (command == hkProcessHandler::HK_CREATE_PROCESS) {
         m_inStream->readArrayGeneric(&id, sizeof(id), 1);
-        if (m_inStream->isOk(&bOk)->m_bool) {
+        if (m_inStream->isOk().m_bool) {
             static_cast<hkProcessHandler*>(this)->createProcess(id);
         }
     }
     else if (command == hkProcessHandler::HK_DELETE_PROCESS) {
         m_inStream->readArrayGeneric(&id, sizeof(id), 1);
-        if (m_inStream->isOk(&bOk)->m_bool) {
+        if (m_inStream->isOk().m_bool) {
             static_cast<hkProcessHandler*>(this)->deleteProcess(id);
         }
     }
@@ -148,8 +147,7 @@ void hkServerProcessHandler::step(float frameTimeInMs) {
         v4->step(frameTimeInMs);
     }
     if (m_inStream) {
-        hkBool bConsumed;
-        m_commandRouter.consumeCommands(&bConsumed, m_inStream);
+        m_commandRouter.consumeCommands(m_inStream);
     }
 }
 
@@ -190,8 +188,6 @@ void hkProcess::getConsumableCommands(uint8_t*& commands, int32_t& numCommands) 
 }
 
 bool hkProcess::isOk() {
-    // isOk writes bOk before it is read.
-    hkBool bOk;
     hkDisplaySerializeOStream* pOutStream = m_outStream;
-    return pOutStream && pOutStream->isOk(&bOk)->m_bool;
+    return pOutStream && pOutStream->isOk().m_bool;
 }

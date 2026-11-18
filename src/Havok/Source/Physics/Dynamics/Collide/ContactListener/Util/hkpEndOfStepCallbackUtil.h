@@ -18,7 +18,7 @@ public:
     // A registered collision: the contact manager, the listener to tell and which body's listener it is.
     struct Collision {
         // The same manager, listener and source.
-        hkBool* equals(hkBool* apResult, const Collision& other) const;
+        hkBool equals(const Collision& other) const;
         // Ordered by the uids of the collision's two entities, the first entity's first: the merge's sort key.
         hkBool operator<(const Collision& other) const;
 

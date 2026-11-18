@@ -29,7 +29,7 @@ public:
     void worldRemovedCallback(hkpWorld* world) override;
 
     void dragObject(const hkVector4& newWorldSpacePoint);
-    hkBool* pickObject(hkBool* apResult, uint64_t id, const hkVector4& worldPosition);
+    hkBool pickObject(uint64_t id, const hkVector4& worldPosition);
     // Removes the mouse spring from the world, wakes its body and releases it.
     void releaseObject();
 

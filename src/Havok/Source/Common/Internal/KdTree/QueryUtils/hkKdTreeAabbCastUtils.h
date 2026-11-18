@@ -32,8 +32,7 @@ public:
     // Casts the box of castInput through root, passing each primitive whose bounds (grown by aabbCheckTolerance) the
     // cast reaches before the collector's hit fraction to collector->addMidPhaseHit; the result is collector->hasHit,
     // written to arResult.
-    static hkBool* castAabb(
-        hkBool* arResult,
+    static hkBool castAabb(
         const hkKdTree* root,
         hkCastAabbInput& castInput,
         hkKdTreeCastCollector* collector,

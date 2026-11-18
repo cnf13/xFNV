@@ -14,8 +14,7 @@
 // address. query holds the box in the current node's integer space; a rescale, a terminal offset or a property command
 // moves it into scaledQuery first, which the recursive calls are given. The rescale (commands 1 to 4) writes neither
 // scaledQuery's paddings nor its tail. A property command stores property 0 only.
-hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
-    hkBool* apResult,
+hkBool hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
     const hkpMoppObbVirtualMachineQuery* query,
     const uint8_t* PC,
     int32_t chunkOffset
@@ -35,7 +34,7 @@ hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
         int32_t property;
         uint32_t propertyValue;
         switch (command) {
-            case 0: apResult->m_bool = m_tempLastShouldTerminalBeRemoved.m_bool; return apResult;
+            case 0: return m_tempLastShouldTerminalBeRemoved.m_bool;
             case 1:
             case 2:
             case 3:
@@ -235,8 +234,7 @@ hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
                 // Cuts the box against the node's bounds along one axis.
                 const int32_t axis = command - 38;
                 if ((&query->m_xHi)[axis] < PC[1] || (&query->m_xLo)[axis] >= PC[2]) {
-                    apResult->m_bool = 0;
-                    return apResult;
+                    return 0;
                 }
                 PC += 3;
                 continue;
@@ -248,8 +246,7 @@ hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
                 const int32_t axis = command - 41;
                 if ((&m_xHi)[axis] < (((PC[1] << 8) + PC[2]) << 8) + PC[3] ||
                     (&m_xLo)[axis] > (((PC[4] << 8) + PC[5]) << 8) + PC[6]) {
-                    apResult->m_bool = 0;
-                    return apResult;
+                    return 0;
                 }
                 PC += 7;
                 continue;
@@ -297,8 +294,7 @@ hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
                         (query->m_primitiveOffset + terminal);
                     m_tempLastShouldTerminalBeRemoved.m_bool =
                         m_modifier->shouldTerminalBeRemoved(id, query->m_properties).m_bool;
-                    apResult->m_bool = m_tempLastShouldTerminalBeRemoved.m_bool;
-                    return apResult;
+                    return m_tempLastShouldTerminalBeRemoved.m_bool;
                 }
             case 96:
             case 97:
@@ -358,25 +354,18 @@ hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
         char removeRight = 0;
         if (hi > rightMin) {
             if (lo < leftMax) {
-                hkBool leftResult;
-                removeLeft = queryModicationPointsRecursive(&leftResult, query, PC + leftOffset, chunkOffset)->m_bool;
-                hkBool rightResult;
-                removeRight =
-                    queryModicationPointsRecursive(&rightResult, query, PC + rightOffset, chunkOffset)->m_bool;
+                removeLeft = queryModicationPointsRecursive(query, PC + leftOffset, chunkOffset).m_bool;
+                removeRight = queryModicationPointsRecursive(query, PC + rightOffset, chunkOffset).m_bool;
             }
             else {
-                hkBool rightResult;
-                removeRight =
-                    queryModicationPointsRecursive(&rightResult, query, PC + rightOffset, chunkOffset)->m_bool;
+                removeRight = queryModicationPointsRecursive(query, PC + rightOffset, chunkOffset).m_bool;
             }
         }
         else {
             if (lo >= leftMax) {
-                apResult->m_bool = 0;
-                return apResult;
+                return 0;
             }
-            hkBool leftResult;
-            removeLeft = queryModicationPointsRecursive(&leftResult, query, PC + leftOffset, chunkOffset)->m_bool;
+            removeLeft = queryModicationPointsRecursive(query, PC + leftOffset, chunkOffset).m_bool;
         }
         // One child to remove and not the other: the modifier removes that child alone.
         if (removeRight == 0 && removeLeft != 0) {
@@ -385,8 +374,7 @@ hkBool* hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
         if (removeRight != 0 && removeLeft == 0) {
             m_modifier->addTerminalRemoveInfo(static_cast<int32_t>(PC + rightOffset - m_code.m_storage->m_data.m_data));
         }
-        apResult->m_bool = removeLeft != 0 && removeRight != 0;
-        return apResult;
+        return removeLeft != 0 && removeRight != 0;
     }
 }
 
@@ -448,8 +436,7 @@ void hkpMoppModifyVirtualMachine::queryAabb(const hkpMoppCode* code, const hkAab
     query.m_properties[0] = 0;
     uint8_t* pCommands = const_cast<uint8_t*>(m_code.m_storage->m_data.begin());
     m_reindexingMask.m_storage = (*pCommands != 13) - 1;
-    hkBool bRemoveAll;
-    queryModicationPointsRecursive(&bRemoveAll, &query, pCommands, 0);
+    hkBool bRemoveAll = queryModicationPointsRecursive(&query, pCommands, 0);
     if (bRemoveAll) {
         modifierOut->addTerminalRemoveInfo(*m_code.m_storage->m_data.begin() != 13 ? 0 : 5);
     }

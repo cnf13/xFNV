@@ -14,10 +14,10 @@ struct hkKdTreeNode;
 // hkKdTreeMath.inl's file-static hkGetOneOver65K: returns 1 / 65535 in every lane.
 hkQuadReal hkGetOneOver65K_D1B280();
 // Calls isSameSignDiff on apA and apB under aiMask and returns its hkBool through apResult.
-hkBool* isSameSignDiffWrapper(hkBool* apResult, const hkVector4* apA, const hkVector4* apB, int32_t aiMask);
+hkBool isSameSignDiffWrapper(const hkVector4* apA, const hkVector4* apB, int32_t aiMask);
 // Whether, under the lane mask x3, each of the three vectors x2[i] - x1[i] has all its masked lanes of one sign (all
 // below, all equal to or all above 0), into the hkBool x0; returns x0.
-hkBool* isSameSignDiff(hkBool* x0, const hkVector4* x1, const hkVector4* x2, int32_t x3);
+hkBool isSameSignDiff(const hkVector4* x1, const hkVector4* x2, int32_t x3);
 
 // Ray queries over an hkKdTree.
 class hkKdTreeUtils {
@@ -50,8 +50,7 @@ public:
     };
 
     // Casts the ray from from to to through tree, reporting each leaf it reaches to collector.
-    static hkBool* castRayIterative(
-        hkBool* arResult,
+    static hkBool castRayIterative(
         const hkKdTree* tree,
         const hkVector4& from,
         const hkVector4& to,
@@ -61,16 +60,14 @@ public:
     // Casts the four rays of a bundle, each from its lane of fromBundle to its lane of toBundle, front to back through
     // tree, the rays rayMask selects, reporting each projected entry whose box an active ray reaches before its hit
     // fraction to collector. The hkBool result is written to arResult and is always true.
-    static hkBool* castRayBundleIterative(
-        hkBool* arResult,
+    static hkBool castRayBundleIterative(
         const hkKdTree* tree,
         const RayBundle& fromBundle,
         const RayBundle& toBundle,
         hkKdTreeBundleCastCollector* collector,
         hkVector4Comparison::Mask rayMask
     );
-    static hkBool* castRayMultiTree(
-        hkBool* apResult,
+    static hkBool castRayMultiTree(
         int32_t numTrees,
         hkKdTree* const* trees,
         const hkVector4& start,

@@ -15,10 +15,10 @@ public:
     hkBufferedStreamWriter(hkStreamWriter* apStream, int32_t aiBufSize);
     ~hkBufferedStreamWriter() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t write(const void* mem, int32_t memSize) override;
     void flush() override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t relOffset, hkStreamWriter::SeekWhence whence) override;
     int32_t tell() const override;
     void calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const override;

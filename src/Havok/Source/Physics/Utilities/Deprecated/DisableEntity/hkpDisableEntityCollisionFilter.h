@@ -48,8 +48,8 @@ public:
     hkBool isCollisionEnabled(const hkpWorldRayCastInput& a, const hkpCollidable& collidableB) const override;
 
     // Drops entity from the filter; the result says whether it was held.
-    hkBool* removeEntityFromFilter(hkBool* arResult, hkpEntity* entity);
-    hkBool* addEntityToFilter(hkBool* apResult, hkpEntity* new_entity);
+    hkBool removeEntityFromFilter(hkpEntity* entity);
+    hkBool addEntityToFilter(hkpEntity* new_entity);
 
     // DeletingDestruct's free (the thread's Havok heap): names one of the two bases' operator deletes.
     static void operator delete(void* apMemory) {

@@ -134,20 +134,15 @@ public:
     static void subSolve(hkpConstraintSolverResources& s, hkpConstraintSolverSetup::SolverMode mode);
     // Whether the constraints' schemas and element temps still fit the resources' buffer. The result is written through
     // apResult.
-    static hkBool* internalIsMemoryOkForNewJacobianSchemas(
-        hkBool* apResult,
+    static hkBool internalIsMemoryOkForNewJacobianSchemas(
         hkpConstraintSolverResources& s,
         hkpConstraintInstance** constraints,
         int32_t numConstraints
     );
     // Whether numEntities more accumulators (and the fixed one, while none is built yet) still fit the resources'
     // accumulator buffer, 16 bytes kept free. The result is written through apResult.
-    static hkBool* internalIsMemoryOkForNewAccumulators(
-        hkBool* apResult,
-        hkpConstraintSolverResources& s,
-        hkpEntity** entities,
-        int32_t numEntities
-    );
+    static hkBool
+    internalIsMemoryOkForNewAccumulators(hkpConstraintSolverResources& s, hkpEntity** entities, int32_t numEntities);
     // Releases what the solve took from the resources: nothing to do on the PC.
     static void shutdownSolver(hkpConstraintSolverResources& s);
 };

@@ -297,29 +297,29 @@ uint8_t hkpRagdollConstraintData::getNotifiedBodyIndex() const {
 
 // Each partial result is stored to the result, as the game does: both frames' rotations orthonormal (to 0.001), the
 // cone limit's minimum angle at its -100 marker, its maximum angle in [0, pi), the planes' and the twist's limits in
-// order. isOrthonormal's result goes to a local.
-hkBool* hkpRagdollConstraintData::isValid(hkBool* arResult) const {
-    hkBool orthonormal;
-    arResult->m_bool = 1;
-    bool bValid = m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(&orthonormal, 0.001f)->m_bool != 0;
-    arResult->m_bool = bValid;
-    bValid = bValid && m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(&orthonormal, 0.001f)->m_bool;
-    arResult->m_bool = bValid;
+// order.
+hkBool hkpRagdollConstraintData::isValid() const {
+    hkBool result;
+    result.m_bool = 1;
+    bool bValid = m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(0.001f).m_bool != 0;
+    result.m_bool = bValid;
+    bValid = bValid && m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(0.001f).m_bool;
+    result.m_bool = bValid;
     bValid = bValid && m_atoms.m_coneLimit.m_minAngle == -100.0;
-    arResult->m_bool = bValid;
+    result.m_bool = bValid;
     bValid = bValid && m_atoms.m_coneLimit.m_maxAngle >= 0.0f;
-    arResult->m_bool = bValid;
+    result.m_bool = bValid;
     bValid = bValid && m_atoms.m_coneLimit.m_maxAngle < 3.1415927410125732;
-    arResult->m_bool = bValid;
+    result.m_bool = bValid;
     bValid = bValid && m_atoms.m_planesLimit.m_maxAngle >= m_atoms.m_planesLimit.m_minAngle;
-    arResult->m_bool = bValid;
+    result.m_bool = bValid;
     if (bValid && m_atoms.m_twistLimit.m_maxAngle >= m_atoms.m_twistLimit.m_minAngle) {
-        arResult->m_bool = 1;
-        return arResult;
+        result.m_bool = 1;
+        return result;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    result.m_bool = 0;
+    return result;
 }
 
 int32_t hkpRagdollConstraintData::getType() const {

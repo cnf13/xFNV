@@ -320,8 +320,7 @@ void hkaNURBS::RemoveSubtractOne(int32_t i, hkArray<int32_t, hkContainerHeapAllo
     }
 }
 
-hkBool* hkaNURBS::WithinTolerance(
-    hkBool* apResult,
+hkBool hkaNURBS::WithinTolerance(
     int32_t n,
     int32_t p,
     const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P,
@@ -334,8 +333,7 @@ hkBool* hkaNURBS::WithinTolerance(
     int32_t v14 = 0;
     if (m < 0) {
     LABEL_5:;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
     int32_t v13 = 0;
@@ -359,13 +357,11 @@ hkBool* hkaNURBS::WithinTolerance(
             goto LABEL_5;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 // True when every point Q[i] lies within E[i] (plus 0.001) of the curve at its parameter ub[i].
-hkBool* hkaNURBS::WithinTolerance(
-    hkBool* apResult,
+hkBool hkaNURBS::WithinTolerance(
     int32_t n,
     int32_t p,
     const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P,
@@ -388,13 +384,11 @@ hkBool* hkaNURBS::WithinTolerance(
             float fTol = pE[i] + 0.0010000000474974513;
             // A NaN goes on to the next point.
             if (fTol < dDist) {
-                apResult->m_bool = 0;
-                return apResult;
+                return 0;
             }
         }
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 // The overload that computes the parameters itself: hkArray<hkReal> ub(m + 1) filled by ChordLengthParameterization,
@@ -527,8 +521,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
             P.m_size = iPoints;
 
             int32_t iNext = j + 1;
-            hkBool bFit;
-            LeastSquaresFit(&bFit, n, iNext, P, U, m, Q, ub, 1e-05f, E);
+            hkBool bFit = LeastSquaresFit(n, iNext, P, U, m, Q, ub, 1e-05f, E);
             if (!bFit.m_bool) {
                 n += -1 - DegreeLowerKnotVector(U, n + j + 1);
                 iPoints = n + 1;
@@ -550,8 +543,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
             }
         }
         if (iRemoved) {
-            hkBool bFit;
-            LeastSquaresFit(&bFit, n, p, P, U, m, Q, ub, 1e-05f, E);
+            LeastSquaresFit(n, p, P, U, m, Q, ub, 1e-05f, E);
             computeProjectionErrors(m, pQ, n, p, &U, &P, &ek, &ub, 100, 10, 1e-06f, 1e-06f, bProject);
             RemoveKnotsBoundCurve(n, p, U, P, m, ub, ek, E, Q);
         }
@@ -1441,8 +1433,7 @@ int32_t hkaNURBS::RemoveKnotsBoundCurve(
 
 // Of the parameters ub, a knot span holding one at least tol inside it gets its flag set; the knot vector is well posed
 // when the flag of every distinct span is set. The flags are n + 1 cleared elements.
-hkBool* hkaNURBS::IsWellPosed(
-    hkBool* apResult,
+hkBool hkaNURBS::IsWellPosed(
     int32_t n,
     int32_t p,
     const hkArray<float, hkContainerHeapAllocator>& U,
@@ -1489,19 +1480,19 @@ hkBool* hkaNURBS::IsWellPosed(
             break;
         }
     }
-    apResult->m_bool = cWellPosed;
+    hkBool result;
+    result.m_bool = cWellPosed;
     pHeap = hkMemoryRouter::getInstance().m_heap;
     if (iFlagCapacity >= 0) {
         pHeap->bufFree(pFlags, static_cast<int32_t>(iFlagCapacity & hkArrayBase<hkBool>::CAPACITY_MASK));
     }
-    return apResult;
+    return result;
 }
 
 // N holds the basis functions N[i][j] = N(j, p)(ub[i]) of the inner points and control points, R the points less their
 // first and last control points' share, Rm the right-hand side N^T R, solved for X by conjugate gradients
 // (hkaCGSolver<float>::Solve) starting from the inner points.
-hkBool* hkaNURBS::LeastSquaresFit(
-    hkBool* apResult,
+hkBool hkaNURBS::LeastSquaresFit(
     int32_t n,
     int32_t p,
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P,
@@ -1514,8 +1505,7 @@ hkBool* hkaNURBS::LeastSquaresFit(
 ) {
     const int32_t iElemSize = static_cast<int32_t>(sizeof(hkaNURBS::Point));
     if (n > m) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
     hkaSparseLSQMatrix<float> N(m - 1, n - 1);
     int32_t iLast = n + p + 1;
@@ -1588,14 +1578,14 @@ hkBool* hkaNURBS::LeastSquaresFit(
         }
     }
 
-    hkBool bWellPosed;
-    if (!*IsWellPosed(&bWellPosed, n, p, U, ub.m_size - 1, ub, tol)) {
-        apResult->m_bool = 0;
+    hkBool result;
+    if (!IsWellPosed(n, p, U, ub.m_size - 1, ub, tol)) {
+        result.m_bool = 0;
         pHeap = hkMemoryRouter::getInstance().m_heap;
         if (iRCapacity >= 0) {
             pHeap->bufFree(pR, (iRCapacity & hkArrayBase<hkaNURBS::Point>::CAPACITY_MASK) * iElemSize);
         }
-        return apResult;
+        return result;
     }
 
     {
@@ -1609,10 +1599,9 @@ hkBool* hkaNURBS::LeastSquaresFit(
                 X(i, j) = fValue;
             }
         }
-        hkBool bSolved;
-        hkaCGSolver<float>::Solve(&bSolved, N, X, Rm, 50, tol);
+        hkBool bSolved = hkaCGSolver<float>::Solve(N, X, Rm, 50, tol);
         if (!bSolved.m_bool) {
-            apResult->m_bool = 0;
+            result.m_bool = 0;
         }
         else {
             // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray()
@@ -1647,12 +1636,12 @@ hkBool* hkaNURBS::LeastSquaresFit(
                     *pComponent = rElement;
                 }
             }
-            if (*isWithinErrorBound(&bSolved, n, p, &Pn, &U, m, &Q, &ub, E)) {
+            if (isWithinErrorBound(n, p, &Pn, &U, m, &Q, &ub, E)) {
                 P.swap(Pn);
-                apResult->m_bool = 1;
+                result.m_bool = 1;
             }
             else {
-                apResult->m_bool = 0;
+                result.m_bool = 0;
             }
             // Pn.clearAndDeallocate().
             pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -1670,7 +1659,7 @@ hkBool* hkaNURBS::LeastSquaresFit(
     if (iRCapacity >= 0) {
         pHeap->bufFree(pR, (iRCapacity & hkArrayBase<hkaNURBS::Point>::CAPACITY_MASK) * iElemSize);
     }
-    return apResult;
+    return result;
 }
 
 // Removes knot i from U, copying the later knots down.
@@ -2094,8 +2083,7 @@ void computeProjectionErrors(
     }
 }
 
-hkBool* isWithinErrorBound(
-    hkBool* a1,
+hkBool isWithinErrorBound(
     int32_t a2,
     int32_t a3,
     const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>* a4,
@@ -2105,9 +2093,10 @@ hkBool* isWithinErrorBound(
     const hkArray<float, hkContainerHeapAllocator>* a8,
     float a9
 ) {
-    a1->m_bool = 1;
+    hkBool result;
+    result.m_bool = 1;
     if (a6 < 0) {
-        return a1;
+        return result;
     }
     const hkaNURBS::Point* v9 = a7->m_data;
     const float* v10 = a8->m_data;
@@ -2125,14 +2114,14 @@ hkBool* isWithinErrorBound(
         v17.point[3] = v14;
         hkaNURBS::CurvePoint(&v18, a2, a3, *a5, *a4, v16);
         if (hkaNURBS::Point::Dist(v17, v18) > a9 * 1.100000023841858) {
-            a1->m_bool = 0;
+            result.m_bool = 0;
         }
         ++v9;
         ++v10;
         --v11;
     }
     while (v11);
-    return a1;
+    return result;
 }
 
 // The chord-length parameters of the points arg4 into a3 (a1 + 1 floats from 0 to 1).

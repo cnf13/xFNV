@@ -267,8 +267,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
             }
             case HK_SHAPE_BOX: {
                 const hkRotation& rotation = parentFromChild.m_rotation;
-                hkBool orthonormal;
-                if (!rotation.isOrthonormal(&orthonormal, 0.001f)->m_bool || !rotation.isOk().m_bool ||
+                if (!rotation.isOrthonormal(0.001f).m_bool || !rotation.isOk().m_bool ||
                     rotation.isApproximatelyEqual(hkTransformIdentity.m_rotation, 0.001f).m_bool) {
                     break;
                 }

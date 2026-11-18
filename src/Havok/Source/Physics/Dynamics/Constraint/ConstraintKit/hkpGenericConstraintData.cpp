@@ -150,9 +150,8 @@ hkpGenericConstraintData::~hkpGenericConstraintData() {
     }
 }
 
-hkBool* hkpGenericConstraintData::isValid(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkpGenericConstraintData::isValid() const {
+    return 1;
 }
 
 int32_t hkpGenericConstraintData::getType() const {

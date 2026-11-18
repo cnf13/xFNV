@@ -127,8 +127,7 @@ void removeNearDuplicateSortedVertices(float threshold, hkArray<hkVector4>* vert
 // KEEP: hkPlaneEquationUtil::findTriPlaneIntersectionPoint (0xDD6380) writes bytes 0x0-0x1B of the point only, and
 // each push copies all 32 bytes into the array (rep movsd at 0xDD6845, 0xDD688F): bytes 0x1C-0x1F, which nothing
 // wrote, reach pointsOut (partcopy).
-hkBool* findNextIntersectionPoints(
-    hkBool* arResult,
+hkBool findNextIntersectionPoints(
     const hkVector4& dir,
     const hkArray<hkVector4>& planes,
     int32_t planeA,
@@ -194,8 +193,7 @@ hkBool* findNextIntersectionPoints(
             ++pointsOut.m_size;
         }
     }
-    *arResult = found;
-    return arResult;
+    return found;
 }
 
 // Unless the edge of planes m_planeA and m_planeB is in visitedEdges already (in either order), records it, finds the
@@ -241,10 +239,8 @@ void visitEdge(
     points.m_data = nullptr;
     points.m_size = 0;
     points.m_capacityAndFlags = hkArrayBase<Point_t>::DONT_DEALLOCATE_FLAG;
-    hkBool next;
-    if (*findNextIntersectionPoints(
-            &next, edge.m_intersectionLineDir, planes, edge.m_planeA, edge.m_planeB, edge.m_fromPoint->m_location,
-            points
+    if (findNextIntersectionPoints(
+            edge.m_intersectionLineDir, planes, edge.m_planeA, edge.m_planeB, edge.m_fromPoint->m_location, points
         )) {
         const Point_t* pFirst = points.m_data;
         // EXE-INLINED none: hkArray<hkVector4>::pushBack

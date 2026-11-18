@@ -91,15 +91,14 @@ HavokError::~HavokError() {
 }
 
 int32_t HavokError::message(hkError::Message m, int32_t id, const char* description, const char* file, int32_t line) {
-    hkBool v9;
     if (id == -1) {
         if (!isReportEnabled(file, line)) {
             return 0;
         }
     }
     else {
-        hkBool* v7 = isEnabled(&v9, id);
-        if (!v7->operator bool()) {
+        hkBool v9 = isEnabled(id);
+        if (!v9.operator bool()) {
             return 0;
         }
     }
@@ -134,10 +133,9 @@ void HavokError::setEnabled(int32_t id, hkBool enabled) {
     }
 }
 
-hkBool* HavokError::isEnabled(hkBool* arResult, int32_t aiId) {
+hkBool HavokError::isEnabled(int32_t aiId) {
     int32_t v3 = m_disabledAssertIds.getWithDefault(aiId, 0);
-    ::new (arResult) hkBool(v3 == 0);
-    return arResult;
+    return v3 == 0;
 }
 
 void HavokError::enableAll() {
@@ -319,16 +317,15 @@ HavokFileStreambufReader::~HavokFileStreambufReader() {
     }
 }
 
-hkBool* HavokFileStreambufReader::isOk(hkBool* arResult) const {
+hkBool HavokFileStreambufReader::isOk() const {
     uint8_t isGood;
     if (pFile) {
         isGood = (uint8_t)pFile->FileIsGood();
-        ::new (arResult) hkBool(isGood);
+        return isGood;
     }
     else {
-        ::new (arResult) hkBool(false);
+        return false;
     }
-    return arResult;
 }
 
 int32_t HavokFileStreambufReader::read(void* apBuf, int32_t aiBytes) {
@@ -373,16 +370,15 @@ HavokFileStreambufWriter::~HavokFileStreambufWriter() {
     }
 }
 
-hkBool* HavokFileStreambufWriter::isOk(hkBool* arResult) const {
+hkBool HavokFileStreambufWriter::isOk() const {
     uint8_t isGood;
     if (pFile) {
         isGood = (uint8_t)pFile->FileIsGood();
-        ::new (arResult) hkBool(isGood);
+        return isGood;
     }
     else {
-        ::new (arResult) hkBool(false);
+        return false;
     }
-    return arResult;
 }
 
 int32_t HavokFileStreambufWriter::write(const void* apBuf, int32_t aiBytes) {

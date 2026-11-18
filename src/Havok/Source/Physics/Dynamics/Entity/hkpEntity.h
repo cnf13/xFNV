@@ -174,16 +174,13 @@ public:
         return m_constraintsSlave;
     }
 
-    hkBool* isFixed(hkBool* apResult) const {
-        apResult->m_bool = m_motion.m_type == hkpMotion::MOTION_FIXED;
-        return apResult;
+    hkBool isFixed() const {
+        return m_motion.m_type == hkpMotion::MOTION_FIXED;
     }
 
     // Stores in apResult whether the motion is fixed or keyframed and returns it.
-    hkBool* isFixedOrKeyframed(hkBool* apResult) const {
-        apResult->m_bool =
-            (m_motion.m_type == hkpMotion::MOTION_FIXED) || (m_motion.m_type == hkpMotion::MOTION_KEYFRAMED);
-        return apResult;
+    hkBool isFixedOrKeyframed() const {
+        return (m_motion.m_type == hkpMotion::MOTION_FIXED) || (m_motion.m_type == hkpMotion::MOTION_KEYFRAMED);
     }
 
     // hkpEntity's data members end here; the rest of the object is the class's 16-byte alignment padding (m_motion

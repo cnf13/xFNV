@@ -157,17 +157,13 @@ hkpHingeLimitsData::hkpHingeLimitsData() {
     m_atoms.m_angLimit.m_angularLimitsTauFactor = 1.0f;
 }
 
-hkBool* hkpHingeLimitsData::isValid(hkBool* arResult) const {
-    hkBool a2;
-    hkBool apResult;
-    if (m_atoms.m_rotations.m_rotationA.isOrthonormal(&a2, 0.001f)->m_bool &&
-        m_atoms.m_rotations.m_rotationB.isOrthonormal(&apResult, 0.001f)->m_bool) {
-        arResult->m_bool = 1;
-        return arResult;
+hkBool hkpHingeLimitsData::isValid() const {
+    if (m_atoms.m_rotations.m_rotationA.isOrthonormal(0.001f).m_bool &&
+        m_atoms.m_rotations.m_rotationB.isOrthonormal(0.001f).m_bool) {
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpHingeLimitsData::getType() const {

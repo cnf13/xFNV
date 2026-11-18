@@ -89,7 +89,7 @@ public:
     // Copies n bytes; the ranges are allowed to overlap.
     static void memMove(void* dst, const void* src, int32_t n);
     static void memSet(void* dst, int32_t c, int32_t n);
-    static hkBool* endsWith(hkBool* arResult, const char* apcString, const char* apcEnding);
+    static hkBool endsWith(const char* apcString, const char* apcEnding);
     // Havok SDK signature (hkBase.lib, tied by reloc).
     static int32_t strNcmp(const char* a, const char* b, int32_t n);
     // Havok SDK signature (hkBase.lib, tied by reloc); hkargs is the SDK's hk_va_list, a va_list.
@@ -110,15 +110,14 @@ public:
     static const char* strStr(const char* haystack, const char* needle);
     // Appends the index of every occurrence of apcSubString in apcString to arOffsets: the first one always, the later
     // ones only for REPLACE_ALL. arResult says whether there was one at all.
-    static hkBool* findAllOccurrences(
-        hkBool* arResult,
+    static hkBool findAllOccurrences(
         const char* apcString,
         const char* apcSubString,
         hkArray<int32_t>& arOffsets,
         ReplaceType eReplaceType
     );
     static void strFree_00CB1190(char* s, hkMemoryAllocator& alloc);
-    static hkBool* beginsWith(hkBool* apResult, const char* a, const char* b);
+    static hkBool beginsWith(const char* a, const char* b);
     static int32_t lastIndexOf(const char* str, char c);
     // Havok SDK signature (hkBase.lib, tied by bytes,reloc).
     static int32_t memCmp(const void* buf1, const void* buf2, int32_t n);
@@ -150,11 +149,9 @@ inline int32_t hkStringPtr::operator!=(const char* s) const {
 }
 
 inline int32_t hkStringPtr::startsWith(const char* s) const {
-    hkBool result;
-    return *hkString::beginsWith(&result, cString(), s);
+    return hkString::beginsWith(cString(), s);
 }
 
 inline int32_t hkStringPtr::endsWith(const char* s) const {
-    hkBool result;
-    return *hkString::endsWith(&result, cString(), s);
+    return hkString::endsWith(cString(), s);
 }

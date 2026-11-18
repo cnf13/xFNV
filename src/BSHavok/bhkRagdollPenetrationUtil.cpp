@@ -106,8 +106,7 @@ bhkRagdollPenetrationUtil::~bhkRagdollPenetrationUtil() {
 // Casts the ray through the phantom's overlaps from arFromWS to arToWS, and when no hit counts, back from arToWS to
 // arFromWS with the shape collection filter on. A hit counts when its root collidable is a rigid body on a layer other
 // than LAYER_BIPED and LAYER_DEADBIP: its point and normal go to arHitPointWS and arHitNormalWS.
-hkBool* bhkRagdollPenetrationUtil::castRay(
-    hkBool* arResult,
+hkBool bhkRagdollPenetrationUtil::castRay(
     const hkpAabbPhantom* apPhantomIn,
     const hkVector4& arFromWS,
     const hkVector4& arToWS,
@@ -164,8 +163,7 @@ hkBool* bhkRagdollPenetrationUtil::castRay(
             bFound = true;
         }
     }
-    arResult->m_bool = bFound;
-    return arResult;
+    return bFound;
 }
 
 uint8_t bhkRagdollPenetrationUtil::QInitialOnNextUpdate() {
@@ -530,10 +528,8 @@ void bhkRagdollPenetrationUtil::Update() {
 
         ConstrainedSystem* pDetectSystem = ActiveSystems.pBuffer[i];
         const bool bWasPenetrating = pDetectSystem->bPenetrating;
-        hkBool kDetected;
         const bool bPenetrating =
-            pDetectSystem->pDetectionUtil->detectPenetration(&kDetected, kPose, pDetectSystem->PenetratedBones)
-                ->m_bool != 0;
+            pDetectSystem->pDetectionUtil->detectPenetration(kPose, pDetectSystem->PenetratedBones).m_bool != 0;
         ActiveSystems.pBuffer[i]->bPenetrating = bPenetrating;
 
         ConstrainedSystem* pResultSystem = ActiveSystems.pBuffer[i];

@@ -100,8 +100,7 @@ void hkpBroadPhaseBorder::maxPositionExceededCallback(hkpEntity* entity) {
         if (v3 == 1) {
             hkpWorld* m_world = this->m_world;
             if (entity->m_world == m_world) {
-                hkBool result;
-                m_world->removeEntity(&result, entity);
+                m_world->removeEntity(entity);
             }
         }
     }

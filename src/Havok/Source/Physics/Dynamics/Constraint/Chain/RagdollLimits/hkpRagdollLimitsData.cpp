@@ -176,30 +176,29 @@ hkpRagdollLimitsData::hkpRagdollLimitsData() {
 }
 
 // Whether both rotations are orthonormal, the cone limit's minimum is the unused -100, its maximum in [0, pi) and the
-// planes and twist limits' maximum at least their minimum. Each isOrthonormal result goes to a local the callee fills.
-hkBool* hkpRagdollLimitsData::isValid(hkBool* arResult) const {
-    hkBool kOrthonormal;
-    hkBool* arResult_1 = arResult;
-    arResult->m_bool = 1;
-    bool m_bool = m_atoms.m_rotations.m_rotationA.isOrthonormal(&kOrthonormal, 0.001f)->m_bool != 0;
-    arResult_1->m_bool = m_bool;
-    bool m_bool_1 = m_bool && m_atoms.m_rotations.m_rotationB.isOrthonormal(&kOrthonormal, 0.001f)->m_bool;
-    arResult_1->m_bool = m_bool_1;
+// planes and twist limits' maximum at least their minimum.
+hkBool hkpRagdollLimitsData::isValid() const {
+    hkBool result;
+    result.m_bool = 1;
+    bool m_bool = m_atoms.m_rotations.m_rotationA.isOrthonormal(0.001f).m_bool != 0;
+    result.m_bool = m_bool;
+    bool m_bool_1 = m_bool && m_atoms.m_rotations.m_rotationB.isOrthonormal(0.001f).m_bool;
+    result.m_bool = m_bool_1;
     bool m_bool_2 = m_bool_1 && m_atoms.m_coneLimit.m_minAngle == -100.0;
-    arResult_1->m_bool = m_bool_2;
+    result.m_bool = m_bool_2;
     bool m_bool_3 = m_bool_2 && m_atoms.m_coneLimit.m_maxAngle >= 0.0f;
-    arResult_1->m_bool = m_bool_3;
+    result.m_bool = m_bool_3;
     bool m_bool_4 = m_bool_3 && m_atoms.m_coneLimit.m_maxAngle < 3.1415927410125732;
-    arResult_1->m_bool = m_bool_4;
+    result.m_bool = m_bool_4;
     bool m_bool_5 = m_bool_4 && m_atoms.m_planesLimit.m_maxAngle >= m_atoms.m_planesLimit.m_minAngle;
-    arResult_1->m_bool = m_bool_5;
+    result.m_bool = m_bool_5;
     if (m_bool_5 && m_atoms.m_twistLimit.m_maxAngle >= m_atoms.m_twistLimit.m_minAngle) {
-        arResult_1->m_bool = 1;
-        return arResult_1;
+        result.m_bool = 1;
+        return result;
     }
 
-    arResult_1->m_bool = 0;
-    return arResult_1;
+    result.m_bool = 0;
+    return result;
 }
 
 int32_t hkpRagdollLimitsData::getType() const {

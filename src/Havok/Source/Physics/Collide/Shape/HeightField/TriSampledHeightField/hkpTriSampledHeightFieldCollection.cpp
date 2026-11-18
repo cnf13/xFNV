@@ -218,8 +218,7 @@ const hkpShape* hkpTriSampledHeightFieldCollection::getChildShape(uint32_t key, 
         );
     }
 
-    hkBool kFlip;
-    pHeightField->getTriangleFlipImpl(&kFlip);
+    hkBool kFlip = pHeightField->getTriangleFlipImpl();
     const int32_t iFlip = kFlip.m_bool != 0;
     const int32_t iOdd = key & 1;
     _mm_store_ps(

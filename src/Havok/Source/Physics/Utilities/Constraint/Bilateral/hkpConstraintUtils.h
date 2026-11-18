@@ -12,8 +12,7 @@ class hkVector4;
 // and reading a constraint's pivots and motors. No instance state.
 class hkpConstraintUtils {
 public:
-    static hkBool* checkAndFixConstraint(
-        hkBool* apResult,
+    static hkBool checkAndFixConstraint(
         const hkpConstraintInstance* constraint,
         float maxAllowedError,
         float relativeDisplacementTowardsParent

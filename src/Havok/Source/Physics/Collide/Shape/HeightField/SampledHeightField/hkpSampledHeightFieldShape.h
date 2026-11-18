@@ -45,7 +45,7 @@ public:
     // The height of the sample at grid point (x, z).
     virtual float getHeightAtImpl(int32_t x, int32_t z) const = 0;
     // Whether the grid cells are split along the other diagonal.
-    virtual hkBool* getTriangleFlipImpl(hkBool* arResult) const = 0;
+    virtual hkBool getTriangleFlipImpl() const = 0;
 
     // Havok SDK.
     void getCinfo(hkpSampledHeightFieldBaseCinfo& cinfo) const;
@@ -65,9 +65,7 @@ public:
     }
 
     hkBool getTriangleFlip() const {
-        hkBool kResult;
-        getTriangleFlipImpl(&kResult);
-        return kResult;
+        return getTriangleFlipImpl();
     }
 
     // Walks the ray over the grid cells, crossing the x, diagonal and z grid lines in order of their ray fraction, and

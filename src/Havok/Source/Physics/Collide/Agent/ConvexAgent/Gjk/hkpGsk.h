@@ -87,8 +87,7 @@ public:
     // Writes the simplex to the cache: the dimensions and each side's vertex ids, the largest id first.
     void exitAndExportCacheImpl(hkpGskCache& cache) const;
 
-    hkBool* linearCast(
-        hkBool* arResult,
+    hkBool linearCast(
         const hkpConvexShape* shapeA,
         const hkpConvexShape* shapeB,
         const hkRotation& aRb,
@@ -130,12 +129,7 @@ protected:
     void handlePenetration(const hkpConvexShape* shapeA, const hkpConvexShape* shapeB, const hkTransform& aTb);
 
 public:
-    hkBool* castRay(
-        hkBool* apResult,
-        const hkpConvexShape* shape,
-        const hkpShapeRayCastInput& input,
-        hkpShapeRayCastOutput& output
-    );
+    hkBool castRay(const hkpConvexShape* shape, const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output);
 
     // Prints the simplex: empty in a release build.
     void print();

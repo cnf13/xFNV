@@ -43,8 +43,7 @@ hkpHavokSnapshot::ConvertListener::~ConvertListener() {
 // hkpStorageExtendedMeshShape, a user-type sampled heightfield an hkpStorageSampledHeightFieldShape, each new object
 // kept in m_objects; the world's fixed rigid body is dropped.
 void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const hkClass*& k) {
-    hkBool bIsMesh;
-    if (hkpMeshShapeClass.isSuperClass(&bIsMesh, *k)->m_bool && k != &hkpStorageMeshShapeClass) {
+    if (hkpMeshShapeClass.isSuperClass(*k).m_bool && k != &hkpStorageMeshShapeClass) {
         const hkpMeshShape* mesh = static_cast<const hkpMeshShape*>(p);
         hkpStorageMeshShape* pMemory = static_cast<hkpStorageMeshShape*>(
             hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpStorageMeshShape))
@@ -60,9 +59,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
         p = pStorage;
         k = &hkpStorageMeshShapeClass;
     }
-    hkBool bIsExtendedMesh;
-    if (hkpExtendedMeshShapeClass.isSuperClass(&bIsExtendedMesh, *k)->m_bool &&
-        k != &hkpStorageExtendedMeshShapeClass) {
+    if (hkpExtendedMeshShapeClass.isSuperClass(*k).m_bool && k != &hkpStorageExtendedMeshShapeClass) {
         const hkpExtendedMeshShape* mesh = static_cast<const hkpExtendedMeshShape*>(p);
         hkpStorageExtendedMeshShape* pMemory = static_cast<hkpStorageExtendedMeshShape*>(
             hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpStorageExtendedMeshShape))
@@ -79,8 +76,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
         k = &hkpStorageExtendedMeshShapeClass;
         return;
     }
-    hkBool bIsHeightField;
-    if (hkpSampledHeightFieldShapeClass.isSuperClass(&bIsHeightField, *k)->m_bool) {
+    if (hkpSampledHeightFieldShapeClass.isSuperClass(*k).m_bool) {
         const hkpSampledHeightFieldShape* hf = static_cast<const hkpSampledHeightFieldShape*>(p);
         if (hf->m_heightfieldType.m_storage == hkpSampledHeightFieldShape::HEIGHTFIELD_USER) {
             hkpStorageSampledHeightFieldShape* pMemory = static_cast<hkpStorageSampledHeightFieldShape*>(
@@ -99,8 +95,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
         }
         return;
     }
-    hkBool bIsRigidBody;
-    if (hkpRigidBodyClass.isSuperClass(&bIsRigidBody, *k)->m_bool) {
+    if (hkpRigidBodyClass.isSuperClass(*k).m_bool) {
         const hkpRigidBody* rb = static_cast<const hkpRigidBody*>(p);
         if (rb->m_world && rb->m_world->m_fixedRigidBody == rb) {
             p = nullptr;
@@ -110,8 +105,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
 }
 
 // The world save: a physics data populated from the world, saved under the root level.
-hkBool* hkpHavokSnapshot::save(
-    hkBool* apResult,
+hkBool hkpHavokSnapshot::save(
     const hkpWorld* apWorld,
     hkStreamWriter* apWriter,
     hkBool abBinaryFormat,
@@ -119,22 +113,18 @@ hkBool* hkpHavokSnapshot::save(
     int32_t abSaveContactPoints
 ) {
     if (!apWorld || !apWriter) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
     char cResult;
     {
         hkpPhysicsData kData;
         kData.populateFromWorld(apWorld, abSaveContactPoints);
-        hkBool bResult;
-        cResult = hkpHavokSnapshot::save(&bResult, &kData, apWriter, abBinaryFormat, apTargetLayout)->m_bool;
+        cResult = hkpHavokSnapshot::save(&kData, apWriter, abBinaryFormat, apTargetLayout).m_bool;
     }
-    apResult->m_bool = cResult;
-    return apResult;
+    return cResult;
 }
 
-hkBool* hkpHavokSnapshot::save(
-    hkBool* apResult,
+hkBool hkpHavokSnapshot::save(
     const void* apData,
     const hkClass& arDataClass,
     hkStreamWriter* apWriter,
@@ -156,15 +146,15 @@ hkBool* hkpHavokSnapshot::save(
         pListener = &kDefaultConvertListener;
     }
     // Tests the hkBool's byte and passes it on zero-extended.
-    apResult->m_bool =
+    hkBool result;
+    result.m_bool =
         hkSerializeUtil::saveTagfile(apData, arDataClass, apWriter, abBinaryFormat.m_bool != 0, pListener) ==
         HK_SUCCESS;
     kDefaultConvertListener.~ConvertListener();
-    return apResult;
+    return result;
 }
 
-hkBool* hkpHavokSnapshot::saveUnderRootLevel(
-    hkBool* apResult,
+hkBool hkpHavokSnapshot::saveUnderRootLevel(
     const void* apData,
     const hkClass& arDataClass,
     hkStreamWriter* apWriter,
@@ -194,8 +184,8 @@ hkBool* hkpHavokSnapshot::saveUnderRootLevel(
     rVariant.m_name = arDataClass.getName();
     rVariant.m_variant.set(const_cast<void*>(apData), &arDataClass);
     rVariant.m_className = rVariant.m_variant.getClass() ? rVariant.m_variant.getClass()->getName() : nullptr;
-    hkpHavokSnapshot::save(
-        apResult, &kContainer, hkRootLevelContainerClass, apWriter, abBinaryFormat, apTargetLayout, nullptr
+    hkBool result = hkpHavokSnapshot::save(
+        &kContainer, hkRootLevelContainerClass, apWriter, abBinaryFormat, apTargetLayout, nullptr
     );
     // EXE-INLINED none: hkArray<NamedVariant>'s destructor
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -220,20 +210,16 @@ hkBool* hkpHavokSnapshot::saveUnderRootLevel(
             sizeof(NamedVariant) * (rVariants.m_capacityAndFlags & hkArrayBase<NamedVariant>::CAPACITY_MASK)
         );
     }
-    return apResult;
+    return result;
 }
 
-hkBool* hkpHavokSnapshot::save(
-    hkBool* apResult,
+hkBool hkpHavokSnapshot::save(
     const hkpPhysicsData* apData,
     hkStreamWriter* apWriter,
     hkBool abBinaryFormat,
     const hkStructureLayout::LayoutRules* apTargetLayout
 ) {
-    hkpHavokSnapshot::saveUnderRootLevel(
-        apResult, apData, hkpPhysicsDataClass, apWriter, abBinaryFormat, apTargetLayout
-    );
-    return apResult;
+    return hkpHavokSnapshot::saveUnderRootLevel(apData, hkpPhysicsDataClass, apWriter, abBinaryFormat, apTargetLayout);
 }
 
 // The physics data of a snapshot: the root container's first hkpPhysicsData, else the object named "SnapshotSave"

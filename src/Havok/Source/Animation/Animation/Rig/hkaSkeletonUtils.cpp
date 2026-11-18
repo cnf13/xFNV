@@ -337,8 +337,7 @@ void hkaSkeletonUtils::getLeaves(const hkaSkeleton& skeleton, hkArray<int16_t>& 
 
 // Walks from endBone up its parents until startBone, each bone inserted at index 0, then startBone itself; found when
 // the walk did not run off a root. The current bone is kept in endBone and inserted from there.
-hkBool* hkaSkeletonUtils::getBoneChain(
-    hkBool* apFoundOut,
+hkBool hkaSkeletonUtils::getBoneChain(
     const hkaSkeleton& skeleton,
     int16_t startBone,
     int16_t endBone,
@@ -352,8 +351,7 @@ hkBool* hkaSkeletonUtils::getBoneChain(
         endBone = skeleton.m_parentIndices.m_data[endBone];
     }
     bonesOut._insertAt<int16_t>(hkMemoryRouter::getInstance().heap(), 0, startBone);
-    apFoundOut->m_bool = endBone >= 0;
-    return apFoundOut;
+    return endBone >= 0;
 }
 
 void hkaSkeletonUtils::enforceSkeletonConstraintsModelSpace(
@@ -546,14 +544,12 @@ void hkaSkeletonUtils::unlockTranslations(hkaSkeleton& skeleton) {
     }
 }
 
-hkBool*
-hkaSkeletonUtils::isBindingOk(hkBool* apResult, const hkaSkeleton& skeleton, const hkaAnimationBinding& binding) {
+hkBool hkaSkeletonUtils::isBindingOk(const hkaSkeleton& skeleton, const hkaAnimationBinding& binding) {
     int32_t m_size = binding.m_transformTrackToBoneIndices.m_size;
     int32_t v4 = 0;
     if (m_size <= 0) {
     LABEL_6:;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
     int16_t* m_data = binding.m_transformTrackToBoneIndices.m_data;
@@ -564,8 +560,7 @@ hkaSkeletonUtils::isBindingOk(hkBool* apResult, const hkaSkeleton& skeleton, con
             goto LABEL_6;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 // Each bone's world transform is worldFromModel times its model space one.

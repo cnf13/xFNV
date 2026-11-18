@@ -235,7 +235,7 @@ public:
         hkpUpdateCollectionFilterMode updateShapeCollectionFilter
     );
 
-    hkBool* removeConstraint(hkBool* op, hkpConstraintInstance* constraint);
+    hkBool removeConstraint(hkpConstraintInstance* constraint);
 
     // Havok SDK.
     void addPhantomListener(hkpPhantomListener* worldListener);
@@ -249,7 +249,7 @@ public:
     // Havok SDK.
     void addEntityBatch(hkpEntity* const* entityBatch, int32_t numEntities, hkpEntityActivation initialActivationState);
 
-    hkBool* removeEntity(hkBool* result, hkpEntity* entity);
+    hkBool removeEntity(hkpEntity* entity);
 
     // Collides the entities discretely at the current time.
     void findInitialContactPoints(hkpEntity** entities, int32_t numEntities);
@@ -522,9 +522,9 @@ public:
 };
 
 // Adds the inactive islands' entities to apSystem and returns whether there were any, through apResult.
-hkBool* enumerateAllInactiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWorld, hkpPhysicsSystem* apSystem);
+hkBool enumerateAllInactiveEntitiesInWorld(const hkpWorld* apWorld, hkpPhysicsSystem* apSystem);
 // Adds the active islands' entities to apSystem; the hkBool result is written to apResult, which is returned.
-hkBool* enumerateAllActiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWorld, hkpPhysicsSystem* apSystem);
+hkBool enumerateAllActiveEntitiesInWorld(const hkpWorld* apWorld, hkpPhysicsSystem* apSystem);
 // Adds the world's phantoms to sys.
 void enumerateAllPhantomsInWorld(const hkpWorld* world, hkpPhysicsSystem* sys);
 // Adds the world's constraints to sys.

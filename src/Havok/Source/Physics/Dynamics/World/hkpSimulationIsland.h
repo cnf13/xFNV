@@ -64,15 +64,13 @@ public:
     void markForWrite();
     void mergeConstraintInfo(hkpSimulationIsland& other);
 
-    hkBool* wasActiveLastFrame(hkBool* arResult) const {
-        arResult->m_bool = m_isInActiveIslandsArray != 0;
-        return arResult;
+    hkBool wasActiveLastFrame() const {
+        return m_isInActiveIslandsArray != 0;
     }
 
     // Whether the island is the world's fixed island (no storage index: HK_INVALID_OBJECT_INDEX).
-    hkBool* isFixed(hkBool* arResult) const {
-        arResult->m_bool = m_storageIndex == 0xFFFF;
-        return arResult;
+    hkBool isFixed() const {
+        return m_storageIndex == 0xFFFF;
     }
 
     // The solver buffer the island's integration needs: the velocity accumulators, the element temps rounded up to 16

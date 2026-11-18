@@ -119,9 +119,8 @@ hkpBallSocketChainData::hkpBallSocketChainData()
 
 hkpBallSocketChainData::~hkpBallSocketChainData() {}
 
-hkBool* hkpBallSocketChainData::isValid(hkBool* arResult) const {
-    arResult->m_bool = true;
-    return arResult;
+hkBool hkpBallSocketChainData::isValid() const {
+    return true;
 }
 
 int32_t hkpBallSocketChainData::getType() const {

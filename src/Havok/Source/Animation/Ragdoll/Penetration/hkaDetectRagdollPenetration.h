@@ -15,8 +15,7 @@ class hkaRagdollRaycastInterface {
 public:
     virtual ~hkaRagdollRaycastInterface() {}
 
-    virtual hkBool* castRay(
-        hkBool* arResult,
+    virtual hkBool castRay(
         const hkpAabbPhantom* apPhantomIn,
         const hkVector4& arFromWS,
         const hkVector4& arToWS,
@@ -70,7 +69,7 @@ public:
     // Marks every bone as penetrating and the ragdoll as not out yet.
     void resetBoneStates();
     // Finds the penetrating bones for the pose and writes them to arOutput.
-    hkBool* detectPenetration(hkBool* arResult, const hkaPose& arRagdollPoseIn, Output& arOutput);
+    hkBool detectPenetration(const hkaPose& arRagdollPoseIn, Output& arOutput);
     const hkArray<BonePenetrationStatus>& getBoneStatusArray() {
         return m_boneStates;
     }

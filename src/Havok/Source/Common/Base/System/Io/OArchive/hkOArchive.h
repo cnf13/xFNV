@@ -38,12 +38,12 @@ public:
     void writeArray64u(const uint64_t* a1, int32_t a2);
     void writeArrayDouble64(const double* a1, int32_t a2);
     void write64(int64_t a1);
-    hkBool* getByteSwap(hkBool* apResult);
+    hkBool getByteSwap();
     void writeArray8(const char* array, int32_t nelem);
     void writeArray32(const int32_t* array, int32_t nelem);
     void write8(int32_t c);
     void write8u(int32_t u);
-    hkBool* isOk(hkBool* apResult);
+    hkBool isOk();
     hkStreamWriter* getStreamWriter();
     void write16(int16_t i);
     void write16u(int32_t u);

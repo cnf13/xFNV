@@ -15,12 +15,8 @@ class alignas(16) hkpMoppModifyVirtualMachine : public hkpMoppObbVirtualMachine 
 public:
     // Walks the code inside the box and asks m_modifier which terminals to remove; the result, written through
     // apResult, is whether the whole subtree goes.
-    hkBool* queryModicationPointsRecursive(
-        hkBool* apResult,
-        const hkpMoppObbVirtualMachineQuery* query,
-        const uint8_t* PC,
-        int32_t chunkOffset
-    );
+    hkBool
+    queryModicationPointsRecursive(const hkpMoppObbVirtualMachineQuery* query, const uint8_t* PC, int32_t chunkOffset);
     void queryAabb(const hkpMoppCode* code, const hkAabb& aabb, hkpMoppModifier* modifierOut);
 
     hkBool m_tempLastShouldTerminalBeRemoved;

@@ -203,19 +203,20 @@ void hkQuaternion::decomposeRestAxis(const hkVector4& axis, hkQuaternion& restOu
     }
 }
 
-hkBool* hkQuaternion::isOk(hkBool* a1) const {
-    ::new (a1) hkBool(m_vec.isOk4());
+hkBool hkQuaternion::isOk() const {
+    hkBool result;
+    result = m_vec.isOk4();
     __m128 v3 = _mm_mul_ps(m_vec.m_quad, m_vec.m_quad);
     __m128 v4 = _mm_add_ps(_mm_shuffle_ps(v3, v3, 78), v3);
     float v6 = (_mm_shuffle_ps(v4, v4, 177)[0] + v4[0]) - 1.0;
     float v7 = std::fabs((double)v6);
-    if (a1->m_bool && v7 < 0.001f) {
-        a1->m_bool = 1;
-        return a1;
+    if (result.m_bool && v7 < 0.001f) {
+        result.m_bool = 1;
+        return result;
     }
 
-    a1->m_bool = 0;
-    return a1;
+    result.m_bool = 0;
+    return result;
 }
 
 void hkQuaternion::setFlippedRotation(const hkVector4& from) {

@@ -70,9 +70,8 @@ bool HitCaster::CastShape(const NiPoint3& aOrigin, const NiPoint3& aDirection, f
         reset();
         bhkShapePhantom* pPhantom = spShapePhantom.operator->();
         pPhantom->SetPositionAndLinearCast(kStart, kInput, *this, nullptr);
-        hkBool kHit;
-        hkBool* pHit = hasHit(&kHit);
-        if (pHit->operator bool()) {
+        hkBool kHit = hasHit();
+        if (kHit.operator bool()) {
             sortHits();
             return true;
         }

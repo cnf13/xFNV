@@ -102,10 +102,8 @@ hkpStiffSpringConstraintData::hkpStiffSpringConstraintData() {
     m_atoms.m_pivots.m_translationB.m_quad = _mm_setzero_ps();
 }
 
-hkBool* hkpStiffSpringConstraintData::isValid(hkBool* arResult) const {
-    hkBool* result = arResult;
-    arResult->m_bool = (int8_t)((uint8_t)(m_atoms.m_spring.m_length > 0.0));
-    return result;
+hkBool hkpStiffSpringConstraintData::isValid() const {
+    return (int8_t)((uint8_t)(m_atoms.m_spring.m_length > 0.0));
 }
 
 int32_t hkpStiffSpringConstraintData::getType() const {

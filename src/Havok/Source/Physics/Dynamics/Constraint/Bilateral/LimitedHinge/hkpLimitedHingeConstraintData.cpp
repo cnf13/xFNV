@@ -273,18 +273,14 @@ uint8_t hkpLimitedHingeConstraintData::getNotifiedBodyIndex() const {
     return (uint8_t)((int32_t)(((uint32_t)((int32_t)m_atoms.m_ballSocket.m_bodiesToNotify)) >> 1));
 }
 
-hkBool* hkpLimitedHingeConstraintData::isValid(hkBool* arResult) const {
-    hkBool a2;
-    hkBool apResult;
-    if (m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(&a2, 0.001f)->m_bool &&
-        (m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(&apResult, 0.001f)->m_bool &&
+hkBool hkpLimitedHingeConstraintData::isValid() const {
+    if (m_atoms.m_transforms.m_transformA.m_rotation.isOrthonormal(0.001f).m_bool &&
+        (m_atoms.m_transforms.m_transformB.m_rotation.isOrthonormal(0.001f).m_bool &&
          (!m_atoms.m_angMotor.m_isEnabled.m_bool || m_atoms.m_angLimit.m_isEnabled))) {
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpLimitedHingeConstraintData::getType() const {

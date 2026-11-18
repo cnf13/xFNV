@@ -76,13 +76,8 @@ public:
     // Appends to bonesOut the chain of bones from startBone down to endBone, each bone after the parent it walked from
     // (so parents come first), and returns whether endBone's chain reached startBone. The hkBool comes back through
     // apFoundOut, the first argument. It walks m_parentIndices from endBone and inserts each bone at index 0.
-    static hkBool* getBoneChain(
-        hkBool* apFoundOut,
-        const hkaSkeleton& skeleton,
-        int16_t startBone,
-        int16_t endBone,
-        hkArray<int16_t>& bonesOut
-    );
+    static hkBool
+    getBoneChain(const hkaSkeleton& skeleton, int16_t startBone, int16_t endBone, hkArray<int16_t>& bonesOut);
     // Havok SDK: puts the model space pose of every bone whose m_lockTranslation is set back
     // in its parent's space (pose[i] = pose[parent] * referencePose[i]); roots are left alone.
     static void enforceSkeletonConstraintsModelSpace(const hkaSkeleton& skeleton, hkQsTransform* poseModelInOut);
@@ -113,7 +108,7 @@ public:
     static void lockTranslations(hkaSkeleton& skeleton, hkBool exceptRoots);
     // Havok SDK signature (hkaAnimation.lib, tied by bytes).
     static void unlockTranslations(hkaSkeleton& skeleton);
-    static hkBool* isBindingOk(hkBool* apResult, const hkaSkeleton& skeleton, const hkaAnimationBinding& binding);
+    static hkBool isBindingOk(const hkaSkeleton& skeleton, const hkaAnimationBinding& binding);
     // Havok SDK: the world space pose of numTransforms bones from their model space pose, the model sitting in
     // worldFromModel.
     static void transformModelPoseToWorldPose(

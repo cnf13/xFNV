@@ -170,7 +170,7 @@ public:
     int32_t preCalcScale(hkpMoppTreeNode* a1, const hkpMoppAssemblerNodeInfo& a2, hkpMoppAssemblerNodeInfo& a3);
     // Havok SDK signature (hkpInternal.lib, tied by bytes,reloc).
     void addCut(const hkpMoppTreeNode* a1, const hkpMoppAssemblerNodeInfo& a2);
-    hkBool* shouldAssemble(hkBool* apResult, hkpMoppTreeNode* a2, const hkpMoppAssemblerNodeInfo& a3);
+    hkBool shouldAssemble(hkpMoppTreeNode* a2, const hkpMoppAssemblerNodeInfo& a3);
     // Havok SDK signature (hkpInternal.lib, tied by bytes,reloc).
     int32_t
     addTerminals(hkpMoppTreeTerminal* a1, const hkpMoppAssemblerNodeInfo& a2, const hkpMoppAssemblerNodeInfo& a3);

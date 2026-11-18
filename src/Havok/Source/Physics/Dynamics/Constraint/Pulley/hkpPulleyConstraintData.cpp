@@ -119,14 +119,12 @@ hkpPulleyConstraintData::hkpPulleyConstraintData() {
     m_atoms.m_pulley.m_fixedPivotBinWorld.m_quad = _mm_setzero_ps();
 }
 
-hkBool* hkpPulleyConstraintData::isValid(hkBool* arResult) const {
+hkBool hkpPulleyConstraintData::isValid() const {
     if (!(m_atoms.m_pulley.m_ropeLength > 0.0f) || !(m_atoms.m_pulley.m_leverageOnBodyB > 0.0f)) {
-        arResult->m_bool = 0;
-        return arResult;
+        return 0;
     }
 
-    arResult->m_bool = 1;
-    return arResult;
+    return 1;
 }
 
 int32_t hkpPulleyConstraintData::getType() const {

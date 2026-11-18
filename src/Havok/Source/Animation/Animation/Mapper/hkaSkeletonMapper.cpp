@@ -108,12 +108,8 @@ void hkaSkeletonMapper::initializeBindingMaps(
         bonesB.m_data = nullptr;
         bonesB.m_size = 0;
         bonesB.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-        hkBool foundA;
-        hkBool foundB;
-        if (hkaSkeletonUtils::getBoneChain(&foundA, *pSkeletonA, rChain.m_startBoneA, rChain.m_endBoneA, bonesA)
-                ->m_bool &&
-            hkaSkeletonUtils::getBoneChain(&foundB, *pSkeletonB, rChain.m_startBoneB, rChain.m_endBoneB, bonesB)
-                ->m_bool) {
+        if (hkaSkeletonUtils::getBoneChain(*pSkeletonA, rChain.m_startBoneA, rChain.m_endBoneA, bonesA).m_bool &&
+            hkaSkeletonUtils::getBoneChain(*pSkeletonB, rChain.m_startBoneB, rChain.m_endBoneB, bonesB).m_bool) {
             bool allAnimated = true;
             for (int32_t i = 0; i < bonesA.m_size; ++i) {
                 if (srcBoneToTrackIndicesOut.m_data[bonesA.m_data[i]] < 0) {
@@ -243,8 +239,7 @@ void hkaSkeletonMapper::mapPose(
         kBones.m_data = reinterpret_cast<int16_t*>(pBlock);
         kBones.m_localMemory = reinterpret_cast<int16_t*>(pBlock);
         kBones.m_capacityAndFlags = static_cast<uint32_t>(iNumBones) | hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
-        hkBool kFound;
-        hkaSkeletonUtils::getBoneChain(&kFound, *rMapping.m_skeletonB, iStartBoneB, iEndBoneB, kBones);
+        hkaSkeletonUtils::getBoneChain(*rMapping.m_skeletonB, iStartBoneB, iEndBoneB, kBones);
 
         // The end bone's local translation, walked up the chain to the bone after the start bone.
         hkVector4 kAccumulated;
@@ -749,7 +744,7 @@ void hkaSkeletonMapper::additivePoseFromCombinedPoseAndReferencePose(
 
 bool hkaSkeletonMapper::checkTransform(hkaSkeletonMapperData::MappingType type, const hkQsTransform& q) {
     hkBool v4;
-    return q.m_rotation.isOk(&v4)->m_bool && (::new (&v4) hkBool(q.m_translation.isOk3()))->m_bool &&
+    return q.m_rotation.isOk().m_bool && (::new (&v4) hkBool(q.m_translation.isOk3()))->m_bool &&
         (::new (&v4) hkBool(q.m_scale.isOk3()))->m_bool != 0;
 }
 

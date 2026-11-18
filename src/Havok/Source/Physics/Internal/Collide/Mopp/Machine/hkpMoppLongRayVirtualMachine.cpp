@@ -68,8 +68,7 @@ void hkpMoppLongRayVirtualMachine::queryLongRay(
     queryRayOnTree(&aScaledQuery, m_data, &aQueryFloat, 0);
 }
 
-hkBool* hkpMoppLongRayVirtualMachine::queryLongRay_00DD2DF0(
-    hkBool* apResult,
+hkBool hkpMoppLongRayVirtualMachine::queryLongRay_00DD2DF0(
     const hkpShapeContainer* collection,
     const hkpMoppCode* code,
     const hkpShapeRayCastInput& input,
@@ -104,8 +103,7 @@ hkBool* hkpMoppLongRayVirtualMachine::queryLongRay_00DD2DF0(
     aQueryFloat.m_rayEnds[1].m_quad = _mm_mul_ps(_mm_shuffle_ps(m_FtoBScale_low, m_FtoBScale_low, 0), v10);
     m_reindexingMask = v13;
     queryRayOnTree(&aScaledQuery, m_data, &aQueryFloat, 0);
-    apResult->m_bool = m_hitFound.m_bool;
-    return apResult;
+    return m_hitFound.m_bool;
 }
 
 // The MOPP walk for one long ray. The split commands carry two bounds on one axis (or a diagonal): the left child holds

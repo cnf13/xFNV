@@ -140,9 +140,8 @@ hkpStiffSpringChainData::hkpStiffSpringChainData(hkFinishLoadedObjectFlag aFlag)
 
 hkpStiffSpringChainData::~hkpStiffSpringChainData() {}
 
-hkBool* hkpStiffSpringChainData::isValid(hkBool* arResult) const {
-    arResult->m_bool = true;
-    return arResult;
+hkBool hkpStiffSpringChainData::isValid() const {
+    return true;
 }
 
 int32_t hkpStiffSpringChainData::getType() const {

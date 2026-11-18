@@ -41,7 +41,7 @@ public:
     hkpPhantomType getType() const override;
     // Havok SDK signature (hkpDynamics.lib, tied by vtable).
     void addOverlappingCollidable(hkpCollidable* collidable) override;
-    hkBool* isOverlappingCollidableAdded(hkBool* arResult, const hkpCollidable* apCollidable) override;
+    hkBool isOverlappingCollidableAdded(const hkpCollidable* apCollidable) override;
     // Havok SDK signature (hkpDynamics.lib, tied by bytes,vtable).
     void removeOverlappingCollidable(hkpCollidable* collidable) override;
     void ensureDeterministicOrder() override;

@@ -33,9 +33,8 @@ hkClass hkStreamWriterClass(
 
 hkStreamWriter::~hkStreamWriter() {}
 
-hkBool* hkStreamWriter::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 0;
-    return arResult;
+hkBool hkStreamWriter::seekTellSupported() const {
+    return 0;
 }
 
 hkResult hkStreamWriter::seek(int32_t offset, SeekWhence whence) {

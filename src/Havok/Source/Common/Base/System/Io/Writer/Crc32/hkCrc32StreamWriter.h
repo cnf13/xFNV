@@ -11,7 +11,7 @@ public:
     hkCrc32StreamWriter(uint32_t startCrc);
 
     // Says yes.
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     // Folds the bytes into the CRC; returns nbytes.
     int32_t write(const void* ptr, int32_t nbytes) override;
 

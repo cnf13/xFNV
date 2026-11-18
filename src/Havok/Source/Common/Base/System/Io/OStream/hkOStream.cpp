@@ -121,9 +121,8 @@ const hkClass* hkOstream::getClassType() const {
     return &hkOstreamClassType;
 }
 
-hkBool* hkOstream::isOk(hkBool* arResult) const {
-    m_writer->isOk(arResult);
-    return arResult;
+hkBool hkOstream::isOk() const {
+    return m_writer->isOk();
 }
 
 // Writes the pointer as "%p" text to m_writer; returns the stream.

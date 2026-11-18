@@ -25,7 +25,7 @@ public:
     hkIstream(const void* mem, int32_t memSize);
     ~hkIstream() override;
 
-    hkBool* isOk(hkBool* apResult);
+    hkBool isOk();
     int32_t getline(char* str, int32_t maxlen, char delim);
     // Reads one white-space-delimited word into str.
     hkIstream& operator>>(hkStringBuf& str);

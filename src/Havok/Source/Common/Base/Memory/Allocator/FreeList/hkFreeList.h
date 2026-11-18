@@ -41,7 +41,7 @@ public:
     }
     // Checks up to aiNumBlocks used blocks, from where the last call stopped, and moves each whose elements are all
     // free onto the free blocks; aiNumBlocksOut gets the count checked. True once the walk has passed the last block.
-    hkBool* incrementalFindGarbage(hkBool* arResult, int32_t aiNumBlocks, int32_t& aiNumBlocksOut);
+    hkBool incrementalFindGarbage(int32_t aiNumBlocks, int32_t& aiNumBlocksOut);
     // Takes the block's elements off the free list; returns nonzero (and the elements stay off) when they were all
     // free.
     int32_t _calcBlockFree(Block* block);
@@ -69,7 +69,7 @@ public:
     }
 
     // Whether every free element is aligned and on an element boundary of a valid used block.
-    hkBool* _checkFreeBlocks(hkBool* apResult);
+    hkBool _checkFreeBlocks();
     uint32_t _calcNumFreeElements();
     // Havok SDK signature (hkBase.lib, tied by bytes,reloc).
     uint32_t _calculateBlockAllocatedSize(hkFreeList::Block* cur);

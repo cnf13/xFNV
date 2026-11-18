@@ -1338,8 +1338,7 @@ hkpWorld::~hkpWorld() {
     m_memoryWatchDog.m_pntr = nullptr;
 
     removeAll();
-    hkBool result;
-    removeEntity(&result, m_fixedRigidBody);
+    removeEntity(m_fixedRigidBody);
     m_fixedRigidBody = nullptr;
     hkpWorldOperationUtil::removeIslandFromDirtyList(this, m_fixedIsland);
     delete m_fixedIsland;
@@ -2442,14 +2441,13 @@ void hkpWorld::updateCollisionFilterOnEntity(
 // KEEP (partcopy:): on the locked path the queued RemoveConstraint (8 bytes at esp+0x4, 0xC97E93) has bytes 0 and
 // 4-7 written; hkpWorldOperationQueue::queueOperation 0xCF7690 (through hkpWorld::queueOperation 0xC91160) copies 20
 // bytes into the queue, so bytes 1-3 and 8-19 of the frame reach the queue unwritten.
-hkBool* hkpWorld::removeConstraint(hkBool* op, hkpConstraintInstance* constraint) {
+hkBool hkpWorld::removeConstraint(hkpConstraintInstance* constraint) {
     if (m_criticalOperationsLockCount) {
         hkWorldOperation::RemoveConstraint operation;
         operation.m_type.m_storage = hkWorldOperation::CONSTRAINT_REMOVE;
         operation.m_constraint = constraint;
         queueOperation(operation);
-        op->m_bool = 0;
-        return op;
+        return 0;
     }
     // EXE-INLINED none: hkpWorld::lockCriticalOperations (the count is 0 here: the exe stores 1)
     m_criticalOperationsLockCount = 1;
@@ -2472,8 +2470,7 @@ hkBool* hkpWorld::removeConstraint(hkBool* op, hkpConstraintInstance* constraint
             internal_executePendingBodyOperations();
         }
     }
-    op->m_bool = 1;
-    return op;
+    return 1;
 }
 
 void hkpWorld::addPhantomListener(hkpPhantomListener* worldListener) {
@@ -2694,8 +2691,7 @@ void hkpWorld::addEntityBatch(
             solverInfo.m_deactivationNumInactiveFramesSelectFlag[0],
             solverInfo.m_deactivationNumInactiveFramesSelectFlag[1], solverInfo.m_deactivationIntegrateCounter
         );
-        hkBool isFixed;
-        if (entity->isFixed(&isFixed)->m_bool) {
+        if (entity->isFixed().m_bool) {
             m_fixedIsland->internalAddEntity(entity);
         }
         else {
@@ -2784,14 +2780,13 @@ void hkpWorld::addEntityBatch(
     addObjectList._clearAndDeallocate(*hkMemoryRouter::getInstance().m_temp);
 }
 
-hkBool* hkpWorld::removeEntity(hkBool* result, hkpEntity* entity) {
+hkBool hkpWorld::removeEntity(hkpEntity* entity) {
     if (m_criticalOperationsLockCount) {
         hkWorldOperation::RemoveEntity operation;
         operation.m_type.m_storage = hkWorldOperation::ENTITY_REMOVE;
         operation.m_entity = entity;
         queueOperation(operation);
-        result->m_bool = 0;
-        return result;
+        return 0;
     }
     m_criticalOperationsLockCount = 1;
     hkpWorldOperationUtil::removeEntityBP(this, entity);
@@ -2817,8 +2812,7 @@ hkBool* hkpWorld::removeEntity(hkBool* result, hkpEntity* entity) {
             internal_executePendingBodyOperations();
         }
     }
-    result->m_bool = 1;
-    return result;
+    return 1;
 }
 
 void hkpWorld::findInitialContactPoints(hkpEntity** entities, int32_t numEntities) {
@@ -3434,8 +3428,7 @@ void hkpWorld::getWorldAsSystems(hkArray<hkpPhysicsSystem*>& systemsInOut) const
     void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpPhysicsSystem));
     static_cast<hkpPhysicsSystem*>(pMemory)->m_memSizeAndFlags = sizeof(hkpPhysicsSystem);
     hkpPhysicsSystem* pSystem = ::new (pMemory) hkpPhysicsSystem;
-    hkBool kInactive;
-    if (enumerateAllInactiveEntitiesInWorld(&kInactive, this, pSystem)->m_bool) {
+    if (enumerateAllInactiveEntitiesInWorld(this, pSystem).m_bool) {
         pSystem->m_active.m_bool = false;
         hkMemoryRouter& router = hkMemoryRouter::getInstance();
         // hkArray::pushBack: grow when the storage is full, then store and count the element.
@@ -3455,8 +3448,7 @@ void hkpWorld::getWorldAsSystems(hkArray<hkpPhysicsSystem*>& systemsInOut) const
         hkArrayUtil::_reserveMore(*router.m_heap, &systemsInOut, sizeof(hkpPhysicsSystem*));
     }
     systemsInOut.m_data[systemsInOut.m_size++] = pSystem;
-    hkBool kActive;
-    enumerateAllActiveEntitiesInWorld(&kActive, this, pSystem);
+    enumerateAllActiveEntitiesInWorld(this, pSystem);
     enumerateAllPhantomsInWorld(this, pSystem);
     enumerateAllConstraintsInWorld(this, pSystem);
     enumerateAllActionsInWorld(this, pSystem);
@@ -4059,7 +4051,6 @@ void hkpWorld::attachActionToEntity(hkpAction* action, hkpEntity* entity) {
 }
 
 void hkpWorld::removeAll() {
-    hkBool result;
     while (m_phantoms.m_size > 0) {
         removePhantom(*m_phantoms.begin());
     }
@@ -4068,15 +4059,15 @@ void hkpWorld::removeAll() {
         if (!(*m_data)->m_entities.m_size) {
             break;
         }
-        removeEntity(&result, *(*m_data)->m_entities.begin());
+        removeEntity(*(*m_data)->m_entities.begin());
     }
     while (m_inactiveSimulationIslands.m_size > 0) {
-        removeEntity(&result, *(*m_inactiveSimulationIslands.begin())->m_entities.begin());
+        removeEntity(*(*m_inactiveSimulationIslands.begin())->m_entities.begin());
     }
     m_fixedRigidBody->addReference();
-    removeEntity(&result, m_fixedRigidBody);
+    removeEntity(m_fixedRigidBody);
     for (hkpSimulationIsland* i = m_fixedIsland; i->m_entities.m_size > 0; i = m_fixedIsland) {
-        removeEntity(&result, *i->m_entities.begin());
+        removeEntity(*i->m_entities.begin());
     }
     addEntity(m_fixedRigidBody, HK_ENTITY_ACTIVATION_DO_ACTIVATE);
     m_fixedRigidBody->removeReference();
@@ -4289,10 +4280,9 @@ hkpWorld::createAndAddConstraintInstance(hkpRigidBody* bodyA, hkpRigidBody* body
 }
 
 void hkpWorld::removePhysicsSystem(const hkpPhysicsSystem* sys) {
-    hkBool result;
     for (int32_t i = 0; i < sys->m_constraints.m_size; ++i) {
         if (sys->m_constraints.m_data[i]) {
-            removeConstraint(&result, sys->m_constraints.m_data[i]);
+            removeConstraint(sys->m_constraints.m_data[i]);
         }
     }
     for (int32_t i = 0; i < sys->m_actions.m_size; ++i) {
@@ -4326,7 +4316,7 @@ void hkpWorld::removePhysicsSystem(const hkpPhysicsSystem* sys) {
     else {
         for (int32_t i = 0; i < sys->m_rigidBodies.m_size; ++i) {
             if (sys->m_rigidBodies.m_data[i]) {
-                removeEntity(&result, sys->m_rigidBodies.m_data[i]);
+                removeEntity(sys->m_rigidBodies.m_data[i]);
             }
         }
     }
@@ -4737,7 +4727,7 @@ const hkClass& hkpWorld::staticClass() {
     return hkpWorldClass;
 }
 
-hkBool* enumerateAllInactiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWorld, hkpPhysicsSystem* apSystem) {
+hkBool enumerateAllInactiveEntitiesInWorld(const hkpWorld* apWorld, hkpPhysicsSystem* apSystem) {
     const hkpWorld* v3 = apWorld;
     hkpSimulationIsland* m_fixedIsland = apWorld->m_fixedIsland;
     bool v10 = false;
@@ -4767,15 +4757,13 @@ hkBool* enumerateAllInactiveEntitiesInWorld(hkBool* apResult, const hkpWorld* ap
         while (m_data != &v3->m_inactiveSimulationIslands.m_data[v3->m_inactiveSimulationIslands.m_size]);
     }
     if (v3->m_inactiveSimulationIslands.m_size > 0 || v10) {
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
-hkBool* enumerateAllActiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWorld, hkpPhysicsSystem* apSystem) {
+hkBool enumerateAllActiveEntitiesInWorld(const hkpWorld* apWorld, hkpPhysicsSystem* apSystem) {
     hkpSimulationIsland** m_data = apWorld->m_activeSimulationIslands.m_data;
     if (m_data != &m_data[apWorld->m_activeSimulationIslands.m_size]) {
         do {
@@ -4791,8 +4779,7 @@ hkBool* enumerateAllActiveEntitiesInWorld(hkBool* apResult, const hkpWorld* apWo
         }
         while (m_data != &apWorld->m_activeSimulationIslands.m_data[apWorld->m_activeSimulationIslands.m_size]);
     }
-    apResult->m_bool = apWorld->m_activeSimulationIslands.m_size > 0;
-    return apResult;
+    return apWorld->m_activeSimulationIslands.m_size > 0;
 }
 
 void enumerateAllPhantomsInWorld(const hkpWorld* world, hkpPhysicsSystem* sys) {
@@ -4913,16 +4900,15 @@ void enumerateAllConstraintsInIsland(hkpSimulationIsland* island, hkpPhysicsSyst
 // The SDK's file-local hkWorld_updateFilterOnSinglePhantom: adds or removes collidable from phantom's overlaps as
 // filter now says, and, where collidable is itself a phantom's, phantom from that phantom's.
 void hkWorld_updateFilterOnSinglePhantom(hkpCollisionFilter* filter, hkpPhantom* phantom, hkpCollidable* collidable) {
-    hkBool oldOverlapping;
-    phantom->isOverlappingCollidableAdded(&oldOverlapping, collidable);
+    hkBool oldOverlapping = phantom->isOverlappingCollidableAdded(collidable);
     hkBool otherOverlapping;
     if (filter->isCollisionEnabled(phantom->m_collidable, *collidable).m_bool) {
         if (!oldOverlapping.m_bool) {
             phantom->addOverlappingCollidable(collidable);
         }
         if (collidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-            static_cast<hkpPhantom*>(collidable->getOwner())
-                ->isOverlappingCollidableAdded(&otherOverlapping, &phantom->m_collidable);
+            otherOverlapping =
+                static_cast<hkpPhantom*>(collidable->getOwner())->isOverlappingCollidableAdded(&phantom->m_collidable);
             if (!otherOverlapping.m_bool) {
                 static_cast<hkpPhantom*>(collidable->getOwner())->addOverlappingCollidable(&phantom->m_collidable);
             }
@@ -4933,8 +4919,8 @@ void hkWorld_updateFilterOnSinglePhantom(hkpCollisionFilter* filter, hkpPhantom*
             phantom->removeOverlappingCollidable(collidable);
         }
         if (collidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-            static_cast<hkpPhantom*>(collidable->getOwner())
-                ->isOverlappingCollidableAdded(&otherOverlapping, &phantom->m_collidable);
+            otherOverlapping =
+                static_cast<hkpPhantom*>(collidable->getOwner())->isOverlappingCollidableAdded(&phantom->m_collidable);
             if (otherOverlapping.m_bool) {
                 static_cast<hkpPhantom*>(collidable->getOwner())->removeOverlappingCollidable(&phantom->m_collidable);
             }
@@ -4943,11 +4929,9 @@ void hkWorld_updateFilterOnSinglePhantom(hkpCollisionFilter* filter, hkpPhantom*
 }
 
 // Adds the inactive, then the active islands' entities to sys, and makes sys active when the world has active islands.
-// Both results share one hkBool.
 void enumerateAllEntitiesInWorld(const hkpWorld* world, hkpPhysicsSystem* sys) {
-    hkBool result;
-    enumerateAllInactiveEntitiesInWorld(&result, world, sys);
-    sys->m_active = *enumerateAllActiveEntitiesInWorld(&result, world, sys);
+    enumerateAllInactiveEntitiesInWorld(world, sys);
+    sys->m_active = enumerateAllActiveEntitiesInWorld(world, sys);
 }
 
 // Copies every member but m_spareAgentSector, which is left as it was.

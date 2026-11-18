@@ -8,9 +8,9 @@ public:
     hkOffsetOnlyStreamWriter();
     ~hkOffsetOnlyStreamWriter() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t write(const void* apBuffer, int32_t n) override;
-    hkBool* seekTellSupported(hkBool* arResult) const override;
+    hkBool seekTellSupported() const override;
     hkResult seek(int32_t offset, hkStreamWriter::SeekWhence whence) override;
     // The current offset, m_offset.
     int32_t tell() const override;

@@ -185,8 +185,7 @@ hkResult hkObjectCopier::copyObject(
     objectCopierPadUp(dataOut, 16);
     saveExtras(dataIn, klassIn, oa, klassOut, classStart, reloc, 0);
     objectCopierPadUp(dataOut, 16);
-    hkBool ok;
-    const hkResult result = static_cast<hkResult>(oa.isOk(&ok)->m_bool == 0);
+    const hkResult result = static_cast<hkResult>(oa.isOk().m_bool == 0);
     return result;
 }
 

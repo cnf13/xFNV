@@ -1751,9 +1751,8 @@ void bhkRagdollController::UpdateDebugLines(bhkRagdollController::DEBUG_SKEL aeS
             hkaRagdollInstance* pInstance = pRagdollInstance;
             NiColorA color(0.0f, 0.75f, 1.0f, 1.0f);
             int32_t iBody = pInstance->m_boneToRigidBodyMap.m_data[ui];
-            hkBool kFixed;
             if (iBody >= 0 && pInstance->m_rigidBodies.m_data[iBody] &&
-                pInstance->getRigidBodyOfBone(ui)->isFixedOrKeyframed(&kFixed)->m_bool) {
+                pInstance->getRigidBodyOfBone(ui)->isFixedOrKeyframed().m_bool) {
                 color = NiColorA::Blue;
             }
             NiLines* plineColor = static_cast<NiLines*>(plineNode->m_kChildren.m_pBase[uiLineIdx].m_pObject);
@@ -2079,8 +2078,7 @@ void bhkRagdollController::DoGrabIK(hkQsTransform& arWorldFromModel) {
         kSetup.m_hingeAxisLS.m_quad[2] = 1.0f;
         kSetup.m_hingeAxisLS.m_quad[3] = 0.0f;
         kSetup.m_endTargetMS = kEndTargetMS;
-        hkBool kSolved;
-        hkaTwoJointsIkSolver::solve(&kSolved, kSetup, *pSGPose);
+        hkaTwoJointsIkSolver::solve(kSetup, *pSGPose);
     }
     if (!GrabIKState[0].bEnabled && !GrabIKState[1].bEnabled) {
         bActiveGrabIK = false;
@@ -2720,8 +2718,7 @@ bool bhkRagdollController::BoneTrack(bhkRagdollController::LookIKBone aeBone, hk
         rParams.PrevRotLS = kPrevLS.m_rotation;
     }
     hkQsTransform& rBoneMS = rParams.pPose->accessBoneModelSpace(rParams.ssBoneIdx, hkaPose::PROPAGATE);
-    hkBool kSolved;
-    const bool bSolved = hkaLookAtIkSolver::solve(&kSolved, setup, targetMS, 1.0f, rBoneMS, nullptr)->m_bool != 0;
+    const bool bSolved = hkaLookAtIkSolver::solve(setup, targetMS, 1.0f, rBoneMS, nullptr).m_bool != 0;
 
     hkQsTransform kBoneLS;
     {
@@ -2732,8 +2729,7 @@ bool bhkRagdollController::BoneTrack(bhkRagdollController::LookIKBone aeBone, hk
     }
     const float fAngle = rParams.bLimitBoneRot ? LimitBoneRot(aeBone, kBoneLS.m_rotation) : 0.0f;
 
-    hkBool kRotationOk;
-    if (!getBoneModelSpace(*rParams.pPose, rParams.ssBoneIdx).m_rotation.isOk(&kRotationOk)->m_bool) {
+    if (!getBoneModelSpace(*rParams.pPose, rParams.ssBoneIdx).m_rotation.isOk().m_bool) {
         // EXE-INLINED none: hkaPose::setBoneLocalSpace
         hkaPose* pPose = rParams.pPose;
         const int32_t iBone = rParams.ssBoneIdx;

@@ -75,20 +75,16 @@ int32_t hkBufferedStreamReader::skip(int32_t nbytes) {
 }
 
 // Buffered bytes left mean the reader is still good; otherwise the underlying stream decides.
-hkBool* hkBufferedStreamReader::isOk(hkBool* arResult) const {
-    hkBool bStreamOk;
-    if (m_buf.current != m_buf.size || m_stream->isOk(&bStreamOk)->m_bool) {
-        arResult->m_bool = 1;
-        return arResult;
+hkBool hkBufferedStreamReader::isOk() const {
+    if (m_buf.current != m_buf.size || m_stream->isOk().m_bool) {
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
-hkBool* hkBufferedStreamReader::markSupported(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)(((uint32_t)m_buf.capacity) != 0));
-    return arResult;
+hkBool hkBufferedStreamReader::markSupported() const {
+    return (int8_t)((uint8_t)(((uint32_t)m_buf.capacity) != 0));
 }
 
 hkResult hkBufferedStreamReader::setMark(int32_t markLimit) {
@@ -106,9 +102,8 @@ hkResult hkBufferedStreamReader::rewindToMark() {
     return static_cast<hkResult>(0);
 }
 
-hkBool* hkBufferedStreamReader::seekTellSupported(hkBool* arResult) const {
-    m_stream->seekTellSupported(arResult);
-    return arResult;
+hkBool hkBufferedStreamReader::seekTellSupported() const {
+    return m_stream->seekTellSupported();
 }
 
 hkResult hkBufferedStreamReader::seek(int32_t offset, hkStreamReader::SeekWhence whence) {
@@ -129,8 +124,7 @@ int32_t hkBufferedStreamReader::tell() const {
 }
 
 hkResult hkBufferedStreamReader::refillBuffer() {
-    hkBool v6;
-    if (!m_stream->isOk(&v6)->m_bool) {
+    if (!m_stream->isOk().m_bool) {
         return HK_FAILURE;
     }
     prepareBufferForRefill();

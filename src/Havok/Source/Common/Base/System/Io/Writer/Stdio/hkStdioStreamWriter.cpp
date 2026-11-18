@@ -19,9 +19,8 @@ hkStdioStreamWriter::~hkStdioStreamWriter() {
     close();
 }
 
-hkBool* hkStdioStreamWriter::isOk(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)(reinterpret_cast<uintptr_t>(m_handle) != 0));
-    return arResult;
+hkBool hkStdioStreamWriter::isOk() const {
+    return (int8_t)((uint8_t)(reinterpret_cast<uintptr_t>(m_handle) != 0));
 }
 
 int32_t hkStdioStreamWriter::write(const void* buf, int32_t nbytes) {
@@ -43,9 +42,8 @@ void hkStdioStreamWriter::flush() {
     }
 }
 
-hkBool* hkStdioStreamWriter::seekTellSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkStdioStreamWriter::seekTellSupported() const {
+    return 1;
 }
 
 hkResult hkStdioStreamWriter::seek(int32_t offset, hkStreamWriter::SeekWhence whence) {
@@ -56,9 +54,8 @@ int32_t hkStdioStreamWriter::tell() const {
     return std::ftell(m_handle);
 }
 
-hkBool* hkStdioStreamWriter::markSupported(hkBool* arResult) const {
-    arResult->m_bool = 1;
-    return arResult;
+hkBool hkStdioStreamWriter::markSupported() const {
+    return 1;
 }
 
 void hkStdioStreamWriter::close() {

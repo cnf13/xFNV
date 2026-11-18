@@ -52,4 +52,4 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
 // The integrate job of one island. Defined in hkpCpuIntegrateJob.cpp.
 hkJobQueue::JobStatus
 integrateJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::JobQueueEntry& nextJobOut);
-hkBool* canSolveOnSingleProcessor(hkBool* result);
+hkBool canSolveOnSingleProcessor();

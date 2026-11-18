@@ -40,8 +40,7 @@ void hkRelocationInfo::addImport(int32_t off, const char* name) {
     hkStorageStringMap<int32_t, hkContainerHeapAllocator>* pPool = m_pool;
     // EXE-INLINED none: hkStorageStringMap::insert
     auto it = pPool->m_map.findKey(reinterpret_cast<hkUlong>(name));
-    hkBool valid;
-    pPool->m_map.isValid(&valid, it);
+    hkBool valid = pPool->m_map.isValid(it);
     const char* pcName;
     if (!valid.m_bool) {
         // EXE-INLINED 0x4A4840

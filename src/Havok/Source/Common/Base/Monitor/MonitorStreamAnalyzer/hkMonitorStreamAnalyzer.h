@@ -163,12 +163,8 @@ public:
     void checkAllThreadsCapturedSameNumFrames() const;
     void drawThreadsToTga(const hkMonitorStreamAnalyzer::ThreadDrawInput& input, hkOstream& outStream);
     char* getStreamBegin();
-    hkBool* captureFrameDetails(
-        hkBool* apResult,
-        const char* monitorStreamBegin,
-        const char* monitorStreamEnd,
-        hkMonitorStreamFrameInfo& info
-    );
+    hkBool
+    captureFrameDetails(const char* monitorStreamBegin, const char* monitorStreamEnd, hkMonitorStreamFrameInfo& info);
     void writeRawStatistics(hkOstream& os);
     // The statistics tree of every frame of thread threadId, under a new "/" root.
     hkMonitorStreamAnalyzer::Node* makeStatisticsTreeForMultipleFrames(int32_t threadId, hkBool reuseNodesIfPossible);

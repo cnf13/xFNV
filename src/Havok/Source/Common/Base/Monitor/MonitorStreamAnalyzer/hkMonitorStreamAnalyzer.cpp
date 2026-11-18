@@ -759,8 +759,7 @@ char* hkMonitorStreamAnalyzer::getStreamBegin() {
     return nullptr;
 }
 
-hkBool* hkMonitorStreamAnalyzer::captureFrameDetails(
-    hkBool* apResult,
+hkBool hkMonitorStreamAnalyzer::captureFrameDetails(
     const char* monitorStreamBegin,
     const char* monitorStreamEnd,
     hkMonitorStreamFrameInfo& info
@@ -786,12 +785,10 @@ hkBool* hkMonitorStreamAnalyzer::captureFrameDetails(
         int32_t v14 = m_data.m_size;
         m_data.m_size = v14 + v6;
         hkString::memCpy(&m_data.m_data[v14], monitorStreamBegin, v6);
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 // The prefix is a NUL-terminated char array on the debug allocator, set up by hkInitIndentString and reset to "" for
@@ -2571,13 +2568,13 @@ void printStatisticsByType(hkOstream& outstream, hkMonitorStreamAnalyzer::Node* 
     }
     Map_t::Iterator it = nameToInfoMap.m_map.getIterator();
     hkBool valid;
-    nameToInfoMap.m_map.isValid(&valid, it);
+    valid = nameToInfoMap.m_map.isValid(it);
     while (valid) {
         // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*>::pushBackUnchecked
         sortedInfos.m_data[sortedInfos.m_size] = nameToInfoMap.getValue(it);
         ++sortedInfos.m_size;
         it = nameToInfoMap.m_map.getNext(it);
-        nameToInfoMap.m_map.isValid(&valid, it);
+        valid = nameToInfoMap.m_map.isValid(it);
     }
     if (sortedInfos.m_size > 1) {
         // EXE-INLINED none: hkAlgorithm::quickSort

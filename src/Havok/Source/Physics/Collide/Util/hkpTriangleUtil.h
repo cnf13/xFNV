@@ -8,8 +8,7 @@ class hkpTriangleUtil {
 public:
     // Whether the triangle a, b, c is degenerate: a sliver (an edge cross product of squared length under tolerance) or
     // a zero area.
-    static hkBool*
-    isDegenerate(hkBool* apResult, const hkVector4& a, const hkVector4& b, const hkVector4& c, float tolerance);
+    static hkBool isDegenerate(const hkVector4& a, const hkVector4& b, const hkVector4& c, float tolerance);
     static uint8_t* rayIntersect(
         uint8_t* a1,
         float* a2,

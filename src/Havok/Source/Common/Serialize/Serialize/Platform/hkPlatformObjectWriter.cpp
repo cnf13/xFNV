@@ -120,8 +120,7 @@ hkResult hkPlatformObjectWriter::writeObject(
         pOut = apStream;
     }
     m_copier->copyObject(apObject, arKlass, pOut, *pKlassOut, arReloc);
-    hkBool kOk;
-    return static_cast<hkResult>(pOut->isOk(&kOk)->m_bool == 0);
+    return static_cast<hkResult>(pOut->isOk().m_bool == 0);
 }
 
 hkResult hkPlatformObjectWriter::writeRaw(hkStreamWriter* a1, const void* a2, int32_t a3) {

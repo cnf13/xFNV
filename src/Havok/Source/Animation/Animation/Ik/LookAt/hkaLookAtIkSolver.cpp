@@ -16,8 +16,7 @@
 // products sum z + (y + x); normalize3 is a reciprocal square root estimate with one Newton step, 0.5 * r * (3 - x * r
 // * r), zero for a zero vector. Scalar steps are written packed: only lane 0 is read. The intermediates are double,
 // rounded to float where the game stores them. The comparisons decide NaN cases as written.
-hkBool* hkaLookAtIkSolver::solve(
-    hkBool* apResult,
+hkBool hkaLookAtIkSolver::solve(
     const Setup& setup,
     const hkVector4& targetMS,
     float gain,
@@ -95,7 +94,8 @@ hkBool* hkaLookAtIkSolver::solve(
     // object still holding the limit axis.
     hkQuaternion kRotation;
     hkQuaternion kLimitRotation;
-    apResult->m_bool = 1;
+    hkBool result;
+    result.m_bool = 1;
     // Outside the cone: turn the limit axis by the half angle towards the target instead.
     if (std::cos(fLimitAngle) > fCosToLimitAxis) {
         hkVector4& kLimitAxis = kRotation.m_vec;
@@ -103,7 +103,7 @@ hkBool* hkaLookAtIkSolver::solve(
         kLimitRotation.setAxisAngle(kLimitAxis, fLimitAngle);
         // EXE-INLINED none: hkVector4::setRotatedDir
         store(kDirection, rotatedDir(kLimitRotation, setup.m_limitAxisMS));
-        apResult->m_bool = 0;
+        result.m_bool = 0;
     }
 
     if (range) {
@@ -138,7 +138,7 @@ hkBool* hkaLookAtIkSolver::solve(
             _mm_load_ps(&reinterpret_cast<const float*>(&hkVector4_setAbs4_absMask)[0])
         );
         if ((_mm_movemask_ps(_mm_cmple_ps(kDiff, _mm_set1_ps(0.001f))) & 7) != 7) {
-            apResult->m_bool = 0;
+            result.m_bool = 0;
         }
     }
 
@@ -202,7 +202,7 @@ hkBool* hkaLookAtIkSolver::solve(
     hkQuaternion kResult;
     kResult.setMul(kRotation, neckModelSpaceInOut.m_rotation);
     store(neckModelSpaceInOut.m_rotation.m_vec, load(kResult.m_vec));
-    return apResult;
+    return result;
 }
 
 // The length is computed with packed adds in the order z + (y + x), then a square root; vectors shorter than the double

@@ -532,12 +532,11 @@ uint32_t hkpExtendedMeshShape::getFirstKey() const {
         return key;
     }
     const hkpTriangleShape* pTriangle = static_cast<const hkpTriangleShape*>(pChild);
-    hkBool result;
     if (!hkpTriangleUtil::isDegenerate(
-             &result, pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
+             pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
              hkDefaultTriangleDegeneracyTolerance
         )
-             ->m_bool) {
+             .m_bool) {
         return key;
     }
     return pContainer->getNextKey(key);
@@ -583,10 +582,10 @@ uint32_t hkpExtendedMeshShape::getNextKey(uint32_t initialKey) const {
         }
         const hkpTriangleShape* pTriangle = static_cast<const hkpTriangleShape*>(pChild);
         if (!hkpTriangleUtil::isDegenerate(
-                 &result, pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
+                 pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
                  hkDefaultTriangleDegeneracyTolerance
             )
-                 ->m_bool) {
+                 .m_bool) {
             return key;
         }
     }
@@ -724,12 +723,11 @@ int32_t hkpExtendedMeshShape::_getNumChildShapesInTrianglesSubpart(
             static_cast<uint32_t>(subpartIndex) << (32 - m_numBitsForSubpartIndex) | static_cast<uint32_t>(i);
         const hkpTriangleShape* pTriangle =
             static_cast<const hkpTriangleShape*>(hkpExtendedMeshShape::getChildShape(uiKey, buffer));
-        hkBool bDegenerate;
         if (!hkpTriangleUtil::isDegenerate(
-                 &bDegenerate, pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
+                 pTriangle->getVertex(0), pTriangle->getVertex(1), pTriangle->getVertex(2),
                  hkDefaultTriangleDegeneracyTolerance
             )
-                 ->m_bool) {
+                 .m_bool) {
             ++iNumChildShapes;
         }
     }

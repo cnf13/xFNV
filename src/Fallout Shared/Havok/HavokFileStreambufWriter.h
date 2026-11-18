@@ -12,7 +12,7 @@ public:
     HavokFileStreambufWriter(const char* apFilename);
     ~HavokFileStreambufWriter() override;
 
-    hkBool* isOk(hkBool* arResult) const override;
+    hkBool isOk() const override;
     int32_t write(const void* apBuf, int32_t aiBytes) override;
     // seek and tell do not override the base's: seek has different parameter types and tell is not const, so both are
     // new virtual functions. The whence is uint32_t rather than the enum because with int32_t the signature would match

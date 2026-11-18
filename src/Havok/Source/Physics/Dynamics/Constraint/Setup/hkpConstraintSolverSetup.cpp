@@ -768,8 +768,7 @@ void hkpConstraintSolverSetup::subSolve(hkpConstraintSolverResources& s, hkpCons
 // Adds up the schema bytes (per range: the second for forced-TOI constraints) and the element temps the constraints
 // need and tells whether they still fit the resources' buffer, each schema range keeping room for its end schema (the
 // zero word internalAddJacobianSchemas writes).
-hkBool* hkpConstraintSolverSetup::internalIsMemoryOkForNewJacobianSchemas(
-    hkBool* apResult,
+hkBool hkpConstraintSolverSetup::internalIsMemoryOkForNewJacobianSchemas(
     hkpConstraintSolverResources& s,
     hkpConstraintInstance** constraints,
     int32_t numConstraints
@@ -815,17 +814,14 @@ hkBool* hkpConstraintSolverSetup::internalIsMemoryOkForNewJacobianSchemas(
     const int32_t iEndSchemaSize = 4;
     if (elemTemp > s.m_elemTempEnd || schemas[0] + iEndSchemaSize > reinterpret_cast<uint8_t*>(s.m_schemas[0].m_end) ||
         schemas[1] + iEndSchemaSize > reinterpret_cast<uint8_t*>(s.m_schemas[1].m_end)) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 // The accumulator buffer's free bytes, less 16, against 128 bytes per accumulator; the compare is signed. The buffer is
 // raw memory carved by byte (see solve), so its free space is a byte difference.
-hkBool* hkpConstraintSolverSetup::internalIsMemoryOkForNewAccumulators(
-    hkBool* apResult,
+hkBool hkpConstraintSolverSetup::internalIsMemoryOkForNewAccumulators(
     hkpConstraintSolverResources& s,
     hkpEntity** entities,
     int32_t numEntities
@@ -837,8 +833,7 @@ hkBool* hkpConstraintSolverSetup::internalIsMemoryOkForNewAccumulators(
     const int32_t bytesLeft = static_cast<int32_t>(
         reinterpret_cast<char*>(s.m_accumulatorsEnd) - reinterpret_cast<char*>(s.m_accumulatorsCurrent)
     );
-    apResult->m_bool = numAccumulators * static_cast<int32_t>(sizeof(hkpVelocityAccumulator)) <= bytesLeft - 16;
-    return apResult;
+    return numAccumulators * static_cast<int32_t>(sizeof(hkpVelocityAccumulator)) <= bytesLeft - 16;
 }
 
 void hkpConstraintSolverSetup::shutdownSolver(hkpConstraintSolverResources& s) {}

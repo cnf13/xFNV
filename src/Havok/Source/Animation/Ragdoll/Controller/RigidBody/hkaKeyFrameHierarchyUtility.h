@@ -23,7 +23,7 @@ public:
     struct ControlData {
         ControlData();
 
-        hkBool* isValid(hkBool* apResult);
+        hkBool isValid();
 
         // Havok SDK signature (hkaRagdoll.lib, tied by target).
         static const hkClass& staticClass();

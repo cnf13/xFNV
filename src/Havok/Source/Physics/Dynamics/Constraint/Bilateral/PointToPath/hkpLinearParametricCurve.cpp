@@ -427,9 +427,8 @@ void hkpLinearParametricCurve::getBinormal(float t, hkVector4& up) const {
     _mm_store_ps(&reinterpret_cast<float*>(&up.m_quad)[0], _mm_mul_ps(_mm_shuffle_ps(kMasked, kMasked, 0x00), kUp));
 }
 
-hkBool* hkpLinearParametricCurve::isClosedLoop(hkBool* arResult) const {
-    arResult->m_bool = (int8_t)((uint8_t)m_closedLoop.m_bool);
-    return arResult;
+hkBool hkpLinearParametricCurve::isClosedLoop() const {
+    return (int8_t)((uint8_t)m_closedLoop.m_bool);
 }
 
 // The SDK's pathPoints = m_points: hkArray's inline operator=, the plain-data copyFromArray.

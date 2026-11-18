@@ -137,8 +137,7 @@ void hkpKdTreeWorldManager::castRay(
         collector.m_filter = nullptr;
         collector.m_collectionFilter = nullptr;
     }
-    hkBool result;
-    hkKdTreeUtils::castRayIterative(&result, m_kdTree, input.m_from, input.m_to, &collector);
+    hkKdTreeUtils::castRayIterative(m_kdTree, input.m_from, input.m_to, &collector);
 }
 
 // Casts the ray through the kd-tree, the hits going to collector. The raycaster's output is a local that is reset by
@@ -161,8 +160,7 @@ void hkpKdTreeWorldManager::castRay(
     kRaycaster.m_output = &kOutput;
     kOutput.m_shapeKeyIndex = 0;
     kOutput.m_rootCollidable = nullptr;
-    hkBool kResult;
-    hkKdTreeUtils::castRayIterative(&kResult, m_kdTree, input.m_from, input.m_to, &kRaycaster);
+    hkKdTreeUtils::castRayIterative(m_kdTree, input.m_from, input.m_to, &kRaycaster);
 }
 
 void hkpKdTreeWorldManager::linearCast(

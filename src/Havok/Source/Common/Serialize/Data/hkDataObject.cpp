@@ -278,9 +278,8 @@ int32_t hkDataClass::isNull() const {
     return m_impl == nullptr;
 }
 
-hkBool* hkDataClass::isSuperClass(hkBool* apResult, const hkDataClass& k) {
-    ::new (apResult) hkBool(m_impl->isSuperClass(k.m_impl));
-    return apResult;
+hkBool hkDataClass::isSuperClass(const hkDataClass& k) {
+    return m_impl->isSuperClass(k.m_impl);
 }
 
 int32_t hkDataClass::getDeclaredMemberIndexByName(const char* name) {

@@ -50,7 +50,7 @@ hkBool hkRotation::isOk() const {
     return hkMatrix3::isOk();
 }
 
-hkBool* hkRotation::isOrthonormal(hkBool* a2, float a3) const {
+hkBool hkRotation::isOrthonormal(float a3) const {
     hkVector4 v3;
     __m128 v6;
     __m128 v7;
@@ -69,29 +69,27 @@ hkBool* hkRotation::isOrthonormal(hkBool* a2, float a3) const {
          (v7 = _mm_mul_ps(m_col2.m_quad, m_col2.m_quad),
           (v12 = (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) - 1.0,
            (v13 = std::fabs((double)v12), v13 > static_cast<double>(a3)))))) {
-        *a2 = false;
-        return a2;
+        return false;
     }
 
-    *a2 = (_mm_movemask_ps(_mm_cmple_ps(
-               _mm_and_ps(
-                   _mm_sub_ps(
-                       _mm_sub_ps(
-                           _mm_mul_ps(
-                               _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 210),
-                               _mm_shuffle_ps(v3.m_quad, v3.m_quad, 201)
-                           ),
-                           _mm_mul_ps(
-                               _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 201),
-                               _mm_shuffle_ps(v3.m_quad, v3.m_quad, 210)
-                           )
-                       ),
-                       m_col2.m_quad
-                   ),
-                   hkVector4_setAbs4_absMask
-               ),
-               _mm_shuffle_ps(_mm_set_ss(a3), _mm_set_ss(a3), 0)
-           )) &
-           7) == 7;
-    return a2;
+    return (_mm_movemask_ps(_mm_cmple_ps(
+                _mm_and_ps(
+                    _mm_sub_ps(
+                        _mm_sub_ps(
+                            _mm_mul_ps(
+                                _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 210),
+                                _mm_shuffle_ps(v3.m_quad, v3.m_quad, 201)
+                            ),
+                            _mm_mul_ps(
+                                _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 201),
+                                _mm_shuffle_ps(v3.m_quad, v3.m_quad, 210)
+                            )
+                        ),
+                        m_col2.m_quad
+                    ),
+                    hkVector4_setAbs4_absMask
+                ),
+                _mm_shuffle_ps(_mm_set_ss(a3), _mm_set_ss(a3), 0)
+            )) &
+            7) == 7;
 }

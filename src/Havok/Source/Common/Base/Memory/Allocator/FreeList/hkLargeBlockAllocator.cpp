@@ -37,10 +37,9 @@ void* hkLargeBlockAllocator::alloc(uint32_t bytes) {
     if (result) {
         return result;
     }
-    hkBool bResult;
     hkMemPage* pPage;
     if (m_server->isSingleBlockServer().m_bool && (pPage = m_pages.m_next) != &m_pages) {
-        if (_resizeSingleBlockServerPage(&bResult, pPage->m_size + nb)->m_bool) {
+        if (_resizeSingleBlockServerPage(pPage->m_size + nb).m_bool) {
             return _allocFromTop(nb);
         }
         if (m_limitedListener) {
@@ -49,7 +48,7 @@ void* hkLargeBlockAllocator::alloc(uint32_t bytes) {
             if (result) {
                 return result;
             }
-            if (_resizeSingleBlockServerPage(&bResult, pPage->m_size + nb)->m_bool) {
+            if (_resizeSingleBlockServerPage(pPage->m_size + nb).m_bool) {
                 return _allocFromTop(nb);
             }
             m_limitedListener->allocationFailure(nb);
@@ -416,7 +415,7 @@ void hkLargeBlockAllocator::_makeTopValid() const {
 
 // Asks the single-block server to resize its one page; on success the top grows by the 16-aligned growth and the
 // page's footer chunk shrinks by as much, keeping its in-use bit.
-hkBool* hkLargeBlockAllocator::_resizeSingleBlockServerPage(hkBool* apResult, uint32_t newSize) {
+hkBool hkLargeBlockAllocator::_resizeSingleBlockServerPage(uint32_t newSize) {
     uint32_t uiSizeOut;
     hkMemPage* pPage = m_pages.m_next;
     if (m_server->resize(pPage, pPage->m_size, newSize, uiSizeOut).m_bool) {
@@ -429,12 +428,10 @@ hkBool* hkLargeBlockAllocator::_resizeSingleBlockServerPage(hkBool* apResult, ui
         pPage->m_size = uiSize;
         m_top->chunkPlusOffset(m_topsize)->head =
             (uiFooterHead & ~hkMemChunk::INUSE_BITS) - uiGrowth | hkMemChunk::CINUSE_BIT;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 // dlmalloc's tmalloc_large: the smallest tree chunk of at least nb bytes, from nb's own bin (walking the size bits,
@@ -574,7 +571,7 @@ void hkLargeBlockAllocator::garbageCollect() {
         if (m_topsize >= 0x8000) {
             // The top's offset in the page's raw memory, plus 0x120, as the game does.
             _resizeSingleBlockServerPage(
-                &bResult, static_cast<uint32_t>(reinterpret_cast<char*>(m_top) - m_pages.m_next->m_start + 0x120)
+                static_cast<uint32_t>(reinterpret_cast<char*>(m_top) - m_pages.m_next->m_start + 0x120)
             );
         }
         return;
@@ -622,25 +619,22 @@ hkLargeBlockAllocator::Iterator* hkLargeBlockAllocator::getIterator(hkLargeBlock
     return apResult;
 }
 
-hkBool* hkLargeBlockAllocator::nextBlock(hkBool* apResult, hkLargeBlockAllocator::Iterator& arIter) {
+hkBool hkLargeBlockAllocator::nextBlock(hkLargeBlockAllocator::Iterator& arIter) {
     if (!arIter.m_chunk) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
     arIter.m_chunk = arIter.m_chunk->nextChunk();
     if (arIter.m_chunk == arIter.m_end) {
         hkMemPage* pPage = arIter.m_page->m_next;
         if (pPage == &m_pages) {
             arIter.m_chunk = nullptr;
-            apResult->m_bool = 0;
-            return apResult;
+            return 0;
         }
         arIter.m_page = pPage;
         arIter.m_chunk = pPage->getFirstChunk();
         arIter.m_end = pPage->getFooter();
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 // The bytes of every used block of every page, after making the top's header valid.
@@ -686,26 +680,22 @@ bool hkLargeBlockAllocator::_checkUsedAlloc(const void* mem) {
 
 // Whether p is a well-formed free chunk: aligned, free, inside the heap, followed by a used chunk that knows it is free
 // and preceded by a used one.
-hkBool* hkLargeBlockAllocator::_checkFreeChunk(hkBool* apResult, hkMemChunk* p) {
+hkBool hkLargeBlockAllocator::_checkFreeChunk(hkMemChunk* p) {
     if (!hkMemChunk::isAligned(p) || p->isInuse() || reinterpret_cast<char*>(p) < m_leastAddr) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
     hkMemChunk* pNext = p->nextChunk();
     if (pNext->isPinuse() || !pNext->isInuse() || !p->isPinuse()) {
-        apResult->m_bool = 0;
-        return apResult;
+        return 0;
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
-hkBool* hkLargeBlockAllocator::checkAllocations(hkBool* apResult, void** allocs, int32_t size) {
+hkBool hkLargeBlockAllocator::checkAllocations(void** allocs, int32_t size) {
     int32_t v4 = 0;
     if (size <= 0) {
     LABEL_4:;
-        apResult->m_bool = 1;
-        return apResult;
+        return 1;
     }
 
     while (_checkUsedAlloc(allocs[v4])) {
@@ -713,8 +703,7 @@ hkBool* hkLargeBlockAllocator::checkAllocations(hkBool* apResult, void** allocs,
             goto LABEL_4;
         }
     }
-    apResult->m_bool = 0;
-    return apResult;
+    return 0;
 }
 
 // Calls callback with the payload and payload size of every used block of every page. The block's size is read before

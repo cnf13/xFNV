@@ -488,20 +488,17 @@ float hkCpuWorldRayCastCollector::addBroadPhaseHandle(const hkpBroadPhaseHandle*
     const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle);
     // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
     const void* pOwner = reinterpret_cast<const char*>(pHandle) + pHandle->m_ownerOffset;
-    hkBool result;
-    testCollidable(&result, static_cast<const hkpCollidable*>(pOwner));
+    testCollidable(static_cast<const hkpCollidable*>(pOwner));
     return m_hitFraction;
 }
 
-// The SDK's primitive id is the collidable's address. testCollidable writes the hkBool straight into the result.
-hkBool* hkCpuWorldRayCastCollector::addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) {
-    testCollidable(arResult, reinterpret_cast<const hkpCollidable*>(primitiveId));
-    return arResult;
+// The SDK's primitive id is the collidable's address.
+hkBool hkCpuWorldRayCastCollector::addMidPhaseHit(hkPrimitiveId primitiveId) {
+    return testCollidable(reinterpret_cast<const hkpCollidable*>(primitiveId));
 }
 
-hkBool* hkCpuWorldRayCastCollector::hasHit(hkBool* arResult) {
-    arResult->m_bool = m_hit.m_bool;
-    return arResult;
+hkBool hkCpuWorldRayCastCollector::hasHit() {
+    return m_hit.m_bool;
 }
 
 float hkCpuWorldRayCastCollector::getHitFraction() {
@@ -510,15 +507,13 @@ float hkCpuWorldRayCastCollector::getHitFraction() {
 
 // A leaf of the world's tree holds its collidable in m_leafData; the hit fraction is the result.
 float hkCpuWorldRayCastCollector::addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::Node* leaf) {
-    hkBool result;
-    testCollidable(&result, static_cast<const hkpCollidable*>(leaf->m_leafData.m_userData));
+    testCollidable(static_cast<const hkpCollidable*>(leaf->m_leafData.m_userData));
     return m_hitFraction;
 }
 
 // A leaf of the world's tree holds its collidable in m_leafData; the hit fraction is the result.
 float hkCpuWorldRayCastCollector::addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Node* leaf) {
-    hkBool result;
-    testCollidable(&result, static_cast<const hkpCollidable*>(leaf->m_leafData.m_userData));
+    testCollidable(static_cast<const hkpCollidable*>(leaf->m_leafData.m_userData));
     return m_hitFraction;
 }
 
@@ -526,7 +521,7 @@ float hkCpuWorldRayCastCollector::addLeaf(const hkAabbTree<hkAabbTreeData::hkAab
 // local result that replaces the next free one, or the farthest kept one when the buffer is full and the new hit is
 // nearer. When choosing the farthest kept result, NaN keeps the current one; the replacement gives up unless the kept
 // one is farther than the hit (NaN gives up). The hit fraction and the replaced one are floats.
-hkBool* hkCpuWorldRayCastCollector::testCollidable(hkBool* arResult, const hkpCollidable* apCollidable) {
+hkBool hkCpuWorldRayCastCollector::testCollidable(const hkpCollidable* apCollidable) {
     // EXE-INLINED 0xC7F690
     auto transformedInversePos = [](const hkTransform& t, const hkVector4& v) {
         const __m128 kD = _mm_sub_ps(v.m_quad, t.m_translation.m_quad);
@@ -542,15 +537,16 @@ hkBool* hkCpuWorldRayCastCollector::testCollidable(hkBool* arResult, const hkpCo
     };
 
     const hkpShape* pShape = apCollidable->m_shape;
-    // The result lives in the caller's buffer: false at once, the cast's result copied in after the cast.
-    arResult->m_bool = false;
+    // The result is false at once, the cast's result copied in after the cast.
+    hkBool result;
+    result.m_bool = false;
     if (!pShape) {
-        return arResult;
+        return result;
     }
     if (!static_cast<const hkpRayCollidableFilter&>(*m_filter)
              .isCollisionEnabled(*m_originalInput, *apCollidable)
              .m_bool) {
-        return arResult;
+        return result;
     }
 
     const hkTransform& kTransform = *apCollidable->m_motion.pMotion;
@@ -567,14 +563,14 @@ hkBool* hkCpuWorldRayCastCollector::testCollidable(hkBool* arResult, const hkpCo
         pShape->castRayWithCollectorImpl(m_workInput, *apCollidable, *m_fixedBufferRayHitCollector);
         m_command->m_numResultsOut = m_fixedBufferRayHitCollector->m_numOutputs.m_storage;
         m_earlyOutHitFraction.m_quad = _mm_set1_ps(m_fixedBufferRayHitCollector->m_earlyOutHitFraction);
-        return arResult;
+        return result;
     }
 
     // EXE-INLINED 0x632C30
     const hkBool kHit = pShape->castRayImpl(m_workInput, output);
-    arResult->m_bool = kHit.m_bool;
+    result.m_bool = kHit.m_bool;
     if (!kHit.m_bool) {
-        return arResult;
+        return result;
     }
     hkpWorldRayCastCommand* pCommand = m_command;
     const int32_t iNumResults = pCommand->m_numResultsOut;
@@ -594,7 +590,7 @@ hkBool* hkCpuWorldRayCastCollector::testCollidable(hkBool* arResult, const hkpCo
             }
         }
         if (!(pDest->m_hitFraction > output.m_hitFraction)) {
-            return arResult;
+            return result;
         }
         fFraction = pDest->m_hitFraction;
     }
@@ -627,7 +623,7 @@ hkBool* hkCpuWorldRayCastCollector::testCollidable(hkBool* arResult, const hkpCo
         m_hit.m_bool = true;
         m_earlyOutHitFraction.m_quad = _mm_set1_ps(m_hitFraction);
     }
-    return arResult;
+    return result;
 }
 
 void hkCpuWorldRayCastCollector::operator delete(void* apMemory) {

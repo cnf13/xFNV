@@ -74,17 +74,15 @@ void hkQsTransform::get4x4ColumnMajor(float* d) const {
 
 // Tests the twelve floats from the translation on, all but the translation's and the scale's w, each for a finite
 // exponent.
-hkBool* hkQsTransform::isOk(hkBool* apResult) const {
+hkBool hkQsTransform::isOk() const {
     const float* pValues = &m_translation(0);
     for (int32_t i = 0; i < 12; ++i) {
         // EXE-INLINED none: hkMath::isFinite
         if (i != 3 && i != 11 && (std::bit_cast<uint32_t>(pValues[i]) & 0x7F800000u) == 0x7F800000u) {
-            apResult->m_bool = 0;
-            return apResult;
+            return 0;
         }
     }
-    apResult->m_bool = 1;
-    return apResult;
+    return 1;
 }
 
 bool* hkQsTransform::isApproximatelyEqual(bool* a1, __m128* a2, uint32_t a3) {

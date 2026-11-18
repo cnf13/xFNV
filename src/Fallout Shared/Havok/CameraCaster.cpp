@@ -101,8 +101,7 @@ bool CameraCaster::Pick(NiPoint3& arFrom, NiPoint3& arTo, hkpRootCdPoint& arPoin
     NI2HK(kStart, arFrom);
     NI2HK(kInput.m_to, arTo);
     GetPlayerShapePhantom()->SetPositionAndLinearCast(kStart, kInput, *pCollector, nullptr);
-    hkBool kHit;
-    bResult = *pCollector->hasHit(&kHit);
+    bResult = pCollector->hasHit();
     if (bResult) {
         pCollector->sortHits();
         int32_t iIndex = 0;
@@ -205,7 +204,6 @@ bool CameraCaster::KeepOutOfCharacter(
     float afRadius,
     float afScaleOffset
 ) {
-    hkBool kHit;
     hkpCollisionInput input;
     alignas(16) hkVector4 capsulePos;
     alignas(16) hkVector4 cameraPos;
@@ -262,7 +260,7 @@ bool CameraCaster::KeepOutOfCharacter(
                 float foldRad = ps->m_radius;
                 ps->setRadius(afRadius);
                 pfunc(*pca, *pcb, input, collector);
-                bres = collector.hasHit(&kHit)->operator bool();
+                bres = collector.hasHit().operator bool();
                 ps->setRadius(foldRad);
             }
         }

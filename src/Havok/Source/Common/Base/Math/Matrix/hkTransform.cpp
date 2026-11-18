@@ -178,18 +178,6 @@ hkBool hkTransform::isApproximatelyEqual(const hkTransform& t, float zero) const
     return kResult;
 }
 
-hkBool* hkTransform::isOk(hkBool* apResult) const {
-    hkBool v4;
-    hkBool v5;
-    if ((&(v4 = m_translation.isOk3()))->m_bool && (&(v5 = m_rotation.isOk()))->m_bool) {
-        apResult->m_bool = 1;
-        return apResult;
-    }
-
-    apResult->m_bool = 0;
-    return apResult;
-}
-
 __m128* hkTransform::get4x4ColumnMajorQuads(__m128* a1) {
     *a1 = _mm_and_ps(m_rotation.m_col0.m_quad, rdata_10C4C10);
     a1[1] = _mm_and_ps(m_rotation.m_col1.m_quad, rdata_10C4C10);

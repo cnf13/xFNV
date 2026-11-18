@@ -27,8 +27,7 @@ hkDefaultError::message(hkError::Message msg, int32_t id, const char* descriptio
         v6 = m_sectionIds.m_data[m_sectionIds.m_size - 1];
     }
 
-    hkBool bEnabled;
-    if (!isEnabled(&bEnabled, v6)->m_bool) {
+    if (!isEnabled(v6).m_bool) {
         return 0;
     }
     const char* v9 = "";
@@ -70,10 +69,9 @@ void hkDefaultError::setEnabled(int32_t id, hkBool enabled) {
     }
 }
 
-hkBool* hkDefaultError::isEnabled(hkBool* arResult, int32_t aiId) {
+hkBool hkDefaultError::isEnabled(int32_t aiId) {
     uint8_t v3 = (uint8_t)(m_disabledAssertIds.getWithDefault(aiId, 0) == 0);
-    arResult->m_bool = (int8_t)v3;
-    return arResult;
+    return (int8_t)v3;
 }
 
 void hkDefaultError::enableAll() {

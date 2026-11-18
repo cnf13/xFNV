@@ -13770,7 +13770,6 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
     float afHealthPerc
 ) {
     double v10;
-    hkBool v28;
     alignas(16) NiPoint3 v44;
     NiPoint3 v45;
     NiMatrix3 rotMatrix;
@@ -13874,8 +13873,8 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
                         v32.NiSetFrom(from);
                         v32.NiSetTo(to);
                         TES::pInstance->Pick(v32);
-                        hkBool* v11 = v32.hasHit(&v28);
-                        if (v11->operator bool()) {
+                        hkBool v28 = v32.hasHit();
+                        if (v28.operator bool()) {
                             NiPoint3 delta = to - from;
                             delta.Unitize();
                             pos = to - delta * pboundobj->GetBoundSize();
@@ -23620,7 +23619,6 @@ bool Script::AttachAshPileFunction(
     uint32_t& auiOffset
 ) {
     hkLocalBuffer<char[512]> v23;
-    hkBool v30;
     CFilter fltr;
     NiPoint3 v38;
     int32_t iparam = 0;
@@ -23655,8 +23653,8 @@ bool Script::AttachAshPileFunction(
         v34.NiSetFrom(v32);
         v34.NiSetTo(v31);
         TES::pInstance->Pick(v34);
-        hkBool* v11 = v34.hasHit(&v30);
-        if (v11->operator bool()) {
+        hkBool v30 = v34.hasHit();
+        if (v30.operator bool()) {
             NiPoint3 v19;
             const hkpShape* Shape = v34.m_rootCollidable->m_shape;
             bhkShape* v27 = bhkShape::Getbhk(Shape);

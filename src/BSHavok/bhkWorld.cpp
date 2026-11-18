@@ -924,8 +924,7 @@ int8_t bhkWorld::RemoveConstraint(hkpConstraintInstance* apConstraint) {
         return 1;
     }
 
-    hkBool bResult;
-    v3->removeConstraint(&bResult, apConstraint);
+    v3->removeConstraint(apConstraint);
     return 1;
 }
 
@@ -946,8 +945,7 @@ bool bhkWorld::RemoveEntity(hkpEntity* apEntity) {
         if (!pWorldObject || (pWorldObject->iFlags & 0x30) != 0) {
             return true;
         }
-        hkBool kResult;
-        return const_cast<hkpWorld*>(pWorld)->removeEntity(&kResult, apEntity)->m_bool != 0;
+        return const_cast<hkpWorld*>(pWorld)->removeEntity(apEntity).m_bool != 0;
     }
     if (!pWorldObject) {
         return true;
@@ -1269,8 +1267,7 @@ void bhkWorld::RemoveBatchedConstraints() {
     for (uint32_t i = 0; i < static_cast<uint32_t>(iConstraintInstanceBatchCount); ++i) {
         hkpConstraintInstance* pConstraint = pConstraintInstanceBatch[i];
         if (pConstraint && pConstraint->m_owner) {
-            hkBool op;
-            pw->removeConstraint(&op, pConstraint);
+            pw->removeConstraint(pConstraint);
         }
         if (pConstraintInstanceBatch[i]) {
             pConstraintInstanceBatch[i]->removeReference();
@@ -1404,8 +1401,7 @@ bool bhkWorld::SaveSnapshot(const char* apFileName) {
     hkOstream kStream(apFileName);
     hkBool bBinary = {false};
     bhkSerializable* pSerializable = this;
-    hkBool bResult;
-    hkpHavokSnapshot::save(&bResult, pSerializable->GethkWorld(), kStream.m_writer, bBinary, nullptr, false);
+    hkBool bResult = hkpHavokSnapshot::save(pSerializable->GethkWorld(), kStream.m_writer, bBinary, nullptr, false);
     return bResult.m_bool != 0;
 }
 
@@ -1499,8 +1495,7 @@ void bhkWorld::AddEntities(hkpEntity** apEntityA, uint32_t auiNumEntities) {
             pwo->iFlags &= ~0x10;
         }
         else {
-            hkBool bRemoved;
-            pw->removeEntity(&bRemoved, apEntityA[i]);
+            pw->removeEntity(apEntityA[i]);
         }
         if (!bSplit) {
             hkpSimulationIsland* pIsland = apEntityA[i]->m_simulationIsland;

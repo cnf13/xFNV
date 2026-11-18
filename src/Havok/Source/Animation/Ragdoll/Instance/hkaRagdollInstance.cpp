@@ -748,7 +748,6 @@ hkResult hkaRagdollInstance::addToWorld(hkpWorld* world, hkBool updateFilter) co
 
 // Havok SDK: fails when the first body is in no world; removes the constraints, then the bodies as one batch.
 hkResult hkaRagdollInstance::removeFromWorld() const {
-    hkBool removed;
     hkpRigidBody* pFirstRigidBody = *m_rigidBodies.m_data;
     if (!pFirstRigidBody) {
         return HK_FAILURE;
@@ -758,7 +757,7 @@ hkResult hkaRagdollInstance::removeFromWorld() const {
         return HK_FAILURE;
     }
     for (int32_t i = 0; i < m_constraints.m_size; ++i) {
-        pWorld->removeConstraint(&removed, m_constraints.m_data[i]);
+        pWorld->removeConstraint(m_constraints.m_data[i]);
     }
     // The rigid body array handed over unchanged, as in addToWorld.
     void* pBatch = m_rigidBodies.m_data;

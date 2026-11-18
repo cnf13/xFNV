@@ -338,8 +338,7 @@ float* hkpSampledHeightFieldShape::getHeightAndNormalAt(
     int32_t& triangleIndexOut
 ) const {
     _mm_store_ps(&reinterpret_cast<float*>(&normalOut.m_quad)[0], _mm_set1_ps(1.0f));
-    hkBool kFlip;
-    getTriangleFlipImpl(&kFlip);
+    hkBool kFlip = getTriangleFlipImpl();
     if (kFlip.m_bool) {
         const float h00 = getHeightAtImpl(xPos, zPos);
         const float h11 = getHeightAtImpl(xPos + 1, zPos + 1);

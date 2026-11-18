@@ -169,14 +169,12 @@ hkpPointToPathConstraintData::~hkpPointToPathConstraintData() {
     }
 }
 
-hkBool* hkpPointToPathConstraintData::isValid(hkBool* arResult) const {
+hkBool hkpPointToPathConstraintData::isValid() const {
     if (m_path && m_angularConstrainedDOF.m_storage) {
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
 
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
 int32_t hkpPointToPathConstraintData::getType() const {
@@ -298,8 +296,7 @@ void hkpPointToPathConstraintData::buildJacobian(const hkpConstraintQueryIn& in,
         }
     }
 
-    hkBool closedLoop;
-    if (!m_path->isClosedLoop(&closedLoop)->m_bool) {
+    if (!m_path->isClosedLoop().m_bool) {
         hkp1dLinearLimitInfo limit;
         limit.m_pivotA = pivotTransformWs.m_translation;
         limit.m_pivotB = pivotAlongPathWs;

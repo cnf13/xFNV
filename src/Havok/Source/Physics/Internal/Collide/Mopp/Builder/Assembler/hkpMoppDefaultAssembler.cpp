@@ -922,22 +922,15 @@ void hkpMoppDefaultAssembler::addCut(const hkpMoppTreeNode* a1, const hkpMoppAss
     }
 }
 
-hkBool*
-hkpMoppDefaultAssembler::shouldAssemble(hkBool* apResult, hkpMoppTreeNode* a2, const hkpMoppAssemblerNodeInfo& a3) {
-    uint8_t* a1 = reinterpret_cast<uint8_t*>(apResult);
-    uint8_t* result;
+hkBool hkpMoppDefaultAssembler::shouldAssemble(hkpMoppTreeNode* a2, const hkpMoppAssemblerNodeInfo& a3) {
     if (a2->m_numPrimitives < 22) {
-        result = a1;
     LABEL_3:;
-        *result = 1;
-        return apResult;
+        return 1;
     }
-    result = a1;
     if (a3.m_level > m_minDepthToBuild) {
         goto LABEL_3;
     }
-    *a1 = 0;
-    return apResult;
+    return 0;
 }
 
 // Writes the terminal command for the node's primitive id relative to the terminal offset (the short form below 32,
@@ -1170,10 +1163,9 @@ int32_t hkpMoppDefaultAssembler::assemblesubNode(
         currentInfo.m_ignoreBandControlCode.m_bool = 0;
         return result;
     }
-    hkBool shouldAssembleResult;
     if (currentNode->m_isTerminal.m_bool) {
         fixScale(currentNode);
-        if (shouldAssemble(&shouldAssembleResult, currentNode, currentInfo)->m_bool) {
+        if (shouldAssemble(currentNode, currentInfo).m_bool) {
             return assembleCutAndTerminalCommand(currentNode, parentInfo, currentInfo);
         }
         return -1;
@@ -1209,7 +1201,7 @@ int32_t hkpMoppDefaultAssembler::assemblesubNode(
     if (rightSize < 0) {
         return -1;
     }
-    if (!shouldAssemble(&shouldAssembleResult, currentNode, currentInfo)->m_bool) {
+    if (!shouldAssemble(currentNode, currentInfo).m_bool) {
         return -1;
     }
     ++m_numNodesAssembled;

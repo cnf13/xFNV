@@ -28,7 +28,7 @@ public:
         ReaderAdapter(hkSocket* apSocket);
         ~ReaderAdapter() override;
 
-        hkBool* isOk(hkBool* arResult) const override;
+        hkBool isOk() const override;
         int32_t read(void* buf, int32_t nbytes) override;
 
         hkSocket* m_socket;
@@ -41,7 +41,7 @@ public:
         WriterAdapter(hkSocket* apSocket);
         ~WriterAdapter() override;
 
-        hkBool* isOk(hkBool* arResult) const override;
+        hkBool isOk() const override;
         int32_t write(const void* buf, int32_t nbytes) override;
 
         hkSocket* m_socket;
@@ -54,7 +54,7 @@ public:
     hkSocket();
     ~hkSocket() override;
 
-    virtual hkBool* isOk(hkBool* arResult) const = 0;
+    virtual hkBool isOk() const = 0;
     virtual void close() = 0;
     virtual int32_t read(void* apBuffer, int32_t aiNumBytes) = 0;
     virtual int32_t write(const void* apBuffer, int32_t aiNumBytes) = 0;

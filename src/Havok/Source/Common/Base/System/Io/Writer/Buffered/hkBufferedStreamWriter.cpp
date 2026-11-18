@@ -55,15 +55,13 @@ hkBufferedStreamWriter::~hkBufferedStreamWriter() {
 }
 
 // Whether the stream is ok, or with no stream whether the buffer is not full.
-hkBool* hkBufferedStreamWriter::isOk(hkBool* arResult) const {
+hkBool hkBufferedStreamWriter::isOk() const {
     hkBool kResult;
     if (m_stream) {
-        arResult->m_bool = m_stream->isOk(&kResult)->m_bool;
-        return arResult;
+        return m_stream->isOk().m_bool;
     }
     kResult.m_bool = m_bufSize != m_bufCapacity;
-    arResult->m_bool = kResult.m_bool;
-    return arResult;
+    return kResult.m_bool;
 }
 
 // Copies the bytes into the buffer, flushing it each time it fills; returns how many bytes were taken, short when a
@@ -95,16 +93,13 @@ void hkBufferedStreamWriter::flush() {
     }
 }
 
-hkBool* hkBufferedStreamWriter::seekTellSupported(hkBool* arResult) const {
-    hkBool v4;
+hkBool hkBufferedStreamWriter::seekTellSupported() const {
     if (m_stream) {
-        char m_bool = m_stream->seekTellSupported(&v4)->m_bool;
-        arResult->m_bool = m_bool;
-        return arResult;
+        char m_bool = m_stream->seekTellSupported().m_bool;
+        return m_bool;
     }
 
-    arResult->m_bool = 1;
-    return arResult;
+    return 1;
 }
 
 // Moves the write position.

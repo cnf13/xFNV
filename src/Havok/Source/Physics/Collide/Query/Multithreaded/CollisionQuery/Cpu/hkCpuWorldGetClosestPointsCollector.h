@@ -34,9 +34,9 @@ public:
     // Havok SDK signature (hkpCollide.lib, tied by bytes,vtable).
     float addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Node* leaf) override;
     // hkKdTreeCastCollector's vtable at +0x8.
-    hkBool* addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) override;
+    hkBool addMidPhaseHit(hkPrimitiveId primitiveId) override;
     // hkKdTreeCastCollector's vtable at +0x8.
-    hkBool* hasHit(hkBool* arResult) override;
+    hkBool hasHit() override;
     // hkKdTreeCastCollector's vtable at +0x8.
     float getHitFraction() override;
 

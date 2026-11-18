@@ -48,7 +48,7 @@ public:
     hkpPoweredChainData(hkFinishLoadedObjectFlag flag);
     ~hkpPoweredChainData() override;
 
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     // getSolverResults takes the base's signature (void*) rather than hkpConstraintRuntime*, so that it overrides the
     // base's virtual.

@@ -36,7 +36,7 @@ __m128 hkGetOneOver65K_D98620() {
 // The k-d tree primitive id is the collidable's address: an integer the tree stores untyped, so the SDK's cast back
 // to the collidable is a reinterpret_cast. A collidable with a shape, other than collidable A and passing the filter,
 // is cast against through the dispatcher's linear-cast function for the pair of shape types.
-hkBool* hkpKdTreeWorldLinearCaster::addMidPhaseHit(hkBool* arResult, hkPrimitiveId primitiveId) {
+hkBool hkpKdTreeWorldLinearCaster::addMidPhaseHit(hkPrimitiveId primitiveId) {
     const hkpCollidable* collB = reinterpret_cast<const hkpCollidable*>(primitiveId);
     const hkpShape* shapeB = collB->m_shape;
     if (shapeB && m_collidableA != collB && m_filter->isCollisionEnabled(*m_collidableA, *collB).m_bool) {
@@ -44,19 +44,16 @@ hkBool* hkpKdTreeWorldLinearCaster::addMidPhaseHit(hkBool* arResult, hkPrimitive
             static_cast<hkpShapeType>(m_typeA.m_storage), static_cast<hkpShapeType>(shapeB->m_type.m_storage)
         );
         linearCast(*m_collidableA, *collB, m_shapeInput, *m_castCollector, m_startPointCollector);
-        arResult->m_bool = 1;
-        return arResult;
+        return 1;
     }
-    arResult->m_bool = 0;
-    return arResult;
+    return 0;
 }
 
-hkBool* hkpKdTreeWorldLinearCaster::hasHit(hkBool* arResult) {
+hkBool hkpKdTreeWorldLinearCaster::hasHit() {
     hkpCdPointCollector* m_castCollector = this->m_castCollector;
     bool v3 = m_castCollector->m_earlyOutDistance > 1.0;
     bool v4 = 1.0 == m_castCollector->m_earlyOutDistance;
-    arResult->m_bool = !v3 && !v4;
-    return arResult;
+    return !v3 && !v4;
 }
 
 float hkpKdTreeWorldLinearCaster::getHitFraction() {
@@ -76,7 +73,6 @@ void hkpKdTreeWorldLinearCaster::linearCast(
     hkVector4 v11;
     hkVector4 v13;
     hkVector4 v14;
-    hkBool arResult;
     hkAabb out_;
     hkKdTreeAabbCastUtils::hkCastAabbInput castInput_12;
     m_castCollector = &castCollector;
@@ -109,5 +105,5 @@ void hkpKdTreeWorldLinearCaster::linearCast(
     castInput_12.m_from.m_quad = _mm_add_ps(v16, v17);
     castInput_12.m_to.m_quad = _mm_add_ps(castInput_12.m_from.m_quad, m_quad);
     castInput_12.m_halfExtents.m_quad = _mm_mul_ps(v15, _mm_sub_ps(v13.m_quad, v14.m_quad));
-    hkKdTreeAabbCastUtils::castAabb(&arResult, tree, castInput_12, this, aabbCheckTolerance);
+    hkKdTreeAabbCastUtils::castAabb(tree, castInput_12, this, aabbCheckTolerance);
 }

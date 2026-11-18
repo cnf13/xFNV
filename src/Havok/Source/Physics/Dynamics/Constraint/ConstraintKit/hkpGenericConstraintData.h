@@ -23,7 +23,7 @@ public:
     hkpGenericConstraintData(int32_t a1);
     ~hkpGenericConstraintData() override;
 
-    hkBool* isValid(hkBool* arResult) const override;
+    hkBool isValid() const override;
     int32_t getType() const override;
     void getRuntimeInfo(hkBool wantRuntime, hkpConstraintData::RuntimeInfo& infoOut) const override;
     void buildJacobian(const hkpConstraintQueryIn& in, hkpConstraintQueryOut& out) override;

@@ -51,8 +51,7 @@ public:
 
     static int32_t MaxIndex(const hkArray<float, hkContainerHeapAllocator>& arr, int32_t len);
     static void RemoveSubtractOne(int32_t i, hkArray<int32_t, hkContainerHeapAllocator>& U, int32_t m);
-    static hkBool* WithinTolerance(
-        hkBool* apResult,
+    static hkBool WithinTolerance(
         int32_t n,
         int32_t p,
         const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P,
@@ -61,8 +60,7 @@ public:
         const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& Q,
         float E
     );
-    static hkBool* WithinTolerance(
-        hkBool* apResult,
+    static hkBool WithinTolerance(
         int32_t n,
         int32_t p,
         const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P,
@@ -204,8 +202,7 @@ public:
         const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& Q_JUNK
     );
     // Whether every distinct knot span of U (n, p) holds one of the m + 1 parameters ub at least tol inside it.
-    static hkBool* IsWellPosed(
-        hkBool* apResult,
+    static hkBool IsWellPosed(
         int32_t n,
         int32_t p,
         const hkArray<float, hkContainerHeapAllocator>& U,
@@ -216,8 +213,7 @@ public:
     // The NURBS Book's least-squares curve fit (A9.7) of the m + 1 points Q at the parameters ub with n + 1 control
     // points of degree p on the knots U: P[0] = Q[0], P[n] = Q[m], the inner ones solved by conjugate gradients; P
     // takes the result only when it is within E of every Q.
-    static hkBool* LeastSquaresFit(
-        hkBool* apResult,
+    static hkBool LeastSquaresFit(
         int32_t n,
         int32_t p,
         hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P,
@@ -292,8 +288,7 @@ void computeProjectionErrors(
 );
 // Whether the curve (a2 = n, a3 = p, a5 = U, a4 = P) lies within 1.1 * a9 of each of the a6 + 1 points a7 (Q) at the
 // parameters a8 (ub). a4 holds the control points and a5 the knots.
-hkBool* isWithinErrorBound(
-    hkBool* a1,
+hkBool isWithinErrorBound(
     int32_t a2,
     int32_t a3,
     const hkArray<hkaNURBS::Point, hkContainerHeapAllocator>* a4,
@@ -401,24 +396,11 @@ class hkaCGSolver {
 public:
     // Solves A^T A x = b column by column: each column of x and b copied into column matrices, SolveOneColumn run on
     // them with maxIter and tol, the result copied back into x; false as soon as one column fails, built in apResult.
-    static hkBool* Solve(
-        hkBool* apResult,
-        const hkaSparseLSQMatrix<T>& A,
-        hkaMatrix<T>& x,
-        const hkaMatrix<T>& b,
-        int32_t maxIter,
-        T tol
-    );
+    static hkBool Solve(const hkaSparseLSQMatrix<T>& A, hkaMatrix<T>& x, const hkaMatrix<T>& b, int32_t maxIter, T tol);
     // Conjugate gradients on A^T A x = b from the start x, at most maxIter steps, until the squared residual falls
     // below tol squared: whether it did is written to apResult.
-    static hkBool* SolveOneColumn(
-        hkBool* apResult,
-        const hkaSparseLSQMatrix<T>& A,
-        hkaMatrix<T>& x,
-        const hkaMatrix<T>& b,
-        int32_t maxIter,
-        T tol
-    );
+    static hkBool
+    SolveOneColumn(const hkaSparseLSQMatrix<T>& A, hkaMatrix<T>& x, const hkaMatrix<T>& b, int32_t maxIter, T tol);
     // The sum of a(i) * b(i) over a's elements.
     static T InnerProduct(const hkaMatrix<T>& a, const hkaMatrix<T>& b);
     // x = a + s * b, element by element.
@@ -567,14 +549,8 @@ void hkaCGSolver<T>::Negate(hkaMatrix<T>& a) {
 // r = b - A^T A x, recomputed from x every 50 steps; r and Ax are by-value results the calls build in their storage
 // (the default-constructed locals hold no storage yet).
 template <typename T>
-hkBool* hkaCGSolver<T>::SolveOneColumn(
-    hkBool* apResult,
-    const hkaSparseLSQMatrix<T>& A,
-    hkaMatrix<T>& x,
-    const hkaMatrix<T>& b,
-    int32_t maxIter,
-    T tol
-) {
+hkBool hkaCGSolver<
+    T>::SolveOneColumn(const hkaSparseLSQMatrix<T>& A, hkaMatrix<T>& x, const hkaMatrix<T>& b, int32_t maxIter, T tol) {
     const int32_t iRows = x.m_m;
     hkaMatrix<T> r;
     {
@@ -611,20 +587,13 @@ hkBool* hkaCGSolver<T>::SolveOneColumn(
             ScaleAdd(p, r, beta, p);
         }
     }
-    *apResult = bConverged;
-    return apResult;
+    return bConverged;
 }
 
 // Each column of x and b is copied into a column matrix and solved; the solved column goes back into x.
 template <typename T>
-hkBool* hkaCGSolver<T>::Solve(
-    hkBool* apResult,
-    const hkaSparseLSQMatrix<T>& A,
-    hkaMatrix<T>& x,
-    const hkaMatrix<T>& b,
-    int32_t maxIter,
-    T tol
-) {
+hkBool
+hkaCGSolver<T>::Solve(const hkaSparseLSQMatrix<T>& A, hkaMatrix<T>& x, const hkaMatrix<T>& b, int32_t maxIter, T tol) {
     hkaMatrix<T> xCol(x.m_m, 1);
     hkaMatrix<T> bCol(b.m_m, 1);
     bool bSolved = true;
@@ -633,8 +602,7 @@ hkBool* hkaCGSolver<T>::Solve(
             xCol(i) = x(i, j);
             bCol(i) = b(i, j);
         }
-        hkBool bColumnSolved;
-        if (!*SolveOneColumn(&bColumnSolved, A, xCol, bCol, maxIter, tol)) {
+        if (!SolveOneColumn(A, xCol, bCol, maxIter, tol)) {
             bSolved = false;
             break;
         }
@@ -642,6 +610,5 @@ hkBool* hkaCGSolver<T>::Solve(
             x(i, j) = xCol(i);
         }
     }
-    *apResult = bSolved;
-    return apResult;
+    return bSolved;
 }

@@ -223,12 +223,11 @@ void hkpSimpleMeshShape::setWeldingInfo(uint32_t key, int16_t weldingInfo) {
 uint32_t hkpSimpleMeshShape::getFirstKey() const {
     for (int32_t i = 0; i < m_triangles.m_size; ++i) {
         const Triangle& kTriangle = m_triangles.m_data[i];
-        hkBool kDegenerate;
         if (!hkpTriangleUtil::isDegenerate(
-                 &kDegenerate, m_vertices.m_data[kTriangle.m_a], m_vertices.m_data[kTriangle.m_b],
-                 m_vertices.m_data[kTriangle.m_c], hkDefaultTriangleDegeneracyTolerance
+                 m_vertices.m_data[kTriangle.m_a], m_vertices.m_data[kTriangle.m_b], m_vertices.m_data[kTriangle.m_c],
+                 hkDefaultTriangleDegeneracyTolerance
             )
-                 ->m_bool) {
+                 .m_bool) {
             return static_cast<uint32_t>(i);
         }
     }
@@ -240,12 +239,11 @@ uint32_t hkpSimpleMeshShape::getFirstKey() const {
 uint32_t hkpSimpleMeshShape::getNextKey(uint32_t oldKey) const {
     for (int32_t i = static_cast<int32_t>(oldKey) + 1; i < m_triangles.m_size; ++i) {
         const Triangle& kTriangle = m_triangles.m_data[i];
-        hkBool kDegenerate;
         if (!hkpTriangleUtil::isDegenerate(
-                 &kDegenerate, m_vertices.m_data[kTriangle.m_a], m_vertices.m_data[kTriangle.m_b],
-                 m_vertices.m_data[kTriangle.m_c], hkDefaultTriangleDegeneracyTolerance
+                 m_vertices.m_data[kTriangle.m_a], m_vertices.m_data[kTriangle.m_b], m_vertices.m_data[kTriangle.m_c],
+                 hkDefaultTriangleDegeneracyTolerance
             )
-                 ->m_bool) {
+                 .m_bool) {
             return static_cast<uint32_t>(i);
         }
     }

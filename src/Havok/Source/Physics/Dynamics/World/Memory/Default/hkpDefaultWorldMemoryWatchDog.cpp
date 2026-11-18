@@ -110,8 +110,7 @@ void hkpDefaultWorldMemoryWatchDog::freeHeapMemoryTillRequestedAmountIsAvailable
 
 // Removes the island's first entity from its world. The result of removeEntity is ignored.
 void hkpDefaultWorldMemoryWatchDog::reduceConstraintsInIsland(hkpSimulationIsland* island, int32_t solverBufferSize) {
-    hkBool result;
-    island->getWorld()->removeEntity(&result, *island->m_entities.begin());
+    island->getWorld()->removeEntity(*island->m_entities.begin());
 }
 
 const hkClass& hkpDefaultWorldMemoryWatchDog::staticClass() {
@@ -138,8 +137,7 @@ void hkpDefaultWorldMemoryWatchDog::removeObjectsFromIsland(
                 *v6 = v10;
             }
             else {
-                hkBool removed;
-                v4->getWorld()->removeEntity(&removed, v4->m_entities.m_data[v5]);
+                v4->getWorld()->removeEntity(v4->m_entities.m_data[v5]);
                 hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
                 if (!Instance->m_heap->canAllocTotal(freeHeapMemoryRequested)) {
                     return;
