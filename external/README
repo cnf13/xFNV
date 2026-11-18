@@ -51,3 +51,13 @@ Source: https://github.com/lieff/minimp3, commit a2ad968c94819fb98589cca8026e0a5
     git clone https://github.com/lieff/minimp3 && git -C minimp3 checkout a2ad968c94819fb98589cca8026e0a57958c963c
 
 Kept, unchanged: minimp3.h, minimp3_ex.h and LICENSE. Left out: the tests, fuzzers, player and scripts.
+
+doctest 2.4.11 (Viktor Kirilov, MIT licence: external/doctest/LICENSE.txt): the unit test framework of the programs in
+tests/ (tests/README.md). Header-only.
+
+Source: https://github.com/doctest/doctest, tag v2.4.11, its single-header release:
+
+    curl -fsSLO https://raw.githubusercontent.com/doctest/doctest/v2.4.11/doctest/doctest.h
+    curl -fsSLO https://raw.githubusercontent.com/doctest/doctest/v2.4.11/LICENSE.txt
+
+Kept, unchanged: doctest.h (sha256 44faa038e9c3f9728efbda143748d01124ea0a27f4bf78f35a15d8fab2e039fb) and LICENSE.txt.

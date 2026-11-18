@@ -4,7 +4,8 @@ project(FalloutNV LANGUAGES C CXX)
 
 # One program, FalloutNV, built from src/: the game's code in the original's folder layout, with src/platform (the
 # layer between the game and the OS, and stand-ins for the DLLs the original game imports) and src/xfnv (the
-# project's own utilities: the seam header, the crash log, the debug heap). external/ holds other people's libraries.
+# project's own utilities: the seam header, the crash log, the debug heap). external/ holds other people's libraries;
+# tests/ holds the unit tests, each a program of a few of the game's files and fakes of what they call.
 # The toolchain file, when one is given, chooses the platform (cmake/i686-windows-clang-cl.cmake,
 # cmake/x86_64-windows-clang-cl.cmake, cmake/x86_64-linux-clang.cmake).
 
@@ -17,6 +18,8 @@ option(FNVD_GUARD_ALLOC "The pass-through allocates from src/xfnv/debugheap's gu
 option(FNVD_ASAN "Linux: everything, SDL3 included, built with AddressSanitizer (the C heap only)" OFF)
 # Stand-ins the Windows program may use in place of Microsoft's DLLs. Linux has no such DLL and always uses them.
 option(FNVD_SDL_AUDIO "DirectSound, mmio and DirectShow from src/platform/dsound, on SDL3's audio" OFF)
+# The unit tests (tests/README.md). Their fakes are written for the Itanium C++ ABI: there are none on MSVC.
+option(FNVD_TESTS "Build the unit tests in tests/, which ctest runs" ON)
 option(FNVD_D3DX "The Direct3D extras from src/platform/d3dx9, not d3dx9_38.dll" OFF)
 if(NOT WIN32)
     set(FNVD_SDL_AUDIO ON)
@@ -74,6 +77,10 @@ endif()
 add_subdirectory(external)
 add_subdirectory(src/platform)
 add_subdirectory(src/xfnv)
+if(FNVD_TESTS AND NOT MSVC)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 # The game: every .cpp under src/ outside platform/ and xfnv/, which are the libraries above. Its own objects, not a
 # library, so that a file nothing references still reaches the program with its static initialisers.
