@@ -3650,7 +3650,7 @@ ProjectileTarget::ProjectileTarget() : pReference(nullptr), spPart(nullptr), kOf
 
 ProjectileTarget::~ProjectileTarget() {}
 
-NiPoint3* ProjectileTarget::GetWorldLocation(NiPoint3* apResult) {
+NiPoint3 ProjectileTarget::GetWorldLocation() {
     NiPoint3 v7 = NiPoint3_ZERO;
     if (spPart.m_pObject) {
         v7 = spPart.m_pObject->GetWorldTransform() * kOffset;
@@ -3668,8 +3668,7 @@ NiPoint3* ProjectileTarget::GetWorldLocation(NiPoint3* apResult) {
             v7 = *Center;
         }
     }
-    *apResult = v7;
-    return apResult;
+    return v7;
 }
 
 void ProjectileTarget::operator delete(void* apMemory) {

@@ -728,9 +728,8 @@ float CombatProcedureMove::GetHidingTime() {
     return 1.0f;
 }
 
-NiPoint3* CombatProcedureMove::GetDestinationPos(NiPoint3* a1) {
-    *a1 = *Destination.GetPoint();
-    return a1;
+NiPoint3 CombatProcedureMove::GetDestinationPos() {
+    return *Destination.GetPoint();
 }
 
 bool CombatProcedureMove::CreatePath() {

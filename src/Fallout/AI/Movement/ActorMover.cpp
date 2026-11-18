@@ -602,14 +602,11 @@ void ActorMover::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     iFirstFailureTimeStamp = 0;
 }
 
-NiPoint3* ActorMover::GetAnticipatedLocation(NiPoint3* apOut, float afTime) {
+NiPoint3 ActorMover::GetAnticipatedLocation(float afTime) {
     if (pCurrentPathHandler) {
-        ::new (apOut) NiPoint3(pCurrentPathHandler->ComputeApproximateLocation(afTime));
+        return pCurrentPathHandler->ComputeApproximateLocation(afTime);
     }
-    else {
-        *apOut = pActor->GetLocationOnReference();
-    }
-    return apOut;
+    return pActor->GetLocationOnReference();
 }
 
 void ActorMover::RemoveReference(TESObjectREFR* apReference) {
@@ -1712,14 +1709,12 @@ void ActorMover::SetCurrentFrameMoveModeAndDelta() {
     DebugOnEvent();
 }
 
-NiPoint3* ActorMover::GetNextNodeLocation(NiPoint3* apResult) {
+NiPoint3 ActorMover::GetNextNodeLocation() {
     if (spCurrentPath.m_pObject && pCurrentPathHandler) {
-        ::new (apResult) NiPoint3(pCurrentPathHandler->GetNextNodeLocation());
-        return apResult;
+        return pCurrentPathHandler->GetNextNodeLocation();
     }
 
-    *apResult = pActor->GetLocationOnReference();
-    return apResult;
+    return pActor->GetLocationOnReference();
 }
 
 bool ActorMover::GetCurrentGoal_009DE2B0(NiPoint3* apRetLocation) {

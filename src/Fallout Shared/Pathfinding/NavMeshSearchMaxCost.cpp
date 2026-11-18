@@ -28,7 +28,6 @@ bool NavMeshSearchMaxCost::GetNodeConnections(
     const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode,
     BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>* apRetNodes
 ) {
-    NiPoint3 apLocation;
     DoorLock doorLock;
     AStarNode<NavMeshSearchNode, NavMeshSearchLink>* pnode;
     NavMesh* potherMesh;
@@ -41,7 +40,7 @@ bool NavMeshSearchMaxCost::GetNodeConnections(
             EdgeExtraInfo* pextra = apNode->tNodeData.pNavMesh->GetEdgeExtraInfo(apNode->tNodeData.sTriangle, i);
             if (!pextra || pextra->eType != EIT_LEDGE_UP) {
                 NiPoint3 nodeCenter = potherMesh->GetCenter(usotherTri);
-                float fcost = (nodeCenter - *apNode->tNodeData.GetCenter(&apLocation)).XYLength() + apNode->fCost;
+                float fcost = (nodeCenter - apNode->tNodeData.GetCenter()).XYLength() + apNode->fCost;
                 if (!(fMaxDist < static_cast<double>(fcost))) {
                     NavMeshTriangle* Triangle = potherMesh->GetTriangle(usotherTri);
                     if (Triangle->GetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR)) {
@@ -100,8 +99,6 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
     float afMaxDist
 ) {
     NiPoint3 result;
-    NiPoint3 apLocation;
-    NiPoint3 v14;
     using links_t = BSScrapArray<NavMeshSearchLink, 1024>;
     XFNV_INLINED_LOCAL(links_t, links, std::nullopt, std::nullopt);
     StartNode.pNavMesh = aStartNode.pNavMesh;
@@ -111,8 +108,8 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
     StartNode.CenterY = center.y;
     StartNode.CenterZ = center.z;
     // The goal's center is built before the start's.
-    const NiPoint3* pgoalCenter = GoalNode.GetCenter(&apLocation);
-    float afHeuristic = (*StartNode.GetCenter(&v14) - *pgoalCenter).Length();
+    NiPoint3 apLocation = GoalNode.GetCenter();
+    float afHeuristic = (StartNode.GetCenter() - apLocation).Length();
     AddStartNode(GetKeyForNode(StartNode.pNavMesh, StartNode.sTriangle), StartNode, afHeuristic);
     if (!aGoalNode.pNavMesh && aGoalNode.usTriangle == 0xFFFF) {
         bHasGoalNode = false;
@@ -134,7 +131,7 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
         result = aGoalLocation;
     }
     else {
-        GetBestAStarNode()->tNodeData.GetCenter(&result);
+        result = GetBestAStarNode()->tNodeData.GetCenter();
     }
     links.~BSScrapArray<NavMeshSearchLink, 1024>();
     return result;
@@ -147,8 +144,6 @@ bool NavMeshSearchMaxCost::BuildNodePath(
     BSSimpleArray<NavMeshSearchNode, 1024>* apReturnNodeArray,
     BSSimpleArray<NavMeshSearchLink, 1024>* apReturnLinkArray
 ) {
-    NiPoint3 apLocation;
-    NiPoint3 v12;
     StartNode = aStartNode;
     pCurrentRequest = apRequest;
     apReturnNodeArray->Clear(false);
@@ -168,8 +163,8 @@ bool NavMeshSearchMaxCost::BuildNodePath(
         }
     }
     // The goal's center is built before the start's.
-    const NiPoint3* pgoalCenter = GoalNode.GetCenter(&apLocation);
-    float afHeuristic = (*StartNode.GetCenter(&v12) - *pgoalCenter).Length();
+    NiPoint3 apLocation = GoalNode.GetCenter();
+    float afHeuristic = (StartNode.GetCenter() - apLocation).Length();
     AddStartNode(GetKeyForNode(aStartNode.pNavMesh, aStartNode.sTriangle), aStartNode, afHeuristic);
     return Search(apReturnNodeArray, apReturnLinkArray, false);
 }

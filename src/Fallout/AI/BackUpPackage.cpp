@@ -279,9 +279,8 @@ void BackUpPackage::InitializeBackUpPackage(Actor* apActor, TESObjectCELL* apcel
     SetIsCreated(true);
 }
 
-NiPoint3* BackUpPackage::GetBackUpPoint(NiPoint3* apResult) {
-    *apResult = pBackUpPoint;
-    return apResult;
+NiPoint3 BackUpPackage::GetBackUpPoint() {
+    return pBackUpPoint;
 }
 
 // aptarget is tested and read before apActor.

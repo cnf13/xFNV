@@ -33,8 +33,7 @@ public:
     bool operator!=(const NiBoundingVolume& kABV) const override;
     void AddViewerStrings(const char* pcPrefix, NiTPrimitiveArray<char*>* pkStrings) const override;
 
-    NiPoint3*
-    GetNormal(NiPoint3* apResult, int32_t iSign0, int32_t iSign1, int32_t iSign2, const NiPoint3 kVelocity) const;
+    NiPoint3 GetNormal(int32_t iSign0, int32_t iSign1, int32_t iSign2, const NiPoint3 kVelocity) const;
 
     // The loader of ms_apfnLoaders[BOX_BV]: a new unit box at the origin that LoadBinary fills from the stream. Hides
     // NiBoundingVolume's, as in the engine.

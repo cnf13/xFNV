@@ -1052,8 +1052,6 @@ NiAVObject* Font::MakeString(
 
 void Font::GetLineOffsets(const char* apTextString, float& afX, float& afY, int32_t aiFlags, uint32_t aiStart) {
     float v7;
-    NiPoint3 v8;
-    NiPoint3 v9;
     NiPoint3 v10;
     if (!(afX > 0.0)) {
         v7 = 0x1.fffffe0000000p+127f;
@@ -1064,12 +1062,12 @@ void Font::GetLineOffsets(const char* apTextString, float& afX, float& afY, int3
     float v11 = v7;
     int32_t v6 = ((int8_t)aiFlags) & 15;
     if (v6 == 2) {
-        v10 = *FontManager::pInstance->CalculateStringDimensions(&v9, apTextString, iFontNum, v11, aiStart);
+        v10 = FontManager::pInstance->CalculateStringDimensions(apTextString, iFontNum, v11, aiStart);
         afX = (float)((-v10.x) / 2.0);
     }
     else {
         if (v6 == 4) {
-            v10 = *FontManager::pInstance->CalculateStringDimensions(&v8, apTextString, iFontNum, v11, aiStart);
+            v10 = FontManager::pInstance->CalculateStringDimensions(apTextString, iFontNum, v11, aiStart);
             afX = (-v10.x);
         }
         else {
@@ -2064,13 +2062,8 @@ bool FontManager::CreateText(BSStringT<char> axTextString, FontManager::TextData
     return true;
 }
 
-NiPoint3* FontManager::CalculateStringDimensions(
-    NiPoint3* apResult,
-    const char* apText,
-    int32_t aiFont,
-    float afWrapwidth,
-    int32_t aiStartIndex
-) {
+NiPoint3
+FontManager::CalculateStringDimensions(const char* apText, int32_t aiFont, float afWrapwidth, int32_t aiStartIndex) {
     if (aiFont >= 1 && (aiFont <= 8 && apText)) {
         float v7;
         NiPoint3 v17 = NiPoint3_ZERO;
@@ -2151,14 +2144,10 @@ NiPoint3* FontManager::CalculateStringDimensions(
             v7 = v17.x;
         }
         v17.z = static_cast<float>(v15);
-        apResult->x = v7;
-        apResult->y = v17.y;
-        apResult->z = v17.z;
-        return apResult;
+        return NiPoint3(v7, v17.y, v17.z);
     }
 
-    *apResult = NiPoint3_ZERO;
-    return apResult;
+    return NiPoint3_ZERO;
 }
 
 float FontManager::GetLinePadding(int32_t aiFont) {

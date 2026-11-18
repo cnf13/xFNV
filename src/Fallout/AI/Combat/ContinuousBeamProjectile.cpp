@@ -159,9 +159,7 @@ void ContinuousBeamProjectile::UpdateProjectile(float afDelta) {
             float faimLooking = pactor_2->GetLooking();
             float faimHeading = pactor_2->GetHeading(false);
             if (pactor_2 == pPlayer) {
-                NiPoint3 kAutoAim;
-                NiPoint3* v2 = pPlayer->GetBulletAutoAim(&kAutoAim);
-                NiPoint3 kdirection = *v2 - data.kPosition;
+                NiPoint3 kdirection = pPlayer->GetBulletAutoAim() - data.kPosition;
                 kdirection.Unitize();
                 faimHeading = GetZAngleFromVector(kdirection);
                 faimLooking = -std::asinf(kdirection.z);

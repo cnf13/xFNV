@@ -32,21 +32,13 @@ bool NavMeshSearchHide::GetNodeConnections(
     const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode,
     BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>* apRetNodes
 ) {
-    NiPoint3* Center;
-    NiPoint3 result;
-    NiPoint3 apLocation;
     DoorLock doorLock;
     AStarNode<NavMeshSearchNode, NavMeshSearchLink>* pnode;
     NavMesh* potherMesh;
     int32_t iotherEdge;
     uint16_t usotherTri;
-    if (apNode->pParentAStarNode) {
-        Center = apNode->tNodeData.GetCenter(&apLocation);
-    }
-    else {
-        Center = ::new (&result) NiPoint3(pCurrentHideRequest->Origin.GetLocation());
-    }
-    NiPoint3 aCurrentLocation = *Center;
+    NiPoint3 aCurrentLocation =
+        apNode->pParentAStarNode ? apNode->tNodeData.GetCenter() : pCurrentHideRequest->Origin.GetLocation();
     for (int32_t i = 0; i < 3; ++i) {
         if (apNode->tNodeData.pNavMesh->GetMatchingEdge(
                 apNode->tNodeData.sTriangle, i, &potherMesh, &usotherTri, &iotherEdge
@@ -128,13 +120,12 @@ bool NavMeshSearchHide::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSea
     uint16_t usVert0;
     uint16_t usVert1;
     uint16_t usVert2;
-    NiPoint3 nodeCenter;
     const NavMeshSearchNode* parentNodeData = &apNode->GetNodeData();
     const NavMeshTriangle* ptriangle = parentNodeData->GetTriangle();
     if (!ptriangle->HasCover()) {
         return false;
     }
-    apNode->tNodeData.GetCenter(&nodeCenter);
+    NiPoint3 nodeCenter = apNode->tNodeData.GetCenter();
     // The horizontal length is stored to a float before the compare.
     float flength = (ThreatLocation - nodeCenter).XYLength();
     double fminDistance = pCurrentHideRequest->fMinHideDistance;
@@ -195,8 +186,7 @@ bool NavMeshSearchHide::BuildNodePath(
     kStartNode.CenterX = kCenter.x;
     kStartNode.CenterY = kCenter.y;
     kStartNode.CenterZ = kCenter.z;
-    NiPoint3 kNodeCenter;
-    float fHeuristic = fDistanceUpperBound - (*kStartNode.GetCenter(&kNodeCenter) - AvoidNodeCenter).Length();
+    float fHeuristic = fDistanceUpperBound - (kStartNode.GetCenter() - AvoidNodeCenter).Length();
     BSClamp(fHeuristic, 0.0f, fDistanceUpperBound);
     AddStartNode(GetKeyForNode(kStartNode.pNavMesh, kStartNode.sTriangle), kStartNode, fHeuristic);
     ThreatLocation = pCurrentHideRequest->GetThreatLocation().GetLocation();

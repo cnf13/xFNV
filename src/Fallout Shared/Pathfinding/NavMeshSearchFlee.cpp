@@ -40,8 +40,7 @@ bool NavMeshSearchFlee::GetNodeConnections(
     NavMesh* potherMesh;
     int32_t iotherEdge;
     uint16_t usotherTri;
-    NiPoint3 aNodeCenter;
-    apNode->tNodeData.GetCenter(&aNodeCenter);
+    NiPoint3 aNodeCenter = apNode->tNodeData.GetCenter();
     PathingAvoidNodeArray* pavoidNodes = pCurrentRequest->GetAvoidNodeArray();
     NiPoint3 avoidDir = NiPoint3_ZERO;
     if (pavoidNodes) {
@@ -125,7 +124,6 @@ bool NavMeshSearchFlee::GetNodeConnections(
 }
 
 bool NavMeshSearchFlee::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
-    NiPoint3 nodeCenter;
     const PathingLocation* pdest = &pCurrentRequest->Destination;
     if (bFavorGoingTowardsGoal) {
         uint16_t sgoalTri;
@@ -140,7 +138,7 @@ bool NavMeshSearchFlee::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSea
     if (apNode == pStartNode) {
         return false;
     }
-    apNode->tNodeData.GetCenter(&nodeCenter);
+    NiPoint3 nodeCenter = apNode->tNodeData.GetCenter();
     // The squared horizontal length is stored to a float before the compare.
     float fsqrLength = (pCurrentRequest->Origin.GetLocation() - nodeCenter).SqrXYLength();
     double fminDistance = pCurrentRequest->fMinFleeDistance;
@@ -169,7 +167,6 @@ bool NavMeshSearchFlee::BuildNodePath(
     BSSimpleArray<NavMeshSearchNode, 1024>* apReturnNodeArray,
     BSSimpleArray<NavMeshSearchLink, 1024>* apReturnLinkArray
 ) {
-    NiPoint3 endLocation;
     pCurrentRequest = apRequest;
     StartNode = aStartNode;
     NiPoint3 startPoint = apRequest->Origin.GetLocation();
@@ -189,7 +186,7 @@ bool NavMeshSearchFlee::BuildNodePath(
     bool bresult = Search(apReturnNodeArray, apReturnLinkArray, pCurrentRequest->bAllowIncompletePath);
     if (!bresult && !apReturnNodeArray->IsEmpty()) {
         NavMeshSearchNode* endNode = &apReturnNodeArray->GetLast();
-        endNode->GetCenter(&endLocation);
+        NiPoint3 endLocation = endNode->GetCenter();
         float fminDistance = pCurrentRequest->fMinFleeDistance * 0.5;
         fminDistance = BSMIN(fminDistance, 256.0f);
         NiPoint3 vec = startPoint - endLocation;

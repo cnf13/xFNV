@@ -48,9 +48,8 @@ SettingT<GameSettingCollection> fPathingLargeActorRadius("fPathingLargeActorRadi
 using AStarNodeArray_NavMeshSearch = BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>;
 using AStarNodeScrapArray_NavMeshSearch = BSScrapArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>;
 
-NiPoint3* NavMeshSearchNode::GetCenter(NiPoint3* apCenter) const {
-    ::new (apCenter) NiPoint3(CenterX, CenterY, CenterZ);
-    return apCenter;
+NiPoint3 NavMeshSearchNode::GetCenter() const {
+    return NiPoint3(CenterX, CenterY, CenterZ);
 }
 
 NavMeshTriangle* NavMeshSearchNode::GetTriangle() const {
@@ -108,11 +107,6 @@ bool NavMeshSearch::GetNodeConnections(
     const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode,
     BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>* apRetNodes
 ) {
-    NiPoint3 kGoalCenter2;
-    NiPoint3 kGoalCenter;
-    NiPoint3 kStartCenter;
-    NiPoint3 kTargetPoint;
-    NiPoint3 parentnodeCenter;
     float fratio;
     NiPoint3 vert1;
     AStarNode<NavMeshSearchNode, NavMeshSearchLink>* pnode;
@@ -148,7 +142,7 @@ bool NavMeshSearch::GetNodeConnections(
         }
         if (pCurrentRequest->fCenterRadius > 0.0) {
             NiPoint3 nodeCenter = potherMesh->GetCenter(usotherTri);
-            NiPoint3 vec = nodeCenter - *pCurrentRequest->GetTargetPoint(&kTargetPoint);
+            NiPoint3 vec = nodeCenter - pCurrentRequest->GetTargetPoint();
             double fsqrLength = vec.SqrLength();
             double fcenterRadius = pCurrentRequest->fCenterRadius;
             if (pCurrentRequest->fCenterRadius * fcenterRadius < fsqrLength) {
@@ -213,7 +207,7 @@ bool NavMeshSearch::GetNodeConnections(
             }
         }
         NiPoint3 nodeCenter_2 = potherMesh->GetCenter(usotherTri);
-        apNode->GetNodeData().GetCenter(&parentnodeCenter);
+        NiPoint3 parentnodeCenter = apNode->GetNodeData().GetCenter();
         float fcost = (nodeCenter_2 - parentnodeCenter).XYLength();
         if (potherMesh->GetTriangle(usotherTri)->IsPreferred()) {
             fcost = fcost * 0.009999999776482582;
@@ -247,9 +241,9 @@ bool NavMeshSearch::GetNodeConnections(
         fcost = fcost * fdoorMultiplier;
         if (pCurrentRequest->GetTryToUseCurvedPath()) {
             // Builds the goal's center before the start's.
-            const NiPoint3* pGoalCenter = GoalNode.GetCenter(&kGoalCenter);
-            NiPoint3 deltaToGoal = *StartNode.GetCenter(&kStartCenter) - *pGoalCenter;
-            NiPoint3 deltaToNode = nodeCenter_2 - *GoalNode.GetCenter(&kGoalCenter2);
+            NiPoint3 kGoalCenter = GoalNode.GetCenter();
+            NiPoint3 deltaToGoal = StartNode.GetCenter() - kGoalCenter;
+            NiPoint3 deltaToNode = nodeCenter_2 - GoalNode.GetCenter();
             float fangleToGoal = GetZAngleFromVector(deltaToGoal);
             float fangleToNode = GetZAngleFromVector(deltaToNode);
             float fdeltaAngle = fangleToNode - fangleToGoal;
@@ -280,10 +274,7 @@ bool NavMeshSearch::GetNodeConnections(
 
 bool NavMeshSearch::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
     if (pCurrentRequest && pCurrentRequest->fActorRadius > 100.0) {
-        NiPoint3 kNodeCenter;
-        NiPoint3 kGoalCenter;
-        const NiPoint3* pNodeCenter = apNode->GetNodeData().GetCenter(&kNodeCenter);
-        NiPoint3 deltaToGoal = *GoalNode.GetCenter(&kGoalCenter) - *pNodeCenter;
+        NiPoint3 deltaToGoal = GoalNode.GetCenter() - apNode->GetNodeData().GetCenter();
         float fsqrxyLength = deltaToGoal.SqrXYLength();
         float fsqrzlength = deltaToGoal.z * deltaToGoal.z;
         double fquarterRadius = pCurrentRequest->fTargetRadius * 0.25;
@@ -302,10 +293,6 @@ bool NavMeshSearch::BuildNodePath(
     BSSimpleArray<NavMeshSearchLink, 1024>* apReturnLinkArray,
     const BSSimpleArray<const NavMeshInfo*, 1024>* apHighLevelSolution
 ) {
-    NiPoint3 kGoalCenter2;
-    NiPoint3 kStartCenter2;
-    NiPoint3 kGoalCenter;
-    NiPoint3 kStartCenter;
     using searchNavmeshes_t = BSSimpleArray<NavMeshPtr, 1024>;
     pCurrentRequest = apRequest;
     apReturnNodeArray->Clear(false);
@@ -324,12 +311,12 @@ bool NavMeshSearch::BuildNodePath(
     GoalNode.CenterY = center.y;
     GoalNode.CenterZ = center.z;
     // Builds the goal's center before the start's, as the game does.
-    const NiPoint3* pGoalCenter = GoalNode.GetCenter(&kGoalCenter);
-    double fdistance = (*StartNode.GetCenter(&kStartCenter) - *pGoalCenter).Length();
+    NiPoint3 kGoalCenter = GoalNode.GetCenter();
+    double fdistance = (StartNode.GetCenter() - kGoalCenter).Length();
     float fmaxFitness = fdistance + fdistance;
     SetMaxFitness(fmaxFitness);
-    pGoalCenter = GoalNode.GetCenter(&kGoalCenter2);
-    float afHeuristic = (*StartNode.GetCenter(&kStartCenter2) - *pGoalCenter).Length();
+    NiPoint3 kGoalCenter2 = GoalNode.GetCenter();
+    float afHeuristic = (StartNode.GetCenter() - kGoalCenter2).Length();
     AddStartNode(GetKeyForNode(StartNode.pNavMesh, StartNode.sTriangle), StartNode, afHeuristic);
     pHighLevelSolution = apHighLevelSolution;
     if (pHighLevelSolution) {
@@ -353,8 +340,6 @@ void NavMeshSearch::SetNodeData(
     NavMesh* apNavMesh,
     uint16_t aiTriangle
 ) {
-    NiPoint3 kGoalCenter;
-    NiPoint3 kNodeCenter;
     NavMeshSearchNode* pdata = &apNode->tNodeData;
     pdata->pNavMesh = apNavMesh;
     pdata->sTriangle = aiTriangle;
@@ -362,8 +347,7 @@ void NavMeshSearch::SetNodeData(
     pdata->CenterX = center.x;
     pdata->CenterY = center.y;
     pdata->CenterZ = center.z;
-    const NiPoint3* pGoalCenter = GoalNode.GetCenter(&kGoalCenter);
-    float fdistanceToGoal = (*pdata->GetCenter(&kNodeCenter) - *pGoalCenter).Length();
+    float fdistanceToGoal = (pdata->GetCenter() - GoalNode.GetCenter()).Length();
     float fheuristic = fdistanceToGoal * 0.009999999776482582;
     apNode->SetHeuristic(fheuristic);
 }

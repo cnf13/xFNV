@@ -717,7 +717,6 @@ void CombatActionMove::StartMovementProcedure(CombatController* apCombatControll
 }
 
 bool CombatActionMove::CheckLocationIdentical(CombatController* apCombatController, int32_t aiLocation) {
-    NiPoint3 a1;
     CombatProcedure* pmovementProcedure = apCombatController->pMovementProcedure;
     if (!pmovementProcedure) {
         return false;
@@ -739,8 +738,7 @@ bool CombatActionMove::CheckLocationIdentical(CombatController* apCombatControll
             }
         }
         else {
-            NiPoint3* DestinationPos = pmoveProcedure->GetDestinationPos(&a1);
-            if (pcombatLocation->GetPoint() != *DestinationPos) {
+            if (pcombatLocation->GetPoint() != pmoveProcedure->GetDestinationPos()) {
                 return false;
             }
         }

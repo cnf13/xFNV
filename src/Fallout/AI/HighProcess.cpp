@@ -3160,7 +3160,6 @@ void HighProcess::EndMoveMessage(Actor* apActor) {
 
 void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode, bool abpursuit) {
     double v12;
-    NiPoint3 delta;
     // The combat controller is a package: takes it, else the running package.
     TESPackage* v96 = apActor->GetCombatController();
     if (!v96) {
@@ -3352,7 +3351,7 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
         if (pcombatController) {
             float fangle = pcombatController->GetCombatPosition();
             if (fangle > 0.0) {
-                ptarg->GetDeltaForAngle(&delta, fangle);
+                NiPoint3 delta = ptarg->GetDeltaForAngle(fangle);
                 delta.operator*=(250.0f);
                 targetloc.operator+=(delta);
             }
@@ -8807,7 +8806,6 @@ void HighProcess::ProcessSleep(Actor* apActor) {
 }
 
 void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
-    NiPoint3 pointB;
     TESPackage* v47 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (apActor->GetSitSleepState() == SIT_SLEEP_IS_SLEEPING) {
@@ -8921,7 +8919,7 @@ void HighProcess::ProcessEat(Actor* apActor, TESObjectREFR* apLocRef) {
                     float facquireDist;
                     uint32_t iradius = pPack->GetSearchLocationRadius(apActor);
                     TESObjectCELL* pCell = pPack->GetSearchLocationCell(apActor);
-                    pPack->GetSearchLocationCoord(&pointB, apActor);
+                    NiPoint3 pointB = pPack->GetSearchLocationCoord(apActor);
                     if (!iradius && !pCell) {
                         const char* afMaxa = pPack->GetFormEditorID();
                         const char* afMin = apActor->GetFormEditorID();
@@ -9842,8 +9840,6 @@ bool HighProcess::ProcessActivate(Actor* apActor, bool abInterateindex) {
 }
 
 void HighProcess::ProcessAccompany(Actor* apActor) {
-    NiPoint3 apResult;
-    NiPoint3 v29;
     TESPackage* v17 = GetPackageThatIsRunning();
     if ((v17) && (!v17->GetWaiting())) {
         uint32_t CastingType;
@@ -9872,14 +9868,12 @@ void HighProcess::ProcessAccompany(Actor* apActor) {
                         NiPoint3 v30;
                         const NiPoint3* pt = &apActor->GetLocationOnReference();
                         const NiPoint3* v23 = &pTarget->GetLocationOnReference();
-                        apActor->pActorMover->GetNextNodeLocation(&apResult);
-                        NiPoint3* p_apResult = &apResult;
-                        pTarget->pActorMover->GetNextNodeLocation(&v29);
-                        NiPoint3* arPos = &v29;
+                        NiPoint3 apResult = apActor->pActorMover->GetNextNodeLocation();
+                        NiPoint3 v29 = pTarget->pActorMover->GetNextNodeLocation();
                         result = v8 - *pt;
                         v20 = v8 - *v23;
                         v28 = *v23 - *pt;
-                        v30 = *arPos - *p_apResult;
+                        v30 = v29 - apResult;
                         float EscortFollowDistance = static_cast<float>(v17->GetEscortFollowDistance());
                         float v16 = EscortFollowDistance * EscortFollowDistance;
                         float v11 = result.SqrLength();
@@ -9902,7 +9896,7 @@ void HighProcess::ProcessAccompany(Actor* apActor) {
                                 uint32_t MoveMode = pTarget->GetMoveMode();
                                 apActor->SetMoveMode(MoveMode);
                                 apActor->SetPathfindingGoal(
-                                    *arPos, apCell, apWorld, EscortFollowDistance,
+                                    v29, apCell, apWorld, EscortFollowDistance,
                                     static_cast<PathingAvoidNodeArray*>(nullptr)
                                 );
                             }
@@ -13205,7 +13199,6 @@ void HighProcess::ClearShootingAction(Actor* a1) {
 void HighProcess::ProcessSearch(Actor* apActor) {
     TESObjectCELL* parentCell;
     TESWorldSpace* worldSpace;
-    NiPoint3 kTargetPos;
     SearchPackage* pSearchPackage = nullptr;
     TESPackage* pPackage = GetPackageThatIsRunning();
     if (pPackage && (((int32_t)pPackage->GetPackType()) == 30)) {
@@ -13224,7 +13217,7 @@ void HighProcess::ProcessSearch(Actor* apActor) {
     SetActorsAnimation(apActor, 0x201u, true);
     if (apActor->IsPathingComplete()) {
         SetCurrentActionComplete((uint8_t)1u);
-        pSearchPackage->LookForTarget(&kTargetPos, apActor);
+        NiPoint3 kTargetPos = pSearchPackage->LookForTarget(apActor);
         worldSpace = pTarget->GetWorldSpace();
         parentCell = pTarget->TESObjectREFR::GetParentCell();
         if (apActor->SetPathfindingGoal(kTargetPos, parentCell, worldSpace, (float)0.0, nullptr)) {
@@ -13888,7 +13881,6 @@ void HighProcess::DetectDoorsForPathing(Actor* apActor) {
     NiPoint3 v8;
     NiPoint3 v9;
     NiPoint3 dst;
-    NiPoint3 apResult;
     XFNV_INLINED_LOCAL(hkpAllCdBodyPairCollector, collector, std::nullopt, std::nullopt);
     NiTransform actorToWorld;
     NiTransform pextenttemp;
@@ -13913,7 +13905,7 @@ void HighProcess::DetectDoorsForPathing(Actor* apActor) {
             boxToActor.~NiTransform();
             ::new (&boxToActor) NiTransform;
             pplayerShape = static_cast<bhkBoxShape*>(spShapePhantom.m_pObject->GetShape());
-            playerextents = *pplayerShape->GetHalfExtents(&apResult);
+            playerextents = pplayerShape->GetHalfExtents();
             imoveMode = apActor->GetMoveMode();
             if ((imoveMode & 2) != 0) {
                 boxToActor.m_Translate = *::new (&dst) NiPoint3(0.0f, -playerextents.y, playerextents.z);
@@ -14017,7 +14009,6 @@ void HighProcess::EvaluateBoneLod(MobileObject* apRef) {
 }
 
 void HighProcess::ProcessBackUp(Actor* apActor) {
-    NiPoint3 vDestination;
     TESPackage* pPack = GetPackageThatIsRunning();
     BackUpPackage* pBackUpPack = dynamic_cast<BackUpPackage*>(pPack);
     bool bIgnoreDistance = false;
@@ -14027,7 +14018,7 @@ void HighProcess::ProcessBackUp(Actor* apActor) {
         if (!GetPackageIdleDone() || (!panim || (!panim->SpecialIdleWorking() && !panim->SpecialIdlePlaying()))) {
             uint8_t bfail;
             bool v22 = epackType != PACKAGE_TYPE_SANDBOX && epackType != PACKAGE_TYPE_WANDER;
-            pBackUpPack->GetBackUpPoint(&vDestination);
+            NiPoint3 vDestination = pBackUpPack->GetBackUpPoint();
             float fcurrentdistance = apActor->GetDistanceFromPoint(vDestination);
             bool batRef = false;
             if (apActor->IsPathingComplete() || apActor == pPlayer) {
@@ -15118,13 +15109,7 @@ bool HighProcess::ComputeRandomPointOnPath(Actor* apActor, NiPoint3 aStartPoint,
     return false;
 }
 
-NiPoint3* HighProcess::ComputeRandomPoint(
-    NiPoint3* apResult,
-    NiPoint3 aStartPoint,
-    float afMaxRadius,
-    float afMinRadius,
-    bool bRandZ
-) {
+NiPoint3 HighProcess::ComputeRandomPoint(NiPoint3 aStartPoint, float afMaxRadius, float afMinRadius, bool bRandZ) {
     NiPoint3 v7;
     NiPoint3 result;
     float x = RandomFloat0To1();
@@ -15142,8 +15127,7 @@ NiPoint3* HighProcess::ComputeRandomPoint(
     }
     NiPoint3* v5 = &(result = dst * v12);
     dst = (v7 = aStartPoint + *v5);
-    *apResult = dst;
-    return apResult;
+    return dst;
 }
 
 bool HighProcess::FindDoorsToSendYellAlarm(TESObjectREFR* apRef, void* aiFilterData) {
@@ -15157,11 +15141,10 @@ bool HighProcess::FindDoorsToSendYellAlarm(TESObjectREFR* apRef, void* aiFilterD
     return false;
 }
 
-NiPoint3* bhkBoxShape::GetHalfExtents(NiPoint3* apResult) {
+NiPoint3 bhkBoxShape::GetHalfExtents() {
     NiPoint3 ecx0;
     const hkVector4* v2 = &GethkHalfExtents();
-    *apResult = HK2NI(ecx0, *v2);
-    return apResult;
+    return HK2NI(ecx0, *v2);
 }
 
 const hkVector4& bhkBoxShape::GethkHalfExtents() {

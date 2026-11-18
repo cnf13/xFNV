@@ -120,8 +120,7 @@ void NiBoxBV::AddViewerStrings(const char* pcPrefix, NiTPrimitiveArray<char*>* p
     pkStrings->Add(pcString);
 }
 
-NiPoint3*
-NiBoxBV::GetNormal(NiPoint3* apResult, int32_t iSign0, int32_t iSign1, int32_t iSign2, const NiPoint3 kVelocity) const {
+NiPoint3 NiBoxBV::GetNormal(int32_t iSign0, int32_t iSign1, int32_t iSign2, const NiPoint3 kVelocity) const {
     double v12;
     double v14;
     float apResultc;
@@ -129,7 +128,7 @@ NiBoxBV::GetNormal(NiPoint3* apResult, int32_t iSign0, int32_t iSign1, int32_t i
     float apResulte;
     float apResultf;
     double x = kVelocity.x;
-    *apResult = NiPoint3_ZERO;
+    NiPoint3 kNormal = NiPoint3_ZERO;
     int32_t v8 = 0;
     double z = kVelocity.z;
     double y = kVelocity.y;
@@ -142,19 +141,19 @@ NiBoxBV::GetNormal(NiPoint3* apResult, int32_t iSign0, int32_t iSign1, int32_t i
         }
     }
     if (iSign0 == 1) {
-        apResult->x = apResult->x + m_kBox.m_akAxis[0].x;
-        apResult->y = m_kBox.m_akAxis[0].y + apResult->y;
-        v12 = m_kBox.m_akAxis[0].z + apResult->z;
+        kNormal.x = kNormal.x + m_kBox.m_akAxis[0].x;
+        kNormal.y = m_kBox.m_akAxis[0].y + kNormal.y;
+        v12 = m_kBox.m_akAxis[0].z + kNormal.z;
     }
     else {
         if (iSign0 != -1) {
             goto LABEL_13;
         }
-        apResult->x = apResult->x - m_kBox.m_akAxis[0].x;
-        apResult->y = apResult->y - m_kBox.m_akAxis[0].y;
-        v12 = apResult->z - m_kBox.m_akAxis[0].z;
+        kNormal.x = kNormal.x - m_kBox.m_akAxis[0].x;
+        kNormal.y = kNormal.y - m_kBox.m_akAxis[0].y;
+        v12 = kNormal.z - m_kBox.m_akAxis[0].z;
     }
-    apResult->z = v12;
+    kNormal.z = v12;
     v8 = 1;
 LABEL_13:;
     if (v11) {
@@ -167,19 +166,19 @@ LABEL_14:;
         double v13;
     LABEL_15:;
         if (iSign1 == 1) {
-            apResult->x = apResult->x + m_kBox.m_akAxis[1].x;
-            apResult->y = m_kBox.m_akAxis[1].y + apResult->y;
-            v13 = m_kBox.m_akAxis[1].z + apResult->z;
+            kNormal.x = kNormal.x + m_kBox.m_akAxis[1].x;
+            kNormal.y = m_kBox.m_akAxis[1].y + kNormal.y;
+            v13 = m_kBox.m_akAxis[1].z + kNormal.z;
         }
         else {
             if (iSign1 != -1) {
                 goto LABEL_20;
             }
-            apResult->x = apResult->x - m_kBox.m_akAxis[1].x;
-            apResult->y = apResult->y - m_kBox.m_akAxis[1].y;
-            v13 = apResult->z - m_kBox.m_akAxis[1].z;
+            kNormal.x = kNormal.x - m_kBox.m_akAxis[1].x;
+            kNormal.y = kNormal.y - m_kBox.m_akAxis[1].y;
+            v13 = kNormal.z - m_kBox.m_akAxis[1].z;
         }
-        apResult->z = v13;
+        kNormal.z = v13;
         ++v8;
     LABEL_20:;
         if (v11) {
@@ -193,25 +192,25 @@ LABEL_14:;
     }
 LABEL_22:;
     if (iSign2 == 1) {
-        apResult->x = apResult->x + m_kBox.m_akAxis[2].x;
-        apResult->y = m_kBox.m_akAxis[2].y + apResult->y;
-        v14 = m_kBox.m_akAxis[2].z + apResult->z;
+        kNormal.x = kNormal.x + m_kBox.m_akAxis[2].x;
+        kNormal.y = m_kBox.m_akAxis[2].y + kNormal.y;
+        v14 = m_kBox.m_akAxis[2].z + kNormal.z;
     }
     else {
         if (iSign2 != -1) {
             goto LABEL_27;
         }
-        apResult->x = apResult->x - m_kBox.m_akAxis[2].x;
-        apResult->y = apResult->y - m_kBox.m_akAxis[2].y;
-        v14 = apResult->z - m_kBox.m_akAxis[2].z;
+        kNormal.x = kNormal.x - m_kBox.m_akAxis[2].x;
+        kNormal.y = kNormal.y - m_kBox.m_akAxis[2].y;
+        v14 = kNormal.z - m_kBox.m_akAxis[2].z;
     }
-    apResult->z = v14;
+    kNormal.z = v14;
     ++v8;
 LABEL_27:;
     if (v8 != 1) {
-        apResult->Unitize();
+        kNormal.Unitize();
     }
-    return apResult;
+    return kNormal;
 }
 
 NiBoundingVolume* NiBoxBV::CreateFromStream(NiStream& kStream) {

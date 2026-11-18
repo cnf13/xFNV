@@ -10485,7 +10485,7 @@ void TESObjectREFR::AddDecalRef(TESObjectREFR* apRef, const NiPoint3& aIntersect
     }
 }
 
-NiPoint3* TESObjectREFR::GetDeltaForAngle(NiPoint3* apResult, float afAngle) {
+NiPoint3 TESObjectREFR::GetDeltaForAngle(float afAngle) {
     NiMatrix3 ecx0;
     float v7 = GetAngleOnReference().z + afAngle;
     v7 = ClampAngle(v7);
@@ -10493,8 +10493,7 @@ NiPoint3* TESObjectREFR::GetDeltaForAngle(NiPoint3* apResult, float afAngle) {
     ecx0.MakeZRotation(v7);
     dst = ecx0 * dst;
     dst.Unitize();
-    *apResult = dst;
-    return apResult;
+    return dst;
 }
 
 void TESObjectREFR::SetSpellEffectLight(NiPointLight* pLight) {
@@ -12006,17 +12005,15 @@ char TESObjectREFR::RemoveRefFromMultiboundTestMap(TESObjectREFR* apRef) {
     return TESObjectCELL::MultiboundTestMap.RemoveAt(apRef);
 }
 
-NiPoint3* TESObjectREFR::GetBoundMax_0056FC30(NiPoint3* apResult, NiAVObject* apObj) {
+NiPoint3 TESObjectREFR::GetBoundMax_0056FC30(NiAVObject* apObj) {
     const NiFixedString* v2;
     BSBound* ExtraData;
     if (apObj && (v2 = &BSBound::Tag(), (ExtraData = static_cast<BSBound*>(apObj->GetExtraData(*v2))) != nullptr)) {
         ExtraData->GetBoundMax(TESObjectREFR_boundMax);
-        *apResult = TESObjectREFR_boundMax;
-        return apResult;
+        return TESObjectREFR_boundMax;
     }
 
-    *apResult = NiPoint3_ZERO;
-    return apResult;
+    return NiPoint3_ZERO;
 }
 
 void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint32_t aiChanged) {

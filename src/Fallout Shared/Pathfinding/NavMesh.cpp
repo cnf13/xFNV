@@ -166,7 +166,6 @@ TESForm* NavMesh::GetParentSpace() {
 }
 
 bool NavMesh::CheckNavMesh(bool abFix) {
-    NiPoint3 normal;
     bool bFoundProblem = false;
     BSStringT<char> cellName;
     TESObjectCELL* pCell = pParentCell;
@@ -227,7 +226,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
                 }
             }
         }
-        GetNormal(&normal, i_2);
+        NiPoint3 normal = GetNormal(i_2);
         if (normal.z < 0.0) {
             Warning(
                 "PATHFINDING: Navmesh %08x Cell %s, Triangle %d, has a downfacing normal, flipping the triangle",

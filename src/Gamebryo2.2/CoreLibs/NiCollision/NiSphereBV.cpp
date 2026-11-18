@@ -239,7 +239,7 @@ bool NiSphereBV::SphereTriFindIntersect(
         v74.z = v26 + v61;
         kIntrPt.z = v74.z;
         if (bCalcNormals) {
-            kNormal1 = *kTri.GetNormal(&kSurfacePt);
+            kNormal1 = kTri.GetNormal();
             // EXE-INLINED 0x4A0BD0
             v74.x = -kNormal1.x;
             v74.y = -kNormal1.y;

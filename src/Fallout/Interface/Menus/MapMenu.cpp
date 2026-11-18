@@ -157,8 +157,6 @@ void MapMenu::DoDownClick(int32_t aiID, Tile* apTarget) {
 }
 
 void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
-    NiPoint3 v66;
-    NiPoint3 v68;
     NiPoint3 v70;
     NiPoint3 dst;
     if (!apTarget && aiID >= 0 && aiID < NUM_TILES) {
@@ -204,7 +202,7 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                             }
                             float yb = pMapTile->GetFloat(4017);
                             NiPoint3 afMenuWidthOverride = PlayerMarkerPos / yb;
-                            PlayerMarkerPos = *MapToWorldCoord(&v68, afMenuWidthOverride, apWorldspace);
+                            PlayerMarkerPos = MapToWorldCoord(afMenuWidthOverride, apWorldspace);
                             PlayerMarkerPos.x = PlayerMarkerPos.x;
                             PlayerMarkerPos.y = PlayerMarkerPos.y;
                             PlayerMarkerPos.z = PlayerMarkerPos.z;
@@ -212,7 +210,7 @@ void MapMenu::DoClick(int32_t aiID, Tile* apTarget) {
                         else {
                             float yc = pMapTile->GetFloat(4017);
                             NiPoint3 afMenuWidthOverridea = PlayerMarkerPos / yc;
-                            PlayerMarkerPos = *MapToWorldCoord(&v66, afMenuWidthOverridea, nullptr);
+                            PlayerMarkerPos = MapToWorldCoord(afMenuWidthOverridea, nullptr);
                             PlayerMarkerSpace = (TESForm*)CalculatePlayerMarkerSpace(PlayerMarkerPos);
                             if (PlayerMarkerSpace) {
                                 static_cast<TESWorldSpace*>(PlayerMarkerSpace)
@@ -2066,7 +2064,6 @@ void MapMenu::StopNoteSound() {
 }
 
 void MapMenu::LoadChallenge(TESChallenge* apChallenge) {
-    NiPoint3 apResult;
     char sChallengeText[512];
     Tile* pchallengeText = pTiles[13]->GetChildByName("MM_DataText");
     Tile* pscrollbar = pTiles[13]->GetChildByName("MM_TextScrollbar");
@@ -2083,7 +2080,7 @@ void MapMenu::LoadChallenge(TESChallenge* apChallenge) {
     BSsprintf(sChallengeText, 512, "%s\n%d\\%d\n\n%s", apChallenge->GetFullName(), v5, a1, a2);
     pchallengeText->Set(4036, sChallengeText, true);
     FontManager* Singleton = FontManager::Instance();
-    float ftextHeight = Singleton->CalculateStringDimensions(&apResult, sChallengeText, 1, 400.0f, 0)->y;
+    float ftextHeight = Singleton->CalculateStringDimensions(sChallengeText, 1, 400.0f, 0).y;
     double Float = pchallengeText->pParent->GetFloat(4016);
     fheightDifference = ftextHeight - Float;
     fheightDifference = BSMAX(0.0f, fheightDifference);
@@ -2098,7 +2095,6 @@ void MapMenu::LoadChallenge(TESChallenge* apChallenge) {
 }
 
 void MapMenu::LoadNote(BGSNote* apNote) {
-    NiPoint3 apResult;
     switch (apNote->GetNoteType()) {
         case NT_SOUND:
         case NT_VOICE: {
@@ -2128,7 +2124,7 @@ void MapMenu::LoadNote(BGSNote* apNote) {
             TESDescription* v21 = apNote->GetNoteText();
             const char* v15 = v21->GetDescription(apNote, TNAM_ID);
             FontManager* Singleton = FontManager::Instance();
-            float ftextHeight = Singleton->CalculateStringDimensions(&apResult, v15, 1, 400.0f, 0)->y;
+            float ftextHeight = Singleton->CalculateStringDimensions(v15, 1, 400.0f, 0).y;
             double Float = pnoteText->pParent->GetFloat(4016);
             fheightDifference = ftextHeight - Float;
             fheightDifference = BSMAX(0.0f, fheightDifference);
@@ -2332,7 +2328,7 @@ void MapMenu::UpdateRadioList() {
     inRangeStationList.RemoveAll();
 }
 
-NiPoint3* MapMenu::MapToWorldCoord(NiPoint3* apResult, NiPoint3 aMapCoord, TESWorldSpace* apWorldspace) {
+NiPoint3 MapMenu::MapToWorldCoord(NiPoint3 aMapCoord, TESWorldSpace* apWorldspace) {
     NiPoint3 ecx0;
     float x = aMapCoord.x;
     float y = aMapCoord.y;
@@ -2347,8 +2343,7 @@ NiPoint3* MapMenu::MapToWorldCoord(NiPoint3* apResult, NiPoint3 aMapCoord, TESWo
         apWorldspace->AdjustMapMarkerCoord(ecx0, true);
     }
 
-    *apResult = ecx0;
-    return apResult;
+    return ecx0;
 }
 
 void MapMenu::UpdateWorldMap() {

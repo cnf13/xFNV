@@ -30,7 +30,7 @@ public:
     // Stores afRadius in fSightRadius.
     void SetSightRadius(float afSightRadius);
     void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
-    NiPoint3* GetLocation(NiPoint3* a2);
+    NiPoint3 GetLocation();
     bool SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& aspLOSMap);
     bool SetSeenTrianglesFromLOSMap(NiPointer<PathingLOSMap>& aspLOSMap);
     bool IsLocationSeen(const PathingLocation& arLocation);

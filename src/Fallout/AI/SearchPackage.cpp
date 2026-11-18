@@ -22,20 +22,17 @@ void SearchPackage::SetCenterLocaiton(NiPoint3 point) {
 }
 
 // The cover copy is made by the copy constructor and destroyed by Destruct, with no constructor before them.
-NiPoint3* SearchPackage::LookForTarget(NiPoint3* a1, TESObjectREFR* a2) {
-    NiPoint3 v13;
-    NiPoint3 apResult;
+NiPoint3 SearchPackage::LookForTarget(TESObjectREFR* a2) {
     NiPoint3 arg0;
     arg0 = this->LocationCenter;
     if (this->LocationCenter.operator==(NiPoint3_ZERO)) {
         NiPoint3 v20 = a2->GetLocationOnReference();
-        this->LocationCenter = *HighProcess::ComputeRandomPoint(&apResult, v20, 800.0f, 1000.0f, false);
+        this->LocationCenter = HighProcess::ComputeRandomPoint(v20, 800.0f, 1000.0f, false);
         const NiPoint3* afMaxRadius = &a2->GetLocationOnReference();
         TESObjectCELL* ParentCell = a2->GetParentCell();
         TESWorldSpace* WorldSpace = a2->GetWorldSpace();
         Pathing::FindPointOnNavMesh(WorldSpace, ParentCell, *afMaxRadius, 300.0f, &this->LocationCenter);
-        *a1 = this->LocationCenter;
-        return a1;
+        return this->LocationCenter;
     }
 
     if (coverPoints.IsEmpty()) {
@@ -46,7 +43,7 @@ NiPoint3* SearchPackage::LookForTarget(NiPoint3* a1, TESObjectREFR* a2) {
         FindCoverToSearch(v19, kTargetPos, pcell, v11);
     }
     if (coverPoints.IsEmpty() || iCurrentCover >= coverPoints.iSize) {
-        arg0 = *HighProcess::ComputeRandomPoint(&v13, this->LocationCenter, 800.0f, 300.0f, false);
+        arg0 = HighProcess::ComputeRandomPoint(this->LocationCenter, 800.0f, 300.0f, false);
         TESObjectCELL* v8 = a2->GetParentCell();
         TESWorldSpace* v6 = a2->GetWorldSpace();
         Pathing::FindPointOnNavMesh(v6, v8, arg0, 300.0f, &arg0);
@@ -57,8 +54,7 @@ NiPoint3* SearchPackage::LookForTarget(NiPoint3* a1, TESObjectREFR* a2) {
         ++iCurrentCover;
         arg0 = v16.GetLocation();
     }
-    *a1 = arg0;
-    return a1;
+    return arg0;
 }
 
 // The origin location is constructed and destroyed right after SetOrigin, before SetThreat.

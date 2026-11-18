@@ -40,8 +40,7 @@ bool NavMeshSearchClosePoint::GetNodeConnections(
     NavMesh* potherMesh;
     int32_t iotherEdge;
     uint16_t usotherTri;
-    NiPoint3 aNodeCenter;
-    apNode->tNodeData.GetCenter(&aNodeCenter);
+    NiPoint3 aNodeCenter = apNode->tNodeData.GetCenter();
     int32_t irandom = Random() % 6;
     int32_t istart = irandom / 2;
     int32_t istep = (irandom & 1) + 1;
@@ -108,8 +107,7 @@ bool NavMeshSearchClosePoint::GetNodeConnections(
 }
 
 bool NavMeshSearchClosePoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
-    NiPoint3 nodeCenter;
-    apNode->tNodeData.GetCenter(&nodeCenter);
+    NiPoint3 nodeCenter = apNode->tNodeData.GetCenter();
     // The horizontal length is stored to a float local before the compare.
     float flength = (pCurrentRequest->Origin.GetLocation() - nodeCenter).XYLength();
     if (fMinDistance > static_cast<double>(flength)) {
@@ -155,8 +153,7 @@ bool NavMeshSearchClosePoint::BuildNodePath(
     kStartNode.CenterX = kCenter.x;
     kStartNode.CenterY = kCenter.y;
     kStartNode.CenterZ = kCenter.z;
-    NiPoint3 kNodeCenter;
-    float fHeuristic = fDistanceUpperBound - (*kStartNode.GetCenter(&kNodeCenter) - AvoidNodeCenter).Length();
+    float fHeuristic = fDistanceUpperBound - (kStartNode.GetCenter() - AvoidNodeCenter).Length();
     BSClamp(fHeuristic, 0.0f, fDistanceUpperBound);
     AddStartNode(GetKeyForNode(kStartNode.pNavMesh, kStartNode.sTriangle), kStartNode, fHeuristic);
     Search(apReturnNodeArray, apReturnLinkArray, true);

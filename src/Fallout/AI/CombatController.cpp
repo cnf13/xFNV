@@ -1321,7 +1321,6 @@ void CombatController::InitializeCombatPlanData() {
 }
 
 void CombatController::UpdateLookAtTarget() {
-    NiPoint3 apResult;
     Actor* Attacker = GetAttacker();
     int32_t v7 = -1;
     uint32_t v8 = 1;
@@ -1336,7 +1335,7 @@ void CombatController::UpdateLookAtTarget() {
             NiPoint3 v4;
             float* v1 = &fCombatPathingLookAheadDelta.Float();
             v4 = Attacker->CalculateAnticipatedLocation(*v1);
-            CombatUtilities::GetAttackerFiringLocationSimple(&apResult, Attacker);
+            NiPoint3 apResult = CombatUtilities::GetAttackerFiringLocationSimple(Attacker);
             const NiPoint3* v2 = &Attacker->GetLocationOnReference();
             v4.z = apResult.z - v2->z + v4.z;
             Attacker->SetLookAtTarget(v4);

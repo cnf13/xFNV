@@ -98,6 +98,5 @@ void NiBoxCapsuleIntersector::ComputeContactInformation(const NiPoint3& kV0, con
     kRelVel.x = kV1.x - kV0.x;
     kRelVel.y = kV1.y - kV0.y;
     kRelVel.z = kV1.z - kV0.z;
-    NiPoint3 kNormal;
-    m_kContactNormal = *m_kBox.GetNormal(&kNormal, aiSign[0], aiSign[1], aiSign[2], kRelVel);
+    m_kContactNormal = m_kBox.GetNormal(aiSign[0], aiSign[1], aiSign[2], kRelVel);
 }

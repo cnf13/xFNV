@@ -127,7 +127,7 @@ public:
     void UpdateChallenges();
     void UpdateQuests();
     void UpdateRadioList();
-    NiPoint3* MapToWorldCoord(NiPoint3* apResult, NiPoint3 aMapCoord, TESWorldSpace* apWorldspace);
+    NiPoint3 MapToWorldCoord(NiPoint3 aMapCoord, TESWorldSpace* apWorldspace);
     void UpdateWorldMap();
     void Zoom_RefreshCompanions();
 

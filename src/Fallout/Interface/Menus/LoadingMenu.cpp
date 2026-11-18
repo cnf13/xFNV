@@ -1081,7 +1081,6 @@ void LoadingMenu::InitStatsTilesSettings(LoadScreenType_Data* apData) {
 }
 
 void LoadingMenu::InitObjectiveTilesSettings(LoadScreenType_Data* apData) {
-    NiPoint3 nip3Dims;
     FontManager* Singleton = FontManager::Instance();
     float fFontHeight = Singleton->pFont[apData->DisplayData1.eDisplayFont]->fFontHeight;
     NiTListItem<Tile*>* piter = ObjectiveTilesList.m_pkHead;
@@ -1124,7 +1123,7 @@ void LoadingMenu::InitObjectiveTilesSettings(LoadScreenType_Data* apData) {
                     int32_t eDisplayFont = apData->DisplayData1.eDisplayFont;
                     const char* v4 = sCurrentObjective.String();
                     FontManager* v3 = FontManager::Instance();
-                    v3->CalculateStringDimensions(&nip3Dims, v4, eDisplayFont, fWrapWidth, 0);
+                    NiPoint3 nip3Dims = v3->CalculateStringDimensions(v4, eDisplayFont, fWrapWidth, 0);
                     pTile->Set(4002, nip3Dims.y, true);
                 }
             }
@@ -1135,9 +1134,6 @@ void LoadingMenu::InitObjectiveTilesSettings(LoadScreenType_Data* apData) {
 }
 
 void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
-    NiPoint3 v24;
-    NiPoint3 v25;
-    NiPoint3 nip3Dims;
     NiTListItem<Tile*>* piter = XPProgressTilesList.m_pkHead;
     while (piter) {
         Tile* pTile = XPProgressTilesList.GetNext(piter);
@@ -1182,7 +1178,7 @@ void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
                     int32_t eDisplayFont = apData->DisplayData1.eDisplayFont;
                     const char* v5 = sLevelProgress.String();
                     FontManager* Singleton = FontManager::Instance();
-                    Singleton->CalculateStringDimensions(&nip3Dims, v5, eDisplayFont, afWrapwidthe, 0);
+                    NiPoint3 nip3Dims = Singleton->CalculateStringDimensions(v5, eDisplayFont, afWrapwidthe, 0);
                     float fHeight = nip3Dims.y;
                     pTile->Set(4016, nip3Dims.y, true);
                 }
@@ -1195,14 +1191,14 @@ void LoadingMenu::InitXPProgressTilesSettings(LoadScreenType_Data* apData) {
                         float afWrapwidthf = pTile->GetFloat(4026);
                         int32_t v7 = apData->DisplayData1.eDisplayFont;
                         FontManager* v3 = FontManager::Instance();
-                        float fCurrLevelWidth = v3->CalculateStringDimensions(&v25, apDest, v7, afWrapwidthf, 0)->x;
+                        float fCurrLevelWidth = v3->CalculateStringDimensions(apDest, v7, afWrapwidthf, 0).x;
                         pTile->Set(4001, fCurrLevelWidth, true);
                         // Converts to a 64-bit integer and passes its low 32 bits.
                         BSsprintf(apText, 260, "%i", static_cast<int32_t>(static_cast<int64_t>(pTile->GetFloat(4102))));
                         float v17 = (static_cast<double>(this->iMaxX - iMinX) - fCurrLevelWidth) / 2.0;
                         int32_t v8 = apData->DisplayData1.eDisplayFont;
                         FontManager* v4 = FontManager::Instance();
-                        float fNextLevelWidth = v4->CalculateStringDimensions(&v24, apText, v8, v17, 0)->x;
+                        float fNextLevelWidth = v4->CalculateStringDimensions(apText, v8, v17, 0).x;
                         float v16 = static_cast<double>(this->iMaxX - iMinX) - (fCurrLevelWidth + fCurrLevelWidth) -
                             fNextLevelWidth;
                         pTile->Set(4017, v16, true);

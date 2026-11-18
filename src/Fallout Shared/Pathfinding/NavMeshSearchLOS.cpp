@@ -33,7 +33,6 @@ bool NavMeshSearchLOS::GetNodeConnections(
     const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode,
     BSSimpleArray<AStarNode<NavMeshSearchNode, NavMeshSearchLink>*, 1024>* apRetNodes
 ) {
-    NiPoint3 v20;
     NiPoint3 result;
     NiPoint3 v23;
     DoorLock doorLock;
@@ -41,8 +40,7 @@ bool NavMeshSearchLOS::GetNodeConnections(
     NavMesh* potherMesh;
     int32_t iotherEdge;
     uint16_t usotherTri;
-    NiPoint3 aNodeCenter;
-    apNode->tNodeData.GetCenter(&aNodeCenter);
+    NiPoint3 aNodeCenter = apNode->tNodeData.GetCenter();
     for (int32_t i = 0; i < 3; ++i) {
         if (apNode->tNodeData.pNavMesh->GetMatchingEdge(
                 apNode->tNodeData.sTriangle, i, &potherMesh, &usotherTri, &iotherEdge
@@ -96,7 +94,7 @@ bool NavMeshSearchLOS::GetNodeConnections(
                             fnodescore = AvoidNodeArray->GetCostForPoint(nodeCenter);
                         }
                         if (bHasGoalNode) {
-                            NiPoint3 deltaToGoal = aNodeCenter - *GoalNode.GetCenter(&v20);
+                            NiPoint3 deltaToGoal = aNodeCenter - GoalNode.GetCenter();
                             NiPoint3 deltaToNode = aNodeCenter - nodeCenter;
                             deltaToGoal.Unitize();
                             deltaToNode.Unitize();
@@ -130,8 +128,6 @@ bool NavMeshSearchLOS::GetNodeConnections(
 }
 
 bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
-    NiPoint3 v12;
-    NiPoint3 triangleCenter;
     uint16_t sTriangle = apNode->tNodeData.sTriangle;
     uint32_t CastingType = apNode->tNodeData.pNavMesh->iFormID;
     char cscore = spLOSMap.m_pObject->GetAt(CastingType, sTriangle);
@@ -140,8 +136,7 @@ bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSear
             if (!pLastValidNode &&
                 ((&apNode->GetNodeData())->sTriangle != StartNode.sTriangle ||
                  (&apNode->GetNodeData())->pNavMesh != StartNode.pNavMesh)) {
-                NiPoint3* Center = (&apNode->GetNodeData())->GetCenter(&v12);
-                NiPoint3 nodeVector = spLOSMap.m_pObject->GetCenter() - *Center;
+                NiPoint3 nodeVector = spLOSMap.m_pObject->GetCenter() - (&apNode->GetNodeData())->GetCenter();
                 float fnodeDistanceSquared = nodeVector.SqrLength();
                 if (fClosestNodeDistanceSquared > static_cast<double>(fnodeDistanceSquared)) {
                     pClosestNode = apNode;
@@ -161,7 +156,7 @@ bool NavMeshSearchLOS::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSear
         if (i >= FormFlags) {
             return true;
         }
-        apNode->tNodeData.GetCenter(&triangleCenter);
+        NiPoint3 triangleCenter = apNode->tNodeData.GetCenter();
         NiPoint3 vec = triangleCenter - ignoreLocations->GetAt(static_cast<int32_t>(i));
         // The squared distance is kept as a double.
         double fdistanceSquared = vec.SqrXYLength();
@@ -182,9 +177,6 @@ bool NavMeshSearchLOS::BuildNodePath(
     BSSimpleArray<NavMeshSearchNode, 1024>* apReturnNodeArray,
     BSSimpleArray<NavMeshSearchLink, 1024>* apReturnLinkArray
 ) {
-    NiPoint3 kGoalCenter;
-    NiPoint3 kStartCenter;
-    NiPoint3 kGridCenter;
     float fheuristic;
     uint16_t usgoalNodeTri;
     pCurrentRequest = apRequest;
@@ -196,7 +188,7 @@ bool NavMeshSearchLOS::BuildNodePath(
     PathingLOSMap* pnewMap;
     if (pmemory) {
         float fradius = apRequest->spLOSGridMap.m_pObject->fRadius;
-        NiPoint3 kCenter = *apRequest->spLOSGridMap.m_pObject->GetLocation(&kGridCenter);
+        NiPoint3 kCenter = apRequest->spLOSGridMap.m_pObject->GetLocation();
         pnewMap = ::new (pmemory) PathingLOSMap(kCenter, fradius);
     }
     else {
@@ -215,8 +207,8 @@ bool NavMeshSearchLOS::BuildNodePath(
     StartNode.CenterZ = center.z;
     if (bHasGoalNode) {
         // The goal's center is built before the start's.
-        const NiPoint3* pgoalCenter = GoalNode.GetCenter(&kGoalCenter);
-        fheuristic = (*StartNode.GetCenter(&kStartCenter) - *pgoalCenter).XYLength();
+        NiPoint3 kGoalCenter = GoalNode.GetCenter();
+        fheuristic = (StartNode.GetCenter() - kGoalCenter).XYLength();
     }
     else {
         fheuristic = 0.0f;
@@ -244,7 +236,6 @@ void NavMeshSearchLOS::SetNodeData(
     NavMesh* apNavMesh,
     uint16_t aiTriangle
 ) {
-    NiPoint3 kGoalCenter;
     apNode->tNodeData.pNavMesh = apNavMesh;
     apNode->tNodeData.sTriangle = aiTriangle;
     NiPoint3 center = apNavMesh->GetCenter(aiTriangle);
@@ -252,7 +243,7 @@ void NavMeshSearchLOS::SetNodeData(
     apNode->tNodeData.CenterY = center.y;
     apNode->tNodeData.CenterZ = center.z;
     if (bHasGoalNode) {
-        apNode->fHeuristic = (center - *GoalNode.GetCenter(&kGoalCenter)).XYLength();
+        apNode->fHeuristic = (center - GoalNode.GetCenter()).XYLength();
     }
     else {
         apNode->fHeuristic = 0.0f;

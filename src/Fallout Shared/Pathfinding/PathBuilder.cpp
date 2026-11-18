@@ -470,9 +470,7 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
     uint32_t aiLastVirtualNodeIndex
 ) {
     NiPoint3 v24;
-    NiPoint3 v26;
     NiPoint3 result;
-    NiPoint3 v31;
     PathingNode* plastNode;
     NiPoint3 delta;
     PathingLocation lastLoc;
@@ -564,7 +562,7 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
         lastNode = &nodes.GetLast();
         a1 = lastNode->sTriangle;
         NavMeshInfo_ = lastNode->pNavMesh->GetNavMeshInfo();
-        XFNV_RECONSTRUCT(PathingLocation)(&lastLoc, *lastNode->GetCenter(&v31), NavMeshInfo_, a1);
+        XFNV_RECONSTRUCT(PathingLocation)(&lastLoc, lastNode->GetCenter(), NavMeshInfo_, a1);
         if (pSolution.m_pObject->iLastLoadedVirtualNodeIndex != aiLastVirtualNodeIndex) {
             goto LABEL_41;
         }
@@ -622,8 +620,8 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
                 break;
             }
             NavMeshInfo* a1b = rconstNodes.GetAt(static_cast<int32_t>(i_3)).pNavMesh->GetNavMeshInfo();
-            NiPoint3* v14 = rconstNodes.GetAt(static_cast<int32_t>(i_3)).GetCenter(&v26);
-            PathingLocation loc(v14, a1b);
+            NiPoint3 v26 = rconstNodes.GetAt(static_cast<int32_t>(i_3)).GetCenter();
+            PathingLocation loc(&v26, a1b);
             pSolution.m_pObject->AddPathingNode(loc, NiPoint3_ZERO);
         }
     LABEL_72:;
@@ -845,8 +843,6 @@ bool PathBuilder::BuildTeleportDoorPath() {
 bool PathBuilder::BuildDetailedPath(Actor* pActor, uint32_t aiFirstHighLevelNode) {
     NiPoint3 v17;
     NiPoint3 result;
-    NiPoint3 tangent_2;
-    NiPoint3 tangent;
     int32_t ilastLoadedNode;
     int32_t ifirstLoadedNode;
     pSolution.m_pObject->ClearCurrentDetailedPath();
@@ -872,7 +868,7 @@ bool PathBuilder::BuildDetailedPath(Actor* pActor, uint32_t aiFirstHighLevelNode
             if ((nextLoc.GetLocation() - *afRadius).SqrLength() > 4096.0) {
                 float afRadiusa = pRequest.m_pObject->fActorRadius;
                 float afHeading = pRequest.m_pObject->fInitialPathHeading;
-                Pathing::ComputeInitialTangentForActor(&tangent, afHeading, startLoc, nextLoc, afRadiusa);
+                NiPoint3 tangent = Pathing::ComputeInitialTangentForActor(afHeading, startLoc, nextLoc, afRadiusa);
                 pnode0->SetTangent(tangent);
             }
         }
@@ -890,7 +886,7 @@ bool PathBuilder::BuildDetailedPath(Actor* pActor, uint32_t aiFirstHighLevelNode
                     PathingLocation goalLoc(*&pnodeN->Location);
                     float afRadiusc = pRequest.m_pObject->fActorRadius;
                     float Lifetime = pRequest.m_pObject->fGoalAngle;
-                    Pathing::ComputeFinalTangentForActor(&tangent_2, Lifetime, goalLoc, afRadiusc);
+                    NiPoint3 tangent_2 = Pathing::ComputeFinalTangentForActor(Lifetime, goalLoc, afRadiusc);
                     pnodeN->SetTangent(tangent_2);
                 }
             }

@@ -30,7 +30,7 @@ public:
     void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) override;
 
     bool CheckExplosion(BGSExplosion* apExplosion, const NiPoint3& arLocation, float afTime);
-    NiPoint3* CalculateTargetedPoint(NiPoint3* a1);
+    NiPoint3 CalculateTargetedPoint();
 
     ATTACK_STATE eState;
     bool bTargetLocation;

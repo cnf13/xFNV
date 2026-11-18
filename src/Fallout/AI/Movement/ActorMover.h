@@ -190,7 +190,7 @@ public:
     virtual void Revert(BGSLoadFormBuffer* apLoadGameBuffer);
 
     // Where the actor will be afTime seconds ahead, written to apOut.
-    NiPoint3* GetAnticipatedLocation(NiPoint3* apOut, float afTime);
+    NiPoint3 GetAnticipatedLocation(float afTime);
     // Informs the path handler that apReference was removed.
     void RemoveReference(TESObjectREFR* apReference);
     // Gets the current path goal.
@@ -281,7 +281,7 @@ public:
     void UpdateMovement(float fdeltaT);
     void HandleProcessLevelChange();
     void SetCurrentFrameMoveModeAndDelta();
-    NiPoint3* GetNextNodeLocation(NiPoint3* apResult);
+    NiPoint3 GetNextNodeLocation();
     bool GetCurrentGoal_009DE2B0(NiPoint3* apRetLocation);
     void WarpToNextNode();
     void HandleMovementResult(ActorPathHandler::PATH_HANDLER_RESULT aeResult);

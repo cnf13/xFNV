@@ -206,7 +206,7 @@ public:
         int32_t* arOtherEdgeIndex
     );
     // The normal of triangle ausTriangle, written to arNormal.
-    NiPoint3* GetNormal(NiPoint3* arNormal, uint16_t ausTriangle);
+    NiPoint3 GetNormal(uint16_t ausTriangle);
     // Reconnects the enabled portals.
     bool ReconnectEnabledPortals();
     // The index of the undo data of apObstacle, or -1.
@@ -379,7 +379,7 @@ public:
         float& afZCoord
     );
     bool FindRandomPointWithinRadius(const NiPoint3& aStartLocation, float aRadius, NiPoint3* apRet1);
-    NiPoint3* MoveAwayFromEdge(NiPoint3* apResult, const NiPoint3& aLocation, float afDistance);
+    NiPoint3 MoveAwayFromEdge(const NiPoint3& aLocation, float afDistance);
     int32_t FindInterectingEdge(
         uint16_t ausTri,
         int32_t aIgnoreEdge,

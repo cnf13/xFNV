@@ -481,7 +481,7 @@ void TESHavokUtilities::InspectHavokObjects(
 // A random point in the middle tenth of the body's local box (0.45 to 0.55 of the way from min to max on each axis),
 // moved into apObject's local space when the body is a bhkRigidBodyT or belongs to another object; the origin when
 // apObject has no rigid body.
-NiPoint3* TESHavokUtilities::GetLocalPointWithinCollision(NiPoint3* apResult, NiAVObject* apObject) {
+NiPoint3 TESHavokUtilities::GetLocalPointWithinCollision(NiAVObject* apObject) {
     // kPoint is 16-aligned; NiTransform::operator* takes it.
     alignas(16) NiPoint3 kPoint = NiPoint3_ZERO;
     bhkCollisionObject* pcol = FindFirstCollisionObject(apObject);
@@ -515,8 +515,7 @@ NiPoint3* TESHavokUtilities::GetLocalPointWithinCollision(NiPoint3* apResult, Ni
             }
         }
     }
-    *apResult = kPoint;
-    return apResult;
+    return kPoint;
 }
 
 TESObjectREFR* TESHavokUtilities::FindCollidableRef_009C69E0(const hkpCollidable* apCol) {

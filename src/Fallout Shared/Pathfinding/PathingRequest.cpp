@@ -61,14 +61,13 @@ PathingRequest::PathingRequest(const PathingRequest& aRequest)
 PathingRequest::~PathingRequest() {}
 
 void PathingRequest::CopyTo(PathingRequest* apDest) const {
-    NiPoint3 center;
     apDest->SetOrigin(Origin);
     apDest->SetDestination(Destination);
     apDest->SetActorHeight(fActorHeight);
     apDest->SetActorRadius(fActorRadius);
     apDest->SetActorLockData(LockData);
     apDest->SetTargetRadius(fTargetRadius);
-    GetTargetPoint(&center);
+    NiPoint3 center = GetTargetPoint();
     apDest->SetCenterRadius(center, fCenterRadius);
     apDest->SetGoalZDelta(fGoalZDelta);
     PathingAvoidNodeArray* AvoidNodeArray = GetAvoidNodeArray();
@@ -420,9 +419,8 @@ bool PathingRequest::GetSoftGoalRadius() const {
     return (bool)((uint8_t)bSoftGoalRadius);
 }
 
-NiPoint3* PathingRequest::GetTargetPoint(NiPoint3* a2) const {
-    *a2 = Center;
-    return a2;
+NiPoint3 PathingRequest::GetTargetPoint() const {
+    return Center;
 }
 
 float PathingRequest::GetDefaultRadius() {

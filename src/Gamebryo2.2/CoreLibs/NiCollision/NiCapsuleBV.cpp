@@ -546,7 +546,7 @@ bool NiCapsuleBV::CapsuleTriFindIntersect(
         v78.z = v31 + result.z;
         kIntrPt.z = v78.z;
         if (bCalcNormals) {
-            kNormal1 = *kTri.GetNormal(&kSurfacePt);
+            kNormal1 = kTri.GetNormal();
             // EXE-INLINED 0x4A0BD0
             v78.x = -kNormal1.x;
             v78.y = -kNormal1.y;

@@ -295,7 +295,6 @@ void ImpactMixer::PlayGunshot(
     NiAVObject* aOriginNode,
     bool abPlayer
 ) {
-    NiPoint3 v27;
     if (ImpactMixer::GetGunshotsInitialized()) {
         BSSoundHandle handl;
         BSSoundHandle handl2;
@@ -392,8 +391,7 @@ void ImpactMixer::PlayGunshot(
                     psound2 = nullptr;
                 }
                 BSAudio* v4 = &BSAudio::QInstance();
-                NiPoint3* ListenerPosition = v4->GetListenerPosition(&v27);
-                NiPoint3 distanceVector = origin - *ListenerPosition;
+                NiPoint3 distanceVector = origin - v4->GetListenerPosition();
                 float fdistanceSqr = distanceVector.x * distanceVector.x + distanceVector.y * distanceVector.y +
                     distanceVector.z * distanceVector.z;
                 for (int32_t i = 0; i < 20; ++i) {

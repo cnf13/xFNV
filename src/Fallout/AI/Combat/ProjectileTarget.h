@@ -12,7 +12,7 @@ public:
     ProjectileTarget();
     ~ProjectileTarget();
 
-    NiPoint3* GetWorldLocation(NiPoint3* apResult);
+    NiPoint3 GetWorldLocation();
 
     static void operator delete(void* apMemory);
 

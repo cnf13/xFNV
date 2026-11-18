@@ -38,7 +38,7 @@ public:
     void CreateAvoidNodeArray(NiPointer<PathingAvoidNodeArray>& arspAvoidNodeArray);
     // The movement multiplier for iLocation: 2 for locations 6 and 7, 0.5 for 8, else 1.
     float GetHidingTime();
-    NiPoint3* GetDestinationPos(NiPoint3* a1);
+    NiPoint3 GetDestinationPos();
     bool CreatePath();
 
     MOVE_STATE eState;

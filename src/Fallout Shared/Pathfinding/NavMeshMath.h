@@ -171,8 +171,7 @@ public:
         float afCircleRadius
     );
     static bool CheckArcAgainstCircle(const Sphere& aCircle1, const AngleSinCosArc& aArc, const Sphere& aCircle2);
-    static NiPoint3*
-    RandomPointOnTriangle(NiPoint3* apResult, const NiPoint3& aVert0, const NiPoint3& aVert1, const NiPoint3& aVert2);
+    static NiPoint3 RandomPointOnTriangle(const NiPoint3& aVert0, const NiPoint3& aVert1, const NiPoint3& aVert2);
     static bool Find2DIntersection_006B9E90(
         const NiPoint2& aSegment1Start,
         const NiPoint2& aSegment1End,

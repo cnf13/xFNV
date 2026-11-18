@@ -21,7 +21,7 @@ struct NavMeshGrid {
     bool IsTriangleInGridCell(uint16_t aiTriangle, uint32_t aiColumn, uint32_t aiRow);
     // The world position of the corner of cell (aiColumn, aiRow) at the grid's minimum height. Writes the point to
     // apResult and returns it.
-    NiPoint3* GetGridPosition(NiPoint3* apResult, uint32_t aiColumn, uint32_t aiRow);
+    NiPoint3 GetGridPosition(uint32_t aiColumn, uint32_t aiRow);
     // The triangle list of the cell aLoc falls in, through apArray.
     void GetTriangleData(const NiPoint3& aLoc, const BSSimpleArray<uint16_t, 1024>*& apArray);
     void

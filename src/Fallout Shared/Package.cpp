@@ -4243,19 +4243,12 @@ TESObjectREFR* TESPackage::GetSecondLocationReference(MobileObject* apActor) {
     return LocReference;
 }
 
-const NiPoint3* TESPackage::GetSearchLocationCoord(NiPoint3* apResult, MobileObject* apActor) {
-    NiPoint3* LocationCoord;
-    NiPoint3 a1;
-    NiPoint3 result;
+const NiPoint3 TESPackage::GetSearchLocationCoord(MobileObject* apActor) {
     PackageLocation* ploc = GetPackageSearchLocation();
     if (ploc == pPackLoc) {
-        LocationCoord = &(result = GetLocationCoord(apActor));
+        return GetLocationCoord(apActor);
     }
-    else {
-        LocationCoord = &(a1 = GetSecondLocationCoord(apActor));
-    }
-    *apResult = *LocationCoord;
-    return apResult;
+    return GetSecondLocationCoord(apActor);
 }
 
 const TESFollowPackageData* TESPackage::GetFollowPackageData() {

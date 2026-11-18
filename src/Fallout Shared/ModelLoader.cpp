@@ -846,7 +846,6 @@ void QueuedModel::Run() {
 }
 
 void QueuedModel::Finish() {
-    NiPoint3 apResult;
     NiUpdateData a2;
     AutoMemContext apMemory(
         eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 997
@@ -872,7 +871,7 @@ void QueuedModel::Finish() {
                     if (radius < 0.0010000000474974513) {
                         Model* v5 = spModel.m_pObject;
                         NiAVObject* v6 = v5->GetModel();
-                        radius = TESObjectREFR::GetBoundMax_0056FC30(&apResult, v6)->z * 0.5;
+                        radius = TESObjectREFR::GetBoundMax_0056FC30(v6).z * 0.5;
                     }
                     float v21 = 3.4028235e+38f;
                     const uint32_t uiGridsToLoad = ::uGridsToLoad.UInt();

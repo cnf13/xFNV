@@ -337,10 +337,8 @@ void PathSmootherPOVSearch::AddNodeForNormalChanges(
             );
             kCurrent += (kMidpoint - kCurrent) * 0.01f;
         }
-        NiPoint3 kNormal;
-        rCrossed.pNavMesh->GetNormal(&kNormal, rCrossed.usTriangle);
-        NiPoint3 kOtherNormal;
-        kOther.pNavMesh->GetNormal(&kOtherNormal, kOther.usTriangle);
+        NiPoint3 kNormal = rCrossed.pNavMesh->GetNormal(rCrossed.usTriangle);
+        NiPoint3 kOtherNormal = kOther.pNavMesh->GetNormal(kOther.usTriangle);
         if (kNormal.Dot(kOtherNormal) < 0.8999999761581421) {
             NiPoint3 kVert1;
             NiPoint3 kVert2;
@@ -416,9 +414,7 @@ bool PathSmootherPOVSearch::CheckForLastNode() {
     FastNavMeshEdgeLocation kEntryLocation;
     kEntryLocation.~FastNavMeshEdgeLocation();
     ::new (&kEntryLocation) FastNavMeshEdgeLocation;
-    NiPoint3 kTangentOffset;
-    NiPoint3 kGoalPoint =
-        kGoalCircle.Center + *kTangents.Results[0].Circle2Param.ComputePoint3(&kTangentOffset, kGoalCircle.fRadius);
+    NiPoint3 kGoalPoint = kGoalCircle.Center + kTangents.Results[0].Circle2Param.ComputePoint3(kGoalCircle.fRadius);
     kExitLocation.iEdgeIndex = -1;
     float fPercentPreferred = 0.0f;
     if (pRequest->GetActorRadius() >= 100.0) {
@@ -484,8 +480,7 @@ bool PathSmootherPOVSearch::CheckArcAgainstNavMesh(
     currentStartAngle.operator=(aArc.Start);
     // The sum is built in currentGoalAngle itself.
     AngleSinCos currentGoalAngle = currentStartAngle + angleStep;
-    NiPoint3 offset;
-    NiPoint3 currentGoalLoc = aSphere.Center + *currentGoalAngle.ComputePoint3(&offset, aSphere.fRadius);
+    NiPoint3 currentGoalLoc = aSphere.Center + currentGoalAngle.ComputePoint3(aSphere.fRadius);
     FastNavMeshEdgeLocation currentStartLocation(aEntryLocation);
     FastNavMeshEdgeLocation currentEndLocation;
     uint32_t icount = 0;
@@ -500,8 +495,7 @@ bool PathSmootherPOVSearch::CheckArcAgainstNavMesh(
         currentStartLocation.Copy(currentEndLocation);
         currentStartAngle.operator=(currentGoalAngle);
         currentGoalAngle.operator=(currentStartAngle + angleStep);
-        NiPoint3 goalOffset;
-        currentGoalLoc = aSphere.Center + *currentGoalAngle.ComputePoint3(&goalOffset, aSphere.fRadius);
+        currentGoalLoc = aSphere.Center + currentGoalAngle.ComputePoint3(aSphere.fRadius);
         iIgnoreEdge = currentEndLocation.iEdgeIndex;
         ++icount;
     }
@@ -509,8 +503,7 @@ bool PathSmootherPOVSearch::CheckArcAgainstNavMesh(
         apReturnLocation->Copy(currentEndLocation);
         return false;
     }
-    NiPoint3 endOffset;
-    NiPoint3 lastGoalLoc = aSphere.Center + *aArc.End.ComputePoint3(&endOffset, aSphere.fRadius);
+    NiPoint3 lastGoalLoc = aSphere.Center + aArc.End.ComputePoint3(aSphere.fRadius);
     currentStartLocation.iEdgeIndex = -1;
     if (CheckSegmentAgainstNavMesh(currentStartLocation, lastGoalLoc, &currentEndLocation, fdummy)) {
         apReturnLocation->Copy(currentEndLocation);
@@ -624,8 +617,7 @@ bool PathSmootherPOVSearch::DoubleCheckArcAgainstNavMesh(
         fLeftRadiusSum = aSphere.fRadius - pRequest->fActorRadius * 0.8999999761581421;
     }
     float fLeftRadius = fLeftRadiusSum;
-    NiPoint3 leftVec;
-    aArc.Start.ComputePoint3(&leftVec, fLeftRadius);
+    NiPoint3 leftVec = aArc.Start.ComputePoint3(fLeftRadius);
     FastNavMeshEdgeLocation leftLoc;
     Sphere leftSphere;
     leftSphere.~Sphere();
@@ -647,8 +639,7 @@ bool PathSmootherPOVSearch::DoubleCheckArcAgainstNavMesh(
         fRightRadiusSum = pRequest->fActorRadius * 0.8999999761581421 + aSphere.fRadius;
     }
     float fRightRadius = fRightRadiusSum;
-    NiPoint3 rightVec;
-    aArc.Start.ComputePoint3(&rightVec, fRightRadius);
+    NiPoint3 rightVec = aArc.Start.ComputePoint3(fRightRadius);
     FastNavMeshEdgeLocation rightLoc;
     Sphere rightSphere;
     rightSphere.~Sphere();
@@ -838,8 +829,6 @@ bool PathSmootherPOVSearch::SmoothPath(
     BSSimpleArray<const NavMeshInfo*, 1024>* apDetailedPathInfos
 ) {
     bool bStartUnderWater;
-    NiPoint3 kGoalCenter;
-    NiPoint3 kStartCenter;
     float fStartZ;
     float fGoalZ;
     PathSmootherPOVNode aNodeData;
@@ -851,9 +840,9 @@ bool PathSmootherPOVSearch::SmoothPath(
     pSolution = apSolution;
     pDetailedPathInfos = apDetailedPathInfos;
     if ((&aTriSolution.GetFirst())->pNavMesh->pParentCell) {
-        NiPoint3* Center = (&aTriSolution.GetFirst())->GetCenter(&kStartCenter);
         TESObjectCELL* pCell = (&aTriSolution.GetFirst())->pNavMesh->pParentCell;
-        bStartUnderWater = Center->z < TES::pInstance->GetWaterHeight(aStartLocation, pCell) + 50.0;
+        bStartUnderWater =
+            (&aTriSolution.GetFirst())->GetCenter().z < TES::pInstance->GetWaterHeight(aStartLocation, pCell) + 50.0;
     }
     else {
         bStartUnderWater = true;
@@ -868,9 +857,8 @@ bool PathSmootherPOVSearch::SmoothPath(
     }
     bool bGoalUnderWater = false;
     if ((!(&apRequest->Destination)->QUnused()) && ((&aTriSolution.GetLast())->pNavMesh->pParentCell)) {
-        NiPoint3* v10 = (&aTriSolution.GetLast())->GetCenter(&kGoalCenter);
         TESObjectCELL* pCell = (&aTriSolution.GetLast())->pNavMesh->pParentCell;
-        if (v10->z < TES::pInstance->GetWaterHeight(aGoalLocation, pCell) + 50.0) {
+        if ((&aTriSolution.GetLast())->GetCenter().z < TES::pInstance->GetWaterHeight(aGoalLocation, pCell) + 50.0) {
             bGoalUnderWater = true;
         }
     }
@@ -1598,9 +1586,8 @@ bool PathSmootherPOVSearch::CheckAndAddNodeConnection(
         }
         // The tangent segment from the exit point to this POV's circle.
         FastNavMeshEdgeLocation entryLocation;
-        NiPoint3 entryOffset;
-        NiPoint3 entryLoc = thisPOVSphere.Center +
-            *tangentResults.Results[e].Circle2Param.ComputePoint3(&entryOffset, thisPOVSphere.fRadius);
+        NiPoint3 entryLoc =
+            thisPOVSphere.Center + tangentResults.Results[e].Circle2Param.ComputePoint3(thisPOVSphere.fRadius);
         exitLocation.iEdgeIndex = -1;
         float fpreferredPercent = 0.0f;
         if (!TripleCheckSegmentAgainstNavMesh(

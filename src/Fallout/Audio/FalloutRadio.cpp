@@ -1042,7 +1042,6 @@ bool FalloutRadio::PipboyRadioEnable(bool abEnable) {
 }
 
 void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
-    NiPoint3 listenerLocation;
     bool bsong = false;
     bool bleadIn = false;
     bool v61 = false;
@@ -1058,7 +1057,7 @@ void FalloutRadio::UpdateStation(FalloutRadio::FORadioStation* pStation) {
         bool bpipboyStation = pStation == FalloutRadio::pCurrentPipboyStation;
         float fmaxUpdateDistance = 3000.0f;
         BSAudio* v1 = &BSAudio::QInstance();
-        v1->GetListenerPosition(&listenerLocation);
+        NiPoint3 listenerLocation = v1->GetListenerPosition();
         FalloutRadio::RadioUpdateCriticalSection.Enter("FalloutRadio::UpdateStation");
         DialogueItem* pcurrentItem =
             pStation->CurrentState.pConvo ? pStation->CurrentState.pConvo->GetCurrentItem() : nullptr;

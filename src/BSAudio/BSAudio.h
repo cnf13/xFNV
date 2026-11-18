@@ -112,7 +112,7 @@ public:
     float GetRadioSecondaryVolume();
     void ExitDialogue();
     void UnPauseSynchTimer();
-    NiPoint3* GetListenerPosition(NiPoint3* apResult);
+    NiPoint3 GetListenerPosition();
     void EnterDialogue();
     void PauseSynchTimer();
     void PrintDebugInfoThunk();

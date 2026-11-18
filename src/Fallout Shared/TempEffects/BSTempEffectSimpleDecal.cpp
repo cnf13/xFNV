@@ -156,14 +156,12 @@ bool BSTempEffectSimpleDecal::GetIsValid() {
     return (bool)((uint8_t)bValidDecal);
 }
 
-NiPoint3* BSTempEffectSimpleDecal::GetOrigin(NiPoint3* p2) {
-    *p2 = pOrigin;
-    return p2;
+NiPoint3 BSTempEffectSimpleDecal::GetOrigin() {
+    return pOrigin;
 }
 
-NiPoint3* BSTempEffectSimpleDecal::GetDirection(NiPoint3* a2) {
-    *a2 = pVector;
-    return a2;
+NiPoint3 BSTempEffectSimpleDecal::GetDirection() {
+    return pVector;
 }
 
 bool BSTempEffectSimpleDecal::ProcessGeometry(NiAVObject* apAVObj) {

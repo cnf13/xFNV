@@ -72,11 +72,11 @@ void NiSphereTriIntersector::ComputeContactInformation(const NiPoint3& kV0, cons
     m_kContactPoint.x = kPoint.x + fEdge1X;
     m_kContactPoint.y = kPoint.y + fEdge1Y;
     m_kContactPoint.z = kPoint.z + fEdge1Z;
-    NiPoint3* pkNormal = m_kTri.GetNormal(&kPoint);
+    NiPoint3 kNormal = m_kTri.GetNormal();
     bool bContact = m_eIntersectionType == IT_CONTACT;
-    m_kContactNormal.x = -pkNormal->x;
-    m_kContactNormal.y = -pkNormal->y;
-    m_kContactNormal.z = -pkNormal->z;
+    m_kContactNormal.x = -kNormal.x;
+    m_kContactNormal.y = -kNormal.y;
+    m_kContactNormal.z = -kNormal.z;
     if (bContact) {
         double dContactTime = m_fContactTime;
         float fMoveX = kV1.x * dContactTime;

@@ -86,12 +86,12 @@ void NiCapsuleTriIntersector::ComputeContactInformation(const NiPoint3& kV0, con
     m_kContactPoint.y = v19;
     float v21 = (float)(z + v25);
     m_kContactPoint.z = v21;
-    NiPoint3* normal = p_m_kTri->GetNormal(&v22);
+    NiPoint3 normal = p_m_kTri->GetNormal();
     uint8_t v9 = (uint8_t)(((int32_t)m_eIntersectionType) == 2);
-    v23 = -normal->x;
-    v24 = -normal->y;
+    v23 = -normal.x;
+    v24 = -normal.y;
     float v10 = v24;
-    double v11 = (double)normal->z;
+    double v11 = (double)normal.z;
     m_kContactNormal.x = v23;
     v25 = (float)(-v11);
     float v12 = v25;

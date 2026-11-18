@@ -22,7 +22,7 @@ public:
     using TESPackage::SaveGame;
 
     void InitializeBackUpPackage(Actor* apActor, TESObjectCELL* apcell, TESObjectREFR* apRef);
-    NiPoint3* GetBackUpPoint(NiPoint3* apResult);
+    NiPoint3 GetBackUpPoint();
 
     // The point 300 units from apActor straight away from aptarget, moved onto the navmesh within 200 units when
     // one is found there; zero without either reference.

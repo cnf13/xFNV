@@ -281,7 +281,7 @@ void CombatProcedureAttackRanged::Update() {
             phitRef = nullptr;
             Actor* apActor = nullptr;
             fdistanceFraction = 0.0f;
-            CombatUtilities::GetBackProjectedAttackerFiringLocation(&firingLocation, pattacker);
+            firingLocation = CombatUtilities::GetBackProjectedAttackerFiringLocation(pattacker);
             bool bprojectilePickHit = CombatUtilities::CalculateProjectileLOS(
                 pattacker, pprojectile, 0.0f, firingLocation, targetPoint, &hitPoint, &phitRef, &fdistanceFraction
             );
@@ -443,7 +443,6 @@ void CombatProcedureAttackRanged::DisplayDebugText(
     DEBUGTEXT_LOCATION aeLocation,
     DEBUGTEXT_JUSTIFY aeJustify
 ) {
-    NiPoint3 rot;
     Actor* pattacker = GetAttacker();
     switch (eState) {
         case CombatProcedureAttackRanged::ATTACK_STATE_IDLE: {
@@ -508,7 +507,7 @@ void CombatProcedureAttackRanged::DisplayDebugText(
     }
     TESObjectWEAP* pweapon = pCombatController->GetCurrentWeapon();
     if ((TargetedPoint.operator!=(NiPoint3_ZERO)) && (pweapon) && (pweapon->GetAimArc() > 0.0)) {
-        CombatUtilities::GetAngleToProjectedPoint(&rot, pattacker, TargetedPoint);
+        NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(pattacker, TargetedPoint);
         float fheading = pattacker->GetActualHeading();
         rot.z = ClampAngle(rot.z);
         float fdir = 0.0f;

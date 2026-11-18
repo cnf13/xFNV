@@ -456,9 +456,7 @@ void ListBox<T>::CalculateTileHeight(Tile* apTile) {
             }
             int32_t iFont = static_cast<int32_t>(pTextTile->GetFloat(Tile::kTileValue_Font));
             const char* pcText = pTextTile->GetString(Tile::kTileValue_String);
-            NiPoint3 kDimensions;
-            fTileHeight =
-                FontManager::Instance()->CalculateStringDimensions(&kDimensions, pcText, iFont, fWrapWidth, 0)->y;
+            fTileHeight = FontManager::Instance()->CalculateStringDimensions(pcText, iFont, fWrapWidth, 0).y;
             fTileHeight = apTile->GetFloat(Tile::TextToTrait("_VerticalSpacing")) + fTileHeight;
         }
     }

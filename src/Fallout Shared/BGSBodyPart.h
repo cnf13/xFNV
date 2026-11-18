@@ -100,9 +100,9 @@ public:
     const char* GetPartName();
     // Returns Data.pDismemberImpactDataSet.
     BGSImpactDataSet* GetDismemberImpactDataSet();
-    NiPoint3* GetGoreTranslate(NiPoint3* apResult);
+    NiPoint3 GetGoreTranslate();
     const char* GetGoreObjectName();
-    NiPoint3* GetGoreRotate(NiPoint3* apResult);
+    NiPoint3 GetGoreRotate();
     const char* GetTargetName();
     const char* GetNodeName();
 

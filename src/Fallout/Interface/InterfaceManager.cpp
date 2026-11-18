@@ -2697,8 +2697,7 @@ void InterfaceManager::RefreshActivateREFR() {
         kViewPos.z = static_cast<float>(pPlayer->GetScale() * dEyeHeight + kViewPos.z);
     }
     if (pPlayer->IsActually3rdPerson()) {
-        NiPoint3 kShoulderOffset;
-        kViewPos += *pPlayer->GetCamera3rdPersonShoulderOffset(&kShoulderOffset);
+        kViewPos += pPlayer->GetCamera3rdPersonShoulderOffset();
     }
     kRotation.MakeZRotation(pPlayer->GetHeading(false));
     kLookRotation.MakeXRotation(pPlayer->GetLooking());
@@ -5390,10 +5389,9 @@ void EditableTextField::HandleKey(int32_t iKey) {
 
 bool EditableTextField::StringIsOk(char* sString) {
     uint32_t iFontIdx;
-    NiPoint3 apResult;
     iFontIdx = this->iFontIdx;
     FontManager* singleton = FontManager::Instance();
-    singleton->CalculateStringDimensions(&apResult, sString, iFontIdx, 0x1.fffffe0000000p+127f, 0);
+    NiPoint3 apResult = singleton->CalculateStringDimensions(sString, iFontIdx, 0x1.fffffe0000000p+127f, 0);
     return (bool)((uint8_t)(((int32_t)apResult.x) <= ((int32_t)iMaxPixelSize)));
 }
 

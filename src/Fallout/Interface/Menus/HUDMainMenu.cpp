@@ -1477,9 +1477,6 @@ void HUDMainMenu::UpdateSneak() {
 }
 
 void HUDMainMenu::UpdateQuestText() {
-    NiPoint3 textDimensions_2;
-    NiPoint3 pos_4;
-    NiPoint3 subtitleDimensions;
     if (HUDMainMenu::pme &&
         (eMenuMode != HUDMainMenu::HMM_VATS &&
          (eMenuMode != HUDMainMenu::HMM_CONTAINER &&
@@ -1560,7 +1557,7 @@ void HUDMainMenu::UpdateQuestText() {
                 int32_t Float = static_cast<int32_t>(pquest->GetFloat(4025));
                 const char* String = pquest->GetString(4036);
                 FontManager* Singleton = FontManager::Instance();
-                Singleton->CalculateStringDimensions(&pos_4, String, Float, a1a, 0);
+                NiPoint3 pos_4 = Singleton->CalculateStringDimensions(String, Float, a1a, 0);
                 iWidth = static_cast<int32_t>(pos_4.x);
                 float v33 = -(pos_4.y + 15.0);
                 pquest->Set(4002, v33, true);
@@ -1641,7 +1638,7 @@ void HUDMainMenu::UpdateQuestText() {
                     nFont = HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->CustomTextSubtitleFont;
                 }
                 FontManager* v12 = FontManager::Instance();
-                v12->CalculateStringDimensions(&subtitleDimensions, Dst, nFont, 3.4028235e+38f, 0);
+                NiPoint3 subtitleDimensions = v12->CalculateStringDimensions(Dst, nFont, 3.4028235e+38f, 0);
                 int32_t iX = static_cast<int32_t>(
                     (static_cast<double>(nSafeScreenWidth) - (fScreenWidthMultiplier + 1.0) * subtitleDimensions.x) *
                     fScreenWidthMultiplier
@@ -1673,7 +1670,7 @@ void HUDMainMenu::UpdateQuestText() {
                         float a1b = pquest_2->GetFloat(4026);
                         int32_t v20 = static_cast<int32_t>(pquest_2->GetFloat(4025));
                         FontManager* v13 = FontManager::Instance();
-                        v13->CalculateStringDimensions(&textDimensions_2, Src, v20, a1b, 0);
+                        NiPoint3 textDimensions_2 = v13->CalculateStringDimensions(Src, v20, a1b, 0);
                         if (i_2 > iSpace) {
                             float v28 = textDimensions_2.y + 5.0;
                             pquest_2->Set(4002, v28, true);
@@ -2537,7 +2534,6 @@ void HUDMainMenu::StatusModeTileEffects(Tile* apTile, float afCurrValue, bool bR
 }
 
 void HUDMainMenu::HandleReminderFade(Tile* apTile) {
-    NiPoint3 textDimensions;
     int32_t iScreenWidth = static_cast<int32_t>(InterfaceManager::GetScreenWidth());
     bool bShowedObjective = false;
     if (!AreObjectivesShowing()) {
@@ -2625,7 +2621,8 @@ void HUDMainMenu::HandleReminderFade(Tile* apTile) {
                 float fWrapWidth = pText->GetFloat(Tile::kTileValue_WrapWidth);
                 int32_t iFont = static_cast<int32_t>(pText->GetFloat(Tile::kTileValue_Font));
                 const char* pString = pText->GetString(Tile::kTileValue_String);
-                FontManager::Instance()->CalculateStringDimensions(&textDimensions, pString, iFont, fWrapWidth, 0);
+                NiPoint3 textDimensions =
+                    FontManager::Instance()->CalculateStringDimensions(pString, iFont, fWrapWidth, 0);
                 iY += static_cast<int32_t>(textDimensions.y);
             }
         }
@@ -3589,8 +3586,7 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
     int32_t iFont =
         static_cast<int32_t>(HUDMainMenu::pme->pTiles[HMMT_INFO_ACTION_NAME]->GetFloat(Tile::kTileValue_Font));
     const char* pNameText = HUDMainMenu::pme->pTiles[HMMT_INFO_ACTION_NAME]->GetString(Tile::kTileValue_String);
-    NiPoint3 kDimensions;
-    FontManager::Instance()->CalculateStringDimensions(&kDimensions, pNameText, iFont, fWrapWidth, 0);
+    NiPoint3 kDimensions = FontManager::Instance()->CalculateStringDimensions(pNameText, iFont, fWrapWidth, 0);
     float fNameHeight = kDimensions.y;
     float fHintBase = HUDMainMenu::pme->pTiles[HMMT_INFO_ACTION_HINT]->GetFloat(Tile::kTileValue_User0);
     float fHintY =
@@ -3929,7 +3925,7 @@ Tile* HUDMainMenu::Create() {
     NiPoint3 kTextSize;
     float fWrapWidth = pme->pTiles[HMMT_REGION_TEXT]->GetFloat(kTileValue_WrapWidth);
     int32_t iFont = static_cast<int32_t>(pme->pTiles[HMMT_REGION_TEXT]->GetFloat(kTileValue_Font));
-    FontManager::Instance()->CalculateStringDimensions(&kTextSize, "Test Height", iFont, fWrapWidth, 0);
+    kTextSize = FontManager::Instance()->CalculateStringDimensions("Test Height", iFont, fWrapWidth, 0);
     pme->pTiles[HMMT_REGION_TEXT]->Set(kTileValue_Y, kTextSize.y, true);
     pme->pTiles[HMMT_LOCATION_TEXT] =
         pMenu->RenderTemplate(pme->pTiles[HMMT_REGION_LOCATION], "template_justify_left_text", nullptr);
@@ -4012,8 +4008,7 @@ Tile* HUDMainMenu::Create() {
     pme->pTiles[HMMT_INFO_ACTION_NAME]->Set(kTileValue_Y, 0);
     fWrapWidth = pme->pTiles[HMMT_INFO_ACTION_NAME]->GetFloat(kTileValue_WrapWidth);
     iFont = static_cast<int32_t>(pme->pTiles[HMMT_INFO_ACTION_NAME]->GetFloat(kTileValue_Font));
-    NiPoint3 kNameSize;
-    kTextSize = *FontManager::Instance()->CalculateStringDimensions(&kNameSize, "Test Height", iFont, fWrapWidth, 0);
+    kTextSize = FontManager::Instance()->CalculateStringDimensions("Test Height", iFont, fWrapWidth, 0);
     pme->pTiles[HMMT_INFO_ACTION_NAME]->Set(kTileValue_User8, kTextSize.y, true);
     pme->pTiles[HMMT_INFO_DOOR_STATE] =
         pMenu->RenderTemplate(pme->pTiles[HMMT_INFO], "template_justify_center_text", nullptr);

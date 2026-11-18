@@ -9,7 +9,7 @@ struct Segment {
     Segment(const NiPoint3& aSegment, const NiPoint3& a2);
 
     void Offset(const NiPoint3& aOffset);
-    NiPoint3* Delta(NiPoint3* apResult);
+    NiPoint3 Delta();
     // Copies aSegment's two points; returns this.
     Segment& operator=(const Segment& aSegment);
 

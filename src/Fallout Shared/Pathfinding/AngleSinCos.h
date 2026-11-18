@@ -25,7 +25,7 @@ struct AngleSinCos {
     // Copies aSinCos's cosine and sine; returns this.
     AngleSinCos& operator=(const AngleSinCos& aSinCos);
     // The point at afRadius along this angle in the XY plane.
-    NiPoint3* ComputePoint3(NiPoint3* apResult, float afRadius) const;
+    NiPoint3 ComputePoint3(float afRadius) const;
     AngleSinCos& operator+=(const AngleSinCos& aSinCos);
     AngleSinCos& operator-=(const AngleSinCos& aSinCos);
 

@@ -15,7 +15,7 @@ public:
     ~SearchPackage() override;
 
     void SetCenterLocaiton(NiPoint3 point);
-    NiPoint3* LookForTarget(NiPoint3* a1, TESObjectREFR* a2);
+    NiPoint3 LookForTarget(TESObjectREFR* a2);
     // The only caller (LookForTarget) passes the reference's GetParentCell and GetWorldSpace, which are passed on to
     // PathingLocation's (cell, worldspace) constructor.
     void FindCoverToSearch(NiPoint3 arg0, NiPoint3 a3, TESObjectCELL* apCell, TESWorldSpace* apWorld);

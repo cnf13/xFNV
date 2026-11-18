@@ -47,7 +47,7 @@ public:
     static bool Should3DRagDoll(TESObjectREFR* apRef, NiAVObject* ap3D);
     static void
     InspectHavokObjects(NiAVObject* apObject, int32_t& aiConvexVerticesCount, int32_t& aiShapeCollectionTriCount);
-    static NiPoint3* GetLocalPointWithinCollision(NiPoint3* apResult, NiAVObject* apObject);
+    static NiPoint3 GetLocalPointWithinCollision(NiAVObject* apObject);
     static TESObjectREFR* FindCollidableRef_009C69E0(const hkpCollidable* apCol);
 
     static inline ExplosionMultArray pfExplosionMult{1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.75f, 0.5f,

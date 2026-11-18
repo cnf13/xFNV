@@ -491,7 +491,7 @@ public:
     void SetDialogueFOV(float afFov);
     void SetPackageIdles(BGSIdleCollection* apIdles);
     TESObjectREFR* GetSecondLocationReference(MobileObject* apActor);
-    const NiPoint3* GetSearchLocationCoord(NiPoint3* apResult, MobileObject* apActor);
+    const NiPoint3 GetSearchLocationCoord(MobileObject* apActor);
     const TESFollowPackageData* GetFollowPackageData();
     int32_t ComparePackageSchedule(PackageSchedule* apSchedule);
     TESTopic* GetOnEndTopic();

@@ -97,7 +97,7 @@ NavMesh::~NavMesh() {
     }
 }
 
-NiPoint3* NavMesh::GetNormal(NiPoint3* arNormal, uint16_t ausTriangle) {
+NiPoint3 NavMesh::GetNormal(uint16_t ausTriangle) {
     const NavMeshTriangle* ptri = GetTriangle(ausTriangle);
     uint16_t Vert = ptri->GetVert(0);
     NavMeshVertex* Vertex = GetVertex(Vert);
@@ -109,8 +109,7 @@ NiPoint3* NavMesh::GetNormal(NiPoint3* arNormal, uint16_t ausTriangle) {
     uint16_t v7 = ptri->GetVert(2u);
     NavMeshVertex* v8 = GetVertex(v7);
     NiPoint3 edge2 = v8->Location - v11->Location;
-    ::new (arNormal) NiPoint3(edge1.UnitCross(edge2));
-    return arNormal;
+    return edge1.UnitCross(edge2);
 }
 
 bool NavMesh::ReconnectEnabledPortals() {
@@ -548,14 +547,10 @@ void NavMesh::CreateGrid() {
                     MeshGrid.SetTriangleData(static_cast<uint16_t>(i), uiColumn, uiRow);
                     continue;
                 }
-                NiPoint3 kTemp00;
-                kCorner00 = *MeshGrid.GetGridPosition(&kTemp00, uiColumn, uiRow);
-                NiPoint3 kTemp10;
-                kCorner10 = *MeshGrid.GetGridPosition(&kTemp10, uiColumn + 1, uiRow);
-                NiPoint3 kTemp01;
-                kCorner01 = *MeshGrid.GetGridPosition(&kTemp01, uiColumn, uiRow + 1);
-                NiPoint3 kTemp11;
-                kCorner11 = *MeshGrid.GetGridPosition(&kTemp11, uiColumn + 1, uiRow + 1);
+                kCorner00 = MeshGrid.GetGridPosition(uiColumn, uiRow);
+                kCorner10 = MeshGrid.GetGridPosition(uiColumn + 1, uiRow);
+                kCorner01 = MeshGrid.GetGridPosition(uiColumn, uiRow + 1);
+                kCorner11 = MeshGrid.GetGridPosition(uiColumn + 1, uiRow + 1);
                 if ((kCorner11.x >= akVerts[0].x && kCorner11.y >= akVerts[0].y && kCorner00.x <= akVerts[0].x &&
                      kCorner00.y <= akVerts[0].y) ||
                     (kCorner11.x >= akVerts[1].x && kCorner11.y >= akVerts[1].y && kCorner00.x <= akVerts[1].x &&
@@ -1454,7 +1449,6 @@ bool NavMesh::ComputeNavMeshZForLocation(
 }
 
 bool NavMesh::FindRandomPointWithinRadius(const NiPoint3& aStartLocation, float aRadius, NiPoint3* apRet1) {
-    NiPoint3 apResult;
     NiPoint3 result;
     bool IsPointInsideNavmesh = false;
     NiPoint3 aLocation = NiPoint3_ZERO;
@@ -1474,13 +1468,11 @@ bool NavMesh::FindRandomPointWithinRadius(const NiPoint3& aStartLocation, float 
         return false;
     }
     aLocation.operator+=(aStartLocation);
-    *apRet1 = *MoveAwayFromEdge(&apResult, aLocation, 64.0f);
+    *apRet1 = MoveAwayFromEdge(aLocation, 64.0f);
     return true;
 }
 
-NiPoint3* NavMesh::MoveAwayFromEdge(NiPoint3* apResult, const NiPoint3& aLocation, float afDistance) {
-    NiPoint3 triangleNormal_2;
-    NiPoint3 triangleNormal;
+NiPoint3 NavMesh::MoveAwayFromEdge(const NiPoint3& aLocation, float afDistance) {
     NiPoint3 retLoc = aLocation;
     uint16_t usTri = FindTriangleForLocation(aLocation, nullptr);
     if (usTri != 0xFFFF) {
@@ -1501,7 +1493,7 @@ NiPoint3* NavMesh::MoveAwayFromEdge(NiPoint3* apResult, const NiPoint3& aLocatio
                 if (afDistance > static_cast<double>(fdistanceFromEdge)) {
                     NiPoint3 v12;
                     NiPoint3 rightAngleVector;
-                    GetNormal(&triangleNormal, usTri);
+                    NiPoint3 triangleNormal = GetNormal(usTri);
                     rightAngleVector =
                         triangleNormal.Cross(vertices.Vertices[0]->Location - vertices.Vertices[1]->Location);
                     rightAngleVector.Unitize();
@@ -1525,7 +1517,7 @@ NiPoint3* NavMesh::MoveAwayFromEdge(NiPoint3* apResult, const NiPoint3& aLocatio
                     if (afDistance > static_cast<double>(fdistanceFromEdge_2)) {
                         NiPoint3 v10;
                         NiPoint3 rightAngleVector_2;
-                        GetNormal(&triangleNormal_2, v28[i]);
+                        NiPoint3 triangleNormal_2 = GetNormal(v28[i]);
                         rightAngleVector_2 =
                             triangleNormal_2.Cross(vertices_2.Vertices[0]->Location - vertices_2.Vertices[1]->Location);
                         rightAngleVector_2.Unitize();
@@ -1536,8 +1528,7 @@ NiPoint3* NavMesh::MoveAwayFromEdge(NiPoint3* apResult, const NiPoint3& aLocatio
             }
         }
     }
-    *apResult = retLoc;
-    return apResult;
+    return retLoc;
 }
 
 int32_t NavMesh::FindInterectingEdge(

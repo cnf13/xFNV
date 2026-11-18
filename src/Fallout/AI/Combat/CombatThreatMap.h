@@ -52,7 +52,7 @@ public:
     // Saves the radius, the start and end times and the damage.
     void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
     float GetBaseThreatScore(Actor* apActor, float afActorHealth);
-    NiPoint3* GetThreatLinearVelocity(NiPoint3* apResult);
+    NiPoint3 GetThreatLinearVelocity();
     PathingAvoidNode* GetAvoidNode(PathingAvoidNode* apResult, Actor* apActor);
     void Load(BGSLoadGameBuffer* a1);
     void InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer);

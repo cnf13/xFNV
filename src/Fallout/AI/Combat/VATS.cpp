@@ -96,7 +96,7 @@ void VATS::QueueAction(VATS_COMMAND* apCommand) {
     commandList.AddTail(apCommand);
 }
 
-NiPoint3* VATS::GetTargetPercentagePos(NiPoint3* apResult, float afPercentage) {
+NiPoint3 VATS::GetTargetPercentagePos(float afPercentage) {
     NiNode* v3 = pVATSAttacker->TESObjectREFR::Get3D();
     NiPoint3 startingPos = v3->GetWorldBound().m_kCenter;
     VATS_COMMAND* pcommand = commandList.GetItem();
@@ -126,8 +126,7 @@ NiPoint3* VATS::GetTargetPercentagePos(NiPoint3* apResult, float afPercentage) {
         float flength = delta.UnitizeGetLength();
         startingPos += delta * flength * afPercentage / 100.0f;
     }
-    *apResult = startingPos;
-    return apResult;
+    return startingPos;
 }
 
 VATS_COMMAND* VATS::GetCurrentAction() {
@@ -1408,12 +1407,11 @@ void VATS::QuitVATSPlayback_0(TESBoundObject* apObject, ExtraDataList* apExtra) 
     QuitVATSPlayback(true, true);
 }
 
-NiPoint3* VATS::GetCamshotTargetPos(NiPoint3* a2) {
+NiPoint3 VATS::GetCamshotTargetPos() {
     NiPoint3 dst;
-    NiPoint3 apResult;
     NiPoint3 v10 = NiPoint3_ZERO;
     if (pCamera) {
-        v10 = *pCamera->GetTargetPos(&apResult);
+        v10 = pCamera->GetTargetPos();
     }
     if (v10.operator==(NiPoint3_ZERO)) {
         NiPoint3 result;
@@ -1423,8 +1421,7 @@ NiPoint3* VATS::GetCamshotTargetPos(NiPoint3* a2) {
         const NiPoint3* WorldTranslate = &v2->GetWorldTranslate();
         v10 = (result = *WorldTranslate + *za);
     }
-    *a2 = v10;
-    return a2;
+    return v10;
 }
 
 bool VATS::GetLineOfSight(VATS_COMMAND* apCommand) {

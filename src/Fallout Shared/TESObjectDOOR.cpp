@@ -851,8 +851,6 @@ void TESObjectDOOR::PlayerPullFollower() {
 void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREFR* apDoor2) {
     NiPoint3 v16;
     NiPoint3 dst;
-    NiPoint3 delta_2;
-    NiPoint3 delta;
     if ((apDoor1) && (apDoor2) && (apDoor1 != apDoor2)) {
         TESObjectDOOR* pbasedoor1 = dynamic_cast<TESObjectDOOR*>(apDoor1->GetObjectReference());
         TESObjectDOOR* pbasedoor2 = dynamic_cast<TESObjectDOOR*>(apDoor2->GetObjectReference());
@@ -872,7 +870,7 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
                     ptel1->SetTeleportRotation(pmark->GetAngleOnReference());
                 }
                 else {
-                    apDoor2->GetDeltaForAngle(&delta, f180);
+                    NiPoint3 delta = apDoor2->GetDeltaForAngle(f180);
                     if (pbasedoor2->IsAutomatic()) {
                         delta.operator*=(fautodist);
                     }
@@ -895,7 +893,7 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
                     ptel2->SetTeleportRotation(*a2);
                 }
                 else {
-                    apDoor1->GetDeltaForAngle(&delta_2, f180);
+                    NiPoint3 delta_2 = apDoor1->GetDeltaForAngle(f180);
                     if (pbasedoor1->IsAutomatic()) {
                         delta_2.operator*=(fautodist);
                     }

@@ -492,7 +492,6 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
 }
 
 ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(float afDeltaT) {
-    NiPoint3 rot;
     ActorPathHandler::PATH_HANDLER_RESULT eresult = ActorPathHandler::PATH_HANDLER_RESULT_NONE;
     bool bimmobile = pActor->GetActorBase()->IsImmobile();
     if (!pActor->GetTurretBehavior() && !pActorMover->DidPathingFail() && !pActorMover->bForceMoveMode) {
@@ -565,7 +564,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
                 if (eresult == ActorPathHandler::PATH_HANDLER_RESULT_NONE) {
                     float a1;
                     float fdir;
-                    CombatUtilities::GetAngleToProjectedPoint(&rot, pActor, lookatPoint);
+                    NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(pActor, lookatPoint);
                     float fgoalAngle = ClampAngle(rot.z);
                     float fgoalLookAngle = rot.x;
                     if (!(pActor->GetRadius() >= 100.0)) {
@@ -653,7 +652,6 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
 }
 
 ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::UpdateWhilePlayerWaits(float afDeltaT) {
-    NiPoint3 rot;
     ResetStaticAvoidance();
     ResetActorAvoidance();
     bRotateMode = false;
@@ -685,7 +683,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::UpdateWhilePlaye
             if (pActorMover->HasLookAtTarget()) {
                 NiPoint3 lookatPoint;
                 pActorMover->GetLookAtPoint(lookatPoint);
-                CombatUtilities::GetAngleToProjectedPoint(&rot, pActor, lookatPoint);
+                NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(pActor, lookatPoint);
                 fgoalAngle = ClampAngle(rot.z);
             }
             else {
@@ -2244,7 +2242,6 @@ void DetailedActorPathHandler::UpdateTether(float afDeltaT) {
 }
 
 void DetailedActorPathHandler::ComputeHeadingAndLooking(float& arfHeading, float& arfLooking) {
-    NiPoint3 rot;
     float fangle = 0.0f;
     float flookingAngle = 0.0f;
     if (bMovementBlocked) {
@@ -2296,7 +2293,7 @@ void DetailedActorPathHandler::ComputeHeadingAndLooking(float& arfHeading, float
                 double v10 = (firingLocation - lookatPoint).SqrXYLength();
                 double Radius = pActor->GetRadius();
                 if (!(pActor->GetRadius() * Radius * 0.25 > v10)) {
-                    CombatUtilities::GetAngleToProjectedPoint(&rot, pActor, lookatPoint);
+                    NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(pActor, lookatPoint);
                     if (!pActor->IsSwimming()) {
                         flookingAngle = rot.x;
                     }

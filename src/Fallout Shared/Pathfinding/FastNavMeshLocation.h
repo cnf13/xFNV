@@ -20,7 +20,7 @@ struct FastNavMeshEdgeLocation : public FastNavMeshEdgeHandle {
 // A point on a navmesh triangle.
 struct FastNavMeshTriLocation : public FastNavMeshTriHandle {
     // Constructs the point in apLocation and returns it.
-    NiPoint3* GetLocation(NiPoint3* apLocation);
+    NiPoint3 GetLocation();
 
     NiPoint3 Location;
 };

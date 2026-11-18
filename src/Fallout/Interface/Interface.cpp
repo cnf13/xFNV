@@ -2671,16 +2671,14 @@ void Interface::SetTargetREFR(TESObjectREFR* apRef) {
     }
 }
 
-NiPoint3* Interface::GetActivatePickLocation(NiPoint3* apResult) {
+NiPoint3 Interface::GetActivatePickLocation() {
     InterfaceManager* v1;
     if (InterfaceManager::Instance() && (v1 = InterfaceManager::Instance(), v1->bFirstInit)) {
         InterfaceManager* v2 = InterfaceManager::Instance();
-        ::new (apResult) NiPoint3(v2->GetActivatePickLocation());
-        return apResult;
+        return v2->GetActivatePickLocation();
     }
 
-    *apResult = NiPoint3_ZERO;
-    return apResult;
+    return NiPoint3_ZERO;
 }
 
 void Interface::SetFirstChanceTextureRelease_00703920() {

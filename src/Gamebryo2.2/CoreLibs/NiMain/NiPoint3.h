@@ -53,7 +53,7 @@ public:
 
     // "<prefix> = (x,y,z)" in a fresh _NiMalloc block the caller owns.
     char* GetViewerString(const char* pPrefix) const;
-    NiPoint3* Perpendicular(NiPoint3* apResult);
+    NiPoint3 Perpendicular();
 
     // Compares the squared length of apPoint with fRadius squared: -1 when the point is shorter, 1 when longer, 0 when
     // equal or unordered.

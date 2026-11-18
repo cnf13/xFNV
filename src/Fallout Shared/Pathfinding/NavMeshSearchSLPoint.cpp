@@ -22,7 +22,6 @@ NavMeshSearchSLPoint::NavMeshSearchSLPoint() {}
 NavMeshSearchSLPoint::~NavMeshSearchSLPoint() {}
 
 bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMeshSearchLink>* apNode) {
-    NiPoint3 triCenter;
     NiPoint3 circumCenter;
     NavMesh* pmesh = apNode->tNodeData.pNavMesh;
     uint16_t itriIndex = apNode->tNodeData.sTriangle;
@@ -44,7 +43,7 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
         if (fminCheckRadii > 0.0 && fdistanceSqr < fminCheckRadii * fminCheckRadii) {
             return false;
         }
-        apNode->tNodeData.GetCenter(&triCenter);
+        NiPoint3 triCenter = apNode->tNodeData.GetCenter();
         if (CheckPointOnGoalCircle(triCenter, targetLoc, pmesh, validPoint)) {
             GoalLocation = validPoint;
             return true;

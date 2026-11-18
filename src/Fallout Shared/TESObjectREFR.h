@@ -691,7 +691,7 @@ public:
     uint32_t GetSeed();
     void InitChildActivates(TESObjectREFR* apActionRef);
     void AddDecalRef(TESObjectREFR* apRef, const NiPoint3& aIntersect, const NiPoint3& aNormal);
-    NiPoint3* GetDeltaForAngle(NiPoint3* apResult, float afAngle);
+    NiPoint3 GetDeltaForAngle(float afAngle);
     void SetSpellEffectLight(NiPointLight* pLight);
     void SetDismembered(
         BGSBodyPart::LIMB_ENUM aeLimb,
@@ -793,7 +793,7 @@ public:
     // Removes apRef from TESObjectCELL::MultiboundTestMap, whose key
     // it is; Release3DRelatedData passes `this`.
     static char RemoveRefFromMultiboundTestMap(TESObjectREFR* apRef);
-    static NiPoint3* GetBoundMax_0056FC30(NiPoint3* apResult, NiAVObject* apObj);
+    static NiPoint3 GetBoundMax_0056FC30(NiAVObject* apObj);
     static void TransChangeCallback(bhkNiCollisionObject* apCollision, uint32_t aiChanged);
     static void DebugDisplayCallback(NiGeometry* ap3D, const NiColor& color);
     static void

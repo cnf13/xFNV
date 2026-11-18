@@ -48,7 +48,7 @@ public:
 
     void QueueAction(VATS_COMMAND* apCommand);
     // The point at afPercentage along the target.
-    NiPoint3* GetTargetPercentagePos(NiPoint3* apResult, float afPercentage);
+    NiPoint3 GetTargetPercentagePos(float afPercentage);
     // The action being run: the first queued command, or null.
     VATS_COMMAND* GetCurrentAction();
     // The last queued command, or null.
@@ -109,7 +109,7 @@ public:
     void UpdateVATSLight(TESObjectREFR* apVictim);
     void RemoveLastAction(ActionPoints::Action& aeAction, bool& abIronSights);
     void QuitVATSPlayback_0(TESBoundObject* apObject, ExtraDataList* apExtra);
-    NiPoint3* GetCamshotTargetPos(NiPoint3* a2);
+    NiPoint3 GetCamshotTargetPos();
     bool GetLineOfSight(VATS_COMMAND* apCommand);
     void SetVATSLight(NiLight* apLight, bool abRemoveOld);
     void AppendCamTarget(TESObjectREFR* apTarget, int32_t a3);

@@ -541,8 +541,7 @@ public:
     // Stub: always reports that no point was found.
     static bool ComputeRandomPointOnPath(Actor* apActor, NiPoint3 aStartPoint, float afRadius, NiPoint3& aOutCoord);
     static void ClearWanderStarted();
-    static NiPoint3*
-    ComputeRandomPoint(NiPoint3* apResult, NiPoint3 aStartPoint, float afMaxRadius, float afMinRadius, bool bRandZ);
+    static NiPoint3 ComputeRandomPoint(NiPoint3 aStartPoint, float afMaxRadius, float afMinRadius, bool bRandZ);
     static bool FindDoorsToSendYellAlarm(TESObjectREFR* apRef, void* aiFilterData);
 
     // 0x25C actors the process detected

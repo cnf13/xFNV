@@ -127,7 +127,7 @@ public:
     // bFailIfGoalOccupied, through the shared one-byte getter.
     bool GetFailIfGoalOccupied();
     // Only reads Center, and NavMeshSearch::GetNodeConnections calls it on its const request.
-    NiPoint3* GetTargetPoint(NiPoint3* a2) const;
+    NiPoint3 GetTargetPoint() const;
     bool GetFirstTangentUsesHeading() const;
     // Returns fInitialPathHeading.
     float GetInitialPathHeading() const;

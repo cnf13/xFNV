@@ -29,7 +29,7 @@ public:
 
     // The half extents arExt, in Havok units, as a new creation info handed to the virtual Init.
     void Init(const hkVector4& arExt);
-    NiPoint3* GetHalfExtents(NiPoint3* apResult);
+    NiPoint3 GetHalfExtents();
     const hkVector4& GethkHalfExtents();
 
     // Factory: returns a new default-constructed box shape, or null when the allocation fails.

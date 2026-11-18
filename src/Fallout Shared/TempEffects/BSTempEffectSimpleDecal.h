@@ -49,8 +49,8 @@ public:
     }
     NiAVObject* GetDecalParent();
     bool GetIsValid();
-    NiPoint3* GetOrigin(NiPoint3* p2);
-    NiPoint3* GetDirection(NiPoint3* a2);
+    NiPoint3 GetOrigin();
+    NiPoint3 GetDirection();
     // Builds the decal geometry from apAVObj; false when no decal results.
     bool ProcessGeometry(NiAVObject* apAVObj);
     // Clips a polygon against the six clipping planes; returns the vertex count left, 0 when nothing is.

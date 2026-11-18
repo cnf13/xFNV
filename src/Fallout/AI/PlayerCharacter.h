@@ -846,7 +846,7 @@ public:
     }
     NiPoint3* GetCached1stPersonCameraPos();
     // Copies kCamera3rdPersonShoulderOffset to apResult.
-    NiPoint3* GetCamera3rdPersonShoulderOffset(NiPoint3* apResult);
+    NiPoint3 GetCamera3rdPersonShoulderOffset();
     BSSimpleArray<ItemChange*>* GetRockItAmmoArray();
     TESObjectREFR* QPlayerMapMarker() const;
     BSSimpleList<BGSQuestObjective*>* GetQuestObjectiveList();
@@ -989,7 +989,7 @@ public:
     // Returns the raw byte, which callers test as a byte.
     uint8_t GetActorInSneakRange();
     // The bullet auto-aim point (BulletAutoAim), returned through apResult.
-    NiPoint3* GetBulletAutoAim(NiPoint3* apResult);
+    NiPoint3 GetBulletAutoAim();
     double GetTimeGrenadeHeld();
     PlayerActionObject* GetPlayerAction(PLAYER_ACTION aeAction);
     // Stores the max carry weight in afMaxEncumbrance, then actor value 0x2E (the

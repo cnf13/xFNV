@@ -43,7 +43,6 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
     NiColorA* color_2;
     NiPoint3* vertex;
     XFNV_INLINED_LOCAL(NiFixedString, v22, std::nullopt, std::nullopt);
-    NiPoint3 apResult;
     NiPoint3 dir_2;
     NiPoint3 v70;
     NiPoint3 v71;
@@ -79,10 +78,10 @@ NiAVObject* BSTestObjects::CreateDirArrow(const NiPoint3& arDir, const NiColorA*
     vertex->y = v51;
     vertex->z = v52;
     float v14 = flength * 0.15000000596046448;
-    NiPoint3* v15 = dir_2.Perpendicular(&apResult);
-    float v16 = v15->x * v14;
-    float v17 = v15->y * v14;
-    float v18 = v15->z * v14;
+    NiPoint3 apResult = dir_2.Perpendicular();
+    float v16 = apResult.x * v14;
+    float v17 = apResult.y * v14;
+    float v18 = apResult.z * v14;
     float v11 = dir_2.x * 0.75f;
     float v12 = dir_2.y * 0.75f;
     float v13 = dir_2.z * 0.75f;
@@ -1762,28 +1761,22 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
     return lines;
 }
 
-NiPoint3* NiPoint3::Perpendicular(NiPoint3* apResult) {
+NiPoint3 NiPoint3::Perpendicular() {
     float v8 = std::fabs(static_cast<double>(x));
     float v7 = std::fabs(static_cast<double>(y));
     if (!(v7 > static_cast<double>(v8))) {
         float v4 = std::fabs(static_cast<double>(z));
         float v3 = std::fabs(static_cast<double>(y));
         if (!(v3 > static_cast<double>(v4))) {
-            ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_Y));
+            return UnitCross(NiPoint3_UNIT_Y);
         }
-        else {
-            ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_Z));
-        }
-        return apResult;
+        return UnitCross(NiPoint3_UNIT_Z);
     }
 
     float v6 = std::fabs(static_cast<double>(z));
     float v5 = std::fabs(static_cast<double>(x));
     if (!(v5 > static_cast<double>(v6))) {
-        ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_X));
+        return UnitCross(NiPoint3_UNIT_X);
     }
-    else {
-        ::new (apResult) NiPoint3(UnitCross(NiPoint3_UNIT_Z));
-    }
-    return apResult;
+    return UnitCross(NiPoint3_UNIT_Z);
 }

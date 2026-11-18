@@ -365,16 +365,8 @@ void BSAudio::UnPauseSynchTimer() {
     SynchTimer.iFlags &= ~1u;
 }
 
-NiPoint3* BSAudio::GetListenerPosition(NiPoint3* apResult) {
-    NiPoint3* v3;
-    if (pListener) {
-        v3 = &pListener->GetPosition();
-    }
-    else {
-        v3 = &NiPoint3_ZERO;
-    }
-    *apResult = *v3;
-    return apResult;
+NiPoint3 BSAudio::GetListenerPosition() {
+    return pListener ? pListener->GetPosition() : NiPoint3_ZERO;
 }
 
 void BSAudio::EnterDialogue() {

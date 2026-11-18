@@ -736,8 +736,7 @@ bool CombatUtilities::IsTargetWithinFiringArc(
     float afArcAngle,
     float afLookingAngle
 ) {
-    NiPoint3 rot;
-    CombatUtilities::GetAngleToProjectedPoint(&rot, apAttacker, arTargetLocation);
+    NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(apAttacker, arTargetLocation);
     if (afArcAngle < 6.2831854820251465) {
         float fheading = apAttacker->GetActualHeading();
         rot.z = ClampAngle(rot.z);
@@ -850,8 +849,7 @@ NiPoint3 CombatUtilities::GetAngleToProjectedTarget(
     return GetAngleToProjectedPoint(aStartLocation, kProjectedPoint);
 }
 
-NiPoint3* CombatUtilities::GetAngleToProjectedTarget(
-    NiPoint3* apResult,
+NiPoint3 CombatUtilities::GetAngleToProjectedTarget(
     TESObjectREFR* apAttacker,
     TESObjectREFR* apTarget,
     float afSpeed,
@@ -880,8 +878,7 @@ NiPoint3* CombatUtilities::GetAngleToProjectedTarget(
     else {
         angle.z = angle.z + 6.2831854820251465;
     }
-    *apResult = angle;
-    return apResult;
+    return angle;
 }
 
 NiPoint3 CombatUtilities::GetProjectedPointForTarget(
@@ -947,7 +944,6 @@ NiPoint3 CombatUtilities::GetProjectedPointForTarget(
     float afProjectileSpeed,
     bool abHighArc
 ) {
-    NiPoint3 result;
     ACTOR_SEGMENT_INVIEW etargetSegmentInView = ACTOR_SEGMENT_INVIEW_MIDDLE;
     if (apAttacker->IsActor()) {
         CombatController* pcombatController = static_cast<Actor*>(apAttacker)->GetCombatController();
@@ -978,11 +974,10 @@ NiPoint3 CombatUtilities::GetProjectedPointForTarget(
     }
     NiPoint3 targetLoc = CombatUtilities::GetTargetFiringLocation(apTarget, etargetSegmentInView);
     NiPoint3 targetVelocity = CombatUtilities::GetTargetVelocity(apTarget);
-    CombatUtilities::GetProjectedPointForTarget(
-        &result, static_cast<Actor*>(apAttacker), targetLoc, targetVelocity, apReleasePoint, apProjectile,
-        afProjectileSpeed, abHighArc
+    return CombatUtilities::GetProjectedPointForTarget(
+        static_cast<Actor*>(apAttacker), targetLoc, targetVelocity, apReleasePoint, apProjectile, afProjectileSpeed,
+        abHighArc
     );
-    return result;
 }
 
 NiPoint3 CombatUtilities::GetAngleToProjectedPoint(NiPoint3 aStartLocation, NiPoint3 aProjectedPoint) {
@@ -1016,14 +1011,11 @@ NiPoint3 CombatUtilities::GetAngleToProjectedPoint(NiPoint3 aStartLocation, NiPo
     return result;
 }
 
-NiPoint3*
-CombatUtilities::GetAngleToProjectedPoint(NiPoint3* apResult, TESObjectREFR* apAttacker, NiPoint3 aProjectedPoint) {
-    NiPoint3 apResulta;
+NiPoint3 CombatUtilities::GetAngleToProjectedPoint(TESObjectREFR* apAttacker, NiPoint3 aProjectedPoint) {
     NiPoint3 attackerFiringLocation = CombatUtilities::GetAttackerFiringLocation(apAttacker);
     float v5 = 0.0f;
-    NiPoint3 v7 = *CombatUtilities::GetAttackerFiringLocationSimple(&apResulta, apAttacker);
-    CombatUtilities::GetAngleToProjectedPoint(apResult, attackerFiringLocation, v7, 0.0f, aProjectedPoint);
-    return apResult;
+    NiPoint3 v7 = CombatUtilities::GetAttackerFiringLocationSimple(apAttacker);
+    return CombatUtilities::GetAngleToProjectedPoint(attackerFiringLocation, v7, 0.0f, aProjectedPoint);
 }
 
 // A ray from aStartLocation: straight to aTargetedPoint without gravity, else along the projectile's ballistic arc in
@@ -1712,14 +1704,13 @@ double CombatUtilities::ComputeProjectileTime_(
     return CombatUtilities::ComputeProjectileTime(fDeltaXY, fAngle, fSpeed);
 }
 
-NiPoint3* CombatUtilities::GetAttackerFiringLocationSimple(NiPoint3* apResult, TESObjectREFR* apAttacker) {
+NiPoint3 CombatUtilities::GetAttackerFiringLocationSimple(TESObjectREFR* apAttacker) {
     NiPoint3 v3 = apAttacker->GetLocationOnReference();
     v3.z = CombatUtilities::GetAttackerFiringZOffset(apAttacker, false) + v3.z;
-    *apResult = v3;
-    return apResult;
+    return v3;
 }
 
-NiPoint3* CombatUtilities::GetBackProjectedAttackerFiringLocation(NiPoint3* apResult, TESObjectREFR* apAttacker) {
+NiPoint3 CombatUtilities::GetBackProjectedAttackerFiringLocation(TESObjectREFR* apAttacker) {
     NiPoint3 result;
     result = CombatUtilities::GetAttackerFiringLocation(apAttacker);
     if (apAttacker->IsActor()) {
@@ -1750,27 +1741,23 @@ NiPoint3* CombatUtilities::GetBackProjectedAttackerFiringLocation(NiPoint3* apRe
         result.y = v19;
         result.z = result.z + v14;
     }
-    *apResult = result;
-    return apResult;
+    return result;
 }
 
-NiPoint3* CombatUtilities::GetAngleToProjectedPoint(
-    NiPoint3* apResult,
+NiPoint3 CombatUtilities::GetAngleToProjectedPoint(
     NiPoint3 aStartLocation,
     NiPoint3 aPivotLocation,
     float afPivotAngle,
     NiPoint3 aProjectedPoint
 ) {
     if (aPivotLocation.x == aStartLocation.x && aPivotLocation.y == aStartLocation.y) {
-        ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
-        return apResult;
+        return CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint);
     }
 
     NiPoint3 result = aProjectedPoint - aPivotLocation;
     float fValue = result.SqrLength();
     if (fValue == 0.0) {
-        ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
-        return apResult;
+        return CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint);
     }
 
     if (fValue < f1024_0 * f1024_0) {
@@ -1778,8 +1765,7 @@ NiPoint3* CombatUtilities::GetAngleToProjectedPoint(
         float v7 = f1024_0 / v10;
         aProjectedPoint = aPivotLocation + result * v7;
     }
-    ::new (apResult) NiPoint3(CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint));
-    return apResult;
+    return CombatUtilities::GetAngleToProjectedPoint(aStartLocation, aProjectedPoint);
 }
 
 void CombatUtilities::CalculateCoverPositions(
@@ -1880,8 +1866,7 @@ bool CombatUtilities::IsDangerousExplosion(BGSExplosion* apExplosion) {
     return !(fDangerousProjectileExplosionRadius.Float() > static_cast<double>(v5));
 }
 
-NiPoint3* CombatUtilities::GetProjectedPointForTarget(
-    NiPoint3* arResult,
+NiPoint3 CombatUtilities::GetProjectedPointForTarget(
     Actor* apSource,
     const NiPoint3& akTargetLocation,
     NiPoint3* arSourcePosition,
@@ -1889,15 +1874,12 @@ NiPoint3* CombatUtilities::GetProjectedPointForTarget(
     float afProjectileSpeed,
     bool abHighArc
 ) {
-    CombatUtilities::GetProjectedPointForTarget(
-        arResult, apSource, akTargetLocation, NiPoint3_ZERO, arSourcePosition, apProjectile, afProjectileSpeed,
-        abHighArc
+    return CombatUtilities::GetProjectedPointForTarget(
+        apSource, akTargetLocation, NiPoint3_ZERO, arSourcePosition, apProjectile, afProjectileSpeed, abHighArc
     );
-    return arResult;
 }
 
-NiPoint3* CombatUtilities::GetProjectedPointForTarget(
-    NiPoint3* arResult,
+NiPoint3 CombatUtilities::GetProjectedPointForTarget(
     TESObjectREFR* apSource,
     NiPoint3 akTargetLocation,
     NiPoint3 akTargetVelocity,
@@ -1907,8 +1889,7 @@ NiPoint3* CombatUtilities::GetProjectedPointForTarget(
     bool abHighArc
 ) {
     if (apProjectile->GetHitScan()) {
-        *arResult = akTargetLocation;
-        return arResult;
+        return akTargetLocation;
     }
 
     NiPoint3 releasePoint;
@@ -1922,12 +1903,9 @@ NiPoint3* CombatUtilities::GetProjectedPointForTarget(
     if (afProjectileSpeed == 0.0) {
         afProjectileSpeed = apProjectile->GetSpeed();
     }
-    ::new (arResult) NiPoint3(
-        CombatUtilities::GetProjectedPointForTarget(
-            releasePoint, akTargetLocation, akTargetVelocity, afProjectileSpeed, fGravity, abHighArc
-        )
+    return CombatUtilities::GetProjectedPointForTarget(
+        releasePoint, akTargetLocation, akTargetVelocity, afProjectileSpeed, fGravity, abHighArc
     );
-    return arResult;
 }
 
 // The Havok world's gravity, or zero without a world. The world is looked up before the read mark.

@@ -3853,8 +3853,7 @@ bool CombatState::FindBestAdvanceLocation(
                     ) &&
                     coverTargetNodes.iSize > 1) {
                     const BSSimpleArray<NavMeshSearchNode>& kTargetNodes = coverTargetNodes;
-                    NiPoint3 kSecondNodeCenter;
-                    nodeCenter = *kTargetNodes[1].GetCenter(&kSecondNodeCenter);
+                    nodeCenter = kTargetNodes[1].GetCenter();
                 }
                 if (pcombatCoverLocation->CoverLocation.IsLeftSideClosest(nodeCenter)) {
                     pcombatCoverLocation->ReservationInfo.bLeftEdge = true;
@@ -3862,8 +3861,7 @@ bool CombatState::FindBestAdvanceLocation(
             }
             else if (coverDestinationNodes.iSize > 1) {
                 const BSSimpleArray<NavMeshSearchNode>& kDestinationNodes = coverDestinationNodes;
-                NiPoint3 nodeCenter;
-                kDestinationNodes[1].GetCenter(&nodeCenter);
+                NiPoint3 nodeCenter = kDestinationNodes[1].GetCenter();
                 if (pcombatCoverLocation->CoverLocation.IsLeftSideClosest(nodeCenter)) {
                     pcombatCoverLocation->ReservationInfo.bLeftEdge = true;
                 }

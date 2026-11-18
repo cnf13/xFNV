@@ -483,7 +483,6 @@ void BGSCameraShot::SetCameraTarget(NiAVObject* apTarget) {
 }
 
 void BGSCameraShot::Update(float afTime) {
-    NiPoint3 apResult;
     NiFrustum vatsFrustum;
     NiFrustum gameFrustum;
     NiPoint3 targetPos;
@@ -579,16 +578,14 @@ void BGSCameraShot::Update(float afTime) {
         else {
             pPlayer->SetFirstPerson(true);
         }
-        NiPoint3* v8 = GetTargetPos(&apResult);
-        double v10 = (*v8 - cameraPos).Length();
+        double v10 = (GetTargetPos() - cameraPos).Length();
         if (fVATSCameraCutAwayDistance.Float() >= v10) {
             bCameraTooClose = true;
         }
     }
 }
 
-NiPoint3* BGSCameraShot::GetTargetPos(NiPoint3* apResult) {
-    NiPoint3 apResulta;
+NiPoint3 BGSCameraShot::GetTargetPos() {
     NiPoint3 targetPos = NiPoint3_ZERO;
     if (!(Data.fTargetPercentBetweenActors > 0.0)) {
         if (spTargetNode.m_pObject) {
@@ -597,7 +594,7 @@ NiPoint3* BGSCameraShot::GetTargetPos(NiPoint3* apResult) {
     }
     else {
         float afPercentage = Data.fTargetPercentBetweenActors;
-        targetPos = *pVATS.GetTargetPercentagePos(&apResulta, afPercentage);
+        targetPos = pVATS.GetTargetPercentagePos(afPercentage);
     }
     if (cCameraHasRotation == 1 && spCameraNode.m_pObject) {
         (&spCameraNode.m_pObject->m_kLocal)
@@ -608,8 +605,7 @@ NiPoint3* BGSCameraShot::GetTargetPos(NiPoint3* apResult) {
         kVATSCameraAngle.y = 0.0f;
         kVATSCameraAngle.z = 0.0f;
     }
-    *apResult = targetPos;
-    return apResult;
+    return targetPos;
 }
 
 bool HitData::IsFlagSet(Flag aeFlag) {

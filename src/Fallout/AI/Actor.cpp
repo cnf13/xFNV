@@ -8182,7 +8182,7 @@ void Actor::DestroyActorMover() {
 NiPoint3 Actor::CalculateAnticipatedLocation(float afDeltaT) {
     NiPoint3 kLocation;
     if (!(afDeltaT <= 0.0)) {
-        pActorMover->GetAnticipatedLocation(&kLocation, afDeltaT);
+        kLocation = pActorMover->GetAnticipatedLocation(afDeltaT);
     }
     else {
         kLocation = *QLocationOnReference();
@@ -8227,7 +8227,6 @@ float Actor::GetEyeLevel() {
 
 void Actor::GetEyeVector(NiPoint3& aOrigin, NiPoint3& aDirection, bool abIncludeCameraOffset) {
     NiMatrix3 rot2_2;
-    NiPoint3 apResult;
     NiMatrix3 rot;
     if (this == pPlayer && p1stPersonCamera) {
         aOrigin = p1stPersonCamera->GetWorldTranslate();
@@ -8237,7 +8236,7 @@ void Actor::GetEyeVector(NiPoint3& aOrigin, NiPoint3& aDirection, bool abInclude
         aOrigin.z = GetEyeLevel() + aOrigin.z;
     }
     if (abIncludeCameraOffset && this == pPlayer && pPlayer->IsActually3rdPerson()) {
-        aOrigin.operator+=(*pPlayer->GetCamera3rdPersonShoulderOffset(&apResult));
+        aOrigin.operator+=(pPlayer->GetCamera3rdPersonShoulderOffset());
     }
     float a2 = GetHeading(false);
     rot.MakeZRotation(a2);
@@ -17054,16 +17053,11 @@ void Actor::DismemberLimb(
     }
     NiTransform goreTransform;
     NiTransform offset;
-    NiPoint3 goreTranslate;
-    offset.m_Translate = *pbodyPart->GetGoreTranslate(&goreTranslate);
-    // The gore rotation in degrees, read once per axis (z, y, x) into its own temporary, times a double constant and
-    // stored as floats.
-    NiPoint3 goreRotateZ;
-    float frotZ = pbodyPart->GetGoreRotate(&goreRotateZ)->z * 0.01745329238474369;
-    NiPoint3 goreRotateY;
-    float frotY = pbodyPart->GetGoreRotate(&goreRotateY)->y * 0.01745329238474369;
-    NiPoint3 goreRotateX;
-    float frotX = pbodyPart->GetGoreRotate(&goreRotateX)->x * 0.01745329238474369;
+    offset.m_Translate = pbodyPart->GetGoreTranslate();
+    // The gore rotation in degrees, read once per axis (z, y, x), times a double constant and stored as floats.
+    float frotZ = pbodyPart->GetGoreRotate().z * 0.01745329238474369;
+    float frotY = pbodyPart->GetGoreRotate().y * 0.01745329238474369;
+    float frotX = pbodyPart->GetGoreRotate().x * 0.01745329238474369;
     NiPoint3 rotation(frotX, frotY, frotZ);
     offset.m_Rotate.FromEulerAnglesXYZ(rotation.x, rotation.y, rotation.z);
     offset.m_fScale = 1.0f;

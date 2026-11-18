@@ -9301,7 +9301,6 @@ void PlayerCharacter::ApplyAutoAimActor(
     TESObjectWEAP* v11;
     const NiPoint3* v62;
     NiMatrix3 v67;
-    NiPoint3 apResult;
     TESObjectREFR* phitRef;
     NiMatrix3 gunRot;
     NiPoint3 delta = NiPoint3_ZERO;
@@ -9677,7 +9676,7 @@ void PlayerCharacter::ApplyAutoAimActor(
                 NiNode* pnode = pvatsTarget3d->IsNode();
                 NiPoint3 localPoint = NiPoint3_ZERO;
                 if (!apProjectile || apProjectile->GetFormType() != PGRE_ID) {
-                    localPoint = *TESHavokUtilities::GetLocalPointWithinCollision(&apResult, pvatsTarget3d);
+                    localPoint = TESHavokUtilities::GetLocalPointWithinCollision(pvatsTarget3d);
                 }
                 if ((apProjectile) && (apProjectile->pTarget)) {
                     ProjectileTarget* ptarget = apProjectile->pTarget;
@@ -10199,7 +10198,6 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
     NiMatrix3 xrot_2;
     NiMatrix3 rotMod_2;
     NiMatrix3 vatsCameraRot_2;
-    NiPoint3 a2;
     NiPoint3 cameraPos;
     NiMatrix3 rotMod;
     NiPoint3 cameraRow;
@@ -10220,8 +10218,7 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
         chaseCamera.SetTranslate(currentPos);
         NiUpdateData UpdateData(0.0f, false, false);
         chaseCamera.Update(UpdateData);
-        NiPoint3* CamshotTargetPos = pVATS.GetCamshotTargetPos(&a2);
-        chaseCamera.LookAtWorldPoint(*CamshotTargetPos, NiPoint3_UNIT_Z);
+        chaseCamera.LookAtWorldPoint(pVATS.GetCamshotTargetPos(), NiPoint3_UNIT_Z);
         rotMod = (*&chaseCamera.m_kLocal).m_Rotate;
         rotMod.GetRow(0, cameraRow);
         cameraRot.SetRow(0, cameraRow.z, cameraRow.x, cameraRow.y);
@@ -10990,8 +10987,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                     double ddistance = GetDistanceFromPoint(targetPos);
                     targetPos.z = fVATSGrenadeDistAimZMult.Float() * ddistance + targetPos.z;
                 }
-                NiPoint3 rot;
-                CombatUtilities::GetAngleToProjectedPoint(&rot, this, targetPos);
+                NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(this, targetPos);
                 SetHeading(rot.z);
                 SetLooking(rot.x);
             }
@@ -13691,9 +13687,8 @@ NiPoint3* PlayerCharacter::GetCached1stPersonCameraPos() {
     return &Cached1stPersonCameraPos;
 }
 
-NiPoint3* PlayerCharacter::GetCamera3rdPersonShoulderOffset(NiPoint3* apResult) {
-    *apResult = kCamera3rdPersonShoulderOffset;
-    return apResult;
+NiPoint3 PlayerCharacter::GetCamera3rdPersonShoulderOffset() {
+    return kCamera3rdPersonShoulderOffset;
 }
 
 BSSimpleArray<ItemChange*>* PlayerCharacter::GetRockItAmmoArray() {
@@ -14482,7 +14477,6 @@ void PlayerCharacter::CreateMouseSpring(
     CFilter v33;
     NiPoint3 v49;
     hkVector4 tmphk;
-    alignas(16) NiPoint3 mousePoint;
     CFilter v65;
     CFilter fltr;
     hkVector4 hkvCenterOfMass;
@@ -14522,7 +14516,7 @@ void PlayerCharacter::CreateMouseSpring(
                 if ((this->eGrabType == PlayerCharacter::GRAB_NORMAL) && (pw) &&
                     (!pSaveLoadGame->GetSaveGameLoading())) {
                     if (Interface::IsActivatePickFuzzy() && ViewCaster::GetFuzzyBody()) {
-                        Interface::GetActivatePickLocation(&mousePoint);
+                        alignas(16) NiPoint3 mousePoint = Interface::GetActivatePickLocation();
                         if (!pSaveLoadGame->GetSaveGameLoading()) {
                             double v9 = (mousePoint - point).Length();
                             this->fGrabDistance = v9;
@@ -17106,9 +17100,8 @@ void PlayerCharacter::UpdateHardcoreMode() {
     }
 }
 
-NiPoint3* PlayerCharacter::GetBulletAutoAim(NiPoint3* apResult) {
-    *apResult = BulletAutoAim;
-    return apResult;
+NiPoint3 PlayerCharacter::GetBulletAutoAim() {
+    return BulletAutoAim;
 }
 
 double PlayerCharacter::GetTimeGrenadeHeld() {

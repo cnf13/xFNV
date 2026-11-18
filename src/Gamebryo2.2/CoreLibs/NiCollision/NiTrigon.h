@@ -6,7 +6,7 @@
 class NiTrigon {
 public:
     // Stores the unit normal of the triangle in apNormal and returns it.
-    NiPoint3* GetNormal(NiPoint3* apNormal);
+    NiPoint3 GetNormal();
 
     NiPoint3 m_kOrigin;
     NiPoint3 m_kEdge0;

@@ -8,7 +8,6 @@ FastNavMeshEdgeLocation* FastNavMeshEdgeLocation::Copy(const FastNavMeshEdgeLoca
     return this;
 }
 
-NiPoint3* FastNavMeshTriLocation::GetLocation(NiPoint3* apLocation) {
-    ::new (apLocation) NiPoint3(Location.x, Location.y, Location.z);
-    return apLocation;
+NiPoint3 FastNavMeshTriLocation::GetLocation() {
+    return NiPoint3(Location.x, Location.y, Location.z);
 }

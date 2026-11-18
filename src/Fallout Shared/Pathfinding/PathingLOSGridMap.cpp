@@ -171,9 +171,8 @@ void PathingLOSGridMap::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     (&Center)->SaveGame(apSaveGameBuffer);
 }
 
-NiPoint3* PathingLOSGridMap::GetLocation(NiPoint3* a2) {
-    ::new (a2) NiPoint3(Center.GetLocation());
-    return a2;
+NiPoint3 PathingLOSGridMap::GetLocation() {
+    return Center.GetLocation();
 }
 
 bool PathingLOSGridMap::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& aspLOSMap) {

@@ -619,7 +619,7 @@ public:
     static void
     IsolateElementsOfMenu(Tile* apMenuTile, bool abGlowOnly, bool abPipBoyOnly, bool abUpdateGlowBranchList);
     static void SetTargetREFR(TESObjectREFR* apRef);
-    static NiPoint3* GetActivatePickLocation(NiPoint3* apResult);
+    static NiPoint3 GetActivatePickLocation();
     static void SetFirstChanceTextureRelease_00703920();
     static void SetRepairMenuVisible(bool abVisibility, bool abAnyVisibleState, bool abTriggerPipboyEffect);
     static void CreateRepairServicesMenu(Actor* apVendor);

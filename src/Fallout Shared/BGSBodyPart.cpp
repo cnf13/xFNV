@@ -374,18 +374,16 @@ BGSImpactDataSet* BGSBodyPart::GetDismemberImpactDataSet() {
     return Data.pDismemberImpactDataSet;
 }
 
-NiPoint3* BGSBodyPart::GetGoreTranslate(NiPoint3* apResult) {
-    *apResult = Data.kGoreTranslate;
-    return apResult;
+NiPoint3 BGSBodyPart::GetGoreTranslate() {
+    return Data.kGoreTranslate;
 }
 
 const char* BGSBodyPart::GetGoreObjectName() {
     return GoreObjectName.String();
 }
 
-NiPoint3* BGSBodyPart::GetGoreRotate(NiPoint3* apResult) {
-    *apResult = Data.kGoreRotate;
-    return apResult;
+NiPoint3 BGSBodyPart::GetGoreRotate() {
+    return Data.kGoreRotate;
 }
 
 void BGSBodyPart::UnhideLimb(BGSBodyPart::LIMB_ENUM aeLimb, NiAVObject* apObj) {

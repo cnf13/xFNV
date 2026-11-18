@@ -116,13 +116,9 @@ bool NavMeshPOVSearch::GetNodeConnections(
                 NiPoint3 cross1 = NiPoint3_ZERO;
                 NiPoint3 cross2 = NiPoint3_ZERO;
                 // The tangent segment, from the point it leaves the parent's circle to the point it touches this one.
-                NiPoint3 exitPoint;
-                NiPoint3* pExitPoint =
-                    tangentResults.Results[e].Circle1Param.ComputePoint3(&exitPoint, parentPOVSphere.fRadius);
-                NiPoint3 entryPoint;
-                NiPoint3* pEntryPoint =
-                    tangentResults.Results[e].Circle2Param.ComputePoint3(&entryPoint, thisPOVSphere.fRadius);
-                NiPoint3 delta = thisPOVSphere.Center + *pEntryPoint - parentPOVSphere.Center - *pExitPoint;
+                NiPoint3 exitPoint = tangentResults.Results[e].Circle1Param.ComputePoint3(parentPOVSphere.fRadius);
+                NiPoint3 entryPoint = tangentResults.Results[e].Circle2Param.ComputePoint3(thisPOVSphere.fRadius);
+                NiPoint3 delta = thisPOVSphere.Center + entryPoint - parentPOVSphere.Center - exitPoint;
                 if (parentPOVNode->pPOV->eType != NavMeshPOV::POV_TYPE_START &&
                     pPOV->eType == NavMeshPOV::POV_TYPE_VERTEX) {
                     // A vertex POV is entered only from outside the corner its two edges make.
@@ -215,10 +211,8 @@ bool NavMeshPOVSearch::GetNodeConnections(
                 FastNavMeshEdgeLocation entryLocation;
                 entryLocation.~FastNavMeshEdgeLocation();
                 ::new (&entryLocation) FastNavMeshEdgeLocation;
-                NiPoint3 entryPoint2;
-                NiPoint3* pEntryPoint2 =
-                    tangentResults.Results[e].Circle2Param.ComputePoint3(&entryPoint2, thisPOVSphere.fRadius);
-                NiPoint3 entryLoc = thisPOVSphere.Center + *pEntryPoint2;
+                NiPoint3 entryLoc =
+                    thisPOVSphere.Center + tangentResults.Results[e].Circle2Param.ComputePoint3(thisPOVSphere.fRadius);
                 if (!CheckSegmentAgainstNavMesh(exitLocation, entryLoc, &entryLocation)) {
                     if (NavMeshPOVSearch::bDrawDebugData) {
                         NavMeshPOVSearch::DrawLine(exitLocation.Location, entryLocation.Location, NiColorA::Yellow);
@@ -340,10 +334,8 @@ bool NavMeshPOVSearch::CheckSegmentAgainstNavMesh(
 }
 
 float NavMeshPOVSearch::CheckArcAgainstPOVs(NavMeshPOV* apThisPOV, AngleSinCosArc aArc, NavMeshPOV* apIgnorePOV) {
-    NiPoint3 kPoint;
     Sphere thisSphere(apThisPOV->Center, apThisPOV->fRadius);
-    NiPoint3* pPoint = aArc.Start.ComputePoint3(&kPoint, thisSphere.fRadius);
-    NiPoint3 kStart = thisSphere.Center + *pPoint;
+    NiPoint3 kStart = thisSphere.Center + aArc.Start.ComputePoint3(thisSphere.fRadius);
     for (uint32_t i = 0; i < POVs.iSize; ++i) {
         for (uint32_t j = 0; j < (&POVs.GetAt(static_cast<int32_t>(i)))->iSize; ++j) {
             NavMeshPOV* pPOV = (&POVs.GetAt(static_cast<int32_t>(i)))->GetAt(static_cast<int32_t>(j));
@@ -374,9 +366,6 @@ bool NavMeshPOVSearch::CheckArcAgainstNavMesh2(
     AngleSinCosArc aArc,
     FastNavMeshEdgeLocation* apReturnLocation
 ) {
-    NiPoint3 kEndPoint;
-    NiPoint3 kNextPoint;
-    NiPoint3 kFirstPoint;
     AngleSinCos kStep;
     AngleSinCos kCurrent;
     FastNavMeshEdgeLocation kReturnLocation;
@@ -391,8 +380,7 @@ bool NavMeshPOVSearch::CheckArcAgainstNavMesh2(
     kCurrent.operator=(aArc.Start);
     // operator+ builds its result in kNext.
     AngleSinCos kNext = kCurrent + kStep;
-    NiPoint3* pPoint = kCurrent.ComputePoint3(&kFirstPoint, aSphere.fRadius);
-    NiPoint3 kPoint = aSphere.Center + *pPoint;
+    NiPoint3 kPoint = aSphere.Center + kCurrent.ComputePoint3(aSphere.fRadius);
     FastNavMeshEdgeLocation kStartLocation(aEntryLocation);
     kReturnLocation.~FastNavMeshEdgeLocation();
     ::new (&kReturnLocation) FastNavMeshEdgeLocation;
@@ -407,16 +395,14 @@ bool NavMeshPOVSearch::CheckArcAgainstNavMesh2(
         kCurrent.operator=(kNext);
         // The sum is built in a temporary, then assigned through operator=.
         kNext = kCurrent + kStep;
-        pPoint = kNext.ComputePoint3(&kNextPoint, aSphere.fRadius);
-        kPoint = aSphere.Center + *pPoint;
+        kPoint = aSphere.Center + kNext.ComputePoint3(aSphere.fRadius);
         ++uiSteps;
     }
     if (uiSteps == 24) {
         apReturnLocation->Copy(kReturnLocation);
         return false;
     }
-    pPoint = aArc.End.ComputePoint3(&kEndPoint, aSphere.fRadius);
-    NiPoint3 kEnd = aSphere.Center + *pPoint;
+    NiPoint3 kEnd = aSphere.Center + aArc.End.ComputePoint3(aSphere.fRadius);
     kStartLocation.iEdgeIndex = -1;
     if (CheckSegmentAgainstNavMesh(kStartLocation, kEnd, &kReturnLocation)) {
         apReturnLocation->Copy(kReturnLocation);
@@ -810,10 +796,6 @@ void NavMeshPOVSearch::DrawArc(
     ANGLE_DIRECTION aDirection,
     const NiColorA& aColor
 ) {
-    NiPoint3 v11;
-    NiPoint3 v13;
-    NiPoint3 v15;
-    NiPoint3 apResult;
     AngleSinCos aAngleStep;
     uint32_t icount;
     AngleSinCos currentStartAngle;
@@ -828,22 +810,18 @@ void NavMeshPOVSearch::DrawArc(
     }
     currentStartAngle.operator=(aStartAngle);
     AngleSinCos currentGoalAngle = currentStartAngle + aAngleStep;
-    NiPoint3* v6 = currentStartAngle.ComputePoint3(&apResult, afRadius);
-    NiPoint3 currentStartLoc = aCenter + *v6;
-    NiPoint3* v7 = currentGoalAngle.ComputePoint3(&v15, afRadius);
-    NiPoint3 currentGoalLoc = aCenter + *v7;
+    NiPoint3 currentStartLoc = aCenter + currentStartAngle.ComputePoint3(afRadius);
+    NiPoint3 currentGoalLoc = aCenter + currentGoalAngle.ComputePoint3(afRadius);
     for (icount = 0; arc.WithinRange(currentGoalAngle) && icount < 24; ++icount) {
         NavMeshPOVSearch::DrawLine(currentStartLoc, currentGoalLoc, aColor);
         currentStartLoc = currentGoalLoc;
         currentStartAngle.operator=(currentGoalAngle);
         // The sum goes into a temporary, then through operator= into currentGoalAngle.
         currentGoalAngle.operator=(currentStartAngle + aAngleStep);
-        NiPoint3* v9 = currentGoalAngle.ComputePoint3(&v13, afRadius);
-        currentGoalLoc = aCenter + *v9;
+        currentGoalLoc = aCenter + currentGoalAngle.ComputePoint3(afRadius);
     }
     if (icount != 24) {
-        NiPoint3* v10 = aGoalAngle.ComputePoint3(&v11, afRadius);
-        [[maybe_unused]] NiPoint3 lastGoalLoc = aCenter + *v10;
+        [[maybe_unused]] NiPoint3 lastGoalLoc = aCenter + aGoalAngle.ComputePoint3(afRadius);
         NavMeshPOVSearch::DrawLine(currentStartLoc, currentGoalLoc, aColor);
     }
 }
@@ -891,11 +869,10 @@ float AngleSinCos::GetAngle() const {
 }
 
 // Builds the point with the three-float constructor, y computed before x.
-NiPoint3* AngleSinCos::ComputePoint3(NiPoint3* apResult, float afRadius) const {
+NiPoint3 AngleSinCos::ComputePoint3(float afRadius) const {
     float fY = afRadius * fSin;
     float fX = afRadius * fCos;
-    ::new (apResult) NiPoint3(fX, fY, 0.0f);
-    return apResult;
+    return NiPoint3(fX, fY, 0.0f);
 }
 
 AngleSinCos& AngleSinCos::operator+=(const AngleSinCos& aSinCos) {

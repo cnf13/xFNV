@@ -18,7 +18,7 @@ class PathingRequest;
 // A navmesh triangle and its center: what a NavMeshSearch node stands for.
 struct NavMeshSearchNode {
     // Builds the center in apCenter and returns it.
-    NiPoint3* GetCenter(NiPoint3* apCenter) const;
+    NiPoint3 GetCenter() const;
     // Copies arCenter into CenterX, CenterY and CenterZ.
     void SetCenter(const NiPoint3& arCenter);
     NavMeshTriangle* GetTriangle() const;

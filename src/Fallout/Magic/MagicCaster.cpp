@@ -986,7 +986,6 @@ bool MagicCaster::AddTarget(
 
 void MagicCaster::FireProjectile() {
     NiPoint3 v20;
-    NiPoint3 a1;
     NiPoint3 v24;
     if (GetCurrentSpell()) {
         TESObjectREFR* ptargetObject;
@@ -1021,10 +1020,10 @@ void MagicCaster::FireProjectile() {
             else {
                 double MaximumLeafAngle = pavEffect->data.fSpeed;
                 float fspeed = fMagicProjectileBaseSpeed.Float() * MaximumLeafAngle;
-                NiPoint3* AngleToProjectedTarget = CombatUtilities::GetAngleToProjectedTarget(
-                    &a1, pcasterObject, ptargetObject, fspeed, 0.0f, ACTOR_SEGMENT_INVIEW_TOP
-                );
-                angle = pcasterObject->GetAngleOnReference() + *AngleToProjectedTarget;
+                angle = pcasterObject->GetAngleOnReference() +
+                    CombatUtilities::GetAngleToProjectedTarget(
+                            pcasterObject, ptargetObject, fspeed, 0.0f, ACTOR_SEGMENT_INVIEW_TOP
+                    );
                 origin = pcasterObject->GetLocationOnReference();
                 NiPoint3* v5 = &(v20 = pcasterObject->GetBoundMax());
                 origin.z = (v5->z - pcasterObject->GetBoundMin().z) * 0.5 + origin.z;

@@ -96,7 +96,7 @@ public:
     void InitCamera(TESObjectREFR* a1, int32_t a2);
     void SetCameraTarget(NiAVObject* apTarget);
     void Update(float afTime);
-    NiPoint3* GetTargetPos(NiPoint3* apResult);
+    NiPoint3 GetTargetPos();
 
     CAMERA_SHOT_DATA Data;
     NiPointer<NiAVObject> spLocationNode;

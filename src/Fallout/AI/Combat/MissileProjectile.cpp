@@ -185,8 +185,6 @@ void MissileProjectile::Process3D() {
 
 void MissileProjectile::UpdateProjectile(float afDelta) {
     NiMatrix3 mMatrixLocal_2;
-    NiPoint3 v19;
-    NiPoint3 apResult;
     NiMatrix3 mMatrix;
     NiPoint3 oldpos;
     NiPoint3 newpos;
@@ -234,15 +232,14 @@ void MissileProjectile::UpdateProjectile(float afDelta) {
                 bool breorient = false;
                 if (pTarget) {
                     ProjectileTarget* CurrentFurniture = pTarget;
-                    NiPoint3 fG = *CurrentFurniture->GetWorldLocation(&apResult);
+                    NiPoint3 fG = CurrentFurniture->GetWorldLocation();
                     AimAtPoint(fG);
                 }
                 if (!bfirstUpdate) {
                     if (pTarget) {
                         const NiPoint3* angle = &GetLocationOnReference();
                         ProjectileTarget* v3 = pTarget;
-                        NiPoint3* WorldLocation = v3->GetWorldLocation(&v19);
-                        NiPoint3 targetDelta = *WorldLocation - *angle;
+                        NiPoint3 targetDelta = v3->GetWorldLocation() - *angle;
                         double v14 = targetDelta.Length();
                         if (fProjectileReorientTracerMin.Float() < v14) {
                             breorient = true;

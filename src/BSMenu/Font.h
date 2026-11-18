@@ -314,13 +314,7 @@ public:
     bool CreateText(BSStringT<char> axTextString, FontManager::TextData& axTextData, NiNode* apNode);
     // The size the text takes in font aiFont wrapped at afWrapwidth, from character aiStartIndex on, written to
     // apResult (x the width, y the height); returns apResult.
-    NiPoint3* CalculateStringDimensions(
-        NiPoint3* apResult,
-        const char* apText,
-        int32_t aiFont,
-        float afWrapwidth,
-        int32_t aiStartIndex
-    );
+    NiPoint3 CalculateStringDimensions(const char* apText, int32_t aiFont, float afWrapwidth, int32_t aiStartIndex);
     // The extra gap between the lines of font aiFont: 4 for fonts 2 and 6, 6 for font 3, 2 for font 7, else 0.
     float GetLinePadding(int32_t aiFont);
     int32_t GetCharType(char acchar);

@@ -34,12 +34,11 @@ bool NavMeshGrid::IsTriangleInGridCell(uint16_t aiTriangle, uint32_t aiColumn, u
 }
 
 // Takes z first, then computes y and x (each rounded to float) in that order.
-NiPoint3* NavMeshGrid::GetGridPosition(NiPoint3* apResult, uint32_t aiColumn, uint32_t aiRow) {
+NiPoint3 NavMeshGrid::GetGridPosition(uint32_t aiColumn, uint32_t aiRow) {
     float fZ = GridBoundsMin.z;
     float fY = (float)((double)aiRow * fRowSectionLen + GridBoundsMin.y);
     float fX = (float)((double)aiColumn * fColumnSectionLen + GridBoundsMin.x);
-    ::new (apResult) NiPoint3(fX, fY, fZ);
-    return apResult;
+    return NiPoint3(fX, fY, fZ);
 }
 
 void NavMeshGrid::GetTriangleData(const NiPoint3& aLoc, const BSSimpleArray<uint16_t, 1024>*& apArray) {

@@ -987,11 +987,10 @@ void ContainerMenu::SetFilterModeTitle(Tile* apTitleTile) {
 }
 
 void ContainerMenu::SetContainerTitle(const char* astrTitle) {
-    NiPoint3 stringDims;
     if ((astrTitle) && (*astrTitle)) {
         int32_t ifontNum = static_cast<int32_t>(pTiles[TI_CONTAINER_TITLE]->GetFloat(4025));
         FontManager* Singleton = FontManager::Instance();
-        Singleton->CalculateStringDimensions(&stringDims, astrTitle, ifontNum, 3.4028235e+38f, 0);
+        NiPoint3 stringDims = Singleton->CalculateStringDimensions(astrTitle, ifontNum, 3.4028235e+38f, 0);
         float fmaxWidth = pTiles[TI_CONTAINER_TITLE]->pParent->GetFloat(4017) - 80.0;
         if (pTiles[TI_CONTAINER_FILTER_LEFT]->IsTrue(4003)) {
             fmaxWidth = fmaxWidth - 35.0;

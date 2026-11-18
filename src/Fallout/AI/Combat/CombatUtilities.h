@@ -105,8 +105,7 @@ public:
         ACTOR_SEGMENT_INVIEW aeTargetSegmentInView
     );
     // The same angles from apAttacker's own firing location at apTarget.
-    static NiPoint3* GetAngleToProjectedTarget(
-        NiPoint3* apResult,
+    static NiPoint3 GetAngleToProjectedTarget(
         TESObjectREFR* apAttacker,
         TESObjectREFR* apTarget,
         float afSpeed,
@@ -135,7 +134,7 @@ public:
     // The aiming angles from aStartLocation to aProjectedPoint.
     static NiPoint3 GetAngleToProjectedPoint(NiPoint3 aStartLocation, NiPoint3 aProjectedPoint);
     // The same angles from apAttacker's own firing location to aProjectedPoint.
-    static NiPoint3* GetAngleToProjectedPoint(NiPoint3* apResult, TESObjectREFR* apAttacker, NiPoint3 aProjectedPoint);
+    static NiPoint3 GetAngleToProjectedPoint(TESObjectREFR* apAttacker, NiPoint3 aProjectedPoint);
     // Whether the throw of apProjectile from aStartLocation reaches aTargetedPoint; the hit
     // point, reference and distance fraction come back through the pointers.
     static bool CalculateProjectileLOS(
@@ -228,10 +227,9 @@ public:
         bool abHighArc,
         float afSpeed
     );
-    static NiPoint3* GetAttackerFiringLocationSimple(NiPoint3* apResult, TESObjectREFR* apAttacker);
-    static NiPoint3* GetBackProjectedAttackerFiringLocation(NiPoint3* apResult, TESObjectREFR* apAttacker);
-    static NiPoint3* GetAngleToProjectedPoint(
-        NiPoint3* apResult,
+    static NiPoint3 GetAttackerFiringLocationSimple(TESObjectREFR* apAttacker);
+    static NiPoint3 GetBackProjectedAttackerFiringLocation(TESObjectREFR* apAttacker);
+    static NiPoint3 GetAngleToProjectedPoint(
         NiPoint3 aStartLocation,
         NiPoint3 aPivotLocation,
         float afPivotAngle,
@@ -254,8 +252,7 @@ public:
     static bool IsDangerousExplosion(BGSExplosion* apExplosion);
     // The projected aim point of apSource at akTargetLocation, for a target standing still: it passes its arguments on
     // to CombatUtilities::GetProjectedPointForTarget with a zero velocity.
-    static NiPoint3* GetProjectedPointForTarget(
-        NiPoint3* arResult,
+    static NiPoint3 GetProjectedPointForTarget(
         Actor* apSource,
         const NiPoint3& akTargetLocation,
         NiPoint3* arSourcePosition,
@@ -263,8 +260,7 @@ public:
         float afProjectileSpeed,
         bool abHighArc
     );
-    static NiPoint3* GetProjectedPointForTarget(
-        NiPoint3* arResult,
+    static NiPoint3 GetProjectedPointForTarget(
         TESObjectREFR* apSource,
         NiPoint3 akTargetLocation,
         NiPoint3 akTargetVelocity,

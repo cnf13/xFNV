@@ -66,13 +66,12 @@ float CombatThreat::ComputeThreatScore(
     float afActorHealth
 ) {
     NiPoint3 v19;
-    NiPoint3 linearVelocity;
     float fthreatScore = 0.0;
     if (afCompareTime < 0.0 || IsActive(afCompareTime)) {
         float fmodifiedRadius = fRadius + afAdditionalRadius;
         float fsquaredDistanceFromThreat = 0.0f;
         float fextrudeRadius = fmodifiedRadius * gs_fCombatThreatExtrudeVelocityThreshold.Float();
-        GetThreatLinearVelocity(&linearVelocity);
+        NiPoint3 linearVelocity = GetThreatLinearVelocity();
         float fvelocityMagnitude = linearVelocity.UnitizeGetLength();
         NiPoint3* a2 = &(v19 = linearVelocity * fvelocityMagnitude * 0.5f);
         const NiPoint3* v7 = &pThreat->GetLocationOnReference();
@@ -168,11 +167,10 @@ float CombatThreat::GetBaseThreatScore(Actor* apActor, float afActorHealth) {
     return fDamage * 2.0 / fcurrentHealth;
 }
 
-NiPoint3* CombatThreat::GetThreatLinearVelocity(NiPoint3* apResult) {
+NiPoint3 CombatThreat::GetThreatLinearVelocity() {
     CombatTimer v8;
     if (fCachedLinearVelocityTimeStamp.ElapsedTime() < 0.33000001311302185) {
-        *apResult = CachedLinearVelocity;
-        return apResult;
+        return CachedLinearVelocity;
     }
     NiAVObject* pthreat3D = pThreat->Get3D();
     if (pthreat3D) {
@@ -188,16 +186,14 @@ NiPoint3* CombatThreat::GetThreatLinearVelocity(NiPoint3* apResult) {
             float a2 = CombatTimer::GetTimer();
             CombatTimeStamp apMemory(a2);
             fCachedLinearVelocityTimeStamp = apMemory;
-            *apResult = CachedLinearVelocity;
-            return apResult;
+            return CachedLinearVelocity;
         }
         if (pprojectile->IsFlagSet(Projectile::NO_COLLISION)) {
             CachedLinearVelocity = NiPoint3_ZERO;
             float a2a = CombatTimer::GetTimer();
             CombatTimeStamp v9(a2a);
             fCachedLinearVelocityTimeStamp = v9;
-            *apResult = CachedLinearVelocity;
-            return apResult;
+            return CachedLinearVelocity;
         }
 
     LABEL_9:;
@@ -221,21 +217,18 @@ NiPoint3* CombatThreat::GetThreatLinearVelocity(NiPoint3* apResult) {
         float a2b = CombatTimer::GetTimer();
         ::new (&v8.fTargetTime) CombatTimeStamp(a2b);
         fCachedLinearVelocityTimeStamp.fTimeStamp = v8.fTargetTime;
-        *apResult = CachedLinearVelocity;
-        return apResult;
+        return CachedLinearVelocity;
     }
 
     float a2c = CombatTimer::GetTimer();
     v8.SetStartTime(a2c);
     fCachedLinearVelocityTimeStamp.fTimeStamp = v8.fStartTime;
-    *apResult = NiPoint3_ZERO;
-    return apResult;
+    return NiPoint3_ZERO;
 }
 
 PathingAvoidNode* CombatThreat::GetAvoidNode(PathingAvoidNode* apResult, Actor* apActor) {
     NiPoint3 v19;
-    NiPoint3 linearVelocity;
-    GetThreatLinearVelocity(&linearVelocity);
+    NiPoint3 linearVelocity = GetThreatLinearVelocity();
     float fextrudeRadius = fRadius * gs_fCombatThreatExtrudeVelocityThreshold.Float();
     float fthreatScore = GetBaseThreatScore(apActor, 0.0f);
     float fvelocityMagnitude = linearVelocity.UnitizeGetLength();

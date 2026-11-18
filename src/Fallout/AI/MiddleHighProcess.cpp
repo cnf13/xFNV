@@ -8702,7 +8702,6 @@ uint8_t MiddleHighProcess::DidPathingFail(Actor* apActor) {
 }
 
 TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPackage, PackageTarget* ptarg) {
-    NiPoint3 apResult;
     if (!apPackage || !ptarg) {
         return nullptr;
     }
@@ -8825,7 +8824,7 @@ TESObjectREFR* MiddleHighProcess::SetTargetData(Actor* apActor, TESPackage* apPa
                             searchLocCell_2 = pCell;
                         }
                         pCell = searchLocCell_2;
-                        pointB = *apPackage->GetSearchLocationCoord(&apResult, apActor);
+                        pointB = apPackage->GetSearchLocationCoord(apActor);
                         if (iradius) {
                             facquireDist_2 = static_cast<float>(iradius);
                         }

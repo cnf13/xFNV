@@ -180,11 +180,8 @@ void MessageMenu::DoIdle() {
 }
 
 void MessageMenu::LoadNextMessage() {
-    NiPoint3 v67;
     std::basic_string<char, std::char_traits<char>, std::allocator<char>> _Result;
-    NiPoint3 v69;
     std::basic_string<char, std::char_traits<char>, std::allocator<char>> apMemory;
-    NiPoint3 textDims;
     char v66 = 0;
     if (MessageMenu::GetQueueHead()) {
         MessageMenu::MessageMenuEntry* pcurrMessage = MessageMenu::GetQueueHead();
@@ -236,7 +233,7 @@ void MessageMenu::LoadNextMessage() {
             }
             char* strTitle = pcurrMessage->strTitle;
             FontManager* Singleton = FontManager::Instance();
-            fminHeaderWidth = Singleton->CalculateStringDimensions(&v69, strTitle, 6, fWrapWidth_4, 0)->x;
+            fminHeaderWidth = Singleton->CalculateStringDimensions(strTitle, 6, fWrapWidth_4, 0).x;
             if (pcurrMessage->uiWidthOverride) {
                 v58 = 0.0f;
             }
@@ -291,7 +288,7 @@ void MessageMenu::LoadNextMessage() {
                         fWrapWidth_2 = fWrapWidth_6;
                         const char* String = ptextChildTile->GetString(4036);
                         FontManager* v10 = FontManager::Instance();
-                        double x = v10->CalculateStringDimensions(&v67, String, 2, fWrapWidth_6, 0)->x;
+                        double x = v10->CalculateStringDimensions(String, 2, fWrapWidth_6, 0).x;
                         imaxButtonWidth = BSMAX(imaxButtonWidth, static_cast<int32_t>(x));
                     }
                     double Float = ptemp->GetFloat(4016);
@@ -357,7 +354,7 @@ void MessageMenu::LoadNextMessage() {
         float a1b = MessageMenu::pMe->pTiles[3]->GetFloat(4026);
         char* v25 = pcurrMessage->strMessageText.pString;
         FontManager* v15 = FontManager::Instance();
-        v15->CalculateStringDimensions(&textDims, v25, 2, a1b, 0);
+        NiPoint3 textDims = v15->CalculateStringDimensions(v25, 2, a1b, 0);
         ftextWidth = fhorizSpacing + fhorizSpacing + textDims.x + ftextWidth;
         if (!(textDims.z > 1.0)) {
             MessageMenu::pMe->pTiles[1]->Set(4023, 2);

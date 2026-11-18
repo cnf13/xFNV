@@ -380,7 +380,6 @@ bool Pathing::GetNavMeshZForLocation(PathingLocation& aLocation, float& aRetHeig
 }
 
 bool Pathing::GetNavmeshNormalForLocation(PathingLocation& aLocation, NiPoint3& aRetNormal) {
-    NiPoint3 result;
     uint16_t arTriangle;
     XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     if (!aLocation.ResolveNavMeshInfo(nullptr)) {
@@ -390,7 +389,7 @@ bool Pathing::GetNavmeshNormalForLocation(PathingLocation& aLocation, NiPoint3& 
     if (aLocation.GetNavMeshAndTriangle(*static_cast<NavMeshPtr*>(&apMemory), arTriangle)) {
         uint16_t v4 = arTriangle;
         NavMesh* v3 = apMemory.m_pObject;
-        aRetNormal = *v3->GetNormal(&result, v4);
+        aRetNormal = v3->GetNormal(v4);
         apMemory.~NiPointer<NavMesh>();
         return true;
     }
@@ -480,8 +479,7 @@ Pathing::GetCoverPoints(PathingRequestCover* apRequest, BSSimpleArray<PathingCov
             if (!apRequest->bFindBothSides && !(ffacing > 0.0)) {
                 continue;
             }
-            NiPoint3 kNormal;
-            NiPoint3 triNormal = *spmesh->GetNormal(&kNormal, itriIndex);
+            NiPoint3 triNormal = spmesh->GetNormal(itriIndex);
             for (uint16_t iedge = 0; iedge < 2; ++iedge) {
                 uint16_t edgeCoverHeight;
                 bool bleft;
@@ -764,8 +762,7 @@ bool Pathing::BuildFleePath(PathingRequestFlee* apRequest, PathingSolution* apSo
                 // Reads the radius before the heading.
                 float fRadius = apRequest->GetActorRadius();
                 float fHeading = apRequest->GetInitialPathHeading();
-                NiPoint3 tangent;
-                Pathing::ComputeInitialTangentForActor(&tangent, fHeading, startLoc, nextLoc, fRadius);
+                NiPoint3 tangent = Pathing::ComputeInitialTangentForActor(fHeading, startLoc, nextLoc, fRadius);
                 pnode0->SetTangent(tangent);
             }
         }
@@ -1067,8 +1064,7 @@ bool Pathing::BuildOptimalLocationPath(PathingRequestOptimalLocation* apRequest,
         const BSSimpleArray<NavMeshSearchNode, 1024>& rconstNodes = nodes;
         endNode = rconstNodes.GetAt(static_cast<int32_t>(nodes.iSize - 1));
         if (optimalPathingLocation.QUnused()) {
-            NiPoint3 nodeCenter;
-            endLocation = *endNode.GetCenter(&nodeCenter);
+            endLocation = endNode.GetCenter();
         }
         else {
             endLocation = closestPoint;
@@ -1076,8 +1072,7 @@ bool Pathing::BuildOptimalLocationPath(PathingRequestOptimalLocation* apRequest,
     }
     else if (!nodes.IsEmpty()) {
         endNode = search.GetBestAStarNode()->tNodeData;
-        NiPoint3 nodeCenter;
-        endLocation = *endNode.GetCenter(&nodeCenter);
+        endLocation = endNode.GetCenter();
     }
     else {
         bool bResult = false;
@@ -1580,7 +1575,6 @@ bool Pathing::FindNavmeshesForLocation(
 }
 
 bool Pathing::FindClosePointViaNavMesh(PathingRequestClosePoint* apRequest, NiPoint3* apRetPt) {
-    NiPoint3 apResult;
     using nodes_t = BSScrapArray<NavMeshSearchNode, 1024>;
     using links_t = BSScrapArray<NavMeshSearchLink, 1024>;
     if (!(&apRequest->Origin)->ResolveToClosestNavmeshAndTriangle()) {
@@ -1608,7 +1602,7 @@ bool Pathing::FindClosePointViaNavMesh(PathingRequestClosePoint* apRequest, NiPo
             verts[1] = lastNode.pNavMesh->GetVertex(v5)->Location;
             uint16_t v6 = ptri->GetVert(2u);
             verts[2] = lastNode.pNavMesh->GetVertex(v6)->Location;
-            *apRetPt = *NavMeshMath::RandomPointOnTriangle(&apResult, *verts, verts[1], verts[2]);
+            *apRetPt = NavMeshMath::RandomPointOnTriangle(*verts, verts[1], verts[2]);
             return true;
         }
 
@@ -1712,8 +1706,7 @@ bool Pathing::ComputeApproximatePathingDistance(
         // Drops the nodes a straight line from each node's center passes through the portal edges to.
         for (uint32_t i = 0; i < pNodes->iSize - 2; ++i) {
             NavMeshSearchNode* pStartNode = &pNodes->GetAt(static_cast<int32_t>(i));
-            NiPoint3 startNodeCenter;
-            pStartNode->GetCenter(&startNodeCenter);
+            NiPoint3 startNodeCenter = pStartNode->GetCenter();
             NavMeshSearchLink* pStartNodeLink = &links.GetAt(static_cast<int32_t>(i));
             NiPoint3 kLeft;
             NiPoint3 kRight;
@@ -1723,8 +1716,7 @@ bool Pathing::ComputeApproximatePathingDistance(
             uint32_t j;
             for (j = i + 2; j < pNodes->iSize; ++j) {
                 NavMeshSearchNode* pAdvanceNode = &pNodes->GetAt(static_cast<int32_t>(j));
-                NiPoint3 advanceNodeCenter;
-                pAdvanceNode->GetCenter(&advanceNodeCenter);
+                NiPoint3 advanceNodeCenter = pAdvanceNode->GetCenter();
                 uint32_t uiLink = j - 1;
                 NavMeshSearchLink* pParentLink = &links.GetAt(static_cast<int32_t>(uiLink));
                 NiPoint3 kVert0;
@@ -1777,8 +1769,7 @@ bool Pathing::ComputeApproximatePathingDistance(
             NavMeshSearchNode* pNode = &pNodes->GetAt(static_cast<int32_t>(i));
             NavMeshSearchNode* pPrevNode = &pNodes->GetAt(static_cast<int32_t>(i - 1));
             NavMeshSearchLink* pInLink = &links.GetAt(static_cast<int32_t>(i - 1));
-            NiPoint3 prevLocation;
-            pPrevNode->GetCenter(&prevLocation);
+            NiPoint3 prevLocation = pPrevNode->GetCenter();
             NiPoint3 kVert0;
             NiPoint3 kVert1;
             pInLink->pNavMesh->GetEdgeVertices(pInLink->sTriangle, pInLink->iEdgeIndex, &kVert0, &kVert1);
@@ -1797,11 +1788,9 @@ bool Pathing::ComputeApproximatePathingDistance(
     if (apReturnDistance) {
         *apReturnDistance = 0.0f;
         if (pNodes->iSize > 1) {
-            NiPoint3 lastLocation;
-            pNodes->GetAt(0).GetCenter(&lastLocation);
+            NiPoint3 lastLocation = pNodes->GetAt(0).GetCenter();
             for (uint32_t i = 1; i < pNodes->iSize; ++i) {
-                NiPoint3 currentLocation;
-                pNodes->GetAt(static_cast<int32_t>(i)).GetCenter(&currentLocation);
+                NiPoint3 currentLocation = pNodes->GetAt(static_cast<int32_t>(i)).GetCenter();
                 *apReturnDistance = (currentLocation - lastLocation).Length() + *apReturnDistance;
                 lastLocation = currentLocation;
             }
@@ -2131,14 +2120,13 @@ bool Pathing::ComputeLineOfSightMap(
     BSSimpleArray<float, 1024>* apHeadings
 ) {
     void* v8;
-    NiPoint3 v9;
     if (!aspGridMap.m_pObject->IsValid()) {
         return false;
     }
     void* apMemory = NiMemObject::operator new(sizeof(PathingLOSMap));
     if (apMemory) {
         float afHeading = aspGridMap.m_pObject->fRadius;
-        NiPoint3 v22 = *aspGridMap.m_pObject->GetLocation(&v9);
+        NiPoint3 v22 = aspGridMap.m_pObject->GetLocation();
         v8 = (void*)::new (apMemory) PathingLOSMap(v22, afHeading);
     }
     else {
@@ -2516,8 +2504,7 @@ bool Pathing::GetNavMeshZForLocation(
     return NavMeshZForLocation_0;
 }
 
-NiPoint3* Pathing::ComputeInitialTangentForActor(
-    NiPoint3* apResult,
+NiPoint3 Pathing::ComputeInitialTangentForActor(
     float afHeading,
     const PathingLocation& aLocation,
     const PathingLocation& aNextLocation,
@@ -2578,28 +2565,19 @@ NiPoint3* Pathing::ComputeInitialTangentForActor(
                   (fdeltaToNextLength = deltaToNext.UnitizeGetLength(),
                    (fdot = deltaToNext.Dot(direction), !(fdot < -0.699999988079071)))) &&
                  (!(fdot < 0.0) || !(fdeltaToNextLength < 64.0)))) {
-                ::new (apResult) NiPoint3(end - start);
-                return apResult;
+                return end - start;
             }
 
-            *apResult = NiPoint3_ZERO;
-            return apResult;
+            return NiPoint3_ZERO;
         }
 
-        *apResult = NiPoint3_ZERO;
-        return apResult;
+        return NiPoint3_ZERO;
     }
 
-    *apResult = NiPoint3_ZERO;
-    return apResult;
+    return NiPoint3_ZERO;
 }
 
-NiPoint3* Pathing::ComputeFinalTangentForActor(
-    NiPoint3* apResult,
-    float afHeading,
-    const PathingLocation& aLocation,
-    float afRadius
-) {
+NiPoint3 Pathing::ComputeFinalTangentForActor(float afHeading, const PathingLocation& aLocation, float afRadius) {
     NiPoint3 v21;
     NiPoint3 v27;
     // Each of these PathingLocations is built and destroyed only through its own Construct/Destruct calls below.
@@ -2633,8 +2611,7 @@ NiPoint3* Pathing::ComputeFinalTangentForActor(
             end = retIntersection.GetLocation();
         }
     }
-    ::new (apResult) NiPoint3(start - end);
-    return apResult;
+    return start - end;
 }
 
 // The double constants are the float two pi over 2^32 and the float pi; the result is rounded to a float local.

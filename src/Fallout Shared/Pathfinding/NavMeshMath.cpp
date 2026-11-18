@@ -372,7 +372,6 @@ bool NavMeshMath::CircleSegmentIntersection(
     float finvDeltaY;
     bool bdox;
     Segment relativeSegment;
-    NiPoint3 delta;
     float fEpsilon = 0.001f;
     if (aCircle.fRadius <= 0.0) {
         return false;
@@ -384,7 +383,7 @@ bool NavMeshMath::CircleSegmentIntersection(
     float fradius = 1.0f;
     relativeSegment.Start.operator/=(aCircle.fRadius);
     relativeSegment.End.operator/=(aCircle.fRadius);
-    relativeSegment.Delta(&delta);
+    NiPoint3 delta = relativeSegment.Delta();
     float fr2 = fradius * fradius;
     if (delta.y != 0.0 || delta.x == 0.0) {
         if (delta.y == 0.0 || delta.x != 0.0) {
@@ -762,12 +761,7 @@ bool NavMeshMath::CheckArcAgainstCircle(const Sphere& aCircle1, const AngleSinCo
     return !aArc.WithinRange(angle1) && !aArc.WithinRange(angle2);
 }
 
-NiPoint3* NavMeshMath::RandomPointOnTriangle(
-    NiPoint3* apResult,
-    const NiPoint3& aVert0,
-    const NiPoint3& aVert1,
-    const NiPoint3& aVert2
-) {
+NiPoint3 NavMeshMath::RandomPointOnTriangle(const NiPoint3& aVert0, const NiPoint3& aVert1, const NiPoint3& aVert2) {
     NiPoint3 v8;
     float frandEdge2;
     NiPoint3 edge1 = aVert1 - aVert0;
@@ -777,8 +771,7 @@ NiPoint3* NavMeshMath::RandomPointOnTriangle(
         frandEdge1 = RandomFloat0To1();
     }
     NiPoint3* fScalar = ::new (&v8) NiPoint3(edge2 * frandEdge2);
-    ::new (apResult) NiPoint3(aVert0 + edge1 * frandEdge1 + *fScalar);
-    return apResult;
+    return aVert0 + edge1 * frandEdge1 + *fScalar;
 }
 
 bool NavMeshMath::Find2DIntersection_006B9E90(
@@ -913,9 +906,8 @@ void Segment::Offset(const NiPoint3& aOffset) {
     End.operator+=(aOffset);
 }
 
-NiPoint3* Segment::Delta(NiPoint3* apResult) {
-    ::new (apResult) NiPoint3(End - Start);
-    return apResult;
+NiPoint3 Segment::Delta() {
+    return End - Start;
 }
 
 Segment& Segment::operator=(const Segment& aSegment) {

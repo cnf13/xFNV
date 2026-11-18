@@ -3201,8 +3201,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             PathingLOSMap* pMemory = static_cast<PathingLOSMap*>(NiMemObject::operator new(sizeof(PathingLOSMap)));
             if (pMemory) {
                 float fRadius = spPathingLOSGridMap.m_pObject->fRadius;
-                NiPoint3 kLocation;
-                NiPoint3 kCenter = *spPathingLOSGridMap.m_pObject->GetLocation(&kLocation);
+                NiPoint3 kCenter = spPathingLOSGridMap.m_pObject->GetLocation();
                 pLOSMap = ::new (pMemory) PathingLOSMap(kCenter, fRadius);
             }
             else {

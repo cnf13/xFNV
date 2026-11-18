@@ -391,7 +391,6 @@ void BGSDecalManager::AddDecal(
 }
 
 bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) {
-    NiPoint3 decalpos;
     int32_t* v2 = &gs_iMaxDecalsPerFrame_Display.Int();
     if (BGSDecalManager::iDecalsThisFrame < *v2) {
         if (arDecalData.pAVObj) {
@@ -452,7 +451,7 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                         BSTempEffect* ptempeffect = static_cast<BSTempEffect*>(plist->m_item.m_pObject);
                         BSTempEffectSimpleDecal* pdata = static_cast<BSTempEffectSimpleDecal*>(ptempeffect);
                         plist = plist->m_pkNext;
-                        pdata->GetOrigin(&decalpos);
+                        NiPoint3 decalpos = pdata->GetOrigin();
                         float radius = pdata->fWidth;
                         NiPoint3 deltaSquared = arDecalData.pOrigin - decalpos;
                         deltaSquared = NiPoint3::ComponentProduct(deltaSquared, deltaSquared);
@@ -710,7 +709,6 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     XFNV_INLINED_LOCAL(NiColorA, v23, std::nullopt, std::nullopt);
     XFNV_INLINED_LOCAL(NiColorA, apMemory, std::nullopt, std::nullopt);
     NiMatrix3 rot_2;
-    NiPoint3 aVector;
     NiPoint3 normal;
     NiPoint3 tangent;
     NiPoint3 start;
@@ -719,11 +717,10 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     NiMatrix3 adjustedrot;
     NiMatrix3 rot;
     NiMatrix3 kzrot;
-    apDecal->GetDirection(&normal);
+    normal = apDecal->GetDirection();
     normal.Unitize();
     normal.operator*=(50.0f);
-    NiPoint3* Origin = apDecal->GetOrigin(&aVector);
-    NiPoint3 pos = *Origin + normal;
+    NiPoint3 pos = apDecal->GetOrigin() + normal;
     NiPoint3 afTime_4 = -normal;
     ::new (&rot) NiMatrix3(BSUtilities::GetRotationZToVector(afTime_4));
     float angle_4 = apDecal->fRotation;

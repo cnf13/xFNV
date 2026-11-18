@@ -3560,7 +3560,6 @@ bool LowProcess::CheckIfHasObject(Actor* apActor, int32_t ainumb) {
 }
 
 TESObjectREFR* LowProcess::GetTargetForPackage(Actor* apActor, TESPackage* apPackage) {
-    NiPoint3 apResult;
     if (!apPackage) {
         return nullptr;
     }
@@ -3652,7 +3651,7 @@ TESObjectREFR* LowProcess::GetTargetForPackage(Actor* apActor, TESPackage* apPac
                                     float facquireDist_2;
                                     uint32_t iradius = apPackage->GetSearchLocationRadius(apActor);
                                     pCell = apPackage->GetSearchLocationCell(apActor);
-                                    pointB = *apPackage->GetSearchLocationCoord(&apResult, apActor);
+                                    pointB = apPackage->GetSearchLocationCoord(apActor);
                                     if (iradius) {
                                         facquireDist_2 = static_cast<float>(iradius);
                                     }
@@ -4284,7 +4283,6 @@ void LowProcess::ClearData() {
 
 void LowProcess::BuildMulitTargetObjectList(Actor* apActor, TESObjectREFR* pref, PACKAGE_OBJECT_TYPE eType) {
     uint32_t iradius_2;
-    NiPoint3 apResult;
     TESContainer* pCont = nullptr;
     if (pref) {
         pCont = pref->HasContainer();
@@ -4496,7 +4494,7 @@ void LowProcess::BuildMulitTargetObjectList(Actor* apActor, TESObjectREFR* pref,
         if (pCell && (v14 = GetCurrentPackage(), v14->GetPackageSearchLocation())) {
             uint32_t iradius = pPack->GetSearchLocationRadius(apActor);
             pCell = pPack->GetSearchLocationCell(apActor);
-            pointB = *pPack->GetSearchLocationCoord(&apResult, apActor);
+            pointB = pPack->GetSearchLocationCoord(apActor);
             if (pCell) {
                 if (iradius) {
                     *reinterpret_cast<float*>(&iradius_2) = static_cast<float>(iradius);

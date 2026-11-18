@@ -231,10 +231,8 @@ void PathSmoother::AddFirstEdge(const NiPoint3& aLeftLocation, const NiPoint3& a
     pPathEdge->pPrevRightEdge = pRightEdge;
     pLeftVert->EdgeList.Add(pPathEdge);
     pRightVert->EdgeList.Add(pPathEdge);
-    NiPoint3 kLeftNormal;
-    NiPoint3 kRightNormal;
-    (*Triangles)[0].pNavMesh->GetNormal(&kLeftNormal, (*Triangles)[0].sTriangle);
-    (*Triangles)[1].pNavMesh->GetNormal(&kRightNormal, (*Triangles)[1].sTriangle);
+    NiPoint3 kLeftNormal = (*Triangles)[0].pNavMesh->GetNormal((*Triangles)[0].sTriangle);
+    NiPoint3 kRightNormal = (*Triangles)[1].pNavMesh->GetNormal((*Triangles)[1].sTriangle);
     pPathEdge->fTriangleNormalDelta = kLeftNormal.Dot(kRightNormal);
     LeftVerts.Add(pLeftVert);
     RightVerts.Add(pRightVert);
@@ -269,10 +267,8 @@ void PathSmoother::AddLeftVert(const NiPoint3& aLocation, uint32_t aiEdgeIndex) 
     pPathEdge->pPrevRightEdge = *static_cast<BoundsEdge**>(RightEdges.GetTail());
     pVert->EdgeList.Add(pPathEdge);
     (*static_cast<UniqueVert**>(RightVerts.GetTail()))->EdgeList.Add(pPathEdge);
-    NiPoint3 kLeftNormal;
-    NiPoint3 kRightNormal;
-    (*Triangles)[aiEdgeIndex].pNavMesh->GetNormal(&kLeftNormal, (*Triangles)[aiEdgeIndex].sTriangle);
-    (*Triangles)[aiEdgeIndex + 1].pNavMesh->GetNormal(&kRightNormal, (*Triangles)[aiEdgeIndex + 1].sTriangle);
+    NiPoint3 kLeftNormal = (*Triangles)[aiEdgeIndex].pNavMesh->GetNormal((*Triangles)[aiEdgeIndex].sTriangle);
+    NiPoint3 kRightNormal = (*Triangles)[aiEdgeIndex + 1].pNavMesh->GetNormal((*Triangles)[aiEdgeIndex + 1].sTriangle);
     pPathEdge->fTriangleNormalDelta = kLeftNormal.Dot(kRightNormal);
     LeftVerts.Add(pVert);
     LeftEdges.Add(pBoundsEdge);
@@ -305,10 +301,8 @@ void PathSmoother::AddRightVert(const NiPoint3& aLocation, uint32_t aiEdgeIndex)
     pPathEdge->pPrevRightEdge = pBoundsEdge;
     pVert->EdgeList.Add(pPathEdge);
     (*static_cast<UniqueVert**>(LeftVerts.GetTail()))->EdgeList.Add(pPathEdge);
-    NiPoint3 kLeftNormal;
-    NiPoint3 kRightNormal;
-    (*Triangles)[aiEdgeIndex].pNavMesh->GetNormal(&kLeftNormal, (*Triangles)[aiEdgeIndex].sTriangle);
-    (*Triangles)[aiEdgeIndex + 1].pNavMesh->GetNormal(&kRightNormal, (*Triangles)[aiEdgeIndex + 1].sTriangle);
+    NiPoint3 kLeftNormal = (*Triangles)[aiEdgeIndex].pNavMesh->GetNormal((*Triangles)[aiEdgeIndex].sTriangle);
+    NiPoint3 kRightNormal = (*Triangles)[aiEdgeIndex + 1].pNavMesh->GetNormal((*Triangles)[aiEdgeIndex + 1].sTriangle);
     pPathEdge->fTriangleNormalDelta = kLeftNormal.Dot(kRightNormal);
     RightVerts.Add(pVert);
     RightEdges.Add(pBoundsEdge);

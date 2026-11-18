@@ -288,15 +288,13 @@ public:
         TESWorldSpace* apWorldSpace,
         float& aRetHeight
     );
-    static NiPoint3* ComputeInitialTangentForActor(
-        NiPoint3* apResult,
+    static NiPoint3 ComputeInitialTangentForActor(
         float afHeading,
         const PathingLocation& aLocation,
         const PathingLocation& aNextLocation,
         float afRadius
     );
-    static NiPoint3*
-    ComputeFinalTangentForActor(NiPoint3* apResult, float afHeading, const PathingLocation& aLocation, float afRadius);
+    static NiPoint3 ComputeFinalTangentForActor(float afHeading, const PathingLocation& aLocation, float afRadius);
 };
 
 extern SettingT<INISettingCollection> fFindClosestEdgesRadius;

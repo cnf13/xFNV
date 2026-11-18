@@ -38,7 +38,6 @@ CombatProcedureAttackGrenade::CombatProcedureAttackGrenade(const NiPoint3& arTar
 CombatProcedureAttackGrenade::~CombatProcedureAttackGrenade() {}
 
 void CombatProcedureAttackGrenade::Update() {
-    NiPoint3 a1;
     Actor* pattacker = GetAttacker();
     Actor* ptarget = GetTarget();
     CombatState* pcombatState = pCombatController->pCombatState;
@@ -58,7 +57,7 @@ void CombatProcedureAttackGrenade::Update() {
         }
         if (pcombatState->GetHasBufferedDetection() && !pcombatState->bTargetSpaceDifferent) {
             pCombatDialogueManager->StartDialogue(pCombatController, DT_COMBAT, 0, false);
-            TargetedPoint = *CalculateTargetedPoint(&a1);
+            TargetedPoint = CalculateTargetedPoint();
             float fminRange = 0.0f;
             float fmaxRange = 0.0f;
             float fabsoluteMaxRange = 0.0f;
@@ -268,11 +267,9 @@ bool CombatProcedureAttackGrenade::CheckExplosion(BGSExplosion* apExplosion, con
     return false;
 }
 
-NiPoint3* CombatProcedureAttackGrenade::CalculateTargetedPoint(NiPoint3* a1) {
-    NiPoint3 v11;
-    NiPoint3 arResult;
+NiPoint3 CombatProcedureAttackGrenade::CalculateTargetedPoint() {
     if (bTargetLocation || GetTarget()) {
-        NiPoint3* ProjectedPointForTarget;
+        NiPoint3 ecx0;
         float v9;
         TESObjectWEAP* CurrentWeapon = pCombatController->GetCurrentWeapon();
         Actor* Attacker = GetAttacker();
@@ -287,23 +284,19 @@ NiPoint3* CombatProcedureAttackGrenade::CalculateTargetedPoint(NiPoint3* a1) {
         bool bHighArc = this->bHighArc;
         if (bTargetLocation) {
             Actor* v6 = GetAttacker();
-            ProjectedPointForTarget = CombatUtilities::GetProjectedPointForTarget(
-                &v11, v6, TargetLocation, nullptr, apProjectile, afProjectileSpeed, bHighArc
+            ecx0 = CombatUtilities::GetProjectedPointForTarget(
+                v6, TargetLocation, nullptr, apProjectile, afProjectileSpeed, bHighArc
             );
         }
         else {
             Actor* Target = GetTarget();
             Actor* v4 = GetAttacker();
-            ProjectedPointForTarget =
-                &(arResult = CombatUtilities::GetProjectedPointForTarget(
-                      v4, Target, nullptr, apProjectile, afProjectileSpeed, bHighArc
-                  ));
+            ecx0 = CombatUtilities::GetProjectedPointForTarget(
+                v4, Target, nullptr, apProjectile, afProjectileSpeed, bHighArc
+            );
         }
-        NiPoint3 ecx0 = *ProjectedPointForTarget;
-        *a1 = ecx0;
-        return a1;
+        return ecx0;
     }
 
-    *a1 = NiPoint3_ZERO;
-    return a1;
+    return NiPoint3_ZERO;
 }
