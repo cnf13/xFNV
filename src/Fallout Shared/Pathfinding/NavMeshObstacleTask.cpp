@@ -40,7 +40,7 @@ void ObstacleTaskData::Process() {
         }
         NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, v11);
         spNewNavMesh.operator=(*ptr);
-        apResult.~NavMeshPtr();
+        apResult = nullptr;
         spSrcMesh.m_pObject->MakeCopyForObstacle(spNewNavMesh);
         SortOperations();
         for (int32_t a2 = 0;; ++a2) {

@@ -359,7 +359,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
             *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
         }
         apChunkBuffer += sizeof(uint32_t);
-        spNavMesh.~NavMeshPtr();
+        spNavMesh = nullptr;
     }
     uiValue = PreferredAdjacentNavMeshes.GetSize();
     if (TESForm::QEndianSwapOnSave()) {
@@ -380,7 +380,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
             *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
         }
         apChunkBuffer += sizeof(uint32_t);
-        spNavMesh.~NavMeshPtr();
+        spNavMesh = nullptr;
     }
     uiValue = ConnectedDoors.GetSize();
     if (TESForm::QEndianSwapOnSave()) {

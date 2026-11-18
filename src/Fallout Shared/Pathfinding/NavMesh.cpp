@@ -779,7 +779,7 @@ bool NavMesh::GetMatchingEdge_0(
     }
     NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pOtherNavMesh);
     apReturnNavMesh->operator=(*ptr);
-    apResult.~NavMeshPtr();
+    apResult = nullptr;
     return true;
 }
 

@@ -1034,7 +1034,7 @@ bool PathBuilder::RunNavMeshSearch(
     ::new (pStartMesh) NavMeshPtr;
     uint16_t usStartTriangle;
     if (!aStartLocation.GetNavMeshAndTriangle(*pStartMesh, usStartTriangle)) {
-        pStartMesh->~NavMeshPtr();
+        *pStartMesh = nullptr;
         return false;
     }
     FastNavMeshTriHandle kStart;
@@ -1046,8 +1046,8 @@ bool PathBuilder::RunNavMeshSearch(
     ::new (pGoalMesh) NavMeshPtr;
     uint16_t usGoalTriangle;
     if (!aGoalLocation.GetNavMeshAndTriangle(*pGoalMesh, usGoalTriangle)) {
-        pGoalMesh->~NavMeshPtr();
-        pStartMesh->~NavMeshPtr();
+        *pGoalMesh = nullptr;
+        *pStartMesh = nullptr;
         return false;
     }
     FastNavMeshTriHandle kGoal;
@@ -1065,8 +1065,8 @@ bool PathBuilder::RunNavMeshSearch(
         reinterpret_cast<const NavMeshSearchNode&>(kGoal), aNodes, aLinks, &DetailedPathInfos
     );
     pSearch->~NavMeshSearch();
-    pGoalMesh->~NavMeshPtr();
-    pStartMesh->~NavMeshPtr();
+    *pGoalMesh = nullptr;
+    *pStartMesh = nullptr;
     return bFound;
 }
 
@@ -1302,7 +1302,7 @@ bool PathBuilder::CheckClosestEdgeToGoal(
             pLocation->~PathingLocation();
         }
     }
-    pspNavMesh->~NavMeshPtr();
+    *pspNavMesh = nullptr;
     return bResult;
 }
 

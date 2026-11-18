@@ -331,7 +331,7 @@ bool PathingLocation::ResolveNavMeshInfo(FindTriangleForLocationFilter* apFilter
         if (pNavMesh->GetNavMesh(spNavMesh)) {
             usTriangle = spNavMesh->FindTriangleForLocation(Location, apFilter);
         }
-        spNavMesh.~NavMeshPtr();
+        spNavMesh = nullptr;
         return true;
     }
 
@@ -348,11 +348,11 @@ bool PathingLocation::ResolveNavMeshInfo(FindTriangleForLocationFilter* apFilter
                     pNavMeshes = nullptr;
                     usTriangle = usFoundTriangle;
                     SetAllMeshesReachable(kFlagAllMeshesReachable);
-                    spNavMesh.~NavMeshPtr();
+                    spNavMesh = nullptr;
                     return true;
                 }
             }
-            spNavMesh.~NavMeshPtr();
+            spNavMesh = nullptr;
         }
         // Otherwise move onto the closest triangle, keeping the point itself.
         const NiPoint3 kLocation = Location;
@@ -385,7 +385,7 @@ bool PathingLocation::ResolveNavMeshInfo(FindTriangleForLocationFilter* apFilter
                 usTriangle = spNavMesh->FindTriangleForLocation(Location, apFilter);
             }
             SetAllMeshesReachable(kFlagAllMeshesReachable);
-            spNavMesh.~NavMeshPtr();
+            spNavMesh = nullptr;
             return true;
         }
     }

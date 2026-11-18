@@ -626,12 +626,12 @@ PathingLocation* Pathing::FindClosestReachableLocation(
     uint16_t usStartTriangle;
     if (!aStartLocation.GetNavMeshAndTriangle(*pspStartMesh, usStartTriangle)) {
         ::new (apResult) PathingLocation(aStartLocation);
-        pspStartMesh->~NavMeshPtr();
+        *pspStartMesh = nullptr;
         return apResult;
     }
     kStartNode.pNavMesh = pspStartMesh->operator->();
     kStartNode.usTriangle = usStartTriangle;
-    pspStartMesh->~NavMeshPtr();
+    *pspStartMesh = nullptr;
     FastNavMeshTriHandle kGoalNode;
     kGoalNode.pNavMesh = nullptr;
     kGoalNode.usTriangle = 0xFFFF;
@@ -643,7 +643,7 @@ PathingLocation* Pathing::FindClosestReachableLocation(
             kGoalNode.pNavMesh = pspGoalMesh->operator->();
             kGoalNode.usTriangle = usGoalTriangle;
         }
-        pspGoalMesh->~NavMeshPtr();
+        *pspGoalMesh = nullptr;
     }
     alignas(NavMeshSearchMaxCost) uint8_t aSearchStorage[sizeof(NavMeshSearchMaxCost)];
     NavMeshSearchMaxCost* pSearch = ::new (aSearchStorage) NavMeshSearchMaxCost;
@@ -1523,7 +1523,7 @@ bool Pathing::FindNavmeshesForLocation(
                 for (uint32_t j = 0; j < padjCell->GetNavMeshArray()->GetNavMeshCount(); ++j) {
                     NavMeshPtr* pnavMesh = padjCell->GetNavMeshArray()->GetNavMeshByIndex(&spnavMesh, j);
                     apRetNavMeshes->Add(*pnavMesh);
-                    spnavMesh.~NavMeshPtr();
+                    spnavMesh = nullptr;
                 }
             }
         }
@@ -2390,7 +2390,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                 }
                 NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apResult, i);
                 apRetNavMeshes->Add(*aItem);
-                apResult.~NavMeshPtr();
+                apResult = nullptr;
             }
         }
     }
@@ -2408,7 +2408,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                         }
                         NavMeshPtr* NavMeshByIndex = parray_2->GetNavMeshByIndex(&apMemory, i_3);
                         apRetNavMeshes->Add(*NavMeshByIndex);
-                        apMemory.~NavMeshPtr();
+                        apMemory = nullptr;
                     }
                 }
             }

@@ -174,7 +174,7 @@ bool NavMeshInfoMap::Load(TESFile* apFile) {
                     pDoors->~BSSimpleArray<TESObjectREFR*>();
                     pPreferred->~BSSimpleArray<NavMeshInfo*>();
                     pAdjacent->~BSSimpleArray<NavMeshInfo*>();
-                    pNavMesh->~NavMeshPtr();
+                    *pNavMesh = nullptr;
                 }
                 else {
                     InfoMap.SetAt(pNewInfo->GetNavMeshID(), pNewInfo);

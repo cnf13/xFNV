@@ -427,7 +427,7 @@ void BSTextureManager::Update(NiCamera* apCamera, bool abMenuMode) {
             if (!pData->bUsedThisFrame && !(pData->uFlags & BT_FLAG_TILED)) {
                 // RemovePos advances kPos.
                 unusedRTPool.RemovePos(kPos);
-                pData->spRenderedTexture.~NiPointer();
+                pData->spRenderedTexture = nullptr;
                 MemoryManager_Singleton.Deallocate(pData);
                 continue;
             }

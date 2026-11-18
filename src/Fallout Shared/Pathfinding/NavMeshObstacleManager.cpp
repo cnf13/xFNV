@@ -963,20 +963,20 @@ bool NavMeshObstacleManager::ReconnectPortals() {
                         pPortalSwaps->PotentialChildren.RemoveFast(uiChild, 1);
                         --uiChild;
                         bConnected = true;
-                        spMatchMesh.~NavMeshPtr();
+                        spMatchMesh = nullptr;
                         break;
                     }
-                    spMatchMesh.~NavMeshPtr();
+                    spMatchMesh = nullptr;
                     continue;
                 }
                 if (kMatchEdge.usTriangle >= spMatchMesh.operator->()->GetTriangleCount()) {
-                    spMatchMesh.~NavMeshPtr();
+                    spMatchMesh = nullptr;
                     continue;
                 }
                 if (spMatchMesh.operator->()
                         ->GetTriangle(kMatchEdge.usTriangle)
                         ->GetFlag(NavMeshTriangle::NAV_TRI_DISABLED)) {
-                    spMatchMesh.~NavMeshPtr();
+                    spMatchMesh = nullptr;
                     continue;
                 }
                 NiPoint3 kMatchStart = spMatchMesh.operator->()
@@ -997,10 +997,10 @@ bool NavMeshObstacleManager::ReconnectPortals() {
                     pPortalSwaps->PotentialChildren.RemoveFast(uiChild, 1);
                     --uiChild;
                     bConnected = true;
-                    spMatchMesh.~NavMeshPtr();
+                    spMatchMesh = nullptr;
                     break;
                 }
-                spMatchMesh.~NavMeshPtr();
+                spMatchMesh = nullptr;
             }
         }
     }
@@ -1384,7 +1384,7 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
                 for (uint32_t j = 0; j < parray->GetNavMeshCount(); ++j) {
                     NavMeshPtr* NavMeshByIndex = parray->GetNavMeshByIndex(&apResult, j);
                     bool Bounds = NavMeshByIndex->m_pObject->NavMesh::GetBounds(navmeshMin, navmeshMax);
-                    apResult.~NavMeshPtr();
+                    apResult = nullptr;
                     if (Bounds) {
                         navmeshMax.z = navmeshMax.z + 128.0;
                         if (Pathing::DoAABBsOverlap(
@@ -1392,7 +1392,7 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
                             )) {
                             NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apMemory, j);
                             apReturnNavMeshArray->Add(*aItem);
-                            apMemory.~NavMeshPtr();
+                            apMemory = nullptr;
                         }
                     }
                 }

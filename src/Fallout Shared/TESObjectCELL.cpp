@@ -916,7 +916,7 @@ TESForm* TESObjectCELL::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
             alignas(NavMeshPtr) uint8_t aNavMeshStorage[sizeof(NavMeshPtr)];
             NavMeshPtr& spNavMesh = *reinterpret_cast<NavMeshPtr*>(aNavMeshStorage);
             TESForm* pNavMesh = pNavMeshes->GetNavMeshByIndex(&spNavMesh, i)->operator->();
-            spNavMesh.~NavMeshPtr();
+            spNavMesh = nullptr;
             if (pNavMesh && !pNavMesh->GetDelete()) {
                 NavMesh* pNewNavMesh = dynamic_cast<NavMesh*>(pNavMesh->CreateDuplicateForm(false, apCopyMap));
                 if (pNewNavMesh) {
@@ -924,13 +924,13 @@ TESForm* TESObjectCELL::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
                     alignas(NavMeshPtr) uint8_t aMadeStorage[sizeof(NavMeshPtr)];
                     NavMeshPtr& spMade = *reinterpret_cast<NavMeshPtr*>(aMadeStorage);
                     spCopy = *NavMeshPtr::MakeNavMeshPtr(&spMade, pNewNavMesh);
-                    spMade.~NavMeshPtr();
+                    spMade = nullptr;
                     // SWEEP-INLINE 0x42fa20
                     pCell->pNavMeshes->AddNavMesh(spCopy);
                 }
             }
         }
-        spCopy.~NavMeshPtr();
+        spCopy = nullptr;
     }
     CellRefLockEnter();
     alignas(BSSimpleList<TESObjectREFR*>) uint8_t aListStorage[sizeof(BSSimpleList<TESObjectREFR*>)];
@@ -1486,7 +1486,7 @@ void TESObjectCELL::InitItem() {
             GetNavMeshArray()->GetNavMeshByIndex(&spNavMesh, i);
             spNavMesh->InitItem();
             pSaveLoadGame->LoadForm(static_cast<NavMesh*>(spNavMesh));
-            spNavMesh.~NavMeshPtr();
+            spNavMesh = nullptr;
         }
     }
     pSaveLoadGame->SetThreadAllowChanges(bOldAllowChanges);
@@ -6391,12 +6391,12 @@ void TESObjectCELL::UnLoadAllTempData() {
             NavMeshPtr* NavMeshByIndex = pNavMeshes->GetNavMeshByIndex(&apResult, aiNavMeshIndex);
             TESForm* Object = NavMeshByIndex->m_pObject;
             TESFile* v12 = Object->GetFile(-1);
-            apResult.~NavMeshPtr();
+            apResult = nullptr;
             if (!v12 || v12->GetMaster()) {
                 pNavMeshes->GetNavMeshByIndex(&apCell, aiNavMeshIndex);
                 pSaveLoadGame->UnloadForm(apCell.operator NavMesh*(), false);
                 pNavMeshes->RemoveNavMeshByIndex(aiNavMeshIndex--);
-                apCell.~NavMeshPtr();
+                apCell = nullptr;
             }
         }
     }
@@ -8462,7 +8462,7 @@ void TESObjectCELL::RenderTestCell(
                     parray->GetNavMeshByIndex(&spnavmesh, static_cast<uint32_t>(i));
                     uint32_t itricount = spnavmesh.m_pObject->GetTriangleCount();
                     itotaltricount += itricount;
-                    spnavmesh.~NavMeshPtr();
+                    spnavmesh = nullptr;
                 }
                 Warning("Testing %i NavMesh triangles.", itotaltricount);
                 for (int32_t i_2 = 0;; ++i_2) {
@@ -8481,7 +8481,7 @@ void TESObjectCELL::RenderTestCell(
                             }
                         }
                     }
-                    spnavmesh_2.~NavMeshPtr();
+                    spnavmesh_2 = nullptr;
                 }
             }
             else {
