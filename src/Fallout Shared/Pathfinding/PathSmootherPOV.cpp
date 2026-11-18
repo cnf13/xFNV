@@ -87,7 +87,7 @@ PathSmootherPOVSearch::PathEdgeVert* PathSmootherPOVSearch::PathEdgeVert::Assign
     PathSmootherPOVSearch::PathEdgeVert* apThis,
     const PathSmootherPOVSearch::PathEdgeVert& arOther
 ) {
-    XFNV_RECONSTRUCT(FastNavMeshVertHandle)(&apThis->Vert, arOther.Vert);
+    ::new (&apThis->Vert) FastNavMeshVertHandle(arOther.Vert);
     apThis->Edge.Copy(arOther.Edge);
     apThis->iOtherSideIndex = arOther.iOtherSideIndex;
     apThis->iThisSideIndex = arOther.iThisSideIndex;

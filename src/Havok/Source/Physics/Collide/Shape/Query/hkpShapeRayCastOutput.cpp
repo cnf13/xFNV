@@ -18,8 +18,10 @@ void hkpShapeRayCastOutput::reset() {
     m_shapeKeys[0] = (-1);
 }
 
+// Resets the collector output (no hit, no extra info), then the shape keys.
 void hkpShapeRayCastOutput::reset_0() {
-    XFNV_RECONSTRUCT(hkpShapeRayCastCollectorOutput)(this);
+    m_hitFraction = 1.0f;
+    m_extraInfo = -1;
     reset();
 }
 

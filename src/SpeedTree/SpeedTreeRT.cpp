@@ -2152,8 +2152,7 @@ void CSpeedTreeRT::ParseSupplementalTexCoordInfo(CTreeFileAccess* pFile) {
             switch (eToken) {
                 case File_SupplementalCompositeFilename: {
                     std::string strFilename = pFile->ParseString();
-                    CIdvFilename cFilename;
-                    XFNV_RECONSTRUCT_AS(CopyConstruct, std::string)(&cFilename, strFilename);
+                    CIdvFilename cFilename(strFilename);
                     CIdvFilename cNoPath;
                     m_pEmbeddedTexCoords->m_strCompositeFilename.assign(
                         *cFilename.NoPath(&cNoPath), 0, std::string::npos

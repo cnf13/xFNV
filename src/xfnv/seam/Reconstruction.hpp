@@ -60,30 +60,6 @@ namespace xfnv {
     ::xfnv::NativeInlinedLocal<type> name##Storage_{atStart, atEnd};                                                   \
     type& name = name##Storage_.object()
 
-// What were calls of a class's Construct static, as the C++ each stands for: the type is the macro's argument (a
-// template id with commas needs no alias), the call's own arguments follow: `XFNV_RECONSTRUCT(NiPoint3)(&kPoint, 0.0f,
-// 0.0f, 0.0f)`. The _AS form named an exe copy of the static under another name, which it still carries; it is the
-// plain form.
-#define XFNV_RECONSTRUCT(...) ::xfnv::reconstruct<__VA_ARGS__>
-#define XFNV_RECONSTRUCT_AS(name, ...) ::xfnv::reconstruct<__VA_ARGS__>
-
-    // XFNV_RECONSTRUCT: the object exists already (C++ constructed it, as a local or a member), so it is destroyed and
-    // constructed again. At parity the call goes: the object's own declaration or its owner's initializer list
-    // constructs it with these arguments. With no arguments the object is default-initialised (`new (object) T`): the
-    // exe's constructor runs its own stores and nothing else, where `T()` would value-initialise a T without a
-    // user-provided default constructor and zero it first.
-    template <class T, class... A>
-    inline T* reconstruct(void* object, A&&... args) {
-        T* pObject = static_cast<T*>(object);
-        pObject->~T();
-        if constexpr (sizeof...(A) == 0) {
-            return ::new (object) T;
-        }
-        else {
-            return ::new (object) T(std::forward<A>(args)...);
-        }
-    }
-
     // The array cookie of MSVC's new[] for an element type with a destructor: the element count in one size_t slot
     // right before the array (4 bytes on x86, as the exe has it; 8 on x64, as MSVC x64 lays it out). arrayCount(p)
     // reads the count of the array p; arrayBlock(p) is the block new[] allocated, which delete[] frees. They stand for

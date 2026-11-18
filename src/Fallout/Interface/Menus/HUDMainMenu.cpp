@@ -3472,18 +3472,13 @@ bool HUDMainMenu::SetInfoForRef(TESObjectREFR* apObject, bool abTelekinesis, boo
     bool bHasSecondaryItem = pProjectile && pProjectile->GetSecondaryItemChange();
     TESObjectWEAP* pSourceWeapon = pProjectile ? pProjectile->GetWeaponSource() : nullptr;
     TESObjectWEAP* pThrownWeapon = pSourceWeapon && pSourceWeapon->IsThrownWeapon() ? pSourceWeapon : nullptr;
-    ItemChange kTempItem;
-    ItemChange* pSourceItem;
-    if (bHasSecondaryItem) {
-        pSourceItem = pProjectile->GetSecondaryItemChange();
-    }
-    else {
-        TESBoundObject* pItemObject = pThrownWeapon ? pThrownWeapon : apObject->GetObjectReference();
-        pSourceItem = XFNV_RECONSTRUCT(ItemChange)(&kTempItem, pItemObject, 0);
-    }
-    ItemChange kItem;
-    kItem.~ItemChange();
-    ::new (&kItem) ItemChange(pSourceItem);
+    // The temporary is bound to a const reference only to take its address, as the game's `&ItemChange(...)` does.
+    ItemChange kItem(
+        bHasSecondaryItem ? pProjectile->GetSecondaryItemChange()
+                          : &static_cast<const ItemChange&>(
+                                ItemChange(pThrownWeapon ? pThrownWeapon : apObject->GetObjectReference(), 0)
+                            )
+    );
     if (!kItem.pExtraObjectList) {
         void* pMemory = ourMalloc(sizeof(BSSimpleList<ExtraDataList*>));
         kItem.pExtraObjectList = pMemory ? ::new (pMemory) BSSimpleList<ExtraDataList*> : nullptr;
