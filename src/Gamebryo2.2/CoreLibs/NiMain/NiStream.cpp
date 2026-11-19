@@ -401,7 +401,7 @@ bool NiStream::LoadHeader() {
                 m_uiNifFileVersion = GetVersion(10, 0, 1, 1);
             }
         }
-        bool ucLength;
+        uint8_t ucLength;
         NiStreamLoadBinary(*this, ucLength);
         NiStreamLoadBinary(*this, m_BSStreamHeader.cAuthor, ucLength);
         NiStreamLoadBinary(*this, ucLength);
