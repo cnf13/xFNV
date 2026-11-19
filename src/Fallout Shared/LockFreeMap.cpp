@@ -108,6 +108,9 @@ void* GetTlsValue(uint32_t dwTlsIndex) {
     return TlsGetValue(dwTlsIndex);
 }
 
+// ThreadSpecificInterfaceManager's destructor as instantiated over LockFreeQueue<bhkRigidBody*>'s interface (the exe's
+// only caller is that queue's RemoveAll, through sub_6C71A0): every thread's interface goes through
+// LockFreeQueueInterface's non-virtual deleting destructor, then the table and the TLS index are freed.
 void sub_6C74A0(ThreadSpecificInterfaceManager* apThis, [[maybe_unused]] void* apEdx) {
     uint32_t i;
     InterfacedClass::BaseInterface* pInterface;

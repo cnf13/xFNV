@@ -47,13 +47,12 @@ void bhkCachingShapePhantom::Init(const hkSerializableCinfo& arInfo) {
     PostInit(arInfo);
 }
 
-// The scope is charged to the Havok heap context; the info is freed through hkWorldObjectCinfo's deleting destructor,
-// called directly.
+// The scope is charged to the Havok heap context; the info is deleted as the hkShapePhantomCinfo CreateCinfo made.
 void bhkCachingShapePhantom::KillCinfo(bool abCreated) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     if (abCreated) {
         if (pInfo) {
-            delete static_cast<hkWorldObjectCinfo*>(pInfo);
+            delete static_cast<hkShapePhantomCinfo*>(pInfo);
         }
         pInfo = nullptr;
     }

@@ -463,13 +463,12 @@ bool bhkRigidBody::Remove() {
     return bhkEntity::Remove();
 }
 
-// The scope is charged to the Havok heap context; the info is freed through hkWorldObjectCinfo's deleting destructor,
-// called directly.
+// The scope is charged to the Havok heap context; the info is deleted as the bhkRigidBodyCinfo CreateCinfo made.
 void bhkRigidBody::KillCinfo(bool abCreated) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     if (abCreated) {
         if (pInfo) {
-            delete static_cast<hkWorldObjectCinfo*>(pInfo);
+            delete static_cast<bhkRigidBodyCinfo*>(pInfo);
         }
         pInfo = nullptr;
     }

@@ -87,7 +87,7 @@ void bhkAabbPhantom::KillCinfo(bool abCreated) {
     if (abCreated) {
         hkSerializableCinfo* pInfo = this->pInfo;
         if (pInfo) {
-            delete static_cast<hkWorldObjectCinfo*>(pInfo);
+            delete static_cast<hkAabbPhantomCinfo*>(pInfo);
         }
         this->pInfo = nullptr;
     }

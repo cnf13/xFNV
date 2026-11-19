@@ -433,9 +433,9 @@ void LockFreeQueue<T>::Push(const T& aData) {
 }
 
 // Under the lock and in the task memory context: drops the interface manager with every thread's interface (the manager
-// instance over LockFreeQueueInterface deletes them, ThreadSpecificInterfaceManager::DestructOf; the standalone manager
-// does not know their class), frees every node with its item released; unless abCalledByDestructor, a new empty node
-// and a new manager for as many threads.
+// instance over LockFreeQueueInterface deletes them, as sub_6C74A0 does for LockFreeQueue<bhkRigidBody*>; the
+// standalone manager does not know their class), frees every node with its item released; unless abCalledByDestructor,
+// a new empty node and a new manager for as many threads.
 template <class T>
 void LockFreeQueue<T>::RemoveAll(bool abCalledByDestructor) {
     kLock.Lock(nullptr);

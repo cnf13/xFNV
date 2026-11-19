@@ -77,13 +77,13 @@ void bhkSimpleShapePhantom::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings
     iMemContext = iSavedMemContext;
 }
 
-// The scope is charged to the Havok heap context; the info is freed through hkWorldObjectCinfo's deleting destructor,
-// called directly.
+// The scope is charged to the Havok heap context; the info is deleted as the hkSimpleShapePhantomCinfo CreateCinfo
+// made.
 void bhkSimpleShapePhantom::KillCinfo(bool abCreated) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     if (abCreated) {
         if (pInfo) {
-            delete static_cast<hkWorldObjectCinfo*>(pInfo);
+            delete static_cast<hkSimpleShapePhantomCinfo*>(pInfo);
         }
         pInfo = nullptr;
     }
@@ -121,11 +121,12 @@ hkSerializableCinfo& bhkSimpleShapePhantom::CreateCinfo(bool& arCreated) {
     const bool bCreated = this->pInfo == nullptr;
     arCreated = bCreated;
     if (bCreated) {
-        uint8_t* pMemory = static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(sizeof(hkShapePhantomCinfo) + 0x10));
+        uint8_t* pMemory =
+            static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(sizeof(hkSimpleShapePhantomCinfo) + 0x10));
         const uint8_t ucPadding = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pMemory) & 0xF));
         pMemory += ucPadding;
         pMemory[-1] = ucPadding;
-        hkSimpleShapePhantomCinfo* pInfo = static_cast<hkSimpleShapePhantomCinfo*>(::new (pMemory) hkShapePhantomCinfo);
+        hkSimpleShapePhantomCinfo* pInfo = ::new (pMemory) hkSimpleShapePhantomCinfo;
         const bool bHasObject = this->phkObject != nullptr;
         this->pInfo = pInfo;
         if (bHasObject) {
