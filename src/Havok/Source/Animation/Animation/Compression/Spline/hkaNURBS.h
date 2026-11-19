@@ -8,9 +8,8 @@
 class hkaNURBS {
 public:
     struct Point {
-        // The default constructor leaves the four floats uninitialised.
-        Point() = default;
-        Point(float x, float y, float z, float w);
+        // The components default to 0, so a default-constructed point is the zero point.
+        Point(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 0.0f);
 
         hkaNURBS::Point abs();
         hkaNURBS::Point floor();

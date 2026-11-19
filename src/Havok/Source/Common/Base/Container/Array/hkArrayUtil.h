@@ -66,7 +66,8 @@ public:
     // The class versions of construct, constructWithCopy and constructWithArray (and destruct above) run each element's
     // C++ constructor or destructor. Where an element type's class has none (it uses static Construct/Destruct
     // instead), that type gets an explicit specialization and any other use fails to link; otherwise the generic bodies
-    // follow the class.
+    // follow the class. construct default-initialises, as the SDK does: an element type with no constructor of its own
+    // is left unwritten.
     template <typename T>
     static void construct(T* t, int32_t n, hkTypeIsClass);
     template <typename T>
@@ -93,7 +94,7 @@ void hkArrayUtil::construct(T* t, int32_t n, const T& tcopy, hkTraitBool<false>)
 template <typename T>
 void hkArrayUtil::construct(T* t, int32_t n, hkTypeIsClass) {
     for (int32_t i = 0; i < n; ++i) {
-        new (t + i) T();
+        new (t + i) T;
     }
 }
 

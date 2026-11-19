@@ -2530,13 +2530,10 @@ int32_t hkgpConvexHullImpl::build(
         m_pendings.clear();
         m_pendings.setSize(numPoints);
         for (int32_t i = 0; i < numPoints; ++i) {
-            // The SDK's Vertex() sets m_scratch and m_index only.
             Vertex v;
-            v.m_scratch = 0.0f;
             v.m_source = points[i];
             hkVector4 x;
             x.m_quad = _mm_mul_ps(_mm_sub_ps(points[i].m_quad, m_origin.m_quad), m_scale.m_quad);
-            v.m_index = -1;
             // Each coordinate clamped to -8192..8191 and rounded half away from zero.
             for (int32_t k = 0; k < 3; ++k) {
                 float f = x.m_quad[k];
@@ -2578,8 +2575,6 @@ int32_t hkgpConvexHullImpl::build(
             switch (m_dimensions) {
                 case 0: {
                     Vertex item;
-                    item.m_scratch = 0.0f;
-                    item.m_index = -1;
                     Vertex* pVertex = m_mesh.m_vertices.allocate(item);
                     makeVertex(m_pendings[0], pVertex);
                     break;
@@ -2612,12 +2607,8 @@ int32_t hkgpConvexHullImpl::build(
                         continue;
                     }
                     Vertex itemA;
-                    itemA.m_scratch = 0.0f;
-                    itemA.m_index = -1;
                     Vertex* pA = m_mesh.m_vertices.allocate(itemA);
                     Vertex itemB;
-                    itemB.m_scratch = 0.0f;
-                    itemB.m_index = -1;
                     Vertex* pB = m_mesh.m_vertices.allocate(itemB);
                     makeVertex(a, pA);
                     makeVertex(b, pB);
@@ -2755,8 +2746,6 @@ int32_t hkgpConvexHullImpl::build(
                         }
                         for (int32_t i = 0; i < m_pendings.m_size; ++i) {
                             Vertex item;
-                            item.m_scratch = 0.0f;
-                            item.m_index = -1;
                             Vertex* pVertex = m_mesh.m_vertices.allocate(item);
                             makeVertex(m_pendings[i], pVertex);
                         }
@@ -2980,10 +2969,8 @@ bool hkgpConvexHullImpl::flushPending() {
         }
     }
     m_projectionPlane.m_quad = hkVector4Zero.m_quad;
-    // The SDK's Vertex() and Triangle() temporaries handed to allocate: their constructors set only these fields.
+    // The SDK's Vertex() and Triangle() temporaries handed to allocate: Triangle's constructor sets only these fields.
     Vertex vertexItem;
-    vertexItem.m_scratch = 0.0f;
-    vertexItem.m_index = -1;
     Triangle triangleItem;
     triangleItem.m_plane.m_index = -1;
     triangleItem.m_index = -1;
@@ -4732,14 +4719,11 @@ hkgpConvexHullImpl* hkgpConvexHullImpl::clone() const {
                 static_cast<int32_t>(sizeof(Vertex))
             );
         }
-        // The new elements are constructed in place (null-tested as placement new does): Vertex's constructor
-        // clears m_scratch and sets m_index to -1.
+        // The new elements are constructed in place, null-tested as placement new does.
         Vertex* pElem = pClone->m_pendings.m_data + pClone->m_pendings.m_size;
         for (int32_t n = numPendings - pClone->m_pendings.m_size; n > 0; --n, ++pElem) {
             if (pElem) {
-                // EXE-INLINED none: hkgpConvexHullImpl::Vertex::Vertex
-                pElem->m_scratch = 0.0f;
-                pElem->m_index = -1;
+                ::new (pElem) Vertex();
             }
         }
         pClone->m_pendings.m_size = numPendings;

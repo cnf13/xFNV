@@ -147,6 +147,10 @@ class hkDataClass {
 public:
     // One member's description, as getDeclaredMemberInfo and getMemberInfo fill it.
     struct MemberInfo {
+        // An empty description: no name, owner or class, type void, tuple count 0.
+        MemberInfo()
+          : m_name(nullptr), m_owner(nullptr), m_type(hkDataObject::TYPE_VOID), m_class(nullptr), m_tupleCount(0) {}
+
         const char* m_name;
         // The class that declares the member.
         const hkDataClassImpl* m_owner;

@@ -386,6 +386,9 @@ public:
     // quantization m_origin, m_scale and m_scaleInv define), a float scratch slot the hull's passes use, a reference
     // count and the vertex's index in the mesh. The coordinates are compared as integers.
     struct Vertex : hkgpAbstractMeshDefinitions::Vertex<Vertex, hkgpConvexHull::Vertex> {
+        // Clears the scratch slot and marks the vertex unindexed (-1); the other fields are left unset.
+        Vertex() : m_scratch(0.0f), m_index(-1) {}
+
         // Orders vertices by their integer coordinates, the first differing one deciding (signed compares): the
         // operator hkAlgorithm::less<Vertex> calls.
         bool operator<(const Vertex& other) const {

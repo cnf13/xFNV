@@ -293,6 +293,9 @@ public:
 
     // An edge keyed by its two vertices, for the hash table that matches open edges, and how often it was met.
     struct SingleEdge {
+        // Both vertices and the edge null, no references.
+        SingleEdge() : m_a(nullptr), m_b(nullptr), m_e(), m_refs(0) {}
+
         const hkgpMeshBase::Vertex* m_a;
         const hkgpMeshBase::Vertex* m_b;
         hkgpMeshBase::Edge m_e;

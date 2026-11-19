@@ -405,13 +405,7 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
                 value.asArray().getClass(&structClass);
                 writeClass(structClass);
                 for (int32_t i = 0; i < structClass.getNumMembers(); ++i) {
-                    // EXE-INLINED none: hkDataClass::MemberInfo::MemberInfo
                     hkDataClass::MemberInfo minfo;
-                    minfo.m_name = nullptr;
-                    minfo.m_owner = nullptr;
-                    minfo.m_type = hkDataObject::TYPE_VOID;
-                    minfo.m_class = nullptr;
-                    minfo.m_tupleCount = 0;
                     structClass.getMemberInfo(i, minfo);
                     if (minfo.m_type != hkDataObject::TYPE_OBJECT) {
                         continue;

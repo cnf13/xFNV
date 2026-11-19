@@ -160,15 +160,11 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
 
             hkLocalArray<hkDataClass::MemberInfo> minfo(iNumMembers);
             // EXE-INLINED none: hkArray<hkDataClass::MemberInfo>::setSize; the capacity is iNumMembers already, so the
-            // exe has no reserve. Each new element is value-initialised by a placement new (its null test kept).
+            // exe has no reserve. Each new element is constructed by a placement new (its null test kept).
             hkDataClass::MemberInfo* pInfo = minfo.m_data + minfo.m_size;
             for (int32_t iNew = iNumMembers - minfo.m_size; iNew > 0; --iNew, ++pInfo) {
                 if (pInfo) {
-                    pInfo->m_name = nullptr;
-                    pInfo->m_owner = nullptr;
-                    pInfo->m_type = hkDataObject::TYPE_VOID;
-                    pInfo->m_class = nullptr;
-                    pInfo->m_tupleCount = 0;
+                    ::new (pInfo) hkDataClass::MemberInfo();
                 }
             }
             minfo.m_size = iNumMembers;
@@ -313,13 +309,8 @@ hkDataObject Reader::readObject(int32_t aiType) {
     {
         hkDataClass::MemberInfo* pInfo = members.m_data + members.m_size;
         for (int32_t iLeft = numMembers - members.m_size; iLeft > 0; --iLeft, ++pInfo) {
-            // EXE-INLINED none: hkDataClass::MemberInfo::MemberInfo
             if (pInfo) {
-                pInfo->m_name = nullptr;
-                pInfo->m_owner = nullptr;
-                pInfo->m_type = hkDataObject::TYPE_VOID;
-                pInfo->m_class = nullptr;
-                pInfo->m_tupleCount = 0;
+                ::new (pInfo) hkDataClass::MemberInfo();
             }
         }
         members.m_size = numMembers;

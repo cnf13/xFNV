@@ -33,6 +33,9 @@ public:
     };
 
     struct ElementDecl {
+        // An empty declaration: no type or usage, offset and stride 0.
+        ElementDecl() : m_byteOffset(0), m_type{HKX_DT_NONE}, m_usage{HKX_DU_NONE}, m_byteStride(0) {}
+
         // Havok SDK signature (hkSceneData.lib, tied by target).
         static const hkClass& staticClass();
 
