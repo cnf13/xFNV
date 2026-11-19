@@ -84,8 +84,7 @@ hkWorldOperation::Result hkpShapePhantom::setShape(const hkpShape* shape) {
             pWorld->queueOperation(op);
             return hkWorldOperation::POSTPONED;
         }
-        // EXE-INLINED none: hkpWorld::lockCriticalOperations
-        ++pWorld->m_criticalOperationsLockCount;
+        pWorld->lockCriticalOperations();
         hkpWorldOperationUtil::removePhantomBP(m_world, this);
     }
     shape->addReference();
@@ -102,10 +101,7 @@ hkWorldOperation::Result hkpShapePhantom::setShape(const hkpShape* shape) {
     hkpWorld* pAddWorld = m_world;
     if (pAddWorld) {
         hkpWorldOperationUtil::addPhantomBP(pAddWorld, this);
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        hkpWorld* pUnlockWorld = m_world;
-        --pUnlockWorld->m_criticalOperationsLockCount;
-        pUnlockWorld->attemptToExecutePendingOperations();
+        m_world->unlockAndAttemptToExecutePendingOperations();
     }
     return hkWorldOperation::DONE;
 }

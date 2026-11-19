@@ -31,10 +31,7 @@ void* ZeroOverheadHeap::Allocate(uint32_t aiSize, uint32_t aiAlignment) {
         pmem = pCurrentFree + 4;
         pCurrentFree = static_cast<char*>(pmem) + aiSize;
         ++iAllocations;
-        // EXE-INLINED none: BSSpinLock::Unlock
-        if (!--CriticalSectionO.uiLockCount) {
-            CriticalSectionO.uiOwningThread = 0;
-        }
+        CriticalSectionO.Unlock();
     }
 #endif
     return pmem;

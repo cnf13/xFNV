@@ -1863,15 +1863,7 @@ void hkpWorld::addPhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPhant
         static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.begin()), newPairs.m_size,
         static_cast<hkpCollidableCollidableFilter*>(m_collisionFilter)
     );
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
 }
 
 // KEEP (partcopy): hkpWorldOperationQueue::queueOperation (0xCF7690, through hkpWorld::queueOperation 0xC91160)
@@ -1956,10 +1948,7 @@ hkpConstraintInstance* hkpWorld::addConstraint(hkpConstraintInstance* constraint
         static_cast<hkpConstraintChainData*>(constraint->m_data)->getNumConstraintInfos();
     }
     m_blockExecutingPendingOperations.m_bool = false;
-    // EXE-INLINED none: hkpWorld::attemptToExecutePendingOperations, without the body operations
-    if (!m_criticalOperationsLockCount && m_pendingOperationsCount) {
-        internal_executePendingOperations();
-    }
+    attemptToExecutePendingOperations(false);
     return result;
 }
 
@@ -2112,15 +2101,7 @@ void hkpWorld::updateCollisionFilterOnWorld(
     }
 
     m_blockExecutingPendingOperations.m_bool = 0;
-    // EXE-INLINED none: hkpWorld::attemptToExecutePendingOperations
-    if (!m_criticalOperationsLockCount) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    attemptToExecutePendingOperations();
     HK_TIMER_END();
 }
 
@@ -2161,16 +2142,7 @@ void hkpWorld::updateCollisionFilterOnPhantom(
         phantom->updateShapeCollectionFilter();
     }
 
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    --m_criticalOperationsLockCount;
-    if (!m_criticalOperationsLockCount && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END_LIST();
 }
 
@@ -2291,15 +2263,7 @@ void hkpWorld::updateCollisionFilterOnEntity(
             );
         }
 
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-            if (m_pendingOperationsCount) {
-                internal_executePendingOperations();
-            }
-            if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-                internal_executePendingBodyOperations();
-            }
-        }
+        unlockAndAttemptToExecutePendingOperations();
     }
     HK_TIMER_END_LIST();
 }
@@ -2315,8 +2279,7 @@ hkBool hkpWorld::removeConstraint(hkpConstraintInstance* constraint) {
         queueOperation(operation);
         return 0;
     }
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations (the count is 0 here: the exe stores 1)
-    m_criticalOperationsLockCount = 1;
+    lockCriticalOperations();
     if (constraint->getType() == hkpConstraintInstance::TYPE_CHAIN) {
         hkpConstraintChainInstance* chain = static_cast<hkpConstraintChainInstance*>(constraint);
         if (chain->m_action->m_world == this) {
@@ -2327,15 +2290,7 @@ hkBool hkpWorld::removeConstraint(hkpConstraintInstance* constraint) {
     hkpWorldOperationUtil::removeConstraintImmediately(this, constraint, hkpWorldOperationUtil::DO_FIRE_CALLBACKS);
     constraint->setFixedRigidBodyPointersToZero(this);
     constraint->removeReference();
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
     return 1;
 }
 
@@ -2365,8 +2320,7 @@ void hkpWorld::shiftBroadPhase(
     );
     m_broadPhaseExtents[0].add4(effectiveShiftDistanceOut);
     m_broadPhaseExtents[1].add4(effectiveShiftDistanceOut);
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_criticalOperationsLockCount;
+    lockCriticalOperations();
     m_broadPhaseDispatcher->addPairs(
         static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.begin()), newPairs.m_size,
         static_cast<hkpCollidableCollidableFilter*>(m_collisionFilter)
@@ -2422,15 +2376,7 @@ void hkpWorld::shiftBroadPhase(
         }
         hkpEntityAabbUtil::entityBatchRecalcAabb(m_collisionInput, entities.m_data, entities.m_size);
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END();
 }
 
@@ -2553,15 +2499,7 @@ void hkpWorld::addEntityBatch(
         hkpWorldCallbackUtil::fireEntityAdded(this, entity);
         hkpEntityCallbackUtil::fireEntityAdded(entity);
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END_LIST();
     // The two temp lists' ~hkArray, in reverse order of construction.
     {
@@ -2643,8 +2581,7 @@ void hkpWorld::removeEntityBatch(hkpEntity* const* entityBatch, int32_t numEntit
         queueOperation(operation);
         return;
     }
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations (the count is known to be 0 here)
-    m_criticalOperationsLockCount = 1;
+    lockCriticalOperations();
     HK_TIMER_BEGIN_LIST("RemEntities", "Init+CallBck");
     m_simulation->resetCollisionInformationForEntities(
         const_cast<hkpEntity**>(entityBatch), numEntities, this, hkpSimulation::RESET_TOI
@@ -2684,15 +2621,7 @@ void hkpWorld::removeEntityBatch(hkpEntity* const* entityBatch, int32_t numEntit
         (*pEntity)->removeReference();
     }
     HK_TIMER_END_LIST();
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
 }
 
 // KEEP (partcopy:): on the locked path the queued RemovePhantomBatch (12 bytes at esp+0x4, 0xC95816) has bytes 0,
@@ -2735,15 +2664,7 @@ void hkpWorld::removePhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPh
         }
         phantom->removeReference();
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
 }
 
 // KEEP (partcopy:): on the locked path the queued AddAction (8 bytes at esp+0x8, 0xC97385) has bytes 0 and 4-7
@@ -2788,15 +2709,7 @@ hkpAction* hkpWorld::addAction(hkpAction* action) {
     if (!mainEntity) {
         entities.m_data[0]->m_simulationIsland->addAction(action);
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
     hkpWorldCallbackUtil::fireActionAdded(this, action);
     return action;
 }
@@ -2844,15 +2757,7 @@ void hkpWorld::removeActionImmediately(hkpAction* action) {
         island->m_dirtyListIndex = static_cast<uint16_t>(dirtyIslands.m_size);
         dirtyIslands.pushBack(island);
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
-        }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
+    unlockAndAttemptToExecutePendingOperations();
     action->removeReference();
 }
 

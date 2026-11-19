@@ -1047,8 +1047,7 @@ void hkpWorldOperationUtil::updateEntityBP(hkpWorld* world, hkpEntity* entity) {
         world->queueOperation(op);
         return;
     }
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++world->m_criticalOperationsLockCount;
+    world->lockCriticalOperations();
 
     hkpLinkedCollidable* pCollidable = &entity->m_collidable;
     if (pCollidable->m_shape) {
@@ -1087,9 +1086,7 @@ void hkpWorldOperationUtil::updateEntityBP(hkpWorld* world, hkpEntity* entity) {
             );
         }
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    --world->m_criticalOperationsLockCount;
-    world->attemptToExecutePendingOperations();
+    world->unlockAndAttemptToExecutePendingOperations();
 }
 
 void hkpWorldOperationUtil::removeConstraintFromCriticalLockedIsland(

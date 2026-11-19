@@ -223,10 +223,7 @@ void bhkCollisionObject::NitohkTransform() {
     kHkRot.normalize();
     bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
     pRigidBody->SetPosRot(kPos, kHkRot);
-    // EXE-INLINED none: BSSpinLock::Unlock
-    if (!--bhkNiCollisionObject::kKeyframeLock.uiLockCount) {
-        bhkNiCollisionObject::kKeyframeLock.uiOwningThread = 0;
-    }
+    bhkNiCollisionObject::kKeyframeLock.Unlock();
 }
 
 void bhkCollisionObject::ClearVelocities() {

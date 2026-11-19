@@ -422,8 +422,7 @@ void hkpWorldCallbackUtil::firePhantomShapeSet(hkpWorld* world, hkpPhantom* Phan
 // Fires the world's island activation listeners, then each entity's activation listeners, all under the world's
 // critical-operations lock. The entity is reloaded from the island for each call.
 void hkpWorldCallbackUtil::fireIslandActivated(hkpWorld* world, hkpSimulationIsland* island) {
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++world->m_criticalOperationsLockCount;
+    world->lockCriticalOperations();
     {
         hkArray<hkpIslandActivationListener*>& listen = world->m_islandActivationListeners;
         for (int32_t i = listen.m_size - 1; i >= 0; i--) {
@@ -449,9 +448,7 @@ void hkpWorldCallbackUtil::fireIslandActivated(hkpWorld* world, hkpSimulationIsl
             removeNullActivationListeners(listeners);
         }
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    --world->m_criticalOperationsLockCount;
-    world->attemptToExecutePendingOperations();
+    world->unlockAndAttemptToExecutePendingOperations();
 }
 
 // The SDK's form: the post-simulation listeners from last to first, each non-null one told under a timer that the
@@ -491,8 +488,7 @@ void hkpWorldCallbackUtil::fireEntitySetMotionType(hkpWorld* world, hkpEntity* e
 // non-null one told that entity was deactivated, then their null entries removed. Unlocking runs the pending
 // operations.
 void hkpWorldCallbackUtil::fireIslandDeactivated(hkpWorld* world, hkpSimulationIsland* island) {
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++world->m_criticalOperationsLockCount;
+    world->lockCriticalOperations();
     {
         hkArray<hkpIslandActivationListener*, hkContainerHeapAllocator>& listen = world->m_islandActivationListeners;
         for (int32_t i = listen.m_size - 1; i >= 0; i--) {
@@ -522,9 +518,7 @@ void hkpWorldCallbackUtil::fireIslandDeactivated(hkpWorld* world, hkpSimulationI
             removeNullActivationListeners(pListeners);
         }
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    --world->m_criticalOperationsLockCount;
-    world->attemptToExecutePendingOperations();
+    world->unlockAndAttemptToExecutePendingOperations();
 }
 
 // The SDK's form, as fireEntitySetMotionType.

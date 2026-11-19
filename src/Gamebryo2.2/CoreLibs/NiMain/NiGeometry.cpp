@@ -413,10 +413,7 @@ void NiGeometry::UpdatePropertiesDownward(NiPropertyState* pkParentState) {
             *pspSlot = pkProperty;
         }
     }
-    // EXE-INLINED none: BSSpinLock::Unlock
-    if (--NiAVObject::kPropertyStateLock.uiLockCount == 0) {
-        NiAVObject::kPropertyStateLock.uiOwningThread = 0;
-    }
+    NiAVObject::kPropertyStateLock.Unlock();
     SetMaterialNeedsUpdate(true);
 }
 

@@ -473,8 +473,7 @@ void hkpSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
     solverInfo.m_deltaTime = solverInfo.m_invNumSteps * stepInfoIn.m_deltaTime;
     // The step count is converted to double, not rounded to float, before the product.
     solverInfo.m_invDeltaTime = static_cast<double>(solverInfo.m_numSteps) * stepInfoIn.m_invDeltaTime;
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
     {
         const hkArray<hkpSimulationIsland*, hkContainerHeapAllocator>& activeIslands =
             m_world->m_activeSimulationIslands;
@@ -484,23 +483,14 @@ void hkpSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
                 activeIsland->m_entities.m_data, activeIsland->m_entities.m_size, m_world
             );
             if (hkOutOfMemoryState == hkMemoryAllocator::MEMORY_STATE_OUT_OF_MEMORY) {
-                hkpWorld* world = m_world;
-                // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-                --world->m_criticalOperationsLockCount;
-                world->attemptToExecutePendingOperations();
+                m_world->unlockAndAttemptToExecutePendingOperations();
                 HK_TIMER_END();
                 return;
             }
         }
     }
-    {
-        hkpWorld* world = m_world;
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        --world->m_criticalOperationsLockCount;
-        world->attemptToExecutePendingOperations();
-    }
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->unlockAndAttemptToExecutePendingOperations();
+    m_world->lockCriticalOperations();
     {
         const hkArray<hkpSimulationIsland*, hkContainerHeapAllocator>& activeIslands =
             m_world->m_activeSimulationIslands;
@@ -523,12 +513,7 @@ void hkpSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
             }
         }
     }
-    {
-        hkpWorld* world = m_world;
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        --world->m_criticalOperationsLockCount;
-        world->attemptToExecutePendingOperations();
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END();
 }
 
@@ -680,18 +665,7 @@ hkpStepResult hkpSimulation::integrateInternal(const hkStepInfo& stepInfoIn) {
             m_previousStepResult = HK_STEP_RESULT_MEMORY_FAILURE_BEFORE_INTEGRATION;
             return HK_STEP_RESULT_MEMORY_FAILURE_BEFORE_INTEGRATION;
         }
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        {
-            hkpWorld* world = m_world;
-            if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-                if (world->m_pendingOperationsCount) {
-                    world->internal_executePendingOperations();
-                }
-                if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-                    world->internal_executePendingBodyOperations();
-                }
-            }
-        }
+        m_world->unlockAndAttemptToExecutePendingOperations();
         hkpWorldMemoryUtil::checkMemoryForIntegration(m_world);
         ++m_world->m_criticalOperationsLockCount;
     }
@@ -700,18 +674,7 @@ hkpStepResult hkpSimulation::integrateInternal(const hkStepInfo& stepInfoIn) {
     HK_TIMER_SPLIT_LIST("Actions");
     applyActions();
     ++m_world->m_criticalOperationsLockCountForPhantoms;
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    {
-        hkpWorld* world = m_world;
-        if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-            if (world->m_pendingOperationsCount) {
-                world->internal_executePendingOperations();
-            }
-            if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-                world->internal_executePendingBodyOperations();
-            }
-        }
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     ++m_world->m_criticalOperationsLockCount;
     // The deactivation's frame counter: the two select flags of the inactive-frame counters toggle on their frames.
     {
@@ -770,18 +733,7 @@ hkpStepResult hkpSimulation::integrateInternal(const hkStepInfo& stepInfoIn) {
             hkpWorldCallbackUtil::fireIslandPostIntegrateCallback(m_world, activeIsland, stepInfoIn);
         }
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    {
-        hkpWorld* world = m_world;
-        if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-            if (world->m_pendingOperationsCount) {
-                world->internal_executePendingOperations();
-            }
-            if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-                world->internal_executePendingBodyOperations();
-            }
-        }
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     if (m_world->m_worldPostIntegrateListeners.m_size) {
         HK_TIMER_BEGIN("WorldPostIntegrateCb", nullptr);
         hkpWorldCallbackUtil::firePostIntegrateCallback(m_world, stepInfoIn);

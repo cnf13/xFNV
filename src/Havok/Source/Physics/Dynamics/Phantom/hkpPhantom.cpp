@@ -184,8 +184,7 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
         pWorld->queueOperation(op);
         return;
     }
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++pWorld->m_criticalOperationsLockCount;
+    pWorld->lockCriticalOperations();
 
     const int32_t iNewCapacity = m_world->m_broadPhaseUpdateSize;
     hkLocalArray<hkpBroadPhaseHandlePair> newPairs(iNewCapacity);
@@ -194,11 +193,7 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
     hkLocalArray<hkpBroadPhaseHandlePair> removedPairs(iRemovedCapacity);
 
     hkpBroadPhaseHandle* pHandle = m_collidable.getBroadPhaseHandle();
-    // EXE-INLINED none: hkpBroadPhase::lock
-    hkpBroadPhase* pLockBroadPhase = m_world->getBroadPhase();
-    if (pLockBroadPhase->m_criticalSection) {
-        pLockBroadPhase->lockImplementation();
-    }
+    m_world->getBroadPhase()->lock();
     m_world->getBroadPhase()->updateAabbs(&pHandle, &aabb, 1, newPairs, removedPairs);
     if (newPairs.m_size || removedPairs.m_size) {
         hkpTypedBroadPhaseDispatcher::removeDuplicates(newPairs, removedPairs);
@@ -213,20 +208,13 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
         );
         removeNullOverlapListeners();
     }
-    // EXE-INLINED none: hkpBroadPhase::unlock
-    hkpBroadPhase* pUnlockBroadPhase = m_world->getBroadPhase();
-    if (pUnlockBroadPhase->m_criticalSection) {
-        pUnlockBroadPhase->unlockImplementation();
-    }
+    m_world->getBroadPhase()->unlock();
     setBoundingVolumeData(aabb);
     hkpWorld* pTreeWorld = m_world;
     if (pTreeWorld->m_kdTreeManager) {
         pTreeWorld->m_kdTreeManager->setUpToDate(false);
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    hkpWorld* pUnlockWorld = m_world;
-    --pUnlockWorld->m_criticalOperationsLockCount;
-    pUnlockWorld->attemptToExecutePendingOperations();
+    m_world->unlockAndAttemptToExecutePendingOperations();
 }
 
 // The list is walked from the back so that a listener may remove itself while it is told.

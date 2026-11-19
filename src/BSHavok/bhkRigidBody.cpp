@@ -1394,10 +1394,8 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
             apSetPosLock->Lock(nullptr);
         }
         SetPosition(arPos);
-        if ((apSetPosLock) && (!--apSetPosLock->uiLockCount))
-        // EXE-INLINED none: BSSpinLock::Unlock
-        {
-            apSetPosLock->uiOwningThread = 0;
+        if (apSetPosLock) {
+            apSetPosLock->Unlock();
         }
 
         SetLinearVelocity(hkVector4::getZero());

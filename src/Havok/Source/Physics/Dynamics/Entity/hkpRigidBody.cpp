@@ -211,16 +211,7 @@ hkWorldOperation::Result hkpRigidBody::setShape(const hkpShape* shape) {
     hkpEntityCallbackUtil::fireEntityShapeSet(this);
     if (m_world) {
         hkpWorldOperationUtil::addEntityBP(m_world, this);
-        hkpWorld* pWorld = m_world;
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        if (--pWorld->m_criticalOperationsLockCount == 0 && !pWorld->m_blockExecutingPendingOperations) {
-            if (pWorld->m_pendingOperationsCount) {
-                pWorld->internal_executePendingOperations();
-            }
-            if (pWorld->m_pendingOperationQueueCount == 1 && pWorld->m_pendingBodyOperationsCount) {
-                pWorld->internal_executePendingBodyOperations();
-            }
-        }
+        m_world->unlockAndAttemptToExecutePendingOperations();
     }
     return hkWorldOperation::DONE;
 }
@@ -714,15 +705,7 @@ void hkpRigidBody::updateBroadphaseAndResetCollisionInformationOfWarpedBody(hkpE
     if (pKdTreeManager) {
         pKdTreeManager->setUpToDate(false);
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (pWorld->m_criticalOperationsLockCount-- == 1 && !pWorld->m_blockExecutingPendingOperations.m_bool) {
-        if (pWorld->m_pendingOperationsCount) {
-            pWorld->internal_executePendingOperations();
-        }
-        if ((pWorld->m_pendingOperationQueueCount == 1) && (pWorld->m_pendingBodyOperationsCount)) {
-            pWorld->internal_executePendingBodyOperations();
-        }
-    }
+    pWorld->unlockAndAttemptToExecutePendingOperations();
 }
 
 // m_properties = otherObj->m_properties, using the class version of hkArrayBase::copyFromArray (hkpProperty is not a

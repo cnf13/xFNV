@@ -102,6 +102,17 @@ public:
     virtual void
     set32BitOffsetAndScale(const hkVector4& offsetLow, const hkVector4& offsetHigh, const hkVector4& scale) = 0;
 
+    // The SDK's inlines: enter and leave the critical section when multithreading is enabled.
+    void lock() {
+        if (m_criticalSection) {
+            lockImplementation();
+        }
+    }
+    void unlock() {
+        if (m_criticalSection) {
+            unlockImplementation();
+        }
+    }
     // Enter and leave the broad phase's critical section.
     void lockImplementation();
     void unlockImplementation();

@@ -1094,8 +1094,7 @@ void hkpContinuousSimulation::reintegrateAndRecollideEntities(
     hkpWorld* world,
     int32_t reintegrateRecollideMode
 ) {
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++world->m_criticalOperationsLockCount;
+    world->lockCriticalOperations();
     hkpProcessCollisionInput* input = world->m_collisionInput;
     const hkStepInfo originalStepInfo = input->m_stepInfo;
     alignas(16) hkStepInfo physicsStepInfo;
@@ -1131,15 +1130,7 @@ void hkpContinuousSimulation::reintegrateAndRecollideEntities(
     else if (reintegrate) {
         resetCollisionInformationForEntities(entities, numEntities, world, RESET_TIM);
     }
-    // EXE-INLINED none: hkpWorld::unlockCriticalOperations
-    if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-        if (world->m_pendingOperationsCount) {
-            world->internal_executePendingOperations();
-        }
-        if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-            world->internal_executePendingBodyOperations();
-        }
-    }
+    world->unlockAndAttemptToExecutePendingOperations();
     world->m_collisionInput->m_stepInfo = originalStepInfo;
 }
 
@@ -1171,8 +1162,7 @@ void hkpContinuousSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
         static_cast<float>(static_cast<double>(solverInfo.m_invNumSteps) * static_cast<double>(stepInfoIn.m_deltaTime));
     solverInfo.m_invDeltaTime =
         static_cast<float>(static_cast<double>(solverInfo.m_numSteps) * static_cast<double>(stepInfoIn.m_invDeltaTime));
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
     bool bOutOfMemory = false;
     {
         hkArray<hkpSimulationIsland*>& islands = m_world->m_activeSimulationIslands;
@@ -1186,18 +1176,8 @@ void hkpContinuousSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
         }
     }
     if (!bOutOfMemory) {
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        hkpWorld* world = m_world;
-        if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-            if (world->m_pendingOperationsCount) {
-                world->internal_executePendingOperations();
-            }
-            if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-                world->internal_executePendingBodyOperations();
-            }
-        }
-        // EXE-INLINED none: hkpWorld::lockCriticalOperations
-        ++m_world->m_criticalOperationsLockCount;
+        m_world->unlockAndAttemptToExecutePendingOperations();
+        m_world->lockCriticalOperations();
         hkArray<hkpSimulationIsland*>& islands = m_world->m_activeSimulationIslands;
         for (int32_t i = 0; i < islands.m_size; ++i) {
             hkpSimulationIsland* island = islands.m_data[i];
@@ -1212,16 +1192,7 @@ void hkpContinuousSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
             }
         }
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    hkpWorld* world = m_world;
-    if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-        if (world->m_pendingOperationsCount) {
-            world->internal_executePendingOperations();
-        }
-        if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-            world->internal_executePendingBodyOperations();
-        }
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END();
 }
 
@@ -1327,8 +1298,7 @@ void hkpContinuousSimulation::collideEntitiesNeedingPsiCollisionDetectionNarrowP
     hkPointerMap<uint32_t, hkpEntity*, hkContainerHeapAllocator>& entitiesNeedingPsiCollisionDetection
 ) {
     HK_TIMER_BEGIN("Recollide PSI", nullptr);
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
 
     hkPointerMap<hkpAgentNnEntry*, int32_t> entriesSet;
     hkArray<EntryAndIsland> entriesAndIslands;
@@ -1398,16 +1368,7 @@ void hkpContinuousSimulation::collideEntitiesNeedingPsiCollisionDetectionNarrowP
         }
     }
 
-    // EXE-INLINED none: hkpWorld::unlockCriticalOperations
-    hkpWorld* world = m_world;
-    if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations) {
-        if (world->m_pendingOperationsCount) {
-            world->internal_executePendingOperations();
-        }
-        if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-            world->internal_executePendingBodyOperations();
-        }
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END();
 }
 
@@ -1434,8 +1395,7 @@ void hkpContinuousSimulation::simulateToi(
     if (m_toiResourceMgr->beginToiAndSetupResources(event, m_toiEvents, toiResources) == HK_FAILURE) {
         return;
     }
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
 
     // EXE-INLINED none: hkStepInfo::hkStepInfo(startTime, endTime)
     alignas(16) hkStepInfo stepInfo;
@@ -1540,16 +1500,7 @@ void hkpContinuousSimulation::simulateToi(
         hkReferencedObject::removeReferences(activeEntities.m_data, activeEntities.m_size);
     }
 
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    hkpWorld* lockedWorld = m_world;
-    if (--lockedWorld->m_criticalOperationsLockCount == 0 && !lockedWorld->m_blockExecutingPendingOperations) {
-        if (lockedWorld->m_pendingOperationsCount) {
-            lockedWorld->internal_executePendingOperations();
-        }
-        if (lockedWorld->m_pendingOperationQueueCount == 1 && lockedWorld->m_pendingBodyOperationsCount) {
-            lockedWorld->internal_executePendingBodyOperations();
-        }
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END_LIST();
 }
 
@@ -1606,8 +1557,7 @@ void hkpContinuousSimulation::handleSimpleToi(
     float rotateNormal
 ) {
     HK_TIMER_BEGIN("SimpleTOI", nullptr);
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
     hkInplaceArray<hkpEntity*, 2> toBeActivated;
     event.m_contactMgr->confirmToi(event, rotateNormal, toBeActivated);
     hkInplaceArray<hkpEntity*, 2> entitiesToRecollide;
@@ -1645,16 +1595,7 @@ void hkpContinuousSimulation::handleSimpleToi(
             m_entitiesNeedingPsiCollisionDetection
         );
     }
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    hkpWorld* lockedWorld = m_world;
-    if (--lockedWorld->m_criticalOperationsLockCount == 0 && !lockedWorld->m_blockExecutingPendingOperations) {
-        if (lockedWorld->m_pendingOperationsCount) {
-            lockedWorld->internal_executePendingOperations();
-        }
-        if (lockedWorld->m_pendingOperationQueueCount == 1 && lockedWorld->m_pendingBodyOperationsCount) {
-            lockedWorld->internal_executePendingBodyOperations();
-        }
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END();
 }
 
@@ -1779,17 +1720,9 @@ void hkpContinuousSimulation::collideEntitiesBroadPhaseContinuous(
             ++aabbIt;
         }
         HK_TIMER_SPLIT_LIST("3AxisSweep");
-        // EXE-INLINED none: hkpBroadPhase::lock
-        hkpBroadPhase* broadPhase = world->m_broadPhase;
-        if (broadPhase->m_criticalSection) {
-            broadPhase->lockImplementation();
-        }
+        world->m_broadPhase->lock();
         world->m_broadPhase->updateAabbsUint32(handles, aabbs, numEntities, newPairs, delPairs);
-        // EXE-INLINED none: hkpBroadPhase::unlock
-        broadPhase = world->m_broadPhase;
-        if (broadPhase->m_criticalSection) {
-            broadPhase->unlockImplementation();
-        }
+        world->m_broadPhase->unlock();
         // EXE-INLINED none: hkStackMemory::shrinkAllocatedStack
         hkMemoryRouter::getInstance().m_stack.m_next.m_storage = handlesBuffer;
         // EXE-INLINED none: hkStackMemory::shrinkAllocatedStack
@@ -2039,8 +1972,7 @@ void hkpContinuousSimulation::processAgentCollideContinuous(
 hkpStepResult hkpContinuousSimulation::handleAllToisTill(float minTime) {
     while (true) {
         hkpWorld* world = m_world;
-        // EXE-INLINED none: hkpWorld::lockCriticalOperations
-        ++world->m_criticalOperationsLockCount;
+        world->lockCriticalOperations();
         int32_t earliestIndex;
         float rotateNormal;
         while (true) {
@@ -2066,9 +1998,7 @@ hkpStepResult hkpContinuousSimulation::handleAllToisTill(float minTime) {
                 }
             }
             if (earliestIndex < 0) {
-                // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-                --world->m_criticalOperationsLockCount;
-                world->attemptToExecutePendingOperations();
+                world->unlockAndAttemptToExecutePendingOperations();
                 return HK_STEP_RESULT_SUCCESS;
             }
             if (fireEarliestToiCallbacksAndCheckEnabled(m_toiEvents.m_data[earliestIndex], rotateNormal).m_bool) {
@@ -2102,14 +2032,10 @@ hkpStepResult hkpContinuousSimulation::handleAllToisTill(float minTime) {
         }
         ++m_toiCounter;
         if (hkOutOfMemoryState == hkMemoryAllocator::MEMORY_STATE_OUT_OF_MEMORY) {
-            // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-            --world->m_criticalOperationsLockCount;
-            world->attemptToExecutePendingOperations();
+            world->unlockAndAttemptToExecutePendingOperations();
             return HK_STEP_RESULT_MEMORY_FAILURE_DURING_TOI_SOLVE;
         }
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        --world->m_criticalOperationsLockCount;
-        world->attemptToExecutePendingOperations();
+        world->unlockAndAttemptToExecutePendingOperations();
     }
 }
 

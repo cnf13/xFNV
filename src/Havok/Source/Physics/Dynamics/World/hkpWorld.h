@@ -278,6 +278,24 @@ public:
     void internal_executePendingOperations();
     void internal_executePendingBodyOperations();
 
+    // The SDK's inlines: while the critical operations are locked, operations on the world are queued instead of run.
+    void lockCriticalOperations() {
+        ++m_criticalOperationsLockCount;
+    }
+    void unlockCriticalOperations() {
+        --m_criticalOperationsLockCount;
+    }
+    void unlockAndAttemptToExecutePendingOperations() {
+        --m_criticalOperationsLockCount;
+        attemptToExecutePendingOperations();
+    }
+    void lockCriticalOperationsForPhantoms() {
+        ++m_criticalOperationsLockCountForPhantoms;
+    }
+    void unlockCriticalOperationsForPhantoms() {
+        --m_criticalOperationsLockCountForPhantoms;
+    }
+
     // The SDK's inline: runs the pending operations unless the world is locked against them.
     void attemptToExecutePendingOperations(bool executeBodyOperations = true) {
         if (!m_criticalOperationsLockCount && !m_blockExecutingPendingOperations) {

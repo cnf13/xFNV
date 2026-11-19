@@ -462,8 +462,7 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
     hkPointerMap<uint32_t, hkpEntity*, hkContainerHeapAllocator>& entitiesNeedingPsiCollisionDetection
 ) {
     HK_TIMER_BEGIN("Recollide PSI", nullptr);
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
 
     using entriesSet_t = hkPointerMap<hkpAgentNnEntry*, int32_t>;
     entriesSet_t entriesSet;
@@ -605,12 +604,7 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
         allEntries, numAllEntries, islandEntriesInfos.m_data, islandEntriesInfos.m_size, *m_world->m_collisionInput,
         hkBool(false)
     );
-    {
-        hkpWorld* world = m_world;
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        --world->m_criticalOperationsLockCount;
-        world->attemptToExecutePendingOperations();
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     HK_TIMER_END();
     hkDeallocateStack(allEntries);
 }
@@ -638,8 +632,7 @@ void hkpMultiThreadedSimulation::setMultithreadConfig(const hkpMultithreadConfig
 hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, float physicsDeltaTime) {
     HK_TIMER_BEGIN_LIST("Physics", "Init");
     m_crossIslandPairsCollectingActive.m_bool = true;
-    // EXE-INLINED none: hkpWorld::lockCriticalOperations
-    ++m_world->m_criticalOperationsLockCount;
+    m_world->lockCriticalOperations();
     m_physicsDeltaTime = physicsDeltaTime;
     // EXE-INLINED none: hkStepInfo::hkStepInfo(hkTime, hkTime). The exe rounds the end time and the delta time to
     // floats in its frame before it reads them again.
@@ -668,18 +661,7 @@ hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, floa
             m_previousStepResult = HK_STEP_RESULT_MEMORY_FAILURE_BEFORE_INTEGRATION;
             return HK_STEP_RESULT_MEMORY_FAILURE_BEFORE_INTEGRATION;
         }
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        {
-            hkpWorld* world = m_world;
-            if (--world->m_criticalOperationsLockCount == 0 && !world->m_blockExecutingPendingOperations.m_bool) {
-                if (world->m_pendingOperationsCount) {
-                    world->internal_executePendingOperations();
-                }
-                if (world->m_pendingOperationQueueCount == 1 && world->m_pendingBodyOperationsCount) {
-                    world->internal_executePendingBodyOperations();
-                }
-            }
-        }
+        m_world->unlockAndAttemptToExecutePendingOperations();
         hkpWorldMemoryUtil::checkMemoryForIntegration(m_world);
         ++m_world->m_criticalOperationsLockCount;
     }
@@ -716,10 +698,9 @@ hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, floa
     if (numIslands > 0) {
         if (m_world->m_processActionsInSingleThread.m_bool) {
             HK_TIMER_SPLIT_LIST("Actions");
-            // EXE-INLINED none: hkpWorld::lockCriticalOperationsForPhantoms
-            --m_world->m_criticalOperationsLockCountForPhantoms;
+            m_world->unlockCriticalOperationsForPhantoms();
             applyActions();
-            ++m_world->m_criticalOperationsLockCountForPhantoms;
+            m_world->lockCriticalOperationsForPhantoms();
         }
         // EXE-INLINED none: hkpIntegrateJob::hkpIntegrateJob
         hkpIntegrateJob job;
@@ -1064,12 +1045,7 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
         hkpWorldCallbackUtil::fireConstraintViolated(m_world, m_world->m_violatedConstraintArray->m_constraints[i]);
     }
     m_currentPsiTime += m_physicsDeltaTime;
-    {
-        hkpWorld* world = m_world;
-        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-        --world->m_criticalOperationsLockCount;
-        world->attemptToExecutePendingOperations();
-    }
+    m_world->unlockAndAttemptToExecutePendingOperations();
     hkpStepResult result = HK_STEP_RESULT_SUCCESS;
     if (hkOutOfMemoryState == hkMemoryAllocator::MEMORY_STATE_OUT_OF_MEMORY) {
         result = HK_STEP_RESULT_MEMORY_FAILURE_DURING_COLLIDE;
