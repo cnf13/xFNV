@@ -204,15 +204,13 @@ bool Interface::ShowSubtitle(
     TESObjectREFR* apTarget,
     bool abForceShow
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, v7, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\Interface.cpp", 2284
     );
     if (InterfaceManager::Instance()) {
         InterfaceManager* v5 = InterfaceManager::Instance();
         if ((v5->bFirstInit) && (HUDMainMenu::pme)) {
-            v7 = ahandle;
-            HUDMainMenu::pme->ShowSubtitle(apString, v7, aSpeakerLoc, apTarget, abForceShow);
+            HUDMainMenu::pme->ShowSubtitle(apString, ahandle, aSpeakerLoc, apTarget, abForceShow);
         }
     }
     bool v12 = false;

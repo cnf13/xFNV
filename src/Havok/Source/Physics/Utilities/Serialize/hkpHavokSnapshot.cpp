@@ -132,15 +132,7 @@ hkBool hkpHavokSnapshot::save(
     [[maybe_unused]] const hkStructureLayout::LayoutRules* apTargetLayout,
     hkPackfileWriter::AddObjectListener* apUserListener
 ) {
-    // EXE-INLINED none: hkpHavokSnapshot::ConvertListener's constructor
-    XFNV_INLINED_LOCAL(
-        hkpHavokSnapshot::ConvertListener, kDefaultConvertListener, hkpHavokSnapshot_ConvertListener_vftable,
-        std::nullopt
-    );
-    kDefaultConvertListener.m_referenceCount = 1;
-    kDefaultConvertListener.m_objects.m_data = nullptr;
-    kDefaultConvertListener.m_objects.m_size = 0;
-    kDefaultConvertListener.m_objects.m_capacityAndFlags = hkArrayBase<hkReferencedObject*>::DONT_DEALLOCATE_FLAG;
+    hkpHavokSnapshot::ConvertListener kDefaultConvertListener;
     hkPackfileWriter::AddObjectListener* pListener = apUserListener;
     if (!apUserListener) {
         pListener = &kDefaultConvertListener;
@@ -150,7 +142,6 @@ hkBool hkpHavokSnapshot::save(
     result.m_bool =
         hkSerializeUtil::saveTagfile(apData, arDataClass, apWriter, abBinaryFormat.m_bool != 0, pListener) ==
         HK_SUCCESS;
-    kDefaultConvertListener.~ConvertListener();
     return result;
 }
 

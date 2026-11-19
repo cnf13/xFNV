@@ -387,7 +387,6 @@ void MagicShaderHitEffect::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 }
 
 bool MagicShaderHitEffect::Init() {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     char path_1[260];
     char v47[260];
     char path[260];
@@ -566,7 +565,7 @@ bool MagicShaderHitEffect::Init() {
                 }
                 NiAVObject* pobject = (&pparticleProp->GetTargetArray()->operator[](i_3))->m_pObject;
                 if (pobject->IsNode()) {
-                    ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+                    NiPointer<Model> spmodel;
                     char* v11 = randomDebris.PickResult();
                     pModelLoader->FindModel(v11, spmodel);
                     if ((spmodel.m_pObject) && (spmodel.m_pObject->GetModel())) {
@@ -590,8 +589,6 @@ bool MagicShaderHitEffect::Init() {
                         NiPointer<NiAVObject> spaddon(paddon);
                         AddOnObjects.Add(spaddon);
                     }
-
-                    NiPointer<Model>::Destroy(&spmodel);
                 }
             }
         }

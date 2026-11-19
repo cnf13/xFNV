@@ -38,12 +38,7 @@ void queryClosestPoint(
         return;
     }
     float closest = 3.40282e+38f;
-    using NodeStack = hkInplaceArray<const Node*, 128, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(NodeStack, stack, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkInplaceArray<const Node*, 128>::hkInplaceArray
-    stack.m_data = stack.m_storage;
-    stack.m_size = 0;
-    stack.m_capacityAndFlags = 128 | hkArrayBase<const Node*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<const Node*, 128, hkContainerHeapAllocator> stack;
     if (root->isLeaf()) {
         a3->addLeaf(root);
     }
@@ -106,12 +101,6 @@ void queryClosestPoint(
             }
         }
         while (stack.m_size != 0);
-    }
-    // EXE-INLINED none: hkInplaceArray<const Node*, 128>::~hkInplaceArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    stack.m_size = 0;
-    if ((stack.m_capacityAndFlags & hkArrayBase<const Node*>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap._bufFree<const Node*>(stack.m_data, stack.getCapacity());
     }
 }
 

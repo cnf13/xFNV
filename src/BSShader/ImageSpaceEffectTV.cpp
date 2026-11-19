@@ -45,7 +45,6 @@ bool ImageSpaceEffectTV::IsActive() {
 }
 
 void ImageSpaceEffectTV::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(1);
     NiTPrimitiveArray<ImageSpaceTexture*>* pTextureList = &pTextures;
     pTextures.SetSize(4u);
@@ -149,8 +148,7 @@ void ImageSpaceEffectTV::Setup(ImageSpaceManager* apManager, ImageSpaceEffectPar
     pparam->SetPixelConstant(
         4, ImageSpaceEffectTV::Tint.r, ImageSpaceEffectTV::Tint.g, ImageSpaceEffectTV::Tint.b, 1.0f
     );
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, pparam);
     SetEffectInputs(
         0, 1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST,
         NiTexturingProperty::FILTER_NEAREST

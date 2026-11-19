@@ -245,12 +245,7 @@ void hkpMultiSphereShape::castRayWithCollectorImpl(
     alignas(16) int32_t aiSphereIndices[MAX_SPHERES];
     alignas(16) float afHitFractions[MAX_SPHERES];
     int32_t iNumHits = castRayInternal(&inputLocal, m_spheres, m_numSpheres, afHitFractions, aiSphereIndices);
-    XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x4A3D20
-    output.m_hitFraction = 1.0f;
-    output.m_extraInfo = -1;
-    output.m_shapeKeyIndex = 0;
-    output.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
+    hkpShapeRayCastOutput output;
     while (iNumHits) {
         // EXE-INLINED 0x4A3D80
         output.m_hitFraction = 1.0f;

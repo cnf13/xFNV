@@ -236,35 +236,9 @@ void hkaDeltaCompressedAnimation::samplePartialTracks(
     getFrameAndDelta(time, frame, delta);
     const float oneMinusDelta = 1.0f - delta;
     const int32_t numSampled = static_cast<int32_t>(numDToSample);
-    // The stack allocator's bytes are untyped memory; each local array keeps its floats there.
-    XFNV_INLINED_LOCAL(hkLocalArray<float>, sampled, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numDToSample) (hkAllocateStack)
-        sampled.m_data = nullptr;
-        sampled.m_size = 0;
-        sampled.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numSampled * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-        sampled.m_data = reinterpret_cast<float*>(pBlock);
-        sampled.m_capacityAndFlags = numSampled | hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        sampled.m_localMemory = sampled.m_data;
-    }
+    hkLocalArray<float> sampled(numSampled);
     sampled.setSize(numSampled);
-    XFNV_INLINED_LOCAL(hkLocalArray<float>, decompressed, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numDToSample * m_blockSize) (hkAllocateStack)
-        const int32_t numDecompressed = numSampled * m_blockSize;
-        decompressed.m_data = nullptr;
-        decompressed.m_size = 0;
-        decompressed.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numDecompressed * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-        decompressed.m_capacityAndFlags = numDecompressed | hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        decompressed.m_data = reinterpret_cast<float*>(pBlock);
-        decompressed.m_localMemory = decompressed.m_data;
-    }
+    hkLocalArray<float> decompressed(numSampled * m_blockSize);
     decompressed.setSize(numSampled * m_blockSize);
 
     // The chunk cache hands out untyped bytes; the decompressed chunk is floats.
@@ -332,10 +306,6 @@ void hkaDeltaCompressedAnimation::samplePartialTracks(
     input.m_dynamicDOFsFloat = sampled.m_data + m_numDynamicTransformDOFs;
     hkaTrackAnalysis::recompose(input, transformTracksOut, floatTracksOut);
     HK_TIMER_END_LIST();
-
-    // The two local arrays are destroyed, the last constructed first.
-    decompressed.~hkLocalArray<float>();
-    sampled.~hkLocalArray<float>();
 }
 
 void hkaDeltaCompressedAnimation::clearAllCacheKeys(hkaChunkCache* cache) {

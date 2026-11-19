@@ -82,16 +82,9 @@ NiObject* NiObject::CreateSharedClone(NiCloningProcess& kCloning) {
 }
 
 NiObject* NiObject::Clone() {
-    XFNV_INLINED_LOCAL(NiCloningProcess, kCloning, std::nullopt, std::nullopt);
-    ::new (&kCloning) NiCloningProcess(257u);
+    NiCloningProcess kCloning(257u);
     NiObject* v2 = CreateClone(kCloning);
     ProcessClone(kCloning);
-    if (kCloning.m_pkCloneMap) {
-        delete kCloning.m_pkCloneMap;
-    }
-    if (kCloning.m_pkProcessMap) {
-        delete kCloning.m_pkProcessMap;
-    }
     return v2;
 }
 

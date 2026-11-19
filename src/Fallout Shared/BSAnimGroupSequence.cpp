@@ -1011,8 +1011,7 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
     NiPointer<NiControllerSequence>& aspControllerSequence
 ) {
     BSAnimGroupSequence* v3;
-    XFNV_INLINED_LOCAL(NiPointer<NiControllerSequence>, spSequence, std::nullopt, std::nullopt);
-    ::new (&spSequence) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    NiPointer<NiControllerSequence> spSequence;
     NiControllerSequence::CreateSequenceFromFile(kStream, uiIndex, spSequence);
     BSAnimGroupSequence* apMemory =
         static_cast<BSAnimGroupSequence*>(NiMemObject::operator new(sizeof(BSAnimGroupSequence)));
@@ -1023,7 +1022,6 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
         v3 = nullptr;
     }
     aspControllerSequence.operator=(static_cast<NiControllerSequence*>(v3));
-    spSequence.~NiPointer<NiControllerSequence>();
 }
 
 NiFixedString& FixedStrings::QAttachSound() {

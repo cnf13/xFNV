@@ -402,11 +402,7 @@ int32_t hkpConstraintSolverSetup::solve(
     // Past this the schemas continue in the second range; all ones once the goto is written.
     uintptr_t uiSchemasLimit = reinterpret_cast<uintptr_t>(schemasLimit);
     // The constraints of priority TOI_HIGHER and above, built after all others.
-    using deferred_t = hkInplaceArray<hkConstraintInternal*, 256>;
-    XFNV_INLINED_LOCAL(deferred_t, deferred, std::nullopt, std::nullopt);
-    deferred.m_data = deferred.m_storage;
-    deferred.m_size = 0;
-    deferred.m_capacityAndFlags = 256 | hkArrayBase<hkConstraintInternal*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkConstraintInternal*, 256> deferred;
     hkpEntity* const* entitiesEnd = bodies + numBodies;
     for (hkpEntity* const* ppEntity = bodies; ppEntity < entitiesEnd; ++ppEntity) {
         hkSmallArray<hkConstraintInternal>& masters = (*ppEntity)->m_constraintsMaster;
@@ -567,17 +563,6 @@ int32_t hkpConstraintSolverSetup::solve(
     }
     // The end schema: a zero first 32-bit word (SCHEMA_TYPE_END) in the raw schema stream.
     *reinterpret_cast<uint32_t*>(out.m_jacobianSchemas) = 0;
-    // EXE-INLINED none: hkArray<hkConstraintInternal*>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = deferred.m_capacityAndFlags;
-    deferred.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            deferred.m_data,
-            (capacityAndFlags & hkArrayBase<hkConstraintInternal*>::CAPACITY_MASK) *
-                int32_t(sizeof(hkConstraintInternal*))
-        );
-    }
 
     hkpJacobianSchema* schemas = reinterpret_cast<hkpJacobianSchema*>(schemaBase);
     const int32_t solveResult = hkSolveConstraints(solverInfo, schemas, accumulators, elemTemp);
@@ -708,21 +693,16 @@ int32_t hkpConstraintSolverSetup::calcBufferOffsetsForSolve(
     return totalSize;
 }
 
-// The task header is the SDK's, built and destroyed inline: its constructor sets the reference and island counts to 1
-// and empties the buffer, the split-island array and the two task lists; its destructor frees the array's storage
-// unless it is flagged not to.
+// The task header is the SDK's, whose constructor is built inline: it sets the reference and island counts to 1 and
+// empties the buffer and the two task lists.
 int32_t hkpConstraintSolverSetup::calcBufferSize(hkpSimulationIsland& island) {
-    alignas(16) XFNV_INLINED_LOCAL(hkpBuildJacobianTaskHeader, taskHeader, std::nullopt, std::nullopt);
+    alignas(16) hkpBuildJacobianTaskHeader taskHeader;
     // EXE-INLINED none: hkpBuildJacobianTaskHeader::hkpBuildJacobianTaskHeader
     taskHeader.m_referenceCount = 1;
     taskHeader.m_numIslandsAfterSplit = 1;
     taskHeader.m_buffer = nullptr;
     taskHeader.m_bufferSize = 0;
     taskHeader.m_bufferCapacity = 0;
-    taskHeader.m_newSplitIslands.m_data = nullptr;
-    taskHeader.m_newSplitIslands.m_size = 0;
-    taskHeader.m_newSplitIslands.m_capacityAndFlags =
-        static_cast<int32_t>(hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG);
     taskHeader.m_tasks.m_buildJacobianTasks = nullptr;
     taskHeader.m_tasks.m_numBuildJacobianTasks = 0;
     taskHeader.m_tasks.m_callbackConstraints = nullptr;
@@ -730,15 +710,6 @@ int32_t hkpConstraintSolverSetup::calcBufferSize(hkpSimulationIsland& island) {
     taskHeader.m_solveTasks.m_firstSolveJacobiansTask = nullptr;
     taskHeader.m_solveTasks.m_firstBatchSize = 0;
     const int32_t size = calcBufferOffsetsForSolve(island, nullptr, 0, taskHeader);
-    // EXE-INLINED none: hkpBuildJacobianTaskHeader::~hkpBuildJacobianTaskHeader (hkArray's destructor)
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    if ((taskHeader.m_newSplitIslands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG) ==
-        0) {
-        heap.bufFree(
-            taskHeader.m_newSplitIslands.m_data,
-            taskHeader.m_newSplitIslands.getCapacity() * static_cast<int32_t>(sizeof(hkpSimulationIsland*))
-        );
-    }
     return size;
 }
 

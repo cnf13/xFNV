@@ -193,8 +193,7 @@ void BSTaskManagerThread::ThreadUpdate() {
                 NiAtomicDecrement(PauseSemaphore.iCount);
                 kIterator.SetBucket(0);
             }
-            XFNV_INLINED_LOCAL(NiPointer<BSTask<int64_t>>, spTask, std::nullopt, std::nullopt);
-            spTask.m_pObject = nullptr;
+            NiPointer<BSTask<int64_t>> spTask;
             int64_t iKey;
             if (pOwner->GetNext(kIterator, iKey, spTask, !bRanTask)) {
                 if (spTask.m_pObject->eState == BS_TASK_STATE_QUEUED &&
@@ -215,9 +214,6 @@ void BSTaskManagerThread::ThreadUpdate() {
             // EXE-INLINED 0x442550
             PauseSemaphore.hSemaphore->Release();
             NiAtomicIncrement(PauseSemaphore.iCount);
-            if (spTask.m_pObject) {
-                spTask.m_pObject->DecRefCount();
-            }
         }
     }
 }
@@ -422,8 +418,7 @@ bool IOManager::UpdateQueue() {
     if (pUpdateSecondaryQueueCallback) {
         bqueueResult = pUpdateSecondaryQueueCallback();
     }
-    XFNV_INLINED_LOCAL(NiPointer<IOTask>, sptask, std::nullopt, std::nullopt);
-    sptask.m_pObject = nullptr;
+    NiPointer<IOTask> sptask;
     pPostProcessQueue->Pop(sptask);
     while (sptask.m_pObject) {
         sptask.m_pObject->PostProcess();
@@ -438,10 +433,6 @@ bool IOManager::UpdateQueue() {
         }
     }
     IOManager::bUpdating = false;
-    // ~NiPointer.
-    if (sptask.m_pObject) {
-        sptask.m_pObject->DecRefCount();
-    }
     return bqueueResult;
 }
 

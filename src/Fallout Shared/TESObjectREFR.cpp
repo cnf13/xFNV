@@ -2675,11 +2675,9 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                 if (fSoundDuration <= 0.0) {
                     fSoundDuration = 2.0f;
                 }
-                // The position is read before the by-value handle argument is built with operator=.
+                // The position is read before the by-value handle argument is built.
                 NiPoint3 kSpeakerLoc = GetLocationOnReference();
-                XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
-                kArgument.operator=(aSoundHand);
-                Interface::ShowSubtitle(pResponse->cText.pString, kArgument, kSpeakerLoc, apTarget, abForceSubtitles);
+                Interface::ShowSubtitle(pResponse->cText.pString, aSoundHand, kSpeakerLoc, apTarget, abForceSubtitles);
             }
         }
     }

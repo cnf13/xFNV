@@ -773,18 +773,12 @@ bool NiSkinPartition::MakePartitions(
     uint16_t* apusPartNumA,
     bool* apbStateChangeA
 ) {
-    // Raw storage: the body frees the set's buffer itself, so no C++ destructor may free it again.
-    XFNV_INLINED_LOCAL(NiBoneSetCollection, kBoneSets, std::nullopt, std::nullopt);
-    // EXE-INLINED none: NiBoneSetCollection constructor (three stores)
-    kBoneSets.m_pBase = nullptr;
-    kBoneSets.m_uiAlloced = 0;
-    kBoneSets.m_uiUsed = 0;
+    NiBoneSetCollection kBoneSets;
     // MakeBoneSets always writes it.
     uint32_t* puiTriangleToPartition;
 
     VertexInteractions* pkVertexInteraction = CreateVertexInteractions(pkTriData->m_usVertices, pkSkinData);
     if (!pkVertexInteraction) {
-        _NiFree(nullptr);
         return false;
     }
 
@@ -812,12 +806,7 @@ bool NiSkinPartition::MakePartitions(
         // A real new[], as in LoadBinary.
         Partition* pkPartitions = new Partition[m_uiPartitions];
 
-        // Raw storage: the body frees the set's buffer itself, so no C++ destructor may free it again.
-        XFNV_INLINED_LOCAL(TriangleSet, kTriangles, std::nullopt, std::nullopt);
-        // EXE-INLINED none: TriangleSet constructor (three stores)
-        kTriangles.m_pBase = nullptr;
-        kTriangles.m_uiAlloced = 0;
-        kTriangles.m_uiUsed = 0;
+        TriangleSet kTriangles;
 
         // The flag is stored over the low byte of ucBonesPerPartition, keeping its upper bits, and that whole value is
         // passed to Create, as the game does.
@@ -864,7 +853,6 @@ bool NiSkinPartition::MakePartitions(
         }
 
         m_pkPartitions = pkPartitions;
-        _NiFree(kTriangles.m_pBase);
     }
 
     // NiDelete[] of the interaction array: each set's buffer last to first, then the block (its count sits before it;
@@ -874,7 +862,6 @@ bool NiSkinPartition::MakePartitions(
         _NiFree(pkVertexInteraction[iInteraction].m_pBase);
     }
     MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pkVertexInteraction) - 1);
-    _NiFree(kBoneSets.m_pBase);
     return bPartition;
 }
 
@@ -1052,11 +1039,7 @@ bool NiSkinPartition::RemoveExcessInteractions(
     using NiTPointerMapUIntFloat = NiTPointerMap<uint32_t, float>;
     NiTPointerMapUIntFloat kMap(37);
 
-    // Raw storage: the body frees the set's buffer itself, so no C++ destructor may free it again.
-    XFNV_INLINED_LOCAL(NiTPrimitiveSet<uint32_t>, kCoincidentVerts, std::nullopt, std::nullopt);
-    kCoincidentVerts.m_pBase = nullptr;
-    kCoincidentVerts.m_uiAlloced = 0;
-    kCoincidentVerts.m_uiUsed = 0;
+    NiTPrimitiveSet<uint32_t> kCoincidentVerts;
 
     uint16_t* pusIndex0;
     uint16_t* pusIndex1;
@@ -1202,7 +1185,6 @@ bool NiSkinPartition::RemoveExcessInteractions(
                         if (--pkJ->m_uiUsed == 0) {
                             _NiFree(pusIndex0);
                             _NiFree(pusIndex1);
-                            _NiFree(kCoincidentVerts.m_pBase);
                             // kMap's destructor runs on return.
                             return false;
                         }
@@ -1237,7 +1219,6 @@ bool NiSkinPartition::RemoveExcessInteractions(
 
     _NiFree(pusIndex0);
     _NiFree(pusIndex1);
-    _NiFree(kCoincidentVerts.m_pBase);
     // kMap's destructor runs on return.
     return true;
 }

@@ -137,11 +137,7 @@ void hkpRagdollDrawer::drawConstraint(
     coneAngle = static_cast<float>(1.5707963705062866 - absMinAngle);
     m_planeCone2.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);
 
-    // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, twistGeometry, std::nullopt, std::nullopt);
-    twistGeometry.m_data = nullptr;
-    twistGeometry.m_size = 0;
-    twistGeometry.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hkArray<hkDisplayGeometry*> twistGeometry;
     alignas(16) hkArray<hkDisplayGeometry*> coneGeometries;
     coneGeometries.m_data = nullptr;
     coneGeometries.m_size = 0;
@@ -221,15 +217,4 @@ void hkpRagdollDrawer::drawConstraint(
     }
     coneGeometries.m_data = nullptr;
     coneGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::~hkArray
-    heap = hkMemoryRouter::getInstance().m_heap;
-    twistGeometry.m_size = 0;
-    if (!(twistGeometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG)) {
-        heap->bufFree(
-            twistGeometry.m_data,
-            static_cast<int32_t>(
-                (twistGeometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) * 4
-            )
-        );
-    }
 }

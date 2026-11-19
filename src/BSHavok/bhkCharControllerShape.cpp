@@ -80,24 +80,17 @@ bhkCharControllerShape* bhkCharControllerShape::CreateFromHull(hkArray<hkVector4
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkCharControllerShape* pShape = nullptr;
-    XFNV_INLINED_LOCAL(hkConvexVerticesShapeCinfo, kInfo, std::nullopt, std::nullopt);
-    kInfo.m_userData = 0;
-    kInfo.m_radius = 0.1f;
-    kInfo.m_vertices.m_data = nullptr;
-    kInfo.m_vertices.m_size = 0;
-    kInfo.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    kInfo.m_planeEquations.m_data = nullptr;
-    kInfo.m_planeEquations.m_size = 0;
-    kInfo.m_planeEquations.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    if (arVerts.m_size != 0) {
-        bhkGeometryUtil::ComputePlanesFromVertices(arVerts, kInfo.m_planeEquations, kInfo.m_vertices);
-        bhkCharControllerShape* pObject =
-            static_cast<bhkCharControllerShape*>(NiMemObject::operator new(sizeof(bhkCharControllerShape)));
-        if (pObject) {
-            pShape = ::new (pObject) bhkCharControllerShape(kInfo);
+    {
+        hkConvexVerticesShapeCinfo kInfo;
+        if (arVerts.m_size != 0) {
+            bhkGeometryUtil::ComputePlanesFromVertices(arVerts, kInfo.m_planeEquations, kInfo.m_vertices);
+            bhkCharControllerShape* pObject =
+                static_cast<bhkCharControllerShape*>(NiMemObject::operator new(sizeof(bhkCharControllerShape)));
+            if (pObject) {
+                pShape = ::new (pObject) bhkCharControllerShape(kInfo);
+            }
         }
     }
-    kInfo.~hkConvexVerticesShapeCinfo();
     GetThreadMemContext() = iOldMemContext;
     return pShape;
 }

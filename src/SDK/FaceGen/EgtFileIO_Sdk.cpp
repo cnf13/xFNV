@@ -16,28 +16,21 @@ void FffEgtFileHeaderS::fix() {
 // scale, the header's sizes, and three images of nrows rows of ncols bytes, the row stride padded to 8 bytes, read
 // from the last row up. The by-value arguments the exe builds in its outgoing argument area (the file ID, the file
 // name, the default modes) are built in locals here and copied; their callees destroy them, as in the exe. The
-// asymmetric images take their first row through the out-of-line operator[] (0x65CC70) and the last image read's
-// failure and the final return call the destructor out of line (0xAAAB30); the other failures inline it. The
-// exe's cleanup-only C++ EH frame is left out.
+// asymmetric images take their first row through the out-of-line operator[] (0x65CC70). The exe's cleanup-only C++
+// EH frame is left out.
 bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 	std::vector<FffModeTexS, std::allocator<FffModeTexS>>& symm,
 	std::vector<FffModeTexS, std::allocator<FffModeTexS>>& asym)
 {
 	FffEgtFileHeaderS header;
-	XFNV_INLINED_LOCAL(BSFaceGenBinaryFile, kFile, std::nullopt, std::nullopt);
 	std::string kFileId("FREGT003");
-	::new (&kFile) BSFaceGenBinaryFile(kFileId);
-	// The early returns' destructor, which the exe inlines.
-	auto fnFail = [&kFile]() -> bool {
-		kFile.~BSFaceGenBinaryFile();
-		return false;
-	};
+	BSFaceGenBinaryFile kFile(kFileId);
 	std::string kFileName(fname);
 	if (!kFile.BSFaceGenBinaryFile::openForRead(kFileName, false)) {
-		return fnFail();
+		return false;
 	}
 	if (!kFile.readHeader(&header, 1, sizeof(header))) {
-		return fnFail();
+		return false;
 	}
 	header.fix();
 	basisKey = header.basisKey;
@@ -55,7 +48,7 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 	symm.resize(header.numSym, kSymMode);
 	for (uint32_t i = 0; i < header.numSym; ++i) {
 		if (!kFile.BSFaceGenBinaryFile::read(&symm[i], sizeof(float), 1)) {
-			return fnFail();
+			return false;
 		}
 		symm[i].width = header.ncols;
 		symm[i].height = header.nrows;
@@ -65,7 +58,7 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 			uint8_t* pRow = &symm[i].img[j][uiTotal - uiStride];
 			for (uint32_t k = 0; k < header.nrows; ++k) {
 				if (!kFile.BSFaceGenBinaryFile::read(pRow, uiElemSize, header.ncols)) {
-					return fnFail();
+					return false;
 				}
 				pRow -= header.ncols + uiRowPad;
 			}
@@ -78,7 +71,7 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 	asym.resize(header.numAsym, kAsymMode);
 	for (uint32_t i = 0; i < header.numAsym; ++i) {
 		if (!kFile.BSFaceGenBinaryFile::read(&asym[i], sizeof(float), 1)) {
-			return fnFail();
+			return false;
 		}
 		asym[i].width = header.ncols;
 		asym[i].height = header.nrows;
@@ -88,13 +81,11 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 			uint8_t* pRow = &asym[i].img[j][uiTotal - uiStride];
 			for (uint32_t k = 0; k < header.nrows; ++k) {
 				if (!kFile.BSFaceGenBinaryFile::read(pRow, uiElemSize, header.ncols)) {
-					kFile.~BSFaceGenBinaryFile();
 					return false;
 				}
 				pRow -= header.ncols + uiRowPad;
 			}
 		}
 	}
-	kFile.~BSFaceGenBinaryFile();
 	return true;
 }

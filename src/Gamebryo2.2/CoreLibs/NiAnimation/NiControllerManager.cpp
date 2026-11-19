@@ -112,14 +112,7 @@ void NiControllerManager::LinkObject(NiStream& kStream) {
             }
         }
 
-        // The NiPointer temporary's reference is taken and released without the class's null tests, since the owner
-        // test above already dereferences pkSequence. The temporary runs no C++ constructor or destructor, so the
-        // reference is taken and released once each.
-        XFNV_INLINED_LOCAL(NiPointer<NiControllerSequence>, kElement, std::nullopt, std::nullopt);
-        kElement.m_pObject = pkSequence;
-        NiIncRefCount(pkSequence);
-        m_kSequenceArray.AddFirstEmpty(kElement);
-        NiDecRefCount(pkSequence);
+        m_kSequenceArray.AddFirstEmpty(NiPointer<NiControllerSequence>(pkSequence));
         m_kStringMap.SetAt(pkSequence->m_kName.GetHandle(), pkSequence);
     }
 }

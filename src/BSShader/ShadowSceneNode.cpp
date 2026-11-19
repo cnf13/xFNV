@@ -744,12 +744,7 @@ ShadowSceneLight* ShadowSceneNode::AddQueuedLight(ShadowSceneLight* apLight) {
         }
     }
 
-    // The NiPointer is filled in without its constructor's null test, because apLight was dereferenced above.
-    XFNV_INLINED_LOCAL(NiPointer<ShadowSceneLight>, spLight, std::nullopt, std::nullopt);
-    spLight.m_pObject = apLight;
-    NiIncRefCount(apLight);
-    lLightList.AddTail(spLight);
-    NiDecRefCount(apLight);
+    lLightList.AddTail(NiPointer<ShadowSceneLight>(apLight));
     if (apLight->bCastShadow) {
         BSRenderedTexture* pShadowMap;
         // Tests bCubeShadowMap through a null ShadowSceneLight pointer, as the game does, so a shadow-casting light
@@ -1394,13 +1389,7 @@ void ShadowSceneNode::RemoveShadowLight(NiAVObject* apObject) {
         ShadowSceneLight* pLight = pItem->m_element.m_pObject;
         pItem = pItem->m_pkNext;
         if (pLight && pLight->spShadowCaster.m_pObject == apObject) {
-            // The NiPointer is filled in directly, without its constructor's and destructor's null tests (pLight was
-            // tested above).
-            XFNV_INLINED_LOCAL(NiPointer<ShadowSceneLight>, spLight, std::nullopt, std::nullopt);
-            spLight.m_pObject = pLight;
-            NiIncRefCount(pLight);
-            RemoveLight(spLight);
-            NiDecRefCount(pLight);
+            RemoveLight(NiPointer<ShadowSceneLight>(pLight));
             return;
         }
     }

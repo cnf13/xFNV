@@ -19,7 +19,8 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
     const hkpMoppAabbJob& job = static_cast<const hkpMoppAabbJob&>(baseJob);
     // A MOPP code over the job's code bytes: only its info, its data array and its build type are set (no vtable or
     // reference count), and no destructor is run on it.
-    XFNV_INLINED_LOCAL(hkpMoppCode, code, std::nullopt, std::nullopt);
+    alignas(16) uint8_t codeStorage[sizeof(hkpMoppCode)];
+    hkpMoppCode& code = *reinterpret_cast<hkpMoppCode*>(codeStorage);
     code.m_info = job.m_moppCodeInfo;
     code.m_data.m_data = const_cast<uint8_t*>(job.m_moppCodeData);
     code.m_data.m_size = 512;
@@ -30,13 +31,8 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
         const hkpMoppAabbCommand* command = &job.m_commandArray[i];
         // The results array over the command's buffer, which is treated as untyped memory: the command declares shape
         // keys, the query writes 4-byte primitive infos into it.
-        // EXE-INLINED 0x62E230
-        using results_t = hkArray<hkpMoppPrimitiveInfo, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(results_t, results, std::nullopt, std::nullopt);
-        results.m_data = reinterpret_cast<hkpMoppPrimitiveInfo*>(command->m_results);
-        results.m_size = 0;
-        results.m_capacityAndFlags = static_cast<int32_t>(
-            static_cast<uint32_t>(hkArrayBase<hkpMoppPrimitiveInfo>::DONT_DEALLOCATE_FLAG) |
+        hkArray<hkpMoppPrimitiveInfo, hkContainerHeapAllocator> results(
+            reinterpret_cast<hkpMoppPrimitiveInfo*>(command->m_results), 0,
             hkpMoppAabbCommand::MAX_OUTPUT_KEYS_PER_QUERY
         );
         alignas(16) hkpMoppObbVirtualMachine machine;
@@ -52,9 +48,6 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
             pTerminator->ID = HK_INVALID_SHAPE_KEY;
         }
         results.m_size++;
-        // The array's destructor.
-        // EXE-INLINED 0xC7B0F0
-        results.clearAndDeallocate();
     }
     HK_TIMER_END();
     return jobQueue.finishJobAndGetNextJob(&nextJobOut, nextJobOut, hkJobQueue::WAIT_FOR_NEXT_JOB);

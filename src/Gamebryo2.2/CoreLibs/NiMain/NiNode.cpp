@@ -60,11 +60,10 @@ void NiAVObjectArray_InsertAt(
 }
 
 void NiAVObjectArray_UpdateSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
-    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
     while (apArray->m_usSize) {
-        NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
-        bool v3 = apArray->m_pBase[apArray->m_usSize - 1].operator!=(*pNull);
-        spNull.~NiPointer<NiAVObject>();
+        bool v3 = apArray->m_pBase[apArray->m_usSize - 1].operator!=(
+            NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr))
+        );
         if (v3) {
             break;
         }
@@ -1105,15 +1104,12 @@ LABEL_6:
 // NiTArray<NiPointer<NiAVObject>>::Compact and ::UpdateSize. Each null test builds a null NiPointer<NiAVObject> and
 // destroys it.
 void NiAVObjectArray_Compact(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
-    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spNull, std::nullopt, std::nullopt);
     if (apArray->m_usESize != apArray->m_usSize) {
         if (apArray->m_usESize) {
             uint16_t v6 = 0;
             uint16_t v5 = 0;
             while (v6 < static_cast<int32_t>(apArray->m_usSize)) {
-                NiPointer<NiAVObject>* pNull = ::new (&spNull) NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
-                bool v3 = apArray->m_pBase[v6].operator!=(*pNull);
-                spNull.~NiPointer<NiAVObject>();
+                bool v3 = apArray->m_pBase[v6].operator!=(NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr)));
                 if (v3) {
                     if (apArray->m_pBase[v5].operator!=(apArray->m_pBase[v6])) {
                         apArray->m_pBase[v5].operator=(apArray->m_pBase[v6]);

@@ -132,14 +132,7 @@ void hkxMesh::appendGeometry(
                 materialsInOut->m_data[materialsInOut->m_size++] = pMaterial;
             }
         }
-        XFNV_INLINED_LOCAL(hkGeometry, geometry, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkGeometry::hkGeometry
-        geometry.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        geometry.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
-        geometry.m_vertices.m_data = nullptr;
-        geometry.m_vertices.m_size = 0;
-        geometry.m_triangles.m_data = nullptr;
-        geometry.m_triangles.m_size = 0;
+        hkGeometry geometry;
         m_sections.m_data[i].val()->appendGeometry(geometry, materialIndex);
         for (int32_t t = 0; t < geometry.m_triangles.m_size; ++t) {
             geometry.m_triangles.m_data[t].m_a += indexOffset;
@@ -155,7 +148,6 @@ void hkxMesh::appendGeometry(
         geometryInOut.m_triangles._insertAt(
             *hkMemoryRouter::getInstance().m_heap, triangleIndex, pTriangles, numTriangles
         );
-        geometry.~hkGeometry();
     }
 }
 

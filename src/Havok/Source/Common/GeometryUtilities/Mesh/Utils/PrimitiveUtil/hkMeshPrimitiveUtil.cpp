@@ -318,20 +318,7 @@ void hkMeshPrimitiveUtil::appendTriangleIndices(
                 break;
             }
             const int32_t numIndices = section.m_numIndices;
-            // The stack allocator's bytes are untyped memory; the local array keeps its indices there.
-            XFNV_INLINED_LOCAL(hkLocalArray<uint16_t>, indices16, std::nullopt, std::nullopt);
-            {
-                // EXE-INLINED none: hkLocalArray<hkUint16>::hkLocalArray(section.m_numIndices) (hkAllocateStack)
-                indices16.m_data = nullptr;
-                indices16.m_size = 0;
-                indices16.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
-                hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-                char* pBlock = stack.m_next.m_storage;
-                stack.m_next.m_storage = pBlock + ((numIndices * static_cast<int32_t>(sizeof(uint16_t)) + 127) & ~127);
-                indices16.m_data = reinterpret_cast<uint16_t*>(pBlock);
-                indices16.m_localMemory = indices16.m_data;
-                indices16.m_capacityAndFlags = numIndices | hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
-            }
+            hkLocalArray<uint16_t> indices16(numIndices);
             appendTriangleIndices16(
                 primType, static_cast<const uint16_t*>(section.m_indices), section.m_numIndices, 0, indices16
             );
@@ -345,7 +332,6 @@ void hkMeshPrimitiveUtil::appendTriangleIndices(
                 indicesOut.m_data[indicesOut.m_size] = index;
                 ++indicesOut.m_size;
             }
-            indices16.~hkLocalArray<uint16_t>();
             break;
         }
         case hkMeshSection::INDEX_TYPE_UINT32: {

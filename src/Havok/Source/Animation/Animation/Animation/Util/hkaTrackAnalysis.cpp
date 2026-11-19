@@ -26,87 +26,99 @@ static hkaTrackAnalysis_reverseBitsArray hkaTrackAnalysis_reverseBits{0x0, 0x8, 
 hkaTrackAnalysis::PerTransformTrackAnalysisInput::~PerTransformTrackAnalysisInput() {}
 
 void hkaTrackAnalysis::AnalysisStats::displayReport() {
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     char buf[512];
     hkError::s_instance->sectionBegin(0x432434A4, "Track Analysis");
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValue = m_numTransformDOFS + m_numFloatDOFS;
-    hkOstream* v2 = &apThis.operator<<("Total DOFs ");
-    v2->operator<<(afValue);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 47);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuea = m_staticPosDOF;
-    hkOstream* v3 = &apThis.operator<<("Static position DOFs ");
-    v3->operator<<(afValuea);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 48);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValueb = m_staticRotDOF;
-    hkOstream* v4 = &apThis.operator<<("Static rotation DOFs ");
-    v4->operator<<(afValueb);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 49);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuec = m_staticSclDOF;
-    hkOstream* v5 = &apThis.operator<<("Static scale DOFs ");
-    v5->operator<<(afValuec);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 50);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValued = m_staticFloatDOF;
-    hkOstream* v6 = &apThis.operator<<("Static float DOFs ");
-    v6->operator<<(afValued);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 51);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuee = m_clearPosDOF;
-    hkOstream* v7 = &apThis.operator<<("Clear position DOFs ");
-    v7->operator<<(afValuee);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 52);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuef = m_clearRotDOF;
-    hkOstream* v8 = &apThis.operator<<("Clear rotation DOFs ");
-    v8->operator<<(afValuef);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 53);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValueg = m_clearSclDOF;
-    hkOstream* v9 = &apThis.operator<<("Clear scale DOFs ");
-    v9->operator<<(afValueg);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 54);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValueh = m_dynamicPosDOF;
-    hkOstream* v10 = &apThis.operator<<("Dynamic position DOFs ");
-    v10->operator<<(afValueh);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 55);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuei = m_dynamicRotDOF;
-    hkOstream* v11 = &apThis.operator<<("Dynamic rotation DOFs ");
-    v11->operator<<(afValuei);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 56);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuej = m_dynamicSclDOF;
-    hkOstream* v12 = &apThis.operator<<("Dynamic scale DOFs ");
-    v12->operator<<(afValuej);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 57);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    uint32_t afValuek = m_dynamicFloatDOF;
-    hkOstream* v13 = &apThis.operator<<("Dynamic float DOFs ");
-    v13->operator<<(afValuek);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 58);
-    apThis.~hkErrStream();
-    ::new (&apThis) hkErrStream(buf, 512);
-    float afValuel = m_ratio;
-    hkOstream* v14 = &apThis.operator<<("Redundancy ");
-    v14->operator<<(afValuel);
-    hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 59);
-    apThis.~hkErrStream();
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValue = m_numTransformDOFS + m_numFloatDOFS;
+        hkOstream* v2 = &apThis.operator<<("Total DOFs ");
+        v2->operator<<(afValue);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 47);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuea = m_staticPosDOF;
+        hkOstream* v3 = &apThis.operator<<("Static position DOFs ");
+        v3->operator<<(afValuea);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 48);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValueb = m_staticRotDOF;
+        hkOstream* v4 = &apThis.operator<<("Static rotation DOFs ");
+        v4->operator<<(afValueb);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 49);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuec = m_staticSclDOF;
+        hkOstream* v5 = &apThis.operator<<("Static scale DOFs ");
+        v5->operator<<(afValuec);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 50);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValued = m_staticFloatDOF;
+        hkOstream* v6 = &apThis.operator<<("Static float DOFs ");
+        v6->operator<<(afValued);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 51);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuee = m_clearPosDOF;
+        hkOstream* v7 = &apThis.operator<<("Clear position DOFs ");
+        v7->operator<<(afValuee);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 52);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuef = m_clearRotDOF;
+        hkOstream* v8 = &apThis.operator<<("Clear rotation DOFs ");
+        v8->operator<<(afValuef);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 53);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValueg = m_clearSclDOF;
+        hkOstream* v9 = &apThis.operator<<("Clear scale DOFs ");
+        v9->operator<<(afValueg);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 54);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValueh = m_dynamicPosDOF;
+        hkOstream* v10 = &apThis.operator<<("Dynamic position DOFs ");
+        v10->operator<<(afValueh);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 55);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuei = m_dynamicRotDOF;
+        hkOstream* v11 = &apThis.operator<<("Dynamic rotation DOFs ");
+        v11->operator<<(afValuei);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 56);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuej = m_dynamicSclDOF;
+        hkOstream* v12 = &apThis.operator<<("Dynamic scale DOFs ");
+        v12->operator<<(afValuej);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 57);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        uint32_t afValuek = m_dynamicFloatDOF;
+        hkOstream* v13 = &apThis.operator<<("Dynamic float DOFs ");
+        v13->operator<<(afValuek);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 58);
+    }
+    {
+        hkErrStream apThis(buf, 512);
+        float afValuel = m_ratio;
+        hkOstream* v14 = &apThis.operator<<("Redundancy ");
+        v14->operator<<(afValuel);
+        hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 59);
+    }
     hkError::s_instance->sectionEnd();
 }
 
@@ -213,21 +225,7 @@ void hkaTrackAnalysis::analyze(
         pStaticFloatDOFs = staticDOFs + (stats.m_staticSclDOF + stats.m_staticRotDOF + stats.m_staticPosDOF);
     }
 
-    XFNV_INLINED_LOCAL(hkLocalArray<float>, minValues, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numFloatTracks) (hkAllocateStack)
-        const int32_t numFloatTracks = static_cast<int32_t>(finput.m_numberOfFloatTracks);
-        minValues.m_data = nullptr;
-        minValues.m_size = 0;
-        minValues.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numFloatTracks * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-        minValues.m_capacityAndFlags = numFloatTracks | hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        minValues.m_data = static_cast<float*>(static_cast<void*>(pBlock));
-        minValues.m_localMemory = minValues.m_data;
-    }
+    hkLocalArray<float> minValues(static_cast<int32_t>(finput.m_numberOfFloatTracks));
     {
         // EXE-INLINED none: hkArray<hkReal>::setSize(numFloatTracks)
         const int32_t size = static_cast<int32_t>(finput.m_numberOfFloatTracks);
@@ -242,21 +240,7 @@ void hkaTrackAnalysis::analyze(
         }
         minValues.m_size = size;
     }
-    XFNV_INLINED_LOCAL(hkLocalArray<float>, maxValues, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(numFloatTracks) (hkAllocateStack)
-        const int32_t numFloatTracks = static_cast<int32_t>(finput.m_numberOfFloatTracks);
-        maxValues.m_data = nullptr;
-        maxValues.m_size = 0;
-        maxValues.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numFloatTracks * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-        maxValues.m_capacityAndFlags = numFloatTracks | hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        maxValues.m_data = static_cast<float*>(static_cast<void*>(pBlock));
-        maxValues.m_localMemory = maxValues.m_data;
-    }
+    hkLocalArray<float> maxValues(static_cast<int32_t>(finput.m_numberOfFloatTracks));
     {
         // EXE-INLINED none: hkArray<hkReal>::setSize(numFloatTracks)
         const int32_t size = static_cast<int32_t>(finput.m_numberOfFloatTracks);
@@ -308,9 +292,6 @@ void hkaTrackAnalysis::analyze(
         );
         stats.displayReport();
     }
-
-    maxValues.~hkLocalArray<float>();
-    minValues.~hkLocalArray<float>();
 }
 
 // The Havok SDK's analysis of the transform tracks. Per track: the average translation, rotation and scale over the
@@ -326,20 +307,7 @@ void hkaTrackAnalysis::analyzeQsTransform(
     hkBool displayStatsReport
 ) {
     const int32_t numTracks = static_cast<int32_t>(input.m_numberOfTransformTracks);
-    XFNV_INLINED_LOCAL(hkLocalArray<hkQsTransform>, average, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkQsTransform>::hkLocalArray(numTracks) (hkAllocateStack)
-        average.m_data = nullptr;
-        average.m_size = 0;
-        average.m_capacityAndFlags = hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numTracks * static_cast<int32_t>(sizeof(hkQsTransform)) + 127) & ~127);
-        average.m_capacityAndFlags = numTracks | hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        average.m_data = static_cast<hkQsTransform*>(static_cast<void*>(pBlock));
-        average.m_localMemory = average.m_data;
-    }
+    hkLocalArray<hkQsTransform> average(numTracks);
     {
         // EXE-INLINED none: hkArray<hkQsTransform>::setSize(numTracks)
         const int32_t size = static_cast<int32_t>(input.m_numberOfTransformTracks);
@@ -608,8 +576,6 @@ void hkaTrackAnalysis::analyzeQsTransform(
         hkaTrackAnalysis::calcStatsQsTransform(staticMask, input.m_numberOfTransformTracks, stats);
         stats.displayReport();
     }
-
-    average.~hkLocalArray<hkQsTransform>();
 }
 
 void hkaTrackAnalysis::calcDynamicStatsQsTransform(

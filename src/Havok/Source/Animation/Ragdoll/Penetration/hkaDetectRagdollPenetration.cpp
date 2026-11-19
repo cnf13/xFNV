@@ -148,18 +148,13 @@ hkBool hkaDetectRagdollPenetration::detectPenetration(
             if (m_boneStates.m_data[boneBeginIdx] != hkaDetectRagdollPenetration::HK_YESP_DESCENDANT) {
                 m_boneStates.m_data[boneBeginIdx] = hkaDetectRagdollPenetration::HK_YESP;
             }
-            // The array's constructor and destructor, inline.
-            XFNV_INLINED_LOCAL(hkArray<int16_t>, bonesOut, std::nullopt, std::nullopt);
-            bonesOut.m_data = nullptr;
-            bonesOut.m_size = 0;
-            bonesOut.m_capacityAndFlags = hkArrayBase<int16_t>::DONT_DEALLOCATE_FLAG;
+            hkArray<int16_t> bonesOut;
             hkaSkeletonUtils::getDescendants(*m_setup.m_ragdollSkeleton, boneBeginIdx, bonesOut, false);
             for (int32_t j = 0; j < bonesOut.m_size; ++j) {
                 if (m_boneStates.m_data[bonesOut.m_data[j]] != hkaDetectRagdollPenetration::HK_YESP_DESCENDANT) {
                     m_boneStates.m_data[bonesOut.m_data[j]] = hkaDetectRagdollPenetration::HK_YESP_DESCENDANT;
                 }
             }
-            bonesOut.clearAndDeallocate();
         }
         return 1;
     }

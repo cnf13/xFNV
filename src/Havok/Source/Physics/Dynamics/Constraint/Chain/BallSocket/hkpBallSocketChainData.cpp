@@ -133,15 +133,10 @@ int32_t hkpBallSocketChainData::getType() const {
 void hkpBallSocketChainData::buildJacobian(const hkpConstraintQueryIn& inChain, hkpConstraintQueryOut& out) {
     hkBeginConstraints(&inChain, &out, static_cast<hkpSolverResults*>(inChain.m_constraintRuntime.m_storage), 8);
 
-    // EXE-INLINED none: hkInplaceArray<hkpVelocityAccumulatorOffset, 32>::hkInplaceArray
-    using accumulators_t = hkInplaceArray<hkpVelocityAccumulatorOffset, 32>;
-    XFNV_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
-    accumulators.m_size = 0;
+    hkInplaceArray<hkpVelocityAccumulatorOffset, 32> accumulators;
     hkpConstraintQueryIn in2 = inChain;
     in2.m_constraintInstance = nullptr;
     in2.m_constraintRuntime.m_storage = nullptr;
-    accumulators.m_capacityAndFlags = 32 | hkArrayBase<hkpVelocityAccumulatorOffset>::DONT_DEALLOCATE_FLAG;
-    accumulators.m_data = accumulators.m_storage;
 
     hkpConstraintChainInstance* instance = static_cast<hkpConstraintChainInstance*>(inChain.m_constraintInstance);
     // The accumulators' base: body A's accumulator less the chain instance's first entity's offset. The accumulator
@@ -219,18 +214,6 @@ void hkpBallSocketChainData::buildJacobian(const hkpConstraintQueryIn& inChain, 
         numConstraints, m_tau, m_damping, m_cfm, accumulators.m_data,
         reinterpret_cast<const hkpVelocityAccumulator*>(accumsBase), jac, inChain, out
     );
-
-    // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::~hkArray
-    // The inline array's destructor, inlined.
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    accumulators.m_size = 0;
-    if (accumulators.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            accumulators.m_data,
-            (accumulators.m_capacityAndFlags & hkArrayBase<hkpVelocityAccumulatorOffset>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpVelocityAccumulatorOffset))
-        );
-    }
 }
 
 void hkpBallSocketChainData::getConstraintInfo(hkpConstraintData::ConstraintInfo& info) const {

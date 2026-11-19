@@ -35,32 +35,26 @@ ImageSpaceEffectGetHit::~ImageSpaceEffectGetHit() {
 }
 
 void ImageSpaceEffectGetHit::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(4);
     pTextures.SetSize(4u);
     ImageSpaceShaderParam* pparam = nullptr;
-    spParam.m_pObject = nullptr;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, nullptr);
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(0, apManager->pEffectList.m_pBase[34], nullptr, 2);
-    spParam.m_pObject = nullptr;
-    pEffectParamList.SetAt(1u, spParam);
+    pEffectParamList.SetAt(1u, nullptr);
     SetEffectInputs(1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(1, apManager->pEffectList.m_pBase[17], nullptr, 2);
-    spParam.m_pObject = nullptr;
-    pEffectParamList.SetAt(2u, spParam);
+    pEffectParamList.SetAt(2u, nullptr);
     SetEffectInputs(2, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(2, apManager->pEffectList.m_pBase[17], nullptr, 2);
     ImageSpaceShaderParam* v6 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v6;
     if (v6) {
         pparam = ::new (v6) ImageSpaceShaderParam;
     }
     pparam->InitConstantMap(0, 2);
     pparam->bUseTexOffset[2] = false;
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(3u, spParam);
+    pEffectParamList.SetAt(3u, pparam);
     SetEffectInputs(3, 1, 2, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(3, apManager->pEffectList.m_pBase[44], pparam, 0);
 }

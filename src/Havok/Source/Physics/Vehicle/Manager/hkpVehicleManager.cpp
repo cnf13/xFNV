@@ -115,24 +115,7 @@ void hkpVehicleManager::removeVehicle(hkpVehicleInstance* vehicle) {
 // allocator, sized to the vehicle's wheel count, then the vehicle is prepared, its wheels collided (collideWheels,
 // through the vtable) and simulated.
 void hkpVehicleManager::stepVehicles(const hkStepInfo& stepInfo) {
-    XFNV_INLINED_LOCAL(
-        hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>, cdInfo, std::nullopt, std::nullopt
-    );
-    cdInfo.m_data = nullptr;
-    cdInfo.m_size = 0;
-    cdInfo.m_capacityAndFlags =
-        hkArrayBase<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage =
-        static_cast<char*>(pBlock) + 16 * sizeof(hkpVehicleWheelCollide::CollisionDetectionWheelOutput);
-    hkpVehicleWheelCollide::CollisionDetectionWheelOutput* pLocal =
-        static_cast<hkpVehicleWheelCollide::CollisionDetectionWheelOutput*>(pBlock);
-    cdInfo.m_data = pLocal;
-    cdInfo.m_capacityAndFlags =
-        16u | hkArrayBase<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>::DONT_DEALLOCATE_FLAG;
-    cdInfo.m_localMemory = pLocal;
+    hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput> cdInfo(16);
 
     const int32_t numVehicles = m_registeredVehicles.m_size;
     for (int32_t i = 0; i < numVehicles; ++i) {
@@ -158,8 +141,6 @@ void hkpVehicleManager::stepVehicles(const hkStepInfo& stepInfo) {
         pVehicle->m_wheelCollide->collideWheels(stepInfo.m_deltaTime, pVehicle, cdInfo.m_data);
         pVehicle->stepVehicleUsingWheelCollideOutput(stepInfo, cdInfo.m_data);
     }
-
-    cdInfo.~hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>();
 }
 
 void hkpVehicleManager::addToWorld(hkpWorld* a1) {

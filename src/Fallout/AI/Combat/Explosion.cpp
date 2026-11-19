@@ -667,7 +667,6 @@ void Explosion::ApplyImpactDecals() {
     NiPoint3 v90;
     alignas(16) CFilter v107;
     alignas(16) NiPoint3 v109;
-    XFNV_INLINED_LOCAL(hkpAllRayHitCollector, pickCollector, std::nullopt, std::nullopt);
     hkpRootCdPoint point_2;
     NiPoint3 v122;
     NiPoint3 location;
@@ -745,7 +744,7 @@ void Explosion::ApplyImpactDecals() {
             }
             HK2NI(contactPoint, point_2.m_contact.getPosition());
             HK2NINS(contactNormal, point_2.m_contact.getNormal());
-            ::new (&pickCollector) hkpAllRayHitCollector;
+            hkpAllRayHitCollector pickCollector;
             bhkPickData pd;
             NiPoint3 origin = this->GetLocationOnReference();
             NiPoint3 pickLength = 2.0f * (contactPoint - origin);
@@ -829,7 +828,6 @@ void Explosion::ApplyImpactDecals() {
             pimpactData = this->GetExplosionBase()->GetImpactData(emat);
             if (!pimpactData) {
             LABEL_100:;
-                pickCollector.~hkpAllRayHitCollector();
                 goto LABEL_101;
             }
             char v88 = 1;

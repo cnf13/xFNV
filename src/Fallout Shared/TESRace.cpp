@@ -1194,8 +1194,6 @@ bool TESRace::GetBodyTexture(
     bool abForceCreate
 ) {
     TESActorBase::SEX esex;
-    XFNV_INLINED_LOCAL(BSStringT<char>, fileEGT, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, facecoord, std::nullopt, std::nullopt);
     char path[264];
     char pcString[264];
     char Path[268];
@@ -1203,17 +1201,14 @@ bool TESRace::GetBodyTexture(
     NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
     NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
     NiPointer<NiTexture> sptexBaseMod(static_cast<NiTexture*>(nullptr));
-    rt::eh_vector_constructor_iterator(
-        facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
+    FR2MatrixVTC<float> facecoord[2][2];
     if (apNPC) {
         esex = apNPC->GetSex();
     }
     else {
         esex = TESActorBase::SEX_MALE;
     }
-    ::new (&fileEGT) BSStringT<char>;
+    BSStringT<char> fileEGT;
     aspOutBaseTexture.operator=(static_cast<NiTexture*>(nullptr));
     if (!abForceCreate && apNPC != pPlayer->GetObjectReference()) {
         aspOutModTexture.operator=(static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture()));
@@ -1293,10 +1288,6 @@ bool TESRace::GetBodyTexture(
     }
     bResult = true;
 done:
-    fileEGT.~BSStringT<char>();
-    rt::eh_vector_destructor_iterator(
-        facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
     return bResult;
 }
 

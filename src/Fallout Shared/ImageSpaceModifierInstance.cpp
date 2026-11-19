@@ -161,16 +161,13 @@ bool ImageSpaceModifierInstanceForm::StartTransition(
 // Removes every active instance of apMod (the list's Remove copies the next node into a removed head, so the scan stays
 // on the same node after a removal) and plays apMod's outro sound once.
 void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
     if (apMod) {
         bool bHasPlayed = false;
         BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* pkList = &TES::pInstance->listActiveImageSpaceModifiers;
         while (pkList) {
             ImageSpaceModifierInstance* pInstance = pkList->m_item.m_pObject;
             if (pInstance && (pInstance->IsForm() && pInstance->IsForm()->pImageSpaceMod == apMod)) {
-                ::new (&spInstance) NiPointer<ImageSpaceModifierInstance>(pInstance);
-                pkList->Remove(spInstance);
-                spInstance.~NiPointer<ImageSpaceModifierInstance>();
+                pkList->Remove(NiPointer<ImageSpaceModifierInstance>(pInstance));
                 if ((apMod->pOutroSound) && (!bHasPlayed)) {
                     bHasPlayed = true;
                     uint32_t uiSoundID = apMod->pOutroSound->iFormID;
@@ -187,7 +184,6 @@ void ImageSpaceModifierInstanceForm::Stop(TESImageSpaceModifier* apMod) {
 
 ImageSpaceModifierInstanceForm*
 ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afStrength, NiAVObject* apTarget) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
     ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
         ImageSpaceModifierInstanceForm* pNew;
@@ -199,9 +195,9 @@ ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afSt
             pNew = nullptr;
         }
         pMod = pNew;
-        ::new (&spForm) NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew));
-        TES::pInstance->listActiveImageSpaceModifiers.AddTail(spForm);
-        spForm.~NiPointer<ImageSpaceModifierInstance>();
+        TES::pInstance->listActiveImageSpaceModifiers.AddTail(
+            NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew))
+        );
         if (apMod->pIntroSound) {
             uint32_t uiSoundID = apMod->pIntroSound->iFormID;
             BSAudio* pAudio = &BSAudio::QInstance();
@@ -216,7 +212,6 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
     float afStrength,
     NiAVObject* apTarget
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spForm, std::nullopt, std::nullopt);
     bool bFound = false;
     ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
@@ -239,9 +234,9 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
                 pNew = nullptr;
             }
             pMod = pNew;
-            ::new (&spForm) NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew));
-            TES::pInstance->listActiveImageSpaceModifiers.AddTail(spForm);
-            spForm.~NiPointer<ImageSpaceModifierInstance>();
+            TES::pInstance->listActiveImageSpaceModifiers.AddTail(
+                NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew))
+            );
             if (apMod->pIntroSound) {
                 uint32_t uiSoundID = apMod->pIntroSound->iFormID;
                 BSAudio* pAudio = &BSAudio::QInstance();

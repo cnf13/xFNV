@@ -136,7 +136,7 @@ NiPoint2 BSShaderManager::kOldGridArrayCenter(NiPoint2::ZERO);
 
 // Gives apObject and every descendant its own copy of its material property: an uncontrolled material is replaced by a
 // new one with the same colours, shine and alpha, a controlled one is re-attached as is. The local NiCloningProcess is
-// built but unused, and its maps are destroyed in place.
+// built but unused.
 void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
     if (!apObject) {
         return;
@@ -148,8 +148,7 @@ void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
     }
     if (pMatProp) {
         apObject->DetachProperty(pMatProp);
-        XFNV_INLINED_LOCAL(NiCloningProcess, kCloneProc, std::nullopt, std::nullopt);
-        ::new (&kCloneProc) NiCloningProcess(257);
+        NiCloningProcess kCloneProc(257);
         NiMaterialProperty* pNewMatProp;
         if (pMatProp->m_spControllers) {
             pNewMatProp = pMatProp;
@@ -172,13 +171,6 @@ void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
             ++pNewMatProp->m_uiRevID;
         }
         apObject->AttachProperty(pNewMatProp);
-        // EXE-INLINED none: NiCloningProcess::~NiCloningProcess (scalar deleting destructors through slot 0)
-        if (kCloneProc.m_pkCloneMap) {
-            delete kCloneProc.m_pkCloneMap;
-        }
-        if (kCloneProc.m_pkProcessMap) {
-            delete kCloneProc.m_pkProcessMap;
-        }
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {

@@ -151,8 +151,7 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
     GetThreadMemContext() = MEM_CONTEXT_INTERFACE;
     Action* pAction = static_cast<Action*>(this->pActionListA);
     float fOldValue = this->fValue;
-    XFNV_INLINED_LOCAL(FloatArray, kStack, std::nullopt, std::nullopt);
-    ::new (&kStack) FloatArray;
+    FloatArray kStack;
     uint8_t bChanged = 0;
     while (pAction) {
         float fOperand = pAction->QFloat();
@@ -338,7 +337,6 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
             this->pParent->FinalPostParse(this->eIndex, this->fValue, this->strValue);
         }
     }
-    kStack.~FloatArray();
     // EXE-INLINED none: AutoMemContext
     GetThreadMemContext() = iOldMemContext;
 }
@@ -3534,16 +3532,12 @@ Tile::BuildStorage* Tile::ParseFile(const char* apName, char* apData, uint32_t a
 
 bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     char* ptokenContext;
-    XFNV_INLINED_LOCAL(BSStringT<char>, strfinalVersion, std::nullopt, std::nullopt);
     char* pstartIndex = apFile->pXMLData;
     const char* pincludeIndex = std::strstr(pstartIndex, "<include");
     if (!pincludeIndex) {
         return false;
     }
-    // BSStringT's constructor is written out here: both lengths and the pointer are stored directly.
-    strfinalVersion.pString = nullptr;
-    strfinalVersion.sLen = 0;
-    strfinalVersion.sMaxLen = 0;
+    BSStringT<char> strfinalVersion;
     uint32_t strtempSize = apFile->iFileSize + 1;
     char* strtemp = static_cast<char*>(MemoryManager_Singleton.Allocate(strtempSize));
     std::memset(strtemp, 0, strtempSize);
@@ -3554,10 +3548,7 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     strfinalVersion.Set(strtemp, 0x4000);
     bool bdone = false;
     while (!bdone) {
-        XFNV_INLINED_LOCAL(BSStringT<char>, strincludeFilename, std::nullopt, std::nullopt);
-        strincludeFilename.pString = nullptr;
-        strincludeFilename.sLen = 0;
-        strincludeFilename.sMaxLen = 0;
+        BSStringT<char> strincludeFilename;
         int32_t iincludeTagLength = std::strchr(pincludeIndex, '>') - pincludeIndex + 1;
         std::memset(strtemp, 0, strtempSize);
         // pincludeIndex is const char*, but strtok_s cuts the XML data it points into in place, hence the const_cast.
@@ -3584,7 +3575,6 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
             bdone = true;
         }
         strfinalVersion += static_cast<const char*>(strtemp);
-        strincludeFilename.Set(nullptr, 0);
     }
     MemoryManager_Singleton.Deallocate(apFile->pXMLData);
     apFile->pXMLData = static_cast<char*>(MemoryManager_Singleton.Allocate(strfinalVersion.Length() + 1));
@@ -3592,7 +3582,6 @@ bool Tile::InsertIncludedFiles(XMLStorage* apFile) {
     apFile->iFileSize = strfinalVersion.Length();
     MemoryManager_Singleton.Deallocate(strtemp);
     Tile::InsertIncludedFiles(apFile);
-    strfinalVersion.Set(nullptr, 0);
     return true;
 }
 

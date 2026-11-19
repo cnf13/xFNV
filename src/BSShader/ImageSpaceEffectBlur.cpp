@@ -42,7 +42,6 @@ ImageSpaceEffectBlur::~ImageSpaceEffectBlur() {
 
 // The parameter list's SetAt stores the pointer without reference counting.
 void ImageSpaceEffectBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(2);
     pTextures.SetSize(bBrightPass ? 4u : 3u);
     int32_t iblurRadius = iRadius - 1;
@@ -72,8 +71,7 @@ void ImageSpaceEffectBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectP
     uint32_t uiSize = static_cast<uint32_t>((2 * iblurRadius + 1) * sizeof(NiPoint4));
     pparam->CopyConstantGroup(1, pfdata, uiSize);
     pparam->SetBlurClearMode();
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, NiPointer<ImageSpaceShaderParam>(pparam));
     if (bBrightPass) {
         SetEffectInputs(0, 1, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     }
@@ -93,8 +91,7 @@ void ImageSpaceEffectBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectP
     pparam_2->InitConstantMap(0, 18);
     pparam_2->CopyConstantGroup(1, pfdata, uiSize);
     pparam_2->SetBlurClearMode();
-    spParam.m_pObject = pparam_2;
-    pEffectParamList.SetAt(1u, spParam);
+    pEffectParamList.SetAt(1u, NiPointer<ImageSpaceShaderParam>(pparam_2));
     SetEffectInputs(1, 2, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(1, apManager->pEffectList.m_pBase[iblurRadius + 78], pparam_2, 0);
 }
@@ -229,7 +226,6 @@ void ImageSpaceEffectFullScreenBlur::Render(
 
 void ImageSpaceEffectFullScreenBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(11);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
@@ -243,7 +239,7 @@ void ImageSpaceEffectFullScreenBlur::Setup(ImageSpaceManager* apManager, ImageSp
     pparam->bUseTexOffset[1] = false;
     pparam->CopyConstantGroup(3, kHDRConstants11ADD48, 64u);
     SetEffect(0, apManager->pEffectList.m_pBase[65], pparam, 2);
-    spParam.m_pObject = pparam;
+    NiPointer<ImageSpaceShaderParam> spParam(pparam);
     NiTPrimitiveArray<NiPointer<ImageSpaceShaderParam>>* p_pEffectParamList = &pEffectParamList;
     pEffectParamList.SetAt(0, spParam);
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_BILERP);

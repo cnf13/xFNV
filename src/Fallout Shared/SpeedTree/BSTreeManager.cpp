@@ -163,25 +163,22 @@ void BSTreeManager::RemoveBackgroundLoadedTree(TESObjectREFR* apRef) {
 }
 
 BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TESObjectTREE* apTreeObj) {
-    XFNV_INLINED_LOCAL(NiPointer<BSTreeModel>, spbasemodel, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_TREEART, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\SpeedTree\\BSTreeManager.cpp", 462
     );
-    ::new (&spbasemodel) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    NiPointer<BSTreeModel> spbasemodel(static_cast<BSTreeModel*>(nullptr));
     BSTreeModel* pmodel = nullptr;
     if (!SpeedTree::bEnableTrees::Get() ||
         (!apTreeObj ||
          (!apTreeObj->GetModel() ||
           (!apTreeObj->GetModelLength() || (apTreeRefr && apTreeRefr->GetObjectReference() != apTreeObj))))) {
-        spbasemodel.~NiPointer<BSTreeModel>();
         return nullptr;
     }
     BSTreeNode* ptreeNode = nullptr;
     if (pBackgroundLoadedTreeMap->GetAt(apTreeRefr, ptreeNode)) {
         pBackgroundLoadedTreeMap->RemoveAt(apTreeRefr);
         BSTreeNode* v15 = ptreeNode;
-        spbasemodel.~NiPointer<BSTreeModel>();
         return v15;
     }
     uint32_t iseed = 1;
@@ -196,7 +193,6 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
     if (spbasemodel.m_pObject->m_uiRefCount <= 2) {
         if (!spbasemodel.m_pObject->InitFromBase(apTreeObj, iseed)) {
         LABEL_23:;
-            spbasemodel.~NiPointer<BSTreeModel>();
             return nullptr;
         }
         pmodel = spbasemodel.m_pObject;
@@ -230,7 +226,6 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
         pretnode->SetName(*a2);
     }
     pmodel->SetInitialized(true);
-    spbasemodel.~NiPointer<BSTreeModel>();
     return pretnode;
 }
 
@@ -277,9 +272,8 @@ NiPointer<BSTreeModel>* BSTreeManager::GetModelArray(TESObjectTREE* apTree) {
 }
 
 void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<BSTreeModel>& aspBSTreeModel) {
-    XFNV_INLINED_LOCAL(NiPointer<BSTreeModel>, sprettree, std::nullopt, std::nullopt);
     BSTreeManager::kModelCriticalSection.Enter(nullptr);
-    ::new (&sprettree) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    NiPointer<BSTreeModel> sprettree(static_cast<BSTreeModel*>(nullptr));
     if (apTree) {
         NiPointer<BSTreeModel>* pmodelarray = GetModelArray(apTree);
         int32_t iemptyslot = -1;
@@ -319,7 +313,6 @@ void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<B
     }
     BSTreeManager::kModelCriticalSection.Leave();
     aspBSTreeModel.operator=(sprettree);
-    sprettree.~NiPointer<BSTreeModel>();
 }
 
 void BSTreeManager::UpdateWindMatrices() {

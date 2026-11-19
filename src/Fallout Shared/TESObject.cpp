@@ -213,7 +213,6 @@ NiAVObject* TESObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
 }
 
 void TESObject::UnClone3D(TESObjectREFR* apRequester) {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     if (this == pDoorMarker || this == pTravelMarker) {
         apRequester = nullptr;
     }
@@ -227,7 +226,7 @@ void TESObject::UnClone3D(TESObjectREFR* apRequester) {
             GetScaledModelFileName(apRequester, cPath);
             pModelLoader->ReleaseFile(cPath);
             bool blastCopy = true;
-            ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+            NiPointer<Model> spmodel;
             if (pModelLoader->FindModel(cPath, spmodel) && spmodel.m_pObject->iManualRefCount > 0) {
                 blastCopy = false;
             }
@@ -238,7 +237,6 @@ void TESObject::UnClone3D(TESObjectREFR* apRequester) {
             else {
                 --iNumScaledModelsCloned;
             }
-            NiPointer<Model>::Destroy(&spmodel);
         }
     }
 
@@ -302,13 +300,11 @@ bool TESObject::ReplaceModel() {
 }
 
 NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     const char* pworldFilename = GetModelFileName(apRef);
     NiAVObject* pData3D = nullptr;
     if (apRef && (apRef->IsMarker() && apRef->GetObjectReference()->GetFormType() != LIGH_ID)) {
         NiAVObject* pData3D_2;
-        ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+        NiPointer<Model> spmodel;
         pModelLoader->FindModel(pworldFilename, spmodel);
         if (spmodel.m_pObject) {
             spmodel.m_pObject->IncManualRefCount();
@@ -321,21 +317,19 @@ NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
             pData3D_2 = nullptr;
         }
         pData3D = pData3D_2;
-        NiPointer<Model>::Destroy(&spmodel);
     }
     else {
         ENUM_LOD_MULT elod = TES::GetLODMult(this);
         if ((apRef) && (apRef->GetScale() != 1.0)) {
             char cScaledPath[264];
             GetScaledModelFileName(apRef, cScaledPath);
-            ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
+            NiPointer<Model> spmodel_2;
             pModelLoader->FindModel(cScaledPath, spmodel_2);
             if (spmodel_2.m_pObject) {
                 spmodel_2.m_pObject->IncManualRefCount();
                 pData3D = spmodel_2.m_pObject->GetModel();
                 ++iNumScaledModelsCloned;
             }
-            NiPointer<Model>::Destroy(&spmodel_2);
         }
 
         if (!pData3D) {

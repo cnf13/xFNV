@@ -248,11 +248,7 @@ namespace hkNativePackfileUtils {
     // Loads packfileData into a buffer of its own: the buffer grows to the size the packfile needs, the contents are
     // loaded into it, the contents' type name comes from the header's map, and the resource takes the buffer over.
     hkResource* load(const void* packfileData, int32_t dataSize, const hkTypeInfoRegistry* userRegistry) {
-        XFNV_INLINED_LOCAL(hkArray<char>, data, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkArray<char>::hkArray
-        data.m_data = nullptr;
-        data.m_size = 0;
-        data.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+        hkArray<char> data;
         int32_t requiredSize = getRequiredBufferSize(packfileData, dataSize);
         // Takes the heap before the capacity test, as the game does.
         hkMemoryAllocator& reserveHeap = hkMemoryRouter::getInstance().heap();
@@ -280,13 +276,6 @@ namespace hkNativePackfileUtils {
         resource->m_contents = contents;
         resource->m_contentsTypeName = contentsTypeName;
         resource->m_data.swap(data);
-        hkMemoryAllocator& freeHeap = hkMemoryRouter::getInstance().heap();
-        data.m_size = 0;
-        if (data.m_capacityAndFlags >= 0) {
-            freeHeap.bufFree(
-                data.m_data, static_cast<int32_t>(data.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)
-            );
-        }
         return resource;
     }
 } // namespace hkNativePackfileUtils

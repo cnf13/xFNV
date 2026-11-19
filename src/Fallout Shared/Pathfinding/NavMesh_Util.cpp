@@ -193,7 +193,6 @@ NavMesh::GetUndoDataIndexForObstacle(const NiPointer<ObstacleData>& apObstacle, 
 }
 
 bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps) {
-    XFNV_INLINED_LOCAL(NavMeshObstacleCutter, cutter_3, std::nullopt, std::nullopt);
     ObstacleUndoData* pundoData = (&Obstacles.GetAt(static_cast<int32_t>(aiUndoIndex)))->m_pObject;
     if (aiUndoIndex == Obstacles.iSize - 1) {
         NavMeshObstacleCutter cutter;
@@ -206,14 +205,9 @@ bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps)
     else {
         if (GetUndoDataMaxObstacleCount(pundoData)) {
             uint32_t iobstacleIndex;
-            using obstaclesToReAdd_t = NiPointer<ObstacleData>[100];
-            XFNV_INLINED_LOCAL(obstaclesToReAdd_t, obstaclesToReAdd, std::nullopt, std::nullopt);
-            rt::eh_vector_constructor_iterator(
-                obstaclesToReAdd, sizeof(NiPointer<ObstacleData>), 100, &xfnv::constructElement<NiPointer<NiRefObject>>,
-                &xfnv::destructElement<NiPointer<NiRefObject>>
-            );
+            NiPointer<ObstacleData> obstaclesToReAdd[100];
             uint32_t iobstacleToReAddCount = 0;
-            ::new (&cutter_3) NavMeshObstacleCutter;
+            NavMeshObstacleCutter cutter_3;
             for (iobstacleIndex = Obstacles.iSize - 1; iobstacleIndex != aiUndoIndex - 1; --iobstacleIndex) {
                 if ((&Obstacles.GetAt(static_cast<int32_t>(iobstacleIndex)))->m_pObject->eState ==
                     ObstacleUndoData::OBSTACLE_UNDO_STATE_ACTIVE) {
@@ -242,10 +236,6 @@ bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps)
             for (uint32_t i = 0; i < iobstacleToReAddCount; ++i) {
                 cutter_3.SplitNavMeshFromObstacle(this, obstaclesToReAdd[i], aPortalSwaps);
             }
-            cutter_3.~NavMeshObstacleCutter();
-            rt::eh_vector_destructor_iterator(
-                obstaclesToReAdd, sizeof(NiPointer<ObstacleData>), 100, &xfnv::destructElement<NiPointer<NiRefObject>>
-            );
         }
         else {
             NavMeshObstacleCutter cutter_2;

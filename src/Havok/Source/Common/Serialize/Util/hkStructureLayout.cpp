@@ -44,7 +44,6 @@ int32_t hkStructureLayout::getMemberSize(
     int32_t result;
     int32_t m_bytesInPointer;
     const hkClassMember* v6;
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     int32_t v3 = 0;
     switch (type) {
         case hkClassMember::TYPE_BOOL:
@@ -118,14 +117,15 @@ int32_t hkStructureLayout::getMemberSize(
         }
         default: {
             char buf[512];
-            ::new (&apThis) hkErrStream(buf, 512);
-            apThis.operator<<("Unknown class member type in structureLayout::getMemberSize().");
-            if (hkError::s_instance->message(
-                    hkError::MESSAGE_ERROR, 0x50A18B58, buf, ".\\Util\\hkStructureLayout.cpp", 195
-                )) {
-                __builtin_debugtrap();
+            {
+                hkErrStream apThis(buf, 512);
+                apThis.operator<<("Unknown class member type in structureLayout::getMemberSize().");
+                if (hkError::s_instance->message(
+                        hkError::MESSAGE_ERROR, 0x50A18B58, buf, ".\\Util\\hkStructureLayout.cpp", 195
+                    )) {
+                    __builtin_debugtrap();
+                }
             }
-            apThis.~hkErrStream();
         LABEL_16:;
             result = 0;
             break;

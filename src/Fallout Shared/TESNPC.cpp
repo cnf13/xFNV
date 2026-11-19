@@ -3034,17 +3034,9 @@ void TESNPC::LoadFaceGen(Character* apCharacter) {
 }
 
 void TESNPC::RandomizeHead(bool a2, bool a3, bool a4) {
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, v21, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, addr, std::nullopt, std::nullopt);
     float v24;
-    rt::eh_vector_constructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
-    rt::eh_vector_constructor_iterator(
-        v21, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
+    FR2MatrixVTC<float> addr[2][2];
+    FR2MatrixVTC<float> v21[2][2];
     BSFaceGenManager::InitFaceGenCoord(&v21);
     TESActorBase::SEX Sex = GetSex();
     FR2MatrixVTC<float>(*afRight)[2][2] = pFormRace->GetMeanFaceCoord(Sex);
@@ -3094,10 +3086,6 @@ void TESNPC::RandomizeHead(bool a2, bool a3, bool a4) {
         BSFaceGenManager::CopyFaceGenCoord(&v21, v9, false, false);
         spBodyModTexture.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
     }
-    rt::eh_vector_destructor_iterator(v21, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>);
-    rt::eh_vector_destructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
 }
 
 void TESNPC::LoadObjectArray(

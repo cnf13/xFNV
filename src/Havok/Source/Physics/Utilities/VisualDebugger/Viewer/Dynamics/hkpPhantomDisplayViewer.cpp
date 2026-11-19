@@ -75,10 +75,7 @@ void hkpPhantomDisplayViewer::init() {
 void hkpPhantomDisplayViewer::phantomAddedCallback(hkpPhantom* phantom) {
     const hkpShape* shape = phantom->m_collidable.m_shape;
     const int32_t type = phantom->getType();
-    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
-    displayGeometries.m_data = nullptr;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkDisplayGeometry*> displayGeometries;
     bool isShapePhantom = type == HK_PHANTOM_SIMPLE_SHAPE || type == HK_PHANTOM_CACHING_SHAPE;
     if (!isShapePhantom) {
         const hkArray<hkpPhantomType>& userTypes = hkpUserShapePhantomTypeIdentifier::s_instance->m_shapePhantomTypes;
@@ -139,17 +136,6 @@ void hkpPhantomDisplayViewer::phantomAddedCallback(hkpPhantom* phantom) {
         for (int32_t i = 0; i < displayGeometries.m_size; ++i) {
             delete displayGeometries.m_data[i];
         }
-    }
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = displayGeometries.m_capacityAndFlags;
-    displayGeometries.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            displayGeometries.m_data,
-            (capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkDisplayGeometry*))
-        );
     }
 }
 

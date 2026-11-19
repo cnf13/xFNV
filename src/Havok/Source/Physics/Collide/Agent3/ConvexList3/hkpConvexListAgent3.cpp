@@ -89,20 +89,12 @@ streamMode:
 
 gskMode:
     {
-        // EXE-INLINED none: hkpMapPointsToSubShapeContactMgr's constructor (with hkReferencedObject's, which leaves
-        // m_memSizeAndFlags as it is, and hkpContactMgr's); its destructor stores nothing.
-        XFNV_INLINED_LOCAL(
-            hkpMapPointsToSubShapeContactMgr, mgr, hkpMapPointsToSubShapeContactMgr_vftable, std::nullopt
-        );
-        mgr.m_referenceCount = 1;
+        hkpMapPointsToSubShapeContactMgr mgr;
+        // EXE-INLINED none: hkpMapPointsToSubShapeContactMgr::hkpMapPointsToSubShapeContactMgr
         mgr.m_type = hkpContactMgr::TYPE_CONVEX_LIST_CONTACT_MGR;
         mgr.m_contactMgr = input.m_contactMgr;
         mgr.m_invalidPointHit.m_bool = 0;
-        XFNV_INLINED_LOCAL(hkpAgent3ProcessInput, gskInput, std::nullopt, std::nullopt);
-        // CopyConstruct copies only the hkpAgent3Input part; the two members after it are copied here.
-        hkpAgent3ProcessInput::CopyConstruct(&gskInput, input);
-        gskInput.m_distAtT1 = input.m_distAtT1;
-        gskInput.m_linearTimInfo = input.m_linearTimInfo;
+        hkpAgent3ProcessInput gskInput(input);
         gskInput.m_contactMgr = &mgr;
         result = hkPredGskAgent3::process(gskInput, entry, agentData, separatingNormal, output);
         gskInput.m_contactMgr = mgr.m_contactMgr;

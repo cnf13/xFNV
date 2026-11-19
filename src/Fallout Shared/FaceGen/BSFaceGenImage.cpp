@@ -260,13 +260,12 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
 }
 
 std::vector<BSFaceGenRGBA, std::allocator<BSFaceGenRGBA>>* BSFaceGenImage::GetUncompressedImage() {
-    XFNV_INLINED_LOCAL(NiPointer<NiSourceTexture>, spUncompressedTex, std::nullopt, std::nullopt);
     if (UncompressedImage.empty() && spCompressedImage.m_pObject) {
         BSFaceGenRGBA emtpyRGBA;
-        ::new (&spUncompressedTex)
-            NiPointer<NiSourceTexture>(BSShaderUtil::ConvertTexture(spCompressedImage.m_pObject, NiPixelFormat_RGBA32));
+        NiPointer<NiSourceTexture> spUncompressedTex(
+            BSShaderUtil::ConvertTexture(spCompressedImage.m_pObject, NiPixelFormat_RGBA32)
+        );
         if (!spUncompressedTex.m_pObject) {
-            spUncompressedTex.~NiPointer<NiSourceTexture>();
             return &UncompressedImage;
         }
         const NiPixelData* ppixeldata = static_cast<const NiPixelData*>(spUncompressedTex.m_pObject->GetSrcPixelData());
@@ -284,7 +283,6 @@ std::vector<BSFaceGenRGBA, std::allocator<BSFaceGenRGBA>>* BSFaceGenImage::GetUn
             UncompressedImage[i].pColor[2] = static_cast<float>(pbuffer[4 * i + 2]);
             UncompressedImage[i].pColor[3] = static_cast<float>(pbuffer[4 * i + 3]);
         }
-        spUncompressedTex.~NiPointer<NiSourceTexture>();
     }
     return &UncompressedImage;
 }

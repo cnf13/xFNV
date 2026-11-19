@@ -59,32 +59,8 @@ hkBool hkCommandRouter::consumeCommands(hkDisplaySerializeIStream* stream) {
                 else if (command == 0xB1) {
                     stream->readQuadVector4(skippedVector);
                 }
-                // EXE-INLINED none: hkStringBuf::hkStringBuf()
-                XFNV_INLINED_LOCAL(hkStringBuf, warning, std::nullopt, std::nullopt);
-                warning.m_string.m_data = warning.m_string.m_storage;
-                warning.m_string.m_size = 0;
-                warning.m_string.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG | 128;
-                hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-                int32_t capacity = warning.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK;
-                if (capacity < 1) {
-                    int32_t newCapacity = 2 * capacity;
-                    if (newCapacity <= 1) {
-                        newCapacity = 1;
-                    }
-                    hkArrayUtil::_reserve(*pTemp, &warning.m_string, newCapacity, sizeof(char));
-                }
-                warning.m_string.m_size = 1;
-                warning.m_string.m_data[0] = 0;
-                warning.m_string.m_data[0] = 0;
+                hkStringBuf warning;
                 warning.printf("VDB: Found a command (%x) with no handler. Could corrupt the stream.", command);
-                // EXE-INLINED none: hkStringBuf::~hkStringBuf()
-                hkMemoryAllocator* pTempEnd = hkMemoryRouter::getInstance().m_temp;
-                warning.m_string.m_size = 0;
-                if (warning.m_string.m_capacityAndFlags >= 0) {
-                    pTempEnd->bufFree(
-                        warning.m_string.m_data, warning.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK
-                    );
-                }
             }
         }
     }

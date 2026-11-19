@@ -273,44 +273,36 @@ void bhkConstraintChain::CopyMembers(bhkSerializable* pDest, NiCloningProcess& a
     hkSerializableCinfo* pBaseInfo = &CreateCinfo(bCreated);
     hkConstraintChainCinfo* pInfo = static_cast<hkConstraintChainCinfo*>(pBaseInfo);
 
-    // EXE-INLINED none: hkArray<bhkWorldObject*>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<bhkWorldObject*>, kEntities, std::nullopt, std::nullopt);
-    kEntities.m_data = nullptr;
-    kEntities.m_size = 0;
-    kEntities.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<bhkWorldObject*>::DONT_DEALLOCATE_FLAG);
-    kEntities.setSize(pInfo->EntitiesA.m_size);
-    for (int32_t i = 0; i < pInfo->EntitiesA.m_size; ++i) {
-        hkpEntity* pEntity = pInfo->EntitiesA.m_data[i];
-        kEntities.m_data[i] = pEntity ? pEntity->m_userData : nullptr;
-    }
+    {
+        hkArray<bhkWorldObject*> kEntities;
+        kEntities.setSize(pInfo->EntitiesA.m_size);
+        for (int32_t i = 0; i < pInfo->EntitiesA.m_size; ++i) {
+            hkpEntity* pEntity = pInfo->EntitiesA.m_data[i];
+            kEntities.m_data[i] = pEntity ? pEntity->m_userData : nullptr;
+        }
 
-    pInfo->EntitiesA.clear();
-    pInfo->EntitiesA.setSize(kEntities.m_size);
-    for (int32_t i = 0; i < kEntities.m_size; ++i) {
-        NiTPointerMap<NiObject*, NiObject*>* pCloneMap = arCloneData.m_pkCloneMap;
-        NiObject* pkEntity = kEntities.m_data[i];
-        // EXE-INLINED 0xA5D3F0
-        // EXE-INLINED 0xA53C30
-        NiTMapItem<NiObject*, NiObject*>* pkItem = pCloneMap->m_ppkHashTable[pCloneMap->KeyToHashIndex(pkEntity)];
-        while (pkItem && !pCloneMap->IsKeysEqual(pkEntity, pkItem->m_key)) {
-            pkItem = pkItem->m_pkNext;
+        pInfo->EntitiesA.clear();
+        pInfo->EntitiesA.setSize(kEntities.m_size);
+        for (int32_t i = 0; i < kEntities.m_size; ++i) {
+            NiTPointerMap<NiObject*, NiObject*>* pCloneMap = arCloneData.m_pkCloneMap;
+            NiObject* pkEntity = kEntities.m_data[i];
+            // EXE-INLINED 0xA5D3F0
+            // EXE-INLINED 0xA53C30
+            NiTMapItem<NiObject*, NiObject*>* pkItem = pCloneMap->m_ppkHashTable[pCloneMap->KeyToHashIndex(pkEntity)];
+            while (pkItem && !pCloneMap->IsKeysEqual(pkEntity, pkItem->m_key)) {
+                pkItem = pkItem->m_pkNext;
+            }
+            NiObject* pkClone;
+            if (pkItem) {
+                pkClone = pkItem->m_val;
+            }
+            else {
+                pkClone = static_cast<NiObject*>(kEntities.m_data[i])->CreateClone(arCloneData);
+            }
+            pInfo->EntitiesA.m_data[i] = static_cast<hkpEntity*>(static_cast<bhkWorldObject*>(pkClone)->phkObject);
         }
-        NiObject* pkClone;
-        if (pkItem) {
-            pkClone = pkItem->m_val;
-        }
-        else {
-            pkClone = static_cast<NiObject*>(kEntities.m_data[i])->CreateClone(arCloneData);
-        }
-        pInfo->EntitiesA.m_data[i] = static_cast<hkpEntity*>(static_cast<bhkWorldObject*>(pkClone)->phkObject);
-    }
 
-    CopyCloneMembers(pDest, arCloneData);
-    // EXE-INLINED none: hkArray<bhkWorldObject*>::~hkArray (the SDK's releaseMemory: no stores after the free)
-    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-    kEntities.m_size = 0;
-    if ((kEntities.m_capacityAndFlags & hkArrayBase<bhkWorldObject*>::DONT_DEALLOCATE_FLAG) == 0) {
-        rHeap._bufFree<bhkWorldObject*>(kEntities.m_data, kEntities.getCapacity());
+        CopyCloneMembers(pDest, arCloneData);
     }
     pTLSData->eMemContext = eMemContext;
 }

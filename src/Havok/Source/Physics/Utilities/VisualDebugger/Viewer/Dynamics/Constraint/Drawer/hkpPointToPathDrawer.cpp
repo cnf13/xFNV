@@ -38,12 +38,7 @@ void hkpPointToPathDrawer::drawConstraint(
         pathToWorld.setMul(refLocalToWorld, pData->m_transform_OS_KS[1]);
         hkpParametricCurve* pPath = pData->m_path;
         if (pPath) {
-            // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, pathPoints, std::nullopt, std::nullopt);
-            // EXE-INLINED none: hkArray<hkVector4>::hkArray
-            pathPoints.m_data = nullptr;
-            pathPoints.m_size = 0;
-            pathPoints.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+            alignas(16) hkArray<hkVector4> pathPoints;
             pPath->getPointsToDraw(pathPoints);
             for (int32_t i = 1; i < pathPoints.getSize(); i++) {
                 // Copies each point to a temporary and transforms that copy.
@@ -55,16 +50,6 @@ void hkpPointToPathDrawer::drawConstraint(
                 point = pathPoints.m_data[i - 1];
                 end.setTransformedPos(pathToWorld, point);
                 displayHandler->displayLine(start, end, hkColor::rgbFromFloats(0.0f, 0.25f, 1.0f, 1.0f), id, tag);
-            }
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            pathPoints.m_size = 0;
-            if (pathPoints.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    pathPoints.m_data,
-                    static_cast<int32_t>(sizeof(hkVector4)) *
-                        static_cast<int32_t>(pathPoints.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-                );
             }
         }
     }

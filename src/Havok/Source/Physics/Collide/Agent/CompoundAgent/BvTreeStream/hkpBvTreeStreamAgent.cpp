@@ -180,14 +180,9 @@ void hkpBvTreeStreamAgent::processCollision(
         in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
     }
 
-    // The SDK's inplace list over its own storage (DONT_DEALLOCATE), holding the invalid shape key. Raw storage: the
-    // body frees the keys itself at the end, so no C++ destructor may free them again.
-    using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
-    hitList.m_data = hitList.m_storage;
-    hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    // The SDK's inplace list over its own storage, holding the invalid shape key.
+    alignas(16) hkInplaceArray<uint32_t, 128> hitList(1);
     hitList.m_storage[0] = 0xFFFFFFFF;
-    hitList.m_size = 1;
 
     alignas(16) hkTransform bTa;
     bTa.setInverse(in3.m_aTb);
@@ -328,14 +323,6 @@ void hkpBvTreeStreamAgent::processCollision(
         }
         hkAgent1nMachine_Process(m_agentTrack, in3, bodyB.m_shape->getContainer(), hitList.m_data, result);
         HK_TIMER_END_LIST();
-    }
-
-    // EXE-INLINED none: hkArray<unsigned int>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = hitList.m_capacityAndFlags;
-    hitList.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(hitList.m_data, (capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t));
     }
 }
 

@@ -234,11 +234,7 @@ void visitEdge(
     }
     ++visitedEdges.m_size;
 
-    XFNV_INLINED_LOCAL(hkArray<Point_t>, points, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkPlaneEquationUtil::IntersectionPoint>::hkArray
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<Point_t>::DONT_DEALLOCATE_FLAG;
+    hkArray<Point_t> points;
     if (findNextIntersectionPoints(
             edge.m_intersectionLineDir, planes, edge.m_planeA, edge.m_planeB, edge.m_fromPoint->m_location, points
         )) {
@@ -270,14 +266,5 @@ void visitEdge(
             );
             visitEdge(edgeBC, planes, visitedEdges, vertexCloudOut);
         }
-    }
-    // EXE-INLINED none: hkArray<hkPlaneEquationUtil::IntersectionPoint>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            points.m_data,
-            (points.m_capacityAndFlags & hkArrayBase<Point_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(Point_t))
-        );
     }
 }

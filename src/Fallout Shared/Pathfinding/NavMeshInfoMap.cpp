@@ -313,13 +313,12 @@ void NavMeshInfoMap::SetAltered(bool abVal) {
 }
 
 void NavMeshInfoMap::DeleteNavMeshInfo(uint32_t auiNavMeshID) {
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     NavMeshInfo* a2;
     if (InfoMap.GetAt(auiNavMeshID, a2)) {
         RemoveInfoFromCellKeyMap(a2);
         bool bMaster = false;
-        ::new (&apMemory) NavMeshPtr;
-        if (a2->GetNavMeshEvenDisabled(*static_cast<NavMeshPtr*>(&apMemory))) {
+        NavMeshPtr apMemory;
+        if (a2->GetNavMeshEvenDisabled(apMemory)) {
             TESForm* v2 = apMemory.m_pObject;
             TESFile* File = v2->GetFile(0);
             if ((File) && (File->GetMaster())) {
@@ -333,7 +332,6 @@ void NavMeshInfoMap::DeleteNavMeshInfo(uint32_t auiNavMeshID) {
         if (bMaster) {
             SetAltered(true);
         }
-        apMemory.~NiPointer<NavMesh>();
     }
 }
 

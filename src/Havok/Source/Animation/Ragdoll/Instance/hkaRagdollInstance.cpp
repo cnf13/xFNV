@@ -143,20 +143,7 @@ hkaRagdollInstance* hkaRagdollInstance::clone(hkpConstraintInstance::CloningMode
     const int32_t numBodies = m_rigidBodies.m_size;
     const int32_t numConstraints = m_constraints.m_size;
 
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, newRigidBodies, std::nullopt, std::nullopt);
-    newRigidBodies.m_data = nullptr;
-    newRigidBodies.m_size = 0;
-    newRigidBodies.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpRigidBody*>
-    hkStackMemory& bodyStack = hkMemoryRouter::getInstance().m_stack;
-    void* pBodyBlock = bodyStack.m_next.m_storage;
-    bodyStack.m_next.m_storage =
-        static_cast<char*>(pBodyBlock) + ((numBodies * static_cast<int32_t>(sizeof(hkpRigidBody*)) + 127) & ~127);
-    hkpRigidBody** pBodyLocal = static_cast<hkpRigidBody**>(pBodyBlock);
-    newRigidBodies.m_data = pBodyLocal;
-    newRigidBodies.m_capacityAndFlags =
-        static_cast<uint32_t>(numBodies) | hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-    newRigidBodies.m_localMemory = pBodyLocal;
+    hkLocalArray<hkpRigidBody*> newRigidBodies(numBodies);
     // EXE-INLINED none: hkArray<hkpRigidBody*>::setSize
     hkMemoryAllocator* pBodyHeap = hkMemoryRouter::getInstance().m_heap;
     const int32_t bodyCapacity =
@@ -170,20 +157,7 @@ hkaRagdollInstance* hkaRagdollInstance::clone(hkpConstraintInstance::CloningMode
     }
     newRigidBodies.m_size = static_cast<uint32_t>(numBodies);
 
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, newConstraints, std::nullopt, std::nullopt);
-    newConstraints.m_data = nullptr;
-    newConstraints.m_size = 0;
-    newConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpConstraintInstance*>
-    hkStackMemory& constraintStack = hkMemoryRouter::getInstance().m_stack;
-    void* pConstraintBlock = constraintStack.m_next.m_storage;
-    constraintStack.m_next.m_storage = static_cast<char*>(pConstraintBlock) +
-        ((numConstraints * static_cast<int32_t>(sizeof(hkpConstraintInstance*)) + 127) & ~127);
-    hkpConstraintInstance** pConstraintLocal = static_cast<hkpConstraintInstance**>(pConstraintBlock);
-    newConstraints.m_data = pConstraintLocal;
-    newConstraints.m_capacityAndFlags =
-        static_cast<uint32_t>(numConstraints) | hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-    newConstraints.m_localMemory = pConstraintLocal;
+    hkLocalArray<hkpConstraintInstance*> newConstraints(numConstraints);
     // EXE-INLINED none: hkArray<hkpConstraintInstance*>::setSize
     hkMemoryAllocator* pConstraintHeap = hkMemoryRouter::getInstance().m_heap;
     const int32_t constraintCapacity =
@@ -220,8 +194,6 @@ hkaRagdollInstance* hkaRagdollInstance::clone(hkpConstraintInstance::CloningMode
         newConstraints.m_data[c]->removeReference();
     }
 
-    newConstraints.~hkLocalArray<hkpConstraintInstance*>();
-    newRigidBodies.~hkLocalArray<hkpRigidBody*>();
     return pInstance;
 }
 

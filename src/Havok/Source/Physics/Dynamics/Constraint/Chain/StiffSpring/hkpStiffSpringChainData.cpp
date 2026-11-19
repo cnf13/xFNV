@@ -161,12 +161,7 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
     in2.m_constraintInstance = nullptr;
     in2.m_constraintRuntime.m_storage = nullptr;
 
-    // EXE-INLINED none: hkInplaceArray<hkpVelocityAccumulatorOffset, 32>::hkInplaceArray
-    using accumulators_t = hkInplaceArray<hkpVelocityAccumulatorOffset, 32>;
-    XFNV_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
-    accumulators.m_data = accumulators.m_storage;
-    accumulators.m_size = 0;
-    accumulators.m_capacityAndFlags = 32 | hkArrayBase<hkpVelocityAccumulatorOffset>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpVelocityAccumulatorOffset, 32> accumulators;
 
     hkpConstraintChainInstance* pInstance = static_cast<hkpConstraintChainInstance*>(inNotValid.m_constraintInstance);
     const int32_t numConstraints = pInstance->m_chainedEntities.m_size - 1;
@@ -246,17 +241,6 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
     hkStiffSpringChainBuildJacobian(
         numConstraints, m_tau, m_damping, m_cfm, accumulators.m_data, pAccumsBase, pJac, inNotValid, out
     );
-
-    // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    accumulators.m_size = 0;
-    if (accumulators.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            accumulators.m_data,
-            (accumulators.m_capacityAndFlags & hkArrayBase<hkpVelocityAccumulatorOffset>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpVelocityAccumulatorOffset))
-        );
-    }
 }
 
 // The bridge atom alone, then the header schema plus the chain schema for m_infos.getSize() constraints (80 bytes

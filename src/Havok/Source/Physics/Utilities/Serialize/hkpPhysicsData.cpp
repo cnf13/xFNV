@@ -366,11 +366,7 @@ void hkpPhysicsData::splitPhysicsSystems(
                     }
                 }
                 for (int32_t a = 0; a < inputSystem->m_actions.m_size;) {
-                    // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-                    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
-                    entities.m_data = nullptr;
-                    entities.m_size = 0;
-                    entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+                    hkArray<hkpEntity*> entities;
                     inputSystem->m_actions.m_data[a]->getEntities(entities);
                     bool bRemoved = false;
                     for (int32_t e = 0; e < entities.m_size; ++e) {
@@ -391,20 +387,6 @@ void hkpPhysicsData::splitPhysicsSystems(
                     if (!bRemoved) {
                         ++a;
                     }
-                    // EXE-INLINED none: hkArray<hkpEntity*>::~hkArray
-                    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                    entities.m_size = 0;
-                    if (entities.m_capacityAndFlags >= 0) {
-                        pHeap->bufFree(
-                            entities.m_data,
-                            static_cast<int32_t>(
-                                (entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                                sizeof(hkpEntity*)
-                            )
-                        );
-                    }
-                    entities.m_data = nullptr;
-                    entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
                 }
             }
         }

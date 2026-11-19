@@ -23,13 +23,11 @@ ImageSpaceEffectVolumetricFog::~ImageSpaceEffectVolumetricFog() {
 }
 
 void ImageSpaceEffectVolumetricFog::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     ImageSpaceShaderParam* pparam;
     SetEffectCount(1);
     pTextures.SetSize(2u);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v4;
     if (v4) {
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
@@ -38,8 +36,7 @@ void ImageSpaceEffectVolumetricFog::Setup(ImageSpaceManager* apManager, ImageSpa
     }
     pparam->InitConstantMap(0, 1);
     pparam->SetPixelConstant(0, 1.0f, 1.0f, 1.0f, 1.0f);
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, pparam);
     SetEffectInputs(0, 1, -1, NiTexturingProperty::FILTER_BILERP, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(0, apManager->pEffectList.m_pBase[42], pparam, 0);
 }

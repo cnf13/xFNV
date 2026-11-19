@@ -340,8 +340,7 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(uiIndex, pcString);
-    XFNV_INLINED_LOCAL(bhkRigidBodyCinfo, ci, std::nullopt, std::nullopt);
-    ::new (&ci) bhkRigidBodyCinfo;
+    bhkRigidBodyCinfo ci;
     CopyCinfo(ci);
     HK2NI(pnt, ci.hk.m_position);
     rot.m_fX = ci.hk.m_rotation.m_vec.m_quad[0];
@@ -426,16 +425,6 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
             --apStrings->m_usESize;
         }
         apStrings->m_pBase[uiIndex] = pcString;
-    }
-    // EXE-INLINED 0x56D730
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    ci.m_properties.m_size = 0;
-    if (ci.m_properties.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            ci.m_properties.m_data,
-            sizeof(hkWorldObjectCinfo::Property) *
-                (ci.m_properties.m_capacityAndFlags & hkArrayBase<hkWorldObjectCinfo::Property>::CAPACITY_MASK)
-        );
     }
 }
 
@@ -522,22 +511,11 @@ int32_t bhkRigidBody::LoadCInfo(NiStream& arStream) {
     bool bCreated;
     bhkRigidBodyCinfo* pInfo = static_cast<bhkRigidBodyCinfo*>(&CreateCinfo(bCreated));
     if (arStream.m_BSStreamHeader.uiVersion < 35) {
-        XFNV_INLINED_LOCAL(bhkRigidBody551Cinfo, kOldCInfo, std::nullopt, std::nullopt);
+        bhkRigidBody551Cinfo kOldCInfo;
         bhkRigidBody551Cinfo::Serialized kForm{};
         arStream.Istr()->BinaryRead(&kForm, sizeof(kForm), nullptr, 0);
         kOldCInfo.ReadSerialized(kForm);
         pInfo->ConvertFromOld(&kOldCInfo);
-        // EXE-INLINED 0x57C530
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        kOldCInfo.m_properties.m_size = 0;
-        if (kOldCInfo.m_properties.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                kOldCInfo.m_properties.m_data,
-                sizeof(hkWorldObjectCinfo::Property) *
-                    (kOldCInfo.m_properties.m_capacityAndFlags &
-                     hkArrayBase<hkWorldObjectCinfo::Property>::CAPACITY_MASK)
-            );
-        }
         alignas(16) char acMessage[256];
         BSsprintf(
             acMessage, 256,

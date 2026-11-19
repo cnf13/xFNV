@@ -363,8 +363,6 @@ void CompanionWheelMenu::SetButtonContextText(int32_t aiID) {
 }
 
 void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
     TESTopicInfo* apTopicInfo = nullptr;
     TESObjectREFR* apTarget = (TESObjectREFR*)pPlayer;
     Actor* apSpeaker = m_pRelatedCompanion;
@@ -393,14 +391,8 @@ void CompanionWheelMenu::SpeakTopic(TESTopic* a1) {
                     true, true, false, false, true
                 );
             }
-            BSSoundHandle* v19 = &v11;
-            BSSoundHandle* v14 = &v11.operator=(this->m_hCurrentReactivityBark);
             BSStringT<char>* Text = &pResponse->cText;
-            BSStringT<char>* v18 = &v10;
-            BSStringT<char>* v12 = ::new (&v10) BSStringT<char>(*Text);
-            this->DisplayCompanionWheelSubtitle(v10, v11);
-            // The callee receives a copy of this raw-storage local, so the local is destroyed here.
-            v10.~BSStringT<char>();
+            this->DisplayCompanionWheelSubtitle(*Text, this->m_hCurrentReactivityBark);
         }
     }
 }

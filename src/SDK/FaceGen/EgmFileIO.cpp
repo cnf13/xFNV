@@ -25,21 +25,15 @@ bool fffReadEgmFile(const std::basic_string<char, std::char_traits<char>, std::a
 	uint32_t& basisKey, std::vector<FffModeGS, std::allocator<FffModeGS>>& symm,
 	std::vector<FffModeGS, std::allocator<FffModeGS>>& asym) {
 	FffEgmFileHeaderS hdr;
-	XFNV_INLINED_LOCAL(BSFaceGenBinaryFile, bfile, std::nullopt, std::nullopt);
 	float scale;
 	std::string kFileId("FREGM002");
-	::new (&bfile) BSFaceGenBinaryFile(kFileId);
-	// Each return's destructor, which the exe inlines.
-	auto fnClose = [&bfile](bool abResult) -> bool {
-		bfile.~BSFaceGenBinaryFile();
-		return abResult;
-	};
+	BSFaceGenBinaryFile bfile(kFileId);
 	std::string kFileName(fname);
 	if (!bfile.BSFaceGenBinaryFile::openForRead(kFileName, false)) {
-		return fnClose(false);
+		return false;
 	}
 	if (!bfile.readHeader(&hdr, 1, sizeof(hdr))) {
-		return fnClose(false);
+		return false;
 	}
 	hdr.fix();
 	basisKey = hdr.basisKey;
@@ -82,11 +76,11 @@ bool fffReadEgmFile(const std::basic_string<char, std::char_traits<char>, std::a
 		FffModeGS* pMode = &symm[i];
 		symm[i].vertPos.resize(hdr.numPoints, FR2Vect3TC<int16_t>{0, 0, 0});
 		if (!bfile.BSFaceGenBinaryFile::read(&scale, sizeof(float), 1)) {
-			return fnClose(false);
+			return false;
 		}
 		symm[i].scale = scale;
 		if (!bfile.readShorts(psData, static_cast<int32_t>(hdr.numPoints * 3))) {
-			return fnClose(false);
+			return false;
 		}
 		fnCopyPoints(pMode);
 	}
@@ -94,18 +88,18 @@ bool fffReadEgmFile(const std::basic_string<char, std::char_traits<char>, std::a
 		FffModeGS* pMode = &asym[i];
 		pMode->vertPos.resize(hdr.numPoints, FR2Vect3TC<int16_t>{0, 0, 0});
 		if (!bfile.BSFaceGenBinaryFile::read(&scale, sizeof(float), 1)) {
-			return fnClose(false);
+			return false;
 		}
 		pMode->scale = scale;
 		if (!bfile.readShorts(psData, static_cast<int32_t>(hdr.numPoints * 3))) {
-			return fnClose(false);
+			return false;
 		}
 		fnCopyPoints(pMode);
 	}
 	if (psData) {
 		MemoryManager_Singleton.Deallocate(psData);
 	}
-	return fnClose(true);
+	return true;
 }
 
 void FffEgmFileHeaderS::fix() {}

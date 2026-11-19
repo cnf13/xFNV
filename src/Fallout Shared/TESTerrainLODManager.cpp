@@ -223,7 +223,8 @@ void TESTerrainLODManager::UpdateGrassForCell(
         int32_t igrassEvalSquared = 2 * igrassEvalSize;
         TESGrass::GRASS_WATER_STATE eWaterState = TESGrass::GWS_COUNT;
         if (apCell && (apCell->GetWorldSpace() && apCell->GetLand())) {
-            XFNV_INLINED_LOCAL(NiPlane, kVertexPos, std::nullopt, std::nullopt);
+            alignas(16) uint8_t kVertexPosStorage[sizeof(NiPlane)];
+            NiPlane& kVertexPos = *reinterpret_cast<NiPlane*>(kVertexPosStorage);
             kVertexPos.m_fConstant = apCell->GetWaterHeight();
             TESObjectLAND* pland = apCell->GetLand();
             int32_t iCellX = apCell->GetDataX();

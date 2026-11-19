@@ -43,12 +43,7 @@ void* hkDeepCopier::deepCopy(
     hkTypeInfoRegistry* loadedObjectRegistry,
     hkFlags<hkObjectCopier::ObjectCopierFlagBits, uint32_t> flags
 ) {
-    // hkArray<char> buffer; hkOstream out(buffer): the lines below are the array's constructor.
-    XFNV_INLINED_LOCAL(hkArray<char>, buffer, std::nullopt, std::nullopt);
-    buffer.m_data = nullptr;
-    buffer.m_size = 0;
-    buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    // Destroyed by hand below, in the game's order.
+    hkArray<char> buffer;
     hkOstream out(buffer);
 
     hkRelocationInfo reloc;
@@ -67,10 +62,7 @@ void* hkDeepCopier::deepCopy(
     reloc.m_pool = nullptr;
 
     // The objects still to copy, with their classes; dataIn first.
-    XFNV_INLINED_LOCAL(hkArray<hkVariant>, todo, std::nullopt, std::nullopt);
-    todo.m_data = nullptr;
-    todo.m_size = 0;
-    todo.m_capacityAndFlags = hkArrayBase<hkVariant>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVariant> todo;
     {
         // EXE-INLINED none: hkArray<hkVariant>::expandOne
         hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
@@ -84,23 +76,14 @@ void* hkDeepCopier::deepCopy(
 
     // The offset in buffer of each original object copied.
     using done_t = hkPointerMap<const void*, int32_t>;
-    XFNV_INLINED_LOCAL(done_t, done, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x626560
-    done.m_map.m_elem = nullptr;
-    done.m_map.m_numElems = 0;
-    done.m_map.m_hashMod = -1;
-    done.m_map.hkUlongMapBase::reserve(hkMemoryRouter::getInstance().heap(), 0);
+    done_t done;
 
-    XFNV_INLINED_LOCAL(hkArray<Copy>, copies, std::nullopt, std::nullopt);
-    copies.m_data = nullptr;
-    copies.m_size = 0;
-    copies.m_capacityAndFlags = hkArrayBase<Copy>::DONT_DEALLOCATE_FLAG;
+    hkArray<Copy> copies;
 
     // Equivalent to hkObjectCopier copier(hkStructureLayout::HostLayoutRules, hkStructureLayout::HostLayoutRules,
     // flags), with the two layout temporaries built right to left.
     hkStructureLayout layoutOut(hkStructureLayout::HostLayoutRules);
     hkStructureLayout layoutIn(hkStructureLayout::HostLayoutRules);
-    // Destroyed by hand below, in the game's order.
     hkObjectCopier copier(layoutIn, layoutOut, flags.get());
 
     for (int32_t todoIndex = 0; todoIndex < todo.getSize(); ++todoIndex) {
@@ -191,12 +174,5 @@ void* hkDeepCopier::deepCopy(
         }
     }
 
-    // The locals' destructors, in the order the game runs them; ~hkArray is the code of clearAndDeallocate.
-    copies.clearAndDeallocate();
-    // EXE-INLINED 0x6264F0
-    // ~hkMap: the table is freed; ~hkMapBase is the exe's empty function 0xA29680.
-    done.m_map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    todo.clearAndDeallocate();
-    buffer.clearAndDeallocate();
     return pResult;
 }

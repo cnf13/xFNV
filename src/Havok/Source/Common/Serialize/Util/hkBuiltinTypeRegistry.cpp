@@ -1314,26 +1314,11 @@ void hkDynamicClassNameRegistry::merge(const hkStringMap<const hkClass*, hkConta
     }
 }
 
-// Registers every class of mergeFrom under its own name. The class list starts empty (no storage, not ours).
+// Registers every class of mergeFrom under its own name.
 void hkDynamicClassNameRegistry::merge(const hkClassNameRegistry& mergeFrom) {
-    XFNV_INLINED_LOCAL(hkArray<const hkClass*>, classes, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<const hkClass*>::hkArray
-    classes.m_data = nullptr;
-    classes.m_size = 0;
-    classes.m_capacityAndFlags = hkArrayBase<const hkClass*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkClass*> classes;
     mergeFrom.getClasses(classes);
     for (int32_t i = 0; i < classes.m_size; ++i) {
         registerClass(classes.m_data[i], nullptr);
-    }
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = classes.m_capacityAndFlags;
-    classes.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            classes.m_data,
-            (capacityAndFlags & hkArrayBase<const hkClass*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(const hkClass*))
-        );
     }
 }

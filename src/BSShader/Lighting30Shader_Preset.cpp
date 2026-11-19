@@ -14,17 +14,10 @@
 
 // Sets up every pass's stages, shaders, render states and constant flags, then builds the passes' constant maps. The
 // depth bias is fDepthBiasUnit, read once into a float local; passes 5 and 6 take twice that, also stored as a float.
-// The D3D values FALSE and TRUE are written as 0 and 1, the colour write masks as numbers. Where the pass was
-// dereferenced before (the assignments of passes 1 to 7, 89 to 92, 70 and 71, and the end), the pass pointer is
-// released without a null check, as the game does, so those releases are written out.
+// The D3D values FALSE and TRUE are written as 0 and 1, the colour write masks as numbers.
 void Lighting30Shader::PresetStages() {
     float fDepthBias = BSShaderProperty::fDepthBiasUnit;
-    // EXE-INLINED none: NiPointer<NiD3DPass>::NiPointer
-    XFNV_INLINED_LOCAL(NiPointer<NiD3DPass>, spD3DPass, std::nullopt, std::nullopt);
-    spD3DPass.m_pObject = spPass[0].m_pObject;
-    if (spD3DPass.m_pObject) {
-        spD3DPass.m_pObject->IncRefCount();
-    }
+    NiPointer<NiD3DPass> spD3DPass = spPass[0];
     CreateDefaultStages(spD3DPass, 0);
     spD3DPass->m_spVertexShader = spVertexShaders[49];
     spD3DPass->m_spPixelShader = spPixelShaders[44];
@@ -32,70 +25,35 @@ void Lighting30Shader::PresetStages() {
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
     ulVertexConstantFlags[0] = 138;
     ulPixelConstantFlags[0] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[1].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[1].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[1];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[49];
     spD3DPass->m_spPixelShader = spPixelShaders[44];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
     ulVertexConstantFlags[1] = 2;
     ulPixelConstantFlags[1] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[2].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[2].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[2];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[50];
     spD3DPass->m_spPixelShader = spPixelShaders[45];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
     ulVertexConstantFlags[2] = 36;
     ulPixelConstantFlags[2] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[3].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[3].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[3];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[51];
     spD3DPass->m_spPixelShader = spPixelShaders[44];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
     ulVertexConstantFlags[3] = 2;
     ulPixelConstantFlags[3] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[4].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[4].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[4];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[52];
     spD3DPass->m_spPixelShader = spPixelShaders[45];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
     ulVertexConstantFlags[4] = 36;
     ulPixelConstantFlags[4] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[5].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[5].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[5];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[53];
     spD3DPass->m_spPixelShader = spPixelShaders[46];
@@ -107,14 +65,7 @@ void Lighting30Shader::PresetStages() {
     spD3DPass->SetRenderState(D3DRS_DEPTHBIAS, std::bit_cast<uint32_t>(fDoubleDepthBias));
     ulVertexConstantFlags[5] = 2;
     ulPixelConstantFlags[5] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[6].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[6].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[6];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[54];
     spD3DPass->m_spPixelShader = spPixelShaders[47];
@@ -125,70 +76,35 @@ void Lighting30Shader::PresetStages() {
     spD3DPass->SetRenderState(D3DRS_DEPTHBIAS, std::bit_cast<uint32_t>(fDoubleDepthBias));
     ulVertexConstantFlags[6] = 36;
     ulPixelConstantFlags[6] = 0;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[89].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[89].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[89];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[55];
     spD3DPass->m_spPixelShader = spPixelShaders[48];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 3);
     ulVertexConstantFlags[89] = 2;
     ulPixelConstantFlags[89] = 18;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[90].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[90].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[90];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[51];
     spD3DPass->m_spPixelShader = spPixelShaders[48];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 3);
     ulVertexConstantFlags[90] = 2;
     ulPixelConstantFlags[90] = 18;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[91].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[91].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[91];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[56];
     spD3DPass->m_spPixelShader = spPixelShaders[49];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 3);
     ulVertexConstantFlags[91] = 36;
     ulPixelConstantFlags[91] = 18;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[92].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[92].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[92];
     CreateDefaultStages(spD3DPass, 1);
     spD3DPass->m_spVertexShader = spVertexShaders[52];
     spD3DPass->m_spPixelShader = spPixelShaders[49];
     spD3DPass->SetRenderState(D3DRS_COLORWRITEENABLE, 3);
     ulVertexConstantFlags[92] = 36;
     ulPixelConstantFlags[92] = 18;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[7].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[7].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[7];
     CreateDefaultStages(spD3DPass, 3);
     spD3DPass->m_spVertexShader = spVertexShaders[0];
     spD3DPass->m_spPixelShader = spPixelShaders[0];
@@ -558,14 +474,7 @@ void Lighting30Shader::PresetStages() {
     spD3DPass->SetSrcDestBlendRenderState(D3DBLEND_ONE, D3DBLEND_ONE, false);
     ulVertexConstantFlags[69] = 0x30082;
     ulPixelConstantFlags[69] = 272;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[70].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[70].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[70];
     CreateDefaultStages(spD3DPass, 11);
     spD3DPass->m_kStages.m_pBase[1].m_pObject->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
     spD3DPass->SetVertexShader(spVertexShaders[12]);
@@ -575,14 +484,7 @@ void Lighting30Shader::PresetStages() {
     spD3DPass->SetSrcDestBlendRenderState(D3DBLEND_ONE, D3DBLEND_ONE, false);
     ulVertexConstantFlags[70] = 0x30082;
     ulPixelConstantFlags[70] = 272;
-    // EXE-INLINED 0xBA53C0
-    if (spD3DPass.m_pObject != spPass[71].m_pObject) {
-        spD3DPass.m_pObject->DecRefCount();
-        spD3DPass.m_pObject = spPass[71].m_pObject;
-        if (spD3DPass.m_pObject) {
-            spD3DPass.m_pObject->IncRefCount();
-        }
-    }
+    spD3DPass = spPass[71];
     CreateDefaultStages(spD3DPass, 11);
     spD3DPass->m_kStages.m_pBase[1].m_pObject->SetClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
     spD3DPass->SetVertexShader(spVertexShaders[13]);
@@ -915,8 +817,6 @@ void Lighting30Shader::PresetStages() {
     ulVertexConstantFlags[101] = 2;
     ulPixelConstantFlags[101] = 0;
     BuildPerPassConstantMaps();
-    // EXE-INLINED 0xB79930
-    spD3DPass.m_pObject->DecRefCount();
 }
 
 // The local NiPointer<NiD3DPass> is written out by hand, using the pass's own reference count.

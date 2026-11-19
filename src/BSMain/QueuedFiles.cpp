@@ -150,7 +150,6 @@ QueuedFile::~QueuedFile() {
 }
 
 void QueuedFile::AddChild(QueuedFile* apChild) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedFile>, spChild, std::nullopt, std::nullopt);
     if (!pChildren) {
         QueuedChildren* pNewChildren;
         void* apMemory = MemoryManager_Singleton.Allocate(sizeof(QueuedChildren));
@@ -162,18 +161,10 @@ void QueuedFile::AddChild(QueuedFile* apChild) {
         }
         pChildren = pNewChildren;
     }
-    spChild.m_pObject = apChild;
-    if (apChild) {
-        InterlockedIncrementInt32(&spChild.m_pObject->iRefCount);
-    }
-    pChildren->Add(spChild);
-    if (spChild.m_pObject) {
-        spChild.m_pObject->DecRefCount();
-    }
+    pChildren->Add(NiPointer<QueuedFile>(apChild));
 }
 
 void QueuedFile::AddAdditionalParent(QueuedFile* apAdditionalParent) {
-    XFNV_INLINED_LOCAL(NiPointer<QueuedFile>, spAdditionalParent, std::nullopt, std::nullopt);
     if (!pAdditionalParents) {
         QueuedParents* pNewParents;
         void* apMemory = MemoryManager_Singleton.Allocate(sizeof(QueuedParents));
@@ -199,14 +190,7 @@ void QueuedFile::AddAdditionalParent(QueuedFile* apAdditionalParent) {
             return;
         }
     }
-    spAdditionalParent.m_pObject = apAdditionalParent;
-    if (apAdditionalParent) {
-        InterlockedIncrementInt32(&spAdditionalParent.m_pObject->iRefCount);
-    }
-    pAdditionalParents->Add(spAdditionalParent);
-    if (spAdditionalParent.m_pObject) {
-        spAdditionalParent.m_pObject->DecRefCount();
-    }
+    pAdditionalParents->Add(NiPointer<QueuedFile>(apAdditionalParent));
     apAdditionalParent->AddChild(this);
 }
 

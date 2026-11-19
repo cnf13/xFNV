@@ -889,11 +889,7 @@ void Font::Load() {
         uiComponentSize = 1;
         // EXE-INLINED 0x462D80
         pTexFile->BinaryRead(auiSize, sizeof(auiSize), &uiComponentSize, 1);
-        XFNV_INLINED_LOCAL(NiTexture::FormatPrefs, kPrefs, std::nullopt, std::nullopt);
-        // EXE-INLINED 0x4F31D0
-        kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PIX_DEFAULT;
-        kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
-        kPrefs.m_eMipMapped = NiTexture::FormatPrefs::MIP_DEFAULT;
+        NiTexture::FormatPrefs kPrefs;
         void* pMemory = NiMemObject::operator new(sizeof(NiPixelData));
         NiPixelData* pPixelData =
             pMemory ? ::new (pMemory) NiPixelData(auiSize[0], auiSize[1], NiPixelFormat_RGBA32, 1, 1) : nullptr;
@@ -1775,7 +1771,6 @@ FontManager::TextPage* FontManager::TextDoc::CurrentPage() {
 }
 
 void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apData) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, v6, std::nullopt, std::nullopt);
     NiTriShape* ptri_2;
     NiTListItem<FontManager::TextPage*>* i;
     NiTList<NiTriShape*> ximages;
@@ -1892,13 +1887,8 @@ void FontManager::TextDoc::Render(NiNode* apParent, FontManager::TextData* apDat
                         v7.x = xpos.x;
                         v7.y = xpos.y;
                         v7.z = xpos.z;
-                        BSStringT<char>* v57 = &v6;
-                        BSStringT<char>* v11 = ::new (&v6) BSStringT<char>(pchar->xFilename);
                         FontManager* v33 = FontManager::pInstance;
-                        NiTriShape* ptri = FontManager::pInstance->MakeImage(v6, v7, iWidth, v9);
-                        // MakeImage takes its argument by value and receives a copy of this raw-storage local, so the
-                        // local is destroyed here.
-                        v6.~BSStringT<char>();
+                        NiTriShape* ptri = FontManager::pInstance->MakeImage(pchar->xFilename, v7, iWidth, v9);
                         ptri_2 = ptri;
                         if (ptri) {
                             ximages.AddTail(ptri_2);
@@ -2566,7 +2556,6 @@ void FontManager::SetNewFonts(bool a2) {
 FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontManager::TextData& axData) {
     size_t sLen;
     FontManager::TextDoc* pdocument;
-    XFNV_INLINED_LOCAL(FontManager::CharData, xchar, std::nullopt, std::nullopt);
     if (!axTextString.pString) {
         return nullptr;
     }
@@ -2597,7 +2586,7 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
     }
     pdocument_2 = pdocument;
     NiColorA v5(0.4588f, 0.2314f, 0.1294f, 1.0f);
-    ::new (&xchar) FontManager::CharData(0, 32, v5, 1);
+    FontManager::CharData xchar(0, 32, v5, 1);
     xchar.RevertToDefault();
     xchar.iFontIndex = axData.iDefaultFont;
     float g = axData.xColor.g;
@@ -2668,7 +2657,6 @@ FontManager::TextDoc* FontManager::PrepText(BSStringT<char>& axTextString, FontM
             axData.iNumLines = ppage->xLines.m_uiCount;
         }
     }
-    xchar.xFilename.Set(nullptr, 0);
     return pdocument_2;
 }
 

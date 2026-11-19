@@ -357,8 +357,7 @@ void BSShaderData::CheckTextureAlphas() {
     if (this->pTextureSet) {
         for (BSShaderProperty::TextureTypeEnum i = BSShaderProperty::TEXTYPE_DIFFUSE;
              i < BSShaderProperty::TEXTYPE_SPECULAR; i = static_cast<BSShaderProperty::TextureTypeEnum>(i + 1)) {
-            XFNV_INLINED_LOCAL(NiPointer<NiTexture>, spTexture, std::nullopt, std::nullopt);
-            spTexture.m_pObject = nullptr;
+            NiPointer<NiTexture> spTexture;
             this->pTextureSet->GetTexture(i, spTexture);
             NiTexture* pTexture = spTexture.m_pObject;
             if (pTexture) {
@@ -374,9 +373,6 @@ void BSShaderData::CheckTextureAlphas() {
                 if (eFormat == NiPixelFormat::FORMAT_DXT3 || eFormat == NiPixelFormat::FORMAT_DXT5) {
                     pbTextureHasAlpha[i] = true;
                 }
-            }
-            if (pTexture) {
-                NiDecRefCount(pTexture);
             }
         }
     }

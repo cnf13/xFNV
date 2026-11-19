@@ -793,7 +793,6 @@ void CombatProcedureAttackMelee::HandleClose() {
 
 void CombatProcedureAttackMelee::MoveToFaceTargetLocation(NiPoint3& arFaceTargetLocation) {
     const NiPoint3* v2;
-    XFNV_INLINED_LOCAL(NiPointer<PathingAvoidNodeArray>, spavoidNodeArray, std::nullopt, std::nullopt);
     Actor* apMemory_40 = GetAttacker();
     Actor* ptarget = GetTarget();
     PathingRequest pathingRequest;
@@ -811,7 +810,7 @@ void CombatProcedureAttackMelee::MoveToFaceTargetLocation(NiPoint3& arFaceTarget
         else {
             v16 = nullptr;
         }
-        NiPointer_PathingAvoidNodeArray_Construct(&spavoidNodeArray, v16);
+        NiPointer<PathingAvoidNodeArray> spavoidNodeArray(v16);
         float WeaponReacha = fMovementNearTargetAvoidCost.Float();
         float afRadius = fMovementNearTargetAvoidRadius.Float();
         const NiPoint3* v3 = &ptarget->GetLocationOnReference();
@@ -820,7 +819,6 @@ void CombatProcedureAttackMelee::MoveToFaceTargetLocation(NiPoint3& arFaceTarget
         TESWorldSpace* ListenerIdle = v26.pWorldSpace;
         TESObjectCELL* Cell = v26.GetCell();
         apMemory_40->BuildRequest(&pathingRequest, v26.GetLocation(), Cell, ListenerIdle, 5.0f, WeaponReachb);
-        spavoidNodeArray.~NiPointer<PathingAvoidNodeArray>();
     }
     else {
         float fradius = 10.0f;

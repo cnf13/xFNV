@@ -207,25 +207,14 @@ void bhkCapsuleShape::CopyMembers(bhkSerializable* apDest, NiCloningProcess& arC
     bhkShape::CopyMembers(apDest, arCloneData);
 }
 
-// Displays the capsule: a cinfo built as hkCapsuleShapeCinfo's constructor does, filled from the shape, then the end
+// Displays the capsule: a cinfo from hkCapsuleShapeCinfo's constructor, filled from the shape, then the end
 // points of the Havok capsule (the zero vector without one) handed to a 6-sided hkDisplayCapsule, whose geometry goes
 // to the debug node, all under the Havok memory context. The display capsule is never freed.
 void bhkCapsuleShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
     TLSData* pTLSData = GetThreadTLSData();
     MEM_CONTEXT eMemContext = pTLSData->eMemContext;
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
-    // EXE-INLINED 0x66D650
-    XFNV_INLINED_LOCAL(hkCapsuleShapeCinfo, kCinfo, std::nullopt, std::nullopt);
-    kCinfo.m_radius = 0.1f;
-    kCinfo.m_vertexA.fX = 0.0f;
-    kCinfo.m_vertexA.fY = 0.0f;
-    kCinfo.m_vertexA.fZ = 0.0f;
-    kCinfo.m_vertexA.fW = 0.0f;
-    kCinfo.m_userData = 0;
-    kCinfo.m_vertexB.fX = 1.0f;
-    kCinfo.m_vertexB.fY = 0.0f;
-    kCinfo.m_vertexB.fZ = 0.0f;
-    kCinfo.m_vertexB.fW = 0.0f;
+    hkCapsuleShapeCinfo kCinfo;
     CopyCinfo(kCinfo);
     // EXE-INLINED 0x4AE750
     hkpCapsuleShape* pCapsule = static_cast<hkpCapsuleShape*>(this ? phkObject : nullptr);

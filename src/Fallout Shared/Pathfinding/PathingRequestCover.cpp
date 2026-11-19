@@ -198,21 +198,18 @@ bool PathingCoverLocation::IsStandCover() {
 }
 
 uint32_t PathingCoverLocation::GetKey() {
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     uint16_t arTriangle;
-    ::new (&apMemory) NavMeshPtr;
+    NavMeshPtr apMemory;
     arTriangle = 0;
-    if (GetNavMeshAndTriangle(static_cast<NavMeshPtr&>(apMemory), arTriangle)) {
+    if (GetNavMeshAndTriangle(apMemory, arTriangle)) {
         uint8_t cEdge = this->cEdge;
         uint16_t v4 = arTriangle;
         NavMesh* v1 = apMemory.m_pObject;
         uint32_t CastingType = v1->GetFormID();
         uint32_t v7 = PathingCoverLocation::ComputeKey(CastingType, v4, cEdge);
-        apMemory.~NiPointer<NavMesh>();
         return v7;
     }
 
-    apMemory.~NiPointer<NavMesh>();
     return 0;
 }
 

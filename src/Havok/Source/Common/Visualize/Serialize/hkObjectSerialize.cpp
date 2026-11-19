@@ -119,11 +119,7 @@ uint64_t hkObjectSerialize::readObject(
     if (!s->isOk().m_bool) {
         return 0;
     }
-    // EXE-INLINED none: hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>::hkArray
-    XFNV_INLINED_LOCAL(LocalFixupArray, localFixups, std::nullopt, std::nullopt);
-    localFixups.m_data = nullptr;
-    localFixups.m_size = 0;
-    localFixups.m_capacityAndFlags = LocalFixupArray::DONT_DEALLOCATE_FLAG;
+    LocalFixupArray localFixups;
     s->read(&numLocalFixups, 4);
     if (!s->isOk().m_bool) {
         goto fail;
@@ -193,32 +189,8 @@ uint64_t hkObjectSerialize::readObject(
         }
     }
     data = buffer;
-    {
-        // EXE-INLINED none: hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        localFixups.m_size = 0;
-        if (localFixups.m_capacityAndFlags >= 0) {
-            heap->bufFree(
-                localFixups.m_data,
-                (localFixups.m_capacityAndFlags & LocalFixupArray::CAPACITY_MASK) *
-                    sizeof(hkObjectSerialize::LocalFixup)
-            );
-        }
-    }
     return id;
 fail:
-    {
-        // EXE-INLINED none: hkArray<hkObjectSerialize::LocalFixup, hkContainerHeapAllocator>::~hkArray
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        localFixups.m_size = 0;
-        if (localFixups.m_capacityAndFlags >= 0) {
-            heap->bufFree(
-                localFixups.m_data,
-                (localFixups.m_capacityAndFlags & LocalFixupArray::CAPACITY_MASK) *
-                    sizeof(hkObjectSerialize::LocalFixup)
-            );
-        }
-    }
     return 0;
 }
 
@@ -233,14 +205,10 @@ int32_t hkObjectSerialize::writeObject(
     hkArray<hkObjectSerialize::GlobalFixup, hkContainerHeapAllocator>& globalFixups
 ) {
     using buffer_t = hkArray<char, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(buffer_t, buffer, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkArrayStreamWriter, apThis, std::nullopt, std::nullopt);
     hkRelocationInfo arReloc_;
     hkPlatformObjectWriter apMemory(destLayout);
-    buffer.m_data = nullptr;
-    buffer.m_size = 0;
-    buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    ::new (&apThis) hkArrayStreamWriter(&buffer, hkArrayStreamWriter::ARRAY_BORROW);
+    buffer_t buffer;
+    hkArrayStreamWriter apThis(&buffer, hkArrayStreamWriter::ARRAY_BORROW);
     arReloc_.m_local.m_data = nullptr;
     arReloc_.m_local.m_size = 0;
     arReloc_.m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
@@ -291,13 +259,5 @@ int32_t hkObjectSerialize::writeObject(
         dataID, reinterpret_cast<uintptr_t>(&klass), buffer.begin(), buffer.m_size,
         hkBool(destLayout.m_rules.m_littleEndian != hkStructureLayout::HostLayoutRules.m_littleEndian), &arReloc_, s
     );
-    apThis.~hkArrayStreamWriter();
-    hkMemoryAllocator* m_heap_1 = (&hkMemoryRouter::getInstance())->m_heap;
-    buffer.m_size = 0;
-    if (buffer.m_capacityAndFlags >= 0) {
-        m_heap_1->bufFree(buffer.begin(), buffer.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-    }
-    buffer.m_data = nullptr;
-    buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
     return v16;
 }

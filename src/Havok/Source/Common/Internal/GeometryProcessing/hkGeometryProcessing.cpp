@@ -1389,10 +1389,7 @@ bool hkGeometryProcessing::generateUniformDistribution(
                     break;
                 }
                 for (int32_t j = 0; j < probes.m_size; ++j) {
-                    XFNV_INLINED_LOCAL(
-                        hkGeometryProcessingInternals::NearestFeaturePolicy, policy,
-                        hkGeometryProcessingInternals_NearestFeaturePolicy_vftable, std::nullopt
-                    );
+                    hkGeometryProcessingInternals::NearestFeaturePolicy policy;
                     policy.m_point = probes.m_data[j];
                     policy.m_distanceSquared = 3.40282e+38f;
                     policy.m_leaf = nullptr;

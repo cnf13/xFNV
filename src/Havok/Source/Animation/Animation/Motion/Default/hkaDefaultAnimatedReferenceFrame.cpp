@@ -164,30 +164,32 @@ hkaDefaultAnimatedReferenceFrame::hkaDefaultAnimatedReferenceFrame(
         right.setCross(options.m_up, options.m_forward);
         const float rightError = std::fabs(static_cast<float>(right.dot3(projected)));
         if (forwardError > 0.01f || rightError > 0.01f) {
-            XFNV_INLINED_LOCAL(hkErrStream, ostr, std::nullopt, std::nullopt);
             char buf[512];
-            ::new (&ostr) hkErrStream(buf, 512);
-            ostr << "Extracting turning motion on an animation works best when the start frame is vertically aligned "
-                    "with the origin.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
-                ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 88
-            );
-            ostr.~hkErrStream();
-            ::new (&ostr) hkErrStream(buf, 512);
-            ostr << "Some misalignment (" << forwardError << ", " << rightError << ") found.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
-                ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 89
-            );
-            ostr.~hkErrStream();
-            ::new (&ostr) hkErrStream(buf, 512);
-            ostr << "For best results, try moving the animation to the origin in the Create Animations filter.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
-                ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 90
-            );
-            ostr.~hkErrStream();
+            {
+                hkErrStream ostr(buf, 512);
+                ostr << "Extracting turning motion on an animation works best when the start frame is vertically "
+                        "aligned with the origin.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
+                    ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 88
+                );
+            }
+            {
+                hkErrStream ostr2(buf, 512);
+                ostr2 << "Some misalignment (" << forwardError << ", " << rightError << ") found.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
+                    ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 89
+                );
+            }
+            {
+                hkErrStream ostr3(buf, 512);
+                ostr3 << "For best results, try moving the animation to the origin in the Create Animations filter.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA9245), buf,
+                    ".\\Motion\\Default\\hkaDefaultAnimatedReferenceFrame.cpp", 90
+                );
+            }
         }
     }
     // The heap is fetched before the capacity test.

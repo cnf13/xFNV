@@ -382,31 +382,11 @@ hkpGravityGun::pickBody(const hkTransform& viewTransform, const hkpRigidBody* ch
                             int32_t v11 = 0;
                             // Declared before the branch, so that the else branch's goto to LABEL_17 does not cross its
                             // initialisation.
-                            XFNV_INLINED_LOCAL(
-                                hkpClosestRayHitCollector, collector, hkpClosestRayHitCollector_vftable, std::nullopt
-                            );
+                            hkpClosestRayHitCollector collector;
                             if (m_size <= 0) {
                             LABEL_17:;
-                                // MAYBE-INLINED 0xE45BB0: before the vptr store of hkpClosestRayHitCollector's inlined
-                                // constructor
-                                collector.m_rayHit.m_extraInfo = -1;
-                                // MAYBE-INLINED 0xE45BBC: before the vptr store of hkpClosestRayHitCollector's inlined
-                                // constructor
-                                collector.m_rayHit.m_hitFraction = 1.0f;
-                                // MAYBE-INLINED 0xE45BC3: before the vptr store of hkpClosestRayHitCollector's inlined
-                                // constructor
-                                collector.m_rayHit.m_shapeKeys[0] = -1;
-                                // MAYBE-INLINED 0xE45BCA: before the vptr store of hkpClosestRayHitCollector's inlined
-                                // constructor
-                                collector.m_earlyOutHitFraction = 1.0f;
                                 input.m_from = viewTransform.m_translation;
                                 v13.m_quad = v7->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad;
-                                // MAYBE-INLINED 0xE45BFB: after the vptr store of hkpClosestRayHitCollector's inlined
-                                // constructor
-                                collector.m_rayHit.m_rootCollidable = nullptr;
-                                // MAYBE-INLINED 0xE45C02: after the vptr store of hkpClosestRayHitCollector's inlined
-                                // constructor
-                                collector.m_rayHit.m_shapeKeyIndex = 0;
                                 input.m_enableShapeCollectionFilter.m_bool = 0;
                                 input.m_filterInfo = 0;
                                 input.m_to.m_quad = v13.m_quad;

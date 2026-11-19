@@ -117,7 +117,6 @@ void bhkCylinderShape::SaveBinary(NiStream& arStream) {
 // The base's strings, this class's name, then the cylinder radius and both end points of a cinfo filled from the
 // wrapped shape; the array grows by its grow-by past its allocated size.
 void bhkCylinderShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    XFNV_INLINED_LOCAL(hkCylinderShapeCinfo, kInfo, std::nullopt, std::nullopt);
     NiPoint3 kPoint;
     hkVector4 kVertex;
     TLSData* v3 = GetThreadTLSData();
@@ -126,17 +125,9 @@ void bhkCylinderShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     bhkConvexShape::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(bhkCylinderShape::ms_RTTI.GetName());
     apStrings->Add(pcString);
-    kInfo.m_radius = 0.1f;
-    kInfo.m_vertexA.fX = 0.0f;
-    kInfo.m_vertexA.fY = 0.0f;
-    kInfo.m_vertexA.fZ = 0.0f;
-    kInfo.m_vertexA.fW = 0.0f;
-    kInfo.m_userData = 0;
+    hkCylinderShapeCinfo kInfo;
     kInfo.fCylinderRadius = 0.0f;
     kInfo.m_vertexB.fX = 1.0f;
-    kInfo.m_vertexB.fY = 0.0f;
-    kInfo.m_vertexB.fZ = 0.0f;
-    kInfo.m_vertexB.fW = 0.0f;
     CopyCinfo(kInfo);
     pcString = NiGetViewerString("RAD", kInfo.fCylinderRadius);
     apStrings->Add(pcString);
@@ -249,23 +240,14 @@ void bhkCylinderShape::CopyMembers(bhkSerializable* apDest, NiCloningProcess& ar
 }
 
 void bhkCylinderShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
-    XFNV_INLINED_LOCAL(hkCylinderShapeCinfo, a1, std::nullopt, std::nullopt);
     hkVector4 top_4;
     hkVector4 v14;
     TLSData* v4 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v4->eMemContext;
     v4->eMemContext = MEM_CONTEXT_HAVOK;
-    a1.m_radius = 0.1f;
-    a1.m_vertexA.fX = 0.0f;
-    a1.m_vertexA.fY = 0.0f;
-    a1.m_vertexA.fZ = 0.0f;
-    a1.m_vertexA.fW = 0.0f;
-    a1.m_userData = 0;
+    hkCylinderShapeCinfo a1;
     a1.fCylinderRadius = 0.0f;
     a1.m_vertexB.fX = 1.0f;
-    a1.m_vertexB.fY = 0.0f;
-    a1.m_vertexB.fZ = 0.0f;
-    a1.m_vertexB.fW = 0.0f;
     CopyCinfo(a1);
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkDisplayCylinder* v6 = static_cast<hkDisplayCylinder*>(Instance->m_heap->blockAlloc(sizeof(hkDisplayCylinder)));

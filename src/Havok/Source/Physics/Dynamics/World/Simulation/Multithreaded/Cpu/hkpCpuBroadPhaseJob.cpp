@@ -81,38 +81,8 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
     // Another thread sets the flag: it is read again on each test, and the pointer is tested for null first.
 	volatile int8_t* exportFinished = &job.m_taskHeader->m_exportFinished;
 
-	XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-	newPairs.m_data = nullptr;
-	newPairs.m_size = 0;
-	newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-	{
-		const int32_t iCapacity = tl.m_world->m_broadPhaseUpdateSize;
-		// EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>. The stack allocator hands out untyped bytes.
-		hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-		char* pBlock = stack.m_next.m_storage;
-		stack.m_next.m_storage =
-			pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-		newPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-		newPairs.m_capacityAndFlags =
-			static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-		newPairs.m_localMemory = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-	}
-	XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, delPairs, std::nullopt, std::nullopt);
-	delPairs.m_data = nullptr;
-	delPairs.m_size = 0;
-	delPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-	{
-		const int32_t iCapacity = tl.m_world->m_broadPhaseUpdateSize;
-		// EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>. The stack allocator hands out untyped bytes.
-		hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-		char* pBlock = stack.m_next.m_storage;
-		stack.m_next.m_storage =
-			pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-		delPairs.m_data = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-		delPairs.m_localMemory = reinterpret_cast<hkpBroadPhaseHandlePair*>(pBlock);
-		delPairs.m_capacityAndFlags =
-			static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-	}
+	hkLocalArray<hkpBroadPhaseHandlePair> newPairs(tl.m_world->m_broadPhaseUpdateSize);
+	hkLocalArray<hkpBroadPhaseHandlePair> delPairs(tl.m_world->m_broadPhaseUpdateSize);
 
 	tl.m_simulation.m_storage->collideEntitiesBroadPhaseContinuousFindPairs(island->m_entities.begin(),
 		island->m_entities.getSize(), tl.m_world, newPairs, delPairs);
@@ -263,7 +233,5 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
 		status = jobQueue.finishJobAndGetNextJob(&nextJobOut, nextJobOut, hkJobQueue::WAIT_FOR_NEXT_JOB);
 	}
 
-	delPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
-	newPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
 	return status;
 }

@@ -190,38 +190,10 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
     ++pWorld->m_criticalOperationsLockCount;
 
     const int32_t iNewCapacity = m_world->m_broadPhaseUpdateSize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, newPairs, std::nullopt, std::nullopt);
-    newPairs.m_data = nullptr;
-    newPairs.m_size = 0;
-    newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rNewStack = hkMemoryRouter::getInstance().m_stack;
-    void* pNewBlock = rNewStack.m_next.m_storage;
-    rNewStack.m_next.m_storage = static_cast<char*>(pNewBlock) +
-        ((iNewCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pNewLocal = static_cast<hkpBroadPhaseHandlePair*>(pNewBlock);
-    newPairs.m_data = pNewLocal;
-    newPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iNewCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
-    newPairs.m_localMemory = pNewLocal;
+    hkLocalArray<hkpBroadPhaseHandlePair> newPairs(iNewCapacity);
 
     const int32_t iRemovedCapacity = m_world->m_broadPhaseUpdateSize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, removedPairs, std::nullopt, std::nullopt);
-    removedPairs.m_data = nullptr;
-    removedPairs.m_size = 0;
-    removedPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rRemovedStack = hkMemoryRouter::getInstance().m_stack;
-    void* pRemovedBlock = rRemovedStack.m_next.m_storage;
-    rRemovedStack.m_next.m_storage = static_cast<char*>(pRemovedBlock) +
-        ((iRemovedCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pRemovedLocal = static_cast<hkpBroadPhaseHandlePair*>(pRemovedBlock);
-    removedPairs.m_data = pRemovedLocal;
-    removedPairs.m_localMemory = pRemovedLocal;
-    removedPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iRemovedCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
+    hkLocalArray<hkpBroadPhaseHandlePair> removedPairs(iRemovedCapacity);
 
     hkpBroadPhaseHandle* pHandle = m_collidable.getBroadPhaseHandle();
     // EXE-INLINED none: hkpBroadPhase::lock
@@ -257,9 +229,6 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
     hkpWorld* pUnlockWorld = m_world;
     --pUnlockWorld->m_criticalOperationsLockCount;
     pUnlockWorld->attemptToExecutePendingOperations();
-
-    removedPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
-    newPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
 }
 
 // The list is walked from the back so that a listener may remove itself while it is told.

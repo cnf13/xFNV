@@ -312,9 +312,6 @@ void HackingMenu::AttachTileByID(int32_t aiID, Tile* apTile) {
 
 // Each log branch builds its lines in a BSStringT array.
 void HackingMenu::DoClick(int32_t a1, Tile* a2) {
-    using StringArray3 = BSStringT<char>[3];
-    using StringArray4 = BSStringT<char>[4];
-    using StringArray5 = BSStringT<char>[5];
     InterfaceManager::Instance();
     if (InterfaceManager::Has360Controller()) {
         a2 = pOverTile;
@@ -349,11 +346,7 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
     if (std::isalpha(*pguess) || BSstrlen(pguess) <= 1) {
         if (inumCommon == iWordLength) {
             const char* ptmp[5];
-            XFNV_INLINED_LOCAL(StringArray5, astrLog, std::nullopt, std::nullopt);
-            rt::eh_vector_constructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 5, &xfnv::constructElement<BSStringT<char>>,
-                &xfnv::destructElement<BSStringT<char>>
-            );
+            BSStringT<char> astrLog[5];
             astrLog[0].SPrintF("%s%s", ">", pguess);
             astrLog[1].SPrintF("%s%s", ">", sHackingGranted.String());
             astrLog[2].SPrintF("%s%s", ">", sHackingAccessing1.String());
@@ -380,16 +373,9 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
                 }
             }
             MiscStatManager::Increment(MiscStatManager::MS_COMPUTERS_HACKED);
-            rt::eh_vector_destructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 5, &xfnv::destructElement<BSStringT<char>>
-            );
         }
         else {
-            XFNV_INLINED_LOCAL(StringArray4, astrLog, std::nullopt, std::nullopt);
-            rt::eh_vector_constructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 4, &xfnv::constructElement<BSStringT<char>>,
-                &xfnv::destructElement<BSStringT<char>>
-            );
+            BSStringT<char> astrLog[4];
             astrLog[0].SPrintF("%s%s", ">", pguess);
             astrLog[1].SPrintF("%s%s", ">", sHackingDenied.String());
             if (--iNumGuesses) {
@@ -426,19 +412,12 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
             if (pSquare) {
                 delete pSquare;
             }
-            rt::eh_vector_destructor_iterator(
-                astrLog, sizeof(BSStringT<char>), 4, &xfnv::destructElement<BSStringT<char>>
-            );
         }
     }
     else {
         uint32_t ilogscroll;
         const char* ptmp[3];
-        XFNV_INLINED_LOCAL(StringArray3, astrLog, std::nullopt, std::nullopt);
-        rt::eh_vector_constructor_iterator(
-            astrLog, sizeof(BSStringT<char>), 3, &xfnv::constructElement<BSStringT<char>>,
-            &xfnv::destructElement<BSStringT<char>>
-        );
+        BSStringT<char> astrLog[3];
         astrLog[0].SPrintF("%s%s", ">", pguess);
         if (iWordsHave == 1) {
             astrLog[1].SPrintF("%s%s", ">", sHackingDenied.String());
@@ -479,7 +458,6 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
         ptmp[1] = astrLog[1].String();
         ptmp[2] = astrLog[2].String();
         ScrollLog(ilogscroll, ptmp);
-        rt::eh_vector_destructor_iterator(astrLog, sizeof(BSStringT<char>), 3, &xfnv::destructElement<BSStringT<char>>);
     }
     BSStringT<char> strtmp;
     const char* pHeader3 = sHackingHeader3.String();

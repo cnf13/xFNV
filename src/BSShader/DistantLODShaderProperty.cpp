@@ -627,8 +627,7 @@ void DistantLODShaderProperty::ClearStaticMaps() {
         }
     }
     DistantLODShaderProperty::CachedGeometry* pCachedGeom = nullptr;
-    XFNV_INLINED_LOCAL(NiPointer<DistantLODShaderProperty::CachedGeometry>, spCachedGeom, std::nullopt, std::nullopt);
-    spCachedGeom.m_pObject = nullptr;
+    NiPointer<DistantLODShaderProperty::CachedGeometry> spCachedGeom;
     if (DistantLODShaderProperty::GetCachedGeometryMap()->m_kAllocator.m_uiCount) {
         if (pPos) {
             do {
@@ -648,9 +647,6 @@ void DistantLODShaderProperty::ClearStaticMaps() {
             while (pPos);
         }
         DistantLODShaderProperty::GetCachedGeometryMap()->RemoveAll();
-    }
-    if (pCachedGeom) {
-        NiDecRefCount(pCachedGeom);
     }
 }
 

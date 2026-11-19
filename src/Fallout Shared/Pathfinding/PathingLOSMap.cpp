@@ -289,19 +289,13 @@ bool PathingLOSMap::IsNavMeshInMap(uint32_t aiNavMeshID) {
 }
 
 void NiAVObjectArray_SetSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray, uint32_t auiSize) {
-    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, v6, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, apMemory, std::nullopt, std::nullopt);
     if (auiSize != apArray->m_usMaxSize) {
         uint16_t i;
         if (auiSize < apArray->m_usSize) {
             for (i = auiSize; i < static_cast<int32_t>(apArray->m_usSize); ++i) {
-                NiPointer<NiAVObject>* ptr = ::new (&apMemory) NiPointer<NiAVObject>(nullptr);
-                bool v8 = apArray->m_pBase[i] != *ptr;
-                apMemory.~NiPointer<NiAVObject>();
+                bool v8 = apArray->m_pBase[i] != NiPointer<NiAVObject>(nullptr);
                 if (v8) {
-                    NiPointer<NiAVObject>* v3 = ::new (&v6) NiPointer<NiAVObject>(nullptr);
-                    apArray->m_pBase[i].operator=(*v3);
-                    v6.~NiPointer<NiAVObject>();
+                    apArray->m_pBase[i].operator=(NiPointer<NiAVObject>(nullptr));
                     --apArray->m_usESize;
                 }
             }

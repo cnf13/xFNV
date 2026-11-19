@@ -80,11 +80,7 @@ float separatingDistanceUsingCapsuleRepresentations(
     hkpAgentEntry* entry,
     void* agentData
 ) {
-    XFNV_INLINED_LOCAL(hkpAgent3ProcessInput, inputLocal, std::nullopt, std::nullopt);
-    // CopyConstruct copies only the hkpAgent3Input part; the two members after it are copied here.
-    hkpAgent3ProcessInput::CopyConstruct(&inputLocal, input);
-    inputLocal.m_distAtT1 = input.m_distAtT1;
-    inputLocal.m_linearTimInfo = input.m_linearTimInfo;
+    hkpAgent3ProcessInput inputLocal = input;
 
     const hkpCdBody** cdBodiesLocal[2] = {&inputLocal.m_bodyA, &inputLocal.m_bodyB};
     // EXE-INLINED none: hkPredGskAgent3::getGskFlag

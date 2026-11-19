@@ -56,13 +56,11 @@ void ImageSpaceEffectRefraction::Render(
 }
 
 void ImageSpaceEffectRefraction::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     ImageSpaceShaderParam* pparam;
     SetEffectCount(1);
     pTextures.SetSize(3u);
     ImageSpaceShaderParam* pMemory =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = pMemory;
     if (pMemory) {
         pparam = ::new (pMemory) ImageSpaceShaderParam;
     }
@@ -72,8 +70,7 @@ void ImageSpaceEffectRefraction::Setup(ImageSpaceManager* apManager, ImageSpaceE
     pparam->InitConstantMap(0, 1);
     NiPoint4 kTint = BSShaderLightingProperty::pShaderLightConstants[0];
     pparam->SetPixelConstant(0, kTint.X(), kTint.Y(), kTint.Z(), kTint.W());
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, pparam);
     SetEffectInputs(0, 1, 2, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(0, apManager->pEffectList.m_pBase[41], pparam, 0);
 }

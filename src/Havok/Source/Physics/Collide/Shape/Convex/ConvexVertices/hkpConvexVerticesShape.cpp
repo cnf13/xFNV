@@ -457,20 +457,7 @@ void hkpConvexVerticesShape::getCentreImpl(hkVector4& centreOut) const {
 // transposed rotation. Both loops are do-whiles: each runs its body once even for an empty array, as the game does.
 void hkpConvexVerticesShape::transformVerticesAndPlaneEquations(const hkTransform& t) {
     const int32_t numVertices = getNumCollisionSpheresImpl();
-    XFNV_INLINED_LOCAL(hkLocalArray<hkVector4>, vertices, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray(numVertices) (hkAllocateStack)
-        vertices.m_data = nullptr;
-        vertices.m_size = 0;
-        vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numVertices * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        vertices.m_data = static_cast<hkVector4*>(static_cast<void*>(pBlock));
-        vertices.m_localMemory = vertices.m_data;
-        vertices.m_capacityAndFlags = numVertices | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    }
+    hkLocalArray<hkVector4> vertices(numVertices);
     getOriginalVertices(vertices);
 
     const __m128 col0 = t.m_rotation.m_col0.m_quad;
@@ -525,8 +512,6 @@ void hkpConvexVerticesShape::transformVerticesAndPlaneEquations(const hkTransfor
         ++pPlane;
     }
     while (--remaining >= 0);
-
-    vertices.~hkLocalArray<hkVector4>();
 }
 
 void hkpConvexVerticesShape::setConnectivity(const hkpConvexVerticesConnectivity* connect, bool sort) {
@@ -620,40 +605,12 @@ void hkpConvexVerticesShape::getOriginalVertices(hkArray<hkVector4>& vertices) c
 // from the copy (the last plane moved into its place); a face whose normal has length 0 takes the first plane again,
 // without removing it. The walk stops when the copy is empty; the planes no face took go after the others.
 void hkpConvexVerticesShape::sortPlanes() {
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    planes.m_data = nullptr;
-    planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::operator= (on the empty array: no free, an allocation when there are
-        // planes)
-        hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-        if (m_planeEquations.m_size > 0) {
-            int32_t n = m_planeEquations.m_size;
-            planes.m_data = alloc._bufAlloc<hkVector4>(n);
-            planes.m_capacityAndFlags = n;
-        }
-        planes.m_size = m_planeEquations.m_size;
-        hkArrayBase<hkVector4>::copy(planes.m_data, m_planeEquations.m_data, planes.m_size);
-    }
+    hkArray<hkVector4> planes(m_planeEquations);
     const int32_t numVertices = m_numVertices;
     // EXE-INLINED none: hkArray<hkVector4>::clear
     m_planeEquations.m_size = 0;
     // The local is 16-aligned; getOriginalVertices gets its address.
-    alignas(16) XFNV_INLINED_LOCAL(hkLocalArray<hkVector4>, vertices, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray(numVertices) (hkAllocateStack)
-        vertices.m_data = nullptr;
-        vertices.m_size = 0;
-        vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numVertices * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        vertices.m_data = static_cast<hkVector4*>(static_cast<void*>(pBlock));
-        vertices.m_localMemory = vertices.m_data;
-        vertices.m_capacityAndFlags = numVertices | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    }
+    alignas(16) hkLocalArray<hkVector4> vertices(numVertices);
     getOriginalVertices(vertices);
 
     int32_t startIndex = 0;
@@ -723,17 +680,6 @@ void hkpConvexVerticesShape::sortPlanes() {
         const int32_t index = m_planeEquations.m_size;
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
         m_planeEquations._insertAt(heap, index, planes.m_data, planes.m_size);
-    }
-
-    vertices.~hkLocalArray<hkVector4>();
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    if (planes.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            planes.m_data,
-            (planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkVector4))
-        );
     }
 }
 

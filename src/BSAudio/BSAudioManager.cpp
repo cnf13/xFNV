@@ -761,23 +761,10 @@ void BSAudioManager::SetAttenuationCurve(
         EnterCriticalSection(&MessageCritSection);
         BSSoundMessage* pMsg = GetFreeMessage();
         {
-            // The message constructor's smart-pointer and vector arguments are copies.
-            XFNV_INLINED_LOCAL(BSSoundMessage, kMsg, std::nullopt, std::nullopt);
-            {
-                NiPointer<NiAVObject> spData;
-                NiPoint3 kVector = NiPoint3_ZERO;
-                kMsg.spData.m_pObject = nullptr;
-                kMsg.msg = MSET_ATTENUATION_CURVE;
-                kMsg.iID = aiSoundID;
-                kMsg.iData = 0;
-                kMsg.pData = nullptr;
-                kMsg.spData.operator=(spData);
-                kMsg.vector3[0] = kVector.x;
-                kMsg.vector3[1] = kVector.y;
-                kMsg.vector3[2] = kVector.z;
-            }
+            BSSoundMessage kMsg;
+            kMsg.msg = MSET_ATTENUATION_CURVE;
+            kMsg.iID = aiSoundID;
             BSSoundMessage::Assign(pMsg, kMsg);
-            kMsg.~BSSoundMessage();
         }
         pMsg->curve[0] = aiCurve[0];
         pMsg->curve[1] = aiCurve[1];
@@ -982,16 +969,10 @@ void BSAudioManager::PrecacheSound(char* a1, uint32_t a2, TESSound* a3) {
     uint32_t ibegin;
     uint32_t imodFlags;
     uint32_t iend;
-    XFNV_INLINED_LOCAL(BSSoundHandle, v16, std::nullopt, std::nullopt);
     if ((a1) && (BSAudio::pAudioInstance->bAudioEnabled)) {
         char pcDest[268];
         uint32_t ithisSoundID = uiSoundCacheIndex++;
-        // MAYBE-INLINED 0xADD784: a write opening BSSoundHandle's uses: may be its inlined constructor
-        v16.iSoundID = ithisSoundID;
-        // MAYBE-INLINED 0xADD787: a write opening BSSoundHandle's uses: may be its inlined constructor
-        v16.bAssumeSuccess = false;
-        // MAYBE-INLINED 0xADD78B: a write opening BSSoundHandle's uses: may be its inlined constructor
-        v16.eState = BSSoundHandle::ASSUMED_STATE_INITIALIZED;
+        BSSoundHandle v16(ithisSoundID);
         strcpy_s(pcDest, 260, a1);
         BSAudio::pAudioInstance->FixSoundPath(pcDest);
         uint32_t itestHash = BSGameSound::GetNameHash(pcDest);

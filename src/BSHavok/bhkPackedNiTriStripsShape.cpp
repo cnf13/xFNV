@@ -317,99 +317,98 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     hkPackedNiTriStripsShape* pShape = this ? static_cast<hkPackedNiTriStripsShape*>(this->phkObject) : nullptr;
     hkPackedNiTriStripsData* pdata = pShape->spTriStripsData.m_pObject;
-    // The array starts with no slots and a grow-by of one.
-    XFNV_INLINED_LOCAL(NiTPrimitiveArray<uint16_t>, shapeArray, std::nullopt, std::nullopt);
-    ::new (&shapeArray) NiTPrimitiveArray<uint16_t>(0u, 1u);
-    uint16_t usvertCount = 0;
-    uint16_t uslastKey = 0;
-    uint16_t uscurrentKey = 0;
-    for (int32_t i = 0; i < pdata->usPartCount; ++i) {
-        uint16_t length = 0;
-        uint16_t us0 = 0;
-        uint16_t us1 = 0;
-        uint16_t us2 = 0;
-        do {
-            TriangleData* ptri = &pdata->paTriData[uscurrentKey];
-            if (!length) {
-                us0 = ptri->us1;
-                us1 = ptri->us2;
-                us2 = ptri->us3;
-                if (us0 >= usvertCount + pdata->paSubPartData[i].uiNumVerts) {
-                    break;
+    {
+        // The array starts with no slots and a grow-by of one.
+        NiTPrimitiveArray<uint16_t> shapeArray(0u, 1u);
+        uint16_t usvertCount = 0;
+        uint16_t uslastKey = 0;
+        uint16_t uscurrentKey = 0;
+        for (int32_t i = 0; i < pdata->usPartCount; ++i) {
+            uint16_t length = 0;
+            uint16_t us0 = 0;
+            uint16_t us1 = 0;
+            uint16_t us2 = 0;
+            do {
+                TriangleData* ptri = &pdata->paTriData[uscurrentKey];
+                if (!length) {
+                    us0 = ptri->us1;
+                    us1 = ptri->us2;
+                    us2 = ptri->us3;
+                    if (us0 >= usvertCount + pdata->paSubPartData[i].uiNumVerts) {
+                        break;
+                    }
+                    shapeArray.Add(static_cast<uint16_t>(us0 - usvertCount));
+                    shapeArray.Add(static_cast<uint16_t>(us1 - usvertCount));
+                    shapeArray.Add(static_cast<uint16_t>(us2 - usvertCount));
+                    ++uscurrentKey;
+                    length = 1;
                 }
-                shapeArray.Add(static_cast<uint16_t>(us0 - usvertCount));
-                shapeArray.Add(static_cast<uint16_t>(us1 - usvertCount));
-                shapeArray.Add(static_cast<uint16_t>(us2 - usvertCount));
-                ++uscurrentKey;
-                length = 1;
+                else if (us1 == ptri->us1 && us2 == ptri->us2) {
+                    // The triangle continues the strip: it shares the last two indices.
+                    us0 = us1;
+                    us1 = us2;
+                    us2 = ptri->us3;
+                    shapeArray.Add(static_cast<uint16_t>(us0 - usvertCount));
+                    shapeArray.Add(static_cast<uint16_t>(us1 - usvertCount));
+                    shapeArray.Add(static_cast<uint16_t>(us2 - usvertCount));
+                    ++length;
+                    ++uscurrentKey;
+                }
+                else {
+                    length = 0;
+                }
             }
-            else if (us1 == ptri->us1 && us2 == ptri->us2) {
-                // The triangle continues the strip: it shares the last two indices.
-                us0 = us1;
-                us1 = us2;
-                us2 = ptri->us3;
-                shapeArray.Add(static_cast<uint16_t>(us0 - usvertCount));
-                shapeArray.Add(static_cast<uint16_t>(us1 - usvertCount));
-                shapeArray.Add(static_cast<uint16_t>(us2 - usvertCount));
-                ++length;
-                ++uscurrentKey;
+            while (us0 < usvertCount + pdata->paSubPartData[i].uiNumVerts && uscurrentKey < pdata->uiKeyCount);
+
+            void* pMemory = NiMemObject::operator new(sizeof(NiTriShapeData));
+            NiTriShapeData* ptsd = pMemory ? ::new (pMemory) NiTriShapeData : nullptr;
+            uint16_t uspartVerts = static_cast<uint16_t>(pdata->paSubPartData[i].uiNumVerts);
+            uint64_t ullSize = static_cast<uint64_t>(uspartVerts) * sizeof(NiPoint3);
+            NiPoint3* verts = static_cast<NiPoint3*>(
+                MemoryManager_Singleton.Allocate(ullSize >> 32 ? 0xFFFFFFFF : static_cast<uint32_t>(ullSize))
+            );
+            // Each point is multiplied by the Havok-to-game scale, which is loaded once before the loop.
+            float fToGame = bhkConvert::fHk2BSScaleSC;
+            for (uint16_t v = usvertCount; v < usvertCount + uspartVerts; ++v) {
+                const NiPoint3& kVert = pdata->paVertData[v];
+                NiPoint3& kOut = verts[v - usvertCount];
+                kOut.x = kVert.x * fToGame;
+                kOut.y = kVert.y * fToGame;
+                kOut.z = kVert.z * fToGame;
             }
-            else {
-                length = 0;
-            }
+            ptsd->NiGeometryData::SetData(
+                uspartVerts, verts, nullptr, nullptr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE
+            );
+            uint16_t usnumTris = static_cast<uint16_t>(uscurrentKey - uslastKey);
+            ullSize = static_cast<uint64_t>(static_cast<uint32_t>(usnumTris) * 3) * sizeof(uint16_t);
+            uint16_t* ptriList = static_cast<uint16_t*>(
+                MemoryManager_Singleton.Allocate(ullSize >> 32 ? 0xFFFFFFFF : static_cast<uint32_t>(ullSize))
+            );
+            rt::memcpy(ptriList, shapeArray.m_pBase, shapeArray.m_usSize * sizeof(uint16_t));
+            ptsd->SetData(usnumTris, ptriList);
+
+            pMemory = NiMemObject::operator new(sizeof(NiTriShape));
+            NiTriShape* ptriShape = pMemory ? ::new (pMemory) NiTriShape(ptsd) : nullptr;
+            alignas(16) NiFixedString kName;
+            // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
+            kName.SetHandle(NiGlobalStringTable::AddString("bhkPackedNiTriStripsShape"));
+            ptriShape->SetName(kName);
+            float fScale = GetScale();
+            fScale = __builtin_fabsf(fScale);
+            ptriShape->m_kLocal.m_fScale = fScale;
+            shapeArray.RemoveAll();
+
+            pMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
+            NiMaterialProperty* pmat = pMemory ? ::new (pMemory) NiMaterialProperty : nullptr;
+            // EXE-INLINED 0x4BC450
+            pmat->m_emit = arDefColor;
+            ++pmat->m_uiRevID;
+            ptriShape->AttachProperty(pmat);
+            apNode->AttachChild(ptriShape, 1);
+            usvertCount += uspartVerts;
+            uslastKey = uscurrentKey;
         }
-        while (us0 < usvertCount + pdata->paSubPartData[i].uiNumVerts && uscurrentKey < pdata->uiKeyCount);
-
-        void* pMemory = NiMemObject::operator new(sizeof(NiTriShapeData));
-        NiTriShapeData* ptsd = pMemory ? ::new (pMemory) NiTriShapeData : nullptr;
-        uint16_t uspartVerts = static_cast<uint16_t>(pdata->paSubPartData[i].uiNumVerts);
-        uint64_t ullSize = static_cast<uint64_t>(uspartVerts) * sizeof(NiPoint3);
-        NiPoint3* verts = static_cast<NiPoint3*>(
-            MemoryManager_Singleton.Allocate(ullSize >> 32 ? 0xFFFFFFFF : static_cast<uint32_t>(ullSize))
-        );
-        // Each point is multiplied by the Havok-to-game scale, which is loaded once before the loop.
-        float fToGame = bhkConvert::fHk2BSScaleSC;
-        for (uint16_t v = usvertCount; v < usvertCount + uspartVerts; ++v) {
-            const NiPoint3& kVert = pdata->paVertData[v];
-            NiPoint3& kOut = verts[v - usvertCount];
-            kOut.x = kVert.x * fToGame;
-            kOut.y = kVert.y * fToGame;
-            kOut.z = kVert.z * fToGame;
-        }
-        ptsd->NiGeometryData::SetData(
-            uspartVerts, verts, nullptr, nullptr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE
-        );
-        uint16_t usnumTris = static_cast<uint16_t>(uscurrentKey - uslastKey);
-        ullSize = static_cast<uint64_t>(static_cast<uint32_t>(usnumTris) * 3) * sizeof(uint16_t);
-        uint16_t* ptriList = static_cast<uint16_t*>(
-            MemoryManager_Singleton.Allocate(ullSize >> 32 ? 0xFFFFFFFF : static_cast<uint32_t>(ullSize))
-        );
-        rt::memcpy(ptriList, shapeArray.m_pBase, shapeArray.m_usSize * sizeof(uint16_t));
-        ptsd->SetData(usnumTris, ptriList);
-
-        pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-        NiTriShape* ptriShape = pMemory ? ::new (pMemory) NiTriShape(ptsd) : nullptr;
-        alignas(16) NiFixedString kName;
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        kName.SetHandle(NiGlobalStringTable::AddString("bhkPackedNiTriStripsShape"));
-        ptriShape->SetName(kName);
-        float fScale = GetScale();
-        fScale = __builtin_fabsf(fScale);
-        ptriShape->m_kLocal.m_fScale = fScale;
-        shapeArray.RemoveAll();
-
-        pMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
-        NiMaterialProperty* pmat = pMemory ? ::new (pMemory) NiMaterialProperty : nullptr;
-        // EXE-INLINED 0x4BC450
-        pmat->m_emit = arDefColor;
-        ++pmat->m_uiRevID;
-        ptriShape->AttachProperty(pmat);
-        apNode->AttachChild(ptriShape, 1);
-        usvertCount += uspartVerts;
-        uslastKey = uscurrentKey;
     }
-    // The array is destroyed, freeing its buffer, before the memory context is restored.
-    shapeArray.~NiTPrimitiveArray();
     GetThreadMemContext() = iOldMemContext;
 }
 

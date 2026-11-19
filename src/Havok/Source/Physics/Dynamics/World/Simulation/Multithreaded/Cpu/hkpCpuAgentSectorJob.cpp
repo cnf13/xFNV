@@ -48,12 +48,8 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
     ::new (&input) hkpProcessCollisionInput(tl.m_collisionInput);
     input.m_stepInfo = job.m_stepInfo;
 
-    XFNV_INLINED_LOCAL(
-        hkpDeferredConstraintOwner, constraintOwner, hkpDeferredConstraintOwner_vftable, hkBaseObject_vftable
-    );
+    hkpDeferredConstraintOwner constraintOwner;
     // EXE-INLINED none: hkpDeferredConstraintOwner::hkpDeferredConstraintOwner
-    constraintOwner.m_referenceCount = 1;
-    ::new (&constraintOwner.m_commandQueue) hkpFixedSizePhysicsCommandQueue<256>;
     constraintOwner.m_constraintInfo.clear();
     constraintOwner.m_constraintAddRemoveCounter.m_storage = 0;
     constraintOwner.m_callbackRequestForAddConstraint.m_storage = 0;

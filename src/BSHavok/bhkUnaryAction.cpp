@@ -132,7 +132,6 @@ bool bhkUnaryAction::Add(bhkWorld* apWorld) {
 // Adds the action's entity to apWorld when it is in no world yet and the world adds no batch; an entity whose flags do
 // not mark it as added anyway gets a warning and is forced in.
 void bhkUnaryAction::ProcessEntity(bhkWorld* apWorld) {
-    XFNV_INLINED_LOCAL(hkOstream, kStream, std::nullopt, std::nullopt);
     TLSData* pTLSData = GetThreadTLSData();
     MEM_CONTEXT eMemContext = pTLSData->eMemContext;
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
@@ -143,14 +142,15 @@ void bhkUnaryAction::ProcessEntity(bhkWorld* apWorld) {
         if (pBody && !pBody->GethkWorld() && !apWorld->iBatchAdd) {
             pBody->Add(apWorld);
             if ((pBody->iFlags & 0x30) == 0) {
-                char acBuffer[512];
-                ::new (&kStream) hkOstream(acBuffer, 512, true);
-                kStream.operator<<("A unary action is being added to the world before its target entities.\n");
-                hkError::s_instance->message(
-                    hkError::MESSAGE_WARNING, 0x234F24FC, acBuffer,
-                    "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkUnaryAction.cpp", 200
-                );
-                kStream.~hkOstream();
+                {
+                    char acBuffer[512];
+                    hkOstream kStream(acBuffer, 512, true);
+                    kStream.operator<<("A unary action is being added to the world before its target entities.\n");
+                    hkError::s_instance->message(
+                        hkError::MESSAGE_WARNING, 0x234F24FC, acBuffer,
+                        "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkUnaryAction.cpp", 200
+                    );
+                }
                 pBody->ForceAdd(apWorld);
             }
         }

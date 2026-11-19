@@ -25,15 +25,8 @@ static void heapSortTextureStages(hkxMaterial::TextureStage* a1, int32_t a2, con
     }
     hkxMaterial::TextureStage* pLast = &a1[n - 1];
     while (n >= 1) {
-        // EXE-INLINED none: hkxMaterial::TextureStage's copy constructor
-        XFNV_INLINED_LOCAL(hkxMaterial::TextureStage, kTemp, std::nullopt, std::nullopt);
-        if (a1->m_texture.m_pntr) {
-            a1->m_texture.m_pntr->addReference();
-        }
-        hkReferencedObject* pTempTexture = a1->m_texture.m_pntr;
-        kTemp.m_texture.m_pntr = pTempTexture;
-        kTemp.m_usageHint.m_storage = a1->m_usageHint.m_storage;
-        kTemp.m_tcoordChannel = a1->m_tcoordChannel;
+        hkxMaterial::TextureStage kTemp(*a1);
+        hkReferencedObject* pTempTexture = kTemp.m_texture.m_pntr;
         // EXE-INLINED none: hkxMaterial::TextureStage::operator=
         if (a1 != pLast) {
             hkReferencedObject* pTexture = pLast->m_texture.m_pntr;
@@ -61,10 +54,6 @@ static void heapSortTextureStages(hkxMaterial::TextureStage* a1, int32_t a2, con
         --n;
         --pLast;
         downHeap(a1, 1, n, x0);
-        // EXE-INLINED none: hkxMaterial::TextureStage's destructor
-        if (pTempTexture) {
-            pTempTexture->removeReference();
-        }
     }
 }
 
@@ -73,14 +62,7 @@ static void heapSortTextureStages(hkxMaterial::TextureStage* a1, int32_t a2, con
 // takes and removes the one it held.
 static void downHeap(hkxMaterial::TextureStage* apArray, int32_t k, int32_t n, const hkxMaterial* x0) {
     hkxMaterial::TextureStage* pStage = &apArray[k - 1];
-    // EXE-INLINED none: hkxMaterial::TextureStage's copy constructor
-    XFNV_INLINED_LOCAL(hkxMaterial::TextureStage, kTemp, std::nullopt, std::nullopt);
-    if (pStage->m_texture.m_pntr) {
-        pStage->m_texture.m_pntr->addReference();
-    }
-    kTemp.m_texture.m_pntr = pStage->m_texture.m_pntr;
-    kTemp.m_usageHint.m_storage = pStage->m_usageHint.m_storage;
-    kTemp.m_tcoordChannel = pStage->m_tcoordChannel;
+    hkxMaterial::TextureStage kTemp(*pStage);
     int32_t iHalf = n / 2;
     while (k <= iHalf) {
         int32_t iChild = 2 * k;
@@ -130,10 +112,6 @@ static void downHeap(hkxMaterial::TextureStage* apArray, int32_t k, int32_t n, c
     pFinal->m_texture.m_pntr = pTexture;
     pFinal->m_usageHint.m_storage = kTemp.m_usageHint.m_storage;
     pFinal->m_tcoordChannel = kTemp.m_tcoordChannel;
-    // EXE-INLINED none: hkxMaterial::TextureStage's destructor
-    if (pTexture) {
-        pTexture->removeReference();
-    }
 }
 
 // The members' destructors release the extra data, the sub-materials and the stages' textures, free the arrays and

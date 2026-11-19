@@ -4048,8 +4048,6 @@ void Main::DrawWorld_MTRender1stPerson(
     BSRenderedTexture* apRenderTexture
 ) {
     FOPipboyManager* v20;
-    XFNV_INLINED_LOCAL(NiPointer<BSShaderAccumulator>, sptempaccum_4, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<BSShaderAccumulator>, sptempaccum_2, std::nullopt, std::nullopt);
     SceneGraph* apSceneGraph = Main::GetWorldSceneGraph();
     BSCullingProcess* apCuller = apSceneGraph->pCuller;
     NiAVObject* ap1stPerson3d = pPlayer->Get3D(true);
@@ -4159,7 +4157,7 @@ void Main::DrawWorld_MTRender1stPerson(
             SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
             NiCamera* pcamera_2 = WorldSceneGraph->GetCamera();
             BSCullingProcess* apCullingProcess = WorldSceneGraph->pCuller;
-            sptempaccum_2.SetPointer(&spDrawWorldAccum);
+            NiPointer<BSShaderAccumulator> sptempaccum_2(spDrawWorldAccum);
             NiPoint3 cameraPos = pcamera_2->GetWorldTranslate();
             pcamera_2->SetWorldTranslate(cameraPos + ISNodeDiff);
             BSShaderAccumulator* pNewViewporth = sptempaccum_2.m_pObject;
@@ -4188,7 +4186,6 @@ void Main::DrawWorld_MTRender1stPerson(
             sptempaccum_2.m_pObject->b1stPerson = false;
             sptempaccum_2.operator=(static_cast<BSShaderAccumulator*>(nullptr));
             pcamera_2->SetWorldTranslate(cameraPos);
-            sptempaccum_2.~NiPointer<BSShaderAccumulator>();
         }
     }
 
@@ -4233,7 +4230,7 @@ void Main::DrawWorld_MTRender1stPerson(
         SceneGraph* apSceneGraph_2 = Main::GetWorldSceneGraph();
         NiCamera* pcamera_3 = apSceneGraph_2->GetCamera();
         BSCullingProcess* apCuller_2 = apSceneGraph_2->pCuller;
-        sptempaccum_4.SetPointer(&spDrawWorldAccum);
+        NiPointer<BSShaderAccumulator> sptempaccum_4(spDrawWorldAccum);
         BSShaderAccumulator* pNewViewportk = sptempaccum_4.m_pObject;
         apCuller_2->SetAccumulator(pNewViewportk);
         sptempaccum_4.m_pObject->b1stPerson = true;
@@ -4245,7 +4242,6 @@ void Main::DrawWorld_MTRender1stPerson(
         sptempaccum_4.m_pObject->b1stPerson = false;
         sptempaccum_4.operator=(static_cast<BSShaderAccumulator*>(nullptr));
         apSun->GetSunGlareNode()->SetAppCulled(bcull);
-        sptempaccum_4.~NiPointer<BSShaderAccumulator>();
     }
 
     if (apSun) {

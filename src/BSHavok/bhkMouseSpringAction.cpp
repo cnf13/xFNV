@@ -148,7 +148,6 @@ void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
 }
 
 void bhkMouseSpringAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    XFNV_INLINED_LOCAL(hkMouseSpringActionCinfo, arInfo, std::nullopt, std::nullopt);
     TLSData* v3 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;
@@ -161,34 +160,9 @@ void bhkMouseSpringAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings)
         apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(m_usSize, a3);
-    // MAYBE-INLINED 0xC87473: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_positionInRbLocal.fX = 0.0f;
-    // MAYBE-INLINED 0xC8747B: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_positionInRbLocal.fY = 0.0f;
-    // MAYBE-INLINED 0xC87481: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_positionInRbLocal.fZ = 0.0f;
-    // MAYBE-INLINED 0xC87486: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_positionInRbLocal.fW = 0.0f;
-    // MAYBE-INLINED 0xC8748C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_mousePositionInWorld.fX = 0.0f;
-    // MAYBE-INLINED 0xC87490: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
+    hkMouseSpringActionCinfo arInfo;
     arInfo.m_userData = 0;
-    // MAYBE-INLINED 0xC87494: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_mousePositionInWorld.fY = 0.0f;
-    // MAYBE-INLINED 0xC87498: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
     arInfo.m_body = nullptr;
-    // MAYBE-INLINED 0xC8749C: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_mousePositionInWorld.fZ = 0.0f;
-    // MAYBE-INLINED 0xC874A0: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_mousePositionInWorld.fW = 0.0f;
-    // MAYBE-INLINED 0xC874AA: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_springDamping = 0.5f;
-    // MAYBE-INLINED 0xC874B4: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_springElasticity = 0.3f;
-    // MAYBE-INLINED 0xC874BE: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_maxRelativeForce = 250.0f;
-    // MAYBE-INLINED 0xC874C8: a write opening hkMouseSpringActionCinfo's uses: may be its inlined constructor
-    arInfo.m_objectDamping = 0.95f;
     CopyCinfo(arInfo);
     char* ViewerString_7 = NiGetViewerString("Damping", arInfo.m_springDamping);
     uint32_t v9 = apStrings->m_usSize;

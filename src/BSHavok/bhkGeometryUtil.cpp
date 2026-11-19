@@ -15,15 +15,7 @@ void bhkGeometryUtil::ComputePlanesFromVertices(
     vertData.m_vertices = &arVerts.m_data[0](0);
     vertData.m_numVertices = arVerts.m_size;
     vertData.m_striding = sizeof(hkVector4);
-    // EXE-INLINED 0xCCE5E0: hkGeometry::hkGeometry
-    XFNV_INLINED_LOCAL(hkGeometry, outGeom, std::nullopt, std::nullopt);
-    outGeom.m_vertices.m_data = nullptr;
-    outGeom.m_vertices.m_size = 0;
-    outGeom.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    outGeom.m_triangles.m_data = nullptr;
-    outGeom.m_triangles.m_size = 0;
-    outGeom.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
+    hkGeometry outGeom;
     hkGeometryUtility::createConvexGeometry(vertData, outGeom, arPlaneEquations);
     outGeom.m_vertices.swap(arOutVerts);
-    outGeom.~hkGeometry();
 }

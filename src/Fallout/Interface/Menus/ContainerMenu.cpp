@@ -544,8 +544,6 @@ int32_t ContainerMenu::GetStolenValue(ItemChange* a1, int32_t a2, bool a3) {
 }
 
 void ContainerMenu::PlayReactivityBark(TESTopic* aRelatedTopic) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, v10, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSSoundHandle, v11, std::nullopt, std::nullopt);
     Actor* pactor;
     TESTopicInfo* pInfo = nullptr;
     Actor* pActionActor = (Actor*)pPlayer;
@@ -580,14 +578,7 @@ void ContainerMenu::PlayReactivityBark(TESTopic* aRelatedTopic) {
                     true, true, false, false, true
                 );
             }
-            BSSoundHandle* v20 = &v11;
-            BSSoundHandle* v14 = &v11.operator=(this->m_hCurrentReactivityBark);
-            BSStringT<char>* Text = &pResponse->cText;
-            BSStringT<char>* v19 = &v10;
-            BSStringT<char>* v12 = ::new (&v10) BSStringT<char>(*Text);
-            this->DisplayContainerMenuSubtitle(v10, v11);
-            // The by-value argument is a copy of this raw-storage local, so the local is destroyed here.
-            v10.~BSStringT<char>();
+            this->DisplayContainerMenuSubtitle(pResponse->cText, this->m_hCurrentReactivityBark);
         }
     }
 }
@@ -742,8 +733,7 @@ void ContainerMenu::UpdateItemInList(
     InventoryChanges* apInventory,
     ListBox<ItemChange*>* apListbox
 ) {
-    XFNV_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
-    ::new (&pnewItemGroup) BSSimpleList<void*>;
+    BSSimpleList<ItemChange*> pnewItemGroup;
     if ((apInventory) && (apObj) && (apListbox)) {
         apInventory->GetItemGroup(apObj, &pnewItemGroup);
         apListbox->RemoveItemGroup(apObj);
@@ -753,8 +743,6 @@ void ContainerMenu::UpdateItemInList(
         }
         pnewItemGroup.RemoveAll();
     }
-
-    pnewItemGroup.~BSSimpleList<ItemChange*>();
 }
 
 bool ContainerMenu::IsPlacingMine(ItemChange* apItem, TESObjectREFR* apRefFrom, TESObjectREFR* apRefTo) {

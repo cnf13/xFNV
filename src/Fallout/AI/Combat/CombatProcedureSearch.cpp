@@ -49,12 +49,10 @@ CombatProcedureSearch::~CombatProcedureSearch() {}
 void CombatProcedureSearch::Update() {
     NiPoint3 result;
     BGSWorldLocation v45;
-    XFNV_INLINED_LOCAL(NiPointer<PathingLOSGridMap>, v47, std::nullopt, std::nullopt);
     BGSWorldLocation attackerWorldLoc_2;
     using ignoreLocations_t = BSSimpleArray<NiPoint3, 1024>;
     BGSWorldLocation attackerWorldLoc;
     BGSWorldLocation searchCenter;
-    XFNV_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
     Actor* pattacker = GetAttacker();
     Actor* ptarget = GetTarget();
     PROCESS_TYPE eprocessLevel = pattacker->GetCurrentProcessType();
@@ -79,21 +77,21 @@ void CombatProcedureSearch::Update() {
                 float* v1;
                 NiPoint3* Point;
                 TESForm* Space;
-                ::new (&request) PathingRequest;
-                Space = psearchLocation->WorldLoc.pSpace;
-                Point = &(&psearchLocation->WorldLoc)->Point;
-                pattacker->BuildRequest_0(&request, *Point, Space, 128.0f, nullptr);
-                request.SetSoftGoalRadius(false);
-                if (!pattacker->SetPathfindingGoal(&request)) {
-                    SetFailed("Cannot setup path to investigate point");
-                    request.~PathingRequest();
-                    return;
+                {
+                    PathingRequest request;
+                    Space = psearchLocation->WorldLoc.pSpace;
+                    Point = &(&psearchLocation->WorldLoc)->Point;
+                    pattacker->BuildRequest_0(&request, *Point, Space, 128.0f, nullptr);
+                    request.SetSoftGoalRadius(false);
+                    if (!pattacker->SetPathfindingGoal(&request)) {
+                        SetFailed("Cannot setup path to investigate point");
+                        return;
+                    }
+                    eState = CombatProcedureSearch::SEARCH_STATE_INVESTIGATING;
+                    v1 = &fCombatSearchCheckInvestigateInitialTime.Float();
+                    CheckDestinationTimer.Reset(*v1);
+                    InvestigateLocation = psearchLocation->WorldLoc;
                 }
-                eState = CombatProcedureSearch::SEARCH_STATE_INVESTIGATING;
-                v1 = &fCombatSearchCheckInvestigateInitialTime.Float();
-                CheckDestinationTimer.Reset(*v1);
-                InvestigateLocation = psearchLocation->WorldLoc;
-                request.~PathingRequest();
             LABEL_44:;
                 SetMoveMode(1);
                 return;
@@ -155,9 +153,7 @@ void CombatProcedureSearch::Update() {
                     losRequest.SetCantOpenDoors(v39->GetCantOpenDoors());
                 }
                 losRequest.SetNoDestination();
-                ::new (&v47) NiPointer<PathingLOSGridMap>(psearchLOSGridMap);
-                losRequest.SetLOSGridMap(v47);
-                v47.~NiPointer<PathingLOSGridMap>();
+                losRequest.SetLOSGridMap(NiPointer<PathingLOSGridMap>(psearchLOSGridMap));
                 CombatLocationTarget* plocationTarget = pcombatState->pLocationTarget;
                 if ((plocationTarget) &&
                     (plocationTarget->cType == 1 || (plocationTarget->cType == 2 || plocationTarget->cType == 3))) {

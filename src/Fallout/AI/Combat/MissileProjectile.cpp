@@ -519,7 +519,6 @@ void MissileProjectile::ProcessImpale() {
     NiMatrix3 rot2_4;
     NiMatrix3 rot_3;
     NiTransform projectileWorld_2;
-    XFNV_INLINED_LOCAL(hkpAllRayHitCollector, collector, std::nullopt, std::nullopt);
     NiMatrix3 rot2_2;
     NiMatrix3 rot_2;
     NiTransform v103;
@@ -644,7 +643,7 @@ void MissileProjectile::ProcessImpale() {
                         direction.Unitize();
                         pd.NiSetFrom(origin - direction * 512.0f);
                         pd.NiSetLength(direction * 1024.0f);
-                        ::new (&collector) hkpAllRayHitCollector;
+                        hkpAllRayHitCollector collector;
                         pd.SetAllCollector(&collector);
                         if (Projectile::PickSceneGraph(&pd, pdismemberedLimb_2, false, true) &&
                             (&pd.pAllCollector->getHits())->m_size > 0) {
@@ -652,7 +651,6 @@ void MissileProjectile::ProcessImpale() {
                                 &(&pd.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(0);
                             pconstrainedObject = GetAVObjectForCollidable(v7->m_rootCollidable);
                         }
-                        collector.~hkpAllRayHitCollector();
                         if (pconstrainedObject) {
                             NiNode* v8 = this->Get3D();
                             bhkCollisionObject* pcol = FindFirstCollisionObject(v8);

@@ -144,13 +144,7 @@ void hkpMultiRayShape::calcContentStatistics(hkStatisticsCollector* collector, c
 // The rays are transformed to world space into an inline array of 16 (both ends of each ray, last point first), then
 // the AABB is the min and max over them. The transform runs once even with no rays, as the game does.
 void hkpMultiRayShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
-    // EXE-INLINED none: hkInplaceArrayAligned16<hkpMultiRayShape::Ray, 16>::hkInplaceArrayAligned16
-    using worldRays_t = hkInplaceArrayAligned16<Ray, 16>;
-    XFNV_INLINED_LOCAL(worldRays_t, worldRays, std::nullopt, std::nullopt);
-    // The inline storage is raw bytes until the rays are written into it.
-    worldRays.m_data = reinterpret_cast<Ray*>(worldRays.m_storage);
-    worldRays.m_size = 0;
-    worldRays.m_capacityAndFlags = hkArrayBase<Ray>::DONT_DEALLOCATE_FLAG | 16;
+    hkInplaceArrayAligned16<Ray, 16> worldRays;
     // EXE-INLINED none: hkArray<hkpMultiRayShape::Ray>::setSize
     int32_t numRays = m_rays.m_size;
     worldRays._reserve(*hkMemoryRouter::getInstance().m_heap, numRays);
@@ -198,15 +192,6 @@ void hkpMultiRayShape::getAabbImpl(const hkTransform& localToWorld, float tolera
     }
     out.m_min.m_quad = minimum;
     out.m_max.m_quad = maximum;
-    // EXE-INLINED none: hkInplaceArrayAligned16<hkpMultiRayShape::Ray, 16>::~hkInplaceArrayAligned16
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    worldRays.m_size = 0;
-    if (worldRays.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            worldRays.m_data,
-            static_cast<int32_t>((worldRays.m_capacityAndFlags & hkArrayBase<Ray>::CAPACITY_MASK) * sizeof(Ray))
-        );
-    }
 }
 
 // A multi-ray shape is never hit by a ray.

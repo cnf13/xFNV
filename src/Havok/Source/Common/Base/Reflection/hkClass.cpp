@@ -505,8 +505,7 @@ hkResult hkClass::retrieveMember(int32_t memberIndex, const void*& defaultOut, c
 
 uint32_t hkClass::getSignature(int32_t signatureFlags) const {
     const hkClass* pThis = this;
-    XFNV_INLINED_LOCAL(hkCrc32StreamWriter, v4, std::nullopt, std::nullopt);
-    ::new (&v4) hkCrc32StreamWriter(0);
+    hkCrc32StreamWriter v4(0);
     for (; pThis; pThis = pThis->getParent()) {
         pThis->writeSignature(&v4);
         if ((signatureFlags & 1) != 0) {

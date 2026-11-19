@@ -126,7 +126,6 @@ uint64_t hkDataObjectNative::DBB140(
 )
 #endif
 {
-    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     char buf[512];
 #if XFNV_64BIT
     hkVariant kResult;
@@ -166,14 +165,13 @@ uint64_t hkDataObjectNative::DBB140(
         }
     }
 #endif
-    ::new (&kStream) hkErrStream(buf, 512);
+    hkErrStream kStream(buf, 512);
     const char* pName = apClass->getName();
     kStream << "Could not find the most derived class for virtual object " << pName << " at "
             << static_cast<const void*>(apAddress) << ". The object is replaced with HK_NULL.";
     hkError::s_instance->message(
         hkError::MESSAGE_WARNING, 0x3476D70F, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 55
     );
-    kStream.~hkErrStream();
 #if XFNV_64BIT
     return kResult;
 #else
@@ -343,10 +341,7 @@ void hkDataWorldNative::findAllClasses(hkArray<hkDataClassImpl*>& classesOut) co
     if (!m_reg) {
         return;
     }
-    XFNV_INLINED_LOCAL(hkArray<const hkClass*>, kClasses, std::nullopt, std::nullopt);
-    kClasses.m_data = nullptr;
-    kClasses.m_size = 0;
-    kClasses.m_capacityAndFlags = hkArrayBase<const hkClass*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkClass*> kClasses;
     m_reg->getClasses(kClasses);
     for (int32_t i = 0; i < kClasses.getSize(); ++i) {
         const hkClass* pClass = kClasses.m_data[i];
@@ -360,16 +355,6 @@ void hkDataWorldNative::findAllClasses(hkArray<hkDataClassImpl*>& classesOut) co
             hkArrayUtil::_reserveMore(kRouter.heap(), &classesOut, sizeof(hkDataClassImpl*));
         }
         *classesOut.expandByUnchecked(1) = pFound;
-    }
-    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-    kClasses.m_size = 0;
-    // A negative capacity marks storage the array must not free.
-    if (kClasses.m_capacityAndFlags >= 0) {
-        kHeap.bufFree(
-            kClasses.m_data,
-            sizeof(const hkClass*) *
-                static_cast<int32_t>(kClasses.m_capacityAndFlags & hkArrayBase<const hkClass*>::CAPACITY_MASK)
-        );
     }
 }
 
@@ -448,7 +433,6 @@ void hkDataWorldNative::setClassRegistry(const hkClassNameRegistry* r) {
 // The contents variant: object, of the registered class of its most derived type for a class with a vtable, else of
 // klass's name. A class the registry does not know is reported and the contents emptied.
 void hkDataWorldNative::setContents(void* object, const hkClass& klass) {
-    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     const hkClass* pClass;
     m_contents.m_object = object;
     if (klass.hasVtable().m_bool) {
@@ -466,14 +450,15 @@ void hkDataWorldNative::setContents(void* object, const hkClass& klass) {
     m_contents.m_class = pClass;
     if (!pClass) {
         char buf[512];
-        ::new (&kStream) hkErrStream(buf, 512);
-        const char* pName = klass.getName();
-        kStream << "Cannot set contents with object at 0x" << static_cast<const void*>(object) << ". Class '" << pName
-                << "' is not registered in the hkDataWorldNative. Ignore it.";
-        hkError::s_instance->message(
-            hkError::MESSAGE_WARNING, 0x1800473B, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 764
-        );
-        kStream.~hkErrStream();
+        {
+            hkErrStream kStream(buf, 512);
+            const char* pName = klass.getName();
+            kStream << "Cannot set contents with object at 0x" << static_cast<const void*>(object) << ". Class '"
+                    << pName << "' is not registered in the hkDataWorldNative. Ignore it.";
+            hkError::s_instance->message(
+                hkError::MESSAGE_WARNING, 0x1800473B, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 764
+            );
+        }
         m_contents.m_object = nullptr;
     }
 }
@@ -960,7 +945,6 @@ float hkDataObjectNative::asReal(const char* name) {
 // The native object of the variant in apWorld: the variant's class becomes the class record of the world's class of
 // that name; a class the world does not know is reported and the variant emptied.
 hkDataObjectImpl* hkDataObjectNative::DBB260(const hkDataWorldNative* apWorld, hkVariant* apVariant) {
-    XFNV_INLINED_LOCAL(hkErrStream, kStream, std::nullopt, std::nullopt);
     if (apVariant->m_class) {
         // The source's cast: a native world's classes are hkDataClassNative records.
         const hkDataClassNative* pClass =
@@ -970,14 +954,15 @@ hkDataObjectImpl* hkDataObjectNative::DBB260(const hkDataWorldNative* apWorld, h
         }
         else {
             char buf[512];
-            ::new (&kStream) hkErrStream(buf, 512);
-            const char* pName = apVariant->m_class->getName();
-            kStream << "Ignore object at 0x" << static_cast<const void*>(apVariant->m_object) << ". Class '" << pName
-                    << "' is not registered in the provided hkDataWorldNative.";
-            hkError::s_instance->message(
-                hkError::MESSAGE_WARNING, 0x1800473A, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 711
-            );
-            kStream.~hkErrStream();
+            {
+                hkErrStream kStream(buf, 512);
+                const char* pName = apVariant->m_class->getName();
+                kStream << "Ignore object at 0x" << static_cast<const void*>(apVariant->m_object) << ". Class '"
+                        << pName << "' is not registered in the provided hkDataWorldNative.";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING, 0x1800473A, buf, ".\\Data\\Native\\hkDataObjectNative.cpp", 711
+                );
+            }
             apVariant->m_object = nullptr;
             apVariant->m_class = nullptr;
         }

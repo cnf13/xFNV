@@ -102,10 +102,8 @@ void hkpCachingShapePhantom::addOverlappingCollidable(hkpCollidable* collidable)
     hkpCollisionDetail* detail = &m_collisionDetails.m_data[size];
     m_collisionDetails.m_size = size + 1;
     const hkpProcessCollisionInput* worldInput = m_world->m_collisionInput;
-    XFNV_INLINED_LOCAL(hkpProcessCollisionInput, input, std::nullopt, std::nullopt);
-    static_cast<hkpCollisionInput&>(input) = *worldInput;
+    hkpProcessCollisionInput input(*worldInput);
     input.m_spareAgentSector = nullptr;
-    ::new (&input) hkpProcessCollisionInput(*worldInput);
     input.m_createPredictiveAgents.m_storage = 0;
     input.m_collisionQualityInfo =
         &input.m_dispatcher->m_collisionQualityInfo[hkpCollisionDispatcher::COLLISION_QUALITY_PSI];
@@ -147,8 +145,7 @@ hkBool hkpCachingShapePhantom::isOverlappingCollidableAdded(const hkpCollidable*
 // agent is cleaned up against a stack constraint owner and the detail removed. A collidable without a shape was never
 // added: nothing is done.
 void hkpCachingShapePhantom::removeOverlappingCollidable(hkpCollidable* collidable) {
-    XFNV_INLINED_LOCAL(hkpConstraintOwner, constraintOwner, hkpConstraintOwner_vftable, std::nullopt);
-    constraintOwner.m_referenceCount = 1;
+    hkpConstraintOwner constraintOwner;
     if (!collidable->m_shape) {
         return;
     }
@@ -207,13 +204,11 @@ hkpPhantom* hkpCachingShapePhantom::clone() const {
 }
 
 void hkpCachingShapePhantom::updateShapeCollectionFilter() {
-    XFNV_INLINED_LOCAL(hkpConstraintOwner, v4, hkpConstraintOwner_vftable, std::nullopt);
     hkpCollisionInput v5;
     rt::memcpy(&v5, m_world->m_collisionInput, sizeof(v5));
     int32_t v2 = 0;
     bool v3 = m_collisionDetails.m_size <= 0;
-    // MAYBE-INLINED 0xD4CA5C: before the vptr store of hkpConstraintOwner's inlined constructor
-    v4.m_referenceCount = 1;
+    hkpConstraintOwner v4;
     if (!v3) {
         do {
             m_collisionDetails.m_data[v2].m_agent->updateShapeCollectionFilter(

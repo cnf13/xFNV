@@ -55,7 +55,6 @@ void CombatProcedureMove::Update() {
     NiPoint3 coverLocation_3;
     PathingCoverLocation coverLocation_2;
     NiPoint3 nextNodeLocation;
-    XFNV_INLINED_LOCAL(NiPointer<PathingAvoidNodeArray>, spavoidNodeArray, std::nullopt, std::nullopt);
     BGSWorldLocation attackerWorldLoc;
     BGSWorldLocation targetWorldLoc;
     BGSWorldLocation targetWorldLocation;
@@ -261,7 +260,9 @@ void CombatProcedureMove::Update() {
                             if (icurrentNode != iCurrentNode || CoveredMoveSearchTimer.Check()) {
                                 iCurrentNode = icurrentNode;
                                 CoveredMoveSearchTimer.Reset(2.0f);
-                                NiPointer_PathingAvoidNodeArray_Construct(&spavoidNodeArray, nullptr);
+                                NiPointer<PathingAvoidNodeArray> spavoidNodeArray(
+                                    static_cast<PathingAvoidNodeArray*>(nullptr)
+                                );
                                 bool bcreatedAvoidNodeArray = false;
                                 NiPoint3 previousNodeLocation = pattacker->GetLocationOnReference();
                                 float fpathLength = 0.0f;
@@ -302,14 +303,12 @@ void CombatProcedureMove::Update() {
                                         TESForm* Space = pattacker->GetSpace();
                                         CurrentDestination.SetLocation(coverLocation_3, Space);
                                         if (!CreatePath()) {
-                                            spavoidNodeArray.~NiPointer<PathingAvoidNodeArray>();
                                             return;
                                         }
                                         CheckCoverTimer.Reset(0.5f);
                                         break;
                                     }
                                 }
-                                spavoidNodeArray.~NiPointer<PathingAvoidNodeArray>();
                             }
                         }
                         bool bforceComplete = false;
@@ -731,11 +730,9 @@ NiPoint3 CombatProcedureMove::GetDestinationPos() {
 }
 
 bool CombatProcedureMove::CreatePath() {
-    XFNV_INLINED_LOCAL(NiPointer<PathingAvoidNodeArray>, aspArray, std::nullopt, std::nullopt);
-    NiPointer_PathingAvoidNodeArray_Construct(&aspArray, nullptr);
+    NiPointer<PathingAvoidNodeArray> aspArray(static_cast<PathingAvoidNodeArray*>(nullptr));
     CreateAvoidNodeArray(aspArray);
     bool Path = CreatePath(aspArray);
-    aspArray.~NiPointer<PathingAvoidNodeArray>();
     return Path;
 }
 

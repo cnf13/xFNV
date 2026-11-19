@@ -56,10 +56,7 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
         return;
     }
     WorldToEntityData* data = m_worldEntities.m_data[index];
-    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
-    displayGeometries.m_data = nullptr;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkDisplayGeometry*> displayGeometries;
     hkpConvexRadiusBuilder::hkpConvexRadiusBuilderEnvironment env;
     env.~hkpConvexRadiusBuilderEnvironment();
     ::new (&env) hkpConvexRadiusBuilder::hkpConvexRadiusBuilderEnvironment;
@@ -112,16 +109,6 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
         if (geometry) {
             delete geometry;
         }
-    }
-    // EXE-INLINED none: hkArray destructor
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacityAndFlags = displayGeometries.m_capacityAndFlags;
-    displayGeometries.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap->bufFree(
-            displayGeometries.m_data,
-            static_cast<int32_t>((capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) * 4)
-        );
     }
 }
 

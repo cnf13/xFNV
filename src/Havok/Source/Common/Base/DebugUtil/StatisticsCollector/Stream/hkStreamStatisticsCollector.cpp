@@ -207,10 +207,7 @@ void hkStreamStatisticsCollector::makeTree(
     hkArray<hkStringPtr, hkContainerHeapAllocator>* stringTable
 ) {
     using NodeArray = hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(NodeArray, stack, std::nullopt, std::nullopt);
-    stack.m_data = nullptr;
-    stack.m_size = 0;
-    stack.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
+    NodeArray stack;
     hkMonitorStreamAnalyzer::Node* pRoot;
     if (m_nodesOut.m_size <= 0) {
         void* pMemory = hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkMonitorStreamAnalyzer::Node));
@@ -279,17 +276,7 @@ void hkStreamStatisticsCollector::makeTree(
         iOffset += iStep;
     }
     _sumNodes(pRoot, stringTable);
-done:
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    stack.m_size = 0;
-    if (stack.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            stack.m_data,
-            (stack.m_capacityAndFlags & hkArrayBase<hkMonitorStreamAnalyzer::Node*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkMonitorStreamAnalyzer::Node*))
-        );
-    }
+done:;
 }
 
 void hkStreamStatisticsCollector::beginSnapshot(int32_t statisticClasses) {
@@ -308,10 +295,7 @@ void hkStreamStatisticsCollector::reset() {
 // Builds the node tree and deletes it again: the report output is compiled out, so outstream and reportLevel are
 // unused. The nodes are deleted from the back, popping each.
 void hkStreamStatisticsCollector::writeStatistics(hkOstream& outstream, int32_t reportLevel) {
-    XFNV_INLINED_LOCAL(hkArray<hkMonitorStreamAnalyzer::Node*>, nodes, std::nullopt, std::nullopt);
-    nodes.m_data = nullptr;
-    nodes.m_size = 0;
-    nodes.m_capacityAndFlags = hkArrayBase<hkMonitorStreamAnalyzer::Node*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkMonitorStreamAnalyzer::Node*> nodes;
     makeTree(nodes, nullptr);
     for (; nodes.m_size != 0; --nodes.m_size) {
         hkMonitorStreamAnalyzer::Node* pNode = nodes.m_data[nodes.m_size - 1];
@@ -319,18 +303,6 @@ void hkStreamStatisticsCollector::writeStatistics(hkOstream& outstream, int32_t 
             pNode->~Node();
             hkMemoryRouter::getInstance().heap().blockFree(pNode, sizeof(hkMonitorStreamAnalyzer::Node));
         }
-    }
-
-    // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzer::Node*>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = nodes.m_capacityAndFlags;
-    nodes.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            nodes.m_data,
-            (capacityAndFlags & hkArrayBase<hkMonitorStreamAnalyzer::Node*>::CAPACITY_MASK) *
-                sizeof(hkMonitorStreamAnalyzer::Node*)
-        );
     }
 }
 

@@ -145,9 +145,7 @@ void PosGen::Build(bool sym) {
         if (i >= 60) {
             using _Message_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
             _Message_t strMessage("Newran: area too large");
-            XFNV_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
-            ::new (&cError) rt::runtime_error(strMessage);
-            throw cError;
+            throw rt::runtime_error(strMessage);
             break;
         }
         sx[i] = v12;
@@ -161,9 +159,7 @@ void PosGen::Build(bool sym) {
     if (i < 50) {
         using _Message_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
         _Message_t strMessage("Newran: area too small");
-        XFNV_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
-        ::new (&cError) rt::runtime_error(strMessage);
-        throw cError;
+        throw rt::runtime_error(strMessage);
     }
     if (sym) {
         v2 = static_cast<double>(i) * 2.0;

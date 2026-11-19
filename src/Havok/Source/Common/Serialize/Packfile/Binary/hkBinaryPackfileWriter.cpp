@@ -82,10 +82,7 @@ int32_t sectionTableSize(const hkArray<hkPackfileSectionHeader, hkContainerHeapA
 void padUp(int32_t r_eax, hkStreamWriter* r_edi) {
     using CharInplaceArray32 = hkInplaceArray<char, 32>;
     int32_t v3 = r_edi->tell();
-    XFNV_INLINED_LOCAL(CharInplaceArray32, buf, std::nullopt, std::nullopt);
-    buf.m_data = buf.m_storage;
-    buf.m_size = 0;
-    buf.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<char>::DONT_DEALLOCATE_FLAG | 32);
+    CharInplaceArray32 buf;
     hkMemoryAllocator* m_heap = hkMemoryRouter::getInstance().m_heap;
     int32_t v4 = buf.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK;
     if (v4 < r_eax) {
@@ -103,12 +100,6 @@ void padUp(int32_t r_eax, hkStreamWriter* r_edi) {
     buf.m_size = r_eax;
     if ((v3 & r_eax - 1) != 0) {
         r_edi->write(buf.m_data, r_eax - (v3 & r_eax - 1));
-    }
-    hkMemoryAllocator* v6 = hkMemoryRouter::getInstance().m_heap;
-    int32_t v10 = buf.m_capacityAndFlags;
-    buf.m_size = 0;
-    if (v10 >= 0) {
-        v6->bufFree(buf.m_data, v10 & hkArrayBase<char>::CAPACITY_MASK);
     }
 }
 
@@ -191,14 +182,12 @@ void hkBinaryPackfileWriter::fillSectionTags(hkBinaryPackfileWriter::SaveContext
 // The types section (section 0) gets the class records of the four reflection classes and of every pending object's
 // class, once each; then each other section gets its objects, written raw or through the platform writer, and after
 // them its local fixups, global and virtual fixup space (written later by doDeferredWrites), exports and imports, each
-// block padded. A global fixup whose target is an import becomes one. The class name map is cleared and freed, never
-// destroyed.
+// block padded. A global fixup whose target is an import becomes one.
 void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext& context) {
     hkPackfileSectionHeader* pTypesHeader = context.m_sectionHeaders.m_data;
     pTypesHeader->m_absoluteDataStart = context.m_stream->tell();
     using ClassNameMap_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(ClassNameMap_t, doneClasses, std::nullopt, std::nullopt);
-    ::new (&doneClasses) ClassNameMap_t(0u);
+    ClassNameMap_t doneClasses;
     const hkClass* const apClasses[4] = {&hkClassClass, &hkClassMemberClass, &hkClassEnumClass, &hkClassEnumItemClass};
     for (int32_t i = 0; i < 4; ++i) {
         // The map's keys are hkUlong words holding the name pointers.
@@ -222,7 +211,6 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
     pTypesHeader->m_exportsOffset = iTypesEnd;
     pTypesHeader->m_importsOffset = iTypesEnd;
     pTypesHeader->m_endOffset = iTypesEnd;
-    doneClasses.clearAndDeallocate();
 
     // EXE-INLINED none: hkArray<hkBinaryPackfileWriter::Location>::setSize
     const int32_t iNumWrites = m_pendingWrites.m_size;
@@ -279,21 +267,7 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
     for (int32_t iSection = 1; iSection < context.m_sectionHeaders.m_size; ++iSection) {
         hkPackfileSectionHeader* pHeader = context.m_sectionHeaders.m_data + iSection;
         pHeader->m_absoluteDataStart = context.m_stream->tell();
-        // EXE-INLINED 0xDBD870: hkRelocationInfo::hkRelocationInfo
-        XFNV_INLINED_LOCAL(hkRelocationInfo, relocs, std::nullopt, std::nullopt);
-        relocs.m_local.m_data = nullptr;
-        relocs.m_local.m_size = 0;
-        relocs.m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
-        relocs.m_global.m_data = nullptr;
-        relocs.m_global.m_size = 0;
-        relocs.m_global.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Global>::DONT_DEALLOCATE_FLAG;
-        relocs.m_finish.m_data = nullptr;
-        relocs.m_finish.m_size = 0;
-        relocs.m_finish.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Finish>::DONT_DEALLOCATE_FLAG;
-        relocs.m_imports.m_data = nullptr;
-        relocs.m_imports.m_size = 0;
-        relocs.m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
-        relocs.m_pool = nullptr;
+        hkRelocationInfo relocs;
 
         if (!context.m_options->m_writeMetaInfo.m_bool && iSection == iTypesSection) {
             // The class records are not written: their objects get no location.
@@ -414,7 +388,6 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
             }
             pHeader->m_endOffset = context.m_stream->tell() - pHeader->m_absoluteDataStart;
         }
-        relocs.~hkRelocationInfo();
     }
 }
 
@@ -515,26 +488,11 @@ void hkBinaryPackfileWriter::doDeferredWrites(
     }
     context.m_stream->seek(sectionHeadersStart, hkStreamWriter::STREAM_SET);
     for (int32_t i = 0; i < context.m_sectionHeaders.m_size; ++i) {
-        XFNV_INLINED_LOCAL(hkRelocationInfo, reloc, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkRelocationInfo::hkRelocationInfo
-        reloc.m_local.m_data = nullptr;
-        reloc.m_local.m_size = 0;
-        reloc.m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
-        reloc.m_global.m_data = nullptr;
-        reloc.m_global.m_size = 0;
-        reloc.m_global.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Global>::DONT_DEALLOCATE_FLAG;
-        reloc.m_finish.m_data = nullptr;
-        reloc.m_finish.m_size = 0;
-        reloc.m_finish.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Finish>::DONT_DEALLOCATE_FLAG;
-        reloc.m_imports.m_data = nullptr;
-        reloc.m_imports.m_size = 0;
-        reloc.m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
-        reloc.m_pool = nullptr;
+        hkRelocationInfo reloc;
         hkObjectWriter* pWriter = &context.m_writer;
         pWriter->writeObject(
             context.m_stream, &context.m_sectionHeaders.m_data[i], hkPackfileSectionHeaderClass, reloc
         );
-        reloc.~hkRelocationInfo();
     }
     context.m_stream->seek(offsetof(hkPackfileHeader, m_contentsSectionIndex), hkStreamWriter::STREAM_SET);
     bool bSwap =

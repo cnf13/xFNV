@@ -55,7 +55,6 @@ ImageSpaceEffectDepthRadialBlur::~ImageSpaceEffectDepthRadialBlur() {
 void ImageSpaceEffectDepthRadialBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_2;
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(2);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
@@ -71,12 +70,10 @@ void ImageSpaceEffectDepthRadialBlur::Setup(ImageSpaceManager* apManager, ImageS
         0, apManager->pEffectList.m_pBase[iRadialBlurLevel.uValue.uint + ImageSpaceManager::EFFECT_SHADER_RADIAL_BLUR],
         pparam, 2
     );
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, NiPointer<ImageSpaceShaderParam>(pparam));
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_BILERP);
     ImageSpaceShaderParam* v7 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v7;
     if (v7) {
         pparam_2 = ::new (v7) ImageSpaceShaderParam;
     }
@@ -86,8 +83,7 @@ void ImageSpaceEffectDepthRadialBlur::Setup(ImageSpaceManager* apManager, ImageS
     pparam_2->InitConstantMap(0, 3);
     pparam_2->SetPixelConstant(0, 1.0f, 1000.0f, 500.0f, fRenderDepthMaxDepth.uValue.f);
     pparam_2->bUseTexOffset[2] = false;
-    spParam.m_pObject = pparam_2;
-    pEffectParamList.SetAt(1u, spParam);
+    pEffectParamList.SetAt(1u, NiPointer<ImageSpaceShaderParam>(pparam_2));
     SetEffectInputs(
         1, 1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_BILERP,
         NiTexturingProperty::FILTER_NEAREST
@@ -148,7 +144,6 @@ ImageSpaceEffectRadialBlur::~ImageSpaceEffectRadialBlur() {
 // One effect with new shader parameters (2 pixel constants): the manager's radial blur shader of the configured level.
 void ImageSpaceEffectRadialBlur::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(1);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
@@ -164,8 +159,7 @@ void ImageSpaceEffectRadialBlur::Setup(ImageSpaceManager* apManager, ImageSpaceE
         0, apManager->pEffectList.m_pBase[iRadialBlurLevel.uValue.uint + ImageSpaceManager::EFFECT_SHADER_RADIAL_BLUR],
         pparam, 0
     );
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, NiPointer<ImageSpaceShaderParam>(pparam));
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_NEAREST);
 }
 

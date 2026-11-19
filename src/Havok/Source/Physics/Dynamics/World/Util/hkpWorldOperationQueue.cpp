@@ -123,10 +123,7 @@ void hkpWorldOperationQueue::queueBodyOperation(
 // two references each entry holds, and repeats while running them queued more.
 void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
     while (m_pendingBodyOperations.m_size != 0) {
-        XFNV_INLINED_LOCAL(hkArray<hkpBodyOperationEntry>, kOperations, std::nullopt, std::nullopt);
-        kOperations.m_data = nullptr;
-        kOperations.m_size = 0;
-        kOperations.m_capacityAndFlags = hkArrayBase<hkpBodyOperationEntry>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpBodyOperationEntry> kOperations;
         kOperations.swap(m_pendingBodyOperations);
         m_world->m_pendingBodyOperationsCount = 0;
         // EXE-INLINED none: hkArray::reserve(16)
@@ -163,20 +160,6 @@ void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
             pOperation->removeReferenceLockUnchecked();
         }
         hkReferencedObject::unlockAll();
-        // EXE-INLINED none: hkArray::~hkArray
-        hkMemoryAllocator* pFreeHeap = &hkMemoryRouter::getInstance().heap();
-        kOperations.m_size = 0;
-        if (kOperations.m_capacityAndFlags >= 0) {
-            pFreeHeap->bufFree(
-                kOperations.m_data,
-                static_cast<int32_t>(
-                    (kOperations.m_capacityAndFlags & hkArrayBase<hkpBodyOperationEntry>::CAPACITY_MASK) *
-                    sizeof(hkpBodyOperationEntry)
-                )
-            );
-        }
-        kOperations.m_data = nullptr;
-        kOperations.m_capacityAndFlags = hkArrayBase<hkpBodyOperationEntry>::DONT_DEALLOCATE_FLAG;
     }
 }
 
@@ -185,10 +168,7 @@ void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
 // blocks it allocated, and runs what each operation queued in turn before the next one.
 void hkpWorldOperationQueue::executeAllPending() {
     hkReferencedObject::lockAll();
-    XFNV_INLINED_LOCAL(hkArray<hkWorldOperation::BiggestOperation>, tmpOldPending, std::nullopt, std::nullopt);
-    tmpOldPending.m_data = nullptr;
-    tmpOldPending.m_size = 0;
-    tmpOldPending.m_capacityAndFlags = hkArrayBase<hkWorldOperation::BiggestOperation>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkWorldOperation::BiggestOperation> tmpOldPending;
     tmpOldPending.swap(m_pending);
     ++m_world->m_pendingOperationQueueCount;
 
@@ -318,10 +298,7 @@ void hkpWorldOperationQueue::executeAllPending() {
                     hkpAction* pAction = pOp->m_action;
                     if (!pAction->m_world) {
                         // The action is added only while every entity it works on is still in this world.
-                        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, kEntities, std::nullopt, std::nullopt);
-                        kEntities.m_data = nullptr;
-                        kEntities.m_size = 0;
-                        kEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+                        hkArray<hkpEntity*> kEntities;
                         pAction->getEntities(kEntities);
                         bool bAllInWorld = true;
                         for (int32_t i = 0; i < kEntities.m_size; ++i) {
@@ -333,20 +310,6 @@ void hkpWorldOperationQueue::executeAllPending() {
                         if (bAllInWorld) {
                             m_world->addAction(pOp->m_action);
                         }
-                        // EXE-INLINED 0xC7B0F0
-                        hkMemoryAllocator* pHeap = &hkMemoryRouter::getInstance().heap();
-                        kEntities.m_size = 0;
-                        if (kEntities.m_capacityAndFlags >= 0) {
-                            pHeap->bufFree(
-                                kEntities.m_data,
-                                static_cast<int32_t>(
-                                    (kEntities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                                    sizeof(hkpEntity*)
-                                )
-                            );
-                        }
-                        kEntities.m_data = nullptr;
-                        kEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
                     }
                     pOp->m_action->removeReference();
                     break;
@@ -614,17 +577,6 @@ void hkpWorldOperationQueue::executeAllPending() {
     m_pending.clear();
     --m_world->m_pendingOperationQueueCount;
     hkReferencedObject::unlockAll();
-    // EXE-INLINED none: hkArray<hkWorldOperation::BiggestOperation>::~hkArray
-    hkMemoryAllocator* pHeap = &hkMemoryRouter::getInstance().heap();
-    if (tmpOldPending.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            tmpOldPending.m_data,
-            static_cast<int32_t>(
-                (tmpOldPending.m_capacityAndFlags & hkArrayBase<hkWorldOperation::BiggestOperation>::CAPACITY_MASK) *
-                sizeof(hkWorldOperation::BiggestOperation)
-            )
-        );
-    }
 }
 
 // Copies the operation into the pending queue and takes the references it holds until it runs: a batch gets a heap

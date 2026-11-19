@@ -222,7 +222,6 @@ void Precipitation::FlushAll() {
 void Precipitation::Update(float afSecondsPassed) {
     float fEndPct;
     float fBeginPct;
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     Sky* pSky = Sky::GetInstance();
     bool v25 = pSky->eMode == Sky::SM_INTERIOR || !pSky->eMode;
     bool bcull = v25;
@@ -272,13 +271,12 @@ void Precipitation::Update(float afSecondsPassed) {
                  (min = pcurModel->GetModel(), (v5 = pQueuedModel->GetModel(), !BSstricmp(v5, min))))) {
                 TESModel* pModel = &pCurrentWeather->precipNIF;
                 const char* pfileName = pModel->GetModel();
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+                NiPointer<Model> spmodel;
                 if (pModelLoader->FindModel(pfileName, spmodel)) {
                     pQueuedModel = nullptr;
                     Load(pfileName);
                     pModelLoader->ReleaseFile(pfileName);
                 }
-                NiPointer<Model>::Destroy(&spmodel);
             }
             else {
                 pQueuedModel = nullptr;

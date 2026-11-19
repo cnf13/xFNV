@@ -182,37 +182,27 @@ void bhkListShape::SaveBinary(NiStream& arStream) {
     rShapes.m_size = 0;
     int32_t iShapesCapacityAndFlags = rShapes.m_capacityAndFlags;
     rShapes.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<uint32_t>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<uint32_t>, kFilterInfos, std::nullopt, std::nullopt);
-    kFilterInfos.m_data = nullptr;
-    kFilterInfos.m_size = 0;
-    kFilterInfos.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-    kFilterInfos.swap(rInfo.m_childShapeFilterInfo);
-    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        int32_t iCinfoSize = static_cast<int32_t>(QCinfoSize());
-        bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rInfo.m_childShapeFilterInfo);
-        bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rShapes);
-    }
-    uint32_t uiNumShapes = static_cast<uint32_t>(iNumShapes);
-    NiStreamSaveBinary(arStream, uiNumShapes);
-    for (uint32_t i = 0; i < uiNumShapes; ++i) {
-        const hkpShape* phkShape = ppShapes[i];
-        arStream.SaveLinkID(phkShape ? phkShape->m_userData : nullptr);
-    }
-    bhkShape::SaveBinary(arStream);
-    bhkStream::SaveBinary(arStream, kFilterInfos);
-    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        int32_t iCinfoSize = static_cast<int32_t>(QCinfoSize());
-        bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rInfo.m_childShapeFilterInfo);
-        bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rShapes);
-    }
-    // EXE-INLINED none: hkArray<uint32_t>::~hkArray
-    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-    kFilterInfos.m_size = 0;
-    if ((kFilterInfos.m_capacityAndFlags & hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG) == 0) {
-        rHeap._bufFree<uint32_t>(
-            kFilterInfos.m_data, kFilterInfos.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK
-        );
+    {
+        hkArray<uint32_t> kFilterInfos;
+        kFilterInfos.swap(rInfo.m_childShapeFilterInfo);
+        if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+            int32_t iCinfoSize = static_cast<int32_t>(QCinfoSize());
+            bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rInfo.m_childShapeFilterInfo);
+            bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rShapes);
+        }
+        uint32_t uiNumShapes = static_cast<uint32_t>(iNumShapes);
+        NiStreamSaveBinary(arStream, uiNumShapes);
+        for (uint32_t i = 0; i < uiNumShapes; ++i) {
+            const hkpShape* phkShape = ppShapes[i];
+            arStream.SaveLinkID(phkShape ? phkShape->m_userData : nullptr);
+        }
+        bhkShape::SaveBinary(arStream);
+        bhkStream::SaveBinary(arStream, kFilterInfos);
+        if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+            int32_t iCinfoSize = static_cast<int32_t>(QCinfoSize());
+            bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rInfo.m_childShapeFilterInfo);
+            bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rShapes);
+        }
     }
     // EXE-INLINED none: hkArray<const hkpShape*>::~hkArray
     hkMemoryAllocator& rShapesHeap = hkMemoryRouter::getInstance().heap();

@@ -104,18 +104,7 @@ bool inRange(int32_t num, int32_t lo, int32_t hi) {
 // tell() comes first, then an hkLocalArray<char> of pad bytes supplies the zeros written.
 void objectCopierPadUp(hkStreamWriter* w, int32_t pad) {
     const int32_t pos = w->tell();
-    XFNV_INLINED_LOCAL(hkLocalArray<char>, zeros, std::nullopt, std::nullopt);
-    zeros.m_data = nullptr;
-    zeros.m_size = 0;
-    zeros.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<char>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage = static_cast<char*>(pBlock) + ((pad + 127) & ~127);
-    char* pLocal = static_cast<char*>(pBlock);
-    zeros.m_data = pLocal;
-    zeros.m_capacityAndFlags = static_cast<uint32_t>(pad) | hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    zeros.m_localMemory = pLocal;
+    hkLocalArray<char> zeros(pad);
 
     // EXE-INLINED none: hkArray<char>::setSize(aiAlign, 0)
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -137,8 +126,6 @@ void objectCopierPadUp(hkStreamWriter* w, int32_t pad) {
     if (misalign != 0) {
         w->write(zeros.m_data, pad - misalign);
     }
-
-    zeros.~hkLocalArray<char>();
 }
 
 // Writes the pointer-sized values as elemsize-byte elements: as they are when elemsize is 4, else widened to 64 bits
@@ -270,16 +257,7 @@ void hkObjectCopier::writeZero(hkOArchive& oa, const hkClassMember& memberOut) {
         }
     }
 
-    // EXE-INLINED none: hkLocalArray<char>::hkLocalArray
-    XFNV_INLINED_LOCAL(hkArray<char>, kZeroes, std::nullopt, std::nullopt);
-    kZeroes.m_data = nullptr;
-    kZeroes.m_size = 0;
-    kZeroes.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-    char* pLocalMemory = rRouter.m_stack.m_next.m_storage;
-    rRouter.m_stack.m_next.m_storage = pLocalMemory + ((iSize + 0x7F) & 0xFFFFFF80);
-    kZeroes.m_data = pLocalMemory;
-    kZeroes.m_capacityAndFlags = static_cast<uint32_t>(iSize) | hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+    hkLocalArray<char> kZeroes(iSize);
     // EXE-INLINED none: hkArrayBase<char>::_setSize
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iCapacity = static_cast<int32_t>(kZeroes.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
@@ -296,10 +274,6 @@ void hkObjectCopier::writeZero(hkOArchive& oa, const hkClassMember& memberOut) {
     }
     kZeroes.m_size = static_cast<uint32_t>(iSize);
     oa.writeRaw(kZeroes.m_data, iSize);
-    // This does the work of ~hkLocalArray<char> by hand on an array held as hkArray<char>. The local is raw storage, so
-    // no destructor runs at scope end: the stack block goes back here, then ~hkArray frees a reallocated storage.
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pLocalMemory;
-    kZeroes.~hkArray<char>();
 }
 
 // Writes klassOut's members of the object at dataIn (laid out as klassIn) at the stream's position, member by member,
@@ -494,10 +468,7 @@ int32_t hkObjectCopier::saveBody(const void* dataIn, const hkClass& klassIn, hkO
                     for (int32_t i = 0; i < count; ++i) {
                         int32_t srcValue = srcMember.getEnumValue(srcAddress);
                         using bitNames_t = hkArray<const char*, hkContainerHeapAllocator>;
-                        XFNV_INLINED_LOCAL(bitNames_t, bitNames, std::nullopt, std::nullopt);
-                        bitNames.m_data = nullptr;
-                        bitNames.m_size = 0;
-                        bitNames.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
+                        bitNames_t bitNames;
                         int32_t bitsOver = 0;
                         srcEnum.decomposeFlags(srcValue, bitNames, bitsOver);
                         int32_t dstValue = 0;
@@ -520,16 +491,6 @@ int32_t hkObjectCopier::saveBody(const void* dataIn, const hkClass& klassIn, hkO
                             case 4: oa.write32(dstValue); break;
                         }
                         srcAddress += elemSize;
-                        // EXE-INLINED none: hkArray<const char*, hkContainerHeapAllocator>::~hkArray
-                        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                        bitNames.m_size = 0;
-                        if (bitNames.m_capacityAndFlags >= 0) {
-                            heap.bufFree(
-                                bitNames.m_data, bitNames.getCapacity() * static_cast<int32_t>(sizeof(const char*))
-                            );
-                        }
-                        bitNames.m_data = nullptr;
-                        bitNames.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
                     }
                 }
                 break;

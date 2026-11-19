@@ -773,13 +773,12 @@ float DetailedActorPathHandler::GetDistanceRemaining() {
 
 NiPoint3 DetailedActorPathHandler::ComputeApproximateLocation(float afDeltaT) {
     NiPoint3 result;
-    XFNV_INLINED_LOCAL(NiPointer<PathingSolution>, sppath, std::nullopt, std::nullopt);
     if (pActorMover->DidPathingFail()) {
         result = pActor->GetLocationOnReference();
         return result;
     }
 
-    sppath.SetPointer(&spPath);
+    NiPointer<PathingSolution> sppath(spPath);
     if (sppath.m_pObject && sppath.m_pObject->GetNodeCount()) {
         float fspeed;
         if ((pActorMover->GetPreferredMoveMode() & 512) != 0) {
@@ -790,12 +789,10 @@ NiPoint3 DetailedActorPathHandler::ComputeApproximateLocation(float afDeltaT) {
         }
         float fdistance = fspeed * afDeltaT;
         ::new (&result) NiPoint3(sppath.m_pObject->ComputeApproxLocationForDistance(fCurrentSplineT, fdistance));
-        sppath.~NiPointer<PathingSolution>();
         return result;
     }
 
     result = pActor->GetLocationOnReference();
-    sppath.~NiPointer<PathingSolution>();
     return result;
 }
 

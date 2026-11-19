@@ -39,11 +39,7 @@ hkDisplaySemiCircle::hkDisplaySemiCircle(
 
 // Two line points per segment, from the semicircle's points: segment i runs from point i to point i + 1.
 void hkDisplaySemiCircle::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) {
-    using points_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(points_t, points, std::nullopt, std::nullopt);
-    points.m_data = nullptr;
-    points.m_size = 0;
-    points.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4, hkContainerHeapAllocator> points;
     generatePoints(points);
     int32_t numLinePoints = 2 * m_numSegments;
     int32_t capacity = lines.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
@@ -58,13 +54,6 @@ void hkDisplaySemiCircle::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hk
     for (int32_t i = 0; i < m_numSegments; ++i) {
         lines.m_data[2 * i] = points.m_data[i];
         lines.m_data[2 * i + 1] = points.m_data[i + 1];
-    }
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    points.m_size = 0;
-    if (points.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            points.m_data, sizeof(hkVector4) * (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)
-        );
     }
 }
 

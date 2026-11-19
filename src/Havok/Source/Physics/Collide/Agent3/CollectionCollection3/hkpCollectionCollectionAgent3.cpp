@@ -586,11 +586,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
         for (int32_t i = 0; i <= iNumHits; ++i) {
             puiKeys[i] = pHitList[i].m_shapeKeyB;
         }
-        XFNV_INLINED_LOCAL(hkpAgent3ProcessInput, kInput, std::nullopt, std::nullopt);
-        // CopyConstruct copies only the hkpAgent3Input part; the two members after it are copied here.
-        hkpAgent3ProcessInput::CopyConstruct(&kInput, input);
-        kInput.m_distAtT1 = input.m_distAtT1;
-        kInput.m_linearTimInfo = input.m_linearTimInfo;
+        hkpAgent3ProcessInput kInput = input;
         kInput.m_bodyA = input.m_overrideBodyA;
         kInput.m_overrideBodyA = nullptr;
         hkAgent1nMachine_Process(*static_cast<hkpAgent1nTrack*>(agentData), kInput, pContainerB, puiKeys, output);

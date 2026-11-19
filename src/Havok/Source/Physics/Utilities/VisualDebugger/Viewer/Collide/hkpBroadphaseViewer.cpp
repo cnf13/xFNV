@@ -41,18 +41,7 @@ hkpBroadphaseViewer::~hkpBroadphaseViewer() {
 void hkpBroadphaseViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpBroadphaseViewer", this);
 
-    // The SDK's hkArray<hkAabb> allAabbs(1024): heap storage for 1024 boxes, the size set to it; a zero-sized
-    // buffer leaves the array flagged DONT_DEALLOCATE.
-    // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkAabb>, allAabbs, std::nullopt, std::nullopt);
-    allAabbs.m_data = nullptr;
-    allAabbs.m_size = 0;
-    allAabbs.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG);
-    int32_t numAabbs = 1024;
-    hkAabb* pAabbs = hkMemoryRouter::getInstance().heap()._bufAlloc<hkAabb>(numAabbs);
-    allAabbs.m_data = pAabbs;
-    allAabbs.m_capacityAndFlags = numAabbs ? numAabbs : static_cast<int32_t>(hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG);
-    allAabbs.m_size = 1024;
+    alignas(16) hkArray<hkAabb> allAabbs(1024);
     world->getBroadPhase()->getAllAabbs(allAabbs);
 
     if (allAabbs.m_size > m_broadPhaseDisplayGeometries.m_size) {
@@ -92,15 +81,8 @@ void hkpBroadphaseViewer::postSimulationCallback(hkpWorld* world) {
 
     HK_TIMER_END();
 
-    // The arrays' inline destructors: the size cleared, the heap storage freed unless flagged DONT_DEALLOCATE.
+    // The array's inline destructor: the size cleared, the heap storage freed unless flagged DONT_DEALLOCATE.
     displayGeometries.clearAndDeallocate();
-    // hkAabb has no destructor to run, so its array's clear only zeroes the size.
-    // EXE-INLINED none: hkArray<hkAabb>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    allAabbs.m_size = 0;
-    if ((allAabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::DONT_DEALLOCATE_FLAG) == 0) {
-        heap._bufFree<hkAabb>(allAabbs.m_data, allAabbs.getCapacity());
-    }
 }
 
 void hkpBroadphaseViewer::worldAddedCallback(hkpWorld* world) {

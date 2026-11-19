@@ -211,10 +211,9 @@ void NiSkinData::FreeBoneVertData() {
 
 void NiSkinData::ComputeBoneBounds(const NiPoint3* pkVerts) {
     using NiPoint3Set_t = NiTSet<NiPoint3, NiTNewInterface<NiPoint3>>;
-    XFNV_INLINED_LOCAL(NiPoint3Set_t, v13, std::nullopt, std::nullopt);
+    NiPoint3Set_t v13{};
     uint32_t m_uiUsed = 0;
     NiPoint3* m_pBase = nullptr;
-    std::memset(&v13, 0, sizeof(v13));
     uint32_t v12 = 0;
     if (m_uiBones) {
         int32_t v5 = 0;
@@ -257,7 +256,6 @@ void NiSkinData::ComputeBoneBounds(const NiPoint3* pkVerts) {
         }
         while (v12 < m_uiBones);
     }
-    MemoryManager_Singleton.Deallocate(m_pBase);
 }
 
 // The default constructor: no bones, no partition; the bone count and root transform are left as allocated.

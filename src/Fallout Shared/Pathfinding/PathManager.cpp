@@ -94,8 +94,6 @@ bool PathManager::BuildPath(
         // The implementation's BuildPath takes both smart pointers by value, and the callee releases them.
         return pImpl->BuildPath(aspRequest, aspMessageQueue);
     }
-    XFNV_INLINED_LOCAL(ActorPathingMessage, kOkMessage, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ActorPathingMessage, kErrorMessage, std::nullopt, std::nullopt);
     void* pMemory = NiMemObject::operator new(sizeof(PathingSolution));
     PathingSolution* pSolution;
     if (pMemory) {
@@ -107,13 +105,13 @@ bool PathManager::BuildPath(
     NiPointer<PathingSolution> spSolution(pSolution);
     if (Pathing::BuildPath(aspRequest.m_pObject, spSolution.m_pObject)) {
         ActorPathingMessageQueue* pQueue = aspMessageQueue.m_pObject;
-        pQueue->Push(::new (&kOkMessage) ActorPathingMessage(PMT_OK, spSolution));
-        kOkMessage.~ActorPathingMessage();
+        ActorPathingMessage kOkMessage(PMT_OK, spSolution);
+        pQueue->Push(&kOkMessage);
     }
     else {
         ActorPathingMessageQueue* pQueue = aspMessageQueue.m_pObject;
-        pQueue->Push(::new (&kErrorMessage) ActorPathingMessage(PMT_ERROR, spSolution));
-        kErrorMessage.~ActorPathingMessage();
+        ActorPathingMessage kErrorMessage(PMT_ERROR, spSolution);
+        pQueue->Push(&kErrorMessage);
     }
     return true;
 }
@@ -665,7 +663,6 @@ void PathManagerImpl::Release() {
 }
 
 void PathManagerImpl::CancelCurrentPathsAndPause() {
-    XFNV_INLINED_LOCAL(ActorPathingMessage, v4, std::nullopt, std::nullopt);
     PathingMessage msg;
     using it_t = LockFreeMap<PathingRequest*, PathingTaskData*>::LockFreeMapIterator;
     UpdateCriticalSection.Enter("PathManagerImpl::CancelCurrentPathsAndPause");
@@ -697,9 +694,10 @@ void PathManagerImpl::CancelCurrentPathsAndPause() {
         PathingTaskData* ptaskData;
         if (RequestToTaskletDataMap.GetNext(it, apThis_16, ptaskData, true)) {
             ActorPathingMessageQueue* v2 = ptaskData->spMessageQueue.m_pObject;
-            ActorPathingMessage* v1 = ::new (&v4) ActorPathingMessage(1u, ptaskData->spSolution);
-            v2->Push(v1);
-            v4.~ActorPathingMessage();
+            {
+                ActorPathingMessage v4(1u, ptaskData->spSolution);
+                v2->Push(&v4);
+            }
             if (ptaskData) {
                 delete ptaskData;
             }

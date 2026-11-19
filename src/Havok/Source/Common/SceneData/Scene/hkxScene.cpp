@@ -64,12 +64,7 @@ hkxScene::getFullPathToNode(const hkxNode* theNode, hkArray<const hkxNode*, hkCo
 
 // The product of the key frames (key, clamped to each node's last) along the path from the root to theNode.
 hkResult hkxScene::getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& worldFromNodeOut, int32_t key) {
-    using NodePathArray = hkInplaceArray<const hkxNode*, 32>;
-    alignas(16) XFNV_INLINED_LOCAL(NodePathArray, pathOut, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkInplaceArray<const hkxNode*, 32>::hkInplaceArray
-    pathOut.m_data = pathOut.m_storage;
-    pathOut.m_size = 0;
-    pathOut.m_capacityAndFlags = hkArrayBase<const hkxNode*>::DONT_DEALLOCATE_FLAG | 32;
+    alignas(16) hkInplaceArray<const hkxNode*, 32> pathOut;
     hkResult result;
     if (getFullPathToNode(theNode, pathOut)) {
         result = HK_FAILURE;
@@ -91,15 +86,6 @@ hkResult hkxScene::getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& 
             worldFromNodeOut.mul(&pNode->m_keyFrames.m_data[frame]);
         }
         result = HK_SUCCESS;
-    }
-    // EXE-INLINED none: hkInplaceArray<const hkxNode*, 32>::~hkInplaceArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    pathOut.m_size = 0;
-    if (pathOut.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            pathOut.m_data,
-            sizeof(const hkxNode*) * (pathOut.m_capacityAndFlags & hkArrayBase<const hkxNode*>::CAPACITY_MASK)
-        );
     }
     return result;
 }

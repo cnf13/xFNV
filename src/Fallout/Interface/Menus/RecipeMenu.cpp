@@ -815,7 +815,6 @@ int32_t RecipeMenu::FilterSortFunction(const void* apPtr1, const void* apPtr2) {
 }
 
 void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
-    XFNV_INLINED_LOCAL(BSStringT<char>, pstring, std::nullopt, std::nullopt);
     Tile* pcurrTiple = RecipeMenu::pMe->plbCurrListbox->GetTileFor(RecipeMenu::pCurrItem);
     BSSimpleList<TESRecipeComponent*>* pCompList = &RecipeMenu::pCurrItem->ingredientlist;
     TESForm* apObj = nullptr;
@@ -920,7 +919,7 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
         }
         RecipeMenu::pMe->pCrafterRef->AddBoundObjectItem(pobject, nullptr, aiAmountSelected * iQuantity);
     LABEL_46:;
-        ::new (&pstring) BSStringT<char>;
+        BSStringT<char> pstring;
         if (aiAmountSelected * iQuantity <= 1) {
             const char* a2b = sAddItemtoInventory.String();
             pstring.SPrintF("%s %s", TESFullName::GetFullName(pobject), a2b);
@@ -936,7 +935,6 @@ void RecipeMenu::ItemSelectCallback(int32_t aiAmountSelected) {
             pstring.pString, 0, "Interface\\Icons\\Message Icons\\glow_message_giftbox.dds", PickUpSoundName, 2.0f,
             false
         );
-        pstring.~BSStringT<char>();
         goto LABEL_50;
     }
 }

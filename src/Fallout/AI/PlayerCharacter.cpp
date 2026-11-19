@@ -3751,8 +3751,6 @@ BipedAnim* PlayerCharacter::GetCurrentBiped() {
 // checks the last known good position, shows the occupied region's map name in the HUD and toggles the imposters of the
 // regions left and entered. Without a cell, only the region sounds are cleared.
 void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
-    // The region name passed to Interface::SetRegionText, which destroys it.
-    XFNV_INLINED_LOCAL(BSStringT<char>, kRegionName, std::nullopt, std::nullopt);
     if (apCell == GetParentCell()) {
         return;
     }
@@ -3982,11 +3980,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         pMapData = static_cast<TESRegionDataMap*>(pOccupiedRegion->pDataList->Find(REGION_DATA_MAP_ID));
     }
     const char* pMapName = pMapData ? pMapData->GetMapName() : nullptr;
-    ::new (&kRegionName) BSStringT<char>(pMapName);
-    Interface::SetRegionText(pOccupiedRegion, kRegionName, true);
-    // Interface::SetRegionText takes its argument by value and receives a copy of this raw-storage local, so the local
-    // is destroyed here.
-    kRegionName.~BSStringT<char>();
+    Interface::SetRegionText(pOccupiedRegion, BSStringT<char>(pMapName), true);
     ResetAudioMarkerList();
     ResetMapMarkerStructList();
     // The regions left: their imposters are hidden.
@@ -10017,8 +10011,6 @@ void PlayerCharacter::PositionPlayerExterior(
 }
 
 void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
-    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
     MemoryLevelManager::MEM_FREE_DATA a1;
     float ftotaldist;
     float fCheckPerk;
@@ -10046,13 +10038,13 @@ void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
         lastcoord.y = (&pPlayer->GetLocationOnReference())->y;
         lastcoord.z = (&pPlayer->GetLocationOnReference())->z;
         ActorLockData playerLockData(pPlayer);
-        PathingLocation* aAngle_8 = ::new (&apMemory) PathingLocation(apRef);
-        PathingLocation* aAngle = ::new (&apLocation) PathingLocation(pPlayer);
-        ftotaldist = Pathing::ComputeTeleportDoorPathLength(
-            *aAngle, *aAngle_8, 0.0f, &playerLockData, Pathing::DOOR_LOCK_DISPOSITION_NORMAL
-        );
-        apLocation.~PathingLocation();
-        apMemory.~PathingLocation();
+        {
+            PathingLocation apMemory(apRef);
+            PathingLocation apLocation(pPlayer);
+            ftotaldist = Pathing::ComputeTeleportDoorPathLength(
+                apLocation, apMemory, 0.0f, &playerLockData, Pathing::DOOR_LOCK_DISPOSITION_NORMAL
+            );
+        }
         if (ftotaldist == 3.4028234663852886e+38) {
             char Dst[1024];
             int32_t v23 = 1024;

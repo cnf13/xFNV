@@ -254,7 +254,6 @@ void BSTempEffectParticle::SaveGame() {
 }
 
 bool BSTempEffectParticle::LoadGame() {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     uint32_t iblockHeader;
     char modelPath[260];
     NiPoint3 loc;
@@ -306,7 +305,7 @@ bool BSTempEffectParticle::LoadGame() {
         if (pnode) {
             spParticleObject.operator=(static_cast<NiAVObject*>(pnode->Clone()));
             if (spParticleObject.m_pObject) {
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+                NiPointer<Model> spmodel;
                 pModelLoader->FindModel(modelPath, spmodel);
                 pFilename = spmodel.m_pObject->pFilename;
                 static_cast<NiAVObject*>(spParticleObject.m_pObject)->NiAVObject::SetTranslate(loc);
@@ -333,7 +332,6 @@ bool BSTempEffectParticle::LoadGame() {
                         bvalid = false;
                     }
                 }
-                NiPointer<Model>::Destroy(&spmodel);
             }
             else {
                 bvalid = false;

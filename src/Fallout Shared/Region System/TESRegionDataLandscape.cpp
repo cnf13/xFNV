@@ -146,11 +146,8 @@ bool TESRegionDataLandscape::SetCanopyShadowTexture(BSStringT<char>* a1) {
 }
 
 NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
-    NiTexturingProperty* v1;
     NiPixelData* ppixeldata;
-    XFNV_INLINED_LOCAL(NiFixedString, apString, std::nullopt, std::nullopt);
     NiTexture::FormatPrefs myPrefs;
-    char v4 = 0;
     if (TESRegionDataLandscape::spDefaultFullMaskTextureProp.m_pObject) {
         return TESRegionDataLandscape::spDefaultFullMaskTextureProp.m_pObject;
     }
@@ -174,19 +171,9 @@ NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
     myPrefs.~FormatPrefs();
     ::new (&myPrefs) NiTexture::FormatPrefs;
     NiTexturingProperty* v6 = static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-    if (v6) {
-        NiFixedString* kName = ::new (static_cast<void*>(&apString)) NiFixedString("DefaultFullMaskTextureProp");
-        v4 = 1;
-        v1 = ::new (v6) NiTexturingProperty(ppixeldata, *kName, myPrefs);
-    }
-    else {
-        v1 = nullptr;
-    }
-    NiRefObject* v7 = v1;
-    TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(v1);
-    if ((v4 & 1) != 0) {
-        apString.~NiFixedString();
-    }
+    // The name is a temporary of the whole assignment, built only when the allocation succeeded.
+    TESRegionDataLandscape::spDefaultFullMaskTextureProp =
+        v6 ? ::new (v6) NiTexturingProperty(ppixeldata, NiFixedString("DefaultFullMaskTextureProp"), myPrefs) : nullptr;
     TESRegionDataLandscape::spDefaultFullMaskTextureProp.m_pObject->SetBaseClampMode(
         NiTexturingProperty::CLAMP_S_CLAMP_T
     );

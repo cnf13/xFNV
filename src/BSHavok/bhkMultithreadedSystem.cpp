@@ -39,37 +39,29 @@ void bhkMultithreadedSystem::InitMTSystem(const uint32_t& arIdToAcquireFor, int3
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
     QuitMTSystem();
     uiMTResourceOwner = arIdToAcquireFor;
-    XFNV_INLINED_LOCAL(hkCpuJobThreadPoolCinfo, ci, std::nullopt, std::nullopt);
-    ::new (&ci) hkCpuJobThreadPoolCinfo;
-    ci.m_numThreads = iNumThreads.uValue.i;
-    hkCpuJobThreadPool* pPoolMemory =
-        static_cast<hkCpuJobThreadPool*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkCpuJobThreadPool)));
-    pPoolMemory->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkCpuJobThreadPool));
-    pJobThreadPool = ::new (pPoolMemory) hkCpuJobThreadPool(ci);
-    hkJobQueueCinfo kQueueInfo;
-    kQueueInfo.m_jobQueueHwSetup.~hkJobQueueHwSetup();
-    ::new (&kQueueInfo.m_jobQueueHwSetup) hkJobQueueHwSetup;
-    kQueueInfo.m_maxNumJobTypes = 10;
-    hkJobQueue* pQueueMemory =
-        static_cast<hkJobQueue*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkJobQueue)));
-    hkJobQueue* pQueue;
-    if (pQueueMemory) {
-        pQueue = ::new (pQueueMemory) hkJobQueue(kQueueInfo);
-    }
-    else {
-        pQueue = nullptr;
-    }
-    pJobQueue = pQueue;
-    hkpWorld::registerWithJobQueue(pQueue);
-    // EXE-INLINED 0xCBF3C0
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    ci.m_hardwareThreadIds.m_size = 0;
-    if (ci.m_hardwareThreadIds.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            ci.m_hardwareThreadIds.begin(),
-            static_cast<int32_t>(ci.m_hardwareThreadIds.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(int32_t))
+    {
+        hkCpuJobThreadPoolCinfo ci;
+        ci.m_numThreads = iNumThreads.uValue.i;
+        hkCpuJobThreadPool* pPoolMemory = static_cast<hkCpuJobThreadPool*>(
+            hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkCpuJobThreadPool))
         );
+        pPoolMemory->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkCpuJobThreadPool));
+        pJobThreadPool = ::new (pPoolMemory) hkCpuJobThreadPool(ci);
+        hkJobQueueCinfo kQueueInfo;
+        kQueueInfo.m_jobQueueHwSetup.~hkJobQueueHwSetup();
+        ::new (&kQueueInfo.m_jobQueueHwSetup) hkJobQueueHwSetup;
+        kQueueInfo.m_maxNumJobTypes = 10;
+        hkJobQueue* pQueueMemory =
+            static_cast<hkJobQueue*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkJobQueue)));
+        hkJobQueue* pQueue;
+        if (pQueueMemory) {
+            pQueue = ::new (pQueueMemory) hkJobQueue(kQueueInfo);
+        }
+        else {
+            pQueue = nullptr;
+        }
+        pJobQueue = pQueue;
+        hkpWorld::registerWithJobQueue(pQueue);
     }
     pTLSData->eMemContext = eMemContext;
 }

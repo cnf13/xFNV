@@ -325,19 +325,10 @@ hkIstream& hkIstream::operator>>(uint64_t& u) {
     return *this;
 }
 
-// The local string buffer gets no destructor of its own, so that its storage is freed only once, by the destruction
-// code below.
 hkIstream& hkIstream::operator>>(hkStringPtr& str) {
-    XFNV_INLINED_LOCAL(hkStringBuf, s, std::nullopt, std::nullopt);
-    ::new (&s) hkStringBuf;
+    hkStringBuf s;
     this->operator>>(s);
     str.operator=(s.m_string.begin());
-    // EXE-INLINED 0xCBBD40
-    hkMemoryAllocator* m_temp = (&hkMemoryRouter::getInstance())->m_temp;
-    s.m_string.m_size = 0;
-    if (s.m_string.m_capacityAndFlags >= 0) {
-        m_temp->bufFree(s.m_string.begin(), s.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-    }
     return *this;
 }
 

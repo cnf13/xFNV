@@ -495,12 +495,7 @@ void hkpSampledHeightFieldShape::castRayInternal(
             static_cast<uint32_t>(cell[2]) >= static_cast<uint32_t>(m_zRes - 1)) {
             goto end;
         }
-        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-        // EXE-INLINED 0x4A3D20
-        output.m_hitFraction = 1.0f;
-        output.m_extraInfo = -1;
-        output.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
-        output.m_shapeKeyIndex = 0;
+        hkpShapeRayCastOutput output;
         // EXE-INLINED 0x4589C0
         output.m_normal.m_quad = _mm_set_ps1(1.0f);
         float subX = rayFrom(0) - static_cast<double>(cell[0]);
@@ -852,14 +847,9 @@ void hkpSampledHeightFieldShape::castRayInternal(
                 goto end;
             }
             {
-                XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-                // EXE-INLINED 0x4A3D20
-                output.m_hitFraction = 1.0f;
+                hkpShapeRayCastOutput output;
                 output.m_normal(3) = 0.0f;
                 output.m_normal(1) = 1.0f;
-                output.m_extraInfo = -1;
-                output.m_shapeKeyIndex = 0;
-                output.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
                 const int32_t prevZ = cell[2] - step[2];
                 // The normal of the cell's triangle behind the line, from three of its grid points.
                 float normalX;

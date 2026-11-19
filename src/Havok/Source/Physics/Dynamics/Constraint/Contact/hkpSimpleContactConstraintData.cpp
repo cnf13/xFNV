@@ -144,10 +144,7 @@ void hkpSimpleContactConstraintData::collisionResponseEndCallback(
         return;
     }
     using modifiers_t = hkInplaceArray<hkpModifierConstraintAtom*, 16>;
-    XFNV_INLINED_LOCAL(modifiers_t, modifiers, std::nullopt, std::nullopt);
-    modifiers.m_data = modifiers.m_storage;
-    modifiers.m_size = 0;
-    modifiers.m_capacityAndFlags = 0x80000010u;
+    modifiers_t modifiers;
     hkpConstraintAtom* pAtom = pConstraint->m_constraintModifiers;
     // EXE-INLINED none: hkpConstraintAtom::isModifierType
     while (pAtom->m_type.m_storage >= hkpConstraintAtom::TYPE_MODIFIER_SOFT_CONTACT) {
@@ -187,18 +184,6 @@ void hkpSimpleContactConstraintData::collisionResponseEndCallback(
                 break;
             default: break;
         }
-    }
-    // EXE-INLINED none: hkInplaceArray<hkpModifierConstraintAtom*, 16>::~hkInplaceArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    modifiers.m_size = 0;
-    if (modifiers.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            modifiers.m_data,
-            sizeof(hkpModifierConstraintAtom*) *
-                static_cast<int32_t>(
-                    modifiers.m_capacityAndFlags & hkArrayBase<hkpModifierConstraintAtom*>::CAPACITY_MASK
-                )
-        );
     }
 }
 

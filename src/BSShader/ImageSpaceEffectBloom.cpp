@@ -28,7 +28,6 @@ ImageSpaceEffectBloom::~ImageSpaceEffectBloom() {
 }
 
 void ImageSpaceEffectBloom::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(3);
     pTextures.SetSize(4u);
     ImageSpaceShaderParam* pParam;
@@ -41,12 +40,10 @@ void ImageSpaceEffectBloom::Setup(ImageSpaceManager* apManager, ImageSpaceEffect
     }
     pParam->InitConstantMap(0, 1);
     pParam->SetPixelConstant(0, 0.0f, f0_6999, f0_2, 0.0f);
-    spParam.m_pObject = pParam;
-    pEffectParamList.SetAt(0u, spParam);
+    pEffectParamList.SetAt(0u, pParam);
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_BILERP);
     SetEffect(0, apManager->pEffectList.m_pBase[45], pParam, 2);
-    spParam.m_pObject = nullptr;
-    pEffectParamList.SetAt(1u, spParam);
+    pEffectParamList.SetAt(1u, nullptr);
     SetEffectInputs(1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(1, apManager->pEffectList.m_pBase[19], nullptr, 2);
     ImageSpaceShaderParam* pParam2 = nullptr;
@@ -57,8 +54,7 @@ void ImageSpaceEffectBloom::Setup(ImageSpaceManager* apManager, ImageSpaceEffect
     pParam2->InitConstantMap(0, 1);
     pParam2->bUseTexOffset[2] = false;
     pParam2->SetPixelConstant(0, 1.0f, 1.0f, 1.0f, 1.0f);
-    spParam.m_pObject = pParam2;
-    pEffectParamList.SetAt(2u, spParam);
+    pEffectParamList.SetAt(2u, pParam2);
     SetEffectInputs(2, 2, 1, NiTexturingProperty::FILTER_BILERP, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(2, apManager->pEffectList.m_pBase[46], pParam2, 0);
 }

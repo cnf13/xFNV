@@ -517,7 +517,6 @@ hkBool hkpVehicleLinearCastWheelCollide::castSingleWheel(
 ) const {
     hkVector4 v6;
     hkpLinearCastInput v8;
-    XFNV_INLINED_LOCAL(hkpClosestCdPointCollector, a3, hkpClosestCdPointCollector_vftable, std::nullopt);
     hkpVehicleLinearCastWheelCollide::WheelState* v5 = &m_wheelStates.m_data[wheelNum];
     // The collidable over the wheel's transform.
     alignas(16) hkpCollidable v10(v5->m_shape, &v5->m_transform, 0);
@@ -527,13 +526,8 @@ hkBool hkpVehicleLinearCastWheelCollide::castSingleWheel(
     v6.m_quad = v5->m_to.m_quad;
     v8.m_maxExtraPenetration = m_maxExtraPenetration;
     v8.m_startPointTolerance = m_startPointTolerance;
-    // MAYBE-INLINED 0xE36A46: before the vptr store of hkpClosestCdPointCollector's inlined constructor
-    a3.m_hitPoint.m_contact.m_separatingNormal.m_quad[3] = 3.40282e+38f;
+    hkpClosestCdPointCollector a3;
     v8.m_to.m_quad = v6.m_quad;
-    // MAYBE-INLINED 0xE36A4F: before the vptr store of hkpClosestCdPointCollector's inlined constructor
-    a3.m_earlyOutDistance = 3.40282e+38f;
-    // MAYBE-INLINED 0xE36A5B: after the vptr store of hkpClosestCdPointCollector's inlined constructor
-    a3.m_hitPoint.m_rootCollidableA = nullptr;
     v5->m_phantom->linearCast(&v10, v8, a3, nullptr);
     if (a3.m_hitPoint.m_rootCollidableA) {
         linearCastOutput.Assign(a3.m_hitPoint);

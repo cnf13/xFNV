@@ -82,7 +82,6 @@ void FalloutAudioMedia::MediaOpen(
     float afAttenuation,
     uint32_t auiSynchTime
 ) {
-    XFNV_INLINED_LOCAL(BSFile, fileCheck, std::nullopt, std::nullopt);
     FalloutAudioMedia::MediaAccessEnter();
     if (aeMediaType == MEDIA_NONE) {
         FalloutAudioMedia::MediaClear();
@@ -94,65 +93,64 @@ void FalloutAudioMedia::MediaOpen(
                 ((aeMediaType >= FalloutAudioMedia::eMediaAType || FalloutAudioMedia::eMediaNextTrack != 1) &&
                  (aeMediaType >= FalloutAudioMedia::eMediaBType || FalloutAudioMedia::eMediaNextTrack))) {
                 const char* pRealFilename = apFileName;
-                ::new (&fileCheck) BSFile(apFileName, NiFile::READ_ONLY, 0x4000u, false);
-                if (fileCheck.BSFile::Exist()) {
-                    fileCheck.~BSFile();
-                    uint32_t ilength = BSAudio::QInstance().GetSynchTime();
-                    if (FalloutAudioMedia::eMediaNextTrack) {
-                        FalloutAudioMedia::fMediaBVolume = 0.0f;
-                        FalloutAudioMedia::fMediaBFadeStartVolume = 0.0f;
-                        FalloutAudioMedia::fMediaBFadeEndVolume =
-                            FalloutAudioMedia::MediaVolume(aeMediaType, afAttenuation);
-                        FalloutAudioMedia::fMediaBAttenuation = afAttenuation;
-                        FalloutAudioMedia::cMediaBFlags = (abLoop ? 32 : 0) | 16;
-                        BSstrcpy(FalloutAudioMedia::pMediaBFileName, 260, apFileName);
-                        FalloutAudioMedia::eMediaBType = aeMediaType;
-                        FalloutAudioMedia::uiMediaBSynchStartTime = auiSynchTime;
-                        FalloutAudioMedia::uiMediaBFadeTime = auiFadeTime;
-                        FalloutAudioMedia::uiMediaBFadeEnd = auiFadeTime + ilength;
-                        FalloutAudioMedia::uiMediaBLastUpdate = 0;
-                        FalloutAudioMedia::uiMediaBID = uiMediaNextID;
-                        FAMThread::kNewTrack.ID = uiMediaNextID++;
-                        FAMThread::kNewTrack.Track = static_cast<MEDIATRACK>(FalloutAudioMedia::eMediaNextTrack);
-                        (s_thread + FalloutAudioMedia::eMediaNextTrack)->AddNewTrack(&FAMThread::kNewTrack);
-                        FalloutAudioMedia::eMediaNextTrack = 0;
-                        FalloutAudioMedia::cMediaAFlags |= 24u;
-                        FalloutAudioMedia::fMediaAFadeStartVolume = FalloutAudioMedia::fMediaAVolume;
-                        FalloutAudioMedia::fMediaAFadeEndVolume = 0.0f;
-                        FalloutAudioMedia::uiMediaAFadeTime = FalloutAudioMedia::uiMediaBFadeTime;
-                        FalloutAudioMedia::uiMediaAFadeEnd = FalloutAudioMedia::uiMediaBFadeEnd;
+                {
+                    BSFile fileCheck(apFileName, NiFile::READ_ONLY, 0x4000u, false);
+                    if (!fileCheck.BSFile::Exist()) {
+                        Warning("FalloutAudioMedia: File '%s' does not exist!", apFileName);
+                        FalloutAudioMedia::MediaAccessLeave();
+                        return;
                     }
-                    else {
-                        FalloutAudioMedia::fMediaAVolume = 0.0f;
-                        FalloutAudioMedia::fMediaAFadeStartVolume = 0.0f;
-                        FalloutAudioMedia::fMediaAFadeEndVolume =
-                            FalloutAudioMedia::MediaVolume(aeMediaType, afAttenuation);
-                        FalloutAudioMedia::fMediaAAttenuation = afAttenuation;
-                        FalloutAudioMedia::cMediaAFlags = (abLoop ? 32 : 0) | 16;
-                        BSstrcpy(FalloutAudioMedia::pMediaAFileName, 260, apFileName);
-                        FalloutAudioMedia::eMediaAType = aeMediaType;
-                        FalloutAudioMedia::uiMediaASynchStartTime = auiSynchTime;
-                        FalloutAudioMedia::uiMediaAFadeTime = auiFadeTime;
-                        FalloutAudioMedia::uiMediaAFadeEnd = auiFadeTime + ilength;
-                        FalloutAudioMedia::uiMediaALastUpdate = 0;
-                        FalloutAudioMedia::uiMediaAID = uiMediaNextID;
-                        FAMThread::kNewTrack.ID = uiMediaNextID++;
-                        FAMThread::kNewTrack.Track = static_cast<MEDIATRACK>(FalloutAudioMedia::eMediaNextTrack);
-                        (s_thread + FalloutAudioMedia::eMediaNextTrack)->AddNewTrack(&FAMThread::kNewTrack);
-                        FalloutAudioMedia::eMediaNextTrack = 1;
-                        FalloutAudioMedia::cMediaBFlags |= 24u;
-                        FalloutAudioMedia::fMediaBFadeStartVolume = FalloutAudioMedia::fMediaBVolume;
-                        FalloutAudioMedia::fMediaBFadeEndVolume = 0.0f;
-                        FalloutAudioMedia::uiMediaBFadeTime = FalloutAudioMedia::uiMediaAFadeTime;
-                        FalloutAudioMedia::uiMediaBFadeEnd = FalloutAudioMedia::uiMediaAFadeEnd;
-                    }
-                    FalloutAudioMedia::MediaAccessLeave();
+                }
+                uint32_t ilength = BSAudio::QInstance().GetSynchTime();
+                if (FalloutAudioMedia::eMediaNextTrack) {
+                    FalloutAudioMedia::fMediaBVolume = 0.0f;
+                    FalloutAudioMedia::fMediaBFadeStartVolume = 0.0f;
+                    FalloutAudioMedia::fMediaBFadeEndVolume =
+                        FalloutAudioMedia::MediaVolume(aeMediaType, afAttenuation);
+                    FalloutAudioMedia::fMediaBAttenuation = afAttenuation;
+                    FalloutAudioMedia::cMediaBFlags = (abLoop ? 32 : 0) | 16;
+                    BSstrcpy(FalloutAudioMedia::pMediaBFileName, 260, apFileName);
+                    FalloutAudioMedia::eMediaBType = aeMediaType;
+                    FalloutAudioMedia::uiMediaBSynchStartTime = auiSynchTime;
+                    FalloutAudioMedia::uiMediaBFadeTime = auiFadeTime;
+                    FalloutAudioMedia::uiMediaBFadeEnd = auiFadeTime + ilength;
+                    FalloutAudioMedia::uiMediaBLastUpdate = 0;
+                    FalloutAudioMedia::uiMediaBID = uiMediaNextID;
+                    FAMThread::kNewTrack.ID = uiMediaNextID++;
+                    FAMThread::kNewTrack.Track = static_cast<MEDIATRACK>(FalloutAudioMedia::eMediaNextTrack);
+                    (s_thread + FalloutAudioMedia::eMediaNextTrack)->AddNewTrack(&FAMThread::kNewTrack);
+                    FalloutAudioMedia::eMediaNextTrack = 0;
+                    FalloutAudioMedia::cMediaAFlags |= 24u;
+                    FalloutAudioMedia::fMediaAFadeStartVolume = FalloutAudioMedia::fMediaAVolume;
+                    FalloutAudioMedia::fMediaAFadeEndVolume = 0.0f;
+                    FalloutAudioMedia::uiMediaAFadeTime = FalloutAudioMedia::uiMediaBFadeTime;
+                    FalloutAudioMedia::uiMediaAFadeEnd = FalloutAudioMedia::uiMediaBFadeEnd;
                 }
                 else {
-                    Warning("FalloutAudioMedia: File '%s' does not exist!", apFileName);
-                    FalloutAudioMedia::MediaAccessLeave();
-                    fileCheck.~BSFile();
+                    FalloutAudioMedia::fMediaAVolume = 0.0f;
+                    FalloutAudioMedia::fMediaAFadeStartVolume = 0.0f;
+                    FalloutAudioMedia::fMediaAFadeEndVolume =
+                        FalloutAudioMedia::MediaVolume(aeMediaType, afAttenuation);
+                    FalloutAudioMedia::fMediaAAttenuation = afAttenuation;
+                    FalloutAudioMedia::cMediaAFlags = (abLoop ? 32 : 0) | 16;
+                    BSstrcpy(FalloutAudioMedia::pMediaAFileName, 260, apFileName);
+                    FalloutAudioMedia::eMediaAType = aeMediaType;
+                    FalloutAudioMedia::uiMediaASynchStartTime = auiSynchTime;
+                    FalloutAudioMedia::uiMediaAFadeTime = auiFadeTime;
+                    FalloutAudioMedia::uiMediaAFadeEnd = auiFadeTime + ilength;
+                    FalloutAudioMedia::uiMediaALastUpdate = 0;
+                    FalloutAudioMedia::uiMediaAID = uiMediaNextID;
+                    FAMThread::kNewTrack.ID = uiMediaNextID++;
+                    FAMThread::kNewTrack.Track = static_cast<MEDIATRACK>(FalloutAudioMedia::eMediaNextTrack);
+                    (s_thread + FalloutAudioMedia::eMediaNextTrack)->AddNewTrack(&FAMThread::kNewTrack);
+                    FalloutAudioMedia::eMediaNextTrack = 1;
+                    FalloutAudioMedia::cMediaBFlags |= 24u;
+                    FalloutAudioMedia::fMediaBFadeStartVolume = FalloutAudioMedia::fMediaBVolume;
+                    FalloutAudioMedia::fMediaBFadeEndVolume = 0.0f;
+                    FalloutAudioMedia::uiMediaBFadeTime = FalloutAudioMedia::uiMediaAFadeTime;
+                    FalloutAudioMedia::uiMediaBFadeEnd = FalloutAudioMedia::uiMediaAFadeEnd;
                 }
+                FalloutAudioMedia::MediaAccessLeave();
             }
             else {
                 Warning("FalloutAudioMedia: Trying to open media out of priority");

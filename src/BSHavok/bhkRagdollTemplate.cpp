@@ -332,13 +332,7 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
         ConstraintsA.pBuffer[i]->pEntityA = pOldCinfo->pEntityA;
         ConstraintsA.pBuffer[i]->pEntityB = pOldCinfo->pEntityB;
 
-        // Calls the base's constructor, then stores the scale (1, 1, 1) from z to x.
-        // EXE-INLINED 0x4AD050
-        XFNV_INLINED_LOCAL(BSCloningProcess, kCloning, std::nullopt, std::nullopt);
-        ::new (&kCloning) NiCloningProcess(257u);
-        kCloning.Scale.z = 1.0f;
-        kCloning.Scale.y = 1.0f;
-        kCloning.Scale.x = 1.0f;
+        BSCloningProcess kCloning(1.0f);
         bhkConstraint* pConstraint = nullptr;
         switch (ConstraintTypeA.pBuffer[i]) {
             case hkpConstraintData::CONSTRAINT_TYPE_BALLANDSOCKET: {
@@ -456,14 +450,6 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
             NiDecRefCount(pConstraint);
         }
         pConstraint->Add(pWorld);
-
-        // EXE-INLINED 0x4AD1D0
-        if (kCloning.m_pkCloneMap) {
-            delete kCloning.m_pkCloneMap;
-        }
-        if (kCloning.m_pkProcessMap) {
-            delete kCloning.m_pkProcessMap;
-        }
     }
 }
 

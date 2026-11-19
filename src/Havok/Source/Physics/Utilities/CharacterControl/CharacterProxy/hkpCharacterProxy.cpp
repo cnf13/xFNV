@@ -282,18 +282,8 @@ void hkpCharacterProxy::updateManifold(
     // EXE-INLINED none: hkArray<hkpPhantom*>::clear
     m_phantoms.m_size = 0;
 
-    // EXE-INLINED none: hkLocalArray<hkpRootCdPoint>::hkLocalArray(numStartHits) (hkAllocateStack)
     const int32_t numStartHits = startPointCollector.m_hits.m_size;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpRootCdPoint>, startPointHits, std::nullopt, std::nullopt);
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((numStartHits * static_cast<int32_t>(sizeof(hkpRootCdPoint)) + 127) & ~127);
-    hkpRootCdPoint* pLocal = static_cast<hkpRootCdPoint*>(pBlock);
-    startPointHits.m_data = pLocal;
-    startPointHits.m_localMemory = pLocal;
-    startPointHits.m_capacityAndFlags =
-        static_cast<int32_t>(static_cast<uint32_t>(numStartHits) | hkArrayBase<hkpRootCdPoint>::DONT_DEALLOCATE_FLAG);
+    hkLocalArray<hkpRootCdPoint> startPointHits(numStartHits);
     startPointHits.m_size = startPointCollector.m_hits.m_size;
     for (int32_t i = 0; i < startPointHits.m_size; ++i) {
         startPointHits.m_data[i].Assign(startPointCollector.m_hits.m_data[i]);
@@ -466,10 +456,6 @@ void hkpCharacterProxy::updateManifold(
             }
         }
     }
-
-    // startPointHits is raw storage that C++ never destroys, so the destructor is called here: without it the stack
-    // block is never given back and the thread's Havok stack runs past its end.
-    startPointHits.~hkLocalArray<hkpRootCdPoint>();
 }
 
 // Builds the surface from a contact: the plane pushed out by the keep distance, the proxy's frictions, and for a rigid
@@ -1257,26 +1243,10 @@ hkpShapePhantom* hkpCharacterProxy::getShapePhantom() {
 
 // Deprecated support query: the simplex solver is run on the manifold's surface constraints (velocities kept) for the
 // proxy's velocity plus direction; ground says whether the solved velocity lost speed along direction (supported) and
-// still moves across it (sliding), with the averaged normal and velocity of the touched planes that face direction. The
-// stack allocator's bytes are untyped memory: each local array keeps its elements there, and its stack pointer goes
-// back as bytes.
+// still moves across it (sliding), with the averaged normal and velocity of the touched planes that face direction.
 void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSurfaceInfoDeprecated& ground) {
     HK_TIMER_BEGIN("checkSupport", nullptr);
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpSurfaceConstraintInfo>, constraints, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInfo>::hkLocalArray (hkAllocateStack)
-        const int32_t iCapacity = m_manifold.m_size + m_userPlanes + 10;
-        constraints.m_data = nullptr;
-        constraints.m_size = 0;
-        constraints.m_capacityAndFlags = hkArrayBase<hkpSurfaceConstraintInfo>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpSurfaceConstraintInfo)) + 127) & ~127);
-        constraints.m_data = reinterpret_cast<hkpSurfaceConstraintInfo*>(pBlock);
-        constraints.m_localMemory = constraints.m_data;
-        constraints.m_capacityAndFlags = iCapacity | hkArrayBase<hkpSurfaceConstraintInfo>::DONT_DEALLOCATE_FLAG;
-    }
+    hkLocalArray<hkpSurfaceConstraintInfo> constraints(m_manifold.m_size + m_userPlanes + 10);
     constraints.setSizeUnchecked(m_manifold.m_size);
     for (int32_t i = 0; i < m_manifold.m_size; ++i) {
         extractSurfaceConstraintInfo(m_manifold.m_data[i], constraints.m_data[i], 0.0f);
@@ -1290,22 +1260,7 @@ void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSu
         }
     }
     // The solver's output per constraint.
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpSurfaceConstraintInteraction>, interactions, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInteraction>::hkLocalArray (hkAllocateStack)
-        const int32_t iCapacity = constraints.m_size + m_userPlanes;
-        interactions.m_data = nullptr;
-        interactions.m_size = 0;
-        interactions.m_capacityAndFlags = hkArrayBase<hkpSurfaceConstraintInteraction>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpSurfaceConstraintInteraction)) + 127) & ~127);
-        interactions.m_capacityAndFlags =
-            iCapacity | hkArrayBase<hkpSurfaceConstraintInteraction>::DONT_DEALLOCATE_FLAG;
-        interactions.m_data = reinterpret_cast<hkpSurfaceConstraintInteraction*>(pBlock);
-        interactions.m_localMemory = interactions.m_data;
-    }
+    hkLocalArray<hkpSurfaceConstraintInteraction> interactions(constraints.m_size + m_userPlanes);
     {
         // EXE-INLINED none: hkArray<hkpSurfaceConstraintInteraction>::setSize, written as its reserve and size store
         // (the element class has no hkArrayUtil::construct of its own).
@@ -1386,9 +1341,6 @@ void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSu
         ground.m_isSupported.m_bool = false;
     }
     HK_TIMER_END();
-    // The local arrays are destroyed in reverse order.
-    interactions.~hkLocalArray<hkpSurfaceConstraintInteraction>();
-    constraints.~hkLocalArray<hkpSurfaceConstraintInfo>();
 }
 
 // Adds apListener to the proxy's listeners.

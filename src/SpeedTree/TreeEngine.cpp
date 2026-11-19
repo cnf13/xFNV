@@ -396,7 +396,6 @@ void CTreeEngine::SetSize(float fSize, float fVariance) {
 }
 
 void CTreeEngine::ParseTreeInfo(CTreeFileAccess& cFile) {
-    XFNV_INLINED_LOCAL(IdvFileError, v6, std::nullopt, std::nullopt);
     CIdvFilename v7;
     int32_t nSeed = cFile.ParseInt();
     do {
@@ -448,10 +447,8 @@ void CTreeEngine::ParseTreeInfo(CTreeFileAccess& cFile) {
             if (nSeed != 1014) {
             LABEL_16:;
                 using apMemory_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
-                XFNV_INLINED_LOCAL(apMemory_t, apMemory, std::nullopt, std::nullopt);
-                ::new (&apMemory) std::string("malformed general tree information");
-                ::new (&v6) IdvFileError(apMemory, false);
-                throw v6;
+                apMemory_t apMemory("malformed general tree information");
+                throw IdvFileError(apMemory, false);
             }
             ParseBranchInfo(cFile);
         }

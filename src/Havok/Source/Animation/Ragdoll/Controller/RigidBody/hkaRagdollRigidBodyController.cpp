@@ -101,21 +101,7 @@ void hkaRagdollRigidBodyController::driveToPose(
         );
     }
     else {
-        // The stack allocator's bytes are untyped memory; the local array keeps its elements there.
-        XFNV_INLINED_LOCAL(hkLocalArray<hkQsTransform>, poseLocalSpace, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkQsTransform>::hkLocalArray(numRigidBodies) (hkAllocateStack)
-            poseLocalSpace.m_data = nullptr;
-            poseLocalSpace.m_size = 0;
-            poseLocalSpace.m_capacityAndFlags = hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                pBlock + ((numRigidBodies * static_cast<int32_t>(sizeof(hkQsTransform)) + 127) & ~127);
-            poseLocalSpace.m_data = reinterpret_cast<hkQsTransform*>(pBlock);
-            poseLocalSpace.m_capacityAndFlags = numRigidBodies | hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG;
-            poseLocalSpace.m_localMemory = poseLocalSpace.m_data;
-        }
+        hkLocalArray<hkQsTransform> poseLocalSpace(numRigidBodies);
         poseLocalSpace.setSizeUnchecked(numRigidBodies);
         for (int32_t i = 0; i < m_ragdollInstance->m_skeleton->m_bones.m_size; ++i) {
             const int32_t rb = m_ragdollInstance->m_boneToRigidBodyMap.m_data[i];
@@ -131,6 +117,5 @@ void hkaRagdollRigidBodyController::driveToPose(
         hkaKeyFrameHierarchyUtility::applyKeyFrame(
             deltaTime, keyFrameData, m_bodyData, m_controlDataPalette.m_data, stressOut
         );
-        poseLocalSpace.~hkLocalArray<hkQsTransform>();
     }
 }

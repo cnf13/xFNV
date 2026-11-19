@@ -15,10 +15,8 @@
 
 void ShadowLightShader::PresetADTPasses_2x() {
     NiD3DPass* v32;
-    // EXE-INLINED none: NiPointer<NiD3DPass> constructor and destructor
-    XFNV_INLINED_LOCAL(NiPointer<NiD3DPass>, spD3DPass, std::nullopt, std::nullopt);
     NiD3DPass* m_pObject = nullptr;
-    spD3DPass.m_pObject = nullptr;
+    NiPointer<NiD3DPass> spD3DPass;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ShadowLightShader::spPass[251].m_pObject) {
@@ -1939,16 +1937,14 @@ void ShadowLightShader::PresetADTPasses_2x() {
         ShadowLightShader::ulVertexConstantFlags[19] = 0x8880;
         ShadowLightShader::ulPixelConstantFlags[19] = 0;
     }
-    v32->DecRefCount();
 }
 
 void ShadowLightShader::PresetADTSPasses_2x() {
     bool v2;
     NiD3DPass* v19;
-    XFNV_INLINED_LOCAL(NiPointer<NiD3DPass>, spCurrentPass, std::nullopt, std::nullopt);
     uint32_t uiValue;
     NiD3DPass* m_pObject = nullptr;
-    spCurrentPass.m_pObject = nullptr;
+    NiPointer<NiD3DPass> spCurrentPass;
     {
         NiPointer<NiD3DTextureStage> spstage;
         if (ShadowLightShader::spPass[149].m_pObject) {
@@ -4400,7 +4396,6 @@ void ShadowLightShader::PresetADTSPasses_2x() {
         ShadowLightShader::ulPixelConstantFlags[563] = 8;
         ShadowLightShader::uiVertexNonVolatileConstantFlags[563] = 256;
     }
-    v19->DecRefCount();
 }
 
 void ShadowLightShader::PresetADPasses_2x() {

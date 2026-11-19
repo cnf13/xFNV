@@ -295,8 +295,6 @@ bool ScriptRunner::EvaluateLine(
     bool abActionInit
 ) {
     double v23;
-    XFNV_INLINED_LOCAL(CExpression, ce_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(CExpression, ce, std::nullopt, std::nullopt);
     double fVal;
     uint32_t uiCurrentOffset;
     uiCurrentOffset = auiDataOffset;
@@ -411,7 +409,7 @@ bool ScriptRunner::EvaluateLine(
                     }
                     int16_t sSize = *reinterpret_cast<uint16_t*>(&pCompiledData[uiCurrentOffset]);
                     uiCurrentOffset += 2;
-                    ::new (&ce) CExpression;
+                    CExpression ce;
                     double val = ce.Eval(
                         &pCompiledData[uiCurrentOffset], apFunctionOwner, m_currentContainer, apScript, m_currentVars,
                         sSize, abEndian
@@ -518,7 +516,7 @@ bool ScriptRunner::EvaluateLine(
                     uiCurrentOffset += 2;
                     int16_t uiSize = *reinterpret_cast<uint16_t*>(&pCompiledData[uiCurrentOffset]);
                     uiCurrentOffset += 2;
-                    ::new (&ce_2) CExpression;
+                    CExpression ce_2;
                     if (abEndian) {
                         ce_2.Eval(
                             &pCompiledData[uiCurrentOffset], apFunctionOwner, m_currentContainer, apScript,

@@ -99,8 +99,6 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
     float afMaxDist
 ) {
     NiPoint3 result;
-    using links_t = BSScrapArray<NavMeshSearchLink, 1024>;
-    XFNV_INLINED_LOCAL(links_t, links, std::nullopt, std::nullopt);
     StartNode.pNavMesh = aStartNode.pNavMesh;
     StartNode.sTriangle = aStartNode.usTriangle;
     NiPoint3 center = StartNode.pNavMesh->GetCenter(StartNode.sTriangle);
@@ -126,14 +124,13 @@ NiPoint3 NavMeshSearchMaxCost::FindClosestPoint(
     fMaxDist = afMaxDist;
     using nodes_t = BSScrapArray<NavMeshSearchNode, 1024>;
     nodes_t nodes;
-    ::new (&links) BSScrapArray<NavMeshSearchLink, 1024>;
+    BSScrapArray<NavMeshSearchLink, 1024> links;
     if (Search(&nodes, &links, false)) {
         result = aGoalLocation;
     }
     else {
         result = GetBestAStarNode()->tNodeData.GetCenter();
     }
-    links.~BSScrapArray<NavMeshSearchLink, 1024>();
     return result;
 }
 

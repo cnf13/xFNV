@@ -1908,7 +1908,6 @@ void Sky::SetFastTravel(bool abOn) {
 }
 
 void Sky::ActivateWeatherSounds(const TESWeather* apWeather) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kHandleArg, std::nullopt, std::nullopt);
     if (!apWeather) {
         return;
     }
@@ -1945,9 +1944,8 @@ void Sky::ActivateWeatherSounds(const TESWeather* apWeather) {
             SkySound* pNewSound;
             SkySound* pMemory = static_cast<SkySound*>(ourMalloc(sizeof(SkySound)));
             if (pMemory) {
-                kHandleArg.operator=(soundHand);
                 pNewSound =
-                    ::new (pMemory) SkySound(kHandleArg, apWeather, pSoundData->eType, pSoundData->uiSoundFormID);
+                    ::new (pMemory) SkySound(soundHand, apWeather, pSoundData->eType, pSoundData->uiSoundFormID);
             }
             else {
                 pNewSound = nullptr;

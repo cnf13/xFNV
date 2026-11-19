@@ -292,10 +292,7 @@ void PathingRequest::SetRetryCount(int32_t aiRetryCount) {
 }
 
 void PathingRequest::Initialize(Actor* apActor) {
-    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
-    PathingLocation* aLoc = ::new (&apLocation) PathingLocation(apActor);
-    Origin.operator=(*aLoc);
-    apLocation.~PathingLocation();
+    Origin = PathingLocation(apActor);
     float aRadius = apActor->GetWidth() * 0.6000000238418579;
     SetActorRadius(aRadius);
     SetActorLockData(apActor);

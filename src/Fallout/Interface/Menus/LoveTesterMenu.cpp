@@ -504,7 +504,7 @@ bool LoveTesterMenu::DoGamepad(int32_t a1, float a2) {
 }
 
 bool LoveTesterMenu::TurnPage(bool bForward) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, psoundHand, std::nullopt, std::nullopt);
+    BSSoundHandle psoundHand;
     bool brunAnim = false;
     if (!bForward) {
         bLoveTesterAnimForward = false;
@@ -524,7 +524,6 @@ bool LoveTesterMenu::TurnPage(bool bForward) {
         BSAudio* v2;
         eState = static_cast<LoveTesterMenu::LOVE_TESTER_MENU_STATE>(eState + 1);
         brunAnim = true;
-        ::new (&psoundHand) BSSoundHandle;
         v2 = &BSAudio::QInstance();
         psoundHand = v2->GetSoundHandleByName("OBJBookSpecialPageTurn", 289u);
         psoundHand.Play(false);

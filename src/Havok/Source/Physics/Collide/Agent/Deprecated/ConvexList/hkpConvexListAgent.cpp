@@ -210,11 +210,8 @@ void hkpConvexListAgent::processCollision(
         }
         HK_TIMER_SPLIT_LIST("Gsk");
         {
+            hkpMapPointsToSubShapeContactMgr mgr;
             // EXE-INLINED none: hkpMapPointsToSubShapeContactMgr::hkpMapPointsToSubShapeContactMgr
-            XFNV_INLINED_LOCAL(
-                hkpMapPointsToSubShapeContactMgr, mgr, hkpMapPointsToSubShapeContactMgr_vftable, std::nullopt
-            );
-            mgr.m_referenceCount = 1;
             mgr.m_contactMgr = m_contactMgr;
             mgr.m_type = hkpContactMgr::TYPE_CONVEX_LIST_CONTACT_MGR;
             mgr.m_invalidPointHit.m_bool = false;
@@ -491,11 +488,7 @@ void hkpConvexListAgent::staticGetPenetrations(
     hkpCdBodyPairCollector& collector
 ) {
     HK_TIMER_BEGIN_LIST("CvxList", "checkHull");
-    // EXE-INLINED none: hkpFlagCdBodyPairCollector::hkpFlagCdBodyPairCollector
-    XFNV_INLINED_LOCAL(
-        hkpFlagCdBodyPairCollector, checker, hkpFlagCdBodyPairCollector_vftable_ConvexList, std::nullopt
-    );
-    checker.m_earlyOut.m_bool = false;
+    hkpFlagCdBodyPairCollector checker;
     hkpGskBaseAgent::staticGetPenetrations(bodyA, bodyB, input, checker);
     // EXE-INLINED none: hkpFlagCdBodyPairCollector::hasHit
     if (checker.m_earlyOut.m_bool) {

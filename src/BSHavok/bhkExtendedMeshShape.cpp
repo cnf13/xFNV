@@ -572,116 +572,116 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
     pdata->pSubDataA = pParts;
     pdata->uiNumSubParts = pSrcData->usPartCount;
 
-    // The array starts with no slots and a grow-by of one.
-    XFNV_INLINED_LOCAL(NiTPrimitiveArray<uint16_t>, kIndices, std::nullopt, std::nullopt);
-    ::new (&kIndices) NiTPrimitiveArray<uint16_t>(0u, 1u);
-
-    bhkExtendedMeshSubPart* currPart = pParts;
-    for (uint32_t ui = 0; static_cast<int32_t>(ui) < static_cast<int32_t>(pSrcData->usPartCount); ++ui, ++currPart) {
-        const SubPartData& rSrcPart = pSrcData->paSubPartData[ui];
-        uint32_t uiNumTris = 0;
-        while (static_cast<uint16_t>(uiTri) < static_cast<uint16_t>(pSrcData->uiKeyCount)) {
-            const TriangleData& rTri = pSrcData->paTriData[static_cast<uint16_t>(uiTri)];
-            if (rTri.us1 >= static_cast<uint16_t>(uiVertOffset) + rSrcPart.uiNumVerts) {
-                break;
-            }
-            const uint16_t ausIndex[3] = {
-                static_cast<uint16_t>(rTri.us1 - uiVertOffset),
-                static_cast<uint16_t>(rTri.us2 - uiVertOffset),
-                static_cast<uint16_t>(rTri.us3 - uiVertOffset),
-            };
-            for (uint16_t usIndex : ausIndex) {
-                // EXE-INLINED none: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::Add
-                uint32_t uiAt = kIndices.m_usSize;
-                if (uiAt >= kIndices.m_usMaxSize) {
-                    kIndices.SetSize(uiAt + kIndices.m_usGrowBy);
-                }
-                // EXE-INLINED 0xA5B870: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::SetAt
-                if (uiAt >= kIndices.m_usSize) {
-                    kIndices.m_usSize = static_cast<uint16_t>(uiAt + 1);
-                    if (usIndex) {
-                        ++kIndices.m_usESize;
-                    }
-                }
-                else if (usIndex) {
-                    if (!kIndices.m_pBase[uiAt]) {
-                        ++kIndices.m_usESize;
-                    }
-                }
-                else if (kIndices.m_pBase[uiAt]) {
-                    --kIndices.m_usESize;
-                }
-                kIndices.m_pBase[uiAt] = usIndex;
-            }
-            ++uiTri;
-            ++uiNumTris;
-        }
-
-        uint32_t uiNumVerts = 0;
-        if (uiNumTris > 0) {
-            uiNumVerts = static_cast<uint16_t>(rSrcPart.uiNumVerts);
-            // One vertex more than the sub part has, three floats each; the byte count saturates as above.
-            uint32_t uiNumFloats = 3 * uiNumVerts + 3;
-            float* pVerts = static_cast<float*>(MemoryManager_Singleton.Allocate(
-                uiNumFloats > SIZE_MAX / sizeof(float) ? SIZE_MAX : uiNumFloats * sizeof(float)
-            ));
-            int32_t iFirstVert = static_cast<uint16_t>(uiVertOffset);
-            for (uint32_t uiVert = static_cast<uint32_t>(iFirstVert);
-                 static_cast<uint16_t>(uiVert) < iFirstVert + static_cast<int32_t>(uiNumVerts); ++uiVert) {
-                uint16_t usVert = static_cast<uint16_t>(uiVert);
-                float* pDest = pVerts + 3 * (usVert - iFirstVert);
-                float fComponent = pSrcData->paVertData[usVert].x;
-                pDest[0] = fComponent;
-                fComponent = pSrcData->paVertData[usVert].y;
-                pDest[1] = fComponent;
-                fComponent = pSrcData->paVertData[usVert].z;
-                pDest[2] = fComponent;
-            }
-            uint32_t uiNumIndices = kIndices.m_usSize;
-            uint16_t* pIndices = static_cast<uint16_t*>(MemoryManager_Singleton.Allocate(
-                uiNumIndices > SIZE_MAX / sizeof(uint16_t) ? SIZE_MAX : uiNumIndices * sizeof(uint16_t)
-            ));
-            rt::memcpy(pIndices, kIndices.m_pBase, uiNumIndices * sizeof(uint16_t));
-            // EXE-INLINED 0xC74EA0: MemoryManager::AlignedAllocate16
-            // The block is raw memory the exe aligns and then writes as the material.
-            uint8_t* pMemory =
-                static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(sizeof(hkpExtendedMaterial) + 0x10));
-            uint8_t ucPadding = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pMemory) & 0xF));
-            pMemory[ucPadding - 1] = ucPadding;
-            hkpExtendedMaterial* pMat = reinterpret_cast<hkpExtendedMaterial*>(pMemory + ucPadding);
-            const SubPartData& rMatPart = pSrcData->paSubPartData[ui];
-            pMat->m_filterInfo = rMatPart.uiFilter;
-            pMat->uiMaterialCRC = static_cast<uint32_t>(rMatPart.uiMaterial);
-            currPart->pMat = pMat;
-            currPart->uiNumVerts = uiNumVerts;
-            currPart->pVertexBaseA = pVerts;
-            currPart->pIndexBaseA = pIndices;
-            currPart->uiNumTris = uiNumTris;
-        }
-        else {
-            --pdata->uiNumSubParts;
-        }
-
-        // EXE-INLINED none: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::RemoveAll
-        for (uint32_t i = 0; i < kIndices.m_usSize; ++i) {
-            kIndices.m_pBase[i] = 0;
-        }
-        uiVertOffset += uiNumVerts;
-        kIndices.m_usSize = 0;
-        kIndices.m_usESize = 0;
-    }
-
     {
-        // cinfo is typed storage for which C++ runs neither the constructor nor the destructor.
-        hkExtendedMeshShapeCinfo cinfo(pdata);
-        float fRadius = arInfo.fRadius;
-        cinfo.fRadius = fRadius;
-        cinfo.vScale.m_quad = arInfo.vScale.m_quad;
-        // Slot 44 (+0xB0), through the vtable.
-        Init(static_cast<const hkSerializableCinfo&>(cinfo));
+        // The array starts with no slots and a grow-by of one.
+        NiTPrimitiveArray<uint16_t> kIndices(0u, 1u);
+
+        bhkExtendedMeshSubPart* currPart = pParts;
+        for (uint32_t ui = 0; static_cast<int32_t>(ui) < static_cast<int32_t>(pSrcData->usPartCount);
+             ++ui, ++currPart) {
+            const SubPartData& rSrcPart = pSrcData->paSubPartData[ui];
+            uint32_t uiNumTris = 0;
+            while (static_cast<uint16_t>(uiTri) < static_cast<uint16_t>(pSrcData->uiKeyCount)) {
+                const TriangleData& rTri = pSrcData->paTriData[static_cast<uint16_t>(uiTri)];
+                if (rTri.us1 >= static_cast<uint16_t>(uiVertOffset) + rSrcPart.uiNumVerts) {
+                    break;
+                }
+                const uint16_t ausIndex[3] = {
+                    static_cast<uint16_t>(rTri.us1 - uiVertOffset),
+                    static_cast<uint16_t>(rTri.us2 - uiVertOffset),
+                    static_cast<uint16_t>(rTri.us3 - uiVertOffset),
+                };
+                for (uint16_t usIndex : ausIndex) {
+                    // EXE-INLINED none: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::Add
+                    uint32_t uiAt = kIndices.m_usSize;
+                    if (uiAt >= kIndices.m_usMaxSize) {
+                        kIndices.SetSize(uiAt + kIndices.m_usGrowBy);
+                    }
+                    // EXE-INLINED 0xA5B870: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::SetAt
+                    if (uiAt >= kIndices.m_usSize) {
+                        kIndices.m_usSize = static_cast<uint16_t>(uiAt + 1);
+                        if (usIndex) {
+                            ++kIndices.m_usESize;
+                        }
+                    }
+                    else if (usIndex) {
+                        if (!kIndices.m_pBase[uiAt]) {
+                            ++kIndices.m_usESize;
+                        }
+                    }
+                    else if (kIndices.m_pBase[uiAt]) {
+                        --kIndices.m_usESize;
+                    }
+                    kIndices.m_pBase[uiAt] = usIndex;
+                }
+                ++uiTri;
+                ++uiNumTris;
+            }
+
+            uint32_t uiNumVerts = 0;
+            if (uiNumTris > 0) {
+                uiNumVerts = static_cast<uint16_t>(rSrcPart.uiNumVerts);
+                // One vertex more than the sub part has, three floats each; the byte count saturates as above.
+                uint32_t uiNumFloats = 3 * uiNumVerts + 3;
+                float* pVerts = static_cast<float*>(MemoryManager_Singleton.Allocate(
+                    uiNumFloats > SIZE_MAX / sizeof(float) ? SIZE_MAX : uiNumFloats * sizeof(float)
+                ));
+                int32_t iFirstVert = static_cast<uint16_t>(uiVertOffset);
+                for (uint32_t uiVert = static_cast<uint32_t>(iFirstVert);
+                     static_cast<uint16_t>(uiVert) < iFirstVert + static_cast<int32_t>(uiNumVerts); ++uiVert) {
+                    uint16_t usVert = static_cast<uint16_t>(uiVert);
+                    float* pDest = pVerts + 3 * (usVert - iFirstVert);
+                    float fComponent = pSrcData->paVertData[usVert].x;
+                    pDest[0] = fComponent;
+                    fComponent = pSrcData->paVertData[usVert].y;
+                    pDest[1] = fComponent;
+                    fComponent = pSrcData->paVertData[usVert].z;
+                    pDest[2] = fComponent;
+                }
+                uint32_t uiNumIndices = kIndices.m_usSize;
+                uint16_t* pIndices = static_cast<uint16_t*>(MemoryManager_Singleton.Allocate(
+                    uiNumIndices > SIZE_MAX / sizeof(uint16_t) ? SIZE_MAX : uiNumIndices * sizeof(uint16_t)
+                ));
+                rt::memcpy(pIndices, kIndices.m_pBase, uiNumIndices * sizeof(uint16_t));
+                // EXE-INLINED 0xC74EA0: MemoryManager::AlignedAllocate16
+                // The block is raw memory the exe aligns and then writes as the material.
+                uint8_t* pMemory =
+                    static_cast<uint8_t*>(MemoryManager_Singleton.Allocate(sizeof(hkpExtendedMaterial) + 0x10));
+                uint8_t ucPadding = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pMemory) & 0xF));
+                pMemory[ucPadding - 1] = ucPadding;
+                hkpExtendedMaterial* pMat = reinterpret_cast<hkpExtendedMaterial*>(pMemory + ucPadding);
+                const SubPartData& rMatPart = pSrcData->paSubPartData[ui];
+                pMat->m_filterInfo = rMatPart.uiFilter;
+                pMat->uiMaterialCRC = static_cast<uint32_t>(rMatPart.uiMaterial);
+                currPart->pMat = pMat;
+                currPart->uiNumVerts = uiNumVerts;
+                currPart->pVertexBaseA = pVerts;
+                currPart->pIndexBaseA = pIndices;
+                currPart->uiNumTris = uiNumTris;
+            }
+            else {
+                --pdata->uiNumSubParts;
+            }
+
+            // EXE-INLINED none: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::RemoveAll
+            for (uint32_t i = 0; i < kIndices.m_usSize; ++i) {
+                kIndices.m_pBase[i] = 0;
+            }
+            uiVertOffset += uiNumVerts;
+            kIndices.m_usSize = 0;
+            kIndices.m_usESize = 0;
+        }
+
+        {
+            // cinfo is typed storage for which C++ runs neither the constructor nor the destructor.
+            hkExtendedMeshShapeCinfo cinfo(pdata);
+            float fRadius = arInfo.fRadius;
+            cinfo.fRadius = fRadius;
+            cinfo.vScale.m_quad = arInfo.vScale.m_quad;
+            // Slot 44 (+0xB0), through the vtable.
+            Init(static_cast<const hkSerializableCinfo&>(cinfo));
+        }
     }
-    // The destructor, which frees the buffer, runs before the memory context is restored.
-    kIndices.~NiTPrimitiveArray();
     pTLSData->eMemContext = eSavedMemContext;
 }
 

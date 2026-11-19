@@ -125,8 +125,7 @@ const hkVariant* hkClassEnum::getAttribute(const char* id) const {
 }
 
 uint32_t hkClassEnum::getSignature() {
-    XFNV_INLINED_LOCAL(hkCrc32StreamWriter, a1, std::nullopt, std::nullopt);
-    ::new (&a1) hkCrc32StreamWriter(0);
+    hkCrc32StreamWriter a1(0);
     writeSignature(&a1);
     return a1.getCrc32();
 }

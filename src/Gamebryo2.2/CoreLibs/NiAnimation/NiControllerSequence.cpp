@@ -907,17 +907,8 @@ void NiControllerSequence::PostLinkObject(NiStream& kStream) {
             m_fBeginKeyTime = 0.0f;
         }
 
-        XFNV_INLINED_LOCAL(NiTPrimitiveArray<char*>, kNames, std::nullopt, std::nullopt);
-        kNames.m_usSize = 0;
-        if (static_cast<uint16_t>(uiArraySize)) {
-            // EXE-INLINED 0x96AFC0
-            kNames.m_pBase = static_cast<char**>(_NiMalloc(sizeof(char*) * static_cast<uint16_t>(uiArraySize)));
-        }
-        else {
-            kNames.m_pBase = nullptr;
-        }
-        XFNV_INLINED_LOCAL(NiTObjectArray<NiPointer<NiInterpController>>, kCtlrs, std::nullopt, std::nullopt);
-        ::new (&kCtlrs) NiTObjectArray<NiPointer<NiInterpController>>(static_cast<uint16_t>(m_uiArraySize), 1u);
+        NiTPrimitiveArray<char*> kNames(static_cast<uint16_t>(uiArraySize), 1u);
+        NiTObjectArray<NiPointer<NiInterpController>> kCtlrs(static_cast<uint16_t>(m_uiArraySize), 1u);
 
         for (uint32_t ui = 0; ui < m_uiArraySize; ui++) {
             const char* pcStoredName = m_pkIDTagArray[ui].m_kAVObjectName.GetHandle();
@@ -958,8 +949,6 @@ void NiControllerSequence::PostLinkObject(NiStream& kStream) {
         for (uint32_t ui = 0; ui < uiNames; ui++) {
             _NiFree(kNames.m_pBase[ui]);
         }
-        kCtlrs.~NiTObjectArray();
-        kNames.~NiTPrimitiveArray();
     }
 }
 
@@ -1520,8 +1509,7 @@ bool NiControllerSequence::ConvertOldNameControllerPair(const char* pcObjectName
         return true;
     }
     do {
-        XFNV_INLINED_LOCAL(IDTag, kIDTag, std::nullopt, std::nullopt);
-        ::new (&kIDTag) IDTag(EmptyFS, EmptyFS, EmptyFS, EmptyFS, EmptyFS);
+        IDTag kIDTag;
 
         // EXE-INLINED none: IDTag::SetAVObjectName
         const char* pcNew = NiGlobalStringTable::AddString(acObjectName);
@@ -1631,27 +1619,6 @@ bool NiControllerSequence::ConvertOldNameControllerPair(const char* pcObjectName
             }
         }
 
-        // EXE-INLINED none: ~IDTag (the five names released, last to first)
-        const char* pcName = kIDTag.m_kInterpolatorID.GetHandle();
-        if (pcName != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pcName) - 8));
-        }
-        pcName = kIDTag.m_kCtlrID.GetHandle();
-        if (pcName != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pcName) - 8));
-        }
-        pcName = kIDTag.m_kCtlrType.GetHandle();
-        if (pcName != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pcName) - 8));
-        }
-        pcName = kIDTag.m_kPropertyType.GetHandle();
-        if (pcName != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pcName) - 8));
-        }
-        pcName = kIDTag.m_kAVObjectName.GetHandle();
-        if (pcName != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pcName) - 8));
-        }
         if (!bAdded) {
             return false;
         }

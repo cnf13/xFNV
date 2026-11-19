@@ -95,15 +95,9 @@ hkpMoppCode* hkpMoppUtility::buildCodeInternal(
     int32_t iBufferSize = kCompiler.calculateRequiredBufferSize(&mediator);
     char* pBuffer = static_cast<char*>(hkMemoryRouter::getInstance().temp().blockAlloc(iBufferSize));
 
+    hkpMoppCompilerChunkInfo kChunkInfo;
     // EXE-INLINED none: hkpMoppCompilerChunkInfo::hkpMoppCompilerChunkInfo
-    XFNV_INLINED_LOCAL(hkpMoppCompilerChunkInfo, kChunkInfo, std::nullopt, std::nullopt);
     kChunkInfo.m_maxChunkSize = 0x200;
-    kChunkInfo.m_reindexInfo.m_data = nullptr;
-    kChunkInfo.m_reindexInfo.m_size = 0;
-    kChunkInfo.m_reindexInfo.m_capacityAndFlags = 0x80000000;
-    kChunkInfo.m_chunks.m_data = nullptr;
-    kChunkInfo.m_chunks.m_size = 0;
-    kChunkInfo.m_chunks.m_capacityAndFlags = 0x80000000;
     kChunkInfo.m_compressor = nullptr;
     kChunkInfo.m_safetySize = 0x14;
     if (moppInput.m_enableChunkSubdivision) {
@@ -124,6 +118,5 @@ hkpMoppCode* hkpMoppUtility::buildCodeInternal(
         );
     }
     hkMemoryRouter::getInstance().temp().blockFree(pBuffer, iBufferSize);
-    kChunkInfo.~hkpMoppCompilerChunkInfo();
     return pCode;
 }

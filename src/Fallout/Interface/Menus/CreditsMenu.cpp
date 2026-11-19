@@ -201,10 +201,6 @@ bool CreditsMenu::IsWellFormedMenu() {
 void CreditsMenu::InitCreditsRoot() {
     NiPoint3 dst;
     int32_t iwidth;
-    XFNV_INLINED_LOCAL(BSFile, LangSpecificFile_3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSStringT<char>, string, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSFile, DefaultCreditsFile, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(BSFile, LangSpecificFile_2, std::nullopt, std::nullopt);
     BSFile* pFileToUse_2;
     char Dst[260];
     Controls* Controls_ = appMain->GetControls();
@@ -233,12 +229,9 @@ void CreditsMenu::InitCreditsRoot() {
         BSstrcat(Dst, 260, "CREDITS.TXT");
     }
     BSFile LangSpecificFile(Dst, NiFile::READ_ONLY, 0x4000u, false);
-    if (bUseWackyCredits) {
-        ::new (&DefaultCreditsFile) BSFile("DATA\\CREDITSWACKY.TXT", NiFile::READ_ONLY, 0x4000u, false);
-    }
-    else {
-        ::new (&DefaultCreditsFile) BSFile("DATA\\CREDITS.TXT", NiFile::READ_ONLY, 0x4000u, false);
-    }
+    BSFile DefaultCreditsFile(
+        bUseWackyCredits ? "DATA\\CREDITSWACKY.TXT" : "DATA\\CREDITS.TXT", NiFile::READ_ONLY, 0x4000u, false
+    );
     BSstrcpy(Dst, 260, "DATA\\");
     const char* v3 = GetLanguageString(elang);
     BSstrcat(Dst, 260, v3);
@@ -249,13 +242,10 @@ void CreditsMenu::InitCreditsRoot() {
     else {
         BSstrcat(Dst, 260, "CREDITSPATCH.TXT");
     }
-    ::new (&LangSpecificFile_2) BSFile(Dst, NiFile::READ_ONLY, 0x4000u, false);
-    if (bUseWackyCredits) {
-        ::new (&LangSpecificFile_3) BSFile("DATA\\CREDITSWACKYPATCH.TXT", NiFile::READ_ONLY, 0x4000u, false);
-    }
-    else {
-        ::new (&LangSpecificFile_3) BSFile("DATA\\CREDITSPATCH.TXT", NiFile::READ_ONLY, 0x4000u, false);
-    }
+    BSFile LangSpecificFile_2(Dst, NiFile::READ_ONLY, 0x4000u, false);
+    BSFile LangSpecificFile_3(
+        bUseWackyCredits ? "DATA\\CREDITSWACKYPATCH.TXT" : "DATA\\CREDITSPATCH.TXT", NiFile::READ_ONLY, 0x4000u, false
+    );
     if (LangSpecificFile.BSFile::Exist()) {
         BSFile* pFileToUse;
         if (LangSpecificFile_2.BSFile::Exist()) {
@@ -309,7 +299,7 @@ void CreditsMenu::InitCreditsRoot() {
             palpha_2->SetAlphaBlending(true);
             spScrollRoot.m_pObject->AttachProperty(palpha_2);
             Font* pfont = FontManager::Instance()->GetFont(static_cast<int32_t>(eFont));
-            ::new (&string) BSStringT<char>;
+            BSStringT<char> string;
             while (iFileOffset < iFileSize) {
                 if (pFileData[iFileOffset] == 13) {
                     iY -= static_cast<int32_t>(pfont->fFontHeight);
@@ -436,23 +426,11 @@ void CreditsMenu::InitCreditsRoot() {
             spScrollRoot.m_pObject->Update(UpdateData);
             NiDX9Renderer* v6 = Renderer::GetNIRenderer();
             v6->UnlockRenderer();
-            string.~BSStringT<char>();
-            LangSpecificFile_3.~BSFile();
-            LangSpecificFile_2.~BSFile();
-            DefaultCreditsFile.~BSFile();
         }
         else {
             ourFree(pFileData);
             pFileData = nullptr;
-            LangSpecificFile_3.~BSFile();
-            LangSpecificFile_2.~BSFile();
-            DefaultCreditsFile.~BSFile();
         }
-    }
-    else {
-        LangSpecificFile_3.~BSFile();
-        LangSpecificFile_2.~BSFile();
-        DefaultCreditsFile.~BSFile();
     }
 }
 

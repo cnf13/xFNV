@@ -37,12 +37,7 @@ hkDisplayCone::hkDisplayCone(
     m_startPos(startPos), m_coneAxis(coneAxis) {}
 
 void hkDisplayCone::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) {
-    using VertexArray = hkInplaceArray<hkVector4, 256, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(VertexArray, vertices, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkInplaceArray<hkVector4, 256>::hkInplaceArray
-    vertices.m_data = vertices.m_storage;
-    vertices.m_size = 0;
-    vertices.m_capacityAndFlags = 256 | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkVector4, 256, hkContainerHeapAllocator> vertices;
     generateConeVertices(vertices);
     int32_t m_size = 4 * this->m_numSegments;
     int32_t m_size_1 = lines.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
@@ -60,12 +55,6 @@ void hkDisplayCone::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemory
         lines.m_data[4 * i + 1] = vertices.m_data[i];
         lines.m_data[4 * i + 2] = vertices.m_data[i];
         lines.m_data[4 * i + 3] = vertices.m_data[(i + 1) % this->m_numSegments];
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-    vertices.m_size = 0;
-    if ((vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-        m_heap->bufFree(vertices.m_data, vertices.getCapacity() * static_cast<int32_t>(sizeof(hkVector4)));
     }
 }
 

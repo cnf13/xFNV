@@ -117,10 +117,7 @@ void WeaponObject::UpdateChildRB3D() {
     if (pkNextCollisionObject) {
         pkWorldObject = pkNextCollisionObject->spWorldObject;
     }
-    XFNV_INLINED_LOCAL(hkArray<hkpRigidBody*>, kBodyA, std::nullopt, std::nullopt);
-    kBodyA.m_data = nullptr;
-    kBodyA.m_size = 0;
-    kBodyA.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpRigidBody*> kBodyA;
     bhkUtilFunctions::GatherRigidBodies(pkSceneObject, kBodyA);
     for (int32_t i = 0; i < kBodyA.getSize(); ++i) {
         if (!pkWorldObject) {
@@ -142,15 +139,6 @@ void WeaponObject::UpdateChildRB3D() {
         NiAVObject* pkBodySceneObject = pkBodyObject->m_pkSceneObject;
         pkBodySceneObject->m_uFlags =
             static_cast<NiAVObject::NiFlags>(pkBodySceneObject->m_uFlags | NiAVObject::APP_CULLED);
-    }
-    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-    kBodyA.m_size = 0;
-    if (kBodyA.getCapacityAndFlags() >= 0) {
-        rHeap.bufFree(
-            kBodyA.m_data,
-            sizeof(hkpRigidBody*) *
-                static_cast<int32_t>(kBodyA.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)
-        );
     }
 }
 

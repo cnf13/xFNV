@@ -1042,8 +1042,7 @@ bool BoundInFrustum(const NiBound& aBound, NiCamera* apCamera) {
         pLastCamera = apCamera;
     }
     for (uint32_t uiplane = 0; uiplane < 6; ++uiplane) {
-        XFNV_INLINED_LOCAL(NiPlane, plane, std::nullopt, std::nullopt);
-        plane = cullPlanes.GetPlane(uiplane);
+        NiPlane plane = cullPlanes.GetPlane(uiplane);
         if (aBound.WhichSide(plane) == 2) {
             return false;
         }

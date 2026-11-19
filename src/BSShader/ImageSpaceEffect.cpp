@@ -62,20 +62,18 @@ bool ImageSpaceEffect::UpdateParams(ImageSpaceEffectParam* pParam) {
     return false;
 }
 
-// Each array's SetAt gets the address of the parameter slot, with no reference counting: the pointees are not
-// NiRefObjects.
+// Each array's SetAt stores the pointer with no reference counting: the pointees are not NiRefObjects.
 void ImageSpaceEffect::SetEffect(
     int32_t aiEffectIndex,
     ImageSpaceEffect* apEffect,
     ImageSpaceEffectParam* apParam,
     int32_t aiOutput
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceEffect>, spEffect, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
-    spEffect.m_pObject = apEffect;
-    pEffectList.SetAt(static_cast<uint32_t>(aiEffectIndex), spEffect);
-    spParam.m_pObject = static_cast<ImageSpaceShaderParam*>(apParam);
-    pEffectParamList.SetAt(static_cast<uint32_t>(aiEffectIndex), spParam);
+    pEffectList.SetAt(static_cast<uint32_t>(aiEffectIndex), NiPointer<ImageSpaceEffect>(apEffect));
+    pEffectParamList.SetAt(
+        static_cast<uint32_t>(aiEffectIndex),
+        NiPointer<ImageSpaceShaderParam>(static_cast<ImageSpaceShaderParam*>(apParam))
+    );
     ImageSpaceEffect_OutputArray_SetAt(&pEffectOutput, static_cast<uint32_t>(aiEffectIndex), aiOutput);
 }
 

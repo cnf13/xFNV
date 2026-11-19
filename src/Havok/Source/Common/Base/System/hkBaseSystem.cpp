@@ -111,10 +111,7 @@ hkResult hkBaseSystem::quitThread() {
 // back in after the last linked node.
 void hkBaseSystem::initSingletons() {
     using failed_t = hkArray<hkSingletonInitNode*, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(failed_t, failed, std::nullopt, std::nullopt);
-    failed.m_data = nullptr;
-    failed.m_size = 0;
-    failed.m_capacityAndFlags = hkArrayBase<hkSingletonInitNode*>::DONT_DEALLOCATE_FLAG;
+    failed_t failed;
     hkSingletonInitNode** prevNext = &hkSingletonInitList;
     hkSingletonInitNode* node = hkSingletonInitList;
     while (node) {
@@ -155,24 +152,12 @@ void hkBaseSystem::initSingletons() {
             }
         }
     }
-    hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
-    const int32_t capacityAndFlags = failed.m_capacityAndFlags;
-    failed.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        temp.bufFree(
-            failed.m_data,
-            (capacityAndFlags & hkArrayBase<hkSingletonInitNode*>::CAPACITY_MASK) * sizeof(hkSingletonInitNode*)
-        );
-    }
 }
 
 // Collects the list into an inplace array of 128 (heap allocator), then releases the instances from its end.
 void hkBaseSystem::quitSingletons() {
     using nodes_t = hkInplaceArray<hkSingletonInitNode*, 128>;
-    XFNV_INLINED_LOCAL(nodes_t, nodes, std::nullopt, std::nullopt);
-    nodes.m_data = nodes.m_storage;
-    nodes.m_size = 0;
-    nodes.m_capacityAndFlags = 128 | hkArrayBase<hkSingletonInitNode*>::DONT_DEALLOCATE_FLAG;
+    nodes_t nodes;
     for (hkSingletonInitNode* node = hkSingletonInitList; node; node = node->m_next) {
         // EXE-INLINED none: hkArray<hkSingletonInitNode*>::pushBack
         hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -188,15 +173,6 @@ void hkBaseSystem::quitSingletons() {
             pObject->removeReferenceLockUnchecked();
             *nodes.m_data[i]->m_value = nullptr;
         }
-    }
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = nodes.m_capacityAndFlags;
-    nodes.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            nodes.m_data,
-            (capacityAndFlags & hkArrayBase<hkSingletonInitNode*>::CAPACITY_MASK) * sizeof(hkSingletonInitNode*)
-        );
     }
 }
 
@@ -229,8 +205,7 @@ hkBool hkBaseSystem::isInitialized() {
 }
 
 hkStreamWriter* hkNativeFileSystem::openWriter(const char* name) {
-    XFNV_INLINED_LOCAL(hkStringBuf, apMemory, std::nullopt, std::nullopt);
-    ::new (&apMemory) hkStringBuf;
+    hkStringBuf apMemory;
     hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
     hkStdioStreamWriter* v3 =
         static_cast<hkStdioStreamWriter*>(Instance->m_heap->blockAlloc(sizeof(hkStdioStreamWriter)));
@@ -243,12 +218,5 @@ hkStreamWriter* hkNativeFileSystem::openWriter(const char* name) {
     v7->m_memSizeAndFlags = sizeof(hkBufferedStreamWriter);
     hkBufferedStreamWriter* hkBufferedStreamWriter_ = ::new (v7) hkBufferedStreamWriter(hkStdioStreamWriter_, 0x1000);
     hkStdioStreamWriter_->removeReference();
-    hkMemoryAllocator* m_temp = (&hkMemoryRouter::getInstance())->m_temp;
-    apMemory.m_string.m_size = 0;
-    if (apMemory.m_string.m_capacityAndFlags >= 0) {
-        m_temp->bufFree(
-            apMemory.m_string.begin(), apMemory.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK
-        );
-    }
     return hkBufferedStreamWriter_;
 }

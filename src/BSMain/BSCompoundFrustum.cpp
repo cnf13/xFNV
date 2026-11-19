@@ -306,8 +306,7 @@ void BSCompoundFrustum::AddOcclusionPlane(BSOcclusionPlane* apPlane) {
         potherplane->GetFrustumPlanes(kViewPosition, ktempplanes);
         potherplane->GetVertices(kVertices);
         // The other plane is built in a temporary and copied over koccplane.
-        XFNV_INLINED_LOCAL(NiPlane, kotherplane, std::nullopt, std::nullopt);
-        koccplane = *::new (&kotherplane) NiPlane(&kVertices[0], &kVertices[1], &kVertices[2]);
+        koccplane = NiPlane(&kVertices[0], &kVertices[1], &kVertices[2]);
         bsameside = iside == koccplane.WhichSide(kViewPosition);
     }
     // This one-plane add covers two cases: a culled or opposite-side neighbour, and an unlinked plane on the same side.

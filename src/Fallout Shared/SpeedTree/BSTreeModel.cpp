@@ -762,246 +762,248 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
     uint16_t slevels;
     CSpeedTreeRT::SGeometry geom;
     uint16_t smaps;
-    XFNV_INLINED_LOCAL(NiPointer<STSPData>, spshaderData, std::nullopt, std::nullopt);
     geom.Init_00B029F0();
     textures.~STextures();
     ::new (&textures) CSpeedTreeRT::STextures;
     const NiPoint3* pcoords = nullptr;
     const NiPoint3* pnormals = nullptr;
-    ::new (&spshaderData) NiPointer<STSPData>(static_cast<STSPData*>(nullptr));
-    bool bflip = false;
-    if (!pSpeedTree) {
-        goto LABEL_15;
-    }
-    if (!pSpeedTree->GetLeafLodSizeAdjustments()) {
-        goto LABEL_15;
-    }
-    if (IsInstance()) {
-        goto LABEL_15;
-    }
-    if (this->pspLeafData) {
-        NiPointer<NiTriShapeData>* pspOldLeafData = this->pspLeafData;
-        if (pspOldLeafData) {
-            delete[] pspOldLeafData;
+    {
+        NiPointer<STSPData> spshaderData;
+        bool bflip = false;
+        if (!pSpeedTree) {
+            goto LABEL_15;
         }
-        this->pspLeafData = nullptr;
-    }
-    if (this->pspLeafShaderProperties) {
-        NiPointer<SpeedTreeLeafShaderProperty>* pspOldProperties = this->pspLeafShaderProperties;
-        if (pspOldProperties) {
-            delete[] pspOldProperties;
+        if (!pSpeedTree->GetLeafLodSizeAdjustments()) {
+            goto LABEL_15;
         }
-        this->pspLeafShaderProperties = nullptr;
-    }
-    slevels = GetNumLeafLODLevels();
-    if (slevels && (pSpeedTree->GetTextures(textures), (smaps = textures.m_uiLeafTextureCount) != 0)) {
-        STLSPData* STLSPData_;
-        uint16_t slevel;
-        for (uint16_t smap = 0; smap < static_cast<int32_t>(smaps); ++smap) {
-            for (uint16_t smap2 = smap + 1; smap2 < static_cast<int32_t>(smaps); ++smap2) {
-                if (BSstrcmp(textures.m_pLeafTextureFilenames[smap], textures.m_pLeafTextureFilenames[smap2])) {
-                    bflip = true;
+        if (IsInstance()) {
+            goto LABEL_15;
+        }
+        if (this->pspLeafData) {
+            NiPointer<NiTriShapeData>* pspOldLeafData = this->pspLeafData;
+            if (pspOldLeafData) {
+                delete[] pspOldLeafData;
+            }
+            this->pspLeafData = nullptr;
+        }
+        if (this->pspLeafShaderProperties) {
+            NiPointer<SpeedTreeLeafShaderProperty>* pspOldProperties = this->pspLeafShaderProperties;
+            if (pspOldProperties) {
+                delete[] pspOldProperties;
+            }
+            this->pspLeafShaderProperties = nullptr;
+        }
+        slevels = GetNumLeafLODLevels();
+        if (slevels && (pSpeedTree->GetTextures(textures), (smaps = textures.m_uiLeafTextureCount) != 0)) {
+            STLSPData* STLSPData_;
+            uint16_t slevel;
+            for (uint16_t smap = 0; smap < static_cast<int32_t>(smaps); ++smap) {
+                for (uint16_t smap2 = smap + 1; smap2 < static_cast<int32_t>(smaps); ++smap2) {
+                    if (BSstrcmp(textures.m_pLeafTextureFilenames[smap], textures.m_pLeafTextureFilenames[smap2])) {
+                        bflip = true;
+                    }
                 }
             }
-        }
-        this->pspLeafData = new NiPointer<NiTriShapeData>[slevels];
-        this->pspLeafShaderProperties = new NiPointer<SpeedTreeLeafShaderProperty>[slevels];
-        for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-            this->pspLeafData[slevel].operator=(static_cast<NiTriShapeData*>(nullptr));
-            this->pspLeafShaderProperties[slevel].operator=(static_cast<SpeedTreeLeafShaderProperty*>(nullptr));
-        }
-        STLSPData* v71 = static_cast<STLSPData*>(NiMemObject::operator new(sizeof(STLSPData)));
-        if (v71) {
-            STLSPData_ = ::new (v71) STLSPData;
-        }
-        else {
-            STLSPData_ = nullptr;
-        }
-        spLeafShaderData.operator=(STLSPData_);
-        spLeafShaderData.m_pObject->SetCurveScalar(fCurveScalar);
-        if ((pSpeedTree) && (pSpeedTree->m_pWindEngine)) {
-            spLeafShaderData.m_pObject->SetRock(pSpeedTree->m_pWindEngine->m_fSpeedWindRockScalar);
-            spLeafShaderData.m_pObject->SetRustle(pSpeedTree->m_pWindEngine->m_fSpeedWindRustleScalar);
-            if (apTreeObj) {
-                spLeafShaderData.m_pObject->SetRockSpeed(apTreeObj->GetRockSpeed());
-                spLeafShaderData.m_pObject->SetRustleSpeed(apTreeObj->GetRustleSpeed());
+            this->pspLeafData = new NiPointer<NiTriShapeData>[slevels];
+            this->pspLeafShaderProperties = new NiPointer<SpeedTreeLeafShaderProperty>[slevels];
+            for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                this->pspLeafData[slevel].operator=(static_cast<NiTriShapeData*>(nullptr));
+                this->pspLeafShaderProperties[slevel].operator=(static_cast<SpeedTreeLeafShaderProperty*>(nullptr));
             }
-        }
+            STLSPData* v71 = static_cast<STLSPData*>(NiMemObject::operator new(sizeof(STLSPData)));
+            if (v71) {
+                STLSPData_ = ::new (v71) STLSPData;
+            }
+            else {
+                STLSPData_ = nullptr;
+            }
+            spLeafShaderData.operator=(STLSPData_);
+            spLeafShaderData.m_pObject->SetCurveScalar(fCurveScalar);
+            if ((pSpeedTree) && (pSpeedTree->m_pWindEngine)) {
+                spLeafShaderData.m_pObject->SetRock(pSpeedTree->m_pWindEngine->m_fSpeedWindRockScalar);
+                spLeafShaderData.m_pObject->SetRustle(pSpeedTree->m_pWindEngine->m_fSpeedWindRustleScalar);
+                if (apTreeObj) {
+                    spLeafShaderData.m_pObject->SetRockSpeed(apTreeObj->GetRockSpeed());
+                    spLeafShaderData.m_pObject->SetRustleSpeed(apTreeObj->GetRustleSpeed());
+                }
+            }
 
-        for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
-            pSpeedTree->GetGeometry(geom, 4u, -1, -1, static_cast<int16_t>(slevel));
-            uint16_t sleafs = geom.m_sLeaves0.m_usLeafCount;
-            uint16_t sverts = 4 * geom.m_sLeaves0.m_usLeafCount;
-            if (geom.m_sLeaves0.m_usLeafCount) {
-                SpeedTreeLeafShaderProperty* SpeedTreeLeafShaderProperty_;
-                STSPData* STSPData_;
-                NiTriShapeData* NiTriShapeData_;
-                pcoords = reinterpret_cast<const NiPoint3*>(geom.m_sLeaves0.m_pCenterCoords);
-                pnormals = reinterpret_cast<const NiPoint3*>(geom.m_sLeaves0.m_pNormals);
-                // new NiPoint3[sverts] (twice), new NiPoint2[sverts] and new D3DXVECTOR4[sverts]: the size is all ones
-                // when it overflows 32 bits, as new[] computes it, and each element gets the empty constructor.
-                NiPoint3* pcoordsCopy = static_cast<NiPoint3*>(
-                    ourMalloc(sverts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * sverts : SIZE_MAX)
-                );
-                if (pcoordsCopy) {
-                    rt::eh_vector_constructor_iterator(pcoordsCopy, sizeof(NiPoint3), sverts, &emptyPointConstructor);
-                }
-                NiPoint3* pnormalsCopy = static_cast<NiPoint3*>(
-                    ourMalloc(sverts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * sverts : SIZE_MAX)
-                );
-                if (pnormalsCopy) {
-                    rt::eh_vector_constructor_iterator(pnormalsCopy, sizeof(NiPoint3), sverts, &emptyPointConstructor);
-                }
-                NiPoint2* ptexCopy = static_cast<NiPoint2*>(
-                    ourMalloc(sverts <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * sverts : SIZE_MAX)
-                );
-                if (ptexCopy) {
-                    rt::eh_vector_constructor_iterator(ptexCopy, sizeof(NiPoint2), sverts, &emptyPointConstructor);
-                }
-                D3DXVECTOR4* pwindinfo = static_cast<D3DXVECTOR4*>(
-                    ourMalloc(sverts <= SIZE_MAX / sizeof(D3DXVECTOR4) ? sizeof(D3DXVECTOR4) * sverts : SIZE_MAX)
-                );
-                if (pwindinfo) {
-                    rt::eh_vector_constructor_iterator(pwindinfo, sizeof(D3DXVECTOR4), sverts, &emptyPointConstructor);
-                }
-                uint16_t* ptrilistCopy = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t) * sleafs));
-                uint16_t* ptrilistMove = ptrilistCopy;
-                for (uint16_t sleaf = 0; sleaf < static_cast<int32_t>(sleafs); ++sleaf) {
-                    uint16_t svertStart = 4 * sleaf;
-                    uint16_t striStart = 6 * sleaf;
-                    // The leaf's centre goes into its fourth corner, and is then copied down corner by corner.
-                    const NiPoint3* v4 = &pcoords[sleaf];
-                    NiPoint3* v5 = &pcoordsCopy[svertStart + 3];
-                    v5->x = v4->x;
-                    v5->y = v4->y;
-                    v5->z = v4->z;
-                    NiPoint3* v6 = &pcoordsCopy[svertStart + 3];
-                    NiPoint3* v7 = &pcoordsCopy[svertStart + 2];
-                    v7->x = v6->x;
-                    v7->y = v6->y;
-                    v7->z = v6->z;
-                    NiPoint3* v8 = &pcoordsCopy[svertStart + 2];
-                    NiPoint3* v9 = &pcoordsCopy[svertStart + 1];
-                    v9->x = v8->x;
-                    v9->y = v8->y;
-                    v9->z = v8->z;
-                    NiPoint3* v10 = &pcoordsCopy[svertStart + 1];
-                    NiPoint3* v11 = &pcoordsCopy[svertStart];
-                    v11->x = v10->x;
-                    v11->y = v10->y;
-                    v11->z = v10->z;
-                    const NiPoint3* v12 = &pnormals[sleaf];
-                    NiPoint3* v13 = &pnormalsCopy[svertStart + 3];
-                    v13->x = v12->x;
-                    v13->y = v12->y;
-                    v13->z = v12->z;
-                    NiPoint3* v14 = &pnormalsCopy[svertStart + 3];
-                    NiPoint3* v15 = &pnormalsCopy[svertStart + 2];
-                    v15->x = v14->x;
-                    v15->y = v14->y;
-                    v15->z = v14->z;
-                    NiPoint3* v16 = &pnormalsCopy[svertStart + 2];
-                    NiPoint3* v17 = &pnormalsCopy[svertStart + 1];
-                    v17->x = v16->x;
-                    v17->y = v16->y;
-                    v17->z = v16->z;
-                    NiPoint3* v18 = &pnormalsCopy[svertStart + 1];
-                    NiPoint3* v19 = &pnormalsCopy[svertStart];
-                    v19->x = v18->x;
-                    v19->y = v18->y;
-                    v19->z = v18->z;
-                    float fcolor = static_cast<double>((geom.m_sLeaves0.m_pColors[sleaf] & 0xFF00) >> 8) / 255.0;
-                    if (fcolor >= 1.0) {
-                        fcolor = 0.99f;
-                    }
-                    const float* ptex = geom.m_sLeaves0.m_pLeafMapTexCoords[sleaf];
-                    for (uint16_t svert = 0; svert < 4u; ++svert) {
-                        if (bflip) {
-                            ptexCopy[svert + svertStart] = NiPoint2(ptex[2 * svert], ptex[2 * (3 - svert) + 1]);
-                        }
-                        else {
-                            ptexCopy[svert + svertStart] = NiPoint2(ptex[2 * svert], ptex[2 * svert + 1]);
-                        }
-                        float fcolorclusterindex =
-                            static_cast<float>((svert + 2) % 4 + 4 * geom.m_sLeaves0.m_pLeafClusterIndices[sleaf]);
-                        float fB_1 = fcolorclusterindex + fcolor;
-                        const float* LeafLodSizeAdjustments = pSpeedTree->GetLeafLodSizeAdjustments();
-                        NiColorA kWindInfo(
-                            geom.m_sLeaves0.m_pWindWeights[sleaf],
-                            static_cast<float>(4 * geom.m_sLeaves0.m_pWindMatrixIndices[sleaf]), fB_1,
-                            LeafLodSizeAdjustments[slevel]
-                        );
-                        NiColorA* pkWindInfo = &kWindInfo;
-                        // The NiColorA is reinterpreted as a D3DXVECTOR4, copying the colour's four components into the
-                        // vector.
-                        pwindinfo[svert + svertStart] = std::bit_cast<D3DXVECTOR4>(*pkWindInfo);
-                    }
-                    ptrilistMove[striStart] = svertStart + 3;
-                    ptrilistMove[striStart + 1] = svertStart + 1;
-                    ptrilistMove[striStart + 2] = svertStart + 2;
-                    ptrilistMove[striStart + 3] = svertStart;
-                    ptrilistMove[striStart + 4] = svertStart + 1;
-                    ptrilistMove[striStart + 5] = svertStart + 3;
-                }
-                NiTriShapeData* v55 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-                if (v55) {
-                    NiTriShapeData_ = ::new (v55) NiTriShapeData(
-                        sverts, pcoordsCopy, pnormalsCopy, nullptr, ptexCopy, 1, NiGeometryData::NBT_METHOD_NONE,
-                        2 * sleafs, ptrilistCopy
+            for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
+                pSpeedTree->GetGeometry(geom, 4u, -1, -1, static_cast<int16_t>(slevel));
+                uint16_t sleafs = geom.m_sLeaves0.m_usLeafCount;
+                uint16_t sverts = 4 * geom.m_sLeaves0.m_usLeafCount;
+                if (geom.m_sLeaves0.m_usLeafCount) {
+                    SpeedTreeLeafShaderProperty* SpeedTreeLeafShaderProperty_;
+                    STSPData* STSPData_;
+                    NiTriShapeData* NiTriShapeData_;
+                    pcoords = reinterpret_cast<const NiPoint3*>(geom.m_sLeaves0.m_pCenterCoords);
+                    pnormals = reinterpret_cast<const NiPoint3*>(geom.m_sLeaves0.m_pNormals);
+                    // new NiPoint3[sverts] (twice), new NiPoint2[sverts] and new D3DXVECTOR4[sverts]: the size is all
+                    // ones when it overflows 32 bits, as new[] computes it, and each element gets the empty
+                    // constructor.
+                    NiPoint3* pcoordsCopy = static_cast<NiPoint3*>(
+                        ourMalloc(sverts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * sverts : SIZE_MAX)
                     );
+                    if (pcoordsCopy) {
+                        rt::eh_vector_constructor_iterator(
+                            pcoordsCopy, sizeof(NiPoint3), sverts, &emptyPointConstructor
+                        );
+                    }
+                    NiPoint3* pnormalsCopy = static_cast<NiPoint3*>(
+                        ourMalloc(sverts <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * sverts : SIZE_MAX)
+                    );
+                    if (pnormalsCopy) {
+                        rt::eh_vector_constructor_iterator(
+                            pnormalsCopy, sizeof(NiPoint3), sverts, &emptyPointConstructor
+                        );
+                    }
+                    NiPoint2* ptexCopy = static_cast<NiPoint2*>(
+                        ourMalloc(sverts <= SIZE_MAX / sizeof(NiPoint2) ? sizeof(NiPoint2) * sverts : SIZE_MAX)
+                    );
+                    if (ptexCopy) {
+                        rt::eh_vector_constructor_iterator(ptexCopy, sizeof(NiPoint2), sverts, &emptyPointConstructor);
+                    }
+                    D3DXVECTOR4* pwindinfo = static_cast<D3DXVECTOR4*>(
+                        ourMalloc(sverts <= SIZE_MAX / sizeof(D3DXVECTOR4) ? sizeof(D3DXVECTOR4) * sverts : SIZE_MAX)
+                    );
+                    if (pwindinfo) {
+                        rt::eh_vector_constructor_iterator(
+                            pwindinfo, sizeof(D3DXVECTOR4), sverts, &emptyPointConstructor
+                        );
+                    }
+                    uint16_t* ptrilistCopy = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t) * sleafs));
+                    uint16_t* ptrilistMove = ptrilistCopy;
+                    for (uint16_t sleaf = 0; sleaf < static_cast<int32_t>(sleafs); ++sleaf) {
+                        uint16_t svertStart = 4 * sleaf;
+                        uint16_t striStart = 6 * sleaf;
+                        // The leaf's centre goes into its fourth corner, and is then copied down corner by corner.
+                        const NiPoint3* v4 = &pcoords[sleaf];
+                        NiPoint3* v5 = &pcoordsCopy[svertStart + 3];
+                        v5->x = v4->x;
+                        v5->y = v4->y;
+                        v5->z = v4->z;
+                        NiPoint3* v6 = &pcoordsCopy[svertStart + 3];
+                        NiPoint3* v7 = &pcoordsCopy[svertStart + 2];
+                        v7->x = v6->x;
+                        v7->y = v6->y;
+                        v7->z = v6->z;
+                        NiPoint3* v8 = &pcoordsCopy[svertStart + 2];
+                        NiPoint3* v9 = &pcoordsCopy[svertStart + 1];
+                        v9->x = v8->x;
+                        v9->y = v8->y;
+                        v9->z = v8->z;
+                        NiPoint3* v10 = &pcoordsCopy[svertStart + 1];
+                        NiPoint3* v11 = &pcoordsCopy[svertStart];
+                        v11->x = v10->x;
+                        v11->y = v10->y;
+                        v11->z = v10->z;
+                        const NiPoint3* v12 = &pnormals[sleaf];
+                        NiPoint3* v13 = &pnormalsCopy[svertStart + 3];
+                        v13->x = v12->x;
+                        v13->y = v12->y;
+                        v13->z = v12->z;
+                        NiPoint3* v14 = &pnormalsCopy[svertStart + 3];
+                        NiPoint3* v15 = &pnormalsCopy[svertStart + 2];
+                        v15->x = v14->x;
+                        v15->y = v14->y;
+                        v15->z = v14->z;
+                        NiPoint3* v16 = &pnormalsCopy[svertStart + 2];
+                        NiPoint3* v17 = &pnormalsCopy[svertStart + 1];
+                        v17->x = v16->x;
+                        v17->y = v16->y;
+                        v17->z = v16->z;
+                        NiPoint3* v18 = &pnormalsCopy[svertStart + 1];
+                        NiPoint3* v19 = &pnormalsCopy[svertStart];
+                        v19->x = v18->x;
+                        v19->y = v18->y;
+                        v19->z = v18->z;
+                        float fcolor = static_cast<double>((geom.m_sLeaves0.m_pColors[sleaf] & 0xFF00) >> 8) / 255.0;
+                        if (fcolor >= 1.0) {
+                            fcolor = 0.99f;
+                        }
+                        const float* ptex = geom.m_sLeaves0.m_pLeafMapTexCoords[sleaf];
+                        for (uint16_t svert = 0; svert < 4u; ++svert) {
+                            if (bflip) {
+                                ptexCopy[svert + svertStart] = NiPoint2(ptex[2 * svert], ptex[2 * (3 - svert) + 1]);
+                            }
+                            else {
+                                ptexCopy[svert + svertStart] = NiPoint2(ptex[2 * svert], ptex[2 * svert + 1]);
+                            }
+                            float fcolorclusterindex =
+                                static_cast<float>((svert + 2) % 4 + 4 * geom.m_sLeaves0.m_pLeafClusterIndices[sleaf]);
+                            float fB_1 = fcolorclusterindex + fcolor;
+                            const float* LeafLodSizeAdjustments = pSpeedTree->GetLeafLodSizeAdjustments();
+                            NiColorA kWindInfo(
+                                geom.m_sLeaves0.m_pWindWeights[sleaf],
+                                static_cast<float>(4 * geom.m_sLeaves0.m_pWindMatrixIndices[sleaf]), fB_1,
+                                LeafLodSizeAdjustments[slevel]
+                            );
+                            NiColorA* pkWindInfo = &kWindInfo;
+                            // The NiColorA is reinterpreted as a D3DXVECTOR4, copying the colour's four components into
+                            // the vector.
+                            pwindinfo[svert + svertStart] = std::bit_cast<D3DXVECTOR4>(*pkWindInfo);
+                        }
+                        ptrilistMove[striStart] = svertStart + 3;
+                        ptrilistMove[striStart + 1] = svertStart + 1;
+                        ptrilistMove[striStart + 2] = svertStart + 2;
+                        ptrilistMove[striStart + 3] = svertStart;
+                        ptrilistMove[striStart + 4] = svertStart + 1;
+                        ptrilistMove[striStart + 5] = svertStart + 3;
+                    }
+                    NiTriShapeData* v55 =
+                        static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
+                    if (v55) {
+                        NiTriShapeData_ = ::new (v55) NiTriShapeData(
+                            sverts, pcoordsCopy, pnormalsCopy, nullptr, ptexCopy, 1, NiGeometryData::NBT_METHOD_NONE,
+                            2 * sleafs, ptrilistCopy
+                        );
+                    }
+                    else {
+                        NiTriShapeData_ = nullptr;
+                    }
+                    this->pspLeafData[slevel].operator=(NiTriShapeData_);
+                    STSPData* v54 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
+                    if (v54) {
+                        STSPData_ = ::new (v54) STSPData;
+                    }
+                    else {
+                        STSPData_ = nullptr;
+                    }
+                    spshaderData.operator=(STSPData_);
+                    spshaderData.m_pObject->SetData(pwindinfo, sverts);
+                    SpeedTreeLeafShaderProperty* v53 = static_cast<SpeedTreeLeafShaderProperty*>(
+                        NiMemObject::operator new(sizeof(SpeedTreeLeafShaderProperty))
+                    );
+                    if (v53) {
+                        STLSPData* pLeafData = spLeafShaderData.m_pObject;
+                        STSPData* pShaderData = spshaderData.m_pObject;
+                        SpeedTreeLeafShaderProperty_ =
+                            ::new (v53) SpeedTreeLeafShaderProperty(slevel, pShaderData, pLeafData);
+                    }
+                    else {
+                        SpeedTreeLeafShaderProperty_ = nullptr;
+                    }
+                    this->pspLeafShaderProperties[slevel].operator=(SpeedTreeLeafShaderProperty_);
+                    SpeedTreeLeafShaderProperty* v41 = this->pspLeafShaderProperties[slevel].m_pObject;
+                    v41->SetBaseTexture(spLeafFrondTexture.m_pObject);
+                    SpeedTreeLeafShaderProperty* v40 = this->pspLeafShaderProperties[slevel].m_pObject;
+                    NiAdditionalGeometryData* apAdditionalGeomData = v40->CreateRendererSpecificProperty(nullptr);
+                    this->pspLeafData[slevel].m_pObject->SetAdditionalGeometryData(apAdditionalGeomData);
+                    this->pspLeafData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
+                    this->pspLeafData[slevel].m_pObject->m_ucKeepFlags = 17u;
+                    this->pspLeafData[slevel].m_pObject->SetCompressFlags(1u);
                 }
-                else {
-                    NiTriShapeData_ = nullptr;
-                }
-                this->pspLeafData[slevel].operator=(NiTriShapeData_);
-                STSPData* v54 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
-                if (v54) {
-                    STSPData_ = ::new (v54) STSPData;
-                }
-                else {
-                    STSPData_ = nullptr;
-                }
-                spshaderData.operator=(STSPData_);
-                spshaderData.m_pObject->SetData(pwindinfo, sverts);
-                SpeedTreeLeafShaderProperty* v53 = static_cast<SpeedTreeLeafShaderProperty*>(
-                    NiMemObject::operator new(sizeof(SpeedTreeLeafShaderProperty))
-                );
-                if (v53) {
-                    STLSPData* pLeafData = spLeafShaderData.m_pObject;
-                    STSPData* pShaderData = spshaderData.m_pObject;
-                    SpeedTreeLeafShaderProperty_ =
-                        ::new (v53) SpeedTreeLeafShaderProperty(slevel, pShaderData, pLeafData);
-                }
-                else {
-                    SpeedTreeLeafShaderProperty_ = nullptr;
-                }
-                this->pspLeafShaderProperties[slevel].operator=(SpeedTreeLeafShaderProperty_);
-                SpeedTreeLeafShaderProperty* v41 = this->pspLeafShaderProperties[slevel].m_pObject;
-                v41->SetBaseTexture(spLeafFrondTexture.m_pObject);
-                SpeedTreeLeafShaderProperty* v40 = this->pspLeafShaderProperties[slevel].m_pObject;
-                NiAdditionalGeometryData* apAdditionalGeomData = v40->CreateRendererSpecificProperty(nullptr);
-                this->pspLeafData[slevel].m_pObject->SetAdditionalGeometryData(apAdditionalGeomData);
-                this->pspLeafData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
-                this->pspLeafData[slevel].m_pObject->m_ucKeepFlags = 17u;
-                this->pspLeafData[slevel].m_pObject->SetCompressFlags(1u);
             }
+            pSpeedTree->FreeLeafLODDataArrays();
         }
-        pSpeedTree->FreeLeafLODDataArrays();
-        spshaderData.~NiPointer<STSPData>();
-        geom.Destroy();
-    }
-    else {
     LABEL_15:;
-        spshaderData.~NiPointer<STSPData>();
-        geom.Destroy();
     }
+    geom.Destroy();
 }
 
 void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
     float pDirection[3];
     CSpeedTreeRT::SGeometry v16;
-    XFNV_INLINED_LOCAL(NiPointer<NiTriShapeData>, spBillboardData, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<NiAlphaProperty>, ppropAlpha, std::nullopt, std::nullopt);
     float fcameraPos[3];
     v16.Init_00B029F0();
     fcameraPos[0] = 0.0f;
@@ -1020,7 +1022,7 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
         CSpeedTreeRT::GetCamera(fcameraPosOld, fcameraDirOld);
         CSpeedTreeRT::SetCamera(fcameraPos, pDirection);
         pSpeedTree->SetLodLevel(0.0f);
-        ::new (&spBillboardData) NiPointer<NiTriShapeData>(static_cast<NiTriShapeData*>(nullptr));
+        NiPointer<NiTriShapeData> spBillboardData;
         apTreeObj->CreateBillboardGeomData(false, spBillboardData);
         spBillboardData.m_pObject->SetConsistency(NiGeometryData::STATIC);
         spBillboardData.m_pObject->m_ucKeepFlags = 17u;
@@ -1033,7 +1035,7 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
             v10 = nullptr;
         }
         spBillboard.operator=(v10);
-        ::new (&ppropAlpha) NiPointer<NiAlphaProperty>(BSTreeModel::CreateAlphaProperty());
+        NiPointer<NiAlphaProperty> ppropAlpha(BSTreeModel::CreateAlphaProperty());
         if (ppropAlpha.m_pObject) {
             spBillboard.m_pObject->AttachProperty(ppropAlpha.m_pObject);
         }
@@ -1077,13 +1079,8 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
             v4->PerformPrecache();
         }
         CSpeedTreeRT::SetCamera(fcameraPosOld, fcameraDirOld);
-        ppropAlpha.~NiPointer<NiAlphaProperty>();
-        spBillboardData.~NiPointer<NiTriShapeData>();
-        v16.Destroy();
     }
-    else {
-        v16.Destroy();
-    }
+    v16.Destroy();
 }
 
 bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {

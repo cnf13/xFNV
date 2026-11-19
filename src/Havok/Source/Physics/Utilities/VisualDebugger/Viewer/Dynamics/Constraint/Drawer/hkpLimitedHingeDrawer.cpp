@@ -78,11 +78,7 @@ void hkpLimitedHingeDrawer::drawConstraint(
                 radius, minAngle, maxAngle, m_numArcSegments, m_bodyBWPivot, axisInWorld, perpInWorld
             );
 
-            // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, geometry, std::nullopt, std::nullopt);
-            geometry.m_data = nullptr;
-            geometry.m_size = 0;
-            geometry.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+            alignas(16) hkArray<hkDisplayGeometry*> geometry;
             // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
             hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
             const int32_t capacity =
@@ -97,18 +93,6 @@ void hkpLimitedHingeDrawer::drawConstraint(
             geometry.m_size = 1;
             geometry.m_data[0] = &m_angularLimit;
             displayHandler->displayGeometry(geometry, -1, id, tag);
-            // EXE-INLINED none: hkArray<hkDisplayGeometry*>::~hkArray
-            heap = hkMemoryRouter::getInstance().m_heap;
-            geometry.m_size = 0;
-            if (!(geometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG)) {
-                heap->bufFree(
-                    geometry.m_data,
-                    static_cast<int32_t>(
-                        (geometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) *
-                        sizeof(hkDisplayGeometry*)
-                    )
-                );
-            }
         }
     }
 

@@ -71,35 +71,13 @@ void ImageSpaceEffectWaterDisplacement::Render(
     ImageSpaceEffectParam* apParam,
     int32_t abEndFrame
 ) {
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, aTex, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, kGreyTex, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, apTex, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, apThis, std::nullopt, std::nullopt);
     fTimeBetweenSimulations = 0.025f;
-    // EXE-INLINED 0x4EBB70
-    aTex.bForceAniso = false;
-    aTex.bIsRenderedTexture = false;
-    aTex.bIsTextureBorrowed = false;
-    aTex.spTexture = nullptr;
-    aTex.eFilterMode = 0;
-    aTex.eClampMode = 0;
+    ImageSpaceTexture aTex;
     float fNewTime = this->fTime + BSShaderManager::fTimerValues[1];
     this->fTime = fNewTime;
     fTimeFromLastRipple = fNewTime + fTimeFromLastRipple;
-    // EXE-INLINED 0x4EBB70
-    kGreyTex.bForceAniso = false;
-    kGreyTex.bIsRenderedTexture = false;
-    kGreyTex.bIsTextureBorrowed = false;
-    kGreyTex.spTexture = nullptr;
-    kGreyTex.eFilterMode = 0;
-    kGreyTex.eClampMode = 0;
-    // EXE-INLINED 0x4EBB70
-    apTex.bForceAniso = false;
-    apTex.bIsRenderedTexture = false;
-    apTex.bIsTextureBorrowed = false;
-    apTex.spTexture = nullptr;
-    apTex.eFilterMode = 0;
-    apTex.eClampMode = 0;
+    ImageSpaceTexture kGreyTex;
+    ImageSpaceTexture apTex;
     kGreyTex.BorrowRenderedTexture(BSTextureManager::TEX_TESWATER_GREY);
     BSRenderedTexture* pMemory = static_cast<BSRenderedTexture*>(NiMemObject::operator new(sizeof(BSRenderedTexture)));
     BSRenderedTexture* pRendered;
@@ -115,13 +93,7 @@ void ImageSpaceEffectWaterDisplacement::Render(
         pRendered = nullptr;
     }
     apTex.SetTexture(pRendered);
-    // EXE-INLINED 0x4EBB70
-    apThis.bForceAniso = false;
-    apThis.bIsRenderedTexture = false;
-    apThis.bIsTextureBorrowed = false;
-    apThis.spTexture = nullptr;
-    apThis.eFilterMode = 0;
-    apThis.eClampMode = 0;
+    ImageSpaceTexture apThis;
     if (ImageSpaceEffectWaterDisplacement::bClearSimulation) {
         ImageSpaceShader* pShader = static_cast<ImageSpaceShader*>(pEffectList.m_pBase[0].m_pObject);
         ImageSpaceEffect* peffect = pShader;
@@ -308,10 +280,6 @@ void ImageSpaceEffectWaterDisplacement::Render(
     if (kGreyTex.GetTexture()) {
         kGreyTex.ReturnRenderedTexture();
     }
-    apThis.~ImageSpaceTexture();
-    apTex.~ImageSpaceTexture();
-    kGreyTex.~ImageSpaceTexture();
-    aTex.~ImageSpaceTexture();
 }
 
 // Nine passes, each with a fresh ImageSpaceShaderParam (two vertex and six pixel constant registers) and the manager's

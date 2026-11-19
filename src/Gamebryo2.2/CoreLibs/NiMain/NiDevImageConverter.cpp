@@ -231,8 +231,7 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
     NiPixelData* pkOptDest,
     bool bMipmap
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spCompressionTmp, std::nullopt, std::nullopt);
-    spCompressionTmp.m_pObject = nullptr;
+    NiPointer<NiPixelData> spCompressionTmp;
     const NiPixelData* pkSrc = &kSrc;
     // Bit 0 of m_uFlags (NiPixelFormat::GetBit).
     if (!(kSrc.m_kPixelFormat.m_uFlags & 1)) {
@@ -248,8 +247,7 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
         pkSrc = spCompressionTmp.m_pObject;
     }
 
-    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spMipmapTmp, std::nullopt, std::nullopt);
-    spMipmapTmp.m_pObject = nullptr;
+    NiPointer<NiPixelData> spMipmapTmp;
     if (bMipmap && pkSrc->m_uiMipmapLevels <= 1) {
         // EXE-INLINED 0xA77920
         uint32_t uiWidth = *pkSrc->m_puiWidth;
@@ -267,21 +265,16 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
 
     if (pkOptDest && pkOptDest->m_kPixelFormat == kDestFmt && (!bMipmap || pkOptDest->m_uiMipmapLevels > 1) &&
         (pkOptDest == pkSrc || ConvertPixelDataFormat(*pkOptDest, *pkSrc, -1))) {
-        spMipmapTmp.~NiPointer<NiPixelData>();
-        spCompressionTmp.~NiPointer<NiPixelData>();
         return pkOptDest;
     }
 
-    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spBumpTmp, std::nullopt, std::nullopt);
-    spBumpTmp.m_pObject = nullptr;
+    NiPointer<NiPixelData> spBumpTmp;
     if (kDestFmt.m_eFormat == NiPixelFormat::FORMAT_BUMP || kDestFmt.m_eFormat == NiPixelFormat::FORMAT_BUMPLUMA) {
         spBumpTmp.SetNew(GenerateBumpMap(*pkSrc, kDestFmt));
         if (spBumpTmp.m_pObject) {
             pkSrc = spBumpTmp.m_pObject;
         }
     }
-    NiPixelData* pkBump = spBumpTmp.m_pObject;
-
     NiPixelData* pkMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
     NiPixelData* pkDest;
     if (pkMemory) {
@@ -293,22 +286,6 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
     }
     // A failed conversion returns null and leaves pkDest allocated, as the game does.
     bool bConverted = ConvertPixelDataFormat(*pkDest, *pkSrc, -1);
-    // Releases spBumpTmp, spMipmapTmp and spCompressionTmp: decrement the count through InterlockedDecrement, then
-    // delete through the virtual DeleteThis.
-    if ((pkBump) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkBump->m_uiRefCount)))) {
-        pkBump->DeleteThis();
-    }
-
-    NiPixelData* pkMipmap = spMipmapTmp.m_pObject;
-    if ((pkMipmap) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkMipmap->m_uiRefCount)))) {
-        pkMipmap->DeleteThis();
-    }
-
-    NiPixelData* pkCompression = spCompressionTmp.m_pObject;
-    if ((pkCompression) && (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pkCompression->m_uiRefCount)))) {
-        pkCompression->DeleteThis();
-    }
-
     return bConverted ? pkDest : nullptr;
 }
 
@@ -617,14 +594,13 @@ NiPixelData* NiDevImageConverter::GenerateMipmapPyramidFromFiles(
     if (!pkDest) {
         return nullptr;
     }
-    XFNV_INLINED_LOCAL(NiPointer<NiPixelData>, spLevel, std::nullopt, std::nullopt);
     for (uint32_t i = 0; i < uiNumLevels; ++i) {
         const char* pcFilename = apcFilenames[i];
         if (!pcFilename) {
             delete pkDest;
             return nullptr;
         }
-        spLevel.m_pObject = nullptr;
+        NiPointer<NiPixelData> spLevel;
         NiPixelData* pkRead;
         if (!i && pkSrc) {
             pkRead = const_cast<NiPixelData*>(pkSrc);
@@ -641,7 +617,6 @@ NiPixelData* NiDevImageConverter::GenerateMipmapPyramidFromFiles(
         uint32_t uiSize = pkDest->m_puiOffsetInBytes[i + 1] - pkDest->m_puiOffsetInBytes[i];
         if (uiSize != pkLevel->m_puiOffsetInBytes[1] - pkLevel->m_puiOffsetInBytes[0]) {
             delete pkDest;
-            spLevel.~NiPointer<NiPixelData>();
             return nullptr;
         }
         rt::memcpy(
@@ -651,8 +626,6 @@ NiPixelData* NiDevImageConverter::GenerateMipmapPyramidFromFiles(
         if ((!i) && (static_cast<uint8_t>(kFmt.GetPalettized()))) {
             pkDest->SetPalette(pkLevel->m_spPalette.m_pObject);
         }
-
-        spLevel.~NiPointer<NiPixelData>();
     }
     return pkDest;
 }

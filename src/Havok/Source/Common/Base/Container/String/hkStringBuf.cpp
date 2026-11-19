@@ -261,14 +261,11 @@ void hkStringBuf::printf(const char* fmt, ...) {
     }
 }
 
-// Formats into a temporary buffer and appends the text to this one, retrying with more storage until the text fits;
-// the temporary buffer's storage goes back to the temp allocator unless it never grew out of its inline characters.
-// The size is cleared before the storage is freed.
+// Formats into a temporary buffer and appends the text to this one, retrying with more storage until the text fits.
 void hkStringBuf::appendPrintf(const char* fmt, ...) {
     va_list arguments;
     va_start(arguments, fmt);
-    XFNV_INLINED_LOCAL(hkStringBuf, kBuffer, std::nullopt, std::nullopt);
-    ::new (&kBuffer) hkStringBuf;
+    hkStringBuf kBuffer;
     for (;;) {
         const int32_t iCapacity =
             static_cast<int32_t>(kBuffer.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
@@ -311,14 +308,6 @@ void hkStringBuf::appendPrintf(const char* fmt, ...) {
         }
     }
     append(kBuffer.m_string.m_data, -1);
-    hkMemoryAllocator* pTempAllocator = hkMemoryRouter::getInstance().m_temp;
-    kBuffer.m_string.m_size = 0;
-    if (kBuffer.m_string.m_capacityAndFlags >= 0) {
-        pTempAllocator->bufFree(
-            kBuffer.m_string.m_data,
-            static_cast<int32_t>(kBuffer.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)
-        );
-    }
 }
 
 void hkStringBuf::append(const char* s, int32_t len) {
@@ -748,8 +737,7 @@ void replace(hkStringBuf* apThis, const char* oldText, const char* newText, int3
         v18[v10] = 0;
     }
     else {
-        XFNV_INLINED_LOCAL(hkStringBuf, v21, std::nullopt, std::nullopt);
-        ::new (&v21) hkStringBuf(*apThis);
+        hkStringBuf v21(*apThis);
         apThis->clear();
         for (int32_t k = v21.indexOf(oldText, 0, 0x7FFFFFFF); k >= 0; k = v21.indexOf(oldText, k + v5, 0x7FFFFFFF)) {
             apThis->append(&v21.m_string.m_data[v6], k - v6);
@@ -760,10 +748,5 @@ void replace(hkStringBuf* apThis, const char* oldText, const char* newText, int3
             }
         }
         apThis->append(&v21.m_string.m_data[v6], v21.m_string.m_size - v6 - 1);
-        hkMemoryAllocator* v8 = (&hkMemoryRouter::getInstance())->m_temp;
-        v21.m_string.m_size = 0;
-        if (v21.m_string.m_capacityAndFlags >= 0) {
-            v8->bufFree(v21.m_string.begin(), v21.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-        }
     }
 }

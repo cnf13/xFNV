@@ -5511,7 +5511,6 @@ bool MiddleHighProcess::HasBackPackWorn() {
 }
 
 void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     if ((!spReserveProjectileClones.m_pObject) && (spWeaponPreload.m_pObject) &&
         (static_cast<QueuedFile*>(spWeaponPreload.m_pObject)->QueuedFile::GetAllChildrenFinished())) {
         TESBoundObject* FormFlags;
@@ -5534,7 +5533,7 @@ void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
             BGSProjectile* Projectile_ = pcurrentWeapon->GetProjectile(apActor);
             int32_t icloneCount = Projectile_->GetPreCloneCount(pcurrentWeapon);
             if (icloneCount > 0) {
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+                NiPointer<Model> spmodel;
                 TESModel* v5 = static_cast<TESModel*>(pcurrentWeapon->GetProjectile(apActor));
                 const char* v3 = v5->GetModel();
                 pModelLoader->FindModel(v3, spmodel);
@@ -5549,8 +5548,6 @@ void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
                     }
                     spReserveProjectileClones.operator=(v4);
                 }
-
-                NiPointer<Model>::Destroy(&spmodel);
             }
         }
     }

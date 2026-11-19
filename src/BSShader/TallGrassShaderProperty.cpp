@@ -434,14 +434,12 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
     }
     CachedGeometry* pCachedGeom = spCachedGeom.m_pObject;
     if (pCachedGeom->bQueued) {
-        XFNV_INLINED_LOCAL(NiPointer<NiObject>, spObject, std::nullopt, std::nullopt);
-        spObject.m_pObject = nullptr;
+        NiPointer<NiObject> spObject;
         if (bUseBackgroundLoading && !pCachedGeom->spGrassLoadTask.m_pObject) {
             void* pMemory = MemoryManager_Singleton.Allocate(sizeof(GrassLoadTask));
             GrassLoadTask* pTask = pMemory ? ::new (pMemory) GrassLoadTask(apGrassParam->pcGeomFilename) : nullptr;
             pCachedGeom->spGrassLoadTask = pTask;
             pIOManager->AddTask(pCachedGeom->spGrassLoadTask.m_pObject);
-            spObject.~NiPointer<NiObject>();
             spCachedGeom.~NiPointer<CachedGeometry>();
             pTLSData->eMemContext = eMemContext;
             return nullptr;
@@ -450,7 +448,6 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         if (pTask) {
             // The background load has not finished yet.
             if (pTask->eState < BS_TASK_STATE_FINISHED) {
-                spObject.~NiPointer<NiObject>();
                 spCachedGeom.~NiPointer<CachedGeometry>();
                 pTLSData->eMemContext = eMemContext;
                 return nullptr;
@@ -468,7 +465,6 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             }
         }
         if (!spObject.m_pObject) {
-            spObject.~NiPointer<NiObject>();
             spCachedGeom.~NiPointer<CachedGeometry>();
             pTLSData->eMemContext = eMemContext;
             return nullptr;
@@ -761,7 +757,6 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         if (pBaseTexture) {
             NiDecRefCount(pBaseTexture);
         }
-        NiDecRefCount(spObject.m_pObject);
     }
     // The map holds a reference, so the geometry outlives the local's release.
     pCachedGeom = spCachedGeom.m_pObject;

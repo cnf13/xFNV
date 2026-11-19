@@ -848,12 +848,11 @@ bool NavMesh::CheckUnconnectedBorderEdges(
 }
 
 bool NavMesh::SetDisableNavMesh(uint32_t aiID, bool abDisable) {
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
     NavMeshInfo* NavMeshInfo_ = NavMeshInfoMap_->GetNavMeshInfo(aiID);
     if (NavMeshInfo_) {
-        ::new (&apMemory) NavMeshPtr;
-        if (NavMeshInfo_->GetNavMeshEvenDisabled(*static_cast<NavMeshPtr*>(&apMemory))) {
+        NavMeshPtr apMemory;
+        if (NavMeshInfo_->GetNavMeshEvenDisabled(apMemory)) {
             TESForm* v4 = apMemory.m_pObject;
             if (v4->GetDisabled() != abDisable) {
                 TESForm* v5 = apMemory.m_pObject;
@@ -864,12 +863,10 @@ bool NavMesh::SetDisableNavMesh(uint32_t aiID, bool abDisable) {
                     v6->ReconnectEnabledPortals();
                 }
             }
-            apMemory.~NiPointer<NavMesh>();
             return true;
         }
 
         Warning("DisableNavMesh Script Function: Did not find matching NavMesh for NavMesh ID parameter %08X", aiID);
-        apMemory.~NiPointer<NavMesh>();
         return false;
     }
 

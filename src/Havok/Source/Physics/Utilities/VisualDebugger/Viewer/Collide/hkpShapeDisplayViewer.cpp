@@ -222,12 +222,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
     if (m_enableInstancing.m_bool) {
         geomId = m_instancedShapeToGeomID.getWithDefault(shape, 0);
     }
-    // EXE-INLINED none: hkInplaceArray<hkDisplayGeometry*, 8>::hkInplaceArray
-    using displayGeometries_t = hkInplaceArray<hkDisplayGeometry*, 8>;
-    XFNV_INLINED_LOCAL(displayGeometries_t, displayGeometries, std::nullopt, std::nullopt);
-    displayGeometries.m_data = displayGeometries.m_storage;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = 8 | hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkDisplayGeometry*, 8> displayGeometries;
     flag = 1;
     if (!geomId && !isCached && m_enableDisplayCreation.m_bool && m_autoGeometryCreation.m_bool) {
         hkGeometry* noDeleteGeometry = static_cast<hkGeometry*>(
@@ -242,15 +237,15 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
             for (int32_t i = displayGeometries.m_size - 1; i >= 0; --i) {
                 hkDisplayGeometry* geometry = displayGeometries.m_data[i];
                 if (geometry->m_type == HK_DISPLAY_CONVEX && !geometry->m_geometry) {
-                    char buf[512];
-                    XFNV_INLINED_LOCAL(hkErrStream, errStream, std::nullopt, std::nullopt);
-                    ::new (&errStream) hkErrStream(buf, 512);
-                    errStream << "Unable to build display geometry from hkpShape geometry data";
-                    hkError::s_instance->message(
-                        hkError::MESSAGE_REPORT, -1, buf,
-                        ".\\VisualDebugger\\Viewer\\Collide\\hkpShapeDisplayViewer.cpp", 316
-                    );
-                    errStream.~hkErrStream();
+                    {
+                        char buf[512];
+                        hkErrStream errStream(buf, 512);
+                        errStream << "Unable to build display geometry from hkpShape geometry data";
+                        hkError::s_instance->message(
+                            hkError::MESSAGE_REPORT, -1, buf,
+                            ".\\VisualDebugger\\Viewer\\Collide\\hkpShapeDisplayViewer.cpp", 316
+                        );
+                    }
                     // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
                     const int32_t last = --displayGeometries.m_size;
                     if (last != i) {
@@ -332,16 +327,6 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         if (displayGeometries.m_data[i]) {
             delete displayGeometries.m_data[i];
         }
-    }
-    // EXE-INLINED none: hkInplaceArray<hkDisplayGeometry*, 8>::~hkInplaceArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    displayGeometries.m_size = 0;
-    if (displayGeometries.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            displayGeometries.m_data,
-            static_cast<int32_t>(sizeof(hkDisplayGeometry*)) *
-                (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)
-        );
     }
 }
 

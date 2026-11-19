@@ -273,8 +273,6 @@ void ImageSpaceEffectWaterFFT::Render(
     }
 }
 
-// The parameter list's SetAt stores the pointer without reference counting, and spParam's constructor and destructor
-// touch no reference count.
 void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_2;
@@ -283,12 +281,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     ImageSpaceShaderParam* pparam_5;
     ImageSpaceShaderParam* pparam_6;
     ImageSpaceShaderParam* pparam_7;
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(12);
     pTextures.SetSize(10u);
     ImageSpaceShaderParam* v4 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v4;
     if (v4) {
         pparam = ::new (v4) ImageSpaceShaderParam;
     }
@@ -298,12 +294,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     pparam->InitConstantMap(2, 3);
     NiTPrimitiveArray<NiPointer<ImageSpaceShaderParam>>* p_pEffectParamList = &pEffectParamList;
     pparam->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, pparam);
     SetEffect(0, apManager->pEffectList.m_pBase[93], pparam, 0);
     ImageSpaceShaderParam* v8 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v8;
     if (v8) {
         pparam_2 = ::new (v8) ImageSpaceShaderParam;
     }
@@ -312,12 +306,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     }
     pparam_2->InitConstantMap(2, 3);
     pparam_2->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam_2;
-    p_pEffectParamList->SetAt(1u, spParam);
+    p_pEffectParamList->SetAt(1u, pparam_2);
     SetEffect(1, apManager->pEffectList.m_pBase[94], pparam_2, 0);
     ImageSpaceShaderParam* v10 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v10;
     if (v10) {
         pparam_3 = ::new (v10) ImageSpaceShaderParam;
     }
@@ -326,12 +318,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     }
     pparam_3->InitConstantMap(2, 3);
     pparam_3->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam_3;
-    p_pEffectParamList->SetAt(2u, spParam);
+    p_pEffectParamList->SetAt(2u, pparam_3);
     SetEffect(2, apManager->pEffectList.m_pBase[95], pparam_3, 0);
     ImageSpaceShaderParam* v12 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v12;
     if (v12) {
         pparam_4 = ::new (v12) ImageSpaceShaderParam;
     }
@@ -340,12 +330,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     }
     pparam_4->InitConstantMap(2, 3);
     pparam_4->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam_4;
-    p_pEffectParamList->SetAt(3u, spParam);
+    p_pEffectParamList->SetAt(3u, pparam_4);
     SetEffect(3, apManager->pEffectList.m_pBase[96], pparam_4, 0);
     ImageSpaceShaderParam* v14 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v14;
     if (v14) {
         pparam_5 = ::new (v14) ImageSpaceShaderParam;
     }
@@ -354,12 +342,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     }
     pparam_5->InitConstantMap(2, 3);
     pparam_5->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam_5;
-    p_pEffectParamList->SetAt(4u, spParam);
+    p_pEffectParamList->SetAt(4u, pparam_5);
     SetEffect(4, apManager->pEffectList.m_pBase[97], pparam_5, 0);
     ImageSpaceShaderParam* v16 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v16;
     if (v16) {
         pparam_6 = ::new (v16) ImageSpaceShaderParam;
     }
@@ -368,12 +354,10 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     }
     pparam_6->InitConstantMap(2, 3);
     pparam_6->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam_6;
-    p_pEffectParamList->SetAt(5u, spParam);
+    p_pEffectParamList->SetAt(5u, pparam_6);
     SetEffect(5, apManager->pEffectList.m_pBase[98], pparam_6, 0);
     ImageSpaceShaderParam* v18 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v18;
     if (v18) {
         pparam_7 = ::new (v18) ImageSpaceShaderParam;
     }
@@ -382,8 +366,7 @@ void ImageSpaceEffectWaterFFT::Setup(ImageSpaceManager* apManager, ImageSpaceEff
     }
     pparam_7->InitConstantMap(2, 3);
     pparam_7->bUseTexOffset[1] = false;
-    spParam.m_pObject = pparam_7;
-    p_pEffectParamList->SetAt(6u, spParam);
+    p_pEffectParamList->SetAt(6u, pparam_7);
     SetEffect(6, apManager->pEffectList.m_pBase[99], pparam_7, 0);
 }
 

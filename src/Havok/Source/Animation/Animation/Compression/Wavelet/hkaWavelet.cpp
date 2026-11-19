@@ -107,21 +107,7 @@ void hkZeroSmallWaveletCoefficients(
         if (1.0 / fN > tolerance) {
             return;
         }
-        XFNV_INLINED_LOCAL(hkLocalArray<float>, sortedCoefs, std::nullopt, std::nullopt);
-        {
-            // EXE-INLINED none: hkLocalArray<hkReal>::hkLocalArray(n) (hkAllocateStack)
-            sortedCoefs.m_data = nullptr;
-            sortedCoefs.m_size = 0;
-            sortedCoefs.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                pBlock + ((static_cast<int32_t>(nValues) * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-            // The stack allocator's bytes are untyped memory; the array keeps its floats there.
-            sortedCoefs.m_data = reinterpret_cast<float*>(pBlock);
-            sortedCoefs.m_capacityAndFlags = static_cast<int32_t>(nValues) | hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-            sortedCoefs.m_localMemory = sortedCoefs.m_data;
-        }
+        hkLocalArray<float> sortedCoefs(static_cast<int32_t>(nValues));
         sortedCoefs.setSize(static_cast<int32_t>(nValues));
         for (uint32_t i = 0; i < nValues; i++) {
             sortedCoefs.m_data[i] = std::fabs(waveletData[i]);
@@ -145,7 +131,6 @@ void hkZeroSmallWaveletCoefficients(
                 waveletData[i] = 0.0f;
             }
         }
-        sortedCoefs.~hkLocalArray<float>();
     }
     else {
         float fThreshold = tolerance;

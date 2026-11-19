@@ -242,12 +242,7 @@ hkJobQueue::JobStatus hkCpuKdTreeBuildSetupJob(hkJobQueue& jobQueue, hkJobQueue:
     // The queue entry holds the job: its hkJob base is the job's.
     const hkpKdTreeBuildSetupJob& job =
         static_cast<const hkpKdTreeBuildSetupJob&>(static_cast<const hkJob&>(nextJobOut));
-    // EXE-INLINED none: hkArray::hkArray(T* buffer, int size, int capacity)
-    using collidables_t = hkArray<const hkpCollidable*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(collidables_t, collidables, std::nullopt, std::nullopt);
-    collidables.m_data = job.m_collidables;
-    collidables.m_size = job.m_endIdx;
-    collidables.m_capacityAndFlags = job.m_endIdx | hkArrayBase<const hkpCollidable*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkpCollidable*, hkContainerHeapAllocator> collidables(job.m_collidables, job.m_endIdx, job.m_endIdx);
     hkJobQueue::JobStatus status;
     // The mediator is destroyed once the next job is taken, before the array.
     {
@@ -255,8 +250,6 @@ hkJobQueue::JobStatus hkCpuKdTreeBuildSetupJob(hkJobQueue& jobQueue, hkJobQueue:
         hkKdTreeBuildingUtils::projectPrimitives(&mediator, job.m_startIdx, job.m_endIdx, job.m_entriesOut);
         status = jobQueue.finishJobAndGetNextJob(&nextJobOut, nextJobOut, hkJobQueue::WAIT_FOR_NEXT_JOB);
     }
-    // EXE-INLINED none: hkArray::~hkArray
-    collidables.clearAndDeallocate();
     HK_TIMER_END();
     return status;
 }

@@ -209,12 +209,7 @@ hkResult hkpFirstPersonGun::sweepSphere(
     kInput.m_to.m_quad = sweepEnd.m_quad;
     kInput.m_maxExtraPenetration = 1.1920929e-07f;
     kInput.m_startPointTolerance = 1.1920929e-07f;
-    alignas(16)
-        XFNV_INLINED_LOCAL(hkpClosestCdPointCollector, kCollector, hkpClosestCdPointCollector_vftable, std::nullopt);
-    // EXE-INLINED 0xC6D170
-    kCollector.m_hitPoint.m_contact.m_separatingNormal.m_quad[3] = 3.40282e+38f;
-    kCollector.m_earlyOutDistance = 3.40282e+38f;
-    kCollector.m_hitPoint.m_rootCollidableA = nullptr;
+    alignas(16) hkpClosestCdPointCollector kCollector;
     world->linearCast(&kCaster, kInput, kCollector, nullptr);
     pSphere->removeReference();
     if (kCollector.m_hitPoint.m_rootCollidableA) {

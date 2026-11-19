@@ -907,24 +907,11 @@ void hkpVehicleInstance::stepVehicle(const hkStepInfo& stepInfo) {
 
     using WheelOutput = hkpVehicleWheelCollide::CollisionDetectionWheelOutput;
     const int32_t numWheels = m_data->m_numWheels;
-    XFNV_INLINED_LOCAL(hkLocalArray<WheelOutput>, cdInfo, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkAllocateStack<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((numWheels * static_cast<int32_t>(sizeof(WheelOutput)) + 127) & ~127);
-    WheelOutput* pLocal = static_cast<WheelOutput*>(pBlock);
-    // EXE-INLINED none: hkLocalArray<hkpVehicleWheelCollide::CollisionDetectionWheelOutput>::hkLocalArray
-    cdInfo.m_data = pLocal;
-    cdInfo.m_size = 0;
-    cdInfo.m_capacityAndFlags = static_cast<uint32_t>(numWheels) | hkArrayBase<WheelOutput>::DONT_DEALLOCATE_FLAG;
-    cdInfo.m_localMemory = pLocal;
+    hkLocalArray<WheelOutput> cdInfo(numWheels);
 
     float deltaTime = stepInfo.m_deltaTime;
     m_wheelCollide->collideWheels(deltaTime, this, cdInfo.m_data);
     stepVehicleUsingWheelCollideOutput(stepInfo, cdInfo.m_data);
-
-    cdInfo.~hkLocalArray<WheelOutput>();
 }
 
 void hkpVehicleInstance::updateBeforeCollisionDetection() {
@@ -986,11 +973,8 @@ void hkpVehicleInstance::updateSteering(
     const hkpVehicleDriverInput::FilteredDriverInputOutput& filteredDriverInputInfo
 ) {
     const int32_t numWheels = m_wheelsSteeringAngle.m_size;
-    XFNV_INLINED_LOCAL(hkpVehicleSteering::SteeringAnglesOutput, steeringOutput, std::nullopt, std::nullopt);
+    hkpVehicleSteering::SteeringAnglesOutput steeringOutput;
     steeringOutput.m_mainSteeringAngle = m_mainSteeringAngle;
-    steeringOutput.m_wheelsSteeringAngle.m_data = nullptr;
-    steeringOutput.m_wheelsSteeringAngle.m_size = 0;
-    steeringOutput.m_wheelsSteeringAngle.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
     // EXE-INLINED none: hkArray<float>::setSize
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     const int32_t capacity = static_cast<int32_t>(
@@ -1013,17 +997,6 @@ void hkpVehicleInstance::updateSteering(
     m_mainSteeringAngle = steeringOutput.m_mainSteeringAngle;
     for (int32_t i = 0; i < m_wheelsSteeringAngle.m_size; ++i) {
         m_wheelsSteeringAngle.m_data[i] = steeringOutput.m_wheelsSteeringAngle.m_data[i];
-    }
-
-    // EXE-INLINED none: hkArray<float>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = steeringOutput.m_wheelsSteeringAngle.m_capacityAndFlags;
-    steeringOutput.m_wheelsSteeringAngle.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            steeringOutput.m_wheelsSteeringAngle.m_data,
-            (capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(float))
-        );
     }
 }
 
@@ -1385,14 +1358,7 @@ void hkpVehicleInstance::updateComponents(
     HK_TIMER_BEGIN("UpdateComponents", nullptr);
     hkpVehicleDriverInput::FilteredDriverInputOutput filteredDriverInputInfo;
     hkpVehicleTransmission::TransmissionOutput transmissionInfo;
-    // EXE-INLINED none: hkpVehicleBrake::WheelBreakingOutput::WheelBreakingOutput
-    XFNV_INLINED_LOCAL(hkpVehicleBrake::WheelBreakingOutput, wheelBreakingInfo, std::nullopt, std::nullopt);
-    wheelBreakingInfo.m_brakingTorque.m_data = nullptr;
-    wheelBreakingInfo.m_brakingTorque.m_size = 0;
-    wheelBreakingInfo.m_brakingTorque.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-    wheelBreakingInfo.m_isFixed.m_data = nullptr;
-    wheelBreakingInfo.m_isFixed.m_size = 0;
-    wheelBreakingInfo.m_isFixed.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
+    hkpVehicleBrake::WheelBreakingOutput wheelBreakingInfo;
 
     const int32_t numWheels = m_data->m_numWheels;
     // EXE-INLINED none: hkAllocateStack<float>
@@ -1427,7 +1393,6 @@ void hkpVehicleInstance::updateComponents(
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
         static_cast<char*>(static_cast<void*>(transmissionInfo.m_wheelsTransmittedTorque));
     HK_TIMER_END();
-    wheelBreakingInfo.~WheelBreakingOutput();
 }
 
 // Member-wise copy. The arrays are copied with hkArray's copyFromArray: for the wheels (a class element type) _reserve,

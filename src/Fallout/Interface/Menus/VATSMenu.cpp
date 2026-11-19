@@ -1020,7 +1020,7 @@ void VATSMenu::UpdateQueuedActionList(VATS_COMMAND* apCommand, bool abForcedRelo
     TESObjectWEAP* pweapon;
     BaseProcess* v22;
     BSSimpleList<VATSTarget*>* ptargetList;
-    XFNV_INLINED_LOCAL(BSSoundHandle, soundHand, std::nullopt, std::nullopt);
+    BSSoundHandle soundHand;
     char Dst[268];
     ItemChange* pweaponItem_2;
     char apDest[264];
@@ -1076,7 +1076,6 @@ void VATSMenu::UpdateQueuedActionList(VATS_COMMAND* apCommand, bool abForcedRelo
         goto LABEL_58;
     }
     mgr = &BSAudioManager::QInstance();
-    ::new (&soundHand) BSSoundHandle;
     soundHand = mgr->GetSoundHandleByName("UIVATSMove", 289u);
     soundHand.Play(false);
     ptargetList = VATSMenu::pVatsMenu->GetVatsTarget(pVATSTarget);

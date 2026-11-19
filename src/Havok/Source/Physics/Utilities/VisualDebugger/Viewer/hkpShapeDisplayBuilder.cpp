@@ -622,11 +622,7 @@ void hkpShapeDisplayBuilder::addObjectToDebugDisplay(const hkpShape* shape, hkTr
     ::new (&env) hkpShapeDisplayBuilderEnvironment;
     alignas(hkpShapeDisplayBuilder) uint8_t aBuilderMemory[sizeof(hkpShapeDisplayBuilder)];
     hkpShapeDisplayBuilder* pBuilder = ::new (aBuilderMemory) hkpShapeDisplayBuilder(env);
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
-    displayGeometries.m_data = nullptr;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkDisplayGeometry*> displayGeometries;
     pBuilder->buildDisplayGeometries(shape, displayGeometries);
     // The shape's address is the shape id hint (a pointer to integer conversion, as the SDK's (hkUlong) cast).
     hkDebugDisplay::s_instance->addGeometry(displayGeometries, t, id, 0, reinterpret_cast<hkUlong>(shape));
@@ -641,16 +637,6 @@ void hkpShapeDisplayBuilder::addObjectToDebugDisplay(const hkpShape* shape, hkTr
             break;
         }
         displayGeometries.m_data[0] = displayGeometries.m_data[displayGeometries.m_size];
-    }
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::~hkArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacityAndFlags = displayGeometries.m_capacityAndFlags;
-    displayGeometries.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap->bufFree(
-            displayGeometries.m_data,
-            static_cast<int32_t>((capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) * 4)
-        );
     }
 }
 

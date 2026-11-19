@@ -29,15 +29,12 @@ ImageSpaceEffectSunbeams::~ImageSpaceEffectSunbeams() {
 }
 
 void ImageSpaceEffectSunbeams::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam2, std::nullopt, std::nullopt);
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_2;
     SetEffectCount(2);
     pTextures.SetSize(3u);
     ImageSpaceShaderParam* pMemory =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = pMemory;
     if (pMemory) {
         pparam = ::new (pMemory) ImageSpaceShaderParam;
     }
@@ -45,12 +42,10 @@ void ImageSpaceEffectSunbeams::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam = nullptr;
     }
     pparam->InitConstantMap(0, 1);
-    spParam.m_pObject = pparam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, NiPointer<ImageSpaceShaderParam>(pparam));
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(0, apManager->pEffectList.m_pBase[39], pparam, 2);
     pMemory = static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam2.m_pObject = pMemory;
     if (pMemory) {
         pparam_2 = ::new (pMemory) ImageSpaceShaderParam;
     }
@@ -58,8 +53,7 @@ void ImageSpaceEffectSunbeams::Setup(ImageSpaceManager* apManager, ImageSpaceEff
         pparam_2 = nullptr;
     }
     pparam_2->InitConstantMap(0, 1);
-    spParam2.m_pObject = pparam_2;
-    pEffectParamList.SetAt(1u, spParam2);
+    pEffectParamList.SetAt(1u, NiPointer<ImageSpaceShaderParam>(pparam_2));
     SetEffectInputs(1, 2, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(1, apManager->pEffectList.m_pBase[57], pparam_2, 0);
     pparam_2->SetPixelConstant(0, ImageSpaceEffectSunbeams::kSunPos.x, ImageSpaceEffectSunbeams::kSunPos.y, 0.0f, 0.0f);

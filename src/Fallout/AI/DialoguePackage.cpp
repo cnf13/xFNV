@@ -881,12 +881,10 @@ void DialoguePackage::Speak(bool abUseSound) {
 
         // GetShowSubtitles: only the low byte of the result is tested.
         {
-            // Copies the location, then the handle with operator=, then reads the text.
+            // Copies the location, then reads the text.
             NiPoint3 kSpeakerLoc = pspeaker->GetLocationOnReference();
-            XFNV_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
-            subtitleHandle = handle;
             const char* pText = pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
-            Interface::ShowSubtitle(pText, subtitleHandle, kSpeakerLoc, pTargetActor, false);
+            Interface::ShowSubtitle(pText, handle, kSpeakerLoc, pTargetActor, false);
         }
 
         if (flistentimer <= 0.0 && pTargetActor != pspeaker) {

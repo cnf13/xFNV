@@ -186,20 +186,8 @@ void hkpContactPointViewer::drawAllContactPointsInIsland(const hkpSimulationIsla
                 continue;
             }
 
-            // The SDK's hkLocalArray<hkContactPointId> contactPoints(HK_MAX_CONTACT_POINT): 256 ids on the thread's
-            // stack allocator, flagged DONT_DEALLOCATE. The stack allocator hands out raw memory.
-            // EXE-INLINED none: hkLocalArray<uint16_t>::hkLocalArray(int)
-            XFNV_INLINED_LOCAL(hkLocalArray<uint16_t>, contactPoints, std::nullopt, std::nullopt);
-            contactPoints.m_data = nullptr;
-            contactPoints.m_size = 0;
-            contactPoints.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG);
-            // EXE-INLINED none: hkAllocateStack<uint16_t>
-            hkMemoryRouter* router = &hkMemoryRouter::getInstance();
-            uint16_t* stackMemory = reinterpret_cast<uint16_t*>(router->m_stack.m_next.m_storage);
-            router->m_stack.m_next.m_storage += (256 * sizeof(uint16_t) + 127) & ~static_cast<size_t>(127);
-            contactPoints.m_data = stackMemory;
-            contactPoints.m_localMemory = stackMemory;
-            contactPoints.m_capacityAndFlags = static_cast<int32_t>(256 | hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG);
+            // The SDK's hkLocalArray<hkContactPointId> contactPoints(HK_MAX_CONTACT_POINT).
+            hkLocalArray<uint16_t> contactPoints(256);
             manager->getAllContactPointIds(contactPoints);
 
             for (int32_t i = 0; i < contactPoints.m_size; ++i) {
@@ -216,8 +204,6 @@ void hkpContactPointViewer::drawAllContactPointsInIsland(const hkpSimulationIsla
                     );
                 }
             }
-
-            contactPoints.~hkLocalArray<uint16_t>();
         }
     }
 

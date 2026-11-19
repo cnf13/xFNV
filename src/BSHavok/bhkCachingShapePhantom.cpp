@@ -131,15 +131,8 @@ NiObject* bhkCachingShapePhantom::CreateObject() {
 // into world space at the end.
 void hkpCachingShapePhantomRay::castRay(const hkpWorldRayCastInput& arInput, hkpWorldRayCastOutput& arOutput) {
     HK_TIMER_BEGIN("rcCachingPhantom", nullptr);
-    XFNV_INLINED_LOCAL(hkpShapeRayCastInput, sinput, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, sout, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x4A3D20
-    sout.m_hitFraction = 1.0f;
-    sout.m_extraInfo = -1;
-    sout.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
-    sout.m_shapeKeyIndex = 0;
-    // EXE-INLINED 0x632CA0
-    sinput.m_rayShapeCollectionFilter = nullptr;
+    hkpShapeRayCastOutput sout;
+    hkpShapeRayCastInput sinput;
     sinput.m_filterInfo = arInput.m_filterInfo;
     hkpCollisionFilter* pFilter;
     if (arInput.m_enableShapeCollectionFilter.m_bool && (pFilter = m_world->m_collisionFilter) != nullptr) {

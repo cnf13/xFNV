@@ -53,10 +53,7 @@ hkpToiCountViewer::~hkpToiCountViewer() {
 // Stops counting the bodies of the world (collected first, then unhooked and dropped from the map) and stops
 // listening to the world.
 void hkpToiCountViewer::worldRemovedCallback(hkpWorld* w) {
-    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entitiesToRemove, std::nullopt, std::nullopt);
-    entitiesToRemove.m_data = nullptr;
-    entitiesToRemove.m_size = 0;
-    entitiesToRemove.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpEntity*> entitiesToRemove;
     for (int32_t it = m_toiCounts.getIterator(); m_toiCounts.isValid(it); it = m_toiCounts.getNext(it)) {
         hkpEntity* entity = m_toiCounts.getKey(it);
         if (entity->m_world == w) {
@@ -75,17 +72,6 @@ void hkpToiCountViewer::worldRemovedCallback(hkpWorld* w) {
             this == nullptr ? nullptr : static_cast<hkpEntityListener*>(this)
         );
         m_toiCounts.remove(static_cast<hkpRigidBody*>(entitiesToRemove.m_data[i]));
-    }
-    // EXE-INLINED 0xC7B0F0
-    hkMemoryAllocator* pHeap = &hkMemoryRouter::getInstance().heap();
-    entitiesToRemove.m_size = 0;
-    if (entitiesToRemove.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            entitiesToRemove.m_data,
-            static_cast<int32_t>(
-                (entitiesToRemove.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) * sizeof(hkpEntity*)
-            )
-        );
     }
     w->removeContactListener(this == nullptr ? nullptr : static_cast<hkpContactListener*>(this));
     w->removeWorldPostSimulationListener(
@@ -246,8 +232,7 @@ void hkpToiCountViewer::displayCountForBody(hkpRigidBody* body, hkpToiCountViewe
     if (m_toiCounts.isValid(it)) {
         uint32_t value = m_toiCounts.m_map.m_elem[it].val;
         uint32_t numRecent = value >> 24;
-        XFNV_INLINED_LOCAL(hkStringBuf, str, std::nullopt, std::nullopt);
-        ::new (&str) hkStringBuf;
+        hkStringBuf str;
         uint32_t numToi = value & 0xFFFFFF;
         if (numRecent) {
             str.printf("%d(%d)", numToi, numRecent);
@@ -260,12 +245,6 @@ void hkpToiCountViewer::displayCountForBody(hkpRigidBody* body, hkpToiCountViewe
             static_cast<int32_t>(hkColor::MAROON), 0.1f, static_cast<hkBool>(true)
         );
         m_toiCounts.m_map.m_elem[it].val = numToi;
-        // EXE-INLINED 0xCBBD40
-        hkMemoryAllocator* m_temp = (&hkMemoryRouter::getInstance())->m_temp;
-        str.m_string.m_size = 0;
-        if (str.m_string.m_capacityAndFlags >= 0) {
-            m_temp->bufFree(str.m_string.begin(), str.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-        }
     }
 }
 

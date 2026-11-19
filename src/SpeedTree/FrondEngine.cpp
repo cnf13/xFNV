@@ -305,10 +305,7 @@ void CFrondEngine::Compute(CIndexedGeometry* pGeometry, CLightingEngine* pLighti
     }
     if (nVertices > 0xFFFF) {
         std::string strMessage = IdvFormatString("frond vertices exceed %d", 0xFFFF);
-        XFNV_INLINED_LOCAL(rt::runtime_error, cError, std::nullopt, std::nullopt);
-        // Natively runtime_error's own constructor: its vtable, then the message string's copy.
-        ::new (&cError) rt::runtime_error(strMessage);
-        throw cError;
+        throw rt::runtime_error(strMessage);
     }
     m_pGeometry->SetNumLodLevels(static_cast<uint16_t>(m_nNumLodLevels));
     switch (m_eFrondType) {

@@ -72,11 +72,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         return;
     }
     WorldToEntityData* data = m_worldEntities.m_data[index];
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*> constructor
-    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
-    displayGeometries.m_data = nullptr;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkDisplayGeometry*> displayGeometries;
     // No destructor is run for either env or builder, as the game does.
     hkpShapeDisplayBuilder::hkpShapeDisplayBuilderEnvironment env;
     hkpShapeDisplayBuilder builder(env);
@@ -86,15 +82,15 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         hkDisplayGeometry* geometry = displayGeometries.m_data[i];
         if (geometry->m_type == HK_DISPLAY_CONVEX && !geometry->m_geometry) {
             // EXE-INLINED none: HK_REPORT
-            alignas(16) char buf[512];
-            XFNV_INLINED_LOCAL(hkErrStream, errStream, std::nullopt, std::nullopt);
-            ::new (&errStream) hkErrStream(buf, 512);
-            errStream << "Unable to build display geometry from hkpShape geometry data";
-            hkError::s_instance->message(
-                hkError::MESSAGE_REPORT, -1, buf,
-                ".\\VisualDebugger\\Viewer\\Dynamics\\hkpSweptTransformDisplayViewer.cpp", 168
-            );
-            errStream.~hkErrStream();
+            {
+                alignas(16) char buf[512];
+                hkErrStream errStream(buf, 512);
+                errStream << "Unable to build display geometry from hkpShape geometry data";
+                hkError::s_instance->message(
+                    hkError::MESSAGE_REPORT, -1, buf,
+                    ".\\VisualDebugger\\Viewer\\Dynamics\\hkpSweptTransformDisplayViewer.cpp", 168
+                );
+            }
             // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
             displayGeometries.m_size--;
             if (displayGeometries.m_size != i) {
@@ -165,18 +161,6 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         if (geometry) {
             delete geometry;
         }
-    }
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*> destructor
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacityAndFlags = displayGeometries.m_capacityAndFlags;
-    displayGeometries.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap->bufFree(
-            displayGeometries.m_data,
-            static_cast<int32_t>(
-                (capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) * sizeof(hkDisplayGeometry*)
-            )
-        );
     }
 }
 

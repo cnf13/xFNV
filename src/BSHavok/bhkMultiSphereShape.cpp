@@ -94,12 +94,7 @@ void bhkMultiSphereShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     bhkSerializable* pThis = this;
     hkMultiSphereShapeCinfo* pCinfo = &static_cast<hkMultiSphereShapeCinfo&>(pThis->CreateCinfo(bCreated));
-    using kSpheres_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(kSpheres_t, kSpheres, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x6299A0
-    kSpheres.m_data = nullptr;
-    kSpheres.m_size = 0;
-    kSpheres.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4, hkContainerHeapAllocator> kSpheres;
     kSpheres.swap(pCinfo->m_spheres);
     // Compares the flag's raw byte with 1: any other byte swaps. A bool compare would only test for zero, so the byte
     // is read as untyped memory.
@@ -114,16 +109,6 @@ void bhkMultiSphereShape::SaveBinary(NiStream& arStream) {
     if (!bCreated && *pucSaveLittleEndian != 1) {
         bhkStream::SwapHKArray(pCinfo, static_cast<int32_t>(pThis->QCinfoSize()), &pCinfo->m_spheres);
     }
-    // EXE-INLINED 0x66DA50
-    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-    kSpheres.m_size = 0;
-    if (kSpheres.m_capacityAndFlags >= 0) {
-        rHeap.bufFree(
-            kSpheres.m_data,
-            static_cast<int32_t>(kSpheres.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkVector4))
-        );
-    }
 }
 
 // Compares the two shapes: the base's data first, then the spheres each shape's Havok object holds, gathered into
@@ -134,43 +119,11 @@ bool bhkMultiSphereShape::IsEqual(NiObject* apObject) {
         return false;
     }
 
-    XFNV_INLINED_LOCAL(hkMultiSphereShapeCinfo, infoThis, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkMultiSphereShapeCinfo, infoOther, std::nullopt, std::nullopt);
-    infoThis.m_userData = 0;
-    infoThis.m_spheres.m_data = nullptr;
-    infoThis.m_spheres.m_size = 0;
-    infoThis.m_spheres.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    infoOther.m_userData = 0;
-    infoOther.m_spheres.m_data = nullptr;
-    infoOther.m_spheres.m_size = 0;
-    infoOther.m_spheres.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkMultiSphereShapeCinfo infoThis;
+    hkMultiSphereShapeCinfo infoOther;
     GetCinfo(infoThis);
     static_cast<bhkMultiSphereShape*>(apObject)->GetCinfo(infoOther);
     bool bEqual = bhkStream::IsEqual(infoThis.m_spheres, infoOther.m_spheres);
-
-    // Asks the thread's router for its heap once per array, before testing whether the array owns storage.
-    hkMemoryAllocator& rOtherHeap = hkMemoryRouter::getInstance().heap();
-    infoOther.m_spheres.m_size = 0;
-    if (infoOther.m_spheres.m_capacityAndFlags >= 0) {
-        rOtherHeap.bufFree(
-            infoOther.m_spheres.m_data,
-            static_cast<int32_t>(infoOther.m_spheres.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkVector4))
-        );
-    }
-    infoOther.m_spheres.m_data = nullptr;
-    infoOther.m_spheres.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator& rThisHeap = hkMemoryRouter::getInstance().heap();
-    infoThis.m_spheres.m_size = 0;
-    if (infoThis.m_spheres.m_capacityAndFlags >= 0) {
-        rThisHeap.bufFree(
-            infoThis.m_spheres.m_data,
-            static_cast<int32_t>(infoThis.m_spheres.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkVector4))
-        );
-    }
-    infoThis.m_spheres.m_data = nullptr;
-    infoThis.m_spheres.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     return bEqual;
 }
 

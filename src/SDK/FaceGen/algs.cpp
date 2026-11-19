@@ -656,14 +656,9 @@ std::string* UncheckedMoveBackward(std::string* _First, std::string* _Last, std:
 // <xmemory>'s _Allocate of strings, out of line.
 std::string* _Allocate(uint32_t _Count)
 {
-	XFNV_INLINED_LOCAL(rt::bad_alloc, kException, std::nullopt, std::nullopt);
 	if (_Count) {
 		if (static_cast<size_t>(-1) / _Count < sizeof(std::string)) {
-			// EXE-INLINED 0x44D6C0
-			const char* pMessage = nullptr;
-			// Natively bad_alloc's own constructor, which stores its own vtable.
-			::new (static_cast<void*>(&kException)) rt::bad_alloc(pMessage);
-			throw kException;
+			throw rt::bad_alloc(nullptr);
 		}
 	} else {
 		_Count = 0;

@@ -294,11 +294,8 @@ void hkpCollisionDispatcher::debugPrintTable() {
     char acBuffer[512];
     char acLine[256];
     alignas(hkErrStream) uint8_t aStream[sizeof(hkErrStream)];
-    // The heading is constructed at the top of each row and released at its end; nothing constructs or destroys it
-    // otherwise.
-    XFNV_INLINED_LOCAL(hkStringBuf, kHeading, std::nullopt, std::nullopt);
     for (int32_t i = 0; i < HK_MAX_SHAPE_TYPE; i++) {
-        ::new (&kHeading) hkStringBuf(
+        hkStringBuf kHeading(
             "\nEntries for (continuous)", hkGetShapeTypeName(hkpShapeType(i)), nullptr, nullptr, nullptr, nullptr
         );
         hkErrStream* pStream = ::new (aStream) hkErrStream(acBuffer, 512);
@@ -324,15 +321,9 @@ void hkpCollisionDispatcher::debugPrintTable() {
                 pStream->~hkErrStream();
             }
         }
-        // EXE-INLINED 0xCBBD40
-        hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-        kHeading.m_string.m_size = 0;
-        if (kHeading.m_string.m_capacityAndFlags >= 0) {
-            pTemp->bufFree(kHeading.m_string.m_data, kHeading.m_string.m_capacityAndFlags & 0x3FFFFFFF);
-        }
     }
     for (int32_t i = 0; i < HK_MAX_SHAPE_TYPE; i++) {
-        ::new (&kHeading) hkStringBuf(
+        hkStringBuf kHeading(
             "\nEntries for (discrete)", hkGetShapeTypeName(hkpShapeType(i)), nullptr, nullptr, nullptr, nullptr
         );
         hkErrStream* pStream = ::new (aStream) hkErrStream(acBuffer, 512);
@@ -357,12 +348,6 @@ void hkpCollisionDispatcher::debugPrintTable() {
                 );
                 pStream->~hkErrStream();
             }
-        }
-        // EXE-INLINED 0xCBBD40
-        hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-        kHeading.m_string.m_size = 0;
-        if (kHeading.m_string.m_capacityAndFlags >= 0) {
-            pTemp->bufFree(kHeading.m_string.m_data, kHeading.m_string.m_capacityAndFlags & 0x3FFFFFFF);
         }
     }
     hkError::s_instance->sectionEnd();

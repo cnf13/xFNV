@@ -180,11 +180,7 @@ void hkpRigidBodyInertiaViewer::postSimulationCallback(hkpWorld* world) {
         m_displayBoxes.m_size = newSize;
     }
 
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::hkArray()
-    XFNV_INLINED_LOCAL(hkArray<hkDisplayGeometry*>, displayGeometries, std::nullopt, std::nullopt);
-    displayGeometries.m_data = nullptr;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG);
+    hkArray<hkDisplayGeometry*> displayGeometries;
     displayGeometries.setSize(m_displayBoxes.m_size);
     for (int32_t i = m_displayBoxes.m_size - 1; i >= 0; --i) {
         displayGeometries.m_data[i] = &m_displayBoxes.m_data[i];
@@ -195,9 +191,6 @@ void hkpRigidBodyInertiaViewer::postSimulationCallback(hkpWorld* world) {
 
     HK_TIMER_END();
     HK_TIMER_END();
-
-    // The array's inline destructor: the size cleared, the heap storage freed unless flagged DONT_DEALLOCATE.
-    displayGeometries.clearAndDeallocate();
 }
 
 void hkpRigidBodyInertiaViewer::worldAddedCallback(hkpWorld* world) {

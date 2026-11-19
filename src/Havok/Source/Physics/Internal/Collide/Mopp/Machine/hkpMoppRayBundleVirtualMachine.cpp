@@ -704,10 +704,7 @@ void hkpMoppRayBundleVirtualMachine::queryRayOnTree(
                     const hkpShape* pShape = m_collection->getChildShape(uiKey, acShapeBuffer);
                     if (m_rays->m_rayShapeCollectionFilter) {
                         // Only the filter info is set: the input's ends are left unwritten, as the game does.
-                        XFNV_INLINED_LOCAL(hkpShapeRayCastInput, kInput, std::nullopt, std::nullopt);
-                        // EXE-INLINED 0x632CA0
-                        kInput.m_filterInfo = 0;
-                        kInput.m_rayShapeCollectionFilter = nullptr;
+                        hkpShapeRayCastInput kInput;
                         kInput.m_filterInfo = m_rays->m_filterInfo;
                         if (!m_rays->m_rayShapeCollectionFilter->isCollisionEnabled(
                                 kInput, *pShape, *m_collection, uiKey

@@ -60,10 +60,7 @@ void ImageSpaceEffectMenuBG::Setup(ImageSpaceManager* apManager, ImageSpaceEffec
     }
     pParam->InitConstantMap(0, 1);
     pParam->SetPixelConstant(0, 0.0f, 0.0f, 0.0f, 0.0f);
-    // The NiPointer's constructor and destructor do nothing, because the parameter class is not a NiRefObject.
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
-    spParam.m_pObject = pParam;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, pParam);
     SetEffectInputs(0, 1, 2, NiTexturingProperty::FILTER_BILERP, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(0, apManager->pEffectList.m_pBase[ImageSpaceManager::EFFECT_SHADER_MENUBG], pParam, 0);
 }

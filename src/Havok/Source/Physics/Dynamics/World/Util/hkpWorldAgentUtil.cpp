@@ -166,13 +166,10 @@ hkpSimulationIsland* hkpWorldAgentUtil::getIslandFromAgentEntry(
     return (searchIslandA != found) ? candidateB : candidateA;
 }
 
-// The sorted copy of the entity's agent list starts empty (no storage, not ours). Each agent with an update-filter
-// function gets the island of its first entity, or of its second when the first is fixed.
+// Each agent with an update-filter function gets the island of its first entity, or of its second when the first is
+// fixed.
 void hkpWorldAgentUtil::updateEntityShapeCollectionFilter(hkpEntity* entity, hkpCollisionInput& collisionInput) {
-    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
-    collisionEntries.m_data = nullptr;
-    collisionEntries.m_size = 0;
-    collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpLinkedCollidable::CollisionEntry> collisionEntries;
     entity->m_collidable.getCollisionEntriesSorted(collisionEntries);
     for (int32_t i = 0; i < collisionEntries.m_size; ++i) {
         hkpAgentNnEntry* entry = collisionEntries.m_data[i].m_agentEntry;
@@ -207,17 +204,6 @@ void hkpWorldAgentUtil::updateEntityShapeCollectionFilter(hkpEntity* entity, hkp
             agentData = static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1;
         }
         func(entry, agentData, *collA, *collB, collisionInput, entry->m_contactMgr, *island);
-    }
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = collisionEntries.m_capacityAndFlags;
-    collisionEntries.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            collisionEntries.m_data,
-            (capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpLinkedCollidable::CollisionEntry))
-        );
     }
 }
 

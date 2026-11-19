@@ -174,19 +174,7 @@ void hkpEndOfStepCallbackUtil::removeCollisions(hkArray<Collision>& removedColli
     }
     const int32_t kElementSize = static_cast<int32_t>(sizeof(T));
     const int32_t kOriginalRemovedSize = removedCollisions.m_size;
-    XFNV_INLINED_LOCAL(hkArray<T>, filtered, std::nullopt, std::nullopt);
-    filtered.m_data = nullptr;
-    filtered.m_size = 0;
-    filtered.m_capacityAndFlags = hkArrayBase<T>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    if (list.m_size != 0) {
-        int32_t numBytes = kElementSize * list.m_size;
-        filtered.m_data = static_cast<T*>(pHeap->bufAlloc(numBytes));
-        int32_t numElements = numBytes / kElementSize;
-        filtered.m_size = static_cast<uint32_t>(numElements);
-        filtered.m_capacityAndFlags =
-            numElements != 0 ? static_cast<uint32_t>(numElements) : hkArrayBase<T>::DONT_DEALLOCATE_FLAG;
-    }
+    hkArray<T> filtered(list.m_size);
     if (list.m_size > 0) {
         T* pOut = filtered.m_data;
         for (uint32_t i = 0; i < list.m_size; ++i) {
@@ -224,14 +212,6 @@ void hkpEndOfStepCallbackUtil::removeCollisions(hkArray<Collision>& removedColli
     }
     filtered.m_size = static_cast<uint32_t>(numKept);
     list.swap(filtered);
-    hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-    filtered.m_size = 0;
-    if (filtered.m_capacityAndFlags >= 0) {
-        pFreeHeap->bufFree(
-            filtered.m_data,
-            kElementSize * static_cast<int32_t>(filtered.m_capacityAndFlags & hkArrayBase<T>::CAPACITY_MASK)
-        );
-    }
 }
 
 template void hkpEndOfStepCallbackUtil::removeCollisions<hkpEndOfStepCallbackUtil::NewCollision>(
@@ -255,21 +235,8 @@ void hkpEndOfStepCallbackUtil::mergeCollisions(hkArray<NewCollision>& newCollisi
     if (reinterpret_cast<uintptr_t>(pNew) == uNewEnd) {
         return;
     }
-    const int32_t kElementSize = static_cast<int32_t>(sizeof(Collision));
     int32_t numElements = newCollisions.m_size + collisions.m_size;
-    XFNV_INLINED_LOCAL(hkArray<Collision>, merged, std::nullopt, std::nullopt);
-    merged.m_data = nullptr;
-    merged.m_size = 0;
-    merged.m_capacityAndFlags = hkArrayBase<Collision>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    if (numElements != 0) {
-        int32_t numBytes = kElementSize * numElements;
-        merged.m_data = static_cast<Collision*>(pHeap->bufAlloc(numBytes));
-        int32_t numAllocated = numBytes / kElementSize;
-        merged.m_size = static_cast<uint32_t>(numAllocated);
-        merged.m_capacityAndFlags =
-            numAllocated != 0 ? static_cast<uint32_t>(numAllocated) : hkArrayBase<Collision>::DONT_DEALLOCATE_FLAG;
-    }
+    hkArray<Collision> merged(numElements);
     Collision* pOut = merged.m_data;
     Collision* pOld = collisions.m_data;
     const uintptr_t uOldEnd =
@@ -296,13 +263,6 @@ void hkpEndOfStepCallbackUtil::mergeCollisions(hkArray<NewCollision>& newCollisi
     }
     collisions.swap(merged);
     newCollisions.m_size = 0;
-    hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-    if (merged.m_capacityAndFlags >= 0) {
-        pFreeHeap->bufFree(
-            merged.m_data,
-            kElementSize * static_cast<int32_t>(merged.m_capacityAndFlags & hkArrayBase<Collision>::CAPACITY_MASK)
-        );
-    }
 }
 
 // Fires the callbacks of the step's collisions. The removed and the re-registered ones cancel out first; with

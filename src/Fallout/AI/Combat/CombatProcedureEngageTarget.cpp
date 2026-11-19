@@ -37,8 +37,6 @@ CombatProcedureEngageTarget::~CombatProcedureEngageTarget() {}
 void CombatProcedureEngageTarget::Update() {
     NiPoint3 optimalLocation;
     NiPoint3 newPoint;
-    XFNV_INLINED_LOCAL(PathingRequest, request_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingRequest, request, std::nullopt, std::nullopt);
     BGSWorldLocation attackerWorldLoc;
     BGSWorldLocation targetWorldLoc;
     Actor* pattacker = GetAttacker();
@@ -90,18 +88,18 @@ void CombatProcedureEngageTarget::Update() {
                 if (!(fsquaredDistance < 262144.0) || !pcombatState->CheckMovement(targetWorldLoc, true, false)) {
                     goto LABEL_17;
                 }
-                ::new (&request) PathingRequest;
-                Space = targetWorldLoc.pSpace;
-                Point = &(&targetWorldLoc)->Point;
-                pattacker->BuildRequest_0(&request, *Point, Space, -1.0f, nullptr);
-                if (pattacker->SetPathfindingGoal(&request)) {
-                    Destination = targetWorldLoc;
-                    SetMoveMode(1);
-                    this->eState = CombatProcedureEngageTarget::ENGAGE_STATE_APPROACHING_TARGET;
-                    request.~PathingRequest();
-                    return;
+                {
+                    PathingRequest request;
+                    Space = targetWorldLoc.pSpace;
+                    Point = &(&targetWorldLoc)->Point;
+                    pattacker->BuildRequest_0(&request, *Point, Space, -1.0f, nullptr);
+                    if (pattacker->SetPathfindingGoal(&request)) {
+                        Destination = targetWorldLoc;
+                        SetMoveMode(1);
+                        this->eState = CombatProcedureEngageTarget::ENGAGE_STATE_APPROACHING_TARGET;
+                        return;
+                    }
                 }
-                request.~PathingRequest();
             LABEL_17:;
                 if (bLeftRightDodgeCheckLOS) {
                     if (!(HoldingTimer.ElapsedTime() < 0.5)) {
@@ -125,17 +123,19 @@ void CombatProcedureEngageTarget::Update() {
                 bLeftRightDodgeLostLOS = 0;
                 bLeftRightDodgeHadLOS = pcombatState->GetHasTarget360LineOfSight();
                 LeftRightDodgeLOSTimer.Clear();
-                ::new (&request_2) PathingRequest;
-                WorldSpace = pattacker->GetWorldSpace();
-                ParentCell = pattacker->GetParentCell();
-                pattacker->BuildRequest(&request_2, LeftRightDodgeStartLocation, ParentCell, WorldSpace, 0.0f, nullptr);
-                if (pattacker->SetPathfindingGoal(&request_2)) {
-                    SetMoveMode(1);
-                    this->eState = CombatProcedureEngageTarget::ENGAGE_STATE_DODGING_LEFT_RIGHT;
-                    request_2.~PathingRequest();
-                    return;
+                {
+                    PathingRequest request_2;
+                    WorldSpace = pattacker->GetWorldSpace();
+                    ParentCell = pattacker->GetParentCell();
+                    pattacker->BuildRequest(
+                        &request_2, LeftRightDodgeStartLocation, ParentCell, WorldSpace, 0.0f, nullptr
+                    );
+                    if (pattacker->SetPathfindingGoal(&request_2)) {
+                        SetMoveMode(1);
+                        this->eState = CombatProcedureEngageTarget::ENGAGE_STATE_DODGING_LEFT_RIGHT;
+                        return;
+                    }
                 }
-                request_2.~PathingRequest();
             LABEL_29:;
                 if (!btooFar && !btooClose) {
                     goto LABEL_58;

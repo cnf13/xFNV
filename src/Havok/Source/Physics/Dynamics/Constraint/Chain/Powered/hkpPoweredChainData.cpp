@@ -220,14 +220,9 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
     hkBeginConstraints(&inNotValid, &out, static_cast<hkpSolverResults*>(inNotValid.m_constraintRuntime.m_storage), 8);
 
     hkpConstraintQueryIn in2 = inNotValid;
-    // EXE-INLINED none: hkInplaceArray<hkpVelocityAccumulatorOffset, 32>::hkInplaceArray
-    using accumulators_t = hkInplaceArray<hkpVelocityAccumulatorOffset, 32>;
-    XFNV_INLINED_LOCAL(accumulators_t, accumulators, std::nullopt, std::nullopt);
-    accumulators.m_data = accumulators.m_storage;
+    hkInplaceArray<hkpVelocityAccumulatorOffset, 32> accumulators;
     in2.m_constraintInstance = nullptr;
     in2.m_constraintRuntime.m_storage = nullptr;
-    accumulators.m_size = 0;
-    accumulators.m_capacityAndFlags = 32 | hkArrayBase<hkpVelocityAccumulatorOffset>::DONT_DEALLOCATE_FLAG;
 
     hkpConstraintChainInstance* instance = static_cast<hkpConstraintChainInstance*>(inNotValid.m_constraintInstance);
     // The accumulators' base: body A's accumulator less the chain instance's first entity's offset. The accumulator
@@ -236,12 +231,7 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
     char* accumsBase = reinterpret_cast<char*>(inNotValid.m_bodyA) - instance->m_entities[0]->m_solverData;
     const int32_t numConstraints = instance->m_chainedEntities.m_size - 1;
 
-    // EXE-INLINED none: hkInplaceArray<hkp3dAngularMotorSolverInfo, 32>::hkInplaceArray
-    using motorsState_t = hkInplaceArray<hkp3dAngularMotorSolverInfo, 32>;
-    XFNV_INLINED_LOCAL(motorsState_t, motorsState, std::nullopt, std::nullopt);
-    motorsState.m_data = motorsState.m_storage;
-    motorsState.m_size = 0;
-    motorsState.m_capacityAndFlags = 32 | hkArrayBase<hkp3dAngularMotorSolverInfo>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkp3dAngularMotorSolverInfo, 32> motorsState;
     // EXE-INLINED none: hkArray<hkp3dAngularMotorSolverInfo>::setSize
     // The SDK's setSize, inlined: the growth to max(2 * capacity, n), then the size (POD elements: no construction).
     {
@@ -425,28 +415,6 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
     params.m_childConstraintStatusWriteBackBuffer = flags;
     params.m_jacobiansEnd = angularJac;
     hkPoweredChainBuildJacobian(params, inNotValid, out);
-
-    // EXE-INLINED none: hkArray<hkp3dAngularMotorSolverInfo>::~hkArray
-    // The inline arrays' destructors, inlined.
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    motorsState.m_size = 0;
-    if (motorsState.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            motorsState.m_data,
-            (motorsState.m_capacityAndFlags & hkArrayBase<hkp3dAngularMotorSolverInfo>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkp3dAngularMotorSolverInfo))
-        );
-    }
-    // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::~hkArray
-    heap = hkMemoryRouter::getInstance().m_heap;
-    accumulators.m_size = 0;
-    if (accumulators.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            accumulators.m_data,
-            (accumulators.m_capacityAndFlags & hkArrayBase<hkpVelocityAccumulatorOffset>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpVelocityAccumulatorOffset))
-        );
-    }
 }
 
 void hkpPoweredChainData::getConstraintInfo(hkpConstraintData::ConstraintInfo& info) const {

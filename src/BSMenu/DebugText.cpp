@@ -237,7 +237,6 @@ void DebugText::HandleQueuedPrints() {
         if (eType) {
             if (eType == DebugText::DTPT_SPECIFIED) {
                 size_t sLen;
-                XFNV_INLINED_LOCAL(BSStringT<char>, string, std::nullopt, std::nullopt);
                 XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
                 int32_t a_2;
                 tempMemContext.iOldMemContext = GetThreadTLSData()->eMemContext;
@@ -256,12 +255,7 @@ void DebugText::HandleQueuedPrints() {
                     p_uValue = &iDebugTextFont.uValue;
                     ifont = p_uValue->uint;
                 }
-                // MAYBE-INLINED 0xA0EC5D: a write opening BSStringT<char>'s uses: may be its inlined constructor
-                string.pString = nullptr;
-                // MAYBE-INLINED 0xA0EC8C: a write opening BSStringT<char>'s uses: may be its inlined constructor
-                string.sLen = 0;
-                // MAYBE-INLINED 0xA0ECB7: a write opening BSStringT<char>'s uses: may be its inlined constructor
-                string.sMaxLen = 0;
+                BSStringT<char> string;
                 if (xPrintData.pBuffer[i]->pTextData->pText.pString &&
                     (xPrintData.pBuffer[i]->pTextData->pText.sLen != 0xFFFF
                          ? sLen = xPrintData.pBuffer[i]->pTextData->pText.sLen
@@ -296,7 +290,6 @@ void DebugText::HandleQueuedPrints() {
                         }
                     }
                     if (a == ilen) {
-                        string.Set(nullptr, 0);
                         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
                         return;
                     }
@@ -327,7 +320,6 @@ void DebugText::HandleQueuedPrints() {
                     }
                     if (a_2 == 200) {
                         Warning("DEFAULT: Too many unique debug text items. \n");
-                        string.Set(nullptr, 0);
                         GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
                         return;
                     }
@@ -388,7 +380,6 @@ void DebugText::HandleQueuedPrints() {
                     }
                     DebugText::Unlock();
                 }
-                string.Set(nullptr, 0);
                 GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
             }
         }

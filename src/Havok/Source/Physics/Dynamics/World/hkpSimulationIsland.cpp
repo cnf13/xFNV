@@ -173,12 +173,7 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
             }
         }
     }
-    using EntityArray = hkInplaceArray<hkpEntity*, 10, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(EntityArray, actionEntities, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkInplaceArray<hkpEntity*, 10>::hkInplaceArray
-    actionEntities.m_data = actionEntities.m_storage;
-    actionEntities.m_size = 0;
-    actionEntities.m_capacityAndFlags = 10 | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    hkInplaceArray<hkpEntity*, 10, hkContainerHeapAllocator> actionEntities;
     for (int32_t j = 0; j < m_actions.m_size; j++) {
         hkpAction* action = m_actions.m_data[j];
         if (action) {
@@ -198,32 +193,11 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
                         actionEntities.m_data[firstUnfixed]->m_storageIndex, actionEntities.m_data[k]->m_storageIndex
                     );
                     if (checkConnectivityOut.isOneGroup().m_bool) {
-                        // EXE-INLINED none: hkArray<hkpEntity*>::~hkArray
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        const int32_t capacityAndFlags = actionEntities.m_capacityAndFlags;
-                        actionEntities.m_size = 0;
-                        if (capacityAndFlags >= 0) {
-                            pHeap->bufFree(
-                                actionEntities.m_data,
-                                (capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                                    static_cast<int32_t>(sizeof(hkpEntity*))
-                            );
-                        }
                         return true;
                     }
                 }
             }
         }
-    }
-    // EXE-INLINED none: hkArray<hkpEntity*>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacityAndFlags = actionEntities.m_capacityAndFlags;
-    actionEntities.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            actionEntities.m_data,
-            (capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkpEntity*))
-        );
     }
     return checkConnectivityOut.isOneGroup().m_bool;
 }
@@ -323,21 +297,17 @@ void hkpSimulationIsland::isValid() {
     ;
 }
 
-// calcBufferSize's code again (hkpConstraintSolverSetup.cpp): the task header is the SDK's, built and destroyed
-// inline: its constructor sets the reference and island counts to 1 and empties the buffer, the split-island array
-// and the two task lists; its destructor frees the array's storage unless it is flagged not to.
+// calcBufferSize's code again (hkpConstraintSolverSetup.cpp): the task header is the SDK's. The stores below are its
+// SDK constructor's: the reference and island counts 1, the buffer and the two task lists empty; the split-island
+// array is constructed and destroyed as the header's member.
 int32_t calcBufferSizeForSolve(hkpSimulationIsland& island) {
-    alignas(16) XFNV_INLINED_LOCAL(hkpBuildJacobianTaskHeader, taskHeader, std::nullopt, std::nullopt);
+    alignas(16) hkpBuildJacobianTaskHeader taskHeader;
     // EXE-INLINED none: hkpBuildJacobianTaskHeader::hkpBuildJacobianTaskHeader
     taskHeader.m_referenceCount = 1;
     taskHeader.m_numIslandsAfterSplit = 1;
     taskHeader.m_buffer = nullptr;
     taskHeader.m_bufferSize = 0;
     taskHeader.m_bufferCapacity = 0;
-    taskHeader.m_newSplitIslands.m_data = nullptr;
-    taskHeader.m_newSplitIslands.m_size = 0;
-    taskHeader.m_newSplitIslands.m_capacityAndFlags =
-        static_cast<int32_t>(hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG);
     taskHeader.m_tasks.m_buildJacobianTasks = nullptr;
     taskHeader.m_tasks.m_numBuildJacobianTasks = 0;
     taskHeader.m_tasks.m_callbackConstraints = nullptr;
@@ -345,15 +315,6 @@ int32_t calcBufferSizeForSolve(hkpSimulationIsland& island) {
     taskHeader.m_solveTasks.m_firstSolveJacobiansTask = nullptr;
     taskHeader.m_solveTasks.m_firstBatchSize = 0;
     const int32_t size = hkpConstraintSolverSetup::calcBufferOffsetsForSolve(island, nullptr, 0, taskHeader);
-    // EXE-INLINED none: hkpBuildJacobianTaskHeader::~hkpBuildJacobianTaskHeader (hkArray's destructor)
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    if ((taskHeader.m_newSplitIslands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG) ==
-        0) {
-        heap.bufFree(
-            taskHeader.m_newSplitIslands.m_data,
-            taskHeader.m_newSplitIslands.getCapacity() * static_cast<int32_t>(sizeof(hkpSimulationIsland*))
-        );
-    }
     return size;
 }
 

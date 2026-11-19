@@ -1846,7 +1846,6 @@ float MobileObject::SpeakSoundFunction(
     bool abLip,
     bool abUseIdleManager
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
     if (IsTalkingActivator()) {
         float fdelay = 0.0f;
         BSStringT<char> tempstring(apSoundFile);
@@ -2016,8 +2015,7 @@ float MobileObject::SpeakSoundFunction(
                 this->bSpeakingDone = false;
             }
             BaseProcess* v30 = this->pCurrentProcess;
-            kVoiceHandle.operator=(aSoundHand);
-            v30->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, kVoiceHandle);
+            v30->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, aSoundHand);
             if (panim) {
                 BaseProcess* v28 = this->pCurrentProcess;
                 LipSynchAnim* v22 = v28->GetCreatureLipSynchAnim();

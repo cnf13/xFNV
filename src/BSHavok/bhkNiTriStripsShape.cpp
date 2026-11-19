@@ -87,8 +87,7 @@ void bhkNiTriStripsShape::LoadBinary(NiStream& arStream) {
             );
         }
         NiObject::LoadBinary(arStream);
-        XFNV_INLINED_LOCAL(hkpMeshShapeCinfo, kCinfo, std::nullopt, std::nullopt);
-        ::new (&kCinfo) hkpMeshShapeCinfo;
+        hkpMeshShapeCinfo kCinfo;
         {
             hkpMeshShapeCinfo::Serialized kForm{};
             arStream.Istr()->BinaryRead(&kForm, sizeof(kForm), nullptr, 0);
@@ -141,7 +140,6 @@ void bhkNiTriStripsShape::LoadBinary(NiStream& arStream) {
         rInfo.m_userData = 0;
         rInfo.m_radius = 0.1f;
         arStream.ReadMultipleLinkIDs();
-        kCinfo.~hkpMeshShapeCinfo();
     }
     else {
         bhkShape::LoadBinary(arStream);
@@ -183,9 +181,7 @@ void bhkNiTriStripsShape::LinkObject(NiStream& arStream) {
         pShapes->SetSize(uiLinks);
         if (uiLinks) {
             // The empty sub part.
-            XFNV_INLINED_LOCAL(hkNiTriStripsData, kEmpty, std::nullopt, std::nullopt);
-            kEmpty.spGeom.m_pObject = nullptr;
-            kEmpty.iFilter = 0;
+            hkNiTriStripsData kEmpty{};
             for (uint32_t uiLeft = uiLinks; uiLeft != 0; --uiLeft) {
                 // EXE-INLINED none: NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>::Add
                 uint32_t uiIndex = pShapes->m_uiSize;
@@ -236,8 +232,7 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
     // CreateCinfo is called virtually, as the game does.
     hkNiTriStripsShapeCinfo* pCinfo =
         &static_cast<hkNiTriStripsShapeCinfo&>(static_cast<bhkSerializable*>(this)->CreateCinfo(bCreated));
-    XFNV_INLINED_LOCAL(NiTLargePrimitiveArray<hkNiTriStripsData>, kShapes, std::nullopt, std::nullopt);
-    ::new (&kShapes) NiTLargePrimitiveArray<hkNiTriStripsData>(0u, 1u);
+    NiTLargePrimitiveArray<hkNiTriStripsData> kShapes(0u, 1u);
     int32_t iSubparts = static_cast<int32_t>(pCinfo->pShapesA.m_uiSize);
     for (int32_t i = 0; i < iSubparts; ++i) {
         // EXE-INLINED none: NiTLargeArray<hkNiTriStripsData, NiTMallocInterface<hkNiTriStripsData>>::Add
@@ -285,7 +280,6 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
         pScale[3] = __builtin_bswap32(pScale[3]);
     }
     static_cast<bhkSerializable*>(this)->KillCinfo(bCreated);
-    kShapes.~NiTLargePrimitiveArray();
     pTLS->eMemContext = eMemContext;
 }
 

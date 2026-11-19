@@ -1710,7 +1710,6 @@ bool FalloutRadio::TunePipboyToStation(TESObjectREFR* apTargetStation, bool abFo
 }
 
 void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, subtitleHandle, std::nullopt, std::nullopt);
     double v33;
     if (FalloutRadio::pCurrentPipboyStation) {
         int32_t StationPower = FalloutRadio::pCurrentPipboyStation->CurrentState.GetStationPower();
@@ -1860,9 +1859,8 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
             FalloutRadio::PipboyVoiceHndl.Play(false);
             if (!FalloutRadio::PipboyVoiceHndl.IsValid()) {
                 NiPoint3 speakerLoc = pPlayer->GetLocationOnReference();
-                subtitleHandle.operator=(FalloutRadio::PipboyVoiceHndl);
                 char* v11 = (&pcurrentItem->GetCurrentResponse()->cText)->pString;
-                Interface::ShowSubtitle(v11, subtitleHandle, speakerLoc, pPlayer, false);
+                Interface::ShowSubtitle(v11, FalloutRadio::PipboyVoiceHndl, speakerLoc, pPlayer, false);
             }
         }
         if (!bsong || FalloutRadio::GetIsDialogueOnlyRadio()) {

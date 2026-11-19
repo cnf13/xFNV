@@ -47,11 +47,7 @@ void hkpWorldSnapshotViewer::init() {
 // HK_SNAPSHOT command, the target layout rules and its size; then the process deletes itself through the handler.
 void hkpWorldSnapshotViewer::step(float frameTimeInMs) {
     if (m_outStream) {
-        // EXE-INLINED none: hkArray<char>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<char>, storage, std::nullopt, std::nullopt);
-        storage.m_data = nullptr;
-        storage.m_size = 0;
-        storage.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+        hkArray<char> storage;
         storage.reserve(100 * 1024);
         {
             hkArrayStreamWriter writer(&storage, hkArrayStreamWriter::ARRAY_BORROW);
@@ -73,13 +69,6 @@ void hkpWorldSnapshotViewer::step(float frameTimeInMs) {
                     m_outStream->writeRaw(storage.m_data, snapshotSize);
                 }
             }
-        }
-        // EXE-INLINED none: hkArray<char>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = storage.m_capacityAndFlags;
-        storage.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(storage.m_data, capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
         }
     }
     if (m_processHandler) {

@@ -14,11 +14,8 @@
 // Lists a directory, appending an entry per file and subdirectory; 0 when the path is a directory, 1 when it is not.
 // Uses std::filesystem and platform::FindFiles, in the same order as the game's attribute check and find calls.
 hkResult hkWin32ListDirectory(const char* pathIn, hkFileSystem::DirectoryListing& directoryListingOut) {
-    XFNV_INLINED_LOCAL(hkStringBuf, pathBuffer, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkStringBuf, nameBuffer, std::nullopt, std::nullopt);
-
-    ::new (&pathBuffer) hkStringBuf;
-    ::new (&nameBuffer) hkStringBuf(pathIn);
+    hkStringBuf pathBuffer;
+    hkStringBuf nameBuffer(pathIn);
     if (nameBuffer.m_string.getSize() - 1 > 0) {
         nameBuffer.replace('\\', '/', hkStringBuf::REPLACE_ALL);
         if (!nameBuffer.endsWith("/")) {
@@ -26,21 +23,10 @@ hkResult hkWin32ListDirectory(const char* pathIn, hkFileSystem::DirectoryListing
         }
         s_havokToPlatformConvert(nameBuffer.m_string.begin(), pathBuffer);
     }
-    // hkStringBuf's destructor.
-    hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-    nameBuffer.m_string.m_size = 0;
-    if (nameBuffer.m_string.getCapacityAndFlags() >= 0) {
-        pTemp->bufFree(nameBuffer.m_string.begin(), nameBuffer.m_string.getCapacityAndFlags() & 0x3FFFFFFF);
-    }
     // GetFileAttributesA: missing (INVALID_FILE_ATTRIBUTES) or no FILE_ATTRIBUTE_DIRECTORY.
     std::error_code kError;
     if (!std::filesystem::is_directory(platform::NativePath(pathBuffer.m_string.begin()), kError)) {
-        // Not a directory: drop the buffer and report the failure as 1.
-        pTemp = hkMemoryRouter::getInstance().m_temp;
-        pathBuffer.m_string.m_size = 0;
-        if (pathBuffer.m_string.getCapacityAndFlags() >= 0) {
-            pTemp->bufFree(pathBuffer.m_string.begin(), pathBuffer.m_string.getCapacityAndFlags() & 0x3FFFFFFF);
-        }
+        // Not a directory: report the failure as 1.
         return HK_FAILURE;
     }
     if (pathBuffer.m_string.getSize() != 1) {
@@ -86,11 +72,6 @@ hkResult hkWin32ListDirectory(const char* pathIn, hkFileSystem::DirectoryListing
             pEntry->flags.m_storage = hkFileSystem::F_ISFILE;
             pEntry->timeModified = uiModified;
         }
-    }
-    pTemp = hkMemoryRouter::getInstance().m_temp;
-    pathBuffer.m_string.m_size = 0;
-    if (pathBuffer.m_string.getCapacityAndFlags() >= 0) {
-        pTemp->bufFree(pathBuffer.m_string.begin(), pathBuffer.m_string.getCapacityAndFlags() & 0x3FFFFFFF);
     }
     return HK_SUCCESS;
 }

@@ -596,9 +596,8 @@ int32_t RepairMenu::SortFunc(ListBoxItem<ItemChange*>* apItem1, ListBoxItem<Item
 }
 
 void RepairMenu::Update() {
-    XFNV_INLINED_LOCAL(BSSimpleList<ItemChange*>, pnewItemGroup, std::nullopt, std::nullopt);
     if (RepairMenu::pBrokenItem) {
-        ::new (&pnewItemGroup) BSSimpleList<void*>;
+        BSSimpleList<ItemChange*> pnewItemGroup;
         InventoryChanges* InventoryChanges_ = InventoryChanges::GetInventoryChanges(pPlayer);
         InventoryChanges_->GetRepairItemGroup(RepairMenu::pBrokenItem->pContainerObj, &pnewItemGroup);
         for (ItemChange*& rpItem : pnewItemGroup.ItemsUntilNull()) {
@@ -698,6 +697,5 @@ void RepairMenu::Update() {
             const char* v11 = sCancel.String();
             RepairMenu::pMe->pTiles[12]->Set(4036, v11, true);
         }
-        pnewItemGroup.~BSSimpleList<ItemChange*>();
     }
 }

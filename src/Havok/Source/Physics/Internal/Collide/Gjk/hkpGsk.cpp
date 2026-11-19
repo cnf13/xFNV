@@ -1990,10 +1990,7 @@ void hkpGsk::handlePenetration(const hkpConvexShape* shapeA, const hkpConvexShap
 // nonzero fraction.
 hkBool hkpGsk::castRay(const hkpConvexShape* shape, const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) {
     HK_TIMER_BEGIN("GJK Ray Cast", nullptr);
-    XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, localOutput, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x696C60
-    // Plain vectors and integers (no vtable, nothing owned): natively harmless.
-    __builtin_memcpy(static_cast<void*>(&localOutput), &output, sizeof(hkpShapeRayCastOutput));
+    hkpShapeRayCastOutput localOutput = output;
     // EXE-INLINED none: hkMatrix3::setIdentity
     hkRotation identity;
     identity.m_col0.m_quad = _mm_setzero_ps();

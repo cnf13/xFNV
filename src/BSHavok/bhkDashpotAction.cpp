@@ -113,7 +113,6 @@ void bhkDashpotAction::SaveBinary(NiStream& arStream) {
 }
 
 void bhkDashpotAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    XFNV_INLINED_LOCAL(hkDashpotActionCinfo, arCinfo, std::nullopt, std::nullopt);
     TLSData* v2 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v2->eMemContext;
     v2->eMemContext = MEM_CONTEXT_HAVOK;
@@ -126,16 +125,9 @@ void bhkDashpotAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(m_usSize, a3);
-    arCinfo.m_pivotA.fX = 0.0f;
-    arCinfo.m_pivotA.fY = 0.0f;
-    arCinfo.m_pivotA.fZ = 0.0f;
-    arCinfo.m_pivotA.fW = 0.0f;
-    arCinfo.m_pivotB.fX = 0.0f;
+    hkDashpotActionCinfo arCinfo;
     // Zeroes the binary action's part of the info (user data and both bodies).
     std::memset(static_cast<hkBinaryActionCinfo*>(&arCinfo), 0, sizeof(hkBinaryActionCinfo));
-    arCinfo.m_pivotB.fY = 0.0f;
-    arCinfo.m_pivotB.fZ = 0.0f;
-    arCinfo.m_pivotB.fW = 0.0f;
     arCinfo.m_strength = 0.1f;
     arCinfo.m_damping = 0.01f;
     this->CopyCinfo(arCinfo);

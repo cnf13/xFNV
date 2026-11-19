@@ -50,7 +50,6 @@ ImageSpaceEffectDepthOfField::~ImageSpaceEffectDepthOfField() {
 void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpaceEffectParam* apParam) {
     ImageSpaceShaderParam* pparam;
     ImageSpaceShaderParam* pparam_3;
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceShaderParam>, spParam, std::nullopt, std::nullopt);
     SetEffectCount(4);
     // Each unsigned size is converted as a signed value plus the float 2^32 when negative; that addition rounds at the
     // thread's precision control (24 bits under Direct3D), where a 64-bit conversion of the size would not.
@@ -83,26 +82,22 @@ void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpac
     pparam->SetPixelConstant(2, afVal0, v15, 0.0f, 0.0f);
     pparam->bUseTexOffset[1] = false;
     SetEffect(0, apManager->pEffectList.m_pBase[65], pparam, 2);
-    spParam.m_pObject = pparam;
     NiTPrimitiveArray<NiPointer<ImageSpaceShaderParam>>* p_pEffectParamList = &pEffectParamList;
     ImageSpaceShaderParam* pparam_2 = nullptr;
-    pEffectParamList.SetAt(0, spParam);
+    pEffectParamList.SetAt(0, pparam);
     SetEffectInputs(0, 1, NiTexturingProperty::FILTER_BILERP);
-    spParam.m_pObject = nullptr;
-    pEffectParamList.SetAt(1u, spParam);
+    pEffectParamList.SetAt(1u, nullptr);
     SetEffectInputs(1, 2, 3, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST);
     SetEffect(1, apManager->pEffectList.m_pBase[18], nullptr, 2);
     ImageSpaceShaderParam* v11 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v11;
     if (v11) {
         pparam_2 = ::new (v11) ImageSpaceShaderParam;
     }
     pparam_2->InitConstantMap(0, 3);
     pparam_2->SetPixelConstant(0, 1.0f, 1000.0f, 500.0f, fRenderDepthMaxDepth.uValue.f);
     pparam_2->bUseTexOffset[2] = false;
-    spParam.m_pObject = pparam_2;
-    p_pEffectParamList->SetAt(2u, spParam);
+    p_pEffectParamList->SetAt(2u, pparam_2);
     SetEffectInputs(
         2, 1, 2, 4, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_BILERP,
         NiTexturingProperty::FILTER_NEAREST
@@ -110,7 +105,6 @@ void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpac
     SetEffect(2, apManager->pEffectList.m_pBase[51], pparam_2, 0);
     ImageSpaceShaderParam* v12 =
         static_cast<ImageSpaceShaderParam*>(MemoryManager_Singleton.Allocate(sizeof(ImageSpaceShaderParam)));
-    spParam.m_pObject = v12;
     if (v12) {
         pparam_3 = ::new (v12) ImageSpaceShaderParam;
     }
@@ -120,8 +114,7 @@ void ImageSpaceEffectDepthOfField::Setup(ImageSpaceManager* apManager, ImageSpac
     pparam_3->InitConstantMap(0, 4);
     pparam_3->SetPixelConstant(0, 1.0f, 1000.0f, 500.0f, fRenderDepthMaxDepth.uValue.f);
     pparam_3->bUseTexOffset[2] = false;
-    spParam.m_pObject = pparam_3;
-    p_pEffectParamList->SetAt(3u, spParam);
+    p_pEffectParamList->SetAt(3u, pparam_3);
     SetEffectInputs(
         3, 1, 2, 4, 5, NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_BILERP,
         NiTexturingProperty::FILTER_NEAREST, NiTexturingProperty::FILTER_NEAREST
