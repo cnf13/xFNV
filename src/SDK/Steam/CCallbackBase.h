@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Reconstruction.hpp"
+#include "SDK/Steam/steamclientpublic.h"
 
 // Steam's callback dispatch interface and registration state.
 // The PDB has no source path; its location was chosen with the Steam SDK interfaces.
@@ -26,9 +26,9 @@ public:
 // steam_api.dll's SteamAPI_RegisterCallback(pCallback, iCallback) (cdecl; the Steam SDK's steam_api.h, void), through
 // the exe's import slot. CCallbackBase's registration helpers (0x6FFB20, 0x6FFB90, 0x6FFC20) call it.
 using SteamAPI_RegisterCallback_t = void (*)(CCallbackBase* pCallback, int32_t iCallback);
-XFNV_IMPORT(SteamAPI_RegisterCallback_t, SteamAPI_RegisterCallback, 0xFDF48C);
+S_API void SteamAPI_RegisterCallback(CCallbackBase* pCallback, int32_t iCallback); // import slot 0xFDF48C
 
 // steam_api.dll's SteamAPI_UnregisterCallback(pCallback) (cdecl; steam_api.h, void), through the exe's import slot;
 // 0x6FFC00 calls it.
 using SteamAPI_UnregisterCallback_t = void (*)(CCallbackBase* pCallback);
-XFNV_IMPORT(SteamAPI_UnregisterCallback_t, SteamAPI_UnregisterCallback, 0xFDF47C);
+S_API void SteamAPI_UnregisterCallback(CCallbackBase* pCallback); // import slot 0xFDF47C

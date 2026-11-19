@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Reconstruction.hpp"
 #include "SDK/Steam/steamclientpublic.h"
 
 #include <cstdint>
@@ -45,4 +44,4 @@ public:
 // steam_api.dll's SteamFriends (cdecl), through the exe's import slot: the friends interface, or null when Steam is
 // not running.
 using SteamFriends_t = ISteamFriends* (*)();
-XFNV_IMPORT(SteamFriends_t, SteamFriends, 0xFDF474);
+S_API ISteamFriends* SteamFriends(); // import slot 0xFDF474

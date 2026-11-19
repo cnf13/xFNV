@@ -2,6 +2,13 @@
 
 #include <cstdint>
 
+// The Steam SDK's export declaration (steamtypes.h): a steam_api.dll export, with C linkage, imported on Windows.
+#ifdef _WIN32
+#define S_API extern "C" __declspec(dllimport)
+#else
+#define S_API extern "C"
+#endif
+
 // The SDK's EUniverse and EAccountType, the values the header's constants use.
 enum EUniverse : int32_t {
     k_EUniverseInvalid = 0,

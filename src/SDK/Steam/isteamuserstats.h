@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Reconstruction.hpp"
+#include "SDK/Steam/steamclientpublic.h"
 
 #include <cstdint>
 
@@ -60,4 +60,4 @@ public:
 // steam_api.dll's SteamUserStats (cdecl), through the exe's import slot: the user stats interface, or null when
 // Steam is not running.
 using SteamUserStats_t = ISteamUserStats* (*)();
-XFNV_IMPORT(SteamUserStats_t, SteamUserStats, 0xFDF490);
+S_API ISteamUserStats* SteamUserStats(); // import slot 0xFDF490

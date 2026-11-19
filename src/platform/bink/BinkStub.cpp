@@ -1,4 +1,4 @@
-// binkw32.dll's exports for the build without the exe: src/SDK/Bink/bink.h declares them (XFNV_IMPORT_STUB, C linkage,
+// binkw32.dll's exports for the build without the exe: src/SDK/Bink/bink.h declares them (C linkage,
 // stdcall), and these definitions stand in for RAD's DLL until it is linked or replaced. No movie opens: BinkOpen
 // returns null, which Movie::OpenBink reports ("Could not open %s for playback.") and carries on from, so nothing
 // else here is reached with a movie.

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Reconstruction.hpp"
+#include "SDK/Steam/steamclientpublic.h"
 
 #include <cstdint>
 
@@ -24,4 +24,4 @@ public:
 // steam_api.dll's SteamApps (cdecl), through the exe's import slot: the apps interface, or null when Steam is not
 // running.
 using SteamApps_t = ISteamApps* (*)();
-XFNV_IMPORT(SteamApps_t, SteamApps, 0xFDF494);
+S_API ISteamApps* SteamApps(); // import slot 0xFDF494

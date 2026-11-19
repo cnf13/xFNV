@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Reconstruction.hpp"
+#include "SDK/Windows/winnt.h"
 
 // The Windows SDK v6.0A <windef.h> declarations the exe's code uses, with the SDK's names and 32-bit layouts, so no
 // Windows header is needed. Global, as Windows declares them.
@@ -16,18 +17,6 @@
 #define CALLBACK
 #endif
 #define APIENTRY WINAPI
-
-// XFNV_IMPORT_AS's callable (Reconstruction.hpp) for an import slot of the SDK's WINAPI pointer type.
-namespace xfnv {
-    template <class R, class... A>
-    struct ImportAs<R(WINAPI*)(A...)> {
-        using Type = R(WINAPI*)(A...);
-        Type (*target)();
-        R operator()(A... aArgs) const {
-            return target()(aArgs...);
-        }
-    };
-} // namespace xfnv
 
 // HWND's type, without windows.h (the same as windows.h declares it)
 struct HWND__ {

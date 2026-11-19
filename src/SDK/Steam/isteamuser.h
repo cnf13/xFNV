@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Reconstruction.hpp"
+#include "SDK/Steam/steamclientpublic.h"
 
 #include <cstdint>
 
@@ -16,4 +16,4 @@ public:
 // steam_api.dll's SteamUser (cdecl), through the exe's import slot: the user interface, or null when Steam is not
 // running.
 using SteamUser_t = ISteamUser* (*)();
-XFNV_IMPORT(SteamUser_t, SteamUser, 0xFDF484);
+S_API ISteamUser* SteamUser(); // import slot 0xFDF484

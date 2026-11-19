@@ -5,6 +5,13 @@
 // The Windows SDK v6.0A <winnt.h> declarations the exe's code uses, with the SDK's names and 32-bit layouts, so no
 // Windows header is needed. Global, as Windows declares them.
 
+// The SDK's import declaration: a function or object a DLL exports, called through the importing module's slot.
+#ifdef _WIN32
+#define DECLSPEC_IMPORT __declspec(dllimport)
+#else
+#define DECLSPEC_IMPORT
+#endif
+
 // The SDK's LONG: 32 bits. Windows spells it `long` (a type of its own there: overloads, template arguments and
 // mangled names tell it from int); elsewhere `long` is 64 bits, so LONG is int32_t.
 #ifdef _WIN32

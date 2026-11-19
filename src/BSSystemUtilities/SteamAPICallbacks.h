@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Reconstruction.hpp"
 #include "SDK/Steam/CCallback.h"
 #include "SDK/Steam/CCallbackBase.h"
 #include "SDK/Steam/isteamuserstats.h"
+#include "SDK/Steam/steamclientpublic.h"
 
 #include <stdint.h>
 
@@ -14,17 +14,17 @@ void* DestroySteamAPICallbacks();
 
 // steam_api.dll's SteamAPI_RunCallbacks.
 using SteamAPI_RunCallbacks_t = void (*)();
-XFNV_IMPORT(SteamAPI_RunCallbacks_t, SteamAPI_RunCallbacks, 0xFDF488);
+S_API void SteamAPI_RunCallbacks(); // import slot 0xFDF488
 
 using SteamAPI_Shutdown_t = void (*)();
-XFNV_IMPORT(SteamAPI_Shutdown_t, SteamAPI_Shutdown, 0xFDF480);
+S_API void SteamAPI_Shutdown(); // import slot 0xFDF480
 
 using SteamAPI_IsSteamRunning_t = bool (*)();
-XFNV_IMPORT(SteamAPI_IsSteamRunning_t, SteamAPI_IsSteamRunning, 0xFDF498);
+S_API bool SteamAPI_IsSteamRunning(); // import slot 0xFDF498
 
 // steam_api.dll's SteamAPI_Init (steam_api.h).
 using SteamAPI_Init_t = bool (*)();
-XFNV_IMPORT(SteamAPI_Init_t, SteamAPI_Init, 0xFDF478);
+S_API bool SteamAPI_Init(); // import slot 0xFDF478
 
 // The Steam user-stats callbacks and the Steam state WinMain configures, allocated by GetSingleton.
 class SteamAPICallbacks {

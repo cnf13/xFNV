@@ -37,9 +37,14 @@ extern "C" const DIDATAFORMAT c_dfDIJoystick;
 using imp_DirectInput8Create_t = HRESULT(WINAPI*)(HINSTANCE__* hinst, uint32_t dwVersion,
 	const GUID* riidltf, void** ppvOut, IUnknown* punkOuter);
 namespace xfnv::imports {
-XFNV_IMPORT(imp_DirectInput8Create_t, DirectInput8Create, 0xFDF02C);
+// import slot 0xFDF02C
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI DirectInput8Create(HINSTANCE__* hinst, uint32_t dwVersion,
+	const GUID* riidltf, void** ppvOut, IUnknown* punkOuter);
 } // namespace xfnv::imports
-XFNV_IMPORT_AS(imp_DirectInput8Create_t, imp_DirectInput8Create, 0xFDF02C, xfnv::imports::DirectInput8Create);
+inline HRESULT imp_DirectInput8Create(HINSTANCE__* hinst, uint32_t dwVersion,
+	const GUID* riidltf, void** ppvOut, IUnknown* punkOuter) {
+	return xfnv::imports::DirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+}
 
 // DirectInput 8 structures the PC Controls embeds (the SDK's dinput.h layouts and field names).
 struct IDirectInputDevice8A;

@@ -16,7 +16,7 @@ struct BINK {
 };
 
 // binkw32.dll's exports the exe calls through its import slots (stdcall; the Bink SDK's bink.h prototypes). The
-// standalone program defines them itself (platform/bink/BinkStub.cpp), so they are XFNV_IMPORT_STUB.
+// standalone program defines them itself (platform/bink/BinkStub.cpp), so they are not declared as imports.
 // Advances the movie to its next frame.
 using BinkNextFrame_t = void(WINAPI*)(BINK* bnk);
 extern "C" void WINAPI BinkNextFrame(BINK* bnk);

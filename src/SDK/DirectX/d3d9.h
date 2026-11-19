@@ -1716,9 +1716,9 @@ struct ID3DXInclude {
 using Direct3DCreate9_t = IDirect3D9*(WINAPI*)(uint32_t SDKVersion);
 using Direct3DCreate9Ex_t = HRESULT(WINAPI*)(uint32_t SDKVersion, IDirect3D9Ex** ppD3D9Ex);
 
-// The exe's d3d9.dll and d3dx9_38.dll imports. Each is XFNV_IMPORT(<pointer to the SDK prototype>, <SDK name>, <import
-// slot>): the export itself, with the address of the exe's import slot it was called through (the exe also reaches
-// some through a `jmp [slot]` thunk, e.g. D3DXMatrixInverse 0xEE6DDA). Every one is WINAPI (stdcall).
+// The exe's d3d9.dll and d3dx9_38.dll imports: the SDK prototypes, each with the address of the exe's import slot it
+// was called through (the exe also reaches some through a `jmp [slot]` thunk, e.g. D3DXMatrixInverse 0xEE6DDA). Every
+// one is WINAPI (stdcall).
 using D3DPERF_SetOptions_t = void(WINAPI*)(uint32_t dwOptions);
 using D3DXLoadSurfaceFromSurface_t = HRESULT(WINAPI*)(
     IDirect3DSurface9* pDestSurface,
@@ -1816,32 +1816,122 @@ using D3DXMatrixInverse_t = D3DXMATRIX*(WINAPI*)(D3DXMATRIX * pOut, float* pDete
 using D3DXMatrixTranspose_t = D3DXMATRIX*(WINAPI*)(D3DXMATRIX * pOut, const D3DXMATRIX* pM);
 using D3DXPlaneNormalize_t = D3DXPLANE*(WINAPI*)(D3DXPLANE * pOut, const D3DXPLANE* pP);
 
-XFNV_IMPORT(D3DPERF_SetOptions_t, D3DPERF_SetOptions, 0xFDF3C8);
-XFNV_IMPORT(D3DXLoadSurfaceFromSurface_t, D3DXLoadSurfaceFromSurface, 0xFDF3D0);
-XFNV_IMPORT(D3DXSaveTextureToFileA_t, D3DXSaveTextureToFileA, 0xFDF3D4);
-XFNV_IMPORT(D3DXAssembleShader_t, D3DXAssembleShader, 0xFDF3D8);
-XFNV_IMPORT(D3DXAssembleShaderFromFileA_t, D3DXAssembleShaderFromFileA, 0xFDF3DC);
-XFNV_IMPORT(D3DXCompileShaderFromFileA_t, D3DXCompileShaderFromFileA, 0xFDF3E0);
-XFNV_IMPORT(D3DXGetShaderConstantTable_t, D3DXGetShaderConstantTable, 0xFDF3E4);
-XFNV_IMPORT(D3DXCreateBuffer_t, D3DXCreateBuffer, 0xFDF3E8);
-XFNV_IMPORT(D3DXVec4Transform_t, D3DXVec4Transform, 0xFDF3EC);
-XFNV_IMPORT(D3DXGetVertexShaderProfile_t, D3DXGetVertexShaderProfile, 0xFDF3F0);
-XFNV_IMPORT(D3DXGetPixelShaderProfile_t, D3DXGetPixelShaderProfile, 0xFDF3F4);
-XFNV_IMPORT(D3DXGetImageInfoFromFileInMemory_t, D3DXGetImageInfoFromFileInMemory, 0xFDF3F8);
-XFNV_IMPORT(D3DXCreateTextureFromFileInMemory_t, D3DXCreateTextureFromFileInMemory, 0xFDF3FC);
-XFNV_IMPORT(D3DXCreateCubeTextureFromFileInMemory_t, D3DXCreateCubeTextureFromFileInMemory, 0xFDF400);
-XFNV_IMPORT(D3DXCreateVolumeTextureFromFileInMemory_t, D3DXCreateVolumeTextureFromFileInMemory, 0xFDF404);
-XFNV_IMPORT(D3DXCompileShader_t, D3DXCompileShader, 0xFDF408);
-XFNV_IMPORT(D3DXMatrixRotationYawPitchRoll_t, D3DXMatrixRotationYawPitchRoll, 0xFDF40C);
-XFNV_IMPORT(D3DXMatrixMultiplyTranspose_t, D3DXMatrixMultiplyTranspose, 0xFDF410);
-XFNV_IMPORT(D3DXVec3TransformCoord_t, D3DXVec3TransformCoord, 0xFDF414);
-XFNV_IMPORT(D3DXPlaneTransform_t, D3DXPlaneTransform, 0xFDF418);
-XFNV_IMPORT(D3DXVec3Normalize_t, D3DXVec3Normalize, 0xFDF41C);
-XFNV_IMPORT(D3DXVec3TransformNormal_t, D3DXVec3TransformNormal, 0xFDF420);
-XFNV_IMPORT(D3DXMatrixMultiply_t, D3DXMatrixMultiply, 0xFDF424);
-XFNV_IMPORT(D3DXMatrixInverse_t, D3DXMatrixInverse, 0xFDF428);
-XFNV_IMPORT(D3DXMatrixTranspose_t, D3DXMatrixTranspose, 0xFDF42C);
-XFNV_IMPORT(D3DXPlaneNormalize_t, D3DXPlaneNormalize, 0xFDF430);
+extern "C" DECLSPEC_IMPORT void WINAPI D3DPERF_SetOptions(uint32_t dwOptions); // import slot 0xFDF3C8
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXLoadSurfaceFromSurface(
+    IDirect3DSurface9* pDestSurface,
+    const PALETTEENTRY* pDestPalette,
+    const RECT* pDestRect,
+    IDirect3DSurface9* pSrcSurface,
+    const PALETTEENTRY* pSrcPalette,
+    const RECT* pSrcRect,
+    uint32_t Filter,
+    uint32_t ColorKey
+); // import slot 0xFDF3D0
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXSaveTextureToFileA(
+    const char* pDestFile,
+    uint32_t DestFormat,
+    IDirect3DBaseTexture9* pSrcTexture,
+    const PALETTEENTRY* pSrcPalette
+); // import slot 0xFDF3D4
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXAssembleShader(
+    const char* pSrcData,
+    uint32_t SrcDataLen,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs
+); // import slot 0xFDF3D8
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXAssembleShaderFromFileA(
+    const char* pSrcFile,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs
+); // import slot 0xFDF3DC
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXCompileShaderFromFileA(
+    const char* pSrcFile,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    const char* pFunctionName,
+    const char* pProfile,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs,
+    ID3DXConstantTable** ppConstantTable
+); // import slot 0xFDF3E0
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI
+D3DXGetShaderConstantTable(const uint32_t* pFunction, ID3DXConstantTable** ppConstantTable); // import slot 0xFDF3E4
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI
+D3DXCreateBuffer(uint32_t NumBytes, ID3DXBuffer** ppBuffer); // import slot 0xFDF3E8
+extern "C" DECLSPEC_IMPORT D3DXVECTOR4* WINAPI
+D3DXVec4Transform(D3DXVECTOR4* pOut, const D3DXVECTOR4* pV, const D3DXMATRIX* pM); // import slot 0xFDF3EC
+extern "C" DECLSPEC_IMPORT const char* WINAPI
+D3DXGetVertexShaderProfile(IDirect3DDevice9* pDevice); // import slot 0xFDF3F0
+extern "C" DECLSPEC_IMPORT const char* WINAPI
+D3DXGetPixelShaderProfile(IDirect3DDevice9* pDevice); // import slot 0xFDF3F4
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXGetImageInfoFromFileInMemory(
+    const void* pSrcData,
+    uint32_t SrcDataSize,
+    D3DXIMAGE_INFO* pSrcInfo
+); // import slot 0xFDF3F8
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXCreateTextureFromFileInMemory(
+    IDirect3DDevice9* pDevice,
+    const void* pSrcData,
+    uint32_t SrcDataSize,
+    IDirect3DTexture9** ppTexture
+); // import slot 0xFDF3FC
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXCreateCubeTextureFromFileInMemory(
+    IDirect3DDevice9* pDevice,
+    const void* pSrcData,
+    uint32_t SrcDataSize,
+    IDirect3DCubeTexture9** ppCubeTexture
+); // import slot 0xFDF400
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXCreateVolumeTextureFromFileInMemory(
+    IDirect3DDevice9* pDevice,
+    const void* pSrcData,
+    uint32_t SrcDataSize,
+    IDirect3DVolumeTexture9** ppVolumeTexture
+); // import slot 0xFDF404
+extern "C" DECLSPEC_IMPORT HRESULT WINAPI D3DXCompileShader(
+    const char* pSrcData,
+    uint32_t SrcDataLen,
+    const D3DXMACRO* pDefines,
+    ID3DXInclude* pInclude,
+    const char* pFunctionName,
+    const char* pProfile,
+    uint32_t Flags,
+    ID3DXBuffer** ppShader,
+    ID3DXBuffer** ppErrorMsgs,
+    ID3DXConstantTable** ppConstantTable
+); // import slot 0xFDF408
+extern "C" DECLSPEC_IMPORT D3DXMATRIX* WINAPI
+D3DXMatrixRotationYawPitchRoll(D3DXMATRIX* pOut, float Yaw, float Pitch, float Roll); // import slot 0xFDF40C
+extern "C" DECLSPEC_IMPORT D3DXMATRIX* WINAPI D3DXMatrixMultiplyTranspose(
+    D3DXMATRIX* pOut,
+    const D3DXMATRIX* pM1,
+    const D3DXMATRIX* pM2
+); // import slot 0xFDF410
+extern "C" DECLSPEC_IMPORT D3DXVECTOR3* WINAPI
+D3DXVec3TransformCoord(D3DXVECTOR3* pOut, const D3DXVECTOR3* pV, const D3DXMATRIX* pM); // import slot 0xFDF414
+extern "C" DECLSPEC_IMPORT D3DXPLANE* WINAPI
+D3DXPlaneTransform(D3DXPLANE* pOut, const D3DXPLANE* pP, const D3DXMATRIX* pM); // import slot 0xFDF418
+extern "C" DECLSPEC_IMPORT D3DXVECTOR3* WINAPI
+D3DXVec3Normalize(D3DXVECTOR3* pOut, const D3DXVECTOR3* pV); // import slot 0xFDF41C
+extern "C" DECLSPEC_IMPORT D3DXVECTOR3* WINAPI D3DXVec3TransformNormal(
+    D3DXVECTOR3* pOut,
+    const D3DXVECTOR3* pV,
+    const D3DXMATRIX* pM
+); // import slot 0xFDF420
+extern "C" DECLSPEC_IMPORT D3DXMATRIX* WINAPI
+D3DXMatrixMultiply(D3DXMATRIX* pOut, const D3DXMATRIX* pM1, const D3DXMATRIX* pM2); // import slot 0xFDF424
+extern "C" DECLSPEC_IMPORT D3DXMATRIX* WINAPI
+D3DXMatrixInverse(D3DXMATRIX* pOut, float* pDeterminant, const D3DXMATRIX* pM); // import slot 0xFDF428
+extern "C" DECLSPEC_IMPORT D3DXMATRIX* WINAPI
+D3DXMatrixTranspose(D3DXMATRIX* pOut, const D3DXMATRIX* pM); // import slot 0xFDF42C
+extern "C" DECLSPEC_IMPORT D3DXPLANE* WINAPI
+D3DXPlaneNormalize(D3DXPLANE* pOut, const D3DXPLANE* pP); // import slot 0xFDF430
 
 // IDA names; not in the PDB.
 extern GUID CLSID_IAsyncReader;

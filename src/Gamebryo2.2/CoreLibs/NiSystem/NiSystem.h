@@ -36,20 +36,26 @@ struct HMMIO__;
 
 // Win32 imports. ole32.dll's CoInitialize (HRESULT result).
 using CoInitialize_t = int32_t(WINAPI*)(void* pvReserved);
-XFNV_IMPORT(CoInitialize_t, CoInitialize, 0xFDF454);
+extern "C" DECLSPEC_IMPORT int32_t WINAPI CoInitialize(void* pvReserved); // import slot 0xFDF454
 // ole32.dll's CoInitializeEx (HRESULT result).
 using CoInitializeEx_t = int32_t(WINAPI*)(void* pvReserved, uint32_t dwCoInit);
-XFNV_IMPORT(CoInitializeEx_t, CoInitializeEx, 0xFDF458);
+extern "C" DECLSPEC_IMPORT int32_t WINAPI CoInitializeEx(void* pvReserved, uint32_t dwCoInit); // import slot 0xFDF458
 // ole32.dll's CoCreateInstance (HRESULT result).
 using CoCreateInstance_t =
     int32_t(WINAPI*)(const GUID* rclsid, IUnknown* pUnkOuter, uint32_t dwClsContext, const GUID* riid, void** ppv);
-XFNV_IMPORT(CoCreateInstance_t, CoCreateInstance, 0xFDF46C);
+extern "C" DECLSPEC_IMPORT int32_t WINAPI CoCreateInstance(
+    const GUID* rclsid,
+    IUnknown* pUnkOuter,
+    uint32_t dwClsContext,
+    const GUID* riid,
+    void** ppv
+); // import slot 0xFDF46C
 // ole32.dll's CoUninitialize.
 using CoUninitialize_t = void(WINAPI*)();
-XFNV_IMPORT(CoUninitialize_t, CoUninitialize, 0xFDF464);
+extern "C" DECLSPEC_IMPORT void WINAPI CoUninitialize(); // import slot 0xFDF464
 // ole32.dll's CoFreeUnusedLibraries.
 using CoFreeUnusedLibraries_t = void(WINAPI*)();
-XFNV_IMPORT(CoFreeUnusedLibraries_t, CoFreeUnusedLibraries, 0xFDF468);
+extern "C" DECLSPEC_IMPORT void WINAPI CoFreeUnusedLibraries(); // import slot 0xFDF468
 // ULARGE_INTEGER: a 64-bit value and its two halves, LowPart first. TESFile::MastersChanged compares each master file's
 // LowPart and HighPart with WIN32_FIND_DATAA's nFileSizeLow and nFileSizeHigh.
 union _ULARGE_INTEGER {
@@ -112,21 +118,25 @@ struct _XOVERLAPPED {
 // The XInputGetState export of XINPUT1_3.dll, imported by ordinal 2.
 using XInputGetState_t = uint32_t(WINAPI*)(uint32_t dwUserIndex, _XINPUT_STATE* pState);
 namespace xfnv::imports {
-    XFNV_IMPORT(XInputGetState_t, XInputGetState, 0xFDF394);
+    extern "C" DECLSPEC_IMPORT uint32_t WINAPI
+    XInputGetState(uint32_t dwUserIndex, _XINPUT_STATE* pState); // import slot 0xFDF394
 } // namespace xfnv::imports
 // XInputSetState from XINPUT1_3.dll, imported by ordinal 3.
 using imp_XInputSetState_t = uint32_t(WINAPI*)(uint32_t dwUserIndex, _XINPUT_VIBRATION* pVibration);
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_XInputSetState_t, XInputSetState, 0xFDF398);
+    extern "C" DECLSPEC_IMPORT uint32_t WINAPI
+    XInputSetState(uint32_t dwUserIndex, _XINPUT_VIBRATION* pVibration); // import slot 0xFDF398
 } // namespace xfnv::imports
-XFNV_IMPORT_AS(imp_XInputSetState_t, imp_XInputSetState, 0xFDF398, xfnv::imports::XInputSetState);
+inline uint32_t imp_XInputSetState(uint32_t dwUserIndex, _XINPUT_VIBRATION* pVibration) {
+    return xfnv::imports::XInputSetState(dwUserIndex, pVibration);
+}
 uint32_t XInputSetState(uint32_t dwUserIndex, _XINPUT_VIBRATION* pVibration);
 // ole32.dll CoTaskMemFree (LPVOID).
 using CoTaskMemFree_t = void(WINAPI*)(void* pv);
-XFNV_IMPORT(CoTaskMemFree_t, CoTaskMemFree, 0xFDF45C);
+extern "C" DECLSPEC_IMPORT void WINAPI CoTaskMemFree(void* pv); // import slot 0xFDF45C
 // ole32.dll CoTaskMemAlloc (SIZE_T).
 using CoTaskMemAlloc_t = void*(WINAPI*)(size_t cb);
-XFNV_IMPORT(CoTaskMemAlloc_t, CoTaskMemAlloc, 0xFDF460);
+extern "C" DECLSPEC_IMPORT void* WINAPI CoTaskMemAlloc(size_t cb); // import slot 0xFDF460
 // The SDK's OVERLAPPED (0x14 bytes): the state of an asynchronous file operation. Internal and InternalHigh are
 // ULONG_PTR; Offset and OffsetHigh share their words with Pointer.
 struct _OVERLAPPED {
@@ -167,9 +177,23 @@ using CreateFileA_t = void*(WINAPI*)(const char* lpFileName,
                                      uint32_t dwCreationDisposition,
                                      uint32_t dwFlagsAndAttributes,
                                      void* hTemplateFile);
-XFNV_IMPORT(ReadFile_t, ReadFile, 0xFDF080);
-XFNV_IMPORT(GetFileSize_t, GetFileSize, 0xFDF084);
-XFNV_IMPORT(CreateFileA_t, CreateFileA, 0xFDF088);
+extern "C" DECLSPEC_IMPORT int32_t WINAPI ReadFile(
+    void* hFile,
+    void* lpBuffer,
+    uint32_t nNumberOfBytesToRead,
+    uint32_t* lpNumberOfBytesRead,
+    _OVERLAPPED* lpOverlapped
+);                                                                                             // import slot 0xFDF080
+extern "C" DECLSPEC_IMPORT uint32_t WINAPI GetFileSize(void* hFile, uint32_t* lpFileSizeHigh); // import slot 0xFDF084
+extern "C" DECLSPEC_IMPORT void* WINAPI CreateFileA(
+    const char* lpFileName,
+    uint32_t dwDesiredAccess,
+    uint32_t dwShareMode,
+    _SECURITY_ATTRIBUTES* lpSecurityAttributes,
+    uint32_t dwCreationDisposition,
+    uint32_t dwFlagsAndAttributes,
+    void* hTemplateFile
+); // import slot 0xFDF088
 // An exception registration record, one node of the thread's exception handler chain. Handler is never called, so it
 // stays an untyped pointer to the handler.
 struct _EXCEPTION_REGISTRATION_RECORD {
@@ -195,7 +219,7 @@ struct _NT_TIB {
 };
 // USER32.dll ShowCursor (BOOL bShow) -> int, the display counter.
 using ShowCursor_t = int32_t(WINAPI*)(int32_t bShow);
-XFNV_IMPORT(ShowCursor_t, ShowCursor, 0xFDF2AC);
+extern "C" DECLSPEC_IMPORT int32_t WINAPI ShowCursor(int32_t bShow); // import slot 0xFDF2AC
 using HMMIO = HMMIO__*;
 using LPMMIOPROC = intptr_t(CALLBACK*)(_MMIOINFO* lpmmioinfo, uint32_t uMsg, intptr_t lParam1, intptr_t lParam2);
 // An open multimedia file's I/O state: its I/O procedure and buffer pointers. The Windows SDK declares it with
@@ -261,10 +285,15 @@ inline char bFirst = 1;
 inline LARGE_INTEGER initial{};
 inline LARGE_INTEGER freq{};
 
-XFNV_IMPORT(mmioOpenA_t, mmioOpenA, 0xFDF318);
-XFNV_IMPORT(mmioDescend_t, mmioDescend, 0xFDF31C);
-XFNV_IMPORT(mmioClose_t, mmioClose, 0xFDF320);
-XFNV_IMPORT(mmioRead_t, mmioRead, 0xFDF324);
-XFNV_IMPORT(mmioAscend_t, mmioAscend, 0xFDF328);
-XFNV_IMPORT(mmioGetInfo_t, mmioGetInfo, 0xFDF32C);
-XFNV_IMPORT(mmioAdvance_t, mmioAdvance, 0xFDF330);
+extern "C" DECLSPEC_IMPORT HMMIO WINAPI
+mmioOpenA(char* pszFileName, _MMIOINFO* pmmioinfo, uint32_t fdwOpen); // import slot 0xFDF318
+extern "C" DECLSPEC_IMPORT uint32_t WINAPI
+mmioDescend(HMMIO hmmio, _MMCKINFO* pmmcki, const _MMCKINFO* pmmckiParent, uint32_t fuDescend); // import slot 0xFDF31C
+extern "C" DECLSPEC_IMPORT uint32_t WINAPI mmioClose(HMMIO hmmio, uint32_t fuClose);            // import slot 0xFDF320
+extern "C" DECLSPEC_IMPORT int32_t WINAPI mmioRead(HMMIO hmmio, char* pch, int32_t cch);        // import slot 0xFDF324
+extern "C" DECLSPEC_IMPORT uint32_t WINAPI
+mmioAscend(HMMIO hmmio, _MMCKINFO* pmmcki, uint32_t fuAscend); // import slot 0xFDF328
+extern "C" DECLSPEC_IMPORT uint32_t WINAPI
+mmioGetInfo(HMMIO hmmio, _MMIOINFO* pmmioinfo, uint32_t fuInfo); // import slot 0xFDF32C
+extern "C" DECLSPEC_IMPORT uint32_t WINAPI
+mmioAdvance(HMMIO hmmio, _MMIOINFO* pmmioinfo, uint32_t fuAdvance); // import slot 0xFDF330

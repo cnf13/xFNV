@@ -32,17 +32,31 @@ using imp_recv_t = ImportCount(WINAPI*)(ImportSocket s, char* buf, ImportLength 
 using imp_send_t = ImportCount(WINAPI*)(ImportSocket s, const char* buf, ImportLength len, int32_t flags);
 using imp_WSAAsyncSelect_t = int32_t(WINAPI*)(SOCKET s, HWND__* hWnd, uint32_t wMsg, int32_t lEvent);
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_closesocket_t, closesocket, 0xFDF33C);
-    XFNV_IMPORT(imp_socket_t, socket, 0xFDF340);
-    XFNV_IMPORT(imp_recv_t, recv, 0xFDF348);
-    XFNV_IMPORT(imp_send_t, send, 0xFDF34C);
-    XFNV_IMPORT(imp_WSAAsyncSelect_t, WSAAsyncSelect, 0xFDF38C);
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI closesocket(SOCKET s); // import slot 0xFDF33C
+    extern "C" DECLSPEC_IMPORT ImportSocket WINAPI
+    socket(int32_t af, int32_t type, int32_t protocol); // import slot 0xFDF340
+    extern "C" DECLSPEC_IMPORT ImportCount WINAPI
+    recv(ImportSocket s, char* buf, ImportLength len, int32_t flags); // import slot 0xFDF348
+    extern "C" DECLSPEC_IMPORT ImportCount WINAPI
+    send(ImportSocket s, const char* buf, ImportLength len, int32_t flags); // import slot 0xFDF34C
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI
+    WSAAsyncSelect(SOCKET s, HWND__* hWnd, uint32_t wMsg, int32_t lEvent); // import slot 0xFDF38C
 } // namespace xfnv::imports
-XFNV_IMPORT_AS(imp_closesocket_t, imp_closesocket, 0xFDF33C, xfnv::imports::closesocket);
-XFNV_IMPORT_AS(imp_socket_t, imp_socket, 0xFDF340, xfnv::imports::socket);
-XFNV_IMPORT_AS(imp_recv_t, imp_recv, 0xFDF348, xfnv::imports::recv);
-XFNV_IMPORT_AS(imp_send_t, imp_send, 0xFDF34C, xfnv::imports::send);
-XFNV_IMPORT_AS(imp_WSAAsyncSelect_t, imp_WSAAsyncSelect, 0xFDF38C, xfnv::imports::WSAAsyncSelect);
+inline int32_t imp_closesocket(SOCKET s) {
+    return xfnv::imports::closesocket(s);
+}
+inline ImportSocket imp_socket(int32_t af, int32_t type, int32_t protocol) {
+    return xfnv::imports::socket(af, type, protocol);
+}
+inline ImportCount imp_recv(ImportSocket s, char* buf, ImportLength len, int32_t flags) {
+    return xfnv::imports::recv(s, buf, len, flags);
+}
+inline ImportCount imp_send(ImportSocket s, const char* buf, ImportLength len, int32_t flags) {
+    return xfnv::imports::send(s, buf, len, flags);
+}
+inline int32_t imp_WSAAsyncSelect(SOCKET s, HWND__* hWnd, uint32_t wMsg, int32_t lEvent) {
+    return xfnv::imports::WSAAsyncSelect(s, hWnd, wMsg, lEvent);
+}
 int32_t WINAPI closesocket(SOCKET s);
 SOCKET WINAPI socket(int32_t af, int32_t type, int32_t protocol);
 int32_t WINAPI recv(SOCKET s, char* buf, int32_t len, int32_t flags);
@@ -52,9 +66,11 @@ int32_t WINAPI WSAAsyncSelect_0(SOCKET s, HWND__* hWnd, uint32_t wMsg, int32_t l
 // only jumps to the slot 0xFDF344. IDA name; not in the PDB.
 using imp_WSAGetLastError_t = int32_t(WINAPI*)();
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_WSAGetLastError_t, WSAGetLastError, 0xFDF344);
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI WSAGetLastError(); // import slot 0xFDF344
 } // namespace xfnv::imports
-XFNV_IMPORT_AS(imp_WSAGetLastError_t, imp_WSAGetLastError, 0xFDF344, xfnv::imports::WSAGetLastError);
+inline int32_t imp_WSAGetLastError() {
+    return xfnv::imports::WSAGetLastError();
+}
 int32_t WINAPI WSAGetLastError_0();
 // The SDK's generic and IPv4 socket addresses (16 bytes each); sin_port and sin_addr are in network byte order.
 struct sockaddr {
@@ -110,11 +126,17 @@ struct WSAData {
 using imp_ioctlsocket_t = int32_t(WINAPI*)(SOCKET s, int32_t cmd, uint32_t* argp);
 using imp_WSAStartup_t = int32_t(WINAPI*)(uint16_t wVersionRequested, WSAData* lpWSAData);
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_ioctlsocket_t, ioctlsocket, 0xFDF360);
-    XFNV_IMPORT(imp_WSAStartup_t, WSAStartup, 0xFDF364);
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI
+    ioctlsocket(SOCKET s, int32_t cmd, uint32_t* argp); // import slot 0xFDF360
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI
+    WSAStartup(uint16_t wVersionRequested, WSAData* lpWSAData); // import slot 0xFDF364
 } // namespace xfnv::imports
-XFNV_IMPORT_AS(imp_ioctlsocket_t, imp_ioctlsocket, 0xFDF360, xfnv::imports::ioctlsocket);
-XFNV_IMPORT_AS(imp_WSAStartup_t, imp_WSAStartup, 0xFDF364, xfnv::imports::WSAStartup);
+inline int32_t imp_ioctlsocket(SOCKET s, int32_t cmd, uint32_t* argp) {
+    return xfnv::imports::ioctlsocket(s, cmd, argp);
+}
+inline int32_t imp_WSAStartup(uint16_t wVersionRequested, WSAData* lpWSAData) {
+    return xfnv::imports::WSAStartup(wVersionRequested, lpWSAData);
+}
 int32_t WINAPI ioctlsocket(SOCKET s, int32_t cmd, uint32_t* argp);
 int32_t WINAPI WSAStartup(uint16_t wVersionRequested, WSAData* lpWSAData);
 // WS2_32.dll gethostbyname's host entry (the SDK's hostent): the name, the alias list, the address family and its
@@ -141,22 +163,39 @@ using imp_bind_t = int32_t(WINAPI*)(ImportSocket s, const sockaddr* name, int32_
 using imp_setsockopt_t =
     int32_t(WINAPI*)(ImportSocket s, int32_t level, int32_t optname, const char* optval, int32_t optlen);
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_htons_t, htons, 0xFDF35C);
+    extern "C" DECLSPEC_IMPORT uint16_t WINAPI htons(int32_t hostshort); // import slot 0xFDF35C
 #if defined(_WIN32)
-    XFNV_IMPORT(imp_gethostname_t, gethostname, 0xFDF368);
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI gethostname(char* name, int32_t namelen); // import slot 0xFDF368
 #else
     // POSIX's gethostname, which takes the length as a size_t (defined in winsock2.cpp, which includes <unistd.h>).
     int32_t gethostname(char* name, int32_t namelen);
 #endif
-    XFNV_IMPORT(imp_listen_t, listen, 0xFDF36C);
-    XFNV_IMPORT(imp_bind_t, bind, 0xFDF370);
-    XFNV_IMPORT(imp_setsockopt_t, setsockopt, 0xFDF374);
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI listen(ImportSocket s, int32_t backlog); // import slot 0xFDF36C
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI
+    bind(ImportSocket s, const sockaddr* name, int32_t namelen); // import slot 0xFDF370
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI setsockopt(
+        ImportSocket s,
+        int32_t level,
+        int32_t optname,
+        const char* optval,
+        int32_t optlen
+    ); // import slot 0xFDF374
 } // namespace xfnv::imports
-XFNV_IMPORT_AS(imp_htons_t, imp_htons, 0xFDF35C, xfnv::imports::htons);
-XFNV_IMPORT_AS(imp_gethostname_t, imp_gethostname, 0xFDF368, xfnv::imports::gethostname);
-XFNV_IMPORT_AS(imp_listen_t, imp_listen, 0xFDF36C, xfnv::imports::listen);
-XFNV_IMPORT_AS(imp_bind_t, imp_bind, 0xFDF370, xfnv::imports::bind);
-XFNV_IMPORT_AS(imp_setsockopt_t, imp_setsockopt, 0xFDF374, xfnv::imports::setsockopt);
+inline uint16_t imp_htons(int32_t hostshort) {
+    return xfnv::imports::htons(hostshort);
+}
+inline int32_t imp_gethostname(char* name, int32_t namelen) {
+    return xfnv::imports::gethostname(name, namelen);
+}
+inline int32_t imp_listen(ImportSocket s, int32_t backlog) {
+    return xfnv::imports::listen(s, backlog);
+}
+inline int32_t imp_bind(ImportSocket s, const sockaddr* name, int32_t namelen) {
+    return xfnv::imports::bind(s, name, namelen);
+}
+inline int32_t imp_setsockopt(ImportSocket s, int32_t level, int32_t optname, const char* optval, int32_t optlen) {
+    return xfnv::imports::setsockopt(s, level, optname, optval, optlen);
+}
 // IDA name; not in the PDB. u_short in the SDK: the exe passes the caller's whole dword on; uint16_t would be
 // zero-extended.
 uint16_t WINAPI htons_0(int32_t hostshort);
@@ -178,12 +217,14 @@ using imp_accept_t = ImportSocket(WINAPI*)(ImportSocket s, sockaddr* addr, int32
 using imp_ntohs_t = uint16_t(WINAPI*)(uint16_t netshort);
 using imp_inet_ntoa_t = char*(WINAPI*)(in_addr in);
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_inet_addr_t, inet_addr, 0xFDF358);
-    XFNV_IMPORT(imp_gethostbyname_t, gethostbyname, 0xFDF354);
-    XFNV_IMPORT(imp_connect_t, connect, 0xFDF350);
-    XFNV_IMPORT(imp_accept_t, accept, 0xFDF384);
-    XFNV_IMPORT(imp_ntohs_t, ntohs, 0xFDF388);
-    XFNV_IMPORT(imp_inet_ntoa_t, inet_ntoa, 0xFDF378);
+    extern "C" DECLSPEC_IMPORT uint32_t WINAPI inet_addr(const char* cp);       // import slot 0xFDF358
+    extern "C" DECLSPEC_IMPORT hostent* WINAPI gethostbyname(const char* name); // import slot 0xFDF354
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI
+    connect(ImportSocket s, const sockaddr* name, int32_t namelen); // import slot 0xFDF350
+    extern "C" DECLSPEC_IMPORT ImportSocket WINAPI
+    accept(ImportSocket s, sockaddr* addr, int32_t* addrlen);            // import slot 0xFDF384
+    extern "C" DECLSPEC_IMPORT uint16_t WINAPI ntohs(uint16_t netshort); // import slot 0xFDF388
+    extern "C" DECLSPEC_IMPORT char* WINAPI inet_ntoa(in_addr in);       // import slot 0xFDF378
 } // namespace xfnv::imports
 inline uint32_t inet_addr(const char* cp) {
     return xfnv::imports::inet_addr(cp);
@@ -239,8 +280,14 @@ using imp_select_t =
     int32_t(WINAPI*)(int32_t nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const timeval* timeout);
 using imp___WSAFDIsSet_t = int32_t(WINAPI*)(SOCKET fd, fd_set* set);
 namespace xfnv::imports {
-    XFNV_IMPORT(imp_select_t, select, 0xFDF37C);
-    XFNV_IMPORT(imp___WSAFDIsSet_t, __WSAFDIsSet, 0xFDF380);
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI select(
+        int32_t nfds,
+        fd_set* readfds,
+        fd_set* writefds,
+        fd_set* exceptfds,
+        const timeval* timeout
+    );                                                                              // import slot 0xFDF37C
+    extern "C" DECLSPEC_IMPORT int32_t WINAPI __WSAFDIsSet(SOCKET fd, fd_set* set); // import slot 0xFDF380
 } // namespace xfnv::imports
 inline int32_t select(int32_t nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const timeval* timeout) {
     return xfnv::imports::select(nfds, readfds, writefds, exceptfds, timeout);

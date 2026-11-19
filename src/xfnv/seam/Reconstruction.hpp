@@ -71,27 +71,6 @@ namespace xfnv {
         return static_cast<size_t*>(array) - 1;
     }
 
-    // XFNV_IMPORT's export: the function type the slot's pointer type points to, its calling convention kept, with C
-    // linkage (a stdcall export links as `_Name@N`), imported from its DLL on Windows. XFNV_IMPORT_AS: a callable that
-    // calls the export at the line's type. It is a constant object that fetches the address at each call, not a pointer
-    // variable: a dllimport address is no constant, so a pointer would be initialised dynamically, and a static
-    // constructor of another file (MemoryManager's, through BSSpinLock) can call it before that, through null. ImportAs
-    // is defined for the SDK's WINAPI pointer types, with the SDK's names (src/SDK/Windows/windef.h).
-    template <class T>
-    using FunctionOf = std::remove_pointer_t<T>;
-    template <class T>
-    struct ImportAs;
-#ifdef _WIN32
-#define XFNV_IMPORT(type, name, address) extern "C" __declspec(dllimport) ::xfnv::FunctionOf<type> name
-#else
-#define XFNV_IMPORT(type, name, address) extern "C" ::xfnv::FunctionOf<type> name
-#endif
-#define XFNV_IMPORT_AS(type, name, address, Export)                                                                    \
-    inline constexpr ::xfnv::ImportAs<type> name {                                                                     \
-        []() { return reinterpret_cast<type>(&Export); }                                                               \
-    }
-#define XFNV_IMPORT_STUB(type, name, address) extern "C" ::xfnv::FunctionOf<type> name
-
     // The adapters below are what a table or callback of the exe's type calls: each is named with its class or member
     // (`xfnv::constructElement<X>`, `xfnv::callMember<&X::f>`) and takes the rest of its parameters from the pointer
     // type its address is taken at.
