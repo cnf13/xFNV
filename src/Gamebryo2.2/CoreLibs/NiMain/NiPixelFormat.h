@@ -125,8 +125,7 @@ public:
 
     // ucBitsPerPixel is an unsigned char value passed as uint32_t: NiDDSReader::ReadHeader passes the whole 32-bit
     // value it read, and only its low byte is used.
-    static NiPixelFormat* CreateFromRGBAMasks(
-        NiPixelFormat* apResult,
+    static NiPixelFormat CreateFromRGBAMasks(
         uint32_t ucBitsPerPixel,
         uint32_t uiMaskRed,
         uint32_t uiMaskGreen,

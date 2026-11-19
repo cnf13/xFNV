@@ -62,8 +62,7 @@ public:
     bool DoesActorKnowaboutCrime(Actor* apActor);
     bool ShouldCrimeBeRemoved();
     void ClearActorKnowList();
-    // Copies fCrimeTimeStamp into apResult and returns apResult.
-    CombatTimeStamp* GetTimeStamp(CombatTimeStamp* apResult);
+    CombatTimeStamp GetTimeStamp();
     void AddtoActorKnowList(Actor* apActor);
     void RemoveActorKnowList(Actor* apActor);
     int32_t GetRefCount();

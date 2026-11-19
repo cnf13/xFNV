@@ -1081,22 +1081,21 @@ void NiPixelFormat::LoadBinary(NiStream& kStream) {
     }
 }
 
-NiPixelFormat* NiPixelFormat::CreateFromRGBAMasks(
-    NiPixelFormat* apResult,
+NiPixelFormat NiPixelFormat::CreateFromRGBAMasks(
     uint32_t ucBitsPerPixel,
     uint32_t uiMaskRed,
     uint32_t uiMaskGreen,
     uint32_t uiMaskBlue,
     uint32_t uiMaskAlpha
 ) {
-    ::new (apResult) NiPixelFormat;
+    NiPixelFormat kFormat;
     // SetLittleEndian(true) sets flag bit 0.
-    apResult->m_uFlags |= 1;
-    apResult->m_ucBitsPerPixel = static_cast<uint8_t>(ucBitsPerPixel);
+    kFormat.m_uFlags |= 1;
+    kFormat.m_ucBitsPerPixel = static_cast<uint8_t>(ucBitsPerPixel);
     // INVALID_RENDERER_HINT.
-    apResult->m_uiRendererHint = 0xFFFFFFFF;
-    apResult->m_eTiling = NiPixelFormat::TILE_NONE;
-    apResult->m_eFormat = (uiMaskAlpha != 0) ? NiPixelFormat::FORMAT_RGBA : NiPixelFormat::FORMAT_RGB;
+    kFormat.m_uiRendererHint = 0xFFFFFFFF;
+    kFormat.m_eTiling = NiPixelFormat::TILE_NONE;
+    kFormat.m_eFormat = (uiMaskAlpha != 0) ? NiPixelFormat::FORMAT_RGBA : NiPixelFormat::FORMAT_RGB;
 
     NiPixelFormat::Component aeComps[4];
     uint8_t aucSizes[4];
@@ -1141,7 +1140,7 @@ NiPixelFormat* NiPixelFormat::CreateFromRGBAMasks(
     uint32_t uiComponent = 0;
     for (uint32_t ui = 0; ui < 4; ui++) {
         if (auiMasks[ui] != 0) {
-            NiComponentSpec& kSpec = apResult->m_akComponents[uiComponent];
+            NiComponentSpec& kSpec = kFormat.m_akComponents[uiComponent];
             kSpec.m_ucBitsPerComponent = aucSizes[ui];
             kSpec.m_bSigned = true;
             kSpec.m_eRepresentation = NiPixelFormat::REP_FIXED;
@@ -1151,7 +1150,7 @@ NiPixelFormat* NiPixelFormat::CreateFromRGBAMasks(
     }
 
     for (uint32_t uj = uiComponent; uj < 4; uj++) {
-        NiComponentSpec& kSpec = apResult->m_akComponents[uiComponent];
+        NiComponentSpec& kSpec = kFormat.m_akComponents[uiComponent];
         kSpec.m_bSigned = true;
         kSpec.m_ucBitsPerComponent = 0;
         kSpec.m_eRepresentation = NiPixelFormat::REP_UNKNOWN;
@@ -1159,5 +1158,5 @@ NiPixelFormat* NiPixelFormat::CreateFromRGBAMasks(
         uiComponent++;
     }
 
-    return apResult;
+    return kFormat;
 }

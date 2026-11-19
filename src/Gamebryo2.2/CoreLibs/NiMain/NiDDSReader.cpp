@@ -435,12 +435,11 @@ bool NiDDSReader::ReadHeader(
         }
 
         // One stack temporary holds both results.
-        XFNV_INLINED_LOCAL(NiPixelFormat, kTemp, std::nullopt, std::nullopt);
-        NiPixelFormat* pkCreated =
-            NiPixelFormat::CreateFromRGBAMasks(&kTemp, uiBitsPerPixel, uiRedMask, uiGreenMask, uiBlueMask, uiAlphaMask);
-        kFormat = *pkCreated;
+        NiPixelFormat kTemp =
+            NiPixelFormat::CreateFromRGBAMasks(uiBitsPerPixel, uiRedMask, uiGreenMask, uiBlueMask, uiAlphaMask);
+        kFormat = kTemp;
         // Copies the temporary, not kFormat, into m_kOriginalFormat, as the game does.
-        m_kOriginalFormat = *pkCreated;
+        m_kOriginalFormat = kTemp;
         kFormat = *ComputeFinalFormat(&kTemp, kFormat);
     }
     else {

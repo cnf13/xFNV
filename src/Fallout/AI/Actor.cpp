@@ -22621,9 +22621,7 @@ void Actor::InitiateUseWeaponPackage(
 }
 
 void Actor::AddBackCrime(Crime* apCrime) {
-    XFNV_INLINED_LOCAL(CombatTimeStamp, kTimeStamp, std::nullopt, std::nullopt);
-    CombatTimeStamp* pTimeStamp = apCrime->GetTimeStamp(&kTimeStamp);
-    float afTimeStamp = pTimeStamp->fTimeStamp;
+    float afTimeStamp = apCrime->GetTimeStamp().fTimeStamp;
     (&m_Extra)->AddToPlayerCrimeList(apCrime, afTimeStamp);
     for (BSSimpleList<TESFaction*>* pfactlist = apCrime->pListofEnemyFactions; pfactlist && !pfactlist->IsEmpty();
          pfactlist = pfactlist->m_pkNext) {

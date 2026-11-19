@@ -33,7 +33,7 @@ public:
     // The next coarser level from vOrigLeafSet: FindPairs, then BuildNewLeaves.
     LeafArray* ComputeNextLevel(LeafArray* apResult, LeafArray vOrigLeafSet);
     // One leaf for each kept pair of m_vPairs, between the two.
-    LeafArray* BuildNewLeaves(LeafArray* apResult);
+    LeafArray BuildNewLeaves();
     // Pairs each leaf of vOrigLeafSet with the nearest unpaired leaf after it within m_fLeafSpacingTolerance, into
     // m_vPairs.
     void FindPairs(LeafArray vOrigLeafSet);

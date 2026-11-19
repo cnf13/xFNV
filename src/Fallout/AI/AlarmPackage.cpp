@@ -484,9 +484,8 @@ void Crime::ClearActorKnowList() {
     iRefCount = 0;
 }
 
-CombatTimeStamp* Crime::GetTimeStamp(CombatTimeStamp* apResult) {
-    apResult->fTimeStamp = fCrimeTimeStamp.fTimeStamp;
-    return apResult;
+CombatTimeStamp Crime::GetTimeStamp() {
+    return fCrimeTimeStamp;
 }
 
 void Crime::AddtoActorKnowList(Actor* apActor) {

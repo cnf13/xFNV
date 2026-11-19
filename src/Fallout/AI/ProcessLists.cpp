@@ -3771,7 +3771,6 @@ void ProcessLists::TurnOffMovementinHigh() {
 
 BSSimpleList<Crime*>* ProcessLists::RemoveCrimesForYieldCheck(float afTime) {
     BSSimpleList<Crime*>* pReturnList;
-    XFNV_INLINED_LOCAL(CombatTimeStamp, kTimeStamp, std::nullopt, std::nullopt);
     BSSimpleList<Crime*>* plist = GlobalCrimeListArray[3];
     BSSimpleList<Crime*>* v7 = static_cast<BSSimpleList<Crime*>*>(ourMalloc(sizeof(BSSimpleList<Crime*>)));
     if (v7) {
@@ -3784,8 +3783,7 @@ BSSimpleList<Crime*>* ProcessLists::RemoveCrimesForYieldCheck(float afTime) {
     BSSimpleList<Crime*>* plastlist = nullptr;
     while (plist && (!plist->IsEmpty() && !bflag)) {
         Crime* pcrime = plist->m_item;
-        CombatTimeStamp* pTimeStamp = pcrime->GetTimeStamp(&kTimeStamp);
-        if (!(static_cast<double>(afTime) >= pTimeStamp->ElapsedTime())) {
+        if (!(static_cast<double>(afTime) >= pcrime->GetTimeStamp().ElapsedTime())) {
             plastlist = plist;
             plist = plist->m_pkNext;
         }

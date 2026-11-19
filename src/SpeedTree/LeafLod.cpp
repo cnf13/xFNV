@@ -37,20 +37,17 @@ LeafArray* CLeafLodEngine::ComputeNextLevel(LeafArray* apResult, LeafArray vOrig
     LeafArray vNextLevel;
     LeafArray vArgument(vOrigLeafSet);
     FindPairs(vArgument);
-    XFNV_INLINED_LOCAL(LeafArray, vNewLeaves, std::nullopt, std::nullopt);
-    LeafArray* pNewLeaves = BuildNewLeaves(&vNewLeaves);
-    // The temporary, raw storage BuildNewLeaves constructed, is destroyed here; the other locals' and the argument's
-    // own destructors run at the end of their scope.
-    vNextLevel = *pNewLeaves;
-    vNewLeaves.~LeafArray();
+    // A named result, so that vNextLevel is copy-assigned from it as in the game, not move-assigned.
+    LeafArray vNewLeaves = BuildNewLeaves();
+    vNextLevel = vNewLeaves;
     ::new (apResult) LeafArray(vNextLevel);
     return apResult;
 }
 
 // cDice is the function's guarded static. The texture index is the leaf's m_ucTextureIndex halved (signed division by
-// 2). The sums and halves are float stores; 0.5 is a double in fAdjust, 0.5f elsewhere. The result is copy-constructed
-// at apResult, then vLeaves is destroyed.
-LeafArray* CLeafLodEngine::BuildNewLeaves(LeafArray* apResult) {
+// 2). The sums and halves are float stores; 0.5 is a double in fAdjust, 0.5f elsewhere. The result is a copy of
+// vLeaves, made before vLeaves is destroyed.
+LeafArray CLeafLodEngine::BuildNewLeaves() {
     static CIdvRandom cDice;
     LeafArray vLeaves;
     SLodEntryVector::iterator i = m_vPairs.begin();
@@ -94,8 +91,7 @@ LeafArray* CLeafLodEngine::BuildNewLeaves(LeafArray* apResult) {
         }
         ++i;
     }
-    ::new (apResult) LeafArray(vLeaves);
-    return apResult;
+    return LeafArray(vLeaves);
 }
 
 // The inner loop tests vFound[nSearchIndex] in its condition and again in its body, as speedtree-2 does. Both distance
