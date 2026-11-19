@@ -1356,8 +1356,6 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
     const NiPointer<ObstacleData>& apData,
     BSSimpleArray<NavMeshPtr, 1024>* apReturnNavMeshArray
 ) {
-    XFNV_INLINED_LOCAL(NavMeshPtr, apMemory, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     NiPoint3 navmeshMin;
     NiPoint3 navmeshMax;
     BSScrapArray<TESObjectCELL*> kCells(32u, 0u, nullptr);
@@ -1366,17 +1364,13 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
             NavMeshArray* parray = kCells.GetAt(i)->GetNavMeshArray();
             if (parray) {
                 for (uint32_t j = 0; j < parray->GetNavMeshCount(); ++j) {
-                    NavMeshPtr* NavMeshByIndex = parray->GetNavMeshByIndex(&apResult, j);
-                    bool Bounds = NavMeshByIndex->m_pObject->NavMesh::GetBounds(navmeshMin, navmeshMax);
-                    apResult = nullptr;
+                    bool Bounds = parray->GetNavMeshByIndex(j).m_pObject->NavMesh::GetBounds(navmeshMin, navmeshMax);
                     if (Bounds) {
                         navmeshMax.z = navmeshMax.z + 128.0;
                         if (Pathing::DoAABBsOverlap(
                                 navmeshMin, navmeshMax, apData.m_pObject->aabbMin, apData.m_pObject->aabbMax
                             )) {
-                            NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apMemory, j);
-                            apReturnNavMeshArray->Add(*aItem);
-                            apMemory = nullptr;
+                            apReturnNavMeshArray->Add(parray->GetNavMeshByIndex(j));
                         }
                     }
                 }

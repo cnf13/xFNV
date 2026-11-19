@@ -650,8 +650,7 @@ bool NavMesh::CheckNavMeshAgainstNeighbors() {
     TESObjectCELL* pWestCell = GetParentCell()->GetWorldSpace()->GetCellFromCellCoord(iX - 1, iY);
     if (pWestCell && pWestCell->GetNavMeshArray()) {
         for (uint32_t i = 0; i < pWestCell->GetNavMeshArray()->GetNavMeshCount(); ++i) {
-            NavMeshPtr spNavMesh;
-            pWestCell->GetNavMeshArray()->GetNavMeshByIndex(&spNavMesh, i);
+            NavMeshPtr spNavMesh = pWestCell->GetNavMeshArray()->GetNavMeshByIndex(i);
             NavMesh* pNavMesh = static_cast<NavMesh*>(spNavMesh);
             if (!CheckUnconnectedBorderEdges(this, pNavMesh, true, fEdgeX, 0.0f)) {
                 bResult = false;
@@ -663,8 +662,7 @@ bool NavMesh::CheckNavMeshAgainstNeighbors() {
     TESObjectCELL* pEastCell = GetParentCell()->GetWorldSpace()->GetCellFromCellCoord(iX + 1, iY);
     if (pEastCell && pEastCell->GetNavMeshArray()) {
         for (uint32_t i = 0; i < pEastCell->GetNavMeshArray()->GetNavMeshCount(); ++i) {
-            NavMeshPtr spNavMesh;
-            pEastCell->GetNavMeshArray()->GetNavMeshByIndex(&spNavMesh, i);
+            NavMeshPtr spNavMesh = pEastCell->GetNavMeshArray()->GetNavMeshByIndex(i);
             NavMesh* pNavMesh = static_cast<NavMesh*>(spNavMesh);
             if (!CheckUnconnectedBorderEdges(this, pNavMesh, true, fEdgeX, 0.0f)) {
                 bResult = false;
@@ -676,8 +674,7 @@ bool NavMesh::CheckNavMeshAgainstNeighbors() {
     TESObjectCELL* pSouthCell = GetParentCell()->GetWorldSpace()->GetCellFromCellCoord(iX, iY - 1);
     if (pSouthCell && pSouthCell->GetNavMeshArray()) {
         for (uint32_t i = 0; i < pSouthCell->GetNavMeshArray()->GetNavMeshCount(); ++i) {
-            NavMeshPtr spNavMesh;
-            pSouthCell->GetNavMeshArray()->GetNavMeshByIndex(&spNavMesh, i);
+            NavMeshPtr spNavMesh = pSouthCell->GetNavMeshArray()->GetNavMeshByIndex(i);
             NavMesh* pNavMesh = static_cast<NavMesh*>(spNavMesh);
             if (!CheckUnconnectedBorderEdges(this, pNavMesh, false, 0.0f, fEdgeY)) {
                 bResult = false;
@@ -689,8 +686,7 @@ bool NavMesh::CheckNavMeshAgainstNeighbors() {
     TESObjectCELL* pNorthCell = GetParentCell()->GetWorldSpace()->GetCellFromCellCoord(iX, iY + 1);
     if (pNorthCell && pNorthCell->GetNavMeshArray()) {
         for (uint32_t i = 0; i < pNorthCell->GetNavMeshArray()->GetNavMeshCount(); ++i) {
-            NavMeshPtr spNavMesh;
-            pNorthCell->GetNavMeshArray()->GetNavMeshByIndex(&spNavMesh, i);
+            NavMeshPtr spNavMesh = pNorthCell->GetNavMeshArray()->GetNavMeshByIndex(i);
             NavMesh* pNavMesh = static_cast<NavMesh*>(spNavMesh);
             if (!CheckUnconnectedBorderEdges(this, pNavMesh, false, 0.0f, fEdgeY)) {
                 bResult = false;
@@ -770,15 +766,12 @@ bool NavMesh::GetMatchingEdge_0(
     uint16_t* apOtherTriangleIndex,
     int32_t* apOtherEdgeIndex
 ) {
-    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     NavMesh* pOtherNavMesh;
     pOtherNavMesh = nullptr;
     if (!GetMatchingEdge(ausTriangleIndex, aiEdgeIndex, &pOtherNavMesh, apOtherTriangleIndex, apOtherEdgeIndex)) {
         return false;
     }
-    NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pOtherNavMesh);
-    apReturnNavMesh->operator=(*ptr);
-    apResult = nullptr;
+    apReturnNavMesh->operator=(NavMeshPtr::MakeNavMeshPtr(pOtherNavMesh));
     return true;
 }
 

@@ -22,7 +22,6 @@ ObstacleTaskData::ObstacleTaskData(NavMeshInfo* apNavMesh) : pInfo(apNavMesh), b
 ObstacleTaskData::~ObstacleTaskData() {}
 
 void ObstacleTaskData::Process() {
-    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     AutoMemContext tempMemContext(
         MEM_CONTEXT_NAVMESH, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Pathfinding\\NavMeshObstacleTask.cpp", 357
@@ -38,9 +37,7 @@ void ObstacleTaskData::Process() {
         else {
             v11 = nullptr;
         }
-        NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, v11);
-        spNewNavMesh.operator=(*ptr);
-        apResult = nullptr;
+        spNewNavMesh.operator=(NavMeshPtr::MakeNavMeshPtr(v11));
         spSrcMesh.m_pObject->MakeCopyForObstacle(spNewNavMesh);
         SortOperations();
         for (int32_t a2 = 0;; ++a2) {

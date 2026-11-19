@@ -1692,7 +1692,6 @@ bool NavMesh::GetPOVForVertex(uint16_t ausVertex, NavMeshPOVData& aRetData) {
 }
 
 void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
-    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     if (apNavmeshInfo) {
         using connectedInfos_t = BSSimpleArray<NavMeshInfo*, 1024>;
         connectedInfos_t connectedInfos;
@@ -1720,9 +1719,7 @@ void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
                     if (!pinfo->GetNavMeshEvenDisabled(spnavmesh)) {
                         TESForm* pnavmeshForm = TESForm::GetFormByNumericID(pinfo->NavMeshID);
                         NavMesh* pnavmesh = dynamic_cast<NavMesh*>(pnavmeshForm);
-                        NavMeshPtr* ptr = NavMeshPtr::MakeNavMeshPtr(&apResult, pnavmesh);
-                        spnavmesh.operator=(*ptr);
-                        apResult = nullptr;
+                        spnavmesh.operator=(NavMeshPtr::MakeNavMeshPtr(pnavmesh));
                     }
                     if (spnavmesh.operator NavMesh*()) {
                         NavMesh* Object = spnavmesh.m_pObject;

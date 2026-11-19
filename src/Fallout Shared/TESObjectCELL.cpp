@@ -913,18 +913,12 @@ TESForm* TESObjectCELL::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap
         NavMeshPtr& spCopy = *reinterpret_cast<NavMeshPtr*>(aCopyStorage);
         ::new (&spCopy) NavMeshPtr;
         for (uint32_t i = 0; i < pNavMeshes->GetNavMeshCount(); ++i) {
-            alignas(NavMeshPtr) uint8_t aNavMeshStorage[sizeof(NavMeshPtr)];
-            NavMeshPtr& spNavMesh = *reinterpret_cast<NavMeshPtr*>(aNavMeshStorage);
-            TESForm* pNavMesh = pNavMeshes->GetNavMeshByIndex(&spNavMesh, i)->operator->();
-            spNavMesh = nullptr;
+            TESForm* pNavMesh = pNavMeshes->GetNavMeshByIndex(i).operator->();
             if (pNavMesh && !pNavMesh->GetDelete()) {
                 NavMesh* pNewNavMesh = dynamic_cast<NavMesh*>(pNavMesh->CreateDuplicateForm(false, apCopyMap));
                 if (pNewNavMesh) {
                     pNewNavMesh->pParentCell = pCell;
-                    alignas(NavMeshPtr) uint8_t aMadeStorage[sizeof(NavMeshPtr)];
-                    NavMeshPtr& spMade = *reinterpret_cast<NavMeshPtr*>(aMadeStorage);
-                    spCopy = *NavMeshPtr::MakeNavMeshPtr(&spMade, pNewNavMesh);
-                    spMade = nullptr;
+                    spCopy = NavMeshPtr::MakeNavMeshPtr(pNewNavMesh);
                     // SWEEP-INLINE 0x42fa20
                     pCell->pNavMeshes->AddNavMesh(spCopy);
                 }
@@ -1480,13 +1474,9 @@ void TESObjectCELL::InitItem() {
     }
     if (GetNavMeshArray() != nullptr) {
         for (uint32_t i = 0; i < GetNavMeshArray()->GetNavMeshCount(); ++i) {
-            // GetNavMeshByIndex constructs its result in place.
-            alignas(NavMeshPtr) uint8_t aNavMeshStorage[sizeof(NavMeshPtr)];
-            NavMeshPtr& spNavMesh = *reinterpret_cast<NavMeshPtr*>(aNavMeshStorage);
-            GetNavMeshArray()->GetNavMeshByIndex(&spNavMesh, i);
+            NavMeshPtr spNavMesh = GetNavMeshArray()->GetNavMeshByIndex(i);
             spNavMesh->InitItem();
             pSaveLoadGame->LoadForm(static_cast<NavMesh*>(spNavMesh));
-            spNavMesh = nullptr;
         }
     }
     pSaveLoadGame->SetThreadAllowChanges(bOldAllowChanges);
@@ -6310,8 +6300,6 @@ void TESObjectCELL::ClearReference3D() {
 }
 
 void TESObjectCELL::UnLoadAllTempData() {
-    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NavMeshPtr, apCell, std::nullopt, std::nullopt);
     TESObjectREFR* pref;
     CellRefLockEnter();
     this->sNumRefsWithVisibleDistant = 0;
@@ -6384,15 +6372,11 @@ void TESObjectCELL::UnLoadAllTempData() {
             if (aiNavMeshIndex >= NavMeshCount) {
                 break;
             }
-            NavMeshPtr* NavMeshByIndex = pNavMeshes->GetNavMeshByIndex(&apResult, aiNavMeshIndex);
-            TESForm* Object = NavMeshByIndex->m_pObject;
-            TESFile* v12 = Object->GetFile(-1);
-            apResult = nullptr;
+            TESFile* v12 = pNavMeshes->GetNavMeshByIndex(aiNavMeshIndex).m_pObject->GetFile(-1);
             if (!v12 || v12->GetMaster()) {
-                pNavMeshes->GetNavMeshByIndex(&apCell, aiNavMeshIndex);
+                NavMeshPtr apCell = pNavMeshes->GetNavMeshByIndex(aiNavMeshIndex);
                 pSaveLoadGame->UnloadForm(apCell.operator NavMesh*(), false);
                 pNavMeshes->RemoveNavMeshByIndex(aiNavMeshIndex--);
-                apCell = nullptr;
             }
         }
     }
@@ -8425,8 +8409,6 @@ void TESObjectCELL::RenderTestCell(
     TESObjectCELL::RENDER_TEST_DATA* apTestData,
     bool abtestEntireCell
 ) {
-    XFNV_INLINED_LOCAL(NavMeshPtr, spnavmesh_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NavMeshPtr, spnavmesh, std::nullopt, std::nullopt);
     NiMatrix3 oldrot;
     TESObjectCELL::RENDER_TEST_DATA defaultdata;
     if ((apCell) && (apCell->Get3D())) {
@@ -8448,10 +8430,9 @@ void TESObjectCELL::RenderTestCell(
                     if (i >= NavMeshCount) {
                         break;
                     }
-                    parray->GetNavMeshByIndex(&spnavmesh, static_cast<uint32_t>(i));
+                    NavMeshPtr spnavmesh = parray->GetNavMeshByIndex(static_cast<uint32_t>(i));
                     uint32_t itricount = spnavmesh.m_pObject->GetTriangleCount();
                     itotaltricount += itricount;
-                    spnavmesh = nullptr;
                 }
                 Warning("Testing %i NavMesh triangles.", itotaltricount);
                 for (int32_t i_2 = 0;; ++i_2) {
@@ -8459,7 +8440,7 @@ void TESObjectCELL::RenderTestCell(
                     if (i_2 >= v5) {
                         break;
                     }
-                    parray->GetNavMeshByIndex(&spnavmesh_2, static_cast<uint32_t>(i_2));
+                    NavMeshPtr spnavmesh_2 = parray->GetNavMeshByIndex(static_cast<uint32_t>(i_2));
                     if (spnavmesh_2.operator NavMesh*()) {
                         uint32_t itricount_2 = spnavmesh_2.m_pObject->GetTriangleCount();
                         for (uint32_t j = 0; j < itricount_2; ++j) {
@@ -8470,7 +8451,6 @@ void TESObjectCELL::RenderTestCell(
                             }
                         }
                     }
-                    spnavmesh_2 = nullptr;
                 }
             }
             else {

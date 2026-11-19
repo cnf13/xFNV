@@ -128,9 +128,8 @@ public:
     // Builds the path apRequest asks for into apSolution with a PathBuilder; false when none is found.
     static bool Pathfind(PathingRequest* apRequest, PathingSolution* apSolution);
     // The location closest to aGoalLocation that a navmesh search from aStartLocation reaches within
-    // afMaxPathingDistance, built in apResult (the by-value result); aStartLocation itself when it has no navmesh.
-    static PathingLocation* FindClosestReachableLocation(
-        PathingLocation* apResult,
+    // afMaxPathingDistance; aStartLocation itself when it has no navmesh.
+    static PathingLocation FindClosestReachableLocation(
         PathingLocation& aStartLocation,
         PathingLocation& aGoalLocation,
         float afMaxPathingDistance

@@ -141,10 +141,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
     NavMeshCellMap.SetAt(apCell, spCellNode);
     NavMeshPtr spNavMesh;
     for (uint32_t i = 0; i < uiNavMeshes; ++i) {
-        XFNV_INLINED_LOCAL(NavMeshPtr, kNavMeshAt, std::nullopt, std::nullopt);
-        NavMeshPtr* pNavMeshAt = pNavMeshes->GetNavMeshByIndex(&kNavMeshAt, i);
-        spNavMesh = *pNavMeshAt;
-        kNavMeshAt = nullptr;
+        spNavMesh = pNavMeshes->GetNavMeshByIndex(i);
         uint32_t uiTriSize = spNavMesh->GetTriangleCount();
         uint32_t uiVertSize = spNavMesh->GetVertexCount();
         if (!uiTriSize) {

@@ -601,55 +601,44 @@ bool Pathing::Pathfind(PathingRequest* apRequest, PathingSolution* apSolution) {
     return bResult;
 }
 
-PathingLocation* Pathing::FindClosestReachableLocation(
-    PathingLocation* apResult,
+PathingLocation Pathing::FindClosestReachableLocation(
     PathingLocation& aStartLocation,
     PathingLocation& aGoalLocation,
     float afMaxPathingDistance
 ) {
     if (!aStartLocation.ResolveNavMeshInfo(nullptr)) {
-        ::new (apResult) PathingLocation(aStartLocation);
-        return apResult;
+        return aStartLocation;
     }
     FastNavMeshTriHandle kStartNode;
-    alignas(NavMeshPtr) uint8_t aStartMeshStorage[sizeof(NavMeshPtr)];
-    NavMeshPtr* pspStartMesh = ::new (aStartMeshStorage) NavMeshPtr;
-    uint16_t usStartTriangle;
-    if (!aStartLocation.GetNavMeshAndTriangle(*pspStartMesh, usStartTriangle)) {
-        ::new (apResult) PathingLocation(aStartLocation);
-        *pspStartMesh = nullptr;
-        return apResult;
+    {
+        NavMeshPtr spStartMesh;
+        uint16_t usStartTriangle;
+        if (!aStartLocation.GetNavMeshAndTriangle(spStartMesh, usStartTriangle)) {
+            return aStartLocation;
+        }
+        kStartNode.pNavMesh = spStartMesh.operator->();
+        kStartNode.usTriangle = usStartTriangle;
     }
-    kStartNode.pNavMesh = pspStartMesh->operator->();
-    kStartNode.usTriangle = usStartTriangle;
-    *pspStartMesh = nullptr;
     FastNavMeshTriHandle kGoalNode;
     kGoalNode.pNavMesh = nullptr;
     kGoalNode.usTriangle = 0xFFFF;
     if (aGoalLocation.ResolveNavMeshInfo(nullptr)) {
-        alignas(NavMeshPtr) uint8_t aGoalMeshStorage[sizeof(NavMeshPtr)];
-        NavMeshPtr* pspGoalMesh = ::new (aGoalMeshStorage) NavMeshPtr;
+        NavMeshPtr spGoalMesh;
         uint16_t usGoalTriangle;
-        if (aGoalLocation.GetNavMeshAndTriangle(*pspGoalMesh, usGoalTriangle)) {
-            kGoalNode.pNavMesh = pspGoalMesh->operator->();
+        if (aGoalLocation.GetNavMeshAndTriangle(spGoalMesh, usGoalTriangle)) {
+            kGoalNode.pNavMesh = spGoalMesh.operator->();
             kGoalNode.usTriangle = usGoalTriangle;
         }
-        *pspGoalMesh = nullptr;
     }
-    alignas(NavMeshSearchMaxCost) uint8_t aSearchStorage[sizeof(NavMeshSearchMaxCost)];
-    NavMeshSearchMaxCost* pSearch = ::new (aSearchStorage) NavMeshSearchMaxCost;
+    NavMeshSearchMaxCost kSearch;
     // Takes the goal's point before the start's.
     NiPoint3 kGoalPoint = aGoalLocation.GetLocation();
     NiPoint3 kStartPoint = aStartLocation.GetLocation();
     NiPoint3 kClosestPoint =
-        pSearch->FindClosestPoint(kStartPoint, kStartNode, kGoalPoint, kGoalNode, afMaxPathingDistance);
-    alignas(PathingLocation) uint8_t aLocationStorage[sizeof(PathingLocation)];
-    PathingLocation* pLocation = ::new (aLocationStorage) PathingLocation(aStartLocation);
-    pLocation->SetLocation(kClosestPoint);
-    ::new (apResult) PathingLocation(*pLocation);
-    pLocation->~PathingLocation();
-    pSearch->~NavMeshSearchMaxCost();
-    return apResult;
+        kSearch.FindClosestPoint(kStartPoint, kStartNode, kGoalPoint, kGoalNode, afMaxPathingDistance);
+    PathingLocation kLocation(aStartLocation);
+    kLocation.SetLocation(kClosestPoint);
+    return kLocation;
 }
 
 // The memory context is not destroyed automatically; each case destroys it explicitly.
@@ -1450,7 +1439,6 @@ bool Pathing::FindNavmeshesForLocation(
     BSSimpleArray<NavMeshPtr, 1024>* apRetNavMeshes,
     bool abConnected
 ) {
-    XFNV_INLINED_LOCAL(NavMeshPtr, spnavMesh, std::nullopt, std::nullopt);
     TESObjectCELL* pcell_2;
     TESObjectCELL* padjacentCell;
     using cells_t = BSSimpleArray<TESObjectCELL*, 1024>;
@@ -1502,9 +1490,7 @@ bool Pathing::FindNavmeshesForLocation(
             TESObjectCELL* padjCell = cells.GetAt(static_cast<int32_t>(i));
             if (padjCell && padjCell->GetNavMeshArray()) {
                 for (uint32_t j = 0; j < padjCell->GetNavMeshArray()->GetNavMeshCount(); ++j) {
-                    NavMeshPtr* pnavMesh = padjCell->GetNavMeshArray()->GetNavMeshByIndex(&spnavMesh, j);
-                    apRetNavMeshes->Add(*pnavMesh);
-                    spnavMesh = nullptr;
+                    apRetNavMeshes->Add(padjCell->GetNavMeshArray()->GetNavMeshByIndex(j));
                 }
             }
         }
@@ -2345,8 +2331,6 @@ bool Pathing::FindPotentialNavmeshesForLocation(
 }
 
 bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMeshes) {
-    XFNV_INLINED_LOCAL(NavMeshPtr, apMemory, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NavMeshPtr, apResult, std::nullopt, std::nullopt);
     if (TES::pInstance->pInteriorCell) {
         NavMeshArray* parray = TES::pInstance->pInteriorCell->GetNavMeshArray();
         if (parray) {
@@ -2355,9 +2339,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                 if (i >= NavMeshCount) {
                     break;
                 }
-                NavMeshPtr* aItem = parray->GetNavMeshByIndex(&apResult, i);
-                apRetNavMeshes->Add(*aItem);
-                apResult = nullptr;
+                apRetNavMeshes->Add(parray->GetNavMeshByIndex(i));
             }
         }
     }
@@ -2373,9 +2355,7 @@ bool Pathing::GetAllLoadedNavmeshes(BSSimpleArray<NavMeshPtr, 1024>* apRetNavMes
                         if (i_3 >= v2) {
                             break;
                         }
-                        NavMeshPtr* NavMeshByIndex = parray_2->GetNavMeshByIndex(&apMemory, i_3);
-                        apRetNavMeshes->Add(*NavMeshByIndex);
-                        apMemory = nullptr;
+                        apRetNavMeshes->Add(parray_2->GetNavMeshByIndex(i_3));
                     }
                 }
             }

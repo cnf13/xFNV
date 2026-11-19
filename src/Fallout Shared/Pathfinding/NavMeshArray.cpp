@@ -35,14 +35,11 @@ uint32_t NavMeshArray::GetNavMeshCount() {
     return NavMeshes.iSize;
 }
 
-NavMeshPtr* NavMeshArray::GetNavMeshByIndex(NavMeshPtr* apResult, uint32_t aiNavMeshIndex) {
+NavMeshPtr NavMeshArray::GetNavMeshByIndex(uint32_t aiNavMeshIndex) {
     if (aiNavMeshIndex < NavMeshes.iSize) {
-        ::new (apResult) NavMeshPtr(NavMeshes.GetAt(aiNavMeshIndex));
+        return NavMeshes.GetAt(aiNavMeshIndex);
     }
-    else {
-        NavMeshPtr::MakeNavMeshPtr(apResult, nullptr);
-    }
-    return apResult;
+    return NavMeshPtr::MakeNavMeshPtr(nullptr);
 }
 
 void NavMeshArray::AddToGarbageCollector() {

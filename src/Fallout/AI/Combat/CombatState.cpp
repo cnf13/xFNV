@@ -2578,8 +2578,6 @@ bool CombatState::FindOptimalLocation(
     NiPoint3 a2;
     NiPoint3 result;
     NiPoint3 arLocation;
-    // Filled by Pathing::FindClosestReachableLocation; nothing stores into it before.
-    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     NiPoint3 arTargetPos;
     NiPoint3 ecx0;
     NiPoint3 v30;
@@ -2600,7 +2598,7 @@ bool CombatState::FindOptimalLocation(
         (v30 = ecx0 - arLocation, (v10 = v30.SqrLength(), !(v26 * v26 < v10)))) {
         PathingLocation apMemory(ecx0, apActor);
         float v12 = v26 + v26;
-        Pathing::FindClosestReachableLocation(&apLocation, v22, apMemory, v12);
+        PathingLocation apLocation = Pathing::FindClosestReachableLocation(v22, apMemory, v12);
         a2 = apLocation.GetLocation();
         result = a2 - arTargetPos;
         float v27 = result.SqrLength();
@@ -2608,11 +2606,9 @@ bool CombatState::FindOptimalLocation(
             (!(v27 > afAbsoluteMaxRange * afAbsoluteMaxRange) &&
              (!abCheckTargetLOS || CombatUtilities::CalculateLOS(apActor, apTarget, a2, arTargetPos, false, -1)))) {
             apRetLocation->SetPoint(a2, nullptr);
-            apLocation.~PathingLocation();
             return true;
         }
 
-        apLocation.~PathingLocation();
         return false;
     }
 

@@ -29,9 +29,8 @@ NavMeshPtr::operator NavMesh*() const {
     return NiPointer<NavMesh>::operator->();
 }
 
-NavMeshPtr* NavMeshPtr::MakeNavMeshPtr(NavMeshPtr* apResult, NavMesh* apNavMesh) {
-    ::new (apResult) NavMeshPtr(apNavMesh);
-    return apResult;
+NavMeshPtr NavMeshPtr::MakeNavMeshPtr(NavMesh* apNavMesh) {
+    return NavMeshPtr(apNavMesh);
 }
 
 void NavMeshPtr::MakeNavMeshPtr(NavMeshPtr& arPtr, NavMesh* apNavMesh) {

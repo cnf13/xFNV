@@ -3403,10 +3403,7 @@ bool TESDataHandler::ConstructObject(
             if (pForm == nullptr) {
                 void* const pMemory = NiMemObject::operator new(sizeof(NavMesh));
                 NavMesh* const pNewNavMesh = pMemory != nullptr ? ::new (pMemory) NavMesh : nullptr;
-                // MakeNavMeshPtr constructs its result in place; the empty pointer it
-                // overwrites holds no reference.
-                NavMeshPtr spNavMesh;
-                NavMeshPtr::MakeNavMeshPtr(&spNavMesh, pNewNavMesh);
+                NavMeshPtr spNavMesh = NavMeshPtr::MakeNavMeshPtr(pNewNavMesh);
                 LoadForm(spNavMesh.operator->(), pFile);
                 if (spNavMesh->GetParentCell() != nullptr) {
                     if (spNavMesh->GetParentCell()->pNavMeshes == nullptr) {

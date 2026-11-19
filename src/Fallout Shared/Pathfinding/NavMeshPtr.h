@@ -24,8 +24,8 @@ public:
     // This conversion hides NiPointer's own and returns the pointer through the one-field getter.
     operator NavMesh*() const;
 
-    // A pointer holding apNavMesh, constructed in apResult.
-    static NavMeshPtr* MakeNavMeshPtr(NavMeshPtr* apResult, NavMesh* apNavMesh);
+    // A pointer holding apNavMesh.
+    static NavMeshPtr MakeNavMeshPtr(NavMesh* apNavMesh);
     // Assigns apNavMesh to the existing arPtr through a temporary pointer.
     static void MakeNavMeshPtr(NavMeshPtr& arPtr, NavMesh* apNavMesh);
 };

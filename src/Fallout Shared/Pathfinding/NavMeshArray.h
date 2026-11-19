@@ -20,8 +20,8 @@ public:
     uint32_t GetNavMeshIndex(NavMeshPtr apNavMesh);
     // The number of navmeshes.
     uint32_t GetNavMeshCount();
-    // Constructs the navmesh at aiNavMeshIndex in apResult and returns it.
-    NavMeshPtr* GetNavMeshByIndex(NavMeshPtr* apResult, uint32_t aiNavMeshIndex);
+    // The navmesh at aiNavMeshIndex, or an empty pointer when the index is out of range.
+    NavMeshPtr GetNavMeshByIndex(uint32_t aiNavMeshIndex);
     // Adds every navmesh to the garbage collector, then clears the array and frees its buffer.
     void AddToGarbageCollector();
     // Clears the navmesh's cell, adds it to the garbage collector and removes it.
