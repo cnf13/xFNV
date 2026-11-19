@@ -25,5 +25,3 @@ public:
     // 7 bytes of padding: m_hitPoint is 16-byte aligned (its hkVector4 members), so it starts at 0x10.
     hkContactPoint m_hitPoint;
 };
-
-inline constexpr xfnv::Vtable hkpSimpleClosestContactCollector_vftable{};

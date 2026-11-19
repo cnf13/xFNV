@@ -184,7 +184,6 @@ int32_t queryAabbInternal(
 // The queries' HK_REAL_MAX in each lane, which the ray casts take as the inverse of a zero direction component.
 // HK_REAL_MAX (3.40282e+38f, 0x7F7FFFEE) in each lane.
 inline hkQuadReal rdata_10CD670{3.40282e+38f, 3.40282e+38f, 3.40282e+38f, 3.40282e+38f};
-inline constexpr xfnv::Vtable hkAabbTreeQueryUtils_hkAabbTreeData_hkAabbTreeAabb_unsigned_int_Collector_vftable{};
 
 // The destructors are empty: the collectors own nothing to destroy.
 template <class BOUNDING_VOLUME, typename IDX>

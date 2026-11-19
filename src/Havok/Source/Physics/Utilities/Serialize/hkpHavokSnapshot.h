@@ -72,4 +72,3 @@ public:
 
 extern hkClass hkRootLevelContainerNamedVariantClass;
 extern hkClass hkpSampledHeightFieldShapeClass;
-inline constexpr xfnv::Vtable hkpHavokSnapshot_ConvertListener_vftable{};

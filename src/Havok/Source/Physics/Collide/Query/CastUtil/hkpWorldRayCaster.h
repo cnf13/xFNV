@@ -55,4 +55,3 @@ public:
     int32_t m_collectorStriding;
     hkpShapeRayCastInput m_shapeInput;
 };
-inline constexpr xfnv::Vtable hkpWorldRayCaster_vftable{};

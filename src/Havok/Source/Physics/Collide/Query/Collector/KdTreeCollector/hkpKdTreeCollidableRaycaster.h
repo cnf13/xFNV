@@ -47,5 +47,3 @@ public:
     hkpWorldRayCastOutput* m_output;
     hkpRayHitCollector* m_collector;
 };
-
-inline constexpr xfnv::Vtable hkpKdTreeCollidableRaycaster_vftable{};

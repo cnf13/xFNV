@@ -18,4 +18,3 @@ public:
 
     hkpWorldRayCastOutput m_rayHit;
 };
-inline constexpr xfnv::Vtable hkpClosestRayHitCollector_vftable{};

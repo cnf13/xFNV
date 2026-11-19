@@ -254,8 +254,6 @@ struct Writer {
     ListenerCache m_listenerCache;
 };
 
-inline constexpr xfnv::Vtable hkBinaryTagfileWriter_vftable{};
-
 // A type at or past TYPE_ARRAY gives the array's size.
 template <typename T>
 int32_t Writer::worthWriting(const T& value) {

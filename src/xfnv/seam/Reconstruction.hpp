@@ -25,27 +25,12 @@
 
 namespace xfnv {
 
-    // An exe vtable: the vptr the exe's inlined constructor stores in an XFNV_INLINED_LOCAL. There are no exe vtables
-    // here: each constant is 0, and only says that the local starts with its class's own vptr.
-    struct Vtable {
-        uintptr_t address;
-    };
-
-    // `type name` whose constructor and destructor the exe inlines down to their vptr stores (atStart, atEnd: Vtable
-    // constants or std::nullopt), the body writing the rest of them by hand (its EXE-INLINED steps). It is raw typed
-    // storage, so the program runs exactly the body's statements, as the exe does: no destructor runs at the scope's
-    // end, and the only construction is the class's default constructor where atStart names a vtable (it gives the
-    // object the class's own vptr; atEnd stores nothing). At parity the form becomes `type name;` with the hand-inlined
-    // steps (the EXE-INLINED lines) removed.
+    // `type name` as raw typed storage: no constructor or destructor runs, so the program runs exactly the body's
+    // statements, as the exe does. At parity the form becomes a real local.
     template <class T>
     class NativeInlinedLocal {
     public:
-        template <class E>
-        NativeInlinedLocal(std::nullopt_t, E) {}
-        template <class E>
-        NativeInlinedLocal(Vtable, E) {
-            ::new (static_cast<void*>(m_bytes)) T;
-        }
+        NativeInlinedLocal(std::nullopt_t, std::nullopt_t) {}
         NativeInlinedLocal(const NativeInlinedLocal&) = delete;
         NativeInlinedLocal& operator=(const NativeInlinedLocal&) = delete;
 

@@ -44,4 +44,3 @@ public:
     // 4 bytes of padding: m_shapeInput is 16-byte aligned (its hkVector4 members), so it starts at 0x20.
     hkpLinearCastCollisionInput m_shapeInput;
 };
-inline constexpr xfnv::Vtable hkpKdTreeWorldLinearCaster_vftable{};

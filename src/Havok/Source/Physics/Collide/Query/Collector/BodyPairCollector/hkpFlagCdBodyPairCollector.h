@@ -16,4 +16,3 @@ public:
     // DeletingDestruct's free (the thread's Havok heap, blockFree with the object's size).
     static void operator delete(void* apMemory);
 };
-inline constexpr xfnv::Vtable hkpFlagCdBodyPairCollector_vftable_ConvexList{};

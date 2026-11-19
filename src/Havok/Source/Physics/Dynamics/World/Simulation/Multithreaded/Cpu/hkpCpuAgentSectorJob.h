@@ -28,4 +28,3 @@ public:
     // The queue's 16-byte alignment puts it at 0x30.
     hkpFixedSizePhysicsCommandQueue<256> m_commandQueue;
 };
-inline constexpr xfnv::Vtable hkpDeferredConstraintOwner_vftable{};

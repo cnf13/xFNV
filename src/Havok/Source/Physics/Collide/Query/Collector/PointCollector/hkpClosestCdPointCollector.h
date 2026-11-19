@@ -36,4 +36,3 @@ public:
 
     hkpRootCdPoint m_hitPoint;
 };
-inline constexpr xfnv::Vtable hkpClosestCdPointCollector_vftable{};

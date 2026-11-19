@@ -18,7 +18,6 @@ public:
     // DeletingDestruct's free (ourFree); hkReferencedObject's own hides it for its subclasses.
     static void operator delete(void* apMemory);
 };
-inline constexpr xfnv::Vtable hkBaseObject_vftable{};
 
 // The class's reflection record.
 extern hkClass hkBaseObjectClass;
