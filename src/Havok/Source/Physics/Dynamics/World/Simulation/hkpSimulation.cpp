@@ -804,23 +804,14 @@ void hkpSimulation::processAgentsOfEntities(
 ) {
     // The entities handled so far, by their collidables.
     using entitiesProcessed_t = hkPointerMap<hkpLinkedCollidable*, int32_t>;
-    XFNV_INLINED_LOCAL(entitiesProcessed_t, entitiesProcessed, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x626630
-    entitiesProcessed.m_map.m_elem = nullptr;
-    entitiesProcessed.m_map.m_numElems = 0;
-    entitiesProcessed.m_map.m_hashMod = -1;
-    entitiesProcessed.m_map.hkUlongMapBase::reserve(hkMemoryRouter::getInstance().heap(), numEntities);
+    entitiesProcessed_t entitiesProcessed(numEntities);
     // EXE-INLINED none: hkpProcessCollisionOutput::hkpProcessCollisionOutput
     hkpProcessCollisionOutput processOutput;
     processOutput.m_toi.m_time.m_storage = 3.40282e+38f;
     processOutput.m_constraintOwner.m_storage = nullptr;
     processOutput.m_toi.m_properties.m_impulseApplied = 0.0f;
     processOutput.m_toi.m_properties.m_internalSolverData = 0.0f;
-    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
-    collisionEntries.m_data = nullptr;
-    collisionEntries.m_size = 0;
-    collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpLinkedCollidable::CollisionEntry> collisionEntries;
     for (int32_t i = 0; i < numEntities; ++i) {
         hkpEntity* entity = entities[i];
         hkpLinkedCollidable* lColl = &entity->m_collidable;
@@ -1042,12 +1033,7 @@ void hkpSimulation::processAgentsOfEntities(
             }
         }
     }
-done:
-    // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::~hkArray
-    collisionEntries.clearAndDeallocate();
-    // EXE-INLINED 0x6264F0
-    entitiesProcessed.m_map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    entitiesProcessed.m_map.destructOperations();
+done:;
 }
 
 bool hkpSimulation::isSimulationAtPsi() const {
@@ -1086,39 +1072,8 @@ void hkpSimulation::collideEntitiesBroadPhaseDiscrete(hkpEntity** delPairs, int3
 
     HK_TIMER_BEGIN_LIST("BroadPhase", "InitMem");
 
-    const int32_t iAddedCapacity = world->m_broadPhaseUpdateSize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, addedPairs, std::nullopt, std::nullopt);
-    addedPairs.m_data = nullptr;
-    addedPairs.m_size = 0;
-    addedPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rAddedStack = hkMemoryRouter::getInstance().m_stack;
-    void* pAddedBlock = rAddedStack.m_next.m_storage;
-    rAddedStack.m_next.m_storage = static_cast<char*>(pAddedBlock) +
-        ((iAddedCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    addedPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iAddedCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
-    hkpBroadPhaseHandlePair* pAddedLocal = static_cast<hkpBroadPhaseHandlePair*>(pAddedBlock);
-    addedPairs.m_data = pAddedLocal;
-    addedPairs.m_localMemory = pAddedLocal;
-
-    const int32_t iRemovedCapacity = world->m_broadPhaseUpdateSize;
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpBroadPhaseHandlePair>, removedPairs, std::nullopt, std::nullopt);
-    removedPairs.m_data = nullptr;
-    removedPairs.m_size = 0;
-    removedPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rRemovedStack = hkMemoryRouter::getInstance().m_stack;
-    void* pRemovedBlock = rRemovedStack.m_next.m_storage;
-    rRemovedStack.m_next.m_storage = static_cast<char*>(pRemovedBlock) +
-        ((iRemovedCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pRemovedLocal = static_cast<hkpBroadPhaseHandlePair*>(pRemovedBlock);
-    removedPairs.m_data = pRemovedLocal;
-    removedPairs.m_capacityAndFlags = static_cast<int32_t>(
-        static_cast<uint32_t>(iRemovedCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
-    );
-    removedPairs.m_localMemory = pRemovedLocal;
+    hkLocalArray<hkpBroadPhaseHandlePair> addedPairs(world->m_broadPhaseUpdateSize);
+    hkLocalArray<hkpBroadPhaseHandlePair> removedPairs(world->m_broadPhaseUpdateSize);
 
     {
         // hkLocalBuffer<hkAabbUint32> aabbs(numEntities), keeping only its pointer.
@@ -1182,9 +1137,6 @@ void hkpSimulation::collideEntitiesBroadPhaseDiscrete(hkpEntity** delPairs, int3
         }
     }
     HK_TIMER_END_LIST();
-
-    removedPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
-    addedPairs.~hkLocalArray<hkpBroadPhaseHandlePair>();
 }
 
 void setLocalTranslationsToWorld(

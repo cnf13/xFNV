@@ -3751,7 +3751,6 @@ float Actor::SpeakSoundFunction(
     bool abLip,
     bool abUseIdleManager
 ) {
-    XFNV_INLINED_LOCAL(BSSoundHandle, kVoiceHandle, std::nullopt, std::nullopt);
     double dDistanceFromPlayer;
     char Dst[516];
     float fdelay = 0.0f;
@@ -3937,6 +3936,7 @@ float Actor::SpeakSoundFunction(
         this->bSpeakingDone = false;
     }
     BaseProcess* v32 = this->pCurrentProcess;
+    BSSoundHandle kVoiceHandle;
     kVoiceHandle.operator=(aSoundHand);
     v32->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, kVoiceHandle);
     if (panim) {
@@ -6822,7 +6822,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                     }
                     bVoiceFileDone = false;
                     // The by-value handle argument is deliberately built with operator=, as the game does.
-                    XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+                    BSSoundHandle kArgument;
                     kArgument.operator=(handle);
                     pCurrentProcess->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, kArgument);
                     fDuration = static_cast<float>(handle.GetDuration());
@@ -6835,7 +6835,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                 !abNeverSubtitle) {
                 // Reads the position before it builds the by-value handle argument with operator=.
                 NiPoint3 kSpeakerLoc = pRef->GetLocationOnReference();
-                XFNV_INLINED_LOCAL(BSSoundHandle, kArgument, std::nullopt, std::nullopt);
+                BSSoundHandle kArgument;
                 kArgument.operator=(handle);
                 Interface::ShowSubtitle(pResponse->cText.pString, kArgument, kSpeakerLoc, apTarget, true);
             }
@@ -17468,7 +17468,6 @@ void Actor::MoveActorAndFollowers(
     float ffollowerSpacing;
     float fdummy;
     NiPoint3 farEnoughPt;
-    XFNV_INLINED_LOCAL(PathingLocation, kDestination, std::nullopt, std::nullopt);
     NiPoint3 location = aLocation;
     float y = -std::cos(afAngle);
     float x = -std::sin(afAngle);
@@ -17539,9 +17538,7 @@ void Actor::MoveActorAndFollowers(
                         PathingRequest followPosRequest;
                         followPosRequest.Initialize(this);
                         followPosRequest.SetCantOpenDoors(true);
-                        PathingLocation* aDestination = ::new (&kDestination) PathingLocation(adjustedLoc, this);
-                        followPosRequest.SetDestination(*aDestination);
-                        kDestination.~PathingLocation();
+                        followPosRequest.SetDestination(PathingLocation(adjustedLoc, this));
                         followPosRequest.SetAllowIncompletePath(true);
                         if (Pathing::BuildPath(&followPosRequest, &followPosSolution) &&
                             followPosSolution.FindPointOnPath(0.0f, faccumulatedSpace, true, &fdummy, &farEnoughPt)) {

@@ -513,7 +513,7 @@ void ShadowSceneLight::TestFrustumCull(NiCullingProcess& arCuller) {
     float v56;
     float v57;
     float v58;
-    XFNV_INLINED_LOCAL(NiFrustumPlanes, frustumPlanes, std::nullopt, std::nullopt);
+    NiFrustumPlanes frustumPlanes;
     NiLight* m_pObject = spLight.m_pObject;
     kbound.m_fRadius = m_pObject->m_kSpec.r;
     bool bCastShadow = this->bCastShadow;
@@ -1513,9 +1513,8 @@ bool ShadowSceneLight::FrustumFrustumIntersection(NiCamera* apCamera1, NiCamera*
     // Each camera's frustum points: the eye, then the four far corners (x, y, z each).
     alignas(8) float v258[15];
     float v259[15];
-    alignas(8) XFNV_INLINED_LOCAL(NiFrustumPlanes, v260, std::nullopt, std::nullopt);
-    alignas(8) XFNV_INLINED_LOCAL(NiFrustumPlanes, v262, std::nullopt, std::nullopt);
-    alignas(8) XFNV_INLINED_LOCAL(NiFrustumPlanes, v263, std::nullopt, std::nullopt);
+    alignas(8) NiFrustumPlanes v262;
+    alignas(8) NiFrustumPlanes v263;
     // The frustum's eight edges as pairs of point indices, stored byte by byte.
     uint8_t aucEdges[8][2];
     aucEdges[0][0] = 0;
@@ -1534,23 +1533,11 @@ bool ShadowSceneLight::FrustumFrustumIntersection(NiCamera* apCamera1, NiCamera*
     aucEdges[6][1] = 4;
     aucEdges[7][0] = 3;
     aucEdges[7][1] = 4;
-    NiPlane* v3 = v262.m_akCullingPlanes;
-    for (int32_t i = 5; i >= 0; --i) {
-        ::new (v3) NiPlane;
-        ++v3;
-    }
-    v262.m_uiActivePlanes = 63;
-    NiPlane* v4 = v263.m_akCullingPlanes;
-    for (int32_t j = 5; j >= 0; --j) {
-        ::new (v4) NiPlane;
-        ++v4;
-    }
     float x = apCamera1->m_kWorld.m_Translate.x;
     float v213 = apCamera1->m_kWorld.m_Rotate.m_pEntry[0][0];
     float y = apCamera1->m_kWorld.m_Translate.y;
     float z = apCamera1->m_kWorld.m_Translate.z;
     float v216 = apCamera1->m_kWorld.m_Rotate.m_pEntry[1][0];
-    v263.m_uiActivePlanes = 63;
     float v218 = apCamera1->m_kWorld.m_Rotate.m_pEntry[2][0];
     float v252 = apCamera1->m_kWorld.m_Rotate.m_pEntry[0][1];
     v258[0] = x;
@@ -1750,14 +1737,9 @@ bool ShadowSceneLight::FrustumFrustumIntersection(NiCamera* apCamera1, NiCamera*
     kcullproc.m_pkCamera = apCamera2;
     kcullproc.SetFrustum(apCamera2->m_kViewFrustum);
     v263 = kcullproc.m_kPlanes;
-    NiPlane* v30 = v260.m_akCullingPlanes;
-    for (int32_t k = 5; k >= 0; --k) {
-        ::new (v30) NiPlane;
-        ++v30;
-    }
+    alignas(8) NiFrustumPlanes v260;
     double v32 = 0.0;
     int32_t v33 = 0;
-    v260.m_uiActivePlanes = 63;
     float* v243 = nullptr;
 LABEL_8:;
     if (v33) {
@@ -1947,23 +1929,24 @@ bool ShadowSceneLight::CubeFaceFrustumFrustumIntersection(
     uint16_t ausCubeFace
 ) {
     NiUpdateData updateData;
-    XFNV_INLINED_LOCAL(BSCubeMapCamera, kCamera, std::nullopt, std::nullopt);
     TLSData* v5 = GetThreadTLSData();
     NiCamera* m_pkCamera = arCuller.m_pkCamera;
     MEM_CONTEXT eMemContext = v5->eMemContext;
     v5->eMemContext = MEM_CONTEXT_SHADOWS;
-    ::new (&kCamera) BSCubeMapCamera(0);
-    kCamera.m_kLocal.m_Translate = aBound.m_kCenter;
-    kCamera.SetupTransformation(static_cast<NiRenderedCubeMap::FaceID>(ausCubeFace));
-    updateData.fTime = 0.0;
-    updateData.bUpdateControllers = false;
-    updateData.bParallelUpdate = false;
-    updateData.bFoundParticles = false;
-    updateData.bFoundMorphController = false;
-    updateData.bSceneGraphChange = false;
-    kCamera.Update(updateData);
-    bool v8 = FrustumFrustumIntersection(m_pkCamera, &kCamera);
-    kCamera.~BSCubeMapCamera();
+    bool v8;
+    {
+        BSCubeMapCamera kCamera(0);
+        kCamera.m_kLocal.m_Translate = aBound.m_kCenter;
+        kCamera.SetupTransformation(static_cast<NiRenderedCubeMap::FaceID>(ausCubeFace));
+        updateData.fTime = 0.0;
+        updateData.bUpdateControllers = false;
+        updateData.bParallelUpdate = false;
+        updateData.bFoundParticles = false;
+        updateData.bFoundMorphController = false;
+        updateData.bSceneGraphChange = false;
+        kCamera.Update(updateData);
+        v8 = FrustumFrustumIntersection(m_pkCamera, &kCamera);
+    }
     v5->eMemContext = eMemContext;
     return v8;
 }

@@ -90,8 +90,6 @@ namespace {
         hkPointerMap<const hkpEntity*, int32_t> m_map;
     };
 
-    inline constexpr xfnv::Vtable hkEntitySelectorAll_vftable{};
-
     int32_t hkEntitySelectorListed::isEntityOk(const hkpEntity* entity) {
         return m_map.getWithDefault(entity, 0);
     }
@@ -123,7 +121,6 @@ namespace {
 // Saves the agent entries of the numEntities entities into sys, each pair once: an entity's collidable goes into a map
 // before its entries are saved, and an entry whose partner is in the map already is skipped.
 using hkpSaveContactPointsCollidableMap = hkPointerMap<const hkpLinkedCollidable*, int32_t>;
-using hkpSaveContactPointsCollidableMapBase = hkUlongMapBase;
 
 hkpSaveContactPointsUtil::EntitySelector::~EntitySelector() {}
 
@@ -139,10 +136,7 @@ void hkpSaveContactPointsUtil::saveContactPoints(
     const hkpWorld* world,
     hkpPhysicsSystemWithContacts* sys
 ) {
-    XFNV_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, islands, std::nullopt, std::nullopt);
-    islands.m_data = nullptr;
-    islands.m_size = 0;
-    islands.m_capacityAndFlags = 0x80000000u;
+    hkArray<hkpSimulationIsland*> islands;
     // EXE-INLINED none: hkArray<hkpSimulationIsland*>::operator=
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iCapacity =
@@ -195,16 +189,6 @@ void hkpSaveContactPointsUtil::saveContactPoints(
             }
             pIsland = islands.m_data[i];
         }
-    }
-    // EXE-INLINED none: hkArray<hkpSimulationIsland*>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    islands.m_size = 0;
-    if (islands.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            islands.m_data,
-            sizeof(hkpSimulationIsland*) *
-                static_cast<int32_t>(islands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK)
-        );
     }
 }
 
@@ -794,10 +778,7 @@ hkResult hkpSaveContactPointsUtil::deserializeCollisionEntry(
         }
     }
 
-    XFNV_INLINED_LOCAL(hkArray<uint16_t>, kPointIds, std::nullopt, std::nullopt);
-    kPointIds.m_data = nullptr;
-    kPointIds.m_size = 0;
-    kPointIds.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
+    hkArray<uint16_t> kPointIds;
     hkpDynamicsContactMgr* pDynamicsMgr = pMgr;
     pDynamicsMgr->getAllContactPointIds(kPointIds);
 
@@ -882,14 +863,6 @@ hkResult hkpSaveContactPointsUtil::deserializeCollisionEntry(
     }
 
     hkAgentNnMachine_InvalidateTimInAgent(entry, *collisionInput);
-    // EXE-INLINED none: hkArray<uint16_t>::~hkArray
-    hkMemoryAllocator* pFreeHeap = hkMemoryRouter::getInstance().m_heap;
-    kPointIds.m_size = 0;
-    if (kPointIds.m_capacityAndFlags >= 0) {
-        pFreeHeap->bufFree(
-            kPointIds.m_data, (kPointIds.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK) * sizeof(uint16_t)
-        );
-    }
     return HK_SUCCESS;
 }
 
@@ -899,7 +872,7 @@ void hkpSaveContactPointsUtil::loadContactPoints(
     hkpPhysicsSystemWithContacts* sys,
     hkpWorld* world
 ) {
-    XFNV_INLINED_LOCAL(hkEntitySelectorAll, selector, hkEntitySelectorAll_vftable, std::nullopt);
+    hkEntitySelectorAll selector;
     loadContactPointsInternal(input, sys, world, selector);
 }
 
@@ -909,12 +882,9 @@ void hkpSaveContactPointsUtil::loadContactPoints(
     hkpEntity** entities,
     int32_t numEntities
 ) {
-    XFNV_INLINED_LOCAL(hkEntitySelectorListed, a4, std::nullopt, std::nullopt);
     hkpWorld* m_world = (*entities)->m_world;
-    ::new (&a4) hkEntitySelectorListed(entities, numEntities);
+    hkEntitySelectorListed a4(entities, numEntities);
     hkpSaveContactPointsUtil::loadContactPointsInternal(input, sys, m_world, a4);
-    hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-    a4.m_map.m_map.clearAndDeallocate(*Instance->m_heap);
 }
 
 // KEEP: the exe body never writes edx, and its caller destroyOldEntry (0xDCD6A0) pushes edx (the entry it loaded
@@ -957,21 +927,10 @@ void hkpSaveContactPointsUtil::saveContactPoints_00DCDC00(
     hkpPhysicsSystemWithContacts* sys
 ) {
     hkpWorld* world = entities[0]->m_world;
-    XFNV_INLINED_LOCAL(hkpSaveContactPointsCollidableMap, processedCollidables, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkPointerMap<const hkpLinkedCollidable*, int>::hkPointerMap
-    processedCollidables.m_map.m_elem = nullptr;
-    processedCollidables.m_map.m_numElems = 0;
-    processedCollidables.m_map.m_hashMod = -1;
-    processedCollidables.m_map.hkpSaveContactPointsCollidableMapBase::reserve(
-        hkMemoryRouter::getInstance().heap(), numEntities
-    );
+    hkpSaveContactPointsCollidableMap processedCollidables(numEntities);
     for (int32_t i = 0; i < numEntities; ++i) {
         processedCollidables.insert(&entities[i]->m_collidable, 0);
-        XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, entries, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
-        entries.m_data = nullptr;
-        entries.m_size = 0;
-        entries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpLinkedCollidable::CollisionEntry> entries;
         entities[i]->m_collidable.getCollisionEntriesSorted(entries);
         for (int32_t j = 0; j < entries.m_size; ++j) {
             const hkpLinkedCollidable::CollisionEntry& entry = entries.m_data[j];
@@ -987,21 +946,7 @@ void hkpSaveContactPointsUtil::saveContactPoints_00DCDC00(
                 pSerialized->removeReference();
             }
         }
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        entries.m_size = 0;
-        if (entries.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                entries.m_data,
-                static_cast<int32_t>(
-                    entries.m_capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::CAPACITY_MASK
-                ) * static_cast<int32_t>(sizeof(hkpLinkedCollidable::CollisionEntry))
-            );
-        }
     }
-    // EXE-INLINED none: hkPointerMap<const hkpLinkedCollidable*, int>::~hkPointerMap (the map's operations
-    // destructor after it is the exe's empty function 0xA29680)
-    processedCollidables.m_map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
 }
 
 // sectorsOut gets a new copy of each saved sector, then each saved sub track is rebuilt in place, at its sector and

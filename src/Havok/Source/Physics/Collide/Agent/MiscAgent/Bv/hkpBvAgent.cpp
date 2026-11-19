@@ -64,10 +64,7 @@ void hkpBvAgent::getPenetrations(
     newOperandA.m_motion = bodyA.m_motion;
     newOperandA.m_shape = bvShape->m_boundingVolumeShape;
     newOperandA.m_shapeKey = HK_INVALID_SHAPE_KEY;
-    XFNV_INLINED_LOCAL(
-        hkpFlagCdBodyPairCollector, checker, hkpFlagCdBodyPairCollector_vftable_ConvexList, std::nullopt
-    );
-    checker.m_earlyOut.m_bool = 0;
+    hkpFlagCdBodyPairCollector checker;
     m_boundingVolumeAgent->getPenetrations(newOperandA, bodyB, input, checker);
     if (checker.m_earlyOut.m_bool) {
         HK_TIMER_SPLIT_LIST("child");
@@ -106,10 +103,7 @@ void hkpBvAgent::getClosestPoints(
     newOperandA.m_motion = bodyA.m_motion;
     newOperandA.m_shape = bvShape->m_boundingVolumeShape;
     newOperandA.m_shapeKey = HK_INVALID_SHAPE_KEY;
-    XFNV_INLINED_LOCAL(
-        hkpFlagCdBodyPairCollector, checker, hkpFlagCdBodyPairCollector_vftable_ConvexList, std::nullopt
-    );
-    checker.m_earlyOut.m_bool = 0;
+    hkpFlagCdBodyPairCollector checker;
     m_boundingVolumeAgent->getPenetrations(newOperandA, bodyB, input, checker);
     if (checker.m_earlyOut.m_bool) {
         HK_TIMER_SPLIT_LIST("child");
@@ -149,13 +143,7 @@ void hkpBvAgent::linearCast(
     newOperandA.m_motion = bodyA.m_motion;
     newOperandA.m_shape = bvShape->m_boundingVolumeShape;
     newOperandA.m_shapeKey = HK_INVALID_SHAPE_KEY;
-    // EXE-INLINED none: hkpSimpleClosestContactCollector::Construct
-    XFNV_INLINED_LOCAL(
-        hkpSimpleClosestContactCollector, checker, hkpSimpleClosestContactCollector_vftable, std::nullopt
-    );
-    checker.m_hitPoint.m_separatingNormal.m_quad[3] = 3.40282e38f;
-    checker.m_earlyOutDistance = 3.40282e38f;
-    checker.m_hasHit.m_bool = 0;
+    hkpSimpleClosestContactCollector checker;
     m_boundingVolumeAgent->linearCast(newOperandA, bodyB, input, checker, &checker);
     if (checker.m_hasHit.m_bool) {
         HK_TIMER_SPLIT_LIST("child");
@@ -195,10 +183,7 @@ void hkpBvAgent::processCollision(
     newOperandA.m_motion = bodyAin.m_motion;
     newOperandA.m_shape = bvShape->m_boundingVolumeShape;
     newOperandA.m_shapeKey = HK_INVALID_SHAPE_KEY;
-    XFNV_INLINED_LOCAL(
-        hkpFlagCdBodyPairCollector, checker, hkpFlagCdBodyPairCollector_vftable_ConvexList, std::nullopt
-    );
-    checker.m_earlyOut.m_bool = 0;
+    hkpFlagCdBodyPairCollector checker;
     m_boundingVolumeAgent->getPenetrations(newOperandA, bodyB, input, checker);
     if (checker.m_earlyOut.m_bool) {
         HK_TIMER_SPLIT_LIST("child");
@@ -311,11 +296,7 @@ void hkpBvAgent::staticGetPenetrations(
     hkpCollisionDispatcher::GetPenetrationsFunc boundingVolumeGetPenetrations =
         input.m_dispatcher->getGetPenetrationsFunc(newOperandA.m_shape->m_type, typeB);
 
-    XFNV_INLINED_LOCAL(
-        hkpFlagCdBodyPairCollector, checker, hkpFlagCdBodyPairCollector_vftable_ConvexList, std::nullopt
-    );
-    // EXE-INLINED none: hkpCdBodyPairCollector::reset
-    checker.m_earlyOut.m_bool = false;
+    hkpFlagCdBodyPairCollector checker;
     boundingVolumeGetPenetrations(newOperandA, bodyB, input, checker);
     // EXE-INLINED none: hkpFlagCdBodyPairCollector::hasHit
     if (checker.m_earlyOut.m_bool) {
@@ -351,11 +332,7 @@ void hkpBvAgent::staticGetClosestPoints(
     hkpCollisionDispatcher::GetPenetrationsFunc boundingVolumeGetPenetrations =
         input.m_dispatcher->getGetPenetrationsFunc(newOperandA.m_shape->m_type, typeB);
 
-    XFNV_INLINED_LOCAL(
-        hkpFlagCdBodyPairCollector, checker, hkpFlagCdBodyPairCollector_vftable_ConvexList, std::nullopt
-    );
-    // EXE-INLINED none: hkpCdBodyPairCollector::reset
-    checker.m_earlyOut.m_bool = false;
+    hkpFlagCdBodyPairCollector checker;
     boundingVolumeGetPenetrations(newOperandA, bodyB, input, checker);
     // EXE-INLINED none: hkpFlagCdBodyPairCollector::hasHit
     if (checker.m_earlyOut.m_bool) {
@@ -391,9 +368,7 @@ void hkpBvAgent::staticLinearCast(
     hkpCollisionDispatcher::LinearCastFunc boundingVolumeLinearCast =
         input.m_dispatcher->getLinearCastFunc(newOperandA.m_shape->m_type, typeB);
 
-    XFNV_INLINED_LOCAL(hkpSimpleClosestContactCollector, castCollector, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkpSimpleClosestContactCollector::hkpSimpleClosestContactCollector
-    ::new (&castCollector) hkpSimpleClosestContactCollector;
+    hkpSimpleClosestContactCollector castCollector;
     boundingVolumeLinearCast(newOperandA, bodyB, input, castCollector, &castCollector);
     // EXE-INLINED none: hkpSimpleClosestContactCollector::hasHit
     if (castCollector.m_hasHit.m_bool) {

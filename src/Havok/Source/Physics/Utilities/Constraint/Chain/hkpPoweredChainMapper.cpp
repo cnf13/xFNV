@@ -82,10 +82,7 @@ void hkpPoweredChainMapper::getMotors(
 // converted to a float; every motor is a limited force motor and gets both. The count is tested against zero, then
 // signed, and reloaded after each motor.
 void hkpPoweredChainMapper::setForceLimits(int32_t linkIndex, int32_t coordinageIndex, float minForce, float maxForce) {
-    XFNV_INLINED_LOCAL(hkArray<hkpConstraintMotor*>, motors, std::nullopt, std::nullopt);
-    motors.m_data = nullptr;
-    motors.m_size = 0;
-    motors.m_capacityAndFlags = hkArrayBase<hkpConstraintMotor*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpConstraintMotor*> motors;
     getMotors(linkIndex, coordinageIndex, motors);
     if (motors.m_size != 0) {
         const float numMotors = static_cast<float>(motors.m_size);
@@ -96,18 +93,6 @@ void hkpPoweredChainMapper::setForceLimits(int32_t linkIndex, int32_t coordinage
             pMotor->m_minForce = minForce;
             pMotor->m_maxForce = maxForce;
         }
-    }
-
-    // EXE-INLINED none: hkArray<hkpConstraintMotor*>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = motors.m_capacityAndFlags;
-    motors.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            motors.m_data,
-            (capacityAndFlags & hkArrayBase<hkpConstraintMotor*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpConstraintMotor*))
-        );
     }
 }
 
@@ -169,7 +154,6 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
         int32_t m_linkIndex;
     };
     using ConstraintIndexMap = hkPointerMap<hkpConstraintInstance*, int32_t>;
-    using ConstraintIndexMapBase = hkUlongMapBase;
 
     // EXE-INLINED 0x56D280: hkReferencedObject::operator new
     hkpPoweredChainMapper* pMemory = static_cast<hkpPoweredChainMapper*>(
@@ -177,17 +161,9 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
     );
     pMemory->m_memSizeAndFlags = sizeof(hkpPoweredChainMapper);
     hkpPoweredChainMapper* pMapper = ::new (pMemory) hkpPoweredChainMapper;
-    // EXE-INLINED none: hkArray<ChainTarget>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<ChainTarget>, targets, std::nullopt, std::nullopt);
-    targets.m_data = nullptr;
-    targets.m_size = 0;
-    targets.m_capacityAndFlags = hkArrayBase<ChainTarget>::DONT_DEALLOCATE_FLAG;
+    hkArray<ChainTarget> targets;
     // The number of chain links made from each constraint.
-    // EXE-INLINED none: hkArray<int>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, numTargets, std::nullopt, std::nullopt);
-    numTargets.m_data = nullptr;
-    numTargets.m_size = 0;
-    numTargets.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    hkArray<int32_t> numTargets;
     {
         const int32_t numConstraints = allConstraints.m_size;
         // EXE-INLINED none: hkArray<int>::setSize
@@ -196,12 +172,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
         numTargets.m_size = numConstraints;
         hkString::memSet(numTargets.m_data, 0, numConstraints * static_cast<int32_t>(sizeof(int32_t)));
     }
-    // EXE-INLINED 0x626560: hkMap<hkUlong, hkUlong>::hkMap(0), with its reserve (0x626600) inlined too
-    XFNV_INLINED_LOCAL(ConstraintIndexMap, constraintToIndex, std::nullopt, std::nullopt);
-    constraintToIndex.m_map.m_elem = nullptr;
-    constraintToIndex.m_map.m_numElems = 0;
-    constraintToIndex.m_map.m_hashMod = -1;
-    static_cast<ConstraintIndexMapBase&>(constraintToIndex.m_map).reserve(hkMemoryRouter::getInstance().heap(), 0);
+    ConstraintIndexMap constraintToIndex;
     for (int32_t i = 0; i < allConstraints.m_size; ++i) {
         constraintToIndex.insert(allConstraints.m_data[i], i);
     }
@@ -226,16 +197,8 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
 
     for (int32_t i = 0; i < pairs.m_size; ++i) {
         const ChainEndpoints& rPair = pairs.m_data[i];
-        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpConstraintInstance*>, chainConstraints, std::nullopt, std::nullopt);
-        chainConstraints.m_data = nullptr;
-        chainConstraints.m_size = 0;
-        chainConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, chainEntities, std::nullopt, std::nullopt);
-        chainEntities.m_data = nullptr;
-        chainEntities.m_size = 0;
-        chainEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpConstraintInstance*> chainConstraints;
+        hkArray<hkpEntity*> chainEntities;
         bool failed = false;
         if (hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
                 allConstraints, rPair.m_start, rPair.m_end, chainEntities, chainConstraints
@@ -323,24 +286,6 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
         }
         if (failed) {
             pMapper->removeReference();
-        }
-        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::~hkArray
-        chainConstraints.clearAndDeallocate();
-        // EXE-INLINED none: hkArray<hkpEntity*>::~hkArray
-        chainEntities.clearAndDeallocate();
-        if (failed) {
-            // EXE-INLINED 0x6264F0: hkMap<hkUlong, hkUlong>::~hkMap (its call of the empty 0xA29680, the operations'
-            // destructor, is left out)
-            static_cast<ConstraintIndexMapBase&>(constraintToIndex.m_map)
-                .clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-            // EXE-INLINED none: hkArray<int>::~hkArray
-            numTargets.clearAndDeallocate();
-            // EXE-INLINED none: hkArray<ChainTarget>::~hkArray
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            targets.m_size = 0;
-            if ((targets.m_capacityAndFlags & hkArrayBase<ChainTarget>::DONT_DEALLOCATE_FLAG) == 0) {
-                heap.bufFree(targets.m_data, targets.getCapacity() * static_cast<int32_t>(sizeof(ChainTarget)));
-            }
             return nullptr;
         }
     }
@@ -378,20 +323,6 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                 unusedConstraints->m_data[unusedConstraints->m_size] = *ppConstraint;
                 unusedConstraints->m_size++;
             }
-        }
-    }
-    // EXE-INLINED 0x6264F0: hkMap<hkUlong, hkUlong>::~hkMap (its call of the empty 0xA29680, the operations'
-    // destructor, is left out)
-    static_cast<ConstraintIndexMapBase&>(constraintToIndex.m_map)
-        .clearAndDeallocate(hkMemoryRouter::getInstance().heap());
-    // EXE-INLINED none: hkArray<int>::~hkArray
-    numTargets.clearAndDeallocate();
-    {
-        // EXE-INLINED none: hkArray<ChainTarget>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        targets.m_size = 0;
-        if ((targets.m_capacityAndFlags & hkArrayBase<ChainTarget>::DONT_DEALLOCATE_FLAG) == 0) {
-            heap.bufFree(targets.m_data, targets.getCapacity() * static_cast<int32_t>(sizeof(ChainTarget)));
         }
     }
     return pMapper;

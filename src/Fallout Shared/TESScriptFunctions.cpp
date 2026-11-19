@@ -6154,12 +6154,7 @@ bool Cmd_DumpTexturePalette(
     Warning("TEXTURES: <<< DUMPTEXTUREPALETTE results");
     BSFile apMemory(Destination, NiFile::WRITE_ONLY, 0x4000u, false);
     apMemory.BSFile::Open(false, false);
-    using TextureArray = NiPointer<NiTexture>[2048];
-    XFNV_INLINED_LOCAL(TextureArray, aspTextures, std::nullopt, std::nullopt);
-    rt::eh_vector_constructor_iterator(
-        aspTextures, sizeof(NiPointer<NiTexture>), 2048, &xfnv::constructElement<NiPointer<NiRefObject>>,
-        &xfnv::destructElement<NiPointer<NiRefObject>>
-    );
+    NiPointer<NiTexture> aspTextures[2048];
     ourMemset(aspTextures, 0, sizeof(aspTextures));
     uint32_t uiTotalSize = 0;
     int32_t iTextureCount = 0;
@@ -6289,9 +6284,6 @@ bool Cmd_DumpTexturePalette(
     apMemory.Close();
     Warning("TEXTURES: >>> DUMPTEXTUREPALETTE results");
     MessageHandler::IncDisableWarningCount(false);
-    rt::eh_vector_destructor_iterator(
-        aspTextures, sizeof(NiPointer<NiTexture>), 2048, &xfnv::destructElement<NiPointer<NiRefObject>>
-    );
     return true;
 }
 
@@ -9408,7 +9400,6 @@ bool Cmd_PreloadMagicEffect(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spModel, std::nullopt, std::nullopt);
     EffectSetting* pEffectSetting;
     pEffectSetting = nullptr;
     if (!Script::ParseParameters(
@@ -9418,13 +9409,12 @@ bool Cmd_PreloadMagicEffect(
         return false;
     }
     if ((pEffectSetting) && (pEffectSetting->GetModelLength())) {
-        ::new (&spModel) NiPointer<Model>(static_cast<Model*>(nullptr));
+        NiPointer<Model> spModel;
         if (!pModelLoader->FindModel(pEffectSetting->GetModel(), spModel)) {
             pModelLoader->QueueModel(
                 pEffectSetting->GetModel(), IO_TASK_PRIORITY_VERY_LOW, nullptr, LOD_MULT_NONE, true, false, false
             );
         }
-        NiPointer<Model>::Destroy(&spModel);
     }
 
     return true;
@@ -12011,24 +12001,14 @@ void Script::DamageObjectBase(TESObjectREFR* apRef, float afValue) {
 }
 
 void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchActor, int32_t aiValue) {
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, blendedcoord, std::nullopt, std::nullopt);
-    using xPresetHeads_t = BSSimpleArray<TESNPC*, 1024>;
-    XFNV_INLINED_LOCAL(xPresetHeads_t, xPresetHeads, std::nullopt, std::nullopt);
     if ((apRef) && (apMatchActor)) {
         FR2MatrixVTC<float>(*pNewCoord)[2][2];
-        XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, chargenoffset, std::nullopt, std::nullopt);
         float fval = static_cast<double>(aiValue) / 100.0;
         TESNPC* pnpcToMatch = dynamic_cast<TESNPC*>(apMatchActor->GetObjectReference());
         TESNPC* pnpcToChange = dynamic_cast<TESNPC*>(apRef->GetObjectReference());
-        rt::eh_vector_constructor_iterator(
-            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-            &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
-        rt::eh_vector_constructor_iterator(
-            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-            &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
-        ::new (&xPresetHeads) BSSimpleArray<TESNPC*, 1024>;
+        FR2MatrixVTC<float> blendedcoord[2][2];
+        FR2MatrixVTC<float> chargenoffset[2][2];
+        BSSimpleArray<TESNPC*, 1024> xPresetHeads;
         TESActorBase::SEX Sex = pnpcToMatch->GetSex();
         TESRace* Race = pnpcToMatch->GetRace();
         TESNPC::FillCharGenPresetList(Race, Sex, &xPresetHeads);
@@ -12077,13 +12057,6 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
         if (apRef->Get3D()) {
             static_cast<Character*>(apRef)->Character::Reset3D();
         }
-        xPresetHeads.~BSSimpleArray<TESNPC*, 1024>();
-        rt::eh_vector_destructor_iterator(
-            chargenoffset, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
-        rt::eh_vector_destructor_iterator(
-            blendedcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
     }
 }
 
@@ -17437,8 +17410,6 @@ bool Script::OutputMemStats(
     uint32_t& auiOffset
 ) {
     char input[512];
-    using LargestTextureArray = NiPointer<NiTexture>[2048];
-    XFNV_INLINED_LOCAL(LargestTextureArray, pLargestTex, std::nullopt, std::nullopt);
     char apString1[268];
     input[0] = 0;
     std::memset(input + 1, 0, 511);
@@ -17468,11 +17439,7 @@ bool Script::OutputMemStats(
     BSsprintf(input, 512, "TextureDump%s.txt", apString1);
     BSFile outfile2(input, NiFile::WRITE_ONLY, 0x4000, false);
     outfile2.BSFile::Open(false, false);
-    int32_t imaxtex = 2048;
-    rt::eh_vector_constructor_iterator(
-        pLargestTex, sizeof(NiPointer<NiTexture>), imaxtex, &xfnv::constructElement<NiPointer<NiRefObject>>,
-        &xfnv::destructElement<NiPointer<NiRefObject>>
-    );
+    NiPointer<NiTexture> pLargestTex[2048];
     ourMemset(pLargestTex, 0, sizeof(pLargestTex));
     uint32_t ultotalMemory = 0;
     int32_t itexcount = 0;
@@ -17600,9 +17567,6 @@ bool Script::OutputMemStats(
         }
     }
     outfile2.Close();
-    rt::eh_vector_destructor_iterator(
-        pLargestTex, sizeof(NiPointer<NiTexture>), 2048, &xfnv::destructElement<NiPointer<NiRefObject>>
-    );
     return true;
 }
 
@@ -19879,14 +19843,9 @@ bool Script::CalcLowPathToPointFunction(
     uint32_t& auiOffset
 ) {
     NiPoint3 v81;
-    // Each of these is built only through the Construct calls below.
-    XFNV_INLINED_LOCAL(PathingLocation, v82, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingLocation, v83, std::nullopt, std::nullopt);
     NiPoint3 v85;
     NiPoint3 v86;
     NiPoint3 result;
-    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
     using apNavMeshInfoArray_t = BSSimpleArray<const NavMeshInfo*, 1024>;
     using a8_t = BSSimpleArray<TESObjectREFR*, 1024>;
     using a7_t = BSSimpleArray<const NavMeshInfo*, 1024>;
@@ -19894,7 +19853,6 @@ bool Script::CalcLowPathToPointFunction(
     int32_t v118;
     int32_t v121;
     int32_t v122;
-    int32_t v76 = 0;
     v121 = 0;
     v118 = 0;
     v122 = 0;
@@ -19911,13 +19869,10 @@ bool Script::CalcLowPathToPointFunction(
     if (Pathing::BuildLowPath(
             kStart, kDest, &kPath, &apActorData, static_cast<Pathing::DOOR_LOCK_DISPOSITION>(v121 != 0)
         )) {
-        PathingLocation* v61;
-        char v77;
         float v110;
         int32_t a2;
         for (a2 = 0;; ++a2) {
             NiPoint3* v18;
-            PathingLocation* v72;
             uint32_t FormFlags = kPath.Doors.iSize;
             if (a2 >= FormFlags) {
                 break;
@@ -19934,29 +19889,13 @@ bool Script::CalcLowPathToPointFunction(
                 const char* v11 = pInteriorCell->GetFormEditorID();
                 Interface::PrintLine("Interior cell %s (%08x)", v11, afTime_4a);
             }
-            if (a2) {
-                TESWorldSpace* afTime_4b = (&kPath.Spaces.GetAt(a2))->pWorldSpace;
-                TESObjectCELL* afTime = (&kPath.Spaces.GetAt(a2))->pInteriorCell;
-                PathingLocation* v71 = ::new (&apLocation)
-                    PathingLocation(&(&kPath.Doors.GetAt(a2 - 1))->DoorTeleportLocation, afTime, afTime_4b);
-                v76 |= 2u;
-                v72 = v71;
-            }
-            else {
-                PathingLocation* v73 = ::new (&apMemory) PathingLocation(pPlayer);
-                v76 |= 1u;
-                v72 = v73;
-            }
-            PathingLocation* aLoc = v72;
-            PathingLocation v101(*v72);
-            if ((v76 & 2) != 0) {
-                v76 &= ~2u;
-                apLocation.~PathingLocation();
-            }
-            if ((v76 & 1) != 0) {
-                v76 &= ~1u;
-                apMemory.~PathingLocation();
-            }
+            PathingLocation v101(
+                a2 ? PathingLocation(
+                         &(&kPath.Doors.GetAt(a2 - 1))->DoorTeleportLocation, (&kPath.Spaces.GetAt(a2))->pInteriorCell,
+                         (&kPath.Spaces.GetAt(a2))->pWorldSpace
+                     )
+                   : PathingLocation(pPlayer)
+            );
             TESWorldSpace* afTime_4c = (&kPath.Spaces.GetAt(a2))->pWorldSpace;
             TESObjectCELL* afTimea = (&kPath.Spaces.GetAt(a2))->pInteriorCell;
             const NiPoint3* LinkedDoorTeleportPosition =
@@ -20067,27 +20006,13 @@ bool Script::CalcLowPathToPointFunction(
             const char* v23 = v63->GetFormEditorID();
             Interface::PrintLine("Interior cell %s (%08x)", v23, afTime_4i);
         }
-        if (a2) {
-            TESWorldSpace* afTime_4j = (&kPath.Spaces.GetAt(a2))->pWorldSpace;
-            TESObjectCELL* afTimed = (&kPath.Spaces.GetAt(a2))->pInteriorCell;
-            PathingLocation* v60 =
-                ::new (&v82) PathingLocation(&(&kPath.Doors.GetAt(a2 - 1))->DoorTeleportLocation, afTimed, afTime_4j);
-            v77 = v76 | 8;
-            v61 = v60;
-        }
-        else {
-            PathingLocation* v62 = ::new (&v83) PathingLocation(pPlayer);
-            v77 = v76 | 4;
-            v61 = v62;
-        }
-        PathingLocation v108(*v61);
-        if ((v77 & 8) != 0) {
-            v77 &= ~8u;
-            v82.~PathingLocation();
-        }
-        if ((v77 & 4) != 0) {
-            v83.~PathingLocation();
-        }
+        PathingLocation v108(
+            a2 ? PathingLocation(
+                     &(&kPath.Doors.GetAt(a2 - 1))->DoorTeleportLocation, (&kPath.Spaces.GetAt(a2))->pInteriorCell,
+                     (&kPath.Spaces.GetAt(a2))->pWorldSpace
+                 )
+               : PathingLocation(pPlayer)
+        );
         PathingLocation v111(apRefObject);
         char v109 = 1;
         if (v108.ResolveNavMeshInfo(nullptr)) {
@@ -23836,7 +23761,6 @@ bool Script::IsImageSpaceActive(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<ImageSpaceModifierInstance>, spInstance, std::nullopt, std::nullopt);
     TESImageSpaceModifier* pImageSpace;
     float fStrength;
     pImageSpace = nullptr;
@@ -23851,17 +23775,15 @@ bool Script::IsImageSpaceActive(
     // The list, its items and its links are read through trivial accessors.
     BSSimpleList<NiPointer<ImageSpaceModifierInstance>>* pNode = &TES::pInstance->listActiveImageSpaceModifiers;
     while (pNode) {
-        spInstance.SetPointer(&pNode->m_item);
+        NiPointer<ImageSpaceModifierInstance> spInstance(pNode->m_item);
         if (spInstance.m_pObject) {
             ImageSpaceModifierInstanceForm* pForm = spInstance.m_pObject->IsForm();
             if ((pForm) && (pForm->pImageSpaceMod == pImageSpace)) {
                 afReturnValue = 1.0;
-                spInstance.~NiPointer<ImageSpaceModifierInstance>();
                 break;
             }
         }
         pNode = pNode->m_pkNext;
-        spInstance.~NiPointer<ImageSpaceModifierInstance>();
     }
     if (0.0 == afReturnValue) {
         Interface::PrintLine("ImageSpace is not active ");

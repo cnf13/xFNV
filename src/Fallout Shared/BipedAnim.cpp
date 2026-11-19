@@ -230,8 +230,6 @@ BipedAnim::~BipedAnim() {
 }
 
 void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
-    XFNV_INLINED_LOCAL(NiPointer<NiObject>, spTempObject, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<NiGeometryData>, spdata, std::nullopt, std::nullopt);
     FaceGenDatas fgcoord;
     BSCloningProcess cloneData;
     float fzoom;
@@ -360,28 +358,25 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                         &xfnv::constructElement<FR2MatrixVTC<float>>,
                                                         &xfnv::destructElement<FR2MatrixVTC<float>>
                                                     );
-                                                    ::new (&spTempObject)
-                                                        NiPointer<NiObject>(static_cast<NiObject*>(nullptr));
-                                                    ::new (&spdata) NiPointer<NiGeometryData>(
-                                                        static_cast<NiGeometryData*>(nullptr)
-                                                    );
-                                                    ptri->GetModelData()->CreateDeepCopy(spTempObject);
-                                                    spdata.operator=(
-                                                        static_cast<NiGeometryData*>(spTempObject.m_pObject)
-                                                    );
-                                                    NiGeometryData* fScale = spdata.m_pObject;
-                                                    ptri->SetModelData(fScale);
-                                                    pnpc_3->GetFaceCoord((&fgcoord)->kFaceGens);
-                                                    if (!BSFaceGenManager::GetUseFaceGenHeads() ||
-                                                        pfgmodel->ApplyCoordinateToExistingMesh(
-                                                            &(&fgcoord)->kFaceGens, ptri, false
-                                                        )) {
-                                                        NiMatrix3 matrot;
-                                                        matrot.MakeYRotation(-1.5707964f);
-                                                        ptri->SetRotate((&ptri->m_kLocal)->m_Rotate * matrot);
+                                                    {
+                                                        NiPointer<NiObject> spTempObject;
+                                                        NiPointer<NiGeometryData> spdata;
+                                                        ptri->GetModelData()->CreateDeepCopy(spTempObject);
+                                                        spdata.operator=(
+                                                            static_cast<NiGeometryData*>(spTempObject.m_pObject)
+                                                        );
+                                                        NiGeometryData* fScale = spdata.m_pObject;
+                                                        ptri->SetModelData(fScale);
+                                                        pnpc_3->GetFaceCoord((&fgcoord)->kFaceGens);
+                                                        if (!BSFaceGenManager::GetUseFaceGenHeads() ||
+                                                            pfgmodel->ApplyCoordinateToExistingMesh(
+                                                                &(&fgcoord)->kFaceGens, ptri, false
+                                                            )) {
+                                                            NiMatrix3 matrot;
+                                                            matrot.MakeYRotation(-1.5707964f);
+                                                            ptri->SetRotate((&ptri->m_kLocal)->m_Rotate * matrot);
+                                                        }
                                                     }
-                                                    spdata.~NiPointer<NiGeometryData>();
-                                                    spTempObject.~NiPointer<NiObject>();
                                                     rt::eh_vector_destructor_iterator(
                                                         &fgcoord, sizeof(FR2MatrixVTC<float>), 4,
                                                         &xfnv::destructElement<FR2MatrixVTC<float>>
@@ -1115,11 +1110,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
         if (pGeometry && pGeometry->GetModelData() && pGeometry->GetSkinInstance() && pFaceGenModel && m_pRequester &&
             m_pRequester->GetObjectReference() && m_pRequester->GetObjectReference()->GetFormType() == NPC__ID) {
             TESNPC* pNPC = static_cast<TESNPC*>(m_pRequester->GetObjectReference());
-            XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aFaceCoord, std::nullopt, std::nullopt);
-            rt::eh_vector_constructor_iterator(
-                aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
+            FR2MatrixVTC<float> aFaceCoord[2][2];
             {
                 NiPointer<NiGeometryData> spModelData = nullptr;
                 pGeometry->GetModelData()->CreateDeepCopy(spCopy);
@@ -1138,9 +1129,6 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
                     );
                 }
             }
-            rt::eh_vector_destructor_iterator(
-                aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
         }
         AdjustSkinComplexion(pGeometry, false);
         NiSkinInstance* pSkinInstance = pGeometry->GetSkinInstance();
@@ -1216,11 +1204,7 @@ void BipedAnim::AdjustSkinComplexion(NiAVObject* apObj, bool abForceReadjust) {
     if (ePart == BO_NONE) {
         return;
     }
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aFaceCoord, std::nullopt, std::nullopt);
-    rt::eh_vector_constructor_iterator(
-        aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
+    FR2MatrixVTC<float> aFaceCoord[2][2];
     TESNPC* pNPC = dynamic_cast<TESNPC*>(m_pRequester->GetObjectReference());
     {
         NiPointer<NiTexture> spBaseTexture = nullptr;
@@ -1267,9 +1251,6 @@ void BipedAnim::AdjustSkinComplexion(NiAVObject* apObj, bool abForceReadjust) {
             pShaderProp->SetFlag(BSShaderProperty::BSSP_FLAG_FACEGENBLEND, true);
         }
     }
-    rt::eh_vector_destructor_iterator(
-        aFaceCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
 }
 
 bool BipedAnim::Get1stPersonModelFileName(TESModel* apModel, char* ap1stPersonFileName) {
@@ -1515,8 +1496,6 @@ void BipedAnim::RunBiped3DDetach(NiAVObject* ap3D) {
 }
 
 void BipedAnim::AttachToSkeleton(NiNode* apSkeleton, NiAVObject* apSkin, NiNode* apParentNode, bool abShowWarnings) {
-    XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, v15, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiTObjectArray<NiPointer<NiAVObject>>, TempBoneArray, std::nullopt, std::nullopt);
     if (apSkin) {
         NiNode* pnode = apSkin->IsNode();
         if (apSkin->IsGeometry()) {
@@ -1582,7 +1561,7 @@ void BipedAnim::AttachToSkeleton(NiNode* apSkeleton, NiAVObject* apSkin, NiNode*
         char v27 = 0;
         if (pnode) {
             pnode->CompactChildArray();
-            ::new (&TempBoneArray) NiTObjectArray<NiPointer<NiAVObject>>(0, 1u);
+            NiTObjectArray<NiPointer<NiAVObject>> TempBoneArray(0, 1u);
             for (int32_t i = 0;; ++i) {
                 uint32_t ArrayCount = pnode->GetArrayCount();
                 if (i >= ArrayCount) {
@@ -1611,16 +1590,13 @@ void BipedAnim::AttachToSkeleton(NiNode* apSkeleton, NiAVObject* apSkin, NiNode*
                                 v27 = 1;
                             }
 
-                            ::new (&v15) NiPointer<NiAVObject>(pobj);
-                            NiAVObjectArray_Add(&TempBoneArray, v15);
-                            v15.~NiPointer<NiAVObject>();
+                            NiAVObjectArray_Add(&TempBoneArray, NiPointer<NiAVObject>(pobj));
                             pnode->DetachChild(pobj);
                         }
                     }
                 }
             }
             pnode->CompactChildArray();
-            NiAVObjectArray_Destruct(&TempBoneArray);
         }
     }
 }

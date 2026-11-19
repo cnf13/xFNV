@@ -1182,7 +1182,7 @@ void MapMenu::UpdatePlayingSounds() {
             this->iSoundPlayStartTime = appTimer.iLastTime;
             // Copies the location, then builds the by-value handle with operator=, then reads the text.
             NiPoint3 kSpeakerLoc = pPlayer->GetLocationOnReference();
-            XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+            BSSoundHandle kHandle;
             kHandle = this->pCurrentSound->m_item;
             Interface::ShowSubtitle(this->SubtitlesToShow.GetAt(0).pString, kHandle, kSpeakerLoc, pPlayer, false);
             this->SubtitlesToShow.Remove(0, true);
@@ -1211,7 +1211,7 @@ void MapMenu::UpdatePlayingSounds() {
             ispeechEndTime = 0;
             // Copies the location, then builds the by-value handle with operator=, then reads the text.
             NiPoint3 kSpeakerLoc = pPlayer->GetLocationOnReference();
-            XFNV_INLINED_LOCAL(BSSoundHandle, kHandle, std::nullopt, std::nullopt);
+            BSSoundHandle kHandle;
             kHandle = this->pCurrentSound->m_item;
             Interface::ShowSubtitle(this->SubtitlesToShow.GetAt(0).pString, kHandle, kSpeakerLoc, pPlayer, true);
             this->SubtitlesToShow.Remove(0, true);
@@ -2002,7 +2002,6 @@ void MapMenu::DeletePlayerMarker() {
 }
 
 TESWorldSpace* MapMenu::CalculatePlayerMarkerSpace(NiPoint3 aWorldPos) {
-    XFNV_INLINED_LOCAL(PathingLocation, destination_2, std::nullopt, std::nullopt);
     NiPoint3 adjustedCoord;
     TESWorldSpace* presult = nullptr;
     float fshortestDist = 3.4028235e+38f;
@@ -2016,9 +2015,7 @@ TESWorldSpace* MapMenu::CalculatePlayerMarkerSpace(NiPoint3 aWorldPos) {
             const char* v2 = BSstristr(strName, "test");
             if (v2 != strName && !pcurrWorld->CantTravelFrom()) {
                 pcurrWorld->AdjustMapMarkerCoord(adjustedCoord, true);
-                PathingLocation* aLoc = ::new (&destination_2) PathingLocation(&adjustedCoord, pcurrWorld);
-                destination.operator=(*aLoc);
-                destination_2.~PathingLocation();
+                destination = PathingLocation(&adjustedCoord, pcurrWorld);
                 if ((destination.ResolveNavMeshInfoOnly()) && (pRootMapSpace) && (pcurrWorld)) {
                     const char* WorldMapTextureName = pRootMapSpace->GetWorldMapTextureName();
                     if (BSstrlen(WorldMapTextureName) >= 31) {
@@ -2511,8 +2508,6 @@ void MapMenu::Zoom_RefreshCompanions() {
                 double v3;
                 Tile* v8;
                 const char* v9;
-                XFNV_INLINED_LOCAL(NiPlane, afValue, std::nullopt, std::nullopt);
-                XFNV_INLINED_LOCAL(NiPlane, v23, std::nullopt, std::nullopt);
                 char apName[68];
                 if (v25) {
                     v9 = v25->GetFullName();
@@ -2541,8 +2536,10 @@ void MapMenu::Zoom_RefreshCompanions() {
                     pAdjustNorthRotationCell->AdjustCoordForNorthRotation(a2, a2, true);
                 }
                 TESWorldSpace* WorldSpace = v25->GetWorldSpace();
+                NiPlane v23;
                 v23.m_kNormal = WorldToMapCoord(a2, WorldSpace);
                 TESWorldSpace* v5 = v25->GetWorldSpace();
+                NiPlane afValue;
                 afValue.m_kNormal = WorldToMapCoord(v17, v5);
                 float Float = pMapTile->GetFloat(4017);
                 afValue.m_fConstant = pMapTile->GetFloat(4016);

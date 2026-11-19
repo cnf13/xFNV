@@ -343,29 +343,25 @@ bool Pathing::BuildLowPath(
 
 bool Pathing::GetNavMeshZForLocation(PathingLocation& aLocation, float& aRetHeight) {
     NiPoint3 v7;
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     uint16_t arTriangle;
     if (aLocation.ResolveNavMeshInfo(nullptr)) {
         if (aLocation.HasNavMeshData()) {
-            ::new (&apMemory) NavMeshPtr;
-            if (aLocation.GetNavMeshAndTriangle(*static_cast<NavMeshPtr*>(&apMemory), arTriangle)) {
+            NavMeshPtr apMemory;
+            if (aLocation.GetNavMeshAndTriangle(apMemory, arTriangle)) {
                 NiPoint3* Location_ = &(v7 = aLocation.GetLocation());
                 uint16_t v4 = arTriangle;
                 NavMesh* v3 = apMemory.m_pObject;
                 if (v3->IsPointInsideTriangle_0(v4, Location_, 180.0f, 180.0f, &aRetHeight)) {
-                    apMemory.~NiPointer<NavMesh>();
                     return true;
                 }
 
                 NiPoint3 v6;
                 aRetHeight = (&(v6 = aLocation.GetLocation()))->z;
-                apMemory.~NiPointer<NavMesh>();
                 return false;
             }
 
             NiPoint3 v8;
             aRetHeight = (&(v8 = aLocation.GetLocation()))->z;
-            apMemory.~NiPointer<NavMesh>();
             return false;
         }
 
@@ -381,20 +377,17 @@ bool Pathing::GetNavMeshZForLocation(PathingLocation& aLocation, float& aRetHeig
 
 bool Pathing::GetNavmeshNormalForLocation(PathingLocation& aLocation, NiPoint3& aRetNormal) {
     uint16_t arTriangle;
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
     if (!aLocation.ResolveNavMeshInfo(nullptr)) {
         return false;
     }
-    ::new (&apMemory) NavMeshPtr;
-    if (aLocation.GetNavMeshAndTriangle(*static_cast<NavMeshPtr*>(&apMemory), arTriangle)) {
+    NavMeshPtr apMemory;
+    if (aLocation.GetNavMeshAndTriangle(apMemory, arTriangle)) {
         uint16_t v4 = arTriangle;
         NavMesh* v3 = apMemory.m_pObject;
         aRetNormal = v3->GetNormal(v4);
-        apMemory.~NiPointer<NavMesh>();
         return true;
     }
 
-    apMemory.~NiPointer<NavMesh>();
     return false;
 }
 
@@ -1891,15 +1884,9 @@ Pathing::FIND_CLOSEST_EDGES_RESULT Pathing::FindClosestEdges(
 }
 
 char Pathing::FindSafeStraightLinePathPoint(TESObjectREFR* a1, TESObjectREFR* a2, float a3, NiPoint3* a4) {
-    XFNV_INLINED_LOCAL(PathingLocation, v14, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     PathingRequestSafeStraightLine straightLineRequest;
-    PathingLocation* apOrigin = ::new (&apLocation) PathingLocation(a1);
-    straightLineRequest.SetOrigin(*apOrigin);
-    apLocation.~PathingLocation();
-    PathingLocation* aDestination = ::new (&v14) PathingLocation(a2);
-    straightLineRequest.SetDestination(*aDestination);
-    v14.~PathingLocation();
+    straightLineRequest.SetOrigin(PathingLocation(a1));
+    straightLineRequest.SetDestination(PathingLocation(a2));
     NiPoint3 v18 = a1->GetBoundMax();
     NiPoint3 v22 = a1->GetBoundMin();
     float fwidth1 = v18.x - v22.x;

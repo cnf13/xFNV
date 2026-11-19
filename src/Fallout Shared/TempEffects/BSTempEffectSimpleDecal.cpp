@@ -168,17 +168,11 @@ bool BSTempEffectSimpleDecal::ProcessGeometry(NiAVObject* apAVObj) {
     NiPoint2 v34;
     NiPoint2 v35;
     NiPoint3 v36;
-    XFNV_INLINED_LOCAL(NiPlane, v37, std::nullopt, std::nullopt);
     NiPoint3 v38;
-    XFNV_INLINED_LOCAL(NiPlane, v39, std::nullopt, std::nullopt);
     NiPoint3 v40;
-    XFNV_INLINED_LOCAL(NiPlane, v41, std::nullopt, std::nullopt);
     NiPoint3 v42;
-    XFNV_INLINED_LOCAL(NiPlane, v43, std::nullopt, std::nullopt);
     NiPoint3 v44;
-    XFNV_INLINED_LOCAL(NiPlane, v45, std::nullopt, std::nullopt);
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(NiPlane, v47, std::nullopt, std::nullopt);
     NiMatrix3 rot_2;
     NiMatrix3 kinvobjrot;
     NiPoint3 kmodelspaceorigin;
@@ -221,24 +215,24 @@ bool BSTempEffectSimpleDecal::ProcessGeometry(NiAVObject* apAVObj) {
         float d = pDecalCenter.Dot(tangent);
         float v31 = -(fWidth * 0.5 - d);
         NiPoint3* v2 = ::new (&dst) NiPoint3(tangent.x, tangent.y, tangent.z);
-        pClippingPlanes[0] = *::new (&v47) NiPlane(*v2, v31);
+        pClippingPlanes[0] = NiPlane(*v2, v31);
         float v30 = -(fWidth * 0.5 + d);
         NiPoint3* v3 = ::new (&v44) NiPoint3(-tangent.x, -tangent.y, -tangent.z);
-        pClippingPlanes[1] = *::new (&v45) NiPlane(*v3, v30);
+        pClippingPlanes[1] = NiPlane(*v3, v30);
         d = pDecalCenter.Dot(binormal);
         float v29 = -(this->GetDecalHeight() * 0.5 - d);
         NiPoint3* v4 = ::new (&v42) NiPoint3(binormal.x, binormal.y, binormal.z);
-        pClippingPlanes[2] = *::new (&v43) NiPlane(*v4, v29);
+        pClippingPlanes[2] = NiPlane(*v4, v29);
         float v28 = -(this->GetDecalHeight() * 0.5 + d);
         NiPoint3* v5 = ::new (&v40) NiPoint3(-binormal.x, -binormal.y, -binormal.z);
-        pClippingPlanes[3] = *::new (&v41) NiPlane(*v5, v28);
+        pClippingPlanes[3] = NiPlane(*v5, v28);
         d = pDecalCenter.Dot(pDecalNormal);
         float v27 = -(fDepth + d);
         NiPoint3* v6 = ::new (&v38) NiPoint3(-pDecalNormal.x, -pDecalNormal.y, -pDecalNormal.z);
-        pClippingPlanes[4] = *::new (&v39) NiPlane(*v6, v27);
+        pClippingPlanes[4] = NiPlane(*v6, v27);
         float v26 = -(fDepth - d);
         NiPoint3* v7 = ::new (&v36) NiPoint3(pDecalNormal.x, pDecalNormal.y, pDecalNormal.z);
-        pClippingPlanes[5] = *::new (&v37) NiPlane(*v7, v26);
+        pClippingPlanes[5] = NiPlane(*v7, v26);
         ClipMesh(apAVObj);
         if (iDecalTriangleCount) {
             float one_over_w = 1.0 / fWidth;
@@ -495,8 +489,6 @@ void BSTempEffectSimpleDecal::CleanUpMemory() {
 }
 
 bool BSTempEffectSimpleDecal::FinalizeGeometry() {
-    XFNV_INLINED_LOCAL(NiPointer<NiRefObject>, spDecal_3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<NiRefObject>, spDecal_2, std::nullopt, std::nullopt);
     // The debug colour, built on each pass.
     bool bForceSolidColor = false;
     if (sp3D.m_pObject) {
@@ -627,9 +619,7 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
                 ReferenceProcessLists.AddTempEffect(this);
             }
             else {
-                ::new (&spDecal_2) NiPointer<NiRefObject>(this);
-                BSTempEffect::kDecals.AddTail(spDecal_2);
-                spDecal_2.~NiPointer<NiRefObject>();
+                BSTempEffect::kDecals.AddTail(NiPointer<NiRefObject>(this));
                 if (++BSTempEffect::iNumDecals > BSTempEffectSimpleDecal::iCurrentMaxDecalCount) {
                     ReferenceProcessLists.AddTempEffect(
                         static_cast<BSTempEffect*>((&BSTempEffect::kDecals)->m_item.m_pObject)
@@ -686,9 +676,7 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
             NiAVObject* fB = Get3D();
             ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
             ShadowSceneNode_->UpdateObjectLighting(fB, false);
-            ::new (&spDecal_3) NiPointer<NiRefObject>(this);
-            pParentNode->pDecalList->AddHead(spDecal_3);
-            spDecal_3.~NiPointer<NiRefObject>();
+            pParentNode->pDecalList->AddHead(NiPointer<NiRefObject>(this));
             CleanUpMemory();
             bFinalize = false;
             bValidDecal = true;
@@ -780,7 +768,6 @@ void BSTempEffectSimpleDecal::ClipMesh(NiAVObject* apAVObj) {
 void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe) {
     NiMatrix3 kinvobjrot;
     NiMatrix3 kobjrot;
-    XFNV_INLINED_LOCAL(NiPointer<NiObject>, spobj, std::nullopt, std::nullopt);
     if (!BGSDecalManager::spDebugDecalBox.m_pObject) {
         BSStream stream;
         if (stream.BSStream::Load("Data\\Meshes\\Decals\\DebugDecalBox.NIF", nullptr)) {
@@ -796,7 +783,7 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
         BSShaderNoLightingProperty* pshaderprop;
         NiAlphaProperty* palpha;
         NiMatrix3 kzrot;
-        ::new (&spobj) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+        NiPointer<NiObject> spobj(static_cast<NiObject*>(nullptr));
         BGSDecalManager::spDebugDecalBox.m_pObject->CreateDeepCopy(spobj);
         NiNode* ptmp = static_cast<NiNode*>(spobj.m_pObject);
         NiAVObject* pavobj = ptmp->GetObjectByName("DebugDecalBox01:0");
@@ -896,7 +883,6 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
         v9->UpdateWorldBound();
         NiUpdateData UpdateData(0.0f, false, false);
         ptmp->Update(UpdateData);
-        spobj.~NiPointer<NiObject>();
     }
 }
 

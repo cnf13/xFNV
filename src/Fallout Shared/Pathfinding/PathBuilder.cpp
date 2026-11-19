@@ -1249,10 +1249,8 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathToValidNavMeshTriangle(
         return eReturn;
     }
     PathingLocation goalLoc;
-    XFNV_INLINED_LOCAL(PathingLocation, startArgument, std::nullopt, std::nullopt);
-    ::new (&startArgument) PathingLocation(aStartLocation);
     RAYCASTPATH_RESULT eReturn = RCP_FAILED;
-    if (FindClosestOpenEdge(startArgument, goalLoc, abStart)) {
+    if (FindClosestOpenEdge(aStartLocation, goalLoc, abStart)) {
         aRetPath.Add(aStartLocation);
         aRetPath.Add(goalLoc);
         eReturn = RCP_SUCCESS;
@@ -1454,43 +1452,31 @@ bool PathBuilder::RunNavMeshSearch_006CD670(
     uint32_t aiFirstVirtualNodeIndex,
     uint32_t aiLastVirtualNodeIndex
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, apMemory, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<NavMesh>, v11, std::nullopt, std::nullopt);
     uint16_t apusTriangle;
-    XFNV_INLINED_LOCAL(NavMeshSearch, apThis, std::nullopt, std::nullopt);
     uint16_t arTriangle;
-    ::new (&apMemory) NavMeshPtr;
-    if (aStartLocation.GetNavMeshAndTriangle(static_cast<NavMeshPtr&>(apMemory), arTriangle)) {
+    NavMeshPtr apMemory;
+    if (aStartLocation.GetNavMeshAndTriangle(apMemory, arTriangle)) {
         NavMeshSearchNode apStart;
         apStart.pNavMesh = apMemory.m_pObject;
         apStart.sTriangle = arTriangle;
-        ::new (&v11) NavMeshPtr;
-        if (aGoalLocation.GetNavMeshAndTriangle(static_cast<NavMeshPtr&>(v11), apusTriangle)) {
+        NavMeshPtr v11;
+        if (aGoalLocation.GetNavMeshAndTriangle(v11, apusTriangle)) {
             NavMeshSearchNode apGoal;
             apGoal.pNavMesh = v11.m_pObject;
             apGoal.sTriangle = apusTriangle;
-            ::new (&apThis) NavMeshSearch;
+            NavMeshSearch apThis;
             apThis.SetBadNodeArray(aBadNodes);
             bool v16 = apThis.BuildNodePath(pRequest.m_pObject, apStart, apGoal, &aNodes, &aLinks, &DetailedPathInfos);
             if (v16) {
-                apThis.~NavMeshSearch();
-                v11.~NiPointer<NavMesh>();
-                apMemory.~NiPointer<NavMesh>();
                 return true;
             }
 
-            apThis.~NavMeshSearch();
-            v11.~NiPointer<NavMesh>();
-            apMemory.~NiPointer<NavMesh>();
             return false;
         }
 
-        v11.~NiPointer<NavMesh>();
-        apMemory.~NiPointer<NavMesh>();
         return false;
     }
 
-    apMemory.~NiPointer<NavMesh>();
     return false;
 }
 

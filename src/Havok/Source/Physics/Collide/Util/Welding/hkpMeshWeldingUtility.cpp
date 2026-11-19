@@ -469,12 +469,7 @@ hkResult hkpMeshWeldingUtility::calcBitcodeForTriangleEdge(
     alignas(16) hkAabb aabb;
     aabb.m_min.m_quad = _mm_add_ps(_mm_setr_ps(fNegTolerance, fNegTolerance, fNegTolerance, 0.0f), kVertex);
     aabb.m_max.m_quad = _mm_add_ps(_mm_setr_ps(kTolerance, kTolerance, kTolerance, 0.0f), kVertex);
-    using KeyArray = hkInplaceArray<uint32_t, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(KeyArray, hits, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkInplaceArray<hkpShapeKey, 128>::hkInplaceArray
-    hits.m_data = hits.m_storage;
-    hits.m_size = 0;
-    hits.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hkInplaceArray<uint32_t, 128> hits;
     bvTreeShape->queryAabb(aabb, hits);
 
     alignas(16) char buffer[512];
@@ -513,18 +508,6 @@ hkResult hkpMeshWeldingUtility::calcBitcodeForTriangleEdge(
             hkpMeshWeldingUtility::modifyCombinedEdgesBitcode(combinedBitcodesOut, edgeIndex, iAngleBitcode);
     }
     const hkResult eResult = static_cast<hkResult>(bConsistent == 0);
-    {
-        // EXE-INLINED none: hkInplaceArray<hkpShapeKey, 128>::~hkInplaceArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t iCapacityAndFlags = hits.m_capacityAndFlags;
-        hits.m_size = 0;
-        if (iCapacityAndFlags >= 0) {
-            pHeap->bufFree(
-                hits.m_data,
-                (iCapacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(uint32_t))
-            );
-        }
-    }
     return eResult;
 }
 
@@ -622,12 +605,9 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
             uint16_t combinedBitcode = 0;
             const hkVector4* pVertices = &pTriangle->m_vertexA;
             for (int32_t edge = 0; edge < 3; ++edge) {
-                XFNV_INLINED_LOCAL(hkHistogram, histogram, std::nullopt, std::nullopt);
+                hkHistogram histogram;
                 // EXE-INLINED none: hkHistogram::hkHistogram
                 histogram.m_freeAngle = weldOpenEdges ? 0.0f : 3.1415927f;
-                histogram.m_entries.m_data = nullptr;
-                histogram.m_entries.m_size = 0;
-                histogram.m_entries.m_capacityAndFlags = hkArrayBase<hkEntry>::DONT_DEALLOCATE_FLAG;
                 hkVector4 edgeStart;
                 edgeStart.m_quad = pVertices[edge].m_quad;
                 hkVector4 edgeEnd;
@@ -692,12 +672,7 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
                     alignas(16) hkAabb aabb;
                     aabb.m_min.m_quad = _mm_min_ps(_mm_min_ps(_mm_set1_ps(3.40282e+38f), start.m_quad), end.m_quad);
                     aabb.m_max.m_quad = _mm_max_ps(_mm_max_ps(_mm_set1_ps(-3.40282e+38f), start.m_quad), end.m_quad);
-                    using KeyArray = hkInplaceArray<uint32_t, 128>;
-                    alignas(16) XFNV_INLINED_LOCAL(KeyArray, hits, std::nullopt, std::nullopt);
-                    // EXE-INLINED none: hkInplaceArray<hkpShapeKey, 128>::hkInplaceArray
-                    hits.m_data = hits.m_storage;
-                    hits.m_size = 0;
-                    hits.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+                    alignas(16) hkInplaceArray<uint32_t, 128> hits;
                     pBvTree->queryAabb(aabb, hits);
                     for (int32_t j = 0; j < hits.m_size; ++j) {
                         const uint32_t childKey = hits.m_data[j];
@@ -762,39 +737,11 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
                             histogram.addEntry(tStart, tEnd, fAngle);
                         }
                     }
-                    {
-                        // EXE-INLINED none: hkInplaceArray<hkpShapeKey, 128>::~hkInplaceArray
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        const int32_t iCapacityAndFlags = hits.m_capacityAndFlags;
-                        hits.m_size = 0;
-                        if (iCapacityAndFlags >= 0) {
-                            pHeap->bufFree(
-                                hits.m_data,
-                                (iCapacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) *
-                                    static_cast<int32_t>(sizeof(uint32_t))
-                            );
-                        }
-                    }
                 }
                 const float fEdgeAngle = histogram.evaluate();
                 const int32_t iAngleBitcode = hkpMeshWeldingUtility::calcEdgeAngleBitcode(fEdgeAngle);
                 combinedBitcode =
                     hkpMeshWeldingUtility::modifyCombinedEdgesBitcode(combinedBitcode, edge, iAngleBitcode);
-                {
-                    // EXE-INLINED none: hkArray<hkEntry>::~hkArray
-                    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                    const int32_t iCapacityAndFlags = histogram.m_entries.m_capacityAndFlags;
-                    histogram.m_entries.m_size = 0;
-                    if (iCapacityAndFlags >= 0) {
-                        pHeap->bufFree(
-                            histogram.m_entries.m_data,
-                            (iCapacityAndFlags & hkArrayBase<hkEntry>::CAPACITY_MASK) *
-                                static_cast<int32_t>(sizeof(hkEntry))
-                        );
-                    }
-                    histogram.m_entries.m_data = nullptr;
-                    histogram.m_entries.m_capacityAndFlags = hkArrayBase<hkEntry>::DONT_DEALLOCATE_FLAG;
-                }
             }
             mesh->setWeldingInfo(key, static_cast<int16_t>(combinedBitcode));
         }
@@ -815,21 +762,7 @@ void hkpMeshWeldingUtility::computeWeldingInfo(
     hkpMeshWeldingUtility::ShapeInfo info;
     info.m_transform = hkTransformIdentity;
     info.m_shape = bvTree;
-    // The stack allocator's bytes are untyped memory; the local array keeps its shape infos there.
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpMeshWeldingUtility::ShapeInfo>, shapes, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpMeshWeldingUtility::ShapeInfo>::hkLocalArray(1) (hkAllocateStack)
-        shapes.m_data = nullptr;
-        shapes.m_size = 0;
-        shapes.m_capacityAndFlags = hkArrayBase<hkpMeshWeldingUtility::ShapeInfo>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((static_cast<int32_t>(sizeof(hkpMeshWeldingUtility::ShapeInfo)) + 127) & ~127);
-        shapes.m_data = reinterpret_cast<hkpMeshWeldingUtility::ShapeInfo*>(pBlock);
-        shapes.m_capacityAndFlags = 1 | hkArrayBase<hkpMeshWeldingUtility::ShapeInfo>::DONT_DEALLOCATE_FLAG;
-        shapes.m_localMemory = shapes.m_data;
-    }
+    hkLocalArray<hkpMeshWeldingUtility::ShapeInfo> shapes(1);
     {
         // EXE-INLINED none: hkArray<hkpMeshWeldingUtility::ShapeInfo>::pushBack
         hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -848,25 +781,6 @@ void hkpMeshWeldingUtility::computeWeldingInfo(
     hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
         hkTransformIdentity, collection, weldingType, shapes, weldOpenEdges
     );
-    {
-        // EXE-INLINED none: hkLocalArray<hkpMeshWeldingUtility::ShapeInfo>::~hkLocalArray
-        hkpMeshWeldingUtility::ShapeInfo* pLocalMemory = shapes.m_localMemory;
-        if (pLocalMemory == shapes.m_data) {
-            shapes.m_size = 0;
-        }
-        // EXE-INLINED none: hkDeallocateStack<hkpMeshWeldingUtility::ShapeInfo>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(pLocalMemory));
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t iCapacityAndFlags = shapes.m_capacityAndFlags;
-        shapes.m_size = 0;
-        if (iCapacityAndFlags >= 0) {
-            pHeap->bufFree(
-                shapes.m_data,
-                (iCapacityAndFlags & hkArrayBase<hkpMeshWeldingUtility::ShapeInfo>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkpMeshWeldingUtility::ShapeInfo))
-            );
-        }
-    }
 }
 
 float hkpMeshWeldingUtility::calcAngleFromVertices(const hkVector4* vertices, float& sinAngleOut, float& cosAngleOut) {
@@ -1027,11 +941,7 @@ float hkHistogram::evaluate() {
             m_entries.m_data, 0, iNumEntries - 1, hkAlgorithm::less<hkEntry>()
         );
     }
-    XFNV_INLINED_LOCAL(hkArray<hkEntry>, ranges, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkEntry>::hkArray
-    ranges.m_data = nullptr;
-    ranges.m_size = 0;
-    ranges.m_capacityAndFlags = hkArrayBase<hkEntry>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkEntry> ranges;
     int32_t iStart = 0;
     for (int32_t i = 1; i <= m_entries.m_size; ++i) {
         if (i < m_entries.m_size) {
@@ -1087,18 +997,6 @@ float hkHistogram::evaluate() {
         }
     }
     const float fResult = bFound ? fBest : 0.0f;
-    {
-        // EXE-INLINED none: hkArray<hkEntry>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t iCapacityAndFlags = ranges.m_capacityAndFlags;
-        ranges.m_size = 0;
-        if (iCapacityAndFlags >= 0) {
-            pHeap->bufFree(
-                ranges.m_data,
-                (iCapacityAndFlags & hkArrayBase<hkEntry>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkEntry))
-            );
-        }
-    }
     return fResult;
 }
 

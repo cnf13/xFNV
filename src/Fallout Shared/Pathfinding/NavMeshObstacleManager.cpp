@@ -695,8 +695,6 @@ void NavMeshObstacleManager::UpdateObstacle(NiPointer<ObstacleData>& spObstacle)
 }
 
 void NavMeshObstacleManager::UpdateObstaclesForReference(uint32_t aiRefID, TESObjectREFR* apRef) {
-    XFNV_INLINED_LOCAL(NiPointer<ObstacleData>, spObstacle_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<ObstacleData>, spObstacle, std::nullopt, std::nullopt);
     NiPointer<ReferenceObstacleArray> spArray(static_cast<ReferenceObstacleArray*>(nullptr));
     if (FormIDMap.GetAt(aiRefID, spArray)) {
         for (uint32_t a = 0;; ++a) {
@@ -704,7 +702,7 @@ void NavMeshObstacleManager::UpdateObstaclesForReference(uint32_t aiRefID, TESOb
             if (a >= FormFlags) {
                 break;
             }
-            spObstacle.SetPointer(&spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(a)));
+            NiPointer<ObstacleData> spObstacle(spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(a)));
             if (spObstacle.m_pObject->bActive) {
                 for (uint32_t i = 0; i < spObstacle.m_pObject->Navmeshes.iSize; ++i) {
                     ObstacleTaskData* TaskForNavMesh =
@@ -719,7 +717,6 @@ void NavMeshObstacleManager::UpdateObstaclesForReference(uint32_t aiRefID, TESOb
             RemoveActivationListener(spObstacle.m_pObject->pRigidBody.m_pObject);
             RigidBodyToObstacleMap.RemoveAt(spObstacle.m_pObject->pRigidBody.m_pObject);
             ObstaclesUpdateList.Remove(spObstacle);
-            spObstacle.~NiPointer<ObstacleData>();
         }
         NavMeshObstacleManager::UpdateObstacleDataForReference(apRef, spArray);
         for (uint32_t a_2 = 0;; ++a_2) {
@@ -727,7 +724,7 @@ void NavMeshObstacleManager::UpdateObstaclesForReference(uint32_t aiRefID, TESOb
             if (a_2 >= v5) {
                 break;
             }
-            spObstacle_2.SetPointer(&spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(a_2)));
+            NiPointer<ObstacleData> spObstacle_2(spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(a_2)));
             NavMeshObstacleManager::UpdateObstacleActiveStatus(spObstacle_2);
             if (spObstacle_2.m_pObject->bActive) {
                 using navmeshes_t = BSScrapArray<NavMeshPtr, 1024>;
@@ -751,14 +748,12 @@ void NavMeshObstacleManager::UpdateObstaclesForReference(uint32_t aiRefID, TESOb
                 AddBoundingBox3DNode(spObstacle_2);
             }
             AddActivationListener(spObstacle_2.m_pObject->pRigidBody.m_pObject);
-            spObstacle_2.~NiPointer<ObstacleData>();
         }
     }
     else {}
 }
 
 void NavMeshObstacleManager::ReallyAddObstaclesForReference(TESObjectREFR* apRef) {
-    XFNV_INLINED_LOCAL(NiPointer<ObstacleData>, spObstacle, std::nullopt, std::nullopt);
     NiPointer<ReferenceObstacleArray> spArray(static_cast<ReferenceObstacleArray*>(nullptr));
     if (!FormIDMap.GetAt(apRef->iFormID, spArray)) {
         ReferenceObstacleArray* pArray;
@@ -778,7 +773,7 @@ void NavMeshObstacleManager::ReallyAddObstaclesForReference(TESObjectREFR* apRef
         if (uiIndex >= uiCount) {
             break;
         }
-        spObstacle.SetPointer(&spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(uiIndex)));
+        NiPointer<ObstacleData> spObstacle(spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(uiIndex)));
         RigidBodyToObstacleMap.SetAt(spObstacle.m_pObject->pRigidBody.m_pObject, spObstacle);
         AddActivationListener(spObstacle.m_pObject->pRigidBody.m_pObject);
         if (spObstacle.m_pObject->pRigidBody.m_pObject->IsActive()) {
@@ -805,12 +800,10 @@ void NavMeshObstacleManager::ReallyAddObstaclesForReference(TESObjectREFR* apRef
                 }
             }
         }
-        spObstacle.~NiPointer<ObstacleData>();
     }
 }
 
 void NavMeshObstacleManager::ReallyRemoveObstaclesForReference(uint32_t aiFormID) {
-    XFNV_INLINED_LOCAL(NiPointer<ObstacleData>, spObstacle, std::nullopt, std::nullopt);
     NiPointer<ReferenceObstacleArray> spArray(static_cast<ReferenceObstacleArray*>(nullptr));
     if (FormIDMap.GetAt(aiFormID, spArray)) {
         FormIDMap.RemoveAt(aiFormID);
@@ -819,7 +812,7 @@ void NavMeshObstacleManager::ReallyRemoveObstaclesForReference(uint32_t aiFormID
             if (i >= FormFlags) {
                 break;
             }
-            spObstacle.SetPointer(&spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i)));
+            NiPointer<ObstacleData> spObstacle(spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i)));
             RigidBodyToObstacleMap.RemoveAt(spObstacle.m_pObject->pRigidBody.m_pObject);
             ObstaclesUpdateList.Remove(spObstacle);
             if (bDrawObstacles) {
@@ -833,7 +826,6 @@ void NavMeshObstacleManager::ReallyRemoveObstaclesForReference(uint32_t aiFormID
                 }
                 spObstacle.m_pObject->Navmeshes.Clear(true);
             }
-            spObstacle.~NiPointer<ObstacleData>();
         }
     }
     else {}
@@ -1228,8 +1220,6 @@ void NavMeshObstacleManager::ProcessDeactivatedObstacles() {
 }
 
 void NavMeshObstacleManager::DrawObstacles(bool abDraw) {
-    XFNV_INLINED_LOCAL(NiPointer<NiTriShape>, spobsNode, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<ObstacleData>, spObstacle, std::nullopt, std::nullopt);
     NiTMapItem<uint32_t, NiPointer<ReferenceObstacleArray>>* it;
     if (abDraw) {
         if (spObstacleRootNode.m_pObject) {
@@ -1287,13 +1277,11 @@ void NavMeshObstacleManager::DrawObstacles(bool abDraw) {
                 if (i >= FormFlags) {
                     break;
                 }
-                spObstacle.SetPointer(&spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i)));
-                ::new (&spobsNode) NiPointer<NiTriShape>(static_cast<NiTriShape*>(nullptr));
+                NiPointer<ObstacleData> spObstacle(spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i)));
+                NiPointer<NiTriShape> spobsNode(static_cast<NiTriShape*>(nullptr));
                 CreateBoundingBox3DNode(spObstacle, spobsNode);
                 NiNode* v4 = spObstacleRootNode.m_pObject;
                 v4->AttachChild(spobsNode.m_pObject, 1);
-                spobsNode.~NiPointer<NiTriShape>();
-                spObstacle.~NiPointer<ObstacleData>();
             }
         }
         spObstacleRootNode.m_pObject->UpdateProperties();
@@ -1343,13 +1331,11 @@ void NavMeshObstacleManager::RemoveBoundingBox3DNode(const NiPointer<ObstacleDat
 
 // The manager is GetInstance's function static `theManager`.
 NavMeshObstacleManager* NavMeshObstacleManager::GetInstance() {
-    XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
-    ::new (&tempMemContext) AutoMemContext(
+    AutoMemContext tempMemContext(
         MEM_CONTEXT_NAVMESH, true,
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Pathfinding\\NavMeshObstacleManager.cpp", 210
     );
     static NavMeshObstacleManager theManager;
-    tempMemContext.~AutoMemContext();
     return &theManager;
 }
 

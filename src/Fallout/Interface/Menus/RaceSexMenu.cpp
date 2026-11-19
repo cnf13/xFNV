@@ -1100,14 +1100,8 @@ void RaceSexMenu::_Create(RaceSexMenuContext aeContext) {
     pPlayerBase = dynamic_cast<TESNPC*>(pBase);
     rsmBackButton->Set(Tile::kTileValue_String, strBackCaps.String(), true);
 
-    // The four title strings. C++ runs no constructor or destructor on them; eh_vector_constructor_iterator constructs
-    // them.
-    using TitleArray = BSStringT<char>[4];
-    XFNV_INLINED_LOCAL(TitleArray, akTitles, std::nullopt, std::nullopt);
-    rt::eh_vector_constructor_iterator(
-        akTitles, sizeof(BSStringT<char>), 4, &xfnv::constructElement<BSStringT<char>>,
-        &xfnv::destructElement<BSStringT<char>>
-    );
+    // The four title strings.
+    BSStringT<char> akTitles[4];
     if (aeContext < 2 || aeContext > 3) {
         akTitles[0].SPrintF("1. %s", sRSMSex.String());
         akTitles[1].SPrintF("2. %s", sRSMRace.String());
@@ -1273,8 +1267,6 @@ void RaceSexMenu::_Create(RaceSexMenuContext aeContext) {
     Sounds[1].Play(false);
     SetActiveList(eActiveList);
     PrepForVisibility(false);
-    // SWEEP-INLINE 0x4037D0
-    rt::eh_vector_destructor_iterator(akTitles, sizeof(BSStringT<char>), 4, &xfnv::destructElement<BSStringT<char>>);
 }
 
 bool RaceSexMenu::SetActiveList(RaceSexMenu::ListID aeList) {
@@ -1452,12 +1444,7 @@ void RaceSexMenu::AddFaceSliders() {
         {RaceSexMenu::RSM_TONE, sRSMToneOption25.String(), fRSMFaceSliderDefaultMin, fRSMFaceSliderDefaultMax},
         {RaceSexMenu::RSM_TONE, sRSMToneOption26.String(), fRSMFaceSliderDefaultMin, fRSMFaceSliderDefaultMax},
     };
-    using FaceCoord = FR2MatrixVTC<float>[2][2];
-    XFNV_INLINED_LOCAL(FaceCoord, tempcoord, std::nullopt, std::nullopt);
-    rt::eh_vector_constructor_iterator(
-        tempcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
+    FR2MatrixVTC<float> tempcoord[2][2];
     FR2MatrixVTC<float>(*pOffsetFaceCoord)[2][2] = pPlayerBase->GetOffsetFaceCoord();
     TESActorBase::SEX eSex = pPlayerBase->GetSex();
     FR2MatrixVTC<float>(*pMeanFaceCoord)[2][2] = pPlayerBase->pFormRace->GetMeanFaceCoord(eSex);
@@ -1610,9 +1597,6 @@ void RaceSexMenu::AddFaceSliders() {
         UpdatePlayerBody();
         SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_BODY, false);
     }
-    rt::eh_vector_destructor_iterator(
-        tempcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
 }
 
 bool RaceSexMenu::IsFlagged(Flag aeFlg) {
@@ -1715,11 +1699,7 @@ void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone)
             pPlayerBase->AttachHead(pPlayer, Biped_0, v10, v11);
         }
         else {
-            XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, currcord, std::nullopt, std::nullopt);
-            rt::eh_vector_constructor_iterator(
-                currcord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
+            FR2MatrixVTC<float> currcord[2][2];
             rt::eh_vector_constructor_iterator(
                 diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
                 &xfnv::destructElement<FR2MatrixVTC<float>>
@@ -1796,9 +1776,6 @@ void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone)
             }
             rt::eh_vector_destructor_iterator(
                 diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
-            rt::eh_vector_destructor_iterator(
-                currcord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
             );
         }
         NiUpdatePlayer3D();
@@ -2166,11 +2143,7 @@ void RaceSexMenu::UpdateScrollArrows() {
 }
 
 void RaceSexMenu::OnFaceSliderChange(RaceSexMenu::Entry* apChangedSlider) {
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, addr, std::nullopt, std::nullopt);
-    rt::eh_vector_constructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
+    FR2MatrixVTC<float> addr[2][2];
     pPlayerBase->GetFaceCoord(addr);
     float ffacevalue = static_cast<double>(apChangedSlider->GetValue_007B3740()) / 10.0;
     // A face slider's data pointer holds its FaceGen control ID, cast here to uint32_t.
@@ -2189,9 +2162,6 @@ void RaceSexMenu::OnFaceSliderChange(RaceSexMenu::Entry* apChangedSlider) {
     if (apChangedSlider->id == static_cast<uint32_t>(RSM_TONE_SLIDER)) {
         SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_BODY, true);
     }
-    rt::eh_vector_destructor_iterator(
-        addr, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
 }
 
 void RaceSexMenu::OnHairColorSliderChange(RaceSexMenu::Entry* apChangedSlider) {
@@ -2255,11 +2225,7 @@ char RaceSexMenu::UpdateEntriesBetween(int32_t aiStart, int32_t aiEnd, FanTypeE 
             if ((popt) && (popt->id == 34 || popt->id == 35)) {
                 int32_t aiLow;
                 int32_t aiHigh;
-                XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, a1, std::nullopt, std::nullopt);
-                rt::eh_vector_constructor_iterator(
-                    a1, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                    &xfnv::destructElement<FR2MatrixVTC<float>>
-                );
+                FR2MatrixVTC<float> a1[2][2];
                 FR2MatrixVTC<float>(*OffsetFaceCoord)[2][2] = pPlayerBase->GetOffsetFaceCoord();
                 TESActorBase::SEX Sex = pPlayerBase->GetSex();
                 FR2MatrixVTC<float>(*MeanFaceCoord)[2][2] = pPlayerBase->pFormRace->GetMeanFaceCoord(Sex);
@@ -2285,9 +2251,6 @@ char RaceSexMenu::UpdateEntriesBetween(int32_t aiStart, int32_t aiEnd, FanTypeE 
                     popt->SetValue(aiLow);
                     bChanged = 1;
                 }
-                rt::eh_vector_destructor_iterator(
-                    a1, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-                );
             }
         }
     }
@@ -2532,20 +2495,12 @@ void RaceSexMenu::SliderRelease() {
         float v11;
         float v12;
         float v14;
-        XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aOffsetCoord, std::nullopt, std::nullopt);
-        XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, aCoord, std::nullopt, std::nullopt);
         // iAge holds the age, then the clamped geometry age.
         int32_t iAge = static_cast<int32_t>(
             static_cast<double>(pSliderOpt->GetValue_007B3740()) * 5.550000190734863 + 9.449999809265137
         );
-        rt::eh_vector_constructor_iterator(
-            aCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-            &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
-        rt::eh_vector_constructor_iterator(
-            aOffsetCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-            &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
+        FR2MatrixVTC<float> aCoord[2][2];
+        FR2MatrixVTC<float> aOffsetCoord[2][2];
         BSFaceGenManager::InitFaceGenCoord(&aOffsetCoord);
         pPlayerBase->GetFaceCoord(aCoord);
         pPlayerBase->GetFaceCoord(LastFaceCoord);
@@ -2605,12 +2560,6 @@ void RaceSexMenu::SliderRelease() {
         RaceSexMenu::pMe->UpdatePlayerHead(true, true, false);
         RaceSexMenu::pMe->SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_HEAD, false);
         RaceSexMenu::pMe->SetFlag(RaceSexMenu::RSM_FLAG_UPDATE_BODY, true);
-        rt::eh_vector_destructor_iterator(
-            aOffsetCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
-        rt::eh_vector_destructor_iterator(
-            aCoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-        );
     }
     else {
         return;

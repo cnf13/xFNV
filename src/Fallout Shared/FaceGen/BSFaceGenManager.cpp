@@ -1730,7 +1730,6 @@ void BSFaceGenManager::AttachHairToHead(
 ) {
     BSHash arDirectoryHash;
     BSHash arFileNameHash;
-    XFNV_INLINED_LOCAL(NiPointer<NiTriBasedGeom>, spshape, std::nullopt, std::nullopt);
     NiMatrix3 matrot;
     AutoMemContext tempMemContext(
         MEM_CONTEXT_FACEGEN_SYSTEM, true,
@@ -1742,7 +1741,7 @@ void BSFaceGenManager::AttachHairToHead(
     BSStringT<char> fileEGT;
     BSStringT<char> fileFIM;
     NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
-    ::new (&spshape) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
     matrot.MakeYRotation(-1.5707964f);
     if (aNpcData.pHair) {
         for (HAIR_PART ehairPart = HAIR_PART_NORMAL; ehairPart < HAIR_PART_COUNT;
@@ -1828,7 +1827,6 @@ void BSFaceGenManager::AttachHairToHead(
             sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
         }
     }
-    spshape.~NiPointer<NiTriBasedGeom>();
 }
 
 // Clears the requested range or fills it with the largest finite float.
@@ -2144,9 +2142,6 @@ void BSFaceGenManager::RefreshMeshFromBaseMorphExtraData(
 // The direction flag is stored only when it turns.
 void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
     NiNode* proot;
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, newcoord, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, oldcoord, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(std::type_identity_t<FR2MatrixVTC<float>[2][2]>, diffcoord, std::nullopt, std::nullopt);
     TESNPC* pnpc = static_cast<TESNPC*>(apActor->GetObjectReference());
     NiAVObject* pobj = apActor->Get3D();
     if (pobj) {
@@ -2155,18 +2150,9 @@ void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
     else {
         proot = nullptr;
     }
-    rt::eh_vector_constructor_iterator(
-        oldcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
-    rt::eh_vector_constructor_iterator(
-        newcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
-    rt::eh_vector_constructor_iterator(
-        diffcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-        &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
+    FR2MatrixVTC<float> oldcoord[2][2];
+    FR2MatrixVTC<float> newcoord[2][2];
+    FR2MatrixVTC<float> diffcoord[2][2];
     pnpc->GetFaceCoord(oldcoord);
     pnpc->GetFaceCoord(newcoord);
     float val =
@@ -2217,15 +2203,6 @@ void BSFaceGenManager::CycleFaceGenCoordValue(Actor* apActor) {
     TESActorBase::SEX Sex = pnpc->GetSex();
     FR2MatrixVTC<float>(*MeanFaceCoord)[2][2] = pnpc->GetFormRace()->GetMeanFaceCoord(Sex);
     BSFaceGenManager::OffsetFaceGenCoord(MeanFaceCoord, &newcoord, OffsetFaceCoord, false);
-    rt::eh_vector_destructor_iterator(
-        diffcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
-    rt::eh_vector_destructor_iterator(
-        newcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
-    rt::eh_vector_destructor_iterator(
-        oldcoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-    );
 }
 
 void BSFaceGenManager::SetUseProceduralEyeBlinking(bool abUse) {
@@ -2308,7 +2285,6 @@ void BSFaceGenManager::ApplyHairMorph(NiTriBasedGeom* apGeom, float afModifierVa
 }
 
 void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDetail) {
-    XFNV_INLINED_LOCAL(NiPointer<BSFaceGenModel>, pmodelFG, std::nullopt, std::nullopt);
     NiCloningProcess v20;
     BSHash kDirHash;
     BSHash kFileHash;
@@ -2321,9 +2297,6 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
         if (pchild) {
             const char* name = (&pchild->m_kName)->GetHandleString();
             if (!BSstrcmp(name, "FaceGenFace")) {
-                XFNV_INLINED_LOCAL(
-                    std::type_identity_t<FR2MatrixVTC<float>[2][2]>, facecoord, std::nullopt, std::nullopt
-                );
                 NiTriBasedGeom* kCloneProc_20 = pchild->IsTriBasedGeom();
                 BSFaceGenModel* poldmodelFG = BSFaceGenManager::GetFaceGenModel(kCloneProc_20);
                 NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
@@ -2334,10 +2307,7 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 BSStringT<char> fileTRI;
                 BSStringT<char> fileEGT;
                 BSStringT<char> kCloneProc_24;
-                rt::eh_vector_constructor_iterator(
-                    facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                    &xfnv::destructElement<FR2MatrixVTC<float>>
-                );
+                FR2MatrixVTC<float> facecoord[2][2];
                 FR2MatrixVTC<float>(*pcoord)[2][2] = BSFaceGenManager::GetFaceGenCoord();
                 BSFaceGenManager::CopyFaceGenCoord(pcoord, &facecoord, false, false);
                 const char* EGMFilename = poldmodelFG->GetEGMFilename();
@@ -2358,23 +2328,16 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                     );
                 }
                 if (!pFileEntry) {
-                    rt::eh_vector_destructor_iterator(
-                        facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-                    );
                     return;
                 }
                 const char* AsEGTFile = BSFaceGenManager::GetAsEGTFile(fileEGT, lodfname.pString);
                 const char* AsTRIFile = BSFaceGenManager::GetAsTRIFile(fileTRI, lodfname.pString, HAIR_PART_NONE);
                 char* v7 = lodfname.pString;
                 const char* AsEGMFile = BSFaceGenManager::GetAsEGMFile(fileEGM, lodfname.pString, HAIR_PART_NONE);
-                ::new (&pmodelFG) NiPointer<BSFaceGenModel>(
+                NiPointer<BSFaceGenModel> pmodelFG(
                     BSFaceGenManager::GetFaceGenModel(AsEGMFile, v7, AsTRIFile, AsEGTFile, true, HAIR_PART_NONE, false)
                 );
                 if (!pmodelFG.m_pObject->ApplyCoordinateToNewMesh(&facecoord, spshape) || !spshape.m_pObject) {
-                    pmodelFG.~NiPointer<BSFaceGenModel>();
-                    rt::eh_vector_destructor_iterator(
-                        facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-                    );
                     return;
                 }
                 spshape.m_pObject->SetName("FaceGenFace");
@@ -2429,10 +2392,6 @@ void BSFaceGenManager::ReplaceFaceMeshLOD(BSFaceGenNiNode* apNode, int32_t aDeta
                 else {
                     apNode->bUsingLoResHead = true;
                 }
-                pmodelFG.~NiPointer<BSFaceGenModel>();
-                rt::eh_vector_destructor_iterator(
-                    facecoord, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-                );
             }
         }
     }
@@ -2456,21 +2415,8 @@ void BSFaceGenManager::ClearBodyTexturesFromPalette(TESNPC* apNPC) {
 
 // The manager's default base texture, or null without a manager.
 NiSourceTexture* BSFaceGenManager::GetBaseTexture() {
-    XFNV_INLINED_LOCAL(NiPointer<NiSourceTexture>, spNull, std::nullopt, std::nullopt);
-    NiPointer<NiSourceTexture>* pspBase;
-    bool bConstructed = false;
-    if (BSFaceGenManager::pInstance) {
-        pspBase = &BSFaceGenManager::pInstance->spDefaultBaseMod;
-    }
-    else {
-        pspBase = ::new (&spNull) NiPointer<NiSourceTexture>(static_cast<NiSourceTexture*>(nullptr));
-        bConstructed = true;
-    }
-    NiSourceTexture* pTexture = pspBase->m_pObject;
-    if (bConstructed) {
-        spNull.~NiPointer<NiSourceTexture>();
-    }
-    return pTexture;
+    return BSFaceGenManager::pInstance ? BSFaceGenManager::pInstance->spDefaultBaseMod.m_pObject
+                                       : NiPointer<NiSourceTexture>(static_cast<NiSourceTexture*>(nullptr)).m_pObject;
 }
 
 void BSFaceGenManager::OffsetFaceGenCoord(
@@ -2821,7 +2767,6 @@ void BSFaceGenManager::AttachEyesToHead(
     FaceGenNpcData& aNpcData,
     bool abForceNoSkinning
 ) {
-    XFNV_INLINED_LOCAL(NiPointer<NiTriBasedGeom>, spshape, std::nullopt, std::nullopt);
     NiMatrix3 matrot;
     AutoMemContext tempMemContext(
         MEM_CONTEXT_FACEGEN_SYSTEM, true,
@@ -2833,7 +2778,7 @@ void BSFaceGenManager::AttachEyesToHead(
     BSStringT<char> fileEGT;
     BSStringT<char> fileFIM;
     NiPointer<NiSourceTexture> sptexBase(static_cast<NiSourceTexture*>(nullptr));
-    ::new (&spshape) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+    NiPointer<NiTriBasedGeom> spshape(static_cast<NiTriBasedGeom*>(nullptr));
     BSFaceGenModel* pmodelFG = nullptr;
     matrot.MakeYRotation(-1.5707964f);
     if (aNpcData.pLeftEye) {
@@ -2953,7 +2898,6 @@ void BSFaceGenManager::AttachEyesToHead(
         spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
         sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
     }
-    spshape.~NiPointer<NiTriBasedGeom>();
 }
 
 void BSFaceGenManager::ComputeModelBound(

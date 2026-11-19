@@ -61,14 +61,10 @@ static hkReferencedObject* hkpUserConvexRadiusBuildercreate() {
 }
 
 double _getPlaneToSurfaceDistance(const hkpShape* r_eax) {
-    using apVertices_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(apVertices_t, apVertices, std::nullopt, std::nullopt);
     // getPlaneEquations, a trivial accessor: the shape's plane equations.
     hkArray<hkVector4, hkContainerHeapAllocator>* v2 =
         &static_cast<const hkpConvexVerticesShape*>(r_eax)->m_planeEquations;
-    apVertices.m_data = nullptr;
-    apVertices.m_size = 0;
-    apVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4, hkContainerHeapAllocator> apVertices;
     static_cast<const hkpConvexVerticesShape*>(r_eax)->getOriginalVertices(apVertices);
     float v9 = -1000.0f;
     if (apVertices.m_size > 0) {
@@ -94,11 +90,6 @@ double _getPlaneToSurfaceDistance(const hkpShape* r_eax) {
             --m_size;
         }
         while (m_size);
-    }
-    hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-    apVertices.m_size = 0;
-    if (apVertices.m_capacityAndFlags >= 0) {
-        m_heap->bufFree(apVertices.begin(), sizeof(hkVector4) * apVertices.m_capacityAndFlags);
     }
     return v9;
 }
@@ -252,11 +243,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             hkVector4 normal;
             normal.setCross(edge01, edge02);
 
-            // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
-            planes.m_data = nullptr;
-            planes.m_size = 0;
-            planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+            alignas(16) hkArray<hkVector4> planes;
             int32_t numAllocated = 8;
             hkVector4* pPlanes = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkVector4>(numAllocated);
             planes.m_data = pPlanes;
@@ -320,17 +307,6 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
                 displayGeometries.m_data[displayGeometries.m_size] = display;
                 displayGeometries.m_size++;
             }
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            heap = hkMemoryRouter::getInstance().m_heap;
-            planes.m_size = 0;
-            if (planes.m_capacityAndFlags >= 0) {
-                heap->bufFree(
-                    planes.m_data,
-                    static_cast<int32_t>(
-                        (planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                    )
-                );
-            }
             break;
         }
 
@@ -367,11 +343,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             const hkArray<hkVector4>* planeEquations = &convexVertices->m_planeEquations;
             const float maxDistance = static_cast<float>(_getPlaneToSurfaceDistance(shape));
 
-            // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-            alignas(16) XFNV_INLINED_LOCAL(hkArray<hkVector4>, planes, std::nullopt, std::nullopt);
-            planes.m_data = nullptr;
-            planes.m_size = 0;
-            planes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+            alignas(16) hkArray<hkVector4> planes;
             // EXE-INLINED none: hkArray<hkVector4>::operator=
             hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
             if (static_cast<int32_t>(planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) <
@@ -415,17 +387,6 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
                 }
                 displayGeometries.m_data[displayGeometries.m_size] = display;
                 displayGeometries.m_size++;
-            }
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            heap = hkMemoryRouter::getInstance().m_heap;
-            planes.m_size = 0;
-            if (planes.m_capacityAndFlags >= 0) {
-                heap->bufFree(
-                    planes.m_data,
-                    static_cast<int32_t>(
-                        (planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                    )
-                );
             }
             break;
         }
@@ -552,33 +513,14 @@ hkDisplayGeometry* hkpConvexRadiusBuilder::getCurrentRawGeometry(
 
 hkDisplayConvex*
 hkpConvexRadiusBuilder::createConvexDisplayFromPoints(const hkArray<hkVector4>& points, const hkTransform& transform) {
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, hullVertices, std::nullopt, std::nullopt);
-    hullVertices.m_data = nullptr;
-    hullVertices.m_size = 0;
-    hullVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> hullVertices;
     createVerticesFromPlaneEquations(points, hullVertices);
     const int32_t numVertices = hullVertices.m_size;
     if (numVertices < 1) {
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        hullVertices.m_size = 0;
-        if (!(hullVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG)) {
-            heap->bufFree(
-                hullVertices.m_data,
-                static_cast<int32_t>(
-                    (hullVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                )
-            );
-        }
         return nullptr;
     }
 
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, transformedVertices, std::nullopt, std::nullopt);
-    transformedVertices.m_data = nullptr;
-    transformedVertices.m_size = 0;
-    transformedVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> transformedVertices;
     // EXE-INLINED none: hkArray<hkVector4>::setSize
     hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
     int32_t capacity =
@@ -620,30 +562,6 @@ hkpConvexRadiusBuilder::createConvexDisplayFromPoints(const hkArray<hkVector4>& 
     static_cast<hkReferencedObject*>(pMemory)->m_memSizeAndFlags = sizeof(hkDisplayConvex);
     hkDisplayConvex* display = ::new (pMemory) hkDisplayConvex(geometry);
 
-    // EXE-INLINED none: hkArray<hkVector4>::clearAndDeallocate
-    heap = hkMemoryRouter::getInstance().m_heap;
-    transformedVertices.m_size = 0;
-    if (transformedVertices.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            transformedVertices.m_data,
-            static_cast<int32_t>(
-                (transformedVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-            )
-        );
-    }
-    transformedVertices.m_data = nullptr;
-    transformedVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    heap = hkMemoryRouter::getInstance().m_heap;
-    hullVertices.m_size = 0;
-    if (hullVertices.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            hullVertices.m_data,
-            static_cast<int32_t>(
-                (hullVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-            )
-        );
-    }
     return display;
 }
 

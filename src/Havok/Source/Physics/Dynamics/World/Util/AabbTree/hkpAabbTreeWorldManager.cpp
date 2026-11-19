@@ -136,7 +136,7 @@ void hkpAabbTreeWorldManager::castRay(
     HK_TIMER_BEGIN_LIST("CastRay", "ActiveTree");
     hkKdTree* kdTree = m_kdTree;
     if (kdTree) {
-        XFNV_INLINED_LOCAL(hkpKdTreeCollidableRaycaster, collector, hkpKdTreeCollidableRaycaster_vftable, std::nullopt);
+        hkpKdTreeCollidableRaycaster collector;
         collector.m_collector = nullptr;
         collector.m_output = &output;
         collector.m_input = &input;
@@ -218,7 +218,7 @@ void hkpAabbTreeWorldManager::linearCast(
 ) {
     hkKdTree* kdTree = m_kdTree;
     if (kdTree) {
-        XFNV_INLINED_LOCAL(hkpKdTreeWorldLinearCaster, kdCaster, hkpKdTreeWorldLinearCaster_vftable, std::nullopt);
+        hkpKdTreeWorldLinearCaster kdCaster;
         kdCaster.m_shapeInput.m_maxExtraPenetration = 1.1920929e-07f;
         kdCaster.m_shapeInput.m_weldClosestPoints.m_storage = 0;
         kdCaster.linearCast(kdTree, collA, input, filter, collInput, config, castCollector, startPointCollector);
@@ -316,10 +316,7 @@ void hkpAabbTreeWorldManager::inactiveEntityMovedCallback(hkpEntity* entity) {
 // HK_TIMER_BEGIN_LIST, HK_TIMER_SPLIT_LIST and HK_TIMER_END_LIST write into the stream's raw buffer, which is treated
 // as untyped (hence the casts). The inactive list starts empty (no storage, not ours). 0xFFFF is s_invalidIdx.
 void hkpAabbTreeWorldManager::fullBuild(hkJobQueue* jobQueue, hkJobThreadPool* jobThreadPool) {
-    XFNV_INLINED_LOCAL(hkArray<const hkpCollidable*>, inactiveList, std::nullopt, std::nullopt);
-    inactiveList.m_data = nullptr;
-    inactiveList.m_size = 0;
-    inactiveList.m_capacityAndFlags = hkArrayBase<const hkpCollidable*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkpCollidable*> inactiveList;
     HK_TIMER_BEGIN_LIST("ActiveTree", "Gather");
     m_activeList.m_size = 0;
     gatherActiveCollidablesFromWorld(m_activeList, m_world);
@@ -344,17 +341,6 @@ void hkpAabbTreeWorldManager::fullBuild(hkJobQueue* jobQueue, hkJobThreadPool* j
         HK_TIMER_END_LIST();
     }
     clearTransitionQueue();
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = inactiveList.m_capacityAndFlags;
-    inactiveList.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            inactiveList.m_data,
-            (capacityAndFlags & hkArrayBase<const hkpCollidable*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(const hkpCollidable*))
-        );
-    }
 }
 
 void hkpAabbTreeWorldManager::buildActiveTree(
@@ -454,12 +440,7 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
     }
     HK_TIMER_END();
 
-    // EXE-INLINED none: hkArray<unsigned short>::hkArray
-    using leafIdx_t = hkArray<uint16_t, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(leafIdx_t, leafIdx, std::nullopt, std::nullopt);
-    leafIdx.m_data = nullptr;
-    leafIdx.m_size = 0;
-    leafIdx.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
+    hkArray<uint16_t> leafIdx;
     HK_TIMER_BEGIN("build", nullptr);
     if (numCollidables > 0) {
         pTree->build(aabbs.m_data, userDatas.m_data, numCollidables, leafIdx);
@@ -468,18 +449,6 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
     for (int32_t i = 0; i < numCollidables; ++i) {
         hkpAabbTreeWorldManager::setNode(collidables.m_data[i], leafIdx.m_data[i]);
     }
-
-    // EXE-INLINED none: hkArray<unsigned short>::~hkArray
-    hkMemoryAllocator* pLeafHeap = hkMemoryRouter::getInstance().m_heap;
-    leafIdx.m_size = 0;
-    if ((leafIdx.m_capacityAndFlags & hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG) == 0) {
-        pLeafHeap->bufFree(
-            leafIdx.m_data,
-            static_cast<int32_t>((leafIdx.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK) * sizeof(uint16_t))
-        );
-    }
-    leafIdx.m_data = nullptr;
-    leafIdx.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
 }
 
 void hkpAabbTreeWorldManager::clearTransitionQueue() {
@@ -565,7 +534,7 @@ void hkpAabbTreeWorldManager::pushBackToActiveList(const hkpCollidable* collidab
 // m_collidables), and the 0x20 frame bytes past the job (+0x60..+0x7F; the entry's tail in src).
 // From 32 collidables on, with a thread pool and a job queue, the tree is built by one coordinator job on the
 // queue; otherwise it is built here from a mediator over the collidables. The depth and sub-job-size arrays are
-// the SDK's hkArray<int>(4), constructed and destroyed inline.
+// the SDK's hkArray<int>(4), their storage allocated inline.
 void hkpAabbTreeWorldManager::buildKdTree(
     hkKdTree*& tree,
     hkArray<const hkpCollidable*, hkContainerHeapAllocator>& collidables,
@@ -589,8 +558,8 @@ void hkpAabbTreeWorldManager::buildKdTree(
         }
         m_kdTreeJobpHeader->m_openJobs = 4;
 
-        // EXE-INLINED none: hkArray<int>::hkArray(int)
-        XFNV_INLINED_LOCAL(hkArray<int32_t>, branchDepths, std::nullopt, std::nullopt);
+        hkArray<int32_t> branchDepths;
+        // EXE-INLINED none: hkArray<int>::hkArray(int), the storage for its elements
         int32_t numBranchDepths = 4;
         branchDepths.m_data = hkMemoryRouter::getInstance().heap()._bufAlloc<int32_t>(numBranchDepths);
         branchDepths.m_size = numBranchDepths;
@@ -600,8 +569,8 @@ void hkpAabbTreeWorldManager::buildKdTree(
         else {
             branchDepths.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
         }
-        // EXE-INLINED none: hkArray<int>::hkArray(int)
-        XFNV_INLINED_LOCAL(hkArray<int32_t>, subJobSizes, std::nullopt, std::nullopt);
+        hkArray<int32_t> subJobSizes;
+        // EXE-INLINED none: hkArray<int>::hkArray(int), the storage for its elements
         int32_t numSubJobSizes = 4;
         subJobSizes.m_data = hkMemoryRouter::getInstance().heap()._bufAlloc<int32_t>(numSubJobSizes);
         subJobSizes.m_size = numSubJobSizes;
@@ -654,29 +623,6 @@ void hkpAabbTreeWorldManager::buildKdTree(
         HK_TIMER_END_LIST();
         HK_TIMER_SPLIT_LIST("Finalize");
         HK_TIMER_END_LIST();
-
-        // EXE-INLINED none: hkArray<int>::~hkArray
-        {
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            const int32_t capacityAndFlags = subJobSizes.m_capacityAndFlags;
-            if (capacityAndFlags >= 0) {
-                heap.bufFree(
-                    subJobSizes.m_data,
-                    (capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(int32_t))
-                );
-            }
-        }
-        // EXE-INLINED none: hkArray<int>::~hkArray
-        {
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            const int32_t capacityAndFlags = branchDepths.m_capacityAndFlags;
-            if (capacityAndFlags >= 0) {
-                heap.bufFree(
-                    branchDepths.m_data,
-                    (capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(int32_t))
-                );
-            }
-        }
         return;
     }
 

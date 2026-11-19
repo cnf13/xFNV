@@ -120,7 +120,6 @@ static void castRayBundleAabbTreeFp(
     hkVector4* earlyHitFractionInOut
 ) {
     using Collector = hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::Collector;
-    using CollectorArray = hkCpuWorldRayCastCollector[4];
     if (!aabbTree) {
         return;
     }
@@ -132,12 +131,10 @@ static void castRayBundleAabbTreeFp(
         &command->m_rayInput[3].m_from.m_quad, &command->m_rayInput[3].m_to.m_quad, hkVector4Comparison::MASK_XYZW
     );
     hkpWorldRayCastCommand commands[4];
-    XFNV_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
+    hkCpuWorldRayCastCollector collectors[4];
     Collector* collectorPtrs[4];
     for (int32_t i = 0; i < 4; ++i) {
         hkCpuWorldRayCastCollector& collector = collectors[i];
-        collector.~hkCpuWorldRayCastCollector();
-        ::new (&collector) hkCpuWorldRayCastCollector;
 
         hkpWorldRayCastCommand& single = commands[i];
         single.m_rayInput.m_from = command->m_rayInput[i].m_from;
@@ -169,10 +166,6 @@ static void castRayBundleAabbTreeFp(
     command->m_numResultsOut[2] = commands[2].m_numResultsOut;
     command->m_numResultsOut[3] = commands[3].m_numResultsOut;
     earlyHitFractionInOut->set(earlyHitFractions[0], earlyHitFractions[1], earlyHitFractions[2], earlyHitFractions[3]);
-    // The collectors' destructors, last collector first.
-    for (int32_t i = 3; i >= 0; --i) {
-        collectors[i].~hkCpuWorldRayCastCollector();
-    }
 }
 
 // hkTreeRayCastJobUtil::castRayBundleAabbTree<hkAabbTreeAabb16>, as castRayBundleAabbTreeFp for hkAabbTreeAabb: one
@@ -185,7 +178,6 @@ static void castRayBundleAabbTree16(
     hkVector4* earlyHitFractionInOut
 ) {
     using Collector16 = hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::Collector;
-    using CollectorArray = hkCpuWorldRayCastCollector[4];
     if (!aabbTree) {
         return;
     }
@@ -197,12 +189,10 @@ static void castRayBundleAabbTree16(
         &command->m_rayInput[3].m_from.m_quad, &command->m_rayInput[3].m_to.m_quad, hkVector4Comparison::MASK_XYZW
     );
     hkpWorldRayCastCommand commands[4];
-    XFNV_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
+    hkCpuWorldRayCastCollector collectors[4];
     Collector16* collectorPtrs[4];
     for (int32_t i = 0; i < 4; ++i) {
         hkCpuWorldRayCastCollector& collector = collectors[i];
-        collector.~hkCpuWorldRayCastCollector();
-        ::new (&collector) hkCpuWorldRayCastCollector;
 
         hkpWorldRayCastCommand& single = commands[i];
         single.m_rayInput.m_from = command->m_rayInput[i].m_from;
@@ -234,10 +224,6 @@ static void castRayBundleAabbTree16(
     command->m_numResultsOut[2] = commands[2].m_numResultsOut;
     command->m_numResultsOut[3] = commands[3].m_numResultsOut;
     earlyHitFractionInOut->set(earlyHitFractions[0], earlyHitFractions[1], earlyHitFractions[2], earlyHitFractions[3]);
-    // The collectors' destructors, last collector first.
-    for (int32_t i = 3; i >= 0; --i) {
-        collectors[i].~hkCpuWorldRayCastCollector();
-    }
 }
 
 using hkAabbTreeQueryUtils_lhkAabbTreeData_nhkAabbTreeAabb_cunsigned_sshort_g_nCollector =
@@ -550,14 +536,10 @@ hkBool hkCpuWorldRayCastCollector::testCollidable(const hkpCollidable* apCollida
     }
 
     const hkTransform& kTransform = *apCollidable->m_motion.pMotion;
-    XFNV_INLINED_LOCAL(hkpWorldRayCastOutput, output, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x4A3D20
+    hkpWorldRayCastOutput output;
     output.m_hitFraction = m_hitFraction;
     m_workInput.m_from.m_quad = transformedInversePos(kTransform, m_originalInput->m_from);
     m_workInput.m_to.m_quad = transformedInversePos(kTransform, m_originalInput->m_to);
-    output.m_extraInfo = -1;
-    output.m_shapeKeys[0] = 0xFFFFFFFF;
-    output.m_shapeKeyIndex = 0;
 
     if (m_fixedBufferRayHitCollector) {
         pShape->castRayWithCollectorImpl(m_workInput, *apCollidable, *m_fixedBufferRayHitCollector);
@@ -683,90 +665,71 @@ hkJobQueue::JobStatus hkCpuWorldRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
         hkpWorldRayCastCommand* commands = const_cast<hkpWorldRayCastCommand*>(job.m_commandArray);
         const int32_t numRays = job.m_numCommands;
 
-        // The rays' start points and inverse directions. The stack allocator's bytes are untyped memory; the local
-        // array keeps its elements there.
-        XFNV_INLINED_LOCAL(hkLocalArray<hkAabbTreeData::Ray>, rays, std::nullopt, std::nullopt);
+        hkVector4 ones;
+        // The rays' start points and inverse directions. The block ends where the exe destroys the rays and the
+        // collectors, which gives the rays' stack memory back before the k-d tree casts.
         {
-            // EXE-INLINED none: hkLocalArray<hkAabbTreeData::Ray>::hkLocalArray(numRays) (hkAllocateStack)
-            rays.m_data = nullptr;
-            rays.m_size = 0;
-            rays.m_capacityAndFlags = hkArrayBase<hkAabbTreeData::Ray>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                pBlock + ((numRays * static_cast<int32_t>(sizeof(hkAabbTreeData::Ray)) + 127) & ~127);
-            rays.m_data = reinterpret_cast<hkAabbTreeData::Ray*>(pBlock);
-            rays.m_capacityAndFlags = numRays | hkArrayBase<hkAabbTreeData::Ray>::DONT_DEALLOCATE_FLAG;
-            rays.m_localMemory = rays.m_data;
-        }
-        {
-            // EXE-INLINED none: hkArray<hkAabbTreeData::Ray>::setSize(numRays)
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            const int32_t capacity =
-                static_cast<int32_t>(rays.m_capacityAndFlags & hkArrayBase<hkAabbTreeData::Ray>::CAPACITY_MASK);
-            if (capacity < numRays) {
-                const int32_t doubled = 2 * capacity;
-                hkArrayUtil::_reserve(
-                    heap, &rays, numRays < doubled ? doubled : numRays,
-                    static_cast<int32_t>(sizeof(hkAabbTreeData::Ray))
+            hkLocalArray<hkAabbTreeData::Ray> rays(numRays);
+            {
+                // EXE-INLINED none: hkArray<hkAabbTreeData::Ray>::setSize(numRays)
+                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
+                const int32_t capacity =
+                    static_cast<int32_t>(rays.m_capacityAndFlags & hkArrayBase<hkAabbTreeData::Ray>::CAPACITY_MASK);
+                if (capacity < numRays) {
+                    const int32_t doubled = 2 * capacity;
+                    hkArrayUtil::_reserve(
+                        heap, &rays, numRays < doubled ? doubled : numRays,
+                        static_cast<int32_t>(sizeof(hkAabbTreeData::Ray))
+                    );
+                }
+                rays.setSizeUnchecked(numRays);
+            }
+
+            // One collector per lane of a ray bundle; castRayFiltering steps through them.
+            hkCpuWorldRayCastCollector collectors[4];
+
+            // EXE-INLINED none: hkLocalBuffer<hkpFixedBufferRayHitCollector>::hkLocalBuffer(4) (hkAllocateStack)
+            hkStackMemory& bufferStack = hkMemoryRouter::getInstance().m_stack;
+            // The fixed buffer collectors' storage is carved out of the stack allocator's untyped free bytes;
+            // castRayFiltering constructs each one it uses.
+            char* pBufferBlock = bufferStack.m_next.m_storage;
+            bufferStack.m_next.m_storage =
+                pBufferBlock + ((4 * static_cast<int32_t>(sizeof(hkpFixedBufferRayHitCollector)) + 127) & ~127);
+            hkpFixedBufferRayHitCollector* fixedBufferCollectors =
+                reinterpret_cast<hkpFixedBufferRayHitCollector*>(pBufferBlock);
+
+            for (int32_t i = 0; i < numRays; i++) {
+                // EXE-INLINED none: hkAabbTreeData::Ray::setRay: the direction's zero lanes are 1 for the reciprocal
+                // estimate (w too) and the largest float in the Newton-refined inverse direction.
+                hkAabbTreeData::Ray& ray = rays.m_data[i];
+                ray.m_start.m_quad = commands[i].m_rayInput.m_from.m_quad;
+                const __m128 delta =
+                    _mm_sub_ps(commands[i].m_rayInput.m_to.m_quad, commands[i].m_rayInput.m_from.m_quad);
+                const __m128 isZero = _mm_cmpeq_ps(delta, hkVector4Zero.m_quad);
+                __m128 masked = _mm_or_ps(_mm_andnot_ps(isZero, delta), _mm_and_ps(isZero, hkQuadReal1111));
+                masked = _mm_shuffle_ps(masked, _mm_unpackhi_ps(masked, hkQuadReal1111), _MM_SHUFFLE(3, 0, 1, 0));
+                const __m128 rcp = _mm_rcp_ps(masked);
+                ray.m_invDir.m_quad = _mm_or_ps(
+                    _mm_andnot_ps(isZero, _mm_sub_ps(_mm_add_ps(rcp, rcp), _mm_mul_ps(_mm_mul_ps(rcp, masked), rcp))),
+                    _mm_and_ps(isZero, rdata_10CD670)
                 );
             }
-            rays.setSizeUnchecked(numRays);
-        }
 
-        // One collector per lane of a ray bundle; castRayFiltering steps through them.
-        using CollectorArray = hkCpuWorldRayCastCollector[4];
-        XFNV_INLINED_LOCAL(CollectorArray, collectors, std::nullopt, std::nullopt);
-        for (hkCpuWorldRayCastCollector& c : collectors) {
-            ::new (&c) hkCpuWorldRayCastCollector;
-        }
-
-        // EXE-INLINED none: hkLocalBuffer<hkpFixedBufferRayHitCollector>::hkLocalBuffer(4) (hkAllocateStack)
-        hkStackMemory& bufferStack = hkMemoryRouter::getInstance().m_stack;
-        // The fixed buffer collectors' storage is carved out of the stack allocator's untyped free bytes;
-        // castRayFiltering constructs each one it uses.
-        char* pBufferBlock = bufferStack.m_next.m_storage;
-        bufferStack.m_next.m_storage =
-            pBufferBlock + ((4 * static_cast<int32_t>(sizeof(hkpFixedBufferRayHitCollector)) + 127) & ~127);
-        hkpFixedBufferRayHitCollector* fixedBufferCollectors =
-            reinterpret_cast<hkpFixedBufferRayHitCollector*>(pBufferBlock);
-
-        for (int32_t i = 0; i < numRays; i++) {
-            // EXE-INLINED none: hkAabbTreeData::Ray::setRay: the direction's zero lanes are 1 for the reciprocal
-            // estimate (w too) and the largest float in the Newton-refined inverse direction.
-            hkAabbTreeData::Ray& ray = rays.m_data[i];
-            ray.m_start.m_quad = commands[i].m_rayInput.m_from.m_quad;
-            const __m128 delta = _mm_sub_ps(commands[i].m_rayInput.m_to.m_quad, commands[i].m_rayInput.m_from.m_quad);
-            const __m128 isZero = _mm_cmpeq_ps(delta, hkVector4Zero.m_quad);
-            __m128 masked = _mm_or_ps(_mm_andnot_ps(isZero, delta), _mm_and_ps(isZero, hkQuadReal1111));
-            masked = _mm_shuffle_ps(masked, _mm_unpackhi_ps(masked, hkQuadReal1111), _MM_SHUFFLE(3, 0, 1, 0));
-            const __m128 rcp = _mm_rcp_ps(masked);
-            ray.m_invDir.m_quad = _mm_or_ps(
-                _mm_andnot_ps(isZero, _mm_sub_ps(_mm_add_ps(rcp, rcp), _mm_mul_ps(_mm_mul_ps(rcp, masked), rcp))),
-                _mm_and_ps(isZero, rdata_10CD670)
+            ones.setAll(1.0f);
+            for (hkCpuWorldRayCastCollector& c : collectors) {
+                c.m_earlyOutHitFraction.m_quad = ones.m_quad;
+                c.m_filter = filter;
+            }
+            hkAabbTreeRayCastUtil<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::castRayFiltering(
+                job.m_aabbTreeFp, rays.m_data, commands, filter, collectors, fixedBufferCollectors, numRays
             );
-        }
+            hkAabbTreeRayCastUtil<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::castRayFiltering(
+                job.m_aabbTreeInt16, rays.m_data, commands, filter, collectors, fixedBufferCollectors, numRays
+            );
 
-        hkVector4 ones;
-        ones.setAll(1.0f);
-        for (hkCpuWorldRayCastCollector& c : collectors) {
-            c.m_earlyOutHitFraction.m_quad = ones.m_quad;
-            c.m_filter = filter;
+            // EXE-INLINED none: hkLocalBuffer<hkpFixedBufferRayHitCollector>::~hkLocalBuffer (hkDeallocateStack)
+            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBufferBlock;
         }
-        hkAabbTreeRayCastUtil<hkAabbTreeData::hkAabbTreeAabb, uint16_t>::castRayFiltering(
-            job.m_aabbTreeFp, rays.m_data, commands, filter, collectors, fixedBufferCollectors, numRays
-        );
-        hkAabbTreeRayCastUtil<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::castRayFiltering(
-            job.m_aabbTreeInt16, rays.m_data, commands, filter, collectors, fixedBufferCollectors, numRays
-        );
-
-        // EXE-INLINED none: hkLocalBuffer<hkpFixedBufferRayHitCollector>::~hkLocalBuffer (hkDeallocateStack)
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBufferBlock;
-        // Each collector's destructor, the last one first.
-        for (int32_t i = 3; i >= 0; i--) {
-            collectors[i].~hkCpuWorldRayCastCollector();
-        }
-        rays.~hkLocalArray<hkAabbTreeData::Ray>();
 
         const hkKdTree* kdTree = job.m_kdTree;
         // No output buffer, capacity 1; the collector is deliberately not destroyed, as the game does.

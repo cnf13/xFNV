@@ -738,11 +738,7 @@ void calcCovarianceOfTriangles(
     zero.setZero4();
     hkVector4 weightedSum;
     weightedSum.setZero4();
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, centroids, std::nullopt, std::nullopt);
-    centroids.m_data = nullptr;
-    centroids.m_size = 0;
-    centroids.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> centroids;
     const int32_t numTriangles = numVertices / 3;
     hkVector4* pCentroid;
     {
@@ -852,18 +848,6 @@ void calcCovarianceOfTriangles(
         }
         centroidOut.m_quad = weightedSum.m_quad;
     }
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacityAndFlags = centroids.m_capacityAndFlags;
-        centroids.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                centroids.m_data,
-                (capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
 }
 
 // Whether the vertices are the 8 corners of a box (the file-local helper of hkGeometryUtility::calcObb): the vertices
@@ -894,11 +878,7 @@ bool getIsBoxGeometry(
     if (cornersCapacityAndFlags == 0) {
         cornersCapacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
     }
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, onSphere, std::nullopt, std::nullopt);
-    onSphere.m_data = nullptr;
-    onSphere.m_size = 0;
-    onSphere.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> onSphere;
     const int32_t numVertices = vertices.m_size;
     for (int32_t i = 0; i < numVertices; ++i) {
         const hkVector4& vertex = vertices.m_data[i];
@@ -1056,18 +1036,6 @@ bool getIsBoxGeometry(
     }
 done:
     {
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacityAndFlags = onSphere.m_capacityAndFlags;
-        onSphere.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                onSphere.m_data,
-                (capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
-    {
         // EXE-INLINED none: hkArray<hkVector4>::~hkArray (the corner buffer's free)
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
         if (cornersCapacityAndFlags >= 0) {
@@ -1212,16 +1180,12 @@ void hkGeometryUtility::createConvexGeometry(
 }
 
 // Fills geometryOut with the convex hull of the vertices of the planes' intersection, or empties it (its triangles'
-// size first) when there are none. The vertex list starts empty (no storage, not ours). The size compare is signed.
+// size first) when there are none. The size compare is signed.
 void hkGeometryUtility::createGeometryFromPlaneEquations(
     const hkArray<hkVector4, hkContainerHeapAllocator>& planeEquationsIn,
     hkGeometry& geometryOut
 ) {
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, hullVertices, std::nullopt, std::nullopt);
-    hullVertices.m_data = nullptr;
-    hullVertices.m_size = 0;
-    hullVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> hullVertices;
     calcConvexHullVertices(planeEquationsIn, hullVertices);
     if (hullVertices.m_size > 0) {
         hkStridedVertices vertices;
@@ -1233,16 +1197,6 @@ void hkGeometryUtility::createGeometryFromPlaneEquations(
     else {
         geometryOut.m_triangles.m_size = 0;
         geometryOut.m_vertices.m_size = 0;
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCapacityAndFlags = hullVertices.m_capacityAndFlags;
-    hullVertices.m_size = 0;
-    if (iCapacityAndFlags >= 0) {
-        pHeap->bufFree(
-            hullVertices.m_data,
-            (iCapacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(hkVector4))
-        );
     }
 }
 
@@ -1256,30 +1210,9 @@ void hkGeometryUtility::calcObb(
     hkTransform& transform,
     hkGeomObbMode mode
 ) {
-    // EXE-INLINED none: hkGeometry::hkGeometry
-    XFNV_INLINED_LOCAL(hkGeometry, geometry, std::nullopt, std::nullopt);
-    geometry.m_vertices.m_data = nullptr;
-    geometry.m_vertices.m_size = 0;
-    geometry.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    geometry.m_triangles.m_data = nullptr;
-    geometry.m_triangles.m_size = 0;
-    geometry.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
+    hkGeometry geometry;
     hkGeometryUtility::createConvexGeometry(stridedVertsIn, geometry);
-    XFNV_INLINED_LOCAL(hkLocalArray<hkVector4>, corners, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray(3 * numTriangles) (hkAllocateStack)
-        const int32_t capacity = 3 * geometry.m_triangles.m_size;
-        corners.m_data = nullptr;
-        corners.m_size = 0;
-        corners.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((capacity * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
-        corners.m_capacityAndFlags = capacity | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        corners.m_data = static_cast<hkVector4*>(static_cast<void*>(pBlock));
-        corners.m_localMemory = corners.m_data;
-    }
+    hkLocalArray<hkVector4> corners(3 * geometry.m_triangles.m_size);
     {
         // EXE-INLINED none: hkArray<hkVector4>::setSize
         const int32_t size = 3 * geometry.m_triangles.m_size;
@@ -1344,8 +1277,6 @@ void hkGeometryUtility::calcObb(
         transform.m_rotation.m_col2.m_quad = pAxes[2].m_quad;
         transform.m_translation.m_quad = pCenter->m_quad;
     }
-    corners.~hkLocalArray<hkVector4>();
-    geometry.~hkGeometry();
 }
 
 void hkPseudoRandomGenerator::getRandomVector01(hkVector4& vecOut) {

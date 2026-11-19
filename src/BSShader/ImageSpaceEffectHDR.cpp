@@ -27,38 +27,10 @@ void ImageSpaceEffectHDR::Render(
     ImageSpaceEffectParam* apParam,
     int32_t abEndFrame
 ) {
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, psrc, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, pdst, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, pblursrc, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ImageSpaceTexture, blurswap, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x4EBB70
-    psrc.bForceAniso = false;
-    psrc.bIsRenderedTexture = false;
-    psrc.bIsTextureBorrowed = false;
-    psrc.spTexture = nullptr;
-    psrc.eFilterMode = 0;
-    psrc.eClampMode = 0;
-    // EXE-INLINED 0x4EBB70
-    pdst.bForceAniso = false;
-    pdst.bIsRenderedTexture = false;
-    pdst.bIsTextureBorrowed = false;
-    pdst.spTexture = nullptr;
-    pdst.eFilterMode = 0;
-    pdst.eClampMode = 0;
-    // EXE-INLINED 0x4EBB70
-    pblursrc.bForceAniso = false;
-    pblursrc.bIsRenderedTexture = false;
-    pblursrc.bIsTextureBorrowed = false;
-    pblursrc.spTexture = nullptr;
-    pblursrc.eFilterMode = 0;
-    pblursrc.eClampMode = 0;
-    // EXE-INLINED 0x4EBB70
-    blurswap.bForceAniso = false;
-    blurswap.bIsRenderedTexture = false;
-    blurswap.bIsTextureBorrowed = false;
-    blurswap.spTexture = nullptr;
-    blurswap.eFilterMode = 0;
-    blurswap.eClampMode = 0;
+    ImageSpaceTexture psrc;
+    ImageSpaceTexture pdst;
+    ImageSpaceTexture pblursrc;
+    ImageSpaceTexture blurswap;
     if (bParamsChanged) {
         bParamsChanged = UpdateParams(apParam);
     }
@@ -69,14 +41,7 @@ void ImageSpaceEffectHDR::Render(
     NiTexturingProperty::FilterMode eFilterMode =
         BSShaderManager::bFPFiltering ? NiTexturingProperty::FILTER_BILERP : NiTexturingProperty::FILTER_NEAREST;
     if (bUseAnisoDownsample) {
-        XFNV_INLINED_LOCAL(ImageSpaceTexture, kAnisoTex, std::nullopt, std::nullopt);
-        // EXE-INLINED 0x4EBB70
-        kAnisoTex.bForceAniso = false;
-        kAnisoTex.bIsRenderedTexture = false;
-        kAnisoTex.bIsTextureBorrowed = false;
-        kAnisoTex.spTexture = nullptr;
-        kAnisoTex.eFilterMode = 0;
-        kAnisoTex.eClampMode = 0;
+        ImageSpaceTexture kAnisoTex;
         ImageSpaceEffect* pEffect = pEffectList.m_pBase[7].m_pObject;
         ImageSpaceShaderParam* pParam = pEffectParamList.m_pBase[7].m_pObject;
         kAnisoTex.BorrowRenderedTexture(BSTextureManager::TEX_HDR_DOWNSAMPLE_ANISOINTERMEDIATE);
@@ -100,7 +65,6 @@ void ImageSpaceEffectHDR::Render(
         static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer)
             ->m_pkD3DDevice9->SetSamplerState(0, D3DSAMP_MAXANISOTROPY, 1);
         kAnisoTex.ReturnRenderedTexture();
-        kAnisoTex.~ImageSpaceTexture();
     }
     else {
         ImageSpaceEffect* pEffect = pEffectList.m_pBase[5].m_pObject;
@@ -276,10 +240,6 @@ void ImageSpaceEffectHDR::Render(
     if (psrc.GetTexture() != pAdapted) {
         psrc.ReturnRenderedTexture();
     }
-    blurswap.~ImageSpaceTexture();
-    pblursrc.~ImageSpaceTexture();
-    pdst.~ImageSpaceTexture();
-    psrc.~ImageSpaceTexture();
 }
 
 // Binds the eleven HDR passes to the manager's shader effects, each with its own shader parameters: the low-res flag

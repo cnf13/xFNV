@@ -1896,21 +1896,18 @@ bool TESObjectCELL::PickWaterDistance(NiPick* apPick, const NiPoint3& aOrigin, c
 }
 
 void TESObjectCELL::FreeLoadedData() {
-    XFNV_INLINED_LOCAL(NiPointer<BSMultiBoundNode>, spnode, std::nullopt, std::nullopt);
     NiTMapItem<TESObjectREFR*, NiPointer<BSMultiBoundNode>>* iter;
     if (pLoadedData) {
         pLoadedData->ScriptedRefs.RemoveAll();
         pLoadedData->ActivatingRefs.RemoveAll();
         iter = pLoadedData->MultiboundRefMap.GetFirstPos();
         while (iter) {
-            ::new (&spnode) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+            NiPointer<BSMultiBoundNode> spnode(static_cast<BSMultiBoundNode*>(nullptr));
             TESObjectREFR* pref = nullptr;
             pLoadedData->MultiboundRefMap.GetNext(iter, pref, spnode);
             if ((pref) && (spnode.m_pObject) && (spnode.m_pObject->QMultiBound()->m_uiRefCount == 2)) {
                 pref->FreeMultiBound();
             }
-
-            spnode.~NiPointer<BSMultiBoundNode>();
         }
         if (pLoadedData->spCell3D.m_pObject) {
             ClearPortalGraph();
@@ -6623,15 +6620,13 @@ void TESObjectCELL::BuildLocalMapDoorList(BSSimpleList<TESObjectREFR*>* apOutLis
 }
 
 void TESObjectCELL::GetExteriorLocalMapTexture(NiPointer<NiTexture>& aspTexture) {
-    XFNV_INLINED_LOCAL(NiPointer<BSRenderedTexture>, sprt, std::nullopt, std::nullopt);
     NiPointer<NiTexture> sprettex(static_cast<NiTexture*>(nullptr));
     const char* v5 = "GetExteriorLocalMapTexture";
     if (!GetInterior()) {
-        ::new (&sprt) NiPointer<ActorPathingMessageQueue>(static_cast<ActorPathingMessageQueue*>(nullptr));
+        NiPointer<BSRenderedTexture> sprt(static_cast<BSRenderedTexture*>(nullptr));
         TakeExteriorLocalMapPicture(sprt);
         sprettex.operator=(static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0)));
         sprt.m_pObject->ClearRenderedTextures();
-        sprt.~NiPointer<BSRenderedTexture>();
     }
     aspTexture.operator=(sprettex);
 }
@@ -7915,8 +7910,7 @@ bool& TESObjectCELL::GetThreadLoadingTempData() {
 void TESObjectCELL::RunQueuedParticleUpdates() {
     QueuedParticleLock.Lock(nullptr);
     while (!QueuedParticleUpdates.IsEmpty()) {
-        XFNV_INLINED_LOCAL(NiPointer<NiAVObject>, spObject, std::nullopt, std::nullopt);
-        spObject.SetPointer(&QueuedParticleUpdates.GetItem());
+        NiPointer<NiAVObject> spObject(QueuedParticleUpdates.GetItem());
         QueuedParticleUpdates.RemoveHead();
         UpdateParticlesOnly(spObject.operator->());
         if (spObject.operator->() != nullptr && spObject->IsFadeNode() != nullptr && spObject->GetWorldBoundChange()) {
@@ -7926,7 +7920,6 @@ void TESObjectCELL::RunQueuedParticleUpdates() {
                 spObject->SetWorldBoundChange(false);
             }
         }
-        spObject.~NiPointer<NiAVObject>();
     }
     QueuedParticleLock.Unlock();
 }

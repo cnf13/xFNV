@@ -518,17 +518,9 @@ hkBool bhkRagdollController::castRay(
         else {
             hkpCachingShapePhantomRay* pPhantom = pControllerPhantom;
             if (pPhantom) {
-                XFNV_INLINED_LOCAL(hkpWorldRayCastInput, kInput, std::nullopt, std::nullopt);
-                XFNV_INLINED_LOCAL(hkpWorldRayCastOutput, kOutput, std::nullopt, std::nullopt);
-                // EXE-INLINED 0x4A3CC0
-                kInput.m_enableShapeCollectionFilter.m_bool = false;
+                hkpWorldRayCastInput kInput;
+                hkpWorldRayCastOutput kOutput;
                 kInput.m_filterInfo = (uiGroup << 16) | L_CUSTOMPICK1;
-                // EXE-INLINED 0x4A3D00
-                kOutput.m_hitFraction = 1.0f;
-                kOutput.m_extraInfo = -1;
-                kOutput.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
-                kOutput.m_shapeKeyIndex = 0;
-                kOutput.m_rootCollidable = nullptr;
                 kInput.m_from.m_quad = arFromWS.m_quad;
                 kInput.m_to.m_quad = arToWS.m_quad;
                 pPhantom->castRay(kInput, kOutput);
@@ -1706,8 +1698,8 @@ void bhkRagdollController::UpdateDebugLines(bhkRagdollController::DEBUG_SKEL aeS
     hkaSkeleton* pskel =
         aeSkeleton == bhkRagdollController::SKEL_RAGDOLL ? pShareData->pLowSkel : pShareData->pHighSkel;
     int32_t inumBones = pskel->m_bones.m_size;
-    // EXE-INLINED none: hkArray<hkQsTransform>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkQsTransform>, posMSRag, std::nullopt, std::nullopt);
+    hkArray<hkQsTransform> posMSRag;
+    // EXE-INLINED none: hkArray<hkQsTransform>::hkArray(int), the allocation after hkArray()
     int32_t iNumAlloc = inumBones;
     hkMemoryAllocator& kHeap = *hkMemoryRouter::getInstance().m_heap;
     posMSRag.m_data = iNumAlloc ? kHeap._bufAlloc<hkQsTransform>(iNumAlloc) : nullptr;
@@ -1766,13 +1758,6 @@ void bhkRagdollController::UpdateDebugLines(bhkRagdollController::DEBUG_SKEL aeS
         pverts[0] = start;
         pverts[1] = end;
         ++uiLineIdx;
-    }
-    // EXE-INLINED none: hkArray<hkQsTransform>::~hkArray
-    hkMemoryAllocator& kFreeHeap = *hkMemoryRouter::getInstance().m_heap;
-    if ((posMSRag.m_capacityAndFlags & static_cast<int32_t>(hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG)) == 0) {
-        kFreeHeap._bufFree<hkQsTransform>(
-            posMSRag.m_data, posMSRag.m_capacityAndFlags & hkArrayBase<hkQsTransform>::CAPACITY_MASK
-        );
     }
 }
 
@@ -3065,29 +3050,8 @@ void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkelet
     if (bhkUtilFunctions::FindNextCollisionObject(apObject)) {
         bhkCollisionObject* pcol = bhkUtilFunctions::FindNextCollisionObject(apObject);
         pRagdollRoot = pcol->m_pkSceneObject->m_pkParent;
-        // EXE-INLINED none: hkLocalArray<hkpRigidBody *>::hkLocalArray(64) (hkAllocateStack); 64 pointers fill whole
-        // 128-byte blocks, so the stack block is not rounded up.
-        XFNV_INLINED_LOCAL(hkLocalArray<hkpRigidBody*>, rbarray, std::nullopt, std::nullopt);
-        rbarray.m_data = nullptr;
-        rbarray.m_size = 0;
-        rbarray.m_capacityAndFlags = hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& rbStack = hkMemoryRouter::getInstance().m_stack;
-        char* pRbBlock = rbStack.m_next.m_storage;
-        rbStack.m_next.m_storage = pRbBlock + 64 * sizeof(hkpRigidBody*);
-        rbarray.m_data = static_cast<hkpRigidBody**>(static_cast<void*>(pRbBlock));
-        rbarray.m_capacityAndFlags = 64 | hkArrayBase<hkpRigidBody*>::DONT_DEALLOCATE_FLAG;
-        rbarray.m_localMemory = rbarray.m_data;
-        // EXE-INLINED none: hkLocalArray<hkpConstraintInstance *>::hkLocalArray(64) (hkAllocateStack)
-        XFNV_INLINED_LOCAL(hkLocalArray<hkpConstraintInstance*>, constarray, std::nullopt, std::nullopt);
-        constarray.m_data = nullptr;
-        constarray.m_size = 0;
-        constarray.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& constStack = hkMemoryRouter::getInstance().m_stack;
-        char* pConstBlock = constStack.m_next.m_storage;
-        constStack.m_next.m_storage = pConstBlock + 64 * sizeof(hkpConstraintInstance*);
-        constarray.m_data = static_cast<hkpConstraintInstance**>(static_cast<void*>(pConstBlock));
-        constarray.m_capacityAndFlags = 64 | hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        constarray.m_localMemory = constarray.m_data;
+        hkLocalArray<hkpRigidBody*> rbarray(64);
+        hkLocalArray<hkpConstraintInstance*> constarray(64);
         FindBones(pcol->m_pkSceneObject, rbarray, constarray);
         hkResult ires = hkaRagdollUtils::reorderForRagdoll(rbarray, constarray);
         if (ires != HK_FAILURE) {
@@ -3181,9 +3145,6 @@ void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkelet
                     ::new (pRagdollToSGMemory) hkaSkeletonMapper(&low_high_data);
             }
         }
-
-        constarray.~hkLocalArray<hkpConstraintInstance*>();
-        rbarray.~hkLocalArray<hkpRigidBody*>();
     }
 }
 

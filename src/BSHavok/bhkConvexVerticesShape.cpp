@@ -85,16 +85,8 @@ void bhkConvexVerticesShape::LoadBinary(NiStream& arStream) {
 void bhkConvexVerticesShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkConvexVerticesShapeCinfo* pCinfo = static_cast<hkConvexVerticesShapeCinfo*>(&CreateCinfo(bCreated));
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, kVertices, std::nullopt, std::nullopt);
-    kVertices.m_data = nullptr;
-    kVertices.m_size = 0;
-    kVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, kPlanes, std::nullopt, std::nullopt);
-    kPlanes.m_data = nullptr;
-    kPlanes.m_size = 0;
-    kPlanes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> kVertices;
+    hkArray<hkVector4> kPlanes;
     {
         // EXE-INLINED 0xD9EC10: hkArray::swap
         hkVector4* pData = kVertices.m_data;
@@ -132,20 +124,6 @@ void bhkConvexVerticesShape::SaveBinary(NiStream& arStream) {
         int32_t iSize = static_cast<int32_t>(QCinfoSize());
         bhkStream::SwapHKArray(pCinfo, iSize, &pCinfo->m_vertices);
         bhkStream::SwapHKArray(pCinfo, iSize, &pCinfo->m_planeEquations);
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator* pHeap = &hkMemoryRouter::getInstance().heap();
-    kPlanes.m_size = 0;
-    if (kPlanes.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(kPlanes.m_data, kPlanes.getCapacity() * static_cast<int32_t>(sizeof(hkVector4)));
-    }
-    kPlanes.m_data = nullptr;
-    kPlanes.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    pHeap = &hkMemoryRouter::getInstance().heap();
-    kVertices.m_size = 0;
-    if (kVertices.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(kVertices.m_data, kVertices.getCapacity() * static_cast<int32_t>(sizeof(hkVector4)));
     }
 }
 
@@ -254,20 +232,12 @@ void bhkConvexVerticesShape::BuildDisplayGeometry(NiNode* apNode, const NiColor&
     // Tests this for null before reading the wrapped shape, as the game does.
     const hkpConvexVerticesShape* pShape = this ? static_cast<const hkpConvexVerticesShape*>(phkObject) : nullptr;
     int32_t iNumSpheres = pShape->getNumCollisionSpheresImpl();
-    // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
-    alignas(16) XFNV_INLINED_LOCAL(hkArray<hkSphere>, kSphereBuffer, std::nullopt, std::nullopt);
-    kSphereBuffer.m_data = nullptr;
-    kSphereBuffer.m_size = 0;
-    kSphereBuffer.m_capacityAndFlags = hkArrayBase<hkSphere>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hkArray<hkSphere> kSphereBuffer;
     // EXE-INLINED none: hkArray<hkSphere>::setSize (hkSphere's construct is empty)
     kSphereBuffer.reserve(iNumSpheres);
     kSphereBuffer.setSizeUnchecked(iNumSpheres);
     const hkSphere* pSpheres = pShape->getCollisionSpheresImpl(kSphereBuffer.m_data);
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, kVertices, std::nullopt, std::nullopt);
-    kVertices.m_data = nullptr;
-    kVertices.m_size = 0;
-    kVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> kVertices;
     kVertices.setSize(iNumSpheres);
     for (int32_t i = 0; i < iNumSpheres; i++) {
         kVertices.m_data[i] = pSpheres[i].m_pos;
@@ -277,31 +247,9 @@ void bhkConvexVerticesShape::BuildDisplayGeometry(NiNode* apNode, const NiColor&
     kStridedVertices.m_vertices = &kVertices.m_data[0](0);
     kStridedVertices.m_numVertices = kVertices.getSize();
     kStridedVertices.m_striding = sizeof(hkVector4);
-    // EXE-INLINED 0xCCE5E0: hkGeometry::hkGeometry
-    XFNV_INLINED_LOCAL(hkGeometry, kGeometry, std::nullopt, std::nullopt);
-    kGeometry.m_vertices.m_data = nullptr;
-    kGeometry.m_vertices.m_size = 0;
-    kGeometry.m_vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    kGeometry.m_triangles.m_data = nullptr;
-    kGeometry.m_triangles.m_size = 0;
-    kGeometry.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
+    hkGeometry kGeometry;
     hkGeometryUtility::createConvexGeometry(kStridedVertices, kGeometry);
     BuildDisplayFromhkGeometry(apNode, &kGeometry, arDefColor, "bhkConvexVerticesShape");
-    kGeometry.~hkGeometry();
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator* pHeap = &hkMemoryRouter::getInstance().heap();
-    kVertices.m_size = 0;
-    if ((kVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-        pHeap->bufFree(kVertices.m_data, kVertices.getCapacity() * static_cast<int32_t>(sizeof(hkVector4)));
-    }
-    kVertices.m_data = nullptr;
-    kVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkSphere>::~hkArray
-    pHeap = &hkMemoryRouter::getInstance().heap();
-    kSphereBuffer.m_size = 0;
-    if ((kSphereBuffer.m_capacityAndFlags & hkArrayBase<hkSphere>::DONT_DEALLOCATE_FLAG) == 0) {
-        pHeap->bufFree(kSphereBuffer.m_data, kSphereBuffer.getCapacity() * static_cast<int32_t>(sizeof(hkSphere)));
-    }
 }
 
 // Fills arInfo from the wrapped Havok shape: the base's fields, the vertices through the shape's own helper, then the

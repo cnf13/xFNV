@@ -59,26 +59,15 @@ static void weldGeometryVertices(
         }
     }
     vertexRemapOut.m_size = numVertices;
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, uniqueVerts, std::nullopt, std::nullopt);
-    uniqueVerts.m_data = nullptr;
-    uniqueVerts.m_size = 0;
-    uniqueVerts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> uniqueVerts;
     weldVertexArray(geom.m_vertices, uniqueVerts, vertexRemapOut, threshold);
 
     // The source of the new vertices: the unique ones as welded, or in their first-use order.
     hkArray<hkVector4>* pNewVerts = &uniqueVerts;
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray, hkArray<int>::hkArray (built only when keepVertexOrder is set)
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, orderedVerts, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, uniqueToOrdered, std::nullopt, std::nullopt);
+    hkArray<hkVector4> orderedVerts;
+    hkArray<int32_t> uniqueToOrdered;
     if (keepVertexOrder.m_bool) {
-        orderedVerts.m_data = nullptr;
-        orderedVerts.m_size = 0;
-        uniqueToOrdered.m_data = nullptr;
-        uniqueToOrdered.m_size = 0;
         const int32_t numUnique = uniqueVerts.m_size;
-        orderedVerts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        uniqueToOrdered.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
         // EXE-INLINED none: hkArray<int>::setSize(numUnique, -1)
         hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
         const int32_t capacity = uniqueToOrdered.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
@@ -134,43 +123,6 @@ static void weldGeometryVertices(
             pDst->m_quad = pSrc->m_quad;
             ++pSrc;
             ++pDst;
-        }
-    }
-    if (keepVertexOrder.m_bool) {
-        // EXE-INLINED none: hkArray<int>::~hkArray. The exe resets this array after the free (0xDA14BB, 0xDA14BF),
-        // not the two hkVector4 arrays.
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        uniqueToOrdered.m_size = 0;
-        if (uniqueToOrdered.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                uniqueToOrdered.m_data,
-                (uniqueToOrdered.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(int32_t))
-            );
-        }
-        uniqueToOrdered.m_data = nullptr;
-        uniqueToOrdered.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        orderedVerts.m_size = 0;
-        if (orderedVerts.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                orderedVerts.m_data,
-                (orderedVerts.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    {
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        uniqueVerts.m_size = 0;
-        if (uniqueVerts.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                uniqueVerts.m_data,
-                (uniqueVerts.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
         }
     }
 
@@ -382,12 +334,7 @@ void hkGeometryUtils::createCapsuleGeometry(
     const hkTransform& transform,
     hkGeometry*& geometryOut
 ) {
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    using verts_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(verts_t, verts, std::nullopt, std::nullopt);
-    verts.m_data = nullptr;
-    verts.m_size = 0;
-    verts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> verts;
     const int32_t phiSamples = thetaSamples >> 1;
 
     // The capsule's frame: z along end - start, the origin halfway between them.
@@ -678,46 +625,14 @@ void hkGeometryUtils::createCapsuleGeometry(
         triangles.m_size++;
     }
     geometryOut = geom;
-
-    // verts' destructor.
-    hkMemoryAllocator& freeHeap = *hkMemoryRouter::getInstance().m_heap;
-    const int32_t vertsCapacityAndFlags = verts.m_capacityAndFlags;
-    verts.m_size = 0;
-    if (vertsCapacityAndFlags >= 0) {
-        const int32_t vertsCapacity =
-            static_cast<int32_t>(vertsCapacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-        freeHeap.bufFree(verts.m_data, vertsCapacity * static_cast<int32_t>(sizeof(hkVector4)));
-    }
 }
 
-// Performs the full weld (weldGeometryVertices) with keepVertexOrder false; its two remap arrays are discarded locals,
-// freed as their destructors do, the triangle remap first.
+// Performs the full weld (weldGeometryVertices) with keepVertexOrder false; its two remap arrays are discarded locals.
 void hkGeometryUtils::weldVertices(hkGeometry& meshGeometry, float threshold) {
-    // EXE-INLINED none: hkArray<int32_t>::hkArray (twice)
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, vertexRemap, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, triangleRemap, std::nullopt, std::nullopt);
-    vertexRemap.m_data = nullptr;
-    vertexRemap.m_size = 0;
-    vertexRemap.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    triangleRemap.m_data = nullptr;
-    triangleRemap.m_size = 0;
-    triangleRemap.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    hkArray<int32_t> vertexRemap;
+    hkArray<int32_t> triangleRemap;
     const float kThreshold = threshold;
     hkBool keepVertexOrder;
     keepVertexOrder.m_bool = 0;
     weldGeometryVertices(meshGeometry, kThreshold, keepVertexOrder, vertexRemap, triangleRemap);
-    // EXE-INLINED none: hkArray<int32_t>::~hkArray (twice). The exe resets the first array freed (0xDA2524,
-    // 0xDA2528), not the second.
-    hkMemoryAllocator& triangleHeap = *hkMemoryRouter::getInstance().m_heap;
-    triangleRemap.m_size = 0;
-    if (triangleRemap.m_capacityAndFlags >= 0) {
-        triangleHeap._bufFree<int32_t>(triangleRemap.m_data, triangleRemap.getCapacity());
-    }
-    triangleRemap.m_data = nullptr;
-    triangleRemap.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator& vertexHeap = *hkMemoryRouter::getInstance().m_heap;
-    vertexRemap.m_size = 0;
-    if (vertexRemap.m_capacityAndFlags >= 0) {
-        vertexHeap._bufFree<int32_t>(vertexRemap.m_data, vertexRemap.getCapacity());
-    }
 }

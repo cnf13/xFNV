@@ -179,39 +179,12 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
     hkpEntity* const* bodies = island->m_entities.begin();
     hkpEntity* const* const bodiesEnd = bodies + numBodies;
 
-    // EXE-INLINED none: hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>::hkArray
-    using normalPriorityConstraints_t = hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(normalPriorityConstraints_t, normalPriorityConstraints, std::nullopt, std::nullopt);
-    normalPriorityConstraints.m_data = nullptr;
-    normalPriorityConstraints.m_size = 0;
-    normalPriorityConstraints.m_capacityAndFlags = hkArrayBase<hkConstraintInternalInfo>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkConstraintInternalInfo, hkContainerTempAllocator> normalPriorityConstraints;
     normalPriorityConstraints._reserve(hkMemoryRouter::getInstance().temp(), island->m_numConstraints);
-    // EXE-INLINED none: hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>::hkArray
-    using highPriorityConstraints_t = hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(highPriorityConstraints_t, highPriorityConstraints, std::nullopt, std::nullopt);
-    highPriorityConstraints.m_data = nullptr;
-    highPriorityConstraints.m_size = 0;
-    highPriorityConstraints.m_capacityAndFlags = hkArrayBase<hkConstraintInternalInfo>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkConstraintInternalInfo, hkContainerTempAllocator> highPriorityConstraints;
     highPriorityConstraints._reserve(hkMemoryRouter::getInstance().temp(), island->m_numConstraints);
 
-    // The stack allocator's bytes are untyped memory; each local array keeps its elements there.
-    XFNV_INLINED_LOCAL(hkLocalArray<hkConstraintInternalCallbackInfo>, callbackConstraints, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkConstraintInternalCallbackInfo>::hkLocalArray(island->m_numConstraints)
-        // (hkAllocateStack)
-        const int32_t capacity = island->m_numConstraints;
-        callbackConstraints.m_data = nullptr;
-        callbackConstraints.m_size = 0;
-        callbackConstraints.m_capacityAndFlags = hkArrayBase<hkConstraintInternalCallbackInfo>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((capacity * static_cast<int32_t>(sizeof(hkConstraintInternalCallbackInfo)) + 127) & ~127);
-        callbackConstraints.m_data = reinterpret_cast<hkConstraintInternalCallbackInfo*>(pBlock);
-        callbackConstraints.m_capacityAndFlags =
-            capacity | hkArrayBase<hkConstraintInternalCallbackInfo>::DONT_DEALLOCATE_FLAG;
-        callbackConstraints.m_localMemory = callbackConstraints.m_data;
-    }
+    hkLocalArray<hkConstraintInternalCallbackInfo> callbackConstraints(island->m_numConstraints);
 
     // Whether every constraint is of the normal type; else the island is solved in a single thread.
     int32_t canSolveInParallel = 1;
@@ -223,8 +196,7 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
         }
         const int32_t pointerBufferSize = 4 * numSlots;
         hkUlong* pointerBuffer = hkMemoryRouter::getInstance().temp()._blockAlloc<hkUlong>(pointerBufferSize);
-        using entityPtrToIndex_t = hkUlongMapBase;
-        XFNV_INLINED_LOCAL(entityPtrToIndex_t, entityPtrToIndex, std::nullopt, std::nullopt);
+        hkUlongMapBase entityPtrToIndex;
         // EXE-INLINED none: hkMap<hkUlong, hkUlong>::hkMap(pointerBuffer, size)
         entityPtrToIndex.init(pointerBuffer, pointerBufferSize * static_cast<int32_t>(sizeof(hkUlong)));
         // The map keys an entity by its address converted to the map's 32-bit storage integer (hkPointerMap::ToMapInt's
@@ -310,22 +282,7 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
     hkpSolveConstraintBatchTask* firstTaskOfPreviousBatch = nullptr;
     hkpSolveConstraintBatchTask* firstTaskOfCurrentBatch = nullptr;
 
-    XFNV_INLINED_LOCAL(hkLocalArray<hkConstraintInternalInfo>, constraintsForThisTask, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkConstraintInternalInfo>::hkLocalArray(MAX_NUM_ATOM_INFOS) (hkAllocateStack)
-        const int32_t capacity = hkpBuildJacobianTask::MAX_NUM_ATOM_INFOS;
-        constraintsForThisTask.m_data = nullptr;
-        constraintsForThisTask.m_size = 0;
-        constraintsForThisTask.m_capacityAndFlags = hkArrayBase<hkConstraintInternalInfo>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((capacity * static_cast<int32_t>(sizeof(hkConstraintInternalInfo)) + 127) & ~127);
-        constraintsForThisTask.m_data = reinterpret_cast<hkConstraintInternalInfo*>(pBlock);
-        constraintsForThisTask.m_capacityAndFlags =
-            capacity | hkArrayBase<hkConstraintInternalInfo>::DONT_DEALLOCATE_FLAG;
-        constraintsForThisTask.m_localMemory = constraintsForThisTask.m_data;
-    }
+    hkLocalArray<hkConstraintInternalInfo> constraintsForThisTask(hkpBuildJacobianTask::MAX_NUM_ATOM_INFOS);
 
     // Per entity, the group of the task of the current batch that holds one of its constraints (0: none yet).
     int32_t* entityGroup = hkMemoryRouter::getInstance().temp()._blockAlloc<int32_t>(numBodies);
@@ -634,15 +591,6 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
             callbackPairs[i].m_atomInfo = callbackConstraints.m_data[i].m_atomInfo;
         }
     }
-
-    // Destroys the two local arrays (~hkLocalArray) and the two priority arrays (clearAndDeallocate through the temp
-    // allocator), the last constructed first. The local arrays' elements are not plain data: their clear calls
-    // hkArrayUtil::destruct. The two local arrays are raw storage that C++ never destroys, so their destructors are
-    // called here: without them their stack blocks are never given back.
-    constraintsForThisTask.~hkLocalArray<hkConstraintInternalInfo>();
-    callbackConstraints.~hkLocalArray<hkConstraintInternalCallbackInfo>();
-    highPriorityConstraints._clearAndDeallocate(hkMemoryRouter::getInstance().temp());
-    normalPriorityConstraints._clearAndDeallocate(hkMemoryRouter::getInstance().temp());
 
     HK_TIMER_END();
 }

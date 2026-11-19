@@ -76,36 +76,10 @@ static void* copyObjectsToChunk(
     hkObjectUpdateTracker* a3,
     const hkArrayBase<int32_t>* r_eax
 ) {
-    XFNV_INLINED_LOCAL(hkArray<char>, buffer, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<char, hkContainerHeapAllocator>::hkArray
-    buffer.m_data = nullptr;
-    buffer.m_size = 0;
-    buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    XFNV_INLINED_LOCAL(hkOstream, out, std::nullopt, std::nullopt);
-    ::new (&out) hkOstream(buffer);
-    XFNV_INLINED_LOCAL(hkRelocationInfo, reloc, std::nullopt, std::nullopt);
-    // EXE-INLINED 0xDBD870: hkRelocationInfo::hkRelocationInfo
-    reloc.m_local.m_data = nullptr;
-    reloc.m_local.m_size = 0;
-    reloc.m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
-    reloc.m_global.m_data = nullptr;
-    reloc.m_global.m_size = 0;
-    reloc.m_global.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Global>::DONT_DEALLOCATE_FLAG;
-    reloc.m_finish.m_data = nullptr;
-    reloc.m_finish.m_size = 0;
-    reloc.m_finish.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Finish>::DONT_DEALLOCATE_FLAG;
-    reloc.m_imports.m_data = nullptr;
-    reloc.m_imports.m_size = 0;
-    reloc.m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
-    reloc.m_pool = nullptr;
-    using offsets_t = hkPointerMap<void*, int32_t, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(offsets_t, offsets, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkPointerMap<void*, int32_t>::hkPointerMap
-    offsets.m_map.m_elem = nullptr;
-    offsets.m_map.m_numElems = 0;
-    offsets.m_map.m_hashMod = -1;
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    offsets.m_map.hkUlongMapBase::reserve(*pRouter->m_heap, 0);
+    hkArray<char> buffer;
+    hkOstream out(buffer);
+    hkRelocationInfo reloc;
+    hkPointerMap<void*, int32_t> offsets;
     for (int32_t i = 0; i < r_eax->m_size; ++i) {
         int32_t index = r_eax->m_data[i];
         const hkVariant& oldVariant = a1->m_data[index];
@@ -122,7 +96,7 @@ static void* copyObjectsToChunk(
         );
     }
     int32_t size = buffer.m_size;
-    pRouter = &hkMemoryRouter::getInstance();
+    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
     char* pChunk = nullptr;
     if (size) {
         pChunk = static_cast<char*>(pRouter->m_heap->blockAlloc(size));
@@ -142,17 +116,6 @@ static void* copyObjectsToChunk(
             const hkRelocationInfo::Global& global = reloc.m_global.m_data[i];
             a3->objectPointedBy(global.m_toAddress, pChunk + global.m_fromOffset);
         }
-        pRouter = &hkMemoryRouter::getInstance();
-    }
-    offsets.m_map.clearAndDeallocate(*pRouter->m_heap);
-    reloc.~hkRelocationInfo();
-    out.~hkOstream();
-    // EXE-INLINED none: hkArray<char, hkContainerHeapAllocator>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iCapacityAndFlags = buffer.m_capacityAndFlags;
-    buffer.m_size = 0;
-    if (iCapacityAndFlags >= 0) {
-        pHeap->bufFree(buffer.m_data, (iCapacityAndFlags & hkArrayBase<char>::CAPACITY_MASK) * sizeof(char));
     }
     return pChunk;
 }
@@ -333,13 +296,8 @@ void* hkVersionUtil::copyObjects(
     hkArray<hkVariant, hkContainerHeapAllocator>& objectsOut,
     hkObjectUpdateTracker& tracker
 ) {
-    using indices_t = hkArray<int32_t, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(indices_t, indices, std::nullopt, std::nullopt);
     int32_t numObjects = objectsIn.m_size;
-    // EXE-INLINED none: hkArray<int32_t, hkContainerTempAllocator>::hkArray
-    indices.m_data = nullptr;
-    indices.m_size = 0;
-    indices.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
+    hkArray<int32_t, hkContainerTempAllocator> indices;
     // EXE-INLINED none: hkArray<int32_t, hkContainerTempAllocator>::setSize
     hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
     int32_t capacity = indices.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
@@ -355,13 +313,6 @@ void* hkVersionUtil::copyObjects(
         indices.m_data[i] = i;
     }
     void* pResult = copyObjectsToChunk(&objectsIn, &objectsOut, &tracker, &indices);
-    // EXE-INLINED none: hkArray<int32_t, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator& tempFree = hkMemoryRouter::getInstance().temp();
-    int32_t iCapacityAndFlags = indices.m_capacityAndFlags;
-    indices.m_size = 0;
-    if (iCapacityAndFlags >= 0) {
-        tempFree.bufFree(indices.m_data, (iCapacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) * sizeof(int32_t));
-    }
     return pResult;
 }
 
@@ -410,18 +361,10 @@ int32_t PackfileObjectCopier::areMembersCompatible(const hkClassMember& src, con
 void hkVersionUtil::recomputeClassMemberOffsets(hkClass* const* classes, int32_t classVersion) {
     updateMetadataInplace(const_cast<hkClass**>(classes), classVersion);
     hkStructureLayout layout;
-    using classesDone_t = hkPointerMap<const hkClass*, int32_t, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(classesDone_t, classesDone, std::nullopt, std::nullopt);
-    classesDone.m_map.m_elem = nullptr;
-    classesDone.m_map.m_numElems = 0;
-    classesDone.m_map.m_hashMod = -1;
-    hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-    classesDone.m_map.hkUlongMapBase::reserve(*Instance->m_heap, 0);
+    hkPointerMap<const hkClass*, int32_t> classesDone;
     hkClass* klass = *classes;
     for (int32_t i = 0; klass; ++i) {
         layout.computeMemberOffsetsInplace(*klass, classesDone, 1);
         klass = classes[i + 1];
     }
-    hkMemoryRouter* Instance_1 = &hkMemoryRouter::getInstance();
-    classesDone.m_map.clearAndDeallocate(*Instance_1->m_heap);
 }

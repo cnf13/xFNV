@@ -19,11 +19,6 @@
 #include "Havok/Source/Common/Visualize/hkProcessContext.h"
 #include "Havok/Source/Common/Visualize/hkVisualDebugger.h"
 
-using hkInspectProcessObjectPairArray = hkArray<hkInspectProcess::ObjectPair>;
-using hkInspectProcessGlobalFixupArray = hkArray<hkObjectSerialize::GlobalFixup>;
-using hkInspectProcessCharArray = hkArray<char>;
-using hkInspectProcessUInt16Array = hkArray<uint16_t>;
-
 // The commands the process consumes, a writable byte array whose address is handed out.
 using hkInspectProcessCommands = uint8_t[5];
 static hkInspectProcessCommands s_inspectCommands{33, 34, 35, 36, 37};
@@ -147,11 +142,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             // The client's ids are the addresses of the object and its class.
             void* ptr = reinterpret_cast<void*>(static_cast<hkUlong>(id));
             const hkClass* pClass = reinterpret_cast<const hkClass*>(static_cast<hkUlong>(classId));
-            XFNV_INLINED_LOCAL(hkInspectProcessObjectPairArray, recursionStack, std::nullopt, std::nullopt);
-            // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::hkArray
-            recursionStack.m_data = nullptr;
-            recursionStack.m_size = 0;
-            recursionStack.m_capacityAndFlags = hkArrayBase<ObjectPair>::DONT_DEALLOCATE_FLAG;
+            hkArray<ObjectPair> recursionStack;
             const bool bRecurse = pClass == &hkClassClass || (flags & 2) != 0;
             writeObject(ptr, *pClass, bRecurse, recursionStack);
             // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::indexOf
@@ -185,18 +176,6 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
                     m_autoUpdateList.m_data[index] = m_autoUpdateList.m_data[m_autoUpdateList.m_size];
                 }
             }
-            // EXE-INLINED none: ~hkArray<hkInspectProcess::ObjectPair>
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            recursionStack.m_size = 0;
-            if (recursionStack.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    recursionStack.m_data,
-                    static_cast<int32_t>(
-                        (recursionStack.m_capacityAndFlags & hkArrayBase<ObjectPair>::CAPACITY_MASK) *
-                        sizeof(ObjectPair)
-                    )
-                );
-            }
             return;
         }
         case HK_UPDATE_MEMBER: {
@@ -208,12 +187,9 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             uint16_t numMembers;
             m_inStream->readArrayGeneric(&numMembers, 2, 1);
             const int32_t pathLength = numMembers;
-            XFNV_INLINED_LOCAL(hkInspectProcessUInt16Array, memberPath, std::nullopt, std::nullopt);
+            hkArray<uint16_t> memberPath;
             {
-                // EXE-INLINED none: hkArray<hkUint16>::hkArray(pathLength)
-                memberPath.m_data = nullptr;
-                memberPath.m_size = 0;
-                memberPath.m_capacityAndFlags = hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG;
+                // EXE-INLINED none: hkArray<hkUint16>::hkArray(pathLength), the storage for pathLength elements
                 hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
                 int32_t count = pathLength;
                 uint16_t* pData = nullptr;
@@ -247,12 +223,9 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             }
             int32_t dataSize;
             m_inStream->readArrayGeneric(&dataSize, 4, 1);
-            XFNV_INLINED_LOCAL(hkInspectProcessCharArray, data, std::nullopt, std::nullopt);
+            hkArray<char> data;
             {
-                // EXE-INLINED none: hkArray<char>::hkArray(dataSize)
-                data.m_data = nullptr;
-                data.m_size = 0;
-                data.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+                // EXE-INLINED none: hkArray<char>::hkArray(dataSize), the storage for dataSize elements
                 hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
                 int32_t count = dataSize;
                 char* pData = nullptr;
@@ -290,29 +263,6 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
                     hkString::memCpy(pTarget, data.m_data, dataSize);
                 }
             }
-            {
-                // EXE-INLINED none: ~hkArray<char>
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                data.m_size = 0;
-                if (data.m_capacityAndFlags >= 0) {
-                    pHeap->bufFree(
-                        data.m_data, static_cast<int32_t>(data.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)
-                    );
-                }
-                data.m_data = nullptr;
-                data.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-            }
-            // EXE-INLINED none: ~hkArray<hkUint16>
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            memberPath.m_size = 0;
-            if (memberPath.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    memberPath.m_data,
-                    static_cast<int32_t>(
-                        (memberPath.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK) * sizeof(uint16_t)
-                    )
-                );
-            }
             return;
         }
         default: return;
@@ -337,28 +287,13 @@ void hkInspectProcess::init() {
 }
 
 void hkInspectProcess::step(float frameTimeInMs) {
-    XFNV_INLINED_LOCAL(hkInspectProcessObjectPairArray, recursionStack, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::hkArray
-    recursionStack.m_data = nullptr;
-    recursionStack.m_size = 0;
-    recursionStack.m_capacityAndFlags = hkArrayBase<ObjectPair>::DONT_DEALLOCATE_FLAG;
+    hkArray<ObjectPair> recursionStack;
     for (int32_t i = 0; i < m_autoUpdateList.m_size; ++i) {
         // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::setSize(0): the heap is fetched for its reserve,
         // which never runs (a capacity is never below 0).
         hkMemoryRouter::getInstance();
         recursionStack.m_size = 0;
         writeObject(m_autoUpdateList.m_data[i].obj, *m_autoUpdateList.m_data[i].klass, false, recursionStack);
-    }
-    // EXE-INLINED none: ~hkArray<hkInspectProcess::ObjectPair>
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    recursionStack.m_size = 0;
-    if (recursionStack.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            recursionStack.m_data,
-            static_cast<int32_t>(
-                (recursionStack.m_capacityAndFlags & hkArrayBase<ObjectPair>::CAPACITY_MASK) * sizeof(ObjectPair)
-            )
-        );
     }
 }
 
@@ -411,11 +346,7 @@ int32_t hkInspectProcess::writeObject(
     hkArray<ObjectPair>& recursionStack
 ) {
     hkStructureLayout layout(hkStructureLayout::MsvcWin32LayoutRules);
-    XFNV_INLINED_LOCAL(hkInspectProcessGlobalFixupArray, globalFixups, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkObjectSerialize::GlobalFixup>::hkArray
-    globalFixups.m_data = nullptr;
-    globalFixups.m_size = 0;
-    globalFixups.m_capacityAndFlags = hkArrayBase<hkObjectSerialize::GlobalFixup>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkObjectSerialize::GlobalFixup> globalFixups;
     // The most derived class from the debugger's registry when the class is virtual.
     const hkClass* pClass = &klass;
     if (m_vdb->m_classReg) {
@@ -437,17 +368,6 @@ int32_t hkInspectProcess::writeObject(
         }
         if (index < size) {
             // Written already.
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            globalFixups.m_size = 0;
-            if (globalFixups.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    globalFixups.m_data,
-                    static_cast<int32_t>(
-                        (globalFixups.m_capacityAndFlags & hkArrayBase<hkObjectSerialize::GlobalFixup>::CAPACITY_MASK) *
-                        sizeof(hkObjectSerialize::GlobalFixup)
-                    )
-                );
-            }
             return 0;
         }
         // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::pushBack
@@ -460,11 +380,7 @@ int32_t hkInspectProcess::writeObject(
         pair.obj = ptr;
         pair.klass = pClass;
     }
-    XFNV_INLINED_LOCAL(hkInspectProcessCharArray, buffer, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<char>::hkArray
-    buffer.m_data = nullptr;
-    buffer.m_size = 0;
-    buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
+    hkArray<char> buffer;
     int32_t result;
     {
         hkArrayStreamWriter writer(&buffer, hkArrayStreamWriter::ARRAY_BORROW);
@@ -491,28 +407,6 @@ int32_t hkInspectProcess::writeObject(
         else {
             result = -1;
         }
-    }
-    // EXE-INLINED none: ~hkArray<char>
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    buffer.m_size = 0;
-    if (buffer.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            buffer.m_data, static_cast<int32_t>(buffer.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)
-        );
-    }
-    buffer.m_data = nullptr;
-    buffer.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: ~hkArray<hkObjectSerialize::GlobalFixup>
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    globalFixups.m_size = 0;
-    if (globalFixups.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            globalFixups.m_data,
-            static_cast<int32_t>(
-                (globalFixups.m_capacityAndFlags & hkArrayBase<hkObjectSerialize::GlobalFixup>::CAPACITY_MASK) *
-                sizeof(hkObjectSerialize::GlobalFixup)
-            )
-        );
     }
     return result;
 }

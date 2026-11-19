@@ -82,7 +82,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
 
     HK_TIMER_BEGIN("CPUSplit", nullptr);
     // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, directions, std::nullopt, std::nullopt);
+    hkArray<hkVector4> directions;
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         if (numRays) {
@@ -100,7 +100,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         directions.m_size = numRays;
     }
     // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, lengthsSquared, std::nullopt, std::nullopt);
+    hkArray<hkVector4> lengthsSquared;
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         if (numRays) {
@@ -118,8 +118,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         lengthsSquared.m_size = numRays;
     }
     // EXE-INLINED none: hkArray<hkArray<int32_t>>::hkArray(int) (each element's constructor too)
-    using octantRays_t = hkArray<hkArray<int32_t>>;
-    XFNV_INLINED_LOCAL(octantRays_t, octantRays, std::nullopt, std::nullopt);
+    hkArray<hkArray<int32_t>> octantRays;
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         int32_t numBytes = 8 * static_cast<int32_t>(sizeof(hkArray<int32_t>));
@@ -144,7 +143,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         rayFrom, rayTo, numRays, directions.m_data, lengthsSquared.m_data, octantRays.m_data, octantCounts
     );
     // EXE-INLINED none: hkArray<int32_t>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, unusedA, std::nullopt, std::nullopt);
+    hkArray<int32_t> unusedA;
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         int32_t numBytes = 8 * static_cast<int32_t>(sizeof(int32_t));
@@ -156,7 +155,7 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
         unusedA.m_size = 8;
     }
     // EXE-INLINED none: hkArray<int32_t>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<int32_t>, unusedB, std::nullopt, std::nullopt);
+    hkArray<int32_t> unusedB;
     {
         hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
         int32_t numBytes = 8 * static_cast<int32_t>(sizeof(int32_t));
@@ -214,74 +213,4 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
     jobThreadPool->waitForCompletion();
     worldRayCastJob->m_semaphore->acquire();
     HK_TIMER_END();
-
-    // EXE-INLINED none: hkArray<int32_t>::~hkArray
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        if (unusedB.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                unusedB.m_data,
-                (unusedB.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(int32_t))
-            );
-        }
-    }
-    // EXE-INLINED none: hkArray<int32_t>::~hkArray
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        if (unusedA.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                unusedA.m_data,
-                (unusedA.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(int32_t))
-            );
-        }
-    }
-    // EXE-INLINED none: hkArray<hkArray<int32_t>>::~hkArray (each element's destructor too)
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        hkArray<int32_t>* element = octantRays.m_data;
-        for (int32_t n = octantRays.m_size; n > 0; --n, ++element) {
-            hkMemoryAllocator& elementHeap = *hkMemoryRouter::getInstance().m_heap;
-            element->m_size = 0;
-            if (element->m_capacityAndFlags >= 0) {
-                elementHeap.bufFree(
-                    element->m_data,
-                    (element->m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(int32_t))
-                );
-            }
-            element->m_data = nullptr;
-            element->m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        }
-        if (octantRays.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                octantRays.m_data,
-                (octantRays.m_capacityAndFlags & hkArrayBase<hkArray<int32_t>>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkArray<int32_t>))
-            );
-        }
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        if (lengthsSquared.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                lengthsSquared.m_data,
-                (lengthsSquared.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        if (directions.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                directions.m_data,
-                (directions.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
 }

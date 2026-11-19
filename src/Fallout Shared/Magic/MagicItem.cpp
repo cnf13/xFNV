@@ -389,12 +389,6 @@ bool MagicItem::IsLoading() {
 }
 
 void MagicItem::FinishedLoading() {
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_6, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_5, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_4, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_3, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel_2, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(NiPointer<Model>, spmodel, std::nullopt, std::nullopt);
     EffectSetting* pavEffectSetting = GetAVEffect(MagicSystem::SELF);
     if (IsLoading()) {
         EffectItemList* plist_2;
@@ -404,13 +398,12 @@ void MagicItem::FinishedLoading() {
                 icount = pavEffectSetting->QueueEffectFinished();
             }
             if (pavEffectSetting->GetModelLength()) {
-                ::new (&spmodel) NiPointer<Model>(static_cast<Model*>(nullptr));
+                NiPointer<Model> spmodel;
                 const char* v1 = pavEffectSetting->GetModel();
                 pModelLoader->FindModel(v1, spmodel);
                 if (spmodel.m_pObject) {
                     spmodel.m_pObject->ModManualRefCount(icount);
                 }
-                NiPointer<Model>::Destroy(&spmodel);
             }
         }
         if (this) {
@@ -433,20 +426,19 @@ void MagicItem::FinishedLoading() {
                     if (pform && pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_WEAPON)) {
                         TESObjectWEAP* pweapon = dynamic_cast<TESObjectWEAP*>(pform);
                         if ((pweapon) && (pweapon->GetModelLength())) {
-                            ::new (&spmodel_2) NiPointer<Model>(static_cast<Model*>(nullptr));
+                            NiPointer<Model> spmodel_2;
                             const char* v2 = pweapon->GetModel();
                             pModelLoader->FindModel(v2, spmodel_2);
                             if (spmodel_2.m_pObject) {
                                 spmodel_2.m_pObject->ModManualRefCount(icount_2);
                             }
-                            NiPointer<Model>::Destroy(&spmodel_2);
                         }
                     }
                     else {
                         if (pform && pes->IsFlagSet(EffectSetting::USE_ASSOCIATED_ARMOR)) {
                             TESObjectARMO* parmor = dynamic_cast<TESObjectARMO*>(pform);
                             if (parmor) {
-                                ::new (&spmodel_3) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                NiPointer<Model> spmodel_3;
                                 const char* BipedModel = parmor->GetBipedModel(TESActorBase::SEX_MALE);
                                 pModelLoader->FindModel(BipedModel, spmodel_3);
                                 if (spmodel_3.m_pObject) {
@@ -457,7 +449,6 @@ void MagicItem::FinishedLoading() {
                                 if (spmodel_3.m_pObject) {
                                     spmodel_3.m_pObject->ModManualRefCount(icount_2);
                                 }
-                                NiPointer<Model>::Destroy(&spmodel_3);
                             }
                         }
                         else {
@@ -468,13 +459,12 @@ void MagicItem::FinishedLoading() {
                                     BSSimpleList<const char*>* plist_4 = pmodelList;
                                     while (plist_4 && !plist_4->IsEmpty()) {
                                         const char* pfilename = plist_4->m_item;
-                                        ::new (&spmodel_4) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                        NiPointer<Model> spmodel_4;
                                         pModelLoader->FindModel(pfilename, spmodel_4);
                                         if (spmodel_4.m_pObject) {
                                             spmodel_4.m_pObject->ModManualRefCount(icount_2);
                                         }
                                         plist_4 = plist_4->GetNext();
-                                        NiPointer<Model>::Destroy(&spmodel_4);
                                     }
                                     pmodelList->RemoveAll();
                                     if (pmodelList) {
@@ -483,7 +473,7 @@ void MagicItem::FinishedLoading() {
                                 }
                                 TESCreature* pcreature = dynamic_cast<TESCreature*>(pform);
                                 if (pcreature) {
-                                    ::new (&spmodel_5) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                    NiPointer<Model> spmodel_5;
                                     const char* v5 = pcreature->GetModel();
                                     pModelLoader->FindModel(v5, spmodel_5);
                                     if (spmodel_5.m_pObject) {
@@ -501,12 +491,11 @@ void MagicItem::FinishedLoading() {
                                             const char* pitem_2 = pfilelist->m_item;
                                             if (pitem_2) {
                                                 BSstrcat(Dst, 260, pitem_2);
-                                                ::new (&spmodel_6) NiPointer<Model>(static_cast<Model*>(nullptr));
+                                                NiPointer<Model> spmodel_6;
                                                 pModelLoader->FindModel(Dst, spmodel_6);
                                                 if (spmodel_6.m_pObject) {
                                                     spmodel_6.m_pObject->ModManualRefCount(icount_2);
                                                 }
-                                                NiPointer<Model>::Destroy(&spmodel_6);
                                             }
                                         }
                                         const char* plastBackSlash = std::strrchr(pfilename_2, 92);
@@ -547,7 +536,6 @@ void MagicItem::FinishedLoading() {
                                             }
                                         }
                                     }
-                                    NiPointer<Model>::Destroy(&spmodel_5);
                                 }
                             }
                         }

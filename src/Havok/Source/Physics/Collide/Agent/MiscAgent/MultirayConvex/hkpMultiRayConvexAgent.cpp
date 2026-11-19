@@ -102,8 +102,7 @@ void hkpMultiRayConvexAgent::getClosestPoints(
     const __m128 col2 = aTb.m_rotation.m_col2.m_quad;
     const __m128 col3 = aTb.m_translation.m_quad;
     for (; iNumRays > 0; --iNumRays, ++pRay) {
-        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-        output.m_hitFraction = 1.0f;
+        hkpShapeRayCastOutput output;
         // EXE-INLINED none: hkVector4::setTransformedPos
         __m128 v = pRay->m_start.m_quad;
         __m128 from = _mm_add_ps(
@@ -111,9 +110,6 @@ void hkpMultiRayConvexAgent::getClosestPoints(
             _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), col3)
         );
         rayInput.m_from.m_quad = from;
-        output.m_extraInfo = -1;
-        output.m_shapeKeys[0] = 0xFFFFFFFFu;
-        output.m_shapeKeyIndex = 0;
         // EXE-INLINED none: hkVector4::setTransformedPos
         v = pRay->m_end.m_quad;
         __m128 to = _mm_add_ps(
@@ -295,8 +291,7 @@ void hkpMultiRayConvexAgent::processCollision(
     rayInput.m_rayShapeCollectionFilter = nullptr;
     const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
     for (int32_t i = 0; i < iNumRays; ++i, ++pRay) {
-        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-        output.m_hitFraction = 1.0f;
+        hkpShapeRayCastOutput output;
         // EXE-INLINED 0xC7F640
         __m128 v = pRay->m_start.m_quad;
         rayInput.m_from.m_quad = _mm_add_ps(
@@ -308,9 +303,6 @@ void hkpMultiRayConvexAgent::processCollision(
         );
         // EXE-INLINED 0xC7F640
         v = pRay->m_end.m_quad;
-        output.m_extraInfo = -1;
-        output.m_shapeKeys[0] = 0xFFFFFFFFu;
-        output.m_shapeKeyIndex = 0;
         rayInput.m_to.m_quad = _mm_add_ps(
             _mm_add_ps(
                 _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), aTb.m_rotation.m_col1.m_quad),
@@ -383,14 +375,10 @@ void hkpMultiRayConvexAgent::staticGetPenetrations(
     int32_t iNumRays = pMultiRay->m_rays.m_size;
     const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
 
-    XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-    output.m_hitFraction = 1.0f;
+    hkpShapeRayCastOutput output;
     hkpShapeRayCastInput rayInput;
     rayInput.m_filterInfo = 0;
     rayInput.m_rayShapeCollectionFilter = nullptr;
-    output.m_extraInfo = -1;
-    output.m_shapeKeyIndex = 0;
-    output.m_shapeKeys[0] = 0xFFFFFFFFu;
     while (iNumRays != 0) {
         --iNumRays;
         if (collector.m_earlyOut.m_bool) {
@@ -463,8 +451,7 @@ void hkpMultiRayConvexAgent::staticGetClosestPoints(
     const __m128 col2 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_rotation.m_col2.m_quad)[0]);
     const __m128 col3 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_translation.m_quad)[0]);
     for (; iNumRays > 0; --iNumRays, ++pRay) {
-        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, output, std::nullopt, std::nullopt);
-        output.m_hitFraction = 1.0f;
+        hkpShapeRayCastOutput output;
         // EXE-INLINED none: hkVector4::setTransformedPos
         __m128 v = _mm_load_ps(&reinterpret_cast<const float*>(&pRay->m_start.m_quad)[0]);
         __m128 from = _mm_add_ps(
@@ -472,9 +459,6 @@ void hkpMultiRayConvexAgent::staticGetClosestPoints(
             _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), col3)
         );
         _mm_store_ps(&reinterpret_cast<float*>(&rayInput.m_from.m_quad)[0], from);
-        output.m_extraInfo = -1;
-        output.m_shapeKeys[0] = 0xFFFFFFFFu;
-        output.m_shapeKeyIndex = 0;
         // EXE-INLINED none: hkVector4::setTransformedPos
         v = _mm_load_ps(&reinterpret_cast<const float*>(&pRay->m_end.m_quad)[0]);
         __m128 to = _mm_add_ps(

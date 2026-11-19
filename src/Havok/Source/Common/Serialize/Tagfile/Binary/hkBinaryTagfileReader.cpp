@@ -116,10 +116,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
     switch (arr.getType()) {
         case hkDataObject::TYPE_BYTE: {
             // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::hkArray(int)
-            XFNV_INLINED_LOCAL(hkArray<uint8_t>, buf, std::nullopt, std::nullopt);
-            buf.m_data = nullptr;
-            buf.m_size = 0;
-            buf.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
+            hkArray<uint8_t, hkContainerTempAllocator> buf;
             hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
             uint8_t* pData = nullptr;
             int32_t iNumBytes = nelem;
@@ -142,16 +139,6 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             }
             m_ia.readArrayGeneric(buf.m_data, 1, nelem);
             arr.setAll(buf.m_data, nelem);
-            // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator* pTemp3 = hkMemoryRouter::getInstance().m_temp;
-            const int32_t iCapFlags = buf.m_capacityAndFlags;
-            buf.m_size = 0;
-            if (iCapFlags >= 0) {
-                pTemp3->bufFree(
-                    buf.m_data,
-                    (iCapFlags & hkArrayBase<uint8_t>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(uint8_t))
-                );
-            }
             return;
         }
         case hkDataObject::TYPE_INT: {
@@ -164,10 +151,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
         }
         case hkDataObject::TYPE_REAL: {
             // EXE-INLINED none: hkArray<hkReal, hkContainerTempAllocator>::hkArray(int)
-            XFNV_INLINED_LOCAL(hkArray<float>, buf, std::nullopt, std::nullopt);
-            buf.m_data = nullptr;
-            buf.m_size = 0;
-            buf.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
+            hkArray<float, hkContainerTempAllocator> buf;
             hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
             float* pData = nullptr;
             int32_t iNum = nelem;
@@ -192,15 +176,6 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             buf.m_size = nelem;
             m_ia.readArrayGeneric(buf.m_data, 4, nelem);
             arr.setAll(buf.m_data, buf.m_size);
-            // EXE-INLINED none: hkArray<hkReal, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator* pTemp3 = hkMemoryRouter::getInstance().m_temp;
-            const int32_t iCapFlags = buf.m_capacityAndFlags;
-            buf.m_size = 0;
-            if (iCapFlags >= 0) {
-                pTemp3->bufFree(
-                    buf.m_data, (iCapFlags & hkArrayBase<float>::CAPACITY_MASK) * static_cast<int32_t>(sizeof(float))
-                );
-            }
             return;
         }
         case hkDataObject::TYPE_VEC_4: {
@@ -251,33 +226,10 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             arr.getClass(&klass);
             const int32_t iNumMembers = klass.getNumMembers();
 
-            alignas(8) XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, bitfield, std::nullopt, std::nullopt);
-            bitfield.m_data = nullptr;
-            bitfield.m_size = 0;
-            bitfield.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
-            // EXE-INLINED none: hkAllocateStack<hkUint8> (untyped stack memory, as the exe treats it)
-            hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-            void* pBits = rStack.m_next.m_storage;
-            rStack.m_next.m_storage = static_cast<char*>(pBits) + 128;
-            bitfield.m_data = static_cast<uint8_t*>(pBits);
-            bitfield.m_localMemory = static_cast<uint8_t*>(pBits);
-            bitfield.m_capacityAndFlags = static_cast<int32_t>(128 | hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
+            alignas(8) hkLocalArray<uint8_t> bitfield(128);
             readBitfield(iNumMembers, bitfield);
 
-            XFNV_INLINED_LOCAL(hkLocalArray<hkDataClass::MemberInfo>, minfo, std::nullopt, std::nullopt);
-            minfo.m_data = nullptr;
-            minfo.m_size = 0;
-            minfo.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG);
-            // EXE-INLINED none: hkAllocateStack<hkDataClass::MemberInfo> (untyped stack memory, as the exe treats it)
-            hkStackMemory& rStack2 = hkMemoryRouter::getInstance().m_stack;
-            void* pInfos = rStack2.m_next.m_storage;
-            rStack2.m_next.m_storage = static_cast<char*>(pInfos) +
-                ((static_cast<int32_t>(sizeof(hkDataClass::MemberInfo)) * iNumMembers + 127) & ~127);
-            minfo.m_capacityAndFlags = static_cast<int32_t>(
-                static_cast<uint32_t>(iNumMembers) | hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG
-            );
-            minfo.m_data = static_cast<hkDataClass::MemberInfo*>(pInfos);
-            minfo.m_localMemory = static_cast<hkDataClass::MemberInfo*>(pInfos);
+            hkLocalArray<hkDataClass::MemberInfo> minfo(iNumMembers);
             // EXE-INLINED none: hkArray<hkDataClass::MemberInfo>::setSize; the capacity is iNumMembers already, so the
             // exe has no reserve. Each new element is value-initialised by a placement new (its null test kept).
             hkDataClass::MemberInfo* pInfo = minfo.m_data + minfo.m_size;
@@ -315,40 +267,6 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
                 members.~hkDataArray();
             }
 
-            // EXE-INLINED none: hkLocalArray<hkDataClass::MemberInfo>::~hkLocalArray
-            hkDataClass::MemberInfo* pInfoMemory = minfo.m_localMemory;
-            if (pInfoMemory == minfo.m_data) {
-                minfo.m_size = 0;
-            }
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-                static_cast<char*>(static_cast<void*>(pInfoMemory));
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            const int32_t iInfoCap = minfo.m_capacityAndFlags;
-            minfo.m_size = 0;
-            if ((iInfoCap & static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG)) == 0) {
-                pHeap->bufFree(
-                    minfo.m_data,
-                    (iInfoCap & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkDataClass::MemberInfo))
-                );
-            }
-            minfo.m_data = nullptr;
-            minfo.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG);
-
-            // EXE-INLINED none: hkLocalArray<hkUint8>::~hkLocalArray
-            uint8_t* pBitMemory = bitfield.m_localMemory;
-            if (pBitMemory == bitfield.m_data) {
-                bitfield.m_size = 0;
-            }
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(pBitMemory));
-            hkMemoryAllocator* pHeap2 = hkMemoryRouter::getInstance().m_heap;
-            const int32_t iBitCap = bitfield.m_capacityAndFlags;
-            bitfield.m_size = 0;
-            if ((iBitCap & static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG)) == 0) {
-                pHeap2->bufFree(bitfield.m_data, iBitCap & hkArrayBase<uint8_t>::CAPACITY_MASK);
-            }
-            bitfield.m_data = nullptr;
-            bitfield.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
             return;
         }
         case hkDataObject::TYPE_CSTRING: {
@@ -479,37 +397,10 @@ hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
         }
     }
 
-    // EXE-INLINED none: hkLocalArray<uint8_t>::hkLocalArray(128)
-    XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, bitfield, std::nullopt, std::nullopt);
-    bitfield.m_data = nullptr;
-    bitfield.m_size = 0;
-    bitfield.m_capacityAndFlags = hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
-    {
-        // EXE-INLINED none: hkAllocateStack<uint8_t> (untyped memory from the thread's stack allocator)
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + 128;
-        bitfield.m_data = static_cast<uint8_t*>(static_cast<void*>(pBlock));
-        bitfield.m_localMemory = static_cast<uint8_t*>(static_cast<void*>(pBlock));
-        bitfield.m_capacityAndFlags = 128 | hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
-    }
+    hkLocalArray<uint8_t> bitfield(128);
     readBitfield(numMembers, bitfield);
 
-    // EXE-INLINED none: hkLocalArray<hkDataClass::MemberInfo>::hkLocalArray(numMembers)
-    XFNV_INLINED_LOCAL(hkLocalArray<hkDataClass::MemberInfo>, members, std::nullopt, std::nullopt);
-    members.m_data = nullptr;
-    members.m_size = 0;
-    members.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-    {
-        // EXE-INLINED none: hkAllocateStack<hkDataClass::MemberInfo> (untyped memory, the byte count rounded up to 128)
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((static_cast<int32_t>(sizeof(hkDataClass::MemberInfo)) * numMembers + 127) & ~127);
-        members.m_capacityAndFlags = numMembers | hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-        members.m_data = static_cast<hkDataClass::MemberInfo*>(static_cast<void*>(pBlock));
-        members.m_localMemory = static_cast<hkDataClass::MemberInfo*>(static_cast<void*>(pBlock));
-    }
+    hkLocalArray<hkDataClass::MemberInfo> members(numMembers);
     // EXE-INLINED none: hkArray<hkDataClass::MemberInfo>::setSize
     {
         hkDataClass::MemberInfo* pInfo = members.m_data + members.m_size;
@@ -534,32 +425,16 @@ hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
         }
     }
     ::new (apResult) hkDataObject(obj);
-    members.~hkLocalArray<hkDataClass::MemberInfo>();
-    bitfield.~hkLocalArray<uint8_t>();
     return apResult;
 }
 
 // Reads a class description (name, version, parent tag, members) and registers it with the world, remembering the new
 // class under the next class tag; fails, reading no more, when the world is a native one (type 0).
 hkResult Reader::readClass() {
-    // EXE-INLINED none: hkDataClass::Cinfo::Cinfo
-    XFNV_INLINED_LOCAL(hkDataClass::Cinfo, info, std::nullopt, std::nullopt);
-    info.members.m_data = nullptr;
-    info.members.m_size = 0;
-    info.members.m_capacityAndFlags = hkArrayBase<hkDataClass::Cinfo::Member>::DONT_DEALLOCATE_FLAG;
+    hkDataClass::Cinfo info;
     info.name = readString();
     info.version = readInt<int32_t>();
     if (!m_world.getType().m_storage) {
-        // EXE-INLINED none: hkDataClass::Cinfo::~Cinfo
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        info.members.m_size = 0;
-        if (info.members.m_capacityAndFlags >= 0) {
-            heap->bufFree(
-                info.members.m_data,
-                (info.members.m_capacityAndFlags & hkArrayBase<hkDataClass::Cinfo::Member>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkDataClass::Cinfo::Member))
-            );
-        }
         return HK_FAILURE;
     }
     int32_t parentTag = readInt<int32_t>();
@@ -605,22 +480,11 @@ hkResult Reader::readClass() {
         m_classes.m_data[m_classes.m_size] = klass;
         ++m_classes.m_size;
     }
-    // EXE-INLINED none: hkDataClass::Cinfo::~Cinfo
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    info.members.m_size = 0;
-    if (info.members.m_capacityAndFlags >= 0) {
-        heap->bufFree(
-            info.members.m_data,
-            (info.members.m_capacityAndFlags & hkArrayBase<hkDataClass::Cinfo::Member>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkDataClass::Cinfo::Member))
-        );
-    }
     return HK_SUCCESS;
 }
 
 hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
     uint32_t v5;
-    XFNV_INLINED_LOCAL(hkErrStream, apThis, std::nullopt, std::nullopt);
     uint32_t array;
     char buf[512];
     m_ia.readArrayGeneric(&array, 4, 1);
@@ -634,13 +498,15 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
                         if (!readInt<int32_t>()) {
                             goto LABEL_8;
                         }
-                        ::new (&apThis) hkErrStream(buf, 512);
-                        apThis.operator<<("Unrecognised tagfile version.");
-                        hkError::s_instance->message(
-                            hkError::MESSAGE_WARNING, 0x2AB6036F, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp",
-                            473
-                        );
-                        goto LABEL_12;
+                        {
+                            hkErrStream apThis(buf, 512);
+                            apThis.operator<<("Unrecognised tagfile version.");
+                            hkError::s_instance->message(
+                                hkError::MESSAGE_WARNING, 0x2AB6036F, buf,
+                                ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 473
+                            );
+                        }
+                        goto LABEL_13;
                     }
                     case 2: {
                         if (readClass() == HK_FAILURE) {
@@ -668,13 +534,11 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
         }
     }
     else {
-        ::new (&apThis) hkErrStream(buf, 512);
-        apThis.operator<<("This does not look like a binary tagfile (magic number mismatch)");
+        hkErrStream apThis2(buf, 512);
+        apThis2.operator<<("This does not look like a binary tagfile (magic number mismatch)");
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, 0x2AB6036F, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 453
         );
-    LABEL_12:;
-        apThis.~hkErrStream();
     }
 LABEL_13:;
     ::new (apResult) hkDataObject(nullptr);

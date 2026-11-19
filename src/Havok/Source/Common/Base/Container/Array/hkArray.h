@@ -316,6 +316,13 @@ public:
 template <typename T, int32_t N>
 class hkInplaceArrayAligned16 : public hkArray<T> {
 public:
+    // The array of size elements over the inline storage, which it never frees.
+    hkInplaceArrayAligned16(int32_t size = 0) {
+        this->m_data = reinterpret_cast<T*>(m_storage);
+        this->m_size = size;
+        this->m_capacityAndFlags = N | hkArrayBase<T>::DONT_DEALLOCATE_FLAG;
+    }
+
     // Whether the array has grown out of the inline storage.
     hkBool wasReallocated() const {
         hkBool kResult;

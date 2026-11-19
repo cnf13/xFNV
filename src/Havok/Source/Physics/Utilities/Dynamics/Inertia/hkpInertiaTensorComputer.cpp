@@ -254,11 +254,7 @@ void computeRecursiveShapeVolumeMassProperties(
         }
         case HK_SHAPE_CONVEX_VERTICES: {
             const hkpConvexShape* convex = static_cast<const hkpConvexShape*>(shape);
-            // EXE-INLINED none: hkArray<hkVector4>::hkArray
-            XFNV_INLINED_LOCAL(hkArray<hkVector4>, vertices, std::nullopt, std::nullopt);
-            vertices.m_data = nullptr;
-            vertices.m_size = 0;
-            vertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+            hkArray<hkVector4> vertices;
             static_cast<const hkpConvexVerticesShape*>(convex)->getOriginalVertices(vertices);
             hkStridedVertices stridedVertices;
             // The vertex array's storage, read as the floats it holds.
@@ -268,17 +264,6 @@ void computeRecursiveShapeVolumeMassProperties(
             hkpInertiaTensorComputer::computeConvexHullMassProperties(
                 stridedVertices, convex->m_radius, newMassProperties
             );
-            // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            vertices.m_size = 0;
-            if (vertices.m_capacityAndFlags >= 0) {
-                pHeap->bufFree(
-                    vertices.m_data,
-                    static_cast<int32_t>(
-                        (vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                    )
-                );
-            }
             break;
         }
         case HK_SHAPE_COLLECTION:
@@ -385,13 +370,7 @@ void computeRecursiveShapeVolumeMassProperties(
     if (newMassProperties.m_volume != 0.0f) {
         newMassProperties.scaleMassAndInertia(newMassProperties.m_volume);
 
-        // EXE-INLINED none: hkInplaceArrayAligned16<hkpMassElement, 2>::hkInplaceArrayAligned16
-        using elements_t = hkInplaceArrayAligned16<hkpMassElement, 2>;
-        XFNV_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
-        // The inline storage is raw bytes until the elements are constructed in it.
-        elements.m_data = reinterpret_cast<hkpMassElement*>(elements.m_storage);
-        elements.m_size = 0;
-        elements.m_capacityAndFlags = hkArrayBase<hkpMassElement>::DONT_DEALLOCATE_FLAG | 2;
+        hkInplaceArrayAligned16<hkpMassElement, 2> elements;
 
         // EXE-INLINED none: hkArray<hkpMassElement>::expandOne
         hkMemoryRouter& router = hkMemoryRouter::getInstance();
@@ -470,18 +449,6 @@ void computeRecursiveShapeVolumeMassProperties(
         );
 
         hkpInertiaTensorComputer::combineMassProperties(elements, massPropertiesOut);
-
-        // EXE-INLINED none: hkInplaceArrayAligned16<hkpMassElement, 2>::~hkInplaceArrayAligned16
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        elements.m_size = 0;
-        if (elements.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                elements.m_data,
-                static_cast<int32_t>(
-                    (elements.m_capacityAndFlags & hkArrayBase<hkpMassElement>::CAPACITY_MASK) * sizeof(hkpMassElement)
-                )
-            );
-        }
     }
 }
 
@@ -531,11 +498,7 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
 ) {
     using ChildArray = hkInplaceArray<const hkpConstraintInstance*, 16>;
     using ChildArrayBase = hkArrayBase<const hkpConstraintInstance*>;
-    // EXE-INLINED none: hkInplaceArray<const hkpConstraintInstance*, 16>::hkInplaceArray
-    alignas(16) XFNV_INLINED_LOCAL(ChildArray, childConstraints, std::nullopt, std::nullopt);
-    childConstraints.m_data = childConstraints.m_storage;
-    childConstraints.m_size = 0;
-    childConstraints.m_capacityAndFlags = 16 | ChildArrayBase::DONT_DEALLOCATE_FLAG;
+    alignas(16) ChildArray childConstraints;
     for (int32_t i = constraints.m_size - 1; i >= 0; --i) {
         const hkpConstraintInstance* ci = constraints.m_data[i];
         hkpRigidBody* other;
@@ -581,18 +544,6 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
     }
     hkBool isFixedOrKeyframed = body->isFixedOrKeyframed();
     if (isFixedOrKeyframed.m_bool) {
-        // EXE-INLINED none: hkInplaceArray<const hkpConstraintInstance*, 16>::~hkInplaceArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        childConstraints.m_size = 0;
-        if (childConstraints.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                childConstraints.m_data,
-                static_cast<int32_t>(
-                    (childConstraints.m_capacityAndFlags & ChildArrayBase::CAPACITY_MASK) *
-                    sizeof(const hkpConstraintInstance*)
-                )
-            );
-        }
         return 0.0f;
     }
     hkMatrix3 inertia;
@@ -602,18 +553,6 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
         maxDiagonal = inertia(0, 0);
     }
     if (sumInertia == 0.0f) {
-        // EXE-INLINED none: hkInplaceArray<const hkpConstraintInstance*, 16>::~hkInplaceArray
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        childConstraints.m_size = 0;
-        if (childConstraints.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                childConstraints.m_data,
-                static_cast<int32_t>(
-                    (childConstraints.m_capacityAndFlags & ChildArrayBase::CAPACITY_MASK) *
-                    sizeof(const hkpConstraintInstance*)
-                )
-            );
-        }
         return maxDiagonal;
     }
     const float maxScaled = maxDiagonal * inertiaFactorHint;
@@ -632,18 +571,6 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
     const float total = maxDiagonal + sumInertia;
     float standsFor = (total > maxScaled) ? maxScaled : total;
     standsFor = (newInertia < standsFor) ? standsFor : newInertia;
-    // EXE-INLINED none: hkInplaceArray<const hkpConstraintInstance*, 16>::~hkInplaceArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    childConstraints.m_size = 0;
-    if (childConstraints.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            childConstraints.m_data,
-            static_cast<int32_t>(
-                (childConstraints.m_capacityAndFlags & ChildArrayBase::CAPACITY_MASK) *
-                sizeof(const hkpConstraintInstance*)
-            )
-        );
-    }
     return standsFor;
 }
 
@@ -1184,11 +1111,7 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
         normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), normal.m_quad);
 
         using VertexArray = hkInplaceArray<hkVector4, 6, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(VertexArray, vertices, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkInplaceArray<hkVector4, 6>::hkInplaceArray
-        vertices.m_data = vertices.m_storage;
-        vertices.m_size = 0;
-        vertices.m_capacityAndFlags = 6 | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+        VertexArray vertices;
         // EXE-INLINED none: hkArray<hkVector4>::setSize
         vertices._reserve(*(&hkMemoryRouter::getInstance())->m_heap, 6);
         vertices.m_size = 6;
@@ -1286,12 +1209,6 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
         inertia.m_col0 = massProperties.m_inertiaTensor.m_col0;
         inertia.m_col1 = massProperties.m_inertiaTensor.m_col1;
         inertia.m_col2 = massProperties.m_inertiaTensor.m_col2;
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-        hkMemoryAllocator* heap = (&hkMemoryRouter::getInstance())->m_heap;
-        vertices.m_size = 0;
-        if ((vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-            heap->bufFree(vertices.m_data, vertices.getCapacity() * static_cast<int32_t>(sizeof(hkVector4)));
-        }
     }
     result.m_mass = mass;
     result.m_inertiaTensor.m_col0 = inertia.m_col0;
@@ -1398,12 +1315,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
     const float sphereMass = sphereVolume * mass / totalVolume;
     const float cylinderMass = cylinderVolume * mass / totalVolume;
 
-    // EXE-INLINED none: hkInplaceArray<hkpMassElement, 3>::hkInplaceArray
-    using elements_t = hkInplaceArray<hkpMassElement, 3>;
-    XFNV_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
-    elements.m_data = elements.m_storage;
-    elements.m_size = 0;
-    elements.m_capacityAndFlags = hkArrayBase<hkpMassElement>::DONT_DEALLOCATE_FLAG | 3;
+    hkInplaceArray<hkpMassElement, 3> elements;
     for (int32_t i = 0; i < 3; ++i) {
         // EXE-INLINED none: hkpMassElement::hkpMassElement
         hkpMassElement& rStorage = elements.m_storage[i];
@@ -1583,18 +1495,6 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
     elements.m_size++;
 
     hkpInertiaTensorComputer::combineMassProperties(elements, result);
-
-    // EXE-INLINED none: hkInplaceArray<hkpMassElement, 3>::~hkInplaceArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    elements.m_size = 0;
-    if (elements.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            elements.m_data,
-            static_cast<int32_t>(
-                (elements.m_capacityAndFlags & hkArrayBase<hkpMassElement>::CAPACITY_MASK) * sizeof(hkpMassElement)
-            )
-        );
-    }
     return HK_SUCCESS;
 }
 
@@ -1686,12 +1586,7 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
     centre.m_quad = _mm_mul_ps(_mm_set1_ps(0.5f), _mm_add_ps(startAxis.m_quad, endAxis.m_quad));
     const float volume = radius * 3.1415927410125732 * radius * height;
 
-    // EXE-INLINED none: hkInplaceArray<hkpMassElement, 1>::hkInplaceArray
-    using elements_t = hkInplaceArray<hkpMassElement, 1>;
-    XFNV_INLINED_LOCAL(elements_t, elements, std::nullopt, std::nullopt);
-    elements.m_data = elements.m_storage;
-    elements.m_size = 0;
-    elements.m_capacityAndFlags = hkArrayBase<hkpMassElement>::DONT_DEALLOCATE_FLAG | 1;
+    hkInplaceArray<hkpMassElement, 1> elements;
     {
         // EXE-INLINED none: hkpMassElement::hkpMassElement
         hkpMassElement& rStorage = elements.m_storage[0];
@@ -1760,18 +1655,6 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
     rElement.m_properties.m_centerOfMass.setZero4();
 
     hkpInertiaTensorComputer::combineMassProperties(elements, result);
-
-    // EXE-INLINED none: hkInplaceArray<hkpMassElement, 1>::~hkInplaceArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    elements.m_size = 0;
-    if (elements.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            elements.m_data,
-            static_cast<int32_t>(
-                (elements.m_capacityAndFlags & hkArrayBase<hkpMassElement>::CAPACITY_MASK) * sizeof(hkpMassElement)
-            )
-        );
-    }
     return HK_SUCCESS;
 }
 
@@ -2300,11 +2183,7 @@ hkResult hkpInertiaTensorComputer::computeVertexCloudMassProperties(
     if (numVertices <= 0) {
         return HK_FAILURE;
     }
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<hkVector4>, verts, std::nullopt, std::nullopt);
-    verts.m_data = nullptr;
-    verts.m_size = 0;
-    verts.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkVector4> verts;
     {
         // EXE-INLINED none: hkArray<hkVector4>::setSize
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -2358,15 +2237,6 @@ hkResult hkpInertiaTensorComputer::computeVertexCloudMassProperties(
         inertia(2, 1) = inertia(2, 1) - z * y * massPerVertex;
         inertia(1, 2) = inertia(1, 2) - z * y * massPerVertex;
     }
-    // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    verts.m_size = 0;
-    if (verts.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            verts.m_data,
-            static_cast<int32_t>((verts.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4))
-        );
-    }
     return HK_SUCCESS;
 }
 
@@ -2389,11 +2259,7 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
     result.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
     const int32_t numTriangles = geom->m_triangles.m_size;
-    // EXE-INLINED none: hkArray<float>::hkArray
-    XFNV_INLINED_LOCAL(hkArray<float>, triArea, std::nullopt, std::nullopt);
-    triArea.m_data = nullptr;
-    triArea.m_size = 0;
-    triArea.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
+    hkArray<float> triArea;
     {
         // EXE-INLINED none: hkArray<float>::setSize
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -2473,15 +2339,6 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
     result.m_centerOfMass.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(invMass), _mm_set_ss(invMass), 0), result.m_centerOfMass.m_quad);
     hkpInertiaTensorComputer::shiftInertiaToCom(result.m_centerOfMass, mass, result.m_inertiaTensor);
-    // EXE-INLINED none: hkArray<float>::~hkArray
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    triArea.m_size = 0;
-    if (triArea.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            triArea.m_data,
-            static_cast<int32_t>((triArea.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK) * sizeof(float))
-        );
-    }
     return HK_SUCCESS;
 }
 
@@ -2598,41 +2455,10 @@ void hkpInertiaTensorComputer::optimizeInertiasOfConstraintTree(
     hkpRigidBody* rootBody,
     float inertiaFactorHint
 ) {
-    XFNV_INLINED_LOCAL(hkLocalArray<const hkpConstraintInstance*>, constrs, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<const hkpConstraintInstance*>::hkLocalArray(numConstraints)
-        constrs.m_data = nullptr;
-        constrs.m_size = 0;
-        constrs.m_capacityAndFlags = hkArrayBase<const hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((numConstraints * static_cast<int32_t>(sizeof(const hkpConstraintInstance*)) + 127) & ~127);
-        constrs.m_capacityAndFlags = numConstraints | hkArrayBase<const hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-        // The stack allocator's bytes are untyped memory; the array keeps its elements there.
-        constrs.m_data = static_cast<const hkpConstraintInstance**>(static_cast<void*>(pBlock));
-        constrs.m_localMemory = constrs.m_data;
-    }
+    hkLocalArray<const hkpConstraintInstance*> constrs(numConstraints);
     for (int32_t i = 0; i < numConstraints; ++i) {
         // EXE-INLINED none: hkArray<const hkpConstraintInstance*>::pushBackUnchecked
         constrs.m_data[constrs.m_size++] = constraints[i];
     }
     hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(constrs, rootBody, inertiaFactorHint);
-    // EXE-INLINED none: hkLocalArray<const hkpConstraintInstance*>::~hkLocalArray
-    const hkpConstraintInstance** pLocalMemory = constrs.m_localMemory;
-    if (pLocalMemory == constrs.m_data) {
-        constrs.m_size = 0;
-    }
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(pLocalMemory));
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    constrs.m_size = 0;
-    if (constrs.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            constrs.m_data,
-            static_cast<int32_t>(
-                (constrs.m_capacityAndFlags & hkArrayBase<const hkpConstraintInstance*>::CAPACITY_MASK) *
-                sizeof(const hkpConstraintInstance*)
-            )
-        );
-    }
 }

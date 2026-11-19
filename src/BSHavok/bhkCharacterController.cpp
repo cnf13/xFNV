@@ -172,16 +172,13 @@ const hkpShapeCollection* GetTriCollectionFromShape(const hkpShape* apShape) {
 
 bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRadius, float afStepHeight) {
     using a2_t = hkArray<hkVector4, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(a2_t, a2, std::nullopt, std::nullopt);
     __m128 v27;
     hkVector4 v28;
     TLSData* v4 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v4->eMemContext;
     v4->eMemContext = MEM_CONTEXT_HAVOK;
-    a2.m_data = nullptr;
+    a2_t a2;
     float v24 = fBS2HkScaleSC * afRadius;
-    a2.m_size = 0;
-    a2.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
     hkArrayUtil::_reserve(*m_heap, &a2, 18, sizeof(hkVector4));
     v27[0] = arBottom.x * fBS2HkScaleSC;
@@ -253,11 +250,6 @@ bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRa
     a2.m_data[v19].m_quad = v27;
     ++a2.m_size;
     bhkCharControllerShape* v20 = bhkCharControllerShape::CreateFromHull(a2);
-    hkMemoryAllocator* v21 = (&hkMemoryRouter::getInstance())->m_heap;
-    a2.m_size = 0;
-    if (a2.m_capacityAndFlags >= 0) {
-        v21->bufFree(a2.begin(), sizeof(hkVector4) * a2.m_capacityAndFlags);
-    }
     v4->eMemContext = eMemContext;
     return v20;
 }
@@ -340,9 +332,7 @@ void bhkCharacterController::Init(bhkCharacterControllerCinfo& rInfo) {
     fStepHeight = fStep;
     InitShapes(rInfo);
     if (!spShapePhantom) {
-        // The local's hkArray is freed inline below.
-        XFNV_INLINED_LOCAL(hkShapePhantomCinfo, kCinfo, std::nullopt, std::nullopt);
-        ::new (&kCinfo) hkShapePhantomCinfo;
+        hkShapePhantomCinfo kCinfo;
         kCinfo.m_collisionFilterInfo = rInfo.iColFilter.iFilter;
         bhkShape* pShape = GetShape();
         kCinfo.m_shape = pShape ? static_cast<hkpShape*>(pShape->phkObject) : nullptr;
@@ -358,15 +348,6 @@ void bhkCharacterController::Init(bhkCharacterControllerCinfo& rInfo) {
             if (pPhantom) {
                 pPhantom->IncRefCount();
             }
-        }
-        // EXE-INLINED none: hkArray<hkpProperty>::~hkArray
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        kCinfo.m_properties.m_size = 0;
-        if (kCinfo.m_properties.m_capacityAndFlags >= 0) {
-            rHeap.bufFree(
-                kCinfo.m_properties.m_data,
-                (kCinfo.m_properties.m_capacityAndFlags & 0x3FFFFFFF) * sizeof(hkWorldObjectCinfo::Property)
-            );
         }
     }
     if (rInfo.pWorld) {
@@ -1030,16 +1011,7 @@ void bhkCharacterController::processConstraintsCallback(
                 _mm_cvtss_f32(_mm_shuffle_ps(rpnt.m_contact.m_position.m_quad, rpnt.m_contact.m_position.m_quad, 0xAA));
             const float fstepZ = _mm_cvtss_f32(_mm_shuffle_ps(stepPos.m_quad, stepPos.m_quad, 0xAA));
             if (fstepZ >= fcontactZ) {
-                XFNV_INLINED_LOCAL(
-                    hkpClosestRayHitCollector, theCollector, hkpClosestRayHitCollector_vftable, std::nullopt
-                );
-                // EXE-INLINED 0x62A290
-                theCollector.m_rayHit.m_hitFraction = 1.0f;
-                theCollector.m_earlyOutHitFraction = 1.0f;
-                theCollector.m_rayHit.m_rootCollidable = nullptr;
-                theCollector.m_rayHit.m_extraInfo = -1;
-                theCollector.m_rayHit.m_shapeKeyIndex = 0;
-                theCollector.m_rayHit.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
+                hkpClosestRayHitCollector theCollector;
                 alignas(16) hkArray<hkpSimpleShapePhantom::CollisionDetail, hkContainerHeapAllocator> theDetails;
                 theDetails.m_data = nullptr;
                 theDetails.m_size = 0;
@@ -2503,12 +2475,8 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     bhkWorld* pw;
     CFilter iflt;
     bhkPickData pickRes;
-    XFNV_INLINED_LOCAL(hkpClosestRayHitCollector, v13, hkpClosestRayHitCollector_vftable, std::nullopt);
+    hkpClosestRayHitCollector v13;
     pickRes.m_hitFraction = 1.0f;
-    // MAYBE-INLINED 0xC6E6CE: before the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_rayHit.m_hitFraction = 1.0f;
-    // MAYBE-INLINED 0xC6E6D5: before the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_earlyOutHitFraction = 1.0f;
     pickRes.m_enableShapeCollectionFilter.m_bool = 0;
     pickRes.m_filterInfo = 0;
     pickRes.m_extraInfo = -1;
@@ -2517,14 +2485,6 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     pickRes.m_rootCollidable = nullptr;
     pickRes.pCache = nullptr;
     pickRes.bPickFailed = false;
-    // MAYBE-INLINED 0xC6E715: after the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_rayHit.m_rootCollidable = nullptr;
-    // MAYBE-INLINED 0xC6E71C: after the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_rayHit.m_extraInfo = -1;
-    // MAYBE-INLINED 0xC6E723: after the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_rayHit.m_shapeKeyIndex = 0;
-    // MAYBE-INLINED 0xC6E72A: after the vptr store of hkpClosestRayHitCollector's inlined constructor
-    v13.m_rayHit.m_shapeKeys[0] = -1;
     v4.m_quad = FrontBack[aiFrontBack].m_quad;
     arPos.m_quad = v4.m_quad;
     double v5 = arPos.m_quad[2] - 25.0;
@@ -3043,8 +3003,7 @@ LABEL_108:;
     }
     if (v8->bCollisionBox) {
         float v103;
-        XFNV_INLINED_LOCAL(hkShapePhantomCinfo, sspci, std::nullopt, std::nullopt);
-        ::new (&sspci) hkShapePhantomCinfo;
+        hkShapePhantomCinfo sspci;
         uint32_t iFilter = v8->iColFilter.iFilter;
         NiAVObject* pObject = v8->pObject;
         sspci.m_collisionFilterInfo = (iFilter & 0xFFFFFF80u) | 32;
@@ -3099,17 +3058,6 @@ LABEL_108:;
             if (v92) {
                 NiIncRefCount(v92);
             }
-        }
-        // EXE-INLINED 0xC72210
-        hkMemoryAllocator* v95 = (&hkMemoryRouter::getInstance())->m_heap;
-        sspci.m_properties.m_size = 0;
-        if (sspci.m_properties.m_capacityAndFlags >= 0) {
-            v95->bufFree(
-                sspci.m_properties.m_data,
-                static_cast<int32_t>(
-                    sspci.m_properties.m_capacityAndFlags & hkArrayBase<hkWorldObjectCinfo::Property>::CAPACITY_MASK
-                ) * static_cast<int32_t>(sizeof(hkWorldObjectCinfo::Property))
-            );
         }
     }
 }
@@ -3276,16 +3224,8 @@ void bhkCharacterController::ClearHurtfulHits() {
 // the character is moved.
 void bhkCharacterController::MoveAsProjectile(float afTimeDelta) {
     if ((iFlags & PROJECTILE) != 0 && spShapePhantom) {
-        // EXE-INLINED 0x620FF0
-        XFNV_INLINED_LOCAL(hkpAllCdPointCollector, collector, hkpAllCdPointCollector_vftable, std::nullopt);
-        collector.m_earlyOutDistance = 3.40282e+38f;
-        collector.m_hits.m_data = collector.m_hits.m_storage;
-        collector.m_hits.m_capacityAndFlags = 8 | hkArrayBase<hkpRootCdPoint>::DONT_DEALLOCATE_FLAG;
-        collector.m_hits.m_size = 0;
-        // EXE-INLINED 0x621290
-        XFNV_INLINED_LOCAL(hkpLinearCastInput, castInput, std::nullopt, std::nullopt);
-        castInput.m_maxExtraPenetration = 1.1920929e-07f;
-        castInput.m_startPointTolerance = 1.1920929e-07f;
+        hkpAllCdPointCollector collector;
+        hkpLinearCastInput castInput;
         hkVector4 startPos;
         GetPosition_hk(startPos);
         castInput.m_to.m_quad = _mm_add_ps(
@@ -3303,7 +3243,6 @@ void bhkCharacterController::MoveAsProjectile(float afTimeDelta) {
             }
         }
         SetPosition(castInput.m_to);
-        collector.~hkpAllCdPointCollector();
     }
     else {
         hkVector4 kPos;
@@ -3793,12 +3732,7 @@ bool bhkCharacterController::CheckInsideOfObject() {
         hkpShapeRayCastInput theInput;
         theInput.m_filterInfo = 0;
         theInput.m_rayShapeCollectionFilter = nullptr;
-        // EXE-INLINED 0x4A3D20
-        XFNV_INLINED_LOCAL(hkpShapeRayCastOutput, theOutput, std::nullopt, std::nullopt);
-        theOutput.m_hitFraction = 1.0f;
-        theOutput.m_extraInfo = -1;
-        theOutput.m_shapeKeys[0] = 0xFFFFFFFFu;
-        theOutput.m_shapeKeyIndex = 0;
+        hkpShapeRayCastOutput theOutput;
         theInput.m_from.setTransformedInversePos(pcollidable->m_motion.pState->m_transform, worldStart);
         theInput.m_to.setTransformedInversePos(pcollidable->m_motion.pState->m_transform, worldEnd);
         bool bhit = false;

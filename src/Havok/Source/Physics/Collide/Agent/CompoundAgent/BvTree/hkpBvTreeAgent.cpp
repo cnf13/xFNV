@@ -114,12 +114,8 @@ void hkpBvTreeAgent::processCollision(
 ) {
     HK_TIMER_BEGIN_LIST("BvTree", "QueryTree");
     hkpConstraintOwner* constraintOwner = result.m_constraintOwner.m_storage;
-    // EXE-INLINED none: hkInplaceArray<uint32_t, 128>::hkInplaceArray
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
-    hitList.m_data = hitList.m_storage;
-    hitList.m_size = 0;
-    hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    hitList_t hitList;
     {
         alignas(16) hkTransform bTa;
         bTa.setMulInverseMul(*bodyB.m_motion.pMotion, *bodyA.m_motion.pMotion);
@@ -381,20 +377,7 @@ void hkpBvTreeAgent::processCollision(
                 reinterpret_cast<uintptr_t>(hitList.m_data) + hitList.m_size * sizeof(uint32_t)
             );
 
-            XFNV_INLINED_LOCAL(hkLocalArray<hkpBvAgentEntryInfo>, newEntries, std::nullopt, std::nullopt);
-            newEntries.m_data = nullptr;
-            newEntries.m_size = 0;
-            newEntries.m_capacityAndFlags = hkArrayBase<hkpBvAgentEntryInfo>::DONT_DEALLOCATE_FLAG;
-            {
-                const int32_t capacity = hitList.m_size;
-                hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-                char* memory = stack.m_next.m_storage;
-                stack.m_next.m_storage = memory + ((capacity * sizeof(hkpBvAgentEntryInfo) + 127) & ~size_t(127));
-                newEntries.m_capacityAndFlags = capacity | hkArrayBase<hkpBvAgentEntryInfo>::DONT_DEALLOCATE_FLAG;
-                // The stack allocator hands out untyped bytes (hkAllocateStack).
-                newEntries.m_data = reinterpret_cast<hkpBvAgentEntryInfo*>(memory);
-                newEntries.m_localMemory = newEntries.m_data;
-            }
+            hkLocalArray<hkpBvAgentEntryInfo> newEntries(hitList.m_size);
             newEntries.reserve(hitList.m_size);
             newEntries.setSizeUnchecked(hitList.m_size);
 
@@ -488,42 +471,9 @@ void hkpBvTreeAgent::processCollision(
                 }
                 entries.m_size = newSize;
             }
-
-            // ~hkLocalArray: the stack memory is handed back (the stack allocator's untyped bytes), then the array's
-            // own destructor.
-            if (newEntries.m_localMemory == newEntries.m_data) {
-                newEntries.m_size = 0;
-            }
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(newEntries.m_localMemory);
-            {
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                const int32_t capacityAndFlags = newEntries.m_capacityAndFlags;
-                newEntries.m_size = 0;
-                if (capacityAndFlags >= 0) {
-                    heap.bufFree(
-                        newEntries.m_data,
-                        static_cast<int32_t>(
-                            (capacityAndFlags & hkArrayBase<hkpBvAgentEntryInfo>::CAPACITY_MASK) *
-                            sizeof(hkpBvAgentEntryInfo)
-                        )
-                    );
-                }
-            }
         }
     }
 queryDone:
-    {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = hitList.m_capacityAndFlags;
-        hitList.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                hitList.m_data,
-                static_cast<int32_t>((capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t))
-            );
-        }
-    }
-
     hkpBvAgentEntryInfo* partner = m_collisionPartners.m_data;
     // The end on the address, as above.
     hkpBvAgentEntryInfo* partnersEnd = reinterpret_cast<hkpBvAgentEntryInfo*>(
@@ -672,12 +622,8 @@ void hkpBvTreeAgent::prepareCollisionPartners(
         m_cachedAabb.m_max.m_quad = aabb.m_max.m_quad;
     }
 
-    // EXE-INLINED none: hkInplaceArray<uint32_t, 128>::hkInplaceArray
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
-    hitList.m_data = hitList.m_storage;
-    hitList.m_size = 0;
-    hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hitList_t hitList;
     static_cast<const hkpBvTreeShape*>(bodyB.m_shape)->queryAabb(aabb, hitList);
 
     const int32_t numPartners = m_collisionPartners.m_size;
@@ -804,20 +750,7 @@ void hkpBvTreeAgent::prepareCollisionPartners(
                 reinterpret_cast<uintptr_t>(hitList.m_data) + hitList.m_size * sizeof(uint32_t)
             );
 
-            XFNV_INLINED_LOCAL(hkLocalArray<hkpBvAgentEntryInfo>, newEntries, std::nullopt, std::nullopt);
-            newEntries.m_data = nullptr;
-            newEntries.m_size = 0;
-            newEntries.m_capacityAndFlags = hkArrayBase<hkpBvAgentEntryInfo>::DONT_DEALLOCATE_FLAG;
-            {
-                const int32_t capacity = hitList.m_size;
-                hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-                char* memory = stack.m_next.m_storage;
-                stack.m_next.m_storage = memory + ((capacity * sizeof(hkpBvAgentEntryInfo) + 127) & ~size_t(127));
-                newEntries.m_capacityAndFlags = capacity | hkArrayBase<hkpBvAgentEntryInfo>::DONT_DEALLOCATE_FLAG;
-                // The stack allocator hands out untyped bytes (hkAllocateStack).
-                newEntries.m_data = reinterpret_cast<hkpBvAgentEntryInfo*>(memory);
-                newEntries.m_localMemory = newEntries.m_data;
-            }
+            hkLocalArray<hkpBvAgentEntryInfo> newEntries(hitList.m_size);
             newEntries.reserve(hitList.m_size);
             newEntries.setSizeUnchecked(hitList.m_size);
 
@@ -911,40 +844,6 @@ void hkpBvTreeAgent::prepareCollisionPartners(
                 }
                 entries.m_size = newSize;
             }
-
-            // ~hkLocalArray: the stack memory is handed back (the stack allocator's untyped bytes), then the array's
-            // own destructor.
-            if (newEntries.m_localMemory == newEntries.m_data) {
-                newEntries.m_size = 0;
-            }
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(newEntries.m_localMemory);
-            {
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                const int32_t capacityAndFlags = newEntries.m_capacityAndFlags;
-                newEntries.m_size = 0;
-                if (capacityAndFlags >= 0) {
-                    heap.bufFree(
-                        newEntries.m_data,
-                        static_cast<int32_t>(
-                            (capacityAndFlags & hkArrayBase<hkpBvAgentEntryInfo>::CAPACITY_MASK) *
-                            sizeof(hkpBvAgentEntryInfo)
-                        )
-                    );
-                }
-            }
-        }
-    }
-
-    // ~hkInplaceArray
-    {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = hitList.m_capacityAndFlags;
-        hitList.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                hitList.m_data,
-                static_cast<int32_t>((capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t))
-            );
         }
     }
 }
@@ -1015,12 +914,9 @@ void hkpBvTreeAgent::staticGetPenetrations(
     staticCalcAabb(bodyA, bodyB, input, aabb);
 
     const hkpBvTreeShape* bvB = static_cast<const hkpBvTreeShape*>(bodyB.m_shape);
-    // 16-aligned, as queryAabb receives it. Raw storage: the body frees the keys itself.
+    // 16-aligned, as queryAabb receives it.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
-    hitList.m_data = hitList.m_storage;
-    hitList.m_size = 0;
-    hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hitList_t hitList;
     bvB->queryAabb(aabb, hitList);
     HK_TIMER_SPLIT_LIST("NarrowPhase");
 
@@ -1051,12 +947,6 @@ void hkpBvTreeAgent::staticGetPenetrations(
         }
     }
     HK_TIMER_END_LIST();
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = hitList.m_capacityAndFlags;
-    hitList.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(hitList.m_data, (capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t));
-    }
 }
 
 // As staticLinearCast, with bodyA's plain box, and each child key first goes through the input's collision filter
@@ -1073,12 +963,9 @@ void hkpBvTreeAgent::staticGetClosestPoints(
     staticCalcAabb(bodyA, bodyB, input, aabb);
 
     const hkpBvTreeShape* bvB = static_cast<const hkpBvTreeShape*>(bodyB.m_shape);
-    // 16-aligned, as queryAabb receives it. Raw storage: the body frees the keys itself.
+    // 16-aligned, as queryAabb receives it.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
-    hitList.m_data = hitList.m_storage;
-    hitList.m_size = 0;
-    hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hitList_t hitList;
     bvB->queryAabb(aabb, hitList);
     HK_TIMER_SPLIT_LIST("NarrowPhase");
 
@@ -1106,12 +993,6 @@ void hkpBvTreeAgent::staticGetClosestPoints(
         );
     }
     HK_TIMER_END_LIST();
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = hitList.m_capacityAndFlags;
-    hitList.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(hitList.m_data, (capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t));
-    }
 }
 
 // HK_TIMER_BEGIN_LIST, HK_TIMER_SPLIT_LIST and HK_TIMER_END_LIST write into the stream's raw buffer, which is treated
@@ -1130,13 +1011,9 @@ void hkpBvTreeAgent::staticLinearCast(
     calcAabbLinearCast(bodyA, bodyB, input, aabb);
 
     const hkpBvTreeShape* bvB = static_cast<const hkpBvTreeShape*>(bodyB.m_shape);
-    // 16-aligned, as queryAabb receives it. Raw storage: the body frees the keys itself at the end, so no C++
-    // destructor may free them again.
+    // 16-aligned, as queryAabb receives it.
     using hitList_t = hkInplaceArray<uint32_t, 128>;
-    alignas(16) XFNV_INLINED_LOCAL(hitList_t, hitList, std::nullopt, std::nullopt);
-    hitList.m_data = hitList.m_storage;
-    hitList.m_size = 0;
-    hitList.m_capacityAndFlags = 128 | hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
+    alignas(16) hitList_t hitList;
     bvB->queryAabb(aabb, hitList);
     HK_TIMER_SPLIT_LIST("NarrowPhase");
 
@@ -1158,12 +1035,6 @@ void hkpBvTreeAgent::staticLinearCast(
         );
     }
     HK_TIMER_END_LIST();
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = hitList.m_capacityAndFlags;
-    hitList.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(hitList.m_data, (capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK) * sizeof(uint32_t));
-    }
 }
 
 void hkpBvTreeAgent::calcAabbLinearCast(

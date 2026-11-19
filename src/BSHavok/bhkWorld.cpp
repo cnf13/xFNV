@@ -682,9 +682,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
         if (pAllCollector) {
             char* pCache = arPickData.pCache;
             if (pCache) {
-                XFNV_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
-                kCaster.m_shapeInput.m_filterInfo = 0;
-                kCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+                hkpWorldRayCaster kCaster;
                 kCaster.castRay(*pWorld->m_broadPhase, arPickData, pWorld->m_collisionFilter, pCache, *pAllCollector);
             }
             else {
@@ -713,9 +711,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
                 char* pCache = arPickData.pCache;
                 if (pCache) {
                     // As above: the caster's constructor and destructor are inline.
-                    XFNV_INLINED_LOCAL(hkpWorldRayCaster, kCaster, hkpWorldRayCaster_vftable, std::nullopt);
-                    kCaster.m_shapeInput.m_filterInfo = 0;
-                    kCaster.m_shapeInput.m_rayShapeCollectionFilter = nullptr;
+                    hkpWorldRayCaster kCaster;
                     kCaster.castRay(
                         *pWorld->m_broadPhase, arPickData, pWorld->m_collisionFilter, pCache, *pClosestCollector
                     );
@@ -1363,10 +1359,7 @@ void bhkWorld::SetVisualDebugger(bool abTF) {
     if (pDebugger) {
         return;
     }
-    XFNV_INLINED_LOCAL(hkArray<hkProcessContext*>, contexts, std::nullopt, std::nullopt);
-    contexts.m_data = nullptr;
-    contexts.m_size = 0;
-    contexts.m_capacityAndFlags = hkArrayBase<hkProcessContext*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkProcessContext*> contexts;
     hkpPhysicsContext::registerAllPhysicsProcesses();
     void* pContextMemory = hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpPhysicsContext));
     static_cast<hkReferencedObject*>(pContextMemory)->m_memSizeAndFlags = sizeof(hkpPhysicsContext);
@@ -1384,14 +1377,6 @@ void bhkWorld::SetVisualDebugger(bool abTF) {
     hkVisualDebugger* pVisualDebugger = ::new (pDebuggerMemory) hkVisualDebugger(&contexts, nullptr);
     pDebugger = pVisualDebugger;
     pVisualDebugger->serve(25001);
-    hkMemoryAllocator& kFreeHeap = hkMemoryRouter::getInstance().heap();
-    contexts.m_size = 0;
-    if (!(contexts.m_capacityAndFlags & hkArrayBase<hkProcessContext*>::DONT_DEALLOCATE_FLAG)) {
-        kFreeHeap.bufFree(
-            contexts.m_data,
-            (contexts.m_capacityAndFlags & hkArrayBase<hkProcessContext*>::CAPACITY_MASK) * sizeof(hkProcessContext*)
-        );
-    }
 }
 
 // Writes the world to the file: an hkOstream over the file name, then the snapshot writer, which gets the world (called
@@ -1586,8 +1571,7 @@ void bhkWorld::AddBatchedPhantoms() {
     }
 }
 
-// An action not yet in a world goes in only when every entity it acts on is in this world. The entity list is a
-// local hkArray, constructed empty and freed inline (heap bufFree unless it never allocated).
+// An action not yet in a world goes in only when every entity it acts on is in this world.
 void bhkWorld::AddBatchedActions() {
     AutoMemContext tempMemContext(MEM_CONTEXT_HAVOK);
     if (iActionBatchCount) {
@@ -1599,10 +1583,7 @@ void bhkWorld::AddBatchedActions() {
             for (uint32_t i = 0; i < iActionBatchCount; ++i) {
                 hkpAction* pAction = pActionBatch[i];
                 if (pAction && !pAction->m_world) {
-                    XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
-                    entities.m_data = nullptr;
-                    entities.m_size = 0;
-                    entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+                    hkArray<hkpEntity*> entities;
                     pAction->getEntities(entities);
                     bool bSameWorld = true;
                     for (int32_t j = 0; j < entities.m_size; ++j) {
@@ -1614,16 +1595,6 @@ void bhkWorld::AddBatchedActions() {
                     if (bSameWorld) {
                         pw->addAction(pActionBatch[i]);
                     }
-                    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-                    entities.m_size = 0;
-                    if (!(entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG)) {
-                        kHeap.bufFree(
-                            entities.m_data,
-                            (entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) * sizeof(hkpEntity*)
-                        );
-                    }
-                    entities.m_data = nullptr;
-                    entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
                 }
                 if (pActionBatch[i]) {
                     pActionBatch[i]->removeReference();
@@ -1925,11 +1896,7 @@ void bhkWorld::DeactivateAllIslands() {
         GethkWorld();
         hkpWorldOperationUtil::cleanupDirtyIslands(pWorld);
         GethkWorld();
-        // EXE-INLINED none: hkArray<hkpSimulationIsland*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpSimulationIsland*>, kIslands, std::nullopt, std::nullopt);
-        kIslands.m_data = nullptr;
-        kIslands.m_size = 0;
-        kIslands.m_capacityAndFlags = static_cast<int32_t>(hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG);
+        hkArray<hkpSimulationIsland*> kIslands;
         GethkWorld();
         // EXE-INLINED none: hkArray<hkpSimulationIsland*>::operator=
         kIslands.copyFromArray(hkMemoryRouter::getInstance().heap(), pWorld->m_activeSimulationIslands, hkTypeIsPod());
@@ -1954,11 +1921,6 @@ void bhkWorld::DeactivateAllIslands() {
         GethkWorld();
         hkpWorldOperationUtil::cleanupDirtyIslands(pWorld);
         GethkWorld();
-        // EXE-INLINED none: hkArray<hkpSimulationIsland*>::~hkArray
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        if ((kIslands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG) == 0) {
-            rHeap._bufFree<hkpSimulationIsland*>(kIslands.m_data, kIslands.getCapacity());
-        }
     }
 }
 

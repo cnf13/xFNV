@@ -434,8 +434,7 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
     alignas(8) hkDataClass klass;
     obj.getClass(&klass);
     writeClass(klass);
-    XFNV_INLINED_LOCAL(Writer::MemberWriteFlags, flags, std::nullopt, std::nullopt);
-    ::new (&flags) Writer::MemberWriteFlags(klass.getNumMembers());
+    Writer::MemberWriteFlags flags(klass.getNumMembers());
     for (int32_t it = obj.getMemberIterator(); obj.isValid(it); it = obj.getNextMember(it)) {
         hkDataObject::Value value;
         obj.getMemberValue(&value, it);
@@ -504,16 +503,6 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
         const int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
         flags.toBytes(m_bitfieldBuf._expandBy(*hkMemoryRouter::getInstance().m_temp, numBytes));
     }
-    // EXE-INLINED none: hkArray<hkBool, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator* pTempFlags = hkMemoryRouter::getInstance().m_temp;
-    flags.m_flags.m_size = 0;
-    if ((flags.m_flags.m_capacityAndFlags & hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG) == 0) {
-        pTempFlags->bufFree(
-            flags.m_flags.m_data, flags.m_flags.m_capacityAndFlags & hkArrayBase<hkBool>::CAPACITY_MASK
-        );
-    }
-    flags.m_flags.m_data = nullptr;
-    flags.m_flags.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
 }
 
 // Writes numItems items of arr by its element type: a tuple's items as arrays (recursively), numbers, vectors (a
@@ -583,13 +572,9 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             alignas(8) hkDataClass klass;
             int32_t numMembers = arr.getClass(&klass)->getNumMembers();
 
-            // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::hkArray(int)
-            // Raw storage: the body frees the storage itself, so no C++ destructor may free it again.
             using minfo_t = hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>;
-            alignas(8) XFNV_INLINED_LOCAL(minfo_t, minfo, std::nullopt, std::nullopt);
-            minfo.m_data = nullptr;
-            minfo.m_size = 0;
-            minfo.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
+            alignas(8) minfo_t minfo;
+            // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::hkArray(int)
             hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
             int32_t numInfos = numMembers;
             hkDataClass::MemberInfo* pInfos = numInfos ? pTemp->_bufAlloc<hkDataClass::MemberInfo>(numInfos) : nullptr;
@@ -626,31 +611,23 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
                 }
             }
 
-            // EXE-INLINED none: hkArray<uint8_t, hkContainerTempAllocator>::hkArray
-            using bytes_t = hkArray<uint8_t, hkContainerTempAllocator>;
-            XFNV_INLINED_LOCAL(bytes_t, bytes, std::nullopt, std::nullopt);
-            bytes.m_data = nullptr;
-            bytes.m_size = 0;
-            int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
-            bytes.m_capacityAndFlags = hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
-            // EXE-INLINED none: hkArray<uint8_t, hkContainerTempAllocator>::setSize
-            hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
-            int32_t capacity = bytes.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
-            if (capacity < numBytes) {
-                int32_t newCapacity = 2 * capacity;
-                if (numBytes >= newCapacity) {
-                    newCapacity = numBytes;
+            {
+                using bytes_t = hkArray<uint8_t, hkContainerTempAllocator>;
+                bytes_t bytes;
+                int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
+                // EXE-INLINED none: hkArray<uint8_t, hkContainerTempAllocator>::setSize
+                hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
+                int32_t capacity = bytes.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
+                if (capacity < numBytes) {
+                    int32_t newCapacity = 2 * capacity;
+                    if (numBytes >= newCapacity) {
+                        newCapacity = numBytes;
+                    }
+                    hkArrayUtil::_reserve(*pTemp2, &bytes, newCapacity, sizeof(uint8_t));
                 }
-                hkArrayUtil::_reserve(*pTemp2, &bytes, newCapacity, sizeof(uint8_t));
-            }
-            bytes.m_size = numBytes;
-            flags.toBytes(bytes.m_data);
-            m_oa.writeRaw(bytes.m_data, bytes.m_size);
-            // EXE-INLINED none: hkArray<uint8_t, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator* pTemp3 = hkMemoryRouter::getInstance().m_temp;
-            bytes.m_size = 0;
-            if (bytes.m_capacityAndFlags >= 0) {
-                pTemp3->bufFree(bytes.m_data, bytes.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK);
+                bytes.m_size = numBytes;
+                flags.toBytes(bytes.m_data);
+                m_oa.writeRaw(bytes.m_data, bytes.m_size);
             }
 
             for (int32_t i = 0; i < numMembers; ++i) {
@@ -671,14 +648,6 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             }
             flags.m_flags.m_data = nullptr;
             flags.m_flags.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
-            // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::~hkArray
-            hkMemoryAllocator* pTemp5 = hkMemoryRouter::getInstance().m_temp;
-            minfo.m_size = 0;
-            if (minfo.m_capacityAndFlags >= 0) {
-                pTemp5->_bufFree<hkDataClass::MemberInfo>(
-                    minfo.m_data, minfo.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK
-                );
-            }
             return;
         }
         case hkDataObject::TYPE_OBJECT: {
@@ -734,8 +703,7 @@ void Writer::writeObject(const hkDataObject& objIn) {
     pDetails->wasWritten = 1;
     writeInt(classIndex);
     const int32_t numMembers = klass.getNumMembers();
-    XFNV_INLINED_LOCAL(Writer::MemberWriteFlags, flags, std::nullopt, std::nullopt);
-    ::new (&flags) Writer::MemberWriteFlags(numMembers);
+    Writer::MemberWriteFlags flags(numMembers);
 
     // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::hkArray(buffer, size, capacity)
     // The object's flag bytes, an array over m_bitfieldBuf's storage that does not own it.
@@ -800,14 +768,4 @@ void Writer::writeObject(const hkDataObject& objIn) {
     }
     minfo.m_data = nullptr;
     minfo.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkBool, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator* pTempFlags = hkMemoryRouter::getInstance().m_temp;
-    flags.m_flags.m_size = 0;
-    if ((flags.m_flags.m_capacityAndFlags & hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG) == 0) {
-        pTempFlags->bufFree(
-            flags.m_flags.m_data, flags.m_flags.m_capacityAndFlags & hkArrayBase<hkBool>::CAPACITY_MASK
-        );
-    }
-    flags.m_flags.m_data = nullptr;
-    flags.m_flags.m_capacityAndFlags = hkArrayBase<hkBool>::DONT_DEALLOCATE_FLAG;
 }

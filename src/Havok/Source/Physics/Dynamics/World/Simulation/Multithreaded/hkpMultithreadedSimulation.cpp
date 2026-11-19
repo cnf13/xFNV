@@ -522,41 +522,12 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
     hkpSimulationIsland* island = entities[0]->getSimulationIsland();
     const int32_t numIslandEntities = island->m_entities.m_size;
 
-    // The stack allocator's bytes are untyped memory (char* in hkStackMemory); each local array keeps its elements
-    // there and gives the block back through the same char*.
-    XFNV_INLINED_LOCAL(hkLocalArray<uint8_t>, entityInfo, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkUchar>::hkLocalArray(numIslandEntities) (hkAllocateStack)
-        entityInfo.m_data = nullptr;
-        entityInfo.m_size = 0;
-        entityInfo.m_capacityAndFlags = hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numIslandEntities + 127) & ~127);
-        entityInfo.m_data = static_cast<uint8_t*>(static_cast<void*>(pBlock));
-        entityInfo.m_capacityAndFlags = numIslandEntities | hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
-        entityInfo.m_localMemory = entityInfo.m_data;
-    }
+    hkLocalArray<uint8_t> entityInfo(numIslandEntities);
     hkString::memSet(entityInfo.m_data, 0, numIslandEntities);
 
-    XFNV_INLINED_LOCAL(hkLocalArray<hkpAgentNnEntry*>, agentEntries, std::nullopt, std::nullopt);
-    {
-        // EXE-INLINED none: hkLocalArray<hkpAgentNnEntry*>::hkLocalArray(1000) (hkAllocateStack)
-        agentEntries.m_data = nullptr;
-        agentEntries.m_size = 0;
-        agentEntries.m_capacityAndFlags = hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((1000 * static_cast<int32_t>(sizeof(hkpAgentNnEntry*)) + 127) & ~127);
-        agentEntries.m_data = static_cast<hkpAgentNnEntry**>(static_cast<void*>(pBlock));
-        agentEntries.m_capacityAndFlags = 1000 | hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG;
-        agentEntries.m_localMemory = agentEntries.m_data;
-    }
+    hkLocalArray<hkpAgentNnEntry*> agentEntries(1000);
 
-    XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
-    collisionEntries.m_data = nullptr;
-    collisionEntries.m_size = 0;
-    collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpLinkedCollidable::CollisionEntry> collisionEntries;
 
     for (int32_t e = 0; e < numEntities; e++) {
         hkpEntity* entity = entities[e];
@@ -593,27 +564,6 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
     if (agentEntries.m_size) {
         processAgentNnEntries(agentEntries.m_data, agentEntries.m_size, input, island, hkBool(false));
     }
-
-    {
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = collisionEntries.m_capacityAndFlags;
-        collisionEntries.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                collisionEntries.m_data,
-                static_cast<int32_t>(
-                    (capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::CAPACITY_MASK) *
-                    sizeof(hkpLinkedCollidable::CollisionEntry)
-                )
-            );
-        }
-        collisionEntries.m_data = nullptr;
-        collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
-    }
-
-    agentEntries.~hkLocalArray<hkpAgentNnEntry*>();
-    entityInfo.~hkLocalArray<uint8_t>();
 }
 
 // Recollides at the PSI time the agents of the entities the TOI phase moved: every agent entry of every entity in the
@@ -629,33 +579,15 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
     ++m_world->m_criticalOperationsLockCount;
 
     using entriesSet_t = hkPointerMap<hkpAgentNnEntry*, int32_t>;
-    XFNV_INLINED_LOCAL(entriesSet_t, entriesSet, std::nullopt, std::nullopt);
-    // EXE-INLINED 0x626630
-    entriesSet.m_map.m_elem = nullptr;
-    entriesSet.m_map.m_numElems = 0;
-    entriesSet.m_map.m_hashMod = -1;
-    // The SDK's inline hkPointerMap constructor's reserve: the map's reserve on the thread's heap.
-    entriesSet.m_map.hkUlongMapBase::reserve(hkMemoryRouter::getInstance().heap(), 0);
-    XFNV_INLINED_LOCAL(hkArray<EntryAndIsland>, entriesAndIslands, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<EntryAndIsland>::hkArray
-    entriesAndIslands.m_data = nullptr;
-    entriesAndIslands.m_size = 0;
-    entriesAndIslands.m_capacityAndFlags = hkArrayBase<EntryAndIsland>::DONT_DEALLOCATE_FLAG;
-    XFNV_INLINED_LOCAL(hkArray<hkpIslandsAgentEntriesInfo>, islandEntriesInfos, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkpIslandsAgentEntriesInfo>::hkArray
-    islandEntriesInfos.m_data = nullptr;
-    islandEntriesInfos.m_size = 0;
-    islandEntriesInfos.m_capacityAndFlags = hkArrayBase<hkpIslandsAgentEntriesInfo>::DONT_DEALLOCATE_FLAG;
+    entriesSet_t entriesSet;
+    hkArray<EntryAndIsland> entriesAndIslands;
+    hkArray<hkpIslandsAgentEntriesInfo> islandEntriesInfos;
     int32_t numAllEntries = 0;
 
     for (int32_t it = entitiesNeedingPsiCollisionDetection.getIterator();
          entitiesNeedingPsiCollisionDetection.isValid(it); it = entitiesNeedingPsiCollisionDetection.getNext(it)) {
         hkpEntity* entity = entitiesNeedingPsiCollisionDetection.getValue(it);
-        XFNV_INLINED_LOCAL(hkArray<hkpLinkedCollidable::CollisionEntry>, collisionEntries, std::nullopt, std::nullopt);
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::hkArray
-        collisionEntries.m_data = nullptr;
-        collisionEntries.m_size = 0;
-        collisionEntries.m_capacityAndFlags = hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpLinkedCollidable::CollisionEntry> collisionEntries;
         entity->m_collidable.getCollisionEntriesSorted(collisionEntries);
         const int32_t numCollisionEntries = collisionEntries.m_size;
         for (int32_t i = 0; i < numCollisionEntries; ++i) {
@@ -730,8 +662,6 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
             numAllEntries++;
         }
         entity->removeReference();
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::~hkArray
-        collisionEntries.clearAndDeallocate();
     }
     entitiesNeedingPsiCollisionDetection.m_map.clear();
 
@@ -803,12 +733,6 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
     // The block goes back by resetting the untyped m_next to its start.
     // EXE-INLINED none: hkDeallocateStack<hkpAgentNnEntry*>
     hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(allEntries);
-    // EXE-INLINED none: hkArray<hkpIslandsAgentEntriesInfo>::~hkArray
-    islandEntriesInfos.clearAndDeallocate();
-    // EXE-INLINED none: hkArray<EntryAndIsland>::~hkArray
-    entriesAndIslands.clearAndDeallocate();
-    // EXE-INLINED 0x6264F0
-    entriesSet.m_map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
 }
 
 void hkpMultiThreadedSimulation::getMultithreadConfig(hkpMultithreadConfig& config) const {
@@ -1355,11 +1279,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntries(
         return;
     }
     const int32_t numAgentNnEntriesPerTask = m_world->m_maxEntriesPerToiCollideTask;
-    // EXE-INLINED 0x62E230
-    XFNV_INLINED_LOCAL(hkArray<hkpAgentNnEntry*>, entriesArray, std::nullopt, std::nullopt);
-    entriesArray.m_data = entries;
-    entriesArray.m_size = numEntries;
-    entriesArray.m_capacityAndFlags = numEntries | hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkpAgentNnEntry*> entriesArray(entries, numEntries, numEntries);
     // EXE-INLINED none: hkpAgentNnEntryJob::hkpAgentNnEntryJob
     alignas(16) hkpAgentNnEntryJob job;
     job.m_jobSubType = hkpDynamicsJob::DYNAMICS_JOB_AGENT_NN_ENTRY;
@@ -1426,15 +1346,6 @@ void hkpMultiThreadedSimulation::processAgentNnEntries(
                 tl.m_collisionInput.m_spareAgentSector, sizeof(hkpAgent1nSector)
             );
         }
-    }
-    // EXE-INLINED none: hkArray<hkpAgentNnEntry*>::~hkArray
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    if (!(entriesArray.m_capacityAndFlags & hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG)) {
-        heap->bufFree(
-            entriesArray.m_data,
-            static_cast<int32_t>(entriesArray.m_capacityAndFlags & hkArrayBase<hkpAgentNnEntry*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpAgentNnEntry*))
-        );
     }
 }
 

@@ -223,17 +223,9 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
             newSystem->m_actions.m_data[i] = nullptr;
             continue;
         }
-        // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, entities, std::nullopt, std::nullopt);
-        entities.m_data = nullptr;
-        entities.m_size = 0;
-        entities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpEntity*> entities;
         action->getEntities(entities);
-        // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpEntity*>, newEntities, std::nullopt, std::nullopt);
-        newEntities.m_data = nullptr;
-        newEntities.m_size = 0;
-        newEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpEntity*> newEntities;
         newEntities.setSize(entities.getSize());
         for (int32_t j = 0; j < newEntities.getSize(); ++j) {
             const hkpEntity* entity = entities.m_data[j];
@@ -247,17 +239,9 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
             }
             newEntities.m_data[j] = newSystem->m_rigidBodies.m_data[index];
         }
-        // EXE-INLINED none: hkArray<hkpPhantom*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpPhantom*>, phantoms, std::nullopt, std::nullopt);
-        phantoms.m_data = nullptr;
-        phantoms.m_size = 0;
-        phantoms.m_capacityAndFlags = hkArrayBase<hkpPhantom*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpPhantom*> phantoms;
         action->getPhantoms(phantoms);
-        // EXE-INLINED none: hkArray<hkpPhantom*>::hkArray
-        XFNV_INLINED_LOCAL(hkArray<hkpPhantom*>, newPhantoms, std::nullopt, std::nullopt);
-        newPhantoms.m_data = nullptr;
-        newPhantoms.m_size = 0;
-        newPhantoms.m_capacityAndFlags = hkArrayBase<hkpPhantom*>::DONT_DEALLOCATE_FLAG;
+        hkArray<hkpPhantom*> newPhantoms;
         newPhantoms.setSize(phantoms.getSize());
         for (int32_t j = 0; j < newPhantoms.getSize(); ++j) {
             const hkpPhantom* phantom = phantoms.m_data[j];
@@ -272,14 +256,6 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
             newPhantoms.m_data[j] = newSystem->m_phantoms.m_data[index];
         }
         newSystem->m_actions.m_data[i] = action->clone(newEntities, newPhantoms);
-        // EXE-INLINED none: hkArray<hkpPhantom*>::~hkArray
-        newPhantoms.clearAndDeallocate();
-        // EXE-INLINED none: hkArray<hkpPhantom*>::~hkArray
-        phantoms.clearAndDeallocate();
-        // EXE-INLINED none: hkArray<hkpEntity*>::~hkArray
-        newEntities.clearAndDeallocate();
-        // EXE-INLINED none: hkArray<hkpEntity*>::~hkArray
-        entities.clearAndDeallocate();
     }
     return newSystem;
 }

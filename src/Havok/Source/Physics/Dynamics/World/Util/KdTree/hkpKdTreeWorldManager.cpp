@@ -91,29 +91,15 @@ void hkpKdTreeWorldManager::phantomRemovedCallback(hkpPhantom* phantom) {
 }
 
 // HK_TIMER_BEGIN_LIST, HK_TIMER_SPLIT_LIST and HK_TIMER_END_LIST write into the stream's raw buffer, which is treated
-// as untyped (hence the casts). The list starts empty (no storage, not ours).
+// as untyped (hence the casts).
 void hkpKdTreeWorldManager::updateFromWorld(hkJobQueue* jobQueue, hkJobThreadPool* jobThreadPool) {
     HK_TIMER_BEGIN_LIST("kdTreeUpdate", "gather");
-    XFNV_INLINED_LOCAL(hkArray<const hkpCollidable*>, collidables, std::nullopt, std::nullopt);
-    collidables.m_data = nullptr;
-    collidables.m_size = 0;
-    collidables.m_capacityAndFlags = hkArrayBase<const hkpCollidable*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkpCollidable*> collidables;
     gatherCollidablesFromWorld(collidables);
     HK_TIMER_SPLIT_LIST("rebuild");
     buildTree(m_kdTree, collidables, jobQueue, jobThreadPool);
     m_mustUpdateFromWorld.m_bool = 0;
     HK_TIMER_END_LIST();
-
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = collidables.m_capacityAndFlags;
-    collidables.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            collidables.m_data,
-            (capacityAndFlags & hkArrayBase<const hkpCollidable*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(const hkpCollidable*))
-        );
-    }
 }
 
 void hkpKdTreeWorldManager::castRay(
@@ -122,7 +108,7 @@ void hkpKdTreeWorldManager::castRay(
     hkpWorldRayCastOutput& output
 ) const {
     hkpWorldRayCastOutput* pOutput = &output;
-    XFNV_INLINED_LOCAL(hkpKdTreeCollidableRaycaster, collector, hkpKdTreeCollidableRaycaster_vftable, std::nullopt);
+    hkpKdTreeCollidableRaycaster collector;
     // MAYBE-INLINED 0xD0A39E: before the vptr store of hkpKdTreeCollidableRaycaster's inlined constructor
     collector.m_output = pOutput;
     // MAYBE-INLINED 0xD0A3AE: after the vptr store of hkpKdTreeCollidableRaycaster's inlined constructor
@@ -172,7 +158,7 @@ void hkpKdTreeWorldManager::linearCast(
     hkpCdPointCollector& castCollector,
     hkpCdPointCollector* startPointCollector
 ) {
-    XFNV_INLINED_LOCAL(hkpKdTreeWorldLinearCaster, v9, hkpKdTreeWorldLinearCaster_vftable, std::nullopt);
+    hkpKdTreeWorldLinearCaster v9;
     // MAYBE-INLINED 0xD0A4A8: before the vptr store of hkpKdTreeWorldLinearCaster's inlined constructor
     v9.m_shapeInput.m_maxExtraPenetration = 1.1920929e-07f;
     hkKdTree* m_kdTree = this->m_kdTree;
@@ -338,7 +324,7 @@ void hkpKdTreeWorldManager::buildTreeDistributed(
     // The SDK's hkArray<int, hkContainerTempAllocator>(4), twice: the branches' depths and the sub jobs' sizes.
     // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray(int)
     using TempIntArray = hkArray<int32_t, hkContainerTempAllocator>;
-    XFNV_INLINED_LOCAL(TempIntArray, branchDepths, std::nullopt, std::nullopt);
+    TempIntArray branchDepths;
     {
         int32_t n = 4;
         branchDepths.m_data = hkMemoryRouter::getInstance().temp()._bufAlloc<int32_t>(n);
@@ -346,7 +332,7 @@ void hkpKdTreeWorldManager::buildTreeDistributed(
         branchDepths.m_capacityAndFlags = n ? n : static_cast<int32_t>(hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
     }
     // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray(int)
-    XFNV_INLINED_LOCAL(TempIntArray, subJobSizes, std::nullopt, std::nullopt);
+    TempIntArray subJobSizes;
     {
         int32_t n = 4;
         subJobSizes.m_data = hkMemoryRouter::getInstance().temp()._bufAlloc<int32_t>(n);
@@ -404,25 +390,5 @@ void hkpKdTreeWorldManager::buildTreeDistributed(
     if (semaphore) {
         semaphore->~hkSemaphore();
         hkMemoryRouter::getInstance().heap().blockFree(semaphore, sizeof(hkSemaphore));
-    }
-
-    // The two arrays' destructors, in reverse order of construction.
-    // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::~hkArray
-    {
-        hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
-        if ((subJobSizes.m_capacityAndFlags & hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG) == 0) {
-            temp._bufFree<int32_t>(
-                subJobSizes.m_data, subJobSizes.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK
-            );
-        }
-    }
-    // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::~hkArray
-    {
-        hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
-        if ((branchDepths.m_capacityAndFlags & hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG) == 0) {
-            temp._bufFree<int32_t>(
-                branchDepths.m_data, branchDepths.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK
-            );
-        }
     }
 }

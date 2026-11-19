@@ -4503,7 +4503,6 @@ void HighProcess::ProcessGreet(
 
 void HighProcess::ProcessObserveCombat(Actor* apActor) {
     NiPoint3 result;
-    XFNV_INLINED_LOCAL(PathingLocation, apMemory, std::nullopt, std::nullopt);
     NiPoint3 goalPoint;
     using v18_t = BSSimpleArray<Actor*, 1024>;
     TESPackage* pbasepack = GetPackageThatIsRunning();
@@ -4570,9 +4569,7 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
                     hideRequest.SetCantOpenDoors(v6->GetCantOpenDoors());
                 }
                 NiPoint3* v3 = ::new (&result) NiPoint3(pspecPack->GetEventCenter());
-                PathingLocation* aThreatLocation = ::new (&apMemory) PathingLocation(*v3, apActor);
-                hideRequest.SetThreatLocation(*aThreatLocation);
-                apMemory.~PathingLocation();
+                hideRequest.SetThreatLocation(PathingLocation(*v3, apActor));
                 float afDistance = pspecPack->fEventRadius + 128.0;
                 hideRequest.SetMinHideDistance(afDistance);
                 hideRequest.SetTargetRadius(64.0f);
@@ -12187,9 +12184,6 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
 
 void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float afRadius) {
     float forigradius;
-    XFNV_INLINED_LOCAL(PathingLocation, v21, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingLocation, v22, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(PathingLocation, apLocation, std::nullopt, std::nullopt);
     NiPoint3 apMemory_252;
     NiPoint3 pPackPoint;
     if (bGreetingFlag) {
@@ -12331,9 +12325,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
             float apMemory_188 = apMemory_192.UnitizeGetLength();
             if (apActor->GetDistanceFromPoint(apMemory_252) <= 20.0) {
                 PathingRequestClosePoint v31;
-                PathingLocation* apOrigin = ::new (&apLocation) PathingLocation(&pPackPoint, apMemory_248);
-                v31.SetOrigin(*apOrigin);
-                apLocation.~PathingLocation();
+                v31.SetOrigin(PathingLocation(&pPackPoint, apMemory_248));
                 float v16 = forigradius_2 * 0.75;
                 float a2_4 = BSMIN(32.0f, v16);
                 v31.SetMinDistance(a2_4);
@@ -12346,9 +12338,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
             apMemory_248 = pDataHandler->GetCellFromWorldCoord(pPackPoint.x, pPackPoint.y, WorldSpace, false);
             if (apMemory_248) {
                 PathingRequestClosePoint apThis_208;
-                PathingLocation* aOrigin = ::new (&v22) PathingLocation(&pPackPoint, apMemory_248);
-                apThis_208.SetOrigin(*aOrigin);
-                v22.~PathingLocation();
+                apThis_208.SetOrigin(PathingLocation(&pPackPoint, apMemory_248));
                 float v14 = forigradius_2 * 0.75;
                 float a2_4a = BSMIN(32.0f, v14);
                 apThis_208.SetMinDistance(a2_4a);
@@ -12390,9 +12380,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
         if (forigradius_2 < static_cast<double>(apThis_204)) {
             apThis_191 = 1;
             PathingRequestClosePoint v26;
-            PathingLocation* v13 = ::new (&v21) PathingLocation(&pPackPoint, apActor->GetParentCell());
-            v26.SetOrigin(*v13);
-            v21.~PathingLocation();
+            v26.SetOrigin(PathingLocation(&pPackPoint, apActor->GetParentCell()));
             float v12 = forigradius_2 / 2.0;
             v26.SetMinDistance(v12);
             v26.SetMaxDistance(forigradius_2);
@@ -13879,7 +13867,6 @@ void HighProcess::DetectDoorsForPathing(Actor* apActor) {
     NiPoint3 v8;
     NiPoint3 v9;
     NiPoint3 dst;
-    XFNV_INLINED_LOCAL(hkpAllCdBodyPairCollector, collector, std::nullopt, std::nullopt);
     NiTransform actorToWorld;
     NiTransform pextenttemp;
     NiTransform boxToActor;
@@ -13928,19 +13915,21 @@ void HighProcess::DetectDoorsForPathing(Actor* apActor) {
             actorToWorld = apActor->Get3D()->GetWorldTransform();
             ::new (&boxToWorld__boxToActor) NiTransform(actorToWorld * boxToActor);
             spShapePhantom.m_pObject->SetTransform(boxToWorld__boxToActor);
-            ::new (&collector) hkpAllCdBodyPairCollector;
-            collector.hkpAllCdBodyPairCollector::reset();
-            spShapePhantom.m_pObject->GetPenetrations(&collector);
-            ihits = (&collector.m_hits)->m_size;
-            for (int32_t I = 0; I < ihits; ++I) {
-                const hkpCollidable* pcol = (&(&collector.m_hits)->operator[]<hkpRootCdBodyPair>(I))->m_rootCollidableB;
-                NiAVObject* pavobj = bhkUtilFunctions::GetNiAVObject(pcol);
-                TESObjectREFR* pTemp = TESObjectREFR::FindReferenceFor3D(pavobj);
-                if ((pTemp) && (pTemp->GetObjectReference()->GetFormType() == DOOR_ID && !pTemp->GetTeleport())) {
-                    pfoundDoor = pTemp;
+            {
+                hkpAllCdBodyPairCollector collector;
+                collector.hkpAllCdBodyPairCollector::reset();
+                spShapePhantom.m_pObject->GetPenetrations(&collector);
+                ihits = (&collector.m_hits)->m_size;
+                for (int32_t I = 0; I < ihits; ++I) {
+                    const hkpCollidable* pcol =
+                        (&(&collector.m_hits)->operator[]<hkpRootCdBodyPair>(I))->m_rootCollidableB;
+                    NiAVObject* pavobj = bhkUtilFunctions::GetNiAVObject(pcol);
+                    TESObjectREFR* pTemp = TESObjectREFR::FindReferenceFor3D(pavobj);
+                    if ((pTemp) && (pTemp->GetObjectReference()->GetFormType() == DOOR_ID && !pTemp->GetTeleport())) {
+                        pfoundDoor = pTemp;
+                    }
                 }
             }
-            collector.~hkpAllCdBodyPairCollector();
         LABEL_21:;
             apActor->SetPathingDoorReference(pfoundDoor);
         }
@@ -14178,7 +14167,6 @@ void HighProcess::ProcessSurfaceOneHour(Actor* apActor) {
 }
 
 bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
-    XFNV_INLINED_LOCAL(PathingLocation, result_1, std::nullopt, std::nullopt);
     NiPoint3 apMemory_192;
     if (!apActor->GetParentCell()) {
         return false;
@@ -14198,9 +14186,7 @@ bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
         apMemory_204 = pDataHandler->GetCellFromWorldCoord(apMemory_192.x, apMemory_192.y, WorldSpace, false);
     }
     PathingRequestClosePoint v11;
-    PathingLocation* apOrigin = ::new (&result_1) PathingLocation(&apMemory_192, apMemory_204);
-    v11.SetOrigin(*apOrigin);
-    result_1.~PathingLocation();
+    v11.SetOrigin(PathingLocation(&apMemory_192, apMemory_204));
     v11.SetMinDistance(32.0f);
     float a2_4 = static_cast<float>(apMemory_188->GetLocationRadius(apActor));
     v11.SetMaxDistance(a2_4);

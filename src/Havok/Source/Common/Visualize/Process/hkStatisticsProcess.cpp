@@ -53,18 +53,9 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     }
     using globalFixups_t = hkArray<hkObjectSerialize::GlobalFixup, hkContainerHeapAllocator>;
     using ptrs_t = hkArray<const char*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(globalFixups_t, globalFixups, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ptrs_t, startPtrs, std::nullopt, std::nullopt);
-    XFNV_INLINED_LOCAL(ptrs_t, endPtrs, std::nullopt, std::nullopt);
-    globalFixups.m_capacityAndFlags = hkArrayBase<hkObjectSerialize::GlobalFixup>::DONT_DEALLOCATE_FLAG;
-    startPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
-    endPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
-    globalFixups.m_data = nullptr;
-    globalFixups.m_size = 0;
-    startPtrs.m_data = nullptr;
-    startPtrs.m_size = 0;
-    endPtrs.m_data = nullptr;
-    endPtrs.m_size = 0;
+    globalFixups_t globalFixups;
+    ptrs_t startPtrs;
+    ptrs_t endPtrs;
     const int32_t numContexts = m_contexts.getSize();
     for (int32_t c = 0; c < numContexts; ++c) {
         if (m_contexts.m_data[c]->m_monitorStreamBegins.getSize() > 0) {
@@ -103,12 +94,7 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     int32_t totalMonLen = 0;
     {
         using map_t = hkPointerMap<const void*, const char*, hkContainerHeapAllocator>;
-        XFNV_INLINED_LOCAL(map_t, map, std::nullopt, std::nullopt);
-        map.m_map.m_elem = nullptr;
-        map.m_map.m_numElems = 0;
-        map.m_map.m_hashMod = -1;
-        hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-        map.m_map.hkUlongMapBase::reserve(*Instance->m_heap, 0);
+        map_t map;
         hkMonitorStreamStringMap strMap;
         for (int32_t si = 0; si < startPtrs.getSize(); ++si) {
             hkMonitorStreamAnalyzer::extractStringMap(startPtrs.m_data[si], endPtrs.m_data[si], map);
@@ -139,8 +125,6 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
                 &writer, destLayout, 1u, &strMap, hkMonitorStreamStringMapClass, globalFixups
             );
         }
-        hkMemoryRouter* Instance_5 = &hkMemoryRouter::getInstance();
-        map.m_map.clearAndDeallocate(*Instance_5->m_heap);
     }
 
     if (totalMonLen >= 1) {
@@ -165,34 +149,6 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
                 m_outStream->writeRaw(startPtrs.m_data[i], len);
             }
         }
-    }
-
-    // The arrays are destroyed here, the last declared first.
-    hkMemoryAllocator* endHeap = (&hkMemoryRouter::getInstance())->m_heap;
-    endPtrs.m_size = 0;
-    if ((endPtrs.m_capacityAndFlags & hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG) == 0) {
-        endHeap->_bufFree<const char*>(
-            endPtrs.m_data, endPtrs.m_capacityAndFlags & hkArrayBase<const char*>::CAPACITY_MASK
-        );
-    }
-    endPtrs.m_data = nullptr;
-    endPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* startHeap = (&hkMemoryRouter::getInstance())->m_heap;
-    startPtrs.m_size = 0;
-    if ((startPtrs.m_capacityAndFlags & hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG) == 0) {
-        startHeap->_bufFree<const char*>(
-            startPtrs.m_data, startPtrs.m_capacityAndFlags & hkArrayBase<const char*>::CAPACITY_MASK
-        );
-    }
-    startPtrs.m_data = nullptr;
-    startPtrs.m_capacityAndFlags = hkArrayBase<const char*>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* fixupHeap = (&hkMemoryRouter::getInstance())->m_heap;
-    globalFixups.m_size = 0;
-    if ((globalFixups.m_capacityAndFlags & hkArrayBase<hkObjectSerialize::GlobalFixup>::DONT_DEALLOCATE_FLAG) == 0) {
-        fixupHeap->_bufFree<hkObjectSerialize::GlobalFixup>(
-            globalFixups.begin(),
-            globalFixups.m_capacityAndFlags & hkArrayBase<hkObjectSerialize::GlobalFixup>::CAPACITY_MASK
-        );
     }
 }
 

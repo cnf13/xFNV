@@ -47,16 +47,12 @@ hkResourceBase::Type hkResourceHandle::getType() const {
     return TYPE_RESOURCE;
 }
 
-// The links are collected in a local hkArray (no storage, not ours) and walked from the last one. A link whose target
+// The links are collected in a local hkArray and walked from the last one. A link whose target
 // the map knows is resolved when the member's class is the target's class or one of its bases: the target is stored
 // through the member's accessor and the link removed, both through the vtable. A target that is the handle's own object
 // ends the walk.
 void hkResourceHandle::tryToResolveLinks(hkResourceMap& map) {
-    XFNV_INLINED_LOCAL(hkArray<hkResourceHandle::Link>, links, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkResourceHandle::Link>::hkArray
-    links.m_data = nullptr;
-    links.m_size = 0;
-    links.m_capacityAndFlags = hkArrayBase<hkResourceHandle::Link>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkResourceHandle::Link> links;
     getExternalLinks(links);
     for (int32_t i = links.m_size - 1; i >= 0; --i) {
         hkResourceHandle::Link& rLink = links.m_data[i];
@@ -85,18 +81,6 @@ void hkResourceHandle::tryToResolveLinks(hkResourceMap& map) {
                 ".\\ResourceDatabase\\hkResourceHandle.cpp", 178
             );
         }
-    }
-
-    // EXE-INLINED none: hkArray<hkResourceHandle::Link>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = links.m_capacityAndFlags;
-    links.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            links.m_data,
-            (capacityAndFlags & hkArrayBase<hkResourceHandle::Link>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkResourceHandle::Link))
-        );
     }
 }
 
@@ -268,29 +252,13 @@ hkResourceBase::Type hkResourceContainer::getType() const {
     return TYPE_RESOURCE;
 }
 
-// The handles are collected in a local hkArray (no storage, not ours); each handle's tryToResolveLinks is called
+// The handles are collected in a local hkArray; each handle's tryToResolveLinks is called
 // through the vtable with the map. The size compare is signed and the size is reloaded after every call.
 void hkResourceContainer::tryToResolveLinks(hkResourceMap& map) {
-    XFNV_INLINED_LOCAL(hkArray<hkResourceHandle*>, handles, std::nullopt, std::nullopt);
-    // EXE-INLINED none: hkArray<hkResourceHandle*>::hkArray
-    handles.m_data = nullptr;
-    handles.m_size = 0;
-    handles.m_capacityAndFlags = hkArrayBase<hkResourceHandle*>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkResourceHandle*> handles;
     findAllResourceRecursively(handles);
     for (int32_t i = 0; i < handles.m_size; ++i) {
         handles.m_data[i]->tryToResolveLinks(map);
-    }
-
-    // EXE-INLINED none: hkArray<hkResourceHandle*>::~hkArray
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacityAndFlags = handles.m_capacityAndFlags;
-    handles.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        heap.bufFree(
-            handles.m_data,
-            (capacityAndFlags & hkArrayBase<hkResourceHandle*>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkResourceHandle*))
-        );
     }
 }
 
@@ -330,18 +298,10 @@ void hkResourceContainer::getPath(hkStringBuf& pathOut) {
     if (v3) {
         v3->getPath(pathOut);
     }
-    XFNV_INLINED_LOCAL(hkStringBuf, apMemory, std::nullopt, std::nullopt);
-    ::new (&apMemory) hkStringBuf;
+    hkStringBuf apMemory;
     const char* v4 = getName(apMemory);
     pathOut.operator+=("/");
     pathOut.operator+=(v4);
-    hkMemoryAllocator* m_temp = (&hkMemoryRouter::getInstance())->m_temp;
-    apMemory.m_string.m_size = 0;
-    if (apMemory.m_string.m_capacityAndFlags >= 0) {
-        m_temp->bufFree(
-            apMemory.m_string.begin(), apMemory.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK
-        );
-    }
 }
 
 hkMemoryResourceContainer::hkMemoryResourceContainer(const char* a1) : m_name(a1), m_parent(nullptr) {}
@@ -427,7 +387,6 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
     const hkResourceHandle* prevObject
 ) const {
     hkMemoryResourceHandle** v6;
-    XFNV_INLINED_LOCAL(hkStringBuf, a2, std::nullopt, std::nullopt);
     int32_t v5 = 0;
     do {
         if (!prevObject) {
@@ -449,31 +408,10 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
         const hkClass* v14;
         hkMemoryResourceHandle* v8 = m_resourceHandles.m_data[v22];
         if (objectName) {
-            a2.m_string.m_data = a2.m_string.m_storage;
-            a2.m_string.m_size = 0;
-            a2.m_string.m_capacityAndFlags = -0x7FFFFF80;
-            hkMemoryAllocator* m_temp = (&hkMemoryRouter::getInstance())->m_temp;
-            if ((a2.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK) == 0) {
-                hkArrayUtil::_reserve(*m_temp, &a2, 1, sizeof(char));
-            }
-            a2.m_string.m_size = 1;
-            *a2.m_string.begin() = 0;
-            *a2.m_string.begin() = 0;
+            hkStringBuf a2;
             const char* v10 = v8->getName(a2);
             if (hkString::strCmp(objectName, v10)) {
-                hkMemoryAllocator* v11 = (&hkMemoryRouter::getInstance())->m_temp;
-                a2.m_string.m_size = 0;
-                if (a2.m_string.m_capacityAndFlags >= 0) {
-                    v11->bufFree(
-                        a2.m_string.begin(), a2.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK
-                    );
-                }
                 goto LABEL_18;
-            }
-            hkMemoryAllocator* v12 = (&hkMemoryRouter::getInstance())->m_temp;
-            a2.m_string.m_size = 0;
-            if (a2.m_string.m_capacityAndFlags >= 0) {
-                v12->bufFree(a2.m_string.begin(), a2.m_string.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
             }
         }
         if (!klass) {
