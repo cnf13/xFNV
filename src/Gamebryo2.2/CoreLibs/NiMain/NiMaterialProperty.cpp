@@ -157,11 +157,7 @@ void NiMaterialProperty::CopyMembers(NiMaterialProperty* pDest, NiCloningProcess
 }
 
 void NiMaterialProperty::_SDMInit() {
-    NiMaterialProperty* pkDefault =
-        static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-    if (pkDefault) {
-        pkDefault = ::new (pkDefault) NiMaterialProperty;
-    }
+    NiMaterialProperty* pkDefault = new NiMaterialProperty;
     // SWEEP-INLINE 0xA759FC
     ms_spDefault = pkDefault;
 }
@@ -177,10 +173,5 @@ int32_t NiMaterialProperty::GetType() {
 }
 
 NiObject* NiMaterialProperty::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiMaterialProperty));
-    if (v0) {
-        return ::new (v0) NiMaterialProperty;
-    }
-
-    return nullptr;
+    return new NiMaterialProperty;
 }

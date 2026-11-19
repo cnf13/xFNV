@@ -404,11 +404,7 @@ void TallGrassShader::CreateConstantMaps() {
     int32_t iOldContext = riContext;
     riContext = MEM_CONTEXT_GRASS;
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 9, 4, nullptr, 0, 0, nullptr, false
@@ -435,14 +431,7 @@ void TallGrassShader::CreateConstantMaps() {
         riContext = iOldContext;
         return;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-    NiD3DShaderConstantMap* pMap;
-    if (pMemory) {
-        pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-    }
-    else {
-        pMap = nullptr;
-    }
+    NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
     m_spPixelConstantMap = pMap;
     m_spPixelConstantMap.m_pObject->AddEntry(
         "point light color", 0x10000007, 0, 2, 1, "", 16, 4, &pfPointLightColor, false
@@ -1323,10 +1312,7 @@ BSShader* TallGrassShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_TEXCOORD, 1u, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     spShaderDecl->GetD3DDeclaration();
-    TallGrassShader* v4 = static_cast<TallGrassShader*>(NiMemObject::operator new(sizeof(TallGrassShader)));
-    if (v4) {
-        pshader = ::new (v4) TallGrassShader(spShaderDecl);
-    }
+    pshader = new TallGrassShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->CreateConstantMaps();

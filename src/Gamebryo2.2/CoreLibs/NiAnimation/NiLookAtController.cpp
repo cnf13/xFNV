@@ -24,15 +24,7 @@ NiLookAtController::~NiLookAtController() {}
 
 NiObject* NiLookAtController::CreateClone(NiCloningProcess& kCloning) {
     uint16_t v6;
-    NiLookAtController* pkObject =
-        static_cast<NiLookAtController*>(NiMemObject::operator new(sizeof(NiLookAtController)));
-    NiLookAtController* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject_2) NiLookAtController;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiLookAtController* pkObject_2 = new NiLookAtController;
     CopyMembers(pkObject_2, kCloning);
     uint16_t m_uFlags = this->m_uFlags;
     pkObject_2->m_uFlags = m_uFlags;
@@ -222,10 +214,5 @@ bool NiLookAtController::TargetIsRequiredType() const {
 }
 
 NiObject* NiLookAtController::CreateObject() {
-    NiLookAtController* pkObject =
-        static_cast<NiLookAtController*>(NiMemObject::operator new(sizeof(NiLookAtController)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiLookAtController;
+    return new NiLookAtController;
 }

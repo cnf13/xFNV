@@ -231,10 +231,5 @@ void NiColorInterpolator::CopyMembers(NiColorInterpolator* pkDest, NiCloningProc
 }
 
 NiObject* NiColorInterpolator::CreateObject() {
-    NiColorInterpolator* pkObject =
-        static_cast<NiColorInterpolator*>(NiMemObject::operator new(sizeof(NiColorInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiColorInterpolator(static_cast<NiColorData*>(nullptr));
+    return new NiColorInterpolator(static_cast<NiColorData*>(nullptr));
 }

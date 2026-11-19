@@ -31,8 +31,7 @@ NiRenderedCubeMap::Create(uint32_t uiSize, NiRenderer* apkRenderer, const NiText
     if (!apkRenderer || !uiSize || (uiSize & (uiSize - 1)) != 0) {
         return nullptr;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiRenderedCubeMap));
-    NiRenderedCubeMap* pkCubeMap = pMemory ? ::new (pMemory) NiRenderedCubeMap : nullptr;
+    NiRenderedCubeMap* pkCubeMap = new NiRenderedCubeMap;
     pkCubeMap->m_kFormatPrefs = kPrefs;
     for (uint32_t i = 0; i < FACE_NUM; ++i) {
         Ni2DBuffer* pkBuffer = Ni2DBuffer::Create_(uiSize, uiSize);

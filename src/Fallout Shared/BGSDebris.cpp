@@ -254,17 +254,10 @@ void BGSDebris::SpawnDebris(TESObjectCELL* apCell, const NiPoint3& arLocation, u
                     if (pdebrisData->GetHasCollisionData()) {
                         BSTempEffectDebris* pdebris;
                         velocity = NiPoint3_ZERO;
-                        BSTempEffectDebris* v7 =
-                            static_cast<BSTempEffectDebris*>(NiMemObject::operator new(sizeof(BSTempEffectDebris)));
-                        if (v7) {
-                            pdebris = ::new (v7) BSTempEffectDebris(
-                                apCell, 90.0f, pdebrisData->pFileName, nullptr, arLocation, debrisVector, velocity,
-                                velocity, afScale, false, false
-                            );
-                        }
-                        else {
-                            pdebris = nullptr;
-                        }
+                        pdebris = new BSTempEffectDebris(
+                            apCell, 90.0f, pdebrisData->pFileName, nullptr, arLocation, debrisVector, velocity,
+                            velocity, afScale, false, false
+                        );
                         BSTempEffectDebris* v9 = pdebris;
                     }
                     else {

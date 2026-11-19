@@ -105,13 +105,7 @@ void Atmosphere::Initialize(NiNode* apSkyRoot, BSFogProperty* apFog) {
         SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
         NiNode* CameraRoot = WorldSceneGraph->GetCameraRoot();
         spSkyQuad.m_pObject->SetTranslate(CameraRoot->GetTranslate());
-        NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (apMemory) {
-            v8 = ::new (apMemory) NiNode(0);
-        }
-        else {
-            v8 = nullptr;
-        }
+        v8 = new NiNode(0);
         spSkyQuadNode = v8;
         spSkyQuadNode.m_pObject->SetSelectiveUpdate(true);
         NiNode* v7 = spSkyQuadNode.m_pObject;

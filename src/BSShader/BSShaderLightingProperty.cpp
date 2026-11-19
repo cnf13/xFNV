@@ -110,14 +110,7 @@ BSShaderLightingProperty::~BSShaderLightingProperty() {
 }
 
 NiObject* BSShaderLightingProperty::CreateClone(NiCloningProcess& arCloneData) {
-    BSShaderLightingProperty* pClone =
-        static_cast<BSShaderLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderLightingProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) BSShaderLightingProperty;
-    }
-    else {
-        pClone = nullptr;
-    }
+    BSShaderLightingProperty* pClone = new BSShaderLightingProperty;
     BSShaderProperty::CopyMembers(pClone, arCloneData);
     CopyToMembers(pClone);
     return pClone;
@@ -704,11 +697,7 @@ void BSShaderLightingProperty::SetPointLight3x(
 }
 
 NiObject* BSShaderLightingProperty::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(BSShaderLightingProperty));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) BSShaderLightingProperty;
+    return new BSShaderLightingProperty;
 }
 
 // Clears the light types and walks the light colours (register 1 on) and their reset colours (register 19 on) to the

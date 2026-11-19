@@ -92,11 +92,5 @@ NiDX9ShaderConstantManager::~NiDX9ShaderConstantManager() {
 }
 
 NiDX9ShaderConstantManager* NiDX9ShaderConstantManager::Create(NiDX9Renderer* pkRenderer, _D3DCAPS9* kD3DCaps9) {
-    NiDX9ShaderConstantManager* v2 =
-        static_cast<NiDX9ShaderConstantManager*>(NiMemObject::operator new(sizeof(NiDX9ShaderConstantManager)));
-    if (v2) {
-        return ::new (v2) NiDX9ShaderConstantManager(pkRenderer, kD3DCaps9);
-    }
-
-    return nullptr;
+    return new NiDX9ShaderConstantManager(pkRenderer, kD3DCaps9);
 }

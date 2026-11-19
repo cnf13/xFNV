@@ -3401,8 +3401,7 @@ bool TESDataHandler::ConstructObject(
                 9999
             );
             if (pForm == nullptr) {
-                void* const pMemory = NiMemObject::operator new(sizeof(NavMesh));
-                NavMesh* const pNewNavMesh = pMemory != nullptr ? ::new (pMemory) NavMesh : nullptr;
+                NavMesh* const pNewNavMesh = new NavMesh;
                 NavMeshPtr spNavMesh = NavMeshPtr::MakeNavMeshPtr(pNewNavMesh);
                 LoadForm(spNavMesh.operator->(), pFile);
                 if (spNavMesh->GetParentCell() != nullptr) {
@@ -3691,13 +3690,7 @@ TESObjectREFR* TESDataHandler::CreateReferenceAtLocation(
                         (apObject == pXMarkerHeading ||
                          (apObject == pMapMarker || (apObject == pAudioMarker || apObject == pAudioBuoyMarker)))))))) {
                     NiAVObject* pmodel;
-                    NiNode* v23 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                    if (v23) {
-                        pmodel = (NiAVObject*)::new (v23) NiNode(0);
-                    }
-                    else {
-                        pmodel = nullptr;
-                    }
+                    pmodel = new NiNode(0);
                     a1 = pmodel;
                     pnewactor->Set3D(pmodel, true);
                 }
@@ -5163,13 +5156,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
     switch (aType) {
         case 4: {
             TESForm* pForm_81;
-            BGSTextureSet* v132 = static_cast<BGSTextureSet*>(NiMemObject::operator new(sizeof(BGSTextureSet)));
-            if (v132) {
-                pForm_81 = (TESForm*)::new (v132) BGSTextureSet;
-            }
-            else {
-                pForm_81 = nullptr;
-            }
+            pForm_81 = new BGSTextureSet;
             pForm_3 = pForm_81;
             break;
         }
@@ -5850,13 +5837,7 @@ TESForm* TESDataHandler::CreateFormOfType(uint8_t aType) {
         }
         case 67: {
             TESForm* pForm_82;
-            NavMesh* v131 = static_cast<NavMesh*>(NiMemObject::operator new(sizeof(NavMesh)));
-            if (v131) {
-                pForm_82 = (TESForm*)::new (v131) NavMesh;
-            }
-            else {
-                pForm_82 = nullptr;
-            }
+            pForm_82 = new NavMesh;
             pForm_3 = pForm_82;
             break;
         }

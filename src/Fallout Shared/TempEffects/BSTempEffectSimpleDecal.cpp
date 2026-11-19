@@ -495,24 +495,11 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
         BSShaderPPLightingProperty* plightingProp;
         NiAlphaProperty* palphaProp;
         NiMaterialProperty* pmatprop;
-        NiMaterialProperty* v35 =
-            static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-        if (v35) {
-            pmatprop = ::new (v35) NiMaterialProperty;
-        }
-        else {
-            pmatprop = nullptr;
-        }
+        pmatprop = new NiMaterialProperty;
         NiProperty* pkProperty = (NiProperty*)pmatprop;
         pmatprop->SetShineness(fSpecular);
         sp3D.m_pObject->AttachProperty(pmatprop);
-        void* apMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-        if (apMemory) {
-            palphaProp = ::new (apMemory) NiAlphaProperty;
-        }
-        else {
-            palphaProp = nullptr;
-        }
+        palphaProp = new NiAlphaProperty;
         palphaProp->SetAlphaBlending(bUseAlphaBlending);
         palphaProp->SetAlphaTesting(bUseAlphaTesting);
         palphaProp->SetTestMode(NiAlphaProperty::TEST_GREATER);
@@ -520,26 +507,12 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
         sp3D.m_pObject->AttachProperty(palphaProp);
         if (bTwoSided) {
             NiStencilProperty* pstencilprop;
-            NiStencilProperty* v31 =
-                static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-            if (v31) {
-                pstencilprop = ::new (v31) NiStencilProperty;
-            }
-            else {
-                pstencilprop = nullptr;
-            }
+            pstencilprop = new NiStencilProperty;
             pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
             sp3D.m_pObject->AttachProperty(pstencilprop);
         }
         Lighting30ShaderProperty* v53 = nullptr;
-        Lighting30ShaderProperty* p30ShaderProperty =
-            static_cast<Lighting30ShaderProperty*>(NiMemObject::operator new(sizeof(Lighting30ShaderProperty)));
-        if (p30ShaderProperty) {
-            plightingProp = (BSShaderPPLightingProperty*)::new (p30ShaderProperty) Lighting30ShaderProperty;
-        }
-        else {
-            plightingProp = nullptr;
-        }
+        plightingProp = new Lighting30ShaderProperty;
         plightingProp->SetShader(29);
         plightingProp->SetFlag(5u, 1);
         BSTextureSet* AsShaderTextureSet = pTextureSet->GetAsShaderTextureSet();
@@ -564,14 +537,7 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
         }
         else {
             BSShaderNoLightingProperty* pnolightingProp;
-            BSShaderNoLightingProperty* v27 =
-                static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-            if (v27) {
-                pnolightingProp = ::new (v27) BSShaderNoLightingProperty;
-            }
-            else {
-                pnolightingProp = nullptr;
-            }
+            pnolightingProp = new BSShaderNoLightingProperty;
             if ((pTextureSet) && ((BGSDecalManager::iDecalDebugFlags & 32) == 0)) {
                 NiPointer<NiTexture> spTempTexture(static_cast<NiTexture*>(nullptr));
                 pTextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTempTexture);
@@ -655,13 +621,7 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
             }
             else {
                 BGSDecalNode* v15;
-                BGSDecalNode* v23 = static_cast<BGSDecalNode*>(NiMemObject::operator new(sizeof(BGSDecalNode)));
-                if (v23) {
-                    v15 = ::new (v23) BGSDecalNode(spTargetNode.m_pObject->m_pkParent, false);
-                }
-                else {
-                    v15 = nullptr;
-                }
+                v15 = new BGSDecalNode(spTargetNode.m_pObject->m_pkParent, false);
                 pParentNode = v15;
             }
             pParentNode->AttachChild(this, true);
@@ -692,17 +652,12 @@ bool BSTempEffectSimpleDecal::FinalizeGeometry() {
 }
 
 NiTriShapeData* BSTempEffectSimpleDecal::CreateTriData() {
-    NiTriShapeData* apMemory = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-    if (apMemory) {
-        // Both counts are passed truncated to their low 16 bits.
-        return ::new (apMemory) NiTriShapeData(
-            static_cast<uint16_t>(iDecalVertexCount), pFinalVertexArray, pFinalNormalArray, pFinalColorArray,
-            pFinalTexcoordArray, 1, NiGeometryData::NBT_METHOD_NONE, static_cast<uint16_t>(iDecalTriangleCount),
-            pFinalIndexArray
-        );
-    }
-
-    return nullptr;
+    // Both counts are passed truncated to their low 16 bits.
+    return new NiTriShapeData(
+        static_cast<uint16_t>(iDecalVertexCount), pFinalVertexArray, pFinalNormalArray, pFinalColorArray,
+        pFinalTexcoordArray, 1, NiGeometryData::NBT_METHOD_NONE, static_cast<uint16_t>(iDecalTriangleCount),
+        pFinalIndexArray
+    );
 }
 
 void BSTempEffectSimpleDecal::ClipMesh(NiAVObject* apAVObj) {
@@ -840,23 +795,10 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
             pavobj->SetTranslate(pOrigin);
         }
         ptmp->DetachAllProperties();
-        NiAlphaProperty* v19 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-        if (v19) {
-            palpha = ::new (v19) NiAlphaProperty;
-        }
-        else {
-            palpha = nullptr;
-        }
+        palpha = new NiAlphaProperty;
         palpha->SetAlphaBlending(true);
         ptmp->AttachProperty(palpha);
-        BSShaderNoLightingProperty* v18 =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (v18) {
-            pshaderprop = ::new (v18) BSShaderNoLightingProperty;
-        }
-        else {
-            pshaderprop = nullptr;
-        }
+        pshaderprop = new BSShaderNoLightingProperty;
         if (abWireframe) {
             pshaderprop->SetFlag(48u, 1);
         }
@@ -864,13 +806,7 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
         BSShaderManager::PrepareObject(pavobj, 0, 0);
         if (bModelSpace) {
             BSTempNode* pn;
-            BSTempNode* v17 = static_cast<BSTempNode*>(NiMemObject::operator new(sizeof(BSTempNode)));
-            if (v17) {
-                pn = ::new (v17) BSTempNode(30.0f);
-            }
-            else {
-                pn = nullptr;
-            }
+            pn = new BSTempNode(30.0f);
             pn->AttachChild(ptmp, 1);
             NiNode* Parent = spTargetNode.m_pObject->m_pkParent;
             Parent->AttachChild(pn, 1);

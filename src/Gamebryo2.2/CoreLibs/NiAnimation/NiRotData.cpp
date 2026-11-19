@@ -135,9 +135,5 @@ void NiRotData::ReplaceAnim(NiRotKey* pkKeys, uint32_t uiNumKeys, NiRotKey::KeyT
 }
 
 NiObject* NiRotData::CreateObject() {
-    NiRotData* pkObject = static_cast<NiRotData*>(NiMemObject::operator new(sizeof(NiRotData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiRotData;
+    return new NiRotData;
 }

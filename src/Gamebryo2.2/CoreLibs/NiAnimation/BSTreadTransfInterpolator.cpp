@@ -240,10 +240,5 @@ void BSTreadTransfInterpolator::CopyMembers(BSTreadTransfInterpolator* pkDest, N
 }
 
 NiObject* BSTreadTransfInterpolator::CreateObject() {
-    BSTreadTransfInterpolator* pkObject =
-        static_cast<BSTreadTransfInterpolator*>(NiMemObject::operator new(sizeof(BSTreadTransfInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSTreadTransfInterpolator;
+    return new BSTreadTransfInterpolator;
 }

@@ -122,14 +122,7 @@ void PArrayPoint::InitSDM() {
 
 // This is the whole `NiNew PArrayPoint` expansion: it allocates the object, constructs it, then clears the name.
 PArrayPoint* PArrayPoint::CreateInstance() {
-    void* pvMemory = NiMemObject::operator new(sizeof(PArrayPoint));
-    PArrayPoint* pkPoint;
-    if (pvMemory) {
-        pkPoint = ::new (pvMemory) PArrayPoint;
-    }
-    else {
-        pkPoint = nullptr;
-    }
+    PArrayPoint* pkPoint = new PArrayPoint;
     // The name is cleared on this path too, so a failed allocation dereferences null here as well, as the game does.
     pkPoint->SetName(EmptyFS);
     return pkPoint;
@@ -186,14 +179,7 @@ BSPSysArrayEmitter::~BSPSysArrayEmitter() {}
 
 NiObject* BSPSysArrayEmitter::CreateClone(NiCloningProcess& arCloneData) {
     BSPSysArrayEmitter* v3;
-    BSPSysArrayEmitter* apMemory =
-        static_cast<BSPSysArrayEmitter*>(NiMemObject::operator new(sizeof(BSPSysArrayEmitter)));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSPSysArrayEmitter;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSPSysArrayEmitter;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -424,12 +410,7 @@ char* BSPSysArrayEmitter::GetViewerString(const char* apPrefix, PARTICLEARRAYTYP
 }
 
 NiObject* BSPSysArrayEmitter::CreateObject() {
-    void* v2 = NiMemObject::operator new(sizeof(BSPSysArrayEmitter));
-    if (v2) {
-        return ::new (v2) BSPSysArrayEmitter;
-    }
-
-    return nullptr;
+    return new BSPSysArrayEmitter;
 }
 
 NiPSysEmitter::~NiPSysEmitter() {}

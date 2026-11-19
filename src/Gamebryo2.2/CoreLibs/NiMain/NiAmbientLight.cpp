@@ -64,9 +64,5 @@ void NiAmbientLight::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 }
 
 NiObject* NiAmbientLight::CreateObject() {
-    NiAmbientLight* v0 = static_cast<NiAmbientLight*>(NiMemObject::operator new(sizeof(NiAmbientLight)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiAmbientLight;
+    return new NiAmbientLight;
 }

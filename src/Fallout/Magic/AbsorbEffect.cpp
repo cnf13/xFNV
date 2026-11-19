@@ -187,25 +187,13 @@ void AbsorbEffect::Start3D() {
     TESObjectREFR* pcaster;
     TESObjectREFR* ptarget;
     NiNode* v29;
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v29 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v29 = nullptr;
-    }
+    v29 = new NiNode(0);
     spBoltNode = v29;
     const NiFixedString* v1 = &BSXFlags::Tag();
     BSXFlags* pextra = static_cast<BSXFlags*>(spBoltNode.m_pObject->GetExtraData(*v1));
     if (!pextra) {
         BSXFlags* pextra_2;
-        BSXFlags* v35 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
-        if (v35) {
-            pextra_2 = ::new (v35) BSXFlags;
-        }
-        else {
-            pextra_2 = nullptr;
-        }
+        pextra_2 = new BSXFlags;
         pextra = pextra_2;
         const NiFixedString* v2 = &BSXFlags::Tag();
         spBoltNode.m_pObject->AddExtraData(*v2, pextra_2);

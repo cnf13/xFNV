@@ -40,14 +40,7 @@ BSPSysSimpleColorModifier::~BSPSysSimpleColorModifier() {}
 
 NiObject* BSPSysSimpleColorModifier::CreateClone(NiCloningProcess& kCloning) {
     BSPSysSimpleColorModifier* pkObject;
-    BSPSysSimpleColorModifier* apMemory =
-        static_cast<BSPSysSimpleColorModifier*>(NiMemObject::operator new(sizeof(BSPSysSimpleColorModifier)));
-    if (apMemory) {
-        pkObject = ::new (apMemory) BSPSysSimpleColorModifier;
-    }
-    else {
-        pkObject = nullptr;
-    }
+    pkObject = new BSPSysSimpleColorModifier;
     CopyMembers(pkObject, kCloning);
     return pkObject;
 }
@@ -203,10 +196,5 @@ void BSPSysSimpleColorModifier::CopyMembers(BSPSysSimpleColorModifier* pkDest, N
 }
 
 NiObject* BSPSysSimpleColorModifier::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSPSysSimpleColorModifier));
-    if (apMemory) {
-        return ::new (apMemory) BSPSysSimpleColorModifier;
-    }
-
-    return nullptr;
+    return new BSPSysSimpleColorModifier;
 }

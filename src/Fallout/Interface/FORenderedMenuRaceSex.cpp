@@ -234,13 +234,7 @@ void FORenderedMenuRaceSex::Initialize() {
     }
     NiUpdateData UpdateData1(0.0f, false, false);
     pgeom->Update(UpdateData1);
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        pcam = ::new (apMemory) NiCamera;
-    }
-    else {
-        pcam = nullptr;
-    }
+    pcam = new NiCamera;
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     pcam->SetViewPort(port);
     rot.SetRow(0, 0.0f, 0.0f, 1.0f);
@@ -295,13 +289,7 @@ void FORenderedMenuRaceSex::Initialize() {
     // Gets the property type before the screen geometry.
     int32_t iAlphaType = NiAlphaProperty::GetType();
     GetScreenGeometry()->RemoveProperty(iAlphaType);
-    NiAlphaProperty* v51 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (v51) {
-        v28 = ::new (v51) NiAlphaProperty;
-    }
-    else {
-        v28 = nullptr;
-    }
+    v28 = new NiAlphaProperty;
     NiProperty* pkProperty = (NiProperty*)v28;
     GetScreenGeometry()->AttachProperty(v28);
     const NiBound* WorldBound = &pgeom->GetWorldBound();
@@ -309,13 +297,7 @@ void FORenderedMenuRaceSex::Initialize() {
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     if (!ShadowSceneNode_->AddAllLightsFromNode_Recurse(pgeom, fradius)) {
         NiPointLight* plight;
-        NiPointLight* v49 = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-        if (v49) {
-            plight = ::new (v49) NiPointLight;
-        }
-        else {
-            plight = nullptr;
-        }
+        plight = new NiPointLight;
         pgeom->AttachChild(plight, 1);
         NiPoint3* v19 = ::new (&dst) NiPoint3(0.0f, -50.0f, 0.0f);
         plight->SetTranslate(*v19);
@@ -369,13 +351,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         ptSavedBip01Translation = v22->GetObjectByName("Bip01")->GetTranslate();
         spPlayer3DParent = spPlayer3D.m_pObject->m_pkParent;
         bPlayer3DCulled = spPlayer3D.m_pObject->GetAppCulled();
-        void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-        if (apMemory) {
-            v20 = ::new (apMemory) NiNode(0);
-        }
-        else {
-            v20 = nullptr;
-        }
+        v20 = new NiNode(0);
         NiRefObject* v29 = (NiRefObject*)v20;
         spPlayerParent = v20;
         ShadowSceneNode* v6 = BSShaderManager::GetShadowSceneNode(3);
@@ -400,13 +376,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         spPlayerParent.m_pObject->Update(bar);
         NiNode* a4 = spPlayerParent.m_pObject;
         prsm->SetPlayerNode(a4);
-        NiCamera* v26 = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-        if (v26) {
-            v16 = ::new (v26) NiCamera;
-        }
-        else {
-            v16 = nullptr;
-        }
+        v16 = new NiCamera;
         NiRefObject* v27 = (NiRefObject*)v16;
         spClonedPlayerCamera = v16;
         ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);

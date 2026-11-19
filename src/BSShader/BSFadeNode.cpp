@@ -56,10 +56,7 @@ BSFadeNode::~BSFadeNode() {
 // Clones the node, then copies the two fade distances and the LOD multiplier type. The clone's fade-state flags
 // (FADED_IN, IGNORE_FADE and HAS_MOVING_SOUND) are cleared in one 4-byte store.
 NiObject* BSFadeNode::CreateClone(NiCloningProcess& arCloneData) {
-    BSFadeNode* pClone = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
-    if (pClone) {
-        pClone = ::new (pClone) BSFadeNode;
-    }
+    BSFadeNode* pClone = new BSFadeNode;
     NiNode::CopyMembers(pClone, arCloneData);
     pClone->m_uFlags = static_cast<NiAVObject::NiFlags>(
         pClone->m_uFlags & ~(NiAVObject::FADED_IN | NiAVObject::IGNORE_FADE | NiAVObject::HAS_MOVING_SOUND)
@@ -608,14 +605,8 @@ void BSFadeNode::IncFadeCounter() {
 
 // Creates the shared fade alpha property, holds it in spFadeAlpha, then interns the fade controller sequence's name.
 void BSFadeNode::InitSDM() {
-    NiAlphaProperty* pAlpha = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (pAlpha) {
-        // SRCALPHA source blend and INVSRCALPHA destination blend, alpha test off.
-        ::new (pAlpha) NiAlphaProperty;
-    }
-    else {
-        pAlpha = nullptr;
-    }
+    // SRCALPHA source blend and INVSRCALPHA destination blend, alpha test off.
+    NiAlphaProperty* pAlpha = new NiAlphaProperty;
 
     spFadeAlpha = pAlpha;
     // Sets the bit with a 16-bit `or`, which rewrites both bytes.
@@ -634,11 +625,7 @@ void BSFadeNode::InitSDM() {
 
 // Allocates a fade node (0xE4 bytes) and runs its constructor; the stream's create-object callback.
 NiObject* BSFadeNode::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(BSFadeNode));
-    if (pMemory) {
-        return ::new (pMemory) BSFadeNode;
-    }
-    return nullptr;
+    return new BSFadeNode;
 }
 
 void BSFadeNode::KillSDM() {

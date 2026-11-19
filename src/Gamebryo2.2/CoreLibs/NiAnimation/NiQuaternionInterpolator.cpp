@@ -257,10 +257,5 @@ void NiQuaternionInterpolator::CopyMembers(NiQuaternionInterpolator* pkDest, NiC
 }
 
 NiObject* NiQuaternionInterpolator::CreateObject() {
-    NiQuaternionInterpolator* pkObject =
-        static_cast<NiQuaternionInterpolator*>(NiMemObject::operator new(sizeof(NiQuaternionInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiQuaternionInterpolator;
+    return new NiQuaternionInterpolator;
 }

@@ -34,8 +34,7 @@ const NiRTTI* BSValueNode::GetRTTI() const {
 }
 
 NiObject* BSValueNode::CreateClone(NiCloningProcess& arCloneData) {
-    void* pMemory = NiMemObject::operator new(sizeof(BSValueNode));
-    BSValueNode* pkClone = pMemory ? ::new (pMemory) BSValueNode : nullptr;
+    BSValueNode* pkClone = new BSValueNode;
     CopyMembers(pkClone, arCloneData);
     return pkClone;
 }
@@ -122,10 +121,5 @@ int32_t BSValueNode::QValue() {
 }
 
 NiObject* BSValueNode::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSValueNode));
-    if (apMemory) {
-        return ::new (apMemory) BSValueNode;
-    }
-
-    return nullptr;
+    return new BSValueNode;
 }

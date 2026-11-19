@@ -104,13 +104,7 @@ void BSBound::KillSDM() {
 // The name is cleared on the failed allocation's path too, as the game does.
 NiObject* BSBound::CreateObject() {
     BSBound* pb_2;
-    BSBound* pb = static_cast<BSBound*>(NiMemObject::operator new(sizeof(BSBound)));
-    if (pb) {
-        pb_2 = ::new (pb) BSBound;
-    }
-    else {
-        pb_2 = nullptr;
-    }
+    pb_2 = new BSBound;
     pb_2->SetName(EmptyFS);
     return pb_2;
 }

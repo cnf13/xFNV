@@ -506,13 +506,7 @@ float TESEffectShader::AnimateFillEffectAlpha(float afCurrentAlpha, float afTime
 BSShaderPPLightingProperty::TextureEffectData*
 TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* apTex, NiSourceTexture* apBlockOutTex) {
     BSShaderPPLightingProperty::TextureEffectData* pData;
-    void* apMemory = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty::TextureEffectData));
-    if (apMemory) {
-        pData = ::new (apMemory) BSShaderPPLightingProperty::TextureEffectData;
-    }
-    else {
-        pData = nullptr;
-    }
+    pData = new BSShaderPPLightingProperty::TextureEffectData;
     int32_t fillTextureRGB = Data.iFillColor;
     int32_t UnderwaterState = Data.iEdgeColor;
     pData->spTexture = static_cast<NiTexture*>(nullptr);

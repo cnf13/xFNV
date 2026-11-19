@@ -254,11 +254,7 @@ BSRenderedTexture* BSRenderedTexture::Create(
     if (!pTexture) {
         return nullptr;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(BSRenderedTexture));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) BSRenderedTexture(pTexture, abDepthBuffer, apSharedDepthBuffer);
+    return new BSRenderedTexture(pTexture, abDepthBuffer, apSharedDepthBuffer);
 }
 
 void BSRenderedTexture::BeginTexture(BSRenderedTexture* apTex, uint32_t aiClearMode) {

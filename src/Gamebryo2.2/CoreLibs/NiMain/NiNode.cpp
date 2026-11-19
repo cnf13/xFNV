@@ -1018,13 +1018,7 @@ bool NiNode::IsLeftFacingUp(NiAVObject* apObject, char* apString) {
 }
 
 NiObject* NiNode::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* v1 = static_cast<NiNode*>(v0);
-    if (!v0) {
-        return nullptr;
-    }
-    ::new (v0) NiNode;
-    return v1;
+    return new NiNode;
 }
 
 void NiAVObjectArray_SetAt(

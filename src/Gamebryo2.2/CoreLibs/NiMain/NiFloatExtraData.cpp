@@ -20,14 +20,7 @@ const NiRTTI* NiFloatExtraData::GetRTTI() const {
 }
 
 NiObject* NiFloatExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiFloatExtraData* pkObject = static_cast<NiFloatExtraData*>(NiMemObject::operator new(sizeof(NiFloatExtraData)));
-    NiFloatExtraData* pkObject_2 = pkObject;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiFloatExtraData;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiFloatExtraData* pkObject_2 = new NiFloatExtraData;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fValue = m_fValue;
     return pkObject_2;
@@ -67,9 +60,5 @@ void NiFloatExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 }
 
 NiObject* NiFloatExtraData::CreateObject() {
-    NiFloatExtraData* pkObject = static_cast<NiFloatExtraData*>(NiMemObject::operator new(sizeof(NiFloatExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiFloatExtraData;
+    return new NiFloatExtraData;
 }

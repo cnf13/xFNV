@@ -226,13 +226,7 @@ void NiBoolInterpolator::SetPoseValue(bool bPoseValue) {
 void NiBoolInterpolator::ReplaceKeys(NiBoolKey* pkKeys, NiAnimationKey::KeyType eType, uint32_t uiNumKeys) {
     if (uiNumKeys) {
         if (!m_spBoolData.m_pObject) {
-            NiBoolData* pkData = static_cast<NiBoolData*>(NiMemObject::operator new(sizeof(NiBoolData)));
-            if (pkData) {
-                pkData = ::new (pkData) NiBoolData;
-            }
-            else {
-                pkData = nullptr;
-            }
+            NiBoolData* pkData = new NiBoolData;
             m_spBoolData.SetNew(pkData);
         }
         m_spBoolData.m_pObject->ReplaceAnim(pkKeys, uiNumKeys, eType);
@@ -282,10 +276,5 @@ void NiBoolInterpolator::CopyMembers(NiBoolInterpolator* pkDest, NiCloningProces
 }
 
 NiObject* NiBoolInterpolator::CreateObject() {
-    NiBoolInterpolator* pkObject =
-        static_cast<NiBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBoolInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBoolInterpolator(static_cast<NiBoolData*>(nullptr));
+    return new NiBoolInterpolator(static_cast<NiBoolData*>(nullptr));
 }

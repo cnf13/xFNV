@@ -156,14 +156,8 @@ BGSPrimitivePlane::~BGSPrimitivePlane() {}
 void BGSPrimitivePlane::Build() {
     BSFadeNode* v4;
     NiFixedString apString;
-    void* v7 = NiMemObject::operator new(sizeof(BSFadeNode));
     int32_t v9 = 0;
-    if (v7) {
-        v4 = ::new (v7) BSFadeNode;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new BSFadeNode;
     NiRefObject* v8 = v4;
     v9 = (-1);
     spNode = v4;
@@ -358,24 +352,14 @@ bool BGSPrimitivePlane::IsInside(NiPoint3& aPoint) {
 
 BSOcclusionPlane* BGSPrimitivePlane::MakeOcclusionPlane() {
     NiPoint2 v5;
-    void* v6 = NiMemObject::operator new(sizeof(BSOcclusionPlane));
     int32_t v7 = 0;
-    if (!v6) {
-        return nullptr;
-    }
-    NiPoint2* v1 = ::new (&v5) NiPoint2(Radii.x, Radii.z);
-    return ::new (v6) BSOcclusionPlane(&NiPoint3_ZERO, v1, &NiMatrix3_IDENTITY);
+    return new BSOcclusionPlane(&NiPoint3_ZERO, ::new (&v5) NiPoint2(Radii.x, Radii.z), &NiMatrix3_IDENTITY);
 }
 
 BSPortal* BGSPrimitivePlane::MakePortal() {
     NiPoint2 v5;
-    void* v6 = NiMemObject::operator new(sizeof(BSPortal));
     int32_t v7 = 0;
-    if (!v6) {
-        return nullptr;
-    }
-    NiPoint2* bounds = ::new (&v5) NiPoint2(Radii.x, Radii.z);
-    return ::new (v6) BSPortal(&NiPoint3_ZERO, bounds, &NiMatrix3_IDENTITY);
+    return new BSPortal(&NiPoint3_ZERO, ::new (&v5) NiPoint2(Radii.x, Radii.z), &NiMatrix3_IDENTITY);
 }
 
 BGSPrimitiveBox::BGSPrimitiveBox() {
@@ -390,18 +374,11 @@ void BGSPrimitiveBox::Build() {
     NiFixedString* a2;
     BSFadeNode* v4;
     NiFixedString apString;
-    void* v7;
     NiRefObject* v8;
     int32_t v9;
     if (!(&spNode)->m_pObject) {
-        v7 = NiMemObject::operator new(sizeof(BSFadeNode));
         v9 = 0;
-        if (v7) {
-            v4 = ::new (v7) BSFadeNode;
-        }
-        else {
-            v4 = nullptr;
-        }
+        v4 = new BSFadeNode;
         v8 = v4;
         v9 = (-1);
         spNode = v4;
@@ -582,24 +559,13 @@ BSMultiBoundShape* BGSPrimitiveBox::MakeMultiBoundShape(NiPoint3& a1) {
     if (v10) {
         BSMultiBoundOBB* v4;
         NiMatrix3 ecx0;
-        BSMultiBoundOBB* apMemory = static_cast<BSMultiBoundOBB*>(NiMemObject::operator new(sizeof(BSMultiBoundOBB)));
-        if (apMemory) {
-            v4 = ::new (apMemory) BSMultiBoundOBB(&NiPoint3_ZERO, &Radii, &NiMatrix3_IDENTITY);
-        }
-        else {
-            v4 = nullptr;
-        }
+        v4 = new BSMultiBoundOBB(&NiPoint3_ZERO, &Radii, &NiMatrix3_IDENTITY);
         ecx0.FromEulerAnglesXYZ(a1.x, a1.y, a1.z);
         v4->SetAxis(ecx0);
         return v4;
     }
 
-    BSMultiBoundAABB* v6 = static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-    if (v6) {
-        return ::new (v6) BSMultiBoundAABB(&NiPoint3_ZERO, &Radii);
-    }
-
-    return nullptr;
+    return new BSMultiBoundAABB(&NiPoint3_ZERO, &Radii);
 }
 
 BSMultiBoundSphere::~BSMultiBoundSphere() {}
@@ -657,33 +623,14 @@ void BGSPrimitiveSphere::Build() {
         }
         uint16_t* l = static_cast<uint16_t*>(ourMalloc(sizeof(uint16_t)));
         *l = 112;
-        NiTriStrips* v25 = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
-        if (v25) {
-            ptri = ::new (v25) NiTriStrips(112, pverts, nullptr, pcolors, nullptr, 0, 0, 110, 1, l, pstrip);
-        }
-        else {
-            ptri = nullptr;
-        }
-        BSShaderNoLightingProperty* v23 =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (v23) {
-            pshprop = ::new (v23) BSShaderNoLightingProperty;
-        }
-        else {
-            pshprop = nullptr;
-        }
+        ptri = new NiTriStrips(112, pverts, nullptr, pcolors, nullptr, 0, 0, 110, 1, l, pstrip);
+        pshprop = new BSShaderNoLightingProperty;
         BSShaderNoLightingProperty* v36 = static_cast<BSShaderNoLightingProperty*>(pshprop);
         pshprop->SetShader(33);
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
         spGeometry = ptri;
-        void* apMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-        if (apMemory) {
-            NiAlphaProperty_ = ::new (apMemory) NiAlphaProperty;
-        }
-        else {
-            NiAlphaProperty_ = nullptr;
-        }
+        NiAlphaProperty_ = new NiAlphaProperty;
         NiRefObject* v22 = static_cast<NiRefObject*>(NiAlphaProperty_);
         NiPointer<NiAlphaProperty> alpha(static_cast<NiAlphaProperty*>(NiAlphaProperty_));
         alpha.m_pObject->SetName("primitive: alpha");
@@ -691,13 +638,7 @@ void BGSPrimitiveSphere::Build() {
         spGeometry.m_pObject->AttachProperty(alpha.m_pObject);
         BSShaderProperty* Property = static_cast<BSShaderProperty*>(spGeometry.m_pObject->GetProperty(3));
         Property->SetFlag(32u, 0);
-        BSFadeNode* v18 = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
-        if (v18) {
-            BSFadeNode_ = ::new (v18) BSFadeNode;
-        }
-        else {
-            BSFadeNode_ = nullptr;
-        }
+        BSFadeNode_ = new BSFadeNode;
         NiRefObject* v19 = BSFadeNode_;
         spNode = BSFadeNode_;
         BSFadeNode* v5 = spNode.m_pObject;

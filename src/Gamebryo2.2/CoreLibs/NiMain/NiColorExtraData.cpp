@@ -23,13 +23,7 @@ const NiRTTI* NiColorExtraData::GetRTTI() const {
 }
 
 NiObject* NiColorExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiColorExtraData* pkObject_2 = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
-    if (pkObject_2) {
-        ::new (pkObject_2) NiColorExtraData;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiColorExtraData* pkObject_2 = new NiColorExtraData;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kColorA = m_kColorA;
     return pkObject_2;
@@ -85,9 +79,5 @@ void NiColorExtraData::SetValue(NiColorA akColorA) {
 }
 
 NiObject* NiColorExtraData::CreateObject() {
-    NiColorExtraData* pkObject = static_cast<NiColorExtraData*>(NiMemObject::operator new(sizeof(NiColorExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiColorExtraData;
+    return new NiColorExtraData;
 }

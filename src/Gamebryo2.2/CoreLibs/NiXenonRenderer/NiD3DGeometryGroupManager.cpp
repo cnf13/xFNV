@@ -226,14 +226,7 @@ void NiD3DGeometryGroupManager::SetHWSkinning(bool bHWSkinning) {
 
 NiD3DGeometryGroupManager*
 NiD3DGeometryGroupManager::Create(IDirect3DDevice9* pkD3DDevice, NiDX9VertexBufferManager* pkVBManager) {
-    NiD3DGeometryGroupManager* pkManager =
-        static_cast<NiD3DGeometryGroupManager*>(NiMemObject::operator new(sizeof(NiD3DGeometryGroupManager)));
-    if (pkManager) {
-        ::new (pkManager) NiD3DGeometryGroupManager;
-    }
-    else {
-        pkManager = nullptr;
-    }
+    NiD3DGeometryGroupManager* pkManager = new NiD3DGeometryGroupManager;
     pkManager->m_pkD3DDevice = pkD3DDevice;
     pkD3DDevice->AddRef();
     pkManager->m_pkVBManager = pkVBManager;

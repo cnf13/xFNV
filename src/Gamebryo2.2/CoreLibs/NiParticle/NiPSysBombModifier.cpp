@@ -26,15 +26,7 @@ NiPSysBombModifier::NiPSysBombModifier()
 NiPSysBombModifier::~NiPSysBombModifier() {}
 
 NiObject* NiPSysBombModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysBombModifier* pkObject =
-        static_cast<NiPSysBombModifier*>(NiMemObject::operator new(sizeof(NiPSysBombModifier)));
-    NiPSysBombModifier* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiPSysBombModifier;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiPSysBombModifier* pkObject_2 = new NiPSysBombModifier;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kBombAxis = m_kBombAxis;
     pkObject_2->m_fDecay = m_fDecay;
@@ -238,10 +230,5 @@ void NiPSysBombModifier::Update(float fTime, NiPSysData* pkData) {
 }
 
 NiObject* NiPSysBombModifier::CreateObject() {
-    NiPSysBombModifier* pkObject =
-        static_cast<NiPSysBombModifier*>(NiMemObject::operator new(sizeof(NiPSysBombModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysBombModifier;
+    return new NiPSysBombModifier;
 }

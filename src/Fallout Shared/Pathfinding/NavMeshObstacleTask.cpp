@@ -30,13 +30,7 @@ void ObstacleTaskData::Process() {
     BSPerformanceTimer* PerformanceTimer = Instance->GetPerformanceTimer();
     if (pInfo->GetNavMesh(spSrcMesh)) {
         NavMesh* v11;
-        NavMesh* v14 = static_cast<NavMesh*>(NiMemObject::operator new(sizeof(NavMesh)));
-        if (v14) {
-            v11 = ::new (v14) NavMesh;
-        }
-        else {
-            v11 = nullptr;
-        }
+        v11 = new NavMesh;
         spNewNavMesh = NavMeshPtr::MakeNavMeshPtr(v11);
         spSrcMesh.m_pObject->MakeCopyForObstacle(spNewNavMesh);
         SortOperations();

@@ -75,10 +75,5 @@ void NiPSysEmitterSpeedCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysEmitterSpeedCtlr::CreateObject() {
-    NiPSysEmitterSpeedCtlr* v0 =
-        static_cast<NiPSysEmitterSpeedCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterSpeedCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysEmitterSpeedCtlr;
+    return new NiPSysEmitterSpeedCtlr;
 }

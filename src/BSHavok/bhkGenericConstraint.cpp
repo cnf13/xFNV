@@ -31,14 +31,7 @@ NiObject* bhkGenericConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkGenericConstraint* pClone =
-        static_cast<bhkGenericConstraint*>(NiMemObject::operator new(sizeof(bhkGenericConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkGenericConstraint;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkGenericConstraint* pClone = new bhkGenericConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     riMemContext = iOldContext;

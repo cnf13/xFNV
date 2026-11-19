@@ -5215,15 +5215,7 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
         else {
             if (GetWeaponEnchantmentVisuals()) {
                 MagicShaderHitEffect* pweapEffect_2;
-                MagicShaderHitEffect* apMemory =
-                    static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-                if (apMemory) {
-                    TESEffectShader* v5 = GetWeaponEnchantmentVisuals();
-                    pweapEffect_2 = ::new (apMemory) MagicShaderHitEffect(apActor, v5, -1.0f);
-                }
-                else {
-                    pweapEffect_2 = nullptr;
-                }
+                pweapEffect_2 = new MagicShaderHitEffect(apActor, GetWeaponEnchantmentVisuals(), -1.0f);
                 pweapEffect_2->bWeaponEnchantment = true;
                 if (bRefreshMagicShaderEffectLoading) {
                     pweapEffect_2->SetLifeTime(100.0f);
@@ -5247,14 +5239,7 @@ void MiddleHighProcess::RefreshMagicShaderEffects(Actor* apActor) {
 
                 if (!pinventory) {
                     MagicShaderHitEffect* pinventory_2;
-                    MagicShaderHitEffect* v12 =
-                        static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-                    if (v12) {
-                        pinventory_2 = ::new (v12) MagicShaderHitEffect(pPlayer, peffect_3, -1.0f);
-                    }
-                    else {
-                        pinventory_2 = nullptr;
-                    }
+                    pinventory_2 = new MagicShaderHitEffect(pPlayer, peffect_3, -1.0f);
                     pinventory = pinventory_2;
                     pinventory_2->bWeaponEnchantment = true;
                     pPlayer->SetInventoryWeaponEffect(pinventory_2);

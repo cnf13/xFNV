@@ -32,19 +32,9 @@ const NiRTTI* NiBSplineCompPoint3Interpolator::GetRTTI() const {
 }
 
 NiObject* NiBSplineCompPoint3Interpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBSplineCompPoint3Interpolator* pkObject = static_cast<NiBSplineCompPoint3Interpolator*>(
-        NiMemObject::operator new(sizeof(NiBSplineCompPoint3Interpolator))
+    NiBSplineCompPoint3Interpolator* pkObject_2 = new NiBSplineCompPoint3Interpolator(
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
-    NiBSplineCompPoint3Interpolator* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBSplineCompPoint3Interpolator(
-            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE,
-            static_cast<NiBSplineBasisData*>(nullptr)
-        );
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
     CopyMembers(pkObject_2, kCloning);
     std::memcpy(pkObject_2->m_afCompScalars, m_afCompScalars, sizeof(pkObject_2->m_afCompScalars));
     return pkObject_2;
@@ -111,14 +101,7 @@ bool NiBSplineCompPoint3Interpolator::Update(float fTime, NiObjectNET*, NiPoint3
 }
 
 NiObject* NiBSplineCompPoint3Interpolator::CreateObject() {
-    NiBSplineCompPoint3Interpolator* pkObject = static_cast<NiBSplineCompPoint3Interpolator*>(
-        NiMemObject::operator new(sizeof(NiBSplineCompPoint3Interpolator))
-    );
-    if (!pkObject) {
-        return nullptr;
-    }
-    ::new (pkObject) NiBSplineCompPoint3Interpolator(
+    return new NiBSplineCompPoint3Interpolator(
         static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
-    return pkObject;
 }

@@ -21,14 +21,7 @@ const NiRTTI* NiSortAdjustNode::GetRTTI() const {
 }
 
 NiObject* NiSortAdjustNode::CreateClone(NiCloningProcess& kCloning) {
-    NiSortAdjustNode* pkObject = static_cast<NiSortAdjustNode*>(NiMemObject::operator new(sizeof(NiSortAdjustNode)));
-    NiSortAdjustNode* pkObject_2 = pkObject;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiSortAdjustNode;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiSortAdjustNode* pkObject_2 = new NiSortAdjustNode;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_eSortingMode = m_eSortingMode;
     return pkObject_2;
@@ -98,9 +91,5 @@ void NiSortAdjustNode::OnVisible(NiCullingProcess& kCuller) {
 }
 
 NiObject* NiSortAdjustNode::CreateObject() {
-    NiSortAdjustNode* pkObject = static_cast<NiSortAdjustNode*>(NiMemObject::operator new(sizeof(NiSortAdjustNode)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSortAdjustNode;
+    return new NiSortAdjustNode;
 }

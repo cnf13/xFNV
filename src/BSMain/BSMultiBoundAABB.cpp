@@ -31,13 +31,7 @@ BSMultiBoundAABB::~BSMultiBoundAABB() {}
 
 NiObject* BSMultiBoundAABB::CreateClone(NiCloningProcess& arCloneData) {
     BSMultiBoundAABB* v3;
-    void* apMemory = NiMemObject::operator new(sizeof(BSMultiBoundAABB));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSMultiBoundAABB;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSMultiBoundAABB;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -321,10 +315,5 @@ void BSMultiBoundAABB::CopyMembers(BSMultiBoundAABB* pDest, NiCloningProcess& ar
 }
 
 NiObject* BSMultiBoundAABB::CreateObject() {
-    BSMultiBoundAABB* apMemory = static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-    if (apMemory) {
-        return ::new (apMemory) BSMultiBoundAABB;
-    }
-
-    return nullptr;
+    return new BSMultiBoundAABB;
 }

@@ -24,13 +24,7 @@ const NiRTTI* BSPlayerDistanceCheckController::GetRTTI() const {
 
 NiObject* BSPlayerDistanceCheckController::CreateClone(NiCloningProcess& kCloning) {
     BSPlayerDistanceCheckController* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSPlayerDistanceCheckController));
-    if (v5) {
-        v3 = ::new (v5) BSPlayerDistanceCheckController;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSPlayerDistanceCheckController;
     CopyMembers(v3, kCloning);
     return v3;
 }

@@ -156,27 +156,11 @@ bool CellMopp::Create(NiTriStrips** appStripArray, uint32_t aiCount, float afOff
                     ci.fOffset = fOffset;
                     ci.CalcMinMax();
                     bhkTriSampledHeightFieldBvTreeShape* pShape;
-                    bhkTriSampledHeightFieldBvTreeShape* pShapeMemory =
-                        static_cast<bhkTriSampledHeightFieldBvTreeShape*>(
-                            NiMemObject::operator new(sizeof(bhkTriSampledHeightFieldBvTreeShape))
-                        );
-                    if (pShapeMemory) {
-                        pShape = ::new (pShapeMemory) bhkTriSampledHeightFieldBvTreeShape(ci);
-                    }
-                    else {
-                        pShape = nullptr;
-                    }
+                    pShape = new bhkTriSampledHeightFieldBvTreeShape(ci);
                     alignas(16) NiPointer<bhkTriSampledHeightFieldBvTreeShape> spshape(pShape);
                     rbinfo.SetShape(spshape.m_pObject->Gethk());
                     bhkRigidBody* prb;
-                    bhkRigidBody* pBodyMemory =
-                        static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-                    if (pBodyMemory) {
-                        prb = ::new (pBodyMemory) bhkRigidBody(rbinfo);
-                    }
-                    else {
-                        prb = nullptr;
-                    }
+                    prb = new bhkRigidBody(rbinfo);
                     // The property key is the RTTI object's address, as SetAVObject's own default key.
                     prb->SetAVObject(pstrips, bhkPropertyKey(NiTriStrips::ms_RTTI));
                     NiPointer<bhkRigidBody> sprb(prb);

@@ -34,12 +34,7 @@ bool bhkBlendCollisionObjectAddRotation::RegisterStreamables(NiStream& arStream)
 // A new object charged to the Havok heap context, then the copied members and this object's additional rotation.
 NiObject* bhkBlendCollisionObjectAddRotation::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-    bhkBlendCollisionObjectAddRotation* pClone = static_cast<bhkBlendCollisionObjectAddRotation*>(
-        NiMemObject::operator new(sizeof(bhkBlendCollisionObjectAddRotation))
-    );
-    if (pClone) {
-        ::new (pClone) bhkBlendCollisionObjectAddRotation;
-    }
+    bhkBlendCollisionObjectAddRotation* pClone = new bhkBlendCollisionObjectAddRotation;
     CopyMembers(pClone, arCloneData);
     __builtin_memcpy(&pClone->AdditionalRotation, &AdditionalRotation, sizeof(pClone->AdditionalRotation));
     return pClone;

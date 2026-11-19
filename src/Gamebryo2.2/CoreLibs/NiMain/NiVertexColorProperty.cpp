@@ -15,11 +15,7 @@ NiPointer<NiVertexColorProperty> NiVertexColorProperty::ms_spDefault;
 // the members through NiProperty::CopyMembers (which leaves the flags alone) and then takes this object's flags.
 NiObject* NiVertexColorProperty::CreateClone(NiCloningProcess& kCloning) {
     if (m_spControllers) {
-        NiVertexColorProperty* pkClone =
-            static_cast<NiVertexColorProperty*>(NiMemObject::operator new(sizeof(NiVertexColorProperty)));
-        if (pkClone) {
-            ::new (pkClone) NiVertexColorProperty;
-        }
+        NiVertexColorProperty* pkClone = new NiVertexColorProperty;
         NiProperty::CopyMembers(pkClone, kCloning);
         pkClone->m_uFlags = m_uFlags;
         return pkClone;
@@ -88,11 +84,7 @@ bool NiVertexColorProperty::IsEqualFast(const NiVertexColorProperty& kProp) cons
 
 // The default flags are 8: lighting mode LIGHTING_E_A_D, source mode SOURCE_IGNORE.
 NiObject* NiVertexColorProperty::CreateObject() {
-    NiVertexColorProperty* pkObject =
-        static_cast<NiVertexColorProperty*>(NiMemObject::operator new(sizeof(NiVertexColorProperty)));
-    if (pkObject) {
-        ::new (pkObject) NiVertexColorProperty;
-    }
+    NiVertexColorProperty* pkObject = new NiVertexColorProperty;
     return pkObject;
 }
 

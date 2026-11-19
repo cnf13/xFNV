@@ -656,13 +656,7 @@ BSTempEffectParticle* BSTempEffectParticle::Spawn(
     if (apCell) {
         BSTempEffectParticle* presult_2;
         NiMatrix3 krandrot;
-        void* apMemory = NiMemObject::operator new(sizeof(BSTempEffectParticle));
-        if (apMemory) {
-            presult_2 = ::new (apMemory) BSTempEffectParticle(apCell, afLifetime, apParticleFilename, apFollowObject);
-        }
-        else {
-            presult_2 = nullptr;
-        }
+        presult_2 = new BSTempEffectParticle(apCell, afLifetime, apParticleFilename, apFollowObject);
         presult = presult_2;
         float frand = RandomFloatTwoPi();
         krandrot.MakeZRotation(frand);
@@ -689,13 +683,7 @@ BSTempEffectParticle* BSTempEffectParticle::Spawn(
     BSTempEffectParticle* presult = nullptr;
     if (apCell) {
         BSTempEffectParticle* presult_2;
-        void* apMemory = NiMemObject::operator new(sizeof(BSTempEffectParticle));
-        if (apMemory) {
-            presult_2 = ::new (apMemory) BSTempEffectParticle(apCell, afLifetime, apParticleFilename, apFollowObject);
-        }
-        else {
-            presult_2 = nullptr;
-        }
+        presult_2 = new BSTempEffectParticle(apCell, afLifetime, apParticleFilename, apFollowObject);
         presult = presult_2;
         NiNode* pparentnode = apCell->GetChildNode(TESObjectCELL::CN_DYNAMIC);
         v9 = aRotation;

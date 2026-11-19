@@ -129,10 +129,5 @@ bool NiBoolTimelineInterpolator::Update(float fTime, NiObjectNET*, bool& bValue)
 }
 
 NiObject* NiBoolTimelineInterpolator::CreateObject() {
-    NiBoolTimelineInterpolator* pkObject =
-        static_cast<NiBoolTimelineInterpolator*>(NiMemObject::operator new(sizeof(NiBoolTimelineInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBoolTimelineInterpolator(static_cast<NiBoolData*>(nullptr));
+    return new NiBoolTimelineInterpolator(static_cast<NiBoolData*>(nullptr));
 }

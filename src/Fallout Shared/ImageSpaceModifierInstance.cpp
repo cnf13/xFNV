@@ -187,13 +187,7 @@ ImageSpaceModifierInstanceForm::Trigger(TESImageSpaceModifier* apMod, float afSt
     ImageSpaceModifierInstanceForm* pMod = nullptr;
     if (apMod) {
         ImageSpaceModifierInstanceForm* pNew;
-        void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
-        if (pMemory) {
-            pNew = ::new (pMemory) ImageSpaceModifierInstanceForm(apMod, -10001.0f, afStrength, apTarget);
-        }
-        else {
-            pNew = nullptr;
-        }
+        pNew = new ImageSpaceModifierInstanceForm(apMod, -10001.0f, afStrength, apTarget);
         pMod = pNew;
         TES::pInstance->listActiveImageSpaceModifiers.AddTail(
             NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew))
@@ -226,13 +220,7 @@ ImageSpaceModifierInstanceForm* ImageSpaceModifierInstanceForm::TriggerIfNotActi
         }
         if (!bFound) {
             ImageSpaceModifierInstanceForm* pNew;
-            void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
-            if (pMemory) {
-                pNew = ::new (pMemory) ImageSpaceModifierInstanceForm(apMod, -10001.0f, afStrength, apTarget);
-            }
-            else {
-                pNew = nullptr;
-            }
+            pNew = new ImageSpaceModifierInstanceForm(apMod, -10001.0f, afStrength, apTarget);
             pMod = pNew;
             TES::pInstance->listActiveImageSpaceModifiers.AddTail(
                 NiPointer<ImageSpaceModifierInstance>(static_cast<ImageSpaceModifierInstance*>(pNew))
@@ -300,15 +288,9 @@ ImageSpaceModifierInstanceDOF* ImageSpaceModifierInstanceDOF::Trigger(
     float afDuration
 ) {
     ImageSpaceModifierInstanceDOF* pInstance;
-    void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceDOF));
-    if (pMemory) {
-        pInstance = ::new (pMemory) ImageSpaceModifierInstanceDOF(
-            afStrength, -10001.0f, aMode, afDistance, afRange, afMaskConst, nullptr, afDuration
-        );
-    }
-    else {
-        pInstance = nullptr;
-    }
+    pInstance = new ImageSpaceModifierInstanceDOF(
+        afStrength, -10001.0f, aMode, afDistance, afRange, afMaskConst, nullptr, afDuration
+    );
     NiPointer<ImageSpaceModifierInstance> spInstance(static_cast<ImageSpaceModifierInstance*>(pInstance));
     TES::pInstance->listActiveImageSpaceModifiers.AddTail(spInstance);
     return pInstance;
@@ -371,16 +353,10 @@ ImageSpaceModifierInstanceDRB* ImageSpaceModifierInstanceDRB::Trigger(
     float afDuration
 ) {
     ImageSpaceModifierInstanceDRB* pInstance;
-    void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceDRB));
-    if (pMemory) {
-        pInstance = ::new (pMemory) ImageSpaceModifierInstanceDRB(
-            afStrength, -10001.0f, nullptr, afDuration, aMode, afDistance, afRange, afRampup, afStart, afRampdown,
-            afDownStart, aCenter
-        );
-    }
-    else {
-        pInstance = nullptr;
-    }
+    pInstance = new ImageSpaceModifierInstanceDRB(
+        afStrength, -10001.0f, nullptr, afDuration, aMode, afDistance, afRange, afRampup, afStart, afRampdown,
+        afDownStart, aCenter
+    );
     NiPointer<ImageSpaceModifierInstance> spInstance(static_cast<ImageSpaceModifierInstance*>(pInstance));
     TES::pInstance->listActiveImageSpaceModifiers.AddTail(spInstance);
     return pInstance;
@@ -440,15 +416,9 @@ ImageSpaceModifierInstanceRB* ImageSpaceModifierInstanceRB::Trigger_0052A440(
     float afDuration
 ) {
     ImageSpaceModifierInstanceRB* pInstance;
-    void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceRB));
-    if (pMemory) {
-        pInstance = ::new (pMemory) ImageSpaceModifierInstanceRB(
-            afStrength, -10001.0f, nullptr, afDuration, afRampup, afStart, afRampdown, afDownStart, aCenter
-        );
-    }
-    else {
-        pInstance = nullptr;
-    }
+    pInstance = new ImageSpaceModifierInstanceRB(
+        afStrength, -10001.0f, nullptr, afDuration, afRampup, afStart, afRampdown, afDownStart, aCenter
+    );
     NiPointer<ImageSpaceModifierInstance> spInstance(static_cast<ImageSpaceModifierInstance*>(pInstance));
     TES::pInstance->listActiveImageSpaceModifiers.AddTail(spInstance);
     return pInstance;

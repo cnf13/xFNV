@@ -576,11 +576,7 @@ NiD3DShaderDeclaration* BSShaderNoLighting::GetShaderDecl(NiGeometry* apGeometry
 // variable names are the empty string.
 void BSShaderNoLighting::CreateConstantMaps() {
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("matcolor", 0x10000007, 0, 0, 1, "", 0x10, 4, &kMaterialColor, false);
         m_spPixelConstantMap.m_pObject->AddEntry("matalpha", 0x10000007, 0, 1, 1, "", 0x10, 4, &Toggles, false);
@@ -588,11 +584,7 @@ void BSShaderNoLighting::CreateConstantMaps() {
         m_spPixelConstantMap.m_pObject->AddEntry("waterfog", 0x10000009, 0, 5, 2, "", 0x20, 4, pWaterFogA, false);
     }
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -1470,16 +1462,10 @@ BSShader* BSShaderNoLighting::CreateShader() {
         5u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0
     );
     pskindeclTexVCN->GetD3DDeclaration();
-    BSShaderNoLighting* v4 = static_cast<BSShaderNoLighting*>(NiMemObject::operator new(sizeof(BSShaderNoLighting)));
-    if (v4) {
-        pshader = ::new (v4) BSShaderNoLighting(
-            pdecl, pdeclVC, pdeclTexVC, pdeclN, pdeclVCN, pdeclTexVCN, pskindecl, pskindeclVC, pskindeclTexVC,
-            pskindeclN, pskindeclVCN, pskindeclTexVCN
-        );
-    }
-    else {
-        pshader = nullptr;
-    }
+    pshader = new BSShaderNoLighting(
+        pdecl, pdeclVC, pdeclTexVC, pdeclN, pdeclVCN, pdeclTexVCN, pskindecl, pskindeclVC, pskindeclTexVC, pskindeclN,
+        pskindeclVCN, pskindeclTexVCN
+    );
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

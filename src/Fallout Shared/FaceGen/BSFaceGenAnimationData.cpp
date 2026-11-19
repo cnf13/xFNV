@@ -930,13 +930,7 @@ BSFaceGenAnimationData* BSFaceGenAnimationData::CreateCopyBS() {
     BSFaceGenAnimationData* pretval;
     BSFaceGenKeyframe* v31;
     void* iter;
-    void* apMemory = NiMemObject::operator new(sizeof(BSFaceGenAnimationData));
-    if (apMemory) {
-        pretval = ::new (apMemory) BSFaceGenAnimationData;
-    }
-    else {
-        pretval = nullptr;
-    }
+    pretval = new BSFaceGenAnimationData;
     pretval->CurrentTargetExpressionData.operator=(&CurrentTargetExpressionData);
     pretval->CurrentAnimExpressionData.operator=(&CurrentAnimExpressionData);
     pretval->CurrentExpressionData.operator=(&CurrentExpressionData);

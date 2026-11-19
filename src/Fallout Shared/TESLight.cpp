@@ -472,12 +472,10 @@ NiAVObject* TESObjectLIGH::LoadGraphics(TESObjectREFR* apRef) {
         pGraphics = TESObject::LoadGraphics(apRef);
     }
     else {
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pGraphics = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pGraphics = new NiNode(0);
     }
     if (pGraphics && !pGraphics->IsNode()) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* pNode = new NiNode(0);
         pNode->AttachChild(pGraphics, true);
         pGraphics = pNode;
     }
@@ -520,8 +518,7 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
         pClone = static_cast<NiAVObject*>(spGraphics->Clone(kCloning));
     }
     else if (!pClone) {
-        void* pMemory = NiMemObject::operator new(sizeof(BSFadeNode));
-        pClone = pMemory ? ::new (pMemory) BSFadeNode : nullptr;
+        pClone = new BSFadeNode;
     }
     GenDynamic(pRequester, static_cast<BSFadeNode*>(pClone), false);
     pClone->UpdateProperties();
@@ -570,13 +567,7 @@ NiLight* TESObjectLIGH::GenDynamic(TESObjectREFR* pRequester, NiAVObject* pModel
         NiPointLight* pnewLight;
         char acName[264];
         BSsprintf(acName, 260, "%s PtLight", GetFormEditorID());
-        void* pMemory = NiMemObject::operator new(sizeof(NiPointLight));
-        if (pMemory) {
-            pnewLight = ::new (pMemory) NiPointLight;
-        }
-        else {
-            pnewLight = nullptr;
-        }
+        pnewLight = new NiPointLight;
         plight = pnewLight;
         plight->SetName(acName);
         pattachnode->AttachChild(plight, 1);

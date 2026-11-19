@@ -72,29 +72,11 @@ void HighActorCuller::Init(NiCamera* apCamera) {
     (&Culler)->NiCullingProcess::SetCamera(apCamera);
     const NiFrustum* viewFrustum = &apCamera->GetViewFrustum();
     (&Culler)->SetFrustum(*viewFrustum);
-    void* v13 = NiMemObject::operator new(sizeof(BSMultiBoundSphere));
-    if (v13) {
-        v9 = ::new (v13) BSMultiBoundSphere;
-    }
-    else {
-        v9 = nullptr;
-    }
+    v9 = new BSMultiBoundSphere;
     spMBSphere = v9;
-    void* v12 = NiMemObject::operator new(sizeof(BSMultiBound));
-    if (v12) {
-        v8 = ::new (v12) BSMultiBound;
-    }
-    else {
-        v8 = nullptr;
-    }
+    v8 = new BSMultiBound;
     spMB = v8;
-    void* apMemory = NiMemObject::operator new(sizeof(BSMultiBoundNode));
-    if (apMemory) {
-        v7 = ::new (apMemory) BSMultiBoundNode;
-    }
-    else {
-        v7 = nullptr;
-    }
+    v7 = new BSMultiBoundNode;
     spMBNode = v7;
     BSMultiBoundSphere* v5 = (&spMBSphere)->m_pObject;
     BSMultiBound* v3 = (&spMB)->m_pObject;

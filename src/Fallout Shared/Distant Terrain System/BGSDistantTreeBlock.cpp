@@ -211,27 +211,14 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
     for (uint32_t k = 0; k < v19; ++k) {
         a2[k] = static_cast<float>(k >> 3);
     }
-    NiAdditionalGeometryData* v8 =
-        static_cast<NiAdditionalGeometryData*>(NiMemObject::operator new(sizeof(NiAdditionalGeometryData)));
-    if (v8) {
-        additionalGeo = ::new (v8) NiAdditionalGeometryData(v19);
-    }
-    else {
-        additionalGeo = nullptr;
-    }
+    additionalGeo = new NiAdditionalGeometryData(v19);
     additionalGeo->SetDataBlockCount(1u);
     additionalGeo->SetDataStreamCount(1u);
     // The data block is raw bytes to the geometry data: the float buffer goes in as uint8_t*.
     additionalGeo->SetDataBlock(0, reinterpret_cast<uint8_t*>(a2), 4 * v19, true);
     additionalGeo->SetDataStream(0, 0, 0, 1u, v19, 4u, 4u);
     ourFree(a2);
-    NiTriShapeData* v7 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-    if (v7) {
-        v2 = ::new (v7) NiTriShapeData(v19, v6, v4, nullptr, v5, 1, NiGeometryData::NBT_METHOD_NONE, v18, pusTriList);
-    }
-    else {
-        v2 = nullptr;
-    }
+    v2 = new NiTriShapeData(v19, v6, v4, nullptr, v5, 1, NiGeometryData::NBT_METHOD_NONE, v18, pusTriList);
     NiPointer<NiTriShapeData> v22(v2);
     v22->SetAdditionalGeometryData(additionalGeo);
     apTreeType->spSharedModelData = v22;
@@ -461,28 +448,14 @@ void BGSDistantTreeBlock::Attach() {
                 break;
             }
             BGSDistantTreeBlock::TreeGroup* group = TreeGroups.GetAt(static_cast<int32_t>(i));
-            BSResizableTriShape* v14 =
-                static_cast<BSResizableTriShape*>(NiMemObject::operator new(sizeof(BSResizableTriShape)));
-            if (v14) {
-                NiTriShapeData* v4 = TreeGroups.GetAt(static_cast<int32_t>(i))->pTreeType->spSharedModelData.m_pObject;
-                v9 = ::new (v14) BSResizableTriShape(v4);
-            }
-            else {
-                v9 = nullptr;
-            }
+            v9 = new BSResizableTriShape(
+                TreeGroups.GetAt(static_cast<int32_t>(i))->pTreeType->spSharedModelData.m_pObject
+            );
             NiRefObject* v15 = v9;
             group->spGeometry = v9;
             uint32_t v2 = group->Instances.iSize;
             group->spGeometry.m_pObject->uiNumPrimitives = 4 * v2;
-            BSDistantTreeShaderProperty* v12 = static_cast<BSDistantTreeShaderProperty*>(
-                NiMemObject::operator new(sizeof(BSDistantTreeShaderProperty))
-            );
-            if (v12) {
-                psp_2 = ::new (v12) BSDistantTreeShaderProperty;
-            }
-            else {
-                psp_2 = nullptr;
-            }
+            psp_2 = new BSDistantTreeShaderProperty;
             BSDistantTreeShaderProperty* v13 = psp_2;
             BSDistantTreeShaderProperty* psp = psp_2;
             SetupShaderProperty(psp_2, *group);
@@ -556,13 +529,11 @@ void BGSDistantTreeBlock::AllocateStaticData(TESWorldSpace* apWorld) {
     BSDistantTreeShader::SetTextureAtlas(spAtlasTexture);
     bStaticDataLoaded = true;
 
-    void* pStencilMemory = NiMemObject::operator new(sizeof(NiStencilProperty));
-    NiStencilProperty* pStencil = pStencilMemory ? ::new (pStencilMemory) NiStencilProperty : nullptr;
+    NiStencilProperty* pStencil = new NiStencilProperty;
     spSharedStencil = pStencil;
     spSharedStencil->SetDrawMode(NiStencilProperty::DRAW_BOTH);
 
-    void* pAlphaMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-    NiAlphaProperty* pAlpha = pAlphaMemory ? ::new (pAlphaMemory) NiAlphaProperty : nullptr;
+    NiAlphaProperty* pAlpha = new NiAlphaProperty;
     spSharedAlpha = pAlpha;
     spSharedAlpha->SetAlphaTesting(true);
     spSharedAlpha->SetAlphaBlending(false);

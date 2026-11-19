@@ -169,13 +169,7 @@ void Precipitation::Load(const char* apFilename) {
             bool bsnow = BSstricmp(apFilename, "Sky\\Snow.NIF") == 0;
             NiUpdateData UpdateData(0.0f, false, false);
             pprecipNode->UpdateDownwardPass(UpdateData, 0);
-            NiNode* v8 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            if (v8) {
-                v6 = ::new (v8) NiNode(0);
-            }
-            else {
-                v6 = nullptr;
-            }
+            v6 = new NiNode(0);
             spCurrentPrecipRoot = v6;
             fBirthRate = 0.0f;
             for (uint32_t i = 0; i < pprecipNode->GetChildCount(); ++i) {
@@ -546,25 +540,10 @@ NiGeometry* Precipitation::CreateShaderGeometry(
                     pusTriList[itri++] = ibase + pgindex[iindex];
                 }
             }
-            NiTriShape* pshape = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-            if (pshape) {
-                NiTriShapeDynamicData* pdata;
-                NiTriShapeDynamicData* pdataMemory =
-                    static_cast<NiTriShapeDynamicData*>(NiMemObject::operator new(sizeof(NiTriShapeDynamicData)));
-                if (pdataMemory) {
-                    pdata = ::new (pdataMemory) NiTriShapeDynamicData(
-                        inuminstances * usinstanceVertices, pvertex, nullptr, nullptr, ptex, 1,
-                        NiGeometryData::NBT_METHOD_NONE, inuminstances * (usinstanceIndices / 3), pusTriList, 0, 0
-                    );
-                }
-                else {
-                    pdata = nullptr;
-                }
-                pnewGeom = ::new (pshape) NiTriShape(pdata);
-            }
-            else {
-                pnewGeom = nullptr;
-            }
+            pnewGeom = new NiTriShape(new NiTriShapeDynamicData(
+                inuminstances * usinstanceVertices, pvertex, nullptr, nullptr, ptex, 1, NiGeometryData::NBT_METHOD_NONE,
+                inuminstances * (usinstanceIndices / 3), pusTriList, 0, 0
+            ));
         }
     }
     else {
@@ -649,25 +628,10 @@ NiGeometry* Precipitation::CreateShaderGeometry(
             pusTriList[iindex + 4] = ivert;
             pusTriList[iindex + 5] = ivert + 2;
         }
-        NiTriShape* pshape = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-        if (pshape) {
-            NiTriShapeDynamicData* pdata;
-            NiTriShapeDynamicData* pdataMemory =
-                static_cast<NiTriShapeDynamicData*>(NiMemObject::operator new(sizeof(NiTriShapeDynamicData)));
-            if (pdataMemory) {
-                pdata = ::new (pdataMemory) NiTriShapeDynamicData(
-                    inumVertices, pvertex, nullptr, nullptr, ptex, 1, NiGeometryData::NBT_METHOD_NONE, inumTriangles,
-                    pusTriList, 0, 0
-                );
-            }
-            else {
-                pdata = nullptr;
-            }
-            pnewGeom = ::new (pshape) NiTriShape(pdata);
-        }
-        else {
-            pnewGeom = nullptr;
-        }
+        pnewGeom = new NiTriShape(new NiTriShapeDynamicData(
+            inumVertices, pvertex, nullptr, nullptr, ptex, 1, NiGeometryData::NBT_METHOD_NONE, inumTriangles,
+            pusTriList, 0, 0
+        ));
     }
     if (!pnewGeom) {
         return nullptr;
@@ -866,14 +830,7 @@ NiGeometry* Precipitation::CreateShaderGeometry(
         }
     }
     NiAdditionalGeometryData* pdata;
-    NiAdditionalGeometryData* pdataMemory =
-        static_cast<NiAdditionalGeometryData*>(NiMemObject::operator new(sizeof(NiAdditionalGeometryData)));
-    if (pdataMemory) {
-        pdata = ::new (pdataMemory) NiAdditionalGeometryData(itotalVertices, 1u, 1);
-    }
-    else {
-        pdata = nullptr;
-    }
+    pdata = new NiAdditionalGeometryData(itotalVertices, 1u, 1);
     pdata->SetDataBlockCount(1u);
     // The data block takes the points as raw bytes.
     pdata->SetDataBlock(
@@ -902,16 +859,9 @@ NiGeometry* Precipitation::CreateShaderGeometry(
     PrecipitationShaderProperty::PrecipitationType eprecipType =
         static_cast<PrecipitationShaderProperty::PrecipitationType>(abSnow);
     PrecipitationShaderProperty* pPSP;
-    PrecipitationShaderProperty* pPSPMemory =
-        static_cast<PrecipitationShaderProperty*>(NiMemObject::operator new(sizeof(PrecipitationShaderProperty)));
-    if (pPSPMemory) {
-        pPSP = ::new (pPSPMemory) PrecipitationShaderProperty(
-            inuminstances, frotationSpeed, kTransformedVelocity, kMin, kMax, eprecipType, efaceMode
-        );
-    }
-    else {
-        pPSP = nullptr;
-    }
+    pPSP = new PrecipitationShaderProperty(
+        inuminstances, frotationSpeed, kTransformedVelocity, kMin, kMax, eprecipType, efaceMode
+    );
     pnewGeom->AttachProperty(pPSP);
     pPSP->SetShader(30);
     BSShaderManager::PrepareObject(pnewGeom, 0, 0);

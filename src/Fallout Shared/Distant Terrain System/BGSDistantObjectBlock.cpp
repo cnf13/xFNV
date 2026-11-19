@@ -283,13 +283,7 @@ void BGSDistantObjectBlock::Prepare() {
     if ((bUseNormalLOD) && (spMesh.m_pObject)) {
         NiAlphaProperty* palpha;
         spMesh.m_pObject->RemoveProperty(NiAlphaProperty::GetType());
-        NiAlphaProperty* apMemory = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-        if (apMemory) {
-            palpha = ::new (apMemory) NiAlphaProperty;
-        }
-        else {
-            palpha = nullptr;
-        }
+        palpha = new NiAlphaProperty;
         palpha->SetAlphaTesting(true);
         palpha->SetAlphaBlending(false);
         palpha->SetTestRef(128);
@@ -351,14 +345,7 @@ void BGSDistantObjectBlock::PrepareStingerObject(NiAVObject* apGeom) {
             int32_t v4 = NiShadeProperty::GetType();
             BSShaderProperty* pshadeProp = static_cast<BSShaderProperty*>(pGeom->GetProperty(v4));
             pGeom->RemoveProperty(NiAlphaProperty::GetType());
-            NiAlphaProperty* apMemory =
-                static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (apMemory) {
-                palpha = ::new (apMemory) NiAlphaProperty;
-            }
-            else {
-                palpha = nullptr;
-            }
+            palpha = new NiAlphaProperty;
             palpha->SetAlphaTesting(true);
             palpha->SetAlphaBlending(false);
             palpha->SetTestRef(128);

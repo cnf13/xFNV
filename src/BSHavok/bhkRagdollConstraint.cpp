@@ -241,14 +241,7 @@ NiObject* bhkRagdollConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkRagdollConstraint* pClone =
-        static_cast<bhkRagdollConstraint*>(NiMemObject::operator new(sizeof(bhkRagdollConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkRagdollConstraint;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkRagdollConstraint* pClone = new bhkRagdollConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     riMemContext = iOldMemContext;
@@ -303,10 +296,5 @@ bhkRagdollConstraint::~bhkRagdollConstraint() {
 }
 
 NiObject* bhkRagdollConstraint::CreateObject() {
-    bhkRagdollConstraint* pkObject =
-        static_cast<bhkRagdollConstraint*>(NiMemObject::operator new(sizeof(bhkRagdollConstraint)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkRagdollConstraint;
+    return new bhkRagdollConstraint;
 }

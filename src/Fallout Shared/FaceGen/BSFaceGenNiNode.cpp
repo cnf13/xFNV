@@ -59,13 +59,7 @@ BSFaceGenNiNode::~BSFaceGenNiNode() {
 
 NiObject* BSFaceGenNiNode::CreateClone(NiCloningProcess& arCloneData) {
     BSFaceGenNiNode* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSFaceGenNiNode));
-    if (v5) {
-        v3 = ::new (v5) BSFaceGenNiNode;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSFaceGenNiNode;
     CopyMembers(v3, arCloneData);
     ProcessClone(arCloneData);
     return v3;

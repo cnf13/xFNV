@@ -24,14 +24,7 @@ BSMultiBoundSphere::BSMultiBoundSphere(NiPoint3* apCenter, float afRadius)
 
 NiObject* BSMultiBoundSphere::CreateClone(NiCloningProcess& arCloneData) {
     BSMultiBoundSphere* v3;
-    BSMultiBoundSphere* apMemory =
-        static_cast<BSMultiBoundSphere*>(NiMemObject::operator new(sizeof(BSMultiBoundSphere)));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSMultiBoundSphere;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSMultiBoundSphere;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -172,10 +165,5 @@ void BSMultiBoundSphere::CopyMembers(BSMultiBoundSphere* pDest, NiCloningProcess
 }
 
 NiObject* BSMultiBoundSphere::CreateObject() {
-    void* v2 = NiMemObject::operator new(sizeof(BSMultiBoundSphere));
-    if (v2) {
-        return ::new (v2) BSMultiBoundSphere;
-    }
-
-    return nullptr;
+    return new BSMultiBoundSphere;
 }

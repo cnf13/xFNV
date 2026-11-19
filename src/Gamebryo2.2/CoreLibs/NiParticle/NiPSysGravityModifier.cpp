@@ -28,13 +28,7 @@ NiPSysGravityModifier::~NiPSysGravityModifier() {}
 
 NiObject* NiPSysGravityModifier::CreateClone(NiCloningProcess& kCloning) {
     NiPSysGravityModifier* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysGravityModifier));
-    if (v3) {
-        v4 = ::new (v3) NiPSysGravityModifier;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiPSysGravityModifier;
     NiPSysModifier::CopyMembers(v4, kCloning);
     v4->m_kGravityAxis.x = m_kGravityAxis.x;
     v4->m_kGravityAxis.y = m_kGravityAxis.y;
@@ -398,10 +392,5 @@ void NiPSysGravityModifier::Update(float fTime, NiPSysData* pkData) {
 }
 
 NiObject* NiPSysGravityModifier::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiPSysGravityModifier));
-    if (v0) {
-        return ::new (v0) NiPSysGravityModifier;
-    }
-
-    return nullptr;
+    return new NiPSysGravityModifier;
 }

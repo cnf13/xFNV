@@ -398,14 +398,7 @@ void MagicFogProjectile::InitHavok() {
         pCinfo->SetWorld(pWorld);
         pCinfo->SetGravity(0.0f);
         // NiNew bhkSphereShape: 0x14 bytes.
-        void* pShapeMemory = NiMemObject::operator new(sizeof(bhkSphereShape));
-        bhkSphereShape* pShape;
-        if (pShapeMemory) {
-            pShape = ::new (pShapeMemory) bhkSphereShape(1.0f, true);
-        }
-        else {
-            pShape = nullptr;
-        }
+        bhkSphereShape* pShape = new bhkSphereShape(1.0f, true);
         pCinfo->SetShape(pShape);
         pCinfo->SetAvoidBox(false);
         TESObjectREFR* pCasterRef = nullptr;
@@ -656,14 +649,7 @@ void MagicFogProjectile::BuildAreaEffectGeometry() {
             NiColor clr(0.0f, 0.0f, 0.0f);
             GetCollisionFilter(&kFilter.iFilter);
             bhkCollisionFilter::GetDebugColor(kFilter, clr);
-            NiMaterialProperty* apMemory =
-                static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-            if (apMemory) {
-                pmat = ::new (apMemory) NiMaterialProperty;
-            }
-            else {
-                pmat = nullptr;
-            }
+            pmat = new NiMaterialProperty;
             pmat->SetEmittance(clr);
             pdebugSphere->AttachProperty(pmat);
             pnode->AttachChild(pdebugSphere, 1);

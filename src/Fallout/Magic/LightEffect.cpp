@@ -169,13 +169,7 @@ void LightEffect::AttachLight() {
             if (plight) {
                 NiNode* v12;
                 NiPointLight* v16;
-                NiPointLight* apMemory = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-                if (apMemory) {
-                    v16 = ::new (apMemory) NiPointLight;
-                }
-                else {
-                    v16 = nullptr;
-                }
+                v16 = new NiPointLight;
                 spPointLight = v16;
                 uint32_t ucolor = plight->GetColor();
                 float b = static_cast<float>(static_cast<uint8_t>(ucolor >> 16));

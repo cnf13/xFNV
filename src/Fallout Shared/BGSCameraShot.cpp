@@ -293,7 +293,6 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
     const NiPoint3* worldTranslate;
     NiNode* v6;
     NiMatrix3 result;
-    void* apMemory;
     NiRefObject* a2;
     int32_t v11;
     if (GetPosFollowsTarget()) {
@@ -301,14 +300,8 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
     }
     else {
         if (apLocation) {
-            apMemory = NiMemObject::operator new(sizeof(NiNode));
             v11 = 0;
-            if (apMemory) {
-                v6 = ::new (apMemory) NiNode(0);
-            }
-            else {
-                v6 = nullptr;
-            }
+            v6 = new NiNode(0);
             a2 = v6;
             v11 = (-1);
             spLocationNode = v6;
@@ -455,13 +448,7 @@ void BGSCameraShot::SetCameraTarget(NiAVObject* apTarget) {
         }
         else {
             NiNode* v2;
-            NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            if (apMemory) {
-                v2 = ::new (apMemory) NiNode(0);
-            }
-            else {
-                v2 = nullptr;
-            }
+            v2 = new NiNode(0);
             spTargetNode = v2;
             spTargetNode.m_pObject->SetWorldTranslate(apTarget->GetWorldTranslate());
         }

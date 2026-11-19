@@ -2037,15 +2037,8 @@ BGSMusicType* TESWorldSpace::GetMusicType() {
 
 BSPortalGraph* TESWorldSpace::GetPortalGraph() {
     BSPortalGraph* v2;
-    void* v4;
     if (!(&spPortalGraph)->m_pObject) {
-        v4 = NiMemObject::operator new(sizeof(BSPortalGraph));
-        if (v4) {
-            v2 = ::new (v4) BSPortalGraph;
-        }
-        else {
-            v2 = nullptr;
-        }
+        v2 = new BSPortalGraph;
         spPortalGraph = v2;
     }
     return (&spPortalGraph)->m_pObject;

@@ -30,11 +30,7 @@ NiRTTI bhkCollisionObject::ms_RTTI("bhkCollisionObject", &bhkNiCollisionObject::
 // The clone's allocation is charged to the Havok heap context, which is restored after the copy.
 NiObject* bhkCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-    bhkCollisionObject* pkClone =
-        static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
-    if (pkClone) {
-        ::new (pkClone) bhkCollisionObject;
-    }
+    bhkCollisionObject* pkClone = new bhkCollisionObject;
     CopyMembers(pkClone, arCloneData);
     return pkClone;
 }
@@ -365,10 +361,5 @@ void bhkCollisionObject::CopyMembers(bhkCollisionObject* apDest, NiCloningProces
 
 // The class loader's factory: a bare bhkCollisionObject block, or null when the allocation fails.
 NiObject* bhkCollisionObject::CreateObject() {
-    bhkCollisionObject* pkObject =
-        static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkCollisionObject;
+    return new bhkCollisionObject;
 }

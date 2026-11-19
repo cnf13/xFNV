@@ -269,13 +269,7 @@ bool CameraCaster::KeepOutOfCharacter(
 
 void CameraCaster::Init(float afRadius, uint32_t aiGroup) {
     bhkSphereShape* pplayerShape;
-    bhkSphereShape* pMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-    if (pMemory) {
-        pplayerShape = ::new (pMemory) bhkSphereShape(afRadius, true);
-    }
-    else {
-        pplayerShape = nullptr;
-    }
+    pplayerShape = new bhkSphereShape(afRadius, true);
     hkSimpleShapePhantomCinfo csi1;
     hkSimpleShapePhantomCinfo csi2;
     CFilter iplayerFilter(0u);
@@ -288,27 +282,13 @@ void CameraCaster::Init(float afRadius, uint32_t aiGroup) {
     csi1.m_shape = **pplayerShape;
     csi1.m_transform.setIdentity();
     bhkSimpleShapePhantom* pPlayerPhantom;
-    bhkSimpleShapePhantom* pPlayerMemory =
-        static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-    if (pPlayerMemory) {
-        pPlayerPhantom = ::new (pPlayerMemory) bhkSimpleShapePhantom(csi1);
-    }
-    else {
-        pPlayerPhantom = nullptr;
-    }
+    pPlayerPhantom = new bhkSimpleShapePhantom(csi1);
     spPlayerShapePhantom = pPlayerPhantom;
     csi2.m_collisionFilterInfo = ihorseFilter.iFilter;
     csi2.m_shape = **pplayerShape;
     csi2.m_transform.setIdentity();
     bhkSimpleShapePhantom* pHorsePhantom;
-    bhkSimpleShapePhantom* pHorseMemory =
-        static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-    if (pHorseMemory) {
-        pHorsePhantom = ::new (pHorseMemory) bhkSimpleShapePhantom(csi2);
-    }
-    else {
-        pHorsePhantom = nullptr;
-    }
+    pHorsePhantom = new bhkSimpleShapePhantom(csi2);
     spHorseShapePhantom = pHorsePhantom;
 }
 

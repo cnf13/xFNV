@@ -45,14 +45,7 @@ NiObject* bhkWheelConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkWheelConstraint* pClone =
-        static_cast<bhkWheelConstraint*>(NiMemObject::operator new(sizeof(bhkWheelConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkWheelConstraint;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkWheelConstraint* pClone = new bhkWheelConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     riMemContext = iOldMemContext;
@@ -98,11 +91,7 @@ hkSerializableCinfo& bhkWheelConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkWheelConstraint::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkWheelConstraint));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) bhkWheelConstraint;
+    return new bhkWheelConstraint;
 }
 
 hkWheelConstraintCinfo::hkWheelConstraintCinfo() {}

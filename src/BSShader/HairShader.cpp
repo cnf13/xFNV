@@ -419,13 +419,7 @@ BSShader* HairShader::CreateShader() {
         7u, 15u, NiShaderDeclaration::SHADERPARAM_NI_BINORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0
     );
     pSkinnedShaderDecl->GetD3DDeclaration();
-    HairShader* v2 = static_cast<HairShader*>(NiMemObject::operator new(sizeof(HairShader)));
-    if (v2) {
-        pshader = ::new (v2) HairShader(spShaderDecl, pSkinnedShaderDecl);
-    }
-    else {
-        pshader = nullptr;
-    }
+    pshader = new HairShader(spShaderDecl, pSkinnedShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

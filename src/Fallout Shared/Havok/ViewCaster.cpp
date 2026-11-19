@@ -73,13 +73,7 @@ void ViewCaster::Init(float afRadius, uint32_t aiGroup) {
         MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Havok\\ViewCaster.cpp", 73
     );
     bhkSphereShape* pshape;
-    bhkSphereShape* pMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-    if (pMemory) {
-        pshape = ::new (pMemory) bhkSphereShape(afRadius, true);
-    }
-    else {
-        pshape = nullptr;
-    }
+    pshape = new bhkSphereShape(afRadius, true);
     alignas(16) hkSimpleShapePhantomCinfo csi;
     CFilter ifilter;
     ifilter.iFilter = 0;
@@ -90,14 +84,7 @@ void ViewCaster::Init(float afRadius, uint32_t aiGroup) {
     csi.m_shape = **pshape;
     csi.m_transform.setIdentity();
     bhkSimpleShapePhantom* pPhantom;
-    bhkSimpleShapePhantom* pPhantomMemory =
-        static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-    if (pPhantomMemory) {
-        pPhantom = ::new (pPhantomMemory) bhkSimpleShapePhantom(csi);
-    }
-    else {
-        pPhantom = nullptr;
-    }
+    pPhantom = new bhkSimpleShapePhantom(csi);
     spShapePhantom = static_cast<bhkShapePhantom*>(pPhantom);
     bInit = true;
 }

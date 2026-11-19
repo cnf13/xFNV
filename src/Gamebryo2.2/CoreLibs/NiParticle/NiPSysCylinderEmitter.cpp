@@ -24,15 +24,7 @@ NiPSysCylinderEmitter::NiPSysCylinderEmitter()
 NiPSysCylinderEmitter::~NiPSysCylinderEmitter() {}
 
 NiObject* NiPSysCylinderEmitter::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysCylinderEmitter* pkObject =
-        static_cast<NiPSysCylinderEmitter*>(NiMemObject::operator new(sizeof(NiPSysCylinderEmitter)));
-    NiPSysCylinderEmitter* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiPSysCylinderEmitter;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiPSysCylinderEmitter* pkObject_2 = new NiPSysCylinderEmitter;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fEmitterRadius = m_fEmitterRadius;
     pkObject_2->m_fEmitterHeight = m_fEmitterHeight;
@@ -117,10 +109,5 @@ void NiPSysCylinderEmitter::SetEmitterHeight(float fEmitterHeight) {
 }
 
 NiObject* NiPSysCylinderEmitter::CreateObject() {
-    NiPSysCylinderEmitter* pkObject =
-        static_cast<NiPSysCylinderEmitter*>(NiMemObject::operator new(sizeof(NiPSysCylinderEmitter)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysCylinderEmitter;
+    return new NiPSysCylinderEmitter;
 }

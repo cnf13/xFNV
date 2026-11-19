@@ -146,10 +146,5 @@ void NiSwitchStringExtraData::CopyMembers(NiSwitchStringExtraData* pDest, NiClon
 }
 
 NiObject* NiSwitchStringExtraData::CreateObject() {
-    NiSwitchStringExtraData* pkObject =
-        static_cast<NiSwitchStringExtraData*>(NiMemObject::operator new(sizeof(NiSwitchStringExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSwitchStringExtraData;
+    return new NiSwitchStringExtraData;
 }

@@ -276,14 +276,7 @@ void Actor::EffectRemoved(ActiveEffect* apEffect) {
 void Actor::EffectReflected(MagicCaster* apCaster, ActiveEffect* apEffect) {
     MagicShaderHitEffect* peffect;
     TESEffectShader* pabsorbEffect = MagicSystem::GetAbsorbShaderEffect();
-    MagicShaderHitEffect* pAbsorbEffect =
-        static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-    if (pAbsorbEffect) {
-        peffect = ::new (pAbsorbEffect) MagicShaderHitEffect(this, pabsorbEffect, 0.0f);
-    }
-    else {
-        peffect = nullptr;
-    }
+    peffect = new MagicShaderHitEffect(this, pabsorbEffect, 0.0f);
     if (peffect->Init()) {
         ReferenceProcessLists.AddTempEffect(peffect);
     }
@@ -297,14 +290,7 @@ void Actor::EffectReflected(MagicCaster* apCaster, ActiveEffect* apEffect) {
 void Actor::EffectAbsorbed(MagicCaster* apCaster, ActiveEffect* apEffect) {
     MagicShaderHitEffect* peffect;
     TESEffectShader* preflectEffect = Get_EffectReflect();
-    MagicShaderHitEffect* apMemory =
-        static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-    if (apMemory) {
-        peffect = ::new (apMemory) MagicShaderHitEffect(this, preflectEffect, 0.0f);
-    }
-    else {
-        peffect = nullptr;
-    }
+    peffect = new MagicShaderHitEffect(this, preflectEffect, 0.0f);
     if (peffect->Init()) {
         ReferenceProcessLists.AddTempEffect(peffect);
     }

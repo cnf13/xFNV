@@ -1741,8 +1741,7 @@ void InterfaceManager::Init(bool abInitialLoad) {
     const bool bHas360 = InterfaceManager::Has360Controller();
     this->pStringRoot->Set(Tile::TextToTrait("_Has360Controller"), static_cast<int32_t>(bHas360));
 
-    void* const pNodeMemory = NiMemObject::operator new(sizeof(NiNode));
-    this->pDebugTextRoot = pNodeMemory ? ::new (pNodeMemory) NiNode(0) : nullptr;
+    this->pDebugTextRoot = new NiNode(0);
     {
         // The temporary name is destroyed after SetName, dropping its reference.
         NiFixedString kName("InterfaceManager: DebugText Root");
@@ -1767,10 +1766,8 @@ void InterfaceManager::Init(bool abInitialLoad) {
     }
 
     {
-        void* const pFogMemory = NiMemObject::operator new(sizeof(BSFogProperty));
         alignas(NiPointer<BSFogProperty>) uint8_t aFogStorage[sizeof(NiPointer<BSFogProperty>)];
-        NiPointer<BSFogProperty>& spFog =
-            *::new (aFogStorage) NiPointer<BSFogProperty>(pFogMemory ? ::new (pFogMemory) BSFogProperty : nullptr);
+        NiPointer<BSFogProperty>& spFog = *::new (aFogStorage) NiPointer<BSFogProperty>(new BSFogProperty);
         spFog->SetDistance(0.0f, 0.0f);
         // The 3D scene graph is fetched and not used.
         this->Get3DSceneGraph();
@@ -1826,11 +1823,9 @@ void InterfaceManager::InitSecond() {
     this->pCursor->GetModel()->SetAppCulled(true);
 
     // ShadowSceneNode is 0x200 bytes.
-    void* const pShadowMemory = NiMemObject::operator new(sizeof(ShadowSceneNode));
-    this->pShadowNode = pShadowMemory ? ::new (pShadowMemory) ShadowSceneNode : nullptr;
+    this->pShadowNode = new ShadowSceneNode;
     this->pShadowNode->SetSceneGraphIndex(BSShaderManager::BSSM_SSN_MENU_OBJECT_3D);
-    void* const pPlayerMemory = NiMemObject::operator new(sizeof(ShadowSceneNode));
-    this->pUIPlayerNode = pPlayerMemory ? ::new (pPlayerMemory) ShadowSceneNode : nullptr;
+    this->pUIPlayerNode = new ShadowSceneNode;
     this->pUIPlayerNode->SetSceneGraphIndex(BSShaderManager::BSSM_SSN_MENU_PLAYER_3D);
     this->spInterfaceAccum->SetShadowSceneNode(this->pShadowNode);
     this->sp3dInterfaceAccum->SetShadowSceneNode(this->pShadowNode);
@@ -3819,8 +3814,7 @@ SceneGraph* InterfaceManager::InitSceneGraph(SceneGraph* apSceneGraph, const cha
     );
     SceneGraph* pSceneGraph = apSceneGraph;
     if (!pSceneGraph) {
-        void* pMemory = NiMemObject::operator new(sizeof(SceneGraph));
-        pSceneGraph = pMemory ? ::new (pMemory) SceneGraph(apName, false, nullptr) : nullptr;
+        pSceneGraph = new SceneGraph(apName, false, nullptr);
     }
     NiRenderer* pRenderer = NiRenderer::GetRenderer();
     NiMatrix3 kRotate;
@@ -3850,16 +3844,14 @@ SceneGraph* InterfaceManager::InitSceneGraph(SceneGraph* apSceneGraph, const cha
     pSceneGraph->GetCamera()->SetTranslate(kCameraTranslate);
     if (!abIs3D) {
         pFaderManager->AddRoot(pSceneGraph, this->fOneToOneDistance, true);
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        this->pInterfaceRoot = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        this->pInterfaceRoot = new NiNode(0);
         NiFixedString kMainName("InterfaceManager: Main Root");
         this->pInterfaceRoot->SetName(kMainName);
         pSceneGraph->AttachChild(this->pInterfaceRoot, true);
         NiPoint3 kOldTranslate = this->pInterfaceRoot->GetTranslate();
         static_cast<void>(kOldTranslate);
         this->pInterfaceRoot->SetTranslate(NiPoint3(0.0f, this->fOneToOneDistance, 0.0f));
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        this->pCursorRoot = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        this->pCursorRoot = new NiNode(0);
         NiFixedString kCursorName("InterfaceManager: Cursor Root");
         this->pCursorRoot->SetName(kCursorName);
         pSceneGraph->AttachChild(this->pCursorRoot, true);

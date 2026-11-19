@@ -109,13 +109,7 @@ NiShaderDesc* NiSingleShaderMaterialLibrary::GetNextMaterialDesc() {
 }
 
 void NiSingleShaderMaterialLibrary::_SDMInit() {
-    void* v0 = NiMemObject::operator new(sizeof(NiSingleShaderMaterialLibrary));
-    if (v0) {
-        NiSingleShaderMaterialLibrary::ms_pkThis = ::new (v0) NiSingleShaderMaterialLibrary;
-    }
-    else {
-        NiSingleShaderMaterialLibrary::ms_pkThis = nullptr;
-    }
+    NiSingleShaderMaterialLibrary::ms_pkThis = new NiSingleShaderMaterialLibrary;
 }
 
 void NiSingleShaderMaterialLibrary::_SDMShutdown() {

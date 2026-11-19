@@ -727,13 +727,7 @@ void LockPickMenu::Prepare3DElements() {
     origPickTranslate = *::new (&dst) NiPoint3(0.0f, 0.0f, -1.6f);
     ppickGeometry->SetTranslate(origPickTranslate);
     ppickGeometry->SetRotate(origPickRotate);
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v14 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v14 = nullptr;
-    }
+    v14 = new NiNode(0);
     NiRefObject* v23 = v14;
     LockPickMenu::spCameraRoot = v14;
     NiNode* v13 = LockPickMenu::spCameraRoot.m_pObject;
@@ -791,13 +785,7 @@ NiCamera* LockPickMenu::Create3DCamera() {
     NiPoint3 v10;
     NiPoint3 dst;
     NiRect<float> port;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        pcam = ::new (apMemory) NiCamera;
-    }
-    else {
-        pcam = nullptr;
-    }
+    pcam = new NiCamera;
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     pcam->SetViewPort(port);
     NiFrustum fr(false);

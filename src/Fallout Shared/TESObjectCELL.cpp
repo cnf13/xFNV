@@ -2698,22 +2698,19 @@ NiNode* TESObjectCELL::Load3D() {
     if (!pnode) {
         SetState(CS_LOADING);
         bCellDetached = false;
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnode = new NiNode(0);
         pnode->SetTranslate(NiPoint3_ZERO);
         pnode->SetRotate(NiMatrix3_IDENTITY);
         pnode->SetFixedBound(true);
         pnode->SetAlwaysDraw(true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        NiNode* pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_ACTOR));
         pnode->AttachChild(pnew, true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetPickOff(true);
@@ -2721,80 +2718,68 @@ NiNode* TESObjectCELL::Load3D() {
         pnode->AttachChild(pnew, true);
         NiNode* pmarkernode = pnew;
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_LIGHT_MARKER));
         pmarkernode->AttachChild(pnew, true);
         spLightMarkerNode = pnew;
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_SOUND_MARKER));
         pmarkernode->AttachChild(pnew, true);
         spSoundMarkerNode = pnew;
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_LAND));
         pnode->AttachChild(pnew, true);
         for (int32_t i = 0; i < 4; ++i) {
-            void* pLandMemory = NiMemObject::operator new(sizeof(BSMultiBoundNode));
-            BSMultiBoundNode* plandnode = pLandMemory ? ::new (pLandMemory) BSMultiBoundNode : nullptr;
+            BSMultiBoundNode* plandnode = new BSMultiBoundNode;
             plandnode->SetCullingMode(BSCullingProcess::BSCP_CULL_ALLPASS);
-            void* pBoundMemory = NiMemObject::operator new(sizeof(BSMultiBound));
-            BSMultiBound* pmultibound = pBoundMemory ? ::new (pBoundMemory) BSMultiBound : nullptr;
-            void* pShapeMemory = NiMemObject::operator new(sizeof(BSMultiBoundAABB));
-            BSMultiBoundAABB* pmbaabb = pShapeMemory ? ::new (pShapeMemory) BSMultiBoundAABB : nullptr;
+            BSMultiBound* pmultibound = new BSMultiBound;
+            BSMultiBoundAABB* pmbaabb = new BSMultiBoundAABB;
             pmultibound->SetShape(pmbaabb);
             plandnode->SetMultiBound(pmultibound);
             pnew->AttachChild(plandnode, true);
         }
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_STATIC));
         pnode->AttachChild(pnew, true);
 
         // Node 4 is never culled; IsNodeCulled is not asked for it.
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(false);
         pnode->AttachChild(pnew, true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_OCCLUSION_PLANE));
         pnode->AttachChild(pnew, true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_PORTAL));
         pnode->AttachChild(pnew, true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_MULTIBOUND));
         pnode->AttachChild(pnew, true);
         pnode->AttachChild(pnew, true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pnew = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pnew = new NiNode(0);
         pnew->SetAlwaysDraw(true);
         pnew->SetFixedBound(true);
         pnew->SetAppCulled(IsNodeCulled(CCN_COLLISION));
@@ -2821,8 +2806,7 @@ NiNode* TESObjectCELL::Load3D() {
     }
     BSPortalGraph* pportalgraph = CreatePortalGraph();
     if (!pportalgraph->GetRootNode()) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        NiNode* ppnr = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* ppnr = new NiNode(0);
         NiFixedString kName("Shared Portal Geometry");
         ppnr->SetName(kName);
         pportalgraph->SetPortalNodeRoot(ppnr);
@@ -2955,10 +2939,8 @@ void TESObjectCELL::AttachReference3D(TESObjectREFR* apRef, [[maybe_unused]] boo
                     NiPoint3 kangle = apRef->GetAngleOnReference();
                     BGSPrimitive* pprim = apRef->GetExtra()->GetPrimitive();
                     BSMultiBoundShape* pshape = pprim->MakeMultiBoundShape(kangle);
-                    void* pMemory = NiMemObject::operator new(sizeof(BSMultiBoundRoom));
-                    BSMultiBoundRoom* pnewroom = pMemory ? ::new (pMemory) BSMultiBoundRoom : nullptr;
-                    void* pBoundMemory = NiMemObject::operator new(sizeof(BSMultiBound));
-                    BSMultiBound* pbound = pBoundMemory ? ::new (pBoundMemory) BSMultiBound : nullptr;
+                    BSMultiBoundRoom* pnewroom = new BSMultiBoundRoom;
+                    BSMultiBound* pbound = new BSMultiBound;
                     pnewroom->SetMultiBound(pbound);
                     pbound->SetShape(pshape);
                     pbound->SetCenter(apRef->GetLocationOnReference());
@@ -2982,8 +2964,7 @@ void TESObjectCELL::AttachReference3D(TESObjectREFR* apRef, [[maybe_unused]] boo
                 pportal->SetCenter(apRef->GetLocationOnReference());
                 pportal->SetRotation(apRef->GetOrientation());
                 apRef->GetExtra()->SetPortal(pportal);
-                void* pMemory = NiMemObject::operator new(sizeof(BSPortalSharedNode));
-                BSPortalSharedNode* pportalnode = pMemory ? ::new (pMemory) BSPortalSharedNode(pportal) : nullptr;
+                BSPortalSharedNode* pportalnode = new BSPortalSharedNode(pportal);
                 NiFixedString kName("Portal Shared Geometry");
                 pportalnode->SetName(kName);
                 pportal->SetSharedGeometryNode(pportalnode);
@@ -3021,8 +3002,7 @@ void TESObjectCELL::AttachReference3D(TESObjectREFR* apRef, [[maybe_unused]] boo
         pAttach = static_cast<NiNode*>(GetChildNode(CN_OCCLUSION_PLANE));
         BSOcclusionPlane* pplane = apRef->GetExtra()->GetOcclusionPlane();
         if (!pplane) {
-            void* pMemory = NiMemObject::operator new(sizeof(BSOcclusionPlane));
-            pplane = pMemory ? ::new (pMemory) BSOcclusionPlane : nullptr;
+            pplane = new BSOcclusionPlane;
             apRef->GetExtra()->SetOcclusionPlane(pplane);
         }
         pplane->SetRotation(apRef->GetOrientation());
@@ -3573,13 +3553,7 @@ BSMultiBoundNode* TESObjectCELL::AddMultiBoundRef(TESObjectREFR* apRef) {
         TESBoundObject* pObjectReference = apRef->GetObjectReference();
         if (pObjectReference != pRoomMarker) {
             BSMultiBoundNode* pNewNode;
-            void* pMemory = NiMemObject::operator new(sizeof(BSMultiBoundNode));
-            if (pMemory) {
-                pNewNode = ::new (pMemory) BSMultiBoundNode;
-            }
-            else {
-                pNewNode = nullptr;
-            }
+            pNewNode = new BSMultiBoundNode;
             pMBNode = pNewNode;
             pMB = apRef->GetMultiBound();
             pNewNode->SetMultiBound(pMB);
@@ -3646,8 +3620,7 @@ void TESObjectCELL::AttachMultiBoundNodes() {
 BSPortalGraph* TESObjectCELL::CreatePortalGraph() {
     if (spPortalGraph.m_pObject == nullptr) {
         if (GetInterior()) {
-            void* pMemory = NiMemObject::operator new(sizeof(BSPortalGraph));
-            BSPortalGraph* pGraph = pMemory ? ::new (pMemory) BSPortalGraph : nullptr;
+            BSPortalGraph* pGraph = new BSPortalGraph;
             spPortalGraph = pGraph;
         }
         else {
@@ -5296,13 +5269,7 @@ void TESObjectCELL::InitHavok() {
         AutoMemContext tempMemContext_2(
             MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 14993
         );
-        CellMopp* v8 = static_cast<CellMopp*>(NiMemObject::operator new(sizeof(CellMopp)));
-        if (v8) {
-            pcm_2 = ::new (v8) CellMopp;
-        }
-        else {
-            pcm_2 = nullptr;
-        }
+        pcm_2 = new CellMopp;
         pcm = pcm_2;
         this->ExtraData.SetCellMopp(pcm_2);
     }
@@ -6992,14 +6959,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
         else {
             BSRenderedTexture::BeginTexture(sprendTextNormals.m_pObject, 7u);
         }
-        BSShaderAccumulator* v24 =
-            static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-        if (v24) {
-            pCustomAccumulator = ::new (v24) BSShaderAccumulator(99, 1u, 759u);
-        }
-        else {
-            pCustomAccumulator = nullptr;
-        }
+        pCustomAccumulator = new BSShaderAccumulator(99, 1u, 759u);
         NiPointer<BSShaderAccumulator> spaccum(static_cast<BSShaderAccumulator*>(pCustomAccumulator));
         spaccum.m_pObject->SetShadowSceneNode(pscene);
         culler.SetAccumulator(spaccum.m_pObject);
@@ -7091,21 +7051,9 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
         frustum.m_fTop = 2176.0f;
         frustum.m_fBottom = -2176.0f;
         frustum.m_fFar = campos.z - heightextents.x + 10.0;
-        NiCamera* apMemory = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-        if (apMemory) {
-            pCellCamera = ::new (apMemory) NiCamera;
-        }
-        else {
-            pCellCamera = nullptr;
-        }
+        pCellCamera = new NiCamera;
         NiPointer<NiCamera> spcamera(pCellCamera);
-        NiNode* v13 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (v13) {
-            v10 = ::new (v13) NiNode(0);
-        }
-        else {
-            v10 = nullptr;
-        }
+        v10 = new NiNode(0);
         NiPointer<NiNode> spcameraNode(v10);
         NiNode* pscene_2 = spcameraNode.m_pObject;
         pscene_2->AttachChild(spcamera.m_pObject, 1);
@@ -7228,22 +7176,10 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
         frustum.m_fTop = 2176.0f;
         frustum.m_fBottom = -2176.0f;
         frustum.m_fFar = campos.z - ecx0 + 10000.0;
-        void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-        if (apMemory) {
-            v10 = (void*)::new (apMemory) NiCamera;
-        }
-        else {
-            v10 = nullptr;
-        }
+        v10 = new NiCamera;
         NiRefObject* v18 = static_cast<NiRefObject*>(v10);
         NiPointer<NiCamera> spcamera(static_cast<NiCamera*>(v10));
-        NiNode* v15 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (v15) {
-            v9 = ::new (v15) NiNode(0);
-        }
-        else {
-            v9 = nullptr;
-        }
+        v9 = new NiNode(0);
         NiRefObject* v16 = (NiRefObject*)v9;
         NiPointer<NiNode> spcameraNode(v9);
         NiNode* v8 = spcameraNode.m_pObject;

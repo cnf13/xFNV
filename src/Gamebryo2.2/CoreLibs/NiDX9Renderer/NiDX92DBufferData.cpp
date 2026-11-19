@@ -302,14 +302,7 @@ NiDX9ImplicitBufferData* NiDX9ImplicitBufferData::Create(
     const D3DPRESENT_PARAMETERS* apkPresentParams,
     Ni2DBuffer** appkBuffer
 ) {
-    NiDX9ImplicitBufferData* pThis =
-        static_cast<NiDX9ImplicitBufferData*>(NiMemObject::operator new(sizeof(NiDX9ImplicitBufferData)));
-    if (pThis) {
-        ::new (pThis) NiDX9ImplicitBufferData;
-    }
-    else {
-        pThis = nullptr;
-    }
+    NiDX9ImplicitBufferData* pThis = new NiDX9ImplicitBufferData;
     memcpy(&pThis->m_kD3DPresentParams, apkPresentParams, sizeof(pThis->m_kD3DPresentParams));
     pThis->m_pkD3DDevice9 = apD3DDevice9;
     apD3DDevice9->AddRef();
@@ -409,15 +402,7 @@ bool NiDX9ImplicitDepthStencilBufferData::Recreate(IDirect3DDevice9* apD3DDevice
 // Width and height of a new buffer come from the surface's descriptor.
 NiDX9ImplicitDepthStencilBufferData*
 NiDX9ImplicitDepthStencilBufferData::Create(IDirect3DDevice9* apD3DDevice9, NiDepthStencilBuffer*& arpkBuffer) {
-    NiDX9ImplicitDepthStencilBufferData* pThis = static_cast<NiDX9ImplicitDepthStencilBufferData*>(
-        NiMemObject::operator new(sizeof(NiDX9ImplicitDepthStencilBufferData))
-    );
-    if (pThis) {
-        ::new (pThis) NiDX9ImplicitDepthStencilBufferData;
-    }
-    else {
-        pThis = nullptr;
-    }
+    NiDX9ImplicitDepthStencilBufferData* pThis = new NiDX9ImplicitDepthStencilBufferData;
     if (apD3DDevice9->GetDepthStencilSurface(&pThis->m_pkSurface) < 0) {
         if (pThis) {
             delete pThis;
@@ -533,15 +518,7 @@ NiDX9AdditionalDepthStencilBufferData* NiDX9AdditionalDepthStencilBufferData::Cr
         NiRenderer::Error("NiDX9AdditionalDepthStencilBufferData::Create> FAILED %s", NiDX9ErrorString(hCheck));
         return nullptr;
     }
-    NiDX9AdditionalDepthStencilBufferData* pThis = static_cast<NiDX9AdditionalDepthStencilBufferData*>(
-        NiMemObject::operator new(sizeof(NiDX9AdditionalDepthStencilBufferData))
-    );
-    if (pThis) {
-        ::new (pThis) NiDX9AdditionalDepthStencilBufferData;
-    }
-    else {
-        pThis = nullptr;
-    }
+    NiDX9AdditionalDepthStencilBufferData* pThis = new NiDX9AdditionalDepthStencilBufferData;
     pThis->bDiscard = bCreateDiscardable;
     pThis->m_eMSAAPref = static_cast<Ni2DBuffer::MultiSamplePreference>(aeMultiSample);
     D3DMULTISAMPLE_TYPE eMultisampleType;
@@ -633,14 +610,7 @@ NiDX9TextureBufferData* NiDX9TextureBufferData::Create(
     uint32_t aeMultiSample,
     IDirect3DSurface9* apkRenderTarget
 ) {
-    NiDX9TextureBufferData* pThis =
-        static_cast<NiDX9TextureBufferData*>(NiMemObject::operator new(sizeof(NiDX9TextureBufferData)));
-    if (pThis) {
-        ::new (pThis) NiDX9TextureBufferData;
-    }
-    else {
-        pThis = nullptr;
-    }
+    NiDX9TextureBufferData* pThis = new NiDX9TextureBufferData;
     pThis->m_pkRenderTexture = apkD3DTexture;
     if (apkD3DTexture) {
         apkD3DTexture->AddRef();
@@ -686,14 +656,7 @@ NiDX9TextureBufferData* NiDX9TextureBufferData::CreateCubeFace(
     IDirect3DDevice9* apkD3DDevice9,
     Ni2DBuffer*& arpkBuffer
 ) {
-    NiDX9TextureBufferData* pThis =
-        static_cast<NiDX9TextureBufferData*>(NiMemObject::operator new(sizeof(NiDX9TextureBufferData)));
-    if (pThis) {
-        ::new (pThis) NiDX9TextureBufferData;
-    }
-    else {
-        pThis = nullptr;
-    }
+    NiDX9TextureBufferData* pThis = new NiDX9TextureBufferData;
     pThis->m_pkRenderTexture = apkD3DCubeTexture;
     apkD3DCubeTexture->AddRef();
     HRESULT eD3DRet = apkD3DCubeTexture->GetCubeMapSurface(aeFace, 0, &pThis->m_pkSurface);

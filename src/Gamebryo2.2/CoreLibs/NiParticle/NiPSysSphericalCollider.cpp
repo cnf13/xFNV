@@ -54,14 +54,7 @@ NiPSysSphericalCollider::~NiPSysSphericalCollider() {}
 
 NiObject* NiPSysSphericalCollider::CreateClone(NiCloningProcess& kCloning) {
     NiPSysSphericalCollider* pkObject;
-    NiPSysSphericalCollider* v3 =
-        static_cast<NiPSysSphericalCollider*>(NiMemObject::operator new(sizeof(NiPSysSphericalCollider)));
-    if (v3) {
-        pkObject = ::new (v3) NiPSysSphericalCollider(1.0f, false, false, nullptr, nullptr, 1.0f);
-    }
-    else {
-        pkObject = nullptr;
-    }
+    pkObject = new NiPSysSphericalCollider(1.0f, false, false, nullptr, nullptr, 1.0f);
     CopyMembers(pkObject, kCloning);
     pkObject->m_fRadius = m_fRadius;
     return pkObject;
@@ -242,10 +235,5 @@ void NiPSysSphericalCollider::SetResolveConstants() {
 }
 
 NiObject* NiPSysSphericalCollider::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiPSysSphericalCollider));
-    if (v0) {
-        return ::new (v0) NiPSysSphericalCollider(1.0, false, false, nullptr, nullptr, 1.0);
-    }
-
-    return nullptr;
+    return new NiPSysSphericalCollider(1.0, false, false, nullptr, nullptr, 1.0);
 }

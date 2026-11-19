@@ -29,14 +29,7 @@ const NiRTTI* BSResizableTriShape::GetRTTI() const {
 }
 
 NiObject* BSResizableTriShape::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(BSResizableTriShape));
-    BSResizableTriShape* v4 = static_cast<BSResizableTriShape*>(v3);
-    if (v3) {
-        ::new (v3) BSResizableTriShape;
-    }
-    else {
-        v4 = nullptr;
-    }
+    BSResizableTriShape* v4 = new BSResizableTriShape;
     CopyMembers(v4, kCloning);
     v4->uiNumPrimitives = uiNumPrimitives;
     return v4;

@@ -31,13 +31,7 @@ NiAlphaProperty::NiAlphaProperty() : m_uFlags(0) {
 // is shared and only NiObject's members are copied onto itself.
 NiObject* NiAlphaProperty::CreateClone(NiCloningProcess& kCloning) {
     if (m_spControllers || abCloneUnique) {
-        NiAlphaProperty* pkClone = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-        if (pkClone) {
-            ::new (pkClone) NiAlphaProperty;
-        }
-        else {
-            pkClone = nullptr;
-        }
+        NiAlphaProperty* pkClone = new NiAlphaProperty;
         NiProperty::CopyMembers(pkClone, kCloning);
         pkClone->m_uFlags = m_uFlags;
         pkClone->m_ucAlphaTestRef = m_ucAlphaTestRef;
@@ -205,10 +199,7 @@ char* NiAlphaProperty::GetViewerString(const char* apcPrefix, TestFunction aeMod
 }
 
 void NiAlphaProperty::_SDMInit() {
-    NiAlphaProperty* pkDefault = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (pkDefault) {
-        ::new (pkDefault) NiAlphaProperty;
-    }
+    NiAlphaProperty* pkDefault = new NiAlphaProperty;
     // SWEEP-INLINE 0xA5CF1F
     ms_spDefault = pkDefault;
 }
@@ -219,9 +210,5 @@ void NiAlphaProperty::_SDMShutdown() {
 }
 
 NiObject* NiAlphaProperty::CreateObject() {
-    NiAlphaProperty* pkObject = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiAlphaProperty;
+    return new NiAlphaProperty;
 }

@@ -78,13 +78,7 @@ void BSWArray::InitSDM() {
 
 NiObject* BSWArray::CreateObject() {
     BSWArray* v1;
-    void* apMemory = NiMemObject::operator new(sizeof(BSWArray));
-    if (apMemory) {
-        v1 = ::new (apMemory) BSWArray;
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new BSWArray;
     v1->SetName(EmptyFS);
     return v1;
 }

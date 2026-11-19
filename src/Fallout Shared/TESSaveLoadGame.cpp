@@ -3832,13 +3832,7 @@ NiRefObject* TESSaveLoadGame::ReadSaveGameDataOLD(
                 AdvanceBuffer(36u);
             }
             akFormat = NiPixelFormat_RGB24;
-            void* apMemory = NiMemObject::operator new(sizeof(NiPixelData));
-            if (apMemory) {
-                v15 = ::new (apMemory) NiPixelData(auiWidth, auiWidth, akFormat, 1u, 1u);
-            }
-            else {
-                v15 = nullptr;
-            }
+            v15 = new NiPixelData(auiWidth, auiWidth, akFormat, 1u, 1u);
             LoadGameDataOLD(v15->GetPixels(0u, 0u), 3 * (v25 * auiWidth));
             NiTexture::FormatPrefs arPrefs;
             arPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
