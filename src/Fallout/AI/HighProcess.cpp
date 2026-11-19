@@ -978,7 +978,6 @@ void HighProcess::Update(MobileObject* apRef) {
         }
         if (!bEvaluateDetection || !EvaluateDetection(apActor)) {
             TESPackage* ppack_2;
-            TESPackage* v106;
             if (!(fDetectionModifierTimer > 0.0)) {
                 fDetectionModifer = 0.0f;
             }
@@ -1150,13 +1149,13 @@ void HighProcess::Update(MobileObject* apRef) {
             TESPackage* peditorpack = (&apActor->m_Extra)->GetPackageExtra();
             TESPackage* pcurrent = pPack;
             if (IsRunningRunOnce()) {
-                v106 = GetCurrentPackage();
+                pcurrent = GetCurrentPackage();
             }
             if (!apActor->IsInCombat() &&
-                ((v106 && v106->GetDrawWeaponFlag()) ||
+                ((pcurrent && pcurrent->GetDrawWeaponFlag()) ||
                  ((peditorpack && peditorpack->GetDrawWeaponFlag()) || (GetAlert() || bWeaponAlertDrawn)))) {
                 if (GetSitSleepState() == SIT_SLEEP_NORMAL && GetAnimAction() == ANIM_ACTION_NONE) {
-                    if (v106 && (v106->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE && apActor == pTarget)) {
+                    if (pcurrent && (pcurrent->GetPackType() == PACKAGE_TYPE_IN_GAME_DIALOGUE && apActor == pTarget)) {
                         if (peditorpack && peditorpack->GetDrawWeaponFlag()) {
                             if (!GetCurrentWeapon()) {
                                 ItemChange* pweap = apActor->GetBestWeapon(COMBAT_WEAPON_TYPE_COUNT);
