@@ -35,8 +35,8 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 // Timer names that this file's HK_TIMER macros store.
@@ -114,8 +114,9 @@ void hkpMultiRayConvexAgent::getClosestPoints(
             );
             event.m_contact.m_position.setTransformedPos(transformB, p);
             event.m_contact.m_separatingNormal.setRotatedDir(transformB.m_rotation, output.m_normal);
-            event.m_contact.m_separatingNormal.m_quad[3] = static_cast<float>(
-                (static_cast<double>(fFraction) - 1.0) * pRay->m_start.m_quad[3] + pMultiRay->m_rayPenetrationDistance
+            XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = static_cast<float>(
+                (static_cast<double>(fFraction) - 1.0) * XFNV_M128_F32(pRay->m_start.m_quad, 3) +
+                pMultiRay->m_rayPenetrationDistance
             );
             collector.addCdPoint(event);
         }
@@ -149,10 +150,10 @@ void hkpMultiRayConvexAgent::linearCast(
     kPoint.m_contact = kClosest.m_hitPoint;
     kPoint.m_cdBodyA = &bodyA;
     kPoint.m_cdBodyB = &bodyB;
-    double fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+    double fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     if ((input.m_tolerance > fDist) && (startCollector)) {
         startCollector->addCdPoint(kPoint);
-        fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+        fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     }
 
     const hkQuadReal& rPath = input.m_path.m_quad;
@@ -186,20 +187,24 @@ void hkpMultiRayConvexAgent::linearCast(
         for (;;) {
             kSecond.m_earlyOutDistance = 3.40282e38f;
             kSecond.m_hasHit.m_bool = false;
-            kSecond.m_hitPoint.m_separatingNormal.m_quad[3] = 3.40282e38f;
+            XFNV_M128_F32(kSecond.m_hitPoint.m_separatingNormal.m_quad, 3) = 3.40282e38f;
             const float fFraction32 = static_cast<float>(fFraction);
             const hkQuadReal& rState = bodyA.m_motion.pState->m_transform.m_translation.m_quad;
-            kMotionState.m_transform.m_translation.m_quad[0] = fFraction32 * rPath[0] + rState[0];
-            kMotionState.m_transform.m_translation.m_quad[1] = fFraction32 * rPath[1] + rState[1];
-            kMotionState.m_transform.m_translation.m_quad[2] = fFraction32 * rPath[2] + rState[2];
-            kMotionState.m_transform.m_translation.m_quad[3] = fFraction32 * rPath[3] + rState[3];
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 0) =
+                fFraction32 * XFNV_M128_F32(rPath, 0) + XFNV_M128_F32(rState, 0);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 1) =
+                fFraction32 * XFNV_M128_F32(rPath, 1) + XFNV_M128_F32(rState, 1);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 2) =
+                fFraction32 * XFNV_M128_F32(rPath, 2) + XFNV_M128_F32(rState, 2);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 3) =
+                fFraction32 * XFNV_M128_F32(rPath, 3) + XFNV_M128_F32(rState, 3);
             getClosestPoints(kBodyA, bodyB, kInput, kSecond);
             if (!kSecond.m_hasHit.m_bool) {
                 return;
             }
             kPoint.m_contact.m_position = kSecond.m_hitPoint.m_position;
             kPoint.m_contact.m_separatingNormal = kSecond.m_hitPoint.m_separatingNormal;
-            kPoint.m_contact.m_separatingNormal.m_quad[3] = fFraction32;
+            XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = fFraction32;
             const __m128 kNewProduct = _mm_mul_ps(rPath, kSecond.m_hitPoint.m_separatingNormal.m_quad);
             double fNewDot = _mm_cvtss_f32(_mm_add_ps(
                 _mm_shuffle_ps(kNewProduct, kNewProduct, 0xAA),
@@ -209,7 +214,7 @@ void hkpMultiRayConvexAgent::linearCast(
                 return;
             }
             const double fNegDot = -fNewDot;
-            const double fNewDist = kSecond.m_hitPoint.m_separatingNormal.m_quad[3];
+            const double fNewDist = XFNV_M128_F32(kSecond.m_hitPoint.m_separatingNormal.m_quad, 3);
             if (fNegDot * fFraction + fNewDist > fNegDot) {
                 return;
             }
@@ -228,12 +233,12 @@ void hkpMultiRayConvexAgent::linearCast(
         }
     }
     if (fDist <= 0.0) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
         return;
     }
     if ((fDist - fSum) * castCollector.m_earlyOutDistance >= fDist) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
     }
 }
@@ -275,8 +280,8 @@ void hkpMultiRayConvexAgent::processCollision(
             );
             pPoint->m_contact.m_position.setTransformedPos(*bodyB.m_motion.pMotion, hitLocal);
             pPoint->m_contact.m_separatingNormal.setRotatedDir(bodyB.m_motion.pMotion->m_rotation, output.m_normal);
-            pPoint->m_contact.m_separatingNormal.m_quad[3] = static_cast<float>(
-                (static_cast<double>(output.m_hitFraction) - 1.0) * pRay->m_start.m_quad[3] +
+            XFNV_M128_F32(pPoint->m_contact.m_separatingNormal.m_quad, 3) = static_cast<float>(
+                (static_cast<double>(output.m_hitFraction) - 1.0) * XFNV_M128_F32(pRay->m_start.m_quad, 3) +
                 pMultiRay->m_rayPenetrationDistance
             );
             if (m_contactInfo.m_data[i].m_contactPointId == 0xFFFF) {
@@ -405,8 +410,9 @@ void hkpMultiRayConvexAgent::staticGetClosestPoints(
             );
             event.m_contact.m_position.setTransformedPos(transformB, p);
             event.m_contact.m_separatingNormal.setRotatedDir(transformB.m_rotation, output.m_normal);
-            event.m_contact.m_separatingNormal.m_quad[3] = static_cast<float>(
-                (static_cast<double>(fFraction) - 1.0) * pRay->m_start.m_quad[3] + pMultiRay->m_rayPenetrationDistance
+            XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = static_cast<float>(
+                (static_cast<double>(fFraction) - 1.0) * XFNV_M128_F32(pRay->m_start.m_quad, 3) +
+                pMultiRay->m_rayPenetrationDistance
             );
             collector.addCdPoint(event);
         }

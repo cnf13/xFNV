@@ -25,6 +25,7 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Physics/Collide/Shape/Deprecated/MultiSphere/hkpMultiSphereShape.h"
+#include "xfnv/Compiler.h"
 
 NiRTTI bhkMultiSphereShape::ms_RTTI("bhkMultiSphereShape", &bhkSphereRepShape::ms_RTTI);
 
@@ -150,10 +151,10 @@ void bhkMultiSphereShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) 
                 for (int32_t i = 0; i < iNumSpheres; ++i, ++pSphere) {
                     __m128 kSphere = pSphere->m_quad;
                     // The radius is the sphere's w component.
-                    float fRadius = pSphere->m_quad[3];
-                    float fX = kSphere[0];
-                    float fY = kSphere[1];
-                    float fZ = kSphere[2];
+                    float fRadius = XFNV_M128_F32(pSphere->m_quad, 3);
+                    float fX = XFNV_M128_F32(kSphere, 0);
+                    float fY = XFNV_M128_F32(kSphere, 1);
+                    float fZ = XFNV_M128_F32(kSphere, 2);
                     alignas(16) NiPoint3 kPosition;
                     kPosition.x = fX * bhkMultiSphereShape_fHk2BSScaleSC;
                     kPosition.y = fY * bhkMultiSphereShape_fHk2BSScaleSC;

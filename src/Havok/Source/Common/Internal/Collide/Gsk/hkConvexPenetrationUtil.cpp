@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "Havok/Source/Common/Internal/Collide/Gsk/hkGsk.h"
 #include "Havok/Source/Common/Internal/Collide/Gsk/hkWingedEdge.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -22,12 +23,16 @@ static void calcBarycentricCoordinates(__m128* a1, __m128* a2, __m128* a3, __m12
     __m128 v6 = *a4;
     __m128 v7 = _mm_sub_ps(*a2, *a3);
     __m128 v8 = _mm_mul_ps(v7, v7);
-    float v37 = _mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+    float v37 = XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0));
     __m128 v9 = _mm_sub_ps(*a4, *a3);
     __m128 v10 = _mm_mul_ps(v9, v9);
-    float v39 = _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    float v39 = XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0));
     __m128 v11 = _mm_mul_ps(v9, v7);
-    double v12 = (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
+    double v12 =
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0)));
     double v13 = v37;
     double v14 = v39;
     float v40 = v37 * v39;
@@ -39,19 +44,24 @@ static void calcBarycentricCoordinates(__m128* a1, __m128* a2, __m128* a3, __m12
     if (!(v42 > 0.0f)) {
         __m128 v27 = _mm_sub_ps(*a2, v6);
         __m128 v28 = _mm_mul_ps(v27, v27);
-        float v36 = _mm_shuffle_ps(v28, v28, 170)[0] + (_mm_shuffle_ps(v28, v28, 85)[0] + v28[0]);
+        float v36 = XFNV_M128_F32(_mm_shuffle_ps(v28, v28, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v28, v28, 85), 0) + XFNV_M128_F32(v28, 0));
         if (!(v13 >= v18)) {
             if (!(v36 >= v18)) {
                 __m128 v33 = *a1;
                 *a5 = 0.0f;
                 __m128 v34 = _mm_mul_ps(_mm_sub_ps(v33, v5), v9);
-                float v47 = (_mm_shuffle_ps(v34, v34, 170)[0] + (_mm_shuffle_ps(v34, v34, 85)[0] + v34[0])) / v18;
+                float v47 = (XFNV_M128_F32(_mm_shuffle_ps(v34, v34, 170), 0) +
+                             (XFNV_M128_F32(_mm_shuffle_ps(v34, v34, 85), 0) + XFNV_M128_F32(v34, 0))) /
+                    v18;
                 a5[2] = v47;
                 a5[1] = 1.0 - v47;
             }
             else {
                 __m128 v32 = _mm_mul_ps(_mm_sub_ps(*a1, v6), v27);
-                float v46 = (_mm_shuffle_ps(v32, v32, 170)[0] + (_mm_shuffle_ps(v32, v32, 85)[0] + v32[0])) / v36;
+                float v46 = (XFNV_M128_F32(_mm_shuffle_ps(v32, v32, 170), 0) +
+                             (XFNV_M128_F32(_mm_shuffle_ps(v32, v32, 85), 0) + XFNV_M128_F32(v32, 0))) /
+                    v36;
                 *a5 = v46;
                 a5[1] = 0.0f;
                 a5[2] = 1.0 - v46;
@@ -61,7 +71,9 @@ static void calcBarycentricCoordinates(__m128* a1, __m128* a2, __m128* a3, __m12
             double v29 = v36;
             if (!(v36 >= static_cast<double>(v37))) {
                 __m128 v31 = _mm_mul_ps(_mm_sub_ps(*a1, v5), v7);
-                float v45 = (_mm_shuffle_ps(v31, v31, 170)[0] + (_mm_shuffle_ps(v31, v31, 85)[0] + v31[0])) / v37;
+                float v45 = (XFNV_M128_F32(_mm_shuffle_ps(v31, v31, 170), 0) +
+                             (XFNV_M128_F32(_mm_shuffle_ps(v31, v31, 85), 0) + XFNV_M128_F32(v31, 0))) /
+                    v37;
                 *a5 = v45;
                 a5[1] = 1.0 - v45;
                 a5[2] = 0.0f;
@@ -74,7 +86,9 @@ static void calcBarycentricCoordinates(__m128* a1, __m128* a2, __m128* a3, __m12
                 }
                 else {
                     __m128 v30 = _mm_mul_ps(_mm_sub_ps(*a1, *a4), v27);
-                    float v44 = (_mm_shuffle_ps(v30, v30, 170)[0] + (_mm_shuffle_ps(v30, v30, 85)[0] + v30[0])) / v29;
+                    float v44 = (XFNV_M128_F32(_mm_shuffle_ps(v30, v30, 170), 0) +
+                                 (XFNV_M128_F32(_mm_shuffle_ps(v30, v30, 85), 0) + XFNV_M128_F32(v30, 0))) /
+                        v29;
                     *a5 = v44;
                     a5[2] = 1.0 - v44;
                 }
@@ -85,10 +99,11 @@ static void calcBarycentricCoordinates(__m128* a1, __m128* a2, __m128* a3, __m12
         double v19 = v42;
         __m128 v20 = _mm_sub_ps(v5, *a1);
         __m128 v21 = _mm_mul_ps(v20, v7);
-        float v22 = _mm_shuffle_ps(v21, v21, 85)[0] + v21[0];
-        float v23 = _mm_shuffle_ps(v21, v21, 170)[0];
+        float v22 = XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 85), 0) + XFNV_M128_F32(v21, 0);
+        float v23 = XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 170), 0);
         __m128 v24 = _mm_mul_ps(v20, v9);
-        float v25 = _mm_shuffle_ps(v24, v24, 170)[0] + (_mm_shuffle_ps(v24, v24, 85)[0] + v24[0]);
+        float v25 = XFNV_M128_F32(_mm_shuffle_ps(v24, v24, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v24, v24, 85), 0) + XFNV_M128_F32(v24, 0));
         float v35 = 1.0 / v42;
         double v26 = (v23 + v22);
         float v43 = v25 * v12 - v18 * v26;
@@ -178,15 +193,15 @@ hkVector4 hkConvexPenetrationUtil::findBestProjection(
     getPointForSimplex(v17, result);
     v6.m_quad = resulta.m_position.m_quad;
     __m128 v8 = _mm_mul_ps(_mm_sub_ps(resulta.m_position.m_quad, from.m_quad), direction.m_quad);
-    float v9 = _mm_shuffle_ps(v8, v8, 85)[0] + v8[0];
+    float v9 = XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0);
     __m128 v10 = _mm_shuffle_ps(v8, v8, 170);
     __m128 v11 = _mm_mul_ps(_mm_sub_ps(result.m_position.m_quad, from.m_quad), v17.m_quad);
-    float v12 = _mm_shuffle_ps(v11, v11, 85)[0] + v11[0];
+    float v12 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0);
     __m128 v13 = _mm_shuffle_ps(v11, v11, 170);
-    v13[0] = v13[0] + v12;
-    v10[0] = v10[0] + v9;
+    XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
+    XFNV_M128_F32(v10, 0) = XFNV_M128_F32(v10, 0) + v9;
     v14.m_quad = _mm_max_ps(v10, v13);
-    v13[0] = v13[0] - v10[0];
+    XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) - XFNV_M128_F32(v10, 0);
     if ((_mm_movemask_ps(v13) & 1) != 0) {
         hkVector4 v16;
         hkWingedEdge::Edge* m_storage = resulta.m_referee.m_storage;

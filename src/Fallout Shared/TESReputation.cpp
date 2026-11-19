@@ -22,6 +22,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> fReputationMinorCrimeNeg("fReputationMinorCrimeNeg", 2.0f);
@@ -230,7 +231,7 @@ bool TESReputation::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;

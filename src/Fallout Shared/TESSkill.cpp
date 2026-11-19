@@ -10,6 +10,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 static SettingT<GameSettingCollection> sSpecNameCombat("sSpecNameCombat", "Combat");
 static SettingT<GameSettingCollection> sSpecNameMagic("sSpecNameMagic", "Magic");
@@ -55,7 +56,7 @@ bool TESSkill::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;

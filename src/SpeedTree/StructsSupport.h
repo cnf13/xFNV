@@ -4,7 +4,7 @@
 #include "SpeedTree/SIdvBranchVertex.h"
 #include "SpeedTree/SpeedTreeRT.h"
 
-#include <__stddef_size_t.h>
+#include <cstddef>
 #include <memory>
 #include <vector>
 

@@ -30,6 +30,7 @@
 #include "Havok/Source/Common/Serialize/Util/hkBuiltinTypeRegistry.h"
 #include "Havok/Source/Common/Serialize/Util/hkSerializeMultiMap.h"
 #include "Havok/Source/Common/Serialize/Util/hkStructureLayout.h"
+#include "xfnv/Compiler.h"
 
 #include <new>
 
@@ -298,7 +299,7 @@ int32_t hkPackfileWriter::notDuplicateMetaData(const void* pointer, const hkClas
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x2518721C, acBuffer, ".\\Packfile\\hkPackfileWriter.cpp", 178
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
         }
         m_knownObjects.insert(pointer, m_knownObjects.getWithDefault(pKnownClass, INDEX_IGNORE));

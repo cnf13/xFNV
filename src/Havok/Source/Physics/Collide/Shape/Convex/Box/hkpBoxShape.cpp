@@ -20,6 +20,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -71,11 +72,13 @@ static void cleanupLoadedObjecthkpBoxShape(void* p) {
 
 // The half extents' w holds the smallest of the three.
 hkpBoxShape::hkpBoxShape(const hkVector4& a1, float a2) : hkpConvexShape(HK_SHAPE_BOX, a2), m_halfExtents(a1) {
-    float fMin = m_halfExtents.m_quad[1] > m_halfExtents.m_quad[0] ? m_halfExtents.m_quad[0] : m_halfExtents.m_quad[1];
-    if (m_halfExtents.m_quad[2] < fMin) {
-        fMin = m_halfExtents.m_quad[2];
+    float fMin = XFNV_M128_F32(m_halfExtents.m_quad, 1) > XFNV_M128_F32(m_halfExtents.m_quad, 0)
+        ? XFNV_M128_F32(m_halfExtents.m_quad, 0)
+        : XFNV_M128_F32(m_halfExtents.m_quad, 1);
+    if (XFNV_M128_F32(m_halfExtents.m_quad, 2) < fMin) {
+        fMin = XFNV_M128_F32(m_halfExtents.m_quad, 2);
     }
-    m_halfExtents.m_quad[3] = fMin;
+    XFNV_M128_F32(m_halfExtents.m_quad, 3) = fMin;
 }
 
 hkpBoxShape::~hkpBoxShape() {}
@@ -184,7 +187,7 @@ int32_t hkpBoxShape::getNumCollisionSpheresImpl() const {
 const hkSphere* hkpBoxShape::getCollisionSpheresImpl(hkSphere* sphereBuffer) const {
     hkVector4 extentsAndRadius;
     extentsAndRadius.m_quad = m_halfExtents.m_quad;
-    extentsAndRadius.m_quad[3] = m_radius;
+    XFNV_M128_F32(extentsAndRadius.m_quad, 3) = m_radius;
     for (int32_t i = 0; i < 8; i += 2) {
         sphereBuffer[i].m_pos.m_quad = _mm_mul_ps(hkpBoxShapeVertexSigns[i], extentsAndRadius.m_quad);
         sphereBuffer[i + 1].m_pos.m_quad = _mm_mul_ps(hkpBoxShapeVertexSigns[i + 1], extentsAndRadius.m_quad);
@@ -199,7 +202,7 @@ void hkpBoxShape::getFirstVertex(hkVector4& v) const {
 void hkpBoxShape::getSupportingVertexImpl(const hkVector4& direction, hkpCdVertex& supportingVertexOut) const {
     hkpCdVertex v3;
     v3.m_quad = _mm_xor_ps(_mm_and_ps(direction.m_quad, hkQuadRealNegateMask), m_halfExtents.m_quad);
-    v3.m_quad[3] = std::bit_cast<float>(
+    XFNV_M128_F32(v3.m_quad, 3) = std::bit_cast<float>(
         static_cast<int32_t>(((_mm_movemask_ps(_mm_cmplt_ps(v3.m_quad, _mm_setzero_ps())) & 7) | 0x3F000000))
     );
     supportingVertexOut.m_quad = v3.m_quad;
@@ -209,7 +212,7 @@ void hkpBoxShape::convertVertexIdsToVerticesImpl(const uint16_t* ids, int32_t nu
     for (int32_t i = numIds - 1; i >= 0; --i) {
         int32_t v7 = *ids | 0x3F000000;
         verticesOut->m_quad = _mm_mul_ps(hkpBoxShapeVertexSigns[*ids], m_halfExtents.m_quad);
-        verticesOut->m_quad[3] = std::bit_cast<float>(v7);
+        XFNV_M128_F32(verticesOut->m_quad, 3) = std::bit_cast<float>(v7);
         ++verticesOut;
         ++ids;
     }
@@ -222,20 +225,20 @@ void hkpBoxShape::getCentreImpl(hkVector4& centreOut) const {
 void hkpBoxShape::setHalfExtents(const hkVector4& halfExtents) {
     double v2;
     m_halfExtents.m_quad = halfExtents.m_quad;
-    if (!(m_halfExtents.m_quad[1] > static_cast<double>(m_halfExtents.m_quad[0]))) {
-        v2 = m_halfExtents.m_quad[1];
+    if (!(XFNV_M128_F32(m_halfExtents.m_quad, 1) > static_cast<double>(XFNV_M128_F32(m_halfExtents.m_quad, 0)))) {
+        v2 = XFNV_M128_F32(m_halfExtents.m_quad, 1);
     }
     else {
-        v2 = m_halfExtents.m_quad[0];
+        v2 = XFNV_M128_F32(m_halfExtents.m_quad, 0);
     }
     float v4 = v2;
     double v3 = v4;
-    m_halfExtents.m_quad[3] = v4;
-    if (m_halfExtents.m_quad[2] < static_cast<double>(v4)) {
-        v3 = m_halfExtents.m_quad[2];
+    XFNV_M128_F32(m_halfExtents.m_quad, 3) = v4;
+    if (XFNV_M128_F32(m_halfExtents.m_quad, 2) < static_cast<double>(v4)) {
+        v3 = XFNV_M128_F32(m_halfExtents.m_quad, 2);
     }
     float v5 = v3;
-    m_halfExtents.m_quad[3] = v5;
+    XFNV_M128_F32(m_halfExtents.m_quad, 3) = v5;
 }
 
 const hkClass& hkpBoxShape::staticClass() {

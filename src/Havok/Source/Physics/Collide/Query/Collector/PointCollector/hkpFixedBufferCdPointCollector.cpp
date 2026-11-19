@@ -7,6 +7,7 @@
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "xfnv/Compiler.h"
 
 // The contact, both root collidables and shape keys, and the shape key path of body B
 // (hkpRayHitCollector::shapeKeysFromCdBody's order, with no bound on the depth) go into the hit. No key path is written
@@ -61,8 +62,8 @@ void hkpFixedBufferCdPointCollector::addCdPointImplementation(
         4) {
         do {
             for (int32_t i = 0; i < 4; i++) {
-                if (pFurthest->m_contact.m_separatingNormal.m_quad[3] <
-                    pPoint[i].m_contact.m_separatingNormal.m_quad[3]) {
+                if (XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3) <
+                    XFNV_M128_F32(pPoint[i].m_contact.m_separatingNormal.m_quad, 3)) {
                     pFurthest = &pPoint[i];
                 }
             }
@@ -71,11 +72,13 @@ void hkpFixedBufferCdPointCollector::addCdPointImplementation(
         while (reinterpret_cast<intptr_t>(pPoint) < reinterpret_cast<intptr_t>(pEnd - 3));
     }
     for (; pPoint < pEnd; ++pPoint) {
-        if (pFurthest->m_contact.m_separatingNormal.m_quad[3] < pPoint->m_contact.m_separatingNormal.m_quad[3]) {
+        if (XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3) <
+            XFNV_M128_F32(pPoint->m_contact.m_separatingNormal.m_quad, 3)) {
             pFurthest = pPoint;
         }
     }
-    if (pFurthest->m_contact.m_separatingNormal.m_quad[3] > event.m_contact.m_separatingNormal.m_quad[3]) {
+    if (XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3) >
+        XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3)) {
         _setHit(pFurthest, &event);
         pFurthest = collector->m_pointsArrayBase.m_storage;
         pPoint = pFurthest + 1;
@@ -85,8 +88,8 @@ void hkpFixedBufferCdPointCollector::addCdPointImplementation(
             4) {
             do {
                 for (int32_t i = 0; i < 4; i++) {
-                    if (pFurthest->m_contact.m_separatingNormal.m_quad[3] <
-                        pPoint[i].m_contact.m_separatingNormal.m_quad[3]) {
+                    if (XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3) <
+                        XFNV_M128_F32(pPoint[i].m_contact.m_separatingNormal.m_quad, 3)) {
                         pFurthest = &pPoint[i];
                     }
                 }
@@ -95,11 +98,12 @@ void hkpFixedBufferCdPointCollector::addCdPointImplementation(
             while (reinterpret_cast<intptr_t>(pPoint) < reinterpret_cast<intptr_t>(pEnd - 3));
         }
         for (; pPoint < pEnd; ++pPoint) {
-            if (pFurthest->m_contact.m_separatingNormal.m_quad[3] < pPoint->m_contact.m_separatingNormal.m_quad[3]) {
+            if (XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3) <
+                XFNV_M128_F32(pPoint->m_contact.m_separatingNormal.m_quad, 3)) {
                 pFurthest = pPoint;
             }
         }
     }
-    float fDistance = pFurthest->m_contact.m_separatingNormal.m_quad[3];
+    float fDistance = XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3);
     collector->m_earlyOutDistance = fDistance;
 }

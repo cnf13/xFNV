@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -17,7 +18,8 @@ float hkVector4Util::getFloatToInt16FloorCorrection() {
     for (int32_t i = 23; i != 0; --i) {
         float m = static_cast<float>((static_cast<double>(h) + l) * 0.5);
         // EXE-INLINED none: hkVector4Util::convertToUint16
-        float fConverted = (m + hkVector4Zero.m_quad[0]) * 1.0f + hkVector4Util_floatToUint16Magic[0];
+        float fConverted =
+            (m + XFNV_M128_F32(hkVector4Zero.m_quad, 0)) * 1.0f + XFNV_M128_F32(hkVector4Util_floatToUint16Magic, 0);
         if (static_cast<uint16_t>(std::bit_cast<uint32_t>(fConverted) >> 6) < 11) {
             l = m;
         }
@@ -37,7 +39,7 @@ float hkVector4Util::getFloatToInt32FloorCorrection() {
     for (int32_t i = 23; i != 0; --i) {
         float m = static_cast<float>((static_cast<double>(h) + l) * 0.5);
         // EXE-INLINED none: hkVector4Util::convertToUint32
-        float fConverted = (m + hkVector4Zero.m_quad[0]) * 1.0f;
+        float fConverted = (m + XFNV_M128_F32(hkVector4Zero.m_quad, 0)) * 1.0f;
         uint32_t uiOut = static_cast<uint32_t>(hkMath::hkToIntFast(fConverted));
         if (uiOut < 11) {
             l = m;
@@ -54,13 +56,13 @@ float hkVector4Util::getFloatToInt32FloorCorrection() {
 // mapPose moves eax into ecx (0xCE3F67) after the call at 0xCE3F62.
 void hkVector4Util::normalizeVectors2(hkVector4& arV0, hkVector4& arV1) {
     __m128 v2 = _mm_mul_ps(arV0.m_quad, arV0.m_quad);
-    float v3 = _mm_shuffle_ps(v2, v2, 85)[0] + v2[0];
+    float v3 = XFNV_M128_F32(_mm_shuffle_ps(v2, v2, 85), 0) + XFNV_M128_F32(v2, 0);
     __m128 v4 = _mm_shuffle_ps(v2, v2, 170);
-    v4[0] = v4[0] + v3;
+    XFNV_M128_F32(v4, 0) = XFNV_M128_F32(v4, 0) + v3;
     __m128 v5 = _mm_mul_ps(arV1.m_quad, arV1.m_quad);
-    float v6 = _mm_shuffle_ps(v5, v5, 85)[0] + v5[0];
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0);
     __m128 v7 = _mm_shuffle_ps(v5, v5, 170);
-    v7[0] = v7[0] + v6;
+    XFNV_M128_F32(v7, 0) = XFNV_M128_F32(v7, 0) + v6;
     __m128 v8 = _mm_shuffle_ps(v4, v4, 0);
     __m128 v9 = _mm_shuffle_ps(v8, _mm_unpackhi_ps(v8, _mm_shuffle_ps(v7, v7, 0)), 196);
     __m128 v10 = _mm_rsqrt_ps(v9);
@@ -76,20 +78,26 @@ void hkVector4Util::normalizeVectors2(hkVector4& arV0, hkVector4& arV1) {
 uint32_t hkVector4Util::packQuaternionIntoInt32(const hkVector4& qin) {
     hkQuadReal u =
         _mm_add_ps(_mm_mul_ps(qin.m_quad, hkVector4Util_packQuaternionScale), hkVector4Util_packQuaternionOffset);
-    uint32_t x = std::bit_cast<uint32_t>(u[0]);
-    uint32_t y = std::bit_cast<uint32_t>(u[1]);
-    uint32_t z = std::bit_cast<uint32_t>(u[2]);
-    uint32_t w = std::bit_cast<uint32_t>(u[3]);
+    uint32_t x = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 0));
+    uint32_t y = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 1));
+    uint32_t z = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 2));
+    uint32_t w = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 3));
     return ((x >> 6) & 0xFF) | (((y >> 6) & 0xFF) << 8) | (((z >> 6) & 0xFF) << 16) | ((w >> 6) << 24);
 }
 
 // The components are read as floats and passed promoted to double.
 const char* hkVector4Util::toString3(const hkVector4& x, hkStringBuf& s, char separator) {
-    s.printf("%f%c%f%c%f", x.m_quad[0], separator, x.m_quad[1], separator, x.m_quad[2]);
+    s.printf(
+        "%f%c%f%c%f", XFNV_M128_F32(x.m_quad, 0), separator, XFNV_M128_F32(x.m_quad, 1), separator,
+        XFNV_M128_F32(x.m_quad, 2)
+    );
     return s.m_string.begin();
 }
 
 const char* hkVector4Util::toString4(const hkVector4& x, hkStringBuf& s, char separator) {
-    s.printf("%f%c%f%c%f%c%f", x.m_quad[0], separator, x.m_quad[1], separator, x.m_quad[2], separator, x.m_quad[3]);
+    s.printf(
+        "%f%c%f%c%f%c%f", XFNV_M128_F32(x.m_quad, 0), separator, XFNV_M128_F32(x.m_quad, 1), separator,
+        XFNV_M128_F32(x.m_quad, 2), separator, XFNV_M128_F32(x.m_quad, 3)
+    );
     return s.m_string.begin();
 }

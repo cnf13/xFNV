@@ -50,6 +50,7 @@
 #include "Havok/Source/Physics/Vehicle/VelocityDamper/hkpVehicleVelocityDamper.h"
 #include "Havok/Source/Physics/Vehicle/WheelCollide/hkpVehicleWheelCollide.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleData.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -574,7 +575,7 @@ const hkClass& hkpVehicleFrictionStatus::staticClass() {
 void hkpVehicleInstance::WheelInfo::init() {
     m_contactPoint.m_position.m_quad = hkVector4Zero.m_quad;
     m_contactPoint.m_separatingNormal.m_quad = hkQuadReal0100;
-    m_contactPoint.m_separatingNormal.m_quad[3] = 1.0f;
+    XFNV_M128_F32(m_contactPoint.m_separatingNormal.m_quad, 3) = 1.0f;
     m_hardPointWs.m_quad = _mm_setzero_ps();
     m_contactFriction = 0.0f;
     m_rayEndPointWs.m_quad = _mm_setzero_ps();
@@ -829,17 +830,19 @@ float hkpVehicleInstance::calcRPM() const {
 
 float hkpVehicleInstance::calcKMPH() const {
     __m128 v1 = _mm_mul_ps(m_entity->m_motion.m_linearVelocity.m_quad, m_entity->m_motion.m_linearVelocity.m_quad);
-    return _mm_cvtss_f32(
-               _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v1, v1, 170)[0] + (_mm_shuffle_ps(v1, v1, 85)[0] + v1[0]))))
-           ) /
+    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+               (XFNV_M128_F32(_mm_shuffle_ps(v1, v1, 170), 0) +
+                (XFNV_M128_F32(_mm_shuffle_ps(v1, v1, 85), 0) + XFNV_M128_F32(v1, 0)))
+           ))) /
         1000.0 * 3600.0;
 }
 
 float hkpVehicleInstance::calcMPH() const {
     __m128 v1 = _mm_mul_ps(m_entity->m_motion.m_linearVelocity.m_quad, m_entity->m_motion.m_linearVelocity.m_quad);
-    return _mm_cvtss_f32(
-               _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v1, v1, 170)[0] + (_mm_shuffle_ps(v1, v1, 85)[0] + v1[0]))))
-           ) /
+    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+               (XFNV_M128_F32(_mm_shuffle_ps(v1, v1, 170), 0) +
+                (XFNV_M128_F32(_mm_shuffle_ps(v1, v1, 85), 0) + XFNV_M128_F32(v1, 0)))
+           ))) /
         1609.300048828125 * 3600.0;
 }
 
@@ -1005,7 +1008,8 @@ void hkpVehicleInstance::applySuspensionForcesAtWheel(float deltaTime, int32_t w
         float Mass = m_contactBody->m_motion.getMass();
         __m128 v11 = _mm_mul_ps(imp_.m_quad, imp_.m_quad);
         float v15 = m_data->m_wheelParams.m_data[w_it_1].m_maxContactBodyAcceleration * Mass * deltaTime;
-        float v16 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+        float v16 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0));
         if (v16 > v15 * v15) {
             float v17 = std::sqrt((double)v16);
             float v18 = 1.0 / v17;
@@ -1029,9 +1033,10 @@ void hkpVehicleInstance::perWheelBehavior(
     hkpVehicleData* m_data = this->m_data;
     __m128 v8 = _mm_mul_ps(m_entity->m_motion.m_linearVelocity.m_quad, m_entity->m_motion.m_linearVelocity.m_quad);
     int32_t w_it = 0;
-    float estimatedCarSpeed = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]))))
-    );
+    float estimatedCarSpeed = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)))
+    )));
     if (m_data->m_numWheels > 0) {
         int32_t v14 = 0;
         int32_t v13 = 0;
@@ -1043,13 +1048,19 @@ void hkpVehicleInstance::perWheelBehavior(
             if (m_contactBody) {
                 hkpRigidBody* v12 = groundBody[m_axle];
                 if (!v12 ||
-                    _mm_shuffle_ps(
-                        v12->m_motion.m_inertiaAndMassInv.m_quad, v12->m_motion.m_inertiaAndMassInv.m_quad, 255
-                    )[0] >
-                        static_cast<double>(_mm_shuffle_ps(
-                            m_contactBody->m_motion.m_inertiaAndMassInv.m_quad,
-                            m_contactBody->m_motion.m_inertiaAndMassInv.m_quad, 255
-                        )[0])) {
+                    XFNV_M128_F32(
+                        _mm_shuffle_ps(
+                            v12->m_motion.m_inertiaAndMassInv.m_quad, v12->m_motion.m_inertiaAndMassInv.m_quad, 255
+                        ),
+                        0
+                    ) >
+                        static_cast<double>(XFNV_M128_F32(
+                            _mm_shuffle_ps(
+                                m_contactBody->m_motion.m_inertiaAndMassInv.m_quad,
+                                m_contactBody->m_motion.m_inertiaAndMassInv.m_quad, 255
+                            ),
+                            0
+                        ))) {
                     groundBody[m_axle] = m_contactBody;
                 }
             }
@@ -1351,7 +1362,8 @@ void hkpVehicleInstance::getAxleParamsFromWheel(
     __m128 v16 = _mm_shuffle_ps(m_quad, m_quad, 210);
     __m128 v17 = _mm_sub_ps(_mm_mul_ps(v15, v16), _mm_mul_ps(v14, v13));
     __m128 v18 = _mm_mul_ps(v17, v17);
-    if ((_mm_shuffle_ps(v18, v18, 170)[0] + (_mm_shuffle_ps(v18, v18, 85)[0] + v18[0])) < 1.1920929e-07f) {
+    if ((XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 85), 0) + XFNV_M128_F32(v18, 0))) < 1.1920929e-07f) {
         v17 = _mm_sub_ps(
             _mm_mul_ps(_mm_shuffle_ps(p_m_quad[8], p_m_quad[8], 210), v13),
             _mm_mul_ps(_mm_shuffle_ps(p_m_quad[8], p_m_quad[8], 201), v16)
@@ -1360,19 +1372,19 @@ void hkpVehicleInstance::getAxleParamsFromWheel(
     int8_t* m_data_2 = m_data->m_numWheelsPerAxle.begin();
     int32_t m_axle_1 = m_data->m_wheelParams.m_data[w_it].m_axle;
     __m128 v21 = _mm_mul_ps(v17, v17);
-    float v22 = _mm_shuffle_ps(v21, v21, 85)[0] + v21[0];
+    float v22 = XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 85), 0) + XFNV_M128_F32(v21, 0);
     __m128 v23 = _mm_shuffle_ps(v21, v21, 170);
-    v23[0] = v23[0] + v22;
-    float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v23[0])));
-    v25[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v23, 0) = XFNV_M128_F32(v23, 0) + v22;
+    float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v23, 0))));
+    XFNV_M128_F32(v25, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v26 = _mm_cmpeq_ss(v23, v25);
-    v25[0] = 3.0f - ((v23[0] * v24) * v24);
+    XFNV_M128_F32(v25, 0) = 3.0f - ((XFNV_M128_F32(v23, 0) * v24) * v24);
     __m128 v27 = _mm_setzero_ps();
-    v27[0] = (0.5f * v24) * v25[0];
+    XFNV_M128_F32(v27, 0) = (0.5f * v24) * XFNV_M128_F32(v25, 0);
     __m128 v28 = _mm_andnot_ps(v26, v27);
     __m128 v29 = _mm_mul_ps(_mm_shuffle_ps(v28, v28, 0), v17);
     float v33 = 1.0 / static_cast<double>(m_data_2[m_axle]);
-    double v30 = p_m_quad[2][0] * v33;
+    double v30 = XFNV_M128_F32(p_m_quad[2], 0) * v33;
     axle_params.m_contactPointWs.m_quad = _mm_add_ps(
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v33), _mm_set_ss(v33), 0), *p_m_quad), axle_params.m_contactPointWs.m_quad
     );
@@ -1431,9 +1443,13 @@ void hkpVehicleInstance::prepareFrictionSolverParams(
     hkpEntity* m_entity = this->m_entity;
     v5.m_quad = m_entity->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad;
     v6.m_quad = m_entity->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad;
-    uint32_t v11 = std::bit_cast<uint32_t>(m_entity->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad[3]);
+    uint32_t v11 = std::bit_cast<uint32_t>(
+        XFNV_M128_F32(m_entity->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3)
+    );
     __m128 v7 = _mm_set_ss(std::bit_cast<float>(v11));
-    v11 = std::bit_cast<uint32_t>(m_entity->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad[3]);
+    v11 = std::bit_cast<uint32_t>(
+        XFNV_M128_F32(m_entity->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3)
+    );
     v13.m_quad = _mm_mul_ps(_mm_sub_ps(v5.m_quad, v6.m_quad), _mm_shuffle_ps(v7, v7, 0));
     v8.m_quad = m_entity->m_motion.m_motionState.m_deltaAngle.m_quad;
     hkpVehicleData* m_data = this->m_data;
@@ -1489,9 +1505,9 @@ void hkpVehicleInstance::getAxleParams(
         }
         alignas(16) hkpMotion* motion = body->getMotion();
         hkRigidMotionUtilApplyForcesAndBuildAccumulators(stepInfo, &motion, 1, 0, accum);
-        const float chassisMassInv = m_entity->m_motion.m_inertiaAndMassInv.m_quad[3];
+        const float chassisMassInv = XFNV_M128_F32(m_entity->m_motion.m_inertiaAndMassInv.m_quad, 3);
         const float maxMassRatio = m_data->m_maxFrictionSolverMassRatio;
-        const float groundMassInv = motion->m_inertiaAndMassInv.m_quad[3];
+        const float groundMassInv = XFNV_M128_F32(motion->m_inertiaAndMassInv.m_quad, 3);
         if (groundMassInv > chassisMassInv * maxMassRatio) {
             const float massRatio = chassisMassInv / groundMassInv;
             const float scale = maxMassRatio * massRatio;
@@ -1500,7 +1516,7 @@ void hkpVehicleInstance::getAxleParams(
         }
         // The swept transform's m_centerOfMass1.w is the inverse of the step's delta time.
         const hkSweptTransform& swept = motion->m_motionState.m_sweptTransform;
-        const float invDeltaTime = swept.m_centerOfMass1.m_quad[3];
+        const float invDeltaTime = XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
         const hkQuadReal invDt = _mm_shuffle_ps(_mm_set_ss(invDeltaTime), _mm_set_ss(invDeltaTime), 0);
         const hkQuadReal linearVel =
             _mm_mul_ps(_mm_sub_ps(swept.m_centerOfMass1.m_quad, swept.m_centerOfMass0.m_quad), invDt);

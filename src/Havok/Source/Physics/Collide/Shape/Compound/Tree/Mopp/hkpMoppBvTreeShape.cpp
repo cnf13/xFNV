@@ -34,6 +34,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppLongRayVirtualMachine.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppObbVirtualMachine.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppRayBundleVirtualMachine.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -195,7 +196,7 @@ void hkMoppBvTreeShapeBase::queryAabb(const hkAabb& aabb, hkArray<uint32_t, hkCo
     hkAabb a2;
     alignas(16) hkpMoppObbVirtualMachine v8;
     v3.m_quad = m_codeInfoCopy.m_quad;
-    double v4 = 16777216.0 / m_codeInfoCopy.m_quad[3];
+    double v4 = 16777216.0 / XFNV_M128_F32(m_codeInfoCopy.m_quad, 3);
     // MAYBE-INLINED 0xD543A6: a write opening hkAabb's uses: may be its inlined constructor
     a2.m_min.m_quad = _mm_max_ps(v3.m_quad, aabb.m_min.m_quad);
     *reinterpret_cast<float*>(&v6) = v4;
@@ -236,7 +237,7 @@ uint32_t hkMoppBvTreeShapeBase::queryAabbImpl(const hkAabb& aAabb, uint32_t* hit
     // extent (2^24 integer steps of the scale in the offset's w), computed in double and stored as a float.
     hkAabb aabb;
     aabb.m_min.m_quad = _mm_max_ps(m_codeInfoCopy.m_quad, aAabb.m_min.m_quad);
-    float fExtent = 16777216.0 / m_codeInfoCopy.m_quad[3];
+    float fExtent = 16777216.0 / XFNV_M128_F32(m_codeInfoCopy.m_quad, 3);
     aabb.m_max.m_quad = _mm_min_ps(_mm_add_ps(_mm_set1_ps(fExtent), m_codeInfoCopy.m_quad), aAabb.m_max.m_quad);
     machine.queryAabb(&code, aabb, &primitives);
     // Equivalent to primitives.getSize(), read through the machine's pointer to the array.

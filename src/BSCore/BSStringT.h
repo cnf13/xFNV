@@ -3,7 +3,6 @@
 #include "BSCore/MemoryManager.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
-#include <__stdarg_va_list.h>
 #include <cstdarg>
 #include <cstdio>
 #include <stdint.h>

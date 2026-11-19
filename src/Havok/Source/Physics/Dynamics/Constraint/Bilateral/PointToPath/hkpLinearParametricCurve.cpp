@@ -17,8 +17,10 @@
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Tree/Mopp/Modifiers/hkpRemoveTerminalsMoppModifierClass.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/PointToPath/hkpParametricCurve.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
+#include <cmath>
 #include <xmmintrin.h>
 
 // The reflected members of hkpLinearParametricCurve.
@@ -217,15 +219,15 @@ LABEL_6:;
     float v58 = t - static_cast<double>(v57);
     __m128 v10 = _mm_mul_ps(v9, v9);
     double v11 = m_smoothingFactor;
-    float v12 = _mm_shuffle_ps(v10, v10, 85)[0] + v10[0];
+    float v12 = XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0);
     __m128 v13 = _mm_shuffle_ps(v10, v10, 170);
-    v13[0] = v13[0] + v12;
-    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
-    v15[0] = 0.0f;
+    XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
+    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v13, 0))));
+    XFNV_M128_F32(v15, 0) = 0.0f;
     __m128 v16 = _mm_setzero_ps();
-    v16[0] = 0.5f;
-    float v18 = 3.0f - ((v13[0] * v14) * v14);
-    v16[0] = (0.5f * v14) * v18;
+    XFNV_M128_F32(v16, 0) = 0.5f;
+    float v18 = 3.0f - ((XFNV_M128_F32(v13, 0) * v14) * v14);
+    XFNV_M128_F32(v16, 0) = (0.5f * v14) * v18;
     __m128 v20 = _mm_andnot_ps(_mm_cmpeq_ss(v13, v15), v16);
     tangent.m_quad = _mm_mul_ps(_mm_shuffle_ps(v20, v20, 0), v9);
     float v61 = 1.0 / m_smoothingFactor;
@@ -242,13 +244,13 @@ LABEL_6:;
         v24 = &tangent;
         *reinterpret_cast<float*>(&v62) = (v11 - v58) * 0.5 * v21;
         __m128 v25 = _mm_mul_ps(v23, v23);
-        float v26 = _mm_shuffle_ps(v25, v25, 85)[0] + v25[0];
+        float v26 = XFNV_M128_F32(_mm_shuffle_ps(v25, v25, 85), 0) + XFNV_M128_F32(v25, 0);
         __m128 v27 = _mm_shuffle_ps(v25, v25, 170);
-        v27[0] = v27[0] + v26;
-        float v28 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v27[0])));
+        XFNV_M128_F32(v27, 0) = XFNV_M128_F32(v27, 0) + v26;
+        float v28 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v27, 0))));
         __m128 v29 = _mm_cmpeq_ss(v27, v15);
-        float v30 = 3.0f - ((v27[0] * v28) * v28);
-        v16[0] = (0.5f * v28) * v30;
+        float v30 = 3.0f - ((XFNV_M128_F32(v27, 0) * v28) * v28);
+        XFNV_M128_F32(v16, 0) = (0.5f * v28) * v30;
         __m128 v32 = _mm_andnot_ps(v29, v16);
         __m128 v33 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v62)), _mm_set_ss(std::bit_cast<float>(v62)), 0);
         __m128 v34 = _mm_add_ps(
@@ -256,12 +258,12 @@ LABEL_6:;
             _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v33), tangent.m_quad)
         );
         __m128 v35 = _mm_mul_ps(v34, v34);
-        v23[0] = _mm_shuffle_ps(v35, v35, 85)[0] + v35[0];
+        XFNV_M128_F32(v23, 0) = XFNV_M128_F32(_mm_shuffle_ps(v35, v35, 85), 0) + XFNV_M128_F32(v35, 0);
         __m128 v36 = _mm_shuffle_ps(v35, v35, 170);
-        v36[0] = v36[0] + v23[0];
-        float v37 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v36[0])));
-        float v39 = 3.0f - ((v36[0] * v37) * v37);
-        v16[0] = (0.5f * v37) * v39;
+        XFNV_M128_F32(v36, 0) = XFNV_M128_F32(v36, 0) + XFNV_M128_F32(v23, 0);
+        float v37 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v36, 0))));
+        float v39 = 3.0f - ((XFNV_M128_F32(v36, 0) * v37) * v37);
+        XFNV_M128_F32(v16, 0) = (0.5f * v37) * v39;
         __m128 v41 = _mm_andnot_ps(_mm_cmpeq_ss(v36, v15), v16);
         v56 = v6;
         tangent.m_quad = _mm_mul_ps(_mm_shuffle_ps(v41, v41, 0), v34);
@@ -270,14 +272,14 @@ LABEL_6:;
     if (v59 < v11 && v6 < m_points.m_size - 1) {
         __m128 v42 = _mm_sub_ps(m_points.m_data[v7 + 1].m_quad, m_points.m_data[v8 + 1].m_quad);
         __m128 v43 = _mm_mul_ps(v42, v42);
-        float v44 = _mm_shuffle_ps(v43, v43, 85)[0] + v43[0];
+        float v44 = XFNV_M128_F32(_mm_shuffle_ps(v43, v43, 85), 0) + XFNV_M128_F32(v43, 0);
         __m128 v45 = _mm_shuffle_ps(v43, v43, 170);
         *reinterpret_cast<float*>(&v63) = v21 * (v22 * (v11 - v59));
-        v45[0] = v45[0] + v44;
-        float v46 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v45[0])));
-        float v47 = 3.0f - ((v45[0] * v46) * v46);
+        XFNV_M128_F32(v45, 0) = XFNV_M128_F32(v45, 0) + v44;
+        float v46 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v45, 0))));
+        float v47 = 3.0f - ((XFNV_M128_F32(v45, 0) * v46) * v46);
         __m128 v48 = _mm_cmpeq_ss(v45, v15);
-        v16[0] = (0.5f * v46) * v47;
+        XFNV_M128_F32(v16, 0) = (0.5f * v46) * v47;
         __m128 v50 = _mm_andnot_ps(v48, v16);
         __m128 v51 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v63)), _mm_set_ss(std::bit_cast<float>(v63)), 0);
         __m128 v52 = _mm_add_ps(
@@ -285,11 +287,12 @@ LABEL_6:;
             _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v51), v24->m_quad)
         );
         __m128 v53 = _mm_mul_ps(v52, v52);
-        v42[0] = _mm_shuffle_ps(v53, v53, 85)[0] + v53[0];
+        XFNV_M128_F32(v42, 0) = XFNV_M128_F32(_mm_shuffle_ps(v53, v53, 85), 0) + XFNV_M128_F32(v53, 0);
         __m128 v54 = _mm_shuffle_ps(v53, v53, 170);
-        v54[0] = v54[0] + v42[0];
-        v42[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v54[0])));
-        v16[0] = (0.5f * v42[0]) * (3.0f - ((v54[0] * v42[0]) * v42[0]));
+        XFNV_M128_F32(v54, 0) = XFNV_M128_F32(v54, 0) + XFNV_M128_F32(v42, 0);
+        XFNV_M128_F32(v42, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v54, 0))));
+        XFNV_M128_F32(v16, 0) = (0.5f * XFNV_M128_F32(v42, 0)) *
+            (3.0f - ((XFNV_M128_F32(v54, 0) * XFNV_M128_F32(v42, 0)) * XFNV_M128_F32(v42, 0)));
         __m128 v55 = _mm_andnot_ps(_mm_cmpeq_ss(v54, v15), v16);
         v24->m_quad = _mm_mul_ps(_mm_shuffle_ps(v55, v55, 0), v52);
     }
@@ -339,9 +342,9 @@ void hkpLinearParametricCurve::getBinormal(float t, hkVector4& up) const {
     }
     else {
         float afAbs[3];
-        afAbs[0] = __builtin_fabsf(kTangent.m_quad[0]);
-        afAbs[1] = __builtin_fabsf(kTangent.m_quad[1]);
-        afAbs[2] = __builtin_fabsf(kTangent.m_quad[2]);
+        afAbs[0] = std::fabsf(XFNV_M128_F32(kTangent.m_quad, 0));
+        afAbs[1] = std::fabsf(XFNV_M128_F32(kTangent.m_quad, 1));
+        afAbs[2] = std::fabsf(XFNV_M128_F32(kTangent.m_quad, 2));
         float fMin = afAbs[0];
         int32_t iMin = 0;
         int32_t iFirst = 1;
@@ -402,8 +405,9 @@ hkpParametricCurve* hkpLinearParametricCurve::clone() {
     }
     pNewCurve->m_closedLoop.m_bool = m_closedLoop.m_bool;
     pNewCurve->m_dirNotParallelToTangentAlongWholePath.set(
-        m_dirNotParallelToTangentAlongWholePath.m_quad[0], m_dirNotParallelToTangentAlongWholePath.m_quad[1],
-        m_dirNotParallelToTangentAlongWholePath.m_quad[2], 0.0f
+        XFNV_M128_F32(m_dirNotParallelToTangentAlongWholePath.m_quad, 0),
+        XFNV_M128_F32(m_dirNotParallelToTangentAlongWholePath.m_quad, 1),
+        XFNV_M128_F32(m_dirNotParallelToTangentAlongWholePath.m_quad, 2), 0.0f
     );
     pNewCurve->m_distance.copyFromArray(
         hkContainerHeapAllocator().get(&pNewCurve->m_distance), m_distance, hkTypeIsPod()
@@ -433,15 +437,15 @@ void hkpLinearParametricCurve::addPoint(const hkVector4& p) {
     }
     else {
         const hkVector4& kPrevious = m_points.m_data[m_points.m_size - 2];
-        float fX = p.m_quad[0] - kPrevious.m_quad[0];
-        float fY = p.m_quad[1] - kPrevious.m_quad[1];
-        float fZ = p.m_quad[2] - kPrevious.m_quad[2];
+        float fX = XFNV_M128_F32(p.m_quad, 0) - XFNV_M128_F32(kPrevious.m_quad, 0);
+        float fY = XFNV_M128_F32(p.m_quad, 1) - XFNV_M128_F32(kPrevious.m_quad, 1);
+        float fZ = XFNV_M128_F32(p.m_quad, 2) - XFNV_M128_F32(kPrevious.m_quad, 2);
         float fXX = fX * fX;
         float fYY = fY * fY;
         float fZZ = fZ * fZ;
         float fSum = fYY + fXX;
         fSum = fZZ + fSum;
-        float fLength = __builtin_elementwise_sqrt(fSum);
+        float fLength = xfnv::SqrtF(fSum);
         fDistance = fLength + m_distance.m_data[m_distance.m_size - 1];
         hkMemoryRouter& kDistanceRouter = hkMemoryRouter::getInstance();
         if (m_distance.m_size == (m_distance.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK)) {

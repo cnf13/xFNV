@@ -15,6 +15,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpCdVertex.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -45,8 +46,8 @@ int32_t hkGskManifold_findRedundant5thPoint(hkpProcessCdPoint* resultPointArray)
             iMin = i;
         }
     }
-    float fDepth = resultPointArray[4].m_contact.m_separatingNormal.m_quad[3] -
-        resultPointArray[iMin].m_contact.m_separatingNormal.m_quad[3];
+    float fDepth = XFNV_M128_F32(resultPointArray[4].m_contact.m_separatingNormal.m_quad, 3) -
+        XFNV_M128_F32(resultPointArray[iMin].m_contact.m_separatingNormal.m_quad, 3);
     aiUsed[iMax] = 1;
     const hkQuadReal vA = resultPointArray[iMax].m_contact.m_position.m_quad;
     float fBest = static_cast<float>(fMaxDist * 1.0499999523162842);
@@ -110,29 +111,29 @@ int32_t hkGskManifold_findRedundant5thPoint(hkpProcessCdPoint* resultPointArray)
         const double dEps = 9.999999717180685e-10;
         int32_t iResult = 4;
         float fRatio = 0.030461745f;
-        float fNewDepth = resultPointArray[4].m_contact.m_separatingNormal.m_quad[3];
-        float fDiff = resultPointArray[0].m_contact.m_separatingNormal.m_quad[3] - fNewDepth;
+        float fNewDepth = XFNV_M128_F32(resultPointArray[4].m_contact.m_separatingNormal.m_quad, 3);
+        float fDiff = XFNV_M128_F32(resultPointArray[0].m_contact.m_separatingNormal.m_quad, 3) - fNewDepth;
         float fSq = fDiff * fDiff;
         float fT = static_cast<float>(fSq + dEps);
         if (0.030461745336651802 * afDist[0] < fT) {
             iResult = 0;
             fRatio = static_cast<float>(fT / (afDist[0] + dEps));
         }
-        fDiff = resultPointArray[1].m_contact.m_separatingNormal.m_quad[3] - fNewDepth;
+        fDiff = XFNV_M128_F32(resultPointArray[1].m_contact.m_separatingNormal.m_quad, 3) - fNewDepth;
         fSq = fDiff * fDiff;
         fT = static_cast<float>(fSq + dEps);
         if (static_cast<double>(afDist[1]) * fRatio < fT) {
             iResult = 1;
             fRatio = static_cast<float>(fT / (afDist[1] + dEps));
         }
-        fDiff = resultPointArray[2].m_contact.m_separatingNormal.m_quad[3] - fNewDepth;
+        fDiff = XFNV_M128_F32(resultPointArray[2].m_contact.m_separatingNormal.m_quad, 3) - fNewDepth;
         fSq = fDiff * fDiff;
         fT = static_cast<float>(fSq + dEps);
         if (static_cast<double>(afDist[2]) * fRatio < fT) {
             iResult = 2;
             fRatio = static_cast<float>(fT / (afDist[2] + dEps));
         }
-        fDiff = resultPointArray[3].m_contact.m_separatingNormal.m_quad[3] - fNewDepth;
+        fDiff = XFNV_M128_F32(resultPointArray[3].m_contact.m_separatingNormal.m_quad, 3) - fNewDepth;
         fSq = fDiff * fDiff;
         fT = static_cast<float>(fSq + dEps);
         if (static_cast<double>(afDist[3]) * fRatio < fT) {
@@ -313,7 +314,8 @@ void hkGskManifold_verifyAndGetPoints(
                 const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
                 const hkQuadReal diff = _mm_sub_ps(rA0, rB0);
                 const hkQuadReal diff2 = _mm_mul_ps(diff, diff);
-                const float fLen2 = (diff2[2] + static_cast<float>(diff2[1] + diff2[0]));
+                const float fLen2 =
+                    (XFNV_M128_F32(diff2, 2) + static_cast<float>(XFNV_M128_F32(diff2, 1) + XFNV_M128_F32(diff2, 0)));
                 if (work.m_radiusSumSqrd.m_storage < static_cast<double>(fLen2)) {
                     break;
                 }
@@ -346,12 +348,13 @@ void hkGskManifold_verifyAndGetPoints(
                     _mm_shuffle_ps(_mm_unpackhi_ps(prod1, prod0), cross2, 228),
                     _mm_add_ps(_mm_shuffle_ps(_mm_movehl_ps(mixed, lo), cross2, 212), mixed)
                 );
-                const float fEdgeLen2 = (edge2[2] + static_cast<float>(edge2[1] + edge2[0]));
-                if (work.m_radiusSumSqrd.m_storage * fEdgeLen2 < sums[3] ||
+                const float fEdgeLen2 =
+                    (XFNV_M128_F32(edge2, 2) + static_cast<float>(XFNV_M128_F32(edge2, 1) + XFNV_M128_F32(edge2, 0)));
+                if (work.m_radiusSumSqrd.m_storage * fEdgeLen2 < XFNV_M128_F32(sums, 3) ||
                     (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
                     break;
                 }
-                sums[0] = sums[0] / (sums[0] + sums[1]);
+                XFNV_M128_F32(sums, 0) = XFNV_M128_F32(sums, 0) / (XFNV_M128_F32(sums, 0) + XFNV_M128_F32(sums, 1));
                 hkVector4 pointB;
                 pointB.setInterpolate4(
                     reinterpret_cast<const hkVector4&>(rB0), reinterpret_cast<const hkVector4&>(rB1), hkSimdReal(sums)
@@ -433,12 +436,13 @@ void hkGskManifold_verifyAndGetPoints(
                     _mm_shuffle_ps(_mm_unpackhi_ps(prod1, prod0), cross2, 228),
                     _mm_add_ps(_mm_shuffle_ps(_mm_movehl_ps(mixed, lo), cross2, 212), mixed)
                 );
-                const float fEdgeLen2 = (edge2[2] + static_cast<float>(edge2[1] + edge2[0]));
-                if (work.m_radiusSumSqrd.m_storage * fEdgeLen2 < sums[3] ||
+                const float fEdgeLen2 =
+                    (XFNV_M128_F32(edge2, 2) + static_cast<float>(XFNV_M128_F32(edge2, 1) + XFNV_M128_F32(edge2, 0)));
+                if (work.m_radiusSumSqrd.m_storage * fEdgeLen2 < XFNV_M128_F32(sums, 3) ||
                     (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
                     break;
                 }
-                sums[0] = sums[0] / (sums[0] + sums[1]);
+                XFNV_M128_F32(sums, 0) = XFNV_M128_F32(sums, 0) / (XFNV_M128_F32(sums, 0) + XFNV_M128_F32(sums, 1));
                 hkVector4 interpolated;
                 interpolated.setInterpolate4(
                     reinterpret_cast<const hkVector4&>(rA1), reinterpret_cast<const hkVector4&>(rA0), hkSimdReal(sums)
@@ -484,14 +488,14 @@ void hkGskManifold_verifyAndGetPoints(
                     break;
                 }
                 hkQuadReal tA = sums;
-                tA[0] = sums[0] / (sums[0] - sums[2]);
+                XFNV_M128_F32(tA, 0) = XFNV_M128_F32(sums, 0) / (XFNV_M128_F32(sums, 0) - XFNV_M128_F32(sums, 2));
                 hkVector4 interpolatedA;
                 interpolatedA.setInterpolate4(
                     reinterpret_cast<const hkVector4&>(rA0), reinterpret_cast<const hkVector4&>(rA1), hkSimdReal(tA)
                 );
                 pointA = interpolatedA.m_quad;
                 hkQuadReal tB = _mm_shuffle_ps(sums, sums, 85);
-                tB[0] = tB[0] / (tB[0] - sums[3]);
+                XFNV_M128_F32(tB, 0) = XFNV_M128_F32(tB, 0) / (XFNV_M128_F32(tB, 0) - XFNV_M128_F32(sums, 3));
                 hkVector4 pointB;
                 pointB.setInterpolate4(
                     reinterpret_cast<const hkVector4&>(rB0), reinterpret_cast<const hkVector4&>(rB1), hkSimdReal(tB)
@@ -548,7 +552,8 @@ void hkGskManifold_verifyAndGetPoints(
                 edges23Hi = _mm_shuffle_ps(c0, master, 238);
                 edges23Lo = _mm_shuffle_ps(c0, master, 68);
                 const hkQuadReal depth = _mm_mul_ps(triNormal, aMinusB);
-                const float fDepth = (depth[2] + static_cast<float>(depth[1] + depth[0]));
+                const float fDepth =
+                    (XFNV_M128_F32(depth, 2) + static_cast<float>(XFNV_M128_F32(depth, 1) + XFNV_M128_F32(depth, 0)));
                 pointA = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fDepth), triNormal), rB0);
                 edges01Hi = _mm_shuffle_ps(c1, c2, 238);
                 bTriangle = true;
@@ -572,7 +577,8 @@ void hkGskManifold_verifyAndGetPoints(
         }
         if (invalid == 0) {
             const hkQuadReal prod = _mm_mul_ps(normal, aMinusB);
-            const float fDist = (prod[2] + static_cast<float>(prod[1] + prod[0]));
+            const float fDist =
+                (XFNV_M128_F32(prod, 2) + static_cast<float>(XFNV_M128_F32(prod, 1) + XFNV_M128_F32(prod, 0)));
             const float fOffsetB = work.m_radiusB.m_storage - fDist;
             const float fRadiusSum = work.m_radiusA.m_storage + work.m_radiusB.m_storage;
             const float fDistance = fDist - fRadiusSum;
@@ -580,7 +586,7 @@ void hkGskManifold_verifyAndGetPoints(
                 hkpProcessCdPoint* pOut = processOut.m_firstFreeContactPoint.m_storage;
                 pOut->m_contact.m_separatingNormal.m_quad = normal;
                 pOut->m_contact.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fOffsetB), normal), pointA);
-                pOut->m_contact.m_separatingNormal.m_quad[3] = fDistance;
+                XFNV_M128_F32(pOut->m_contact.m_separatingNormal.m_quad, 3) = fDistance;
                 pOut->m_contactPointId.m_storage = cp->m_id;
                 processOut.m_firstFreeContactPoint.m_storage = pOut + 1;
                 ++cp;
@@ -666,7 +672,7 @@ int32_t hkGskManifold_convertFeature(
             const float edgeLengthSq = _mm_cvtss_f32(_mm_add_ss(
                 _mm_shuffle_ps(edgeSq, edgeSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(edgeSq, edgeSq, 0x55), edgeSq)
             ));
-            if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < sums[3] ||
+            if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < XFNV_M128_F32(sums, 3) ||
                 (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
                 break;
             }
@@ -766,7 +772,7 @@ int32_t hkGskManifold_convertFeature(
             const float edgeLengthSq = _mm_cvtss_f32(_mm_add_ss(
                 _mm_shuffle_ps(edgeSq, edgeSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(edgeSq, edgeSq, 0x55), edgeSq)
             ));
-            if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < sums[3] ||
+            if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < XFNV_M128_F32(sums, 3) ||
                 (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
                 break;
             }
@@ -937,7 +943,7 @@ int32_t hkGskManifold_convertPointEdge(
     const float edgeLengthSq = _mm_cvtss_f32(
         _mm_add_ss(_mm_shuffle_ps(edgeSq, edgeSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(edgeSq, edgeSq, 0x55), edgeSq))
     );
-    if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < sums[3] ||
+    if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < XFNV_M128_F32(sums, 3) ||
         (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
         return HK_FEATURE_INVALID;
     }
@@ -981,7 +987,7 @@ int32_t hkGskManifold_convertEdgePoint(
     const float edgeLengthSq = _mm_cvtss_f32(
         _mm_add_ss(_mm_shuffle_ps(edgeSq, edgeSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(edgeSq, edgeSq, 0x55), edgeSq))
     );
-    if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < sums[3] ||
+    if (work.m_radiusSumSqrd.m_storage * edgeLengthSq < XFNV_M128_F32(sums, 3) ||
         (_mm_movemask_ps(_mm_cmplt_ps(sums, _mm_setzero_ps())) & 3) != 0) {
         return HK_FEATURE_INVALID;
     }

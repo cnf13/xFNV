@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Collide/Util/Welding/hkpWeldingUtility.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -150,7 +151,7 @@ void hkGskAgentUtil_processCollisionNoTim(
         const hkpCollisionQualityInfo* qualityInfo = processInput->m_collisionQualityInfo;
         const float createContact =
             (gskCache.m_dimA + gskCache.m_dimB == 4) ? qualityInfo->m_create4dContact : qualityInfo->m_createContact;
-        if (createContact > separatingNormal.m_quad[3]) {
+        if (createContact > XFNV_M128_F32(separatingNormal.m_quad, 3)) {
             const hkpGskManifoldAddStatus addStatus = hkGskManifold_addPoint(
                 gskManifold, *input.m_bodyA, *input.m_bodyB, *processInput, output, gskCache, resultPoint,
                 resultPointArray, input.m_contactMgr,

@@ -21,6 +21,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 TESObjectMISC::TESObjectMISC() {
     SetFormType(MISC_ID);
@@ -57,7 +58,7 @@ bool TESObjectMISC::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, 0x200);
                 TESForm* pForm = this;
                 pForm->SetFormEditorID(pBuffer);
@@ -66,7 +67,7 @@ bool TESObjectMISC::Load(TESFile* apFile) {
             case MODS_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(

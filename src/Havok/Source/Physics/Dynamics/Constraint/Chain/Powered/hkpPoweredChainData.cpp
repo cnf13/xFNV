@@ -33,6 +33,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpProjectileGun.h"
+#include "xfnv/Compiler.h"
 
 static void cleanupLoadedObjecthkpPoweredChainData(void* p);
 static const void* getVtablehkpPoweredChainData();
@@ -347,7 +348,8 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
             motorInfo.m_velocity = motorOutput.m_targetVelocity;
             motorInfo.m_tau = motorOutput.m_tau;
             motorInfo.m_damping = motorOutput.m_damping;
-            angularJac->m_angular[1].m_quad[3] = in2.m_substepInvDeltaTime * motorOutput.m_targetPosition;
+            XFNV_M128_F32(angularJac->m_angular[1].m_quad, 3) =
+                in2.m_substepInvDeltaTime * motorOutput.m_targetPosition;
             angularJac++;
         }
     }

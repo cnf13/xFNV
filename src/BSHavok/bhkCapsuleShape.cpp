@@ -28,6 +28,7 @@
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayCapsule.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/Capsule/hkpCapsuleShape.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -50,14 +51,14 @@ bhkCapsuleShape::bhkCapsuleShape(const hkCapsuleShapeCinfo& arInfo) {
 bhkCapsuleShape::bhkCapsuleShape(const NiPoint3& arInfo, const NiPoint3& a2, float a3) {
     hkVector4 kTop;
     hkVector4 kBottom;
-    kTop.m_quad[0] = (float)(arInfo.x * bhkConvert::fBS2HkScaleSC);
-    kTop.m_quad[1] = (float)(arInfo.y * bhkConvert::fBS2HkScaleSC);
-    kTop.m_quad[2] = (float)(arInfo.z * bhkConvert::fBS2HkScaleSC);
-    kTop.m_quad[3] = 0.0f;
-    kBottom.m_quad[0] = (float)(a2.x * bhkConvert::fBS2HkScaleSC);
-    kBottom.m_quad[1] = (float)(a2.y * bhkConvert::fBS2HkScaleSC);
-    kBottom.m_quad[2] = (float)(a2.z * bhkConvert::fBS2HkScaleSC);
-    kBottom.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kTop.m_quad, 0) = (float)(arInfo.x * bhkConvert::fBS2HkScaleSC);
+    XFNV_M128_F32(kTop.m_quad, 1) = (float)(arInfo.y * bhkConvert::fBS2HkScaleSC);
+    XFNV_M128_F32(kTop.m_quad, 2) = (float)(arInfo.z * bhkConvert::fBS2HkScaleSC);
+    XFNV_M128_F32(kTop.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(kBottom.m_quad, 0) = (float)(a2.x * bhkConvert::fBS2HkScaleSC);
+    XFNV_M128_F32(kBottom.m_quad, 1) = (float)(a2.y * bhkConvert::fBS2HkScaleSC);
+    XFNV_M128_F32(kBottom.m_quad, 2) = (float)(a2.z * bhkConvert::fBS2HkScaleSC);
+    XFNV_M128_F32(kBottom.m_quad, 3) = 0.0f;
     Init(kTop, kBottom, bhkConvert::fBS2HkScaleSC * a3);
 }
 
@@ -89,14 +90,14 @@ void bhkCapsuleShape::LoadBinary(NiStream& arStream) {
         // The end points' floats are byte-swapped as untyped 32-bit integers, not as floats.
         uint32_t* puiVertexA = reinterpret_cast<uint32_t*>(&rCinfo.m_vertexA);
         uint32_t* puiVertexB = reinterpret_cast<uint32_t*>(&rCinfo.m_vertexB);
-        puiVertexA[0] = __builtin_bswap32(puiVertexA[0]);
-        puiVertexA[1] = __builtin_bswap32(puiVertexA[1]);
-        puiVertexA[2] = __builtin_bswap32(puiVertexA[2]);
-        puiVertexA[3] = __builtin_bswap32(puiVertexA[3]);
-        puiVertexB[0] = __builtin_bswap32(puiVertexB[0]);
-        puiVertexB[1] = __builtin_bswap32(puiVertexB[1]);
-        puiVertexB[2] = __builtin_bswap32(puiVertexB[2]);
-        puiVertexB[3] = __builtin_bswap32(puiVertexB[3]);
+        puiVertexA[0] = std::byteswap<uint32_t>(puiVertexA[0]);
+        puiVertexA[1] = std::byteswap<uint32_t>(puiVertexA[1]);
+        puiVertexA[2] = std::byteswap<uint32_t>(puiVertexA[2]);
+        puiVertexA[3] = std::byteswap<uint32_t>(puiVertexA[3]);
+        puiVertexB[0] = std::byteswap<uint32_t>(puiVertexB[0]);
+        puiVertexB[1] = std::byteswap<uint32_t>(puiVertexB[1]);
+        puiVertexB[2] = std::byteswap<uint32_t>(puiVertexB[2]);
+        puiVertexB[3] = std::byteswap<uint32_t>(puiVertexB[3]);
     }
 }
 
@@ -110,25 +111,25 @@ void bhkCapsuleShape::SaveBinary(NiStream& arStream) {
     uint32_t* puiVertexA = reinterpret_cast<uint32_t*>(&rCinfo.m_vertexA);
     uint32_t* puiVertexB = reinterpret_cast<uint32_t*>(&rCinfo.m_vertexB);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        puiVertexA[0] = __builtin_bswap32(puiVertexA[0]);
-        puiVertexA[1] = __builtin_bswap32(puiVertexA[1]);
-        puiVertexA[2] = __builtin_bswap32(puiVertexA[2]);
-        puiVertexA[3] = __builtin_bswap32(puiVertexA[3]);
-        puiVertexB[0] = __builtin_bswap32(puiVertexB[0]);
-        puiVertexB[1] = __builtin_bswap32(puiVertexB[1]);
-        puiVertexB[2] = __builtin_bswap32(puiVertexB[2]);
-        puiVertexB[3] = __builtin_bswap32(puiVertexB[3]);
+        puiVertexA[0] = std::byteswap<uint32_t>(puiVertexA[0]);
+        puiVertexA[1] = std::byteswap<uint32_t>(puiVertexA[1]);
+        puiVertexA[2] = std::byteswap<uint32_t>(puiVertexA[2]);
+        puiVertexA[3] = std::byteswap<uint32_t>(puiVertexA[3]);
+        puiVertexB[0] = std::byteswap<uint32_t>(puiVertexB[0]);
+        puiVertexB[1] = std::byteswap<uint32_t>(puiVertexB[1]);
+        puiVertexB[2] = std::byteswap<uint32_t>(puiVertexB[2]);
+        puiVertexB[3] = std::byteswap<uint32_t>(puiVertexB[3]);
     }
     bhkConvexShape::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        puiVertexA[0] = __builtin_bswap32(puiVertexA[0]);
-        puiVertexA[1] = __builtin_bswap32(puiVertexA[1]);
-        puiVertexA[2] = __builtin_bswap32(puiVertexA[2]);
-        puiVertexA[3] = __builtin_bswap32(puiVertexA[3]);
-        puiVertexB[0] = __builtin_bswap32(puiVertexB[0]);
-        puiVertexB[1] = __builtin_bswap32(puiVertexB[1]);
-        puiVertexB[2] = __builtin_bswap32(puiVertexB[2]);
-        puiVertexB[3] = __builtin_bswap32(puiVertexB[3]);
+        puiVertexA[0] = std::byteswap<uint32_t>(puiVertexA[0]);
+        puiVertexA[1] = std::byteswap<uint32_t>(puiVertexA[1]);
+        puiVertexA[2] = std::byteswap<uint32_t>(puiVertexA[2]);
+        puiVertexA[3] = std::byteswap<uint32_t>(puiVertexA[3]);
+        puiVertexB[0] = std::byteswap<uint32_t>(puiVertexB[0]);
+        puiVertexB[1] = std::byteswap<uint32_t>(puiVertexB[1]);
+        puiVertexB[2] = std::byteswap<uint32_t>(puiVertexB[2]);
+        puiVertexB[3] = std::byteswap<uint32_t>(puiVertexB[3]);
     }
 }
 

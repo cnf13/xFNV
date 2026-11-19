@@ -5,6 +5,7 @@
 #include "Fallout Shared/Region System/TESRegionData.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 
@@ -106,7 +107,7 @@ bool TESRegionDataMap::LoadRegionDataMap(TESFile* apFile) {
         return false;
     }
     // A 16-byte aligned stack buffer of the chunk's size.
-    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
     apFile->GetChunkData(pBuffer, 0);
     MapName.Set(pBuffer, 0);
     return true;

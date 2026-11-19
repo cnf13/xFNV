@@ -25,6 +25,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCinfo.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -49,28 +50,40 @@ hkpBroadPhaseBorder::hkpBroadPhaseBorder(
     // Each face: an AABB from the extents with one axis collapsed to the face's side, (min, max) per row.
     const hkAabb akFaces[6] = {
         hkAabb(
-            hkVector4(kMax.m_quad[0], kMin.m_quad[1], kMin.m_quad[2], 0.0f),
-            hkVector4(kMax.m_quad[0], kMax.m_quad[1], kMax.m_quad[2], 0.0f)
+            hkVector4(
+                XFNV_M128_F32(kMax.m_quad, 0), XFNV_M128_F32(kMin.m_quad, 1), XFNV_M128_F32(kMin.m_quad, 2), 0.0f
+            ),
+            hkVector4(XFNV_M128_F32(kMax.m_quad, 0), XFNV_M128_F32(kMax.m_quad, 1), XFNV_M128_F32(kMax.m_quad, 2), 0.0f)
         ),
         hkAabb(
-            hkVector4(kMin.m_quad[0], kMin.m_quad[1], kMin.m_quad[2], 0.0f),
-            hkVector4(kMin.m_quad[0], kMax.m_quad[1], kMax.m_quad[2], 0.0f)
+            hkVector4(
+                XFNV_M128_F32(kMin.m_quad, 0), XFNV_M128_F32(kMin.m_quad, 1), XFNV_M128_F32(kMin.m_quad, 2), 0.0f
+            ),
+            hkVector4(XFNV_M128_F32(kMin.m_quad, 0), XFNV_M128_F32(kMax.m_quad, 1), XFNV_M128_F32(kMax.m_quad, 2), 0.0f)
         ),
         hkAabb(
-            hkVector4(kMin.m_quad[0], kMax.m_quad[1], kMin.m_quad[2], 0.0f),
-            hkVector4(kMax.m_quad[0], kMax.m_quad[1], kMax.m_quad[2], 0.0f)
+            hkVector4(
+                XFNV_M128_F32(kMin.m_quad, 0), XFNV_M128_F32(kMax.m_quad, 1), XFNV_M128_F32(kMin.m_quad, 2), 0.0f
+            ),
+            hkVector4(XFNV_M128_F32(kMax.m_quad, 0), XFNV_M128_F32(kMax.m_quad, 1), XFNV_M128_F32(kMax.m_quad, 2), 0.0f)
         ),
         hkAabb(
-            hkVector4(kMin.m_quad[0], kMin.m_quad[1], kMin.m_quad[2], 0.0f),
-            hkVector4(kMax.m_quad[0], kMin.m_quad[1], kMax.m_quad[2], 0.0f)
+            hkVector4(
+                XFNV_M128_F32(kMin.m_quad, 0), XFNV_M128_F32(kMin.m_quad, 1), XFNV_M128_F32(kMin.m_quad, 2), 0.0f
+            ),
+            hkVector4(XFNV_M128_F32(kMax.m_quad, 0), XFNV_M128_F32(kMin.m_quad, 1), XFNV_M128_F32(kMax.m_quad, 2), 0.0f)
         ),
         hkAabb(
-            hkVector4(kMin.m_quad[0], kMin.m_quad[1], kMax.m_quad[2], 0.0f),
-            hkVector4(kMax.m_quad[0], kMax.m_quad[1], kMax.m_quad[2], 0.0f)
+            hkVector4(
+                XFNV_M128_F32(kMin.m_quad, 0), XFNV_M128_F32(kMin.m_quad, 1), XFNV_M128_F32(kMax.m_quad, 2), 0.0f
+            ),
+            hkVector4(XFNV_M128_F32(kMax.m_quad, 0), XFNV_M128_F32(kMax.m_quad, 1), XFNV_M128_F32(kMax.m_quad, 2), 0.0f)
         ),
         hkAabb(
-            hkVector4(kMin.m_quad[0], kMin.m_quad[1], kMin.m_quad[2], 0.0f),
-            hkVector4(kMax.m_quad[0], kMax.m_quad[1], kMin.m_quad[2], 0.0f)
+            hkVector4(
+                XFNV_M128_F32(kMin.m_quad, 0), XFNV_M128_F32(kMin.m_quad, 1), XFNV_M128_F32(kMin.m_quad, 2), 0.0f
+            ),
+            hkVector4(XFNV_M128_F32(kMax.m_quad, 0), XFNV_M128_F32(kMax.m_quad, 1), XFNV_M128_F32(kMin.m_quad, 2), 0.0f)
         ),
     };
     for (int32_t i = 0; i < 6; ++i) {

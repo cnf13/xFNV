@@ -31,6 +31,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/hkpConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInfo.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -93,9 +94,10 @@ hkInternalConstraintUtils_calcRelativeAngle(__m128* a1, __m128* a2, __m128* a3, 
     __m128 v6 = *a2;
     __m128 v7 = _mm_add_ps(*a1, *a2);
     __m128 v8 = _mm_mul_ps(v7, v7);
-    float v9 = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]))))
-    );
+    float v9 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)))
+    )));
     if (v9 > 1.0000000168623835e-16) {
         *reinterpret_cast<float*>(&v16) = 1.0 / v9;
         v6 = _mm_mul_ps(
@@ -111,8 +113,10 @@ hkInternalConstraintUtils_calcRelativeAngle(__m128* a1, __m128* a2, __m128* a3, 
     __m128 v14 = _mm_mul_ps(*a3, v12);
     __m128 v15 = _mm_mul_ps(*a3, v13);
     *a6 = hkMath_atan2fApproximation(
-        _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]),
-        _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])
+        XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 85), 0) + XFNV_M128_F32(v14, 0)),
+        XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0))
     );
     *a5 = v6;
 }
@@ -124,9 +128,11 @@ double calcAngleAboutAxis(const hkpGenericConstraintDataParameters* apVars, int3
     __m128 kAxisA = (&apVars->m_angularBasisAw.m_col0)[iNext].m_quad;
     __m128 kY =
         _mm_mul_ps((&apVars->m_angularBasisBw.m_col0)[hkGenericConstraintDataAxisOrder[aiAxis + 1]].m_quad, kAxisA);
-    float fY = _mm_shuffle_ps(kY, kY, 170)[0] + (_mm_shuffle_ps(kY, kY, 85)[0] + kY[0]);
+    float fY = XFNV_M128_F32(_mm_shuffle_ps(kY, kY, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(kY, kY, 85), 0) + XFNV_M128_F32(kY, 0));
     __m128 kX = _mm_mul_ps((&apVars->m_angularBasisBw.m_col0)[iNext].m_quad, kAxisA);
-    float fX = _mm_shuffle_ps(kX, kX, 170)[0] + (_mm_shuffle_ps(kX, kX, 85)[0] + kX[0]);
+    float fX = XFNV_M128_F32(_mm_shuffle_ps(kX, kX, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(kX, kX, 85), 0) + XFNV_M128_F32(kX, 0));
     return hkMath_atan2fApproximation(fY, fX);
 }
 
@@ -358,13 +364,13 @@ void hkpGenericConstraintData::constrainAllLinearW(
     arInfo.m_pivotA = vars.m_pivotAw;
     arInfo.m_pivotB = vars.m_pivotBw;
     arInfo.m_constrainedDofW.m_quad = _mm_setzero_ps();
-    arInfo.m_constrainedDofW.m_quad[0] = 1.0f;
+    XFNV_M128_F32(arInfo.m_constrainedDofW.m_quad, 0) = 1.0f;
     hk1dLinearBilateralConstraintBuildJacobian(arInfo, in, out);
-    arInfo.m_constrainedDofW.m_quad[0] = 0.0f;
-    arInfo.m_constrainedDofW.m_quad[1] = 1.0f;
+    XFNV_M128_F32(arInfo.m_constrainedDofW.m_quad, 0) = 0.0f;
+    XFNV_M128_F32(arInfo.m_constrainedDofW.m_quad, 1) = 1.0f;
     hk1dLinearBilateralConstraintBuildJacobian(arInfo, in, out);
-    arInfo.m_constrainedDofW.m_quad[1] = 0.0f;
-    arInfo.m_constrainedDofW.m_quad[2] = 1.0f;
+    XFNV_M128_F32(arInfo.m_constrainedDofW.m_quad, 1) = 0.0f;
+    XFNV_M128_F32(arInfo.m_constrainedDofW.m_quad, 2) = 1.0f;
     hk1dLinearBilateralConstraintBuildJacobian(arInfo, in, out);
     vars.m_currentResult += 3;
 }
@@ -431,8 +437,8 @@ void hkpGenericConstraintData::setLinearLimitW(
     arInfo.m_constrainedDofW = *(&vars.m_linearBasisW.m_col0 + *currentCommand);
     arInfo.m_pivotA = vars.m_pivotAw;
     arInfo.m_pivotB = vars.m_pivotBw;
-    arInfo.m_min = v7->m_quad[0];
-    double m_max = v7->m_quad[1];
+    arInfo.m_min = XFNV_M128_F32(v7->m_quad, 0);
+    double m_max = XFNV_M128_F32(v7->m_quad, 1);
     currentData = v7 + 1;
     arInfo.m_max = m_max;
     hk1dLinearLimitBuildJacobian(arInfo, in, out);
@@ -456,18 +462,18 @@ void hkpGenericConstraintData::setAngularLimitW(
     info.m_constrainedDofW = vars.m_angularBasisAw.getColumn(axis);
     info.m_computedAngle.m_storage = static_cast<float>(calcAngleAboutAxis(&vars, axis));
     hkVector4* pData = currentData;
-    info.m_min.m_storage = pData->m_quad[0];
+    info.m_min.m_storage = XFNV_M128_F32(pData->m_quad, 0);
     currentData = pData + 1;
-    info.m_max.m_storage = pData->m_quad[1];
-    if (info.m_computedAngle.m_storage < 0.0f && pData->m_quad[2] > 0.0f &&
-        pData->m_quad[2] - info.m_computedAngle.m_storage > 3.1415927410125732) {
+    info.m_max.m_storage = XFNV_M128_F32(pData->m_quad, 1);
+    if (info.m_computedAngle.m_storage < 0.0f && XFNV_M128_F32(pData->m_quad, 2) > 0.0f &&
+        XFNV_M128_F32(pData->m_quad, 2) - info.m_computedAngle.m_storage > 3.1415927410125732) {
         info.m_computedAngle.m_storage = static_cast<float>(info.m_computedAngle.m_storage + 6.2831854820251465);
     }
-    if (info.m_computedAngle.m_storage > 0.0f && pData->m_quad[2] < 0.0f &&
-        info.m_computedAngle.m_storage - pData->m_quad[2] > 3.1415927410125732) {
+    if (info.m_computedAngle.m_storage > 0.0f && XFNV_M128_F32(pData->m_quad, 2) < 0.0f &&
+        info.m_computedAngle.m_storage - XFNV_M128_F32(pData->m_quad, 2) > 3.1415927410125732) {
         info.m_computedAngle.m_storage = static_cast<float>(info.m_computedAngle.m_storage - 6.2831854820251465);
     }
-    pData->m_quad[2] = info.m_computedAngle.m_storage;
+    XFNV_M128_F32(pData->m_quad, 2) = info.m_computedAngle.m_storage;
     hk1dAngularLimitBuildJacobian(info, in, out);
     ++vars.m_currentResult;
 }
@@ -497,7 +503,9 @@ void hkpGenericConstraintData::setConeLimitW(
         return;
     }
     info.m_computedAngle.m_storage =
-        ((a.m_quad[1] * b.m_quad[1] + a.m_quad[0] * b.m_quad[0]) + a.m_quad[2] * b.m_quad[2]);
+        ((XFNV_M128_F32(a.m_quad, 1) * XFNV_M128_F32(b.m_quad, 1) +
+          XFNV_M128_F32(a.m_quad, 0) * XFNV_M128_F32(b.m_quad, 0)) +
+         XFNV_M128_F32(a.m_quad, 2) * XFNV_M128_F32(b.m_quad, 2));
     // EXE-INLINED 0x62AEA0
     {
         const __m128 len2v = _mm_add_ps(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ps(_mm_shuffle_ps(sq, sq, 0x55), sq));
@@ -508,9 +516,9 @@ void hkpGenericConstraintData::setConeLimitW(
         info.m_constrainedDofW.m_quad = _mm_mul_ps(_mm_shuffle_ps(inv, inv, 0), cross.m_quad);
     }
     const hkVector4* pData = currentData;
-    info.m_min.m_storage = pData->m_quad[0];
+    info.m_min.m_storage = XFNV_M128_F32(pData->m_quad, 0);
     currentData = currentData + 1;
-    info.m_max.m_storage = pData->m_quad[1];
+    info.m_max.m_storage = XFNV_M128_F32(pData->m_quad, 1);
     hk1dAngularLimitBuildJacobian(info, in, out);
     ++vars.m_currentResult;
 }
@@ -536,9 +544,9 @@ void hkpGenericConstraintData::setTwistLimitW(
     );
     hkVector4* v10 = currentData;
     hkVector4* v11 = currentData + 1;
-    info_.m_min.m_storage = currentData->m_quad[0];
+    info_.m_min.m_storage = XFNV_M128_F32(currentData->m_quad, 0);
     currentData = v11;
-    info_.m_max.m_storage = v10->m_quad[1];
+    info_.m_max.m_storage = XFNV_M128_F32(v10->m_quad, 1);
     hk1dAngularLimitBuildJacobian(info_, in, out);
     ++vars.m_currentResult;
 }
@@ -561,9 +569,9 @@ void hkpGenericConstraintData::setAngularMotorW(
     const int32_t iAxis = *currentCommand;
     hkVector4* pData = currentData;
     ++currentData;
-    const float fLastAngle = pData->m_quad[1];
-    float fTurns = pData->m_quad[2];
-    hkpConstraintMotor* pMotor = scheme.m_motors.m_data[static_cast<int32_t>(pData->m_quad[0])];
+    const float fLastAngle = XFNV_M128_F32(pData->m_quad, 1);
+    float fTurns = XFNV_M128_F32(pData->m_quad, 2);
+    hkpConstraintMotor* pMotor = scheme.m_motors.m_data[static_cast<int32_t>(XFNV_M128_F32(pData->m_quad, 0))];
     const int32_t iNext = hkGenericConstraintDataAxisOrder[iAxis];
     const __m128 kAxisA = vars.m_angularBasisAw.getColumn(iNext).m_quad;
     const __m128 kY =
@@ -579,7 +587,7 @@ void hkpGenericConstraintData::setAngularMotorW(
     else if (fAngle - fLastAngle > 3.1415927410125732) {
         fTurns = static_cast<float>(fTurns - 1.0);
     }
-    pData->set(pData->m_quad[0], fAngle, fTurns, 0.0f);
+    pData->set(XFNV_M128_F32(pData->m_quad, 0), fAngle, fTurns, 0.0f);
     if (pMotor) {
         hkpJacobianSchema* pJac = out.m_jacobianSchemas;
         // The SDK's cast: the motor's angular Jacobian is written at the schema cursor, untyped memory.
@@ -612,7 +620,7 @@ void hkpGenericConstraintData::setLinearMotorW(
     hkpConstraintMotorOutput motorOut;
     ++currentCommand;
     int32_t iAxis = *currentCommand;
-    int32_t iMotor = static_cast<int32_t>(currentData->m_quad[0]);
+    int32_t iMotor = static_cast<int32_t>(XFNV_M128_F32(currentData->m_quad, 0));
     ++currentData;
     hkpConstraintMotor* pMotor = scheme.m_motors.m_data[iMotor];
     hkVector4 constrainedDofW = *(&vars.m_linearBasisW.m_col0 + iAxis);
@@ -646,7 +654,7 @@ void hkpGenericConstraintData::setAngularFrictionW(
     hkp1dAngularFrictionInfo arInfo;
     ++currentCommand;
     arInfo.m_constrainedDofW = &vars.m_angularBasisAw.m_col0 + *currentCommand;
-    float fMaxFrictionTorque = currentData->m_quad[0];
+    float fMaxFrictionTorque = XFNV_M128_F32(currentData->m_quad, 0);
     ++currentData;
     arInfo.m_maxFrictionTorque = fMaxFrictionTorque;
     arInfo.m_lastSolverResults =
@@ -672,7 +680,7 @@ void hkpGenericConstraintData::setLinearFrictionW(
     arInfo.m_pivot.m_quad = _mm_sub_ps(vars.m_pivotAw.m_quad, vars.m_pivotBw.m_quad);
     hkVector4* pData = currentData;
     currentData = pData + 1;
-    arInfo.m_maxFrictionForce = pData->m_quad[0];
+    arInfo.m_maxFrictionForce = XFNV_M128_F32(pData->m_quad, 0);
     arInfo.m_lastSolverResults =
         static_cast<hkpSolverResults*>(in.m_constraintRuntime.m_storage) + vars.m_currentResult;
     hk1dLinearFrictionBuildJacobian(arInfo, in, out);

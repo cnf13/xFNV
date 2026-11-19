@@ -338,6 +338,7 @@
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <cstdint>
@@ -14119,8 +14120,8 @@ int32_t PlayerCharacter::GetCurrentPotionCount() {
         }
     }
     // 16-byte aligned stack arrays of iMax entries.
-    MagicItem** pPotions = static_cast<MagicItem**>(__builtin_alloca_with_align(sizeof(MagicItem*) * iMax, 128));
-    uint32_t* pEffectCounts = static_cast<uint32_t*>(__builtin_alloca_with_align(4 * iMax, 128));
+    MagicItem** pPotions = static_cast<MagicItem**>(XFNV_ALLOCA16(sizeof(MagicItem*) * iMax));
+    uint32_t* pEffectCounts = static_cast<uint32_t*>(XFNV_ALLOCA16(4 * iMax));
     if (!pPotions || !pEffectCounts) {
         return iCount;
     }

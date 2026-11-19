@@ -27,6 +27,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -135,7 +136,8 @@ float hkpTransformShape::getMaximumProjection(const hkVector4& direction) const 
         ),
         direction.m_quad
     );
-    return _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    return XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0));
 }
 
 const hkpShapeContainer* hkpTransformShape::getContainer() const {

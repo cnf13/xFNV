@@ -41,6 +41,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with the game's IDs and values, in initialization order.
 NiPoint3 currentCameraPos(NiPoint3_ZERO);
@@ -155,7 +156,7 @@ bool BGSCameraShot::Load(TESFile* apFile) {
                     break;
                 case EDID_ID: {
                     // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                     apFile->GetChunkData(pBuffer, 0x200);
                     SetFormEditorID(pBuffer);
                     break;

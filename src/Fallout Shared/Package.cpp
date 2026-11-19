@@ -59,6 +59,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/FaceGen/assert.hpp"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // The reference EvaluateEscortReference accepted last; GetEscortTargetForPackage takes it and clears it.
 static TESObjectREFR* pTempTarget;
@@ -146,7 +147,7 @@ bool TESPackage::Load(TESFile* apFile) {
             case EDID_ID: {
                 // The buffer is sized by the chunk, but the read is deliberately capped at 0x200 bytes, as the game
                 // does.
-                char* pMessage = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pMessage = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pMessage, 0x200);
                 SetFormEditorID(pMessage);
                 break;

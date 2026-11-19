@@ -26,6 +26,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeBuffer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -175,7 +176,7 @@ const hkSphere* hkpConvexPieceShape::getCollisionSpheresImpl(hkSphere* sphereBuf
         int32_t v5 = 0;
         do {
             *v4 = static_cast<hkSphere>(m_vertices[v5]);
-            v4->m_pos.m_quad[3] = m_radius;
+            XFNV_M128_F32(v4->m_pos.m_quad, 3) = m_radius;
             ++v3;
             ++v4;
             ++v5;

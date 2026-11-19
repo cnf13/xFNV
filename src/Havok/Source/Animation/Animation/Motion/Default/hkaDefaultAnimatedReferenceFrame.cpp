@@ -19,6 +19,7 @@
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Serialize/Util/hkFinishLoadedObjectFlag.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -256,7 +257,7 @@ void hkaDefaultAnimatedReferenceFrame::getReferenceFrame(float time, hkQsTransfo
         motion.m_quad = m_referenceFrameSamples.m_data[iNumSamples - 1].m_quad;
     }
     motionOut.m_translation.m_quad = motion.m_quad;
-    motionOut.m_rotation.setAxisAngle(m_up, motion.m_quad[3]);
+    motionOut.m_rotation.setAxisAngle(m_up, XFNV_M128_F32(motion.m_quad, 3));
     motionOut.m_scale.m_quad = _mm_set1_ps(1.0f);
 }
 
@@ -298,7 +299,8 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
             if (loops >= 0) {
                 __m128 v26 = _mm_mul_ps(v10.m_quad, v7.m_vec.m_quad);
                 __m128 v27 = _mm_shuffle_ps(v26, v26, 170);
-                v27[0] = v27[0] + (_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
+                XFNV_M128_F32(v27, 0) =
+                    XFNV_M128_F32(v27, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v26, v26, 85), 0) + XFNV_M128_F32(v26, 0));
                 __m128 v28 = _mm_add_ps(
                     _mm_mul_ps(
                         _mm_sub_ps(
@@ -320,7 +322,8 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
                 hkQuaternion q0_8;
                 __m128 v12 = _mm_mul_ps(v46.m_translation.m_quad, v7.m_vec.m_quad);
                 __m128 v13 = _mm_shuffle_ps(v12, v12, 170);
-                v13[0] = v13[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]);
+                XFNV_M128_F32(v13, 0) =
+                    XFNV_M128_F32(v13, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0));
                 __m128 v14 = _mm_mul_ps(_mm_shuffle_ps(v46.m_translation.m_quad, v46.m_translation.m_quad, 210), v9);
                 __m128 v15 = _mm_add_ps(
                     _mm_mul_ps(_mm_add_ps(_mm_mul_ps(v8, v8), hkQuadRealMinusHalf), v46.m_translation.m_quad),
@@ -345,7 +348,8 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
                 __m128 v20 = _mm_xor_ps(rdata_10C4C00, v7.m_vec.m_quad);
                 __m128 v21 = _mm_mul_ps(v20, v10.m_quad);
                 __m128 v22 = _mm_shuffle_ps(v21, v21, 170);
-                v22[0] = v22[0] + (_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
+                XFNV_M128_F32(v22, 0) =
+                    XFNV_M128_F32(v22, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 85), 0) + XFNV_M128_F32(v21, 0));
                 __m128 v23 = _mm_shuffle_ps(v20, v20, 255);
                 __m128 v24 = _mm_add_ps(
                     _mm_mul_ps(
@@ -385,7 +389,8 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
     }
     __m128 v29 = _mm_mul_ps(v52.m_rotation.m_vec.m_quad, v52.m_translation.m_quad);
     __m128 v30 = _mm_shuffle_ps(v29, v29, 170);
-    v30[0] = v30[0] + (_mm_shuffle_ps(v29, v29, 85)[0] + v29[0]);
+    XFNV_M128_F32(v30, 0) =
+        XFNV_M128_F32(v30, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v29, v29, 85), 0) + XFNV_M128_F32(v29, 0));
     __m128 v31 = _mm_shuffle_ps(v52.m_rotation.m_vec.m_quad, v52.m_rotation.m_vec.m_quad, 255);
     __m128 v32 = _mm_xor_ps(v52.m_rotation.m_vec.m_quad, rdata_10C4C00);
     __m128 v33 = _mm_add_ps(
@@ -413,7 +418,8 @@ void hkaDefaultAnimatedReferenceFrame::getDeltaReferenceFrame(
     __m128 v44 = _mm_and_ps(_mm_sub_ps(_mm_add_ps(v36, v36), _mm_mul_ps(_mm_mul_ps(v36, v35), v36)), rdata_10C4C10);
     __m128 v37 = _mm_mul_ps(v32, v10.m_quad);
     __m128 v38 = _mm_shuffle_ps(v37, v37, 170);
-    v38[0] = v38[0] + (_mm_shuffle_ps(v37, v37, 85)[0] + v37[0]);
+    XFNV_M128_F32(v38, 0) =
+        XFNV_M128_F32(v38, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v37, v37, 85), 0) + XFNV_M128_F32(v37, 0));
     __m128 v39 = _mm_shuffle_ps(v32, v32, 255);
     v42 = _mm_xor_ps(v34, hkQuadRealNegateMask);
     v43.m_vec.m_quad = v32;
@@ -475,16 +481,16 @@ void hkaDefaultAnimatedReferenceFrame::project(
         hkQuaternion rest;
         float angle;
         motion.m_rotation.decomposeRestAxis(options.m_up, rest, angle);
-        const float previousAngle = previous.m_quad[3];
+        const float previousAngle = XFNV_M128_F32(previous.m_quad, 3);
         while (angle - previousAngle > 3.1415927410125732) {
             angle = angle - 6.2831854820251465;
         }
         while (angle - previousAngle < -3.1415927410125732) {
             angle = angle + 6.2831854820251465;
         }
-        projectedOut.m_quad[3] = angle;
+        XFNV_M128_F32(projectedOut.m_quad, 3) = angle;
     }
     else {
-        projectedOut.m_quad[3] = 0.0f;
+        XFNV_M128_F32(projectedOut.m_quad, 3) = 0.0f;
     }
 }

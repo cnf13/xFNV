@@ -12,6 +12,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "SDK/Windows/winsock2.h"
+#include "xfnv/Compiler.h"
 
 void hkBsdNetworkInit() {
     WSAData wsaData;
@@ -23,7 +24,7 @@ void hkBsdNetworkInit() {
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x321825F8, buf, ".\\System\\Io\\Socket\\Bsd\\hkBsdSocket.cpp", 72
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
         }
         g_defaultPlatformInitOnce.m_bool = 1;

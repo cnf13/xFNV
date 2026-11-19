@@ -24,6 +24,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Collide/Util/Welding/hkpWeldingUtility.h"
 #include "Havok/Source/Physics/Collide/Util/hkpTriangleUtil.h"
+#include "xfnv/Compiler.h"
 
 namespace {
     // Each member's offset in this struct (-1: no default), then weldingType's default.
@@ -177,38 +178,54 @@ void hkpSimpleMeshShape::calcContentStatistics(hkStatisticsCollector* collector,
 // The bounds of the transformed vertices, widened by the radius plus the tolerance on all four lanes. Starts from
 // 0x7F7FFFEE and its negation with w zero; min and max take the box first, so a NaN lane takes the vertex's.
 void hkpSimpleMeshShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
-    out.m_min.m_quad[0] = 0x1.FFFFDCp+127f;
-    out.m_min.m_quad[1] = 0x1.FFFFDCp+127f;
-    out.m_min.m_quad[2] = 0x1.FFFFDCp+127f;
-    out.m_min.m_quad[3] = 0.0f;
-    out.m_max.m_quad[0] = -0x1.FFFFDCp+127f;
-    out.m_max.m_quad[1] = -0x1.FFFFDCp+127f;
-    out.m_max.m_quad[2] = -0x1.FFFFDCp+127f;
-    out.m_max.m_quad[3] = 0.0f;
+    XFNV_M128_F32(out.m_min.m_quad, 0) = 0x1.FFFFDCp+127f;
+    XFNV_M128_F32(out.m_min.m_quad, 1) = 0x1.FFFFDCp+127f;
+    XFNV_M128_F32(out.m_min.m_quad, 2) = 0x1.FFFFDCp+127f;
+    XFNV_M128_F32(out.m_min.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(out.m_max.m_quad, 0) = -0x1.FFFFDCp+127f;
+    XFNV_M128_F32(out.m_max.m_quad, 1) = -0x1.FFFFDCp+127f;
+    XFNV_M128_F32(out.m_max.m_quad, 2) = -0x1.FFFFDCp+127f;
+    XFNV_M128_F32(out.m_max.m_quad, 3) = 0.0f;
     for (const hkVector4& kLocalVertex : m_vertices) {
         alignas(16) hkVector4 kVertex;
         kVertex.setTransformedPos(localToWorld, kLocalVertex);
         hkQuadReal& kMin = out.m_min.m_quad;
-        kMin[0] = kMin[0] < kVertex.m_quad[0] ? kMin[0] : kVertex.m_quad[0];
-        kMin[1] = kMin[1] < kVertex.m_quad[1] ? kMin[1] : kVertex.m_quad[1];
-        kMin[2] = kMin[2] < kVertex.m_quad[2] ? kMin[2] : kVertex.m_quad[2];
-        kMin[3] = kMin[3] < kVertex.m_quad[3] ? kMin[3] : kVertex.m_quad[3];
+        XFNV_M128_F32(kMin, 0) = XFNV_M128_F32(kMin, 0) < XFNV_M128_F32(kVertex.m_quad, 0)
+            ? XFNV_M128_F32(kMin, 0)
+            : XFNV_M128_F32(kVertex.m_quad, 0);
+        XFNV_M128_F32(kMin, 1) = XFNV_M128_F32(kMin, 1) < XFNV_M128_F32(kVertex.m_quad, 1)
+            ? XFNV_M128_F32(kMin, 1)
+            : XFNV_M128_F32(kVertex.m_quad, 1);
+        XFNV_M128_F32(kMin, 2) = XFNV_M128_F32(kMin, 2) < XFNV_M128_F32(kVertex.m_quad, 2)
+            ? XFNV_M128_F32(kMin, 2)
+            : XFNV_M128_F32(kVertex.m_quad, 2);
+        XFNV_M128_F32(kMin, 3) = XFNV_M128_F32(kMin, 3) < XFNV_M128_F32(kVertex.m_quad, 3)
+            ? XFNV_M128_F32(kMin, 3)
+            : XFNV_M128_F32(kVertex.m_quad, 3);
         hkQuadReal& kMax = out.m_max.m_quad;
-        kMax[0] = kMax[0] > kVertex.m_quad[0] ? kMax[0] : kVertex.m_quad[0];
-        kMax[1] = kMax[1] > kVertex.m_quad[1] ? kMax[1] : kVertex.m_quad[1];
-        kMax[2] = kMax[2] > kVertex.m_quad[2] ? kMax[2] : kVertex.m_quad[2];
-        kMax[3] = kMax[3] > kVertex.m_quad[3] ? kMax[3] : kVertex.m_quad[3];
+        XFNV_M128_F32(kMax, 0) = XFNV_M128_F32(kMax, 0) > XFNV_M128_F32(kVertex.m_quad, 0)
+            ? XFNV_M128_F32(kMax, 0)
+            : XFNV_M128_F32(kVertex.m_quad, 0);
+        XFNV_M128_F32(kMax, 1) = XFNV_M128_F32(kMax, 1) > XFNV_M128_F32(kVertex.m_quad, 1)
+            ? XFNV_M128_F32(kMax, 1)
+            : XFNV_M128_F32(kVertex.m_quad, 1);
+        XFNV_M128_F32(kMax, 2) = XFNV_M128_F32(kMax, 2) > XFNV_M128_F32(kVertex.m_quad, 2)
+            ? XFNV_M128_F32(kMax, 2)
+            : XFNV_M128_F32(kVertex.m_quad, 2);
+        XFNV_M128_F32(kMax, 3) = XFNV_M128_F32(kMax, 3) > XFNV_M128_F32(kVertex.m_quad, 3)
+            ? XFNV_M128_F32(kMax, 3)
+            : XFNV_M128_F32(kVertex.m_quad, 3);
     }
     // The sum is rounded to a float.
     float fRadius = m_radius + tolerance;
-    out.m_min.m_quad[0] -= fRadius;
-    out.m_min.m_quad[1] -= fRadius;
-    out.m_min.m_quad[2] -= fRadius;
-    out.m_min.m_quad[3] -= fRadius;
-    out.m_max.m_quad[0] += fRadius;
-    out.m_max.m_quad[1] += fRadius;
-    out.m_max.m_quad[2] += fRadius;
-    out.m_max.m_quad[3] += fRadius;
+    XFNV_M128_F32(out.m_min.m_quad, 0) -= fRadius;
+    XFNV_M128_F32(out.m_min.m_quad, 1) -= fRadius;
+    XFNV_M128_F32(out.m_min.m_quad, 2) -= fRadius;
+    XFNV_M128_F32(out.m_min.m_quad, 3) -= fRadius;
+    XFNV_M128_F32(out.m_max.m_quad, 0) += fRadius;
+    XFNV_M128_F32(out.m_max.m_quad, 1) += fRadius;
+    XFNV_M128_F32(out.m_max.m_quad, 2) += fRadius;
+    XFNV_M128_F32(out.m_max.m_quad, 3) += fRadius;
 }
 
 void hkpSimpleMeshShape::initWeldingInfo(hkpWeldingUtility::WeldingType weldingType) {

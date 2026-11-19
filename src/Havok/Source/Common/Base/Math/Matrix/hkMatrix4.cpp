@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -20,18 +21,30 @@ hkResult hkMatrix4::invert(float epsilon) {
     uint32_t v22;
     hkSimdReal scale;
     hkMatrix4 a;
-    float v17 = m_col0.m_quad[0] * m_col1.m_quad[1] - m_col0.m_quad[1] * m_col1.m_quad[0u];
-    float v19 = m_col2.m_quad[1] * m_col0.m_quad[0] - m_col0.m_quad[1] * m_col2.m_quad[0u];
-    float v15 = m_col0.m_quad[0] * m_col3.m_quad[1] - m_col0.m_quad[1] * m_col3.m_quad[0u];
-    float v14 = m_col2.m_quad[1] * m_col1.m_quad[0u] - m_col2.m_quad[0u] * m_col1.m_quad[1];
-    float v13 = m_col3.m_quad[1] * m_col1.m_quad[0u] - m_col3.m_quad[0u] * m_col1.m_quad[1];
-    float v12 = m_col2.m_quad[0u] * m_col3.m_quad[1] - m_col3.m_quad[0u] * m_col2.m_quad[1];
-    float v11 = m_col1.m_quad[3] * m_col0.m_quad[2] - m_col1.m_quad[2] * m_col0.m_quad[3];
-    float v9 = m_col2.m_quad[3] * m_col0.m_quad[2] - m_col0.m_quad[3] * m_col2.m_quad[2];
-    float v10 = m_col3.m_quad[3] * m_col0.m_quad[2] - m_col3.m_quad[2] * m_col0.m_quad[3];
-    float v20 = m_col2.m_quad[3] * m_col1.m_quad[2] - m_col1.m_quad[3] * m_col2.m_quad[2];
-    float v18 = m_col3.m_quad[3] * m_col1.m_quad[2] - m_col3.m_quad[2] * m_col1.m_quad[3];
-    float v16 = m_col3.m_quad[3] * m_col2.m_quad[2] - m_col3.m_quad[2] * m_col2.m_quad[3];
+    float v17 = XFNV_M128_F32(m_col0.m_quad, 0) * XFNV_M128_F32(m_col1.m_quad, 1) -
+        XFNV_M128_F32(m_col0.m_quad, 1) * XFNV_M128_F32(m_col1.m_quad, 0u);
+    float v19 = XFNV_M128_F32(m_col2.m_quad, 1) * XFNV_M128_F32(m_col0.m_quad, 0) -
+        XFNV_M128_F32(m_col0.m_quad, 1) * XFNV_M128_F32(m_col2.m_quad, 0u);
+    float v15 = XFNV_M128_F32(m_col0.m_quad, 0) * XFNV_M128_F32(m_col3.m_quad, 1) -
+        XFNV_M128_F32(m_col0.m_quad, 1) * XFNV_M128_F32(m_col3.m_quad, 0u);
+    float v14 = XFNV_M128_F32(m_col2.m_quad, 1) * XFNV_M128_F32(m_col1.m_quad, 0u) -
+        XFNV_M128_F32(m_col2.m_quad, 0u) * XFNV_M128_F32(m_col1.m_quad, 1);
+    float v13 = XFNV_M128_F32(m_col3.m_quad, 1) * XFNV_M128_F32(m_col1.m_quad, 0u) -
+        XFNV_M128_F32(m_col3.m_quad, 0u) * XFNV_M128_F32(m_col1.m_quad, 1);
+    float v12 = XFNV_M128_F32(m_col2.m_quad, 0u) * XFNV_M128_F32(m_col3.m_quad, 1) -
+        XFNV_M128_F32(m_col3.m_quad, 0u) * XFNV_M128_F32(m_col2.m_quad, 1);
+    float v11 = XFNV_M128_F32(m_col1.m_quad, 3) * XFNV_M128_F32(m_col0.m_quad, 2) -
+        XFNV_M128_F32(m_col1.m_quad, 2) * XFNV_M128_F32(m_col0.m_quad, 3);
+    float v9 = XFNV_M128_F32(m_col2.m_quad, 3) * XFNV_M128_F32(m_col0.m_quad, 2) -
+        XFNV_M128_F32(m_col0.m_quad, 3) * XFNV_M128_F32(m_col2.m_quad, 2);
+    float v10 = XFNV_M128_F32(m_col3.m_quad, 3) * XFNV_M128_F32(m_col0.m_quad, 2) -
+        XFNV_M128_F32(m_col3.m_quad, 2) * XFNV_M128_F32(m_col0.m_quad, 3);
+    float v20 = XFNV_M128_F32(m_col2.m_quad, 3) * XFNV_M128_F32(m_col1.m_quad, 2) -
+        XFNV_M128_F32(m_col1.m_quad, 3) * XFNV_M128_F32(m_col2.m_quad, 2);
+    float v18 = XFNV_M128_F32(m_col3.m_quad, 3) * XFNV_M128_F32(m_col1.m_quad, 2) -
+        XFNV_M128_F32(m_col3.m_quad, 2) * XFNV_M128_F32(m_col1.m_quad, 3);
+    float v16 = XFNV_M128_F32(m_col3.m_quad, 3) * XFNV_M128_F32(m_col2.m_quad, 2) -
+        XFNV_M128_F32(m_col3.m_quad, 2) * XFNV_M128_F32(m_col2.m_quad, 3);
     double v2 = v16;
     double v3 = v17;
     double v4 = v18;
@@ -45,22 +58,38 @@ hkResult hkMatrix4::invert(float epsilon) {
     if (epsilon >= static_cast<double>(v23)) {
         return HK_FAILURE;
     }
-    a.m_col0.m_quad[0] = v2 * m_col1.m_quad[1] - m_col2.m_quad[1] * v4 + v6 * m_col3.m_quad[1];
-    a.m_col0.m_quad[1] = m_col2.m_quad[1] * v10 - m_col0.m_quad[1] * v2 - v9 * m_col3.m_quad[1];
-    a.m_col0.m_quad[2] = m_col0.m_quad[1] * v4 - v10 * m_col1.m_quad[1] + v11 * m_col3.m_quad[1];
-    a.m_col0.m_quad[3] = v9 * m_col1.m_quad[1] - m_col0.m_quad[1] * v6 - m_col2.m_quad[1] * v11;
-    a.m_col1.m_quad[0] = m_col2.m_quad[0u] * v4 - v2 * m_col1.m_quad[0u] - m_col3.m_quad[0u] * v6;
-    a.m_col1.m_quad[1] = v2 * m_col0.m_quad[0] - m_col2.m_quad[0u] * v10 + m_col3.m_quad[0u] * v9;
-    a.m_col1.m_quad[2] = v10 * m_col1.m_quad[0u] - v4 * m_col0.m_quad[0] - m_col3.m_quad[0u] * v11;
-    a.m_col1.m_quad[3] = v6 * m_col0.m_quad[0] - v9 * m_col1.m_quad[0u] + v11 * m_col2.m_quad[0u];
-    a.m_col2.m_quad[0] = m_col3.m_quad[3] * v14 + (m_col1.m_quad[3] * v12 - m_col2.m_quad[3] * v13);
-    a.m_col2.m_quad[1] = m_col2.m_quad[3] * v15 - v12 * m_col0.m_quad[3] - m_col3.m_quad[3] * v5;
-    a.m_col2.m_quad[2] = m_col0.m_quad[3] * v13 - m_col1.m_quad[3] * v15 + m_col3.m_quad[3] * v3;
-    a.m_col2.m_quad[3] = m_col1.m_quad[3] * v5 - m_col0.m_quad[3] * v14 - m_col2.m_quad[3] * v3;
-    a.m_col3.m_quad[0] = v13 * m_col2.m_quad[2] - m_col1.m_quad[2] * v12 - m_col3.m_quad[2] * v14;
-    a.m_col3.m_quad[1] = m_col0.m_quad[2] * v12 - v15 * m_col2.m_quad[2] + m_col3.m_quad[2] * v5;
-    a.m_col3.m_quad[2] = v15 * m_col1.m_quad[2] - v13 * m_col0.m_quad[2] - m_col3.m_quad[2] * v3;
-    a.m_col3.m_quad[3] = v17 * m_col2.m_quad[2] + (v14 * m_col0.m_quad[2] - v5 * m_col1.m_quad[2]);
+    XFNV_M128_F32(a.m_col0.m_quad, 0) = v2 * XFNV_M128_F32(m_col1.m_quad, 1) - XFNV_M128_F32(m_col2.m_quad, 1) * v4 +
+        v6 * XFNV_M128_F32(m_col3.m_quad, 1);
+    XFNV_M128_F32(a.m_col0.m_quad, 1) = XFNV_M128_F32(m_col2.m_quad, 1) * v10 - XFNV_M128_F32(m_col0.m_quad, 1) * v2 -
+        v9 * XFNV_M128_F32(m_col3.m_quad, 1);
+    XFNV_M128_F32(a.m_col0.m_quad, 2) = XFNV_M128_F32(m_col0.m_quad, 1) * v4 - v10 * XFNV_M128_F32(m_col1.m_quad, 1) +
+        v11 * XFNV_M128_F32(m_col3.m_quad, 1);
+    XFNV_M128_F32(a.m_col0.m_quad, 3) = v9 * XFNV_M128_F32(m_col1.m_quad, 1) - XFNV_M128_F32(m_col0.m_quad, 1) * v6 -
+        XFNV_M128_F32(m_col2.m_quad, 1) * v11;
+    XFNV_M128_F32(a.m_col1.m_quad, 0) = XFNV_M128_F32(m_col2.m_quad, 0u) * v4 - v2 * XFNV_M128_F32(m_col1.m_quad, 0u) -
+        XFNV_M128_F32(m_col3.m_quad, 0u) * v6;
+    XFNV_M128_F32(a.m_col1.m_quad, 1) = v2 * XFNV_M128_F32(m_col0.m_quad, 0) - XFNV_M128_F32(m_col2.m_quad, 0u) * v10 +
+        XFNV_M128_F32(m_col3.m_quad, 0u) * v9;
+    XFNV_M128_F32(a.m_col1.m_quad, 2) = v10 * XFNV_M128_F32(m_col1.m_quad, 0u) - v4 * XFNV_M128_F32(m_col0.m_quad, 0) -
+        XFNV_M128_F32(m_col3.m_quad, 0u) * v11;
+    XFNV_M128_F32(a.m_col1.m_quad, 3) = v6 * XFNV_M128_F32(m_col0.m_quad, 0) - v9 * XFNV_M128_F32(m_col1.m_quad, 0u) +
+        v11 * XFNV_M128_F32(m_col2.m_quad, 0u);
+    XFNV_M128_F32(a.m_col2.m_quad, 0) = XFNV_M128_F32(m_col3.m_quad, 3) * v14 +
+        (XFNV_M128_F32(m_col1.m_quad, 3) * v12 - XFNV_M128_F32(m_col2.m_quad, 3) * v13);
+    XFNV_M128_F32(a.m_col2.m_quad, 1) = XFNV_M128_F32(m_col2.m_quad, 3) * v15 - v12 * XFNV_M128_F32(m_col0.m_quad, 3) -
+        XFNV_M128_F32(m_col3.m_quad, 3) * v5;
+    XFNV_M128_F32(a.m_col2.m_quad, 2) = XFNV_M128_F32(m_col0.m_quad, 3) * v13 - XFNV_M128_F32(m_col1.m_quad, 3) * v15 +
+        XFNV_M128_F32(m_col3.m_quad, 3) * v3;
+    XFNV_M128_F32(a.m_col2.m_quad, 3) = XFNV_M128_F32(m_col1.m_quad, 3) * v5 - XFNV_M128_F32(m_col0.m_quad, 3) * v14 -
+        XFNV_M128_F32(m_col2.m_quad, 3) * v3;
+    XFNV_M128_F32(a.m_col3.m_quad, 0) = v13 * XFNV_M128_F32(m_col2.m_quad, 2) - XFNV_M128_F32(m_col1.m_quad, 2) * v12 -
+        XFNV_M128_F32(m_col3.m_quad, 2) * v14;
+    XFNV_M128_F32(a.m_col3.m_quad, 1) = XFNV_M128_F32(m_col0.m_quad, 2) * v12 - v15 * XFNV_M128_F32(m_col2.m_quad, 2) +
+        XFNV_M128_F32(m_col3.m_quad, 2) * v5;
+    XFNV_M128_F32(a.m_col3.m_quad, 2) = v15 * XFNV_M128_F32(m_col1.m_quad, 2) - v13 * XFNV_M128_F32(m_col0.m_quad, 2) -
+        XFNV_M128_F32(m_col3.m_quad, 2) * v3;
+    XFNV_M128_F32(a.m_col3.m_quad, 3) = v17 * XFNV_M128_F32(m_col2.m_quad, 2) +
+        (v14 * XFNV_M128_F32(m_col0.m_quad, 2) - v5 * XFNV_M128_F32(m_col1.m_quad, 2));
     setMul(scale, a);
     return HK_SUCCESS;
 }
@@ -71,24 +100,24 @@ hkResult hkMatrix4::setInverse(const hkMatrix4& m, float epsilon) {
 }
 
 void hkMatrix4::transpose() {
-    float x = m_col1.m_quad[0];
-    m_col1.m_quad[0] = m_col0.m_quad[1];
-    m_col0.m_quad[1] = x;
-    float v2 = m_col2.m_quad[0];
-    m_col2.m_quad[0] = m_col0.m_quad[2];
-    m_col0.m_quad[2] = v2;
-    float v3 = m_col3.m_quad[0];
-    m_col3.m_quad[0] = m_col0.m_quad[3];
-    m_col0.m_quad[3] = v3;
-    float y = m_col2.m_quad[1];
-    m_col2.m_quad[1] = m_col1.m_quad[2];
-    m_col1.m_quad[2] = y;
-    float v5 = m_col3.m_quad[1];
-    m_col3.m_quad[1] = m_col1.m_quad[3];
-    m_col1.m_quad[3] = v5;
-    float z = m_col3.m_quad[2];
-    m_col3.m_quad[2] = m_col2.m_quad[3];
-    m_col2.m_quad[3] = z;
+    float x = XFNV_M128_F32(m_col1.m_quad, 0);
+    XFNV_M128_F32(m_col1.m_quad, 0) = XFNV_M128_F32(m_col0.m_quad, 1);
+    XFNV_M128_F32(m_col0.m_quad, 1) = x;
+    float v2 = XFNV_M128_F32(m_col2.m_quad, 0);
+    XFNV_M128_F32(m_col2.m_quad, 0) = XFNV_M128_F32(m_col0.m_quad, 2);
+    XFNV_M128_F32(m_col0.m_quad, 2) = v2;
+    float v3 = XFNV_M128_F32(m_col3.m_quad, 0);
+    XFNV_M128_F32(m_col3.m_quad, 0) = XFNV_M128_F32(m_col0.m_quad, 3);
+    XFNV_M128_F32(m_col0.m_quad, 3) = v3;
+    float y = XFNV_M128_F32(m_col2.m_quad, 1);
+    XFNV_M128_F32(m_col2.m_quad, 1) = XFNV_M128_F32(m_col1.m_quad, 2);
+    XFNV_M128_F32(m_col1.m_quad, 2) = y;
+    float v5 = XFNV_M128_F32(m_col3.m_quad, 1);
+    XFNV_M128_F32(m_col3.m_quad, 1) = XFNV_M128_F32(m_col1.m_quad, 3);
+    XFNV_M128_F32(m_col1.m_quad, 3) = v5;
+    float z = XFNV_M128_F32(m_col3.m_quad, 2);
+    XFNV_M128_F32(m_col3.m_quad, 2) = XFNV_M128_F32(m_col2.m_quad, 3);
+    XFNV_M128_F32(m_col2.m_quad, 3) = z;
 }
 
 // Each element is the dot product of a row of a (a column of its transposed copy) with a column of b, added pairwise
@@ -173,7 +202,7 @@ void hkMatrix4::mul(const hkSimdReal& scale) {
 
 hkBool hkMatrix4::isOk() {
     int32_t v2 = 0;
-    while ((std::bit_cast<uint32_t>(m_col0.m_quad[v2]) & 0x7F800000) != 0x7F800000) {
+    while ((std::bit_cast<uint32_t>(XFNV_M128_F32(m_col0.m_quad, v2)) & 0x7F800000) != 0x7F800000) {
         if (++v2 >= 16) {
             return 1;
         }
@@ -182,22 +211,22 @@ hkBool hkMatrix4::isOk() {
 }
 
 void hkMatrix4::setTranspose(const hkMatrix4& s) {
-    m_col0.m_quad[0] = s.m_col0.m_quad[0];
-    m_col1.m_quad[1] = s.m_col1.m_quad[1];
-    m_col2.m_quad[2] = s.m_col2.m_quad[2];
-    m_col3.m_quad[3] = s.m_col3.m_quad[3];
-    m_col0.m_quad[1] = s.m_col1.m_quad[0];
-    m_col1.m_quad[0] = s.m_col0.m_quad[1];
-    m_col0.m_quad[2] = s.m_col2.m_quad[0];
-    m_col2.m_quad[0] = s.m_col0.m_quad[2];
-    m_col0.m_quad[3] = s.m_col3.m_quad[0];
-    m_col3.m_quad[0] = s.m_col0.m_quad[3];
-    m_col1.m_quad[2] = s.m_col2.m_quad[1];
-    m_col2.m_quad[1] = s.m_col1.m_quad[2];
-    m_col1.m_quad[3] = s.m_col3.m_quad[1];
-    m_col3.m_quad[1] = s.m_col1.m_quad[3];
-    m_col2.m_quad[3] = s.m_col3.m_quad[2];
-    m_col3.m_quad[2] = s.m_col2.m_quad[3];
+    XFNV_M128_F32(m_col0.m_quad, 0) = XFNV_M128_F32(s.m_col0.m_quad, 0);
+    XFNV_M128_F32(m_col1.m_quad, 1) = XFNV_M128_F32(s.m_col1.m_quad, 1);
+    XFNV_M128_F32(m_col2.m_quad, 2) = XFNV_M128_F32(s.m_col2.m_quad, 2);
+    XFNV_M128_F32(m_col3.m_quad, 3) = XFNV_M128_F32(s.m_col3.m_quad, 3);
+    XFNV_M128_F32(m_col0.m_quad, 1) = XFNV_M128_F32(s.m_col1.m_quad, 0);
+    XFNV_M128_F32(m_col1.m_quad, 0) = XFNV_M128_F32(s.m_col0.m_quad, 1);
+    XFNV_M128_F32(m_col0.m_quad, 2) = XFNV_M128_F32(s.m_col2.m_quad, 0);
+    XFNV_M128_F32(m_col2.m_quad, 0) = XFNV_M128_F32(s.m_col0.m_quad, 2);
+    XFNV_M128_F32(m_col0.m_quad, 3) = XFNV_M128_F32(s.m_col3.m_quad, 0);
+    XFNV_M128_F32(m_col3.m_quad, 0) = XFNV_M128_F32(s.m_col0.m_quad, 3);
+    XFNV_M128_F32(m_col1.m_quad, 2) = XFNV_M128_F32(s.m_col2.m_quad, 1);
+    XFNV_M128_F32(m_col2.m_quad, 1) = XFNV_M128_F32(s.m_col1.m_quad, 2);
+    XFNV_M128_F32(m_col1.m_quad, 3) = XFNV_M128_F32(s.m_col3.m_quad, 1);
+    XFNV_M128_F32(m_col3.m_quad, 1) = XFNV_M128_F32(s.m_col1.m_quad, 3);
+    XFNV_M128_F32(m_col2.m_quad, 3) = XFNV_M128_F32(s.m_col3.m_quad, 2);
+    XFNV_M128_F32(m_col3.m_quad, 2) = XFNV_M128_F32(s.m_col2.m_quad, 3);
 }
 
 void hkMatrix4::add(const hkMatrix4& a) {
@@ -215,88 +244,88 @@ void hkMatrix4::sub(const hkMatrix4& a) {
 }
 
 void hkMatrix4::get4x4RowMajor(float* d) {
-    *d = m_col0.m_quad[0];
-    d[4] = m_col0.m_quad[1];
-    d[8] = m_col0.m_quad[2];
-    d[12] = m_col0.m_quad[3];
-    d[1] = m_col1.m_quad[0];
-    d[5] = m_col1.m_quad[1];
-    d[9] = m_col1.m_quad[2];
-    d[13] = m_col1.m_quad[3];
-    d[2] = m_col2.m_quad[0];
-    d[6] = m_col2.m_quad[1];
-    d[10] = m_col2.m_quad[2];
-    d[14] = m_col2.m_quad[3];
-    d[3] = m_col3.m_quad[0];
-    d[7] = m_col3.m_quad[1];
-    d[11] = m_col3.m_quad[2];
-    d[15] = m_col3.m_quad[3];
+    *d = XFNV_M128_F32(m_col0.m_quad, 0);
+    d[4] = XFNV_M128_F32(m_col0.m_quad, 1);
+    d[8] = XFNV_M128_F32(m_col0.m_quad, 2);
+    d[12] = XFNV_M128_F32(m_col0.m_quad, 3);
+    d[1] = XFNV_M128_F32(m_col1.m_quad, 0);
+    d[5] = XFNV_M128_F32(m_col1.m_quad, 1);
+    d[9] = XFNV_M128_F32(m_col1.m_quad, 2);
+    d[13] = XFNV_M128_F32(m_col1.m_quad, 3);
+    d[2] = XFNV_M128_F32(m_col2.m_quad, 0);
+    d[6] = XFNV_M128_F32(m_col2.m_quad, 1);
+    d[10] = XFNV_M128_F32(m_col2.m_quad, 2);
+    d[14] = XFNV_M128_F32(m_col2.m_quad, 3);
+    d[3] = XFNV_M128_F32(m_col3.m_quad, 0);
+    d[7] = XFNV_M128_F32(m_col3.m_quad, 1);
+    d[11] = XFNV_M128_F32(m_col3.m_quad, 2);
+    d[15] = XFNV_M128_F32(m_col3.m_quad, 3);
 }
 
 void hkMatrix4::set4x4RowMajor(const float* p) {
-    m_col0.m_quad[0] = *p;
-    m_col0.m_quad[1] = p[4];
-    m_col0.m_quad[2] = p[8];
-    m_col0.m_quad[3] = p[12];
-    m_col1.m_quad[0] = p[1];
-    m_col1.m_quad[1] = p[5];
-    m_col1.m_quad[2] = p[9];
-    m_col1.m_quad[3] = p[13];
-    m_col2.m_quad[0] = p[2];
-    m_col2.m_quad[1] = p[6];
-    m_col2.m_quad[2] = p[10];
-    m_col2.m_quad[3] = p[14];
-    m_col3.m_quad[0] = p[3];
-    m_col3.m_quad[1] = p[7];
-    m_col3.m_quad[2] = p[11];
-    m_col3.m_quad[3] = p[15];
+    XFNV_M128_F32(m_col0.m_quad, 0) = *p;
+    XFNV_M128_F32(m_col0.m_quad, 1) = p[4];
+    XFNV_M128_F32(m_col0.m_quad, 2) = p[8];
+    XFNV_M128_F32(m_col0.m_quad, 3) = p[12];
+    XFNV_M128_F32(m_col1.m_quad, 0) = p[1];
+    XFNV_M128_F32(m_col1.m_quad, 1) = p[5];
+    XFNV_M128_F32(m_col1.m_quad, 2) = p[9];
+    XFNV_M128_F32(m_col1.m_quad, 3) = p[13];
+    XFNV_M128_F32(m_col2.m_quad, 0) = p[2];
+    XFNV_M128_F32(m_col2.m_quad, 1) = p[6];
+    XFNV_M128_F32(m_col2.m_quad, 2) = p[10];
+    XFNV_M128_F32(m_col2.m_quad, 3) = p[14];
+    XFNV_M128_F32(m_col3.m_quad, 0) = p[3];
+    XFNV_M128_F32(m_col3.m_quad, 1) = p[7];
+    XFNV_M128_F32(m_col3.m_quad, 2) = p[11];
+    XFNV_M128_F32(m_col3.m_quad, 3) = p[15];
 }
 
 // Copies the sixteen floats one by one, column after column.
 void hkMatrix4::get4x4ColumnMajor(float* d) const {
-    d[0] = m_col0.m_quad[0];
-    d[1] = m_col0.m_quad[1];
-    d[2] = m_col0.m_quad[2];
-    d[3] = m_col0.m_quad[3];
-    d[4] = m_col1.m_quad[0];
-    d[5] = m_col1.m_quad[1];
-    d[6] = m_col1.m_quad[2];
-    d[7] = m_col1.m_quad[3];
-    d[8] = m_col2.m_quad[0];
-    d[9] = m_col2.m_quad[1];
-    d[10] = m_col2.m_quad[2];
-    d[11] = m_col2.m_quad[3];
-    d[12] = m_col3.m_quad[0];
-    d[13] = m_col3.m_quad[1];
-    d[14] = m_col3.m_quad[2];
-    d[15] = m_col3.m_quad[3];
+    d[0] = XFNV_M128_F32(m_col0.m_quad, 0);
+    d[1] = XFNV_M128_F32(m_col0.m_quad, 1);
+    d[2] = XFNV_M128_F32(m_col0.m_quad, 2);
+    d[3] = XFNV_M128_F32(m_col0.m_quad, 3);
+    d[4] = XFNV_M128_F32(m_col1.m_quad, 0);
+    d[5] = XFNV_M128_F32(m_col1.m_quad, 1);
+    d[6] = XFNV_M128_F32(m_col1.m_quad, 2);
+    d[7] = XFNV_M128_F32(m_col1.m_quad, 3);
+    d[8] = XFNV_M128_F32(m_col2.m_quad, 0);
+    d[9] = XFNV_M128_F32(m_col2.m_quad, 1);
+    d[10] = XFNV_M128_F32(m_col2.m_quad, 2);
+    d[11] = XFNV_M128_F32(m_col2.m_quad, 3);
+    d[12] = XFNV_M128_F32(m_col3.m_quad, 0);
+    d[13] = XFNV_M128_F32(m_col3.m_quad, 1);
+    d[14] = XFNV_M128_F32(m_col3.m_quad, 2);
+    d[15] = XFNV_M128_F32(m_col3.m_quad, 3);
 }
 
 void hkMatrix4::set4x4ColumnMajor(const float* p) {
-    m_col0.m_quad[0] = p[0];
-    m_col0.m_quad[1] = p[1];
-    m_col0.m_quad[2] = p[2];
-    m_col0.m_quad[3] = p[3];
-    m_col1.m_quad[0] = p[4];
-    m_col1.m_quad[1] = p[5];
-    m_col1.m_quad[2] = p[6];
-    m_col1.m_quad[3] = p[7];
-    m_col2.m_quad[0] = p[8];
-    m_col2.m_quad[1] = p[9];
-    m_col2.m_quad[2] = p[10];
-    m_col2.m_quad[3] = p[11];
-    m_col3.m_quad[0] = p[12];
-    m_col3.m_quad[1] = p[13];
-    m_col3.m_quad[2] = p[14];
-    m_col3.m_quad[3] = p[15];
+    XFNV_M128_F32(m_col0.m_quad, 0) = p[0];
+    XFNV_M128_F32(m_col0.m_quad, 1) = p[1];
+    XFNV_M128_F32(m_col0.m_quad, 2) = p[2];
+    XFNV_M128_F32(m_col0.m_quad, 3) = p[3];
+    XFNV_M128_F32(m_col1.m_quad, 0) = p[4];
+    XFNV_M128_F32(m_col1.m_quad, 1) = p[5];
+    XFNV_M128_F32(m_col1.m_quad, 2) = p[6];
+    XFNV_M128_F32(m_col1.m_quad, 3) = p[7];
+    XFNV_M128_F32(m_col2.m_quad, 0) = p[8];
+    XFNV_M128_F32(m_col2.m_quad, 1) = p[9];
+    XFNV_M128_F32(m_col2.m_quad, 2) = p[10];
+    XFNV_M128_F32(m_col2.m_quad, 3) = p[11];
+    XFNV_M128_F32(m_col3.m_quad, 0) = p[12];
+    XFNV_M128_F32(m_col3.m_quad, 1) = p[13];
+    XFNV_M128_F32(m_col3.m_quad, 2) = p[14];
+    XFNV_M128_F32(m_col3.m_quad, 3) = p[15];
 }
 
 // Each column's w becomes 0, the last one's 1.
 void hkMatrix4::resetFourthRow() {
-    m_col2.m_quad[3] = 0.0f;
-    m_col1.m_quad[3] = 0.0f;
-    m_col0.m_quad[3] = 0.0f;
-    m_col3.m_quad[3] = 1.0f;
+    XFNV_M128_F32(m_col2.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_col1.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_col0.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_col3.m_quad, 3) = 1.0f;
 }
 
 // The SDK copies the rotation's columns and the translation, then resets the fourth row.
@@ -305,10 +334,10 @@ void hkMatrix4::set(const hkTransform& t) {
     m_col1.m_quad = t.m_rotation.m_col1.m_quad;
     m_col2.m_quad = t.m_rotation.m_col2.m_quad;
     m_col3.m_quad = t.m_translation.m_quad;
-    m_col0.m_quad[3] = 0.0f;
-    m_col1.m_quad[3] = 0.0f;
-    m_col2.m_quad[3] = 0.0f;
-    m_col3.m_quad[3] = 1.0f;
+    XFNV_M128_F32(m_col0.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_col1.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_col2.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_col3.m_quad, 3) = 1.0f;
 }
 
 void hkMatrix4::get(hkTransform& t) {
@@ -369,9 +398,9 @@ int32_t hkMatrix4::isAffineTransformation(uint32_t* a1) {
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(a1[3])), v2),
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(a1[7])), v3)
     );
-    v2[0] = 0.0f;
-    v3[0] = 0.0f;
-    v1[0] = 0.0f;
+    XFNV_M128_F32(v2, 0) = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.0f;
+    XFNV_M128_F32(v1, 0) = 0.0f;
     return (_mm_movemask_ps(_mm_cmple_ps(
                 _mm_and_ps(
                     _mm_sub_ps(

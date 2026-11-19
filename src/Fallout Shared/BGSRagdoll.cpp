@@ -14,6 +14,7 @@
 #include "Fallout Shared/TESModel.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <new>
 
@@ -490,7 +491,7 @@ bool BGSRagdoll::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first.
                 pEditorID[0] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200);
@@ -558,7 +559,7 @@ bool BGSRagdoll::Load(TESFile* apFile) {
             case ANAM_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first.
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);

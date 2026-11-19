@@ -26,6 +26,7 @@
 #include "Havok/Source/Physics/Collide/Shape/HeightField/TriSampledHeightField/hkpTriSampledHeightFieldBvTreeShape.h"
 #include "Havok/Source/Physics/Collide/Shape/HeightField/TriSampledHeightField/hkpTriSampledHeightFieldCollection.h"
 #include "Havok/Source/Physics/Collide/Shape/HeightField/hkpHeightFieldShape.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -223,8 +224,8 @@ void bhkTriSampledHeightFieldBvTreeShape::CopyCinfo(hkTriSampledHeightFieldBvTre
             const hkBSHeightFieldShape* pShape =
                 static_cast<const hkBSHeightFieldShape*>(pCollection->getHeightFieldShape());
             if (pShape) {
-                arInfo.m_maxHeight = pShape->m_extents.m_quad[2] + pShape->m_heightCenter;
-                arInfo.m_minHeight = pShape->m_heightCenter - pShape->m_extents.m_quad[2];
+                arInfo.m_maxHeight = XFNV_M128_F32(pShape->m_extents.m_quad, 2) + pShape->m_heightCenter;
+                arInfo.m_minHeight = pShape->m_heightCenter - XFNV_M128_F32(pShape->m_extents.m_quad, 2);
                 arInfo.m_scale = pShape->m_intToFloatScale;
                 arInfo.m_xRes = pShape->m_xRes;
                 arInfo.m_zRes = pShape->m_zRes;

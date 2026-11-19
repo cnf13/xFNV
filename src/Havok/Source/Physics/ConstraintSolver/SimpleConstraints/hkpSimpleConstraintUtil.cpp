@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverCheck.h"
 #include "Havok/Source/Physics/Dynamics/Motion/Rigid/hkpBoxMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -35,7 +36,8 @@ float hkpSimpleConstraintInfo::BodyInfo::getEnergy(const hkpBodyVelocity& vel) c
     __m128 v13 = _mm_shuffle_ps(v11, v11, 255);
     __m128 v14 =
         _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), _mm_mul_ps(vel.m_linear.m_quad, vel.m_linear.m_quad)), v12);
-    return _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
+    return XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 85), 0) + XFNV_M128_F32(v14, 0));
 }
 
 // Per body: the jacobians are massRelPos crossed with each direction, the inverse inertia is applied to them, the
@@ -50,15 +52,15 @@ void hkSimpleConstraintUtil_InitInfo(
     const hkMatrix3& directions,
     hkpSimpleConstraintInfo& out
 ) {
-    const float fInvMassSum = bodyA.m_invMasses.m_quad[3] + bodyB.m_invMasses.m_quad[3];
+    const float fInvMassSum = XFNV_M128_F32(bodyA.m_invMasses.m_quad, 3) + XFNV_M128_F32(bodyB.m_invMasses.m_quad, 3);
     hkMatrix3& invMassMatrix = out.m_invMassMatrix;
     const __m128 kZero = _mm_setzero_ps();
     _mm_store_ps(&reinterpret_cast<float*>(&invMassMatrix.m_col0.m_quad)[0], kZero);
     _mm_store_ps(&reinterpret_cast<float*>(&invMassMatrix.m_col1.m_quad)[0], kZero);
     _mm_store_ps(&reinterpret_cast<float*>(&invMassMatrix.m_col2.m_quad)[0], kZero);
-    invMassMatrix.m_col0.m_quad[0] = fInvMassSum;
-    invMassMatrix.m_col1.m_quad[1] = fInvMassSum;
-    invMassMatrix.m_col2.m_quad[2] = fInvMassSum;
+    XFNV_M128_F32(invMassMatrix.m_col0.m_quad, 0) = fInvMassSum;
+    XFNV_M128_F32(invMassMatrix.m_col1.m_quad, 1) = fInvMassSum;
+    XFNV_M128_F32(invMassMatrix.m_col2.m_quad, 2) = fInvMassSum;
     _mm_store_ps(
         &reinterpret_cast<float*>(&out.m_base.m_col0.m_quad)[0],
         _mm_load_ps(&reinterpret_cast<const float*>(&directions.m_col0.m_quad)[0])
@@ -92,7 +94,7 @@ void hkSimpleConstraintUtil_InitInfo(
             &reinterpret_cast<float*>(&info.m_invMasses.m_quad)[0],
             _mm_load_ps(&reinterpret_cast<const float*>(&pBody->m_invMasses.m_quad)[0])
         );
-        const float fInvMass = pBody->m_invMasses.m_quad[3];
+        const float fInvMass = XFNV_M128_F32(pBody->m_invMasses.m_quad, 3);
         const float fClamped = (fInvMass > 1e-11f) ? fInvMass : 1e-11f;
         info.m_mass = 1.0f / fClamped;
         info.m_transform = pBody->m_transform;
@@ -125,18 +127,18 @@ void hkSimpleConstraintUtil_InitInfo(
     _mm_store_ps(&reinterpret_cast<float*>(&out.m_massMatrix.m_col2.m_quad)[0], _mm_mul_ps(kR2, kScale));
 
     // EXE-INLINED none: hkpSimpleConstraintInfo::getMass00
-    float fMass00 = invMassMatrix.m_col0.m_quad[0];
+    float fMass00 = XFNV_M128_F32(invMassMatrix.m_col0.m_quad, 0);
     if (fMass00 < 9.999999960041972e-12) {
         fMass00 = 1e-11f;
     }
-    invMassMatrix.m_col0.m_quad[3] = 1.0f / fMass00;
-    float fDet12 = invMassMatrix.m_col2.m_quad[2] * invMassMatrix.m_col1.m_quad[1] -
-        invMassMatrix.m_col2.m_quad[1] * invMassMatrix.m_col1.m_quad[2];
+    XFNV_M128_F32(invMassMatrix.m_col0.m_quad, 3) = 1.0f / fMass00;
+    float fDet12 = XFNV_M128_F32(invMassMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(invMassMatrix.m_col1.m_quad, 1) -
+        XFNV_M128_F32(invMassMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(invMassMatrix.m_col1.m_quad, 2);
     if (fDet12 < 9.999999682655225e-23) {
         fDet12 = 9.9999997e-23f;
     }
     // EXE-INLINED none: hkpSimpleConstraintInfo::getInvDetM12
-    invMassMatrix.m_col1.m_quad[3] = 1.0f / fDet12;
+    XFNV_M128_F32(invMassMatrix.m_col1.m_quad, 3) = 1.0f / fDet12;
 }
 
 const hkpSimpleConstraintInfo* hkSimpleConstraintUtil_applyImpulse(
@@ -257,8 +259,8 @@ double hkSimpleConstraintUtil_Collide(
         }
     }
     hkSimpleConstraintUtil_getPointVelocity(info, velA, velB, v41);
-    if (params.m_externalSeperatingVelocity < static_cast<double>(v41.m_quad[0])) {
-        v41.m_quad[0] = params.m_externalSeperatingVelocity;
+    if (params.m_externalSeperatingVelocity < static_cast<double>(XFNV_M128_F32(v41.m_quad, 0))) {
+        XFNV_M128_F32(v41.m_quad, 0) = params.m_externalSeperatingVelocity;
         if (params.m_extraSeparatingVelocity <= static_cast<double>(params.m_externalSeperatingVelocity)) {
             return 0.0;
         }
@@ -267,8 +269,8 @@ double hkSimpleConstraintUtil_Collide(
     __m128 v6 = info.m_massMatrix.m_col1.m_quad;
     __m128 v7 = info.m_massMatrix.m_col0.m_quad;
     v41.m_quad = _mm_xor_ps(v41.m_quad, hkQuadRealNegateMask);
-    float v32 = m_restitution * v41.m_quad[0];
-    v41.m_quad[0] = v41.m_quad[0] + (params.m_extraSeparatingVelocity + v32);
+    float v32 = m_restitution * XFNV_M128_F32(v41.m_quad, 0);
+    XFNV_M128_F32(v41.m_quad, 0) = XFNV_M128_F32(v41.m_quad, 0) + (params.m_extraSeparatingVelocity + v32);
     __m128 v8 = v41.m_quad;
     float m_maxImpulse = params.m_maxImpulse;
     __m128 v9 = _mm_add_ps(
@@ -279,42 +281,45 @@ double hkSimpleConstraintUtil_Collide(
         _mm_mul_ps(_mm_shuffle_ps(v41.m_quad, v41.m_quad, 170), info.m_massMatrix.m_col2.m_quad)
     );
     v42.m_quad = v9;
-    double result = v9[0];
+    double result = XFNV_M128_F32(v9, 0);
     params.m_contactImpulseLimitBreached.m_bool = 0;
-    if (m_maxImpulse < static_cast<double>(v9[0])) {
+    if (m_maxImpulse < static_cast<double>(XFNV_M128_F32(v9, 0))) {
         const float fScale = m_maxImpulse / result;
         v9 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fScale), _mm_set_ss(fScale), 0), v9);
         v42.m_quad = v9;
         params.m_contactImpulseLimitBreached.m_bool = 1;
-        result = v9[0];
+        result = XFNV_M128_F32(v9, 0);
     }
     double m_friction = params.m_friction;
     __m128 v43 = _mm_mul_ps(v9, v9);
-    float v26 = v43[2] + v43[1];
-    double v11 = m_friction * m_friction * v43[0];
+    float v26 = XFNV_M128_F32(v43, 2) + XFNV_M128_F32(v43, 1);
+    double v11 = m_friction * m_friction * XFNV_M128_F32(v43, 0);
     double v12 = v26;
     float v27 = v11;
     if (v27 < v12 || result < 0.0) {
         double v21;
         double v13 = m_maxImpulse;
         v42.m_quad = _mm_setzero_ps();
-        float v39 = v41.m_quad[2] * v41.m_quad[2] + v41.m_quad[1] * v41.m_quad[1];
-        float v23 = v41.m_quad[0] * info.m_invMassMatrix.m_col0.m_quad[3];
+        float v39 = XFNV_M128_F32(v41.m_quad, 2) * XFNV_M128_F32(v41.m_quad, 2) +
+            XFNV_M128_F32(v41.m_quad, 1) * XFNV_M128_F32(v41.m_quad, 1);
+        float v23 = XFNV_M128_F32(v41.m_quad, 0) * XFNV_M128_F32(info.m_invMassMatrix.m_col0.m_quad, 3);
         double v14 = v23;
         if (v23 > static_cast<double>(m_maxImpulse)) {
             params.m_contactImpulseLimitBreached.m_bool = 1;
             v23 = m_maxImpulse;
             v14 = m_maxImpulse;
         }
-        double v15 = info.m_invMassMatrix.m_col2.m_quad[2];
+        double v15 = XFNV_M128_F32(info.m_invMassMatrix.m_col2.m_quad, 2);
         __m128 v16 = _mm_sub_ps(
             v8, _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v23), _mm_set_ss(v23), 0), info.m_invMassMatrix.m_col0.m_quad)
         );
         v41.m_quad = v16;
-        float v24 =
-            (v15 * v16[1] - v16[2] * info.m_invMassMatrix.m_col2.m_quad[1]) * info.m_invMassMatrix.m_col1.m_quad[3];
-        float v28 = (v16[2] * info.m_invMassMatrix.m_col1.m_quad[1] - v16[1] * info.m_invMassMatrix.m_col2.m_quad[1]) *
-            info.m_invMassMatrix.m_col1.m_quad[3];
+        float v24 = (v15 * XFNV_M128_F32(v16, 1) -
+                     XFNV_M128_F32(v16, 2) * XFNV_M128_F32(info.m_invMassMatrix.m_col2.m_quad, 1)) *
+            XFNV_M128_F32(info.m_invMassMatrix.m_col1.m_quad, 3);
+        float v28 = (XFNV_M128_F32(v16, 2) * XFNV_M128_F32(info.m_invMassMatrix.m_col1.m_quad, 1) -
+                     XFNV_M128_F32(v16, 1) * XFNV_M128_F32(info.m_invMassMatrix.m_col2.m_quad, 1)) *
+            XFNV_M128_F32(info.m_invMassMatrix.m_col1.m_quad, 3);
         float v35 = v28 * v28 + v24 * v24;
         float v33 = params.m_friction * v14;
         float v34 = v33 * v33;
@@ -327,8 +332,8 @@ double hkSimpleConstraintUtil_Collide(
             v14 = v23;
             v13 = m_maxImpulse;
         }
-        v42.m_quad[1] = v24;
-        v42.m_quad[2] = v28;
+        XFNV_M128_F32(v42.m_quad, 1) = v24;
+        XFNV_M128_F32(v42.m_quad, 2) = v28;
         __m128 v17 = _mm_sub_ps(
             _mm_sub_ps(
                 v16, _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v24), _mm_set_ss(v24), 0), info.m_invMassMatrix.m_col1.m_quad)
@@ -336,7 +341,7 @@ double hkSimpleConstraintUtil_Collide(
             _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v28), _mm_set_ss(v28), 0), info.m_invMassMatrix.m_col2.m_quad)
         );
         v41.m_quad = v17;
-        float v38 = (v17[0] - v32) * info.m_invMassMatrix.m_col0.m_quad[3];
+        float v38 = (XFNV_M128_F32(v17, 0) - v32) * XFNV_M128_F32(info.m_invMassMatrix.m_col0.m_quad, 3);
         double v18 = v38;
         if (v38 < 0.0) {
             v18 = 0.0;
@@ -352,18 +357,21 @@ double hkSimpleConstraintUtil_Collide(
             v29 = v20;
         }
         __m128 v22 = info.m_invMassMatrix.m_col0.m_quad;
-        v42.m_quad[0] = v21 + v29;
+        XFNV_M128_F32(v42.m_quad, 0) = v21 + v29;
         v41.m_quad = _mm_sub_ps(v17, _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v29), _mm_set_ss(v29), 0), v22));
-        float v30 = v41.m_quad[2] * v41.m_quad[2] + v41.m_quad[1] * v41.m_quad[1];
+        float v30 = XFNV_M128_F32(v41.m_quad, 2) * XFNV_M128_F32(v41.m_quad, 2) +
+            XFNV_M128_F32(v41.m_quad, 1) * XFNV_M128_F32(v41.m_quad, 1);
         if (!(v39 > static_cast<double>(v30))) {
             v30 = v39;
         }
         float v40 = std::sqrt((double)v30);
-        v42.m_quad[0] = v40 * info.m_invMassMatrix.m_col0.m_quad[3] * params.m_extraSlope + v42.m_quad[0];
-        result = v42.m_quad[0];
-        if (m_maxImpulse < static_cast<double>(v42.m_quad[0])) {
+        XFNV_M128_F32(v42.m_quad, 0) =
+            v40 * XFNV_M128_F32(info.m_invMassMatrix.m_col0.m_quad, 3) * params.m_extraSlope +
+            XFNV_M128_F32(v42.m_quad, 0);
+        result = XFNV_M128_F32(v42.m_quad, 0);
+        if (m_maxImpulse < static_cast<double>(XFNV_M128_F32(v42.m_quad, 0))) {
             params.m_contactImpulseLimitBreached.m_bool = 1;
-            v42.m_quad[0] = m_maxImpulse;
+            XFNV_M128_F32(v42.m_quad, 0) = m_maxImpulse;
             result = m_maxImpulse;
         }
     }

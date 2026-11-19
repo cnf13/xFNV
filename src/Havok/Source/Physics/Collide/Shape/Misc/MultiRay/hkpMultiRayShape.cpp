@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpRayHitCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -115,8 +116,8 @@ hkpMultiRayShape::hkpMultiRayShape(const hkpMultiRayShape::Ray* Rays, int32_t nR
         pRay->m_end = Rays->m_end;
         __m128 dir = _mm_sub_ps(pRay->m_end.m_quad, pRay->m_start.m_quad);
         __m128 sq = _mm_mul_ps(dir, dir);
-        float fLengthSquared = sq[2] + (sq[1] + sq[0]);
-        pRay->m_start.m_quad[3] = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(fLengthSquared)));
+        float fLengthSquared = XFNV_M128_F32(sq, 2) + (XFNV_M128_F32(sq, 1) + XFNV_M128_F32(sq, 0));
+        XFNV_M128_F32(pRay->m_start.m_quad, 3) = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(fLengthSquared)));
         float fEstimate = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(fLengthSquared)));
         float fInvLength =
             fLengthSquared == 0.0f ? 0.0f : (0.5f * fEstimate) * (3.0f - (fLengthSquared * fEstimate) * fEstimate);

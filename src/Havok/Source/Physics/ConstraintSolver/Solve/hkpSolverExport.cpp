@@ -25,6 +25,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverElemTemp.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInfo.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverResults.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -148,7 +149,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                 bilateralJac = &bilateral->m_jac;
                 const float impulse = std::fabs(temp->m_impulseApplied);
                 schema = reinterpret_cast<const hkpJacobianSchema*>(bilateral + 1);
-                if (bilateralJac->m_angular[1].m_quad[3] * 0.9900000095367432 < impulse) {
+                if (XFNV_M128_F32(bilateralJac->m_angular[1].m_quad, 3) * 0.9900000095367432 < impulse) {
                     limitBreached = 1;
                 }
                 // A run of these schemas is one constraint: it is listed once, at the run's last schema.
@@ -185,7 +186,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                     reinterpret_cast<const hkpJacobianSingleContactSchema*>(schema);
                 bilateralJac = &contact->m_jac;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(contact + 1);
-                const float limit = bilateralJac->m_angular[1].m_quad[3] * 0.9900000095367432;
+                const float limit = XFNV_M128_F32(bilateralJac->m_angular[1].m_quad, 3) * 0.9900000095367432;
                 if (limit < temp->m_impulseApplied) {
                     numBreached++;
                     breachedElem->m_type = 0;
@@ -197,7 +198,7 @@ void hkSolverExport::exportImpulsesAndRhs(
             }
             exportBilateral:
                 {
-                    const float rhs = bilateralJac->m_linear0.m_quad[3] * dampDivTauDt;
+                    const float rhs = XFNV_M128_F32(bilateralJac->m_linear0.m_quad, 3) * dampDivTauDt;
                     const __m128 angVel = _mm_add_ps(
                         _mm_mul_ps(accB->m_scratch123.m_col0.m_quad, bilateralJac->m_angular[1].m_quad),
                         _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, bilateralJac->m_angular[0].m_quad)
@@ -206,7 +207,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     results->m_impulseApplied = temp->m_impulseApplied;
                     const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, bilateralJac->m_linear0.m_quad));
                     const float velSum =
-                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
+                        (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0)));
                     const float scaledVel = velSum * stepsDt;
                     results->m_internalSolverData = rhs - scaledVel;
                     results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -230,15 +232,15 @@ void hkSolverExport::exportImpulsesAndRhs(
                 impulseFactor = temp[1].m_usedImpulseFactor;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(motor + 1);
                 // The motor's rhs takes the solver's change to it.
-                const_cast<hkpJacobian1dLinearMotorSchema*>(motor)->m_jac.m_linear0.m_quad[3] =
-                    temp[2].m_deltaRhs + motor->m_jac.m_linear0.m_quad[3];
+                XFNV_M128_F32(const_cast<hkpJacobian1dLinearMotorSchema*>(motor)->m_jac.m_linear0.m_quad, 3) =
+                    temp[2].m_deltaRhs + XFNV_M128_F32(motor->m_jac.m_linear0.m_quad, 3);
                 scaledType = static_cast<int8_t>(motorSchema->m_bytes.m_type);
             }
             exportScaled:
                 {
                     const hkpSolverElemTemp* nextTemp =
                         &temp[hkpJacobianSchema::s_schemaNumSolverElemTemps[scaledType]];
-                    const float rhs = scaledJac->m_linear0.m_quad[3] * dampDivTauDt;
+                    const float rhs = XFNV_M128_F32(scaledJac->m_linear0.m_quad, 3) * dampDivTauDt;
                     const __m128 angVel = _mm_add_ps(
                         _mm_mul_ps(accB->m_scratch123.m_col0.m_quad, scaledJac->m_angular[1].m_quad),
                         _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, scaledJac->m_angular[0].m_quad)
@@ -248,7 +250,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, scaledJac->m_linear0.m_quad));
                     temp = nextTemp;
                     const float velSum =
-                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
+                        (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0)));
                     const float scaledVel = velSum * stepsDt;
                     const float unscaledRhs = rhs - scaledVel;
                     results->m_internalSolverData = unscaledRhs * impulseFactor;
@@ -267,9 +270,11 @@ void hkSolverExport::exportImpulsesAndRhs(
                 const __m128 vel = _mm_add_ps(
                     angVel, _mm_sub_ps(_mm_mul_ps(accA->m_scratch0.m_quad, jac.m_linear[0].m_quad), linVelB)
                 );
-                const float rhs = jac.m_linear[0].m_quad[3] * dampDivTauDt;
+                const float rhs = XFNV_M128_F32(jac.m_linear[0].m_quad, 3) * dampDivTauDt;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(pulley + 1);
-                const float velSum = (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
+                const float velSum =
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0)));
                 const float scaledVel = velSum * stepsDt;
                 results->m_internalSolverData = rhs - scaledVel;
                 results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -290,7 +295,7 @@ void hkSolverExport::exportImpulsesAndRhs(
             }
             exportAngular:
                 {
-                    const float rhs = angularJac->m_angular[1].m_quad[3];
+                    const float rhs = XFNV_M128_F32(angularJac->m_angular[1].m_quad, 3);
                     const __m128 angVelB =
                         _mm_mul_ps(accB->m_scratch123.m_col0.m_quad, angularJac->m_angular[1].m_quad);
                     results->m_impulseApplied = temp->m_impulseApplied;
@@ -298,7 +303,9 @@ void hkSolverExport::exportImpulsesAndRhs(
                         angVelB, _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, angularJac->m_angular[0].m_quad)
                     );
                     results->m_internalSolverData = rhs * deltaTime -
-                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])) * stepsDt;
+                        (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0))) *
+                            stepsDt;
                     results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
                     temp++;
                     continue;
@@ -320,15 +327,15 @@ void hkSolverExport::exportImpulsesAndRhs(
                 impulseFactor = temp[1].m_usedImpulseFactor;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(motor + 1);
                 // The motor's rhs takes the solver's change to it.
-                const_cast<hkpJacobian1dAngularMotorSchema*>(motor)->m_jac.m_angular[1].m_quad[3] =
-                    temp[2].m_deltaRhs + motor->m_jac.m_angular[1].m_quad[3];
+                XFNV_M128_F32(const_cast<hkpJacobian1dAngularMotorSchema*>(motor)->m_jac.m_angular[1].m_quad, 3) =
+                    temp[2].m_deltaRhs + XFNV_M128_F32(motor->m_jac.m_angular[1].m_quad, 3);
                 scaledType = static_cast<int8_t>(motorSchema->m_bytes.m_type);
             }
             exportScaledAngular:
                 {
                     const hkpSolverElemTemp* nextTemp =
                         &temp[hkpJacobianSchema::s_schemaNumSolverElemTemps[scaledType]];
-                    const float rhs = scaledAngularJac->m_angular[1].m_quad[3];
+                    const float rhs = XFNV_M128_F32(scaledAngularJac->m_angular[1].m_quad, 3);
                     const __m128 angVelB =
                         _mm_mul_ps(accB->m_scratch123.m_col0.m_quad, scaledAngularJac->m_angular[1].m_quad);
                     results->m_impulseApplied = temp->m_impulseApplied;
@@ -337,7 +344,9 @@ void hkSolverExport::exportImpulsesAndRhs(
                         angVelB, _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, scaledAngularJac->m_angular[0].m_quad)
                     );
                     const float unscaledRhs = rhs * deltaTime -
-                        (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0])) * stepsDt;
+                        (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0))) *
+                            stepsDt;
                     results->m_internalSolverData = unscaledRhs * impulseFactor;
                     results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
                     continue;
@@ -348,7 +357,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                     reinterpret_cast<const hkpJacobianPairContactSchema*>(schema);
                 const hkpJacDouble2Bil& jac = pair->m_jac;
                 const __m128 linDiff = _mm_sub_ps(accA->m_scratch0.m_quad, accB->m_scratch0.m_quad);
-                const float rhs0 = jac.m_jac0.m_linear0.m_quad[3] * dampDivTauDt;
+                const float rhs0 = XFNV_M128_F32(jac.m_jac0.m_linear0.m_quad, 3) * dampDivTauDt;
                 const __m128 vel0 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac0.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -356,9 +365,10 @@ void hkSolverExport::exportImpulsesAndRhs(
                     ),
                     _mm_mul_ps(jac.m_jac0.m_linear0.m_quad, linDiff)
                 );
-                const float rhs1 = dampDivTauDt * jac.m_jac1.m_linear0.m_quad[3];
+                const float rhs1 = dampDivTauDt * XFNV_M128_F32(jac.m_jac1.m_linear0.m_quad, 3);
                 const float velSum0 =
-                    (_mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]));
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0x55), 0) + XFNV_M128_F32(vel0, 0)));
                 const __m128 vel1 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac1.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -373,7 +383,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                 results->m_impulseApplied = temp[1].m_impulseApplied;
                 schema = reinterpret_cast<const hkpJacobianSchema*>(pair + 1);
                 const float velSum1 =
-                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0]));
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0x55), 0) + XFNV_M128_F32(vel1, 0)));
                 const float scaledVel1 = velSum1 * stepsDt;
                 results->m_internalSolverData = rhs1 - scaledVel1;
                 results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -386,7 +397,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                 const hkpJacDouble2Bil& jac = friction->m_jac;
                 const float factor = temp[2].m_usedImpulseFactor;
                 const __m128 linDiff = _mm_sub_ps(accA->m_scratch0.m_quad, accB->m_scratch0.m_quad);
-                const float rhs0 = jac.m_jac0.m_linear0.m_quad[3] * dampDivFrictionTauDt;
+                const float rhs0 = XFNV_M128_F32(jac.m_jac0.m_linear0.m_quad, 3) * dampDivFrictionTauDt;
                 const __m128 vel0 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac0.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -394,10 +405,11 @@ void hkSolverExport::exportImpulsesAndRhs(
                     ),
                     _mm_mul_ps(jac.m_jac0.m_linear0.m_quad, linDiff)
                 );
-                const float rhs1 = jac.m_jac1.m_linear0.m_quad[3] * dampDivFrictionTauDt;
+                const float rhs1 = XFNV_M128_F32(jac.m_jac1.m_linear0.m_quad, 3) * dampDivFrictionTauDt;
                 const float impulse1 = temp[1].m_impulseApplied;
                 const float velSum0 =
-                    (_mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]));
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0x55), 0) + XFNV_M128_F32(vel0, 0)));
                 const __m128 vel1 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac1.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -414,7 +426,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                 frictionResults[0].m_internalSolverData = unscaledRhs0 * factor;
                 frictionResults[1].m_impulseApplied = impulse1;
                 const float velSum1 =
-                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0]));
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0x55), 0) + XFNV_M128_F32(vel1, 0)));
                 const float scaledVel1 = velSum1 * stepsDt;
                 const float unscaledRhs1 = rhs1 - scaledVel1;
                 frictionResults[1].m_internalSolverData = factor * unscaledRhs1;
@@ -426,10 +439,10 @@ void hkSolverExport::exportImpulsesAndRhs(
                 const hkpJacTriple2Bil1Ang& jac = friction->m_jac;
                 const float factor = temp[3].m_usedImpulseFactor;
                 hkpSolverResults* frictionResults = friction->m_solverResults;
-                const float rhs1 = jac.m_jac1.m_linear0.m_quad[3] * dampDivFrictionTauDt;
+                const float rhs1 = XFNV_M128_F32(jac.m_jac1.m_linear0.m_quad, 3) * dampDivFrictionTauDt;
                 const __m128 linDiff = _mm_sub_ps(accA->m_scratch0.m_quad, accB->m_scratch0.m_quad);
-                const float rhs2 = jac.m_jac2.m_angular[1].m_quad[3];
-                const float rhs0 = jac.m_jac0.m_linear0.m_quad[3] * dampDivFrictionTauDt;
+                const float rhs2 = XFNV_M128_F32(jac.m_jac2.m_angular[1].m_quad, 3);
+                const float rhs0 = XFNV_M128_F32(jac.m_jac0.m_linear0.m_quad, 3) * dampDivFrictionTauDt;
                 const __m128 vel0 = _mm_add_ps(
                     _mm_add_ps(
                         _mm_mul_ps(jac.m_jac0.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad),
@@ -438,7 +451,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                     _mm_mul_ps(jac.m_jac0.m_linear0.m_quad, linDiff)
                 );
                 const float velSum0 =
-                    (_mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]));
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0x55), 0) + XFNV_M128_F32(vel0, 0)));
                 const float scaledVel0 = velSum0 * stepsDt;
                 const __m128 vel1 = _mm_add_ps(
                     _mm_add_ps(
@@ -449,7 +463,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                 );
                 const float unscaledRhs0 = rhs0 - scaledVel0;
                 const float velSum1 =
-                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0]));
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0x55), 0) + XFNV_M128_F32(vel1, 0)));
                 const float scaledRhs0 = unscaledRhs0 * factor;
                 const float impulse1 = temp[1].m_impulseApplied;
                 const __m128 vel2 = _mm_add_ps(
@@ -466,7 +481,9 @@ void hkSolverExport::exportImpulsesAndRhs(
                 frictionResults[1].m_internalSolverData = unscaledRhs1 * factor;
                 frictionResults[2].m_impulseApplied = temp[-2].m_impulseApplied;
                 const float unscaledRhs2 = rhs2 * dampDivFrictionTauDt -
-                    (_mm_shuffle_ps(vel2, vel2, 0xAA)[0] + (_mm_shuffle_ps(vel2, vel2, 0x55)[0] + vel2[0])) * stepsDt;
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel2, vel2, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel2, vel2, 0x55), 0) + XFNV_M128_F32(vel2, 0))) *
+                        stepsDt;
                 frictionResults[2].m_internalSolverData = factor * unscaledRhs2;
                 continue;
             }
@@ -475,15 +492,15 @@ void hkSolverExport::exportImpulsesAndRhs(
                     reinterpret_cast<const hkpJacobian2dRollingFrictionSchema*>(schema);
                 const float factor = temp[2].m_usedImpulseFactor;
                 const int32_t numTemps = hkpJacobianSchema::s_schemaNumSolverElemTemps[type];
-                const float rhs0 = friction->m_jac0.m_angular[1].m_quad[3];
-                const float rhs1 = friction->m_jac1.m_angular[1].m_quad[3];
+                const float rhs0 = XFNV_M128_F32(friction->m_jac0.m_angular[1].m_quad, 3);
+                const float rhs1 = XFNV_M128_F32(friction->m_jac1.m_angular[1].m_quad, 3);
                 const __m128 vel0 = _mm_add_ps(
                     _mm_mul_ps(friction->m_jac0.m_angular[1].m_quad, accB->m_scratch123.m_col0.m_quad),
                     _mm_mul_ps(friction->m_jac0.m_angular[0].m_quad, accA->m_scratch123.m_col0.m_quad)
                 );
                 const float impulse1 = temp[1].m_impulseApplied;
-                const float velSum0 =
-                    _mm_shuffle_ps(vel0, vel0, 0xAA)[0] + (_mm_shuffle_ps(vel0, vel0, 0x55)[0] + vel0[0]);
+                const float velSum0 = XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0xAA), 0) +
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel0, vel0, 0x55), 0) + XFNV_M128_F32(vel0, 0));
                 const __m128 vel1 = _mm_add_ps(
                     _mm_mul_ps(friction->m_jac1.m_angular[1].m_quad, accB->m_scratch123.m_col0.m_quad),
                     _mm_mul_ps(accA->m_scratch123.m_col0.m_quad, friction->m_jac1.m_angular[0].m_quad)
@@ -495,7 +512,9 @@ void hkSolverExport::exportImpulsesAndRhs(
                 frictionResults[0].m_internalSolverData = unscaledRhs0 * factor;
                 frictionResults[1].m_impulseApplied = impulse1;
                 const float unscaledRhs1 = rhs1 * deltaTime -
-                    (_mm_shuffle_ps(vel1, vel1, 0xAA)[0] + (_mm_shuffle_ps(vel1, vel1, 0x55)[0] + vel1[0])) * stepsDt;
+                    (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(vel1, vel1, 0x55), 0) + XFNV_M128_F32(vel1, 0))) *
+                        stepsDt;
                 frictionResults[1].m_internalSolverData = factor * unscaledRhs1;
                 temp += numTemps;
                 continue;
@@ -565,7 +584,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                         const hkpVelocityAccumulator* chainAccB = reinterpret_cast<const hkpVelocityAccumulator*>(
                             reinterpret_cast<const char*>(accums) + offsets[i + 1].m_offset
                         );
-                        const float rhs = jac->m_linear0.m_quad[3] * deltaTime;
+                        const float rhs = XFNV_M128_F32(jac->m_linear0.m_quad, 3) * deltaTime;
                         const __m128 angVel = _mm_add_ps(
                             _mm_mul_ps(chainAccB->m_scratch123.m_col0.m_quad, jac->m_angular[1].m_quad),
                             _mm_mul_ps(chainAccA->m_scratch123.m_col0.m_quad, jac->m_angular[0].m_quad)
@@ -574,7 +593,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                         results->m_impulseApplied = temp->m_impulseApplied;
                         const __m128 vel = _mm_add_ps(angVel, _mm_mul_ps(linDiff, jac->m_linear0.m_quad));
                         const float velSum =
-                            (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
+                            (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                             (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0)));
                         const float scaledVel = velSum * stepsDt;
                         temp++;
                         jac++;
@@ -605,7 +625,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                             reinterpret_cast<const char*>(accums) + offsets[i + 1].m_offset
                         );
                         for (int32_t row = 0; row < 3; row++) {
-                            const float rhs = jac->m_linear0.m_quad[3] * deltaTime;
+                            const float rhs = XFNV_M128_F32(jac->m_linear0.m_quad, 3) * deltaTime;
                             const __m128 angVel = _mm_add_ps(
                                 _mm_mul_ps(jac->m_angular[0].m_quad, chainAccA->m_scratch123.m_col0.m_quad),
                                 _mm_mul_ps(jac->m_angular[1].m_quad, chainAccB->m_scratch123.m_col0.m_quad)
@@ -617,7 +637,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                             temp++;
                             jac++;
                             const float velSum =
-                                (_mm_shuffle_ps(vel, vel, 0xAA)[0] + (_mm_shuffle_ps(vel, vel, 0x55)[0] + vel[0]));
+                                (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0xAA), 0) +
+                                 (XFNV_M128_F32(_mm_shuffle_ps(vel, vel, 0x55), 0) + XFNV_M128_F32(vel, 0)));
                             const float scaledVel = velSum * stepsDt;
                             results->m_internalSolverData = rhs - scaledVel;
                             results = reinterpret_cast<hkpSolverResults*>(reinterpret_cast<char*>(results) + striding);
@@ -656,7 +677,7 @@ void hkSolverExport::exportImpulsesAndRhs(
                         // to the fourth to sixth, 8 bytes apart whatever the striding.
                         hkpSolverResults* angularResults = results + 3;
                         for (int32_t row = 0; row < 3; row++) {
-                            const float linRhs = linJac->m_linear0.m_quad[3] * deltaTime;
+                            const float linRhs = XFNV_M128_F32(linJac->m_linear0.m_quad, 3) * deltaTime;
                             const __m128 linVel = _mm_add_ps(
                                 _mm_add_ps(
                                     _mm_mul_ps(linJac->m_angular[1].m_quad, chainAccB->m_scratch123.m_col0.m_quad),
@@ -669,17 +690,17 @@ void hkSolverExport::exportImpulsesAndRhs(
                             );
                             results->m_impulseApplied = temp[row].m_impulseApplied;
                             const float linVelSum =
-                                (_mm_shuffle_ps(linVel, linVel, 0xAA)[0] +
-                                 (_mm_shuffle_ps(linVel, linVel, 0x55)[0] + linVel[0]));
+                                (XFNV_M128_F32(_mm_shuffle_ps(linVel, linVel, 0xAA), 0) +
+                                 (XFNV_M128_F32(_mm_shuffle_ps(linVel, linVel, 0x55), 0) + XFNV_M128_F32(linVel, 0)));
                             const float scaledLinVel = linVelSum * stepsDt;
                             results->m_internalSolverData = linRhs - scaledLinVel;
                             const __m128 angVel = _mm_add_ps(
                                 _mm_mul_ps(angJac->m_angular[1].m_quad, chainAccB->m_scratch123.m_col0.m_quad),
                                 _mm_mul_ps(angJac->m_angular[0].m_quad, chainAccA->m_scratch123.m_col0.m_quad)
                             );
-                            float angRhs = angJac->m_angular[1].m_quad[3] * deltaTime -
-                                (_mm_shuffle_ps(angVel, angVel, 0xAA)[0] +
-                                 (_mm_shuffle_ps(angVel, angVel, 0x55)[0] + angVel[0])) *
+                            float angRhs = XFNV_M128_F32(angJac->m_angular[1].m_quad, 3) * deltaTime -
+                                (XFNV_M128_F32(_mm_shuffle_ps(angVel, angVel, 0xAA), 0) +
+                                 (XFNV_M128_F32(_mm_shuffle_ps(angVel, angVel, 0x55), 0) + XFNV_M128_F32(angVel, 0))) *
                                     stepsDt;
                             angularResults[row].m_impulseApplied = temp[3 + row].m_impulseApplied;
                             angularResults[row].m_internalSolverData = angRhs;
@@ -690,7 +711,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                             const hkp1dMotorSolverInfo& motor = status->m_motorInfos[row];
                             if ((status->m_broken >> (2 * row) & 3) ==
                                 hkp3dAngularMotorSolverInfo::MOTOR_BROKEN_MIN_BREACHED) {
-                                const float limit = motor.m_minImpulsePerSubstep / angJac->m_angular[0].m_quad[3];
+                                const float limit =
+                                    motor.m_minImpulsePerSubstep / XFNV_M128_F32(angJac->m_angular[0].m_quad, 3);
                                 const float limitRhs = limit * info.m_deltaTime / motor.m_tau * 1.5;
                                 if (!(limitRhs < angRhs)) {
                                     angRhs = limitRhs;
@@ -699,7 +721,8 @@ void hkSolverExport::exportImpulsesAndRhs(
                             }
                             if ((status->m_broken >> (2 * row) & 3) ==
                                 hkp3dAngularMotorSolverInfo::MOTOR_BROKEN_MAX_BREACHED) {
-                                const float limit = motor.m_maxImpulsePerSubstep / angJac->m_angular[0].m_quad[3];
+                                const float limit =
+                                    motor.m_maxImpulsePerSubstep / XFNV_M128_F32(angJac->m_angular[0].m_quad, 3);
                                 const float limitRhs = limit * info.m_deltaTime / motor.m_tau * 1.5;
                                 if (limitRhs > angRhs) {
                                     angularResults[row].m_internalSolverData = angRhs;

@@ -97,6 +97,7 @@
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
+#include <cstring>
 
 pLockLevelNames_t pLockLevelNames{&sLockLevelNameVeryEasy, &sLockLevelNameEasy,     &sLockLevelNameAverage,
                                   &sLockLevelNameHard,     &sLockLevelNameVeryHard, &sLockLevelNameImpossible};
@@ -490,12 +491,12 @@ void ExtraDecalRefs::SetRefDecalData(TESObjectREFR* apRef, const NiPoint3& aInte
         REF_DECAL_DATA* pItem = pData;
         DecalRefList.AddHead(pItem);
     }
-    __builtin_memcpy(&pData->Intersect.x, &aIntersect.x, sizeof(pData->Intersect.x));
-    __builtin_memcpy(&pData->Intersect.y, &aIntersect.y, sizeof(pData->Intersect.y));
-    __builtin_memcpy(&pData->Intersect.z, &aIntersect.z, sizeof(pData->Intersect.z));
-    __builtin_memcpy(&pData->Normal.x, &aNormal.x, sizeof(pData->Normal.x));
-    __builtin_memcpy(&pData->Normal.y, &aNormal.y, sizeof(pData->Normal.y));
-    __builtin_memcpy(&pData->Normal.z, &aNormal.z, sizeof(pData->Normal.z));
+    std::memcpy(&pData->Intersect.x, &aIntersect.x, sizeof(pData->Intersect.x));
+    std::memcpy(&pData->Intersect.y, &aIntersect.y, sizeof(pData->Intersect.y));
+    std::memcpy(&pData->Intersect.z, &aIntersect.z, sizeof(pData->Intersect.z));
+    std::memcpy(&pData->Normal.x, &aNormal.x, sizeof(pData->Normal.x));
+    std::memcpy(&pData->Normal.y, &aNormal.y, sizeof(pData->Normal.y));
+    std::memcpy(&pData->Normal.z, &aNormal.z, sizeof(pData->Normal.z));
 }
 
 int32_t ExtraDecalRefs::ClearDecalData() {

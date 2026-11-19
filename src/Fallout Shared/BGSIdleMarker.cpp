@@ -12,6 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "xfnv/Compiler.h"
 
 // Reads the marker's chunks: the idle collection's flags, count, idle list and timer, and a package target built from
 // the PTDT chunk and destroyed again without being kept, as the game does.
@@ -26,7 +27,7 @@ bool BGSIdleMarker::Load(TESFile* apFile) {
         switch (eChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

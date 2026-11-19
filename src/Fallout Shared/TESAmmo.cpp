@@ -31,6 +31,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> iMaxArrowsInQuiver("iMaxArrowsInQuiver", 20);
@@ -51,7 +52,7 @@ bool TESAmmo::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;
@@ -65,7 +66,7 @@ bool TESAmmo::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(
@@ -109,14 +110,14 @@ bool TESAmmo::Load(TESFile* apFile) {
                 break;
             case ONAM_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 cDesc.Set(pBuffer, 0);
                 break;
             }
             case QNAM_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 cAbbrev.Set(pBuffer, 0);
                 break;

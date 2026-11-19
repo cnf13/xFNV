@@ -96,7 +96,7 @@ public:
     // A pointer or integer key or value as the map's integer, and back.
     template <typename T>
     static Storage ToMapInt(T x) {
-        if constexpr (__is_pointer(T)) {
+        if constexpr (std::is_pointer_v<T>) {
             return static_cast<Storage>(reinterpret_cast<uintptr_t>(x));
         }
         else {
@@ -106,7 +106,7 @@ public:
 
     template <typename T>
     static T FromMapInt(Storage x) {
-        if constexpr (__is_pointer(T)) {
+        if constexpr (std::is_pointer_v<T>) {
             return reinterpret_cast<T>(static_cast<uintptr_t>(x));
         }
         else {

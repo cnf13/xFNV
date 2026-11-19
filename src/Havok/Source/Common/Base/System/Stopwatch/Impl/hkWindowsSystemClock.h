@@ -2,8 +2,7 @@
 
 #include "Havok/Source/Common/Base/System/Stopwatch/hkSystemClock.h"
 #include "SDK/Windows/winbase.h"
-
-#include <x86intrin.h>
+#include "xfnv/Compiler.h"
 
 // The SDK's getTicksPerSecond keeps it as its function-local static freq.
 inline LARGE_INTEGER freq_0{};

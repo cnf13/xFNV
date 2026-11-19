@@ -23,6 +23,7 @@
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/hkDebugDisplayHandler.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -172,7 +173,8 @@ void hkDebugDisplay::displayRayModelSpace(
     v8.m_vec.m_quad = worldFromModel.m_rotation.m_vec.m_quad;
     __m128 v9 = _mm_mul_ps(direction.m_quad, v8.m_vec.m_quad);
     __m128 v10 = _mm_shuffle_ps(v9, v9, 170);
-    v10[0] = v10[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]);
+    XFNV_M128_F32(v10, 0) =
+        XFNV_M128_F32(v10, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0));
     __m128 v11 = _mm_shuffle_ps(v8.m_vec.m_quad, v8.m_vec.m_quad, 255);
     __m128 v12 = _mm_add_ps(
         _mm_mul_ps(
@@ -567,7 +569,7 @@ void hkDebugDisplay::displayStar(__m128* a1, float a2, int32_t a3, int32_t a4, i
     do {
         hkVector4 end;
         hkVector4 start;
-        v10[v6] = a2;
+        XFNV_M128_F32(v10, v6) = a2;
         __m128 v7 = _mm_sub_ps(*a1, v10);
         start.m_quad = _mm_add_ps(*a1, v10);
         end.m_quad = v7;
@@ -596,7 +598,7 @@ void hkDebugDisplay::displayPlane(__m128* a1, __m128* a2, uint32_t a3, int32_t a
     hkVector4 v36;
     hkVector4 dir;
     __m128 v7 = *a1;
-    *reinterpret_cast<float*>(&v30) = -(*a1)[3];
+    *reinterpret_cast<float*>(&v30) = -XFNV_M128_F32((*a1), 3);
     __m128 v8 = _mm_add_ps(
         _mm_mul_ps(
             _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v30)), _mm_set_ss(std::bit_cast<float>(v30)), 0), *a1
@@ -606,8 +608,8 @@ void hkDebugDisplay::displayPlane(__m128* a1, __m128* a2, uint32_t a3, int32_t a
     __m128 v9 = _mm_and_ps(*a1, hkVector4_setAbs4_absMask);
     __m128 v33 = v9;
     v36.m_quad = v8;
-    if (!(v9[1] > static_cast<double>(v9[0]))) {
-        if (!(v33[2] > static_cast<double>(v9[0]))) {
+    if (!(XFNV_M128_F32(v9, 1) > static_cast<double>(XFNV_M128_F32(v9, 0)))) {
+        if (!(XFNV_M128_F32(v33, 2) > static_cast<double>(XFNV_M128_F32(v9, 0)))) {
             v10 = 0;
         }
         else {
@@ -615,7 +617,7 @@ void hkDebugDisplay::displayPlane(__m128* a1, __m128* a2, uint32_t a3, int32_t a
         }
     }
     else {
-        if (!(v33[2] > static_cast<double>(v9[1]))) {
+        if (!(XFNV_M128_F32(v33, 2) > static_cast<double>(XFNV_M128_F32(v9, 1)))) {
             v10 = 1;
         }
         else {
@@ -627,19 +629,23 @@ void hkDebugDisplay::displayPlane(__m128* a1, __m128* a2, uint32_t a3, int32_t a
     __m128 v12 = _mm_shuffle_ps(v7, v7, 210);
     int32_t v13 = 1;
     int32_t v31 = 4;
-    v33[(v10 + 1) % 3] = 1.0f;
+    XFNV_M128_F32(v33, (v10 + 1) % 3) = 1.0f;
     __m128 v14 =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v33, v33, 210), v11), _mm_mul_ps(_mm_shuffle_ps(v33, v33, 201), v12));
     __m128 v15 = _mm_mul_ps(v14, v14);
     __m128 v16 = _mm_shuffle_ps(v15, v15, 170);
     __m128 v17 = _mm_set_ss(std::bit_cast<float>(a3));
-    v16[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss((v16[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])))));
+    XFNV_M128_F32(v16, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(
+        _mm_set_ss((XFNV_M128_F32(v16, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0))))
+    ));
     __m128 v18 = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), v14), _mm_shuffle_ps(v17, v17, 0));
     __m128 v19 =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v18, v18, 201), v12), _mm_mul_ps(_mm_shuffle_ps(v18, v18, 210), v11));
     __m128 v20 = _mm_mul_ps(v19, v19);
     __m128 v21 = _mm_shuffle_ps(v20, v20, 170);
-    v21[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss((v21[0] + (_mm_shuffle_ps(v20, v20, 85)[0] + v20[0])))));
+    XFNV_M128_F32(v21, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(
+        _mm_set_ss((XFNV_M128_F32(v21, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v20, v20, 85), 0) + XFNV_M128_F32(v20, 0))))
+    ));
     __m128 m_quad = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(v21, v21, 0), v19), _mm_shuffle_ps(v17, v17, 0));
     v33 = v18;
     for (dir.m_quad = m_quad;; m_quad = dir.m_quad) {
@@ -736,24 +742,24 @@ void displayFrameQs(hkDebugDisplay* a1, int32_t edx0, const hkQsTransform* a3, u
     hkVector4 v19;
     a3a.m_quad = _mm_setzero_ps();
     v13.setTransformedPos(*a3, a3a);
-    v6[0] = 0.0f;
-    v7[0] = 0.0f;
+    XFNV_M128_F32(v6, 0) = 0.0f;
+    XFNV_M128_F32(v7, 0) = 0.0f;
     __m128 v9 = _mm_unpacklo_ps(
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(a4)), v7),
         _mm_unpacklo_ps(v6, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
     );
     a3a.m_quad = v9;
     v14.setTransformedPos(*a3, a3a);
-    v9[0] = 0.0f;
-    v7[0] = 0.0f;
+    XFNV_M128_F32(v9, 0) = 0.0f;
+    XFNV_M128_F32(v7, 0) = 0.0f;
     __m128 v10 = _mm_unpacklo_ps(
         _mm_set_ss(std::bit_cast<float>(a4)), _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
     );
     __m128 v11 = _mm_unpacklo_ps(_mm_unpacklo_ps(v9, v7), v10);
     a3a.m_quad = v11;
     v15.setTransformedPos(*a3, a3a);
-    v11[0] = 0.0f;
-    v10[0] = 0.0f;
+    XFNV_M128_F32(v11, 0) = 0.0f;
+    XFNV_M128_F32(v10, 0) = 0.0f;
     a3a.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v11, _mm_set_ss(std::bit_cast<float>(a4))),
         _mm_unpacklo_ps(v10, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))

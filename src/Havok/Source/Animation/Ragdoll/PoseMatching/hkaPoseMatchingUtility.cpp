@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -25,14 +26,14 @@ void hkRemoveTwist(const hkVector4& direction, hkQuaternion& rotationInOut) {
     v24.m_vec.m_quad = _mm_setzero_ps();
     __m128 v3 = _mm_and_ps(v2.m_quad, hkVector4_setAbs4_absMask);
     result.m_vec.m_quad = v3;
-    if (!(v3[1] > static_cast<double>(v3[0]))) {
-        if (!(result.m_vec.m_quad[2] > static_cast<double>(v3[0]))) {
+    if (!(XFNV_M128_F32(v3, 1) > static_cast<double>(XFNV_M128_F32(v3, 0)))) {
+        if (!(XFNV_M128_F32(result.m_vec.m_quad, 2) > static_cast<double>(XFNV_M128_F32(v3, 0)))) {
             v4 = 0;
             goto LABEL_7;
         }
         goto LABEL_5;
     }
-    if (result.m_vec.m_quad[2] > static_cast<double>(v3[1])) {
+    if (XFNV_M128_F32(result.m_vec.m_quad, 2) > static_cast<double>(XFNV_M128_F32(v3, 1))) {
     LABEL_5:;
         v4 = 2;
         goto LABEL_7;
@@ -41,7 +42,7 @@ void hkRemoveTwist(const hkVector4& direction, hkQuaternion& rotationInOut) {
 LABEL_7:;
     __m128 m_quad = rotationInOut.m_vec.m_quad;
     __m128 v6 = _mm_shuffle_ps(rotationInOut.m_vec.m_quad, rotationInOut.m_vec.m_quad, 255);
-    v24.m_vec.m_quad[(v4 + 1) % 3] = 1.0f;
+    XFNV_M128_F32(v24.m_vec.m_quad, (v4 + 1) % 3) = 1.0f;
     __m128 v7 = _mm_mul_ps(m_quad, v24.m_vec.m_quad);
     __m128 v8 = _mm_add_ss(_mm_shuffle_ps(v7, v7, 170), _mm_add_ss(_mm_shuffle_ps(v7, v7, 85), v7));
     __m128 v9 = _mm_add_ps(
@@ -137,33 +138,33 @@ void hkaPoseMatchingUtility::computeOrientation(const hkQsTransform* poseModelSp
     v47.m_quad = poseModelSpace[m_rootBoneIdx].m_translation.m_quad;
     __m128 v3 = _mm_sub_ps(poseModelSpace[m_otherBoneIdx].m_translation.m_quad, v47.m_quad);
     __m128 v4 = _mm_mul_ps(v3, v3);
-    float v5 = _mm_shuffle_ps(v4, v4, 85)[0] + v4[0];
+    float v5 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0);
     __m128 v6 = _mm_shuffle_ps(v4, v4, 170);
-    v6[0] = v6[0] + v5;
-    float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v6[0])));
-    v8[0] = 0.0f;
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) + v5;
+    float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v6, 0))));
+    XFNV_M128_F32(v8, 0) = 0.0f;
     int32_t m_anotherBoneIdx = this->m_anotherBoneIdx;
     __m128 v11 = _mm_setzero_ps();
-    v11[0] = 0.5f;
+    XFNV_M128_F32(v11, 0) = 0.5f;
     const hkQsTransform* v13 = &poseModelSpace[m_anotherBoneIdx];
-    float v14 = 3.0f - ((v6[0] * v7) * v7);
+    float v14 = 3.0f - ((XFNV_M128_F32(v6, 0) * v7) * v7);
     __m128 v15 = _mm_cmpeq_ss(v6, v8);
     __m128 v16 = v11;
-    v16[0] = (v11[0] * v7) * v14;
+    XFNV_M128_F32(v16, 0) = (XFNV_M128_F32(v11, 0) * v7) * v14;
     __m128 v17 = _mm_andnot_ps(v15, v16);
     __m128 v43 = v13->m_translation.m_quad;
     v18.m_quad = _mm_mul_ps(_mm_shuffle_ps(v17, v17, 0), v3);
     __m128 v19 = _mm_sub_ps(v43, v47.m_quad);
     __m128 v20 = _mm_mul_ps(v19, v19);
-    v42[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
-    float v21 = _mm_shuffle_ps(v20, v20, 85)[0] + v20[0];
+    XFNV_M128_F32(v42, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v21 = XFNV_M128_F32(_mm_shuffle_ps(v20, v20, 85), 0) + XFNV_M128_F32(v20, 0);
     __m128 v22 = _mm_shuffle_ps(v20, v20, 170);
-    v22[0] = v22[0] + v21;
-    float v23 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v22[0])));
+    XFNV_M128_F32(v22, 0) = XFNV_M128_F32(v22, 0) + v21;
+    float v23 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v22, 0))));
     __m128 v24 = _mm_cmpeq_ss(v22, v8);
-    v8[0] = 3.0f - ((v22[0] * v23) * v23);
+    XFNV_M128_F32(v8, 0) = 3.0f - ((XFNV_M128_F32(v22, 0) * v23) * v23);
     __m128 v25 = v11;
-    v25[0] = (v11[0] * v23) * v8[0];
+    XFNV_M128_F32(v25, 0) = (XFNV_M128_F32(v11, 0) * v23) * XFNV_M128_F32(v8, 0);
     __m128 v26 = _mm_andnot_ps(v24, v25);
     __m128 v27 = _mm_mul_ps(_mm_shuffle_ps(v26, v26, 0), v19);
     __m128 v44 = _mm_shuffle_ps(v18.m_quad, v18.m_quad, 201);
@@ -171,26 +172,27 @@ void hkaPoseMatchingUtility::computeOrientation(const hkQsTransform* poseModelSp
     __m128 v29 =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v27, v27, 201), v28), _mm_mul_ps(_mm_shuffle_ps(v27, v27, 210), v44));
     __m128 v30 = _mm_mul_ps(v29, v29);
-    float v31 = _mm_shuffle_ps(v30, v30, 85)[0] + v30[0];
+    float v31 = XFNV_M128_F32(_mm_shuffle_ps(v30, v30, 85), 0) + XFNV_M128_F32(v30, 0);
     __m128 v32 = _mm_shuffle_ps(v30, v30, 170);
-    v32[0] = v32[0] + v31;
-    v47.m_quad[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v32[0])));
+    XFNV_M128_F32(v32, 0) = XFNV_M128_F32(v32, 0) + v31;
+    XFNV_M128_F32(v47.m_quad, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v32, 0))));
     __m128 v33 = _mm_cmpeq_ss(v32, v42);
-    v8[0] = 3.0f - ((v32[0] * v47.m_quad[0]) * v47.m_quad[0]);
+    XFNV_M128_F32(v8, 0) =
+        3.0f - ((XFNV_M128_F32(v32, 0) * XFNV_M128_F32(v47.m_quad, 0)) * XFNV_M128_F32(v47.m_quad, 0));
     __m128 v34 = v11;
-    v34[0] = (v11[0] * v47.m_quad[0]) * v8[0];
+    XFNV_M128_F32(v34, 0) = (XFNV_M128_F32(v11, 0) * XFNV_M128_F32(v47.m_quad, 0)) * XFNV_M128_F32(v8, 0);
     __m128 v35 = _mm_andnot_ps(v33, v34);
     __m128 v36 = _mm_mul_ps(_mm_shuffle_ps(v35, v35, 0), v29);
     __m128 v37 =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v36, v36, 201), v28), _mm_mul_ps(_mm_shuffle_ps(v36, v36, 210), v44));
     __m128 v38 = _mm_mul_ps(v37, v37);
-    v33[0] = _mm_shuffle_ps(v38, v38, 85)[0] + v38[0];
+    XFNV_M128_F32(v33, 0) = XFNV_M128_F32(_mm_shuffle_ps(v38, v38, 85), 0) + XFNV_M128_F32(v38, 0);
     __m128 m_quad_1 = _mm_shuffle_ps(v38, v38, 170);
-    m_quad_1[0] = m_quad_1[0] + v33[0];
+    XFNV_M128_F32(m_quad_1, 0) = XFNV_M128_F32(m_quad_1, 0) + XFNV_M128_F32(v33, 0);
     // The rsqrt is kept in v45 until hkQuaternion::set overwrites it.
     v45.m_vec.m_quad = _mm_rsqrt_ss(m_quad_1);
-    float v39 = v45.m_vec.m_quad[0];
-    v11[0] = (v11[0] * v39) * (3.0f - ((m_quad_1[0] * v39) * v39));
+    float v39 = XFNV_M128_F32(v45.m_vec.m_quad, 0);
+    XFNV_M128_F32(v11, 0) = (XFNV_M128_F32(v11, 0) * v39) * (3.0f - ((XFNV_M128_F32(m_quad_1, 0) * v39) * v39));
     __m128 v41 = _mm_andnot_ps(_mm_cmpeq_ss(m_quad_1, v42), v11);
     r.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v41, v41, 0), v37);
     r.m_col1.m_quad = _mm_sub_ps(
@@ -214,7 +216,7 @@ int32_t hkaPoseMatchingUtility::findBestCandidatePoseIndex(const hkQsTransform* 
         do {
             __m128 v8 = _mm_mul_ps(m_candidatePoses.m_data[v4].m_reference.m_vec.m_quad, m_quad);
             __m128 v9 = _mm_add_ps(_mm_shuffle_ps(v8, v8, 78), v8);
-            float v11 = std::fabs((double)(_mm_shuffle_ps(v9, v9, 177)[0] + v9[0]));
+            float v11 = std::fabs((double)(XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 177), 0) + XFNV_M128_F32(v9, 0)));
             float v12 = 1.0 - v11;
             if (error > static_cast<double>(v12)) {
                 error = v12;

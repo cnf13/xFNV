@@ -27,6 +27,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 SettingT<GameSettingCollection> sArmorWeightLight("sArmorWeightLight", "Light");
 SettingT<GameSettingCollection> sArmorWeightHeavy("sArmorWeightHeavy", "Heavy");
@@ -56,7 +57,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);
@@ -111,7 +112,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             case MODL_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -121,7 +122,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case MOD2_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -131,7 +132,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case MOD3_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -141,7 +142,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case MOD4_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -151,7 +152,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case BMCT_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -197,7 +198,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
                 break;
             case ICON_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -206,7 +207,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case ICO2_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -215,7 +216,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case MICO_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -224,7 +225,7 @@ bool TESObjectARMO::Load(TESFile* apFile) {
             }
             case MIC2_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);

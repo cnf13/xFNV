@@ -23,6 +23,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -77,7 +78,9 @@ hkpPlaneShape::hkpPlaneShape(const hkVector4& plane, const hkAabb& aabb)
 hkpPlaneShape::hkpPlaneShape(const hkVector4& direction, const hkVector4& center, const hkVector4& halfExtents)
   : hkpHeightFieldShape(HK_SHAPE_PLANE), m_plane(direction), m_aabbCenter(center), m_aabbHalfExtents(halfExtents) {
     __m128 v5 = _mm_mul_ps(direction.m_quad, center.m_quad);
-    m_plane.m_quad[3] = -(_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]));
+    XFNV_M128_F32(m_plane.m_quad, 3) =
+        -(XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+          (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0)));
 }
 
 hkpPlaneShape::~hkpPlaneShape() {}
@@ -177,14 +180,15 @@ void hkpPlaneShape::collideSpheres(
 ) const {
     double v8;
     hkSphere* m_spheres = input.m_spheres;
-    for (int32_t i = input.m_numSpheres - 1; i >= 0; outputArray[-1].m_quad[3] = v8) {
+    for (int32_t i = input.m_numSpheres - 1; i >= 0; XFNV_M128_F32(outputArray[-1].m_quad, 3) = v8) {
         hkVector4 v6;
         *outputArray = m_plane;
         v6.m_quad = m_plane.m_quad;
         __m128 v7 = _mm_mul_ps(m_spheres->m_pos.m_quad, v6.m_quad);
-        v8 = ((_mm_shuffle_ps(v7, v7, 170)[0] + _mm_shuffle_ps(v6.m_quad, v6.m_quad, 255)[0]) +
-              (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) -
-            m_spheres->m_pos.m_quad[3];
+        v8 = ((XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+               XFNV_M128_F32(_mm_shuffle_ps(v6.m_quad, v6.m_quad, 255), 0)) +
+              (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0))) -
+            XFNV_M128_F32(m_spheres->m_pos.m_quad, 3);
         ++outputArray;
         ++m_spheres;
         --i;
@@ -202,14 +206,15 @@ void hkpPlaneShape::castSphere(
     v4.m_quad = m_plane.m_quad;
     __m128 v5 = _mm_mul_ps(v4.m_quad, inputLocal.m_from.m_quad);
     double v6 =
-        ((_mm_shuffle_ps(v5, v5, 170)[0] + _mm_shuffle_ps(v4.m_quad, v4.m_quad, 255)[0]) +
-         (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]));
+        ((XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) + XFNV_M128_F32(_mm_shuffle_ps(v4.m_quad, v4.m_quad, 255), 0)) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0)));
     v7.m_quad = inputLocal.m_to.m_quad;
     double m_radius = inputLocal.m_radius;
     __m128 v9 = _mm_mul_ps(v4.m_quad, v7.m_quad);
     float v16 = v6 - m_radius;
-    float v18 = ((_mm_shuffle_ps(v9, v9, 170)[0] + _mm_shuffle_ps(v4.m_quad, v4.m_quad, 255)[0]) +
-                 (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0])) -
+    float v18 =
+        ((XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 170), 0) + XFNV_M128_F32(_mm_shuffle_ps(v4.m_quad, v4.m_quad, 255), 0)) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0))) -
         m_radius;
     if (!(v18 >= 0.0f)) {
         double v10 = v16;

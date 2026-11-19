@@ -21,6 +21,7 @@
 #include "Fallout Shared/TESWorldSpace.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Interface/Menus/HUDMainMenu.h"
+#include "xfnv/Compiler.h"
 
 TESRegion::TESRegion()
   : TESForm(), pDataList(new TESRegionDataList(true)), pPointLists(new BSSimpleList<TESRegionPointList*>()),
@@ -78,7 +79,7 @@ bool TESRegion::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is terminated first.
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);

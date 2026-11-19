@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -61,11 +62,11 @@ void hkQsTransform::get4x4ColumnMajor(float* d) const {
     hkTransform v6;
     hkRotation arA;
     arA.set(m_rotation);
-    double v3 = m_scale.m_quad[0u];
+    double v3 = XFNV_M128_F32(m_scale.m_quad, 0u);
     std::memset(&arB, 0, sizeof(arB));
-    arB.m_col0.m_quad[0] = v3;
-    arB.m_col1.m_quad[1] = m_scale.m_quad[1];
-    arB.m_col2.m_quad[2] = m_scale.m_quad[2];
+    XFNV_M128_F32(arB.m_col0.m_quad, 0) = v3;
+    XFNV_M128_F32(arB.m_col1.m_quad, 1) = XFNV_M128_F32(m_scale.m_quad, 1);
+    XFNV_M128_F32(arB.m_col2.m_quad, 2) = XFNV_M128_F32(m_scale.m_quad, 2);
     v5.setMul(arA, arB);
     v6.m_rotation = v5;
     v6.m_translation = m_translation;
@@ -98,7 +99,7 @@ bool* hkQsTransform::isApproximatelyEqual(bool* a1, __m128* a2, uint32_t a3) {
         __m128 v7 = a2[1];
         __m128 v8 = _mm_mul_ps(v6.m_vec.m_quad, v7);
         __m128 v9 = _mm_add_ps(_mm_shuffle_ps(v8, v8, 78), v8);
-        if ((_mm_shuffle_ps(v9, v9, 177)[0] + v9[0]) < 0.0f) {
+        if ((XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 177), 0) + XFNV_M128_F32(v9, 0)) < 0.0f) {
             v6.m_vec.m_quad = _mm_mul_ps(
                 _mm_shuffle_ps(
                     _mm_set_ss(std::bit_cast<float>(0xBF800000u)), _mm_set_ss(std::bit_cast<float>(0xBF800000u)), 0

@@ -7,6 +7,7 @@
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BSStringT<char> TESDescription::strCurrentDescription;
 
@@ -90,7 +91,7 @@ void TESDescription::LoadDescription(TESForm* apForm, CHUNK_ID aeChunk) {
         if (uiChunk == (uint32_t)aeChunk) {
             // A 16-byte aligned stack buffer of the chunk's size, read whole.
             uint32_t uiChunkSize = pFile->GetChunkSize();
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
             // An empty chunk leaves the buffer unwritten, so it is terminated first.
             pBuffer[0] = '\0';
             pFile->GetChunkData(pBuffer, 0);

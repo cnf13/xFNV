@@ -61,6 +61,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -186,7 +187,7 @@ bool TESWorldSpace::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pMessage = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pMessage = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pMessage[0] = '\0';
                 apFile->GetChunkData(pMessage, 0x200);
@@ -320,7 +321,7 @@ bool TESWorldSpace::Load(TESFile* apFile) {
                 uint32_t isize = apFile->GetChunkSize();
                 if (isize) {
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* ptemp = static_cast<char*>(__builtin_alloca_with_align(isize, 128));
+                    char* ptemp = static_cast<char*>(XFNV_ALLOCA16(isize));
                     apFile->GetChunkData(ptemp, isize);
                     CanopyShadowTexture.SetTextureName(ptemp);
                 }
@@ -330,7 +331,7 @@ bool TESWorldSpace::Load(TESFile* apFile) {
                 uint32_t isize = apFile->GetChunkSize();
                 if (isize) {
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* ptemp = static_cast<char*>(__builtin_alloca_with_align(isize, 128));
+                    char* ptemp = static_cast<char*>(XFNV_ALLOCA16(isize));
                     apFile->GetChunkData(ptemp, isize);
                     WaterNoiseTexture.SetTextureName(ptemp);
                 }

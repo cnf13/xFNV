@@ -39,6 +39,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -127,12 +128,13 @@ void bhkLiquidAction::LoadBinary(NiStream& arStream) {
         bool bCreated;
         hkLiquidActionCinfo& rInfo = static_cast<hkLiquidActionCinfo&>(CreateCinfo(bCreated));
         rInfo.fInitialStickForce =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fInitialStickForce)));
-        rInfo.fStickStrength = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fStickStrength)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fInitialStickForce)));
+        rInfo.fStickStrength =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fStickStrength)));
         rInfo.fNeighborDistance =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fNeighborDistance)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fNeighborDistance)));
         rInfo.fNeighborStrength =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fNeighborStrength)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fNeighborStrength)));
     }
 }
 
@@ -143,22 +145,24 @@ void bhkLiquidAction::SaveBinary(NiStream& arStream) {
     hkLiquidActionCinfo& rInfo = static_cast<hkLiquidActionCinfo&>(CreateCinfo(bCreated));
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         rInfo.fInitialStickForce =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fInitialStickForce)));
-        rInfo.fStickStrength = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fStickStrength)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fInitialStickForce)));
+        rInfo.fStickStrength =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fStickStrength)));
         rInfo.fNeighborDistance =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fNeighborDistance)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fNeighborDistance)));
         rInfo.fNeighborStrength =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fNeighborStrength)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fNeighborStrength)));
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         rInfo.fInitialStickForce =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fInitialStickForce)));
-        rInfo.fStickStrength = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fStickStrength)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fInitialStickForce)));
+        rInfo.fStickStrength =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fStickStrength)));
         rInfo.fNeighborDistance =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fNeighborDistance)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fNeighborDistance)));
         rInfo.fNeighborStrength =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.fNeighborStrength)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.fNeighborStrength)));
     }
 }
 
@@ -350,7 +354,7 @@ void bhkLiquidAction::Update(float afDelta) {
                     hkContactPoint point;
                     point.m_position.m_quad = pPoint->m_position.m_quad;
                     point.m_separatingNormal.m_quad = pPoint->m_separatingNormal.m_quad;
-                    if (point.m_separatingNormal.m_quad[2] < 0.5f) {
+                    if (XFNV_M128_F32(point.m_separatingNormal.m_quad, 2) < 0.5f) {
                         HK2NI(StickPoint, point.m_position);
                         HK2NINS(StickNormal, point.m_separatingNormal);
                         velocity.set(zero, zero, zero, zero);
@@ -406,9 +410,9 @@ void bhkLiquidAction::Update(float afDelta) {
                         pneighborEntity ? static_cast<bhkRigidBody*>(pneighborEntity->getUserData()) : nullptr;
                     hkVector4 kNeighborPosHK;
                     const hkVector4& rkNeighborPosHK = pneighbor->GetPosition(kNeighborPosHK);
-                    float fX = rkNeighborPosHK.m_quad[0];
-                    float fY = rkNeighborPosHK.m_quad[1];
-                    float fZ = rkNeighborPosHK.m_quad[2];
+                    float fX = XFNV_M128_F32(rkNeighborPosHK.m_quad, 0);
+                    float fY = XFNV_M128_F32(rkNeighborPosHK.m_quad, 1);
+                    float fZ = XFNV_M128_F32(rkNeighborPosHK.m_quad, 2);
                     NiPoint3 neighborPos;
                     neighborPos.x = fX * bhkConvert::fHk2BSScaleSC;
                     neighborPos.y = fY * bhkConvert::fHk2BSScaleSC;

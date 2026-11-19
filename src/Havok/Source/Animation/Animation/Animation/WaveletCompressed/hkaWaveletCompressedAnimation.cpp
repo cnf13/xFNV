@@ -467,7 +467,7 @@ void hkaWaveletCompressedAnimation::handleEndian() {
     }
     uint16_t* staticMask = reinterpret_cast<uint16_t*>(data + 4);
     for (int32_t i = 0; i < m_numberOfTransformTracks + m_numberOfFloatTracks; ++i) {
-        staticMask[i] = __builtin_bswap16(staticMask[i]);
+        staticMask[i] = std::byteswap<uint16_t>(staticMask[i]);
     }
 
     // The SDK's AnalysisStats constructor zeroes every count and the ratio.
@@ -522,7 +522,7 @@ void hkaWaveletCompressedAnimation::handleEndian() {
 
     uint32_t* blockIndex = reinterpret_cast<uint32_t*>(m_dataBuffer.m_data + m_blockIndexIdx);
     for (uint32_t i = 0; i < m_blockIndexSize; ++i) {
-        blockIndex[i] = __builtin_bswap32(blockIndex[i]);
+        blockIndex[i] = std::byteswap<uint32_t>(blockIndex[i]);
     }
 }
 

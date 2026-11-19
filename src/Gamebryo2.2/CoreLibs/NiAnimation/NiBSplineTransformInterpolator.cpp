@@ -14,6 +14,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
+#include <cstring>
+
 NiRTTI NiBSplineTransformInterpolator::ms_RTTI("NiBSplineTransformInterpolator", &NiBSplineInterpolator::ms_RTTI);
 
 // The transform value starts invalid.
@@ -41,7 +43,7 @@ NiObject* NiBSplineTransformInterpolator::CreateClone(NiCloningProcess& kCloning
     NiBSplineTransformInterpolator* v4;
     v4 = new NiBSplineTransformInterpolator(nullptr, 0xFFFFu, 0xFFFFu, 0xFFFFu, nullptr);
     NiBSplineInterpolator::CopyMembers(v4, kCloning);
-    __builtin_memcpy(
+    std::memcpy(
         &v4->m_kTransformValue, &m_kTransformValue,
         sizeof(NiBSplineTransformInterpolator) - offsetof(NiBSplineTransformInterpolator, m_kTransformValue)
     );

@@ -1,6 +1,7 @@
 // Virtual memory on POSIX: a reservation is an inaccessible anonymous mapping without swap reserved for it; commit
 // makes pages read-write, decommit maps fresh inaccessible pages over them (their contents gone, their memory back).
 #include "platform/Memory.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -139,16 +140,14 @@ namespace platform {
     bool Commit(void* address, size_t size) {
         char* start;
         size_t length;
-        return PageRange(address, size, start, length) &&
-            Reserved(start, length, "Commit", __builtin_return_address(0)) &&
+        return PageRange(address, size, start, length) && Reserved(start, length, "Commit", XFNV_RETURN_ADDRESS()) &&
             mprotect(start, length, PROT_READ | PROT_WRITE) == 0;
     }
 
     bool Decommit(void* address, size_t size) {
         char* start;
         size_t length;
-        return PageRange(address, size, start, length) &&
-            Reserved(start, length, "Decommit", __builtin_return_address(0)) &&
+        return PageRange(address, size, start, length) && Reserved(start, length, "Decommit", XFNV_RETURN_ADDRESS()) &&
             mmap(start, length, PROT_NONE, kReserveFlags | MAP_FIXED, -1, 0) != MAP_FAILED;
     }
 

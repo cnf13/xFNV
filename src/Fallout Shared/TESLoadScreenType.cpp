@@ -6,6 +6,7 @@
 #include "BSMenu/Font.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
+#include "xfnv/Compiler.h"
 
 void DisplayData::Init() {
     uDisplayPositionX = 0;
@@ -80,7 +81,7 @@ bool TESLoadScreenType::Load(TESFile* apFile) {
                 LoadData(apFile, reinterpret_cast<char*>(&data), sizeof(LoadScreenType_Data));
                 break;
             case 0x44494445: { // 'EDID'
-                char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pEditorID, 0x200);
                 SetFormEditorID(pEditorID);
                 break;

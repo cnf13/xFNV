@@ -16,6 +16,7 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with their IDs and default values, in initialization order.
 SettingT<INISettingCollection> bWarnOnMissingFileEntry("bWarnOnMissingFileEntry:General", false);
@@ -49,7 +50,7 @@ void TESTextureList::Load(TESFile* apFile, TESForm* apParentForm, const char* ap
     }
     uint32_t uiSize = uiCount * 0x18;
     // The records are built in an alloca'd buffer that is zeroed first.
-    BSHashData* pBuffer = static_cast<BSHashData*>(__builtin_alloca(uiSize));
+    BSHashData* pBuffer = static_cast<BSHashData*>(XFNV_ALLOCA(uiSize));
     ourMemset(pBuffer, 0, uiSize);
     apFile->GetChunkData(pBuffer, uiSize);
     LoadFromBuffer(pBuffer, uiCount, apParentForm, apModelName);
@@ -256,7 +257,7 @@ void TESModel::LoadModelChunk(TESModel* apModel, TESFile* apFile) {
     int32_t chunk = static_cast<int32_t>(apFile->GetTESChunk());
     // PNAM is read as the model path, the same as MODL.
     if (chunk == static_cast<int32_t>(CHUNK_ID::MODL_ID) || chunk == static_cast<int32_t>(CHUNK_ID::PNAM_ID)) {
-        void* data = __builtin_alloca(apFile->GetChunkSize());
+        void* data = XFNV_ALLOCA(apFile->GetChunkSize());
         apFile->GetChunkData(data, 0);
         apModel->SetModel(static_cast<const char*>(data));
     }

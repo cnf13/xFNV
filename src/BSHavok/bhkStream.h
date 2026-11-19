@@ -44,7 +44,7 @@ public:
     // Swaps the byte order of each of the vector's four words, x to w, and returns the vector.
     static hkVector4& Endian(hkVector4& arVector) {
         for (int32_t i = 0; i < 4; ++i) {
-            arVector(i) = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(arVector(i))));
+            arVector(i) = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(arVector(i))));
         }
         return arVector;
     }
@@ -60,10 +60,10 @@ public:
 
     // Swaps the byte order of each of the vector's four words, x to w, and returns the vector.
     static bhkVector4& Endian(bhkVector4& arVector) {
-        arVector.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(arVector.fX)));
-        arVector.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(arVector.fY)));
-        arVector.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(arVector.fZ)));
-        arVector.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(arVector.fW)));
+        arVector.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(arVector.fX)));
+        arVector.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(arVector.fY)));
+        arVector.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(arVector.fZ)));
+        arVector.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(arVector.fW)));
         return arVector;
     }
 

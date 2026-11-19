@@ -9,6 +9,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianElement.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianSchema.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianStiffSpringChainSchema.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -31,7 +32,7 @@ void hkBallSocketChainBuildJacobian(
     hkpJacobianSchema* pSchemaUnit = out.m_jacobianSchemas;
     hkpJacobianBallSocketChainSchema* pSchema = &pSchemaUnit->m_ballSocketChain;
     // EXE-INLINED none: hkpJacobianBallSocketChainSchema::initBallSocketChainSchema
-    pSchemaUnit->m_quad[0] = pSchemaUnit->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchemaUnit->m_quad, 0) = XFNV_M128_F32(pSchemaUnit->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->m_tau = tau;
     pSchema->m_damping = damping;
     pSchema->m_size = hkpJacobianBallSocketChainSchema::getSize(static_cast<uint16_t>(numConstraints));
@@ -77,7 +78,8 @@ void hkBallSocketChainBuildJacobian(
                         _mm_mul_ps(_mm_mul_ps(pJac[i].m_angular[1].m_quad, pJac[j].m_angular[1].m_quad), invMassB)
                     )
                 );
-                const float fDot = _mm_shuffle_ps(sum, sum, 0xAA)[0] + static_cast<float>(sum[1] + sum[0]);
+                const float fDot = XFNV_M128_F32(_mm_shuffle_ps(sum, sum, 0xAA), 0) +
+                    static_cast<float>(XFNV_M128_F32(sum, 1) + XFNV_M128_F32(sum, 0));
                 kDiag(i, j) = fDot;
                 kDiag(j, i) = fDot;
             }
@@ -101,7 +103,8 @@ void hkBallSocketChainBuildJacobian(
                             _mm_mul_ps(pNext[m].m_linear0.m_quad, pJac[k].m_linear0.m_quad)
                         )
                     );
-                    kOffDiag(k, m) = _mm_shuffle_ps(v, v, 0xAA)[0] + static_cast<float>(v[1] + v[0]);
+                    kOffDiag(k, m) = XFNV_M128_F32(_mm_shuffle_ps(v, v, 0xAA), 0) +
+                        static_cast<float>(XFNV_M128_F32(v, 1) + XFNV_M128_F32(v, 0));
                 }
             }
         }
@@ -112,9 +115,9 @@ void hkBallSocketChainBuildJacobian(
                 pTriple->m_lower(r, col) = kPrevOffDiag(col, r);
             }
         }
-        pTriple->m_lower.m_col0.m_quad[3] = 0.0f;
-        pTriple->m_lower.m_col1.m_quad[3] = 0.0f;
-        pTriple->m_lower.m_col2.m_quad[3] = 0.0f;
+        XFNV_M128_F32(pTriple->m_lower.m_col0.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(pTriple->m_lower.m_col1.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(pTriple->m_lower.m_col2.m_quad, 3) = 0.0f;
         hkMatrix3 kProduct;
         hkMatrix3_setMulMat3Mat3(&kProduct, &pTriple->m_lower, &kPrevUpper);
         hkMatrix3& rDiagInv = pTriple->m_diagonalInv;
@@ -158,7 +161,7 @@ void hkStiffSpringChainBuildJacobian(
     hkpJacobianSchema* pSchemaUnit = out.m_jacobianSchemas;
     hkpJacobianStiffSpringChainSchema* pSchema = &pSchemaUnit->m_stiffSpringChain;
     // EXE-INLINED none: hkpJacobianStiffSpringChainSchema::initStiffSpringChainSchema
-    pSchemaUnit->m_quad[0] = pSchemaUnit->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchemaUnit->m_quad, 0) = XFNV_M128_F32(pSchemaUnit->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->m_tau = tau;
     pSchema->m_damping = damping;
     pSchema->m_size = hkpJacobianStiffSpringChainSchema::getSize(static_cast<uint16_t>(numConstraints));
@@ -189,7 +192,8 @@ void hkStiffSpringChainBuildJacobian(
         const __m128 masses = _mm_add_ps(invMassA, invMassB);
         const __m128 terms = _mm_shuffle_ps(angular, _mm_unpackhi_ps(angular, masses), 0xC4);
         const __m128 pairs = _mm_add_ps(_mm_shuffle_ps(terms, terms, 0x4E), terms);
-        const float fEffMass = static_cast<float>(pairs[1] + pairs[0]) + 1.1920928955078125e-07;
+        const float fEffMass =
+            static_cast<float>(XFNV_M128_F32(pairs, 1) + XFNV_M128_F32(pairs, 0)) + 1.1920928955078125e-07;
         const float fDiag = fEffMass + cfm;
 
         float fOffDiag = 0.0f;
@@ -202,7 +206,8 @@ void hkStiffSpringChainBuildJacobian(
                     _mm_shuffle_ps(invMassB, invMassB, 0xFF)
                 )
             );
-            fOffDiag = _mm_shuffle_ps(v, v, 0xAA)[0] + static_cast<float>(v[1] + v[0]);
+            fOffDiag = XFNV_M128_F32(_mm_shuffle_ps(v, v, 0xAA), 0) +
+                static_cast<float>(XFNV_M128_F32(v, 1) + XFNV_M128_F32(v, 0));
         }
 
         pTriple->m_lower = fPrevOffDiag;
@@ -271,8 +276,9 @@ void buildBlockTridiagonalLu(
                         _mm_mul_ps(_mm_mul_ps(pJac[j].m_angular[1].m_quad, pJac[i].m_angular[1].m_quad), invMassB)
                     )
                 );
-                const float fDot =
-                    _mm_add_ss(_mm_shuffle_ps(sum, sum, 0xAA), _mm_add_ss(_mm_shuffle_ps(sum, sum, 0x55), sum))[0];
+                const float fDot = XFNV_M128_F32(
+                    _mm_add_ss(_mm_shuffle_ps(sum, sum, 0xAA), _mm_add_ss(_mm_shuffle_ps(sum, sum, 0x55), sum)), 0
+                );
                 kDiag(i, j) = fDot;
                 kDiag(j, i) = fDot;
             }
@@ -296,8 +302,9 @@ void buildBlockTridiagonalLu(
                             _mm_mul_ps(pNext[m].m_linear0.m_quad, pJac[k].m_linear0.m_quad)
                         )
                     );
-                    kOffDiag(k, m) =
-                        _mm_add_ss(_mm_shuffle_ps(v, v, 0xAA), _mm_add_ss(_mm_shuffle_ps(v, v, 0x55), v))[0];
+                    kOffDiag(k, m) = XFNV_M128_F32(
+                        _mm_add_ss(_mm_shuffle_ps(v, v, 0xAA), _mm_add_ss(_mm_shuffle_ps(v, v, 0x55), v)), 0
+                    );
                 }
             }
         }
@@ -307,9 +314,9 @@ void buildBlockTridiagonalLu(
         rLower(0, 0) = kPrevOffDiag(0, 0);
         rLower(1, 1) = kPrevOffDiag(1, 1);
         rLower(2, 2) = kPrevOffDiag(2, 2);
-        rLower.m_col0.m_quad[3] = 0.0f;
-        rLower.m_col1.m_quad[3] = 0.0f;
-        rLower.m_col2.m_quad[3] = 0.0f;
+        XFNV_M128_F32(rLower.m_col0.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(rLower.m_col1.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(rLower.m_col2.m_quad, 3) = 0.0f;
         rLower(1, 0) = kPrevOffDiag(0, 1);
         rLower(0, 1) = kPrevOffDiag(1, 0);
         rLower(2, 0) = kPrevOffDiag(0, 2);
@@ -370,7 +377,7 @@ void buildTridiagonalLu(
         const __m128 masses = _mm_add_ps(invMassA, invMassB);
         const __m128 terms = _mm_shuffle_ps(angular, _mm_unpackhi_ps(angular, masses), 0xC4);
         const __m128 pairs = _mm_add_ps(_mm_shuffle_ps(terms, terms, 0x4E), terms);
-        const float fSum = _mm_add_ps(_mm_shuffle_ps(pairs, pairs, 0xB1), pairs)[0];
+        const float fSum = XFNV_M128_F32(_mm_add_ps(_mm_shuffle_ps(pairs, pairs, 0xB1), pairs), 0);
         const float fEffMass = fSum + 1.1920928955078125e-07;
         const float fDiag = fEffMass + cfm;
 
@@ -384,7 +391,8 @@ void buildTridiagonalLu(
                     _mm_shuffle_ps(invMassB, invMassB, 0xFF)
                 )
             );
-            fOffDiag = _mm_add_ss(_mm_shuffle_ps(v, v, 0xAA), _mm_add_ss(_mm_shuffle_ps(v, v, 0x55), v))[0];
+            fOffDiag =
+                XFNV_M128_F32(_mm_add_ss(_mm_shuffle_ps(v, v, 0xAA), _mm_add_ss(_mm_shuffle_ps(v, v, 0x55), v)), 0);
         }
 
         pTriple->m_lower = fPrevOffDiag;

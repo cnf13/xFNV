@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -169,15 +170,15 @@ void hkInverseWaveletTransform(float* data, uint32_t nValues) {
     }
     while (n7 < 7);
     // The sums are copied out float by float because data need not be aligned.
-    data[0] = v3[0];
-    data[1] = v3[1];
-    data[2] = v3[2];
-    data[3] = v3[3];
+    data[0] = XFNV_M128_F32(v3, 0);
+    data[1] = XFNV_M128_F32(v3, 1);
+    data[2] = XFNV_M128_F32(v3, 2);
+    data[3] = XFNV_M128_F32(v3, 3);
     uint32_t n8 = 8;
-    data[4] = v10[0];
-    data[5] = v10[1];
-    data[6] = v10[2];
-    data[7] = v10[3];
+    data[4] = XFNV_M128_F32(v10, 0);
+    data[5] = XFNV_M128_F32(v10, 1);
+    data[6] = XFNV_M128_F32(v10, 2);
+    data[7] = XFNV_M128_F32(v10, 3);
     while (n8 < nValues) {
         hkUpdateReflect(-0.25f, data, &data[n8], n8);
         hkPredictReflect(0.5f, data, &data[n8], n8);

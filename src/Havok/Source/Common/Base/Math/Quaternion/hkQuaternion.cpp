@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -38,7 +39,7 @@ void hkQuaternion::setAxisAngle(const hkVector4& axis, float angle) {
         &reinterpret_cast<float*>(&m_vec.m_quad)[0],
         _mm_mul_ps(_mm_set1_ps(fSin), _mm_load_ps(&reinterpret_cast<const float*>(&axis.m_quad)[0]))
     );
-    m_vec.m_quad[3] = std::cos(fHalfAngle);
+    XFNV_M128_F32(m_vec.m_quad, 3) = std::cos(fHalfAngle);
 }
 
 // The cosine is the four-lane dot product, taken positive with the sign kept for q1's weight. At or above 0.999 (a NaN
@@ -94,7 +95,7 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
     __m128 m_quad = m_vec.m_quad;
     __m128 v4 = _mm_mul_ps(axis.m_quad, m_vec.m_quad);
     __m128 v5 = _mm_shuffle_ps(v4, v4, 170);
-    v5[0] = v5[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
+    XFNV_M128_F32(v5, 0) = XFNV_M128_F32(v5, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0));
     __m128 v6 = _mm_shuffle_ps(m_quad, m_quad, 255);
     __m128 v7 = _mm_shuffle_ps(axis.m_quad, axis.m_quad, 201);
     __m128 v8 = _mm_shuffle_ps(axis.m_quad, axis.m_quad, 210);
@@ -112,7 +113,9 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
     );
     __m128 v10 = _mm_add_ps(v9, v9);
     __m128 v11 = _mm_mul_ps(axis.m_quad, v10);
-    double v12 = (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
+    double v12 =
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0)));
     if (!(v12 - 1.0 > -0.0010000000474974513)) {
         hkVector4 arAxis;
         if (!(v12 + 1.0 < 0.0010000000474974513)) {
@@ -121,15 +124,15 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
                 _mm_mul_ps(_mm_shuffle_ps(v10, v10, 210), v7), _mm_mul_ps(_mm_shuffle_ps(v10, v10, 201), v8)
             );
             __m128 v18 = _mm_mul_ps(v17, v17);
-            float v19 = _mm_shuffle_ps(v18, v18, 85)[0] + v18[0];
+            float v19 = XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 85), 0) + XFNV_M128_F32(v18, 0);
             __m128 v20 = _mm_shuffle_ps(v18, v18, 170);
-            v20[0] = v20[0] + v19;
-            float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v20[0])));
-            v22[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+            XFNV_M128_F32(v20, 0) = XFNV_M128_F32(v20, 0) + v19;
+            float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v20, 0))));
+            XFNV_M128_F32(v22, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
             __m128 v23 = _mm_cmpeq_ss(v20, v22);
-            v22[0] = 3.0f - ((v20[0] * v21) * v21);
+            XFNV_M128_F32(v22, 0) = 3.0f - ((XFNV_M128_F32(v20, 0) * v21) * v21);
             __m128 v24 = _mm_setzero_ps();
-            v24[0] = (0.5f * v21) * v22[0];
+            XFNV_M128_F32(v24, 0) = (0.5f * v21) * XFNV_M128_F32(v22, 0);
             __m128 v25 = _mm_andnot_ps(v23, v24);
             float r = v12;
             arAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(v25, v25, 0), v17);
@@ -140,9 +143,9 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
             int32_t v13 = 0;
             int32_t v14 = 1;
             int32_t v15 = 2;
-            float v28 = std::fabs((double)axis.m_quad[0]);
-            float v29 = std::fabs((double)axis.m_quad[1]);
-            float v30 = std::fabs((double)axis.m_quad[2]);
+            float v28 = std::fabs((double)XFNV_M128_F32(axis.m_quad, 0));
+            float v29 = std::fabs((double)XFNV_M128_F32(axis.m_quad, 1));
+            float v30 = std::fabs((double)XFNV_M128_F32(axis.m_quad, 2));
             if (v28 > static_cast<double>(v29)) {
                 v28 = v29;
                 v14 = 0;
@@ -151,10 +154,10 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
             if (v28 > static_cast<double>(v30)) {
                 v15 = v13;
             }
-            double v16 = axis.m_quad[v15];
+            double v16 = XFNV_M128_F32(axis.m_quad, v15);
             arAxis.m_quad = _mm_setzero_ps();
-            arAxis.m_quad[v14] = v16;
-            arAxis.m_quad[v15] = -axis.m_quad[v14];
+            XFNV_M128_F32(arAxis.m_quad, v14) = v16;
+            XFNV_M128_F32(arAxis.m_quad, v15) = -XFNV_M128_F32(axis.m_quad, v14);
             setAxisAngle(arAxis, 3.1415927f);
         }
     }
@@ -164,7 +167,7 @@ void hkQuaternion::removeAxisComponent(const hkVector4& axis) {
 }
 
 double hkQuaternion::getAngle() const {
-    float v5 = std::fabs((double)m_vec.m_quad[3]);
+    float v5 = std::fabs((double)XFNV_M128_F32(m_vec.m_quad, 3));
     double v1 = v5;
     float v6 = std::fabs((double)v5);
     if (!(v6 >= 1.0f)) {
@@ -208,7 +211,7 @@ hkBool hkQuaternion::isOk() const {
     result = m_vec.isOk4();
     __m128 v3 = _mm_mul_ps(m_vec.m_quad, m_vec.m_quad);
     __m128 v4 = _mm_add_ps(_mm_shuffle_ps(v3, v3, 78), v3);
-    float v6 = (_mm_shuffle_ps(v4, v4, 177)[0] + v4[0]) - 1.0;
+    float v6 = (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 177), 0) + XFNV_M128_F32(v4, 0)) - 1.0;
     float v7 = std::fabs((double)v6);
     if (result.m_bool && v7 < 0.001f) {
         result.m_bool = 1;
@@ -221,12 +224,12 @@ hkBool hkQuaternion::isOk() const {
 
 void hkQuaternion::setFlippedRotation(const hkVector4& from) {
     __m128 v10 = _mm_undefined_ps();
-    float v14 = std::fabs((double)from.m_quad[0]);
+    float v14 = std::fabs((double)XFNV_M128_F32(from.m_quad, 0));
     int32_t v2 = 0;
     int32_t v3 = 1;
     int32_t v4 = 2;
-    float v15 = std::fabs((double)from.m_quad[1]);
-    float v16 = std::fabs((double)from.m_quad[2]);
+    float v15 = std::fabs((double)XFNV_M128_F32(from.m_quad, 1));
+    float v16 = std::fabs((double)XFNV_M128_F32(from.m_quad, 2));
     if (v14 > static_cast<double>(v15)) {
         v14 = v15;
         v3 = 0;
@@ -235,23 +238,23 @@ void hkQuaternion::setFlippedRotation(const hkVector4& from) {
     if (v14 > static_cast<double>(v16)) {
         v4 = v2;
     }
-    double v5 = from.m_quad[v4];
+    double v5 = XFNV_M128_F32(from.m_quad, v4);
     __m128 v18 = _mm_setzero_ps();
-    v18[v3] = v5;
-    v18[v4] = -from.m_quad[v3];
+    XFNV_M128_F32(v18, v3) = v5;
+    XFNV_M128_F32(v18, v4) = -XFNV_M128_F32(from.m_quad, v3);
     __m128 v6 = _mm_mul_ps(v18, v18);
-    float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
+    float v7 = XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0);
     __m128 v8 = _mm_shuffle_ps(v6, v6, 170);
-    v8[0] = v8[0] + v7;
-    float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
-    v10[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v8, 0) = XFNV_M128_F32(v8, 0) + v7;
+    float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v8, 0))));
+    XFNV_M128_F32(v10, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v11 = _mm_cmpeq_ss(v8, v10);
-    v10[0] = 3.0f - ((v8[0] * v9) * v9);
+    XFNV_M128_F32(v10, 0) = 3.0f - ((XFNV_M128_F32(v8, 0) * v9) * v9);
     __m128 v12 = _mm_setzero_ps();
-    v12[0] = (0.5f * v9) * v10[0];
+    XFNV_M128_F32(v12, 0) = (0.5f * v9) * XFNV_M128_F32(v10, 0);
     __m128 v13 = _mm_andnot_ps(v11, v12);
     v18 = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v18);
-    v18[3] = 0.0f;
+    XFNV_M128_F32(v18, 3) = 0.0f;
     m_vec.m_quad = v18;
 }
 

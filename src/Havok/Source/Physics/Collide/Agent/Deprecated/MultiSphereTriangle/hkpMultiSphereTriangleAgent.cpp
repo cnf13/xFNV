@@ -22,6 +22,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Deprecated/MultiSphere/hkpMultiSphereShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -69,7 +70,7 @@ void hkpMultiSphereTriangleAgent::getPenetrations(
     }
 
     for (int32_t i = 0; i < numSpheres; i++) {
-        const float radiusSum = triShape->m_radius + msShape->m_spheres[i].m_quad[3];
+        const float radiusSum = triShape->m_radius + XFNV_M128_F32(msShape->m_spheres[i].m_quad, 3);
         hkpCollideTriangleUtil::ClosestPointTriangleResult result;
         hkpCollideTriangleUtil::closestPointTriangle(
             worldSpheres[i], triVertices, m_closestPointTriangleCache, result, nullptr
@@ -112,7 +113,7 @@ void hkpMultiSphereTriangleAgent::getClosestPoints(
     event.m_cdBodyA = &bodyA;
     event.m_cdBodyB = &bodyB;
     for (int32_t i = 0; i < numSpheres; i++) {
-        const float radiusSum = triShape->m_radius + msShape->m_spheres[i].m_quad[3];
+        const float radiusSum = triShape->m_radius + XFNV_M128_F32(msShape->m_spheres[i].m_quad, 3);
         hkpCollideTriangleUtil::ClosestPointTriangleResult result;
         hkpCollideTriangleUtil::closestPointTriangle(
             worldSpheres[i], triVertices, m_closestPointTriangleCache, result, nullptr
@@ -129,7 +130,7 @@ void hkpMultiSphereTriangleAgent::getClosestPoints(
                 _mm_load_ps(&reinterpret_cast<float*>(&worldSpheres[i].m_quad)[0])
             );
             _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_separatingNormal.m_quad)[0], hitDirection);
-            event.m_contact.m_separatingNormal.m_quad[3] = distance - radiusSum;
+            XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = distance - radiusSum;
             _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_position.m_quad)[0], position);
             collector.addCdPoint(event);
         }
@@ -178,7 +179,7 @@ void hkpMultiSphereTriangleAgent::processCollision(
     const hkVector4* sphere = msShape->m_spheres;
     uint16_t* contactPointId = &m_contactPointId[numSpheres - 1];
     for (int32_t i = numSpheres - 1; i >= 0; i--) {
-        const float radiusSum = sphere->m_quad[3] + triShape->m_radius;
+        const float radiusSum = XFNV_M128_F32(sphere->m_quad, 3) + triShape->m_radius;
         hkpCollideTriangleUtil::ClosestPointTriangleResult cpt;
         hkpCollideTriangleUtil::closestPointTriangle(*position, triVertices, m_closestPointTriangleCache, cpt, nullptr);
         const float distance = cpt.distance;
@@ -192,7 +193,7 @@ void hkpMultiSphereTriangleAgent::processCollision(
             point->m_contact.m_position.m_quad =
                 _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), hitDirection), position->m_quad);
             point->m_contact.m_separatingNormal.m_quad = cpt.hitDirection.m_quad;
-            point->m_contact.m_separatingNormal.m_quad[3] = distance - radiusSum;
+            XFNV_M128_F32(point->m_contact.m_separatingNormal.m_quad, 3) = distance - radiusSum;
             bool added = true;
             if (*contactPointId == 0xFFFF) {
                 *contactPointId =
@@ -262,7 +263,7 @@ void hkpMultiSphereTriangleAgent::staticGetPenetrations(
     hkpCollideTriangleUtil::setupClosestPointTriangleCache(vertices, cache);
 
     for (int32_t i = 0; i < numSpheres; i++) {
-        const float radiusSum = triShape->m_radius + msShape->m_spheres[i].m_quad[3];
+        const float radiusSum = triShape->m_radius + XFNV_M128_F32(msShape->m_spheres[i].m_quad, 3);
         hkpCollideTriangleUtil::ClosestPointTriangleResult result;
         hkpCollideTriangleUtil::closestPointTriangle(worldSpheres[i], triVertices, cache, result, nullptr);
         // The pair is reported when radiusSum > distance and neither is NaN.
@@ -305,7 +306,7 @@ void hkpMultiSphereTriangleAgent::staticGetClosestPoints(
     hkpCollideTriangleUtil::setupClosestPointTriangleCache(&triShape->m_vertexA, cache);
 
     for (int32_t i = 0; i < numSpheres; i++) {
-        const float radiusSum = msShape->m_spheres[i].m_quad[3] + triShape->m_radius;
+        const float radiusSum = XFNV_M128_F32(msShape->m_spheres[i].m_quad, 3) + triShape->m_radius;
         hkpCollideTriangleUtil::ClosestPointTriangleResult result;
         hkpCollideTriangleUtil::closestPointTriangle(worldSpheres[i], triVertices, cache, result, nullptr);
         const float distance = result.distance;
@@ -320,7 +321,7 @@ void hkpMultiSphereTriangleAgent::staticGetClosestPoints(
                 _mm_load_ps(&reinterpret_cast<float*>(&worldSpheres[i].m_quad)[0])
             );
             _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_separatingNormal.m_quad)[0], hitDirection);
-            event.m_contact.m_separatingNormal.m_quad[3] = distance - radiusSum;
+            XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = distance - radiusSum;
             _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_position.m_quad)[0], position);
             collector.addCdPoint(event);
         }

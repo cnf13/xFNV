@@ -41,6 +41,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 #include <zlib.h>
@@ -962,7 +963,7 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
     uint16_t sChunkSize = apFile->GetChunkSize();
     uint16_t sOffset = asSize;
     // A 16-byte aligned stack buffer of the chunk's size, holding raw bytes.
-    uint8_t* pBuffer = static_cast<uint8_t*>(__builtin_alloca_with_align(sChunkSize, 128));
+    uint8_t* pBuffer = static_cast<uint8_t*>(XFNV_ALLOCA16(sChunkSize));
     apFile->GetChunkData(pBuffer, sChunkSize);
     ourMemcpy(apData, pBuffer, Min(sChunkSize, asSize));
     TESUsesForm* pUses = dynamic_cast<TESUsesForm*>(this);

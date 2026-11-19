@@ -25,6 +25,7 @@
 #include "Fallout/Misc/SaveLoad/BGSChangeFlags.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSNote::BGSNote() {
     SetFormType(49u);
@@ -94,7 +95,7 @@ bool BGSNote::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200u);
@@ -118,7 +119,7 @@ bool BGSNote::Load(TESFile* apFile) {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 if (uiChunkSize) {
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, uiChunkSize);
                     // The image is fetched twice, once to test it and once to write to.
                     if (this->GetNoteImage()) {

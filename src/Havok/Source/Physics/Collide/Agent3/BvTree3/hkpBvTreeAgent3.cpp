@@ -31,6 +31,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -169,8 +170,11 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
     __m128 kExtent;
     __m128 kMotion = kTimInB;
     if (input.m_collisionQualityInfo->m_useContinuousPhysics != 0) {
-        const float fRadiusB = msB->m_deltaAngle.m_quad[3] * msB->m_deltaAngle.m_quad[3] * msB->m_objectRadius;
-        const float fRadiusA = (msA->m_deltaAngle.m_quad[3] + msB->m_deltaAngle.m_quad[3]) * msA->m_objectRadius;
+        const float fRadiusB = XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3) * XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3) *
+            msB->m_objectRadius;
+        const float fRadiusA =
+            (XFNV_M128_F32(msA->m_deltaAngle.m_quad, 3) + XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3)) *
+            msA->m_objectRadius;
         const float fTolerance = fRadiusA + fRadiusB + input.m_tolerance * 0.5;
         bodyA.m_shape->getAabbImpl(bTa, fTolerance, aabb);
 
@@ -186,8 +190,9 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
         kExtent = _mm_sub_ps(kMax, kMin);
         fSpill = fRadius;
 
-        if (0.0f < msB->m_deltaAngle.m_quad[3]) {
-            const float fScale = msB->m_sweptTransform.m_centerOfMass1.m_quad[3] * input.m_stepInfo.m_deltaTime;
+        if (0.0f < XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3)) {
+            const float fScale =
+                XFNV_M128_F32(msB->m_sweptTransform.m_centerOfMass1.m_quad, 3) * input.m_stepInfo.m_deltaTime;
             hkVector4 arm;
             arm.m_quad = _mm_sub_ps(
                 kCenter,

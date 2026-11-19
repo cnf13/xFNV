@@ -31,6 +31,8 @@
 #include "Havok/Source/Common/Visualize/hkServerProcessHandler.h"
 #include "Havok/Source/Common/Visualize/hkVersionReporter.h"
 
+#include <cmath>
+
 // The contexts copied and told their owner, the report, the common processes registered and the three default viewers
 // added. hkStopwatch has no constructor, so the name and reset() are done here.
 hkVisualDebugger::hkVisualDebugger(const hkArray<hkProcessContext*>* contexts, const hkVtableClassRegistry* classReg)
@@ -87,7 +89,7 @@ void hkVisualDebugger::step(float frameTimeInMs) {
         m_frameTimer.stop();
     }
     m_amTimingFrame.m_bool = 1;
-    if (__builtin_fabsf(frameTimeInMs) > 1.1920929e-7f) {
+    if (std::fabsf(frameTimeInMs) > 1.1920929e-7f) {
         fFrameTime = frameTimeInMs;
     }
     pollForNewClients();

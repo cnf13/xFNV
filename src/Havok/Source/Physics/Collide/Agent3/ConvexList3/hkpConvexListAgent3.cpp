@@ -30,6 +30,9 @@
 #include "Havok/Source/Physics/Internal/Collide/Gjk/Continuous/hkpContinuousGsk.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
+
+#include <cstring>
 
 // The agent works in one of two modes. In stream mode the convex list's children are collided one by one through the
 // agent's track of sub-agents; after the stream mode counter runs out, GSK is tried on the list's hull, and when it
@@ -111,7 +114,7 @@ gskMode:
             float penetrationA = input.m_bodyA->getRootCollidable()->getAllowedPenetrationDepth();
             float minPenetration = hkMath::min2(penetrationA, penetrationB);
             float twicePenetration = minPenetration + minPenetration;
-            if (!(-twicePenetration > separatingNormal->m_quad[3])) {
+            if (!(-twicePenetration > XFNV_M128_F32(separatingNormal->m_quad, 3))) {
                 goto done;
             }
         }
@@ -124,7 +127,7 @@ gskMode:
         output.m_toi.m_contactPoint = backup.m_toi.m_contactPoint;
         output.m_toi.m_time = backup.m_toi.m_time;
         output.m_toi.m_seperatingVelocity = backup.m_toi.m_seperatingVelocity;
-        __builtin_memcpy(&output.m_toi.m_gskCache, &backup.m_toi.m_gskCache, sizeof(hkGskCache16));
+        std::memcpy(&output.m_toi.m_gskCache, &backup.m_toi.m_gskCache, sizeof(hkGskCache16));
         output.m_toi.m_properties = backup.m_toi.m_properties;
     }
     output.m_firstFreeContactPoint.m_storage = backup.m_firstPoint;
@@ -150,7 +153,7 @@ gskMode:
 
 processStream:
     {
-        separatingNormal->m_quad[3] = -1.70141e+38f;
+        XFNV_M128_F32(separatingNormal->m_quad, 3) = -1.70141e+38f;
         int32_t numChildren = cvxList->m_childShapes.m_size;
         uint32_t* hitList = hkAllocateStack<uint32_t>(numChildren + 1, nullptr);
         for (int32_t i = 0; i < numChildren; i++) {
@@ -291,7 +294,7 @@ void hkConvexListAgent3::sepNormal(
     }
     else {
         separatingNormalOut = hkTransformIdentity.m_rotation.m_col0;
-        separatingNormalOut.m_quad[3] = -1.70141e+38f;
+        XFNV_M128_F32(separatingNormalOut.m_quad, 3) = -1.70141e+38f;
     }
 }
 
@@ -340,7 +343,7 @@ hkpProcessCollisionData::ToiInfo& hkpProcessCollisionData::ToiInfo::operator=(co
     m_contactPoint = __that.m_contactPoint;
     m_time = __that.m_time;
     m_seperatingVelocity = __that.m_seperatingVelocity;
-    __builtin_memcpy(&m_gskCache, &__that.m_gskCache, sizeof(hkGskCache16));
+    std::memcpy(&m_gskCache, &__that.m_gskCache, sizeof(hkGskCache16));
     m_properties = __that.m_properties;
     return *this;
 }

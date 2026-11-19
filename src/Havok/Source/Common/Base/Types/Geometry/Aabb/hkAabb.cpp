@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Reflection/hkClassMember.h"
 #include "Havok/Source/Common/Base/Reflection/hkTypeInfo.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -73,9 +74,9 @@ hkAabb::hkAabb(const hkVector4& min, const hkVector4& max) : m_min(min), m_max(m
 
 hkBool hkAabb::isValid() {
     int32_t v2 = 0;
-    while ((std::bit_cast<uint32_t>(m_min.m_quad[v2]) & 0x7F800000) != 0x7F800000 &&
-           ((std::bit_cast<uint32_t>(m_max.m_quad[v2]) & 0x7F800000) != 0x7F800000 &&
-            !(m_max.m_quad[v2] < static_cast<double>(m_min.m_quad[v2])))) {
+    while ((std::bit_cast<uint32_t>(XFNV_M128_F32(m_min.m_quad, v2)) & 0x7F800000) != 0x7F800000 &&
+           ((std::bit_cast<uint32_t>(XFNV_M128_F32(m_max.m_quad, v2)) & 0x7F800000) != 0x7F800000 &&
+            !(XFNV_M128_F32(m_max.m_quad, v2) < static_cast<double>(XFNV_M128_F32(m_min.m_quad, v2))))) {
         if (++v2 >= 3) {
             return 1;
         }

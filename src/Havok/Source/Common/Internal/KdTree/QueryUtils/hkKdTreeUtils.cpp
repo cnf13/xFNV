@@ -14,6 +14,7 @@
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeBundleCastCollector.h"
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeCastCollector.h"
 #include "Havok/Source/Common/Internal/KdTree/hkKdTree.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <emmintrin.h>
@@ -79,16 +80,18 @@ hkBool hkKdTreeUtils::castRayIterative(
     __m128 dir = _mm_sub_ps(to.m_quad, from.m_quad);
     __m128 dirSq = _mm_mul_ps(dir, dir);
     __m128 lengthSq = _mm_shuffle_ps(dirSq, dirSq, 170);
-    lengthSq[0] = lengthSq[0] + (_mm_shuffle_ps(dirSq, dirSq, 85)[0] + dirSq[0]);
-    float rsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(lengthSq[0])));
+    XFNV_M128_F32(lengthSq, 0) =
+        XFNV_M128_F32(lengthSq, 0) + (XFNV_M128_F32(_mm_shuffle_ps(dirSq, dirSq, 85), 0) + XFNV_M128_F32(dirSq, 0));
+    float rsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(lengthSq, 0))));
     __m128 lengthSqIsZero = _mm_cmpeq_ss(lengthSq, _mm_setzero_ps());
-    float newtonStep = 3.0f - ((lengthSq[0] * rsqrt) * rsqrt);
+    float newtonStep = 3.0f - ((XFNV_M128_F32(lengthSq, 0) * rsqrt) * rsqrt);
     __m128 invLength = _mm_setzero_ps();
-    invLength[0] = (0.5f * rsqrt) * newtonStep;
+    XFNV_M128_F32(invLength, 0) = (0.5f * rsqrt) * newtonStep;
     invLength = _mm_andnot_ps(lengthSqIsZero, invLength);
     invLength = _mm_shuffle_ps(invLength, invLength, 0);
-    float rayLength =
-        (_mm_shuffle_ps(dirSq, dirSq, 170)[0] + (_mm_shuffle_ps(dirSq, dirSq, 85)[0] + dirSq[0])) * invLength[0];
+    float rayLength = (XFNV_M128_F32(_mm_shuffle_ps(dirSq, dirSq, 170), 0) +
+                       (XFNV_M128_F32(_mm_shuffle_ps(dirSq, dirSq, 85), 0) + XFNV_M128_F32(dirSq, 0))) *
+        XFNV_M128_F32(invLength, 0);
     float nodeTFar = rayLength;
     __m128 origin = from.m_quad;
     __m128 unitDir = _mm_mul_ps(invLength, dir);
@@ -142,18 +145,20 @@ traverse:
             }
             // The ray does not move along the split axis: from's coordinate decides which children it is in.
             float splitMax =
-                static_cast<double>(static_cast<uint16_t>(secondWord >> 16)) / 65535.0 * scale[axis] + offset[axis];
+                static_cast<double>(static_cast<uint16_t>(secondWord >> 16)) / 65535.0 * XFNV_M128_F32(scale, axis) +
+                XFNV_M128_F32(offset, axis);
             float splitMaxPlus = splitMax + 9.999999747378752e-05;
             float splitMin =
-                static_cast<double>(static_cast<uint16_t>(secondWord)) / 65535.0 * scale[axis] + offset[axis];
+                static_cast<double>(static_cast<uint16_t>(secondWord)) / 65535.0 * XFNV_M128_F32(scale, axis) +
+                XFNV_M128_F32(offset, axis);
             float splitMinMinus = splitMin - 9.999999747378752e-05;
-            if (!(splitMaxPlus >= origin[axis])) {
-                if (!(splitMinMinus <= origin[axis])) {
+            if (!(splitMaxPlus >= XFNV_M128_F32(origin, axis))) {
+                if (!(splitMinMinus <= XFNV_M128_F32(origin, axis))) {
                     goto popStack;
                 }
                 ++node;
             }
-            else if (splitMinMinus <= origin[axis]) {
+            else if (splitMinMinus <= XFNV_M128_F32(origin, axis)) {
                 stackTop->tNear = tNear;
                 stackTop->node = node + 1;
                 stackTop->tFar = tFar;
@@ -166,9 +171,11 @@ traverse:
             }
         }
         // The ray parameters where it crosses the two splits, near child first along the ray's direction.
-        float tSplitNear = splitScale[axis] * static_cast<double>(static_cast<uint16_t>(secondWord)) + splitBias[axis];
+        float tSplitNear = XFNV_M128_F32(splitScale, axis) * static_cast<double>(static_cast<uint16_t>(secondWord)) +
+            XFNV_M128_F32(splitBias, axis);
         float tSplitFar =
-            static_cast<double>(static_cast<uint16_t>(secondWord >> 16)) * splitScale[axis] + splitBias[axis];
+            static_cast<double>(static_cast<uint16_t>(secondWord >> 16)) * XFNV_M128_F32(splitScale, axis) +
+            XFNV_M128_F32(splitBias, axis);
         if ((axisBit & _mm_movemask_ps(_mm_cmplt_ps(zero, unitDir))) == axisBit) {
             nearChild = node++;
         }

@@ -27,6 +27,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Util/Welding/hkpWeldingUtility.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppRayBundleVirtualMachine.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -110,15 +111,15 @@ __m128* calcTriangleNormal(const __m128* a1, const __m128* a2, __m128* a3, const
         _mm_mul_ps(_mm_shuffle_ps(v4, v4, 210), _mm_shuffle_ps(v5, v5, 201))
     );
     __m128 v8 = _mm_mul_ps(v7, v7);
-    v4[0] = _mm_shuffle_ps(v8, v8, 85)[0] + v8[0];
+    XFNV_M128_F32(v4, 0) = XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0);
     __m128 v9 = _mm_shuffle_ps(v8, v8, 170);
-    v9[0] = v9[0] + v4[0];
-    float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v9[0])));
-    v11[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v9, 0) = XFNV_M128_F32(v9, 0) + XFNV_M128_F32(v4, 0);
+    float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v9, 0))));
+    XFNV_M128_F32(v11, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v12 = _mm_cmpeq_ss(v9, v11);
-    v11[0] = 3.0f - ((v9[0] * v10) * v10);
+    XFNV_M128_F32(v11, 0) = 3.0f - ((XFNV_M128_F32(v9, 0) * v10) * v10);
     __m128 v13 = _mm_setzero_ps();
-    v13[0] = (0.5f * v10) * v11[0];
+    XFNV_M128_F32(v13, 0) = (0.5f * v10) * XFNV_M128_F32(v11, 0);
     __m128 v14 = _mm_andnot_ps(v12, v13);
     *a3 = _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), v7);
     return a3;
@@ -342,7 +343,7 @@ hkVector4Comparison hkpTriangleShape::castRayBundleImpl(
     for (int32_t i = 0; i < 4; ++i) {
         if ((iHitBits & axisMaskBits_10C92E0[i]) != 0) {
             hkpShapeRayCastOutput& rOutput = output.m_outputs[i];
-            rOutput.m_hitFraction = hitFractions.m_quad[i];
+            rOutput.m_hitFraction = XFNV_M128_F32(hitFractions.m_quad, i);
             hitNormal.normalize3();
             // The normal takes the sign of the start's distance, so that it faces the ray.
             startSide.setBroadcast(fromDist, i);
@@ -360,18 +361,18 @@ int32_t hkpTriangleShape::getNumCollisionSpheresImpl() const {
 
 const hkSphere* hkpTriangleShape::getCollisionSpheresImpl(hkSphere* sphereBuffer) const {
     (*sphereBuffer).m_pos = m_vertexA;
-    sphereBuffer->m_pos.m_quad[3] = m_radius;
+    XFNV_M128_F32(sphereBuffer->m_pos.m_quad, 3) = m_radius;
     sphereBuffer[1].m_pos = m_vertexB;
-    sphereBuffer[1].m_pos.m_quad[3] = m_radius;
+    XFNV_M128_F32(sphereBuffer[1].m_pos.m_quad, 3) = m_radius;
     sphereBuffer[2].m_pos = m_vertexC;
-    sphereBuffer[2].m_pos.m_quad[3] = m_radius;
+    XFNV_M128_F32(sphereBuffer[2].m_pos.m_quad, 3) = m_radius;
     if (m_isExtruded) {
         sphereBuffer[3].m_pos.m_quad = _mm_add_ps(m_extrusion.m_quad, m_vertexA.m_quad);
-        sphereBuffer[3].m_pos.m_quad[3] = m_radius;
+        XFNV_M128_F32(sphereBuffer[3].m_pos.m_quad, 3) = m_radius;
         sphereBuffer[4].m_pos.m_quad = _mm_add_ps(m_extrusion.m_quad, m_vertexB.m_quad);
-        sphereBuffer[4].m_pos.m_quad[3] = m_radius;
+        XFNV_M128_F32(sphereBuffer[4].m_pos.m_quad, 3) = m_radius;
         sphereBuffer[5].m_pos.m_quad = _mm_add_ps(m_vertexC.m_quad, m_extrusion.m_quad);
-        sphereBuffer[5].m_pos.m_quad[3] = m_radius;
+        XFNV_M128_F32(sphereBuffer[5].m_pos.m_quad, 3) = m_radius;
     }
     return sphereBuffer;
 }
@@ -400,16 +401,16 @@ void hkpTriangleShape::getSupportingVertexImpl(const hkVector4& aDirection, hkpC
         _mm_mul_ps(_mm_shuffle_ps(direction, direction, 0xAA), rowZ)
     );
     int32_t vertexId;
-    double maxDot = dots.m_quad[2];
-    if (!(dots.m_quad[1] < maxDot)) {
-        maxDot = dots.m_quad[1];
+    double maxDot = XFNV_M128_F32(dots.m_quad, 2);
+    if (!(XFNV_M128_F32(dots.m_quad, 1) < maxDot)) {
+        maxDot = XFNV_M128_F32(dots.m_quad, 1);
         vertexId = 1;
     }
     else {
         vertexId = 2;
     }
     const float fMaxDot = maxDot;
-    if (fMaxDot < static_cast<double>(dots.m_quad[0])) {
+    if (fMaxDot < static_cast<double>(XFNV_M128_F32(dots.m_quad, 0))) {
         vertexId = 0;
     }
     supportingVertexOut.m_quad = getVertex(vertexId).m_quad;
@@ -486,7 +487,7 @@ int32_t hkpTriangleShape::weldContactPointImpl(
     calcTriangleNormal(&m_vertexA.m_quad, &m_vertexC.m_quad, &triangleNormal.m_quad, &m_vertexB);
     const float cosAngle = triangleNormal.dot3(normalLocal);
     const float absCosAngle = std::fabs(cosAngle);
-    float distance = absCosAngle * separatingNormal.m_quad[3];
+    float distance = absCosAngle * XFNV_M128_F32(separatingNormal.m_quad, 3);
     hkVector4 edge;
     edge.setSub4(getVertex(mod3Table[edgeId + 1]), getVertex(edgeId));
     edge.normalize3();
@@ -582,7 +583,7 @@ int32_t hkpTriangleShape::weldContactPointImpl(
         }
     }
     separatingNormalInOut = separatingNormal;
-    separatingNormalInOut.m_quad[3] = distance;
+    XFNV_M128_F32(separatingNormalInOut.m_quad, 3) = distance;
     return hkpConvexShape::WELD_RESULT_ACCEPT_CONTACT_POINT_MODIFIED;
 }
 

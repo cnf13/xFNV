@@ -27,6 +27,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpFirstPersonGun.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -230,23 +231,24 @@ void hkpGunProjectile::flyTrue(hkpRigidBody* body, float minVelocity, float time
     arB.m_translation = body->m_motion.m_motionState.m_transform.m_translation;
     __m128 v5 = _mm_mul_ps(v3.m_quad, v3.m_quad);
     arB.m_rotation.m_col0.m_quad = m_quad;
-    if (minVelocity < static_cast<double>(_mm_cvtss_f32(_mm_sqrt_ss(
-                          _mm_set_ss((_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])))
-                      )))) {
+    if (minVelocity < static_cast<double>(_mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+                          (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+                           (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0)))
+                      ))))) {
         hkVector4 q;
         __m128 v6 = _mm_mul_ps(v3.m_quad, v3.m_quad);
-        float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
+        float v7 = XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0);
         __m128 v8 = _mm_shuffle_ps(v6, v6, 170);
-        v8[0] = v8[0] + v7;
-        float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
+        XFNV_M128_F32(v8, 0) = XFNV_M128_F32(v8, 0) + v7;
+        float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v8, 0))));
         __m128 v10 = _mm_setzero_ps();
-        v10[0] = 0.0f;
+        XFNV_M128_F32(v10, 0) = 0.0f;
         __m128 v11 = _mm_setzero_ps();
-        v11[0] = 0.5f;
+        XFNV_M128_F32(v11, 0) = 0.5f;
         __m128 v12 = _mm_cmpeq_ss(v8, v10);
         q.m_quad = v10;
-        v10[0] = 3.0f - ((v8[0] * v9) * v9);
-        v11[0] = (0.5f * v9) * v10[0];
+        XFNV_M128_F32(v10, 0) = 3.0f - ((XFNV_M128_F32(v8, 0) * v9) * v9);
+        XFNV_M128_F32(v11, 0) = (0.5f * v9) * XFNV_M128_F32(v10, 0);
         __m128 v14 = _mm_andnot_ps(v12, v11);
         __m128 v15 = _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), v3.m_quad);
         __m128 v16 = _mm_sub_ps(
@@ -254,18 +256,19 @@ void hkpGunProjectile::flyTrue(hkpRigidBody* body, float minVelocity, float time
             _mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 201), _mm_shuffle_ps(v15, v15, 210))
         );
         __m128 v17 = _mm_mul_ps(v16, v16);
-        float v18 = _mm_cvtss_f32(
-            _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]))))
-        );
+        float v18 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+            (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0)))
+        )));
         if (v18 > 1e-05f) {
             hkRotation v26;
             hkRotation arA;
-            float v19 = _mm_shuffle_ps(v17, v17, 85)[0] + v17[0];
+            float v19 = XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0);
             __m128 v20 = _mm_shuffle_ps(v17, v17, 170);
-            v20[0] = v20[0] + v19;
-            float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v20[0])));
+            XFNV_M128_F32(v20, 0) = XFNV_M128_F32(v20, 0) + v19;
+            float v21 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v20, 0))));
             float afAngle = v18 * timeStep * -5.0;
-            v11[0] = (0.5f * v21) * (3.0f - ((v20[0] * v21) * v21));
+            XFNV_M128_F32(v11, 0) = (0.5f * v21) * (3.0f - ((XFNV_M128_F32(v20, 0) * v21) * v21));
             __m128 v22 = _mm_andnot_ps(_mm_cmpeq_ss(v20, q.m_quad), v11);
             q.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v16);
             arA.setAxisAngle(q, afAngle);

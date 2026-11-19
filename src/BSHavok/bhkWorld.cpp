@@ -158,8 +158,10 @@
 #include "Havok/Source/Physics/Utilities/Weapons/hkpMountedBallGun.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpProjectileGun.h"
 #include "SDK/MSVC/stdlib.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
+#include <cmath>
 #include <xmmintrin.h>
 
 #if XFNV_SYSTEM_ALLOC
@@ -1495,15 +1497,16 @@ void bhkWorld::AddEntities(hkpEntity** apEntityA, uint32_t auiNumEntities) {
             ? static_cast<hkpRigidBody*>(pwo->phkObject)->m_motion.m_linearVelocity
             : hkVector4Zero;
         bool bAtRest = false;
-        if (__builtin_fabsf(kLinear.m_quad[0] - hkVector4Zero.m_quad[0]) <= 0.001f &&
-            __builtin_fabsf(kLinear.m_quad[1] - hkVector4Zero.m_quad[1]) <= 0.001f &&
-            __builtin_fabsf(kLinear.m_quad[2] - hkVector4Zero.m_quad[2]) <= 0.001f) {
+        if (std::fabsf(XFNV_M128_F32(kLinear.m_quad, 0) - XFNV_M128_F32(hkVector4Zero.m_quad, 0)) <= 0.001f &&
+            std::fabsf(XFNV_M128_F32(kLinear.m_quad, 1) - XFNV_M128_F32(hkVector4Zero.m_quad, 1)) <= 0.001f &&
+            std::fabsf(XFNV_M128_F32(kLinear.m_quad, 2) - XFNV_M128_F32(hkVector4Zero.m_quad, 2)) <= 0.001f) {
             const hkVector4& kAngular = (pwo && pwo->phkObject)
                 ? static_cast<hkpRigidBody*>(pwo->phkObject)->m_motion.m_angularVelocity
                 : hkVector4Zero;
-            bAtRest = __builtin_fabsf(kAngular.m_quad[0] - hkVector4Zero.m_quad[0]) <= 0.001f &&
-                __builtin_fabsf(kAngular.m_quad[1] - hkVector4Zero.m_quad[1]) <= 0.001f &&
-                __builtin_fabsf(kAngular.m_quad[2] - hkVector4Zero.m_quad[2]) <= 0.001f;
+            bAtRest =
+                std::fabsf(XFNV_M128_F32(kAngular.m_quad, 0) - XFNV_M128_F32(hkVector4Zero.m_quad, 0)) <= 0.001f &&
+                std::fabsf(XFNV_M128_F32(kAngular.m_quad, 1) - XFNV_M128_F32(hkVector4Zero.m_quad, 1)) <= 0.001f &&
+                std::fabsf(XFNV_M128_F32(kAngular.m_quad, 2) - XFNV_M128_F32(hkVector4Zero.m_quad, 2)) <= 0.001f;
         }
         if (!bAtRest && pwo && pwo->phkObject) {
             static_cast<hkpEntity*>(pwo->phkObject)->activate();
@@ -1642,10 +1645,10 @@ void bhkWorld::GetOrigin(NiPoint3& arOrigin) {
 
 void bhkWorld::SetOrigin(const NiPoint3& arOrigin) {
     hkVector4 kOrigin;
-    kOrigin.m_quad[0] = arOrigin.x * bhkConvert::fBS2HkScaleSC;
-    kOrigin.m_quad[1] = arOrigin.y * bhkConvert::fBS2HkScaleSC;
-    kOrigin.m_quad[2] = bhkConvert::fBS2HkScaleSC * arOrigin.z;
-    kOrigin.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kOrigin.m_quad, 0) = arOrigin.x * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(kOrigin.m_quad, 1) = arOrigin.y * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(kOrigin.m_quad, 2) = bhkConvert::fBS2HkScaleSC * arOrigin.z;
+    XFNV_M128_F32(kOrigin.m_quad, 3) = 0.0f;
     SethkOrigin(kOrigin);
 }
 
@@ -1653,20 +1656,20 @@ void bhkWorld::SetOrigin(const NiPoint3& arOrigin) {
 // and added per lane.
 void bhkWorld::SethkOrigin(const hkVector4& arOrigin) {
     hkVector4 kShift;
-    kShift.m_quad[0] = arOrigin.m_quad[0] - Origin.m_quad[0];
-    kShift.m_quad[1] = arOrigin.m_quad[1] - Origin.m_quad[1];
-    kShift.m_quad[2] = arOrigin.m_quad[2] - Origin.m_quad[2];
-    kShift.m_quad[3] = arOrigin.m_quad[3] - Origin.m_quad[3];
+    XFNV_M128_F32(kShift.m_quad, 0) = XFNV_M128_F32(arOrigin.m_quad, 0) - XFNV_M128_F32(Origin.m_quad, 0);
+    XFNV_M128_F32(kShift.m_quad, 1) = XFNV_M128_F32(arOrigin.m_quad, 1) - XFNV_M128_F32(Origin.m_quad, 1);
+    XFNV_M128_F32(kShift.m_quad, 2) = XFNV_M128_F32(arOrigin.m_quad, 2) - XFNV_M128_F32(Origin.m_quad, 2);
+    XFNV_M128_F32(kShift.m_quad, 3) = XFNV_M128_F32(arOrigin.m_quad, 3) - XFNV_M128_F32(Origin.m_quad, 3);
     ahkpWorld* pw = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
     // The write mark, empty in the game's build, leaves only its world lookup.
     GethkWorld();
     hkVector4 kEffectiveShift;
     pw->shiftBroadPhase(kShift, kEffectiveShift, hkpWorld::SHIFT_BROADPHASE_UPDATE_ENTITY_AABBS);
     GethkWorld();
-    Origin.m_quad[0] = Origin.m_quad[0] + kEffectiveShift.m_quad[0];
-    Origin.m_quad[1] = Origin.m_quad[1] + kEffectiveShift.m_quad[1];
-    Origin.m_quad[2] = Origin.m_quad[2] + kEffectiveShift.m_quad[2];
-    Origin.m_quad[3] = Origin.m_quad[3] + kEffectiveShift.m_quad[3];
+    XFNV_M128_F32(Origin.m_quad, 0) = XFNV_M128_F32(Origin.m_quad, 0) + XFNV_M128_F32(kEffectiveShift.m_quad, 0);
+    XFNV_M128_F32(Origin.m_quad, 1) = XFNV_M128_F32(Origin.m_quad, 1) + XFNV_M128_F32(kEffectiveShift.m_quad, 1);
+    XFNV_M128_F32(Origin.m_quad, 2) = XFNV_M128_F32(Origin.m_quad, 2) + XFNV_M128_F32(kEffectiveShift.m_quad, 2);
+    XFNV_M128_F32(Origin.m_quad, 3) = XFNV_M128_F32(Origin.m_quad, 3) + XFNV_M128_F32(kEffectiveShift.m_quad, 3);
 }
 
 ahkpWorld* bhkWorld::operator*() const {
@@ -1789,13 +1792,19 @@ void bhkWorld::Add(hkpWorldObject* apObject) {
                 if ((pwo->GetCollisionFilter(&kFilter)->iFilter & 0x7F) != L_BIPED) {
                     bhkRigidBody* pbody = static_cast<bhkRigidBody*>(pwo);
                     const hkVector4& kLinear = pbody->GetLinearVelocity();
-                    if (__builtin_fabsf(kLinear.m_quad[0] - hkVector4Zero.m_quad[0]) <= 0.001f &&
-                        __builtin_fabsf(kLinear.m_quad[1] - hkVector4Zero.m_quad[1]) <= 0.001f &&
-                        __builtin_fabsf(kLinear.m_quad[2] - hkVector4Zero.m_quad[2]) <= 0.001f) {
+                    if (std::fabsf(XFNV_M128_F32(kLinear.m_quad, 0) - XFNV_M128_F32(hkVector4Zero.m_quad, 0)) <=
+                            0.001f &&
+                        std::fabsf(XFNV_M128_F32(kLinear.m_quad, 1) - XFNV_M128_F32(hkVector4Zero.m_quad, 1)) <=
+                            0.001f &&
+                        std::fabsf(XFNV_M128_F32(kLinear.m_quad, 2) - XFNV_M128_F32(hkVector4Zero.m_quad, 2)) <=
+                            0.001f) {
                         const hkVector4& kAngular = pbody->GetAngularVelocity();
-                        if (__builtin_fabsf(kAngular.m_quad[0] - hkVector4Zero.m_quad[0]) <= 0.001f &&
-                            __builtin_fabsf(kAngular.m_quad[1] - hkVector4Zero.m_quad[1]) <= 0.001f &&
-                            __builtin_fabsf(kAngular.m_quad[2] - hkVector4Zero.m_quad[2]) <= 0.001f) {
+                        if (std::fabsf(XFNV_M128_F32(kAngular.m_quad, 0) - XFNV_M128_F32(hkVector4Zero.m_quad, 0)) <=
+                                0.001f &&
+                            std::fabsf(XFNV_M128_F32(kAngular.m_quad, 1) - XFNV_M128_F32(hkVector4Zero.m_quad, 1)) <=
+                                0.001f &&
+                            std::fabsf(XFNV_M128_F32(kAngular.m_quad, 2) - XFNV_M128_F32(hkVector4Zero.m_quad, 2)) <=
+                                0.001f) {
                             eActivation = HK_ENTITY_ACTIVATION_DO_NOT_ACTIVATE;
                         }
                     }

@@ -23,6 +23,7 @@
 #include "Havok/Source/Common/SceneData/Mesh/hkxMesh.h"
 #include "Havok/Source/Common/SceneData/Selection/hkxNodeSelectionSet.h"
 #include "Havok/Source/Common/SceneData/Skin/hkxSkinBinding.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -75,10 +76,10 @@ hkResult hkxScene::getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& 
         worldFromNodeOut.m_col1.m_quad = _mm_setzero_ps();
         worldFromNodeOut.m_col2.m_quad = _mm_setzero_ps();
         worldFromNodeOut.m_col3.m_quad = _mm_setzero_ps();
-        worldFromNodeOut.m_col0.m_quad[0] = 1.0f;
-        worldFromNodeOut.m_col1.m_quad[1] = 1.0f;
-        worldFromNodeOut.m_col2.m_quad[2] = 1.0f;
-        worldFromNodeOut.m_col3.m_quad[3] = 1.0f;
+        XFNV_M128_F32(worldFromNodeOut.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(worldFromNodeOut.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(worldFromNodeOut.m_col2.m_quad, 2) = 1.0f;
+        XFNV_M128_F32(worldFromNodeOut.m_col3.m_quad, 3) = 1.0f;
         for (const hkxNode* pNode : pathOut) {
             int32_t numKeys = pNode->m_keyFrames.m_size;
             int32_t frame = key >= numKeys ? numKeys - 1 : key;

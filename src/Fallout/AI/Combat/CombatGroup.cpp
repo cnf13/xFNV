@@ -59,6 +59,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <new>
 
@@ -1086,8 +1087,8 @@ bool CombatGroup::CheckMemberTargetIntersection() {
     if (!uiMemberCount || !uiTargetCount || (uiMemberCount == 1 && uiTargetCount == 1)) {
         return false;
     }
-    NiPoint3* pMemberPositions = static_cast<NiPoint3*>(__builtin_alloca_with_align(12 * uiMemberCount, 128));
-    NiPoint3* pTargetPositions = static_cast<NiPoint3*>(__builtin_alloca_with_align(12 * uiTargetCount, 128));
+    NiPoint3* pMemberPositions = static_cast<NiPoint3*>(XFNV_ALLOCA16(12 * uiMemberCount));
+    NiPoint3* pTargetPositions = static_cast<NiPoint3*>(XFNV_ALLOCA16(12 * uiTargetCount));
     NiPoint3 kMemberCenter = NiPoint3_ZERO;
     NiPoint3 kTargetCenter = NiPoint3_ZERO;
     for (uint32_t i = 0; i < uiMemberCount; ++i) {

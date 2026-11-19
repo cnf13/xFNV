@@ -40,6 +40,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 TerminalServerTextArray s_TerminalServerTexts{&sTerminalServerText1, &sTerminalServerText2, &sTerminalServerText3,
                                               &sTerminalServerText4, &sTerminalServerText5, &sTerminalServerText6,
@@ -143,7 +144,7 @@ bool BGSTerminal::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first.
                 pEditorID[0] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200);
@@ -159,7 +160,7 @@ bool BGSTerminal::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiSize = apFile->GetChunkSize();
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                 apFile->GetChunkData(pBuffer, uiSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiSize, usFormVersion);
@@ -197,7 +198,7 @@ bool BGSTerminal::Load(TESFile* apFile) {
             case ITXT_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first.
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -212,7 +213,7 @@ bool BGSTerminal::Load(TESFile* apFile) {
                 if (pItem) {
                     // A 16-byte aligned buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                     // An empty chunk leaves the buffer unwritten, so it is cleared first.
                     pBuffer[0] = '\0';
                     apFile->GetChunkData(pBuffer, 0);
@@ -256,7 +257,7 @@ bool BGSTerminal::Load(TESFile* apFile) {
             case SCDA_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 ourMemset(pBuffer, 0, uiChunkSize);
                 apFile->GetChunkData(pBuffer, 0);
                 pItem->ResultScript.SetCompileData(uiChunkSize, pBuffer);
@@ -274,7 +275,7 @@ bool BGSTerminal::Load(TESFile* apFile) {
                 else if (pNewVariable) {
                     // A 16-byte aligned buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                     // An empty chunk leaves the buffer unwritten, so it is cleared first.
                     pBuffer[0] = '\0';
                     apFile->GetChunkData(pBuffer, 0x200);

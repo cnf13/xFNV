@@ -32,6 +32,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
+#include <cstring>
 #include <xmmintrin.h>
 
 hkpPhantom::MembersArray hkpPhantom::Members{
@@ -83,7 +84,7 @@ void hkpPhantom::calcContentStatistics(hkStatisticsCollector* collector, const h
     hkpWorldObject::calcContentStatistics(collector, &hkpWorldObjectClass);
     int32_t iCapacityAndFlags = m_overlapListeners.m_capacityAndFlags;
     uint8_t uiIncludeUnmanaged;
-    __builtin_memcpy(&uiIncludeUnmanaged, &collector->m_includeUnmanagedArrayMemory, 1u);
+    std::memcpy(&uiIncludeUnmanaged, &collector->m_includeUnmanagedArrayMemory, 1u);
     if (iCapacityAndFlags >= 0 || uiIncludeUnmanaged != 0) {
         int32_t iAllocated = hkStatisticsCollector::getAllocatedSize(
             m_overlapListeners.m_data, (iCapacityAndFlags & hkArrayBase<hkpPhantomOverlapListener*>::CAPACITY_MASK) * 4
@@ -94,7 +95,7 @@ void hkpPhantom::calcContentStatistics(hkStatisticsCollector* collector, const h
         );
     }
     iCapacityAndFlags = m_phantomListeners.m_capacityAndFlags;
-    __builtin_memcpy(&uiIncludeUnmanaged, &collector->m_includeUnmanagedArrayMemory, 1u);
+    std::memcpy(&uiIncludeUnmanaged, &collector->m_includeUnmanagedArrayMemory, 1u);
     if (iCapacityAndFlags >= 0 || uiIncludeUnmanaged != 0) {
         int32_t iAllocated = hkStatisticsCollector::getAllocatedSize(
             m_phantomListeners.m_data, (iCapacityAndFlags & hkArrayBase<hkpPhantomListener*>::CAPACITY_MASK) * 4

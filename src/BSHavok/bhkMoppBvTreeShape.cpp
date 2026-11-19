@@ -98,13 +98,13 @@ void bhkMoppBvTreeShape::SaveBinary(NiStream& arStream) {
     hkMoppBvTreeShapeCinfo* pCinfo = static_cast<hkMoppBvTreeShapeCinfo*>(&pThis->CreateCinfo(bCreated));
     // Compares the flag's raw byte with 1: any other byte swaps.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        pCinfo->fScale = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->fScale)));
+        pCinfo->fScale = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->fScale)));
     }
     bhkBvTreeShape::SaveBinary(arStream);
     bhkStream::SaveBinary(arStream, pCinfo->m_code);
     pThis->KillCinfo(bCreated);
     if (!bCreated && *static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        pCinfo->fScale = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->fScale)));
+        pCinfo->fScale = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->fScale)));
     }
 }
 
@@ -174,7 +174,7 @@ int32_t bhkMoppBvTreeShape::LoadCInfo(NiStream& arStream) {
         pCinfo->ReadSerialized(kForm);
         // Compares the flag's raw byte with 1: any other byte swaps.
         if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-            pCinfo->fScale = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->fScale)));
+            pCinfo->fScale = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->fScale)));
         }
     }
     else {

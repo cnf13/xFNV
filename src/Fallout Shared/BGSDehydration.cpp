@@ -8,6 +8,7 @@
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout/Misc/SaveLoad/BGSReconstructFormsInAllFilesMap.h"
+#include "xfnv/Compiler.h"
 
 // Reads the stage's data (the dehydration amount and the sickness spell) and its editor ID.
 bool BGSDehydrationStage::Load(TESFile* apFile) {
@@ -35,7 +36,7 @@ bool BGSDehydrationStage::Load(TESFile* apFile) {
         }
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned buffer of the chunk's size, read up to 0x200.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0x200);
             SetFormEditorID(pBuffer);
         }

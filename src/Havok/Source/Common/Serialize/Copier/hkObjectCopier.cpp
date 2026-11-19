@@ -23,6 +23,7 @@
 #include "Havok/Source/Common/Serialize/Util/hkFinishLoadedObjectFlag.h"
 #include "Havok/Source/Common/Serialize/Util/hkStructureLayout.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 static int32_t hkMin2(int32_t a1, int32_t a2);
 
@@ -231,7 +232,7 @@ void hkObjectCopier::writeZero(hkOArchive& oa, const hkClassMember& memberOut) {
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x5EF4E5A4, acBuffer, ".\\Copier\\hkObjectCopier.cpp", 0xA8
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
             break;
         }
@@ -481,7 +482,7 @@ int32_t hkObjectCopier::saveBody(const void* dataIn, const hkClass& klassIn, hkO
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x641E3E03, buf, ".\\Copier\\hkObjectCopier.cpp", 549
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 break;
             }
@@ -564,7 +565,7 @@ void hkObjectCopier::saveExtras(
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x641E3E05, buf, ".\\Copier\\hkObjectCopier.cpp", 926
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 break;
             }
@@ -812,7 +813,7 @@ void hkObjectCopier::saveExtras(
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x641E3E05, buf, ".\\Copier\\hkObjectCopier.cpp", 931
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 break;
             }
@@ -864,7 +865,7 @@ void hkObjectCopier::writePodArray(int32_t nelem, uint32_t msize, hkOArchive* oa
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x747E1E03, buf, ".\\Copier\\hkObjectCopier.cpp", 251
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
             break;
         }

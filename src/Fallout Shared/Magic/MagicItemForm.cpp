@@ -9,6 +9,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // The record's chunks: the bound, the name, the effects (from 'EFID' or 'CTDA') and the editor ID; every chunk then
 // goes to the magic item's own type-specific chunk loader, and the item's data chunk is cleared and read.
@@ -33,7 +34,7 @@ bool MagicItemForm::Load(TESFile* apFile) {
         }
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0x200);
             SetFormEditorID(pBuffer);
         }

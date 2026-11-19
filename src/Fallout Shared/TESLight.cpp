@@ -50,6 +50,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 
@@ -266,7 +267,7 @@ bool TESObjectLIGH::Load(TESFile* apFile) {
         // The switch compares the record code signed.
         switch (static_cast<int32_t>(iChunk)) {
             case 0x44494445: { // 'EDID'
-                char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pEditorID, 0x200);
                 SetFormEditorID(pEditorID);
                 break;
@@ -285,7 +286,7 @@ bool TESObjectLIGH::Load(TESFile* apFile) {
                 break;
             case 0x53444F4D: { // 'MODS'
                 uint32_t iSize = apFile->GetChunkSize();
-                char* pData = static_cast<char*>(__builtin_alloca(iSize));
+                char* pData = static_cast<char*>(XFNV_ALLOCA(iSize));
                 apFile->GetChunkData(pData, iSize);
                 TESModelTextureSwap::UnpackTextureSwapChunkData(pData, iSize, apFile->GetFormVersion());
                 break;
@@ -493,7 +494,7 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
         return nullptr;
     }
     uint32_t uiBufferSize = GetFormEditorIDLength() + 16;
-    void* pBuffer = __builtin_alloca_with_align(uiBufferSize, 128);
+    void* pBuffer = XFNV_ALLOCA16(uiBufferSize);
     (void)pBuffer;
     if (!static_cast<TESModelTextureSwap*>(this)->TESModel::GetModelLength()) {
         NiAVObject* pGraphics = spGraphics.operator->();

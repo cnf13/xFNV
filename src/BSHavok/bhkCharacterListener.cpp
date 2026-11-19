@@ -9,6 +9,7 @@
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/CharacterProxy/hkpCharacterProxy.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/CharacterProxy/hkpCharacterProxyListener.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -70,18 +71,18 @@ void bhkCharacterListener::characterInteractionCallback(
         __m128 v8 = _mm_undefined_ps();
         hkVector4 v12;
         v12.m_quad = arContact.m_separatingNormal.m_quad;
-        v12.m_quad[2] = 0.0f;
-        v13.m_quad[2] = 0.0f;
+        XFNV_M128_F32(v12.m_quad, 2) = 0.0f;
+        XFNV_M128_F32(v13.m_quad, 2) = 0.0f;
         __m128 v4 = _mm_mul_ps(v12.m_quad, v12.m_quad);
-        float v5 = _mm_shuffle_ps(v4, v4, 85)[0] + v4[0];
+        float v5 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0);
         __m128 v6 = _mm_shuffle_ps(v4, v4, 170);
-        v6[0] = v6[0] + v5;
-        float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v6[0])));
-        v8[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+        XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) + v5;
+        float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v6, 0))));
+        XFNV_M128_F32(v8, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
         __m128 v9 = _mm_cmpeq_ss(v6, v8);
-        v8[0] = 3.0f - ((v6[0] * v7) * v7);
+        XFNV_M128_F32(v8, 0) = 3.0f - ((XFNV_M128_F32(v6, 0) * v7) * v7);
         __m128 v10 = _mm_setzero_ps();
-        v10[0] = (0.5f * v7) * v8[0];
+        XFNV_M128_F32(v10, 0) = (0.5f * v7) * XFNV_M128_F32(v8, 0);
         __m128 v11 = _mm_andnot_ps(v9, v10);
         v13.m_quad = _mm_add_ps(
             (&apOtherProxy->getLinearVelocity())->m_quad,
@@ -148,16 +149,18 @@ void bhkCharacterListener::AddSupportHeight(uint32_t aiIndex, float afHeight) {
 void bhkCharacterListener::AddSupportHeight2(hkVector4* apFrontBack, const hkVector4& arPos) {
     alignas(16) hkVector4 kDiff[4];
     for (int32_t i = 0; i < 4; ++i) {
-        kDiff[i].m_quad[0] = arPos.m_quad[0] - apFrontBack[i].m_quad[0];
-        kDiff[i].m_quad[1] = arPos.m_quad[1] - apFrontBack[i].m_quad[1];
-        kDiff[i].m_quad[2] = 0.0f;
+        XFNV_M128_F32(kDiff[i].m_quad, 0) = XFNV_M128_F32(arPos.m_quad, 0) - XFNV_M128_F32(apFrontBack[i].m_quad, 0);
+        XFNV_M128_F32(kDiff[i].m_quad, 1) = XFNV_M128_F32(arPos.m_quad, 1) - XFNV_M128_F32(apFrontBack[i].m_quad, 1);
+        XFNV_M128_F32(kDiff[i].m_quad, 2) = 0.0f;
     }
-    float fLen0 = (kDiff[0].m_quad[1] * kDiff[0].m_quad[1] + kDiff[0].m_quad[0] * kDiff[0].m_quad[0]) +
-        kDiff[0].m_quad[2] * kDiff[0].m_quad[2];
-    float fLen1 = (kDiff[1].m_quad[1] * kDiff[1].m_quad[1] + kDiff[1].m_quad[0] * kDiff[1].m_quad[0]) +
-        kDiff[1].m_quad[2] * kDiff[1].m_quad[2];
+    float fLen0 = (XFNV_M128_F32(kDiff[0].m_quad, 1) * XFNV_M128_F32(kDiff[0].m_quad, 1) +
+                   XFNV_M128_F32(kDiff[0].m_quad, 0) * XFNV_M128_F32(kDiff[0].m_quad, 0)) +
+        XFNV_M128_F32(kDiff[0].m_quad, 2) * XFNV_M128_F32(kDiff[0].m_quad, 2);
+    float fLen1 = (XFNV_M128_F32(kDiff[1].m_quad, 1) * XFNV_M128_F32(kDiff[1].m_quad, 1) +
+                   XFNV_M128_F32(kDiff[1].m_quad, 0) * XFNV_M128_F32(kDiff[1].m_quad, 0)) +
+        XFNV_M128_F32(kDiff[1].m_quad, 2) * XFNV_M128_F32(kDiff[1].m_quad, 2);
     int32_t iIndex = (fLen1 > fLen0) ? 0 : 1;
-    float fHeight = arPos.m_quad[2];
+    float fHeight = XFNV_M128_F32(arPos.m_quad, 2);
     // EXE-INLINED 0xC6C720
     if (SupportHeight[iIndex] == 1.17549435e-38f) {
         SupportHeight[iIndex] = fHeight;
@@ -166,12 +169,14 @@ void bhkCharacterListener::AddSupportHeight2(hkVector4* apFrontBack, const hkVec
         float fSum = fHeight + SupportHeight[iIndex];
         SupportHeight[iIndex] = static_cast<float>(fSum * 0.5);
     }
-    float fLen2 = (kDiff[2].m_quad[1] * kDiff[2].m_quad[1] + kDiff[2].m_quad[0] * kDiff[2].m_quad[0]) +
-        kDiff[2].m_quad[2] * kDiff[2].m_quad[2];
-    float fLen3 = (kDiff[3].m_quad[1] * kDiff[3].m_quad[1] + kDiff[3].m_quad[0] * kDiff[3].m_quad[0]) +
-        kDiff[3].m_quad[2] * kDiff[3].m_quad[2];
+    float fLen2 = (XFNV_M128_F32(kDiff[2].m_quad, 1) * XFNV_M128_F32(kDiff[2].m_quad, 1) +
+                   XFNV_M128_F32(kDiff[2].m_quad, 0) * XFNV_M128_F32(kDiff[2].m_quad, 0)) +
+        XFNV_M128_F32(kDiff[2].m_quad, 2) * XFNV_M128_F32(kDiff[2].m_quad, 2);
+    float fLen3 = (XFNV_M128_F32(kDiff[3].m_quad, 1) * XFNV_M128_F32(kDiff[3].m_quad, 1) +
+                   XFNV_M128_F32(kDiff[3].m_quad, 0) * XFNV_M128_F32(kDiff[3].m_quad, 0)) +
+        XFNV_M128_F32(kDiff[3].m_quad, 2) * XFNV_M128_F32(kDiff[3].m_quad, 2);
     iIndex = (fLen3 > fLen2) ? 2 : 3;
-    fHeight = arPos.m_quad[2];
+    fHeight = XFNV_M128_F32(arPos.m_quad, 2);
     // EXE-INLINED 0xC6C720
     if (SupportHeight[iIndex] == 1.17549435e-38f) {
         SupportHeight[iIndex] = fHeight;

@@ -49,6 +49,7 @@
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -174,7 +175,7 @@ hkpMouseSpringAction::hkpMouseSpringAction(
             );
         hkpCollisionInput input = *pWorld->m_collisionInput;
         hkpClosestCdPointCollector collector;
-        collector.m_hitPoint.m_contact.m_separatingNormal.m_quad[3] = 3.40282e+38f;
+        XFNV_M128_F32(collector.m_hitPoint.m_contact.m_separatingNormal.m_quad, 3) = 3.40282e+38f;
         collector.m_earlyOutDistance = 3.40282e+38f;
         collector.m_hitPoint.m_rootCollidableA = nullptr;
         getClosestPoints(collidable, rb->m_collidable, input, collector);
@@ -206,7 +207,7 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
         pMotion = &pRb->m_motion;
     }
     // EXE-INLINED none: hkpMotion::getMassInv
-    float massInv = pMotion->m_inertiaAndMassInv.m_quad[3];
+    float massInv = XFNV_M128_F32(pMotion->m_inertiaAndMassInv.m_quad, 3);
 
     alignas(16) hkVector4 rel;
     rel.setSub4(pointWs, pRb->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1);
@@ -219,11 +220,11 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
     // The mass matrix: massInv on the diagonal, zero elsewhere.
     alignas(16) hkMatrix3 mass;
     mass.m_col0.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
-    mass.m_col0.m_quad[0] = massInv;
+    XFNV_M128_F32(mass.m_col0.m_quad, 0) = massInv;
     mass.m_col1.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
-    mass.m_col1.m_quad[1] = massInv;
+    XFNV_M128_F32(mass.m_col1.m_quad, 1) = massInv;
     mass.m_col2.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
-    mass.m_col2.m_quad[2] = massInv;
+    XFNV_M128_F32(mass.m_col2.m_quad, 2) = massInv;
     {
         alignas(16) hkMatrix3 temp;
         temp.setMul(rhat, inertiaInv);
@@ -238,18 +239,18 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
     // EXE-INLINED none: hkpRigidBody::getLinearVelocity, hkVector4::mul4
     alignas(16) hkVector4 linVel = pRb->m_motion.m_linearVelocity;
     float damping = m_objectDamping;
-    linVel.m_quad[0] = damping * linVel.m_quad[0];
-    linVel.m_quad[1] = damping * linVel.m_quad[1];
-    linVel.m_quad[2] = damping * linVel.m_quad[2];
-    linVel.m_quad[3] = damping * linVel.m_quad[3];
+    XFNV_M128_F32(linVel.m_quad, 0) = damping * XFNV_M128_F32(linVel.m_quad, 0);
+    XFNV_M128_F32(linVel.m_quad, 1) = damping * XFNV_M128_F32(linVel.m_quad, 1);
+    XFNV_M128_F32(linVel.m_quad, 2) = damping * XFNV_M128_F32(linVel.m_quad, 2);
+    XFNV_M128_F32(linVel.m_quad, 3) = damping * XFNV_M128_F32(linVel.m_quad, 3);
     pRb->setLinearVelocity(linVel);
     // EXE-INLINED none: hkpRigidBody::getAngularVelocity, hkVector4::mul4
     alignas(16) hkVector4 angVel = pRb->m_motion.m_angularVelocity;
     damping = m_objectDamping;
-    angVel.m_quad[0] = damping * angVel.m_quad[0];
-    angVel.m_quad[1] = damping * angVel.m_quad[1];
-    angVel.m_quad[2] = damping * angVel.m_quad[2];
-    angVel.m_quad[3] = damping * angVel.m_quad[3];
+    XFNV_M128_F32(angVel.m_quad, 0) = damping * XFNV_M128_F32(angVel.m_quad, 0);
+    XFNV_M128_F32(angVel.m_quad, 1) = damping * XFNV_M128_F32(angVel.m_quad, 1);
+    XFNV_M128_F32(angVel.m_quad, 2) = damping * XFNV_M128_F32(angVel.m_quad, 2);
+    XFNV_M128_F32(angVel.m_quad, 3) = damping * XFNV_M128_F32(angVel.m_quad, 3);
     pRb->setAngularVelocity(angVel);
 
     alignas(16) hkVector4 pointVel;
@@ -259,10 +260,14 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
     float elasticity = m_springElasticity * stepInfo.m_invDeltaTime;
     alignas(16) hkVector4 deltaV;
     float springDamping = m_springDamping;
-    deltaV.m_quad[0] = springDamping * pointVel.m_quad[0] + elasticity * posError.m_quad[0];
-    deltaV.m_quad[1] = springDamping * pointVel.m_quad[1] + elasticity * posError.m_quad[1];
-    deltaV.m_quad[2] = springDamping * pointVel.m_quad[2] + elasticity * posError.m_quad[2];
-    deltaV.m_quad[3] = springDamping * pointVel.m_quad[3] + elasticity * posError.m_quad[3];
+    XFNV_M128_F32(deltaV.m_quad, 0) =
+        springDamping * XFNV_M128_F32(pointVel.m_quad, 0) + elasticity * XFNV_M128_F32(posError.m_quad, 0);
+    XFNV_M128_F32(deltaV.m_quad, 1) =
+        springDamping * XFNV_M128_F32(pointVel.m_quad, 1) + elasticity * XFNV_M128_F32(posError.m_quad, 1);
+    XFNV_M128_F32(deltaV.m_quad, 2) =
+        springDamping * XFNV_M128_F32(pointVel.m_quad, 2) + elasticity * XFNV_M128_F32(posError.m_quad, 2);
+    XFNV_M128_F32(deltaV.m_quad, 3) =
+        springDamping * XFNV_M128_F32(pointVel.m_quad, 3) + elasticity * XFNV_M128_F32(posError.m_quad, 3);
 
     alignas(16) hkVector4 impulse;
     impulse.setMul3(mass, deltaV);
@@ -275,10 +280,10 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
         float len = std::sqrt(impulseLen2);
         float factor = 1.0f / len;
         factor = factor * maxImpulse;
-        impulse.m_quad[0] = factor * impulse.m_quad[0];
-        impulse.m_quad[1] = factor * impulse.m_quad[1];
-        impulse.m_quad[2] = factor * impulse.m_quad[2];
-        impulse.m_quad[3] = factor * impulse.m_quad[3];
+        XFNV_M128_F32(impulse.m_quad, 0) = factor * XFNV_M128_F32(impulse.m_quad, 0);
+        XFNV_M128_F32(impulse.m_quad, 1) = factor * XFNV_M128_F32(impulse.m_quad, 1);
+        XFNV_M128_F32(impulse.m_quad, 2) = factor * XFNV_M128_F32(impulse.m_quad, 2);
+        XFNV_M128_F32(impulse.m_quad, 3) = factor * XFNV_M128_F32(impulse.m_quad, 3);
     }
 
     pRb->activate();

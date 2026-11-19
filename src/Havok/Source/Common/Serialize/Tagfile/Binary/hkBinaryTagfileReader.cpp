@@ -20,6 +20,7 @@
 #include "Havok/Source/Common/Serialize/Data/hkDataObject.h"
 #include "Havok/Source/Common/Serialize/Data/hkDataObjectImpl.h"
 #include "Havok/Source/Common/Serialize/Data/hkDataWorld.h"
+#include "xfnv/Compiler.h"
 
 hkBinaryTagfileReader::hkBinaryTagfileReader() {}
 
@@ -296,7 +297,7 @@ hkDataObject Reader::readObject(int32_t aiType) {
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x484994D5, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 376
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
         }
     }

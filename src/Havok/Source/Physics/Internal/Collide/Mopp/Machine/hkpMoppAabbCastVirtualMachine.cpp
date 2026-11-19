@@ -13,6 +13,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverCheck.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -55,11 +56,11 @@ void hkpMoppAabbCastVirtualMachine::aabbCast(
         m_castObjectType = eCastType;
         uint8_t* pCodeData = pCode->m_data.m_data;
         aScaledQuery.m_FtoBoffset.m_quad = _mm_setzero_ps();
-        m_ItoFScale = 1.0 / pCode->m_info.m_offset.m_quad[3];
-        aScaledQuery.m_FtoBScale = pCode->m_info.m_offset.m_quad[3] * 1.52587890625e-05;
+        m_ItoFScale = 1.0 / XFNV_M128_F32(pCode->m_info.m_offset.m_quad, 3);
+        aScaledQuery.m_FtoBScale = XFNV_M128_F32(pCode->m_info.m_offset.m_quad, 3) * 1.52587890625e-05;
         // The scale in lane 0 of a zeroed register, then broadcast.
         __m128 scaleLow = _mm_setzero_ps();
-        scaleLow[0] = aScaledQuery.m_FtoBScale;
+        XFNV_M128_F32(scaleLow, 0) = aScaledQuery.m_FtoBScale;
         const __m128 extents = _mm_mul_ps(_mm_shuffle_ps(scaleLow, scaleLow, 0), input.m_extents.m_quad);
         aScaledQuery.m_extents.m_quad = extents;
         // The extents are summed as z + (y + x) in single precision and stored as a float, then scaled by 3.
@@ -412,7 +413,7 @@ void hkpMoppAabbCastVirtualMachine::queryRayOnTree(
                         hkError::MESSAGE_ERROR, 0x1298fedd, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppAabbCastVirtualMachine.cpp", 521
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }

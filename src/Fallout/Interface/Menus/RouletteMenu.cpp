@@ -65,6 +65,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 static RouletteMenu::RouletteState eprevRouletteState{RouletteMenu::RO_IDLE};
 static bool bInvalidBet;
@@ -907,7 +908,7 @@ void RouletteMenu::ShiftWheelTexture(int32_t aiResult) {
     else {
         i += 5;
     }
-    __builtin_memcpy(&akRot, &NiMatrix3_IDENTITY, sizeof(akRot));
+    std::memcpy(&akRot, &NiMatrix3_IDENTITY, sizeof(akRot));
     float v2 = (float)((((double)i) * 9.473684210526315) * 0.01745329238474369);
     (&akRot)->MakeZRotation(v2);
     NiAVObject* objectByName = BSUtilities::GetObjectByName(pRouletteTableGeometry, "Roulette_Wheel:2");

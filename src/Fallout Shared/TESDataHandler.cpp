@@ -171,7 +171,9 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/tchar.h"
 #include "platform/Paths.h"
+#include "xfnv/Compiler.h"
 
+#include <bit>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
@@ -3027,7 +3029,7 @@ bool TESDataHandler::ConstructObject(
                         uint32_t uiID = pIDs[i];
                         if (pFile->QEndian()) {
                             // the engine's ENDIAN<long>
-                            uiID = __builtin_bswap32(uiID);
+                            uiID = std::byteswap<uint32_t>(uiID);
                         }
                         const uint32_t uiFileIndex = uiID >> 24;
                         TESFile* pOwner = pFile->GetIndexFile(uiFileIndex + 1);
@@ -3223,7 +3225,7 @@ bool TESDataHandler::ConstructObject(
                 "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESDataHandler.cpp", 8465
             );
             if (pFile->GetTESChunk() == EDID_ID) {
-                char* const pKey = static_cast<char*>(__builtin_alloca(pFile->GetChunkSize()));
+                char* const pKey = static_cast<char*>(XFNV_ALLOCA(pFile->GetChunkSize()));
                 pFile->GetChunkData(pKey, 0);
                 SettingT<GameSettingCollection>::GetCollection()->ReadSetting(pFile, pKey);
             }

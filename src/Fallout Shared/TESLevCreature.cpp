@@ -11,6 +11,7 @@
 #include "Fallout Shared/TESLeveledList.h"
 #include "Fallout Shared/TESModelTextureSwap.h"
 #include "Fallout Shared/TESObject.h"
+#include "xfnv/Compiler.h"
 
 // The entry the last LVLO chunk created; the COED chunk that follows gives it its extra data
 // (TESLevCreature::Load's function-local static plastload).
@@ -39,7 +40,7 @@ bool TESLevCreature::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is terminated first.
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);
@@ -56,7 +57,7 @@ bool TESLevCreature::Load(TESFile* apFile) {
             case MODS_ID: {
                 const uint32_t uiSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                 apFile->GetChunkData(pBuffer, uiSize);
                 const uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiSize, usFormVersion);

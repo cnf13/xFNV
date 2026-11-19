@@ -107,6 +107,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 // No code reads or writes these values.
 static bool data_1189626 = false;
@@ -1879,7 +1880,7 @@ bool TESWaterSystem::AddPlaceableWater(TESObjectREFR* apWaterRef) {
     NiNode* pNode = apWaterRef->Get3D();
     NiPoint3 pos = pNode->GetWorldTranslate();
     NiNode* pNode2 = apWaterRef->Get3D();
-    __builtin_memcpy(&rot, &pNode2->GetWorldTransform(), sizeof(rot));
+    std::memcpy(&rot, &pNode2->GetWorldTransform(), sizeof(rot));
     return AddWaterRef(apWaterRef, &pos, &rot);
 }
 
@@ -2071,7 +2072,7 @@ void TESWaterSystem::RemoveWaterRefFromWaterSystem(TESObjectREFR* apRef) {
     NiNode* v2 = apRef->Get3D();
     NiPoint3 v5 = v2->GetWorldTranslate();
     NiNode* v3 = apRef->Get3D();
-    __builtin_memcpy(&v6, &v3->GetWorldTransform(), sizeof(v6));
+    std::memcpy(&v6, &v3->GetWorldTransform(), sizeof(v6));
     RemovePlaceableWater(apRef, &v5, &v6);
 }
 

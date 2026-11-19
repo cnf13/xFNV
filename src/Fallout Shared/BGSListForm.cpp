@@ -12,6 +12,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSListForm::BGSListForm() : iScriptAddedFormCount(0) {
     cFormType = 85;
@@ -40,7 +41,7 @@ bool BGSListForm::Load(TESFile* apFile) {
         }
 
         if (eChunk == EDID_ID) {
-            char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
             apFile->GetChunkData(pEditorID, 0x200);
             SetFormEditorID(pEditorID);
         }

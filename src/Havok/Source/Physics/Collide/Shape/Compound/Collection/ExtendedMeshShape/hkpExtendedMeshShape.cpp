@@ -33,8 +33,10 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Collide/Util/Welding/hkpWeldingUtility.h"
 #include "Havok/Source/Physics/Collide/Util/hkpTriangleUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
+#include <cmath>
 #include <xmmintrin.h>
 
 // Copies 6 quads (96 bytes) from src to dst, as hkString::memCpy16<96> does on Win32;
@@ -80,9 +82,9 @@ hkpExtendedMeshShape::TrianglesSubpart::operator=(const hkpExtendedMeshShape::Tr
 // beyond 0.001 on any axis, FLAG_ROTATE_SET for a rotation of 0.001 or more.
 hkpExtendedMeshShape::ShapesSubpart::ShapesSubpart(hkFinishLoadedObjectFlag flag) : m_childShapes(flag) {
     if (flag.m_finishing) {
-        int32_t iFlags =
-            !(__builtin_fabsf(m_translation.m_quad[0]) <= 0.001f &&
-              __builtin_fabsf(m_translation.m_quad[1]) <= 0.001f && __builtin_fabsf(m_translation.m_quad[2]) <= 0.001f)
+        int32_t iFlags = !(std::fabsf(XFNV_M128_F32(m_translation.m_quad, 0)) <= 0.001f &&
+                           std::fabsf(XFNV_M128_F32(m_translation.m_quad, 1)) <= 0.001f &&
+                           std::fabsf(XFNV_M128_F32(m_translation.m_quad, 2)) <= 0.001f)
             ? FLAG_TRANSLATE_SET
             : FLAG_NONE;
         if (!(m_rotation.getAngle() < 0.001f)) {
@@ -115,8 +117,8 @@ hkpExtendedMeshShape::ShapesSubpart::ShapesSubpart(const hkpConvexShape* const* 
     }
     m_rotation.setIdentity();
     m_translation.setInt24W(
-        !(__builtin_fabsf(a3.m_quad[0]) <= 0.001f && __builtin_fabsf(a3.m_quad[1]) <= 0.001f &&
-          __builtin_fabsf(a3.m_quad[2]) <= 0.001f)
+        !(std::fabsf(XFNV_M128_F32(a3.m_quad, 0)) <= 0.001f && std::fabsf(XFNV_M128_F32(a3.m_quad, 1)) <= 0.001f &&
+          std::fabsf(XFNV_M128_F32(a3.m_quad, 2)) <= 0.001f)
             ? FLAG_TRANSLATE_SET
             : FLAG_NONE
     );
@@ -144,9 +146,9 @@ hkpExtendedMeshShape::ShapesSubpart::ShapesSubpart(const hkpConvexShape* const* 
         }
         m_childShapes.m_data[i] = pChild;
     }
-    int32_t iFlags =
-        !(__builtin_fabsf(m_translation.m_quad[0]) <= 0.001f && __builtin_fabsf(m_translation.m_quad[1]) <= 0.001f &&
-          __builtin_fabsf(m_translation.m_quad[2]) <= 0.001f)
+    int32_t iFlags = !(std::fabsf(XFNV_M128_F32(m_translation.m_quad, 0)) <= 0.001f &&
+                       std::fabsf(XFNV_M128_F32(m_translation.m_quad, 1)) <= 0.001f &&
+                       std::fabsf(XFNV_M128_F32(m_translation.m_quad, 2)) <= 0.001f)
         ? FLAG_TRANSLATE_SET
         : FLAG_NONE;
     if (!r.m_rotation.isApproximatelyEqual(hkTransformIdentity.m_rotation, 0.001f).m_bool) {
@@ -374,8 +376,8 @@ int32_t hkpExtendedMeshShape::calcSizeForSpu(const hkpShape::CalcSizeForSpuInput
     while (true) {
         hkpShape* v6 = v4->m_childShapes.m_data[v5];
         int32_t v7 = v6->calcSizeForSpu(a1, 256);
-        int32_t v8 = (std::bit_cast<int32_t>(v4->m_translation.m_quad[3]) & 0xC0FFFFFFu) != 0
-            ? (std::bit_cast<int32_t>(v4->m_translation.m_quad[3]) & 0xC0FFFFFFu) != 1 ? 416 : 464
+        int32_t v8 = (std::bit_cast<int32_t>(XFNV_M128_F32(v4->m_translation.m_quad, 3)) & 0xC0FFFFFFu) != 0
+            ? (std::bit_cast<int32_t>(XFNV_M128_F32(v4->m_translation.m_quad, 3)) & 0xC0FFFFFFu) != 1 ? 416 : 464
             : 512;
         if (v7 < 0 || v7 > v8) {
             return -1;
@@ -693,8 +695,8 @@ const hkpShape* hkpExtendedMeshShape::getChildShape(uint32_t key, char (&buffer)
     // The extrusion's squared length, summed x + y, then + z.
     const hkQuadReal extrusion = part->m_extrusion.m_quad;
     const hkQuadReal squares = _mm_mul_ps(extrusion, extrusion);
-    const float xy = squares[1] + squares[0];
-    const float lengthSquared = squares[2] + xy;
+    const float xy = XFNV_M128_F32(squares, 1) + XFNV_M128_F32(squares, 0);
+    const float lengthSquared = XFNV_M128_F32(squares, 2) + xy;
     pTriangle->m_type.m_storage = HK_SHAPE_TRIANGLE;
     pTriangle->m_isExtruded = lengthSquared > 0.0f ? 1 : 0;
     pTriangle->m_extrusion.m_quad = extrusion;
@@ -917,14 +919,14 @@ void calcAabbExtents(const hkpExtendedMeshShape::TrianglesSubpart& part, hkVecto
         alignas(16) hkVector4 akFrame[6];
         for (int32_t j = 0; j < 3; ++j) {
             const float* pVertex = apTriangle[j];
-            float fX = pVertex[0] * scaling.m_quad[0];
-            float fY = pVertex[1] * scaling.m_quad[1];
-            float fZ = pVertex[2] * scaling.m_quad[2];
+            float fX = pVertex[0] * XFNV_M128_F32(scaling.m_quad, 0);
+            float fY = pVertex[1] * XFNV_M128_F32(scaling.m_quad, 1);
+            float fZ = pVertex[2] * XFNV_M128_F32(scaling.m_quad, 2);
             hkVector4& kScaled = akFrame[2 * j];
-            kScaled.m_quad[0] = fX;
-            kScaled.m_quad[1] = fY;
-            kScaled.m_quad[2] = fZ;
-            kScaled.m_quad[3] = 0.0f;
+            XFNV_M128_F32(kScaled.m_quad, 0) = fX;
+            XFNV_M128_F32(kScaled.m_quad, 1) = fY;
+            XFNV_M128_F32(kScaled.m_quad, 2) = fZ;
+            XFNV_M128_F32(kScaled.m_quad, 3) = 0.0f;
             hkVector4& kPoint = akFrame[2 * j + 1];
             kPoint.setTransformedPos(hkTransformIdentity, kScaled);
             __m128 kP = _mm_load_ps(&reinterpret_cast<float*>(&kPoint.m_quad)[0]);

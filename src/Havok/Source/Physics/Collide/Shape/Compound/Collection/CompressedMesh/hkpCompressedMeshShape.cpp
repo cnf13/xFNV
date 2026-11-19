@@ -32,6 +32,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Collide/Util/Welding/hkpWeldingUtility.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -860,8 +861,8 @@ void hkpCompressedMeshShape::getChunkVertex(
     uint32_t v23;
     uint16_t* m_data = apChunk->m_vertices.begin();
     *reinterpret_cast<float*>(&v18) = static_cast<float>(m_data[aiIndex0]);
-    v9[0] = 0.0f;
-    v8[0] = afScale;
+    XFNV_M128_F32(v9, 0) = 0.0f;
+    XFNV_M128_F32(v8, 0) = afScale;
     *reinterpret_cast<float*>(&v21) = static_cast<float>(m_data[aiIndex0 + 1]);
     *reinterpret_cast<float*>(&v15) = static_cast<float>(m_data[aiIndex0 + 2]);
     __m128 v11 = _mm_mul_ps(
@@ -875,7 +876,7 @@ void hkpCompressedMeshShape::getChunkVertex(
     arVertex0.m_quad = _mm_add_ps(v11, apChunk->m_offset.m_quad);
     uint16_t* v13 = apChunk->m_vertices.begin();
     *reinterpret_cast<float*>(&v19) = static_cast<float>(v13[aiIndex1]);
-    v12.m_quad[0] = afScale;
+    XFNV_M128_F32(v12.m_quad, 0) = afScale;
     *reinterpret_cast<float*>(&v16) = static_cast<float>(v13[aiIndex1 + 1]);
     *reinterpret_cast<float*>(&v22) = static_cast<float>(v13[aiIndex1 + 2]);
     arVertex1.m_quad = _mm_add_ps(

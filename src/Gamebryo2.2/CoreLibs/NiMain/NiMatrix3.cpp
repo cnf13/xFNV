@@ -832,7 +832,7 @@ void NiMatrix3::TransformVertices(
 float* NiMatrix3::EigenSolveSymmetric(void* apThis, [[maybe_unused]] void* apEdx, float* a2, float* a3) {
     float v5[2];
     NiMatrix3 v6;
-    __builtin_memcpy(&v6, apThis, sizeof(v6));
+    std::memcpy(&v6, apThis, sizeof(v6));
     int8_t v3 = v6.Tridiagonal(a2, v5);
     v6.QLAlgorithm(a2, v5);
     float* result = a3;

@@ -179,10 +179,6 @@ T* BSSimpleArray<T, uiGrowStep>::_Reallocate(T* apBuffer, uint32_t aiNewSizeInIt
     return static_cast<T*>(ourRealloc(apBuffer, aiNewSizeInItem * static_cast<uint32_t>(sizeof(T))));
 }
 
-namespace bhkUtilFunctions {
-    struct AVLevel;
-}
-
 template <class T, uint32_t uiGrowStep>
 int32_t BSSimpleArray<T, uiGrowStep>::Find(const T& aValue, uint32_t aiStartIndex, EqualFunction apFunc) const {
     while (aiStartIndex < iSize) {
@@ -319,11 +315,6 @@ template <class T, uint32_t uiGrowStep>
 void BSSimpleArray<T, uiGrowStep>::SetAt(uint32_t aiIndex, const T& aValue) {
     GetAt(aiIndex) = aValue;
 }
-
-// For the AVLevel array, SetAt inserts aValue at aiIndex, moving the later items up. Its caller (bhkUtilFunctions.cpp,
-// apQueue.SetAt(0, ...)) relies on that. Defined in BSSimpleArray.cpp, where AVLevel is complete.
-template <>
-void BSSimpleArray<bhkUtilFunctions::AVLevel, 1024>::SetAt(uint32_t aiIndex, const bhkUtilFunctions::AVLevel& aValue);
 
 // Swaps the items from both ends inward; the indices compare signed, so an empty array does nothing.
 template <class T, uint32_t uiGrowStep>

@@ -20,6 +20,7 @@
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpSetLocalTransformsConstraintAtom.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/Hinge/hkpHingeConstraintData.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -128,31 +129,31 @@ void hkHingeConstraintCinfo::LoadBinary(NiStream& arStream) {
     hkTransform* p_m_transformB = &pd->m_atoms.m_transforms.m_transformB;
     v6->m_uiAbsoluteCurrentPos += v6->m_pfnRead(v6, p_m_transformB, 64, nullptr, 0);
     if (!arStream.m_bSourceIsLittleEndian) {
-        p_m_transformA->m_translation.m_quad[0] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformA->m_translation.m_quad[0])))
-        );
-        p_m_transformA->m_translation.m_quad[1] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformA->m_translation.m_quad[1])))
-        );
-        p_m_transformA->m_translation.m_quad[2] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformA->m_translation.m_quad[2])))
-        );
-        p_m_transformA->m_translation.m_quad[3] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformA->m_translation.m_quad[3])))
-        );
+        XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 0) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 0)))
+        ));
+        XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 1) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 1)))
+        ));
+        XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 2) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 2)))
+        ));
+        XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 3) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformA->m_translation.m_quad, 3)))
+        ));
         bhkRigidBodyCinfo::EndianMatrix(p_m_transformA->m_rotation);
-        p_m_transformB->m_translation.m_quad[0] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformB->m_translation.m_quad[0])))
-        );
-        p_m_transformB->m_translation.m_quad[1] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformB->m_translation.m_quad[1])))
-        );
-        p_m_transformB->m_translation.m_quad[2] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformB->m_translation.m_quad[2])))
-        );
-        p_m_transformB->m_translation.m_quad[3] = std::bit_cast<float>(
-            static_cast<int32_t>(__builtin_bswap32(std::bit_cast<uint32_t>(p_m_transformB->m_translation.m_quad[3])))
-        );
+        XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 0) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 0)))
+        ));
+        XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 1) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 1)))
+        ));
+        XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 2) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 2)))
+        ));
+        XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 3) = std::bit_cast<float>(static_cast<int32_t>(
+            std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(p_m_transformB->m_translation.m_quad, 3)))
+        ));
         bhkRigidBodyCinfo::EndianMatrix(p_m_transformB->m_rotation);
     }
 }

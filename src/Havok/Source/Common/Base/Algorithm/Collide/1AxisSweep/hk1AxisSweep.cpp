@@ -6,30 +6,31 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
 void hk1AxisSweep::AabbInt::set(const hkAabb& aabbIn, int32_t key) {
-    m_min[0] = (std::bit_cast<int32_t>(aabbIn.m_min.m_quad[0]) ^
-                (std::bit_cast<int32_t>(aabbIn.m_min.m_quad[0]) >> 31 | 0x80000001u)) >>
+    m_min[0] = (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_min.m_quad, 0)) ^
+                (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_min.m_quad, 0)) >> 31 | 0x80000001u)) >>
         1;
-    m_min[1] = (std::bit_cast<int32_t>(aabbIn.m_min.m_quad[1]) ^
-                (std::bit_cast<int32_t>(aabbIn.m_min.m_quad[1]) >> 31 | 0x80000001u)) >>
+    m_min[1] = (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_min.m_quad, 1)) ^
+                (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_min.m_quad, 1)) >> 31 | 0x80000001u)) >>
         1;
-    m_min[2] = (std::bit_cast<int32_t>(aabbIn.m_min.m_quad[2]) ^
-                (std::bit_cast<int32_t>(aabbIn.m_min.m_quad[2]) >> 31 | 0x80000001u)) >>
+    m_min[2] = (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_min.m_quad, 2)) ^
+                (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_min.m_quad, 2)) >> 31 | 0x80000001u)) >>
         1;
     getKey() = key;
-    m_max[0u] = ((std::bit_cast<int32_t>(aabbIn.m_max.m_quad[0]) ^
-                  (std::bit_cast<int32_t>(aabbIn.m_max.m_quad[0]) >> 31 | 0x80000001u)) >>
+    m_max[0u] = ((std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_max.m_quad, 0)) ^
+                  (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_max.m_quad, 0)) >> 31 | 0x80000001u)) >>
                  1) +
         1;
-    m_max[1] = ((std::bit_cast<int32_t>(aabbIn.m_max.m_quad[1]) ^
-                 (std::bit_cast<int32_t>(aabbIn.m_max.m_quad[1]) >> 31 | 0x80000001u)) >>
+    m_max[1] = ((std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_max.m_quad, 1)) ^
+                 (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_max.m_quad, 1)) >> 31 | 0x80000001u)) >>
                 1) +
         1;
-    m_max[2] = ((std::bit_cast<int32_t>(aabbIn.m_max.m_quad[2]) ^
-                 (std::bit_cast<int32_t>(aabbIn.m_max.m_quad[2]) >> 31 | 0x80000001u)) >>
+    m_max[2] = ((std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_max.m_quad, 2)) ^
+                 (std::bit_cast<int32_t>(XFNV_M128_F32(aabbIn.m_max.m_quad, 2)) >> 31 | 0x80000001u)) >>
                 1) +
         1;
 }

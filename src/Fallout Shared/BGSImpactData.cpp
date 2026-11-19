@@ -13,6 +13,7 @@
 #include "Fallout Shared/TESModel.h"
 #include "Fallout Shared/TESSound.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // The decal sizes first, then the impact fields, then the rest of the decal data and the sound level, in the game's
 // order. The flag and parallax pass bytes need no swap.
@@ -112,7 +113,7 @@ bool BGSImpactData::Load(TESFile* apFile) {
             }
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

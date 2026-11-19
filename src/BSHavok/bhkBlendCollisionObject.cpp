@@ -61,6 +61,7 @@
 #include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cstdint>
@@ -308,10 +309,10 @@ void bhkBlendCollisionObject::hktoNiTransform() {
         hkRotation kInitialRot;
         pobj->UpdateWorldLoc();
         NiTransform* nit = &pobj->m_kWorld;
-        kNiPos_8.m_quad[0] = pobj->m_kWorld.m_Translate.x * bhkConvert::fBS2HkScaleSC;
-        kNiPos_8.m_quad[1] = pobj->m_kWorld.m_Translate.y * bhkConvert::fBS2HkScaleSC;
-        kNiPos_8.m_quad[2] = bhkConvert::fBS2HkScaleSC * pobj->m_kWorld.m_Translate.z;
-        kNiPos_8.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kNiPos_8.m_quad, 0) = pobj->m_kWorld.m_Translate.x * bhkConvert::fBS2HkScaleSC;
+        XFNV_M128_F32(kNiPos_8.m_quad, 1) = pobj->m_kWorld.m_Translate.y * bhkConvert::fBS2HkScaleSC;
+        XFNV_M128_F32(kNiPos_8.m_quad, 2) = bhkConvert::fBS2HkScaleSC * pobj->m_kWorld.m_Translate.z;
+        XFNV_M128_F32(kNiPos_8.m_quad, 3) = 0.0f;
         NI2HK(kInitialRot, pobj->m_kWorld.m_Rotate);
         rbRot.set(kInitialRot);
         prb->GetPosition(rbPos);

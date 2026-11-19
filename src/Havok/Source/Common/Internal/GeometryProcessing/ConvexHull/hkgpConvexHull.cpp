@@ -38,11 +38,11 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
 #include <new>
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 // Sets out to the matrix that scales space by scale along the plane's normal (plane xyz, w its offset): the identity
@@ -61,23 +61,23 @@ static hkMatrix4* calcPlanarScaleMatrix(const hkVector4& plane, float scale, hkM
     const hkQuadReal sss = _mm_shuffle_ps(_mm_set_ss(s), _mm_set_ss(s), 0);
     const hkQuadReal sn = _mm_mul_ps(sss, plane.m_quad);
     const hkQuadReal snn = _mm_mul_ps(sss, _mm_mul_ps(plane.m_quad, plane.m_quad));
-    out.m_col0.m_quad[0] = snn[0] + 1.0f;
-    out.m_col1.m_quad[0] = plane.m_quad[0] * sn[1];
-    out.m_col2.m_quad[0] = plane.m_quad[0] * sn[2];
-    out.m_col3.m_quad[0] = sn[0] * plane.m_quad[3];
+    XFNV_M128_F32(out.m_col0.m_quad, 0) = XFNV_M128_F32(snn, 0) + 1.0f;
+    XFNV_M128_F32(out.m_col1.m_quad, 0) = XFNV_M128_F32(plane.m_quad, 0) * XFNV_M128_F32(sn, 1);
+    XFNV_M128_F32(out.m_col2.m_quad, 0) = XFNV_M128_F32(plane.m_quad, 0) * XFNV_M128_F32(sn, 2);
+    XFNV_M128_F32(out.m_col3.m_quad, 0) = XFNV_M128_F32(sn, 0) * XFNV_M128_F32(plane.m_quad, 3);
     // The symmetric elements are copied from the stored ones.
-    out.m_col0.m_quad[1] = out.m_col1.m_quad[0];
-    out.m_col1.m_quad[1] = snn[1] + 1.0f;
-    out.m_col2.m_quad[1] = plane.m_quad[1] * sn[2];
-    out.m_col3.m_quad[1] = sn[1] * plane.m_quad[3];
-    out.m_col0.m_quad[2] = out.m_col2.m_quad[0];
-    out.m_col1.m_quad[2] = out.m_col2.m_quad[1];
-    out.m_col2.m_quad[2] = snn[2] + 1.0f;
-    out.m_col3.m_quad[2] = sn[2] * plane.m_quad[3];
-    out.m_col0.m_quad[3] = 0.0f;
-    out.m_col1.m_quad[3] = 0.0f;
-    out.m_col2.m_quad[3] = 0.0f;
-    out.m_col3.m_quad[3] = 1.0f;
+    XFNV_M128_F32(out.m_col0.m_quad, 1) = XFNV_M128_F32(out.m_col1.m_quad, 0);
+    XFNV_M128_F32(out.m_col1.m_quad, 1) = XFNV_M128_F32(snn, 1) + 1.0f;
+    XFNV_M128_F32(out.m_col2.m_quad, 1) = XFNV_M128_F32(plane.m_quad, 1) * XFNV_M128_F32(sn, 2);
+    XFNV_M128_F32(out.m_col3.m_quad, 1) = XFNV_M128_F32(sn, 1) * XFNV_M128_F32(plane.m_quad, 3);
+    XFNV_M128_F32(out.m_col0.m_quad, 2) = XFNV_M128_F32(out.m_col2.m_quad, 0);
+    XFNV_M128_F32(out.m_col1.m_quad, 2) = XFNV_M128_F32(out.m_col2.m_quad, 1);
+    XFNV_M128_F32(out.m_col2.m_quad, 2) = XFNV_M128_F32(snn, 2) + 1.0f;
+    XFNV_M128_F32(out.m_col3.m_quad, 2) = XFNV_M128_F32(sn, 2) * XFNV_M128_F32(plane.m_quad, 3);
+    XFNV_M128_F32(out.m_col0.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(out.m_col1.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(out.m_col2.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(out.m_col3.m_quad, 3) = 1.0f;
     return &out;
 }
 
@@ -214,7 +214,7 @@ float hkgpConvexHull::getVolume() const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return this->m_data->m_volume;
@@ -237,7 +237,7 @@ float hkgpConvexHull::getSurfaceArea() const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return this->m_data->m_surface;
@@ -269,7 +269,7 @@ int32_t hkgpConvexHull::getNumPlanes() const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return this->m_data->m_planes.m_size;
@@ -287,7 +287,7 @@ const hkVector4& hkgpConvexHull::getPlane(int32_t index) const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return this->m_data->m_planes.m_data[index];
@@ -299,8 +299,10 @@ float hkgpConvexHull::maximumDistanceToPlanes(const hkVector4& point) const {
     float fMax = -3.40282002e+38f;
     for (int32_t i = 0; i < getNumPlanes(); ++i) {
         const hkVector4& plane = getPlane(i);
-        float fDistance = point.m_quad[2] * plane.m_quad[2] +
-            (point.m_quad[1] * plane.m_quad[1] + point.m_quad[0] * plane.m_quad[0]) + plane.m_quad[3];
+        float fDistance = XFNV_M128_F32(point.m_quad, 2) * XFNV_M128_F32(plane.m_quad, 2) +
+            (XFNV_M128_F32(point.m_quad, 1) * XFNV_M128_F32(plane.m_quad, 1) +
+             XFNV_M128_F32(point.m_quad, 0) * XFNV_M128_F32(plane.m_quad, 0)) +
+            XFNV_M128_F32(plane.m_quad, 3);
         if (!(fDistance < fMax)) {
             fMax = fDistance;
         }
@@ -396,10 +398,10 @@ int32_t hkgpConvexHull::build(const hkStridedVertices& vertices, const BuildConf
     for (int32_t i = 0; i < vertices.m_numVertices; ++i) {
         const float* pFloats = reinterpret_cast<const float*>(pVertex);
         hkVector4 vertex;
-        vertex.m_quad[0] = pFloats[0];
-        vertex.m_quad[1] = pFloats[1];
-        vertex.m_quad[2] = pFloats[2];
-        vertex.m_quad[3] = 0.0f;
+        XFNV_M128_F32(vertex.m_quad, 0) = pFloats[0];
+        XFNV_M128_F32(vertex.m_quad, 1) = pFloats[1];
+        XFNV_M128_F32(vertex.m_quad, 2) = pFloats[2];
+        XFNV_M128_F32(vertex.m_quad, 3) = 0.0f;
         points.m_data[i] = vertex;
         pVertex += vertices.m_striding;
     }
@@ -454,16 +456,25 @@ hkgpConvexHull::buildFromPlanes(const hkVector4* planes, int32_t numPlanes, cons
     for (int32_t i = 0; i < numPlanes; ++i) {
         // The right-hand side's lanes are written one per loop, as the game does; its w is never read.
         __m128 rhs;
-        rhs[0] = 0.0f - planes[i].m_quad[3];
+        XFNV_M128_F32(rhs, 0) = 0.0f - XFNV_M128_F32(planes[i].m_quad, 3);
         for (int32_t j = i + 1; j < numPlanes; ++j) {
-            rhs[1] = 0.0f - planes[j].m_quad[3];
+            XFNV_M128_F32(rhs, 1) = 0.0f - XFNV_M128_F32(planes[j].m_quad, 3);
             for (int32_t k = j + 1; k < numPlanes; ++k) {
                 // The planes' normals as the matrix's rows.
                 hkMatrix3 m;
-                m.m_col0.m_quad = _mm_setr_ps(planes[i].m_quad[0], planes[j].m_quad[0], planes[k].m_quad[0], 0.0f);
-                m.m_col1.m_quad = _mm_setr_ps(planes[i].m_quad[1], planes[j].m_quad[1], planes[k].m_quad[1], 0.0f);
-                m.m_col2.m_quad = _mm_setr_ps(planes[i].m_quad[2], planes[j].m_quad[2], planes[k].m_quad[2], 0.0f);
-                rhs[2] = 0.0f - planes[k].m_quad[3];
+                m.m_col0.m_quad = _mm_setr_ps(
+                    XFNV_M128_F32(planes[i].m_quad, 0), XFNV_M128_F32(planes[j].m_quad, 0),
+                    XFNV_M128_F32(planes[k].m_quad, 0), 0.0f
+                );
+                m.m_col1.m_quad = _mm_setr_ps(
+                    XFNV_M128_F32(planes[i].m_quad, 1), XFNV_M128_F32(planes[j].m_quad, 1),
+                    XFNV_M128_F32(planes[k].m_quad, 1), 0.0f
+                );
+                m.m_col2.m_quad = _mm_setr_ps(
+                    XFNV_M128_F32(planes[i].m_quad, 2), XFNV_M128_F32(planes[j].m_quad, 2),
+                    XFNV_M128_F32(planes[k].m_quad, 2), 0.0f
+                );
+                XFNV_M128_F32(rhs, 2) = 0.0f - XFNV_M128_F32(planes[k].m_quad, 3);
                 if (m.invert(1.1920929e-07f) != HK_SUCCESS) {
                     continue;
                 }
@@ -482,7 +493,8 @@ hkgpConvexHull::buildFromPlanes(const hkVector4* planes, int32_t numPlanes, cons
                     }
                     const __m128 p = planes[l].m_quad;
                     const __m128 xp = _mm_mul_ps(x.m_quad, p);
-                    const float fDistance = static_cast<float>(xp[2] + p[3]) + static_cast<float>(xp[1] + xp[0]);
+                    const float fDistance = static_cast<float>(XFNV_M128_F32(xp, 2) + XFNV_M128_F32(p, 3)) +
+                        static_cast<float>(XFNV_M128_F32(xp, 1) + XFNV_M128_F32(xp, 0));
                     if (fDistance > 1.1920929e-07f) {
                         bInside = false;
                         break;
@@ -521,15 +533,24 @@ int32_t hkgpConvexHull::buildFromPlanes(
     for (int32_t i = 0; i < numPlanes; ++i) {
         // The right-hand side's lanes are written one per loop, as the game does; its w is never read.
         __m128 rhs;
-        rhs[0] = 0.0f - planes[i].m_quad[3];
+        XFNV_M128_F32(rhs, 0) = 0.0f - XFNV_M128_F32(planes[i].m_quad, 3);
         for (int32_t j = i + 1; j < numPlanes; ++j) {
-            rhs[1] = 0.0f - planes[j].m_quad[3];
+            XFNV_M128_F32(rhs, 1) = 0.0f - XFNV_M128_F32(planes[j].m_quad, 3);
             // The planes' normals as the matrix's rows.
             hkMatrix3 m;
-            m.m_col0.m_quad = _mm_setr_ps(planes[i].m_quad[0], planes[j].m_quad[0], projectionPlane.m_quad[0], 0.0f);
-            m.m_col1.m_quad = _mm_setr_ps(planes[i].m_quad[1], planes[j].m_quad[1], projectionPlane.m_quad[1], 0.0f);
-            m.m_col2.m_quad = _mm_setr_ps(planes[i].m_quad[2], planes[j].m_quad[2], projectionPlane.m_quad[2], 0.0f);
-            rhs[2] = 0.0f - projectionPlane.m_quad[3];
+            m.m_col0.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(planes[i].m_quad, 0), XFNV_M128_F32(planes[j].m_quad, 0),
+                XFNV_M128_F32(projectionPlane.m_quad, 0), 0.0f
+            );
+            m.m_col1.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(planes[i].m_quad, 1), XFNV_M128_F32(planes[j].m_quad, 1),
+                XFNV_M128_F32(projectionPlane.m_quad, 1), 0.0f
+            );
+            m.m_col2.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(planes[i].m_quad, 2), XFNV_M128_F32(planes[j].m_quad, 2),
+                XFNV_M128_F32(projectionPlane.m_quad, 2), 0.0f
+            );
+            XFNV_M128_F32(rhs, 2) = 0.0f - XFNV_M128_F32(projectionPlane.m_quad, 3);
             if (m.invert(1.1920929e-07f) != HK_SUCCESS) {
                 continue;
             }
@@ -547,7 +568,8 @@ int32_t hkgpConvexHull::buildFromPlanes(
                 }
                 const __m128 p = planes[l].m_quad;
                 const __m128 xp = _mm_mul_ps(x, p);
-                const float fDistance = static_cast<float>(xp[2] + p[3]) + static_cast<float>(xp[1] + xp[0]);
+                const float fDistance = static_cast<float>(XFNV_M128_F32(xp, 2) + XFNV_M128_F32(p, 3)) +
+                    static_cast<float>(XFNV_M128_F32(xp, 1) + XFNV_M128_F32(xp, 0));
                 if (fDistance > 1.1920929e-07f) {
                     bInside = false;
                     break;
@@ -600,7 +622,7 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     hkVector4 center;
@@ -687,7 +709,7 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
             if (!(offset < fDistance)) {
                 fDistance = offset;
             }
-            plane.m_quad[3] -= fDistance;
+            XFNV_M128_F32(plane.m_quad, 3) -= fDistance;
             points.pushBack(plane);
         }
         const int32_t iDimensions = getDimensions();
@@ -716,7 +738,7 @@ const hkVector4& hkgpConvexHull::getCenterOfMass() const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return this->m_data->m_localTransform.m_translation;
@@ -838,12 +860,12 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
                 points.m_data[i] = point;
             }
             points.m_size = 6;
-            points.m_data[0].m_quad[0] = points.m_data[0].m_quad[0] + fHalf;
-            points.m_data[1].m_quad[0] = points.m_data[1].m_quad[0] - fHalf;
-            points.m_data[2].m_quad[1] = points.m_data[2].m_quad[1] + fHalf;
-            points.m_data[3].m_quad[1] = points.m_data[3].m_quad[1] - fHalf;
-            points.m_data[4].m_quad[2] = points.m_data[4].m_quad[2] + fHalf;
-            points.m_data[5].m_quad[2] = points.m_data[5].m_quad[2] - fHalf;
+            XFNV_M128_F32(points.m_data[0].m_quad, 0) = XFNV_M128_F32(points.m_data[0].m_quad, 0) + fHalf;
+            XFNV_M128_F32(points.m_data[1].m_quad, 0) = XFNV_M128_F32(points.m_data[1].m_quad, 0) - fHalf;
+            XFNV_M128_F32(points.m_data[2].m_quad, 1) = XFNV_M128_F32(points.m_data[2].m_quad, 1) + fHalf;
+            XFNV_M128_F32(points.m_data[3].m_quad, 1) = XFNV_M128_F32(points.m_data[3].m_quad, 1) - fHalf;
+            XFNV_M128_F32(points.m_data[4].m_quad, 2) = XFNV_M128_F32(points.m_data[4].m_quad, 2) + fHalf;
+            XFNV_M128_F32(points.m_data[5].m_quad, 2) = XFNV_M128_F32(points.m_data[5].m_quad, 2) - fHalf;
             vertices.m_vertices = reinterpret_cast<const float*>(points.m_data);
             vertices.m_numVertices = points.m_size;
             vertices.m_striding = sizeof(hkVector4);
@@ -955,7 +977,7 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
                     hkError::MESSAGE_ERROR, 0x172CDF48, acBuffer,
                     ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 2679
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
             goto rebuildIndices;
         }
@@ -993,7 +1015,7 @@ const hkMatrix3& hkgpConvexHull::getWorldInertia() const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return this->m_data->m_inertiaMatrix;
@@ -1277,7 +1299,7 @@ int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Vertex* a1) const {
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return static_cast<const hkgpConvexHullImpl::Vertex*>(a1)->m_index;
@@ -1301,7 +1323,7 @@ int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Triangle* a1) const {
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return static_cast<const hkgpConvexHullImpl::Triangle*>(a1)->m_index;
@@ -1325,7 +1347,7 @@ int32_t hkgpConvexHull::getPlaneIndex(const hkgpConvexHull::Triangle* triangle) 
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return static_cast<const hkgpConvexHullImpl::Triangle*>(triangle)->m_plane.m_index;
@@ -1368,7 +1390,7 @@ hkVector4 hkgpConvexHull::getMajorPlane() const {
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D887u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     getLocalInertia(inertiaSpace, inertiaDiagonal);
@@ -1418,19 +1440,21 @@ __m128* hkgpConvexHull::calcTrianglePlane(__m128* a1, hkgpConvexHull::Triangle* 
         _mm_mul_ps(_mm_shuffle_ps(e2, e2, 0xC9), _mm_shuffle_ps(e1, e1, 0xD2))
     );
     const __m128 n2 = _mm_mul_ps(n, n);
-    const float fXY = _mm_shuffle_ps(n2, n2, 0x55)[0] + n2[0];
+    const float fXY = XFNV_M128_F32(_mm_shuffle_ps(n2, n2, 0x55), 0) + XFNV_M128_F32(n2, 0);
     __m128 len2 = _mm_shuffle_ps(n2, n2, 0xAA);
-    len2[0] = len2[0] + fXY;
-    const float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
+    XFNV_M128_F32(len2, 0) = XFNV_M128_F32(len2, 0) + fXY;
+    const float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(len2, 0))));
     const __m128 isZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-    const float fRefine = 3.0f - ((len2[0] * fRsqrt) * fRsqrt);
+    const float fRefine = 3.0f - ((XFNV_M128_F32(len2, 0) * fRsqrt) * fRsqrt);
     __m128 invLen = _mm_setzero_ps();
-    invLen[0] = (0.5f * fRsqrt) * fRefine;
+    XFNV_M128_F32(invLen, 0) = (0.5f * fRsqrt) * fRefine;
     invLen = _mm_andnot_ps(isZero, invLen);
     const __m128 normal = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0x00), n);
     *a1 = normal;
     const __m128 nv0 = _mm_mul_ps(normal, v0);
-    (*a1)[3] = 0.0f - (_mm_shuffle_ps(nv0, nv0, 0xAA)[0] + (_mm_shuffle_ps(nv0, nv0, 0x55)[0] + nv0[0]));
+    XFNV_M128_F32((*a1), 3) = 0.0f -
+        (XFNV_M128_F32(_mm_shuffle_ps(nv0, nv0, 0xAA), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(nv0, nv0, 0x55), 0) + XFNV_M128_F32(nv0, 0)));
     return a1;
 }
 
@@ -1488,7 +1512,7 @@ void hkgpConvexHull::getMajorPlanes(hkVector4* planes) const {
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D887u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     getLocalInertia(inertiaSpace, inertiaDiagonal);
@@ -1672,7 +1696,7 @@ void hkgpConvexHull::getLocalInertia(hkTransform& inertiaSpace, hkVector4& inert
                 hkError::MESSAGE_ERROR, 0x79F9D887, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 334
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     inertiaSpace = m_data->m_localTransform;
@@ -2218,7 +2242,7 @@ void hkgpConvexHull::createVoronoiCells(
                         break;
                     case NEGATIVE: {
                         if (fFarthest < 0.0f) {
-                            fFarthest = pCell->m_data->getFarthestVertexDistanceSquared(&site).m_quad[0];
+                            fFarthest = XFNV_M128_F32(pCell->m_data->getFarthestVertexDistanceSquared(&site).m_quad, 0);
                         }
                         // The remaining points are all too far.
                         if (fFarthest * 4.0 < fDistance) {
@@ -2297,10 +2321,14 @@ hkgpConvexHullImpl::~hkgpConvexHullImpl() {
 bool hkgpConvexHullImpl::isPointInside(const hkVector4& point, bool usePlanes, float epsilon) const {
     if (!usePlanes) {
         hkVector4 quantized;
-        quantized.m_quad[0] = (point.m_quad[0] - m_origin.m_quad[0]) * m_scale.m_quad[0];
-        quantized.m_quad[1] = (point.m_quad[1] - m_origin.m_quad[1]) * m_scale.m_quad[1];
-        quantized.m_quad[2] = (point.m_quad[2] - m_origin.m_quad[2]) * m_scale.m_quad[2];
-        quantized.m_quad[3] = (point.m_quad[3] - m_origin.m_quad[3]) * m_scale.m_quad[3];
+        XFNV_M128_F32(quantized.m_quad, 0) =
+            (XFNV_M128_F32(point.m_quad, 0) - XFNV_M128_F32(m_origin.m_quad, 0)) * XFNV_M128_F32(m_scale.m_quad, 0);
+        XFNV_M128_F32(quantized.m_quad, 1) =
+            (XFNV_M128_F32(point.m_quad, 1) - XFNV_M128_F32(m_origin.m_quad, 1)) * XFNV_M128_F32(m_scale.m_quad, 1);
+        XFNV_M128_F32(quantized.m_quad, 2) =
+            (XFNV_M128_F32(point.m_quad, 2) - XFNV_M128_F32(m_origin.m_quad, 2)) * XFNV_M128_F32(m_scale.m_quad, 2);
+        XFNV_M128_F32(quantized.m_quad, 3) =
+            (XFNV_M128_F32(point.m_quad, 3) - XFNV_M128_F32(m_origin.m_quad, 3)) * XFNV_M128_F32(m_scale.m_quad, 3);
         const float* afComponent = &reinterpret_cast<float*>(&quantized.m_quad)[0];
         int32_t aiQuantized[3];
         bool bOutside = false;
@@ -2352,8 +2380,10 @@ bool hkgpConvexHullImpl::isPointInside(const hkVector4& point, bool usePlanes, f
     }
     const hkVector4* pPlane = m_planes.m_data;
     for (int32_t i = 0; i < iNumPlanes; ++i) {
-        const float fDistance = pPlane->m_quad[2] * point.m_quad[2] +
-            (pPlane->m_quad[1] * point.m_quad[1] + pPlane->m_quad[0] * point.m_quad[0]) + pPlane->m_quad[3];
+        const float fDistance = XFNV_M128_F32(pPlane->m_quad, 2) * XFNV_M128_F32(point.m_quad, 2) +
+            (XFNV_M128_F32(pPlane->m_quad, 1) * XFNV_M128_F32(point.m_quad, 1) +
+             XFNV_M128_F32(pPlane->m_quad, 0) * XFNV_M128_F32(point.m_quad, 0)) +
+            XFNV_M128_F32(pPlane->m_quad, 3);
         if (fDistance > epsilon) {
             return false;
         }
@@ -2385,7 +2415,10 @@ int32_t hkgpConvexHullImpl::build(
         aligned_t aligned;
         aligned.setSize(numPoints);
         for (int32_t i = 0; i < numPoints; ++i) {
-            aligned.m_data[i].set(points[i].m_quad[0], points[i].m_quad[1], points[i].m_quad[2], points[i].m_quad[3]);
+            aligned.m_data[i].set(
+                XFNV_M128_F32(points[i].m_quad, 0), XFNV_M128_F32(points[i].m_quad, 1),
+                XFNV_M128_F32(points[i].m_quad, 2), XFNV_M128_F32(points[i].m_quad, 3)
+            );
         }
         const int32_t result = build(aligned.m_data, numPoints, forcePlanar, domain);
         return result;
@@ -2411,7 +2444,8 @@ int32_t hkgpConvexHullImpl::build(
                 boxMax.setMax4(boxMax, points[i]);
             }
             for (int32_t k = 0; k < 3; ++k) {
-                if (boxMin.m_quad[k] < -3.402820018375656e+38 || boxMax.m_quad[k] > 3.402820018375656e+38) {
+                if (XFNV_M128_F32(boxMin.m_quad, k) < -3.402820018375656e+38 ||
+                    XFNV_M128_F32(boxMax.m_quad, k) > 3.402820018375656e+38) {
                     char buf[512];
                     hkErrStream errStream(buf, 512);
                     errStream << "Input domain out of range";
@@ -2419,18 +2453,18 @@ int32_t hkgpConvexHullImpl::build(
                             hkError::MESSAGE_ERROR, 0x405A2174, buf,
                             ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 552
                         )) {
-                        __builtin_debugtrap();
+                        xfnv::DebugTrap();
                     }
                 }
                 // An axis narrower than twice the epsilon is widened about its center.
-                if (boxMax.m_quad[k] - boxMin.m_quad[k] < 9.999999747378752e-06) {
-                    const float center = (boxMax.m_quad[k] + boxMin.m_quad[k]) * 0.5;
+                if (XFNV_M128_F32(boxMax.m_quad, k) - XFNV_M128_F32(boxMin.m_quad, k) < 9.999999747378752e-06) {
+                    const float center = (XFNV_M128_F32(boxMax.m_quad, k) + XFNV_M128_F32(boxMin.m_quad, k)) * 0.5;
                     const float low = center - 9.999999747378752e-06;
-                    const float oldMin = boxMin.m_quad[k];
-                    boxMin.m_quad[k] = (low > oldMin) ? oldMin : low;
-                    const float oldMax = boxMax.m_quad[k];
+                    const float oldMin = XFNV_M128_F32(boxMin.m_quad, k);
+                    XFNV_M128_F32(boxMin.m_quad, k) = (low > oldMin) ? oldMin : low;
+                    const float oldMax = XFNV_M128_F32(boxMax.m_quad, k);
                     const float high = center + 9.999999747378752e-06;
-                    boxMax.m_quad[k] = (high < oldMax) ? oldMax : high;
+                    XFNV_M128_F32(boxMax.m_quad, k) = (high < oldMax) ? oldMax : high;
                 }
             }
             hkVector4 half;
@@ -2439,8 +2473,8 @@ int32_t hkgpConvexHullImpl::build(
             halfExtents.m_quad = _mm_mul_ps(half.m_quad, _mm_sub_ps(boxMax.m_quad, boxMin.m_quad));
             m_origin.m_quad = _mm_add_ps(halfExtents.m_quad, boxMin.m_quad);
             m_scale.setReciprocal3(halfExtents);
-            m_origin.m_quad[3] = 0.0f;
-            m_scale.m_quad[3] = 0.0f;
+            XFNV_M128_F32(m_origin.m_quad, 3) = 0.0f;
+            XFNV_M128_F32(m_scale.m_quad, 3) = 0.0f;
             hkVector4 gridScale;
             gridScale.setAll(8191.0f);
             m_scale.m_quad = _mm_mul_ps(gridScale.m_quad, m_scale.m_quad);
@@ -2470,11 +2504,11 @@ int32_t hkgpConvexHullImpl::build(
                             hkVector4 normal;
                             normal.setCross(e1, e2);
                             const __m128 n2 = _mm_mul_ps(normal.m_quad, normal.m_quad);
-                            const float fNormalLength2 =
-                                _mm_shuffle_ps(n2, n2, 0xAA)[0] + (_mm_shuffle_ps(n2, n2, 0x55)[0] + n2[0]);
+                            const float fNormalLength2 = XFNV_M128_F32(_mm_shuffle_ps(n2, n2, 0xAA), 0) +
+                                (XFNV_M128_F32(_mm_shuffle_ps(n2, n2, 0x55), 0) + XFNV_M128_F32(n2, 0));
                             const __m128 p2 = _mm_mul_ps(m_projectionPlane.m_quad, m_projectionPlane.m_quad);
-                            const float fPlaneLength2 =
-                                _mm_shuffle_ps(p2, p2, 0xAA)[0] + (_mm_shuffle_ps(p2, p2, 0x55)[0] + p2[0]);
+                            const float fPlaneLength2 = XFNV_M128_F32(_mm_shuffle_ps(p2, p2, 0xAA), 0) +
+                                (XFNV_M128_F32(_mm_shuffle_ps(p2, p2, 0x55), 0) + XFNV_M128_F32(p2, 0));
                             if (fPlaneLength2 < fNormalLength2) {
                                 m_projectionPlane = normal;
                                 if (fNormalLength2 > 9.999999747378752e-05) {
@@ -2489,7 +2523,8 @@ int32_t hkgpConvexHullImpl::build(
                 // normalize3: (1, 0, 0) for a zero normal.
                 const hkVector4 plane = m_projectionPlane;
                 const __m128 q2 = _mm_mul_ps(plane.m_quad, plane.m_quad);
-                const float fLength2 = _mm_shuffle_ps(q2, q2, 0xAA)[0] + (_mm_shuffle_ps(q2, q2, 0x55)[0] + q2[0]);
+                const float fLength2 = XFNV_M128_F32(_mm_shuffle_ps(q2, q2, 0xAA), 0) +
+                    (XFNV_M128_F32(_mm_shuffle_ps(q2, q2, 0x55), 0) + XFNV_M128_F32(q2, 0));
                 if (fLength2 == 0.0) {
                     m_projectionPlane.set(1.0f, 0.0f, 0.0f, 0.0f);
                 }
@@ -2500,8 +2535,9 @@ int32_t hkgpConvexHullImpl::build(
                 }
                 // The plane through the first point.
                 const __m128 d = _mm_mul_ps(points[0].m_quad, m_projectionPlane.m_quad);
-                m_projectionPlane.m_quad[3] =
-                    0.0f - (_mm_shuffle_ps(d, d, 0xAA)[0] + (_mm_shuffle_ps(d, d, 0x55)[0] + d[0]));
+                XFNV_M128_F32(m_projectionPlane.m_quad, 3) = 0.0f -
+                    (XFNV_M128_F32(_mm_shuffle_ps(d, d, 0xAA), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(d, d, 0x55), 0) + XFNV_M128_F32(d, 0)));
             }
         }
         m_pendings.clear();
@@ -2513,7 +2549,7 @@ int32_t hkgpConvexHullImpl::build(
             x.m_quad = _mm_mul_ps(_mm_sub_ps(points[i].m_quad, m_origin.m_quad), m_scale.m_quad);
             // Each coordinate clamped to -8192..8191 and rounded half away from zero.
             for (int32_t k = 0; k < 3; ++k) {
-                float f = x.m_quad[k];
+                float f = XFNV_M128_F32(x.m_quad, k);
                 if (f > 8191.0) {
                     f = 8191.0f;
                 }
@@ -2563,16 +2599,17 @@ int32_t hkgpConvexHullImpl::build(
                     const hkVector4 axis = m_projectionAxis;
                     for (int32_t i = 1; i < numPoints; ++i) {
                         const __m128 di = _mm_mul_ps(axis.m_quad, m_pendings[i].m_source.m_quad);
-                        const float fDot = _mm_shuffle_ps(di, di, 0xAA)[0] + (_mm_shuffle_ps(di, di, 0x55)[0] + di[0]);
+                        const float fDot = XFNV_M128_F32(_mm_shuffle_ps(di, di, 0xAA), 0) +
+                            (XFNV_M128_F32(_mm_shuffle_ps(di, di, 0x55), 0) + XFNV_M128_F32(di, 0));
                         const __m128 dMin = _mm_mul_ps(m_pendings[iMin].m_source.m_quad, axis.m_quad);
-                        const float fMinDot =
-                            _mm_shuffle_ps(dMin, dMin, 0xAA)[0] + (_mm_shuffle_ps(dMin, dMin, 0x55)[0] + dMin[0]);
+                        const float fMinDot = XFNV_M128_F32(_mm_shuffle_ps(dMin, dMin, 0xAA), 0) +
+                            (XFNV_M128_F32(_mm_shuffle_ps(dMin, dMin, 0x55), 0) + XFNV_M128_F32(dMin, 0));
                         if (fMinDot > fDot) {
                             iMin = i;
                         }
                         const __m128 dMax = _mm_mul_ps(m_pendings[iMax].m_source.m_quad, axis.m_quad);
-                        const float fMaxDot =
-                            _mm_shuffle_ps(dMax, dMax, 0xAA)[0] + (_mm_shuffle_ps(dMax, dMax, 0x55)[0] + dMax[0]);
+                        const float fMaxDot = XFNV_M128_F32(_mm_shuffle_ps(dMax, dMax, 0xAA), 0) +
+                            (XFNV_M128_F32(_mm_shuffle_ps(dMax, dMax, 0x55), 0) + XFNV_M128_F32(dMax, 0));
                         if (fMaxDot < fDot) {
                             iMax = i;
                         }
@@ -2767,9 +2804,9 @@ void hkgpConvexHullImpl::reset(int32_t a1) {
     hkVector4 v8;
     hkVector4 v9;
     m_mesh.reset();
-    v2[0] = 0.0f;
-    v3[0] = 0.0f;
-    v4[0] = 3.40282e+38f;
+    XFNV_M128_F32(v2, 0) = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.0f;
+    XFNV_M128_F32(v4, 0) = 3.40282e+38f;
     m_planes.m_size = 0;
     m_pendings.m_size = 0;
     m_supportCache.m_size = 0;
@@ -2781,7 +2818,7 @@ void hkgpConvexHullImpl::reset(int32_t a1) {
     );
     m_centroids[0u].m_quad = v6;
     m_centroids[1].m_quad = v6;
-    v6[0] = 3.40282e+38f;
+    XFNV_M128_F32(v6, 0) = 3.40282e+38f;
     v7.m_quad = _mm_shuffle_ps(v6, v6, 0);
     m_boundingBoxes[0u].m_min.m_quad = v7.m_quad;
     v8.m_quad = _mm_shuffle_ps(_mm_set_ss(rdata_104E148), _mm_set_ss(rdata_104E148), 0);
@@ -2807,7 +2844,7 @@ void hkgpConvexHullImpl::reset(int32_t a1) {
 template <typename POSITION>
 hkVector4& hkgpConvexHullImpl::getCentroid() {
     hkVector4& centroid = m_centroids[POSITION::INDEX];
-    if (centroid.m_quad[3] == 3.402820018375656e+38) {
+    if (XFNV_M128_F32(centroid.m_quad, 3) == 3.402820018375656e+38) {
         centroid.m_quad = hkVector4Zero.m_quad;
         for (const Vertex* v = m_mesh.m_vertices.m_used; v; v = v->m_next) {
             centroid.m_quad = _mm_add_ps(POSITION::get(*this, *v), centroid.m_quad);
@@ -2817,7 +2854,7 @@ hkVector4& hkgpConvexHullImpl::getCentroid() {
             const float fInvCount = 1.0 / static_cast<double>(numVertices);
             centroid.m_quad = _mm_mul_ps(_mm_set1_ps(fInvCount), centroid.m_quad);
         }
-        centroid.m_quad[3] = 0.0f;
+        XFNV_M128_F32(centroid.m_quad, 3) = 0.0f;
     }
     return centroid;
 }
@@ -2942,7 +2979,7 @@ bool hkgpConvexHullImpl::flushPending() {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x642CF968, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 756
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     m_projectionPlane.m_quad = hkVector4Zero.m_quad;
@@ -3004,26 +3041,27 @@ bool hkgpConvexHullImpl::flushPending() {
                         _mm_mul_ps(_mm_shuffle_ps(e2, e2, 0xC9), _mm_shuffle_ps(e1, e1, 0xD2))
                     );
                     const __m128 n2 = _mm_mul_ps(n, n);
-                    const float fXY = _mm_shuffle_ps(n2, n2, 0x55)[0] + n2[0];
+                    const float fXY = XFNV_M128_F32(_mm_shuffle_ps(n2, n2, 0x55), 0) + XFNV_M128_F32(n2, 0);
                     __m128 len2 = _mm_shuffle_ps(n2, n2, 0xAA);
-                    len2[0] = len2[0] + fXY;
-                    const float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
+                    XFNV_M128_F32(len2, 0) = XFNV_M128_F32(len2, 0) + fXY;
+                    const float fRsqrt = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(len2, 0))));
                     const __m128 isZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-                    const float fRefine = 3.0f - ((len2[0] * fRsqrt) * fRsqrt);
+                    const float fRefine = 3.0f - ((XFNV_M128_F32(len2, 0) * fRsqrt) * fRsqrt);
                     __m128 invLen = _mm_setzero_ps();
-                    invLen[0] = (0.5f * fRsqrt) * fRefine;
+                    XFNV_M128_F32(invLen, 0) = (0.5f * fRsqrt) * fRefine;
                     invLen = _mm_andnot_ps(isZero, invLen);
                     __m128 planeEquation = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0x00), n);
                     const __m128 na = _mm_mul_ps(planeEquation, pa);
-                    planeEquation[3] =
-                        0.0f - (_mm_shuffle_ps(na, na, 0xAA)[0] + (_mm_shuffle_ps(na, na, 0x55)[0] + na[0]));
+                    XFNV_M128_F32(planeEquation, 3) = 0.0f -
+                        (XFNV_M128_F32(_mm_shuffle_ps(na, na, 0xAA), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(na, na, 0x55), 0) + XFNV_M128_F32(na, 0)));
                     // Keeps the plane whose normal is longer than m_projectionPlane's (lengthSquared3 of each).
                     const __m128 p2 = _mm_mul_ps(planeEquation, planeEquation);
-                    const float fPlaneLength2 =
-                        _mm_shuffle_ps(p2, p2, 0xAA)[0] + (_mm_shuffle_ps(p2, p2, 0x55)[0] + p2[0]);
+                    const float fPlaneLength2 = XFNV_M128_F32(_mm_shuffle_ps(p2, p2, 0xAA), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(p2, p2, 0x55), 0) + XFNV_M128_F32(p2, 0));
                     const __m128 q2 = _mm_mul_ps(m_projectionPlane.m_quad, m_projectionPlane.m_quad);
-                    const float fProjectionLength2 =
-                        _mm_shuffle_ps(q2, q2, 0xAA)[0] + (_mm_shuffle_ps(q2, q2, 0x55)[0] + q2[0]);
+                    const float fProjectionLength2 = XFNV_M128_F32(_mm_shuffle_ps(q2, q2, 0xAA), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(q2, q2, 0x55), 0) + XFNV_M128_F32(q2, 0));
                     if (fProjectionLength2 < fPlaneLength2) {
                         m_projectionPlane.m_quad = planeEquation;
                     }
@@ -3176,7 +3214,7 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
                 hkError::MESSAGE_ERROR, 0x3E0ABBAB, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 1403
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
         return;
     }
@@ -3273,7 +3311,7 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
                     hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer,
                     ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
         }
         using IntArray = hkArray<int32_t, hkContainerHeapAllocator>;
@@ -3377,7 +3415,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     vpf.m_size = 0;
@@ -3575,10 +3613,10 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
             if (m_used) {
                 do {
                     __m128 v4 = _mm_undefined_ps();
-                    v2[0] = static_cast<float>(m_used->m_x[0]);
-                    v3.m_quad[0] = static_cast<float>(m_used->m_x[1]);
-                    v4[0] = static_cast<float>(m_used->m_x[2]);
-                    m_quad_2[0] = 0.0f;
+                    XFNV_M128_F32(v2, 0) = static_cast<float>(m_used->m_x[0]);
+                    XFNV_M128_F32(v3.m_quad, 0) = static_cast<float>(m_used->m_x[1]);
+                    XFNV_M128_F32(v4, 0) = static_cast<float>(m_used->m_x[2]);
+                    XFNV_M128_F32(m_quad_2, 0) = 0.0f;
                     hkVector4* v43 = v42++;
                     __m128 v44 = _mm_mul_ps(
                         _mm_unpacklo_ps(_mm_unpacklo_ps(v2, v4), _mm_unpacklo_ps(v3.m_quad, m_quad_2)),
@@ -3630,10 +3668,10 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
                 v41 = _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)));
             }
             m_hasMassProperties.m_bool = 1;
-            v3.m_quad[0] = v41[0];
-            m_quad_2[0] = v41[0];
+            XFNV_M128_F32(v3.m_quad, 0) = XFNV_M128_F32(v41, 0);
+            XFNV_M128_F32(m_quad_2, 0) = XFNV_M128_F32(v41, 0);
             m_surface = 0.5 * v62;
-            this->m_inertiaMatrix.m_col0.m_quad[0u] = 1.0f;
+            XFNV_M128_F32(this->m_inertiaMatrix.m_col0.m_quad, 0u) = 1.0f;
             m_inertia.m_quad =
                 _mm_unpacklo_ps(_mm_unpacklo_ps(_mm_set_ss(1.0f), m_quad_2), _mm_unpacklo_ps(v3.m_quad, v41));
             *reinterpret_cast<float*>(&v57) = 1.0f / v62;
@@ -3664,37 +3702,39 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
     r.m_quad = hkVector4Zero.m_quad;
     __m128 m_quad_1 = hkVector4Zero.m_quad;
     for (i = hkVector4Zero.m_quad; m_next;
-         i[2] = (m_inertiaMatrix.m_col1.m_quad[0] * m_inertiaMatrix.m_col1.m_quad[1] * 2.0 +
-                 (m_inertiaMatrix.m_col0.m_quad[0] * m_inertiaMatrix.m_col0.m_quad[1] * 2.0 +
-                  (m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[0] +
-                   m_inertiaMatrix.m_col1.m_quad[1] * m_inertiaMatrix.m_col0.m_quad[0] +
-                   m_inertiaMatrix.m_col0.m_quad[1] * m_inertiaMatrix.m_col2.m_quad[0] +
-                   m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col0.m_quad[0] +
-                   m_inertiaMatrix.m_col0.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[0] +
-                   m_inertiaMatrix.m_col1.m_quad[1] * m_inertiaMatrix.m_col2.m_quad[0])) +
-                 2.0 * (m_inertiaMatrix.m_col2.m_quad[0] * m_inertiaMatrix.m_col2.m_quad[1])) *
+         XFNV_M128_F32(i, 2) =
+             (XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) * 2.0 +
+              (XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) * 2.0 +
+               (XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+                XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+                XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) +
+                XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+                XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+                XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0))) +
+              2.0 *
+                  (XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1))) *
                  *reinterpret_cast<float*>(&v65) +
-             i[2]) {
+             XFNV_M128_F32(i, 2)) {
         __m128 m_quad_3 = _mm_undefined_ps();
         hkVector4 v18;
         hkVector4 v19;
         const hkgpConvexHullImpl::Vertex* v15 = m_next->m_vertices[2];
         float v76 = static_cast<float>(v15->m_x[0]);
         float v75 = static_cast<float>(v15->m_x[1]);
-        m_quad_3[0] = static_cast<float>(v15->m_x[2]);
+        XFNV_M128_F32(m_quad_3, 0) = static_cast<float>(v15->m_x[2]);
         const hkgpConvexHullImpl::Vertex* v16 = m_next->m_vertices[1];
-        v2[0] = static_cast<float>(v16->m_x[0]);
-        v67 = m_quad_3[0];
+        XFNV_M128_F32(v2, 0) = static_cast<float>(v16->m_x[0]);
+        v67 = XFNV_M128_F32(m_quad_3, 0);
         float v77 = static_cast<float>(v16->m_x[1]);
-        m_quad_3[0] = static_cast<float>(v16->m_x[2]);
+        XFNV_M128_F32(m_quad_3, 0) = static_cast<float>(v16->m_x[2]);
         hkgpConvexHullImpl::Vertex* v17 = m_next->m_vertices[0];
-        v6[0] = static_cast<float>(v17->m_x[2]);
-        v3.m_quad[0] = static_cast<float>(v17->m_x[1]);
+        XFNV_M128_F32(v6, 0) = static_cast<float>(v17->m_x[2]);
+        XFNV_M128_F32(v3.m_quad, 0) = static_cast<float>(v17->m_x[1]);
         v18.m_quad = m_scaleInv.m_quad;
-        fZ1 = m_quad_3[0];
-        m_quad_3[0] = static_cast<float>(v17->m_x[0]);
+        fZ1 = XFNV_M128_F32(m_quad_3, 0);
+        XFNV_M128_F32(m_quad_3, 0) = static_cast<float>(v17->m_x[0]);
         v19.m_quad = m_origin.m_quad;
-        v7[0] = v13[0];
+        XFNV_M128_F32(v7, 0) = XFNV_M128_F32(v13, 0);
         __m128 v20 = _mm_add_ps(
             _mm_mul_ps(_mm_unpacklo_ps(_mm_unpacklo_ps(m_quad_3, v6), _mm_unpacklo_ps(v3.m_quad, v7)), v18.m_quad),
             v19.m_quad
@@ -3725,7 +3765,7 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
         );
         hkSimdReal* Determinant = ::new (&result) hkSimdReal(m_inertiaMatrix.getDeterminant());
         m_quad_2 = m_inertiaMatrix.m_col2.m_quad;
-        v65 = std::bit_cast<uint32_t>(Determinant->m_real[0]);
+        v65 = std::bit_cast<uint32_t>(XFNV_M128_F32(Determinant->m_real, 0));
         __m128 v23 = _mm_sub_ps(m_inertiaMatrix.m_col1.m_quad, eigenVal.m_quad);
         __m128 v24 = _mm_sub_ps(m_inertiaMatrix.m_col2.m_quad, eigenVal.m_quad);
         v6 = _mm_shuffle_ps(v23, v23, 210);
@@ -3748,60 +3788,64 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
         );
         r.m_quad = v3.m_quad;
         v68 = *reinterpret_cast<float*>(&v65) + v68;
-        m_quad_1[0] = *reinterpret_cast<float*>(&v65) *
-                (m_inertiaMatrix.m_col0.m_quad[0] * m_inertiaMatrix.m_col0.m_quad[0] +
-                 (m_inertiaMatrix.m_col2.m_quad[0] * m_inertiaMatrix.m_col1.m_quad[0] +
-                  m_inertiaMatrix.m_col1.m_quad[0] * m_inertiaMatrix.m_col0.m_quad[0] +
-                  m_inertiaMatrix.m_col2.m_quad[0] * m_inertiaMatrix.m_col0.m_quad[0]) +
-                 m_inertiaMatrix.m_col1.m_quad[0] * m_inertiaMatrix.m_col1.m_quad[0] +
-                 m_inertiaMatrix.m_col2.m_quad[0] * m_inertiaMatrix.m_col2.m_quad[0]) +
-            m_quad_1[0];
-        i[0] = (m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[1] +
-                m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[1] +
-                m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[1] +
-                m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[1] +
-                m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[1] +
-                m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[2] +
-                (m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[1] +
-                 m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[1]) +
-                (m_inertiaMatrix.m_col1.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[2] +
-                 m_inertiaMatrix.m_col1.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[2]) +
-                (m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col2.m_quad[2] +
-                 m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col2.m_quad[2])) *
+        XFNV_M128_F32(m_quad_1, 0) = *reinterpret_cast<float*>(&v65) *
+                (XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+                 (XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+                  XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+                  XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0)) +
+                 XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+                 XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0)) +
+            XFNV_M128_F32(m_quad_1, 0);
+        XFNV_M128_F32(i, 0) =
+            (XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) +
+             (XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) +
+              XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1)) +
+             (XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) +
+              XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2)) +
+             (XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) +
+              XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2))) *
                 *reinterpret_cast<float*>(&v65) +
-            i[0];
-        m_quad_1[1] = (m_inertiaMatrix.m_col0.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[1] +
-                       m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[1] +
-                       m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col0.m_quad[1] +
-                       m_inertiaMatrix.m_col0.m_quad[1] * m_inertiaMatrix.m_col0.m_quad[1] +
-                       m_inertiaMatrix.m_col1.m_quad[1] * m_inertiaMatrix.m_col1.m_quad[1] +
-                       m_inertiaMatrix.m_col2.m_quad[1] * m_inertiaMatrix.m_col2.m_quad[1]) *
+            XFNV_M128_F32(i, 0);
+        XFNV_M128_F32(m_quad_1, 1) =
+            (XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 1)) *
                 *reinterpret_cast<float*>(&v65) +
-            m_quad_1[1];
-        i[1] = (m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[0] +
-                m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[0] +
-                m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[0] +
-                m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[0] +
-                m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[0] +
-                m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[0] +
-                (m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[0] +
-                 m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[0]) +
-                (m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[0] +
-                 m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[0]) +
-                (m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[0] +
-                 m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[0])) *
+            XFNV_M128_F32(m_quad_1, 1);
+        XFNV_M128_F32(i, 1) =
+            (XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+             (XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0) +
+              XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0)) +
+             (XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0) +
+              XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 0)) +
+             (XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0) +
+              XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 0))) *
                 *reinterpret_cast<float*>(&v65) +
-            i[1];
+            XFNV_M128_F32(i, 1);
         m_next = m_next->m_next;
         v13 = _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)));
-        m_quad_1[2] = (m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[2] +
-                       m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[2] +
-                       m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[2] +
-                       m_inertiaMatrix.m_col0.m_quad[2] * m_inertiaMatrix.m_col0.m_quad[2] +
-                       m_inertiaMatrix.m_col1.m_quad[2] * m_inertiaMatrix.m_col1.m_quad[2] +
-                       m_inertiaMatrix.m_col2.m_quad[2] * m_inertiaMatrix.m_col2.m_quad[2]) *
+        XFNV_M128_F32(m_quad_1, 2) =
+            (XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 2) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 2) +
+             XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2) * XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2)) *
                 *reinterpret_cast<float*>(&v65) +
-            m_quad_1[2];
+            XFNV_M128_F32(m_quad_1, 2);
     }
     double v26 = v68;
     *reinterpret_cast<float*>(&v52) = 1.0 / (4.0 * v68);
@@ -3835,7 +3879,7 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
     hkMatrix3 arA_;
     hkMatrix3 arA;
     hkMatrix3 v82;
-    v7[0] = v13[0];
+    XFNV_M128_F32(v7, 0) = XFNV_M128_F32(v13, 0);
     *reinterpret_cast<float*>(&v54) = 1.0f / (v26 * 10.0);
     m_quad_1 = _mm_mul_ps(
         _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v54)), _mm_set_ss(std::bit_cast<float>(v54)), 0), m_quad_1
@@ -3843,23 +3887,23 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
     *reinterpret_cast<float*>(&v55) = 1.0f / (v26 * 20.0);
     __m128 i_1 = i;
     i = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v55)), _mm_set_ss(std::bit_cast<float>(v55)), 0), i);
-    const __m128 negZ = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[2]));
-    const __m128 negY = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[1]));
-    const __m128 negX = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(i[0]));
-    i_1[0] = negZ[0];
-    *reinterpret_cast<float*>(&v56) = m_quad_1[2] + m_quad_1[1];
-    m_quad_2[0] = negZ[0];
-    v6[0] = negY[0];
+    const __m128 negZ = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(XFNV_M128_F32(i, 2)));
+    const __m128 negY = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(XFNV_M128_F32(i, 1)));
+    const __m128 negX = _mm_sub_ss(_mm_set_ss(-0.0f), _mm_set_ss(XFNV_M128_F32(i, 0)));
+    XFNV_M128_F32(i_1, 0) = XFNV_M128_F32(negZ, 0);
+    *reinterpret_cast<float*>(&v56) = XFNV_M128_F32(m_quad_1, 2) + XFNV_M128_F32(m_quad_1, 1);
+    XFNV_M128_F32(m_quad_2, 0) = XFNV_M128_F32(negZ, 0);
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(negY, 0);
     r.m_quad = _mm_sub_ps(m_quad_4, a1.m_quad);
-    *reinterpret_cast<float*>(&v58) = m_quad_1[2] + m_quad_1[0];
-    v67 = m_quad_1[0] + m_quad_1[1];
+    *reinterpret_cast<float*>(&v58) = XFNV_M128_F32(m_quad_1, 2) + XFNV_M128_F32(m_quad_1, 0);
+    v67 = XFNV_M128_F32(m_quad_1, 0) + XFNV_M128_F32(m_quad_1, 1);
     m_inertiaMatrix.m_col0.m_quad =
         _mm_unpacklo_ps(_mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v56)), v6), _mm_unpacklo_ps(m_quad_2, v7));
     __m128 v29 = negX;
-    v6[0] = negX[0];
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(negX, 0);
     v30.m_quad = _mm_unpacklo_ps(_mm_unpacklo_ps(i_1, v6), _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v58)), v7));
     m_inertiaMatrix.m_col1.m_quad = v30.m_quad;
-    v30.m_quad[0] = negY[0];
+    XFNV_M128_F32(v30.m_quad, 0) = XFNV_M128_F32(negY, 0);
     m_inertiaMatrix.m_col2.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v30.m_quad, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v67)))),
         _mm_unpacklo_ps(v29, v13)
@@ -3882,7 +3926,7 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x45465, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 1753
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     eigenVec.transpose();
@@ -3891,11 +3935,11 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
     m_inertiaMatrix.changeBasis(eigenVec);
     m_inertia.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col0.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col2.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_inertiaMatrix.m_col0.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_inertiaMatrix.m_col2.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaMatrix.m_col1.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_inertiaMatrix.m_col1.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -4273,7 +4317,7 @@ void hkgpConvexHullImpl::fetchBevelPlanes(
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     if (m_dimensions != 3) {
@@ -4366,7 +4410,7 @@ void hkgpConvexHullImpl::getOrientedBoundingBox(hkVector4& halfExtents, hkTransf
                     hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                     328
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
         }
         float fBestExtent = 3.40282e+38f;
@@ -4384,7 +4428,7 @@ void hkgpConvexHullImpl::getOrientedBoundingBox(hkVector4& halfExtents, hkTransf
                     fBestExtent = fExtent;
                     halfExtents.m_quad = rectHalfExtents.m_quad;
                     fBestVolume = fVolume;
-                    halfExtents.m_quad[2] = fExtent;
+                    XFNV_M128_F32(halfExtents.m_quad, 2) = fExtent;
                     worldTransform.m_rotation.m_col0.m_quad = rectTransform.m_rotation.m_col0.m_quad;
                     worldTransform.m_rotation.m_col1.m_quad = rectTransform.m_rotation.m_col1.m_quad;
                     worldTransform.m_rotation.m_col2.m_quad = rectTransform.m_rotation.m_col2.m_quad;
@@ -4392,9 +4436,9 @@ void hkgpConvexHullImpl::getOrientedBoundingBox(hkVector4& halfExtents, hkTransf
                 }
             }
         }
-        halfExtents.m_quad[2] = halfExtents.m_quad[2] * 0.5;
+        XFNV_M128_F32(halfExtents.m_quad, 2) = XFNV_M128_F32(halfExtents.m_quad, 2) * 0.5;
         // translation.addMul4(-halfExtents(2), column 2): the broadcast float times the column, plus the translation.
-        const float fOffset = -halfExtents.m_quad[2];
+        const float fOffset = -XFNV_M128_F32(halfExtents.m_quad, 2);
         worldTransform.m_translation.m_quad = _mm_add_ps(
             _mm_mul_ps(_mm_set1_ps(fOffset), worldTransform.m_rotation.m_col2.m_quad),
             worldTransform.m_translation.m_quad
@@ -4436,7 +4480,7 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
                 _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod)
             ));
             pVertex->m_scratch = fDistance;
-            const float fMagnitude = __builtin_fabsf(fDistance);
+            const float fMagnitude = std::fabsf(fDistance);
             if (fMagnitude <= thickness) {
                 pVertex->m_scratch = 0.0f;
             }
@@ -4542,8 +4586,8 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
         const float fMin = afRange[0];
         const float fMax = afRange[1];
         const float fWidth = fMax - fMin;
-        const float fAbsMax = __builtin_fabsf(fMax);
-        const float fAbsMin = __builtin_fabsf(fMin);
+        const float fAbsMax = std::fabsf(fMax);
+        const float fAbsMin = std::fabsf(fMin);
         const float fNearest = fAbsMax > fAbsMin ? fAbsMin : fAbsMax;
         if (!(thickness >= fWidth) && !(fNearest <= thickness)) {
             abovePoints.reserve(m_mesh.m_vertices.m_numUsed / 4 + aiCounts[0]);
@@ -4645,7 +4689,7 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
     if (hkError::s_instance->message(
             hkError::MESSAGE_ERROR, 0x3A86E3EF, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 2132
         )) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
     return hkgpConvexHull::INVALID;
 }
@@ -4789,7 +4833,7 @@ void hkgpConvexHullImpl::generateVertexAdjacencyGraph(
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     const int32_t numVertices = m_mesh.m_vertices.m_numUsed;
@@ -4833,7 +4877,8 @@ void hkgpConvexHullImpl::getSupportingVertexTransformed(__m128* a1, __m128* a2, 
             a1[3]
         );
         __m128 v7 = _mm_mul_ps(*a2, v6);
-        float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+        float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
         if (!i || v9 < static_cast<double>(v8)) {
             v9 = v8;
             *a3 = v6;
@@ -5175,7 +5220,7 @@ bool hkgpConvexHullImpl::clipLine(const hkVector4& a, const hkVector4& b, float&
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     // The clipped ends, recomputed from a and b after each cut.
@@ -5247,7 +5292,7 @@ float hkgpConvexHullImpl::getOrientedRectangle(
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79f9d886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     float fBestArea = 3.40282e+38f;
@@ -5397,7 +5442,7 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
                 hkError::MESSAGE_ERROR, 0x79F9D888, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 340
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     if (containment) {
@@ -5510,7 +5555,7 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
                         p1
                     );
                     const hkSimdReal det = kMatrix.getDeterminant();
-                    const float fDet = det.m_real[0];
+                    const float fDet = XFNV_M128_F32(det.m_real, 0);
                     fVolume = fDet + fVolume;
                     if (bForward) {
                         const uintptr_t next = pTriangle->m_links[(18 >> (2 * j)) & 3];
@@ -5880,19 +5925,19 @@ void hkPseudoRandomGenerator::getRandomVector11(hkVector4& vecOut) {
     uint32_t v3 = 0x19660D * m_current + 0x3C6EF35F;
     m_current = v3;
     float v4 = static_cast<double>(v3) * 2.3283064365386963e-10;
-    vecOut.m_quad[0] = v4 * 2.0 - 1.0;
+    XFNV_M128_F32(vecOut.m_quad, 0) = v4 * 2.0 - 1.0;
     uint32_t vecOuta = 0x19660D * m_current + 0x3C6EF35F;
     m_current = vecOuta;
     float vecOutb = static_cast<double>(vecOuta) * 2.3283064365386963e-10;
-    vecOut.m_quad[1] = vecOutb * 2.0 - 1.0;
+    XFNV_M128_F32(vecOut.m_quad, 1) = vecOutb * 2.0 - 1.0;
     uint32_t vecOutc = 0x19660D * m_current + 0x3C6EF35F;
     m_current = vecOutc;
     float vecOutd = static_cast<double>(vecOutc) * 2.3283064365386963e-10;
-    vecOut.m_quad[2] = vecOutd * 2.0 - 1.0;
+    XFNV_M128_F32(vecOut.m_quad, 2) = vecOutd * 2.0 - 1.0;
     uint32_t vecOute = 0x19660D * m_current + 0x3C6EF35F;
     m_current = vecOute;
     float vecOutf = 2.3283064365386963e-10 * static_cast<double>(vecOute);
-    vecOut.m_quad[3] = 2.0 * vecOutf - 1.0;
+    XFNV_M128_F32(vecOut.m_quad, 3) = 2.0 * vecOutf - 1.0;
 }
 
 // The smaller of two floats; y when they are equal or either is NaN.

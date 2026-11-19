@@ -13,6 +13,7 @@
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeCastCollector.h"
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeUtils.h"
 #include "Havok/Source/Common/Internal/KdTree/hkKdTree.h"
+#include "xfnv/Compiler.h"
 
 // hkGetOneOver65K's function-local static x (hkKdTreeMath.inl; the release hkInternal.lib's hkKdTreeAabbQueryUtils.obj
 // has it as ?x@?1??hkGetOneOver65K@@YA?AUhkQuadReal@@XZ@4U2@A): this translation unit's copy, 1 / 65535 in every lane.
@@ -314,12 +315,14 @@ void castRayRecursive(
             reinterpret_cast<const hkKdTreeNode*>(reinterpret_cast<const char*>(pNode) + (iWord & 0x7FFFFFFC));
         const hkKdTreeNode* pRight = pLeft + 1;
         int32_t iAxis = iWord & 3;
-        float fSplitMin = static_cast<double>(pNode->m_data.m_node.m_splitMin) / 65535.0 * (*a4)[iAxis] + (*a5)[iAxis];
-        float fSplitMax = static_cast<double>(pNode->m_data.m_node.m_splitMax) / 65535.0 * (*a4)[iAxis] + (*a5)[iAxis];
+        float fSplitMin = static_cast<double>(pNode->m_data.m_node.m_splitMin) / 65535.0 * XFNV_M128_F32((*a4), iAxis) +
+            XFNV_M128_F32((*a5), iAxis);
+        float fSplitMax = static_cast<double>(pNode->m_data.m_node.m_splitMax) / 65535.0 * XFNV_M128_F32((*a4), iAxis) +
+            XFNV_M128_F32((*a5), iAxis);
         uint32_t uiAxisBit = axisMaskBits_10C92E0[iAxis];
         if ((_mm_movemask_ps(_mm_cmpeq_ps(_mm_setzero_ps(), *a7)) & uiAxisBit) == uiAxisBit) {
-            bool bLeft = fSplitMax + 0.25 >= (*a6)[iAxis];
-            bool bRight = (*a6)[iAxis] >= fSplitMin - 0.25;
+            bool bLeft = fSplitMax + 0.25 >= XFNV_M128_F32((*a6), iAxis);
+            bool bRight = XFNV_M128_F32((*a6), iAxis) >= fSplitMin - 0.25;
             if (bLeft) {
                 castRayRecursive(a1, pLeft, a3, a4, a5, a6, a7, a8, a9, a10, a11);
             }
@@ -329,8 +332,8 @@ void castRayRecursive(
             pNode = pRight;
             continue;
         }
-        float fT1 = (fSplitMin - (*a6)[iAxis]) / (*a7)[iAxis];
-        float fT2 = (fSplitMax - (*a6)[iAxis]) / (*a7)[iAxis];
+        float fT1 = (fSplitMin - XFNV_M128_F32((*a6), iAxis)) / XFNV_M128_F32((*a7), iAxis);
+        float fT2 = (fSplitMax - XFNV_M128_F32((*a6), iAxis)) / XFNV_M128_F32((*a7), iAxis);
         const hkKdTreeNode* pFirst = pLeft;
         const hkKdTreeNode* pSecond = pRight;
         if ((_mm_movemask_ps(_mm_cmplt_ps(_mm_setzero_ps(), *a7)) & uiAxisBit) != uiAxisBit) {

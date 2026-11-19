@@ -20,6 +20,7 @@
 #include "Fallout/Audio/ImpactMixer.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Reads the impact data set's chunks. The DATA chunk holds one form ID per material, which a big-endian file stores
 // swapped and which are swapped back in place.
@@ -49,7 +50,7 @@ bool BGSImpactDataSet::Load(TESFile* apFile) {
                 break;
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

@@ -25,6 +25,7 @@
 #include "Havok/Source/Physics/Vehicle/Friction/hkpVehicleFriction.h"
 #include "Havok/Source/Physics/Vehicle/Suspension/hkpVehicleSuspension.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleInstance.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -401,23 +402,24 @@ void hkpVehicleData::init(
             _mm_and_ps(m_chassisOrientation.m_col2.m_quad, hkVector4_setAbs4_absMask)
         )
     );
-    orientation.m_quad[3] = 1.0f;
+    XFNV_M128_F32(orientation.m_quad, 3) = 1.0f;
     const float invMass = 1.0 / chassis->m_motion.getMass();
     const __m128 invMassSplat = _mm_set_ss(invMass);
     m_chassisFrictionInertiaInvDiag.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(invMassSplat, invMassSplat, 0), orientation.m_quad);
     cinfo.m_chassisCenterOfMass.m_quad = chassis->m_motion.m_motionState.m_sweptTransform.m_centerOfMassLocal.m_quad;
     const hkRotation& rotation = chassis->m_motion.m_motionState.m_transform.m_rotation;
-    const __m128 diag0 = _mm_set_ss(m_chassisFrictionInertiaInvDiag.m_quad[0]);
+    const __m128 diag0 = _mm_set_ss(XFNV_M128_F32(m_chassisFrictionInertiaInvDiag.m_quad, 0));
     inertiaInvLocal.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(diag0, diag0, 0), rotation.m_col0.m_quad);
-    const __m128 diag1 = _mm_set_ss(m_chassisFrictionInertiaInvDiag.m_quad[1]);
+    const __m128 diag1 = _mm_set_ss(XFNV_M128_F32(m_chassisFrictionInertiaInvDiag.m_quad, 1));
     inertiaInvLocal.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(diag1, diag1, 0), rotation.m_col1.m_quad);
-    const __m128 diag2 = _mm_set_ss(m_chassisFrictionInertiaInvDiag.m_quad[2]);
+    const __m128 diag2 = _mm_set_ss(XFNV_M128_F32(m_chassisFrictionInertiaInvDiag.m_quad, 2));
     inertiaInvLocal.m_col2.m_quad = _mm_mul_ps(_mm_shuffle_ps(diag2, diag2, 0), rotation.m_col2.m_quad);
     cinfo.m_chassisFrictionInertiaInv.setMulInverse(inertiaInvLocal, rotation);
-    cinfo.m_chassisMassInv = _mm_shuffle_ps(
-        chassis->m_motion.m_inertiaAndMassInv.m_quad, chassis->m_motion.m_inertiaAndMassInv.m_quad, 255
-    )[0];
+    cinfo.m_chassisMassInv = XFNV_M128_F32(
+        _mm_shuffle_ps(chassis->m_motion.m_inertiaAndMassInv.m_quad, chassis->m_motion.m_inertiaAndMassInv.m_quad, 255),
+        0
+    );
     cinfo.m_directionUp.m_quad = _mm_and_ps(hkVector4_setAbs4_absMask, m_chassisOrientation.m_col0.m_quad);
     cinfo.m_frictionEqualizer = m_frictionEqualizer;
     cinfo.m_directionFront.m_quad = _mm_and_ps(m_chassisOrientation.m_col1.m_quad, hkVector4_setAbs4_absMask);

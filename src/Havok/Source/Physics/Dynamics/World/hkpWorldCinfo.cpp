@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Types/hkRefPtr.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Common/Serialize/Util/hkFinishLoadedObjectFlag.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -111,13 +112,13 @@ void hkpWorldCinfo::setupSolverInfo(hkpWorldCinfo::SolverType st) {
 // Multiplies by the doubles -0.5 and 0.5 and rounds each product to a float before broadcasting it.
 void hkpWorldCinfo::setBroadPhaseWorldSize(float sideLength) {
     float fMin = static_cast<float>(-0.5 * sideLength);
-    m_broadPhaseWorldAabb.m_min.m_quad[0] = fMin;
-    m_broadPhaseWorldAabb.m_min.m_quad[1] = fMin;
-    m_broadPhaseWorldAabb.m_min.m_quad[2] = fMin;
-    m_broadPhaseWorldAabb.m_min.m_quad[3] = fMin;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_min.m_quad, 0) = fMin;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_min.m_quad, 1) = fMin;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_min.m_quad, 2) = fMin;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_min.m_quad, 3) = fMin;
     float fMax = static_cast<float>(sideLength * 0.5);
-    m_broadPhaseWorldAabb.m_max.m_quad[0] = fMax;
-    m_broadPhaseWorldAabb.m_max.m_quad[1] = fMax;
-    m_broadPhaseWorldAabb.m_max.m_quad[2] = fMax;
-    m_broadPhaseWorldAabb.m_max.m_quad[3] = fMax;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_max.m_quad, 0) = fMax;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_max.m_quad, 1) = fMax;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_max.m_quad, 2) = fMax;
+    XFNV_M128_F32(m_broadPhaseWorldAabb.m_max.m_quad, 3) = fMax;
 }

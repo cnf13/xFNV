@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantom.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -300,9 +301,10 @@ void hkpSpringAction::setPositionsInWorldSpace(const hkVector4& pivotA, const hk
     m_positionBinB.setTransformedInversePos(m_entityB->m_motion.m_motionState.m_transform, pivotB);
     __m128 v5 = _mm_sub_ps(pivotA.m_quad, pivotB.m_quad);
     __m128 v6 = _mm_mul_ps(v5, v5);
-    m_restLength = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]))))
-    );
+    m_restLength = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0)))
+    )));
 }
 
 void hkpSpringAction::setPositionsInBodySpace(const hkVector4& pivotA, const hkVector4& pivotB) {
@@ -316,9 +318,10 @@ void hkpSpringAction::setPositionsInBodySpace(const hkVector4& pivotA, const hkV
     v9.setTransformedPos(m_entityB->m_motion.m_motionState.m_transform, pivotB);
     __m128 v6 = _mm_sub_ps(v8.m_quad, v9.m_quad);
     __m128 v7 = _mm_mul_ps(v6, v6);
-    m_restLength = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]))))
-    );
+    m_restLength = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0)))
+    )));
 }
 
 const hkClass& hkpSpringAction::staticClass() {

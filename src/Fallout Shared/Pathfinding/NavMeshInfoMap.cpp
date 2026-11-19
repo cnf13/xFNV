@@ -17,6 +17,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
+#include "xfnv/Compiler.h"
 
 NavMeshInfoMap::NavMeshInfoMap() : bUpdateAll(false), InfoMap(0x2719), CellKeyNavMeshInfoMap(103), bInit(0) {
     cFormType = NAVI_ID;
@@ -118,7 +119,7 @@ bool NavMeshInfoMap::Load(TESFile* apFile) {
             case EDID_ID: {
                 // The buffer is allocated on the stack at the chunk's size; at most 0x200 bytes are read.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is terminated first (see above).
                 pEditorID[0] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200);

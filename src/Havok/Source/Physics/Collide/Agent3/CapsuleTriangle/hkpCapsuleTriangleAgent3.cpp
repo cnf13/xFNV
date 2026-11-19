@@ -15,6 +15,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Convex/Triangle/hkpTriangleShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Collide/Util/hkpCollideCapsuleUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -121,7 +122,7 @@ void hkCapsuleTriangleAgent3::sepNormal(
         static_cast<hkpCapsuleTriangleCache3*>(agentData)->m_triangleCache, 3.40282e+38f, 0, points, nullptr
     );
 
-    if (points[1].m_separatingNormal.m_quad[3] > points[0].m_separatingNormal.m_quad[3]) {
+    if (XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3)) {
         separatingNormalOut = points[0].m_separatingNormal;
     }
     else {
@@ -169,11 +170,14 @@ hkpAgentData* hkCapsuleTriangleAgent3::process(
         features
     );
 
-    const int32_t iPoint = points[1].m_separatingNormal.m_quad[3] > points[0].m_separatingNormal.m_quad[3] ? 0 : 1;
+    const int32_t iPoint =
+        XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3)
+        ? 0
+        : 1;
     uint8_t numPoints = 0;
     for (int32_t i = 0; i < 3; i++) {
         uint16_t id = cache->m_contactPointId[i];
-        if (!(input.m_input->m_tolerance > points[i].m_separatingNormal.m_quad[3])) {
+        if (!(input.m_input->m_tolerance > XFNV_M128_F32(points[i].m_separatingNormal.m_quad, 3))) {
             if (id != 0xFFFF) {
                 input.m_contactMgr->removeContactPoint(id, *result.m_constraintOwner.m_storage);
                 id = 0xFFFF;

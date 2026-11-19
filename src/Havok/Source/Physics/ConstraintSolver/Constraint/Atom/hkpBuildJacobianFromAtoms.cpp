@@ -34,6 +34,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianElement.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianSchema.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -215,10 +216,10 @@ void _hkBallSocketConstraintBuildJacobian(
     if (m_violatedConstraints) {
         hkSimdReal v16;
         __m128 v13 = _mm_mul_ps(v12, v12);
-        float v14 = _mm_shuffle_ps(v13, v13, 85)[0] + v13[0];
-        float v15 = _mm_shuffle_ps(v13, v13, 170)[0];
+        float v14 = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 85), 0) + XFNV_M128_F32(v13, 0);
+        float v15 = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 170), 0);
         v16.m_real = apIn->hkpConstraintQueryIn::m_maxConstraintViolationSqrd.m_real;
-        v16.m_real[0] = v16.m_real[0] - (v15 + v14);
+        XFNV_M128_F32(v16.m_real, 0) = XFNV_M128_F32(v16.m_real, 0) - (v15 + v14);
         if ((_mm_movemask_ps(v16.m_real) & 1) != 0) {
             // EXE-INLINED none: hkCriticalSection::atomicExchangeAdd
             // EXE-CAST: hkUint32 as LONG (the SDK's atomicExchangeAdd casts the counter for InterlockedExchangeAdd)
@@ -267,22 +268,25 @@ void _hkBallSocketConstraintBuildJacobian(
         __m128 v33 = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v30, v30), m_quad_5), _mm_mul_ps(_mm_mul_ps(v29, v29), m_quad_6));
         __m128 v34 = _mm_shuffle_ps(v33, _mm_unpackhi_ps(v33, _mm_add_ps(m_quad_6, m_quad_5)), 196);
         __m128 v35 = _mm_add_ps(_mm_shuffle_ps(v34, v34, 78), v34);
-        float v43 = (_mm_shuffle_ps(v35, v35, 177)[0] + v35[0]) + 1.1920928955078125e-07;
-        m_jacobianSchemas[2].m_quad[3] = v43;
-        m_jacobianSchemas[1].m_quad[3] = m_virtMassFactor / v43;
+        float v43 = (XFNV_M128_F32(_mm_shuffle_ps(v35, v35, 177), 0) + XFNV_M128_F32(v35, 0)) + 1.1920928955078125e-07;
+        XFNV_M128_F32(m_jacobianSchemas[2].m_quad, 3) = v43;
+        XFNV_M128_F32(m_jacobianSchemas[1].m_quad, 3) = m_virtMassFactor / v43;
         v36 = v39;
         __m128 v37 =
             _mm_mul_ps(_mm_sub_ps(arTransformB.m_translation.m_quad, arTransformA.m_translation.m_quad), pAxis->m_quad);
-        m_jacobianSchemas->m_quad[3] =
-            (_mm_shuffle_ps(v37, v37, 170)[0] + (_mm_shuffle_ps(v37, v37, 85)[0] + v37[0])) * m_rhsFactor_1;
-        m_jacobianSchemas->m_quad[3] = v45[v39] * apIn->m_rhsFactor;
-        m_jacobianSchemas->m_quad[0] = m_jacobianSchemas->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(m_jacobianSchemas->m_quad, 3) =
+            (XFNV_M128_F32(_mm_shuffle_ps(v37, v37, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v37, v37, 85), 0) + XFNV_M128_F32(v37, 0))) *
+            m_rhsFactor_1;
+        XFNV_M128_F32(m_jacobianSchemas->m_quad, 3) = XFNV_M128_F32(v45, v39) * apIn->m_rhsFactor;
+        XFNV_M128_F32(m_jacobianSchemas->m_quad, 0) =
+            XFNV_M128_F32(m_jacobianSchemas->m_quad, 0) + 1.1920928955078125e-07;
         if (m_maxImpulse == 3.402820018375656e+38) {
             m_jacobianSchemas->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_BILATERAL;
         }
         else {
             m_jacobianSchemas->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_BILATERAL_WITH_IMPULSE_LIMIT;
-            m_jacobianSchemas[2].m_quad[3] = m_maxImpulse;
+            XFNV_M128_F32(m_jacobianSchemas[2].m_quad, 3) = m_maxImpulse;
         }
         m_jacobianSchemas += 3;
         ++pAxis;
@@ -304,7 +308,7 @@ void buildJacobianHeader(
     uint32_t bodyBIndex = arIn.m_accumulatorBIndex.m_storage;
     uint32_t bodyAIndex = arIn.m_accumulatorAIndex.m_storage;
     hkpConstraintInstance* pConstraintInstance = arIn.m_constraintInstance;
-    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->getHeader().m_bodyBIndex = static_cast<uint16_t>(bodyBIndex);
     pSchema->getHeader().m_constraintInstance = pConstraintInstance;
     pSchema->getHeader().m_bodyAIndex = static_cast<uint16_t>(bodyAIndex);
@@ -319,7 +323,7 @@ void buildJacobianHeader(
 void buildShiftSolverResults(hkpConstraintQueryOut& arOut, uint8_t auiNumToSkip) {
     hkpJacobianSchema* pShift = arOut.m_jacobianSchemas;
     pShift->m_shiftSolverResults.m_numSolverResultsToSkip = auiNumToSkip;
-    pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
     pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
     arOut.m_jacobianSchemas = pShift + 1;
 }
@@ -528,7 +532,7 @@ hkp1dBilateralConstraintStatus* build2AngJacobian(
     float fDiag = _mm_cvtss_f32(kSum) + 1.1920928955078125e-07;
     float fVirtualMass = 1.0f / fDiag;
     const float fStored = fVirtualMass;
-    arJac.m_angular[0].m_quad[3] = fStored;
+    XFNV_M128_F32(arJac.m_angular[0].m_quad, 3) = fStored;
     arStatusOut.m_virtualMass = fStored;
     return &arStatusOut;
 }
@@ -701,7 +705,7 @@ void buildJacobianFromAngFrictionAtom(
     else {
         hkpJacobianSchema* pShift = arOut.m_jacobianSchemas;
         pShift->m_shiftSolverResults.m_numSolverResultsToSkip = arAtom.m_numFrictionAxes;
-        pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
         pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
         arOut.m_jacobianSchemas = pShift + 1;
     }
@@ -728,7 +732,7 @@ void buildJacobianFromLinFrictionAtom(
     else {
         hkpJacobianSchema* pShift = out.m_jacobianSchemas;
         pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
-        pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
         pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
         out.m_jacobianSchemas = pShift + 1;
     }
@@ -746,7 +750,7 @@ void buildJacobianHeaderPtr(
     uint32_t bodyBIndex = apIn->m_accumulatorBIndex.m_storage;
     uint32_t bodyAIndex = apIn->m_accumulatorAIndex.m_storage;
     hkpConstraintInstance* pConstraintInstance = apIn->m_constraintInstance;
-    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->getHeader().m_bodyBIndex = static_cast<uint16_t>(bodyBIndex);
     pSchema->getHeader().m_constraintInstance = pConstraintInstance;
     pSchema->getHeader().m_bodyAIndex = static_cast<uint16_t>(bodyAIndex);
@@ -968,23 +972,23 @@ void buildJacobianFromAngMotorAtom(
         );
         const float fInvMassEps = fInvMass + 1.1920928955078125e-07;
         const float fVirtualMass = 1.0 / fInvMassEps;
-        pJac[0].m_quad[3] = fVirtualMass;
+        XFNV_M128_F32(pJac[0].m_quad, 3) = fVirtualMass;
         kMotorInput.m_virtualMass = fVirtualMass;
         kMotorInput.m_stepInfo = &out;
         kMotorInput.m_lastResults = *static_cast<hkpSolverResults*>(out.m_constraintRuntime.m_storage);
         kMotorInput.m_deltaTarget = baseB.m_targetAngle - *pPrevious;
         kMotorInput.m_positionError = *pPrevious - fAngle;
         hkCalcMotorData(pMotor, &kMotorInput, &kMotorOutput);
-        pJac[1].m_quad[3] = out.m_substepInvDeltaTime * kMotorOutput.m_targetPosition;
+        XFNV_M128_F32(pJac[1].m_quad, 3) = out.m_substepInvDeltaTime * kMotorOutput.m_targetPosition;
         hkpJacobianSchema* pSchema = baseA.m_jacobianSchemas;
-        pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
         pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_MOTOR;
-        pSchema[2].m_quad[0] = kMotorOutput.m_maxForce * out.m_microStepDeltaTime;
+        XFNV_M128_F32(pSchema[2].m_quad, 0) = kMotorOutput.m_maxForce * out.m_microStepDeltaTime;
         baseA.m_jacobianSchemas = pSchema + 4;
-        pSchema[2].m_quad[1] = kMotorOutput.m_minForce * out.m_microStepDeltaTime;
-        pSchema[2].m_quad[2] = kMotorOutput.m_targetVelocity;
-        pSchema[2].m_quad[3] = kMotorOutput.m_tau;
-        pSchema[3].m_quad[0] = kMotorOutput.m_damping;
+        XFNV_M128_F32(pSchema[2].m_quad, 1) = kMotorOutput.m_minForce * out.m_microStepDeltaTime;
+        XFNV_M128_F32(pSchema[2].m_quad, 2) = kMotorOutput.m_targetVelocity;
+        XFNV_M128_F32(pSchema[2].m_quad, 3) = kMotorOutput.m_tau;
+        XFNV_M128_F32(pSchema[3].m_quad, 0) = kMotorOutput.m_damping;
         // A target that differs (or is NaN) is stored.
         if (baseB.m_targetAngle != *pPrevious || *pInitialized == 0) {
             *pPrevious = baseB.m_targetAngle;
@@ -994,7 +998,7 @@ void buildJacobianFromAngMotorAtom(
     else {
         hkpJacobianSchema* pShift = baseA.m_jacobianSchemas;
         pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
-        pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
         pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
         baseA.m_jacobianSchemas = pShift + 1;
     }
@@ -1018,7 +1022,7 @@ void buildJacobianFromRagdollMotorAtom(
     if (!baseB.m_isEnabled.m_bool) {
         hkpJacobianSchema* pShift = baseA.m_jacobianSchemas;
         pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 3;
-        pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
         pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
         baseA.m_jacobianSchemas = pShift + 1;
         return;
@@ -1041,7 +1045,7 @@ void buildJacobianFromRagdollMotorAtom(
         if (pMotor == nullptr) {
             hkpJacobianSchema* pShift = baseA.m_jacobianSchemas;
             pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
-            pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+            XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
             pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
             baseA.m_jacobianSchemas = pShift + 1;
             continue;
@@ -1145,22 +1149,22 @@ void buildJacobianFromRagdollMotorAtom(
         );
         const float fInvMassEps = fInvMass + 1.1920928955078125e-07;
         const float fVirtualMass = 1.0 / fInvMassEps;
-        pJac[0].m_quad[3] = fVirtualMass;
+        XFNV_M128_F32(pJac[0].m_quad, 3) = fVirtualMass;
         kMotorInput.m_virtualMass = fVirtualMass;
         kMotorInput.m_lastResults = static_cast<hkpSolverResults*>(out.m_constraintRuntime.m_storage)[i];
         kMotorInput.m_deltaTarget = fTarget - pPrevious[i];
         kMotorInput.m_positionError = pPrevious[i] - fCurrent;
         hkCalcMotorData(pMotor, &kMotorInput, &kMotorOutput);
-        pJac[1].m_quad[3] = out.m_substepInvDeltaTime * kMotorOutput.m_targetPosition;
+        XFNV_M128_F32(pJac[1].m_quad, 3) = out.m_substepInvDeltaTime * kMotorOutput.m_targetPosition;
         hkpJacobianSchema* pSchema = baseA.m_jacobianSchemas;
-        pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
         pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_MOTOR;
-        pSchema[2].m_quad[0] = kMotorOutput.m_maxForce * out.m_microStepDeltaTime;
+        XFNV_M128_F32(pSchema[2].m_quad, 0) = kMotorOutput.m_maxForce * out.m_microStepDeltaTime;
         baseA.m_jacobianSchemas = pSchema + 4;
-        pSchema[2].m_quad[1] = kMotorOutput.m_minForce * out.m_microStepDeltaTime;
-        pSchema[2].m_quad[2] = kMotorOutput.m_targetVelocity;
-        pSchema[2].m_quad[3] = kMotorOutput.m_tau;
-        pSchema[3].m_quad[0] = kMotorOutput.m_damping;
+        XFNV_M128_F32(pSchema[2].m_quad, 1) = kMotorOutput.m_minForce * out.m_microStepDeltaTime;
+        XFNV_M128_F32(pSchema[2].m_quad, 2) = kMotorOutput.m_targetVelocity;
+        XFNV_M128_F32(pSchema[2].m_quad, 3) = kMotorOutput.m_tau;
+        XFNV_M128_F32(pSchema[3].m_quad, 0) = kMotorOutput.m_damping;
         // The target is stored unless it equals the previous one.
         if (fTarget != pPrevious[i]) {
             pPrevious[i] = fTarget;
@@ -1249,7 +1253,7 @@ void buildJacobianFromLinMotorAtom(
     else {
         hkpJacobianSchema* pShift = baseB.m_jacobianSchemas;
         pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
-        pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
         pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
         baseB.m_jacobianSchemas = pShift + 1;
     }
@@ -1300,8 +1304,8 @@ void buildJacobianPulleyFromData(
     else {
         kDirB = _mm_xor_ps(kIdentity, hkQuadRealNegateMask);
     }
-    float fRopeLength = apData[4].m_quad[0];
-    float fLeverage = apData[4].m_quad[1];
+    float fRopeLength = XFNV_M128_F32(apData[4].m_quad, 0);
+    float fLeverage = XFNV_M128_F32(apData[4].m_quad, 1);
     __m128 kJacLinB = _mm_mul_ps(_mm_set1_ps(fLeverage), kDirB);
     float fInvDeltaTime = arIn.m_substepInvDeltaTime;
     float fVirtMassFactor = arIn.m_virtMassFactor;
@@ -1343,8 +1347,8 @@ void buildJacobianPulleyFromData(
         _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0xAA), _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0x55), kMass))
     );
     float fLeverageSq = fLeverage * fLeverage;
-    float fLinearMass =
-        fLeverageSq * pBodyB->m_invMasses.m_quad[3] + pBodyA->m_invMasses.m_quad[3] + 1.1920928955078125e-07;
+    float fLinearMass = fLeverageSq * XFNV_M128_F32(pBodyB->m_invMasses.m_quad, 3) +
+        XFNV_M128_F32(pBodyA->m_invMasses.m_quad, 3) + 1.1920928955078125e-07;
     __m128 kSegA = _mm_sub_ps(kFixedA, kPivotA);
     kSq = _mm_mul_ps(kSegA, kSegA);
     float fLengthA = _mm_cvtss_f32(
@@ -1356,13 +1360,13 @@ void buildJacobianPulleyFromData(
     float fLengthB = _mm_cvtss_f32(
         _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0x55), kSq)))
     );
-    pJac[2].m_quad[3] = fVirtMassFactor / fInvMass;
+    XFNV_M128_F32(pJac[2].m_quad, 3) = fVirtMassFactor / fInvMass;
     float fRope = fLeverage * fLengthB + fLengthA;
     float fError = fRope - fRopeLength;
-    pJac[0].m_quad[3] = fError * fInvDeltaTime;
+    XFNV_M128_F32(pJac[0].m_quad, 3) = fError * fInvDeltaTime;
     hkpJacobianSchema* pSchema = arOut.m_jacobianSchemas;
     arOut.m_jacobianSchemas = pSchema + 4;
-    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_PULLEY;
 }
 
@@ -1455,8 +1459,8 @@ void buildJacobianPulley(
         _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0xAA), _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0x55), kMass))
     );
     float fLeverageSq = fLeverage * fLeverage;
-    float fLinearMass =
-        fLeverageSq * pBodyB->m_invMasses.m_quad[3] + pBodyA->m_invMasses.m_quad[3] + 1.1920928955078125e-07;
+    float fLinearMass = fLeverageSq * XFNV_M128_F32(pBodyB->m_invMasses.m_quad, 3) +
+        XFNV_M128_F32(pBodyA->m_invMasses.m_quad, 3) + 1.1920928955078125e-07;
     // Both lengths are taken from the pivot-to-fixed vectors computed at the start.
     kSq = _mm_mul_ps(kToA, kToA);
     float fLengthA = _mm_cvtss_f32(
@@ -1467,13 +1471,13 @@ void buildJacobianPulley(
     float fLengthB = _mm_cvtss_f32(
         _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0x55), kSq)))
     );
-    pJac[2].m_quad[3] = fVirtMassFactor / fInvMass;
+    XFNV_M128_F32(pJac[2].m_quad, 3) = fVirtMassFactor / fInvMass;
     float fRope = fLeverage * fLengthB + fLengthA;
     float fError = fRope - fRopeLength;
-    pJac[0].m_quad[3] = fError * fInvDeltaTime;
+    XFNV_M128_F32(pJac[0].m_quad, 3) = fError * fInvDeltaTime;
     hkpJacobianSchema* pSchema = arOut.m_jacobianSchemas;
     arOut.m_jacobianSchemas = pSchema + 4;
-    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_PULLEY;
 }
 
@@ -1505,7 +1509,7 @@ void buildJacobianFromSoftContactModifier(
     uint8_t* pProperties = reinterpret_cast<uint8_t*>(pPoints + pContact->m_numReservedContactPoints);
     uint32_t uiStriding = pContact->m_contactPointPropertiesStriding;
     for (int32_t i = 0; i < iNumPoints; ++i) {
-        float fDistance = pPoints[i].m_separatingNormal.m_quad[3];
+        float fDistance = XFNV_M128_F32(pPoints[i].m_separatingNormal.m_quad, 3);
         float fAllowed = arAtom.m_maxAcceleration * arIn.m_microStepDeltaTime * arIn.m_substepDeltaTime / arAtom.m_tau;
         hkpContactPointProperties* pProperty = reinterpret_cast<hkpContactPointProperties*>(pProperties);
         // Stored only when the old value is above the new one.
@@ -1614,7 +1618,7 @@ void buildJacobianFromMovingSurfaceModifier(
     uint32_t uiBodyBIndex = arIn.m_accumulatorBIndex.m_storage;
     uint32_t uiBodyAIndex = arIn.m_accumulatorAIndex.m_storage;
     hkpConstraintInstance* pConstraintInstance = arIn.m_constraintInstance;
-    pHeader->m_quad[0] = pHeader->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pHeader->m_quad, 0) = XFNV_M128_F32(pHeader->m_quad, 0) + 1.1920928955078125e-07;
     pHeader->getHeader().m_bodyAIndex = static_cast<uint16_t>(uiBodyAIndex);
     pHeader->getHeader().m_bodyBIndex = static_cast<uint16_t>(uiBodyBIndex);
     pHeader->getHeader().m_solverResultInMainMemory = static_cast<hkpSolverResults*>(pSolverResults);
@@ -1708,11 +1712,15 @@ void hkBallSocketConstraintBuildJacobian_noSchema(
         // The three angular lanes and the sum of the inverse masses' w lanes, added across.
         const __m128 kTerms = _mm_shuffle_ps(kMass, _mm_unpackhi_ps(kMass, _mm_add_ps(kInvMassesA, kInvMassesB)), 196);
         const __m128 kPairs = _mm_add_ps(_mm_shuffle_ps(kTerms, kTerms, 78), kTerms);
-        const float fDiag = (_mm_shuffle_ps(kPairs, kPairs, 177)[0] + kPairs[0]) + 1.1920928955078125e-07;
-        rJac.m_angular[1].m_quad[3] = fDiag;
-        rJac.m_angular[0].m_quad[3] = fVirtMassFactor / fDiag;
+        const float fDiag =
+            (XFNV_M128_F32(_mm_shuffle_ps(kPairs, kPairs, 177), 0) + XFNV_M128_F32(kPairs, 0)) + 1.1920928955078125e-07;
+        XFNV_M128_F32(rJac.m_angular[1].m_quad, 3) = fDiag;
+        XFNV_M128_F32(rJac.m_angular[0].m_quad, 3) = fVirtMassFactor / fDiag;
         const __m128 kSeparation = _mm_mul_ps(_mm_sub_ps(posB.m_quad, posA.m_quad), kDir);
-        rJac.m_linear0.m_quad[3] = (kSeparation[2] + static_cast<float>(kSeparation[1] + kSeparation[0])) * fRhsFactor;
+        XFNV_M128_F32(rJac.m_linear0.m_quad, 3) =
+            (XFNV_M128_F32(kSeparation, 2) +
+             static_cast<float>(XFNV_M128_F32(kSeparation, 1) + XFNV_M128_F32(kSeparation, 0))) *
+            fRhsFactor;
     }
 }
 
@@ -1756,7 +1764,7 @@ hkp1dBilateralConstraintStatus* hk1dAngularVelocityMotorBeginJacobian(
     float fDiag = _mm_cvtss_f32(kSum) + 1.1920928955078125e-07;
     float fVirtualMass = 1.0f / fDiag;
     const float fStored = fVirtualMass;
-    jac.m_angular[0].m_quad[3] = fStored;
+    XFNV_M128_F32(jac.m_angular[0].m_quad, 3) = fStored;
     statusOut.m_virtualMass = fStored;
     return &statusOut;
 }
@@ -1801,17 +1809,17 @@ void hk1dAngularLimitBuildJacobian(
         _mm_add_ps(_mm_shuffle_ps(kMass, kMass, 0xAA), _mm_add_ps(_mm_shuffle_ps(kMass, kMass, 0x55), kMass));
     // The sum plus epsilon is rounded to float before tau is divided by it.
     float fDiag = _mm_cvtss_f32(kSum) + 1.1920928955078125e-07;
-    pSchema[0].m_quad[3] = fTau / fDiag;
+    XFNV_M128_F32(pSchema[0].m_quad, 3) = fTau / fDiag;
     const float fNegInvDt = -in.m_substepInvDeltaTime;
     const float fMin = info.m_min.m_storage;
     const float fMax = info.m_max.m_storage;
-    pSchema[1].m_quad[3] = info.m_computedAngle.m_storage * fNegInvDt;
+    XFNV_M128_F32(pSchema[1].m_quad, 3) = info.m_computedAngle.m_storage * fNegInvDt;
     hkpJacobianSchema* pLimit = out.m_jacobianSchemas;
     out.m_jacobianSchemas = pLimit + 3;
-    pLimit[2].m_quad[0] = fMin * fNegInvDt * fTau;
-    pLimit[2].m_quad[1] = fNegInvDt * fMax * fTau;
-    pLimit[2].m_quad[2] = fTau;
-    pLimit[0].m_quad[0] = pLimit[0].m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pLimit[2].m_quad, 0) = fMin * fNegInvDt * fTau;
+    XFNV_M128_F32(pLimit[2].m_quad, 1) = fNegInvDt * fMax * fTau;
+    XFNV_M128_F32(pLimit[2].m_quad, 2) = fTau;
+    XFNV_M128_F32(pLimit[0].m_quad, 0) = XFNV_M128_F32(pLimit[0].m_quad, 0) + 1.1920928955078125e-07;
     pLimit[0].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_LIMITS;
 }
 
@@ -1822,16 +1830,16 @@ hkpJacobianSchema* hk1dAngularVelocityMotorCommitJacobian(
     hkp2AngJacobian& jac,
     hkpConstraintQueryOut& out
 ) {
-    jac.m_angular[1].m_quad[3] = in.m_substepInvDeltaTime * info.m_targetPosition;
+    XFNV_M128_F32(jac.m_angular[1].m_quad, 3) = in.m_substepInvDeltaTime * info.m_targetPosition;
     hkpJacobianSchema* pSchema = out.m_jacobianSchemas;
-    pSchema[0].m_quad[0] = pSchema[0].m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema[0].m_quad, 0) = XFNV_M128_F32(pSchema[0].m_quad, 0) + 1.1920928955078125e-07;
     pSchema[0].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_MOTOR;
     out.m_jacobianSchemas = pSchema + 4;
-    pSchema[2].m_quad[0] = info.m_maxForce * in.m_microStepDeltaTime;
-    pSchema[2].m_quad[1] = info.m_minForce * in.m_microStepDeltaTime;
-    pSchema[2].m_quad[2] = info.m_targetVelocity;
-    pSchema[2].m_quad[3] = info.m_tau;
-    pSchema[3].m_quad[0] = info.m_damping;
+    XFNV_M128_F32(pSchema[2].m_quad, 0) = info.m_maxForce * in.m_microStepDeltaTime;
+    XFNV_M128_F32(pSchema[2].m_quad, 1) = info.m_minForce * in.m_microStepDeltaTime;
+    XFNV_M128_F32(pSchema[2].m_quad, 2) = info.m_targetVelocity;
+    XFNV_M128_F32(pSchema[2].m_quad, 3) = info.m_tau;
+    XFNV_M128_F32(pSchema[3].m_quad, 0) = info.m_damping;
     return pSchema + 4;
 }
 
@@ -1843,7 +1851,7 @@ hkpJacobianSchema* hkBeginConstraints(
     uint8_t solverResultStriding
 ) {
     hkpJacobianSchema* pSchema = out->m_jacobianSchemas;
-    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->getHeader().m_bodyBIndex = static_cast<uint16_t>(in->m_accumulatorBIndex.m_storage);
     pSchema->getHeader().m_constraintInstance = in->m_constraintInstance;
     pSchema->getHeader().m_bodyAIndex = static_cast<uint16_t>(in->m_accumulatorAIndex.m_storage);
@@ -1977,24 +1985,27 @@ void buildBallSocketJacobian(
         // The three angular lanes and the sum of the inverse masses' w lanes, added across.
         const __m128 kTerms = _mm_shuffle_ps(kMass, _mm_unpackhi_ps(kMass, _mm_add_ps(kInvMassesA, kInvMassesB)), 196);
         const __m128 kPairs = _mm_add_ps(_mm_shuffle_ps(kTerms, kTerms, 78), kTerms);
-        const float fSum = _mm_add_ps(_mm_shuffle_ps(kPairs, kPairs, 177), kPairs)[0];
+        const float fSum = XFNV_M128_F32(_mm_add_ps(_mm_shuffle_ps(kPairs, kPairs, 177), kPairs), 0);
         const float fDiag = fSum + 1.1920928955078125e-07;
-        pSchemas[2].m_quad[3] = fDiag;
-        pSchemas[1].m_quad[3] = fVirtMassFactor / fDiag;
+        XFNV_M128_F32(pSchemas[2].m_quad, 3) = fDiag;
+        XFNV_M128_F32(pSchemas[1].m_quad, 3) = fVirtMassFactor / fDiag;
         const __m128 kSeparation = _mm_mul_ps(_mm_sub_ps(posB.m_quad, posA.m_quad), pAxis->m_quad);
-        const float fSeparation = _mm_add_ss(
-            _mm_shuffle_ps(kSeparation, kSeparation, 170),
-            _mm_add_ss(_mm_shuffle_ps(kSeparation, kSeparation, 85), kSeparation)
-        )[0];
-        pSchemas[0].m_quad[3] = fSeparation * fRhsFactor;
-        pSchemas[0].m_quad[3] = error(i) * in.m_rhsFactor;
-        pSchemas[0].m_quad[0] = pSchemas[0].m_quad[0] + 1.1920928955078125e-07;
+        const float fSeparation = XFNV_M128_F32(
+            _mm_add_ss(
+                _mm_shuffle_ps(kSeparation, kSeparation, 170),
+                _mm_add_ss(_mm_shuffle_ps(kSeparation, kSeparation, 85), kSeparation)
+            ),
+            0
+        );
+        XFNV_M128_F32(pSchemas[0].m_quad, 3) = fSeparation * fRhsFactor;
+        XFNV_M128_F32(pSchemas[0].m_quad, 3) = error(i) * in.m_rhsFactor;
+        XFNV_M128_F32(pSchemas[0].m_quad, 0) = XFNV_M128_F32(pSchemas[0].m_quad, 0) + 1.1920928955078125e-07;
         if (maxImpulse == 3.402820018375656e+38) {
             pSchemas[0].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_BILATERAL;
         }
         else {
             pSchemas[0].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_BILATERAL_WITH_IMPULSE_LIMIT;
-            pSchemas[2].m_quad[3] = maxImpulse;
+            XFNV_M128_F32(pSchemas[2].m_quad, 3) = maxImpulse;
         }
     }
     out.m_jacobianSchemas = pSchemas;
@@ -2046,7 +2057,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
     pHeader->m_solverResultInMainMemory = static_cast<hkpSolverResults*>(kIn.m_constraintRuntime.m_storage);
     pHeader->m_bodyAIndex = static_cast<uint16_t>(kIn.m_accumulatorAIndex.m_storage);
     pHeader->m_bodyBIndex = static_cast<uint16_t>(kIn.m_accumulatorBIndex.m_storage);
-    pHeaderSchema->m_quad[0] = pHeaderSchema->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pHeaderSchema->m_quad, 0) = XFNV_M128_F32(pHeaderSchema->m_quad, 0) + 1.1920928955078125e-07;
     pHeaderSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_HEADER;
     pHeader->m_constraintInstance = kIn.m_constraintInstance;
     pHeader->m_solverResultStriding = 8;
@@ -2369,7 +2380,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 else {
                     hkpJacobianSchema* pShift = out.m_jacobianSchemas;
                     pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
-                    pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+                    XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
                     pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
                     out.m_jacobianSchemas = pShift + 1;
                 }
@@ -2607,7 +2618,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 else {
                     hkpJacobianSchema* pShift = out.m_jacobianSchemas;
                     pShift->m_shiftSolverResults.m_numSolverResultsToSkip = pFriction->m_numFrictionAxes;
-                    pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+                    XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
                     pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
                     out.m_jacobianSchemas = pShift + 1;
                 }
@@ -2722,23 +2733,23 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                     ));
                     float fInvMassEps = fInvMass + 1.1920928955078125e-07;
                     float fVirtualMass = 1.0 / fInvMassEps;
-                    pJac[0].m_quad[3] = fVirtualMass;
+                    XFNV_M128_F32(pJac[0].m_quad, 3) = fVirtualMass;
                     kMotorInput.m_virtualMass = fVirtualMass;
                     kMotorInput.m_stepInfo = &kIn;
                     kMotorInput.m_lastResults = *static_cast<hkpSolverResults*>(kIn.m_constraintRuntime.m_storage);
                     kMotorInput.m_deltaTarget = pMotorAtom->m_targetAngle - *pPrevious;
                     kMotorInput.m_positionError = *pPrevious - fAngle;
                     hkCalcMotorData(pMotor, &kMotorInput, &kMotorOutput);
-                    pJac[1].m_quad[3] = kMotorOutput.m_targetPosition * kIn.m_substepInvDeltaTime;
+                    XFNV_M128_F32(pJac[1].m_quad, 3) = kMotorOutput.m_targetPosition * kIn.m_substepInvDeltaTime;
                     hkpJacobianSchema* pSchema = out.m_jacobianSchemas;
-                    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+                    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
                     pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_MOTOR;
                     out.m_jacobianSchemas = pSchema + 4;
-                    pSchema[2].m_quad[0] = kIn.m_microStepDeltaTime * kMotorOutput.m_maxForce;
-                    pSchema[2].m_quad[1] = kMotorOutput.m_minForce * kIn.m_microStepDeltaTime;
-                    pSchema[2].m_quad[2] = kMotorOutput.m_targetVelocity;
-                    pSchema[2].m_quad[3] = kMotorOutput.m_tau;
-                    pSchema[3].m_quad[0] = kMotorOutput.m_damping;
+                    XFNV_M128_F32(pSchema[2].m_quad, 0) = kIn.m_microStepDeltaTime * kMotorOutput.m_maxForce;
+                    XFNV_M128_F32(pSchema[2].m_quad, 1) = kMotorOutput.m_minForce * kIn.m_microStepDeltaTime;
+                    XFNV_M128_F32(pSchema[2].m_quad, 2) = kMotorOutput.m_targetVelocity;
+                    XFNV_M128_F32(pSchema[2].m_quad, 3) = kMotorOutput.m_tau;
+                    XFNV_M128_F32(pSchema[3].m_quad, 0) = kMotorOutput.m_damping;
                     // A target that differs (or is NaN) is stored.
                     if (pMotorAtom->m_targetAngle != *pPrevious || *pInitialized == 0) {
                         *pPrevious = pMotorAtom->m_targetAngle;
@@ -2748,7 +2759,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 else {
                     hkpJacobianSchema* pShift = out.m_jacobianSchemas;
                     pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
-                    pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+                    XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
                     pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
                     out.m_jacobianSchemas = pShift + 1;
                 }
@@ -2765,7 +2776,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                     hkpJacobianSchema* pShift = out.m_jacobianSchemas;
                     pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 3;
                     pCursor += sizeof(hkpRagdollMotorConstraintAtom);
-                    pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+                    XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
                     pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
                     out.m_jacobianSchemas = pShift + 1;
                     goto lRuntimeThree;
@@ -2783,7 +2794,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                     hkpConstraintMotor* pMotor = pMotorAtom->m_motors[i];
                     if (pMotor == nullptr) {
                         hkpJacobianSchema* pShift = out.m_jacobianSchemas;
-                        pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+                        XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
                         pShift->m_shiftSolverResults.m_numSolverResultsToSkip = 1;
                         pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
                         out.m_jacobianSchemas = pShift + 1;
@@ -2914,22 +2925,22 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                     ));
                     float fInvMassEps = fInvMass + 1.1920928955078125e-07;
                     float fVirtualMass = 1.0 / fInvMassEps;
-                    pJac[0].m_quad[3] = fVirtualMass;
+                    XFNV_M128_F32(pJac[0].m_quad, 3) = fVirtualMass;
                     kMotorInput.m_virtualMass = fVirtualMass;
                     kMotorInput.m_lastResults = static_cast<hkpSolverResults*>(kIn.m_constraintRuntime.m_storage)[i];
                     kMotorInput.m_deltaTarget = fTarget - pPrevious[i];
                     kMotorInput.m_positionError = pPrevious[i] - fCurrent;
                     hkCalcMotorData(pMotor, &kMotorInput, &kMotorOutput);
-                    pJac[1].m_quad[3] = kMotorOutput.m_targetPosition * kIn.m_substepInvDeltaTime;
+                    XFNV_M128_F32(pJac[1].m_quad, 3) = kMotorOutput.m_targetPosition * kIn.m_substepInvDeltaTime;
                     hkpJacobianSchema* pSchema = out.m_jacobianSchemas;
-                    pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+                    XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
                     pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_MOTOR;
                     out.m_jacobianSchemas = pSchema + 4;
-                    pSchema[2].m_quad[0] = kMotorOutput.m_maxForce * kIn.m_microStepDeltaTime;
-                    pSchema[2].m_quad[1] = kMotorOutput.m_minForce * kIn.m_microStepDeltaTime;
-                    pSchema[2].m_quad[2] = kMotorOutput.m_targetVelocity;
-                    pSchema[2].m_quad[3] = kMotorOutput.m_tau;
-                    pSchema[3].m_quad[0] = kMotorOutput.m_damping;
+                    XFNV_M128_F32(pSchema[2].m_quad, 0) = kMotorOutput.m_maxForce * kIn.m_microStepDeltaTime;
+                    XFNV_M128_F32(pSchema[2].m_quad, 1) = kMotorOutput.m_minForce * kIn.m_microStepDeltaTime;
+                    XFNV_M128_F32(pSchema[2].m_quad, 2) = kMotorOutput.m_targetVelocity;
+                    XFNV_M128_F32(pSchema[2].m_quad, 3) = kMotorOutput.m_tau;
+                    XFNV_M128_F32(pSchema[3].m_quad, 0) = kMotorOutput.m_damping;
                     // The target is stored unless it equals the previous one.
                     if (fTarget != pPrevious[i]) {
                         pPrevious[i] = fTarget;
@@ -3056,8 +3067,8 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                     _mm_shuffle_ps(kMass, kMass, 0xAA), _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0x55), kMass)
                 ));
                 float fLeverageSq = fLeverage * fLeverage;
-                float fLinearMass = fLeverageSq * pBodyB->m_invMasses.m_quad[3] + pBodyA->m_invMasses.m_quad[3] +
-                    1.1920928955078125e-07;
+                float fLinearMass = fLeverageSq * XFNV_M128_F32(pBodyB->m_invMasses.m_quad, 3) +
+                    XFNV_M128_F32(pBodyA->m_invMasses.m_quad, 3) + 1.1920928955078125e-07;
                 __m128 kSegA = _mm_sub_ps(kFixedA, kPivotA);
                 kSq = _mm_mul_ps(kSegA, kSegA);
                 float fLengthA = _mm_cvtss_f32(_mm_sqrt_ss(
@@ -3070,13 +3081,13 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                     _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0x55), kSq))
                 ));
                 pCursor += sizeof(hkpPulleyConstraintAtom);
-                pJac[2].m_quad[3] = fVirtMassFactor / fInvMass;
+                XFNV_M128_F32(pJac[2].m_quad, 3) = fVirtMassFactor / fInvMass;
                 float fRope = fLeverage * fLengthB + fLengthA;
                 float fError = fRope - fRopeLength;
-                pJac[0].m_quad[3] = fError * fInvDeltaTime;
+                XFNV_M128_F32(pJac[0].m_quad, 3) = fError * fInvDeltaTime;
                 hkpJacobianSchema* pSchema = out.m_jacobianSchemas;
                 out.m_jacobianSchemas = pSchema + 4;
-                pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+                XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
                 pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_PULLEY;
                 goto lRuntimeOne;
             }
@@ -3102,7 +3113,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 uint32_t uiStriding = pContact->m_contactPointPropertiesStriding;
                 // Each point's allowed penetration grows by the soft contact's speed limit over one substep.
                 for (int32_t i = 0; i < iNumPoints; ++i) {
-                    float fDistance = pPoints[i].m_separatingNormal.m_quad[3];
+                    float fDistance = XFNV_M128_F32(pPoints[i].m_separatingNormal.m_quad, 3);
                     float fAllowed =
                         pSoft->m_maxAcceleration * kIn.m_microStepDeltaTime * kIn.m_substepDeltaTime / pSoft->m_tau;
                     hkpContactPointProperties* pProperty = reinterpret_cast<hkpContactPointProperties*>(pProperties);
@@ -3353,7 +3364,7 @@ void hkSolverBuildJacobianFromAtomsNotContact(
             // A schema that only skips uiShift solver results.
             hkpJacobianSchema* pShift = out.m_jacobianSchemas;
             pShift->m_shiftSolverResults.m_numSolverResultsToSkip = uiShift;
-            pShift->m_quad[0] = pShift->m_quad[0] + 1.1920928955078125e-07;
+            XFNV_M128_F32(pShift->m_quad, 0) = XFNV_M128_F32(pShift->m_quad, 0) + 1.1920928955078125e-07;
             pShift->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SHIFT_SOLVER_RESULTS_POINTER;
             out.m_jacobianSchemas = pShift + 1;
             goto lNext;
@@ -3419,14 +3430,14 @@ void hkSolverBuildJacobianFromAtomsNotContact(
                 _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0xAA), _mm_add_ss(_mm_shuffle_ps(kMass, kMass, 0x55), kMass))
             );
             float fInvMassEps = fInvMass + 1.1920928955078125e-07;
-            pJac[0].m_quad[3] = fLimitTau / fInvMassEps;
+            XFNV_M128_F32(pJac[0].m_quad, 3) = fLimitTau / fInvMassEps;
             float fNegInvDeltaTime = -kIn.m_substepInvDeltaTime;
-            pJac[1].m_quad[3] = fLimitAngle * fNegInvDeltaTime;
+            XFNV_M128_F32(pJac[1].m_quad, 3) = fLimitAngle * fNegInvDeltaTime;
             out.m_jacobianSchemas = pJac + 3;
-            pJac[2].m_quad[0] = fLimitMin * fNegInvDeltaTime * fLimitTau;
-            pJac[2].m_quad[1] = fNegInvDeltaTime * fLimitMax * fLimitTau;
-            pJac[2].m_quad[2] = fLimitTau;
-            pJac->m_quad[0] = pJac->m_quad[0] + 1.1920928955078125e-07;
+            XFNV_M128_F32(pJac[2].m_quad, 0) = fLimitMin * fNegInvDeltaTime * fLimitTau;
+            XFNV_M128_F32(pJac[2].m_quad, 1) = fNegInvDeltaTime * fLimitMax * fLimitTau;
+            XFNV_M128_F32(pJac[2].m_quad, 2) = fLimitTau;
+            XFNV_M128_F32(pJac->m_quad, 0) = XFNV_M128_F32(pJac->m_quad, 0) + 1.1920928955078125e-07;
             pJac->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_ANGULAR_LIMITS;
             goto lNext;
         }

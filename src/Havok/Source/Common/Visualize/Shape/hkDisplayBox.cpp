@@ -14,6 +14,7 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometryTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -38,13 +39,13 @@ void hkDisplayBox::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryA
         v.m_quad = m_halfExtents.m_quad;
         // Scales by a double -1.0 and stores the float back.
         if (i & 1) {
-            v.m_quad[0] = static_cast<float>(v.m_quad[0] * -1.0);
+            XFNV_M128_F32(v.m_quad, 0) = static_cast<float>(XFNV_M128_F32(v.m_quad, 0) * -1.0);
         }
         if (i & 2) {
-            v.m_quad[1] = static_cast<float>(v.m_quad[1] * -1.0);
+            XFNV_M128_F32(v.m_quad, 1) = static_cast<float>(XFNV_M128_F32(v.m_quad, 1) * -1.0);
         }
         if (i & 4) {
-            v.m_quad[2] = static_cast<float>(-1.0 * v.m_quad[2]);
+            XFNV_M128_F32(v.m_quad, 2) = static_cast<float>(-1.0 * XFNV_M128_F32(v.m_quad, 2));
         }
         vertices[i].setTransformedPos(m_transform, v);
     }
@@ -88,11 +89,13 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v4->m_vertices.m_size;
     __m128 v10 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v10[0] = -0.0f - m_halfExtents.m_quad[0];
+    XFNV_M128_F32(v10, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 0);
     v4->m_vertices.m_data[m_size].m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(v10, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[2])))),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[1]))),
+            v10, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 2))))
+        ),
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -111,11 +114,11 @@ void hkDisplayBox::buildGeometry() {
     ++m_geometry->m_vertices.m_size;
     m_geometry->m_vertices.m_data[v13].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -133,12 +136,12 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v17->m_vertices.m_size;
     __m128 v23 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v23[0] = -0.0f - m_halfExtents.m_quad[1];
+    XFNV_M128_F32(v23, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 1);
     __m128 v24 = _mm_unpacklo_ps(v23, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))));
     v17->m_vertices.m_data[v19].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 2))))
         ),
         v24
     );
@@ -156,10 +159,12 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v25->m_vertices.m_size;
     __m128 v31 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v24[0] = -0.0f - m_halfExtents.m_quad[0];
-    v31[0] = -0.0f - m_halfExtents.m_quad[1];
+    XFNV_M128_F32(v24, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 0);
+    XFNV_M128_F32(v31, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 1);
     __m128 v32 = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(v24, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[2])))),
+        _mm_unpacklo_ps(
+            v24, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 2))))
+        ),
         _mm_unpacklo_ps(v31, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
     );
     v25->m_vertices.m_data[v27].m_quad = v32;
@@ -177,12 +182,12 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v33->m_vertices.m_size;
     __m128 v39 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v32[0] = -0.0f - m_halfExtents.m_quad[0];
-    v39[0] = -0.0f - m_halfExtents.m_quad[2];
+    XFNV_M128_F32(v32, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 0);
+    XFNV_M128_F32(v39, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 2);
     v33->m_vertices.m_data[v35].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v32, v39),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -200,11 +205,13 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v40->m_vertices.m_size;
     __m128 v46 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v46[0] = -0.0f - m_halfExtents.m_quad[2];
+    XFNV_M128_F32(v46, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 2);
     v40->m_vertices.m_data[v42].m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[0]))), v46),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 0)))), v46
+        ),
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -222,11 +229,14 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v47->m_vertices.m_size;
     __m128 v53 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v46[0] = -0.0f - m_halfExtents.m_quad[1];
-    v53[0] = -0.0f - m_halfExtents.m_quad[2];
+    XFNV_M128_F32(v46, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 1);
+    XFNV_M128_F32(v53, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 2);
     __m128 v54 = _mm_unpacklo_ps(v46, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))));
     __m128 v55 = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_halfExtents.m_quad[0]))), v53), v54
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_halfExtents.m_quad, 0)))), v53
+        ),
+        v54
     );
     v47->m_vertices.m_data[v49].m_quad = v55;
     hkGeometry* v56 = this->m_geometry;
@@ -243,9 +253,9 @@ void hkDisplayBox::buildGeometry() {
     }
     ++v56->m_vertices.m_size;
     __m128 v62 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v55[0] = -0.0f - m_halfExtents.m_quad[0];
-    v54[0] = -0.0f - m_halfExtents.m_quad[1];
-    v62[0] = -0.0f - m_halfExtents.m_quad[2];
+    XFNV_M128_F32(v55, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 0);
+    XFNV_M128_F32(v54, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 1);
+    XFNV_M128_F32(v62, 0) = -0.0f - XFNV_M128_F32(m_halfExtents.m_quad, 2);
     __m128* p_m_quad = &v56->m_vertices.m_data[v58].m_quad;
     int32_t v64 = 0;
     *p_m_quad = _mm_unpacklo_ps(

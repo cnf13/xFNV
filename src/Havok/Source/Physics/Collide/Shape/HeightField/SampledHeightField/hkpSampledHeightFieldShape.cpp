@@ -36,9 +36,11 @@
 #include "Havok/Source/Physics/Utilities/Serialize/hkpHavokSnapshot.h"
 #include "SDK/MSVC/string.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
+#include <cstring>
 #include <xmmintrin.h>
 
 namespace {
@@ -220,20 +222,21 @@ hkpSampledHeightFieldShape::hkpSampledHeightFieldShape(
     );
     m_extents.m_quad = _mm_mul_ps(m_extents.m_quad, ci.m_scale.m_quad);
     if (!(ci.m_maxHeight < static_cast<double>(ci.m_minHeight))) {
-        m_heightCenter = (ci.m_maxHeight + ci.m_minHeight) * 0.5 * ci.m_scale.m_quad[1];
+        m_heightCenter = (ci.m_maxHeight + ci.m_minHeight) * 0.5 * XFNV_M128_F32(ci.m_scale.m_quad, 1);
     }
     else {
         m_heightCenter = -1.0f;
-        m_extents.m_quad[1] = -1.0f;
+        XFNV_M128_F32(m_extents.m_quad, 1) = -1.0f;
     }
     m_intToFloatScale = ci.m_scale;
     m_floatToIntScale.set(
-        static_cast<float>(1.0 / ci.m_scale.m_quad[0]), static_cast<float>(1.0 / ci.m_scale.m_quad[1]),
-        static_cast<float>(1.0 / ci.m_scale.m_quad[2]), 0.0f
+        static_cast<float>(1.0 / XFNV_M128_F32(ci.m_scale.m_quad, 0)),
+        static_cast<float>(1.0 / XFNV_M128_F32(ci.m_scale.m_quad, 1)),
+        static_cast<float>(1.0 / XFNV_M128_F32(ci.m_scale.m_quad, 2)), 0.0f
     );
     float fFloorCorrection = hkVector4Util::getFloatToInt16FloorCorrection();
     m_floatToIntOffsetFloorCorrected.m_quad = _mm_mul_ps(_mm_set1_ps(fFloorCorrection), m_intToFloatScale.m_quad);
-    m_floatToIntOffsetFloorCorrected.m_quad[1] = 0.0f;
+    XFNV_M128_F32(m_floatToIntOffsetFloorCorrected.m_quad, 1) = 0.0f;
 }
 
 hkpSampledHeightFieldShape::~hkpSampledHeightFieldShape() {}
@@ -245,7 +248,7 @@ void hkpSampledHeightFieldShape::getAabbImpl(const hkTransform& localToWorld, fl
     hkVector4 halfExtents;
     float minHeight = getHeightAtImpl(0, 0);
     float maxHeight = minHeight;
-    if (m_extents.m_quad[1] < 0.0f) {
+    if (XFNV_M128_F32(m_extents.m_quad, 1) < 0.0f) {
         for (int32_t i = 0; i < m_xRes; ++i) {
             for (int32_t j = 0; j < m_zRes; ++j) {
                 float height = getHeightAtImpl(i, j);
@@ -257,8 +260,8 @@ void hkpSampledHeightFieldShape::getAabbImpl(const hkTransform& localToWorld, fl
                 }
             }
         }
-        float scaledMin = m_intToFloatScale.m_quad[1] * minHeight;
-        float scaledMax = m_intToFloatScale.m_quad[1] * maxHeight;
+        float scaledMin = XFNV_M128_F32(m_intToFloatScale.m_quad, 1) * minHeight;
+        float scaledMax = XFNV_M128_F32(m_intToFloatScale.m_quad, 1) * maxHeight;
         double lo = scaledMin;
         double hi = scaledMax;
         if (!(scaledMax > static_cast<double>(scaledMin))) {
@@ -269,12 +272,12 @@ void hkpSampledHeightFieldShape::getAabbImpl(const hkTransform& localToWorld, fl
         }
         hkpSampledHeightFieldShape* self = const_cast<hkpSampledHeightFieldShape*>(this);
         self->m_heightCenter = (hi + lo) * 0.5;
-        self->m_extents.m_quad[1] = hi - lo;
+        XFNV_M128_F32(self->m_extents.m_quad, 1) = hi - lo;
     }
     float heightCenter = m_heightCenter;
     __m128 m_quad = _mm_mul_ps(m_extents.m_quad, hkQuadRealHalf);
     center.m_quad = m_quad;
-    center.m_quad[1] = heightCenter;
+    XFNV_M128_F32(center.m_quad, 1) = heightCenter;
     halfExtents.m_quad = m_quad;
     hkAabbUtil::calcAabb(localToWorld, halfExtents, center, tolerance, out);
 }
@@ -304,15 +307,15 @@ void hkpSampledHeightFieldShape::castSphere(
 ) const {
     hkpShapeRayCastInput v6;
     float m_radius = input.m_radius;
-    bool v4 = m_intToFloatScale.m_quad[1] > 0.0f;
+    bool v4 = XFNV_M128_F32(m_intToFloatScale.m_quad, 1) > 0.0f;
     // The ray input is copied bytewise, padding included; it holds only plain vectors and a filter pointer, so this is
     // harmless.
-    __builtin_memcpy(static_cast<void*>(&v6), &input, sizeof(v6));
+    std::memcpy(static_cast<void*>(&v6), &input, sizeof(v6));
     if (v4) {
         m_radius = -m_radius;
     }
-    v6.m_from.m_quad[1] = v6.m_from.m_quad[1] + m_radius;
-    v6.m_to.m_quad[1] = m_radius + v6.m_to.m_quad[1];
+    XFNV_M128_F32(v6.m_from.m_quad, 1) = XFNV_M128_F32(v6.m_from.m_quad, 1) + m_radius;
+    XFNV_M128_F32(v6.m_to.m_quad, 1) = m_radius + XFNV_M128_F32(v6.m_to.m_quad, 1);
     castRayInternal(v6, cdBody, static_cast<hkBool>(true), input.m_maxExtraPenetration, collector);
 }
 
@@ -339,8 +342,8 @@ float* hkpSampledHeightFieldShape::getHeightAndNormalAt(
             const float fSlopeX = h10 - h00;
             const float fSlopeZ = h11 - h10;
             heightOut = h00 + fSlopeZ * subZ + fSlopeX * subX;
-            normalOut.m_quad[0] = -fSlopeX;
-            normalOut.m_quad[2] = -fSlopeZ;
+            XFNV_M128_F32(normalOut.m_quad, 0) = -fSlopeX;
+            XFNV_M128_F32(normalOut.m_quad, 2) = -fSlopeZ;
             triangleIndexOut = 1;
         }
         else {
@@ -348,8 +351,8 @@ float* hkpSampledHeightFieldShape::getHeightAndNormalAt(
             const float fSlopeX = h11 - h01;
             const float fSlopeZ = h01 - h00;
             heightOut = h00 + fSlopeZ * subZ + fSlopeX * subX;
-            normalOut.m_quad[0] = -fSlopeX;
-            normalOut.m_quad[2] = -fSlopeZ;
+            XFNV_M128_F32(normalOut.m_quad, 0) = -fSlopeX;
+            XFNV_M128_F32(normalOut.m_quad, 2) = -fSlopeZ;
             triangleIndexOut = 0;
         }
     }
@@ -361,8 +364,8 @@ float* hkpSampledHeightFieldShape::getHeightAndNormalAt(
             const float fSlopeX = h11 - h01;
             const float fSlopeZ = h11 - h10;
             heightOut = h10 + fSlopeZ * subZ + (subX - 1.0) * fSlopeX;
-            normalOut.m_quad[0] = -fSlopeX;
-            normalOut.m_quad[2] = -fSlopeZ;
+            XFNV_M128_F32(normalOut.m_quad, 0) = -fSlopeX;
+            XFNV_M128_F32(normalOut.m_quad, 2) = -fSlopeZ;
             triangleIndexOut = 1;
         }
         else {
@@ -370,8 +373,8 @@ float* hkpSampledHeightFieldShape::getHeightAndNormalAt(
             const float fSlopeX = h10 - h00;
             const float fSlopeZ = h01 - h00;
             heightOut = h00 + fSlopeZ * subZ + fSlopeX * subX;
-            normalOut.m_quad[0] = -fSlopeX;
-            normalOut.m_quad[2] = -fSlopeZ;
+            XFNV_M128_F32(normalOut.m_quad, 0) = -fSlopeX;
+            XFNV_M128_F32(normalOut.m_quad, 2) = -fSlopeZ;
             triangleIndexOut = 0;
         }
     }
@@ -396,8 +399,8 @@ void hkpSampledHeightFieldShape::castRayInternal(
         hkVector4Util_floatToUint16Magic
     );
     int32_t cell[3];
-    cell[0] = static_cast<int16_t>(std::bit_cast<uint32_t>(startInt[0]) >> 6);
-    cell[2] = static_cast<int16_t>(std::bit_cast<uint32_t>(startInt[2]) >> 6);
+    cell[0] = static_cast<int16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(startInt, 0)) >> 6);
+    cell[2] = static_cast<int16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(startInt, 2)) >> 6);
     hkVector4 rayFrom;
     rayFrom.m_quad = _mm_mul_ps(m_floatToIntScale.m_quad, input.m_from.m_quad);
     hkVector4 rayTo;

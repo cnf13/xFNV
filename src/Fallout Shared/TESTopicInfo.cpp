@@ -39,6 +39,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/stdlib.h"
+#include "xfnv/Compiler.h"
 
 extern TESTopicInfo* pCurrentResultScriptInfo;
 
@@ -644,7 +645,7 @@ Script* TESTopicInfo::GetResultScript(TOPIC_INFO_RESULT_SCRIPT aeScript) {
                 }
                 else if (pNewVariable) {
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(pFile->GetChunkSize(), 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(pFile->GetChunkSize()));
                     pFile->GetChunkData(pBuffer, 0x200);
                     pNewVariable->cName.Set(pBuffer, 0);
                 }
@@ -658,7 +659,7 @@ Script* TESTopicInfo::GetResultScript(TOPIC_INFO_RESULT_SCRIPT aeScript) {
             case SCDA_ID: {
                 uint32_t n = pFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* tmpdata = static_cast<char*>(__builtin_alloca_with_align(n, 128));
+                char* tmpdata = static_cast<char*>(XFNV_ALLOCA16(n));
                 ourMemset(tmpdata, 0, n);
                 pFile->GetChunkData(tmpdata, 0);
                 pResultScriptA[iloadscript].SetCompileData(n, tmpdata);
@@ -946,7 +947,7 @@ ResponseListWrapper* TESTopicInfo::GetResponseList(ResponseListWrapper* apList) 
                 if (pResponse) {
                     uint32_t uiSize = pFile->GetChunkSize();
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                     pFile->GetChunkData(pBuffer, uiSize);
                     pResponse->SetResponseText(pBuffer);
                 }

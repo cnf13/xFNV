@@ -12,8 +12,8 @@
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkClassMember.h"
+#include "xfnv/Compiler.h"
 
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 static void finishLoadedObjecthkaInterleavedUncompressedAnimation(void* p, int32_t finishing);
@@ -238,7 +238,8 @@ void hkaInterleavedUncompressedAnimation::transformTrack(int32_t track, const hk
             __m128 v10 = i->m_rotation.m_vec.m_quad;
             __m128 v11 = _mm_mul_ps(v10, m_quad);
             __m128 v12 = _mm_shuffle_ps(v11, v11, 170);
-            v12[0] = v12[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+            XFNV_M128_F32(v12, 0) =
+                XFNV_M128_F32(v12, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0));
             __m128 v13 = _mm_shuffle_ps(v10, v10, 255);
             __m128 v14 = _mm_add_ps(
                 _mm_mul_ps(

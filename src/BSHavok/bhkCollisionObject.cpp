@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -208,10 +209,10 @@ void bhkCollisionObject::NitohkTransform() {
         }
     }
     hkQuaternion kHkRot;
-    kHkRot.m_vec.m_quad[0] = kRot.m_fX;
-    kHkRot.m_vec.m_quad[1] = kRot.m_fY;
-    kHkRot.m_vec.m_quad[2] = kRot.m_fZ;
-    kHkRot.m_vec.m_quad[3] = kRot.m_fW;
+    XFNV_M128_F32(kHkRot.m_vec.m_quad, 0) = kRot.m_fX;
+    XFNV_M128_F32(kHkRot.m_vec.m_quad, 1) = kRot.m_fY;
+    XFNV_M128_F32(kHkRot.m_vec.m_quad, 2) = kRot.m_fZ;
+    XFNV_M128_F32(kHkRot.m_vec.m_quad, 3) = kRot.m_fW;
     kHkRot.normalize();
     bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
     pRigidBody->SetPosRot(kPos, kHkRot);

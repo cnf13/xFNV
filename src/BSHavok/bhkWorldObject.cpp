@@ -27,6 +27,9 @@
 #include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpLinkedCollidable.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
+
+#include <bit>
 
 // The class's RTTI name string.
 using bhkWorldObject_Name_t = const char[15];
@@ -72,7 +75,7 @@ void bhkWorldObject::LoadBinary(NiStream& arStream) {
     pkCinfo->m_properties.m_data = nullptr;
     pkCinfo->m_properties.m_capacityAndFlags = hkArrayBase<hkWorldObjectCinfo::Property>::DONT_DEALLOCATE_FLAG;
     if (!arStream.m_bSourceIsLittleEndian) {
-        pkCinfo->m_collisionFilterInfo = __builtin_bswap32(pkCinfo->m_collisionFilterInfo);
+        pkCinfo->m_collisionFilterInfo = std::byteswap<uint32_t>(pkCinfo->m_collisionFilterInfo);
     }
     // Files before version 9 carry the old material type bits: bit 5 becomes the platform bit.
     if (arStream.m_BSStreamHeader.uiVersion < 9 && (pkCinfo->m_collisionFilterInfo & 0x20) != 0) {
@@ -134,7 +137,7 @@ void bhkWorldObject::SaveBinary(NiStream& arStream) {
     // bool tested.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::SwapHKArray(pkCinfo, static_cast<int32_t>(QCinfoSize()), &pkCinfo->m_properties);
-        pkCinfo->m_collisionFilterInfo = __builtin_bswap32(pkCinfo->m_collisionFilterInfo);
+        pkCinfo->m_collisionFilterInfo = std::byteswap<uint32_t>(pkCinfo->m_collisionFilterInfo);
     }
     // Clears and deallocates the creation info's property array. The byte count scales the capacity by 8 bytes per
     // element, as the game does, while hkpProperty here is 0x10 wide, so the byte count is written out.
@@ -197,7 +200,7 @@ void bhkWorldObject::Link(bool abAttach) {
         auto* pkObject = this ? static_cast<hkpWorldObject*>(phkObject) : nullptr;
         if (pkObject) {
             const hkpCollidable* pCollidable = &pkObject->m_collidable;
-            __asm__("" : "+r"(pCollidable));
+            xfnv::HidePointer(pCollidable);
             if (pCollidable) {
                 const hkpShape* pkShape = pCollidable->m_shape;
                 if (pkShape) {
@@ -272,9 +275,9 @@ NiAVObject* bhkWorldObject::CreateDisplayGeometry(NiNode* apNode) {
         return apNode;
     }
     // The collidable's address is tested for null here and at the filter read below, as the game does. clang assumes a
-    // member's address is non-null and drops those tests; the empty asm hides the pointer.
+    // member's address is non-null and drops those tests; HidePointer hides the pointer.
     const hkpCollidable* pkCollidable = &pkObject->m_collidable;
-    __asm__("" : "+r"(pkCollidable));
+    xfnv::HidePointer(pkCollidable);
     if (!pkCollidable) {
         return apNode;
     }
@@ -302,7 +305,7 @@ NiAVObject* bhkWorldObject::CreateDisplayGeometry(NiNode* apNode) {
     uint32_t uiFilter = 0;
     if (pkObjectRw) {
         const hkpCollidable* pkCollidableRw = &pkObjectRw->m_collidable;
-        __asm__("" : "+r"(pkCollidableRw));
+        xfnv::HidePointer(pkCollidableRw);
         if (pkCollidableRw) {
             uiFilter = pkCollidableRw->getCollisionFilterInfo();
         }
@@ -313,7 +316,7 @@ NiAVObject* bhkWorldObject::CreateDisplayGeometry(NiNode* apNode) {
 }
 
 // Has the wrapped object's shape wrapper destroy its debug display. The address of m_collidable is also null-tested, as
-// the game does; clang assumes a member's address is non-null and drops that test, so the empty asm hides the pointer.
+// the game does; clang assumes a member's address is non-null and drops that test, so HidePointer hides the pointer.
 void bhkWorldObject::DestroyDisplayGeometry() {
     if (!this) {
         return;
@@ -323,7 +326,7 @@ void bhkWorldObject::DestroyDisplayGeometry() {
         return;
     }
     const hkpCollidable* pkCollidable = &pkObject->m_collidable;
-    __asm__("" : "+r"(pkCollidable));
+    xfnv::HidePointer(pkCollidable);
     if (!pkCollidable) {
         return;
     }

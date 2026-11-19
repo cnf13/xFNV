@@ -25,6 +25,9 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
+
+#include <cmath>
 
 // The child collector of _SharedShapeData::recursivelyParseShapeReferences: appends apShape's child shapes to
 // apChildren by its type: for 9 each child of its shape container, for 0xB and 0xC one child shape, for 0xF another.
@@ -245,10 +248,10 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                     const hkVector4& rColumn = (&rotation.m_col0)[column];
                     bool found = false;
                     for (int32_t row = 0; row < 3; ++row) {
-                        const float absolute = __builtin_fabsf(rColumn.m_quad[row]);
+                        const float absolute = std::fabsf(XFNV_M128_F32(rColumn.m_quad, row));
                         const bool isZero = absolute < 9.999999747378752e-05;
                         const float offOne = absolute - 1.0f;
-                        const float absoluteOffOne = __builtin_fabsf(offOne);
+                        const float absoluteOffOne = std::fabsf(offOne);
                         const bool isOne = absoluteOffOne < 9.999999747378752e-05;
                         if (!isZero && !isOne) {
                             isPermutation = false;
@@ -263,11 +266,11 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                         isPermutation = false;
                         break;
                     }
-                    const float absY = __builtin_fabsf(rColumn.m_quad[1]);
-                    const float absX = __builtin_fabsf(rColumn.m_quad[0]);
+                    const float absY = std::fabsf(XFNV_M128_F32(rColumn.m_quad, 1));
+                    const float absX = std::fabsf(XFNV_M128_F32(rColumn.m_quad, 0));
                     const float sumX = absX + 0.0f;
                     const float sumXY = absY + sumX;
-                    const float absZ = __builtin_fabsf(rColumn.m_quad[2]);
+                    const float absZ = std::fabsf(XFNV_M128_F32(rColumn.m_quad, 2));
                     const float sumXYZ = sumXY + absZ;
                     if (!(sumXYZ - 1.0 < 9.999999747378752e-05)) {
                         isPermutation = false;
@@ -279,8 +282,9 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                 const hkpBoxShape* pBox = static_cast<const hkpBoxShape*>(child);
                 hkVector4 halfExtents;
                 halfExtents.m_quad = _mm_setr_ps(
-                    pBox->m_halfExtents.m_quad[axisOfRow[0]], pBox->m_halfExtents.m_quad[axisOfRow[1]],
-                    pBox->m_halfExtents.m_quad[axisOfRow[2]], 0.0f
+                    XFNV_M128_F32(pBox->m_halfExtents.m_quad, axisOfRow[0]),
+                    XFNV_M128_F32(pBox->m_halfExtents.m_quad, axisOfRow[1]),
+                    XFNV_M128_F32(pBox->m_halfExtents.m_quad, axisOfRow[2]), 0.0f
                 );
                 void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpBoxShape));
                 static_cast<hkpBoxShape*>(pMemory)->m_memSizeAndFlags = sizeof(hkpBoxShape);
@@ -352,7 +356,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                 for (int32_t i = 0; i < pPlanes->m_size; ++i) {
                     hkVector4 plane;
                     plane.m_quad = pPlanes->m_data[i].m_quad;
-                    const float planeW = plane.m_quad[3];
+                    const float planeW = XFNV_M128_F32(plane.m_quad, 3);
                     const hkQuadReal products = _mm_mul_ps(plane.m_quad, translationCopy.m_quad);
                     hkQuadReal dot = _mm_add_ss(_mm_shuffle_ps(products, products, 0x55), products);
                     dot = _mm_add_ss(_mm_shuffle_ps(products, products, 0xAA), dot);
@@ -360,7 +364,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                     const float offset = planeW - distance;
                     plane.setRotatedDir(parentFromChild.m_rotation, plane);
                     // An x87 copy.
-                    plane.m_quad[3] = offset;
+                    XFNV_M128_F32(plane.m_quad, 3) = offset;
                     planes.m_data[i].m_quad = plane.m_quad;
                 }
                 void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpConvexVerticesShape));

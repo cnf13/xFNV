@@ -23,6 +23,7 @@
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayPlane.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplaySemiCircle.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplaySphere.h"
+#include "xfnv/Compiler.h"
 
 hkDisplaySerializeIStream::hkDisplaySerializeIStream(hkStreamReader* apStream) : hkIArchive(apStream, false) {}
 
@@ -31,14 +32,14 @@ hkDisplaySerializeIStream::~hkDisplaySerializeIStream() {}
 // Reads x, y and z and clears w.
 void hkDisplaySerializeIStream::readQuadVector4(hkVector4& v) {
     readArrayGeneric(&v, 4, 3);
-    v.m_quad[3] = 0.0f;
+    XFNV_M128_F32(v.m_quad, 3) = 0.0f;
 }
 
 void hkDisplaySerializeIStream::readTransform(hkTransform& t) {
     hkVector4 array;
     hkQuaternion arQuaternion;
     readArrayGeneric(&array, 4, 3);
-    array.m_quad[3] = 1.0f;
+    XFNV_M128_F32(array.m_quad, 3) = 1.0f;
     readArrayGeneric(&arQuaternion, 4, 4);
     t.m_translation.m_quad = array.m_quad;
     t.m_rotation.set(arQuaternion);

@@ -12,6 +12,7 @@
 #include "Havok/Source/Common/Base/Thread/CriticalSection/hkCriticalSection.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 static void clearMap(hkLeakDetectAllocatorMap* a1);
 
@@ -103,12 +104,12 @@ void hkLeakDetectAllocator::checkedFree(int32_t isBuf, void* p, int32_t numBytes
             int32_t iIndex = static_cast<int32_t>(reinterpret_cast<uintptr_t>(it));
             if (iIndex > m_dynamic->m_activePointers.m_hashMod) {
                 m_outputFunc("Freeing block not from this allocator", m_outputFuncArg);
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
             hkLeakDetectAllocator::AllocInfo info = m_dynamic->m_activePointers.m_elem[iIndex].val;
             if (info.size != numBytes) {
                 danger("Freeing block of incorrect size", p, info);
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
             m_dynamic->m_activePointers.remove(it);
             m_inUse -= m_childAllocator->getAllocatedSize(p, numBytes);
@@ -117,14 +118,14 @@ void hkLeakDetectAllocator::checkedFree(int32_t isBuf, void* p, int32_t numBytes
         }
         else {
             m_outputFunc("Given zero bytes to free with an nonnull address\n", m_outputFuncArg);
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
             LeaveCriticalSection(&m_criticalSection.m_section);
         }
     }
     else {
         if (numBytes) {
             m_outputFunc("Given nonzero bytes to free with an null address\n", m_outputFuncArg);
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
         LeaveCriticalSection(&m_criticalSection.m_section);
     }
@@ -236,7 +237,7 @@ void hkLeakDetectAllocator::quit() {
             "                            *\n**************************************************************\n",
             m_outputFuncArg
         );
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
     m_callTree.quit();
     m_dynamic->m_activePointers.clearAndDeallocate(*m_debugAllocator);

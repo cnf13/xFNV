@@ -50,8 +50,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
-
-#include <x86intrin.h>
+#include "xfnv/Compiler.h"
 
 using TimerName11 = const char[11];
 static TimerName11 s_szChildrenTimer{"Stchildren"};
@@ -79,7 +78,7 @@ hkpConvexListAgent::hkpConvexListAgent(
     m_cache.init(
         static_cast<const hkpConvexShape*>(bodyA.m_shape), static_cast<const hkpConvexShape*>(bodyB.m_shape), btoa
     );
-    m_separatingNormal.m_quad[3] = -1.0f;
+    XFNV_M128_F32(m_separatingNormal.m_quad, 3) = -1.0f;
     m_timeOfSeparatingNormal = -1.0f;
 }
 
@@ -172,7 +171,7 @@ void hkpConvexListAgent::processCollision(
             gskInput.m_transformA.m_storage = bodyA.m_motion.pMotion;
             hkVector4 pointOnB;
             if (hkpGsk::getClosestPoint(gskInput, m_cache, m_separatingNormal, pointOnB) == HK_SUCCESS) {
-                getStream().m_inStreamModeTimDist = -m_separatingNormal.m_quad[3];
+                getStream().m_inStreamModeTimDist = -XFNV_M128_F32(m_separatingNormal.m_quad, 3);
                 break;
             }
         }
@@ -182,10 +181,10 @@ void hkpConvexListAgent::processCollision(
     gskMode:
         // The separating plane moves by the bodies' motion over the step: while the hull stays apart past the
         // tolerance, the manifold's points go and nothing is collided.
-        if (m_separatingNormal.m_quad[3] > input.m_tolerance) {
+        if (XFNV_M128_F32(m_separatingNormal.m_quad, 3) > input.m_tolerance) {
             float fDistChange = timInfo.dot4xyz1(m_separatingNormal);
-            m_separatingNormal.m_quad[3] -= fDistChange;
-            if (m_separatingNormal.m_quad[3] > input.m_tolerance) {
+            XFNV_M128_F32(m_separatingNormal.m_quad, 3) -= fDistChange;
+            if (XFNV_M128_F32(m_separatingNormal.m_quad, 3) > input.m_tolerance) {
                 if (m_manifold.m_numContactPoints) {
                     hkGskManifold_cleanup(m_manifold, m_contactMgr, *result.m_constraintOwner.m_storage);
                 }
@@ -211,7 +210,7 @@ void hkpConvexListAgent::processCollision(
                 float allowedA = bodyA.getRootCollidable()->getAllowedPenetrationDepth();
                 float allowedPenetration = allowedA < allowedB ? allowedA : allowedB;
                 float twiceAllowed = allowedPenetration + allowedPenetration;
-                if (!(m_separatingNormal.m_quad[3] < -twiceAllowed)) {
+                if (!(XFNV_M128_F32(m_separatingNormal.m_quad, 3) < -twiceAllowed)) {
                     goto end;
                 }
             }
@@ -384,7 +383,7 @@ void hkpConvexListAgent::staticGetClosestPoints(
         }
         else if (
             static_cast<const hkpConvexListShape*>(bodyB.m_shape)->m_minDistanceToUseConvexHullForGetClosestPoints <
-            closest.m_hitPoint.m_contact.m_separatingNormal.m_quad[3]
+            XFNV_M128_F32(closest.m_hitPoint.m_contact.m_separatingNormal.m_quad, 3)
         ) {
             hkpCdPoint event;
             event.m_contact = closest.m_hitPoint.m_contact;

@@ -43,6 +43,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
+#include <cstring>
+
 NiRTTI BSFaceGenNiNode::ms_RTTI("BSFaceGenNiNode", &NiNode::ms_RTTI);
 
 FaceGenUpdateData::FaceGenUpdateData() {}
@@ -537,7 +539,7 @@ void BSFaceGenNiNode::CopyMembers(BSFaceGenNiNode* apDest, NiCloningProcess& arC
     if (apDest) {
         NiNode::CopyMembers(apDest, arCloneData);
         apDest->spAnimationData = spAnimationData;
-        __builtin_memcpy(
+        std::memcpy(
             &apDest->BaseRotation, &BaseRotation,
             offsetof(BSFaceGenNiNode, bApplyRotationToParent) - offsetof(BSFaceGenNiNode, BaseRotation)
         );

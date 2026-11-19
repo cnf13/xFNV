@@ -3,6 +3,7 @@
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
+#include "xfnv/Compiler.h"
 
 #include <stdint.h>
 
@@ -10,7 +11,7 @@ class hkpSimpleClosestContactCollector : public hkpCdPointCollector {
 public:
     // The hit point's distance at HK_REAL_MAX, then no hit.
     hkpSimpleClosestContactCollector() : m_hasHit(false) {
-        m_hitPoint.m_separatingNormal.m_quad[3] = 3.40282e38f;
+        XFNV_M128_F32(m_hitPoint.m_separatingNormal.m_quad, 3) = 3.40282e38f;
     }
     ~hkpSimpleClosestContactCollector() override;
 

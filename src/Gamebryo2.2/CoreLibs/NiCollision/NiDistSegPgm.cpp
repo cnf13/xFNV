@@ -20,7 +20,7 @@ float NiSqrDistance::Compute(
     NiPoint3 kNormal = kPgm.m_kEdge0.Cross(kPgm.m_kEdge1);
 
     float fNormalDotDir = kNormal.Dot(kSeg.m_kDirection);
-    float fAbsNormalDotDir = __builtin_fabsf(fNormalDotDir);
+    float fAbsNormalDotDir = std::fabsf(fNormalDotDir);
     float fNormalLength = kNormal.Length();
     float fDirLength = kSeg.m_kDirection.Length();
     float fParallelTolerance = fDirLength * fNormalLength * 9.999999747378752e-06;
@@ -51,7 +51,7 @@ float NiSqrDistance::Compute(
         float fCof02 = fA01 * fA12 - fA02 * fA11;
         float fDet = fA00 * fCof00 + fA01 * fCof01 + fA02 * fCof02;
 
-        if (__builtin_fabsf(fDet) >= 1e-05f) {
+        if (std::fabsf(fDet) >= 1e-05f) {
             float fCof11 = fA00 * fA22 - fA02 * fA02;
             float fCof12 = fA02 * fA01 - fA00 * fA12;
             float fCof22 = fA00 * fA11 - fA01 * fA01;
@@ -295,7 +295,7 @@ float NiSqrDistance::Compute(
                             fPgmParam0 * (fA01 * fSegParam + fA11 * fPgmParam0 + fA12 * fPgmParam1 + 2.0 * fB1) +
                             fPgmParam1 * (fA02 * fSegParam + fA12 * fPgmParam0 + fA22 * fPgmParam1 + 2.0 * fB2) +
                             kDiff.Dot(kDiff);
-                        return __builtin_fabsf(fSqrDist);
+                        return std::fabsf(fSqrDist);
                     }
                     else {
                         // global minimum is on face t=1

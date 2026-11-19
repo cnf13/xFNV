@@ -9,6 +9,7 @@
 #include "Fallout Shared/TESModel.h"
 #include "Fallout Shared/TESObject.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 SettingT<INISettingCollection> TESGrass::fWaveOffsetRange("fWaveOffsetRange:Grass", 1.75f);
 
@@ -60,7 +61,7 @@ bool TESGrass::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;

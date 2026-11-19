@@ -88,6 +88,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "xfnv/Compiler.h"
 
 // Fire's guarded static: the scope offset, a function-local static built on first use.
 static NiPoint3 offset{};
@@ -118,7 +119,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);
@@ -139,7 +140,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
             case MODS_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(
@@ -313,7 +314,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &ShellCasingModel;
                     pModel->SetModel(pBuffer);
@@ -329,7 +330,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &ScopeModel;
                     pModel->SetModel(pBuffer);
@@ -345,7 +346,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModel;
                     pModel->SetModel(pBuffer);
@@ -361,7 +362,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod1;
                     pModel->SetModel(pBuffer);
@@ -377,7 +378,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod2;
                     pModel->SetModel(pBuffer);
@@ -393,7 +394,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod12;
                     pModel->SetModel(pBuffer);
@@ -409,7 +410,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod3;
                     pModel->SetModel(pBuffer);
@@ -425,7 +426,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod13;
                     pModel->SetModel(pBuffer);
@@ -441,7 +442,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod23;
                     pModel->SetModel(pBuffer);
@@ -457,7 +458,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize() != 0) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pModel = &WorldModelMod123;
                     pModel->SetModel(pBuffer);
@@ -555,7 +556,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
             case NNAM_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);
@@ -629,7 +630,7 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
             case VANM_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0);

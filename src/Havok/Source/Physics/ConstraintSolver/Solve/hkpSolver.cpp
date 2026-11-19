@@ -30,6 +30,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverElemTemp.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInfo.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInternal.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -110,7 +111,8 @@ static int32_t hkPoweredChain_BuildVelocities(const hkpChainSolverInfo& info, hk
                         _mm_set1_ps(tauFactor)
                     )
                 );
-                const float dot = (sum[2] + static_cast<float>(sum[1] + sum[0]));
+                const float dot =
+                    (XFNV_M128_F32(sum, 2) + static_cast<float>(XFNV_M128_F32(sum, 1) + XFNV_M128_F32(sum, 0)));
                 velocity->m_lin(n) = static_cast<float>(tau * jac->m_linear0(3) - dot);
                 // The motor row n.
                 const float motorTau = motor[n].m_tau;
@@ -130,7 +132,9 @@ static int32_t hkPoweredChain_BuildVelocities(const hkpChainSolverInfo& info, hk
                         _mm_set1_ps(motor[n].m_damping)
                     )
                 );
-                const float dotAng = (sumAng[2] + static_cast<float>(sumAng[1] + sumAng[0]));
+                const float dotAng =
+                    (XFNV_M128_F32(sumAng, 2) +
+                     static_cast<float>(XFNV_M128_F32(sumAng, 1) + XFNV_M128_F32(sumAng, 0)));
                 velocity->m_ang(n) = (motorTau * jacAng->m_angular[1](3) - dotAng);
                 ++jac;
                 ++jacAng;
@@ -174,7 +178,7 @@ static hkVector8* hkPoweredChain_computeMotorVelocity(
             _mm_set1_ps(tauFactor)
         )
     );
-    const float dot = (sum[2] + static_cast<float>(sum[1] + sum[0]));
+    const float dot = (XFNV_M128_F32(sum, 2) + static_cast<float>(XFNV_M128_F32(sum, 1) + XFNV_M128_F32(sum, 0)));
     velocities[constraintIndex].m_ang(motorIndex) = (motorTau * jac.m_angular[1](3) - dot);
     return velocities;
 }
@@ -231,7 +235,7 @@ static void hkSolver_solveBallAndSocketChain(
         const __m128 damping = _mm_set1_ps(chain->m_damping);
         const float tau = chain->m_tau;
         // x87: the product rounded to a float.
-        const float factor = info.m_invIntegrateVelocityFactor.m_quad[0] * tau;
+        const float factor = XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0) * tau;
         const __m128 factorV = _mm_set1_ps(factor);
 
         // Each row's right-hand side: tau times the Jacobian's w less the dot of the Jacobian with the scratch
@@ -250,8 +254,8 @@ static void hkSolver_solveBallAndSocketChain(
         );
         const __m128 dot0 = _mm_add_ps(_mm_mul_ps(pos0, factorV), _mm_mul_ps(vel0, damping));
         const __m128 dot0XY = _mm_add_ps(_mm_shuffle_ps(dot0, dot0, 0x55), dot0);
-        const float dot0Sum = _mm_add_ps(_mm_shuffle_ps(dot0, dot0, 0xAA), dot0XY)[0];
-        const float rhs0 = tau * jac[0].m_linear0.m_quad[3] - dot0Sum;
+        const float dot0Sum = XFNV_M128_F32(_mm_add_ps(_mm_shuffle_ps(dot0, dot0, 0xAA), dot0XY), 0);
+        const float rhs0 = tau * XFNV_M128_F32(jac[0].m_linear0.m_quad, 3) - dot0Sum;
 
         const __m128 pos1 = _mm_add_ps(
             _mm_add_ps(
@@ -267,8 +271,8 @@ static void hkSolver_solveBallAndSocketChain(
         );
         const __m128 dot1 = _mm_add_ps(_mm_mul_ps(pos1, factorV), _mm_mul_ps(vel1, damping));
         const __m128 dot1XY = _mm_add_ps(_mm_shuffle_ps(dot1, dot1, 0x55), dot1);
-        const float dot1Sum = _mm_add_ps(_mm_shuffle_ps(dot1, dot1, 0xAA), dot1XY)[0];
-        const float rhs1 = tau * jac[1].m_linear0.m_quad[3] - dot1Sum;
+        const float dot1Sum = XFNV_M128_F32(_mm_add_ps(_mm_shuffle_ps(dot1, dot1, 0xAA), dot1XY), 0);
+        const float rhs1 = tau * XFNV_M128_F32(jac[1].m_linear0.m_quad, 3) - dot1Sum;
 
         const __m128 pos2 = _mm_add_ps(
             _mm_add_ps(
@@ -284,8 +288,8 @@ static void hkSolver_solveBallAndSocketChain(
         );
         const __m128 dot2 = _mm_add_ps(_mm_mul_ps(pos2, factorV), _mm_mul_ps(vel2, damping));
         const __m128 dot2XY = _mm_add_ps(_mm_shuffle_ps(dot2, dot2, 0x55), dot2);
-        const float dot2Sum = _mm_add_ps(_mm_shuffle_ps(dot2, dot2, 0xAA), dot2XY)[0];
-        const float rhs2 = tau * jac[2].m_linear0.m_quad[3] - dot2Sum;
+        const float dot2Sum = XFNV_M128_F32(_mm_add_ps(_mm_shuffle_ps(dot2, dot2, 0xAA), dot2XY), 0);
+        const float rhs2 = tau * XFNV_M128_F32(jac[2].m_linear0.m_quad, 3) - dot2Sum;
 
         // Forward substitution: less the lower block times the previous link's solution, times the inverted
         // diagonal block.
@@ -344,7 +348,7 @@ static void hkSolver_solveBallAndSocketChain(
         const __m128 angA0 = _mm_add_ps(_mm_mul_ps(jac[0].m_angular[0].m_quad, impulseA0), accA->m_angularVel.m_quad);
         accB->m_angularVel.m_quad =
             _mm_add_ps(_mm_mul_ps(jac[0].m_angular[1].m_quad, impulseB0), accB->m_angularVel.m_quad);
-        sr[3 * i].m_deltaRhs = sr[3 * i].m_deltaRhs + sol[0];
+        sr[3 * i].m_deltaRhs = sr[3 * i].m_deltaRhs + XFNV_M128_F32(sol, 0);
         accA->m_angularVel.m_quad = angA0;
 
         solY = _mm_shuffle_ps(sol, sol, 0x55);
@@ -360,7 +364,7 @@ static void hkSolver_solveBallAndSocketChain(
         const __m128 angB1 = _mm_add_ps(_mm_mul_ps(impulseB1, jac[1].m_angular[1].m_quad), accB->m_angularVel.m_quad);
         accA->m_angularVel.m_quad = angA1;
         accB->m_angularVel.m_quad = angB1;
-        sr[3 * i + 1].m_deltaRhs = sr[3 * i + 1].m_deltaRhs + solY[0];
+        sr[3 * i + 1].m_deltaRhs = sr[3 * i + 1].m_deltaRhs + XFNV_M128_F32(solY, 0);
 
         solZ = _mm_shuffle_ps(sol, sol, 0xAA);
         const __m128 impulseA2 = _mm_mul_ps(accA->m_invMasses.m_quad, solZ);
@@ -374,7 +378,7 @@ static void hkSolver_solveBallAndSocketChain(
         const __m128 angA2 = _mm_add_ps(_mm_mul_ps(jac[2].m_angular[0].m_quad, impulseA2), accA->m_angularVel.m_quad);
         accB->m_angularVel.m_quad =
             _mm_add_ps(_mm_mul_ps(jac[2].m_angular[1].m_quad, impulseB2), accB->m_angularVel.m_quad);
-        sr[3 * i + 2].m_deltaRhs = sr[3 * i + 2].m_deltaRhs + solZ[0];
+        sr[3 * i + 2].m_deltaRhs = sr[3 * i + 2].m_deltaRhs + XFNV_M128_F32(solZ, 0);
         accA->m_angularVel.m_quad = angA2;
     }
 }
@@ -477,10 +481,11 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(angA, m_quad)),
                         _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
-                    float v202 = _mm_shuffle_ps(v201, v201, 85)[0] + v201[0];
-                    float v203 = _mm_shuffle_ps(v201, v201, 170)[0];
+                    float v202 = XFNV_M128_F32(_mm_shuffle_ps(v201, v201, 85), 0) + XFNV_M128_F32(v201, 0);
+                    float v203 = XFNV_M128_F32(_mm_shuffle_ps(v201, v201, 170), 0);
                     __m128 v204 = _mm_shuffle_ps(m_quad_1, m_quad_1, 255);
-                    v204[0] = (v204[0] - (v203 + v202)) * _mm_shuffle_ps(m_quad, m_quad, 255)[0];
+                    XFNV_M128_F32(v204, 0) = (XFNV_M128_F32(v204, 0) - (v203 + v202)) *
+                        XFNV_M128_F32(_mm_shuffle_ps(m_quad, m_quad, 255), 0);
                     __m128 v205 = v204;
                     __m128 v206 = _mm_shuffle_ps(v205, v205, 0);
                     __m128 v207 = _mm_mul_ps(invB, v206);
@@ -489,10 +494,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linB = _mm_sub_ps(linB, _mm_mul_ps(m_quad_1, _mm_shuffle_ps(v207, v207, 255)));
                     __m128 v209 = _mm_mul_ps(a0, v208);
                     __m128 v210 = _mm_mul_ps(a1, v207);
-                    v207[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v207, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(angA, v209);
                     angB = _mm_add_ps(angB, v210);
-                    elemTemp->m_deltaRhs = v207[0] + v205[0];
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v207, 0) + XFNV_M128_F32(v205, 0);
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 }
@@ -514,13 +519,15 @@ int32_t hkSolveConstraintsByTheSteps(
                     );
                     __m128 m_quad_3 = l0;
                     __m128 v214 = _mm_shuffle_ps(l0, l0, 255);
-                    v214[0] = (v214[0] -
-                               (_mm_shuffle_ps(v212, v212, 170)[0] + (_mm_shuffle_ps(v212, v212, 85)[0] + v212[0]))) *
-                        _mm_shuffle_ps(m_quad_2, m_quad_2, 255)[0];
+                    XFNV_M128_F32(v214, 0) =
+                        (XFNV_M128_F32(v214, 0) -
+                         (XFNV_M128_F32(_mm_shuffle_ps(v212, v212, 170), 0) +
+                          (XFNV_M128_F32(_mm_shuffle_ps(v212, v212, 85), 0) + XFNV_M128_F32(v212, 0)))) *
+                        XFNV_M128_F32(_mm_shuffle_ps(m_quad_2, m_quad_2, 255), 0);
                     __m128 m_quad_4 = hkQuadReal0000;
                     __m128 v216 = _mm_shuffle_ps(a1, a1, 255);
-                    m_quad_4[0] = (0.0f - v216[0]) - elemTemp->m_deltaRhs;
-                    v216[0] = v216[0] - elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(m_quad_4, 0) = (0.0f - XFNV_M128_F32(v216, 0)) - elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v216, 0) = XFNV_M128_F32(v216, 0) - elemTemp->m_deltaRhs;
                     __m128 v217 = _mm_min_ps(v216, _mm_max_ps(m_quad_4, v214));
                     __m128 v218 = _mm_shuffle_ps(v217, v217, 0);
                     __m128 v219 = _mm_mul_ps(invB, v218);
@@ -529,10 +536,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linB = _mm_sub_ps(linB, _mm_mul_ps(_mm_shuffle_ps(v219, v219, 255), m_quad_3));
                     __m128 v221 = _mm_mul_ps(a0, v220);
                     __m128 v222 = _mm_mul_ps(a1, v219);
-                    v219[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v219, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(angA, v221);
                     angB = _mm_add_ps(angB, v222);
-                    elemTemp->m_deltaRhs = v219[0] + v217[0];
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v219, 0) + XFNV_M128_F32(v217, 0);
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 }
@@ -549,7 +556,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                     const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
                     float v338 = pS->m_tau;
-                    float v367 = l0[3];
+                    float v367 = XFNV_M128_F32(l0, 3);
                     __m128 v224 = _mm_set_ss(pS->m_damping);
                     __m128 v225 = _mm_sub_ps(_mm_sub_ps(linA, s0A), _mm_sub_ps(linB, s0B));
                     __m128 m_quad_5 = a1;
@@ -557,7 +564,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 v228 = _mm_mul_ps(a0, _mm_sub_ps(angA, s1A));
                     __m128 m_quad_6 = l0;
                     double v230 = v338;
-                    float v339 = info.m_invIntegrateVelocityFactor.m_quad[0u] * v338;
+                    float v339 = XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u) * v338;
                     __m128 v231 = _mm_add_ps(
                         _mm_mul_ps(
                             _mm_shuffle_ps(v224, v224, 0),
@@ -571,11 +578,12 @@ int32_t hkSolveConstraintsByTheSteps(
                             )
                         )
                     );
-                    float v384 = _mm_shuffle_ps(v231, v231, 170)[0] + (_mm_shuffle_ps(v231, v231, 85)[0] + v231[0]);
+                    float v384 = XFNV_M128_F32(_mm_shuffle_ps(v231, v231, 170), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(v231, v231, 85), 0) + XFNV_M128_F32(v231, 0));
                     __m128 m_quad_7 = l0;
                     float v340 = v230 * v367 - v384;
                     __m128 v233 = _mm_set_ss(v340);
-                    v233[0] = v340 * _mm_shuffle_ps(a0, a0, 255)[0];
+                    XFNV_M128_F32(v233, 0) = v340 * XFNV_M128_F32(_mm_shuffle_ps(a0, a0, 255), 0);
                     __m128 v234 = _mm_shuffle_ps(v233, v233, 0);
                     __m128 v235 = _mm_mul_ps(v234, invA);
                     __m128 v236 = _mm_mul_ps(v234, invB);
@@ -583,10 +591,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linB = _mm_sub_ps(linB, _mm_mul_ps(_mm_shuffle_ps(v236, v236, 255), m_quad_7));
                     __m128 v237 = _mm_mul_ps(a0, v235);
                     __m128 v238 = _mm_mul_ps(a1, v236);
-                    v236[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v236, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(v237, angA);
                     angB = _mm_add_ps(angB, v238);
-                    elemTemp->m_deltaRhs = v236[0] + v233[0];
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v236, 0) + XFNV_M128_F32(v233, 0);
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 }
@@ -604,12 +612,13 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 v248 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(a0, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
-                    float v388 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                        (_mm_shuffle_ps(v248, v248, 170)[0] + (_mm_shuffle_ps(v248, v248, 85)[0] + v248[0]));
+                    float v388 = XFNV_M128_F32(_mm_shuffle_ps(l0, l0, 255), 0) -
+                        (XFNV_M128_F32(_mm_shuffle_ps(v248, v248, 170), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(v248, v248, 85), 0) + XFNV_M128_F32(v248, 0)));
                     float v359 = v388;
                     float v343 = -elemTemp->m_deltaRhs;
                     float v312 = v388 - pS->m_minRhs;
-                    float v313 = v312 * a0[3];
+                    float v313 = v312 * XFNV_M128_F32(a0, 3);
                     if (v343 < static_cast<double>(v313)) {
                         __m128 v249 = _mm_shuffle_ps(_mm_set_ss(v313), _mm_set_ss(v313), 0);
                         __m128 v250 = _mm_mul_ps(invB, v249);
@@ -619,13 +628,13 @@ int32_t hkSolveConstraintsByTheSteps(
                         linB = _mm_sub_ps(linB, v252);
                         __m128 v253 = _mm_mul_ps(a0, v251);
                         __m128 v254 = _mm_mul_ps(v250, a1);
-                        v251[0] = elemTemp->m_deltaRhs;
+                        XFNV_M128_F32(v251, 0) = elemTemp->m_deltaRhs;
                         angA = _mm_add_ps(v253, angA);
                         angB = _mm_add_ps(v254, angB);
-                        elemTemp->m_deltaRhs = v251[0] + v313;
+                        elemTemp->m_deltaRhs = XFNV_M128_F32(v251, 0) + v313;
                     }
                     float v314 = v359 - pS->m_maxRhs;
-                    float v315 = v314 * a0[3];
+                    float v315 = v314 * XFNV_M128_F32(a0, 3);
                     if (v315 < static_cast<double>(v343)) {
                         __m128 v255 = _mm_shuffle_ps(_mm_set_ss(v315), _mm_set_ss(v315), 0);
                         __m128 v256 = _mm_mul_ps(invA, v255);
@@ -634,10 +643,10 @@ int32_t hkSolveConstraintsByTheSteps(
                         linA = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v256, v256, 255), l0), linA);
                         linB = _mm_sub_ps(linB, v258);
                         __m128 v259 = _mm_mul_ps(v257, a1);
-                        v255[0] = elemTemp->m_deltaRhs;
+                        XFNV_M128_F32(v255, 0) = elemTemp->m_deltaRhs;
                         angA = _mm_add_ps(_mm_mul_ps(v256, a0), angA);
                         angB = _mm_add_ps(angB, v259);
-                        elemTemp->m_deltaRhs = v255[0] + v315;
+                        elemTemp->m_deltaRhs = XFNV_M128_F32(v255, 0) + v315;
                     }
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
@@ -656,9 +665,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 v239 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(a0, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
-                    float v386 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                        (_mm_shuffle_ps(v239, v239, 170)[0] + (_mm_shuffle_ps(v239, v239, 85)[0] + v239[0]));
-                    float v311 = a0[3] * v386;
+                    float v386 = XFNV_M128_F32(_mm_shuffle_ps(l0, l0, 255), 0) -
+                        (XFNV_M128_F32(_mm_shuffle_ps(v239, v239, 170), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(v239, v239, 85), 0) + XFNV_M128_F32(v239, 0)));
+                    float v311 = XFNV_M128_F32(a0, 3) * v386;
                     float v341 = std::fabs(static_cast<double>(v311));
                     if (!(pS->m_maxImpulse < static_cast<double>(v341))) {
                         v240 = 1.0;
@@ -677,10 +687,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linB = _mm_sub_ps(linB, v244);
                     __m128 v245 = _mm_mul_ps(a0, v242);
                     __m128 v246 = _mm_mul_ps(v243, a1);
-                    v242[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v242, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(v245, angA);
                     angB = _mm_add_ps(angB, v246);
-                    elemTemp->m_deltaRhs = v242[0] + v311;
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v242, 0) + v311;
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 }
@@ -698,7 +708,7 @@ int32_t hkSolveConstraintsByTheSteps(
                     float v344 = motor.m_velocity * stepTemp.m_intregratePositions.m_storage + elemTemp[2].m_deltaRhs;
                     elemTemp[2].m_deltaRhs = v344;
                     float v261 = motor.m_damping;
-                    float v360 = l0[3] + v344;
+                    float v360 = XFNV_M128_F32(l0, 3) + v344;
                     float v345 = motor.m_tau;
                     __m128 v262 = _mm_sub_ps(_mm_sub_ps(linA, s0A), _mm_sub_ps(linB, s0B));
                     __m128 v263 = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
@@ -706,16 +716,17 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 m_quad_8 = l0;
                     __m128 v266 = _mm_add_ps(_mm_add_ps(v264, v263), _mm_mul_ps(v262, m_quad_8));
                     double v267 = v345;
-                    float v346 = v345 * info.m_invIntegrateVelocityFactor.m_quad[0u];
+                    float v346 = v345 * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u);
                     __m128 v268 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(s1B, a1), _mm_mul_ps(s1A, a0)), _mm_mul_ps(_mm_sub_ps(s0A, s0B), l0)
                     );
                     __m128 v269 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v346), _mm_set_ss(v346), 0), v268);
-                    v268[0] = v261;
+                    XFNV_M128_F32(v268, 0) = v261;
                     __m128 v270 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v268, v268, 0), v266), v269);
-                    float v375 = _mm_shuffle_ps(v270, v270, 170)[0] + (_mm_shuffle_ps(v270, v270, 85)[0] + v270[0]);
+                    float v375 = XFNV_M128_F32(_mm_shuffle_ps(v270, v270, 170), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(v270, v270, 85), 0) + XFNV_M128_F32(v270, 0));
                     float v347 = v267 * v360 - v375;
-                    double v271 = a0[3] * v347;
+                    double v271 = XFNV_M128_F32(a0, 3) * v347;
                     float v361 = v271;
                     double v272 = v361;
                     if (!(motor.m_maxImpulsePerSubstep < static_cast<double>(v361))) {
@@ -760,7 +771,8 @@ int32_t hkSolveConstraintsByTheSteps(
                 );
                 hkSimdReal sDot;
                 sDot.m_real = _mm_shuffle_ps(v280, v280, 170);
-                sDot.m_real[0] = sDot.m_real[0] + (_mm_shuffle_ps(v280, v280, 85)[0] + v280[0]);
+                XFNV_M128_F32(sDot.m_real, 0) = XFNV_M128_F32(sDot.m_real, 0) +
+                    (XFNV_M128_F32(_mm_shuffle_ps(v280, v280, 85), 0) + XFNV_M128_F32(v280, 0));
                 hkSimdReal sRhs;
                 sRhs.m_real = _mm_shuffle_ps(l0, l0, 255);
                 hkSimdReal sDelta = sRhs - sDot;
@@ -780,7 +792,7 @@ int32_t hkSolveConstraintsByTheSteps(
                 angA = _mm_add_ps(angA, v286);
                 angB = _mm_add_ps(angB, v287);
                 hkSimdReal sSum = sApplied + sImpulse;
-                elemTemp->m_deltaRhs = sSum.m_real[0];
+                elemTemp->m_deltaRhs = XFNV_M128_F32(sSum.m_real, 0);
                 ++elemTemp;
                 pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 continue;
@@ -791,10 +803,12 @@ int32_t hkSolveConstraintsByTheSteps(
                     const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                     __m128 m_quad_9 = pS->m_jac.m_angular[1].m_quad;
                     __m128 v190 = _mm_add_ps(_mm_mul_ps(m_quad_9, angB), _mm_mul_ps(angA, a0));
-                    float v191 = _mm_shuffle_ps(v190, v190, 170)[0] + (_mm_shuffle_ps(v190, v190, 85)[0] + v190[0]);
+                    float v191 = XFNV_M128_F32(_mm_shuffle_ps(v190, v190, 170), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(v190, v190, 85), 0) + XFNV_M128_F32(v190, 0));
                     __m128 v192 = _mm_shuffle_ps(m_quad_9, m_quad_9, 255);
-                    v192[0] = (v192[0] - v191) * _mm_shuffle_ps(a0, a0, 255)[0];
-                    float v193 = v192[0];
+                    XFNV_M128_F32(v192, 0) =
+                        (XFNV_M128_F32(v192, 0) - v191) * XFNV_M128_F32(_mm_shuffle_ps(a0, a0, 255), 0);
+                    float v193 = XFNV_M128_F32(v192, 0);
                     __m128 v194 = _mm_shuffle_ps(v192, v192, 0);
                     __m128 v195 = _mm_mul_ps(_mm_mul_ps(v194, invA), a0);
                     float fImpulseApplied = elemTemp->m_deltaRhs;
@@ -814,13 +828,13 @@ int32_t hkSolveConstraintsByTheSteps(
                     const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                     const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
                     float v331 = pS->m_tau;
-                    float v304 = a1[3];
+                    float v304 = XFNV_M128_F32(a1, 3);
                     __m128 m_damping_low = _mm_set_ss(info.m_damping);
                     __m128 v159 = _mm_sub_ps(angB, s1B);
                     __m128 v160 = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
                     __m128 m_quad_10 = a1;
                     double v162 = v331;
-                    float v332 = info.m_invIntegrateVelocityFactor.m_quad[0u] * v331;
+                    float v332 = XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u) * v331;
                     __m128 v163 = _mm_add_ps(
                         _mm_mul_ps(
                             _mm_shuffle_ps(m_damping_low, m_damping_low, 0),
@@ -831,11 +845,12 @@ int32_t hkSolveConstraintsByTheSteps(
                             _mm_add_ps(_mm_mul_ps(a1, s1B), _mm_mul_ps(s1A, a0))
                         )
                     );
-                    float v376 = _mm_shuffle_ps(v163, v163, 170)[0] + (_mm_shuffle_ps(v163, v163, 85)[0] + v163[0]);
+                    float v376 = XFNV_M128_F32(_mm_shuffle_ps(v163, v163, 170), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(v163, v163, 85), 0) + XFNV_M128_F32(v163, 0));
                     float v378 = v162 * v304 - v376;
                     float v334 = -elemTemp->m_deltaRhs;
                     float v305 = v378 - pS->m_minRhs;
-                    float v306 = a0[3] * v305;
+                    float v306 = XFNV_M128_F32(a0, 3) * v305;
                     if (v334 < static_cast<double>(v306)) {
                         __m128 v164 = _mm_set_ss(v306);
                         __m128 v165 = _mm_shuffle_ps(v164, v164, 0);
@@ -844,11 +859,11 @@ int32_t hkSolveConstraintsByTheSteps(
                         float fImpulseApplied = elemTemp->m_deltaRhs;
                         angA = _mm_add_ps(v166, angA);
                         angB = _mm_add_ps(angB, v167);
-                        elemTemp->m_deltaRhs = fImpulseApplied + v164[0];
+                        elemTemp->m_deltaRhs = fImpulseApplied + XFNV_M128_F32(v164, 0);
                     }
                     else {
                         float v307 = v378 - pS->m_maxRhs;
-                        float v308 = a0[3] * v307;
+                        float v308 = XFNV_M128_F32(a0, 3) * v307;
                         if (v308 < static_cast<double>(v334)) {
                             __m128 v164 = _mm_set_ss(v308);
                             __m128 v169 = _mm_shuffle_ps(v164, v164, 0);
@@ -857,7 +872,7 @@ int32_t hkSolveConstraintsByTheSteps(
                             float fImpulseApplied = elemTemp->m_deltaRhs;
                             angA = _mm_add_ps(v170, angA);
                             angB = _mm_add_ps(v171, angB);
-                            elemTemp->m_deltaRhs = fImpulseApplied + v164[0];
+                            elemTemp->m_deltaRhs = fImpulseApplied + XFNV_M128_F32(v164, 0);
                         }
                     }
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
@@ -874,9 +889,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
                     double v153;
                     __m128 v152 = _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(angA, a0));
-                    float v391 = _mm_shuffle_ps(a1, a1, 255)[0] -
-                        (_mm_shuffle_ps(v152, v152, 170)[0] + (_mm_shuffle_ps(v152, v152, 85)[0] + v152[0]));
-                    float v303 = a0[3] * v391;
+                    float v391 = XFNV_M128_F32(_mm_shuffle_ps(a1, a1, 255), 0) -
+                        (XFNV_M128_F32(_mm_shuffle_ps(v152, v152, 170), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(v152, v152, 85), 0) + XFNV_M128_F32(v152, 0)));
+                    float v303 = XFNV_M128_F32(a0, 3) * v391;
                     float v329 = std::fabs(static_cast<double>(v303));
                     if (!(pS->m_maxImpulse < static_cast<double>(v329))) {
                         v153 = 1.0;
@@ -890,10 +906,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     __m128 v154 = _mm_shuffle_ps(_mm_set_ss(v303), _mm_set_ss(v303), 0);
                     __m128 v155 = _mm_mul_ps(v154, invA);
                     __m128 v156 = _mm_mul_ps(a1, _mm_mul_ps(v154, invB));
-                    v154[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v154, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(angA, _mm_mul_ps(v155, a0));
                     angB = _mm_add_ps(angB, v156);
-                    elemTemp->m_deltaRhs = v154[0] + v303;
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v154, 0) + v303;
                     elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 }
@@ -910,19 +926,20 @@ int32_t hkSolveConstraintsByTheSteps(
                     elemTemp[2].m_deltaRhs = v335;
                     float v173 = motor.m_damping;
                     __m128 v174 = _mm_sub_ps(angB, s1B);
-                    float v309 = a1[3] + v335;
+                    float v309 = XFNV_M128_F32(a1, 3) + v335;
                     __m128 v175 = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
                     __m128 v176 = a1;
                     double v177 = motor.m_tau;
                     __m128 v178 = _mm_add_ps(_mm_mul_ps(v174, v176), v175);
-                    float v336 = v177 * info.m_invIntegrateVelocityFactor.m_quad[0u];
+                    float v336 = v177 * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u);
                     __m128 v179 = _mm_add_ps(_mm_mul_ps(s1B, a1), _mm_mul_ps(s1A, a0));
                     __m128 v180 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v336), _mm_set_ss(v336), 0), v179);
-                    v179[0] = v173;
+                    XFNV_M128_F32(v179, 0) = v173;
                     __m128 v181 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v179, v179, 0), v178), v180);
-                    float v380 = _mm_shuffle_ps(v181, v181, 170)[0] + (_mm_shuffle_ps(v181, v181, 85)[0] + v181[0]);
+                    float v380 = XFNV_M128_F32(_mm_shuffle_ps(v181, v181, 170), 0) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(v181, v181, 85), 0) + XFNV_M128_F32(v181, 0));
                     float v337 = v177 * v309 - v380;
-                    float v310 = a0[3] * v337;
+                    float v310 = XFNV_M128_F32(a0, 3) * v337;
                     double v182 = v310;
                     if (!(motor.m_maxImpulsePerSubstep < static_cast<double>(v310))) {
                         if (!(motor.m_minImpulsePerSubstep > v182)) {
@@ -965,12 +982,14 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
                     __m128 v66 = _mm_shuffle_ps(l0, l0, 255);
-                    v66[0] =
-                        (v66[0] - (_mm_shuffle_ps(v65, v65, 170)[0] + (_mm_shuffle_ps(v65, v65, 85)[0] + v65[0]))) *
-                        _mm_shuffle_ps(m_quad_11, m_quad_11, 255)[0];
+                    XFNV_M128_F32(v66, 0) =
+                        (XFNV_M128_F32(v66, 0) -
+                         (XFNV_M128_F32(_mm_shuffle_ps(v65, v65, 170), 0) +
+                          (XFNV_M128_F32(_mm_shuffle_ps(v65, v65, 85), 0) + XFNV_M128_F32(v65, 0)))) *
+                        XFNV_M128_F32(_mm_shuffle_ps(m_quad_11, m_quad_11, 255), 0);
                     pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                     __m128 m_quad_13 = hkQuadReal0000;
-                    m_quad_13[0] = 0.0f - elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(m_quad_13, 0) = 0.0f - elemTemp->m_deltaRhs;
                     __m128 v68 = _mm_max_ps(m_quad_13, v66);
                     __m128 v69 = _mm_shuffle_ps(v68, v68, 0);
                     __m128 v70 = _mm_mul_ps(v69, invA);
@@ -979,10 +998,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linB = _mm_sub_ps(linB, _mm_mul_ps(_mm_shuffle_ps(v71, v71, 255), m_quad_12));
                     __m128 v72 = _mm_mul_ps(a0, v70);
                     __m128 v73 = _mm_mul_ps(a1, v71);
-                    v71[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v71, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(v72, angA);
                     angB = _mm_add_ps(angB, v73);
-                    elemTemp->m_deltaRhs = v71[0] + v68[0];
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v71, 0) + XFNV_M128_F32(v68, 0);
                     // EXE-INLINED 0xD921D0
                     elemTemp +=
                         hkpJacobianSchema::s_schemaNumSolverElemTemps[static_cast<int8_t>(pCurrent->m_bytes.m_type)];
@@ -1004,13 +1023,15 @@ int32_t hkSolveConstraintsByTheSteps(
                         _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
                     __m128 v76 = _mm_shuffle_ps(l0, l0, 255);
-                    v76[0] =
-                        (v76[0] - (_mm_shuffle_ps(v75, v75, 170)[0] + (_mm_shuffle_ps(v75, v75, 85)[0] + v75[0]))) *
-                        _mm_shuffle_ps(m_quad_14, m_quad_14, 255)[0];
+                    XFNV_M128_F32(v76, 0) =
+                        (XFNV_M128_F32(v76, 0) -
+                         (XFNV_M128_F32(_mm_shuffle_ps(v75, v75, 170), 0) +
+                          (XFNV_M128_F32(_mm_shuffle_ps(v75, v75, 85), 0) + XFNV_M128_F32(v75, 0)))) *
+                        XFNV_M128_F32(_mm_shuffle_ps(m_quad_14, m_quad_14, 255), 0);
                     __m128 m_quad_15 = hkQuadReal0000;
-                    m_quad_15[0] = 0.0f - elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(m_quad_15, 0) = 0.0f - elemTemp->m_deltaRhs;
                     __m128 v78 = _mm_shuffle_ps(a1, a1, 255);
-                    v78[0] = v78[0] - elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v78, 0) = XFNV_M128_F32(v78, 0) - elemTemp->m_deltaRhs;
                     __m128 v79 = _mm_min_ps(v78, _mm_max_ps(m_quad_15, v76));
                     __m128 v80 = _mm_shuffle_ps(v79, v79, 0);
                     __m128 v81 = _mm_mul_ps(v80, invA);
@@ -1020,10 +1041,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linB = _mm_sub_ps(linB, v83);
                     __m128 v84 = _mm_mul_ps(a0, v81);
                     __m128 v85 = _mm_mul_ps(v82, a1);
-                    v81[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v81, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(v84, angA);
                     angB = _mm_add_ps(v85, angB);
-                    elemTemp->m_deltaRhs = v81[0] + v79[0];
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v81, 0) + XFNV_M128_F32(v79, 0);
                     // EXE-INLINED 0xD921D0
                     elemTemp +=
                         hkpJacobianSchema::s_schemaNumSolverElemTemps[static_cast<int8_t>(pSchema->m_bytes.m_type)];
@@ -1044,19 +1065,21 @@ int32_t hkSolveConstraintsByTheSteps(
                 __m128 v12 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(a00, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v395 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                    (_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]));
+                float v395 = XFNV_M128_F32(_mm_shuffle_ps(l0, l0, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0)));
                 __m128 v15 = l1;
                 __m128 v16 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), v15)
                 );
-                float v17 = _mm_shuffle_ps(v15, v15, 255)[0] -
-                    (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
-                float v350 = v395 * a01[3] + v17 * pS->m_invJac01;
-                float v296 = v395 * pS->m_invJac01 + v17 * a11[3];
+                float v17 = XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 85), 0) + XFNV_M128_F32(v16, 0)));
+                float v350 = v395 * XFNV_M128_F32(a01, 3) + v17 * pS->m_invJac01;
+                float v296 = v395 * pS->m_invJac01 + v17 * XFNV_M128_F32(a11, 3);
                 bool bFirstOnly;
                 if (!(-elemTemp->m_deltaRhs < v350)) {
-                    float v297 = v17 * a10[3];
+                    float v297 = v17 * XFNV_M128_F32(a10, 3);
                     bFirstOnly = -elemTemp[1].m_deltaRhs >= v297;
                     if (!bFirstOnly) {
                         // The second point alone.
@@ -1068,10 +1091,10 @@ int32_t hkSolveConstraintsByTheSteps(
                         linB = _mm_sub_ps(linB, _mm_mul_ps(v38, _mm_shuffle_ps(v41, v41, 255)));
                         __m128 v42 = _mm_mul_ps(a10, v40);
                         __m128 v43 = _mm_mul_ps(a11, v41);
-                        v41[0] = elemTemp[1].m_deltaRhs;
+                        XFNV_M128_F32(v41, 0) = elemTemp[1].m_deltaRhs;
                         angA = _mm_add_ps(angA, v42);
                         angB = _mm_add_ps(angB, v43);
-                        elemTemp[1].m_deltaRhs = v41[0] + v297;
+                        elemTemp[1].m_deltaRhs = XFNV_M128_F32(v41, 0) + v297;
                     }
                 }
                 else {
@@ -1097,18 +1120,18 @@ int32_t hkSolveConstraintsByTheSteps(
                         linB = _mm_sub_ps(linB, _mm_mul_ps(_mm_shuffle_ps(v27, v27, 255), v26));
                         __m128 v28 = _mm_mul_ps(a10, v25);
                         __m128 v29 = _mm_mul_ps(a11, v27);
-                        v27[0] = elemTemp[1].m_deltaRhs;
+                        XFNV_M128_F32(v27, 0) = elemTemp[1].m_deltaRhs;
                         angA = _mm_add_ps(v28, angA);
                         angB = _mm_add_ps(v29, angB);
-                        elemTemp[1].m_deltaRhs = v27[0] + v296;
+                        elemTemp[1].m_deltaRhs = XFNV_M128_F32(v27, 0) + v296;
                     }
                 }
                 if (bFirstOnly) {
                     // The first point alone, clamped to a non-negative accumulated impulse.
                     __m128 v30 = _mm_set_ss(v395);
                     __m128 m_quad_16 = hkQuadReal0000;
-                    v30[0] = v395 * _mm_shuffle_ps(a00, a00, 255)[0];
-                    m_quad_16[0] = 0.0f - elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v30, 0) = v395 * XFNV_M128_F32(_mm_shuffle_ps(a00, a00, 255), 0);
+                    XFNV_M128_F32(m_quad_16, 0) = 0.0f - elemTemp->m_deltaRhs;
                     __m128 v32 = _mm_max_ps(m_quad_16, v30);
                     __m128 v33 = _mm_shuffle_ps(v32, v32, 0);
                     __m128 v34 = _mm_mul_ps(v33, invA);
@@ -1117,10 +1140,10 @@ int32_t hkSolveConstraintsByTheSteps(
                     linA = _mm_add_ps(linA, _mm_mul_ps(l0, _mm_shuffle_ps(v34, v34, 255)));
                     linB = _mm_sub_ps(linB, _mm_mul_ps(m_quad_17, _mm_shuffle_ps(v35, v35, 255)));
                     __m128 v37 = _mm_mul_ps(a01, v35);
-                    v35[0] = elemTemp->m_deltaRhs;
+                    XFNV_M128_F32(v35, 0) = elemTemp->m_deltaRhs;
                     angA = _mm_add_ps(_mm_mul_ps(v34, a00), angA);
                     angB = _mm_add_ps(v37, angB);
-                    elemTemp->m_deltaRhs = v35[0] + v32[0];
+                    elemTemp->m_deltaRhs = XFNV_M128_F32(v35, 0) + XFNV_M128_F32(v32, 0);
                 }
                 pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 elemTemp += 2;
@@ -1138,16 +1161,18 @@ int32_t hkSolveConstraintsByTheSteps(
                 __m128 v136 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(a00, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v393 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                    (_mm_shuffle_ps(v136, v136, 170)[0] + (_mm_shuffle_ps(v136, v136, 85)[0] + v136[0]));
+                float v393 = XFNV_M128_F32(_mm_shuffle_ps(l0, l0, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v136, v136, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v136, v136, 85), 0) + XFNV_M128_F32(v136, 0)));
                 __m128 v137 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(l1, _mm_sub_ps(linA, linB))
                 );
-                float v385 = _mm_shuffle_ps(l1, l1, 255)[0] -
-                    (_mm_shuffle_ps(v137, v137, 170)[0] + (_mm_shuffle_ps(v137, v137, 85)[0] + v137[0]));
+                float v385 = XFNV_M128_F32(_mm_shuffle_ps(l1, l1, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v137, v137, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v137, v137, 85), 0) + XFNV_M128_F32(v137, 0)));
                 float v366 = pS->m_maxImpulse * pS->m_maxImpulse;
-                float v357 = a01[3] * v393 + v385 * pS->m_invJac01;
-                float v302 = v393 * pS->m_invJac01 + v385 * a11[3];
+                float v357 = XFNV_M128_F32(a01, 3) * v393 + v385 * pS->m_invJac01;
+                float v302 = v393 * pS->m_invJac01 + v385 * XFNV_M128_F32(a11, 3);
                 float v326 = v302 * v302 + v357 * v357;
                 if (!(v366 < static_cast<double>(v326))) {
                     v138 = 1.0;
@@ -1168,10 +1193,10 @@ int32_t hkSolveConstraintsByTheSteps(
                 linB = _mm_sub_ps(linB, v142);
                 __m128 v143 = _mm_add_ps(angA, _mm_mul_ps(a00, v141));
                 __m128 v144 = _mm_mul_ps(a01, v140);
-                v140[0] = elemTemp->m_deltaRhs;
+                XFNV_M128_F32(v140, 0) = elemTemp->m_deltaRhs;
                 angA = v143;
                 angB = _mm_add_ps(angB, v144);
-                elemTemp->m_deltaRhs = v140[0] + v357;
+                elemTemp->m_deltaRhs = XFNV_M128_F32(v140, 0) + v357;
                 __m128 v145 = l1;
                 __m128 v146 = _mm_shuffle_ps(_mm_set_ss(v302), _mm_set_ss(v302), 0);
                 __m128 v147 = _mm_mul_ps(invA, v146);
@@ -1180,10 +1205,10 @@ int32_t hkSolveConstraintsByTheSteps(
                 linB = _mm_sub_ps(linB, _mm_mul_ps(v145, _mm_shuffle_ps(v148, v148, 255)));
                 __m128 v149 = _mm_mul_ps(a10, v147);
                 __m128 v150 = _mm_mul_ps(a11, v148);
-                v148[0] = elemTemp[1].m_deltaRhs;
+                XFNV_M128_F32(v148, 0) = elemTemp[1].m_deltaRhs;
                 angA = _mm_add_ps(v149, angA);
                 angB = _mm_add_ps(angB, v150);
-                elemTemp[1].m_deltaRhs = v148[0] + v302;
+                elemTemp[1].m_deltaRhs = XFNV_M128_F32(v148, 0) + v302;
                 elemTemp += 3;
                 pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 continue;
@@ -1202,20 +1227,23 @@ int32_t hkSolveConstraintsByTheSteps(
                 __m128 v113 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(a00, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v381 = _mm_shuffle_ps(l0, l0, 255)[0] -
-                    (_mm_shuffle_ps(v113, v113, 170)[0] + (_mm_shuffle_ps(v113, v113, 85)[0] + v113[0]));
+                float v381 = XFNV_M128_F32(_mm_shuffle_ps(l0, l0, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v113, v113, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v113, v113, 85), 0) + XFNV_M128_F32(v113, 0)));
                 __m128 v114 = l1;
                 __m128 v115 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), v114)
                 );
-                float v389 = _mm_shuffle_ps(v114, v114, 255)[0] -
-                    (_mm_shuffle_ps(v115, v115, 170)[0] + (_mm_shuffle_ps(v115, v115, 85)[0] + v115[0]));
+                float v389 = XFNV_M128_F32(_mm_shuffle_ps(v114, v114, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v115, v115, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v115, v115, 85), 0) + XFNV_M128_F32(v115, 0)));
                 __m128 v116 = _mm_add_ps(_mm_mul_ps(a21, angB), _mm_mul_ps(a20, angA));
-                float v383 = _mm_shuffle_ps(a21, a21, 255)[0] -
-                    (_mm_shuffle_ps(v116, v116, 170)[0] + (_mm_shuffle_ps(v116, v116, 85)[0] + v116[0]));
-                float v355 = v383 * a20[3];
-                float v365 = a01[3] * v381 + pS->m_invJac01 * v389;
-                float v301 = v381 * pS->m_invJac01 + v389 * a11[3];
+                float v383 = XFNV_M128_F32(_mm_shuffle_ps(a21, a21, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v116, v116, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v116, v116, 85), 0) + XFNV_M128_F32(v116, 0)));
+                float v355 = v383 * XFNV_M128_F32(a20, 3);
+                float v365 = XFNV_M128_F32(a01, 3) * v381 + pS->m_invJac01 * v389;
+                float v301 = v381 * pS->m_invJac01 + v389 * XFNV_M128_F32(a11, 3);
                 float v321 = v301 * v301 + v365 * v365 + v355 * v355;
                 double v117 = v321;
                 float v322 = pS->m_maxImpulse * pS->m_maxImpulse;
@@ -1252,17 +1280,17 @@ int32_t hkSolveConstraintsByTheSteps(
                 linB = _mm_sub_ps(linB, _mm_mul_ps(_mm_shuffle_ps(v128, v128, 255), v125));
                 __m128 v129 = _mm_mul_ps(a10, v127);
                 __m128 v130 = _mm_mul_ps(a11, v128);
-                v128[0] = elemTemp[1].m_deltaRhs;
+                XFNV_M128_F32(v128, 0) = elemTemp[1].m_deltaRhs;
                 angA = _mm_add_ps(v129, angA);
                 angB = _mm_add_ps(v130, angB);
-                elemTemp[1].m_deltaRhs = v128[0] + v301;
+                elemTemp[1].m_deltaRhs = XFNV_M128_F32(v128, 0) + v301;
                 __m128 v131 = _mm_shuffle_ps(_mm_set_ss(v356), _mm_set_ss(v356), 0);
                 __m128 v132 = _mm_mul_ps(v131, invA);
                 __m128 v133 = _mm_mul_ps(a21, _mm_mul_ps(v131, invB));
-                v131[0] = elemTemp[2].m_deltaRhs;
+                XFNV_M128_F32(v131, 0) = elemTemp[2].m_deltaRhs;
                 angA = _mm_add_ps(_mm_mul_ps(v132, a20), angA);
                 angB = _mm_add_ps(v133, angB);
-                elemTemp[2].m_deltaRhs = v131[0] + v356;
+                elemTemp[2].m_deltaRhs = XFNV_M128_F32(v131, 0) + v356;
                 elemTemp += 4;
                 pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 continue;
@@ -1276,14 +1304,16 @@ int32_t hkSolveConstraintsByTheSteps(
                 double v104;
                 float v318 = pS->m_maxImpulse * pS->m_maxImpulse;
                 __m128 v101 = _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(angA, a00));
-                double v102 = a00[3];
-                float v387 = _mm_shuffle_ps(a01, a01, 255)[0] -
-                    (_mm_shuffle_ps(v101, v101, 170)[0] + (_mm_shuffle_ps(v101, v101, 85)[0] + v101[0]));
+                double v102 = XFNV_M128_F32(a00, 3);
+                float v387 = XFNV_M128_F32(_mm_shuffle_ps(a01, a01, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v101, v101, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v101, v101, 85), 0) + XFNV_M128_F32(v101, 0)));
                 float v300 = v102 * v387;
                 __m128 v103 = _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA));
-                float v379 = _mm_shuffle_ps(a11, a11, 255)[0] -
-                    (_mm_shuffle_ps(v103, v103, 170)[0] + (_mm_shuffle_ps(v103, v103, 85)[0] + v103[0]));
-                float v354 = a10[3] * v379;
+                float v379 = XFNV_M128_F32(_mm_shuffle_ps(a11, a11, 255), 0) -
+                    (XFNV_M128_F32(_mm_shuffle_ps(v103, v103, 170), 0) +
+                     (XFNV_M128_F32(_mm_shuffle_ps(v103, v103, 85), 0) + XFNV_M128_F32(v103, 0)));
+                float v354 = XFNV_M128_F32(a10, 3) * v379;
                 float v364 = v354 * v354 + v300 * v300;
                 if (!(v318 < static_cast<double>(v364))) {
                     v104 = 1.0;
@@ -1299,17 +1329,17 @@ int32_t hkSolveConstraintsByTheSteps(
                 __m128 v105 = _mm_shuffle_ps(_mm_set_ss(v300), _mm_set_ss(v300), 0);
                 __m128 v106 = _mm_mul_ps(v105, invA);
                 __m128 v107 = _mm_mul_ps(a01, _mm_mul_ps(v105, invB));
-                v105[0] = elemTemp->m_deltaRhs;
+                XFNV_M128_F32(v105, 0) = elemTemp->m_deltaRhs;
                 angA = _mm_add_ps(angA, _mm_mul_ps(v106, a00));
                 angB = _mm_add_ps(angB, v107);
-                elemTemp->m_deltaRhs = v105[0] + v300;
+                elemTemp->m_deltaRhs = XFNV_M128_F32(v105, 0) + v300;
                 __m128 v108 = _mm_shuffle_ps(_mm_set_ss(v354), _mm_set_ss(v354), 0);
                 __m128 v109 = _mm_mul_ps(v108, invA);
                 __m128 v110 = _mm_mul_ps(a11, _mm_mul_ps(v108, invB));
-                v108[0] = elemTemp[1].m_deltaRhs;
+                XFNV_M128_F32(v108, 0) = elemTemp[1].m_deltaRhs;
                 angA = _mm_add_ps(_mm_mul_ps(v109, a10), angA);
                 angB = _mm_add_ps(angB, v110);
-                elemTemp[1].m_deltaRhs = v108[0] + v354;
+                elemTemp[1].m_deltaRhs = XFNV_M128_F32(v108, 0) + v354;
                 elemTemp += getNumSolverElemTemps(reinterpret_cast<char*>(pSchema));
                 pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 continue;
@@ -1329,8 +1359,8 @@ int32_t hkSolveConstraintsByTheSteps(
                 hkpVelocityAccumulator* pAcc = reinterpret_cast<hkpVelocityAccumulator*>(
                     uAccA ^ (uMask & (reinterpret_cast<uintptr_t>(pAccB) ^ uAccA))
                 );
-                float x =
-                    info.m_integrateVelocityFactor.m_quad[0u] * static_cast<double>(stepTemp.m_currentStep.m_storage);
+                float x = XFNV_M128_F32(info.m_integrateVelocityFactor.m_quad, 0u) *
+                    static_cast<double>(stepTemp.m_currentStep.m_storage);
                 hkSimdReal sFactor(x);
                 __m128 m_quad_20 = pS->m_deltaVel.m_quad;
                 __m128 m_real = sFactor.m_real;
@@ -1381,7 +1411,7 @@ int32_t hkSolveConstraintsByTheSteps(
             }
             default: {
                 // Assert on an unknown schema type: trap, then return.
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
                 return 1;
             }
         }
@@ -1438,14 +1468,14 @@ int32_t hkSolveConstraints(
             case hkpVelocityAccumulator::HK_END: break;
             default:
                 // Breaks here and then tests the end again without moving on, as the game does.
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
                 continue;
         }
         break;
     }
 
     // x87: the product rounded to a float.
-    const float factor = info.m_invNumSteps * info.m_invIntegrateVelocityFactor.m_quad[0];
+    const float factor = info.m_invNumSteps * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0);
     const __m128 factorV = _mm_shuffle_ps(_mm_set_ss(factor), _mm_set_ss(factor), 0);
     for (int32_t currentStep = 0; currentStep < info.m_numSteps; ++currentStep) {
         hkSolver::SolverStepTemp stepTemp;
@@ -1477,7 +1507,7 @@ int32_t hkSolveConstraints(
                         default:
                             // An unknown schema type is asserted on (a debug trap), then treated as the end of the
                             // stream.
-                            __builtin_debugtrap();
+                            xfnv::DebugTrap();
                             [[fallthrough]];
                         case hkpJacobianSchema::SCHEMA_TYPE_END: bSchemasDone = true; continue;
                         case hkpJacobianSchema::SCHEMA_TYPE_HEADER:
@@ -1581,13 +1611,14 @@ int32_t hkSolveConstraints(
                                 const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                                 const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
                                 const float tau = pS->m_tau;
-                                const float rhs = l0[3];
+                                const float rhs = XFNV_M128_F32(l0, 3);
                                 const __m128 damping = _mm_set_ss(pS->m_damping);
                                 const __m128 linDiff = _mm_sub_ps(_mm_sub_ps(linA, s0A), _mm_sub_ps(linB, s0B));
                                 const __m128 angDiffA = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
                                 const __m128 angDiffB = _mm_mul_ps(_mm_sub_ps(angB, s1B), a1);
                                 // x87: tau times the inverse integration factor, rounded to a float.
-                                const float tauFactor = info.m_invIntegrateVelocityFactor.m_quad[0] * tau;
+                                const float tauFactor =
+                                    XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0) * tau;
                                 const __m128 sum = _mm_add_ps(
                                     _mm_mul_ps(
                                         _mm_shuffle_ps(damping, damping, 0),
@@ -1643,7 +1674,7 @@ int32_t hkSolveConstraints(
                                 const float negApplied = -elemTemp->m_deltaRhs;
                                 // x87: each limit's violation, then its impulse, rounded to a float.
                                 const float minViolation = rel - pS->m_minRhs;
-                                const float minImpulse = minViolation * a0[3];
+                                const float minImpulse = minViolation * XFNV_M128_F32(a0, 3);
                                 if (negApplied < static_cast<double>(minImpulse)) {
                                     const __m128 impulse4 =
                                         _mm_shuffle_ps(_mm_set_ss(minImpulse), _mm_set_ss(minImpulse), 0);
@@ -1659,7 +1690,7 @@ int32_t hkSolveConstraints(
                                     _mm_store_ss(&elemTemp->m_deltaRhs, _mm_add_ps(applied, _mm_set_ss(minImpulse)));
                                 }
                                 const float maxViolation = rel - pS->m_maxRhs;
-                                const float maxImpulse = maxViolation * a0[3];
+                                const float maxImpulse = maxViolation * XFNV_M128_F32(a0, 3);
                                 if (maxImpulse < static_cast<double>(negApplied)) {
                                     const __m128 impulse4 =
                                         _mm_shuffle_ps(_mm_set_ss(maxImpulse), _mm_set_ss(maxImpulse), 0);
@@ -1698,7 +1729,7 @@ int32_t hkSolveConstraints(
                                 );
                                 const float rel = _mm_cvtss_f32(_mm_sub_ps(_mm_shuffle_ps(l0, l0, 0xFF), dot));
                                 // x87 from here to the stores: the impulse, scaled down to the maximum impulse.
-                                float impulse = a0[3] * rel;
+                                float impulse = XFNV_M128_F32(a0, 3) * rel;
                                 const float absImpulse = std::fabs(static_cast<double>(impulse));
                                 double usedFactor;
                                 if (!(pS->m_maxImpulse < static_cast<double>(absImpulse))) {
@@ -1742,14 +1773,15 @@ int32_t hkSolveConstraints(
                                     elemTemp[2].m_deltaRhs;
                                 elemTemp[2].m_deltaRhs = target;
                                 const float damping = motor.m_damping;
-                                const float rhs = l0[3] + target;
+                                const float rhs = XFNV_M128_F32(l0, 3) + target;
                                 const float tau = motor.m_tau;
                                 const __m128 linDiff = _mm_sub_ps(_mm_sub_ps(linA, s0A), _mm_sub_ps(linB, s0B));
                                 const __m128 angDiffA = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
                                 const __m128 angDiffB = _mm_mul_ps(_mm_sub_ps(angB, s1B), a1);
                                 const __m128 velSum =
                                     _mm_add_ps(_mm_add_ps(angDiffB, angDiffA), _mm_mul_ps(linDiff, l0));
-                                const float tauFactor = tau * info.m_invIntegrateVelocityFactor.m_quad[0];
+                                const float tauFactor =
+                                    tau * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0);
                                 const __m128 posSum = _mm_add_ps(
                                     _mm_add_ps(_mm_mul_ps(s1B, a1), _mm_mul_ps(s1A, a0)),
                                     _mm_mul_ps(_mm_sub_ps(s0A, s0B), l0)
@@ -1765,7 +1797,7 @@ int32_t hkSolveConstraints(
                                 ));
                                 // x87 from here to the stores: the impulse clamped to the motor's range.
                                 const float rel = static_cast<double>(tau) * rhs - dot;
-                                float impulse = a0[3] * rel;
+                                float impulse = XFNV_M128_F32(a0, 3) * rel;
                                 const double impulseD = impulse;
                                 if (!(motor.m_maxImpulsePerSubstep < static_cast<double>(impulse))) {
                                     if (!(motor.m_minImpulsePerSubstep > impulseD)) {
@@ -1876,13 +1908,14 @@ int32_t hkSolveConstraints(
                                     reinterpret_cast<hkpJacobian1dAngularLimitsSchema*>(pSchema);
                                 const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                                 const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
-                                const float rhs = a1[3];
+                                const float rhs = XFNV_M128_F32(a1, 3);
                                 const double tau = pS->m_tau;
                                 const __m128 damping = _mm_set_ss(info.m_damping);
                                 const __m128 angDiffB = _mm_sub_ps(angB, s1B);
                                 const __m128 angDiffA = _mm_mul_ps(a0, _mm_sub_ps(angA, s1A));
                                 // x87: tau times the inverse integration factor, rounded to a float.
-                                const float tauFactor = tau * info.m_invIntegrateVelocityFactor.m_quad[0];
+                                const float tauFactor =
+                                    tau * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0);
                                 const __m128 sum = _mm_add_ps(
                                     _mm_mul_ps(
                                         _mm_shuffle_ps(damping, damping, 0),
@@ -1900,10 +1933,10 @@ int32_t hkSolveConstraints(
                                 const float rel = tau * rhs - dot;
                                 const float negApplied = -elemTemp->m_deltaRhs;
                                 const float minViolation = rel - pS->m_minRhs;
-                                const float minImpulse = minViolation * a0[3];
+                                const float minImpulse = minViolation * XFNV_M128_F32(a0, 3);
                                 if (!(negApplied < static_cast<double>(minImpulse))) {
                                     const float maxViolation = rel - pS->m_maxRhs;
-                                    const float maxImpulse = maxViolation * a0[3];
+                                    const float maxImpulse = maxViolation * XFNV_M128_F32(a0, 3);
                                     if (maxImpulse < static_cast<double>(negApplied)) {
                                         const __m128 impulse4 =
                                             _mm_shuffle_ps(_mm_set_ss(maxImpulse), _mm_set_ss(maxImpulse), 0);
@@ -1946,7 +1979,7 @@ int32_t hkSolveConstraints(
                                 );
                                 const float rel = _mm_cvtss_f32(_mm_sub_ps(_mm_shuffle_ps(a1, a1, 0xFF), dot));
                                 // x87 from here to the stores: the impulse, scaled down to the maximum impulse.
-                                float impulse = a0[3] * rel;
+                                float impulse = XFNV_M128_F32(a0, 3) * rel;
                                 const float absImpulse = std::fabs(static_cast<double>(impulse));
                                 double usedFactor;
                                 if (!(pS->m_maxImpulse < static_cast<double>(absImpulse))) {
@@ -1985,11 +2018,12 @@ int32_t hkSolveConstraints(
                                 elemTemp[2].m_deltaRhs = target;
                                 const float damping = motor.m_damping;
                                 const __m128 angDiffB = _mm_sub_ps(angB, s1B);
-                                const float rhs = a1[3] + target;
+                                const float rhs = XFNV_M128_F32(a1, 3) + target;
                                 const __m128 angDiffA = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
                                 const double tau = motor.m_tau;
                                 const __m128 velSum = _mm_add_ps(_mm_mul_ps(angDiffB, a1), angDiffA);
-                                const float tauFactor = tau * info.m_invIntegrateVelocityFactor.m_quad[0];
+                                const float tauFactor =
+                                    tau * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0);
                                 const __m128 posSum = _mm_add_ps(_mm_mul_ps(s1B, a1), _mm_mul_ps(s1A, a0));
                                 const __m128 posTerm =
                                     _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(tauFactor), _mm_set_ss(tauFactor), 0), posSum);
@@ -2002,7 +2036,7 @@ int32_t hkSolveConstraints(
                                 ));
                                 // x87 from here to the stores: the impulse clamped to the motor's range.
                                 const float rel = tau * rhs - dot;
-                                float impulse = a0[3] * rel;
+                                float impulse = XFNV_M128_F32(a0, 3) * rel;
                                 const double impulseD = impulse;
                                 if (!(motor.m_maxImpulsePerSubstep < static_cast<double>(impulse))) {
                                     if (!(motor.m_minImpulsePerSubstep > impulseD)) {
@@ -2143,11 +2177,11 @@ int32_t hkSolveConstraints(
                             );
                             const float rel1 = _mm_cvtss_f32(_mm_sub_ps(_mm_shuffle_ps(l1, l1, 0xFF), dot1));
                             // x87: both points' impulses through the pair's inverse 2x2 matrix.
-                            const float impulse0 = rel1 * pS->m_invJac01 + rel0 * a01[3];
-                            const float impulse1 = rel0 * pS->m_invJac01 + rel1 * a11[3];
+                            const float impulse0 = rel1 * pS->m_invJac01 + rel0 * XFNV_M128_F32(a01, 3);
+                            const float impulse1 = rel0 * pS->m_invJac01 + rel1 * XFNV_M128_F32(a11, 3);
                             bool bFirstOnly;
                             if (!(-elemTemp->m_deltaRhs < impulse0)) {
-                                const float impulse1Alone = rel1 * a10[3];
+                                const float impulse1Alone = rel1 * XFNV_M128_F32(a10, 3);
                                 bFirstOnly = -elemTemp[1].m_deltaRhs >= impulse1Alone;
                                 if (!bFirstOnly) {
                                     // The second point alone.
@@ -2244,8 +2278,8 @@ int32_t hkSolveConstraints(
                             const float rel1 = _mm_cvtss_f32(_mm_sub_ps(_mm_shuffle_ps(l1, l1, 0xFF), dot1));
                             // x87 from here to the stores: both impulses, scaled down together to the maximum impulse.
                             const float maxImpulseSqrd = pS->m_maxImpulse * pS->m_maxImpulse;
-                            float impulse0 = a01[3] * rel0 + rel1 * pS->m_invJac01;
-                            float impulse1 = rel0 * pS->m_invJac01 + rel1 * a11[3];
+                            float impulse0 = XFNV_M128_F32(a01, 3) * rel0 + rel1 * pS->m_invJac01;
+                            float impulse1 = rel0 * pS->m_invJac01 + rel1 * XFNV_M128_F32(a11, 3);
                             const float impulseSqrd = impulse1 * impulse1 + impulse0 * impulse0;
                             double usedFactor;
                             if (!(maxImpulseSqrd < static_cast<double>(impulseSqrd))) {
@@ -2319,9 +2353,9 @@ int32_t hkSolveConstraints(
                             const float rel2 = _mm_cvtss_f32(_mm_sub_ps(_mm_shuffle_ps(a21, a21, 0xFF), dot2));
                             // x87 from here to the stores: the three impulses, scaled down together to the maximum
                             // impulse.
-                            float impulse2 = rel2 * a20[3];
-                            float impulse0 = a01[3] * rel0 + rel1 * pS->m_invJac01;
-                            float impulse1 = rel0 * pS->m_invJac01 + rel1 * a11[3];
+                            float impulse2 = rel2 * XFNV_M128_F32(a20, 3);
+                            float impulse0 = XFNV_M128_F32(a01, 3) * rel0 + rel1 * pS->m_invJac01;
+                            float impulse1 = rel0 * pS->m_invJac01 + rel1 * XFNV_M128_F32(a11, 3);
                             const float impulseSqrd = impulse1 * impulse1 + impulse0 * impulse0 + impulse2 * impulse2;
                             const double impulseSqrdD = impulseSqrd;
                             const float maxImpulseSqrd = pS->m_maxImpulse * pS->m_maxImpulse;
@@ -2383,7 +2417,7 @@ int32_t hkSolveConstraints(
                             // maximum impulse.
                             const float maxImpulseSqrd = pS->m_maxImpulse * pS->m_maxImpulse;
                             const __m128 sum0 = _mm_add_ps(_mm_mul_ps(angB, a01), _mm_mul_ps(angA, a00));
-                            const double invDiag0 = a00[3];
+                            const double invDiag0 = XFNV_M128_F32(a00, 3);
                             const __m128 dot0 = _mm_add_ps(
                                 _mm_shuffle_ps(sum0, sum0, 0xAA), _mm_add_ps(_mm_shuffle_ps(sum0, sum0, 0x55), sum0)
                             );
@@ -2394,7 +2428,7 @@ int32_t hkSolveConstraints(
                                 _mm_shuffle_ps(sum1, sum1, 0xAA), _mm_add_ps(_mm_shuffle_ps(sum1, sum1, 0x55), sum1)
                             );
                             const float rel1 = _mm_cvtss_f32(_mm_sub_ps(_mm_shuffle_ps(a11, a11, 0xFF), dot1));
-                            float impulse1 = a10[3] * rel1;
+                            float impulse1 = XFNV_M128_F32(a10, 3) * rel1;
                             const float impulseSqrd = impulse0 * impulse0 + impulse1 * impulse1;
                             double usedFactor;
                             if (!(maxImpulseSqrd < static_cast<double>(impulseSqrd))) {
@@ -2441,7 +2475,7 @@ int32_t hkSolveConstraints(
                                 uAccA ^ (uMask & (reinterpret_cast<uintptr_t>(pAccB) ^ uAccA))
                             );
                             // x87: the integration factor times the step number, rounded to a float.
-                            const float x = info.m_integrateVelocityFactor.m_quad[0] *
+                            const float x = XFNV_M128_F32(info.m_integrateVelocityFactor.m_quad, 0) *
                                 static_cast<double>(stepTemp.m_currentStep.m_storage);
                             hkSimdReal sFactor(x);
                             const __m128 deltaVel = pS->m_deltaVel.m_quad;
@@ -2677,7 +2711,7 @@ void hkSolver_solveStiffSpringChain(
             reinterpret_cast<const hkpVelocityAccumulator*>(accumsBase + offsets[i + 1].m_offset);
         const hkp1Lin2AngJacobian& jac = jacobians[i];
         const float tau = chain->m_tau;
-        const float velocityFactor = info.m_invIntegrateVelocityFactor.m_quad[0] * tau;
+        const float velocityFactor = XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0) * tau;
         const hkQuadReal damping = _mm_shuffle_ps(_mm_set_ss(chain->m_damping), _mm_set_ss(chain->m_damping), 0);
         const hkQuadReal factor = _mm_shuffle_ps(_mm_set_ss(velocityFactor), _mm_set_ss(velocityFactor), 0);
         const hkQuadReal velTerm = _mm_mul_ps(
@@ -2710,9 +2744,9 @@ void hkSolver_solveStiffSpringChain(
         const hkQuadReal sum = _mm_add_ps(velTerm, _mm_mul_ps(posTerm, factor));
         // Sums (y + x) first, then z + that, each rounded to a float, as _ps operations.
         const hkQuadReal sumXY = _mm_add_ps(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(1, 1, 1, 1)), sum);
-        const float dot = _mm_add_ps(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(2, 2, 2, 2)), sumXY)[0];
+        const float dot = XFNV_M128_F32(_mm_add_ps(_mm_shuffle_ps(sum, sum, _MM_SHUFFLE(2, 2, 2, 2)), sumXY), 0);
         // The right-hand side is rounded to a float before the substitution.
-        float rhs = tau * jac.m_linear0.m_quad[3] - dot;
+        float rhs = tau * XFNV_M128_F32(jac.m_linear0.m_quad, 3) - dot;
         tempBuffer[i + 1] = (rhs - tempBuffer[i] * triples[i].m_lower) / triples[i].m_diagonal;
     }
 
@@ -2940,7 +2974,7 @@ void hkSolveApplyGravityByTheSteps(
             case hkpVelocityAccumulator::HK_END: return;
             default:
                 // Breaks here and then tests the end again without moving on, as the game does.
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
                 break;
         }
     }
@@ -2959,7 +2993,7 @@ int32_t hkSolveIntegrateVelocitiesByTheSteps(
 ) {
     const __m128 gravity = info.m_globalAccelerationPerSubStep.m_quad;
     // x87: the product rounded to a float.
-    const float factor = info.m_invNumSteps * info.m_invIntegrateVelocityFactor.m_quad[0];
+    const float factor = info.m_invNumSteps * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0);
     const __m128 factorV = _mm_set1_ps(factor);
     bool solveFinished = false;
     outSolveFinished.m_bool = 0;
@@ -3262,7 +3296,7 @@ void hkSolveStepJacobians(
                     const __m128& l0 = pS->m_jac.m_linear0.m_quad;
                     const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                     const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
-                    float v345 = l0[3];
+                    float v345 = XFNV_M128_F32(l0, 3);
                     double v204 = pS->m_tau;
                     float v205 = pS->m_damping;
                     __m128 m_quad_5 = l0;
@@ -3278,13 +3312,13 @@ void hkSolveStepJacobians(
                     __m128 v212 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(a1, v378), _mm_mul_ps(v376, a0)), _mm_mul_ps(l0, _mm_sub_ps(v383, v381))
                     );
-                    float v317 = v204 * info.m_invIntegrateVelocityFactor.m_quad[0u];
+                    float v317 = v204 * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u);
                     __m128 v213 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v317), _mm_set_ss(v317), 0), v212);
-                    v212[0] = v205;
+                    XFNV_M128_F32(v212, 0) = v205;
                     __m128 v214 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v212, v212, 0), v211), v213);
                     const __m128 v214Sum =
                         _mm_add_ps(_mm_shuffle_ps(v214, v214, 170), _mm_add_ps(_mm_shuffle_ps(v214, v214, 85), v214));
-                    float v362 = v214Sum[0];
+                    float v362 = XFNV_M128_F32(v214Sum, 0);
                     __m128 m_quad_7 = l0;
                     float v318 = v204 * v345 - v362;
                     __m128 v217 = _mm_mul_ps(_mm_set_ss(v318), _mm_shuffle_ps(a0, a0, 255));
@@ -3314,14 +3348,19 @@ void hkSolveStepJacobians(
                     __m128 v230 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(angA, a0)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
-                    float v366 = _mm_sub_ps(
-                        _mm_shuffle_ps(l0, l0, 255),
-                        _mm_add_ps(_mm_shuffle_ps(v230, v230, 170), _mm_add_ps(_mm_shuffle_ps(v230, v230, 85), v230))
-                    )[0];
+                    float v366 = XFNV_M128_F32(
+                        _mm_sub_ps(
+                            _mm_shuffle_ps(l0, l0, 255),
+                            _mm_add_ps(
+                                _mm_shuffle_ps(v230, v230, 170), _mm_add_ps(_mm_shuffle_ps(v230, v230, 85), v230)
+                            )
+                        ),
+                        0
+                    );
                     float v337 = v366;
                     float v321 = -tmp->m_deltaRhs;
                     float v292 = v366 - pS->m_minRhs;
-                    float v293 = v292 * a0[3];
+                    float v293 = v292 * XFNV_M128_F32(a0, 3);
                     if (v321 < static_cast<double>(v293)) {
                         __m128 v231 = _mm_shuffle_ps(_mm_set_ss(v293), _mm_set_ss(v293), 0);
                         __m128 v232 = _mm_mul_ps(invA, v231);
@@ -3335,7 +3374,7 @@ void hkSolveStepJacobians(
                         _mm_store_ss(&tmp->m_deltaRhs, _mm_add_ps(_mm_load_ss(&tmp->m_deltaRhs), v231));
                     }
                     float v294 = v337 - pS->m_maxRhs;
-                    float v295 = v294 * a0[3];
+                    float v295 = v294 * XFNV_M128_F32(a0, 3);
                     if (v295 < static_cast<double>(v321)) {
                         __m128 v236 = _mm_shuffle_ps(_mm_set_ss(v295), _mm_set_ss(v295), 0);
                         __m128 v237 = _mm_mul_ps(invB, v236);
@@ -3365,11 +3404,16 @@ void hkSolveStepJacobians(
                     __m128 v222 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(a1, angB), _mm_mul_ps(angA, a0)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                     );
-                    float v364 = _mm_sub_ps(
-                        _mm_shuffle_ps(l0, l0, 255),
-                        _mm_add_ps(_mm_shuffle_ps(v222, v222, 170), _mm_add_ps(_mm_shuffle_ps(v222, v222, 85), v222))
-                    )[0];
-                    float v291 = a0[3] * v364;
+                    float v364 = XFNV_M128_F32(
+                        _mm_sub_ps(
+                            _mm_shuffle_ps(l0, l0, 255),
+                            _mm_add_ps(
+                                _mm_shuffle_ps(v222, v222, 170), _mm_add_ps(_mm_shuffle_ps(v222, v222, 85), v222)
+                            )
+                        ),
+                        0
+                    );
+                    float v291 = XFNV_M128_F32(a0, 3) * v364;
                     float v319 = std::fabs(static_cast<double>(v291));
                     if (!(pS->m_maxImpulse < static_cast<double>(v319))) {
                         v223 = 1.0;
@@ -3408,7 +3452,7 @@ void hkSolveStepJacobians(
                     float v322 = motor.m_velocity * stepTemp.m_intregratePositions.m_storage + tmp[2].m_deltaRhs;
                     tmp[2].m_deltaRhs = v322;
                     float v242 = motor.m_damping;
-                    float v338 = l0[3] + v322;
+                    float v338 = XFNV_M128_F32(l0, 3) + v322;
                     float v323 = motor.m_tau;
                     __m128 v243 = _mm_sub_ps(_mm_sub_ps(linA, s0A), _mm_sub_ps(linB, s0B));
                     __m128 v244 = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
@@ -3420,18 +3464,18 @@ void hkSolveStepJacobians(
                     __m128 v386 = s1B;
                     __m128 v247 = _mm_add_ps(_mm_add_ps(v245, v244), _mm_mul_ps(v243, m_quad_8));
                     double v248 = v323;
-                    float v324 = v323 * info.m_invIntegrateVelocityFactor.m_quad[0u];
+                    float v324 = v323 * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u);
                     __m128 v249 = _mm_add_ps(
                         _mm_add_ps(_mm_mul_ps(v386, a1), _mm_mul_ps(v384, a0)), _mm_mul_ps(_mm_sub_ps(v380, v382), l0)
                     );
                     __m128 v250 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v324), _mm_set_ss(v324), 0), v249);
-                    v249[0] = v242;
+                    XFNV_M128_F32(v249, 0) = v242;
                     __m128 v251 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v249, v249, 0), v247), v250);
-                    float v353 = _mm_add_ps(
-                        _mm_shuffle_ps(v251, v251, 170), _mm_add_ps(_mm_shuffle_ps(v251, v251, 85), v251)
-                    )[0];
+                    float v353 = XFNV_M128_F32(
+                        _mm_add_ps(_mm_shuffle_ps(v251, v251, 170), _mm_add_ps(_mm_shuffle_ps(v251, v251, 85), v251)), 0
+                    );
                     float v325 = v248 * v338 - v353;
-                    double v252 = a0[3] * v325;
+                    double v252 = XFNV_M128_F32(a0, 3) * v325;
                     float v339 = v252;
                     double v253 = v339;
                     if (!(motor.m_maxImpulsePerSubstep < static_cast<double>(v339))) {
@@ -3497,7 +3541,7 @@ void hkSolveStepJacobians(
                 angA = _mm_add_ps(angA, v267);
                 angB = _mm_add_ps(angB, v268);
                 hkSimdReal sSum = sApplied + sImpulse;
-                tmp->m_deltaRhs = sSum.m_real[0];
+                tmp->m_deltaRhs = XFNV_M128_F32(sSum.m_real, 0);
                 ++tmp;
                 pSchema = reinterpret_cast<hkpJacobianSchema*>(pS + 1);
                 continue;
@@ -3533,7 +3577,7 @@ void hkSolveStepJacobians(
                     hkpJacobian1dAngularLimitsSchema* pS = reinterpret_cast<hkpJacobian1dAngularLimitsSchema*>(pSchema);
                     const __m128& a0 = pS->m_jac.m_angular[0].m_quad;
                     const __m128& a1 = pS->m_jac.m_angular[1].m_quad;
-                    float v284 = a1[3];
+                    float v284 = XFNV_M128_F32(a1, 3);
                     double v143 = pS->m_tau;
                     __m128 m_damping_low = _mm_set_ss(info.m_damping);
                     __m128 v145 = _mm_sub_ps(angB, s1B);
@@ -3541,7 +3585,7 @@ void hkSolveStepJacobians(
                     __m128 m_quad_10 = a1;
                     __m128 v385 = s1A;
                     __m128 v377 = s1B;
-                    float v311 = v143 * info.m_invIntegrateVelocityFactor.m_quad[0u];
+                    float v311 = v143 * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u);
                     __m128 v148 = _mm_add_ps(
                         _mm_mul_ps(
                             _mm_shuffle_ps(m_damping_low, m_damping_low, 0),
@@ -3552,13 +3596,13 @@ void hkSolveStepJacobians(
                             _mm_add_ps(_mm_mul_ps(v377, a1), _mm_mul_ps(a0, v385))
                         )
                     );
-                    float v354 = _mm_add_ps(
-                        _mm_shuffle_ps(v148, v148, 170), _mm_add_ps(_mm_shuffle_ps(v148, v148, 85), v148)
-                    )[0];
+                    float v354 = XFNV_M128_F32(
+                        _mm_add_ps(_mm_shuffle_ps(v148, v148, 170), _mm_add_ps(_mm_shuffle_ps(v148, v148, 85), v148)), 0
+                    );
                     float v356 = v143 * v284 - v354;
                     float v313 = -tmp->m_deltaRhs;
                     float v285 = v356 - pS->m_minRhs;
-                    float v286 = a0[3] * v285;
+                    float v286 = XFNV_M128_F32(a0, 3) * v285;
                     if (v313 < static_cast<double>(v286)) {
                         __m128 v149 = _mm_set_ss(v286);
                         __m128 v150 = _mm_shuffle_ps(v149, v149, 0);
@@ -3569,7 +3613,7 @@ void hkSolveStepJacobians(
                     }
                     else {
                         float v287 = v356 - pS->m_maxRhs;
-                        float v288 = a0[3] * v287;
+                        float v288 = XFNV_M128_F32(a0, 3) * v287;
                         if (v288 < static_cast<double>(v313)) {
                             __m128 v149 = _mm_set_ss(v288);
                             __m128 v153 = _mm_shuffle_ps(v149, v149, 0);
@@ -3596,11 +3640,16 @@ void hkSolveStepJacobians(
                     double v138;
                     __m128 m_quad_11 = a1;
                     __m128 v137 = _mm_add_ps(_mm_mul_ps(angB, m_quad_11), _mm_mul_ps(angA, a0));
-                    float v369 = _mm_sub_ps(
-                        _mm_shuffle_ps(m_quad_11, m_quad_11, 255),
-                        _mm_add_ps(_mm_shuffle_ps(v137, v137, 170), _mm_add_ps(_mm_shuffle_ps(v137, v137, 85), v137))
-                    )[0];
-                    float v283 = a0[3] * v369;
+                    float v369 = XFNV_M128_F32(
+                        _mm_sub_ps(
+                            _mm_shuffle_ps(m_quad_11, m_quad_11, 255),
+                            _mm_add_ps(
+                                _mm_shuffle_ps(v137, v137, 170), _mm_add_ps(_mm_shuffle_ps(v137, v137, 85), v137)
+                            )
+                        ),
+                        0
+                    );
+                    float v283 = XFNV_M128_F32(a0, 3) * v369;
                     float v309 = std::fabs(static_cast<double>(v283));
                     if (!(pS->m_maxImpulse < static_cast<double>(v309))) {
                         v138 = 1.0;
@@ -3634,23 +3683,23 @@ void hkSolveStepJacobians(
                     tmp[2].m_deltaRhs = v314;
                     float v155 = motor.m_damping;
                     __m128 v156 = _mm_sub_ps(angB, s1B);
-                    float v289 = a1[3] + v314;
+                    float v289 = XFNV_M128_F32(a1, 3) + v314;
                     __m128 v157 = _mm_mul_ps(_mm_sub_ps(angA, s1A), a0);
                     __m128 v158 = a1;
                     double v159 = motor.m_tau;
                     __m128 v375 = s1A;
                     __m128 v379 = s1B;
                     __m128 v160 = _mm_add_ps(_mm_mul_ps(v156, v158), v157);
-                    float v315 = v159 * info.m_invIntegrateVelocityFactor.m_quad[0u];
+                    float v315 = v159 * XFNV_M128_F32(info.m_invIntegrateVelocityFactor.m_quad, 0u);
                     __m128 v161 = _mm_add_ps(_mm_mul_ps(v379, a1), _mm_mul_ps(v375, a0));
                     __m128 v162 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v315), _mm_set_ss(v315), 0), v161);
-                    v161[0] = v155;
+                    XFNV_M128_F32(v161, 0) = v155;
                     __m128 v163 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v161, v161, 0), v160), v162);
-                    float v358 = _mm_add_ps(
-                        _mm_shuffle_ps(v163, v163, 170), _mm_add_ps(_mm_shuffle_ps(v163, v163, 85), v163)
-                    )[0];
+                    float v358 = XFNV_M128_F32(
+                        _mm_add_ps(_mm_shuffle_ps(v163, v163, 170), _mm_add_ps(_mm_shuffle_ps(v163, v163, 85), v163)), 0
+                    );
                     float v316 = v159 * v289 - v358;
-                    float v290 = a0[3] * v316;
+                    float v290 = XFNV_M128_F32(a0, 3) * v316;
                     double v164 = v290;
                     if (!(motor.m_maxImpulsePerSubstep < static_cast<double>(v290))) {
                         if (!(motor.m_minImpulsePerSubstep > v164)) {
@@ -3762,24 +3811,30 @@ void hkSolveStepJacobians(
                 __m128 v8 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(angA, a00)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v373 = _mm_sub_ps(
-                    _mm_shuffle_ps(l0, l0, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v8, v8, 170), _mm_add_ps(_mm_shuffle_ps(v8, v8, 85), v8))
-                )[0];
+                float v373 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(l0, l0, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v8, v8, 170), _mm_add_ps(_mm_shuffle_ps(v8, v8, 85), v8))
+                    ),
+                    0
+                );
                 float v392 = v373;
                 __m128 v11 = l1;
                 __m128 v12 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), v11)
                 );
-                float v13 = _mm_sub_ps(
-                    _mm_shuffle_ps(v11, v11, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v12, v12, 170), _mm_add_ps(_mm_shuffle_ps(v12, v12, 85), v12))
-                )[0];
-                float v328 = v373 * a01[3] + v13 * pS->m_invJac01;
-                float v276 = v373 * pS->m_invJac01 + v13 * a11[3];
+                float v13 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(v11, v11, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v12, v12, 170), _mm_add_ps(_mm_shuffle_ps(v12, v12, 85), v12))
+                    ),
+                    0
+                );
+                float v328 = v373 * XFNV_M128_F32(a01, 3) + v13 * pS->m_invJac01;
+                float v276 = v373 * pS->m_invJac01 + v13 * XFNV_M128_F32(a11, 3);
                 bool bFirstOnly;
                 if (!(-tmp->m_deltaRhs < v328)) {
-                    float v277 = v13 * a10[3];
+                    float v277 = v13 * XFNV_M128_F32(a10, 3);
                     bFirstOnly = -tmp[1].m_deltaRhs >= v277;
                     if (!bFirstOnly) {
                         // The second point alone.
@@ -3855,20 +3910,26 @@ void hkSolveStepJacobians(
                 __m128 v120 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(angA, a00)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v371 = _mm_sub_ps(
-                    _mm_shuffle_ps(l0, l0, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v120, v120, 170), _mm_add_ps(_mm_shuffle_ps(v120, v120, 85), v120))
-                )[0];
+                float v371 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(l0, l0, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v120, v120, 170), _mm_add_ps(_mm_shuffle_ps(v120, v120, 85), v120))
+                    ),
+                    0
+                );
                 __m128 v121 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(l1, _mm_sub_ps(linA, linB))
                 );
-                float v363 = _mm_sub_ps(
-                    _mm_shuffle_ps(l1, l1, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v121, v121, 170), _mm_add_ps(_mm_shuffle_ps(v121, v121, 85), v121))
-                )[0];
+                float v363 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(l1, l1, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v121, v121, 170), _mm_add_ps(_mm_shuffle_ps(v121, v121, 85), v121))
+                    ),
+                    0
+                );
                 float v344 = pS->m_maxImpulse * pS->m_maxImpulse;
-                float v335 = a01[3] * v371 + v363 * pS->m_invJac01;
-                float v282 = v371 * pS->m_invJac01 + v363 * a11[3];
+                float v335 = XFNV_M128_F32(a01, 3) * v371 + v363 * pS->m_invJac01;
+                float v282 = v371 * pS->m_invJac01 + v363 * XFNV_M128_F32(a11, 3);
                 float v306 = v282 * v282 + v335 * v335;
                 if (!(v344 < static_cast<double>(v306))) {
                     v122 = 1.0;
@@ -3921,26 +3982,35 @@ void hkSolveStepJacobians(
                 __m128 v97 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a01, angB), _mm_mul_ps(angA, a00)), _mm_mul_ps(_mm_sub_ps(linA, linB), l0)
                 );
-                float v359 = _mm_sub_ps(
-                    _mm_shuffle_ps(l0, l0, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v97, v97, 170), _mm_add_ps(_mm_shuffle_ps(v97, v97, 85), v97))
-                )[0];
+                float v359 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(l0, l0, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v97, v97, 170), _mm_add_ps(_mm_shuffle_ps(v97, v97, 85), v97))
+                    ),
+                    0
+                );
                 __m128 v98 = l1;
                 __m128 v99 = _mm_add_ps(
                     _mm_add_ps(_mm_mul_ps(a11, angB), _mm_mul_ps(a10, angA)), _mm_mul_ps(_mm_sub_ps(linA, linB), v98)
                 );
-                float v367 = _mm_sub_ps(
-                    _mm_shuffle_ps(v98, v98, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v99, v99, 170), _mm_add_ps(_mm_shuffle_ps(v99, v99, 85), v99))
-                )[0];
+                float v367 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(v98, v98, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v99, v99, 170), _mm_add_ps(_mm_shuffle_ps(v99, v99, 85), v99))
+                    ),
+                    0
+                );
                 __m128 v100 = _mm_add_ps(_mm_mul_ps(a21, angB), _mm_mul_ps(angA, a20));
-                float v361 = _mm_sub_ps(
-                    _mm_shuffle_ps(a21, a21, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v100, v100, 170), _mm_add_ps(_mm_shuffle_ps(v100, v100, 85), v100))
-                )[0];
-                float v333 = v361 * a20[3];
-                float v343 = a01[3] * v359 + pS->m_invJac01 * v367;
-                float v281 = v359 * pS->m_invJac01 + v367 * a11[3];
+                float v361 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(a21, a21, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v100, v100, 170), _mm_add_ps(_mm_shuffle_ps(v100, v100, 85), v100))
+                    ),
+                    0
+                );
+                float v333 = v361 * XFNV_M128_F32(a20, 3);
+                float v343 = XFNV_M128_F32(a01, 3) * v359 + pS->m_invJac01 * v367;
+                float v281 = v359 * pS->m_invJac01 + v367 * XFNV_M128_F32(a11, 3);
                 float v301 = v281 * v281 + v343 * v343 + v333 * v333;
                 double v101 = v301;
                 float v302 = pS->m_maxImpulse * pS->m_maxImpulse;
@@ -3998,18 +4068,24 @@ void hkSolveStepJacobians(
                 double v88;
                 float v298 = pS->m_maxImpulse * pS->m_maxImpulse;
                 __m128 v85 = _mm_add_ps(_mm_mul_ps(angB, a01), _mm_mul_ps(angA, a00));
-                double v86 = a00[3];
-                float v365 = _mm_sub_ps(
-                    _mm_shuffle_ps(a01, a01, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v85, v85, 170), _mm_add_ps(_mm_shuffle_ps(v85, v85, 85), v85))
-                )[0];
+                double v86 = XFNV_M128_F32(a00, 3);
+                float v365 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(a01, a01, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v85, v85, 170), _mm_add_ps(_mm_shuffle_ps(v85, v85, 85), v85))
+                    ),
+                    0
+                );
                 float v280 = v86 * v365;
                 __m128 v87 = _mm_add_ps(_mm_mul_ps(angB, a11), _mm_mul_ps(angA, a10));
-                float v357 = _mm_sub_ps(
-                    _mm_shuffle_ps(a11, a11, 255),
-                    _mm_add_ps(_mm_shuffle_ps(v87, v87, 170), _mm_add_ps(_mm_shuffle_ps(v87, v87, 85), v87))
-                )[0];
-                float v332 = a10[3] * v357;
+                float v357 = XFNV_M128_F32(
+                    _mm_sub_ps(
+                        _mm_shuffle_ps(a11, a11, 255),
+                        _mm_add_ps(_mm_shuffle_ps(v87, v87, 170), _mm_add_ps(_mm_shuffle_ps(v87, v87, 85), v87))
+                    ),
+                    0
+                );
+                float v332 = XFNV_M128_F32(a10, 3) * v357;
                 float v342 = v332 * v332 + v280 * v280;
                 if (!(v298 < static_cast<double>(v342))) {
                     v88 = 1.0;
@@ -4052,8 +4128,8 @@ void hkSolveStepJacobians(
                 hkpVelocityAccumulator* pAcc = reinterpret_cast<hkpVelocityAccumulator*>(
                     uAccA ^ (uMask & (reinterpret_cast<uintptr_t>(pAccB) ^ uAccA))
                 );
-                float x =
-                    info.m_integrateVelocityFactor.m_quad[0u] * static_cast<double>(stepTemp.m_currentStep.m_storage);
+                float x = XFNV_M128_F32(info.m_integrateVelocityFactor.m_quad, 0u) *
+                    static_cast<double>(stepTemp.m_currentStep.m_storage);
                 hkSimdReal sFactor(x);
                 __m128 m_quad_21 = pS->m_deltaVel.m_quad;
                 __m128 m_real = sFactor.m_real;
@@ -4104,7 +4180,7 @@ void hkSolveStepJacobians(
             }
             default: {
                 // Assert on an unknown schema type: trap, then return.
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
                 return;
             }
         }

@@ -2,12 +2,12 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
+#include "BSShader/ParticleShaderProperty.h"
 #include "Fallout/Magic/MagicHitEffect.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 
 class ActiveEffect;
-class ParticleShaderProperty;
 class TESBoundObject;
 class TESEffectShader;
 class TESObjectREFR;

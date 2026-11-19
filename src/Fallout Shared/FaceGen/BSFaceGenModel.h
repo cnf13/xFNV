@@ -10,8 +10,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/iosfwd.h"
 
-#include <__stddef_ptrdiff_t.h>
-#include <__stddef_size_t.h>
+#include <cstddef>
 #include <memory>
 #include <stdint.h>
 #include <string>

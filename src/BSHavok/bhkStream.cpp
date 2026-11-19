@@ -13,6 +13,10 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
+
+#include <bit>
+#include <cmath>
 
 // Both calls swap the same words at the creation info, treated as raw words (hence the char* casts); the array's three
 // words are read after the first one and written back after the second, being kept in locals across that call.
@@ -51,8 +55,10 @@ bool bhkStream::IsEqual(const hkArray<hkVector4>& arA, const hkArray<hkVector4>&
     for (int32_t i = 0; i < iSize; ++i) {
         const hkQuadReal& kA = arA.m_data[i].m_quad;
         const hkQuadReal& kB = arB.m_data[i].m_quad;
-        if (!(__builtin_fabsf(kA[0] - kB[0]) <= 0.001f) || !(__builtin_fabsf(kA[1] - kB[1]) <= 0.001f) ||
-            !(__builtin_fabsf(kA[2] - kB[2]) <= 0.001f) || !(__builtin_fabsf(kA[3] - kB[3]) <= 0.001f)) {
+        if (!(std::fabsf(XFNV_M128_F32(kA, 0) - XFNV_M128_F32(kB, 0)) <= 0.001f) ||
+            !(std::fabsf(XFNV_M128_F32(kA, 1) - XFNV_M128_F32(kB, 1)) <= 0.001f) ||
+            !(std::fabsf(XFNV_M128_F32(kA, 2) - XFNV_M128_F32(kB, 2)) <= 0.001f) ||
+            !(std::fabsf(XFNV_M128_F32(kA, 3) - XFNV_M128_F32(kB, 3)) <= 0.001f)) {
             return false;
         }
     }
@@ -137,10 +143,10 @@ int32_t bhkStream::LoadBinary(NiStream& arStream, hkpMoppCode*& arMoppCode) {
     // Compares the flag byte with 1, and swaps the info's four floats as raw 32-bit words.
     if (arStream.m_bSourceIsLittleEndian != 1) {
         uint32_t* puiInfo = reinterpret_cast<uint32_t*>(&arMoppCode->m_info.m_offset.m_quad);
-        puiInfo[0] = __builtin_bswap32(puiInfo[0]);
-        puiInfo[1] = __builtin_bswap32(puiInfo[1]);
-        puiInfo[2] = __builtin_bswap32(puiInfo[2]);
-        puiInfo[3] = __builtin_bswap32(puiInfo[3]);
+        puiInfo[0] = std::byteswap<uint32_t>(puiInfo[0]);
+        puiInfo[1] = std::byteswap<uint32_t>(puiInfo[1]);
+        puiInfo[2] = std::byteswap<uint32_t>(puiInfo[2]);
+        puiInfo[3] = std::byteswap<uint32_t>(puiInfo[3]);
     }
     riMemContext = iOldMemContext;
     return iSize;
@@ -154,7 +160,7 @@ int32_t bhkStream::SaveBinary(NiStream& arStream, hkArray<uint32_t>& arArray) {
     for (int32_t i = 0; i < iSize; ++i) {
         uint32_t uiValue = arArray.m_data[i];
         if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-            uiValue = __builtin_bswap32(uiValue);
+            uiValue = std::byteswap<uint32_t>(uiValue);
         }
         NiStreamSaveBinary(arStream, uiValue);
     }

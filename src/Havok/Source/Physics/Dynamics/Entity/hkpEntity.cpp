@@ -48,6 +48,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "Havok/Source/Physics/Utilities/Destruction/BreakOffParts/hkpBreakOffPartsUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -508,9 +509,9 @@ void hkpEntity::deactivate() {
             hkpEntity** m_data = v5->m_entities.begin();
             do {
                 hkpEntity* v8 = *m_data;
-                v8->m_motion.m_deactivationRefPosition[0].m_quad[3] = 3.40282e+38f;
+                XFNV_M128_F32(v8->m_motion.m_deactivationRefPosition[0].m_quad, 3) = 3.40282e+38f;
                 ++v6;
-                v8->m_motion.m_deactivationRefPosition[1].m_quad[3] = 3.40282e+38f;
+                XFNV_M128_F32(v8->m_motion.m_deactivationRefPosition[1].m_quad, 3) = 3.40282e+38f;
                 ++m_data;
             }
             while (v6 < v5->m_entities.m_size);
@@ -705,7 +706,9 @@ const hkArray<hkpConstraintInstance*, hkContainerHeapAllocator>& hkpEntity::getC
 }
 
 double hkpEntity::getMotionMassInv() {
-    return _mm_shuffle_ps(m_motion.m_inertiaAndMassInv.m_quad, m_motion.m_inertiaAndMassInv.m_quad, 255)[0];
+    return XFNV_M128_F32(
+        _mm_shuffle_ps(m_motion.m_inertiaAndMassInv.m_quad, m_motion.m_inertiaAndMassInv.m_quad, 255), 0
+    );
 }
 
 hkBool* hkEntity_isActive(const hkpEntity* entity, hkBool* apResult) {

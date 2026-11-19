@@ -17,6 +17,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> fLevelScalingMult("fLevelScalingMult", 0.6f);
@@ -47,7 +48,7 @@ bool BGSEncounterZone::Load(TESFile* apFile) {
         }
         else if (eChunk == EDID_ID) {
             // Allocates the chunk's size on the stack and reads at most 0x200 bytes.
-            char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
             apFile->GetChunkData(pEditorID, 0x200u);
             // Calls the form's own override through the vtable.
             TESForm* pForm = this;

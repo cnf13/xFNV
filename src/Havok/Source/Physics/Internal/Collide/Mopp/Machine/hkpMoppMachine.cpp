@@ -11,6 +11,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppKDopGeometriesVirtualMachine.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppModifyVirtualMachine.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppSphereVirtualMachine.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -100,10 +101,10 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                 // A split along one axis, the right child an 8-bit offset away.
                 const int32_t axis = command - 16;
                 rightAabb = fQueryL;
-                fQueryL.m_aabb.m_max.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[1] << query->m_shift)) * m_ItoFScale
                 );
-                rightAabb.m_aabb.m_min.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_min.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[2] << query->m_shift)) * m_ItoFScale
                 );
                 leftOffset = 0;
@@ -135,10 +136,10 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                 // A single plane along one axis: the right child an 8-bit offset away.
                 const int32_t axis = command - 32;
                 rightAabb = fQueryL;
-                rightAabb.m_aabb.m_min.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_min.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[1] << query->m_shift)) * m_ItoFScale
                 );
-                fQueryL.m_aabb.m_max.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + ((PC[1] + 1) << query->m_shift)) * m_ItoFScale
                 );
                 leftOffset = 0;
@@ -152,10 +153,10 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                 // A split along one axis with 16-bit offsets to both children.
                 const int32_t axis = command - 35;
                 rightAabb = fQueryL;
-                fQueryL.m_aabb.m_max.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[1] << query->m_shift)) * m_ItoFScale
                 );
-                rightAabb.m_aabb.m_min.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_min.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[2] << query->m_shift)) * m_ItoFScale
                 );
                 leftOffset = (PC[3] << 8) + PC[4];
@@ -168,10 +169,10 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
             case 40: {
                 // Cuts the box to the node's bounds along one axis.
                 const int32_t axis = command - 38;
-                fQueryL.m_aabb.m_min.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_min.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[1] << query->m_shift)) * m_ItoFScale
                 );
-                fQueryL.m_aabb.m_max.m_quad[axis] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, axis) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[axis] + (PC[2] << query->m_shift)) * m_ItoFScale
                 );
                 PC += 3;
@@ -182,9 +183,9 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
             case 43: {
                 // Cuts the box to 24-bit bounds of the unscaled space along one axis.
                 const int32_t axis = command - 41;
-                fQueryL.m_aabb.m_min.m_quad[axis] =
+                XFNV_M128_F32(fQueryL.m_aabb.m_min.m_quad, axis) =
                     static_cast<float>(static_cast<double>((((PC[1] << 8) + PC[2]) << 8) + PC[3]) * m_ItoFScale);
-                fQueryL.m_aabb.m_max.m_quad[axis] =
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, axis) =
                     static_cast<float>(static_cast<double>((((PC[4] << 8) + PC[5]) << 8) + PC[6]) * m_ItoFScale);
                 PC += 7;
             }
@@ -285,7 +286,7 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                         "hkpMoppUsingFloatAabbVirtualMachine.inl",
                         301
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -294,22 +295,22 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
         while (PC[leftOffset] >= 38 && PC[leftOffset] <= 43) {
             const int32_t cut = PC[leftOffset];
             if (cut >= 41) {
-                fQueryL.m_aabb.m_min.m_quad[cut - 41] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_min.m_quad, cut - 41) = static_cast<float>(
                     static_cast<double>((((PC[leftOffset + 1] << 8) + PC[leftOffset + 2]) << 8) + PC[leftOffset + 3]) *
                     m_ItoFScale
                 );
-                fQueryL.m_aabb.m_max.m_quad[cut - 41] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, cut - 41) = static_cast<float>(
                     static_cast<double>((((PC[leftOffset + 4] << 8) + PC[leftOffset + 5]) << 8) + PC[leftOffset + 6]) *
                     m_ItoFScale
                 );
                 leftOffset += 7;
             }
             else {
-                fQueryL.m_aabb.m_min.m_quad[cut - 38] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_min.m_quad, cut - 38) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[cut - 38] + (PC[leftOffset + 1] << query->m_shift)) *
                     m_ItoFScale
                 );
-                fQueryL.m_aabb.m_max.m_quad[cut - 38] = static_cast<float>(
+                XFNV_M128_F32(fQueryL.m_aabb.m_max.m_quad, cut - 38) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[cut - 38] + (PC[leftOffset + 2] << query->m_shift)) *
                     m_ItoFScale
                 );
@@ -319,13 +320,13 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
         while (PC[rightOffset] >= 38 && PC[rightOffset] <= 43) {
             const int32_t cut = PC[rightOffset];
             if (cut >= 41) {
-                rightAabb.m_aabb.m_min.m_quad[cut - 41] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_min.m_quad, cut - 41) = static_cast<float>(
                     static_cast<double>(
                         (((PC[rightOffset + 1] << 8) + PC[rightOffset + 2]) << 8) + PC[rightOffset + 3]
                     ) *
                     m_ItoFScale
                 );
-                rightAabb.m_aabb.m_max.m_quad[cut - 41] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_max.m_quad, cut - 41) = static_cast<float>(
                     static_cast<double>(
                         (((PC[rightOffset + 4] << 8) + PC[rightOffset + 5]) << 8) + PC[rightOffset + 6]
                     ) *
@@ -334,11 +335,11 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                 rightOffset += 7;
             }
             else {
-                rightAabb.m_aabb.m_min.m_quad[cut - 38] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_min.m_quad, cut - 38) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[cut - 38] + (PC[rightOffset + 1] << query->m_shift)) *
                     m_ItoFScale
                 );
-                rightAabb.m_aabb.m_max.m_quad[cut - 38] = static_cast<float>(
+                XFNV_M128_F32(rightAabb.m_aabb.m_max.m_quad, cut - 38) = static_cast<float>(
                     static_cast<double>((&query->m_offset_x)[cut - 38] + (PC[rightOffset + 2] << query->m_shift)) *
                     m_ItoFScale
                 );
@@ -473,7 +474,7 @@ void hkMoppUsingFloatAabbVirtualMachine_queryPlanes(
     kQuery.m_shift = 16;
     kAabb.m_aabb.m_min.m_quad = _mm_setzero_ps();
     machine.m_queryObject.m_numTransforms = 0;
-    machine.m_ItoFScale = 1.0 / code->m_info.m_offset.m_quad[3];
+    machine.m_ItoFScale = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     const float fMax = machine.m_ItoFScale * 16777216.0;
     kAabb.m_aabb.m_max.m_quad = _mm_set1_ps(fMax);
     hkTransform* pRotated = machine.m_queryObject.m_rotatedPlanes;
@@ -482,14 +483,22 @@ void hkMoppUsingFloatAabbVirtualMachine_queryPlanes(
         uint32_t numGroups = ((static_cast<uint32_t>(numPlanes & ~3) - 1) >> 2) + 1;
         numGrouped = static_cast<int32_t>(numGroups * 4);
         do {
-            pRotated->m_rotation.m_col0.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[0], pPlane[1].m_quad[0], pPlane[2].m_quad[0], pPlane[3].m_quad[0]);
-            pRotated->m_rotation.m_col1.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[1], pPlane[1].m_quad[1], pPlane[2].m_quad[1], pPlane[3].m_quad[1]);
-            pRotated->m_rotation.m_col2.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[2], pPlane[1].m_quad[2], pPlane[2].m_quad[2], pPlane[3].m_quad[2]);
-            pRotated->m_translation.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[3], pPlane[1].m_quad[3], pPlane[2].m_quad[3], pPlane[3].m_quad[3]);
+            pRotated->m_rotation.m_col0.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 0), XFNV_M128_F32(pPlane[1].m_quad, 0),
+                XFNV_M128_F32(pPlane[2].m_quad, 0), XFNV_M128_F32(pPlane[3].m_quad, 0)
+            );
+            pRotated->m_rotation.m_col1.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 1), XFNV_M128_F32(pPlane[1].m_quad, 1),
+                XFNV_M128_F32(pPlane[2].m_quad, 1), XFNV_M128_F32(pPlane[3].m_quad, 1)
+            );
+            pRotated->m_rotation.m_col2.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 2), XFNV_M128_F32(pPlane[1].m_quad, 2),
+                XFNV_M128_F32(pPlane[2].m_quad, 2), XFNV_M128_F32(pPlane[3].m_quad, 2)
+            );
+            pRotated->m_translation.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 3), XFNV_M128_F32(pPlane[1].m_quad, 3),
+                XFNV_M128_F32(pPlane[2].m_quad, 3), XFNV_M128_F32(pPlane[3].m_quad, 3)
+            );
             ++pRotated;
             pPlane += 4;
             ++machine.m_queryObject.m_numTransforms;
@@ -500,14 +509,22 @@ void hkMoppUsingFloatAabbVirtualMachine_queryPlanes(
     if (numLeft == 1 || numLeft == 2 || numLeft == 3) {
         const hkVector4* pSecond = numLeft == 1 ? pPlane : pPlane + 1;
         const hkVector4* pThird = numLeft == 3 ? pPlane + 2 : pPlane;
-        pRotated->m_rotation.m_col0.m_quad =
-            _mm_setr_ps(pPlane->m_quad[0], pSecond->m_quad[0], pThird->m_quad[0], pPlane->m_quad[0]);
-        pRotated->m_rotation.m_col1.m_quad =
-            _mm_setr_ps(pPlane->m_quad[1], pSecond->m_quad[1], pThird->m_quad[1], pPlane->m_quad[1]);
-        pRotated->m_rotation.m_col2.m_quad =
-            _mm_setr_ps(pPlane->m_quad[2], pSecond->m_quad[2], pThird->m_quad[2], pPlane->m_quad[2]);
-        pRotated->m_translation.m_quad =
-            _mm_setr_ps(pPlane->m_quad[3], pSecond->m_quad[3], pThird->m_quad[3], pPlane->m_quad[3]);
+        pRotated->m_rotation.m_col0.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 0), XFNV_M128_F32(pSecond->m_quad, 0), XFNV_M128_F32(pThird->m_quad, 0),
+            XFNV_M128_F32(pPlane->m_quad, 0)
+        );
+        pRotated->m_rotation.m_col1.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 1), XFNV_M128_F32(pSecond->m_quad, 1), XFNV_M128_F32(pThird->m_quad, 1),
+            XFNV_M128_F32(pPlane->m_quad, 1)
+        );
+        pRotated->m_rotation.m_col2.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 2), XFNV_M128_F32(pSecond->m_quad, 2), XFNV_M128_F32(pThird->m_quad, 2),
+            XFNV_M128_F32(pPlane->m_quad, 2)
+        );
+        pRotated->m_translation.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 3), XFNV_M128_F32(pSecond->m_quad, 3), XFNV_M128_F32(pThird->m_quad, 3),
+            XFNV_M128_F32(pPlane->m_quad, 3)
+        );
         ++machine.m_queryObject.m_numTransforms;
     }
     for (int32_t i = machine.m_queryObject.m_numTransforms - 1; i >= 0; --i) {
@@ -555,7 +572,7 @@ void hkMoppUsingFloatAabbVirtualMachine_queryPlanesOptimized(
     kQuery.m_shift = 16;
     kAabb.m_aabb.m_min.m_quad = _mm_setzero_ps();
     machine.m_queryObject.m_numTransforms = 0;
-    machine.m_ItoFScale = 1.0 / code->m_info.m_offset.m_quad[3];
+    machine.m_ItoFScale = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     const float fMax = machine.m_ItoFScale * 16777216.0;
     kAabb.m_aabb.m_max.m_quad = _mm_set1_ps(fMax);
     hkTransform* pRotated = machine.m_queryObject.m_rotatedPlanes;
@@ -564,14 +581,22 @@ void hkMoppUsingFloatAabbVirtualMachine_queryPlanesOptimized(
         uint32_t numGroups = ((static_cast<uint32_t>(numPlanes & ~3) - 1) >> 2) + 1;
         numGrouped = static_cast<int32_t>(numGroups * 4);
         do {
-            pRotated->m_rotation.m_col0.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[0], pPlane[1].m_quad[0], pPlane[2].m_quad[0], pPlane[3].m_quad[0]);
-            pRotated->m_rotation.m_col1.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[1], pPlane[1].m_quad[1], pPlane[2].m_quad[1], pPlane[3].m_quad[1]);
-            pRotated->m_rotation.m_col2.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[2], pPlane[1].m_quad[2], pPlane[2].m_quad[2], pPlane[3].m_quad[2]);
-            pRotated->m_translation.m_quad =
-                _mm_setr_ps(pPlane[0].m_quad[3], pPlane[1].m_quad[3], pPlane[2].m_quad[3], pPlane[3].m_quad[3]);
+            pRotated->m_rotation.m_col0.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 0), XFNV_M128_F32(pPlane[1].m_quad, 0),
+                XFNV_M128_F32(pPlane[2].m_quad, 0), XFNV_M128_F32(pPlane[3].m_quad, 0)
+            );
+            pRotated->m_rotation.m_col1.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 1), XFNV_M128_F32(pPlane[1].m_quad, 1),
+                XFNV_M128_F32(pPlane[2].m_quad, 1), XFNV_M128_F32(pPlane[3].m_quad, 1)
+            );
+            pRotated->m_rotation.m_col2.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 2), XFNV_M128_F32(pPlane[1].m_quad, 2),
+                XFNV_M128_F32(pPlane[2].m_quad, 2), XFNV_M128_F32(pPlane[3].m_quad, 2)
+            );
+            pRotated->m_translation.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pPlane[0].m_quad, 3), XFNV_M128_F32(pPlane[1].m_quad, 3),
+                XFNV_M128_F32(pPlane[2].m_quad, 3), XFNV_M128_F32(pPlane[3].m_quad, 3)
+            );
             ++pRotated;
             pPlane += 4;
             ++machine.m_queryObject.m_numTransforms;
@@ -582,14 +607,22 @@ void hkMoppUsingFloatAabbVirtualMachine_queryPlanesOptimized(
     if (numLeft == 1 || numLeft == 2 || numLeft == 3) {
         const hkVector4* pSecond = numLeft == 1 ? pPlane : pPlane + 1;
         const hkVector4* pThird = numLeft == 3 ? pPlane + 2 : pPlane;
-        pRotated->m_rotation.m_col0.m_quad =
-            _mm_setr_ps(pPlane->m_quad[0], pSecond->m_quad[0], pThird->m_quad[0], pPlane->m_quad[0]);
-        pRotated->m_rotation.m_col1.m_quad =
-            _mm_setr_ps(pPlane->m_quad[1], pSecond->m_quad[1], pThird->m_quad[1], pPlane->m_quad[1]);
-        pRotated->m_rotation.m_col2.m_quad =
-            _mm_setr_ps(pPlane->m_quad[2], pSecond->m_quad[2], pThird->m_quad[2], pPlane->m_quad[2]);
-        pRotated->m_translation.m_quad =
-            _mm_setr_ps(pPlane->m_quad[3], pSecond->m_quad[3], pThird->m_quad[3], pPlane->m_quad[3]);
+        pRotated->m_rotation.m_col0.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 0), XFNV_M128_F32(pSecond->m_quad, 0), XFNV_M128_F32(pThird->m_quad, 0),
+            XFNV_M128_F32(pPlane->m_quad, 0)
+        );
+        pRotated->m_rotation.m_col1.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 1), XFNV_M128_F32(pSecond->m_quad, 1), XFNV_M128_F32(pThird->m_quad, 1),
+            XFNV_M128_F32(pPlane->m_quad, 1)
+        );
+        pRotated->m_rotation.m_col2.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 2), XFNV_M128_F32(pSecond->m_quad, 2), XFNV_M128_F32(pThird->m_quad, 2),
+            XFNV_M128_F32(pPlane->m_quad, 2)
+        );
+        pRotated->m_translation.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pPlane->m_quad, 3), XFNV_M128_F32(pSecond->m_quad, 3), XFNV_M128_F32(pThird->m_quad, 3),
+            XFNV_M128_F32(pPlane->m_quad, 3)
+        );
         ++machine.m_queryObject.m_numTransforms;
     }
     for (int32_t i = machine.m_queryObject.m_numTransforms - 1; i >= 0; --i) {
@@ -659,13 +692,13 @@ void hkMoppUsingFloatAabbVirtualMachine_querySphere(
     kQuery.m_offset_y = 0;
     kQuery.m_offset_z = 0;
     kQuery.m_shift = 16;
-    machine.m_ItoFScale = 1.0 / code->m_info.m_offset.m_quad[3];
+    machine.m_ItoFScale = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     const float fMax = machine.m_ItoFScale * 16777216.0;
     kAabb.m_aabb.m_max.m_quad = _mm_set1_ps(fMax);
-    const float fRadius = query.m_pos.m_quad[3] + query.m_pos.m_quad[3];
+    const float fRadius = XFNV_M128_F32(query.m_pos.m_quad, 3) + XFNV_M128_F32(query.m_pos.m_quad, 3);
     const __m128 centre = _mm_sub_ps(query.m_pos.m_quad, offset);
     machine.m_queryObject.m_sphere2.m_pos.m_quad = _mm_add_ps(centre, centre);
-    machine.m_queryObject.m_sphere2.m_pos.m_quad[3] = fRadius;
+    XFNV_M128_F32(machine.m_queryObject.m_sphere2.m_pos.m_quad, 3) = fRadius;
     machine.m_queryObject.m_primitives_out = fullyIncludedHitsOut;
     machine.queryMoppTree(&kQuery, pCommands, kAabb);
 }
@@ -692,13 +725,13 @@ void hkMoppUsingFloatAabbVirtualMachine_querySphereOptimized(
     kQuery.m_offset_y = 0;
     kQuery.m_offset_z = 0;
     kQuery.m_shift = 16;
-    machine.m_ItoFScale = 1.0 / code->m_info.m_offset.m_quad[3];
+    machine.m_ItoFScale = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     const float fMax = machine.m_ItoFScale * 16777216.0;
     kAabb.m_aabb.m_max.m_quad = _mm_set1_ps(fMax);
-    const float fRadius = query.m_pos.m_quad[3] + query.m_pos.m_quad[3];
+    const float fRadius = XFNV_M128_F32(query.m_pos.m_quad, 3) + XFNV_M128_F32(query.m_pos.m_quad, 3);
     const __m128 centre = _mm_sub_ps(query.m_pos.m_quad, offset);
     machine.m_queryObject.m_sphere2.m_pos.m_quad = _mm_add_ps(centre, centre);
-    machine.m_queryObject.m_sphere2.m_pos.m_quad[3] = fRadius;
+    XFNV_M128_F32(machine.m_queryObject.m_sphere2.m_pos.m_quad, 3) = fRadius;
     machine.m_queryObject.m_primitives_out = fullyIncludedHitsOut;
     machine.queryMoppTree(&kQuery, pCommands, kAabb);
 }

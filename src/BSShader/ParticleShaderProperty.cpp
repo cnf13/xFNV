@@ -45,6 +45,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
+#include <cmath>
 #include <cstdint>
 
 NiRTTI ParticleShaderProperty::ms_RTTI("ParticleShaderProperty", &BSShaderProperty::ms_RTTI);
@@ -227,7 +228,7 @@ void ParticleShaderProperty::InitParticleData(float afTime) {
 // ray), not the EMITTER_TYPE names.
 void ParticleShaderProperty::UpdateParticles(float afTime, bool abNeedsOffset, bool abGenerateNew) {
     float fDelta = afTime - fTimer;
-    float fElapsed = __builtin_fabsf(fDelta);
+    float fElapsed = std::fabsf(fDelta);
     int32_t iMaxSize = static_cast<int32_t>(ParticleShader::GetMaxInstanceSize());
     int32_t iCap = static_cast<int32_t>(static_cast<double>(fMaxParticleRatio) * iMaxSize);
     int32_t iLimit = iMaxSize;

@@ -20,6 +20,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSDebrisData::BGSDebrisData() : cPercentage(10), cFlags(0), pFileName(nullptr), TextureList() {}
 
@@ -110,7 +111,7 @@ bool BGSDebris::Load(TESFile* apFile) {
         }
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0x200);
             SetFormEditorID(pBuffer);
         }

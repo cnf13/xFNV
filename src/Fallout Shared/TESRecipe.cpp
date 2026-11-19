@@ -15,6 +15,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/tchar.h"
+#include "xfnv/Compiler.h"
 
 void RECIPE_DATA::Endian() {
     ENDIAN(ReqSkillId, false);
@@ -93,7 +94,7 @@ bool TESRecipe::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first.
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);
@@ -451,7 +452,7 @@ bool TESRecipeCategory::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;

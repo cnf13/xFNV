@@ -10,6 +10,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 bool MagicItemObject::Load(TESFile* apFile) {
     LoadForm(apFile);
@@ -27,7 +28,7 @@ bool MagicItemObject::Load(TESFile* apFile) {
                 break;
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

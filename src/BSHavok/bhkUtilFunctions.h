@@ -130,3 +130,9 @@ namespace bhkUtilFunctions {
         uint32_t auiCurLevel
     );
 } // namespace bhkUtilFunctions
+
+// For the AVLevel array, SetAt inserts aValue at aiIndex, moving the later items up. Its caller (bhkUtilFunctions.cpp,
+// apQueue.SetAt(0, ...)) relies on that. Defined in BSSimpleArray.cpp. Declared here, where AVLevel is complete: the
+// declaration instantiates the class, and cl compiles its virtual members with it.
+template <>
+void BSSimpleArray<bhkUtilFunctions::AVLevel, 1024>::SetAt(uint32_t aiIndex, const bhkUtilFunctions::AVLevel& aValue);

@@ -110,10 +110,12 @@ template class ListBox<TESChallenge*>;
 template class ListBox<StartMenu::Option*>;
 template class ListBox<BGSSaveLoadFileEntry*>;
 
-// RemoveItemGroup and BuildFromContainer work on ItemChange data: defined after the instantiations above, so that only
-// ListBox<ItemChange*> instantiates them.
+// RemoveItemGroup and BuildFromContainer work on ItemChange data: their constraint keeps every other list's
+// instantiation from compiling them.
 template <class T>
-void ListBox<T>::RemoveItemGroup(TESBoundObject* apRemoveObj) {
+void ListBox<T>::RemoveItemGroup(TESBoundObject* apRemoveObj)
+requires std::same_as<T, ItemChange*>
+{
     BSSimpleList<ListBoxItem<T>*> kRemoveList;
     for (ListBoxItem<T>*& rpItem : static_cast<BSSimpleList<ListBoxItem<T>*>*>(this)->ItemsUntilNull()) {
         if (rpItem->data && rpItem->data->pContainerObj == apRemoveObj) {
@@ -135,7 +137,9 @@ void ListBox<T>::BuildFromContainer(
     void (*apInitFn)(Tile*, T),
     bool abNoStack,
     bool abBarter
-) {
+)
+requires std::same_as<T, ItemChange*>
+{
     if (!apContainer || !pContainerRect || !pTemplateName) {
         return;
     }

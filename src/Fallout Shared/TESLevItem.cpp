@@ -12,6 +12,7 @@
 #include "Fallout Shared/TESObject.h"
 #include "Fallout/AI/BaseProcess.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
+#include "xfnv/Compiler.h"
 
 // The entry the last LVLO chunk created; the COED chunk that follows gives it its extra data
 // (TESLevItem::Load's function-local static plastload).
@@ -39,7 +40,7 @@ bool TESLevItem::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);

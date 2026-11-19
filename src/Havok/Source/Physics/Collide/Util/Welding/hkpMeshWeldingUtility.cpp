@@ -40,6 +40,7 @@
 #include "Havok/Source/Physics/Collide/Util/hkpTriangleUtil.h"
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpBuildJacobianFromAtoms.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -55,29 +56,29 @@ hkBool hkClipEdgeAgainstPlanes(
     float& tStart,
     float& tEnd
 ) {
-    float fStartX = edgeStart.m_quad[0];
-    float fStartY = edgeStart.m_quad[1];
-    float fStartZ = edgeStart.m_quad[2];
-    float fEndX = edgeEnd.m_quad[0];
-    float fEndY = edgeEnd.m_quad[1];
-    float fEndZ = edgeEnd.m_quad[2];
+    float fStartX = XFNV_M128_F32(edgeStart.m_quad, 0);
+    float fStartY = XFNV_M128_F32(edgeStart.m_quad, 1);
+    float fStartZ = XFNV_M128_F32(edgeStart.m_quad, 2);
+    float fEndX = XFNV_M128_F32(edgeEnd.m_quad, 0);
+    float fEndY = XFNV_M128_F32(edgeEnd.m_quad, 1);
+    float fEndZ = XFNV_M128_F32(edgeEnd.m_quad, 2);
 
     for (int32_t i = 0; i < numPlanes; ++i) {
         const hkQuadReal& kPlane = planes[i].m_quad;
 
         // The signed distances of the two ends: the plane's w plus the dot product of its normal with the end.
-        const float fStartDotX = kPlane[0] * fStartX;
-        const float fStartDotY = kPlane[1] * fStartY;
-        const float fStartDotZ = kPlane[2] * fStartZ;
+        const float fStartDotX = XFNV_M128_F32(kPlane, 0) * fStartX;
+        const float fStartDotY = XFNV_M128_F32(kPlane, 1) * fStartY;
+        const float fStartDotZ = XFNV_M128_F32(kPlane, 2) * fStartZ;
         const float fStartDotXY = fStartDotY + fStartDotX;
         const float fStartDot = fStartDotZ + fStartDotXY;
-        const float fDistStart = kPlane[3] + fStartDot;
-        const float fEndDotX = fEndX * kPlane[0];
-        const float fEndDotY = fEndY * kPlane[1];
-        const float fEndDotZ = fEndZ * kPlane[2];
+        const float fDistStart = XFNV_M128_F32(kPlane, 3) + fStartDot;
+        const float fEndDotX = fEndX * XFNV_M128_F32(kPlane, 0);
+        const float fEndDotY = fEndY * XFNV_M128_F32(kPlane, 1);
+        const float fEndDotZ = fEndZ * XFNV_M128_F32(kPlane, 2);
         const float fEndDotXY = fEndDotY + fEndDotX;
         const float fEndDot = fEndDotZ + fEndDotXY;
-        const float fDistEnd = kPlane[3] + fEndDot;
+        const float fDistEnd = XFNV_M128_F32(kPlane, 3) + fEndDot;
 
         // Both ends at or above the plane (neither NaN) leave nothing of the edge.
         if (fDistStart >= 0.0f && fDistEnd >= 0.0f) {
@@ -114,27 +115,27 @@ hkBool hkClipEdgeAgainstPlanes(
     // The clipped ends projected onto the original edge, over its squared length.
     const hkQuadReal& kStart = edgeStart.m_quad;
     const hkQuadReal& kEnd = edgeEnd.m_quad;
-    const float fEdgeX = kEnd[0] - kStart[0];
-    const float fEdgeY = kEnd[1] - kStart[1];
-    const float fEdgeZ = kEnd[2] - kStart[2];
+    const float fEdgeX = XFNV_M128_F32(kEnd, 0) - XFNV_M128_F32(kStart, 0);
+    const float fEdgeY = XFNV_M128_F32(kEnd, 1) - XFNV_M128_F32(kStart, 1);
+    const float fEdgeZ = XFNV_M128_F32(kEnd, 2) - XFNV_M128_F32(kStart, 2);
     const float fLengthX = fEdgeX * fEdgeX;
     const float fLengthY = fEdgeY * fEdgeY;
     const float fLengthZ = fEdgeZ * fEdgeZ;
     const float fLengthXY = fLengthY + fLengthX;
     const float fLengthSq = fLengthZ + fLengthXY;
 
-    const float fStartOffX = fStartX - kStart[0];
-    const float fStartOffY = fStartY - kStart[1];
-    const float fStartOffZ = fStartZ - kStart[2];
+    const float fStartOffX = fStartX - XFNV_M128_F32(kStart, 0);
+    const float fStartOffY = fStartY - XFNV_M128_F32(kStart, 1);
+    const float fStartOffZ = fStartZ - XFNV_M128_F32(kStart, 2);
     const float fStartProjX = fStartOffX * fEdgeX;
     const float fStartProjY = fStartOffY * fEdgeY;
     const float fStartProjZ = fStartOffZ * fEdgeZ;
     const float fStartProjXY = fStartProjY + fStartProjX;
     const float fStartProj = fStartProjZ + fStartProjXY;
 
-    const float fEndOffX = fEndX - kStart[0];
-    const float fEndOffY = fEndY - kStart[1];
-    const float fEndOffZ = fEndZ - kStart[2];
+    const float fEndOffX = fEndX - XFNV_M128_F32(kStart, 0);
+    const float fEndOffY = fEndY - XFNV_M128_F32(kStart, 1);
+    const float fEndOffZ = fEndZ - XFNV_M128_F32(kStart, 2);
     const float fEndProjX = fEndOffX * fEdgeX;
     const float fEndProjY = fEndOffY * fEdgeY;
     const float fEndProjZ = fEndOffZ * fEdgeZ;
@@ -178,60 +179,70 @@ void hkBuildClipPlanesForTriangle(hkVector4* out, const hkpTriangleShape* triang
     __m128 v7 = _mm_sub_ps(v4.m_quad, v3.m_quad);
     __m128 v8 = _mm_mul_ps(triangle->m_vertexA.m_quad, m_quad);
     __m128 v9 = _mm_setzero_ps();
-    out->m_quad[3] = v36 - (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
+    XFNV_M128_F32(out->m_quad, 3) = v36 -
+        (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)));
     __m128 v10 = _mm_xor_ps(rdata_10C4C00, m_quad);
     out[1].m_quad = v10;
     __m128 v11 = _mm_mul_ps(v10, triangle->m_vertexA.m_quad);
     __m128 v12 = _mm_shuffle_ps(m_quad, m_quad, 210);
     __m128 v38 = _mm_shuffle_ps(m_quad, m_quad, 201);
-    out[1].m_quad[3] = v36 - (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
+    XFNV_M128_F32(out[1].m_quad, 3) = v36 -
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0)));
     out[2].m_quad =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v5, v5, 201), v12), _mm_mul_ps(_mm_shuffle_ps(v5, v5, 210), v38));
     __m128 v13 = _mm_mul_ps(out[2].m_quad, out[2].m_quad);
-    v11[0] = _mm_shuffle_ps(v13, v13, 85)[0] + v13[0];
+    XFNV_M128_F32(v11, 0) = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 85), 0) + XFNV_M128_F32(v13, 0);
     __m128 v14 = _mm_shuffle_ps(v13, v13, 170);
-    v14[0] = v14[0] + v11[0];
-    float v15 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v14[0])));
-    v9[0] = 0.0f;
+    XFNV_M128_F32(v14, 0) = XFNV_M128_F32(v14, 0) + XFNV_M128_F32(v11, 0);
+    float v15 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v14, 0))));
+    XFNV_M128_F32(v9, 0) = 0.0f;
     normal.m_quad = v9;
     __m128 v16 = _mm_setzero_ps();
-    v16[0] = 0.5f;
+    XFNV_M128_F32(v16, 0) = 0.5f;
     __m128 v17 = _mm_cmpeq_ss(v14, v9);
-    v9[0] = 3.0f - ((v14[0] * v15) * v15);
-    v16[0] = (0.5f * v15) * v9[0];
+    XFNV_M128_F32(v9, 0) = 3.0f - ((XFNV_M128_F32(v14, 0) * v15) * v15);
+    XFNV_M128_F32(v16, 0) = (0.5f * v15) * XFNV_M128_F32(v9, 0);
     __m128 v19 = _mm_andnot_ps(v17, v16);
     out[2].m_quad = _mm_mul_ps(_mm_shuffle_ps(v19, v19, 0), out[2].m_quad);
     __m128 v20 = _mm_mul_ps(out[2].m_quad, triangle->m_vertexA.m_quad);
-    out[2].m_quad[3] = v36 - (_mm_shuffle_ps(v20, v20, 170)[0] + (_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]));
+    XFNV_M128_F32(out[2].m_quad, 3) = v36 -
+        (XFNV_M128_F32(_mm_shuffle_ps(v20, v20, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v20, v20, 85), 0) + XFNV_M128_F32(v20, 0)));
     out[3].m_quad =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v7, v7, 201), v12), _mm_mul_ps(_mm_shuffle_ps(v7, v7, 210), v38));
     __m128 v21 = out[3].m_quad;
     __m128 v22 = _mm_mul_ps(v21, v21);
-    v7[0] = _mm_shuffle_ps(v22, v22, 85)[0] + v22[0];
+    XFNV_M128_F32(v7, 0) = XFNV_M128_F32(_mm_shuffle_ps(v22, v22, 85), 0) + XFNV_M128_F32(v22, 0);
     __m128 v23 = _mm_shuffle_ps(v22, v22, 170);
-    v23[0] = v23[0] + v7[0];
-    float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v23[0])));
+    XFNV_M128_F32(v23, 0) = XFNV_M128_F32(v23, 0) + XFNV_M128_F32(v7, 0);
+    float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v23, 0))));
     __m128 v25 = _mm_cmpeq_ss(v23, normal.m_quad);
-    v9[0] = 3.0f - ((v23[0] * v24) * v24);
-    v16[0] = (0.5f * v24) * v9[0];
+    XFNV_M128_F32(v9, 0) = 3.0f - ((XFNV_M128_F32(v23, 0) * v24) * v24);
+    XFNV_M128_F32(v16, 0) = (0.5f * v24) * XFNV_M128_F32(v9, 0);
     __m128 v27 = _mm_andnot_ps(v25, v16);
     out[3].m_quad = _mm_mul_ps(_mm_shuffle_ps(v27, v27, 0), v21);
     __m128 v28 = _mm_mul_ps(out[3].m_quad, triangle->m_vertexB.m_quad);
-    float v37 = _mm_shuffle_ps(v28, v28, 170)[0] + (_mm_shuffle_ps(v28, v28, 85)[0] + v28[0]);
+    float v37 = XFNV_M128_F32(_mm_shuffle_ps(v28, v28, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v28, v28, 85), 0) + XFNV_M128_F32(v28, 0));
     __m128 v30 = _mm_mul_ps(_mm_shuffle_ps(v40, v40, 210), v38);
-    out[3].m_quad[3] = v36 - v37;
+    XFNV_M128_F32(out[3].m_quad, 3) = v36 - v37;
     out[4].m_quad = _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v40, v40, 201), v12), v30);
     __m128 v31 = out[4].m_quad;
     __m128 v32 = _mm_mul_ps(v31, v31);
-    v30[0] = _mm_shuffle_ps(v32, v32, 85)[0] + v32[0];
+    XFNV_M128_F32(v30, 0) = XFNV_M128_F32(_mm_shuffle_ps(v32, v32, 85), 0) + XFNV_M128_F32(v32, 0);
     __m128 v33 = _mm_shuffle_ps(v32, v32, 170);
-    v33[0] = v33[0] + v30[0];
-    v30[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v33[0])));
-    v16[0] = (0.5f * v30[0]) * (3.0f - ((v33[0] * v30[0]) * v30[0]));
+    XFNV_M128_F32(v33, 0) = XFNV_M128_F32(v33, 0) + XFNV_M128_F32(v30, 0);
+    XFNV_M128_F32(v30, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v33, 0))));
+    XFNV_M128_F32(v16, 0) = (0.5f * XFNV_M128_F32(v30, 0)) *
+        (3.0f - ((XFNV_M128_F32(v33, 0) * XFNV_M128_F32(v30, 0)) * XFNV_M128_F32(v30, 0)));
     __m128 v34 = _mm_andnot_ps(_mm_cmpeq_ss(v33, normal.m_quad), v16);
     out[4].m_quad = _mm_mul_ps(_mm_shuffle_ps(v34, v34, 0), v31);
     __m128 v35 = _mm_mul_ps(out[4].m_quad, triangle->m_vertexC.m_quad);
-    out[4].m_quad[3] = v36 - (_mm_shuffle_ps(v35, v35, 170)[0] + (_mm_shuffle_ps(v35, v35, 85)[0] + v35[0]));
+    XFNV_M128_F32(out[4].m_quad, 3) = v36 -
+        (XFNV_M128_F32(_mm_shuffle_ps(v35, v35, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v35, v35, 85), 0) + XFNV_M128_F32(v35, 0)));
 }
 
 // Whether two triangles have the same three vertices, each within 0.001 in x, y and z.
@@ -298,7 +309,8 @@ uint8_t* triangleHasVertices(uint8_t* a1, const hkVector4* a2, const hkVector4* 
 // Whether two directions are almost perpendicular: |dot3| below 0.05.
 bool* isPerpendicular(bool* a1, const hkVector4* a2, const hkVector4* a3) {
     __m128 v3 = _mm_mul_ps(a2->m_quad, a3->m_quad);
-    float v5 = std::fabs((double)(_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])));
+    float v5 = std::fabs((double)(XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 170), 0) +
+                                  (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0))));
     *a1 = v5 < 0.05000000074505806;
     return a1;
 }
@@ -517,11 +529,13 @@ float hkpMeshWeldingUtility::calcAngleForEdge(
     const hkVector4& triangleNormal
 ) {
     __m128 v3 = _mm_mul_ps(edgeOrtho.m_quad, triangleNormal.m_quad);
-    float v4 = _mm_shuffle_ps(v3, v3, 85)[0] + v3[0];
-    float v5 = _mm_shuffle_ps(v3, v3, 170)[0];
+    float v4 = XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0);
+    float v5 = XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 170), 0);
     __m128 v6 = _mm_mul_ps(edgeNormal.m_quad, triangleNormal.m_quad);
     return hkMath_atan2fApproximation(
-        v5 + v4, _mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0])
+        v5 + v4,
+        XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0))
     );
 }
 
@@ -539,15 +553,15 @@ void hkpMeshWeldingUtility::calcAntiClockwiseTriangleNormal(
         _mm_mul_ps(_mm_shuffle_ps(v4, v4, 210), _mm_shuffle_ps(v5, v5, 201))
     );
     __m128 v7 = _mm_mul_ps(v6, v6);
-    v4[0] = _mm_shuffle_ps(v7, v7, 85)[0] + v7[0];
+    XFNV_M128_F32(v4, 0) = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0);
     __m128 v8 = _mm_shuffle_ps(v7, v7, 170);
-    v8[0] = v8[0] + v4[0];
-    float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v8[0])));
-    v10[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v8, 0) = XFNV_M128_F32(v8, 0) + XFNV_M128_F32(v4, 0);
+    float v9 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v8, 0))));
+    XFNV_M128_F32(v10, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v11 = _mm_cmpeq_ss(v8, v10);
-    v10[0] = 3.0f - ((v8[0] * v9) * v9);
+    XFNV_M128_F32(v10, 0) = 3.0f - ((XFNV_M128_F32(v8, 0) * v9) * v9);
     __m128 v12 = _mm_setzero_ps();
-    v12[0] = (0.5f * v9) * v10[0];
+    XFNV_M128_F32(v12, 0) = (0.5f * v9) * XFNV_M128_F32(v10, 0);
     __m128 v13 = _mm_andnot_ps(v11, v12);
     normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v6);
 }
@@ -775,15 +789,15 @@ float hkpMeshWeldingUtility::calcAngleFromVertices(const hkVector4* vertices, fl
     hkpMeshWeldingUtility::calcAntiClockwiseTriangleNormal(*(vertices + 1), *vertices, *(vertices + 3), v19);
     __m128 afX = _mm_sub_ps(vertices[1].m_quad, vertices->m_quad);
     __m128 v4 = _mm_mul_ps(afX, afX);
-    float v5 = _mm_shuffle_ps(v4, v4, 85)[0] + v4[0];
+    float v5 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0);
     __m128 v6 = _mm_shuffle_ps(v4, v4, 170);
-    v6[0] = v6[0] + v5;
-    float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v6[0])));
-    v8[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) + v5;
+    float v7 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v6, 0))));
+    XFNV_M128_F32(v8, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v9 = _mm_cmpeq_ss(v6, v8);
-    v8[0] = 3.0f - ((v6[0] * v7) * v7);
+    XFNV_M128_F32(v8, 0) = 3.0f - ((XFNV_M128_F32(v6, 0) * v7) * v7);
     __m128 v10 = _mm_setzero_ps();
-    v10[0] = (0.5f * v7) * v8[0];
+    XFNV_M128_F32(v10, 0) = (0.5f * v7) * XFNV_M128_F32(v8, 0);
     __m128 v11 = _mm_andnot_ps(v9, v10);
     __m128 v12 = _mm_mul_ps(_mm_shuffle_ps(v11, v11, 0), afX);
     __m128 v13 = _mm_mul_ps(
@@ -793,13 +807,14 @@ float hkpMeshWeldingUtility::calcAngleFromVertices(const hkVector4* vertices, fl
         ),
         v19.m_quad
     );
-    float v14 = _mm_shuffle_ps(v13, v13, 85)[0] + v13[0];
-    v8[0] = _mm_shuffle_ps(v13, v13, 170)[0];
+    float v14 = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 85), 0) + XFNV_M128_F32(v13, 0);
+    XFNV_M128_F32(v8, 0) = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 170), 0);
     __m128 v15 = _mm_mul_ps(v19.m_quad, normal.m_quad);
-    sinAngleOut = v8[0] + v14;
-    afX[0] = _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
-    cosAngleOut = afX[0];
-    return hkMath_atan2fApproximation(sinAngleOut, afX[0]);
+    sinAngleOut = XFNV_M128_F32(v8, 0) + v14;
+    XFNV_M128_F32(afX, 0) = XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0));
+    cosAngleOut = XFNV_M128_F32(afX, 0);
+    return hkMath_atan2fApproximation(sinAngleOut, XFNV_M128_F32(afX, 0));
 }
 
 // The welding bitcodes of the triangle's three edges; a degenerate triangle gets none and fails, as does one any edge

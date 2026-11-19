@@ -9,6 +9,7 @@
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 class hkaChunkCache;
 class hkQsTransform;
@@ -93,7 +94,7 @@ public:
                 hkError::MESSAGE_ERROR, 0x54E32123, buf,
                 "d:\\Projects\\fallout\\code\\Havok\\Source\\Animation/Animation/Animation/hkaAnimation.inl", 25
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
 
@@ -122,7 +123,7 @@ public:
                 hkError::MESSAGE_ERROR, 0x54E32124, buf,
                 "d:\\Projects\\fallout\\code\\Havok\\Source\\Animation/Animation/Animation/hkaAnimation.inl", 37
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
 

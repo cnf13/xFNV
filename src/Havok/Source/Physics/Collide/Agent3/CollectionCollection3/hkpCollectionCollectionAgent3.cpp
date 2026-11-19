@@ -33,6 +33,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <emmintrin.h>
 #include <xmmintrin.h>
@@ -87,10 +88,10 @@ void hkpCollectionCollectionAgent3::quantiseAabb(
     int32_t aiMin[3];
     int32_t aiMax[4];
     for (int32_t i = 0; i < 3; ++i) {
-        __asm__("flds %1\n\tfistpl %0" : "=m"(aiMin[i]) : "m"(afMin[i]));
+        xfnv::RoundToInt(aiMin[i], afMin[i]);
     }
     for (int32_t i = 0; i < 4; ++i) {
-        __asm__("flds %1\n\tfistpl %0" : "=m"(aiMax[i]) : "m"(afMax[i]));
+        xfnv::RoundToInt(aiMax[i], afMax[i]);
     }
     arOut.m_min[0] = static_cast<uint32_t>(aiMin[0]);
     arOut.m_min[1] = static_cast<uint32_t>(aiMin[1]);
@@ -178,7 +179,7 @@ void hkpCollectionCollectionAgent3::growAabbByRootMotion(const hkpAgent3RootMoti
         _mm_add_ss(_mm_shuffle_ps(kSquared, kSquared, 0x55), kSquared), _mm_shuffle_ps(kSquared, kSquared, 0xAA)
     )));
     const __m128 kLength = _mm_set1_ps(fLength);
-    const __m128 kAngle = _mm_set1_ps(arMotion.m_motionState->m_deltaAngle.m_quad[3]);
+    const __m128 kAngle = _mm_set1_ps(XFNV_M128_F32(arMotion.m_motionState->m_deltaAngle.m_quad, 3));
     const __m128 kGrow = _mm_min_ps(kLength, _mm_add_ps(_mm_mul_ps(kAngle, kLength), kHalfExtent));
     kLo = _mm_sub_ps(kLo, kGrow);
     kHi = _mm_add_ps(kHi, kGrow);

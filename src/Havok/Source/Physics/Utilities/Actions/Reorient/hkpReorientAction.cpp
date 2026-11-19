@@ -104,7 +104,7 @@ void hkpReorientAction::applyAction(const hkStepInfo& stepInfo) {
     const float fCos = _mm_cvtss_f32(
         _mm_add_ss(_mm_shuffle_ps(kCosP, kCosP, 0xAA), _mm_add_ss(_mm_shuffle_ps(kCosP, kCosP, 0x55), kCosP))
     );
-    const float fAbsCos = __builtin_fabsf(fCos);
+    const float fAbsCos = std::fabsf(fCos);
     float fAngle;
     if (!(fAbsCos >= 1.0f)) {
         fAngle = std::acos(fCos);

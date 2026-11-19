@@ -14,6 +14,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Splitter/hkpMoppSplitter.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -159,12 +160,12 @@ void hkpMoppCachedShapeMediator::addConvexShape(
         }
         else {
             const hkVector4& kDirection = a3[i].m_direction;
-            float fRadius = pSpheres[0].m_pos.m_quad[3];
+            float fRadius = XFNV_M128_F32(pSpheres[0].m_pos.m_quad, 3);
             const float fDot = pSpheres[0].m_pos.dot3(kDirection);
             fAbsMin = fDot - fRadius;
             fAbsMax = fDot + fRadius;
             for (int32_t j = 1; j < iNumSpheres; j++) {
-                fRadius = pSpheres[j].m_pos.m_quad[3];
+                fRadius = XFNV_M128_F32(pSpheres[j].m_pos.m_quad, 3);
                 const float fDotJ = pSpheres[j].m_pos.dot3(kDirection);
                 const float fMin = fDotJ - fRadius;
                 const float fMax = fDotJ + fRadius;

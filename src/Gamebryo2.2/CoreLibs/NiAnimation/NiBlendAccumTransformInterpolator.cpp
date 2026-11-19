@@ -17,6 +17,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
 #include <cfloat>
+#include <cstring>
 
 NiRTTI NiBlendAccumTransformInterpolator::ms_RTTI("NiBlendAccumTransformInterpolator", &NiBlendInterpolator::ms_RTTI);
 
@@ -234,7 +235,7 @@ void NiBlendAccumTransformInterpolator::ClearAccumulatedTransform() {
     if (m_ucInterpCount == 1) {
         v2.~NiQuatTransform();
         ::new (&v2) NiQuatTransform;
-        __builtin_memcpy(&m_kAccumulatedTransformValue, &v2, sizeof(m_kAccumulatedTransformValue));
+        std::memcpy(&m_kAccumulatedTransformValue, &v2, sizeof(m_kAccumulatedTransformValue));
     }
     else {
         (&m_kAccumulatedTransformValue)->SetTranslate(NiPoint3_ZERO);

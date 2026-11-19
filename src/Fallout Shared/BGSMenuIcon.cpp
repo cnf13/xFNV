@@ -6,6 +6,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESIcon.h"
 #include "Fallout Shared/TESTexture.h"
+#include "xfnv/Compiler.h"
 
 BGSMenuIcon::BGSMenuIcon() {
     cFormType = 5;
@@ -28,7 +29,7 @@ bool BGSMenuIcon::Load(TESFile* apFile) {
         }
 
         if (eChunk == EDID_ID) {
-            char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
             apFile->GetChunkData(pEditorID, 0x200);
             SetFormEditorID(pEditorID);
         }

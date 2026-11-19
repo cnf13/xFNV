@@ -17,6 +17,7 @@
 #include "Fallout Shared/TESScriptVariable.h"
 #include "Fallout/AI/PlayerCharacter.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BSStringT<char> cLogEntry;
 
@@ -65,7 +66,7 @@ bool TESQuestStageItem::Load(TESFile* apFile) {
         case SCDA_ID: {
             uint32_t uiChunkSize = apFile->GetChunkSize();
             // A 16-byte aligned stack buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
             ourMemset(pBuffer, 0, uiChunkSize);
             apFile->GetChunkData(pBuffer, 0);
             cResultScript.SetCompileData(uiChunkSize, pBuffer);
@@ -81,7 +82,7 @@ bool TESQuestStageItem::Load(TESFile* apFile) {
             }
             else if (pNewVariable) {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 pNewVariable->cName.Set(pBuffer, 0);
             }
@@ -154,7 +155,7 @@ const char* TESQuestStageItem::GetLogEntry(TESForm* apOwner) {
                 if (bInEntry) {
                     uint32_t uiMaxSize = pFile->GetChunkSize();
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiMaxSize, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiMaxSize));
                     pFile->GetChunkData(pBuffer, uiMaxSize);
                     cLogEntry.Set(pBuffer, 0);
                 }

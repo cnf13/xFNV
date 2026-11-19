@@ -31,6 +31,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
 #include "SDK/MSVC/stdlib.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -290,13 +291,18 @@ void finishLoadedObjecthkpCenterOfMassChangerModifierConstraintAtom(void* p, int
 char intersectRayPlane(__m128* a1, __m128* a2, __m128* a3, float* a4) {
     __m128 v4 = *a3;
     __m128 v5 = _mm_mul_ps(_mm_sub_ps(*a2, *a1), *a3);
-    float v6 = _mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0));
     if (!((v6 * v6) > 1.1920929e-07f)) {
         return 0;
     }
-    float v7 = _mm_shuffle_ps(v4, v4, 255)[0];
+    float v7 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 255), 0);
     __m128 v8 = _mm_mul_ps(v4, *a1);
-    *a4 = (0.0f - ((_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0])) + v7)) / v6;
+    *a4 = (0.0f -
+           ((XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0))) +
+            v7)) /
+        v6;
     return 1;
 }
 
@@ -306,8 +312,11 @@ double squaredDistanceToSegment(__m128* a1, __m128* a2, __m128* a3, float* a4) {
     __m128 v5 = _mm_sub_ps(*a3, *a2);
     __m128 v6 = _mm_mul_ps(v5, v4);
     __m128 v7 = _mm_mul_ps(v5, v5);
-    float v12 = (0.0f - (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]))) /
-        (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]));
+    float v12 = (0.0f -
+                 (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+                  (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0)))) /
+        (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0)));
     *a4 = v12;
     if (!(v12 < 0.0f)) {
         v8 = 1.0;
@@ -331,7 +340,10 @@ LABEL_5:;
         v4
     );
     __m128 v10 = _mm_mul_ps(v9, v9);
-    return (_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]));
+    return (
+        XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0))
+    );
 }
 
 __m128* normalToOctahedron(float* a1, __m128* a2) {
@@ -407,7 +419,7 @@ __m128* normalToOctahedron(float* a1, __m128* a2) {
             v24 = v6;
         }
     }
-    v2[0] = 0.0f;
+    XFNV_M128_F32(v2, 0) = 0.0f;
     *reinterpret_cast<float*>(&v21) = (v20 + 1.0) * 0.5;
     *reinterpret_cast<float*>(&v27) = 0.5 * (v24 + 1.0);
     *a2 = _mm_unpacklo_ps(
@@ -446,8 +458,11 @@ double squaredDistanceToEdge(__m128* a1, __m128* a2, __m128* a3, __m128* a4, flo
     __m128 v7 = _mm_sub_ps(*a3, *a2);
     __m128 v8 = _mm_mul_ps(v7, v6);
     __m128 v9 = _mm_mul_ps(v7, v7);
-    float v13 = (0.0f - (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]))) /
-        (_mm_shuffle_ps(v9, v9, 170)[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]));
+    float v13 = (0.0f -
+                 (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+                  (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)))) /
+        (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0)));
     if (!(v13 < 0.0f)) {
         v5 = v13;
         if (v13 > 1.0f) {
@@ -464,7 +479,10 @@ double squaredDistanceToEdge(__m128* a1, __m128* a2, __m128* a3, __m128* a4, flo
         *a5 = v14;
     }
     __m128 v11 = _mm_mul_ps(v10, v10);
-    return (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
+    return (
+        XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0))
+    );
 }
 
 // The point a1's closest point on the triangle a2, a3, a4: the triangle's plane normal into a5 and, when a6 is given,
@@ -486,25 +504,28 @@ double squaredDistanceToTriangle(hkVector4* a1, __m128* a2, __m128* a3, __m128* 
         _mm_mul_ps(_mm_shuffle_ps(v8, v8, 201), _mm_shuffle_ps(v9, v9, 210))
     );
     __m128 v11 = _mm_mul_ps(v10, v10);
-    float v12 = _mm_shuffle_ps(v11, v11, 85)[0] + v11[0];
+    float v12 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0);
     __m128 v13 = _mm_shuffle_ps(v11, v11, 170);
-    v13[0] = v13[0] + v12;
-    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
-    v15[0] = zero;
+    XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
+    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v13, 0))));
+    XFNV_M128_F32(v15, 0) = zero;
     __m128 v16 = _mm_cmpeq_ss(v13, v15);
-    v15[0] = 3.0f - ((v13[0] * v14) * v14);
+    XFNV_M128_F32(v15, 0) = 3.0f - ((XFNV_M128_F32(v13, 0) * v14) * v14);
     __m128 v17 = _mm_setzero_ps();
-    v17[0] = 0.5f * v14;
+    XFNV_M128_F32(v17, 0) = 0.5f * v14;
     __m128 m_quad = a1->m_quad;
-    v17[0] = v17[0] * v15[0];
+    XFNV_M128_F32(v17, 0) = XFNV_M128_F32(v17, 0) * XFNV_M128_F32(v15, 0);
     __m128 v19 = _mm_andnot_ps(v16, v17);
     __m128 v56 = _mm_mul_ps(_mm_shuffle_ps(v19, v19, 0), v10);
     __m128 v20 = _mm_mul_ps(v56, v7);
-    v56[3] = 0.0f - (_mm_shuffle_ps(v20, v20, 170)[0] + (_mm_shuffle_ps(v20, v20, 85)[0] + v20[0]));
+    XFNV_M128_F32(v56, 3) = 0.0f -
+        (XFNV_M128_F32(_mm_shuffle_ps(v20, v20, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v20, v20, 85), 0) + XFNV_M128_F32(v20, 0)));
     __m128 v21 = _mm_mul_ps(v56, m_quad);
     double v22 =
-        ((_mm_shuffle_ps(v21, v21, 170)[0] + (_mm_shuffle_ps(v21, v21, 85)[0] + v21[0])) +
-         _mm_shuffle_ps(v56, v56, 255)[0]);
+        ((XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 170), 0) +
+          (XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 85), 0) + XFNV_M128_F32(v21, 0))) +
+         XFNV_M128_F32(_mm_shuffle_ps(v56, v56, 255), 0));
     // The negated distance is rounded to float before the SSE code reads it.
     const float fNegDist = static_cast<float>(-v22);
     __m128 v23 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fNegDist), _mm_set_ss(fNegDist), 0), v56), m_quad);
@@ -517,7 +538,8 @@ double squaredDistanceToTriangle(hkVector4* a1, __m128* a2, __m128* a3, __m128* 
         ),
         v56
     );
-    if ((_mm_shuffle_ps(v26, v26, 170)[0] + (_mm_shuffle_ps(v26, v26, 85)[0] + v26[0])) > 0.0f) {
+    if ((XFNV_M128_F32(_mm_shuffle_ps(v26, v26, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v26, v26, 85), 0) + XFNV_M128_F32(v26, 0))) > 0.0f) {
         __m128 v27 = _mm_sub_ps(v55, v23);
         __m128 v28 = _mm_mul_ps(
             _mm_sub_ps(
@@ -527,7 +549,8 @@ double squaredDistanceToTriangle(hkVector4* a1, __m128* a2, __m128* a3, __m128* 
             v56
         );
         v25 = _mm_shuffle_ps(v28, v28, 85);
-        if ((_mm_shuffle_ps(v28, v28, 170)[0] + (v25[0] + v28[0])) > 0.0f) {
+        if ((XFNV_M128_F32(_mm_shuffle_ps(v28, v28, 170), 0) + (XFNV_M128_F32(v25, 0) + XFNV_M128_F32(v28, 0))) >
+            0.0f) {
             __m128 v29 = _mm_mul_ps(
                 _mm_sub_ps(
                     _mm_mul_ps(_mm_shuffle_ps(v24, v24, 210), _mm_shuffle_ps(v27, v27, 201)),
@@ -537,7 +560,7 @@ double squaredDistanceToTriangle(hkVector4* a1, __m128* a2, __m128* a3, __m128* 
             );
             v24 = _mm_shuffle_ps(v29, v29, 85);
             v25 = _mm_shuffle_ps(v29, v29, 170);
-            if ((v25[0] + (v24[0] + v29[0])) > 0.0f) {
+            if ((XFNV_M128_F32(v25, 0) + (XFNV_M128_F32(v24, 0) + XFNV_M128_F32(v29, 0))) > 0.0f) {
                 *a5 = v56;
                 if (a6) {
                     __m128 v46;
@@ -549,44 +572,48 @@ double squaredDistanceToTriangle(hkVector4* a1, __m128* a2, __m128* a3, __m128* 
                     );
                     __m128 v33 = _mm_mul_ps(v32, v32);
                     __m128 v34 = _mm_shuffle_ps(v33, v33, 85);
-                    v34[0] =
-                        _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v33, v33, 170)[0] + (v34[0] + v33[0])))));
+                    XFNV_M128_F32(v34, 0) = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+                        (XFNV_M128_F32(_mm_shuffle_ps(v33, v33, 170), 0) +
+                         (XFNV_M128_F32(v34, 0) + XFNV_M128_F32(v33, 0)))
+                    )));
                     __m128 v35 = _mm_sub_ps(*a4, v23);
                     __m128 v36 = _mm_sub_ps(
                         _mm_mul_ps(_mm_shuffle_ps(v30, v30, 210), _mm_shuffle_ps(v35, v35, 201)),
                         _mm_mul_ps(_mm_shuffle_ps(v30, v30, 201), _mm_shuffle_ps(v35, v35, 210))
                     );
                     __m128 v37 = _mm_mul_ps(v36, v36);
-                    v30[0] = _mm_cvtss_f32(_mm_sqrt_ss(
-                        _mm_set_ss((_mm_shuffle_ps(v37, v37, 170)[0] + (_mm_shuffle_ps(v37, v37, 85)[0] + v37[0])))
-                    ));
+                    XFNV_M128_F32(v30, 0) = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+                        (XFNV_M128_F32(_mm_shuffle_ps(v37, v37, 170), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(v37, v37, 85), 0) + XFNV_M128_F32(v37, 0)))
+                    )));
                     __m128 v38 = _mm_sub_ps(
                         _mm_mul_ps(_mm_shuffle_ps(v35, v35, 210), _mm_shuffle_ps(v31, v31, 201)),
                         _mm_mul_ps(_mm_shuffle_ps(v35, v35, 201), _mm_shuffle_ps(v31, v31, 210))
                     );
                     __m128 v39 = _mm_mul_ps(v38, v38);
                     __m128 v40 = _mm_shuffle_ps(v39, v39, 170);
-                    v40[0] =
-                        _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss((v40[0] + (_mm_shuffle_ps(v39, v39, 85)[0] + v39[0])))));
+                    XFNV_M128_F32(v40, 0) = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss((
+                        XFNV_M128_F32(v40, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v39, v39, 85), 0) + XFNV_M128_F32(v39, 0))
+                    ))));
                     // The weights of a2, a3 and a4: the areas opposite them (v40, v30 and v34), then 0.
                     __m128 v42 = _mm_unpacklo_ps(
-                        _mm_unpacklo_ps(_mm_set_ss(v40[0]), _mm_set_ss(v34[0])),
-                        _mm_unpacklo_ps(_mm_set_ss(v30[0]), _mm_set_ss(zero))
+                        _mm_unpacklo_ps(_mm_set_ss(XFNV_M128_F32(v40, 0)), _mm_set_ss(XFNV_M128_F32(v34, 0))),
+                        _mm_unpacklo_ps(_mm_set_ss(XFNV_M128_F32(v30, 0)), _mm_set_ss(zero))
                     );
                     __m128 v43 = _mm_shuffle_ps(v42, v42, 85);
                     __m128 v44 = _mm_shuffle_ps(v42, v42, 170);
                     *a6 = v42;
-                    v44[0] = v44[0] + (v43[0] + v42[0]);
-                    if (!(v44[0] > 1.1920929e-07f)) {
-                        v44[0] = 0.33333334f;
-                        v43[0] = 0.33333334f;
+                    XFNV_M128_F32(v44, 0) = XFNV_M128_F32(v44, 0) + (XFNV_M128_F32(v43, 0) + XFNV_M128_F32(v42, 0));
+                    if (!(XFNV_M128_F32(v44, 0) > 1.1920929e-07f)) {
+                        XFNV_M128_F32(v44, 0) = 0.33333334f;
+                        XFNV_M128_F32(v43, 0) = 0.33333334f;
                         v46 = _mm_unpacklo_ps(
                             _mm_unpacklo_ps(v44, _mm_set_ss(0.33333334f)), _mm_unpacklo_ps(v43, _mm_set_ss(zero))
                         );
                     }
                     else {
                         __m128 kInvSum = _mm_set_ss(1.0f);
-                        kInvSum[0] = 1.0f / v44[0];
+                        XFNV_M128_F32(kInvSum, 0) = 1.0f / XFNV_M128_F32(v44, 0);
                         v46 = _mm_mul_ps(_mm_shuffle_ps(kInvSum, kInvSum, 0), v42);
                     }
                     *a6 = v46;
@@ -623,13 +650,13 @@ LABEL_17:;
             v49 = _mm_set_ss(zero);
             if (n2 == 1) {
                 v25 = _mm_set_ss(afEdgeParam[1]);
-                v23[0] = 0.0f;
+                XFNV_M128_F32(v23, 0) = 0.0f;
                 const float fRest = static_cast<float>(1.0 - afEdgeParam[1]);
                 v24 = _mm_set_ss(fRest);
             }
             else {
                 v23 = _mm_set_ss(afEdgeParam[2]);
-                v24[0] = 0.0f;
+                XFNV_M128_F32(v24, 0) = 0.0f;
                 const float fRest = static_cast<float>(1.0 - afEdgeParam[2]);
                 v25 = _mm_set_ss(fRest);
             }
@@ -637,7 +664,7 @@ LABEL_17:;
         else {
             v49 = _mm_set_ss(zero);
             v24 = _mm_set_ss(afEdgeParam[0]);
-            v25[0] = 0.0f;
+            XFNV_M128_F32(v25, 0) = 0.0f;
             const float fRest = static_cast<float>(1.0 - afEdgeParam[0]);
             v23 = _mm_set_ss(fRest);
         }
@@ -651,17 +678,24 @@ double nearestDistanceBetweenLines(__m128* a1, __m128* a2, __m128* a3, __m128* a
     __m128 v7 = _mm_sub_ps(*a3, *a1);
     __m128 v8 = _mm_sub_ps(*a2, *a1);
     __m128 v9 = _mm_mul_ps(v6, v8);
-    float v10 = _mm_shuffle_ps(v9, v9, 170)[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0]);
+    float v10 = XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0));
     __m128 v11 = _mm_mul_ps(v7, v8);
     double v12 = v10;
     double v13 = v10;
-    float v14 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+    float v14 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0));
     __m128 v15 = _mm_mul_ps(v6, v7);
-    float v34 = _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+    float v34 = XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0));
     __m128 v16 = _mm_mul_ps(v8, v8);
-    float v31 = _mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]);
+    float v31 = XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 85), 0) + XFNV_M128_F32(v16, 0));
     __m128 v17 = _mm_mul_ps(v6, v6);
-    float v32 = v31 * (_mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0])) - v13 * v13;
+    float v32 = v31 *
+            (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0))) -
+        v13 * v13;
     double v18 = v32;
     float v33 = std::fabs((double)v32);
     if (!(v33 > 1.1920929e-07f)) {
@@ -701,8 +735,10 @@ double nearestDistanceBetweenLines(__m128* a1, __m128* a2, __m128* a3, __m128* a
         *a3
     );
     __m128 v23 = _mm_mul_ps(_mm_sub_ps(*a1, v22), v8);
-    float v24 = (_mm_shuffle_ps(v23, v23, 170)[0] + (_mm_shuffle_ps(v23, v23, 85)[0] + v23[0])) /
-        (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
+    float v24 = (XFNV_M128_F32(_mm_shuffle_ps(v23, v23, 170), 0) +
+                 (XFNV_M128_F32(_mm_shuffle_ps(v23, v23, 85), 0) + XFNV_M128_F32(v23, 0))) /
+        (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 85), 0) + XFNV_M128_F32(v16, 0)));
     double v25 = (0.0f - v24);
     if (v25 < v20 || (v20 = (0.0f - v24), !(v25 > v21))) {
         v21 = v20;
@@ -723,9 +759,10 @@ double nearestDistanceBetweenLines(__m128* a1, __m128* a2, __m128* a3, __m128* a
         v22
     );
     __m128 v27 = _mm_mul_ps(v26, v26);
-    return _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v27, v27, 170)[0] + (_mm_shuffle_ps(v27, v27, 85)[0] + v27[0]))))
-    );
+    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v27, v27, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v27, v27, 85), 0) + XFNV_M128_F32(v27, 0)))
+    )));
 }
 
 bool isPointInsideTriangle(__m128* a1, __m128* a2, __m128* a3, __m128* a4, float a5) {
@@ -746,7 +783,10 @@ bool isPointInsideTriangle(__m128* a1, __m128* a2, __m128* a3, __m128* a4, float
     );
     double v11 = a5;
     bool result = false;
-    if (!(a5 > static_cast<double>((_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]))))) {
+    if (!(a5 > static_cast<double>(
+                   (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+                    (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0)))
+               ))) {
         __m128 v13 = _mm_sub_ps(*a4, *a1);
         __m128 v14 = _mm_mul_ps(
             _mm_sub_ps(
@@ -755,7 +795,8 @@ bool isPointInsideTriangle(__m128* a1, __m128* a2, __m128* a3, __m128* a4, float
             ),
             v7
         );
-        if (!((_mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0])) < v11)) {
+        if (!((XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 170), 0) +
+               (XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 85), 0) + XFNV_M128_F32(v14, 0))) < v11)) {
             __m128 v15 = _mm_mul_ps(
                 _mm_sub_ps(
                     _mm_mul_ps(_mm_shuffle_ps(v8, v8, 210), _mm_shuffle_ps(v13, v13, 201)),
@@ -763,7 +804,8 @@ bool isPointInsideTriangle(__m128* a1, __m128* a2, __m128* a3, __m128* a4, float
                 ),
                 v7
             );
-            if (!((_mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])) < v11)) {
+            if (!((XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+                   (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0))) < v11)) {
                 return true;
             }
         }
@@ -908,9 +950,9 @@ bool hkGeometryProcessing::intersectPlanes(
     const __m128 kP0 = _mm_load_ps(&reinterpret_cast<const float*>(&p0.m_quad)[0]);
     const __m128 kP1 = _mm_load_ps(&reinterpret_cast<const float*>(&p1.m_quad)[0]);
     const __m128 kP2 = _mm_load_ps(&reinterpret_cast<const float*>(&p2.m_quad)[0]);
-    const float fRhs0 = 0.0f - p0.m_quad[3];
-    const float fRhs1 = 0.0f - p1.m_quad[3];
-    const float fRhs2 = 0.0f - p2.m_quad[3];
+    const float fRhs0 = 0.0f - XFNV_M128_F32(p0.m_quad, 3);
+    const float fRhs1 = 0.0f - XFNV_M128_F32(p1.m_quad, 3);
+    const float fRhs2 = 0.0f - XFNV_M128_F32(p2.m_quad, 3);
     const __m128 kRhs = _mm_set_ps(0.0f, fRhs2, fRhs1, fRhs0);
 
     // Transpose, with the w lanes taken from zero.
@@ -943,8 +985,8 @@ bool hkGeometryProcessing::intersectPlanes(
 // x <= 1 (NaN: the outer case), x + y >= -1 or y - x >= -1 (NaN: the outer case). The angle is t times
 // 1.5707963705062866 unless r equals 0 (NaN multiplies). The sqrt, cos and sin results are each stored as a float.
 void hkGeometryProcessing::octahedronToNormal(const hkVector4& uv, hkVector4& normal) {
-    const float fX = uv.m_quad[0] * 2.0 - 1.0;
-    const float fY = uv.m_quad[1] * 2.0 - 1.0;
+    const float fX = XFNV_M128_F32(uv.m_quad, 0) * 2.0 - 1.0;
+    const float fY = XFNV_M128_F32(uv.m_quad, 1) * 2.0 - 1.0;
     const float fSum = fY + fX;
     const float fDiff = fY - fX;
     float fR;
@@ -1012,10 +1054,10 @@ void hkGeometryProcessing::octahedronToNormal(const hkVector4& uv, hkVector4& no
     const float fSin = std::sin(fAngle);
     const float fNormalY = fSin * fScale;
     const float fNormalZ = (1.0 - fR2) * fSign;
-    normal.m_quad[0] = fNormalX;
-    normal.m_quad[1] = fNormalY;
-    normal.m_quad[2] = fNormalZ;
-    normal.m_quad[3] = 0.0f;
+    XFNV_M128_F32(normal.m_quad, 0) = fNormalX;
+    XFNV_M128_F32(normal.m_quad, 1) = fNormalY;
+    XFNV_M128_F32(normal.m_quad, 2) = fNormalZ;
+    XFNV_M128_F32(normal.m_quad, 3) = 0.0f;
 }
 
 // Takes the four points of a block lane by lane, each product and sum rounded to a float. A lane keeps its best dot
@@ -1028,9 +1070,9 @@ void hkGeometryProcessing::getSupportingVertex(
     hkVector4& vertexOut
 ) {
     const TransposedVectors* pVertices = transposedVertices.m_data;
-    const float fDirX = direction.m_quad[0];
-    const float fDirY = direction.m_quad[1];
-    const float fDirZ = direction.m_quad[2];
+    const float fDirX = XFNV_M128_F32(direction.m_quad, 0);
+    const float fDirY = XFNV_M128_F32(direction.m_quad, 1);
+    const float fDirZ = XFNV_M128_F32(direction.m_quad, 2);
 
     // -3.40282e38 (0xFF7FFFEE) in every lane.
     float afBestDot[4] = {-0x1.ffffdcp+127f, -0x1.ffffdcp+127f, -0x1.ffffdcp+127f, -0x1.ffffdcp+127f};
@@ -1044,13 +1086,16 @@ void hkGeometryProcessing::getSupportingVertex(
         uint32_t uiBlocks = ((uiNumPoints - 1) >> 2) + 1;
         do {
             const float afX[4] = {
-                pBlock->m_x.m_quad[0], pBlock->m_x.m_quad[1], pBlock->m_x.m_quad[2], pBlock->m_x.m_quad[3]
+                XFNV_M128_F32(pBlock->m_x.m_quad, 0), XFNV_M128_F32(pBlock->m_x.m_quad, 1),
+                XFNV_M128_F32(pBlock->m_x.m_quad, 2), XFNV_M128_F32(pBlock->m_x.m_quad, 3)
             };
             const float afY[4] = {
-                pBlock->m_y.m_quad[0], pBlock->m_y.m_quad[1], pBlock->m_y.m_quad[2], pBlock->m_y.m_quad[3]
+                XFNV_M128_F32(pBlock->m_y.m_quad, 0), XFNV_M128_F32(pBlock->m_y.m_quad, 1),
+                XFNV_M128_F32(pBlock->m_y.m_quad, 2), XFNV_M128_F32(pBlock->m_y.m_quad, 3)
             };
             const float afZ[4] = {
-                pBlock->m_z.m_quad[0], pBlock->m_z.m_quad[1], pBlock->m_z.m_quad[2], pBlock->m_z.m_quad[3]
+                XFNV_M128_F32(pBlock->m_z.m_quad, 0), XFNV_M128_F32(pBlock->m_z.m_quad, 1),
+                XFNV_M128_F32(pBlock->m_z.m_quad, 2), XFNV_M128_F32(pBlock->m_z.m_quad, 3)
             };
             for (int32_t i = 0; i < 4; ++i) {
                 const float fDotY = afY[i] * fDirY;
@@ -1422,7 +1467,8 @@ float hkGeometryProcessingInternals::NearestFeaturePolicy::addLeaf(
         m_point.m_quad, _mm_mul_ps(_mm_add_ps(leaf->m_volume.m_max.m_quad, leaf->m_volume.m_min.m_quad), hkQuadRealHalf)
     );
     __m128 v3 = _mm_mul_ps(v2, v2);
-    float v6 = _mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0));
     if (m_distanceSquared > static_cast<double>(v6)) {
         m_distanceSquared = v6;
         m_leaf = leaf;

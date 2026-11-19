@@ -28,6 +28,7 @@
 #include "Fallout/Interface/Interface.h"
 #include "Fallout/Misc/Calendar.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 SettingT<GameSettingCollection> gs_sFloraSuccessMessage("sFloraSuccessMessage", "You successfully harvest %s.");
 SettingT<GameSettingCollection> gs_sFloraFailureMessage("sFloraFailureMessage", "You find nothing of use.");
@@ -70,7 +71,7 @@ bool TESFlora::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200 bytes.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // Clears the buffer first because an empty chunk leaves it unwritten (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);
@@ -83,7 +84,7 @@ bool TESFlora::Load(TESFile* apFile) {
             case MODD_ID: TESModel::LoadModelChunk(static_cast<TESModel*>(this), apFile); break;
             case MODS_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint32_t uiVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, uiVersion);

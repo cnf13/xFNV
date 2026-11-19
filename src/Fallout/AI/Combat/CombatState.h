@@ -10,6 +10,7 @@
 #include "Fallout/AI/Combat/CombatCoverSearch.h"
 #include "Fallout/AI/Combat/CombatTimeStamp.h"
 #include "Fallout/AI/Combat/CombatTimer.h"
+#include "Fallout/AI/Combat/UnreachableCoverLocation.h"
 #include "Fallout/AI/ProcessArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -27,7 +28,6 @@ class CombatCoverLocation;
 class CombatLocation;
 class PathingAvoidNodeArray;
 class PathingRequestCoveredMove;
-class UnreachableCoverLocation;
 class UnreachableLocation;
 
 enum ACTOR_SEGMENT_INVIEW : int32_t;

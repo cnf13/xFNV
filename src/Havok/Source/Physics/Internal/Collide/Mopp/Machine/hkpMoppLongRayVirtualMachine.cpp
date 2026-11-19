@@ -16,6 +16,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverCheck.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -46,11 +47,11 @@ void hkpMoppLongRayVirtualMachine::queryLongRay(
     m_code = code;
     uint8_t* m_data = code->m_data.m_data;
     aScaledQuery.m_FtoBoffset.m_quad = _mm_setzero_ps();
-    m_ItoFScale = 1.0 / code->m_info.m_offset.m_quad[3];
+    m_ItoFScale = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     v7.m_offset.m_quad = code->m_info.m_offset.m_quad;
     __m128 m_quad = input.m_from.m_quad;
     __m128 v9 = _mm_sub_ps(input.m_to.m_quad, v7.m_offset.m_quad);
-    aScaledQuery.m_FtoBScale = code->m_info.m_offset.m_quad[3] * 1.52587890625e-05;
+    aScaledQuery.m_FtoBScale = XFNV_M128_F32(code->m_info.m_offset.m_quad, 3) * 1.52587890625e-05;
     __m128 v10 = _mm_sub_ps(m_quad, v7.m_offset.m_quad);
     __m128 m_FtoBScale_low = _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(aScaledQuery.m_FtoBScale)));
     m_ray.m_from.m_quad = m_quad;
@@ -83,11 +84,11 @@ hkBool hkpMoppLongRayVirtualMachine::queryLongRay_00DD2DF0(
     m_rayResultPtr = &rayResult;
     uint8_t* m_data = code->m_data.m_data;
     aScaledQuery.m_FtoBoffset.m_quad = _mm_setzero_ps();
-    m_ItoFScale = 1.0 / code->m_info.m_offset.m_quad[3];
+    m_ItoFScale = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     v8.m_offset.m_quad = code->m_info.m_offset.m_quad;
     __m128 m_quad = input.m_from.m_quad;
     __m128 v10 = _mm_sub_ps(input.m_to.m_quad, v8.m_offset.m_quad);
-    aScaledQuery.m_FtoBScale = code->m_info.m_offset.m_quad[3] * 1.52587890625e-05;
+    aScaledQuery.m_FtoBScale = XFNV_M128_F32(code->m_info.m_offset.m_quad, 3) * 1.52587890625e-05;
     __m128 v11 = _mm_sub_ps(m_quad, v8.m_offset.m_quad);
     __m128 m_FtoBScale_low = _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(aScaledQuery.m_FtoBScale)));
     m_ray.m_from.m_quad = m_quad;
@@ -212,8 +213,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
                 fLeftMax = static_cast<float>(PC[1]);
                 fRightMin = static_cast<float>(PC[2]);
                 iSplitDirection = command - 16;
-                fStart = fQuery->m_rayEnds[0].m_quad[iSplitDirection];
-                fEnd = fQuery->m_rayEnds[1].m_quad[iSplitDirection];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, iSplitDirection);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, iSplitDirection);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -221,8 +222,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 19:
                 fLeftMax = static_cast<float>(2 * PC[1]);
                 fRightMin = static_cast<float>(2 * PC[2]);
-                fStart = fQuery->m_rayEnds[0].m_quad[2] + fQuery->m_rayEnds[0].m_quad[1];
-                fEnd = fQuery->m_rayEnds[1].m_quad[2] + fQuery->m_rayEnds[1].m_quad[1];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2) + XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2) + XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -230,8 +231,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 20:
                 fLeftMax = static_cast<float>(2 * PC[1] - 255);
                 fRightMin = static_cast<float>(2 * PC[2] - 255);
-                fStart = fQuery->m_rayEnds[0].m_quad[1] - fQuery->m_rayEnds[0].m_quad[2];
-                fEnd = fQuery->m_rayEnds[1].m_quad[1] - fQuery->m_rayEnds[1].m_quad[2];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1) - XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1) - XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -239,8 +240,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 21:
                 fLeftMax = static_cast<float>(2 * PC[1]);
                 fRightMin = static_cast<float>(2 * PC[2]);
-                fStart = fQuery->m_rayEnds[0].m_quad[2] + fQuery->m_rayEnds[0].m_quad[0];
-                fEnd = fQuery->m_rayEnds[1].m_quad[2] + fQuery->m_rayEnds[1].m_quad[0];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2) + XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2) + XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -248,8 +249,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 22:
                 fLeftMax = static_cast<float>(2 * PC[1] - 255);
                 fRightMin = static_cast<float>(2 * PC[2] - 255);
-                fStart = fQuery->m_rayEnds[0].m_quad[0] - fQuery->m_rayEnds[0].m_quad[2];
-                fEnd = fQuery->m_rayEnds[1].m_quad[0] - fQuery->m_rayEnds[1].m_quad[2];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -257,8 +258,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 23:
                 fLeftMax = static_cast<float>(2 * PC[1]);
                 fRightMin = static_cast<float>(2 * PC[2]);
-                fStart = fQuery->m_rayEnds[0].m_quad[1] + fQuery->m_rayEnds[0].m_quad[0];
-                fEnd = fQuery->m_rayEnds[1].m_quad[1] + fQuery->m_rayEnds[1].m_quad[0];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1) + XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1) + XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -266,8 +267,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 24:
                 fLeftMax = static_cast<float>(2 * PC[1] - 255);
                 fRightMin = static_cast<float>(2 * PC[2] - 255);
-                fStart = fQuery->m_rayEnds[0].m_quad[0] - fQuery->m_rayEnds[0].m_quad[1];
-                fEnd = fQuery->m_rayEnds[1].m_quad[0] - fQuery->m_rayEnds[1].m_quad[1];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -275,9 +276,10 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 25:
                 fLeftMax = static_cast<float>(3 * PC[1]);
                 fRightMin = static_cast<float>(3 * PC[2]);
-                fStart =
-                    fQuery->m_rayEnds[0].m_quad[1] + fQuery->m_rayEnds[0].m_quad[0] + fQuery->m_rayEnds[0].m_quad[2];
-                fEnd = fQuery->m_rayEnds[1].m_quad[1] + fQuery->m_rayEnds[1].m_quad[0] + fQuery->m_rayEnds[1].m_quad[2];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1) + XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0) +
+                    XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1) + XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0) +
+                    XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -285,9 +287,10 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 26:
                 fLeftMax = static_cast<float>(3 * (PC[1] - 85));
                 fRightMin = static_cast<float>(3 * (PC[2] - 85));
-                fStart =
-                    fQuery->m_rayEnds[0].m_quad[1] + fQuery->m_rayEnds[0].m_quad[0] - fQuery->m_rayEnds[0].m_quad[2];
-                fEnd = fQuery->m_rayEnds[1].m_quad[1] + fQuery->m_rayEnds[1].m_quad[0] - fQuery->m_rayEnds[1].m_quad[2];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1) + XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0) -
+                    XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1) + XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0) -
+                    XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -295,9 +298,10 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 27:
                 fLeftMax = static_cast<float>(3 * (PC[1] - 85));
                 fRightMin = static_cast<float>(3 * (PC[2] - 85));
-                fStart =
-                    fQuery->m_rayEnds[0].m_quad[0] - fQuery->m_rayEnds[0].m_quad[1] + fQuery->m_rayEnds[0].m_quad[2];
-                fEnd = fQuery->m_rayEnds[1].m_quad[0] - fQuery->m_rayEnds[1].m_quad[1] + fQuery->m_rayEnds[1].m_quad[2];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1) +
+                    XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1) +
+                    XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -305,9 +309,10 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             case 28:
                 fLeftMax = static_cast<float>(3 * (PC[1] - 170));
                 fRightMin = static_cast<float>(3 * (PC[2] - 170));
-                fStart =
-                    fQuery->m_rayEnds[0].m_quad[0] - fQuery->m_rayEnds[0].m_quad[1] - fQuery->m_rayEnds[0].m_quad[2];
-                fEnd = fQuery->m_rayEnds[1].m_quad[0] - fQuery->m_rayEnds[1].m_quad[1] - fQuery->m_rayEnds[1].m_quad[2];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 1) -
+                    XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, 2);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 0) - XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 1) -
+                    XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, 2);
                 iRightOffset = PC[3];
                 iLeftOffset = 0;
                 PC += 4;
@@ -318,8 +323,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
                 iSplitDirection = command - 32;
                 fRightMin = static_cast<float>(PC[1]);
                 fLeftMax = fRightMin + 1.0;
-                fStart = fQuery->m_rayEnds[0].m_quad[iSplitDirection];
-                fEnd = fQuery->m_rayEnds[1].m_quad[iSplitDirection];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, iSplitDirection);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, iSplitDirection);
                 iRightOffset = PC[2];
                 iLeftOffset = 0;
                 PC += 3;
@@ -330,8 +335,8 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
                 fLeftMax = static_cast<float>(PC[1]);
                 fRightMin = static_cast<float>(PC[2]);
                 iSplitDirection = command - 35;
-                fStart = fQuery->m_rayEnds[0].m_quad[iSplitDirection];
-                fEnd = fQuery->m_rayEnds[1].m_quad[iSplitDirection];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, iSplitDirection);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, iSplitDirection);
                 iLeftOffset = (PC[3] << 8) + PC[4];
                 iRightOffset = (PC[5] << 8) + PC[6];
                 PC += 7;
@@ -358,15 +363,15 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
                     const int32_t iLower = (((PC[1] << 8) + PC[2]) << 8) + PC[3];
                     float fScaled = static_cast<double>(iLower) * m_ItoFScale;
                     fScaled = fScaled * query->m_FtoBScale;
-                    fLower = fScaled - query->m_FtoBoffset.m_quad[iDirection];
+                    fLower = fScaled - XFNV_M128_F32(query->m_FtoBoffset.m_quad, iDirection);
                     const int32_t iUpper = (((PC[4] << 8) + PC[5]) << 8) + PC[6];
                     fScaled = static_cast<double>(iUpper) * m_ItoFScale;
                     fScaled = fScaled * query->m_FtoBScale;
-                    fUpper = fScaled - query->m_FtoBoffset.m_quad[iDirection];
+                    fUpper = fScaled - XFNV_M128_F32(query->m_FtoBoffset.m_quad, iDirection);
                     PC += 7;
                 }
-                fStart = fQuery->m_rayEnds[0].m_quad[iDirection];
-                fEnd = fQuery->m_rayEnds[1].m_quad[iDirection];
+                fStart = XFNV_M128_F32(fQuery->m_rayEnds[0].m_quad, iDirection);
+                fEnd = XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, iDirection);
                 // The end the ray leaves the bounds through: 0 when it runs up the axis, 1 when it runs down.
                 int32_t iFirst;
                 if (fEnd > fStart) {
@@ -541,7 +546,7 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
                         hkError::MESSAGE_ERROR, 0x1298fedd, shapeBuffer,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppLongRayVirtualMachine.cpp", 554
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -594,7 +599,7 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
                 );
                 fQuery->m_rayEnds[1].m_quad = _mm_mul_ps(_mm_set1_ps(query->m_FtoBScale), fQuery->m_rayEnds[1].m_quad);
                 fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(fQuery->m_rayEnds[1].m_quad, query->m_FtoBoffset.m_quad);
-                if (iSplitDirection < 3 && fRightMin > fQuery->m_rayEnds[1].m_quad[iSplitDirection]) {
+                if (iSplitDirection < 3 && fRightMin > XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, iSplitDirection)) {
                     return;
                 }
             }
@@ -630,7 +635,7 @@ void hkpMoppLongRayVirtualMachine::queryRayOnTree(
             );
             fQuery->m_rayEnds[1].m_quad = _mm_mul_ps(_mm_set1_ps(query->m_FtoBScale), fQuery->m_rayEnds[1].m_quad);
             fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(fQuery->m_rayEnds[1].m_quad, query->m_FtoBoffset.m_quad);
-            if (iSplitDirection < 3 && fLeftMax < fQuery->m_rayEnds[1].m_quad[iSplitDirection]) {
+            if (iSplitDirection < 3 && fLeftMax < XFNV_M128_F32(fQuery->m_rayEnds[1].m_quad, iSplitDirection)) {
                 return;
             }
         }

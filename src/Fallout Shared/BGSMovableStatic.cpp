@@ -10,6 +10,7 @@
 #include "Fallout Shared/TESObjectSTAT.h"
 #include "Fallout Shared/TESSound.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 MOVABLE_STATIC_DATA::MOVABLE_STATIC_DATA() : cFlags(0) {}
 
@@ -45,7 +46,7 @@ bool BGSMovableStatic::Load(TESFile* apFile) {
         switch (eChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pEditorID, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pEditorID);
                 break;
@@ -59,7 +60,7 @@ bool BGSMovableStatic::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                 apFile->GetChunkData(pBuffer, uiSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiSize, usFormVersion);

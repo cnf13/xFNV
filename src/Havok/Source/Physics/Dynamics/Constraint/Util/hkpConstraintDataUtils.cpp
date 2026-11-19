@@ -15,6 +15,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Malleable/hkpMalleableConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
+#include "xfnv/Compiler.h"
 
 // The closest point between a shape and a point, asked of the world's collision dispatcher: the point is a sphere of
 // the collision tolerance (0.01) placed at arPosition by an identity transform, the other body is arShape at
@@ -31,9 +32,9 @@ int32_t hkGetClosestPointOnShape(hkpWorld* apWorld, const hkpShape* apShape, con
     transform.m_rotation.m_col0.m_quad = zero;
     transform.m_rotation.m_col1.m_quad = zero;
     transform.m_rotation.m_col2.m_quad = zero;
-    transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-    transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-    transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
     transform.m_translation = arPosition;
     hkpCdBody bodyA;
     bodyA.m_shape = pSphere;
@@ -105,9 +106,9 @@ void hkpConstraintDataUtils::getPivotTransform(const hkpConstraintData* apData, 
         arPivot.m_rotation.m_col0.m_quad = zero;
         arPivot.m_rotation.m_col1.m_quad = zero;
         arPivot.m_rotation.m_col2.m_quad = zero;
-        arPivot.m_rotation.m_col0.m_quad[0] = 1.0f;
-        arPivot.m_rotation.m_col1.m_quad[1] = 1.0f;
-        arPivot.m_rotation.m_col2.m_quad[2] = 1.0f;
+        XFNV_M128_F32(arPivot.m_rotation.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(arPivot.m_rotation.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(arPivot.m_rotation.m_col2.m_quad, 2) = 1.0f;
         arPivot.m_translation.m_quad = zero;
         switch (apData->getType()) {
             case hkpConstraintData::CONSTRAINT_TYPE_BREAKABLE:

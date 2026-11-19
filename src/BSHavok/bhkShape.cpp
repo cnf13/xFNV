@@ -26,6 +26,8 @@
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
 #include "SDK/Windows/winbase.h"
 
+#include <bit>
+
 // The name of each HavokMaterialType.
 using MaterialNameArray = const char* [BHK_MATERIAL_MAX];
 static MaterialNameArray pMaterialNameA{
@@ -101,7 +103,7 @@ void bhkShape::LoadBinary(NiStream& arStream) {
     hkShapeCinfo& rInfo = static_cast<hkShapeCinfo&>(pThis->CreateCinfo(bCreated));
     // Compares the flag's raw byte with 1: any other byte swaps.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-        rInfo.m_userData = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(rInfo.m_userData)));
+        rInfo.m_userData = static_cast<int32_t>(std::byteswap<uint32_t>(static_cast<uint32_t>(rInfo.m_userData)));
     }
     if (rInfo.m_userData >= BHK_MATERIAL_MAX) {
         rInfo.m_userData = 0;
@@ -128,11 +130,11 @@ void bhkShape::SaveBinary(NiStream& arStream) {
     rInfo.m_userData = static_cast<int32_t>(uiMaterial);
     // Compares the flag's raw byte with 1: any other byte swaps.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        rInfo.m_userData = static_cast<int32_t>(__builtin_bswap32(uiMaterial));
+        rInfo.m_userData = static_cast<int32_t>(std::byteswap<uint32_t>(uiMaterial));
     }
     bhkSerializable::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        rInfo.m_userData = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(rInfo.m_userData)));
+        rInfo.m_userData = static_cast<int32_t>(std::byteswap<uint32_t>(static_cast<uint32_t>(rInfo.m_userData)));
     }
     pThis->KillCinfo(bCreated);
 }

@@ -65,6 +65,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -335,11 +336,11 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
             }
             hkpWorldObject* pObject = static_cast<hkpWorldObject*>(pbhkRB->phkObject);
             // The collidable's address is tested for null at the read and at the store, as the game does. clang assumes
-            // a member's address is non-null and drops those tests; the empty asm hides the pointer from it.
+            // a member's address is non-null and drops those tests; HidePointer hides the pointer from it.
             uint32_t uiFilter = 0;
             if (pObject) {
                 const hkpCollidable* pcol = pObject->getCollidable();
-                __asm__("" : "+r"(pcol));
+                xfnv::HidePointer(pcol);
                 if (pcol) {
                     uiFilter = pcol->getCollisionFilterInfo();
                 }
@@ -348,7 +349,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
                 uiFilter &= ~0x4000u;
                 if (pObject) {
                     hkpCollidable* pCollidableRw = &pObject->m_collidable;
-                    __asm__("" : "+r"(pCollidableRw));
+                    xfnv::HidePointer(pCollidableRw);
                     if (pCollidableRw) {
                         pCollidableRw->m_broadPhaseHandle.m_collisionFilterInfo = uiFilter;
                     }

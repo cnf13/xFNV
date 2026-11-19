@@ -52,6 +52,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -188,7 +189,8 @@ uint16_t hkpSimpleConstraintContactMgr::addContactPointImpl(
     cpi->m_impulseApplied = 0.0f;
     __m128 dot = _mm_mul_ps(deltaVel, cp.m_separatingNormal.m_quad);
     cpi->m_userData = 0;
-    float projectedVel = _mm_shuffle_ps(dot, dot, 170)[0] + (_mm_shuffle_ps(dot, dot, 85)[0] + dot[0]);
+    float projectedVel = XFNV_M128_F32(_mm_shuffle_ps(dot, dot, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(dot, dot, 85), 0) + XFNV_M128_F32(dot, 0));
     hkpManifoldPointAddedEvent event(id, this, &input, &output, &a, &b, &cp, contactCache, cpi, projectedVel);
     hkpWorldCallbackUtil::fireContactPointAdded(m_world, event);
     if (rbA->m_contactListeners.m_size) {
@@ -211,7 +213,7 @@ uint16_t hkpSimpleConstraintContactMgr::addContactPointImpl(
             float invSum = 1.0 / (sumInvMass + 1.000000013351432e-10);
             cpi->m_impulseApplied = invSum * -0.20000000298023224 * projectedVel;
             cpi->m_internalSolverData = 0.0f;
-            cpi->m_internalDataA = cp.m_separatingNormal.m_quad[3];
+            cpi->m_internalDataA = XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3);
             return id;
         }
     }

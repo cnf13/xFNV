@@ -28,6 +28,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -64,7 +65,9 @@ float hkpConvexShape::getMaximumProjection(const hkVector4& direction) const {
     hkpCdVertex v7;
     getSupportingVertexImpl(direction, v7);
     __m128 v3 = _mm_mul_ps(direction.m_quad, v7.m_quad);
-    return m_radius + (_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]));
+    return m_radius +
+        (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0)));
 }
 
 // KEEP (partcopy:): the output handed to collector.addRayHit has m_pad (bytes 0x18-0x1F) and m_shapeKeys[1..7]
@@ -148,6 +151,6 @@ const hkpConvexShape* getClosestPointAndNormal(
     hkVector4 pointOnB;
     pointOnB.m_quad = _mm_sub_ps(pointOnA.m_quad, _mm_mul_ps(_mm_shuffle_ps(w, w, _MM_SHUFFLE(0, 0, 0, 0)), s));
     a4->setTransformedInversePos(aTb, pointOnB);
-    a3->m_quad[3] = sepOut.m_quad[3] - a1->m_radius - a2->m_radius;
+    XFNV_M128_F32(a3->m_quad, 3) = XFNV_M128_F32(sepOut.m_quad, 3) - a1->m_radius - a2->m_radius;
     return a1;
 }

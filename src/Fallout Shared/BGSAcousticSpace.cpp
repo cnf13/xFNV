@@ -9,6 +9,7 @@
 #include "Fallout Shared/TESObject.h"
 #include "Fallout Shared/TESSound.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSAcousticSpace::BGSAcousticSpace() {
     SetFormType(ASPC_ID);
@@ -52,7 +53,7 @@ bool BGSAcousticSpace::Load(TESFile* apFile) {
         }
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0x200);
             SetFormEditorID(pBuffer);
         }

@@ -10,6 +10,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESModel.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 void TESTextureListArray::ClearData() {
     TESTextureList* v2;
@@ -34,7 +35,7 @@ void TESTextureListArray::Load(TESModelList* apModelList, TESFile* apFile) {
     ClearData();
     const uint32_t uiSize = apFile->GetChunkSize();
     // A 16-byte aligned stack buffer of the chunk's size.
-    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize < 4 ? 4 : uiSize, 128));
+    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize < 4 ? 4 : uiSize));
     // The game does not zero these bytes, so a chunk shorter than the count leaves them unwritten (see above).
     pBuffer[0] = 0;
     pBuffer[1] = 0;

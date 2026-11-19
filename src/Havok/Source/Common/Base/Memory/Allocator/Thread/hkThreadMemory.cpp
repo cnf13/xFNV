@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Util/hkMemUtil.h"
+#include "xfnv/Compiler.h"
 
 // Sets up 17 empty free lists (MEMORY_MAX_ALL_ROW rows), the lookup tables, then a cleared memory system with a limit
 // of 8 blocks per free list.
@@ -251,7 +252,7 @@ void hkThreadMemory::initLookupTables() {
                                                             if (v2 > 2048) {
                                                                 if (v2 > 0x1000) {
                                                                     if (v2 > 0x2000) {
-                                                                        __builtin_debugtrap();
+                                                                        xfnv::DebugTrap();
                                                                         v3 = -1;
                                                                     }
                                                                     else {
@@ -340,7 +341,7 @@ void hkThreadMemory::initLookupTables() {
                                                             if (v4 > 2048) {
                                                                 if (v4 > 0x1000) {
                                                                     if (v4 > 0x2000) {
-                                                                        __builtin_debugtrap();
+                                                                        xfnv::DebugTrap();
                                                                         v6 = -1;
                                                                     }
                                                                     else {

@@ -4,7 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
-#include <__stddef_size_t.h>
+#include <cstddef>
 #include <memory>
 #include <vector>
 

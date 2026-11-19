@@ -13,6 +13,7 @@
 #include "Havok/Source/Common/Base/Types/Geometry/hkGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometryTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -104,10 +105,10 @@ void hkDisplayCylinder::buildGeometry() {
     _mm_store_ps(&reinterpret_cast<float*>(&kDirectionV.m_quad)[0], kDirection);
     // The unit axis that is least aligned with the direction: y when |x| is over 0.5, else x when |y| is not, else z.
     __m128 kAxis;
-    if (fabsf(kDirectionV.m_quad[0]) > 0.5f) {
+    if (fabsf(XFNV_M128_F32(kDirectionV.m_quad, 0)) > 0.5f) {
         kAxis = _mm_setr_ps(0.0f, 1.0f, 0.0f, 0.0f);
     }
-    else if (fabsf(kDirectionV.m_quad[1]) > 0.5f) {
+    else if (fabsf(XFNV_M128_F32(kDirectionV.m_quad, 1)) > 0.5f) {
         kAxis = _mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f);
     }
     else {

@@ -73,6 +73,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -826,9 +827,9 @@ template <>
 void hkgpMesh::PrismShape<1>::getSupportingVertex(const hkVector4& direction, hkVector4& out) const {
     hkVector4 first;
     first.m_quad = m_triangle->m_vertices[0]->m_position.m_quad;
-    first.m_quad[3] = std::bit_cast<float>(0x3F000000u);
+    XFNV_M128_F32(first.m_quad, 3) = std::bit_cast<float>(0x3F000000u);
     out.m_quad = first.m_quad;
-    out.m_quad[3] = std::bit_cast<float>(0x3F000000u);
+    XFNV_M128_F32(out.m_quad, 3) = std::bit_cast<float>(0x3F000000u);
     const __m128 p0 = _mm_mul_ps(direction.m_quad, out.m_quad);
     float best = _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(p0, p0, 170), _mm_add_ss(_mm_shuffle_ps(p0, p0, 85), p0)));
     for (int32_t i = 1; i < 6; ++i) {
@@ -839,13 +840,13 @@ void hkgpMesh::PrismShape<1>::getSupportingVertex(const hkVector4& direction, hk
             const __m128 y = _mm_shuffle_ps(vertex->m_data.m_quad, vertex->m_data.m_quad, 85);
             v.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(y, y, 0), vertex->m_normal.m_quad), v.m_quad);
         }
-        v.m_quad[3] = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(i));
+        XFNV_M128_F32(v.m_quad, 3) = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(i));
         const __m128 p = _mm_mul_ps(direction.m_quad, v.m_quad);
         const float d = _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(p, p, 170), _mm_add_ss(_mm_shuffle_ps(p, p, 85), p)));
         if (best < d) {
             out.m_quad = v.m_quad;
             best = d;
-            out.m_quad[3] = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(i));
+            XFNV_M128_F32(out.m_quad, 3) = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(i));
         }
     }
 }
@@ -858,11 +859,12 @@ hkAabb* hkgpMesh::PrismShape<1>::getBoundingBox(hkAabb& aabbOut) const {
     for (int32_t k = 0; k < 3; ++k) {
         const hkgpMeshBase::Vertex* vertex = m_triangle->m_vertices[k];
         vertices[2 * k].m_quad = vertex->m_position.m_quad;
-        vertices[2 * k].m_quad[3] = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(2 * k));
+        XFNV_M128_F32(vertices[2 * k].m_quad, 3) = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(2 * k));
         const __m128 y = _mm_shuffle_ps(vertex->m_data.m_quad, vertex->m_data.m_quad, 85);
         vertices[2 * k + 1].m_quad =
             _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(y, y, 0), vertex->m_normal.m_quad), vertex->m_position.m_quad);
-        vertices[2 * k + 1].m_quad[3] = std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(2 * k + 1));
+        XFNV_M128_F32(vertices[2 * k + 1].m_quad, 3) =
+            std::bit_cast<float>(0x3F000000u | static_cast<uint32_t>(2 * k + 1));
     }
     hkAabbUtil::calcAabb(vertices, 6, aabbOut);
     return &aabbOut;
@@ -1062,22 +1064,22 @@ void hkgpDefaultTriangulatorType::setDomainFromPoints(
         while (--count);
     }
     const double epsilon = 1.1920928955078125e-05;
-    if (static_cast<double>(vMax[0]) - vMin[0] < epsilon) {
-        vMin[0] = vMin[0] - epsilon;
-        vMax[0] = vMax[0] + epsilon;
+    if (static_cast<double>(XFNV_M128_F32(vMax, 0)) - XFNV_M128_F32(vMin, 0) < epsilon) {
+        XFNV_M128_F32(vMin, 0) = XFNV_M128_F32(vMin, 0) - epsilon;
+        XFNV_M128_F32(vMax, 0) = XFNV_M128_F32(vMax, 0) + epsilon;
     }
-    if (static_cast<double>(vMax[1]) - vMin[1] < epsilon) {
-        vMin[1] = vMin[1] - epsilon;
-        vMax[1] = vMax[1] + epsilon;
+    if (static_cast<double>(XFNV_M128_F32(vMax, 1)) - XFNV_M128_F32(vMin, 1) < epsilon) {
+        XFNV_M128_F32(vMin, 1) = XFNV_M128_F32(vMin, 1) - epsilon;
+        XFNV_M128_F32(vMax, 1) = XFNV_M128_F32(vMax, 1) + epsilon;
     }
     __m128 extent = _mm_sub_ps(vMax, vMin);
     if (keepRatio) {
-        const int32_t larger = extent[1] < extent[0] ? 0 : 1;
+        const int32_t larger = XFNV_M128_F32(extent, 1) < XFNV_M128_F32(extent, 0) ? 0 : 1;
         const int32_t smaller = 1 - larger;
-        const float half = (static_cast<double>(extent[larger]) - extent[smaller]) * 0.5;
-        vMin[smaller] = vMin[smaller] - half;
-        vMax[smaller] = half + vMax[smaller];
-        extent[smaller] = extent[larger];
+        const float half = (static_cast<double>(XFNV_M128_F32(extent, larger)) - XFNV_M128_F32(extent, smaller)) * 0.5;
+        XFNV_M128_F32(vMin, smaller) = XFNV_M128_F32(vMin, smaller) - half;
+        XFNV_M128_F32(vMax, smaller) = half + XFNV_M128_F32(vMax, smaller);
+        XFNV_M128_F32(extent, smaller) = XFNV_M128_F32(extent, larger);
     }
     const int32_t margin = dmax ? 1 : 0;
     m_margin = margin;
@@ -1085,10 +1087,12 @@ void hkgpDefaultTriangulatorType::setDomainFromPoints(
     hkMatrix4 frame = hkMatrix4Identity;
     const float fMargin = static_cast<float>(margin);
     const float scale = 32767.0 - (static_cast<double>(fMargin) + fMargin);
-    frame.m_col0.m_quad[0] = scale / extent[0];
-    frame.m_col1.m_quad[1] = scale / extent[1];
-    frame.m_col3.m_quad[0] = fMargin - static_cast<double>(frame.m_col0.m_quad[0]) * vMin[0];
-    frame.m_col3.m_quad[1] = fMargin - static_cast<double>(frame.m_col1.m_quad[1]) * vMin[1];
+    XFNV_M128_F32(frame.m_col0.m_quad, 0) = scale / XFNV_M128_F32(extent, 0);
+    XFNV_M128_F32(frame.m_col1.m_quad, 1) = scale / XFNV_M128_F32(extent, 1);
+    XFNV_M128_F32(frame.m_col3.m_quad, 0) =
+        fMargin - static_cast<double>(XFNV_M128_F32(frame.m_col0.m_quad, 0)) * XFNV_M128_F32(vMin, 0);
+    XFNV_M128_F32(frame.m_col3.m_quad, 1) =
+        fMargin - static_cast<double>(XFNV_M128_F32(frame.m_col1.m_quad, 1)) * XFNV_M128_F32(vMin, 1);
     m_worldToLocal.setMul(frame, worldToXYPlane);
     m_localToWorld.setInverse(m_worldToLocal, 0.0f);
     reset(true);
@@ -1304,7 +1308,8 @@ static int32_t checkTriangle(hkGsk* apThis, const hkVector4* apPoint, hkVector4*
         __m128 v21 =
             _mm_mul_ps(_mm_sub_ps(apThis->m_verticesA[0u].m_quad, apThis->m_verticesBinA[0u].m_quad), v10.m_quad);
         __m128 v22 = _mm_shuffle_ps(v21, v21, 170);
-        v22[0] = v22[0] + (_mm_shuffle_ps(v21, v21, 85)[0] + v21[0]);
+        XFNV_M128_F32(v22, 0) =
+            XFNV_M128_F32(v22, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v21, v21, 85), 0) + XFNV_M128_F32(v21, 0));
         if ((_mm_movemask_ps(v22) & 1) != 0) {
             // Flip the triangle: swap its first two vertices and their B copies (at 4 and 5), negate the normal and
             // swap the first two weights.
@@ -1313,9 +1318,9 @@ static int32_t checkTriangle(hkGsk* apThis, const hkVector4* apPoint, hkVector4*
             a3[1] = kVertex0;
             const hkVector4 kVertexB0 = a3[4];
             a4->m_quad = _mm_xor_ps(v10.m_quad, hkQuadRealNegateMask);
-            const float fDot0 = apThis->m_checkTriangleDots.m_quad[0];
-            apThis->m_checkTriangleDots.m_quad[0] = apThis->m_checkTriangleDots.m_quad[1];
-            apThis->m_checkTriangleDots.m_quad[1] = fDot0;
+            const float fDot0 = XFNV_M128_F32(apThis->m_checkTriangleDots.m_quad, 0);
+            XFNV_M128_F32(apThis->m_checkTriangleDots.m_quad, 0) = XFNV_M128_F32(apThis->m_checkTriangleDots.m_quad, 1);
+            XFNV_M128_F32(apThis->m_checkTriangleDots.m_quad, 1) = fDot0;
             a3[4] = a3[5];
             a3[5] = kVertexB0;
             apThis->m_featureChange.m_storage = 1;
@@ -1688,24 +1693,24 @@ void hkgpMakeAabbCubic(hkAabb* aabb) {
     __m128 v3 = _mm_mul_ps(_mm_sub_ps(aabb->m_max.m_quad, aabb->m_min.m_quad), hkQuadRealHalf);
     __m128 v4 = _mm_and_ps(hkVector4_setAbs4_absMask, v3);
     __m128 v5 = _mm_mul_ps(v2, hkQuadRealHalf);
-    if (!(v4[1] > static_cast<double>(v4[0]))) {
-        if (!(v4[2] > static_cast<double>(v4[0]))) {
+    if (!(XFNV_M128_F32(v4, 1) > static_cast<double>(XFNV_M128_F32(v4, 0)))) {
+        if (!(XFNV_M128_F32(v4, 2) > static_cast<double>(XFNV_M128_F32(v4, 0)))) {
             v6 = 0;
             goto LABEL_7;
         }
         goto LABEL_5;
     }
-    if (v4[2] > static_cast<double>(v4[1])) {
+    if (XFNV_M128_F32(v4, 2) > static_cast<double>(XFNV_M128_F32(v4, 1))) {
     LABEL_5:;
         v6 = 2;
         goto LABEL_7;
     }
     v6 = 1;
 LABEL_7:;
-    v4[0] = v3[v6];
-    m_quad[0] = v4[0];
+    XFNV_M128_F32(v4, 0) = XFNV_M128_F32(v3, v6);
+    XFNV_M128_F32(m_quad, 0) = XFNV_M128_F32(v4, 0);
     __m128 v7 = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v4[0]))), m_quad),
+        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(v4, 0)))), m_quad),
         _mm_unpacklo_ps(v4, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
     );
     aabb->m_min.m_quad = _mm_sub_ps(v5, v7);
@@ -1829,7 +1834,7 @@ int32_t hkgpMesh::IConvexOverlap::IConvexShape::getMaxIndex() const {
             hkError::MESSAGE_ERROR, -0x30582034, buf,
             "d:\\build\\20091222_000100_AiAnBeClDePh\\Source\\Common/Internal/GeometryProcessing/Mesh/hkgpMesh.h", 280
         )) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
     return 0;
 }
@@ -1848,14 +1853,14 @@ void hkgpMesh::IConvexOverlap::operator delete(void* apMemory) {
 // rounded to float in a separate float local. Returns m_a only when m_b's projection is below m_a's (not on NaN).
 void hkgpMesh::LineShape::getSupportingVertex(const hkVector4& direction, hkVector4& out) const {
     const hkQuadReal& kDir = direction.m_quad;
-    const float fAx = kDir[0] * m_a.m_quad[0];
-    const float fAy = kDir[1] * m_a.m_quad[1];
-    const float fAz = kDir[2] * m_a.m_quad[2];
+    const float fAx = XFNV_M128_F32(kDir, 0) * XFNV_M128_F32(m_a.m_quad, 0);
+    const float fAy = XFNV_M128_F32(kDir, 1) * XFNV_M128_F32(m_a.m_quad, 1);
+    const float fAz = XFNV_M128_F32(kDir, 2) * XFNV_M128_F32(m_a.m_quad, 2);
     const float fAxy = fAy + fAx;
     const float fDotA = fAz + fAxy;
-    const float fBx = m_b.m_quad[0] * kDir[0];
-    const float fBy = m_b.m_quad[1] * kDir[1];
-    const float fBz = m_b.m_quad[2] * kDir[2];
+    const float fBx = XFNV_M128_F32(m_b.m_quad, 0) * XFNV_M128_F32(kDir, 0);
+    const float fBy = XFNV_M128_F32(m_b.m_quad, 1) * XFNV_M128_F32(kDir, 1);
+    const float fBz = XFNV_M128_F32(m_b.m_quad, 2) * XFNV_M128_F32(kDir, 2);
     const float fBxy = fBy + fBx;
     const float fDotB = fBz + fBxy;
     if (fDotB < fDotA) {
@@ -1872,15 +1877,15 @@ hkAabb* hkgpMesh::LineShape::getBoundingBox(hkAabb& aabbOut) const {
     const hkQuadReal& kA = m_a.m_quad;
     const hkQuadReal& kB = m_b.m_quad;
     hkQuadReal kMin;
-    kMin[0] = kA[0] < kB[0] ? kA[0] : kB[0];
-    kMin[1] = kA[1] < kB[1] ? kA[1] : kB[1];
-    kMin[2] = kA[2] < kB[2] ? kA[2] : kB[2];
-    kMin[3] = kA[3] < kB[3] ? kA[3] : kB[3];
+    XFNV_M128_F32(kMin, 0) = XFNV_M128_F32(kA, 0) < XFNV_M128_F32(kB, 0) ? XFNV_M128_F32(kA, 0) : XFNV_M128_F32(kB, 0);
+    XFNV_M128_F32(kMin, 1) = XFNV_M128_F32(kA, 1) < XFNV_M128_F32(kB, 1) ? XFNV_M128_F32(kA, 1) : XFNV_M128_F32(kB, 1);
+    XFNV_M128_F32(kMin, 2) = XFNV_M128_F32(kA, 2) < XFNV_M128_F32(kB, 2) ? XFNV_M128_F32(kA, 2) : XFNV_M128_F32(kB, 2);
+    XFNV_M128_F32(kMin, 3) = XFNV_M128_F32(kA, 3) < XFNV_M128_F32(kB, 3) ? XFNV_M128_F32(kA, 3) : XFNV_M128_F32(kB, 3);
     hkQuadReal kMax;
-    kMax[0] = kA[0] > kB[0] ? kA[0] : kB[0];
-    kMax[1] = kA[1] > kB[1] ? kA[1] : kB[1];
-    kMax[2] = kA[2] > kB[2] ? kA[2] : kB[2];
-    kMax[3] = kA[3] > kB[3] ? kA[3] : kB[3];
+    XFNV_M128_F32(kMax, 0) = XFNV_M128_F32(kA, 0) > XFNV_M128_F32(kB, 0) ? XFNV_M128_F32(kA, 0) : XFNV_M128_F32(kB, 0);
+    XFNV_M128_F32(kMax, 1) = XFNV_M128_F32(kA, 1) > XFNV_M128_F32(kB, 1) ? XFNV_M128_F32(kA, 1) : XFNV_M128_F32(kB, 1);
+    XFNV_M128_F32(kMax, 2) = XFNV_M128_F32(kA, 2) > XFNV_M128_F32(kB, 2) ? XFNV_M128_F32(kA, 2) : XFNV_M128_F32(kB, 2);
+    XFNV_M128_F32(kMax, 3) = XFNV_M128_F32(kA, 3) > XFNV_M128_F32(kB, 3) ? XFNV_M128_F32(kA, 3) : XFNV_M128_F32(kB, 3);
     aabbOut.m_min.m_quad = kMin;
     aabbOut.m_max.m_quad = kMax;
     return &aabbOut;
@@ -1892,13 +1897,15 @@ void hkgpMesh::TriangleShape::getSupportingVertex(const hkVector4& a1, hkVector4
     int32_t v11;
     hkgpMeshBase::Triangle* m_triangle = this->m_triangle;
     __m128 v4 = _mm_mul_ps(m_triangle->m_vertices[0]->m_position.m_quad, a1.m_quad);
-    float v5 = _mm_shuffle_ps(v4, v4, 85)[0] + v4[0];
-    float v6 = _mm_shuffle_ps(v4, v4, 170)[0];
+    float v5 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0);
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 170), 0);
     __m128 v7 = _mm_mul_ps(m_triangle->m_vertices[1]->m_position.m_quad, a1.m_quad);
     float v8 = v6 + v5;
-    float v9 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v9 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
     __m128 v10 = _mm_mul_ps(m_triangle->m_vertices[2]->m_position.m_quad, a1.m_quad);
-    float v12 = _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    float v12 = XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0));
     if (!(v9 < static_cast<double>(v8))) {
         v11 = 1;
         if (v12 < static_cast<double>(v9)) {
@@ -1914,7 +1921,7 @@ void hkgpMesh::TriangleShape::getSupportingVertex(const hkVector4& a1, hkVector4
     v11 = 0;
 LABEL_6:;
     a2 = m_triangle->m_vertices[v11]->m_position;
-    a2.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>((v11 | 0x3F000000)));
+    XFNV_M128_F32(a2.m_quad, 3) = std::bit_cast<float>(static_cast<int32_t>((v11 | 0x3F000000)));
 }
 
 // The box of the triangle's three positions, copied into a local array; returns aabbOut.
@@ -1978,12 +1985,12 @@ bool hkgpMesh::PrismPolicy::addHit(
     shapeA.m_triangle = triangleA;
     shapeB.m_triangle = triangleB;
     if (overlap->checkOverlap(&shapeA, &shapeB, 0.0f)) {
-        triangleA->m_vertices[0]->m_data.m_quad[3] = 0.0f;
-        triangleB->m_vertices[0]->m_data.m_quad[3] = 0.0f;
-        triangleA->m_vertices[1]->m_data.m_quad[3] = 0.0f;
-        triangleB->m_vertices[1]->m_data.m_quad[3] = 0.0f;
-        triangleA->m_vertices[2]->m_data.m_quad[3] = 0.0f;
-        triangleB->m_vertices[2]->m_data.m_quad[3] = 0.0f;
+        XFNV_M128_F32(triangleA->m_vertices[0]->m_data.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(triangleB->m_vertices[0]->m_data.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(triangleA->m_vertices[1]->m_data.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(triangleB->m_vertices[1]->m_data.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(triangleA->m_vertices[2]->m_data.m_quad, 3) = 0.0f;
+        XFNV_M128_F32(triangleB->m_vertices[2]->m_data.m_quad, 3) = 0.0f;
     }
     return false;
 }
@@ -2047,8 +2054,10 @@ float hkgpMesh::WeldingPolicy::addLeaf(const hkAabbTree<hkAabbTreeData::hkAabbTr
     );
     __m128 v3 = _mm_mul_ps(v2, v2);
     double v4 = 1.0;
-    if (m_weldingRadiusSquared >=
-        static_cast<double>((_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])))) {
+    if (m_weldingRadiusSquared >= static_cast<double>(
+                                      (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 170), 0) +
+                                       (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0)))
+                                  )) {
         // The mesh's tree keeps each leaf's vertex in the leaf's user data.
         m_match = static_cast<hkgpMeshBase::Vertex*>(leaf->m_leafData.m_userData);
     }
@@ -2427,12 +2436,12 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
                 const hkQuadReal& kP0 = pTriB->m_vertices[0]->m_position.m_quad;
                 const hkQuadReal& kP1 = pTriB->m_vertices[1]->m_position.m_quad;
                 const hkQuadReal& kP2 = pTriB->m_vertices[2]->m_position.m_quad;
-                float fAx = kP1[0] - kP0[0];
-                float fAy = kP1[1] - kP0[1];
-                float fAz = kP1[2] - kP0[2];
-                float fBx = kP2[0] - kP0[0];
-                float fBy = kP2[1] - kP0[1];
-                float fBz = kP2[2] - kP0[2];
+                float fAx = XFNV_M128_F32(kP1, 0) - XFNV_M128_F32(kP0, 0);
+                float fAy = XFNV_M128_F32(kP1, 1) - XFNV_M128_F32(kP0, 1);
+                float fAz = XFNV_M128_F32(kP1, 2) - XFNV_M128_F32(kP0, 2);
+                float fBx = XFNV_M128_F32(kP2, 0) - XFNV_M128_F32(kP0, 0);
+                float fBy = XFNV_M128_F32(kP2, 1) - XFNV_M128_F32(kP0, 1);
+                float fBz = XFNV_M128_F32(kP2, 2) - XFNV_M128_F32(kP0, 2);
                 float fCx = fBz * fAy - fBy * fAz;
                 float fCy = fBx * fAz - fBz * fAx;
                 float fCz = fBy * fAx - fBx * fAy;
@@ -2441,7 +2450,7 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
                 float fCzz = fCz * fCz;
                 float fSum = fCyy + fCxx;
                 fSum = fCzz + fSum;
-                float fLength = __builtin_elementwise_sqrt(fSum);
+                float fLength = xfnv::SqrtF(fSum);
                 if (!(static_cast<double>(fLength) > 9.999999747378752e-05)) {
                     continue;
                 }
@@ -2466,21 +2475,21 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
             // Each distance: (z + w) + (y + x) of the corner times the plane, w the plane's.
             float afDist[3];
             {
-                float fMx = kV0[0] * kN[0];
-                float fMy = kV0[1] * kN[1];
-                float fMz = kV0[2] * kN[2];
-                afDist[0] = (fMz + kN[3]) + (fMy + fMx);
-                fMx = kV1[0] * kN[0];
-                fMy = kV1[1] * kN[1];
-                fMz = kV1[2] * kN[2];
-                afDist[1] = (fMz + kN[3]) + (fMy + fMx);
-                fMx = kV2[0] * kN[0];
-                fMy = kV2[1] * kN[1];
-                fMz = kV2[2] * kN[2];
-                afDist[2] = (fMy + fMx) + (fMz + kN[3]);
+                float fMx = XFNV_M128_F32(kV0, 0) * XFNV_M128_F32(kN, 0);
+                float fMy = XFNV_M128_F32(kV0, 1) * XFNV_M128_F32(kN, 1);
+                float fMz = XFNV_M128_F32(kV0, 2) * XFNV_M128_F32(kN, 2);
+                afDist[0] = (fMz + XFNV_M128_F32(kN, 3)) + (fMy + fMx);
+                fMx = XFNV_M128_F32(kV1, 0) * XFNV_M128_F32(kN, 0);
+                fMy = XFNV_M128_F32(kV1, 1) * XFNV_M128_F32(kN, 1);
+                fMz = XFNV_M128_F32(kV1, 2) * XFNV_M128_F32(kN, 2);
+                afDist[1] = (fMz + XFNV_M128_F32(kN, 3)) + (fMy + fMx);
+                fMx = XFNV_M128_F32(kV2, 0) * XFNV_M128_F32(kN, 0);
+                fMy = XFNV_M128_F32(kV2, 1) * XFNV_M128_F32(kN, 1);
+                fMz = XFNV_M128_F32(kV2, 2) * XFNV_M128_F32(kN, 2);
+                afDist[2] = (fMy + fMx) + (fMz + XFNV_M128_F32(kN, 3));
             }
             for (float& rDist : afDist) {
-                float fAbs = __builtin_fabsf(rDist);
+                float fAbs = std::fabsf(rDist);
                 if (fEpsilon >= fAbs) {
                     rDist = 0.0f;
                 }
@@ -2488,20 +2497,32 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
             const hkQuadReal& kOne = hkQuadReal1111_0;
             hkVector4 akPoints[3];
             float fT = afDist[0] / (afDist[0] - afDist[1]);
-            akPoints[0].m_quad[0] = (kOne[0] - fT) * kV0[0] + fT * kV1[0];
-            akPoints[0].m_quad[1] = (kOne[1] - fT) * kV0[1] + fT * kV1[1];
-            akPoints[0].m_quad[2] = (kOne[2] - fT) * kV0[2] + fT * kV1[2];
-            akPoints[0].m_quad[3] = (kOne[3] - fT) * kV0[3] + fT * kV1[3];
+            XFNV_M128_F32(akPoints[0].m_quad, 0) =
+                (XFNV_M128_F32(kOne, 0) - fT) * XFNV_M128_F32(kV0, 0) + fT * XFNV_M128_F32(kV1, 0);
+            XFNV_M128_F32(akPoints[0].m_quad, 1) =
+                (XFNV_M128_F32(kOne, 1) - fT) * XFNV_M128_F32(kV0, 1) + fT * XFNV_M128_F32(kV1, 1);
+            XFNV_M128_F32(akPoints[0].m_quad, 2) =
+                (XFNV_M128_F32(kOne, 2) - fT) * XFNV_M128_F32(kV0, 2) + fT * XFNV_M128_F32(kV1, 2);
+            XFNV_M128_F32(akPoints[0].m_quad, 3) =
+                (XFNV_M128_F32(kOne, 3) - fT) * XFNV_M128_F32(kV0, 3) + fT * XFNV_M128_F32(kV1, 3);
             fT = afDist[1] / (afDist[1] - afDist[2]);
-            akPoints[1].m_quad[0] = (kOne[0] - fT) * kV1[0] + fT * kV2[0];
-            akPoints[1].m_quad[1] = (kOne[1] - fT) * kV1[1] + fT * kV2[1];
-            akPoints[1].m_quad[2] = (kOne[2] - fT) * kV1[2] + fT * kV2[2];
-            akPoints[1].m_quad[3] = (kOne[3] - fT) * kV1[3] + fT * kV2[3];
+            XFNV_M128_F32(akPoints[1].m_quad, 0) =
+                (XFNV_M128_F32(kOne, 0) - fT) * XFNV_M128_F32(kV1, 0) + fT * XFNV_M128_F32(kV2, 0);
+            XFNV_M128_F32(akPoints[1].m_quad, 1) =
+                (XFNV_M128_F32(kOne, 1) - fT) * XFNV_M128_F32(kV1, 1) + fT * XFNV_M128_F32(kV2, 1);
+            XFNV_M128_F32(akPoints[1].m_quad, 2) =
+                (XFNV_M128_F32(kOne, 2) - fT) * XFNV_M128_F32(kV1, 2) + fT * XFNV_M128_F32(kV2, 2);
+            XFNV_M128_F32(akPoints[1].m_quad, 3) =
+                (XFNV_M128_F32(kOne, 3) - fT) * XFNV_M128_F32(kV1, 3) + fT * XFNV_M128_F32(kV2, 3);
             fT = afDist[2] / (afDist[2] - afDist[0]);
-            akPoints[2].m_quad[0] = (kOne[0] - fT) * kV2[0] + fT * kV0[0];
-            akPoints[2].m_quad[1] = (kOne[1] - fT) * kV2[1] + fT * kV0[1];
-            akPoints[2].m_quad[2] = (kOne[2] - fT) * kV2[2] + fT * kV0[2];
-            akPoints[2].m_quad[3] = (kOne[3] - fT) * kV2[3] + fT * kV0[3];
+            XFNV_M128_F32(akPoints[2].m_quad, 0) =
+                (XFNV_M128_F32(kOne, 0) - fT) * XFNV_M128_F32(kV2, 0) + fT * XFNV_M128_F32(kV0, 0);
+            XFNV_M128_F32(akPoints[2].m_quad, 1) =
+                (XFNV_M128_F32(kOne, 1) - fT) * XFNV_M128_F32(kV2, 1) + fT * XFNV_M128_F32(kV0, 1);
+            XFNV_M128_F32(akPoints[2].m_quad, 2) =
+                (XFNV_M128_F32(kOne, 2) - fT) * XFNV_M128_F32(kV2, 2) + fT * XFNV_M128_F32(kV0, 2);
+            XFNV_M128_F32(akPoints[2].m_quad, 3) =
+                (XFNV_M128_F32(kOne, 3) - fT) * XFNV_M128_F32(kV2, 3) + fT * XFNV_M128_F32(kV0, 3);
             float fProduct01 = afDist[0] * afDist[1];
             float fProduct12 = afDist[1] * afDist[2];
             float fProduct20 = afDist[2] * afDist[0];
@@ -2514,23 +2535,23 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
                 }
                 const hkQuadReal& kPoint = akPoints[k].m_quad;
                 const hkQuadReal& kStart = pTriB->m_vertices[k]->m_position.m_quad;
-                float fDx = kPoint[0] - kStart[0];
-                float fDy = kPoint[1] - kStart[1];
-                float fDz = kPoint[2] - kStart[2];
+                float fDx = XFNV_M128_F32(kPoint, 0) - XFNV_M128_F32(kStart, 0);
+                float fDy = XFNV_M128_F32(kPoint, 1) - XFNV_M128_F32(kStart, 1);
+                float fDz = XFNV_M128_F32(kPoint, 2) - XFNV_M128_F32(kStart, 2);
                 float fSum = fDy * fDy + fDx * fDx;
                 fSum = fDz * fDz + fSum;
-                float fDistance = __builtin_elementwise_sqrt(fSum);
+                float fDistance = xfnv::SqrtF(fSum);
                 if (fEpsilon >= fDistance) {
                     uiMask &= ~uiBit;
                     continue;
                 }
                 const hkQuadReal& kEnd = pTriB->m_vertices[(k + 1) % 3]->m_position.m_quad;
-                fDx = kPoint[0] - kEnd[0];
-                fDy = kPoint[1] - kEnd[1];
-                fDz = kPoint[2] - kEnd[2];
+                fDx = XFNV_M128_F32(kPoint, 0) - XFNV_M128_F32(kEnd, 0);
+                fDy = XFNV_M128_F32(kPoint, 1) - XFNV_M128_F32(kEnd, 1);
+                fDz = XFNV_M128_F32(kPoint, 2) - XFNV_M128_F32(kEnd, 2);
                 fSum = fDy * fDy + fDx * fDx;
                 fSum = fDz * fDz + fSum;
-                fDistance = __builtin_elementwise_sqrt(fSum);
+                fDistance = xfnv::SqrtF(fSum);
                 if (fEpsilon >= fDistance) {
                     uiMask &= ~uiBit;
                 }
@@ -2540,11 +2561,11 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
                     continue;
                 }
                 const hkQuadReal& kPoint = akPoints[k].m_quad;
-                float fMx = kPoint[0] * kN[0];
-                float fMy = kPoint[1] * kN[1];
-                float fMz = kPoint[2] * kN[2];
-                float fOffset = (fMy + fMx) + (fMz + kN[3]);
-                if (fEpsilon < __builtin_fabsf(fOffset)) {
+                float fMx = XFNV_M128_F32(kPoint, 0) * XFNV_M128_F32(kN, 0);
+                float fMy = XFNV_M128_F32(kPoint, 1) * XFNV_M128_F32(kN, 1);
+                float fMz = XFNV_M128_F32(kPoint, 2) * XFNV_M128_F32(kN, 2);
+                float fOffset = (fMy + fMx) + (fMz + XFNV_M128_F32(kN, 3));
+                if (fEpsilon < std::fabsf(fOffset)) {
                     uiMask = 0;
                     break;
                 }
@@ -2798,18 +2819,18 @@ void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) 
          pVertex = pVertex->m_next) {
         // mulps by the broadcast offset, then addps: all four lanes.
         alignas(16) hkVector4 kSample;
-        const float fOffsetX = offsetWarmup * pVertex->m_normal.m_quad[0];
-        const float fOffsetY = offsetWarmup * pVertex->m_normal.m_quad[1];
-        const float fOffsetZ = offsetWarmup * pVertex->m_normal.m_quad[2];
-        const float fOffsetW = offsetWarmup * pVertex->m_normal.m_quad[3];
-        kSample.m_quad[0] = fOffsetX + pVertex->m_position.m_quad[0];
-        kSample.m_quad[1] = fOffsetY + pVertex->m_position.m_quad[1];
-        kSample.m_quad[2] = fOffsetZ + pVertex->m_position.m_quad[2];
-        kSample.m_quad[3] = fOffsetW + pVertex->m_position.m_quad[3];
+        const float fOffsetX = offsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 0);
+        const float fOffsetY = offsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 1);
+        const float fOffsetZ = offsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 2);
+        const float fOffsetW = offsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 3);
+        XFNV_M128_F32(kSample.m_quad, 0) = fOffsetX + XFNV_M128_F32(pVertex->m_position.m_quad, 0);
+        XFNV_M128_F32(kSample.m_quad, 1) = fOffsetY + XFNV_M128_F32(pVertex->m_position.m_quad, 1);
+        XFNV_M128_F32(kSample.m_quad, 2) = fOffsetZ + XFNV_M128_F32(pVertex->m_position.m_quad, 2);
+        XFNV_M128_F32(kSample.m_quad, 3) = fOffsetW + XFNV_M128_F32(pVertex->m_position.m_quad, 3);
         const float fDistance = projectPointOnSurface(offset, pVertex->m_normal, kSample, 2);
         // Below, equal or unordered (NaN) take the -1 branch.
         if (fDistance > 0.0f) {
-            kSample.m_quad[3] = __builtin_fabsf(fDistance);
+            XFNV_M128_F32(kSample.m_quad, 3) = std::fabsf(fDistance);
             hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
             if (vertices.m_size == (vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
                 hkArrayUtil::_reserveMore(kHeap, &vertices, sizeof(hkVector4));
@@ -2864,9 +2885,9 @@ void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) 
                 const hkQuadReal& kOther = pOther->m_plane.m_quad;
                 const hkQuadReal& kPlane = pTriangle->m_plane.m_quad;
                 // The products are summed as y + x, then z is added to that.
-                const float fCosX = kOther[0] * kPlane[0];
-                const float fCosY = kOther[1] * kPlane[1];
-                const float fCosZ = kOther[2] * kPlane[2];
+                const float fCosX = XFNV_M128_F32(kOther, 0) * XFNV_M128_F32(kPlane, 0);
+                const float fCosY = XFNV_M128_F32(kOther, 1) * XFNV_M128_F32(kPlane, 1);
+                const float fCosZ = XFNV_M128_F32(kOther, 2) * XFNV_M128_F32(kPlane, 2);
                 const float fCosXY = fCosY + fCosX;
                 const float fCos = fCosZ + fCosXY;
                 // The edge is skipped as flat when the cosine is above (double)0.9999f.
@@ -2876,34 +2897,34 @@ void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) 
                 const hkQuadReal kA = pTriangle->m_vertices[i]->m_position.m_quad;
                 const hkQuadReal kB = pTriangle->m_vertices[iNext]->m_position.m_quad;
                 const hkQuadReal kC = pTriangle->m_vertices[(0x12 >> (2 * i)) & 3]->m_position.m_quad;
-                kNormal.m_quad[0] = kOther[0] + kNormal.m_quad[0];
-                kNormal.m_quad[1] = kOther[1] + kNormal.m_quad[1];
-                kNormal.m_quad[2] = kOther[2] + kNormal.m_quad[2];
-                kNormal.m_quad[3] = kOther[3] + kNormal.m_quad[3];
+                XFNV_M128_F32(kNormal.m_quad, 0) = XFNV_M128_F32(kOther, 0) + XFNV_M128_F32(kNormal.m_quad, 0);
+                XFNV_M128_F32(kNormal.m_quad, 1) = XFNV_M128_F32(kOther, 1) + XFNV_M128_F32(kNormal.m_quad, 1);
+                XFNV_M128_F32(kNormal.m_quad, 2) = XFNV_M128_F32(kOther, 2) + XFNV_M128_F32(kNormal.m_quad, 2);
+                XFNV_M128_F32(kNormal.m_quad, 3) = XFNV_M128_F32(kOther, 3) + XFNV_M128_F32(kNormal.m_quad, 3);
                 const hkQuadReal kD = pOther->m_vertices[(0x12 >> (2 * (uiLink & 3))) & 3]->m_position.m_quad;
                 alignas(16) hkMatrix3 kEdges;
-                kEdges.m_col0.m_quad[0] = kB[0] - kA[0];
-                kEdges.m_col0.m_quad[1] = kB[1] - kA[1];
-                kEdges.m_col0.m_quad[2] = kB[2] - kA[2];
-                kEdges.m_col0.m_quad[3] = kB[3] - kA[3];
-                kEdges.m_col1.m_quad[0] = kC[0] - kA[0];
-                kEdges.m_col1.m_quad[1] = kC[1] - kA[1];
-                kEdges.m_col1.m_quad[2] = kC[2] - kA[2];
-                kEdges.m_col1.m_quad[3] = kC[3] - kA[3];
-                kEdges.m_col2.m_quad[0] = kD[0] - kA[0];
-                kEdges.m_col2.m_quad[1] = kD[1] - kA[1];
-                kEdges.m_col2.m_quad[2] = kD[2] - kA[2];
-                kEdges.m_col2.m_quad[3] = kD[3] - kA[3];
+                XFNV_M128_F32(kEdges.m_col0.m_quad, 0) = XFNV_M128_F32(kB, 0) - XFNV_M128_F32(kA, 0);
+                XFNV_M128_F32(kEdges.m_col0.m_quad, 1) = XFNV_M128_F32(kB, 1) - XFNV_M128_F32(kA, 1);
+                XFNV_M128_F32(kEdges.m_col0.m_quad, 2) = XFNV_M128_F32(kB, 2) - XFNV_M128_F32(kA, 2);
+                XFNV_M128_F32(kEdges.m_col0.m_quad, 3) = XFNV_M128_F32(kB, 3) - XFNV_M128_F32(kA, 3);
+                XFNV_M128_F32(kEdges.m_col1.m_quad, 0) = XFNV_M128_F32(kC, 0) - XFNV_M128_F32(kA, 0);
+                XFNV_M128_F32(kEdges.m_col1.m_quad, 1) = XFNV_M128_F32(kC, 1) - XFNV_M128_F32(kA, 1);
+                XFNV_M128_F32(kEdges.m_col1.m_quad, 2) = XFNV_M128_F32(kC, 2) - XFNV_M128_F32(kA, 2);
+                XFNV_M128_F32(kEdges.m_col1.m_quad, 3) = XFNV_M128_F32(kC, 3) - XFNV_M128_F32(kA, 3);
+                XFNV_M128_F32(kEdges.m_col2.m_quad, 0) = XFNV_M128_F32(kD, 0) - XFNV_M128_F32(kA, 0);
+                XFNV_M128_F32(kEdges.m_col2.m_quad, 1) = XFNV_M128_F32(kD, 1) - XFNV_M128_F32(kA, 1);
+                XFNV_M128_F32(kEdges.m_col2.m_quad, 2) = XFNV_M128_F32(kD, 2) - XFNV_M128_F32(kA, 2);
+                XFNV_M128_F32(kEdges.m_col2.m_quad, 3) = XFNV_M128_F32(kD, 3) - XFNV_M128_F32(kA, 3);
                 // Only lane 0 of the determinant is read; hkSimdReal does not model its vector yet.
-                const float fDet = __builtin_bit_cast(hkQuadReal, kEdges.getDeterminant())[0];
+                const float fDet = XFNV_M128_F32(__builtin_bit_cast(hkQuadReal, kEdges.getDeterminant()), 0);
                 // A determinant below FLT_EPSILON (convex) skips the edge.
                 if (1.1920929e-07f > fDet) {
                     continue;
                 }
             }
-            const float fLengthX = kNormal.m_quad[0] * kNormal.m_quad[0];
-            const float fLengthY = kNormal.m_quad[1] * kNormal.m_quad[1];
-            const float fLengthZ = kNormal.m_quad[2] * kNormal.m_quad[2];
+            const float fLengthX = XFNV_M128_F32(kNormal.m_quad, 0) * XFNV_M128_F32(kNormal.m_quad, 0);
+            const float fLengthY = XFNV_M128_F32(kNormal.m_quad, 1) * XFNV_M128_F32(kNormal.m_quad, 1);
+            const float fLengthZ = XFNV_M128_F32(kNormal.m_quad, 2) * XFNV_M128_F32(kNormal.m_quad, 2);
             const float fLengthXY = fLengthY + fLengthX;
             const float fLengthSq = fLengthZ + fLengthXY;
             // Only an exactly zero squared length skips the edge.
@@ -2922,8 +2943,8 @@ void hkgpMesh::generateConcaveEdges(float offset, hkArray<hkVector4>& edgesOut) 
             const hkVector4& kTo = vertices.m_data[pTo->m_tag];
             // The w of each end carries its index.
             LineShape kLine(kFrom, kTo);
-            kLine.m_a.m_quad[3] = 0.5f;
-            kLine.m_b.m_quad[3] = 0.50000006f;
+            XFNV_M128_F32(kLine.m_a.m_quad, 3) = 0.5f;
+            XFNV_M128_F32(kLine.m_b.m_quad, 3) = 0.50000006f;
             if (!checkOverlap(&kLine, 0.0f, true)) {
                 hkMemoryAllocator& kHeapFrom = hkMemoryRouter::getInstance().heap();
                 if (edgesOut.m_size == (edgesOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
@@ -2981,9 +3002,9 @@ float hkgpMesh::projectPointOnSurface(
             v8 = v14;
             v14 = maxDistance - v14;
             __m128 v9 = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v14), _mm_set_ss(v14), 0), v18.m_quad), m_quad);
-            float v10 = _mm_shuffle_ps(v9, v9, 85)[0] + v9[0];
+            float v10 = XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0);
             __m128 v11 = _mm_shuffle_ps(v9, v9, 170);
-            v11[0] = v11[0] + v10;
+            XFNV_M128_F32(v11, 0) = XFNV_M128_F32(v11, 0) + v10;
             point.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v11, v11, 0), m_quad), point.m_quad);
         }
         while (v5);
@@ -3033,19 +3054,19 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
         for (const hkgpMeshBase::Vertex* pVertex = static_cast<const hkgpMeshBase::Vertex*>(m_vertices.m_used); pVertex;
              pVertex = pVertex->m_next) {
             // The offset warmup in all lanes times the normal, plus the position.
-            const float fOffX = fOffsetWarmup * pVertex->m_normal.m_quad[0];
-            const float fOffY = fOffsetWarmup * pVertex->m_normal.m_quad[1];
-            const float fOffZ = fOffsetWarmup * pVertex->m_normal.m_quad[2];
-            const float fOffW = fOffsetWarmup * pVertex->m_normal.m_quad[3];
+            const float fOffX = fOffsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 0);
+            const float fOffY = fOffsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 1);
+            const float fOffZ = fOffsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 2);
+            const float fOffW = fOffsetWarmup * XFNV_M128_F32(pVertex->m_normal.m_quad, 3);
             alignas(16) hkVector4 kSample;
-            kSample.m_quad[0] = fOffX + pVertex->m_position.m_quad[0];
-            kSample.m_quad[1] = fOffY + pVertex->m_position.m_quad[1];
-            kSample.m_quad[2] = fOffZ + pVertex->m_position.m_quad[2];
-            kSample.m_quad[3] = fOffW + pVertex->m_position.m_quad[3];
+            XFNV_M128_F32(kSample.m_quad, 0) = fOffX + XFNV_M128_F32(pVertex->m_position.m_quad, 0);
+            XFNV_M128_F32(kSample.m_quad, 1) = fOffY + XFNV_M128_F32(pVertex->m_position.m_quad, 1);
+            XFNV_M128_F32(kSample.m_quad, 2) = fOffZ + XFNV_M128_F32(pVertex->m_position.m_quad, 2);
+            XFNV_M128_F32(kSample.m_quad, 3) = fOffW + XFNV_M128_F32(pVertex->m_position.m_quad, 3);
             const float fDistance = projectPointOnSurface(config.m_offset, kSample, config.m_iterations);
             // Only a threshold below the distance keeps the sample.
             if (fThreshold < fDistance) {
-                kSample.m_quad[3] = __builtin_fabsf(fDistance);
+                XFNV_M128_F32(kSample.m_quad, 3) = std::fabsf(fDistance);
                 samplesOut.pushBack(kSample);
             }
         }
@@ -3093,48 +3114,48 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
                 const hkQuadReal& kOther = pOther->m_plane.m_quad;
                 const hkQuadReal& kPlane = pTriangle->m_plane.m_quad;
                 // The products are summed as y + x, then z is added to that.
-                const float fCosX = kOther[0] * kPlane[0];
-                const float fCosY = kOther[1] * kPlane[1];
-                const float fCosZ = kOther[2] * kPlane[2];
+                const float fCosX = XFNV_M128_F32(kOther, 0) * XFNV_M128_F32(kPlane, 0);
+                const float fCosY = XFNV_M128_F32(kOther, 1) * XFNV_M128_F32(kPlane, 1);
+                const float fCosZ = XFNV_M128_F32(kOther, 2) * XFNV_M128_F32(kPlane, 2);
                 const float fCosXY = fCosY + fCosX;
                 const float fCos = fCosZ + fCosXY;
                 // A maximum below the cosine skips the edge.
                 if (config.m_maxCosAngle < fCos) {
                     continue;
                 }
-                kNormal.m_quad[0] = kOther[0] + kNormal.m_quad[0];
-                kNormal.m_quad[1] = kOther[1] + kNormal.m_quad[1];
-                kNormal.m_quad[2] = kOther[2] + kNormal.m_quad[2];
-                kNormal.m_quad[3] = kOther[3] + kNormal.m_quad[3];
+                XFNV_M128_F32(kNormal.m_quad, 0) = XFNV_M128_F32(kOther, 0) + XFNV_M128_F32(kNormal.m_quad, 0);
+                XFNV_M128_F32(kNormal.m_quad, 1) = XFNV_M128_F32(kOther, 1) + XFNV_M128_F32(kNormal.m_quad, 1);
+                XFNV_M128_F32(kNormal.m_quad, 2) = XFNV_M128_F32(kOther, 2) + XFNV_M128_F32(kNormal.m_quad, 2);
+                XFNV_M128_F32(kNormal.m_quad, 3) = XFNV_M128_F32(kOther, 3) + XFNV_M128_F32(kNormal.m_quad, 3);
                 if (config.m_discardConvex.m_bool) {
                     const hkQuadReal kA = pTriangle->m_vertices[i]->m_position.m_quad;
                     const hkQuadReal kB = pTriangle->m_vertices[iNext]->m_position.m_quad;
                     const hkQuadReal kC = pTriangle->m_vertices[(0x12 >> (2 * i)) & 3]->m_position.m_quad;
                     const hkQuadReal kD = pOther->m_vertices[(0x12 >> (2 * (uiLink & 3))) & 3]->m_position.m_quad;
                     alignas(16) hkMatrix3 kEdges;
-                    kEdges.m_col0.m_quad[0] = kB[0] - kA[0];
-                    kEdges.m_col0.m_quad[1] = kB[1] - kA[1];
-                    kEdges.m_col0.m_quad[2] = kB[2] - kA[2];
-                    kEdges.m_col0.m_quad[3] = kB[3] - kA[3];
-                    kEdges.m_col1.m_quad[0] = kC[0] - kA[0];
-                    kEdges.m_col1.m_quad[1] = kC[1] - kA[1];
-                    kEdges.m_col1.m_quad[2] = kC[2] - kA[2];
-                    kEdges.m_col1.m_quad[3] = kC[3] - kA[3];
-                    kEdges.m_col2.m_quad[0] = kD[0] - kA[0];
-                    kEdges.m_col2.m_quad[1] = kD[1] - kA[1];
-                    kEdges.m_col2.m_quad[2] = kD[2] - kA[2];
-                    kEdges.m_col2.m_quad[3] = kD[3] - kA[3];
+                    XFNV_M128_F32(kEdges.m_col0.m_quad, 0) = XFNV_M128_F32(kB, 0) - XFNV_M128_F32(kA, 0);
+                    XFNV_M128_F32(kEdges.m_col0.m_quad, 1) = XFNV_M128_F32(kB, 1) - XFNV_M128_F32(kA, 1);
+                    XFNV_M128_F32(kEdges.m_col0.m_quad, 2) = XFNV_M128_F32(kB, 2) - XFNV_M128_F32(kA, 2);
+                    XFNV_M128_F32(kEdges.m_col0.m_quad, 3) = XFNV_M128_F32(kB, 3) - XFNV_M128_F32(kA, 3);
+                    XFNV_M128_F32(kEdges.m_col1.m_quad, 0) = XFNV_M128_F32(kC, 0) - XFNV_M128_F32(kA, 0);
+                    XFNV_M128_F32(kEdges.m_col1.m_quad, 1) = XFNV_M128_F32(kC, 1) - XFNV_M128_F32(kA, 1);
+                    XFNV_M128_F32(kEdges.m_col1.m_quad, 2) = XFNV_M128_F32(kC, 2) - XFNV_M128_F32(kA, 2);
+                    XFNV_M128_F32(kEdges.m_col1.m_quad, 3) = XFNV_M128_F32(kC, 3) - XFNV_M128_F32(kA, 3);
+                    XFNV_M128_F32(kEdges.m_col2.m_quad, 0) = XFNV_M128_F32(kD, 0) - XFNV_M128_F32(kA, 0);
+                    XFNV_M128_F32(kEdges.m_col2.m_quad, 1) = XFNV_M128_F32(kD, 1) - XFNV_M128_F32(kA, 1);
+                    XFNV_M128_F32(kEdges.m_col2.m_quad, 2) = XFNV_M128_F32(kD, 2) - XFNV_M128_F32(kA, 2);
+                    XFNV_M128_F32(kEdges.m_col2.m_quad, 3) = XFNV_M128_F32(kD, 3) - XFNV_M128_F32(kA, 3);
                     // Only lane 0 of the determinant is read; hkSimdReal does not model its vector yet.
-                    const float fDet = __builtin_bit_cast(hkQuadReal, kEdges.getDeterminant())[0];
+                    const float fDet = XFNV_M128_F32(__builtin_bit_cast(hkQuadReal, kEdges.getDeterminant()), 0);
                     // A determinant below FLT_EPSILON skips the edge.
                     if (1.1920929e-07f > fDet) {
                         continue;
                     }
                 }
             }
-            const float fLengthX = kNormal.m_quad[0] * kNormal.m_quad[0];
-            const float fLengthY = kNormal.m_quad[1] * kNormal.m_quad[1];
-            const float fLengthZ = kNormal.m_quad[2] * kNormal.m_quad[2];
+            const float fLengthX = XFNV_M128_F32(kNormal.m_quad, 0) * XFNV_M128_F32(kNormal.m_quad, 0);
+            const float fLengthY = XFNV_M128_F32(kNormal.m_quad, 1) * XFNV_M128_F32(kNormal.m_quad, 1);
+            const float fLengthZ = XFNV_M128_F32(kNormal.m_quad, 2) * XFNV_M128_F32(kNormal.m_quad, 2);
             const float fLengthXY = fLengthY + fLengthX;
             const float fLengthSq = fLengthZ + fLengthXY;
             // An edge whose squared length is exactly zero is skipped.
@@ -3143,21 +3164,21 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
             }
             const float fLength = std::sqrt(fLengthSq);
             const float fInvLength = 1.0f / fLength;
-            kNormal.m_quad[0] = fInvLength * kNormal.m_quad[0];
-            kNormal.m_quad[1] = fInvLength * kNormal.m_quad[1];
-            kNormal.m_quad[2] = fInvLength * kNormal.m_quad[2];
-            kNormal.m_quad[3] = fInvLength * kNormal.m_quad[3];
+            XFNV_M128_F32(kNormal.m_quad, 0) = fInvLength * XFNV_M128_F32(kNormal.m_quad, 0);
+            XFNV_M128_F32(kNormal.m_quad, 1) = fInvLength * XFNV_M128_F32(kNormal.m_quad, 1);
+            XFNV_M128_F32(kNormal.m_quad, 2) = fInvLength * XFNV_M128_F32(kNormal.m_quad, 2);
+            XFNV_M128_F32(kNormal.m_quad, 3) = fInvLength * XFNV_M128_F32(kNormal.m_quad, 3);
             const hkQuadReal& kStart = pTriangle->m_vertices[i]->m_position.m_quad;
             const hkQuadReal& kEnd = pTriangle->m_vertices[iNext]->m_position.m_quad;
-            const float fEdgeX = kStart[0] - kEnd[0];
-            const float fEdgeY = kStart[1] - kEnd[1];
-            const float fEdgeZ = kStart[2] - kEnd[2];
+            const float fEdgeX = XFNV_M128_F32(kStart, 0) - XFNV_M128_F32(kEnd, 0);
+            const float fEdgeY = XFNV_M128_F32(kStart, 1) - XFNV_M128_F32(kEnd, 1);
+            const float fEdgeZ = XFNV_M128_F32(kStart, 2) - XFNV_M128_F32(kEnd, 2);
             const float fEdgeXX = fEdgeX * fEdgeX;
             const float fEdgeYY = fEdgeY * fEdgeY;
             const float fEdgeZZ = fEdgeZ * fEdgeZ;
             const float fEdgeXY = fEdgeYY + fEdgeXX;
             const float fEdgeSq = fEdgeZZ + fEdgeXY;
-            const float fEdgeLength = __builtin_elementwise_sqrt(fEdgeSq);
+            const float fEdgeLength = xfnv::SqrtF(fEdgeSq);
             // At most 64 steps; the compare is signed.
             int32_t iSteps =
                 static_cast<int32_t>(static_cast<double>(fEdgeLength) / config.m_edgeSamplesSpacing + 0.5) + 3;
@@ -3170,33 +3191,33 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
                 const hkQuadReal& kFrom = pTriangle->m_vertices[i]->m_position.m_quad;
                 const hkQuadReal& kTo = pTriangle->m_vertices[iNext]->m_position.m_quad;
                 const float fOneMinusT = 1.0f - fT;
-                const float fFromX = fOneMinusT * kFrom[0];
-                const float fFromY = fOneMinusT * kFrom[1];
-                const float fFromZ = fOneMinusT * kFrom[2];
-                const float fFromW = fOneMinusT * kFrom[3];
-                const float fToX = kTo[0] * fT;
-                const float fToY = kTo[1] * fT;
-                const float fToZ = kTo[2] * fT;
-                const float fToW = kTo[3] * fT;
-                const float fOffX = fOffsetWarmup * kNormal.m_quad[0];
-                const float fOffY = fOffsetWarmup * kNormal.m_quad[1];
-                const float fOffZ = fOffsetWarmup * kNormal.m_quad[2];
-                const float fOffW = fOffsetWarmup * kNormal.m_quad[3];
+                const float fFromX = fOneMinusT * XFNV_M128_F32(kFrom, 0);
+                const float fFromY = fOneMinusT * XFNV_M128_F32(kFrom, 1);
+                const float fFromZ = fOneMinusT * XFNV_M128_F32(kFrom, 2);
+                const float fFromW = fOneMinusT * XFNV_M128_F32(kFrom, 3);
+                const float fToX = XFNV_M128_F32(kTo, 0) * fT;
+                const float fToY = XFNV_M128_F32(kTo, 1) * fT;
+                const float fToZ = XFNV_M128_F32(kTo, 2) * fT;
+                const float fToW = XFNV_M128_F32(kTo, 3) * fT;
+                const float fOffX = fOffsetWarmup * XFNV_M128_F32(kNormal.m_quad, 0);
+                const float fOffY = fOffsetWarmup * XFNV_M128_F32(kNormal.m_quad, 1);
+                const float fOffZ = fOffsetWarmup * XFNV_M128_F32(kNormal.m_quad, 2);
+                const float fOffW = fOffsetWarmup * XFNV_M128_F32(kNormal.m_quad, 3);
                 const float fLerpX = fFromX + fToX;
                 const float fLerpY = fFromY + fToY;
                 const float fLerpZ = fFromZ + fToZ;
                 const float fLerpW = fFromW + fToW;
                 alignas(16) hkVector4 kSample;
-                kSample.m_quad[0] = fLerpX + fOffX;
-                kSample.m_quad[1] = fLerpY + fOffY;
-                kSample.m_quad[2] = fLerpZ + fOffZ;
-                kSample.m_quad[3] = fLerpW + fOffW;
+                XFNV_M128_F32(kSample.m_quad, 0) = fLerpX + fOffX;
+                XFNV_M128_F32(kSample.m_quad, 1) = fLerpY + fOffY;
+                XFNV_M128_F32(kSample.m_quad, 2) = fLerpZ + fOffZ;
+                XFNV_M128_F32(kSample.m_quad, 3) = fLerpW + fOffW;
                 const float fDistance = projectPointOnSurface(config.m_offset, kSample, config.m_iterations);
                 const float fDelta = fDistance - config.m_offset;
-                const float fAbsDelta = __builtin_fabsf(fDelta);
+                const float fAbsDelta = std::fabsf(fDelta);
                 // Only a threshold above the change keeps the sample.
                 if (fThreshold > fAbsDelta) {
-                    kSample.m_quad[3] = __builtin_fabsf(fDistance);
+                    XFNV_M128_F32(kSample.m_quad, 3) = std::fabsf(fDistance);
                     samplesOut.pushBack(kSample);
                 }
                 if (config.m_edgeCenterOnly.m_bool) {
@@ -3467,7 +3488,7 @@ void hkgpMesh::assignVertexNormals() {
 
 void hkgpMesh::setVerticesData(int32_t index, float value) {
     for (hkgpMeshBase::Vertex* i = m_vertices.m_used; i; i = i->m_next) {
-        i->m_data.m_quad[index] = value;
+        XFNV_M128_F32(i->m_data.m_quad, index) = value;
     }
 }
 
@@ -3499,15 +3520,15 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
             for (uint32_t k = 0; k < 3; ++k) {
                 const hkgpMeshBase::Vertex* pVertex = pTriangle->m_vertices[k];
                 akPrism[2 * k].m_quad = pVertex->m_position.m_quad;
-                akPrism[2 * k].m_quad[3] = std::bit_cast<float>(0x3F000000u + 2 * k);
-                const float fScale = pVertex->m_data.m_quad[2];
-                const float fMoveX = fScale * pVertex->m_normal.m_quad[0];
-                const float fMoveY = fScale * pVertex->m_normal.m_quad[1];
-                const float fMoveZ = fScale * pVertex->m_normal.m_quad[2];
-                akPrism[2 * k + 1].m_quad[0] = fMoveX + pVertex->m_position.m_quad[0];
-                akPrism[2 * k + 1].m_quad[1] = fMoveY + pVertex->m_position.m_quad[1];
-                akPrism[2 * k + 1].m_quad[2] = fMoveZ + pVertex->m_position.m_quad[2];
-                akPrism[2 * k + 1].m_quad[3] = std::bit_cast<float>(0x3F000001u + 2 * k);
+                XFNV_M128_F32(akPrism[2 * k].m_quad, 3) = std::bit_cast<float>(0x3F000000u + 2 * k);
+                const float fScale = XFNV_M128_F32(pVertex->m_data.m_quad, 2);
+                const float fMoveX = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 0);
+                const float fMoveY = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 1);
+                const float fMoveZ = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 2);
+                XFNV_M128_F32(akPrism[2 * k + 1].m_quad, 0) = fMoveX + XFNV_M128_F32(pVertex->m_position.m_quad, 0);
+                XFNV_M128_F32(akPrism[2 * k + 1].m_quad, 1) = fMoveY + XFNV_M128_F32(pVertex->m_position.m_quad, 1);
+                XFNV_M128_F32(akPrism[2 * k + 1].m_quad, 2) = fMoveZ + XFNV_M128_F32(pVertex->m_position.m_quad, 2);
+                XFNV_M128_F32(akPrism[2 * k + 1].m_quad, 3) = std::bit_cast<float>(0x3F000001u + 2 * k);
             }
             alignas(16) hkAabb kAabb;
             hkAabbUtil::calcAabb(akPrism, 6, kAabb);
@@ -3534,8 +3555,9 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
             for (hkgpMeshBase::Vertex* pVertex = static_cast<hkgpMeshBase::Vertex*>(pMesh->m_vertices.m_used); pVertex;
                  pVertex = pVertex->m_next) {
                 hkQuadReal& kData = pVertex->m_data.m_quad;
-                kData[3] = 1.0f;
-                kData[1] = static_cast<float>((static_cast<double>(kData[2]) + kData[0]) * 0.5);
+                XFNV_M128_F32(kData, 3) = 1.0f;
+                XFNV_M128_F32(kData, 1) =
+                    static_cast<float>((static_cast<double>(XFNV_M128_F32(kData, 2)) + XFNV_M128_F32(kData, 0)) * 0.5);
             }
             if (kPolicy.m_iconvexoverlap) {
                 QueryUtils::queryTreeCollision(pTree, pTree, &kPolicy);
@@ -3544,11 +3566,15 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
                  pVertex = pVertex->m_next) {
                 hkQuadReal& kData = pVertex->m_data.m_quad;
                 // Not equal or unordered (NaN) raises the low bound.
-                if (1.0f == kData[3]) {
-                    kData[0] = static_cast<float>((static_cast<double>(kData[1]) + kData[0]) * 0.5);
+                if (1.0f == XFNV_M128_F32(kData, 3)) {
+                    XFNV_M128_F32(kData, 0) = static_cast<float>(
+                        (static_cast<double>(XFNV_M128_F32(kData, 1)) + XFNV_M128_F32(kData, 0)) * 0.5
+                    );
                 }
                 else {
-                    kData[2] = static_cast<float>((static_cast<double>(kData[1]) + kData[2]) * 0.5);
+                    XFNV_M128_F32(kData, 2) = static_cast<float>(
+                        (static_cast<double>(XFNV_M128_F32(kData, 1)) + XFNV_M128_F32(kData, 2)) * 0.5
+                    );
                 }
             }
         }
@@ -3557,16 +3583,17 @@ hkgpMesh* hkgpMesh::createOffset(float offset, int32_t numIterations) const {
     for (hkgpMeshBase::Vertex* pVertex = static_cast<hkgpMeshBase::Vertex*>(pMesh->m_vertices.m_used); pVertex;
          pVertex = pVertex->m_next) {
         // The tried offset when w is still 1, else the low bound.
-        const float fScale =
-            (1.0f == pVertex->m_data.m_quad[3]) ? pVertex->m_data.m_quad[1] : pVertex->m_data.m_quad[0];
-        const float fMoveX = fScale * pVertex->m_normal.m_quad[0];
-        const float fMoveY = fScale * pVertex->m_normal.m_quad[1];
-        const float fMoveZ = fScale * pVertex->m_normal.m_quad[2];
-        const float fMoveW = fScale * pVertex->m_normal.m_quad[3];
-        pVertex->m_position.m_quad[0] = fMoveX + pVertex->m_position.m_quad[0];
-        pVertex->m_position.m_quad[1] = fMoveY + pVertex->m_position.m_quad[1];
-        pVertex->m_position.m_quad[2] = fMoveZ + pVertex->m_position.m_quad[2];
-        pVertex->m_position.m_quad[3] = fMoveW + pVertex->m_position.m_quad[3];
+        const float fScale = (1.0f == XFNV_M128_F32(pVertex->m_data.m_quad, 3))
+            ? XFNV_M128_F32(pVertex->m_data.m_quad, 1)
+            : XFNV_M128_F32(pVertex->m_data.m_quad, 0);
+        const float fMoveX = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 0);
+        const float fMoveY = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 1);
+        const float fMoveZ = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 2);
+        const float fMoveW = fScale * XFNV_M128_F32(pVertex->m_normal.m_quad, 3);
+        XFNV_M128_F32(pVertex->m_position.m_quad, 0) = fMoveX + XFNV_M128_F32(pVertex->m_position.m_quad, 0);
+        XFNV_M128_F32(pVertex->m_position.m_quad, 1) = fMoveY + XFNV_M128_F32(pVertex->m_position.m_quad, 1);
+        XFNV_M128_F32(pVertex->m_position.m_quad, 2) = fMoveZ + XFNV_M128_F32(pVertex->m_position.m_quad, 2);
+        XFNV_M128_F32(pVertex->m_position.m_quad, 3) = fMoveW + XFNV_M128_F32(pVertex->m_position.m_quad, 3);
     }
     pMesh->updatePlaneEquations();
     pMesh->rebuildConvexHull();
@@ -3650,9 +3677,9 @@ void hkgpMesh::appendConcaveEdges(float minConcavity, float extrusion, const hkg
         const hkgpMeshBase::Triangle* pOther = reinterpret_cast<const hkgpMeshBase::Triangle*>(
             pTriangle->m_links[edges.m_data[j].m_index] & ~uintptr_t(3)
         );
-        const float fX = pOther->m_plane.m_quad[0] * pTriangle->m_plane.m_quad[0];
-        const float fY = pOther->m_plane.m_quad[1] * pTriangle->m_plane.m_quad[1];
-        const float fZ = pOther->m_plane.m_quad[2] * pTriangle->m_plane.m_quad[2];
+        const float fX = XFNV_M128_F32(pOther->m_plane.m_quad, 0) * XFNV_M128_F32(pTriangle->m_plane.m_quad, 0);
+        const float fY = XFNV_M128_F32(pOther->m_plane.m_quad, 1) * XFNV_M128_F32(pTriangle->m_plane.m_quad, 1);
+        const float fZ = XFNV_M128_F32(pOther->m_plane.m_quad, 2) * XFNV_M128_F32(pTriangle->m_plane.m_quad, 2);
         const float fXY = fY + fX;
         const float fDot = fZ + fXY;
         values.m_data[j] = hkMath::acos(fDot);
@@ -3679,23 +3706,23 @@ void hkgpMesh::appendConcaveEdges(float minConcavity, float extrusion, const hkg
         const hkgpMeshBase::Vertex* pB = pTriangle->m_vertices[(9 >> (2 * uiIndex)) & 3];
         // mulps by the broadcast offset, then addps: all four lanes.
         alignas(16) hkVector4 kPosA;
-        const float fAx = extrusion * pA->m_normal.m_quad[0];
-        const float fAy = extrusion * pA->m_normal.m_quad[1];
-        const float fAz = extrusion * pA->m_normal.m_quad[2];
-        const float fAw = extrusion * pA->m_normal.m_quad[3];
-        kPosA.m_quad[0] = fAx + pA->m_position.m_quad[0];
-        kPosA.m_quad[1] = fAy + pA->m_position.m_quad[1];
-        kPosA.m_quad[2] = fAz + pA->m_position.m_quad[2];
-        kPosA.m_quad[3] = fAw + pA->m_position.m_quad[3];
+        const float fAx = extrusion * XFNV_M128_F32(pA->m_normal.m_quad, 0);
+        const float fAy = extrusion * XFNV_M128_F32(pA->m_normal.m_quad, 1);
+        const float fAz = extrusion * XFNV_M128_F32(pA->m_normal.m_quad, 2);
+        const float fAw = extrusion * XFNV_M128_F32(pA->m_normal.m_quad, 3);
+        XFNV_M128_F32(kPosA.m_quad, 0) = fAx + XFNV_M128_F32(pA->m_position.m_quad, 0);
+        XFNV_M128_F32(kPosA.m_quad, 1) = fAy + XFNV_M128_F32(pA->m_position.m_quad, 1);
+        XFNV_M128_F32(kPosA.m_quad, 2) = fAz + XFNV_M128_F32(pA->m_position.m_quad, 2);
+        XFNV_M128_F32(kPosA.m_quad, 3) = fAw + XFNV_M128_F32(pA->m_position.m_quad, 3);
         alignas(16) hkVector4 kPosB;
-        const float fBx = extrusion * pB->m_normal.m_quad[0];
-        const float fBy = extrusion * pB->m_normal.m_quad[1];
-        const float fBz = extrusion * pB->m_normal.m_quad[2];
-        const float fBw = extrusion * pB->m_normal.m_quad[3];
-        kPosB.m_quad[0] = fBx + pB->m_position.m_quad[0];
-        kPosB.m_quad[1] = fBy + pB->m_position.m_quad[1];
-        kPosB.m_quad[2] = fBz + pB->m_position.m_quad[2];
-        kPosB.m_quad[3] = fBw + pB->m_position.m_quad[3];
+        const float fBx = extrusion * XFNV_M128_F32(pB->m_normal.m_quad, 0);
+        const float fBy = extrusion * XFNV_M128_F32(pB->m_normal.m_quad, 1);
+        const float fBz = extrusion * XFNV_M128_F32(pB->m_normal.m_quad, 2);
+        const float fBw = extrusion * XFNV_M128_F32(pB->m_normal.m_quad, 3);
+        XFNV_M128_F32(kPosB.m_quad, 0) = fBx + XFNV_M128_F32(pB->m_position.m_quad, 0);
+        XFNV_M128_F32(kPosB.m_quad, 1) = fBy + XFNV_M128_F32(pB->m_position.m_quad, 1);
+        XFNV_M128_F32(kPosB.m_quad, 2) = fBz + XFNV_M128_F32(pB->m_position.m_quad, 2);
+        XFNV_M128_F32(kPosB.m_quad, 3) = fBw + XFNV_M128_F32(pB->m_position.m_quad, 3);
         // The default-constructed items that are copied (uninitialised but for the vertex's m_refs and m_tag).
         alignas(16) hkgpMeshBase::Vertex kVertexItem;
         alignas(16) hkgpMeshBase::Triangle kTriangleItem;
@@ -3782,13 +3809,14 @@ int32_t hkgpMesh::setDistanceToPlane(const hkVector4& plane, int32_t data_index)
     char v4 = 0;
     for (i = 0; m_used; m_used = m_used->m_next) {
         __m128 v5 = _mm_mul_ps(m_used->m_position.m_quad, plane.m_quad);
-        float v8 = (_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0])) +
-            _mm_shuffle_ps(plane.m_quad, plane.m_quad, 255)[0];
+        float v8 = (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+                    (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0))) +
+            XFNV_M128_F32(_mm_shuffle_ps(plane.m_quad, plane.m_quad, 255), 0);
         float v9 = v8 * v8;
         if (m_epsMinEdgeSqLength >= static_cast<double>(v9)) {
             v8 = 0.0f;
         }
-        m_used->m_data.m_quad[data_index] = v8;
+        XFNV_M128_F32(m_used->m_data.m_quad, data_index) = v8;
         if (!(v8 < 0.0f)) {
             if (v8 > 0.0f) {
                 v4 = 1;
@@ -3810,18 +3838,18 @@ int32_t hkgpMesh::setDistanceToPlane(const hkVector4& plane, int32_t data_index)
 int32_t hkgpMesh::removeOrphanVertices() {
     int32_t numRemoved = 0;
     for (hkgpMeshBase::Vertex* v = m_vertices.m_used; v; v = v->m_next) {
-        v->m_data.m_quad[0] = 0.0f;
+        XFNV_M128_F32(v->m_data.m_quad, 0) = 0.0f;
     }
     for (hkgpMeshBase::Triangle* t = m_triangles.m_used; t; t = t->m_next) {
-        t->m_vertices[0]->m_data.m_quad[0] = 1.0f;
-        t->m_vertices[1]->m_data.m_quad[0] = 1.0f;
-        t->m_vertices[2]->m_data.m_quad[0] = 1.0f;
+        XFNV_M128_F32(t->m_vertices[0]->m_data.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(t->m_vertices[1]->m_data.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(t->m_vertices[2]->m_data.m_quad, 0) = 1.0f;
     }
     hkgpMeshBase::Vertex* v = m_vertices.m_used;
     while (v) {
         hkgpMeshBase::Vertex* vertex = v;
         v = v->m_next;
-        if (vertex->m_data.m_quad[0] == 0.0f) {
+        if (XFNV_M128_F32(vertex->m_data.m_quad, 0) == 0.0f) {
             // EXE-INLINED none: hkgpAbstractMeshDefinitions::List::release (the unlink; the pool's release is called)
             hkgpMeshBase::Vertex* next = vertex->m_next;
             hkgpMeshBase::Vertex* prev = vertex->m_prev;
@@ -4109,8 +4137,8 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
                 if (!bTake) {
                     continue;
                 }
-                const float fDistA = pA->m_data.m_quad[0];
-                const float fDistB = pB->m_data.m_quad[0];
+                const float fDistA = XFNV_M128_F32(pA->m_data.m_quad, 0);
+                const float fDistB = XFNV_M128_F32(pB->m_data.m_quad, 0);
                 if (!(static_cast<double>(fDistB) * fDistA < 0.0)) {
                     continue;
                 }
@@ -4145,18 +4173,18 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
                 // subps, mulps by the broadcast t, addps: all four lanes.
                 const hkQuadReal& kA = pA->m_position.m_quad;
                 const hkQuadReal& kB = pB->m_position.m_quad;
-                const float fDx = kB[0] - kA[0];
-                const float fDy = kB[1] - kA[1];
-                const float fDz = kB[2] - kA[2];
-                const float fDw = kB[3] - kA[3];
+                const float fDx = XFNV_M128_F32(kB, 0) - XFNV_M128_F32(kA, 0);
+                const float fDy = XFNV_M128_F32(kB, 1) - XFNV_M128_F32(kA, 1);
+                const float fDz = XFNV_M128_F32(kB, 2) - XFNV_M128_F32(kA, 2);
+                const float fDw = XFNV_M128_F32(kB, 3) - XFNV_M128_F32(kA, 3);
                 const float fMx = fDx * fT;
                 const float fMy = fDy * fT;
                 const float fMz = fDz * fT;
                 const float fMw = fDw * fT;
-                pNew->m_position.m_quad[0] = fMx + kA[0];
-                pNew->m_position.m_quad[1] = fMy + kA[1];
-                pNew->m_position.m_quad[2] = fMz + kA[2];
-                pNew->m_position.m_quad[3] = fMw + kA[3];
+                XFNV_M128_F32(pNew->m_position.m_quad, 0) = fMx + XFNV_M128_F32(kA, 0);
+                XFNV_M128_F32(pNew->m_position.m_quad, 1) = fMy + XFNV_M128_F32(kA, 1);
+                XFNV_M128_F32(pNew->m_position.m_quad, 2) = fMz + XFNV_M128_F32(kA, 2);
+                XFNV_M128_F32(pNew->m_position.m_quad, 3) = fMw + XFNV_M128_F32(kA, 3);
                 pNew->m_data.m_quad = hkVector4Zero.m_quad;
                 const uintptr_t uiLink = pTriangle->m_links[i];
                 const uint32_t uiPrev = (18 >> (2 * i)) & 3;
@@ -4231,9 +4259,9 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
          pTriangle = pTriangle->m_next) {
         // (d1 + d0) + d2 is summed in extended precision and rounded to float once.
         const float fSum = static_cast<float>(
-            (static_cast<double>(pTriangle->m_vertices[1]->m_data.m_quad[0]) +
-             pTriangle->m_vertices[0]->m_data.m_quad[0]) +
-            pTriangle->m_vertices[2]->m_data.m_quad[0]
+            (static_cast<double>(XFNV_M128_F32(pTriangle->m_vertices[1]->m_data.m_quad, 0)) +
+             XFNV_M128_F32(pTriangle->m_vertices[0]->m_data.m_quad, 0)) +
+            XFNV_M128_F32(pTriangle->m_vertices[2]->m_data.m_quad, 0)
         );
         if (fSum == 0.0f) {
             hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
@@ -4354,7 +4382,7 @@ void hkgpMesh::locate(const hkVector4& x, hkgpMesh::Location& location) const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x672B48D7, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 1317
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     hkgpMesh::NearestFeaturePolicy nfp;
@@ -4380,8 +4408,9 @@ void hkgpMesh::locate(const hkVector4& x, hkgpMesh::Location& location) const {
             location.m_normal.m_quad =
                 _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(invLength), _mm_set_ss(invLength), 0), nfp.m_normal.m_quad);
         }
-        const int32_t nonZeroCoordinates = (nfp.m_coordinates.m_quad[0] != 0.0f ? 1 : 0) +
-            (nfp.m_coordinates.m_quad[1] != 0.0f ? 2 : 0) + (nfp.m_coordinates.m_quad[2] != 0.0f ? 4 : 0);
+        const int32_t nonZeroCoordinates = (XFNV_M128_F32(nfp.m_coordinates.m_quad, 0) != 0.0f ? 1 : 0) +
+            (XFNV_M128_F32(nfp.m_coordinates.m_quad, 1) != 0.0f ? 2 : 0) +
+            (XFNV_M128_F32(nfp.m_coordinates.m_quad, 2) != 0.0f ? 4 : 0);
         hkgpMeshBase::Triangle* triangle = nfp.m_nearestTriangle;
         hkgpMeshBase::Vertex* vertex0 = triangle->m_vertices[0];
         hkgpMeshBase::Vertex* vertex1 = triangle->m_vertices[1];
@@ -4650,19 +4679,19 @@ void hkgpMesh::removePartFromClassification(
             const hkQuadReal& kP1 = t->m_vertices[1]->m_position.m_quad;
             const hkQuadReal& kP2 = t->m_vertices[2]->m_position.m_quad;
             const float fThird = 0.3333333432674408f;
-            const float fSumX = kP1[0] + kP0[0];
-            const float fSumY = kP1[1] + kP0[1];
-            const float fSumZ = kP1[2] + kP0[2];
-            const float fSumW = kP1[3] + kP0[3];
-            const float fSum2X = kP2[0] + fSumX;
-            const float fSum2Y = kP2[1] + fSumY;
-            const float fSum2Z = kP2[2] + fSumZ;
-            const float fSum2W = kP2[3] + fSumW;
+            const float fSumX = XFNV_M128_F32(kP1, 0) + XFNV_M128_F32(kP0, 0);
+            const float fSumY = XFNV_M128_F32(kP1, 1) + XFNV_M128_F32(kP0, 1);
+            const float fSumZ = XFNV_M128_F32(kP1, 2) + XFNV_M128_F32(kP0, 2);
+            const float fSumW = XFNV_M128_F32(kP1, 3) + XFNV_M128_F32(kP0, 3);
+            const float fSum2X = XFNV_M128_F32(kP2, 0) + fSumX;
+            const float fSum2Y = XFNV_M128_F32(kP2, 1) + fSumY;
+            const float fSum2Z = XFNV_M128_F32(kP2, 2) + fSumZ;
+            const float fSum2W = XFNV_M128_F32(kP2, 3) + fSumW;
             hkVector4 c;
-            c.m_quad[0] = fSum2X * fThird;
-            c.m_quad[1] = fSum2Y * fThird;
-            c.m_quad[2] = fSum2Z * fThird;
-            c.m_quad[3] = fSum2W * fThird;
+            XFNV_M128_F32(c.m_quad, 0) = fSum2X * fThird;
+            XFNV_M128_F32(c.m_quad, 1) = fSum2Y * fThird;
+            XFNV_M128_F32(c.m_quad, 2) = fSum2Z * fThird;
+            XFNV_M128_F32(c.m_quad, 3) = fSum2W * fThird;
             c.setTransformedPos(transform, c);
             Location location;
             location.~Location();
@@ -4716,14 +4745,14 @@ float hkgpMesh::normalize(hkVector4& trs, hkVector4& scl, float baseScale) {
         _mm_store_ps(&reinterpret_cast<float*>(&trs.m_quad)[0], _mm_mul_ps(_mm_set1_ps(-0.5f), kSum.m_quad));
         scl.setSub4(kMax, kMin);
 
-        float fExtent = scl.m_quad[0];
-        const float fExtentY = scl.m_quad[1];
+        float fExtent = XFNV_M128_F32(scl.m_quad, 0);
+        const float fExtentY = XFNV_M128_F32(scl.m_quad, 1);
         fExtent = fExtentY < fExtent ? fExtent : fExtentY;
-        const float fExtentZ = scl.m_quad[2];
+        const float fExtentZ = XFNV_M128_F32(scl.m_quad, 2);
         fExtent = fExtentZ < fExtent ? fExtent : fExtentZ;
-        scl.m_quad[0] = fExtent;
-        scl.m_quad[1] = fExtent;
-        scl.m_quad[2] = fExtent;
+        XFNV_M128_F32(scl.m_quad, 0) = fExtent;
+        XFNV_M128_F32(scl.m_quad, 1) = fExtent;
+        XFNV_M128_F32(scl.m_quad, 2) = fExtent;
         const float fInvSize = 1.0f / baseScale;
         const __m128 kScale = _mm_mul_ps(_mm_set1_ps(fInvSize), _mm_load_ps(&reinterpret_cast<float*>(&scl.m_quad)[0]));
         _mm_store_ps(&reinterpret_cast<float*>(&scl.m_quad)[0], kScale);
@@ -4742,7 +4771,7 @@ float hkgpMesh::normalize(hkVector4& trs, hkVector4& scl, float baseScale) {
             rebuildConvexHull();
         }
     }
-    return scl.m_quad[0];
+    return XFNV_M128_F32(scl.m_quad, 0);
 }
 
 // ch is built from the vertex positions (a strided view, stride 16); unless the build gives 3 (a 3D hull) nothing is
@@ -4793,7 +4822,8 @@ void hkgpMesh::generateEmptySpaceSamples(
         const __m128 kToCorner = _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&center.m_quad)[0]), kMax);
         hkQuadReal kToCornerSq;
         _mm_store_ps(&reinterpret_cast<float*>(&kToCornerSq)[0], _mm_mul_ps(kToCorner, kToCorner));
-        const float fHalfDiagonalSq = kToCornerSq[2] + (kToCornerSq[1] + kToCornerSq[0]);
+        const float fHalfDiagonalSq =
+            XFNV_M128_F32(kToCornerSq, 2) + (XFNV_M128_F32(kToCornerSq, 1) + XFNV_M128_F32(kToCornerSq, 0));
         const int32_t iDepth = box.m_min.getInt24W();
         bool bInside = false;
         hkVector4 normal;
@@ -4803,7 +4833,7 @@ void hkgpMesh::generateEmptySpaceSamples(
             if (!bSkip && ch.isPointInside(center, false, 0.0f)) {
                 hkVector4 sample = center;
                 const float fDistance = std::sqrt(fSquaredDistance);
-                sample.m_quad[3] = fDistance * scaling;
+                XFNV_M128_F32(sample.m_quad, 3) = fDistance * scaling;
                 samplesOut.pushBack(sample);
             }
         }
@@ -4815,28 +4845,52 @@ void hkgpMesh::generateEmptySpaceSamples(
                 __m128 kCorner;
                 switch (i) {
                     case 0:
-                        kCorner = _mm_setr_ps(box.m_min.m_quad[0], box.m_min.m_quad[1], box.m_min.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_min.m_quad, 0), XFNV_M128_F32(box.m_min.m_quad, 1),
+                            XFNV_M128_F32(box.m_min.m_quad, 2), 0.0f
+                        );
                         break;
                     case 1:
-                        kCorner = _mm_setr_ps(box.m_max.m_quad[0], box.m_min.m_quad[1], box.m_min.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_max.m_quad, 0), XFNV_M128_F32(box.m_min.m_quad, 1),
+                            XFNV_M128_F32(box.m_min.m_quad, 2), 0.0f
+                        );
                         break;
                     case 2:
-                        kCorner = _mm_setr_ps(box.m_max.m_quad[0], box.m_max.m_quad[1], box.m_min.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_max.m_quad, 0), XFNV_M128_F32(box.m_max.m_quad, 1),
+                            XFNV_M128_F32(box.m_min.m_quad, 2), 0.0f
+                        );
                         break;
                     case 3:
-                        kCorner = _mm_setr_ps(box.m_min.m_quad[0], box.m_max.m_quad[1], box.m_min.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_min.m_quad, 0), XFNV_M128_F32(box.m_max.m_quad, 1),
+                            XFNV_M128_F32(box.m_min.m_quad, 2), 0.0f
+                        );
                         break;
                     case 4:
-                        kCorner = _mm_setr_ps(box.m_min.m_quad[0], box.m_min.m_quad[1], box.m_max.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_min.m_quad, 0), XFNV_M128_F32(box.m_min.m_quad, 1),
+                            XFNV_M128_F32(box.m_max.m_quad, 2), 0.0f
+                        );
                         break;
                     case 5:
-                        kCorner = _mm_setr_ps(box.m_max.m_quad[0], box.m_min.m_quad[1], box.m_max.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_max.m_quad, 0), XFNV_M128_F32(box.m_min.m_quad, 1),
+                            XFNV_M128_F32(box.m_max.m_quad, 2), 0.0f
+                        );
                         break;
                     case 6:
-                        kCorner = _mm_setr_ps(box.m_max.m_quad[0], box.m_max.m_quad[1], box.m_max.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_max.m_quad, 0), XFNV_M128_F32(box.m_max.m_quad, 1),
+                            XFNV_M128_F32(box.m_max.m_quad, 2), 0.0f
+                        );
                         break;
                     case 7:
-                        kCorner = _mm_setr_ps(box.m_min.m_quad[0], box.m_max.m_quad[1], box.m_max.m_quad[2], 0.0f);
+                        kCorner = _mm_setr_ps(
+                            XFNV_M128_F32(box.m_min.m_quad, 0), XFNV_M128_F32(box.m_max.m_quad, 1),
+                            XFNV_M128_F32(box.m_max.m_quad, 2), 0.0f
+                        );
                         break;
                     default: kCorner = _mm_mul_ps(kSum, _mm_set1_ps(0.5f)); break;
                 }
@@ -4848,7 +4902,7 @@ void hkgpMesh::generateEmptySpaceSamples(
                     &reinterpret_cast<float*>(&pChild->m_max.m_quad)[0],
                     _mm_max_ps(_mm_load_ps(&reinterpret_cast<float*>(&center.m_quad)[0]), kCorner)
                 );
-                pChild->m_min.m_quad[3] = fChildW;
+                XFNV_M128_F32(pChild->m_min.m_quad, 3) = fChildW;
             }
         }
     }
@@ -4930,9 +4984,9 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
         const __m128 kRadius =
             _mm_shuffle_ps(_mm_set_ss(m_epsVertexWeldingRadius), _mm_set_ss(m_epsVertexWeldingRadius), 0);
         aabb.m_min.m_quad = _mm_sub_ps(position.m_quad, kRadius);
-        aabb.m_min.m_quad[3] = 0.0f;
+        XFNV_M128_F32(aabb.m_min.m_quad, 3) = 0.0f;
         aabb.m_max.m_quad = _mm_add_ps(kRadius, position.m_quad);
-        aabb.m_max.m_quad[3] = 0.0f;
+        XFNV_M128_F32(aabb.m_max.m_quad, 3) = 0.0f;
         policy.m_match = nullptr;
         queryAabb(&kTree, &aabb.m_min.m_quad, &policy);
         if (policy.m_match) {
@@ -5429,14 +5483,15 @@ hkVector4 hkgpMesh::getSupportingVertex(const hkVector4& direction) {
 hkVector4 hkgpMesh::getCenter() {
     hkVector4 center;
     uint32_t v13;
-    int32_t v2 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[1]);
-    center.m_quad[0] = std::bit_cast<float>(static_cast<int32_t>(std::bit_cast<int32_t>(hkVector4Zero.m_quad[0])));
-    int32_t v3 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[2]);
-    center.m_quad[1] = std::bit_cast<float>(v2);
-    int32_t v4 = std::bit_cast<int32_t>(hkVector4Zero.m_quad[3]);
-    center.m_quad[2] = std::bit_cast<float>(v3);
+    int32_t v2 = std::bit_cast<int32_t>(XFNV_M128_F32(hkVector4Zero.m_quad, 1));
+    XFNV_M128_F32(center.m_quad, 0) =
+        std::bit_cast<float>(static_cast<int32_t>(std::bit_cast<int32_t>(XFNV_M128_F32(hkVector4Zero.m_quad, 0))));
+    int32_t v3 = std::bit_cast<int32_t>(XFNV_M128_F32(hkVector4Zero.m_quad, 2));
+    XFNV_M128_F32(center.m_quad, 1) = std::bit_cast<float>(v2);
+    int32_t v4 = std::bit_cast<int32_t>(XFNV_M128_F32(hkVector4Zero.m_quad, 3));
+    XFNV_M128_F32(center.m_quad, 2) = std::bit_cast<float>(v3);
     int32_t m_numUsed = m_vertices.m_numUsed;
-    center.m_quad[3] = std::bit_cast<float>(v4);
+    XFNV_M128_F32(center.m_quad, 3) = std::bit_cast<float>(v4);
     int32_t v12 = m_numUsed;
     if (m_numUsed <= 0) {
         hkgpConvexHull* m_convexHull = this->m_convexHull;
@@ -5511,17 +5566,17 @@ bool hkgpMesh::setPlane(__m128* a1, __m128* a2, __m128* a3, __m128* a4, char a5)
     const float length = _mm_cvtss_f32(
         _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq)))
     );
-    (*a4)[3] = length;
+    XFNV_M128_F32((*a4), 3) = length;
     if (a5 && m_epsMinTwiceTriangleArea > length) {
         reportBadAreaTriangle(a1, a2, a3);
         bValid = false;
     }
     // Reloads w and rounds the reciprocal to float.
-    const float invLength = 1.0f / (*a4)[3];
+    const float invLength = 1.0f / XFNV_M128_F32((*a4), 3);
     const __m128 unitNormal = _mm_mul_ps(_mm_set1_ps(invLength), *a4);
     *a4 = unitNormal;
     const __m128 dot = _mm_mul_ps(*a1, unitNormal);
-    (*a4)[3] = _mm_cvtss_f32(_mm_sub_ss(
+    XFNV_M128_F32((*a4), 3) = _mm_cvtss_f32(_mm_sub_ss(
         _mm_setzero_ps(), _mm_add_ss(_mm_shuffle_ps(dot, dot, 0xAA), _mm_add_ss(_mm_shuffle_ps(dot, dot, 0x55), dot))
     ));
     return bValid;
@@ -5546,9 +5601,12 @@ void hkgpMesh::setPartId(int32_t pid) {
 
 void hkgpMesh::copyPartIdToVerticesW() {
     for (hkgpMeshBase::Triangle* i = m_triangles.m_used; i; i = i->m_next) {
-        i->m_vertices[0]->m_position.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>((i->m_partId | 0x3F000000)));
-        i->m_vertices[1]->m_position.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>((i->m_partId | 0x3F000000)));
-        i->m_vertices[2]->m_position.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>((i->m_partId | 0x3F000000)));
+        XFNV_M128_F32(i->m_vertices[0]->m_position.m_quad, 3) =
+            std::bit_cast<float>(static_cast<int32_t>((i->m_partId | 0x3F000000)));
+        XFNV_M128_F32(i->m_vertices[1]->m_position.m_quad, 3) =
+            std::bit_cast<float>(static_cast<int32_t>((i->m_partId | 0x3F000000)));
+        XFNV_M128_F32(i->m_vertices[2]->m_position.m_quad, 3) =
+            std::bit_cast<float>(static_cast<int32_t>((i->m_partId | 0x3F000000)));
     }
 }
 
@@ -5674,7 +5732,7 @@ void hkgpMesh::retriangulateFromPlanes() {
             const int32_t iMaxCoord = 0x7FFF - iMargin;
             int32_t xy[2];
             for (int32_t c = 0; c < 2; ++c) {
-                const float f = local[c];
+                const float f = XFNV_M128_F32(local, c);
                 const int32_t r =
                     static_cast<int32_t>(f < 0.0f ? static_cast<double>(f) - 0.5 : static_cast<double>(f) + 0.5);
                 xy[c] = r < iMargin ? iMargin : (r > iMaxCoord ? iMaxCoord : r);
@@ -5711,7 +5769,7 @@ void hkgpMesh::retriangulateFromPlanes() {
                     worldToLocal.m_col3.m_quad
                 );
                 for (int32_t c = 0; c < 2; ++c) {
-                    const float f = local[c];
+                    const float f = XFNV_M128_F32(local, c);
                     const int32_t r =
                         static_cast<int32_t>(f < 0.0f ? static_cast<double>(f) - 0.5 : static_cast<double>(f) + 0.5);
                     xy[e][c] = r < iMargin ? iMargin : (r > iMaxCoord ? iMaxCoord : r);
@@ -5991,9 +6049,9 @@ double hkgpMesh::evaluatePlanarSymmetry(__m128* a1, float a2) {
     for (hkgpMeshBase::Vertex* i = m_vertices.m_used; i; i = i->m_next) {
         __m128 m_quad = i->m_position.m_quad;
         __m128 v6 = _mm_mul_ps(*a1, m_quad);
-        float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
+        float v7 = XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0);
         __m128 v8 = _mm_shuffle_ps(v6, v6, 170);
-        v8[0] = (v8[0] + v7) * -2.0f;
+        XFNV_M128_F32(v8, 0) = (XFNV_M128_F32(v8, 0) + v7) * -2.0f;
         point.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v8, v8, 0), *a1), m_quad);
         float v16 = std::sqrt((double)squaredDistanceToPoint(point, normal, nullptr));
         v15 = v16 + v15;
@@ -6016,9 +6074,9 @@ double hkgpMesh::evaluatePlanarSymmetry(__m128* a1, float a2) {
             )
         );
         __m128 v12 = _mm_mul_ps(*a1, v11);
-        float v13 = _mm_shuffle_ps(v12, v12, 85)[0] + v12[0];
+        float v13 = XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0);
         __m128 v14 = _mm_shuffle_ps(v12, v12, 170);
-        v14[0] = (v14[0] + v13) * -2.0f;
+        XFNV_M128_F32(v14, 0) = (XFNV_M128_F32(v14, 0) + v13) * -2.0f;
         point.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), *a1), v11);
         float v17 = std::sqrt((double)squaredDistanceToPoint(point, normal, nullptr));
         v15 = v17 + v15;
@@ -6054,14 +6112,14 @@ double hkgpMesh::findBestPlanarSymmetry(hkVector4* apPlane) {
                 hkVector4 uv;
                 hkVector4 normal;
                 uv.m_quad = _mm_setzero_ps();
-                uv.m_quad[0] = 0.25 * iU * fSize + fMinU + fHalfCell;
-                uv.m_quad[1] = fV;
+                XFNV_M128_F32(uv.m_quad, 0) = 0.25 * iU * fSize + fMinU + fHalfCell;
+                XFNV_M128_F32(uv.m_quad, 1) = fV;
                 hkGeometryProcessing::octahedronToNormal(uv, normal);
                 const __m128 vProd = _mm_mul_ps(normal.m_quad, vCenter.m_quad);
                 const __m128 vSum = _mm_add_ss(
                     _mm_shuffle_ps(vProd, vProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(vProd, vProd, 0x55), vProd)
                 );
-                normal.m_quad[3] = _mm_cvtss_f32(_mm_sub_ss(hkQuadReal0000, vSum));
+                XFNV_M128_F32(normal.m_quad, 3) = _mm_cvtss_f32(_mm_sub_ss(hkQuadReal0000, vSum));
                 const float fValue = evaluatePlanarSymmetry(&normal.m_quad, fBest);
                 if (fBest > fValue) {
                     fBest = fValue;
@@ -6089,7 +6147,7 @@ float hkgpMesh::getVolume() {
             m.m_col0 = t->m_vertices[0]->m_position;
             m.m_col1 = t->m_vertices[1]->m_position;
             m.m_col2 = t->m_vertices[2]->m_position;
-            const float det = m.getDeterminant().m_real[0];
+            const float det = XFNV_M128_F32(m.getDeterminant().m_real, 0);
             volume = det + volume;
         }
         volume = static_cast<float>(volume / 6.0);
@@ -6108,7 +6166,7 @@ bool hkgpMesh::hasValidTopology(bool a1) const {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x4C5C2AFA, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 2857
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
 
@@ -6148,7 +6206,7 @@ bool hkgpMesh::bindEdge(hkgpMeshBase::Edge a1, bool a2, bool a3) {
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x1FB636C8, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 2881
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     return false;
@@ -6383,7 +6441,7 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                     plane.dot4xyz1(kA).getQuad(), plane.dot4xyz1(kB).getQuad(), plane.dot4xyz1(kC).getQuad()
                 };
                 for (__m128& rSide : side) {
-                    if (fEpsilon >= __builtin_fabsf(_mm_cvtss_f32(rSide))) {
+                    if (fEpsilon >= std::fabsf(_mm_cvtss_f32(rSide))) {
                         rSide = _mm_set_ss(0.0f);
                     }
                 }
@@ -6405,7 +6463,7 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                         if (fEpsilon >= static_cast<float>(cut[k].distanceTo3(kA)) ||
                             fEpsilon >= static_cast<float>(cut[k].distanceTo3(kB)) ||
                             fEpsilon >= static_cast<float>(cut[k].distanceTo3(kC)) ||
-                            fEpsilon < __builtin_fabsf(static_cast<float>(plane.dot4xyz1(cut[k])))) {
+                            fEpsilon < std::fabsf(static_cast<float>(plane.dot4xyz1(cut[k])))) {
                             iCrossings &= ~iBit;
                         }
                     }
@@ -7124,9 +7182,9 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
     zero.m_quad = _mm_setzero_ps();
     for (int32_t i = 0; i < 8; ++i) {
         hkVector4 uv = zero;
-        uv.m_quad[1] = static_cast<float>(static_cast<double>(i) / 7.0);
+        XFNV_M128_F32(uv.m_quad, 1) = static_cast<float>(static_cast<double>(i) / 7.0);
         for (int32_t j = 0; j < 8; ++j) {
-            uv.m_quad[0] = static_cast<float>(static_cast<double>(j) / 7.0);
+            XFNV_M128_F32(uv.m_quad, 0) = static_cast<float>(static_cast<double>(j) / 7.0);
             hkVector4& rNormal = normals.expandOne();
             hkGeometryProcessing::octahedronToNormal(uv, rNormal);
         }
@@ -7205,7 +7263,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                             const int32_t iMaxCoord = 0x7FFF - iMargin;
                             int32_t xy[2];
                             for (int32_t c = 0; c < 2; ++c) {
-                                const float f = local[c];
+                                const float f = XFNV_M128_F32(local, c);
                                 const int32_t r = static_cast<int32_t>(
                                     f < 0.0f ? static_cast<double>(f) - 0.5 : static_cast<double>(f) + 0.5
                                 );
@@ -7773,7 +7831,7 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
                 continue;
             }
             // The difference and its absolute value are rounded to float before the compare.
-            const float difference = plane.m_quad[3] - pOther->m_plane.m_quad[3];
+            const float difference = XFNV_M128_F32(plane.m_quad, 3) - XFNV_M128_F32(pOther->m_plane.m_quad, 3);
             const float distance = std::fabs(difference);
             if (!(minDistance >= distance)) {
                 continue;
@@ -7975,8 +8033,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                     if (t->m_links[e] & ~static_cast<uintptr_t>(3)) {
                         continue;
                     }
-                    if (!(0.0f == t->m_vertices[e]->m_data.m_quad[0]) ||
-                        !(0.0f == t->m_vertices[next(e)]->m_data.m_quad[0])) {
+                    if (!(0.0f == XFNV_M128_F32(t->m_vertices[e]->m_data.m_quad, 0)) ||
+                        !(0.0f == XFNV_M128_F32(t->m_vertices[next(e)]->m_data.m_quad, 0))) {
                         continue;
                     }
                     bool bKnown = false;
@@ -8037,10 +8095,10 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             // normal across n1, n3 n1 across n2; the rotation's rows are n1 (negated for part 1), n2 and n3.
             hkVector4 vMax = hkVector4Zero;
             hkVector4 vMin = hkVector4Zero;
-            const float fAbsX = std::fabs(cutplane.m_quad[0]);
+            const float fAbsX = std::fabs(XFNV_M128_F32(cutplane.m_quad, 0));
             float fSmallest = fAbsX;
-            const float fAbsY = std::fabs(cutplane.m_quad[1]);
-            const float fAbsZ = std::fabs(cutplane.m_quad[2]);
+            const float fAbsY = std::fabs(XFNV_M128_F32(cutplane.m_quad, 1));
+            const float fAbsZ = std::fabs(XFNV_M128_F32(cutplane.m_quad, 2));
             int32_t iA = 0;
             int32_t iB = 1;
             int32_t iC = 2;
@@ -8054,8 +8112,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             }
             hkVector4 n1;
             n1.m_quad = _mm_setzero_ps();
-            n1.m_quad[iB] = cutplane.m_quad[iC];
-            n1.m_quad[iC] = -cutplane.m_quad[iB];
+            XFNV_M128_F32(n1.m_quad, iB) = XFNV_M128_F32(cutplane.m_quad, iC);
+            XFNV_M128_F32(n1.m_quad, iC) = -XFNV_M128_F32(cutplane.m_quad, iB);
             n1.normalize3();
             hkVector4 n2;
             n2.setCross(cutplane, n1);
@@ -8070,9 +8128,15 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                 n1.m_quad = _mm_mul_ps(_mm_set1_ps(-1.0f), n1.m_quad);
             }
             hkRotation rotation;
-            rotation.m_col0.set(n1.m_quad[0], n2.m_quad[0], n3.m_quad[0], 0.0f);
-            rotation.m_col1.set(n1.m_quad[1], n2.m_quad[1], n3.m_quad[1], 0.0f);
-            rotation.m_col2.set(n1.m_quad[2], n2.m_quad[2], n3.m_quad[2], 0.0f);
+            rotation.m_col0.set(
+                XFNV_M128_F32(n1.m_quad, 0), XFNV_M128_F32(n2.m_quad, 0), XFNV_M128_F32(n3.m_quad, 0), 0.0f
+            );
+            rotation.m_col1.set(
+                XFNV_M128_F32(n1.m_quad, 1), XFNV_M128_F32(n2.m_quad, 1), XFNV_M128_F32(n3.m_quad, 1), 0.0f
+            );
+            rotation.m_col2.set(
+                XFNV_M128_F32(n1.m_quad, 2), XFNV_M128_F32(n2.m_quad, 2), XFNV_M128_F32(n3.m_quad, 2), 0.0f
+            );
             // Each segment's start in the plane's frame, and their bounds.
             for (int32_t k = 0; k < rings.m_size; ++k) {
                 Ring* pRing = rings.m_data[k];
@@ -8093,7 +8157,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             }
             hkVector4 extents;
             extents.m_quad = _mm_sub_ps(vMax.m_quad, vMin.m_quad);
-            if (extents.m_quad[0] < 1.1920929e-07f || extents.m_quad[1] < 1.1920929e-07f) {
+            if (XFNV_M128_F32(extents.m_quad, 0) < 1.1920929e-07f ||
+                XFNV_M128_F32(extents.m_quad, 1) < 1.1920929e-07f) {
                 apResult->m_value = INVALID_TRIANGULATION_DOMAIN;
                 // Leftover heap lookup of a destructor with nothing to free, kept deliberately as the game does.
                 hkMemoryRouter::getInstance();
@@ -8129,7 +8194,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                     const int32_t iMaxCoord = 0x7FFF - iMargin;
                     int32_t xy[2];
                     for (int32_t c = 0; c < 2; ++c) {
-                        const float f = local.m_quad[c];
+                        const float f = XFNV_M128_F32(local.m_quad, c);
                         const int32_t r = static_cast<int32_t>(
                             f < 0.0f ? static_cast<double>(f) - 0.5 : static_cast<double>(f) + 0.5
                         );
@@ -8460,7 +8525,7 @@ bool hkgpMesh::clipTriangles(
         const __m128 dp = _mm_mul_ps(kPlane.m_quad, kV0.m_quad);
         const __m128 dpSum = _mm_add_ss(_mm_shuffle_ps(dp, dp, 0xAA), _mm_add_ss(_mm_shuffle_ps(dp, dp, 0x55), dp));
         const float fOffset = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dpSum));
-        kPlane.m_quad[3] = fOffset;
+        XFNV_M128_F32(kPlane.m_quad, 3) = fOffset;
         if (!kPlane.isNormalized3(0.0001f).m_bool) {
             continue;
         }
@@ -8527,8 +8592,10 @@ bool hkgpMesh::clipTriangles(
 
 bool hkgpMesh::hasPosition(const hkgpMeshBase::Triangle* t, const hkVector4& position) {
     int32_t v2 = 0;
-    for (hkgpMeshBase::Vertex* const* i = t->m_vertices; position.m_quad[0] != (*i)->m_position.m_quad[0] ||
-         (position.m_quad[1] != (*i)->m_position.m_quad[1] || position.m_quad[2] != (*i)->m_position.m_quad[2]);
+    for (hkgpMeshBase::Vertex* const* i = t->m_vertices;
+         XFNV_M128_F32(position.m_quad, 0) != XFNV_M128_F32((*i)->m_position.m_quad, 0) ||
+         (XFNV_M128_F32(position.m_quad, 1) != XFNV_M128_F32((*i)->m_position.m_quad, 1) ||
+          XFNV_M128_F32(position.m_quad, 2) != XFNV_M128_F32((*i)->m_position.m_quad, 2));
          ++i) {
         if (++v2 >= 3) {
             return false;
@@ -8553,7 +8620,7 @@ float hkgpMesh::tetrahedronVolume6(hkgpMeshBase::Edge edge) {
     m.m_col1.m_quad =
         _mm_sub_ps(edge.m_triangle->m_vertices[(18u >> (2 * edge.m_index)) & 3]->m_position.m_quad, origin);
     m.m_col2.m_quad = _mm_sub_ps(pOther->m_vertices[(18u >> (2 * otherIndex)) & 3]->m_position.m_quad, origin);
-    return m.getDeterminant().m_real[0];
+    return XFNV_M128_F32(m.getDeterminant().m_real, 0);
 }
 
 void hkgpMeshInternals::Ring::operator delete(void* p, size_t size) {
@@ -8595,22 +8662,24 @@ float hkgpMeshInternals::RayCaster::addLeaf(const hkAabbTree<hkAabbTreeData::hkA
     hkgpMeshBase::Triangle* v2 = static_cast<hkgpMeshBase::Triangle*>(leaf->m_leafData.m_userData);
     v4.m_quad = m_rayDir.m_quad;
     __m128 v5 = _mm_mul_ps(v2->m_plane.m_quad, v4.m_quad);
-    float v6 = _mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0));
     if ((v6 * v6) > 1.1920929e-07f) {
         hkVector4 v7;
         v7.m_quad = m_rayFrom.m_quad;
         __m128 v8 = _mm_mul_ps(v2->m_plane.m_quad, v7.m_quad);
-        float v9 = _mm_shuffle_ps(v8, v8, 170)[0] + _mm_shuffle_ps(v2->m_plane.m_quad, v2->m_plane.m_quad, 255)[0];
-        float v10 = _mm_shuffle_ps(v8, v8, 85)[0] + v8[0];
+        float v9 = XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+            XFNV_M128_F32(_mm_shuffle_ps(v2->m_plane.m_quad, v2->m_plane.m_quad, 255), 0);
+        float v10 = XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0);
         __m128 m_quad = hkQuadReal0000;
-        m_quad[0] = (0.0f - (v9 + v10)) / v6;
+        XFNV_M128_F32(m_quad, 0) = (0.0f - (v9 + v10)) / v6;
         a1 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 0), v4.m_quad), v7.m_quad);
-        if (m_quad[0] > 0.0f && m_fraction > static_cast<double>(m_quad[0]) &&
+        if (XFNV_M128_F32(m_quad, 0) > 0.0f && m_fraction > static_cast<double>(XFNV_M128_F32(m_quad, 0)) &&
             isPointInsideTriangle(
                 &a1, &v2->m_vertices[0]->m_position.m_quad, &v2->m_vertices[1]->m_position.m_quad,
                 &v2->m_vertices[2]->m_position.m_quad, -1.1920929e-07f
             )) {
-            m_fraction = m_quad[0];
+            m_fraction = XFNV_M128_F32(m_quad, 0);
             m_triangle = v2;
         }
     }
@@ -8749,7 +8818,7 @@ void hkGskShape::convertVertexIdsToVertices(uint8_t* ids, int32_t numVerts, hkVe
             hkError::MESSAGE_ERROR, 0x50CC4DA8, buf,
             "d:\\build\\20091222_000100_AiAnBeClDePh\\Source\\Common/Internal/Collide/Gsk/hkGsk.h", 44
         )) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
 }
 
@@ -8783,8 +8852,8 @@ void IConvexOverlapImpl::ShapeBridge::convertVertexIdsToVertices(
     __m128 v4 = _mm_undefined_ps();
     __m128 v5 = _mm_undefined_ps();
     hkVector4 v7;
-    v4[0] = 0.0f;
-    v5[0] = 0.0f;
+    XFNV_M128_F32(v4, 0) = 0.0f;
+    XFNV_M128_F32(v5, 0) = 0.0f;
     v7.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(0x3F800000u)), v5),
         _mm_unpacklo_ps(v4, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
@@ -8818,7 +8887,7 @@ float IConvexOverlapImpl::distance(
         return -3.40282e+38f;
     }
 
-    return _mm_shuffle_ps(apOut_.m_normalInA.m_quad, apOut_.m_normalInA.m_quad, 255)[0];
+    return XFNV_M128_F32(_mm_shuffle_ps(apOut_.m_normalInA.m_quad, apOut_.m_normalInA.m_quad, 255), 0);
 }
 
 bool IConvexOverlapImpl::checkOverlap(

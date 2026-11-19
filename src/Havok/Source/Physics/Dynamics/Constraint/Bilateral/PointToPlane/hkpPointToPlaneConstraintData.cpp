@@ -15,6 +15,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpLinConstraintAtom.h"
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpSetLocalTransformsConstraintAtom.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -149,16 +150,16 @@ hkpPointToPlaneConstraintData::hkpPointToPlaneConstraintData() {
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_transforms.m_transformA.m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_transforms.m_transformB.m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_lin.m_axisIndex = 0;
 }
@@ -202,17 +203,21 @@ void hkpPointToPlaneConstraintData::setInBodySpace(
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     int32_t m_axisIndex = m_atoms.m_lin.m_axisIndex;
     __m128* v5 = &m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + m_axisIndex;
     *v5 = planeNormalB.m_quad;
     int32_t v18 = 0;
     int32_t v6 = 1;
-    float v17 = std::fabs((double)(*v5)[0]);
-    float v19 = std::fabs((double)m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad[4 * m_axisIndex + 1]);
-    float v20 = std::fabs((double)m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad[4 * m_axisIndex + 2]);
+    float v17 = std::fabs((double)XFNV_M128_F32((*v5), 0));
+    float v19 = std::fabs(
+        (double)XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, 4 * m_axisIndex + 1)
+    );
+    float v20 = std::fabs(
+        (double)XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, 4 * m_axisIndex + 2)
+    );
     __m128* v7 = &m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + (m_axisIndex + 1) % 3;
     if (v17 > static_cast<double>(v19)) {
         v17 = v19;
@@ -224,18 +229,18 @@ void hkpPointToPlaneConstraintData::setInBodySpace(
         v8 = 2;
     }
     *v7 = _mm_setzero_ps();
-    (*v7)[v6] = (*v5)[v8];
-    (*v7)[v8] = -(*v5)[v6];
+    XFNV_M128_F32((*v7), v6) = XFNV_M128_F32((*v5), v8);
+    XFNV_M128_F32((*v7), v8) = -XFNV_M128_F32((*v5), v6);
     __m128 v9 = _mm_mul_ps(*v7, *v7);
-    float v10 = _mm_shuffle_ps(v9, v9, 85)[0] + v9[0];
+    float v10 = XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0);
     __m128 v11 = _mm_shuffle_ps(v9, v9, 170);
-    v11[0] = v11[0] + v10;
-    float v12 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v11[0])));
-    v13[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v11, 0) = XFNV_M128_F32(v11, 0) + v10;
+    float v12 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v11, 0))));
+    XFNV_M128_F32(v13, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v14 = _mm_cmpeq_ss(v11, v13);
-    v13[0] = 3.0f - ((v11[0] * v12) * v12);
+    XFNV_M128_F32(v13, 0) = 3.0f - ((XFNV_M128_F32(v11, 0) * v12) * v12);
     __m128 v15 = _mm_setzero_ps();
-    v15[0] = (0.5f * v12) * v13[0];
+    XFNV_M128_F32(v15, 0) = (0.5f * v12) * XFNV_M128_F32(v13, 0);
     __m128 v16 = _mm_andnot_ps(v14, v15);
     *v7 = _mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), *v7);
     *(&m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + (m_axisIndex + 2) % 3) = _mm_sub_ps(
@@ -256,15 +261,19 @@ void hkpPointToPlaneConstraintData::setInWorldSpace(
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     int32_t m_axisIndex = m_atoms.m_lin.m_axisIndex;
     hkVector4* v7 = &m_atoms.m_transforms.m_transformB.m_rotation.m_col0 + m_axisIndex;
     v7->setRotatedInverseDir(bodyBTransform.m_rotation, planeNormalW);
-    float v19 = std::fabs((double)v7->m_quad[0]);
-    float v21 = std::fabs((double)m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad[4 * m_axisIndex + 1]);
-    float v22 = std::fabs((double)m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad[4 * m_axisIndex + 2]);
+    float v19 = std::fabs((double)XFNV_M128_F32(v7->m_quad, 0));
+    float v21 = std::fabs(
+        (double)XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, 4 * m_axisIndex + 1)
+    );
+    float v22 = std::fabs(
+        (double)XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, 4 * m_axisIndex + 2)
+    );
     int32_t v20 = 0;
     __m128* v8 = &m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + (m_axisIndex + 1) % 3;
     int32_t v9 = 1;
@@ -278,18 +287,18 @@ void hkpPointToPlaneConstraintData::setInWorldSpace(
         v10 = 2;
     }
     *v8 = _mm_setzero_ps();
-    (*v8)[v9] = v7->m_quad[v10];
-    (*v8)[v10] = -v7->m_quad[v9];
+    XFNV_M128_F32((*v8), v9) = XFNV_M128_F32(v7->m_quad, v10);
+    XFNV_M128_F32((*v8), v10) = -XFNV_M128_F32(v7->m_quad, v9);
     __m128 v11 = _mm_mul_ps(*v8, *v8);
-    float v12 = _mm_shuffle_ps(v11, v11, 85)[0] + v11[0];
+    float v12 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0);
     __m128 v13 = _mm_shuffle_ps(v11, v11, 170);
-    v13[0] = v13[0] + v12;
-    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
-    v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
+    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v13, 0))));
+    XFNV_M128_F32(v15, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v16 = _mm_cmpeq_ss(v13, v15);
-    v15[0] = 3.0f - ((v13[0] * v14) * v14);
+    XFNV_M128_F32(v15, 0) = 3.0f - ((XFNV_M128_F32(v13, 0) * v14) * v14);
     __m128 v17 = _mm_setzero_ps();
-    v17[0] = (0.5f * v14) * v15[0];
+    XFNV_M128_F32(v17, 0) = (0.5f * v14) * XFNV_M128_F32(v15, 0);
     __m128 v18 = _mm_andnot_ps(v16, v17);
     *v8 = _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), *v8);
     *(&m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad + (m_axisIndex + 2) % 3) = _mm_sub_ps(

@@ -9,6 +9,7 @@
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
 #include "Havok/Source/Physics/Collide/Util/hkpCollideTriangleUtil.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -88,9 +89,9 @@ hkResult hkCollideCapsuleUtilClostestPointCapsVsCaps(
     if (!bHaveNormal) {
         // Any direction perpendicular to dA: its smallest component zeroed, the other two swapped, one negated.
         const float* pA = &reinterpret_cast<float*>(&dA.m_quad)[0];
-        float fMin = __builtin_fabsf(pA[0]);
-        const float fAbsY = __builtin_fabsf(pA[1]);
-        const float fAbsZ = __builtin_fabsf(pA[2]);
+        float fMin = std::fabsf(pA[0]);
+        const float fAbsY = std::fabsf(pA[1]);
+        const float fAbsZ = std::fabsf(pA[2]);
         int32_t iMin = 0;
         int32_t iFirst = 1;
         int32_t iSecond = 2;
@@ -117,7 +118,7 @@ hkResult hkCollideCapsuleUtilClostestPointCapsVsCaps(
             _mm_load_ps(&reinterpret_cast<float*>(&result.m_closestPointA.m_quad)[0])
         )
     );
-    cpoint.m_separatingNormal.m_quad[3] = fDistance - fRadiusSum;
+    XFNV_M128_F32(cpoint.m_separatingNormal.m_quad, 3) = fDistance - fRadiusSum;
     return static_cast<hkResult>(0);
 }
 
@@ -148,7 +149,8 @@ int32_t hkCollideCapsuleUtilManifoldCapsVsCaps(
     __m128 v9 = _mm_sub_ps(capsBPoints[1].m_quad, capsBPoints->m_quad);
     __m128 v10 = _mm_sub_ps(m_quad, capsAPointsIn->m_quad);
     __m128 v11 = _mm_mul_ps(v9, v10);
-    float v124 = _mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]);
+    float v124 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0));
     float v123 = v124;
     __m128 v129 = v10;
     __m128 v133 = v9;
@@ -166,12 +168,16 @@ int32_t hkCollideCapsuleUtilManifoldCapsVsCaps(
     __m128 v13 = _mm_sub_ps(m_quad_2, m_quad_3);
     __m128 v14 = _mm_mul_ps(v13, v10);
     __m128 v15 = _mm_mul_ps(v13, v9);
-    float v16 = _mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]);
-    float v120 = _mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0]);
+    float v16 = XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 85), 0) + XFNV_M128_F32(v14, 0));
+    float v120 = XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0));
     __m128 v17 = _mm_mul_ps(v10, v10);
-    float v126 = _mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+    float v126 = XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0));
     __m128 v18 = _mm_mul_ps(v9, v9);
-    float v125 = _mm_shuffle_ps(v18, v18, 170)[0] + (_mm_shuffle_ps(v18, v18, 85)[0] + v18[0]);
+    float v125 = XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 85), 0) + XFNV_M128_F32(v18, 0));
     double v19 = v125;
     float v122 = v16;
     double v20 = v125 * v126;
@@ -245,7 +251,7 @@ int32_t hkCollideCapsuleUtilManifoldCapsVsCaps(
 LABEL_22:;
     float v127 = capsARadius + capsBRadius;
     __m128 v31 = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v104), _mm_set_ss(v104), 0), v10), m_quad_3);
-    double v32 = points->m_separatingNormal.m_quad[3];
+    double v32 = XFNV_M128_F32(points->m_separatingNormal.m_quad, 3);
     __m128 m_quad_6 =
         _mm_sub_ps(v31, _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v109), _mm_set_ss(v109), 0), v9), m_quad_2));
     if (v32 < 1.1920928955078125e-07) {
@@ -253,9 +259,10 @@ LABEL_22:;
     }
     float v110 = v32;
     __m128 v34 = _mm_mul_ps(m_quad_6, m_quad_6);
-    float v35 = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v34, v34, 170)[0] + (_mm_shuffle_ps(v34, v34, 85)[0] + v34[0]))))
-    );
+    float v35 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v34, v34, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v34, v34, 85), 0) + XFNV_M128_F32(v34, 0)))
+    )));
     double v36 = v35;
     float v106 = v35;
     points->m_separatingNormal.m_quad = m_quad_6;
@@ -286,10 +293,10 @@ LABEL_22:;
             int32_t n2_2 = 0;
             v106 = 0.0f;
             int32_t v41 = 1;
-            float v96 = std::fabs((double)v129[0]);
+            float v96 = std::fabs((double)XFNV_M128_F32(v129, 0));
             float v111 = v96;
-            float v97 = std::fabs((double)v129[1]);
-            float v98 = std::fabs((double)v129[2]);
+            float v97 = std::fabs((double)XFNV_M128_F32(v129, 1));
+            float v98 = std::fabs((double)XFNV_M128_F32(v129, 2));
             if (v111 > static_cast<double>(v97)) {
                 v41 = 0;
                 v111 = v97;
@@ -298,27 +305,27 @@ LABEL_22:;
             if (v111 > static_cast<double>(v98)) {
                 n2 = n2_2;
             }
-            double v42 = v129[n2];
+            double v42 = XFNV_M128_F32(v129, n2);
             points->m_separatingNormal.m_quad = _mm_setzero_ps();
-            points->m_separatingNormal.m_quad[v41] = v42;
-            points->m_separatingNormal.m_quad[n2] = -v129[v41];
+            XFNV_M128_F32(points->m_separatingNormal.m_quad, v41) = v42;
+            XFNV_M128_F32(points->m_separatingNormal.m_quad, n2) = -XFNV_M128_F32(v129, v41);
             v43.m_quad = points->m_separatingNormal.m_quad;
             __m128 v44 = _mm_mul_ps(v43.m_quad, v43.m_quad);
-            float v45 = _mm_shuffle_ps(v44, v44, 85)[0] + v44[0];
+            float v45 = XFNV_M128_F32(_mm_shuffle_ps(v44, v44, 85), 0) + XFNV_M128_F32(v44, 0);
             __m128 v46 = _mm_shuffle_ps(v44, v44, 170);
-            v46[0] = v46[0] + v45;
-            float v47 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v46[0])));
-            v48[0] = zero;
+            XFNV_M128_F32(v46, 0) = XFNV_M128_F32(v46, 0) + v45;
+            float v47 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v46, 0))));
+            XFNV_M128_F32(v48, 0) = zero;
             __m128 v49 = _mm_cmpeq_ss(v46, v48);
-            v48[0] = 3.0f - ((v46[0] * v47) * v47);
+            XFNV_M128_F32(v48, 0) = 3.0f - ((XFNV_M128_F32(v46, 0) * v47) * v47);
             __m128 v50 = _mm_setzero_ps();
-            v50[0] = (0.5f * v47) * v48[0];
+            XFNV_M128_F32(v50, 0) = (0.5f * v47) * XFNV_M128_F32(v48, 0);
             __m128 v51 = _mm_andnot_ps(v49, v50);
             points->m_separatingNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(v51, v51, 0), v43.m_quad);
         }
         *reinterpret_cast<float*>(&v99) = capsBRadius - v106;
         v52.m_quad = points->m_separatingNormal.m_quad;
-        points->m_separatingNormal.m_quad[3] = v39;
+        XFNV_M128_F32(points->m_separatingNormal.m_quad, 3) = v39;
         points->m_position.m_quad = _mm_add_ps(
             _mm_mul_ps(
                 _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v99)), _mm_set_ss(std::bit_cast<float>(v99)), 0),
@@ -389,8 +396,9 @@ LABEL_22:;
         LABEL_49:;
             m_quad_9 = _mm_sub_ps(m_quad_8, m_quad_14);
             v73 = _mm_mul_ps(m_quad_9, m_quad_9);
-            v114 = v59->m_separatingNormal.m_quad[3] + v127;
-            v74 = _mm_shuffle_ps(v73, v73, 170)[0] + (_mm_shuffle_ps(v73, v73, 85)[0] + v73[0]);
+            v114 = XFNV_M128_F32(v59->m_separatingNormal.m_quad, 3) + v127;
+            v74 = XFNV_M128_F32(_mm_shuffle_ps(v73, v73, 170), 0) +
+                (XFNV_M128_F32(_mm_shuffle_ps(v73, v73, 85), 0) + XFNV_M128_F32(v73, 0));
             v115 = v114 * v114;
             if (!(v115 > static_cast<double>(v74))) {
                 double v88;
@@ -414,15 +422,15 @@ LABEL_22:;
                 __m128 v80;
                 __m128 m_quad_11 = v59->m_separatingNormal.m_quad;
                 __m128 v76 = _mm_mul_ps(m_quad_11, m_quad_11);
-                float v77 = _mm_shuffle_ps(v76, v76, 85)[0] + v76[0];
+                float v77 = XFNV_M128_F32(_mm_shuffle_ps(v76, v76, 85), 0) + XFNV_M128_F32(v76, 0);
                 __m128 v78 = _mm_shuffle_ps(v76, v76, 170);
-                v78[0] = v78[0] + v77;
-                float v79 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v78[0])));
-                v80[0] = zero;
+                XFNV_M128_F32(v78, 0) = XFNV_M128_F32(v78, 0) + v77;
+                float v79 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v78, 0))));
+                XFNV_M128_F32(v80, 0) = zero;
                 __m128 v81 = _mm_cmpeq_ss(v78, v80);
-                v80[0] = 3.0f - ((v78[0] * v79) * v79);
+                XFNV_M128_F32(v80, 0) = 3.0f - ((XFNV_M128_F32(v78, 0) * v79) * v79);
                 __m128 v82 = _mm_setzero_ps();
-                v82[0] = (0.5f * v79) * v80[0];
+                XFNV_M128_F32(v82, 0) = (0.5f * v79) * XFNV_M128_F32(v80, 0);
                 __m128 v83 = _mm_andnot_ps(v81, v82);
                 m_quad_10 = _mm_mul_ps(_mm_shuffle_ps(v83, v83, 0), m_quad_11);
             }
@@ -432,7 +440,7 @@ LABEL_22:;
             v59->m_separatingNormal.m_quad = m_quad_10;
             *reinterpret_cast<float*>(&v117) = capsBRadius - v116;
             m_quad_12 = v59->m_separatingNormal.m_quad;
-            v59->m_separatingNormal.m_quad[3] = v85 - v127;
+            XFNV_M128_F32(v59->m_separatingNormal.m_quad, 3) = v85 - v127;
             v19 = v125;
             m_quad_13 = _mm_add_ps(
                 _mm_mul_ps(
@@ -496,7 +504,7 @@ LABEL_22:;
     }
     points->m_separatingNormal.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v95), _mm_set_ss(v95), 0), points->m_separatingNormal.m_quad);
-    points->m_separatingNormal.m_quad[3] = v118;
+    XFNV_M128_F32(points->m_separatingNormal.m_quad, 3) = v118;
     return n2_1;
 }
 
@@ -575,9 +583,9 @@ void hkCollideCapsuleUtilCapsVsTri(
     pRow1[2] = fSwap;
     alignas(16) hkVector4 normal;
     _mm_store_ps(&reinterpret_cast<float*>(&normal.m_quad)[0], kNormal);
-    pRow0[3] = normal.m_quad[0];
-    pRow1[3] = normal.m_quad[1];
-    pRow2[3] = normal.m_quad[2];
+    pRow0[3] = XFNV_M128_F32(normal.m_quad, 0);
+    pRow1[3] = XFNV_M128_F32(normal.m_quad, 1);
+    pRow2[3] = XFNV_M128_F32(normal.m_quad, 2);
 
     // The capsule's end points relative to the triangle: x, y and z their edge plane distances, w the plane distance
     // (hkVector4::_setMul4xyz1 with planeEquations).
@@ -588,7 +596,7 @@ void hkCollideCapsuleUtilCapsVsTri(
         &reinterpret_cast<float*>(&projected[0].m_quad)[0],
         _mm_sub_ps(_mm_load_ps(&reinterpret_cast<const float*>(&capsAPoints[0].m_quad)[0]), kT0)
     );
-    translation.m_quad[0] = cache.m_normalLen * -cache.m_invEdgeLen[0];
+    XFNV_M128_F32(translation.m_quad, 0) = cache.m_normalLen * -cache.m_invEdgeLen[0];
     _mm_store_ps(
         &reinterpret_cast<float*>(&projected[1].m_quad)[0],
         _mm_sub_ps(_mm_load_ps(&reinterpret_cast<const float*>(&capsAPoints[1].m_quad)[0]), kT0)
@@ -613,9 +621,9 @@ void hkCollideCapsuleUtilCapsVsTri(
 
     const float fRadiusSum = capsARadius + triBRadius;
     const float fMaxDistance = fRadiusSum + collisionTolerance;
-    points[0].m_separatingNormal.m_quad[3] = 3.40282e+38f;
-    points[1].m_separatingNormal.m_quad[3] = 3.40282e+38f;
-    points[2].m_separatingNormal.m_quad[3] = 3.40282e+38f;
+    XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3) = 3.40282e+38f;
+    XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) = 3.40282e+38f;
+    XFNV_M128_F32(points[2].m_separatingNormal.m_quad, 3) = 3.40282e+38f;
     const __m128 kProjected0 = _mm_load_ps(&reinterpret_cast<float*>(&projected[0].m_quad)[0]);
     const __m128 kProjected1 = _mm_load_ps(&reinterpret_cast<float*>(&projected[1].m_quad)[0]);
     const __m128 kMaxDistance = _mm_set1_ps(fMaxDistance);
@@ -624,8 +632,8 @@ void hkCollideCapsuleUtilCapsVsTri(
         return;
     }
     const float fNegMaxDistance = -fMaxDistance;
-    const float fW0 = projected[0].m_quad[3];
-    const float fW1 = projected[1].m_quad[3];
+    const float fW0 = XFNV_M128_F32(projected[0].m_quad, 3);
+    const float fW1 = XFNV_M128_F32(projected[1].m_quad, 3);
     if (fNegMaxDistance > fW0 && fW1 < fNegMaxDistance) {
         return;
     }
@@ -648,18 +656,18 @@ void hkCollideCapsuleUtilCapsVsTri(
              ) &
              7) == 7) {
             hkContactPoint& cp = points[1];
-            cp.m_separatingNormal.m_quad[3] = -3.40282e+38f;
+            XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) = -3.40282e+38f;
             // The deeper end point along the normal.
             for (int32_t i = 0; i < 2; ++i) {
                 const int32_t iOutside = outside[i];
                 if ((iOutside & 7) == 7) {
-                    const float fAbsDistance = __builtin_fabsf(projected[i].m_quad[3]);
+                    const float fAbsDistance = std::fabsf(XFNV_M128_F32(projected[i].m_quad, 3));
                     const float fDistance = -fAbsDistance - fRadiusSum;
-                    if (cp.m_separatingNormal.m_quad[3] < fDistance) {
+                    if (XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) < fDistance) {
                         if (iOutside & 8) {
                             _mm_store_ps(&reinterpret_cast<float*>(&cp.m_separatingNormal.m_quad)[0], kNormal);
-                            const float fScale = triBRadius - projected[i].m_quad[3];
-                            cp.m_separatingNormal.m_quad[3] = fDistance;
+                            const float fScale = triBRadius - XFNV_M128_F32(projected[i].m_quad, 3);
+                            XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) = fDistance;
                             _mm_store_ps(
                                 &reinterpret_cast<float*>(&cp.m_position.m_quad)[0],
                                 _mm_add_ps(
@@ -670,8 +678,8 @@ void hkCollideCapsuleUtilCapsVsTri(
                         }
                         else {
                             cp.m_separatingNormal.setNeg4(normal);
-                            const float fScale = -triBRadius - projected[i].m_quad[3];
-                            cp.m_separatingNormal.m_quad[3] = fDistance;
+                            const float fScale = -triBRadius - XFNV_M128_F32(projected[i].m_quad, 3);
+                            XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) = fDistance;
                             _mm_store_ps(
                                 &reinterpret_cast<float*>(&cp.m_position.m_quad)[0],
                                 _mm_add_ps(
@@ -689,7 +697,7 @@ void hkCollideCapsuleUtilCapsVsTri(
             _mm_store_ps(&reinterpret_cast<float*>(&dir.m_quad)[0], _mm_sub_ps(kProjected1, kProjected0));
             const float* pDir = &reinterpret_cast<float*>(&dir.m_quad)[0];
             const float* pProjected0 = &reinterpret_cast<float*>(&projected[0].m_quad)[0];
-            const float fDirW = dir.m_quad[3];
+            const float fDirW = XFNV_M128_F32(dir.m_quad, 3);
             const double dDirWSquared = static_cast<double>(fDirW) * fDirW;
             for (int32_t i = 0; i < 3; ++i) {
                 float fW = fDirW;
@@ -700,7 +708,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                     static_cast<float>(static_cast<double>(fD) * fW0 - static_cast<double>(pProjected0[i]) * fDirW);
                 const float fDistanceSquared =
                     static_cast<float>(static_cast<double>(fCross) * fCross * fLengthSquaredInv);
-                const float fLimit = cp.m_separatingNormal.m_quad[3] + fRadiusSum;
+                const float fLimit = XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) + fRadiusSum;
                 if (!(fDistanceSquared < static_cast<double>(fLimit) * fLimit)) {
                     continue;
                 }
@@ -733,7 +741,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                     _mm_mul_ps(kProject, _mm_load_ps(&reinterpret_cast<const float*>(&capsAPoints[1].m_quad)[0]))
                 );
                 const float fScale = triBRadius - fNegDistance;
-                cp.m_separatingNormal.m_quad[3] = fNegDistance - fRadiusSum;
+                XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) = fNegDistance - fRadiusSum;
                 _mm_store_ps(
                     &reinterpret_cast<float*>(&cp.m_position.m_quad)[0],
                     _mm_add_ps(kOnCapsule, _mm_mul_ps(_mm_set1_ps(fScale), kSeparatingNormal))
@@ -767,10 +775,10 @@ void hkCollideCapsuleUtilCapsVsTri(
         if (searchManifold) {
             // The capsule against each edge the end points are not both outside of, keeping the closest result in
             // points[0].
-            points[0].m_separatingNormal.m_quad[3] = collisionTolerance;
-            points[1].m_separatingNormal.m_quad[3] = collisionTolerance;
-            points[2].m_separatingNormal.m_quad[3] = collisionTolerance;
-            projected[1].m_quad[3] = 3.40282e+38f;
+            XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3) = collisionTolerance;
+            XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) = collisionTolerance;
+            XFNV_M128_F32(points[2].m_separatingNormal.m_quad, 3) = collisionTolerance;
+            XFNV_M128_F32(projected[1].m_quad, 3) = 3.40282e+38f;
             int32_t iBit = 1;
             for (int32_t i = 0; i < 3; ++i) {
                 if (!(iOutsideAny & iBit)) {
@@ -800,7 +808,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                             }
                         }
                     }
-                    if (projected[1].m_quad[3] < points[0].m_separatingNormal.m_quad[3]) {
+                    if (XFNV_M128_F32(projected[1].m_quad, 3) < XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3)) {
                         _mm_store_ps(
                             &reinterpret_cast<float*>(&points[0].m_position.m_quad)[0],
                             _mm_load_ps(&reinterpret_cast<float*>(&projected[0].m_quad)[0])
@@ -840,7 +848,7 @@ void hkCollideCapsuleUtilCapsVsTri(
             }
             const int32_t iOutside = outside[iPoint];
             if ((iOutside & 7) == 7) {
-                const float fW = projected[iPoint].m_quad[3];
+                const float fW = XFNV_M128_F32(projected[iPoint].m_quad, 3);
                 const __m128 kFaceNormal = _mm_load_ps(&reinterpret_cast<float*>(&normal.m_quad)[0]);
                 hkVector4 kSeparating;
                 float fDistance;
@@ -869,7 +877,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                     kSeparating.m_quad = kFaceNormal;
                 }
                 _mm_store_ps(&reinterpret_cast<float*>(&pPoint->m_separatingNormal.m_quad)[0], kSeparating.m_quad);
-                pPoint->m_separatingNormal.m_quad[3] = fDistance - fRadiusSum;
+                XFNV_M128_F32(pPoint->m_separatingNormal.m_quad, 3) = fDistance - fRadiusSum;
                 if (featuresOut) {
                     featuresOut[iPoint].numFeatures = 3;
                     featuresOut[iPoint].featureIds[0] = 0;
@@ -911,7 +919,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                     featuresOut[iPoint].featureIds[1] = static_cast<uint16_t>(iEnd);
                 }
             }
-            const float fLimit = pPoint->m_separatingNormal.m_quad[3] + fRadiusSum;
+            const float fLimit = XFNV_M128_F32(pPoint->m_separatingNormal.m_quad, 3) + fRadiusSum;
             const float fLimitSquared = fLimit * fLimit;
             const float fDistanceSquared = result.m_distanceSquared;
             if (!(fLimitSquared > fDistanceSquared)) {
@@ -978,7 +986,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                 )
             );
             _mm_store_ps(&reinterpret_cast<float*>(&pPoint->m_separatingNormal.m_quad)[0], kSeparating.m_quad);
-            pPoint->m_separatingNormal.m_quad[3] = fDistance - fRadiusSum;
+            XFNV_M128_F32(pPoint->m_separatingNormal.m_quad, 3) = fDistance - fRadiusSum;
         }
         if (bSinglePoint) {
             return;
@@ -1022,19 +1030,19 @@ calcTriangleBarycentricPlanes(hkVector4* normalOut, const float* params, hkMatri
         _mm_mul_ps(_mm_shuffle_ps(kC, kC, 0xC9), kNormalD2), _mm_mul_ps(_mm_shuffle_ps(kC, kC, 0xD2), kNormalC9)
     );
 
-    float fTmp = out->m_col1.m_quad[0];
-    out->m_col1.m_quad[0] = out->m_col0.m_quad[1];
-    out->m_col0.m_quad[1] = fTmp;
-    fTmp = out->m_col2.m_quad[0];
-    out->m_col2.m_quad[0] = out->m_col0.m_quad[2];
-    out->m_col0.m_quad[2] = fTmp;
-    fTmp = out->m_col2.m_quad[1];
-    out->m_col2.m_quad[1] = out->m_col1.m_quad[2];
-    out->m_col1.m_quad[2] = fTmp;
-    out->m_col0.m_quad[3] = normalOut->m_quad[0];
-    out->m_col1.m_quad[3] = normalOut->m_quad[1];
-    out->m_col2.m_quad[3] = normalOut->m_quad[2];
+    float fTmp = XFNV_M128_F32(out->m_col1.m_quad, 0);
+    XFNV_M128_F32(out->m_col1.m_quad, 0) = XFNV_M128_F32(out->m_col0.m_quad, 1);
+    XFNV_M128_F32(out->m_col0.m_quad, 1) = fTmp;
+    fTmp = XFNV_M128_F32(out->m_col2.m_quad, 0);
+    XFNV_M128_F32(out->m_col2.m_quad, 0) = XFNV_M128_F32(out->m_col0.m_quad, 2);
+    XFNV_M128_F32(out->m_col0.m_quad, 2) = fTmp;
+    fTmp = XFNV_M128_F32(out->m_col2.m_quad, 1);
+    XFNV_M128_F32(out->m_col2.m_quad, 1) = XFNV_M128_F32(out->m_col1.m_quad, 2);
+    XFNV_M128_F32(out->m_col1.m_quad, 2) = fTmp;
+    XFNV_M128_F32(out->m_col0.m_quad, 3) = XFNV_M128_F32(normalOut->m_quad, 0);
+    XFNV_M128_F32(out->m_col1.m_quad, 3) = XFNV_M128_F32(normalOut->m_quad, 1);
+    XFNV_M128_F32(out->m_col2.m_quad, 3) = XFNV_M128_F32(normalOut->m_quad, 2);
     out->m_col3.m_quad = _mm_setzero_ps();
-    out->m_col3.m_quad[0] = params[4] * -params[0];
+    XFNV_M128_F32(out->m_col3.m_quad, 0) = params[4] * -params[0];
     return out;
 }

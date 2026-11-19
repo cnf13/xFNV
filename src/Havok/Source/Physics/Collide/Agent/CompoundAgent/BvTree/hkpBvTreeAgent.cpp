@@ -47,6 +47,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -138,8 +139,11 @@ void hkpBvTreeAgent::processCollision(
         // The box's extent before it is grown by the motion.
         hkQuadReal extent;
         if (input.m_collisionQualityInfo->m_useContinuousPhysics.m_storage) {
-            const float epsB = msB->m_deltaAngle.m_quad[3] * msB->m_deltaAngle.m_quad[3] * msB->m_objectRadius;
-            const float rotEps = (msA->m_deltaAngle.m_quad[3] + msB->m_deltaAngle.m_quad[3]) * msA->m_objectRadius;
+            const float epsB = XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3) * XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3) *
+                msB->m_objectRadius;
+            const float rotEps =
+                (XFNV_M128_F32(msA->m_deltaAngle.m_quad, 3) + XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3)) *
+                msA->m_objectRadius;
             const float tolerance = rotEps + epsB + input.m_tolerance * 0.5;
             bodyA.m_shape->getAabbImpl(bTa, tolerance, aabb);
 
@@ -154,9 +158,10 @@ void hkpBvTreeAgent::processCollision(
             aabb.m_max.m_quad = _mm_min_ps(aabb.m_max.m_quad, _mm_add_ps(center.m_quad, r));
             extent = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
 
-            if (msB->m_deltaAngle.m_quad[3] > 0.0f) {
+            if (XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3) > 0.0f) {
                 const hkQuadReal rel = _mm_sub_ps(center.m_quad, msB->m_sweptTransform.m_centerOfMassLocal.m_quad);
-                const float scale = msB->m_sweptTransform.m_centerOfMass1.m_quad[3] * input.m_stepInfo.m_deltaTime;
+                const float scale =
+                    XFNV_M128_F32(msB->m_sweptTransform.m_centerOfMass1.m_quad, 3) * input.m_stepInfo.m_deltaTime;
                 const hkQuadReal dA = msB->m_deltaAngle.m_quad;
                 const hkQuadReal cross = _mm_sub_ps(
                     _mm_mul_ps(

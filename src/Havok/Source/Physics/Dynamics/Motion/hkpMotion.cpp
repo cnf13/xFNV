@@ -20,6 +20,7 @@
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/SceneData/Attributes/hkxAttributeGroupClass.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -249,7 +250,8 @@ void cleanupLoadedObjecthkpMaxSizeMotion(void* p) {
 
 hkpMotion::hkpMotion(const hkVector4& position, const hkQuaternion& rotation, bool wantDeactivation)
   : m_deactivationIntegrateCounter(
-        wantDeactivation ? static_cast<uint8_t>(static_cast<int32_t>(position.m_quad[0]) & 15) : uint8_t{0xFF}
+        wantDeactivation ? static_cast<uint8_t>(static_cast<int32_t>(XFNV_M128_F32(position.m_quad, 0)) & 15)
+                         : uint8_t{0xFF}
     ),
     m_deactivationNumInactiveFrames{0, 0}, m_deactivationRefOrientation{0, 0} {
     m_linearVelocity.m_quad = _mm_setzero_ps();
@@ -277,7 +279,7 @@ void hkpMotion::setMass(float mass) {
 }
 
 void hkpMotion::setMassInv(float massInv) {
-    m_inertiaAndMassInv.m_quad[3] = massInv;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 3) = massInv;
 }
 
 void hkpMotion::setCenterOfMassInLocal(const hkVector4& centerOfMass) {
@@ -322,7 +324,7 @@ void hkpMotion::getMotionStateAndVelocitiesAndDeactivationType(hkpMotion* a2) {
 
 float hkpMotion::getMass() const {
     double v1 = 0.0;
-    float v2 = _mm_shuffle_ps(m_inertiaAndMassInv.m_quad, m_inertiaAndMassInv.m_quad, 255)[0];
+    float v2 = XFNV_M128_F32(_mm_shuffle_ps(m_inertiaAndMassInv.m_quad, m_inertiaAndMassInv.m_quad, 255), 0);
     if (v2 != 0.0f) {
         return 1.0 / v2;
     }
@@ -411,8 +413,10 @@ void hkpKeyframedRigidMotion::getProjectedPointVelocity(
         ),
         m_angularVelocity.m_quad
     );
-    a3 = (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) +
-        (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
+    a3 = (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+          (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0))) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0)));
     a4 = 0.0f;
 }
 

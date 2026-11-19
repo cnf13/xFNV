@@ -25,6 +25,7 @@
 #include "Havok/Source/Physics/Collide/Util/hkpCollideCapsuleUtil.h"
 #include "Havok/Source/Physics/Collide/Util/hkpCollideTriangleUtil.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -130,7 +131,7 @@ void hkpCapsuleTriangleAgent::processCollision(
     );
 
     for (int32_t p = 0; p < 3; p++) {
-        if (!(input.m_tolerance > points[p].m_separatingNormal.m_quad[3])) {
+        if (!(input.m_tolerance > XFNV_M128_F32(points[p].m_separatingNormal.m_quad, 3))) {
             if (m_contactPointId[p] != 0xFFFF) {
                 m_contactMgr->removeContactPoint(m_contactPointId[p], *result.m_constraintOwner.m_storage);
                 m_contactPointId[p] = 0xFFFF;
@@ -209,8 +210,11 @@ void hkpCapsuleTriangleAgent::getClosestPoints(
         features
     );
 
-    const int32_t iPoint = points[1].m_separatingNormal.m_quad[3] > points[0].m_separatingNormal.m_quad[3] ? 0 : 1;
-    if (input.m_tolerance > points[iPoint].m_separatingNormal.m_quad[3]) {
+    const int32_t iPoint =
+        XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3)
+        ? 0
+        : 1;
+    if (input.m_tolerance > XFNV_M128_F32(points[iPoint].m_separatingNormal.m_quad, 3)) {
         uint8_t numFeatures = features[iPoint].numFeatures;
         int32_t iWeldResult = hkpConvexShape::WELD_RESULT_ACCEPT_CONTACT_POINT_UNMODIFIED;
         if (input.m_weldClosestPoints.m_storage != 0 && numFeatures > 0) {
@@ -272,7 +276,8 @@ void hkpCapsuleTriangleAgent::getPenetrations(
         capsAPoints, capsA->m_radius, triVertices, triB->m_radius, m_triangleCache, input.m_tolerance, 0, points,
         nullptr
     );
-    if (0.0f > points[0].m_separatingNormal.m_quad[3] || 0.0f > points[1].m_separatingNormal.m_quad[3]) {
+    if (0.0f > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3) ||
+        0.0f > XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3)) {
         collector.addCdBodyPair(bodyA, bodyB);
     }
     HK_TIMER_END();
@@ -332,8 +337,11 @@ void hkpCapsuleTriangleAgent::staticGetClosestPoints(
         capsAPoints, capsA->m_radius, triVertices, triB->m_radius, cache, input.m_tolerance, 0, points, features
     );
 
-    const int32_t iPoint = points[1].m_separatingNormal.m_quad[3] > points[0].m_separatingNormal.m_quad[3] ? 0 : 1;
-    if (input.m_tolerance > points[iPoint].m_separatingNormal.m_quad[3]) {
+    const int32_t iPoint =
+        XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3)
+        ? 0
+        : 1;
+    if (input.m_tolerance > XFNV_M128_F32(points[iPoint].m_separatingNormal.m_quad, 3)) {
         uint8_t numFeatures = features[iPoint].numFeatures;
         bool reject = false;
         if (input.m_weldClosestPoints.m_storage != 0 && numFeatures != 0) {
@@ -400,7 +408,8 @@ void hkpCapsuleTriangleAgent::staticGetPenetrations(
     hkCollideCapsuleUtilCapsVsTri(
         capsAPoints, capsA->m_radius, triVertices, triB->m_radius, cache, input.m_tolerance, 0, points, nullptr
     );
-    if (0.0f > points[0].m_separatingNormal.m_quad[3] || 0.0f > points[1].m_separatingNormal.m_quad[3]) {
+    if (0.0f > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3) ||
+        0.0f > XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3)) {
         collector.addCdBodyPair(bodyA, bodyB);
     }
     HK_TIMER_END();
@@ -487,8 +496,11 @@ hkpCapsuleTriangleAgent::ClosestPointResult hkpCapsuleTriangleAgent::getClosestP
         capsAPoints, capsA->m_radius, triVertices, triB->m_radius, cache, input.m_tolerance, 0, points, features
     );
 
-    const int32_t iPoint = points[1].m_separatingNormal.m_quad[3] > points[0].m_separatingNormal.m_quad[3] ? 0 : 1;
-    if (!(input.m_tolerance > points[iPoint].m_separatingNormal.m_quad[3])) {
+    const int32_t iPoint =
+        XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) > XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3)
+        ? 0
+        : 1;
+    if (!(input.m_tolerance > XFNV_M128_F32(points[iPoint].m_separatingNormal.m_quad, 3))) {
         return ST_CP_MISS;
     }
 

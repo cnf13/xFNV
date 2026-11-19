@@ -13,16 +13,18 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/Mesh/hkgpMesh.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/hkGeometryProcessing.h"
+#include "xfnv/Compiler.h"
 
 // The SDK's reset(createDomainTriangulation): the mesh reset through its vtable, the roots cleared, the edge data
 // table destroyed (destroyEdgeDataHashTable) and the edge data pools freed; for createDomainTriangulation, the domain's
 // four corners and its two triangles (newVertex, newTriangle with setRoot), bound along their diagonal.
 // KEEP: partcopy: the exe hands one frame slot nothing wrote ([esp+0x14], 0x24 bytes) to the vertex and triangle
 // lists' allocate (0xE247C0, 0xE24850) as the item to copy, and their copies carry its bytes into the new items on
-// the heap. no_builtin keeps clang from turning the exe's inline clearing of the roots (rep stosd) into a call of the
-// DLL's memset.
+// the heap. XFNV_NO_BUILTIN keeps clang from turning the exe's inline clearing of the roots (rep stosd) into a call of
+// the DLL's memset.
 template <>
-__attribute__((no_builtin("memset"))) void hkgpDefaultTriangulatorType::reset(bool createDomainTriangulation) {
+XFNV_NO_BUILTIN("memset")
+void hkgpDefaultTriangulatorType::reset(bool createDomainTriangulation) {
     hkgpTriangulatorAbstractMesh* pMesh = &m_mesh;
     pMesh->reset();
     for (Triangle*& pRoot : m_roots) {

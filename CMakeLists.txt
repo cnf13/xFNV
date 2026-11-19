@@ -7,7 +7,7 @@ project(FalloutNV LANGUAGES C CXX)
 # project's own utilities: the crash log, the debug heap). external/ holds other people's libraries;
 # tests/ holds the unit tests, each a program of a few of the game's files and fakes of what they call.
 # The toolchain file, when one is given, chooses the platform (cmake/i686-windows-clang-cl.cmake,
-# cmake/x86_64-windows-clang-cl.cmake, cmake/x86_64-linux-clang.cmake).
+# cmake/x86_64-windows-clang-cl.cmake, cmake/x86_64-windows-msvc-wine.cmake, cmake/x86_64-linux-clang.cmake).
 
 option(XFNV_NO_STEAM "Never start Steam (no SteamAPI_Init: no stats, achievements or callbacks)" ON)
 option(XFNV_FIX_FAST_MAIN_MENU "Skip the start-up's welcome screens once the main menu exists" ON)
@@ -37,15 +37,24 @@ if(XFNV_ASAN)
     set(LINKER_SUPPORTS_WL_NO_UNDEFINED OFF)
 endif()
 
-set(CMAKE_CXX_STANDARD 26)
+# Microsoft's cl knows no C++26: its newest is /std:c++latest, which CMake gives for 23.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_STANDARD 23)
+else()
+    set(CMAKE_CXX_STANDARD 26)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# No source is a module: no compile waits on a dependency scan (one more process per file, under Wine cl's).
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-# Debug info inside each object (ccache can cache it; the program's .pdb still comes from the link), with paths
-# relative to the build folder, so that an object is the same in every checkout.
+# Debug info inside each object (ccache can cache it; the program's .pdb still comes from the link), with clang's
+# paths relative to the build folder, so that an object is the same in every checkout.
 set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT Embedded)
-add_compile_options(-fdebug-compilation-dir=.)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-fdebug-compilation-dir=.)
+endif()
 include(cmake/Ccache.cmake)
 
 # What everything compiled against the game's headers shares.
@@ -55,14 +64,19 @@ target_include_directories(xfnv_game_options INTERFACE src)
 target_link_libraries(xfnv_game_options INTERFACE xfnv_zlib xfnv_vorbis xfnv_platform)
 # The game calls members on null pointers and the members test `this` (BSSimpleList walks start at `this`): clang
 # must not delete those tests as undefined behaviour. Every error of a file is reported, not the first 20.
-target_compile_options(xfnv_game_options INTERFACE -fno-delete-null-pointer-checks -ferror-limit=0)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(xfnv_game_options INTERFACE -fno-delete-null-pointer-checks -ferror-limit=0)
+endif()
 # Float code is the same on every target and every machine: `a * b + c` is never contracted into a fused
-# multiply-add, which only some CPUs have.
+# multiply-add, which only some CPUs have. cl's /fp:precise never contracts (/fp:contract would).
 if(MSVC)
-    # The game calls the C runtime's plain forms (strcpy, sprintf, fopen). clang-cl takes -ffp-contract as -Xclang:
-    # ccache refuses to cache its /clang: form.
+    # The game calls the C runtime's plain forms (strcpy, sprintf, fopen).
     target_compile_definitions(xfnv_game_options INTERFACE _CRT_SECURE_NO_WARNINGS)
-    target_compile_options(xfnv_game_options INTERFACE /W4 /EHsc -Wno-invalid-offsetof -Wno-microsoft-cast
+    target_compile_options(xfnv_game_options INTERFACE /W4 /EHsc)
+endif()
+if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # clang-cl takes -ffp-contract as -Xclang: ccache refuses to cache its /clang: form.
+    target_compile_options(xfnv_game_options INTERFACE -Wno-invalid-offsetof -Wno-microsoft-cast
         "SHELL:-Xclang -ffp-contract=off")
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         # The 32-bit game heap hands out 4-byte aligned blocks, as the original's does. A class with a 16-byte
@@ -70,7 +84,7 @@ if(MSVC)
         # no pointer is assumed aligned past 4 unless its type says so itself.
         target_compile_options(xfnv_game_options INTERFACE "SHELL:-Xclang -fmax-type-align=4")
     endif()
-else()
+elseif(NOT MSVC)
     target_compile_options(xfnv_game_options INTERFACE -Wall -Wextra -Wno-invalid-offsetof -ffp-contract=off)
 endif()
 
@@ -118,21 +132,24 @@ if(WIN32)
     target_link_libraries(FalloutNV PRIVATE kernel32 user32 gdi32 advapi32 shell32 ole32 d3d9 dsound winmm wsock32
         dxguid strmiids SDL3::SDL3-static)
     # The third-party DLLs still in use, by their import libraries (external/lib/make.sh): d3dx9_38 unless
-    # XFNV_D3DX, and the game's 32-bit steam_api (the 64-bit program has src/platform/steam's stub).
-    set(XFNV_IMPORT_LIBS "${CMAKE_SOURCE_DIR}/external/lib")
+    # XFNV_D3DX, and the game's 32-bit steam_api (the 64-bit program has src/platform/steam's stub). By name from
+    # their folder: Microsoft's link takes a path beginning with / for an option.
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        string(APPEND XFNV_IMPORT_LIBS /x64)
+        target_link_directories(FalloutNV PRIVATE external/lib/x64)
     else()
-        target_link_libraries(FalloutNV PRIVATE "${XFNV_IMPORT_LIBS}/steam_api.lib")
+        target_link_directories(FalloutNV PRIVATE external/lib)
+        target_link_libraries(FalloutNV PRIVATE steam_api)
     endif()
     if(NOT XFNV_D3DX)
-        target_link_libraries(FalloutNV PRIVATE "${XFNV_IMPORT_LIBS}/d3dx9_38.lib")
+        target_link_libraries(FalloutNV PRIVATE d3dx9_38)
     endif()
     # A fixed image base, as the original has: a crash's addresses are the same in every run. The guard-page heap
-    # reserves a large region, so that build may use the whole 32-bit address space. Every undefined symbol is
-    # listed, by its mangled name, for build.py status.
-    target_link_options(FalloutNV PRIVATE /dynamicbase:no /errorlimit:0 /demangle:no
-        $<$<BOOL:${XFNV_GUARD_ALLOC}>:/largeaddressaware>)
+    # reserves a large region, so that build may use the whole 32-bit address space.
+    target_link_options(FalloutNV PRIVATE /dynamicbase:no $<$<BOOL:${XFNV_GUARD_ALLOC}>:/largeaddressaware>)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # lld-link lists every undefined symbol, by its mangled name, for build.py status.
+        target_link_options(FalloutNV PRIVATE /errorlimit:0 /demangle:no)
+    endif()
 else()
     # SDL3 is shared here: DXVK, the program's Direct3D 9, opens libSDL3.so.0 itself for its window and must find
     # the program's own.

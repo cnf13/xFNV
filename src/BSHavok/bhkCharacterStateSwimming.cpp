@@ -10,6 +10,7 @@
 #include "Havok/Source/Physics/Utilities/CharacterControl/CharacterProxy/hkpCharacterProxy.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/Util/hkpCharacterMovementUtil.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -40,9 +41,11 @@ void bhkCharacterStateSwimming::Update(bhkCharacterController& arInput) {
     v3.m_quad = arInput.UpVec.m_quad;
     muInput.m_forward = arInput.ForwardVec;
     muInput.m_currentVelocity = arInput.OutVelocity;
-    uint32_t v11 = std::bit_cast<uint32_t>(_mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 170)[0]);
+    uint32_t v11 = std::bit_cast<uint32_t>(
+        XFNV_M128_F32(_mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 170), 0)
+    );
     hkVector4* p_kOutVelocity = &arInput.OutVelocity;
-    uint32_t v16 = std::bit_cast<uint32_t>(arInput.Direction.m_quad[0]);
+    uint32_t v16 = std::bit_cast<uint32_t>(XFNV_M128_F32(arInput.Direction.m_quad, 0));
     __m128 v5 = _mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 85);
     muInput.m_maxVelocityDelta = 100.0f;
     muInput.m_up.m_quad = v3.m_quad;
@@ -68,7 +71,8 @@ void bhkCharacterStateSwimming::Update(bhkCharacterController& arInput) {
         arInput.bhkCharacterProxy::GethkWorldRw();
         v7 = Position;
     }
-    float v17 = _mm_shuffle_ps(v7->m_quad, v7->m_quad, 170)[0] - arInput.RotCenter.m_quad[2];
+    float v17 =
+        XFNV_M128_F32(_mm_shuffle_ps(v7->m_quad, v7->m_quad, 170), 0) - XFNV_M128_F32(arInput.RotCenter.m_quad, 2);
     if (arInput.fSwimFloatHeight >= 0.5f) {
         v17 = arInput.fActorHeight * 0.5 * arInput.fSwimFloatHeight + v17;
     }
@@ -82,8 +86,8 @@ void bhkCharacterStateSwimming::Update(bhkCharacterController& arInput) {
             arInput.UpdateState();
             goto LABEL_24;
         }
-        if (_mm_shuffle_ps(p_kOutVelocity->m_quad, p_kOutVelocity->m_quad, 170)[0] > 0.0f) {
-            arInput.OutVelocity.m_quad[2] = 0.0f;
+        if (XFNV_M128_F32(_mm_shuffle_ps(p_kOutVelocity->m_quad, p_kOutVelocity->m_quad, 170), 0) > 0.0f) {
+            XFNV_M128_F32(arInput.OutVelocity.m_quad, 2) = 0.0f;
         }
         goto LABEL_22;
     }

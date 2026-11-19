@@ -12,6 +12,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Accumulator/hkpVelocityAccumulator.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInfo.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -111,7 +112,8 @@ void hkRigidMotionUtilStep(
             const hkVector4 linVel = motion->m_linearVelocity;
             const float maxLinVel = hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
             const hkQuadReal sq = _mm_mul_ps(linVel.m_quad, linVel.m_quad);
-            const float linVelSqrd = sq[2] + static_cast<float>(sq[1] + sq[0]);
+            const float linVelSqrd =
+                XFNV_M128_F32(sq, 2) + static_cast<float>(XFNV_M128_F32(sq, 1) + XFNV_M128_F32(sq, 0));
             if (linVelSqrd > maxLinVel * maxLinVel) {
                 const float fRoot = std::sqrt(linVelSqrd);
                 const float fInvRoot = 1.0f / fRoot;
@@ -135,7 +137,8 @@ void hkRigidMotionUtilStep(
         hkQuaternion dq;
         dq.m_vec.m_quad = _mm_mul_ps(_mm_set1_ps(fHalfDeltaTime), angVel.m_quad);
         const hkQuadReal dqSq = _mm_mul_ps(dq.m_vec.m_quad, dq.m_vec.m_quad);
-        const float dqLenSqrd = dqSq[2] + static_cast<float>(dqSq[1] + dqSq[0]);
+        const float dqLenSqrd =
+            XFNV_M128_F32(dqSq, 2) + static_cast<float>(XFNV_M128_F32(dqSq, 1) + XFNV_M128_F32(dqSq, 0));
         float pre = dqLenSqrd * 0.40528471201320165;
         float maxAngle = hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value] * info.m_deltaTime;
         if (maxAngle > 0.8999999761581421) {
@@ -385,9 +388,11 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
                     radius = 1.0f;
                 }
                 const hkQuadReal linSq = _mm_mul_ps(motion->m_linearVelocity.m_quad, motion->m_linearVelocity.m_quad);
-                const float linVelSqrd = linSq[2] + static_cast<float>(linSq[1] + linSq[0]);
+                const float linVelSqrd =
+                    XFNV_M128_F32(linSq, 2) + static_cast<float>(XFNV_M128_F32(linSq, 1) + XFNV_M128_F32(linSq, 0));
                 const hkQuadReal angSq = _mm_mul_ps(motion->m_angularVelocity.m_quad, motion->m_angularVelocity.m_quad);
-                const float angVelSqrd = angSq[2] + static_cast<float>(angSq[1] + angSq[0]);
+                const float angVelSqrd =
+                    XFNV_M128_F32(angSq, 2) + static_cast<float>(XFNV_M128_F32(angSq, 1) + XFNV_M128_F32(angSq, 0));
                 const float velSqrd = radius * radius * angVelSqrd + linVelSqrd;
                 float maxVelSqrd = motion->m_deactivationRefPosition[j](3);
                 if (!(velSqrd < maxVelSqrd)) {
@@ -400,7 +405,8 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
                 const hkpSolverInfo::DeactivationInfo& di = solverInfo.m_deactivationInfo[ms.m_deactivationClass];
                 const hkQuadReal d = _mm_sub_ps(motion->m_deactivationRefPosition[j].m_quad, st.m_centerOfMass1.m_quad);
                 const hkQuadReal dSq = _mm_mul_ps(d, d);
-                const float distSqrd = dSq[2] + static_cast<float>(dSq[1] + dSq[0]);
+                const float distSqrd =
+                    XFNV_M128_F32(dSq, 2) + static_cast<float>(XFNV_M128_F32(dSq, 1) + XFNV_M128_F32(dSq, 0));
                 bool bReset = di.m_maxDistSqrd[j] < distSqrd;
                 if (!bReset) {
                     hkVector4 refRotation;
@@ -410,7 +416,7 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
                     const hkQuadReal rSq = _mm_mul_ps(r, r);
                     const hkQuadReal sum0 = _mm_add_ps(_mm_shuffle_ps(rSq, rSq, 0x4E), rSq);
                     const hkQuadReal sum1 = _mm_add_ps(_mm_shuffle_ps(sum0, sum0, 0xB1), sum0);
-                    const float rotDistSqrd = sum1[0];
+                    const float rotDistSqrd = XFNV_M128_F32(sum1, 0);
                     // EXE-INLINED none: hkHalf::operator float (the top half of a float)
                     const float maxRotSqrd = di.m_maxRotSqrd[j];
                     bReset = maxRotSqrd < rotDistSqrd;

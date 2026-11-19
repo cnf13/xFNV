@@ -31,6 +31,7 @@
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "SDK/MSVC/string.h"
 
+#include <cmath>
 #include <xmmintrin.h>
 
 namespace bhkConvert {} // namespace bhkConvert
@@ -337,7 +338,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
             alignas(16) NiFixedString kName("bhkPackedNiTriStripsShape");
             ptriShape->SetName(kName);
             float fScale = GetScale();
-            fScale = __builtin_fabsf(fScale);
+            fScale = std::fabsf(fScale);
             ptriShape->m_kLocal.m_fScale = fScale;
             shapeArray.RemoveAll();
 

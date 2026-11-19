@@ -19,6 +19,7 @@
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpAabbPhantom.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantom.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -135,10 +136,10 @@ void bhkPCollisionObject::NitohkTransform() {
                     _mm_sub_ps(kAabb.m_max.m_quad, kAabb.m_min.m_quad)
                 );
                 hkVector4 kCenter;
-                kCenter.m_quad[0] = kWorld.m_Translate.x * bhkConvert::fBS2HkScaleSC;
-                kCenter.m_quad[1] = kWorld.m_Translate.y * bhkConvert::fBS2HkScaleSC;
-                kCenter.m_quad[2] = bhkConvert::fBS2HkScaleSC * kWorld.m_Translate.z;
-                kCenter.m_quad[3] = 0.0f;
+                XFNV_M128_F32(kCenter.m_quad, 0) = kWorld.m_Translate.x * bhkConvert::fBS2HkScaleSC;
+                XFNV_M128_F32(kCenter.m_quad, 1) = kWorld.m_Translate.y * bhkConvert::fBS2HkScaleSC;
+                XFNV_M128_F32(kCenter.m_quad, 2) = bhkConvert::fBS2HkScaleSC * kWorld.m_Translate.z;
+                XFNV_M128_F32(kCenter.m_quad, 3) = 0.0f;
                 kAabb.m_min.m_quad = _mm_add_ps(
                     _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(-1.0f), _mm_set_ss(-1.0f), 0), kHalfExtent), kCenter.m_quad
                 );

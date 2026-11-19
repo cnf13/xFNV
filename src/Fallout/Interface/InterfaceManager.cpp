@@ -126,6 +126,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSemaphore.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -3877,8 +3878,8 @@ void InterfaceManager::ReinitialisePipboyManager() {
 
 void InterfaceManager::DrawInterface_Screen(BSCullingProcess* apCuller, bool abPipboyVisible) {
     // abPipboyVisible is never read, but callers still store it and pass it. Without a use, clang's dead argument
-    // elimination leaves the caller's argument unset; the empty asm keeps it live.
-    __asm__ volatile("" : : "r"(abPipboyVisible));
+    // elimination leaves the caller's argument unset; KeepLive keeps it live.
+    xfnv::KeepLive(abPipboyVisible);
     apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     NiRenderer* pRenderer = NiRenderer::GetRenderer();
     if (bUseImageSpaceMenuFX.Bool() && bUsePipboyMode.Bool()) {

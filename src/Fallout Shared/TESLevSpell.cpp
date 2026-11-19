@@ -24,6 +24,7 @@
 #include "Fallout/AI/Actor.h"
 #include "Fallout/Interface/Interface.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 int32_t retn_minusOne() {
     return (-1);
@@ -53,7 +54,7 @@ bool TESLevSpell::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // Clears the buffer first because an empty chunk leaves it unwritten (see above); the game does not do
                 // this.
                 pBuffer[0] = '\0';

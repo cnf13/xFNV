@@ -2,6 +2,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 #include <stdint.h>
 
 // The exe tests the cached first character for the end of lpString1 and stops at the end of lpString2 only after the
@@ -56,9 +57,9 @@ uint16_t* WINAPI lstrcpynWInternal(uint16_t* a1, int16_t* a2, int32_t a3)
 	return result;
 }
 
-// The exe's own wide-string length loop. no_builtin keeps clang from turning the loop into a call of the DLL's wcslen,
-// which the exe does not make.
-__attribute__((no_builtin("wcslen"))) int32_t WINAPI strlen_w(const uint16_t* a1) {
+// The exe's own wide-string length loop. XFNV_NO_BUILTIN keeps clang from turning the loop into a call of the DLL's
+// wcslen, which the exe does not make.
+XFNV_NO_BUILTIN("wcslen") int32_t WINAPI strlen_w(const uint16_t* a1) {
 	int32_t result = -1;
 	do {
 		++result;

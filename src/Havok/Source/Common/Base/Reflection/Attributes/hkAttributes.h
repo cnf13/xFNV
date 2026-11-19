@@ -127,7 +127,7 @@ struct hkDescriptionAttribute {
     // The reflection class hkDescriptionAttributeClass.
     static const hkClass& staticClass();
 
-    char* m_string;
+    const char* m_string;
 };
 
 // What a reflected array holds for the tools.

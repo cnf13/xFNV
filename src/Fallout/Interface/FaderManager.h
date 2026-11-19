@@ -16,7 +16,7 @@ enum FADER_ENUM : int32_t {
 // One fader's state; FaderData holds one per FADER_ENUM.
 struct FADER_DATA {
     bool bBelowMenus;
-    char* pFaderTextureFilename;
+    const char* pFaderTextureFilename;
     bool bFadingIn;
     // Padding, cleared together with bFadingIn by the FaderData initialiser.
     uint8_t unk09[3];

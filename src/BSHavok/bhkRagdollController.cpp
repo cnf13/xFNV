@@ -102,6 +102,7 @@
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -190,15 +191,15 @@ void AddRagdollData(
 
 NiTransform& HK2NI(NiTransform& arNiTran, const hkQsTransform& arhkTran) {
     NiQuaternion v4;
-    v4.m_fX = arhkTran.m_rotation.m_vec.m_quad[0];
-    v4.m_fY = arhkTran.m_rotation.m_vec.m_quad[1];
-    v4.m_fZ = arhkTran.m_rotation.m_vec.m_quad[2];
-    v4.m_fW = arhkTran.m_rotation.m_vec.m_quad[3];
+    v4.m_fX = XFNV_M128_F32(arhkTran.m_rotation.m_vec.m_quad, 0);
+    v4.m_fY = XFNV_M128_F32(arhkTran.m_rotation.m_vec.m_quad, 1);
+    v4.m_fZ = XFNV_M128_F32(arhkTran.m_rotation.m_vec.m_quad, 2);
+    v4.m_fW = XFNV_M128_F32(arhkTran.m_rotation.m_vec.m_quad, 3);
     v4.Normalize();
     v4.ToRotation(arNiTran.m_Rotate);
     HK2NI(arNiTran.m_Translate, arhkTran.m_translation);
     hkVector4 m_scale = arhkTran.m_scale;
-    arNiTran.m_fScale = arhkTran.m_scale.m_quad[0];
+    arNiTran.m_fScale = XFNV_M128_F32(arhkTran.m_scale.m_quad, 0);
     return arNiTran;
 }
 
@@ -456,7 +457,8 @@ hkBool bhkRagdollController::castRay(
         hkVector4 kCachedHit;
         kCachedHit.setInterpolate4(rCast.From, rCast.To, kFraction);
         bHit = true;
-        arHitFractionOut = (arFromWS.m_quad[2] - kCachedHit.m_quad[2]) / (arFromWS.m_quad[2] - arToWS.m_quad[2]);
+        arHitFractionOut = (XFNV_M128_F32(arFromWS.m_quad, 2) - XFNV_M128_F32(kCachedHit.m_quad, 2)) /
+            (XFNV_M128_F32(arFromWS.m_quad, 2) - XFNV_M128_F32(arToWS.m_quad, 2));
         fHitFraction = arHitFractionOut;
     }
     else {
@@ -544,10 +546,10 @@ hkBool bhkRagdollController::castRay(
         hkVector4 kUpWS;
         kUpWS.setRotatedDir(rRootRotation.m_rotation, kUp);
         if (LegInfoA.m_size == 2) {
-            float fUpZ = std::fabs(kUpWS.m_quad[2]);
-            if (fUpZ > 0.2 && kRootWS.m_quad[2] - 2.0 < kHitWS.m_quad[2]) {
-                arHitFractionOut =
-                    (arFromWS.m_quad[2] - kHitWS.m_quad[2] + 2.0) / (arFromWS.m_quad[2] - arToWS.m_quad[2]);
+            float fUpZ = std::fabs(XFNV_M128_F32(kUpWS.m_quad, 2));
+            if (fUpZ > 0.2 && XFNV_M128_F32(kRootWS.m_quad, 2) - 2.0 < XFNV_M128_F32(kHitWS.m_quad, 2)) {
+                arHitFractionOut = (XFNV_M128_F32(arFromWS.m_quad, 2) - XFNV_M128_F32(kHitWS.m_quad, 2) + 2.0) /
+                    (XFNV_M128_F32(arFromWS.m_quad, 2) - XFNV_M128_F32(arToWS.m_quad, 2));
             }
         }
         if (!bAlignFeetToTerrain) {
@@ -1739,8 +1741,8 @@ void bhkRagdollController::DoFootIK(hkQsTransform& arWorldFromModel) {
     kRoot.m_translation = rRootMS.m_translation;
     kRoot.m_rotation = rRootMS.m_rotation;
     kRoot.m_scale = rRootMS.m_scale;
-    const float fRaisedZ = kRoot.m_translation.m_quad[2] + fVertFootIkError;
-    float fTargetZ = fVertErrorGain.uValue.f * fVertFootIkError + kRoot.m_translation.m_quad[2];
+    const float fRaisedZ = XFNV_M128_F32(kRoot.m_translation.m_quad, 2) + fVertFootIkError;
+    float fTargetZ = fVertErrorGain.uValue.f * fVertFootIkError + XFNV_M128_F32(kRoot.m_translation.m_quad, 2);
     const float fDiff = fTargetZ - fRaisedZ;
     const float fTether = fControllerTetherLen.uValue.f;
     if (fTether < fDiff) {
@@ -1749,8 +1751,8 @@ void bhkRagdollController::DoFootIK(hkQsTransform& arWorldFromModel) {
     if (-fTether > fDiff) {
         fTargetZ = fRaisedZ - fTether;
     }
-    const float fDeltaZ = fTargetZ - kRoot.m_translation.m_quad[2];
-    kRoot.m_translation.m_quad[2] = fTargetZ;
+    const float fDeltaZ = fTargetZ - XFNV_M128_F32(kRoot.m_translation.m_quad, 2);
+    XFNV_M128_F32(kRoot.m_translation.m_quad, 2) = fTargetZ;
     hkVector4 kOffset;
     kOffset.set(0.0f, 0.0f, fDeltaZ, 0.0f);
     kInput.m_worldFromModel.m_translation.setAdd4(kOffset, kInput.m_worldFromModel.m_translation);
@@ -1897,15 +1899,15 @@ void bhkRagdollController::DoGrabIK(hkQsTransform& arWorldFromModel) {
         if (!kInfo.bEaseOutGrabIK) {
             const NiPoint3& kTargetWS = kInfo.pTarget->m_kWorld.m_Translate;
             alignas(16) hkVector4 kReachWS;
-            kReachWS.m_quad[0] = kTargetWS.x * bhkConvert::fBS2HkScaleSC;
-            kReachWS.m_quad[1] = kTargetWS.y * bhkConvert::fBS2HkScaleSC;
-            kReachWS.m_quad[2] = kTargetWS.z * bhkConvert::fBS2HkScaleSC;
-            kReachWS.m_quad[3] = 0.0f;
+            XFNV_M128_F32(kReachWS.m_quad, 0) = kTargetWS.x * bhkConvert::fBS2HkScaleSC;
+            XFNV_M128_F32(kReachWS.m_quad, 1) = kTargetWS.y * bhkConvert::fBS2HkScaleSC;
+            XFNV_M128_F32(kReachWS.m_quad, 2) = kTargetWS.z * bhkConvert::fBS2HkScaleSC;
+            XFNV_M128_F32(kReachWS.m_quad, 3) = 0.0f;
             alignas(16) hkVector4 kReachNormWS;
-            kReachNormWS.m_quad[0] = 0.0f;
-            kReachNormWS.m_quad[1] = 1.0f;
-            kReachNormWS.m_quad[2] = 0.0f;
-            kReachNormWS.m_quad[3] = 0.0f;
+            XFNV_M128_F32(kReachNormWS.m_quad, 0) = 0.0f;
+            XFNV_M128_F32(kReachNormWS.m_quad, 1) = 1.0f;
+            XFNV_M128_F32(kReachNormWS.m_quad, 2) = 0.0f;
+            XFNV_M128_F32(kReachNormWS.m_quad, 3) = 0.0f;
             if (0.0f < kInfo.fReachWeight) {
                 const __m128 kGain = _mm_set1_ps(kInfo.fIntrpGain);
                 const __m128 kOldGain = _mm_sub_ps(_mm_set1_ps(1.0f), kGain);
@@ -1951,10 +1953,10 @@ void bhkRagdollController::DoGrabIK(hkQsTransform& arWorldFromModel) {
         kSetup.m_secondJointIdx = GrabSetup[uiHand].usElbowIdx;
         kSetup.m_firstJointIkGain = kInfo.fReachWeight;
         kSetup.m_endBoneIdx = GrabSetup[uiHand].usHandIdx;
-        kSetup.m_hingeAxisLS.m_quad[0] = 0.0f;
-        kSetup.m_hingeAxisLS.m_quad[1] = 0.0f;
-        kSetup.m_hingeAxisLS.m_quad[2] = 1.0f;
-        kSetup.m_hingeAxisLS.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kSetup.m_hingeAxisLS.m_quad, 0) = 0.0f;
+        XFNV_M128_F32(kSetup.m_hingeAxisLS.m_quad, 1) = 0.0f;
+        XFNV_M128_F32(kSetup.m_hingeAxisLS.m_quad, 2) = 1.0f;
+        XFNV_M128_F32(kSetup.m_hingeAxisLS.m_quad, 3) = 0.0f;
         kSetup.m_endTargetMS = kEndTargetMS;
         hkaTwoJointsIkSolver::solve(kSetup, *pSGPose);
     }
@@ -2303,7 +2305,9 @@ bool bhkRagdollController::IsPoweredRagdoll() {
                     v6 = m_data->getPlaneMotor() == nullptr;
                 }
                 else {
-                    v6 = std::bit_cast<int32_t>(m_data->m_atoms.m_ragdollMotors.m_target_bRca.m_col0.m_quad[0]) == 0;
+                    v6 = std::bit_cast<int32_t>(
+                             XFNV_M128_F32(m_data->m_atoms.m_ragdollMotors.m_target_bRca.m_col0.m_quad, 0)
+                         ) == 0;
                 }
                 if (v6) {
                     goto LABEL_13;
@@ -2428,7 +2432,7 @@ void bhkRagdollController::AdjustCurrentTarget() {
         hkVector4 kLocal;
         kLocal.setTransformedInversePos(WorldFromModel, CurrentTargetWS);
         float fOffset = 5.0f;
-        if (kLocal.m_quad[0] < 0.0f) {
+        if (XFNV_M128_F32(kLocal.m_quad, 0) < 0.0f) {
             fOffset = -5.0f;
         }
         hkVector4 kPos;
@@ -2438,8 +2442,8 @@ void bhkRagdollController::AdjustCurrentTarget() {
         }
         const hkQsTransform& rHeadMS = getBoneModelSpace(*pSGPose, BoneParamA[1].ssBoneIdx);
         kPos.setTransformedPos(rHeadMS, kPos);
-        const float fX = kPos.m_quad[0] + fOffset;
-        kPos.m_quad[0] = fX;
+        const float fX = XFNV_M128_F32(kPos.m_quad, 0) + fOffset;
+        XFNV_M128_F32(kPos.m_quad, 0) = fX;
         kPos.setTransformedPos(WorldFromModel, kPos);
         CurrentTargetWS.m_quad = kPos.m_quad;
     }
@@ -3620,17 +3624,17 @@ hkRotation& NI2HK(hkRotation& arhkRot, const NiMatrix3& arNiRot) {
 hkQsTransform& NI2HK(hkQsTransform& arhkQ, const NiTransform& arNiQ) {
     alignas(16) NiQuaternion niquat;
     niquat.FromRotation(arNiQ.m_Rotate);
-    arhkQ.m_rotation.m_vec.m_quad[0u] = niquat.m_fX;
-    arhkQ.m_rotation.m_vec.m_quad[1] = niquat.m_fY;
-    arhkQ.m_rotation.m_vec.m_quad[2] = niquat.m_fZ;
-    arhkQ.m_rotation.m_vec.m_quad[3] = niquat.m_fW;
+    XFNV_M128_F32(arhkQ.m_rotation.m_vec.m_quad, 0u) = niquat.m_fX;
+    XFNV_M128_F32(arhkQ.m_rotation.m_vec.m_quad, 1) = niquat.m_fY;
+    XFNV_M128_F32(arhkQ.m_rotation.m_vec.m_quad, 2) = niquat.m_fZ;
+    XFNV_M128_F32(arhkQ.m_rotation.m_vec.m_quad, 3) = niquat.m_fW;
     arhkQ.m_rotation.normalize();
     // The translation, scaled to Havok units.
     hkVector4 kTranslation;
-    kTranslation.m_quad[0] = arNiQ.m_Translate.x * bhkConvert::fBS2HkScaleSC;
-    kTranslation.m_quad[1] = arNiQ.m_Translate.y * bhkConvert::fBS2HkScaleSC;
-    kTranslation.m_quad[2] = bhkConvert::fBS2HkScaleSC * arNiQ.m_Translate.z;
-    kTranslation.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kTranslation.m_quad, 0) = arNiQ.m_Translate.x * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(kTranslation.m_quad, 1) = arNiQ.m_Translate.y * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(kTranslation.m_quad, 2) = bhkConvert::fBS2HkScaleSC * arNiQ.m_Translate.z;
+    XFNV_M128_F32(kTranslation.m_quad, 3) = 0.0f;
     arhkQ.m_translation = kTranslation;
     arhkQ.m_scale.m_quad = _mm_shuffle_ps(_mm_set_ss(arNiQ.m_fScale), _mm_set_ss(arNiQ.m_fScale), 0);
     return arhkQ;

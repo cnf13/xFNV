@@ -361,7 +361,7 @@ bool NiCamera::FitNearAndFarToBound(const NiBound& kBound) {
     float fDirZ = m_kWorld.m_Rotate.m_pEntry[2][0];
     // The same untyped storage holds fDirZ's bytes first and the update data's bytes later, so fDirZ's bytes are
     // deliberately copied into kData starting at bSceneGraphChange, as the game does.
-    __builtin_memcpy(&kData.bSceneGraphChange, &fDirZ, sizeof(fDirZ));
+    std::memcpy(&kData.bSceneGraphChange, &fDirZ, sizeof(fDirZ));
     float fDiffX = kBound.m_kCenter.x - m_kWorld.m_Translate.x;
     float fDiffY = kBound.m_kCenter.y - m_kWorld.m_Translate.y;
     float fDiffZ = kBound.m_kCenter.z - m_kWorld.m_Translate.z;

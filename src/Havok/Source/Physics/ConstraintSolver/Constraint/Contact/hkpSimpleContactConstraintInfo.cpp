@@ -14,6 +14,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobian3dFrictionSchema.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianSchema.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverResults.h"
+#include "xfnv/Compiler.h"
 
 // The reflected types' hkTypeInfo records: constant .data (no initialiser): the type name, the finish and cleanup
 // functions, no vtable, the RTTI type descriptor and the size.
@@ -85,7 +86,7 @@ void hkSimpleContactConstraintDataBuildJacobian(
     if (writeHeaderSchemas.m_bool) {
         hkpJacobianHeaderSchema* pHeader = &pSchema->getHeader();
         pHeader->m_bodyAIndex = static_cast<uint16_t>(in.m_accumulatorAIndex.m_storage);
-        pSchema->m_quad[0] = pSchema->m_quad[0] + 1.1920928955078125e-07;
+        XFNV_M128_F32(pSchema->m_quad, 0) = XFNV_M128_F32(pSchema->m_quad, 0) + 1.1920928955078125e-07;
         pHeader->m_bodyBIndex = static_cast<uint16_t>(in.m_accumulatorBIndex.m_storage);
         pHeader->m_constraintInstance = in.m_constraintInstance;
         pSchema->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_HEADER;
@@ -141,14 +142,14 @@ void hkSimpleContactConstraintDataBuildJacobian(
         pSchema[1].m_quad = kAngA;
         const float fDiag = _mm_cvtss_f32(_mm_add_ps(_mm_shuffle_ps(kMassHalves, kMassHalves, 0xB1), kMassHalves)) +
             1.1920928955078125e-07;
-        pSchema[2].m_quad[3] = fDiag;
-        pSchema[1].m_quad[3] = in.m_virtMassFactor / fDiag;
+        XFNV_M128_F32(pSchema[2].m_quad, 3) = fDiag;
+        XFNV_M128_F32(pSchema[1].m_quad, 3) = in.m_virtMassFactor / fDiag;
         fFrictionSum = static_cast<float>(pProperties->m_friction) + fFrictionSum;
         fImpulseSum = pProperties->m_impulseApplied + fImpulseSum;
 
         // EXE-INLINED 0xD720A0
         const float fInternalDataA = pProperties->m_internalDataA;
-        float fRhs = pPoints[iPoint].m_separatingNormal.m_quad[3] - fInternalDataA;
+        float fRhs = XFNV_M128_F32(pPoints[iPoint].m_separatingNormal.m_quad, 3) - fInternalDataA;
         const float fSolverRhs = -pProperties->m_internalSolverData - fRhs;
         const float fScaledDeltaTime = in.m_frameDeltaTime * HK_CONTACT_LINEAR_ERROR_RECOVERY_VELOCITY;
         const float fLimit = -HK_CONTACT_EXPONENTIAL_ERROR_RECOVERY_VELOCITY * fInternalDataA;
@@ -166,11 +167,11 @@ void hkSimpleContactConstraintDataBuildJacobian(
 
         kPositionSum = _mm_add_ps(kPositionSum, kPosition);
         kNormalSum = _mm_add_ps(kNormalSum, kNormal);
-        pSchema[0].m_quad[3] = -fRhs * in.m_rhsFactor;
+        XFNV_M128_F32(pSchema[0].m_quad, 3) = -fRhs * in.m_rhsFactor;
         if (iUsesPath2) {
             // This point and the previous single contact become one pair contact schema.
-            const float fPrevDiag = pSchema[-1].m_quad[3];
-            const float fThisDiag = pSchema[2].m_quad[3];
+            const float fPrevDiag = XFNV_M128_F32(pSchema[-1].m_quad, 3);
+            const float fThisDiag = XFNV_M128_F32(pSchema[2].m_quad, 3);
             const __m128 kNormals = _mm_mul_ps(pSchema[-3].m_quad, pSchema[0].m_quad);
             const __m128 kCoupling = _mm_add_ps(
                 _mm_add_ps(
@@ -189,22 +190,22 @@ void hkSimpleContactConstraintDataBuildJacobian(
                                     )) *
                 0.9900000095367432;
             const float fInvDet = in.m_virtMassFactor / (fThisDiag * fPrevDiag - fCoupling * fCoupling);
-            pSchema[-5].m_quad[3] = fThisDiag * fInvDet;
-            pSchema[-2].m_quad[3] = fPrevDiag * fInvDet;
+            XFNV_M128_F32(pSchema[-5].m_quad, 3) = fThisDiag * fInvDet;
+            XFNV_M128_F32(pSchema[-2].m_quad, 3) = fPrevDiag * fInvDet;
             // The pair schema's m_invJac01.
-            pSchema[-1].m_quad[0] = fInvDet * -fCoupling;
-            pSchema[-7].m_quad[0] = pSchema[-7].m_quad[0] + 1.1920928955078125e-07;
+            XFNV_M128_F32(pSchema[-1].m_quad, 0) = fInvDet * -fCoupling;
+            XFNV_M128_F32(pSchema[-7].m_quad, 0) = XFNV_M128_F32(pSchema[-7].m_quad, 0) + 1.1920928955078125e-07;
             pSchema[-7].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_PAIR_CONTACT;
         }
         else {
             hkpJacobianSchema* pSingle = pSchema;
             pSchema += 3;
-            pSingle->m_quad[0] = pSingle->m_quad[0] + 1.1920928955078125e-07;
+            XFNV_M128_F32(pSingle->m_quad, 0) = XFNV_M128_F32(pSingle->m_quad, 0) + 1.1920928955078125e-07;
             pSingle->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SINGLE_CONTACT;
             if (pProperties->m_maxImpulse.m_value) {
-                pSingle->m_quad[0] = pSingle->m_quad[0] + 1.1920928955078125e-07;
+                XFNV_M128_F32(pSingle->m_quad, 0) = XFNV_M128_F32(pSingle->m_quad, 0) + 1.1920928955078125e-07;
                 pSingle->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_SINGLE_LIMIT_CONTACT;
-                pSingle[2].m_quad[3] = pProperties->m_maxImpulse;
+                XFNV_M128_F32(pSingle[2].m_quad, 3) = pProperties->m_maxImpulse;
             }
         }
         ++iPoint;
@@ -271,11 +272,11 @@ void hkSimpleContactConstraintDataBuildJacobian(
     if (!(fBinormalLen2 > 0.10000000149011612)) {
         const __m128 kAbsNormal = _mm_and_ps(kNormal, hkVector4_setAbs4_absMask);
         uint16_t uiAxis;
-        if (kAbsNormal[1] > kAbsNormal[0]) {
-            uiAxis = kAbsNormal[2] > kAbsNormal[0] ? 0 : 2;
+        if (XFNV_M128_F32(kAbsNormal, 1) > XFNV_M128_F32(kAbsNormal, 0)) {
+            uiAxis = XFNV_M128_F32(kAbsNormal, 2) > XFNV_M128_F32(kAbsNormal, 0) ? 0 : 2;
         }
         else {
-            uiAxis = kAbsNormal[2] > kAbsNormal[1] ? 1 : 2;
+            uiAxis = XFNV_M128_F32(kAbsNormal, 2) > XFNV_M128_F32(kAbsNormal, 1) ? 1 : 2;
         }
         kInfo.m_biNormalAxis = uiAxis;
         kInfo.m_frictionResults[0].m_internalSolverData = 0.0f;
@@ -349,9 +350,9 @@ void hkSimpleContactConstraintDataBuildJacobian(
     const float fTangentDiag =
         _mm_cvtss_f32(_mm_add_ps(_mm_shuffle_ps(kTangentMassHalves, kTangentMassHalves, 0xB1), kTangentMassHalves)) +
         1.1920928955078125e-07;
-    pSchema[2].m_quad[3] = fTangentDiag;
-    pSchema[1].m_quad[3] = in.m_virtMassFactor / fTangentDiag;
-    pSchema[0].m_quad[3] = kInfo.m_frictionResults[0].m_internalSolverData * in.m_frictionRhsFactor;
+    XFNV_M128_F32(pSchema[2].m_quad, 3) = fTangentDiag;
+    XFNV_M128_F32(pSchema[1].m_quad, 3) = in.m_virtMassFactor / fTangentDiag;
+    XFNV_M128_F32(pSchema[0].m_quad, 3) = kInfo.m_frictionResults[0].m_internalSolverData * in.m_frictionRhsFactor;
 
     pSchema[3].m_quad = kUnitBinormal;
     const __m128 kBinormalArmA = _mm_sub_ps(kCenter, pBodyA->m_scratch0.m_quad);
@@ -395,12 +396,12 @@ void hkSimpleContactConstraintDataBuildJacobian(
     const float fBinormalDiag =
         _mm_cvtss_f32(_mm_add_ps(_mm_shuffle_ps(kBinormalMassHalves, kBinormalMassHalves, 0xB1), kBinormalMassHalves)) +
         1.1920928955078125e-07;
-    pSchema[5].m_quad[3] = fBinormalDiag;
-    pSchema[4].m_quad[3] = in.m_virtMassFactor / fBinormalDiag;
-    pSchema[3].m_quad[3] = kInfo.m_frictionResults[1].m_internalSolverData * in.m_frictionRhsFactor;
+    XFNV_M128_F32(pSchema[5].m_quad, 3) = fBinormalDiag;
+    XFNV_M128_F32(pSchema[4].m_quad, 3) = in.m_virtMassFactor / fBinormalDiag;
+    XFNV_M128_F32(pSchema[3].m_quad, 3) = kInfo.m_frictionResults[1].m_internalSolverData * in.m_frictionRhsFactor;
 
     // The two rows' coupling.
-    const float fTangentRowDiag = pSchema[2].m_quad[3];
+    const float fTangentRowDiag = XFNV_M128_F32(pSchema[2].m_quad, 3);
     const __m128 kDirections = _mm_mul_ps(pSchema[3].m_quad, pSchema[0].m_quad);
     const __m128 kCoupling = _mm_add_ps(
         _mm_add_ps(
@@ -415,17 +416,17 @@ void hkSimpleContactConstraintDataBuildJacobian(
     const float fCoupling = _mm_cvtss_f32(_mm_add_ss(
         _mm_shuffle_ps(kCoupling, kCoupling, 0xAA), _mm_add_ss(_mm_shuffle_ps(kCoupling, kCoupling, 0x55), kCoupling)
     ));
-    const float fBinormalRowDiag = pSchema[5].m_quad[3];
+    const float fBinormalRowDiag = XFNV_M128_F32(pSchema[5].m_quad, 3);
     const float fInvDet = in.m_virtMassFactor / (fBinormalRowDiag * fTangentRowDiag - fCoupling * fCoupling);
-    pSchema[2].m_quad[3] = fBinormalRowDiag * fInvDet;
-    pSchema[5].m_quad[3] = fTangentRowDiag * fInvDet;
+    XFNV_M128_F32(pSchema[2].m_quad, 3) = fBinormalRowDiag * fInvDet;
+    XFNV_M128_F32(pSchema[5].m_quad, 3) = fTangentRowDiag * fInvDet;
     const float fInvJac01 = fInvDet * -fCoupling;
     const float fMaxImpulse = in.m_invNumStepsTimesMicroSteps * fFrictionImpulse;
     hkpJacobian2dFrictionSchema* pFriction2d = reinterpret_cast<hkpJacobian2dFrictionSchema*>(pSchema);
     pFriction2d->m_invJac01 = fInvJac01;
     pFriction2d->m_solverResults = &kInfo.m_frictionResults[0];
     pFriction2d->m_maxImpulse = fMaxImpulse;
-    pSchema[0].m_quad[0] = pSchema[0].m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema[0].m_quad, 0) = XFNV_M128_F32(pSchema[0].m_quad, 0) + 1.1920928955078125e-07;
     pSchema[0].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_2D_FRICTION;
     if (iNumContactPoints <= 1) {
         out.m_jacobianSchemas = pSchema + HK_SIZE_OF_JACOBIAN_2D_FRICTION_SCHEMA / sizeof(hkpJacobianSchema);
@@ -485,16 +486,16 @@ void hkSimpleContactConstraintDataBuildJacobian(
                                  _mm_add_ss(_mm_shuffle_ps(kTwistMass, kTwistMass, 0x55), kTwistMass)
                              )) +
         1.1920928955078125e-07;
-    pSchema[6].m_quad[3] = in.m_virtMassFactor / fTwistDiag;
-    pSchema[7].m_quad[3] = kInfo.m_frictionResults[2].m_internalSolverData * in.m_frictionRhsFactor;
-    pSchema[6].m_quad[3] = pSchema[6].m_quad[3] * fInvRadius;
+    XFNV_M128_F32(pSchema[6].m_quad, 3) = in.m_virtMassFactor / fTwistDiag;
+    XFNV_M128_F32(pSchema[7].m_quad, 3) = kInfo.m_frictionResults[2].m_internalSolverData * in.m_frictionRhsFactor;
+    XFNV_M128_F32(pSchema[6].m_quad, 3) = XFNV_M128_F32(pSchema[6].m_quad, 3) * fInvRadius;
     const float fContactRadius = kInfo.m_contactRadius;
     hkpJacobian3dFrictionSchema* pFriction3d = reinterpret_cast<hkpJacobian3dFrictionSchema*>(pSchema);
     pFriction3d->m_solverResults = &kInfo.m_frictionResults[0];
     pFriction3d->m_invJac01 = fInvJac01;
     pFriction3d->m_maxImpulse = fMaxImpulse;
     pFriction3d->m_contactRadius = fContactRadius;
-    pSchema[0].m_quad[0] = pSchema[0].m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchema[0].m_quad, 0) = XFNV_M128_F32(pSchema[0].m_quad, 0) + 1.1920928955078125e-07;
     pSchema[0].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_3D_FRICTION;
     out.m_jacobianSchemas = pSchema + HK_SIZE_OF_JACOBIAN_3D_FRICTION_SCHEMA / sizeof(hkpJacobianSchema);
 }

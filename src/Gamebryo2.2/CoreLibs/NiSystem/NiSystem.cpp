@@ -4,20 +4,22 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/Windows/winnt.h"
 
+#include <atomic>
+
 int32_t NiAtomicIncrement(int32_t& aiValue) {
-    return __atomic_add_fetch(&aiValue, 1, __ATOMIC_SEQ_CST);
+    return ++std::atomic_ref(aiValue);
 }
 
 uint32_t NiAtomicIncrement(uint32_t& auiValue) {
-    return __atomic_add_fetch(&auiValue, 1, __ATOMIC_SEQ_CST);
+    return ++std::atomic_ref(auiValue);
 }
 
 int32_t NiAtomicDecrement(int32_t& aiValue) {
-    return __atomic_sub_fetch(&aiValue, 1, __ATOMIC_SEQ_CST);
+    return --std::atomic_ref(aiValue);
 }
 
 uint32_t NiAtomicDecrement(uint32_t& auiValue) {
-    return __atomic_sub_fetch(&auiValue, 1, __ATOMIC_SEQ_CST);
+    return --std::atomic_ref(auiValue);
 }
 
 int32_t NiStricmp(const char* s1, const char* s2) {

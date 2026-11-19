@@ -18,6 +18,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
+#include <bit>
 #include <cstdint>
 
 NiRTTI BSDismemberSkinInstance::ms_RTTI("BSDismemberSkinInstance", &NiObject::ms_RTTI);
@@ -35,12 +36,12 @@ namespace {
     // Converts one entry between the file's and the machine's byte order: the body part as a 16-bit value, then the
     // whole entry as a 32-bit one (the order is reversed when converting back).
     void SwapBodyPart(BSDismemberSkinInstance::PartitionData* apData) {
-        apData->usBodyPartNum = __builtin_bswap16(apData->usBodyPartNum);
+        apData->usBodyPartNum = std::byteswap<uint16_t>(apData->usBodyPartNum);
     }
 
     void SwapEntry(BSDismemberSkinInstance::PartitionData* apData) {
         uint32_t* puiEntry = reinterpret_cast<uint32_t*>(apData);
-        *puiEntry = __builtin_bswap32(*puiEntry);
+        *puiEntry = std::byteswap<uint32_t>(*puiEntry);
     }
 
 } // namespace

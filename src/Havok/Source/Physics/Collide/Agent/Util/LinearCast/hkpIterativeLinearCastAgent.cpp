@@ -10,6 +10,7 @@
 #include "Havok/Source/Physics/Collide/Dispatch/hkpCollisionDispatcher.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpSimpleClosestContactCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -36,10 +37,10 @@ void hkpIterativeLinearCastAgent::linearCast(
     kPoint.m_contact = pClosest->m_hitPoint;
     kPoint.m_cdBodyA = &bodyA;
     kPoint.m_cdBodyB = &bodyB;
-    double fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+    double fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     if ((input.m_tolerance > fDist) && (startCollector)) {
         startCollector->addCdPoint(kPoint);
-        fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+        fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     }
 
     const hkQuadReal& rPath = input.m_path.m_quad;
@@ -78,20 +79,24 @@ void hkpIterativeLinearCastAgent::linearCast(
         for (;;) {
             pSecond->m_earlyOutDistance = 3.40282e38f;
             pSecond->m_hasHit.m_bool = false;
-            pSecond->m_hitPoint.m_separatingNormal.m_quad[3] = 3.40282e38f;
+            XFNV_M128_F32(pSecond->m_hitPoint.m_separatingNormal.m_quad, 3) = 3.40282e38f;
             const float fFraction32 = static_cast<float>(fFraction);
             const hkQuadReal& rState = bodyA.m_motion.pState->m_transform.m_translation.m_quad;
-            pMotionState->m_transform.m_translation.m_quad[0] = fFraction32 * rPath[0] + rState[0];
-            pMotionState->m_transform.m_translation.m_quad[1] = fFraction32 * rPath[1] + rState[1];
-            pMotionState->m_transform.m_translation.m_quad[2] = fFraction32 * rPath[2] + rState[2];
-            pMotionState->m_transform.m_translation.m_quad[3] = fFraction32 * rPath[3] + rState[3];
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 0) =
+                fFraction32 * XFNV_M128_F32(rPath, 0) + XFNV_M128_F32(rState, 0);
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 1) =
+                fFraction32 * XFNV_M128_F32(rPath, 1) + XFNV_M128_F32(rState, 1);
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 2) =
+                fFraction32 * XFNV_M128_F32(rPath, 2) + XFNV_M128_F32(rState, 2);
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 3) =
+                fFraction32 * XFNV_M128_F32(rPath, 3) + XFNV_M128_F32(rState, 3);
             getClosestPoints(kBodyA, bodyB, kInput, *pSecond);
             if (!pSecond->m_hasHit.m_bool) {
                 return;
             }
             kPoint.m_contact.m_position = pSecond->m_hitPoint.m_position;
             kPoint.m_contact.m_separatingNormal = pSecond->m_hitPoint.m_separatingNormal;
-            kPoint.m_contact.m_separatingNormal.m_quad[3] = fFraction32;
+            XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = fFraction32;
             const __m128 kNewProduct = _mm_mul_ps(
                 _mm_load_ps(&reinterpret_cast<const float*>(&rPath)[0]),
                 _mm_load_ps(&reinterpret_cast<float*>(&pSecond->m_hitPoint.m_separatingNormal.m_quad)[0])
@@ -104,7 +109,7 @@ void hkpIterativeLinearCastAgent::linearCast(
                 return;
             }
             const double fNegDot = -fNewDot;
-            const double fNewDist = pSecond->m_hitPoint.m_separatingNormal.m_quad[3];
+            const double fNewDist = XFNV_M128_F32(pSecond->m_hitPoint.m_separatingNormal.m_quad, 3);
             if (fNegDot * fFraction + fNewDist > fNegDot) {
                 return;
             }
@@ -123,12 +128,12 @@ void hkpIterativeLinearCastAgent::linearCast(
         }
     }
     if (fDist <= 0.0) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
         return;
     }
     if ((fDist - fSum) * castCollector.m_earlyOutDistance >= fDist) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
     }
 }
@@ -166,10 +171,10 @@ void hkpIterativeLinearCastAgent::staticLinearCast(
     kPoint.m_contact = pClosest->m_hitPoint;
     kPoint.m_cdBodyA = &bodyA;
     kPoint.m_cdBodyB = &bodyB;
-    double fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+    double fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     if ((input.m_tolerance > fDist) && (startCollector)) {
         startCollector->addCdPoint(kPoint);
-        fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+        fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     }
 
     const hkQuadReal& rPath = input.m_path.m_quad;
@@ -208,20 +213,24 @@ void hkpIterativeLinearCastAgent::staticLinearCast(
         for (;;) {
             pSecond->m_earlyOutDistance = 3.40282e38f;
             pSecond->m_hasHit.m_bool = false;
-            pSecond->m_hitPoint.m_separatingNormal.m_quad[3] = 3.40282e38f;
+            XFNV_M128_F32(pSecond->m_hitPoint.m_separatingNormal.m_quad, 3) = 3.40282e38f;
             const float fFraction32 = static_cast<float>(fFraction);
             const hkQuadReal& rState = bodyA.m_motion.pState->m_transform.m_translation.m_quad;
-            pMotionState->m_transform.m_translation.m_quad[0] = fFraction32 * rPath[0] + rState[0];
-            pMotionState->m_transform.m_translation.m_quad[1] = fFraction32 * rPath[1] + rState[1];
-            pMotionState->m_transform.m_translation.m_quad[2] = fFraction32 * rPath[2] + rState[2];
-            pMotionState->m_transform.m_translation.m_quad[3] = fFraction32 * rPath[3] + rState[3];
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 0) =
+                fFraction32 * XFNV_M128_F32(rPath, 0) + XFNV_M128_F32(rState, 0);
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 1) =
+                fFraction32 * XFNV_M128_F32(rPath, 1) + XFNV_M128_F32(rState, 1);
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 2) =
+                fFraction32 * XFNV_M128_F32(rPath, 2) + XFNV_M128_F32(rState, 2);
+            XFNV_M128_F32(pMotionState->m_transform.m_translation.m_quad, 3) =
+                fFraction32 * XFNV_M128_F32(rPath, 3) + XFNV_M128_F32(rState, 3);
             pGetClosestPoints(kBodyA, bodyB, kInput, *pSecond);
             if (!pSecond->m_hasHit.m_bool) {
                 return;
             }
             kPoint.m_contact.m_position = pSecond->m_hitPoint.m_position;
             kPoint.m_contact.m_separatingNormal = pSecond->m_hitPoint.m_separatingNormal;
-            kPoint.m_contact.m_separatingNormal.m_quad[3] = fFraction32;
+            XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = fFraction32;
             const __m128 kNewProduct = _mm_mul_ps(
                 _mm_load_ps(&reinterpret_cast<const float*>(&rPath)[0]),
                 _mm_load_ps(&reinterpret_cast<float*>(&pSecond->m_hitPoint.m_separatingNormal.m_quad)[0])
@@ -234,7 +243,7 @@ void hkpIterativeLinearCastAgent::staticLinearCast(
                 return;
             }
             const double fNegDot = -fNewDot;
-            const double fNewDist = pSecond->m_hitPoint.m_separatingNormal.m_quad[3];
+            const double fNewDist = XFNV_M128_F32(pSecond->m_hitPoint.m_separatingNormal.m_quad, 3);
             if (fNegDot * fFraction + fNewDist > fNegDot) {
                 return;
             }
@@ -253,12 +262,12 @@ void hkpIterativeLinearCastAgent::staticLinearCast(
         }
     }
     if (fDist <= 0.0) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
         return;
     }
     if ((fDist - fSum) * castCollector.m_earlyOutDistance >= fDist) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
     }
 }

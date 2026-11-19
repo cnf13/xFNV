@@ -31,6 +31,7 @@
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -257,7 +258,8 @@ void hkaRagdollInstance::setPoseModelSpace(const hkQsTransform* poseIn, const hk
                     v7.m_vec.m_quad = worldFromModel.m_rotation.m_vec.m_quad;
                     __m128 v8 = _mm_mul_ps(poseIn->m_translation.m_quad, v7.m_vec.m_quad);
                     __m128 v9 = _mm_shuffle_ps(v8, v8, 170);
-                    v9[0] = v9[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+                    XFNV_M128_F32(v9, 0) =
+                        XFNV_M128_F32(v9, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0));
                     __m128 v10 = _mm_shuffle_ps(v7.m_vec.m_quad, v7.m_vec.m_quad, 255);
                     __m128 v11 = _mm_add_ps(
                         _mm_mul_ps(
@@ -426,7 +428,7 @@ void hkaRagdollInstance::getPoseModelSpace(hkQsTransform* poseOut, const hkQsTra
     v6.m_vec.m_quad = a2.m_rotation.m_vec.m_quad;
     __m128 v7 = _mm_mul_ps(a2.m_translation.m_quad, v6.m_vec.m_quad);
     __m128 v8 = _mm_shuffle_ps(v7, v7, 170);
-    v8[0] = v8[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    XFNV_M128_F32(v8, 0) = XFNV_M128_F32(v8, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
     __m128 v9 = _mm_shuffle_ps(v6.m_vec.m_quad, v6.m_vec.m_quad, 255);
     __m128 v10 = _mm_add_ps(
         _mm_mul_ps(
@@ -464,7 +466,8 @@ void hkaRagdollInstance::getPoseModelSpace(hkQsTransform* poseOut, const hkQsTra
         while (true) {
             __m128 v17 = _mm_mul_ps(v3->m_translation.m_quad, m_quad);
             __m128 v18 = _mm_shuffle_ps(v17, v17, 170);
-            v18[0] = v18[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+            XFNV_M128_F32(v18, 0) =
+                XFNV_M128_F32(v18, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0));
             __m128 v19 = _mm_add_ps(
                 _mm_mul_ps(
                     _mm_sub_ps(

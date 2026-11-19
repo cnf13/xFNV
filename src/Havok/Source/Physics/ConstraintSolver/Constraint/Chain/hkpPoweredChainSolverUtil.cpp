@@ -6,6 +6,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianPoweredChainSchema.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianSchema.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInternal.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -513,7 +514,7 @@ int32_t hkPoweredChainBuildJacobian(
 
     // EXE-INLINED none: hkpJacobianPoweredChainSchema::initPoweredChainSchema
     pSchema->m_statusFlagsOutput = params.m_childConstraintStatusWriteBackBuffer;
-    pSchemaUnit->m_quad[0] = pSchemaUnit->m_quad[0] + 1.1920928955078125e-07;
+    XFNV_M128_F32(pSchemaUnit->m_quad, 0) = XFNV_M128_F32(pSchemaUnit->m_quad, 0) + 1.1920928955078125e-07;
     pSchema->m_tau = params.m_chainTau;
     pSchema->m_damping = params.m_chainDamping;
     pSchema->m_size = hkpJacobianPoweredChainSchema::getSize(static_cast<uint16_t>(numConstraints));

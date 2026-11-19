@@ -8,6 +8,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/CharacterProxy/hkpCharacterProxy.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -51,7 +52,7 @@ void bhkCharacterStateJumping::Update(bhkCharacterController& arInput) {
     }
     hkVector4 kVelocity;
     kVelocity.m_quad = pLinearVelocity->m_quad;
-    kVelocity.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kVelocity.m_quad, 2) = 0.0f;
     arInput.OutVelocity.m_quad = _mm_add_ps(kVelocity.m_quad, kJump.m_quad);
     hkVector4 kPosition;
     arInput.GetPosition_hk(kPosition);

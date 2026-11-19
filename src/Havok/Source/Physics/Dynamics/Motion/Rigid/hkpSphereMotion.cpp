@@ -30,6 +30,7 @@
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -79,7 +80,7 @@ hkpSphereMotion::hkpSphereMotion(int32_t a1) : hkpMotion(hkFinishLoadedObjectFla
 hkpSphereMotion::~hkpSphereMotion() {}
 
 void hkpSphereMotion::getInertiaLocal(hkMatrix3& inertia) const {
-    double v2 = m_inertiaAndMassInv.m_quad[0];
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     if (v2 < 1.1920928955078125e-07) {
         v2 = 1.1920929e-07f;
     }
@@ -88,13 +89,13 @@ void hkpSphereMotion::getInertiaLocal(hkMatrix3& inertia) const {
     inertia.m_col1.m_quad = _mm_setzero_ps();
     inertia.m_col2.m_quad = _mm_setzero_ps();
     float v4 = 1.0 / v3;
-    inertia.m_col0.m_quad[0] = v4;
-    inertia.m_col1.m_quad[1] = v4;
-    inertia.m_col2.m_quad[2] = v4;
+    XFNV_M128_F32(inertia.m_col0.m_quad, 0) = v4;
+    XFNV_M128_F32(inertia.m_col1.m_quad, 1) = v4;
+    XFNV_M128_F32(inertia.m_col2.m_quad, 2) = v4;
 }
 
 void hkpSphereMotion::getInertiaWorld(hkMatrix3& inertia) const {
-    double v2 = m_inertiaAndMassInv.m_quad[0];
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     if (v2 < 1.1920928955078125e-07) {
         v2 = 1.1920929e-07f;
     }
@@ -103,52 +104,54 @@ void hkpSphereMotion::getInertiaWorld(hkMatrix3& inertia) const {
     inertia.m_col1.m_quad = _mm_setzero_ps();
     inertia.m_col2.m_quad = _mm_setzero_ps();
     float v4 = 1.0 / v3;
-    inertia.m_col0.m_quad[0] = v4;
-    inertia.m_col1.m_quad[1] = v4;
-    inertia.m_col2.m_quad[2] = v4;
+    XFNV_M128_F32(inertia.m_col0.m_quad, 0) = v4;
+    XFNV_M128_F32(inertia.m_col1.m_quad, 1) = v4;
+    XFNV_M128_F32(inertia.m_col2.m_quad, 2) = v4;
 }
 
 // The largest diagonal element, inverted (0 when it is not positive). Each step is rounded to a float. The later
 // element is kept unless it is below.
 void hkpSphereMotion::setInertiaLocal(const hkMatrix3& inertia) {
-    float fMax =
-        inertia.m_col1.m_quad[1] < inertia.m_col0.m_quad[0] ? inertia.m_col0.m_quad[0] : inertia.m_col1.m_quad[1];
-    fMax = inertia.m_col2.m_quad[2] < fMax ? fMax : inertia.m_col2.m_quad[2];
+    float fMax = XFNV_M128_F32(inertia.m_col1.m_quad, 1) < XFNV_M128_F32(inertia.m_col0.m_quad, 0)
+        ? XFNV_M128_F32(inertia.m_col0.m_quad, 0)
+        : XFNV_M128_F32(inertia.m_col1.m_quad, 1);
+    fMax = XFNV_M128_F32(inertia.m_col2.m_quad, 2) < fMax ? fMax : XFNV_M128_F32(inertia.m_col2.m_quad, 2);
     float fInv = fMax > 0.0f ? 1.0f / fMax : 0.0f;
-    m_inertiaAndMassInv.m_quad[0] = fInv;
-    m_inertiaAndMassInv.m_quad[1] = fInv;
-    m_inertiaAndMassInv.m_quad[2] = fInv;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0) = fInv;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 1) = fInv;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 2) = fInv;
 }
 
 // The smallest diagonal element of the inverse inertia. Each compare keeps the later element unless it is above the
 // current minimum.
 void hkpSphereMotion::setInertiaInvLocal(const hkMatrix3& inertiaInv) {
-    float fMin = inertiaInv.m_col1.m_quad[1] > inertiaInv.m_col0.m_quad[0] ? inertiaInv.m_col0.m_quad[0]
-                                                                           : inertiaInv.m_col1.m_quad[1];
-    fMin = inertiaInv.m_col2.m_quad[2] > fMin ? fMin : inertiaInv.m_col2.m_quad[2];
-    m_inertiaAndMassInv.m_quad[0] = fMin;
-    m_inertiaAndMassInv.m_quad[1] = fMin;
-    m_inertiaAndMassInv.m_quad[2] = fMin;
+    float fMin = XFNV_M128_F32(inertiaInv.m_col1.m_quad, 1) > XFNV_M128_F32(inertiaInv.m_col0.m_quad, 0)
+        ? XFNV_M128_F32(inertiaInv.m_col0.m_quad, 0)
+        : XFNV_M128_F32(inertiaInv.m_col1.m_quad, 1);
+    fMin = XFNV_M128_F32(inertiaInv.m_col2.m_quad, 2) > fMin ? fMin : XFNV_M128_F32(inertiaInv.m_col2.m_quad, 2);
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0) = fMin;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 1) = fMin;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 2) = fMin;
 }
 
 void hkpSphereMotion::getInertiaInvLocal(hkMatrix3& inertiaInv) const {
-    double v2 = m_inertiaAndMassInv.m_quad[0];
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     inertiaInv.m_col0.m_quad = _mm_setzero_ps();
     inertiaInv.m_col1.m_quad = _mm_setzero_ps();
     inertiaInv.m_col2.m_quad = _mm_setzero_ps();
-    inertiaInv.m_col0.m_quad[0] = v2;
-    inertiaInv.m_col1.m_quad[1] = v2;
-    inertiaInv.m_col2.m_quad[2] = v2;
+    XFNV_M128_F32(inertiaInv.m_col0.m_quad, 0) = v2;
+    XFNV_M128_F32(inertiaInv.m_col1.m_quad, 1) = v2;
+    XFNV_M128_F32(inertiaInv.m_col2.m_quad, 2) = v2;
 }
 
 void hkpSphereMotion::getInertiaInvWorld(hkMatrix3& inertiaInv) const {
-    double v2 = m_inertiaAndMassInv.m_quad[0];
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     inertiaInv.m_col0.m_quad = _mm_setzero_ps();
     inertiaInv.m_col1.m_quad = _mm_setzero_ps();
     inertiaInv.m_col2.m_quad = _mm_setzero_ps();
-    inertiaInv.m_col0.m_quad[0] = v2;
-    inertiaInv.m_col1.m_quad[1] = v2;
-    inertiaInv.m_col2.m_quad[2] = v2;
+    XFNV_M128_F32(inertiaInv.m_col0.m_quad, 0) = v2;
+    XFNV_M128_F32(inertiaInv.m_col1.m_quad, 1) = v2;
+    XFNV_M128_F32(inertiaInv.m_col2.m_quad, 2) = v2;
 }
 
 void hkpSphereMotion::getProjectedPointVelocity(
@@ -164,11 +167,14 @@ void hkpSphereMotion::getProjectedPointVelocity(
     __m128 v9 = _mm_sub_ps(v6, v7);
     __m128 v10 = _mm_mul_ps(m_angularVelocity.m_quad, v9);
     __m128 v11 = _mm_mul_ps(v9, v9);
-    velOut = (_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0])) +
-        (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
-    invVirtMassOut = m_inertiaAndMassInv.m_quad[0] *
-            (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0])) +
-        m_inertiaAndMassInv.m_quad[3];
+    velOut = (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+              (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0))) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)));
+    invVirtMassOut = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0) *
+            (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0))) +
+        XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 3);
 }
 
 void hkpSphereMotion::applyPointImpulse(const hkVector4& imp, const hkVector4& p) {

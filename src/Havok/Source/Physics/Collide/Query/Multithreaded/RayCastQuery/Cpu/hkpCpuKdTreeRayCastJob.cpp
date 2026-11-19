@@ -16,6 +16,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayBundleCastInput.h"
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -98,10 +99,10 @@ void hkKdTreeCpuBroadphaseBundleCastCollector::addMidPhaseHit(hkPrimitiveId prim
 // The four rays' hit fractions, taken from the command's results. Without a command the vector is left untouched.
 void hkKdTreeCpuBroadphaseBundleCastCollector::getHitFractions(hkVector4& hitFractions) const {
     if (m_command) {
-        hitFractions.m_quad[0] = m_command->m_results[0].m_hitFraction;
-        hitFractions.m_quad[1] = m_command->m_results[1].m_hitFraction;
-        hitFractions.m_quad[2] = m_command->m_results[2].m_hitFraction;
-        hitFractions.m_quad[3] = m_command->m_results[3].m_hitFraction;
+        XFNV_M128_F32(hitFractions.m_quad, 0) = m_command->m_results[0].m_hitFraction;
+        XFNV_M128_F32(hitFractions.m_quad, 1) = m_command->m_results[1].m_hitFraction;
+        XFNV_M128_F32(hitFractions.m_quad, 2) = m_command->m_results[2].m_hitFraction;
+        XFNV_M128_F32(hitFractions.m_quad, 3) = m_command->m_results[3].m_hitFraction;
     }
 }
 

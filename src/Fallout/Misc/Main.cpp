@@ -281,6 +281,7 @@
 #include "platform/Ini.h"
 #include "platform/Paths.h"
 #include "platform/System.h"
+#include "xfnv/Compiler.h"
 
 #include <SDL3/SDL.h>
 #include <cstdint>
@@ -981,7 +982,7 @@ void MessageMenuCallback() {
     if (MessageMenuResult == 1 || MessageMenuResult == 3) {
         InitializationFlow("Warning Response was to Exit the Process");
         if (platform::DebuggerPresent()) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
         std::_Exit(0);
     }

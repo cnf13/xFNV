@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -60,35 +61,35 @@ hkpCharacterMotion::hkpCharacterMotion(const hkVector4& position, const hkQuater
 hkpCharacterMotion::hkpCharacterMotion(int32_t a1) : hkpMotion(hkFinishLoadedObjectFlag{a1}) {}
 
 void hkpCharacterMotion::getInertiaLocal(hkMatrix3& a1) const {
-    double v2 = 1.0 / m_inertiaAndMassInv.m_quad[0];
+    double v2 = 1.0 / XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     a1.m_col0.m_quad = _mm_setzero_ps();
     a1.m_col1.m_quad = _mm_setzero_ps();
     a1.m_col2.m_quad = _mm_setzero_ps();
     float v3 = v2;
-    a1.m_col0.m_quad[0] = v3;
-    a1.m_col1.m_quad[1] = v3;
-    a1.m_col2.m_quad[2] = v3;
+    XFNV_M128_F32(a1.m_col0.m_quad, 0) = v3;
+    XFNV_M128_F32(a1.m_col1.m_quad, 1) = v3;
+    XFNV_M128_F32(a1.m_col2.m_quad, 2) = v3;
 }
 
 void hkpCharacterMotion::getInertiaWorld(hkMatrix3& a1) const {
-    double v2 = 1.0 / m_inertiaAndMassInv.m_quad[0];
+    double v2 = 1.0 / XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     a1.m_col0.m_quad = _mm_setzero_ps();
     a1.m_col1.m_quad = _mm_setzero_ps();
     a1.m_col2.m_quad = _mm_setzero_ps();
     float v3 = v2;
-    a1.m_col0.m_quad[0] = v3;
-    a1.m_col1.m_quad[1] = v3;
-    a1.m_col2.m_quad[2] = v3;
+    XFNV_M128_F32(a1.m_col0.m_quad, 0) = v3;
+    XFNV_M128_F32(a1.m_col1.m_quad, 1) = v3;
+    XFNV_M128_F32(a1.m_col2.m_quad, 2) = v3;
 }
 
 void hkpCharacterMotion::setInertiaLocal(const hkMatrix3& a2) {
-    float v6 = (&a2)->m_col1.m_quad[1];
-    double v3 = (double)(&a2)->m_col0.m_quad[0];
+    float v6 = XFNV_M128_F32((&a2)->m_col1.m_quad, 1);
+    double v3 = (double)XFNV_M128_F32((&a2)->m_col0.m_quad, 0);
     if (!(v6 < v3)) {
         v3 = (double)v6;
     }
     float v8 = (float)v3;
-    float v7 = (&a2)->m_col2.m_quad[2];
+    float v7 = XFNV_M128_F32((&a2)->m_col2.m_quad, 2);
     double v4 = (double)v8;
     if (!(v7 < ((double)v8))) {
         v4 = (double)v7;
@@ -99,47 +100,47 @@ void hkpCharacterMotion::setInertiaLocal(const hkMatrix3& a2) {
         v5 = 1.0 / v9;
     }
     float v10 = (float)v5;
-    m_inertiaAndMassInv.m_quad[0] = v10;
-    m_inertiaAndMassInv.m_quad[1] = v10;
-    m_inertiaAndMassInv.m_quad[2] = v10;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0) = v10;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 1) = v10;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 2) = v10;
 }
 
 void hkpCharacterMotion::setInertiaInvLocal(const hkMatrix3& a2) {
-    float v5 = (&a2)->m_col1.m_quad[1];
-    double v3 = (double)(&a2)->m_col0.m_quad[0];
+    float v5 = XFNV_M128_F32((&a2)->m_col1.m_quad, 1);
+    double v3 = (double)XFNV_M128_F32((&a2)->m_col0.m_quad, 0);
     if (!(v5 > v3)) {
         v3 = (double)v5;
     }
     float v7 = (float)v3;
-    float v6 = (&a2)->m_col2.m_quad[2];
+    float v6 = XFNV_M128_F32((&a2)->m_col2.m_quad, 2);
     double v4 = (double)v7;
     if (!(v6 > ((double)v7))) {
         v4 = (double)v6;
     }
     float v8 = (float)v4;
-    m_inertiaAndMassInv.m_quad[0] = v8;
-    m_inertiaAndMassInv.m_quad[1] = v8;
-    m_inertiaAndMassInv.m_quad[2] = v8;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0) = v8;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 1) = v8;
+    XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 2) = v8;
 }
 
 void hkpCharacterMotion::getInertiaInvLocal(hkMatrix3& a1) const {
-    double v2 = m_inertiaAndMassInv.m_quad[0];
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     a1.m_col0.m_quad = _mm_setzero_ps();
     a1.m_col1.m_quad = _mm_setzero_ps();
     a1.m_col2.m_quad = _mm_setzero_ps();
-    a1.m_col0.m_quad[0] = v2;
-    a1.m_col1.m_quad[1] = v2;
-    a1.m_col2.m_quad[2] = v2;
+    XFNV_M128_F32(a1.m_col0.m_quad, 0) = v2;
+    XFNV_M128_F32(a1.m_col1.m_quad, 1) = v2;
+    XFNV_M128_F32(a1.m_col2.m_quad, 2) = v2;
 }
 
 void hkpCharacterMotion::getInertiaInvWorld(hkMatrix3& a1) const {
-    double v2 = m_inertiaAndMassInv.m_quad[0];
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
     a1.m_col0.m_quad = _mm_setzero_ps();
     a1.m_col1.m_quad = _mm_setzero_ps();
     a1.m_col2.m_quad = _mm_setzero_ps();
-    a1.m_col0.m_quad[0] = v2;
-    a1.m_col1.m_quad[1] = v2;
-    a1.m_col2.m_quad[2] = v2;
+    XFNV_M128_F32(a1.m_col0.m_quad, 0) = v2;
+    XFNV_M128_F32(a1.m_col1.m_quad, 1) = v2;
+    XFNV_M128_F32(a1.m_col2.m_quad, 2) = v2;
 }
 
 void hkpCharacterMotion::getProjectedPointVelocity(
@@ -157,9 +158,11 @@ void hkpCharacterMotion::getProjectedPointVelocity(
         ),
         m_angularVelocity.m_quad
     );
-    a3 = (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) +
-        (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
-    a4 = m_inertiaAndMassInv.m_quad[3];
+    a3 = (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+          (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0))) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0)));
+    a4 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 3);
 }
 
 void hkpCharacterMotion::applyPointImpulse(const hkVector4& a1, const hkVector4& a2) {

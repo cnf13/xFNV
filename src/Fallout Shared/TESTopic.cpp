@@ -36,6 +36,7 @@
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 #include "SDK/MSVC/time.h"
+#include "xfnv/Compiler.h"
 
 // The built-in topics of each dialogue type, which pDefaultTopics indexes (the counts are
 // uiNumHardcodedTopicsPerCategory); AddDefaultTopics creates their forms.
@@ -154,7 +155,7 @@ bool TESTopic::Load(TESFile* pFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(pFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(pFile->GetChunkSize()));
                 pFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;
@@ -439,7 +440,7 @@ const char* TESTopic::GetFormEditorID() {
 bool TESTopic::SetFormEditorID(const char* apEditorID) {
     uint32_t uiSize = BSstrlen(apEditorID) + 1;
     // A 16-byte aligned stack buffer.
-    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
     BSstrcpy(pBuffer, uiSize, apEditorID);
     if (!strEditorID.StrCmp(pBuffer, true)) {
         return false;

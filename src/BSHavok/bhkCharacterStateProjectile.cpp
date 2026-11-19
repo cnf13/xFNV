@@ -9,6 +9,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/Util/hkpCharacterMovementUtil.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -22,7 +23,7 @@ hkpCharacterStateType bhkCharacterStateProjectile::getType() const {
 void bhkCharacterStateProjectile::Update(bhkCharacterController& arInput) {
     hkpCharacterMovementUtil::hkpMovementUtilInput muInput;
     hkVector4* p_kOutVelocity = &arInput.OutVelocity;
-    float v17 = arInput.OutVelocity.m_quad[0];
+    float v17 = XFNV_M128_F32(arInput.OutVelocity.m_quad, 0);
     muInput.m_forward = arInput.ForwardVec;
     muInput.m_up = arInput.UpVec;
     muInput.m_surfaceNormal = muInput.m_up;
@@ -34,12 +35,12 @@ void bhkCharacterStateProjectile::Update(bhkCharacterController& arInput) {
         muInput.m_currentVelocity.m_quad = p_kOutVelocity->m_quad;
         muInput.m_gain = fAcrobatics;
         __m128 v5 = _mm_set_ss(
-            std::bit_cast<float>(
-                std::bit_cast<uint32_t>(_mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 170)[0])
-            )
+            std::bit_cast<float>(std::bit_cast<uint32_t>(
+                XFNV_M128_F32(_mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 170), 0)
+            ))
         );
         v6.m_quad = arInput.Direction.m_quad;
-        uint32_t v21 = std::bit_cast<uint32_t>(arInput.Direction.m_quad[0]);
+        uint32_t v21 = std::bit_cast<uint32_t>(XFNV_M128_F32(arInput.Direction.m_quad, 0));
         muInput.m_maxVelocityDelta = 100000.0f;
         muInput.m_desiredVelocity.m_quad = _mm_unpacklo_ps(
             _mm_unpacklo_ps(_mm_shuffle_ps(v6.m_quad, v6.m_quad, 85), v5),
@@ -52,21 +53,22 @@ void bhkCharacterStateProjectile::Update(bhkCharacterController& arInput) {
         float fGravity = arInput.fGravity;
         if (fGravity > 0.0f) {
             __m128 v7 = _mm_mul_ps(arInput.UpVec.m_quad, p_kOutVelocity->m_quad);
-            float v8 = _mm_shuffle_ps(v7, v7, 85)[0] + v7[0];
-            float v9 = _mm_shuffle_ps(v7, v7, 170)[0];
+            float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0);
+            float v9 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0);
             __m128 m_quad = hkQuadReal0000;
-            m_quad[0] = 0.0f - (v9 + v8);
+            XFNV_M128_F32(m_quad, 0) = 0.0f - (v9 + v8);
             p_kOutVelocity->m_quad =
                 _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 0), arInput.UpVec.m_quad), p_kOutVelocity->m_quad);
             __m128 v11 = _mm_mul_ps(arInput.UpVec.m_quad, muInput.m_currentVelocity.m_quad);
-            float v12 = _mm_shuffle_ps(v11, v11, 85)[0] + v11[0];
+            float v12 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0);
             __m128 v13 = _mm_shuffle_ps(v11, v11, 170);
-            v13[0] = v13[0] + v12;
+            XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
             p_kOutVelocity->m_quad =
                 _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), arInput.UpVec.m_quad), p_kOutVelocity->m_quad);
         }
         arInput.GetPosition_hk(position);
-        if (arInput.fWaterHeight < static_cast<double>(_mm_shuffle_ps(position.m_quad, position.m_quad, 170)[0])) {
+        if (arInput.fWaterHeight <
+            static_cast<double>(XFNV_M128_F32(_mm_shuffle_ps(position.m_quad, position.m_quad, 170), 0))) {
             arInput.GethkWorld();
             const hkpWorld* v14 = arInput.GethkWorld();
             __m128 v24 = v14->m_gravity.m_quad;
@@ -85,13 +87,14 @@ void bhkCharacterStateProjectile::Update(bhkCharacterController& arInput) {
     }
     else {
         hkVector4 v3;
-        p_kOutVelocity->m_quad[0] = 0.0f;
+        XFNV_M128_F32(p_kOutVelocity->m_quad, 0) = 0.0f;
         muInput.m_currentVelocity.m_quad = p_kOutVelocity->m_quad;
         muInput.m_gain = 1.0f;
-        uint32_t v20 =
-            std::bit_cast<uint32_t>(_mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 170)[0]);
+        uint32_t v20 = std::bit_cast<uint32_t>(
+            XFNV_M128_F32(_mm_shuffle_ps(arInput.Direction.m_quad, arInput.Direction.m_quad, 170), 0)
+        );
         v3.m_quad = arInput.Direction.m_quad;
-        uint32_t v18 = std::bit_cast<uint32_t>(arInput.Direction.m_quad[0]);
+        uint32_t v18 = std::bit_cast<uint32_t>(XFNV_M128_F32(arInput.Direction.m_quad, 0));
         muInput.m_maxVelocityDelta = 100000.0f;
         muInput.m_desiredVelocity.m_quad = _mm_unpacklo_ps(
             _mm_unpacklo_ps(_mm_shuffle_ps(v3.m_quad, v3.m_quad, 85), _mm_set_ss(std::bit_cast<float>(v20))),

@@ -32,6 +32,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpSetLocalTransformsConstraintAtom.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/LimitedHinge/hkpLimitedHingeConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/hkpConstraintMotor.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -220,31 +221,39 @@ void hkLimitedHingeConstraintCinfo::LoadBinary(NiStream& arStream) {
     v17 = 4;
     v11->m_uiAbsoluteCurrentPos += v12(v11, &pd->m_atoms.m_angFriction.m_maxFrictionTorque, 4, &v17, 1);
     if (!v2->m_bSourceIsLittleEndian) {
-        pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[0u] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[0]))
-        ));
-        pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[1] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[1]))
-        ));
-        pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[2] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[2]))
-        ));
-        pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad[3]))
-        ));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 0u) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 0))
+            )));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 1) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 1))
+            )));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 2) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 2))
+            )));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 3) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformA.m_translation.m_quad, 3))
+            )));
         bhkRigidBodyCinfo::EndianMatrix(pd->m_atoms.m_transforms.m_transformA.m_rotation);
-        pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[0u] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[0]))
-        ));
-        pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[1] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[1]))
-        ));
-        pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[2] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[2]))
-        ));
-        pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[3] = std::bit_cast<float>(static_cast<int32_t>(
-            __builtin_bswap32(std::bit_cast<uint32_t>(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad[3]))
-        ));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 0u) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 0))
+            )));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 1) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 1))
+            )));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 2) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 2))
+            )));
+        XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 3) =
+            std::bit_cast<float>(static_cast<int32_t>(std::byteswap<uint32_t>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(pd->m_atoms.m_transforms.m_transformB.m_translation.m_quad, 3))
+            )));
         bhkRigidBodyCinfo::EndianMatrix(pd->m_atoms.m_transforms.m_transformB.m_rotation);
     }
     if (v2->m_BSStreamHeader.uiVersion > 29) {

@@ -37,6 +37,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -124,7 +125,8 @@ uint16_t hkpReportContactMgr::addContactPointImpl(
     );
     hkpManifoldPointAddedEvent event(
         0, this, &a3, &a4, &a1, &a2, &a6, a5, nullptr,
-        _mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0])
+        XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0))
     );
     hkpWorldCallbackUtil::fireContactPointAdded(m_world, event);
     if (m_bodyA->m_contactListeners.m_size) {

@@ -4,8 +4,8 @@
 #include "SpeedTree/CRotTransform.h"
 #include "SpeedTree/SpeedTreeRT.h"
 
-#include <__stddef_ptrdiff_t.h>
 #include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <vector>
 

@@ -10,6 +10,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Sets the memory system's state.
 void hkSetOutOfMemoryState(hkMemoryAllocator::MemoryState state) {
@@ -507,7 +508,7 @@ void hkFreeListAllocator::init(hkMemoryBlockServer* a1) {
 // same element size is already filed, that one is kept and the new one dropped. Traps if the pool of lists has run out.
 hkFreeList* hkFreeListAllocator::_newFreeList(uint32_t elementSize, uint32_t alignment, uint32_t blockSize) {
     if (m_topFreeList >= m_lastFreeList) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
     hkFreeList* pFreeList = m_topFreeList;
     m_topFreeList = pFreeList + 1;

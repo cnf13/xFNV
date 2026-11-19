@@ -17,6 +17,7 @@
 #include "Havok/Source/Physics/Dynamics/World/Util/hkpWorldOperationUtil.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpSimulationIsland.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
+#include "xfnv/Compiler.h"
 
 hkpDefaultWorldMaintenanceMgr::hkpDefaultWorldMaintenanceMgr()
   : m_minAllowedTimeValue(33.0f), m_maxAllowedTimeValue(63.0f) {}
@@ -62,8 +63,8 @@ void hkpDefaultWorldMaintenanceMgr::resetWorldTime(hkpWorld* world, hkStepInfo& 
     for (hkpSimulationIsland* pIsland : world->m_activeSimulationIslands) {
         hkpEntity* v9;
         for (int32_t j = 0; j < pIsland->m_entities.m_size;
-             v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad[3] =
-                 v5 + v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad[3]) {
+             XFNV_M128_F32(v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3) =
+                 v5 + XFNV_M128_F32(v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3)) {
             v9 = pIsland->m_entities.m_data[j++];
         }
         hkpWorldAgentUtil::warpTime(

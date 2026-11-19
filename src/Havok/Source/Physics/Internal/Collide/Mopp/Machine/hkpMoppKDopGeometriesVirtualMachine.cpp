@@ -11,6 +11,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 float exchangeLowBound(hkp26Dop* apDop, int32_t aiAxis, float afValue) {
     float v5 = *(&apDop->m_lx + 2 * aiAxis);
@@ -58,7 +59,7 @@ void hkpMoppKDopGeometriesVirtualMachine::queryMopp(
 ) {
     hkpMoppKDopGeometriesVirtualMachine::hkpMoppKDopGeometriesVirtualMachineQuery scaledQuery;
     m_kDopGeometries = kDopGeometries;
-    double v4 = 1.0 / code->m_info.m_offset.m_quad[3];
+    double v4 = 1.0 / XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     std::memset(&scaledQuery, 0, 20);
     m_ItoFScale = v4;
     m_offset = code->m_info.m_offset;
@@ -421,7 +422,7 @@ void hkpMoppKDopGeometriesVirtualMachine::queryMoppKDopGeometriesRecurse(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppKDopGeometriesVirtualMachine.cpp", 593
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }

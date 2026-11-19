@@ -29,6 +29,7 @@
 #include "Fallout/AI/Combat/Explosion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // Reads the explosion's chunks. ENAM/EITM and ANAM/EAMT are the enchantment's form ID and amount, MNAM its image
 // space modifier, INAM the placed object; the DATA chunk holds the explosion data, which a big-endian file stores
@@ -62,7 +63,7 @@ bool BGSExplosion::Load(TESFile* apFile) {
                 break;
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

@@ -18,6 +18,7 @@
 #include "Fallout Shared/TESValueForm.h"
 #include "Fallout Shared/TESWeightForm.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
+#include "xfnv/Compiler.h"
 
 TESObjectIMOD::TESObjectIMOD() {
     cFormType = IMOD_ID;
@@ -48,7 +49,7 @@ bool TESObjectIMOD::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, 0x200);
                 TESForm* pForm = this;
                 pForm->SetFormEditorID(pBuffer);
@@ -63,7 +64,7 @@ bool TESObjectIMOD::Load(TESFile* apFile) {
             case MODS_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(

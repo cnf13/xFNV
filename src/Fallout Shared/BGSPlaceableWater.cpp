@@ -20,6 +20,7 @@
 #include "Fallout/AI/PlayerCharacter.h"
 #include "Fallout/Misc/SaveLoad/BGSReconstructFormsInAllFilesMap.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // Reads the model chunks, the DATA record (8 bytes: the flags and the water type's form ID, of which only the water
 // type is kept, the flags are cleared) and the DNAM record. GetTESForm's result is stored as a byte and compared
@@ -69,7 +70,7 @@ bool BGSPlaceableWater::Load(TESFile* apFile) {
         else if (eChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size.
             uint32_t uiChunkSize = apFile->GetChunkSize();
-            char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
             // An empty chunk leaves the buffer unwritten (see above).
             pEditorID[0] = '\0';
             apFile->GetChunkData(pEditorID, 0x200);

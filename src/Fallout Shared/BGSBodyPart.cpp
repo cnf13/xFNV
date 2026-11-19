@@ -46,6 +46,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 
@@ -57,7 +58,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
     }
     if (apFile->GetTESChunk() == BPTN_ID) {
         // A 16-byte aligned stack buffer of the chunk's size.
-        char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+        char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
         apFile->GetChunkData(pBuffer, 0);
         PartName.Set(pBuffer, 0);
         if (!apFile->NextChunk()) {
@@ -74,7 +75,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         return false;
     }
     {
-        char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+        char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
         apFile->GetChunkData(pBuffer, 0);
         NodeName.Set(pBuffer, 0);
     }
@@ -85,7 +86,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         return false;
     }
     {
-        char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+        char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
         apFile->GetChunkData(pBuffer, 0);
         TargetName.Set(pBuffer, 0);
     }
@@ -93,7 +94,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         return false;
     }
     if (apFile->GetTESChunk() == BPNI_ID) {
-        char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+        char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
         apFile->GetChunkData(pBuffer, 0);
         IKStartNodeName.Set(pBuffer, 0);
         if (!apFile->NextChunk()) {
@@ -146,7 +147,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         return false;
     }
     if (apFile->GetChunkSize()) {
-        char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+        char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
         apFile->GetChunkData(pBuffer, 0);
         TESModel* pDebrisModel = &ExplosionSpecialDebris;
         pDebrisModel->SetModel(pBuffer);
@@ -157,14 +158,14 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         }
         if (apFile->GetChunkSize()) {
             // Reads the chunk into a buffer that is never looked at, as the game does.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0);
         }
         if (!apFile->NextChunk() || apFile->GetTESChunk() != NAM3_ID) {
             return apFile->GetFormVersion() < 2;
         }
         if (apFile->GetChunkSize()) {
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0);
         }
     }
@@ -172,7 +173,7 @@ bool BGSBodyPart::Load(TESFile* apFile) {
         return apFile->GetFormVersion() < 2;
     }
     if (apFile->GetChunkSize()) {
-        char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+        char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
         apFile->GetChunkData(pBuffer, 0);
         GoreObjectName.Set(pBuffer, 0);
     }

@@ -7,12 +7,13 @@
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "xfnv/Compiler.h"
 
 hkpClosestCdPointCollector::~hkpClosestCdPointCollector() {}
 
 void hkpClosestCdPointCollector::reset() {
     m_hitPoint.m_rootCollidableA = nullptr;
-    m_hitPoint.m_contact.m_separatingNormal.m_quad[3] = 0x1.ffffdc0000000p+127f;
+    XFNV_M128_F32(m_hitPoint.m_contact.m_separatingNormal.m_quad, 3) = 0x1.ffffdc0000000p+127f;
     m_earlyOutDistance = 0x1.ffffdc0000000p+127f;
 }
 
@@ -21,7 +22,8 @@ void hkpClosestCdPointCollector::reset() {
 // leaf first, ended by HK_INVALID_SHAPE_KEY; the new distance becomes the early-out distance.
 void hkpClosestCdPointCollector::addCdPoint(const hkpCdPoint& event) {
     if (!m_hitPoint.m_rootCollidableA ||
-        m_hitPoint.m_contact.m_separatingNormal.m_quad[3] > event.m_contact.m_separatingNormal.m_quad[3]) {
+        XFNV_M128_F32(m_hitPoint.m_contact.m_separatingNormal.m_quad, 3) >
+            XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3)) {
         m_hitPoint.m_contact = event.m_contact;
         m_hitPoint.m_rootCollidableA = event.m_cdBodyA->getRootCollidable();
         m_hitPoint.m_shapeKeyA = event.m_cdBodyA->m_shapeKey;
@@ -47,7 +49,7 @@ void hkpClosestCdPointCollector::addCdPoint(const hkpCdPoint& event) {
             m_hitPoint.m_shapeKeysB[i] = pBodyB->m_shapeKey;
             pBodyB = pBodyB->m_parent;
         }
-        m_earlyOutDistance = event.m_contact.m_separatingNormal.m_quad[3];
+        m_earlyOutDistance = XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3);
     }
 }
 

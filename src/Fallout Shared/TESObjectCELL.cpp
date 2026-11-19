@@ -287,6 +287,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -455,7 +456,7 @@ bool TESObjectCELL::Load(TESFile* apFile) {
                 // A 16-byte aligned stack buffer sized by the chunk, but the read is capped at 0x200 bytes, as the game
                 // does.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pEditorID[0] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200);
@@ -519,7 +520,7 @@ bool TESObjectCELL::Load(TESFile* apFile) {
                 uint32_t uiSize = apFile->GetChunkSize();
                 if (uiSize != 0) {
                     // 16-byte aligned.
-                    char* pTextureName = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                    char* pTextureName = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                     apFile->GetChunkData(pTextureName, uiSize);
                     WaterNoiseTexture.SetTextureName(pTextureName);
                 }

@@ -21,6 +21,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystemDesc.h"
 #include "SDK/MSVC/stdlib.h"
 #include "platform/Paths.h"
+#include "xfnv/Compiler.h"
 
 #include <cerrno>
 #include <cstring>
@@ -974,7 +975,7 @@ void TESFile::operator delete(void* apMemory) {
 // TES4 records to learn whether the file has groups, and rewinds. Returns TES_ERROR-style codes: 2 when the file cannot
 // be opened, 11 when the first record is not TES4, else 0. The CNAM and SNAM buffers are each initialised to "" (one
 // zeroed byte, allocated even for an empty chunk) so an empty chunk (malformed data) is not read uninitialised. The
-// chunk buffers are allocated on the stack with __builtin_alloca at the chunk size.
+// chunk buffers are allocated on the stack with XFNV_ALLOCA at the chunk size.
 TES_RETURN_CODE TESFile::LoadTESInfo() {
     ClearMasterLists();
     if (m_pFile) {
@@ -1002,7 +1003,7 @@ TES_RETURN_CODE TESFile::LoadTESInfo() {
                 break;
             case CNAM_ID: {
                 uint32_t uiChunkSize = GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca(uiChunkSize ? uiChunkSize : 1));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA(uiChunkSize ? uiChunkSize : 1));
                 // Cleared first because an empty chunk leaves the buffer unwritten (see above); the game does not do
                 // this.
                 pBuffer[0] = '\0';
@@ -1012,7 +1013,7 @@ TES_RETURN_CODE TESFile::LoadTESInfo() {
             }
             case SNAM_ID: {
                 uint32_t uiChunkSize = GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca(uiChunkSize ? uiChunkSize : 1));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA(uiChunkSize ? uiChunkSize : 1));
                 // Cleared first because an empty chunk leaves the buffer unwritten (see above); the game does not do
                 // this.
                 pBuffer[0] = '\0';

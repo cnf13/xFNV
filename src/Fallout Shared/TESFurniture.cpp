@@ -27,6 +27,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 static SettingT<GameSettingCollection> fFurnitureMarker01DeltaX("fFurnitureMarker01DeltaX", 0.0f);
 static SettingT<GameSettingCollection> fFurnitureMarker01DeltaY("fFurnitureMarker01DeltaY", 0.0f);
@@ -259,7 +260,7 @@ bool TESFurniture::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;
@@ -272,7 +273,7 @@ bool TESFurniture::Load(TESFile* apFile) {
             case FULL_ID: TESFullName::LoadFullNameChunk(static_cast<TESFullName*>(this), apFile); break;
             case MODS_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint32_t uiVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, uiVersion);

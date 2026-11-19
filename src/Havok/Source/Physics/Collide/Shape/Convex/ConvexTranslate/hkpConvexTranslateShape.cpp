@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -83,7 +84,9 @@ void hkpConvexTranslateShape::calcContentStatistics(hkStatisticsCollector* colle
 float hkpConvexTranslateShape::getMaximumProjection(const hkVector4& direction) const {
     float v6 = m_childShape.m_childShape->getMaximumProjection(direction);
     __m128 v3 = _mm_mul_ps(m_translation.m_quad, direction.m_quad);
-    return (_mm_shuffle_ps(v3, v3, 170)[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0])) + v6;
+    return (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0))) +
+        v6;
 }
 
 const hkpShapeContainer* hkpConvexTranslateShape::getContainer() const {
@@ -156,11 +159,11 @@ void hkpConvexTranslateShape::castRayWithCollectorImpl(
     // Builds the identity rotation inline: each column zeroed, then its diagonal 1 stored.
     hkTransform translation;
     translation.m_rotation.m_col0.m_quad = _mm_setzero_ps();
-    translation.m_rotation.m_col0.m_quad[0] = 1.0f;
+    XFNV_M128_F32(translation.m_rotation.m_col0.m_quad, 0) = 1.0f;
     translation.m_rotation.m_col1.m_quad = _mm_setzero_ps();
-    translation.m_rotation.m_col1.m_quad[1] = 1.0f;
+    XFNV_M128_F32(translation.m_rotation.m_col1.m_quad, 1) = 1.0f;
     translation.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    translation.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(translation.m_rotation.m_col2.m_quad, 2) = 1.0f;
     translation.m_translation.m_quad = m_translation.m_quad;
     hkTransform childToWorld;
     childToWorld.setMul(*cdBody.m_motion.pMotion, translation);

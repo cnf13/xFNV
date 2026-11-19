@@ -4,6 +4,8 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBodyCinfo.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 
+#include <bit>
+
 class bhkRigidBody551Cinfo;
 
 // The creation info a bhkRigidBody builds its Havok body from: the entity info plus the Havok one for the body.
@@ -86,7 +88,7 @@ public:
             uint32_t ui;
         } kBits;
         kBits.f = afValue;
-        kBits.ui = __builtin_bswap32(kBits.ui);
+        kBits.ui = std::byteswap<uint32_t>(kBits.ui);
         return kBits.f;
     }
 

@@ -24,6 +24,7 @@
 #include "Fallout Shared/TESTexture.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Reads the name, model, description, icon, editor ID, object bound and DATA chunks and the counter effects (ESCE). The
 // DATA record is cleared and given a speed of 1 before it is read, as the game does.
@@ -46,7 +47,7 @@ bool EffectSetting::Load(TESFile* apFile) {
             case DESC_ID: TESDescription::LoadDescriptionData(static_cast<TESDescription*>(this), apFile); break;
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pEditorID, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pEditorID);
                 break;

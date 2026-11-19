@@ -25,6 +25,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpSimulationIsland.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -85,18 +86,18 @@ void hkpBreakableConstraintData::buildJacobian(const hkpConstraintQueryIn& in, h
     }
     const hkpVelocityAccumulator* bodyA = in.m_bodyA;
     const hkpVelocityAccumulator* bodyB = in.m_bodyB;
-    runtime->m_linearVelcityA[0] = bodyA->m_linearVel.m_quad[0];
-    runtime->m_linearVelcityA[1] = bodyA->m_linearVel.m_quad[1];
-    runtime->m_linearVelcityA[2] = bodyA->m_linearVel.m_quad[2];
-    runtime->m_linearVelcityB[0] = bodyB->m_linearVel.m_quad[0];
-    runtime->m_linearVelcityB[1] = bodyB->m_linearVel.m_quad[1];
-    runtime->m_linearVelcityB[2] = bodyB->m_linearVel.m_quad[2];
-    runtime->m_angularVelcityA[0] = bodyA->m_angularVel.m_quad[0];
-    runtime->m_angularVelcityA[1] = bodyA->m_angularVel.m_quad[1];
-    runtime->m_angularVelcityA[2] = bodyA->m_angularVel.m_quad[2];
-    runtime->m_angularVelcityB[0] = bodyB->m_angularVel.m_quad[0];
-    runtime->m_angularVelcityB[1] = bodyB->m_angularVel.m_quad[1];
-    runtime->m_angularVelcityB[2] = bodyB->m_angularVel.m_quad[2];
+    runtime->m_linearVelcityA[0] = XFNV_M128_F32(bodyA->m_linearVel.m_quad, 0);
+    runtime->m_linearVelcityA[1] = XFNV_M128_F32(bodyA->m_linearVel.m_quad, 1);
+    runtime->m_linearVelcityA[2] = XFNV_M128_F32(bodyA->m_linearVel.m_quad, 2);
+    runtime->m_linearVelcityB[0] = XFNV_M128_F32(bodyB->m_linearVel.m_quad, 0);
+    runtime->m_linearVelcityB[1] = XFNV_M128_F32(bodyB->m_linearVel.m_quad, 1);
+    runtime->m_linearVelcityB[2] = XFNV_M128_F32(bodyB->m_linearVel.m_quad, 2);
+    runtime->m_angularVelcityA[0] = XFNV_M128_F32(bodyA->m_angularVel.m_quad, 0);
+    runtime->m_angularVelcityA[1] = XFNV_M128_F32(bodyA->m_angularVel.m_quad, 1);
+    runtime->m_angularVelcityA[2] = XFNV_M128_F32(bodyA->m_angularVel.m_quad, 2);
+    runtime->m_angularVelcityB[0] = XFNV_M128_F32(bodyB->m_angularVel.m_quad, 0);
+    runtime->m_angularVelcityB[1] = XFNV_M128_F32(bodyB->m_angularVel.m_quad, 1);
+    runtime->m_angularVelcityB[2] = XFNV_M128_F32(bodyB->m_angularVel.m_quad, 2);
     hkpConstraintData::ConstraintInfo kInfo;
     m_constraintData->getConstraintInfo(kInfo);
     if (kInfo.m_atoms->m_type.m_storage == hkpConstraintAtom::TYPE_CONTACT) {

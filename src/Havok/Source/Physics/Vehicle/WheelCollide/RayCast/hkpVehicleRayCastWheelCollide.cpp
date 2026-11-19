@@ -38,6 +38,7 @@
 #include "Havok/Source/Physics/Vehicle/WheelCollide/hkpVehicleWheelCollide.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleData.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleInstance.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -359,7 +360,7 @@ void hkpVehicleRayCastWheelCollide::getCollisionOutputFromCastResult(
         ),
         wheelInfo->m_hardPointWs.m_quad
     );
-    cdInfo.m_contactPoint.m_separatingNormal.m_quad[3] = currentSuspensionLength;
+    XFNV_M128_F32(cdInfo.m_contactPoint.m_separatingNormal.m_quad, 3) = currentSuspensionLength;
     hkVector4 normal = cdInfo.m_contactPoint.m_separatingNormal;
     cdInfo.m_contactFriction = cdInfo.m_contactBody->m_material.m_friction;
     float denominator = normal.dot3(wheelInfo->m_suspensionDirectionWs);
@@ -425,7 +426,7 @@ void hkpVehicleRayCastWheelCollide::getCollisionOutputWithoutHit(
         _mm_shuffle_ps(v6, _mm_unpackhi_ps(v6, cdInfo.m_contactPoint.m_separatingNormal.m_quad), 196);
     cdInfo.m_contactFriction = 0.0f;
     cdInfo.m_suspensionScalingFactor = 1.0f;
-    cdInfo.m_contactPoint.m_separatingNormal.m_quad[3] = m_length;
+    XFNV_M128_F32(cdInfo.m_contactPoint.m_separatingNormal.m_quad, 3) = m_length;
 }
 
 const hkClass& hkpVehicleRayCastWheelCollide::staticClass() {

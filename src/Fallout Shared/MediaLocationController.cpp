@@ -19,6 +19,7 @@
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/PlayerCharacter.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -78,7 +79,7 @@ bool MediaLocationController::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

@@ -3,14 +3,12 @@
 #include <cstdint>
 
 // The vcruntime's own __RTDynamicCast (rttidata.h, which is not a public header), which rt::__RTDynamicCast forwards
-// to. Declared with C linkage here so that its name does not clash with rt's.
+// to. Declared with C linkage here so that its name does not clash with rt's, and as rttidata.h declares it (PVOID,
+// LONG, BOOL; it throws std::bad_cast): Microsoft's cl declares the function itself.
 namespace xfnv::imports {
-    extern "C" void* __RTDynamicCast(
-        void* apObject,
-        int32_t aiVfDelta,
-        const void* apSrcType,
-        const void* apDstType,
-        int32_t abIsReference
+    extern "C" void*
+    __RTDynamicCast(void* apObject, long aiVfDelta, void* apSrcType, void* apDstType, int abIsReference) noexcept(
+        false
     );
 } // namespace xfnv::imports
 
@@ -27,7 +25,9 @@ namespace rt {
         const void* apDstType,
         int32_t abIsReference
     ) {
-        return xfnv::imports::__RTDynamicCast(apObject, aiVfDelta, apSrcType, apDstType, abIsReference);
+        return xfnv::imports::__RTDynamicCast(
+            apObject, aiVfDelta, const_cast<void*>(apSrcType), const_cast<void*>(apDstType), abIsReference
+        );
     }
 
 } // namespace rt

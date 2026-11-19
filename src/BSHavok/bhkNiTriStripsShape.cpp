@@ -31,8 +31,10 @@
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
+#include <cmath>
 
 NiRTTI bhkNiTriStripsShape::ms_RTTI("bhkNiTriStripsShape", &bhkShapeCollection::ms_RTTI);
 hkNiTriStripsData bhkNiTriStripsShape::EmptySubpart;
@@ -104,20 +106,24 @@ void bhkNiTriStripsShape::LoadBinary(NiStream& arStream) {
         kCinfo.m_numMaterialsArray.clearAndDeallocate();
         // Compares the flag's raw byte with 1, here and below: any other byte swaps.
         if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-            kCinfo.m_userData = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(kCinfo.m_userData)));
-            kCinfo.m_radius = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(kCinfo.m_radius)));
+            kCinfo.m_userData = static_cast<int32_t>(std::byteswap<uint32_t>(static_cast<uint32_t>(kCinfo.m_userData)));
+            kCinfo.m_radius = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(kCinfo.m_radius)));
         }
         int32_t iMaterial = kCinfo.m_userData;
         rInfo.m_radius = kCinfo.m_radius;
         if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-            kCinfo.m_scaling.m_quad[0] =
-                std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(kCinfo.m_scaling.m_quad[0])));
-            kCinfo.m_scaling.m_quad[1] =
-                std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(kCinfo.m_scaling.m_quad[1])));
-            kCinfo.m_scaling.m_quad[2] =
-                std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(kCinfo.m_scaling.m_quad[2])));
-            kCinfo.m_scaling.m_quad[3] =
-                std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(kCinfo.m_scaling.m_quad[3])));
+            XFNV_M128_F32(kCinfo.m_scaling.m_quad, 0) = std::bit_cast<float>(
+                std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kCinfo.m_scaling.m_quad, 0)))
+            );
+            XFNV_M128_F32(kCinfo.m_scaling.m_quad, 1) = std::bit_cast<float>(
+                std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kCinfo.m_scaling.m_quad, 1)))
+            );
+            XFNV_M128_F32(kCinfo.m_scaling.m_quad, 2) = std::bit_cast<float>(
+                std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kCinfo.m_scaling.m_quad, 2)))
+            );
+            XFNV_M128_F32(kCinfo.m_scaling.m_quad, 3) = std::bit_cast<float>(
+                std::byteswap<uint32_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kCinfo.m_scaling.m_quad, 3)))
+            );
         }
         if (iMaterial >= BHK_MATERIAL_MAX) {
             iMaterial = BHK_MATERIAL_STONE;
@@ -135,7 +141,7 @@ void bhkNiTriStripsShape::LoadBinary(NiStream& arStream) {
         NiStreamLoadBinary(arStream, uiCount);
         // Swaps the cinfo's radius here even though this path never reads it from the file, as the game does.
         if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
-            rInfo.m_radius = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_radius)));
+            rInfo.m_radius = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_radius)));
         }
         for (uint32_t i = 0; i < uiCount; ++i) {
             alignas(16) hkNiTriStripsData kData{};
@@ -236,12 +242,12 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
     // floats.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         uint32_t* pRadius = reinterpret_cast<uint32_t*>(&pCinfo->m_radius);
-        *pRadius = __builtin_bswap32(*pRadius);
+        *pRadius = std::byteswap<uint32_t>(*pRadius);
         uint32_t* pScale = reinterpret_cast<uint32_t*>(&pCinfo->Scale);
-        pScale[0] = __builtin_bswap32(pScale[0]);
-        pScale[1] = __builtin_bswap32(pScale[1]);
-        pScale[2] = __builtin_bswap32(pScale[2]);
-        pScale[3] = __builtin_bswap32(pScale[3]);
+        pScale[0] = std::byteswap<uint32_t>(pScale[0]);
+        pScale[1] = std::byteswap<uint32_t>(pScale[1]);
+        pScale[2] = std::byteswap<uint32_t>(pScale[2]);
+        pScale[3] = std::byteswap<uint32_t>(pScale[3]);
     }
     bhkShape::SaveBinary(arStream);
     uint32_t uiComponentSize = 4;
@@ -259,12 +265,12 @@ void bhkNiTriStripsShape::SaveBinary(NiStream& arStream) {
     // The same raw byte test and 32-bit byte swaps, undoing the first.
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         uint32_t* pRadius = reinterpret_cast<uint32_t*>(&pCinfo->m_radius);
-        *pRadius = __builtin_bswap32(*pRadius);
+        *pRadius = std::byteswap<uint32_t>(*pRadius);
         uint32_t* pScale = reinterpret_cast<uint32_t*>(&pCinfo->Scale);
-        pScale[0] = __builtin_bswap32(pScale[0]);
-        pScale[1] = __builtin_bswap32(pScale[1]);
-        pScale[2] = __builtin_bswap32(pScale[2]);
-        pScale[3] = __builtin_bswap32(pScale[3]);
+        pScale[0] = std::byteswap<uint32_t>(pScale[0]);
+        pScale[1] = std::byteswap<uint32_t>(pScale[1]);
+        pScale[2] = std::byteswap<uint32_t>(pScale[2]);
+        pScale[3] = std::byteswap<uint32_t>(pScale[3]);
     }
     static_cast<bhkSerializable*>(this)->KillCinfo(bCreated);
     pTLS->eMemContext = eMemContext;
@@ -397,10 +403,10 @@ int32_t bhkNiTriStripsShape::LoadCInfo(NiStream& arStream) {
         arStream.m_BSStreamHeader.uiVersion >= 4u) {
         // Byte-swaps the scale's four 32-bit words as raw memory, not as floats.
         uint32_t* pScale = reinterpret_cast<uint32_t*>(&pCinfo->Scale);
-        pScale[0] = __builtin_bswap32(pScale[0]);
-        pScale[1] = __builtin_bswap32(pScale[1]);
-        pScale[2] = __builtin_bswap32(pScale[2]);
-        pScale[3] = __builtin_bswap32(pScale[3]);
+        pScale[0] = std::byteswap<uint32_t>(pScale[0]);
+        pScale[1] = std::byteswap<uint32_t>(pScale[1]);
+        pScale[2] = std::byteswap<uint32_t>(pScale[2]);
+        pScale[3] = std::byteswap<uint32_t>(pScale[3]);
     }
     return iCinfoSize;
 }
@@ -512,7 +518,7 @@ void bhkNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& ar
         }
         NiTriStrips* pStrips = new NiTriStrips(pData);
         pStrips->SetName("bhkNiTriStripsShape");
-        float fScale = __builtin_fabsf(GetScale());
+        float fScale = std::fabsf(GetScale());
         pStrips->m_kLocal.m_fScale = fScale;
         uint32_t uiMaterial = pSubpart->spGeom.m_pObject ? (pSubpart->spGeom.m_pObject->m_usDataFlags >> 6) & 0x1F : 0;
         bhkMigrationUtilFunctions::PrepareDebugGeom(
@@ -572,7 +578,7 @@ bool bhkNiTriStripsShape::GetSubMaterialVarType(uint32_t aiKey, MATERIAL_VARIANT
 float bhkNiTriStripsShape::GetScale() const {
     hkNiTriStripsShape* pShape;
     if (this && (pShape = static_cast<hkNiTriStripsShape*>(this->phkObject)) != nullptr) {
-        return pShape->Scale.m_quad[0];
+        return XFNV_M128_F32(pShape->Scale.m_quad, 0);
     }
     return 1.0f;
 }

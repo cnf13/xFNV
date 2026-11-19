@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 // Every field starts empty except m_lastIncrementalBlock, which the engine leaves as the caller had it.
 hkFreeList::hkFreeList() {
@@ -501,9 +502,9 @@ void hkFreeList::freeSmallFreeBlocks(uint32_t minSize) {
 
 // Sorts the used blocks and the free elements (the free list's and those between m_top and m_blockEnd) by address,
 // moves every block whose elements are all free onto m_freeBlocks, and rebuilds both lists in address order. Returns
-// the number of blocks moved, -1 when the memory server has no memory for the two arrays. no_builtin keeps clang from
-// turning the inline zeroing loop into a call of the DLL's memset.
-__attribute__((no_builtin("memset"))) int32_t hkFreeList::findGarbage() {
+// the number of blocks moved, -1 when the memory server has no memory for the two arrays. XFNV_NO_BUILTIN keeps clang
+// from turning the inline zeroing loop into a call of the DLL's memset.
+XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
     if (!m_blocks) {
         return 0;
     }

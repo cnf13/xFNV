@@ -23,6 +23,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Convex/Box/hkpBoxShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/Sphere/hkpSphereShape.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -65,9 +66,9 @@ void hkpSphereBoxAgent::getClosestPoints(
     float distance;
     if ((_mm_movemask_ps(_mm_cmplt_ps(clipped, _mm_setzero_ps())) & 7) == 0) {
         // Inside: the face of the largest (least negative) of the centre's distances to the faces.
-        const float dx = absPos[0] - boxB->m_halfExtents.m_quad[0];
-        const float dy = absPos[1] - boxB->m_halfExtents.m_quad[1];
-        const float dz = absPos[2] - boxB->m_halfExtents.m_quad[2];
+        const float dx = XFNV_M128_F32(absPos, 0) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 0);
+        const float dy = XFNV_M128_F32(absPos, 1) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 1);
+        const float dz = XFNV_M128_F32(absPos, 2) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 2);
         int32_t axis;
         float faceDistance;
         if (dy < dx) {
@@ -89,7 +90,7 @@ void hkpSphereBoxAgent::getClosestPoints(
             faceDistance = dz;
         }
         point.m_contact.m_separatingNormal.setXYZ(bodyB.m_motion.pMotion->m_rotation.getColumn(axis));
-        if (posLocal.m_quad[axis] < 0.0f) {
+        if (XFNV_M128_F32(posLocal.m_quad, axis) < 0.0f) {
             point.m_contact.m_separatingNormal.m_quad =
                 _mm_xor_ps(point.m_contact.m_separatingNormal.m_quad, hkQuadRealNegateMask);
         }
@@ -130,8 +131,8 @@ void hkpSphereBoxAgent::getClosestPoints(
     const float scale = -distance - sphereA->m_radius;
     point.m_contact.m_position.m_quad =
         _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), point.m_contact.m_separatingNormal.m_quad), posA.m_quad);
-    point.m_contact.m_separatingNormal.m_quad[3] = distance;
-    point.m_contact.m_position.m_quad[3] = 1.0f;
+    XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3) = distance;
+    XFNV_M128_F32(point.m_contact.m_position.m_quad, 3) = 1.0f;
     collector.addCdPoint(point);
     HK_TIMER_END();
 }
@@ -170,9 +171,9 @@ void hkpSphereBoxAgent::processCollision(
     bool inRange = true;
     if ((_mm_movemask_ps(_mm_cmplt_ps(clipped, _mm_setzero_ps())) & 7) == 0) {
         // Inside: the face of the largest (least negative) of the centre's distances to the faces.
-        const float dx = absPos[0] - boxB->m_halfExtents.m_quad[0];
-        const float dy = absPos[1] - boxB->m_halfExtents.m_quad[1];
-        const float dz = absPos[2] - boxB->m_halfExtents.m_quad[2];
+        const float dx = XFNV_M128_F32(absPos, 0) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 0);
+        const float dy = XFNV_M128_F32(absPos, 1) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 1);
+        const float dz = XFNV_M128_F32(absPos, 2) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 2);
         int32_t axis;
         float faceDistance;
         if (dy < dx) {
@@ -194,7 +195,7 @@ void hkpSphereBoxAgent::processCollision(
             faceDistance = dz;
         }
         point->m_contact.m_separatingNormal.setXYZ(bodyB.m_motion.pMotion->m_rotation.getColumn(axis));
-        if (posLocal.m_quad[axis] < 0.0f) {
+        if (XFNV_M128_F32(posLocal.m_quad, axis) < 0.0f) {
             point->m_contact.m_separatingNormal.m_quad =
                 _mm_xor_ps(point->m_contact.m_separatingNormal.m_quad, hkQuadRealNegateMask);
         }
@@ -237,8 +238,8 @@ void hkpSphereBoxAgent::processCollision(
         const float scale = -distance - sphereA->m_radius;
         point->m_contact.m_position.m_quad =
             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), point->m_contact.m_separatingNormal.m_quad), posA.m_quad);
-        point->m_contact.m_separatingNormal.m_quad[3] = distance;
-        point->m_contact.m_position.m_quad[3] = 1.0f;
+        XFNV_M128_F32(point->m_contact.m_separatingNormal.m_quad, 3) = distance;
+        XFNV_M128_F32(point->m_contact.m_position.m_quad, 3) = 1.0f;
         if (m_contactPointId == 0xFFFF) {
             m_contactPointId = m_contactMgr->addContactPoint(bodyA, bodyB, input, result, nullptr, point->m_contact);
         }
@@ -288,9 +289,9 @@ void hkpSphereBoxAgent::staticGetClosestPoints(
     float distance;
     if ((_mm_movemask_ps(_mm_cmplt_ps(clipped, _mm_setzero_ps())) & 7) == 0) {
         // Inside: the face of the largest (least negative) of the centre's distances to the faces.
-        const float dx = absPos[0] - boxB->m_halfExtents.m_quad[0];
-        const float dy = absPos[1] - boxB->m_halfExtents.m_quad[1];
-        const float dz = absPos[2] - boxB->m_halfExtents.m_quad[2];
+        const float dx = XFNV_M128_F32(absPos, 0) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 0);
+        const float dy = XFNV_M128_F32(absPos, 1) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 1);
+        const float dz = XFNV_M128_F32(absPos, 2) - XFNV_M128_F32(boxB->m_halfExtents.m_quad, 2);
         int32_t axis;
         float faceDistance;
         if (dy < dx) {
@@ -312,7 +313,7 @@ void hkpSphereBoxAgent::staticGetClosestPoints(
             faceDistance = dz;
         }
         point.m_contact.m_separatingNormal.setXYZ(bodyB.m_motion.pMotion->m_rotation.getColumn(axis));
-        if (posLocal.m_quad[axis] < 0.0f) {
+        if (XFNV_M128_F32(posLocal.m_quad, axis) < 0.0f) {
             point.m_contact.m_separatingNormal.m_quad =
                 _mm_xor_ps(point.m_contact.m_separatingNormal.m_quad, hkQuadRealNegateMask);
         }
@@ -353,8 +354,8 @@ void hkpSphereBoxAgent::staticGetClosestPoints(
     const float scale = -distance - sphereA->m_radius;
     point.m_contact.m_position.m_quad =
         _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), point.m_contact.m_separatingNormal.m_quad), posA.m_quad);
-    point.m_contact.m_separatingNormal.m_quad[3] = distance;
-    point.m_contact.m_position.m_quad[3] = 1.0f;
+    XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3) = distance;
+    XFNV_M128_F32(point.m_contact.m_position.m_quad, 3) = 1.0f;
     collector.addCdPoint(point);
     HK_TIMER_END();
 }

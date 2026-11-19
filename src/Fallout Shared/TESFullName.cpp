@@ -6,6 +6,7 @@
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 TESFullName::TESFullName() : BaseFormComponent(), cFullName() {}
 
@@ -55,7 +56,7 @@ void TESFullName::LoadFullNameChunk(TESFullName* apFullName, TESFile* apFile) {
         uint32_t uiChunk = apFile->GetTESChunk();
         if (uiChunk == FULL_ID) {
             if (apFile->GetChunkSize()) {
-                char* pBuffer = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 apFullName->SetFullName(pBuffer);
             }

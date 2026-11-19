@@ -11,6 +11,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSkinInstance.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cstdint>
@@ -121,12 +122,12 @@ void NiProcessorSpecificCode::IdentifyProcessor() {
     uint32_t uiEDX;
     ms_bIDSet = true;
     uiEAX = 0x80000000u;
-    __asm__ volatile("cpuid" : "+a"(uiEAX), "=b"(uiEBX), "=c"(uiECX), "=d"(uiEDX));
+    xfnv::Cpuid(uiEAX, uiEBX, uiECX, uiEDX);
     ms_uiCPUIDFeatures = static_cast<int32_t>(uiEAX);
     if ((ms_uiCPUIDFeatures & 0x80000000u) != 0) {
         uiEAX = ms_uiCPUIDFeatures & 0x80000000u;
         uiEDX = 0x80000001u;
-        __asm__ volatile("cpuid" : "+a"(uiEAX), "=b"(uiEBX), "=c"(uiECX), "+d"(uiEDX));
+        xfnv::CpuidEdxIn(uiEAX, uiEBX, uiECX, uiEDX);
         ms_uiCPUIDFeatures = static_cast<int32_t>(uiEAX);
         if ((ms_uiCPUIDFeatures & 0x80000000u) != 0) {
             ms_eProcessorID = NI_3DNOW;
@@ -134,7 +135,7 @@ void NiProcessorSpecificCode::IdentifyProcessor() {
         }
     }
     uiEAX = 1;
-    __asm__ volatile("cpuid" : "+a"(uiEAX), "=b"(uiEBX), "=c"(uiECX), "=d"(uiEDX));
+    xfnv::Cpuid(uiEAX, uiEBX, uiECX, uiEDX);
     ms_uiCPUIDFeatures = static_cast<int32_t>(uiEDX);
     if ((ms_uiCPUIDFeatures & 0x800000) == 0) {
         if ((ms_uiCPUIDFeatures & 0x8000) == 0) {

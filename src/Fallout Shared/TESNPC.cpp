@@ -204,9 +204,11 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <vector>
 
@@ -252,7 +254,7 @@ bool TESNPC::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pMessage = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pMessage = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pMessage[0] = '\0';
                 apFile->GetChunkData(pMessage, 0x200);
@@ -451,7 +453,7 @@ bool TESNPC::Load(TESFile* apFile) {
                 int32_t isize = static_cast<int32_t>(imemsize >> 2);
                 RaceFaceOffsetCoord[etype][esymm].resize(isize, 1);
                 // A 16-byte aligned stack buffer of the chunk's size.
-                float* pfloats = static_cast<float*>(__builtin_alloca_with_align(imemsize, 128));
+                float* pfloats = static_cast<float*>(XFNV_ALLOCA16(imemsize));
                 ourMemset(pfloats, 0, imemsize);
                 apFile->GetChunkData(pfloats, imemsize);
                 for (uint32_t i = 0; i < static_cast<uint32_t>(isize); ++i) {
@@ -3264,7 +3266,7 @@ void TESNPC::InitLoadFaceGen(Character* apCharacter) {
             v3 = nullptr;
         }
         v8 = v3;
-        __builtin_memcpy(&apRotIn, &NiMatrix3_IDENTITY, sizeof(apRotIn));
+        std::memcpy(&apRotIn, &NiMatrix3_IDENTITY, sizeof(apRotIn));
         if (v3) {
             v2 = &(arOut = pPlayer->MultipleMatrixByRace(apRotIn));
             v8->SetRotate(*v2);

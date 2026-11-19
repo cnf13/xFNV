@@ -24,6 +24,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/Agent/hkpGskAgentUtil.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/Continuous/hkpContinuousGsk.h"
+#include "xfnv/Compiler.h"
 
 // The agent's cache starts from the two shapes' first vertices, through the triangle's own init when B is a triangle;
 // the contact-TIM flag is cleared and the manifold's counts reset. The free memory ends at the next multiple of 16
@@ -240,9 +241,9 @@ void hkPredGskAgent3::sepNormal(
     if (gsk.m_featureChange.m_storage) {
         gsk.exitAndExportCacheImpl(cache);
     }
-    float distance = separatingNormal.m_quad[3];
+    float distance = XFNV_M128_F32(separatingNormal.m_quad, 3);
     separatingNormalOut.setRotatedDir(input.m_bodyA->m_motion.pMotion->m_rotation, separatingNormal);
-    separatingNormalOut.m_quad[3] = distance - (shapeB->m_radius + shapeA->m_radius);
+    XFNV_M128_F32(separatingNormalOut.m_quad, 3) = distance - (shapeB->m_radius + shapeA->m_radius);
 }
 
 // KEEP: hkpCollisionDispatcher::registerAgent3 (0xCFBD60) copies 0x40 bytes from f (rep movsd, 16 dwords) into the

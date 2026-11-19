@@ -11,6 +11,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -39,9 +40,9 @@ void hkpBoxMotion::getInertiaLocal(hkMatrix3& inertia) const {
     inertia.m_col0.m_quad = _mm_setzero_ps();
     inertia.m_col1.m_quad = _mm_setzero_ps();
     inertia.m_col2.m_quad = _mm_setzero_ps();
-    inertia.m_col0.m_quad[0] = 1.0 / v2[0];
-    inertia.m_col1.m_quad[1] = 1.0 / v2[1];
-    inertia.m_col2.m_quad[2] = 1.0 / v2[2];
+    XFNV_M128_F32(inertia.m_col0.m_quad, 0) = 1.0 / XFNV_M128_F32(v2, 0);
+    XFNV_M128_F32(inertia.m_col1.m_quad, 1) = 1.0 / XFNV_M128_F32(v2, 1);
+    XFNV_M128_F32(inertia.m_col2.m_quad, 2) = 1.0 / XFNV_M128_F32(v2, 2);
 }
 
 void hkpBoxMotion::getInertiaWorld(hkMatrix3& inertia) const {
@@ -49,9 +50,9 @@ void hkpBoxMotion::getInertiaWorld(hkMatrix3& inertia) const {
     inertia.m_col0.m_quad = _mm_setzero_ps();
     inertia.m_col1.m_quad = _mm_setzero_ps();
     inertia.m_col2.m_quad = _mm_setzero_ps();
-    inertia.m_col0.m_quad[0] = 1.0 / v2[0];
-    inertia.m_col1.m_quad[1] = 1.0 / v2[1];
-    inertia.m_col2.m_quad[2] = 1.0 / v2[2];
+    XFNV_M128_F32(inertia.m_col0.m_quad, 0) = 1.0 / XFNV_M128_F32(v2, 0);
+    XFNV_M128_F32(inertia.m_col1.m_quad, 1) = 1.0 / XFNV_M128_F32(v2, 1);
+    XFNV_M128_F32(inertia.m_col2.m_quad, 2) = 1.0 / XFNV_M128_F32(v2, 2);
     inertia.changeBasis(m_motionState.m_transform.m_rotation);
 }
 
@@ -59,14 +60,14 @@ void hkpBoxMotion::setInertiaLocal(const hkMatrix3& inertia) {
     uint32_t v2;
     uint32_t v3;
     uint32_t v4;
-    *reinterpret_cast<float*>(&v2) = 1.0 / inertia.m_col0.m_quad[0];
-    *reinterpret_cast<float*>(&v3) = 1.0 / inertia.m_col1.m_quad[1];
-    *reinterpret_cast<float*>(&v4) = 1.0 / inertia.m_col2.m_quad[2];
+    *reinterpret_cast<float*>(&v2) = 1.0 / XFNV_M128_F32(inertia.m_col0.m_quad, 0);
+    *reinterpret_cast<float*>(&v3) = 1.0 / XFNV_M128_F32(inertia.m_col1.m_quad, 1);
+    *reinterpret_cast<float*>(&v4) = 1.0 / XFNV_M128_F32(inertia.m_col2.m_quad, 2);
     m_inertiaAndMassInv.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v2)), _mm_set_ss(std::bit_cast<float>(v4))),
         _mm_unpacklo_ps(
             _mm_set_ss(std::bit_cast<float>(v3)),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaAndMassInv.m_quad[3])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 3))))
         )
     );
 }
@@ -74,27 +75,27 @@ void hkpBoxMotion::setInertiaLocal(const hkMatrix3& inertia) {
 void hkpBoxMotion::setInertiaInvLocal(const hkMatrix3& inertiaInv) {
     m_inertiaAndMassInv.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(inertiaInv.m_col0.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(inertiaInv.m_col2.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(inertiaInv.m_col0.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(inertiaInv.m_col2.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(inertiaInv.m_col1.m_quad[1]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_inertiaAndMassInv.m_quad[3])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(inertiaInv.m_col1.m_quad, 1)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 3))))
         )
     );
 }
 
 void hkpBoxMotion::getInertiaInvLocal(hkMatrix3& inertiaInv) const {
-    float v3 = m_inertiaAndMassInv.m_quad[0];
-    float v4 = m_inertiaAndMassInv.m_quad[1];
-    double v2 = m_inertiaAndMassInv.m_quad[2];
+    float v3 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 0);
+    float v4 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 1);
+    double v2 = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 2);
     inertiaInv.m_col0.m_quad = _mm_setzero_ps();
     float v5 = v2;
     inertiaInv.m_col1.m_quad = _mm_setzero_ps();
     inertiaInv.m_col2.m_quad = _mm_setzero_ps();
-    inertiaInv.m_col0.m_quad[0] = v3;
-    inertiaInv.m_col1.m_quad[1] = v4;
-    inertiaInv.m_col2.m_quad[2] = v5;
+    XFNV_M128_F32(inertiaInv.m_col0.m_quad, 0) = v3;
+    XFNV_M128_F32(inertiaInv.m_col1.m_quad, 1) = v4;
+    XFNV_M128_F32(inertiaInv.m_col2.m_quad, 2) = v5;
 }
 
 void hkpBoxMotion::getInertiaInvWorld(hkMatrix3& inertiaInv) const {
@@ -129,8 +130,10 @@ void hkpBoxMotion::getProjectedPointVelocity(
     __m128 v8 = _mm_mul_ps(m_linearVelocity.m_quad, normal.m_quad);
     __m128 v9 = _mm_sub_ps(v7, v6);
     __m128 v10 = _mm_mul_ps(m_angularVelocity.m_quad, v9);
-    velOut = (_mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0])) +
-        (_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]));
+    velOut = (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+              (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0))) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)));
     v11.m_quad = m_motionState.m_transform.m_rotation.m_col1.m_quad;
     v12.m_quad = m_motionState.m_transform.m_rotation.m_col2.m_quad;
     v13.m_quad = m_motionState.m_transform.m_rotation.m_col0.m_quad;
@@ -145,8 +148,9 @@ void hkpBoxMotion::getProjectedPointVelocity(
         _mm_mul_ps(_mm_shuffle_ps(v14, v12.m_quad, 228), _mm_shuffle_ps(v9, v9, 170))
     );
     __m128 v18 = _mm_mul_ps(_mm_mul_ps(m_inertiaAndMassInv.m_quad, v17), v17);
-    invVirtMassOut =
-        m_inertiaAndMassInv.m_quad[3] + (_mm_shuffle_ps(v18, v18, 170)[0] + (_mm_shuffle_ps(v18, v18, 85)[0] + v18[0]));
+    invVirtMassOut = XFNV_M128_F32(m_inertiaAndMassInv.m_quad, 3) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 85), 0) + XFNV_M128_F32(v18, 0)));
 }
 
 void hkpBoxMotion::applyPointImpulse(const hkVector4& imp, const hkVector4& p) {

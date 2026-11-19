@@ -13,6 +13,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppVirtualMachine.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Collects the primitives the sphere overlaps: its centre less one and its radius plus two in the code's integer
 // space, then the walk from the root (the high 16 bits: shift 16).
@@ -24,14 +25,14 @@ void hkpMoppSphereVirtualMachine::querySphere(
     hkpMoppSphereVirtualMachineQuery query;
     const uint8_t* codeData = code->m_data.m_data;
     m_primitives_out = primitiveResults;
-    const float scale = code->m_info.m_offset.m_quad[3];
-    const float x = (sphere.m_pos.m_quad[0] - code->m_info.m_offset.m_quad[0]) * scale;
+    const float scale = XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
+    const float x = (XFNV_M128_F32(sphere.m_pos.m_quad, 0) - XFNV_M128_F32(code->m_info.m_offset.m_quad, 0)) * scale;
     m_x = hkMath::hkToIntFast(x) - 1;
-    const float y = (sphere.m_pos.m_quad[1] - code->m_info.m_offset.m_quad[1]) * scale;
+    const float y = (XFNV_M128_F32(sphere.m_pos.m_quad, 1) - XFNV_M128_F32(code->m_info.m_offset.m_quad, 1)) * scale;
     m_y = hkMath::hkToIntFast(y) - 1;
-    const float z = (sphere.m_pos.m_quad[2] - code->m_info.m_offset.m_quad[2]) * scale;
+    const float z = (XFNV_M128_F32(sphere.m_pos.m_quad, 2) - XFNV_M128_F32(code->m_info.m_offset.m_quad, 2)) * scale;
     m_z = hkMath::hkToIntFast(z) - 1;
-    const float r = sphere.m_pos.m_quad[3] * scale;
+    const float r = XFNV_M128_F32(sphere.m_pos.m_quad, 3) * scale;
     m_radius = hkMath::hkToIntFast(r) + 2;
     query.m_x = m_x >> 16;
     query.m_y = m_y >> 16;
@@ -352,7 +353,7 @@ void hkpMoppSphereVirtualMachine::querySphereOnTree(const hkpMoppSphereVirtualMa
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppSphereVirtualMachine.cpp", 292
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }

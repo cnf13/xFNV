@@ -20,6 +20,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Convex/Sphere/hkpSphereShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -60,7 +61,8 @@ void hkpSphereSphereAgent::getClosestPoints(
     __m128 vec = _mm_sub_ps(bodyA.m_motion.pState->m_transform.m_translation.m_quad, pPosB->m_quad);
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius + input.m_tolerance;
-    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 85), 0) + XFNV_M128_F32(vecSq, 0));
     double distSquaredD = distSquared;
     if (distSquared < radiusSum * radiusSum) {
         double dist;
@@ -79,7 +81,7 @@ void hkpSphereSphereAgent::getClosestPoints(
         float radiusA = sphereA->m_radius;
         float radiusB = sphereB->m_radius;
         point.m_contact.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(radiusB), normal), pPosB->m_quad);
-        point.m_contact.m_separatingNormal.m_quad[3] = distF - (radiusB + radiusA);
+        XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3) = distF - (radiusB + radiusA);
         collector.addCdPoint(point);
     }
     HK_TIMER_END();
@@ -111,7 +113,8 @@ void hkpSphereSphereAgent::processCollision(
     __m128 vec = _mm_sub_ps(bodyA.m_motion.pState->m_transform.m_translation.m_quad, pPosB->m_quad);
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius + input.m_tolerance;
-    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 85), 0) + XFNV_M128_F32(vecSq, 0));
     double distSquaredD = distSquared;
     if (distSquared < radiusSum * radiusSum) {
         hkpProcessCdPoint* point = result.m_firstFreeContactPoint.m_storage;
@@ -129,7 +132,7 @@ void hkpSphereSphereAgent::processCollision(
         float radiusB = sphereB->m_radius;
         point->m_contact.m_position.m_quad =
             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(radiusB), point->m_contact.m_separatingNormal.m_quad), pPosB->m_quad);
-        point->m_contact.m_separatingNormal.m_quad[3] = dist;
+        XFNV_M128_F32(point->m_contact.m_separatingNormal.m_quad, 3) = dist;
         if (m_contactPointId == HK_INVALID_CONTACT_POINT) {
             m_contactPointId =
                 m_contactMgr->addContactPointImpl(bodyA, bodyB, input, result, nullptr, point->m_contact);
@@ -183,7 +186,8 @@ void hkpSphereSphereAgent::staticGetClosestPoints(
     __m128 vec = _mm_sub_ps(bodyA.m_motion.pState->m_transform.m_translation.m_quad, pPosB->m_quad);
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius + input.m_tolerance;
-    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 85), 0) + XFNV_M128_F32(vecSq, 0));
     double distSquaredD = distSquared;
     if (distSquared < radiusSum * radiusSum) {
         double dist;
@@ -202,7 +206,7 @@ void hkpSphereSphereAgent::staticGetClosestPoints(
         float radiusA = sphereA->m_radius;
         float radiusB = sphereB->m_radius;
         point.m_contact.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(radiusB), normal), pPosB->m_quad);
-        point.m_contact.m_separatingNormal.m_quad[3] = distF - (radiusB + radiusA);
+        XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3) = distF - (radiusB + radiusA);
         collector.addCdPoint(point);
     }
     HK_TIMER_END();
@@ -223,7 +227,8 @@ void hkpSphereSphereAgent::staticGetPenetrations(
     );
     __m128 vecSq = _mm_mul_ps(vec, vec);
     float radiusSum = sphereA->m_radius + sphereB->m_radius;
-    float distSquared = _mm_shuffle_ps(vecSq, vecSq, 170)[0] + (_mm_shuffle_ps(vecSq, vecSq, 85)[0] + vecSq[0]);
+    float distSquared = XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(vecSq, vecSq, 85), 0) + XFNV_M128_F32(vecSq, 0));
     if (distSquared < radiusSum * radiusSum) {
         collector.addCdBodyPair(bodyA, bodyB);
     }

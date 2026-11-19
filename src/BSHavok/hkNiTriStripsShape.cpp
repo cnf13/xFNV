@@ -19,6 +19,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -54,7 +55,7 @@ hkNiTriStripsShape::~hkNiTriStripsShape() {}
 void hkNiTriStripsShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
     // Compares against 3.40282e+38f; NaN goes on to the transform test.
     // EXE-INLINED 0x5609F0
-    if (WorldAabb.m_min.m_quad[0] != 3.40282e+38f &&
+    if (XFNV_M128_F32(WorldAabb.m_min.m_quad, 0) != 3.40282e+38f &&
         AabbTransform.isApproximatelyEqual(localToWorld, 0.001f).m_bool != 0) {
         _mm_store_ps(
             &reinterpret_cast<float*>(&out.m_min.m_quad)[0],
@@ -82,10 +83,10 @@ void hkNiTriStripsShape::getAabbImpl(const hkTransform& localToWorld, float tole
                 alignas(16) hkVector4 kLocal;
                 // Reads the factor once per vertex.
                 const float fScale = bhkConvert::fBS2HkScaleSC;
-                kLocal.m_quad[0] = pVertex->x * fScale;
-                kLocal.m_quad[1] = pVertex->y * fScale;
-                kLocal.m_quad[2] = fScale * pVertex->z;
-                kLocal.m_quad[3] = 0.0f;
+                XFNV_M128_F32(kLocal.m_quad, 0) = pVertex->x * fScale;
+                XFNV_M128_F32(kLocal.m_quad, 1) = pVertex->y * fScale;
+                XFNV_M128_F32(kLocal.m_quad, 2) = fScale * pVertex->z;
+                XFNV_M128_F32(kLocal.m_quad, 3) = 0.0f;
                 __m128 kScaled = _mm_mul_ps(
                     _mm_load_ps(&reinterpret_cast<const float*>(&Scale.m_quad)[0]),
                     _mm_load_ps(&reinterpret_cast<float*>(&kLocal.m_quad)[0])
@@ -187,20 +188,20 @@ const hkpShape* hkNiTriStripsShape::getChildShape(uint32_t aKey, char (&arBuffer
         ptriangleShape = nullptr;
     }
     double v20 = bhkConvert::fBS2HkScaleSC;
-    v23[0] = *p_x * bhkConvert::fBS2HkScaleSC;
-    v23[1] = p_x[1] * bhkConvert::fBS2HkScaleSC;
-    v23[2] = p_x[2] * bhkConvert::fBS2HkScaleSC;
-    v23[3] = 0.0f;
+    XFNV_M128_F32(v23, 0) = *p_x * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(v23, 1) = p_x[1] * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(v23, 2) = p_x[2] * bhkConvert::fBS2HkScaleSC;
+    XFNV_M128_F32(v23, 3) = 0.0f;
     ptriangleShape->m_vertexA.m_quad = _mm_mul_ps(v23, Scale.m_quad);
-    v23[0] = *v17 * v20;
-    v23[1] = v17[1] * v20;
-    v23[2] = v17[2] * v20;
-    v23[3] = 0.0f;
+    XFNV_M128_F32(v23, 0) = *v17 * v20;
+    XFNV_M128_F32(v23, 1) = v17[1] * v20;
+    XFNV_M128_F32(v23, 2) = v17[2] * v20;
+    XFNV_M128_F32(v23, 3) = 0.0f;
     ptriangleShape->m_vertexB.m_quad = _mm_mul_ps(v23, Scale.m_quad);
-    v23[0] = *v18 * v20;
-    v23[1] = v18[1] * v20;
-    v23[2] = v20 * v18[2];
-    v23[3] = 0.0f;
+    XFNV_M128_F32(v23, 0) = *v18 * v20;
+    XFNV_M128_F32(v23, 1) = v18[1] * v20;
+    XFNV_M128_F32(v23, 2) = v20 * v18[2];
+    XFNV_M128_F32(v23, 3) = 0.0f;
     ptriangleShape->m_vertexC.m_quad = _mm_mul_ps(v23, Scale.m_quad);
     return ptriangleShape;
 }
@@ -228,9 +229,9 @@ void hkNiTriStripsShape::CalcWorldAabb(const hkTransform& localToWorld) {
     __m128 v4 = _mm_undefined_ps();
     hkVector4 v9;
     AabbTransform = localToWorld;
-    v2[0] = 3.40282e+38f;
-    v3[0] = 3.40282e+38f;
-    v4[0] = 0.0f;
+    XFNV_M128_F32(v2, 0) = 3.40282e+38f;
+    XFNV_M128_F32(v3, 0) = 3.40282e+38f;
+    XFNV_M128_F32(v4, 0) = 0.0f;
     uint32_t m_uiSize = pShapesA.m_uiSize;
     uint32_t v7 = 0;
     __m128 v8 = _mm_unpacklo_ps(v3, v4);
@@ -238,8 +239,8 @@ void hkNiTriStripsShape::CalcWorldAabb(const hkTransform& localToWorld) {
         _mm_unpacklo_ps(v2, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(rdata_104DA48)))), v8
     );
     WorldAabb.m_min.m_quad = v9.m_quad;
-    v9.m_quad[0] = -3.40282e+38f;
-    v8[0] = -3.40282e+38f;
+    XFNV_M128_F32(v9.m_quad, 0) = -3.40282e+38f;
+    XFNV_M128_F32(v8, 0) = -3.40282e+38f;
     uint32_t v19 = m_uiSize;
     uint32_t v18 = 0;
     for (WorldAabb.m_max.m_quad = _mm_unpacklo_ps(
@@ -259,10 +260,10 @@ void hkNiTriStripsShape::CalcWorldAabb(const hkTransform& localToWorld) {
                 hkVector4 a3;
                 hkVector4 v21;
                 v14.m_quad = Scale.m_quad;
-                a3.m_quad[0] = *(p_z - 2) * bhkConvert::fBS2HkScaleSC;
-                a3.m_quad[1] = *(p_z - 1) * bhkConvert::fBS2HkScaleSC;
-                a3.m_quad[2] = bhkConvert::fBS2HkScaleSC * *p_z;
-                a3.m_quad[3] = 0.0f;
+                XFNV_M128_F32(a3.m_quad, 0) = *(p_z - 2) * bhkConvert::fBS2HkScaleSC;
+                XFNV_M128_F32(a3.m_quad, 1) = *(p_z - 1) * bhkConvert::fBS2HkScaleSC;
+                XFNV_M128_F32(a3.m_quad, 2) = bhkConvert::fBS2HkScaleSC * *p_z;
+                XFNV_M128_F32(a3.m_quad, 3) = 0.0f;
                 a3.m_quad = _mm_mul_ps(v14.m_quad, a3.m_quad);
                 v21.setTransformedPos(localToWorld, a3);
                 __m128 m_quad = v21.m_quad;

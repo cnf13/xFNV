@@ -17,6 +17,7 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometryTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -28,10 +29,10 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
 static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4) {
     if (0.0f != a4) {
         __m128 v58 = _mm_undefined_ps();
-        v58[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+        XFNV_M128_F32(v58, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
         int32_t v4 = arg4;
         __m128 v5 = _mm_setzero_ps();
-        v5[0] = 0.5f;
+        XFNV_M128_F32(v5, 0) = 0.5f;
         while (true) {
             __m128 v15 = _mm_undefined_ps();
             int32_t m_size = a1->m_vertices.m_size;
@@ -60,7 +61,7 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
             a1->m_triangles.m_size += 3;
             hkGeometry::Triangle* v14 = &a1->m_triangles.m_data[v4];
             hkVector4* v53 = &a1->m_vertices.m_data[v14->m_b];
-            v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+            XFNV_M128_F32(v15, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
             int32_t m_a = v14->m_a;
             __m128 m_quad = a1->m_vertices.m_data[m_a].m_quad;
             hkVector4* v18 = &a1->m_vertices.m_data[m_a];
@@ -69,49 +70,49 @@ static void _subdivideRecursive(hkGeometry* a1, int32_t arg4, float a3, float a4
             __m128 v21 = _mm_add_ps(v53->m_quad, m_quad);
             hkVector4* v22 = &a1->m_vertices.m_data[v14->m_c];
             __m128 v23 = _mm_mul_ps(v21, v21);
-            float v24 = _mm_shuffle_ps(v23, v23, 85)[0] + v23[0];
+            float v24 = XFNV_M128_F32(_mm_shuffle_ps(v23, v23, 85), 0) + XFNV_M128_F32(v23, 0);
             __m128 v25 = _mm_shuffle_ps(v23, v23, 170);
-            v25[0] = v25[0] + v24;
-            float v26 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v25[0])));
+            XFNV_M128_F32(v25, 0) = XFNV_M128_F32(v25, 0) + v24;
+            float v26 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v25, 0))));
             __m128 v27 = _mm_cmpeq_ss(v25, v58);
-            float v28 = 3.0f - ((v25[0] * v26) * v26);
-            v5[0] = (v5[0] * v26) * v28;
+            float v28 = 3.0f - ((XFNV_M128_F32(v25, 0) * v26) * v26);
+            XFNV_M128_F32(v5, 0) = (XFNV_M128_F32(v5, 0) * v26) * v28;
             __m128 v30 = _mm_andnot_ps(v27, v5);
             __m128 v31 = _mm_mul_ps(_mm_shuffle_ps(v30, v30, 0), v21);
             (*v19).m_quad = v21;
             (*v19).m_quad = v31;
-            v21[0] = a3;
+            XFNV_M128_F32(v21, 0) = a3;
             v19->m_quad = _mm_mul_ps(_mm_shuffle_ps(v21, v21, 0), v31);
             __m128 v32 = _mm_add_ps(v22->m_quad, v53->m_quad);
             __m128 v33 = _mm_mul_ps(v32, v32);
-            v30[0] = _mm_shuffle_ps(v33, v33, 85)[0] + v33[0];
+            XFNV_M128_F32(v30, 0) = XFNV_M128_F32(_mm_shuffle_ps(v33, v33, 85), 0) + XFNV_M128_F32(v33, 0);
             __m128 v34 = _mm_shuffle_ps(v33, v33, 170);
-            v34[0] = v34[0] + v30[0];
-            float v35 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v34[0])));
+            XFNV_M128_F32(v34, 0) = XFNV_M128_F32(v34, 0) + XFNV_M128_F32(v30, 0);
+            float v35 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v34, 0))));
             v19[1].m_quad = v32;
             __m128 v36 = _mm_cmpeq_ss(v34, v15);
-            float v37 = 3.0f - ((v34[0] * v35) * v35);
-            v5[0] = (v5[0] * v35) * v37;
+            float v37 = 3.0f - ((XFNV_M128_F32(v34, 0) * v35) * v35);
+            XFNV_M128_F32(v5, 0) = (XFNV_M128_F32(v5, 0) * v35) * v37;
             __m128 v39 = _mm_andnot_ps(v36, v5);
             float v54 = a4 - 1.0;
             __m128 v40 = _mm_mul_ps(_mm_shuffle_ps(v39, v39, 0), v32);
             v19[1].m_quad = v40;
-            v32[0] = a3;
+            XFNV_M128_F32(v32, 0) = a3;
             v19[1].m_quad = _mm_mul_ps(_mm_shuffle_ps(v32, v32, 0), v40);
             __m128 v41 = _mm_add_ps(v22->m_quad, v18->m_quad);
             (*v20).m_quad = v41;
             __m128 v42 = _mm_mul_ps(v41, v41);
-            v39[0] = _mm_shuffle_ps(v42, v42, 85)[0] + v42[0];
+            XFNV_M128_F32(v39, 0) = XFNV_M128_F32(_mm_shuffle_ps(v42, v42, 85), 0) + XFNV_M128_F32(v42, 0);
             __m128 v43 = _mm_shuffle_ps(v42, v42, 170);
-            v43[0] = v43[0] + v39[0];
-            float v44 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v43[0])));
+            XFNV_M128_F32(v43, 0) = XFNV_M128_F32(v43, 0) + XFNV_M128_F32(v39, 0);
+            float v44 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v43, 0))));
             __m128 v45 = v43;
-            float v46 = 3.0f - ((v43[0] * v44) * v44);
-            v5[0] = (v5[0] * v44) * v46;
+            float v46 = 3.0f - ((XFNV_M128_F32(v43, 0) * v44) * v44);
+            XFNV_M128_F32(v5, 0) = (XFNV_M128_F32(v5, 0) * v44) * v46;
             __m128 v48 = _mm_andnot_ps(_mm_cmpeq_ss(v45, v15), v5);
             __m128 v49 = _mm_mul_ps(_mm_shuffle_ps(v48, v48, 0), v41);
             (*v20).m_quad = v49;
-            v41[0] = a3;
+            XFNV_M128_F32(v41, 0) = a3;
             v20->m_quad = _mm_mul_ps(_mm_shuffle_ps(v41, v41, 0), v49);
             hkGeometry::Triangle* m_data = a1->m_triangles.begin();
             hkGeometry::Triangle* v51 = &m_data[v56];
@@ -171,7 +172,7 @@ void hkDisplaySphere::buildGeometry() {
         v8 = nullptr;
     }
     m_geometry = v8;
-    float a3 = m_sphere.m_pos.m_quad[3];
+    float a3 = XFNV_M128_F32(m_sphere.m_pos.m_quad, 3);
     float v57 = 0.525731086730957 * a3;
     float v55 = a3 * 0.8506507873535156;
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
@@ -185,71 +186,71 @@ void hkDisplaySphere::buildGeometry() {
     __m128 v11 = _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v55)));
     __m128 v12 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
     __m128* p_m_quad = &v8->m_vertices.begin()->m_quad;
-    v3[0] = a3 * 0.8506507873535156;
-    v4[0] = 0.0f;
-    v12[0] = -0.0f - v57;
-    v1[0] = -0.0f - v57;
-    v2[0] = 0.0f;
+    XFNV_M128_F32(v3, 0) = a3 * 0.8506507873535156;
+    XFNV_M128_F32(v4, 0) = 0.0f;
+    XFNV_M128_F32(v12, 0) = -0.0f - v57;
+    XFNV_M128_F32(v1, 0) = -0.0f - v57;
+    XFNV_M128_F32(v2, 0) = 0.0f;
     v8->m_vertices.m_size = 12;
     __m128 v14 = _mm_unpacklo_ps(v2, v4);
     __m128 v15 = _mm_unpacklo_ps(_mm_unpacklo_ps(v1, v3), v14);
     *p_m_quad = v15;
-    v15[0] = 0.525731086730957 * a3;
-    v14[0] = 0.0f;
+    XFNV_M128_F32(v15, 0) = 0.525731086730957 * a3;
+    XFNV_M128_F32(v14, 0) = 0.0f;
     __m128 v16 = _mm_unpacklo_ps(v14, v4);
     v8->m_vertices.m_data[1].m_quad = _mm_unpacklo_ps(_mm_unpacklo_ps(v15, v3), v16);
     __m128 v17 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
-    v17[0] = -0.0f - v55;
-    v3[0] = -0.0f - v55;
-    v11[0] = -0.0f - v57;
-    v16[0] = 0.0f;
+    XFNV_M128_F32(v17, 0) = -0.0f - v55;
+    XFNV_M128_F32(v3, 0) = -0.0f - v55;
+    XFNV_M128_F32(v11, 0) = -0.0f - v57;
+    XFNV_M128_F32(v16, 0) = 0.0f;
     __m128 v18 = _mm_unpacklo_ps(v16, v4);
     __m128 v19 = _mm_unpacklo_ps(_mm_unpacklo_ps(v11, v3), v18);
     v8->m_vertices.m_data[2].m_quad = v19;
-    v19[0] = 0.525731086730957 * a3;
-    v18[0] = 0.0f;
+    XFNV_M128_F32(v19, 0) = 0.525731086730957 * a3;
+    XFNV_M128_F32(v18, 0) = 0.0f;
     __m128 v20 = _mm_unpacklo_ps(_mm_unpacklo_ps(v19, v3), _mm_unpacklo_ps(v18, v4));
     v8->m_vertices.m_data[3].m_quad = v20;
-    v3[0] = 0.525731086730957 * a3;
-    v20[0] = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.525731086730957 * a3;
+    XFNV_M128_F32(v20, 0) = 0.0f;
     __m128 v21 = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v20, v3), _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v55))), v4)
     );
     v8->m_vertices.m_data[4].m_quad = v21;
-    v3[0] = -0.0f - v57;
-    v21[0] = 0.0f;
+    XFNV_M128_F32(v3, 0) = -0.0f - v57;
+    XFNV_M128_F32(v21, 0) = 0.0f;
     __m128 v22 = _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v55))), v4);
     __m128 v23 = _mm_unpacklo_ps(_mm_unpacklo_ps(v21, v3), v22);
     v8->m_vertices.m_data[5].m_quad = v23;
-    v3[0] = 0.525731086730957 * a3;
-    v23[0] = 0.0f;
-    v22[0] = -0.0f - v55;
+    XFNV_M128_F32(v3, 0) = 0.525731086730957 * a3;
+    XFNV_M128_F32(v23, 0) = 0.0f;
+    XFNV_M128_F32(v22, 0) = -0.0f - v55;
     __m128 v24 = _mm_unpacklo_ps(v22, v4);
     __m128 v25 = _mm_unpacklo_ps(_mm_unpacklo_ps(v23, v3), v24);
     v8->m_vertices.m_data[6].m_quad = v25;
-    v25[0] = 0.0f;
-    v24[0] = -0.0f - v55;
-    v3[0] = -0.0f - v57;
+    XFNV_M128_F32(v25, 0) = 0.0f;
+    XFNV_M128_F32(v24, 0) = -0.0f - v55;
+    XFNV_M128_F32(v3, 0) = -0.0f - v57;
     __m128 v26 = _mm_unpacklo_ps(v24, v4);
     v8->m_vertices.m_data[7].m_quad = _mm_unpacklo_ps(_mm_unpacklo_ps(v25, v3), v26);
-    v26[0] = 0.525731086730957 * a3;
-    v3[0] = 0.0f;
+    XFNV_M128_F32(v26, 0) = 0.525731086730957 * a3;
+    XFNV_M128_F32(v3, 0) = 0.0f;
     __m128 v27 = _mm_unpacklo_ps(v26, v4);
     __m128 v28 =
         _mm_unpacklo_ps(_mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v55))), v3), v27);
     v8->m_vertices.m_data[8].m_quad = v28;
-    v28[0] = -0.0f - v55;
-    v27[0] = 0.0f;
+    XFNV_M128_F32(v28, 0) = -0.0f - v55;
+    XFNV_M128_F32(v27, 0) = 0.0f;
     __m128 v29 = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v28, v27), _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v57))), v3)
     );
     v8->m_vertices.m_data[9].m_quad = v29;
-    v29[0] = -0.0f - v57;
+    XFNV_M128_F32(v29, 0) = -0.0f - v57;
     __m128 v30 = _mm_unpacklo_ps(
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(v55))), v27), _mm_unpacklo_ps(v29, v3)
     );
     v8->m_vertices.m_data[10].m_quad = v30;
-    v30[0] = 0.0f;
+    XFNV_M128_F32(v30, 0) = 0.0f;
     v8->m_vertices.m_data[11].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v17, v30), _mm_unpacklo_ps(v12, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
     );

@@ -25,6 +25,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Collide/Util/hkpSphereUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -108,10 +109,10 @@ hkVector4Comparison hkpSphereShape::castRayBundleImpl(
     hkVector4Comparison result;
     HK_TIMER_BEGIN("rcSphereBundle", nullptr);
     __m128 kHundred;
-    kHundred[0] = 100.0f;
-    kHundred[1] = 100.0f;
-    kHundred[2] = 100.0f;
-    kHundred[3] = 100.0f;
+    XFNV_M128_F32(kHundred, 0) = 100.0f;
+    XFNV_M128_F32(kHundred, 1) = 100.0f;
+    XFNV_M128_F32(kHundred, 2) = 100.0f;
+    XFNV_M128_F32(kHundred, 3) = 100.0f;
     result.m_mask = mask.m_mask;
     const __m128 kRadiusLow = _mm_set_ss(m_radius);
     const __m128 kRadius = _mm_shuffle_ps(kRadiusLow, kRadiusLow, 0);
@@ -201,7 +202,7 @@ hkVector4Comparison hkpSphereShape::castRayBundleImpl(
     for (int32_t i = 0; i < 4; ++i) {
         if ((_mm_movemask_ps(kHit) & axisMaskBits_10C92E0[i]) != 0) {
             hkpShapeRayCastOutput& rOut = output.m_outputs[i];
-            rOut.m_hitFraction = hitT.m_quad[i];
+            rOut.m_hitFraction = XFNV_M128_F32(hitT.m_quad, i);
             rOut.m_normal.m_quad = points[i].m_quad;
             rOut.m_shapeKeys[rOut.m_shapeKeyIndex] = HK_INVALID_SHAPE_KEY;
         }
@@ -216,7 +217,7 @@ int32_t hkpSphereShape::getNumCollisionSpheresImpl() const {
 
 const hkSphere* hkpSphereShape::getCollisionSpheresImpl(hkSphere* sphereBuffer) const {
     (*sphereBuffer).m_pos.m_quad = _mm_setzero_ps();
-    sphereBuffer->m_pos.m_quad[3] = m_radius;
+    XFNV_M128_F32(sphereBuffer->m_pos.m_quad, 3) = m_radius;
     return sphereBuffer;
 }
 
@@ -272,13 +273,15 @@ hkBool hkpSphereUtil::castRayUtil(float radius, const hkpShapeRayCastInput& inpu
     float v21 = radius * radius;
     __m128 v4 = _mm_sub_ps(input.m_to.m_quad, input.m_from.m_quad);
     __m128 v5 = _mm_mul_ps(input.m_from.m_quad, v4);
-    float v29 = _mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    float v29 = XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0));
     float v26 = v29;
     if (v29 >= 0.0f) {
         goto LABEL_9;
     }
     v6 = _mm_mul_ps(v4, v4);
-    v7 = _mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]);
+    v7 = XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0));
     v8 = v21;
     v22 = v7 * v21 * 100.0;
     if (!(v22 < v29 * v29)) {
@@ -305,7 +308,9 @@ hkBool hkpSphereUtil::castRayUtil(float radius, const hkpShapeRayCastInput& inpu
         );
     }
     v15 = _mm_mul_ps(v14, v14);
-    v30 = (_mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])) - v11;
+    v30 = (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+           (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0))) -
+        v11;
     v31 = v26 * v26 - v9 * v30;
     if (v31 <= v10 ||
         ((v28 = -v26,

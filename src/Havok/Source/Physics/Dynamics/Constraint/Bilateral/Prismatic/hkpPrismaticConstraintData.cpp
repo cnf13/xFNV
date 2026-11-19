@@ -27,6 +27,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/hkConstraintInternal.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -191,16 +192,16 @@ hkpPrismaticConstraintData::hkpPrismaticConstraintData() {
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_transforms.m_transformA.m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_transforms.m_transformB.m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_linLimit.m_axisIndex = 0;
     m_atoms.m_linLimit.m_min = -3.40282e+38f;
@@ -311,27 +312,27 @@ void hkpPrismaticConstraintData::setInBodySpace(
     m_atoms.m_transforms.m_transformA.m_translation.m_quad = pivotA.m_quad;
     m_atoms.m_transforms.m_transformB.m_translation.m_quad = pivotB.m_quad;
     __m128 v7 = _mm_mul_ps(axisA.m_quad, axisA.m_quad);
-    float v8 = _mm_shuffle_ps(v7, v7, 85)[0] + v7[0];
+    float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0);
     __m128 v9 = _mm_shuffle_ps(v7, v7, 170);
-    v9[0] = v9[0] + v8;
-    float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v9[0])));
-    v11[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v9, 0) = XFNV_M128_F32(v9, 0) + v8;
+    float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v9, 0))));
+    XFNV_M128_F32(v11, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v12 = _mm_setzero_ps();
-    v12[0] = 0.5f;
+    XFNV_M128_F32(v12, 0) = 0.5f;
     __m128 v13 = _mm_cmpeq_ss(v9, v11);
-    float v14 = 3.0f - ((v9[0] * v10) * v10);
-    v12[0] = (0.5f * v10) * v14;
+    float v14 = 3.0f - ((XFNV_M128_F32(v9, 0) * v10) * v10);
+    XFNV_M128_F32(v12, 0) = (0.5f * v10) * v14;
     __m128 v16 = _mm_andnot_ps(v13, v12);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v16, v16, 0), axisA.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = axisAPerp.m_quad;
     v17.m_quad = m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad;
     __m128 v18 = _mm_mul_ps(v17.m_quad, v17.m_quad);
-    v16[0] = _mm_shuffle_ps(v18, v18, 85)[0] + v18[0];
+    XFNV_M128_F32(v16, 0) = XFNV_M128_F32(_mm_shuffle_ps(v18, v18, 85), 0) + XFNV_M128_F32(v18, 0);
     __m128 v19 = _mm_shuffle_ps(v18, v18, 170);
-    v19[0] = v19[0] + v16[0];
-    float v20 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v19[0])));
-    float v22 = 3.0f - ((v19[0] * v20) * v20);
-    v12[0] = (0.5f * v20) * v22;
+    XFNV_M128_F32(v19, 0) = XFNV_M128_F32(v19, 0) + XFNV_M128_F32(v16, 0);
+    float v20 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v19, 0))));
+    float v22 = 3.0f - ((XFNV_M128_F32(v19, 0) * v20) * v20);
+    XFNV_M128_F32(v12, 0) = (0.5f * v20) * v22;
     __m128 v24 = _mm_andnot_ps(_mm_cmpeq_ss(v19, v11), v12);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v24, v24, 0), v17.m_quad);
     m_atoms.m_transforms.m_transformA.m_rotation.m_col2.m_quad = _mm_sub_ps(
@@ -357,23 +358,24 @@ void hkpPrismaticConstraintData::setInBodySpace(
         )
     );
     __m128 v25 = _mm_mul_ps(axisB.m_quad, axisB.m_quad);
-    v24[0] = _mm_shuffle_ps(v25, v25, 85)[0] + v25[0];
+    XFNV_M128_F32(v24, 0) = XFNV_M128_F32(_mm_shuffle_ps(v25, v25, 85), 0) + XFNV_M128_F32(v25, 0);
     __m128 v26 = _mm_shuffle_ps(v25, v25, 170);
-    v26[0] = v26[0] + v24[0];
-    float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v26[0])));
+    XFNV_M128_F32(v26, 0) = XFNV_M128_F32(v26, 0) + XFNV_M128_F32(v24, 0);
+    float v27 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v26, 0))));
     __m128 v28 = _mm_cmpeq_ss(v26, v11);
-    float v29 = 3.0f - ((v26[0] * v27) * v27);
-    v12[0] = (0.5f * v27) * v29;
+    float v29 = 3.0f - ((XFNV_M128_F32(v26, 0) * v27) * v27);
+    XFNV_M128_F32(v12, 0) = (0.5f * v27) * v29;
     __m128 v31 = _mm_andnot_ps(v28, v12);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v31, v31, 0), axisB.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = axisBPerp.m_quad;
     v32.m_quad = m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad;
     __m128 v33 = _mm_mul_ps(v32.m_quad, v32.m_quad);
-    v31[0] = _mm_shuffle_ps(v33, v33, 85)[0] + v33[0];
+    XFNV_M128_F32(v31, 0) = XFNV_M128_F32(_mm_shuffle_ps(v33, v33, 85), 0) + XFNV_M128_F32(v33, 0);
     __m128 v34 = _mm_shuffle_ps(v33, v33, 170);
-    v34[0] = v34[0] + v31[0];
-    v31[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v34[0])));
-    v12[0] = (0.5f * v31[0]) * (3.0f - ((v34[0] * v31[0]) * v31[0]));
+    XFNV_M128_F32(v34, 0) = XFNV_M128_F32(v34, 0) + XFNV_M128_F32(v31, 0);
+    XFNV_M128_F32(v31, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v34, 0))));
+    XFNV_M128_F32(v12, 0) = (0.5f * XFNV_M128_F32(v31, 0)) *
+        (3.0f - ((XFNV_M128_F32(v34, 0) * XFNV_M128_F32(v31, 0)) * XFNV_M128_F32(v31, 0)));
     __m128 v35 = _mm_andnot_ps(_mm_cmpeq_ss(v34, v11), v12);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v35, v35, 0), v32.m_quad);
     m_atoms.m_transforms.m_transformB.m_rotation.m_col2.m_quad = _mm_sub_ps(

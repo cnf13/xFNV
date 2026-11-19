@@ -26,6 +26,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/PointToPath/hkpPointToPathConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
+#include "xfnv/Compiler.h"
 
 const char* bhkConstraintManager::GetTypeName(uint32_t aiType) {
     const char* result;
@@ -285,7 +286,7 @@ void hkPointToPathConstraintCinfo::CloneData(hkpConstraintData* a1, NiCloningPro
     // The cloning process is a BSCloningProcess: its scale's x (+0x10; NiCloningProcess is 0x10 bytes).
     float v12 = static_cast<BSCloningProcess*>(v4)->Scale.x;
     if (1.0f != v12) {
-        v11.m_quad[0] = v12;
+        XFNV_M128_F32(v11.m_quad, 0) = v12;
         pnd->m_transform_OS_KS[0].m_translation.m_quad =
             _mm_mul_ps(_mm_shuffle_ps(v11.m_quad, v11.m_quad, 0), pnd->m_transform_OS_KS[0].m_translation.m_quad);
         pnd->m_transform_OS_KS[1].m_translation.m_quad = _mm_mul_ps(

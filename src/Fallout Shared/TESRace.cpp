@@ -105,6 +105,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 
@@ -140,7 +141,7 @@ bool TESRace::Load(TESFile* apFile) {
             case EDID_ID: {
                 uint32_t uiSize = apFile->GetChunkSize();
                 // Allocates the chunk's size plus a terminator byte.
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiSize + 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiSize + 1));
                 pEditorID[uiSize] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200);
                 SetFormEditorID(pEditorID);
@@ -248,7 +249,7 @@ bool TESRace::Load(TESFile* apFile) {
             }
             case ATTR_ID: {
                 int32_t iSize = MaleAttributes.GetAttributeDataSize();
-                char* pData = static_cast<char*>(__builtin_alloca_with_align(2 * iSize, 128));
+                char* pData = static_cast<char*>(XFNV_ALLOCA16(2 * iSize));
                 for (int32_t i = 0; i < 2 * iSize; ++i) {
                     pData[i] = 0;
                 }
@@ -281,7 +282,7 @@ bool TESRace::Load(TESFile* apFile) {
                     MeanFaceCoordMale[iFaceGenType][iFaceGenPart].resize(static_cast<int32_t>(uiCount), 1);
                 }
                 MeanFaceCoordFemale[iFaceGenType][iFaceGenPart].resize(static_cast<int32_t>(uiCount), 1);
-                float* pValues = static_cast<float*>(__builtin_alloca_with_align(uiSize, 128));
+                float* pValues = static_cast<float*>(XFNV_ALLOCA16(uiSize));
                 ourMemset(pValues, 0, uiSize);
                 apFile->GetChunkData(pValues, uiSize);
                 for (uint32_t i = 0; i < uiCount; ++i) {
@@ -587,7 +588,7 @@ void TESRace::Save() {
     TESForm::AddChunk(UNAM_ID, fClampFaceGeoValue2);
     int32_t iAttributeSize = MaleAttributes.GetAttributeDataSize();
     // A 16-byte aligned stack buffer of the chunk's size.
-    char* pAttributes = static_cast<char*>(__builtin_alloca_with_align(2 * iAttributeSize, 128));
+    char* pAttributes = static_cast<char*>(XFNV_ALLOCA16(2 * iAttributeSize));
     MaleAttributes.Save(pAttributes);
     FemaleAttributes.Save(pAttributes + iAttributeSize);
     TESForm::AddChunkArray(ATTR_ID, pAttributes, 2);
@@ -987,7 +988,7 @@ const char* TESRace::GetFormEditorID() {
 // The ID is copied to a stack buffer first, as the game does; returns false when it is unchanged (ignoring case).
 bool TESRace::SetFormEditorID(const char* apEditorID) {
     uint32_t uiSize = BSstrlen(apEditorID) + 1;
-    char* pEditorID = static_cast<char*>(__builtin_alloca(uiSize));
+    char* pEditorID = static_cast<char*>(XFNV_ALLOCA(uiSize));
     BSstrcpy(pEditorID, uiSize, apEditorID);
     if (!strEditorID.StrCmp(pEditorID, true)) {
         return false;

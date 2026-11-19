@@ -16,6 +16,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpConstraintAtom.h"
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpSetLocalRotationsConstraintAtom.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -114,15 +115,15 @@ hkpRotationalConstraintData::hkpRotationalConstraintData() {
     m_atoms.m_rotations.m_rotationA.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_rotations.m_rotationA.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_rotations.m_rotationA.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_rotations.m_rotationA.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_rotations.m_rotationA.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_rotations.m_rotationA.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationA.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationA.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationA.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_rotations.m_rotationB.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_rotations.m_rotationB.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_rotations.m_rotationB.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_rotations.m_rotationB.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_rotations.m_rotationB.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_rotations.m_rotationB.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationB.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationB.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationB.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_ang.m_firstConstrainedAxis = 0;
     m_atoms.m_ang.m_numConstrainedAxes = 3;
 }
@@ -159,9 +160,9 @@ void hkpRotationalConstraintData::setInBodySpace(const hkQuaternion& aTb) {
     m_atoms.m_rotations.m_rotationA.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_rotations.m_rotationA.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_rotations.m_rotationA.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_rotations.m_rotationA.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_rotations.m_rotationA.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_rotations.m_rotationA.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationA.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationA.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_rotations.m_rotationA.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_rotations.m_rotationB.set(aTb);
 }
 

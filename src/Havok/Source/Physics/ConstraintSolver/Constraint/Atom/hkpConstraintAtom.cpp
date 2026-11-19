@@ -22,6 +22,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolve.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInfo.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -468,17 +469,17 @@ void hkpSoftContactModifierConstraintAtom::collisionResponseEndCallback(
 ) {
     __m128 v7 = _mm_undefined_ps();
     float m_tau = this->m_tau;
-    v7[0] = m_tau;
+    XFNV_M128_F32(v7, 0) = m_tau;
     __m128 v8 = _mm_shuffle_ps(v7, v7, 0);
     velA.m_linear.m_quad = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v8), s_savedLinearVelocityA), _mm_mul_ps(velA.m_linear.m_quad, v8)
     );
-    v8[0] = m_tau;
+    XFNV_M128_F32(v8, 0) = m_tau;
     __m128 v9 = _mm_shuffle_ps(v8, v8, 0);
     velA.m_angular.m_quad = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v9), s_savedAngularVelocityA), _mm_mul_ps(velA.m_angular.m_quad, v9)
     );
-    v9[0] = m_tau;
+    XFNV_M128_F32(v9, 0) = m_tau;
     __m128 v10 = _mm_shuffle_ps(v9, v9, 0);
     velB.m_linear.m_quad = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v10), s_savedLinearVelocityB), _mm_mul_ps(velB.m_linear.m_quad, v10)
@@ -536,7 +537,8 @@ void hkpMassChangerModifierConstraintAtom::collisionResponseBeginCallback(
     int32_t v13 = 2;
     do {
         pInA->m_invMasses.m_quad = _mm_mul_ps(pInA->m_invMasses.m_quad, m_quad);
-        if (v12.m_quad[1] == v12.m_quad[0] && v12.m_quad[2] == v12.m_quad[1]) {
+        if (XFNV_M128_F32(v12.m_quad, 1) == XFNV_M128_F32(v12.m_quad, 0) &&
+            XFNV_M128_F32(v12.m_quad, 2) == XFNV_M128_F32(v12.m_quad, 1)) {
             hkSimdReal v15;
             v15.m_real = m_quad;
             pInA->m_invInertia.mul(v15);
@@ -548,9 +550,9 @@ void hkpMassChangerModifierConstraintAtom::collisionResponseBeginCallback(
             hkMatrix3* p_m_invInertia = &pInA->m_invInertia;
             arA.setMulInverseMul(m_transform->m_rotation, pInA->m_invInertia);
             v14.setMul(arA, m_transform->m_rotation);
-            v14.m_col0.m_quad[0] = v14.m_col0.m_quad[0] * v12.m_quad[0];
-            v14.m_col1.m_quad[1] = v14.m_col1.m_quad[1] * v12.m_quad[1];
-            v14.m_col2.m_quad[2] = v14.m_col2.m_quad[2] * v12.m_quad[2];
+            XFNV_M128_F32(v14.m_col0.m_quad, 0) = XFNV_M128_F32(v14.m_col0.m_quad, 0) * XFNV_M128_F32(v12.m_quad, 0);
+            XFNV_M128_F32(v14.m_col1.m_quad, 1) = XFNV_M128_F32(v14.m_col1.m_quad, 1) * XFNV_M128_F32(v12.m_quad, 1);
+            XFNV_M128_F32(v14.m_col2.m_quad, 2) = XFNV_M128_F32(v14.m_col2.m_quad, 2) * XFNV_M128_F32(v12.m_quad, 2);
             arA.setMulInverse(v14, m_transform->m_rotation);
             p_m_invInertia->setMul(m_transform->m_rotation, arA);
         }
@@ -577,9 +579,9 @@ void hkpMovingSurfaceModifierConstraintAtom::collisionResponseEndCallback(
     hkVector4 v10;
     v10.m_quad = m_velocity.m_quad;
     __m128 v7 = _mm_mul_ps(cp.m_separatingNormal.m_quad, v10.m_quad);
-    float v8 = _mm_shuffle_ps(v7, v7, 85)[0] + v7[0];
+    float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0);
     __m128 v9 = _mm_shuffle_ps(v7, v7, 170);
-    v9[0] = v9[0] + v8;
+    XFNV_M128_F32(v9, 0) = XFNV_M128_F32(v9, 0) + v8;
     velB.m_linear.m_quad =
         _mm_sub_ps(velB.m_linear.m_quad, _mm_sub_ps(v10.m_quad, _mm_mul_ps(_mm_shuffle_ps(v9, v9, 0), v10.m_quad)));
 }
@@ -594,9 +596,9 @@ void hkpMovingSurfaceModifierConstraintAtom::collisionResponseBeginCallback(
     hkVector4 v10;
     v10.m_quad = m_velocity.m_quad;
     __m128 v7 = _mm_mul_ps(cp.m_separatingNormal.m_quad, v10.m_quad);
-    float v8 = _mm_shuffle_ps(v7, v7, 85)[0] + v7[0];
+    float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0);
     __m128 v9 = _mm_shuffle_ps(v7, v7, 170);
-    v9[0] = v9[0] + v8;
+    XFNV_M128_F32(v9, 0) = XFNV_M128_F32(v9, 0) + v8;
     velB.m_linear.m_quad =
         _mm_add_ps(_mm_sub_ps(v10.m_quad, _mm_mul_ps(_mm_shuffle_ps(v9, v9, 0), v10.m_quad)), velB.m_linear.m_quad);
 }

@@ -17,8 +17,8 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/Util/hkpWorldConstraintUtil.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 // The monitor stream's timer names: the begin command ("Tt" + the name) and the end command.
@@ -141,9 +141,9 @@ void hkpResponseModifier::setInvMassScalingForContact(
             pAtom->m_factorB = factor;
         }
         // A NaN w is not zero.
-        if (0.0f == pAtom->m_factorA.m_quad[3] && 0.0f == pAtom->m_factorB.m_quad[3]) {
-            pAtom->m_factorA.m_quad[3] = 1.0f;
-            pAtom->m_factorB.m_quad[3] = 1.0f;
+        if (0.0f == XFNV_M128_F32(pAtom->m_factorA.m_quad, 3) && 0.0f == XFNV_M128_F32(pAtom->m_factorB.m_quad, 3)) {
+            XFNV_M128_F32(pAtom->m_factorA.m_quad, 3) = 1.0f;
+            XFNV_M128_F32(pAtom->m_factorB.m_quad, 3) = 1.0f;
         }
     }
     // EXE-INLINED none: HK_TIMER_END

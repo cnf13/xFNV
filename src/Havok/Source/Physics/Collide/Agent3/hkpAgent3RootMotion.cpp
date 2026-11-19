@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -20,7 +21,8 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
     hkQuaternion q;
 
     // The transform at the step's start (time t0).
-    float t = (swept.m_centerOfMass0.m_quad[3] - swept.m_centerOfMass0.m_quad[3]) * swept.m_centerOfMass1.m_quad[3];
+    float t = (XFNV_M128_F32(swept.m_centerOfMass0.m_quad, 3) - XFNV_M128_F32(swept.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
     __m128 tv = _mm_shuffle_ps(_mm_set_ss(t), _mm_set_ss(t), 0);
     __m128 rot = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tv), swept.m_rotation0.m_vec.m_quad),
@@ -29,9 +31,9 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
     __m128 len2 = _mm_mul_ps(rot, rot);
     len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0x4E), len2);
     len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0xB1), len2);
-    float r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
+    float r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(len2, 0))));
     __m128 scale = _mm_setzero_ps();
-    scale[0] = (0.5f * r) * (3.0f - ((len2[0] * r) * r));
+    XFNV_M128_F32(scale, 0) = (0.5f * r) * (3.0f - ((XFNV_M128_F32(len2, 0) * r) * r));
     scale = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), scale);
     q.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0), rot);
     arOut.m_transform.m_rotation.set(q);
@@ -60,24 +62,24 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
         )
     );
 
-    if (0.0f == swept.m_centerOfMass1.m_quad[3]) {
+    if (0.0f == XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3)) {
         arOut.m_numSamples = 0;
         return;
     }
-    float deltaTime = 1.0 / swept.m_centerOfMass1.m_quad[3];
-    float deltaAngle = apMotionState->m_deltaAngle.m_quad[3];
+    float deltaTime = 1.0 / XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
+    float deltaAngle = XFNV_M128_F32(apMotionState->m_deltaAngle.m_quad, 3);
     if (deltaAngle <= 0.39269909262657166) {
         // One sample: the start transform.
         arOut.m_samples[0] = arOut.m_transform;
         float cosApprox = 1.0 - deltaAngle * deltaAngle * 0.5;
-        arOut.m_samples[0].m_translation.m_quad[3] = 1.0 / cosApprox;
+        XFNV_M128_F32(arOut.m_samples[0].m_translation.m_quad, 3) = 1.0 / cosApprox;
         arOut.m_numSamples = 1;
         return;
     }
     if (deltaAngle <= 0.7853981852531433) {
         // One sample: the transform at the step's middle.
-        float time = deltaTime * 0.5 + swept.m_centerOfMass0.m_quad[3];
-        t = (time - swept.m_centerOfMass0.m_quad[3]) * swept.m_centerOfMass1.m_quad[3];
+        float time = deltaTime * 0.5 + XFNV_M128_F32(swept.m_centerOfMass0.m_quad, 3);
+        t = (time - XFNV_M128_F32(swept.m_centerOfMass0.m_quad, 3)) * XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
         tv = _mm_shuffle_ps(_mm_set_ss(t), _mm_set_ss(t), 0);
         rot = _mm_add_ps(
             _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tv), swept.m_rotation0.m_vec.m_quad),
@@ -86,9 +88,9 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
         len2 = _mm_mul_ps(rot, rot);
         len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0x4E), len2);
         len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0xB1), len2);
-        r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
+        r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(len2, 0))));
         scale = _mm_setzero_ps();
-        scale[0] = (0.5f * r) * (3.0f - ((len2[0] * r) * r));
+        XFNV_M128_F32(scale, 0) = (0.5f * r) * (3.0f - ((XFNV_M128_F32(len2, 0) * r) * r));
         scale = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), scale);
         q.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0), rot);
         hkTransform& sample = arOut.m_samples[0];
@@ -117,7 +119,7 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
             )
         );
         float cosApprox = 1.0 - deltaAngle * deltaAngle * 0.25 * 0.5;
-        sample.m_translation.m_quad[3] = 1.0 / cosApprox;
+        XFNV_M128_F32(sample.m_translation.m_quad, 3) = 1.0 / cosApprox;
         arOut.m_numSamples = 1;
         return;
     }
@@ -132,8 +134,8 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
     }
     do {
         hkTransform& sample = arOut.m_samples[arOut.m_numSamples++];
-        float time = i * invNumSteps * deltaTime + swept.m_centerOfMass0.m_quad[3];
-        t = (time - swept.m_centerOfMass0.m_quad[3]) * swept.m_centerOfMass1.m_quad[3];
+        float time = i * invNumSteps * deltaTime + XFNV_M128_F32(swept.m_centerOfMass0.m_quad, 3);
+        t = (time - XFNV_M128_F32(swept.m_centerOfMass0.m_quad, 3)) * XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
         tv = _mm_shuffle_ps(_mm_set_ss(t), _mm_set_ss(t), 0);
         rot = _mm_add_ps(
             _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tv), swept.m_rotation0.m_vec.m_quad),
@@ -142,9 +144,9 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
         len2 = _mm_mul_ps(rot, rot);
         len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0x4E), len2);
         len2 = _mm_add_ps(_mm_shuffle_ps(len2, len2, 0xB1), len2);
-        r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(len2[0])));
+        r = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(len2, 0))));
         scale = _mm_setzero_ps();
-        scale[0] = (0.5f * r) * (3.0f - ((len2[0] * r) * r));
+        XFNV_M128_F32(scale, 0) = (0.5f * r) * (3.0f - ((XFNV_M128_F32(len2, 0) * r) * r));
         scale = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), scale);
         q.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0), rot);
         sample.m_rotation.set(q);
@@ -171,7 +173,7 @@ void hkpAgent3CalcRootMotion(const hkMotionState* apMotionState, hkpAgent3RootMo
                 )
             )
         );
-        sample.m_translation.m_quad[3] = 1.0824f;
+        XFNV_M128_F32(sample.m_translation.m_quad, 3) = 1.0824f;
         i = i + 2.0;
     }
     while (i < numStepsD);

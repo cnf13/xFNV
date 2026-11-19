@@ -94,6 +94,7 @@
 
 #include <bit>
 #include <cstdint>
+#include <cstring>
 
 ShadowLightShaderPassArray ShadowLightShader::spPass;
 NiRTTI ShadowLightShader::ms_RTTI("ShadowLightShader", &NiD3DDefaultShader::ms_RTTI);
@@ -5948,7 +5949,7 @@ void ShadowLightShader::LoadPixelShaders() {
     if (BSShaderManager::eShaderLevel >= 2) {
         char v18[8];
         // EXE-INLINED none: strcpy
-        __builtin_strcpy(v18, "-0.6");
+        std::strcpy(v18, "-0.6");
         if (BSShaderManager::e2xShaderLevel == 6 || BSShaderManager::e2xShaderLevel == 4) {
             kMacroArray_SM2[152].kMacros[1].Definition = v18;
             kMacroArray_SM2[153].kMacros[1].Definition = v18;

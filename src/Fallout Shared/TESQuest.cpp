@@ -32,6 +32,7 @@
 #include "Fallout/Misc/SaveLoad/BGSChangeFlags.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> bActivateAllQuestScripts("bActivateAllQuestScripts:General", false);
@@ -100,7 +101,7 @@ bool TESQuest::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first (see above).
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);
@@ -773,7 +774,7 @@ void TESQuest::InitItem() {
 bool TESQuest::SetFormEditorID(const char* apEditorID) {
     uint32_t uiSize = BSstrlen(apEditorID) + 1;
     // A 16-byte aligned stack buffer of the string's size.
-    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
     BSstrcpy(pBuffer, uiSize, apEditorID);
     if (!strEditorID.StrCmp(pBuffer, true)) {
         return false;

@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpBuildJacobianFromAtoms.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -112,7 +113,7 @@ hkBool hkaLookAtIkSolver::solve(
     kAxis.normalize3();
     const float fCos = kFwdMS.dot3(kDirection);
     float fAngle;
-    if (!(__builtin_fabsf(fCos) >= 1.0f)) {
+    if (!(std::fabsf(fCos) >= 1.0f)) {
         fAngle = std::acos(fCos);
     }
     else {
@@ -137,7 +138,7 @@ hkBool hkaLookAtIkSolver::solve(
         const float fDistanceSq = static_cast<float>(static_cast<double>(fDistance) * fDistance);
         const float fOffsetSq = static_cast<float>(static_cast<double>(fEyeOffset) * fEyeOffset);
         const float fDiff =
-            __builtin_fabsf(static_cast<float>(static_cast<double>(fDistanceSq) - static_cast<double>(fOffsetSq)));
+            std::fabsf(static_cast<float>(static_cast<double>(fDistanceSq) - static_cast<double>(fOffsetSq)));
         float fLeg = std::sqrt(fDiff);
         const float fLegSq = static_cast<float>(static_cast<double>(fLeg) * fLeg);
         const double dS = fDistanceSq;
@@ -148,7 +149,7 @@ hkBool hkaLookAtIkSolver::solve(
         const double dB = (dS * dS) + dA;
         const double dC = (dTwoS * dQ) + dB;
         const double dD = dC + (dR * dR);
-        const float fSum = __builtin_fabsf(static_cast<float>((dQ * dQ) + dD));
+        const float fSum = std::fabsf(static_cast<float>((dQ * dQ) + dD));
         const float fRoot = std::sqrt(fSum);
         const float fHyp = static_cast<float>((static_cast<double>(fRoot) * 0.5) / fLeg);
         float fTwist = 0.0f;
@@ -179,9 +180,9 @@ void hkaLookAtIkSolver::sphericalFromCartesian(hkVector4& cartesianInSphericalOu
         cartesianInSphericalOut.m_quad = _mm_setzero_ps();
         return;
     }
-    const float fX = cartesianInSphericalOut.m_quad[0];
-    const float fY = cartesianInSphericalOut.m_quad[1];
-    const float fSinElevation = cartesianInSphericalOut.m_quad[2] / fLength;
+    const float fX = XFNV_M128_F32(cartesianInSphericalOut.m_quad, 0);
+    const float fY = XFNV_M128_F32(cartesianInSphericalOut.m_quad, 1);
+    const float fSinElevation = XFNV_M128_F32(cartesianInSphericalOut.m_quad, 2) / fLength;
     const float fElevation = hkMath::asin(fSinElevation);
     const float fAzimuth = lookAtAtan2(fY, fX);
     cartesianInSphericalOut.m_quad = _mm_unpacklo_ps(
@@ -198,9 +199,9 @@ void hkaLookAtIkSolver::cartesianFromSpherical(hkVector4& sphericalInCartesianOu
     uint32_t v4;
     uint32_t v10;
     uint32_t v11;
-    float v6 = sphericalInCartesianOut.m_quad[0];
-    float v1 = sphericalInCartesianOut.m_quad[1];
-    float v5 = sphericalInCartesianOut.m_quad[2];
+    float v6 = XFNV_M128_F32(sphericalInCartesianOut.m_quad, 0);
+    float v1 = XFNV_M128_F32(sphericalInCartesianOut.m_quad, 1);
+    float v5 = XFNV_M128_F32(sphericalInCartesianOut.m_quad, 2);
     float v2 = std::cos((double)v5);
     float v3 = v2 * v6;
     float v7 = std::cos((double)v1);

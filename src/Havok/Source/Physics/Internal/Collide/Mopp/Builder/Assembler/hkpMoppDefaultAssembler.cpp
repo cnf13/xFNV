@@ -19,6 +19,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Mediator/hkpMoppMediator.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Splitter/hkpMoppSplitter.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -165,11 +166,11 @@ void hkpMoppAssemblerNodeInfo::updateOffsetAndSpread(const hkpMoppTreeNode* node
 
 void hkpMoppAssemblerNodeInfo::updateExtents(const hkpMoppTreeNode* node, const hkpMoppCode::CodeInfo& codeInfo) {
     for (int32_t i = 0; i < 3; ++i) {
-        const float fMin =
-            (node->m_extents.m_extent[i].m_min - codeInfo.m_offset.m_quad[i]) * codeInfo.m_offset.m_quad[3];
+        const float fMin = (node->m_extents.m_extent[i].m_min - XFNV_M128_F32(codeInfo.m_offset.m_quad, i)) *
+            XFNV_M128_F32(codeInfo.m_offset.m_quad, 3);
         m_extents[i][0] = hkFloorToInt(fMin);
-        const float fMax =
-            (node->m_extents.m_extent[i].m_max - codeInfo.m_offset.m_quad[i]) * codeInfo.m_offset.m_quad[3];
+        const float fMax = (node->m_extents.m_extent[i].m_max - XFNV_M128_F32(codeInfo.m_offset.m_quad, i)) *
+            XFNV_M128_F32(codeInfo.m_offset.m_quad, 3);
         m_extents[i][1] = hkFloorToInt(fMax) + 1;
     }
 }
@@ -420,7 +421,7 @@ void hkpMoppDefaultAssembler::getScaleInfo(hkpMoppTreeNode* a1, hkpMoppCode::Cod
     if (!(v6 < static_cast<double>(v3))) {
         v3 = a1->m_extents.m_extent[2].m_max - a1->m_extents.m_extent[2].m_min;
     }
-    a2->m_offset.m_quad[3] = 254.0 / v3 * 65536.0;
+    XFNV_M128_F32(a2->m_offset.m_quad, 3) = 254.0 / v3 * 65536.0;
 }
 
 // Hands a non-terminal node's two branches back to the node manager when nodes are built interleaved.
@@ -768,7 +769,7 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
             float axisTolerance = m_params.m_absoluteFitToleranceOfAxisAlignedTriangles(axis);
             float extent = a1->m_extents.m_extent[axis].m_max - a1->m_extents.m_extent[axis].m_min;
             if (axisTolerance > extent && tolerance > axisTolerance) {
-                float scale = m_codeInfo.m_offset.m_quad[3];
+                float scale = XFNV_M128_F32(m_codeInfo.m_offset.m_quad, 3);
                 float scaledTolerance = axisTolerance * scale;
                 if (hkMath::hkFloatToInt(scaledTolerance) << 7 < resolution) {
                     if (!a1->m_assemblerData.m_scaleIsValid.m_bool) {
@@ -780,7 +781,7 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
                 }
             }
         }
-        float scaledTolerance = m_codeInfo.m_offset.m_quad[3] * 0.8999999761581421 * tolerance;
+        float scaledTolerance = XFNV_M128_F32(m_codeInfo.m_offset.m_quad, 3) * 0.8999999761581421 * tolerance;
         uint32_t steps = static_cast<uint32_t>(hkMath::hkFloatToInt(scaledTolerance));
         int32_t numBits = 0;
         while (steps) {
@@ -955,7 +956,8 @@ int32_t hkpMoppDefaultAssembler::addTerminals(
 void hkpMoppDefaultAssembler::calcTermCut(hkpMoppTreeNode* a1, hkpMoppAssemblerCutInfo& a2) {
     for (int32_t axis = 0; axis < 3; axis++) {
         float extent = a1->m_extents.m_extent[axis].m_max - a1->m_extents.m_extent[axis].m_min;
-        float tolerance = static_cast<double>(1 << a2.m_currentBitsResolution) / m_codeInfo.m_offset.m_quad[3];
+        float tolerance =
+            static_cast<double>(1 << a2.m_currentBitsResolution) / XFNV_M128_F32(m_codeInfo.m_offset.m_quad, 3);
         float triangleTolerance = m_params.m_absoluteFitToleranceOfTriangles;
         if (!(triangleTolerance < tolerance)) {
             tolerance = triangleTolerance;
@@ -964,7 +966,7 @@ void hkpMoppDefaultAssembler::calcTermCut(hkpMoppTreeNode* a1, hkpMoppAssemblerC
         if (axisTolerance > extent && !(tolerance < axisTolerance)) {
             tolerance = axisTolerance;
         }
-        float scale = m_codeInfo.m_offset.m_quad[3];
+        float scale = XFNV_M128_F32(m_codeInfo.m_offset.m_quad, 3);
         float scaledTolerance = scale * tolerance;
         int32_t delta = hkMath::hkFloatToInt(scaledTolerance);
         a1->m_assemblerData.m_minCutPlanePosition[axis] = a2.m_extents[axis][0] - delta;

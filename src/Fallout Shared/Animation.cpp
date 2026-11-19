@@ -124,6 +124,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <cstring>
 
 // The game settings this file defines, with their IDs and default values, in initialization order.
 SettingT<INISettingCollection> fAnimationMult("fAnimationMult:General", 1.0f);
@@ -1409,7 +1410,7 @@ bool Animation::GetDelta(NiPoint3* delta, TESObjectREFR* apRef, bool applyRot, b
     NiPoint3 kZero = NiPoint3_ZERO;
     NiPoint3 kVector = movementDelta;
     NiNode* pRootNode = (&pAnimRoot)->m_pObject;
-    __builtin_memcpy(&kLocalRot, &pRootNode->GetLocalTransform(), sizeof(kLocalRot));
+    std::memcpy(&kLocalRot, &pRootNode->GetLocalTransform(), sizeof(kLocalRot));
     if (((!apRef->IsCreature()) && static_cast<Actor*>(apRef)->IsMoving()) && (pCurrentSequence[1])) {
         pAnimGroup = pCurrentSequence[1]->GetAnimGroup();
         if (((int32_t)pAnimGroup->GetType()) >= 3) {

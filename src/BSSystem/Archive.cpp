@@ -26,6 +26,7 @@
 #include "SDK/MSVC/string.h"
 #include "SDK/MSVC/sys/stat.h"
 
+#include <cstring>
 #include <zlib.h>
 
 BSCriticalSection ArchiveManager::s_ArchiveListLock;
@@ -83,8 +84,8 @@ Archive::Archive(
         for (uint32_t i = iDirectories; i-- > 0;) {
             BSDirectoryEntry kEntry;
             const char* pRecord = reinterpret_cast<const char*>(pDirectories) + i * kFileRecordSize;
-            __builtin_memcpy(static_cast<BSHash*>(&kEntry), pRecord, sizeof(BSHash));
-            __builtin_memcpy(&kEntry.iFiles, pRecord + offsetof(BSDirectoryEntry, iFiles), sizeof(kEntry.iFiles));
+            std::memcpy(static_cast<BSHash*>(&kEntry), pRecord, sizeof(BSHash));
+            std::memcpy(&kEntry.iFiles, pRecord + offsetof(BSDirectoryEntry, iFiles), sizeof(kEntry.iFiles));
             kEntry.pFiles = nullptr;
             pDirectories[i] = kEntry;
         }

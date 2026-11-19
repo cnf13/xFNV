@@ -3,6 +3,7 @@
 #include "BSHavok/bhkEntity.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
+#include "xfnv/Compiler.h"
 
 // This file's copy of 2 pi (6.2831855f).
 static float f6_2831855 = 6.2831855f;
@@ -40,15 +41,15 @@ void bhkWindListener::Update(float afTime) {
             fAngle = fAngle + f6_2831855;
         }
         alignas(16) hkVector4 kWind;
-        kWind.m_quad[0] = 0.0f;
-        kWind.m_quad[1] = fSpeed;
-        kWind.m_quad[2] = 0.0f;
-        kWind.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kWind.m_quad, 0) = 0.0f;
+        XFNV_M128_F32(kWind.m_quad, 1) = fSpeed;
+        XFNV_M128_F32(kWind.m_quad, 2) = 0.0f;
+        XFNV_M128_F32(kWind.m_quad, 3) = 0.0f;
         alignas(16) hkVector4 kAxis;
-        kAxis.m_quad[0] = 0.0f;
-        kAxis.m_quad[1] = 0.0f;
-        kAxis.m_quad[2] = 1.0f;
-        kAxis.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kAxis.m_quad, 0) = 0.0f;
+        XFNV_M128_F32(kAxis.m_quad, 1) = 0.0f;
+        XFNV_M128_F32(kAxis.m_quad, 2) = 1.0f;
+        XFNV_M128_F32(kAxis.m_quad, 3) = 0.0f;
         alignas(16) hkRotation kRotation;
         kRotation.setAxisAngle(kAxis, fAngle);
         alignas(16) hkVector4 kForce;

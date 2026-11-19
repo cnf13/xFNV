@@ -138,6 +138,7 @@
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
 
 #include <cmath>
+#include <cstring>
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> bProjectileDebug("bProjectileDebug:Combat", false);
@@ -1820,7 +1821,7 @@ void Projectile::Sync3DWithReference(bool abSyncRotation, bool abDoArcReorientat
             pRootNode->SetRotate(ecx0);
         }
         if (abDoArcReorientation && IsFlagSet(Projectile::REORIENT)) {
-            __builtin_memcpy(&akRot, &pRootNode->GetLocalTransform(), sizeof(akRot));
+            std::memcpy(&akRot, &pRootNode->GetLocalTransform(), sizeof(akRot));
             (&akRot)->ToEulerAnglesZXY(rfZAngle, rfXAngle, rfYAngle);
             movementDirection = &(result = GetMovementDirection());
             rfXAngle = -NiASin(movementDirection->z);

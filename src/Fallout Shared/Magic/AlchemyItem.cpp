@@ -28,6 +28,7 @@
 #include "Fallout/AI/Actor.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Swaps the cost, the addiction, its chance and the consumption sound read from a big-endian file; the flags at +4
 // are left alone.
@@ -213,7 +214,7 @@ void AlchemyItem::LoadMagicItemChunk(TESFile* apFile, CHUNK_ID apChunkID) {
         case MODS_ID: {
             uint32_t uiChunkSize = apFile->GetChunkSize();
             // A 16-byte aligned stack buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
             apFile->GetChunkData(pBuffer, uiChunkSize);
             uint16_t usFormVersion = apFile->GetFormVersion();
             static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, usFormVersion);

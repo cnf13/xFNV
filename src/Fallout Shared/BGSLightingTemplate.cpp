@@ -7,6 +7,7 @@
 #include "Fallout Shared/TESObjectCELL.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 BGSLightingTemplate::BGSLightingTemplate() {
     SetFormType(101);
@@ -37,7 +38,7 @@ bool BGSLightingTemplate::Load(TESFile* apFile) {
         }
         else if (eTESChunk == EDID_ID) {
             // Reserves the chunk's size on the stack and reads up to 0x200 bytes into it.
-            char* pcEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+            char* pcEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
             apFile->GetChunkData(pcEditorID, 0x200);
             static_cast<TESForm*>(this)->SetFormEditorID(pcEditorID);
         }

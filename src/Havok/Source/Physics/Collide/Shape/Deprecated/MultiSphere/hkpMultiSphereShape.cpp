@@ -23,6 +23,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 
@@ -114,7 +115,7 @@ int32_t findClosestHit(
         _mm_mul_ps(_mm_sub_ps(apInput->m_to.m_quad, kCentre), kFraction)
     );
     apOutput->m_normal.m_quad = kNormal.m_quad;
-    const float fInvRadius = 1.0 / apSpheres[iSphere].m_quad[3];
+    const float fInvRadius = 1.0 / XFNV_M128_F32(apSpheres[iSphere].m_quad, 3);
     apOutput->m_extraInfo = iSphere;
     apOutput->m_normal.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fInvRadius), _mm_set_ss(fInvRadius), 0), kNormal.m_quad);
@@ -152,7 +153,7 @@ int32_t castRayInternal(
             const float fA = _mm_cvtss_f32(_mm_add_ps(
                 _mm_shuffle_ps(kDirSq, kDirSq, 0xAA), _mm_add_ps(_mm_shuffle_ps(kDirSq, kDirSq, 0x55), kDirSq)
             ));
-            float fRadiusSq = apSpheres[i].m_quad[3] * apSpheres[i].m_quad[3];
+            float fRadiusSq = XFNV_M128_F32(apSpheres[i].m_quad, 3) * XFNV_M128_F32(apSpheres[i].m_quad, 3);
             float fCMinusRadiusSq = fC - fRadiusSq;
             float fDiscriminant = fB * fB - fCMinusRadiusSq * (fA * 4.0);
             if (!(fDiscriminant <= 0.0f)) {

@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Internal/KdTree/hkKdTree.h"
 #include "Havok/Source/Physics/Internal/Collide/BroadPhase/3AxisSweep/hkp3AxisSweep.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <emmintrin.h>
@@ -196,8 +197,12 @@ hkSplitPrimitivesStatus hkKdTreeProjectedEntryBuilder::splitPrimitives(
 
         // The extent as (z, x, y, 0) and (y, z, x, 0): their product is each axis's split face area, their sum times an
         // eighth of the extent the area one bucket adds to a side.
-        const __m128 kZxy = _mm_set_ps(0.0f, extent.m_quad[1], extent.m_quad[0], extent.m_quad[2]);
-        const __m128 kYzx = _mm_set_ps(0.0f, extent.m_quad[0], extent.m_quad[2], extent.m_quad[1]);
+        const __m128 kZxy = _mm_set_ps(
+            0.0f, XFNV_M128_F32(extent.m_quad, 1), XFNV_M128_F32(extent.m_quad, 0), XFNV_M128_F32(extent.m_quad, 2)
+        );
+        const __m128 kYzx = _mm_set_ps(
+            0.0f, XFNV_M128_F32(extent.m_quad, 0), XFNV_M128_F32(extent.m_quad, 2), XFNV_M128_F32(extent.m_quad, 1)
+        );
         alignas(16) float initialSA[4];
         _mm_store_ps(initialSA, _mm_mul_ps(kZxy, kYzx));
         alignas(16) float deltaSurfaceArea[4];
@@ -825,7 +830,7 @@ void hkKdTreeBuilder<const hkKdTreeProjectedEntry*, hkKdTreeProjectedEntry*, 0>:
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x5010D60C, acBuffer, ".\\KdTree\\Build\\hkKdTreeBuilder.cpp", 408
                 )) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
         }
         const hkKdTreeProjectedEntry* const quarterEnds[4] = {

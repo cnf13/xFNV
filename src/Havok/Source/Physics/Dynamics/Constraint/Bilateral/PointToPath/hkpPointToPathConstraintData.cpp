@@ -39,6 +39,7 @@
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -149,16 +150,16 @@ hkpPointToPathConstraintData::hkpPointToPathConstraintData() : m_path(nullptr), 
     m_transform_OS_KS[0].m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[0].m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[0].m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_transform_OS_KS[0].m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_transform_OS_KS[0].m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_transform_OS_KS[0].m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[0].m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[0].m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[0].m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_transform_OS_KS[0].m_translation.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[1].m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[1].m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[1].m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_transform_OS_KS[1].m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_transform_OS_KS[1].m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_transform_OS_KS[1].m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[1].m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[1].m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[1].m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_transform_OS_KS[1].m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_bridgeAtom.init(this);
 }
@@ -362,16 +363,16 @@ void hkpPointToPathConstraintData::setInBodySpace(
     m_transform_OS_KS[0].m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[0].m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[0].m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_transform_OS_KS[0].m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_transform_OS_KS[0].m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_transform_OS_KS[0].m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[0].m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[0].m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[0].m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_transform_OS_KS[0].m_translation.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[1].m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[1].m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[1].m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_transform_OS_KS[1].m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_transform_OS_KS[1].m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_transform_OS_KS[1].m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[1].m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[1].m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_transform_OS_KS[1].m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_transform_OS_KS[1].m_translation.m_quad = _mm_setzero_ps();
     m_transform_OS_KS[0].m_translation.m_quad = pivotA.m_quad;
     m_transform_OS_KS[1].m_translation.m_quad = pivotB.m_quad;

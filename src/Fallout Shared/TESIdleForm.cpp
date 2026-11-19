@@ -22,6 +22,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 void IDLE_DATA::Endian() {
     ENDIAN(sReplayDelay, false);
@@ -112,7 +113,7 @@ bool TESIdleForm::Load(TESFile* apFile) {
         switch (eChunk) {
             case EDID_ID: {
                 // The buffer is sized by the chunk, but the read is capped at 0x200 bytes.
-                char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pEditorID, 0x200);
                 SetFormEditorID(pEditorID);
                 break;
@@ -308,7 +309,7 @@ const char* TESIdleForm::GetFormEditorID() {
 
 bool TESIdleForm::SetFormEditorID(const char* apEditorID) {
     uint32_t uiSize = BSstrlen(apEditorID) + 1;
-    char* pEditorID = static_cast<char*>(__builtin_alloca(uiSize));
+    char* pEditorID = static_cast<char*>(XFNV_ALLOCA(uiSize));
     BSstrcpy(pEditorID, uiSize, apEditorID);
     if (!strEditorID.StrCmp(pEditorID, true)) {
         return false;

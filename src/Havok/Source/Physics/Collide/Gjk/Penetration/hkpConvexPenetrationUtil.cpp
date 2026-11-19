@@ -13,6 +13,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpCdVertex.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
 #include "Havok/Source/Physics/Collide/Util/hkpCollideTriangleUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -106,7 +107,8 @@ static void findNearestTrianglePair(
                 goto LABEL_23;
             }
             v13 = _mm_mul_ps(triB->m_normal.m_quad, triA->m_normal.m_quad);
-            v14 = _mm_shuffle_ps(v13, v13, 170)[0] + (_mm_shuffle_ps(v13, v13, 85)[0] + v13[0]);
+            v14 = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 170), 0) +
+                (XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 85), 0) + XFNV_M128_F32(v13, 0));
             v15 = v14;
             if (v14 < -0.5f) {
                 goto LABEL_23;
@@ -205,7 +207,7 @@ LABEL_25:;
     }
     float v55 = v5;
     float v56 = std::sqrt((double)v55);
-    a3->m_quad[3] = v56;
+    XFNV_M128_F32(a3->m_quad, 3) = v56;
 }
 
 static void updateBestSupportPair(
@@ -231,11 +233,11 @@ static void updateBestSupportPair(
     // Sums as (y + x) + z in the low lane.
     const float distance =
         _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(v14, v14, 170), _mm_add_ss(_mm_shuffle_ps(v14, v14, 85), v14)));
-    if (best->m_direction.m_quad[3] < distance) {
+    if (XFNV_M128_F32(best->m_direction.m_quad, 3) < distance) {
         best->m_direction.m_quad = dir;
         best->m_vertexA.m_quad = vertexA.m_quad;
         best->m_vertexB.m_quad = b;
-        best->m_direction.m_quad[3] = distance;
+        XFNV_M128_F32(best->m_direction.m_quad, 3) = distance;
     }
 }
 
@@ -252,7 +254,7 @@ static hkpGskOut* sampleSupportPenetration(
     hkpGskOut* output
 ) {
     hkSupportPair best;
-    best.m_direction.m_quad[3] = -3.40282e+38f;
+    XFNV_M128_F32(best.m_direction.m_quad, 3) = -3.40282e+38f;
     for (int32_t i = 0; i < 3; ++i) {
         hkVector4 direction = hkTransformIdentity.m_rotation.getColumn(i);
         updateBestSupportPair(shapeA, shapeB, &best, &direction, transform);
@@ -263,9 +265,9 @@ static hkpGskOut* sampleSupportPenetration(
     float scale = 1.0f;
     while (true) {
         float step = scale * 0.9900000095367432;
-        float absX = std::fabs(best.m_direction.m_quad[0]);
-        float absY = std::fabs(best.m_direction.m_quad[1]);
-        float absZ = std::fabs(best.m_direction.m_quad[2]);
+        float absX = std::fabs(XFNV_M128_F32(best.m_direction.m_quad, 0));
+        float absY = std::fabs(XFNV_M128_F32(best.m_direction.m_quad, 1));
+        float absZ = std::fabs(XFNV_M128_F32(best.m_direction.m_quad, 2));
         // The axis of the direction's least component (iMin) and the two others (i0, i1): the perpendicular swaps
         // those two and negates one.
         int32_t iMin = 0;
@@ -281,8 +283,8 @@ static hkpGskOut* sampleSupportPenetration(
         }
         hkVector4 perp;
         perp.m_quad = zero;
-        perp.m_quad[i0] = best.m_direction.m_quad[i1];
-        perp.m_quad[i1] = -best.m_direction.m_quad[i0];
+        XFNV_M128_F32(perp.m_quad, i0) = XFNV_M128_F32(best.m_direction.m_quad, i1);
+        XFNV_M128_F32(perp.m_quad, i1) = -XFNV_M128_F32(best.m_direction.m_quad, i0);
         perp.normalize3();
         const __m128 perpN = perp.m_quad;
         const __m128 stepV = _mm_set1_ps(step);
@@ -314,7 +316,7 @@ static hkpGskOut* sampleSupportPenetration(
     }
     *pointsAinA = best.m_vertexA;
     *pointsBinB = best.m_vertexB;
-    output->m_distance.m_storage = best.m_direction.m_quad[3];
+    output->m_distance.m_storage = XFNV_M128_F32(best.m_direction.m_quad, 3);
     output->m_normalInA = best.m_direction;
     output->m_pointAinA = best.m_vertexA;
     return output;
@@ -870,9 +872,9 @@ hkpGskStatus hkpConvexPenetrationUtil::calculatePenetrationDepth(hkpGskOut& outp
             const float r = static_cast<float>(
                 (hkpConvexPenetrationUtil_rand01(backupTries) - 9.999999747378752e-05) * 0.00019999999494757503
             );
-            offset.m_quad[0] = r;
-            offset.m_quad[1] = r;
-            offset.m_quad[2] = r;
+            XFNV_M128_F32(offset.m_quad, 0) = r;
+            XFNV_M128_F32(offset.m_quad, 1) = r;
+            XFNV_M128_F32(offset.m_quad, 2) = r;
             m_aTb.m_translation.m_quad = _mm_add_ps(m_aTb.m_translation.m_quad, offset.m_quad);
         }
     }
@@ -948,7 +950,8 @@ hkpWingedEdge::Triangle::TriangleState hkpWingedEdge::Triangle::calcStateAndUpda
     float* apPreviousMinimumDistance
 ) {
     __m128 v4 = _mm_mul_ps(_mm_sub_ps(arPoint.m_quad, m_edge[0].m_vertex->m_position.m_quad), m_normal.m_quad);
-    float v9 = _mm_shuffle_ps(v4, v4, 170)[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
+    float v9 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0));
     double v5 = v9;
     hkpWingedEdge::Triangle::TriangleState v6 = hkpWingedEdge::Triangle::HK_VISIBLE;
     if (!(*apToleranceBorder < static_cast<double>(v9))) {

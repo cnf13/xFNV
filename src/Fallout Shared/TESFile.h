@@ -869,7 +869,7 @@ void TESFile::WidenFormIDRecords(
     // overwrites bytes still to be moved.
     for (uint32_t i = auiCount; i-- > 0;) {
         char* pRecord = pRecords + i * auiSize;
-        __builtin_memmove(pRecord, pRecords + i * auiFileSize, auiFileSize);
+        std::memmove(pRecord, pRecords + i * auiFileSize, auiFileSize);
         uint32_t uiEnd = auiFileSize;
         for (size_t j = N; j-- > 0;) {
             const FormIDField& rField = aFields[j];
@@ -878,13 +878,13 @@ void TESFile::WidenFormIDRecords(
                 continue;
             }
             uint32_t uiFormID;
-            __builtin_memcpy(&uiFormID, pRecord + rField.uiFileOffset, sizeof(uiFormID));
-            __builtin_memmove(
+            std::memcpy(&uiFormID, pRecord + rField.uiFileOffset, sizeof(uiFormID));
+            std::memmove(
                 pRecord + rField.uiOffset + sizeof(uintptr_t), pRecord + rField.uiFileOffset + 4,
                 uiEnd - rField.uiFileOffset - 4
             );
             uintptr_t uiValue = uiFormID;
-            __builtin_memcpy(pRecord + rField.uiOffset, &uiValue, sizeof(uiValue));
+            std::memcpy(pRecord + rField.uiOffset, &uiValue, sizeof(uiValue));
             uiEnd = rField.uiFileOffset;
         }
     }
@@ -907,14 +907,14 @@ void TESFile::NarrowFormIDRecords(
         size_t uiStart = 0;
         for (const FormIDField& rField : aFields) {
             uintptr_t uiValue;
-            __builtin_memcpy(&uiValue, pRecord + rField.uiOffset, sizeof(uiValue));
-            __builtin_memmove(pFileRecord + uiFileStart, pRecord + uiStart, rField.uiFileOffset - uiFileStart);
+            std::memcpy(&uiValue, pRecord + rField.uiOffset, sizeof(uiValue));
+            std::memmove(pFileRecord + uiFileStart, pRecord + uiStart, rField.uiFileOffset - uiFileStart);
             uint32_t uiFormID = static_cast<uint32_t>(uiValue);
-            __builtin_memcpy(pFileRecord + rField.uiFileOffset, &uiFormID, sizeof(uiFormID));
+            std::memcpy(pFileRecord + rField.uiFileOffset, &uiFormID, sizeof(uiFormID));
             uiFileStart = rField.uiFileOffset + 4;
             uiStart = rField.uiOffset + sizeof(uintptr_t);
         }
-        __builtin_memmove(pFileRecord + uiFileStart, pRecord + uiStart, auiFileSize - uiFileStart);
+        std::memmove(pFileRecord + uiFileStart, pRecord + uiStart, auiFileSize - uiFileStart);
     }
 }
 #endif

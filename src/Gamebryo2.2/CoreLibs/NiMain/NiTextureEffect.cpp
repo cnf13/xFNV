@@ -214,13 +214,13 @@ void NiTextureEffect::UpdateProjection() {
             m_kWorldProjTrans.y = (float)0.0;
             m_kWorldProjTrans.x = (float)0.0;
             v7 = &(v24 = (&m_kWorld.m_Rotate)->Transpose());
-            __builtin_memcpy(&m_kWorldProjMat, &(v23 = m_kModelProjMat * *v7), sizeof(m_kWorldProjMat));
+            std::memcpy(&m_kWorldProjMat, &(v23 = m_kModelProjMat * *v7), sizeof(m_kWorldProjMat));
         }
         else {
             v13 = (float)(1.0 / m_kWorld.m_fScale);
             v3 = &(v23 = (&m_kWorld.m_Rotate)->Transpose());
             v4 = &(v24 = m_kModelProjMat * *v3);
-            __builtin_memcpy(&m_kWorldProjMat, &(v25 = *v4 * v13), sizeof(m_kWorldProjMat));
+            std::memcpy(&m_kWorldProjMat, &(v25 = *v4 * v13), sizeof(m_kWorldProjMat));
             v5 = &(v22 = m_kWorldProjMat * m_kWorld.m_Translate);
             v16 = m_kModelProjTrans.x - v5->x;
             v18 = m_kModelProjTrans.y - v5->y;

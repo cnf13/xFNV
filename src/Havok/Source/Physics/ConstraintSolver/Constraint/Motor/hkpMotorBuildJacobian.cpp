@@ -9,6 +9,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Position/hkpPositionConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/SpringDamper/hkpSpringDamperConstraintMotor.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Motor/Velocity/hkpVelocityConstraintMotor.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -141,24 +142,24 @@ void hk1dLinearVelocityMotorBeginJacobian(const hkVector4& directionOfConstraint
 	__m128 v20 = _mm_add_ps(_mm_mul_ps(_mm_mul_ps(v16, v16), v19), _mm_mul_ps(_mm_mul_ps(v17, v17), v18));
 	__m128 v21 = _mm_shuffle_ps(v20, _mm_unpackhi_ps(v20, _mm_add_ps(v19, v18)), 196);
 	__m128 v22 = _mm_add_ps(_mm_shuffle_ps(v21, v21, 78), v21);
-    float v23 = (_mm_shuffle_ps(v22, v22, 177)[0] + v22[0]) + 1.1920928955078125e-07;
-    jac[2].m_quad[3] = v23;
+    float v23 = (XFNV_M128_F32(_mm_shuffle_ps(v22, v22, 177), 0) + XFNV_M128_F32(v22, 0)) + 1.1920928955078125e-07;
+    XFNV_M128_F32(jac[2].m_quad, 3) = v23;
 	float v24 = 1.0 / v23;
-	jac[1].m_quad[3] = v24;
+	XFNV_M128_F32(jac[1].m_quad, 3) = v24;
 	statusOut->m_virtualMass = v24;
 }
 
 void hk1dLinearVelocityMotorCommitJacobian(hkp1dConstraintMotorInfo* info, const hkpConstraintQueryIn& in,
 	hkpJacobianSchema* jac, hkpConstraintQueryOut& out) {
-	jac->m_quad[3] = in.m_substepInvDeltaTime * info->m_targetPosition;
+	XFNV_M128_F32(jac->m_quad, 3) = in.m_substepInvDeltaTime * info->m_targetPosition;
 	hkpJacobianSchema* m_jacobianSchemas = out.m_jacobianSchemas + 5;
-	m_jacobianSchemas[-5].m_quad[0] = out.m_jacobianSchemas->m_quad[0] + 1.1920928955078125e-07;
+	XFNV_M128_F32(m_jacobianSchemas[-5].m_quad, 0) = XFNV_M128_F32(out.m_jacobianSchemas->m_quad, 0) + 1.1920928955078125e-07;
 	m_jacobianSchemas[-5].m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_1D_LINEAR_MOTOR;
 	double m_maxForce = info->m_maxForce;
 	out.m_jacobianSchemas = m_jacobianSchemas;
-	m_jacobianSchemas[-2].m_quad[0] = m_maxForce * in.m_microStepDeltaTime;
-	m_jacobianSchemas[-2].m_quad[1] = info->m_minForce * in.m_microStepDeltaTime;
-	m_jacobianSchemas[-2].m_quad[2] = info->m_targetVelocity;
-	m_jacobianSchemas[-2].m_quad[3] = info->m_tau;
-	m_jacobianSchemas[-1].m_quad[0] = info->m_damping;
+	XFNV_M128_F32(m_jacobianSchemas[-2].m_quad, 0) = m_maxForce * in.m_microStepDeltaTime;
+	XFNV_M128_F32(m_jacobianSchemas[-2].m_quad, 1) = info->m_minForce * in.m_microStepDeltaTime;
+	XFNV_M128_F32(m_jacobianSchemas[-2].m_quad, 2) = info->m_targetVelocity;
+	XFNV_M128_F32(m_jacobianSchemas[-2].m_quad, 3) = info->m_tau;
+	XFNV_M128_F32(m_jacobianSchemas[-1].m_quad, 0) = info->m_damping;
 }

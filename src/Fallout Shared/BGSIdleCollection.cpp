@@ -12,6 +12,7 @@
 #include "Fallout/AI/Actor.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 void BGSIdleCollection::Load(TESFile* apFile) {
     CHUNK_ID chunkid = apFile->GetTESChunk();
@@ -170,7 +171,7 @@ void BGSIdleCollection::Save() {
     TESForm::AddChunk(IDLC_ID, cIdleCount);
     TESForm::AddChunk(IDLT_ID, fTimerCheckForIdle);
     // A 16-byte aligned stack buffer of one form ID per idle.
-    uint32_t* pIdleIDs = static_cast<uint32_t*>(__builtin_alloca_with_align(4 * cIdleCount, 128));
+    uint32_t* pIdleIDs = static_cast<uint32_t*>(XFNV_ALLOCA16(4 * cIdleCount));
     for (uint32_t i = 0; i < cIdleCount; ++i) {
         pIdleIDs[i] = pIdleArray[i] ? pIdleArray[i]->GetFormID() : 0;
     }

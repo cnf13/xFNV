@@ -12,6 +12,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Internal/ConvexHull/hkPlaneEquationUtil.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -95,19 +96,19 @@ int32_t findPlanarIntersections(
 }
 
 hkVector4::hkVector4(float afX, float afY, float afZ, float afW) {
-    m_quad[0] = afX;
-    m_quad[1] = afY;
-    m_quad[2] = afZ;
-    m_quad[3] = afW;
+    XFNV_M128_F32(m_quad, 0) = afX;
+    XFNV_M128_F32(m_quad, 1) = afY;
+    XFNV_M128_F32(m_quad, 2) = afZ;
+    XFNV_M128_F32(m_quad, 3) = afW;
 }
 
 // Computes (v.y * col1 + v.x * col0) + (v.z * col2 + translation) in this order. Each step rounds to float, so each
 // goes through a float local; the four components are stored once, after all inputs are read.
 void hkVector4::setTransformedPos(const hkTransform& t, const hkVector4& v) {
     const hkRotation& r = t.m_rotation;
-    float fX = v.m_quad[0];
-    float fY = v.m_quad[1];
-    float fZ = v.m_quad[2];
+    float fX = XFNV_M128_F32(v.m_quad, 0);
+    float fY = XFNV_M128_F32(v.m_quad, 1);
+    float fZ = XFNV_M128_F32(v.m_quad, 2);
     hkQuadReal kResult;
     for (int32_t i = 0; i < 4; ++i) {
         float fYCol1 = fY * (&reinterpret_cast<const float*>(&r.m_col1.m_quad)[0])[i];
@@ -127,7 +128,7 @@ void hkVector4::setTransformedPos(const hkQsTransform& t, const hkVector4& v) {
     __m128 v4 = _mm_mul_ps(t.m_scale.m_quad, v.m_quad);
     __m128 v5 = _mm_mul_ps(v3.m_vec.m_quad, v4);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 170);
-    v6[0] = v6[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0));
     __m128 v7 = _mm_shuffle_ps(v3.m_vec.m_quad, v3.m_vec.m_quad, 255);
     __m128 v8 = _mm_add_ps(
         _mm_mul_ps(
@@ -154,17 +155,17 @@ hkBool hkVector4::isOk3() const {
 }
 
 void hkVector4::setAll3(float a) {
-    m_quad[0] = a;
-    m_quad[1] = a;
-    m_quad[2] = a;
+    XFNV_M128_F32(m_quad, 0) = a;
+    XFNV_M128_F32(m_quad, 1) = a;
+    XFNV_M128_F32(m_quad, 2) = a;
 }
 
 // Computes (a.y * col1 + a.x * col0) + a.z * col2 in that order, with each step rounded to float as in
 // setTransformedPos.
 void hkVector4::setMul3(const hkMatrix3& r, const hkVector4& b) {
-    float fX = b.m_quad[0];
-    float fY = b.m_quad[1];
-    float fZ = b.m_quad[2];
+    float fX = XFNV_M128_F32(b.m_quad, 0);
+    float fY = XFNV_M128_F32(b.m_quad, 1);
+    float fZ = XFNV_M128_F32(b.m_quad, 2);
     hkQuadReal kResult;
     for (int32_t i = 0; i < 4; ++i) {
         float fYCol1 = fY * (&reinterpret_cast<const float*>(&r.m_col1.m_quad)[0])[i];
@@ -179,9 +180,9 @@ void hkVector4::setMul3(const hkMatrix3& r, const hkVector4& b) {
 // The rotation's turn on a direction vector: (a.y * col1 + a.x * col0) + a.z * col2, in this order, each step rounded
 // to float as in setMul3.
 void hkVector4::setRotatedDir(const hkRotation& a, const hkVector4& b) {
-    float fX = b.m_quad[0];
-    float fY = b.m_quad[1];
-    float fZ = b.m_quad[2];
+    float fX = XFNV_M128_F32(b.m_quad, 0);
+    float fY = XFNV_M128_F32(b.m_quad, 1);
+    float fZ = XFNV_M128_F32(b.m_quad, 2);
     hkQuadReal kResult;
     for (int32_t i = 0; i < 4; ++i) {
         float fYCol1 = fY * (&reinterpret_cast<const float*>(&a.m_col1.m_quad)[0])[i];
@@ -223,7 +224,7 @@ void hkVector4::setTransformedInversePos(const hkQsTransform& a, const hkVector4
     __m128 v4 = _mm_sub_ps(b.m_quad, a.m_translation.m_quad);
     __m128 v5 = _mm_mul_ps(v3.m_vec.m_quad, v4);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 170);
-    v6[0] = v6[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0));
     __m128 v7 = _mm_shuffle_ps(v3.m_vec.m_quad, v3.m_vec.m_quad, 255);
     __m128 v8 = _mm_add_ps(
         _mm_mul_ps(
@@ -263,9 +264,9 @@ hkBool hkVector4::isNormalized3(float eps) const {
     hkQuadReal kSq = _mm_mul_ps(m_quad, m_quad);
     hkQuadReal kXY = _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0x55), kSq);
     hkQuadReal kXYZ = _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0xAA), kXY);
-    float fLengthSquared = kXYZ[0];
+    float fLengthSquared = XFNV_M128_F32(kXYZ, 0);
     float fDiff = fLengthSquared - 1.0;
-    float fAbs = __builtin_fabsf(fDiff);
+    float fAbs = std::fabsf(fDiff);
     kResult.m_bool = eps > fAbs;
     return kResult;
 }
@@ -280,9 +281,9 @@ hkBool hkVector4::isNormalized4(float eps) const {
     hkQuadReal kSq = _mm_mul_ps(m_quad, m_quad);
     hkQuadReal kSum0 = _mm_add_ps(_mm_shuffle_ps(kSq, kSq, 0x4E), kSq);
     hkQuadReal kSum1 = _mm_add_ps(_mm_shuffle_ps(kSum0, kSum0, 0xB1), kSum0);
-    float fLengthSquared = kSum1[0];
+    float fLengthSquared = XFNV_M128_F32(kSum1, 0);
     float fDiff = fLengthSquared - 1.0;
-    float fAbs = __builtin_fabsf(fDiff);
+    float fAbs = std::fabsf(fDiff);
     kResult.m_bool = eps > fAbs;
     return kResult;
 }
@@ -296,11 +297,11 @@ void hkVector4::sub_D53060(hkRotation* a1, hkRotation* arg4, hkVector4* a3) {
     hkVector4 arVector;
     hkVector4 v24;
     int32_t v4 = 0;
-    float v19 = std::fabs((double)a3->m_quad[0]);
+    float v19 = std::fabs((double)XFNV_M128_F32(a3->m_quad, 0));
     int32_t v6 = 1;
     int32_t v7 = 2;
-    float v20 = std::fabs((double)a3->m_quad[1]);
-    float v21 = std::fabs((double)a3->m_quad[2]);
+    float v20 = std::fabs((double)XFNV_M128_F32(a3->m_quad, 1));
+    float v21 = std::fabs((double)XFNV_M128_F32(a3->m_quad, 2));
     if (v19 > static_cast<double>(v20)) {
         v19 = v20;
         v6 = 0;
@@ -309,20 +310,20 @@ void hkVector4::sub_D53060(hkRotation* a1, hkRotation* arg4, hkVector4* a3) {
     if (v19 > static_cast<double>(v21)) {
         v7 = v4;
     }
-    double v8 = a3->m_quad[v7];
+    double v8 = XFNV_M128_F32(a3->m_quad, v7);
     arVector.m_quad = _mm_setzero_ps();
-    arVector.m_quad[v6] = v8;
-    arVector.m_quad[v7] = -a3->m_quad[v6];
+    XFNV_M128_F32(arVector.m_quad, v6) = v8;
+    XFNV_M128_F32(arVector.m_quad, v7) = -XFNV_M128_F32(a3->m_quad, v6);
     __m128 v9 = _mm_mul_ps(arVector.m_quad, arVector.m_quad);
-    float v10 = _mm_shuffle_ps(v9, v9, 85)[0] + v9[0];
+    float v10 = XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0);
     __m128 v11 = _mm_shuffle_ps(v9, v9, 170);
-    v11[0] = v11[0] + v10;
-    float v12 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v11[0])));
-    v13[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v11, 0) = XFNV_M128_F32(v11, 0) + v10;
+    float v12 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v11, 0))));
+    XFNV_M128_F32(v13, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v14 = _mm_cmpeq_ss(v11, v13);
-    v13[0] = 3.0f - ((v11[0] * v12) * v12);
+    XFNV_M128_F32(v13, 0) = 3.0f - ((XFNV_M128_F32(v11, 0) * v12) * v12);
     __m128 v15 = _mm_setzero_ps();
-    v15[0] = (0.5f * v12) * v13[0];
+    XFNV_M128_F32(v15, 0) = (0.5f * v12) * XFNV_M128_F32(v13, 0);
     __m128 v16 = _mm_andnot_ps(v14, v15);
     __m128 v17 = _mm_shuffle_ps(v16, v16, 0);
     __m128 m_quad = a3->m_quad;
@@ -341,9 +342,10 @@ void hkVector4::sub_D53060(hkRotation* a1, hkRotation* arg4, hkVector4* a3) {
 
 bool* hkVector4::hasValidAxis(bool* a1) {
     __m128 v2 = _mm_mul_ps(m_quad, m_quad);
-    *a1 = _mm_cvtss_f32(
-              _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v2, v2, 170)[0] + (_mm_shuffle_ps(v2, v2, 85)[0] + v2[0]))))
-          ) > 1.1920929e-07f;
+    *a1 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+              (XFNV_M128_F32(_mm_shuffle_ps(v2, v2, 170), 0) +
+               (XFNV_M128_F32(_mm_shuffle_ps(v2, v2, 85), 0) + XFNV_M128_F32(v2, 0)))
+          ))) > 1.1920929e-07f;
     return a1;
 }
 
@@ -488,20 +490,20 @@ hkMatrix4* calcTriangleBarycentricMatrix(const hkVector4* a1, const float* a2, h
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v1, v1, 0xC9), nZxy), _mm_mul_ps(_mm_shuffle_ps(v1, v1, 0xD2), nYzx));
     a3->m_col2.m_quad =
         _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(v2, v2, 0xC9), nZxy), _mm_mul_ps(_mm_shuffle_ps(v2, v2, 0xD2), nYzx));
-    float t = a3->m_col1.m_quad[0];
-    a3->m_col1.m_quad[0] = a3->m_col0.m_quad[1];
-    a3->m_col0.m_quad[1] = t;
-    t = a3->m_col2.m_quad[0];
-    a3->m_col2.m_quad[0] = a3->m_col0.m_quad[2];
-    a3->m_col0.m_quad[2] = t;
-    t = a3->m_col2.m_quad[1];
-    a3->m_col2.m_quad[1] = a3->m_col1.m_quad[2];
-    a3->m_col1.m_quad[2] = t;
-    a3->m_col0.m_quad[3] = a4->m_quad[0];
-    a3->m_col1.m_quad[3] = a4->m_quad[1];
-    a3->m_col2.m_quad[3] = a4->m_quad[2];
+    float t = XFNV_M128_F32(a3->m_col1.m_quad, 0);
+    XFNV_M128_F32(a3->m_col1.m_quad, 0) = XFNV_M128_F32(a3->m_col0.m_quad, 1);
+    XFNV_M128_F32(a3->m_col0.m_quad, 1) = t;
+    t = XFNV_M128_F32(a3->m_col2.m_quad, 0);
+    XFNV_M128_F32(a3->m_col2.m_quad, 0) = XFNV_M128_F32(a3->m_col0.m_quad, 2);
+    XFNV_M128_F32(a3->m_col0.m_quad, 2) = t;
+    t = XFNV_M128_F32(a3->m_col2.m_quad, 1);
+    XFNV_M128_F32(a3->m_col2.m_quad, 1) = XFNV_M128_F32(a3->m_col1.m_quad, 2);
+    XFNV_M128_F32(a3->m_col1.m_quad, 2) = t;
+    XFNV_M128_F32(a3->m_col0.m_quad, 3) = XFNV_M128_F32(a4->m_quad, 0);
+    XFNV_M128_F32(a3->m_col1.m_quad, 3) = XFNV_M128_F32(a4->m_quad, 1);
+    XFNV_M128_F32(a3->m_col2.m_quad, 3) = XFNV_M128_F32(a4->m_quad, 2);
     a3->m_col3.m_quad = _mm_setzero_ps();
-    a3->m_col3.m_quad[0] = a2[4] * -a2[0];
+    XFNV_M128_F32(a3->m_col3.m_quad, 0) = a2[4] * -a2[0];
     return a3;
 }
 
@@ -665,20 +667,20 @@ calcTriangleBarycentricPlanes(const hkVector4* vertices, const float* params, hk
         _mm_mul_ps(_mm_shuffle_ps(kC, kC, 0xC9), kNormalD2), _mm_mul_ps(_mm_shuffle_ps(kC, kC, 0xD2), kNormalC9)
     );
 
-    float fTmp = out->m_col1.m_quad[0];
-    out->m_col1.m_quad[0] = out->m_col0.m_quad[1];
-    out->m_col0.m_quad[1] = fTmp;
-    fTmp = out->m_col2.m_quad[0];
-    out->m_col2.m_quad[0] = out->m_col0.m_quad[2];
-    out->m_col0.m_quad[2] = fTmp;
-    fTmp = out->m_col2.m_quad[1];
-    out->m_col2.m_quad[1] = out->m_col1.m_quad[2];
-    out->m_col1.m_quad[2] = fTmp;
-    out->m_col0.m_quad[3] = normalOut->m_quad[0];
-    out->m_col1.m_quad[3] = normalOut->m_quad[1];
-    out->m_col2.m_quad[3] = normalOut->m_quad[2];
+    float fTmp = XFNV_M128_F32(out->m_col1.m_quad, 0);
+    XFNV_M128_F32(out->m_col1.m_quad, 0) = XFNV_M128_F32(out->m_col0.m_quad, 1);
+    XFNV_M128_F32(out->m_col0.m_quad, 1) = fTmp;
+    fTmp = XFNV_M128_F32(out->m_col2.m_quad, 0);
+    XFNV_M128_F32(out->m_col2.m_quad, 0) = XFNV_M128_F32(out->m_col0.m_quad, 2);
+    XFNV_M128_F32(out->m_col0.m_quad, 2) = fTmp;
+    fTmp = XFNV_M128_F32(out->m_col2.m_quad, 1);
+    XFNV_M128_F32(out->m_col2.m_quad, 1) = XFNV_M128_F32(out->m_col1.m_quad, 2);
+    XFNV_M128_F32(out->m_col1.m_quad, 2) = fTmp;
+    XFNV_M128_F32(out->m_col0.m_quad, 3) = XFNV_M128_F32(normalOut->m_quad, 0);
+    XFNV_M128_F32(out->m_col1.m_quad, 3) = XFNV_M128_F32(normalOut->m_quad, 1);
+    XFNV_M128_F32(out->m_col2.m_quad, 3) = XFNV_M128_F32(normalOut->m_quad, 2);
     out->m_col3.m_quad = _mm_setzero_ps();
-    out->m_col3.m_quad[0] = params[4] * -params[0];
+    XFNV_M128_F32(out->m_col3.m_quad, 0) = params[4] * -params[0];
     return out;
 }
 
@@ -751,15 +753,15 @@ float calcPointRelativeVelocity(
     const hkMotionState* r_eax,
     const hkVector4* r_esi
 ) {
-    const float tA =
-        (a5 - a2->m_sweptTransform.m_centerOfMass0.m_quad[3]) * a2->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    const float tA = (a5 - XFNV_M128_F32(a2->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(a2->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     const __m128 bcA = _mm_shuffle_ps(_mm_set_ss(tA), _mm_set_ss(tA), 0);
     const __m128 centerA = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, bcA), a2->m_sweptTransform.m_centerOfMass0.m_quad),
         _mm_mul_ps(a2->m_sweptTransform.m_centerOfMass1.m_quad, bcA)
     );
-    const float tB =
-        (a5 - r_eax->m_sweptTransform.m_centerOfMass0.m_quad[3]) * r_eax->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    const float tB = (a5 - XFNV_M128_F32(r_eax->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(r_eax->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     const __m128 rA = _mm_sub_ps(r_esi->m_quad, centerA);
     const __m128 bcB = _mm_shuffle_ps(_mm_set_ss(tB), _mm_set_ss(tB), 0);
     const __m128 centerB = _mm_add_ps(

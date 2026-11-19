@@ -28,6 +28,7 @@
 #include "Fallout/AI/Actor.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 
@@ -470,7 +471,7 @@ bool BGSEntryPointFunctionDataActivateChoice::Load(TESFile* apFile) {
             }
             else if (pNewVariable) {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 pNewVariable->cName.Set(pBuffer, 0);
             }
@@ -478,7 +479,7 @@ bool BGSEntryPointFunctionDataActivateChoice::Load(TESFile* apFile) {
         case SCDA_ID: {
             uint32_t uiChunkSize = apFile->GetChunkSize();
             // A 16-byte aligned buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
             ourMemset(pBuffer, 0, uiChunkSize);
             apFile->GetChunkData(pBuffer, 0);
             ActivateChoiceScript.SetCompileData(uiChunkSize, pBuffer);
@@ -504,7 +505,7 @@ bool BGSEntryPointFunctionDataActivateChoice::Load(TESFile* apFile) {
         }
         case EPF2_ID: {
             // A 16-byte aligned buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0);
             SetLabel(pBuffer);
             break;

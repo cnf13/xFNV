@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <new>
@@ -41,15 +42,15 @@ void XFNV_TRIANGULATOR_TYP::setDomain(const hkVector4& dmin, const hkVector4& dm
     const float fExt = static_cast<float>(32767.0 - (static_cast<double>(iMargin) + iMargin));
     const float fS = std::sin(angle);
     const float fC = std::cos(angle);
-    const float fSclX = static_cast<float>((static_cast<double>(dmax.m_quad[0]) - dmin.m_quad[0]) / fExt);
-    const float fSclY = static_cast<float>((static_cast<double>(dmax.m_quad[1]) - dmin.m_quad[1]) / fExt);
+    const float fSclX = static_cast<float>((static_cast<double>(XFNV_M128_F32(dmax.m_quad, 0)) - XFNV_M128_F32(dmin.m_quad, 0)) / fExt);
+    const float fSclY = static_cast<float>((static_cast<double>(XFNV_M128_F32(dmax.m_quad, 1)) - XFNV_M128_F32(dmin.m_quad, 1)) / fExt);
     m_localToWorld = hkMatrix4Identity;
-    m_localToWorld.m_col0.m_quad[0] = fC * fSclX;
-    m_localToWorld.m_col1.m_quad[0] = fS * fSclY;
-    m_localToWorld.m_col3.m_quad[0] = dmin.m_quad[0];
-    m_localToWorld.m_col0.m_quad[1] = -fS * fSclX;
-    m_localToWorld.m_col1.m_quad[1] = fC * fSclY;
-    m_localToWorld.m_col3.m_quad[1] = dmin.m_quad[1];
+    XFNV_M128_F32(m_localToWorld.m_col0.m_quad, 0) = fC * fSclX;
+    XFNV_M128_F32(m_localToWorld.m_col1.m_quad, 0) = fS * fSclY;
+    XFNV_M128_F32(m_localToWorld.m_col3.m_quad, 0) = XFNV_M128_F32(dmin.m_quad, 0);
+    XFNV_M128_F32(m_localToWorld.m_col0.m_quad, 1) = -fS * fSclX;
+    XFNV_M128_F32(m_localToWorld.m_col1.m_quad, 1) = fC * fSclY;
+    XFNV_M128_F32(m_localToWorld.m_col3.m_quad, 1) = XFNV_M128_F32(dmin.m_quad, 1);
     m_worldToLocal.setInverse(m_localToWorld, 0.0f);
     reset(true);
 }
@@ -208,7 +209,7 @@ auto XFNV_TRIANGULATOR_TYP::locateVertex(Location* apResult, int32_t x, int32_t 
             "hkgpTriangulator.inl",
             847
         )) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
     // Edge::null().
     apResult->m_type.m_storage = Location::CYCLE;
@@ -288,7 +289,7 @@ auto XFNV_TRIANGULATOR_TYP::locateExistingVertex(Edge* apResult, Edge root, cons
             "hkgpTriangulator.inl",
             847
         )) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
     // Edge::null().
     apResult->m_triangle = nullptr;

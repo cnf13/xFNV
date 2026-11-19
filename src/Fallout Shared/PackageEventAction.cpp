@@ -71,6 +71,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 
@@ -151,7 +152,7 @@ void PackageEventAction::Load(TESFile* apFile) {
                 }
                 else if (pLastVariable) {
                     // A 16-byte aligned stack buffer of the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                     apFile->GetChunkData(pBuffer, 0x200);
                     pLastVariable->cName.Set(pBuffer, 0);
                 }
@@ -172,7 +173,7 @@ void PackageEventAction::Load(TESFile* apFile) {
             case SCDA_ID: {
                 uint32_t uiSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                 ourMemset(pBuffer, 0, uiSize);
                 apFile->GetChunkData(pBuffer, 0);
                 pResultScript->SetCompileData(uiSize, pBuffer);

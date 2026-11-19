@@ -10,6 +10,7 @@
 #include "Havok/Source/Common/Base/Types/Geometry/hkGeometry.h"
 #include "Havok/Source/Common/Base/Types/Geometry/hkStridedVertices.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -35,46 +36,48 @@ uint8_t* diagonalizeSymmetricMatrix3(uint8_t* apResult, __m128* apMatrix, int32_
     }
     if (0.0 != fMax) {
         for (int32_t k = 0; k < 3; ++k) {
-            apMatrix[0][k] = apMatrix[0][k] / fMax;
-            apMatrix[1][k] = apMatrix[1][k] / fMax;
-            apMatrix[2][k] = apMatrix[2][k] / fMax;
+            XFNV_M128_F32(apMatrix[0], k) = XFNV_M128_F32(apMatrix[0], k) / fMax;
+            XFNV_M128_F32(apMatrix[1], k) = XFNV_M128_F32(apMatrix[1], k) / fMax;
+            XFNV_M128_F32(apMatrix[2], k) = XFNV_M128_F32(apMatrix[2], k) / fMax;
         }
     }
-    afDiag[0] = apMatrix[0][0];
-    if (apMatrix[2][0] == 0.0f) {
-        afDiag[1] = apMatrix[1][1];
-        afDiag[2] = apMatrix[2][2];
-        afOff[0] = apMatrix[1][0];
-        afOff[1] = apMatrix[2][1];
+    afDiag[0] = XFNV_M128_F32(apMatrix[0], 0);
+    if (XFNV_M128_F32(apMatrix[2], 0) == 0.0f) {
+        afDiag[1] = XFNV_M128_F32(apMatrix[1], 1);
+        afDiag[2] = XFNV_M128_F32(apMatrix[2], 2);
+        afOff[0] = XFNV_M128_F32(apMatrix[1], 0);
+        afOff[1] = XFNV_M128_F32(apMatrix[2], 1);
         apMatrix[0] = _mm_setzero_ps();
         apMatrix[1] = _mm_setzero_ps();
         apMatrix[2] = _mm_setzero_ps();
         afOff[2] = 0.0f;
-        apMatrix[0][0] = 1.0f;
-        apMatrix[1][1] = 1.0f;
-        apMatrix[2][2] = 1.0f;
+        XFNV_M128_F32(apMatrix[0], 0) = 1.0f;
+        XFNV_M128_F32(apMatrix[1], 1) = 1.0f;
+        XFNV_M128_F32(apMatrix[2], 2) = 1.0f;
     }
     else {
         afOff[2] = 0.0f;
-        const float fLength2 = apMatrix[2][0] * apMatrix[2][0] + apMatrix[1][0] * apMatrix[1][0];
+        const float fLength2 = XFNV_M128_F32(apMatrix[2], 0) * XFNV_M128_F32(apMatrix[2], 0) +
+            XFNV_M128_F32(apMatrix[1], 0) * XFNV_M128_F32(apMatrix[1], 0);
         const float fLength = std::sqrt(fLength2);
-        const float fCos = apMatrix[1][0] / fLength;
-        const float fSin = apMatrix[2][0] / fLength;
-        const float fQ = (apMatrix[2][2] - apMatrix[1][1]) * fSin + (fCos + fCos) * apMatrix[2][1];
+        const float fCos = XFNV_M128_F32(apMatrix[1], 0) / fLength;
+        const float fSin = XFNV_M128_F32(apMatrix[2], 0) / fLength;
+        const float fQ = (XFNV_M128_F32(apMatrix[2], 2) - XFNV_M128_F32(apMatrix[1], 1)) * fSin +
+            (fCos + fCos) * XFNV_M128_F32(apMatrix[2], 1);
         const double dQSin = static_cast<double>(fQ) * fSin;
-        afDiag[1] = apMatrix[1][1] + dQSin;
-        afDiag[2] = apMatrix[2][2] - dQSin;
+        afDiag[1] = XFNV_M128_F32(apMatrix[1], 1) + dQSin;
+        afDiag[2] = XFNV_M128_F32(apMatrix[2], 2) - dQSin;
         afOff[0] = fLength;
-        afOff[1] = apMatrix[2][1] - static_cast<double>(fQ) * fCos;
-        apMatrix[0][0] = 1.0f;
-        apMatrix[1][0] = 0.0f;
-        apMatrix[2][0] = 0.0f;
-        apMatrix[0][1] = 0.0f;
-        apMatrix[0][2] = 0.0f;
-        apMatrix[1][1] = fCos;
-        apMatrix[2][1] = fSin;
-        apMatrix[1][2] = fSin;
-        apMatrix[2][2] = -fCos;
+        afOff[1] = XFNV_M128_F32(apMatrix[2], 1) - static_cast<double>(fQ) * fCos;
+        XFNV_M128_F32(apMatrix[0], 0) = 1.0f;
+        XFNV_M128_F32(apMatrix[1], 0) = 0.0f;
+        XFNV_M128_F32(apMatrix[2], 0) = 0.0f;
+        XFNV_M128_F32(apMatrix[0], 1) = 0.0f;
+        XFNV_M128_F32(apMatrix[0], 2) = 0.0f;
+        XFNV_M128_F32(apMatrix[1], 1) = fCos;
+        XFNV_M128_F32(apMatrix[2], 1) = fSin;
+        XFNV_M128_F32(apMatrix[1], 2) = fSin;
+        XFNV_M128_F32(apMatrix[2], 2) = -fCos;
     }
     int32_t iLow = 0;
     for (int32_t iRemaining = 2; iRemaining > -1; --iRemaining, ++iLow) {
@@ -128,9 +131,9 @@ uint8_t* diagonalizeSymmetricMatrix3(uint8_t* apResult, __m128* apMatrix, int32_
                     afDiag[i + 1] = fG + fP;
                     fG = fRot * fCos - fB;
                     for (int32_t k = 0; k < 3; ++k) {
-                        const float fZ = apMatrix[i + 1][k];
-                        apMatrix[i + 1][k] = fCos * fZ + apMatrix[i][k] * fSin;
-                        apMatrix[i][k] = apMatrix[i][k] * fCos - fZ * fSin;
+                        const float fZ = XFNV_M128_F32(apMatrix[i + 1], k);
+                        XFNV_M128_F32(apMatrix[i + 1], k) = fCos * fZ + XFNV_M128_F32(apMatrix[i], k) * fSin;
+                        XFNV_M128_F32(apMatrix[i], k) = XFNV_M128_F32(apMatrix[i], k) * fCos - fZ * fSin;
                     }
                 }
                 afDiag[iLow] = afDiag[iLow] - fP;
@@ -163,7 +166,8 @@ uint8_t* calcEigenVectors(uint8_t* a1, __m128* a2, __m128* a3, __m128* a4, __m12
             ),
             v14
         );
-        if ((_mm_shuffle_ps(v15, v15, 170)[0] + (_mm_shuffle_ps(v15, v15, 85)[0] + v15[0])) < 0.0f) {
+        if ((XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v15, v15, 85), 0) + XFNV_M128_F32(v15, 0))) < 0.0f) {
             *a5 = _mm_xor_ps(v14, hkQuadRealNegateMask);
         }
         return a1;
@@ -173,20 +177,20 @@ uint8_t* calcEigenVectors(uint8_t* a1, __m128* a2, __m128* a3, __m128* a4, __m12
     __m128 v6 = _mm_undefined_ps();
     __m128 v7 = _mm_undefined_ps();
     __m128 v8 = _mm_undefined_ps();
-    v7[0] = 0.0f;
-    v8[0] = 0.0f;
-    v5[0] = 1.0f;
-    v6[0] = 0.0f;
+    XFNV_M128_F32(v7, 0) = 0.0f;
+    XFNV_M128_F32(v8, 0) = 0.0f;
+    XFNV_M128_F32(v5, 0) = 1.0f;
+    XFNV_M128_F32(v6, 0) = 0.0f;
     __m128 v9 = _mm_unpacklo_ps(v6, v8);
     __m128 v10 = _mm_unpacklo_ps(_mm_unpacklo_ps(v5, v7), v9);
     *a3 = v10;
-    v10[0] = 0.0f;
-    v9[0] = 1.0f;
+    XFNV_M128_F32(v10, 0) = 0.0f;
+    XFNV_M128_F32(v9, 0) = 1.0f;
     __m128 v12 = _mm_unpacklo_ps(v9, v8);
     __m128 v13 = _mm_unpacklo_ps(_mm_unpacklo_ps(v10, v7), v12);
     *a4 = v13;
-    v13[0] = 0.0f;
-    v12[0] = 0.0f;
+    XFNV_M128_F32(v13, 0) = 0.0f;
+    XFNV_M128_F32(v12, 0) = 0.0f;
     *a5 = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v13, _mm_set_ss(std::bit_cast<float>(0x3F800000u))),
         _mm_unpacklo_ps(v12, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
@@ -546,8 +550,12 @@ hkSphere* calcSphereFrom4Points(
     const __m128 kAC = _mm_sub_ps(apC->m_quad, kA);
     const __m128 kAD = _mm_sub_ps(apD->m_quad, kA);
     const float fDeterminant =
-        ((kAD[2] * kAC[1] - kAD[1] * kAC[2]) * kAB[0] - (kAD[2] * kAC[0] - kAC[2] * kAD[0]) * kAB[1]) +
-        (kAD[1] * kAC[0] - kAC[1] * kAD[0]) * kAB[2];
+        ((XFNV_M128_F32(kAD, 2) * XFNV_M128_F32(kAC, 1) - XFNV_M128_F32(kAD, 1) * XFNV_M128_F32(kAC, 2)) *
+             XFNV_M128_F32(kAB, 0) -
+         (XFNV_M128_F32(kAD, 2) * XFNV_M128_F32(kAC, 0) - XFNV_M128_F32(kAC, 2) * XFNV_M128_F32(kAD, 0)) *
+             XFNV_M128_F32(kAB, 1)) +
+        (XFNV_M128_F32(kAD, 1) * XFNV_M128_F32(kAC, 0) - XFNV_M128_F32(kAC, 1) * XFNV_M128_F32(kAD, 0)) *
+            XFNV_M128_F32(kAB, 2);
     const float fScale = 0.5 / fDeterminant;
     const __m128 kADSq = _mm_mul_ps(kAD, kAD);
     const __m128 kACSq = _mm_mul_ps(kAC, kAC);
@@ -1007,7 +1015,7 @@ done:
 
 void hkGeometryUtility::expandPlanes(hkArray<hkVector4>& planeEquations, float byDistance) {
     for (hkVector4& plane : planeEquations) {
-        plane.m_quad[3] -= byDistance;
+        XFNV_M128_F32(plane.m_quad, 3) -= byDistance;
     }
 }
 
@@ -1045,9 +1053,9 @@ hkSphere hkGeometryUtility::createMinBoundingSphere(const hkStridedVertices& str
     int32_t iStride = stridedVertsIn.m_striding / 4;
     int32_t iOffset = 0;
     for (int32_t i = 0; i < stridedVertsIn.m_numVertices; ++i) {
-        pPoints[i].m_quad[0] = stridedVertsIn.m_vertices[iOffset];
-        pPoints[i].m_quad[1] = stridedVertsIn.m_vertices[iOffset + 1];
-        pPoints[i].m_quad[2] = stridedVertsIn.m_vertices[iOffset + 2];
+        XFNV_M128_F32(pPoints[i].m_quad, 0) = stridedVertsIn.m_vertices[iOffset];
+        XFNV_M128_F32(pPoints[i].m_quad, 1) = stridedVertsIn.m_vertices[iOffset + 1];
+        XFNV_M128_F32(pPoints[i].m_quad, 2) = stridedVertsIn.m_vertices[iOffset + 2];
         iOffset += iStride;
     }
     hkSphere kSphere;
@@ -1223,14 +1231,14 @@ void hkGeometryUtility::calcObb(
 void hkPseudoRandomGenerator::getRandomVector01(hkVector4& vecOut) {
     uint32_t v3 = 0x19660D * m_current + 0x3C6EF35F;
     m_current = v3;
-    vecOut.m_quad[0] = static_cast<double>(v3) * 2.3283064365386963e-10;
+    XFNV_M128_F32(vecOut.m_quad, 0) = static_cast<double>(v3) * 2.3283064365386963e-10;
     uint32_t vecOuta = 0x19660D * m_current + 0x3C6EF35F;
     m_current = vecOuta;
-    vecOut.m_quad[1] = static_cast<double>(vecOuta) * 2.3283064365386963e-10;
+    XFNV_M128_F32(vecOut.m_quad, 1) = static_cast<double>(vecOuta) * 2.3283064365386963e-10;
     uint32_t vecOutb = 0x19660D * m_current + 0x3C6EF35F;
     m_current = vecOutb;
-    vecOut.m_quad[2] = static_cast<double>(vecOutb) * 2.3283064365386963e-10;
+    XFNV_M128_F32(vecOut.m_quad, 2) = static_cast<double>(vecOutb) * 2.3283064365386963e-10;
     uint32_t vecOutc = 0x19660D * m_current + 0x3C6EF35F;
     m_current = vecOutc;
-    vecOut.m_quad[3] = 2.3283064365386963e-10 * static_cast<double>(vecOutc);
+    XFNV_M128_F32(vecOut.m_quad, 3) = 2.3283064365386963e-10 * static_cast<double>(vecOutc);
 }

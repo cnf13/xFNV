@@ -28,6 +28,7 @@
 #include "Havok/Source/Physics/Collide/Util/Welding/hkpWeldingUtility.h"
 #include "Havok/Source/Physics/Collide/Util/hkpTriangleUtil.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -544,11 +545,20 @@ const hkpShape* hkpMeshShape::getChildShape(uint32_t key, char (&buffer)[512]) c
         );
     }
     hkVector4 v0;
-    v0.set(pV0[0] * m_scaling.m_quad[0], pV0[1] * m_scaling.m_quad[1], pV0[2] * m_scaling.m_quad[2], 0.0f);
+    v0.set(
+        pV0[0] * XFNV_M128_F32(m_scaling.m_quad, 0), pV0[1] * XFNV_M128_F32(m_scaling.m_quad, 1),
+        pV0[2] * XFNV_M128_F32(m_scaling.m_quad, 2), 0.0f
+    );
     hkVector4 v1;
-    v1.set(m_scaling.m_quad[0] * pV1[0], pV1[1] * m_scaling.m_quad[1], pV1[2] * m_scaling.m_quad[2], 0.0f);
+    v1.set(
+        XFNV_M128_F32(m_scaling.m_quad, 0) * pV1[0], pV1[1] * XFNV_M128_F32(m_scaling.m_quad, 1),
+        pV1[2] * XFNV_M128_F32(m_scaling.m_quad, 2), 0.0f
+    );
     hkVector4 v2;
-    v2.set(m_scaling.m_quad[0] * pV2[0], pV2[1] * m_scaling.m_quad[1], pV2[2] * m_scaling.m_quad[2], 0.0f);
+    v2.set(
+        XFNV_M128_F32(m_scaling.m_quad, 0) * pV2[0], pV2[1] * XFNV_M128_F32(m_scaling.m_quad, 1),
+        pV2[2] * XFNV_M128_F32(m_scaling.m_quad, 2), 0.0f
+    );
     const uint16_t weldingInfo =
         m_weldingInfo.m_size == 0 ? 0 : m_weldingInfo.m_data[part.m_triangleOffset + triangleIndex];
     hkpTriangleShape* pTriangle = nullptr;
@@ -579,9 +589,9 @@ void hkpMeshShape::addToAabb(
     uint32_t v7;
     hkVector4 a3;
     hkVector4 v9;
-    *reinterpret_cast<float*>(&v5) = *apVertex * scaling.m_quad[0];
-    *reinterpret_cast<float*>(&v6) = apVertex[1] * scaling.m_quad[1];
-    *reinterpret_cast<float*>(&v7) = apVertex[2] * scaling.m_quad[2];
+    *reinterpret_cast<float*>(&v5) = *apVertex * XFNV_M128_F32(scaling.m_quad, 0);
+    *reinterpret_cast<float*>(&v6) = apVertex[1] * XFNV_M128_F32(scaling.m_quad, 1);
+    *reinterpret_cast<float*>(&v7) = apVertex[2] * XFNV_M128_F32(scaling.m_quad, 2);
     a3.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v5)), _mm_set_ss(std::bit_cast<float>(v7))),
         _mm_unpacklo_ps(

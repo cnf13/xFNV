@@ -9,6 +9,8 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Chain/RagdollLimits/hkpRagdollLimitsData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
 
+#include <cmath>
+
 // The vector code is written as SSE lane operations with intrinsics, each product's operands in a fixed order. The
 // normalize3 Newton step's constants 0.0, 3.0 and 0.5 are the SDK's. The draw sizes and the cone angles are floats;
 // pi/2 is the double 1.5707963705062866. The first two geometry arrays get clearAndDeallocate (their data and capacity
@@ -74,14 +76,14 @@ void hkpRagdollLimitsDrawer::drawConstraint(
     const float planeMinAngle = limits->m_atoms.m_planesLimit.m_minAngle;
     // EXE-INLINED none: hkpConstraintDrawer::getConeSizeForDraw
     coneSize = m_scale * m_coneSize;
-    const float absMaxAngle = __builtin_fabsf(limits->m_atoms.m_planesLimit.m_maxAngle);
+    const float absMaxAngle = std::fabsf(limits->m_atoms.m_planesLimit.m_maxAngle);
     float coneAngle = static_cast<float>(1.5707963705062866 - absMaxAngle);
     m_planeCone1.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);
 
     // EXE-INLINED none: hkpConstraintDrawer::getConeSizeForDraw
     coneSize = m_scale * m_coneSize;
     refPlaneNormalWorld.setNeg4(refPlaneNormalWorld);
-    const float absMinAngle = __builtin_fabsf(planeMinAngle);
+    const float absMinAngle = std::fabsf(planeMinAngle);
     coneAngle = static_cast<float>(1.5707963705062866 - absMinAngle);
     m_planeCone2.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);
 

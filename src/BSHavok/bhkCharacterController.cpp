@@ -128,11 +128,11 @@
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 #include "SDK/MSVC/ehvec.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
 #include <cstdint>
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 namespace bhkConvert {} // namespace bhkConvert
@@ -180,27 +180,27 @@ bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRa
     float v24 = fBS2HkScaleSC * afRadius;
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
     hkArrayUtil::_reserve(*m_heap, &a2, 18, sizeof(hkVector4));
-    v27[0] = arBottom.x * fBS2HkScaleSC;
-    v27[1] = arBottom.y * fBS2HkScaleSC;
-    v27[2] = fBS2HkScaleSC * arBottom.z;
-    v27[3] = 0.0f;
-    v27[2] = v27[2] - v24;
+    XFNV_M128_F32(v27, 0) = arBottom.x * fBS2HkScaleSC;
+    XFNV_M128_F32(v27, 1) = arBottom.y * fBS2HkScaleSC;
+    XFNV_M128_F32(v27, 2) = fBS2HkScaleSC * arBottom.z;
+    XFNV_M128_F32(v27, 3) = 0.0f;
+    XFNV_M128_F32(v27, 2) = XFNV_M128_F32(v27, 2) - v24;
     hkMemoryAllocator* v6 = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t m_size = a2.m_size;
     if (a2.m_size == (a2.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
         hkArrayUtil::_reserveMore(*v6, &a2, sizeof(hkVector4));
         m_size = a2.m_size;
     }
-    double v8 = afStepHeight + 0.10000000149011612 + v27[2];
+    double v8 = afStepHeight + 0.10000000149011612 + XFNV_M128_F32(v27, 2);
     a2.m_data[m_size].m_quad = v27;
     ++a2.m_size;
     uint32_t v9 = 0;
-    v27[2] = v8;
+    XFNV_M128_F32(v27, 2) = v8;
     do {
         double v10 = fCircleX[v9];
         v28.m_quad = v27;
-        v28.m_quad[0] = v10 * v24 + v27[0];
-        v28.m_quad[1] = v24 * fCircleY[v9] + v27[1];
+        XFNV_M128_F32(v28.m_quad, 0) = v10 * v24 + XFNV_M128_F32(v27, 0);
+        XFNV_M128_F32(v28.m_quad, 1) = v24 * fCircleY[v9] + XFNV_M128_F32(v27, 1);
         hkMemoryAllocator* v11 = (&hkMemoryRouter::getInstance())->m_heap;
         int32_t v12 = a2.m_size;
         if (a2.m_size == (a2.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
@@ -213,18 +213,18 @@ bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRa
     }
     while (v9 < 8);
     uint32_t v13 = 0;
-    v27[0] = arTop.x * fBS2HkScaleSC;
-    v27[1] = arTop.y * fBS2HkScaleSC;
-    v27[2] = fBS2HkScaleSC * arTop.z;
-    v27[3] = 0.0f;
+    XFNV_M128_F32(v27, 0) = arTop.x * fBS2HkScaleSC;
+    XFNV_M128_F32(v27, 1) = arTop.y * fBS2HkScaleSC;
+    XFNV_M128_F32(v27, 2) = fBS2HkScaleSC * arTop.z;
+    XFNV_M128_F32(v27, 3) = 0.0f;
     double v14 = v24;
     double v26 = 0.5 * v24;
-    v27[2] = v26 + v27[2];
+    XFNV_M128_F32(v27, 2) = v26 + XFNV_M128_F32(v27, 2);
     while (true) {
         double v15 = fCircleX[v13] * v14;
         v28.m_quad = v27;
-        v28.m_quad[0] = v15;
-        v28.m_quad[1] = v14 * fCircleY[v13];
+        XFNV_M128_F32(v28.m_quad, 0) = v15;
+        XFNV_M128_F32(v28.m_quad, 1) = v14 * fCircleY[v13];
         hkMemoryAllocator* v16 = (&hkMemoryRouter::getInstance())->m_heap;
         int32_t v17 = a2.m_size;
         if (a2.m_size == (a2.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
@@ -239,7 +239,7 @@ bhkShape* MakeConvex(const NiPoint3& arTop, const NiPoint3& arBottom, float afRa
         }
         v14 = v24;
     }
-    v27[2] = v27[2] + v26;
+    XFNV_M128_F32(v27, 2) = XFNV_M128_F32(v27, 2) + v26;
     hkMemoryAllocator* v18 = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v19 = a2.m_size;
     if (a2.m_size == (a2.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
@@ -432,10 +432,10 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
             pVelocity = &NiPoint3_ZERO;
         }
         const float fScale = fBS2HkScaleSC;
-        OutVelocity.m_quad[0] = pVelocity->x * fScale;
-        OutVelocity.m_quad[1] = pVelocity->y * fScale;
-        OutVelocity.m_quad[2] = fScale * pVelocity->z;
-        OutVelocity.m_quad[3] = 0.0f;
+        XFNV_M128_F32(OutVelocity.m_quad, 0) = pVelocity->x * fScale;
+        XFNV_M128_F32(OutVelocity.m_quad, 1) = pVelocity->y * fScale;
+        XFNV_M128_F32(OutVelocity.m_quad, 2) = fScale * pVelocity->z;
+        XFNV_M128_F32(OutVelocity.m_quad, 3) = 0.0f;
         HK_TIMER_END();
         return MOVE_OK;
     }
@@ -510,7 +510,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
         kPitch.setAxisAngle(kAxis, arData.Angle.x);
         Direction.setRotatedDir(kPitch, Direction);
     }
-    RotCenter.m_quad[2] = fCenter;
+    XFNV_M128_F32(RotCenter.m_quad, 2) = fCenter;
     const uint32_t uiPitchFlags = iFlags;
     hkVector4 kForward;
     _mm_store_ps(&reinterpret_cast<float*>(&kForward.m_quad)[0], _mm_setr_ps(0.0f, -1.0f, 0.0f, 0.0f));
@@ -540,7 +540,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
         gElevator = nullptr;
         OutVelocity = GethkLinearVelocity();
         if (bNoMove && hkpCharacterContext::getState() != HK_CHARACTER_IN_AIR) {
-            OutVelocity.m_quad[2] = 0.0f;
+            XFNV_M128_F32(OutVelocity.m_quad, 2) = 0.0f;
         }
         if (arData.bVisible || hkpCharacterContext::getState() != HK_CHARACTER_ON_GROUND ||
             !(*pDisplacement == NiPoint3_ZERO) || hkSupportNorm.equals4(hkVector4Zero, 0.001f)) {
@@ -555,7 +555,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
                 if (!bSupport && !((uiSupportFlags >> 9) & 1)) {
                     iFlags &= ~JUMPING;
                 }
-                else if (OutVelocity.m_quad[2] <= 0.0f) {
+                else if (XFNV_M128_F32(OutVelocity.m_quad, 2) <= 0.0f) {
                     // A NaN z fails the zero test and goes on to the speed, as the game does.
                     iFlags &= ~JUMPING;
                 }
@@ -566,7 +566,8 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
                     if (fSpeed > 0.0f) {
                         const float fInvSpeed = 1.0f / fSpeed;
                         // Tests fMaxSlope <= the normal's z; a NaN fails the test.
-                        if (bSupport && ((uiSupportFlags >> 9) & 1) && fMaxSlope <= hkSupportNorm.m_quad[2]) {
+                        if (bSupport && ((uiSupportFlags >> 9) & 1) &&
+                            fMaxSlope <= XFNV_M128_F32(hkSupportNorm.m_quad, 2)) {
                             const __m128 kDir = _mm_mul_ps(
                                 _mm_mul_ps(_mm_set1_ps(fInvSpeed), kVel),
                                 _mm_load_ps(&reinterpret_cast<float*>(&hkSupportNorm.m_quad)[0])
@@ -605,7 +606,8 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
         // z integrates.
         uint8_t bIntegrate = 1;
         if (bNoMove && hkpCharacterContext::getState() != HK_CHARACTER_IN_AIR &&
-            (hkpCharacterContext::getState() != HK_CHARACTER_USER_STATE_0 || 0.0f == OutVelocity.m_quad[2]) &&
+            (hkpCharacterContext::getState() != HK_CHARACTER_USER_STATE_0 ||
+             0.0f == XFNV_M128_F32(OutVelocity.m_quad, 2)) &&
             pCharProxy->GetCdPoints()->m_size <= LastManifold.m_size) {
             uint8_t bChanged = 0;
             int32_t iPoint = 0;
@@ -657,8 +659,8 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
             UnMarkWrite();
             hkpCharacterProxy* pProxy = **this;
             hkVector4 kPosition = pProxy->getPosition();
-            const float fRise = gElevator->m_motion.m_linearVelocity.m_quad[2] * StepInfo.m_deltaTime;
-            kPosition.m_quad[2] = RotCenter.m_quad[2] + gHeightOfFloor + fRise;
+            const float fRise = XFNV_M128_F32(gElevator->m_motion.m_linearVelocity.m_quad, 2) * StepInfo.m_deltaTime;
+            XFNV_M128_F32(kPosition.m_quad, 2) = XFNV_M128_F32(RotCenter.m_quad, 2) + gHeightOfFloor + fRise;
             pProxy->setPosition(kPosition);
             UnMarkWrite();
         }
@@ -918,7 +920,7 @@ void bhkCharacterController::processConstraintsCallback(
             pbody->m_motion.m_type.m_storage == hkpMotion::MOTION_KEYFRAMED && !gElevator) {
             hkVector4 stepPos;
             GetPosition_hk(stepPos);
-            stepPos.m_quad[2] = fStepHeight + stepPos.m_quad[2];
+            XFNV_M128_F32(stepPos.m_quad, 2) = fStepHeight + XFNV_M128_F32(stepPos.m_quad, 2);
             const float fcontactZ =
                 _mm_cvtss_f32(_mm_shuffle_ps(rpnt.m_contact.m_position.m_quad, rpnt.m_contact.m_position.m_quad, 0xAA));
             const float fstepZ = _mm_cvtss_f32(_mm_shuffle_ps(stepPos.m_quad, stepPos.m_quad, 0xAA));
@@ -1107,7 +1109,7 @@ void bhkCharacterController::processConstraintsCallback(
                     if (!(iFlags & (CHASEBIP | FOLLOWRAGDOLL))) {
                         rsurface.m_dynamicFriction = 0.0f;
                     }
-                    tempSupportNormal.m_quad[2] = 1.0f;
+                    XFNV_M128_F32(tempSupportNormal.m_quad, 2) = 1.0f;
                     iFlags |= TRY_STEP | CANJUMP;
                     tempSupportNormal.normalize3();
                     rsurface.m_plane.m_quad = tempSupportNormal.m_quad;
@@ -1122,7 +1124,7 @@ void bhkCharacterController::processConstraintsCallback(
                         hkpSurfaceConstraintInfo* newConstraint = &arInput.m_constraints[arInput.m_numConstraints];
                         hkpSurfaceConstraintInfo::Assign(newConstraint, rsurface);
                         newConstraint->m_velocity.m_quad = kZero.m_quad;
-                        newConstraint->m_plane.m_quad[2] = 0.0f;
+                        XFNV_M128_F32(newConstraint->m_plane.m_quad, 2) = 0.0f;
                         newConstraint->m_plane.normalize3();
                         ++inewConstraintsAdded;
                         ++arInput.m_numConstraints;
@@ -1183,7 +1185,7 @@ void bhkCharacterController::processConstraintsCallback(
                         rsurface.m_velocity.m_quad = kZero.m_quad;
                     }
                     else {
-                        rsurface.m_plane.m_quad[2] = 0.0f;
+                        XFNV_M128_F32(rsurface.m_plane.m_quad, 2) = 0.0f;
                         rsurface.m_plane.normalize3IfNotZero();
                     }
                     break;
@@ -1230,14 +1232,14 @@ void bhkCharacterController::characterInteractionCallback(
     // The contact's normal, flattened and normalised when its squared length is above zero.
     hkVector4 kNormal;
     kNormal.m_quad = arContact.m_separatingNormal.m_quad;
-    kNormal.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kNormal.m_quad, 2) = 0.0f;
     if (kNormal.dot3(kNormal) > 0.0f) {
         kNormal.normalize3();
     }
     // This character's horizontal speed, 20 more while it is resizing; the push is a quarter of it, backwards.
     hkVector4 kVelocity;
     kVelocity.m_quad = GethkLinearVelocity().m_quad;
-    kVelocity.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kVelocity.m_quad, 2) = 0.0f;
     const __m128 sqV = _mm_mul_ps(kVelocity.m_quad, kVelocity.m_quad);
     float fSpeed = _mm_cvtss_f32(
         _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sqV, sqV, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqV, sqV, 0x55), sqV)))
@@ -1260,10 +1262,10 @@ void bhkCharacterController::characterInteractionCallback(
     hkVector4 kDiff;
     kDiff.m_quad = arContact.m_position.m_quad;
     kDiff.m_quad = _mm_sub_ps(kDiff.m_quad, pcc->GethkPosition().m_quad);
-    kDiff.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kDiff.m_quad, 2) = 0.0f;
     hkVector4 kProj;
     kProj.m_quad = pcc->ForwardVec.m_quad;
-    kProj.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kProj.m_quad, 2) = 0.0f;
     kProj.normalize3();
     const float fAlong = kProj.dot3(kDiff);
     kProj.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fAlong), _mm_set_ss(fAlong), 0), kProj.m_quad);
@@ -1275,11 +1277,11 @@ void bhkCharacterController::characterInteractionCallback(
     // The contact's flattened normal, normalised.
     hkVector4 kSepNormal;
     kSepNormal.m_quad = arContact.m_separatingNormal.m_quad;
-    kSepNormal.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kSepNormal.m_quad, 2) = 0.0f;
     kSepNormal.normalize3();
     // How fast this character moves against the contact normal, horizontally (0 when it stands still).
     kVelocity.m_quad = GethkLinearVelocity().m_quad;
-    kVelocity.m_quad[2] = 0.0f;
+    XFNV_M128_F32(kVelocity.m_quad, 2) = 0.0f;
     float fApproach = 0.0f;
     const __m128 sqW = _mm_mul_ps(kVelocity.m_quad, kVelocity.m_quad);
     const float fLen2 =
@@ -1307,7 +1309,7 @@ void bhkCharacterController::characterInteractionCallback(
             )
         );
         float fTurnSpeed = fClamped;
-        if (cross[2] > 0.0f) {
+        if (XFNV_M128_F32(cross, 2) > 0.0f) {
             fTurnSpeed = fTurnSpeed * -1.0;
         }
         const float fRotation = fTurnSpeed + fTurnSpeed;
@@ -1327,9 +1329,10 @@ void bhkCharacterController::objectInteractionCallback(
     float v25;
     float Mass = arInput.m_body->m_motion.getMass();
     __m128 v5 = _mm_mul_ps(arOutput.m_objectImpulse.m_quad, arOutput.m_objectImpulse.m_quad);
-    float v6 = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v5, v5, 170)[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]))))
-    );
+    float v6 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0)))
+    )));
     float v23 = v6;
     if (!(Mass > 0.0f) || !(bhkCharacterListener::fMoveLimitMass > static_cast<double>(Mass))) {
         arOutput.m_objectImpulse.m_quad = _mm_setzero_ps();
@@ -1367,20 +1370,20 @@ LABEL_11:;
         hkVector4 v26;
         GetPosition_hk(v26);
         v26.m_quad = _mm_sub_ps(arInput.m_position.m_quad, v26.m_quad);
-        if (fHeight * 0.8999999761581421 < v26.m_quad[2]) {
+        if (fHeight * 0.8999999761581421 < XFNV_M128_F32(v26.m_quad, 2)) {
             hkVector4 v10;
             __m128 v15 = _mm_undefined_ps();
             v10.m_quad = OutVelocity.m_quad;
             __m128 v11 = _mm_mul_ps(v10.m_quad, v10.m_quad);
-            float v12 = _mm_shuffle_ps(v11, v11, 85)[0] + v11[0];
+            float v12 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0);
             __m128 v13 = _mm_shuffle_ps(v11, v11, 170);
-            v13[0] = v13[0] + v12;
-            float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
-            v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+            XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
+            float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v13, 0))));
+            XFNV_M128_F32(v15, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
             __m128 v16 = _mm_cmpeq_ss(v13, v15);
-            v15[0] = 3.0f - ((v13[0] * v14) * v14);
+            XFNV_M128_F32(v15, 0) = 3.0f - ((XFNV_M128_F32(v13, 0) * v14) * v14);
             __m128 v17 = _mm_setzero_ps();
-            v17[0] = (0.5f * v14) * v15[0];
+            XFNV_M128_F32(v17, 0) = (0.5f * v14) * XFNV_M128_F32(v15, 0);
             __m128 v18 = _mm_andnot_ps(v16, v17);
             arOutput.m_objectImpulse.m_quad = _mm_mul_ps(
                 _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), v10.m_quad), _mm_shuffle_ps(_mm_set_ss(v23), _mm_set_ss(v23), 0)
@@ -1824,18 +1827,19 @@ void bhkCharacterController::SetLinearVelocityNi(const NiPoint3& arVelocity) {
 void bhkCharacterController::SetVelocityModifier(const NiPoint3& arVelocity, float afTime) {
     uint32_t v8;
     __m128 v9;
-    v9[0] = arVelocity.x * fBS2HkScaleSC;
-    v9[1] = arVelocity.y * fBS2HkScaleSC;
-    v9[2] = fBS2HkScaleSC * arVelocity.z;
-    v9[3] = 0.0f;
+    XFNV_M128_F32(v9, 0) = arVelocity.x * fBS2HkScaleSC;
+    XFNV_M128_F32(v9, 1) = arVelocity.y * fBS2HkScaleSC;
+    XFNV_M128_F32(v9, 2) = fBS2HkScaleSC * arVelocity.z;
+    XFNV_M128_F32(v9, 3) = 0.0f;
     *reinterpret_cast<float*>(&v8) = 1.0 / afTime;
     __m128 v3 =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v8)), _mm_set_ss(std::bit_cast<float>(v8)), 0), v9);
     __m128 v4 = _mm_mul_ps(v3, v3);
-    float v5 = _mm_shuffle_ps(v4, v4, 85)[0] + v4[0];
-    float v6 = _mm_shuffle_ps(v4, v4, 170)[0];
+    float v5 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0);
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 170), 0);
     __m128 v7 = _mm_mul_ps(VelocityMod.m_quad, VelocityMod.m_quad);
-    if ((_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0])) < static_cast<double>((v6 + v5))) {
+    if ((XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0))) < static_cast<double>((v6 + v5))) {
         fVelocityTime = afTime;
         VelocityMod.m_quad = v3;
     }
@@ -2133,12 +2137,12 @@ void bhkCharacterController::CalculatePitchAndRoll() {
             if (1.1754944e-38f == fBack) {
                 alignas(16) hkVector4 kPoint;
                 FindSupportPoint(0, kPoint);
-                fBack = kPoint.m_quad[2];
+                fBack = XFNV_M128_F32(kPoint.m_quad, 2);
             }
             if (1.1754944e-38f == fFront) {
                 alignas(16) hkVector4 kPoint;
                 FindSupportPoint(1, kPoint);
-                fFront = kPoint.m_quad[2];
+                fFront = XFNV_M128_F32(kPoint.m_quad, 2);
             }
             float fDelta = fFront - fBack;
             float fAngle;
@@ -2177,12 +2181,12 @@ void bhkCharacterController::CalculatePitchAndRoll() {
         if (1.1754944e-38f == fLeft) {
             alignas(16) hkVector4 kPoint;
             FindSupportPoint(2, kPoint);
-            fLeft = kPoint.m_quad[2];
+            fLeft = XFNV_M128_F32(kPoint.m_quad, 2);
         }
         if (1.1754944e-38f == fRight) {
             alignas(16) hkVector4 kPoint;
             FindSupportPoint(3, kPoint);
-            fRight = kPoint.m_quad[2];
+            fRight = XFNV_M128_F32(kPoint.m_quad, 2);
         }
         float fDelta = fRight - fLeft;
         float fAngle;
@@ -2221,7 +2225,7 @@ void bhkCharacterController::CalculatePitchAndRoll() {
     float fLimit = (float)(fMaxSlopeDefault * 0.01745329238474369);
     uint32_t uiFlags2 = iFlags;
     if ((uiFlags2 >> 26) & 1) {
-        float fTilt = (float)(kNormal.m_quad[0] * -1.0);
+        float fTilt = (float)(XFNV_M128_F32(kNormal.m_quad, 0) * -1.0);
         float fClamped = (fTilt < fLimit) ? fTilt : fLimit;
         float fNegLimit = -fLimit;
         fClamped = (fNegLimit < fClamped) ? fClamped : fNegLimit;
@@ -2234,7 +2238,7 @@ void bhkCharacterController::CalculatePitchAndRoll() {
         }
     }
     if ((uiFlags2 >> 25) & 1) {
-        float fTilt = kNormal.m_quad[1];
+        float fTilt = XFNV_M128_F32(kNormal.m_quad, 1);
         float fClamped = (fTilt < fLimit) ? fTilt : fLimit;
         float fNegLimit = -fLimit;
         fClamped = (fNegLimit < fClamped) ? fClamped : fNegLimit;
@@ -2267,9 +2271,9 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     pickRes.bPickFailed = false;
     v4.m_quad = FrontBack[aiFrontBack].m_quad;
     arPos.m_quad = v4.m_quad;
-    double v5 = arPos.m_quad[2] - 25.0;
+    double v5 = XFNV_M128_F32(arPos.m_quad, 2) - 25.0;
     pickRes.m_from.m_quad = v4.m_quad;
-    arPos.m_quad[2] = v5;
+    XFNV_M128_F32(arPos.m_quad, 2) = v5;
     pickRes.hkLength.m_quad = hkVector4Zero.m_quad;
     v6.m_quad = arPos.m_quad;
     pickRes.pCloseCollector = static_cast<SpecificItemCollector*>(&v13);
@@ -2293,7 +2297,8 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     }
     if (pw->PickObject(pickRes)) {
         *reinterpret_cast<float*>(&iflt.iFilter) = 1.0 - v13.m_rayHit.m_hitFraction;
-        arPos.m_quad[2] = *reinterpret_cast<float*>(&iflt.iFilter) * 25.0 + arPos.m_quad[2];
+        XFNV_M128_F32(arPos.m_quad, 2) =
+            *reinterpret_cast<float*>(&iflt.iFilter) * 25.0 + XFNV_M128_F32(arPos.m_quad, 2);
     }
 }
 
@@ -2471,8 +2476,8 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                             v2 = this;
                             v8 = stSizeInBytes;
                             NiPointer<bhkShape>* spShapes = this->spShapes;
-                            this->RotCenter.m_quad[0] = v130 * v70;
-                            v2->RotCenter.m_quad[1] = v131 * v70;
+                            XFNV_M128_F32(this->RotCenter.m_quad, 0) = v130 * v70;
+                            XFNV_M128_F32(v2->RotCenter.m_quad, 1) = v131 * v70;
                             if (*spShapes) {
                                 v79 = v70;
                             }
@@ -2483,7 +2488,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                                 float v107 = v106 * v70;
                                 float v108 = v107 + (v8->m_keepDistance + v8->m_keepDistance);
                                 v2->fCenter = v108;
-                                v2->RotCenter.m_quad[2] = v108 + v2->RotCenter.m_quad[2];
+                                XFNV_M128_F32(v2->RotCenter.m_quad, 2) = v108 + XFNV_M128_F32(v2->RotCenter.m_quad, 2);
                                 if (v29 == v8->m_contactAngleSensitivity) {
                                     v8->m_contactAngleSensitivity = v70 * v10;
                                 }
@@ -2549,7 +2554,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                         v121 = v31 * stSizeInBytes->m_keepDistance;
                         double v44 = v121;
                         this->fCenter = v121;
-                        this->RotCenter.m_quad[2] = v44 + this->RotCenter.m_quad[2];
+                        XFNV_M128_F32(this->RotCenter.m_quad, 2) = v44 + XFNV_M128_F32(this->RotCenter.m_quad, 2);
                         if (0.0 == stSizeInBytes->m_contactAngleSensitivity) {
                             stSizeInBytes->m_contactAngleSensitivity = v10 * fBS2HkScaleSC;
                         }
@@ -2857,14 +2862,14 @@ void bhkCharacterController::InitFrontBack() {
         kPoint.set(0.0f, fHalfHeight, frad, 0.0f);
         for (int32_t i = 0; i < 2; ++i) {
             FrontBack[i].setTransformedPos(rTransform, kPoint);
-            FrontBack[i].m_quad[2] = fStepHeight + FrontBack[i].m_quad[2];
-            kPoint.m_quad[1] = fNegHalfHeight;
+            XFNV_M128_F32(FrontBack[i].m_quad, 2) = fStepHeight + XFNV_M128_F32(FrontBack[i].m_quad, 2);
+            XFNV_M128_F32(kPoint.m_quad, 1) = fNegHalfHeight;
         }
         kPoint.set(fNegHalfHeight, 0.0f, frad, 0.0f);
         for (int32_t i = 2; i < 4; ++i) {
             FrontBack[i].setTransformedPos(rTransform, kPoint);
-            FrontBack[i].m_quad[2] = FrontBack[i].m_quad[2] + fStepHeight;
-            kPoint.m_quad[0] = fHalfHeight;
+            XFNV_M128_F32(FrontBack[i].m_quad, 2) = XFNV_M128_F32(FrontBack[i].m_quad, 2) + fStepHeight;
+            XFNV_M128_F32(kPoint.m_quad, 0) = fHalfHeight;
         }
     }
 }
@@ -2936,18 +2941,18 @@ void bhkCharacterController::ChangeSize(float afTime) {
             p_m_vertexB = &hkVector4Zero;
         }
         __m128 m_quad = p_m_vertexB->m_quad;
-        v21.m_quad[2] = v21.m_quad[2] - fraddiff;
-        m_quad[2] = fraddiff + p_m_vertexB->m_quad[2];
+        XFNV_M128_F32(v21.m_quad, 2) = XFNV_M128_F32(v21.m_quad, 2) - fraddiff;
+        XFNV_M128_F32(m_quad, 2) = fraddiff + XFNV_M128_F32(p_m_vertexB->m_quad, 2);
         if (phkObject) {
             double v11 = phkObject->m_radius;
             phkObject->m_vertexA.m_quad = v21.m_quad;
-            phkObject->m_vertexA.m_quad[3] = v11;
+            XFNV_M128_F32(phkObject->m_vertexA.m_quad, 3) = v11;
         }
         hkpCapsuleShape* v12 = static_cast<hkpCapsuleShape*>(pcs->phkObject);
         if (v12) {
             double v13 = v12->m_radius;
             v12->m_vertexB.m_quad = m_quad;
-            v12->m_vertexB.m_quad[3] = v13;
+            XFNV_M128_F32(v12->m_vertexB.m_quad, 3) = v13;
         }
         hkpCapsuleShape* v14 = static_cast<hkpCapsuleShape*>(pcs->phkObject);
         if (v14) {
@@ -3116,7 +3121,7 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
         }
         hkVector4 contactPos;
         contactPos.m_quad = arPoint.m_contact.m_position.m_quad;
-        const float fhitz = contactPos.m_quad[2];
+        const float fhitz = XFNV_M128_F32(contactPos.m_quad, 2);
         hkVector4 rayFrom;
         GetPosition_hk(rayFrom);
         if (iFlags & QUADRUPED) {
@@ -3136,36 +3141,36 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
                         _mm_unpacklo_ps(_mm_set_ss(fheight), _mm_set_ss(zero))
                     );
                     if (ui == 1) {
-                        vert.m_quad[1] = vert.m_quad[1] * -1.0;
+                        XFNV_M128_F32(vert.m_quad, 1) = XFNV_M128_F32(vert.m_quad, 1) * -1.0;
                     }
                 }
                 FrontBack[ui].setTransformedPos(rTransform, vert);
-                FrontBack[ui].m_quad[2] = FrontBack[ui].m_quad[2] + fStepHeight;
+                XFNV_M128_F32(FrontBack[ui].m_quad, 2) = XFNV_M128_F32(FrontBack[ui].m_quad, 2) + fStepHeight;
                 diffs[ui].m_quad = _mm_sub_ps(contactPos.m_quad, FrontBack[ui].m_quad);
             }
             const float dist0 = diffs[0].dot3(diffs[0]);
             const float dist1 = diffs[1].dot3(diffs[1]);
             // Picks the back point on a tie or NaN.
             uiclosestFBIdx = (dist1 > dist0) ? 0 : 1;
-            rayFrom.m_quad[0] = FrontBack[uiclosestFBIdx].m_quad[0];
-            rayFrom.m_quad[1] = FrontBack[uiclosestFBIdx].m_quad[1];
+            XFNV_M128_F32(rayFrom.m_quad, 0) = XFNV_M128_F32(FrontBack[uiclosestFBIdx].m_quad, 0);
+            XFNV_M128_F32(rayFrom.m_quad, 1) = XFNV_M128_F32(FrontBack[uiclosestFBIdx].m_quad, 1);
         }
         // The contact's horizontal direction from the feet, normalised.
         hkVector4 contactNorm;
         contactNorm.m_quad = _mm_sub_ps(rayFrom.m_quad, contactPos.m_quad);
-        contactNorm.m_quad[2] = 0.0f;
-        rayFrom.m_quad[2] = rayFrom.m_quad[2] + fStepHeight;
+        XFNV_M128_F32(contactNorm.m_quad, 2) = 0.0f;
+        XFNV_M128_F32(rayFrom.m_quad, 2) = XFNV_M128_F32(rayFrom.m_quad, 2) + fStepHeight;
         contactNorm.normalize3();
-        contactPos.m_quad[2] = rayFrom.m_quad[2];
+        XFNV_M128_F32(contactPos.m_quad, 2) = XFNV_M128_F32(rayFrom.m_quad, 2);
         // How far the contact lies above the raised feet; a contact above them counts only by stair materials.
-        float fhitHeight = fhitz - rayFrom.m_quad[2];
+        float fhitHeight = fhitz - XFNV_M128_F32(rayFrom.m_quad, 2);
         bool bstairMaterialOnly = fhitHeight > 0.0f;
         const float fstepHeightAdjust = fStepHeight / 3.0;
         if (fstepHeightAdjust < fhitHeight) {
             if (!(iFlags & QUADRUPED)) {
                 goto end;
             }
-            fhitHeight = fhitz - FrontBack[uiclosestFBIdx].m_quad[2] + fStepHeight;
+            fhitHeight = fhitz - XFNV_M128_F32(FrontBack[uiclosestFBIdx].m_quad, 2) + fStepHeight;
             if (fhitHeight > 0.0f) {
                 if (fstepHeightAdjust < fhitHeight) {
                     goto end;
@@ -3193,22 +3198,27 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
             hkVector4 endPoints[2];
             endPoints[1].m_quad = contactPos.m_quad;
             endPoints[0].m_quad = contactPos.m_quad;
-            endPoints[1].m_quad[0] = endPoints[1].m_quad[0] - contactNorm.m_quad[0] * fCastDepth;
-            endPoints[1].m_quad[1] = endPoints[1].m_quad[1] - contactNorm.m_quad[1] * fCastDepth;
+            XFNV_M128_F32(endPoints[1].m_quad, 0) =
+                XFNV_M128_F32(endPoints[1].m_quad, 0) - XFNV_M128_F32(contactNorm.m_quad, 0) * fCastDepth;
+            XFNV_M128_F32(endPoints[1].m_quad, 1) =
+                XFNV_M128_F32(endPoints[1].m_quad, 1) - XFNV_M128_F32(contactNorm.m_quad, 1) * fCastDepth;
             hkContactPoint points[3];
             hkCollideCapsuleUtilCapsVsTri(
                 endPoints, 0.05f, triVertices, psub->m_radius, cache, 0.0f, 0, points, nullptr
             );
             // Each distance must be at least zero (NaN is no step).
-            bstep = points[0].m_separatingNormal.m_quad[3] >= 0.0f && points[1].m_separatingNormal.m_quad[3] >= 0.0f;
+            bstep = XFNV_M128_F32(points[0].m_separatingNormal.m_quad, 3) >= 0.0f &&
+                XFNV_M128_F32(points[1].m_separatingNormal.m_quad, 3) >= 0.0f;
         }
         else {
             // A ray from the raised feet back along the direction by the radius and cast depth, in the body's space.
             const float fcd = fCastDepth + frad;
             hkVector4 rayTo;
             rayTo.m_quad = rayFrom.m_quad;
-            rayTo.m_quad[0] = rayTo.m_quad[0] - contactNorm.m_quad[0] * fcd;
-            rayTo.m_quad[1] = rayTo.m_quad[1] - contactNorm.m_quad[1] * fcd;
+            XFNV_M128_F32(rayTo.m_quad, 0) =
+                XFNV_M128_F32(rayTo.m_quad, 0) - XFNV_M128_F32(contactNorm.m_quad, 0) * fcd;
+            XFNV_M128_F32(rayTo.m_quad, 1) =
+                XFNV_M128_F32(rayTo.m_quad, 1) - XFNV_M128_F32(contactNorm.m_quad, 1) * fcd;
             hkpShapeRayCastInput rci;
             rci.m_filterInfo = 0;
             rci.m_rayShapeCollectionFilter = nullptr;
@@ -3239,7 +3249,7 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
     }
 end:
     if ((iFlags & QUADRUPED) && bstep) {
-        AddSupportHeight(uiclosestFBIdx, arPoint.m_contact.m_position.m_quad[2]);
+        AddSupportHeight(uiclosestFBIdx, XFNV_M128_F32(arPoint.m_contact.m_position.m_quad, 2));
     }
     return bstep;
 }
@@ -3451,8 +3461,8 @@ bool bhkCharacterController::CheckInsideOfObject() {
             theOutput.m_hitFraction = 1.0f;
             theOutput.m_extraInfo = -1;
             theOutput.m_shapeKeys[0] = 0xFFFFFFFFu;
-            theInput.m_from.m_quad[2] = theInput.m_from.m_quad[2] + fhghtAdj;
-            theInput.m_to.m_quad[2] = fhghtAdj + theInput.m_to.m_quad[2];
+            XFNV_M128_F32(theInput.m_from.m_quad, 2) = XFNV_M128_F32(theInput.m_from.m_quad, 2) + fhghtAdj;
+            XFNV_M128_F32(theInput.m_to.m_quad, 2) = fhghtAdj + XFNV_M128_F32(theInput.m_to.m_quad, 2);
             theOutput.m_shapeKeyIndex = 0;
             ps->castRayImpl(theInput, theOutput);
             if (theOutput.m_hitFraction < 1.0f) {
@@ -3468,8 +3478,8 @@ bool bhkCharacterController::CheckInsideOfObject() {
                 theOutput.m_hitFraction = 1.0f;
                 theOutput.m_extraInfo = -1;
                 theOutput.m_shapeKeys[0] = 0xFFFFFFFFu;
-                theInput.m_from.m_quad[2] = theInput.m_from.m_quad[2] + fhghtAdj;
-                theInput.m_to.m_quad[2] = fhghtAdj + theInput.m_to.m_quad[2];
+                XFNV_M128_F32(theInput.m_from.m_quad, 2) = XFNV_M128_F32(theInput.m_from.m_quad, 2) + fhghtAdj;
+                XFNV_M128_F32(theInput.m_to.m_quad, 2) = fhghtAdj + XFNV_M128_F32(theInput.m_to.m_quad, 2);
                 theOutput.m_shapeKeyIndex = 0;
                 ps->castRayImpl(theInput, theOutput);
                 if (theOutput.m_hitFraction < 1.0f) {

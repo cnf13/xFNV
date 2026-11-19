@@ -8,6 +8,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 
@@ -41,9 +42,9 @@ void bhkWorldM::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
 // phase's overhang past the world on that side, and a pull back when it points the same way. The overhang is stored as
 // a float.
 void bhkWorldM::CalcNewCenter(hkVector4& arCenter) {
-    float fValue = arCenter.m_quad[0];
-    float fBroadPhase = BroadPhaseSize.m_quad[0];
-    float fTotal = WorldTotalSize.m_quad[0];
+    float fValue = XFNV_M128_F32(arCenter.m_quad, 0);
+    float fBroadPhase = XFNV_M128_F32(BroadPhaseSize.m_quad, 0);
+    float fTotal = XFNV_M128_F32(WorldTotalSize.m_quad, 0);
     int32_t iSign = -1;
     if (fValue >= 0.0f) {
         iSign = 1;
@@ -51,12 +52,12 @@ void bhkWorldM::CalcNewCenter(hkVector4& arCenter) {
     float fSign = static_cast<float>(iSign);
     float fShift = static_cast<float>(fValue + (static_cast<double>(fBroadPhase) - fTotal) * fSign);
     if (fShift * fSign > 0.0f) {
-        arCenter.m_quad[0] -= fShift;
+        XFNV_M128_F32(arCenter.m_quad, 0) -= fShift;
     }
 
-    fValue = arCenter.m_quad[1];
-    fBroadPhase = BroadPhaseSize.m_quad[1];
-    fTotal = WorldTotalSize.m_quad[1];
+    fValue = XFNV_M128_F32(arCenter.m_quad, 1);
+    fBroadPhase = XFNV_M128_F32(BroadPhaseSize.m_quad, 1);
+    fTotal = XFNV_M128_F32(WorldTotalSize.m_quad, 1);
     iSign = -1;
     if (fValue >= 0.0f) {
         iSign = 1;
@@ -64,12 +65,12 @@ void bhkWorldM::CalcNewCenter(hkVector4& arCenter) {
     fSign = static_cast<float>(iSign);
     fShift = static_cast<float>(fValue + (static_cast<double>(fBroadPhase) - fTotal) * fSign);
     if (fShift * fSign > 0.0f) {
-        arCenter.m_quad[1] -= fShift;
+        XFNV_M128_F32(arCenter.m_quad, 1) -= fShift;
     }
 
-    fValue = arCenter.m_quad[2];
-    fBroadPhase = BroadPhaseSize.m_quad[2];
-    fTotal = WorldTotalSize.m_quad[2];
+    fValue = XFNV_M128_F32(arCenter.m_quad, 2);
+    fBroadPhase = XFNV_M128_F32(BroadPhaseSize.m_quad, 2);
+    fTotal = XFNV_M128_F32(WorldTotalSize.m_quad, 2);
     iSign = -1;
     if (fValue >= 0.0f) {
         iSign = 1;
@@ -77,7 +78,7 @@ void bhkWorldM::CalcNewCenter(hkVector4& arCenter) {
     fSign = static_cast<float>(iSign);
     fShift = static_cast<float>(fValue + (static_cast<double>(fBroadPhase) - fTotal) * fSign);
     if (fShift * fSign > 0.0f) {
-        arCenter.m_quad[2] -= fShift;
+        XFNV_M128_F32(arCenter.m_quad, 2) -= fShift;
     }
 }
 

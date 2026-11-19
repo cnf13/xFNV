@@ -24,6 +24,7 @@
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/ConvexTransform/hkpConvexTransformShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
+#include "xfnv/Compiler.h"
 
 NiRTTI bhkConvexTransformShape::ms_RTTI("bhkConvexTransformShape", &bhkConvexShape::ms_RTTI);
 
@@ -232,9 +233,9 @@ hkSerializableCinfo& bhkConvexTransformShape::CreateCinfo(bool& arCreated) {
         pCinfo->m_transform.m_rotation.m_col0.m_quad = kZero;
         pCinfo->m_transform.m_rotation.m_col1.m_quad = kZero;
         pCinfo->m_transform.m_rotation.m_col2.m_quad = kZero;
-        pCinfo->m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-        pCinfo->m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-        pCinfo->m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+        XFNV_M128_F32(pCinfo->m_transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(pCinfo->m_transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(pCinfo->m_transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
         pCinfo->m_transform.m_translation.m_quad = kZero;
         pInfo = pCinfo;
         if (phkObject) {

@@ -1,3 +1,5 @@
+
+#include "xfnv/Compiler.h"
 class BSPortal;
 
 template <class T>
@@ -141,7 +143,7 @@ template <class T>
 void BSSimpleList<T>::Sort(int32_t (*apCompareFn)(T, T)) {
     int32_t iCount = ItemsInList();
     // A 16-byte aligned stack array of one item per node, plus a spare.
-    T* pArray = static_cast<T*>(__builtin_alloca_with_align(sizeof(T) * iCount + sizeof(T), 128));
+    T* pArray = static_cast<T*>(XFNV_ALLOCA16(sizeof(T) * iCount + sizeof(T)));
     if (!pArray) {
         BubbleSort(apCompareFn);
         return;

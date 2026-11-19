@@ -9,6 +9,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Reads the DATA chunk (the stage's sleep deprivation and the form ID of its sickness spell) and the editor ID.
 // GetTESForm's result is stored as a byte and compared zero-extended, hence the uint8_t.
@@ -39,7 +40,7 @@ bool BGSSleepDeprevationStage::Load(TESFile* apFile) {
         else if (eChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size.
             uint32_t uiChunkSize = apFile->GetChunkSize();
-            char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
             // An empty chunk leaves the buffer unwritten (see above).
             pEditorID[0] = '\0';
             apFile->GetChunkData(pEditorID, 0x200);

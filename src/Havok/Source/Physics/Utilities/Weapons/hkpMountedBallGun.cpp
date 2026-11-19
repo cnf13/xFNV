@@ -19,6 +19,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBodyCinfo.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpFirstPersonGun.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -89,10 +90,10 @@ hkTypeInfo hkpMountedBallGunTypeInfo = {
 hkpMountedBallGun::hkpMountedBallGun(int32_t numBullets) : hkpBallGun(numBullets) {
     m_type.m_storage = WEAPON_TYPE_MOUNTEDBALLGUN;
     m_name = "MountedBallGun";
-    m_position.m_quad[0] = 0.0f;
-    m_position.m_quad[1] = 100.0f;
-    m_position.m_quad[2] = 0.0f;
-    m_position.m_quad[3] = 0.0f;
+    XFNV_M128_F32(m_position.m_quad, 0) = 0.0f;
+    XFNV_M128_F32(m_position.m_quad, 1) = 100.0f;
+    XFNV_M128_F32(m_position.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(m_position.m_quad, 3) = 0.0f;
 }
 
 void hkpMountedBallGun::fireGun(hkpWorld* world, const hkTransform& viewTransform) {

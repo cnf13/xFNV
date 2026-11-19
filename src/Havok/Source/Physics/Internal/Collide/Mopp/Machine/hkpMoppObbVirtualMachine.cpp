@@ -15,6 +15,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppVirtualMachine.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Walks the MOPP code from PC, appending every terminal whose node the box overlaps to m_primitives_out. query holds
 // the box in the current node's integer space; a rescale, a terminal offset or a property command moves it into
@@ -341,7 +342,7 @@ void hkpMoppObbVirtualMachine::queryAabbOnTree(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppObbVirtualMachine.cpp", 459
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -374,7 +375,7 @@ void hkpMoppObbVirtualMachine::queryObb(
     hkpMoppObbVirtualMachineQuery query;
     m_primitives_out = primitives_out;
     m_code.m_storage = code;
-    const float scale = code->m_info.m_offset.m_quad[3];
+    const float scale = XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
     const __m128 e = extent.m_quad;
     // The box's half extent along the world axes: the absolute rotated extent, plus the radius.
     __m128 halfExtent = _mm_add_ps(
@@ -398,12 +399,12 @@ void hkpMoppObbVirtualMachine::queryObb(
     const __m128 scale4 = _mm_shuffle_ps(s, s, 0);
     const __m128 hi = _mm_mul_ps(_mm_add_ps(center, halfExtent), scale4);
     const __m128 lo = _mm_mul_ps(scale4, _mm_add_ps(_mm_xor_ps(halfExtent, hkQuadRealNegateMask), center));
-    m_xLo = hkMath::hkToIntFast(lo[0]) - 1;
-    m_xHi = hkMath::hkToIntFast(hi[0]) + 1;
-    m_yLo = hkMath::hkToIntFast(lo[1]) - 1;
-    m_yHi = hkMath::hkToIntFast(hi[1]) + 1;
-    m_zLo = hkMath::hkToIntFast(lo[2]) - 1;
-    const int32_t zHi = hkMath::hkToIntFast(hi[2]) + 1;
+    m_xLo = hkMath::hkToIntFast(XFNV_M128_F32(lo, 0)) - 1;
+    m_xHi = hkMath::hkToIntFast(XFNV_M128_F32(hi, 0)) + 1;
+    m_yLo = hkMath::hkToIntFast(XFNV_M128_F32(lo, 1)) - 1;
+    m_yHi = hkMath::hkToIntFast(XFNV_M128_F32(hi, 1)) + 1;
+    m_zLo = hkMath::hkToIntFast(XFNV_M128_F32(lo, 2)) - 1;
+    const int32_t zHi = hkMath::hkToIntFast(XFNV_M128_F32(hi, 2)) + 1;
     m_zHi = zHi;
     // The root's space: the high 16 bits.
     query.m_xLo = m_xLo >> 16;
@@ -436,16 +437,16 @@ void hkpMoppObbVirtualMachine::queryAabb(
     hkpMoppObbVirtualMachineQuery query;
     m_primitives_out = primitives_out;
     m_code.m_storage = code;
-    const float scale = code->m_info.m_offset.m_quad[3];
-    const float offsetX = code->m_info.m_offset.m_quad[0];
-    m_xLo = hkMath::hkToIntFast((aabb.m_min.m_quad[0] - offsetX) * scale) - 1;
-    m_xHi = hkMath::hkToIntFast((aabb.m_max.m_quad[0] - offsetX) * scale) + 1;
-    const float offsetY = code->m_info.m_offset.m_quad[1];
-    m_yLo = hkMath::hkToIntFast((aabb.m_min.m_quad[1] - offsetY) * scale) - 1;
-    m_yHi = hkMath::hkToIntFast((aabb.m_max.m_quad[1] - offsetY) * scale) + 1;
-    const float offsetZ = code->m_info.m_offset.m_quad[2];
-    m_zLo = hkMath::hkToIntFast((aabb.m_min.m_quad[2] - offsetZ) * scale) - 1;
-    const int32_t zHi = hkMath::hkToIntFast((aabb.m_max.m_quad[2] - offsetZ) * scale) + 1;
+    const float scale = XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
+    const float offsetX = XFNV_M128_F32(code->m_info.m_offset.m_quad, 0);
+    m_xLo = hkMath::hkToIntFast((XFNV_M128_F32(aabb.m_min.m_quad, 0) - offsetX) * scale) - 1;
+    m_xHi = hkMath::hkToIntFast((XFNV_M128_F32(aabb.m_max.m_quad, 0) - offsetX) * scale) + 1;
+    const float offsetY = XFNV_M128_F32(code->m_info.m_offset.m_quad, 1);
+    m_yLo = hkMath::hkToIntFast((XFNV_M128_F32(aabb.m_min.m_quad, 1) - offsetY) * scale) - 1;
+    m_yHi = hkMath::hkToIntFast((XFNV_M128_F32(aabb.m_max.m_quad, 1) - offsetY) * scale) + 1;
+    const float offsetZ = XFNV_M128_F32(code->m_info.m_offset.m_quad, 2);
+    m_zLo = hkMath::hkToIntFast((XFNV_M128_F32(aabb.m_min.m_quad, 2) - offsetZ) * scale) - 1;
+    const int32_t zHi = hkMath::hkToIntFast((XFNV_M128_F32(aabb.m_max.m_quad, 2) - offsetZ) * scale) + 1;
     // The root's space: the high 16 bits.
     query.m_xLo = m_xLo >> 16;
     query.m_xHi = (m_xHi >> 16) + 1;

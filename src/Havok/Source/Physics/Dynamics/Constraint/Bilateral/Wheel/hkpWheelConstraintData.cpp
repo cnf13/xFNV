@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpSetLocalRotationsConstraintAtom.h"
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/Atom/hkpSetLocalTransformsConstraintAtom.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -144,28 +145,28 @@ hkpWheelConstraintData::hkpWheelConstraintData() {
     m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_steeringBase.m_rotationA.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_steeringBase.m_rotationA.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_steeringBase.m_rotationB.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_steeringBase.m_rotationB.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_steeringBase.m_rotationB.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_steeringBase.m_rotationB.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationB.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationB.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_suspensionBase.m_transformA.m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_suspensionBase.m_transformB.m_translation.m_quad = _mm_setzero_ps();
     m_atoms.m_2dAng.m_freeRotationAxis = 0;
 }
@@ -217,19 +218,28 @@ void hkpWheelConstraintData::setSteeringAngle(float angle) {
     const hkVector4& rAxis = m_initialSteeringAxisInB;
     const hkVector4& rAxle = m_initialAxleInB;
     hkVector4 kRow0;
-    kRow0.m_quad[0] =
-        (rAxis.m_quad[1] * rAxle.m_quad[2] - rAxis.m_quad[2] * rAxle.m_quad[1]) * fSin + rAxle.m_quad[0] * fCos;
-    kRow0.m_quad[1] =
-        (rAxis.m_quad[2] * rAxle.m_quad[0] - rAxis.m_quad[0] * rAxle.m_quad[2]) * fSin + rAxle.m_quad[1] * fCos;
-    kRow0.m_quad[2] =
-        (rAxis.m_quad[0] * rAxle.m_quad[1] - rAxis.m_quad[1] * rAxle.m_quad[0]) * fSin + rAxle.m_quad[2] * fCos;
-    kRow0.m_quad[3] = rAxle.m_quad[3] * fCos;
+    XFNV_M128_F32(kRow0.m_quad, 0) = (XFNV_M128_F32(rAxis.m_quad, 1) * XFNV_M128_F32(rAxle.m_quad, 2) -
+                                      XFNV_M128_F32(rAxis.m_quad, 2) * XFNV_M128_F32(rAxle.m_quad, 1)) *
+            fSin +
+        XFNV_M128_F32(rAxle.m_quad, 0) * fCos;
+    XFNV_M128_F32(kRow0.m_quad, 1) = (XFNV_M128_F32(rAxis.m_quad, 2) * XFNV_M128_F32(rAxle.m_quad, 0) -
+                                      XFNV_M128_F32(rAxis.m_quad, 0) * XFNV_M128_F32(rAxle.m_quad, 2)) *
+            fSin +
+        XFNV_M128_F32(rAxle.m_quad, 1) * fCos;
+    XFNV_M128_F32(kRow0.m_quad, 2) = (XFNV_M128_F32(rAxis.m_quad, 0) * XFNV_M128_F32(rAxle.m_quad, 1) -
+                                      XFNV_M128_F32(rAxis.m_quad, 1) * XFNV_M128_F32(rAxle.m_quad, 0)) *
+            fSin +
+        XFNV_M128_F32(rAxle.m_quad, 2) * fCos;
+    XFNV_M128_F32(kRow0.m_quad, 3) = XFNV_M128_F32(rAxle.m_quad, 3) * fCos;
     m_atoms.m_steeringBase.m_rotationB.m_col0 = kRow0;
     hkVector4 kRow2;
-    kRow2.m_quad[0] = rAxis.m_quad[2] * kRow0.m_quad[1] - rAxis.m_quad[1] * kRow0.m_quad[2];
-    kRow2.m_quad[1] = rAxis.m_quad[0] * kRow0.m_quad[2] - rAxis.m_quad[2] * kRow0.m_quad[0];
-    kRow2.m_quad[2] = rAxis.m_quad[1] * kRow0.m_quad[0] - rAxis.m_quad[0] * kRow0.m_quad[1];
-    kRow2.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kRow2.m_quad, 0) = XFNV_M128_F32(rAxis.m_quad, 2) * XFNV_M128_F32(kRow0.m_quad, 1) -
+        XFNV_M128_F32(rAxis.m_quad, 1) * XFNV_M128_F32(kRow0.m_quad, 2);
+    XFNV_M128_F32(kRow2.m_quad, 1) = XFNV_M128_F32(rAxis.m_quad, 0) * XFNV_M128_F32(kRow0.m_quad, 2) -
+        XFNV_M128_F32(rAxis.m_quad, 2) * XFNV_M128_F32(kRow0.m_quad, 0);
+    XFNV_M128_F32(kRow2.m_quad, 2) = XFNV_M128_F32(rAxis.m_quad, 1) * XFNV_M128_F32(kRow0.m_quad, 0) -
+        XFNV_M128_F32(rAxis.m_quad, 0) * XFNV_M128_F32(kRow0.m_quad, 1);
+    XFNV_M128_F32(kRow2.m_quad, 3) = 0.0f;
     m_atoms.m_steeringBase.m_rotationB.m_col2 = kRow2;
 }
 
@@ -300,16 +310,16 @@ void hkpWheelConstraintData::setInBodySpace(
     m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col0.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col1.m_quad = _mm_setzero_ps();
     m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad = suspensionAxisB.m_quad;
-    float v55 = std::fabs((double)m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad[0]);
+    float v55 = std::fabs((double)XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad, 0));
     int32_t v7 = 0;
     int32_t v8 = 1;
     int32_t v9 = 2;
-    float v57 = std::fabs((double)m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad[1]);
-    float v58 = std::fabs((double)m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad[2]);
+    float v57 = std::fabs((double)XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad, 1));
+    float v58 = std::fabs((double)XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad, 2));
     if (v55 > static_cast<double>(v57)) {
         v55 = v57;
         v8 = 0;
@@ -319,22 +329,22 @@ void hkpWheelConstraintData::setInBodySpace(
         v9 = v7;
     }
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad = _mm_setzero_ps();
-    m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad[v8] =
-        m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad[v9];
-    m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad[v9] =
-        -m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad[v8];
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad, v8) =
+        XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad, v9);
+    XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad, v9) =
+        -XFNV_M128_F32(m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col0.m_quad, v8);
     v11.m_quad = m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad;
     __m128 v12 = _mm_mul_ps(v11.m_quad, v11.m_quad);
-    float v13 = _mm_shuffle_ps(v12, v12, 85)[0] + v12[0];
+    float v13 = XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0);
     __m128 v14 = _mm_shuffle_ps(v12, v12, 170);
-    v14[0] = v14[0] + v13;
-    float v15 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v14[0])));
-    v16[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v14, 0) = XFNV_M128_F32(v14, 0) + v13;
+    float v15 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v14, 0))));
+    XFNV_M128_F32(v16, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v17 = _mm_setzero_ps();
-    v17[0] = 0.5f;
+    XFNV_M128_F32(v17, 0) = 0.5f;
     __m128 v18 = _mm_cmpeq_ss(v14, v16);
-    float v19 = 3.0f - ((v14[0] * v15) * v15);
-    v17[0] = (0.5f * v15) * v19;
+    float v19 = 3.0f - ((XFNV_M128_F32(v14, 0) * v15) * v15);
+    XFNV_M128_F32(v17, 0) = (0.5f * v15) * v19;
     __m128 v21 = _mm_andnot_ps(v18, v17);
     m_atoms.m_suspensionBase.m_transformB.m_rotation.m_col1.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(v21, v21, 0), v11.m_quad);
@@ -361,34 +371,34 @@ void hkpWheelConstraintData::setInBodySpace(
         )
     );
     __m128 v22 = _mm_mul_ps(axleA.m_quad, axleA.m_quad);
-    v21[0] = _mm_shuffle_ps(v22, v22, 85)[0] + v22[0];
+    XFNV_M128_F32(v21, 0) = XFNV_M128_F32(_mm_shuffle_ps(v22, v22, 85), 0) + XFNV_M128_F32(v22, 0);
     __m128 v23 = _mm_shuffle_ps(v22, v22, 170);
-    v23[0] = v23[0] + v21[0];
-    float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v23[0])));
-    float v26 = 3.0f - ((v23[0] * v24) * v24);
-    v17[0] = (0.5f * v24) * v26;
+    XFNV_M128_F32(v23, 0) = XFNV_M128_F32(v23, 0) + XFNV_M128_F32(v21, 0);
+    float v24 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v23, 0))));
+    float v26 = 3.0f - ((XFNV_M128_F32(v23, 0) * v24) * v24);
+    XFNV_M128_F32(v17, 0) = (0.5f * v24) * v26;
     __m128 v28 = _mm_andnot_ps(_mm_cmpeq_ss(v23, v16), v17);
     m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v28, v28, 0), axleA.m_quad);
     __m128 m_quad = axleB.m_quad;
     __m128 v30 = _mm_mul_ps(m_quad, m_quad);
-    v28[0] = _mm_shuffle_ps(v30, v30, 85)[0] + v30[0];
+    XFNV_M128_F32(v28, 0) = XFNV_M128_F32(_mm_shuffle_ps(v30, v30, 85), 0) + XFNV_M128_F32(v30, 0);
     __m128 v31 = _mm_shuffle_ps(v30, v30, 170);
-    v31[0] = v31[0] + v28[0];
-    float v32 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v31[0])));
-    float v34 = 3.0f - ((v31[0] * v32) * v32);
-    v17[0] = (0.5f * v32) * v34;
+    XFNV_M128_F32(v31, 0) = XFNV_M128_F32(v31, 0) + XFNV_M128_F32(v28, 0);
+    float v32 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v31, 0))));
+    float v34 = 3.0f - ((XFNV_M128_F32(v31, 0) * v32) * v32);
+    XFNV_M128_F32(v17, 0) = (0.5f * v32) * v34;
     m_atoms.m_steeringBase.m_rotationB.m_col0.m_quad = axleB.m_quad;
     __m128 v36 = _mm_andnot_ps(_mm_cmpeq_ss(v31, v16), v17);
     v37.m_quad = _mm_mul_ps(_mm_shuffle_ps(v36, v36, 0), m_quad);
     m_atoms.m_steeringBase.m_rotationB.m_col0.m_quad = v37.m_quad;
     m_initialAxleInB.m_quad = v37.m_quad;
     int32_t v38 = 0;
-    float v61 = std::fabs((double)m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad[0]);
+    float v61 = std::fabs((double)XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad, 0));
     int32_t v39 = 1;
     int32_t v40 = 2;
     float v56 = v61;
-    float v62 = std::fabs((double)m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad[1]);
-    float v63 = std::fabs((double)m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad[2]);
+    float v62 = std::fabs((double)XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad, 1));
+    float v63 = std::fabs((double)XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad, 2));
     if (v56 > static_cast<double>(v62)) {
         v56 = v62;
         v39 = 0;
@@ -398,27 +408,30 @@ void hkpWheelConstraintData::setInBodySpace(
         v40 = v38;
     }
     m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad = _mm_setzero_ps();
-    m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad[v39] = m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad[v40];
-    m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad[v40] = -m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad[v39];
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad, v39) =
+        XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad, v40);
+    XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad, v40) =
+        -XFNV_M128_F32(m_atoms.m_steeringBase.m_rotationA.m_col0.m_quad, v39);
     v42.m_quad = m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad;
     __m128 v43 = _mm_mul_ps(v42.m_quad, v42.m_quad);
-    float v44 = _mm_shuffle_ps(v43, v43, 85)[0] + v43[0];
+    float v44 = XFNV_M128_F32(_mm_shuffle_ps(v43, v43, 85), 0) + XFNV_M128_F32(v43, 0);
     __m128 v45 = _mm_shuffle_ps(v43, v43, 170);
-    v45[0] = v45[0] + v44;
-    float v46 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v45[0])));
-    float v47 = 3.0f - ((v45[0] * v46) * v46);
+    XFNV_M128_F32(v45, 0) = XFNV_M128_F32(v45, 0) + v44;
+    float v46 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v45, 0))));
+    float v47 = 3.0f - ((XFNV_M128_F32(v45, 0) * v46) * v46);
     __m128 v48 = _mm_cmpeq_ss(v45, v16);
-    v17[0] = (0.5f * v46) * v47;
+    XFNV_M128_F32(v17, 0) = (0.5f * v46) * v47;
     __m128 v50 = _mm_andnot_ps(v48, v17);
     m_atoms.m_steeringBase.m_rotationA.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v50, v50, 0), v42.m_quad);
     m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad = steeringAxisB.m_quad;
     v51.m_quad = m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad;
     __m128 v52 = _mm_mul_ps(v51.m_quad, v51.m_quad);
-    v50[0] = _mm_shuffle_ps(v52, v52, 85)[0] + v52[0];
+    XFNV_M128_F32(v50, 0) = XFNV_M128_F32(_mm_shuffle_ps(v52, v52, 85), 0) + XFNV_M128_F32(v52, 0);
     __m128 v53 = _mm_shuffle_ps(v52, v52, 170);
-    v53[0] = v53[0] + v50[0];
-    v50[0] = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v53[0])));
-    v17[0] = (0.5f * v50[0]) * (3.0f - ((v53[0] * v50[0]) * v50[0]));
+    XFNV_M128_F32(v53, 0) = XFNV_M128_F32(v53, 0) + XFNV_M128_F32(v50, 0);
+    XFNV_M128_F32(v50, 0) = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v53, 0))));
+    XFNV_M128_F32(v17, 0) = (0.5f * XFNV_M128_F32(v50, 0)) *
+        (3.0f - ((XFNV_M128_F32(v53, 0) * XFNV_M128_F32(v50, 0)) * XFNV_M128_F32(v50, 0)));
     __m128 v54 = _mm_andnot_ps(_mm_cmpeq_ss(v53, v16), v17);
     m_atoms.m_steeringBase.m_rotationB.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v54, v54, 0), v51.m_quad);
     m_initialSteeringAxisInB = m_atoms.m_steeringBase.m_rotationB.m_col1;

@@ -24,6 +24,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> sChallengeComplete("sChallengeComplete", "Challenge Completed");
@@ -68,7 +69,7 @@ bool TESChallenge::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;

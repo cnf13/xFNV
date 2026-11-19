@@ -12,6 +12,8 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/Ragdoll/hkpRagdollConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
 
+#include <cmath>
+
 // The plane and the cones go with their members.
 hkpRagdollDrawer::~hkpRagdollDrawer() {}
 
@@ -86,14 +88,14 @@ void hkpRagdollDrawer::drawConstraint(
     const float planeMinAngle = atoms.m_planesLimit.m_minAngle;
     // EXE-INLINED none: hkpConstraintDrawer::getConeSizeForDraw
     coneSize = m_scale * m_coneSize;
-    const float absMaxAngle = __builtin_fabsf(atoms.m_planesLimit.m_maxAngle);
+    const float absMaxAngle = std::fabsf(atoms.m_planesLimit.m_maxAngle);
     float coneAngle = static_cast<float>(1.5707963705062866 - absMaxAngle);
     m_planeCone1.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);
 
     // EXE-INLINED none: hkpConstraintDrawer::getConeSizeForDraw
     coneSize = m_scale * m_coneSize;
     refPlaneNormalWorld.setNeg4(refPlaneNormalWorld);
-    const float absMinAngle = __builtin_fabsf(planeMinAngle);
+    const float absMinAngle = std::fabsf(planeMinAngle);
     coneAngle = static_cast<float>(1.5707963705062866 - absMinAngle);
     m_planeCone2.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);
 

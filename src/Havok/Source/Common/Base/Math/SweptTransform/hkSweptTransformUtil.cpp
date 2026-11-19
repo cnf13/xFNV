@@ -9,6 +9,7 @@
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Common/Base/Types/Physics/hkStepInfo.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -35,7 +36,7 @@ void hkSweptTransformUtil::warpToPosition(const hkVector4& position, hkMotionSta
     ms.m_deltaAngle.m_quad = _mm_setzero_ps();
     ms.m_transform.m_translation.m_quad = position.m_quad;
     v2.m_quad = ms.m_sweptTransform.m_centerOfMassLocal.m_quad;
-    double v3 = ms.m_sweptTransform.m_centerOfMass0.m_quad[3];
+    double v3 = XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass0.m_quad, 3);
     v4.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_add_ps(
@@ -47,10 +48,10 @@ void hkSweptTransformUtil::warpToPosition(const hkVector4& position, hkMotionSta
         position.m_quad
     );
     ms.m_sweptTransform.m_centerOfMass0.m_quad = v4.m_quad;
-    ms.m_sweptTransform.m_centerOfMass0.m_quad[3] = v3;
+    XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass0.m_quad, 3) = v3;
     ms.m_sweptTransform.m_centerOfMass1.m_quad = v4.m_quad;
     v5.m_vec.m_quad = ms.m_sweptTransform.m_rotation1.m_vec.m_quad;
-    ms.m_sweptTransform.m_centerOfMass1.m_quad[3] = 0.0f;
+    XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass1.m_quad, 3) = 0.0f;
     ms.m_sweptTransform.m_rotation0.m_vec.m_quad = v5.m_vec.m_quad;
 }
 
@@ -59,8 +60,8 @@ void hkSweptTransformUtil::warpToRotation(const hkQuaternion& rotation, hkMotion
 }
 
 void hkSweptTransformUtil::setTimeInformation(float startTime, float invDeltaTime, hkMotionState& motionState) {
-    motionState.m_sweptTransform.m_centerOfMass0.m_quad[3] = startTime;
-    motionState.m_sweptTransform.m_centerOfMass1.m_quad[3] = invDeltaTime;
+    XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3) = startTime;
+    XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3) = invDeltaTime;
 }
 
 void hkSweptTransformUtil::warpTo(const hkVector4& position, const hkQuaternion& rotation, hkMotionState& ms) {
@@ -72,7 +73,7 @@ void hkSweptTransformUtil::warpTo(const hkVector4& position, const hkQuaternion&
     ms.m_transform.m_rotation.set(rotation);
     ms.m_transform.m_translation.m_quad = position.m_quad;
     v3.m_quad = ms.m_sweptTransform.m_centerOfMassLocal.m_quad;
-    double v4 = ms.m_sweptTransform.m_centerOfMass0.m_quad[3];
+    double v4 = XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass0.m_quad, 3);
     v5.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_add_ps(
@@ -85,8 +86,8 @@ void hkSweptTransformUtil::warpTo(const hkVector4& position, const hkQuaternion&
     );
     ms.m_sweptTransform.m_centerOfMass0.m_quad = v5.m_quad;
     ms.m_sweptTransform.m_centerOfMass1.m_quad = v5.m_quad;
-    ms.m_sweptTransform.m_centerOfMass0.m_quad[3] = v4;
-    ms.m_sweptTransform.m_centerOfMass1.m_quad[3] = 0.0f;
+    XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass0.m_quad, 3) = v4;
+    XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass1.m_quad, 3) = 0.0f;
 }
 
 void hkSweptTransformUtil::warpTo(const hkTransform& transform, hkMotionState& ms) {
@@ -100,7 +101,7 @@ void hkSweptTransformUtil::warpTo(const hkTransform& transform, hkMotionState& m
     ms.m_sweptTransform.m_rotation0.m_vec.m_quad = v6.m_vec.m_quad;
     ms.m_sweptTransform.m_rotation1.m_vec.m_quad = m_quad;
     v3.m_quad = ms.m_sweptTransform.m_centerOfMassLocal.m_quad;
-    double v4 = ms.m_sweptTransform.m_centerOfMass0.m_quad[3];
+    double v4 = XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass0.m_quad, 3);
     v5.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_add_ps(
@@ -113,8 +114,8 @@ void hkSweptTransformUtil::warpTo(const hkTransform& transform, hkMotionState& m
     );
     ms.m_sweptTransform.m_centerOfMass0.m_quad = v5.m_quad;
     ms.m_sweptTransform.m_centerOfMass1.m_quad = v5.m_quad;
-    ms.m_sweptTransform.m_centerOfMass0.m_quad[3] = v4;
-    ms.m_sweptTransform.m_centerOfMass1.m_quad[3] = 0.0f;
+    XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass0.m_quad, 3) = v4;
+    XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass1.m_quad, 3) = 0.0f;
 }
 
 void hkSweptTransformUtil::lerp2(const hkSweptTransform& sweptTrans, float t, hkTransform& transformOut) {
@@ -131,12 +132,13 @@ void hkSweptTransformUtil::lerp2(const hkSweptTransform& sweptTrans, float t, hk
     v4.m_vec.m_quad = sweptTrans.m_rotation0.m_vec.m_quad;
     __m128 v5 = _mm_add_ps(v3.m_vec.m_quad, v4.m_vec.m_quad);
     __m128 v6 = _mm_mul_ps(v5, v5);
-    float v28 = (t - sweptTrans.m_centerOfMass0.m_quad[3]) * sweptTrans.m_centerOfMass1.m_quad[3];
+    float v28 =
+        (t - XFNV_M128_F32(sweptTrans.m_centerOfMass0.m_quad, 3)) * XFNV_M128_F32(sweptTrans.m_centerOfMass1.m_quad, 3);
     __m128 v7 = _mm_add_ps(_mm_shuffle_ps(v6, v6, 78), v6);
-    v6[0] = _mm_shuffle_ps(v7, v7, 177)[0] + v7[0];
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 177), 0) + XFNV_M128_F32(v7, 0);
     arQuaternion.m_vec.m_quad = v5;
-    float v24 = 0.75 - 0.125 * v6[0];
-    *reinterpret_cast<float*>(&v25) = (1.5 - v6[0] * 0.5 * v24 * v24) * v24;
+    float v24 = 0.75 - 0.125 * XFNV_M128_F32(v6, 0);
+    *reinterpret_cast<float*>(&v25) = (1.5 - XFNV_M128_F32(v6, 0) * 0.5 * v24 * v24) * v24;
     __m128 v8 =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v25)), _mm_set_ss(std::bit_cast<float>(v25)), 0), v5);
     double v9 = v28 + v28;
@@ -156,12 +158,12 @@ void hkSweptTransformUtil::lerp2(const hkSweptTransform& sweptTrans, float t, hk
     __m128 v15 = _mm_mul_ps(v14, v14);
     __m128 v16 = _mm_add_ps(_mm_shuffle_ps(v15, v15, 78), v15);
     __m128 v17 = _mm_add_ps(_mm_shuffle_ps(v16, v16, 177), v16);
-    float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
-    v19[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v17, 0))));
+    XFNV_M128_F32(v19, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v20 = _mm_cmpeq_ss(v17, v19);
-    v19[0] = 3.0f - ((v17[0] * v18) * v18);
+    XFNV_M128_F32(v19, 0) = 3.0f - ((XFNV_M128_F32(v17, 0) * v18) * v18);
     __m128 v21 = _mm_setzero_ps();
-    v21[0] = (0.5f * v18) * v19[0];
+    XFNV_M128_F32(v21, 0) = (0.5f * v18) * XFNV_M128_F32(v19, 0);
     __m128 v22 = _mm_andnot_ps(v20, v21);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v14);
     transformOut.m_rotation.set(arQuaternion);
@@ -200,8 +202,8 @@ void hkSweptTransformUtil::backStepMotionState(float time, hkMotionState& motion
     uint32_t v27;
     uint32_t v28;
     uint32_t v29;
-    float v31 = (time - motionState.m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-        motionState.m_sweptTransform.m_centerOfMass1.m_quad[3];
+    float v31 = (time - XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3);
     double v2 = 1.1920929e-07f;
     if (v31 > 1.1920929e-07f) {
         v2 = v31;
@@ -213,7 +215,7 @@ void hkSweptTransformUtil::backStepMotionState(float time, hkMotionState& motion
     v6.m_vec.m_quad = _mm_add_ps(v3.m_vec.m_quad, v4.m_vec.m_quad);
     __m128 v7 = _mm_mul_ps(v6.m_vec.m_quad, v6.m_vec.m_quad);
     __m128 v8 = _mm_add_ps(_mm_shuffle_ps(v7, v7, 78), v7);
-    double v9 = (_mm_shuffle_ps(v8, v8, 177)[0] + v8[0]);
+    double v9 = (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 177), 0) + XFNV_M128_F32(v8, 0));
     motionState.m_sweptTransform.m_rotation1.m_vec.m_quad = v6.m_vec.m_quad;
     float v26 = 0.75 - 0.125 * v9;
     *reinterpret_cast<float*>(&v27) = (1.5 - v9 * 0.5 * v26 * v26) * v26;
@@ -239,23 +241,23 @@ void hkSweptTransformUtil::backStepMotionState(float time, hkMotionState& motion
     __m128 v16 = _mm_mul_ps(p_m_rotation1->m_vec.m_quad, p_m_rotation1->m_vec.m_quad);
     __m128 v17 = _mm_add_ps(_mm_shuffle_ps(v16, v16, 78), v16);
     __m128 v18 = _mm_add_ps(_mm_shuffle_ps(v17, v17, 177), v17);
-    float v19 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v18[0])));
-    v20[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v19 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v18, 0))));
+    XFNV_M128_F32(v20, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v21 = _mm_cmpeq_ss(v18, v20);
-    v20[0] = 3.0f - ((v18[0] * v19) * v19);
+    XFNV_M128_F32(v20, 0) = 3.0f - ((XFNV_M128_F32(v18, 0) * v19) * v19);
     __m128 v22 = _mm_setzero_ps();
-    v22[0] = (0.5f * v19) * v20[0];
+    XFNV_M128_F32(v22, 0) = (0.5f * v19) * XFNV_M128_F32(v20, 0);
     __m128 v23 = _mm_andnot_ps(v21, v22);
     __m128 v24 = _mm_mul_ps(_mm_shuffle_ps(v23, v23, 0), p_m_rotation1->m_vec.m_quad);
     (*p_m_rotation1).m_vec.m_quad = v24;
-    float v30 = motionState.m_sweptTransform.m_centerOfMass1.m_quad[3];
-    v24[0] = v32;
+    float v30 = XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3);
+    XFNV_M128_F32(v24, 0) = v32;
     __m128 v25 = _mm_shuffle_ps(v24, v24, 0);
     motionState.m_sweptTransform.m_centerOfMass1.m_quad = _mm_add_ps(
         _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v25), motionState.m_sweptTransform.m_centerOfMass0.m_quad),
         _mm_mul_ps(motionState.m_sweptTransform.m_centerOfMass1.m_quad, v25)
     );
-    motionState.m_sweptTransform.m_centerOfMass1.m_quad[3] = v30 / v11;
+    XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3) = v30 / v11;
     motionState.m_deltaAngle.m_quad =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v32), _mm_set_ss(v32), 0), motionState.m_deltaAngle.m_quad);
     motionState.m_transform.m_rotation.set(motionState.m_sweptTransform.m_rotation1);
@@ -300,7 +302,7 @@ void hkSweptTransformUtil::freezeMotionState(float time, hkMotionState& motionSt
     uint32_t v27;
     uint32_t v28;
     uint32_t v29;
-    float v30 = motionState.m_sweptTransform.m_centerOfMass0.m_quad[3];
+    float v30 = XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3);
     double v2 = time;
     if (!(v30 < static_cast<double>(time))) {
         v2 = v30;
@@ -310,10 +312,10 @@ void hkSweptTransformUtil::freezeMotionState(float time, hkMotionState& motionSt
     hkQuaternion* p_m_rotation1 = &motionState.m_sweptTransform.m_rotation1;
     v6.m_vec.m_quad = _mm_add_ps(v3.m_vec.m_quad, v4.m_vec.m_quad);
     __m128 v7 = _mm_mul_ps(v6.m_vec.m_quad, v6.m_vec.m_quad);
-    float v31 = (v2 - motionState.m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-        motionState.m_sweptTransform.m_centerOfMass1.m_quad[3];
+    float v31 = (v2 - XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3);
     __m128 v8 = _mm_add_ps(_mm_shuffle_ps(v7, v7, 78), v7);
-    double v9 = (_mm_shuffle_ps(v8, v8, 177)[0] + v8[0]);
+    double v9 = (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 177), 0) + XFNV_M128_F32(v8, 0));
     motionState.m_sweptTransform.m_rotation1.m_vec.m_quad = v6.m_vec.m_quad;
     float v26 = 0.75 - 0.125 * v9;
     *reinterpret_cast<float*>(&v27) = (1.5 - v9 * 0.5 * v26 * v26) * v26;
@@ -338,12 +340,12 @@ void hkSweptTransformUtil::freezeMotionState(float time, hkMotionState& motionSt
     __m128 v15 = _mm_mul_ps(p_m_rotation1->m_vec.m_quad, p_m_rotation1->m_vec.m_quad);
     __m128 v16 = _mm_add_ps(_mm_shuffle_ps(v15, v15, 78), v15);
     __m128 v17 = _mm_add_ps(_mm_shuffle_ps(v16, v16, 177), v16);
-    float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
-    v19[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v17, 0))));
+    XFNV_M128_F32(v19, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v20 = _mm_cmpeq_ss(v17, v19);
-    v19[0] = 3.0f - ((v17[0] * v18) * v18);
+    XFNV_M128_F32(v19, 0) = 3.0f - ((XFNV_M128_F32(v17, 0) * v18) * v18);
     __m128 v21 = _mm_setzero_ps();
-    v21[0] = (0.5f * v18) * v19[0];
+    XFNV_M128_F32(v21, 0) = (0.5f * v18) * XFNV_M128_F32(v19, 0);
     __m128 v22 = _mm_andnot_ps(v20, v21);
     p_m_rotation1->m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), p_m_rotation1->m_vec.m_quad);
     v23.m_quad = motionState.m_sweptTransform.m_centerOfMass0.m_quad;
@@ -354,9 +356,9 @@ void hkSweptTransformUtil::freezeMotionState(float time, hkMotionState& motionSt
         _mm_mul_ps(v24, motionState.m_sweptTransform.m_centerOfMass1.m_quad)
     );
     motionState.m_sweptTransform.m_centerOfMass0.m_quad = v25.m_quad;
-    motionState.m_sweptTransform.m_centerOfMass0.m_quad[3] = v2;
+    XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3) = v2;
     motionState.m_sweptTransform.m_centerOfMass1.m_quad = v25.m_quad;
-    motionState.m_sweptTransform.m_centerOfMass1.m_quad[3] = 0.0f;
+    XFNV_M128_F32(motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3) = 0.0f;
     motionState.m_transform.m_rotation.set(motionState.m_sweptTransform.m_rotation1);
     motionState.m_transform.m_translation.m_quad = _mm_sub_ps(
         motionState.m_sweptTransform.m_centerOfMass1.m_quad,
@@ -414,9 +416,9 @@ void hkSweptTransformUtil::keyframeMotionState(
         axis.m_quad = _mm_setzero_ps();
     }
     motionState.m_deltaAngle.m_quad = _mm_mul_ps(_mm_set1_ps(angle), axis.m_quad);
-    motionState.m_deltaAngle.m_quad[3] = angle;
-    st.m_centerOfMass0.m_quad[3] = stepInfo.m_startTime;
-    st.m_centerOfMass1.m_quad[3] = stepInfo.m_invDeltaTime;
+    XFNV_M128_F32(motionState.m_deltaAngle.m_quad, 3) = angle;
+    XFNV_M128_F32(st.m_centerOfMass0.m_quad, 3) = stepInfo.m_startTime;
+    XFNV_M128_F32(st.m_centerOfMass1.m_quad, 3) = stepInfo.m_invDeltaTime;
     motionState.m_transform.m_rotation.set(st.m_rotation1);
     const hkQuadReal local = st.m_centerOfMassLocal.m_quad;
     const hkRotation& rotation = motionState.m_transform.m_rotation;
@@ -449,16 +451,16 @@ void hkSweptTransformUtil::lerp2Ha(
     hkQuaternion arQuaternion;
     v4.m_vec.m_quad = sweptTrans.m_rotation1.m_vec.m_quad;
     v5.m_vec.m_quad = sweptTrans.m_rotation0.m_vec.m_quad;
-    float v29 = t - sweptTrans.m_centerOfMass0.m_quad[3];
+    float v29 = t - XFNV_M128_F32(sweptTrans.m_centerOfMass0.m_quad, 3);
     __m128 v6 = _mm_add_ps(v4.m_vec.m_quad, v5.m_vec.m_quad);
     __m128 v7 = _mm_mul_ps(v6, v6);
     float v30 = v29 + tAddOn;
     __m128 v8 = _mm_add_ps(_mm_shuffle_ps(v7, v7, 78), v7);
-    v7[0] = _mm_shuffle_ps(v8, v8, 177)[0] + v8[0];
-    float v31 = v30 * sweptTrans.m_centerOfMass1.m_quad[3];
+    XFNV_M128_F32(v7, 0) = XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 177), 0) + XFNV_M128_F32(v8, 0);
+    float v31 = v30 * XFNV_M128_F32(sweptTrans.m_centerOfMass1.m_quad, 3);
     arQuaternion.m_vec.m_quad = v6;
-    float v25 = 0.75 - 0.125 * v7[0];
-    *reinterpret_cast<float*>(&v26) = (1.5 - v7[0] * 0.5 * v25 * v25) * v25;
+    float v25 = 0.75 - 0.125 * XFNV_M128_F32(v7, 0);
+    *reinterpret_cast<float*>(&v26) = (1.5 - XFNV_M128_F32(v7, 0) * 0.5 * v25 * v25) * v25;
     __m128 v9 =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v26)), _mm_set_ss(std::bit_cast<float>(v26)), 0), v6);
     double v10 = v31 + v31;
@@ -478,12 +480,12 @@ void hkSweptTransformUtil::lerp2Ha(
     __m128 v16 = _mm_mul_ps(v15, v15);
     __m128 v17 = _mm_add_ps(_mm_shuffle_ps(v16, v16, 78), v16);
     __m128 v18 = _mm_add_ps(_mm_shuffle_ps(v17, v17, 177), v17);
-    float v19 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v18[0])));
-    v20[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v19 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v18, 0))));
+    XFNV_M128_F32(v20, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v21 = _mm_cmpeq_ss(v18, v20);
-    v20[0] = 3.0f - ((v18[0] * v19) * v19);
+    XFNV_M128_F32(v20, 0) = 3.0f - ((XFNV_M128_F32(v18, 0) * v19) * v19);
     __m128 v22 = _mm_setzero_ps();
-    v22[0] = (0.5f * v19) * v20[0];
+    XFNV_M128_F32(v22, 0) = (0.5f * v19) * XFNV_M128_F32(v20, 0);
     __m128 v23 = _mm_andnot_ps(v21, v22);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v23, v23, 0), v15);
     transformOut.m_rotation.set(arQuaternion);
@@ -528,10 +530,10 @@ void hkSweptTransformUtil::lerp2Rel(const hkSweptTransform& sweptTrans, float r,
     __m128 v5 = _mm_add_ps(v3.m_vec.m_quad, v4.m_vec.m_quad);
     __m128 v6 = _mm_mul_ps(v5, v5);
     __m128 v7 = _mm_add_ps(_mm_shuffle_ps(v6, v6, 78), v6);
-    v6[0] = _mm_shuffle_ps(v7, v7, 177)[0] + v7[0];
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 177), 0) + XFNV_M128_F32(v7, 0);
     arQuaternion.m_vec.m_quad = v5;
-    float v24 = 0.75 - 0.125 * v6[0];
-    *reinterpret_cast<float*>(&v25) = (1.5 - v6[0] * 0.5 * v24 * v24) * v24;
+    float v24 = 0.75 - 0.125 * XFNV_M128_F32(v6, 0);
+    *reinterpret_cast<float*>(&v25) = (1.5 - XFNV_M128_F32(v6, 0) * 0.5 * v24 * v24) * v24;
     __m128 v8 =
         _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v25)), _mm_set_ss(std::bit_cast<float>(v25)), 0), v5);
     double v9 = r + r;
@@ -551,12 +553,12 @@ void hkSweptTransformUtil::lerp2Rel(const hkSweptTransform& sweptTrans, float r,
     __m128 v15 = _mm_mul_ps(v14, v14);
     __m128 v16 = _mm_add_ps(_mm_shuffle_ps(v15, v15, 78), v15);
     __m128 v17 = _mm_add_ps(_mm_shuffle_ps(v16, v16, 177), v16);
-    float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v17[0])));
-    v19[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v18 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v17, 0))));
+    XFNV_M128_F32(v19, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v20 = _mm_cmpeq_ss(v17, v19);
-    v19[0] = 3.0f - ((v17[0] * v18) * v18);
+    XFNV_M128_F32(v19, 0) = 3.0f - ((XFNV_M128_F32(v17, 0) * v18) * v18);
     __m128 v21 = _mm_setzero_ps();
-    v21[0] = (0.5f * v18) * v19[0];
+    XFNV_M128_F32(v21, 0) = (0.5f * v18) * XFNV_M128_F32(v19, 0);
     __m128 v22 = _mm_andnot_ps(v20, v21);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v22, v22, 0), v14);
     transformOut.m_rotation.set(arQuaternion);

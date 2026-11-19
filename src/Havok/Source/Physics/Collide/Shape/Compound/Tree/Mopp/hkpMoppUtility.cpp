@@ -14,6 +14,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Mediator/Shape/hkpMoppShapeMediator.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Mediator/hkpMoppMediator.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
 
 hkpMoppCode* hkpMoppUtility::buildCode(
     const hkpShapeContainer* shapeContainer,
@@ -65,10 +66,10 @@ hkpMoppCode* hkpMoppUtility::buildCodeInternal(
     kAssemblerParams.m_absoluteFitToleranceOfTriangles = 1.0f;
     kAssemblerParams.m_groupLevels = 5;
     kAssemblerParams.m_interleavedBuildingEnabled.m_bool = 1;
-    kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad[0] = 0.2f;
-    kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad[1] = 0.2f;
-    kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad[2] = 0.05f;
-    kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad, 0) = 0.2f;
+    XFNV_M128_F32(kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad, 1) = 0.2f;
+    XFNV_M128_F32(kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad, 2) = 0.05f;
+    XFNV_M128_F32(kAssemblerParams.m_absoluteFitToleranceOfAxisAlignedTriangles.m_quad, 3) = 0.0f;
 
     kAssemblerParams.m_relativeFitToleranceOfInternalNodes = moppInput.getRelativeFitToleranceOfInternalNodes();
     kAssemblerParams.m_absoluteFitToleranceOfInternalNodes = moppInput.getAbsoluteFitToleranceOfInternalNodes();

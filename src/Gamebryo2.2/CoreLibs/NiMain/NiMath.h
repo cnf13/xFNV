@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
+#include "xfnv/Compiler.h"
 
 #include <cfloat>
 
@@ -51,6 +52,6 @@ inline float NiSymmetricRandom() {
 // Rounds in the FPU's current rounding mode, not by truncation.
 inline int32_t NiFastFloatToInt(float afValue) {
     int32_t iValue;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iValue) : "m"(afValue));
+    xfnv::RoundToInt(iValue, afValue);
     return iValue;
 }

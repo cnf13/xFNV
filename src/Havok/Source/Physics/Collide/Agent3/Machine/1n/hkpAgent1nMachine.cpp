@@ -28,6 +28,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 // Havok SDK signature (hkpCollide.lib, tied by bytes,reloc).
 static void hkAgent1nMachine_VisitAllAgents(
@@ -262,10 +263,10 @@ void hkAgent1nMachine_Weld(
             hkVector4Util::dot3_3vs3(diff, pointNormal, repNormal, diff, repNormal, pointNormal, dotsOut);
             const hkQuadReal dots = dotsOut.m_quad;
 
-            const float cosAngle = dots[2];
+            const float cosAngle = XFNV_M128_F32(dots, 2);
             const double scaledRadius = (cosAngle - 1.0) * shapeA->m_radius;
-            const float distA = scaledRadius - dots[1];
-            const float distB = scaledRadius + dots[0];
+            const float distA = scaledRadius - XFNV_M128_F32(dots, 1);
+            const float distB = scaledRadius + XFNV_M128_F32(dots, 0);
             const float radius = shapeA->m_radius + 0.0;
             if (radius < distA) {
                 continue;
@@ -794,9 +795,9 @@ int32_t contactPointIsValid(
     __m128 dots = _mm_add_ps(
         _mm_shuffle_ps(hi, normals, 0xE4), _mm_add_ps(_mm_shuffle_ps(_mm_movehl_ps(lohi, lo), normals, 0xD4), lohi)
     );
-    double cosNormals = dots[2];
-    float v16 = (cosNormals - 1.0) * a2 - dots[1];
-    float v19 = (cosNormals - 1.0) * a2 + dots[0];
+    double cosNormals = XFNV_M128_F32(dots, 2);
+    float v16 = (cosNormals - 1.0) * a2 - XFNV_M128_F32(dots, 1);
+    float v19 = (cosNormals - 1.0) * a2 + XFNV_M128_F32(dots, 0);
     float v18 = a2 + a4;
     if (v18 < v16) {
         return 0;

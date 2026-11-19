@@ -62,6 +62,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -650,11 +651,11 @@ void hkLs_backstepAndFreezeEntireIsland(
                 v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1;
             v9->m_motion.m_motionState.m_sweptTransform.m_rotation0 =
                 v9->m_motion.m_motionState.m_sweptTransform.m_rotation1;
-            v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad[3] = time;
+            XFNV_M128_F32(v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad, 3) = time;
             ++v4;
             double v7 = 1.0 / (island->getWorld()->getCurrentPsiTime() - time);
             v5 = time;
-            v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad[3] = v7;
+            XFNV_M128_F32(v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1.m_quad, 3) = v7;
         }
         while (v4 < island->m_entities.m_size);
     }
@@ -1644,7 +1645,7 @@ void hkpContinuousSimulation::collideEntitiesBroadPhaseContinuous(
         for (int32_t i = numEntities - 1; i >= 0; i--) {
             hkpEntity* entity = *entityIt;
             if (i >= 4) {
-                __builtin_prefetch(&entityIt[4]->m_collidable, 0, 0);
+                _mm_prefetch(reinterpret_cast<const char*>(&entityIt[4]->m_collidable), _MM_HINT_NTA);
             }
             *handleIt = &entity->m_collidable.m_broadPhaseHandle;
             const hkpCollidable::BoundingVolumeData& bv = entity->m_collidable.m_boundingVolumeData;
@@ -1736,7 +1737,7 @@ void hkpContinuousSimulation::collideEntitiesBroadPhaseContinuousFindPairs(
     for (int32_t i = numEntities - 1; i >= 0; i--) {
         hkpEntity* entity = *entityIt;
         if (i >= 4) {
-            __builtin_prefetch(&entityIt[4]->m_collidable, 0, 0);
+            _mm_prefetch(reinterpret_cast<const char*>(&entityIt[4]->m_collidable), _MM_HINT_NTA);
         }
         *handleIt = &entity->m_collidable.m_broadPhaseHandle;
         const hkpCollidable::BoundingVolumeData& bv = entity->m_collidable.m_boundingVolumeData;

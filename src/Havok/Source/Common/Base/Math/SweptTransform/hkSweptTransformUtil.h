@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Common/Base/Types/Physics/hkStepInfo.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -132,7 +133,8 @@ namespace hkSweptTransformUtil {
         {
             const float maxLinVel = hkUFloat8_intToReal[motionState.m_maxLinearVelocity.m_value];
             const hkQuadReal sq = _mm_mul_ps(linearVelocity.m_quad, linearVelocity.m_quad);
-            const float linVelSqrd = sq[2] + static_cast<float>(sq[1] + sq[0]);
+            const float linVelSqrd =
+                XFNV_M128_F32(sq, 2) + static_cast<float>(XFNV_M128_F32(sq, 1) + XFNV_M128_F32(sq, 0));
             if (linVelSqrd > maxLinVel * maxLinVel) {
                 const float f = (1.0f / std::sqrt(linVelSqrd)) * maxLinVel;
                 linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), linearVelocity.m_quad);
@@ -151,7 +153,8 @@ namespace hkSweptTransformUtil {
         hkQuaternion dq;
         dq.m_vec.m_quad = _mm_mul_ps(_mm_set1_ps(halfDeltaTime), angularVelocity.m_quad);
         const hkQuadReal dqSq = _mm_mul_ps(dq.m_vec.m_quad, dq.m_vec.m_quad);
-        const float dqLenSqrd = dqSq[2] + static_cast<float>(dqSq[1] + dqSq[0]);
+        const float dqLenSqrd =
+            XFNV_M128_F32(dqSq, 2) + static_cast<float>(XFNV_M128_F32(dqSq, 1) + XFNV_M128_F32(dqSq, 0));
         float pre = dqLenSqrd * 0.40528471201320165;
         float maxAngle = hkUFloat8_intToReal[motionState.m_maxAngularVelocity.m_value] * info.m_deltaTime;
         if (maxAngle > 0.8999999761581421) {
@@ -185,9 +188,11 @@ namespace hkSweptTransformUtil {
         const float maxAngular = hkUFloat8_intToReal[motionState.m_maxAngularVelocity.m_value] *
             hkUFloat8_intToReal[motionState.m_maxAngularVelocity.m_value];
         const hkQuadReal linSq = _mm_mul_ps(linearVelocity.m_quad, linearVelocity.m_quad);
-        const float linVelSqrd = linSq[2] + static_cast<float>(linSq[1] + linSq[0]);
+        const float linVelSqrd =
+            XFNV_M128_F32(linSq, 2) + static_cast<float>(XFNV_M128_F32(linSq, 1) + XFNV_M128_F32(linSq, 0));
         const hkQuadReal angSq = _mm_mul_ps(angularVelocity.m_quad, angularVelocity.m_quad);
-        const float angVelSqrd = angSq[2] + static_cast<float>(angSq[1] + angSq[0]);
+        const float angVelSqrd =
+            XFNV_M128_F32(angSq, 2) + static_cast<float>(XFNV_M128_F32(angSq, 1) + XFNV_M128_F32(angSq, 0));
         const float maxLinear = hkUFloat8_intToReal[motionState.m_maxLinearVelocity.m_value] *
             hkUFloat8_intToReal[motionState.m_maxLinearVelocity.m_value];
         if (linVelSqrd > maxLinear || linVelSqrd != linVelSqrd) {

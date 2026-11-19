@@ -10,8 +10,7 @@
 
 // buf is the storage create placement-constructs the tracer in, aligned as the tracer; _stackTracerWin32DataBuf is the
 // hkStackTracerWin32Data the constructor points m_impl at.
-using hkStackTracerBuf_t [[gnu::aligned(alignof(hkStackTracer))]] = char[sizeof(hkStackTracer)];
-static hkStackTracerBuf_t buf{};
+alignas(hkStackTracer) static char buf[sizeof(hkStackTracer)]{};
 static hkStackTracerImpl _stackTracerWin32DataBuf{};
 
 // m_value is untyped storage: populate and depopulate move any singleton's instance pointer through it.

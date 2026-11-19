@@ -50,19 +50,20 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
 #include <xmmintrin.h>
 
 void estimateAllowedPenetrationDepth(const hkVector4& arExtent, hkpCollidable* apCollidable) {
-    float y = arExtent.m_quad[1];
-    double x = arExtent.m_quad[0];
+    float y = XFNV_M128_F32(arExtent.m_quad, 1);
+    double x = XFNV_M128_F32(arExtent.m_quad, 0);
     if (!(y > x)) {
         x = y;
     }
     float v4 = x;
-    float z = arExtent.m_quad[2];
+    float z = XFNV_M128_F32(arExtent.m_quad, 2);
     double v3 = v4;
     if (!(z > static_cast<double>(v4))) {
         v3 = z;
@@ -389,9 +390,9 @@ void hkpRigidBody::setLinearVelocityAsCriticalOperation(const hkVector4& newVel)
         hkWorldOperation::SetRigidBodyLinearVelocity kOperation;
         kOperation.m_rigidBody = this;
         kOperation.m_type.m_storage = hkWorldOperation::RIGIDBODY_SET_LINEAR_VELOCITY;
-        kOperation.m_linearVelocity[0] = newVel.m_quad[0];
-        kOperation.m_linearVelocity[1] = newVel.m_quad[1];
-        kOperation.m_linearVelocity[2] = newVel.m_quad[2];
+        kOperation.m_linearVelocity[0] = XFNV_M128_F32(newVel.m_quad, 0);
+        kOperation.m_linearVelocity[1] = XFNV_M128_F32(newVel.m_quad, 1);
+        kOperation.m_linearVelocity[2] = XFNV_M128_F32(newVel.m_quad, 2);
         pWorld->queueOperation(kOperation);
     }
     else {
@@ -407,9 +408,9 @@ void hkpRigidBody::setAngularVelocityAsCriticalOperation(const hkVector4& newVel
         hkWorldOperation::SetRigidBodyAngularVelocity kOperation;
         kOperation.m_rigidBody = this;
         kOperation.m_type.m_storage = hkWorldOperation::RIGIDBODY_SET_ANGULAR_VELOCITY;
-        kOperation.m_angularVelocity[0] = newVel.m_quad[0];
-        kOperation.m_angularVelocity[1] = newVel.m_quad[1];
-        kOperation.m_angularVelocity[2] = newVel.m_quad[2];
+        kOperation.m_angularVelocity[0] = XFNV_M128_F32(newVel.m_quad, 0);
+        kOperation.m_angularVelocity[1] = XFNV_M128_F32(newVel.m_quad, 1);
+        kOperation.m_angularVelocity[2] = XFNV_M128_F32(newVel.m_quad, 2);
         m_world->queueOperation(kOperation);
     }
     else {
@@ -423,11 +424,11 @@ void hkpRigidBody::applyLinearImpulseAsCriticalOperation(const hkVector4& imp) {
     hkpWorld* pWorld = m_world;
     if (pWorld && pWorld->m_criticalOperationsLockCount) {
         hkWorldOperation::ApplyRigidBodyLinearImpulse kOperation;
-        kOperation.m_linearImpulse[0] = imp.m_quad[0];
+        kOperation.m_linearImpulse[0] = XFNV_M128_F32(imp.m_quad, 0);
         kOperation.m_type.m_storage = hkWorldOperation::RIGIDBODY_APPLY_LINEAR_IMPULSE;
         kOperation.m_rigidBody = this;
-        kOperation.m_linearImpulse[1] = imp.m_quad[1];
-        kOperation.m_linearImpulse[2] = imp.m_quad[2];
+        kOperation.m_linearImpulse[1] = XFNV_M128_F32(imp.m_quad, 1);
+        kOperation.m_linearImpulse[2] = XFNV_M128_F32(imp.m_quad, 2);
         pWorld->queueOperation(kOperation);
     }
     else {
@@ -464,11 +465,11 @@ void hkpRigidBody::applyAngularImpulseAsCriticalOperation(const hkVector4& imp) 
     hkpWorld* pWorld = m_world;
     if (pWorld && pWorld->m_criticalOperationsLockCount) {
         hkWorldOperation::ApplyRigidBodyAngularImpulse kOperation;
-        kOperation.m_angularImpulse[0] = imp.m_quad[0];
+        kOperation.m_angularImpulse[0] = XFNV_M128_F32(imp.m_quad, 0);
         kOperation.m_type.m_storage = hkWorldOperation::RIGIDBODY_APPLY_ANGULAR_IMPULSE;
         kOperation.m_rigidBody = this;
-        kOperation.m_angularImpulse[1] = imp.m_quad[1];
-        kOperation.m_angularImpulse[2] = imp.m_quad[2];
+        kOperation.m_angularImpulse[1] = XFNV_M128_F32(imp.m_quad, 1);
+        kOperation.m_angularImpulse[2] = XFNV_M128_F32(imp.m_quad, 2);
         pWorld->queueOperation(kOperation);
     }
     else {
@@ -628,9 +629,9 @@ void hkpRigidBody::createDynamicRigidMotion(
     hkpMotion* pMotion;
     switch (motionType) {
         case hkpMotion::MOTION_DYNAMIC: {
-            float fXX = inertiaLocal.m_col0.m_quad[0];
-            float fYY = inertiaLocal.m_col1.m_quad[1];
-            float fZZ = inertiaLocal.m_col2.m_quad[2];
+            float fXX = XFNV_M128_F32(inertiaLocal.m_col0.m_quad, 0);
+            float fYY = XFNV_M128_F32(inertiaLocal.m_col1.m_quad, 1);
+            float fZZ = XFNV_M128_F32(inertiaLocal.m_col2.m_quad, 2);
             float fMin = hkMath::min2(fXX, hkMath::min2(fYY, fZZ));
             double dMaxScaled = hkMath::max2<float>(fXX, hkMath::max2<float>(fYY, fZZ)) * 0.800000011920929;
             if (fMin > dMaxScaled) {

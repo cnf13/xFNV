@@ -30,6 +30,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeBuffer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -301,7 +302,7 @@ void hkAgent1nMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
                             timEntry->m_timeOfSeparatingNormal = in3.m_input->m_stepInfo.m_endTime;
                             timEntry->m_separatingNormal.setZero4();
                             distAtT1 = static_cast<float>(quality->m_minSeparation * 0.10000000149011612);
-                            timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                            XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
                             goto processTim;
                         }
                         // The separating normal at the step's start: both bodies at their start transforms.
@@ -323,11 +324,11 @@ void hkAgent1nMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
                     timEntry->m_timeOfSeparatingNormal = in3.m_input->m_stepInfo.m_endTime;
 					{
 						const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
-						distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
+						distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
 					}
 					if (in3.m_input->m_tolerance <= distAtT1) {
 						// Still separated at the step's end: the agent does not run.
-						timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+						XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
 						if (entry->m_numContactPoints) {
 							hkpAgentData* end = dispatcher->m_agent3Func[entry->m_agentType].m_cleanupFunc(entry,
 								timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner.m_storage);
@@ -363,7 +364,7 @@ void hkAgent1nMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 							timEntry->m_timeOfSeparatingNormal = flippedTimIn3.m_input->m_stepInfo.m_endTime;
 							timEntry->m_separatingNormal.setZero4();
 							distAtT1 = static_cast<float>(quality->m_minSeparation * 0.5);
-							timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+							XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
 							goto processFlippedTim;
 						}
 						// The separating normal at the step's start: both bodies at their start transforms. The child
@@ -384,11 +385,11 @@ void hkAgent1nMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 					timEntry->m_timeOfSeparatingNormal = flippedTimIn3.m_input->m_stepInfo.m_endTime;
 					{
 						const float fProjected = flippedTimIn3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
-						distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
+						distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
 					}
 					if (flippedTimIn3.m_input->m_tolerance <= distAtT1) {
 						// Still separated at the step's end: the agent does not run.
-						timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+						XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
 						if (entry->m_numContactPoints) {
 							hkpAgentData* end = dispatcher->m_agent3Func[entry->m_agentType].m_cleanupFunc(entry,
 								timEntry + 1, flippedTimIn3.m_contactMgr, *output.m_constraintOwner.m_storage);
@@ -831,7 +832,7 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
                             timEntry->m_timeOfSeparatingNormal = pInput->m_stepInfo.m_endTime;
                             timEntry->m_separatingNormal.setZero4();
                             distAtT1 = static_cast<float>(quality->m_minSeparation * 0.10000000149011612);
-                            timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                            XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
                             goto processTim;
                         }
                         // The separating normal at the step's start: both bodies at their start transforms. The
@@ -854,10 +855,10 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
                     {
 						timEntry->m_timeOfSeparatingNormal = pInput->m_stepInfo.m_endTime;
 						const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
-						distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
+						distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
 						if (distAtT1 >= in3.m_input->m_tolerance) {
 							// Still separated at the step's end: the agent does not run.
-							timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+							XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
 							if (!entry->m_numContactPoints) {
 								currentData += entry->m_size;
 								numTim++;
@@ -890,7 +891,7 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 							timEntry->m_timeOfSeparatingNormal = flippedTimInput.m_input->m_stepInfo.m_endTime;
 							timEntry->m_separatingNormal.setZero4();
 							distAtT1 = static_cast<float>(quality->m_minSeparation * 0.5);
-							timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+							XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
 							goto processTimFlipped;
 						}
 						if (!sepInputFlippedInitialized) {
@@ -911,9 +912,9 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 					{
 						timEntry->m_timeOfSeparatingNormal = flippedTimInput.m_input->m_stepInfo.m_endTime;
 						const float fProjected = flippedTimInput.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
-						distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
+						distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
 						if (distAtT1 >= flippedTimInput.m_input->m_tolerance) {
-							timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+							XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
 							if (!entry->m_numContactPoints) {
 								currentData += entry->m_size;
 								numTim++;

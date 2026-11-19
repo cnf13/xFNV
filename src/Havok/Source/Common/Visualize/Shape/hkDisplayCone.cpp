@@ -15,6 +15,7 @@
 #include "Havok/Source/Common/Base/Types/Geometry/hkGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometryTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -162,12 +163,12 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
     }
     vertices.m_size = m_numSegments;
     hkVector4* p_m_coneAxis = &m_coneAxis;
-    float v31 = std::fabs((double)m_coneAxis.m_quad[0]);
+    float v31 = std::fabs((double)XFNV_M128_F32(m_coneAxis.m_quad, 0));
     int32_t v8 = 1;
     int32_t n2_1 = 0;
     int32_t n2 = 2;
-    float v33 = std::fabs((double)m_coneAxis.m_quad[1]);
-    float v34 = std::fabs((double)m_coneAxis.m_quad[2]);
+    float v33 = std::fabs((double)XFNV_M128_F32(m_coneAxis.m_quad, 1));
+    float v34 = std::fabs((double)XFNV_M128_F32(m_coneAxis.m_quad, 2));
     if (v31 > static_cast<double>(v33)) {
         v31 = v33;
         v8 = 0;
@@ -176,20 +177,20 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
     if (v31 > static_cast<double>(v34)) {
         n2 = n2_1;
     }
-    double v10 = p_m_coneAxis->m_quad[n2];
+    double v10 = XFNV_M128_F32(p_m_coneAxis->m_quad, n2);
     arAxis.m_quad = _mm_setzero_ps();
-    arAxis.m_quad[v8] = v10;
-    arAxis.m_quad[n2] = -p_m_coneAxis->m_quad[v8];
+    XFNV_M128_F32(arAxis.m_quad, v8) = v10;
+    XFNV_M128_F32(arAxis.m_quad, n2) = -XFNV_M128_F32(p_m_coneAxis->m_quad, v8);
     __m128 v11 = _mm_mul_ps(arAxis.m_quad, arAxis.m_quad);
-    float v12 = _mm_shuffle_ps(v11, v11, 85)[0] + v11[0];
+    float v12 = XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0);
     __m128 v13 = _mm_shuffle_ps(v11, v11, 170);
-    v13[0] = v13[0] + v12;
-    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v13[0])));
-    v15[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    XFNV_M128_F32(v13, 0) = XFNV_M128_F32(v13, 0) + v12;
+    float v14 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v13, 0))));
+    XFNV_M128_F32(v15, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v16 = _mm_cmpeq_ss(v13, v15);
-    v15[0] = 3.0f - ((v13[0] * v14) * v14);
+    XFNV_M128_F32(v15, 0) = 3.0f - ((XFNV_M128_F32(v13, 0) * v14) * v14);
     __m128 v17 = _mm_setzero_ps();
-    v17[0] = (0.5f * v14) * v15[0];
+    XFNV_M128_F32(v17, 0) = (0.5f * v14) * XFNV_M128_F32(v15, 0);
     __m128 v18 = _mm_andnot_ps(v16, v17);
     float afAngle = m_coneAngle;
     arAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(v18, v18, 0), arAxis.m_quad);
@@ -198,7 +199,8 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
     v39.setAxisAngle(m_coneAxis, afAngle_1);
     __m128 v19 = _mm_mul_ps(p_m_coneAxis->m_quad, v38.m_vec.m_quad);
     __m128 v20 = _mm_shuffle_ps(v19, v19, 170);
-    v20[0] = v20[0] + (_mm_shuffle_ps(v19, v19, 85)[0] + v19[0]);
+    XFNV_M128_F32(v20, 0) =
+        XFNV_M128_F32(v20, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v19, v19, 85), 0) + XFNV_M128_F32(v19, 0));
     __m128 v21 = _mm_shuffle_ps(v38.m_vec.m_quad, v38.m_vec.m_quad, 255);
     int32_t m_numSegments_3 = 0;
     __m128 v23 = _mm_add_ps(
@@ -231,7 +233,8 @@ void hkDisplayCone::generateConeVertices(hkArrayBase<hkVector4>& vertices) {
             );
             __m128 v26 = _mm_mul_ps(v39.m_vec.m_quad, v24);
             __m128 v27 = _mm_shuffle_ps(v26, v26, 170);
-            v27[0] = v27[0] + (_mm_shuffle_ps(v26, v26, 85)[0] + v26[0]);
+            XFNV_M128_F32(v27, 0) =
+                XFNV_M128_F32(v27, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v26, v26, 85), 0) + XFNV_M128_F32(v26, 0));
             __m128 v28 = _mm_shuffle_ps(v39.m_vec.m_quad, v39.m_vec.m_quad, 255);
             ++m_numSegments_3;
             __m128 v29 = _mm_add_ps(

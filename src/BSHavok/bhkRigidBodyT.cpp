@@ -35,6 +35,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -131,10 +132,10 @@ void bhkRigidBodyT::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
     }
     apStrings->SetAt(m_usSize, v19);
-    rot.m_fX = kLocalRot.m_vec.m_quad[0];
-    rot.m_fY = kLocalRot.m_vec.m_quad[1];
-    rot.m_fZ = kLocalRot.m_vec.m_quad[2];
-    rot.m_fW = kLocalRot.m_vec.m_quad[3];
+    rot.m_fX = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 0);
+    rot.m_fY = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 1);
+    rot.m_fZ = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 2);
+    rot.m_fW = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 3);
     HK2NI(pos, kLocalPos);
     char* v9 = rot.GetViewerString("Local Rot");
     uint32_t v10 = apStrings->m_usSize;
@@ -222,7 +223,8 @@ hkVector4& bhkRigidBodyT::GetPosition(hkVector4& arPos) {
         GetRotation(hkq);
         __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
         __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
-        v4[0] = v4[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
+        XFNV_M128_F32(v4, 0) =
+            XFNV_M128_F32(v4, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0));
         __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
         __m128 v8 = _mm_add_ps(
             _mm_mul_ps(
@@ -266,7 +268,8 @@ void bhkRigidBodyT::SetPosition(const hkVector4& arPos) {
         GetRotation(hkq);
         __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
         __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
-        v4[0] = v4[0] + (_mm_shuffle_ps(v3, v3, 85)[0] + v3[0]);
+        XFNV_M128_F32(v4, 0) =
+            XFNV_M128_F32(v4, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0));
         __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
         __m128 v6 = _mm_add_ps(
             _mm_mul_ps(
@@ -319,10 +322,10 @@ hkVector4& bhkRigidBodyT::GetCenterOfMassInWorld(hkVector4& arCOM) {
         if (pBody) {
             hkVector4 kOffset;
             kOffset.setMul3(pBody->m_motion.m_motionState.m_transform.m_rotation, kLocalPos);
-            arCOM.m_quad[0] = arCOM.m_quad[0] - kOffset.m_quad[0];
-            arCOM.m_quad[1] = arCOM.m_quad[1] - kOffset.m_quad[1];
-            arCOM.m_quad[2] = arCOM.m_quad[2] - kOffset.m_quad[2];
-            arCOM.m_quad[3] = arCOM.m_quad[3] - kOffset.m_quad[3];
+            XFNV_M128_F32(arCOM.m_quad, 0) = XFNV_M128_F32(arCOM.m_quad, 0) - XFNV_M128_F32(kOffset.m_quad, 0);
+            XFNV_M128_F32(arCOM.m_quad, 1) = XFNV_M128_F32(arCOM.m_quad, 1) - XFNV_M128_F32(kOffset.m_quad, 1);
+            XFNV_M128_F32(arCOM.m_quad, 2) = XFNV_M128_F32(arCOM.m_quad, 2) - XFNV_M128_F32(kOffset.m_quad, 2);
+            XFNV_M128_F32(arCOM.m_quad, 3) = XFNV_M128_F32(arCOM.m_quad, 3) - XFNV_M128_F32(kOffset.m_quad, 3);
         }
     }
     return arCOM;

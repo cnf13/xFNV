@@ -10,6 +10,7 @@
 #include "Havok/Source/Common/Base/Reflection/hkTypeInfo.h"
 #include "Havok/Source/Common/SceneData/Attributes/hkxAttributeGroupClass.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -98,7 +99,8 @@ void hkSweptTransform::approxTransformAt(float time, hkTransform& transformOut) 
     __m128 v12 = _mm_undefined_ps();
     uint32_t v16;
     hkQuaternion arQuaternion;
-    *reinterpret_cast<float*>(&v16) = (time - m_centerOfMass0.m_quad[3]) * m_centerOfMass1.m_quad[3];
+    *reinterpret_cast<float*>(&v16) =
+        (time - XFNV_M128_F32(m_centerOfMass0.m_quad, 3)) * XFNV_M128_F32(m_centerOfMass1.m_quad, 3);
     __m128 v4 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v16)), _mm_set_ss(std::bit_cast<float>(v16)), 0);
     __m128 v5 = _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v4), m_rotation0.m_vec.m_quad);
     __m128 v6 = _mm_mul_ps(m_rotation1.m_vec.m_quad, v4);
@@ -106,12 +108,12 @@ void hkSweptTransform::approxTransformAt(float time, hkTransform& transformOut) 
     __m128 v8 = _mm_mul_ps(v7, v7);
     __m128 v9 = _mm_add_ps(_mm_shuffle_ps(v8, v8, 78), v8);
     __m128 v10 = _mm_add_ps(_mm_shuffle_ps(v9, v9, 177), v9);
-    float v11 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v10[0])));
-    v12[0] = std::bit_cast<float>(static_cast<int32_t>(0.0f));
+    float v11 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v10, 0))));
+    XFNV_M128_F32(v12, 0) = std::bit_cast<float>(static_cast<int32_t>(0.0f));
     __m128 v13 = _mm_cmpeq_ss(v10, v12);
-    v12[0] = 3.0f - ((v10[0] * v11) * v11);
+    XFNV_M128_F32(v12, 0) = 3.0f - ((XFNV_M128_F32(v10, 0) * v11) * v11);
     __m128 v14 = _mm_setzero_ps();
-    v14[0] = (0.5f * v11) * v12[0];
+    XFNV_M128_F32(v14, 0) = (0.5f * v11) * XFNV_M128_F32(v12, 0);
     __m128 v15 = _mm_andnot_ps(v13, v14);
     arQuaternion.m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v15, v15, 0), v7);
     transformOut.m_rotation.set(arQuaternion);

@@ -31,6 +31,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "SDK/MSVC/string.h"
 
+#include <bit>
 #include <cstring>
 
 template void NiTLargeArray<BLENDKEY, NiTMallocInterface<BLENDKEY>>::SetSize(uint32_t uiMaxSize);
@@ -433,9 +434,9 @@ void bhkBlendController::SaveBinary(NiStream& arStream) {
         uint32_t auiKey[3];
         memcpy(auiKey, &pBlendKeyA.m_pBase[i], sizeof(auiKey));
         if (!arStream.m_bSaveLittleEndian) {
-            auiKey[0] = __builtin_bswap32(auiKey[0]);
-            auiKey[1] = __builtin_bswap32(auiKey[1]);
-            auiKey[2] = __builtin_bswap32(auiKey[2]);
+            auiKey[0] = std::byteswap<uint32_t>(auiKey[0]);
+            auiKey[1] = std::byteswap<uint32_t>(auiKey[1]);
+            auiKey[2] = std::byteswap<uint32_t>(auiKey[2]);
         }
         uint32_t uiTwelve = 12;
         arStream.m_pkOstr->BinaryWrite(auiKey, 12, &uiTwelve, 1);
@@ -521,9 +522,9 @@ void bhkBlendController::LoadBinary(NiStream& arStream) {
         if (!arStream.m_bSourceIsLittleEndian) {
             uint32_t auiKey[3];
             memcpy(auiKey, &kKey, sizeof(auiKey));
-            auiKey[0] = __builtin_bswap32(auiKey[0]);
-            auiKey[1] = __builtin_bswap32(auiKey[1]);
-            auiKey[2] = __builtin_bswap32(auiKey[2]);
+            auiKey[0] = std::byteswap<uint32_t>(auiKey[0]);
+            auiKey[1] = std::byteswap<uint32_t>(auiKey[1]);
+            auiKey[2] = std::byteswap<uint32_t>(auiKey[2]);
             memcpy(&kKey, auiKey, sizeof(kKey));
         }
         AddKey(kKey);

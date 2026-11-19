@@ -35,6 +35,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, in initialization order.
 SettingT<GameSettingCollection> fBookPerkBonus("fBookPerkBonus", 1.0f);
@@ -68,7 +69,7 @@ bool TESObjectBOOK::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;
@@ -82,7 +83,7 @@ bool TESObjectBOOK::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
                 apFile->GetChunkData(pBuffer, uiSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiSize, usFormVersion);

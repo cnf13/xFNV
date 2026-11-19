@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/Types/Geometry/Sphere/hkSphere.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppFindAllVirtualMachine.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppVirtualMachine.h"
+#include "xfnv/Compiler.h"
 
 class hkpMoppCode;
 struct hkpMoppInfo;
@@ -106,7 +107,7 @@ public:
         const hkpMoppFindAllVirtualMachine::hkpMoppFindAllVirtualMachineQuery* query,
         const uint8_t* commands
     ) {
-        const float radiusSquared = m_sphere2.m_pos.m_quad[3] * m_sphere2.m_pos.m_quad[3];
+        const float radiusSquared = XFNV_M128_F32(m_sphere2.m_pos.m_quad, 3) * XFNV_M128_F32(m_sphere2.m_pos.m_quad, 3);
         const __m128 extent = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
         const __m128 centre = _mm_and_ps(
             _mm_sub_ps(_mm_add_ps(aabb.m_max.m_quad, aabb.m_min.m_quad), m_sphere2.m_pos.m_quad),
@@ -147,7 +148,7 @@ public:
         const hkpMoppFindAllVirtualMachine::hkpMoppFindAllVirtualMachineQuery* query,
         const uint8_t* commands
     ) {
-        const float radiusSquared = m_sphere2.m_pos.m_quad[3] * m_sphere2.m_pos.m_quad[3];
+        const float radiusSquared = XFNV_M128_F32(m_sphere2.m_pos.m_quad, 3) * XFNV_M128_F32(m_sphere2.m_pos.m_quad, 3);
         const __m128 extent = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
         const __m128 centre = _mm_and_ps(
             _mm_sub_ps(_mm_add_ps(aabb.m_max.m_quad, aabb.m_min.m_quad), m_sphere2.m_pos.m_quad),

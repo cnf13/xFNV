@@ -25,9 +25,11 @@
 #include "Havok/Source/Physics/Collide/BroadPhase/hkpBroadPhaseHandlePair.h"
 #include "Havok/Source/Physics/Collide/Dispatch/BroadPhase/hkpBroadPhaseHandle.h"
 #include "Havok/Source/Physics/Collide/Dispatch/BroadPhase/hkpTypedBroadPhaseHandle.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
+#include <cstring>
 #include <xmmintrin.h>
 
 // The 3-axis sweep keeps 16-bit coordinates.
@@ -106,9 +108,9 @@ void hkp3AxisSweep::set32BitOffsetAndScale(
         ),
         m_quad
     );
-    *reinterpret_cast<float*>(&v6) = 1.0 / v9[0];
-    *reinterpret_cast<float*>(&v7) = 1.0 / v9[1];
-    *reinterpret_cast<float*>(&v8) = 1.0 / v9[2];
+    *reinterpret_cast<float*>(&v6) = 1.0 / XFNV_M128_F32(v9, 0);
+    *reinterpret_cast<float*>(&v7) = 1.0 / XFNV_M128_F32(v9, 1);
+    *reinterpret_cast<float*>(&v8) = 1.0 / XFNV_M128_F32(v9, 2);
     m_scale.m_quad = _mm_mul_ps(
         _mm_unpacklo_ps(
             _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(v6)), _mm_set_ss(std::bit_cast<float>(v8))),
@@ -269,12 +271,12 @@ void hkp3AxisSweep::updateAabbs(
         );
         // The quantized value is the float's bits shifted right by 7, cut to 16 bits; a min end clears the low bit,
         // a max end sets it.
-        uint32_t minX = std::bit_cast<uint32_t>(quantMin[0]) >> 7 & 0xFFFE;
-        uint32_t minY = std::bit_cast<uint32_t>(quantMin[1]) >> 7 & 0xFFFE;
-        uint32_t minZ = std::bit_cast<uint32_t>(quantMin[2]) >> 7 & 0xFFFE;
-        uint32_t maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[0]) >> 7) | 1;
-        uint32_t maxY = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[1]) >> 7) | 1;
-        uint32_t maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[2]) >> 7) | 1;
+        uint32_t minX = std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, 0)) >> 7 & 0xFFFE;
+        uint32_t minY = std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, 1)) >> 7 & 0xFFFE;
+        uint32_t minZ = std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, 2)) >> 7 & 0xFFFE;
+        uint32_t maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, 0)) >> 7) | 1;
+        uint32_t maxY = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, 1)) >> 7) | 1;
+        uint32_t maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, 2)) >> 7) | 1;
         hkpBpNode* nodes = m_nodes.m_data;
         uint32_t id = (*ppObject)->m_id;
         hkpBpNode* node = &nodes[id];
@@ -1462,10 +1464,10 @@ void hkp3AxisSweep::queryBatchAabbSub(
             uint32_t nodeMax;
             uint32_t otherMin;
             uint32_t otherMax;
-            __builtin_memcpy(&nodeMin, &node->min_y, sizeof(uint32_t));
-            __builtin_memcpy(&nodeMax, &node->max_y, sizeof(uint32_t));
-            __builtin_memcpy(&otherMin, &other->min_y, sizeof(uint32_t));
-            __builtin_memcpy(&otherMax, &other->max_y, sizeof(uint32_t));
+            std::memcpy(&nodeMin, &node->min_y, sizeof(uint32_t));
+            std::memcpy(&nodeMax, &node->max_y, sizeof(uint32_t));
+            std::memcpy(&otherMin, &other->min_y, sizeof(uint32_t));
+            std::memcpy(&otherMax, &other->max_y, sizeof(uint32_t));
             if (((otherMax - nodeMin) | (nodeMax - otherMin)) & 0x80008000u) {
                 continue;
             }
@@ -1541,10 +1543,10 @@ void hkp3AxisSweep::queryBatchAabbSub(
             uint32_t nodeMax;
             uint32_t otherMin;
             uint32_t otherMax;
-            __builtin_memcpy(&nodeMin, &node->min_y, sizeof(uint32_t));
-            __builtin_memcpy(&nodeMax, &node->max_y, sizeof(uint32_t));
-            __builtin_memcpy(&otherMin, &other->min_y, sizeof(uint32_t));
-            __builtin_memcpy(&otherMax, &other->max_y, sizeof(uint32_t));
+            std::memcpy(&nodeMin, &node->min_y, sizeof(uint32_t));
+            std::memcpy(&nodeMax, &node->max_y, sizeof(uint32_t));
+            std::memcpy(&otherMin, &other->min_y, sizeof(uint32_t));
+            std::memcpy(&otherMax, &other->max_y, sizeof(uint32_t));
             if (((otherMax - nodeMin) | (nodeMax - otherMin)) & 0x80008000u) {
                 continue;
             }
@@ -1640,7 +1642,7 @@ void hkp3AxisSweep::querySingleAabb(const hkAabb& aabbIn, hkArray<hkpBroadPhaseH
     __m128 zero = _mm_setzero_ps();
     uint32_t* pClear = pBitField;
     for (int32_t i = numNodes >> 7; i >= 0; i--) {
-        __builtin_memset(pClear, 0, sizeof(uint32_t) * 4);
+        std::memset(pClear, 0, sizeof(uint32_t) * 4);
         pClear += 4;
     }
 
@@ -1793,7 +1795,7 @@ void hkp3AxisSweep::querySingleAabbWithCollector(const hkAabb& aabbIn, hkpBroadP
     __m128 zero = _mm_setzero_ps();
     uint32_t* pClear = pBitField;
     for (int32_t i = numNodes >> 7; i >= 0; i--) {
-        __builtin_memset(pClear, 0, sizeof(uint32_t) * 4);
+        std::memset(pClear, 0, sizeof(uint32_t) * 4);
         pClear += 4;
     }
 
@@ -1936,7 +1938,7 @@ void hkp3AxisSweep::calcAabbCache(const hkAabb& aabb, hkpBroadPhaseAabbCache* Aa
     __m128 zero = _mm_setzero_ps();
     uint32_t* pClear = pBitField;
     for (int32_t i = numNodes >> 7; i >= 0; i--) {
-        __builtin_memset(pClear, 0, sizeof(uint32_t) * 4);
+        std::memset(pClear, 0, sizeof(uint32_t) * 4);
         pClear += 4;
     }
 
@@ -2195,9 +2197,9 @@ void hkp3AxisSweep::castRay(
     );
     // The quantized value is the float's bits shifted right by 7, cut to 16 bits.
     uint32_t fromQuant[3];
-    fromQuant[0] = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantFrom[0]) >> 7);
-    fromQuant[1] = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantFrom[1]) >> 7);
-    fromQuant[2] = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantFrom[2]) >> 7);
+    fromQuant[0] = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantFrom, 0)) >> 7);
+    fromQuant[1] = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantFrom, 1)) >> 7);
+    fromQuant[2] = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantFrom, 2)) >> 7);
 
     // EXE-INLINED none: hkLocalBuffer<hkUchar>::hkLocalBuffer
     int32_t numBytes = m_nodes.m_size + 16;
@@ -2220,7 +2222,7 @@ void hkp3AxisSweep::castRay(
     // memclear16(bitField, m_nodes.m_size): the exe clears with movaps stores of a zero register.
     uint8_t* pClear = bitField;
     for (int32_t i = m_nodes.m_size >> 4; i >= 0; i--) {
-        __builtin_memset(pClear, 0, 16);
+        std::memset(pClear, 0, 16);
         pClear += 16;
     }
 
@@ -2335,12 +2337,14 @@ void hkp3AxisSweep::castRay(
         float invDir[3];
         float startOffset[3];
         for (int32_t i = 0; i < 3; i++) {
-            float scaledDir = dir.m_quad[i] * m_scale.m_quad[i];
+            float scaledDir = XFNV_M128_F32(dir.m_quad, i) * XFNV_M128_F32(m_scale.m_quad, i);
             float absDir = std::fabs(scaledDir);
-            float scaledFrom = (m_offsetLow.m_quad[i] + rayInput.m_from.m_quad[i]) * m_scale.m_quad[i];
+            float scaledFrom = (XFNV_M128_F32(m_offsetLow.m_quad, i) + XFNV_M128_F32(rayInput.m_from.m_quad, i)) *
+                XFNV_M128_F32(m_scale.m_quad, i);
             float scaledTo;
             if (scaledFrom * 1.1920928955078125e-07 > absDir ||
-                (scaledTo = (to.m_quad[i] + m_offsetLow.m_quad[i]) * m_scale.m_quad[i],
+                (scaledTo = (XFNV_M128_F32(to.m_quad, i) + XFNV_M128_F32(m_offsetLow.m_quad, i)) *
+                     XFNV_M128_F32(m_scale.m_quad, i),
                  scaledTo * 1.1920928955078125e-07 > absDir)) {
                 invDir[i] = 0.0f;
                 startOffset[i] = -2.0f;
@@ -2488,8 +2492,8 @@ void hkp3AxisSweep::castAabb(
     uint32_t minQuant[3];
     uint32_t maxQuant[3];
     for (int32_t i = 0; i < 3; i++) {
-        minQuant[i] = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMin[i]) >> 7);
-        maxQuant[i] = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[i]) >> 7);
+        minQuant[i] = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, i)) >> 7);
+        maxQuant[i] = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, i)) >> 7);
     }
 
     // EXE-INLINED none: hkLocalBuffer<hkUchar>::hkLocalBuffer
@@ -2513,7 +2517,7 @@ void hkp3AxisSweep::castAabb(
     // memclear16(bitField, m_nodes.m_size): the exe clears with movaps stores of a zero register.
     uint8_t* pClear = bitField;
     for (int32_t i = m_nodes.m_size >> 4; i >= 0; i--) {
-        __builtin_memset(pClear, 0, 16);
+        std::memset(pClear, 0, 16);
         pClear += 16;
     }
 
@@ -2610,7 +2614,7 @@ void hkp3AxisSweep::castAabb(
     float trailOffset[3];
     float leadOffset[3];
     for (int32_t i = 0; i < 3; i++) {
-        float scaledDir = dir.m_quad[i] * m_scale.m_quad[i];
+        float scaledDir = XFNV_M128_F32(dir.m_quad, i) * XFNV_M128_F32(m_scale.m_quad, i);
         float absDir = std::fabs(scaledDir);
         if (scaledDir > 0.0f) {
             step[i] = 1;
@@ -2621,18 +2625,20 @@ void hkp3AxisSweep::castAabb(
             // Towards lower values the min face leads: the faces swap, each starting at the end point below.
             step[i] = -1;
             const hkpBpEndPoint* oldTrail = trailEp[i];
-            float oldMin = aabbMin.m_quad[i];
+            float oldMin = XFNV_M128_F32(aabbMin.m_quad, i);
             trailEp[i] = leadEp[i] - 1;
-            aabbMin.m_quad[i] = aabbMax.m_quad[i];
+            XFNV_M128_F32(aabbMin.m_quad, i) = XFNV_M128_F32(aabbMax.m_quad, i);
             leadEp[i] = oldTrail - 1;
-            aabbMax.m_quad[i] = oldMin;
+            XFNV_M128_F32(aabbMax.m_quad, i) = oldMin;
             trailFlip[i] = 1;
             leadFlip[i] = 0;
         }
-        float scaledMin = (aabbMin.m_quad[i] + m_offsetLow.m_quad[i]) * m_scale.m_quad[i];
+        float scaledMin = (XFNV_M128_F32(aabbMin.m_quad, i) + XFNV_M128_F32(m_offsetLow.m_quad, i)) *
+            XFNV_M128_F32(m_scale.m_quad, i);
         float scaledTo;
         if (scaledMin * 1.1920928955078125e-07 > absDir ||
-            (scaledTo = (m_offsetLow.m_quad[i] + input.m_to.m_quad[i]) * m_scale.m_quad[i],
+            (scaledTo = (XFNV_M128_F32(m_offsetLow.m_quad, i) + XFNV_M128_F32(input.m_to.m_quad, i)) *
+                 XFNV_M128_F32(m_scale.m_quad, i),
              scaledTo * 1.1920928955078125e-07 > absDir)) {
             invDir[i] = 0.0f;
             trailOffset[i] = -2.0f;
@@ -2643,7 +2649,8 @@ void hkp3AxisSweep::castAabb(
             invDir[i] = inv;
             float minCorrected = scaledMin - m_intToFloatFloorCorrection;
             trailOffset[i] = minCorrected * inv;
-            float scaledMax = (aabbMax.m_quad[i] + m_offsetLow.m_quad[i]) * m_scale.m_quad[i];
+            float scaledMax = (XFNV_M128_F32(aabbMax.m_quad, i) + XFNV_M128_F32(m_offsetLow.m_quad, i)) *
+                XFNV_M128_F32(m_scale.m_quad, i);
             float maxCorrected = scaledMax - m_intToFloatFloorCorrection;
             leadOffset[i] = inv * maxCorrected;
         }
@@ -3327,12 +3334,12 @@ void hkp3AxisSweep::addObjectBatch(
         );
         // The quantized value is the float's bits shifted right by 7, cut to 16 bits; a min end clears the low bit,
         // a max end sets it.
-        uint16_t minX = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMin[0]) >> 7 & 0xFFFE);
-        uint16_t minY = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMin[1]) >> 7 & 0xFFFE);
-        uint16_t minZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMin[2]) >> 7 & 0xFFFE);
-        uint16_t maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[0]) >> 7) | 1;
-        uint16_t maxY = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[1]) >> 7) | 1;
-        uint16_t maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(quantMax[2]) >> 7) | 1;
+        uint16_t minX = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, 0)) >> 7 & 0xFFFE);
+        uint16_t minY = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, 1)) >> 7 & 0xFFFE);
+        uint16_t minZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMin, 2)) >> 7 & 0xFFFE);
+        uint16_t maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, 0)) >> 7) | 1;
+        uint16_t maxY = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, 1)) >> 7) | 1;
+        uint16_t maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(quantMax, 2)) >> 7) | 1;
 
         hkpBroadPhaseHandle* handle = addObjectList.m_data[i];
         int32_t nodeIndex = oldNumNodes + i;
@@ -3377,7 +3384,7 @@ void hkp3AxisSweep::addObjectBatch(
     // words) a store.
     uint32_t* pClear = bitField;
     for (int32_t i = oldNumNodes >> 7; i >= 0; i--) {
-        __builtin_memset(pClear, 0, sizeof(uint32_t) * 4);
+        std::memset(pClear, 0, sizeof(uint32_t) * 4);
         pClear += 4;
     }
 
@@ -3399,12 +3406,12 @@ void hkp3AxisSweep::addObjectBatch(
         ),
         convertToUint16WithClipMagicQuad
     );
-    uint32_t totalMinX = std::bit_cast<uint32_t>(totalQuantMin[0]) >> 7 & 0xFFFE;
-    uint32_t totalMinY = std::bit_cast<uint32_t>(totalQuantMin[1]) >> 7 & 0xFFFE;
-    uint32_t totalMinZ = std::bit_cast<uint32_t>(totalQuantMin[2]) >> 7 & 0xFFFE;
-    uint32_t totalMaxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(totalQuantMax[0]) >> 7) | 1;
-    uint32_t totalMaxY = static_cast<uint16_t>(std::bit_cast<uint32_t>(totalQuantMax[1]) >> 7) | 1;
-    uint32_t totalMaxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(totalQuantMax[2]) >> 7) | 1;
+    uint32_t totalMinX = std::bit_cast<uint32_t>(XFNV_M128_F32(totalQuantMin, 0)) >> 7 & 0xFFFE;
+    uint32_t totalMinY = std::bit_cast<uint32_t>(XFNV_M128_F32(totalQuantMin, 1)) >> 7 & 0xFFFE;
+    uint32_t totalMinZ = std::bit_cast<uint32_t>(XFNV_M128_F32(totalQuantMin, 2)) >> 7 & 0xFFFE;
+    uint32_t totalMaxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(totalQuantMax, 0)) >> 7) | 1;
+    uint32_t totalMaxY = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(totalQuantMax, 1)) >> 7) | 1;
+    uint32_t totalMaxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(totalQuantMax, 2)) >> 7) | 1;
 
     // The sweep along x: from the marker below the total AABB's min, its node and its overlaps set and the nodes
     // it contains cleared, or else from the first end point; every end point below the min flips its node, and
@@ -4772,6 +4779,7 @@ void hkp3AxisSweep::updateNodesAfterInsert(hkpBpNode* nodes, int32_t numNodes, h
     const int16_t maxZ = int16_t(newNode.max_z - 2);
     const int16_t minX = int16_t(newNode.min_x - 1);
     const int16_t maxX = int16_t(newNode.max_x - 2);
+#if defined(__clang__)
     const __m64 minYZ = _mm_set_pi16(minZ, minY, minZ, minY);
     const __m64 maxYZ = _mm_set_pi16(maxZ, maxY, maxZ, maxY);
     // Lanes 2 and 3 of these two are set to 0; their value does not matter because the mask zeroes the lanes they
@@ -4790,6 +4798,19 @@ void hkp3AxisSweep::updateNodesAfterInsert(hkpBpNode* nodes, int32_t numNodes, h
         quads[1] = _mm_sub_pi16(x, _mm_and_si64(xMask, xSteps));
     }
     _mm_empty();
+#else
+    // cl's x64 has no MMX: the same lanes as one SSE2 value, the y and z half and then the x half.
+    const __m128i kMin = _mm_set_epi16(0, 0, minX, minX, minZ, minY, minZ, minY);
+    const __m128i kMax = _mm_set_epi16(0, 0, maxX, maxX, maxZ, maxY, maxZ, maxY);
+    const __m128i kMask = _mm_set_epi32(0, -1, -1, -1);
+    hkpBpNode* end = nodes + numNodes;
+    for (hkpBpNode* node = nodes; node < end; ++node) {
+        __m128i* pQuads = reinterpret_cast<__m128i*>(node);
+        const __m128i kValue = _mm_loadu_si128(pQuads);
+        const __m128i kSteps = _mm_add_epi16(_mm_cmpgt_epi16(kValue, kMin), _mm_cmpgt_epi16(kValue, kMax));
+        _mm_storeu_si128(pQuads, _mm_sub_epi16(kValue, _mm_and_si128(kMask, kSteps)));
+    }
+#endif
 }
 
 // Havok SDK: clears the bit field, then sets the bits of the nodes whose x interval holds x_value. With markers,
@@ -4808,7 +4829,7 @@ void hkp3AxisSweep::setBitsBasedOnXInterval(
     // Clears 16 bytes per 128 nodes.
     uint32_t* pClear = bitField;
     for (int32_t i = numNodes >> 7; i >= 0; i--) {
-        __builtin_memset(pClear, 0, sizeof(uint32_t) * 4);
+        std::memset(pClear, 0, sizeof(uint32_t) * 4);
         pClear += 4;
     }
     const hkpBpEndPoint* ep = &m_axis[0].m_endPoints.m_data[1];
@@ -4951,10 +4972,10 @@ void hkp3AxisSweep::getAabbFromNode(const hkp3AxisSweep::hkpBpNode& node, hkAabb
     hkp3AxisSweep::hkpBpEndPoint* m_data = m_axis[0].m_endPoints.m_data;
     hkp3AxisSweep::hkpBpEndPoint* v5 = m_axis[1].m_endPoints.m_data;
     v6.m_quad = m_offsetLow.m_quad;
-    v3[0] = 0.0f;
-    float v10 = 1.0 / m_scale.m_quad[0];
-    float v12 = 1.0 / m_scale.m_quad[1];
-    float v14 = 1.0 / m_scale.m_quad[2];
+    XFNV_M128_F32(v3, 0) = 0.0f;
+    float v10 = 1.0 / XFNV_M128_F32(m_scale.m_quad, 0);
+    float v12 = 1.0 / XFNV_M128_F32(m_scale.m_quad, 1);
+    float v14 = 1.0 / XFNV_M128_F32(m_scale.m_quad, 2);
     hkp3AxisSweep::hkpBpEndPoint* v7 = m_axis[2].m_endPoints.m_data;
     *reinterpret_cast<float*>(&v9) = static_cast<double>(m_data[node.min_x].m_value) * v10;
     double v8 = v12;
@@ -5121,7 +5142,7 @@ const hkAabb& hkp3AxisSweep::getOriginalAabb() const {
 void memclear16(void* dest, int32_t bytesize) {
     uint8_t* pClear = static_cast<uint8_t*>(dest);
     for (int32_t i = bytesize >> 4; i >= 0; i--) {
-        __builtin_memset(pClear, 0, 16);
+        std::memset(pClear, 0, 16);
         pClear += 16;
     }
 }

@@ -10,6 +10,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/Util/hkpCharacterMovementUtil.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -27,7 +28,7 @@ hkpCharacterStateType bhkCharacterStateOnGround::getType() const {
 void bhkCharacterStateOnGround::Update(bhkCharacterController& arInput) {
     if ((arInput.iFlags & bhkCharacterController::SUPPORT) == 0 && !arInput.bFakeSupport) {
         if (bKillVelocityOnLaunch) {
-            arInput.OutVelocity.m_quad[2] = 0.0f;
+            XFNV_M128_F32(arInput.OutVelocity.m_quad, 2) = 0.0f;
         }
         alignas(16) NiPoint3 kNiPosition;
         arInput.GetPosition(kNiPosition);
@@ -57,15 +58,15 @@ void bhkCharacterStateOnGround::Update(bhkCharacterController& arInput) {
     muInput.m_currentVelocity = arInput.OutVelocity;
     __m128 kDirection = arInput.Direction.m_quad;
     if ((arInput.iFlags & bhkCharacterController::CHASEBIP) != 0) {
-        float fZ = arInput.Direction.m_quad[2];
-        float fX = arInput.Direction.m_quad[0];
+        float fZ = XFNV_M128_F32(arInput.Direction.m_quad, 2);
+        float fX = XFNV_M128_F32(arInput.Direction.m_quad, 0);
         muInput.m_desiredVelocity.m_quad = _mm_unpacklo_ps(
             _mm_unpacklo_ps(_mm_shuffle_ps(kDirection, kDirection, 0x55), _mm_set_ss(fZ)),
             _mm_unpacklo_ps(_mm_set_ss(fX), _mm_set_ss(zero))
         );
     }
     else {
-        float fX = arInput.Direction.m_quad[0];
+        float fX = XFNV_M128_F32(arInput.Direction.m_quad, 0);
         muInput.m_desiredVelocity.m_quad = _mm_unpacklo_ps(
             _mm_unpacklo_ps(_mm_shuffle_ps(kDirection, kDirection, 0x55), _mm_set_ss(zero)),
             _mm_unpacklo_ps(_mm_set_ss(fX), _mm_set_ss(zero))
@@ -75,7 +76,7 @@ void bhkCharacterStateOnGround::Update(bhkCharacterController& arInput) {
     muInput.m_surfaceVelocity = arInput.m_surfaceVelocity;
     hkpCharacterMovementUtil::calculateMovement(muInput, arInput.OutVelocity);
     if ((arInput.iFlags & bhkCharacterController::CHASEBIP) == 0) {
-        arInput.OutVelocity.m_quad[2] = muInput.m_currentVelocity.m_quad[2];
+        XFNV_M128_F32(arInput.OutVelocity.m_quad, 2) = XFNV_M128_F32(muInput.m_currentVelocity.m_quad, 2);
         const hkpWorld* pWorld = arInput.GethkWorld();
         float fScale = arInput.fGravity * 0.5 * arInput.fSpeedPct;
         float fDeltaTime = arInput.StepInfo.m_deltaTime;

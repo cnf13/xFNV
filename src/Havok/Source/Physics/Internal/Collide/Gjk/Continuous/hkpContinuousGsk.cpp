@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGsk.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -39,7 +40,7 @@ void hk4dGskCollideInitMatrices(const hkp4dGskVertexCollidePointsInput& input, f
     out.m_aTb.setMulInverseMul(out.m_wTa, out.m_wTb);
     out.m_plane.setRotatedDir(out.m_aTb.getRotation(), input.m_planeB);
     out.m_pointOnPlane.setTransformedPos(out.m_aTb, input.m_pointOnPlaneB);
-    out.m_plane.m_quad[3] = -input.m_radiusSum.m_storage;
+    XFNV_M128_F32(out.m_plane.m_quad, 3) = -input.m_radiusSum.m_storage;
     out.m_massCenterAinA.m_quad = input.m_motionA.m_storage->m_sweptTransform.m_centerOfMassLocal.m_quad;
 
     hkVector4Util::rotateInversePoints(out.m_wTa.getRotation(), input.m_deltaAngles, 2, out.m_angularVel);
@@ -297,8 +298,8 @@ void hk4dGskCollideCalcToi(
     alignas(16) hkp4dGskVertexCollidePointsInput sweepIn;
     sweepIn.m_verticesA.m_storage = nullptr;
     const float fDeltaTime = input->m_stepInfo.m_deltaTime;
-    const float fDeltaRtA = fDeltaTime * motionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
-    const float fDeltaRtB = fDeltaTime * motionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    const float fDeltaRtA = fDeltaTime * XFNV_M128_F32(motionA->m_sweptTransform.m_centerOfMass1.m_quad, 3);
+    const float fDeltaRtB = fDeltaTime * XFNV_M128_F32(motionB->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     sweepIn.m_deltaAngles[0].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtA), motionA->m_deltaAngle.m_quad);
     sweepIn.m_deltaAngles[1].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtB), motionB->m_deltaAngle.m_quad);
 
@@ -323,12 +324,12 @@ void hk4dGskCollideCalcToi(
         alignas(16) hkTransform wTa;
         alignas(16) hkTransform wTb;
         alignas(16) hkTransform aTb;
-        float fPrevDist = separatingNormal.m_quad[3];
+        float fPrevDist = XFNV_M128_F32(separatingNormal.m_quad, 3);
         lastNormal.setZero4();
         int32_t iFeatureChange = 1;
         float fRt = 0.0f;
         float fRt0 = 0.0f;
-        float fDist = separatingNormal.m_quad[3];
+        float fDist = XFNV_M128_F32(separatingNormal.m_quad, 3);
         const float fToiSepWithAccuracy = tol.m_toiAccuracy.m_storage + toiSeparation;
         bool bSweepDone = false;
         bool bHaveFeature = false;
@@ -355,11 +356,11 @@ void hk4dGskCollideCalcToi(
                 if (fApproach <= 0.0f) {
                     goto done;
                 }
-                const float fDistAtEnd = separatingNormal.m_quad[3] - fDeltaRt * fApproach;
+                const float fDistAtEnd = XFNV_M128_F32(separatingNormal.m_quad, 3) - fDeltaRt * fApproach;
                 if (minSeparation < fDistAtEnd) {
                     goto done;
                 }
-                const float fToMinSeparation = separatingNormal.m_quad[3] - minSeparation;
+                const float fToMinSeparation = XFNV_M128_F32(separatingNormal.m_quad, 3) - minSeparation;
                 float fStep = fToMinSeparation / fApproach;
                 if (fStep < 0.20000000298023224 && !bSweepDone && bHaveFeature && fLinear < fAngular) {
                     if (!sweepIn.m_verticesA.m_storage) {
@@ -378,9 +379,11 @@ void hk4dGskCollideCalcToi(
                         // The stack block is untyped memory the spheres are written to and read back as vectors.
                         pShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
                         const float fAccelA = sweepIn.m_motionA.m_storage->m_objectRadius *
-                            sweepIn.m_deltaAngles[0].m_quad[3] * sweepIn.m_deltaAngles[0].m_quad[3];
+                            XFNV_M128_F32(sweepIn.m_deltaAngles[0].m_quad, 3) *
+                            XFNV_M128_F32(sweepIn.m_deltaAngles[0].m_quad, 3);
                         const float fAccelB = sweepIn.m_motionB.m_storage->m_objectRadius *
-                            sweepIn.m_deltaAngles[1].m_quad[3] * sweepIn.m_deltaAngles[1].m_quad[3];
+                            XFNV_M128_F32(sweepIn.m_deltaAngles[1].m_quad, 3) *
+                            XFNV_M128_F32(sweepIn.m_deltaAngles[1].m_quad, 3);
                         sweepIn.m_maxAccel.m_storage = fAccelA + fAccelB;
                         sweepIn.m_invMaxAccel.m_storage = 1.0 / (sweepIn.m_maxAccel.m_storage + 1.1920928955078125e-07);
                     }
@@ -413,7 +416,7 @@ void hk4dGskCollideCalcToi(
                     fRt = 1.0f;
                 }
 
-                fPrevDist = separatingNormal.m_quad[3];
+                fPrevDist = XFNV_M128_F32(separatingNormal.m_quad, 3);
                 const float fTAddOn = input->m_stepInfo.m_deltaTime * fRt;
                 lastNormal = separatingNormal;
                 hkSweptTransformUtil::lerp2Ha(motionA->m_sweptTransform, input->m_stepInfo.m_startTime, fTAddOn, wTa);
@@ -445,8 +448,9 @@ void hk4dGskCollideCalcToi(
                     _mm_sub_ps(pointOnA.m_quad, _mm_mul_ps(_mm_shuffle_ps(w, w, _MM_SHUFFLE(0, 0, 0, 0)), s));
                 sweepIn.m_pointOnPlaneB.setTransformedInversePos(aTb, pointOnB);
                 iFeatureChange = gsk.m_featureChange.m_storage;
-                separatingNormal.m_quad[3] = sepOut.m_quad[3] - shapeA->m_radius - shapeB->m_radius;
-                fDist = separatingNormal.m_quad[3];
+                XFNV_M128_F32(separatingNormal.m_quad, 3) =
+                    XFNV_M128_F32(sepOut.m_quad, 3) - shapeA->m_radius - shapeB->m_radius;
+                fDist = XFNV_M128_F32(separatingNormal.m_quad, 3);
                 sweepIn.m_planeB._setRotatedInverseDir(wTb.getRotation(), separatingNormal);
                 bHaveFeature = true;
                 if (fDist <= fToiSepWithAccuracy) {
@@ -538,7 +542,7 @@ void hk4dGskCollideCalcToi(
                     &sepOut
                 );
             }
-            fDist = sepOut.m_quad[3] - fRadiusSum;
+            fDist = XFNV_M128_F32(sepOut.m_quad, 3) - fRadiusSum;
             const float fNewError = fDist - toiSeparation;
             const float fNewAbsError = std::fabs(fNewError);
             if (tol.m_toiAccuracy.m_storage > fNewAbsError) {
@@ -584,7 +588,7 @@ void hk4dGskCollideCalcToi(
         cp.m_separatingNormal.setRotatedDir(wTa.getRotation(), sepOut);
         const float fPositionScale = -pShapeA->m_radius - fDist;
         const hkQuadReal rotatedNormal = cp.m_separatingNormal.m_quad;
-        cp.m_separatingNormal.m_quad[3] = fDist;
+        XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) = fDist;
         alignas(16) hkVector4 normalInOut = cp.m_separatingNormal;
         cp.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set_ps1(fPositionScale), rotatedNormal), pointWorld.m_quad);
 
@@ -628,14 +632,14 @@ void hk4dGskCollideCalcToi(
         // motion and B's angular motion about its mass centre, along the normal.
         const hkMotionState* pMotionA = in3.m_bodyA->m_motion.pState;
         const hkMotionState* pMotionB = in3.m_bodyB->m_motion.pState;
-        const float fRelA = (fToi - pMotionA->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-            pMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
+        const float fRelA = (fToi - XFNV_M128_F32(pMotionA->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+            XFNV_M128_F32(pMotionA->m_sweptTransform.m_centerOfMass1.m_quad, 3);
         hkVector4 centerA;
         centerA.setInterpolate4(
             pMotionA->m_sweptTransform.m_centerOfMass0, pMotionA->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelA)
         );
-        const float fRelB = (fToi - pMotionB->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-            pMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
+        const float fRelB = (fToi - XFNV_M128_F32(pMotionB->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+            XFNV_M128_F32(pMotionB->m_sweptTransform.m_centerOfMass1.m_quad, 3);
         hkVector4 centerB;
         centerB.setInterpolate4(
             pMotionB->m_sweptTransform.m_centerOfMass0, pMotionB->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelB)
@@ -661,8 +665,8 @@ void hk4dGskCollideCalcToi(
             alignas(16) hkp4dGskVertexCollidePointsInput sweepIn2;
             sweepIn2.m_startRt.m_storage = fT;
             const float fDeltaTime2 = in3.m_input->m_stepInfo.m_deltaTime;
-            const float fDeltaRtA2 = fDeltaTime2 * pMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
-            const float fDeltaRtB2 = fDeltaTime2 * pMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
+            const float fDeltaRtA2 = fDeltaTime2 * XFNV_M128_F32(pMotionA->m_sweptTransform.m_centerOfMass1.m_quad, 3);
+            const float fDeltaRtB2 = fDeltaTime2 * XFNV_M128_F32(pMotionB->m_sweptTransform.m_centerOfMass1.m_quad, 3);
             sweepIn2.m_deltaAngles[0].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtA2), pMotionA->m_deltaAngle.m_quad);
             sweepIn2.m_deltaAngles[1].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtB2), pMotionB->m_deltaAngle.m_quad);
             hkVector4 crossA;
@@ -690,10 +694,10 @@ void hk4dGskCollideCalcToi(
             sweepIn2.m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
             // The stack block is untyped memory the spheres are written to and read back as vectors.
             pSweepShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
-            const float fAccelA = sweepIn2.m_motionA.m_storage->m_objectRadius * sweepIn2.m_deltaAngles[0].m_quad[3] *
-                sweepIn2.m_deltaAngles[0].m_quad[3];
-            const float fAccelB = sweepIn2.m_motionB.m_storage->m_objectRadius * sweepIn2.m_deltaAngles[1].m_quad[3] *
-                sweepIn2.m_deltaAngles[1].m_quad[3];
+            const float fAccelA = sweepIn2.m_motionA.m_storage->m_objectRadius *
+                XFNV_M128_F32(sweepIn2.m_deltaAngles[0].m_quad, 3) * XFNV_M128_F32(sweepIn2.m_deltaAngles[0].m_quad, 3);
+            const float fAccelB = sweepIn2.m_motionB.m_storage->m_objectRadius *
+                XFNV_M128_F32(sweepIn2.m_deltaAngles[1].m_quad, 3) * XFNV_M128_F32(sweepIn2.m_deltaAngles[1].m_quad, 3);
             sweepIn2.m_maxAccel.m_storage = fAccelA + fAccelB;
             sweepIn2.m_invMaxAccel.m_storage = 1.0 / (sweepIn2.m_maxAccel.m_storage + 1.1920928955078125e-07);
             sweepIn2.m_planeB.setRotatedInverseDir(wTb.getRotation(), cp.m_separatingNormal);
@@ -776,10 +780,11 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
     double v13;
     uint32_t v22;
     uint32_t v23;
-    *reinterpret_cast<float*>(&v22) = (afTime - apMotionA->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-        apMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    *reinterpret_cast<float*>(&v22) = (afTime - XFNV_M128_F32(apMotionA->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(apMotionA->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     __m128 v7 = _mm_mul_ps(_mm_xor_ps(apLinearTimInfo->m_quad, hkQuadRealNegateMask), apNormal->m_quad);
-    float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
     __m128 v9 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v22)), _mm_set_ss(std::bit_cast<float>(v22)), 0);
     __m128 v10 = _mm_sub_ps(
         apPoint->m_quad,
@@ -795,7 +800,9 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
         ),
         apNormal->m_quad
     );
-    double v12 = (_mm_shuffle_ps(v11, v11, 170)[0] + (_mm_shuffle_ps(v11, v11, 85)[0] + v11[0]));
+    double v12 =
+        (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v11, v11, 85), 0) + XFNV_M128_F32(v11, 0)));
     if (!(v12 <= 0.0)) {
         v13 = v12 / 1.2000000476837158;
     }
@@ -803,8 +810,8 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
         v13 = v12 * 1.2000000476837158;
     }
     float v20 = v13 + v8;
-    *reinterpret_cast<float*>(&v23) = (afTime - apMotionB->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-        apMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    *reinterpret_cast<float*>(&v23) = (afTime - XFNV_M128_F32(apMotionB->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(apMotionB->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     __m128 v14 = _mm_shuffle_ps(_mm_set_ss(std::bit_cast<float>(v23)), _mm_set_ss(std::bit_cast<float>(v23)), 0);
     __m128 v15 = _mm_sub_ps(
         apPoint->m_quad,
@@ -820,7 +827,9 @@ float hk4dGskCalcPointVelocityAssumingAngularVelError(
         ),
         apNormal->m_quad
     );
-    double v17 = (_mm_shuffle_ps(v16, v16, 170)[0] + (_mm_shuffle_ps(v16, v16, 85)[0] + v16[0]));
+    double v17 =
+        (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v16, v16, 85), 0) + XFNV_M128_F32(v16, 0)));
     if (!(v17 >= 0.0)) {
         return v20 - v17 / 1.2000000476837158;
     }
@@ -934,7 +943,7 @@ void findToi(
                 &sepOut
             );
         }
-        fDist = sepOut.m_quad[3] - fRadiusSum;
+        fDist = XFNV_M128_F32(sepOut.m_quad, 3) - fRadiusSum;
         const float fNewError = fDist - tol->m_toiSeparation.m_storage;
         const float fNewAbsError = std::fabs(fNewError);
         if (tol->m_toiAccuracy.m_storage > fNewAbsError) {
@@ -980,7 +989,7 @@ void findToi(
     cp.m_separatingNormal.setRotatedDir(wTa.getRotation(), sepOut);
     const float fPositionScale = -pShapeA->m_radius - fDist;
     const hkQuadReal rotatedNormal = cp.m_separatingNormal.m_quad;
-    cp.m_separatingNormal.m_quad[3] = fDist;
+    XFNV_M128_F32(cp.m_separatingNormal.m_quad, 3) = fDist;
     alignas(16) hkVector4 normalInOut = cp.m_separatingNormal;
     cp.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set_ps1(fPositionScale), rotatedNormal), pointWorld.m_quad);
 
@@ -1024,14 +1033,14 @@ void findToi(
     // and B's angular motion about its mass centre, along the normal.
     const hkMotionState* pMotionA = in3.m_bodyA->m_motion.pState;
     const hkMotionState* pMotionB = in3.m_bodyB->m_motion.pState;
-    const float fRelA = (fToi - pMotionA->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-        pMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    const float fRelA = (fToi - XFNV_M128_F32(pMotionA->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(pMotionA->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     hkVector4 centerA;
     centerA.setInterpolate4(
         pMotionA->m_sweptTransform.m_centerOfMass0, pMotionA->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelA)
     );
-    const float fRelB = (fToi - pMotionB->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
-        pMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
+    const float fRelB = (fToi - XFNV_M128_F32(pMotionB->m_sweptTransform.m_centerOfMass0.m_quad, 3)) *
+        XFNV_M128_F32(pMotionB->m_sweptTransform.m_centerOfMass1.m_quad, 3);
     hkVector4 centerB;
     centerB.setInterpolate4(
         pMotionB->m_sweptTransform.m_centerOfMass0, pMotionB->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelB)
@@ -1057,8 +1066,8 @@ void findToi(
         alignas(16) hkp4dGskVertexCollidePointsInput sweepIn2;
         sweepIn2.m_startRt.m_storage = fT;
         const float fDeltaTime2 = in3.m_input->m_stepInfo.m_deltaTime;
-        const float fDeltaRtA2 = fDeltaTime2 * pMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
-        const float fDeltaRtB2 = fDeltaTime2 * pMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
+        const float fDeltaRtA2 = fDeltaTime2 * XFNV_M128_F32(pMotionA->m_sweptTransform.m_centerOfMass1.m_quad, 3);
+        const float fDeltaRtB2 = fDeltaTime2 * XFNV_M128_F32(pMotionB->m_sweptTransform.m_centerOfMass1.m_quad, 3);
         sweepIn2.m_deltaAngles[0].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtA2), pMotionA->m_deltaAngle.m_quad);
         sweepIn2.m_deltaAngles[1].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtB2), pMotionB->m_deltaAngle.m_quad);
         hkVector4 crossA;
@@ -1086,10 +1095,10 @@ void findToi(
         sweepIn2.m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
         // The stack block is untyped memory the spheres are written to and read back as vectors.
         pSweepShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
-        const float fAccelB = sweepIn2.m_motionB.m_storage->m_objectRadius * sweepIn2.m_deltaAngles[1].m_quad[3] *
-            sweepIn2.m_deltaAngles[1].m_quad[3];
-        const float fAccelA = sweepIn2.m_motionA.m_storage->m_objectRadius * sweepIn2.m_deltaAngles[0].m_quad[3] *
-            sweepIn2.m_deltaAngles[0].m_quad[3];
+        const float fAccelB = sweepIn2.m_motionB.m_storage->m_objectRadius *
+            XFNV_M128_F32(sweepIn2.m_deltaAngles[1].m_quad, 3) * XFNV_M128_F32(sweepIn2.m_deltaAngles[1].m_quad, 3);
+        const float fAccelA = sweepIn2.m_motionA.m_storage->m_objectRadius *
+            XFNV_M128_F32(sweepIn2.m_deltaAngles[0].m_quad, 3) * XFNV_M128_F32(sweepIn2.m_deltaAngles[0].m_quad, 3);
         sweepIn2.m_maxAccel.m_storage = fAccelB + fAccelA;
         sweepIn2.m_invMaxAccel.m_storage = 1.0 / (sweepIn2.m_maxAccel.m_storage + 1.1920928955078125e-07);
         sweepIn2.m_planeB.setRotatedInverseDir(wTb.getRotation(), cp.m_separatingNormal);

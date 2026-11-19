@@ -18,6 +18,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 
+#include <cstring>
+
 NiRTTI bhkBlendCollisionObjectAddRotation::ms_RTTI(
     "bhkBlendCollisionObjectAddRotation",
     &bhkBlendCollisionObject::ms_RTTI
@@ -36,7 +38,7 @@ NiObject* bhkBlendCollisionObjectAddRotation::CreateClone(NiCloningProcess& arCl
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkBlendCollisionObjectAddRotation* pClone = new bhkBlendCollisionObjectAddRotation;
     CopyMembers(pClone, arCloneData);
-    __builtin_memcpy(&pClone->AdditionalRotation, &AdditionalRotation, sizeof(pClone->AdditionalRotation));
+    std::memcpy(&pClone->AdditionalRotation, &AdditionalRotation, sizeof(pClone->AdditionalRotation));
     return pClone;
 }
 
@@ -100,7 +102,7 @@ void bhkBlendCollisionObjectAddRotation::CopyFrom(bhkBlendCollisionObject* apBle
 }
 
 void bhkBlendCollisionObjectAddRotation::SetAdditionalRotation(const NiMatrix3& aAdditionalRotation) {
-    __builtin_memcpy(&AdditionalRotation, &aAdditionalRotation, sizeof(AdditionalRotation));
+    std::memcpy(&AdditionalRotation, &aAdditionalRotation, sizeof(AdditionalRotation));
 }
 
 // Copies the gains and the stored world itself after the base's copy.

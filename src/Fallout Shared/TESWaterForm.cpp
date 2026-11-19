@@ -124,6 +124,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 
@@ -161,7 +162,7 @@ bool TESWaterForm::Load(TESFile* apFile) {
             else if (uiChunk == MNAM_ID) {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above), so it is terminated first; the game does not
                 // do this.
                 pBuffer[0] = '\0';
@@ -225,7 +226,7 @@ bool TESWaterForm::Load(TESFile* apFile) {
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size.
             uint32_t uiChunkSize = apFile->GetChunkSize();
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
             // An empty chunk leaves the buffer unwritten (see above), so it is terminated first; the game does not do
             // this.
             pBuffer[0] = '\0';

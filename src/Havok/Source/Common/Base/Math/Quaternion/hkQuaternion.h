@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 
@@ -142,10 +143,10 @@ inline void hkVector4::setRotatedDir(const hkQuaternion& quat, const hkVector4& 
         const float fTotal = fCrossW + fSum;
         r[i] = fTotal + fTotal;
     }
-    m_quad[0] = r[0];
-    m_quad[1] = r[1];
-    m_quad[2] = r[2];
-    m_quad[3] = r[3];
+    XFNV_M128_F32(m_quad, 0) = r[0];
+    XFNV_M128_F32(m_quad, 1) = r[1];
+    XFNV_M128_F32(m_quad, 2) = r[2];
+    XFNV_M128_F32(m_quad, 3) = r[3];
 }
 
 inline void hkVector4::setRotatedInverseDir(const hkQuaternion& quat, const hkVector4& direction) {
@@ -174,10 +175,10 @@ inline void hkVector4::setRotatedInverseDir(const hkQuaternion& quat, const hkVe
         const float fTotal = fCrossW + fSum;
         r[i] = fTotal + fTotal;
     }
-    m_quad[0] = r[0];
-    m_quad[1] = r[1];
-    m_quad[2] = r[2];
-    m_quad[3] = r[3];
+    XFNV_M128_F32(m_quad, 0) = r[0];
+    XFNV_M128_F32(m_quad, 1) = r[1];
+    XFNV_M128_F32(m_quad, 2) = r[2];
+    XFNV_M128_F32(m_quad, 3) = r[3];
 }
 
 // The SDK's SSE form of hkQuaternion::setInverse: the sign bits of x, y and z flipped with the mask above.
@@ -204,7 +205,7 @@ inline void hkQuaternion::setMul(const hkQuaternion& q0, const hkQuaternion& q1)
     __m128 v4 = _mm_shuffle_ps(q1.m_vec.m_quad, q1.m_vec.m_quad, 255);
     __m128 v5 = _mm_mul_ps(q1.m_vec.m_quad, q0.m_vec.m_quad);
     __m128 v6 = _mm_shuffle_ps(v5, v5, 170);
-    v6[0] = v6[0] + (_mm_shuffle_ps(v5, v5, 85)[0] + v5[0]);
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0));
     __m128 v7 = _mm_add_ps(
         _mm_mul_ps(_mm_shuffle_ps(v4, v4, 0), q0.m_vec.m_quad),
         _mm_add_ps(
@@ -230,7 +231,7 @@ inline void hkQuaternion::mul(const hkQuaternion& q) {
     __m128 v3 = _mm_shuffle_ps(q.m_vec.m_quad, q.m_vec.m_quad, 255);
     __m128 v4 = _mm_mul_ps(m_vec.m_quad, q.m_vec.m_quad);
     __m128 v5 = _mm_shuffle_ps(v4, v4, 170);
-    v5[0] = v5[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
+    XFNV_M128_F32(v5, 0) = XFNV_M128_F32(v5, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0));
     __m128 v6 = _mm_add_ps(
         _mm_mul_ps(_mm_shuffle_ps(v3, v3, 0), m_vec.m_quad),
         _mm_add_ps(
@@ -304,14 +305,14 @@ inline void hkQuaternion::setInverseMul(const hkQuaternion& q0, const hkQuaterni
 // zero length), negated when w is negative.
 inline void hkQuaternion::getAxis(hkVector4& axisOut) const {
     __m128 v2 = _mm_mul_ps(m_vec.m_quad, m_vec.m_quad);
-    float v3 = _mm_shuffle_ps(v2, v2, 85)[0] + v2[0];
+    float v3 = XFNV_M128_F32(_mm_shuffle_ps(v2, v2, 85), 0) + XFNV_M128_F32(v2, 0);
     __m128 v4 = _mm_shuffle_ps(v2, v2, 170);
-    v4[0] = v4[0] + v3;
-    float v5 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v4[0])));
+    XFNV_M128_F32(v4, 0) = XFNV_M128_F32(v4, 0) + v3;
+    float v5 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v4, 0))));
     __m128 v7 = _mm_cmpeq_ss(v4, _mm_setzero_ps());
-    float fNewton = 3.0f - ((v4[0] * v5) * v5);
+    float fNewton = 3.0f - ((XFNV_M128_F32(v4, 0) * v5) * v5);
     __m128 v8 = _mm_setzero_ps();
-    v8[0] = (0.5f * v5) * fNewton;
+    XFNV_M128_F32(v8, 0) = (0.5f * v5) * fNewton;
     __m128 v9 = _mm_andnot_ps(v7, v8);
     __m128 v10 = _mm_mul_ps(_mm_shuffle_ps(v9, v9, 0), m_vec.m_quad);
     if ((_mm_movemask_ps(_mm_cmplt_ps(m_vec.m_quad, _mm_setzero_ps())) & 8) != 0) {
@@ -348,9 +349,9 @@ inline void hkQuaternion::estimateAngleTo(const hkQuaternion& to, hkVector4& ang
 
 inline void hkQuaternion::setShortestRotation(const hkVector4& from, const hkVector4& to) {
     __m128 v3 = _mm_mul_ps(to.m_quad, from.m_quad);
-    float v4 = _mm_shuffle_ps(v3, v3, 85)[0] + v3[0];
+    float v4 = XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0);
     __m128 v5 = _mm_shuffle_ps(v3, v3, 170);
-    v5[0] = v5[0] + v4;
+    XFNV_M128_F32(v5, 0) = XFNV_M128_F32(v5, 0) + v4;
     __m128 v6 = _mm_shuffle_ps(v5, v5, 0);
     __m128 v7 = _mm_cmplt_ps(v6, _mm_xor_ps(hkQuadRealNegateMask, rdata_10CB620));
     if (_mm_movemask_ps(_mm_cmplt_ps(rdata_10CB620, v6))) {
@@ -371,15 +372,15 @@ inline void hkQuaternion::setShortestRotation(const hkVector4& from, const hkVec
         __m128 v12 = _mm_mul_ps(v10, hkQuadRealHalf);
         if (_mm_movemask_ps(_mm_cmplt_ps(v6, rdata_10CB630))) {
             __m128 v13 = _mm_mul_ps(v11, v11);
-            float v14 = _mm_shuffle_ps(v13, v13, 85)[0] + v13[0];
+            float v14 = XFNV_M128_F32(_mm_shuffle_ps(v13, v13, 85), 0) + XFNV_M128_F32(v13, 0);
             __m128 v15 = _mm_shuffle_ps(v13, v13, 170);
-            v15[0] = v15[0] + v14;
+            XFNV_M128_F32(v15, 0) = XFNV_M128_F32(v15, 0) + v14;
             __m128 v16 = _mm_sub_ps(v8, v6);
-            float v25 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v15[0])));
+            float v25 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v15, 0))));
             __m128 v18 = _mm_cmpeq_ss(v15, _mm_setzero_ps());
-            float v19 = 3.0f - ((v15[0] * v25) * v25);
+            float v19 = 3.0f - ((XFNV_M128_F32(v15, 0) * v25) * v25);
             __m128 v20 = _mm_setzero_ps();
-            v20[0] = (0.5f * v25) * v19;
+            XFNV_M128_F32(v20, 0) = (0.5f * v25) * v19;
             __m128 v21 = _mm_andnot_ps(v18, v20);
             __m128 v22 = _mm_rsqrt_ps(v16);
             __m128 v23 = _mm_mul_ps(
@@ -397,7 +398,8 @@ inline void hkQuaternion::setShortestRotation(const hkVector4& from, const hkVec
 
 inline void hkQuaternion::setShortestRotationDamped(float gain, const hkVector4& from, const hkVector4& to) {
     __m128 v4 = _mm_mul_ps(to.m_quad, from.m_quad);
-    float v5 = _mm_shuffle_ps(v4, v4, 170)[0] + (_mm_shuffle_ps(v4, v4, 85)[0] + v4[0]);
+    float v5 = XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0));
     float v15 = 1.0 - gain + v5 * gain;
     float v16 = (v15 + 1.0) * 0.5;
     if (v16 <= 0.0f || v5 < -0.9999989867210388) {
@@ -414,15 +416,15 @@ inline void hkQuaternion::setShortestRotationDamped(float gain, const hkVector4&
             ),
             _mm_shuffle_ps(_mm_set_ss(fRescaleSin), _mm_set_ss(fRescaleSin), 0)
         );
-        v19[3] = v6;
+        XFNV_M128_F32(v19, 3) = v6;
         __m128 v7 = _mm_mul_ps(v19, v19);
         __m128 v8 = _mm_add_ps(_mm_shuffle_ps(v7, v7, 78), v7);
         __m128 v9 = _mm_add_ps(_mm_shuffle_ps(v8, v8, 177), v8);
-        float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v9[0])));
+        float v10 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v9, 0))));
         __m128 v12 = _mm_cmpeq_ss(v9, _mm_setzero_ps());
-        float fNewton = 3.0f - ((v9[0] * v10) * v10);
+        float fNewton = 3.0f - ((XFNV_M128_F32(v9, 0) * v10) * v10);
         __m128 v13 = _mm_setzero_ps();
-        v13[0] = (0.5f * v10) * fNewton;
+        XFNV_M128_F32(v13, 0) = (0.5f * v10) * fNewton;
         __m128 v14 = _mm_andnot_ps(v12, v13);
         m_vec.m_quad = _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), v19);
     }

@@ -15,6 +15,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastInput.h"
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 // The reflected members of hkpShape; the type member's enum is null.
 using hkpShapeClass_MembersArray = const hkClassMember[2];
@@ -59,8 +60,8 @@ float hkpShape::getMaximumProjection(const hkVector4& direction) const {
     const hkQuadReal support =
         _mm_add_ps(_mm_xor_ps(halfExtents, _mm_and_ps(direction.m_quad, hkQuadRealNegateMask)), center);
     const hkQuadReal products = _mm_mul_ps(support, direction.m_quad);
-    const float fXY = _mm_shuffle_ps(products, products, 0x55)[0] + products[0];
-    return _mm_shuffle_ps(products, products, 0xAA)[0] + fXY;
+    const float fXY = XFNV_M128_F32(_mm_shuffle_ps(products, products, 0x55), 0) + XFNV_M128_F32(products, 0);
+    return XFNV_M128_F32(_mm_shuffle_ps(products, products, 0xAA), 0) + fXY;
 }
 
 // A shape that cannot go to the SPU.

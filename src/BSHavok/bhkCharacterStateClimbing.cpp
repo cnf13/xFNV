@@ -1,6 +1,7 @@
 #include "BSHavok/bhkCharacterStateClimbing.h"
 
 #include "BSHavok/bhkCharacterController.h"
+#include "xfnv/Compiler.h"
 
 hkpCharacterStateType bhkCharacterStateClimbing::getType() const {
     return HK_CHARACTER_CLIMBING;
@@ -16,8 +17,8 @@ void bhkCharacterStateClimbing::Update(bhkCharacterController& arInput) {
     // ORs the whole 32-bit flags value.
     uint32_t& rFlags = arInput.iFlags;
     rFlags |= bhkCharacterController::CANJUMP;
-    arInput.OutVelocity.m_quad[0] = 0.0f;
-    arInput.OutVelocity.m_quad[1] = 0.0f;
-    arInput.OutVelocity.m_quad[2] = arInput.Direction.m_quad[1];
-    arInput.OutVelocity.m_quad[3] = 0.0f;
+    XFNV_M128_F32(arInput.OutVelocity.m_quad, 0) = 0.0f;
+    XFNV_M128_F32(arInput.OutVelocity.m_quad, 1) = 0.0f;
+    XFNV_M128_F32(arInput.OutVelocity.m_quad, 2) = XFNV_M128_F32(arInput.Direction.m_quad, 1);
+    XFNV_M128_F32(arInput.OutVelocity.m_quad, 3) = 0.0f;
 }

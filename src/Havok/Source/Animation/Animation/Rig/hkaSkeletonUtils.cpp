@@ -21,6 +21,7 @@
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -256,7 +257,8 @@ void hkaSkeletonUtils::enforceSkeletonConstraintsModelSpace(
                     v7.m_vec.m_quad = poseModelInOut[v6].m_rotation.m_vec.m_quad;
                     __m128 v8 = _mm_mul_ps(v5->m_translation.m_quad, v7.m_vec.m_quad);
                     __m128 v9 = _mm_shuffle_ps(v8, v8, 170);
-                    v9[0] = v9[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+                    XFNV_M128_F32(v9, 0) =
+                        XFNV_M128_F32(v9, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0));
                     __m128 v10 = _mm_shuffle_ps(v7.m_vec.m_quad, v7.m_vec.m_quad, 255);
                     __m128 v11 = _mm_add_ps(
                         _mm_mul_ps(
@@ -380,7 +382,8 @@ void hkaSkeletonUtils::transformLocalBoneToModelBone(
         __m128 m_quad = v5->m_rotation.m_vec.m_quad;
         __m128 v7 = _mm_mul_ps(boneModelOut.m_translation.m_quad, m_quad);
         __m128 v8 = _mm_shuffle_ps(v7, v7, 170);
-        v8[0] = v8[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+        XFNV_M128_F32(v8, 0) =
+            XFNV_M128_F32(v8, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
         __m128 v9 = _mm_shuffle_ps(m_quad, m_quad, 255);
         __m128 v10 = _mm_add_ps(
             _mm_mul_ps(

@@ -8,6 +8,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppModifier.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppObbVirtualMachine.h"
+#include "xfnv/Compiler.h"
 
 // Walks the MOPP code from PC inside the box and asks m_modifier about each terminal; the result is whether the whole
 // subtree is to be removed. Where only one child of a split is to be removed, the modifier gets that child's relative
@@ -342,7 +343,7 @@ hkBool hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppModifyVirtualMachine.cpp", 293
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -392,29 +393,29 @@ void hkpMoppModifyVirtualMachine::queryAabb(const hkpMoppCode* code, const hkAab
     m_code.m_storage = code;
     m_modifier = modifierOut;
     m_primitives_out = nullptr;
-    float fScale = code->m_info.m_offset.m_quad[3];
-    float fOffset = code->m_info.m_offset.m_quad[0];
+    float fScale = XFNV_M128_F32(code->m_info.m_offset.m_quad, 3);
+    float fOffset = XFNV_M128_F32(code->m_info.m_offset.m_quad, 0);
     float fScaled;
     int32_t iRounded;
-    fScaled = (aabb.m_min.m_quad[0] - fOffset) * fScale;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iRounded) : "m"(fScaled));
+    fScaled = (XFNV_M128_F32(aabb.m_min.m_quad, 0) - fOffset) * fScale;
+    xfnv::RoundToInt(iRounded, fScaled);
     m_xLo = iRounded - 1;
-    fScaled = (aabb.m_max.m_quad[0] - fOffset) * fScale;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iRounded) : "m"(fScaled));
+    fScaled = (XFNV_M128_F32(aabb.m_max.m_quad, 0) - fOffset) * fScale;
+    xfnv::RoundToInt(iRounded, fScaled);
     m_xHi = iRounded + 1;
-    fOffset = code->m_info.m_offset.m_quad[1];
-    fScaled = (aabb.m_min.m_quad[1] - fOffset) * fScale;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iRounded) : "m"(fScaled));
+    fOffset = XFNV_M128_F32(code->m_info.m_offset.m_quad, 1);
+    fScaled = (XFNV_M128_F32(aabb.m_min.m_quad, 1) - fOffset) * fScale;
+    xfnv::RoundToInt(iRounded, fScaled);
     m_yLo = iRounded - 1;
-    fScaled = (aabb.m_max.m_quad[1] - fOffset) * fScale;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iRounded) : "m"(fScaled));
+    fScaled = (XFNV_M128_F32(aabb.m_max.m_quad, 1) - fOffset) * fScale;
+    xfnv::RoundToInt(iRounded, fScaled);
     m_yHi = iRounded + 1;
-    fOffset = code->m_info.m_offset.m_quad[2];
-    fScaled = (aabb.m_min.m_quad[2] - fOffset) * fScale;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iRounded) : "m"(fScaled));
+    fOffset = XFNV_M128_F32(code->m_info.m_offset.m_quad, 2);
+    fScaled = (XFNV_M128_F32(aabb.m_min.m_quad, 2) - fOffset) * fScale;
+    xfnv::RoundToInt(iRounded, fScaled);
     m_zLo = iRounded - 1;
-    fScaled = (aabb.m_max.m_quad[2] - fOffset) * fScale;
-    __asm__("flds %1\n\tfistpl %0" : "=m"(iRounded) : "m"(fScaled));
+    fScaled = (XFNV_M128_F32(aabb.m_max.m_quad, 2) - fOffset) * fScale;
+    xfnv::RoundToInt(iRounded, fScaled);
     int32_t iZHi = iRounded + 1;
     m_zHi = iZHi;
     // The query queryModicationPointsRecursive walks: the high corner, its padding, the low corner, its padding, then

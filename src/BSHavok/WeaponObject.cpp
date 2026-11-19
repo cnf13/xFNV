@@ -40,6 +40,8 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
+#include <cstring>
+
 NiRTTI WeaponObject::ms_RTTI("WeaponObject", &bhkBlendCollisionObject::ms_RTTI);
 
 void GetTransformRecursive(NiAVObject* apObject, NiAVObject* apRoot, NiTransform& aWorldTransform) {
@@ -92,7 +94,7 @@ void WeaponObject::UpdateWorldData(NiUpdateData& a2) {
     if ((m_pkSceneObject) &&
         (m_pkSceneObject->m_kLocal.m_Translate != NiPoint3_ZERO ||
          (!(m_pkSceneObject->m_kLocal.m_Rotate == NiMatrix3_IDENTITY)))) {
-        __builtin_memcpy(&m_pkSceneObject->m_kLocal, &NiMatrix3_IDENTITY, 0x24u);
+        std::memcpy(&m_pkSceneObject->m_kLocal, &NiMatrix3_IDENTITY, 0x24u);
         m_pkSceneObject->m_kLocal.m_Translate = NiPoint3_ZERO;
     }
 

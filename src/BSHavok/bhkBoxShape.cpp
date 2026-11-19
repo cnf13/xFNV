@@ -79,10 +79,10 @@ void bhkBoxShape::LoadBinary(NiStream& arStream) {
         bool bCreated;
         bhkSerializable* pThis = this;
         bhkVector4& rExt = static_cast<hkBoxShapeCinfo&>(pThis->CreateCinfo(bCreated)).m_halfExtents;
-        rExt.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fX)));
-        rExt.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fY)));
-        rExt.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fZ)));
-        rExt.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fW)));
+        rExt.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fX)));
+        rExt.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fY)));
+        rExt.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fZ)));
+        rExt.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fW)));
     }
 }
 
@@ -95,17 +95,17 @@ void bhkBoxShape::SaveBinary(NiStream& arStream) {
     bhkSerializable* pThis = this;
     bhkVector4& rExt = static_cast<hkBoxShapeCinfo&>(pThis->CreateCinfo(bCreated)).m_halfExtents;
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        rExt.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fX)));
-        rExt.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fY)));
-        rExt.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fZ)));
-        rExt.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fW)));
+        rExt.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fX)));
+        rExt.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fY)));
+        rExt.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fZ)));
+        rExt.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fW)));
     }
     bhkConvexShape::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        rExt.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fX)));
-        rExt.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fY)));
-        rExt.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fZ)));
-        rExt.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rExt.fW)));
+        rExt.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fX)));
+        rExt.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fY)));
+        rExt.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fZ)));
+        rExt.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rExt.fW)));
     }
 }
 

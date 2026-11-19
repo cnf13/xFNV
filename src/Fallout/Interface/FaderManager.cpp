@@ -170,7 +170,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     pvertOrder[5] = 3;
     faderNode = new NiNode(0);
     FaderData[aeFader].pRoot = faderNode;
-    FaderData[aeFader].pRoot->SetName(static_cast<const char*>(FaderData[aeFader].pFaderTextureFilename));
+    FaderData[aeFader].pRoot->SetName(FaderData[aeFader].pFaderTextureFilename);
     palphaProp = new NiAlphaProperty;
     palphaProp->SetAlphaBlending(true);
     FaderData[aeFader].pRoot->AttachProperty(palphaProp);

@@ -15,6 +15,7 @@
 #include "Fallout Shared/TESQuestTarget.h"
 #include "Fallout/AI/PlayerCharacter.h"
 #include "Fallout/Interface/Menus/HUDMainMenu.h"
+#include "xfnv/Compiler.h"
 
 BGSQuestObjective::BGSQuestObjective() {
     InitializeData();
@@ -74,7 +75,7 @@ void BGSQuestObjective::Load(TESFile* apFile) {
         }
         else if (uiTESChunk == NNAM_ID) {
             if (apFile->GetChunkSize()) {
-                char* pcText = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pcText = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pcText, 0);
                 SetDisplayText(pcText);
             }

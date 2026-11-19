@@ -32,6 +32,7 @@
 #include "Fallout/Interface/ListBox.h"
 #include "Fallout/Interface/Menus/LevelUpMenu.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 // Reads DATA (8 bytes; the quest's form ID, which InitItem resolves, and the stage) up to the end of the entry
 // (PRKF). A DATA chunk of the wrong size fails.
@@ -136,7 +137,7 @@ bool BGSPerk::Load(TESFile* apFile) {
             case CIDA_ID: PerkConditions.Load(apFile); break;
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;

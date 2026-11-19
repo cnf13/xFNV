@@ -35,6 +35,7 @@
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
 #include "Havok/Source/Physics/Utilities/VisualDebugger/Viewer/Dynamics/hkpWorldViewerBase.h"
 #include "Havok/Source/Physics/Utilities/VisualDebugger/hkpPhysicsContext.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -276,7 +277,7 @@ void hkpToiCountViewer::displayTextAtBody(
     float sign = 1.0 - (static_cast<double>(pos / 3) + static_cast<double>(pos / 3));
     __m128 halfExtents = _mm_sub_ps(aabb.m_max.m_quad, center);
     __m128 dir = hkVector4Zero.m_quad;
-    dir[pos % 3] = sign;
+    XFNV_M128_F32(dir, pos % 3) = sign;
     __m128 extent = _mm_mul_ps(halfExtents, dir);
     __m128 sumXY = _mm_add_ss(_mm_shuffle_ps(extent, extent, 0x55), extent);
     __m128 sum = _mm_add_ss(_mm_shuffle_ps(extent, extent, 0xAA), sumXY);
@@ -302,8 +303,8 @@ hkpToiCountViewer::DisplayPosition hkpToiCountViewer::getDisplayPositionFromGrav
     const __m128* a1 = &gravity.m_quad;
     int32_t v2;
     __m128 v1 = _mm_and_ps(_mm_mul_ps(*a1, *a1), hkVector4_setAbs4_absMask);
-    if (!(v1[1] > static_cast<double>(v1[0]))) {
-        if (!(v1[2] > static_cast<double>(v1[0]))) {
+    if (!(XFNV_M128_F32(v1, 1) > static_cast<double>(XFNV_M128_F32(v1, 0)))) {
+        if (!(XFNV_M128_F32(v1, 2) > static_cast<double>(XFNV_M128_F32(v1, 0)))) {
             v2 = 0;
         }
         else {
@@ -311,14 +312,14 @@ hkpToiCountViewer::DisplayPosition hkpToiCountViewer::getDisplayPositionFromGrav
         }
     }
     else {
-        if (!(v1[2] > static_cast<double>(v1[1]))) {
+        if (!(XFNV_M128_F32(v1, 2) > static_cast<double>(XFNV_M128_F32(v1, 1)))) {
             v2 = 1;
         }
         else {
             v2 = 2;
         }
     }
-    if (!((*a1)[v2] > 0.0f)) {
+    if (!(XFNV_M128_F32((*a1), v2) > 0.0f)) {
         return static_cast<hkpToiCountViewer::DisplayPosition>(v2);
     }
 

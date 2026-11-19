@@ -18,6 +18,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Util/hkpCollideTriangleUtil.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -117,7 +118,7 @@ void hkGskRecalcContactInternal(
                 );
                 normalOut->m_quad = kHint;
             }
-            normalOut->m_quad[3] = _mm_cvtss_f32(kW);
+            XFNV_M128_F32(normalOut->m_quad, 3) = _mm_cvtss_f32(kW);
             pointOut->m_quad = verticesA[0].m_quad;
             break;
         }
@@ -126,7 +127,7 @@ void hkGskRecalcContactInternal(
             const __m128 kHint = hint->m_quad;
             normalOut->m_quad = kHint;
             const __m128 kProd = _mm_mul_ps(kDiff, kHint);
-            normalOut->m_quad[3] = _mm_cvtss_f32(
+            XFNV_M128_F32(normalOut->m_quad, 3) = _mm_cvtss_f32(
                 _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0x55), kProd))
             );
             pointOut->m_quad = verticesA[0].m_quad;
@@ -142,7 +143,7 @@ void hkGskRecalcContactInternal(
             const __m128 kPointB = verticesB[0].m_quad;
             pointOut->m_quad = kPointB;
             pointOut->m_quad = _mm_sub_ps(kPointB, _mm_mul_ps(_mm_shuffle_ps(kDist, kDist, 0), normalOut->m_quad));
-            normalOut->m_quad[3] = _mm_cvtss_f32(_mm_sub_ss(hkQuadReal0000, kDist));
+            XFNV_M128_F32(normalOut->m_quad, 3) = _mm_cvtss_f32(_mm_sub_ss(hkQuadReal0000, kDist));
             break;
         }
         case 18: {
@@ -239,11 +240,11 @@ void hkGskRecalcContactInternal(
                 _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0x55), kProd));
             pointOut->m_quad = kPoint;
             if (iCase == 11) {
-                normalOut->m_quad[3] = _mm_cvtss_f32(kDist);
+                XFNV_M128_F32(normalOut->m_quad, 3) = _mm_cvtss_f32(kDist);
             }
             else {
                 pointOut->m_quad = _mm_sub_ps(kPoint, _mm_mul_ps(_mm_shuffle_ps(kDist, kDist, 0), normalOut->m_quad));
-                normalOut->m_quad[3] = _mm_cvtss_f32(_mm_sub_ss(hkQuadReal0000, kDist));
+                XFNV_M128_F32(normalOut->m_quad, 3) = _mm_cvtss_f32(_mm_sub_ss(hkQuadReal0000, kDist));
             }
             break;
         }
@@ -410,7 +411,8 @@ int32_t findClosestTriangle(float fSign, hkVector4* r_eax, hkVector4* r_esi) {
             afRatio[i] = 3.40282e+38f;
         }
         else {
-            afRatio[i] = static_cast<float>(static_cast<double>(kSignedSq[i]) / static_cast<double>(fLen2));
+            afRatio[i] =
+                static_cast<float>(static_cast<double>(XFNV_M128_F32(kSignedSq, i)) / static_cast<double>(fLen2));
         }
     }
 
@@ -977,8 +979,8 @@ separated:
         m_support.normalize3();
         separatingNormalOut = m_support;
         const float fDistance = _mm_cvtss_f32(m_support.dot3(ab).getQuad());
-        separatingNormalOut.m_quad[3] = fDistance;
-        m_support.m_quad[3] = fDistance;
+        XFNV_M128_F32(separatingNormalOut.m_quad, 3) = fDistance;
+        XFNV_M128_F32(m_support.m_quad, 3) = fDistance;
     }
     return HK_GSK_OK;
 }
@@ -1128,8 +1130,9 @@ nextPass:
         // The difference's vertex joins the simplex unless it holds it already.
         const int32_t iDim = m_dimA.m_storage;
         for (int32_t i = 0; i < m_dimA.m_storage; i++) {
-            if (point.m_quad[0] == m_verticesA[i].m_quad[0] && point.m_quad[1] == m_verticesA[i].m_quad[1] &&
-                point.m_quad[2] == m_verticesA[i].m_quad[2]) {
+            if (XFNV_M128_F32(point.m_quad, 0) == XFNV_M128_F32(m_verticesA[i].m_quad, 0) &&
+                XFNV_M128_F32(point.m_quad, 1) == XFNV_M128_F32(m_verticesA[i].m_quad, 1) &&
+                XFNV_M128_F32(point.m_quad, 2) == XFNV_M128_F32(m_verticesA[i].m_quad, 2)) {
                 goto known;
             }
         }
@@ -1543,9 +1546,9 @@ int32_t hkpGsk::checkTriangleBoundaries(const hkVector4& a, hkVector4* b, hkpGsk
             &reinterpret_cast<float*>(&b[4].m_quad)[0], _mm_load_ps(&reinterpret_cast<float*>(&b[5].m_quad)[0])
         );
         _mm_store_ps(&reinterpret_cast<float*>(&b[5].m_quad)[0], kVB);
-        const float fTmp = m_checkTriangleDots.m_quad[0];
-        m_checkTriangleDots.m_quad[0] = m_checkTriangleDots.m_quad[1];
-        m_checkTriangleDots.m_quad[1] = fTmp;
+        const float fTmp = XFNV_M128_F32(m_checkTriangleDots.m_quad, 0);
+        XFNV_M128_F32(m_checkTriangleDots.m_quad, 0) = XFNV_M128_F32(m_checkTriangleDots.m_quad, 1);
+        XFNV_M128_F32(m_checkTriangleDots.m_quad, 1) = fTmp;
         m_featureChange.m_storage = 1;
     }
     return iMask;
@@ -1595,16 +1598,16 @@ void hkpGsk::reduceDimension() {
         for (int32_t j = 0; j < iNumB; j++) {
             const hkVector4& rA = m_verticesA[hkpCollideTriangleUtil::vertexToEdgeLut[i + 2]];
             hkVector4 kDirA;
-            kDirA.m_quad[0] = rA.m_quad[0] - m_verticesA[i].m_quad[0];
-            kDirA.m_quad[1] = rA.m_quad[1] - m_verticesA[i].m_quad[1];
-            kDirA.m_quad[2] = rA.m_quad[2] - m_verticesA[i].m_quad[2];
-            kDirA.m_quad[3] = rA.m_quad[3] - m_verticesA[i].m_quad[3];
+            XFNV_M128_F32(kDirA.m_quad, 0) = XFNV_M128_F32(rA.m_quad, 0) - XFNV_M128_F32(m_verticesA[i].m_quad, 0);
+            XFNV_M128_F32(kDirA.m_quad, 1) = XFNV_M128_F32(rA.m_quad, 1) - XFNV_M128_F32(m_verticesA[i].m_quad, 1);
+            XFNV_M128_F32(kDirA.m_quad, 2) = XFNV_M128_F32(rA.m_quad, 2) - XFNV_M128_F32(m_verticesA[i].m_quad, 2);
+            XFNV_M128_F32(kDirA.m_quad, 3) = XFNV_M128_F32(rA.m_quad, 3) - XFNV_M128_F32(m_verticesA[i].m_quad, 3);
             const hkVector4& rB = m_verticesBinA[hkpCollideTriangleUtil::vertexToEdgeLut[j + 2]];
             hkVector4 kDirB;
-            kDirB.m_quad[0] = rB.m_quad[0] - m_verticesBinA[j].m_quad[0];
-            kDirB.m_quad[1] = rB.m_quad[1] - m_verticesBinA[j].m_quad[1];
-            kDirB.m_quad[2] = rB.m_quad[2] - m_verticesBinA[j].m_quad[2];
-            kDirB.m_quad[3] = rB.m_quad[3] - m_verticesBinA[j].m_quad[3];
+            XFNV_M128_F32(kDirB.m_quad, 0) = XFNV_M128_F32(rB.m_quad, 0) - XFNV_M128_F32(m_verticesBinA[j].m_quad, 0);
+            XFNV_M128_F32(kDirB.m_quad, 1) = XFNV_M128_F32(rB.m_quad, 1) - XFNV_M128_F32(m_verticesBinA[j].m_quad, 1);
+            XFNV_M128_F32(kDirB.m_quad, 2) = XFNV_M128_F32(rB.m_quad, 2) - XFNV_M128_F32(m_verticesBinA[j].m_quad, 2);
+            XFNV_M128_F32(kDirB.m_quad, 3) = XFNV_M128_F32(rB.m_quad, 3) - XFNV_M128_F32(m_verticesBinA[j].m_quad, 3);
             hkLineSegmentUtil::ClosestLineSegLineSegResult kResult;
             hkLineSegmentUtil::closestLineSegLineSeg(m_verticesA[i], kDirA, m_verticesBinA[j], kDirB, kResult);
             if (fBest > kResult.m_distanceSquared.m_storage) {
@@ -1717,9 +1720,11 @@ hkpGsk::NextCase hkpGsk::processEdgeTriangle(
             case 3: --dimB.m_storage; return hkpGsk::NEXT_IS_EDGE_EDGE;
             // Cases 1, 2 and 4: each difference of the dots is stored as a float before multiplying, as the game does.
             case 1: {
-                const float fA = (double)m_checkTriangleDots.m_quad[1] - (double)kDots.m_quad[1];
-                const float fC = (double)m_checkTriangleDots.m_quad[2] - (double)kDots.m_quad[2];
-                if ((double)fA * kDots.m_quad[2] > (double)kDots.m_quad[1] * fC) {
+                const float fA =
+                    (double)XFNV_M128_F32(m_checkTriangleDots.m_quad, 1) - (double)XFNV_M128_F32(kDots.m_quad, 1);
+                const float fC =
+                    (double)XFNV_M128_F32(m_checkTriangleDots.m_quad, 2) - (double)XFNV_M128_F32(kDots.m_quad, 2);
+                if ((double)fA * XFNV_M128_F32(kDots.m_quad, 2) > (double)XFNV_M128_F32(kDots.m_quad, 1) * fC) {
                     --dimB.m_storage;
                     return hkpGsk::NEXT_IS_EDGE_EDGE;
                 }
@@ -1729,18 +1734,22 @@ hkpGsk::NextCase hkpGsk::processEdgeTriangle(
                 return hkpGsk::NEXT_IS_EDGE_EDGE;
             }
             case 2: {
-                const float fA = (double)m_checkTriangleDots.m_quad[2] - (double)kDots.m_quad[2];
-                const float fC = (double)m_checkTriangleDots.m_quad[0] - (double)kDots.m_quad[0];
-                if (!((double)fA * kDots.m_quad[0] > (double)kDots.m_quad[2] * fC)) {
+                const float fA =
+                    (double)XFNV_M128_F32(m_checkTriangleDots.m_quad, 2) - (double)XFNV_M128_F32(kDots.m_quad, 2);
+                const float fC =
+                    (double)XFNV_M128_F32(m_checkTriangleDots.m_quad, 0) - (double)XFNV_M128_F32(kDots.m_quad, 0);
+                if (!((double)fA * XFNV_M128_F32(kDots.m_quad, 0) > (double)XFNV_M128_F32(kDots.m_quad, 2) * fC)) {
                     --dimB.m_storage;
                     return hkpGsk::NEXT_IS_EDGE_EDGE;
                 }
                 break;
             }
             case 4: {
-                const float fA = (double)m_checkTriangleDots.m_quad[0] - (double)kDots.m_quad[0];
-                const float fC = (double)m_checkTriangleDots.m_quad[1] - (double)kDots.m_quad[1];
-                if ((double)fA * kDots.m_quad[1] > (double)kDots.m_quad[0] * fC) {
+                const float fA =
+                    (double)XFNV_M128_F32(m_checkTriangleDots.m_quad, 0) - (double)XFNV_M128_F32(kDots.m_quad, 0);
+                const float fC =
+                    (double)XFNV_M128_F32(m_checkTriangleDots.m_quad, 1) - (double)XFNV_M128_F32(kDots.m_quad, 1);
+                if ((double)fA * XFNV_M128_F32(kDots.m_quad, 1) > (double)XFNV_M128_F32(kDots.m_quad, 0) * fC) {
                     --dimB.m_storage;
                     vertexB[1].m_quad = vertexB[2].m_quad;
                     vertexB[5].m_quad = vertexB[6].m_quad;
@@ -1802,7 +1811,7 @@ hkpGsk::NextCase hkpGsk::processEdgeTriangle(
         }
     }
     else {
-        if (__builtin_fabsf(_mm_cvtss_f32(kSecondDots)) < __builtin_fabsf(_mm_cvtss_f32(kFirstDots))) {
+        if (std::fabsf(_mm_cvtss_f32(kSecondDots)) < std::fabsf(_mm_cvtss_f32(kFirstDots))) {
             const __m128 kSwap = _mm_load_ps(&reinterpret_cast<float*>(&vertexA[0].m_quad)[0]);
             _mm_store_ps(
                 &reinterpret_cast<float*>(&vertexA[0].m_quad)[0],
@@ -2035,7 +2044,7 @@ hkResult hkpGsk::getClosestPoint(
         gsk.exitAndExportCacheImpl(gskCache);
     }
 
-    const double distance = separatingNormal.m_quad[3];
+    const double distance = XFNV_M128_F32(separatingNormal.m_quad, 3);
     const hkQuadReal n = separatingNormal.m_quad;
     const hkRotation& rotationA = input.m_transformA.m_storage->m_rotation;
     const float distanceOut = distance - input.m_shapeA.m_storage->m_radius - input.m_shapeB.m_storage->m_radius;
@@ -2046,7 +2055,7 @@ hkResult hkpGsk::getClosestPoint(
         ),
         _mm_mul_ps(_mm_shuffle_ps(n, n, 170), rotationA.m_col2.m_quad)
     );
-    separatingNormalOut.m_quad[3] = distanceOut;
+    XFNV_M128_F32(separatingNormalOut.m_quad, 3) = distanceOut;
     if (!(input.m_collisionTolerance.m_storage > distanceOut)) {
         return HK_FAILURE;
     }

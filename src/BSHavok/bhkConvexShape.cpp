@@ -34,7 +34,7 @@ void bhkConvexShape::LoadBinary(NiStream& arStream) {
     if (!arStream.m_bSourceIsLittleEndian) {
         bool bCreated;
         hkConvexShapeCinfo& rInfo = static_cast<hkConvexShapeCinfo&>(CreateCinfo(bCreated));
-        rInfo.m_radius = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_radius)));
+        rInfo.m_radius = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_radius)));
     }
 }
 
@@ -43,11 +43,11 @@ void bhkConvexShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkConvexShapeCinfo& rInfo = static_cast<hkConvexShapeCinfo&>(CreateCinfo(bCreated));
     if (!arStream.m_bSaveLittleEndian) {
-        rInfo.m_radius = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_radius)));
+        rInfo.m_radius = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_radius)));
     }
     bhkShape::SaveBinary(arStream);
     if (!arStream.m_bSaveLittleEndian) {
-        rInfo.m_radius = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_radius)));
+        rInfo.m_radius = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_radius)));
     }
 }
 

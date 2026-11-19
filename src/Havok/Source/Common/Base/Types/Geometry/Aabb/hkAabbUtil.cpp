@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -15,14 +16,14 @@
 // before it (a box over its own points sees the store).
 hkAabb* hkAabbUtil::calcAabb(const hkVector4* const* vectorArray, int32_t numVertices, hkAabb& aabbOut) {
     if (numVertices == 0) {
-        aabbOut.m_min.m_quad[0] = 3.40282e38f;
-        aabbOut.m_min.m_quad[1] = 3.40282e38f;
-        aabbOut.m_min.m_quad[2] = 3.40282e38f;
-        aabbOut.m_min.m_quad[3] = 3.40282e38f;
-        aabbOut.m_max.m_quad[0] = -3.40282e38f;
-        aabbOut.m_max.m_quad[1] = -3.40282e38f;
-        aabbOut.m_max.m_quad[2] = -3.40282e38f;
-        aabbOut.m_max.m_quad[3] = -3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_min.m_quad, 0) = 3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_min.m_quad, 1) = 3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_min.m_quad, 2) = 3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_min.m_quad, 3) = 3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_max.m_quad, 0) = -3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_max.m_quad, 1) = -3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_max.m_quad, 2) = -3.40282e38f;
+        XFNV_M128_F32(aabbOut.m_max.m_quad, 3) = -3.40282e38f;
         return &aabbOut;
     }
     aabbOut.m_min.m_quad = vectorArray[0]->m_quad;
@@ -31,22 +32,34 @@ hkAabb* hkAabbUtil::calcAabb(const hkVector4* const* vectorArray, int32_t numVer
         const hkQuadReal kPoint = vectorArray[i]->m_quad;
         const hkQuadReal kMin = aabbOut.m_min.m_quad;
         hkQuadReal kNewMin;
-        kNewMin[0] = kPoint[0] < kMin[0] ? kPoint[0] : kMin[0];
-        kNewMin[1] = kPoint[1] < kMin[1] ? kPoint[1] : kMin[1];
-        kNewMin[2] = kPoint[2] < kMin[2] ? kPoint[2] : kMin[2];
-        kNewMin[3] = kPoint[3] < kMin[3] ? kPoint[3] : kMin[3];
+        XFNV_M128_F32(kNewMin, 0) =
+            XFNV_M128_F32(kPoint, 0) < XFNV_M128_F32(kMin, 0) ? XFNV_M128_F32(kPoint, 0) : XFNV_M128_F32(kMin, 0);
+        XFNV_M128_F32(kNewMin, 1) =
+            XFNV_M128_F32(kPoint, 1) < XFNV_M128_F32(kMin, 1) ? XFNV_M128_F32(kPoint, 1) : XFNV_M128_F32(kMin, 1);
+        XFNV_M128_F32(kNewMin, 2) =
+            XFNV_M128_F32(kPoint, 2) < XFNV_M128_F32(kMin, 2) ? XFNV_M128_F32(kPoint, 2) : XFNV_M128_F32(kMin, 2);
+        XFNV_M128_F32(kNewMin, 3) =
+            XFNV_M128_F32(kPoint, 3) < XFNV_M128_F32(kMin, 3) ? XFNV_M128_F32(kPoint, 3) : XFNV_M128_F32(kMin, 3);
         const hkQuadReal kMax = aabbOut.m_max.m_quad;
         aabbOut.m_min.m_quad = kNewMin;
         const hkQuadReal kPointAgain = vectorArray[i]->m_quad;
         hkQuadReal kNewMax;
-        kNewMax[0] = kPointAgain[0] > kMax[0] ? kPointAgain[0] : kMax[0];
-        kNewMax[1] = kPointAgain[1] > kMax[1] ? kPointAgain[1] : kMax[1];
-        kNewMax[2] = kPointAgain[2] > kMax[2] ? kPointAgain[2] : kMax[2];
-        kNewMax[3] = kPointAgain[3] > kMax[3] ? kPointAgain[3] : kMax[3];
+        XFNV_M128_F32(kNewMax, 0) = XFNV_M128_F32(kPointAgain, 0) > XFNV_M128_F32(kMax, 0)
+            ? XFNV_M128_F32(kPointAgain, 0)
+            : XFNV_M128_F32(kMax, 0);
+        XFNV_M128_F32(kNewMax, 1) = XFNV_M128_F32(kPointAgain, 1) > XFNV_M128_F32(kMax, 1)
+            ? XFNV_M128_F32(kPointAgain, 1)
+            : XFNV_M128_F32(kMax, 1);
+        XFNV_M128_F32(kNewMax, 2) = XFNV_M128_F32(kPointAgain, 2) > XFNV_M128_F32(kMax, 2)
+            ? XFNV_M128_F32(kPointAgain, 2)
+            : XFNV_M128_F32(kMax, 2);
+        XFNV_M128_F32(kNewMax, 3) = XFNV_M128_F32(kPointAgain, 3) > XFNV_M128_F32(kMax, 3)
+            ? XFNV_M128_F32(kPointAgain, 3)
+            : XFNV_M128_F32(kMax, 3);
         aabbOut.m_max.m_quad = kNewMax;
     }
-    aabbOut.m_min.m_quad[3] = 0.0f;
-    aabbOut.m_max.m_quad[3] = 0.0f;
+    XFNV_M128_F32(aabbOut.m_min.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(aabbOut.m_max.m_quad, 3) = 0.0f;
     return &aabbOut;
 }
 

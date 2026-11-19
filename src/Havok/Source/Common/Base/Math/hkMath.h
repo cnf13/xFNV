@@ -1,5 +1,8 @@
 #pragma once
 
+#include "xfnv/Compiler.h"
+
+#include <cmath>
 #include <cstdint>
 
 // Havok's scalar math helpers.
@@ -10,7 +13,7 @@ namespace hkMath {
     // Rounds in the FPU's current rounding mode, not by truncation.
     inline int32_t hkToIntFast(float r) {
         int32_t i;
-        __asm__("flds %1\n\tfistpl %0" : "=m"(i) : "m"(r));
+        xfnv::RoundToInt(i, r);
         return i;
     }
 
@@ -31,7 +34,7 @@ namespace hkMath {
     }
     // The absolute value of r.
     inline float fabs(float r) {
-        return __builtin_fabsf(r);
+        return std::fabsf(r);
     }
 
     float acos(float r);

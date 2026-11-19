@@ -31,6 +31,7 @@
 #include "Havok/Source/Physics/Utilities/Weapons/hkpBallGun.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpGravityGun.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpMountedBallGun.h"
+#include "xfnv/Compiler.h"
 
 #include <new>
 
@@ -231,16 +232,16 @@ void hkpFirstPersonGun::calcVelocityToTarget(
     hkVector4& velocity
 ) {
     hkVector4 kDir;
-    kDir.m_quad[0] = target.m_quad[0] - position.m_quad[0];
-    kDir.m_quad[1] = target.m_quad[1] - position.m_quad[1];
-    kDir.m_quad[2] = target.m_quad[2] - position.m_quad[2];
-    kDir.m_quad[3] = target.m_quad[3] - position.m_quad[3];
-    float fXX = kDir.m_quad[0] * kDir.m_quad[0];
-    float fYY = kDir.m_quad[1] * kDir.m_quad[1];
-    float fZZ = kDir.m_quad[2] * kDir.m_quad[2];
+    XFNV_M128_F32(kDir.m_quad, 0) = XFNV_M128_F32(target.m_quad, 0) - XFNV_M128_F32(position.m_quad, 0);
+    XFNV_M128_F32(kDir.m_quad, 1) = XFNV_M128_F32(target.m_quad, 1) - XFNV_M128_F32(position.m_quad, 1);
+    XFNV_M128_F32(kDir.m_quad, 2) = XFNV_M128_F32(target.m_quad, 2) - XFNV_M128_F32(position.m_quad, 2);
+    XFNV_M128_F32(kDir.m_quad, 3) = XFNV_M128_F32(target.m_quad, 3) - XFNV_M128_F32(position.m_quad, 3);
+    float fXX = XFNV_M128_F32(kDir.m_quad, 0) * XFNV_M128_F32(kDir.m_quad, 0);
+    float fYY = XFNV_M128_F32(kDir.m_quad, 1) * XFNV_M128_F32(kDir.m_quad, 1);
+    float fZZ = XFNV_M128_F32(kDir.m_quad, 2) * XFNV_M128_F32(kDir.m_quad, 2);
     float fSum = fYY + fXX;
     fSum = fZZ + fSum;
-    float fLength = __builtin_elementwise_sqrt(fSum);
+    float fLength = xfnv::SqrtF(fSum);
     if (!(fLength > 1.1920929e-07f)) {
         velocity = kDir;
         return;
@@ -248,32 +249,32 @@ void hkpFirstPersonGun::calcVelocityToTarget(
     float fTime = (fLength / speed);
     float fScale = static_cast<float>(fTime * -0.5);
     hkVector4 kExtra;
-    kExtra.m_quad[0] = fScale * gravity.m_quad[0];
-    kExtra.m_quad[1] = fScale * gravity.m_quad[1];
-    kExtra.m_quad[2] = fScale * gravity.m_quad[2];
-    kExtra.m_quad[3] = fScale * gravity.m_quad[3];
-    fXX = kExtra.m_quad[0] * kExtra.m_quad[0];
-    fYY = kExtra.m_quad[1] * kExtra.m_quad[1];
-    fZZ = kExtra.m_quad[2] * kExtra.m_quad[2];
+    XFNV_M128_F32(kExtra.m_quad, 0) = fScale * XFNV_M128_F32(gravity.m_quad, 0);
+    XFNV_M128_F32(kExtra.m_quad, 1) = fScale * XFNV_M128_F32(gravity.m_quad, 1);
+    XFNV_M128_F32(kExtra.m_quad, 2) = fScale * XFNV_M128_F32(gravity.m_quad, 2);
+    XFNV_M128_F32(kExtra.m_quad, 3) = fScale * XFNV_M128_F32(gravity.m_quad, 3);
+    fXX = XFNV_M128_F32(kExtra.m_quad, 0) * XFNV_M128_F32(kExtra.m_quad, 0);
+    fYY = XFNV_M128_F32(kExtra.m_quad, 1) * XFNV_M128_F32(kExtra.m_quad, 1);
+    fZZ = XFNV_M128_F32(kExtra.m_quad, 2) * XFNV_M128_F32(kExtra.m_quad, 2);
     fSum = fYY + fXX;
     fSum = fZZ + fSum;
-    float fExtraLength = __builtin_elementwise_sqrt(fSum);
+    float fExtraLength = xfnv::SqrtF(fSum);
     if (fExtraLength > speed) {
         float fShrink = (speed / fExtraLength);
-        kExtra.m_quad[0] = fShrink * kExtra.m_quad[0];
-        kExtra.m_quad[1] = fShrink * kExtra.m_quad[1];
-        kExtra.m_quad[2] = fShrink * kExtra.m_quad[2];
-        kExtra.m_quad[3] = fShrink * kExtra.m_quad[3];
+        XFNV_M128_F32(kExtra.m_quad, 0) = fShrink * XFNV_M128_F32(kExtra.m_quad, 0);
+        XFNV_M128_F32(kExtra.m_quad, 1) = fShrink * XFNV_M128_F32(kExtra.m_quad, 1);
+        XFNV_M128_F32(kExtra.m_quad, 2) = fShrink * XFNV_M128_F32(kExtra.m_quad, 2);
+        XFNV_M128_F32(kExtra.m_quad, 3) = fShrink * XFNV_M128_F32(kExtra.m_quad, 3);
     }
     float fDirScale = (speed / fLength);
-    float fX = fDirScale * kDir.m_quad[0];
-    float fY = fDirScale * kDir.m_quad[1];
-    float fZ = fDirScale * kDir.m_quad[2];
-    float fW = fDirScale * kDir.m_quad[3];
-    velocity.m_quad[0] = fX + kExtra.m_quad[0];
-    velocity.m_quad[1] = fY + kExtra.m_quad[1];
-    velocity.m_quad[2] = fZ + kExtra.m_quad[2];
-    velocity.m_quad[3] = fW + kExtra.m_quad[3];
+    float fX = fDirScale * XFNV_M128_F32(kDir.m_quad, 0);
+    float fY = fDirScale * XFNV_M128_F32(kDir.m_quad, 1);
+    float fZ = fDirScale * XFNV_M128_F32(kDir.m_quad, 2);
+    float fW = fDirScale * XFNV_M128_F32(kDir.m_quad, 3);
+    XFNV_M128_F32(velocity.m_quad, 0) = fX + XFNV_M128_F32(kExtra.m_quad, 0);
+    XFNV_M128_F32(velocity.m_quad, 1) = fY + XFNV_M128_F32(kExtra.m_quad, 1);
+    XFNV_M128_F32(velocity.m_quad, 2) = fZ + XFNV_M128_F32(kExtra.m_quad, 2);
+    XFNV_M128_F32(velocity.m_quad, 3) = fW + XFNV_M128_F32(kExtra.m_quad, 3);
 }
 
 const hkClass& hkpFirstPersonGun::staticClass() {

@@ -49,6 +49,7 @@
 #include "Havok/Source/Physics/Vehicle/WheelCollide/hkpVehicleWheelCollide.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleData.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleInstance.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <new>
@@ -502,7 +503,8 @@ const hkpRootCdPoint* hkpVehicleLinearCastWheelCollide::determineNearestHit(
         if (command.m_numResultsOut != 0) {
             const hkpRootCdPoint* hit = command.m_results;
             if (!nearest ||
-                nearest->m_contact.m_separatingNormal.m_quad[3] > hit->m_contact.m_separatingNormal.m_quad[3]) {
+                XFNV_M128_F32(nearest->m_contact.m_separatingNormal.m_quad, 3) >
+                    XFNV_M128_F32(hit->m_contact.m_separatingNormal.m_quad, 3)) {
                 nearest = hit;
             }
         }
@@ -564,11 +566,14 @@ void hkpVehicleLinearCastWheelCollide::getCollisionOutputFromCastResult(
     output.m_contactShapeKey[0] = linearCastOutput.m_shapeKeyB;
     // HK_INVALID_SHAPE_KEY ends the key list.
     output.m_contactShapeKey[1] = 0xFFFFFFFF;
-    output.m_currentSuspensionLength = linearCastOutput.m_contact.m_separatingNormal.m_quad[3] * suspensionLength;
+    output.m_currentSuspensionLength =
+        XFNV_M128_F32(linearCastOutput.m_contact.m_separatingNormal.m_quad, 3) * suspensionLength;
 
     const hkQuadReal& direction = wheelInfo.m_suspensionDirectionWs.m_quad;
     const hkQuadReal& normal = output.m_contactPoint.m_separatingNormal.m_quad;
-    const float denominator = (direction[1] * normal[1] + direction[0] * normal[0]) + direction[2] * normal[2];
+    const float denominator = (XFNV_M128_F32(direction, 1) * XFNV_M128_F32(normal, 1) +
+                               XFNV_M128_F32(direction, 0) * XFNV_M128_F32(normal, 0)) +
+        XFNV_M128_F32(direction, 2) * XFNV_M128_F32(normal, 2);
     if (denominator < -vehicle->m_data->m_normalClippingAngleCos) {
         hkVector4 chassisVelocity;
         hkVector4 groundVelocity;
@@ -578,9 +583,12 @@ void hkpVehicleLinearCastWheelCollide::getCollisionOutputFromCastResult(
         // Divides the double constant -1.0 by the float and rounds the result to float.
         const float inverse = static_cast<float>(-1.0 / denominator);
         const hkQuadReal& normalAfter = output.m_contactPoint.m_separatingNormal.m_quad;
-        const float dx = (chassisVelocity.m_quad[0] - groundVelocity.m_quad[0]) * normalAfter[0];
-        const float dy = (chassisVelocity.m_quad[1] - groundVelocity.m_quad[1]) * normalAfter[1];
-        const float dz = (chassisVelocity.m_quad[2] - groundVelocity.m_quad[2]) * normalAfter[2];
+        const float dx = (XFNV_M128_F32(chassisVelocity.m_quad, 0) - XFNV_M128_F32(groundVelocity.m_quad, 0)) *
+            XFNV_M128_F32(normalAfter, 0);
+        const float dy = (XFNV_M128_F32(chassisVelocity.m_quad, 1) - XFNV_M128_F32(groundVelocity.m_quad, 1)) *
+            XFNV_M128_F32(normalAfter, 1);
+        const float dz = (XFNV_M128_F32(chassisVelocity.m_quad, 2) - XFNV_M128_F32(groundVelocity.m_quad, 2)) *
+            XFNV_M128_F32(normalAfter, 2);
         const float projectedVelocity = (dy + dx) + dz;
         output.m_suspensionClosingSpeed = projectedVelocity * inverse;
         output.m_suspensionScalingFactor = inverse;
@@ -607,7 +615,7 @@ void hkpVehicleLinearCastWheelCollide::getCollisionOutputWithoutHit(
         _mm_shuffle_ps(v6, _mm_unpackhi_ps(v6, cdInfo.m_contactPoint.m_separatingNormal.m_quad), 196);
     cdInfo.m_contactFriction = 0.0f;
     cdInfo.m_suspensionScalingFactor = 1.0f;
-    cdInfo.m_contactPoint.m_separatingNormal.m_quad[3] = m_length;
+    XFNV_M128_F32(cdInfo.m_contactPoint.m_separatingNormal.m_quad, 3) = m_length;
 }
 
 // The wheel's cast: its transform from the chassis's rotation times the wheel's steering orientation and the hard
@@ -638,7 +646,7 @@ void hkpVehicleLinearCastWheelCollide::centerWheelContactPoint(
     hkVector4 v6;
     hkTransform* p_m_transform = &m_wheelStates.m_data[wheelIndex].m_transform;
     a3.setTransformedInversePos(*p_m_transform, cdInfo.m_contactPoint.m_position);
-    a3.m_quad[2] = 0.0f;
+    XFNV_M128_F32(a3.m_quad, 2) = 0.0f;
     v6.setTransformedPos(*p_m_transform, a3);
     cdInfo.m_contactPoint.m_position.m_quad = v6.m_quad;
 }
@@ -670,8 +678,8 @@ hkpCylinderShape* hkpVehicleLinearCastWheelCollide::createWheelShape(float width
     uint32_t v8;
     hkVector4 vertexB;
     hkVector4 vertexA;
-    v3[0] = 0.0f;
-    v4[0] = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.0f;
+    XFNV_M128_F32(v4, 0) = 0.0f;
     *reinterpret_cast<float*>(&v8) = width * 0.5;
     vertexA.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
@@ -700,20 +708,20 @@ void hkpVehicleLinearCastWheelCollide::calcAabbOfWheel(
     hkpVehicleData::WheelComponentParams* m_data = vehicle->m_data->m_wheelParams.begin();
     __m128 m_radius_low = _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_data[wheelNum].m_radius)));
     float* p_m_radius = &m_data[wheelNum].m_radius;
-    v5[0] = 0.0f;
+    XFNV_M128_F32(v5, 0) = 0.0f;
     *reinterpret_cast<float*>(&v13) =
         (vehicle->m_suspension->m_wheelParams.m_data[wheelNum].m_length + *p_m_radius) * 0.5;
     __m128 v9 = _mm_set_ss(std::bit_cast<float>(v13));
-    v4[0] = *reinterpret_cast<float*>(&v13);
+    XFNV_M128_F32(v4, 0) = *reinterpret_cast<float*>(&v13);
     *reinterpret_cast<float*>(&v14) = 0.5 * p_m_radius[2];
     hkpVehicleLinearCastWheelCollide::WheelState* v10 = m_wheelStates.m_data;
     __m128 v11 =
         _mm_unpacklo_ps(_mm_unpacklo_ps(m_radius_low, _mm_set_ss(std::bit_cast<float>(v14))), _mm_unpacklo_ps(v4, v5));
     __m128 v12 = _mm_set_ss(std::bit_cast<float>(0x80000000u));
     halfExtents.m_quad = v11;
-    v12[0] = -0.0f - *reinterpret_cast<float*>(&v13);
-    v11[0] = 0.0f;
-    v9[0] = 0.0f;
+    XFNV_M128_F32(v12, 0) = -0.0f - *reinterpret_cast<float*>(&v13);
+    XFNV_M128_F32(v11, 0) = 0.0f;
+    XFNV_M128_F32(v9, 0) = 0.0f;
     center.m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(v11, v9), _mm_unpacklo_ps(v12, _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero))))
     );

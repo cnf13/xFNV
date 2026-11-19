@@ -148,13 +148,14 @@
 
 void ImageSpaceParameterData::Endian() {
     for (float& rfData : pfHDRData) {
-        rfData =
-            std::bit_cast<float>(static_cast<uint32_t>(__builtin_bswap32((uint32_t)std::bit_cast<uint32_t>(rfData))));
+        rfData = std::bit_cast<float>(
+            static_cast<uint32_t>(std::byteswap<uint32_t>((uint32_t)std::bit_cast<uint32_t>(rfData)))
+        );
     }
     uint32_t* pfBloomData = reinterpret_cast<uint32_t*>(this->pfBloomData);
     int32_t v3 = 3;
     do {
-        *pfBloomData = __builtin_bswap32(*pfBloomData);
+        *pfBloomData = std::byteswap<uint32_t>(*pfBloomData);
         ++pfBloomData;
         --v3;
     }
@@ -162,7 +163,7 @@ void ImageSpaceParameterData::Endian() {
     uint32_t* pfGetHitData = reinterpret_cast<uint32_t*>(this->pfGetHitData);
     int32_t v5 = 3;
     do {
-        *pfGetHitData = __builtin_bswap32(*pfGetHitData);
+        *pfGetHitData = std::byteswap<uint32_t>(*pfGetHitData);
         ++pfGetHitData;
         --v5;
     }
@@ -170,12 +171,12 @@ void ImageSpaceParameterData::Endian() {
     uint32_t* pfCinematicData = reinterpret_cast<uint32_t*>(this->pfCinematicData);
     int32_t v7 = 12;
     do {
-        *pfCinematicData = __builtin_bswap32(*pfCinematicData);
+        *pfCinematicData = std::byteswap<uint32_t>(*pfCinematicData);
         ++pfCinematicData;
         --v7;
     }
     while (v7);
-    uiCinematicsEnabled = __builtin_bswap32(uiCinematicsEnabled);
+    uiCinematicsEnabled = std::byteswap<uint32_t>(uiCinematicsEnabled);
 }
 
 ImageSpaceManager::ImageSpaceManager()

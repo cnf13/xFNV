@@ -34,6 +34,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -89,7 +90,7 @@ void hkpSphereTriangleAgent::getClosestPoints(
             _mm_load_ps(&reinterpret_cast<const float*>(&sphereCentre.m_quad)[0])
         );
         _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_separatingNormal.m_quad)[0], hitDirection);
-        event.m_contact.m_separatingNormal.m_quad[3] = distance - radiusSum;
+        XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = distance - radiusSum;
         _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_position.m_quad)[0], position);
         collector.addCdPoint(event);
     }
@@ -163,7 +164,7 @@ void hkpSphereTriangleAgent::processCollision(
         point.m_contact.m_position.m_quad =
             _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), hitDirection), sphereCentre.m_quad);
         point.m_contact.m_separatingNormal.m_quad = hitDirection;
-        point.m_contact.m_separatingNormal.m_quad[3] = distance - radiusSum;
+        XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3) = distance - radiusSum;
         // numFeatures is copied to a byte local, whose address the weld gets.
         uint8_t numFeatures = features.numFeatures;
         if (numFeatures > 0) {
@@ -335,7 +336,7 @@ void hkpSphereTriangleAgent::staticGetClosestPoints(
             _mm_load_ps(&reinterpret_cast<const float*>(&sphereCentre.m_quad)[0])
         );
         _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_separatingNormal.m_quad)[0], hitDirection);
-        event.m_contact.m_separatingNormal.m_quad[3] = distance - radiusSum;
+        XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = distance - radiusSum;
         _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_position.m_quad)[0], position);
         bool reject = false;
         if (input.m_weldClosestPoints.m_storage != 0 && numFeatures > 0) {

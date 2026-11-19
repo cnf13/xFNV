@@ -43,6 +43,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Byte swaps every field, in field order.
 void OBJ_TREE::Endian() {
@@ -133,7 +134,7 @@ bool TESObjectTREE::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, 0x200);
                 TESForm* pForm = this;
                 pForm->SetFormEditorID(pBuffer);

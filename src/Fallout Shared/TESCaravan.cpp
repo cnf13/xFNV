@@ -22,6 +22,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 void CARAVANDECKDATA::Endian() {
     ENDIAN(uiValue, false);
@@ -64,7 +65,7 @@ bool TESCaravanCard::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;
@@ -78,7 +79,7 @@ bool TESCaravanCard::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(
@@ -264,7 +265,7 @@ bool TESCaravanMoney::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;
@@ -278,7 +279,7 @@ bool TESCaravanMoney::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usFormVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(
@@ -289,7 +290,7 @@ bool TESCaravanMoney::Load(TESFile* apFile) {
             case MOD2_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, 0);
                 static_cast<TESModel*>(&anteModels[0])->SetModel(pBuffer);
                 TESModel::LoadModelTextureChunk(&anteModels[0], apFile);
@@ -298,7 +299,7 @@ bool TESCaravanMoney::Load(TESFile* apFile) {
             case MOD3_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, 0);
                 static_cast<TESModel*>(&anteModels[1])->SetModel(pBuffer);
                 TESModel::LoadModelTextureChunk(&anteModels[1], apFile);
@@ -472,7 +473,7 @@ bool TESCaravanDeck::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten.
                 pBuffer[0] = '\0';
                 apFile->GetChunkData(pBuffer, 0x200);

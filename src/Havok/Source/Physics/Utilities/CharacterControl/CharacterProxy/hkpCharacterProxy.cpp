@@ -65,10 +65,10 @@
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
 #include "SDK/MSVC/string.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 // When the plane at index r_eax of r_edi faces up by more than 0.01 but by less than maxSlopeCos, appends a copy of
@@ -234,8 +234,8 @@ void hkpCharacterProxy::updateManifold(
     startPointHits.m_size = startPointCollector.m_hits.m_size;
     for (int32_t i = 0; i < startPointHits.m_size; ++i) {
         startPointHits.m_data[i].Assign(startPointCollector.m_hits.m_data[i]);
-        if (minimumPenetration > startPointHits.m_data[i].m_contact.m_separatingNormal.m_quad[3]) {
-            minimumPenetration = startPointHits.m_data[i].m_contact.m_separatingNormal.m_quad[3];
+        if (minimumPenetration > XFNV_M128_F32(startPointHits.m_data[i].m_contact.m_separatingNormal.m_quad, 3)) {
+            minimumPenetration = XFNV_M128_F32(startPointHits.m_data[i].m_contact.m_separatingNormal.m_quad, 3);
         }
     }
 
@@ -268,7 +268,7 @@ void hkpCharacterProxy::updateManifold(
 
     // The start hits left at the smallest distance replace the manifold point they match, or are added.
     for (const hkpRootCdPoint& hit : startPointHits) {
-        if (minimumPenetration == hit.m_contact.m_separatingNormal.m_quad[3]) {
+        if (minimumPenetration == XFNV_M128_F32(hit.m_contact.m_separatingNormal.m_quad, 3)) {
             const int32_t index = findSurface(hit);
             if (index >= 0) {
                 hkpRootCdPoint& surface = m_manifold.m_data[index];
@@ -344,7 +344,7 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
     float timeTravelled
 ) {
     surface.m_plane = hit.m_contact.m_separatingNormal;
-    surface.m_plane.m_quad[3] = surface.m_plane.m_quad[3] - m_keepDistance;
+    XFNV_M128_F32(surface.m_plane.m_quad, 3) = XFNV_M128_F32(surface.m_plane.m_quad, 3) - m_keepDistance;
     surface.m_staticFriction = m_staticFriction;
     surface.m_dynamicFriction = m_dynamicFriction;
     surface.m_extraUpStaticFriction = m_extraUpStaticFriction;
@@ -359,12 +359,12 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
         }
         else {
             const hkSweptTransform& swept = pBody->m_motion.m_motionState.m_sweptTransform;
-            float invDeltaTime = swept.m_centerOfMass1.m_quad[3];
+            float invDeltaTime = XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
             __m128 linVel = _mm_mul_ps(
                 _mm_sub_ps(swept.m_centerOfMass1.m_quad, swept.m_centerOfMass0.m_quad),
                 _mm_shuffle_ps(_mm_set_ss(invDeltaTime), _mm_set_ss(invDeltaTime), 0)
             );
-            float invDeltaTime2 = swept.m_centerOfMass1.m_quad[3];
+            float invDeltaTime2 = XFNV_M128_F32(swept.m_centerOfMass1.m_quad, 3);
             __m128 angVel = _mm_mul_ps(
                 _mm_shuffle_ps(_mm_set_ss(invDeltaTime2), _mm_set_ss(invDeltaTime2), 0),
                 pBody->m_motion.m_motionState.m_deltaAngle.m_quad
@@ -377,7 +377,7 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
             surface.m_velocity.m_quad = _mm_add_ps(surface.m_velocity.m_quad, linVel);
         }
         float velDot = surface.m_velocity.dot3(surface.m_plane);
-        surface.m_plane.m_quad[3] = surface.m_plane.m_quad[3] - velDot * timeTravelled;
+        XFNV_M128_F32(surface.m_plane.m_quad, 3) = XFNV_M128_F32(surface.m_plane.m_quad, 3) - velDot * timeTravelled;
         if (pBody->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
             surface.m_priority = 2;
         }
@@ -385,8 +385,8 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
             surface.m_priority = 1;
         }
     }
-    if (surface.m_plane.m_quad[3] < -1.1920929e-07f) {
-        float recoverySpeed = m_penetrationRecoverySpeed * -surface.m_plane.m_quad[3];
+    if (XFNV_M128_F32(surface.m_plane.m_quad, 3) < -1.1920929e-07f) {
+        float recoverySpeed = m_penetrationRecoverySpeed * -XFNV_M128_F32(surface.m_plane.m_quad, 3);
         surface.m_velocity.m_quad = _mm_add_ps(
             _mm_mul_ps(
                 _mm_shuffle_ps(_mm_set_ss(recoverySpeed), _mm_set_ss(recoverySpeed), 0),
@@ -394,7 +394,7 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
             ),
             surface.m_velocity.m_quad
         );
-        surface.m_plane.m_quad[3] = 0.0f;
+        XFNV_M128_F32(surface.m_plane.m_quad, 3) = 0.0f;
     }
 }
 
@@ -406,7 +406,8 @@ float hkpCharacterProxy::surfaceDistance(const hkpRootCdPoint& p1, const hkpRoot
     const float cosAngle = p1.m_contact.m_separatingNormal.dot3(p2.m_contact.m_separatingNormal);
     const float oneMinusCos = 1.0f - cosAngle;
     const float angleDistance = m_contactAngleSensitivity * m_contactAngleSensitivity * oneMinusCos;
-    const float distanceDelta = p1.m_contact.m_separatingNormal.m_quad[3] - p2.m_contact.m_separatingNormal.m_quad[3];
+    const float distanceDelta = XFNV_M128_F32(p1.m_contact.m_separatingNormal.m_quad, 3) -
+        XFNV_M128_F32(p2.m_contact.m_separatingNormal.m_quad, 3);
     const float distanceDistance = distanceDelta * distanceDelta;
     hkVector4 velocity2;
     hkVector4 velocity1;
@@ -693,10 +694,10 @@ void hkpCharacterProxy::updateFromCinfo(const hkpCharacterProxyCinfo& info) {
     if (m_shapePhantom->m_world != nullptr) {
         setPosition(info.m_position);
     }
-    m_oldDisplacement.m_quad[0] = 0.0f;
-    m_oldDisplacement.m_quad[1] = 0.0f;
-    m_oldDisplacement.m_quad[2] = 0.0f;
-    m_oldDisplacement.m_quad[3] = 0.0f;
+    XFNV_M128_F32(m_oldDisplacement.m_quad, 0) = 0.0f;
+    XFNV_M128_F32(m_oldDisplacement.m_quad, 1) = 0.0f;
+    XFNV_M128_F32(m_oldDisplacement.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(m_oldDisplacement.m_quad, 3) = 0.0f;
     for (int32_t i = 0; i < m_bodies.m_size; ++i) {
         m_bodies.m_data[i]->removeEntityListener(static_cast<hkpEntityListener*>(this));
     }
@@ -1163,7 +1164,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
         }
         const hkpRootCdPoint& point = m_manifold.m_data[s];
         input.m_position = point.m_contact.m_position;
-        input.m_position.m_quad[3] = point.m_contact.m_separatingNormal.m_quad[3];
+        XFNV_M128_F32(input.m_position.m_quad, 3) = XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3);
         input.m_normal = point.m_contact.m_separatingNormal;
         input.m_body = body;
 
@@ -1176,9 +1177,10 @@ void hkpCharacterProxy::applySurfaceInteractions(
             pointVel.setSub4(pointVel, m_velocity);
             input.m_projectedVelocity = pointVel.dot3(input.m_normal);
             deltaVelocity = -input.m_projectedVelocity * 0.8999999761581421;
-            if (input.m_position.m_quad[3] < 0.0f) {
+            if (XFNV_M128_F32(input.m_position.m_quad, 3) < 0.0f) {
                 deltaVelocity =
-                    input.m_position.m_quad[3] * stepInfo.m_invDeltaTime * 0.4000000059604645 + deltaVelocity;
+                    XFNV_M128_F32(input.m_position.m_quad, 3) * stepInfo.m_invDeltaTime * 0.4000000059604645 +
+                    deltaVelocity;
             }
         }
 
@@ -1196,7 +1198,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
             hkVector4 rc;
             rc.setMul3(inertiaInv, jacAng);
             input.m_objectMassInv = rc.dot3(jacAng);
-            input.m_objectMassInv = input.m_objectMassInv + body->m_motion.m_inertiaAndMassInv.m_quad[3];
+            input.m_objectMassInv = input.m_objectMassInv + XFNV_M128_F32(body->m_motion.m_inertiaAndMassInv.m_quad, 3);
             input.m_objectImpulse = deltaVelocity / input.m_objectMassInv;
             const float maxPushImpulse = -m_characterStrength * stepInfo.m_deltaTime;
             if (input.m_objectImpulse < maxPushImpulse) {
@@ -1206,7 +1208,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
         }
         else {
             input.m_objectImpulse = 0.0f;
-            input.m_objectMassInv = body->m_motion.m_inertiaAndMassInv.m_quad[3];
+            input.m_objectMassInv = XFNV_M128_F32(body->m_motion.m_inertiaAndMassInv.m_quad, 3);
         }
 
         // The character's weight along the normal, while the two are not separating faster than gravity pulls.
@@ -1259,10 +1261,10 @@ void hkpCharacterProxy::convertFractionToDistance(
 ) {
     hkpRootCdPoint* pHits = const_cast<hkpRootCdPoint*>(cHit);
     for (int32_t i = numHits - 1; i >= 0; --i) {
-        float fraction = pHits->m_contact.m_separatingNormal.m_quad[3];
-        pHits->m_contact.m_position.m_quad[3] = fraction;
+        float fraction = XFNV_M128_F32(pHits->m_contact.m_separatingNormal.m_quad, 3);
+        XFNV_M128_F32(pHits->m_contact.m_position.m_quad, 3) = fraction;
         float projLength = pHits->m_contact.m_separatingNormal.dot3(displacement);
-        pHits->m_contact.m_separatingNormal.m_quad[3] = fraction * -projLength;
+        XFNV_M128_F32(pHits->m_contact.m_separatingNormal.m_quad, 3) = fraction * -projLength;
         pHits++;
     }
 }
@@ -1306,13 +1308,15 @@ float hkpCharacterProxy::moveToLinearCastHitPosition(
     uint32_t v18;
     hkpRootCdPoint* m_data = castCollector.m_hits.m_data;
     __m128 v6 = _mm_mul_ps(output.m_position.m_quad, output.m_position.m_quad);
-    float v7 = _mm_shuffle_ps(v6, v6, 85)[0] + v6[0];
-    float v8 = _mm_shuffle_ps(v6, v6, 170)[0];
+    float v7 = XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0);
+    float v8 = XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0);
     __m128 v9 = _mm_mul_ps(m_data->m_contact.m_separatingNormal.m_quad, output.m_position.m_quad);
     double v10 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss((v8 + v7))));
-    float v19 = (_mm_shuffle_ps(v9, v9, 170)[0] + (_mm_shuffle_ps(v9, v9, 85)[0] + v9[0])) / v10;
+    float v19 = (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 170), 0) +
+                 (XFNV_M128_F32(_mm_shuffle_ps(v9, v9, 85), 0) + XFNV_M128_F32(v9, 0))) /
+        v10;
     float v20 = m_keepDistance / -v19;
-    float v16 = m_data->m_contact.m_position.m_quad[3] - v20 / v10;
+    float v16 = XFNV_M128_F32(m_data->m_contact.m_position.m_quad, 3) - v20 / v10;
     double v11 = 1.0;
     if (v16 < 1.0f) {
         v11 = v16;

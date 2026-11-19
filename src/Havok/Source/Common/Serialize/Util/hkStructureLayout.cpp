@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 namespace hkSerializerHostDetection {
     union EndianChecker {
@@ -123,7 +124,7 @@ int32_t hkStructureLayout::getMemberSize(
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x50A18B58, buf, ".\\Util\\hkStructureLayout.cpp", 195
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
             }
         LABEL_16:;

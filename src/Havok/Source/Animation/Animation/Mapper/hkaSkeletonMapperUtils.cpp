@@ -22,6 +22,7 @@
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -129,7 +130,8 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         v6.m_vec.m_quad = a.m_rotation.m_vec.m_quad;
         __m128 v7 = _mm_mul_ps(a.m_translation.m_quad, v6.m_vec.m_quad);
         __m128 v8 = _mm_shuffle_ps(v7, v7, 170);
-        v8[0] = v8[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+        XFNV_M128_F32(v8, 0) =
+            XFNV_M128_F32(v8, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
         __m128 v9 = _mm_shuffle_ps(v6.m_vec.m_quad, v6.m_vec.m_quad, 255);
         __m128 v10 = _mm_add_ps(
             _mm_mul_ps(
@@ -158,7 +160,8 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         v16.m_quad = b.m_translation.m_quad;
         __m128 v17 = _mm_mul_ps(v16.m_quad, m_quad);
         __m128 v18 = _mm_shuffle_ps(v17, v17, 170);
-        v18[0] = v18[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+        XFNV_M128_F32(v18, 0) =
+            XFNV_M128_F32(v18, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0));
         __m128 v19 = _mm_shuffle_ps(m_quad, m_quad, 255);
         q0_.m_vec.m_quad = m_quad;
         __m128 v20 = _mm_add_ps(

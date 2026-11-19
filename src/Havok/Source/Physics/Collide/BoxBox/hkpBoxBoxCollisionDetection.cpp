@@ -13,6 +13,7 @@
 #include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionOutput.h"
 #include "Havok/Source/Physics/Collide/BoxBox/hkpBoxBoxContactPoint.h"
 #include "Havok/Source/Physics/Collide/BoxBox/hkpBoxBoxManifold.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -203,7 +204,7 @@ hkBool hkpBoxBoxCollisionDetection::calculateClosestPoint(hkContactPoint& contac
         );
     }
     const float distance = fpp.m_distance;
-    normal[3] = distance;
+    XFNV_M128_F32(normal, 3) = distance;
     if (featureIdA > 2u) {
         const float negDistance = -distance;
         position = _mm_add_ps(
@@ -212,7 +213,7 @@ hkBool hkpBoxBoxCollisionDetection::calculateClosestPoint(hkContactPoint& contac
     }
     contact.m_separatingNormal.m_quad = normal;
     contact.m_position.m_quad = position;
-    contact.m_separatingNormal.m_quad[3] = distance;
+    XFNV_M128_F32(contact.m_separatingNormal.m_quad, 3) = distance;
     return result;
 }
 
@@ -291,24 +292,30 @@ hkResult hkpBoxBoxCollisionDetection::checkIntersection(const hkVector4& toleran
     __m128 v69 = _mm_shuffle_ps(m_dinA.m_quad, m_dinA.m_quad, 85);
     __m128 v14 = _mm_mul_ps(v75.m_col1.m_quad, v75.m_col1.m_quad);
     __m128 v15 = _mm_add_ps(v13, v14);
-    double v16 = v4[2] * m_radiusA.m_quad[1] + v4[1] * m_radiusA.m_quad[2] + v6[0] * m_radiusB.m_quad[1] +
-        v5[0] * m_radiusB.m_quad[2];
+    double v16 = XFNV_M128_F32(v4, 2) * XFNV_M128_F32(m_radiusA.m_quad, 1) +
+        XFNV_M128_F32(v4, 1) * XFNV_M128_F32(m_radiusA.m_quad, 2) +
+        XFNV_M128_F32(v6, 0) * XFNV_M128_F32(m_radiusB.m_quad, 1) +
+        XFNV_M128_F32(v5, 0) * XFNV_M128_F32(m_radiusB.m_quad, 2);
     v59 = v16;
-    v56 = v6[0] * m_radiusB.m_quad[0] + (v5[2] * m_radiusA.m_quad[1] + v5[1] * m_radiusA.m_quad[2]) +
-        v4[0] * m_radiusB.m_quad[2];
-    v32 = v5[0] * m_radiusB.m_quad[0] + (v6[2] * m_radiusA.m_quad[1] + v6[1] * m_radiusA.m_quad[2]) +
-        v4[0] * m_radiusB.m_quad[1];
-    float v45 = v15[0] + 1.1920928955078125e-07;
+    v56 = XFNV_M128_F32(v6, 0) * XFNV_M128_F32(m_radiusB.m_quad, 0) +
+        (XFNV_M128_F32(v5, 2) * XFNV_M128_F32(m_radiusA.m_quad, 1) +
+         XFNV_M128_F32(v5, 1) * XFNV_M128_F32(m_radiusA.m_quad, 2)) +
+        XFNV_M128_F32(v4, 0) * XFNV_M128_F32(m_radiusB.m_quad, 2);
+    v32 = XFNV_M128_F32(v5, 0) * XFNV_M128_F32(m_radiusB.m_quad, 0) +
+        (XFNV_M128_F32(v6, 2) * XFNV_M128_F32(m_radiusA.m_quad, 1) +
+         XFNV_M128_F32(v6, 1) * XFNV_M128_F32(m_radiusA.m_quad, 2)) +
+        XFNV_M128_F32(v4, 0) * XFNV_M128_F32(m_radiusB.m_quad, 1);
+    float v45 = XFNV_M128_F32(v15, 0) + 1.1920928955078125e-07;
     float v46 = std::sqrt((double)v45);
-    v53[0] = 1.0 / v46;
-    float v47 = v15[1] + 1.1920928955078125e-07;
+    XFNV_M128_F32(v53, 0) = 1.0 / v46;
+    float v47 = XFNV_M128_F32(v15, 1) + 1.1920928955078125e-07;
     float v48 = std::sqrt((double)v47);
-    v53[1] = 1.0 / v48;
-    float v49 = v15[2] + 1.1920928955078125e-07;
+    XFNV_M128_F32(v53, 1) = 1.0 / v48;
+    float v49 = XFNV_M128_F32(v15, 2) + 1.1920928955078125e-07;
     float v50 = std::sqrt((double)v49);
     v17.m_quad = v75.m_col2.m_quad;
-    v53[2] = 1.0 / v50;
-    v53[3] = 0.0f;
+    XFNV_M128_F32(v53, 2) = 1.0 / v50;
+    XFNV_M128_F32(v53, 3) = 0.0f;
     __m128 v18 = _mm_mul_ps(
         _mm_sub_ps(
             _mm_and_ps(
@@ -326,29 +333,34 @@ hkResult hkpBoxBoxCollisionDetection::checkIntersection(const hkVector4& toleran
     }
     __m128 v68 = _mm_shuffle_ps(_mm_set_ss(999.99994f), _mm_set_ss(999.99994f), 0);
     __m128 v19 = _mm_cmplt_ps(v68, v53);
-    double v20 = v4[0] * m_radiusA.m_quad[2] + v4[2] * m_radiusA.m_quad[0];
+    double v20 = XFNV_M128_F32(v4, 0) * XFNV_M128_F32(m_radiusA.m_quad, 2) +
+        XFNV_M128_F32(v4, 2) * XFNV_M128_F32(m_radiusA.m_quad, 0);
     __m128 v21 = _mm_shuffle_ps(_mm_set_ss(-1e17f), _mm_set_ss(-1e17f), 0);
-    double v22 = v6[1] * m_radiusB.m_quad[1];
+    double v22 = XFNV_M128_F32(v6, 1) * XFNV_M128_F32(m_radiusB.m_quad, 1);
     m_sepDist[2].m_quad = _mm_or_ps(_mm_and_ps(v19, v21), _mm_andnot_ps(v19, v18));
     __m128 v72 = _mm_mul_ps(_mm_shuffle_ps(m_dinA.m_quad, m_dinA.m_quad, 0), v17.m_quad);
     __m128 v65 = _mm_shuffle_ps(m_dinA.m_quad, m_dinA.m_quad, 170);
     __m128 v23 = _mm_add_ps(v13, v74);
-    v57 = v20 + v22 + v5[1] * m_radiusB.m_quad[2];
-    v60 = v6[1] * m_radiusB.m_quad[0] + (v5[2] * m_radiusA.m_quad[0] + v5[0] * m_radiusA.m_quad[2]) +
-        v4[1] * m_radiusB.m_quad[2];
-    v51 = v5[1] * m_radiusB.m_quad[0] + (v6[2] * m_radiusA.m_quad[0] + v6[0] * m_radiusA.m_quad[2]) +
-        v4[1] * m_radiusB.m_quad[1];
-    float v33 = v23[0] + 1.1920928955078125e-07;
+    v57 = v20 + v22 + XFNV_M128_F32(v5, 1) * XFNV_M128_F32(m_radiusB.m_quad, 2);
+    v60 = XFNV_M128_F32(v6, 1) * XFNV_M128_F32(m_radiusB.m_quad, 0) +
+        (XFNV_M128_F32(v5, 2) * XFNV_M128_F32(m_radiusA.m_quad, 0) +
+         XFNV_M128_F32(v5, 0) * XFNV_M128_F32(m_radiusA.m_quad, 2)) +
+        XFNV_M128_F32(v4, 1) * XFNV_M128_F32(m_radiusB.m_quad, 2);
+    v51 = XFNV_M128_F32(v5, 1) * XFNV_M128_F32(m_radiusB.m_quad, 0) +
+        (XFNV_M128_F32(v6, 2) * XFNV_M128_F32(m_radiusA.m_quad, 0) +
+         XFNV_M128_F32(v6, 0) * XFNV_M128_F32(m_radiusA.m_quad, 2)) +
+        XFNV_M128_F32(v4, 1) * XFNV_M128_F32(m_radiusB.m_quad, 1);
+    float v33 = XFNV_M128_F32(v23, 0) + 1.1920928955078125e-07;
     float v34 = std::sqrt((double)v33);
-    v54[0] = 1.0 / v34;
-    float v35 = v23[1] + 1.1920928955078125e-07;
+    XFNV_M128_F32(v54, 0) = 1.0 / v34;
+    float v35 = XFNV_M128_F32(v23, 1) + 1.1920928955078125e-07;
     float v36 = std::sqrt((double)v35);
-    v54[1] = 1.0 / v36;
-    float v37 = v23[2] + 1.1920928955078125e-07;
+    XFNV_M128_F32(v54, 1) = 1.0 / v36;
+    float v37 = XFNV_M128_F32(v23, 2) + 1.1920928955078125e-07;
     float v38 = std::sqrt((double)v37);
     v24.m_quad = v75.m_col0.m_quad;
-    v54[2] = 1.0 / v38;
-    v54[3] = 0.0f;
+    XFNV_M128_F32(v54, 2) = 1.0 / v38;
+    XFNV_M128_F32(v54, 3) = 0.0f;
     __m128 v25 = _mm_mul_ps(
         _mm_sub_ps(
             _mm_and_ps(
@@ -364,26 +376,32 @@ hkResult hkpBoxBoxCollisionDetection::checkIntersection(const hkVector4& toleran
         return HK_FAILURE;
     }
     __m128 v26 = _mm_cmplt_ps(v68, v54);
-    double v27 = v4[0] * m_radiusA.m_quad[1] + v4[1] * m_radiusA.m_quad[0];
+    double v27 = XFNV_M128_F32(v4, 0) * XFNV_M128_F32(m_radiusA.m_quad, 1) +
+        XFNV_M128_F32(v4, 1) * XFNV_M128_F32(m_radiusA.m_quad, 0);
     m_sepDist[3].m_quad = _mm_or_ps(_mm_and_ps(v26, v21), _mm_andnot_ps(v26, v25));
     __m128 v28 = _mm_shuffle_ps(m_dinA.m_quad, m_dinA.m_quad, 85);
     __m128 v66 = _mm_mul_ps(_mm_shuffle_ps(v28, v28, 0), v24.m_quad);
     __m128 v29 = _mm_add_ps(v74, v14);
-    v58 = v27 + v6[2] * m_radiusB.m_quad[1] + v5[2] * m_radiusB.m_quad[2];
-    v61 = v6[2] * m_radiusB.m_quad[0] +
-        (v5[1] * m_radiusA.m_quad[0] + v5[0] * m_radiusA.m_quad[1] + v4[2] * m_radiusB.m_quad[2]);
-    v52 = v5[2] * m_radiusB.m_quad[0] + (v6[1] * m_radiusA.m_quad[0] + v6[0] * m_radiusA.m_quad[1]) +
-        v4[2] * m_radiusB.m_quad[1];
-    float v39 = v29[0] + 1.1920928955078125e-07;
+    v58 = v27 + XFNV_M128_F32(v6, 2) * XFNV_M128_F32(m_radiusB.m_quad, 1) +
+        XFNV_M128_F32(v5, 2) * XFNV_M128_F32(m_radiusB.m_quad, 2);
+    v61 = XFNV_M128_F32(v6, 2) * XFNV_M128_F32(m_radiusB.m_quad, 0) +
+        (XFNV_M128_F32(v5, 1) * XFNV_M128_F32(m_radiusA.m_quad, 0) +
+         XFNV_M128_F32(v5, 0) * XFNV_M128_F32(m_radiusA.m_quad, 1) +
+         XFNV_M128_F32(v4, 2) * XFNV_M128_F32(m_radiusB.m_quad, 2));
+    v52 = XFNV_M128_F32(v5, 2) * XFNV_M128_F32(m_radiusB.m_quad, 0) +
+        (XFNV_M128_F32(v6, 1) * XFNV_M128_F32(m_radiusA.m_quad, 0) +
+         XFNV_M128_F32(v6, 0) * XFNV_M128_F32(m_radiusA.m_quad, 1)) +
+        XFNV_M128_F32(v4, 2) * XFNV_M128_F32(m_radiusB.m_quad, 1);
+    float v39 = XFNV_M128_F32(v29, 0) + 1.1920928955078125e-07;
     float v40 = std::sqrt((double)v39);
-    v55[0] = 1.0 / v40;
-    float v41 = v29[1] + 1.1920928955078125e-07;
+    XFNV_M128_F32(v55, 0) = 1.0 / v40;
+    float v41 = XFNV_M128_F32(v29, 1) + 1.1920928955078125e-07;
     float v42 = std::sqrt((double)v41);
-    v55[1] = 1.0 / v42;
-    float v43 = v29[2] + 1.1920928955078125e-07;
+    XFNV_M128_F32(v55, 1) = 1.0 / v42;
+    float v43 = XFNV_M128_F32(v29, 2) + 1.1920928955078125e-07;
     float v44 = std::sqrt((double)v43);
-    v55[2] = 1.0 / v44;
-    v55[3] = 0.0f;
+    XFNV_M128_F32(v55, 2) = 1.0 / v44;
+    XFNV_M128_F32(v55, 3) = 0.0f;
     __m128 v30 = _mm_mul_ps(
         _mm_sub_ps(
             _mm_and_ps(
@@ -416,7 +434,7 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
     const int32_t edgeB = fpp.m_featureIndexB & 15;
     const __m128 signA = vertexSignArray[(fpp.m_featureIndexA & 0x70) >> 4];
     __m128 v4 = _mm_mul_ps(m_radiusA.m_quad, signA);
-    double v5 = m_radiusB.m_quad[edgeB];
+    double v5 = XFNV_M128_F32(m_radiusB.m_quad, edgeB);
     const __m128 signB = vertexSignArray[(fpp.m_featureIndexB & 0x70) >> 4];
     const int32_t edgeA = fpp.m_featureIndexA & 15;
     hkVector4 v8;
@@ -424,14 +442,14 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
     const float v41 = v5 + v5;
     __m128 v9 = _mm_mul_ps(signB, m_radiusB.m_quad);
     __m128 v10 = _mm_set_ss(v41);
-    float v42 = m_radiusA.m_quad[edgeA] * -2.0;
+    float v42 = XFNV_M128_F32(m_radiusA.m_quad, edgeA) * -2.0;
     __m128 v11 = _mm_mul_ps(_mm_shuffle_ps(v10, v10, 0), (&m_aTb.m_rotation.m_col0)[edgeB].m_quad);
     hkVector4 v12;
     v12.m_quad = m_aTb.m_rotation.m_col1.m_quad;
     __m128 v53 = v11;
     double v13 = v42;
-    float v37 = v53[edgeA] * v42;
-    double v14 = m_radiusB.m_quad[edgeB];
+    float v37 = XFNV_M128_F32(v53, edgeA) * v42;
+    double v14 = XFNV_M128_F32(m_radiusB.m_quad, edgeB);
     float v44 = v14 * v14 * 4.0;
     __m128 v15 = _mm_sub_ps(
         _mm_add_ps(
@@ -448,12 +466,13 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
     __m128 v17 = _mm_mul_ps(v15, v11);
     double v18 = v37;
     float v38 = v42 * v42;
-    float v43 = _mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+    float v43 = XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0));
     double v19 = v38 * v44 - v18 * v18;
     double v20 = v44;
     float v45 = v19;
     float v46 = std::fabs((double)v45);
-    float v47 = v15[edgeA] * v13;
+    float v47 = XFNV_M128_F32(v15, edgeA) * v13;
     float v39 = v47 * v20 - v43 * v16;
     double v21 = v46;
     float v49 = 1.1920928955078125e-07 * v46;
@@ -478,8 +497,8 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
         return result;
     }
     v53 = _mm_setzero_ps();
-    v4[edgeA] = v40 * v13 + v4[edgeA];
-    v53[edgeA] = v13 * 0.5;
+    XFNV_M128_F32(v4, edgeA) = v40 * v13 + XFNV_M128_F32(v4, edgeA);
+    XFNV_M128_F32(v53, edgeA) = v13 * 0.5;
     // The edges' cross product, normalised with the SDK's rsqrt and one Newton step (zero for a zero length).
     __m128 v23 = _mm_sub_ps(
         _mm_mul_ps(_mm_shuffle_ps(v53, v53, 201), _mm_shuffle_ps(v11, v11, 210)),
@@ -487,27 +506,32 @@ hkBool hkpBoxBoxCollisionDetection::isValidEdgeEdge(hkpFeaturePointCache& fpp) c
     );
     __m128 v24 = _mm_mul_ps(v23, v23);
     __m128 v25 = _mm_shuffle_ps(v24, v24, 170);
-    v25[0] = v25[0] + (_mm_shuffle_ps(v24, v24, 85)[0] + v24[0]);
-    float v26 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v25[0])));
+    XFNV_M128_F32(v25, 0) =
+        XFNV_M128_F32(v25, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v24, v24, 85), 0) + XFNV_M128_F32(v24, 0));
+    float v26 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(XFNV_M128_F32(v25, 0))));
     __m128 v28 = _mm_cmpeq_ss(v25, _mm_set_ss(zero));
     __m128 v29 = _mm_setzero_ps();
-    v29[0] = (0.5f * v26) * (3.0f - ((v25[0] * v26) * v26));
+    XFNV_M128_F32(v29, 0) = (0.5f * v26) * (3.0f - ((XFNV_M128_F32(v25, 0) * v26) * v26));
     __m128 v30 = _mm_andnot_ps(v28, v29);
     __m128 v31 = _mm_shuffle_ps(v30, v30, 0);
     __m128 v32 = _mm_mul_ps(v31, v23);
-    if (m_boundaryTolerance >
-        static_cast<double>(
-            ((_mm_shuffle_ps(v24, v24, 170)[0] + (_mm_shuffle_ps(v24, v24, 85)[0] + v24[0])) * v31[0])
-        )) {
+    if (m_boundaryTolerance > static_cast<double>(
+                                  ((XFNV_M128_F32(_mm_shuffle_ps(v24, v24, 170), 0) +
+                                    (XFNV_M128_F32(_mm_shuffle_ps(v24, v24, 85), 0) + XFNV_M128_F32(v24, 0))) *
+                                   XFNV_M128_F32(v31, 0))
+                              )) {
         result.m_bool = 0;
         return result;
     }
     __m128 v33 = _mm_mul_ps(signA, v32);
-    if ((_mm_shuffle_ps(v33, v33, 170)[0] + (_mm_shuffle_ps(v33, v33, 85)[0] + v33[0])) < 0.0f) {
+    if ((XFNV_M128_F32(_mm_shuffle_ps(v33, v33, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v33, v33, 85), 0) + XFNV_M128_F32(v33, 0))) < 0.0f) {
         v32 = _mm_xor_ps(v32, hkQuadRealNegateMask);
     }
     __m128 v34 = _mm_mul_ps(v32, v15);
-    float distance = (_mm_shuffle_ps(v34, v34, 170)[0] + (_mm_shuffle_ps(v34, v34, 85)[0] + v34[0]));
+    float distance =
+        (XFNV_M128_F32(_mm_shuffle_ps(v34, v34, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v34, v34, 85), 0) + XFNV_M128_F32(v34, 0)));
     // An unordered (NaN) distance is also taken as within the tolerance.
     if (m_tolerance < distance) {
         result.m_bool = 0;
@@ -533,11 +557,11 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
 ) const {
     for (int32_t iterationsLeft = 8;;) {
         uint32_t feature = HK_BOXBOX_FACE_A_X;
-        float maxDist = m_sepDist[0].m_quad[0];
+        float maxDist = XFNV_M128_F32(m_sepDist[0].m_quad, 0);
         for (uint32_t i = HK_BOXBOX_FACE_A_Y; i < HK_BOXBOX_FEATURE_COUNT; ++i) {
-            if ((i & 3) != 3 && maxDist < m_sepDist[i >> 2].m_quad[i & 3]) {
+            if ((i & 3) != 3 && maxDist < XFNV_M128_F32(m_sepDist[i >> 2].m_quad, i & 3)) {
                 feature = i;
-                maxDist = m_sepDist[i >> 2].m_quad[i & 3];
+                maxDist = XFNV_M128_F32(m_sepDist[i >> 2].m_quad, i & 3);
             }
         }
 
@@ -548,11 +572,12 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             // Row `feature` of aTb's rotation, w 0.
             const __m128 row = _mm_unpacklo_ps(
                 _mm_unpacklo_ps(
-                    _mm_set_ss(m_aTb.getColumn(0).m_quad[feature]), _mm_set_ss(m_aTb.getColumn(2).m_quad[feature])
+                    _mm_set_ss(XFNV_M128_F32(m_aTb.getColumn(0).m_quad, feature)),
+                    _mm_set_ss(XFNV_M128_F32(m_aTb.getColumn(2).m_quad, feature))
                 ),
-                _mm_unpacklo_ps(_mm_set_ss(m_aTb.getColumn(1).m_quad[feature]), _mm_set_ss(0.0f))
+                _mm_unpacklo_ps(_mm_set_ss(XFNV_M128_F32(m_aTb.getColumn(1).m_quad, feature)), _mm_set_ss(0.0f))
             );
-            if (0.0f > m_dinA.m_quad[feature]) {
+            if (0.0f > XFNV_M128_F32(m_dinA.m_quad, feature)) {
                 fpp.m_normalSign = -1.0f;
                 fpp.m_vB = m_radiusB;
             }
@@ -581,8 +606,8 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             hkVector4 absA;
             absA.setAbs4(fpp.m_vA);
             if ((_mm_movemask_ps(_mm_cmplt_ps(absA.m_quad, m_keepRadiusA.m_quad)) & 7) == 7) {
-                fpp.m_distance =
-                    fpp.m_vA.m_quad[fpp.m_featureIndexA] * fpp.m_normalSign - m_radiusA.m_quad[fpp.m_featureIndexA];
+                fpp.m_distance = XFNV_M128_F32(fpp.m_vA.m_quad, fpp.m_featureIndexA) * fpp.m_normalSign -
+                    XFNV_M128_F32(m_radiusA.m_quad, fpp.m_featureIndexA);
                 return 2;
             }
         }
@@ -592,7 +617,7 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             fpp.m_featureIndexA = static_cast<int32_t>(feature);
             const int32_t axis = static_cast<int32_t>(feature) - HK_BOXBOX_FACE_B_X;
             const __m128 column = m_aTb.getColumn(axis).m_quad;
-            if (0.0f > m_dinB.m_quad[axis]) {
+            if (0.0f > XFNV_M128_F32(m_dinB.m_quad, axis)) {
                 fpp.m_normalSign = -1.0f;
                 fpp.m_vA.setNeg4(m_radiusA);
             }
@@ -623,7 +648,8 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             absB.setAbs4(fpp.m_vB);
             if ((_mm_movemask_ps(_mm_cmplt_ps(absB.m_quad, m_keepRadiusB.m_quad)) & 7) == 7) {
                 const int32_t i = fpp.m_featureIndexA - HK_BOXBOX_FACE_B_X;
-                fpp.m_distance = fpp.m_vB.m_quad[i] * -fpp.m_normalSign - m_radiusB.m_quad[i];
+                fpp.m_distance =
+                    XFNV_M128_F32(fpp.m_vB.m_quad, i) * -fpp.m_normalSign - XFNV_M128_F32(m_radiusB.m_quad, i);
                 return 2;
             }
         }
@@ -636,7 +662,7 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             fpp.m_featureIndexB = static_cast<int32_t>(edgeB);
             const __m128 dirB = m_aTb.getColumn(static_cast<int32_t>(edgeB)).m_quad;
             __m128 dirA = _mm_setzero_ps();
-            dirA[edgeA] = 1.0f;
+            XFNV_M128_F32(dirA, edgeA) = 1.0f;
             // EXE-INLINED 0x630DF0: hkVector4::setCross(dirA, dirB), each product with dirB's lanes first.
             hkVector4 normal;
             normal.m_quad = _mm_sub_ps(
@@ -648,10 +674,10 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             }
             fpp.m_vA = normal;
             __m128 signsA = fpp.m_vA.m_quad;
-            signsA[edgeA] = 1.0f;
+            XFNV_M128_F32(signsA, edgeA) = 1.0f;
             fpp.m_vB.setRotatedInverseDir(m_aTb.getRotation(), normal);
             __m128 signsB = fpp.m_vB.m_quad;
-            signsB[edgeB] = 1.0f;
+            XFNV_M128_F32(signsB, edgeB) = 1.0f;
             // The vertex bits: A's from the normal's signs (bit 7 set), B's from the inverted signs.
             const uint8_t featureIdA =
                 static_cast<uint8_t>(((_mm_movemask_ps(_mm_cmplt_ps(signsA, _mm_setzero_ps())) | 0xF8) << 4) | edgeA);
@@ -673,7 +699,7 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             }
         }
 
-        m_sepDist[feature >> 2].m_quad[feature & 3] = -3.40282e+38f;
+        XFNV_M128_F32(m_sepDist[feature >> 2].m_quad, feature & 3) = -3.40282e+38f;
         if (--iterationsLeft <= 0) {
             return 0;
         }
@@ -811,7 +837,7 @@ void hkpBoxBoxCollisionDetection::addAdditionalEdgeHelper(
         );
     }
     cdPoint->m_contact.m_separatingNormal.m_quad = normal;
-    cdPoint->m_contact.m_separatingNormal.m_quad[3] = fpp.m_distance;
+    XFNV_M128_F32(cdPoint->m_contact.m_separatingNormal.m_quad, 3) = fpp.m_distance;
     if (manifold.m_numPoints > 1) {
         // A normal against the previous contact's (dot product at most zero; unordered keeps the point) is dropped.
         const hkpProcessCdPoint* previous = m_result->m_firstFreeContactPoint.m_storage - 1;
@@ -857,8 +883,8 @@ void hkpBoxBoxCollisionDetection::tryToAddPointOnEdge(
     fcp.m_contactPointId = 0;
     hkVector4 signsA = normalA;
     hkVector4 signsB = normalB;
-    signsA.m_quad[edgeA] = 1.0f;
-    signsB.m_quad[edgeB] = 1.0f;
+    XFNV_M128_F32(signsA.m_quad, edgeA) = 1.0f;
+    XFNV_M128_F32(signsB.m_quad, edgeB) = 1.0f;
     const int32_t negativeA = _mm_movemask_ps(_mm_cmplt_ps(signsA.m_quad, _mm_setzero_ps()));
     const int32_t negativeB = _mm_movemask_ps(_mm_cmplt_ps(signsB.m_quad, _mm_setzero_ps()));
     fcp.m_featureIdA = static_cast<uint8_t>(((negativeA | 0xF8) << 4) | edgeA);

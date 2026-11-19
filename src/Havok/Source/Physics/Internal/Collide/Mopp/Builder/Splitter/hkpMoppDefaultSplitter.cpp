@@ -11,6 +11,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Mediator/hkpMoppMediator.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Splitter/hkpMoppCostFunction.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Builder/Splitter/hkpMoppSplitter.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -173,17 +174,21 @@ void hkpMoppDefaultSplitter::sortLeftAndRight(
             alignas(16) hkVector4 negDirection;
             // Negates by XORing each lane's bits with this file's sign mask hkQuadRealNegateMask.
             const hkQuadReal& direction = pPlane->m_direction.m_quad;
-            negDirection.m_quad[0] = std::bit_cast<float>(
-                std::bit_cast<uint32_t>(direction[0]) ^ std::bit_cast<uint32_t>(hkQuadRealNegateMask[0])
+            XFNV_M128_F32(negDirection.m_quad, 0) = std::bit_cast<float>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(direction, 0)) ^
+                std::bit_cast<uint32_t>(XFNV_M128_F32(hkQuadRealNegateMask, 0))
             );
-            negDirection.m_quad[1] = std::bit_cast<float>(
-                std::bit_cast<uint32_t>(direction[1]) ^ std::bit_cast<uint32_t>(hkQuadRealNegateMask[1])
+            XFNV_M128_F32(negDirection.m_quad, 1) = std::bit_cast<float>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(direction, 1)) ^
+                std::bit_cast<uint32_t>(XFNV_M128_F32(hkQuadRealNegateMask, 1))
             );
-            negDirection.m_quad[2] = std::bit_cast<float>(
-                std::bit_cast<uint32_t>(direction[2]) ^ std::bit_cast<uint32_t>(hkQuadRealNegateMask[2])
+            XFNV_M128_F32(negDirection.m_quad, 2) = std::bit_cast<float>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(direction, 2)) ^
+                std::bit_cast<uint32_t>(XFNV_M128_F32(hkQuadRealNegateMask, 2))
             );
-            negDirection.m_quad[3] = std::bit_cast<float>(
-                std::bit_cast<uint32_t>(direction[3]) ^ std::bit_cast<uint32_t>(hkQuadRealNegateMask[3])
+            XFNV_M128_F32(negDirection.m_quad, 3) = std::bit_cast<float>(
+                std::bit_cast<uint32_t>(XFNV_M128_F32(direction, 3)) ^
+                std::bit_cast<uint32_t>(XFNV_M128_F32(hkQuadRealNegateMask, 3))
             );
             hkpMoppCompilerPrimitive* pCurrent = *appCurrent;
             m_mediator->splitPrimitive(*pCurrent, negDirection, -planeMiddle, depth, pCurrent);

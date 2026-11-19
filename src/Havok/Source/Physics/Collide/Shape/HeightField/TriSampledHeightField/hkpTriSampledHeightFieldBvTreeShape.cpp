@@ -28,6 +28,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -143,11 +144,11 @@ void hkpTriSampledHeightFieldBvTreeShape::queryAabb(
                 hits.pushBack(uiKey | 1);
                 if (bAabbAbove || bAabbBelow) {
                     float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(x), static_cast<int32_t>(z));
-                    fHeight = pHeightField->m_intToFloatScale.m_quad[1] * fHeight;
-                    if (fHeight > kAabb.m_min.m_quad[1]) {
+                    fHeight = XFNV_M128_F32(pHeightField->m_intToFloatScale.m_quad, 1) * fHeight;
+                    if (fHeight > XFNV_M128_F32(kAabb.m_min.m_quad, 1)) {
                         bAabbAbove = false;
                     }
-                    if (kAabb.m_max.m_quad[1] > fHeight) {
+                    if (XFNV_M128_F32(kAabb.m_max.m_quad, 1) > fHeight) {
                         bAabbBelow = false;
                     }
                 }
@@ -158,21 +159,21 @@ void hkpTriSampledHeightFieldBvTreeShape::queryAabb(
             const uint32_t uiEdgeZ = uiMaxZ + 1;
             for (uint32_t x = uiMinX; x <= uiEdgeX; ++x) {
                 float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(x), static_cast<int32_t>(uiEdgeZ));
-                fHeight = pHeightField->m_intToFloatScale.m_quad[1] * fHeight;
-                if (fHeight > kAabb.m_min.m_quad[1]) {
+                fHeight = XFNV_M128_F32(pHeightField->m_intToFloatScale.m_quad, 1) * fHeight;
+                if (fHeight > XFNV_M128_F32(kAabb.m_min.m_quad, 1)) {
                     bAabbAbove = false;
                 }
-                if (kAabb.m_max.m_quad[1] > fHeight) {
+                if (XFNV_M128_F32(kAabb.m_max.m_quad, 1) > fHeight) {
                     bAabbBelow = false;
                 }
             }
             for (uint32_t z = uiMinZ; z <= uiEdgeZ; ++z) {
                 float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(uiEdgeX), static_cast<int32_t>(z));
-                fHeight = pHeightField->m_intToFloatScale.m_quad[1] * fHeight;
-                if (fHeight > kAabb.m_min.m_quad[1]) {
+                fHeight = XFNV_M128_F32(pHeightField->m_intToFloatScale.m_quad, 1) * fHeight;
+                if (fHeight > XFNV_M128_F32(kAabb.m_min.m_quad, 1)) {
                     bAabbAbove = false;
                 }
-                if (kAabb.m_max.m_quad[1] > fHeight) {
+                if (XFNV_M128_F32(kAabb.m_max.m_quad, 1) > fHeight) {
                     bAabbBelow = false;
                 }
             }
@@ -226,11 +227,11 @@ hkpTriSampledHeightFieldBvTreeShape::queryAabbImpl(const hkAabb& aabbIn, uint32_
                 }
                 if (bAabbAbove || bAabbBelow) {
                     float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(x), static_cast<int32_t>(z));
-                    fHeight = pHeightField->m_intToFloatScale.m_quad[1] * fHeight;
-                    if (fHeight > kAabb.m_min.m_quad[1]) {
+                    fHeight = XFNV_M128_F32(pHeightField->m_intToFloatScale.m_quad, 1) * fHeight;
+                    if (fHeight > XFNV_M128_F32(kAabb.m_min.m_quad, 1)) {
                         bAabbAbove = false;
                     }
-                    if (kAabb.m_max.m_quad[1] > fHeight) {
+                    if (XFNV_M128_F32(kAabb.m_max.m_quad, 1) > fHeight) {
                         bAabbBelow = false;
                     }
                 }
@@ -241,21 +242,21 @@ hkpTriSampledHeightFieldBvTreeShape::queryAabbImpl(const hkAabb& aabbIn, uint32_
             const uint32_t uiEdgeZ = uiMaxZ + 1;
             for (uint32_t x = uiMinX; x <= uiEdgeX; ++x) {
                 float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(x), static_cast<int32_t>(uiEdgeZ));
-                fHeight = fHeight * pHeightField->m_intToFloatScale.m_quad[1];
-                if (fHeight > kAabb.m_min.m_quad[1]) {
+                fHeight = fHeight * XFNV_M128_F32(pHeightField->m_intToFloatScale.m_quad, 1);
+                if (fHeight > XFNV_M128_F32(kAabb.m_min.m_quad, 1)) {
                     bAabbAbove = false;
                 }
-                if (kAabb.m_max.m_quad[1] > fHeight) {
+                if (XFNV_M128_F32(kAabb.m_max.m_quad, 1) > fHeight) {
                     bAabbBelow = false;
                 }
             }
             for (uint32_t z = uiMinZ; z <= uiEdgeZ; ++z) {
                 float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(uiEdgeX), static_cast<int32_t>(z));
-                fHeight = fHeight * pHeightField->m_intToFloatScale.m_quad[1];
-                if (fHeight > kAabb.m_min.m_quad[1]) {
+                fHeight = fHeight * XFNV_M128_F32(pHeightField->m_intToFloatScale.m_quad, 1);
+                if (fHeight > XFNV_M128_F32(kAabb.m_min.m_quad, 1)) {
                     bAabbAbove = false;
                 }
-                if (kAabb.m_max.m_quad[1] > fHeight) {
+                if (XFNV_M128_F32(kAabb.m_max.m_quad, 1) > fHeight) {
                     bAabbBelow = false;
                 }
             }
@@ -374,8 +375,8 @@ hkBool hkpTriSampledHeightFieldBvTreeShape::getExtentsForQueryAabb(
         ),
         hkpTriSampledHeightFieldBvTreeShape_s_quadReal65536
     );
-    minX = static_cast<uint16_t>(std::bit_cast<uint32_t>(kLow[0]) >> 7);
-    minZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(kLow[2]) >> 7);
+    minX = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kLow, 0)) >> 7);
+    minZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kLow, 2)) >> 7);
     const __m128 kHigh = _mm_add_ps(
         _mm_max_ps(
             _mm_min_ps(
@@ -389,7 +390,7 @@ hkBool hkpTriSampledHeightFieldBvTreeShape::getExtentsForQueryAabb(
         ),
         hkpTriSampledHeightFieldBvTreeShape_s_quadReal65536
     );
-    maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(kHigh[0]) >> 7);
-    maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(kHigh[2]) >> 7);
+    maxX = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kHigh, 0)) >> 7);
+    maxZ = static_cast<uint16_t>(std::bit_cast<uint32_t>(XFNV_M128_F32(kHigh, 2)) >> 7);
     return 1;
 }

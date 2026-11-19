@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Vehicle/hkpVehicleData.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleInstance.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -208,7 +209,7 @@ hkpTyremarkPoint::hkpTyremarkPoint() {
 }
 
 float hkpTyremarkPoint::getTyremarkStrength() {
-    return m_pointRight.m_quad[3];
+    return XFNV_M128_F32(m_pointRight.m_quad, 3);
 }
 
 const hkClass& hkpTyremarkPoint::staticClass() {
@@ -339,8 +340,8 @@ void hkpTyremarksInfo::updateTyremarksInfo(float timestep, const hkpVehicleInsta
         vRightEdge.m_quad = _mm_add_ps(
             _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fRightOffset), _mm_set_ss(fRightOffset), 0), vRight.m_quad), vCenter
         );
-        vRightEdge.m_quad[0] = vRightEdge.m_quad[0] + vStep[0];
-        vRightEdge.m_quad[3] = vRightEdge.m_quad[3] + vStep[3];
+        XFNV_M128_F32(vRightEdge.m_quad, 0) = XFNV_M128_F32(vRightEdge.m_quad, 0) + XFNV_M128_F32(vStep, 0);
+        XFNV_M128_F32(vRightEdge.m_quad, 3) = XFNV_M128_F32(vRightEdge.m_quad, 3) + XFNV_M128_F32(vStep, 3);
         hkpTyremarkPoint point;
         point.~hkpTyremarkPoint();
         ::new (&point) hkpTyremarkPoint;
@@ -350,13 +351,13 @@ void hkpTyremarksInfo::updateTyremarksInfo(float timestep, const hkpVehicleInsta
             ),
             vStep
         );
-        point.m_pointLeft.m_quad[3] = fStrength;
+        XFNV_M128_F32(point.m_pointLeft.m_quad, 3) = fStrength;
         point.m_pointRight.m_quad = vRightEdge.m_quad;
-        point.m_pointRight.m_quad[1] =
-            _mm_add_ss(_mm_shuffle_ps(vRightEdge.m_quad, vRightEdge.m_quad, 0x55), vStepY)[0];
-        point.m_pointRight.m_quad[2] =
-            _mm_add_ss(_mm_shuffle_ps(vRightEdge.m_quad, vRightEdge.m_quad, 0xAA), vStepZ)[0];
-        point.m_pointRight.m_quad[3] = fStrength;
+        XFNV_M128_F32(point.m_pointRight.m_quad, 1) =
+            XFNV_M128_F32(_mm_add_ss(_mm_shuffle_ps(vRightEdge.m_quad, vRightEdge.m_quad, 0x55), vStepY), 0);
+        XFNV_M128_F32(point.m_pointRight.m_quad, 2) =
+            XFNV_M128_F32(_mm_add_ss(_mm_shuffle_ps(vRightEdge.m_quad, vRightEdge.m_quad, 0xAA), vStepZ), 0);
+        XFNV_M128_F32(point.m_pointRight.m_quad, 3) = fStrength;
         m_tyremarksWheel.m_data[i]->addTyremarkPoint(&point);
     }
 }

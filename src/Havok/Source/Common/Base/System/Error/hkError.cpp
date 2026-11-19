@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/System/Io/Writer/Buffered/hkBufferedStreamWriter.h"
 #include "Havok/Source/Common/Base/System/Io/Writer/hkStreamWriter.h"
+#include "xfnv/Compiler.h"
 
 // m_value is untyped storage: populate and depopulate move any singleton's instance pointer through it.
 static hkSingletonInitNode
@@ -19,7 +20,7 @@ void _hkErrorMessage(const char* c) {
     hkErrStream apThis(buf, 512);
     apThis << c;
     if (hkError::s_instance->message(hkError::MESSAGE_ERROR, 0x2636FE25, buf, ".\\System\\Error\\hkError.cpp", 40)) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
 }
 
@@ -46,7 +47,7 @@ void hkError::hkReferenceCountError(const hkReferencedObject* a1, const char* a2
     hkOstream* v12 = &(*v11 << " * Is this a valid object?\n");
     *v12 << " * Do you have more than 32768 references? (unlikely)\n";
     if (hkError::s_instance->message(hkError::MESSAGE_ERROR, 0x2C66F2D8, buf, ".\\System\\Error\\hkError.cpp", 33)) {
-        __builtin_debugtrap();
+        xfnv::DebugTrap();
     }
 }
 

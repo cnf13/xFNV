@@ -6,6 +6,7 @@
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
+#include "xfnv/Compiler.h"
 
 BGSVoiceType::BGSVoiceType() : Data{0} {
     SetFormType(0x5Du);
@@ -28,7 +29,7 @@ bool BGSVoiceType::Load(TESFile* apFile) {
             break;
         }
         if (uiChunk == EDID_ID) {
-            char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
             apFile->GetChunkData(pEditorID, 0x200u);
             this->SetFormEditorID(pEditorID);
         }

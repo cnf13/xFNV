@@ -21,6 +21,7 @@
 #include "SDK/MSVC/ehvec.h"
 
 #include <cmath>
+#include <cstring>
 
 NiRTTI BSOcclusionPlane::ms_RTTI("BSOcclusionPlane", &NiObject::ms_RTTI);
 
@@ -365,7 +366,7 @@ void BSOcclusionPlane::SetHalfExtents(const NiPoint2& arHalfExtents) {
 }
 
 void BSOcclusionPlane::SetRotation(const NiMatrix3& arRotation) {
-    __builtin_memcpy(&kRotation, &arRotation, sizeof(kRotation));
+    std::memcpy(&kRotation, &arRotation, sizeof(kRotation));
     bDirtyVertices = true;
     bDirtyPlanes = true;
 }
@@ -379,7 +380,7 @@ bool BSOcclusionPlane::TestIntersection(const NiBound& aBound) {
     if (!(&kRotation)->Inverse(inv)) {
         (&inv)->MakeZero();
     }
-    __builtin_memcpy(&v23, &inv, sizeof(v23));
+    std::memcpy(&v23, &inv, sizeof(v23));
     NiPoint3* v2 = &(result = (&aBound)->m_kCenter - kCenter);
     (v21 = v23 * *v2);
     float v11 = (float)std::fabs((double)v21.x);

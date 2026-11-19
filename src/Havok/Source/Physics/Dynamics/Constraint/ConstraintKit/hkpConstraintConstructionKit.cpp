@@ -18,6 +18,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -192,8 +193,8 @@ int32_t hkpConstraintConstructionKit::setStrength(float strength) {
     if (p_m_commands->m_size == (p_m_commands->m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
         hkArrayUtil::_reserveMore(*Instance->m_heap, p_m_commands, sizeof(int32_t));
     }
-    v2[0] = 0.0f;
-    v3[0] = 0.0f;
+    XFNV_M128_F32(v2, 0) = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.0f;
     p_m_commands->m_data[p_m_commands->m_size++] = hkpGenericConstraintDataScheme::e_setStrength;
     hkpGenericConstraintDataScheme* v8 = this->m_scheme;
     int32_t m_size = v8->m_data.m_size;
@@ -239,10 +240,10 @@ int32_t hkpConstraintConstructionKit::setConeLimit(int32_t axis, float angle) {
     const float fCos = std::cos(angle);
     const int32_t iDataIndex = m_scheme->m_data.m_size;
     hkVector4 kData;
-    kData.m_quad[0] = fCos;
-    kData.m_quad[1] = 100.0f;
-    kData.m_quad[2] = 0.0f;
-    kData.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 0) = fCos;
+    XFNV_M128_F32(kData.m_quad, 1) = 100.0f;
+    XFNV_M128_F32(kData.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 3) = 0.0f;
     m_scheme->m_data.pushBack(kData);
     m_scheme->m_info.add(0x30, 1, 1);
     return iDataIndex;
@@ -261,10 +262,10 @@ int32_t hkpConstraintConstructionKit::setTwistLimit(int32_t twistAxis, int32_t p
     const float fSinMin = std::sin(min);
     const int32_t iDataIndex = m_scheme->m_data.m_size;
     hkVector4 kData;
-    kData.m_quad[0] = fSinMin;
-    kData.m_quad[1] = fSinMax;
-    kData.m_quad[2] = 0.0f;
-    kData.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 0) = fSinMin;
+    XFNV_M128_F32(kData.m_quad, 1) = fSinMax;
+    XFNV_M128_F32(kData.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 3) = 0.0f;
     m_scheme->m_data.pushBack(kData);
     m_scheme->m_info.add(0x30, 1, 1);
     return iDataIndex;
@@ -418,10 +419,10 @@ int32_t hkpConstraintConstructionKit::setLinearLimit(int32_t axis, float min, fl
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     hkVector4 kData;
-    kData.m_quad[0] = min;
-    kData.m_quad[1] = max;
-    kData.m_quad[2] = 0.0f;
-    kData.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 0) = min;
+    XFNV_M128_F32(kData.m_quad, 1) = max;
+    XFNV_M128_F32(kData.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 3) = 0.0f;
     pScheme->m_data.pushBack(kData);
     hkpGenericConstraintDataScheme* pInfoScheme = m_scheme;
     pInfoScheme->m_info.m_sizeOfSchemas += 64;
@@ -443,7 +444,7 @@ int32_t hkpConstraintConstructionKit::setAngularLimit(int32_t axis, float min, f
     if (v8->m_size == (v8->m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
         hkArrayUtil::_reserveMore(*v9->m_heap, v8, sizeof(int32_t));
     }
-    v4[0] = 0.0f;
+    XFNV_M128_F32(v4, 0) = 0.0f;
     v8->m_data[v8->m_size++] = static_cast<uint8_t>(axis);
     hkpGenericConstraintDataScheme* m_scheme = this->m_scheme;
     int32_t m_size = m_scheme->m_data.m_size;
@@ -476,10 +477,10 @@ int32_t hkpConstraintConstructionKit::setAngularMotor(int32_t axis, hkpConstrain
     m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     hkVector4 kData;
-    kData.m_quad[0] = static_cast<float>(pScheme->m_motors.m_size);
-    kData.m_quad[1] = 0.0f;
-    kData.m_quad[2] = 0.0f;
-    kData.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 0) = static_cast<float>(pScheme->m_motors.m_size);
+    XFNV_M128_F32(kData.m_quad, 1) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 3) = 0.0f;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     motor->addReference();
     m_scheme->m_data.pushBack(kData);
@@ -497,10 +498,10 @@ int32_t hkpConstraintConstructionKit::setLinearMotor(int32_t axis, hkpConstraint
     m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     hkVector4 kData;
-    kData.m_quad[0] = static_cast<float>(pScheme->m_motors.m_size);
-    kData.m_quad[1] = 0.0f;
-    kData.m_quad[2] = 0.0f;
-    kData.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 0) = static_cast<float>(pScheme->m_motors.m_size);
+    XFNV_M128_F32(kData.m_quad, 1) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 3) = 0.0f;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     motor->addReference();
     m_scheme->m_data.pushBack(kData);
@@ -521,10 +522,10 @@ int32_t hkpConstraintConstructionKit::setAngularFriction(int32_t axis, float max
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     hkVector4 kData;
-    kData.m_quad[0] = maxImpulse;
-    kData.m_quad[1] = 0.0f;
-    kData.m_quad[2] = 0.0f;
-    kData.m_quad[3] = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 0) = maxImpulse;
+    XFNV_M128_F32(kData.m_quad, 1) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(kData.m_quad, 3) = 0.0f;
     pScheme->m_data.pushBack(kData);
     hkpGenericConstraintDataScheme* pInfoScheme = m_scheme;
     pInfoScheme->m_info.m_sizeOfSchemas += 48;
@@ -547,8 +548,8 @@ int32_t hkpConstraintConstructionKit::setLinearFriction(int32_t axis, float maxI
     if (v8->m_size == (v8->m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
         hkArrayUtil::_reserveMore(*v9->m_heap, v8, sizeof(int32_t));
     }
-    v3[0] = 0.0f;
-    v4[0] = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.0f;
+    XFNV_M128_F32(v4, 0) = 0.0f;
     v8->m_data[v8->m_size++] = static_cast<uint8_t>(axis);
     hkpGenericConstraintDataScheme* m_scheme = this->m_scheme;
     int32_t m_size = m_scheme->m_data.m_size;

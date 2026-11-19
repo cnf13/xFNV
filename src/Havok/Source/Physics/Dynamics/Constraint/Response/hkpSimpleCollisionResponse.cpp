@@ -14,6 +14,7 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/Contact/hkpSimpleContactConstraintData.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <xmmintrin.h>
@@ -62,7 +63,7 @@ void hkpSimpleCollisionResponse::solveSingleContact(
     hkpBodyVelocity stepVelA;
     {
         const hkMotionState& ms = bodyA->m_motionState;
-        const float invDt = ms.m_sweptTransform.m_centerOfMass1.m_quad[3];
+        const float invDt = XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass1.m_quad, 3);
         const hkQuadReal invDtq = _mm_shuffle_ps(_mm_set_ss(invDt), _mm_set_ss(invDt), 0);
         stepVelA.m_linear.m_quad = _mm_mul_ps(
             invDtq, _mm_sub_ps(ms.m_sweptTransform.m_centerOfMass1.m_quad, ms.m_sweptTransform.m_centerOfMass0.m_quad)
@@ -72,7 +73,7 @@ void hkpSimpleCollisionResponse::solveSingleContact(
     hkpBodyVelocity stepVelB;
     {
         const hkMotionState& ms = bodyB->m_motionState;
-        const float invDt = ms.m_sweptTransform.m_centerOfMass1.m_quad[3];
+        const float invDt = XFNV_M128_F32(ms.m_sweptTransform.m_centerOfMass1.m_quad, 3);
         const hkQuadReal invDtq = _mm_shuffle_ps(_mm_set_ss(invDt), _mm_set_ss(invDt), 0);
         stepVelB.m_linear.m_quad = _mm_mul_ps(
             invDtq, _mm_sub_ps(ms.m_sweptTransform.m_centerOfMass1.m_quad, ms.m_sweptTransform.m_centerOfMass0.m_quad)
@@ -99,8 +100,8 @@ void hkpSimpleCollisionResponse::solveSingleContact(
     hkSimpleConstraintUtil_getPointVelocity(info, stepVelA, velB, pointVelA);
     hkVector4 pointVelB;
     hkSimpleConstraintUtil_getPointVelocity(info, velA, stepVelB, pointVelB);
-    output.m_velocityKeyframedA = pointVelA.m_quad[0];
-    output.m_velocityKeyframedB = pointVelB.m_quad[0];
+    output.m_velocityKeyframedA = XFNV_M128_F32(pointVelA.m_quad, 0);
+    output.m_velocityKeyframedB = XFNV_M128_F32(pointVelB.m_quad, 0);
 
     if (bodyA->getType() != hkpMotion::MOTION_FIXED) {
         bodyA->setLinearVelocity(velA.m_linear);

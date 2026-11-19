@@ -12,6 +12,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverCheck.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -340,7 +341,7 @@ void hkpMoppEarlyExitObbVirtualMachine::queryOBBOnTree(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppEarlyExitObbVirtualMachine.cpp", 342
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -387,17 +388,23 @@ void hkpMoppEarlyExitObbVirtualMachine::generateQueryFromNode(
     halfExtent = _mm_add_ps(halfExtent, _mm_shuffle_ps(r, r, 0));
     const __m128 lo = _mm_add_ps(BvToWorld.m_translation.m_quad, _mm_xor_ps(halfExtent, hkQuadRealNegateMask));
     const __m128 hi = _mm_add_ps(BvToWorld.m_translation.m_quad, halfExtent);
-    const float xLo = (lo[0] - m_code->m_info.m_offset.m_quad[0]) * m_code->m_info.m_offset.m_quad[3];
+    const float xLo = (XFNV_M128_F32(lo, 0) - XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 0)) *
+        XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     m_xLo = hkMath::hkToIntFast(xLo) - 1;
-    const float xHi = (hi[0] - m_code->m_info.m_offset.m_quad[0]) * m_code->m_info.m_offset.m_quad[3];
+    const float xHi = (XFNV_M128_F32(hi, 0) - XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 0)) *
+        XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     m_xHi = hkMath::hkToIntFast(xHi) + 1;
-    const float yLo = (lo[1] - m_code->m_info.m_offset.m_quad[1]) * m_code->m_info.m_offset.m_quad[3];
+    const float yLo = (XFNV_M128_F32(lo, 1) - XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 1)) *
+        XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     m_yLo = hkMath::hkToIntFast(yLo) - 1;
-    const float yHi = (hi[1] - m_code->m_info.m_offset.m_quad[1]) * m_code->m_info.m_offset.m_quad[3];
+    const float yHi = (XFNV_M128_F32(hi, 1) - XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 1)) *
+        XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     m_yHi = hkMath::hkToIntFast(yHi) + 1;
-    const float zLo = (lo[2] - m_code->m_info.m_offset.m_quad[2]) * m_code->m_info.m_offset.m_quad[3];
+    const float zLo = (XFNV_M128_F32(lo, 2) - XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 2)) *
+        XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     m_zLo = hkMath::hkToIntFast(zLo) - 1;
-    const float zHi = (hi[2] - m_code->m_info.m_offset.m_quad[2]) * m_code->m_info.m_offset.m_quad[3];
+    const float zHi = (XFNV_M128_F32(hi, 2) - XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 2)) *
+        XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     const int32_t zHiInt = hkMath::hkToIntFast(zHi) + 1;
     m_cx = (m_xLo + m_xHi) >> 1;
     m_cy = (m_yLo + m_yHi) >> 1;
@@ -409,7 +416,7 @@ void hkpMoppEarlyExitObbVirtualMachine::generateQueryFromNode(
     const __m128 sumXYZ = _mm_add_ss(_mm_shuffle_ps(squared, squared, 0xAA), sumXY);
     const float length = _mm_cvtss_f32(_mm_sqrt_ss(sumXYZ));
     const float grown = radius + length;
-    const float scaledRadius = grown * m_code->m_info.m_offset.m_quad[3];
+    const float scaledRadius = grown * XFNV_M128_F32(m_code->m_info.m_offset.m_quad, 3);
     m_cradius = hkMath::hkToIntFast(scaledRadius) + 1;
     query.m_xLo = m_xLo >> 16;
     query.m_xHi = (m_xHi >> 16) + 1;

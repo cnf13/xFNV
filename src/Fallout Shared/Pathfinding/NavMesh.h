@@ -3,8 +3,10 @@
 #include "BSCore/BSSimpleArray.h"
 #include "Fallout Shared/Pathfinding/NavMeshGrid.h"
 #include "Fallout Shared/Pathfinding/NavMeshObstacleManager.h"
+#include "Fallout Shared/Pathfinding/NavMeshStaticAvoidNode.h"
 #include "Fallout Shared/Pathfinding/NavMeshTriangle.h"
 #include "Fallout Shared/Pathfinding/NavMeshVertex.h"
+#include "Fallout Shared/Pathfinding/ObstacleUndoData.h"
 #include "Fallout Shared/TESChildCell.h"
 #include "Fallout Shared/TESForm.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -21,8 +23,6 @@ class NavMesh;
 struct NavMeshEdgeHandle;
 class NavMeshInfo;
 class NavMeshPtr;
-class NavMeshStaticAvoidNode;
-class ObstacleUndoData;
 struct TaskPortalSwap;
 class TESObjectCELL;
 

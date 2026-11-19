@@ -21,6 +21,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSkinInstance.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSBodyPartData::BGSBodyPartData() {
     SetFormType(BPTD_ID);
@@ -100,7 +101,7 @@ bool BGSBodyPartData::Load(TESFile* apFile) {
         }
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0x200);
             SetFormEditorID(pBuffer);
         }

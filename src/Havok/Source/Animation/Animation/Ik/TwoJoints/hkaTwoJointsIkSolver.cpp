@@ -8,10 +8,10 @@
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 // The timer names that solve's HK_TIMER macros store.

@@ -34,6 +34,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Reads the DATA record, the muzzle-flash model (NAM1's path through the model's virtual setter, NAM2's texture chunk),
 // the destruction chunks, the full name, the model chunks and the sound level. GetTESForm's byte is stored and compared
@@ -78,7 +79,7 @@ bool BGSProjectile::Load(TESFile* apFile) {
                 if (apFile->GetChunkSize()) {
                     // GetChunkSize is called a second time for the buffer, which is a 16-byte aligned stack buffer of
                     // the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                     apFile->GetChunkData(pBuffer, 0);
                     TESModel* pMuzzleFlashModel = &MuzzleFlashModel;
                     pMuzzleFlashModel->SetModel(pBuffer);
@@ -93,7 +94,7 @@ bool BGSProjectile::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // Cleared first because an empty chunk leaves the buffer unwritten; the game itself does not clear it.
                 pEditorID[0] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200);

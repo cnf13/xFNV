@@ -61,16 +61,16 @@ void bhkDashpotAction::LoadBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkDashpotActionCinfo& rInfo = static_cast<hkDashpotActionCinfo&>(CreateCinfo(bCreated));
-        rInfo.m_pivotA.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fX)));
-        rInfo.m_pivotA.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fY)));
-        rInfo.m_pivotA.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fZ)));
-        rInfo.m_pivotA.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fW)));
-        rInfo.m_pivotB.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fX)));
-        rInfo.m_pivotB.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fY)));
-        rInfo.m_pivotB.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fZ)));
-        rInfo.m_pivotB.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fW)));
-        rInfo.m_strength = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_strength)));
-        rInfo.m_damping = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_damping)));
+        rInfo.m_pivotA.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fX)));
+        rInfo.m_pivotA.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fY)));
+        rInfo.m_pivotA.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fZ)));
+        rInfo.m_pivotA.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fW)));
+        rInfo.m_pivotB.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fX)));
+        rInfo.m_pivotB.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fY)));
+        rInfo.m_pivotB.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fZ)));
+        rInfo.m_pivotB.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fW)));
+        rInfo.m_strength = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_strength)));
+        rInfo.m_damping = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_damping)));
     }
 }
 
@@ -80,29 +80,29 @@ void bhkDashpotAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkDashpotActionCinfo& rInfo = static_cast<hkDashpotActionCinfo&>(CreateCinfo(bCreated));
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        rInfo.m_pivotA.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fX)));
-        rInfo.m_pivotA.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fY)));
-        rInfo.m_pivotA.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fZ)));
-        rInfo.m_pivotA.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fW)));
-        rInfo.m_pivotB.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fX)));
-        rInfo.m_pivotB.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fY)));
-        rInfo.m_pivotB.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fZ)));
-        rInfo.m_pivotB.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fW)));
-        rInfo.m_strength = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_strength)));
-        rInfo.m_damping = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_damping)));
+        rInfo.m_pivotA.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fX)));
+        rInfo.m_pivotA.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fY)));
+        rInfo.m_pivotA.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fZ)));
+        rInfo.m_pivotA.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fW)));
+        rInfo.m_pivotB.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fX)));
+        rInfo.m_pivotB.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fY)));
+        rInfo.m_pivotB.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fZ)));
+        rInfo.m_pivotB.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fW)));
+        rInfo.m_strength = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_strength)));
+        rInfo.m_damping = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_damping)));
     }
     bhkBinaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        rInfo.m_pivotA.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fX)));
-        rInfo.m_pivotA.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fY)));
-        rInfo.m_pivotA.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fZ)));
-        rInfo.m_pivotA.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotA.fW)));
-        rInfo.m_pivotB.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fX)));
-        rInfo.m_pivotB.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fY)));
-        rInfo.m_pivotB.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fZ)));
-        rInfo.m_pivotB.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_pivotB.fW)));
-        rInfo.m_strength = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_strength)));
-        rInfo.m_damping = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(rInfo.m_damping)));
+        rInfo.m_pivotA.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fX)));
+        rInfo.m_pivotA.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fY)));
+        rInfo.m_pivotA.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fZ)));
+        rInfo.m_pivotA.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotA.fW)));
+        rInfo.m_pivotB.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fX)));
+        rInfo.m_pivotB.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fY)));
+        rInfo.m_pivotB.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fZ)));
+        rInfo.m_pivotB.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_pivotB.fW)));
+        rInfo.m_strength = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_strength)));
+        rInfo.m_damping = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(rInfo.m_damping)));
     }
 }
 

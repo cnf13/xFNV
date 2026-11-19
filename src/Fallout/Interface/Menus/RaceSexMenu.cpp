@@ -80,6 +80,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "SDK/MSVC/tchar.h"
 
+#include <cstring>
+
 static SettingT<INISettingCollection> gs_fRSMStartingZoom_Interface("fRSMStartingZoom:Interface", 0.7f);
 
 // The game settings this file defines, with their IDs and values, in initialization order.
@@ -2030,7 +2032,7 @@ bool RaceSexMenu::RotatePlayer(float afRadians, bool abForce) {
     float rfYAngle;
     NiMatrix3 akRot;
     NiAVObject* v3 = (&spPlayerNode)->m_pObject;
-    __builtin_memcpy(&akRot, &v3->GetLocalTransform(), sizeof(akRot));
+    std::memcpy(&akRot, &v3->GetLocalTransform(), sizeof(akRot));
     (&akRot)->ToEulerAnglesXYZ(rfXAngle, rfYAngle, rfZAngle);
     float v15 = rfZAngle - afRadians;
     if (!(v15 < 0.0)) {
@@ -2045,14 +2047,14 @@ bool RaceSexMenu::RotatePlayer(float afRadians, bool abForce) {
         return false;
     }
     (&akRot)->MakeZRotation(v15);
-    __builtin_memcpy(&mat, &NiMatrix3::ZERO, sizeof(mat));
+    std::memcpy(&mat, &NiMatrix3::ZERO, sizeof(mat));
     float a4 = pPlayerBase->GetWeight();
     (&mat)->SetEntry(0, 0, a4);
     float a4a = pPlayerBase->GetWeight();
     (&mat)->SetEntry(1u, 1u, a4a);
     float a4b = pPlayerBase->GetHeight();
     (&mat)->SetEntry(2u, 2u, a4b);
-    __builtin_memcpy(&akRot, &(result = akRot * mat), sizeof(akRot));
+    std::memcpy(&akRot, &(result = akRot * mat), sizeof(akRot));
     NiAVObject* v5 = (&spPlayerNode)->m_pObject;
     v5->SetRotate(akRot);
     NiUpdatePlayer3D();

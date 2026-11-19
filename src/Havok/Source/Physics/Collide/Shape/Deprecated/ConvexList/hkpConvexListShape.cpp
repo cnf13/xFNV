@@ -41,6 +41,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "SDK/MSVC/string.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <new>
@@ -183,7 +184,8 @@ void hkpConvexListShape::getSupportingVertexImpl(const hkVector4& dir, hkpCdVert
         hkpCdVertex support;
         m_childShapes.m_data[i]->getSupportingVertexImpl(dir, support);
         __m128 product = _mm_mul_ps(dir.m_quad, support.m_quad);
-        float dot = _mm_shuffle_ps(product, product, 170)[0] + (_mm_shuffle_ps(product, product, 85)[0] + product[0]);
+        float dot = XFNV_M128_F32(_mm_shuffle_ps(product, product, 170), 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(product, product, 85), 0) + XFNV_M128_F32(product, 0));
         if (maxDot < dot) {
             maxDot = dot;
             supportingVertexOut = support;
@@ -208,9 +210,9 @@ void hkpConvexListShape::convertVertexIdsToVerticesImpl(
             v7 >>= 8;
             const hkpConvexShape* v8 = m_childShapes.m_data[v7];
             v8->convertVertexIdsToVerticesImpl(&usChildVertexId, 1, v6);
-            v6->m_quad[3] = std::bit_cast<float>(
-                static_cast<int32_t>(((v7 << 8) + (std::bit_cast<int32_t>(v6->m_quad[3]) & 0xC0FFFFFFu) | 0x3F000000))
-            );
+            XFNV_M128_F32(v6->m_quad, 3) = std::bit_cast<float>(static_cast<int32_t>(
+                ((v7 << 8) + (std::bit_cast<int32_t>(XFNV_M128_F32(v6->m_quad, 3)) & 0xC0FFFFFFu) | 0x3F000000)
+            ));
             ++ids;
             ++v6;
             --v4;
@@ -349,7 +351,8 @@ float hkpConvexTransformShape::getMaximumProjection(const hkVector4& direction) 
         ),
         direction.m_quad
     );
-    return _mm_shuffle_ps(v10, v10, 170)[0] + (_mm_shuffle_ps(v10, v10, 85)[0] + v10[0]);
+    return XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v10, v10, 85), 0) + XFNV_M128_F32(v10, 0));
 }
 
 const hkpShapeContainer* hkpConvexTransformShape::getContainer() const {

@@ -19,6 +19,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 TEX_SWAP::TEX_SWAP() : pNewTexture(nullptr), iGeomIndex(-1) {
     pGeomName[0] = 0;
@@ -326,7 +327,7 @@ void TESModelTextureSwap::LoadModelTextureSwapChunk(TESModelTextureSwap* apModel
         case MODS_ID: {
             uint32_t uiChunkSize = apFile->GetChunkSize();
             // A 16-byte aligned stack buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
             apFile->GetChunkData(pBuffer, uiChunkSize);
             uint16_t usFormVersion = apFile->GetFormVersion();
             apModel->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, usFormVersion);

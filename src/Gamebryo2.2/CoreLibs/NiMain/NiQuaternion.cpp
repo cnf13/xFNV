@@ -315,7 +315,7 @@ NiQuaternion NiQuaternion::UnitInverse(const NiQuaternion& p) {
 NiQuaternion NiQuaternion::Log(const NiQuaternion& q) {
     float fAngle = NiACos(q.m_fW);
     float fSin = std::sin(fAngle);
-    float fAbsSin = __builtin_fabsf(fSin);
+    float fAbsSin = std::fabsf(fSin);
     float fCoeff = fAbsSin < 0.001f ? 1.0f : fAngle / fSin;
     NiQuaternion kLog;
     kLog.m_fW = 0.0f;

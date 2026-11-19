@@ -56,8 +56,12 @@ if (XFNV_D3DX)
     target_link_libraries(xfnv_d3dx9 PRIVATE xfnv_zlib)
     if (MSVC)
         # NiD3DDefines.h, whose prototypes it implements, declares the functions dllimport on Windows; the
-        # program's calls then resolve to these definitions.
-        target_compile_options(xfnv_d3dx9 PRIVATE /W4 -Wno-inconsistent-dllimport /clang:-ffp-contract=off)
+        # program's calls then resolve to these definitions. cl's /fp:precise never contracts.
+        if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            target_compile_options(xfnv_d3dx9 PRIVATE /W4 -Wno-inconsistent-dllimport /clang:-ffp-contract=off)
+        else ()
+            target_compile_options(xfnv_d3dx9 PRIVATE /W4 /wd4273)
+        endif ()
         target_compile_definitions(xfnv_d3dx9 PRIVATE _CRT_SECURE_NO_WARNINGS)
     else ()
         target_compile_options(xfnv_d3dx9 PRIVATE -Wall -Wextra -ffp-contract=off)

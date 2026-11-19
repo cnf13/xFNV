@@ -131,6 +131,7 @@
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -271,9 +272,9 @@ void bhkRigidBody::SaveBinary(NiStream& arStream) {
     }
     bhkEntity::SaveBinary(*v4);
     // The list head's address is tested for null before each walk. clang assumes &kActionConstrants is non-null and
-    // drops those tests; the empty asm hides the pointer from it.
+    // drops those tests; HidePointer hides the pointer from it.
     BSSimpleList<NiPointer<bhkSerializable>>* pHead = &kActionConstrants;
-    __asm__("" : "+r"(pHead));
+    xfnv::HidePointer(pHead);
     BSSimpleList<NiPointer<bhkSerializable>>* p_kActionConstrants = pHead;
     BSSimpleList<NiPointer<bhkSerializable>>* v7 = pHead;
     int32_t v8 = 0;
@@ -334,10 +335,10 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     bhkRigidBodyCinfo ci;
     CopyCinfo(ci);
     HK2NI(pnt, ci.hk.m_position);
-    rot.m_fX = ci.hk.m_rotation.m_vec.m_quad[0];
-    rot.m_fY = ci.hk.m_rotation.m_vec.m_quad[1];
-    rot.m_fZ = ci.hk.m_rotation.m_vec.m_quad[2];
-    rot.m_fW = ci.hk.m_rotation.m_vec.m_quad[3];
+    rot.m_fX = XFNV_M128_F32(ci.hk.m_rotation.m_vec.m_quad, 0);
+    rot.m_fY = XFNV_M128_F32(ci.hk.m_rotation.m_vec.m_quad, 1);
+    rot.m_fZ = XFNV_M128_F32(ci.hk.m_rotation.m_vec.m_quad, 2);
+    rot.m_fW = XFNV_M128_F32(ci.hk.m_rotation.m_vec.m_quad, 3);
     pcString = pnt.GetViewerString("Position");
     apStrings->Add(pcString);
     pcString = rot.GetViewerString("Rotation");
@@ -368,9 +369,9 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     apStrings->Add(pcString);
     // The inertia tensor's diagonal, read from a copy of the matrix as the game does.
     hkMatrix3 kinertiaMatrix = ci.hk.m_inertiaTensor;
-    kinertia.x = kinertiaMatrix.m_col0.m_quad[0];
-    kinertia.y = kinertiaMatrix.m_col1.m_quad[1];
-    kinertia.z = kinertiaMatrix.m_col2.m_quad[2];
+    kinertia.x = XFNV_M128_F32(kinertiaMatrix.m_col0.m_quad, 0);
+    kinertia.y = XFNV_M128_F32(kinertiaMatrix.m_col1.m_quad, 1);
+    kinertia.z = XFNV_M128_F32(kinertiaMatrix.m_col2.m_quad, 2);
     pcString = kinertia.GetViewerString("InertiaTensor");
     apStrings->Add(pcString);
     pcString = NiGetViewerString("PENDEPTH", ci.hk.m_allowedPenetrationDepth);
@@ -572,9 +573,9 @@ void bhkRigidBody::Init(const hkSerializableCinfo& arInfo) {
             MarkRead();
             // EXE-INLINED none: hkpWorldObject::getCollidable
             // The exe adds 0x10 and tests the result for null (`add edi, 0x10; test edi, edi`). clang assumes
-            // &pRigidBody->m_collidable is non-null and drops that test; the empty asm hides the pointer from it.
+            // &pRigidBody->m_collidable is non-null and drops that test; HidePointer hides the pointer from it.
             hkpCollidable* pCollidable = &pRigidBody->m_collidable;
-            __asm__("" : "+r"(pCollidable));
+            xfnv::HidePointer(pCollidable);
             UnMarkRead();
             if (pCollidable) {
                 // The box is not default-constructed: it is left for GetAabbLocal to fill. It must be 16-aligned.
@@ -825,9 +826,9 @@ hkTransform& bhkRigidBody::GetTransform(hkTransform& arTrans) {
         arTrans.m_rotation.m_col0.m_quad = kZero;
         arTrans.m_rotation.m_col1.m_quad = kZero;
         arTrans.m_rotation.m_col2.m_quad = kZero;
-        arTrans.m_rotation.m_col0.m_quad[0] = 1.0f;
-        arTrans.m_rotation.m_col1.m_quad[1] = 1.0f;
-        arTrans.m_rotation.m_col2.m_quad[2] = 1.0f;
+        XFNV_M128_F32(arTrans.m_rotation.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(arTrans.m_rotation.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(arTrans.m_rotation.m_col2.m_quad, 2) = 1.0f;
         arTrans.m_translation.m_quad = kZero;
     }
     return arTrans;
@@ -845,9 +846,9 @@ void bhkRigidBody::GetAabb(hkAabb& arOut) {
         MarkRead();
         // EXE-INLINED none: hkpWorldObject::getCollidable
         // The exe adds 0x10 and tests the result for null (`add edi, 0x10; test edi, edi`). clang assumes
-        // &pBody->m_collidable is non-null and drops that test; the empty asm hides the pointer from it.
+        // &pBody->m_collidable is non-null and drops that test; HidePointer hides the pointer from it.
         const hkpCollidable* pCollidable = &pBody->m_collidable;
-        __asm__("" : "+r"(pCollidable));
+        xfnv::HidePointer(pCollidable);
         UnMarkRead();
         if (pCollidable) {
             ps = pCollidable->m_shape;
@@ -897,7 +898,7 @@ void bhkRigidBody::ApplyKeyframe(
     hkVector4* v7 = &GetCenterOfMassLocal(c);
     __m128 v8 = _mm_mul_ps(v7->m_quad, arNewRot.m_vec.m_quad);
     __m128 v9 = _mm_shuffle_ps(v8, v8, 170);
-    v9[0] = v9[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]);
+    XFNV_M128_F32(v9, 0) = XFNV_M128_F32(v9, 0) + (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0));
     __m128 v10 = _mm_shuffle_ps(arNewRot.m_vec.m_quad, arNewRot.m_vec.m_quad, 255);
     __m128 v11 = _mm_add_ps(
         _mm_mul_ps(
@@ -923,9 +924,10 @@ void bhkRigidBody::ApplyKeyframe(
         _mm_sub_ps(_mm_add_ps(_mm_add_ps(v11, v11), arNewPos.m_quad), (&GetCenterOfMassInWorld(c))->m_quad)
     );
     __m128 v12 = _mm_mul_ps(v31.m_vec.m_quad, v31.m_vec.m_quad);
-    float axis_12 = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]))))
-    );
+    float axis_12 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0)))
+    )));
     float flinCap = GethkMaxLinearVelocity();
     if (flinCap < static_cast<double>(axis_12)) {
         *reinterpret_cast<float*>(&axis_8a) = flinCap / axis_12;
@@ -952,9 +954,10 @@ void bhkRigidBody::ApplyKeyframe(
         inverseOldRotation__nav.m_vec.m_quad = m_quad;
     }
     __m128 v14 = _mm_mul_ps(m_quad, m_quad);
-    float axis_8 = _mm_cvtss_f32(
-        _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v14, v14, 170)[0] + (_mm_shuffle_ps(v14, v14, 85)[0] + v14[0]))))
-    );
+    float axis_8 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+        (XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 170), 0) +
+         (XFNV_M128_F32(_mm_shuffle_ps(v14, v14, 85), 0) + XFNV_M128_F32(v14, 0)))
+    )));
     float fangCap = GetMaxAngularVelocity();
     if (fangCap < static_cast<double>(axis_8)) {
         *reinterpret_cast<float*>(&axis_8c) = fangCap / axis_8;
@@ -965,8 +968,9 @@ void bhkRigidBody::ApplyKeyframe(
     }
     const hkpWorld* pw = bhkWorldObject::GethkWorld();
     if (pw) {
-        v31.m_vec.m_quad[2] = v31.m_vec.m_quad[2] -
-            _mm_shuffle_ps(pw->m_gravity.m_quad, pw->m_gravity.m_quad, 170)[0] * afVelGain / afInvDeltaTime;
+        XFNV_M128_F32(v31.m_vec.m_quad, 2) = XFNV_M128_F32(v31.m_vec.m_quad, 2) -
+            XFNV_M128_F32(_mm_shuffle_ps(pw->m_gravity.m_quad, pw->m_gravity.m_quad, 170), 0) * afVelGain /
+                afInvDeltaTime;
     }
     hkpRigidBody* phkObject = static_cast<hkpRigidBody*>(this->phkObject);
     hkVector4* p_m_linearVelocity = &phkObject->m_motion.m_linearVelocity;
@@ -1098,9 +1102,9 @@ void bhkRigidBody::GetAabbLocal(hkAabb& arOut) {
             MarkRead();
             // EXE-INLINED none: hkpWorldObject::getCollidable
             // The exe adds 0x10 and tests the result for null (`add edi, 0x10; test edi, edi`). clang assumes
-            // &pBody->m_collidable is non-null and drops that test; the empty asm hides the pointer from it.
+            // &pBody->m_collidable is non-null and drops that test; HidePointer hides the pointer from it.
             const hkpCollidable* pCollidable = &pBody->m_collidable;
-            __asm__("" : "+r"(pCollidable));
+            xfnv::HidePointer(pCollidable);
             UnMarkRead();
             if (pCollidable) {
                 pShape = pCollidable->m_shape;
@@ -1213,9 +1217,9 @@ void bhkRigidBody::CopyMembers(bhkSerializable* apDest, NiCloningProcess& arClon
 int32_t bhkRigidBody::CountActions() {
     int32_t result = 0;
     // The list head's address is tested for null, as the game does. clang assumes &kActionConstrants is non-null and
-    // drops that test; the empty asm hides the pointer from it.
+    // drops that test; HidePointer hides the pointer from it.
     BSSimpleList<NiPointer<bhkSerializable>>* i = &kActionConstrants;
-    __asm__("" : "+r"(i));
+    xfnv::HidePointer(i);
     for (; i; ++result) {
         if (!i->m_item) {
             break;
@@ -1789,27 +1793,27 @@ void bhkRigidBodyCinfo::SetRestitution(float afRest) {
 // its helper, the center of mass, the callback delay and then the body settings.
 void bhkRigidBodyCinfo::Endian() {
     hkpRigidBodyCinfo& rkHk = hk;
-    rkHk.m_position.m_quad[0] = SwapFloat(rkHk.m_position.m_quad[0]);
-    rkHk.m_position.m_quad[1] = SwapFloat(rkHk.m_position.m_quad[1]);
-    rkHk.m_position.m_quad[2] = SwapFloat(rkHk.m_position.m_quad[2]);
-    rkHk.m_position.m_quad[3] = SwapFloat(rkHk.m_position.m_quad[3]);
-    rkHk.m_rotation.m_vec.m_quad[0] = SwapFloat(rkHk.m_rotation.m_vec.m_quad[0]);
-    rkHk.m_rotation.m_vec.m_quad[1] = SwapFloat(rkHk.m_rotation.m_vec.m_quad[1]);
-    rkHk.m_rotation.m_vec.m_quad[2] = SwapFloat(rkHk.m_rotation.m_vec.m_quad[2]);
-    rkHk.m_rotation.m_vec.m_quad[3] = SwapFloat(rkHk.m_rotation.m_vec.m_quad[3]);
-    rkHk.m_linearVelocity.m_quad[0] = SwapFloat(rkHk.m_linearVelocity.m_quad[0]);
-    rkHk.m_linearVelocity.m_quad[1] = SwapFloat(rkHk.m_linearVelocity.m_quad[1]);
-    rkHk.m_linearVelocity.m_quad[2] = SwapFloat(rkHk.m_linearVelocity.m_quad[2]);
-    rkHk.m_linearVelocity.m_quad[3] = SwapFloat(rkHk.m_linearVelocity.m_quad[3]);
-    rkHk.m_angularVelocity.m_quad[0] = SwapFloat(rkHk.m_angularVelocity.m_quad[0]);
-    rkHk.m_angularVelocity.m_quad[1] = SwapFloat(rkHk.m_angularVelocity.m_quad[1]);
-    rkHk.m_angularVelocity.m_quad[2] = SwapFloat(rkHk.m_angularVelocity.m_quad[2]);
-    rkHk.m_angularVelocity.m_quad[3] = SwapFloat(rkHk.m_angularVelocity.m_quad[3]);
+    XFNV_M128_F32(rkHk.m_position.m_quad, 0) = SwapFloat(XFNV_M128_F32(rkHk.m_position.m_quad, 0));
+    XFNV_M128_F32(rkHk.m_position.m_quad, 1) = SwapFloat(XFNV_M128_F32(rkHk.m_position.m_quad, 1));
+    XFNV_M128_F32(rkHk.m_position.m_quad, 2) = SwapFloat(XFNV_M128_F32(rkHk.m_position.m_quad, 2));
+    XFNV_M128_F32(rkHk.m_position.m_quad, 3) = SwapFloat(XFNV_M128_F32(rkHk.m_position.m_quad, 3));
+    XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 0) = SwapFloat(XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 0));
+    XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 1) = SwapFloat(XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 1));
+    XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 2) = SwapFloat(XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 2));
+    XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 3) = SwapFloat(XFNV_M128_F32(rkHk.m_rotation.m_vec.m_quad, 3));
+    XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 0) = SwapFloat(XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 0));
+    XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 1) = SwapFloat(XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 1));
+    XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 2) = SwapFloat(XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 2));
+    XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 3) = SwapFloat(XFNV_M128_F32(rkHk.m_linearVelocity.m_quad, 3));
+    XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 0) = SwapFloat(XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 0));
+    XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 1) = SwapFloat(XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 1));
+    XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 2) = SwapFloat(XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 2));
+    XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 3) = SwapFloat(XFNV_M128_F32(rkHk.m_angularVelocity.m_quad, 3));
     EndianMatrix(rkHk.m_inertiaTensor);
-    rkHk.m_centerOfMass.m_quad[0] = SwapFloat(rkHk.m_centerOfMass.m_quad[0]);
-    rkHk.m_centerOfMass.m_quad[1] = SwapFloat(rkHk.m_centerOfMass.m_quad[1]);
-    rkHk.m_centerOfMass.m_quad[2] = SwapFloat(rkHk.m_centerOfMass.m_quad[2]);
-    rkHk.m_centerOfMass.m_quad[3] = SwapFloat(rkHk.m_centerOfMass.m_quad[3]);
+    XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 0) = SwapFloat(XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 0));
+    XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 1) = SwapFloat(XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 1));
+    XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 2) = SwapFloat(XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 2));
+    XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 3) = SwapFloat(XFNV_M128_F32(rkHk.m_centerOfMass.m_quad, 3));
     uint16_t uiDelay = rkHk.m_contactPointCallbackDelay;
     rkHk.m_contactPointCallbackDelay = (uint16_t)((uiDelay >> 8) | (uiDelay << 8));
     rkHk.m_mass = SwapFloat(rkHk.m_mass);
@@ -1832,9 +1836,12 @@ void bhkRigidBodyCinfo::Scale(float afScale) {
     // The cube is rounded to a float before it is used.
     float fScaleCubed = afScale * afScale * afScale;
     for (int32_t i = 0; i < 3; ++i) {
-        hk.m_inertiaTensor.m_col0.m_quad[i] = hk.m_inertiaTensor.m_col0.m_quad[i] * fScaleCubed;
-        hk.m_inertiaTensor.m_col1.m_quad[i] = hk.m_inertiaTensor.m_col1.m_quad[i] * fScaleCubed;
-        hk.m_inertiaTensor.m_col2.m_quad[i] = fScaleCubed * hk.m_inertiaTensor.m_col2.m_quad[i];
+        XFNV_M128_F32(hk.m_inertiaTensor.m_col0.m_quad, i) =
+            XFNV_M128_F32(hk.m_inertiaTensor.m_col0.m_quad, i) * fScaleCubed;
+        XFNV_M128_F32(hk.m_inertiaTensor.m_col1.m_quad, i) =
+            XFNV_M128_F32(hk.m_inertiaTensor.m_col1.m_quad, i) * fScaleCubed;
+        XFNV_M128_F32(hk.m_inertiaTensor.m_col2.m_quad, i) =
+            fScaleCubed * XFNV_M128_F32(hk.m_inertiaTensor.m_col2.m_quad, i);
     }
     hk.m_mass = afScale * hk.m_mass;
 }
@@ -1934,10 +1941,10 @@ void bhkRigidBodyCinfo::EndianMatrix(hkMatrix3& arMatrix) {
     uint32_t* p_z = reinterpret_cast<uint32_t*>(&reinterpret_cast<float*>(&arMatrix.m_col0.m_quad)[2]);
     int32_t v2 = 3;
     do {
-        *(p_z - 2) = __builtin_bswap32(*(p_z - 2));
-        *(p_z - 1) = __builtin_bswap32(*(p_z - 1));
-        *p_z = __builtin_bswap32(*p_z);
-        p_z[1] = __builtin_bswap32(p_z[1]);
+        *(p_z - 2) = std::byteswap<uint32_t>(*(p_z - 2));
+        *(p_z - 1) = std::byteswap<uint32_t>(*(p_z - 1));
+        *p_z = std::byteswap<uint32_t>(*p_z);
+        p_z[1] = std::byteswap<uint32_t>(p_z[1]);
         p_z += 4;
         --v2;
     }

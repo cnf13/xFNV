@@ -29,6 +29,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 
+#include <cmath>
+
 NiRTTI bhkNiCollisionObject::ms_RTTI("bhkNiCollisionObject", &NiCollisionObject::ms_RTTI);
 BSSpinLock bhkNiCollisionObject::kKeyframeLock;
 SettingT<INISettingCollection> bhkNiCollisionObject::bWONameSync("bWONameSync:Havok", true);
@@ -301,7 +303,7 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
         if (pParent) {
             float fScale = pParent->m_kWorld.m_fScale;
             fScale = 1.0f / fScale;
-            fScale = __builtin_fabsf(fScale);
+            fScale = std::fabsf(fScale);
             pNode->m_kLocal.m_fScale = fScale;
             pParent->AttachChild(pNode, true);
             kUpdateData.fTime = 0.0f;

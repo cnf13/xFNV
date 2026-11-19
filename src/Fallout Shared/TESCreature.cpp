@@ -70,6 +70,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -111,7 +112,7 @@ bool TESCreature::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pMessage = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pMessage = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first; the game does not do this.
                 pMessage[0] = '\0';
                 apFile->GetChunkData(pMessage, 0x200);
@@ -279,7 +280,7 @@ bool TESCreature::Load(TESFile* apFile) {
             case NAM1_ID:
                 if (apFile->GetChunkSize()) {
                     // The chunk is read into a stack buffer and dropped.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                     apFile->GetChunkData(pBuffer, 0);
                 }
                 break;

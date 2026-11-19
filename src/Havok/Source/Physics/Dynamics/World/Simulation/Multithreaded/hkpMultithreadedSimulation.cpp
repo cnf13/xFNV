@@ -53,6 +53,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/Continuous/hkpContinuousGsk.h"
+#include "xfnv/Compiler.h"
 
 static hkJobQueue::JobStatus
 hkCpuSplitSimulationIslandJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::JobQueueEntry& jobInOut);
@@ -655,7 +656,7 @@ hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, floa
     if (!hkMemoryRouter::getInstance().solver().canAllocSingleBlock(memUsage.m_maxRuntimeBlockSize)) {
         if (!m_world->getMemoryWatchDog()) {
             if (m_world->m_assertOnRunningOutOfSolverMemory.m_bool) {
-                __builtin_debugtrap();
+                xfnv::DebugTrap();
             }
             m_previousStepResult = HK_STEP_RESULT_MEMORY_FAILURE_BEFORE_INTEGRATION;
             return HK_STEP_RESULT_MEMORY_FAILURE_BEFORE_INTEGRATION;

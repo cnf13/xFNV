@@ -36,6 +36,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Collide/Util/hkpTriangleUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -76,8 +77,9 @@ double _getPlaneToSurfaceDistance(const hkpShape* r_eax) {
                 int32_t v5 = v2->m_size;
                 do {
                     __m128 v6 = _mm_mul_ps(*p_m_quad, m_data->m_quad);
-                    float v11 =
-                        (*p_m_quad)[3] + (_mm_shuffle_ps(v6, v6, 170)[0] + (_mm_shuffle_ps(v6, v6, 85)[0] + v6[0]));
+                    float v11 = XFNV_M128_F32((*p_m_quad), 3) +
+                        (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+                         (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0)));
                     if (v9 < static_cast<double>(v11)) {
                         v9 = v11;
                     }

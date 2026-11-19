@@ -11,6 +11,7 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 const char* BSUtils::CreateNormalMapString(BSStringT<char>& arOut, const char* apFileName) {
     char Dst[264];
@@ -123,7 +124,7 @@ void TESTexture::LoadTextureChunk(TESTexture* apTexture, TESFile* apFile) {
         return;
     }
     if (apFile->GetChunkSize()) {
-        char* pTextureName = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+        char* pTextureName = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
         apFile->GetChunkData(pTextureName, 0);
         if ((std::strlen(pTextureName)) && (pTextureName[0] == '\\')) {
             for (uint32_t i = 0; i < std::strlen(pTextureName); ++i) {

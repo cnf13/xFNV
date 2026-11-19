@@ -40,6 +40,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -235,19 +236,19 @@ hkBool hkpConvexVerticesShape::castRayImpl(const hkpShapeRayCastInput& input, hk
                     __m128 v2;
                     uint32_t uiId = pFace[0];
                     const FourVectors* pBlock = &pVertices[uiId >> 2];
-                    v0[0] = pBlock->m_x.m_quad[uiId & 3];
-                    v0[1] = pBlock->m_y.m_quad[uiId & 3];
-                    v0[2] = pBlock->m_z.m_quad[uiId & 3];
+                    XFNV_M128_F32(v0, 0) = XFNV_M128_F32(pBlock->m_x.m_quad, uiId & 3);
+                    XFNV_M128_F32(v0, 1) = XFNV_M128_F32(pBlock->m_y.m_quad, uiId & 3);
+                    XFNV_M128_F32(v0, 2) = XFNV_M128_F32(pBlock->m_z.m_quad, uiId & 3);
                     uiId = pFace[1];
                     pBlock = &pVertices[uiId >> 2];
-                    v1[0] = pBlock->m_x.m_quad[uiId & 3];
-                    v1[1] = pBlock->m_y.m_quad[uiId & 3];
-                    v1[2] = pBlock->m_z.m_quad[uiId & 3];
+                    XFNV_M128_F32(v1, 0) = XFNV_M128_F32(pBlock->m_x.m_quad, uiId & 3);
+                    XFNV_M128_F32(v1, 1) = XFNV_M128_F32(pBlock->m_y.m_quad, uiId & 3);
+                    XFNV_M128_F32(v1, 2) = XFNV_M128_F32(pBlock->m_z.m_quad, uiId & 3);
                     uiId = pFace[2];
                     pBlock = &pVertices[uiId >> 2];
-                    v2[0] = pBlock->m_x.m_quad[uiId & 3];
-                    v2[1] = pBlock->m_y.m_quad[uiId & 3];
-                    v2[2] = pBlock->m_z.m_quad[uiId & 3];
+                    XFNV_M128_F32(v2, 0) = XFNV_M128_F32(pBlock->m_x.m_quad, uiId & 3);
+                    XFNV_M128_F32(v2, 1) = XFNV_M128_F32(pBlock->m_y.m_quad, uiId & 3);
+                    XFNV_M128_F32(v2, 2) = XFNV_M128_F32(pBlock->m_z.m_quad, uiId & 3);
                     hkVector4 e1;
                     e1.m_quad = _mm_sub_ps(v1, v0);
                     hkVector4 e2;
@@ -258,7 +259,7 @@ hkBool hkpConvexVerticesShape::castRayImpl(const hkpShapeRayCastInput& input, hk
                     const __m128 d = _mm_mul_ps(planeEquation.m_quad, v0);
                     const __m128 dot =
                         _mm_add_ss(_mm_shuffle_ps(d, d, 0xAA), _mm_add_ss(_mm_shuffle_ps(d, d, 0x55), d));
-                    planeEquation.m_quad[3] = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
+                    XFNV_M128_F32(planeEquation.m_quad, 3) = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
                     m_planeEquations.pushBack(planeEquation);
                     ++pFaceOffset;
                 }
@@ -331,15 +332,19 @@ const hkSphere* hkpConvexVerticesShape::getCollisionSpheresImpl(hkSphere* sphere
     int32_t i = m_numVertices - 1;
     for (; i >= 3; i -= 4) {
         for (int32_t j = 0; j < 4; ++j) {
-            pSphere->m_pos.m_quad =
-                _mm_setr_ps(pBlock->m_x.m_quad[j], pBlock->m_y.m_quad[j], pBlock->m_z.m_quad[j], m_radius);
+            pSphere->m_pos.m_quad = _mm_setr_ps(
+                XFNV_M128_F32(pBlock->m_x.m_quad, j), XFNV_M128_F32(pBlock->m_y.m_quad, j),
+                XFNV_M128_F32(pBlock->m_z.m_quad, j), m_radius
+            );
             ++pSphere;
         }
         ++pBlock;
     }
     for (int32_t j = 0; j <= i; ++j) {
-        pSphere->m_pos.m_quad =
-            _mm_setr_ps(pBlock->m_x.m_quad[j], pBlock->m_y.m_quad[j], pBlock->m_z.m_quad[j], m_radius);
+        pSphere->m_pos.m_quad = _mm_setr_ps(
+            XFNV_M128_F32(pBlock->m_x.m_quad, j), XFNV_M128_F32(pBlock->m_y.m_quad, j),
+            XFNV_M128_F32(pBlock->m_z.m_quad, j), m_radius
+        );
         ++pSphere;
     }
     return sphereBuffer;
@@ -347,10 +352,10 @@ const hkSphere* hkpConvexVerticesShape::getCollisionSpheresImpl(hkSphere* sphere
 
 void hkpConvexVerticesShape::getFirstVertex(hkVector4& v) const {
     hkpConvexVerticesShape::FourVectors* m_data = m_rotatedVertices.m_data;
-    v.m_quad[0] = m_data->m_x.m_quad[0];
-    v.m_quad[1] = m_data->m_y.m_quad[0u];
-    v.m_quad[2] = m_data->m_z.m_quad[0u];
-    v.m_quad[3] = 0.0f;
+    XFNV_M128_F32(v.m_quad, 0) = XFNV_M128_F32(m_data->m_x.m_quad, 0);
+    XFNV_M128_F32(v.m_quad, 1) = XFNV_M128_F32(m_data->m_y.m_quad, 0u);
+    XFNV_M128_F32(v.m_quad, 2) = XFNV_M128_F32(m_data->m_z.m_quad, 0u);
+    XFNV_M128_F32(v.m_quad, 3) = 0.0f;
 }
 
 // Computes the dots of four vertices at a time with the direction, keeping per lane the best dot and its vertex index;
@@ -363,10 +368,10 @@ void hkpConvexVerticesShape::getSupportingVertexImpl(
     const FourVectors* pVertices = m_rotatedVertices.m_data;
     if ((initialDot_guard & 1) == 0) {
         initialDot_guard |= 1;
-        initialDot[0] = -3.40282e+38f;
-        initialDot[1] = -3.40282e+38f;
-        initialDot[2] = -3.40282e+38f;
-        initialDot[3] = -3.40282e+38f;
+        XFNV_M128_F32(initialDot, 0) = -3.40282e+38f;
+        XFNV_M128_F32(initialDot, 1) = -3.40282e+38f;
+        XFNV_M128_F32(initialDot, 2) = -3.40282e+38f;
+        XFNV_M128_F32(initialDot, 3) = -3.40282e+38f;
     }
     __m128 bestDot = initialDot;
     __m128 curIndices = rdata_10D9FE0;
@@ -389,24 +394,24 @@ void hkpConvexVerticesShape::getSupportingVertexImpl(
     }
     // Unordered compares keep lane 1, take lane 3, and take the second pair's lane.
     int32_t iBestLow = 1;
-    if (bestDot[1] < bestDot[0]) {
+    if (XFNV_M128_F32(bestDot, 1) < XFNV_M128_F32(bestDot, 0)) {
         iBestLow = 0;
     }
     int32_t iBestHigh = 2;
-    if (!(bestDot[3] < bestDot[2])) {
+    if (!(XFNV_M128_F32(bestDot, 3) < XFNV_M128_F32(bestDot, 2))) {
         iBestHigh = 3;
     }
     int32_t iBest = iBestLow;
-    if (!(bestDot[iBestHigh] < bestDot[iBestLow])) {
+    if (!(XFNV_M128_F32(bestDot, iBestHigh) < XFNV_M128_F32(bestDot, iBestLow))) {
         iBest = iBestHigh;
     }
-    const uint32_t uiId = static_cast<uint32_t>(static_cast<int32_t>(bestIndices[iBest]));
+    const uint32_t uiId = static_cast<uint32_t>(static_cast<int32_t>(XFNV_M128_F32(bestIndices, iBest)));
     const FourVectors& rBlock = pVertices[uiId >> 2];
     const uint32_t uiLane = uiId & 3;
-    supportingVertexOut.m_quad[0] = rBlock.m_x.m_quad[uiLane];
-    supportingVertexOut.m_quad[1] = rBlock.m_y.m_quad[uiLane];
-    supportingVertexOut.m_quad[3] = std::bit_cast<float>(uiId | 0x3F000000u);
-    supportingVertexOut.m_quad[2] = rBlock.m_z.m_quad[uiLane];
+    XFNV_M128_F32(supportingVertexOut.m_quad, 0) = XFNV_M128_F32(rBlock.m_x.m_quad, uiLane);
+    XFNV_M128_F32(supportingVertexOut.m_quad, 1) = XFNV_M128_F32(rBlock.m_y.m_quad, uiLane);
+    XFNV_M128_F32(supportingVertexOut.m_quad, 3) = std::bit_cast<float>(uiId | 0x3F000000u);
+    XFNV_M128_F32(supportingVertexOut.m_quad, 2) = XFNV_M128_F32(rBlock.m_z.m_quad, uiLane);
 }
 
 // Each id picks lane (id & 3) of group (id >> 2) of m_rotatedVertices; w holds the id as an int with 0x3F000000 or'd in
@@ -420,10 +425,10 @@ void hkpConvexVerticesShape::convertVertexIdsToVerticesImpl(
         uint32_t uiId = *ids++;
         const FourVectors& rFour = m_rotatedVertices.m_data[static_cast<int32_t>(uiId) >> 2];
         uint32_t uiLane = uiId & 3;
-        verticesOut->m_quad[0] = (&reinterpret_cast<const float*>(&rFour.m_x.m_quad)[0])[uiLane];
-        verticesOut->m_quad[1] = (&reinterpret_cast<const float*>(&rFour.m_y.m_quad)[0])[uiLane];
-        verticesOut->m_quad[2] = (&reinterpret_cast<const float*>(&rFour.m_z.m_quad)[0])[uiLane];
-        verticesOut->m_quad[3] = std::bit_cast<float>(uiId | 0x3F000000u);
+        XFNV_M128_F32(verticesOut->m_quad, 0) = (&reinterpret_cast<const float*>(&rFour.m_x.m_quad)[0])[uiLane];
+        XFNV_M128_F32(verticesOut->m_quad, 1) = (&reinterpret_cast<const float*>(&rFour.m_y.m_quad)[0])[uiLane];
+        XFNV_M128_F32(verticesOut->m_quad, 2) = (&reinterpret_cast<const float*>(&rFour.m_z.m_quad)[0])[uiLane];
+        XFNV_M128_F32(verticesOut->m_quad, 3) = std::bit_cast<float>(uiId | 0x3F000000u);
         ++verticesOut;
     }
 }

@@ -88,6 +88,7 @@
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Joins groups smaller than the world's minimum island size into sparse islands: each group's size is its entities'
 // constraint count (at least one per entity), -1 for a group with no recently active entity (with deactivation), -2
@@ -1870,10 +1871,10 @@ void hkpWorldOperationUtil::replaceMotionObject(
             newMotion->m_deactivationIntegrateCounter = oldMotion.m_deactivationIntegrateCounter;
             // The swept transform's w lanes: the inverse delta time (centre of mass 1) and the base time (0).
             const hkSweptTransform& sweptTransform = oldMotion.m_motionState.m_sweptTransform;
-            float invDeltaTime = sweptTransform.m_centerOfMass1.m_quad[3];
+            float invDeltaTime = XFNV_M128_F32(sweptTransform.m_centerOfMass1.m_quad, 3);
             if (invDeltaTime != 0.0f) {
-                float time =
-                    world ? world->getCurrentTime() : 1.0f / invDeltaTime + sweptTransform.m_centerOfMass0.m_quad[3];
+                float time = world ? world->getCurrentTime()
+                                   : 1.0f / invDeltaTime + XFNV_M128_F32(sweptTransform.m_centerOfMass0.m_quad, 3);
                 hkSweptTransformUtil::freezeMotionState(time, newMotion->m_motionState);
             }
         }

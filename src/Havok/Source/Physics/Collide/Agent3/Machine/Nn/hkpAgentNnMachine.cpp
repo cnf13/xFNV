@@ -36,6 +36,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -531,7 +532,7 @@ void hkAgentNnMachine_ProcessAgent(
                         timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
                         timEntry->m_separatingNormal.setZero4();
                         distAtT1 = -3.40282e+38f;
-                        timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
                         goto processAgent;
                     }
                     // The separating normal at the step's start: both bodies at their start transforms.
@@ -565,10 +566,10 @@ void hkAgentNnMachine_ProcessAgent(
                 {
                     timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
                     const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
-                    distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
+                    distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
                     if (distAtT1 >= input.m_tolerance) {
                         // Still separated at the step's end: the agent does not run.
-                        timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
                         if (entry->m_numContactPoints) {
                             input.m_dispatcher->m_agent3Func[entry->m_agentType].m_cleanupFunc(
                                 entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner
@@ -916,7 +917,7 @@ void hkAgentNnMachine_InlineProcessAgent(
                         timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
                         timEntry->m_separatingNormal.setZero4();
                         distAtT1 = -3.40282e+38f;
-                        timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
                         goto processAgent;
                     }
                     // The separating normal at the step's start: both bodies at their start transforms.
@@ -950,10 +951,10 @@ void hkAgentNnMachine_InlineProcessAgent(
                 {
                     timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
                     const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
-                    distAtT1 = timEntry->m_separatingNormal.m_quad[3] - fProjected;
+                    distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
                     if (distAtT1 >= input.m_tolerance) {
                         // Still separated at the step's end: the agent does not run, and counts as skipped.
-                        timEntry->m_separatingNormal.m_quad[3] = distAtT1;
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
                         if (entry->m_numContactPoints) {
                             input.m_dispatcher->m_agent3Func[entry->m_agentType].m_cleanupFunc(
                                 entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner
@@ -1029,10 +1030,10 @@ initVertexCollidePointsInput(const hkpAgent3ProcessInput* r_eax, hkp4dGskVertexC
     r_esi->m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
     // The stack block is untyped memory the spheres are written to and read back as vectors.
     const hkSphere* pResult = pShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
-    const float fAccelB =
-        pMotionB->m_objectRadius * r_esi->m_deltaAngles[1].m_quad[3] * r_esi->m_deltaAngles[1].m_quad[3];
-    const float fAccelA =
-        pMotionA->m_objectRadius * r_esi->m_deltaAngles[0].m_quad[3] * r_esi->m_deltaAngles[0].m_quad[3];
+    const float fAccelB = pMotionB->m_objectRadius * XFNV_M128_F32(r_esi->m_deltaAngles[1].m_quad, 3) *
+        XFNV_M128_F32(r_esi->m_deltaAngles[1].m_quad, 3);
+    const float fAccelA = pMotionA->m_objectRadius * XFNV_M128_F32(r_esi->m_deltaAngles[0].m_quad, 3) *
+        XFNV_M128_F32(r_esi->m_deltaAngles[0].m_quad, 3);
     r_esi->m_maxAccel.m_storage = fAccelB + fAccelA;
     r_esi->m_invMaxAccel.m_storage = 1.0 / (r_esi->m_maxAccel.m_storage + 1.1920928955078125e-07);
     return pResult;

@@ -3,6 +3,7 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -38,5 +39,8 @@ float hkpSimpleContactConstraintUtil::calculateSeparatingVelocity(
         ),
         cp->m_separatingNormal.m_quad
     );
-    return (_mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]));
+    return (
+        XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0))
+    );
 }

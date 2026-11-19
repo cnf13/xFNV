@@ -19,6 +19,7 @@
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpSimpleClosestContactCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/Triangle/hkpTriangleShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -37,7 +38,7 @@ hkpGskBaseAgent::hkpGskBaseAgent(const hkpCdBody& bodyA, const hkpCdBody& bodyB,
         m_cache.init(shapeA, shapeB, btoa);
     }
     m_separatingNormal.m_quad = _mm_setzero_ps();
-    m_separatingNormal.m_quad[3] = -1.0f;
+    XFNV_M128_F32(m_separatingNormal.m_quad, 3) = -1.0f;
     const float penetrationA = bodyA.getRootCollidable()->getAllowedPenetrationDepth();
     const float penetrationB = bodyB.getRootCollidable()->getAllowedPenetrationDepth();
     m_allowedPenetration = penetrationB > penetrationA ? penetrationA : penetrationB;
@@ -87,7 +88,7 @@ void hkpGskBaseAgent::getPenetrations(
     }
     else {
         // The distance is rounded to a float before it is stored and compared.
-        float distance = separatingNormal.m_quad[3] - shapeA->m_radius - shapeB->m_radius;
+        float distance = XFNV_M128_F32(separatingNormal.m_quad, 3) - shapeA->m_radius - shapeB->m_radius;
         const hkRotation& rotationA = bodyA.m_motion.pState->m_transform.m_rotation;
         const hkQuadReal n = separatingNormal.m_quad;
         m_separatingNormal.m_quad = _mm_add_ps(
@@ -97,7 +98,7 @@ void hkpGskBaseAgent::getPenetrations(
             ),
             _mm_mul_ps(_mm_shuffle_ps(n, n, 170), rotationA.m_col2.m_quad)
         );
-        m_separatingNormal.m_quad[3] = distance;
+        XFNV_M128_F32(m_separatingNormal.m_quad, 3) = distance;
         if (distance < 0.0f) {
             collector.addCdBodyPair(bodyA, bodyB);
         }
@@ -160,10 +161,10 @@ void hkpGskBaseAgent::linearCast(
     kPoint.m_contact = kClosest.m_hitPoint;
     kPoint.m_cdBodyA = &bodyA;
     kPoint.m_cdBodyB = &bodyB;
-    double fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+    double fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     if ((input.m_tolerance > fDist) && (startCollector)) {
         startCollector->addCdPoint(kPoint);
-        fDist = kPoint.m_contact.m_separatingNormal.m_quad[3];
+        fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
     }
 
     const hkQuadReal& rPath = input.m_path.m_quad;
@@ -197,20 +198,24 @@ void hkpGskBaseAgent::linearCast(
         for (;;) {
             kSecond.m_earlyOutDistance = 3.40282e38f;
             kSecond.m_hasHit.m_bool = false;
-            kSecond.m_hitPoint.m_separatingNormal.m_quad[3] = 3.40282e38f;
+            XFNV_M128_F32(kSecond.m_hitPoint.m_separatingNormal.m_quad, 3) = 3.40282e38f;
             const float fFraction32 = static_cast<float>(fFraction);
             const hkQuadReal& rState = bodyA.m_motion.pState->m_transform.m_translation.m_quad;
-            kMotionState.m_transform.m_translation.m_quad[0] = fFraction32 * rPath[0] + rState[0];
-            kMotionState.m_transform.m_translation.m_quad[1] = fFraction32 * rPath[1] + rState[1];
-            kMotionState.m_transform.m_translation.m_quad[2] = fFraction32 * rPath[2] + rState[2];
-            kMotionState.m_transform.m_translation.m_quad[3] = fFraction32 * rPath[3] + rState[3];
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 0) =
+                fFraction32 * XFNV_M128_F32(rPath, 0) + XFNV_M128_F32(rState, 0);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 1) =
+                fFraction32 * XFNV_M128_F32(rPath, 1) + XFNV_M128_F32(rState, 1);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 2) =
+                fFraction32 * XFNV_M128_F32(rPath, 2) + XFNV_M128_F32(rState, 2);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 3) =
+                fFraction32 * XFNV_M128_F32(rPath, 3) + XFNV_M128_F32(rState, 3);
             getClosestPoints(kBodyA, bodyB, kInput, kSecond);
             if (!kSecond.m_hasHit.m_bool) {
                 return;
             }
             kPoint.m_contact.m_position = kSecond.m_hitPoint.m_position;
             kPoint.m_contact.m_separatingNormal = kSecond.m_hitPoint.m_separatingNormal;
-            kPoint.m_contact.m_separatingNormal.m_quad[3] = fFraction32;
+            XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = fFraction32;
             const __m128 kNewProduct = _mm_mul_ps(rPath, kSecond.m_hitPoint.m_separatingNormal.m_quad);
             double fNewDot = _mm_cvtss_f32(_mm_add_ps(
                 _mm_shuffle_ps(kNewProduct, kNewProduct, 0xAA),
@@ -220,7 +225,7 @@ void hkpGskBaseAgent::linearCast(
                 return;
             }
             const double fNegDot = -fNewDot;
-            const double fNewDist = kSecond.m_hitPoint.m_separatingNormal.m_quad[3];
+            const double fNewDist = XFNV_M128_F32(kSecond.m_hitPoint.m_separatingNormal.m_quad, 3);
             if (fNegDot * fFraction + fNewDist > fNegDot) {
                 return;
             }
@@ -239,12 +244,12 @@ void hkpGskBaseAgent::linearCast(
         }
     }
     if (fDist <= 0.0) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
         return;
     }
     if ((fDist - fSum) * castCollector.m_earlyOutDistance >= fDist) {
-        kPoint.m_contact.m_separatingNormal.m_quad[3] = 0.0f;
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
         castCollector.addCdPoint(kPoint);
     }
 }
@@ -379,7 +384,7 @@ void hkpGskBaseAgent::staticGetPenetrations(
     HK_TIMER_END();
     if (gjkStatus == HK_GSK_OK) {
         // The distance is rounded to a float before the compare.
-        float dist = separatingNormal.m_quad[3] - shapeA->m_radius - shapeB->m_radius;
+        float dist = XFNV_M128_F32(separatingNormal.m_quad, 3) - shapeA->m_radius - shapeB->m_radius;
         if (!(dist < 0.0f)) {
             return;
         }
@@ -493,7 +498,7 @@ void hkpGskBaseAgent::calcSeparatingNormal(
     aTb.setMulInverseMul(*bodyA.m_motion.pMotion, *bodyB.m_motion.pMotion);
     hkVector4 separatingNormal;
     gsk.getClosestFeature(shapeA, shapeB, aTb, separatingNormal);
-    double distance = separatingNormal.m_quad[3];
+    double distance = XFNV_M128_F32(separatingNormal.m_quad, 3);
     const hkRotation& rotationA = bodyA.m_motion.pState->m_transform.m_rotation;
     const hkQuadReal n = separatingNormal.m_quad;
     separatingNormalOut.m_quad = _mm_add_ps(
@@ -503,5 +508,5 @@ void hkpGskBaseAgent::calcSeparatingNormal(
         ),
         _mm_mul_ps(_mm_shuffle_ps(n, n, 170), rotationA.m_col2.m_quad)
     );
-    separatingNormalOut.m_quad[3] = distance - shapeA->m_radius - shapeB->m_radius;
+    XFNV_M128_F32(separatingNormalOut.m_quad, 3) = distance - shapeA->m_radius - shapeB->m_radius;
 }

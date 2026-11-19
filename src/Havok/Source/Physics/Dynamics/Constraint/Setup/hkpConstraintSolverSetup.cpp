@@ -33,6 +33,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpSimulationIsland.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCallbackUtil.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 #include <xmmintrin.h>
@@ -446,7 +447,7 @@ int32_t hkpConstraintSolverSetup::solve(
                 reinterpret_cast<hkpJacobianGotoSchema*>(pGoto)->m_offset =
                     static_cast<uint32_t>(secondSchemas - reinterpret_cast<char*>(pGoto));
                 uiSchemasLimit = ~uintptr_t(0);
-                pGoto->m_quad[0] = pGoto->m_quad[0] + 1.1920928955078125e-07;
+                XFNV_M128_F32(pGoto->m_quad, 0) = XFNV_M128_F32(pGoto->m_quad, 0) + 1.1920928955078125e-07;
                 pGoto->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_GOTO;
                 out.m_jacobianSchemas = reinterpret_cast<hkpJacobianSchema*>(secondSchemas);
             }
@@ -503,7 +504,7 @@ int32_t hkpConstraintSolverSetup::solve(
             hkpJacobianSchema* pGoto = out.m_jacobianSchemas;
             reinterpret_cast<hkpJacobianGotoSchema*>(pGoto)->m_offset =
                 static_cast<uint32_t>(secondSchemas - reinterpret_cast<char*>(pGoto));
-            pGoto->m_quad[0] = pGoto->m_quad[0] + 1.1920928955078125e-07;
+            XFNV_M128_F32(pGoto->m_quad, 0) = XFNV_M128_F32(pGoto->m_quad, 0) + 1.1920928955078125e-07;
             pGoto->m_bytes.m_type = hkpJacobianSchema::SCHEMA_TYPE_GOTO;
             out.m_jacobianSchemas = reinterpret_cast<hkpJacobianSchema*>(secondSchemas);
             uiSchemasLimit = ~uintptr_t(0);

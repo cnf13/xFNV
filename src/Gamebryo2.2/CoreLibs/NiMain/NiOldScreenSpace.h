@@ -2,6 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiScreenTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPool.h"
@@ -12,7 +13,6 @@
 #include <stdint.h>
 
 class NiPoint2;
-class NiScreenTexture;
 
 // The old screen-space API: screen geometry, screen polygons and the camera that draws them.
 

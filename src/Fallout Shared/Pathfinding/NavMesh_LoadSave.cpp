@@ -17,6 +17,7 @@
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
+#include "xfnv/Compiler.h"
 
 // The NAVM DATA chunk: the parent cell and the array sizes. Files before version 5 have no DoorPortalCount.
 struct NavMeshSaveStruct {
@@ -85,7 +86,7 @@ bool NavMesh::Load(TESFile* apFile) {
         do {
             switch (apFile->GetTESChunk()) {
                 case EDID_ID: {
-                    char* pMessage = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                    char* pMessage = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                     apFile->GetChunkData(pMessage, 0x200);
                     SetFormEditorID(pMessage);
                     break;

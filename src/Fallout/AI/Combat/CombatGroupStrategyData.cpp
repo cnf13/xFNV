@@ -7,6 +7,7 @@
 #include "Fallout/AI/Combat/GroupMemberData.h"
 #include "Fallout/AI/CombatController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "xfnv/Compiler.h"
 
 // Sorts the group's initialised members into the melee and ranged lists.
 CombatGroupData::CombatGroupData(CombatGroup* apCombatGroup)
@@ -69,7 +70,7 @@ GroupMemberData* CombatGroupData::GetRangedMember(uint32_t aiIndex) {
 
 void CombatGroupData::SortRangedMembers() {
     uint32_t uiNumMembers = GetRangedMemberCount();
-    NiPoint3* kActorPositions = static_cast<NiPoint3*>(__builtin_alloca_with_align(12 * uiNumMembers, 128));
+    NiPoint3* kActorPositions = static_cast<NiPoint3*>(XFNV_ALLOCA16(12 * uiNumMembers));
     NiPoint3 kSummedActorPositions = NiPoint3_ZERO;
     for (uint32_t i = 0; i < uiNumMembers; ++i) {
         GroupMemberData& rMember = RangedMembers[i];
@@ -77,7 +78,7 @@ void CombatGroupData::SortRangedMembers() {
         kSummedActorPositions += kActorPositions[i];
     }
     kSummedActorPositions /= static_cast<float>(uiNumMembers);
-    float* fDistances = static_cast<float*>(__builtin_alloca_with_align(4 * uiNumMembers, 128));
+    float* fDistances = static_cast<float*>(XFNV_ALLOCA16(4 * uiNumMembers));
     for (uint32_t j = 0; j < uiNumMembers; ++j) {
         fDistances[j] = (kActorPositions[j] - kSummedActorPositions).SqrLength();
     }

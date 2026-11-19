@@ -14,6 +14,7 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometry.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayGeometryTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -38,175 +39,221 @@ void hkDisplayAABB::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemory
         hkArrayUtil::_reserve(a, &lines, v5, sizeof(hkVector4));
     }
     lines.m_size = 24;
-    v3[0] = 0.0f;
+    XFNV_M128_F32(v3, 0) = 0.0f;
     (&lines)->begin()->m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[1].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[2].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[3].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[4].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[5].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[6].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[7].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[8].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[9].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[10].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[11].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[12].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[13].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[14].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[15].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[16].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[17].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[18].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[19].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[20].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[21].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[22].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
-        _mm_unpacklo_ps(_mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))), v3)
+        _mm_unpacklo_ps(
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))), v3
+        )
     );
     lines.m_data[23].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -240,11 +287,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v4->m_vertices.m_size;
     v4->m_vertices.m_data[m_size].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -263,11 +310,11 @@ void hkDisplayAABB::buildGeometry() {
     ++m_geometry->m_vertices.m_size;
     m_geometry->m_vertices.m_data[v12].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -286,11 +333,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v16->m_vertices.m_size;
     v16->m_vertices.m_data[v18].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -309,11 +356,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v22->m_vertices.m_size;
     v22->m_vertices.m_data[v24].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -332,11 +379,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v28->m_vertices.m_size;
     v28->m_vertices.m_data[v30].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -355,11 +402,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v34->m_vertices.m_size;
     v34->m_vertices.m_data[v36].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -378,11 +425,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v40->m_vertices.m_size;
     v40->m_vertices.m_data[v42].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );
@@ -401,11 +448,11 @@ void hkDisplayAABB::buildGeometry() {
     ++v46->m_vertices.m_size;
     v46->m_vertices.m_data[v48].m_quad = _mm_unpacklo_ps(
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[0]))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_minExtent.m_quad[2])))
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 0)))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_minExtent.m_quad, 2))))
         ),
         _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(m_maxExtent.m_quad[1]))),
+            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(XFNV_M128_F32(m_maxExtent.m_quad, 1)))),
             _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(zero)))
         )
     );

@@ -8,6 +8,7 @@
 #include "Havok/Source/Physics/ConstraintSolver/Constraint/hkpConstraintQueryIn.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianElement.h"
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianSchema.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -48,8 +49,8 @@ hkp1Lin2AngJacobian* hkp1dLinearBilateralConstraintInfo::buildJacobian(
     float fSum = _mm_cvtss_f32(sum);
     // HK_REAL_EPSILON, as a double constant.
     float fDiag = fSum + 1.1920928955078125e-07;
-    r_eax->m_angular[1].m_quad[3] = fDiag;
-    r_eax->m_angular[0].m_quad[3] = fVirtMassFactor / fDiag;
-    r_eax->m_linear0.m_quad[3] = r_esi->m_rhsFactor * a1;
+    XFNV_M128_F32(r_eax->m_angular[1].m_quad, 3) = fDiag;
+    XFNV_M128_F32(r_eax->m_angular[0].m_quad, 3) = fVirtMassFactor / fDiag;
+    XFNV_M128_F32(r_eax->m_linear0.m_quad, 3) = r_esi->m_rhsFactor * a1;
     return r_eax;
 }

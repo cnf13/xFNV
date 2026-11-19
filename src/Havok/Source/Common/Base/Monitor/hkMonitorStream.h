@@ -3,8 +3,7 @@
 #include "Havok/Source/Common/Base/Thread/Thread/hkThreadLocalData.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "SDK/Windows/winbase.h"
-
-#include <x86intrin.h>
+#include "xfnv/Compiler.h"
 
 // A thread's buffer of timer and monitor events.
 class hkMonitorStream {

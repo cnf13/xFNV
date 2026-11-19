@@ -11,6 +11,7 @@
 #include "Fallout Shared/TESNPC.h"
 #include "Fallout Shared/TESRace.h"
 #include "Fallout Shared/TESTexture.h"
+#include "xfnv/Compiler.h"
 
 TESEyes::TESEyes() : TESForm(), TESFullName(), TESTexture() {
     SetFormType(EYES_ID);
@@ -36,7 +37,7 @@ bool TESEyes::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;

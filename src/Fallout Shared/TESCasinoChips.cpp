@@ -22,6 +22,7 @@
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 void CASINO_DATA::Endian() {
     ENDIAN(fBJ_ShufflePercent, false);
@@ -71,7 +72,7 @@ bool TESCasinoChips::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;
@@ -85,7 +86,7 @@ bool TESCasinoChips::Load(TESFile* apFile) {
             case MODS_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read whole.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(
                     pBuffer, uiChunkSize, apFile->GetFormVersion()
@@ -114,7 +115,7 @@ bool TESCasinoChips::Load(TESFile* apFile) {
             }
             case ONAM_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read whole (size 0).
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 cDesc.Set(pBuffer, 0);
                 break;
@@ -245,7 +246,7 @@ bool TESCasino::Load(TESFile* apFile) {
         switch (uiChunk) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200);
                 SetFormEditorID(pBuffer);
                 break;
@@ -254,7 +255,7 @@ bool TESCasino::Load(TESFile* apFile) {
             case FULL_ID: TESFullName::LoadFullNameChunk(this, apFile); break;
             case MODL_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read whole.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 // The model is set through the virtual SetModel call, as the game does.
                 TESModel* pModel = &modelArrayList[iModel];
@@ -264,7 +265,7 @@ bool TESCasino::Load(TESFile* apFile) {
                 break;
             }
             case MOD2_ID: {
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 TESModel* pModel = &modelArrayList[7];
                 pModel->SetModel(pBuffer);
@@ -272,7 +273,7 @@ bool TESCasino::Load(TESFile* apFile) {
                 break;
             }
             case MOD3_ID: {
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 TESModel* pModel = &modelArrayList[8];
                 pModel->SetModel(pBuffer);
@@ -280,7 +281,7 @@ bool TESCasino::Load(TESFile* apFile) {
                 break;
             }
             case MOD4_ID: {
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 TESModel* pModel = &modelArrayList[9];
                 pModel->SetModel(pBuffer);

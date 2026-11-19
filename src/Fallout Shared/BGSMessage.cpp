@@ -12,6 +12,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadManager.h"
+#include "xfnv/Compiler.h"
 
 // The game settings this file defines, in initialization order.
 SettingT<GameSettingCollection> iMessageBoxMaxItems("iMessageBoxMaxItems", 10);
@@ -63,7 +64,7 @@ bool BGSMessage::Load(TESFile* apFile) {
             case DNAM_ID: apFile->GetChunkData<uint32_t>(iFlags); break;
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;
@@ -78,7 +79,7 @@ bool BGSMessage::Load(TESFile* apFile) {
             }
             case ITXT_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 void* pMemory = ourMalloc(sizeof(MESSAGEBOX_BUTTON));
                 MESSAGEBOX_BUTTON* pButton = pMemory ? ::new (pMemory) MESSAGEBOX_BUTTON : nullptr;

@@ -356,6 +356,7 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <cstdint>
@@ -658,7 +659,7 @@ bool TESObjectREFR::Load(TESFile* apFile) {
             case EDID_ID: {
                 // Allocates the chunk's size on the stack and reads at most 0x200 bytes.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca(uiChunkSize ? uiChunkSize : 1));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above).
                 pEditorID[0] = '\0';
                 apFile->GetChunkData(pEditorID, 0x200u);
@@ -7009,8 +7010,8 @@ bool TESObjectREFR::GetClosestFreeMarker(
                 if (pMarker) {
                     uint32_t uiMarks = pMarker->QNumMarks();
                     if (uiMarks) {
-                        NiPoint3* pPositions = static_cast<NiPoint3*>(__builtin_alloca_with_align(12 * uiMarks, 128));
-                        int32_t* pIndices = static_cast<int32_t*>(__builtin_alloca_with_align(4 * uiMarks, 128));
+                        NiPoint3* pPositions = static_cast<NiPoint3*>(XFNV_ALLOCA16(12 * uiMarks));
+                        int32_t* pIndices = static_cast<int32_t*>(XFNV_ALLOCA16(4 * uiMarks));
                         uint32_t uiCount = 0;
                         for (uint32_t i = 0; i < uiMarks; ++i) {
                             if (!pFurniture->GetMarkerEnabled(i) || GetMarkerUsed(i, abIgnoreReservations)) {
@@ -7026,7 +7027,7 @@ bool TESObjectREFR::GetClosestFreeMarker(
                             }
                         }
                         if (uiCount) {
-                            NiPoint3* pWorld = static_cast<NiPoint3*>(__builtin_alloca_with_align(12 * uiMarks, 128));
+                            NiPoint3* pWorld = static_cast<NiPoint3*>(XFNV_ALLOCA16(12 * uiMarks));
                             const NiPoint3* pLocation = &GetLocationOnReference();
                             NiMatrix3 kOrientation = GetOrientation();
                             NiMatrix3::TransformVertices(kOrientation, *pLocation, uiCount, pPositions, pWorld);

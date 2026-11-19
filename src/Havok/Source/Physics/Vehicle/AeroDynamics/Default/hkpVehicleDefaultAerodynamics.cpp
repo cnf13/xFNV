@@ -15,8 +15,10 @@
 #include "Havok/Source/Physics/Vehicle/AeroDynamics/hkpVehicleAerodynamics.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleData.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleInstance.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
+#include <cmath>
 #include <xmmintrin.h>
 
 static void finishLoadedObjecthkpVehicleDefaultAerodynamics(void* p, int32_t finishing);
@@ -130,7 +132,8 @@ void hkpVehicleDefaultAerodynamics::calcAerodynamics(
     __m128 v15 = _mm_mul_ps(_mm_shuffle_ps(v13, v13, 0), v8);
     __m128 v16 = _mm_shuffle_ps(v13, v13, 85);
     __m128 v17 = _mm_mul_ps(m_entity->m_motion.m_linearVelocity.m_quad, v14);
-    float v19 = _mm_shuffle_ps(v17, v17, 170)[0] + (_mm_shuffle_ps(v17, v17, 85)[0] + v17[0]);
+    float v19 = XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v17, v17, 85), 0) + XFNV_M128_F32(v17, 0));
     *reinterpret_cast<float*>(&v21) = calcAerodynamicDrag(v19);
     *reinterpret_cast<float*>(&v20) = calcAerodynamicLift(v19);
     v18.m_quad = _mm_mul_ps(
@@ -155,7 +158,7 @@ void hkpVehicleDefaultAerodynamics::calcAerodynamics(
 // The drag opposes the motion and grows with the square of the speed. The speed is rounded to float, the product is
 // kept in double and then rounded to float.
 float hkpVehicleDefaultAerodynamics::calcAerodynamicDrag(const float forwardVelocity) const {
-    float fSpeed = __builtin_fabsf(forwardVelocity);
+    float fSpeed = std::fabsf(forwardVelocity);
     float fDrag = m_airDensity * -0.5 * m_dragCoefficient * m_frontalArea * fSpeed * forwardVelocity;
     return fDrag;
 }

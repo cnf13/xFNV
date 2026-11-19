@@ -4,6 +4,7 @@
 #include "BSCore/MemoryManager.h"
 #include "Fallout/Interface/MenuManager.h"
 
+#include <concepts>
 #include <stdint.h>
 
 class BGSNote;
@@ -124,9 +125,11 @@ public:
     T GetDataFor(Tile* apTile) const;
     // Marks every item apFilterFn rejects as filtered; specialised next to the caller.
     void Filter(FilterFunction apFilterFn);
-    // Removes the items whose data belongs to apRemoveObj.
-    void RemoveItemGroup(TESBoundObject* apRemoveObj);
-    // Fills the list from apContainer's inventory.
+    // Removes the items whose data belongs to apRemoveObj. ListBox<ItemChange*>'s alone: no other list's explicit
+    // instantiation compiles it.
+    void RemoveItemGroup(TESBoundObject* apRemoveObj)
+    requires std::same_as<T, ItemChange*>;
+    // Fills the list from apContainer's inventory. ListBox<ItemChange*>'s alone.
     void BuildFromContainer(
         TESObjectREFR* apContainer,
         bool (*apFilterFn)(T),
@@ -134,7 +137,8 @@ public:
         void (*apInitFn)(Tile*, T),
         bool abNoStack,
         bool abBarter
-    );
+    )
+    requires std::same_as<T, ItemChange*>;
     // Enables or disables the list's container and items.
     void SetEnabled(bool abVal);
     // Clears the selection of every item (only the unfiltered ones when abUnfilteredOnly).

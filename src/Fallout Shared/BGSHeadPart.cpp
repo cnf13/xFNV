@@ -9,6 +9,7 @@
 #include "Fallout Shared/TESFullName.h"
 #include "Fallout Shared/TESModelTextureSwap.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSHeadPart::BGSHeadPart() : TESForm(), TESFullName(), TESModelTextureSwap(), ExtraParts() {
     SetFormType(9u);
@@ -44,7 +45,7 @@ bool BGSHeadPart::Load(TESFile* apFile) {
             case DATA_ID: apFile->GetChunkData(&cFlags, 1u); break;
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;
@@ -64,7 +65,7 @@ bool BGSHeadPart::Load(TESFile* apFile) {
             case MODS_ID: {
                 uint32_t uiChunkSize = apFile->GetChunkSize();
                 // A 16-byte aligned stack buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize));
                 apFile->GetChunkData(pBuffer, uiChunkSize);
                 uint16_t usVersion = apFile->GetFormVersion();
                 static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiChunkSize, usVersion);

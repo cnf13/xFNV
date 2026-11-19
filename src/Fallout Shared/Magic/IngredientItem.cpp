@@ -16,6 +16,7 @@
 #include "Fallout Shared/TESWeightForm.h"
 #include "Fallout/AI/Actor.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 void IngredientItemData::Endian() {
     ENDIAN(iCostOverride, false);
@@ -133,7 +134,7 @@ void IngredientItem::LoadMagicItemChunk(TESFile* apFile, CHUNK_ID apChunkID) {
         case MODS_ID: {
             uint32_t uiSize = apFile->GetChunkSize();
             // A 16-byte aligned stack buffer of the chunk's size.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiSize, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
             apFile->GetChunkData(pBuffer, uiSize);
             uint16_t usFormVersion = apFile->GetFormVersion();
             static_cast<TESModelTextureSwap*>(this)->UnpackTextureSwapChunkData(pBuffer, uiSize, usFormVersion);

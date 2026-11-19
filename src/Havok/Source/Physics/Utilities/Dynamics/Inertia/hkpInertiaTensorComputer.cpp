@@ -46,6 +46,7 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBodyCinfo.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -137,7 +138,7 @@ void hkpMassProperties::scaleToMass(float newMass) {
     double v2 = newMass / m_mass;
     hkMatrix3* p_m_inertiaTensor = &m_inertiaTensor;
     *reinterpret_cast<float*>(&v4) = v2;
-    p_m_inertiaTensor[-1].m_col1.m_quad[1] = newMass;
+    XFNV_M128_F32(p_m_inertiaTensor[-1].m_col1.m_quad, 1) = newMass;
     v5.m_real = _mm_set_ss(std::bit_cast<float>(v4));
     p_m_inertiaTensor->mul(v5);
 }
@@ -282,11 +283,11 @@ void computeRecursiveShapeVolumeMassProperties(
             // EXE-INLINED none: hkTransform::hkTransform(hkQuaternion identity, translation)
             alignas(16) hkTransform translation;
             _mm_store_ps(&reinterpret_cast<float*>(&translation.m_rotation.m_col0.m_quad)[0], kZero);
-            translation.m_rotation.m_col0.m_quad[0] = 1.0f;
+            XFNV_M128_F32(translation.m_rotation.m_col0.m_quad, 0) = 1.0f;
             _mm_store_ps(&reinterpret_cast<float*>(&translation.m_rotation.m_col1.m_quad)[0], kZero);
-            translation.m_rotation.m_col1.m_quad[1] = 1.0f;
+            XFNV_M128_F32(translation.m_rotation.m_col1.m_quad, 1) = 1.0f;
             _mm_store_ps(&reinterpret_cast<float*>(&translation.m_rotation.m_col2.m_quad)[0], kZero);
-            translation.m_rotation.m_col2.m_quad[2] = 1.0f;
+            XFNV_M128_F32(translation.m_rotation.m_col2.m_quad, 2) = 1.0f;
             _mm_store_ps(
                 &reinterpret_cast<float*>(&translation.m_translation.m_quad)[0],
                 _mm_load_ps(&reinterpret_cast<const float*>(&translateShape->m_translation.m_quad)[0])
@@ -342,7 +343,7 @@ void computeRecursiveShapeVolumeMassProperties(
                     _mm_load_ps(&reinterpret_cast<const float*>(&transform.m_translation.m_quad)[0])
                 );
                 sphereTransform.m_translation.setTransformedPos(sphereTransform, sphere);
-                hkpSphereShape* sphereShape = ::new (sphereMemory) hkpSphereShape(sphere.m_quad[3]);
+                hkpSphereShape* sphereShape = ::new (sphereMemory) hkpSphereShape(XFNV_M128_F32(sphere.m_quad, 3));
                 computeRecursiveShapeVolumeMassProperties(
                     sphereShape, sphereTransform, minTriangleThickness, massPropertiesOut
                 );
@@ -381,9 +382,9 @@ void computeRecursiveShapeVolumeMassProperties(
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_rotation.m_col0.m_quad)[0], kZero);
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_rotation.m_col1.m_quad)[0], kZero);
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_rotation.m_col2.m_quad)[0], kZero);
-            pNew->m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-            pNew->m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-            pNew->m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+            XFNV_M128_F32(pNew->m_transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+            XFNV_M128_F32(pNew->m_transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+            XFNV_M128_F32(pNew->m_transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_translation.m_quad)[0], kZero);
         }
         hkpMassElement* pAccumulated = elements.m_data + elements.m_size;
@@ -408,9 +409,9 @@ void computeRecursiveShapeVolumeMassProperties(
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_rotation.m_col0.m_quad)[0], kZero);
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_rotation.m_col1.m_quad)[0], kZero);
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_rotation.m_col2.m_quad)[0], kZero);
-            pNew->m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-            pNew->m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-            pNew->m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+            XFNV_M128_F32(pNew->m_transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+            XFNV_M128_F32(pNew->m_transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+            XFNV_M128_F32(pNew->m_transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
             _mm_store_ps(&reinterpret_cast<float*>(&pNew->m_transform.m_translation.m_quad)[0], kZero);
         }
         hkpMassElement* pShapeElement = elements.m_data + elements.m_size;
@@ -658,7 +659,8 @@ void InternalInertiaTensorComputer::compProjectionIntegrals(const hkVector4* v) 
 // Computes Mirtich's face integrals Fa..Fcca from the projection integrals P1..Pbbb.
 void InternalInertiaTensorComputer::compFaceIntegrals(const hkVector4* v, const hkVector4& n) {
     compProjectionIntegrals(v);
-    const float w = -n(0) * v[0].m_quad[0] - v[0].m_quad[1] * n(1) - v[0].m_quad[2] * n(2);
+    const float w = -n(0) * XFNV_M128_F32(v[0].m_quad, 0) - XFNV_M128_F32(v[0].m_quad, 1) * n(1) -
+        XFNV_M128_F32(v[0].m_quad, 2) * n(2);
     const float k1 = 1.0f / n(C);
     const float k2 = k1 * k1;
     const float k3 = k2 * k1;
@@ -786,35 +788,47 @@ void InternalInertiaTensorComputer::computeInertialTensorInternal(
     hkVector4& r,
     hkMatrix3& J
 ) {
-    r.m_quad[0] = T1[0u] / T0;
-    r.m_quad[1] = T1[1] / T0;
-    r.m_quad[2] = T1[2] / T0;
-    J.m_col0.m_quad[0] = (T2[2] + T2[1]) * density;
-    J.m_col1.m_quad[1] = (T2[2] + T2[0u]) * density;
-    J.m_col2.m_quad[2] = (T2[1] + T2[0u]) * density;
+    XFNV_M128_F32(r.m_quad, 0) = T1[0u] / T0;
+    XFNV_M128_F32(r.m_quad, 1) = T1[1] / T0;
+    XFNV_M128_F32(r.m_quad, 2) = T1[2] / T0;
+    XFNV_M128_F32(J.m_col0.m_quad, 0) = (T2[2] + T2[1]) * density;
+    XFNV_M128_F32(J.m_col1.m_quad, 1) = (T2[2] + T2[0u]) * density;
+    XFNV_M128_F32(J.m_col2.m_quad, 2) = (T2[1] + T2[0u]) * density;
     float massCentera = -density;
     double v6 = massCentera;
     float massCenterb = TP[0u] * massCentera;
-    J.m_col0.m_quad[1] = massCenterb;
-    J.m_col1.m_quad[0] = massCenterb;
+    XFNV_M128_F32(J.m_col0.m_quad, 1) = massCenterb;
+    XFNV_M128_F32(J.m_col1.m_quad, 0) = massCenterb;
     float massCenterc = TP[1] * v6;
-    J.m_col1.m_quad[2] = massCenterc;
-    J.m_col2.m_quad[1] = massCenterc;
+    XFNV_M128_F32(J.m_col1.m_quad, 2) = massCenterc;
+    XFNV_M128_F32(J.m_col2.m_quad, 1) = massCenterc;
     float massCenterd = v6 * TP[2];
-    J.m_col2.m_quad[0] = massCenterd;
-    J.m_col0.m_quad[2] = massCenterd;
-    J.m_col0.m_quad[0] = J.m_col0.m_quad[0] - (r.m_quad[2] * r.m_quad[2] + r.m_quad[1] * r.m_quad[1]) * mass;
-    J.m_col1.m_quad[1] = J.m_col1.m_quad[1] - (r.m_quad[2] * r.m_quad[2] + r.m_quad[0] * r.m_quad[0]) * mass;
-    J.m_col2.m_quad[2] = J.m_col2.m_quad[2] - (r.m_quad[1] * r.m_quad[1] + r.m_quad[0] * r.m_quad[0]) * mass;
-    float massCentere = r.m_quad[0] * mass * r.m_quad[1] + J.m_col0.m_quad[1];
-    J.m_col0.m_quad[1] = massCentere;
-    J.m_col1.m_quad[0] = massCentere;
-    float massCenterf = r.m_quad[1] * mass * r.m_quad[2] + J.m_col1.m_quad[2];
-    J.m_col1.m_quad[2] = massCenterf;
-    J.m_col2.m_quad[1] = massCenterf;
-    float massCenterg = mass * r.m_quad[2] * r.m_quad[0] + J.m_col2.m_quad[0];
-    J.m_col2.m_quad[0] = massCenterg;
-    J.m_col0.m_quad[2] = massCenterg;
+    XFNV_M128_F32(J.m_col2.m_quad, 0) = massCenterd;
+    XFNV_M128_F32(J.m_col0.m_quad, 2) = massCenterd;
+    XFNV_M128_F32(J.m_col0.m_quad, 0) = XFNV_M128_F32(J.m_col0.m_quad, 0) -
+        (XFNV_M128_F32(r.m_quad, 2) * XFNV_M128_F32(r.m_quad, 2) +
+         XFNV_M128_F32(r.m_quad, 1) * XFNV_M128_F32(r.m_quad, 1)) *
+            mass;
+    XFNV_M128_F32(J.m_col1.m_quad, 1) = XFNV_M128_F32(J.m_col1.m_quad, 1) -
+        (XFNV_M128_F32(r.m_quad, 2) * XFNV_M128_F32(r.m_quad, 2) +
+         XFNV_M128_F32(r.m_quad, 0) * XFNV_M128_F32(r.m_quad, 0)) *
+            mass;
+    XFNV_M128_F32(J.m_col2.m_quad, 2) = XFNV_M128_F32(J.m_col2.m_quad, 2) -
+        (XFNV_M128_F32(r.m_quad, 1) * XFNV_M128_F32(r.m_quad, 1) +
+         XFNV_M128_F32(r.m_quad, 0) * XFNV_M128_F32(r.m_quad, 0)) *
+            mass;
+    float massCentere =
+        XFNV_M128_F32(r.m_quad, 0) * mass * XFNV_M128_F32(r.m_quad, 1) + XFNV_M128_F32(J.m_col0.m_quad, 1);
+    XFNV_M128_F32(J.m_col0.m_quad, 1) = massCentere;
+    XFNV_M128_F32(J.m_col1.m_quad, 0) = massCentere;
+    float massCenterf =
+        XFNV_M128_F32(r.m_quad, 1) * mass * XFNV_M128_F32(r.m_quad, 2) + XFNV_M128_F32(J.m_col1.m_quad, 2);
+    XFNV_M128_F32(J.m_col1.m_quad, 2) = massCenterf;
+    XFNV_M128_F32(J.m_col2.m_quad, 1) = massCenterf;
+    float massCenterg =
+        mass * XFNV_M128_F32(r.m_quad, 2) * XFNV_M128_F32(r.m_quad, 0) + XFNV_M128_F32(J.m_col2.m_quad, 0);
+    XFNV_M128_F32(J.m_col2.m_quad, 0) = massCenterg;
+    XFNV_M128_F32(J.m_col0.m_quad, 2) = massCenterg;
 }
 
 void InternalInertiaTensorComputer::compGeometryAabb(
@@ -858,9 +872,9 @@ void hkpInertiaTensorComputer::computeShapeVolumeMassProperties(
     edx0.m_mass = 0.0f;
     edx0.m_volume = 0.0f;
     std::memset(&arA, 0, sizeof(arA));
-    arA.m_rotation.m_col0.m_quad[0] = 1.0f;
-    arA.m_rotation.m_col1.m_quad[1] = 1.0f;
-    arA.m_rotation.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(arA.m_rotation.m_col0.m_quad, 0) = 1.0f;
+    XFNV_M128_F32(arA.m_rotation.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(arA.m_rotation.m_col2.m_quad, 2) = 1.0f;
     std::memset(&edx0.m_centerOfMass, 0, sizeof(edx0.m_centerOfMass));
     std::memset(&edx0.m_inertiaTensor, 0, sizeof(edx0.m_inertiaTensor));
     computeRecursiveShapeVolumeMassProperties(shape, arA, 0.0f, edx0);
@@ -879,24 +893,33 @@ void hkpInertiaTensorComputer::computeShapeVolumeMassProperties(
 }
 
 void hkpInertiaTensorComputer::shiftInertiaFromCom(const hkVector4& shift, float mass, hkMatrix3& inertia) {
-    (&inertia)->m_col0.m_quad[0] =
-        (((((&shift)->m_quad[2] * (&shift)->m_quad[2]) + ((&shift)->m_quad[1] * (&shift)->m_quad[1])) * mass) +
-         (&inertia)->m_col0.m_quad[0]);
-    (&inertia)->m_col1.m_quad[1] =
-        (((((&shift)->m_quad[2] * (&shift)->m_quad[2]) + ((&shift)->m_quad[0] * (&shift)->m_quad[0])) * mass) +
-         (&inertia)->m_col1.m_quad[1]);
-    (&inertia)->m_col2.m_quad[2] =
-        (((((&shift)->m_quad[1] * (&shift)->m_quad[1]) + ((&shift)->m_quad[0] * (&shift)->m_quad[0])) * mass) +
-         (&inertia)->m_col2.m_quad[2]);
-    float v5 = (&inertia)->m_col0.m_quad[1] - (((&shift)->m_quad[0] * mass) * (&shift)->m_quad[1]);
-    (&inertia)->m_col0.m_quad[1] = v5;
-    (&inertia)->m_col1.m_quad[0] = v5;
-    float v6 = (&inertia)->m_col1.m_quad[2] - (((&shift)->m_quad[1] * mass) * (&shift)->m_quad[2]);
-    (&inertia)->m_col1.m_quad[2] = v6;
-    (&inertia)->m_col2.m_quad[1] = v6;
-    float v7 = (&inertia)->m_col2.m_quad[0] - ((mass * (&shift)->m_quad[2]) * (&shift)->m_quad[0]);
-    (&inertia)->m_col2.m_quad[0] = v7;
-    (&inertia)->m_col0.m_quad[2] = v7;
+    XFNV_M128_F32((&inertia)->m_col0.m_quad, 0) =
+        ((((XFNV_M128_F32((&shift)->m_quad, 2) * XFNV_M128_F32((&shift)->m_quad, 2)) +
+           (XFNV_M128_F32((&shift)->m_quad, 1) * XFNV_M128_F32((&shift)->m_quad, 1))) *
+          mass) +
+         XFNV_M128_F32((&inertia)->m_col0.m_quad, 0));
+    XFNV_M128_F32((&inertia)->m_col1.m_quad, 1) =
+        ((((XFNV_M128_F32((&shift)->m_quad, 2) * XFNV_M128_F32((&shift)->m_quad, 2)) +
+           (XFNV_M128_F32((&shift)->m_quad, 0) * XFNV_M128_F32((&shift)->m_quad, 0))) *
+          mass) +
+         XFNV_M128_F32((&inertia)->m_col1.m_quad, 1));
+    XFNV_M128_F32((&inertia)->m_col2.m_quad, 2) =
+        ((((XFNV_M128_F32((&shift)->m_quad, 1) * XFNV_M128_F32((&shift)->m_quad, 1)) +
+           (XFNV_M128_F32((&shift)->m_quad, 0) * XFNV_M128_F32((&shift)->m_quad, 0))) *
+          mass) +
+         XFNV_M128_F32((&inertia)->m_col2.m_quad, 2));
+    float v5 = XFNV_M128_F32((&inertia)->m_col0.m_quad, 1) -
+        ((XFNV_M128_F32((&shift)->m_quad, 0) * mass) * XFNV_M128_F32((&shift)->m_quad, 1));
+    XFNV_M128_F32((&inertia)->m_col0.m_quad, 1) = v5;
+    XFNV_M128_F32((&inertia)->m_col1.m_quad, 0) = v5;
+    float v6 = XFNV_M128_F32((&inertia)->m_col1.m_quad, 2) -
+        ((XFNV_M128_F32((&shift)->m_quad, 1) * mass) * XFNV_M128_F32((&shift)->m_quad, 2));
+    XFNV_M128_F32((&inertia)->m_col1.m_quad, 2) = v6;
+    XFNV_M128_F32((&inertia)->m_col2.m_quad, 1) = v6;
+    float v7 = XFNV_M128_F32((&inertia)->m_col2.m_quad, 0) -
+        ((mass * XFNV_M128_F32((&shift)->m_quad, 2)) * XFNV_M128_F32((&shift)->m_quad, 0));
+    XFNV_M128_F32((&inertia)->m_col2.m_quad, 0) = v7;
+    XFNV_M128_F32((&inertia)->m_col0.m_quad, 2) = v7;
 }
 
 void hkpInertiaTensorComputer::shiftInertiaToCom(const hkVector4& shift, float mass, hkMatrix3& inertia) {
@@ -930,13 +953,13 @@ hkpInertiaTensorComputer::computeSphereVolumeMassProperties(float radius, float 
     result.m_inertiaTensor.m_col1.m_quad = _mm_setzero_ps();
     result.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
     float v5 = v4 * mass * v4 * 0.4000000059604645;
-    result.m_inertiaTensor.m_col0.m_quad[0u] = 1.0f;
-    result.m_inertiaTensor.m_col1.m_quad[1] = 1.0f;
-    result.m_inertiaTensor.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col0.m_quad, 0u) = 1.0f;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col2.m_quad, 2) = 1.0f;
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
-    result.m_inertiaTensor.m_col0.m_quad[0u] = v5;
-    result.m_inertiaTensor.m_col1.m_quad[1] = v5;
-    result.m_inertiaTensor.m_col2.m_quad[2] = v5;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col0.m_quad, 0u) = v5;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col1.m_quad, 1) = v5;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col2.m_quad, 2) = v5;
     result.m_volume = v4 * (v4 * 4.188790321350098 * v4);
     result.m_mass = mass;
     return HK_SUCCESS;
@@ -1237,9 +1260,9 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
         rStorage.m_transform.m_rotation.m_col0.m_quad = _mm_setzero_ps();
         rStorage.m_transform.m_rotation.m_col1.m_quad = _mm_setzero_ps();
         rStorage.m_transform.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-        rStorage.m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-        rStorage.m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-        rStorage.m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+        XFNV_M128_F32(rStorage.m_transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(rStorage.m_transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(rStorage.m_transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
         rStorage.m_transform.m_translation.m_quad = _mm_setzero_ps();
     }
 
@@ -1254,9 +1277,9 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
     element.m_properties.m_inertiaTensor.m_col1.m_quad = _mm_setzero_ps();
     element.m_properties.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
     const float fRadialInertia = height * halfHeight * 0.5 / 3.0 + radius * radius * 0.25;
-    element.m_properties.m_inertiaTensor.m_col0.m_quad[0] = fRadialInertia;
-    element.m_properties.m_inertiaTensor.m_col1.m_quad[1] = fRadialInertia;
-    element.m_properties.m_inertiaTensor.m_col2.m_quad[2] = radius * radius * 0.5;
+    XFNV_M128_F32(element.m_properties.m_inertiaTensor.m_col0.m_quad, 0) = fRadialInertia;
+    XFNV_M128_F32(element.m_properties.m_inertiaTensor.m_col1.m_quad, 1) = fRadialInertia;
+    XFNV_M128_F32(element.m_properties.m_inertiaTensor.m_col2.m_quad, 2) = radius * radius * 0.5;
     hkSimdReal cylinderMassReal;
     cylinderMassReal.m_real = _mm_set_ss(cylinderMass);
     element.m_properties.m_inertiaTensor.mul(cylinderMassReal);
@@ -1415,9 +1438,9 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
         rStorage.m_transform.m_rotation.m_col0.m_quad = _mm_setzero_ps();
         rStorage.m_transform.m_rotation.m_col1.m_quad = _mm_setzero_ps();
         rStorage.m_transform.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-        rStorage.m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-        rStorage.m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-        rStorage.m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+        XFNV_M128_F32(rStorage.m_transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(rStorage.m_transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(rStorage.m_transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
         rStorage.m_transform.m_translation.m_quad = _mm_setzero_ps();
     }
 
@@ -1438,9 +1461,9 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
         pNew->m_transform.m_rotation.m_col0.m_quad = _mm_setzero_ps();
         pNew->m_transform.m_rotation.m_col1.m_quad = _mm_setzero_ps();
         pNew->m_transform.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-        pNew->m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-        pNew->m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-        pNew->m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
+        XFNV_M128_F32(pNew->m_transform.m_rotation.m_col0.m_quad, 0) = 1.0f;
+        XFNV_M128_F32(pNew->m_transform.m_rotation.m_col1.m_quad, 1) = 1.0f;
+        XFNV_M128_F32(pNew->m_transform.m_rotation.m_col2.m_quad, 2) = 1.0f;
         pNew->m_transform.m_translation.m_quad = _mm_setzero_ps();
     }
     hkpMassElement& rElement = elements.m_data[elements.m_size];
@@ -1454,9 +1477,9 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
     rElement.m_properties.m_centerOfMass.set(0.0f, 0.0f, 0.0f, 0.0f);
     rElement.m_properties.m_inertiaTensor.setIdentity();
     const float fRadialInertia = height * (height * 0.5) * 0.5 / 3.0 + radius * radius * 0.25;
-    rElement.m_properties.m_inertiaTensor.m_col0.m_quad[0] = fRadialInertia;
-    rElement.m_properties.m_inertiaTensor.m_col1.m_quad[1] = fRadialInertia;
-    rElement.m_properties.m_inertiaTensor.m_col2.m_quad[2] = radius * radius * 0.5;
+    XFNV_M128_F32(rElement.m_properties.m_inertiaTensor.m_col0.m_quad, 0) = fRadialInertia;
+    XFNV_M128_F32(rElement.m_properties.m_inertiaTensor.m_col1.m_quad, 1) = fRadialInertia;
+    XFNV_M128_F32(rElement.m_properties.m_inertiaTensor.m_col2.m_quad, 2) = radius * radius * 0.5;
     hkSimdReal massReal;
     massReal.m_real = _mm_set_ss(mass);
     rElement.m_properties.m_inertiaTensor.mul(massReal);
@@ -1476,21 +1499,21 @@ hkResult hkpInertiaTensorComputer::computeBoxVolumeMassProperties(
     if (mass <= 0.0f) {
         return HK_FAILURE;
     }
-    float v5 = halfExtents.m_quad[0];
-    float v7 = halfExtents.m_quad[1];
-    float v6 = halfExtents.m_quad[2];
+    float v5 = XFNV_M128_F32(halfExtents.m_quad, 0);
+    float v7 = XFNV_M128_F32(halfExtents.m_quad, 1);
+    float v6 = XFNV_M128_F32(halfExtents.m_quad, 2);
     result.m_inertiaTensor.m_col0.m_quad = _mm_setzero_ps();
     result.m_inertiaTensor.m_col1.m_quad = _mm_setzero_ps();
     result.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
     float v8 = 0.3333333432674408 * mass;
-    result.m_inertiaTensor.m_col0.m_quad[0u] = 1.0f;
-    result.m_inertiaTensor.m_col1.m_quad[1] = 1.0f;
-    result.m_inertiaTensor.m_col2.m_quad[2] = 1.0f;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col0.m_quad, 0u) = 1.0f;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col1.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col2.m_quad, 2) = 1.0f;
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
     double v4 = v7 * v7;
-    result.m_inertiaTensor.m_col0.m_quad[0u] = (v4 + v6 * v6) * v8;
-    result.m_inertiaTensor.m_col1.m_quad[1] = (v6 * v6 + v5 * v5) * v8;
-    result.m_inertiaTensor.m_col2.m_quad[2] = v8 * (v4 + v5 * v5);
+    XFNV_M128_F32(result.m_inertiaTensor.m_col0.m_quad, 0u) = (v4 + v6 * v6) * v8;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col1.m_quad, 1) = (v6 * v6 + v5 * v5) * v8;
+    XFNV_M128_F32(result.m_inertiaTensor.m_col2.m_quad, 2) = v8 * (v4 + v5 * v5);
     result.m_volume = v6 * (v7 * v5) * 8.0;
     result.m_mass = mass;
     return HK_SUCCESS;

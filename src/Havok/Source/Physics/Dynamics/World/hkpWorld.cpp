@@ -161,11 +161,11 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "SDK/MSVC/string.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
 #include <new>
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 static void cleanupLoadedObjecthkpWorld(void* p);
@@ -1023,7 +1023,7 @@ hkpWorld::hkpWorld(const hkpWorldCinfo& info, uint32_t sdkversion)
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x53C94B42, acBuffer, ".\\World\\hkpWorld.cpp", 0xBB5
             )) {
-            __builtin_debugtrap();
+            xfnv::DebugTrap();
         }
     }
     hkpWeldingUtility::initWeldingTable(
@@ -1048,8 +1048,10 @@ hkpWorld::hkpWorld(const hkpWorldCinfo& info, uint32_t sdkversion)
 
     // The deactivation thresholds scale with the gravity; a zero gravity sizes them for the earth's.
     const hkQuadReal& kInfoGravity = info.m_gravity.m_quad;
-    float fGravity = __builtin_sqrtf(
-        kInfoGravity[0] * kInfoGravity[0] + kInfoGravity[1] * kInfoGravity[1] + kInfoGravity[2] * kInfoGravity[2]
+    float fGravity = std::sqrtf(
+        XFNV_M128_F32(kInfoGravity, 0) * XFNV_M128_F32(kInfoGravity, 0) +
+        XFNV_M128_F32(kInfoGravity, 1) * XFNV_M128_F32(kInfoGravity, 1) +
+        XFNV_M128_F32(kInfoGravity, 2) * XFNV_M128_F32(kInfoGravity, 2)
     );
     if (fGravity == 0.0f) {
         fGravity = 9.81f;
@@ -1177,14 +1179,14 @@ hkpWorld::hkpWorld(const hkpWorldCinfo& info, uint32_t sdkversion)
     const hkQuadReal& kMax = info.m_broadPhaseWorldAabb.m_max.m_quad;
     hkpCollisionInput::Aabb32Info& rAabb32 = pInput->m_aabb32Info;
     for (int32_t i = 0; i < 3; ++i) {
-        const float fExtent = kMax[i] - kMin[i];
-        rAabb32.m_bitScale.m_quad[i] = (1.0f / fExtent) * 2147352576.0f;
-        rAabb32.m_bitOffsetLow.m_quad[i] = -kMin[i];
-        rAabb32.m_bitOffsetHigh.m_quad[i] = 4.656897090171697e-10f * fExtent - kMin[i];
+        const float fExtent = XFNV_M128_F32(kMax, i) - XFNV_M128_F32(kMin, i);
+        XFNV_M128_F32(rAabb32.m_bitScale.m_quad, i) = (1.0f / fExtent) * 2147352576.0f;
+        XFNV_M128_F32(rAabb32.m_bitOffsetLow.m_quad, i) = -XFNV_M128_F32(kMin, i);
+        XFNV_M128_F32(rAabb32.m_bitOffsetHigh.m_quad, i) = 4.656897090171697e-10f * fExtent - XFNV_M128_F32(kMin, i);
     }
-    rAabb32.m_bitScale.m_quad[3] = 0.0f;
-    rAabb32.m_bitOffsetLow.m_quad[3] = 0.0f;
-    rAabb32.m_bitOffsetHigh.m_quad[3] = 0.0f;
+    XFNV_M128_F32(rAabb32.m_bitScale.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(rAabb32.m_bitOffsetLow.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(rAabb32.m_bitOffsetHigh.m_quad, 3) = 0.0f;
     m_broadPhase->set32BitOffsetAndScale(rAabb32.m_bitOffsetLow, rAabb32.m_bitOffsetHigh, rAabb32.m_bitScale);
     hkWorld_setupContactMgrFactories(this, m_collisionDispatcher);
 
@@ -1215,8 +1217,10 @@ hkpWorld::hkpWorld(const hkpWorldCinfo& info, uint32_t sdkversion)
 
     // The collision qualities, from the world's gravity this time.
     const hkQuadReal& kWorldGravity = m_gravity.m_quad;
-    fGravity = __builtin_sqrtf(
-        kWorldGravity[0] * kWorldGravity[0] + kWorldGravity[1] * kWorldGravity[1] + kWorldGravity[2] * kWorldGravity[2]
+    fGravity = std::sqrtf(
+        XFNV_M128_F32(kWorldGravity, 0) * XFNV_M128_F32(kWorldGravity, 0) +
+        XFNV_M128_F32(kWorldGravity, 1) * XFNV_M128_F32(kWorldGravity, 1) +
+        XFNV_M128_F32(kWorldGravity, 2) * XFNV_M128_F32(kWorldGravity, 2)
     );
     if (fGravity == 0.0f) {
         fGravity = 9.81f;

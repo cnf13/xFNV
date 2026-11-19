@@ -36,6 +36,7 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpFirstPersonGun.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -253,14 +254,14 @@ hkpGravityGun::hkpGravityGun()
     m_impulseAppliedWhenObjectNotPicked(100.0f), m_throwVelocity(50.0f) {
     m_type.m_storage = WEAPON_TYPE_GRAVITYGUN;
     m_name = "GravityGun";
-    m_capturedObjectPosition.m_quad[0] = 2.5f;
-    m_capturedObjectPosition.m_quad[1] = 0.6f;
-    m_capturedObjectPosition.m_quad[2] = 0.0f;
-    m_capturedObjectPosition.m_quad[3] = 0.0f;
-    m_capturedObjectsOffset.m_quad[0] = 0.0f;
-    m_capturedObjectsOffset.m_quad[1] = 1.0f;
-    m_capturedObjectsOffset.m_quad[2] = 0.0f;
-    m_capturedObjectsOffset.m_quad[3] = 0.0f;
+    XFNV_M128_F32(m_capturedObjectPosition.m_quad, 0) = 2.5f;
+    XFNV_M128_F32(m_capturedObjectPosition.m_quad, 1) = 0.6f;
+    XFNV_M128_F32(m_capturedObjectPosition.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(m_capturedObjectPosition.m_quad, 3) = 0.0f;
+    XFNV_M128_F32(m_capturedObjectsOffset.m_quad, 0) = 0.0f;
+    XFNV_M128_F32(m_capturedObjectsOffset.m_quad, 1) = 1.0f;
+    XFNV_M128_F32(m_capturedObjectsOffset.m_quad, 2) = 0.0f;
+    XFNV_M128_F32(m_capturedObjectsOffset.m_quad, 3) = 0.0f;
 }
 
 // The grabbed bodies array frees itself.
@@ -363,12 +364,12 @@ hkpGravityGun::pickBody(const hkTransform& viewTransform, const hkpRigidBody* ch
                     v29.setTransformedInversePos(
                         viewTransform, v7->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1
                     );
-                    double v8 = v29.m_quad[0];
-                    if (!(v29.m_quad[0] < 0.10000000149011612) && !(m_maxDistOfObjectPicked < v8) &&
+                    double v8 = XFNV_M128_F32(v29.m_quad, 0);
+                    if (!(XFNV_M128_F32(v29.m_quad, 0) < 0.10000000149011612) && !(m_maxDistOfObjectPicked < v8) &&
                         v7 != characterBody) {
-                        float v16 = std::fabs((double)v29.m_quad[2]);
+                        float v16 = std::fabs((double)XFNV_M128_F32(v29.m_quad, 2));
                         double v9 = v16;
-                        float v17 = std::fabs((double)v29.m_quad[1]);
+                        float v17 = std::fabs((double)XFNV_M128_F32(v29.m_quad, 1));
                         float v18 = v9 + v17;
                         float v19 = v18 / (v8 + 1.0);
                         float Mass = v7->m_motion.getMass();
@@ -508,7 +509,8 @@ hkpRigidBody* hkpGravityGun::dropObject(int32_t index) {
     hkpRigidBody* pBody = m_grabbedBodies.m_data[index];
     m_grabbedBodies.removeAtAndCopy(index);
     const __m128 kInertiaAndMassInv = pBody->m_motion.m_inertiaAndMassInv.m_quad;
-    float afMassInv = _mm_shuffle_ps(kInertiaAndMassInv, kInertiaAndMassInv, 255)[0] * 0.009999999776482582;
+    float afMassInv =
+        XFNV_M128_F32(_mm_shuffle_ps(kInertiaAndMassInv, kInertiaAndMassInv, 255), 0) * 0.009999999776482582;
     pBody->setMassInv(afMassInv);
     pBody->removeReference();
     return pBody;
@@ -528,7 +530,7 @@ void hkpGravityGun::gravityGunPush(
             _mm_shuffle_ps(_mm_set_ss(m_throwVelocity), _mm_set_ss(m_throwVelocity), 0),
             viewTransform.m_rotation.m_col0.m_quad
         );
-        arVelocity.m_quad[1] = arVelocity.m_quad[1] + 0.5;
+        XFNV_M128_F32(arVelocity.m_quad, 1) = XFNV_M128_F32(arVelocity.m_quad, 1) + 0.5;
         arVelocity.m_quad = _mm_add_ps(v6.m_quad, arVelocity.m_quad);
         v5->setLinearVelocity(arVelocity);
         v5->m_collidable.setQualityType(HK_COLLIDABLE_QUALITY_BULLET);
@@ -567,7 +569,9 @@ void hkpGravityGun::takeObject(hkpRigidBody* body) {
     }
     p_m_grabbedBodies->m_data[p_m_grabbedBodies->m_size++] = body;
     float v4 =
-        _mm_shuffle_ps(body->m_motion.m_inertiaAndMassInv.m_quad, body->m_motion.m_inertiaAndMassInv.m_quad, 255)[0] *
+        XFNV_M128_F32(
+            _mm_shuffle_ps(body->m_motion.m_inertiaAndMassInv.m_quad, body->m_motion.m_inertiaAndMassInv.m_quad, 255), 0
+        ) *
         100.0;
     body->setMassInv(v4);
 }
@@ -580,9 +584,12 @@ void hkpGravityGun::gravityGunPull(
     hkpRigidBody* body = pickBody(viewTransform, characterBody, world);
     if (body) {
         if (m_maxMassOfObjectPicked *
-                    _mm_shuffle_ps(
-                        body->m_motion.m_inertiaAndMassInv.m_quad, body->m_motion.m_inertiaAndMassInv.m_quad, 255
-                    )[0] <
+                    XFNV_M128_F32(
+                        _mm_shuffle_ps(
+                            body->m_motion.m_inertiaAndMassInv.m_quad, body->m_motion.m_inertiaAndMassInv.m_quad, 255
+                        ),
+                        0
+                    ) <
                 1.0 ||
             m_grabbedBodies.m_size >= m_maxNumObjectsPicked) {
             float impulse = -m_impulseAppliedWhenObjectNotPicked;

@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastInput.h"
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -114,10 +115,10 @@ void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, con
 
 void hkKdTreeCollidableRayBundleCaster::getHitFractions(hkVector4& hitFractions) const {
     hkpWorldRayCastOutput* m_output = this->m_output;
-    hitFractions.m_quad[0] = m_output->m_hitFraction;
-    hitFractions.m_quad[1] = m_output[1].m_hitFraction;
-    hitFractions.m_quad[2] = m_output[2].m_hitFraction;
-    hitFractions.m_quad[3] = m_output[3].m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 0) = m_output->m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 1) = m_output[1].m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 2) = m_output[2].m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 3) = m_output[3].m_hitFraction;
 }
 
 void hkKdTreeCollidableRayBundleCaster::operator delete(void* apMemory) {

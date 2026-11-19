@@ -4,6 +4,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSSpinLock.h"
+#include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSDecalManager.h"
 #include "Fallout Shared/ExtraDataList.h"
@@ -26,7 +27,6 @@ class BGSLightingTemplate;
 class BGSMusicType;
 class bhkPickData;
 class bhkWorldM;
-class BSMultiBoundNode;
 class BSPortalGraph;
 class CellMopp;
 class FOIslandActivationListener;

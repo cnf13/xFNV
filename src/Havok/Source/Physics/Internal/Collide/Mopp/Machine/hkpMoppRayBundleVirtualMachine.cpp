@@ -12,6 +12,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverCheck.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Code/hkpMoppCode.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -774,7 +775,7 @@ void hkpMoppRayBundleVirtualMachine::queryRayOnTree(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, acBuffer,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppRayBundleVirtualMachine.cpp", 838
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }

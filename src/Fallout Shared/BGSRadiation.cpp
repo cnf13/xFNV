@@ -11,6 +11,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cstdint>
 
@@ -43,7 +44,7 @@ bool BGSRadiationStage::Load(TESFile* apFile) {
         else if (eChunk == EDID_ID) {
             // A 16-byte aligned buffer of the chunk's size.
             uint32_t uiChunkSize = apFile->GetChunkSize();
-            char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+            char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
             // Cleared first because an empty chunk leaves the buffer unwritten; the game does not clear it.
             pEditorID[0] = '\0';
             apFile->GetChunkData(pEditorID, 0x200);

@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -98,8 +99,11 @@ void hkMathUtil::decompose4x4ColTransform(const float* matrixIn, Decomposition& 
 
     const hkMatrix4& scaleAndSkew = decompOut.m_scaleAndSkew;
     const __m128 scale = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(scaleAndSkew.m_col0.m_quad[0]), _mm_set_ss(scaleAndSkew.m_col2.m_quad[2])),
-        _mm_unpacklo_ps(_mm_set_ss(scaleAndSkew.m_col1.m_quad[1]), _mm_set_ss(0.0f))
+        _mm_unpacklo_ps(
+            _mm_set_ss(XFNV_M128_F32(scaleAndSkew.m_col0.m_quad, 0)),
+            _mm_set_ss(XFNV_M128_F32(scaleAndSkew.m_col2.m_quad, 2))
+        ),
+        _mm_unpacklo_ps(_mm_set_ss(XFNV_M128_F32(scaleAndSkew.m_col1.m_quad, 1)), _mm_set_ss(0.0f))
     );
     decompOut.m_scale.m_quad = scale;
     const __m128 eps = _mm_set1_ps(0.001f);
@@ -115,10 +119,10 @@ void hkMathUtil::decompose4x4ColTransform(const float* matrixIn, Decomposition& 
     scaleInv.m_col1.m_quad = _mm_setzero_ps();
     scaleInv.m_col2.m_quad = _mm_setzero_ps();
     scaleInv.m_col3.m_quad = _mm_setzero_ps();
-    scaleInv.m_col0.m_quad[0] = 1.0f / decompOut.m_scale.m_quad[0];
-    scaleInv.m_col1.m_quad[1] = 1.0f / decompOut.m_scale.m_quad[1];
-    scaleInv.m_col2.m_quad[2] = 1.0f / decompOut.m_scale.m_quad[2];
-    scaleInv.m_col3.m_quad[3] = 1.0f;
+    XFNV_M128_F32(scaleInv.m_col0.m_quad, 0) = 1.0f / XFNV_M128_F32(decompOut.m_scale.m_quad, 0);
+    XFNV_M128_F32(scaleInv.m_col1.m_quad, 1) = 1.0f / XFNV_M128_F32(decompOut.m_scale.m_quad, 1);
+    XFNV_M128_F32(scaleInv.m_col2.m_quad, 2) = 1.0f / XFNV_M128_F32(decompOut.m_scale.m_quad, 2);
+    XFNV_M128_F32(scaleInv.m_col3.m_quad, 3) = 1.0f;
     decompOut.m_skew.setMul(scaleInv, decompOut.m_scaleAndSkew);
 
     const hkMatrix4& skew = decompOut.m_skew;

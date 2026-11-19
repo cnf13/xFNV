@@ -43,6 +43,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 #include <cmath>
 #include <cstdint>
@@ -65,7 +66,7 @@ bool TESEffectShader::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten (see above), so it is cleared first; the game does not do
                 // this.
                 pBuffer[0] = '\0';

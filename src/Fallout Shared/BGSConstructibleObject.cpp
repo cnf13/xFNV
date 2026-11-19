@@ -22,6 +22,7 @@
 #include "Fallout Shared/TESValueForm.h"
 #include "Fallout Shared/TESWeightForm.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSConstructibleObject::BGSConstructibleObject() : TESObjectMISC() {
     SetFormType(50u);
@@ -55,13 +56,13 @@ bool BGSConstructibleObject::Load(TESFile* apFile) {
         else if (uiChunk == MODS_ID) {
             // A 16-byte aligned buffer of the chunk's size.
             uint32_t uiDataSize = apFile->GetChunkSize();
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiDataSize, 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiDataSize));
             apFile->GetChunkData(pBuffer, uiDataSize);
             UnpackTextureSwapChunkData(pBuffer, uiDataSize, apFile->GetFormVersion());
         }
         else if (uiChunk == EDID_ID) {
             // A 16-byte aligned stack buffer of the chunk's size, read up to 0x200.
-            char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+            char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
             apFile->GetChunkData(pBuffer, 0x200);
             SetFormEditorID(pBuffer);
         }

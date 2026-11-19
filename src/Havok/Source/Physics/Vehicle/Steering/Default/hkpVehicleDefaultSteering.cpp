@@ -22,6 +22,7 @@
 #include "Havok/Source/Physics/Vehicle/Steering/hkpVehicleSteering.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleData.h"
 #include "Havok/Source/Physics/Vehicle/hkpVehicleInstance.h"
+#include "xfnv/Compiler.h"
 
 #include <xmmintrin.h>
 
@@ -129,7 +130,8 @@ void hkpVehicleDefaultSteering::calcMainSteeringAngle(
     steeringOutput.m_mainSteeringAngle = filteredInfoOutput.m_steeringWheelInput * m_maxSteeringAngle;
     v11.setRotatedDir(p_m_motionState->m_transform.m_rotation, *p_m_col1);
     __m128 v7 = _mm_mul_ps(vehicle->m_entity->m_motion.m_linearVelocity.m_quad, v11.m_quad);
-    float v8 = _mm_shuffle_ps(v7, v7, 170)[0] + (_mm_shuffle_ps(v7, v7, 85)[0] + v7[0]);
+    float v8 = XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+        (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0));
     if (m_maxSpeedFullSteeringAngle < static_cast<double>(v8)) {
         float v10 = m_maxSpeedFullSteeringAngle / v8;
         steeringOutput.m_mainSteeringAngle = steeringOutput.m_mainSteeringAngle * v10 * v10;

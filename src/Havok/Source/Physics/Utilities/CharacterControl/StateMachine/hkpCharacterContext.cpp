@@ -9,6 +9,7 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterState.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <xmmintrin.h>
@@ -67,9 +68,10 @@ void hkpCharacterContext::update(const hkpCharacterInput& input, hkpCharacterOut
         double v14;
         __m128 m_quad = output.m_velocity.m_quad;
         __m128 v8 = _mm_mul_ps(m_quad, m_quad);
-        float v9 = _mm_cvtss_f32(
-            _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v8, v8, 170)[0] + (_mm_shuffle_ps(v8, v8, 85)[0] + v8[0]))))
-        );
+        float v9 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+            (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 170), 0) +
+             (XFNV_M128_F32(_mm_shuffle_ps(v8, v8, 85), 0) + XFNV_M128_F32(v8, 0)))
+        )));
         if (m_maxLinearVelocity < static_cast<double>(v9)) {
             *reinterpret_cast<float*>(&vars0b) = m_maxLinearVelocity / v9;
             output.m_velocity.m_quad = _mm_mul_ps(
@@ -86,10 +88,10 @@ void hkpCharacterContext::update(const hkpCharacterInput& input, hkpCharacterOut
             _mm_sub_ps(output.m_velocity.m_quad, v10.m_quad)
         );
         __m128 v12 = _mm_mul_ps(v11, v11);
-        double v13 =
-            _mm_cvtss_f32(
-                _mm_sqrt_ss(_mm_set_ss((_mm_shuffle_ps(v12, v12, 170)[0] + (_mm_shuffle_ps(v12, v12, 85)[0] + v12[0]))))
-            ) /
+        double v13 = _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(
+                         (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 170), 0) +
+                          (XFNV_M128_F32(_mm_shuffle_ps(v12, v12, 85), 0) + XFNV_M128_F32(v12, 0)))
+                     ))) /
             m_maxLinearAcceleration;
         output.m_velocity.m_quad = v10.m_quad;
         float vars0 = v13;

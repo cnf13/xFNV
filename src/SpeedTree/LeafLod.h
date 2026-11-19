@@ -1,7 +1,6 @@
 #pragma once
 
-#include <__stddef_ptrdiff_t.h>
-#include <__stddef_size_t.h>
+#include <cstddef>
 #include <memory>
 #include <stdint.h>
 #include <vector>

@@ -30,10 +30,10 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
 #include "SDK/Windows/winbase.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
-#include <x86intrin.h>
 #include <xmmintrin.h>
 
 // Extracts one transform track's frames into translation, rotation and scale arrays.
@@ -847,7 +847,7 @@ void hkaSplineCompressedAnimation::sampleFloat(
         double m_frameDuration = this->m_frameDuration;
         I_.m_quad = _mm_setzero_ps();
         readNURBSCurve(dataInOut, quantizedTime, m_frameDuration, u, mask, scalarQuantizationType, I_, out_);
-        out = out_.m_quad[0];
+        out = XFNV_M128_F32(out_.m_quad, 0);
     }
     else {
         out = 0.0f;
@@ -1284,49 +1284,56 @@ uint8_t hkaSplineCompressedAnimation::isStatic(
     float v23;
     float v28;
     float v29;
-    float v8 = mean.m_quad[0] - minp.m_quad[0];
+    float v8 = XFNV_M128_F32(mean.m_quad, 0) - XFNV_M128_F32(minp.m_quad, 0);
     float v9 = std::fabs((double)v8);
     double v5 = tol;
     if (!(tol >= static_cast<double>(v9)) ||
-        (v10 = mean.m_quad[0] - maxp.m_quad[0], (v11 = std::fabs((double)v10), !(v11 <= v5)))) {
+        (v10 = XFNV_M128_F32(mean.m_quad, 0) - XFNV_M128_F32(maxp.m_quad, 0),
+         (v11 = std::fabs((double)v10), !(v11 <= v5)))) {
         v6 = 16;
     }
     else {
-        float v12 = mean.m_quad[0] - a5.m_quad[0];
+        float v12 = XFNV_M128_F32(mean.m_quad, 0) - XFNV_M128_F32(a5.m_quad, 0);
         float v13 = std::fabs((double)v12);
         v6 = v13 > v5;
     }
-    float v14 = mean.m_quad[1] - minp.m_quad[1];
+    float v14 = XFNV_M128_F32(mean.m_quad, 1) - XFNV_M128_F32(minp.m_quad, 1);
     float v15 = std::fabs((double)v14);
-    if (!(v15 <= v5) || (v16 = mean.m_quad[1] - maxp.m_quad[1], (v17 = std::fabs((double)v16), !(v17 <= v5)))) {
+    if (!(v15 <= v5) ||
+        (v16 = XFNV_M128_F32(mean.m_quad, 1) - XFNV_M128_F32(maxp.m_quad, 1),
+         (v17 = std::fabs((double)v16), !(v17 <= v5)))) {
         v6 |= 32u;
     }
     else {
-        float v18 = mean.m_quad[1] - a5.m_quad[1];
+        float v18 = XFNV_M128_F32(mean.m_quad, 1) - XFNV_M128_F32(a5.m_quad, 1);
         float v19 = std::fabs((double)v18);
         if (!(v19 <= v5)) {
             v6 |= 2u;
         }
     }
-    float v20 = mean.m_quad[2] - minp.m_quad[2];
+    float v20 = XFNV_M128_F32(mean.m_quad, 2) - XFNV_M128_F32(minp.m_quad, 2);
     float v21 = std::fabs((double)v20);
-    if (!(v21 <= v5) || (v22 = mean.m_quad[2] - maxp.m_quad[2], (v23 = std::fabs((double)v22), !(v23 <= v5)))) {
+    if (!(v21 <= v5) ||
+        (v22 = XFNV_M128_F32(mean.m_quad, 2) - XFNV_M128_F32(maxp.m_quad, 2),
+         (v23 = std::fabs((double)v22), !(v23 <= v5)))) {
         v6 |= 64u;
     }
     else {
-        float v24 = mean.m_quad[2] - a5.m_quad[2];
+        float v24 = XFNV_M128_F32(mean.m_quad, 2) - XFNV_M128_F32(a5.m_quad, 2);
         float v25 = std::fabs((double)v24);
         if (!(v25 <= v5)) {
             v6 |= 4u;
         }
     }
-    float v26 = mean.m_quad[3] - minp.m_quad[3];
+    float v26 = XFNV_M128_F32(mean.m_quad, 3) - XFNV_M128_F32(minp.m_quad, 3);
     float v27 = std::fabs((double)v26);
-    if (!(v27 <= v5) || (v28 = mean.m_quad[3] - maxp.m_quad[3], (v29 = std::fabs((double)v28), !(v29 <= v5)))) {
+    if (!(v27 <= v5) ||
+        (v28 = XFNV_M128_F32(mean.m_quad, 3) - XFNV_M128_F32(maxp.m_quad, 3),
+         (v29 = std::fabs((double)v28), !(v29 <= v5)))) {
         v6 |= 128u;
     }
     else {
-        float v30 = mean.m_quad[3] - a5.m_quad[3];
+        float v30 = XFNV_M128_F32(mean.m_quad, 3) - XFNV_M128_F32(a5.m_quad, 3);
         float v31 = std::fabs((double)v30);
         if (!(v31 <= v5)) {
             return v6 | 8;
@@ -1538,17 +1545,17 @@ void hkaSplineCompressedAnimation::evaluateSimple2(
     *reinterpret_cast<float*>(&v15) = time - a3[1];
     __m128 v6 = _mm_set_ss(std::bit_cast<float>(v15));
     float v16 = a3[2] - time;
-    float v8 = 1.0f / (v16 + v6[0]);
+    float v8 = 1.0f / (v16 + XFNV_M128_F32(v6, 0));
     *reinterpret_cast<float*>(&v17) = time - *a3;
     __m128 v10 = _mm_set_ss(std::bit_cast<float>(v17));
     float v11 = (v16 * v8) + 0.0f;
     float v12 = v16 + *reinterpret_cast<float*>(&v17);
     float v18 = a3[3] - time;
     float v13 = v11 / v12;
-    v5[0] = (v16 * v13) + 0.0f;
-    float v14 = (v6[0] * v8) / (v18 + v6[0]);
-    v6[0] = v6[0] * v14;
-    v10[0] = (v10[0] * v13) + (v18 * v14);
+    XFNV_M128_F32(v5, 0) = (v16 * v13) + 0.0f;
+    float v14 = (XFNV_M128_F32(v6, 0) * v8) / (v18 + XFNV_M128_F32(v6, 0));
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) * v14;
+    XFNV_M128_F32(v10, 0) = (XFNV_M128_F32(v10, 0) * v13) + (v18 * v14);
     a5.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_mul_ps(_mm_shuffle_ps(v10, v10, 0), a4[1].m_quad), _mm_mul_ps(_mm_shuffle_ps(v5, v5, 0), a4->m_quad)
@@ -1571,7 +1578,7 @@ void hkaSplineCompressedAnimation::evaluateSimple3(
     *reinterpret_cast<float*>(&v20) = time - a3[2];
     __m128 v6 = _mm_set_ss(std::bit_cast<float>(v20));
     float v21 = a3[3] - time;
-    float v8 = 1.0f / (v21 + v6[0]);
+    float v8 = 1.0f / (v21 + XFNV_M128_F32(v6, 0));
     float v9 = v21 * v8;
     *reinterpret_cast<float*>(&v22) = time - a3[1];
     __m128 v10 = _mm_set_ss(std::bit_cast<float>(v22));
@@ -1579,18 +1586,18 @@ void hkaSplineCompressedAnimation::evaluateSimple3(
     float v12 = v21 + *reinterpret_cast<float*>(&v22);
     float v23 = a3[4] - time;
     float v26 = v11 / v12;
-    float v14 = v23 + v6[0];
+    float v14 = v23 + XFNV_M128_F32(v6, 0);
     *reinterpret_cast<float*>(&v24) = time - *a3;
     __m128 v27 = _mm_set_ss(std::bit_cast<float>(v24));
-    float v15 = (v6[0] * v8) / v14;
+    float v15 = (XFNV_M128_F32(v6, 0) * v8) / v14;
     float v25 = a3[5] - time;
-    float v16 = ((v21 * v26) + 0.0f) / (v21 + v27[0]);
-    v5[0] = (v21 * v16) + 0.0f;
-    float v17 = ((v10[0] * v26) + (v23 * v15)) / (v23 + v10[0]);
-    v27[0] = (v27[0] * v16) + (v23 * v17);
-    float v19 = (v6[0] * v15) / (v25 + v6[0]);
-    v6[0] = v6[0] * v19;
-    v10[0] = (v10[0] * v17) + (v25 * v19);
+    float v16 = ((v21 * v26) + 0.0f) / (v21 + XFNV_M128_F32(v27, 0));
+    XFNV_M128_F32(v5, 0) = (v21 * v16) + 0.0f;
+    float v17 = ((XFNV_M128_F32(v10, 0) * v26) + (v23 * v15)) / (v23 + XFNV_M128_F32(v10, 0));
+    XFNV_M128_F32(v27, 0) = (XFNV_M128_F32(v27, 0) * v16) + (v23 * v17);
+    float v19 = (XFNV_M128_F32(v6, 0) * v15) / (v25 + XFNV_M128_F32(v6, 0));
+    XFNV_M128_F32(v6, 0) = XFNV_M128_F32(v6, 0) * v19;
+    XFNV_M128_F32(v10, 0) = (XFNV_M128_F32(v10, 0) * v17) + (v25 * v19);
     a5.m_quad = _mm_add_ps(
         _mm_add_ps(
             _mm_add_ps(
@@ -1607,7 +1614,7 @@ void hkaSplineCompressedAnimation::evaluateSimple1(float u, int32_t p, float* U,
     *reinterpret_cast<float*>(&v8) = u - *U;
     __m128 v5 = _mm_set_ss(std::bit_cast<float>(v8));
     float v9 = U[1] - u;
-    v5[0] = v5[0] / (v9 + v5[0]);
+    XFNV_M128_F32(v5, 0) = XFNV_M128_F32(v5, 0) / (v9 + XFNV_M128_F32(v5, 0));
     __m128 v6 = _mm_shuffle_ps(v5, v5, 0);
     out.m_quad = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, v6), P->m_quad), _mm_mul_ps(P[1].m_quad, v6));
 }

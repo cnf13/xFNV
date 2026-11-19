@@ -40,6 +40,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 #include <cstring>
 
@@ -734,7 +735,7 @@ bool Script::Load(TESFile* pFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = pFile->GetChunkSize();
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // An empty chunk leaves the buffer unwritten, so it is cleared first (see above).
                 pBuffer[0] = '\0';
                 pFile->GetChunkData(pBuffer, 0x200);
@@ -759,7 +760,7 @@ bool Script::Load(TESFile* pFile) {
                 if (pVariable) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = pFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                     // An empty chunk leaves the buffer unwritten, so it is cleared first (see above).
                     pBuffer[0] = '\0';
                     pFile->GetChunkData(pBuffer, 0x200);

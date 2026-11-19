@@ -22,6 +22,7 @@
 #include "Havok/Source/Common/Visualize/Shape/hkDisplayPlane.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplaySemiCircle.h"
 #include "Havok/Source/Common/Visualize/Shape/hkDisplaySphere.h"
+#include "xfnv/Compiler.h"
 
 hkDisplaySerializeOStream::hkDisplaySerializeOStream(hkArray<char, hkContainerHeapAllocator>& a1)
   : hkOArchive(a1, hkBool(false)) {}
@@ -149,7 +150,7 @@ void hkDisplaySerializeOStream::writeDisplayGeometry(hkDisplayGeometry* dg) {
             hkVector4* PerpToNormal = &static_cast<hkDisplayPlane*>(dg)->hkDisplayPlane::getPerpToNormal();
             writeQuadVector4(*PerpToNormal);
             hkVector4* Extents = &static_cast<hkDisplayPlane*>(dg)->hkDisplayPlane::getExtents();
-            writeFloat32(Extents->m_quad[0]);
+            writeFloat32(XFNV_M128_F32(Extents->m_quad, 0));
             break;
         }
         case HK_DISPLAY_CAPSULE: {

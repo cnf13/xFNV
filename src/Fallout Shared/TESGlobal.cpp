@@ -6,6 +6,7 @@
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 TESGlobal::TESGlobal() : TESForm(), strEditorID(), cType('s'), fValue(0.0f) {
     SetFormType(GLOB_ID);
@@ -28,7 +29,7 @@ bool TESGlobal::Load(TESFile* apFile) {
         // The switch compares the record code signed.
         switch (static_cast<int32_t>(iChunk)) {
             case 0x44494445: { // 'EDID'
-                char* pEditorID = static_cast<char*>(__builtin_alloca(apFile->GetChunkSize()));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA(apFile->GetChunkSize()));
                 apFile->GetChunkData(pEditorID, 0x200);
                 SetFormEditorID(pEditorID);
                 break;

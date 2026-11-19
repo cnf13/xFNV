@@ -15,6 +15,7 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Physics/Collide/Shape/HeightField/Plane/hkpPlaneShape.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 
@@ -51,22 +52,26 @@ void bhkPlaneShape::LoadBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&v2->m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkPlaneShapeCinfo* v4 = static_cast<hkPlaneShapeCinfo*>(&CreateCinfo(bCreated));
-        v4->m_plane.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_plane.fX)));
-        v4->m_plane.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_plane.fY)));
-        v4->m_plane.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_plane.fZ)));
-        v4->m_plane.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_plane.fW)));
+        v4->m_plane.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_plane.fX)));
+        v4->m_plane.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_plane.fY)));
+        v4->m_plane.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_plane.fZ)));
+        v4->m_plane.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_plane.fW)));
         v4->m_aabbHalfExtents.fX =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fX)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fX)));
         v4->m_aabbHalfExtents.fY =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fY)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fY)));
         v4->m_aabbHalfExtents.fZ =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fZ)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fZ)));
         v4->m_aabbHalfExtents.fW =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fW)));
-        v4->m_aabbCenter.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbCenter.fX)));
-        v4->m_aabbCenter.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbCenter.fY)));
-        v4->m_aabbCenter.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbCenter.fZ)));
-        v4->m_aabbCenter.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(v4->m_aabbCenter.fW)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbHalfExtents.fW)));
+        v4->m_aabbCenter.fX =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbCenter.fX)));
+        v4->m_aabbCenter.fY =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbCenter.fY)));
+        v4->m_aabbCenter.fZ =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbCenter.fZ)));
+        v4->m_aabbCenter.fW =
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(v4->m_aabbCenter.fW)));
     }
 }
 
@@ -76,49 +81,49 @@ void bhkPlaneShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkPlaneShapeCinfo* pCinfo = static_cast<hkPlaneShapeCinfo*>(&CreateCinfo(bCreated));
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        pCinfo->m_plane.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fX)));
-        pCinfo->m_plane.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fY)));
-        pCinfo->m_plane.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fZ)));
-        pCinfo->m_plane.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fW)));
+        pCinfo->m_plane.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fX)));
+        pCinfo->m_plane.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fY)));
+        pCinfo->m_plane.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fZ)));
+        pCinfo->m_plane.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fW)));
         pCinfo->m_aabbHalfExtents.fX =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fX)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fX)));
         pCinfo->m_aabbHalfExtents.fY =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fY)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fY)));
         pCinfo->m_aabbHalfExtents.fZ =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fZ)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fZ)));
         pCinfo->m_aabbHalfExtents.fW =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fW)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fW)));
         pCinfo->m_aabbCenter.fX =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fX)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fX)));
         pCinfo->m_aabbCenter.fY =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fY)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fY)));
         pCinfo->m_aabbCenter.fZ =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fZ)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fZ)));
         pCinfo->m_aabbCenter.fW =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fW)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fW)));
     }
     bhkShape::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        pCinfo->m_plane.fX = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fX)));
-        pCinfo->m_plane.fY = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fY)));
-        pCinfo->m_plane.fZ = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fZ)));
-        pCinfo->m_plane.fW = std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_plane.fW)));
+        pCinfo->m_plane.fX = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fX)));
+        pCinfo->m_plane.fY = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fY)));
+        pCinfo->m_plane.fZ = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fZ)));
+        pCinfo->m_plane.fW = std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_plane.fW)));
         pCinfo->m_aabbHalfExtents.fX =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fX)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fX)));
         pCinfo->m_aabbHalfExtents.fY =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fY)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fY)));
         pCinfo->m_aabbHalfExtents.fZ =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fZ)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fZ)));
         pCinfo->m_aabbHalfExtents.fW =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fW)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbHalfExtents.fW)));
         pCinfo->m_aabbCenter.fX =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fX)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fX)));
         pCinfo->m_aabbCenter.fY =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fY)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fY)));
         pCinfo->m_aabbCenter.fZ =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fZ)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fZ)));
         pCinfo->m_aabbCenter.fW =
-            std::bit_cast<float>(__builtin_bswap32(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fW)));
+            std::bit_cast<float>(std::byteswap<uint32_t>(std::bit_cast<uint32_t>(pCinfo->m_aabbCenter.fW)));
     }
 }
 
@@ -142,7 +147,7 @@ void bhkPlaneShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     HK2NI(kNormal, kPlane);
     pcString = kNormal.GetViewerString("Normal");
     apStrings->Add(pcString);
-    pcString = NiGetViewerString("Constant", kPlane.m_quad[3]);
+    pcString = NiGetViewerString("Constant", XFNV_M128_F32(kPlane.m_quad, 3));
     apStrings->Add(pcString);
 }
 

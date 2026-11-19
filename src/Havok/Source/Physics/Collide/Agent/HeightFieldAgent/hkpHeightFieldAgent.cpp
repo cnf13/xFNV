@@ -42,6 +42,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
+#include "xfnv/Compiler.h"
 
 // With a contact manager, one invalid contact point id per collision sphere of body A's shape.
 hkpHeightFieldAgent::hkpHeightFieldAgent(
@@ -159,7 +160,7 @@ void hkpHeightFieldAgent::processCollision(
             point->m_contact.m_position.setTransformedPos(hfTransform, cpPos);
             point->m_contact.m_separatingNormal._setRotatedDir(hfBody.m_motion.pState->m_transform.m_rotation, *output);
             // The distance.
-            point->m_contact.m_separatingNormal.m_quad[3] = (*output)(3);
+            XFNV_M128_F32(point->m_contact.m_separatingNormal.m_quad, 3) = (*output)(3);
             if (*cpId == 0xFFFF) {
                 const uint16_t id =
                     m_contactMgr->addContactPointImpl(csBody, hfBody, input, result, nullptr, point->m_contact);
@@ -424,7 +425,7 @@ void hkHeightFieldRayForwardingCollector::addRayHit(
     point.m_contact.m_position.m_quad = pos;
     point.m_contact.m_separatingNormal._setRotatedDir(cdBody.m_motion.pState->m_transform.m_rotation, hitInfo.m_normal);
     const hkQuadReal normal = point.m_contact.m_separatingNormal.m_quad;
-    point.m_contact.m_separatingNormal.m_quad[3] = hitInfo.m_hitFraction;
+    XFNV_M128_F32(point.m_contact.m_separatingNormal.m_quad, 3) = hitInfo.m_hitFraction;
     const hkQuadReal r = _mm_set_ss(negRadius);
     point.m_contact.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), normal), pos);
     m_collector.addCdPoint(point);

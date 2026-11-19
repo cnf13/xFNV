@@ -8,6 +8,7 @@
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Physics/Internal/Collide/Mopp/Machine/hkpMoppVirtualMachine.h"
+#include "xfnv/Compiler.h"
 
 // Walks the MOPP code from assertBuf and appends every terminal under it, offset by the query's primitive offset, to
 // m_primitives_out; each node's both children are walked (the first through a recursive call). The query is
@@ -198,7 +199,7 @@ void hkpMoppFindAllVirtualMachine::queryOnTree(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppFindAllVirtualMachine.cpp", 113
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -365,7 +366,7 @@ void hkpMoppFindAllVirtualMachine::queryOnTreeLeft(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppFindAllVirtualMachine.cpp", 305
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }
@@ -533,7 +534,7 @@ void hkpMoppFindAllVirtualMachine::queryOnTreeRight(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppFindAllVirtualMachine.cpp", 211
                     )) {
-                    __builtin_debugtrap();
+                    xfnv::DebugTrap();
                 }
                 continue;
             }

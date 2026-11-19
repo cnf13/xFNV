@@ -21,6 +21,7 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h"
+#include "xfnv/Compiler.h"
 
 #include <bit>
 #include <cmath>
@@ -101,15 +102,15 @@ void hkpCylinderShape::getAabbImpl(const hkTransform& localToWorld, float tolera
     const __m128 kInvLength = _mm_rsqrt_ss(kLength2);
     hkVector4 axis;
     axis.m_quad = _mm_mul_ps(_mm_shuffle_ps(kInvLength, kInvLength, 0), kDir);
-    const float fSinX2 = 1.0099999904632568 - axis.m_quad[0] * axis.m_quad[0];
+    const float fSinX2 = 1.0099999904632568 - XFNV_M128_F32(axis.m_quad, 0) * XFNV_M128_F32(axis.m_quad, 0);
     const float fSinX = std::sqrt(fSinX2);
-    axis.m_quad[0] = fSinX;
-    const float fSinY2 = 1.0099999904632568 - axis.m_quad[1] * axis.m_quad[1];
+    XFNV_M128_F32(axis.m_quad, 0) = fSinX;
+    const float fSinY2 = 1.0099999904632568 - XFNV_M128_F32(axis.m_quad, 1) * XFNV_M128_F32(axis.m_quad, 1);
     const float fSinY = std::sqrt(fSinY2);
-    axis.m_quad[1] = fSinY;
-    const float fSinZ2 = 1.0099999904632568 - axis.m_quad[2] * axis.m_quad[2];
+    XFNV_M128_F32(axis.m_quad, 1) = fSinY;
+    const float fSinZ2 = 1.0099999904632568 - XFNV_M128_F32(axis.m_quad, 2) * XFNV_M128_F32(axis.m_quad, 2);
     const float fSinZ = std::sqrt(fSinZ2);
-    axis.m_quad[2] = fSinZ;
+    XFNV_M128_F32(axis.m_quad, 2) = fSinZ;
     const float fRadius = m_radius + tolerance;
     const __m128 kExtent = _mm_add_ps(
         _mm_shuffle_ps(_mm_set_ss(fRadius), _mm_set_ss(fRadius), 0),
@@ -326,7 +327,7 @@ const hkSphere* hkpCylinderShape::getCollisionSpheresImpl(hkSphere* sphereBuffer
     for (int32_t n = 2; n != 0; --n) {
         hkVector4 centre;
         centre.m_quad = pVertex->m_quad;
-        centre.m_quad[3] = radius;
+        XFNV_M128_F32(centre.m_quad, 3) = radius;
         pSphere[0].m_pos.m_quad = _mm_add_ps(centre.m_quad, ring1);
         pSphere[1].m_pos.m_quad = _mm_add_ps(centre.m_quad, diagSum);
         pSphere[2].m_pos.m_quad = _mm_add_ps(centre.m_quad, ring2);
@@ -348,8 +349,8 @@ const hkSphere* hkpCylinderShape::getCollisionSpheresImpl(hkSphere* sphereBuffer
     float capRadius = radius + capOffset;
     sphereBuffer[16].m_pos.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(capOffset), normal), m_vertexA.m_quad);
     sphereBuffer[17].m_pos.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(negCapOffset), normal), m_vertexB.m_quad);
-    sphereBuffer[16].m_pos.m_quad[3] = capRadius;
-    sphereBuffer[17].m_pos.m_quad[3] = capRadius;
+    XFNV_M128_F32(sphereBuffer[16].m_pos.m_quad, 3) = capRadius;
+    XFNV_M128_F32(sphereBuffer[17].m_pos.m_quad, 3) = capRadius;
     return sphereBuffer;
 }
 
@@ -502,8 +503,8 @@ void hkpCylinderShape::getCentreImpl(hkVector4& centreOut) const {
 
 void hkpCylinderShape::setCylinderRadius(float radius) {
     m_cylRadius = radius;
-    m_vertexA.m_quad[3] = m_radius + radius;
-    m_vertexB.m_quad[3] = radius + m_radius;
+    XFNV_M128_F32(m_vertexA.m_quad, 3) = m_radius + radius;
+    XFNV_M128_F32(m_vertexB.m_quad, 3) = radius + m_radius;
 }
 
 float hkpCylinderShape::getCylinderRadius() const {
@@ -530,9 +531,9 @@ void hkpCylinderShape::presetPerpendicularVector() {
     );
     hkVector4 axis;
     axis.m_quad = _mm_mul_ps(_mm_shuffle_ps(axisLenInv, axisLenInv, 0), axisRaw);
-    float absX = std::fabs(axis.m_quad[0]);
-    float absY = std::fabs(axis.m_quad[1]);
-    float absZ = std::fabs(axis.m_quad[2]);
+    float absX = std::fabs(XFNV_M128_F32(axis.m_quad, 0));
+    float absY = std::fabs(XFNV_M128_F32(axis.m_quad, 1));
+    float absZ = std::fabs(XFNV_M128_F32(axis.m_quad, 2));
     int32_t i = 0;
     int32_t j = 1;
     int32_t k = 2;
@@ -546,8 +547,8 @@ void hkpCylinderShape::presetPerpendicularVector() {
         k = i;
     }
     m_perpendicular1.m_quad = _mm_setzero_ps();
-    m_perpendicular1.m_quad[j] = axis.m_quad[k];
-    m_perpendicular1.m_quad[k] = -axis.m_quad[j];
+    XFNV_M128_F32(m_perpendicular1.m_quad, j) = XFNV_M128_F32(axis.m_quad, k);
+    XFNV_M128_F32(m_perpendicular1.m_quad, k) = -XFNV_M128_F32(axis.m_quad, j);
     const __m128 perp = m_perpendicular1.m_quad;
     const __m128 perpSq = _mm_mul_ps(perp, perp);
     const __m128 perpLen2 =

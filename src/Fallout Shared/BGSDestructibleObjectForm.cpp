@@ -77,6 +77,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 DestructibleRefsTakingDamageMap BGSDestructibleObjectForm::DestructibleObjects(37);
 
@@ -1221,7 +1222,7 @@ void BGSDestructibleObjectForm::LoadChunk(BGSDestructibleObjectForm* apDestruct,
                                 Data->pStagesArray[cStageNum]->CreateReplacementModel();
                                 uint32_t uiDataSize = apFile->GetChunkSize();
                                 // A 16-byte aligned stack buffer of the chunk's size.
-                                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiDataSize, 128));
+                                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiDataSize));
                                 apFile->GetChunkData(pBuffer, uiDataSize);
                                 uint16_t FormVersion = apFile->GetFormVersion();
                                 Data->pStagesArray[cStageNum]->pReplacementModel->UnpackTextureSwapChunkData(
@@ -1235,8 +1236,7 @@ void BGSDestructibleObjectForm::LoadChunk(BGSDestructibleObjectForm* apDestruct,
                             case DMDL_ID: {
                                 Data->pStagesArray[cStageNum]->CreateReplacementModel();
                                 // A 16-byte aligned buffer of the chunk's size, read with no size limit.
-                                char* pBuffer =
-                                    static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                                 apFile->GetChunkData(pBuffer, 0);
                                 Data->pStagesArray[cStageNum]->pReplacementModel->SetModel(pBuffer);
                                 break;

@@ -14,6 +14,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESSoundFile.h"
 #include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
 
 BGSMusicType::MusicFileEntry::MusicFileEntry(char* apFilename) {
     ourStrcpy(cFilename, apFilename);
@@ -55,14 +56,14 @@ bool BGSMusicType::Load(TESFile* apFile) {
             }
             case EDID_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0x200u);
                 static_cast<TESForm*>(this)->SetFormEditorID(pBuffer);
                 break;
             }
             case FNAM_ID: {
                 // A 16-byte aligned buffer of the chunk's size.
-                char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(apFile->GetChunkSize(), 128));
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
                 apFile->GetChunkData(pBuffer, 0);
                 static_cast<TESSoundFile*>(this)->SetSoundFile(pBuffer);
                 break;

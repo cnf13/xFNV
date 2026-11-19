@@ -20,6 +20,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
+#include "xfnv/Compiler.h"
 
 // Reads the faction's chunks. RNAM starts a new rank; the MNAM, FNAM and INAM chunks after it fill that rank's titles
 // and insignia. When a chunk is empty (malformed data), the EDID, MNAM, FNAM and INAM buffers and the old-format flags
@@ -32,7 +33,7 @@ bool TESFaction::Load(TESFile* apFile) {
             case EDID_ID: {
                 // A 16-byte aligned stack buffer of the chunk's size.
                 uint32_t uiChunkSize = apFile->GetChunkSize();
-                char* pEditorID = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                char* pEditorID = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                 // Not done by the game: the buffer is cleared first because an empty chunk leaves it unwritten (see
                 // above).
                 pEditorID[0] = '\0';
@@ -82,7 +83,7 @@ bool TESFaction::Load(TESFile* apFile) {
                 if (pRankData) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                     // Not done by the game: the buffer is cleared first because an empty chunk leaves it unwritten (see
                     // above).
                     pBuffer[0] = '\0';
@@ -94,7 +95,7 @@ bool TESFaction::Load(TESFile* apFile) {
                 if (pRankData) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                     // Not done by the game: the buffer is cleared first because an empty chunk leaves it unwritten (see
                     // above).
                     pBuffer[0] = '\0';
@@ -106,7 +107,7 @@ bool TESFaction::Load(TESFile* apFile) {
                 if (pRankData) {
                     // A 16-byte aligned stack buffer of the chunk's size.
                     uint32_t uiChunkSize = apFile->GetChunkSize();
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(uiChunkSize ? uiChunkSize : 1, 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiChunkSize ? uiChunkSize : 1));
                     // Not done by the game: the buffer is cleared first because an empty chunk leaves it unwritten (see
                     // above).
                     pBuffer[0] = '\0';

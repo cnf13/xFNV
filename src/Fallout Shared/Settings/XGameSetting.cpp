@@ -3,6 +3,7 @@
 #include "BSMain/SettingCollection.h"
 #include "BSMain/SettingCollectionMap.h"
 #include "Fallout Shared/TESFile.h"
+#include "xfnv/Compiler.h"
 
 void SettingCollection::SetFileName(const char* apFileName) {
     if (apFileName) {
@@ -26,7 +27,7 @@ bool GameSettingCollection::ReadSetting(Setting& rSetting) {
                 case Setting::ST_FLOAT: bResult = pFile->GetChunkData<uint32_t>(rSetting.uValue.uint); break;
                 case Setting::ST_STRING: {
                     // A 16-aligned stack buffer of the chunk's size.
-                    char* pBuffer = static_cast<char*>(__builtin_alloca_with_align(pFile->GetChunkSize(), 128));
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(pFile->GetChunkSize()));
                     bResult = pFile->GetChunkData(pBuffer, 0);
                     rSetting = pBuffer;
                     break;
