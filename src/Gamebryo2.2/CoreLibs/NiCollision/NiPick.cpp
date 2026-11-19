@@ -24,8 +24,8 @@ NiPick::Results::Results(uint32_t uiMaxSize, uint32_t uiGrowBy)
 
 // Deletes every record, kept or valid; the base frees the buffer.
 NiPick::Results::~Results() {
-    for (Record* pkRecord : *this) {
-        delete pkRecord;
+    for (uint32_t i = 0; i < m_usSize; ++i) {
+        delete m_pBase[i];
     }
 }
 

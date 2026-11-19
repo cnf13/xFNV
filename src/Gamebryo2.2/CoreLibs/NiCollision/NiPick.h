@@ -75,6 +75,11 @@ public:
         Record* GetAt(uint32_t uiIndex) const;
         // m_uiValidResults.
         uint32_t GetSize() const;
+
+        // NiTArray's begin/end run to m_usSize, past this pick's results into the kept records, so a range-for over
+        // the results would disagree with GetSize; loop on GetSize instead.
+        Record** begin() const = delete;
+        Record** end() const = delete;
         NiPick::Record* AddNew(NiAVObject* pObject);
 
         static void operator delete(void* apMemory);
