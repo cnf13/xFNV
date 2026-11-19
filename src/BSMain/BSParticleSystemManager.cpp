@@ -60,13 +60,7 @@ BSParticleSystemManager::~BSParticleSystemManager() {
 
 NiObject* BSParticleSystemManager::CreateClone(NiCloningProcess& kCloning) {
     BSParticleSystemManager* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSParticleSystemManager));
-    if (v5) {
-        v3 = ::new (v5) BSParticleSystemManager;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSParticleSystemManager;
     CopyMembers(v3, kCloning);
     return v3;
 }
@@ -350,14 +344,7 @@ BSMasterParticleSystem* BSParticleSystemManager::MakeMasterParticleSystem(NiNode
     BSMasterParticleSystem* apMasterSystem = nullptr;
     if (BSParticleSystemManager::CheckEmitterRecurse(apBaseNode, nullptr)) {
         BSMasterParticleSystem* v2;
-        BSMasterParticleSystem* apMemory =
-            static_cast<BSMasterParticleSystem*>(NiMemObject::operator new(sizeof(BSMasterParticleSystem)));
-        if (apMemory) {
-            v2 = ::new (apMemory) BSMasterParticleSystem;
-        }
-        else {
-            v2 = nullptr;
-        }
+        v2 = new BSMasterParticleSystem;
         apMasterSystem = v2;
         BSParticleSystemManager::ReplaceEmitterRecurse(apBaseNode, v2);
         apMasterSystem->AttachChild(apBaseNode, 1);

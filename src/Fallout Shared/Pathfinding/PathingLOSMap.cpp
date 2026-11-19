@@ -155,30 +155,12 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
     void* v15;
     void* v16;
     NiNode* pLOSGeometry;
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        pLOSGeometry = ::new (apMemory) NiNode(0);
-    }
-    else {
-        pLOSGeometry = nullptr;
-    }
-    NiAlphaProperty* v24 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (v24) {
-        v16 = (void*)::new (v24) NiAlphaProperty;
-    }
-    else {
-        v16 = nullptr;
-    }
+    pLOSGeometry = new NiNode(0);
+    v16 = new NiAlphaProperty;
     NiRefObject* v25 = static_cast<NiRefObject*>(v16);
     NiPointer<NiAlphaProperty> spAlphaProp(static_cast<NiAlphaProperty*>(v16));
     spAlphaProp.m_pObject->SetAlphaBlending(true);
-    NiMaterialProperty* v22 = static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-    if (v22) {
-        v15 = (void*)::new (v22) NiMaterialProperty;
-    }
-    else {
-        v15 = nullptr;
-    }
+    v15 = new NiMaterialProperty;
     NiRefObject* v23 = static_cast<NiRefObject*>(v15);
     NiPointer<NiMaterialProperty> spmat(static_cast<NiMaterialProperty*>(v15));
     spmat.m_pObject->SetEmittance(NiColor(1.0f, 1.0f, 1.0f));
@@ -248,13 +230,7 @@ NiNode* PathingLOSMap::CreateDebugGeometry() {
     }
     if (fRadius != 0.0) {
         NiNode* pradiusDebugGeometry;
-        NiNode* v20 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (v20) {
-            pradiusDebugGeometry = ::new (v20) NiNode(0);
-        }
-        else {
-            pradiusDebugGeometry = nullptr;
-        }
+        pradiusDebugGeometry = new NiNode(0);
         NiColorA color(1.0f, 1.0f, 0.0f, 0.5f);
         for (uint32_t i_3 = 0; i_3 < 5; ++i_3) {
             NiAVObject* pradiusCircle = BSTestObjects::CreateCircle(fRadius, 36, &color);

@@ -133,8 +133,7 @@ void NiMorphData::LoadBinary(NiStream& stream) {
                 NiAnimationKey::GetCreateFunction(NiAnimationKey::FLOATKEY, eType)(stream, uiNumKeys)
             );
             NiAnimationKey::GetFillDerivedFunction(NiAnimationKey::FLOATKEY, eType)(pkKeys, uiNumKeys, ucSize);
-            void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-            NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(nullptr) : nullptr;
+            NiFloatInterpolator* pkInterp = new NiFloatInterpolator(nullptr);
             pkInterp->ReplaceKeys(pkKeys, uiNumKeys, eType);
             kTarget.m_spLegacyInterpolator = pkInterp;
             pkInterp->Collapse();
@@ -220,9 +219,5 @@ void NiMorphData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 }
 
 NiObject* NiMorphData::CreateObject() {
-    NiMorphData* pkObject = static_cast<NiMorphData*>(NiMemObject::operator new(sizeof(NiMorphData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiMorphData;
+    return new NiMorphData;
 }

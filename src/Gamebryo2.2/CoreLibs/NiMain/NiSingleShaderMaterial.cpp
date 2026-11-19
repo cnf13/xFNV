@@ -89,13 +89,6 @@ NiSingleShaderMaterial* NiSingleShaderMaterial::Create(const char* materialname,
     if (pkMaterial) {
         return pkMaterial;
     }
-    NiSingleShaderMaterial* pkNew =
-        static_cast<NiSingleShaderMaterial*>(NiMemObject::operator new(sizeof(NiSingleShaderMaterial)));
-    if (!pkNew) {
-        return nullptr;
-    }
     // The constructor reads only the low byte of the caller's value.
-    NiSingleShaderMaterial* pkResult =
-        ::new (pkNew) NiSingleShaderMaterial(materialname, materialname, static_cast<uint8_t>(a2));
-    return pkResult;
+    return new NiSingleShaderMaterial(materialname, materialname, static_cast<uint8_t>(a2));
 }

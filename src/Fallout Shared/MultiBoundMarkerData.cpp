@@ -78,10 +78,7 @@ BSMultiBound* MultiBoundMarkerData::CreateMultiBoundForRef(TESObjectREFR* apRef)
     const NiPoint3* v7;
     BSMultiBoundOBB* v10;
     BSMultiBoundAABB* v11;
-    void* v12;
     NiMatrix3 result;
-    void* v14;
-    void* apMemory;
     BSMultiBoundAABB* v18;
     int32_t v20;
     BSMultiBound* v9 = nullptr;
@@ -92,14 +89,8 @@ BSMultiBound* MultiBoundMarkerData::CreateMultiBoundForRef(TESObjectREFR* apRef)
             (((angleOnReference = &apRef->GetAngleOnReference()),
               (!(std::fabs(angleOnReference->y) < 0.009999999776482582))) ||
              ((v3 = &apRef->GetAngleOnReference()), (!(std::fabs(v3->z) < 0.009999999776482582))))) {
-            v14 = NiMemObject::operator new(sizeof(BSMultiBoundOBB));
             v20 = 1;
-            if (v14) {
-                v10 = ::new (v14) BSMultiBoundOBB;
-            }
-            else {
-                v10 = nullptr;
-            }
+            v10 = new BSMultiBoundOBB;
             v20 = (-1);
             v18 = v10;
             localRotation = &(result = apRef->GetOrientation());
@@ -108,14 +99,8 @@ BSMultiBound* MultiBoundMarkerData::CreateMultiBoundForRef(TESObjectREFR* apRef)
             v18->SetHalfExtents(*multiBoundHalfExtent);
         }
         else {
-            apMemory = NiMemObject::operator new(sizeof(BSMultiBoundAABB));
             v20 = 0;
-            if (apMemory) {
-                v11 = ::new (apMemory) BSMultiBoundAABB;
-            }
-            else {
-                v11 = nullptr;
-            }
+            v11 = new BSMultiBoundAABB;
             v20 = (-1);
             v18 = v11;
             v4 = &apRef->GetMultiBoundHalfExtent();
@@ -123,14 +108,8 @@ BSMultiBound* MultiBoundMarkerData::CreateMultiBoundForRef(TESObjectREFR* apRef)
         }
         v7 = &apRef->GetLocationOnReference();
         v18->SetCenter(*v7);
-        v12 = NiMemObject::operator new(sizeof(BSMultiBound));
         v20 = 2;
-        if (v12) {
-            v9 = ::new (v12) BSMultiBound;
-        }
-        else {
-            v9 = nullptr;
-        }
+        v9 = new BSMultiBound;
         v20 = (-1);
         v9->SetShape(v18);
     }
@@ -147,13 +126,7 @@ BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
             (!(std::fabs((&apRef->GetAngleOnReference())->y) < 0.009999999776482582) ||
              !(std::fabs((&apRef->GetAngleOnReference())->z) < 0.009999999776482582))) {
             BSMultiBoundShape* pshape_3;
-            BSMultiBoundOBB* v13 = static_cast<BSMultiBoundOBB*>(NiMemObject::operator new(sizeof(BSMultiBoundOBB)));
-            if (v13) {
-                pshape_3 = ::new (v13) BSMultiBoundOBB;
-            }
-            else {
-                pshape_3 = nullptr;
-            }
+            pshape_3 = new BSMultiBoundOBB;
             pshape = pshape_3;
             static_cast<BSMultiBoundOBB*>(pshape)->BSMultiBoundOBB::SetAxis(apRef->GetOrientation());
             const NiPoint3* MultiBoundHalfExtent = &apRef->GetMultiBoundHalfExtent();
@@ -161,34 +134,16 @@ BSMultiBoundRoom* MultiBoundMarkerData::CreateRoomForRef(TESObjectREFR* apRef) {
         }
         else {
             BSMultiBoundShape* pshape_2;
-            void* apMemory = NiMemObject::operator new(sizeof(BSMultiBoundAABB));
-            if (apMemory) {
-                pshape_2 = ::new (apMemory) BSMultiBoundAABB;
-            }
-            else {
-                pshape_2 = nullptr;
-            }
+            pshape_2 = new BSMultiBoundAABB;
             pshape = pshape_2;
             const NiPoint3* v1 = &apRef->GetMultiBoundHalfExtent();
             static_cast<BSMultiBoundAABB*>(pshape_2)->BSMultiBoundAABB::SetHalfExtents(*v1);
         }
         const NiPoint3* v4 = &apRef->GetLocationOnReference();
         pshape->SetCenter(*v4);
-        BSMultiBoundRoom* v11 = static_cast<BSMultiBoundRoom*>(NiMemObject::operator new(sizeof(BSMultiBoundRoom)));
-        if (v11) {
-            pbound_2 = ::new (v11) BSMultiBoundRoom;
-        }
-        else {
-            pbound_2 = nullptr;
-        }
+        pbound_2 = new BSMultiBoundRoom;
         pbound = pbound_2;
-        BSMultiBound* v10 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
-        if (v10) {
-            pmb = ::new (v10) BSMultiBound;
-        }
-        else {
-            pmb = nullptr;
-        }
+        pmb = new BSMultiBound;
         pmb->SetShape(pshape);
         pbound->SetMultiBound(pmb);
     }

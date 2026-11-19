@@ -156,13 +156,7 @@ void BSAttachPoints::InitSDM() {
 
 NiObject* BSAttachPoints::CreateObject() {
     BSAttachPoints* v1;
-    void* v2 = NiMemObject::operator new(sizeof(BSAttachPoints));
-    if (v2) {
-        v1 = ::new (v2) BSAttachPoints;
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new BSAttachPoints;
     v1->SetName(EmptyFS);
     return v1;
 }

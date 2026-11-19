@@ -23,8 +23,7 @@ void TileRect::Init(Tile* apParent, const char* apName, Tile* apReplacedTile) {
 // Builds the rectangle's empty node under the parent's model (or the interface root), named after the tile.
 NiNode* TileRect::MakeNode() {
     NiNode* parentModel = this->GetParentModel();
-    void* nodeMemory = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* node = nodeMemory ? ::new (nodeMemory) NiNode(0) : nullptr;
+    NiNode* node = new NiNode(0);
     this->spModel = node;
     if (!parentModel) {
         parentModel = Interface::GetInterfaceRoot();
@@ -48,8 +47,7 @@ NiNode* TileRect::MakeNode() {
     }
     this->spModel.m_pObject->UpdateProperties();
     Interface::SetNeedToUpdate(true);
-    void* extraMemory = NiMemObject::operator new(sizeof(Tile::Extra));
-    Tile::Extra* extra = extraMemory ? ::new (extraMemory) Tile::Extra(this, this->spModel.m_pObject) : nullptr;
+    Tile::Extra* extra = new Tile::Extra(this, this->spModel.m_pObject);
     this->spModel.m_pObject->AddExtraData(extra);
     this->FinalPostParse(kTileValue_X, this->GetFloat(kTileValue_X), nullptr);
     this->FinalPostParse(kTileValue_Y, this->GetFloat(kTileValue_Y), nullptr);

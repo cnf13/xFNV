@@ -61,13 +61,7 @@ const NiRTTI* BSScissorTriShape::GetRTTI() const {
 
 NiObject* BSScissorTriShape::CreateClone(NiCloningProcess& arCloneData) {
     BSScissorTriShape* pNode;
-    BSScissorTriShape* v5 = static_cast<BSScissorTriShape*>(NiMemObject::operator new(sizeof(BSScissorTriShape)));
-    if (v5) {
-        pNode = ::new (v5) BSScissorTriShape;
-    }
-    else {
-        pNode = nullptr;
-    }
+    pNode = new BSScissorTriShape;
     CopyMembers(pNode, arCloneData);
     return pNode;
 }

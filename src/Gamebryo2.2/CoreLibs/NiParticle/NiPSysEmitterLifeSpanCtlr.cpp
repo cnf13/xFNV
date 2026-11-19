@@ -73,10 +73,5 @@ void NiPSysEmitterLifeSpanCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysEmitterLifeSpanCtlr::CreateObject() {
-    NiPSysEmitterLifeSpanCtlr* v0 =
-        static_cast<NiPSysEmitterLifeSpanCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterLifeSpanCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysEmitterLifeSpanCtlr;
+    return new NiPSysEmitterLifeSpanCtlr;
 }

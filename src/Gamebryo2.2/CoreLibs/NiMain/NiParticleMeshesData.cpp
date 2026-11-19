@@ -125,11 +125,7 @@ void NiParticleMeshesData::UpdateParticles() {
 
 // Stores the old-format flag through the result even when the allocation failed, as the game does.
 NiObject* NiParticleMeshesData::CreateObject() {
-    NiParticleMeshesData* pkData =
-        static_cast<NiParticleMeshesData*>(NiMemObject::operator new(sizeof(NiParticleMeshesData)));
-    if (pkData) {
-        pkData = ::new (pkData) NiParticleMeshesData;
-    }
+    NiParticleMeshesData* pkData = new NiParticleMeshesData;
     pkData->m_bIsOldRotatingParticlesObject = true;
     return pkData;
 }

@@ -22,13 +22,7 @@ const NiRTTI* NiDirectionalLight::GetRTTI() const {
 
 NiObject* NiDirectionalLight::CreateClone(NiCloningProcess& kCloning) {
     NiDirectionalLight* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiDirectionalLight));
-    if (v3) {
-        v4 = ::new (v3) NiDirectionalLight;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiDirectionalLight;
     NiLight::CopyMembers(v4, kCloning);
     v4->m_kWorldDir.x = m_kWorldDir.x;
     v4->m_kWorldDir.y = m_kWorldDir.y;
@@ -71,10 +65,5 @@ void NiDirectionalLight::UpdateWorldData(NiUpdateData& UpdateData) {
 }
 
 NiObject* NiDirectionalLight::CreateObject() {
-    NiDirectionalLight* v0 = static_cast<NiDirectionalLight*>(NiMemObject::operator new(sizeof(NiDirectionalLight)));
-    if (v0) {
-        return ::new (v0) NiDirectionalLight;
-    }
-
-    return nullptr;
+    return new NiDirectionalLight;
 }

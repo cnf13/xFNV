@@ -252,12 +252,7 @@ void NiPSysMeshUpdateModifier::CopyMembers(NiPSysMeshUpdateModifier* pkDest, NiC
 }
 
 NiObject* NiPSysMeshUpdateModifier::CreateObject() {
-    NiPSysMeshUpdateModifier* pkObject =
-        static_cast<NiPSysMeshUpdateModifier*>(NiMemObject::operator new(sizeof(NiPSysMeshUpdateModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysMeshUpdateModifier;
+    return new NiPSysMeshUpdateModifier;
 }
 
 void NiMeshPSysData::FillPool(uint32_t uiGeneration, NiAVObject* pkOriginal) {

@@ -24,8 +24,7 @@ const NiRTTI* BSRangeNode::GetRTTI() const {
 }
 
 NiObject* BSRangeNode::CreateClone(NiCloningProcess& arCloneData) {
-    void* pMemory = NiMemObject::operator new(sizeof(BSRangeNode));
-    BSRangeNode* pkClone = pMemory ? ::new (pMemory) BSRangeNode : nullptr;
+    BSRangeNode* pkClone = new BSRangeNode;
     CopyMembers(pkClone, arCloneData);
     return pkClone;
 }
@@ -133,10 +132,5 @@ void BSRangeNode::CopyMembers(BSRangeNode* pDest, NiCloningProcess& arCloneData)
 }
 
 NiObject* BSRangeNode::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSRangeNode));
-    if (apMemory) {
-        return ::new (apMemory) BSRangeNode;
-    }
-
-    return nullptr;
+    return new BSRangeNode;
 }

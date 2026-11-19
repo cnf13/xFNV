@@ -83,8 +83,7 @@ void NiDynamicGeometryGroup::Purge() {
         m_kSets.GetNext(kPos, uiIndex, pkSet);
         m_kSets.RemoveAt(uiIndex);
         if (pkSet) {
-            pkSet->~NiVBDynamicSet();
-            NiMemObject::operator delete(pkSet, sizeof(NiVBDynamicSet));
+            delete pkSet;
         }
     }
 
@@ -99,8 +98,7 @@ void NiDynamicGeometryGroup::Purge() {
     for (uint32_t i = 0; i < m_kMultiStreamSets.GetAllocatedSize(); i++) {
         NiVBDynamicSet* pkSet = m_kMultiStreamSets.RemoveAt(i);
         if (pkSet) {
-            pkSet->~NiVBDynamicSet();
-            NiMemObject::operator delete(pkSet, sizeof(NiVBDynamicSet));
+            delete pkSet;
         }
         m_kMultiStreamChips.GetAt(i)->m_pkVB = nullptr;
     }
@@ -318,8 +316,7 @@ bool NiDynamicGeometryGroup::IsDynamic() {
 
 NiGeometryGroup* NiDynamicGeometryGroup::Create() {
     if (!ms_pkGroup) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiDynamicGeometryGroup));
-        ms_pkGroup = pMemory ? ::new (pMemory) NiDynamicGeometryGroup : nullptr;
+        ms_pkGroup = new NiDynamicGeometryGroup;
     }
     return ms_pkGroup;
 }

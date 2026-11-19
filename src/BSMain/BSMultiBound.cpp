@@ -13,8 +13,7 @@ BSMultiBound::BSMultiBound() : NiObject(), uiBoundFrameCount(0), spShape(nullptr
 BSMultiBound::~BSMultiBound() {}
 
 NiObject* BSMultiBound::CreateClone(NiCloningProcess& arCloneData) {
-    void* pMemory = NiMemObject::operator new(sizeof(BSMultiBound));
-    BSMultiBound* pkClone = pMemory ? ::new (pMemory) BSMultiBound : nullptr;
+    BSMultiBound* pkClone = new BSMultiBound;
     CopyMembers(pkClone, arCloneData);
     return pkClone;
 }
@@ -75,6 +74,5 @@ void BSMultiBound::CopyMembers(BSMultiBound* pDest, NiCloningProcess& arCloneDat
 }
 
 NiObject* BSMultiBound::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(BSMultiBound));
-    return pMemory ? ::new (pMemory) BSMultiBound : nullptr;
+    return new BSMultiBound;
 }

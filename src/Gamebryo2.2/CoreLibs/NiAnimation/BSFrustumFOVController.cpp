@@ -53,11 +53,7 @@ void BSFrustumFOVController::LinkObject(NiStream& kStream) {
     NiFloatInterpController::LinkObject(kStream);
     if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
         NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        NiFloatInterpolator* pkInterpolator =
-            static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-        if (pkInterpolator) {
-            pkInterpolator = ::new (pkInterpolator) NiFloatInterpolator(pkData);
-        }
+        NiFloatInterpolator* pkInterpolator = new NiFloatInterpolator(pkData);
         m_spInterpolator = pkInterpolator;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -119,10 +115,5 @@ void BSFrustumFOVController::GetTargetFloatValue(float& fValue) {
 }
 
 NiObject* BSFrustumFOVController::CreateObject() {
-    BSFrustumFOVController* v0 =
-        static_cast<BSFrustumFOVController*>(NiMemObject::operator new(sizeof(BSFrustumFOVController)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) BSFrustumFOVController;
+    return new BSFrustumFOVController;
 }

@@ -238,9 +238,5 @@ void BSSegmentedTriShape::SetSystemDisabled(bool abDisable) {
 }
 
 NiObject* BSSegmentedTriShape::CreateObject() {
-    void* pkMemory = NiMemObject::operator new(sizeof(BSSegmentedTriShape));
-    if (!pkMemory) {
-        return nullptr;
-    }
-    return ::new (pkMemory) BSSegmentedTriShape;
+    return new BSSegmentedTriShape;
 }

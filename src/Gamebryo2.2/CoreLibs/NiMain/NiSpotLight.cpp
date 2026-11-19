@@ -98,10 +98,5 @@ void NiSpotLight::CopyMembers(NiSpotLight* pDest, NiCloningProcess& kCloning) {
 }
 
 NiObject* NiSpotLight::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiSpotLight));
-    if (v0) {
-        return ::new (v0) NiSpotLight;
-    }
-
-    return nullptr;
+    return new NiSpotLight;
 }

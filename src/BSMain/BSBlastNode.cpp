@@ -16,13 +16,7 @@ const NiRTTI* BSBlastNode::GetRTTI() const {
 
 // The default constructor, then the members copied.
 NiObject* BSBlastNode::CreateClone(NiCloningProcess& arCloneData) {
-    BSBlastNode* pClone = static_cast<BSBlastNode*>(NiMemObject::operator new(sizeof(BSBlastNode)));
-    if (pClone) {
-        ::new (pClone) BSBlastNode;
-    }
-    else {
-        pClone = nullptr;
-    }
+    BSBlastNode* pClone = new BSBlastNode;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -57,9 +51,5 @@ void BSBlastNode::CopyMembers(BSBlastNode* pDest, NiCloningProcess& arCloneData)
 }
 
 NiObject* BSBlastNode::CreateObject() {
-    BSBlastNode* pObject = static_cast<BSBlastNode*>(NiMemObject::operator new(sizeof(BSBlastNode)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) BSBlastNode;
+    return new BSBlastNode;
 }

@@ -52,14 +52,7 @@ void NiColorExtraDataController::LinkObject(NiStream& kStream) {
     if ((&kStream)->GetFileVersion() < 0xA010068) {
         NiColorInterpolator* v5;
         NiColorData* pkColorData = static_cast<NiColorData*>(kStream.GetObjectFromLinkID());
-        NiColorInterpolator* v4 =
-            static_cast<NiColorInterpolator*>(NiMemObject::operator new(sizeof(NiColorInterpolator)));
-        if (v4) {
-            v5 = ::new (v4) NiColorInterpolator(pkColorData);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiColorInterpolator(pkColorData);
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -103,13 +96,7 @@ void NiColorExtraDataController::Update(NiUpdateData& UpdateData) {
 
 // The pose interpolator holds the extra data's color (not null-checked).
 NiInterpolator* NiColorExtraDataController::CreatePoseInterpolator(uint16_t usIndex) {
-    NiColorInterpolator* pkInterp =
-        static_cast<NiColorInterpolator*>(NiMemObject::operator new(sizeof(NiColorInterpolator)));
-    if (!pkInterp) {
-        return nullptr;
-    }
-    return ::new (pkInterp)
-        NiColorInterpolator(static_cast<NiColorExtraData*>(static_cast<NiExtraData*>(m_spExtraData))->m_kColorA);
+    return new NiColorInterpolator(static_cast<NiColorExtraData*>(static_cast<NiExtraData*>(m_spExtraData))->m_kColorA);
 }
 
 // apInterp must be a NiColorInterpolator; the extra data is not null-checked.
@@ -128,11 +115,7 @@ NiBlendInterpolator* NiColorExtraDataController::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMem = NiMemObject::operator new(sizeof(NiBlendColorInterpolator));
-    if (!pvMem) {
-        return nullptr;
-    }
-    return ::new (pvMem) NiBlendColorInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
+    return new NiBlendColorInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiColorExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
@@ -140,9 +123,5 @@ bool NiColorExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkInt
 }
 
 NiObject* NiColorExtraDataController::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiColorExtraDataController));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiColorExtraDataController;
+    return new NiColorExtraDataController;
 }

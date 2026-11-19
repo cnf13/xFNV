@@ -135,9 +135,5 @@ void BSAnimNotes::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
 }
 
 NiObject* BSAnimNotes::CreateObject() {
-    BSAnimNotes* pkObject = static_cast<BSAnimNotes*>(NiMemObject::operator new(sizeof(BSAnimNotes)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSAnimNotes;
+    return new BSAnimNotes;
 }

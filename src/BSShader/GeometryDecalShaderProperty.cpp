@@ -38,11 +38,7 @@ GeometryDecalShaderProperty::~GeometryDecalShaderProperty() {}
 
 // The clone is built in an engine block by the class's constructor; the copy body fills in the members.
 NiObject* GeometryDecalShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    GeometryDecalShaderProperty* pClone =
-        static_cast<GeometryDecalShaderProperty*>(NiMemObject::operator new(sizeof(GeometryDecalShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) GeometryDecalShaderProperty;
-    }
+    GeometryDecalShaderProperty* pClone = new GeometryDecalShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }

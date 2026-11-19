@@ -308,13 +308,7 @@ NiAVObject* TESObject::LoadGraphics(TESObjectREFR* apRef) {
         if (spmodel.m_pObject) {
             spmodel.m_pObject->IncManualRefCount();
         }
-        BSFadeNode* apMemory = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
-        if (apMemory) {
-            pData3D_2 = ::new (apMemory) BSFadeNode;
-        }
-        else {
-            pData3D_2 = nullptr;
-        }
+        pData3D_2 = new BSFadeNode;
         pData3D = pData3D_2;
     }
     else {
@@ -514,8 +508,7 @@ NiAVObject* TESBoundObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
                 pNode = pClonedObject->IsNode();
             }
             else {
-                void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-                NiNode* pNewNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+                NiNode* pNewNode = new NiNode(0);
                 pNewNode->AttachChild(static_cast<NiAVObject*>(pClonedObject), true);
                 pNode = pNewNode;
             }

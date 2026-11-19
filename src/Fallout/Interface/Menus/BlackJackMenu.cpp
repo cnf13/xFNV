@@ -1711,13 +1711,7 @@ void BlackJackMenu::LoadNifs() {
     );
     NiAVObject* pTableGeometry = this->pTableGeometry;
     BlackJackMenu::spCamera = static_cast<NiCamera*>(BSUtilities::GetObjectByName(this->pTableGeometry, "object1"));
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v45 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v45 = nullptr;
-    }
+    v45 = new NiNode(0);
     NiRefObject* v75 = (NiRefObject*)v45;
     BlackJackMenu::spSceneRoot = v45;
     NiNode* v44 = BlackJackMenu::spSceneRoot.m_pObject;
@@ -2297,13 +2291,7 @@ NiCamera* BlackJackMenu::SetupCamera() {
     NiPoint3 v12;
     NiPoint3 dst;
     NiRect<float> a2;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        v10 = ::new (apMemory) NiCamera;
-    }
-    else {
-        v10 = nullptr;
-    }
+    v10 = new NiCamera;
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
     NiFrustum kFrustum(false);

@@ -302,10 +302,5 @@ void NiUVData::ReplaceVTilingAnim(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnim
 }
 
 NiObject* NiUVData::CreateObject() {
-    NiUVData* pkObject = static_cast<NiUVData*>(NiMemObject::operator new(sizeof(NiUVData)));
-    if (pkObject) {
-        return ::new (pkObject) NiUVData;
-    }
-
-    return nullptr;
+    return new NiUVData;
 }

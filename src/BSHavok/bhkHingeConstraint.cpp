@@ -47,11 +47,7 @@ NiObject* bhkHingeConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkHingeConstraint* pClone =
-        static_cast<bhkHingeConstraint*>(NiMemObject::operator new(sizeof(bhkHingeConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkHingeConstraint;
-    }
+    bhkHingeConstraint* pClone = new bhkHingeConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     GetThreadMemContext() = iOldMemContext;
@@ -95,12 +91,7 @@ hkSerializableCinfo& bhkHingeConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkHingeConstraint::CreateObject() {
-    bhkHingeConstraint* pkObject =
-        static_cast<bhkHingeConstraint*>(NiMemObject::operator new(sizeof(bhkHingeConstraint)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkHingeConstraint;
+    return new bhkHingeConstraint;
 }
 
 // Copies this cinfo's hinge data into apData (made from the Havok heap when null): the two local transforms, then the

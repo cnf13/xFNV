@@ -96,11 +96,7 @@ bool NiD3DShaderProgramCreatorObj::LoadShaderCodeFromBuffer(
 // Creates the creator into NiD3DShaderProgramCreatorObj::ms_pkCreator and registers it for both extensions; the global
 // is reloaded for the second registration.
 void NiD3DShaderProgramCreatorObj::_SDMInit() {
-    NiD3DShaderProgramCreatorObj* pkCreator =
-        static_cast<NiD3DShaderProgramCreatorObj*>(NiMemObject::operator new(sizeof(NiD3DShaderProgramCreatorObj)));
-    if (pkCreator) {
-        ::new (pkCreator) NiD3DShaderProgramCreatorObj;
-    }
+    NiD3DShaderProgramCreatorObj* pkCreator = new NiD3DShaderProgramCreatorObj;
     NiD3DShaderProgramCreatorObj_126FA54 = pkCreator;
     NiD3DShaderProgramFactory::RegisterShaderCreator("vso", pkCreator);
     NiD3DShaderProgramFactory::RegisterShaderCreator("pso", NiD3DShaderProgramCreatorObj_126FA54);

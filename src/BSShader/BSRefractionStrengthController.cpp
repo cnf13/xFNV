@@ -27,11 +27,7 @@ const NiRTTI* BSRefractionStrengthController::GetRTTI() const {
 // The base copies the members and the cloning process records the clone (a failed allocation is passed through as
 // null).
 NiObject* BSRefractionStrengthController::CreateClone(NiCloningProcess& kCloning) {
-    BSRefractionStrengthController* pkClone =
-        static_cast<BSRefractionStrengthController*>(NiMemObject::operator new(sizeof(BSRefractionStrengthController)));
-    if (pkClone) {
-        ::new (pkClone) BSRefractionStrengthController;
-    }
+    BSRefractionStrengthController* pkClone = new BSRefractionStrengthController;
     CopyMembers(pkClone, kCloning);
     return pkClone;
 }
@@ -49,11 +45,7 @@ void BSRefractionStrengthController::LinkObject(NiStream& kStream) {
     NiFloatInterpController::LinkObject(kStream);
     if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
         NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        NiFloatInterpolator* pkInterpolator =
-            static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-        if (pkInterpolator) {
-            pkInterpolator = ::new (pkInterpolator) NiFloatInterpolator(pkData);
-        }
+        NiFloatInterpolator* pkInterpolator = new NiFloatInterpolator(pkData);
         m_spInterpolator = pkInterpolator;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -106,10 +98,6 @@ void BSRefractionStrengthController::GetTargetFloatValue(float& fValue) {
 
 // Stream factory for this class: returns a new controller, or null.
 NiObject* BSRefractionStrengthController::CreateObject() {
-    BSRefractionStrengthController* pkController =
-        static_cast<BSRefractionStrengthController*>(NiMemObject::operator new(sizeof(BSRefractionStrengthController)));
-    if (pkController) {
-        ::new (pkController) BSRefractionStrengthController;
-    }
+    BSRefractionStrengthController* pkController = new BSRefractionStrengthController;
     return pkController;
 }

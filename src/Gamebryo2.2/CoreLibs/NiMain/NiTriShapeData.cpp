@@ -286,9 +286,5 @@ void NiTriShapeData::SetData(uint16_t usTriangles, uint16_t* pusTriList) {
 }
 
 NiObject* NiTriShapeData::CreateObject() {
-    NiTriShapeData* pkObject = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiTriShapeData;
+    return new NiTriShapeData;
 }

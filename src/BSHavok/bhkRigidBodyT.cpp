@@ -183,10 +183,7 @@ NiAVObject* bhkRigidBodyT::CreateDisplayGeometry(NiNode* apNode) {
             pNode = apNode;
         }
         else {
-            void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-            if (pMemory) {
-                pNode = ::new (pMemory) NiNode(0);
-            }
+            pNode = new NiNode(0);
             apNode->AttachChild(pNode, true);
             NiUpdateData kUpdateData;
             kUpdateData.fTime = 0.0f;
@@ -199,10 +196,7 @@ NiAVObject* bhkRigidBodyT::CreateDisplayGeometry(NiNode* apNode) {
         }
     }
     else {
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        if (pMemory) {
-            pNode = ::new (pMemory) NiNode(0);
-        }
+        pNode = new NiNode(0);
     }
     pNode->SetName(NiFixedString(bhkRigidBodyT_Name));
     hkRotation kRotation;

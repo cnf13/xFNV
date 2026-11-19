@@ -215,15 +215,7 @@ void SunDamageEffect::UpdateHitEffect(bool abDamaging) {
                     }
                     this->pHitEffects = nullptr;
                 }
-                void* apMemory = NiMemObject::operator new(sizeof(MagicShaderHitEffect));
-                if (apMemory) {
-                    MagicTarget* Target = pTarget;
-                    TESObjectREFR* v3 = Target->GetTargetStatsObject();
-                    peffect = ::new (apMemory) MagicShaderHitEffect(v3, pEffectData, -1.0f);
-                }
-                else {
-                    peffect = nullptr;
-                }
+                peffect = new MagicShaderHitEffect(pTarget->GetTargetStatsObject(), pEffectData, -1.0f);
                 MagicShaderHitEffect* peffect_2 = peffect;
                 if (peffect->Init()) {
                     BSSimpleList<MagicHitEffect*>* v7;

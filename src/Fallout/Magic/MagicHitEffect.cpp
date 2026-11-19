@@ -148,16 +148,7 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
     }
     if (!apEffect->IsFlagSet(ActiveEffect::NO_HITEFFECT_NIF) && !Main::GetSceneIsComplex()) {
         MagicHitEffect* peffect_2;
-        MagicModelHitEffect* apMemory =
-            static_cast<MagicModelHitEffect*>(NiMemObject::operator new(sizeof(MagicModelHitEffect)));
-        if (apMemory) {
-            MagicTarget* Target = apEffect->pTarget;
-            TESObjectREFR* v5 = Target->GetTargetStatsObject();
-            peffect_2 = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect(v5, apEffect);
-        }
-        else {
-            peffect_2 = nullptr;
-        }
+        peffect_2 = new MagicModelHitEffect(apEffect->pTarget->GetTargetStatsObject(), apEffect);
         peffect = peffect_2;
         if (peffect_2->Init()) {
             BSSimpleList<MagicHitEffect*>* plist;
@@ -179,16 +170,7 @@ BSSimpleList<MagicHitEffect*>* MagicHitEffect::InstantiateHitEffects(ActiveEffec
     }
     if (!apEffect->IsFlagSet(ActiveEffect::NO_HITEFFECT_SHADER)) {
         MagicHitEffect* peffect_3;
-        MagicShaderHitEffect* v17 =
-            static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-        if (v17) {
-            MagicTarget* v11 = apEffect->pTarget;
-            TESObjectREFR* v7 = v11->GetTargetStatsObject();
-            peffect_3 = (MagicHitEffect*)::new (v17) MagicShaderHitEffect(v7, apEffect);
-        }
-        else {
-            peffect_3 = nullptr;
-        }
+        peffect_3 = new MagicShaderHitEffect(apEffect->pTarget->GetTargetStatsObject(), apEffect);
         peffect = peffect_3;
         if (peffect_3->Init()) {
             ReferenceProcessLists.AddTempEffect(peffect);

@@ -76,10 +76,5 @@ void BSStripParticleSystem::RenderImmediate(NiRenderer* apkRenderer) {
 }
 
 NiObject* BSStripParticleSystem::CreateObject() {
-    BSStripParticleSystem* pkObject =
-        static_cast<BSStripParticleSystem*>(NiMemObject::operator new(sizeof(BSStripParticleSystem)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSStripParticleSystem;
+    return new BSStripParticleSystem;
 }

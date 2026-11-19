@@ -27,14 +27,7 @@ NiBlendBoolInterpolator::NiBlendBoolInterpolator(
 NiBlendBoolInterpolator::~NiBlendBoolInterpolator() {}
 
 NiObject* NiBlendBoolInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiBlendBoolInterpolator));
-    NiBlendBoolInterpolator* v4 = static_cast<NiBlendBoolInterpolator*>(v3);
-    if (v3) {
-        ::new (v3) NiBlendBoolInterpolator;
-    }
-    else {
-        v4 = nullptr;
-    }
+    NiBlendBoolInterpolator* v4 = new NiBlendBoolInterpolator;
     NiBlendInterpolator::CopyMembers(v4, kCloning);
     v4->m_bBoolValue = m_bBoolValue;
     return v4;
@@ -146,11 +139,5 @@ bool NiBlendBoolInterpolator::BlendValues(float fTime, NiObjectNET* pkInterpTarg
 }
 
 NiObject* NiBlendBoolInterpolator::CreateObject() {
-    NiBlendBoolInterpolator* pkObject =
-        static_cast<NiBlendBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBlendBoolInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    ::new (pkObject) NiBlendBoolInterpolator;
-    return pkObject;
+    return new NiBlendBoolInterpolator;
 }

@@ -28,18 +28,9 @@ const NiRTTI* NiBSplineFloatInterpolator::GetRTTI() const {
 }
 
 NiObject* NiBSplineFloatInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBSplineFloatInterpolator* pkObject =
-        static_cast<NiBSplineFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBSplineFloatInterpolator)));
-    NiBSplineFloatInterpolator* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBSplineFloatInterpolator(
-            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE,
-            static_cast<NiBSplineBasisData*>(nullptr)
-        );
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiBSplineFloatInterpolator* pkObject_2 = new NiBSplineFloatInterpolator(
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
+    );
     NiBSplineInterpolator::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fFloatValue = m_fFloatValue;
     pkObject_2->m_kFloatCPHandle = m_kFloatCPHandle;
@@ -129,13 +120,7 @@ void NiBSplineFloatInterpolator::CopyMembers(NiBSplineFloatInterpolator* pkDest,
 }
 
 NiObject* NiBSplineFloatInterpolator::CreateObject() {
-    NiBSplineFloatInterpolator* pkObject =
-        static_cast<NiBSplineFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBSplineFloatInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    ::new (pkObject) NiBSplineFloatInterpolator(
+    return new NiBSplineFloatInterpolator(
         static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
-    return pkObject;
 }

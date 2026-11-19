@@ -22,14 +22,7 @@ const NiRTTI* BSLookIKNote::GetRTTI() const {
 }
 
 NiObject* BSLookIKNote::CreateClone(NiCloningProcess& arCloneData) {
-    NiObject* pkCtlr = static_cast<NiObject*>(NiMemObject::operator new(sizeof(BSLookIKNote)));
-    BSLookIKNote* pkCtlr_2 = static_cast<BSLookIKNote*>(pkCtlr);
-    if (pkCtlr) {
-        ::new (pkCtlr) BSLookIKNote;
-    }
-    else {
-        pkCtlr_2 = nullptr;
-    }
+    BSLookIKNote* pkCtlr_2 = new BSLookIKNote;
     CopyMembers(pkCtlr_2, arCloneData);
     pkCtlr_2->fGain = fGain;
     pkCtlr_2->eState = eState;
@@ -113,9 +106,5 @@ bool BSLookIKNote::ParseTextKey(const NiTextKey* apTextKey) {
 }
 
 NiObject* BSLookIKNote::CreateObject() {
-    BSLookIKNote* pkObject = static_cast<BSLookIKNote*>(NiMemObject::operator new(sizeof(BSLookIKNote)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSLookIKNote;
+    return new BSLookIKNote;
 }

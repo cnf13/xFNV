@@ -193,10 +193,5 @@ void NiPSysEmitterCtlrData::ReplaceEmitterActiveKeys(
 }
 
 NiObject* NiPSysEmitterCtlrData::CreateObject() {
-    NiPSysEmitterCtlrData* pkObject =
-        static_cast<NiPSysEmitterCtlrData*>(NiMemObject::operator new(sizeof(NiPSysEmitterCtlrData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysEmitterCtlrData;
+    return new NiPSysEmitterCtlrData;
 }

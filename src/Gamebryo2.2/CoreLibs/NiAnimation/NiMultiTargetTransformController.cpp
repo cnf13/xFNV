@@ -233,12 +233,7 @@ NiInterpolator* NiMultiTargetTransformController::CreatePoseInterpolator(uint16_
     kPoseValue.m_fScale = pkTarget->m_kLocal.m_fScale;
     kPoseValue.m_kTranslate = pkTarget->m_kLocal.m_Translate;
     kPoseValue.m_kRotate = kRotate;
-    NiTransformInterpolator* pkInterp =
-        static_cast<NiTransformInterpolator*>(NiMemObject::operator new(sizeof(NiTransformInterpolator)));
-    if (!pkInterp) {
-        return nullptr;
-    }
-    return ::new (pkInterp) NiTransformInterpolator(kPoseValue);
+    return new NiTransformInterpolator(kPoseValue);
 }
 
 // The target's blend interpolator; no new one is built.
@@ -365,9 +360,5 @@ void NiMultiTargetTransformController::CopyMembers(
 }
 
 NiObject* NiMultiTargetTransformController::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiMultiTargetTransformController));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiMultiTargetTransformController;
+    return new NiMultiTargetTransformController;
 }

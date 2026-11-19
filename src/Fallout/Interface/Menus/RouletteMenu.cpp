@@ -1034,13 +1034,7 @@ void RouletteMenu::Prepare3DElements() {
     }
     NiNode* pTableNode = static_cast<NiNode*>(pRouletteTableGeometry);
     RouletteMenu::sp3DCamera = static_cast<NiCamera*>(BSUtilities::GetObjectByName(pTableNode, "object4"));
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v17 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v17 = nullptr;
-    }
+    v17 = new NiNode(0);
     NiRefObject* v26 = (NiRefObject*)v17;
     RouletteMenu::spModel = v17;
     NiNode* v16 = RouletteMenu::spModel.m_pObject;
@@ -1090,13 +1084,7 @@ NiCamera* RouletteMenu::Create3DCamera() {
     NiPoint3 v12;
     NiPoint3 dst;
     NiRect<float> a2;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        v10 = ::new (apMemory) NiCamera;
-    }
-    else {
-        v10 = nullptr;
-    }
+    v10 = new NiCamera;
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
     NiFrustum kFrustum(false);

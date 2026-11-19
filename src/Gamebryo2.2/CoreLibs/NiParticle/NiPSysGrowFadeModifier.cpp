@@ -20,15 +20,7 @@ NiPSysGrowFadeModifier::NiPSysGrowFadeModifier()
 NiPSysGrowFadeModifier::~NiPSysGrowFadeModifier() {}
 
 NiObject* NiPSysGrowFadeModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysGrowFadeModifier* pkObject =
-        static_cast<NiPSysGrowFadeModifier*>(NiMemObject::operator new(sizeof(NiPSysGrowFadeModifier)));
-    NiPSysGrowFadeModifier* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiPSysGrowFadeModifier;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiPSysGrowFadeModifier* pkObject_2 = new NiPSysGrowFadeModifier;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fGrowTime = m_fGrowTime;
     pkObject_2->m_usGrowGeneration = m_usGrowGeneration;
@@ -123,10 +115,5 @@ void NiPSysGrowFadeModifier::Update(float fTime, NiPSysData* pkData) {
 }
 
 NiObject* NiPSysGrowFadeModifier::CreateObject() {
-    NiPSysGrowFadeModifier* pkObject =
-        static_cast<NiPSysGrowFadeModifier*>(NiMemObject::operator new(sizeof(NiPSysGrowFadeModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysGrowFadeModifier;
+    return new NiPSysGrowFadeModifier;
 }

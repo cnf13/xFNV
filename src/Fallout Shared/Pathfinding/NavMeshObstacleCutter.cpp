@@ -112,14 +112,7 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
         }
     }
     this->Edges.Clear(false);
-    void* pMemory = NiMemObject::operator new(sizeof(ObstacleUndoData));
-    ObstacleUndoData* pNewUndoData;
-    if (pMemory) {
-        pNewUndoData = ::new (pMemory) ObstacleUndoData;
-    }
-    else {
-        pNewUndoData = nullptr;
-    }
+    ObstacleUndoData* pNewUndoData = new ObstacleUndoData;
     this->pUndoData = pNewUndoData;
     BSSimpleArray<uint16_t, 1024>* pOverlapped = &this->pUndoData->OverlappedTriangles;
     NiPoint3* pFudge = ::new (&kFudge) NiPoint3(5.0f, 5.0f, 5.0f);

@@ -163,12 +163,7 @@ NiObject* bhkBallSocketConstraintChain::CreateClone(NiCloningProcess& arCloneDat
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
 
     bhkSerializable::CloneCritLock();
-    bhkBallSocketConstraintChain* pClone = nullptr;
-    bhkBallSocketConstraintChain* pChain =
-        static_cast<bhkBallSocketConstraintChain*>(NiMemObject::operator new(sizeof(bhkBallSocketConstraintChain)));
-    if (pChain) {
-        pClone = ::new (pChain) bhkBallSocketConstraintChain;
-    }
+    bhkBallSocketConstraintChain* pClone = new bhkBallSocketConstraintChain;
     bhkConstraintChain::CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -223,12 +218,7 @@ void bhkBallSocketConstraintChain::CopyCinfo(hkBallSocketChainCinfo* arInfo) {
 
 // A new chain with no creation info yet.
 NiObject* bhkBallSocketConstraintChain::CreateObject() {
-    bhkBallSocketConstraintChain* pChain =
-        static_cast<bhkBallSocketConstraintChain*>(NiMemObject::operator new(sizeof(bhkBallSocketConstraintChain)));
-    if (!pChain) {
-        return nullptr;
-    }
-    return ::new (pChain) bhkBallSocketConstraintChain;
+    return new bhkBallSocketConstraintChain;
 }
 
 bhkConstraintChain::bhkConstraintChain() {

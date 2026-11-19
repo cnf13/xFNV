@@ -87,9 +87,5 @@ void NiParticles::CopyMembers(NiParticles* pDest, NiCloningProcess& kCloning) {
 }
 
 NiObject* NiParticles::CreateObject() {
-    NiParticles* pkObject = static_cast<NiParticles*>(NiMemObject::operator new(sizeof(NiParticles)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiParticles;
+    return new NiParticles;
 }

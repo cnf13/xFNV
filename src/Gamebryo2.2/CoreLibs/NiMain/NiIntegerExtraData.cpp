@@ -16,11 +16,7 @@ const NiRTTI* NiIntegerExtraData::GetRTTI() const {
 
 // A failed allocation still runs the copy on null, as the game does.
 NiObject* NiIntegerExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiIntegerExtraData* pkClone =
-        static_cast<NiIntegerExtraData*>(NiMemObject::operator new(sizeof(NiIntegerExtraData)));
-    if (pkClone) {
-        ::new (pkClone) NiIntegerExtraData;
-    }
+    NiIntegerExtraData* pkClone = new NiIntegerExtraData;
     NiExtraData::CopyMembers(pkClone, kCloning);
     pkClone->m_iValue = m_iValue;
     return pkClone;
@@ -65,10 +61,5 @@ void NiIntegerExtraData::CopyMembers(NiIntegerExtraData* pDest, NiCloningProcess
 }
 
 NiObject* NiIntegerExtraData::CreateObject() {
-    NiIntegerExtraData* pkObject =
-        static_cast<NiIntegerExtraData*>(NiMemObject::operator new(sizeof(NiIntegerExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiIntegerExtraData;
+    return new NiIntegerExtraData;
 }

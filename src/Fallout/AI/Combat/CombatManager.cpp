@@ -619,13 +619,7 @@ void CombatManager::UpdateDebugGeometry() {
         if (bDebugCombatDetectionEvents.Bool()) {
             if (!spDebugGeometry.m_pObject) {
                 NiNode* v7;
-                NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                if (apMemory) {
-                    v7 = ::new (apMemory) NiNode(0);
-                }
-                else {
-                    v7 = nullptr;
-                }
+                v7 = new NiNode(0);
                 spDebugGeometry = v7;
             }
             uint32_t inumHighActors = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
@@ -663,13 +657,7 @@ void CombatManager::UpdateDebugGeometry() {
         }
         if (spDebugGeometry.m_pObject) {
             NiAlphaProperty* palpha;
-            NiAlphaProperty* v10 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (v10) {
-                palpha = ::new (v10) NiAlphaProperty;
-            }
-            else {
-                palpha = nullptr;
-            }
+            palpha = new NiAlphaProperty;
             palpha->SetAlphaBlending(true);
             spDebugGeometry.m_pObject->AttachProperty(palpha);
             AddNoLightingPropertyRecurse(spDebugGeometry.m_pObject);

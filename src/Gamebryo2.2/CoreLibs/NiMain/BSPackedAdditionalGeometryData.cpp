@@ -107,10 +107,6 @@ NiAdditionalGeometryData::NiAGDDataBlock* BSPackedAdditionalGeometryData::Create
 }
 
 NiObject* BSPackedAdditionalGeometryData::CreateObject() {
-    BSPackedAdditionalGeometryData* pkObject =
-        static_cast<BSPackedAdditionalGeometryData*>(NiMemObject::operator new(sizeof(BSPackedAdditionalGeometryData)));
-    if (pkObject) {
-        ::new (pkObject) BSPackedAdditionalGeometryData;
-    }
+    BSPackedAdditionalGeometryData* pkObject = new BSPackedAdditionalGeometryData;
     return pkObject;
 }

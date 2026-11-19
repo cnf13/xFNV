@@ -74,24 +74,12 @@ LABEL_9:;
         kIsta = pkOptDest;
     }
     else {
-        NiPixelData* v10 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        if (v10) {
-            kIsta = ::new (v10) NiPixelData(this->m_usWidth, m_usHeight, m_kFormat, 1u, 1u);
-        }
-        else {
-            kIsta = nullptr;
-        }
+        kIsta = new NiPixelData(this->m_usWidth, m_usHeight, m_kFormat, 1u, 1u);
         v9 = kIsta;
     }
     if (m_bColormapped) {
         NiPalette* v12;
-        NiPalette* v11 = static_cast<NiPalette*>(NiMemObject::operator new(sizeof(NiPalette)));
-        if (v11) {
-            v12 = ::new (v11) NiPalette(m_bAlpha, m_usPalLength, m_pkColorMap);
-        }
-        else {
-            v12 = nullptr;
-        }
+        v12 = new NiPalette(m_bAlpha, m_usPalLength, m_pkColorMap);
         v9->SetPalette(v12);
     }
     if (m_uiRawDataMax < v8) {

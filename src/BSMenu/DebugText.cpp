@@ -578,13 +578,7 @@ NiNode* DebugText::CreateDebugText(
         }
         NiNode* v25 = nullptr;
         iwidth = 0;
-        NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (apMemory) {
-            pnode = ::new (apMemory) NiNode(0);
-        }
-        else {
-            pnode = nullptr;
-        }
+        pnode = new NiNode(0);
         NiColorA xcolor_2;
         if (apColor) {
             xcolor_2 = *apColor;
@@ -856,17 +850,14 @@ bool DebugText::AddFloatingText(NiNode* apObject, const char* apText, int32_t ai
             }
         }
         apObject->DetachChild(pExtra->pBillboard);
-        void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
-        pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
+        pNode = new NiBillboardNode;
         pNode->SetName("FloatingText");
         bHadText = true;
     }
     else {
-        void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
-        pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
+        pNode = new NiBillboardNode;
         pNode->SetName("FloatingText");
-        void* pExtraMemory = NiMemObject::operator new(sizeof(DebugTextExtraData));
-        pExtra = pExtraMemory ? ::new (pExtraMemory) DebugTextExtraData(pNode, apText, aiHeight, iCenter) : nullptr;
+        pExtra = new DebugTextExtraData(pNode, apText, aiHeight, iCenter);
     }
     int32_t iZ = pExtra->iOldCenter + aiHeight;
     int32_t iWidth = 10000;
@@ -894,8 +885,7 @@ bool DebugText::AddFloatingText(NiNode* apObject, const char* apText, int32_t ai
     pNode->m_kLocal.m_Rotate = (kRot * kRotY) * pNode->m_kLocal.m_Rotate;
     pNode->m_kLocal.m_fScale = static_cast<float>(std::fabs(0.5));
     pExtra->pBillboard = pNode;
-    void* pAlphaMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-    NiAlphaProperty* pAlpha = pAlphaMemory ? ::new (pAlphaMemory) NiAlphaProperty : nullptr;
+    NiAlphaProperty* pAlpha = new NiAlphaProperty;
     pAlpha->SetBit(true, NiAlphaProperty::ALPHA_BLEND_MASK);
     pAlpha->SetBit(false, NiAlphaProperty::ALPHA_NOSORTER_MASK);
     pNode->AttachProperty(pAlpha);
@@ -1044,8 +1034,7 @@ NiBillboardNode* DebugText::CreateBillboardText(
     NiColorA* apColor,
     bool abPrepareObject
 ) {
-    void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
-    NiBillboardNode* pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
+    NiBillboardNode* pNode = new NiBillboardNode;
     pNode->SetName(NiFixedString("FloatingText"));
     int32_t iWidth = 10000;
     BSStringT<char> kString;
@@ -1073,8 +1062,7 @@ NiBillboardNode* DebugText::CreateBillboardText(
     // Widens the scale to double and calls the double fabs, not the float overload.
     float fScale = static_cast<float>(std::fabs(static_cast<double>(afScale)));
     pNode->m_kLocal.m_fScale = fScale;
-    void* pAlphaMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-    NiAlphaProperty* pAlpha = pAlphaMemory ? ::new (pAlphaMemory) NiAlphaProperty : nullptr;
+    NiAlphaProperty* pAlpha = new NiAlphaProperty;
     pAlpha->SetBit(true, NiAlphaProperty::ALPHA_BLEND_MASK);
     pAlpha->SetBit(false, NiAlphaProperty::ALPHA_NOSORTER_MASK);
     pNode->AttachProperty(pAlpha);

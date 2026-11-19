@@ -3166,13 +3166,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
     }
     if (!this->spPathCheckQueue.m_pObject) {
         ActorPathingMessageQueue* pQueue;
-        void* apMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
-        if (apMemory) {
-            pQueue = ::new (apMemory) ActorPathingMessageQueue;
-        }
-        else {
-            pQueue = nullptr;
-        }
+        pQueue = new ActorPathingMessageQueue;
         this->spPathCheckQueue = pQueue;
     }
     if (aiLocation) {
@@ -3185,13 +3179,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
                 return false;
             }
             PathingRequest* prequest;
-            void* pRequestMemory = NiMemObject::operator new(sizeof(PathingRequest));
-            if (pRequestMemory) {
-                prequest = ::new (pRequestMemory) PathingRequest;
-            }
-            else {
-                prequest = nullptr;
-            }
+            prequest = new PathingRequest;
             pattacker->BuildRequest(
                 prequest, pathingLocationTarget.GetLocation(), pathingLocationTarget.pCell,
                 pathingLocationTarget.pWorldSpace, -1.0f, nullptr
@@ -3203,13 +3191,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
     }
     else {
         PathingRequest* prequest;
-        void* pRequestMemory = NiMemObject::operator new(sizeof(PathingRequest));
-        if (pRequestMemory) {
-            prequest = ::new (pRequestMemory) PathingRequest;
-        }
-        else {
-            prequest = nullptr;
-        }
+        prequest = new PathingRequest;
         BGSWorldLocation targetWorldLoc;
         ptarget->GetWorldLocation(&targetWorldLoc);
         pattacker->BuildRequest_0(prequest, targetWorldLoc.Point, targetWorldLoc.pSpace, -1.0f, nullptr);

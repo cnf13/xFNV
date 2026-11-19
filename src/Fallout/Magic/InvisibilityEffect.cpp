@@ -138,16 +138,8 @@ void InvisibilityEffect::Finish() {
         MagicHitEffect* peffect = nullptr;
         if (GetEffectSetting()->GetModelLength()) {
             MagicHitEffect* peffect_2;
-            MagicModelHitEffect* apMemory =
-                static_cast<MagicModelHitEffect*>(NiMemObject::operator new(sizeof(MagicModelHitEffect)));
-            if (apMemory) {
-                TESModel* v5 = static_cast<TESModel*>(GetEffectSetting());
-                const char* v1 = v5->GetModel();
-                peffect_2 = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect(ptargetActor, v1, -1.0f);
-            }
-            else {
-                peffect_2 = nullptr;
-            }
+            peffect_2 =
+                new MagicModelHitEffect(ptargetActor, static_cast<TESModel*>(GetEffectSetting())->GetModel(), -1.0f);
             peffect = peffect_2;
         }
         if (peffect && peffect->Init()) {

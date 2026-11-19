@@ -74,10 +74,5 @@ hkSerializableCinfo& bhkConvexSweepShape::CreateCinfo(bool& arCreated) {
 
 // Builds an empty convex sweep shape, or null when the allocation fails.
 NiObject* bhkConvexSweepShape::CreateObject() {
-    bhkConvexSweepShape* pkShape =
-        static_cast<bhkConvexSweepShape*>(NiMemObject::operator new(sizeof(bhkConvexSweepShape)));
-    if (!pkShape) {
-        return nullptr;
-    }
-    return ::new (pkShape) bhkConvexSweepShape;
+    return new bhkConvexSweepShape;
 }

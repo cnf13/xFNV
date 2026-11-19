@@ -243,9 +243,5 @@ void NiFloatInterpolator::CopyMembers(NiFloatInterpolator* pkDest, NiCloningProc
 
 // Uses the NiFloatInterpolator(NiFloatData*) constructor with no data.
 NiObject* NiFloatInterpolator::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
+    return new NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
 }

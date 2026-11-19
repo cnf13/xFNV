@@ -179,10 +179,5 @@ void NiTextKeyExtraData::CopyMembers(NiTextKeyExtraData* pDest, NiCloningProcess
 }
 
 NiObject* NiTextKeyExtraData::CreateObject() {
-    NiTextKeyExtraData* pkObject =
-        static_cast<NiTextKeyExtraData*>(NiMemObject::operator new(sizeof(NiTextKeyExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiTextKeyExtraData;
+    return new NiTextKeyExtraData;
 }

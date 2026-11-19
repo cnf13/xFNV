@@ -971,23 +971,12 @@ void NiTexturingProperty::_SDMShutdown() {
 }
 
 NiObject* NiTexturingProperty::CreateObject() {
-    NiTexturingProperty* v0 = static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-    if (v0) {
-        return ::new (v0) NiTexturingProperty;
-    }
-
-    return nullptr;
+    return new NiTexturingProperty;
 }
 
 void NiTexturingProperty::_SDMInit() {
     NiTexturingProperty* v1;
-    NiTexturingProperty* v0 = static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-    if (v0) {
-        v1 = ::new (v0) NiTexturingProperty;
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new NiTexturingProperty;
     NiTexturingProperty::ms_spDefault = v1;
     const char* m_kHandle = NiTexturingProperty::ms_akMapIDtoNames[0].GetHandle();
     if (NiTexturingProperty::ms_akMapIDtoNames[0].GetHandle() != aBase_0) {

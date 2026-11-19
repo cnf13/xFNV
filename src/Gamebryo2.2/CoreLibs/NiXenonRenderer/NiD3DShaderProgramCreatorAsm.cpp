@@ -36,12 +36,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorAsm::CreateVertexShaderFromFile(
     int32_t bSoftwareVP,
     int32_t bRecoverable
 ) {
-    NiD3DVertexShader* pkVertexShader =
-        static_cast<NiD3DVertexShader*>(NiMemObject::operator new(sizeof(NiD3DVertexShader)));
+    NiD3DVertexShader* pkVertexShader = new NiD3DVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkVertexShader) {
         return nullptr;
     }
-    ::new (pkVertexShader) NiD3DVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     uint32_t uiConstantSize = 0;
@@ -80,12 +78,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorAsm::CreateVertexShaderFromBuffer(
     int32_t bSoftwareVP,
     int32_t bRecoverable
 ) {
-    NiD3DVertexShader* pkVertexShader =
-        static_cast<NiD3DVertexShader*>(NiMemObject::operator new(sizeof(NiD3DVertexShader)));
+    NiD3DVertexShader* pkVertexShader = new NiD3DVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkVertexShader) {
         return nullptr;
     }
-    ::new (pkVertexShader) NiD3DVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     uint32_t uiConstantSize = 0;
@@ -123,12 +119,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorAsm::CreatePixelShaderFromFile(
     const char* a4,
     int32_t bRecoverable
 ) {
-    NiD3DPixelShader* pkPixelShader =
-        static_cast<NiD3DPixelShader*>(NiMemObject::operator new(sizeof(NiD3DPixelShader)));
+    NiD3DPixelShader* pkPixelShader = new NiD3DPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkPixelShader) {
         return nullptr;
     }
-    ::new (pkPixelShader) NiD3DPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     uint32_t pvConstantData_2 = 0;
@@ -160,12 +154,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorAsm::CreatePixelShaderFromBuffer(
     const char* a5,
     int32_t bRecoverable
 ) {
-    NiD3DPixelShader* pkPixelShader =
-        static_cast<NiD3DPixelShader*>(NiMemObject::operator new(sizeof(NiD3DPixelShader)));
+    NiD3DPixelShader* pkPixelShader = new NiD3DPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkPixelShader) {
         return nullptr;
     }
-    ::new (pkPixelShader) NiD3DPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     uint32_t pvConstantData_2 = 0;
@@ -289,14 +281,7 @@ bool NiD3DShaderProgramCreatorAsm::LoadShaderCodeFromFile(
 }
 
 void NiD3DShaderProgramCreatorAsm::_SDMInit() {
-    NiD3DShaderProgramCreatorAsm* v0 =
-        static_cast<NiD3DShaderProgramCreatorAsm*>(NiMemObject::operator new(sizeof(NiD3DShaderProgramCreatorAsm)));
-    if (v0) {
-        ::new (v0) NiD3DShaderProgramCreatorAsm;
-    }
-    else {
-        v0 = nullptr;
-    }
+    NiD3DShaderProgramCreatorAsm* v0 = new NiD3DShaderProgramCreatorAsm;
     NiD3DShaderProgramCreatorAsm::ms_pkCreator = v0;
     NiD3DShaderProgramFactory::RegisterShaderCreator("vsh", v0);
     NiD3DShaderProgramFactory::RegisterShaderCreator("psh", NiD3DShaderProgramCreatorAsm::ms_pkCreator);

@@ -195,10 +195,7 @@ void NiImageConverter::_SDMShutdown() {
 }
 
 void NiImageConverter::_SDMInit() {
-    NiImageConverter* pkConverter = static_cast<NiImageConverter*>(NiMemObject::operator new(sizeof(NiImageConverter)));
-    if (pkConverter != nullptr) {
-        pkConverter = ::new (pkConverter) NiImageConverter;
-    }
+    NiImageConverter* pkConverter = new NiImageConverter;
     NiImageConverter* pkOld = ms_spConverter.m_pObject;
     if (pkOld == pkConverter) {
         return;

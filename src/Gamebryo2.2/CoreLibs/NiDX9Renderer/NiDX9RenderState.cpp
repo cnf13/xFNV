@@ -342,13 +342,7 @@ bool NiDX9RenderState::SetPixelShaderConstantI(
 }
 
 NiDX9RenderState* NiDX9RenderState::Create(NiDX9Renderer* a1, _D3DCAPS9* a2, bool a3) {
-    NiDX9RenderState* v4 = static_cast<NiDX9RenderState*>(NiMemObject::operator new(sizeof(NiDX9RenderState)));
-    if (v4) {
-        ::new (v4) NiDX9RenderState(a1, a2);
-    }
-    else {
-        v4 = nullptr;
-    }
+    NiDX9RenderState* v4 = new NiDX9RenderState(a1, a2);
     v4->ReadRenderStateCaps();
     for (uint32_t i = 0; i < 256; i += 4) {
         D3DRENDERSTATETYPE m_eType = NiDX9RenderState::ms_akInitialRenderStateSettings[i].m_eType;

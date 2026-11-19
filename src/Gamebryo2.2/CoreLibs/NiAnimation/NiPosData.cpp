@@ -146,9 +146,5 @@ void NiPosData::SetAnim(NiPosKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::Ke
 }
 
 NiObject* NiPosData::CreateObject() {
-    NiPosData* pkObject = static_cast<NiPosData*>(NiMemObject::operator new(sizeof(NiPosData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPosData;
+    return new NiPosData;
 }

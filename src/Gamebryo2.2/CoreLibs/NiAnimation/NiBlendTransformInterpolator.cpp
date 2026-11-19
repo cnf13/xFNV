@@ -239,9 +239,5 @@ void NiBlendTransformInterpolator::SetAlwaysBlend(bool abTF) {
 }
 
 NiObject* NiBlendTransformInterpolator::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiBlendTransformInterpolator));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiBlendTransformInterpolator;
+    return new NiBlendTransformInterpolator;
 }

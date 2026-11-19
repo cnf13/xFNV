@@ -29,13 +29,7 @@ const NiRTTI* NiBinaryExtraData::GetRTTI() const {
 
 // The clone gets its own _NiMalloc copy of the blob.
 NiObject* NiBinaryExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiBinaryExtraData* pkClone = static_cast<NiBinaryExtraData*>(NiMemObject::operator new(sizeof(NiBinaryExtraData)));
-    if (pkClone) {
-        ::new (pkClone) NiBinaryExtraData;
-    }
-    else {
-        pkClone = nullptr;
-    }
+    NiBinaryExtraData* pkClone = new NiBinaryExtraData;
     NiExtraData::CopyMembers(pkClone, kCloning);
     if (m_uiSize > 0) {
         pkClone->m_pcBinaryData = static_cast<char*>(_NiMalloc(m_uiSize));
@@ -101,9 +95,5 @@ void NiBinaryExtraData::SetValue(uint32_t uiSize, char* pcBinaryData) {
 }
 
 NiObject* NiBinaryExtraData::CreateObject() {
-    NiBinaryExtraData* pkObject = static_cast<NiBinaryExtraData*>(NiMemObject::operator new(sizeof(NiBinaryExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBinaryExtraData;
+    return new NiBinaryExtraData;
 }

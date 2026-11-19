@@ -23,15 +23,7 @@ SpeedTreeBranchShaderProperty::SpeedTreeBranchShaderProperty(STSPData* apData)
 SpeedTreeBranchShaderProperty::~SpeedTreeBranchShaderProperty() {}
 
 NiObject* SpeedTreeBranchShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    SpeedTreeBranchShaderProperty* pprop =
-        static_cast<SpeedTreeBranchShaderProperty*>(NiMemObject::operator new(sizeof(SpeedTreeBranchShaderProperty)));
-    if (pprop) {
-        STSPData* v4 = GetData();
-        ::new (pprop) SpeedTreeBranchShaderProperty(v4);
-    }
-    else {
-        pprop = nullptr;
-    }
+    SpeedTreeBranchShaderProperty* pprop = new SpeedTreeBranchShaderProperty(GetData());
     CopyMembers(pprop, arCloneData);
     return pprop;
 }
@@ -50,14 +42,7 @@ NiAdditionalGeometryData* SpeedTreeBranchShaderProperty::CreateRendererSpecificP
         return nullptr;
     }
     uint16_t usverts = apGeometry->m_spModelData.m_pObject->m_usVertices;
-    NiAdditionalGeometryData* v5 =
-        static_cast<NiAdditionalGeometryData*>(NiMemObject::operator new(sizeof(NiAdditionalGeometryData)));
-    if (v5) {
-        pdata = ::new (v5) NiAdditionalGeometryData(usverts, 1u);
-    }
-    else {
-        pdata = nullptr;
-    }
+    pdata = new NiAdditionalGeometryData(usverts, 1u);
     pdata->SetDataBlockCount(1u);
     // SetDataBlock takes untyped bytes: the wind vectors are handed over as raw memory (as SpeedTreeLeafShaderProperty
     // does).
@@ -68,14 +53,7 @@ NiAdditionalGeometryData* SpeedTreeBranchShaderProperty::CreateRendererSpecificP
 }
 
 SpeedTreeBranchShaderProperty* SpeedTreeBranchShaderProperty::CreateCopy() {
-    SpeedTreeBranchShaderProperty* v2 =
-        static_cast<SpeedTreeBranchShaderProperty*>(NiMemObject::operator new(sizeof(SpeedTreeBranchShaderProperty)));
-    SpeedTreeBranchShaderProperty* result = nullptr;
-    if (v2) {
-        STSPData* v4 = GetData();
-        return ::new (v2) SpeedTreeBranchShaderProperty(v4);
-    }
-    return result;
+    return new SpeedTreeBranchShaderProperty(GetData());
 }
 
 void SpeedTreeBranchShaderProperty::CopyMembers(SpeedTreeBranchShaderProperty* apDest, NiCloningProcess& arCloneData) {

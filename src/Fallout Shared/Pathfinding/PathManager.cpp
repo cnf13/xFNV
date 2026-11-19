@@ -94,14 +94,7 @@ bool PathManager::BuildPath(
         // The implementation's BuildPath takes both smart pointers by value, and the callee releases them.
         return pImpl->BuildPath(aspRequest, aspMessageQueue);
     }
-    void* pMemory = NiMemObject::operator new(sizeof(PathingSolution));
-    PathingSolution* pSolution;
-    if (pMemory) {
-        pSolution = ::new (pMemory) PathingSolution;
-    }
-    else {
-        pSolution = nullptr;
-    }
+    PathingSolution* pSolution = new PathingSolution;
     NiPointer<PathingSolution> spSolution(pSolution);
     if (Pathing::BuildPath(aspRequest.m_pObject, spSolution.m_pObject)) {
         ActorPathingMessageQueue* pQueue = aspMessageQueue.m_pObject;
@@ -188,8 +181,7 @@ void PathingTaskData::Process() {
     PathManager* pManager = PathManager::QInstance();
     if (pManager->pImpl->TaskTryLock()) {
         if (AllRayCastPathComputed()) {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingSolution));
-            PathingSolution* pSolution = pMemory ? ::new (pMemory) PathingSolution : nullptr;
+            PathingSolution* pSolution = new PathingSolution;
             spSolution = pSolution;
             bool bBuilt = Pathing::BuildPath(spRequest.m_pObject, spSolution.m_pObject);
             if (!bWaitingForRayCasts) {

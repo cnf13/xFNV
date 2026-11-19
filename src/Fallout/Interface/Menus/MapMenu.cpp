@@ -2865,14 +2865,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
             else {
                 pnewGrid = nullptr;
             }
-            TileShaderProperty* v70 =
-                static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-            if (v70) {
-                ptsp = ::new (v70) TileShaderProperty(false);
-            }
-            else {
-                ptsp = nullptr;
-            }
+            ptsp = new TileShaderProperty(false);
             NiTexture* zc = spmaptex.m_pObject;
             ptsp->SetTileTexture(zc);
             ptsp->TexClampMode = NiTexturingProperty::CLAMP_S_CLAMP_T;
@@ -2880,13 +2873,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
             ptsp->SetUseVertexColors(true);
             spmaptex = static_cast<NiTexture*>(nullptr);
             pnewGrid->AttachProperty(ptsp);
-            NiAlphaProperty* v69 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (v69) {
-                palpha = ::new (v69) NiAlphaProperty;
-            }
-            else {
-                palpha = nullptr;
-            }
+            palpha = new NiAlphaProperty;
             palpha->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
             palpha->SetDestBlendMode(NiAlphaProperty::ALPHA_ONE);
             palpha->SetAlphaBlending(true);

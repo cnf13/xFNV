@@ -62,11 +62,7 @@ void BeamShader::RecreateRendererData() {
 // an empty string.
 void BeamShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, PAS_VC_WORLDVIEWTRANSFORM, 4, nullptr, 0, 0, nullptr, false
@@ -74,11 +70,7 @@ void BeamShader::CreateConstantMaps() {
         m_spVertexConstantMap.m_pObject->AddEntry("fVars", 0x10000009, 0, PAS_VC_VARS, 4, "", 0x40, 4, fVars, false);
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
     }
 }
@@ -218,10 +210,7 @@ BSShader* BeamShader::CreateShader() {
         3u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0
     );
     spShaderDecl->GetD3DDeclaration();
-    BeamShader* v2 = static_cast<BeamShader*>(NiMemObject::operator new(sizeof(BeamShader)));
-    if (v2) {
-        pshader = ::new (v2) BeamShader(spShaderDecl);
-    }
+    pshader = new BeamShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

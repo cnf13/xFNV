@@ -526,13 +526,7 @@ bool FleePackage::FindTeleportDoor(Actor* apActor, TESObjectREFR* apThreat) {
 PathingAvoidNodeArray* FleePackage::CreateAvoidNodeArray() {
     float favoidNodeRadius;
     PathingAvoidNodeArray* pavoidNodeArray;
-    void* apMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
-    if (apMemory) {
-        pavoidNodeArray = ::new (apMemory) PathingAvoidNodeArray;
-    }
-    else {
-        pavoidNodeArray = nullptr;
-    }
+    pavoidNodeArray = new PathingAvoidNodeArray;
     if (GetPackageTarget()) {
         favoidNodeRadius = static_cast<float>(GetPackageTarget()->iValue);
     }

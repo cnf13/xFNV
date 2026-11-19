@@ -81,11 +81,5 @@ void NiPSysAirFieldInheritVelocityCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysAirFieldInheritVelocityCtlr::CreateObject() {
-    NiPSysAirFieldInheritVelocityCtlr* v0 = static_cast<NiPSysAirFieldInheritVelocityCtlr*>(
-        NiMemObject::operator new(sizeof(NiPSysAirFieldInheritVelocityCtlr))
-    );
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysAirFieldInheritVelocityCtlr;
+    return new NiPSysAirFieldInheritVelocityCtlr;
 }

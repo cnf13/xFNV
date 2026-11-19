@@ -253,8 +253,7 @@ uint32_t NiD3DShaderConstantMap::AddAttributeEntry(
     const void* pvDataSource,
     bool bCopyData
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
-    NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
+    NiShaderConstantMapEntry* pkEntry = new NiShaderConstantMapEntry;
 
     pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiFlags = (uiFlags & 0x0FFFFFFF) | 0x30000000;
@@ -290,8 +289,7 @@ uint32_t NiD3DShaderConstantMap::AddConstantEntry(
     const void* pvDataSource,
     bool bCopyData
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
-    NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
+    NiShaderConstantMapEntry* pkEntry = new NiShaderConstantMapEntry;
 
     pkEntry->m_kKey = NiFixedString(pszKey);
 
@@ -369,8 +367,7 @@ uint32_t NiD3DShaderConstantMap::AddGlobalEntry(
     const void* pvDataSource,
     bool bCopyData
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
-    NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
+    NiShaderConstantMapEntry* pkEntry = new NiShaderConstantMapEntry;
 
     pkEntry->m_kKey = NiFixedString(pszKey);
     uint32_t uiFlags = (auiFlags & 0x0FFFFFFF) | 0x40000000;
@@ -414,8 +411,7 @@ uint32_t NiD3DShaderConstantMap::AddOperatorEntry(
     uint32_t uiRegisterCount,
     const char* pszVariableName
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
-    NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
+    NiShaderConstantMapEntry* pkEntry = new NiShaderConstantMapEntry;
 
     pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiShaderRegister = uiShaderRegister;
@@ -441,8 +437,7 @@ uint32_t NiD3DShaderConstantMap::AddObjectEntry(
     uint32_t uiObjectIndex,
     NiShaderAttributeDesc::ObjectType eObjectType
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
-    NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
+    NiShaderConstantMapEntry* pkEntry = new NiShaderConstantMapEntry;
 
     pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiShaderRegister = uiShaderRegister;
@@ -479,8 +474,7 @@ uint32_t NiD3DShaderConstantMap::AddPredefinedEntry(
     const void* pvDataSource,
     bool bCopyData
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiShaderConstantMapEntry));
-    NiShaderConstantMapEntry* pkEntry = pvMemory ? ::new (pvMemory) NiShaderConstantMapEntry : nullptr;
+    NiShaderConstantMapEntry* pkEntry = new NiShaderConstantMapEntry;
 
     pkEntry->m_kKey = NiFixedString(pszKey);
     pkEntry->m_uiExtra = uiExtra;

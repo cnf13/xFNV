@@ -32,11 +32,7 @@ BSFogProperty::BSFogProperty()
 
 // Constructs an empty fog property, then copies the members into it.
 NiObject* BSFogProperty::CreateClone(NiCloningProcess& arCloneData) {
-    BSFogProperty* pClone = static_cast<BSFogProperty*>(NiMemObject::operator new(sizeof(BSFogProperty)));
-    BSFogProperty* pResult = nullptr;
-    if (pClone) {
-        pResult = ::new (pClone) BSFogProperty;
-    }
+    BSFogProperty* pResult = new BSFogProperty;
     CopyMembers(pResult, arCloneData);
     return pResult;
 }

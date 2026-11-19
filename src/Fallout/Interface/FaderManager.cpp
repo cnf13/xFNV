@@ -56,8 +56,7 @@ void FaderManager::AddRoot(NiNode* apNode, float afOneToOneDistance, bool abBelo
     AutoMemContext kMemContext(
         MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\FaderManager.cpp", 80
     );
-    void* pNodeMemory = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* pNode = pNodeMemory ? ::new (pNodeMemory) NiNode(0) : nullptr;
+    NiNode* pNode = new NiNode(0);
     if (abBelowMenus) {
         pRootBelowMenus = pNode;
         NiFixedString kName("FaderNode Below Menus");
@@ -69,8 +68,7 @@ void FaderManager::AddRoot(NiNode* apNode, float afOneToOneDistance, bool abBelo
         pNode->SetName(kName);
         afOneToOneDistance = afOneToOneDistance - 20.0;
     }
-    void* pLightMemory = NiMemObject::operator new(sizeof(NiDirectionalLight));
-    NiDirectionalLight* pLight = pLightMemory ? ::new (pLightMemory) NiDirectionalLight : nullptr;
+    NiDirectionalLight* pLight = new NiDirectionalLight;
     NiFixedString kLightName("FaderNodeLight");
     pLight->SetName(kLightName);
     pLight->SetAmbientColor(NiColor(1.0f, 1.0f, 1.0f));
@@ -170,32 +168,13 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     pvertOrder[3] = 2;
     pvertOrder[4] = 1;
     pvertOrder[5] = 3;
-    NiNode* v49 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v49) {
-        faderNode = ::new (v49) NiNode(0);
-    }
-    else {
-        faderNode = nullptr;
-    }
+    faderNode = new NiNode(0);
     FaderData[aeFader].pRoot = faderNode;
     FaderData[aeFader].pRoot->SetName(static_cast<const char*>(FaderData[aeFader].pFaderTextureFilename));
-    NiAlphaProperty* v46 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (v46) {
-        palphaProp = ::new (v46) NiAlphaProperty;
-    }
-    else {
-        palphaProp = nullptr;
-    }
+    palphaProp = new NiAlphaProperty;
     palphaProp->SetAlphaBlending(true);
     FaderData[aeFader].pRoot->AttachProperty(palphaProp);
-    NiTriShape* v44 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v44) {
-        ptri = ::new (v44)
-            NiTriShape(4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvertOrder);
-    }
-    else {
-        ptri = nullptr;
-    }
+    ptri = new NiTriShape(4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvertOrder);
     FaderData[aeFader].pRoot->AttachChild(ptri, 1);
     BSStringT<char> textureFilename;
     textureFilename.SPrintF("Data\\Textures\\Interface\\Faders\\%s", FaderData[aeFader].pFaderTextureFilename);
@@ -210,13 +189,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
         falpha = 1.0f;
         cFaderManagerSkipFadeOutFrames = 3;
     }
-    TileShaderProperty* v41 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-    if (v41) {
-        ptsp = ::new (v41) TileShaderProperty(false);
-    }
-    else {
-        ptsp = nullptr;
-    }
+    ptsp = new TileShaderProperty(false);
     NiSourceTexture* negativeHeightb = ptexture.m_pObject;
     ptsp->SetTileTexture(negativeHeightb);
     ptsp->TexClampMode = NiTexturingProperty::WRAP_S_WRAP_T;

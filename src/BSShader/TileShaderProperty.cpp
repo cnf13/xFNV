@@ -48,11 +48,7 @@ TileShaderProperty::~TileShaderProperty() {}
 
 // CopyMembers still runs when the allocation failed, with a null destination, as the game does.
 NiObject* TileShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    TileShaderProperty* pClone =
-        static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) TileShaderProperty(false);
-    }
+    TileShaderProperty* pClone = new TileShaderProperty(false);
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -176,10 +172,5 @@ void TileShaderProperty::CopyMembers(TileShaderProperty* pDest, NiCloningProcess
 }
 
 NiObject* TileShaderProperty::CreateObject() {
-    TileShaderProperty* pObject =
-        static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-    if (pObject) {
-        return ::new (pObject) TileShaderProperty(false);
-    }
-    return nullptr;
+    return new TileShaderProperty(false);
 }

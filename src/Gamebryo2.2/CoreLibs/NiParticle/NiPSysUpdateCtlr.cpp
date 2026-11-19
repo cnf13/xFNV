@@ -120,11 +120,7 @@ bool NiPSysUpdateCtlr::TargetIsRequiredType() const {
 }
 
 NiObject* NiPSysUpdateCtlr::CreateObject() {
-    NiPSysUpdateCtlr* v0 = static_cast<NiPSysUpdateCtlr*>(NiMemObject::operator new(sizeof(NiPSysUpdateCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysUpdateCtlr;
+    return new NiPSysUpdateCtlr;
 }
 
 void NiTimeController::SetNext(NiTimeController* pkNext) {

@@ -80,10 +80,5 @@ bool NiPSysResetOnLoopCtlr::TargetIsRequiredType() const {
 }
 
 NiObject* NiPSysResetOnLoopCtlr::CreateObject() {
-    NiPSysResetOnLoopCtlr* pkObject =
-        static_cast<NiPSysResetOnLoopCtlr*>(NiMemObject::operator new(sizeof(NiPSysResetOnLoopCtlr)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysResetOnLoopCtlr;
+    return new NiPSysResetOnLoopCtlr;
 }
