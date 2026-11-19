@@ -1,6 +1,7 @@
 #include "BSHavok/bhkBinaryAction.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkAction.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkSerializable.h"
@@ -99,8 +100,8 @@ bool bhkBinaryAction::IsEqual(NiObject* apObject) {
 // The base's lines, then the class's RTTI name, appended the way NiTArray::Add does it (unsigned compare against
 // m_usMaxSize, grow by m_usGrowBy, store at m_usSize), all under the Havok heap context.
 void bhkBinaryAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     bhkAction::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(ms_RTTI.GetName());
@@ -111,8 +112,8 @@ void bhkBinaryAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
 // Under the Havok heap context: with a world, adds entity B's wrapper first (when there is one) and the action only
 // when that succeeded; without one, removes the action. False without an action or a world.
 bool bhkBinaryAction::Add(bhkWorld* apWorld) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     bool bAdded = false;
     if (this && phkObject) {
@@ -135,8 +136,8 @@ bool bhkBinaryAction::Add(bhkWorld* apWorld) {
 // one body, attached to the world), the action drops it. Both worlds come through GethkWorld: this action's, then the
 // bhkWorld's own. The result is the base's; false when the action is in no world.
 bool bhkBinaryAction::Remove() {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     ahkpWorld* pWorld = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
     bhkWorld* pWorldM = pWorld ? static_cast<bhkWorld*>(pWorld->m_userData) : nullptr;

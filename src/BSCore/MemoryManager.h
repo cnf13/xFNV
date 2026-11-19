@@ -203,20 +203,14 @@ void* ourCalloc(uint32_t aNum, uint32_t aSize);
 void* ourMemset(void* apDest, int32_t aiValue, uint32_t aCount);
 // The engine's memcpy wrapper: it calls the CRT memcpy and returns its result. Defined in BGSDehydration.cpp.
 void* ourMemcpy(void* apDest, const void* apSrc, size_t aCount);
-// Sets the calling thread's memory context to aeContext.
+// The calling thread's memory context, TLSData::eMemContext (the exe's inlined sites read and write that field
+// directly). Defined in EffectItem.cpp.
+MEM_CONTEXT QMemContext();
+// Sets the calling thread's memory context to aeContext. Defined in EffectItem.cpp.
 void SetMemContext(MEM_CONTEXT aeContext);
 // The engine's aligned allocator: aSize bytes aligned to acAlignment.
 void* ourMemalign(uint8_t acAlignment, size_t aSize);
 int32_t cleanup_1();
-
-inline int32_t& GetThreadMemContext() {
-    static thread_local int32_t iMemContext = MEM_CONTEXT_STATICVARS;
-    return iMemContext;
-}
-inline uint32_t& GetThreadSpecificFlags() {
-    static thread_local uint32_t uiFlags = 0;
-    return uiFlags;
-}
 
 // Bethesda's heap-context guard: charges the scope's allocations to one context and restores the thread's previous
 // context on exit. The constructor saves the old context and stores the new one, the destructor stores the saved one
@@ -224,17 +218,17 @@ inline uint32_t& GetThreadSpecificFlags() {
 class AutoMemContext {
 public:
     // A default-constructed AutoMemContext holds the current context, which the destructor restores unchanged.
-    AutoMemContext() : iOldMemContext(static_cast<MEM_CONTEXT>(GetThreadMemContext())) {}
+    AutoMemContext() : iOldMemContext(QMemContext()) {}
 
     explicit AutoMemContext(MEM_CONTEXT aeMemContext) {
-        iOldMemContext = static_cast<MEM_CONTEXT>(GetThreadMemContext());
-        GetThreadMemContext() = aeMemContext;
+        iOldMemContext = QMemContext();
+        SetMemContext(aeMemContext);
     }
 
     AutoMemContext(const AutoMemContext&) = delete;
     AutoMemContext(MEM_CONTEXT memContext, bool overridable, const char* apFile, int32_t aiLine);
     ~AutoMemContext() {
-        GetThreadMemContext() = iOldMemContext;
+        SetMemContext(iOldMemContext);
     }
 
     AutoMemContext& operator=(const AutoMemContext&) = delete;

@@ -54,8 +54,8 @@ bhkExtendedMeshSubPart::bhkExtendedMeshSubPart()
 // in the byte before it). Each block goes back to the heap under the Havok context, the material block through the
 // aligned free (the padding length sits in the byte before it).
 bhkExtendedMeshSubPart::~bhkExtendedMeshSubPart() {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     if (pVertexBaseA) {
         MemoryManager_Singleton.Deallocate(pVertexBaseA);
@@ -156,8 +156,8 @@ bhkExtendedMeshShapeData::bhkExtendedMeshShapeData() : uiNumSubParts(0), pSubDat
 
 // The sub parts are destroyed and freed under the Havok heap context.
 bhkExtendedMeshShapeData::~bhkExtendedMeshShapeData() {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     delete[] pSubDataA;
     riMemContext = iSavedMemContext;
@@ -268,8 +268,8 @@ const NiRTTI* bhkExtendedMeshShape::GetRTTI() const {
 
 NiObject* bhkExtendedMeshShape::CreateClone(NiCloningProcess& arCloneData) {
     // The clone is charged to the Havok heap context for the duration of the copy.
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkExtendedMeshShape* pClone = new bhkExtendedMeshShape;
@@ -353,8 +353,8 @@ void bhkExtendedMeshShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings)
 
 // Destroys and frees the creation info CreateCinfo made, under the Havok heap context.
 void bhkExtendedMeshShape::KillCinfo(bool abCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     if (abCreated) {
         hkSerializableCinfo* pInfo = this->pInfo;
         if (pInfo) {
@@ -368,7 +368,7 @@ void bhkExtendedMeshShape::KillCinfo(bool abCreated) {
         }
         this->pInfo = nullptr;
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 uint32_t bhkExtendedMeshShape::QCinfoSize() const {
@@ -378,8 +378,8 @@ uint32_t bhkExtendedMeshShape::QCinfoSize() const {
 // The creation info is read into a scratch block from the Havok heap context and dropped again: nothing is kept, and
 // the size read is returned.
 int32_t bhkExtendedMeshShape::LoadCInfo(NiStream& arStream) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     // Slot 42 (+0xA8), through the vtable.
     uint32_t uiCinfoSize = static_cast<const bhkSerializable*>(this)->QCinfoSize();
@@ -457,8 +457,8 @@ void bhkExtendedMeshShape::Init(const hkSerializableCinfo& arInfo) {
 // The shape's creation info: filled from the wrapped Havok object when there is one, else a new one from the Havok
 // context, zeroed with a radius of 0 and a scale of one.
 hkSerializableCinfo& bhkExtendedMeshShape::CreateCinfo(bool& arCreated) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     arCreated = pInfo == nullptr;
     if (arCreated) {

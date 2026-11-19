@@ -53,14 +53,14 @@ const NiRTTI* bhkNiTriStripsShape::GetRTTI() const {
 }
 
 NiObject* bhkNiTriStripsShape::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkNiTriStripsShape* pClone = new bhkNiTriStripsShape;
     // Called through the base, so the class's CopyMembers is reached through the vtable.
     static_cast<bhkShape*>(this)->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 
@@ -360,8 +360,8 @@ void bhkNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) 
 // Drops the creation info when it was built here: destroys the sub parts array, then deallocates the aligned block,
 // whose padding byte sits just before it.
 void bhkNiTriStripsShape::KillCinfo(bool abCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     if (abCreated) {
         hkNiTriStripsShapeCinfo* pCinfo = static_cast<hkNiTriStripsShapeCinfo*>(this->pInfo);
         if (pCinfo) {
@@ -373,7 +373,7 @@ void bhkNiTriStripsShape::KillCinfo(bool abCreated) {
         }
         this->pInfo = nullptr;
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 // The size of the shape's creation info in a file: its serialized form's.
@@ -414,8 +414,8 @@ int32_t bhkNiTriStripsShape::LoadCInfo(NiStream& arStream) {
 // Builds the Havok shape in a block the engine aligns to 16, keeping the padding byte before it, then hands the object
 // to the wrapper and drops the local reference.
 void bhkNiTriStripsShape::Init(const hkSerializableCinfo& arInfo) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     char* pBlock = static_cast<char*>(MemoryManager_Singleton.Allocate(sizeof(hkNiTriStripsShape) + 0x10));
     uint8_t uiPad = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pBlock) & 0xF));
     void* pMemory = pBlock + uiPad;
@@ -426,15 +426,15 @@ void bhkNiTriStripsShape::Init(const hkSerializableCinfo& arInfo) {
     static_cast<bhkSerializable*>(this)->SethkObject(pObject);
     pObject->removeReference();
     static_cast<bhkSerializable*>(this)->PostInit(arInfo);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 // Builds the creation info when there is none: a block the engine aligns to 16 from the Havok heap context holding the
 // sub parts' array (its vtable, zeroed counts, a grow-by of one) and the unit scale, then copies the wrapped shape's
 // data into it.
 hkSerializableCinfo& bhkNiTriStripsShape::CreateCinfo(bool& arCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     arCreated = this->pInfo == nullptr;
     if (arCreated) {
         char* pBlock = static_cast<char*>(MemoryManager_Singleton.Allocate(sizeof(hkNiTriStripsShapeCinfo) + 0x10));
@@ -468,7 +468,7 @@ hkSerializableCinfo& bhkNiTriStripsShape::CreateCinfo(bool& arCreated) {
         }
     }
     hkSerializableCinfo* pInfo = this->pInfo;
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return *pInfo;
 }
 
@@ -495,8 +495,8 @@ bool bhkNiTriStripsShape::CanShare(NiCloningProcess& arCloneData) {
 // Adds a NiTriStrips named for the class over each sub part whose geometry is a NiTriStripsData to apNode, scaled by
 // the shape's |scale| and prepared with the geometry's material bits and arDefColor, under the Havok heap context.
 void bhkNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     hkNiTriStripsShape* pShape = static_cast<hkNiTriStripsShape*>(this->phkObject);
     // EXE-INLINED none: bhkNiTriStripsShape::GetNumSubparts
     int32_t iSubparts = pShape ? static_cast<int32_t>(pShape->pShapesA.m_uiSize) : 0;
@@ -526,7 +526,7 @@ void bhkNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& ar
         );
         apNode->AttachChild(pStrips, true);
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 // The material of the sub part the key's top twelve bits index, or the shape's own for the key -1.

@@ -215,8 +215,8 @@ BSRenderedTexture* ImageSpaceManager::GetDepthRenderedTexture() {
 void ImageSpaceManager::SetBaseParameterData(const ImageSpaceParameterData* apParameterData) {
     // Only the save and restore of a heap-context guard is kept here, and the new context is never stored, as the game
     // does. The thread's block is reached once.
-    int32_t& riMemContext = GetThreadMemContext();
-    const int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    const MEM_CONTEXT iOldMemContext = riMemContext;
     pBaseParameterData = apParameterData;
     riMemContext = iOldMemContext;
 }

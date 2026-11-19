@@ -1,6 +1,7 @@
 #include "BSHavok/bhkSimpleShapePhantom.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkPhantom.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkSerializable.h"
@@ -42,8 +43,8 @@ bhkSimpleShapePhantom::~bhkSimpleShapePhantom() {
 // inside the engine's clone critical section and charged to the Havok heap context.
 NiObject* bhkSimpleShapePhantom::CreateClone(NiCloningProcess& arCloneData) {
     // Reads the thread's TLS block once, before the lock, to save and restore the heap context.
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
 
     bhkSimpleShapePhantom* pClone = nullptr;
@@ -60,8 +61,8 @@ NiObject* bhkSimpleShapePhantom::CreateClone(NiCloningProcess& arCloneData) {
 void bhkSimpleShapePhantom::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     // Saves and restores the heap context around the base call, reading the thread's TLS block once, before the base
     // call.
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
 
     bhkShapePhantom::GetViewerStrings(apStrings);
@@ -95,8 +96,8 @@ void bhkSimpleShapePhantom::KillCinfo(bool abCreated) {
 void bhkSimpleShapePhantom::Init(const hkSerializableCinfo& arInfo) {
     const hkSimpleShapePhantomCinfo& cinfo = static_cast<const hkSimpleShapePhantomCinfo&>(arInfo);
     // Saves and restores the heap context, reading the thread's TLS block once.
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
 
     hkTransform hkt;

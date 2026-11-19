@@ -400,8 +400,8 @@ void TallGrassShader::SetupPassTextures(uint32_t auiCurrentPass) {
 
 // Builds the constant maps under the grass heap context.
 void TallGrassShader::CreateConstantMaps() {
-    int32_t& riContext = GetThreadMemContext();
-    int32_t iOldContext = riContext;
+    MEM_CONTEXT& riContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldContext = riContext;
     riContext = MEM_CONTEXT_GRASS;
     if (!m_spVertexConstantMap.m_pObject) {
         NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);

@@ -1,6 +1,7 @@
 #include "BSHavok/bhkCollisionBox.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkCachingShapePhantom.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkConvert.h"
@@ -36,8 +37,8 @@ const NiRTTI* bhkCollisionBox::GetRTTI() const {
 // Adds the box's viewer lines to apStrings: the base phantom's lines, then the class heading.
 void bhkCollisionBox::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     // Reads the thread's TLS block once, before the base call.
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
 
     bhkSimpleShapePhantom::GetViewerStrings(apStrings);

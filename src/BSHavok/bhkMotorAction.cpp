@@ -136,8 +136,8 @@ uint32_t bhkMotorAction::QCinfoSize() const {
 // size word set, the action's constructor run on it with the creation info's body, axis, spin rate and gain, then the
 // action handed to SethkObject and the constructor's reference dropped. PostInit drops the creation info.
 void bhkMotorAction::Init(const hkSerializableCinfo& arInfo) {
-    int32_t& eMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = eMemContext;
+    MEM_CONTEXT& eMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = eMemContext;
     eMemContext = MEM_CONTEXT_HAVOK;
     const hkMotorActionCinfo& kCinfo = static_cast<const hkMotorActionCinfo&>(arInfo);
     hkpMotorAction* pAction =
@@ -157,8 +157,8 @@ void bhkMotorAction::Init(const hkSerializableCinfo& arInfo) {
 // the cinfo's size plus the 16 bytes alignment can need. The bytes between m_body and m_axis are left unwritten, as the
 // game does.
 hkSerializableCinfo& bhkMotorAction::CreateCinfo(bool& arCreated) {
-    int32_t& eMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = eMemContext;
+    MEM_CONTEXT& eMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = eMemContext;
     eMemContext = MEM_CONTEXT_HAVOK;
     arCreated = pInfo == nullptr;
     if (arCreated) {

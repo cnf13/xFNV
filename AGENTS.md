@@ -98,8 +98,9 @@ The decompiler lowered a lot of C++; much of the project's work is writing it ba
   `BSSimpleArray` have `begin()`/`end()` over `[0, size)`, including NiTArray's empty slots. `hkLocalBuffer` has no
   `end()`. `BSSimpleList::ItemsUntilNull()` stops at a null item; a plain range-for over an empty list yields its null
   head.
-- **Memory contexts.** The thread's memory context lives in two places, `GetThreadMemContext()` (a `thread_local`)
-  and `TLSData::eMemContext`; in the exe they are one value.
+- **Memory contexts.** The thread's memory context is `TLSData::eMemContext`, as in the exe. Hand-written save and
+  restore sites write it through `GetThreadTLSData()`; `AutoMemContext` reaches it through `QMemContext()` and
+  `SetMemContext()`, which are out of line (`TLSData.h` cannot be included from `MemoryManager.h`).
 
 ## History
 
@@ -128,5 +129,4 @@ uses `fnvd` names.
 - 96 hand-expanded `operator new(sizeof ...)` sites and 14 hand-expanded array news (`>> 32 ? 0xFFFFFFFF`).
 - Raw-pointer members that should be `NiPointer`s, SDK default constructors (`hkpMassProperties` and others),
   `hkpProcessCollisionInput`'s spare-sector frees: these need IDA.
-- The two memory contexts: the one item that may be a real behaviour difference.
 - The `void*` audit table at the end of FOLLOWUPS.md.

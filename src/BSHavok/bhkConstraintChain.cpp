@@ -104,8 +104,8 @@ bool bhkConstraintChain::IsEqual(NiObject* apObject) {
 // wraps nothing, apWorld is null, or apWorld is already the instance's world.
 bool bhkConstraintChain::Add(bhkWorld* apWorld) {
     // Reads the thread's TLS block once, before the calls.
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
 
     // Null-checks this before reading the field, as the game does.

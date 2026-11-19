@@ -47,8 +47,8 @@ bhkListShape::~bhkListShape() {
 
 // Clones the shape: builds an empty copy under the clone lock and has it copy this shape's members.
 NiObject* bhkListShape::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkListShape* pkClone = new bhkListShape;

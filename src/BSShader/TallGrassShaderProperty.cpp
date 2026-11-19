@@ -104,11 +104,9 @@ TallGrassShaderProperty::~TallGrassShaderProperty() {
 
 // Builds the clone with the grass heap context selected.
 NiObject* TallGrassShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_GRASS;
+    AutoMemContext kMemContext(MEM_CONTEXT_GRASS);
     TallGrassShaderProperty* pClone = new TallGrassShaderProperty;
     this->CopyMembers(pClone, arCloneData);
-    GetThreadMemContext() = iOldMemContext;
     return pClone;
 }
 
@@ -390,17 +388,13 @@ TallGrassShaderProperty::GetCachedGeometryMap() {
 
 // The cached geometry of apGrassParam's model, loading it on first use: one dynamic geometry holding as many copies of
 // the model's first geometry as one draw can index, with each copy's instance number per vertex. Null while the model's
-// background load runs. Smart-pointer locals are released before the thread's memory context is restored:
-// spCachedGeom by a null assignment on each way out, so that its destructor finds nothing left to release.
+// background load runs.
 // KEEP: on a cache miss the exe copies SetAt's by-value NiPointer argument (InterlockedIncrement at 0xB61AA2) before
 // calling GetCachedGeometryMap (0xB61AB7); C++17 evaluates the object expression of the call first, so src cannot
 // express the exe's order.
 TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeometry(GrassParam* apGrassParam) {
-    TLSData* pTLSData = GetThreadTLSData();
-    MEM_CONTEXT eMemContext = pTLSData->eMemContext;
-    pTLSData->eMemContext = MEM_CONTEXT_GRASS;
+    AutoMemContext kMemContext(MEM_CONTEXT_GRASS);
     if (!BSShaderManager::eShaderLevel || !apGrassParam->pcGeomFilename) {
-        pTLSData->eMemContext = eMemContext;
         return nullptr;
     }
     NiPointer<CachedGeometry> spCachedGeom;
@@ -417,8 +411,6 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             GrassLoadTask* pTask = pMemory ? ::new (pMemory) GrassLoadTask(apGrassParam->pcGeomFilename) : nullptr;
             pCachedGeom->spGrassLoadTask = pTask;
             pIOManager->AddTask(pCachedGeom->spGrassLoadTask.m_pObject);
-            spCachedGeom = nullptr;
-            pTLSData->eMemContext = eMemContext;
             return nullptr;
         }
     }
@@ -430,16 +422,12 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             GrassLoadTask* pTask = pMemory ? ::new (pMemory) GrassLoadTask(apGrassParam->pcGeomFilename) : nullptr;
             pCachedGeom->spGrassLoadTask = pTask;
             pIOManager->AddTask(pCachedGeom->spGrassLoadTask.m_pObject);
-            spCachedGeom = nullptr;
-            pTLSData->eMemContext = eMemContext;
             return nullptr;
         }
         GrassLoadTask* pTask = pCachedGeom->spGrassLoadTask.m_pObject;
         if (pTask) {
             // The background load has not finished yet.
             if (pTask->eState < BS_TASK_STATE_FINISHED) {
-                spCachedGeom = nullptr;
-                pTLSData->eMemContext = eMemContext;
                 return nullptr;
             }
             spObject = pTask->GetObject();
@@ -455,8 +443,6 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             }
         }
         if (!spObject.m_pObject) {
-            spCachedGeom = nullptr;
-            pTLSData->eMemContext = eMemContext;
             return nullptr;
         }
         pCachedGeom->bQueued = false;
@@ -737,10 +723,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         }
     }
     // The map holds a reference, so the geometry outlives the local's release.
-    pCachedGeom = spCachedGeom.m_pObject;
-    spCachedGeom = nullptr;
-    pTLSData->eMemContext = eMemContext;
-    return pCachedGeom;
+    return spCachedGeom;
 }
 
 // Each group of the grass that has the chunk drops the chunk; a group left without chunks leaves the group list (the

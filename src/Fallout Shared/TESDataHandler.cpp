@@ -7,6 +7,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
+#include "BSCore/TLSData.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
 #include "BSMain/SettingCollection.h"
@@ -6511,18 +6512,18 @@ bool TESObjectWEAP::IsEmbeddedWeapon() {
 }
 
 bool BGSSaveLoadGame::GetThreadAllowChanges() {
-    return (GetThreadSpecificFlags() & 1u) == 0;
+    return (GetThreadTLSData()->uiThreadSpecificFlags & 1u) == 0;
 }
 
 bool BGSSaveLoadGame::SetThreadAllowChanges(bool abValue) {
     bool bThreadAllowChanges = GetThreadAllowChanges();
     if (abValue) {
-        uint32_t uiFlags = GetThreadSpecificFlags();
-        GetThreadSpecificFlags() = uiFlags & ~1u;
+        uint32_t uiFlags = GetThreadTLSData()->uiThreadSpecificFlags;
+        GetThreadTLSData()->uiThreadSpecificFlags = uiFlags & ~1u;
     }
     else {
-        uint32_t uiFlags = GetThreadSpecificFlags();
-        GetThreadSpecificFlags() = uiFlags | 1u;
+        uint32_t uiFlags = GetThreadTLSData()->uiThreadSpecificFlags;
+        GetThreadTLSData()->uiThreadSpecificFlags = uiFlags | 1u;
     }
     return bThreadAllowChanges;
 }

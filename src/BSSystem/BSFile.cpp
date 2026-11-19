@@ -348,12 +348,12 @@ int32_t BSFile::WriteHere(const void* apBuffer, uint32_t auiBytes) {
 
 void BSFile::CheckIsGood() {
     uint8_t bEmpty;
-    int32_t eMemContext;
+    MEM_CONTEXT eMemContext;
     if (m_pFile) {
         m_bGood = true;
         if ((m_uiBufferAllocSize) && (!m_pBuffer)) {
-            eMemContext = GetThreadMemContext();
-            GetThreadMemContext() = 23;
+            eMemContext = GetThreadTLSData()->eMemContext;
+            GetThreadTLSData()->eMemContext = MEM_CONTEXT_BSFILE;
             bEmpty = (uint8_t)(m_uiBufferAllocSize == (-1));
             if (m_uiBufferAllocSize == 0xFFFFFFFFu) {
                 m_uiBufferAllocSize = GetFileSize();
@@ -368,7 +368,7 @@ void BSFile::CheckIsGood() {
                     m_bGood = false;
                 }
             }
-            GetThreadMemContext() = eMemContext;
+            GetThreadTLSData()->eMemContext = eMemContext;
         }
     }
     else {

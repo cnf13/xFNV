@@ -142,8 +142,8 @@ void bhkOrientHingedBodyAction::Init(const hkSerializableCinfo& arInfo) {
 // Builds the action's creation info when there is none: a block the engine aligns to 16 from the Havok heap context
 // holding the unary action's zeroed user data and entity, two zero axes, and a 0.5 strength with 0.1 damping.
 hkSerializableCinfo& bhkOrientHingedBodyAction::CreateCinfo(bool& arCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     arCreated = this->pInfo == nullptr;
     if (arCreated) {
         char* pBlock =
@@ -165,7 +165,7 @@ hkSerializableCinfo& bhkOrientHingedBodyAction::CreateCinfo(bool& arCreated) {
         }
     }
     hkSerializableCinfo* pInfo = this->pInfo;
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return *pInfo;
 }
 

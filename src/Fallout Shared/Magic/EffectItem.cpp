@@ -75,7 +75,7 @@ float FloatFloor(float aIn) {
 }
 
 MEM_CONTEXT QMemContext() {
-    return static_cast<MEM_CONTEXT>(GetThreadMemContext());
+    return GetThreadTLSData()->eMemContext;
 }
 
 EffectItemData::EffectItemData()

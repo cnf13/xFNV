@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
@@ -1289,11 +1290,11 @@ void BGSReconstructWorldSpacesMap::operator delete(void* apMemory) {
 
 void BGSSaveLoadGame::SetReconstructingForms(bool abValue) {
     if (abValue) {
-        uint32_t uiFlags = GetThreadSpecificFlags();
-        GetThreadSpecificFlags() = uiFlags | 4u;
+        uint32_t uiFlags = GetThreadTLSData()->uiThreadSpecificFlags;
+        GetThreadTLSData()->uiThreadSpecificFlags = uiFlags | 4u;
     }
     else {
-        uint32_t uiFlags = GetThreadSpecificFlags();
-        GetThreadSpecificFlags() = uiFlags & ~4u;
+        uint32_t uiFlags = GetThreadTLSData()->uiThreadSpecificFlags;
+        GetThreadTLSData()->uiThreadSpecificFlags = uiFlags & ~4u;
     }
 }

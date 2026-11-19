@@ -1,6 +1,7 @@
 #include "BSHavok/bhkAction.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkWorld.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
@@ -66,8 +67,8 @@ hkpWorld* bhkAction::GethkWorldRw() {
 // Adds the wrapped action to apWorld, first taking it out of the world it is in when that is another one (or when there
 // is no world); the whole body runs under the Havok heap context.
 bool bhkAction::Add(bhkWorld* apWorld) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     bool bAdded = false;
     hkpAction* pAction = this ? static_cast<hkpAction*>(phkObject) : nullptr;
@@ -90,8 +91,8 @@ bool bhkAction::Add(bhkWorld* apWorld) {
 // Takes the wrapped action out of the world its wrapper points at, under the Havok heap context; the result is the
 // world's own.
 bool bhkAction::Remove() {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     ahkpWorld* pWorld = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
     bhkWorld* pWorldM = pWorld ? static_cast<bhkWorld*>(pWorld->m_userData) : nullptr;

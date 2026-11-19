@@ -139,8 +139,8 @@ NiGlobalStringTable::GlobalStringHandle NiGlobalStringTable::AddString(const cha
         return kExisting;
     }
 
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_STRING_TABLES;
 
     // The block is the reference count, the length, the characters and their terminator, padded to 4 bytes.

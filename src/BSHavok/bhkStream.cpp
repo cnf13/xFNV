@@ -119,8 +119,8 @@ int32_t bhkStream::SaveBinary(NiStream& arStream, const hkpMoppCode* apMoppCode)
 // pointer and restored through it.
 int32_t bhkStream::LoadBinary(NiStream& arStream, hkpMoppCode*& arMoppCode) {
     // EXE-INLINED none: AutoMemContext
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     hkpMoppCode* pMoppCode =
         static_cast<hkpMoppCode*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpMoppCode)));

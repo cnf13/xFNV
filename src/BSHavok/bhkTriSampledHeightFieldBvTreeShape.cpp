@@ -51,13 +51,13 @@ bhkTriSampledHeightFieldBvTreeShape::~bhkTriSampledHeightFieldBvTreeShape() {
 
 // A new shape built in the Havok heap context under the clone lock, then the members copied through the vtable.
 NiObject* bhkTriSampledHeightFieldBvTreeShape::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkTriSampledHeightFieldBvTreeShape* pClone = new bhkTriSampledHeightFieldBvTreeShape;
     CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 
@@ -184,8 +184,8 @@ void bhkTriSampledHeightFieldBvTreeShape::Init(const hkSerializableCinfo& arInfo
 // A new creation info from the Havok heap, filled from the Havok shape when there is one; arCreated says whether it was
 // made here.
 hkSerializableCinfo& bhkTriSampledHeightFieldBvTreeShape::CreateCinfo(bool& arCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bool bCreate = pInfo == nullptr;
     arCreated = bCreate;
     if (bCreate) {
@@ -202,7 +202,7 @@ hkSerializableCinfo& bhkTriSampledHeightFieldBvTreeShape::CreateCinfo(bool& arCr
         }
     }
     hkSerializableCinfo* pResult = pInfo;
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return *pResult;
 }
 

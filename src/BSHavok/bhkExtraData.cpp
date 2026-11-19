@@ -35,7 +35,7 @@ const NiRTTI* bhkExtraData::GetRTTI() const {
 // The clone is allocated inside the Havok heap context, built by the constructor and filled in by CopyMembers, which is
 // called even when the allocation failed, as the game does.
 NiObject* bhkExtraData::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& iMemContext = GetThreadMemContext();
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
     MEM_CONTEXT eOldMemContext = static_cast<MEM_CONTEXT>(iMemContext);
     iMemContext = MEM_CONTEXT_HAVOK;
 
@@ -55,7 +55,7 @@ void bhkExtraData::LoadBinary(NiStream& arStream) {
 // The linked controllers are taken from the stream's queued link IDs, one per count the file stored. The whole body
 // runs with the thread's heap context switched to Havok.
 void bhkExtraData::LinkObject(NiStream& arStream) {
-    int32_t& iMemContext = GetThreadMemContext();
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
     MEM_CONTEXT eOldMemContext = static_cast<MEM_CONTEXT>(iMemContext);
     iMemContext = MEM_CONTEXT_HAVOK;
 

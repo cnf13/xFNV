@@ -377,15 +377,15 @@ bhkWorld::bhkWorld(const bhkWorldCinfo& arInfo)
 // entity listeners (each destroyed through its vtable) and the action list; the context is restored before the members'
 // destructors run (the list, then the two hkArrays).
 bhkWorld::~bhkWorld() {
-    int32_t iOldMemContext = GetThreadMemContext();
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
     --iCount;
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     if (pDebugger) {
         GethkWorld();
         pDebugger->removeReference();
         pDebugger = nullptr;
     }
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     GethkWorld();
     bhkSerializable::Kill();
     MemoryManager_Singleton.Deallocate(pEntityBatch);
@@ -401,7 +401,7 @@ bhkWorld::~bhkWorld() {
     }
     pEntityListenerA.m_size = 0;
     ActionList.RemoveAll();
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 void bhkWorld::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
@@ -2822,8 +2822,8 @@ void bhkTaskletManagerCallback::bhkThreadState::CreateThreadMemory() {
     EnterCriticalSection(&StateLock);
     // iNumElem is compared signed.
     if (static_cast<int32_t>(iNumElem) < 16) {
-        int32_t& riMemContext = GetThreadMemContext();
-        int32_t iOldContext = riMemContext;
+        MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+        MEM_CONTEXT iOldContext = riMemContext;
         riMemContext = MEM_CONTEXT_HAVOK;
         bhkTaskletManagerCallback::bhkThreadStateElem* pElem = &Elem[iNumElem];
         hkMemorySystem& rSystem = hkMemorySystem::getInstance();

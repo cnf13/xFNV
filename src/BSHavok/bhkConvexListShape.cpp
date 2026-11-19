@@ -49,8 +49,8 @@ const NiRTTI* bhkConvexListShape::GetRTTI() const {
 
 // Clones the shape: builds an empty copy under the clone lock and has it copy this shape's members.
 NiObject* bhkConvexListShape::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     bhkConvexListShape* pkClone = nullptr;
     bhkSerializable::CloneCritLock();
@@ -232,8 +232,8 @@ uint32_t bhkConvexListShape::QCinfoSize() const {
 
 // Builds the wrapped Havok convex list shape from the creation info.
 void bhkConvexListShape::Init(const hkSerializableCinfo& arInfo) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     const hkConvexListShapeCinfo* pCinfo = static_cast<const hkConvexListShapeCinfo*>(&arInfo);
     const hkpConvexShape* const* ppChildShapes = pCinfo->m_childShapes.m_data;
@@ -251,8 +251,8 @@ void bhkConvexListShape::Init(const hkSerializableCinfo& arInfo) {
 
 // Builds the shape's creation info; arCreated tells whether it was allocated here.
 hkSerializableCinfo& bhkConvexListShape::CreateCinfo(bool& arCreated) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     arCreated = (pInfo == nullptr);
     if (arCreated) {

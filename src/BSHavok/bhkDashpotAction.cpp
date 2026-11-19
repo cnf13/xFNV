@@ -43,8 +43,8 @@ const NiRTTI* bhkDashpotAction::GetRTTI() const {
 // The clone is charged to the Havok heap context, built as in CreateObject, then given the members through the virtual
 // CopyMembers.
 NiObject* bhkDashpotAction::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& eMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = eMemContext;
+    MEM_CONTEXT& eMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = eMemContext;
     eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkDashpotAction* pClone = new bhkDashpotAction;
@@ -155,8 +155,8 @@ void bhkDashpotAction::Init(const hkSerializableCinfo& arInfo) {
 // the cinfo's size plus the 16 bytes alignment can need. The four padding bytes before m_pivotA are deliberately left
 // unwritten, as the game does.
 hkSerializableCinfo& bhkDashpotAction::CreateCinfo(bool& arCreated) {
-    int32_t& eMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = eMemContext;
+    MEM_CONTEXT& eMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = eMemContext;
     eMemContext = MEM_CONTEXT_HAVOK;
     arCreated = pInfo == nullptr;
     if (arCreated) {

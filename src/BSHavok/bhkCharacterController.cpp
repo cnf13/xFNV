@@ -3592,8 +3592,8 @@ bhkCharacterControllerCinfo::bhkCharacterControllerCinfo(bool abDefaultStates)
     bUseDefaultShape(false), bCanPitch(false), bCanRoll(false), eStartState(HK_CHARACTER_ON_GROUND), spManager(nullptr),
     fStepHeight(static_cast<float>(static_cast<double>(fBS2HkScaleSC) * 31.0)), fScale(1.0f),
     eShapeType(bhkCharacterController::ST_CONVEX), iPriority(0) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     uint32_t uiGroup = (bhkCollisionFilter::uiNextGroup + 1) & 0xFFFF;
     bhkCollisionFilter::uiNextGroup = uiGroup;

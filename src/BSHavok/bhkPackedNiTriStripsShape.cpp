@@ -52,14 +52,14 @@ const NiRTTI* bhkPackedNiTriStripsShape::GetRTTI() const {
 }
 
 NiObject* bhkPackedNiTriStripsShape::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkPackedNiTriStripsShape* pClone = new bhkPackedNiTriStripsShape;
     // Called through the base so that the class's CopyMembers is reached by virtual dispatch.
     static_cast<bhkShape*>(this)->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 
@@ -164,8 +164,8 @@ void bhkPackedNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStr
 }
 
 void bhkPackedNiTriStripsShape::KillCinfo(bool abCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     if (abCreated) {
         hkSerializableCinfo* pInfo = this->pInfo;
         if (pInfo) {
@@ -179,7 +179,7 @@ void bhkPackedNiTriStripsShape::KillCinfo(bool abCreated) {
         }
         this->pInfo = nullptr;
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 uint32_t bhkPackedNiTriStripsShape::QCinfoSize() const {
@@ -187,21 +187,21 @@ uint32_t bhkPackedNiTriStripsShape::QCinfoSize() const {
 }
 
 int32_t bhkPackedNiTriStripsShape::LoadCInfo(NiStream& arStream) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     // Reads the creation info into a scratch block and drops it: nothing is kept.
     uint32_t uiCinfoSize = static_cast<const bhkSerializable*>(this)->QCinfoSize();
     void* pCinfo = MemoryManager_Singleton.Allocate(uiCinfoSize);
     NiBinaryStream* pIstr = arStream.m_pkIstr;
     pIstr->BinaryRead(pCinfo, uiCinfoSize, nullptr, 0);
     MemoryManager_Singleton.Deallocate(pCinfo);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return static_cast<int32_t>(uiCinfoSize);
 }
 
 void bhkPackedNiTriStripsShape::Init(const hkSerializableCinfo& arInfo) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
     hkPackedNiTriStripsShape* pShape = static_cast<hkPackedNiTriStripsShape*>(
         kRouter.heap().blockAlloc(static_cast<int32_t>(sizeof(hkPackedNiTriStripsShape)))
@@ -214,12 +214,12 @@ void bhkPackedNiTriStripsShape::Init(const hkSerializableCinfo& arInfo) {
     static_cast<bhkSerializable*>(this)->SethkObject(pObject);
     pObject->removeReference();
     static_cast<bhkSerializable*>(this)->PostInit(arInfo);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 hkSerializableCinfo& bhkPackedNiTriStripsShape::CreateCinfo(bool& arCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     arCreated = this->pInfo == nullptr;
     if (arCreated) {
         char* pMemory =
@@ -236,7 +236,7 @@ hkSerializableCinfo& bhkPackedNiTriStripsShape::CreateCinfo(bool& arCreated) {
         }
     }
     hkSerializableCinfo* pResult = this->pInfo;
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return *pResult;
 }
 
@@ -261,8 +261,8 @@ bool bhkPackedNiTriStripsShape::CanShare(NiCloningProcess& arCloneData) {
 // gathered into shapeArray as index triples relative to the part's first vertex, following a strip while each next
 // triangle shares the last two indices.
 void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     hkPackedNiTriStripsShape* pShape = this ? static_cast<hkPackedNiTriStripsShape*>(this->phkObject) : nullptr;
     hkPackedNiTriStripsData* pdata = pShape->spTriStripsData.m_pObject;
     {
@@ -352,7 +352,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
             uslastKey = uscurrentKey;
         }
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 HavokMaterialType bhkPackedNiTriStripsShape::QSubMaterial(uint32_t aiKey) {

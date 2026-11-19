@@ -200,13 +200,13 @@ const NiRTTI* bhkMalleableConstraint::GetRTTI() const {
 // A new constraint built as CreateObject builds one, filled from this one under the clone lock with the Havok heap
 // context selected.
 NiObject* bhkMalleableConstraint::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkMalleableConstraint* pClone = new bhkMalleableConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 

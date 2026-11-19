@@ -83,8 +83,8 @@ void BSAudio::Init(void* pHandle) {
 void BSAudio::Shutdown() {
     BSAudioManager* singleton;
     BSAudioManager* v2;
-    int32_t eMemContext = GetThreadMemContext();
-    GetThreadMemContext() = 11;
+    MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     if (bAudioEnabled) {
         if (bMultiThread) {
             singleton = &BSAudioManager::QInstance();
@@ -94,7 +94,7 @@ void BSAudio::Shutdown() {
         v2 = &BSAudioManager::QInstance();
         v2->Shutdown();
     }
-    GetThreadMemContext() = eMemContext;
+    GetThreadTLSData()->eMemContext = eMemContext;
 }
 
 void BSAudio::PauseWorldVoices() {
@@ -162,21 +162,21 @@ BSSoundHandle BSAudio::GetSoundHandleByName(const char* apSoundName, uint32_t ai
 }
 
 BSSoundHandle BSAudio::GetSoundHandleByFilename(const char* apFilename, uint32_t aiTypeFlags, void* apSettingsContext) {
-    int32_t eMemContext = GetThreadMemContext();
-    GetThreadMemContext() = 11;
+    MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
     BSSoundHandle kHandle =
         singleton->GetSoundHandleByFilePath(apFilename, aiTypeFlags, static_cast<TESSound*>(apSettingsContext));
-    GetThreadMemContext() = eMemContext;
+    GetThreadTLSData()->eMemContext = eMemContext;
     return kHandle;
 }
 
 BSSoundHandle BSAudio::GetSoundHandleByNumericID(uint32_t aiFormID, uint32_t aiTypeFlags) {
-    int32_t uiHeapIndex = GetThreadMemContext();
-    GetThreadMemContext() = 11;
+    MEM_CONTEXT uiHeapIndex = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
     BSSoundHandle kHandle = singleton->GetSoundHandleByNumericID(aiFormID, aiTypeFlags);
-    GetThreadMemContext() = uiHeapIndex;
+    GetThreadTLSData()->eMemContext = uiHeapIndex;
     return kHandle;
 }
 
@@ -210,11 +210,11 @@ void BSAudio::Precache(const char* apSoundName, uint32_t aiFlags) {
 }
 
 void BSAudio::PrecacheSound(const char* apFilename, uint32_t aiFlags, TESSound* apSettingsContext) {
-    int32_t eMemContext = GetThreadMemContext();
-    GetThreadMemContext() = 11;
+    MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
     singleton->PrecacheSound(const_cast<char*>(apFilename), aiFlags, apSettingsContext);
-    GetThreadMemContext() = eMemContext;
+    GetThreadTLSData()->eMemContext = eMemContext;
 }
 
 bool BSAudio::IsAudioEnabled() {

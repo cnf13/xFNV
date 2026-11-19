@@ -2,9 +2,9 @@
 
 #include "BSCore/IMemoryHeap.h"
 #include "BSCore/MemoryPool.h"
+#include "BSCore/TLSData.h"
 #include "BSMain/NiObjectGarbage.h"
 #include "BSSystemUtilities/BSSystemUtility.h"
-#include "Fallout Shared/Magic/EffectItem.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout/AI/ProcessLists.h"
 #include "Fallout/Misc/GarbageCollector.h"
@@ -150,12 +150,12 @@ void MemoryManager::Initialize() {
     SpecifyPools();
 #endif
     InitializeStackTrace();
-    GetThreadMemContext() = MEM_CONTEXT_STATICVARS;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_STATICVARS;
 }
 
 void MemoryManager::AddPool(uint32_t aiBlockSize, uint32_t aiPoolSize, const char* apDesc) {
-    const int32_t eOldContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_POOL;
+    const MEM_CONTEXT eOldContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_POOL;
 #if XFNV_64BIT
     // The 64-bit program makes only the pools whose blocks are a multiple of 16 bytes, so that every block is aligned
     // as the platform's allocators align (and holds the free list's two pointers); the other sizes go to the next
@@ -164,7 +164,7 @@ void MemoryManager::AddPool(uint32_t aiBlockSize, uint32_t aiPoolSize, const cha
 #else
     if (aiBlockSize < 8) {
 #endif
-        GetThreadMemContext() = eOldContext;
+        GetThreadTLSData()->eMemContext = eOldContext;
         return;
     }
     bAllowPoolUse = false;
@@ -178,7 +178,7 @@ void MemoryManager::AddPool(uint32_t aiBlockSize, uint32_t aiPoolSize, const cha
     }
 
     bAllowPoolUse = true;
-    GetThreadMemContext() = eOldContext;
+    GetThreadTLSData()->eMemContext = eOldContext;
 }
 
 void* MemoryManager::Allocate(size_t aSize) {
@@ -197,7 +197,7 @@ void* MemoryManager::Allocate(size_t aSize) {
     const size_t uiRequested = aSize;
     void* pMemory = nullptr;
     aSize = aSize > 8 ? (aSize + 3) & ~3u : 8;
-    const int32_t eMemContext = GetThreadMemContext();
+    const MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
     if (bAllowPoolUse) {
         MemoryPool* pPool = aSize > 0x3FC ? nullptr : MemoryPool::pMemoryPoolsBySize[aSize >> 2];
         if (!pPool) {
@@ -649,7 +649,7 @@ void* MemoryManager::ClearMainThreadMemoryProblemPassSignal() {
 }
 
 void MemoryManager::InitializeStandard() {
-    GetThreadMemContext() = 0;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_STATICVARS;
     bInitialized = true;
 }
 

@@ -107,8 +107,8 @@ bool bhkUnaryAction::IsEqual(NiObject* apObject) {
 // The base's world check and add, with the action's entity run through the world first, all under the Havok heap
 // context.
 bool bhkUnaryAction::Add(bhkWorld* apWorld) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     bool bAdded = false;
     hkpAction* pAction = this ? static_cast<hkpAction*>(phkObject) : nullptr;

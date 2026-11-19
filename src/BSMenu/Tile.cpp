@@ -9,6 +9,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSMain/NiObjectGarbage.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
@@ -146,8 +147,8 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
     }
 
     // EXE-INLINED none: AutoMemContext
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_INTERFACE;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
     Action* pAction = static_cast<Action*>(this->pActionListA);
     float fOldValue = this->fValue;
     FloatArray kStack;
@@ -334,7 +335,7 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
         }
     }
     // EXE-INLINED none: AutoMemContext
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 void Tile::Value::AddAction(int32_t aiActionType, float afActionVal) {

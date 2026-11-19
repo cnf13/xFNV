@@ -1,6 +1,7 @@
 #include "BSHavok/bhkPCollisionObject.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkRigidBody.h"
@@ -33,12 +34,12 @@ bhkPCollisionObject::bhkPCollisionObject(NiAVObject* apObject) : bhkNiCollisionO
 
 // The clone's allocation is charged to the Havok heap context, which is restored after the copy.
 NiObject* bhkPCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkPCollisionObject* pClone = new bhkPCollisionObject;
     // Copies even into a null clone, as the game does.
     CopyMembers(pClone, arCloneData);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 
@@ -75,12 +76,12 @@ bool bhkPCollisionObject::IsEqual(NiObject* apObject) {
 }
 
 void bhkPCollisionObject::AddViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkNiCollisionObject::AddViewerStrings(apStrings);
     char* pcString = NiGetViewerString(bhkPCollisionObject::ms_RTTI.m_pcName);
     apStrings->Add(pcString);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 // Sets the scene object's transform from the phantom's AABB: an identity rotation, unit scale and, as the game does,

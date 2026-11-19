@@ -1,6 +1,7 @@
 #include "BSHavok/bhkRagdollConstraint.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkConstraint.h"
 #include "BSHavok/bhkHingeConstraint.h"
 #include "BSHavok/bhkRefObject.h"
@@ -237,8 +238,8 @@ bhkRagdollConstraint::bhkRagdollConstraint() {
 // Clones under the Havok heap context and the clone lock: a new constraint built by the default constructor, then the
 // constraint's members copied.
 NiObject* bhkRagdollConstraint::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkRagdollConstraint* pClone = new bhkRagdollConstraint;

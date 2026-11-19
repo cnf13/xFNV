@@ -55,8 +55,8 @@ const NiRTTI* PrecipitationShaderProperty::GetRTTI() const {
 
 // The clone is allocated in the precipitation heap context.
 NiObject* PrecipitationShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_PRECIPITATION;
     PrecipitationShaderProperty* pClone = new PrecipitationShaderProperty;
     CopyMembers(pClone, arCloneData);

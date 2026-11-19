@@ -25,8 +25,8 @@ bhkSerializable::bhkSerializable() : pInfo(nullptr) {}
 
 // Releases the creation info under the Havok heap context.
 bhkSerializable::~bhkSerializable() {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     MemoryManager_Singleton.Deallocate(pInfo);
     pInfo = nullptr;
@@ -70,8 +70,8 @@ bool bhkSerializable::IsEqual(NiObject* apObject) {
 // The base lines, then the class's heading line, appended to the array (16-bit sizes, unsigned compare), all under the
 // Havok heap context.
 void bhkSerializable::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     bhkRefObject::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(ms_RTTI.GetName());

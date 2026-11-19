@@ -1,6 +1,7 @@
 #include "BSHavok/bhkForceController.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkBlendCollisionObject.h"
 #include "BSHavok/bhkCollisionObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
@@ -179,8 +180,8 @@ void bhkForceController::TestForce(NiAVObject* apObject, hkVector4& arForce, NiA
 // As TestForce on apObject, under the Havok heap context, lasting until afEndTime. The damping share is taken from the
 // caller's force (reread), the mass share from the copy, written as intrinsics.
 void bhkForceController::TestForce2(NiAVObject* apObject, hkVector4& arForce, float afEndTime) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     NiTimeController* pController = apObject->GetController(&bhkForceController::ms_RTTI);
     if (!pController) {
         // The block is aligned to 16 as in CreateClone, the offset kept in the byte before the object; the block is
@@ -221,5 +222,5 @@ void bhkForceController::TestForce2(NiAVObject* apObject, hkVector4& arForce, fl
     pController->m_fFrequency = 1.0f;
     static_cast<bhkForceController*>(pController)->Force.m_quad = kResult.m_quad;
     pController->Start(-3.4028235e+38f);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }

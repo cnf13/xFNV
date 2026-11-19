@@ -268,17 +268,17 @@ void bhkNiCollisionObject::SetTransform(NiTransform& arTrans) {
 // so that it cancels the parent's world scale, and the world object's display geometry is put in it. Off: the world
 // object's display geometry is destroyed and every child of the node whose own name is "bhkColDisp" is detached.
 void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
-    int32_t eOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT eOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     NiUpdateData kUpdateData;
     if (abTF) {
         if ((usFlags & 0x10) != 0) {
-            GetThreadMemContext() = eOldMemContext;
+            GetThreadTLSData()->eMemContext = eOldMemContext;
             return;
         }
         bhkRigidBody* pWorldObject = this->spWorldObject;
         if (!pWorldObject) {
-            GetThreadMemContext() = eOldMemContext;
+            GetThreadTLSData()->eMemContext = eOldMemContext;
             return;
         }
         hkpWorldObject* pkObject = static_cast<hkpWorldObject*>(pWorldObject->phkObject);
@@ -289,7 +289,7 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
         }
         // Bodies on the ground layer get no display geometry.
         if ((uiFilter & 0x7F) == L_GROUND) {
-            GetThreadMemContext() = eOldMemContext;
+            GetThreadTLSData()->eMemContext = eOldMemContext;
             return;
         }
         NiAVObject* pSceneObject = this->m_pkSceneObject;
@@ -337,7 +337,7 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
     }
     else {
         if ((usFlags & 0x10) == 0) {
-            GetThreadMemContext() = eOldMemContext;
+            GetThreadTLSData()->eMemContext = eOldMemContext;
             return;
         }
         NiAVObject* pSceneObject = this->m_pkSceneObject;
@@ -370,7 +370,7 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
         }
         usFlags &= ~0x10u;
     }
-    GetThreadMemContext() = eOldMemContext;
+    GetThreadTLSData()->eMemContext = eOldMemContext;
 }
 
 bool bhkNiCollisionObject::GetFlag(uint16_t ausFlag) {

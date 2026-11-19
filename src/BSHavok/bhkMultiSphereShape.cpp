@@ -204,8 +204,8 @@ uint32_t bhkMultiSphereShape::QCinfoSize() const {
 // the HAVOK memory context, its size word is set, then it is constructed, attached and posted in.
 void bhkMultiSphereShape::Init(const hkSerializableCinfo& arInfo) {
     const hkMultiSphereShapeCinfo& rCinfo = static_cast<const hkMultiSphereShapeCinfo&>(arInfo);
-    int32_t iMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     hkpMultiSphereShape* pShape =
         static_cast<hkpMultiSphereShape*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpMultiSphereShape)));
     pShape->m_memSizeAndFlags = sizeof(hkpMultiSphereShape);
@@ -214,14 +214,14 @@ void bhkMultiSphereShape::Init(const hkSerializableCinfo& arInfo) {
     pThis->SethkObject(pBuilt);
     pBuilt->removeReference();
     pThis->PostInit(arInfo);
-    GetThreadMemContext() = iMemContext;
+    GetThreadTLSData()->eMemContext = iMemContext;
 }
 
 // Makes the shape's creation info, inside the HAVOK memory context: when the shape holds none, an empty one is
 // allocated with the engine's memory manager, becomes the shape's, and the wrapped Havok shape fills its spheres.
 hkSerializableCinfo& bhkMultiSphereShape::CreateCinfo(bool& arCreated) {
-    int32_t iMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     arCreated = (pInfo == nullptr);
     if (arCreated) {
         hkMultiSphereShapeCinfo* pCinfo =
@@ -239,7 +239,7 @@ hkSerializableCinfo& bhkMultiSphereShape::CreateCinfo(bool& arCreated) {
         }
     }
     hkSerializableCinfo* pResult = pInfo;
-    GetThreadMemContext() = iMemContext;
+    GetThreadTLSData()->eMemContext = iMemContext;
     return *pResult;
 }
 

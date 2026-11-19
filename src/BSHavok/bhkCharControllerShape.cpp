@@ -1,6 +1,7 @@
 #include "BSHavok/bhkCharControllerShape.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkConvexShape.h"
 #include "BSHavok/bhkConvexVerticesShape.h"
 #include "BSHavok/bhkGeometryUtil.h"
@@ -52,8 +53,8 @@ const NiRTTI* bhkCharControllerShape::GetRTTI() const {
 // own reference.
 void bhkCharControllerShape::Init(const hkSerializableCinfo& arInfo) {
     const hkConvexVerticesShapeCinfo& rInfo = static_cast<const hkConvexVerticesShapeCinfo&>(arInfo);
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
     hkCharControllerShape* pShape = static_cast<hkCharControllerShape*>(
         kRouter.heap().blockAlloc(static_cast<int32_t>(sizeof(hkCharControllerShape)))
@@ -70,15 +71,15 @@ void bhkCharControllerShape::Init(const hkSerializableCinfo& arInfo) {
     rThis.SethkObject(pShape);
     pShape->removeReference();
     rThis.PostInit(arInfo);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 // Builds a character controller shape from a hull's vertices: the plane equations and the rounded vertices the geometry
 // utility makes from them go into a creation info on the stack, and the shape is built from that info on the
 // NiMemObject heap. Empty vertices give no shape; the creation info is released either way.
 bhkCharControllerShape* bhkCharControllerShape::CreateFromHull(hkArray<hkVector4, hkContainerHeapAllocator>& arVerts) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkCharControllerShape* pShape = nullptr;
     {
         hkConvexVerticesShapeCinfo kInfo;
@@ -87,6 +88,6 @@ bhkCharControllerShape* bhkCharControllerShape::CreateFromHull(hkArray<hkVector4
             pShape = new bhkCharControllerShape(kInfo);
         }
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pShape;
 }

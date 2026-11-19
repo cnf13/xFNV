@@ -189,11 +189,11 @@ void BSWin32Audio::SetOrientation(NiPoint3 aFront, NiPoint3 aTop) {
 }
 
 void BSWin32Audio::PrecacheSoundFromID(int32_t auiFormID, int32_t a2) {
-    int32_t eMemContext = GetThreadMemContext();
-    GetThreadMemContext() = 11;
+    MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_AUDIO;
     BSAudioManager* singleton = &BSAudioManager::QInstance();
     singleton->PrecacheSoundFromID(auiFormID, a2);
-    GetThreadMemContext() = eMemContext;
+    GetThreadTLSData()->eMemContext = eMemContext;
 }
 
 bool BSWin32Audio::IsEnableAudioCache() {

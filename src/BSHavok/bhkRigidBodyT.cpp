@@ -82,8 +82,8 @@ bhkRigidBodyT::~bhkRigidBodyT() {
 // Charges the thread's allocations to Havok's heap context, holds the clone critical section, switches the Havok
 // assertions off around the copy, builds the clone the way CreateObject does and restores the saved context.
 NiObject* bhkRigidBodyT::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     SetHavokAssertState(false);
@@ -175,8 +175,8 @@ void bhkRigidBodyT::PostInit(const hkSerializableCinfo& arInfo) {
 // attached to it and updated at time 0, or a new parentless node without apNode. The node is placed at the local offset
 // converted to game units, then the base builds the geometry.
 NiAVObject* bhkRigidBodyT::CreateDisplayGeometry(NiNode* apNode) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     NiNode* pNode = nullptr;
     if (apNode) {

@@ -23,12 +23,12 @@ bhkSPCollisionObject::bhkSPCollisionObject(NiNode* apObject) : bhkPCollisionObje
 
 // The clone's allocation is charged to the Havok heap context, restored after the copy.
 NiObject* bhkSPCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSPCollisionObject* pClone = new bhkSPCollisionObject;
     // Copies even into a null clone, as the game does.
     CopyMembers(pClone, arCloneData);
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 

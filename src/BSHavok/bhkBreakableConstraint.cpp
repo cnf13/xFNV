@@ -38,13 +38,13 @@ const NiRTTI* bhkBreakableConstraint::GetRTTI() const {
 // The clone is made under the Havok heap context and the clone lock, then the creation info and entities are copied
 // over.
 NiObject* bhkBreakableConstraint::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkBreakableConstraint* pClone = new bhkBreakableConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return pClone;
 }
 

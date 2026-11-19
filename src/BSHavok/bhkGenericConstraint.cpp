@@ -27,8 +27,8 @@ bhkGenericConstraint::~bhkGenericConstraint() {
 // Clones the constraint under the Havok heap context and the shared clone lock: a new generic constraint, filled by
 // bhkConstraint's clone helper.
 NiObject* bhkGenericConstraint::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkGenericConstraint* pClone = new bhkGenericConstraint;

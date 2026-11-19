@@ -1,6 +1,7 @@
 #include "BSHavok/bhkConvexTransformShape.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkConvexShape.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkSerializable.h"
@@ -284,8 +285,8 @@ bool bhkConvexTransformShape::CanShare(NiCloningProcess& arCloneData) {
 // Adds a node named for the class under apNode, placed by the wrapped shape's transform, and lets the child shape's
 // wrapper build its own geometry under it.
 void bhkConvexTransformShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefColor) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     const hkTransform* pTransform;
     hkpConvexTransformShape* pShape = this ? static_cast<hkpConvexTransformShape*>(phkObject) : nullptr;

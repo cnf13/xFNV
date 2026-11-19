@@ -13,7 +13,6 @@ double fFloor(float a1);
 // The game's floor of a float: the truncation fFloor gives, less 1 when aIn lies below it, with the result rounded to
 // float. Not the CRT's floor.
 float FloatFloor(float aIn);
-MEM_CONTEXT QMemContext();
 
 // The numbers of one magic effect entry.
 struct EffectItemData {

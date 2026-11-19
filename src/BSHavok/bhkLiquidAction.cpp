@@ -110,14 +110,14 @@ const NiRTTI* bhkLiquidAction::GetRTTI() const {
 // Clones the action into a new object of the class: the engine's heap, under the engine's clone critical section, with
 // the clone charged to the Havok heap context.
 NiObject* bhkLiquidAction::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t iMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkLiquidAction* pClone = nullptr;
     bhkSerializable::CloneCritLock();
     pClone = new bhkLiquidAction;
     this->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
-    GetThreadMemContext() = iMemContext;
+    GetThreadTLSData()->eMemContext = iMemContext;
     return pClone;
 }
 
@@ -168,12 +168,12 @@ void bhkLiquidAction::SaveBinary(NiStream& arStream) {
 
 // Appends the base's strings and then the class's RTTI name to the viewer string array.
 void bhkLiquidAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    int32_t iMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bhkUnaryAction::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(bhkLiquidAction::ms_RTTI.m_pcName);
     apStrings->Add(pcString);
-    GetThreadMemContext() = iMemContext;
+    GetThreadTLSData()->eMemContext = iMemContext;
 }
 
 // Releases a creation info this action made: the aligned block it sits in, found through the padding byte in front of
@@ -210,8 +210,8 @@ int32_t bhkLiquidAction::LoadCInfo(NiStream& arStream) {
 // body carries under the collision object base's RTTI, and follows the collision object to the scene object's parent.
 // The low 32 bits of the property value are the object.
 void bhkLiquidAction::Init(const hkSerializableCinfo& arInfo) {
-    int32_t iMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     const hkLiquidActionCinfo& rCinfo = static_cast<const hkLiquidActionCinfo&>(arInfo);
     fInitialStickForce = rCinfo.fInitialStickForce;
     fStickStrength = rCinfo.fStickStrength;
@@ -239,7 +239,7 @@ void bhkLiquidAction::Init(const hkSerializableCinfo& arInfo) {
         }
     }
     this->PostInit(arInfo);
-    GetThreadMemContext() = iMemContext;
+    GetThreadTLSData()->eMemContext = iMemContext;
 }
 
 // Makes the cinfo from the wrapped action, or returns the one already made; the whole body runs under the Havok heap
@@ -470,10 +470,10 @@ void bhkLiquidAction::Update(float afDelta) {
 // Makes apObject the object the action follows, then puts the action in the map's list for that object, making the list
 // when the object has none yet.
 void bhkLiquidAction::SetTargetObject(NiAVObject* apObject) {
-    int32_t iMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     if (!apObject) {
-        GetThreadMemContext() = iMemContext;
+        GetThreadTLSData()->eMemContext = iMemContext;
         return;
     }
 
@@ -490,14 +490,14 @@ void bhkLiquidAction::SetTargetObject(NiAVObject* apObject) {
         }
         LiquidListMap.SetAt(this->pTargetObject, pList);
         if (!pList) {
-            GetThreadMemContext() = iMemContext;
+            GetThreadTLSData()->eMemContext = iMemContext;
             return;
         }
     }
 
     bhkLiquidAction* pAction = this;
     pList->AddHead(pAction);
-    GetThreadMemContext() = iMemContext;
+    GetThreadTLSData()->eMemContext = iMemContext;
 }
 
 // The factory: a new action in the engine's heap, built in place.

@@ -97,8 +97,8 @@ const NiRTTI* bhkFixedConstraint::GetRTTI() const {
 // Clones under the Havok heap context and the clone lock: a new constraint built by the default constructor, then the
 // constraint's members copied.
 NiObject* bhkFixedConstraint::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkFixedConstraint* pClone = new bhkFixedConstraint;
@@ -136,8 +136,8 @@ NiObject* bhkFixedConstraint::CreateObject() {
 }
 
 bhkConstraint* bhkFixedConstraint::FixConstraint(bhkConstraint* apConstraint, float afStrength) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkConstraint* pConstraint;
     {

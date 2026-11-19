@@ -185,8 +185,8 @@ bhkRigidBody::~bhkRigidBody() {
 // Charges the thread's allocations to Havok's heap context, holds the clone critical section, switches the Havok
 // assertions off around the copy and builds the clone the way CreateObject does.
 NiObject* bhkRigidBody::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     SetHavokAssertState(false);
@@ -635,8 +635,8 @@ hkSerializableCinfo& bhkRigidBody::CreateCinfo(bool& arCreated) {
 // Removes the action constraints while the thread's allocations are charged to Havok's heap context, then kills
 // the entity and restores the saved context.
 void bhkRigidBody::Kill() {
-    int32_t& iContext = GetThreadMemContext();
-    int32_t iSavedContext = iContext;
+    MEM_CONTEXT& iContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
     kActionConstrants.RemoveAll();
     bhkEntity::Kill();

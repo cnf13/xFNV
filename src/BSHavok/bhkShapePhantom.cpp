@@ -1,5 +1,6 @@
 #include "BSHavok/bhkShapePhantom.h"
 
+#include "BSCore/TLSData.h"
 #include "BSHavok/bhkPhantom.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkWorldObject.h"
@@ -28,8 +29,8 @@ hkShapePhantomCinfo::hkShapePhantomCinfo() {
 // Adds the phantom's viewer lines to apStrings: the base phantom's lines, the class heading, then the transform's
 // rotation and translation in game units.
 void bhkShapePhantom::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
 
     bhkPhantom::GetViewerStrings(apStrings);

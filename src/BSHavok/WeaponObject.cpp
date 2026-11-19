@@ -79,8 +79,8 @@ const NiRTTI* WeaponObject::GetRTTI() const {
 
 // The clone is allocated in the Havok heap context.
 NiObject* WeaponObject::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     WeaponObject* pkClone = new WeaponObject;
     CopyMembers(pkClone, arCloneData);
@@ -304,8 +304,8 @@ WeaponObject* WeaponObject::CreateWeaponObject(
     NiAVObject* apObject,
     bool abDefaultKeyframed
 ) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iSavedContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     if (!apObject) {
         riMemContext = iSavedContext;

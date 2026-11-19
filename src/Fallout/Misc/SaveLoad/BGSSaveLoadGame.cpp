@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/TLSData.h"
 #include "BSMain/IOManager.h"
 #include "BSShader/BSShaderManager.h"
 #include "Fallout Shared/ActorValue.h"
@@ -232,12 +233,12 @@ bool BGSSaveLoadGame::ShouldRemoveChanges(TESForm* apForm) {
 // The TLS address is fetched again for each read and write.
 void BGSSaveLoadGame::SetLoadingMovedRefs(bool abValue) {
     if (abValue) {
-        uint32_t uiFlags = GetThreadSpecificFlags();
-        GetThreadSpecificFlags() = uiFlags | 2u;
+        uint32_t uiFlags = GetThreadTLSData()->uiThreadSpecificFlags;
+        GetThreadTLSData()->uiThreadSpecificFlags = uiFlags | 2u;
     }
     else {
-        uint32_t uiFlags = GetThreadSpecificFlags();
-        GetThreadSpecificFlags() = uiFlags & ~2u;
+        uint32_t uiFlags = GetThreadTLSData()->uiThreadSpecificFlags;
+        GetThreadTLSData()->uiThreadSpecificFlags = uiFlags & ~2u;
     }
 }
 

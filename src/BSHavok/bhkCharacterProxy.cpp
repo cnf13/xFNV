@@ -54,8 +54,8 @@ bhkCharacterProxy::~bhkCharacterProxy() {
 
 // Clones the wrapper with the clone critical section held and the thread's memory context on Havok.
 NiObject* bhkCharacterProxy::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     bhkCharacterProxy* pClone = nullptr;
     bhkSerializable::CloneCritLock();
@@ -210,8 +210,8 @@ hkpWorld* bhkCharacterProxy::GethkWorldRw() {
 
 // Returns the creation info the proxy made to the thread's Havok heap, and forgets it.
 void bhkCharacterProxy::KillCinfo(bool abCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     if (abCreated) {
         hkSerializableCinfo* pCinfo = pInfo;
         if (pCinfo) {
@@ -220,7 +220,7 @@ void bhkCharacterProxy::KillCinfo(bool abCreated) {
         }
         pInfo = nullptr;
     }
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
 }
 
 // Builds the proxy in the thread's Havok memory context: the block comes from the thread's heap allocator with its size
@@ -228,8 +228,8 @@ void bhkCharacterProxy::KillCinfo(bool abCreated) {
 // drops the reference the construction left. Error id 0x6CEE9071 is disabled while the proxy is built and enabled again
 // afterwards.
 void bhkCharacterProxy::Init(const hkSerializableCinfo& arInfo) {
-    int32_t& iMemContext = GetThreadMemContext();
-    int32_t iSavedMemContext = iMemContext;
+    MEM_CONTEXT& iMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iSavedMemContext = iMemContext;
     iMemContext = MEM_CONTEXT_HAVOK;
     hkError* pError = hkError::s_instance;
     hkBool bEnabled;
@@ -250,8 +250,8 @@ void bhkCharacterProxy::Init(const hkSerializableCinfo& arInfo) {
 // Makes the proxy's creation info on the thread's Havok heap when the wrapper has none yet, and has the proxy fill it
 // in.
 hkSerializableCinfo& bhkCharacterProxy::CreateCinfo(bool& arCreated) {
-    int32_t iOldMemContext = GetThreadMemContext();
-    GetThreadMemContext() = MEM_CONTEXT_HAVOK;
+    MEM_CONTEXT iOldMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_HAVOK;
     bool bCreated = (pInfo == nullptr);
     arCreated = bCreated;
     if (bCreated) {
@@ -269,7 +269,7 @@ hkSerializableCinfo& bhkCharacterProxy::CreateCinfo(bool& arCreated) {
         }
     }
     hkSerializableCinfo* pResult = pInfo;
-    GetThreadMemContext() = iOldMemContext;
+    GetThreadTLSData()->eMemContext = iOldMemContext;
     return *pResult;
 }
 

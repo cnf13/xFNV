@@ -4,7 +4,6 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
-#include "BSCore/TLSData.h"
 #include "BSMain/Setting.h"
 #include "BSMain/SettingCollection.h"
 #include "BSMenu/Font.h"
@@ -230,8 +229,6 @@ void DebugText::SetCurrentLine(DEBUGTEXT_LOCATION aeLoc, int32_t aiLine) {
     iHeight[(int32_t)aeLoc] = aiLine;
 }
 
-// The memory-context guard is written as the game's statements: the thread's context saved, the interface context
-// set, and the saved one restored on each way out.
 void DebugText::HandleQueuedPrints() {
     for (uint32_t i = 0; i < xPrintData.iSize; ++i) {
         DebugText::DEBUG_TEXT_PRINT_TYPE eType = xPrintData.pBuffer[i]->eType;
@@ -239,10 +236,8 @@ void DebugText::HandleQueuedPrints() {
             if (eType == DebugText::DTPT_SPECIFIED) {
                 size_t sLen;
                 int32_t a_2;
-                MEM_CONTEXT eOldMemContext = GetThreadTLSData()->eMemContext;
-                GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
+                AutoMemContext kMemContext(MEM_CONTEXT_INTERFACE);
                 if (!Interface::GetDebugTextRoot()) {
-                    GetThreadTLSData()->eMemContext = eOldMemContext;
                     return;
                 }
                 bool btext_is_the_same_2 = false;
@@ -290,7 +285,6 @@ void DebugText::HandleQueuedPrints() {
                         }
                     }
                     if (a == ilen) {
-                        GetThreadTLSData()->eMemContext = eOldMemContext;
                         return;
                     }
                     uint32_t b = 0;
@@ -320,7 +314,6 @@ void DebugText::HandleQueuedPrints() {
                     }
                     if (a_2 == 200) {
                         Warning("DEFAULT: Too many unique debug text items. \n");
-                        GetThreadTLSData()->eMemContext = eOldMemContext;
                         return;
                     }
                 }
@@ -380,7 +373,6 @@ void DebugText::HandleQueuedPrints() {
                     }
                     DebugText::Unlock();
                 }
-                GetThreadTLSData()->eMemContext = eOldMemContext;
             }
         }
         else {
@@ -544,8 +536,6 @@ const char* DebugText::GetDebugText(float afX, float afY, int32_t aiJustify) {
     return nullptr;
 }
 
-// The memory-context guard is written as the game's statements: the thread's context saved, the interface context
-// set, and the saved one restored on each way out.
 NiNode* DebugText::CreateDebugText(
     const char* apText,
     float afX,
@@ -555,8 +545,7 @@ NiNode* DebugText::CreateDebugText(
     const NiColorA* apColor
 ) {
     int32_t iwidth;
-    MEM_CONTEXT eOldMemContext = GetThreadTLSData()->eMemContext;
-    GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
+    AutoMemContext kMemContext(MEM_CONTEXT_INTERFACE);
     if (*apText && (Interface::IsConsoleVisible() || Interface::IsDebugTextVisible())) {
         NiNode* pnode;
         NiUpdateData UpdateData;
@@ -633,12 +622,9 @@ NiNode* DebugText::CreateDebugText(
         UpdateData.bSceneGraphChange = false;
         pnode->Update(UpdateData);
         DebugText::Unlock();
-        string.Set(nullptr, 0);
-        GetThreadTLSData()->eMemContext = eOldMemContext;
         return pnode;
     }
 
-    GetThreadTLSData()->eMemContext = eOldMemContext;
     return nullptr;
 }
 
@@ -716,10 +702,8 @@ int32_t DebugText::PrintByIndex(char* apString, int32_t a2) {
 DebugText* DebugText::Instance(bool abCreate) {
     DebugText* v2;
     void* v3;
-    int32_t eMemContext;
     if ((!pInstance) && abCreate) {
-        eMemContext = GetThreadMemContext();
-        GetThreadMemContext() = 13;
+        AutoMemContext kMemContext(MEM_CONTEXT_INTERFACE);
         v3 = (&MemoryManager_Singleton)->Allocate(sizeof(DebugText));
         if (v3) {
             v2 = ::new (v3) DebugText;
@@ -728,7 +712,6 @@ DebugText* DebugText::Instance(bool abCreate) {
             v2 = nullptr;
         }
         pInstance = v2;
-        GetThreadMemContext() = eMemContext;
     }
     return pInstance;
 }

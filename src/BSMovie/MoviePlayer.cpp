@@ -40,10 +40,10 @@ void BinkFree(void* a1) {
 }
 
 void* BinkAlloc(void* apThis, [[maybe_unused]] void* apEdx, uint32_t Size) {
-    int32_t eMemContext = GetThreadMemContext();
-    GetThreadMemContext() = 20;
+    MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_MOVIEPLAYER;
     void* result = (&MemoryManager_Singleton)->Allocate(Size);
-    GetThreadMemContext() = eMemContext;
+    GetThreadTLSData()->eMemContext = eMemContext;
     return result;
 }
 
@@ -416,8 +416,8 @@ void MoviePlayer::WaitForSequenceToBegin() {
 bool MoviePlayer::PlayBackground(const char* apFileName, bool abPreloadBink) {
     Movie* v4;
     void* apMemory;
-    int32_t eMemContext = GetThreadMemContext();
-    GetThreadMemContext() = 20;
+    MEM_CONTEXT eMemContext = GetThreadTLSData()->eMemContext;
+    GetThreadTLSData()->eMemContext = MEM_CONTEXT_MOVIEPLAYER;
     Pause();
     if (bUseThreadLoadedMovie && pThreadLoadedMovie) {
         pCurrentMovie = pThreadLoadedMovie;
@@ -438,7 +438,7 @@ bool MoviePlayer::PlayBackground(const char* apFileName, bool abPreloadBink) {
     if (!v7) {
         Stop();
     }
-    GetThreadMemContext() = eMemContext;
+    GetThreadTLSData()->eMemContext = eMemContext;
     return (bool)v7;
 }
 

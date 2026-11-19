@@ -53,8 +53,8 @@ bhkTransformShape::~bhkTransformShape() {
 // Clones the shape under the Havok heap context and the clone lock: a new shape filled by CopyMembers through the
 // vtable.
 NiObject* bhkTransformShape::CreateClone(NiCloningProcess& arCloneData) {
-    int32_t& riMemContext = GetThreadMemContext();
-    int32_t iOldMemContext = riMemContext;
+    MEM_CONTEXT& riMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     bhkTransformShape* pClone = new bhkTransformShape;

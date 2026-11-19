@@ -11657,11 +11657,11 @@ void BGSSaveFormBuffer::SetChangeFlags(BGSChangeFlags aiChangeFlags) {
 }
 
 bool BGSSaveLoadGame::GetLoadingMovedRefs() {
-    return (GetThreadSpecificFlags() & 2u) != 0;
+    return (GetThreadTLSData()->uiThreadSpecificFlags & 2u) != 0;
 }
 
 bool BGSSaveLoadGame::GetReconstructingForms() {
-    return (GetThreadSpecificFlags() & 4u) != 0;
+    return (GetThreadTLSData()->uiThreadSpecificFlags & 4u) != 0;
 }
 
 float NiCos(float fRadians) {
