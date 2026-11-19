@@ -29,15 +29,9 @@ const NiRTTI* NiColorExtraDataController::GetRTTI() const {
 }
 
 NiObject* NiColorExtraDataController::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiColorExtraDataController));
-    if (v3) {
-        NiExtraDataController* v4 = ::new (v3) NiColorExtraDataController;
-        NiExtraDataController::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiExtraDataController::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiExtraDataController* v4 = new NiColorExtraDataController;
+    NiExtraDataController::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiColorExtraDataController::LoadBinary(NiStream& kStream) {

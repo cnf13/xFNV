@@ -31,15 +31,9 @@ const NiRTTI* NiFloatInterpolator::GetRTTI() const {
 
 // The clone is constructed through NiFloatInterpolator(NiFloatData*) with no data (Gamebryo's default argument).
 NiObject* NiFloatInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-    if (v3) {
-        NiFloatInterpolator* v4 = ::new (v3) NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiFloatInterpolator* v4 = new NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiFloatInterpolator::LoadBinary(NiStream& kStream) {

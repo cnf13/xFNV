@@ -23,16 +23,9 @@ NiPSysRadialFieldModifier::NiPSysRadialFieldModifier() : NiPSysFieldModifier(), 
 NiPSysRadialFieldModifier::~NiPSysRadialFieldModifier() {}
 
 NiObject* NiPSysRadialFieldModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysRadialFieldModifier* pkObject =
-        static_cast<NiPSysRadialFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysRadialFieldModifier)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysRadialFieldModifier;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysRadialFieldModifier* pkObject = new NiPSysRadialFieldModifier;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiPSysRadialFieldModifier::LoadBinary(NiStream& kStream) {

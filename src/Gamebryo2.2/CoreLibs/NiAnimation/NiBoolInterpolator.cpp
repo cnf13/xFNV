@@ -31,16 +31,9 @@ const NiRTTI* NiBoolInterpolator::GetRTTI() const {
 }
 
 NiObject* NiBoolInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBoolInterpolator* pkObject =
-        static_cast<NiBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBoolInterpolator)));
-    if (pkObject) {
-        pkObject = ::new (pkObject) NiBoolInterpolator(static_cast<NiBoolData*>(nullptr));
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiBoolInterpolator* pkObject = new NiBoolInterpolator(static_cast<NiBoolData*>(nullptr));
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiBoolInterpolator::LoadBinary(NiStream& kStream) {

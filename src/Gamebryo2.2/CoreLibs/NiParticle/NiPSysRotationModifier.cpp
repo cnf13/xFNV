@@ -34,16 +34,9 @@ NiPSysRotationModifier::NiPSysRotationModifier()
 NiPSysRotationModifier::~NiPSysRotationModifier() {}
 
 NiObject* NiPSysRotationModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysRotationModifier* pkObject =
-        static_cast<NiPSysRotationModifier*>(NiMemObject::operator new(sizeof(NiPSysRotationModifier)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysRotationModifier;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysRotationModifier* pkObject = new NiPSysRotationModifier;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Files before 20.0.0.2 store only the initial speed and the random-axis flag.

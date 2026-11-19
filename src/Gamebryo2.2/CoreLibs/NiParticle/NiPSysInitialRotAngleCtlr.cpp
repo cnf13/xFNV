@@ -17,16 +17,9 @@ NiPSysInitialRotAngleCtlr::NiPSysInitialRotAngleCtlr() : NiPSysModifierFloatCtlr
 NiPSysInitialRotAngleCtlr::~NiPSysInitialRotAngleCtlr() {}
 
 NiObject* NiPSysInitialRotAngleCtlr::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysInitialRotAngleCtlr));
-    NiPSysModifierCtlr* v4 = static_cast<NiPSysModifierCtlr*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysInitialRotAngleCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysInitialRotAngleCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysInitialRotAngleCtlr::LoadBinary(NiStream& kStream) {

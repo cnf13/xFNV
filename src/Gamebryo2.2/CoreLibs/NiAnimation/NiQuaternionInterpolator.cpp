@@ -27,16 +27,9 @@ const NiRTTI* NiQuaternionInterpolator::GetRTTI() const {
 }
 
 NiObject* NiQuaternionInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiQuaternionInterpolator* pkObject =
-        static_cast<NiQuaternionInterpolator*>(NiMemObject::operator new(sizeof(NiQuaternionInterpolator)));
-    if (pkObject) {
-        ::new (pkObject) NiQuaternionInterpolator;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiQuaternionInterpolator* pkObject = new NiQuaternionInterpolator;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiQuaternionInterpolator::LoadBinary(NiStream& kStream) {

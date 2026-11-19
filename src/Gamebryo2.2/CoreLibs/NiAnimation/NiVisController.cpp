@@ -27,14 +27,9 @@ const NiRTTI* NiVisController::GetRTTI() const {
 }
 
 NiObject* NiVisController::CreateClone(NiCloningProcess& kCloning) {
-    NiVisController* pkClone = static_cast<NiVisController*>(NiMemObject::operator new(sizeof(NiVisController)));
-    if (pkClone) {
-        ::new (pkClone) NiVisController;
-        CopyMembers(pkClone, kCloning);
-        return pkClone;
-    }
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiVisController* pkClone = new NiVisController;
+    CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 // Files older than 10.1.0.104 carry a link to an old data block, which is skipped. NiAlphaController,

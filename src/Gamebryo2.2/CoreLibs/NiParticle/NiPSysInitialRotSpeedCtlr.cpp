@@ -17,16 +17,9 @@ NiPSysInitialRotSpeedCtlr::NiPSysInitialRotSpeedCtlr() : NiPSysModifierFloatCtlr
 NiPSysInitialRotSpeedCtlr::~NiPSysInitialRotSpeedCtlr() {}
 
 NiObject* NiPSysInitialRotSpeedCtlr::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysInitialRotSpeedCtlr));
-    NiPSysModifierCtlr* v4 = static_cast<NiPSysModifierCtlr*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysInitialRotSpeedCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysInitialRotSpeedCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysInitialRotSpeedCtlr::LoadBinary(NiStream& kStream) {

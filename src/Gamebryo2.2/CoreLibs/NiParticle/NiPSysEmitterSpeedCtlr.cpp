@@ -17,17 +17,9 @@ NiPSysEmitterSpeedCtlr::NiPSysEmitterSpeedCtlr() : NiPSysModifierFloatCtlr() {}
 NiPSysEmitterSpeedCtlr::~NiPSysEmitterSpeedCtlr() {}
 
 NiObject* NiPSysEmitterSpeedCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysEmitterSpeedCtlr* v3 =
-        static_cast<NiPSysEmitterSpeedCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterSpeedCtlr)));
-    NiPSysModifierCtlr* v4 = v3;
-    if (v3) {
-        ::new (v3) NiPSysEmitterSpeedCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysEmitterSpeedCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysEmitterSpeedCtlr::LoadBinary(NiStream& kStream) {

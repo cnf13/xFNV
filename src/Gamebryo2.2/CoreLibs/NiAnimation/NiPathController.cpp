@@ -45,15 +45,9 @@ NiPathController::~NiPathController() {
 }
 
 NiObject* NiPathController::CreateClone(NiCloningProcess& kCloning) {
-    NiPathController* pkObject = static_cast<NiPathController*>(NiMemObject::operator new(sizeof(NiPathController)));
-    if (pkObject) {
-        ::new (pkObject) NiPathController;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPathController* pkObject = new NiPathController;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // The bank direction is read into an uninitialised local and stored to m_eBankDir; a short read leaves the local

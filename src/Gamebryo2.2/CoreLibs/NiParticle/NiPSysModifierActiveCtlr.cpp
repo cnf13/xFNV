@@ -17,17 +17,9 @@ NiPSysModifierActiveCtlr::NiPSysModifierActiveCtlr() : NiPSysModifierBoolCtlr() 
 NiPSysModifierActiveCtlr::~NiPSysModifierActiveCtlr() {}
 
 NiObject* NiPSysModifierActiveCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysModifierActiveCtlr* v3 =
-        static_cast<NiPSysModifierActiveCtlr*>(NiMemObject::operator new(sizeof(NiPSysModifierActiveCtlr)));
-    NiPSysModifierCtlr* v4 = v3;
-    if (v3) {
-        ::new (v3) NiPSysModifierActiveCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysModifierActiveCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysModifierActiveCtlr::LoadBinary(NiStream& kStream) {

@@ -30,15 +30,9 @@ const NiRTTI* NiLODNode::GetRTTI() const {
 }
 
 NiObject* NiLODNode::CreateClone(NiCloningProcess& kCloning) {
-    NiLODNode* pkObject = static_cast<NiLODNode*>(NiMemObject::operator new(sizeof(NiLODNode)));
-    if (pkObject) {
-        ::new (pkObject) NiLODNode;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiLODNode* pkObject = new NiLODNode;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Up to 10.1.0.11 the ranges were stored inline in the node; they now live in a linked NiLODData.

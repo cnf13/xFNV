@@ -17,18 +17,9 @@ NiPSysEmitterPlanarAngleVarCtlr::NiPSysEmitterPlanarAngleVarCtlr() : NiPSysModif
 NiPSysEmitterPlanarAngleVarCtlr::~NiPSysEmitterPlanarAngleVarCtlr() {}
 
 NiObject* NiPSysEmitterPlanarAngleVarCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysEmitterPlanarAngleVarCtlr* v3 = static_cast<NiPSysEmitterPlanarAngleVarCtlr*>(
-        NiMemObject::operator new(sizeof(NiPSysEmitterPlanarAngleVarCtlr))
-    );
-    NiPSysModifierCtlr* v4 = v3;
-    if (v3) {
-        ::new (v3) NiPSysEmitterPlanarAngleVarCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysEmitterPlanarAngleVarCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysEmitterPlanarAngleVarCtlr::LoadBinary(NiStream& kStream) {

@@ -31,15 +31,9 @@ const NiRTTI* BSSegmentedTriShape::GetRTTI() const {
 }
 
 NiObject* BSSegmentedTriShape::CreateClone(NiCloningProcess& kCloning) {
-    void* pkMemory = NiMemObject::operator new(sizeof(BSSegmentedTriShape));
-    if (pkMemory) {
-        BSSegmentedTriShape* pkObject = ::new (pkMemory) BSSegmentedTriShape;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    BSSegmentedTriShape* pkObject = new BSSegmentedTriShape;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Reads the segments; empty ones start at index 0. Every segment loads disabled, its flag byte is skipped.

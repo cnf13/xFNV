@@ -34,16 +34,9 @@ const NiRTTI* NiTransformController::GetRTTI() const {
 }
 
 NiObject* NiTransformController::CreateClone(NiCloningProcess& kCloning) {
-    NiTransformController* v4 =
-        static_cast<NiTransformController*>(NiMemObject::operator new(sizeof(NiTransformController)));
-    if (v4) {
-        ::new (v4) NiTransformController;
-        NiSingleInterpController::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiSingleInterpController::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiTransformController* v4 = new NiTransformController;
+    NiSingleInterpController::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // Files before 10.1.0.104 also store the link to an old-style keyframe data, which LinkObject resolves.

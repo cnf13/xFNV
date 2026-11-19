@@ -17,15 +17,9 @@ NiPSysPositionModifier::NiPSysPositionModifier() : NiPSysModifier() {}
 NiPSysPositionModifier::~NiPSysPositionModifier() {}
 
 NiObject* NiPSysPositionModifier::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysPositionModifier));
-    if (v3) {
-        NiPSysPositionModifier* v4 = ::new (v3) NiPSysPositionModifier;
-        NiPSysModifier::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifier::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysPositionModifier* v4 = new NiPSysPositionModifier;
+    NiPSysModifier::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysPositionModifier::LoadBinary(NiStream& kStream) {

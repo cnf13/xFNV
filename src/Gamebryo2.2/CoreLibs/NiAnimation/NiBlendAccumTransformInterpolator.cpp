@@ -58,17 +58,9 @@ NiBlendAccumTransformInterpolator::~NiBlendAccumTransformInterpolator() {
 }
 
 NiObject* NiBlendAccumTransformInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBlendAccumTransformInterpolator* v3 = static_cast<NiBlendAccumTransformInterpolator*>(
-        NiMemObject::operator new(sizeof(NiBlendAccumTransformInterpolator))
-    );
-    if (v3) {
-        NiBlendAccumTransformInterpolator* v4 = ::new (v3) NiBlendAccumTransformInterpolator;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiBlendAccumTransformInterpolator* v4 = new NiBlendAccumTransformInterpolator;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiBlendAccumTransformInterpolator::LoadBinary(NiStream& kStream) {

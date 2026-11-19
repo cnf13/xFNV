@@ -47,15 +47,9 @@ const NiRTTI* NiMultiTargetTransformController::GetRTTI() const {
 }
 
 NiObject* NiMultiTargetTransformController::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiMultiTargetTransformController));
-    if (v3) {
-        NiMultiTargetTransformController* v4 = ::new (v3) NiMultiTargetTransformController;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiMultiTargetTransformController* v4 = new NiMultiTargetTransformController;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // The targets are taken as they resolve, without a type check.

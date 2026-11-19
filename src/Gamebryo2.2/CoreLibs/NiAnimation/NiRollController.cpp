@@ -21,15 +21,9 @@ NiRollController::NiRollController() : NiFloatController() {}
 NiRollController::~NiRollController() {}
 
 NiObject* NiRollController::CreateClone(NiCloningProcess& kCloning) {
-    NiRollController* pkObject = static_cast<NiRollController*>(NiMemObject::operator new(sizeof(NiRollController)));
-    if (pkObject) {
-        ::new (pkObject) NiRollController;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiRollController* pkObject = new NiRollController;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiRollController::LoadBinary(NiStream& stream) {

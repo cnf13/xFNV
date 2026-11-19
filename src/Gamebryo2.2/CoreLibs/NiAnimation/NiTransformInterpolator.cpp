@@ -46,16 +46,9 @@ NiTransformInterpolator::NiTransformInterpolator(NiQuatTransform kPoseValue)
 NiTransformInterpolator::~NiTransformInterpolator() {}
 
 NiObject* NiTransformInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiTransformInterpolator* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiTransformInterpolator));
-    if (v3) {
-        v4 = ::new (v3) NiTransformInterpolator(nullptr);
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiTransformInterpolator* v4 = new NiTransformInterpolator(nullptr);
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // The data link is resolved at once (nif binds it in LinkObject). Without data, a transform with any valid part is a

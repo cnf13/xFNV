@@ -34,15 +34,9 @@ BSStripPSysData::~BSStripPSysData() {
 }
 
 NiObject* BSStripPSysData::CreateClone(NiCloningProcess& kCloning) {
-    BSStripPSysData* pkObject_2 = static_cast<BSStripPSysData*>(NiMemObject::operator new(sizeof(BSStripPSysData)));
-    if (pkObject_2) {
-        ::new (pkObject_2) BSStripPSysData;
-        CopyMembers(pkObject_2, kCloning);
-        return pkObject_2;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    BSStripPSysData* pkObject_2 = new BSStripPSysData;
+    CopyMembers(pkObject_2, kCloning);
+    return pkObject_2;
 }
 
 // Each vertex gets a strip of usMaxPointCount points; the point buffers are not constructed.

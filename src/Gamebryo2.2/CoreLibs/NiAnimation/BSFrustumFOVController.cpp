@@ -28,16 +28,9 @@ const NiRTTI* BSFrustumFOVController::GetRTTI() const {
 }
 
 NiObject* BSFrustumFOVController::CreateClone(NiCloningProcess& kCloning) {
-    BSFrustumFOVController* v3 =
-        static_cast<BSFrustumFOVController*>(NiMemObject::operator new(sizeof(BSFrustumFOVController)));
-    if (v3) {
-        ::new (v3) BSFrustumFOVController;
-        CopyMembers(v3, kCloning);
-        return v3;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    BSFrustumFOVController* v3 = new BSFrustumFOVController;
+    CopyMembers(v3, kCloning);
+    return v3;
 }
 
 void BSFrustumFOVController::LoadBinary(NiStream& kStream) {

@@ -41,17 +41,9 @@ const NiRTTI* BSMultiTargetTreadTransfController::GetRTTI() const {
 }
 
 NiObject* BSMultiTargetTreadTransfController::CreateClone(NiCloningProcess& kCloning) {
-    BSMultiTargetTreadTransfController* pkObject = static_cast<BSMultiTargetTreadTransfController*>(
-        NiMemObject::operator new(sizeof(BSMultiTargetTreadTransfController))
-    );
-    if (pkObject) {
-        ::new (pkObject) BSMultiTargetTreadTransfController;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    BSMultiTargetTreadTransfController* pkObject = new BSMultiTargetTreadTransfController;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Only the base's part is streamed.

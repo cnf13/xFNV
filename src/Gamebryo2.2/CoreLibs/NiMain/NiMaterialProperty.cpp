@@ -30,18 +30,10 @@ NiMaterialProperty::~NiMaterialProperty() {
 }
 
 NiObject* NiMaterialProperty::CreateClone(NiCloningProcess& kCloning) {
-    void* v3;
-    NiMaterialProperty* v4;
     if (m_spControllers) {
-        v3 = NiMemObject::operator new(sizeof(NiMaterialProperty));
-        if (v3) {
-            v4 = ::new (v3) NiMaterialProperty;
-            CopyMembers(v4, kCloning);
-            return v4;
-        }
-
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
+        NiMaterialProperty* v4 = new NiMaterialProperty;
+        CopyMembers(v4, kCloning);
+        return v4;
     }
 
     NiObject::CopyMembers(this, kCloning);

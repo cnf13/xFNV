@@ -16,16 +16,9 @@ NiVertWeightsExtraData::NiVertWeightsExtraData() {}
 NiVertWeightsExtraData::~NiVertWeightsExtraData() {}
 
 NiObject* NiVertWeightsExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiVertWeightsExtraData* pkObject =
-        static_cast<NiVertWeightsExtraData*>(NiMemObject::operator new(sizeof(NiVertWeightsExtraData)));
-    if (pkObject) {
-        ::new (pkObject) NiVertWeightsExtraData;
-        NiExtraData::CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    NiExtraData::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiVertWeightsExtraData* pkObject = new NiVertWeightsExtraData;
+    NiExtraData::CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Only files before 5.0.0.16 hold any data (not even the name after that); the weights are read and dropped.

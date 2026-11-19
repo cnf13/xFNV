@@ -17,17 +17,9 @@ NiPSysEmitterLifeSpanCtlr::NiPSysEmitterLifeSpanCtlr() : NiPSysModifierFloatCtlr
 NiPSysEmitterLifeSpanCtlr::~NiPSysEmitterLifeSpanCtlr() {}
 
 NiObject* NiPSysEmitterLifeSpanCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysEmitterLifeSpanCtlr* v3 =
-        static_cast<NiPSysEmitterLifeSpanCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterLifeSpanCtlr)));
-    NiPSysModifierCtlr* v4 = v3;
-    if (v3) {
-        ::new (v3) NiPSysEmitterLifeSpanCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysEmitterLifeSpanCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysEmitterLifeSpanCtlr::LoadBinary(NiStream& kStream) {

@@ -21,16 +21,9 @@ NiPSysColliderManager::NiPSysColliderManager() : NiPSysModifier(), m_spColliders
 NiPSysColliderManager::~NiPSysColliderManager() {}
 
 NiObject* NiPSysColliderManager::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysColliderManager* pkObject =
-        static_cast<NiPSysColliderManager*>(NiMemObject::operator new(sizeof(NiPSysColliderManager)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysColliderManager;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysColliderManager* pkObject = new NiPSysColliderManager;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // The collider list's link id is only read here; LinkObject resolves it. NiPSysColorModifier shares this body.

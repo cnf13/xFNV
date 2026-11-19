@@ -28,16 +28,9 @@ const NiRTTI* NiPoint3Interpolator::GetRTTI() const {
 }
 
 NiObject* NiPoint3Interpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiPoint3Interpolator* pkObject =
-        static_cast<NiPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiPoint3Interpolator)));
-    if (pkObject) {
-        ::new (pkObject) NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPoint3Interpolator* pkObject = new NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiPoint3Interpolator::LoadBinary(NiStream& kStream) {

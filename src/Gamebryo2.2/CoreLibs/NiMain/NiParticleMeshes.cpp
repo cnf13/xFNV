@@ -27,15 +27,9 @@ NiParticleMeshes::NiParticleMeshes() : m_bUpdateControllers(true) {}
 NiParticleMeshes::~NiParticleMeshes() {}
 
 NiObject* NiParticleMeshes::CreateClone(NiCloningProcess& kCloning) {
-    NiParticleMeshes* pkObject = static_cast<NiParticleMeshes*>(NiMemObject::operator new(sizeof(NiParticleMeshes)));
-    if (pkObject) {
-        ::new (pkObject) NiParticleMeshes;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiParticleMeshes* pkObject = new NiParticleMeshes;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiParticleMeshes::LoadBinary(NiStream& kStream) {

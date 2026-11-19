@@ -79,15 +79,9 @@ const NiRTTI* NiCollisionData::GetRTTI() const {
 }
 
 NiObject* NiCollisionData::CreateClone(NiCloningProcess& kCloning) {
-    NiCollisionData* v3 = static_cast<NiCollisionData*>(NiMemObject::operator new(sizeof(NiCollisionData)));
-    if (v3) {
-        NiCollisionData* v4 = ::new (v3) NiCollisionData;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiCollisionData* v4 = new NiCollisionData;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // KEEP (niread:): the exe reads each mode and the volume flag into a stack slot, then stores or tests it; a short

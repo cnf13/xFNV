@@ -284,16 +284,9 @@ NiTexturingProperty::~NiTexturingProperty() {
 
 NiObject* NiTexturingProperty::CreateClone(NiCloningProcess& kCloning) {
     if (m_spControllers) {
-        NiTexturingProperty* v3 =
-            static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-        if (v3) {
-            NiTexturingProperty* v4 = ::new (v3) NiTexturingProperty;
-            CopyMembers(v4, kCloning);
-            return v4;
-        }
-
-        CopyMembers(nullptr, kCloning);
-        return nullptr;
+        NiTexturingProperty* v4 = new NiTexturingProperty;
+        CopyMembers(v4, kCloning);
+        return v4;
     }
 
     NiObject::CopyMembers(this, kCloning);

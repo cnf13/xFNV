@@ -62,13 +62,7 @@ const NiRTTI* NiDefaultAVObjectPalette::GetRTTI() const {
 // NiImplementCreateClone: the default constructor (hash size 37), then CopyMembers, which is NiAVObjectPalette's.
 // CopyMembers is called even when the allocation fails, as the game does.
 NiObject* NiDefaultAVObjectPalette::CreateClone(NiCloningProcess& kCloning) {
-    NiDefaultAVObjectPalette* pkClone =
-        static_cast<NiDefaultAVObjectPalette*>(NiMemObject::operator new(sizeof(NiDefaultAVObjectPalette)));
-    if (!pkClone) {
-        NiAVObjectPalette::CopyMembers(nullptr, kCloning);
-        return nullptr;
-    }
-    ::new (pkClone) NiDefaultAVObjectPalette;
+    NiDefaultAVObjectPalette* pkClone = new NiDefaultAVObjectPalette;
     NiAVObjectPalette::CopyMembers(pkClone, kCloning);
     return pkClone;
 }

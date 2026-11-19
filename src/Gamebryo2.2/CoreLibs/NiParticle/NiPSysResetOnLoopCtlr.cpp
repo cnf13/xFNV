@@ -18,16 +18,9 @@ NiPSysResetOnLoopCtlr::NiPSysResetOnLoopCtlr() : NiTimeController(), m_fLastScal
 NiPSysResetOnLoopCtlr::~NiPSysResetOnLoopCtlr() {}
 
 NiObject* NiPSysResetOnLoopCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysResetOnLoopCtlr* pkObject =
-        static_cast<NiPSysResetOnLoopCtlr*>(NiMemObject::operator new(sizeof(NiPSysResetOnLoopCtlr)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysResetOnLoopCtlr;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysResetOnLoopCtlr* pkObject = new NiPSysResetOnLoopCtlr;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiPSysResetOnLoopCtlr::LoadBinary(NiStream& kStream) {

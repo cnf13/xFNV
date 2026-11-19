@@ -29,16 +29,9 @@ const NiRTTI* NiIntegersExtraData::GetRTTI() const {
 }
 
 NiObject* NiIntegersExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiIntegersExtraData* pkClone =
-        static_cast<NiIntegersExtraData*>(NiMemObject::operator new(sizeof(NiIntegersExtraData)));
-    if (pkClone) {
-        ::new (pkClone) NiIntegersExtraData;
-        CopyMembers(pkClone, kCloning);
-        return pkClone;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiIntegersExtraData* pkClone = new NiIntegersExtraData;
+    CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 // The old array is not freed.

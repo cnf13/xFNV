@@ -26,16 +26,9 @@ NiBackToFrontAccumulator::~NiBackToFrontAccumulator() {
 }
 
 NiObject* NiBackToFrontAccumulator::CreateClone(NiCloningProcess& kCloning) {
-    NiBackToFrontAccumulator* pkObject =
-        static_cast<NiBackToFrontAccumulator*>(NiMemObject::operator new(sizeof(NiBackToFrontAccumulator)));
-    if (pkObject) {
-        ::new (pkObject) NiBackToFrontAccumulator;
-        NiAccumulator::CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    NiAccumulator::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiBackToFrontAccumulator* pkObject = new NiBackToFrontAccumulator;
+    NiAccumulator::CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiBackToFrontAccumulator::LoadBinary(NiStream& kStream) {

@@ -44,15 +44,9 @@ NiParticleSystem::NiParticleSystem()
 NiParticleSystem::~NiParticleSystem() {}
 
 NiObject* NiParticleSystem::CreateClone(NiCloningProcess& kCloning) {
-    NiParticleSystem* v3 = static_cast<NiParticleSystem*>(NiMemObject::operator new(sizeof(NiParticleSystem)));
-    if (v3) {
-        NiParticleSystem* pkObject = ::new (v3) NiParticleSystem;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiParticleSystem* pkObject = new NiParticleSystem;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // The modifier link IDs are queued here and resolved in LinkObject. A short read leaves ucWorldSpace uninitialised.

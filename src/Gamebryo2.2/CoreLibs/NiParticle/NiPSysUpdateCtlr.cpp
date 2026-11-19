@@ -26,15 +26,9 @@ NiPSysUpdateCtlr::NiPSysUpdateCtlr() : NiTimeController() {
 NiPSysUpdateCtlr::~NiPSysUpdateCtlr() {}
 
 NiObject* NiPSysUpdateCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysUpdateCtlr* v3 = static_cast<NiPSysUpdateCtlr*>(NiMemObject::operator new(sizeof(NiPSysUpdateCtlr)));
-    if (v3) {
-        ::new (v3) NiPSysUpdateCtlr;
-        CopyMembers(v3, kCloning);
-        return v3;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysUpdateCtlr* v3 = new NiPSysUpdateCtlr;
+    CopyMembers(v3, kCloning);
+    return v3;
 }
 
 void NiPSysUpdateCtlr::LoadBinary(NiStream& kStream) {

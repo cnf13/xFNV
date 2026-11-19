@@ -17,16 +17,9 @@ BSStripParticleSystem::BSStripParticleSystem() {}
 BSStripParticleSystem::~BSStripParticleSystem() {}
 
 NiObject* BSStripParticleSystem::CreateClone(NiCloningProcess& kCloning) {
-    BSStripParticleSystem* pkObject =
-        static_cast<BSStripParticleSystem*>(NiMemObject::operator new(sizeof(BSStripParticleSystem)));
-    if (pkObject) {
-        ::new (pkObject) BSStripParticleSystem;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    BSStripParticleSystem* pkObject = new BSStripParticleSystem;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void BSStripParticleSystem::LoadBinary(NiStream& kStream) {

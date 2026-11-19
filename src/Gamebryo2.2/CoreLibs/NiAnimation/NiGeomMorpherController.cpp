@@ -49,15 +49,9 @@ const NiRTTI* NiGeomMorpherController::GetRTTI() const {
 }
 
 NiObject* NiGeomMorpherController::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiGeomMorpherController));
-    if (v3) {
-        NiGeomMorpherController* v4 = ::new (v3) NiGeomMorpherController;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiGeomMorpherController* v4 = new NiGeomMorpherController;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // Before 10.0.1.2 the flags come from the stream's time controller flags. Before 20.1.0.3 the interpolators are

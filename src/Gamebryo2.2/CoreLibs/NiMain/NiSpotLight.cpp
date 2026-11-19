@@ -24,16 +24,9 @@ const NiRTTI* NiSpotLight::GetRTTI() const {
 }
 
 NiObject* NiSpotLight::CreateClone(NiCloningProcess& kCloning) {
-    NiSpotLight* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiSpotLight));
-    if (v3) {
-        v4 = ::new (v3) NiSpotLight;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiSpotLight* v4 = new NiSpotLight;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // Files before 20.2.0.5 carry no inner angle; it keeps its current value.

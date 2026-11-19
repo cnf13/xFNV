@@ -730,15 +730,9 @@ const NiRTTI* NiScreenSpaceCamera::GetRTTI() const {
 }
 
 NiObject* NiScreenSpaceCamera::CreateClone(NiCloningProcess& kCloning) {
-    NiScreenSpaceCamera* v3 = static_cast<NiScreenSpaceCamera*>(NiMemObject::operator new(sizeof(NiScreenSpaceCamera)));
-    if (v3) {
-        NiScreenSpaceCamera* pkObject = ::new (v3) NiScreenSpaceCamera;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiScreenSpaceCamera* pkObject = new NiScreenSpaceCamera;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 void NiScreenSpaceCamera::LoadBinary(NiStream& kStream) {

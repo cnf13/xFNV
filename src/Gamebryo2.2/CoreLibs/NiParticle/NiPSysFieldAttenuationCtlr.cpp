@@ -17,16 +17,9 @@ NiPSysFieldAttenuationCtlr::NiPSysFieldAttenuationCtlr() : NiPSysModifierFloatCt
 NiPSysFieldAttenuationCtlr::~NiPSysFieldAttenuationCtlr() {}
 
 NiObject* NiPSysFieldAttenuationCtlr::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysFieldAttenuationCtlr));
-    NiPSysModifierCtlr* v4 = static_cast<NiPSysModifierCtlr*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysFieldAttenuationCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysFieldAttenuationCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysFieldAttenuationCtlr::LoadBinary(NiStream& kStream) {

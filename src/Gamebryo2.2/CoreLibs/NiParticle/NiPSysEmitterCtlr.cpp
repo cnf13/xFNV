@@ -48,16 +48,9 @@ NiPSysEmitterCtlr::NiPSysEmitterCtlr(const char* apcModifierName)
 NiPSysEmitterCtlr::~NiPSysEmitterCtlr() {}
 
 NiObject* NiPSysEmitterCtlr::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysEmitterCtlr));
-    NiPSysEmitterCtlr* v4 = static_cast<NiPSysEmitterCtlr*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysEmitterCtlr;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysEmitterCtlr* v4 = new NiPSysEmitterCtlr;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // The emitter active link is read in every file version.

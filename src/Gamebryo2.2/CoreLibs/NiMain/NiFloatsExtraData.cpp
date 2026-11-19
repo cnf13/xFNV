@@ -23,16 +23,9 @@ const NiRTTI* NiFloatsExtraData::GetRTTI() const {
 }
 
 NiObject* NiFloatsExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiExtraData* pkObject = static_cast<NiExtraData*>(NiMemObject::operator new(sizeof(NiFloatsExtraData)));
-    NiFloatsExtraData* pkObject_2 = static_cast<NiFloatsExtraData*>(pkObject);
-    if (pkObject) {
-        ::new (pkObject) NiFloatsExtraData;
-        CopyMembers(pkObject_2, kCloning);
-        return pkObject_2;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiFloatsExtraData* pkObject_2 = new NiFloatsExtraData;
+    CopyMembers(pkObject_2, kCloning);
+    return pkObject_2;
 }
 
 // The old array is not freed, as the game does.

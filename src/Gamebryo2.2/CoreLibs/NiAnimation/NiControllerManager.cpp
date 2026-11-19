@@ -51,15 +51,9 @@ NiControllerManager::~NiControllerManager() {
 }
 
 NiObject* NiControllerManager::CreateClone(NiCloningProcess& kCloning) {
-    NiControllerManager* v3 = static_cast<NiControllerManager*>(NiMemObject::operator new(sizeof(NiControllerManager)));
-    if (v3) {
-        NiControllerManager* v4 = ::new (v3) NiControllerManager;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiControllerManager* v4 = new NiControllerManager;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // The object palette is in files from 10.1.0.104 on.

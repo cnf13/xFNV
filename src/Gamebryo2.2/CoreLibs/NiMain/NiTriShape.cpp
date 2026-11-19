@@ -51,15 +51,9 @@ const NiRTTI* NiTriShape::GetRTTI() const {
 }
 
 NiObject* NiTriShape::CreateClone(NiCloningProcess& kCloning) {
-    NiTriShape* pkClone = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (pkClone) {
-        ::new (pkClone) NiTriShape;
-        CopyMembers(pkClone, kCloning);
-        return pkClone;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiTriShape* pkClone = new NiTriShape;
+    CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 // NiTriStrips uses the same function.

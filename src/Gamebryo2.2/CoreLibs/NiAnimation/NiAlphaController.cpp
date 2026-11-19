@@ -26,15 +26,9 @@ const NiRTTI* NiAlphaController::GetRTTI() const {
 }
 
 NiObject* NiAlphaController::CreateClone(NiCloningProcess& kCloning) {
-    NiAlphaController* v3 = static_cast<NiAlphaController*>(NiMemObject::operator new(sizeof(NiAlphaController)));
-    if (v3) {
-        ::new (v3) NiAlphaController;
-        CopyMembers(v3, kCloning);
-        return v3;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiAlphaController* v3 = new NiAlphaController;
+    CopyMembers(v3, kCloning);
+    return v3;
 }
 
 void NiAlphaController::LoadBinary(NiStream& kStream) {

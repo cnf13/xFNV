@@ -37,15 +37,9 @@ NiPSysData::~NiPSysData() {
 }
 
 NiObject* NiPSysData::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysData* pkObject = static_cast<NiPSysData*>(NiMemObject::operator new(sizeof(NiPSysData)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysData;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysData* pkObject = new NiPSysData;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Files before 10.3.0.5 store rotations as quaternions: they become angle/axis pairs. Every particle gets a

@@ -54,16 +54,9 @@ const NiRTTI* NiTextureEffect::GetRTTI() const {
 }
 
 NiObject* NiTextureEffect::CreateClone(NiCloningProcess& kCloning) {
-    NiTextureEffect* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiTextureEffect));
-    if (v3) {
-        v4 = ::new (v3) NiTextureEffect;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiTextureEffect* v4 = new NiTextureEffect;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // Files before 10.3.0.4 carry two more 16-bit values and files before 4.1.0.16 a third; all are skipped.

@@ -17,16 +17,9 @@ NiPSysEmitterInitialRadiusCtlr::NiPSysEmitterInitialRadiusCtlr() : NiPSysModifie
 NiPSysEmitterInitialRadiusCtlr::~NiPSysEmitterInitialRadiusCtlr() {}
 
 NiObject* NiPSysEmitterInitialRadiusCtlr::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysEmitterInitialRadiusCtlr));
-    NiPSysModifierCtlr* v4 = static_cast<NiPSysModifierCtlr*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysEmitterInitialRadiusCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysEmitterInitialRadiusCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysEmitterInitialRadiusCtlr::LoadBinary(NiStream& kStream) {

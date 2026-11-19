@@ -30,15 +30,9 @@ NiBlendTransformInterpolator::NiBlendTransformInterpolator(
 NiBlendTransformInterpolator::~NiBlendTransformInterpolator() {}
 
 NiObject* NiBlendTransformInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiBlendTransformInterpolator));
-    if (v3) {
-        NiBlendInterpolator* v4 = ::new (v3) NiBlendTransformInterpolator;
-        NiBlendInterpolator::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiBlendInterpolator::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiBlendInterpolator* v4 = new NiBlendTransformInterpolator;
+    NiBlendInterpolator::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // Files before 10.1.0.110 store a transform here that is no longer used; it is read and dropped.

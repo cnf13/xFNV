@@ -29,15 +29,9 @@ NiLines::NiLines(
 NiLines::~NiLines() {}
 
 NiObject* NiLines::CreateClone(NiCloningProcess& kCloning) {
-    NiLines* pkClone = static_cast<NiLines*>(NiMemObject::operator new(sizeof(NiLines)));
-    if (pkClone) {
-        ::new (pkClone) NiLines;
-        NiGeometry::CopyMembers(pkClone, kCloning);
-        return pkClone;
-    }
-
-    NiGeometry::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiLines* pkClone = new NiLines;
+    NiGeometry::CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 // Other geometry classes without stream data of their own use the same function.

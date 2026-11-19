@@ -80,16 +80,9 @@ NiNode::~NiNode() {
 }
 
 NiObject* NiNode::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* v4 = static_cast<NiNode*>(v3);
-    if (v3) {
-        ::new (v3) NiNode;
-        CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiNode* v4 = new NiNode;
+    CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // Two link ID blocks follow the base object's data; the pick-off flag is cleared afterwards.

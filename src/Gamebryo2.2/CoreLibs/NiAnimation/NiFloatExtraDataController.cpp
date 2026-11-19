@@ -27,15 +27,9 @@ const NiRTTI* NiFloatExtraDataController::GetRTTI() const {
 }
 
 NiObject* NiFloatExtraDataController::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiFloatExtraDataController));
-    if (v3) {
-        NiFloatExtraDataController* pkClone = ::new (v3) NiFloatExtraDataController;
-        CopyMembers(pkClone, kCloning);
-        return pkClone;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiFloatExtraDataController* pkClone = new NiFloatExtraDataController;
+    CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 // Files before 10.1.0.104 also store the link to an old-style float data, which LinkObject resolves.

@@ -38,16 +38,9 @@ NiLookAtInterpolator::NiLookAtInterpolator(NiAVObject* pkLookAt, NiLookAtInterpo
 NiLookAtInterpolator::~NiLookAtInterpolator() {}
 
 NiObject* NiLookAtInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiLookAtInterpolator* v3 =
-        static_cast<NiLookAtInterpolator*>(NiMemObject::operator new(sizeof(NiLookAtInterpolator)));
-    if (v3) {
-        NiLookAtInterpolator* pkObject = ::new (v3) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiLookAtInterpolator* pkObject = new NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // The look-at target is kept as a raw pointer: it is resolved again by name through ResolveDependencies.

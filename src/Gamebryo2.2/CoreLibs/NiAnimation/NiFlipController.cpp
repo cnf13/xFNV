@@ -38,15 +38,9 @@ const NiRTTI* NiFlipController::GetRTTI() const {
 }
 
 NiObject* NiFlipController::CreateClone(NiCloningProcess& kCloning) {
-    NiFlipController* v3 = static_cast<NiFlipController*>(NiMemObject::operator new(sizeof(NiFlipController)));
-    if (v3) {
-        NiFlipController* pkObject = ::new (v3) NiFlipController;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiFlipController* pkObject = new NiFlipController;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Files before 10.1.0.104 store a start time and the seconds per frame in place of an interpolator: the controller

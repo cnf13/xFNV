@@ -17,18 +17,9 @@ NiPSysEmitterDeclinationVarCtlr::NiPSysEmitterDeclinationVarCtlr() : NiPSysModif
 NiPSysEmitterDeclinationVarCtlr::~NiPSysEmitterDeclinationVarCtlr() {}
 
 NiObject* NiPSysEmitterDeclinationVarCtlr::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysEmitterDeclinationVarCtlr* v3 = static_cast<NiPSysEmitterDeclinationVarCtlr*>(
-        NiMemObject::operator new(sizeof(NiPSysEmitterDeclinationVarCtlr))
-    );
-    NiPSysModifierCtlr* v4 = v3;
-    if (v3) {
-        ::new (v3) NiPSysEmitterDeclinationVarCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysEmitterDeclinationVarCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysEmitterDeclinationVarCtlr::LoadBinary(NiStream& kStream) {

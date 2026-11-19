@@ -17,16 +17,9 @@ NiPSysFieldMaxDistanceCtlr::NiPSysFieldMaxDistanceCtlr() : NiPSysModifierFloatCt
 NiPSysFieldMaxDistanceCtlr::~NiPSysFieldMaxDistanceCtlr() {}
 
 NiObject* NiPSysFieldMaxDistanceCtlr::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysFieldMaxDistanceCtlr));
-    NiPSysModifierCtlr* v4 = static_cast<NiPSysModifierCtlr*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysFieldMaxDistanceCtlr;
-        NiPSysModifierCtlr::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiPSysModifierCtlr::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysModifierCtlr* v4 = new NiPSysFieldMaxDistanceCtlr;
+    NiPSysModifierCtlr::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 void NiPSysFieldMaxDistanceCtlr::LoadBinary(NiStream& kStream) {

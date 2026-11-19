@@ -30,15 +30,9 @@ const NiRTTI* NiScreenTexture::GetRTTI() const {
 
 // CopyMembers is called with a null clone when the allocation fails, as the game does.
 NiObject* NiScreenTexture::CreateClone(NiCloningProcess& kCloning) {
-    NiScreenTexture* pkObject = static_cast<NiScreenTexture*>(NiMemObject::operator new(sizeof(NiScreenTexture)));
-    if (pkObject) {
-        ::new (pkObject) NiScreenTexture;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiScreenTexture* pkObject = new NiScreenTexture;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // Each rectangle is six 2-byte transfers and its color; the texturing property link is queued for LinkObject.

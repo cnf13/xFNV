@@ -19,15 +19,9 @@ NiParticles::NiParticles() {}
 NiParticles::~NiParticles() {}
 
 NiObject* NiParticles::CreateClone(NiCloningProcess& kCloning) {
-    NiParticles* pkClone = static_cast<NiParticles*>(NiMemObject::operator new(sizeof(NiParticles)));
-    if (pkClone) {
-        ::new (pkClone) NiParticles;
-        NiGeometry::CopyMembers(pkClone, kCloning);
-        return pkClone;
-    }
-
-    NiGeometry::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiParticles* pkClone = new NiParticles;
+    NiGeometry::CopyMembers(pkClone, kCloning);
+    return pkClone;
 }
 
 void NiParticles::LoadBinary(NiStream& stream) {

@@ -24,16 +24,9 @@ NiTextKeyExtraData::~NiTextKeyExtraData() {
 }
 
 NiObject* NiTextKeyExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiTextKeyExtraData* pkObject =
-        static_cast<NiTextKeyExtraData*>(NiMemObject::operator new(sizeof(NiTextKeyExtraData)));
-    if (pkObject) {
-        ::new (pkObject) NiTextKeyExtraData;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiTextKeyExtraData* pkObject = new NiTextKeyExtraData;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // An empty key list in the file leaves the current keys as they are; otherwise the old array is not freed.

@@ -22,15 +22,9 @@ const NiRTTI* NiAmbientLight::GetRTTI() const {
 }
 
 NiObject* NiAmbientLight::CreateClone(NiCloningProcess& kCloning) {
-    NiAmbientLight* v3 = static_cast<NiAmbientLight*>(NiMemObject::operator new(sizeof(NiAmbientLight)));
-    if (v3) {
-        ::new (v3) NiAmbientLight;
-        CopyMembers(v3, kCloning);
-        return v3;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiAmbientLight* v3 = new NiAmbientLight;
+    CopyMembers(v3, kCloning);
+    return v3;
 }
 
 // NiDirectionalLight's slot is the same function.

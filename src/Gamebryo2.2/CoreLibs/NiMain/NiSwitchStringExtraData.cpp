@@ -26,16 +26,9 @@ NiSwitchStringExtraData::~NiSwitchStringExtraData() {
 }
 
 NiObject* NiSwitchStringExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiSwitchStringExtraData* pkObject =
-        static_cast<NiSwitchStringExtraData*>(NiMemObject::operator new(sizeof(NiSwitchStringExtraData)));
-    if (pkObject) {
-        ::new (pkObject) NiSwitchStringExtraData;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiSwitchStringExtraData* pkObject = new NiSwitchStringExtraData;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // The old array and strings are not freed.

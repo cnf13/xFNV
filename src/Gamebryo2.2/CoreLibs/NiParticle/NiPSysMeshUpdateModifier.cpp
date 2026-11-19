@@ -46,16 +46,9 @@ NiPSysMeshUpdateModifier::NiPSysMeshUpdateModifier() {}
 NiPSysMeshUpdateModifier::~NiPSysMeshUpdateModifier() {}
 
 NiObject* NiPSysMeshUpdateModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysMeshUpdateModifier* pkObject =
-        static_cast<NiPSysMeshUpdateModifier*>(NiMemObject::operator new(sizeof(NiPSysMeshUpdateModifier)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysMeshUpdateModifier;
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiPSysMeshUpdateModifier* pkObject = new NiPSysMeshUpdateModifier;
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // The stored order is overridden; the mesh links are read here and resolved in LinkObject.

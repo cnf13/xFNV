@@ -27,15 +27,9 @@ const NiRTTI* NiLightDimmerController::GetRTTI() const {
 }
 
 NiObject* NiLightDimmerController::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiLightDimmerController));
-    if (v3) {
-        NiLightDimmerController* v4 = ::new (v3) NiLightDimmerController;
-        NiFloatInterpController::CopyMembers(v4, kCloning);
-        return v4;
-    }
-
-    NiFloatInterpController::CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiLightDimmerController* v4 = new NiLightDimmerController;
+    NiFloatInterpController::CopyMembers(v4, kCloning);
+    return v4;
 }
 
 // BSMaterialEmittanceMultController uses the same function.

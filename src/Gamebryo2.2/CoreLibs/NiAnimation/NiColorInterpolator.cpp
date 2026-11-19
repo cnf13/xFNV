@@ -27,16 +27,9 @@ const NiRTTI* NiColorInterpolator::GetRTTI() const {
 }
 
 NiObject* NiColorInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiColorInterpolator* pkObject =
-        static_cast<NiColorInterpolator*>(NiMemObject::operator new(sizeof(NiColorInterpolator)));
-    if (pkObject) {
-        pkObject = ::new (pkObject) NiColorInterpolator(static_cast<NiColorData*>(nullptr));
-        CopyMembers(pkObject, kCloning);
-        return pkObject;
-    }
-
-    CopyMembers(nullptr, kCloning);
-    return nullptr;
+    NiColorInterpolator* pkObject = new NiColorInterpolator(static_cast<NiColorData*>(nullptr));
+    CopyMembers(pkObject, kCloning);
+    return pkObject;
 }
 
 // NiQuaternionInterpolator uses the same function: its quaternion is read as four floats, like the colour.
