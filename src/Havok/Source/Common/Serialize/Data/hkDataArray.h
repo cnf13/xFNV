@@ -60,10 +60,10 @@ public:
         const float* asVec(int32_t nreal) const;
         // Stores nreal reals.
         void setVec(const float* ra, int32_t nreal);
-        // The element as a data object, into apResult; returns apResult.
-        hkDataObject* asObject(hkDataObject* apResult) const;
-        // The element as an array, into apResult: m_impl's asArray with m_index; returns apResult.
-        hkDataArray* asArray(hkDataArray* apResult) const;
+        // The element as a data object.
+        hkDataObject asObject() const;
+        // The element as an array: m_impl's asArray with m_index.
+        hkDataArray asArray() const;
         // The element as a C string.
         const char* asString() const;
 
@@ -80,7 +80,7 @@ public:
         int32_t m_index;
     };
 
-    // A null array, safe to destroy: some sites declare the local, then a call fills it in (the by-value result).
+    // A null array.
     hkDataArray() : m_impl(nullptr) {}
     // Takes an external reference on a1.
     hkDataArray(hkDataArrayImpl* a1);
@@ -106,17 +106,16 @@ public:
     void setSize(int32_t n);
     // Havok SDK signature (hkSerialize.lib, tied by reloc).
     hkDataObject::Type getType() const;
-    // Acts as Value operator[](int i), writing the Value into apResult.
-    Value* access(Value* apResult, int32_t i);
+    // Acts as Value operator[](int i).
+    Value access(int32_t i);
     // The const Value operator[](int i) const, the same code as the non-const one. Its callers read the element
     // (Copier::copyIntoNativeArray, Writer::_writeArrayItems).
-    Value* access(Value* apResult, int32_t i) const;
+    Value access(int32_t i) const;
     // Returns m_impl's getSize.
     int32_t getSize() const;
     // The result is written to apResult.
     hkDataClass* getClass(hkDataClass* apResult) const;
-    // The result is written to apResult.
-    hkDataArray* swizzleObjectMember(hkDataArray* apResult, const char* name) const;
+    hkDataArray swizzleObjectMember(const char* name) const;
 
     hkDataArrayImpl* m_impl;
 };

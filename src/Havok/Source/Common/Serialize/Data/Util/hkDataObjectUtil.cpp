@@ -118,8 +118,7 @@ void Cloner::copySimpleValue<hkDataArray::Value>(hkDataArray::Value dst, const h
         }
         case 7:
         case 8: {
-            hkDataObject object;
-            src.asObject(&object);
+            hkDataObject object = src.asObject();
             hkDataObject copy;
             dst = *copyObject(copy, object);
             break;
@@ -147,10 +146,9 @@ void Cloner::copySimpleValue<hkDataObject::Value>(hkDataObject::Value dst, const
         }
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            hkDataObject object;
-            hkDataObject* pObject = src.asObject(&object);
+            hkDataObject object = src.asObject();
             hkDataObject copy;
-            dst.setObject(*copyObject(copy, *pObject));
+            dst.setObject(*copyObject(copy, object));
             break;
         }
         case hkDataObject::TYPE_CSTRING: dst.setString(src.asString()); break;
@@ -357,8 +355,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<uint8_t>(pDst->m_size);
             elementSize = sizeof(uint8_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = srcArray.access(&element, i)->asInt() != 0;
+                pDst->m_data[i] = srcArray.access(i).asInt() != 0;
             }
             break;
         }
@@ -368,8 +365,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<char>(pDst->m_size);
             elementSize = sizeof(char);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<char>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<char>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -379,8 +375,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<int8_t>(pDst->m_size);
             elementSize = sizeof(int8_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<int8_t>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<int8_t>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -390,8 +385,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<uint8_t>(pDst->m_size);
             elementSize = sizeof(uint8_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<uint8_t>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<uint8_t>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -401,8 +395,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<int16_t>(pDst->m_size);
             elementSize = sizeof(int16_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<int16_t>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<int16_t>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -412,8 +405,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<uint16_t>(pDst->m_size);
             elementSize = sizeof(uint16_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<uint16_t>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<uint16_t>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -423,8 +415,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<int32_t>(pDst->m_size);
             elementSize = sizeof(int32_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = srcArray.access(&element, i)->asInt();
+                pDst->m_data[i] = srcArray.access(i).asInt();
             }
             break;
         }
@@ -434,8 +425,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<uint32_t>(pDst->m_size);
             elementSize = sizeof(uint32_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<uint32_t>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<uint32_t>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -445,8 +435,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<int64_t>(pDst->m_size);
             elementSize = sizeof(int64_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = srcArray.access(&element, i)->asInt();
+                pDst->m_data[i] = srcArray.access(i).asInt();
             }
             break;
         }
@@ -457,8 +446,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<uint64_t>(pDst->m_size);
             elementSize = sizeof(uint64_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<uint64_t>(static_cast<int64_t>(srcArray.access(&element, i)->asInt()));
+                pDst->m_data[i] = static_cast<uint64_t>(static_cast<int64_t>(srcArray.access(i).asInt()));
             }
             break;
         }
@@ -468,8 +456,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<float>(pDst->m_size);
             elementSize = sizeof(float);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = srcArray.access(&element, i)->asReal();
+                pDst->m_data[i] = srcArray.access(i).asReal();
             }
             break;
         }
@@ -480,9 +467,8 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkVector4>(pDst->m_size);
             elementSize = sizeof(hkVector4);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
                 // asVec's four reals are read as one hkVector4.
-                pDst->m_data[i] = *reinterpret_cast<const hkVector4*>(srcArray.access(&element, i)->asVec(4));
+                pDst->m_data[i] = *reinterpret_cast<const hkVector4*>(srcArray.access(i).asVec(4));
             }
             break;
         }
@@ -492,9 +478,8 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkMatrix3>(pDst->m_size);
             elementSize = sizeof(hkMatrix3);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
                 // The twelve reals returned by asVec are read as an hkMatrix3.
-                const hkMatrix3* pValue = reinterpret_cast<const hkMatrix3*>(srcArray.access(&element, i)->asVec(12));
+                const hkMatrix3* pValue = reinterpret_cast<const hkMatrix3*>(srcArray.access(i).asVec(12));
                 pDst->m_data[i].operator=(*pValue);
             }
             break;
@@ -507,10 +492,8 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkQsTransform>(pDst->m_size);
             elementSize = sizeof(hkQsTransform);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
                 // The const float* holding asVec's twelve reals is read as an hkQsTransform.
-                const hkQsTransform* pValue =
-                    reinterpret_cast<const hkQsTransform*>(srcArray.access(&element, i)->asVec(12));
+                const hkQsTransform* pValue = reinterpret_cast<const hkQsTransform*>(srcArray.access(i).asVec(12));
                 pDst->m_data[i] = *pValue;
             }
             break;
@@ -521,9 +504,8 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkMatrix4>(pDst->m_size);
             elementSize = sizeof(hkMatrix4);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
                 // The sixteen reals returned by asVec are read as an hkMatrix4.
-                const hkMatrix4* pValue = reinterpret_cast<const hkMatrix4*>(srcArray.access(&element, i)->asVec(16));
+                const hkMatrix4* pValue = reinterpret_cast<const hkMatrix4*>(srcArray.access(i).asVec(16));
                 pDst->m_data[i].operator=(*pValue);
             }
             break;
@@ -534,10 +516,8 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkTransform>(pDst->m_size);
             elementSize = sizeof(hkTransform);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
                 // The sixteen reals returned by asVec are read as an hkTransform.
-                const hkTransform* pValue =
-                    reinterpret_cast<const hkTransform*>(srcArray.access(&element, i)->asVec(16));
+                const hkTransform* pValue = reinterpret_cast<const hkTransform*>(srcArray.access(i).asVec(16));
                 pDst->m_data[i].Assign(*pValue);
             }
             break;
@@ -550,9 +530,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             elementSize = sizeof(void*);
             hkString::memSet(pDst->m_data, 0, pDst->m_size * static_cast<int32_t>(sizeof(void*)));
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                hkDataObject object;
-                srcArray.access(&element, i)->asObject(&object);
+                hkDataObject object = srcArray.access(i).asObject();
                 if (!object.isNull()) {
                     hkVariant copy;
                     findOrCopy(&copy, object, owningReference);
@@ -570,9 +548,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             // The element class is the first element's; without one the array is left unallocated.
             const hkClass* pClass;
             {
-                hkDataArray::Value element;
-                hkDataObject object;
-                srcArray.access(&element, 0)->asObject(&object);
+                hkDataObject object = srcArray.access(0).asObject();
                 pClass = getMemberClassAndCheck(member, object);
             }
             if (!pClass) {
@@ -585,9 +561,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             hkString::memSet(pArray->m_data, 0, pClass->getObjectSize() * srcArray.getSize());
             for (int32_t i = 0; i < srcArray.getSize() && result == HK_SUCCESS; ++i) {
                 void* pElement = static_cast<char*>(pArray->m_data) + pClass->getObjectSize() * i;
-                hkDataArray::Value element;
-                hkDataObject object;
-                srcArray.access(&element, i)->asObject(&object);
+                hkDataObject object = srcArray.access(i).asObject();
                 result = fillNativeMembers(pElement, object);
             }
             if (elementSize <= 0) {
@@ -602,9 +576,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             elementSize = sizeof(hkVariant);
             hkString::memSet(pDst->m_data, 0, pDst->m_size * static_cast<int32_t>(sizeof(hkVariant)));
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                hkDataObject object;
-                srcArray.access(&element, i)->asObject(&object);
+                hkDataObject object = srcArray.access(i).asObject();
                 if (!object.isNull()) {
                     hkVariant copy;
                     findOrCopy(&copy, object, owningReference);
@@ -624,10 +596,9 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_size = srcArray.getSize();
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<char*>(pDst->m_size);
             for (int32_t i = 0; i < srcArray.getSize() && result == HK_SUCCESS; ++i) {
-                hkDataArray::Value element;
                 result = fillNativeArrayElement(
-                    &pDst->m_data[i], static_cast<hkClassMember::Type>(member.m_subtype.m_storage),
-                    *srcArray.access(&element, i), nullptr, owningReference
+                    &pDst->m_data[i], static_cast<hkClassMember::Type>(member.m_subtype.m_storage), srcArray.access(i),
+                    nullptr, owningReference
                 );
             }
             // Falls through into the string pointer case, which allocates and fills the array again without freeing the
@@ -640,10 +611,9 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkStringPtr>(pDst->m_size);
             elementSize = sizeof(hkStringPtr);
             for (int32_t i = 0; i < srcArray.getSize() && result == HK_SUCCESS; ++i) {
-                hkDataArray::Value element;
                 result = fillNativeArrayElement(
-                    &pDst->m_data[i], static_cast<hkClassMember::Type>(member.m_subtype.m_storage),
-                    *srcArray.access(&element, i), nullptr, owningReference
+                    &pDst->m_data[i], static_cast<hkClassMember::Type>(member.m_subtype.m_storage), srcArray.access(i),
+                    nullptr, owningReference
                 );
             }
             break;
@@ -654,8 +624,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<uint32_t>(pDst->m_size);
             elementSize = sizeof(uint32_t);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
-                pDst->m_data[i] = static_cast<uint32_t>(srcArray.access(&element, i)->asInt());
+                pDst->m_data[i] = static_cast<uint32_t>(srcArray.access(i).asInt());
             }
             break;
         }
@@ -665,13 +634,12 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             pDst->m_data = hkMemoryRouter::getInstance().m_heap->_bufAlloc<hkHalf>(pDst->m_size);
             elementSize = sizeof(hkHalf);
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
-                hkDataArray::Value element;
                 // A half is the top half of the single's bits.
                 union {
                     float f;
                     int32_t i;
                 } kBits;
-                kBits.f = srcArray.access(&element, i)->asReal();
+                kBits.f = srcArray.access(i).asReal();
                 pDst->m_data[i].m_value = static_cast<int16_t>(kBits.i >> 16);
             }
             break;
@@ -711,8 +679,7 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                 continue;
             }
             // Calls the non-const operator[] on srcObj.
-            alignas(8) hkDataObject::Value value;
-            const_cast<hkDataObject&>(srcObj).access(&value, member.m_name);
+            alignas(8) hkDataObject::Value value = const_cast<hkDataObject&>(srcObj).access(member.m_name);
             int32_t numElements = member.getCstyleArraySize();
             if (numElements == 0) {
                 numElements = 1;
@@ -750,12 +717,10 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                     }
                     else {
                         // A C-style array: one element of srcObj's array per slot.
-                        hkDataArray array;
-                        value.asArray(&array);
+                        hkDataArray array = value.asArray();
                         for (int32_t i = 0; i < array.getSize() && result == HK_SUCCESS; ++i) {
-                            alignas(8) hkDataArray::Value element;
                             result = fillNativeArrayElement(
-                                address, mtype, *array.access(&element, i), member.getClass(), owningReference
+                                address, mtype, array.access(i), member.getClass(), owningReference
                             );
                             address = static_cast<char*>(address) + elementSize;
                         }
@@ -770,13 +735,10 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                             );
                         }
                         else {
-                            hkDataArray array;
-                            value.asArray(&array);
+                            hkDataArray array = value.asArray();
                             for (int32_t i = 0; i < array.getSize() && result == HK_SUCCESS; ++i) {
-                                alignas(8) hkDataArray::Value element;
                                 result = fillNativeArrayElement(
-                                    address, hkClassMember::TYPE_CSTRING, *array.access(&element, i), nullptr,
-                                    owningReference
+                                    address, hkClassMember::TYPE_CSTRING, array.access(i), nullptr, owningReference
                                 );
                                 address = static_cast<char*>(address) + elementSize;
                             }
@@ -784,24 +746,18 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                     }
                     else if (member.m_subtype.m_storage == hkClassMember::TYPE_STRUCT) {
                         if (numElements == 1) {
-                            alignas(8) hkDataObject object;
-                            value.asObject(&object);
+                            alignas(8) hkDataObject object = value.asObject();
                             result = fillNativeSimpleMember(
                                 address, mtype, value, getMemberClassAndCheck(member, object), owningReference
                             );
                         }
                         else {
-                            hkDataArray array;
-                            value.asArray(&array);
+                            hkDataArray array = value.asArray();
                             for (int32_t i = 0; i < array.getSize() && result == HK_SUCCESS; ++i) {
-                                alignas(8) hkDataArray::Value element;
-                                alignas(8) hkDataObject object;
-                                array.access(&element, i)->asObject(&object);
+                                alignas(8) hkDataObject object = array.access(i).asObject();
                                 const hkClass* pClass = getMemberClassAndCheck(member, object);
-                                alignas(8) hkDataArray::Value pointerElement;
-                                result = fillNativeArrayElement(
-                                    address, mtype, *array.access(&pointerElement, i), pClass, owningReference
-                                );
+                                result =
+                                    fillNativeArrayElement(address, mtype, array.access(i), pClass, owningReference);
                                 address = static_cast<char*>(address) + elementSize;
                             }
                         }
@@ -817,8 +773,7 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                          member.m_subtype.m_storage == hkClassMember::TYPE_CSTRING)) {
                         return HK_FAILURE;
                     }
-                    hkDataArray array;
-                    result = copyIntoNativeArray(address, member, *value.asArray(&array));
+                    result = copyIntoNativeArray(address, member, value.asArray());
                     break;
                 }
                 case hkClassMember::TYPE_ENUM:
@@ -834,12 +789,9 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                         int32_t m_size;
                     };
                     DummyHomogeneousArray* pDst = static_cast<DummyHomogeneousArray*>(address);
-                    hkDataArray array;
-                    value.asArray(&array);
+                    hkDataArray array = value.asArray();
                     {
-                        alignas(8) hkDataArray::Value element;
-                        alignas(8) hkDataObject object;
-                        array.access(&element, 0)->asObject(&object);
+                        alignas(8) hkDataObject object = array.access(0).asObject();
                         pDst->m_class = getMemberClassAndCheck(member, object);
                     }
                     pDst->m_size = array.getSize();
@@ -851,9 +803,7 @@ hkResult Copier::fillNativeMembers(void* dstObject, const hkDataObject& srcObj) 
                     int32_t offset = 0;
                     for (int32_t i = 0; i < pDst->m_size && result == HK_SUCCESS; ++i) {
                         void* pElement = static_cast<char*>(pDst->m_data) + offset;
-                        alignas(8) hkDataArray::Value element;
-                        alignas(8) hkDataObject object;
-                        array.access(&element, i)->asObject(&object);
+                        alignas(8) hkDataObject object = array.access(i).asObject();
                         result = fillNativeMembers(pElement, object);
                         offset += objectSize;
                     }
@@ -1103,8 +1053,7 @@ hkResult Copier::fillNativeArrayElement(
             if (!structClass) {
                 return HK_SUCCESS;
             }
-            hkDataObject object;
-            value.asObject(&object);
+            hkDataObject object = value.asObject();
             if (!object.isNull()) {
                 hkVariant copy;
                 findOrCopy(&copy, object, owningReference);
@@ -1119,8 +1068,7 @@ hkResult Copier::fillNativeArrayElement(
             if (!structClass) {
                 return HK_SUCCESS;
             }
-            hkDataObject object;
-            value.asObject(&object);
+            hkDataObject object = value.asObject();
             bool bFailed = fillNativeMembers(address, object) == HK_FAILURE;
             return bFailed ? HK_FAILURE : HK_SUCCESS;
         }
@@ -1190,8 +1138,7 @@ hkResult Copier::fillNativeArrayElement(
             if (m_allocatedOnHeap) {
                 return HK_FAILURE;
             }
-            hkDataObject object;
-            value.asObject(&object);
+            hkDataObject object = value.asObject();
             if (!object.isNull()) {
                 hkVariant copy;
                 findOrCopy(&copy, object, owningReference);
@@ -1258,8 +1205,7 @@ hkResult Copier::fillNativeSimpleMember(
             if (!structClass) {
                 return HK_SUCCESS;
             }
-            hkDataObject object;
-            value.asObject(&object);
+            hkDataObject object = value.asObject();
             if (!object.isNull()) {
                 hkVariant copy;
                 findOrCopy(&copy, object, owningReference);
@@ -1274,8 +1220,7 @@ hkResult Copier::fillNativeSimpleMember(
             if (!structClass) {
                 return HK_SUCCESS;
             }
-            hkDataObject object;
-            value.asObject(&object);
+            hkDataObject object = value.asObject();
             bool bFailed = fillNativeMembers(address, object) == HK_FAILURE;
             return bFailed ? HK_FAILURE : HK_SUCCESS;
         }
@@ -1345,8 +1290,7 @@ hkResult Copier::fillNativeSimpleMember(
             if (m_allocatedOnHeap) {
                 return HK_FAILURE;
             }
-            hkDataObject object;
-            value.asObject(&object);
+            hkDataObject object = value.asObject();
             if (!object.isNull()) {
                 hkVariant copy;
                 findOrCopy(&copy, object, owningReference);
@@ -1617,13 +1561,9 @@ hkDataClassImpl* Cloner::findDestClass(const char* classname) {
     return pDstClass;
 }
 
-// Every branch fetches its first member value into one Value, which is cleared before branching.
 void Cloner::copyValue(hkDataObject& dstObj, const hkDataObject& srcObj, const hkDataClass::MemberInfo& minfo) {
-    hkDataObject::Value value;
-    value.m_impl = nullptr;
     if (minfo.m_type & hkDataObject::TYPE_TUPLE) {
-        hkDataArray srcArray;
-        srcObj.access(&value, minfo.m_name)->asArray(&srcArray);
+        hkDataArray srcArray = srcObj.access(minfo.m_name).asArray();
         hkDataClass dstClass;
         hkDataArrayImpl* pImpl = dstObj.getClass(&dstClass)->getWorld()->newArray(dstObj, minfo);
         hkDataArray dstArray(pImpl);
@@ -1631,8 +1571,7 @@ void Cloner::copyValue(hkDataObject& dstObj, const hkDataObject& srcObj, const h
         copyArray(dstArray, srcArray, minfo.m_tupleCount);
     }
     else if (minfo.m_type & hkDataObject::TYPE_ARRAY) {
-        hkDataArray srcArray;
-        srcObj.access(&value, minfo.m_name)->asArray(&srcArray);
+        hkDataArray srcArray = srcObj.access(minfo.m_name).asArray();
         hkDataClass dstClass;
         hkDataArrayImpl* pImpl = dstObj.getClass(&dstClass)->getWorld()->newArray(dstObj, minfo);
         hkDataArray dstArray(pImpl);
@@ -1640,10 +1579,8 @@ void Cloner::copyValue(hkDataObject& dstObj, const hkDataObject& srcObj, const h
         copyArray(dstArray, srcArray, srcArray.getSize());
     }
     else {
-        dstObj.access(&value, minfo.m_name);
-        hkDataObject::Value srcValue;
-        const hkDataObject::Value* pSrcValue = srcObj.access(&srcValue, minfo.m_name);
-        copySimpleValue<hkDataObject::Value>(value, *pSrcValue);
+        hkDataObject::Value value = dstObj.access(minfo.m_name);
+        copySimpleValue<hkDataObject::Value>(value, srcObj.access(minfo.m_name));
     }
 }
 
@@ -1655,18 +1592,14 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
         case hkDataObject::TYPE_BYTE:
         case hkDataObject::TYPE_INT:
             for (int32_t i = 0; i < arraySize; ++i) {
-                alignas(8) hkDataArray::Value srcValue;
-                int32_t iValue = src.access(&srcValue, i)->asInt();
-                alignas(8) hkDataArray::Value dstValue;
-                *dst.access(&dstValue, i) = iValue;
+                int32_t iValue = src.access(i).asInt();
+                dst.access(i) = iValue;
             }
             break;
         case hkDataObject::TYPE_REAL:
             for (int32_t i = 0; i < arraySize; ++i) {
-                alignas(8) hkDataArray::Value srcValue;
-                float fValue = src.access(&srcValue, i)->asReal();
-                alignas(8) hkDataArray::Value dstValue;
-                *dst.access(&dstValue, i) = fValue;
+                float fValue = src.access(i).asReal();
+                dst.access(i) = fValue;
             }
             break;
         case hkDataObject::TYPE_VEC_4:
@@ -1675,23 +1608,18 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
         case hkDataObject::TYPE_VEC_16: {
             int32_t iNumReals = 4 * static_cast<int32_t>(src.getType()) - 12;
             for (int32_t i = 0; i < arraySize; ++i) {
-                alignas(8) hkDataArray::Value srcValue;
-                const float* pValue = src.access(&srcValue, i)->asVec(iNumReals);
-                alignas(8) hkDataArray::Value dstValue;
-                dst.access(&dstValue, i)->setVec(pValue, iNumReals);
+                const float* pValue = src.access(i).asVec(iNumReals);
+                dst.access(i).setVec(pValue, iNumReals);
             }
             break;
         }
         case hkDataObject::TYPE_OBJECT:
             dst.setSize(arraySize);
             for (int32_t i = 0; i < arraySize; ++i) {
-                alignas(8) hkDataObject object;
-                alignas(8) hkDataArray::Value srcValue;
-                hkDataObject* pObject = src.access(&srcValue, i)->asObject(&object);
+                alignas(8) hkDataObject object = src.access(i).asObject();
                 alignas(8) hkDataObject copy;
-                hkDataObject* pCopy = copyObject(copy, *pObject);
-                alignas(8) hkDataArray::Value dstValue;
-                *dst.access(&dstValue, i) = *pCopy;
+                hkDataObject* pCopy = copyObject(copy, object);
+                dst.access(i) = *pCopy;
             }
             break;
         case hkDataObject::TYPE_STRUCT: {
@@ -1729,37 +1657,25 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
                 if (!(mi.m_type & hkDataObject::TYPE_MASK_BASIC_TYPES)) {
                     continue;
                 }
-                alignas(8) hkDataArray dstMembers;
-                dst.swizzleObjectMember(&dstMembers, mi.m_name);
-                alignas(8) hkDataArray srcMembers;
-                src.swizzleObjectMember(&srcMembers, mi.m_name);
+                alignas(8) hkDataArray dstMembers = dst.swizzleObjectMember(mi.m_name);
+                alignas(8) hkDataArray srcMembers = src.swizzleObjectMember(mi.m_name);
                 if (mi.m_type & (hkDataObject::TYPE_ARRAY | hkDataObject::TYPE_TUPLE)) {
                     for (int32_t i = 0; i < arraySize; ++i) {
                         int32_t iSize;
                         if (mi.m_type & hkDataObject::TYPE_ARRAY) {
-                            alignas(8) hkDataArray sizeArray;
-                            alignas(8) hkDataArray::Value sizeValue;
-                            iSize = dstMembers.access(&sizeValue, i)->asArray(&sizeArray)->getSize();
+                            iSize = dstMembers.access(i).asArray().getSize();
                         }
                         else {
                             iSize = mi.m_tupleCount;
                         }
-                        alignas(8) hkDataArray dstArray;
-                        alignas(8) hkDataArray::Value dstValue;
-                        dstMembers.access(&dstValue, i)->asArray(&dstArray);
-                        alignas(8) hkDataArray srcArray;
-                        alignas(8) hkDataArray::Value srcValue;
-                        hkDataArray* pSrcArray = srcMembers.access(&srcValue, i)->asArray(&srcArray);
-                        copyArray(dstArray, *pSrcArray, iSize);
+                        alignas(8) hkDataArray dstArray = dstMembers.access(i).asArray();
+                        alignas(8) hkDataArray srcArray = srcMembers.access(i).asArray();
+                        copyArray(dstArray, srcArray, iSize);
                     }
                 }
                 else {
                     for (int32_t i = 0; i < arraySize; ++i) {
-                        alignas(8) hkDataArray::Value dstValue;
-                        hkDataArray::Value* pDstValue = dstMembers.access(&dstValue, i);
-                        alignas(8) hkDataArray::Value srcValue;
-                        hkDataArray::Value* pSrcValue = srcMembers.access(&srcValue, i);
-                        copySimpleValue<hkDataArray::Value>(*pDstValue, *pSrcValue);
+                        copySimpleValue<hkDataArray::Value>(dstMembers.access(i), srcMembers.access(i));
                     }
                 }
             }
@@ -1777,10 +1693,8 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
         }
         case hkDataObject::TYPE_CSTRING:
             for (int32_t i = 0; i < arraySize; ++i) {
-                alignas(8) hkDataArray::Value srcValue;
-                const char* pValue = src.access(&srcValue, i)->asString();
-                alignas(8) hkDataArray::Value dstValue;
-                *dst.access(&dstValue, i) = pValue;
+                const char* pValue = src.access(i).asString();
+                dst.access(i) = pValue;
             }
             break;
         default: break;

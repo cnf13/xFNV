@@ -205,11 +205,11 @@ struct Writer {
 
         // The object the listener returned for h's handle, else h itself, with the listener not called: a null h, no
         // listener, or a handle not in m_indexFromHandle give h.
-        hkDataObject* getCachedDataObject(hkDataObject* apResult, const hkDataObject& h) const;
+        hkDataObject getCachedDataObject(const hkDataObject& h) const;
         // As getCachedDataObject, but a handle not cached yet goes to the listener's addDataObjectCallback; an answer
         // other than h is cached as a heap hkDataObject at the end of m_cachedObjects, its index stored for the handle,
         // and returned.
-        hkDataObject* callListenerAndCache(hkDataObject* apResult, const hkDataObject& h);
+        hkDataObject callListenerAndCache(const hkDataObject& h);
 
         hkTagfileWriter::AddDataObjectListener* m_listener;
         hkMap<hkDataObject::Handle, int32_t, HandleOps, hkContainerHeapAllocator> m_indexFromHandle;
@@ -258,8 +258,7 @@ struct Writer {
 template <typename T>
 int32_t Writer::worthWriting(const T& value) {
     if (value.getType() >= hkDataObject::TYPE_ARRAY) {
-        hkDataArray array;
-        return value.asArray(&array)->getSize();
+        return value.asArray().getSize();
     }
     switch (value.getType()) {
         case hkDataObject::TYPE_BYTE:
@@ -269,15 +268,9 @@ int32_t Writer::worthWriting(const T& value) {
         case hkDataObject::TYPE_VEC_12:
         case hkDataObject::TYPE_VEC_16: return 1;
         case hkDataObject::TYPE_OBJECT:
-        case hkDataObject::TYPE_STRUCT: {
-            hkDataObject object;
-            return value.asObject(&object)->isNull() == 0;
-        }
+        case hkDataObject::TYPE_STRUCT: return value.asObject().isNull() == 0;
         case hkDataObject::TYPE_CSTRING: return value.asString() != nullptr;
-        case hkDataObject::TYPE_ARRAY: {
-            hkDataArray array;
-            return value.asArray(&array)->getSize() != 0;
-        }
+        case hkDataObject::TYPE_ARRAY: return value.asArray().getSize() != 0;
         default: return 0;
     }
 }

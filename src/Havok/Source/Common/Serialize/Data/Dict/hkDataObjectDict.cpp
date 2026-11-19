@@ -2615,8 +2615,7 @@ void hkDataObjectDict::releaseValue(hkDataObject::Type type, Union* value, int32
 // through the setter of the array's element type (the vectors with 4 * type - 12 reals).
 void hkDataArrayImpl::set(int32_t index, hkDataObject::Value val) {
     if (getType() & hkDataObject::TYPE_TUPLE) {
-        hkDataArray array;
-        setArray(index, val.asArray(&array)->m_impl);
+        setArray(index, val.asArray().m_impl);
         return;
     }
     switch (getType()) {
@@ -2628,11 +2627,7 @@ void hkDataArrayImpl::set(int32_t index, hkDataObject::Value val) {
         case hkDataObject::TYPE_VEC_12:
         case hkDataObject::TYPE_VEC_16: setVec(index, val.asVec(4 * static_cast<int32_t>(getType()) - 12)); break;
         case hkDataObject::TYPE_OBJECT:
-        case hkDataObject::TYPE_STRUCT: {
-            hkDataObject object;
-            setObject(index, val.asObject(&object)->m_impl);
-            break;
-        }
+        case hkDataObject::TYPE_STRUCT: setObject(index, val.asObject().m_impl); break;
         case hkDataObject::TYPE_CSTRING: setString(index, val.asString()); break;
         default: break;
     }

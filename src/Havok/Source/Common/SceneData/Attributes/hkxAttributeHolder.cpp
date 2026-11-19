@@ -115,66 +115,34 @@ hkReferencedObject* hkxAttributeHolder::findAttributeObjectByName(const char* na
     if (!name) {
         return nullptr;
     }
-    XFNV_INLINED_LOCAL(hkRefVariant, variant, std::nullopt, std::nullopt);
-    findAttributeVariantByName(&variant, name);
+    hkRefVariant variant = findAttributeVariantByName(name);
     if (!variant.m_pntr) {
         return nullptr;
     }
     if (type) {
         const char* pcVariantClassName = variant.getClass()->getName();
         if (hkString::strCasecmp(type->getName(), pcVariantClassName) != 0) {
-            // EXE-INLINED 0xC6CCA0
-            if (variant.m_pntr) {
-                variant.m_pntr->removeReference();
-            }
             return nullptr;
         }
     }
-    hkReferencedObject* pObject = variant.m_pntr;
-    // EXE-INLINED 0xC6CCA0
-    if (pObject) {
-        pObject->removeReference();
-    }
-    return pObject;
+    return variant.m_pntr;
 }
 
-hkRefVariant* hkxAttributeHolder::findAttributeVariantByName(hkRefVariant* apResult, const char* name) const {
-    int32_t v4;
-    hkRefVariant* v7;
-    // The variant's reference is released by hand below.
-    XFNV_INLINED_LOCAL(hkRefVariant, apResulta, std::nullopt, std::nullopt);
-    if (!name || (v4 = 0, m_attributeGroups.m_size <= 0)) {
-        hkVariant v11;
-    LABEL_6:;
-        v7 = apResult;
-        v11.m_object = nullptr;
-        v11.m_class = nullptr;
-        apResult->assignVariant(v11);
-        return v7;
-    }
-    int32_t v5 = 0;
-    while (true) {
-        m_attributeGroups.m_data[v5].findAttributeVariantByName(&apResulta, name);
-        if (apResulta.m_pntr) {
-            break;
-        }
-        ++v4;
-        ++v5;
-        bool v6 = v4 < m_attributeGroups.m_size;
-        apResulta.m_pntr = nullptr;
-        if (!v6) {
-            goto LABEL_6;
+// The first group's variant for name that holds an object, copied into the result; else a variant built from a null
+// hkVariant.
+hkRefVariant hkxAttributeHolder::findAttributeVariantByName(const char* name) const {
+    if (name) {
+        for (int32_t i = 0; i < m_attributeGroups.m_size; ++i) {
+            hkRefVariant variant = m_attributeGroups.m_data[i].findAttributeVariantByName(name);
+            if (variant.m_pntr) {
+                return variant;
+            }
         }
     }
-    apResulta.m_pntr->addReference();
-    hkReferencedObject* m_pntr = apResulta.m_pntr;
-    v7 = apResult;
-    apResult->m_pntr = apResulta.m_pntr;
-    if (!m_pntr) {
-        return v7;
-    }
-    m_pntr->removeReference();
-    return apResult;
+    hkVariant nullVariant = {nullptr, nullptr};
+    hkRefVariant result;
+    result.assignVariant(nullVariant);
+    return result;
 }
 
 const hkClass& hkxAttributeHolder::staticClass() {

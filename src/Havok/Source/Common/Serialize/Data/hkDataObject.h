@@ -92,8 +92,8 @@ public:
         void setArray(const hkDataArray& a);
         // The member's type, from m_impl's class.
         hkDataObject::Type getType() const;
-        hkDataObject* asObject(hkDataObject* apResult) const;
-        hkDataArray* asArray(hkDataArray* apResult) const;
+        hkDataObject asObject() const;
+        hkDataArray asArray() const;
 
         class hkDataObjectImpl* m_impl;
         // The member's name: the dictionary objects' interned name, the native objects' name as passed in.
@@ -124,13 +124,13 @@ public:
     Handle* getHandle(Handle* apResult) const;
     // m_impl->getClass() as an hkDataClass.
     hkDataClass* getClass(hkDataClass* apResult) const;
-    // Equivalent of Value operator[](name): m_impl->accessByName(name). The Value is written to apResult.
-    Value* access(Value* apResult, const char* name);
-    Value* access(Value* apResult, const char* name) const;
+    // Equivalent of Value operator[](name): m_impl->accessByName(name).
+    Value access(const char* name);
+    Value access(const char* name) const;
     // m_impl->getMemberName(i).
     const char* getMemberName(int32_t it) const;
     // m_impl->getMemberValue(i).
-    Value* getMemberValue(Value* apResult, int32_t i) const;
+    Value getMemberValue(int32_t i) const;
     // Whether the object has no implementation; Havok's hkBool32.
     int32_t isNull() const;
     // Whether both objects have the same handle.

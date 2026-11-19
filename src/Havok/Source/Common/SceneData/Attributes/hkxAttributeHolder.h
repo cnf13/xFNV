@@ -20,7 +20,7 @@ public:
     const hkxAttributeGroup* findAttributeGroupByName(const char* name) const;
     // The object held by the attribute called apName, of class apType when given; or null.
     hkReferencedObject* findAttributeObjectByName(const char* name, const hkClass* type = nullptr) const;
-    hkRefVariant* findAttributeVariantByName(hkRefVariant* apResult, const char* name) const;
+    hkRefVariant findAttributeVariantByName(const char* name) const;
 
     // Havok SDK signature (hkSceneData.lib, tied by target).
     static const hkClass& staticClass();

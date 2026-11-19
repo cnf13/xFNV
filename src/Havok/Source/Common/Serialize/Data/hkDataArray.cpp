@@ -24,14 +24,12 @@ void hkDataArray::Value::setVec(const float* ra, int32_t nreal) {
     m_impl->setVec(m_index, ra);
 }
 
-hkDataObject* hkDataArray::Value::asObject(hkDataObject* apResult) const {
-    hkDataObjectImpl* v2 = m_impl->asObject(m_index);
-    return ::new (apResult) hkDataObject(v2);
+hkDataObject hkDataArray::Value::asObject() const {
+    return hkDataObject(m_impl->asObject(m_index));
 }
 
-hkDataArray* hkDataArray::Value::asArray(hkDataArray* apResult) const {
-    hkDataArrayImpl* v2 = m_impl->asArray(m_index);
-    return ::new (apResult) hkDataArray(v2);
+hkDataArray hkDataArray::Value::asArray() const {
+    return hkDataArray(m_impl->asArray(m_index));
 }
 
 const char* hkDataArray::Value::asString() const {
@@ -141,8 +139,6 @@ hkDataClass* hkDataArray::getClass(hkDataClass* apResult) const {
     return apResult;
 }
 
-hkDataArray* hkDataArray::swizzleObjectMember(hkDataArray* apResult, const char* name) const {
-    hkDataArrayImpl* v3 = m_impl->swizzleObjectMember(name);
-    ::new (apResult) hkDataArray(v3);
-    return apResult;
+hkDataArray hkDataArray::swizzleObjectMember(const char* name) const {
+    return hkDataArray(m_impl->swizzleObjectMember(name));
 }

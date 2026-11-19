@@ -26,10 +26,8 @@ hkBinaryTagfileReader::hkBinaryTagfileReader() {}
 hkBinaryTagfileReader::~hkBinaryTagfileReader() {}
 
 hkDataObject hkBinaryTagfileReader::load(hkStreamReader* stream, hkDataWorld& cont) {
-    hkDataObject result;
     Reader v5(stream, cont);
-    v5.readObjectTree(&result);
-    return result;
+    return v5.readObjectTree();
 }
 
 // The class table starts with a null class, the string table with the empty string and a null string: tags 0 and 1.
@@ -133,8 +131,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
         case hkDataObject::TYPE_INT: {
             for (int32_t i = 0; i < nelem; ++i) {
                 const int32_t iValue = readInt<int32_t>();
-                alignas(8) hkDataArray::Value value;
-                arr.access(&value, i)->operator=(iValue);
+                arr.access(i) = iValue;
             }
             return;
         }
@@ -166,8 +163,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             vec[3] = 0.0f;
             for (int32_t i = 0; i < nelem; ++i) {
                 m_ia.readArrayGeneric(vec, 4, iNumReals);
-                hkDataArray::Value value;
-                arr.access(&value, i)->setVec(vec, 4);
+                arr.access(i).setVec(vec, 4);
             }
             return;
         }
@@ -182,18 +178,13 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
                     m_ia.readArrayGeneric((&fReal), 4, 1);
                     vec[k] = fReal;
                 }
-                alignas(8) hkDataArray::Value value;
-                arr.access(&value, i)->setVec(vec, iNumReals);
+                arr.access(i).setVec(vec, iNumReals);
             }
             return;
         }
         case hkDataObject::TYPE_OBJECT: {
             for (int32_t i = 0; i < nelem; ++i) {
-                XFNV_INLINED_LOCAL(hkDataObject, obj, std::nullopt, std::nullopt);
-                hkDataObject* pObj = readObject(&obj, -1);
-                hkDataArray::Value value;
-                arr.access(&value, i)->operator=(*pObj);
-                obj.~hkDataObject();
+                arr.access(i) = readObject(-1);
             }
             return;
         }
@@ -227,21 +218,16 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
                 if (bitfield.m_data[m] == 0) {
                     continue;
                 }
-                XFNV_INLINED_LOCAL(hkDataArray, members, std::nullopt, std::nullopt);
-                arr.swizzleObjectMember(&members, mi.m_name);
+                hkDataArray members = arr.swizzleObjectMember(mi.m_name);
                 if (mi.m_tupleCount == 0) {
                     _readArrayItems(members, nelem);
                 }
                 else {
                     for (int32_t i = 0; i < nelem; ++i) {
-                        alignas(8) XFNV_INLINED_LOCAL(hkDataArray, tuple, std::nullopt, std::nullopt);
-                        hkDataArray::Value value;
-                        members.access(&value, i)->asArray(&tuple);
+                        hkDataArray tuple = members.access(i).asArray();
                         _readArrayItems(tuple, mi.m_tupleCount);
-                        tuple.~hkDataArray();
                     }
                 }
-                members.~hkDataArray();
             }
 
             return;
@@ -249,8 +235,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
         case hkDataObject::TYPE_CSTRING: {
             for (int32_t i = 0; i < nelem; ++i) {
                 const char* pString = readString();
-                hkDataArray::Value value;
-                arr.access(&value, i)->operator=(pString);
+                arr.access(i) = pString;
             }
             return;
         }
@@ -313,10 +298,7 @@ void Reader::readBinaryValue(hkDataObject::Value value, const hkDataClass::Membe
         }
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            XFNV_INLINED_LOCAL(hkDataObject, obj, std::nullopt, std::nullopt);
-            readObject(&obj, -1);
-            value.setObject(obj);
-            obj.~hkDataObject();
+            value.setObject(readObject(-1));
             break;
         }
         case hkDataObject::TYPE_CSTRING: {
@@ -330,19 +312,17 @@ void Reader::readBinaryValue(hkDataObject::Value value, const hkDataClass::Membe
 // Reads one object: a reference to a remembered object (5), a null object (6), or a new object of the class under the
 // tag read next (3; 4 also remembers it), whose members the bitfield marks as present are read into it. The bitfield's
 // and the member infos' local arrays come from the thread's stack memory.
-hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
+hkDataObject Reader::readObject(int32_t aiType) {
     int32_t iType = aiType;
     if (aiType == -1) {
         iType = readInt<int32_t>();
     }
     if (iType == 5) {
         int32_t iIndex = readInt<int32_t>();
-        ::new (apResult) hkDataObject(m_rememberedObjects.m_data[iIndex]);
-        return apResult;
+        return hkDataObject(m_rememberedObjects.m_data[iIndex]);
     }
     if (iType == 6) {
-        ::new (apResult) hkDataObject(nullptr);
-        return apResult;
+        return hkDataObject(nullptr);
     }
     int32_t iClassTag = readInt<int32_t>();
     hkDataClass klass(m_classes.m_data[iClassTag]);
@@ -397,12 +377,10 @@ hkDataObject* Reader::readObject(hkDataObject* apResult, int32_t aiType) {
     for (int32_t i = 0; i < numMembers; ++i) {
         const hkDataClass::MemberInfo& info = members.m_data[i];
         if (bitfield.m_data[i]) {
-            hkDataObject::Value value;
-            readBinaryValue(*obj.access(&value, info.m_name), info);
+            readBinaryValue(obj.access(info.m_name), info);
         }
     }
-    ::new (apResult) hkDataObject(obj);
-    return apResult;
+    return obj;
 }
 
 // Reads a class description (name, version, parent tag, members) and registers it with the world, remembering the new
@@ -460,7 +438,7 @@ hkResult Reader::readClass() {
     return HK_SUCCESS;
 }
 
-hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
+hkDataObject Reader::readObjectTree() {
     uint32_t v5;
     uint32_t array;
     char buf[512];
@@ -499,8 +477,7 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
                     case 3:
                     case 4:
                     case 6: {
-                        readObject(apResult, v3);
-                        return apResult;
+                        return readObject(v3);
                     }
                     default: {
                         goto LABEL_13;
@@ -518,6 +495,5 @@ hkDataObject* Reader::readObjectTree(hkDataObject* apResult) {
         );
     }
 LABEL_13:;
-    ::new (apResult) hkDataObject(nullptr);
-    return apResult;
+    return hkDataObject(nullptr);
 }

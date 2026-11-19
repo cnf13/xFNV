@@ -45,7 +45,7 @@ struct hkxAttributeGroup {
     hkResult getIntValue(const char* name, bool warnIfNotFound, int32_t& intOut) const;
     // The getIntValue(const char*, bool, hkUint32&) const overload, renamed. Its body only forwards to getIntValue.
     hkResult getIntValue_00E5C8A0(const char* name, bool warnIfNotFound, uint32_t& intOut) const;
-    hkRefVariant* findAttributeVariantByName(hkRefVariant* apResult, const char* name) const;
+    hkRefVariant findAttributeVariantByName(const char* name) const;
     // The attribute's object when its class is type's (by name), else null; a null type takes any.
     // The Havok SDK's hkSceneData.lib name and signature (const).
     hkReferencedObject* findAttributeObjectByName(const char* name, const hkClass* type) const;

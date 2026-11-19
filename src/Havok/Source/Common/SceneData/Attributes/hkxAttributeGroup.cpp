@@ -223,59 +223,33 @@ hkResult hkxAttributeGroup::getIntValue_00E5C8A0(const char* name, bool warnIfNo
     return getIntValue(name, warnIfNotFound, *reinterpret_cast<int32_t*>(&intOut));
 }
 
-// Writes `index >= 0 ? m_attributes[index].m_value : HK_NULL` into apResult with a new reference. The null alternative
-// is a temporary variant built from a null hkVariant and destroyed after the copy.
-hkRefVariant* hkxAttributeGroup::findAttributeVariantByName(hkRefVariant* apResult, const char* name) const {
-    XFNV_INLINED_LOCAL(hkRefVariant, nullValue, std::nullopt, std::nullopt);
-    bool bNullValueBuilt = false;
+// `index >= 0 ? m_attributes[index].m_value : HK_NULL`, with a new reference. The null alternative is a temporary
+// variant built from a null hkVariant and destroyed after the copy.
+hkRefVariant hkxAttributeGroup::findAttributeVariantByName(const char* name) const {
     const int32_t index = findAttributeIndexByName(name);
-    hkVariant nullVariant = {nullptr, nullptr};
-    const hkRefVariant* pValue;
     if (index >= 0) {
-        pValue = &m_attributes.m_data[index].m_value;
+        return m_attributes.m_data[index].m_value;
     }
-    else {
-        bNullValueBuilt = true;
-        nullValue.assignVariant(nullVariant);
-        pValue = &nullValue;
-    }
-    if (pValue->m_pntr) {
-        pValue->m_pntr->addReference();
-    }
-    apResult->m_pntr = pValue->m_pntr;
-    if ((bNullValueBuilt) && (nullValue.m_pntr))
-    // EXE-INLINED 0xC6CCA0
-    {
-        nullValue.m_pntr->removeReference();
-    }
-
-    return apResult;
+    hkVariant nullVariant = {nullptr, nullptr};
+    hkRefVariant nullValue;
+    nullValue.assignVariant(nullVariant);
+    return nullValue;
 }
 
 // The attribute's object when type is null or its class has type's name, else null. The variant's reference is released
 // before the object is returned.
 hkReferencedObject* hkxAttributeGroup::findAttributeObjectByName(const char* name, const hkClass* type) const {
-    XFNV_INLINED_LOCAL(hkRefVariant, variant, std::nullopt, std::nullopt);
-    findAttributeVariantByName(&variant, name);
+    hkRefVariant variant = findAttributeVariantByName(name);
     if (!variant.m_pntr) {
         return nullptr;
     }
     if (type) {
         const char* pcVariantClassName = variant.getClass()->getName();
         if (hkString::strCasecmp(type->getName(), pcVariantClassName) != 0) {
-            // EXE-INLINED 0xC6CCA0
-            if (variant.m_pntr) {
-                variant.m_pntr->removeReference();
-            }
             return nullptr;
         }
     }
-    hkReferencedObject* pObject = variant.m_pntr;
-    // EXE-INLINED 0xC6CCA0
-    if (pObject) {
-        pObject->removeReference();
-    }
-    return pObject;
+    return variant.m_pntr;
 }
 
 // The vector attribute's first value; a warning when warnIfNotFound and it does not exist. The warning names it a

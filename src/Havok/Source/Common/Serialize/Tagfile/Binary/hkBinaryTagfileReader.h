@@ -41,12 +41,12 @@ struct Reader {
     // One member's value, by the member's type.
     void readBinaryValue(hkDataObject::Value value, const hkDataClass::MemberInfo& minfo);
     // One object of tag aiType (-1: read the tag first).
-    hkDataObject* readObject(hkDataObject* apResult, int32_t aiType);
+    hkDataObject readObject(int32_t aiType);
     // A class name, version and member list, registered with the world.
     hkResult readClass();
     // Checks the magic numbers, reads the version and the classes, then the first object;
     // a null object on failure.
-    hkDataObject* readObjectTree(hkDataObject* apResult);
+    hkDataObject readObjectTree();
     // Reads a bit-packed signed varint; used for int and __int64.
     template <typename T>
     T readInt();

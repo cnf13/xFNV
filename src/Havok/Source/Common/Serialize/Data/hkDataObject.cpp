@@ -88,16 +88,12 @@ hkDataObject::Type hkDataObject::Value::getType() const {
     return v8.m_type;
 }
 
-hkDataObject* hkDataObject::Value::asObject(hkDataObject* apResult) const {
-    hkDataObjectImpl* v2 = m_impl->asObject(m_name);
-    ::new (apResult) hkDataObject(v2);
-    return apResult;
+hkDataObject hkDataObject::Value::asObject() const {
+    return hkDataObject(m_impl->asObject(m_name));
 }
 
-hkDataArray* hkDataObject::Value::asArray(hkDataArray* apResult) const {
-    hkDataArrayImpl* v2 = m_impl->asArray(m_name);
-    ::new (apResult) hkDataArray(v2);
-    return apResult;
+hkDataArray hkDataObject::Value::asArray() const {
+    return hkDataArray(m_impl->asArray(m_name));
 }
 
 hkDataObject::hkDataObject() : m_impl(nullptr) {}
@@ -187,24 +183,20 @@ hkDataClass* hkDataObject::getClass(hkDataClass* apResult) const {
     return apResult;
 }
 
-hkDataObject::Value* hkDataObject::access(hkDataObject::Value* apResult, const char* name) {
-    ::new (apResult) hkDataObject::Value(m_impl->accessByName(name));
-    return apResult;
+hkDataObject::Value hkDataObject::access(const char* name) {
+    return m_impl->accessByName(name);
 }
 
-hkDataObject::Value* hkDataObject::access(hkDataObject::Value* apResult, const char* name) const {
-    ::new (apResult) hkDataObject::Value(m_impl->accessByName(name));
-    return apResult;
+hkDataObject::Value hkDataObject::access(const char* name) const {
+    return m_impl->accessByName(name);
 }
 
 const char* hkDataObject::getMemberName(int32_t it) const {
     return m_impl->getMemberName(it);
 }
 
-hkDataObject::Value* hkDataObject::getMemberValue(hkDataObject::Value* apResult, int32_t i) const {
-    // The Value is built in place in apResult.
-    ::new (apResult) hkDataObject::Value(m_impl->getMemberValue(i));
-    return apResult;
+hkDataObject::Value hkDataObject::getMemberValue(int32_t i) const {
+    return m_impl->getMemberValue(i);
 }
 
 int32_t hkDataObject::isNull() const {
@@ -344,16 +336,12 @@ hkDataArray::~hkDataArray() {
 
 // Value operator[](int i): the array and the index. Non-const: callers such as Cloner::copyArray assign through the
 // element it returns.
-hkDataArray::Value* hkDataArray::access(Value* apResult, int32_t i) {
-    apResult->m_impl = m_impl;
-    apResult->m_index = i;
-    return apResult;
+hkDataArray::Value hkDataArray::access(int32_t i) {
+    return {m_impl, i};
 }
 
-hkDataArray::Value* hkDataArray::access(hkDataArray::Value* apResult, int32_t i) const {
-    apResult->m_impl = m_impl;
-    apResult->m_index = i;
-    return apResult;
+hkDataArray::Value hkDataArray::access(int32_t i) const {
+    return {m_impl, i};
 }
 
 int32_t hkDataArray::getSize() const {

@@ -157,27 +157,24 @@ Writer::ListenerCache::~ListenerCache() {
     }
 }
 
-hkDataObject* Writer::ListenerCache::getCachedDataObject(hkDataObject* apResult, const hkDataObject& h) const {
+hkDataObject Writer::ListenerCache::getCachedDataObject(const hkDataObject& h) const {
     int32_t v4;
     hkDataObject::Handle a1;
     if (!m_listener || (h.isNull() || (h.getHandle(&a1), (v4 = m_indexFromHandle.getWithDefault(a1, -1), v4 == -1)))) {
-        ::new (apResult) hkDataObject(h);
-        return apResult;
+        return h;
     }
 
-    ::new (apResult) hkDataObject(m_cachedObjects.m_data[v4]->m_impl);
-    return apResult;
+    return hkDataObject(m_cachedObjects.m_data[v4]->m_impl);
 }
 
 // The listener's answer is built in a plain local and destroyed with hkDataObject's destructor on both paths.
-hkDataObject* Writer::ListenerCache::callListenerAndCache(hkDataObject* apResult, const hkDataObject& h) {
+hkDataObject Writer::ListenerCache::callListenerAndCache(const hkDataObject& h) {
     if (m_listener && !h.isNull()) {
         hkDataObject::Handle handle;
         h.getHandle(&handle);
         const int32_t index = m_indexFromHandle.getWithDefault(handle, -1);
         if (index != -1) {
-            ::new (apResult) hkDataObject(m_cachedObjects.m_data[index]->m_impl);
-            return apResult;
+            return hkDataObject(m_cachedObjects.m_data[index]->m_impl);
         }
         hkDataObject obj;
         m_listener->addDataObjectCallback(&obj, h);
@@ -194,12 +191,10 @@ hkDataObject* Writer::ListenerCache::callListenerAndCache(hkDataObject* apResult
             }
             m_cachedObjects.m_data[m_cachedObjects.m_size] = pCached;
             m_cachedObjects.m_size += 1;
-            ::new (apResult) hkDataObject(obj);
-            return apResult;
+            return obj;
         }
     }
-    ::new (apResult) hkDataObject(h);
-    return apResult;
+    return h;
 }
 
 // "" is entered as index 0 of the class and string maps; their keys are the strings' addresses (hkUlong words, hence
@@ -211,19 +206,15 @@ Writer::Writer(hkStreamWriter* a1, hkTagfileWriter::AddDataObjectListener* a2)
 }
 
 // A tuple writes its items; an array its size, then, for an array of structs whose member has no class of its own, the
-// index of the array's class, then its items; any other value by its basic type. The array, the array's class and the
-// object are plain locals.
+// index of the array's class, then its items; any other value by its basic type.
 void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClass::MemberInfo& minfo) {
     if (value.getType() & hkDataObject::TYPE_TUPLE) {
-        XFNV_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
-        value.asArray(&array);
+        hkDataArray array = value.asArray();
         _writeArrayItems(array, array.getSize());
-        array.~hkDataArray();
         return;
     }
     if (value.getType() & hkDataObject::TYPE_ARRAY) {
-        XFNV_INLINED_LOCAL(hkDataArray, array, std::nullopt, std::nullopt);
-        value.asArray(&array);
+        hkDataArray array = value.asArray();
         const int32_t numItems = array.getSize();
         writeInt(numItems);
         if (array.getType() == hkDataObject::TYPE_STRUCT && minfo.m_class == nullptr) {
@@ -234,7 +225,6 @@ void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClas
             writeInt(static_cast<int32_t>(m_doneClasses.getWithDefault(reinterpret_cast<hkUlong>(klass.getName()), 0)));
         }
         _writeArrayItems(array, numItems);
-        array.~hkDataArray();
         return;
     }
     switch (value.getType()) {
@@ -251,9 +241,7 @@ void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClas
         }
         case hkDataObject::TYPE_OBJECT:
         case hkDataObject::TYPE_STRUCT: {
-            XFNV_INLINED_LOCAL(hkDataObject, object, std::nullopt, std::nullopt);
-            writeObject(*value.asObject(&object));
-            object.~hkDataObject();
+            writeObject(value.asObject());
             return;
         }
         case hkDataObject::TYPE_CSTRING: writeString(value.asString()); return;
@@ -405,8 +393,7 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
 // structs through each object member of the struct). With a2 zero the flags go to m_bitfieldBuf, where the object's
 // details point.
 void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
-    alignas(8) hkDataObject obj;
-    m_listenerCache.callListenerAndCache(&obj, objIn);
+    hkDataObject obj = m_listenerCache.callListenerAndCache(objIn);
     if (obj.isNull()) {
         return;
     }
@@ -436,8 +423,7 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
     writeClass(klass);
     Writer::MemberWriteFlags flags(klass.getNumMembers());
     for (int32_t it = obj.getMemberIterator(); obj.isValid(it); it = obj.getNextMember(it)) {
-        hkDataObject::Value value;
-        obj.getMemberValue(&value, it);
+        hkDataObject::Value value = obj.getMemberValue(it);
         if (!worthWriting(value)) {
             continue;
         }
@@ -449,15 +435,13 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
         switch (value.getType()) {
             case hkDataObject::TYPE_OBJECT:
             case hkDataObject::TYPE_STRUCT: {
-                hkDataObject member;
-                scanObject(*value.asObject(&member), 0);
+                scanObject(value.asObject(), 0);
                 break;
             }
             case hkDataObject::TYPE_ARRAY_STRUCT:
             case hkDataObject::TYPE_TUPLE_STRUCT: {
-                alignas(8) hkDataArray array;
                 hkDataClass structClass;
-                value.asArray(&array)->getClass(&structClass);
+                value.asArray().getClass(&structClass);
                 writeClass(structClass);
                 for (int32_t i = 0; i < structClass.getNumMembers(); ++i) {
                     // EXE-INLINED none: hkDataClass::MemberInfo::MemberInfo
@@ -471,27 +455,19 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
                     if (minfo.m_type != hkDataObject::TYPE_OBJECT) {
                         continue;
                     }
-                    hkDataArray whole;
-                    hkDataArray objects;
-                    value.asArray(&whole)->swizzleObjectMember(&objects, minfo.m_name);
+                    hkDataArray objects = value.asArray().swizzleObjectMember(minfo.m_name);
                     const int32_t numObjects = objects.getSize();
                     for (int32_t j = 0; j < numObjects; ++j) {
-                        hkDataArray::Value item;
-                        alignas(8) hkDataObject member;
-                        scanObject(*objects.access(&item, j)->asObject(&member), 0);
+                        scanObject(objects.access(j).asObject(), 0);
                     }
                 }
                 break;
             }
             case hkDataObject::TYPE_ARRAY_OBJECT:
             case hkDataObject::TYPE_TUPLE_OBJECT: {
-                hkDataArray sizeArray;
-                const int32_t numObjects = value.asArray(&sizeArray)->getSize();
+                const int32_t numObjects = value.asArray().getSize();
                 for (int32_t j = 0; j < numObjects; ++j) {
-                    hkDataArray array;
-                    hkDataArray::Value item;
-                    alignas(8) hkDataObject member;
-                    scanObject(*value.asArray(&array)->access(&item, j)->asObject(&member), 0);
+                    scanObject(value.asArray().access(j).asObject(), 0);
                 }
                 break;
             }
@@ -511,9 +487,7 @@ void Writer::scanObject(const hkDataObject& objIn, int32_t a2) {
 void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
     if ((arr.getType() & hkDataObject::TYPE_TUPLE) != 0) {
         for (int32_t i = 0; i < numItems; ++i) {
-            alignas(8) hkDataArray::Value item;
-            alignas(8) hkDataArray tuple;
-            arr.access(&item, i)->asArray(&tuple);
+            hkDataArray tuple = arr.access(i).asArray();
             _writeArrayItems(tuple, tuple.getSize());
         }
         return;
@@ -521,22 +495,19 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
     switch (arr.getType()) {
         case hkDataObject::TYPE_BYTE: {
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                m_oa.write8u(arr.access(&item, i)->asInt());
+                m_oa.write8u(arr.access(i).asInt());
             }
             return;
         }
         case hkDataObject::TYPE_INT: {
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                writeInt(arr.access(&item, i)->asInt());
+                writeInt(arr.access(i).asInt());
             }
             return;
         }
         case hkDataObject::TYPE_REAL: {
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                float f = arr.access(&item, i)->asReal();
+                float f = arr.access(i).asReal();
                 m_oa.writeFloat32(f);
             }
             return;
@@ -545,16 +516,14 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             // Three reals per item, four when any item's w is not 0 (a NaN counts as not 0).
             int32_t numReals = 3;
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                if (0.0f != arr.access(&item, i)->asVec(4)[3]) {
+                if (0.0f != arr.access(i).asVec(4)[3]) {
                     numReals = 4;
                     break;
                 }
             }
             writeInt(numReals);
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                m_oa.writeArrayFloat32(arr.access(&item, i)->asVec(4), numReals);
+                m_oa.writeArrayFloat32(arr.access(i).asVec(4), numReals);
             }
             return;
         }
@@ -563,8 +532,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             // 12 or 16 reals: the type is read again.
             int32_t numReals = 4 * (arr.getType() - hkDataObject::TYPE_REAL);
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                m_oa.writeArrayFloat32(arr.access(&item, i)->asVec(numReals), numReals);
+                m_oa.writeArrayFloat32(arr.access(i).asVec(numReals), numReals);
             }
             return;
         }
@@ -581,11 +549,9 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             // A member is written when any item's value in it is worth writing.
             for (int32_t i = 0; i < numMembers; ++i) {
                 if (minfo.m_data[i].m_type != hkDataObject::TYPE_VOID) {
-                    alignas(8) hkDataArray member;
-                    arr.swizzleObjectMember(&member, minfo.m_data[i].m_name);
+                    hkDataArray member = arr.swizzleObjectMember(minfo.m_data[i].m_name);
                     for (int32_t j = 0; j < member.getSize(); ++j) {
-                        alignas(8) hkDataArray::Value item;
-                        if (worthWriting(*member.access(&item, j))) {
+                        if (worthWriting(member.access(j))) {
                             flags.m_flags.m_data[i].m_bool = 1;
                             break;
                         }
@@ -614,9 +580,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
 
             for (int32_t i = 0; i < numMembers; ++i) {
                 if (flags.m_flags.m_data[i].m_bool) {
-                    alignas(8) hkDataArray member;
-                    arr.swizzleObjectMember(&member, minfo.m_data[i].m_name);
-                    _writeArrayItems(member, numItems);
+                    _writeArrayItems(arr.swizzleObjectMember(minfo.m_data[i].m_name), numItems);
                 }
             }
 
@@ -634,17 +598,13 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
         }
         case hkDataObject::TYPE_OBJECT: {
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                alignas(8) hkDataObject obj;
-                arr.access(&item, i)->asObject(&obj);
-                writeObject(obj);
+                writeObject(arr.access(i).asObject());
             }
             return;
         }
         case hkDataObject::TYPE_CSTRING: {
             for (int32_t i = 0; i < numItems; ++i) {
-                alignas(8) hkDataArray::Value item;
-                writeString(arr.access(&item, i)->asString());
+                writeString(arr.access(i).asString());
             }
             return;
         }
@@ -657,8 +617,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
 // it is referenced more than once), the class's index, the member flags scanObject left in m_bitfieldBuf and the values
 // of the members they mark.
 void Writer::writeObject(const hkDataObject& objIn) {
-    hkDataObject obj;
-    m_listenerCache.getCachedDataObject(&obj, objIn);
+    hkDataObject obj = m_listenerCache.getCachedDataObject(objIn);
     if (obj.isNull()) {
         writeInt(hkBinaryTagfile::TAG_OBJECT_NULL);
         return;
@@ -733,10 +692,8 @@ void Writer::writeObject(const hkDataObject& objIn) {
 
     for (int32_t i = 0; i < numMembers; ++i) {
         if (flags.m_flags.m_data[i].m_bool) {
-            hkDataObject::Value value;
             // Calls the const operator[] on the cached object.
-            static_cast<const hkDataObject&>(obj).access(&value, minfo.m_data[i].m_name);
-            writeBinaryValue(value, minfo.m_data[i]);
+            writeBinaryValue(static_cast<const hkDataObject&>(obj).access(minfo.m_data[i].m_name), minfo.m_data[i]);
         }
     }
 
