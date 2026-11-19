@@ -748,8 +748,8 @@ void hkpVehicleInstance::init() {
         hkArrayUtil::_reserve(heap, reinterpret_cast<hkArrayBase<void>*>(&m_wheelsInfo), capacity, sizeof(WheelInfo));
     }
     m_wheelsInfo.m_size = static_cast<uint32_t>(numWheels);
-    for (int32_t i = 0; i < m_wheelsInfo.m_size; ++i) {
-        m_wheelsInfo.m_data[i].init();
+    for (WheelInfo& wheelInfo : m_wheelsInfo) {
+        wheelInfo.init();
     }
 
     // EXE-INLINED none: hkArray<hkBool>::setSize
@@ -764,16 +764,16 @@ void hkpVehicleInstance::init() {
         hkArrayUtil::_reserve(heap, reinterpret_cast<hkArrayBase<void>*>(&m_isFixed), capacity, sizeof(hkBool));
     }
     m_isFixed.m_size = static_cast<uint32_t>(numWheels);
-    for (int32_t i = 0; i < m_isFixed.m_size; ++i) {
-        m_isFixed.m_data[i].m_bool = false;
+    for (hkBool& isFixed : m_isFixed) {
+        isFixed.m_bool = false;
     }
 
     m_wheelsTimeSinceMaxPedalInput = 0.0f;
     m_mainSteeringAngle = 0.0f;
 
     m_wheelsSteeringAngle.setSize(m_data->m_numWheels);
-    for (int32_t i = 0; i < m_wheelsSteeringAngle.m_size; ++i) {
-        m_wheelsSteeringAngle.m_data[i] = 0.0f;
+    for (float& steeringAngle : m_wheelsSteeringAngle) {
+        steeringAngle = 0.0f;
     }
 
     m_torque = 0.0f;

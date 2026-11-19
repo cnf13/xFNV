@@ -342,8 +342,8 @@ void hkpPhysicsSystem::transform(const hkTransform& transformation) {
         t.setMulEq(m_rigidBodies.m_data[i]->m_motion.m_motionState.m_transform);
         m_rigidBodies.m_data[i]->setTransform(t);
     }
-    for (int32_t i = 0; i < m_constraints.m_size; ++i) {
-        m_constraints.m_data[i]->transform(transformation);
+    for (hkpConstraintInstance* constraint : m_constraints) {
+        constraint->transform(transformation);
     }
     for (int32_t i = 0; i < m_phantoms.m_size; ++i) {
         tranformPhantom(m_phantoms.m_data[i], transformation);

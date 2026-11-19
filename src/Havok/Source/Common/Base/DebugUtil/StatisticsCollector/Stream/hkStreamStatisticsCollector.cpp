@@ -362,8 +362,8 @@ hkStreamStatisticsCollector::Command* _newCommand(int32_t a1, hkArray<char, hkCo
 // is then the sum of its children's. The values are truncated to ints (_ftol2), the second one first.
 void _sumNodes(hkMonitorStreamAnalyzer::Node* a1, hkArray<hkStringPtr, hkContainerHeapAllocator>* a2) {
     if (a1 && a1->m_children.m_size) {
-        for (int32_t i = 0; i < a1->m_children.m_size; ++i) {
-            _sumNodes(a1->m_children.m_data[i], a2);
+        for (hkMonitorStreamAnalyzer::Node* pChild : a1->m_children) {
+            _sumNodes(pChild, a2);
         }
         if (a1->m_value[0] != 0.0f) {
             const int32_t iAllocated = static_cast<int32_t>(a1->m_value[1]);
@@ -376,8 +376,7 @@ void _sumNodes(hkMonitorStreamAnalyzer::Node* a1, hkArray<hkStringPtr, hkContain
         }
         a1->m_value[0] = 0.0f;
         a1->m_value[1] = 0.0f;
-        for (int32_t i = 0; i < a1->m_children.m_size; ++i) {
-            hkMonitorStreamAnalyzer::Node* pChild = a1->m_children.m_data[i];
+        for (hkMonitorStreamAnalyzer::Node* pChild : a1->m_children) {
             a1->m_value[0] = pChild->m_value[0] + a1->m_value[0];
             a1->m_value[1] = pChild->m_value[1] + a1->m_value[1];
         }

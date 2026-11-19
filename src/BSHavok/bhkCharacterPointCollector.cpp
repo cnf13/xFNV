@@ -35,8 +35,8 @@ bhkCharacterPointCollector::bhkCharacterPointCollector(bhkCharacterPointCollecto
 
 // The colliding objects' references are dropped; the arrays' destructors free their buffers.
 bhkCharacterPointCollector::~bhkCharacterPointCollector() {
-    for (int32_t i = 0; i < m_collidingObjects.m_size; ++i) {
-        m_collidingObjects.m_data[i]->removeReference();
+    for (hkpWorldObject* pObject : m_collidingObjects) {
+        pObject->removeReference();
     }
 }
 

@@ -27,8 +27,8 @@
 hkpMidphaseViewer::hkpMidphaseViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts)
   : hkpWorldViewerBase(contexts), hkpWorldPostSimulationListener(), m_broadPhaseDisplayGeometries() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
-            m_context->m_worlds.m_data[i]->addWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->addWorldPostSimulationListener(this);
         }
     }
 }
@@ -36,8 +36,8 @@ hkpMidphaseViewer::hkpMidphaseViewer(const hkArray<hkProcessContext*, hkContaine
 // Removes the viewer from the context's worlds; the display geometries go with their member.
 hkpMidphaseViewer::~hkpMidphaseViewer() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
-            m_context->m_worlds.m_data[i]->removeWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->removeWorldPostSimulationListener(this);
         }
     }
 }

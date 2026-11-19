@@ -71,8 +71,8 @@ const void* getVtablehkpVehicleManager() {
 
 // Releases the registered vehicles; the array frees itself.
 hkpVehicleManager::~hkpVehicleManager() {
-    for (int32_t i = 0; i < m_registeredVehicles.m_size; ++i) {
-        m_registeredVehicles.m_data[i]->removeReference();
+    for (hkpVehicleInstance* vehicle : m_registeredVehicles) {
+        vehicle->removeReference();
     }
 }
 

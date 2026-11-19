@@ -38,14 +38,14 @@ hkpCollisionFilterList::hkpCollisionFilterList(
     const hkArray<const hkpCollisionFilter*, hkContainerHeapAllocator>& collisionFilters
 ) {
     m_type.m_storage = HK_FILTER_LIST;
-    for (int32_t i = 0; i < collisionFilters.m_size; i++) {
-        addCollisionFilter(collisionFilters.m_data[i]);
+    for (const hkpCollisionFilter* pFilter : collisionFilters) {
+        addCollisionFilter(pFilter);
     }
 }
 
 hkpCollisionFilterList::~hkpCollisionFilterList() {
-    for (int32_t i = 0; i < m_collisionFilters.m_size; i++) {
-        m_collisionFilters.m_data[i]->removeReference();
+    for (const hkpCollisionFilter* pFilter : m_collisionFilters) {
+        pFilter->removeReference();
     }
 }
 

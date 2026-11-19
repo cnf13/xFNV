@@ -575,8 +575,8 @@ void ShadowSceneNode::SetPortalGraph(BSPortalGraph* apBSPortalGraph) {
                     continue;
                 }
 
-                for (uint32_t i = 0; i < pRoom->kLights.iSize; i++) {
-                    BSSimpleArray<BSMultiBoundNode*>& kRooms = pRoom->kLights.pBuffer[i]->kMultiboundRooms;
+                for (ShadowSceneLight* pLight : pRoom->kLights) {
+                    BSSimpleArray<BSMultiBoundNode*>& kRooms = pLight->kMultiboundRooms;
                     uint32_t uiCount = kRooms.iSize;
                     BSMultiBoundNode** ppRooms = kRooms.pBuffer;
                     for (uint32_t j = 0; j < uiCount; j++) {
@@ -1411,8 +1411,7 @@ ShadowSceneLight* ShadowSceneNode::AddLight(NiLight* apLight, bool abDynamic) {
 
 uint32_t ShadowSceneNode::AddAllLightsFromNode_Recurse(NiNode* apNode, float afDefaultRadius) {
     uint32_t uiCount = 0;
-    for (uint32_t i = 0; i < apNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pChild = apNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pChild : apNode->m_kChildren) {
         if (!pChild) {
             continue;
         }
@@ -1664,8 +1663,8 @@ void ShadowSceneNode::UpdateQueuedLight(ShadowSceneLight* apSSLight) {
             apSSLight->kMultiboundRooms.pBuffer[uiRoomIndex] = pRoom;
         }
 
-        for (uint32_t i = 0; i < pBSPortalGraph->kUnboundNodes.iSize; ++i) {
-            apSSLight->AddObject(pBSPortalGraph->kUnboundNodes.pBuffer[i].m_pObject);
+        for (NiNode* pUnboundNode : pBSPortalGraph->kUnboundNodes) {
+            apSSLight->AddObject(pUnboundNode);
         }
 
         NiTListItem<BSPortal*>* pPortalIter = pBSPortalGraph->lPortalList.m_pkHead;
@@ -1728,8 +1727,7 @@ void ShadowSceneNode::UpdateQueuedLight(ShadowSceneLight* apSSLight) {
     }
 
     if (this != BSShaderManager::pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD]) {
-        for (uint32_t i = 0; i < m_kChildren.m_usSize; ++i) {
-            NiAVObject* pChild = m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pChild : m_kChildren) {
             if (pChild) {
                 NiNode* pChildNode = pChild->IsNode();
                 if (pChildNode) {
@@ -2420,8 +2418,7 @@ bool ShadowSceneNode::UpdateQueuedObjectLightingStart(
         ppLights = static_cast<ShadowSceneLight**>(
             pScrapHeap->Allocate(pRoom->kLights.iSize * sizeof(ShadowSceneLight*) + 4, ScrapHeap::ALIGNMENT)
         );
-        for (uint32_t i = 0; i < pRoom->kLights.iSize; i++) {
-            ShadowSceneLight* pLight = pRoom->kLights.pBuffer[i];
+        for (ShadowSceneLight* pLight : pRoom->kLights) {
             if (pLight &&
                 (!static_cast<uint8_t>(abActiveLightsOnly) || pLight->usFrustumCull != ShadowSceneLight::SSL_ALL) &&
                 pLight->BoundWithinLightRadius(kBound, pLight->spLight, 1.0f)) {
@@ -2434,8 +2431,7 @@ bool ShadowSceneNode::UpdateQueuedObjectLightingStart(
         ppLights = static_cast<ShadowSceneLight**>(
             pScrapHeap->Allocate(pPortalNode->kLights.iSize * sizeof(ShadowSceneLight*) + 4, ScrapHeap::ALIGNMENT)
         );
-        for (uint32_t i = 0; i < pPortalNode->kLights.iSize; i++) {
-            ShadowSceneLight* pLight = pPortalNode->kLights.pBuffer[i];
+        for (ShadowSceneLight* pLight : pPortalNode->kLights) {
             if (pLight &&
                 (!static_cast<uint8_t>(abActiveLightsOnly) || pLight->usFrustumCull != ShadowSceneLight::SSL_ALL) &&
                 pLight->BoundWithinLightRadius(kBound, pLight->spLight, 1.0f)) {
@@ -2508,16 +2504,14 @@ bool ShadowSceneNode::UpdateQueuedObjectLighting(
     NiBound kBound = *pWorldBound;
 
     if (apRoom) {
-        for (uint32_t i = 0; i < apRoom->kLights.iSize; ++i) {
-            ShadowSceneLight* pLight = apRoom->kLights.pBuffer[i];
+        for (ShadowSceneLight* pLight : apRoom->kLights) {
             if (pLight && pLight->BoundWithinLightRadius(kBound, pLight->spLight.m_pObject, 1.0f)) {
                 pLight->AddTriGeom(apGeom);
             }
         }
     }
     else if (apPortal) {
-        for (uint32_t i = 0; i < apPortal->kLights.iSize; ++i) {
-            ShadowSceneLight* pLight = apPortal->kLights.pBuffer[i];
+        for (ShadowSceneLight* pLight : apPortal->kLights) {
             if (pLight && pLight->BoundWithinLightRadius(kBound, pLight->spLight.m_pObject, 1.0f)) {
                 pLight->AddTriGeom(apGeom);
             }
@@ -2568,8 +2562,7 @@ bool ShadowSceneNode::UpdateQueuedObjectLighting(
         return bResult;
     }
 
-    for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pChild : pNode->m_kChildren) {
         if (pChild) {
             if (pChild->IsTriBasedGeom()) {
                 bResult &= UpdateQueuedObjectLighting(
@@ -2646,8 +2639,7 @@ bool ShadowSceneNode::UpdateQueuedObjectLightingList(
         return bResult;
     }
 
-    for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pChild : pNode->m_kChildren) {
         if (pChild) {
             if (pChild->IsTriBasedGeom()) {
                 bResult &= UpdateQueuedObjectLightingList(

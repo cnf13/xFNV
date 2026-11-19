@@ -475,9 +475,9 @@ static void drawStatistics(
                     continue;
                 }
                 bool inTable = false;
-                for (int32_t j = 0; j < apColorTable->m_colorPairs.m_size; ++j) {
-                    if (!hkString::strCasecmp(apColorTable->m_colorPairs.m_data[j].m_colorName.cString(), name)) {
-                        color = apColorTable->m_colorPairs.m_data[j].m_color;
+                for (const hkMonitorStreamColorTable::ColorPair& rPair : apColorTable->m_colorPairs) {
+                    if (!hkString::strCasecmp(rPair.m_colorName.cString(), name)) {
+                        color = rPair.m_color;
                         knownColors.insert(name, color);
                         inTable = true;
                         break;
@@ -616,8 +616,8 @@ hkMonitorStreamAnalyzer::Node::Node(Node* apParent, const char* apcName, NodeTyp
 
 // The node owns its children; their pointer array goes with its own destructor.
 hkMonitorStreamAnalyzer::Node::~Node() {
-    for (int32_t i = 0; i < m_children.m_size; ++i) {
-        delete m_children.m_data[i];
+    for (Node* pChild : m_children) {
+        delete pChild;
     }
 }
 
@@ -764,8 +764,7 @@ void hkMonitorStreamAnalyzer::writeRawStatistics(hkOstream& os) {
         "StatisticsDumpInfo(num_threads=%i, num_spus=%i, num_frames=%i)\n", m_numThreads, m_numSpus,
         m_frameInfos.m_data[0].m_size
     );
-    for (int32_t thread = 0; thread < m_frameInfos.m_size; ++thread) {
-        hkArray<hkMonitorStreamFrameInfo, hkContainerHeapAllocator>& infos = m_frameInfos.m_data[thread];
+    for (const auto& infos : m_frameInfos) {
         for (int32_t frame = 0; frame < infos.m_size; ++frame) {
             const hkMonitorStreamFrameInfo& info = infos.m_data[frame];
             os.printf(
@@ -883,8 +882,7 @@ void hkMonitorStreamAnalyzer::writeStatistics(hkOstream& outStream, int32_t repo
         nodes.pushBack(tree);
     }
     writeStatisticsDetails(outStream, nodes, m_numThreads, m_numSpus, reportLevel, m_nodeIdForFrameOverview, true);
-    for (int32_t i = 0; i < nodes.m_size; ++i) {
-        Node* node = nodes.m_data[i];
+    for (Node* node : nodes) {
         if (node) {
             node->~Node();
             hkMemoryRouter::getInstance().m_heap->blockFree(node, sizeof(Node));
@@ -1015,10 +1013,8 @@ void hkMonitorStreamAnalyzer::showCombinedThreadSummaryRec(
     }
 
     if (!options.m_displayPartialTree.m_bool || (node->m_userFlags & 1)) {
-        for (int32_t i = 0; i < node->m_children.m_size; ++i) {
-            showCombinedThreadSummaryRec(
-                os, node->m_children.m_data[i], recursionDepth + 1, numThreads, numSpus, options
-            );
+        for (Node* pChild : node->m_children) {
+            showCombinedThreadSummaryRec(os, pChild, recursionDepth + 1, numThreads, numSpus, options);
         }
     }
 
@@ -1336,8 +1332,8 @@ void hkMonitorStreamAnalyzer::writeStatisticsDetails(
     {
         Node sum(nullptr, "Sum", Node::NODE_TYPE_DIRECTORY);
         fInvNumFrames = static_cast<float>(1.0 / static_cast<double>(pFrames->m_size));
-        for (int32_t i = 0; i < pFrames->m_size; ++i) {
-            hkMakeSumRecursive(&sum, pFrames->m_data[i]);
+        for (Node* pFrame : *pFrames) {
+            hkMakeSumRecursive(&sum, pFrame);
         }
         Node* pChild = hkFindChildByName(&sum, nodeIdForFrameOverview, static_cast<hkBool>(true));
         if (pChild) {
@@ -1630,13 +1626,12 @@ void hkMonitorStreamAnalyzer::getTimerLimits(
             const hkArray<hkMonitorStreamAnalyzer::Node*, hkContainerHeapAllocator>& children =
                 nodeList.m_data[iThread]->m_children.m_data[iFrame]->m_children;
             if (children.m_size > 0) {
-                for (int32_t i = 0; i < children.m_size; ++i) {
-                    const float fStart = static_cast<float>(children.m_data[i]->m_absoluteStartTime);
+                for (const hkMonitorStreamAnalyzer::Node* pChild : children) {
+                    const float fStart = static_cast<float>(pChild->m_absoluteStartTime);
                     const float fCurrent = startTimes.m_data[iSlot];
                     startTimes.m_data[iSlot] = fCurrent > fStart ? fStart : fCurrent;
                 }
-                for (int32_t i = 0; i < children.m_size; ++i) {
-                    const hkMonitorStreamAnalyzer::Node* pChild = children.m_data[i];
+                for (const hkMonitorStreamAnalyzer::Node* pChild : children) {
                     const float fEnd = pChild->m_value[iTimer] + pChild->m_absoluteStartTime - startTimes.m_data[iSlot];
                     const float fMax = maxFrameTime;
                     maxFrameTime = fMax < fEnd ? fEnd : fMax;
@@ -1850,10 +1845,9 @@ int32_t hkMonitorStreamAnalyzer::findMaxTimerNameIndent(
     if (static_cast<uint8_t>(displayPartialTree) && (node->m_userFlags & 1) == 0) {
         return v4 + spacing * recursionDepth + 8;
     }
-    for (int32_t i = 0; i < node->m_children.m_size; ++i) {
-        int32_t MaxTimerNameIndent = hkMonitorStreamAnalyzer::findMaxTimerNameIndent(
-            node->m_children.m_data[i], recursionDepth + 1, spacing, displayPartialTree
-        );
+    for (Node* pChild : node->m_children) {
+        int32_t MaxTimerNameIndent =
+            hkMonitorStreamAnalyzer::findMaxTimerNameIndent(pChild, recursionDepth + 1, spacing, displayPartialTree);
         if (MaxTimerNameIndent > v5) {
             v5 = MaxTimerNameIndent;
         }
@@ -2303,14 +2297,14 @@ void printStatisticsByType(hkOstream& outstream, hkMonitorStreamAnalyzer::Node* 
             if (pInfo->m_this.m_value[1] > threshold) {
                 outstream.printf("\n");
                 outstream.printf("************************************\n\n");
-                for (int32_t j = 0; j < pInfo->m_parents.m_size; ++j) {
+                for (const hkMonitorStreamAnalyzer::Node& rParent : pInfo->m_parents) {
                     outstream.printf("\t\t");
-                    printSingleNodeValues(outstream, 0.0f, &pInfo->m_parents.m_data[j]);
+                    printSingleNodeValues(outstream, 0.0f, &rParent);
                 }
                 printSingleNodeValues(outstream, total, &pInfo->m_this);
-                for (int32_t j = 0; j < pInfo->m_children.m_size; ++j) {
+                for (const hkMonitorStreamAnalyzer::Node& rChild : pInfo->m_children) {
                     outstream.printf("\t\t");
-                    printSingleNodeValues(outstream, 0.0f, &pInfo->m_children.m_data[j]);
+                    printSingleNodeValues(outstream, 0.0f, &rChild);
                 }
             }
             pInfo->~hkMonitorStreamAnalyzerPrintByTypeInfo();
@@ -2369,8 +2363,7 @@ void hkBuildSizePerName(
         pInfo->m_this.m_value[k] += node->m_value[k];
         pInfo->m_this.m_count[k] += node->m_count[k];
     }
-    for (int32_t i = 0; i < node->m_children.m_size; ++i) {
-        const Node* pChild = node->m_children.m_data[i];
+    for (const Node* pChild : node->m_children) {
         hkBuildSizePerName(pChild, mapOut);
         const char* pcChildName = pChild->m_name;
         int32_t j = pInfo->m_children.m_size - 1;

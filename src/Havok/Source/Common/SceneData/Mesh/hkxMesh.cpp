@@ -95,8 +95,8 @@ hkxMesh::hkxMesh(hkFinishLoadedObjectFlag aFlag)
 hkxMesh::~hkxMesh() {}
 
 void hkxMesh::collectVertexPositions(hkArray<hkVector4, hkContainerHeapAllocator>& verticesInOut) const {
-    for (int32_t i = 0; i < m_sections.m_size; ++i) {
-        m_sections.m_data[i].val()->collectVertexPositions(verticesInOut);
+    for (const hkRefPtr<hkxMeshSection>& section : m_sections) {
+        section.val()->collectVertexPositions(verticesInOut);
     }
 }
 
@@ -108,10 +108,10 @@ void hkxMesh::appendGeometry(
     hkArray<hkxMaterial*, hkContainerHeapAllocator>* materialsInOut
 ) const {
     int32_t materialIndex = -1;
-    for (int32_t i = 0; i < m_sections.m_size; ++i) {
+    for (const hkRefPtr<hkxMeshSection>& section : m_sections) {
         int32_t indexOffset = geometryInOut.m_vertices.m_size;
         if (materialsInOut) {
-            hkxMaterial* pMaterial = m_sections.m_data[i].val()->m_material.val();
+            hkxMaterial* pMaterial = section.val()->m_material.val();
             materialIndex = materialsInOut->indexOf(pMaterial);
             if (materialIndex == -1) {
                 materialIndex = materialsInOut->m_size;
@@ -119,11 +119,11 @@ void hkxMesh::appendGeometry(
             }
         }
         hkGeometry geometry;
-        m_sections.m_data[i].val()->appendGeometry(geometry, materialIndex);
-        for (int32_t t = 0; t < geometry.m_triangles.m_size; ++t) {
-            geometry.m_triangles.m_data[t].m_a += indexOffset;
-            geometry.m_triangles.m_data[t].m_b += indexOffset;
-            geometry.m_triangles.m_data[t].m_c += indexOffset;
+        section.val()->appendGeometry(geometry, materialIndex);
+        for (hkGeometry::Triangle& triangle : geometry.m_triangles) {
+            triangle.m_a += indexOffset;
+            triangle.m_b += indexOffset;
+            triangle.m_c += indexOffset;
         }
         int32_t numVertices = geometry.m_vertices.m_size;
         hkVector4* pVertices = geometry.m_vertices.m_data;

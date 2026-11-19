@@ -355,8 +355,7 @@ hkResult Reader::readClass() {
         }
         info.members.m_size = numMembers;
     }
-    for (int32_t i = 0; i < info.members.m_size; ++i) {
-        hkDataClass::Cinfo::Member& member = info.members.m_data[i];
+    for (hkDataClass::Cinfo::Member& member : info.members) {
         member.name = readString();
         member.type = static_cast<hkDataObject::Type>(readInt<int32_t>());
         member.tupleCount = (member.type & hkDataObject::TYPE_TUPLE) ? readInt<int32_t>() : 0;

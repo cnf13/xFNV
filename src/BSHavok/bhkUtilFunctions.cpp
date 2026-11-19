@@ -564,11 +564,10 @@ bhkCollisionObject* bhkUtilFunctions::FindNextCollisionObject(NiAVObject* apObj)
     }
     // The children are read through apObj, not through IsNode's result.
     auto* pNode = static_cast<NiNode*>(apObj);
-    for (uint32_t ui = 0; ui < pNode->m_kChildren.m_usSize; ++ui) {
+    for (NiAVObject* pChild : pNode->m_kChildren) {
         if (pCollisionObject) {
             break;
         }
-        NiAVObject* pChild = pNode->m_kChildren.m_pBase[ui].m_pObject;
         if (pChild) {
             pCollisionObject = bhkUtilFunctions::FindNextCollisionObject(pChild);
         }
@@ -737,10 +736,9 @@ void bhkUtilFunctions::SetUseVelocityRecurse(bool abUseVelocity, NiAVObject* apO
     }
     NiNode* v3 = apObject->IsNode();
     if (v3) {
-        for (uint32_t i = 0; i < v3->m_kChildren.m_usSize; ++i) {
-            NiPointer<NiAVObject>* m_pBase = v3->m_kChildren.m_pBase;
-            if (m_pBase[i].m_pObject) {
-                bhkUtilFunctions::SetUseVelocityRecurse(abUseVelocity, m_pBase[i].m_pObject);
+        for (NiAVObject* pChild : v3->m_kChildren) {
+            if (pChild) {
+                bhkUtilFunctions::SetUseVelocityRecurse(abUseVelocity, pChild);
             }
         }
     }
@@ -986,10 +984,8 @@ char bhkUtilFunctions::GetClosestBodyRec(
     }
     NiNode* pnode = apObject->IsNode();
     if (pnode) {
-        for (uint32_t i = 0; i < pnode->m_kChildren.m_usSize; ++i) {
-            bres |= bhkUtilFunctions::GetClosestBodyRec(
-                pnode->m_kChildren.m_pBase[i].m_pObject, arSphere, arClosest, abIgnoreHead
-            );
+        for (NiAVObject* pChild : pnode->m_kChildren) {
+            bres |= bhkUtilFunctions::GetClosestBodyRec(pChild, arSphere, arClosest, abIgnoreHead);
         }
     }
     return bres;
@@ -1158,8 +1154,7 @@ bhkCollisionObject* bhkUtilFunctions::FindCollisionObjectBFSRec(
     if (!pcol && apObject->IsNode() && auiCurLevel < auiMaxLevel) {
         // Reads the children through apObject itself, not through IsNode's result.
         NiNode* pNode = static_cast<NiNode*>(apObject);
-        for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pChild : pNode->m_kChildren) {
             if (pChild) {
                 bhkUtilFunctions::AVLevel avchild;
                 avchild.pObj = pChild;

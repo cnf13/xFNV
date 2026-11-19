@@ -417,8 +417,7 @@ void NiTimeController::StartAnimations(NiObjectNET* pkObj, float fTime) {
 
     if (pkObj->IsNode()) {
         NiNode* pkNode = static_cast<NiNode*>(pkObj);
-        for (uint32_t i = 0; i < pkNode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pkChild = pkNode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pkChild : pkNode->m_kChildren) {
             if (pkChild) {
                 NiTimeController::StartAnimations(pkChild, fTime);
             }
@@ -446,8 +445,7 @@ void NiTimeController::StartAnimations(NiObjectNET* pkObj) {
 
     if (pkObj->IsNode()) {
         NiNode* pkNode = static_cast<NiNode*>(pkObj);
-        for (uint32_t i = 0; i < pkNode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pkChild = pkNode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pkChild : pkNode->m_kChildren) {
             if (pkChild) {
                 NiTimeController::StartAnimations(pkChild);
             }

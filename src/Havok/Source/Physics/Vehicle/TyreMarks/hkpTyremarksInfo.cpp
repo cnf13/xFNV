@@ -268,25 +268,24 @@ const hkClass& hkpTyremarksWheel::staticClass() {
 hkpTyremarksInfo::hkpTyremarksInfo(const hkpVehicleData& data, int32_t num_points)
   : m_minTyremarkEnergy(0.0f), m_maxTyremarkEnergy(0.0f) {
     m_tyremarksWheel.setSize(data.m_numWheels);
-    for (int32_t i = 0; i < m_tyremarksWheel.m_size; ++i) {
+    for (hkpTyremarksWheel*& rWheel : m_tyremarksWheel) {
         hkpTyremarksWheel* pWheel = new (hkReferencedObject::newObject(sizeof(hkpTyremarksWheel))) hkpTyremarksWheel();
         pWheel->setNumPoints(num_points);
-        m_tyremarksWheel.m_data[i] = pWheel;
+        rWheel = pWheel;
     }
 }
 
 // Drops this object's reference to each wheel's history; the array is freed by its own destructor.
 hkpTyremarksInfo::~hkpTyremarksInfo() {
-    for (int32_t i = 0; i < m_tyremarksWheel.m_size; ++i) {
-        m_tyremarksWheel.m_data[i]->removeReference();
+    for (hkpTyremarksWheel* pWheel : m_tyremarksWheel) {
+        pWheel->removeReference();
     }
 }
 
 void hkpTyremarksInfo::calcContentStatistics(hkStatisticsCollector* collector, const hkClass* cls) const {
-    for (int32_t i = 0; i < m_tyremarksWheel.m_size; ++i) {
-        hkpTyremarksWheel* v5 = m_tyremarksWheel.m_data[i];
-        int32_t m_capacityAndFlags = v5->m_tyremarkPoints.m_capacityAndFlags;
-        hkArray<hkpTyremarkPoint, hkContainerHeapAllocator>* p_m_tyremarkPoints = &v5->m_tyremarkPoints;
+    for (hkpTyremarksWheel* pWheel : m_tyremarksWheel) {
+        int32_t m_capacityAndFlags = pWheel->m_tyremarkPoints.m_capacityAndFlags;
+        hkArray<hkpTyremarkPoint, hkContainerHeapAllocator>* p_m_tyremarkPoints = &pWheel->m_tyremarkPoints;
         if (m_capacityAndFlags >= 0 || collector->m_includeUnmanagedArrayMemory) {
             int32_t AllocatedSize = hkStatisticsCollector::getAllocatedSize(
                 p_m_tyremarkPoints->begin(),

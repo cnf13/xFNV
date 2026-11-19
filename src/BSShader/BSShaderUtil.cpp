@@ -67,8 +67,7 @@ void BSShaderUtil::RecursiveSetPropertyFadeAlpha(NiNode* apNode, float afAlpha) 
     if (!pBound || !(0.0f != static_cast<NiBound&>(*pBound).m_fRadius)) {
         return;
     }
-    for (uint32_t i = 0; i < apNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pChild = apNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pChild : apNode->m_kChildren) {
         if (!pChild) {
             continue;
         }

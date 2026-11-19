@@ -178,9 +178,9 @@ hkResult hkServerDebugDisplayHandler::updateBehavior(
         nameLengths.m_data = nullptr;
         nameLengths.m_size = 0;
         nameLengths.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        for (int32_t i = 0; i < activeNodes.m_size; ++i) {
-            if (activeNodes.m_data[i]) {
-                int32_t length = hkString::strLen(activeNodes.m_data[i]);
+        for (const char* nodeName : activeNodes) {
+            if (nodeName) {
+                int32_t length = hkString::strLen(nodeName);
                 hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
                 if (nameLengths.m_size == (nameLengths.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
                     hkArrayUtil::_reserveMore(*Instance->m_heap, &nameLengths, sizeof(int32_t));
@@ -217,18 +217,18 @@ hkResult hkServerDebugDisplayHandler::updateBehavior(
             }
         }
         this->m_outStream->write32u(static_cast<uint32_t>(transforms.m_size));
-        for (int32_t i = 0; i < transforms.m_size; ++i) {
+        for (const hkQsTransform& transform : transforms) {
             hkTransform arTransformOut_;
-            transforms.m_data[i].copyToTransform(arTransformOut_);
+            transform.copyToTransform(arTransformOut_);
             this->m_outStream->writeTransform(arTransformOut_);
         }
         this->m_outStream->write32u(static_cast<uint32_t>(activeStateIds.m_size));
-        for (int32_t i = 0; i < activeStateIds.m_size; ++i) {
-            this->m_outStream->write32u(static_cast<uint32_t>(activeStateIds.m_data[i]));
+        for (int32_t stateId : activeStateIds) {
+            this->m_outStream->write32u(static_cast<uint32_t>(stateId));
         }
         this->m_outStream->write32u(static_cast<uint32_t>(activeTransitions.m_size));
-        for (int32_t i = 0; i < activeTransitions.m_size; ++i) {
-            this->m_outStream->write32u(static_cast<uint32_t>(activeTransitions.m_data[i]));
+        for (int32_t transition : activeTransitions) {
+            this->m_outStream->write32u(static_cast<uint32_t>(transition));
         }
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
         nameLengths.m_size = 0;
@@ -480,8 +480,8 @@ hkResult hkServerDebugDisplayHandler::holdImmediate() {
 void hkServerDebugDisplayHandler::sendGeometryData(const hkArrayBase<hkDisplayGeometry*>& geometries) {
     EnterCriticalSection(&m_outstreamLock->m_section);
     this->m_outStream->write32(geometries.m_size);
-    for (int32_t i = 0; i < geometries.m_size; ++i) {
-        this->m_outStream->writeDisplayGeometry(geometries.m_data[i]);
+    for (hkDisplayGeometry* geometry : geometries) {
+        this->m_outStream->writeDisplayGeometry(geometry);
     }
     LeaveCriticalSection(&m_outstreamLock->m_section);
 }

@@ -31,8 +31,7 @@ hkpCollidableMediator::hkpCollidableMediator(
 )
   : m_collidables(&collidables) {
     if (world) {
-        for (int32_t i = 0; i < m_collidables->m_size; ++i) {
-            const hkpCollidable* pCollidable = m_collidables->m_data[i];
+        for (const hkpCollidable* pCollidable : *m_collidables) {
             if (!pCollidable->m_boundingVolumeData.isValid()) {
                 if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
                     hkpEntity* pEntity = static_cast<hkpEntity*>(pCollidable->getOwner());

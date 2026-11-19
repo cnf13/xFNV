@@ -451,8 +451,8 @@ bool bhkWorldObject::HasProperty(uint32_t aiKey) {
     if (!pkObject) {
         return false;
     }
-    for (int32_t i = 0; i < pkObject->m_properties.m_size; ++i) {
-        if (pkObject->m_properties.m_data[i].m_key == aiKey) {
+    for (const hkpProperty& rProperty : pkObject->m_properties) {
+        if (rProperty.m_key == aiKey) {
             return true;
         }
     }

@@ -199,9 +199,8 @@ hkBool hkpConvexPieceMeshShape::vertexIsSet(const uint32_t* stream, int32_t key)
 void hkpConvexPieceMeshShape::getStats(hkpConvexPieceMeshShape::Stats& statsOut) {
     statsOut.m_numTriangles += m_convexPieceStream->m_convexPieceSingleTriangles.m_size;
     statsOut.m_numConvexPieces += m_convexPieceStream->m_convexPieceSingleTriangles.m_size;
-    for (int32_t i = 0; i < m_convexPieceStream->m_convexPieceOffsets.m_size; ++i) {
-        int32_t v3 =
-            m_convexPieceStream->m_convexPieceStream.m_data[m_convexPieceStream->m_convexPieceOffsets.m_data[i]];
+    for (uint32_t offset : m_convexPieceStream->m_convexPieceOffsets) {
+        int32_t v3 = m_convexPieceStream->m_convexPieceStream.m_data[offset];
         int32_t m_maxTrianglesPerConvexPiece = statsOut.m_maxTrianglesPerConvexPiece;
         statsOut.m_numTriangles += v3;
         if (m_maxTrianglesPerConvexPiece > v3) {

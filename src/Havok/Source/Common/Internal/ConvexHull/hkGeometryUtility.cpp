@@ -1005,10 +1005,9 @@ done:
     return isBox;
 }
 
-// The size reloads each pass and the compare is signed.
 void hkGeometryUtility::expandPlanes(hkArray<hkVector4>& planeEquations, float byDistance) {
-    for (int32_t i = 0; i < planeEquations.m_size; ++i) {
-        planeEquations.m_data[i].m_quad[3] -= byDistance;
+    for (hkVector4& plane : planeEquations) {
+        plane.m_quad[3] -= byDistance;
     }
 }
 

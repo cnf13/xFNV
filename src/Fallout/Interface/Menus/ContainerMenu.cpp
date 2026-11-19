@@ -361,9 +361,9 @@ void ContainerMenu::UpdateLists(TESBoundObject* apUpdateObj) {
         // themselves would be devirtualised.
         ListBox<ItemChange*>* pContainerList = &lbContainer;
         pContainerList->RemoveAll();
-        for (int32_t iitemCt = 0; iitemCt < prockItLauncherItems->iSize; ++iitemCt) {
-            const char* FullName = (*prockItLauncherItems)[iitemCt]->GetFullName();
-            lbContainer.AddItem((*prockItLauncherItems)[iitemCt], FullName, nullptr, nullptr);
+        for (ItemChange* pItem : *prockItLauncherItems) {
+            const char* FullName = pItem->GetFullName();
+            lbContainer.AddItem(pItem, FullName, nullptr, nullptr);
         }
         if (apUpdateObj) {
             InventoryChanges* pplayerInventory = InventoryChanges::GetInventoryChanges(pPlayer);

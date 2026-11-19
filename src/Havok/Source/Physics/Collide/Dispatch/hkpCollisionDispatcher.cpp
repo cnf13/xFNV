@@ -640,8 +640,7 @@ void hkpCollisionDispatcher::internalRegisterCollisionAgent(
     m_collisionAgentRegistered.m_bool = true;
 
     // Register the agent for the types that have typeA or typeB as their alternate type too, one level deeper.
-    for (int32_t i = 0; i < m_shapeInheritance.m_size; ++i) {
-        ShapeInheritance& si = m_shapeInheritance.m_data[i];
+    for (ShapeInheritance& si : m_shapeInheritance) {
         if (si.m_alternateType == typeA) {
             internalRegisterCollisionAgent(
                 agentTypesTable, agentType, si.m_primaryType, typeB, origA, origB, debugTable, depth + 1

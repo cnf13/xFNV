@@ -21,9 +21,9 @@ int32_t s_convexRadiusFixedObjectColor = hkColor::rgbFromChars(70, 200, 70, 140)
 
 hkpWorldViewerBase::hkpWorldViewerBase(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts)
   : hkProcess(true), m_context(nullptr) {
-    for (int32_t i = 0; i < contexts.m_size; i++) {
-        if (!hkString::strCmp("Physics", contexts.m_data[i]->getType())) {
-            m_context = static_cast<hkpPhysicsContext*>(contexts.m_data[i]);
+    for (hkProcessContext* context : contexts) {
+        if (!hkString::strCmp("Physics", context->getType())) {
+            m_context = static_cast<hkpPhysicsContext*>(context);
             break;
         }
     }

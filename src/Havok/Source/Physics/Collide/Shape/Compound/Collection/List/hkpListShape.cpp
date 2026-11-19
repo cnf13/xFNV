@@ -204,8 +204,8 @@ hkpListShape::hkpListShape(hkFinishLoadedObjectFlag a1) : hkpShapeCollection(a1)
 
 // Each child's reference goes back; the array frees its own storage.
 hkpListShape::~hkpListShape() {
-    for (int32_t i = 0; i < m_childInfo.m_size; ++i) {
-        m_childInfo.m_data[i].m_shape->removeReference();
+    for (const ChildInfo& child : m_childInfo) {
+        child.m_shape->removeReference();
     }
 }
 

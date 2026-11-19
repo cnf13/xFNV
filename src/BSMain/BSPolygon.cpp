@@ -336,12 +336,11 @@ bool BSPolygon2D::IsAnEar(int32_t aiIndex, int32_t aiPrev, int32_t aiNext) {
     if (pConcaveVertexIndexList->IsInArray(aValue)) {
         return false;
     }
-    for (uint32_t i = 0; i < pConcaveVertexIndexList->iSize; ++i) {
-        int32_t v8 = pConcaveVertexIndexList->pBuffer[i];
-        if (v8 != aiPrev && v8 != aiNext) {
+    for (int32_t iVertex : *pConcaveVertexIndexList) {
+        if (iVertex != aiPrev && iVertex != aiNext) {
             NiPoint2 afPoint;
-            afPoint.x = pVertexSimpleArray->pBuffer[v8].x;
-            afPoint.y = pVertexSimpleArray->pBuffer[v8].y;
+            afPoint.x = pVertexSimpleArray->pBuffer[iVertex].x;
+            afPoint.y = pVertexSimpleArray->pBuffer[iVertex].y;
             if (IsPointInsideTri(afPoint, aiPrev, aiIndex, aiNext)) {
                 return false;
             }

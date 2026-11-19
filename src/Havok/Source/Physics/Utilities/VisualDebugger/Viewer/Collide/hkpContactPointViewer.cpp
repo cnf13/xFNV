@@ -111,8 +111,8 @@ void hkpContactPointViewer::init() {
 void hkpContactPointViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpActiveContactPointViewer::postSimulationCallback", this);
     const hkArray<hkpSimulationIsland*>& islands = getIslands(world);
-    for (int32_t i = 0; i < islands.m_size; ++i) {
-        drawAllContactPointsInIsland(islands.m_data[i]);
+    for (hkpSimulationIsland* island : islands) {
+        drawAllContactPointsInIsland(island);
     }
     HK_TIMER_END();
 }
@@ -160,9 +160,9 @@ void hkpContactPointViewer::drawAllContactPointsInIsland(const hkpSimulationIsla
             hkLocalArray<uint16_t> contactPoints(256);
             manager->getAllContactPointIds(contactPoints);
 
-            for (int32_t i = 0; i < contactPoints.m_size; ++i) {
-                hkContactPoint* cp = manager->getContactPoint(contactPoints.m_data[i]);
-                hkpContactPointProperties* properties = manager->getContactPointProperties(contactPoints.m_data[i]);
+            for (uint16_t contactPointId : contactPoints) {
+                hkContactPoint* cp = manager->getContactPoint(contactPointId);
+                hkpContactPointProperties* properties = manager->getContactPointProperties(contactPointId);
                 // Drawn unless below the limit: an unordered compare draws too.
                 if (!(m_limit > properties->m_impulseApplied)) {
                     const hkpEntity* masterEntity =

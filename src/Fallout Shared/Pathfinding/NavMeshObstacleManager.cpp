@@ -275,8 +275,7 @@ void NavMeshObstacleManager::RemoveObstacleForReference(TESObjectREFR* apRef) {
     }
     NiPointer<ReferenceObstacleArray> spObstacleArray(nullptr);
     if (FormIDMap.GetAt(apRef->GetFormID(), spObstacleArray)) {
-        for (uint32_t i = 0; i < spObstacleArray->Obstacles.GetSize(); ++i) {
-            NiPointer<ObstacleData>& spObstacle = spObstacleArray->Obstacles.GetAt(i);
+        for (NiPointer<ObstacleData>& spObstacle : spObstacleArray->Obstacles) {
             RemoveActivationListener(spObstacle->pRigidBody.operator->());
         }
         uint32_t uiRemoveID = apRef->GetFormID();
@@ -570,8 +569,8 @@ void NavMeshObstacleManager::ProcessNewReferences() {
             }
         }
     }
-    for (uint32_t i = 0; i < kProcessedRefs.GetSize(); ++i) {
-        QueuedListOfRefsToAdd.Remove(kProcessedRefs.GetAt(i));
+    for (TESObjectREFR* pRef : kProcessedRefs) {
+        QueuedListOfRefsToAdd.Remove(pRef);
     }
 }
 
@@ -584,8 +583,8 @@ void NavMeshObstacleManager::ProcessRemovedReferences() {
         pIter = pIter->GetNext();
         NiPointer<ReferenceObstacleArray> spObstacleArray(nullptr);
         if (FormIDMap.GetAt(uiFormID, spObstacleArray)) {
-            for (uint32_t i = 0; i < spObstacleArray->Obstacles.GetSize(); ++i) {
-                ObstaclesUpdateList.Remove(spObstacleArray->Obstacles.GetAt(i));
+            for (const NiPointer<ObstacleData>& spObstacle : spObstacleArray->Obstacles) {
+                ObstaclesUpdateList.Remove(spObstacle);
             }
         }
         ReallyRemoveObstaclesForReference(uiFormID);
@@ -664,8 +663,8 @@ void NavMeshObstacleManager::ProcessMovingReferences() {
 
 void NavMeshObstacleManager::UpdateObstacle(NiPointer<ObstacleData>& spObstacle) {
     if (spObstacle.m_pObject->bActive) {
-        for (uint32_t uiIndex = 0; uiIndex < spObstacle.m_pObject->Navmeshes.iSize; ++uiIndex) {
-            ObstacleTaskData* TaskForNavMesh = GetTaskForNavMesh(spObstacle.m_pObject->Navmeshes.GetAt(uiIndex));
+        for (NavMeshInfo* pNavMeshInfo : spObstacle.m_pObject->Navmeshes) {
+            ObstacleTaskData* TaskForNavMesh = GetTaskForNavMesh(pNavMeshInfo);
             TaskForNavMesh->AddOperation(spObstacle, OBSTACLE_TASK_TYPE_REMOVE_OBSTACLE_FOR_UPDATE);
         }
         spObstacle.m_pObject->Navmeshes.Clear(true);
@@ -704,9 +703,8 @@ void NavMeshObstacleManager::UpdateObstaclesForReference(uint32_t aiRefID, TESOb
             }
             NiPointer<ObstacleData> spObstacle(spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(a)));
             if (spObstacle.m_pObject->bActive) {
-                for (uint32_t i = 0; i < spObstacle.m_pObject->Navmeshes.iSize; ++i) {
-                    ObstacleTaskData* TaskForNavMesh =
-                        GetTaskForNavMesh(spObstacle.m_pObject->Navmeshes.GetAt(static_cast<int32_t>(i)));
+                for (NavMeshInfo* pNavMeshInfo : spObstacle.m_pObject->Navmeshes) {
+                    ObstacleTaskData* TaskForNavMesh = GetTaskForNavMesh(pNavMeshInfo);
                     TaskForNavMesh->AddOperation(spObstacle, OBSTACLE_TASK_TYPE_REMOVE_OBSTACLE_FOR_UPDATE);
                 }
                 spObstacle.m_pObject->Navmeshes.Clear(true);
@@ -813,9 +811,8 @@ void NavMeshObstacleManager::ReallyRemoveObstaclesForReference(uint32_t aiFormID
                 RemoveBoundingBox3DNode(spObstacle);
             }
             if (!spObstacle.m_pObject->Navmeshes.IsEmpty()) {
-                for (uint32_t j = 0; j < spObstacle.m_pObject->Navmeshes.iSize; ++j) {
-                    ObstacleTaskData* TaskForNavMesh =
-                        GetTaskForNavMesh(spObstacle.m_pObject->Navmeshes.GetAt(static_cast<int32_t>(j)));
+                for (NavMeshInfo* pNavMeshInfo : spObstacle.m_pObject->Navmeshes) {
+                    ObstacleTaskData* TaskForNavMesh = GetTaskForNavMesh(pNavMeshInfo);
                     TaskForNavMesh->AddOperation(spObstacle, OBSTACLE_TASK_TYPE_REMOVE_OBSTACLE);
                 }
                 spObstacle.m_pObject->Navmeshes.Clear(true);
@@ -1035,14 +1032,10 @@ bool NavMeshObstacleManager::ProcessRemovedDoors() {
         plist = plist->GetNext();
         NiPointer<ReferenceObstacleArray> spArray(static_cast<ReferenceObstacleArray*>(nullptr));
         if (this->ClosedDoorMap.GetAt(doorId, spArray)) {
-            for (uint32_t i = 0; i < spArray.m_pObject->Obstacles.iSize; ++i) {
-                for (uint32_t j = 0;
-                     j < spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i)).m_pObject->Navmeshes.iSize; ++j) {
-                    NiPointer<ObstacleData>* pspObstacle = &spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i));
-                    NavMeshInfo* pNavMesh = spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i))
-                                                .m_pObject->Navmeshes.GetAt(static_cast<int32_t>(j));
+            for (NiPointer<ObstacleData>& spObstacle : spArray.m_pObject->Obstacles) {
+                for (NavMeshInfo* pNavMesh : spObstacle.m_pObject->Navmeshes) {
                     ObstacleTaskData* pTask = this->GetTaskForNavMesh(pNavMesh);
-                    pTask->AddOperation(*pspObstacle, OBSTACLE_TASK_TYPE_REMOVE_DOOR);
+                    pTask->AddOperation(spObstacle, OBSTACLE_TASK_TYPE_REMOVE_DOOR);
                 }
             }
             this->ClosedDoorMap.RemoveAt(doorId);
@@ -1069,21 +1062,16 @@ bool NavMeshObstacleManager::ProcessNewDoors() {
             pNewArray = new ReferenceObstacleArray;
             NiPointer<ReferenceObstacleArray> spArray(pNewArray);
             if (NavMeshObstacleManager::GetObstacleDataForReference(pdoor, spArray)) {
-                for (uint32_t i = 0; i < spArray.m_pObject->Obstacles.iSize; ++i) {
+                for (NiPointer<ObstacleData>& spObstacle : spArray.m_pObject->Obstacles) {
                     using navmeshes_t = BSScrapArray<NavMeshPtr, 1024>;
                     navmeshes_t navmeshes;
-                    NiPointer<ObstacleData>* v8 = &spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i));
-                    if (NavMeshObstacleManager::GetNavMeshListForObstacle(*v8, &navmeshes)) {
-                        for (uint32_t j = 0; j < navmeshes.iSize; ++j) {
-                            NiPointer<ObstacleData>* v9 = &spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i));
-                            NavMeshInfo* NavMeshInfo_ =
-                                (&navmeshes.GetAt(static_cast<int32_t>(j)))->m_pObject->GetNavMeshInfo();
+                    if (NavMeshObstacleManager::GetNavMeshListForObstacle(spObstacle, &navmeshes)) {
+                        for (const NavMeshPtr& spNavMesh : navmeshes) {
+                            NavMeshInfo* NavMeshInfo_ = spNavMesh.m_pObject->GetNavMeshInfo();
                             ObstacleTaskData* TaskForNavMesh = this->GetTaskForNavMesh(NavMeshInfo_);
-                            TaskForNavMesh->AddOperation(*v9, OBSTACLE_TASK_TYPE_ADD_DOOR);
-                            pNavMeshInfo = (&navmeshes.GetAt(static_cast<int32_t>(j)))->m_pObject->GetNavMeshInfo();
-                            ObstacleData* v6 =
-                                (&spArray.m_pObject->Obstacles.GetAt(static_cast<int32_t>(i)))->m_pObject;
-                            v6->Navmeshes.Add(pNavMeshInfo);
+                            TaskForNavMesh->AddOperation(spObstacle, OBSTACLE_TASK_TYPE_ADD_DOOR);
+                            pNavMeshInfo = spNavMesh.m_pObject->GetNavMeshInfo();
+                            spObstacle.m_pObject->Navmeshes.Add(pNavMeshInfo);
                         }
                     }
                 }
@@ -1319,8 +1307,8 @@ bool NavMeshObstacleManager::GetNavMeshListForObstacle(
     NiPoint3 navmeshMax;
     BSScrapArray<TESObjectCELL*> kCells(32u, 0u, nullptr);
     if (NavMeshObstacleManager::GetCellListForObstacle(apData, &kCells)) {
-        for (uint32_t i = 0; i < kCells.GetSize(); ++i) {
-            NavMeshArray* parray = kCells.GetAt(i)->GetNavMeshArray();
+        for (TESObjectCELL* pCell : kCells) {
+            NavMeshArray* parray = pCell->GetNavMeshArray();
             if (parray) {
                 for (uint32_t j = 0; j < parray->GetNavMeshCount(); ++j) {
                     bool Bounds = parray->GetNavMeshByIndex(j).m_pObject->NavMesh::GetBounds(navmeshMin, navmeshMax);

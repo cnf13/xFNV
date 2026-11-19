@@ -65,9 +65,9 @@ PathSmoother::PathSmoother()
 // The vertices and edges live in TheScrapHeap: each vertex is destroyed in place and handed back, as are the edges. The
 // first two right vertices are dropped before the rest are destroyed.
 PathSmoother::~PathSmoother() {
-    for (uint32_t uiIndex = 0; uiIndex < LeftVerts.iSize; ++uiIndex) {
-        LeftVerts.GetAt(static_cast<int32_t>(uiIndex))->~UniqueVert();
-        TheScrapHeap.Deallocate(LeftVerts.GetAt(static_cast<int32_t>(uiIndex)));
+    for (UniqueVert* pVert : LeftVerts) {
+        pVert->~UniqueVert();
+        TheScrapHeap.Deallocate(pVert);
     }
     if (!RightVerts.IsEmpty()) {
         RightVerts.RemoveFast(0, 1u);
@@ -75,22 +75,22 @@ PathSmoother::~PathSmoother() {
     if (!RightVerts.IsEmpty()) {
         RightVerts.RemoveFast(0, 1u);
     }
-    for (uint32_t i = 0; i < RightVerts.iSize; ++i) {
-        RightVerts.GetAt(static_cast<int32_t>(i))->~UniqueVert();
-        TheScrapHeap.Deallocate(RightVerts.GetAt(static_cast<int32_t>(i)));
+    for (UniqueVert* pVert : RightVerts) {
+        pVert->~UniqueVert();
+        TheScrapHeap.Deallocate(pVert);
     }
     LeftVerts.Clear(true);
     RightVerts.Clear(true);
-    for (uint32_t j = 0; j < LeftEdges.iSize; ++j) {
-        TheScrapHeap.Deallocate(LeftEdges.GetAt(static_cast<int32_t>(j)));
+    for (BoundsEdge* pEdge : LeftEdges) {
+        TheScrapHeap.Deallocate(pEdge);
     }
-    for (uint32_t k = 0; k < RightEdges.iSize; ++k) {
-        TheScrapHeap.Deallocate(RightEdges.GetAt(static_cast<int32_t>(k)));
+    for (BoundsEdge* pEdge : RightEdges) {
+        TheScrapHeap.Deallocate(pEdge);
     }
     LeftEdges.Clear(true);
     RightEdges.Clear(true);
-    for (uint32_t m = 0; m < PathEdges.iSize; ++m) {
-        TheScrapHeap.Deallocate(PathEdges.GetAt(static_cast<int32_t>(m)));
+    for (PathEdge* pEdge : PathEdges) {
+        TheScrapHeap.Deallocate(pEdge);
     }
     PathEdges.Clear(true);
 }
@@ -744,11 +744,11 @@ bool PathSmoother::TestBoundsEdgeAgainstOtherBound(BoundsEdge* apEdge1, BoundsEd
 }
 
 void PathSmoother::SetLeftRightShrunkLocations() {
-    for (uint32_t i = 0; i < PathEdges.iSize; ++i) {
-        NiPoint3* p_ShrunkLocation = &PathEdges.GetAt(i)->pLeftVert->ShrunkLocation;
-        PathEdges.GetAt(i)->LeftShrunkLocation = *p_ShrunkLocation;
-        NiPoint3* v2 = &PathEdges.GetAt(i)->pRightVert->ShrunkLocation;
-        PathEdges.GetAt(i)->RightShrunkLocation = *v2;
+    for (PathEdge* pEdge : PathEdges) {
+        NiPoint3* p_ShrunkLocation = &pEdge->pLeftVert->ShrunkLocation;
+        pEdge->LeftShrunkLocation = *p_ShrunkLocation;
+        NiPoint3* v2 = &pEdge->pRightVert->ShrunkLocation;
+        pEdge->RightShrunkLocation = *v2;
     }
 }
 
@@ -1287,17 +1287,16 @@ bool PathSmoother::IsSegmentValid(NiPoint3* a1, NiPoint3* a2) {
 }
 
 char PathSmoother::SegmentClearOfEdges(NiPoint3* a1, NiPoint3* a2) {
-    for (uint32_t uiIndex = 0; uiIndex < LeftEdges.iSize; ++uiIndex) {
+    for (BoundsEdge* pEdge : LeftEdges) {
         if (NavMeshMath::Find2DIntersection3(
-                *a1, *a2, LeftEdges.GetAt(uiIndex)->pStartVert->ShrunkLocation,
-                LeftEdges.GetAt(uiIndex)->pEndVert->ShrunkLocation
+                *a1, *a2, pEdge->pStartVert->ShrunkLocation, pEdge->pEndVert->ShrunkLocation
             )) {
             return 0;
         }
     }
-    for (uint32_t i = 0; i < RightEdges.iSize; ++i) {
+    for (BoundsEdge* pEdge : RightEdges) {
         if (NavMeshMath::Find2DIntersection3(
-                *a1, *a2, RightEdges.GetAt(i)->pStartVert->ShrunkLocation, RightEdges.GetAt(i)->pEndVert->ShrunkLocation
+                *a1, *a2, pEdge->pStartVert->ShrunkLocation, pEdge->pEndVert->ShrunkLocation
             )) {
             return 0;
         }

@@ -48,11 +48,11 @@ hkPackfileData::hkPackfileData() : m_topLevelObject(nullptr), m_name(nullptr), m
 // pointer release theirs themselves.
 hkPackfileData::~hkPackfileData() {
     hkPackfileData::callDestructors();
-    for (int32_t i = 0; i < m_memory.m_size; ++i) {
-        hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), m_memory.m_data[i]);
+    for (void* pMemory : m_memory) {
+        hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), pMemory);
     }
-    for (int32_t i = 0; i < m_chunks.m_size; ++i) {
-        hkMemoryRouter::getInstance().m_heap->blockFree(m_chunks.m_data[i].pointer, m_chunks.m_data[i].numBytes);
+    for (const Chunk& kChunk : m_chunks) {
+        hkMemoryRouter::getInstance().m_heap->blockFree(kChunk.pointer, kChunk.numBytes);
     }
     hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), m_name);
 }

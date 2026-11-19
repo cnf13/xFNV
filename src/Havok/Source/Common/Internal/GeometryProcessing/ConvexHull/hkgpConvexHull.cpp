@@ -1825,13 +1825,12 @@ bool hkgpConvexHull::booleanSubtraction(
     hkgpConvexHull* pClone = operandA->clone();
     remaining.pushBack(pClone);
     int32_t iNumRemaining = remaining.m_size;
-    for (int32_t i = 0; i < operandsB.m_size; ++i) {
+    for (hkgpConvexHull* pOperandB : operandsB) {
         for (int32_t j = 0; j < iNumRemaining; ++j) {
             parts.m_size = 0;
-            if (booleanSubtraction(remaining.m_data[j], operandsB.m_data[i], parts, thickness)) {
+            if (booleanSubtraction(remaining.m_data[j], pOperandB, parts, thickness)) {
                 delete remaining.m_data[j];
-                for (int32_t k = 0; k < parts.m_size; ++k) {
-                    hkgpConvexHull* pPart = parts.m_data[k];
+                for (hkgpConvexHull* pPart : parts) {
                     pieces.pushBack(pPart);
                     pPart->buildIndices(0.9999f, false);
                 }
@@ -1845,8 +1844,7 @@ bool hkgpConvexHull::booleanSubtraction(
         iNumRemaining = remaining.m_size;
         pieces.m_size = 0;
     }
-    for (int32_t i = 0; i < remaining.m_size; ++i) {
-        hkgpConvexHull* pPiece = remaining.m_data[i];
+    for (hkgpConvexHull* pPiece : remaining) {
         output.pushBack(pPiece);
     }
     return iNumRemaining > 0;
@@ -2157,10 +2155,10 @@ void hkgpConvexHull::createVoronoiCells(
     const __m128 kHalf = _mm_set_ss(0.5f);
     sites.reserve(points.m_size);
     sorted.reserve(points.m_size);
-    for (int32_t i = 0; i < points.m_size; ++i) {
+    for (const hkVector4& point : points) {
         bool bKeep = true;
-        for (int32_t j = 0; j < sites.m_size; ++j) {
-            const __m128 d = _mm_sub_ps(sites.m_data[j].m_quad, points.m_data[i].m_quad);
+        for (const hkVector4& site : sites) {
+            const __m128 d = _mm_sub_ps(site.m_quad, point.m_quad);
             const __m128 sq = _mm_mul_ps(d, d);
             const float fDistance =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq)));
@@ -2172,17 +2170,16 @@ void hkgpConvexHull::createVoronoiCells(
         }
         if (bKeep) {
             // Both arrays were reserved for every point: no capacity check.
-            sites.m_data[sites.m_size] = points.m_data[i];
+            sites.m_data[sites.m_size] = point;
             sites.m_size++;
-            sorted.m_data[sorted.m_size] = points.m_data[i];
+            sorted.m_data[sorted.m_size] = point;
             sorted.m_size++;
         }
     }
     // The squared distance to the current cell's farthest vertex, -1 when it is to be computed again.
     float fFarthest = -1.0f;
-    for (int32_t iSite = 0; iSite < sites.m_size; ++iSite) {
+    for (const hkVector4& site : sites) {
         hkgpConvexHull* pCell = domain->clone();
-        hkVector4 site = sites.m_data[iSite];
         if (sorted.m_size > 1) {
             sortByDistance(sorted.m_data, 0, sorted.m_size - 1, &site);
         }
@@ -2262,10 +2259,9 @@ void hkgpConvexHull::createVoronoiEdges(
     using pieces_t = hkArray<hkgpConvexHull*, hkContainerHeapAllocator>;
     pieces_t pieces;
     hkgpConvexHull::createVoronoiFeatures(domain, points, pieces, edges, margin);
-    for (int32_t i = 0; i < pieces.m_size; ++i) {
-        hkgpConvexHull* v5 = pieces.m_data[i];
-        if (v5) {
-            delete v5;
+    for (hkgpConvexHull* pPiece : pieces) {
+        if (pPiece) {
+            delete pPiece;
         }
     }
 }
@@ -2725,10 +2721,10 @@ int32_t hkgpConvexHullImpl::build(
                                 v.m_x[2] = iSwap;
                             }
                         }
-                        for (int32_t i = 0; i < m_pendings.m_size; ++i) {
+                        for (const Vertex& pending : m_pendings) {
                             Vertex item;
                             Vertex* pVertex = m_mesh.m_vertices.allocate(item);
-                            makeVertex(m_pendings[i], pVertex);
+                            makeVertex(pending, pVertex);
                         }
                         m_pendings.clear();
                     }
@@ -3290,9 +3286,9 @@ void hkgpConvexHullImpl::simplify(const hkgpConvexHull::SimplifyConfig& config) 
             used.clear();
             generateIndexedFaces(verticesPerFace, indices, false, false);
             // The distinct vertex indices the faces use.
-            for (int32_t i = 0; i < indices.m_size; i++) {
-                if (used.indexOf(indices.m_data[i]) == -1) {
-                    used.pushBack(indices.m_data[i]);
+            for (int32_t index : indices) {
+                if (used.indexOf(index) == -1) {
+                    used.pushBack(index);
                 }
             }
             const int32_t iNumVertices = m_mesh.m_vertices.m_numUsed;
@@ -3478,8 +3474,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
         for (Vertex* v = m_mesh.m_vertices.m_used; v; v = v->m_next) {
             vertices.pushBack(v);
         }
-        for (int32_t f = 0; f < vpf.m_size; ++f) {
-            const int32_t n = vpf.m_data[f];
+        for (const int32_t n : vpf) {
             if (n >= 3) {
                 int64_t best = -1;
                 int32_t bestIndex = -1;
@@ -4071,8 +4066,8 @@ void hkgpConvexHullImpl::buildIndices() {
             // The SDK's hkArray<Edge, hkContainerTempAllocator>: the edges still to cross while flooding a plane.
             using edges_t = hkArray<Edge, hkContainerTempAllocator>;
             edges_t edges;
-            for (int32_t i = 0; i < sorted.m_size; ++i) {
-                Triangle* seed = sorted.m_data[i].m_data;
+            for (const SortedTriangle& sortedTriangle : sorted) {
+                Triangle* seed = sortedTriangle.m_data;
                 if (seed->m_plane.m_index != -1) {
                     continue;
                 }
@@ -4241,8 +4236,7 @@ void hkgpConvexHullImpl::buildIndices() {
     }
     if (m_config.m_ensurePlaneEnclosing.m_bool) {
         for (Vertex* v = m_mesh.m_vertices.m_used; v; v = v->m_next) {
-            for (int32_t i = 0; i < m_planes.m_size; ++i) {
-                hkVector4& plane = m_planes.m_data[i];
+            for (hkVector4& plane : m_planes) {
                 const __m128 d = _mm_mul_ps(plane.m_quad, v->m_source.m_quad);
                 const float fDistance = _mm_cvtss_f32(_mm_add_ss(
                     _mm_add_ss(_mm_shuffle_ps(d, d, 0xAA), _mm_add_ss(_mm_shuffle_ps(d, d, 0x55), d)),
@@ -4377,14 +4371,14 @@ void hkgpConvexHullImpl::getOrientedBoundingBox(hkVector4& halfExtents, hkTransf
         }
         float fBestExtent = 3.40282e+38f;
         float fBestVolume = 3.40282e+38f;
-        for (int32_t i = 0; i < m_planes.m_size; ++i) {
+        for (const hkVector4& plane : m_planes) {
             // The extent's minimum and maximum are adjacent floats.
             float fMinMax[2];
-            const float fExtent = getSpan(m_planes.m_data[i], &fMinMax[0], &fMinMax[1]);
+            const float fExtent = getSpan(plane, &fMinMax[0], &fMinMax[1]);
             if (fBestExtent > fExtent) {
                 hkVector4 rectHalfExtents;
                 hkTransform rectTransform;
-                const float fArea = getOrientedRectangle(m_planes.m_data[i], rectHalfExtents, rectTransform);
+                const float fArea = getOrientedRectangle(plane, rectHalfExtents, rectTransform);
                 const float fVolume = fArea * (fMinMax[1] - fMinMax[0]);
                 if (fBestVolume > fVolume) {
                     fBestExtent = fExtent;
@@ -4816,9 +4810,8 @@ void hkgpConvexHullImpl::generateVertexAdjacencyGraph(
     for (int32_t i = 0; i < adjacency.m_size; ++i) {
         const int32_t numNeighbours = adjacency.m_data[i].m_size;
         edges.pushBack(numNeighbours);
-        for (int32_t j = 0; j < adjacency.m_data[i].m_size; ++j) {
-            const int32_t* pNeighbour = &adjacency.m_data[i].m_data[j];
-            edges.pushBack(*pNeighbour);
+        for (const int32_t neighbour : adjacency.m_data[i]) {
+            edges.pushBack(neighbour);
         }
         vertexOffsets.m_data[i] = offset;
         offset += adjacency.m_data[i].m_size + 1;
@@ -4935,8 +4928,7 @@ double hkgpConvexHullImpl::maxDistanceToTransformedPlanes(
     hkVector4* planeOut
 ) {
     float fBest = 1.1920929e-07f;
-    for (int32_t i = 0; i < points->m_size; ++i) {
-        const hkVector4* pPoint = &points->m_data[i];
+    for (const hkVector4& point : *points) {
         for (Triangle* t = m_mesh.m_triangles.m_used; t; t = t->m_next) {
             const __m128 c0 = transform->m_col0.m_quad;
             const __m128 c1 = transform->m_col1.m_quad;
@@ -4968,7 +4960,7 @@ double hkgpConvexHullImpl::maxDistanceToTransformedPlanes(
             const float fDot0 =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(d0, d0, 0xAA), _mm_add_ss(_mm_shuffle_ps(d0, d0, 0x55), d0)));
             plane(3) = 0.0f - fDot0;
-            const __m128 d = _mm_mul_ps(pPoint->m_quad, plane.m_quad);
+            const __m128 d = _mm_mul_ps(point.m_quad, plane.m_quad);
             const float fDistance = _mm_cvtss_f32(_mm_add_ss(
                 _mm_add_ss(_mm_shuffle_ps(d, d, 0xAA), _mm_add_ss(_mm_shuffle_ps(d, d, 0x55), d)),
                 _mm_shuffle_ps(plane.m_quad, plane.m_quad, 0xFF)
@@ -5147,9 +5139,9 @@ void hkgpConvexHullImpl::ensureContainment(const hkArray<hkVector4, hkContainerH
     for (Vertex* v = m_mesh.m_vertices.m_used; v; v = v->m_next) {
         *pOut++ = v->m_source;
     }
-    for (int32_t i = 0; i < vertices.m_size; ++i) {
-        const __m128 x = vertices.m_data[i].m_quad;
-        vertices.m_data[i].m_quad = _mm_add_ps(
+    for (hkVector4& vertex : vertices) {
+        const __m128 x = vertex.m_quad;
+        vertex.m_quad = _mm_add_ps(
             _mm_add_ps(
                 _mm_add_ps(
                     _mm_mul_ps(_mm_shuffle_ps(x, x, 0x55), transform.m_col1.m_quad),
@@ -5191,8 +5183,8 @@ bool hkgpConvexHullImpl::clipLine(const hkVector4& a, const hkVector4& b, float&
     __m128 x1 = b.m_quad;
     t0 = 0.0f;
     t1 = 1.0f;
-    for (int32_t i = 0; i < m_planes.m_size; ++i) {
-        const __m128 plane = m_planes.m_data[i].m_quad;
+    for (const hkVector4& planeEquation : m_planes) {
+        const __m128 plane = planeEquation.m_quad;
         const __m128 w = _mm_shuffle_ps(plane, plane, 0xFF);
         const __m128 p0 = _mm_mul_ps(plane, x0);
         const __m128 p1 = _mm_mul_ps(plane, x1);
@@ -5337,8 +5329,7 @@ float hkgpConvexHullImpl::getOrientedRectangle(
         }
     }
     else if (m_dimensions == 2) {
-        for (int32_t i = 0; i < m_planes.m_size; ++i) {
-            const hkVector4 axis0 = m_planes.m_data[i];
+        for (const hkVector4& axis0 : m_planes) {
             hkVector4 axis1;
             axis1.setCross(projectionPlane, axis0);
             const __m128 s1 = _mm_mul_ps(axis1.m_quad, axis1.m_quad);

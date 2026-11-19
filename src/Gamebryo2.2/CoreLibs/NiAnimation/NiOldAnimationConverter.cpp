@@ -86,8 +86,8 @@ void NiOldAnimationConverter::RecurseScene(NiStream& kStream, NiObjectNET* pkObj
 
     NiNode* pkNode = pkObject->IsNode();
     if (pkNode) {
-        for (uint32_t ui = 0; ui < pkNode->m_kChildren.m_usSize; ui++) {
-            RecurseScene(kStream, pkNode->m_kChildren.m_pBase[ui].m_pObject);
+        for (NiAVObject* pkChild : pkNode->m_kChildren) {
+            RecurseScene(kStream, pkChild);
         }
     }
 }

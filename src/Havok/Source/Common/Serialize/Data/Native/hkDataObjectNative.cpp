@@ -343,8 +343,7 @@ void hkDataWorldNative::findAllClasses(hkArray<hkDataClassImpl*>& classesOut) co
     }
     hkArray<const hkClass*> kClasses;
     m_reg->getClasses(kClasses);
-    for (int32_t i = 0; i < kClasses.getSize(); ++i) {
-        const hkClass* pClass = kClasses.m_data[i];
+    for (const hkClass* pClass : kClasses) {
         // A local signature marks a class the game builds itself, not one of the data's.
         if (pClass->getFlags().anyIsSet(hkClass::SIGNATURE_LOCAL)) {
             continue;

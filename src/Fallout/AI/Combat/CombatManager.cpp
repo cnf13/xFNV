@@ -103,8 +103,7 @@ void CombatManager::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     if (ptempMap) {
         delete ptempMap;
     }
-    for (uint32_t i = 0; i < CombatGroups.m_usSize; ++i) {
-        CombatGroup* pgroup = CombatGroups[i];
+    for (CombatGroup* pgroup : CombatGroups) {
         if (pgroup) {
             pgroup->InitLoadGame(apLoadGameBuffer);
         }
@@ -596,8 +595,7 @@ void CombatManager::ClearData(bool abNotifyGroupMembers) {
 
 void CombatManager::UpdateDebugGeometry() {
     NiPoint3 actorLoc;
-    for (uint32_t i = 0; i < CombatGroups.m_usSize; ++i) {
-        CombatGroup* pgroup = CombatGroups[i];
+    for (CombatGroup* pgroup : CombatGroups) {
         if (pgroup) {
             pgroup->CreateDebugGeometry(eFalse);
             uint32_t imemberCount = pgroup->GetMemberCount();

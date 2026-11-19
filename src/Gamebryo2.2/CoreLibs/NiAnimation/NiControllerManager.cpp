@@ -118,8 +118,7 @@ bool NiControllerManager::RegisterStreamables(NiStream& kStream) {
         return false;
     }
 
-    for (uint32_t i = 0; i < m_kSequenceArray.m_usSize; i++) {
-        NiControllerSequence* pkSequence = m_kSequenceArray.m_pBase[i].m_pObject;
+    for (NiControllerSequence* pkSequence : m_kSequenceArray) {
         if (pkSequence) {
             pkSequence->RegisterStreamables(kStream);
         }
@@ -360,8 +359,7 @@ NiControllerSequence* NiControllerManager::CreateTempBlendSequence(
 void NiControllerManager::CopyMembers(NiControllerManager* pkDest, NiCloningProcess& kCloning) {
     NiTimeController::CopyMembers(pkDest, kCloning);
     pkDest->m_bCumulative = m_bCumulative;
-    for (uint32_t ui = 0; ui < m_kSequenceArray.m_usSize; ++ui) {
-        NiControllerSequence* pkSequence = m_kSequenceArray.m_pBase[ui];
+    for (NiControllerSequence* pkSequence : m_kSequenceArray) {
         if (pkSequence) {
             NiControllerSequence* pkClone = static_cast<NiControllerSequence*>(pkSequence->CreateClone(kCloning));
             pkDest->AddSequence(static_cast<BSAnimGroupSequence*>(pkClone), EmptyFS, false);

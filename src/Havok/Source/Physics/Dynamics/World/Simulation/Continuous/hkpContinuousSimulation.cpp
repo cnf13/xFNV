@@ -315,8 +315,7 @@ void hkLs_toiResetVelocityAccumulatorsForEntities(
     hkpConstraintSolverResources& solverResources,
     const hkArray<hkpEntity*, hkContainerHeapAllocator>& entities
 ) {
-    for (int32_t i = 0; i < entities.m_size; i++) {
-        hkpEntity* entity = entities.m_data[i];
+    for (hkpEntity* entity : entities) {
         // Adds the byte offset to the buffer's address: raw memory, typed as the accumulator it holds.
         hkpVelocityAccumulator* accumulator = reinterpret_cast<hkpVelocityAccumulator*>(
             reinterpret_cast<char*>(solverResources.m_accumulators) + entity->m_solverData
@@ -478,8 +477,7 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
     // The capacity is 0x800003E8 (1000 with the flag).
     const int32_t kNumLocalEntries = 1000;
     alignas(16) hkLocalArray<hkpAgentNnEntry*> entriesOut(kNumLocalEntries);
-    for (int32_t i = 0; i < toBeActivated.m_size; ++i) {
-        hkpEntity* entity = toBeActivated.m_data[i];
+    for (hkpEntity* entity : toBeActivated) {
         if (entityState.m_data.m_storage[entity->m_storageIndex] == HK_TOI_ENTITY_STATE_ZERO) {
             entityState.m_data.m_storage[entity->m_storageIndex] = HK_TOI_ENTITY_STATE_TRANSFORM_UPDATED;
             hkSweptTransformUtil::lerp2(
@@ -514,8 +512,8 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
     for (int32_t i = 0; i < toBeActivated.m_size; ++i) {
         hkpEntity* entity = toBeActivated.m_data[i];
         entityState.m_data.m_storage[entity->m_storageIndex] = HK_TOI_ENTITY_STATE_ACTIVE;
-        for (int32_t j = 0; j < entity->m_constraintsMaster.m_size; ++j) {
-            hkConstraintInternal* ci = &entity->m_constraintsMaster.m_data[j];
+        for (hkConstraintInternal& master : entity->m_constraintsMaster) {
+            hkConstraintInternal* ci = &master;
             if (minPriorityToProcess > ci->m_constraint->m_priority.m_storage) {
                 continue;
             }
@@ -547,8 +545,8 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
         // are sorted.
         const int32_t firstNewConstraint = newTouchedConstraints.m_size;
         const int32_t firstNewEntity = newTouchedEntities.m_size;
-        for (int32_t j = 0; j < entity->m_constraintsSlave.m_size; ++j) {
-            hkConstraintInternal* ci = entity->m_constraintsSlave.m_data[j]->m_internal;
+        for (hkpConstraintInstance* slave : entity->m_constraintsSlave) {
+            hkConstraintInternal* ci = slave->m_internal;
             if (minPriorityToProcess > ci->m_constraint->m_priority.m_storage) {
                 continue;
             }
@@ -816,8 +814,7 @@ hkResult hkLs_localizedSolveToi(
                 touchedEntities._reserve(
                     hkMemoryRouter::getInstance().heap(), touchedEntities.m_size + newTouchedEntities.m_size
                 );
-                for (int32_t i = 0; i < newTouchedEntities.m_size; i++) {
-                    hkpEntity* entity = newTouchedEntities.m_data[i];
+                for (hkpEntity* entity : newTouchedEntities) {
                     if (entity->m_motion.m_type.m_storage != hkpMotion::MOTION_KEYFRAMED) {
                         touchedEntities.pushBackUnchecked(entity);
                     }
@@ -837,16 +834,16 @@ hkResult hkLs_localizedSolveToi(
             }
             else {
                 // Out of resources: the entities to activate stay manifold-updated, the new ones transform-updated.
-                for (int32_t i = 0; i < toBeActivated.m_size; i++) {
-                    entityState[toBeActivated.m_data[i]->m_storageIndex] = HK_TOI_ENTITY_STATE_MANIFOLD_UPDATED;
+                for (hkpEntity* entity : toBeActivated) {
+                    entityState[entity->m_storageIndex] = HK_TOI_ENTITY_STATE_MANIFOLD_UPDATED;
                 }
-                for (int32_t i = 0; i < newTouchedEntities.m_size; i++) {
-                    entityState[newTouchedEntities.m_data[i]->m_storageIndex] = HK_TOI_ENTITY_STATE_TRANSFORM_UPDATED;
+                for (hkpEntity* entity : newTouchedEntities) {
+                    entityState[entity->m_storageIndex] = HK_TOI_ENTITY_STATE_TRANSFORM_UPDATED;
                 }
                 if (toiResourceMgr.resourcesDepleted() == HK_TOI_RESOURCE_MGR_RESPONSE_BACKSTEP) {
                     hkLs_backstepAndFreezeEntireIsland(event.m_time, island, entityState, activeEntities);
-                    for (int32_t i = 0; i < activeEntities.m_size; i++) {
-                        hkpWorldAgentUtil::invalidateTim(activeEntities.m_data[i], *world->m_collisionInput);
+                    for (hkpEntity* entity : activeEntities) {
+                        hkpWorldAgentUtil::invalidateTim(entity, *world->m_collisionInput);
                     }
                     activeEntities.m_size = 0;
                     goto cleanup;
@@ -892,8 +889,8 @@ hkResult hkLs_localizedSolveToi(
                         toiResourceMgr.cannotSolve(violatedConstraints) == HK_TOI_RESOURCE_MGR_RESPONSE_BACKSTEP;
                     if (backstep) {
                         hkLs_backstepAndFreezeEntireIsland(event.m_time, island, entityState, activeEntities);
-                        for (int32_t i = 0; i < activeEntities.m_size; i++) {
-                            hkpWorldAgentUtil::invalidateTim(activeEntities.m_data[i], *world->m_collisionInput);
+                        for (hkpEntity* entity : activeEntities) {
+                            hkpWorldAgentUtil::invalidateTim(entity, *world->m_collisionInput);
                         }
                         activeEntities.m_size = 0;
                     }
@@ -928,16 +925,16 @@ hkResult hkLs_localizedSolveToi(
                 entityState[activeEntities.m_data[1]->m_storageIndex] = HK_TOI_ENTITY_STATE_ACTIVE;
             }
         }
-        for (int32_t i = 0; i < activeEntities.m_size; i++) {
-            hkSweptTransformUtil::backStepMotionState(event.m_time, activeEntities.m_data[i]->m_motion.m_motionState);
+        for (hkpEntity* entity : activeEntities) {
+            hkSweptTransformUtil::backStepMotionState(event.m_time, entity->m_motion.m_motionState);
         }
         hkpConstraintSolverSetup::oneStepIntegrate(
             *solverResources.m_solverInfo, *solverResources.m_stepInfo, solverResources.m_accumulators,
             activeEntities.m_data, activeEntities.m_size
         );
         hkLs_restoreTransformOnBodiesWithUpdatedTransform(island, entityState, solverResources);
-        for (int32_t i = 0; i < activeEntities.m_size; i++) {
-            hkpWorldAgentUtil::invalidateTim(activeEntities.m_data[i], *world->m_collisionInput);
+        for (hkpEntity* entity : activeEntities) {
+            hkpWorldAgentUtil::invalidateTim(entity, *world->m_collisionInput);
         }
     }
 

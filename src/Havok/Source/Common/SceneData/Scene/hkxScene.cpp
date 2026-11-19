@@ -79,8 +79,7 @@ hkResult hkxScene::getWorldFromNodeTransform(const hkxNode* theNode, hkMatrix4& 
         worldFromNodeOut.m_col1.m_quad[1] = 1.0f;
         worldFromNodeOut.m_col2.m_quad[2] = 1.0f;
         worldFromNodeOut.m_col3.m_quad[3] = 1.0f;
-        for (int32_t i = 0; i < pathOut.m_size; ++i) {
-            const hkxNode* pNode = pathOut.m_data[i];
+        for (const hkxNode* pNode : pathOut) {
             int32_t numKeys = pNode->m_keyFrames.m_size;
             int32_t frame = key >= numKeys ? numKeys - 1 : key;
             worldFromNodeOut.mul(&pNode->m_keyFrames.m_data[frame]);

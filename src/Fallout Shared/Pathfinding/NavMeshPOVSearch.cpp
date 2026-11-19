@@ -329,9 +329,8 @@ bool NavMeshPOVSearch::CheckSegmentAgainstNavMesh(
 float NavMeshPOVSearch::CheckArcAgainstPOVs(NavMeshPOV* apThisPOV, AngleSinCosArc aArc, NavMeshPOV* apIgnorePOV) {
     Sphere thisSphere(apThisPOV->Center, apThisPOV->fRadius);
     NiPoint3 kStart = thisSphere.Center + aArc.Start.ComputePoint3(thisSphere.fRadius);
-    for (uint32_t i = 0; i < POVs.iSize; ++i) {
-        for (uint32_t j = 0; j < (&POVs.GetAt(static_cast<int32_t>(i)))->iSize; ++j) {
-            NavMeshPOV* pPOV = (&POVs.GetAt(static_cast<int32_t>(i)))->GetAt(static_cast<int32_t>(j));
+    for (const auto& rPOVArray : POVs) {
+        for (NavMeshPOV* pPOV : rPOVArray) {
             if (pPOV == apIgnorePOV || pPOV == apThisPOV) {
                 continue;
             }
@@ -424,9 +423,8 @@ float NavMeshPOVSearch::CheckSegmentAgainstPOVs(
     const NiPoint3& aGoal,
     NavMeshPOV* apIgnorePOV
 ) {
-    for (uint32_t i = 0; i < POVs.iSize; ++i) {
-        for (uint32_t j = 0; j < (&POVs.GetAt(static_cast<int32_t>(i)))->iSize; ++j) {
-            NavMeshPOV* pPOV = (&POVs.GetAt(static_cast<int32_t>(i)))->GetAt(static_cast<int32_t>(j));
+    for (const auto& rPOVArray : POVs) {
+        for (NavMeshPOV* pPOV : rPOVArray) {
             if (pPOV == apIgnorePOV || pPOV == apThisPOV) {
                 continue;
             }
@@ -489,9 +487,8 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
     }
     // A POV for every vertex POV handle; a vertex between two edges with extra info is a portal.
     for (uint32_t i = 0; i < povs.iSize; ++i) {
-        for (uint32_t j = 0; j < povs.GetAt(static_cast<int32_t>(i)).iSize; ++j) {
-            FastNavMeshVertHandle* hthisPov = &povs.GetAt(static_cast<int32_t>(i)).GetAt(static_cast<int32_t>(j));
-            if (!hthisPov->pNavMesh->GetPOVForVertex(hthisPov->usVertex, pov)) {
+        for (const FastNavMeshVertHandle& hthisPov : povs.GetAt(static_cast<int32_t>(i))) {
+            if (!hthisPov.pNavMesh->GetPOVForVertex(hthisPov.usVertex, pov)) {
                 continue;
             }
             NavMeshPOV* pNewPOV;
@@ -504,18 +501,18 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
             }
             NavMeshPOV* ppov = pNewPOV;
             ppov->eType = NavMeshPOV::POV_TYPE_VERTEX;
-            ppov->Center = hthisPov->pNavMesh->GetVertex(hthisPov->usVertex)->Location;
+            ppov->Center = hthisPov.pNavMesh->GetVertex(hthisPov.usVertex)->Location;
             ppov->fRadius = pRequest->fActorRadius;
-            ppov->iVertexIndex = hthisPov->usVertex;
-            NavMeshTriangle* ptri1 = hthisPov->pNavMesh->GetTriangle(pov.Edge1.QTriangle());
-            NavMeshTriangle* ptri2 = hthisPov->pNavMesh->GetTriangle(pov.Edge2.QTriangle());
+            ppov->iVertexIndex = hthisPov.usVertex;
+            NavMeshTriangle* ptri1 = hthisPov.pNavMesh->GetTriangle(pov.Edge1.QTriangle());
+            NavMeshTriangle* ptri2 = hthisPov.pNavMesh->GetTriangle(pov.Edge2.QTriangle());
             if (ptri1->EdgeHasExtraInfo(pov.Edge1.QEdge()) || ptri2->EdgeHasExtraInfo(pov.Edge2.QEdge())) {
                 ppov->eType = NavMeshPOV::POV_TYPE_PORTAL;
             }
             int32_t iEdge1 = pov.Edge1.QEdge();
-            NavMeshEdgeVertices verts1 = hthisPov->pNavMesh->GetEdgeVertices(pov.Edge1.QTriangle(), iEdge1);
+            NavMeshEdgeVertices verts1 = hthisPov.pNavMesh->GetEdgeVertices(pov.Edge1.QTriangle(), iEdge1);
             int32_t iEdge2 = pov.Edge2.QEdge();
-            NavMeshEdgeVertices verts2 = hthisPov->pNavMesh->GetEdgeVertices(pov.Edge2.QTriangle(), iEdge2);
+            NavMeshEdgeVertices verts2 = hthisPov.pNavMesh->GetEdgeVertices(pov.Edge2.QTriangle(), iEdge2);
             ppov->Edge1 = verts1.Vertices[1]->Location - verts1.Vertices[0]->Location;
             ppov->Edge2 = verts2.Vertices[1]->Location - verts2.Vertices[0]->Location;
             ppov->Edge1.z = 0.0f;
@@ -526,9 +523,7 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
     // Two POVs for every obstacle POV handle, each the other's duplicate: one of the actor's radius and one of radius
     // 10 at twice the cost.
     for (uint32_t i = 0; i < obstaclePovs.iSize; ++i) {
-        for (uint32_t j = 0; j < obstaclePovs.GetAt(static_cast<int32_t>(i)).iSize; ++j) {
-            FastNavMeshVertHandle* hthisPov =
-                &obstaclePovs.GetAt(static_cast<int32_t>(i)).GetAt(static_cast<int32_t>(j));
+        for (const FastNavMeshVertHandle& hthisPov : obstaclePovs.GetAt(static_cast<int32_t>(i))) {
             NavMeshPOV* pNewPOV;
             NavMeshPOV* pMemory = static_cast<NavMeshPOV*>(ourMalloc(sizeof(NavMeshPOV)));
             if (pMemory) {
@@ -539,9 +534,9 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
             }
             NavMeshPOV* ppov = pNewPOV;
             ppov->eType = NavMeshPOV::POV_TYPE_OBSTACLE;
-            ppov->Center = hthisPov->pNavMesh->GetVertex(hthisPov->usVertex)->Location;
+            ppov->Center = hthisPov.pNavMesh->GetVertex(hthisPov.usVertex)->Location;
             ppov->fRadius = pRequest->fActorRadius;
-            ppov->iVertexIndex = hthisPov->usVertex;
+            ppov->iVertexIndex = hthisPov.usVertex;
             aRetPOVs.GetAt(static_cast<int32_t>(i)).Add(ppov);
             NavMeshPOV* pNewSecondPOV;
             NavMeshPOV* pSecondMemory = static_cast<NavMeshPOV*>(ourMalloc(sizeof(NavMeshPOV)));
@@ -553,9 +548,9 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
             }
             NavMeshPOV* psecondPOV = pNewSecondPOV;
             psecondPOV->eType = NavMeshPOV::POV_TYPE_OBSTACLE;
-            psecondPOV->Center = hthisPov->pNavMesh->GetVertex(hthisPov->usVertex)->Location;
+            psecondPOV->Center = hthisPov.pNavMesh->GetVertex(hthisPov.usVertex)->Location;
             psecondPOV->fRadius = 10.0f;
-            psecondPOV->iVertexIndex = hthisPov->usVertex;
+            psecondPOV->iVertexIndex = hthisPov.usVertex;
             psecondPOV->fCostFactor = 2.0f;
             aRetPOVs.GetAt(static_cast<int32_t>(i)).Add(psecondPOV);
             ppov->pDuplicates->Add(psecondPOV);
@@ -585,9 +580,8 @@ bool NavMeshPOVSearch::BuildPOVListForTriangles(
                     }
                 }
                 else {
-                    for (uint32_t m = 0; m < aRetPOVs.GetAt(static_cast<int32_t>(k)).iSize; ++m) {
-                        NiPoint3* pOtherCenter =
-                            &aRetPOVs.GetAt(static_cast<int32_t>(k)).GetAt(static_cast<int32_t>(m))->Center;
+                    for (NavMeshPOV* pOtherPOV : aRetPOVs.GetAt(static_cast<int32_t>(k))) {
+                        NiPoint3* pOtherCenter = &pOtherPOV->Center;
                         NavMeshPOV* pThisPOV = aRetPOVs.GetAt(static_cast<int32_t>(i)).GetAt(static_cast<int32_t>(j));
                         if (fSqrDuplicateTolerance > (pThisPOV->Center - *pOtherCenter).SqrLength()) {
                             RemoveIndex findIndex(static_cast<int32_t>(i), static_cast<int32_t>(j));

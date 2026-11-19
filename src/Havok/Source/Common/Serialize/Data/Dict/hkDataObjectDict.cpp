@@ -86,8 +86,7 @@ hkDataClassImpl* hkDataWorldDict::newClass(const hkDataClass::Cinfo& cinfo) {
     }
     ++pClass->m_count;
     m_tracker->trackClass(pClass);
-    for (int32_t i = 0; i < cinfo.members.m_size; ++i) {
-        const hkDataClass::Cinfo::Member& rMember = cinfo.members.m_data[i];
+    for (const hkDataClass::Cinfo::Member& rMember : cinfo.members) {
         InternedString kName = m_tracker->intern(rMember.name);
         InternedStringHandle kTypeName;
         // addMember is handed the pointer the handle's maker returns.
@@ -240,14 +239,14 @@ void hkDataWorldDict::removeClassMember(hkDataClass& klass, const char* name) {
     const char* className = klass.getName();
     objs.m_size = 0;
     m_tracker->findTrackedObjectsByBase(className, 1, 0, objs);
-    for (int32_t i = 0; i < objs.m_size; ++i) {
-        static_cast<hkDataObjectDict*>(objs.m_data[i])->removeMember(internedName);
+    for (hkDataObjectImpl* pObj : objs) {
+        static_cast<hkDataObjectDict*>(pObj)->removeMember(internedName);
     }
 
     hkArray<hkDataArrayImpl*> arrays;
     m_tracker->getTrackedStructArrays(pClass, 1, arrays);
-    for (int32_t i = 0; i < arrays.m_size; ++i) {
-        static_cast<StructArrayImplementation*>(arrays.m_data[i])->removeMember(internedName);
+    for (hkDataArrayImpl* pArray : arrays) {
+        static_cast<StructArrayImplementation*>(pArray)->removeMember(internedName);
     }
 
     pClass->removeMember(internedName);
@@ -286,8 +285,7 @@ hkDataClassImpl* hkDataWorldDict::copyClassFromWorld(const char* name, const hkD
     srcClass.getAllDeclaredMemberInfo(minfos);
     cinfo.members.reserve(minfos.m_size);
     hkDataClass dstClass(pNewClass);
-    for (int32_t i = 0; i < minfos.m_size; ++i) {
-        const hkDataClass::MemberInfo& rInfo = minfos.m_data[i];
+    for (const hkDataClass::MemberInfo& rInfo : minfos) {
         const char* pTypeName = nullptr;
         if (rInfo.m_class) {
             pTypeName = rInfo.m_class->getName();
@@ -798,19 +796,18 @@ void hkDataClassDict::selfDestruct() {
         while (i < m_size);
     }
     m_memberInfo.m_size = 0;
-    for (int32_t i = 0; i < m_enums.m_size; ++i) {
-        hkDataClassDict::Enum* v7 = m_enums.m_data[i];
-        if (v7) {
+    for (hkDataClassDict::Enum* pEnum : m_enums) {
+        if (pEnum) {
             hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-            int32_t m_capacityAndFlags = v7->m_items.m_capacityAndFlags;
-            v7->m_items.m_size = 0;
+            int32_t m_capacityAndFlags = pEnum->m_items.m_capacityAndFlags;
+            pEnum->m_items.m_size = 0;
             if (m_capacityAndFlags >= 0) {
-                m_heap->bufFree(v7->m_items.begin(), sizeof(hkDataClassDict::Enum::Item) * m_capacityAndFlags);
+                m_heap->bufFree(pEnum->m_items.begin(), sizeof(hkDataClassDict::Enum::Item) * m_capacityAndFlags);
             }
-            v7->m_items.m_data = nullptr;
-            v7->m_items.m_capacityAndFlags = hkArrayBase<hkDataClassDict::Enum::Item>::DONT_DEALLOCATE_FLAG;
+            pEnum->m_items.m_data = nullptr;
+            pEnum->m_items.m_capacityAndFlags = hkArrayBase<hkDataClassDict::Enum::Item>::DONT_DEALLOCATE_FLAG;
             hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-            Instance->m_heap->blockFree(v7, sizeof(hkDataClassDict::Enum));
+            Instance->m_heap->blockFree(pEnum, sizeof(hkDataClassDict::Enum));
         }
     }
     m_enums.m_size = 0;
@@ -856,8 +853,7 @@ hkDataWorldDict::ObjectTracker::~ObjectTracker() {
             m_objectsFromClass.remove(pClass);
         }
     }
-    for (int32_t i = 0; i < objects.m_size; ++i) {
-        hkDataObjectDict* pObject = objects.m_data[i];
+    for (hkDataObjectDict* pObject : objects) {
         if (pObject->m_externalCount > 0) {
             char acBuffer[0x200];
             hkErrStream kStream(acBuffer, 0x200);
@@ -873,14 +869,12 @@ hkDataWorldDict::ObjectTracker::~ObjectTracker() {
         }
         pObject->selfDestruct();
     }
-    for (int32_t i = 0; i < objects.m_size; ++i) {
-        hkDataObjectDict* pObject = objects.m_data[i];
+    for (hkDataObjectDict* pObject : objects) {
         if (--pObject->m_count == 0) {
             delete pObject;
         }
     }
-    for (int32_t i = 0; i < classes.m_size; ++i) {
-        hkDataClassDict* pClass = classes.m_data[i];
+    for (hkDataClassDict* pClass : classes) {
         if (--pClass->m_count == 0) {
             delete pClass;
         }
@@ -1024,8 +1018,7 @@ void hkDataWorldDict::ObjectTracker::removeClassContent(hkDataClassDict* klass) 
         iObject = m_objectsFromClass.m_valueChain.m_data[iObject].next;
     }
     while (iObject != -1);
-    for (int32_t i = 0; i < objects.m_size; ++i) {
-        hkDataObjectDict* pObject = objects.m_data[i];
+    for (hkDataObjectDict* pObject : objects) {
         if (m_topLevelObject == pObject) {
             m_topLevelObject = nullptr;
         }
@@ -1046,8 +1039,7 @@ void hkDataWorldDict::ObjectTracker::removeClassContent(hkDataClassDict* klass) 
         }
         pObject->selfDestruct();
     }
-    for (int32_t j = 0; j < objects.m_size; ++j) {
-        hkDataObjectDict* pObject = objects.m_data[j];
+    for (hkDataObjectDict* pObject : objects) {
         if (--pObject->m_count == 0) {
             delete pObject;
         }
@@ -1339,8 +1331,7 @@ PointerArrayImplementation::PointerArrayImplementation(const hkDataClassImpl* a1
 
 // Each object and the class lose the array's reference; the array frees itself.
 PointerArrayImplementation::~PointerArrayImplementation() {
-    for (int32_t i = 0; i < m_data.m_size; ++i) {
-        hkDataObjectImpl* pObject = m_data.m_data[i];
+    for (hkDataObjectImpl* pObject : m_data) {
         if ((pObject) && (pObject->m_count-- == 1)) {
             delete pObject;
         }
@@ -1559,8 +1550,8 @@ void IntArrayImplementation::setAll(const uint64_t* v, int32_t n) {
 
 // The strings the array owns are freed; the array frees itself.
 CstringArrayImplementation::~CstringArrayImplementation() {
-    for (int32_t i = 0; i < m_data.m_size; ++i) {
-        hkString::strFree(m_data.m_data[i]);
+    for (char* pString : m_data) {
+        hkString::strFree(pString);
     }
 }
 
@@ -1933,8 +1924,8 @@ StructArrayImplementation::StructArrayImplementation(const hkDataClassDict* a1)
 // Each member's values lose the array's reference, the array leaves its class's tracked arrays and the class loses its
 // reference; the member array frees itself.
 StructArrayImplementation::~StructArrayImplementation() {
-    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
-        hkDataArrayImpl* pValues = m_memberData.m_data[i].m_values;
+    for (const MemberData& member : m_memberData) {
+        hkDataArrayImpl* pValues = member.m_values;
         if (pValues->m_count-- == 1) {
             delete pValues;
         }
@@ -1979,8 +1970,8 @@ void StructArrayImplementation::clear() {
 }
 
 void StructArrayImplementation::reserve(int32_t n) {
-    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
-        m_memberData.m_data[i].m_values->reserve(n);
+    for (const MemberData& member : m_memberData) {
+        member.m_values->reserve(n);
     }
 }
 
@@ -2170,8 +2161,8 @@ hkDataObject::Value hkDataObjectDict::accessByName(const char* name) {
 // Whether the object has a member called name. Member names are interned, so they compare by pointer.
 int32_t hkDataObjectDict::hasMember(const char* name) const {
     InternedString pName = m_class->m_world->m_tracker->intern(name);
-    for (int32_t i = 0; i < m_memberData.m_size; ++i) {
-        if (m_memberData.m_data[i].m_memberName == pName) {
+    for (const MemberData& member : m_memberData) {
+        if (member.m_memberName == pName) {
             return 1;
         }
     }

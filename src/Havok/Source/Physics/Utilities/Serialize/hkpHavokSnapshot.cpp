@@ -32,9 +32,9 @@
 
 // Deletes the objects addObjectCallback created; the array goes with its member.
 hkpHavokSnapshot::ConvertListener::~ConvertListener() {
-    for (int32_t i = 0; i < m_objects.m_size; ++i) {
-        if (m_objects.m_data[i]) {
-            delete m_objects.m_data[i];
+    for (hkReferencedObject* pObject : m_objects) {
+        if (pObject) {
+            delete pObject;
         }
     }
 }

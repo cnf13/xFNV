@@ -123,8 +123,8 @@ void hkpSimulationIsland::calcContentStatistics(hkStatisticsCollector* collector
             static_cast<int32_t>(sizeof(*m_actions.m_data)) * m_actions.m_size, v13
         );
     }
-    for (int32_t j = 0; j < m_actions.m_size; ++j) {
-        collector->addReferencedObject("Actions", m_actions.m_data[j], 0);
+    for (hkpAction* action : m_actions) {
+        collector->addReferencedObject("Actions", action, 0);
     }
     hkpAgentMachineUtil::calcNnStatisticsContactMgrsOnly(m_agentTrack, collector);
     collector->pushDir("CollAgents");
@@ -151,8 +151,8 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
     for (int32_t e = 0; e < m_entities.m_size; e++) {
         hkpEntity* entity = m_entities.m_data[e];
         hkArray<hkpLinkedCollidable::CollisionEntry>& collisionEntries = entity->m_collidable.m_collisionEntries;
-        for (int32_t i = 0; i < collisionEntries.m_size; i++) {
-            hkpEntity* otherEntity = static_cast<hkpEntity*>(collisionEntries.m_data[i].m_partner->getOwner());
+        for (const hkpLinkedCollidable::CollisionEntry& entry : collisionEntries) {
+            hkpEntity* otherEntity = static_cast<hkpEntity*>(entry.m_partner->getOwner());
             if (!otherEntity->isFixed().m_bool) {
                 checkConnectivityOut.addEdge(e, otherEntity->m_storageIndex);
                 if (checkConnectivityOut.isOneGroup().m_bool) {
@@ -161,12 +161,10 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
             }
         }
     }
-    for (int32_t e = 0; e < m_entities.m_size; e++) {
-        hkpEntity* entity = m_entities.m_data[e];
-        for (int32_t i = 0; i < entity->m_constraintsMaster.m_size; i++) {
-            hkConstraintInternal* con = &entity->m_constraintsMaster.begin()[i];
-            if (!con->m_entities[0]->isFixed().m_bool && !con->m_entities[1]->isFixed().m_bool) {
-                checkConnectivityOut.addEdge(con->m_entities[0]->m_storageIndex, con->m_entities[1]->m_storageIndex);
+    for (hkpEntity* entity : m_entities) {
+        for (const hkConstraintInternal& con : entity->m_constraintsMaster) {
+            if (!con.m_entities[0]->isFixed().m_bool && !con.m_entities[1]->isFixed().m_bool) {
+                checkConnectivityOut.addEdge(con.m_entities[0]->m_storageIndex, con.m_entities[1]->m_storageIndex);
                 if (checkConnectivityOut.isOneGroup().m_bool) {
                     return true;
                 }
@@ -174,8 +172,7 @@ bool hkpSimulationIsland::isFullyConnected(hkUnionFind& checkConnectivityOut) {
         }
     }
     hkInplaceArray<hkpEntity*, 10, hkContainerHeapAllocator> actionEntities;
-    for (int32_t j = 0; j < m_actions.m_size; j++) {
-        hkpAction* action = m_actions.m_data[j];
+    for (hkpAction* action : m_actions) {
         if (action) {
             actionEntities.clear();
             action->getEntities(actionEntities);

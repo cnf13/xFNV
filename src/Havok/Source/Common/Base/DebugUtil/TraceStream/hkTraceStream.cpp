@@ -133,8 +133,8 @@ const hkClass& hkTraceStream::Title::staticClass() {
 hkTraceStream::~hkTraceStream() {}
 
 void hkTraceStream::printf(const char* title, const char* fmt, ...) {
-    for (int32_t i = 0; i < m_titles.m_size; ++i) {
-        if (hkString::strCmp(m_titles.m_data[i].m_value, title) == 0) {
+    for (const Title& rTitle : m_titles) {
+        if (hkString::strCmp(rTitle.m_value, title) == 0) {
             return;
         }
     }

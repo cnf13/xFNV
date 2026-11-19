@@ -90,9 +90,9 @@ NavMeshObstacleCutter::NavMeshObstacleCutter()
 
 // The edges live on the cutter's scrap heap and are never destroyed: their obstacle references are released here.
 NavMeshObstacleCutter::~NavMeshObstacleCutter() {
-    for (uint32_t i = 0; i < Edges.iSize; ++i) {
-        if (Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject) {
-            Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject->DecRefCount();
+    for (NavMeshObstacleEdge* pEdge : Edges) {
+        if (pEdge->spObstacle.m_pObject) {
+            pEdge->spObstacle.m_pObject->DecRefCount();
         }
     }
 }
@@ -106,9 +106,9 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
     pNavMesh = apNavMesh;
     this->spObstacle = aBox;
     this->Vertices.Clear(false);
-    for (uint32_t i = 0; i < this->Edges.iSize; ++i) {
-        if (this->Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject) {
-            this->Edges.GetAt(static_cast<int32_t>(i))->spObstacle.m_pObject->DecRefCount();
+    for (NavMeshObstacleEdge* pEdge : this->Edges) {
+        if (pEdge->spObstacle.m_pObject) {
+            pEdge->spObstacle.m_pObject->DecRefCount();
         }
     }
     this->Edges.Clear(false);
@@ -128,14 +128,12 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
     this->pUndoData->iFirstAddedTriangleIndex = this->pNavMesh->GetTriangleCount();
     this->iMaxObstacleCount = this->GetTrianglesMaxObstacleCount();
     this->GetModifiedTriangleList(this->pUndoData->BoundsTriangles);
-    for (uint32_t i_2 = 0; i_2 < this->pUndoData->OverlappedTriangles.iSize; ++i_2) {
-        uint16_t* pusTriangle = &this->pUndoData->OverlappedTriangles.GetAt(static_cast<int32_t>(i_2));
-        NavMeshTriangle* pTriangle = this->pNavMesh->GetTriangle(*pusTriangle);
+    for (uint16_t usTriangle : this->pUndoData->OverlappedTriangles) {
+        NavMeshTriangle* pTriangle = this->pNavMesh->GetTriangle(usTriangle);
         pTriangle->SetFlag(32);
     }
     this->GenerateOutsideVertsAndEdges();
-    for (uint32_t i_3 = 0; i_3 < this->pUndoData->OverlappedTriangles.iSize; ++i_3) {
-        uint16_t ustriangle = this->pUndoData->OverlappedTriangles.GetAt(static_cast<int32_t>(i_3));
+    for (uint16_t ustriangle : this->pUndoData->OverlappedTriangles) {
         NiPointer<ObstacleData> sppreviousObstacle(static_cast<ObstacleData*>(nullptr));
         if (this->pNavMesh->pTriangleToObstacleMap->GetAt(ustriangle, sppreviousObstacle)) {
             // The by-value argument is copied by NiPointer's copy constructor.
@@ -145,9 +143,9 @@ bool NavMeshObstacleCutter::SplitNavMeshFromObstacle(
     }
     this->GenerateBoxVertsAndEdges();
     this->SplitEdges();
-    for (uint32_t i_4 = 0; i_4 < this->Vertices.iSize; ++i_4) {
-        if (this->IsVertInObstacleArea(this->Vertices.GetAt(static_cast<int32_t>(i_4)))) {
-            this->Vertices.GetAt(static_cast<int32_t>(i_4))->bInObstacleArea = true;
+    for (NavMeshObstacleVertex* pVertex : this->Vertices) {
+        if (this->IsVertInObstacleArea(pVertex)) {
+            pVertex->bInObstacleArea = true;
         }
     }
     this->RemoveInvalidEdges();
@@ -390,9 +388,8 @@ void NavMeshObstacleCutter::GetModifiedTriangleList(BSSimpleArray<BoundsTriangle
                             boundsTriangle, 0, &BSSimpleArray<uint16_t, 1024>::DefaultEqualFunctionByAddress
                         ) == -1) {
                         bool bInList = false;
-                        for (uint32_t j = 0; j < aBoundsTriangle.iSize; ++j) {
-                            int32_t usTriangleIndex =
-                                (&aBoundsTriangle.GetAt(static_cast<int32_t>(j)))->usTriangleIndex;
+                        for (const BoundsTriangleInfo& rBoundsInfo : aBoundsTriangle) {
+                            int32_t usTriangleIndex = rBoundsInfo.usTriangleIndex;
                             if (usTriangleIndex == boundsTriangle) {
                                 bInList = true;
                                 break;
@@ -818,10 +815,10 @@ void NavMeshObstacleCutter::CreateRemainingEdges() {
 }
 
 void NavMeshObstacleCutter::AddNewPOVs() {
-    for (uint32_t i = 0; i < Vertices.iSize; ++i) {
-        if (Vertices.GetAt(i)->bOnObstacle) {
-            pNavMesh->ObstaclePOVs.Add(Vertices.GetAt(i)->usVertexIndex);
-            pUndoData->AddedPOVs.Add(Vertices.GetAt(i)->usVertexIndex);
+    for (NavMeshObstacleVertex* pVertex : Vertices) {
+        if (pVertex->bOnObstacle) {
+            pNavMesh->ObstaclePOVs.Add(pVertex->usVertexIndex);
+            pUndoData->AddedPOVs.Add(pVertex->usVertexIndex);
         }
     }
 }
@@ -833,23 +830,23 @@ void NavMeshObstacleCutter::SetObstacleCount() {
         NavMeshTriangle* Triangle = pNavMesh->GetTriangle(i);
         Triangle->SetObjectCount(v3);
     }
-    for (uint32_t auiIndex = 0; auiIndex < pUndoData->BoundsTriangles.iSize; ++auiIndex) {
-        NavMeshTriangle* v5 = pNavMesh->GetTriangle((&pUndoData->BoundsTriangles.GetAt(auiIndex))->usTriangleIndex);
+    for (const BoundsTriangleInfo& rBoundsInfo : pUndoData->BoundsTriangles) {
+        NavMeshTriangle* v5 = pNavMesh->GetTriangle(rBoundsInfo.usTriangleIndex);
         uint16_t ObjectCount = v5->GetObjectCount();
         v5->SetObjectCount(ObjectCount + 1);
     }
 }
 
 void NavMeshObstacleCutter::ConnectTriangles() {
-    for (uint32_t i = 0; i < Edges.iSize; ++i) {
-        if (Edges.GetAt(i)->Triangles[0] != 0xFFFF && Edges.GetAt(i)->Triangles[1] != 0xFFFF) {
-            uint16_t v5 = Edges.GetAt(i)->Triangles[1];
-            uint32_t v3 = Edges.GetAt(i)->TriangleEdges[0];
-            NavMeshTriangle* Triangle = pNavMesh->GetTriangle(Edges.GetAt(i)->Triangles[0]);
+    for (NavMeshObstacleEdge* pEdge : Edges) {
+        if (pEdge->Triangles[0] != 0xFFFF && pEdge->Triangles[1] != 0xFFFF) {
+            uint16_t v5 = pEdge->Triangles[1];
+            uint32_t v3 = pEdge->TriangleEdges[0];
+            NavMeshTriangle* Triangle = pNavMesh->GetTriangle(pEdge->Triangles[0]);
             Triangle->SetTri(v3, v5);
-            uint16_t v6 = Edges.GetAt(i)->Triangles[0];
-            uint32_t v4 = Edges.GetAt(i)->TriangleEdges[1];
-            NavMeshTriangle* v2 = pNavMesh->GetTriangle(Edges.GetAt(i)->Triangles[1]);
+            uint16_t v6 = pEdge->Triangles[0];
+            uint32_t v4 = pEdge->TriangleEdges[1];
+            NavMeshTriangle* v2 = pNavMesh->GetTriangle(pEdge->Triangles[1]);
             v2->SetTri(v4, v6);
         }
     }
@@ -1051,12 +1048,12 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
     // The indices into aPortalSwaps.PotentialChildren of the children the undone swaps leave stale.
     using childSwapsToRemove_t = BSSimpleArray<uint32_t, 1024>;
     childSwapsToRemove_t childSwapsToRemove;
-    for (uint32_t i = 0; i < pUndoData->EdgeSwap.iSize; ++i) {
+    for (const PortalEdgeSwap& rSwap : pUndoData->EdgeSwap) {
         // The swap the other way round: the old edge becomes the new one and the new one the old.
         reverseSwap.~PortalEdgeSwap();
         ::new (&reverseSwap) PortalEdgeSwap;
-        reverseSwap.hNewEdge.Copy(pUndoData->EdgeSwap.GetAt(static_cast<int32_t>(i)).hOldEdge);
-        reverseSwap.hOldEdge.Copy(pUndoData->EdgeSwap.GetAt(static_cast<int32_t>(i)).hNewEdge);
+        reverseSwap.hNewEdge.Copy(rSwap.hOldEdge);
+        reverseSwap.hOldEdge.Copy(rSwap.hNewEdge);
         reverseSwap.bFromAddition = false;
         uint32_t index =
             static_cast<uint32_t>(aPortalSwaps.PotentialChildren.Find(reverseSwap.hOldEdge, 0, &EdgeHandleEqual));
@@ -1081,23 +1078,19 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
             aPortalSwaps.PotentialChildren.Remove(childSwapsToRemove.GetAt(i_2), true);
         }
     }
-    for (uint32_t i_3 = 0; i_3 < pUndoData->OverlappedTriangles.iSize; ++i_3) {
-        uint16_t* pusTriangle = &pUndoData->OverlappedTriangles.GetAt(static_cast<int32_t>(i_3));
-        NavMeshTriangle* ptri = pNavMesh->GetTriangle(*pusTriangle);
+    for (uint16_t usTriangle : pUndoData->OverlappedTriangles) {
+        NavMeshTriangle* ptri = pNavMesh->GetTriangle(usTriangle);
         ptri->ClearFlag(32);
     }
-    for (uint32_t i_4 = 0; i_4 < pUndoData->BoundsTriangles.iSize; ++i_4) {
-        NavMeshTriangle* ptri_2 =
-            pNavMesh->GetTriangle(pUndoData->BoundsTriangles.GetAt(static_cast<int32_t>(i_4)).usTriangleIndex);
+    for (const BoundsTriangleInfo& rBoundsInfo : pUndoData->BoundsTriangles) {
+        NavMeshTriangle* ptri_2 = pNavMesh->GetTriangle(rBoundsInfo.usTriangleIndex);
         ptri_2->ClearFlag(256);
         for (int32_t e = 0; e < 3; ++e) {
-            if (pUndoData->BoundsTriangles.GetAt(static_cast<int32_t>(i_4)).bPortals[e]) {
-                ptri_2->SetEdgeExtraInfo(e, pUndoData->BoundsTriangles.GetAt(static_cast<int32_t>(i_4)).Triangles[e]);
+            if (rBoundsInfo.bPortals[e]) {
+                ptri_2->SetEdgeExtraInfo(e, rBoundsInfo.Triangles[e]);
             }
             else {
-                ptri_2->SetTri(
-                    static_cast<uint32_t>(e), pUndoData->BoundsTriangles.GetAt(static_cast<int32_t>(i_4)).Triangles[e]
-                );
+                ptri_2->SetTri(static_cast<uint32_t>(e), rBoundsInfo.Triangles[e]);
             }
         }
     }
@@ -1107,9 +1100,8 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
         NavMeshTriangle* pTriangle = pNavMesh->GetTriangle(static_cast<uint16_t>(i_5));
         pTriangle->SetFlag(32);
     }
-    for (uint32_t i_6 = 0; i_6 < pUndoData->BoundsTriangles.iSize; ++i_6) {
-        NavMeshTriangle* ptri_3 =
-            pNavMesh->GetTriangle(pUndoData->BoundsTriangles.GetAt(static_cast<int32_t>(i_6)).usTriangleIndex);
+    for (const BoundsTriangleInfo& rBoundsInfo : pUndoData->BoundsTriangles) {
+        NavMeshTriangle* ptri_3 = pNavMesh->GetTriangle(rBoundsInfo.usTriangleIndex);
         uint16_t usObjectCount = ptri_3->GetObjectCount();
         // Passes count - 1 unmasked.
         ptri_3->SetObjectCount(usObjectCount - 1);
@@ -1133,9 +1125,8 @@ bool NavMeshObstacleCutter::UndoNavMeshFromObstacleUndoData(
 }
 
 void NavMeshObstacleCutter::RemovePOVs() {
-    for (uint32_t i = 0; i < pUndoData->AddedPOVs.iSize; ++i) {
-        uint16_t* v1 = &pUndoData->AddedPOVs.GetAt(static_cast<int32_t>(i));
-        uint32_t iindex = pNavMesh->ObstaclePOVs.Find(*v1, 0, return_equals);
+    for (uint16_t usPOV : pUndoData->AddedPOVs) {
+        uint32_t iindex = pNavMesh->ObstaclePOVs.Find(usPOV, 0, return_equals);
         if (iindex != -1) {
             pNavMesh->ObstaclePOVs.RemoveFast(iindex, 1u);
         }

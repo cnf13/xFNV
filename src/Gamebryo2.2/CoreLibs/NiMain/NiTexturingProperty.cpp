@@ -271,12 +271,12 @@ NiTexturingProperty::NiTexturingProperty(
 
 // The maps, the shader maps and their array are owned; m_kMaps' buffer is released by its own destructor.
 NiTexturingProperty::~NiTexturingProperty() {
-    for (uint32_t i = 0; i < m_kMaps.m_usSize; ++i) {
-        delete m_kMaps.m_pBase[i];
+    for (Map* pkMap : m_kMaps) {
+        delete pkMap;
     }
     if (m_pkShaderMaps) {
-        for (uint32_t i = 0; i < m_pkShaderMaps->m_usSize; ++i) {
-            delete m_pkShaderMaps->m_pBase[i];
+        for (ShaderMap* pkMap : *m_pkShaderMaps) {
+            delete pkMap;
         }
         delete m_pkShaderMaps;
     }
@@ -491,22 +491,20 @@ void NiTexturingProperty::LinkObject(NiStream& kStream) {
     }
 }
 
-// The sizes are re-read on every iteration; the textures' own results are ignored.
+// The textures' own results are ignored.
 bool NiTexturingProperty::RegisterStreamables(NiStream& kStream) {
     if (!NiProperty::RegisterStreamables(kStream)) {
         return false;
     }
 
-    for (uint32_t i = 0; i < m_kMaps.GetSize(); ++i) {
-        Map* pkMap = m_kMaps.m_pBase[i];
+    for (Map* pkMap : m_kMaps) {
         if (pkMap && pkMap->m_spTexture) {
             pkMap->m_spTexture->RegisterStreamables(kStream);
         }
     }
 
     if (m_pkShaderMaps) {
-        for (uint32_t i = 0; i < m_pkShaderMaps->GetSize(); ++i) {
-            ShaderMap* pkMap = m_pkShaderMaps->m_pBase[i];
+        for (ShaderMap* pkMap : *m_pkShaderMaps) {
             if (pkMap && pkMap->m_spTexture) {
                 pkMap->m_spTexture->RegisterStreamables(kStream);
             }

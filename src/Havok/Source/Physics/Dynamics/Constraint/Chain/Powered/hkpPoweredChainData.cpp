@@ -187,10 +187,10 @@ hkpPoweredChainData::hkpPoweredChainData()
 
 // Releases each link's three motors; the compiler frees m_infos.
 hkpPoweredChainData::~hkpPoweredChainData() {
-    for (int32_t i = 0; i < m_infos.m_size; ++i) {
+    for (const ConstraintInfo& info : m_infos) {
         for (int32_t j = 0; j < 3; ++j) {
-            if (m_infos.m_data[i].m_motors[j]) {
-                m_infos.m_data[i].m_motors[j]->removeReference();
+            if (info.m_motors[j]) {
+                info.m_motors[j]->removeReference();
             }
         }
     }

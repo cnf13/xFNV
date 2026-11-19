@@ -203,8 +203,7 @@ void hkaSkeletonUtils::getLeaves(const hkaSkeleton& skeleton, hkArray<int16_t>& 
 
     isParent.setSize(skeleton.m_bones.m_size, false);
 
-    for (int32_t i = 0; i < skeleton.m_parentIndices.m_size; ++i) {
-        const int16_t parent = skeleton.m_parentIndices.m_data[i];
+    for (const int16_t parent : skeleton.m_parentIndices) {
         if (parent != -1) {
             isParent.m_data[parent].m_bool = true;
         }

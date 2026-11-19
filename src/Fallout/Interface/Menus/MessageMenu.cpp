@@ -684,10 +684,9 @@ void MessageMenu::ClearMessageQueueHead() {
 }
 
 void MessageMenu::ClearMessageQueue() {
-    for (uint32_t i = 0; i < MessageMenu::xEntryList.iSize; ++i) {
-        MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList[i];
-        if (v0) {
-            delete v0;
+    for (MessageMenu::MessageMenuEntry* pEntry : MessageMenu::xEntryList) {
+        if (pEntry) {
+            delete pEntry;
         }
     }
     MessageMenu::xEntryList.Clear(true);

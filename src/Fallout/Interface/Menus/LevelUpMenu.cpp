@@ -625,46 +625,43 @@ void LevelUpMenu::ResetSkillsFunc(Tile* apTile, ActorValue::Index a2) {
 }
 
 void LevelUpMenu::PerkUpdateFunc(Tile* apTile, ActorValue::Index aeIndex) {
-    for (int32_t ieffectCt = 0; ieffectCt < LevelUpMenu::PerkEffectList.iSize; ++ieffectCt) {
-        if ((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iActorValue == aeIndex) {
+    for (EffectItemData& rEffect : LevelUpMenu::PerkEffectList) {
+        if (rEffect.iActorValue == aeIndex) {
             double Float = apTile->GetFloat(g_levelUpMenu_Trait_BaseValue);
             double v17 = apTile->GetFloat(g_levelUpMenu_Trait_ExtraValue) + Float;
             int32_t itotalValue = static_cast<int32_t>(apTile->GetFloat(LevelUpMenu::iUT_AddedValue) + v17);
             int32_t iUT_Overflow = Tile::TextToTrait("_OverflowValue");
             if (apTile->GetFloat(iUT_Overflow) != 0.0) {
-                EffectItemData* v16 = &LevelUpMenu::PerkEffectList.GetAt(ieffectCt);
+                EffectItemData* v16 = &rEffect;
                 v16->iMagnitude += static_cast<int32_t>(apTile->GetFloat(iUT_Overflow));
                 apTile->Set(iUT_Overflow, 0.0f, true);
             }
-            double v15 = static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude + itotalValue);
+            double v15 = static_cast<double>(rEffect.iMagnitude + itotalValue);
             int32_t v2 = Tile::TextToTrait("_MaxValue");
             if (!(apTile->GetFloat(v2) < v15)) {
-                double v12 =
-                    static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude + itotalValue);
+                double v12 = static_cast<double>(rEffect.iMagnitude + itotalValue);
                 int32_t v5 = Tile::TextToTrait("_MinValue");
                 if (apTile->GetFloat(v5) > v12) {
-                    double v11 =
-                        static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude + itotalValue);
+                    double v11 = static_cast<double>(rEffect.iMagnitude + itotalValue);
                     int32_t v6 = Tile::TextToTrait("_MinValue");
                     int32_t idifference_2 = static_cast<int32_t>(v11 - apTile->GetFloat(v6));
                     int32_t iUT_Overflow_3 = Tile::TextToTrait("_OverflowValue");
                     apTile->Set(iUT_Overflow_3, idifference_2);
-                    EffectItemData* v10 = &LevelUpMenu::PerkEffectList.GetAt(ieffectCt);
+                    EffectItemData* v10 = &rEffect;
                     v10->iMagnitude -= idifference_2;
                 }
             }
             else {
-                double v14 =
-                    static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude + itotalValue);
+                double v14 = static_cast<double>(rEffect.iMagnitude + itotalValue);
                 int32_t v3 = Tile::TextToTrait("_MaxValue");
                 int32_t idifference = static_cast<int32_t>(v14 - apTile->GetFloat(v3));
                 int32_t iUT_Overflow_2 = Tile::TextToTrait("_OverflowValue");
                 apTile->Set(iUT_Overflow_2, idifference);
-                EffectItemData* v13 = &LevelUpMenu::PerkEffectList.GetAt(ieffectCt);
+                EffectItemData* v13 = &rEffect;
                 v13->iMagnitude -= idifference;
             }
             double v8 = apTile->GetFloat(g_levelUpMenu_Trait_ExtraValue);
-            float afValue = static_cast<double>((&LevelUpMenu::PerkEffectList.GetAt(ieffectCt))->iMagnitude) + v8;
+            float afValue = static_cast<double>(rEffect.iMagnitude) + v8;
             apTile->Set(g_levelUpMenu_Trait_ExtraValue, afValue, true);
         }
     }

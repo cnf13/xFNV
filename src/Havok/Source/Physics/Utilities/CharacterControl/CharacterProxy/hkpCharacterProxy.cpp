@@ -267,8 +267,7 @@ void hkpCharacterProxy::updateManifold(
     }
 
     // The start hits left at the smallest distance replace the manifold point they match, or are added.
-    for (int32_t j = 0; j < startPointHits.m_size; ++j) {
-        const hkpRootCdPoint& hit = startPointHits.m_data[j];
+    for (const hkpRootCdPoint& hit : startPointHits) {
         if (minimumPenetration == hit.m_contact.m_separatingNormal.m_quad[3]) {
             const int32_t index = findSurface(hit);
             if (index >= 0) {

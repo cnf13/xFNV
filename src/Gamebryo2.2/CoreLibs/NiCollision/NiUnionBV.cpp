@@ -39,8 +39,7 @@ void NiUnionBV::SaveBinary(NiStream& stream) {
     NiBoundingVolume::SaveBinary(stream);
     uint32_t uiCount = m_kBoundingVolume.GetSize();
     NiStreamSaveBinary(stream, uiCount);
-    for (uint32_t i = 0; i < m_kBoundingVolume.GetSize(); i++) {
-        NiBoundingVolume* pkABV = m_kBoundingVolume.GetAt(i);
+    for (NiBoundingVolume* pkABV : m_kBoundingVolume) {
         if (pkABV) {
             pkABV->SaveBinary(stream);
         }
@@ -168,8 +167,8 @@ void NiUnionBV::AddBoundingVolume(NiBoundingVolume* pkABV) {
     if (!pkABV) {
         return;
     }
-    for (uint32_t i = 0; i < m_kBoundingVolume.GetSize(); i++) {
-        if (m_kBoundingVolume.GetAt(i) == pkABV) {
+    for (NiBoundingVolume* pkMember : m_kBoundingVolume) {
+        if (pkMember == pkABV) {
             return;
         }
     }
@@ -177,8 +176,8 @@ void NiUnionBV::AddBoundingVolume(NiBoundingVolume* pkABV) {
 }
 
 void NiUnionBV::RemoveAllBoundingVolumes() {
-    for (uint32_t i = 0; i < m_kBoundingVolume.GetSize(); i++) {
-        delete m_kBoundingVolume.GetAt(i);
+    for (NiBoundingVolume* pkMember : m_kBoundingVolume) {
+        delete pkMember;
     }
     m_kBoundingVolume.RemoveAll();
 }

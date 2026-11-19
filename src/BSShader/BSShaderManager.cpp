@@ -1307,8 +1307,7 @@ void BSShaderManager::SetObjectTypeRecurse(NiAVObject* apObject, eObjectType aeO
         return;
     }
     NiNode* pNode = static_cast<NiNode*>(apObject);
-    for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pChild : pNode->m_kChildren) {
         if (pChild) {
             SetObjectTypeRecurse(pChild, aeObjectType);
         }
@@ -1326,8 +1325,7 @@ void BSShaderManager::RecursiveSetForcedDarkness(NiAVObject* apObj, float afForc
     // Tests IsNode's result but reads the children through apObj, not through the result.
     if (apObj->IsNode()) {
         NiNode* pNode = static_cast<NiNode*>(apObj);
-        for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pChild : pNode->m_kChildren) {
             if (pChild) {
                 BSShaderManager::RecursiveSetForcedDarkness(pChild, afForcedDarkness);
             }

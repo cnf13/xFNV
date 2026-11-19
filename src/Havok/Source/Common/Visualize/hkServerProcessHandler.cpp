@@ -44,8 +44,8 @@ hkServerProcessHandler::hkServerProcessHandler(
 // The handler owns its processes, its two streams and its display handler; the arrays and the command router are
 // destroyed by their own destructors.
 hkServerProcessHandler::~hkServerProcessHandler() {
-    for (int32_t i = 0; i < m_processList.m_size; ++i) {
-        delete m_processList.m_data[i];
+    for (hkProcess* pProcess : m_processList) {
+        delete pProcess;
     }
     delete m_inStream;
     delete m_outStream;

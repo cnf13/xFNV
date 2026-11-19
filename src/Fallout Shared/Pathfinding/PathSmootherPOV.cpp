@@ -747,8 +747,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstAvoidNodes(
     if ((aGoal - aStart).SqrXYLength() < 0.0010000000474974513) {
         return true;
     }
-    for (uint32_t i = 0; i < AvoidNodePOVs.GetSize(); ++i) {
-        PathSmootherPOV* pPOV = AvoidNodePOVs.GetAt(i);
+    for (PathSmootherPOV* pPOV : AvoidNodePOVs) {
         if (!NavMeshMath::DoCircleAndSegmentIntersect(pPOV->Center, pPOV->fRadius, aStart, aGoal)) {
             continue;
         }
@@ -1001,10 +1000,9 @@ void PathSmootherPOVSearch::BuildPOVList() {
 void PathSmootherPOVSearch::AddPOVsFromStaticAvoidNodes() {
     using pathMeshes_t = BSSimpleArray<NavMesh*, 1024>;
     pathMeshes_t pathMeshes;
-    for (uint32_t i = 0; i < Triangles->iSize; ++i) {
-        if (pathMeshes.Find((*Triangles)[i].pNavMesh, 0, &BSSimpleArray<NavMesh*>::DefaultEqualFunctionByAddress) ==
-            -1) {
-            pathMeshes.Add((*Triangles)[i].pNavMesh);
+    for (const NavMeshSearchNode& rTriangle : *Triangles) {
+        if (pathMeshes.Find(rTriangle.pNavMesh, 0, &BSSimpleArray<NavMesh*>::DefaultEqualFunctionByAddress) == -1) {
+            pathMeshes.Add(rTriangle.pNavMesh);
         }
     }
     for (uint32_t i_2 = 0; i_2 < pathMeshes.iSize; ++i_2) {
@@ -1287,25 +1285,23 @@ void PathSmootherPOVSearch::AddPOVsFromTrianglePath() {
     for (uint32_t i_3 = 0; i_3 < RightVerts.iSize; ++i_3) {
         CheckAddPOVForVert(RightVerts, i_3, false);
     }
-    for (uint32_t j = 0; j < LeftVerts.iSize; ++j) {
-        if ((&LeftVerts.GetAt(static_cast<int32_t>(j)))->iPOVIndex != -1) {
-            for (uint32_t k = (&LeftVerts.GetAt(static_cast<int32_t>(j)))->iOtherSideIndex; k < RightVerts.iSize; ++k) {
+    for (const PathSmootherPOVSearch::PathEdgeVert& rLeftVert : LeftVerts) {
+        if (rLeftVert.iPOVIndex != -1) {
+            for (uint32_t k = rLeftVert.iOtherSideIndex; k < RightVerts.iSize; ++k) {
                 if ((&RightVerts.GetAt(static_cast<int32_t>(k)))->iPOVIndex != -1) {
                     PathSmootherPOVSearch::PathEdgeVert* v15 = &RightVerts.GetAt(static_cast<int32_t>(k));
-                    LeftPOVs.GetAt((&LeftVerts.GetAt(static_cast<int32_t>(j)))->iPOVIndex)->iOtherSideIndex =
-                        v15->iPOVIndex;
+                    LeftPOVs.GetAt(rLeftVert.iPOVIndex)->iOtherSideIndex = v15->iPOVIndex;
                     break;
                 }
             }
         }
     }
-    for (uint32_t m = 0; m < RightVerts.iSize; ++m) {
-        if ((&RightVerts.GetAt(static_cast<int32_t>(m)))->iPOVIndex != -1) {
-            for (uint32_t n = (&RightVerts.GetAt(static_cast<int32_t>(m)))->iOtherSideIndex; n < LeftVerts.iSize; ++n) {
+    for (const PathSmootherPOVSearch::PathEdgeVert& rRightVert : RightVerts) {
+        if (rRightVert.iPOVIndex != -1) {
+            for (uint32_t n = rRightVert.iOtherSideIndex; n < LeftVerts.iSize; ++n) {
                 if ((&LeftVerts.GetAt(static_cast<int32_t>(n)))->iPOVIndex != -1) {
                     PathSmootherPOVSearch::PathEdgeVert* v18 = &LeftVerts.GetAt(static_cast<int32_t>(n));
-                    RightPOVs.GetAt((&RightVerts.GetAt(static_cast<int32_t>(m)))->iPOVIndex)->iOtherSideIndex =
-                        v18->iPOVIndex;
+                    RightPOVs.GetAt(rRightVert.iPOVIndex)->iOtherSideIndex = v18->iPOVIndex;
                     break;
                 }
             }

@@ -53,9 +53,9 @@ void hkpWorldSnapshotViewer::step(float frameTimeInMs) {
             hkArrayStreamWriter writer(&storage, hkArrayStreamWriter::ARRAY_BORROW);
             const hkStructureLayout::LayoutRules* rules =
                 m_convert ? &hkStructureLayout::MsvcWin32LayoutRules : &hkStructureLayout::HostLayoutRules;
-            for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
+            for (hkpWorld* world : m_context->m_worlds) {
                 storage.setSize(0);
-                hkpHavokSnapshot::save(m_context->m_worlds.m_data[i], &writer, true, rules, 0);
+                hkpHavokSnapshot::save(world, &writer, true, rules, 0);
                 const int32_t snapshotSize = storage.m_size;
                 if (snapshotSize > 0) {
                     // The command byte, the four layout bytes and the 32-bit size, then the snapshot.

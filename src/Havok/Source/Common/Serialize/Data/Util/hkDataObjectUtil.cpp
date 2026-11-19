@@ -1533,9 +1533,9 @@ hkDataClassImpl* Cloner::findDestClass(const char* classname) {
     // The SDK's ~hkArray<hkDataClass::Cinfo, hkContainerTempAllocator>, inline: each element's members array goes
     // back to the heap, then the storage to the temp allocator.
     pTemp = hkMemoryRouter::getInstance().m_temp;
-    for (int32_t i = 0; i < cinfos.m_size; ++i) {
+    for (hkDataClass::Cinfo& rCinfo : cinfos) {
         hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        hkArray<hkDataClass::Cinfo::Member>& rMembers = cinfos.m_data[i].members;
+        hkArray<hkDataClass::Cinfo::Member>& rMembers = rCinfo.members;
         int32_t iMembersCapacity = rMembers.m_capacityAndFlags;
         rMembers.m_size = 0;
         if (iMembersCapacity >= 0) {
@@ -1641,8 +1641,8 @@ void Cloner::copyArray(hkDataArray& dst, const hkDataArray& src, int32_t arraySi
             minfo.m_capacityAndFlags = iAllocated != 0
                 ? iAllocated
                 : static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG);
-            for (int32_t i = 0; i < minfo.m_size; ++i) {
-                new (&minfo.m_data[i]) hkDataClass::MemberInfo();
+            for (hkDataClass::MemberInfo& rMemberInfo : minfo) {
+                new (&rMemberInfo) hkDataClass::MemberInfo();
             }
             for (int32_t i = minfo.m_size; i < iNumMembers; ++i) {
                 new (&minfo.m_data[i]) hkDataClass::MemberInfo();
@@ -1732,8 +1732,8 @@ void Cloner::copyObjectMembers(hkDataObject& a1, const hkDataObject& a2) {
     MemberInfoArray infos;
     hkDataClass srcClass;
     getClassMemberInfos(infos, dstClass, *a2.getClass(&srcClass));
-    for (int32_t i = 0; i < infos.m_size; ++i) {
-        copyValue(a1, a2, infos.m_data[i]);
+    for (const hkDataClass::MemberInfo& info : infos) {
+        copyValue(a1, a2, info);
     }
 }
 

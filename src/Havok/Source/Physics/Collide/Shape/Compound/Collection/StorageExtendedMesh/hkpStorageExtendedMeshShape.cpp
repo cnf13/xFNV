@@ -108,11 +108,11 @@ hkpStorageExtendedMeshShape::hkpStorageExtendedMeshShape(const hkpExtendedMeshSh
     m_scaling = mesh->m_scaling;
     m_userData = mesh->m_userData;
     m_disableWelding.m_bool = mesh->m_disableWelding.m_bool;
-    for (int32_t i = 0; i < mesh->m_trianglesSubparts.m_size; i++) {
-        hkpStorageExtendedMeshShape::addTrianglesSubpart(mesh->m_trianglesSubparts.m_data[i]);
+    for (const TrianglesSubpart& part : mesh->m_trianglesSubparts) {
+        hkpStorageExtendedMeshShape::addTrianglesSubpart(part);
     }
-    for (int32_t i = 0; i < mesh->m_shapesSubparts.m_size; i++) {
-        hkpStorageExtendedMeshShape::addShapesSubpart(mesh->m_shapesSubparts.m_data[i]);
+    for (const ShapesSubpart& part : mesh->m_shapesSubparts) {
+        hkpStorageExtendedMeshShape::addShapesSubpart(part);
     }
     m_weldingInfo.copyFromArray(hkContainerHeapAllocator().get(&m_weldingInfo), mesh->m_weldingInfo, hkTypeIsPod());
     m_weldingType.m_storage = mesh->m_weldingType.m_storage;
@@ -121,11 +121,11 @@ hkpStorageExtendedMeshShape::hkpStorageExtendedMeshShape(const hkpExtendedMeshSh
 
 // Each storage's reference goes back; the subparts and the arrays are destroyed by the base and the arrays.
 hkpStorageExtendedMeshShape::~hkpStorageExtendedMeshShape() {
-    for (int32_t i = 0; i < m_meshstorage.m_size; ++i) {
-        m_meshstorage.m_data[i]->removeReference();
+    for (MeshSubpartStorage* pStorage : m_meshstorage) {
+        pStorage->removeReference();
     }
-    for (int32_t i = 0; i < m_shapestorage.m_size; ++i) {
-        m_shapestorage.m_data[i]->removeReference();
+    for (ShapeSubpartStorage* pStorage : m_shapestorage) {
+        pStorage->removeReference();
     }
 }
 

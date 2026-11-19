@@ -614,8 +614,7 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
                 edgeEnd.m_quad = pVertices[(edge + 1) % 3].m_quad;
                 hkVector4 third;
                 third.m_quad = pVertices[(edge + 2) % 3].m_quad;
-                for (int32_t i = 0; i < allShapes.m_size; ++i) {
-                    const hkpMeshWeldingUtility::ShapeInfo& kInfo = allShapes.m_data[i];
+                for (const hkpMeshWeldingUtility::ShapeInfo& kInfo : allShapes) {
                     const hkpBvTreeShape* pBvTree = kInfo.m_shape;
                     // The triangle's normal and points in the shape's space.
                     hkTransform toShape;
@@ -674,8 +673,7 @@ void hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
                     aabb.m_max.m_quad = _mm_max_ps(_mm_max_ps(_mm_set1_ps(-3.40282e+38f), start.m_quad), end.m_quad);
                     alignas(16) hkInplaceArray<uint32_t, 128> hits;
                     pBvTree->queryAabb(aabb, hits);
-                    for (int32_t j = 0; j < hits.m_size; ++j) {
-                        const uint32_t childKey = hits.m_data[j];
+                    for (uint32_t childKey : hits) {
                         const hkpShapeContainer* pChildContainer = pBvTree->getContainer();
                         const hkpShape* pChild = pChildContainer->getChildShape(childKey, childBuffer);
                         if (pChild->m_type.m_storage != HK_SHAPE_TRIANGLE) {
@@ -959,8 +957,7 @@ float hkHistogram::evaluate() {
     }
     float fBest = 3.1415927f;
     bool bFound = false;
-    for (int32_t k = 0; k < ranges.m_size; ++k) {
-        const hkEntry& kRange = ranges.m_data[k];
+    for (const hkEntry& kRange : ranges) {
         if (!(kRange.m_hi - kRange.m_lo < 0.6000000238418579)) {
             float fValue = kRange.m_value;
             if (!(fValue > fBest)) {

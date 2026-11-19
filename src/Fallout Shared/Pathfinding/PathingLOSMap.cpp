@@ -122,12 +122,10 @@ uint32_t PathingLOSMap::GetNavMeshCount() const {
 
 bool PathingLOSMap::Setup(const BSSimpleArray<NavMeshPtr, 1024>& aNavMeshes) {
     iTotalTriangleCount = 0;
-    for (uint32_t uiIndex = 0; uiIndex < aNavMeshes.iSize; ++uiIndex) {
-        NavMeshToOffsetMap.SetAt(
-            (&aNavMeshes.GetAt(static_cast<int32_t>(uiIndex)))->m_pObject->iFormID, iTotalTriangleCount
-        );
-        iTotalTriangleCount += (&aNavMeshes.GetAt(static_cast<int32_t>(uiIndex)))->m_pObject->GetTriangleCount();
-        NavMeshes.Add(aNavMeshes.GetAt(static_cast<int32_t>(uiIndex)));
+    for (const NavMeshPtr& spMesh : aNavMeshes) {
+        NavMeshToOffsetMap.SetAt(spMesh.m_pObject->iFormID, iTotalTriangleCount);
+        iTotalTriangleCount += spMesh.m_pObject->GetTriangleCount();
+        NavMeshes.Add(spMesh);
     }
     if (pTriangleScores) {
         ourFree(pTriangleScores);

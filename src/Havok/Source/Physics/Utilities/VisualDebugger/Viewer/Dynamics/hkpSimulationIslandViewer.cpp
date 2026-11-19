@@ -30,16 +30,16 @@ hkpSimulationIslandViewer::hkpSimulationIslandViewer(
 )
   : hkpWorldViewerBase(contexts), m_showActiveIslands(true), m_showInactiveIslands(true) {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; i++) {
-            m_context->m_worlds.m_data[i]->addWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->addWorldPostSimulationListener(this);
         }
     }
 }
 
 hkpSimulationIslandViewer::~hkpSimulationIslandViewer() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; i++) {
-            m_context->m_worlds.m_data[i]->removeWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->removeWorldPostSimulationListener(this);
         }
     }
 }
@@ -70,8 +70,8 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
             hkVector4 islandMin;
             islandMin.m_quad = _mm_set1_ps(rdata_104DA48);
             hkInplaceArray<hkpEntity*, 1>& entities = island->m_entities;
-            for (int32_t j = 0; j < entities.m_size; j++) {
-                hkpCollidable* collidable = &entities.m_data[j]->m_collidable;
+            for (hkpEntity* entity : entities) {
+                hkpCollidable* collidable = &entity->m_collidable;
                 if (collidable->m_shape != nullptr) {
                     hkAabb entityAabb;
                     world->m_broadPhase->getAabb(collidable->getBroadPhaseHandle(), entityAabb);
@@ -100,8 +100,8 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
             hkVector4 islandMin;
             islandMin.m_quad = _mm_set1_ps(rdata_104DA48);
             hkInplaceArray<hkpEntity*, 1>& entities = island->m_entities;
-            for (int32_t j = 0; j < entities.m_size; j++) {
-                hkpCollidable* collidable = &entities.m_data[j]->m_collidable;
+            for (hkpEntity* entity : entities) {
+                hkpCollidable* collidable = &entity->m_collidable;
                 if (collidable->m_shape != nullptr) {
                     hkAabb entityAabb;
                     world->m_broadPhase->getAabb(collidable->getBroadPhaseHandle(), entityAabb);

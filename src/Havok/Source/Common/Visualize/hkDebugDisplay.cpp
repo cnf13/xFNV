@@ -57,9 +57,8 @@ void hkDebugDisplay::addGeometry(
     hkUlong shapeIdHint
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v8 = m_debugDisplayHandlers.m_data[i];
-        v8->addGeometry(geometries, transform, id, tag, shapeIdHint);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->addGeometry(geometries, transform, id, tag, shapeIdHint);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -76,9 +75,8 @@ void hkDebugDisplay::removeDebugDisplayHandler(hkDebugDisplayHandler* debugDispl
 
 void hkDebugDisplay::displayLine(const hkVector4& start, const hkVector4& end, int32_t color, int32_t id, int32_t tag) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v8 = m_debugDisplayHandlers.m_data[i];
-        v8->displayLine(start, end, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->displayLine(start, end, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -347,9 +345,8 @@ void hkDebugDisplay::displayTriangle(
     int32_t tag
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v9 = m_debugDisplayHandlers.m_data[i];
-        v9->displayTriangle(a, b, c, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->displayTriangle(a, b, c, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -450,27 +447,24 @@ void hkDebugDisplay::addGeometryInstance(
     hkUlong shapeIdHint
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v8 = m_debugDisplayHandlers.m_data[i];
-        v8->addGeometryInstance(instanceId, transform, id, tag, shapeIdHint);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->addGeometryInstance(instanceId, transform, id, tag, shapeIdHint);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
 
 void hkDebugDisplay::updateGeometry(const hkTransform& transform, hkUlong id, int32_t tag) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v6 = m_debugDisplayHandlers.m_data[i];
-        v6->updateGeometry(transform, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->updateGeometry(transform, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
 
 void hkDebugDisplay::removeGeometry(hkUlong id, int32_t tag, hkUlong shapeIdHint) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v6 = m_debugDisplayHandlers.m_data[i];
-        v6->removeGeometry(id, tag, shapeIdHint);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->removeGeometry(id, tag, shapeIdHint);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -485,9 +479,8 @@ void hkDebugDisplay::updateCamera(
     const char* name
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v10 = m_debugDisplayHandlers.m_data[i];
-        v10->updateCamera(from, to, up, nearPlane, farPlane, fov, name);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->updateCamera(from, to, up, nearPlane, farPlane, fov, name);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -503,9 +496,8 @@ void hkDebugDisplay::updateBehavior(
     hkArray<hkQsTransform, hkContainerHeapAllocator>& transforms
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v11 = m_debugDisplayHandlers.m_data[i];
-        v11->updateBehavior(
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->updateBehavior(
             wordVarIdx, wordStack, quadVarIdx, quadStack, activeNodes, activeStateIds, activeTransitions, transforms
         );
     }
@@ -514,9 +506,8 @@ void hkDebugDisplay::updateBehavior(
 
 void hkDebugDisplay::displayPoint(const hkVector4& position, int32_t color, int32_t id, int32_t tag) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v7 = m_debugDisplayHandlers.m_data[i];
-        v7->displayPoint(position, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->displayPoint(position, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -531,8 +522,7 @@ void hkDebugDisplay::displayRay(
 ) {
     hkVector4 end;
     end.setAdd4(start, direction);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* handler = m_debugDisplayHandlers.m_data[i];
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
         handler->displayLine(start, end, color, id, tag);
     }
 }
@@ -679,18 +669,16 @@ void hkDebugDisplay::displayPlane(__m128* a1, __m128* a2, uint32_t a3, int32_t a
 
 void hkDebugDisplay::displayText(const char* text, int32_t color, int32_t id, int32_t tag) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v7 = m_debugDisplayHandlers.m_data[i];
-        v7->displayText(text, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->displayText(text, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
 
 void hkDebugDisplay::display3dText(const char* text, const hkVector4& pos, int32_t color, int32_t id, int32_t tag) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v8 = m_debugDisplayHandlers.m_data[i];
-        v8->display3dText(text, pos, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->display3dText(text, pos, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -703,9 +691,8 @@ void hkDebugDisplay::displayGeometry(
     int32_t tag
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v8 = m_debugDisplayHandlers.m_data[i];
-        v8->displayGeometry(geometries, transform, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->displayGeometry(geometries, transform, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -717,9 +704,8 @@ void hkDebugDisplay::displayGeometry(
     int32_t tag
 ) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    for (int32_t i = 0; i < m_debugDisplayHandlers.m_size; ++i) {
-        hkDebugDisplayHandler* v7 = m_debugDisplayHandlers.m_data[i];
-        v7->displayGeometry(geometries, color, id, tag);
+    for (hkDebugDisplayHandler* handler : m_debugDisplayHandlers) {
+        handler->displayGeometry(geometries, color, id, tag);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }

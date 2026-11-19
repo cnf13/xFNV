@@ -74,8 +74,7 @@ void hkKdTree::initNodeArray(int32_t numNodes) {
 
 // Builds the 32-bit id from the entry's two id words and stops at the first match.
 void hkKdTree::invalidatePrimitive(hkPrimitiveId aId) {
-    for (int32_t i = 0; i < m_projectedEntries.m_size; ++i) {
-        hkKdTreeProjectedEntry& rEntry = m_projectedEntries.m_data[i];
+    for (hkKdTreeProjectedEntry& rEntry : m_projectedEntries) {
         hkPrimitiveId id = rEntry.getPrimitiveId();
         if (id == aId) {
             rEntry.m_min[0] = 0xFFFF;

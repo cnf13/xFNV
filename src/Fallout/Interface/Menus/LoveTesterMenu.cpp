@@ -580,10 +580,10 @@ void LoveTesterMenu::RefreshPage() {
                 int32_t nThreshold = LoveTesterMenu::pInstance->LightBulbs[auiIndex]->nThreshold;
                 LoveTesterMenu::pInstance->LightBulbs[auiIndex];
             }
-            for (uint32_t i = 0; i < LoveTesterMenu::pInstance->LightBulbGlows.iSize; ++i) {
-                int32_t m_nValueToGlowAt = LoveTesterMenu::pInstance->LightBulbGlows[i]->m_nValueToGlowAt;
-                if (LoveTesterMenu::pInstance->LightBulbGlows[i]->m_GlowCard) {
-                    LoveTesterMenu::pInstance->LightBulbGlows[i]->m_GlowCard->SetAppCulled(v11 < m_nValueToGlowAt);
+            for (LoveTesterLightBulbGlows* pGlow : LoveTesterMenu::pInstance->LightBulbGlows) {
+                int32_t m_nValueToGlowAt = pGlow->m_nValueToGlowAt;
+                if (pGlow->m_GlowCard) {
+                    pGlow->m_GlowCard->SetAppCulled(v11 < m_nValueToGlowAt);
                 }
             }
         }
@@ -1164,26 +1164,24 @@ void LoveTesterMenu::Close() {
         LoveTesterMenu::pInstance->pCabinetGeometry = nullptr;
         LoveTesterMenu::sp3DCamera = static_cast<NiCamera*>(nullptr);
         for (int32_t i = 0; i < 9; ++i) {
-            for (uint32_t auiIndex = 0; auiIndex < LoveTesterMenu::pInstance->Pages[i].Buttons.iSize; ++auiIndex) {
-                LoveTesterMenu::LoveTesterButton* apThis = LoveTesterMenu::pInstance->Pages[i].Buttons[auiIndex];
-                if (apThis) {
-                    delete apThis;
+            for (LoveTesterMenu::LoveTesterButton* pButton : LoveTesterMenu::pInstance->Pages[i].Buttons) {
+                if (pButton) {
+                    delete pButton;
                 }
             }
-            for (uint32_t j = 0; j < LoveTesterMenu::pInstance->Pages[i].TextItems.iSize; ++j) {
-                ourFree(LoveTesterMenu::pInstance->Pages[i].TextItems[j]);
+            for (LoveTesterMenu::LoveTesterTextItem* pItem : LoveTesterMenu::pInstance->Pages[i].TextItems) {
+                ourFree(pItem);
             }
             LoveTesterMenu::pInstance->Pages[i].Buttons.Clear(true);
             LoveTesterMenu::pInstance->Pages[i].TextItems.Clear(true);
         }
-        for (uint32_t k = 0; k < LoveTesterMenu::pInstance->GlobalPage.Buttons.iSize; ++k) {
-            LoveTesterMenu::LoveTesterButton* v4 = LoveTesterMenu::pInstance->GlobalPage.Buttons[k];
-            if (v4) {
-                delete v4;
+        for (LoveTesterMenu::LoveTesterButton* pButton : LoveTesterMenu::pInstance->GlobalPage.Buttons) {
+            if (pButton) {
+                delete pButton;
             }
         }
-        for (uint32_t m = 0; m < LoveTesterMenu::pInstance->GlobalPage.TextItems.iSize; ++m) {
-            ourFree(LoveTesterMenu::pInstance->GlobalPage.TextItems[m]);
+        for (LoveTesterMenu::LoveTesterTextItem* pItem : LoveTesterMenu::pInstance->GlobalPage.TextItems) {
+            ourFree(pItem);
         }
         LoveTesterMenu::pInstance->GlobalPage.Buttons.Clear(true);
         LoveTesterMenu::pInstance->GlobalPage.TextItems.Clear(true);

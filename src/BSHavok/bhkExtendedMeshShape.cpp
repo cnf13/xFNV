@@ -255,8 +255,8 @@ bhkExtendedMeshShape::bhkExtendedMeshShape() {
 // then releases the sub-part list.
 bhkExtendedMeshShape::~bhkExtendedMeshShape() {
     hkpExtendedMeshShape* pShape = static_cast<hkpExtendedMeshShape*>(phkObject);
-    for (int32_t i = 0; i < pShape->m_trianglesSubparts.getSize(); ++i) {
-        pShape->m_trianglesSubparts.m_data[i].m_numTriangleShapes = 0;
+    for (hkpExtendedMeshShape::TrianglesSubpart& rSubpart : pShape->m_trianglesSubparts) {
+        rSubpart.m_numTriangleShapes = 0;
     }
     bhkSerializable::Kill();
     --iCount;

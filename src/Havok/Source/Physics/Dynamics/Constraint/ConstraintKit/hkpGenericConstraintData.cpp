@@ -145,8 +145,8 @@ hkpGenericConstraintData::hkpGenericConstraintData(int32_t a1)
 
 // Releases the motors' references; the scheme is destroyed by the compiler.
 hkpGenericConstraintData::~hkpGenericConstraintData() {
-    for (int32_t i = 0; i < m_scheme.m_motors.m_size; ++i) {
-        m_scheme.m_motors.m_data[i]->removeReference();
+    for (hkpConstraintMotor* pMotor : m_scheme.m_motors) {
+        pMotor->removeReference();
     }
 }
 

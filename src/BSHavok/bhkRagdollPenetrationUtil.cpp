@@ -295,11 +295,9 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
     }
 
     // The watched systems not kept are deleted.
-    for (uint32_t ui = 0; ui < ActiveSystems.iSize; ++ui) {
-        ConstrainedSystem** ppSystem = &ActiveSystems.pBuffer[ui];
-        int32_t iIndex = newSystems.Find(*ppSystem, 0, SystemArray::DefaultEqualFunctionByAddress);
+    for (ConstrainedSystem* pSystem : ActiveSystems) {
+        int32_t iIndex = newSystems.Find(pSystem, 0, SystemArray::DefaultEqualFunctionByAddress);
         if (iIndex == -1) {
-            ConstrainedSystem* pSystem = *ppSystem;
             if (pSystem) {
                 pSystem->~ConstrainedSystem();
                 MemoryManager_Singleton.Deallocate(pSystem);
@@ -566,9 +564,9 @@ void bhkRagdollPenetrationUtil::Update() {
 
 // The interval in milliseconds is rounded to a float before it is scaled by the counter frequency.
 void bhkRagdollPenetrationUtil::ResetSystems() {
-    for (uint32_t i = 0; i < ActiveSystems.iSize; ++i) {
-        ActiveSystems.pBuffer[i]->bPenetrating = true;
-        ActiveSystems.pBuffer[i]->pDetectionUtil->resetBoneStates();
+    for (ConstrainedSystem* pSystem : ActiveSystems) {
+        pSystem->bPenetrating = true;
+        pSystem->pDetectionUtil->resetBoneStates();
     }
     float fIntervalMS = static_cast<float>(fDetectionUpdateTimeSec.uValue.f * 1000.0);
     DetectionTimer.iStartTime = BSPrecisionTimer::GetTimer();
@@ -576,12 +574,10 @@ void bhkRagdollPenetrationUtil::ResetSystems() {
 }
 
 void bhkRagdollPenetrationUtil::Clear() {
-    for (uint32_t ui = 0; ui < ActiveSystems.iSize; ++ui) {
-        bhkRagdollPenetrationUtil::ConstrainedSystem** pBuffer = ActiveSystems.pBuffer;
-        bhkRagdollPenetrationUtil::ConstrainedSystem* v4 = pBuffer[ui];
-        if (v4) {
-            pBuffer[ui]->~ConstrainedSystem();
-            MemoryManager_Singleton.Deallocate(v4);
+    for (bhkRagdollPenetrationUtil::ConstrainedSystem* pSystem : ActiveSystems) {
+        if (pSystem) {
+            pSystem->~ConstrainedSystem();
+            MemoryManager_Singleton.Deallocate(pSystem);
         }
     }
     if (ActiveSystems.pBuffer) {
@@ -617,20 +613,18 @@ void bhkRagdollPenetrationUtil::FindSystems(NiAVObject* apObject, BSSimpleArray<
             hkpRigidBody* pRigidBody = static_cast<hkpRigidBody*>(pCollisionObject->spWorldObject->phkObject);
             if (pRigidBody) {
                 bMastersOnlyContacts = true;
-                for (int32_t i = 0; i < pRigidBody->m_constraintsMaster.m_size; ++i) {
+                for (const hkConstraintInternal& rInternal : pRigidBody->m_constraintsMaster) {
                     if (!bMastersOnlyContacts) {
                         break;
                     }
                     bMastersOnlyContacts =
-                        pRigidBody->m_constraintsMaster.m_data[i].m_constraint->getDataRw()->getType() ==
-                        hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
+                        rInternal.m_constraint->getDataRw()->getType() == hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
                 }
-                for (int32_t i = 0; i < pRigidBody->m_constraintsSlave.m_size; ++i) {
+                for (hkpConstraintInstance* pConstraint : pRigidBody->m_constraintsSlave) {
                     if (bSlaveOfOther) {
                         break;
                     }
-                    bSlaveOfOther = pRigidBody->m_constraintsSlave.m_data[i]->getDataRw()->getType() !=
-                        hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
+                    bSlaveOfOther = pConstraint->getDataRw()->getType() != hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
                 }
             }
         }
@@ -640,8 +634,8 @@ void bhkRagdollPenetrationUtil::FindSystems(NiAVObject* apObject, BSSimpleArray<
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {
-        for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-            FindSystems(pNode->m_kChildren.m_pBase[i].m_pObject, arRoots);
+        for (NiAVObject* pChild : pNode->m_kChildren) {
+            FindSystems(pChild, arRoots);
         }
     }
 }
@@ -650,19 +644,18 @@ void bhkRagdollPenetrationUtil::FindLeaves(
     hkArray<hkpRigidBody*, hkContainerHeapAllocator>& arRigidBodies,
     BSSimpleArray<bhkRigidBody*, 1024>& arLeaves
 ) {
-    for (int32_t i = 0; i < arRigidBodies.m_size; ++i) {
+    for (hkpRigidBody* pBody : arRigidBodies) {
         bool bonlyMasterContact = true;
-        for (int32_t j = 0; j < arRigidBodies.m_data[i]->m_constraintsMaster.m_size && bonlyMasterContact; ++j) {
-            hkpConstraintInstance* pConstraint = arRigidBodies.m_data[i]->m_constraintsMaster.m_data[j].m_constraint;
+        for (int32_t j = 0; j < pBody->m_constraintsMaster.m_size && bonlyMasterContact; ++j) {
+            hkpConstraintInstance* pConstraint = pBody->m_constraintsMaster.m_data[j].m_constraint;
             bonlyMasterContact = pConstraint->getDataRw()->getType() == hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
         }
         bool bhasSlaveNonContact = false;
-        for (int32_t j = 0; j < arRigidBodies.m_data[i]->m_constraintsSlave.m_size && !bhasSlaveNonContact; ++j) {
-            hkpConstraintInstance* pConstraint = arRigidBodies.m_data[i]->m_constraintsSlave.m_data[j];
+        for (int32_t j = 0; j < pBody->m_constraintsSlave.m_size && !bhasSlaveNonContact; ++j) {
+            hkpConstraintInstance* pConstraint = pBody->m_constraintsSlave.m_data[j];
             bhasSlaveNonContact = pConstraint->getDataRw()->getType() != hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
         }
         if (!bonlyMasterContact && !bhasSlaveNonContact) {
-            hkpRigidBody* pBody = arRigidBodies.m_data[i];
             bhkRigidBody* prb = pBody ? static_cast<bhkRigidBody*>(pBody->m_userData) : nullptr;
             arLeaves.Add(prb);
         }
@@ -724,9 +717,8 @@ void bhkRagdollPenetrationUtil::AddToArrays(
     if ((!pweap || conA.m_size > 0) && !bcontainsBreakable) {
         hkpRigidBody* pBody = static_cast<hkpRigidBody*>(apRB->phkObject);
         arRigidBodies.pushBack(pBody);
-        for (int32_t i = 0; i < conA.m_size; ++i) {
-            hkpConstraintInstance** ppConstraint = &conA.m_data[i];
-            arConstraints.pushBack(*ppConstraint);
+        for (hkpConstraintInstance* pConstraint : conA) {
+            arConstraints.pushBack(pConstraint);
         }
     }
 }
@@ -757,8 +749,8 @@ void bhkRagdollPenetrationUtil::FindBones(
     }
     NiNode* pnode = static_cast<NiNode*>(apObject->DynamicCastMember(&NiNode::ms_RTTI));
     if (pnode) {
-        for (uint32_t i = 0; i < pnode->m_kChildren.m_usSize; ++i) {
-            FindBones(pnode->m_kChildren.m_pBase[i].m_pObject, arRigidBodies, arConstraints);
+        for (NiAVObject* pChild : pnode->m_kChildren) {
+            FindBones(pChild, arRigidBodies, arConstraints);
         }
     }
 }

@@ -47,13 +47,13 @@ hkTypeInfo hkpPoweredChainMapperLinkInfoTypeInfo = {
 
 // The links' limit constraints and the chains lose their reference; the three arrays' storage goes with them.
 hkpPoweredChainMapper::~hkpPoweredChainMapper() {
-    for (int32_t i = 0; i < m_links.m_size; ++i) {
-        if (m_links.m_data[i].m_limitConstraint) {
-            m_links.m_data[i].m_limitConstraint->removeReference();
+    for (LinkInfo& rLink : m_links) {
+        if (rLink.m_limitConstraint) {
+            rLink.m_limitConstraint->removeReference();
         }
     }
-    for (int32_t i = 0; i < m_chains.m_size; ++i) {
-        m_chains.m_data[i]->removeReference();
+    for (hkpConstraintChainInstance* pChain : m_chains) {
+        pChain->removeReference();
     }
 }
 
@@ -80,7 +80,7 @@ void hkpPoweredChainMapper::getMotors(
 
 // The motors are collected in a local hkArray (no storage, not ours). Each limit is divided by the motor count and
 // converted to a float; every motor is a limited force motor and gets both. The count is tested against zero, then
-// signed, and reloaded after each motor.
+// signed.
 void hkpPoweredChainMapper::setForceLimits(int32_t linkIndex, int32_t coordinageIndex, float minForce, float maxForce) {
     hkArray<hkpConstraintMotor*> motors;
     getMotors(linkIndex, coordinageIndex, motors);
@@ -88,8 +88,8 @@ void hkpPoweredChainMapper::setForceLimits(int32_t linkIndex, int32_t coordinage
         const float numMotors = static_cast<float>(motors.m_size);
         minForce = minForce / numMotors;
         maxForce = maxForce / numMotors;
-        for (int32_t i = 0; i < motors.m_size; ++i) {
-            hkpLimitedForceConstraintMotor* pMotor = static_cast<hkpLimitedForceConstraintMotor*>(motors.m_data[i]);
+        for (hkpConstraintMotor* pMotorBase : motors) {
+            hkpLimitedForceConstraintMotor* pMotor = static_cast<hkpLimitedForceConstraintMotor*>(pMotorBase);
             pMotor->m_minForce = minForce;
             pMotor->m_maxForce = maxForce;
         }
@@ -292,8 +292,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
         pMapper->m_targets._reserve(heap, numAllTargets);
         pMapper->m_targets.m_size = numAllTargets;
     }
-    for (int32_t t = 0; t < targets.m_size; ++t) {
-        const ChainTarget& rTarget = targets.m_data[t];
+    for (const ChainTarget& rTarget : targets) {
         LinkInfo& rLink = pMapper->m_links.m_data[rTarget.m_linkIndex];
         const int32_t targetIndex = rLink.m_firstTargetIdx + rLink.m_numTargets;
         pMapper->m_targets.m_data[targetIndex].m_chain = rTarget.m_chain;

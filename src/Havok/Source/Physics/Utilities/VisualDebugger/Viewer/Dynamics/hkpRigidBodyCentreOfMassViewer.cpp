@@ -77,28 +77,21 @@ void hkpRigidBodyCentreOfMassViewer::entityRemovedCallback(hkpEntity* entity) {
 // in red, green and blue.
 void hkpRigidBodyCentreOfMassViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpRigidBodyCentreOfMassViewer", this);
-    for (int32_t i = 0; i < m_entitiesCreated.m_size; ++i) {
-        if (m_entitiesCreated.m_data[i]->getMass() != 0.0f) {
+    for (hkpRigidBody* body : m_entitiesCreated) {
+        if (body->getMass() != 0.0f) {
             HK_TIMER_BEGIN("getMassAndLines", this);
-            hkVector4 centreOfMass = m_entitiesCreated.m_data[i]->getCenterOfMassInWorld();
+            hkVector4 centreOfMass = body->getCenterOfMassInWorld();
             const __m128 scale = _mm_shuffle_ps(_mm_load_ss(&m_scale), _mm_load_ss(&m_scale), 0);
             hkVector4 xAxis;
-            xAxis.m_quad = _mm_add_ps(
-                _mm_mul_ps(scale, m_entitiesCreated.m_data[i]->getTransform().getColumn(0).m_quad), centreOfMass.m_quad
-            );
+            xAxis.m_quad = _mm_add_ps(_mm_mul_ps(scale, body->getTransform().getColumn(0).m_quad), centreOfMass.m_quad);
             hkVector4 yAxis;
-            yAxis.m_quad = _mm_add_ps(
-                _mm_mul_ps(scale, m_entitiesCreated.m_data[i]->getTransform().getColumn(1).m_quad), centreOfMass.m_quad
-            );
+            yAxis.m_quad = _mm_add_ps(_mm_mul_ps(scale, body->getTransform().getColumn(1).m_quad), centreOfMass.m_quad);
             hkVector4 zAxis;
-            zAxis.m_quad = _mm_add_ps(
-                _mm_mul_ps(scale, m_entitiesCreated.m_data[i]->getTransform().getColumn(2).m_quad), centreOfMass.m_quad
-            );
+            zAxis.m_quad = _mm_add_ps(_mm_mul_ps(scale, body->getTransform().getColumn(2).m_quad), centreOfMass.m_quad);
             HK_TIMER_END();
             HK_TIMER_BEGIN("display3lines", this);
             // The id is an int display id: the low 32 bits of the collidable's address.
-            const int32_t id =
-                static_cast<int32_t>(reinterpret_cast<hkUlong>(m_entitiesCreated.m_data[i]->getCollidable()));
+            const int32_t id = static_cast<int32_t>(reinterpret_cast<hkUlong>(body->getCollidable()));
             m_displayHandler->displayLine(centreOfMass, xAxis, static_cast<int32_t>(hkColor::RED), id, m_tag);
             m_displayHandler->displayLine(centreOfMass, yAxis, static_cast<int32_t>(hkColor::GREEN), id, m_tag);
             m_displayHandler->displayLine(centreOfMass, zAxis, static_cast<int32_t>(hkColor::BLUE), id, m_tag);

@@ -87,8 +87,7 @@ void NiBSBoneLODController::LoadBinary(NiStream& kStream) {
 void NiBSBoneLODController::LinkObject(NiStream& kStream) {
     NiTimeController::LinkObject(kStream);
 
-    for (uint32_t i = 0; i < m_kBoneArray.GetSize(); i++) {
-        NiTPrimitiveSet<NiNode*>* pkBones = m_kBoneArray.GetAt(i);
+    for (NiTPrimitiveSet<NiNode*>* pkBones : m_kBoneArray) {
         if (!pkBones) {
             continue;
         }
@@ -112,8 +111,7 @@ void NiBSBoneLODController::SaveBinary(NiStream& kStream) {
 
     uint32_t uiNumBoneSets = m_kBoneArray.GetSize();
     NiStreamSaveBinary(kStream, uiNumBoneSets);
-    for (uint32_t i = 0; i < m_kBoneArray.GetSize(); i++) {
-        NiTPrimitiveSet<NiNode*>* pkBones = m_kBoneArray.GetAt(i);
+    for (NiTPrimitiveSet<NiNode*>* pkBones : m_kBoneArray) {
         if (pkBones) {
             uint32_t uiNumBones = pkBones->GetSize();
             NiStreamSaveBinary(kStream, uiNumBones);
@@ -265,8 +263,7 @@ bool NiBSBoneLODController::SetBoneLOD(int32_t iLOD) {
 }
 
 void NiBSBoneLODController::CleanUp() {
-    for (uint32_t i = 0; i < m_kBoneArray.m_usSize; ++i) {
-        NiTPrimitiveSet<NiNode*>* Block = m_kBoneArray.m_pBase[i];
+    for (NiTPrimitiveSet<NiNode*>* Block : m_kBoneArray) {
         if (Block) {
             _NiFree(Block->m_pBase);
             MemoryManager_Singleton.Deallocate(Block);
@@ -405,8 +402,7 @@ void NiBSBoneLODController::BuildBoneMap(
 ) {
     uint32_t uiLOD;
     uint32_t uiOrigLOD = uiCurrentLOD;
-    for (uint32_t ui = 0; ui < pkBone->m_kChildren.m_usSize; ++ui) {
-        NiAVObject* pkChild = pkBone->m_kChildren.m_pBase[ui].m_pObject;
+    for (NiAVObject* pkChild : pkBone->m_kChildren) {
         if ((pkChild) && (pkChild->IsNode())) {
             uint32_t uiReturnedLOD = uiOrigLOD;
             BuildBoneMap(static_cast<NiNode*>(pkChild), kBoneToLOD, uiReturnedLOD);
@@ -498,8 +494,7 @@ void NiBSBoneLODController::FindBoneRootNodes(NiNode* pkNode, NiTPrimitiveSet<Ni
             }
         }
     }
-    for (uint32_t k = 0; k < pkNode->m_kChildren.m_usSize; ++k) {
-        NiAVObject* pkChild = pkNode->m_kChildren.m_pBase[k].m_pObject;
+    for (NiAVObject* pkChild : pkNode->m_kChildren) {
         if ((pkChild) && (pkChild->IsNode())) {
             NiBSBoneLODController::FindBoneRootNodes(static_cast<NiNode*>(pkChild), kBoneRootNodes);
         }

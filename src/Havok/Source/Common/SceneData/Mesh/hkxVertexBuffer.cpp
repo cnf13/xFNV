@@ -174,8 +174,7 @@ void hkxVertexBuffer::setNumVertices(int32_t n, const hkxVertexDescription& form
     }
     m_desc.m_decls.m_size = 0;
     m_data.clear();
-    for (int32_t i = 0; i < format.m_decls.m_size; ++i) {
-        const hkxVertexDescription::ElementDecl& srcDecl = format.m_decls.m_data[i];
+    for (const hkxVertexDescription::ElementDecl& srcDecl : format.m_decls) {
         hkxVertexDescription::ElementDecl& decl = m_desc.m_decls.expandOne();
         decl.m_type.m_storage = srcDecl.m_type.m_storage;
         decl.m_usage.m_storage = srcDecl.m_usage.m_storage;
@@ -208,8 +207,7 @@ void hkxVertexBuffer::setNumVertices(int32_t n, const hkxVertexDescription& form
             default: break;
         }
     }
-    for (int32_t i = 0; i < m_desc.m_decls.m_size; ++i) {
-        hkxVertexDescription::ElementDecl& decl = m_desc.m_decls.m_data[i];
+    for (hkxVertexDescription::ElementDecl& decl : m_desc.m_decls) {
         switch (decl.m_type.m_storage) {
             case hkxVertexDescription::HKX_DT_UINT8: decl.m_byteStride = m_data.m_uint8Stride; break;
             case hkxVertexDescription::HKX_DT_INT16: decl.m_byteStride = m_data.m_uint16Stride; break;
@@ -391,8 +389,7 @@ void hkxVertexBuffer::copyVertex(const hkxVertexBuffer& other, int32_t vertFrom,
         }
         return;
     }
-    for (int32_t i = 0; i < m_desc.m_decls.m_size; ++i) {
-        const hkxVertexDescription::ElementDecl& decl = m_desc.m_decls.m_data[i];
+    for (const hkxVertexDescription::ElementDecl& decl : m_desc.m_decls) {
         const hkxVertexDescription::ElementDecl* pOtherDecl = other.m_desc.getElementDecl(
             static_cast<hkxVertexDescription::DataUsage>(decl.m_usage.m_storage), usageCount[decl.m_usage.m_storage]
         );

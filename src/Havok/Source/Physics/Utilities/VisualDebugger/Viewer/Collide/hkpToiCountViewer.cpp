@@ -60,11 +60,9 @@ void hkpToiCountViewer::worldRemovedCallback(hkpWorld* w) {
             entitiesToRemove.pushBack(entity);
         }
     }
-    for (int32_t i = 0; i < entitiesToRemove.m_size; ++i) {
-        entitiesToRemove.m_data[i]->removeEntityListener(
-            this == nullptr ? nullptr : static_cast<hkpEntityListener*>(this)
-        );
-        m_toiCounts.remove(static_cast<hkpRigidBody*>(entitiesToRemove.m_data[i]));
+    for (hkpEntity* entity : entitiesToRemove) {
+        entity->removeEntityListener(this == nullptr ? nullptr : static_cast<hkpEntityListener*>(this));
+        m_toiCounts.remove(static_cast<hkpRigidBody*>(entity));
     }
     w->removeContactListener(this == nullptr ? nullptr : static_cast<hkpContactListener*>(this));
     w->removeWorldPostSimulationListener(

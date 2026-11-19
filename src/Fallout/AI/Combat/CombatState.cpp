@@ -1068,8 +1068,7 @@ void CombatState::UpdateInventoryData() {
         if (fLargestDistanceDPS > 0.0) {
             pLargestDPSWeapon = nullptr;
         }
-        for (uint32_t j = 0; j < kWeaponDataArray.GetSize(); ++j) {
-            WeaponData& rWeaponData = kWeaponDataArray[j];
+        for (WeaponData& rWeaponData : kWeaponDataArray) {
             TESObjectWEAP* pWeapon = rWeaponData.pWeapon;
             COMBAT_WEAPON_TYPE eType = rWeaponData.pWeapon->GetCombatWeaponType();
             float fDamagePerSecond = rWeaponData.fDamagePerSecond;
@@ -1174,11 +1173,10 @@ void CombatState::UpdatePeriodicData() {
                 TESObjectWEAP* v20 = nullptr;
                 if (bforceSwitch && pCurrentEmbeddedWeapon) {
                     int32_t iembeddedWeaponIndex = RandomInt(0, inumEmbeddedWeapons - 1);
-                    for (uint32_t apThis_16 = 0; apThis_16 < EmbeddedWeaponsArray.iSize; ++apThis_16) {
-                        TESObjectWEAP* apThis_12 = EmbeddedWeaponsArray[apThis_16];
-                        if (apThis_12 != pCurrentEmbeddedWeapon) {
+                    for (TESObjectWEAP* pEmbeddedWeapon : EmbeddedWeaponsArray) {
+                        if (pEmbeddedWeapon != pCurrentEmbeddedWeapon) {
                             if (!iembeddedWeaponIndex) {
-                                v20 = apThis_12;
+                                v20 = pEmbeddedWeapon;
                                 break;
                             }
                             --iembeddedWeaponIndex;
@@ -3720,8 +3718,8 @@ bool CombatState::FindBestAdvanceLocation(
         if (!abBackgroundThread) {
             pCombatManager->pCoverMap->LockForWrite();
         }
-        for (uint32_t i = 0; i < pcombatCoverSearchInfo->kCoverLocations.iSize; ++i) {
-            PathingCoverLocation* coverLoc = &pcombatCoverSearchInfo->kCoverLocations.GetAt(static_cast<int32_t>(i));
+        for (PathingCoverLocation& rCoverLocation : pcombatCoverSearchInfo->kCoverLocations) {
+            PathingCoverLocation* coverLoc = &rCoverLocation;
             uint32_t icoverKey = coverLoc->GetKey();
             if (apCoveredMoveRequest->GetUnreachableCoverLocations()->Find(
                     icoverKey, 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress

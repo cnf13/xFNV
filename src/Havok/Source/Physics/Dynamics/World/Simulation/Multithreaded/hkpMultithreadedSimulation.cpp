@@ -430,8 +430,7 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
         hkpEntity* entity = entities[e];
         entityInfo.m_data[entity->m_storageIndex] = 1;
         entity->m_collidable.getCollisionEntriesSorted(collisionEntries);
-        for (int32_t i = 0; i < collisionEntries.m_size; i++) {
-            const hkpLinkedCollidable::CollisionEntry& entry = collisionEntries.m_data[i];
+        for (const hkpLinkedCollidable::CollisionEntry& entry : collisionEntries) {
             hkpEntity* partner = static_cast<hkpEntity*>(entry.m_partner->getOwner());
             if (partner->getSimulationIsland() == island && entityInfo.m_data[partner->m_storageIndex]) {
                 continue;
@@ -552,10 +551,10 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
     entitiesNeedingPsiCollisionDetection.m_map.clear();
 
     int32_t firstEntryIdx = 0;
-    for (int32_t i = 0; i < islandEntriesInfos.m_size; ++i) {
-        islandEntriesInfos.m_data[i].m_firstEntryIdx = firstEntryIdx;
-        islandEntriesInfos.m_data[i].m_nextEntryIdx = firstEntryIdx;
-        firstEntryIdx += islandEntriesInfos.m_data[i].m_numEntries;
+    for (hkpIslandsAgentEntriesInfo& info : islandEntriesInfos) {
+        info.m_firstEntryIdx = firstEntryIdx;
+        info.m_nextEntryIdx = firstEntryIdx;
+        firstEntryIdx += info.m_numEntries;
     }
 
     hkpAgentNnEntry** allEntries = hkAllocateStack<hkpAgentNnEntry*>(numAllEntries, nullptr);

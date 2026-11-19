@@ -787,8 +787,7 @@ void hkpWorldOperationUtil::internalActivateIsland(
     island->m_timeSinceLastLowFrequencyCheck = 0.0f;
     island->m_isInActiveIslandsArray = 1;
     island->m_storageIndex = m_size - 1;
-    for (int32_t i = 0; i < island->m_entities.m_size; ++i) {
-        hkpEntity* entity = island->m_entities.m_data[i];
+    for (hkpEntity* entity : island->m_entities) {
         hkSweptTransformUtil::setTimeInformation(0.0f, 0.0f, entity->m_motion.m_motionState);
         entity->m_motion.m_deactivationNumInactiveFrames[1] = 0;
         entity->m_motion.m_deactivationNumInactiveFrames[0] = 0;
@@ -865,8 +864,7 @@ void hkpWorldOperationUtil::internalDeactivateIsland(hkpWorld* world, hkpSimulat
         island->m_isInActiveIslandsArray = 0;
         island->m_storageIndex = m_size - 1;
         island->m_timeOfDeactivation = world->m_dynamicsStepInfo.m_stepInfo.m_startTime;
-        for (int32_t i = 0; i < island->m_entities.m_size; ++i) {
-            hkpEntity* entity = island->m_entities.m_data[i];
+        for (hkpEntity* entity : island->m_entities) {
             hkSweptTransformUtil::freezeMotionState(island->m_timeOfDeactivation, entity->m_motion.m_motionState);
             // Both setters are called virtually through the motion pointer.
             hkpMotion* motion = &entity->m_motion;
@@ -911,8 +909,7 @@ void hkpWorldOperationUtil::removeAttachedActionsFromDynamicIsland(
         hkpAction* action = entity->m_actions.m_data[i];
         action->getEntities(entities);
         bool allOthersFixed = true;
-        for (int32_t j = 0; j < entities.m_size; ++j) {
-            hkpEntity* other = entities.m_data[j];
+        for (hkpEntity* other : entities) {
             if (other->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED && other != entity) {
                 allOthersFixed = false;
                 break;
@@ -963,8 +960,7 @@ void hkpWorldOperationUtil::addActionsToEntitysIsland(
         action->removeReference();
         entities.m_size = 0;
         action->getEntities(entities);
-        for (int32_t j = 0; j < entities.m_size; ++j) {
-            hkpEntity* other = entities.m_data[j];
+        for (hkpEntity* other : entities) {
             if (other != entity && other->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED &&
                 entity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED &&
                 other->m_simulationIsland != entity->m_simulationIsland) {
@@ -1191,8 +1187,7 @@ void hkpWorldOperationUtil::internalMergeTwoIslands(
         hkArrayUtil::_reserve(*heap, actions, newCapacity, sizeof(hkpAction*));
     }
     actions->m_size = maxActions;
-    for (int32_t i = 0; i < islandB->m_actions.m_size; ++i) {
-        hkpAction* action = islandB->m_actions.m_data[i];
+    for (hkpAction* action : islandB->m_actions) {
         if (action) {
             actions->m_data[numActions] = action;
             actions->m_data[numActions]->m_island = islandA;
@@ -1211,8 +1206,7 @@ void hkpWorldOperationUtil::internalMergeTwoIslands(
     actions->m_size = numActions;
 
     // The constraints the moved entities master now belong to islandA.
-    for (int32_t i = 0; i < islandB->m_entities.m_size; ++i) {
-        hkpEntity* entity = islandB->m_entities.m_data[i];
+    for (hkpEntity* entity : islandB->m_entities) {
         hkConstraintInternal* constraint = entity->m_constraintsMaster.begin();
         for (int32_t j = entity->m_constraintsMaster.m_size - 1; j >= 0; --j, ++constraint) {
             constraint->m_constraint->m_owner = islandA;
@@ -1609,8 +1603,8 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                 hkInplaceArray<hkpEntity*, 16, hkContainerHeapAllocator> entities;
                 action->getEntities(entities);
                 hkpSimulationIsland* actionIsland = nullptr;
-                for (int32_t i = 0; i < entities.m_size; ++i) {
-                    actionIsland = entities.m_data[i]->m_simulationIsland;
+                for (hkpEntity* entity : entities) {
+                    actionIsland = entity->m_simulationIsland;
                     if (actionIsland != fixedIsland) {
                         break;
                     }
@@ -1784,16 +1778,15 @@ void hkpWorldOperationUtil::setRigidBodyMotionType(
     world->m_criticalOperationsAllowed.m_bool = 1;
 
     hkArray<hkpLinkedCollidable::CollisionEntry> entries;
-    for (int32_t i = 0; i < removedConstraints.m_size; ++i) {
-        hkpConstraintInstance* constraint = removedConstraints.m_data[i];
+    for (hkpConstraintInstance* constraint : removedConstraints) {
         addConstraintImmediately(world, constraint, DO_NOT_FIRE_CALLBACKS_AND_SUPPRESS_EXECUTION_OF_PENDING_OPERATIONS);
         constraint->removeReference();
     }
     // A body that is not fixed now merges its island with each non-fixed partner's.
     if (newState != hkpMotion::MOTION_FIXED) {
         body->m_collidable.getCollisionEntriesSorted(entries);
-        for (int32_t i = 0; i < entries.m_size; ++i) {
-            hkpEntity* partner = static_cast<hkpEntity*>(entries.m_data[i].m_partner->getOwner());
+        for (const hkpLinkedCollidable::CollisionEntry& entry : entries) {
+            hkpEntity* partner = static_cast<hkpEntity*>(entry.m_partner->getOwner());
             if (body->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED &&
                 partner->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED &&
                 body->getSimulationIsland() != partner->getSimulationIsland()) {

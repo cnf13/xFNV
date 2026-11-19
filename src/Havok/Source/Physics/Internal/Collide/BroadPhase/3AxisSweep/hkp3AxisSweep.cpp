@@ -222,10 +222,9 @@ void hkp3AxisSweep::getAllAabbs(hkArray<hkAabb, hkContainerHeapAllocator>& allAa
     }
     allAabbs.m_size = m_nodes.m_size - m_numMarkers;
     int32_t iAabb = 0;
-    for (int32_t i = 0; i < m_nodes.m_size; ++i) {
-        hkp3AxisSweep::hkpBpNode* node = &m_nodes.m_data[i];
-        if (!node->isMarker()) {
-            getAabbFromNode(*node, allAabbs.m_data[iAabb++]);
+    for (const hkp3AxisSweep::hkpBpNode& node : m_nodes) {
+        if (!node.isMarker()) {
+            getAabbFromNode(node, allAabbs.m_data[iAabb++]);
         }
     }
 }
@@ -1456,9 +1455,9 @@ void hkp3AxisSweep::queryBatchAabbSub(
         }
 
         const hkpBpNode* node = &m_nodes.m_data[nodeIndex];
-        for (int32_t i = 0; i < openQueryNodes.m_size; ++i) {
+        for (uint16_t otherIndex : openQueryNodes) {
             const hkpBpNode* nodes = m_nodes.m_data;
-            const hkpBpNode* other = &nodes[openQueryNodes.m_data[i]];
+            const hkpBpNode* other = &nodes[otherIndex];
             uint32_t nodeMin;
             uint32_t nodeMax;
             uint32_t otherMin;
@@ -1535,9 +1534,9 @@ void hkp3AxisSweep::queryBatchAabbSub(
             continue;
         }
 
-        for (int32_t i = 0; i < openOtherNodes.m_size; ++i) {
+        for (uint16_t otherIndex : openOtherNodes) {
             const hkpBpNode* nodes = m_nodes.m_data;
-            const hkpBpNode* other = &nodes[openOtherNodes.m_data[i]];
+            const hkpBpNode* other = &nodes[otherIndex];
             uint32_t nodeMin;
             uint32_t nodeMax;
             uint32_t otherMin;
@@ -2061,8 +2060,8 @@ void hkp3AxisSweep::calcAabbCache(
 ) const {
     const int32_t numCollidables = overlappingCollidables.m_size;
     hkLocalArray<const hkpBpNode*> overlaps(numCollidables);
-    for (int32_t i = 0; i < overlappingCollidables.m_size; i++) {
-        overlaps.pushBackUnchecked(&m_nodes.m_data[overlappingCollidables.m_data[i]->m_broadPhaseHandle.m_id]);
+    for (hkpCollidable* collidable : overlappingCollidables) {
+        overlaps.pushBackUnchecked(&m_nodes.m_data[collidable->m_broadPhaseHandle.m_id]);
     }
     calcAabbCacheInternal(overlaps, AabbCacheOut);
 }
@@ -2146,9 +2145,8 @@ void hkp3AxisSweep::defragment() {
 
         for (hkpBpAxis& rAxis : m_axis) {
             hkArray<hkpBpEndPoint>& endPoints = rAxis.m_endPoints;
-            for (int32_t i = 0; i < endPoints.m_size; ++i) {
-                endPoints.m_data[i].m_nodeIndex =
-                    static_cast<uint16_t>(newIndex.m_data[endPoints.m_data[i].m_nodeIndex]);
+            for (hkpBpEndPoint& endPoint : endPoints) {
+                endPoint.m_nodeIndex = static_cast<uint16_t>(newIndex.m_data[endPoint.m_nodeIndex]);
             }
         }
 
@@ -3975,8 +3973,8 @@ void hkp3AxisSweep::removeObjectBatch(
         }
     }
 
-    for (int32_t j = 0; j < movedNodes.m_size; j++) {
-        _fixDeterministicOrderAfterNodeIdWasDecreased(movedNodes.m_data[j]);
+    for (int32_t nodeIndex : movedNodes) {
+        _fixDeterministicOrderAfterNodeIdWasDecreased(nodeIndex);
     }
 
     // EXE-INLINED none: ~hkArray<hkp3AxisSweep::hkpBpNode, hkContainerTempAllocator>

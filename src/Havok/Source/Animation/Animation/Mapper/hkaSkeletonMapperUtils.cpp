@@ -342,8 +342,7 @@ void hkaSkeletonMapperUtils::createMapping(
         }
 
         // The user's mappings from A to B.
-        for (int32_t m = 0; m < params.m_userMappingsAtoB.m_size; ++m) {
-            const UserMapping& kUser = params.m_userMappingsAtoB.m_data[m];
+        for (const UserMapping& kUser : params.m_userMappingsAtoB) {
             const int16_t boneA =
                 hkaSkeletonUtils::findBoneWithName(*params.m_skeletonA, kUser.m_boneIn, params.m_compareNames);
             const int16_t boneB =
@@ -372,8 +371,7 @@ void hkaSkeletonMapperUtils::createMapping(
         }
 
         // The user's mappings from B to A.
-        for (int32_t m = 0; m < params.m_userMappingsBtoA.m_size; ++m) {
-            const UserMapping& kUser = params.m_userMappingsBtoA.m_data[m];
+        for (const UserMapping& kUser : params.m_userMappingsBtoA) {
             const int16_t boneB =
                 hkaSkeletonUtils::findBoneWithName(*params.m_skeletonB, kUser.m_boneIn, params.m_compareNames);
             const int16_t boneA =
@@ -469,8 +467,8 @@ void hkaSkeletonMapperUtils::createMapping(
                     );
                 }
                 else {
-                    for (int32_t i = 0; i < chainA.m_size; ++i) {
-                        if (bonesAMapped.m_data[chainA.m_data[i]] != -1) {
+                    for (int16_t boneA : chainA) {
+                        if (bonesAMapped.m_data[boneA] != -1) {
                             hkErrStream kStream(buf, 512);
                             kStream << "Couldn't make a chain (" << kChainA.m_start << " - " << kChainA.m_end
                                     << ")  Perhaps a bone is mapped twice?";
@@ -480,8 +478,8 @@ void hkaSkeletonMapperUtils::createMapping(
                             );
                         }
                     }
-                    for (int32_t i = 0; i < chainB.m_size; ++i) {
-                        if (bonesBMapped.m_data[chainB.m_data[i]] != -1) {
+                    for (int16_t boneB : chainB) {
+                        if (bonesBMapped.m_data[boneB] != -1) {
                             hkErrStream kStream(buf, 512);
                             kStream << "Couldn't make a chain (" << kChainB.m_start << " - " << kChainB.m_end
                                     << ")  Perhaps a bone is mapped twice?";
@@ -515,11 +513,11 @@ void hkaSkeletonMapperUtils::createMapping(
                     );
                     pBToA->m_chainMappings.pushBack(kChainBToA);
                     pAToB->m_chainMappings.pushBack(kChainAToB);
-                    for (int32_t i = 0; i < chainA.m_size; ++i) {
-                        bonesAMapped.m_data[chainA.m_data[i]] = -2;
+                    for (int16_t boneA : chainA) {
+                        bonesAMapped.m_data[boneA] = -2;
                     }
-                    for (int32_t i = 0; i < chainB.m_size; ++i) {
-                        bonesBMapped.m_data[chainB.m_data[i]] = -2;
+                    for (int16_t boneB : chainB) {
+                        bonesBMapped.m_data[boneB] = -2;
                     }
                 }
             }
@@ -527,8 +525,7 @@ void hkaSkeletonMapperUtils::createMapping(
         else {
             // Ragdoll: each user chain names its start and end bones in both skeletons; a bone missing from one is
             // taken from the other's mapping.
-            for (int32_t c = 0; c < params.m_userChains.m_size; ++c) {
-                const UserChain& kChain = params.m_userChains.m_data[c];
+            for (const UserChain& kChain : params.m_userChains) {
                 int16_t startA =
                     hkaSkeletonUtils::findBoneWithName(*params.m_skeletonA, kChain.m_start, params.m_compareNames);
                 int16_t endA =
@@ -699,9 +696,9 @@ void hkaSkeletonMapperUtils::createMapping(
                     }
                 }
             }
-            for (int32_t p = 0; p < pairs.m_size; ++p) {
-                const int16_t boneA = static_cast<int16_t>(pairs.m_data[p].m_boneA);
-                const int16_t boneB = static_cast<int16_t>(pairs.m_data[p].m_boneB);
+            for (const BonePair& kPair : pairs) {
+                const int16_t boneA = static_cast<int16_t>(kPair.m_boneA);
+                const int16_t boneB = static_cast<int16_t>(kPair.m_boneB);
                 if (bonesAMapped.m_data[boneA] != -1 || bonesBMapped.m_data[boneB] != -1) {
                     continue;
                 }
@@ -974,8 +971,7 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
     const int32_t numBonesB = pSkeletonB->m_bones.m_size;
     int32_t rootA = pSkeletonA->m_bones.m_size;
     int32_t rootB = numBonesB;
-    for (int32_t i = 0; i < mapperData.m_simpleMappings.m_size; ++i) {
-        const hkaSkeletonMapperData::SimpleMapping& rSimple = mapperData.m_simpleMappings.m_data[i];
+    for (const hkaSkeletonMapperData::SimpleMapping& rSimple : mapperData.m_simpleMappings) {
         if (rSimple.m_boneA < rootA) {
             rootB = rSimple.m_boneB;
             if (rootB >= numBonesB) {
@@ -1028,12 +1024,11 @@ hkResult hkaSkeletonMapperUtils::lockTranslationsAutomatically(const hkaSkeleton
 // start and end transforms.
 void hkaSkeletonMapperUtils::scaleMapping(hkaSkeletonMapper& mapper, float scale) {
     hkaSkeletonMapperData& rMapping = mapper.m_mapping;
-    for (int32_t i = 0; i < rMapping.m_simpleMappings.m_size; ++i) {
-        hkVector4& rTranslation = rMapping.m_simpleMappings.m_data[i].m_aFromBTransform.m_translation;
+    for (hkaSkeletonMapperData::SimpleMapping& rSimple : rMapping.m_simpleMappings) {
+        hkVector4& rTranslation = rSimple.m_aFromBTransform.m_translation;
         rTranslation.m_quad = _mm_mul_ps(_mm_set1_ps(scale), rTranslation.m_quad);
     }
-    for (int32_t i = 0; i < rMapping.m_chainMappings.m_size; ++i) {
-        hkaSkeletonMapperData::ChainMapping& rChain = rMapping.m_chainMappings.m_data[i];
+    for (hkaSkeletonMapperData::ChainMapping& rChain : rMapping.m_chainMappings) {
         rChain.m_startAFromBTransform.m_translation.m_quad =
             _mm_mul_ps(_mm_set1_ps(scale), rChain.m_startAFromBTransform.m_translation.m_quad);
         rChain.m_endAFromBTransform.m_translation.m_quad =

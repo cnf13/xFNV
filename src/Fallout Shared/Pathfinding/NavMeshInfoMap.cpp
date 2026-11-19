@@ -95,10 +95,10 @@ bool NavMeshInfoMap::Load(TESFile* apFile) {
             uint32_t uiKey;
             NavMeshInfo* pInfo;
             InfoMap.GetNext(pPos, uiKey, pInfo);
-            for (uint32_t i = 0; i < pInfo->ConnectedDoors.GetSize(); ++i) {
-                uint32_t uiDoorID = pInfo->ConnectedDoors.GetAt(i)->GetFormID();
+            for (TESObjectREFR*& rpDoor : pInfo->ConnectedDoors) {
+                uint32_t uiDoorID = rpDoor->GetFormID();
                 // Stores the form ID in the pointer-sized slot.
-                pInfo->ConnectedDoors.GetAt(i) = reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(uiDoorID));
+                rpDoor = reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(uiDoorID));
             }
         }
         bInit = 0;
@@ -287,11 +287,10 @@ void NavMeshInfoMap::InitItem() {
             pinfo->InitDoorPointers();
         }
     }
-    for (uint32_t i = 0; i < infosToRemove.GetSize(); ++i) {
-        InfoMap.RemoveAt(infosToRemove.GetAt(static_cast<int32_t>(i))->NavMeshID);
-        NavMeshInfo* apThis = infosToRemove.GetAt(static_cast<int32_t>(i));
-        if (apThis) {
-            delete apThis;
+    for (NavMeshInfo* pInfoToRemove : infosToRemove) {
+        InfoMap.RemoveAt(pInfoToRemove->NavMeshID);
+        if (pInfoToRemove) {
+            delete pInfoToRemove;
         }
     }
     bInit = 1;
@@ -662,8 +661,7 @@ void NavMeshInfoMap::CheckMap() {
                                 break;
                             }
                         }
-                        for (uint32_t i_8 = 0; i_8 < pinfo->ConnectedDoors.iSize; ++i_8) {
-                            TESObjectREFR* pdoor = pinfo->ConnectedDoors.GetAt(static_cast<int32_t>(i_8));
+                        for (TESObjectREFR* pdoor : pinfo->ConnectedDoors) {
                             bool bhasPortal = false;
                             for (uint32_t j = 0; j < spMesh.m_pObject->GetNumDoorPortals(); ++j) {
                                 if (spMesh.m_pObject->GetDoorPortalFromArray(j)->pDoorForm == pdoor) {
@@ -738,11 +736,10 @@ void NavMeshInfoMap::CheckMap() {
             infosToRemove.Add(pinfo);
         }
     }
-    for (uint32_t i_9 = 0; i_9 < infosToRemove.iSize; ++i_9) {
-        RemoveNavMeshInfo(infosToRemove.GetAt(static_cast<int32_t>(i_9))->NavMeshID);
-        NavMeshInfo* apThis = infosToRemove.GetAt(static_cast<int32_t>(i_9));
-        if (apThis) {
-            delete apThis;
+    for (NavMeshInfo* pInfoToRemove : infosToRemove) {
+        RemoveNavMeshInfo(pInfoToRemove->NavMeshID);
+        if (pInfoToRemove) {
+            delete pInfoToRemove;
         }
     }
 }
@@ -761,8 +758,8 @@ bool NavMeshInfoMap::CheckAllNavmeshBoundingBoxes() {
             pcellKeyMap->GetNext(cellIt, icellkey, parray);
             if (parray->GetSize() > 1) {
                 uint32_t uiBounded = 0;
-                for (uint32_t i = 0; i < parray->GetSize(); ++i) {
-                    if ((*parray)[i]->pBounds) {
+                for (NavMeshInfo* pInfo : *parray) {
+                    if (pInfo->pBounds) {
                         ++uiBounded;
                     }
                 }

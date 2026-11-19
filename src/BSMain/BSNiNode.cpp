@@ -118,8 +118,7 @@ void BSNiNode::ReparentSkinInstances(NiNode* apRoot, NiNode* apNewParent) {
     if (!apRoot || !apNewParent) {
         return;
     }
-    for (uint32_t i = 0; i < apRoot->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pkChild = apRoot->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pkChild : apRoot->m_kChildren) {
         if (!pkChild) {
             continue;
         }

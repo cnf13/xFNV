@@ -540,14 +540,14 @@ void hkaRagdollInstance::commonInit(
     m_rigidBodies.copyFromArray(hkContainerHeapAllocator().get(&m_rigidBodies), rigidBodies, hkTypeIsPod());
     // EXE-INLINED none: hkArray<hkpConstraintInstance*>::operator=
     m_constraints.copyFromArray(hkContainerHeapAllocator().get(&m_constraints), constraints, hkTypeIsPod());
-    for (int32_t i = 0; i < m_rigidBodies.m_size; ++i) {
-        if (m_rigidBodies.m_data[i]) {
-            m_rigidBodies.m_data[i]->addReference();
+    for (hkpRigidBody* pRigidBody : m_rigidBodies) {
+        if (pRigidBody) {
+            pRigidBody->addReference();
         }
     }
-    for (int32_t j = 0; j < m_constraints.m_size; ++j) {
-        if (m_constraints.m_data[j]) {
-            m_constraints.m_data[j]->addReference();
+    for (hkpConstraintInstance* pConstraint : m_constraints) {
+        if (pConstraint) {
+            pConstraint->addReference();
         }
     }
 }

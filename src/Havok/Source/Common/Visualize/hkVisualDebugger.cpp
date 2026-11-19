@@ -204,8 +204,8 @@ void hkVisualDebugger::capture(const char* captureFilename) {
         hkVisualDebuggerClient* pClient = &m_clients.m_data[m_clients.m_size - 1];
         hkStringBuf kViewers;
         kViewers = "Turning on the following viewers: [";
-        for (int32_t i = 0; i < m_defaultProcesses.m_size; ++i) {
-            const char* pcName = m_defaultProcesses.m_data[i].cString();
+        for (const hkStringPtr& kProcessName : m_defaultProcesses) {
+            const char* pcName = kProcessName.cString();
             const int32_t iId = pClient->m_processHandler->getProcessId(pcName);
             if (iId >= 0) {
                 kViewers.appendJoin(" ", pcName, nullptr, nullptr, nullptr, nullptr);
@@ -347,11 +347,9 @@ void hkVisualDebugger::createClient(hkSocket* socket, hkStreamReader* reader, hk
     hkServerProcessHandler* v13 = ::new (v12) hkServerProcessHandler(m_contexts, reader, writer);
     v10->m_processHandler = v13;
     v13->registerAllAvailableProcesss();
-    for (int32_t i = 0; i < m_defaultProcesses.m_size; ++i) {
+    for (const hkStringPtr& kProcessName : m_defaultProcesses) {
         int32_t v15 = v10->m_processHandler->getProcessId(
-            reinterpret_cast<const char*>(
-                reinterpret_cast<uintptr_t>(m_defaultProcesses.m_data[i].m_stringAndFlag) & ~uintptr_t(1)
-            )
+            reinterpret_cast<const char*>(reinterpret_cast<uintptr_t>(kProcessName.m_stringAndFlag) & ~uintptr_t(1))
         );
         if (v15 >= 0) {
             v10->m_processHandler->selectProcess(v15);

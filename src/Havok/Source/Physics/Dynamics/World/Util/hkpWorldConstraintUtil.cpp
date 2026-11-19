@@ -366,10 +366,9 @@ hkpConstraintInstance* hkpWorldConstraintUtil::getConstraint(const hkpEntity* en
         const hkpEntity* entity = entities[e];
         const hkpEntity* otherEntity = entities[1 - e];
         const hkSmallArray<hkConstraintInternal>& masters = entity->getConstraintMasters();
-        for (int32_t i = 0; i < masters.m_size; ++i) {
-            const hkConstraintInternal* c = &masters.m_data[i];
-            if (c->getOtherEntity(entity) == otherEntity) {
-                return c->m_constraint;
+        for (const hkConstraintInternal& c : masters) {
+            if (c.getOtherEntity(entity) == otherEntity) {
+                return c.m_constraint;
             }
         }
     }

@@ -414,13 +414,13 @@ void DebugText::HandleQueuedPrints() {
             }
         }
     }
-    for (uint32_t iprintCt = 0; iprintCt < xPrintData.iSize; ++iprintCt) {
-        DebugText::DebugTextData* Block = xPrintData.pBuffer[iprintCt]->pTextData;
+    for (sPrintData* pPrintData : xPrintData) {
+        DebugText::DebugTextData* Block = pPrintData->pTextData;
         if (Block) {
             Block->~DebugTextData();
             MemoryManager_Singleton.Deallocate(Block);
         }
-        MemoryManager_Singleton.Deallocate(xPrintData.pBuffer[iprintCt]);
+        MemoryManager_Singleton.Deallocate(pPrintData);
     }
     xPrintData.Clear(true);
 }

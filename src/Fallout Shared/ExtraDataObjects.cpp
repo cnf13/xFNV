@@ -1949,14 +1949,13 @@ ExtraDismemberedLimbs::ExtraDismemberedLimbs()
     eLastHitLimb(BGSBodyPart::LIMB_NONE), bEaten(false) {}
 
 ExtraDismemberedLimbs::~ExtraDismemberedLimbs() {
-    for (uint32_t uiIndex = 0; uiIndex < DismemberedLimbs.iSize; ++uiIndex) {
-        delete DismemberedLimbs[uiIndex];
+    for (DismemberedLimb* pDismemberedLimb : DismemberedLimbs) {
+        delete pDismemberedLimb;
     }
 }
 
 void ExtraDismemberedLimbs::RemoveLimb(BGSBodyPart::LIMB_ENUM aeLimb, bool abRemoved) {
-    for (uint32_t i = 0; i < DismemberedLimbs.iSize; ++i) {
-        DismemberedLimb* pdismemberedLimb = DismemberedLimbs[i];
+    for (DismemberedLimb* pdismemberedLimb : DismemberedLimbs) {
         if ((pdismemberedLimb) && (pdismemberedLimb->cLimb == aeLimb)) {
             pdismemberedLimb->bLimbRemoved = abRemoved;
         }
@@ -2753,8 +2752,8 @@ bool ExtraGuardedRefData::Compare(BSExtraData* apCompare) {
     if (pcomp->Guards.iSize != Guards.iSize) {
         return true;
     }
-    for (uint32_t i = 0; i < Guards.iSize; ++i) {
-        if (pcomp->Guards.Find(Guards[i], 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress) == -1) {
+    for (uint32_t uiGuard : Guards) {
+        if (pcomp->Guards.Find(uiGuard, 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress) == -1) {
             return true;
         }
     }

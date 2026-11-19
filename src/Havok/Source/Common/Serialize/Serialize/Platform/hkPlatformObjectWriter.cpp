@@ -19,8 +19,8 @@ hkPlatformObjectWriter::Cache::Cache() {}
 
 // Frees the converted classes; the maps and the array free their storage themselves.
 hkPlatformObjectWriter::Cache::~Cache() {
-    for (int32_t i = 0; i < m_allocations.m_size; ++i) {
-        hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), m_allocations.m_data[i]);
+    for (void* pAllocation : m_allocations) {
+        hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), pAllocation);
     }
 }
 

@@ -69,15 +69,15 @@ void hkaSkeletonMapper::initializeBindingMaps(
         if (hkaSkeletonUtils::getBoneChain(*pSkeletonA, rChain.m_startBoneA, rChain.m_endBoneA, bonesA).m_bool &&
             hkaSkeletonUtils::getBoneChain(*pSkeletonB, rChain.m_startBoneB, rChain.m_endBoneB, bonesB).m_bool) {
             bool allAnimated = true;
-            for (int32_t i = 0; i < bonesA.m_size; ++i) {
-                if (srcBoneToTrackIndicesOut.m_data[bonesA.m_data[i]] < 0) {
+            for (int16_t boneA : bonesA) {
+                if (srcBoneToTrackIndicesOut.m_data[boneA] < 0) {
                     allAnimated = false;
                     break;
                 }
             }
             if (allAnimated) {
-                for (int32_t i = 0; i < bonesB.m_size; ++i) {
-                    dstTrackToBoneIndicesOut.pushBack(bonesB.m_data[i]);
+                for (int16_t boneB : bonesB) {
+                    dstTrackToBoneIndicesOut.pushBack(boneB);
                 }
             }
         }
@@ -117,8 +117,7 @@ void hkaSkeletonMapper::mapPose(
 
     HK_TIMER_SPLIT_LIST("chainMappings");
 
-    for (int32_t c = 0; c < rMapping.m_chainMappings.m_size; ++c) {
-        const hkaSkeletonMapperData::ChainMapping& rChain = rMapping.m_chainMappings.m_data[c];
+    for (const hkaSkeletonMapperData::ChainMapping& rChain : rMapping.m_chainMappings) {
         const int16_t iStartBoneA = rChain.m_startBoneA;
         const int16_t iStartBoneB = rChain.m_startBoneB;
         const int16_t iEndBoneB = rChain.m_endBoneB;
@@ -235,8 +234,7 @@ void hkaSkeletonMapper::mapPose(
     HK_TIMER_SPLIT_LIST("unmappedBones");
 
     if (rMapping.m_keepUnmappedLocal.m_bool) {
-        for (int32_t j = 0; j < rMapping.m_unmappedBones.m_size; ++j) {
-            const int32_t iBone = rMapping.m_unmappedBones.m_data[j];
+        for (const int32_t iBone : rMapping.m_unmappedBones) {
             const int16_t iParent = rMapping.m_skeletonB->m_parentIndices.m_data[iBone];
             if (iParent == -1) {
                 _mm_store_ps(
@@ -402,8 +400,7 @@ void hkaSkeletonMapper::mapPoseLocalSpace(
 
     HK_TIMER_SPLIT_LIST("chainMappings");
 
-    for (int32_t c = 0; c < rMapping.m_chainMappings.m_size; ++c) {
-        const hkaSkeletonMapperData::ChainMapping& rChain = rMapping.m_chainMappings.m_data[c];
+    for (const hkaSkeletonMapperData::ChainMapping& rChain : rMapping.m_chainMappings) {
 
         // Skeleton A's chain: the end bone's position in the start bone's space and the chain's length.
         __m128 kLengthA = _mm_set_ss(0.0f);
@@ -572,8 +569,7 @@ bool hkaSkeletonMapper::checkTransform(hkaSkeletonMapperData::MappingType type, 
 void hkaSkeletonMapper::checkMapping(const hkaSkeletonMapperData& m_mapping) {
     alignas(16) char buf[512];
     if (m_mapping.m_mappingType.m_storage == hkaSkeletonMapperData::HK_RAGDOLL_MAPPING) {
-        for (int32_t i = 0; i < m_mapping.m_simpleMappings.m_size; ++i) {
-            const hkaSkeletonMapperData::SimpleMapping& rSimple = m_mapping.m_simpleMappings.m_data[i];
+        for (const hkaSkeletonMapperData::SimpleMapping& rSimple : m_mapping.m_simpleMappings) {
             const hkaBone& rBoneA = m_mapping.m_skeletonA->m_bones.m_data[rSimple.m_boneA];
             const hkaBone& rBoneB = m_mapping.m_skeletonB->m_bones.m_data[rSimple.m_boneB];
             if (rBoneB.m_lockTranslation.m_bool) {
@@ -592,8 +588,8 @@ void hkaSkeletonMapper::checkMapping(const hkaSkeletonMapperData& m_mapping) {
     }
     if (m_mapping.m_mappingType.m_storage == hkaSkeletonMapperData::HK_RAGDOLL_MAPPING) {
         const hkaSkeleton* pSkeletonB = m_mapping.m_skeletonB;
-        for (int32_t i = 0; i < pSkeletonB->m_bones.m_size; ++i) {
-            if (pSkeletonB->m_bones.m_data[i].m_lockTranslation.m_bool) {
+        for (const hkaBone& rBone : pSkeletonB->m_bones) {
+            if (rBone.m_lockTranslation.m_bool) {
                 return;
             }
         }
@@ -617,8 +613,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
     }
     boneCounts.m_size = numBonesB;
 
-    for (int32_t i = 0; i < m_mapping.m_simpleMappings.m_size; ++i) {
-        const hkaSkeletonMapperData::SimpleMapping& rSimple = m_mapping.m_simpleMappings.m_data[i];
+    for (const hkaSkeletonMapperData::SimpleMapping& rSimple : m_mapping.m_simpleMappings) {
         if (!checkTransform(m_mapping.m_mappingType, rSimple.m_aFromBTransform)) {
             hkErrStream kStream(buf, 512);
             kStream << "Improper mapping transform found";
@@ -650,8 +645,7 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
         }
     }
 
-    for (int32_t c = 0; c < m_mapping.m_chainMappings.m_size; ++c) {
-        const hkaSkeletonMapperData::ChainMapping& rChain = m_mapping.m_chainMappings.m_data[c];
+    for (const hkaSkeletonMapperData::ChainMapping& rChain : m_mapping.m_chainMappings) {
         if (!checkTransform(m_mapping.m_mappingType, rChain.m_startAFromBTransform)) {
             hkErrStream kStream(buf, 512);
             kStream << "Improper mapping transform found";

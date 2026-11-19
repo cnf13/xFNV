@@ -44,9 +44,8 @@ void* getAgentData(hkpAgentNnEntry* entry) {
 
 void hkpWorldAgentUtil::invalidateTim(hkpEntity* entity, const hkpCollisionInput& collisionInput) {
     hkpLinkedCollidable* collidable = &entity->m_collidable;
-    // Havok's getSize() is an int, so the compare is signed.
-    for (int32_t i = 0; i < collidable->m_collisionEntries.m_size; i++) {
-        hkAgentNnMachine_InvalidateTimInAgent(collidable->m_collisionEntries.m_data[i].m_agentEntry, collisionInput);
+    for (const hkpLinkedCollidable::CollisionEntry& entry : collidable->m_collisionEntries) {
+        hkAgentNnMachine_InvalidateTimInAgent(entry.m_agentEntry, collisionInput);
     }
 }
 
@@ -156,8 +155,7 @@ hkpSimulationIsland* hkpWorldAgentUtil::getIslandFromAgentEntry(
     const bool searchIslandA = candidateA->m_agentTrack.m_sectors.m_size <= candidateB->m_agentTrack.m_sectors.m_size;
     hkpSimulationIsland* islandToSearch = searchIslandA ? candidateA : candidateB;
     bool found = false;
-    for (int32_t i = 0; i < islandToSearch->m_agentTrack.m_sectors.m_size; i++) {
-        hkpAgentNnSector* sector = islandToSearch->m_agentTrack.m_sectors.m_data[i];
+    for (hkpAgentNnSector* sector : islandToSearch->m_agentTrack.m_sectors) {
         if (sector->getBegin() <= entry && entry < sector->getEnd()) {
             found = true;
             break;
@@ -171,8 +169,8 @@ hkpSimulationIsland* hkpWorldAgentUtil::getIslandFromAgentEntry(
 void hkpWorldAgentUtil::updateEntityShapeCollectionFilter(hkpEntity* entity, hkpCollisionInput& collisionInput) {
     hkArray<hkpLinkedCollidable::CollisionEntry> collisionEntries;
     entity->m_collidable.getCollisionEntriesSorted(collisionEntries);
-    for (int32_t i = 0; i < collisionEntries.m_size; ++i) {
-        hkpAgentNnEntry* entry = collisionEntries.m_data[i].m_agentEntry;
+    for (const hkpLinkedCollidable::CollisionEntry& collisionEntry : collisionEntries) {
+        hkpAgentNnEntry* entry = collisionEntry.m_agentEntry;
         hkAgent3::UpdateFilterFunc func =
             collisionInput.m_dispatcher->m_agent3Func[entry->m_agentType].m_updateFilterFunc;
         if (!func) {

@@ -233,8 +233,8 @@ hkResourceBase::Type hkResourceContainer::getType() const {
 void hkResourceContainer::tryToResolveLinks(hkResourceMap& map) {
     hkArray<hkResourceHandle*> handles;
     findAllResourceRecursively(handles);
-    for (int32_t i = 0; i < handles.m_size; ++i) {
-        handles.m_data[i]->tryToResolveLinks(map);
+    for (hkResourceHandle* pHandle : handles) {
+        pHandle->tryToResolveLinks(map);
     }
 }
 
@@ -284,17 +284,17 @@ hkMemoryResourceContainer::hkMemoryResourceContainer(const char* a1) : m_name(a1
 
 // The children and handles lose the references the container holds; the arrays and the name free themselves.
 hkMemoryResourceContainer::~hkMemoryResourceContainer() {
-    for (int32_t i = 0; i < m_children.m_size; ++i) {
-        if (m_children.m_data[i]) {
-            m_children.m_data[i]->removeReference();
+    for (hkMemoryResourceContainer*& pChild : m_children) {
+        if (pChild) {
+            pChild->removeReference();
         }
-        m_children.m_data[i] = nullptr;
+        pChild = nullptr;
     }
-    for (int32_t i = 0; i < m_resourceHandles.m_size; ++i) {
-        if (m_resourceHandles.m_data[i]) {
-            m_resourceHandles.m_data[i]->removeReference();
+    for (hkMemoryResourceHandle*& pHandle : m_resourceHandles) {
+        if (pHandle) {
+            pHandle->removeReference();
         }
-        m_resourceHandles.m_data[i] = nullptr;
+        pHandle = nullptr;
     }
 }
 
@@ -590,8 +590,7 @@ hkResult hkMemoryResourceContainer::parentTo(hkResourceContainer* newParent) {
 hkContainerResourceMap::hkContainerResourceMap(hkResourceContainer* container) {
     hkArray<hkResourceHandle*> handles;
     container->findAllResourceRecursively(handles);
-    for (int32_t i = 0; i < handles.m_size; ++i) {
-        hkResourceHandle* pHandle = handles.m_data[i];
+    for (hkResourceHandle* pHandle : handles) {
         hkStringBuf buffer;
         m_resources.insert(pHandle->getName(buffer), pHandle);
     }

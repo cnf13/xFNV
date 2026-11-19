@@ -288,8 +288,8 @@ void hkpWorldOperationQueue::executeAllPending() {
                         hkArray<hkpEntity*> kEntities;
                         pAction->getEntities(kEntities);
                         bool bAllInWorld = true;
-                        for (int32_t i = 0; i < kEntities.m_size; ++i) {
-                            if (kEntities.m_data[i]->m_world != m_world) {
+                        for (hkpEntity* pEntity : kEntities) {
+                            if (pEntity->m_world != m_world) {
                                 bAllInWorld = false;
                                 break;
                             }

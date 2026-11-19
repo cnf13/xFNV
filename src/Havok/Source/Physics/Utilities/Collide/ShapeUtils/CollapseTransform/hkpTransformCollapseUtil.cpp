@@ -205,8 +205,8 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
         static_cast<hkpListShape*>(pMemory)->m_memSizeAndFlags = sizeof(hkpListShape);
         hkpListShape* pNewList = ::new (pMemory)
             hkpListShape(newChildren.m_data, newChildren.m_size, hkpShapeContainer::REFERENCE_POLICY_INCREMENT);
-        for (int32_t i = 0; i < newChildren.m_size; ++i) {
-            newChildren.m_data[i]->removeReference();
+        for (const hkpShape* pChild : newChildren) {
+            pChild->removeReference();
         }
         sharedShapeData.setReplacement(transformShape, pNewList);
         return pNewList;
@@ -573,8 +573,7 @@ hkResult hkpTransformCollapseUtil::collapseTransforms(
 ) {
     resultsOut.reset();
     _SharedShapeData sharedShapeData(rigidBodies);
-    for (int32_t i = 0; i < rigidBodies.m_size; ++i) {
-        hkpRigidBody* pBody = rigidBodies.m_data[i];
+    for (hkpRigidBody* pBody : rigidBodies) {
         const hkpShape* pShape = pBody->m_collidable.m_shape;
         const hkpShape* pNewShape = collapseShapesRecursively(pShape, options, sharedShapeData, resultsOut);
         pShape->removeReference();
@@ -654,8 +653,8 @@ const hkpShape* hkpTransformCollapseUtil::transformTransformShape(const hkpShape
 
 // Each rigid body's shape is recorded, then the shapes referenced once are dropped.
 _SharedShapeData::_SharedShapeData(const hkArray<hkpRigidBody*, hkContainerHeapAllocator>& a1) {
-    for (int32_t i = 0; i < a1.m_size; ++i) {
-        recursivelyParseShapeReferences(a1.m_data[i]->m_collidable.m_shape);
+    for (hkpRigidBody* pBody : a1) {
+        recursivelyParseShapeReferences(pBody->m_collidable.m_shape);
     }
     removeSingleReferencedShapeData();
 }
@@ -667,12 +666,12 @@ _SharedShapeData::_SharedShapeData(const hkpShape* shape) {
 
 // Every record's two shapes lose their reference; the records' storage goes with m_sharedShapes.
 _SharedShapeData::~_SharedShapeData() {
-    for (int32_t i = 0; i < m_sharedShapes.m_size; i++) {
-        if (m_sharedShapes.m_data[i].m_originalShape) {
-            m_sharedShapes.m_data[i].m_originalShape->removeReference();
+    for (const SharedShape& kShape : m_sharedShapes) {
+        if (kShape.m_originalShape) {
+            kShape.m_originalShape->removeReference();
         }
-        if (m_sharedShapes.m_data[i].m_replacementShape) {
-            m_sharedShapes.m_data[i].m_replacementShape->removeReference();
+        if (kShape.m_replacementShape) {
+            kShape.m_replacementShape->removeReference();
         }
     }
 }
@@ -713,8 +712,8 @@ void _SharedShapeData::recursivelyParseShapeReferences(const hkpShape* shape) {
         r_esi.m_size = 0;
         r_esi.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
         collectChildShapes(shape, &r_esi);
-        for (int32_t i = 0; i < r_esi.m_size; ++i) {
-            recursivelyParseShapeReferences(r_esi.m_data[i]);
+        for (const hkpShape* pChild : r_esi) {
+            recursivelyParseShapeReferences(pChild);
         }
         hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
         r_esi.m_size = 0;

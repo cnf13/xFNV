@@ -98,8 +98,8 @@ void ObstacleTaskData::Process() {
         }
     }
     else {
-        for (uint32_t j = 0; j < Operations.iSize; ++j) {
-            (&Operations.GetAt(static_cast<int32_t>(j)))->eResult = OBSTACLE_TASK_RESULT_FAILLURE;
+        for (ObstacleTaskNavMeshOperation& rOperation : Operations) {
+            rOperation.eResult = OBSTACLE_TASK_RESULT_FAILLURE;
         }
     }
     NavMeshObstacleManager* v6 = NavMeshObstacleManager::GetInstance();
@@ -120,8 +120,8 @@ bool ObstacleTaskData::ReplaceNavMesh() {
         bReplace = true;
     }
     else {
-        for (uint32_t i = 0; i < Operations.GetSize(); ++i) {
-            if (Operations.GetAt(i).eResult == 0) {
+        for (const ObstacleTaskNavMeshOperation& rOperation : Operations) {
+            if (rOperation.eResult == 0) {
                 bReplace = true;
                 break;
             }
@@ -204,9 +204,8 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
             break;
         }
         case OBSTACLE_TASK_TYPE_REMOVE_DOOR: {
-            for (uint32_t j = 0; j < Operations.iSize; ++j) {
-                if ((&Operations.GetAt(static_cast<int32_t>(j)))->spObstacle == apObstacle &&
-                    (&Operations.GetAt(static_cast<int32_t>(j)))->eType == OBSTACLE_TASK_TYPE_REMOVE_DOOR) {
+            for (const ObstacleTaskNavMeshOperation& rOperation : Operations) {
+                if (rOperation.spObstacle == apObstacle && rOperation.eType == OBSTACLE_TASK_TYPE_REMOVE_DOOR) {
                     return false;
                 }
             }

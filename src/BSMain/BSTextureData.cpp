@@ -51,8 +51,8 @@ void BSTextureData::LoadBinary(NiStream& kStream) {
 
 void BSTextureData::LinkObject(NiStream& kStream) {
     NiExtraData::LinkObject(kStream);
-    for (uint32_t i = 0; i < pObjects.iSize; i++) {
-        pObjects[i] = static_cast<NiAVObject*>(kStream.GetObjectFromLinkID());
+    for (NiAVObject*& rpObject : pObjects) {
+        rpObject = static_cast<NiAVObject*>(kStream.GetObjectFromLinkID());
     }
 }
 
@@ -60,8 +60,8 @@ bool BSTextureData::RegisterStreamables(NiStream& kStream) {
     if (!NiExtraData::RegisterStreamables(kStream)) {
         return false;
     }
-    for (uint32_t i = 0; i < pObjects.iSize; i++) {
-        pObjects[i]->RegisterStreamables(kStream);
+    for (NiAVObject* pObject : pObjects) {
+        pObject->RegisterStreamables(kStream);
     }
     return true;
 }
@@ -70,8 +70,8 @@ void BSTextureData::SaveBinary(NiStream& kStream) {
     NiExtraData::SaveBinary(kStream);
     uint32_t uiNum = pObjects.iSize;
     NiStreamSaveBinary(kStream, uiNum);
-    for (uint32_t i = 0; i < pObjects.iSize; i++) {
-        kStream.SaveLinkID(pObjects[i]);
+    for (NiAVObject* pObject : pObjects) {
+        kStream.SaveLinkID(pObject);
     }
 }
 
@@ -94,8 +94,8 @@ bool BSTextureData::IsEqual(NiObject* pObject) {
 void BSTextureData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
     NiExtraData::GetViewerStrings(pStrings);
     pStrings->Add(NiGetViewerString(BSTextureData::ms_RTTI.GetName()));
-    for (uint32_t i = 0; i < pObjects.iSize; i++) {
-        pStrings->Add(NiGetViewerString("ObjectName", static_cast<const char*>(pObjects[i]->m_kName)));
+    for (NiAVObject* pObject : pObjects) {
+        pStrings->Add(NiGetViewerString("ObjectName", static_cast<const char*>(pObject->m_kName)));
     }
 }
 

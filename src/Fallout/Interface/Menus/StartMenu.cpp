@@ -883,33 +883,30 @@ void StartMenu::_Create(bool abInGame, bool abForceReload) {
     BSstrcat(acPath, 0x104, ".fos");
     const bool bSavesExist = !platform::FindFiles(acPath).empty();
 
-    for (uint32_t i = 0; i < StartMenu::pOptionsA.GetSize(); ++i) {
+    for (Option* pOption : StartMenu::pOptionsA) {
         Tile* pTile = nullptr;
-        const bool bDisabled = (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseSave &&
-                                !pSaveLoadManager->IsSavingAllowed(false)) ||
-            (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseContinue &&
-             (abInGame ? abForceReload : !bSavesExist)) ||
-            (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseLoad && !bSavesExist) ||
-            (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseHelp &&
-             Menu::GetMenuByClass(TutorialMenu::GetClassStatic()));
-        if ((abInGame && StartMenu::pOptionsA.GetAt(i)->IsForModes(MODE_PAUSE)) ||
-            (!abInGame && StartMenu::pOptionsA.GetAt(i)->IsForModes(MODE_MAIN))) {
-            pTile = this->lbMain.AddItem(StartMenu::pOptionsA.GetAt(i), nullptr, nullptr, nullptr);
+        const bool bDisabled =
+            (pOption->pfChooseFn == &StartMenu::ChooseSave && !pSaveLoadManager->IsSavingAllowed(false)) ||
+            (pOption->pfChooseFn == &StartMenu::ChooseContinue && (abInGame ? abForceReload : !bSavesExist)) ||
+            (pOption->pfChooseFn == &StartMenu::ChooseLoad && !bSavesExist) ||
+            (pOption->pfChooseFn == &StartMenu::ChooseHelp && Menu::GetMenuByClass(TutorialMenu::GetClassStatic()));
+        if ((abInGame && pOption->IsForModes(MODE_PAUSE)) || (!abInGame && pOption->IsForModes(MODE_MAIN))) {
+            pTile = this->lbMain.AddItem(pOption, nullptr, nullptr, nullptr);
         }
-        else if (StartMenu::pOptionsA.GetAt(i)->IsForModes(MODE_SETTINGS)) {
-            pTile = this->lbSettings.AddItem(StartMenu::pOptionsA.GetAt(i), nullptr, nullptr, nullptr);
+        else if (pOption->IsForModes(MODE_SETTINGS)) {
+            pTile = this->lbSettings.AddItem(pOption, nullptr, nullptr, nullptr);
         }
-        if (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseDownloads) {
+        if (pOption->pfChooseFn == &StartMenu::ChooseDownloads) {
             this->pDownloadsOption = pTile;
         }
-        else if (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseContinue) {
+        else if (pOption->pfChooseFn == &StartMenu::ChooseContinue) {
             this->pContinueOption = pTile;
         }
-        else if (StartMenu::pOptionsA.GetAt(i)->pfChooseFn == &StartMenu::ChooseLoad) {
+        else if (pOption->pfChooseFn == &StartMenu::ChooseLoad) {
             this->pLoadOption = pTile;
         }
         if (pTile) {
-            pTile->Set(kTileValue_String, StartMenu::pOptionsA.GetAt(i)->pDisplayText, true);
+            pTile->Set(kTileValue_String, pOption->pDisplayText, true);
             if (bDisabled) {
                 pTile->Set(this->ENABLED_TRAIT, 0);
             }
@@ -1028,28 +1025,25 @@ void StartMenu::PopulateOptionsListBox(uint32_t auiModes) {
     Fade(StartMenu::eOptionsContainer, true, 0x80000000u, -1.0f);
     const char* pDefaultsText = sDefaults.String();
     pTiles[eDefaultsButton]->Set(Tile::kTileValue_String, pDefaultsText, true);
-    for (uint32_t uiIndex = 0; uiIndex < StartMenu::pUserOptionsA.iSize; ++uiIndex) {
-        if (!StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->IsForModes(auiModes)) {
+    for (UserOption* pOption : StartMenu::pUserOptionsA) {
+        if (!pOption->IsForModes(auiModes)) {
             continue;
         }
         // The controller and rumble options are left out when XInputGetState fails (no controller in port 0).
-        if ((StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->pfChangeFn == &SetXboxController ||
-             StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->pfChangeFn == &StartMenu::SetRumble) &&
+        if ((pOption->pfChangeFn == &SetXboxController || pOption->pfChangeFn == &StartMenu::SetRumble) &&
             XInputGetState(0, &pState)) {
             unk1CC = nullptr;
             continue;
         }
-        const char* pTemplate = StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->pTemplate;
-        const char* pDisplayText = StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->pDisplayText;
-        Tile* pItem = lbOptions.AddItem(
-            StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex)), pDisplayText, nullptr, pTemplate
-        );
-        if (StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->pfChangeFn == &StartMenu::SetRumble) {
+        const char* pTemplate = pOption->pTemplate;
+        const char* pDisplayText = pOption->pDisplayText;
+        Tile* pItem = lbOptions.AddItem(pOption, pDisplayText, nullptr, pTemplate);
+        if (pOption->pfChangeFn == &StartMenu::SetRumble) {
             unk1CC = pItem;
             bool bHas360Controller = InterfaceManager::Has360Controller();
             pItem->Set(static_cast<int32_t>(StartMenu::pMe->ENABLED_TRAIT), static_cast<int32_t>(bHas360Controller));
         }
-        if (StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->pfChangeFn == &SettingsMenu_ToggleHardcore) {
+        if (pOption->pfChangeFn == &SettingsMenu_ToggleHardcore) {
             bool bEnabled = !StartMenu::MainMenuIsActive() &&
                 (pPlayer && !pPlayer->GetControlsDisabled(PlayerCharacter::DPC_PIPBOY));
             pItem->Set(Tile::kTileValue_Target, static_cast<int32_t>(bEnabled));
@@ -1063,23 +1057,20 @@ void StartMenu::PopulateOptionsListBox(uint32_t auiModes) {
                 pChildren->Get(pPos)->Set(Tile::kTileValue_Target, static_cast<int32_t>(bEnabled));
             }
         }
-        if (StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->eType == StartMenu::UserOption::UOPT_METER) {
-            uint32_t uiMaxValue = StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->iNumSettings - 1;
+        if (pOption->eType == StartMenu::UserOption::UOPT_METER) {
+            uint32_t uiMaxValue = pOption->iNumSettings - 1;
             pItem->Set(Tile::kTileValue_User3, uiMaxValue);
         }
-        if (StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->iArrowSpacing) {
-            uint32_t uiArrowSpacing = StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex))->iArrowSpacing;
+        if (pOption->iArrowSpacing) {
+            uint32_t uiArrowSpacing = pOption->iArrowSpacing;
             pItem->Set(Tile::kTileValue_User4, uiArrowSpacing);
         }
-        DisplayOption(StartMenu::pUserOptionsA.GetAt(static_cast<int32_t>(uiIndex)), pItem);
+        DisplayOption(pOption, pItem);
     }
-    for (uint32_t j = 0; j < StartMenu::pOptionsA.iSize; ++j) {
-        if (StartMenu::pOptionsA.GetAt(static_cast<int32_t>(j))->IsForModes(auiModes)) {
-            Tile* pItem = lbOptions.AddItem(
-                StartMenu::pOptionsA.GetAt(static_cast<int32_t>(j)),
-                StartMenu::pOptionsA.GetAt(static_cast<int32_t>(j))->pDisplayText, nullptr, "lb_meter_template"
-            );
-            pItem->SetName(StartMenu::pOptionsA.GetAt(static_cast<int32_t>(j))->pDisplayText);
+    for (Option* pOption : StartMenu::pOptionsA) {
+        if (pOption->IsForModes(auiModes)) {
+            Tile* pItem = lbOptions.AddItem(pOption, pOption->pDisplayText, nullptr, "lb_meter_template");
+            pItem->SetName(pOption->pDisplayText);
             pItem->Set(Tile::kTileValue_User3, 16);
             Tile* pLeftArrow = pItem->GetChildByID(eLeftArrow);
             Tile::Value* pVisible = pLeftArrow->GetValue(Tile::kTileValue_Visible);
@@ -2545,12 +2536,12 @@ void StartMenu::CreateMenuElements() {
 }
 
 void StartMenu::DestroyMenuElements() {
-    for (uint32_t i = 0; i < StartMenu::pOptionsA.GetSize(); ++i) {
-        delete StartMenu::pOptionsA.GetAt(i);
+    for (Option* pOption : StartMenu::pOptionsA) {
+        delete pOption;
     }
     StartMenu::pOptionsA.Clear(true);
-    for (uint32_t i = 0; i < StartMenu::pUserOptionsA.GetSize(); ++i) {
-        delete StartMenu::pUserOptionsA.GetAt(i);
+    for (UserOption* pOption : StartMenu::pUserOptionsA) {
+        delete pOption;
     }
     StartMenu::pUserOptionsA.Clear(true);
     StartMenu::kVideoResolutions.Clear(true);

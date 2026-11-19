@@ -53,8 +53,8 @@ hkpConvexListShape::hkpConvexListShape(const hkpConvexShape* const* apChildShape
 }
 
 hkpConvexListShape::~hkpConvexListShape() {
-    for (int32_t i = 0; i < m_childShapes.m_size; i++) {
-        m_childShapes.m_data[i]->removeReference();
+    for (const hkpConvexShape* pChild : m_childShapes) {
+        pChild->removeReference();
     }
 }
 
@@ -72,8 +72,8 @@ void hkpConvexListShape::calcContentStatistics(hkStatisticsCollector* collector,
             iNumBytesAllocated
         );
     }
-    for (int32_t i = 0; i < m_childShapes.m_size; ++i) {
-        collector->addReferencedObject(nullptr, m_childShapes.m_data[i], 0);
+    for (const hkpConvexShape* pChild : m_childShapes) {
+        collector->addReferencedObject(nullptr, pChild, 0);
     }
     hkReferencedObject::calcContentStatistics(collector, &hkpConvexShapeClass);
 }

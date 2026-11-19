@@ -1318,7 +1318,7 @@ void hkDynamicClassNameRegistry::merge(const hkStringMap<const hkClass*, hkConta
 void hkDynamicClassNameRegistry::merge(const hkClassNameRegistry& mergeFrom) {
     hkArray<const hkClass*> classes;
     mergeFrom.getClasses(classes);
-    for (int32_t i = 0; i < classes.m_size; ++i) {
-        registerClass(classes.m_data[i], nullptr);
+    for (const hkClass* pClass : classes) {
+        registerClass(pClass, nullptr);
     }
 }

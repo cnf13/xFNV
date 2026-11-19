@@ -423,8 +423,8 @@ Pathing::GetCoverPoints(PathingRequestCover* apRequest, BSSimpleArray<PathingCov
     NavMeshPtr spmesh;
     bool bcanCrouch = apRequest->bCanCrouch;
     bool bhideCover = apRequest->bHideCover;
-    for (uint32_t imesh = 0; imesh < navmeshes.iSize; ++imesh) {
-        spmesh = navmeshes.GetAt(static_cast<int32_t>(imesh));
+    for (const NavMeshPtr& rspMesh : navmeshes) {
+        spmesh = rspMesh;
         uint16_t itriangles = static_cast<uint16_t>(spmesh->CoverArray.iSize);
         for (uint16_t i = 0; i < itriangles; ++i) {
             uint16_t itriIndex = spmesh->CoverArray[i];
@@ -1348,8 +1348,8 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
                 continue;
             }
             bool binListAlready = false;
-            for (uint32_t j = 0; j < allTris.iSize; ++j) {
-                if (allTris.GetAt(static_cast<int32_t>(j)).hTri == otherEdge) {
+            for (const NavmeshTriFan& rTri : allTris) {
+                if (rTri.hTri == otherEdge) {
                     binListAlready = true;
                     break;
                 }
@@ -1377,18 +1377,18 @@ bool Pathing::FindClosestOpenEdge(PathingLocation& aLocation, float afMaxRadius,
     }
     FastNavMeshEdgeLocation closestEdge;
     float fBestSqrDist = 3.4028235e+38f;
-    for (uint32_t i = 0; i < foundOpenEdges.iSize; ++i) {
+    for (const FastNavMeshEdgeHandle& rEdge : foundOpenEdges) {
         NiPoint3 vert1;
         NiPoint3 vert2;
-        int32_t iEdgeIndex = foundOpenEdges.GetAt(static_cast<int32_t>(i)).iEdgeIndex;
-        uint16_t usTriangle = foundOpenEdges.GetAt(static_cast<int32_t>(i)).usTriangle;
-        foundOpenEdges.GetAt(static_cast<int32_t>(i)).pNavMesh->GetEdgeVertices(usTriangle, iEdgeIndex, &vert1, &vert2);
+        int32_t iEdgeIndex = rEdge.iEdgeIndex;
+        uint16_t usTriangle = rEdge.usTriangle;
+        rEdge.pNavMesh->GetEdgeVertices(usTriangle, iEdgeIndex, &vert1, &vert2);
         NiPoint3 edgePt = NavMeshMath::ProjectPointOntoSegment(aLocation.GetLocation(), vert1, vert2);
         float fSqrDist = (edgePt - aLocation.GetLocation()).SqrLength();
         if (fBestSqrDist > fSqrDist) {
             fBestSqrDist = fSqrDist;
             closestEdge.Location = edgePt;
-            closestEdge.FastNavMeshEdgeHandle::Copy(foundOpenEdges.GetAt(static_cast<int32_t>(i)));
+            closestEdge.FastNavMeshEdgeHandle::Copy(rEdge);
         }
     }
     aRetEdge.pNavMeshInfo = closestEdge.pNavMesh->GetNavMeshInfo();
@@ -1485,8 +1485,7 @@ bool Pathing::FindNavmeshesForLocation(
         if (cells.IsEmpty()) {
             return false;
         }
-        for (uint32_t i = 0; i < cells.iSize; ++i) {
-            TESObjectCELL* padjCell = cells.GetAt(static_cast<int32_t>(i));
+        for (TESObjectCELL* padjCell : cells) {
             if (padjCell && padjCell->GetNavMeshArray()) {
                 for (uint32_t j = 0; j < padjCell->GetNavMeshArray()->GetNavMeshCount(); ++j) {
                     apRetNavMeshes->Add(padjCell->GetNavMeshArray()->GetNavMeshByIndex(j));
@@ -1599,8 +1598,8 @@ bool Pathing::ComputeApproximatePathingDistance(
     keepSmartPointers_t keepSmartPointers;
     Pathing::GetAllLoadedNavmeshes(&keepSmartPointers);
     restrictSearchInfos_t restrictSearchInfos;
-    for (uint32_t i = 0; i < keepSmartPointers.iSize; ++i) {
-        const NavMeshInfo* pInfo = keepSmartPointers.GetAt(static_cast<int32_t>(i))->GetNavMeshInfo();
+    for (const NavMeshPtr& spMesh : keepSmartPointers) {
+        const NavMeshInfo* pInfo = spMesh->GetNavMeshInfo();
         restrictSearchInfos.Add(pInfo);
     }
     if (!aStartLocation.ResolveToClosestNavmeshAndTriangle()) {
@@ -1820,8 +1819,7 @@ Pathing::FIND_CLOSEST_EDGES_RESULT Pathing::FindClosestEdges(
     navmeshes_t navmeshes;
     Pathing::FindPotentialNavmeshesForLocation(aLocation, fMaxDist, &navmeshes);
     FoundEdges_t FoundEdges;
-    for (uint32_t n = 0; n < navmeshes.iSize; ++n) {
-        NavMeshPtr spmesh(navmeshes.GetAt(static_cast<int32_t>(n)));
+    for (NavMeshPtr spmesh : navmeshes) {
         for (uint32_t t = 0; t < spmesh.m_pObject->GetTriangleCount(); ++t) {
             NavMeshTriangle* ptri = spmesh.m_pObject->GetTriangle(static_cast<uint16_t>(t));
             for (int32_t e = 0; e < 3; ++e) {
@@ -2284,34 +2282,33 @@ bool Pathing::ComputeLineOfSightMapForLocation(
             }
             if (bLineOfSightFound) {
                 // Every crossed triangle is seen: its score is its neighbour count.
-                for (uint32_t i = 0; i < crossedTriangles.iSize; ++i) {
-                    uint8_t ucNeighbors = crossedTriangles.GetAt(i).iNeighborCount;
-                    aspRetMap->SetAt(crossedTriangles.GetAt(i).iTriangleIndex, ucNeighbors);
+                for (const CrossedTriangle& rTriangle : crossedTriangles) {
+                    uint8_t ucNeighbors = rTriangle.iNeighborCount;
+                    aspRetMap->SetAt(rTriangle.iTriangleIndex, ucNeighbors);
                 }
-                for (uint32_t i = 0; i < crossedTriangles.iSize; ++i) {
+                for (const CrossedTriangle& rTriangle : crossedTriangles) {
                     if (static_cast<int8_t>(aspRetMap->iMaxScore) == 3) {
                         break;
                     }
-                    if (static_cast<int8_t>(crossedTriangles.GetAt(i).iNeighborCount) >
-                        static_cast<int8_t>(aspRetMap->iMaxScore)) {
-                        aspRetMap->iMaxScore = crossedTriangles.GetAt(i).iNeighborCount;
+                    if (static_cast<int8_t>(rTriangle.iNeighborCount) > static_cast<int8_t>(aspRetMap->iMaxScore)) {
+                        aspRetMap->iMaxScore = rTriangle.iNeighborCount;
                     }
                 }
             }
             else {
                 // The crossed triangles not scored yet are unseen: the negated neighbour count.
-                for (uint32_t i = 0; i < crossedTriangles.iSize; ++i) {
-                    if (aspRetMap->GetTriangleScore(crossedTriangles.GetAt(i).iTriangleIndex) == 127) {
-                        int32_t iScore = -static_cast<int8_t>(crossedTriangles.GetAt(i).iNeighborCount);
-                        aspRetMap->SetAt(crossedTriangles.GetAt(i).iTriangleIndex, iScore);
+                for (const CrossedTriangle& rTriangle : crossedTriangles) {
+                    if (aspRetMap->GetTriangleScore(rTriangle.iTriangleIndex) == 127) {
+                        int32_t iScore = -static_cast<int8_t>(rTriangle.iNeighborCount);
+                        aspRetMap->SetAt(rTriangle.iTriangleIndex, iScore);
                     }
                 }
-                for (uint32_t i = 0; i < crossedTriangles.iSize; ++i) {
+                for (const CrossedTriangle& rTriangle : crossedTriangles) {
                     if (aspRetMap->iMinScore == -3) {
                         break;
                     }
-                    if (-static_cast<int8_t>(crossedTriangles.GetAt(i).iNeighborCount) < aspRetMap->iMinScore) {
-                        aspRetMap->iMinScore = -static_cast<int8_t>(crossedTriangles.GetAt(i).iNeighborCount);
+                    if (-static_cast<int8_t>(rTriangle.iNeighborCount) < aspRetMap->iMinScore) {
+                        aspRetMap->iMinScore = -static_cast<int8_t>(rTriangle.iNeighborCount);
                     }
                 }
             }

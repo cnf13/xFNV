@@ -124,29 +124,26 @@ void* hkDeepCopier::deepCopy(
         hkString::memCpy(pResult, buffer.begin(), buffer.getSize());
         // The pointers within the copies. The block is raw bytes: the relocations patch it at byte offsets, with no
         // type of their own.
-        for (int32_t i = 0; i < reloc.m_local.getSize(); ++i) {
-            const hkRelocationInfo::Local& local = reloc.m_local.m_data[i];
+        for (const hkRelocationInfo::Local& local : reloc.m_local) {
             *reinterpret_cast<char**>(pResult + local.m_fromOffset) = pResult + local.m_toOffset;
         }
         // The pointers to other objects: to their copy where one was made here, else to the object itself.
-        for (int32_t i = 0; i < reloc.m_global.getSize(); ++i) {
-            void* pTo = reloc.m_global.m_data[i].m_toAddress;
+        for (const hkRelocationInfo::Global& global : reloc.m_global) {
+            void* pTo = global.m_toAddress;
             const int32_t offset = done.getWithDefault(pTo, -1);
             if (offset != -1) {
                 pTo = pResult + offset;
             }
-            *reinterpret_cast<void**>(pResult + reloc.m_global.m_data[i].m_fromOffset) = pTo;
+            *reinterpret_cast<void**>(pResult + global.m_fromOffset) = pTo;
         }
         if (previousCopies) {
-            for (int32_t i = 0; i < copies.getSize(); ++i) {
-                previousCopies->insert(copies.m_data[i].original, pResult + copies.m_data[i].copyOffset);
+            for (const Copy& copy : copies) {
+                previousCopies->insert(copy.original, pResult + copy.copyOffset);
             }
         }
         if (loadedObjectRegistry) {
-            for (int32_t i = 0; i < copies.getSize(); ++i) {
-                loadedObjectRegistry->finishLoadedObject(
-                    pResult + copies.m_data[i].copyOffset, copies.m_data[i].className
-                );
+            for (const Copy& copy : copies) {
+                loadedObjectRegistry->finishLoadedObject(pResult + copy.copyOffset, copy.className);
             }
         }
     }

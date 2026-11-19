@@ -185,9 +185,9 @@ void hkpSimpleMeshShape::getAabbImpl(const hkTransform& localToWorld, float tole
     out.m_max.m_quad[1] = -0x1.FFFFDCp+127f;
     out.m_max.m_quad[2] = -0x1.FFFFDCp+127f;
     out.m_max.m_quad[3] = 0.0f;
-    for (int32_t i = 0; i < m_vertices.m_size; ++i) {
+    for (const hkVector4& kLocalVertex : m_vertices) {
         alignas(16) hkVector4 kVertex;
-        kVertex.setTransformedPos(localToWorld, m_vertices.m_data[i]);
+        kVertex.setTransformedPos(localToWorld, kLocalVertex);
         hkQuadReal& kMin = out.m_min.m_quad;
         kMin[0] = kMin[0] < kVertex.m_quad[0] ? kMin[0] : kVertex.m_quad[0];
         kMin[1] = kMin[1] < kVertex.m_quad[1] ? kMin[1] : kVertex.m_quad[1];

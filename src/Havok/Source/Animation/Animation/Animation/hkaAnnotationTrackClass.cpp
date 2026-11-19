@@ -557,8 +557,8 @@ hkMemoryResourceHandle::hkMemoryResourceHandle(hkFinishLoadedObjectFlag aFlag)
 hkMemoryResourceContainer::hkMemoryResourceContainer(hkFinishLoadedObjectFlag flag)
   : hkResourceContainer(flag), m_name(flag), m_resourceHandles(flag), m_children(flag) {
     if (flag.m_finishing) {
-        for (int32_t i = 0; i < m_children.m_size; ++i) {
-            m_children.m_data[i]->m_parent = this;
+        for (hkMemoryResourceContainer* pChild : m_children) {
+            pChild->m_parent = this;
         }
     }
 }

@@ -373,8 +373,7 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
             break;
         }
         hkpRigidBody* pBody = nullptr;
-        for (int32_t c = 0; c < candidateRBs.m_size; ++c) {
-            hkpRigidBody* pCandidate = candidateRBs.m_data[c];
+        for (hkpRigidBody* pCandidate : candidateRBs) {
             const char* pName = pCandidate->m_name.cString();
             if (pName && hkString::strCmp(pName, bone.m_name.cString()) == 0) {
                 if (pBody) {
@@ -402,8 +401,7 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
         }
         hkpRigidBody* pParentBody = rigidBodies.m_data[boneToRigidBody.m_data[parentBone]];
         hkpConstraintInstance* pConstraint = nullptr;
-        for (int32_t c = 0; c < candidateConstraints.m_size; ++c) {
-            hkpConstraintInstance* pCandidate = candidateConstraints.m_data[c];
+        for (hkpConstraintInstance* pCandidate : candidateConstraints) {
             hkpEntity* pEntityA = pCandidate->m_entities[0];
             hkpEntity* pEntityB = pCandidate->m_entities[1];
             if (pEntityA == pBody && pEntityB == pParentBody) {

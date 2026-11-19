@@ -374,8 +374,7 @@ void hkNativePackfileUtils::getImportsExports(
     hkArray<hkResource::Import, hkContainerHeapAllocator>& impOut
 ) {
     const InplaceDataHeader* pHeader = static_cast<const InplaceDataHeader*>(loadedBuffer);
-    for (int32_t i = 0; i < pHeader->m_sections.m_size; ++i) {
-        const hkPackfileSectionHeader& rSection = pHeader->m_sections.m_data[i];
+    for (const hkPackfileSectionHeader& rSection : pHeader->m_sections) {
         const void* pSectionBegin = static_cast<const char*>(loadedBuffer) + rSection.m_absoluteDataStart;
         rSection.getExports(pSectionBegin, expOut);
         rSection.getImports(pSectionBegin, impOut);

@@ -426,8 +426,7 @@ hkMemoryMeshShape::hkMemoryMeshShape(const hkMeshSectionCinfo* sections, int32_t
 
 // Drops the references the sections hold; the arrays and the name free themselves.
 hkMemoryMeshShape::~hkMemoryMeshShape() {
-    for (int32_t i = 0; i < m_sections.m_size; ++i) {
-        hkMeshSectionCinfo& section = m_sections.m_data[i];
+    for (const hkMeshSectionCinfo& section : m_sections) {
         section.m_vertexBuffer->removeReference();
         if (section.m_material) {
             section.m_material->removeReference();

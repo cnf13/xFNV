@@ -177,8 +177,7 @@ void hkpEndOfStepCallbackUtil::removeCollisions(hkArray<Collision>& removedColli
     hkArray<T> filtered(list.m_size);
     if (list.m_size > 0) {
         T* pOut = filtered.m_data;
-        for (uint32_t i = 0; i < list.m_size; ++i) {
-            const T& kEntry = list.m_data[i];
+        for (const T& kEntry : list) {
             int32_t iFound = -1;
             for (uint32_t j = 0; j < removedCollisions.m_size; ++j) {
                 if (removedCollisions.m_data[j].equals(kEntry).m_bool) {

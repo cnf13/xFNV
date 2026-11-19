@@ -264,8 +264,8 @@ void BSUtilities::SetAlwaysDraw(NiAVObject* apObject) {
         pNode = bIsNode ? static_cast<NiNode*>(apObject) : nullptr;
     }
     if (pNode) {
-        for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-            BSUtilities::SetAlwaysDraw(pNode->m_kChildren.m_pBase[i].m_pObject);
+        for (NiAVObject* pChild : pNode->m_kChildren) {
+            BSUtilities::SetAlwaysDraw(pChild);
         }
     }
 }
@@ -345,8 +345,8 @@ void BSUtilities::ProcessSelectiveUpdate(NiAVObject* apObject) {
         apObject->m_uFlags &= ~NiAVObject::SELECTIVE_UPDATE_RIGID;
         NiNode* pnode = apObject->IsNode();
         if (pnode) {
-            for (uint32_t I = 0; I < pnode->m_kChildren.m_usSize; ++I) {
-                BSUtilities::ProcessSelectiveUpdate(pnode->m_kChildren.m_pBase[I].m_pObject);
+            for (NiAVObject* pChild : pnode->m_kChildren) {
+                BSUtilities::ProcessSelectiveUpdate(pChild);
             }
         }
     }
@@ -413,8 +413,8 @@ void BSUtilities::FindAnimatedTextures(NiAVObject* apObject, NiTPrimitiveArray<N
     LABEL_28:;
         NiNode* pnode = v2 != 0 ? static_cast<NiNode*>(apObject) : nullptr;
         if (pnode) {
-            for (uint32_t k = 0; k < pnode->m_kChildren.m_usSize; ++k) {
-                BSUtilities::FindAnimatedTextures(pnode->m_kChildren.m_pBase[k].m_pObject, arTextureArray);
+            for (NiAVObject* pChild : pnode->m_kChildren) {
+                BSUtilities::FindAnimatedTextures(pChild, arTextureArray);
             }
         }
     }

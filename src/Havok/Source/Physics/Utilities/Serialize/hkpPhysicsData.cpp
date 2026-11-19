@@ -148,17 +148,17 @@ hkpPhysicsData::~hkpPhysicsData() {
     if (m_worldCinfo) {
         m_worldCinfo->removeReference();
     }
-    for (int32_t i = 0; i < m_systems.m_size; ++i) {
-        m_systems.m_data[i]->removeReference();
+    for (hkpPhysicsSystem* pSystem : m_systems) {
+        pSystem->removeReference();
     }
 }
 
 // The first system whose name matches, case-insensitively; systems without a name are skipped.
 hkpPhysicsSystem* hkpPhysicsData::findPhysicsSystemByName(const char* name) const {
-    for (int32_t i = 0; i < m_systems.m_size; ++i) {
-        const char* pcName = m_systems.m_data[i]->m_name.cString();
+    for (hkpPhysicsSystem* pSystem : m_systems) {
+        const char* pcName = pSystem->m_name.cString();
         if (pcName && !hkString::strCasecmp(pcName, name)) {
-            return m_systems.m_data[i];
+            return pSystem;
         }
     }
     return nullptr;
@@ -294,17 +294,17 @@ void hkpPhysicsData::splitPhysicsSystems(
         static_cast<hkpPhysicsSystem*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpPhysicsSystem)));
     inputSystem->m_memSizeAndFlags = sizeof(hkpPhysicsSystem);
     inputSystem = ::new (inputSystem) hkpPhysicsSystem;
-    for (int32_t i = 0; i < inputSystemConst->m_rigidBodies.m_size; ++i) {
-        inputSystem->addRigidBody(inputSystemConst->m_rigidBodies.m_data[i]);
+    for (hkpRigidBody* body : inputSystemConst->m_rigidBodies) {
+        inputSystem->addRigidBody(body);
     }
-    for (int32_t i = 0; i < inputSystemConst->m_actions.m_size; ++i) {
-        inputSystem->addAction(inputSystemConst->m_actions.m_data[i]);
+    for (hkpAction* action : inputSystemConst->m_actions) {
+        inputSystem->addAction(action);
     }
-    for (int32_t i = 0; i < inputSystemConst->m_constraints.m_size; ++i) {
-        inputSystem->addConstraint(inputSystemConst->m_constraints.m_data[i]);
+    for (hkpConstraintInstance* constraint : inputSystemConst->m_constraints) {
+        inputSystem->addConstraint(constraint);
     }
-    for (int32_t i = 0; i < inputSystemConst->m_phantoms.m_size; ++i) {
-        inputSystem->addPhantom(inputSystemConst->m_phantoms.m_data[i]);
+    for (hkpPhantom* phantom : inputSystemConst->m_phantoms) {
+        inputSystem->addPhantom(phantom);
     }
 
     // EXE-INLINED 0x56D280
@@ -446,8 +446,8 @@ void hkpPhysicsData::splitPhysicsSystems(
         phantomSystem->m_name = "Phantoms";
         phantomSystem->m_userData = inputSystem->m_userData;
         output.m_phantoms = phantomSystem;
-        for (int32_t i = 0; i < inputSystem->m_phantoms.m_size; ++i) {
-            phantomSystem->addPhantom(inputSystem->m_phantoms.m_data[i]);
+        for (hkpPhantom* phantom : inputSystem->m_phantoms) {
+            phantomSystem->addPhantom(phantom);
         }
     }
     else {

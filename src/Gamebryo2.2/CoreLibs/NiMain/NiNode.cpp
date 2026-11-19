@@ -134,8 +134,7 @@ bool NiNode::RegisterStreamables(NiStream& kStream) {
     if (!NiAVObject::RegisterStreamables(kStream)) {
         return false;
     }
-    for (uint32_t uiIndex = 0; uiIndex < m_kChildren.m_usSize; ++uiIndex) {
-        NiAVObject* pChild = m_kChildren.m_pBase[uiIndex].m_pObject;
+    for (NiAVObject* pChild : m_kChildren) {
         if (pChild) {
             pChild->RegisterStreamables(kStream);
         }
@@ -217,8 +216,7 @@ void NiNode::ProcessClone(NiCloningProcess& kCloning) {
     NiAVObject::ProcessClone(kCloning);
     NiObject* pkClone;
     kCloning.m_pkCloneMap->GetAt(this, pkClone);
-    for (uint32_t uiIndex = 0; uiIndex < m_kChildren.m_usSize; ++uiIndex) {
-        NiAVObject* pChild = m_kChildren.m_pBase[uiIndex].m_pObject;
+    for (NiAVObject* pChild : m_kChildren) {
         if (pChild) {
             pChild->ProcessClone(kCloning);
         }
@@ -313,8 +311,7 @@ NiAVObject* NiNode::GetObjectByName(const NiFixedString& kName) {
     if (pFound) {
         return pFound;
     }
-    for (uint32_t uiIndex = 0; uiIndex < m_kChildren.m_usSize; ++uiIndex) {
-        NiAVObject* pChild = m_kChildren.m_pBase[uiIndex].m_pObject;
+    for (NiAVObject* pChild : m_kChildren) {
         if (pChild) {
             pFound = pChild->GetObjectByName(kName);
             if (pFound) {
@@ -342,8 +339,7 @@ void NiNode::SetSelectiveUpdateFlags(bool& bSelectiveUpdate, int32_t bSelectiveU
     uint8_t* pucSelectiveUpdate = static_cast<uint8_t*>(static_cast<void*>(&bSelectiveUpdate));
     *pucSelectiveUpdate = static_cast<uint8_t>(bSelectiveUpdateTransforms);
     bRigid = true;
-    for (uint32_t i = 0; i < m_kChildren.m_usSize; ++i) {
-        NiAVObject* pkChild = m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pkChild : m_kChildren) {
         if (pkChild) {
             bool bChildSelectiveUpdate = false;
             bool bChildRigid = true;
@@ -591,8 +587,7 @@ void NiNode::UpdatePropertiesDownward(NiPropertyState* pkParentState) {
     NiAVObject::UpdatePropertiesDownward(pParentState);
     pkParentState = nullptr;
     PushLocalProperties(pParentState, true, pkParentState);
-    for (uint32_t uiIndex = 0; uiIndex < m_kChildren.m_usSize; ++uiIndex) {
-        NiAVObject* pChild = m_kChildren.m_pBase[uiIndex].m_pObject;
+    for (NiAVObject* pChild : m_kChildren) {
         if (pChild) {
             pChild->UpdatePropertiesDownward(pkParentState);
         }
@@ -710,8 +705,7 @@ void NiNode::OnVisible(NiCullingProcess& kCuller) {
 
 void NiNode::PurgeRendererData(NiRenderer* apkRenderer) {
     NiAVObject::PurgeRendererData(apkRenderer);
-    for (uint32_t uiIndex = 0; uiIndex < m_kChildren.m_usSize; ++uiIndex) {
-        NiAVObject* pChild = m_kChildren.m_pBase[uiIndex].m_pObject;
+    for (NiAVObject* pChild : m_kChildren) {
         if (pChild) {
             pChild->PurgeRendererData(apkRenderer);
         }

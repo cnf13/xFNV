@@ -157,11 +157,11 @@ hkpExtendedMeshShape::ShapesSubpart::ShapesSubpart(const hkpConvexShape* const* 
 
 // Each child's reference goes back and its slot is cleared; the array frees its own storage.
 hkpExtendedMeshShape::ShapesSubpart::~ShapesSubpart() {
-    for (int32_t i = 0; i < m_childShapes.m_size; ++i) {
-        if (m_childShapes.m_data[i]) {
-            m_childShapes.m_data[i]->removeReference();
+    for (hkpConvexShape*& pChild : m_childShapes) {
+        if (pChild) {
+            pChild->removeReference();
         }
-        m_childShapes.m_data[i] = nullptr;
+        pChild = nullptr;
     }
 }
 
@@ -230,14 +230,14 @@ hkpExtendedMeshShape::hkpExtendedMeshShape(hkFinishLoadedObjectFlag flag)
         return;
     }
     m_collectionType.m_storage = COLLECTION_EXTENDED_MESH;
-    for (int32_t i = 0; i < m_trianglesSubparts.m_size; ++i) {
-        if (m_trianglesSubparts.m_data[i].m_materialIndexStridingType.m_storage == MATERIAL_INDICES_INVALID) {
-            m_trianglesSubparts.m_data[i].m_materialIndexStridingType.m_storage = MATERIAL_INDICES_INT8;
+    for (TrianglesSubpart& part : m_trianglesSubparts) {
+        if (part.m_materialIndexStridingType.m_storage == MATERIAL_INDICES_INVALID) {
+            part.m_materialIndexStridingType.m_storage = MATERIAL_INDICES_INT8;
         }
     }
-    for (int32_t i = 0; i < m_shapesSubparts.m_size; ++i) {
-        if (m_shapesSubparts.m_data[i].m_materialIndexStridingType.m_storage == MATERIAL_INDICES_INVALID) {
-            m_shapesSubparts.m_data[i].m_materialIndexStridingType.m_storage = MATERIAL_INDICES_INT8;
+    for (ShapesSubpart& part : m_shapesSubparts) {
+        if (part.m_materialIndexStridingType.m_storage == MATERIAL_INDICES_INVALID) {
+            part.m_materialIndexStridingType.m_storage = MATERIAL_INDICES_INT8;
         }
     }
     if (m_trianglesSubparts.m_size == 1) {
@@ -739,13 +739,13 @@ void hkpExtendedMeshShape::recalcAabbExtents() {
     __m128 vMin = _mm_shuffle_ps(_mm_set_ss(rdata_104DA48), _mm_set_ss(rdata_104DA48), 0);
     __m128 vMax = _mm_xor_ps(hkQuadRealNegateMask, vMin);
     __m128 vRadius = _mm_shuffle_ps(_mm_set_ss(m_triangleRadius), _mm_set_ss(m_triangleRadius), 0);
-    for (int32_t i = 0; i < m_trianglesSubparts.m_size; ++i) {
-        calcAabbExtents(m_trianglesSubparts.m_data[i], m_scaling, aabb);
+    for (const TrianglesSubpart& part : m_trianglesSubparts) {
+        calcAabbExtents(part, m_scaling, aabb);
         vMin = _mm_min_ps(vMin, _mm_sub_ps(aabb.m_min.m_quad, vRadius));
         vMax = _mm_max_ps(vMax, _mm_add_ps(aabb.m_max.m_quad, vRadius));
     }
-    for (int32_t i = 0; i < m_shapesSubparts.m_size; ++i) {
-        calcAabbExtents(&m_shapesSubparts.m_data[i], &aabb);
+    for (const ShapesSubpart& part : m_shapesSubparts) {
+        calcAabbExtents(&part, &aabb);
         vMin = _mm_min_ps(vMin, aabb.m_min.m_quad);
         vMax = _mm_max_ps(vMax, aabb.m_max.m_quad);
     }
@@ -986,8 +986,8 @@ void calcAabbExtents(const hkpExtendedMeshShape::ShapesSubpart* part, hkAabb* sc
     transform.getTranslation() = part->m_translation;
     transform.getRotation().set(part->m_rotation);
     hkAabb childAabb;
-    for (int32_t i = 0; i < part->m_childShapes.m_size; i++) {
-        part->m_childShapes.m_data[i]->getAabb(transform, 0.0f, childAabb);
+    for (hkpConvexShape* pChild : part->m_childShapes) {
+        pChild->getAabb(transform, 0.0f, childAabb);
         scaling->m_min.setMin4(scaling->m_min, childAabb.m_min);
         scaling->m_max.setMax4(scaling->m_max, childAabb.m_max);
     }

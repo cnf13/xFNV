@@ -366,16 +366,15 @@ void BGSDistantTreeBlock::AddTree(const uint32_t uiType, const BGSDistantTreeBlo
 }
 
 void BGSDistantTreeBlock::ClearTrees() {
-    for (uint32_t i = 0; i < TreeGroups.iSize; ++i) {
-        TreeGroups.GetAt(i)->Instances.Clear(true);
-        if (TreeGroups.GetAt(i)->spGeometry.m_pObject) {
+    for (BGSDistantTreeBlock::TreeGroup* pGroup : TreeGroups) {
+        pGroup->Instances.Clear(true);
+        if (pGroup->spGeometry.m_pObject) {
             NiNode* TreeNode = pNode->pManager->GetTreeNode();
-            TreeNode->DetachChild(TreeGroups.GetAt(i)->spGeometry.m_pObject);
-            TreeGroups.GetAt(i)->spGeometry = static_cast<BSResizableTriShape*>(nullptr);
+            TreeNode->DetachChild(pGroup->spGeometry.m_pObject);
+            pGroup->spGeometry = static_cast<BSResizableTriShape*>(nullptr);
         }
-        BGSDistantTreeBlock::TreeGroup* v3 = TreeGroups.GetAt(i);
-        if (v3) {
-            delete v3;
+        if (pGroup) {
+            delete pGroup;
         }
     }
     TreeGroups.Clear(true);
@@ -483,8 +482,7 @@ void BGSDistantTreeBlock::Attach() {
 }
 
 void BGSDistantTreeBlock::UpdateShaderProperties() {
-    for (uint32_t i = 0; i < TreeGroups.iSize; ++i) {
-        BGSDistantTreeBlock::TreeGroup* pgroup = TreeGroups.GetAt(i);
+    for (BGSDistantTreeBlock::TreeGroup* pgroup : TreeGroups) {
         if ((!pgroup->bShaderPropertyUpToDate) && (pgroup->spGeometry.m_pObject)) {
             int32_t Type = NiShadeProperty::GetType();
             BSDistantTreeShaderProperty* pprop =
@@ -497,8 +495,8 @@ void BGSDistantTreeBlock::UpdateShaderProperties() {
 }
 
 void BGSDistantTreeBlock::HideQueuedTrees() {
-    for (uint32_t i = 0; i < TreesQueuedToHide.iSize; ++i) {
-        HideTree(TreesQueuedToHide.GetAt(i), false);
+    for (uint32_t uiID : TreesQueuedToHide) {
+        HideTree(uiID, false);
     }
     ClearQueuedTrees();
 }
@@ -581,9 +579,8 @@ void BGSDistantTreeBlock::operator delete(void* apMemory) {
 }
 
 void BGSDistantTreeBlock::DeallocateStaticData() {
-    for (uint32_t i = 0; i < BGSDistantTreeBlock::TreeTypes.iSize; ++i) {
-        BGSDistantTreeBlock::TreeType* v0 = &BGSDistantTreeBlock::TreeTypes.GetAt(i);
-        v0->spSharedModelData = static_cast<NiTriShapeData*>(nullptr);
+    for (BGSDistantTreeBlock::TreeType& rType : BGSDistantTreeBlock::TreeTypes) {
+        rType.spSharedModelData = static_cast<NiTriShapeData*>(nullptr);
     }
     BGSDistantTreeBlock::spSharedStencil = static_cast<NiStencilProperty*>(nullptr);
     BGSDistantTreeBlock::spSharedAlpha = static_cast<NiAlphaProperty*>(nullptr);

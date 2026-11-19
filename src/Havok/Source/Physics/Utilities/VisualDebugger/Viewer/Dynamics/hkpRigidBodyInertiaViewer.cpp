@@ -92,11 +92,11 @@ void hkpRigidBodyInertiaViewer::postSimulationCallback(hkpWorld* world) {
     m_displayBoxes.setSize(m_entitiesCreated.m_size);
 
     int32_t numBoxes = 0;
-    for (int32_t i = 0; i < m_entitiesCreated.m_size; ++i) {
-        const float mass = m_entitiesCreated.m_data[i]->getMass();
+    for (hkpRigidBody* body : m_entitiesCreated) {
+        const float mass = body->getMass();
         if (mass != 0.0f) {
             hkMatrix3 inertia;
-            m_entitiesCreated.m_data[i]->getInertiaLocal(inertia);
+            body->getInertiaLocal(inertia);
 
             // The squared full extents, each rounded to float.
             const float extentYSq = (inertia(0, 0) - inertia(1, 1) + inertia(2, 2)) / mass * 6.0;
@@ -130,8 +130,8 @@ void hkpRigidBodyInertiaViewer::postSimulationCallback(hkpWorld* world) {
             hkVector4 halfExtents;
             halfExtents.set(halfX, halfY, halfZ, 0.0f);
 
-            hkTransform t = m_entitiesCreated.m_data[i]->getTransform();
-            hkVector4 centerOfMass = m_entitiesCreated.m_data[i]->getCenterOfMassLocal();
+            hkTransform t = body->getTransform();
+            hkVector4 centerOfMass = body->getCenterOfMassLocal();
             hkVector4 centerShift;
             centerShift.setRotatedDir(t.getRotation(), centerOfMass);
             t.getTranslation().add4(centerShift);

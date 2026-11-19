@@ -114,9 +114,9 @@ hkpShapeDisplayViewer::hkpShapeDisplayViewer(const hkArray<hkProcessContext*, hk
     m_autoGeometryCreation(true), m_enableAutoColor(true), m_enableAutoColorOverride(false), m_timeForDisplay(-1.0f),
     m_fixedObjectColor(s_fixedObjectColor), m_movableObjectColor(s_movableObjectColor) {
     // The first options context among the contexts sets whether the transforms are kept up to date.
-    for (int32_t i = 0; i < contexts.m_size; ++i) {
-        if (!hkString::strCmp("ShapeDisplayViewerOptions", contexts.m_data[i]->getType())) {
-            ShapeDisplayViewerOptions* options = static_cast<ShapeDisplayViewerOptions*>(contexts.m_data[i]);
+    for (hkProcessContext* context : contexts) {
+        if (!hkString::strCmp("ShapeDisplayViewerOptions", context->getType())) {
+            ShapeDisplayViewerOptions* options = static_cast<ShapeDisplayViewerOptions*>(context);
             m_enableShapeTransformUpdate.m_bool = options->m_enableShapeTransformUpdate.m_bool;
             break;
         }
@@ -300,12 +300,12 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         }
     }
     // Geometries given by a no-delete property are not the display geometries' to free.
-    for (int32_t i = 0; i < displayGeometries.m_size; ++i) {
+    for (hkDisplayGeometry* geometry : displayGeometries) {
         if (!flag) {
-            displayGeometries.m_data[i]->m_geometry = nullptr;
+            geometry->m_geometry = nullptr;
         }
-        if (displayGeometries.m_data[i]) {
-            delete displayGeometries.m_data[i];
+        if (geometry) {
+            delete geometry;
         }
     }
 }
@@ -486,14 +486,11 @@ void hkpShapeDisplayViewer::removeWorld(int32_t i) {
 // Removes the display objects made for the world's entities, each with the shape its collidable has now.
 void hkpShapeDisplayViewer::removeAllGeometries(int32_t worldIndex) {
     hkpShapeDisplayViewer::WorldToEntityData* data = m_worldEntities.m_data[worldIndex];
-    for (int32_t i = 0; i < data->entitiesCreated.m_size; ++i) {
+    for (hkUlong id : data->entitiesCreated) {
         // The id is the collidable's address: the shape is read through it, also for an id a debug display id property
         // gave, as the game does.
-        const hkpLinkedCollidable* collidable =
-            reinterpret_cast<const hkpLinkedCollidable*>(data->entitiesCreated.m_data[i]);
-        m_displayHandler->removeGeometry(
-            data->entitiesCreated.m_data[i], m_tag, reinterpret_cast<hkUlong>(collidable->m_shape)
-        );
+        const hkpLinkedCollidable* collidable = reinterpret_cast<const hkpLinkedCollidable*>(id);
+        m_displayHandler->removeGeometry(id, m_tag, reinterpret_cast<hkUlong>(collidable->m_shape));
     }
     data->entitiesCreated.setSize(0);
 }

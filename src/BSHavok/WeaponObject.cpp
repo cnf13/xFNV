@@ -116,11 +116,10 @@ void WeaponObject::UpdateChildRB3D() {
     }
     hkArray<hkpRigidBody*> kBodyA;
     bhkUtilFunctions::GatherRigidBodies(pkSceneObject, kBodyA);
-    for (int32_t i = 0; i < kBodyA.getSize(); ++i) {
+    for (hkpWorldObject* pkBody : kBodyA) {
         if (!pkWorldObject) {
             break;
         }
-        hkpWorldObject* pkBody = kBodyA.m_data[i];
         if (pkBody == pkWorldObject->phkObject) {
             continue;
         }

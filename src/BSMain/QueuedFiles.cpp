@@ -251,11 +251,10 @@ bool QueuedFileEntry::GetDescription(char* apDescription, size_t aiBufferSize, c
         }
     }
     if (pChildren) {
-        for (uint32_t i = 0; i < pChildren->iSize; ++i) {
-            if (pChildren->pBuffer[i].m_pObject) {
+        for (QueuedFile* pChild : *pChildren) {
+            if (pChild) {
                 char v7[13000];
-                QueuedFile* m_pObject = pChildren->pBuffer[i].m_pObject;
-                if (m_pObject->GetDescription(v7, 0x32C8u)) {
+                if (pChild->GetDescription(v7, 0x32C8u)) {
                     strcat_s(apDescription, aiBufferSize, "\n * ");
                     strcat_s(apDescription, aiBufferSize, v7);
                 }

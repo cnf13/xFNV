@@ -40,8 +40,8 @@
 hkpConstraintViewer::hkpConstraintViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts)
   : hkpWorldViewerBase(contexts), hkpWorldPostSimulationListener(), m_constraints() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
-            m_context->m_worlds.m_data[i]->addWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->addWorldPostSimulationListener(this);
         }
     }
 }
@@ -49,29 +49,26 @@ hkpConstraintViewer::hkpConstraintViewer(const hkArray<hkProcessContext*, hkCont
 // Removes the viewer from the context's worlds; the constraint list goes with its member.
 hkpConstraintViewer::~hkpConstraintViewer() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
-            m_context->m_worlds.m_data[i]->removeWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->removeWorldPostSimulationListener(this);
         }
     }
 }
 
-// Every constraint each entity of the active, then the inactive islands is master of is drawn. The island is reloaded
-// from the world's array for each entity.
+// Every constraint each entity of the active, then the inactive islands is master of is drawn.
 void hkpConstraintViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpConstraintViewer", this);
-    for (int32_t i = 0; i < world->m_activeSimulationIslands.m_size; ++i) {
-        for (int32_t j = 0; j < world->m_activeSimulationIslands.m_data[i]->m_entities.m_size; ++j) {
-            hkpEntity* masterEntity = world->m_activeSimulationIslands.m_data[i]->m_entities.m_data[j];
-            for (int32_t k = 0; k < masterEntity->m_constraintsMaster.m_size; ++k) {
-                draw(masterEntity->m_constraintsMaster.m_data[k].m_constraint, masterEntity, m_displayHandler);
+    for (hkpSimulationIsland* island : world->m_activeSimulationIslands) {
+        for (hkpEntity* masterEntity : island->m_entities) {
+            for (const hkConstraintInternal& internal : masterEntity->m_constraintsMaster) {
+                draw(internal.m_constraint, masterEntity, m_displayHandler);
             }
         }
     }
-    for (int32_t i = 0; i < world->m_inactiveSimulationIslands.m_size; ++i) {
-        for (int32_t j = 0; j < world->m_inactiveSimulationIslands.m_data[i]->m_entities.m_size; ++j) {
-            hkpEntity* masterEntity = world->m_inactiveSimulationIslands.m_data[i]->m_entities.m_data[j];
-            for (int32_t k = 0; k < masterEntity->m_constraintsMaster.m_size; ++k) {
-                draw(masterEntity->m_constraintsMaster.m_data[k].m_constraint, masterEntity, m_displayHandler);
+    for (hkpSimulationIsland* island : world->m_inactiveSimulationIslands) {
+        for (hkpEntity* masterEntity : island->m_entities) {
+            for (const hkConstraintInternal& internal : masterEntity->m_constraintsMaster) {
+                draw(internal.m_constraint, masterEntity, m_displayHandler);
             }
         }
     }

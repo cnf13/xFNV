@@ -144,8 +144,8 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
                         static_cast<const hkVersionPatchManager::FunctionPatch*>(rComponent.patch)->function;
                     ObjectArray objects;
                     world->findObjectsByBaseClass(pClassName, objects);
-                    for (int32_t j = 0; j < objects.m_size; ++j) {
-                        hkDataObject object(objects.m_data[j]);
+                    for (hkDataObjectImpl* pObjectImpl : objects) {
+                        hkDataObject object(pObjectImpl);
                         pFunction(object);
                     }
                     break;
@@ -156,8 +156,8 @@ applyPatchesToWorld(hkArrayBase<const hkVersionPatchManager::PatchInfo*>* patche
                     hkDataClass castClass(pFindWorld->findClass(pCast->name));
                     ObjectArray objects;
                     world->findObjectsByExactClass(pClassName, objects);
-                    for (int32_t j = 0; j < objects.m_size; ++j) {
-                        hkDataObject object(objects.m_data[j]);
+                    for (hkDataObjectImpl* pObjectImpl : objects) {
+                        hkDataObject object(pObjectImpl);
                         world->castObject(object, castClass);
                     }
                     break;
@@ -426,9 +426,9 @@ hkResult hkVersionPatchManager::preparePatches(
 
     VersionArray origVersions;
     origVersions.reserve(origClasses.getSize());
-    for (int32_t i = 0; i < origClasses.m_size; ++i) {
-        const char* name = origClasses.m_data[i]->getName();
-        int32_t version = origClasses.m_data[i]->getVersion();
+    for (hkDataClassImpl* pClass : origClasses) {
+        const char* name = pClass->getName();
+        int32_t version = pClass->getVersion();
         ClassVersion entry;
         entry.name = name;
         entry.version = version;
@@ -464,10 +464,9 @@ hkResult hkVersionPatchManager::preparePatches(
     patchInfosOut.m_size = 0;
     {
         HeapArray<UidItem> toDo;
-        for (int32_t i = 0; i < origVersions.m_size; ++i) {
+        for (const ClassVersion& origVersion : origVersions) {
             setAllDependeciesToDo(
-                toDo, origVersions.m_data[i].name, origVersions.m_data[i].version, worldToUpdate, *this,
-                addedClassPatch, uidState
+                toDo, origVersion.name, origVersion.version, worldToUpdate, *this, addedClassPatch, uidState
             );
         }
         while (toDo.m_elems.m_size != 0) {
@@ -597,13 +596,12 @@ hkResult hkVersionPatchManager::preparePatches(
     tempWorld.hkDataWorldDict::findAllClasses(tempClasses);
     NameMap classFromName(0);
     NameMap unusedMap(0);
-    for (int32_t i = 0; i < tempClasses.m_size; ++i) {
-        hkDataClassImpl* pClass = tempClasses.m_data[i];
+    for (hkDataClassImpl* pClass : tempClasses) {
         classFromName.insert(reinterpret_cast<hkUlong>(pClass->getName()), reinterpret_cast<hkUlong>(pClass));
     }
-    for (int32_t i = 0; i < origClasses.m_size; ++i) {
-        if (classFromName.getWithDefault(reinterpret_cast<hkUlong>(origClasses.m_data[i]->getName()), 0)) {
-            classFromName.remove(reinterpret_cast<hkUlong>(origClasses.m_data[i]->getName()));
+    for (hkDataClassImpl* pClass : origClasses) {
+        if (classFromName.getWithDefault(reinterpret_cast<hkUlong>(pClass->getName()), 0)) {
+            classFromName.remove(reinterpret_cast<hkUlong>(pClass->getName()));
         }
     }
     {

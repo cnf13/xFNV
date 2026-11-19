@@ -238,8 +238,8 @@ void hkLocalFrame::getPositionInRoot(hkVector4& position) const {
 
 // Drops the references on the children and the group; the name and the child array free themselves.
 hkSimpleLocalFrame::~hkSimpleLocalFrame() {
-    for (int32_t i = 0; i < m_children.m_size; ++i) {
-        m_children.m_data[i]->removeReference();
+    for (hkLocalFrame* pChild : m_children) {
+        pChild->removeReference();
     }
     if (m_group) {
         m_group->removeReference();

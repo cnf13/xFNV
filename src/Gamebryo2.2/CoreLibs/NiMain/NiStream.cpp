@@ -660,8 +660,7 @@ uint32_t NiStream::PreSaveObjectSizeTable() {
 bool NiStream::SaveObjectSizeTable(uint32_t uiStartOffset) {
     uint32_t uiPosition = m_pkOstr->GetPosition();
     m_pkOstr->Seek(static_cast<int32_t>(uiStartOffset - uiPosition));
-    for (uint32_t i = 0; i < m_kObjectSizes.m_uiSize; ++i) {
-        uint32_t uiSize = m_kObjectSizes.m_pBase[i];
+    for (uint32_t uiSize : m_kObjectSizes) {
         uint32_t uiComponentSize = 4;
         m_pkOstr->BinaryWrite(&uiSize, 4, &uiComponentSize, 1);
     }
@@ -953,8 +952,7 @@ void NiStream::SetSelectiveUpdateFlagsForOldVersions() {
         return;
     }
 
-    for (uint32_t i = 0; i < m_kObjects.GetSize(); ++i) {
-        NiObject* pkObject = m_kObjects.GetAt(i).m_pObject;
+    for (NiObject* pkObject : m_kObjects) {
         if (!pkObject) {
             continue;
         }
@@ -980,8 +978,7 @@ void NiStream::SetSelectiveUpdateFlagsTTTFRecursive(NiAVObject* pkAVObject) {
         NiAVObject::SELECTIVE_UPDATE_CONTROLLER;
     NiNode* pkNode = pkAVObject->IsNode();
     if (pkNode) {
-        for (uint32_t i = 0; i < pkNode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pkChild = pkNode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pkChild : pkNode->m_kChildren) {
             if (pkChild) {
                 SetSelectiveUpdateFlagsTTTFRecursive(pkChild);
             }
@@ -1018,8 +1015,7 @@ void NiStream::SaveObjectGroups() {
 void NiStream::UpdateObjectGroups() {
     m_kGroups.SetSize(1);
     m_kGroups.SetAt(0, nullptr);
-    for (uint32_t i = 0; i < m_kObjects.m_uiSize; ++i) {
-        NiObject* pkObject = m_kObjects.m_pBase[i].m_pObject;
+    for (NiObject* pkObject : m_kObjects) {
         if (!pkObject) {
             continue;
         }
@@ -1041,8 +1037,7 @@ void NiStream::UpdateObjectGroups() {
         m_kGroups.Add(pkGroup);
         pkGroup->m_uiSize = 0;
     }
-    for (uint32_t i = 0; i < m_kObjects.m_uiSize; ++i) {
-        NiObject* pkObject = m_kObjects.m_pBase[i].m_pObject;
+    for (NiObject* pkObject : m_kObjects) {
         if (!pkObject) {
             continue;
         }
@@ -1101,8 +1096,8 @@ void NiStream::SaveRTTI() {
     using RTTIMap = NiTStringPointerMap<uint16_t>;
     RTTIMap kRTTIMap(37, false);
 
-    for (uint32_t i = 0; i < m_kObjects.m_uiSize; ++i) {
-        const char* pcName = m_kObjects.m_pBase[i].m_pObject->GetStreamableRTTI()->GetName();
+    for (NiObject* pkObject : m_kObjects) {
+        const char* pcName = pkObject->GetStreamableRTTI()->GetName();
         uint16_t usIndex;
         if (!kRTTIMap.GetAt(pcName, usIndex)) {
             kRTTIMap.RTTIMapBase::SetAt(pcName, static_cast<uint16_t>(kRTTIMap.GetCount()));
@@ -1129,8 +1124,7 @@ void NiStream::SaveRTTI() {
     // uiRTTI is shared by every object, so a name the map lacks (never the case, every name was added above) would
     // leave the previous object's index, as the game does.
     uint16_t uiRTTI;
-    for (uint32_t i = 0; i < m_kObjects.m_uiSize; ++i) {
-        NiObject* pkObject = m_kObjects.m_pBase[i].m_pObject;
+    for (NiObject* pkObject : m_kObjects) {
         const char* pcName = pkObject->GetStreamableRTTI()->GetName();
         kRTTIMap.GetAt(pcName, uiRTTI);
         if (pkObject->StreamCanSkip()) {

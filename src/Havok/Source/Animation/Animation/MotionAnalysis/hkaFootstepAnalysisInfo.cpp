@@ -233,8 +233,7 @@ const hkClass& hkaFootstepAnalysisInfo::staticClass() {
 // only when a value compares above it.
 float hkaFootstepAnalysisInfo::getMin(const hkArrayBase<float>& arr) {
     float minValue = 3.40282e+38f;
-    for (int32_t i = 0; i < arr.m_size; ++i) {
-        const float value = arr.m_data[i];
+    for (const float value : arr) {
         if (!(value > minValue)) {
             minValue = value;
         }

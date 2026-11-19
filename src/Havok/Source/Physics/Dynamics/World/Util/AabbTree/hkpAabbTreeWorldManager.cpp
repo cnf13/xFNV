@@ -275,8 +275,7 @@ void hkpAabbTreeWorldManager::islandActivatedCallback(hkpSimulationIsland* islan
     if (m_useInactiveTree) {
         m_mustUpdateActiveList = true;
         m_treeIsClean = false;
-        for (int32_t i = 0; i < island->getEntities().getSize(); ++i) {
-            hkpEntity* entity = island->getEntities().m_data[i];
+        for (hkpEntity* entity : island->getEntities()) {
             if (entity->m_collidable.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
                 queueActivated(&entity->m_collidable);
             }
@@ -287,13 +286,12 @@ void hkpAabbTreeWorldManager::islandActivatedCallback(hkpSimulationIsland* islan
 // Marks the active list for a rebuild and queues the island's own entities for the transition queue: an activated
 // island's with 1, a deactivated island's with -1. Each entity is queued through its collidable, and only when its
 // broad phase handle says it is a plain entity (an island's list holds only entities, but the type is tested anyway, as
-// the game does). The island's array is indexed and its size re-read each turn, as the game does.
+// the game does).
 void hkpAabbTreeWorldManager::islandDeactivatedCallback(hkpSimulationIsland* island) {
     if (m_useInactiveTree) {
         m_mustUpdateActiveList = true;
         m_treeIsClean = false;
-        for (int32_t i = 0; i < island->getEntities().getSize(); ++i) {
-            hkpEntity* entity = island->getEntities().m_data[i];
+        for (hkpEntity* entity : island->getEntities()) {
             if (entity->m_collidable.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
                 queueInactivated(&entity->m_collidable);
             }
@@ -324,8 +322,8 @@ void hkpAabbTreeWorldManager::fullBuild(hkJobQueue* jobQueue, hkJobThreadPool* j
     if (!m_useInactiveTree) {
         gatherInactiveCollidablesFromWorld(m_activeList, m_world);
     }
-    for (int32_t i = 0; i < m_activeList.m_size; ++i) {
-        setNode(m_activeList.m_data[i], 0xFFFF);
+    for (const hkpCollidable* collidable : m_activeList) {
+        setNode(collidable, 0xFFFF);
     }
     HK_TIMER_SPLIT_LIST("Clear");
     HK_TIMER_SPLIT_LIST("Rebuild");
@@ -611,13 +609,12 @@ void hkpAabbTreeWorldManager::incrementalBuild(hkJobQueue* jobQueue, hkJobThread
             bInactivated = scanActiveListAndGetInactivated(inactivatedOut);
             HK_TIMER_SPLIT_LIST("Update Inactive Tree");
             hkAabbTree<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>* pTree = m_inactiveTree;
-            for (int32_t i = 0; i < inactivatedOut.m_size; ++i) {
-                const hkpCollidable* pCollidable = inactivatedOut.m_data[i];
+            for (const hkpCollidable* pCollidable : inactivatedOut) {
                 hkAabb aabb;
                 pCollidable->m_shape->getAabb(*pCollidable->m_motion.pMotion, 0.0f, aabb);
                 HK_MONITOR_ADD_VALUE("Num of Added Nodes", 1.0f, HK_MONITOR_TYPE_INT);
                 const uint16_t idx = pTree->add(aabb, const_cast<hkpCollidable*>(pCollidable));
-                hkpAabbTreeWorldManager::setNode(inactivatedOut.m_data[i], idx);
+                hkpAabbTreeWorldManager::setNode(pCollidable, idx);
             }
             m_mustUpdateActiveList = false;
         }

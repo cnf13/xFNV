@@ -27,8 +27,7 @@ hkpDisableEntityCollisionFilter::hkpDisableEntityCollisionFilter(hkFinishLoadedO
 // The filter stops listening to each entity it still holds; the array's storage goes with m_disabledEntities. An entity
 // with no listener lists has nothing to remove.
 hkpDisableEntityCollisionFilter::~hkpDisableEntityCollisionFilter() {
-    for (int32_t i = 0; i < m_disabledEntities.m_size; i++) {
-        hkpEntity* pEntity = m_disabledEntities.m_data[i];
+    for (hkpEntity* pEntity : m_disabledEntities) {
         hkpEntity::ExtendedListeners* pListeners = pEntity->m_extendedListeners;
         if (!pListeners) {
             continue;
@@ -57,8 +56,8 @@ void hkpDisableEntityCollisionFilter::entityDeletedCallback(hkpEntity* entity) {
 // Two collidables may collide unless either belongs to a held entity.
 hkBool hkpDisableEntityCollisionFilter::isCollisionEnabled(const hkpCollidable& a, const hkpCollidable& b) const {
     hkBool result;
-    for (int32_t i = 0; i < m_disabledEntities.m_size; i++) {
-        const hkpCollidable* collidable = &m_disabledEntities.m_data[i]->m_collidable;
+    for (hkpEntity* pEntity : m_disabledEntities) {
+        const hkpCollidable* collidable = &pEntity->m_collidable;
         if (collidable == &a || collidable == &b) {
             result.m_bool = 0;
             return result;

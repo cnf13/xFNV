@@ -57,15 +57,15 @@ static void weldGeometryVertices(
     if (keepVertexOrder.m_bool) {
         const int32_t numUnique = uniqueVerts.m_size;
         uniqueToOrdered.setSize(numUnique, -1);
-        for (int32_t i = 0; i < vertexRemapOut.m_size; ++i) {
-            const int32_t unique = vertexRemapOut.m_data[i];
+        for (int32_t& rRemap : vertexRemapOut) {
+            const int32_t unique = rRemap;
             int32_t ordered = uniqueToOrdered.m_data[unique];
             if (ordered == -1) {
                 ordered = orderedVerts.m_size;
                 uniqueToOrdered.m_data[unique] = ordered;
                 orderedVerts.pushBack(uniqueVerts.m_data[unique]);
             }
-            vertexRemapOut.m_data[i] = ordered;
+            rRemap = ordered;
         }
         pNewVerts = &orderedVerts;
     }
@@ -196,8 +196,7 @@ static void weldVertexArray(
 // accumulated as a float, divided by 6.
 float computeVolume(const hkGeometry& geometry) {
     float volume = 0.0f;
-    for (int32_t i = 0; i < geometry.m_triangles.m_size; ++i) {
-        const hkGeometry::Triangle& triangle = geometry.m_triangles.m_data[i];
+    for (const hkGeometry::Triangle& triangle : geometry.m_triangles) {
         const __m128 c = geometry.m_vertices.m_data[triangle.m_c].m_quad;
         const __m128 b = geometry.m_vertices.m_data[triangle.m_b].m_quad;
         const __m128 cross = _mm_sub_ps(
@@ -216,8 +215,7 @@ float computeVolume(const hkGeometry& geometry) {
 // The SDK's hkGeometryUtils::transformGeometry (hkGeometryUtilities.lib): each vertex becomes
 // col0 * x + col1 * y + col2 * z + col3, the matrix columns read again for each vertex.
 void transformGeometry(const hkMatrix4& transform, hkGeometry& geometryInOut) {
-    for (int32_t i = 0; i < geometryInOut.m_vertices.m_size; ++i) {
-        hkVector4& vertex = geometryInOut.m_vertices.m_data[i];
+    for (hkVector4& vertex : geometryInOut.m_vertices) {
         const __m128 p = vertex.m_quad;
         __m128 result = _mm_add_ps(
             _mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), transform.m_col1.m_quad),
@@ -461,8 +459,8 @@ void hkGeometryUtils::createCapsuleGeometry(
         pDst++;
         pSrc++;
     }
-    for (int32_t vi = 0; vi < geom->m_vertices.m_size; vi++) {
-        geom->m_vertices.m_data[vi].setTransformedPos(transform, geom->m_vertices.m_data[vi]);
+    for (hkVector4& vertex : geom->m_vertices) {
+        vertex.setTransformedPos(transform, vertex);
     }
 
     // The top fan: the top pole (vertex 0) with the first ring.

@@ -974,9 +974,9 @@ bool NavMesh::IsPointInsideTriangleFilter(
 }
 
 NavMeshClosedDoorInfo* NavMesh::GetClosedDoorInfoForTriangle(uint16_t aiTriangle) {
-    for (uint32_t i = 0; i < ClosedDoors.GetSize(); ++i) {
-        if (ClosedDoors.GetAt(i).iTriangleIndex == aiTriangle) {
-            return &ClosedDoors.GetAt(i);
+    for (NavMeshClosedDoorInfo& rDoorInfo : ClosedDoors) {
+        if (rDoorInfo.iTriangleIndex == aiTriangle) {
+            return &rDoorInfo;
         }
     }
     return nullptr;
@@ -1140,17 +1140,17 @@ bool NavMesh::AddClosedDoor(uint32_t aiDoorID, ObstacleData* apData) {
         NiPointer<ObstacleData> spData(apData);
         GetOverlappedTriangleList(spData, kFudge, pTriangles);
     }
-    for (uint32_t i = 0; i < pTriangles->GetSize(); ++i) {
-        NavMeshClosedDoorInfo* pInfo = GetClosedDoorInfoForTriangle(pTriangles->GetAt(i));
+    for (uint16_t usTriangle : *pTriangles) {
+        NavMeshClosedDoorInfo* pInfo = GetClosedDoorInfoForTriangle(usTriangle);
         if (pInfo && pInfo->DoorFormID == aiDoorID) {
             continue;
         }
-        GetTriangle(pTriangles->GetAt(i))->SetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
+        GetTriangle(usTriangle)->SetFlag(NavMeshTriangle::NAV_TRI_CLOSED_DOOR);
         NavMeshClosedDoorInfo kInfo;
         kInfo.~NavMeshClosedDoorInfo();
         ::new (&kInfo) NavMeshClosedDoorInfo;
         kInfo.DoorFormID = aiDoorID;
-        kInfo.iTriangleIndex = pTriangles->GetAt(i);
+        kInfo.iTriangleIndex = usTriangle;
         ClosedDoors.Add(kInfo);
     }
     return true;
@@ -1618,14 +1618,13 @@ void NavMesh::ClearAllObstacles() {
 
 uint32_t NavMesh::GetUndoDataMaxObstacleCount(ObstacleUndoData* apUndoData) {
     uint32_t iA = 0;
-    for (uint32_t auiIndex = 0; auiIndex < apUndoData->OverlappedTriangles.iSize; ++auiIndex) {
-        uint16_t* v2 = &apUndoData->OverlappedTriangles.GetAt(auiIndex);
-        NavMeshTriangle* Triangle = GetTriangle(*v2);
+    for (uint16_t usTriangle : apUndoData->OverlappedTriangles) {
+        NavMeshTriangle* Triangle = GetTriangle(usTriangle);
         uint16_t ObjectCount = Triangle->GetObjectCount();
         iA = BSMAX(iA, ObjectCount);
     }
-    for (uint32_t i = 0; i < apUndoData->BoundsTriangles.iSize; ++i) {
-        NavMeshTriangle* v5 = GetTriangle((&apUndoData->BoundsTriangles.GetAt(i))->usTriangleIndex);
+    for (const BoundsTriangleInfo& rBoundsInfo : apUndoData->BoundsTriangles) {
+        NavMeshTriangle* v5 = GetTriangle(rBoundsInfo.usTriangleIndex);
         uint16_t v6 = v5->GetObjectCount();
         iA = BSMAX(iA, v6);
     }

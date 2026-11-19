@@ -128,8 +128,8 @@ const hkClass& hkpSerializedDisplayRbTransforms::DisplayTransformPair::staticCla
 
 // Each pair's rigid body loses its reference; the array's storage goes with m_transforms.
 hkpSerializedDisplayRbTransforms::~hkpSerializedDisplayRbTransforms() {
-    for (int32_t i = 0; i < m_transforms.m_size; i++) {
-        m_transforms.m_data[i].m_rb->removeReference();
+    for (const DisplayTransformPair& rPair : m_transforms) {
+        rPair.m_rb->removeReference();
     }
 }
 

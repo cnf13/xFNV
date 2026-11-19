@@ -215,8 +215,8 @@ char LookIK_DATA::Compare(LookIK_DATA* a1) {
 void LookIK_DATA::Copy(const LookIK_DATA& arData) {
     HeadSystemsA.Clear(true);
     // The names are const, so the const is cast away to free each one.
-    for (uint32_t uiIndex = 0; uiIndex < HeadSystemsNameA.iSize; ++uiIndex) {
-        ourFree(const_cast<char*>(HeadSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
+    for (const char* pName : HeadSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     HeadSystemsNameA.Clear(true);
     uint32_t FormFlags = arData.HeadSystemsA.iSize;
@@ -282,8 +282,8 @@ char GrabIK_DATA::Compare(GrabIK_DATA* a1) {
 void GrabIK_DATA::Copy(const GrabIK_DATA& arData) {
     ArmSystemsA.Clear(true);
     // The names are const, so the const is cast away to free each one.
-    for (uint32_t uiIndex = 0; uiIndex < ArmSystemsNameA.iSize; ++uiIndex) {
-        ourFree(const_cast<char*>(ArmSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
+    for (const char* pName : ArmSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     ArmSystemsNameA.Clear(true);
     uint32_t FormFlags = arData.ArmSystemsA.iSize;
@@ -373,8 +373,8 @@ char FootIK_DATA::Compare(FootIK_DATA* a1) {
 void FootIK_DATA::Copy(const FootIK_DATA& arData) {
     LegSystemsA.Clear(true);
     // The names are const, so the const is cast away to free each one.
-    for (uint32_t uiIndex = 0; uiIndex < LegSystemsNameA.iSize; ++uiIndex) {
-        ourFree(const_cast<char*>(LegSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
+    for (const char* pName : LegSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     LegSystemsNameA.Clear(true);
     uint32_t FormFlags = arData.LegSystemsA.iSize;
@@ -419,8 +419,8 @@ void BGSRagdoll::InitializeData() {
     FeedbackData.SystemData.fPosMaxAngVel = 18.0f;
     FeedbackData.DynamicBoneIdxA.Clear(true);
     // The names are const, so the const is cast away to free each one.
-    for (uint32_t uiIndex = 0; uiIndex < FootIKData.LegSystemsNameA.iSize; ++uiIndex) {
-        ourFree(const_cast<char*>(FootIKData.LegSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
+    for (const char* pName : FootIKData.LegSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     FootIKData.LegSystemsA.Clear(true);
     FootIKData.LegSystemsNameA.Clear(true);
@@ -430,13 +430,13 @@ void BGSRagdoll::InitializeData() {
     FootIKData.SystemData.fFootRaisedGain = 0.0f;
     FootIKData.SystemData.fRaycastDistUp = 0.0f;
     FootIKData.SystemData.fRaycastDistDown = 0.0f;
-    for (uint32_t i = 0; i < LookIKData.HeadSystemsNameA.iSize; ++i) {
-        ourFree(const_cast<char*>(LookIKData.HeadSystemsNameA.GetAt(static_cast<int32_t>(i))));
+    for (const char* pName : LookIKData.HeadSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     LookIKData.HeadSystemsA.Clear(true);
     LookIKData.HeadSystemsNameA.Clear(true);
-    for (uint32_t j = 0; j < GrabIKData.ArmSystemsNameA.iSize; ++j) {
-        ourFree(const_cast<char*>(GrabIKData.ArmSystemsNameA.GetAt(static_cast<int32_t>(j))));
+    for (const char* pName : GrabIKData.ArmSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     GrabIKData.ArmSystemsA.Clear(true);
     GrabIKData.ArmSystemsNameA.Clear(true);
@@ -455,18 +455,18 @@ void BGSRagdoll::InitializeData() {
 void BGSRagdoll::ClearData() {
     FeedbackData.DynamicBoneIdxA.Clear(true);
     // The names are const, so the const is cast away to free each one.
-    for (uint32_t uiIndex = 0; uiIndex < FootIKData.LegSystemsNameA.iSize; ++uiIndex) {
-        ourFree(const_cast<char*>(FootIKData.LegSystemsNameA.GetAt(static_cast<int32_t>(uiIndex))));
+    for (const char* pName : FootIKData.LegSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     FootIKData.LegSystemsA.Clear(true);
     FootIKData.LegSystemsNameA.Clear(true);
-    for (uint32_t i = 0; i < LookIKData.HeadSystemsNameA.iSize; ++i) {
-        ourFree(const_cast<char*>(LookIKData.HeadSystemsNameA.GetAt(static_cast<int32_t>(i))));
+    for (const char* pName : LookIKData.HeadSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     LookIKData.HeadSystemsA.Clear(true);
     LookIKData.HeadSystemsNameA.Clear(true);
-    for (uint32_t j = 0; j < GrabIKData.ArmSystemsNameA.iSize; ++j) {
-        ourFree(const_cast<char*>(GrabIKData.ArmSystemsNameA.GetAt(static_cast<int32_t>(j))));
+    for (const char* pName : GrabIKData.ArmSystemsNameA) {
+        ourFree(const_cast<char*>(pName));
     }
     GrabIKData.ArmSystemsA.Clear(true);
     GrabIKData.ArmSystemsNameA.Clear(true);

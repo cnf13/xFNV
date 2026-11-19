@@ -333,8 +333,8 @@ CombatGroup::~CombatGroup() {
     for (uint32_t i = 0; i < imemberCount; ++i) {
         pCombatManager->NotifyCombatGroupRemovedMember(this, GetMember(i));
     }
-    for (uint32_t i = 0; i < ClusterArray.iSize; ++i) {
-        ourFree(ClusterArray[i]);
+    for (CombatGroupCluster* pCluster : ClusterArray) {
+        ourFree(pCluster);
     }
     CreateDebugGeometry(eTrue);
 }
@@ -1052,10 +1052,9 @@ void CombatGroup::RemoveMember(Actor* apActor) {
 }
 
 CombatTarget* CombatGroup::GetCombatTargetForNumericID(uint32_t aiTargetID) {
-    for (uint32_t auiIndex = 0; auiIndex < TargetArray.GetSize(); ++auiIndex) {
-        CombatTarget* v4 = &TargetArray[auiIndex];
-        if (v4->pActor->GetFormID() == aiTargetID) {
-            return v4;
+    for (CombatTarget& rTarget : TargetArray) {
+        if (rTarget.pActor->GetFormID() == aiTargetID) {
+            return &rTarget;
         }
     }
     return nullptr;
@@ -1625,8 +1624,8 @@ void CombatGroup::BuildSearchTeleportDoorArray() {
             doorArray.RemoveRange(i_2 + 1, inumDuplicates, false);
         }
     }
-    for (uint32_t j = 0; j < doorArray.iSize; ++j) {
-        AddSearchDoor(doorArray[j]);
+    for (TESObjectREFR* pDoor : doorArray) {
+        AddSearchDoor(pDoor);
     }
 }
 
@@ -1966,8 +1965,7 @@ void CombatGroup::UpdateClusters() {
 void CombatGroup::UpdateClusterCenters() {
     NiPoint3 centerPoint_2;
     NiPoint3 centerPoint;
-    for (uint32_t i = 0; i < ClusterArray.iSize; ++i) {
-        CombatGroupCluster* pcluster = ClusterArray[i];
+    for (CombatGroupCluster* pcluster : ClusterArray) {
         pcluster->Center.SetPoint(NiPoint3_ZERO);
         pcluster->iMemberCount = 0;
     }
@@ -3022,8 +3020,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
         }
     }
     if (bDebugCombatGroupClusters.Bool() && !CombatGroup::bUseSimpleCombatGroupClustering && pDebugActor) {
-        for (uint32_t i = 0; i < ClusterArray.iSize; ++i) {
-            CombatGroupCluster* pCluster = ClusterArray[i];
+        for (CombatGroupCluster* pCluster : ClusterArray) {
             if (!spDebugGeometry.m_pObject) {
                 NiNode* pNode;
                 pNode = new NiNode(0);
@@ -3097,8 +3094,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
                 spDebugGeometry.m_pObject->AttachChild(pSphere, 1);
             }
         }
-        for (uint32_t i = 0; i < SearchTeleportDoors.iSize; ++i) {
-            CombatSearchDoor& rDoor = SearchTeleportDoors[i];
+        for (const CombatSearchDoor& rDoor : SearchTeleportDoors) {
             TESObjectREFR* pDoor = nullptr;
             if (rDoor.pDoor && rDoor.pDoor->GetSpace() == pSpace) {
                 pDoor = rDoor.pDoor;

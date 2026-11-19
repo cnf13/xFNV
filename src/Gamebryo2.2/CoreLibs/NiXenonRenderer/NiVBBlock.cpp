@@ -17,8 +17,8 @@ void NiVBBlock::ClearAllData() {
     m_uiCurrOffset = 0;
     m_uiFreeBytes = 0;
     m_uiTotalFreeBytes = 0;
-    for (uint16_t i = 0; i < m_apkChips.m_usSize; ++i) {
-        m_apkChips.m_pBase[i] = nullptr;
+    for (NiVBChip*& rpkChip : m_apkChips) {
+        rpkChip = nullptr;
     }
     m_apkChips.m_usSize = 0;
     m_apkChips.m_usESize = 0;

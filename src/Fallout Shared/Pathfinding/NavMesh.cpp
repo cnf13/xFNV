@@ -170,9 +170,8 @@ bool NavMesh::CheckNavMesh(bool abFix) {
     BSStringT<char> cellName;
     TESObjectCELL* pCell = pParentCell;
     pCell->GetFormDetailedString(cellName);
-    for (uint32_t i = 0; i < Vertices.iSize; ++i) {
-        if (!std::isfinite((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.x) ||
-            std::fabs((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.x) > 100000000376832.0) {
+    for (const NavMeshVertex& rVertex : Vertices) {
+        if (!std::isfinite(rVertex.Location.x) || std::fabs(rVertex.Location.x) > 100000000376832.0) {
             Warning(
                 "PATHFINDING: Navmesh %08x Cell %s, has bad vertex X coordinate, Please regenerate", iFormID,
                 cellName.String()
@@ -180,8 +179,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
             bFoundProblem = true;
             break;
         }
-        if (!std::isfinite((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.y) ||
-            std::fabs((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.y) > 100000000376832.0) {
+        if (!std::isfinite(rVertex.Location.y) || std::fabs(rVertex.Location.y) > 100000000376832.0) {
             Warning(
                 "PATHFINDING: Navmesh %08x Cell %s, has bad vertex Y coordinate, Please regenerate", iFormID,
                 cellName.String()
@@ -189,8 +187,7 @@ bool NavMesh::CheckNavMesh(bool abFix) {
             bFoundProblem = true;
             break;
         }
-        if (!std::isfinite((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.z) ||
-            std::fabs((&Vertices.GetAt(static_cast<int32_t>(i)))->Location.z) > 100000000376832.0) {
+        if (!std::isfinite(rVertex.Location.z) || std::fabs(rVertex.Location.z) > 100000000376832.0) {
             Warning(
                 "PATHFINDING: Navmesh %08x Cell %s, has bad vertex Z coordinate, Please regenerate", iFormID,
                 cellName.String()

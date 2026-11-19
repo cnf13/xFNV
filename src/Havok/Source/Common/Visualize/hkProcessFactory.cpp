@@ -45,9 +45,9 @@ int32_t hkProcessFactory::registerProcess(const char* viewerName, CreationFuncti
     EnterCriticalSection(&m_criticalSection->m_section);
     // The entry of processName, if any; the search is getProcessId's loop, and the entry's address is tested for null.
     ProcessIdPair* pPair = nullptr;
-    for (int32_t i = 0; i < m_name2creationFunction.m_size; ++i) {
-        if (m_name2creationFunction.m_data[i].m_name == viewerName) {
-            pPair = &m_name2creationFunction.m_data[i];
+    for (ProcessIdPair& pair : m_name2creationFunction) {
+        if (pair.m_name == viewerName) {
+            pPair = &pair;
             break;
         }
     }

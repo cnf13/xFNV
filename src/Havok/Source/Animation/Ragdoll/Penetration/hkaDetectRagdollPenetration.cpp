@@ -37,9 +37,8 @@ hkaDetectRagdollPenetration::hkaDetectRagdollPenetration(hkaDetectRagdollPenetra
 hkaDetectRagdollPenetration::~hkaDetectRagdollPenetration() {}
 
 void hkaDetectRagdollPenetration::resetBoneStates() {
-    // Havok's getSize() is an int, so the compare is signed.
-    for (int32_t i = 0; i < m_boneStates.m_size; i++) {
-        m_boneStates.m_data[i] = HK_YESP;
+    for (BonePenetrationStatus& rState : m_boneStates) {
+        rState = HK_YESP;
     }
     m_ragdollIsOut.m_bool = false;
 }
@@ -136,20 +135,20 @@ hkBool hkaDetectRagdollPenetration::detectPenetration(
             }
         }
     }
-    for (int32_t i = 0; i < m_boneStates.m_size; ++i) {
-        m_boneStates.m_data[i] = hkaDetectRagdollPenetration::HK_NOP;
+    for (BonePenetrationStatus& rState : m_boneStates) {
+        rState = hkaDetectRagdollPenetration::HK_NOP;
     }
     if (arOutput.m_penetrations.m_size) {
-        for (int32_t i = 0; i < arOutput.m_penetrations.m_size; ++i) {
-            const int16_t boneBeginIdx = arOutput.m_penetrations.m_data[i].m_boneBeginIndex;
+        for (const BonePenetration& rPenetration : arOutput.m_penetrations) {
+            const int16_t boneBeginIdx = rPenetration.m_boneBeginIndex;
             if (m_boneStates.m_data[boneBeginIdx] != hkaDetectRagdollPenetration::HK_YESP_DESCENDANT) {
                 m_boneStates.m_data[boneBeginIdx] = hkaDetectRagdollPenetration::HK_YESP;
             }
             hkArray<int16_t> bonesOut;
             hkaSkeletonUtils::getDescendants(*m_setup.m_ragdollSkeleton, boneBeginIdx, bonesOut, false);
-            for (int32_t j = 0; j < bonesOut.m_size; ++j) {
-                if (m_boneStates.m_data[bonesOut.m_data[j]] != hkaDetectRagdollPenetration::HK_YESP_DESCENDANT) {
-                    m_boneStates.m_data[bonesOut.m_data[j]] = hkaDetectRagdollPenetration::HK_YESP_DESCENDANT;
+            for (int16_t descendantIdx : bonesOut) {
+                if (m_boneStates.m_data[descendantIdx] != hkaDetectRagdollPenetration::HK_YESP_DESCENDANT) {
+                    m_boneStates.m_data[descendantIdx] = hkaDetectRagdollPenetration::HK_YESP_DESCENDANT;
                 }
             }
         }

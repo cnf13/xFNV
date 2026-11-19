@@ -72,10 +72,10 @@ void hkBallSocketChainCinfo::CloneData(hkpConstraintData* apData, NiCloningProce
     // The clone process is always a BSCloningProcess; Scale.x is read from it.
     float fScale = static_cast<BSCloningProcess&>(arCloneData).Scale.x;
     if (fScale != 1.0f) {
-        for (int32_t i = 0; i < pDest->m_infos.m_size; ++i) {
+        for (hkpBallSocketChainData::ConstraintInfo& rInfo : pDest->m_infos) {
             const hkSimdReal kScale(fScale);
-            pDest->m_infos.m_data[i].m_pivotInA.mul4(kScale);
-            pDest->m_infos.m_data[i].m_pivotInB.mul4(kScale);
+            rInfo.m_pivotInA.mul4(kScale);
+            rInfo.m_pivotInB.mul4(kScale);
         }
     }
     hkConstraintCinfo::CloneData(pDest, arCloneData);

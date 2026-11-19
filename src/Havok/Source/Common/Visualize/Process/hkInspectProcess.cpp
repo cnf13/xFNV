@@ -108,8 +108,8 @@ hkInspectProcess::hkInspectProcess(const hkArray<hkProcessContext*>& contexts) :
 
 hkInspectProcess::~hkInspectProcess() {
     if (m_vdb) {
-        for (int32_t i = 0; i < m_vdb->m_trackedObjects.m_size; ++i) {
-            removeTopLevelObject(m_vdb->m_trackedObjects.m_data[i].m_ptr);
+        for (const hkVisualDebuggerTrackedObject& object : m_vdb->m_trackedObjects) {
+            removeTopLevelObject(object.m_ptr);
         }
         m_vdb->removeTrackedObjectCallback(&myTrackedObjectCallback);
         m_vdb->removeReference();
@@ -224,17 +224,17 @@ void hkInspectProcess::init() {
         m_outStream->write8u(hkStructureLayout::HostLayoutRules.m_reusePaddingOptimization);
         m_outStream->write8u(hkStructureLayout::HostLayoutRules.m_emptyBaseClassOptimization);
         const hkArray<hkVisualDebuggerTrackedObject>& tracked = m_vdb->m_trackedObjects;
-        for (int32_t i = 0; i < tracked.m_size; ++i) {
-            addTopLevelObject(tracked.m_data[i].m_ptr, *tracked.m_data[i].m_class, tracked.m_data[i].m_tag);
+        for (const hkVisualDebuggerTrackedObject& object : tracked) {
+            addTopLevelObject(object.m_ptr, *object.m_class, object.m_tag);
         }
     }
 }
 
 void hkInspectProcess::step(float frameTimeInMs) {
     hkArray<ObjectPair> recursionStack;
-    for (int32_t i = 0; i < m_autoUpdateList.m_size; ++i) {
+    for (const ObjectPair& entry : m_autoUpdateList) {
         recursionStack.setSize(0);
-        writeObject(m_autoUpdateList.m_data[i].obj, *m_autoUpdateList.m_data[i].klass, false, recursionStack);
+        writeObject(entry.obj, *entry.klass, false, recursionStack);
     }
 }
 
@@ -323,8 +323,7 @@ int32_t hkInspectProcess::writeObject(
             m_outStream->writeRaw(buffer.m_data, buffer.m_size);
             if (recurse.m_bool) {
                 // The objects it points to: a global fixup's ids are the addresses of the object and its class.
-                for (int32_t i = 0; i < globalFixups.m_size; ++i) {
-                    const hkObjectSerialize::GlobalFixup& fixup = globalFixups.m_data[i];
+                for (const hkObjectSerialize::GlobalFixup& fixup : globalFixups) {
                     total += writeObject(
                         reinterpret_cast<const void*>(static_cast<hkUlong>(fixup.toID)),
                         *reinterpret_cast<const hkClass*>(static_cast<hkUlong>(fixup.toClassID)), true, recursionStack

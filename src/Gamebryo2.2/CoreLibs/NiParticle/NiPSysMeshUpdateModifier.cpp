@@ -74,8 +74,7 @@ bool NiPSysMeshUpdateModifier::RegisterStreamables(NiStream& kStream) {
     if (!NiPSysModifier::RegisterStreamables(kStream)) {
         return false;
     }
-    for (uint32_t i = 0; i < m_kMeshes.GetSize(); i++) {
-        NiAVObject* pkMesh = m_kMeshes.m_pBase[i];
+    for (NiAVObject* pkMesh : m_kMeshes) {
         if (pkMesh) {
             pkMesh->RegisterStreamables(kStream);
         }
@@ -127,8 +126,7 @@ void NiPSysMeshUpdateModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStri
 
 void NiPSysMeshUpdateModifier::ProcessClone(NiCloningProcess& kCloning) {
     NiPSysModifier::ProcessClone(kCloning);
-    for (uint32_t i = 0; i < m_kMeshes.GetSize(); i++) {
-        NiAVObject* pkMesh = m_kMeshes.m_pBase[i];
+    for (NiAVObject* pkMesh : m_kMeshes) {
         if (pkMesh) {
             pkMesh->ProcessClone(kCloning);
         }

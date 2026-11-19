@@ -219,9 +219,9 @@ void hkpVehicleLinearCastBatchingManager::stepVehiclesUsingCastResults(
 // hkpVehicleLinearCastWheelCollide).
 int32_t hkpVehicleLinearCastBatchingManager::getTotalNumCommands() const {
     int32_t totalNumCommands = 0;
-    for (int32_t i = 0; i < m_registeredVehicles.m_size; ++i) {
+    for (const hkpVehicleInstance* vehicle : m_registeredVehicles) {
         const hkpVehicleLinearCastWheelCollide* wheelCollide =
-            static_cast<const hkpVehicleLinearCastWheelCollide*>(m_registeredVehicles.m_data[i]->m_wheelCollide);
+            static_cast<const hkpVehicleLinearCastWheelCollide*>(vehicle->m_wheelCollide);
         totalNumCommands += wheelCollide->getTotalNumCommands();
     }
     return totalNumCommands;

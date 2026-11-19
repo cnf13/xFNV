@@ -121,10 +121,9 @@ uint32_t hkaAnimation::getNumAnnotations(float startTime, float deltaTime) const
     float endTime = startTime + deltaTime;
     float wrapTime = m_duration < endTime ? endTime - m_duration : -3.402820018375656e+38;
     uint32_t numAnnotations = 0;
-    for (int32_t i = 0; i < m_annotationTracks.m_size; ++i) {
-        const hkaAnnotationTrack& track = m_annotationTracks.m_data[i];
-        for (int32_t j = 0; j < track.m_annotations.m_size; ++j) {
-            float time = track.m_annotations.m_data[j].m_time;
+    for (const hkaAnnotationTrack& track : m_annotationTracks) {
+        for (const hkaAnnotationTrack::Annotation& annotation : track.m_annotations) {
+            float time = annotation.m_time;
             if ((time >= startTime && time < endTime) || time < wrapTime) {
                 ++numAnnotations;
             }

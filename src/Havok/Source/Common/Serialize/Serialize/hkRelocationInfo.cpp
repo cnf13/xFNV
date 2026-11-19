@@ -58,10 +58,10 @@ void hkRelocationInfo::addImport(int32_t off, const char* name) {
 // buffer. The buffer is raw packfile data and untyped: the fixup slots are pointers written through casts.
 void hkRelocationInfo::applyLocalAndGlobal(void* buffer) {
     char* pBuffer = static_cast<char*>(buffer);
-    for (int32_t i = 0; i < m_local.m_size; ++i) {
-        *reinterpret_cast<void**>(pBuffer + m_local.m_data[i].m_fromOffset) = pBuffer + m_local.m_data[i].m_toOffset;
+    for (const Local& kLocal : m_local) {
+        *reinterpret_cast<void**>(pBuffer + kLocal.m_fromOffset) = pBuffer + kLocal.m_toOffset;
     }
-    for (int32_t i = 0; i < m_global.m_size; ++i) {
-        *reinterpret_cast<void**>(pBuffer + m_global.m_data[i].m_fromOffset) = m_global.m_data[i].m_toAddress;
+    for (const Global& kGlobal : m_global) {
+        *reinterpret_cast<void**>(pBuffer + kGlobal.m_fromOffset) = kGlobal.m_toAddress;
     }
 }

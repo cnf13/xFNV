@@ -211,8 +211,8 @@ void visitEdge(
             edge.m_intersectionLineDir, planes, edge.m_planeA, edge.m_planeB, edge.m_fromPoint->m_location, points
         )) {
         vertexCloudOut.pushBack(points.m_data[0].m_location);
-        for (int32_t i = 0; i < points.m_size; ++i) {
-            Point_t* pPoint = &points.m_data[i];
+        for (Point_t& point : points) {
+            Point_t* pPoint = &point;
             Edge_t edgeAC;
             edgeAC.m_planeA = pPoint->m_planeA;
             edgeAC.m_planeB = pPoint->m_planeC;
@@ -221,7 +221,6 @@ void visitEdge(
                 &planes, pPoint->m_planeA, pPoint->m_planeC, pPoint->m_planeB, &edgeAC.m_intersectionLineDir
             );
             visitEdge(edgeAC, planes, visitedEdges, vertexCloudOut);
-            pPoint = &points.m_data[i];
             Edge_t edgeBC;
             edgeBC.m_planeA = pPoint->m_planeB;
             edgeBC.m_planeB = pPoint->m_planeC;

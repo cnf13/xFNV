@@ -833,8 +833,7 @@ void ShadowSceneLight::ParseObjectAddRadius(NiAVObject* apObject) {
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {
-        for (uint32_t i = 0; i < pNode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pChild = pNode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pChild : pNode->m_kChildren) {
             if (!pChild) {
                 continue;
             }

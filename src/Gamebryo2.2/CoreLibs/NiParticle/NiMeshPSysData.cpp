@@ -99,8 +99,7 @@ void NiMeshPSysData::SaveBinary(NiStream& kStream) {
 
     uint32_t uiNumGenerations = m_kPools.GetSize();
     NiStreamSaveBinary(kStream, uiNumGenerations);
-    for (uint32_t i = 0; i < m_kPools.GetSize(); i++) {
-        NiTObjectArray<NiPointer<NiAVObject>>* pkPool = m_kPools.GetAt(i);
+    for (NiTObjectArray<NiPointer<NiAVObject>>* pkPool : m_kPools) {
         uint32_t uiPoolSize = pkPool ? pkPool->GetAllocatedSize() : 0;
         NiStreamSaveBinary(kStream, uiPoolSize);
     }

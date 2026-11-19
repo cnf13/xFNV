@@ -62,10 +62,10 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
         pChainInstance->addEntity(pFirstEntity);
     }
     alignas(16) char buf[512];
-    for (int32_t c = 0; c < constraints.m_size; ++c) {
+    for (hkpConstraintInstance*& pConstraint : constraints) {
         hkVector4 pivotInA;
         hkVector4 pivotInB;
-        if (hkpConstraintUtils::getConstraintPivots(constraints.m_data[c], pivotInA, pivotInB) == HK_FAILURE) {
+        if (hkpConstraintUtils::getConstraintPivots(pConstraint, pivotInA, pivotInB) == HK_FAILURE) {
             {
                 alignas(16) hkErrStream stream(buf, 512);
                 stream << "Not supported types of constraints used to build a chain!";
@@ -78,7 +78,7 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
             pChainInstance->removeReference();
             return nullptr;
         }
-        hkpConstraintInstance** ppInstance = &constraints.m_data[c];
+        hkpConstraintInstance** ppInstance = &pConstraint;
         if ((*ppInstance)->m_entities[0] !=
             pChainInstance->m_chainedEntities.m_data[pChainInstance->m_chainedEntities.m_size - 1]) {
             // Entity B is the chain's last body: the pivots swap.
@@ -135,10 +135,10 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
             pMotor2 = pMotor2->clone();
         }
         pChainData->addConstraintInfoInBodySpace(pivotInA, pivotInB, aTc, pMotor0, pMotor1, pMotor2);
-        hkpEntity* pEntityA = constraints.m_data[c]->m_entities[0];
+        hkpEntity* pEntityA = pConstraint->m_entities[0];
         if (pEntityA == pChainInstance->m_chainedEntities.m_data[pChainInstance->m_chainedEntities.m_size - 1]) {
             pChainData->m_infos.m_data[pChainData->m_infos.m_size - 1].m_switchBodies.m_bool = true;
-            pChainInstance->addEntity(constraints.m_data[c]->m_entities[1]);
+            pChainInstance->addEntity(pConstraint->m_entities[1]);
         }
         else {
             pChainInstance->addEntity(pEntityA);
@@ -202,8 +202,7 @@ void hkpConstraintChainUtil::getAdjointEntities(
     hkArray<hkpEntity*, hkContainerHeapAllocator>& entitiesOut,
     hkArray<hkpConstraintInstance*, hkContainerHeapAllocator>& constraintsOut
 ) {
-    for (int32_t i = 0; i < allConstraints.m_size; ++i) {
-        hkpConstraintInstance* pInstance = allConstraints.m_data[i];
+    for (hkpConstraintInstance* pInstance : allConstraints) {
         hkpEntity* pEntityA = pInstance->m_entities[0];
         if (pEntityA == entity || pInstance->m_entities[1] == entity) {
             hkpEntity* pOther =
@@ -253,8 +252,7 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
 
     hkArray<hkpEntity*> entities;
     EntityIndexMap entityToIndex;
-    for (int32_t i = 0; i < allConstraints.m_size; ++i) {
-        const hkpConstraintInstance* pConstraint = allConstraints.m_data[i];
+    for (const hkpConstraintInstance* pConstraint : allConstraints) {
         for (int32_t e = 0; e < 2; ++e) {
             if (!entityToIndex.isValid(entityToIndex.findKey(pConstraint->m_entities[e]))) {
                 entityToIndex.insert(pConstraint->m_entities[e], entities.m_size);
@@ -271,8 +269,8 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
         info._reserve(heap, numEntities);
         info.m_size = numEntities;
     }
-    for (int32_t i = 0; i < info.m_size; ++i) {
-        info.m_data[i].m_side = -1;
+    for (EntityInfo& rInfo : info) {
+        rInfo.m_side = -1;
     }
     // The two sides' queues of body indices (side 0 searches from entityA, side 1 from entityB).
     EntityQueues queues;

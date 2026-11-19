@@ -185,8 +185,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
         NiNode* parent = apDistantLODParam->p3DData;
         if (parent) {
             while (!plodgeom) {
-                for (uint32_t i = 0; i < parent->m_kChildren.m_usSize; ++i) {
-                    NiAVObject* pavobj = parent->m_kChildren.m_pBase[i].m_pObject;
+                for (NiAVObject* pavobj : parent->m_kChildren) {
                     if (pavobj) {
                         plodgeom = pavobj->IsGeometry();
                         if (plodgeom) {

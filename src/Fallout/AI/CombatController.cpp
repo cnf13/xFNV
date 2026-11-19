@@ -699,10 +699,9 @@ void CombatController::SetActualMoveMode(uint32_t aiMoveMode) {
 }
 
 CombatProcedure* CombatController::GetBackgroundProcedure(int32_t aiProcedureType) {
-    for (uint32_t auiIndex = 0; auiIndex < BackgroundProcedures.iSize; ++auiIndex) {
-        CombatProcedure* v4 = BackgroundProcedures[auiIndex];
-        if (v4->GetType() == aiProcedureType) {
-            return v4;
+    for (CombatProcedure* pProcedure : BackgroundProcedures) {
+        if (pProcedure->GetType() == aiProcedureType) {
+            return pProcedure;
         }
     }
     return nullptr;

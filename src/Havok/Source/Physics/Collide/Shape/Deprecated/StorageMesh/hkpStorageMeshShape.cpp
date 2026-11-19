@@ -196,16 +196,16 @@ hkpStorageMeshShape::hkpStorageMeshShape(const hkpMeshShape* mesh)
     m_scaling = mesh->m_scaling;
     m_userData = mesh->m_userData;
     m_disableWelding.m_bool = mesh->m_disableWelding.m_bool;
-    for (int32_t i = 0; i < mesh->m_subparts.m_size; ++i) {
-        hkpStorageMeshShape::addSubpart(mesh->m_subparts.m_data[i]);
+    for (const Subpart& part : mesh->m_subparts) {
+        hkpStorageMeshShape::addSubpart(part);
     }
     m_weldingInfo.copyFromArray(hkContainerHeapAllocator().get(&m_weldingInfo), mesh->m_weldingInfo, hkTypeIsPod());
     m_weldingType.m_storage = mesh->m_weldingType.m_storage;
 }
 
 hkpStorageMeshShape::~hkpStorageMeshShape() {
-    for (int32_t i = 0; i < m_storage.m_size; ++i) {
-        m_storage.m_data[i]->removeReference();
+    for (SubpartStorage* pStorage : m_storage) {
+        pStorage->removeReference();
     }
 }
 

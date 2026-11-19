@@ -94,8 +94,7 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
         }
     }
 
-    for (int32_t i = 0; i < displayGeometries.m_size; i++) {
-        hkDisplayGeometry* geometry = displayGeometries.m_data[i];
+    for (hkDisplayGeometry* geometry : displayGeometries) {
         if (geometry) {
             delete geometry;
         }
@@ -126,10 +125,9 @@ void hkpConvexRadiusViewer::entityRemovedCallback(hkpEntity* entity) {
 // time, under the viewer's timer. The ids are the collidables' addresses plus 3, taken as numbers.
 void hkpConvexRadiusViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpConvexRadiusViewer", this);
-    for (int32_t i = 0; i < world->m_activeSimulationIslands.m_size; i++) {
-        const hkArrayBase<hkpEntity*>& entities = world->m_activeSimulationIslands.m_data[i]->m_entities;
-        for (int32_t j = 0; j < entities.m_size; j++) {
-            hkpEntity* entity = entities.m_data[j];
+    for (hkpSimulationIsland* island : world->m_activeSimulationIslands) {
+        const hkArrayBase<hkpEntity*>& entities = island->m_entities;
+        for (hkpEntity* entity : entities) {
             alignas(16) hkTransform transform;
             float time = world->getCurrentTime();
             entity->m_motion.approxTransformAt(time, transform);
@@ -286,8 +284,8 @@ void hkpConvexRadiusViewer::removeWorld(int32_t i) {
 
 void hkpConvexRadiusViewer::removeAllGeometries(int32_t worldIndex) {
     hkpConvexRadiusViewer::WorldToEntityData* v3 = m_worldEntities.m_data[worldIndex];
-    for (int32_t i = 0; i < v3->entitiesCreated.m_size; ++i) {
-        m_displayHandler->removeGeometry(v3->entitiesCreated.m_data[i], hkpConvexRadiusViewer::m_tag, 0);
+    for (hkUlong id : v3->entitiesCreated) {
+        m_displayHandler->removeGeometry(id, hkpConvexRadiusViewer::m_tag, 0);
     }
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v6 = v3->entitiesCreated.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;

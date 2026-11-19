@@ -169,8 +169,8 @@ hkpFirstPersonGun::hkpFirstPersonGun(hkFinishLoadedObjectFlag aFlag) : hkReferen
 }
 
 hkpFirstPersonGun::~hkpFirstPersonGun() {
-    for (int32_t i = 0; i < m_listeners.m_size; i++) {
-        m_listeners.m_data[i]->removeReference();
+    for (hkpFirstPersonGunBulletListener* pListener : m_listeners) {
+        pListener->removeReference();
     }
 }
 

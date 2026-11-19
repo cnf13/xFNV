@@ -73,8 +73,8 @@ void hkpCachingShapePhantom::calcContentStatistics(hkStatisticsCollector* collec
         );
     }
     collector->pushDir("agents");
-    for (int32_t i = 0; i < m_collisionDetails.m_size; ++i) {
-        collector->addReferencedObject(nullptr, m_collisionDetails.m_data[i].m_agent, 0);
+    for (const hkpCollisionDetail& detail : m_collisionDetails) {
+        collector->addReferencedObject(nullptr, detail.m_agent, 0);
     }
     collector->popDir();
 }

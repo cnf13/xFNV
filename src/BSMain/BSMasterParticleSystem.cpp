@@ -88,8 +88,7 @@ bool BSMasterParticleSystem::RegisterStreamables(NiStream& kStream) {
         return false;
     }
 
-    for (uint32_t i = 0; i < ChildParticles.GetSize(); ++i) {
-        NiParticles* pkParticles = ChildParticles.GetAt(i);
+    for (NiParticles* pkParticles : ChildParticles) {
         if (pkParticles) {
             pkParticles->RegisterStreamables(kStream);
         }

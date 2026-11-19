@@ -109,8 +109,7 @@ void hkpRemoveTerminalsMoppModifier::applyRemoveTerminals(hkpMoppCode* moppCode)
 // Gives each removed terminal its code byte back: the byte the remove info kept in its low byte, at the info's
 // offset (its upper 24 bits).
 void hkpRemoveTerminalsMoppModifier::undoRemoveTerminals(hkpMoppCode* moppCode) {
-    for (int32_t i = 0; i < m_removeInfo.m_size; ++i) {
-        const uint32_t info = m_removeInfo.m_data[i];
+    for (uint32_t info : m_removeInfo) {
         moppCode->m_data.m_data[info >> 8] = static_cast<uint8_t>(info);
     }
 }

@@ -1358,15 +1358,14 @@ bool hkGeometryProcessing::generateUniformDistribution(
                     result = false;
                     break;
                 }
-                for (int32_t j = 0; j < probes.m_size; ++j) {
+                for (hkVector4& probe : probes) {
                     hkGeometryProcessingInternals::NearestFeaturePolicy policy;
-                    policy.m_point = probes.m_data[j];
+                    policy.m_point = probe;
                     policy.m_distanceSquared = 3.40282e+38f;
                     policy.m_leaf = nullptr;
-                    queryClosestPoint(&tree, probes.m_data[j], &policy);
+                    queryClosestPoint(&tree, probe, &policy);
                     if (policy.m_leaf) {
                         hkVector4* pNearest = static_cast<hkVector4*>(policy.m_leaf->m_leafData.m_userData);
-                        hkVector4& probe = probes.m_data[j];
                         const float d = densityFunction->evaluate(probe);
                         probe.m_quad = _mm_mul_ps(_mm_set1_ps(d), probe.m_quad);
                         probe(3) = d;

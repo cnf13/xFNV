@@ -93,8 +93,8 @@ void NavMeshGrid::GetTriangleDataForAABB(
     for (int32_t i = istartrow; i <= igoalrow; ++i) {
         for (int32_t j = istartcolumn; j <= igoalcolumn; ++j) {
             BSSimpleArray<uint16_t, 1024>* parray = GetTriangleArray(static_cast<uint32_t>(j), i);
-            for (uint32_t k = 0; k < parray->iSize; ++k) {
-                apReturnArray->Add(parray->GetAt(k));
+            for (uint16_t usTriangle : *parray) {
+                apReturnArray->Add(usTriangle);
             }
         }
     }

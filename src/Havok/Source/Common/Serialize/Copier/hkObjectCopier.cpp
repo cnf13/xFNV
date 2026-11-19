@@ -452,8 +452,8 @@ int32_t hkObjectCopier::saveBody(const void* dataIn, const hkClass& klassIn, hkO
                         int32_t bitsOver = 0;
                         srcEnum.decomposeFlags(srcValue, bitNames, bitsOver);
                         int32_t dstValue = 0;
-                        for (int32_t j = 0; j < bitNames.m_size; ++j) {
-                            if (dstEnum.getValueOfName(bitNames.m_data[j], &bitValue) == HK_SUCCESS) {
+                        for (const char* bitName : bitNames) {
+                            if (dstEnum.getValueOfName(bitName, &bitValue) == HK_SUCCESS) {
                                 dstValue |= bitValue;
                             }
                             else {

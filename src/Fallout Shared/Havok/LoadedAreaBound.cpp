@@ -102,8 +102,8 @@ bool LoadedAreaBound::GetBoundFromCell(TESObjectCELL* apCell, GridCellArray* apC
         kMin.setAll(3.40282e+38f);
         if (apCell->GetInterior()) {
             const hkArray<hkpEntity*>& rEntities = pWorld->getFixedIsland()->getEntities();
-            for (int32_t i = 0; i < rEntities.getSize(); ++i) {
-                const hkpCollidable* pCollidable = rEntities[i]->getCollidable();
+            for (hkpEntity* pEntity : rEntities) {
+                const hkpCollidable* pCollidable = pEntity->getCollidable();
                 if (pCollidable->hkpCdBody::getShape()) {
                     hkpBroadPhase* pBroadPhase = pWorld->getBroadPhase();
                     pBroadPhase->getAabb(const_cast<hkpCollidable*>(pCollidable)->getBroadPhaseHandle(), kAabb);
@@ -121,12 +121,12 @@ bool LoadedAreaBound::GetBoundFromCell(TESObjectCELL* apCell, GridCellArray* apC
                         continue;
                     }
                     NiTObjectArray<NiPointer<bhkRigidBody>>& rBodies = pGridCell->pCell->GetCellMopp()->GetRigidBodyA();
-                    for (uint32_t j = 0; j < rBodies.GetSize(); ++j) {
-                        const hkpCollidable* pCollidable = rBodies[j]->GetCollidable();
+                    for (const NiPointer<bhkRigidBody>& spBody : rBodies) {
+                        const hkpCollidable* pCollidable = spBody->GetCollidable();
                         if (!pCollidable->hkpCdBody::getShape()) {
                             continue;
                         }
-                        bhkRigidBody* pBody = rBodies[j].operator->();
+                        bhkRigidBody* pBody = spBody.operator->();
                         if (pBody->GethkWorld()) {
                             hkpBroadPhase* pBroadPhase = pWorld->getBroadPhase();
                             pBroadPhase->getAabb(const_cast<hkpCollidable*>(pCollidable)->getBroadPhaseHandle(), kAabb);
@@ -135,8 +135,8 @@ bool LoadedAreaBound::GetBoundFromCell(TESObjectCELL* apCell, GridCellArray* apC
                             alignas(16) hkTransform kTransform;
                             kTransform.~hkTransform();
                             ::new (&kTransform) hkTransform;
-                            rBodies[j]->GetTransform(kTransform);
-                            hkpShape* pShape = rBodies[j]->GetShape()->Gethk();
+                            spBody->GetTransform(kTransform);
+                            hkpShape* pShape = spBody->GetShape()->Gethk();
                             pShape->getAabb(kTransform, 0.1f, kAabb);
                         }
                         kMax.setMax4(kMax, kAabb.m_max);
@@ -260,22 +260,20 @@ void LoadedAreaBound::Update(TESObjectCELL* apCell, GridCellArray* apCellGrid) {
                 }
             }
         }
-        for (int32_t i = 0; i < phantomA.getSize(); ++i) {
+        for (hkpPhantom* pPhantom : phantomA) {
             if (!buseWarp) {
                 continue;
             }
             CFilter filter;
-            filter.iFilter = phantomA.operator[]<hkpPhantom*>(i)->getCollidable()->getCollisionFilterInfo();
-            TESObjectREFR* pref =
-                TESHavokUtilities::FindCollidableRef(phantomA.operator[]<hkpPhantom*>(i)->getCollidable());
+            filter.iFilter = pPhantom->getCollidable()->getCollisionFilterInfo();
+            TESObjectREFR* pref = TESHavokUtilities::FindCollidableRef(pPhantom->getCollidable());
             if (filter.GetLayer() == L_CHARCONTROLLER && pref && pref->IsActor()) {
                 Actor* pactor = static_cast<Actor*>(pref);
                 WarpActor(pactor);
             }
         }
         alignas(16) RigidBodyArray warpedChildBodies;
-        for (int32_t i = 0; i < bodyA.getSize(); ++i) {
-            hkpRigidBody* prb = bodyA.operator[]<hkpRigidBody*>(i);
+        for (hkpRigidBody* prb : bodyA) {
             if (warpedChildBodies.indexOf(prb, 0, -1) != -1) {
                 continue;
             }
@@ -290,8 +288,8 @@ void LoadedAreaBound::Update(TESObjectCELL* apCell, GridCellArray* apCellGrid) {
             if (buseWarp) {
                 RigidBodyArray warpedBodies;
                 WarpBody(pbhkRb, warpedBodies);
-                for (int32_t j = 0; j < warpedBodies.getSize(); ++j) {
-                    warpedChildBodies.pushBack(warpedBodies.operator[]<hkpRigidBody*>(j));
+                for (hkpRigidBody* pWarpedBody : warpedBodies) {
+                    warpedChildBodies.pushBack(pWarpedBody);
                 }
                 continue;
             }
@@ -330,8 +328,8 @@ void LoadedAreaBound::Update(TESObjectCELL* apCell, GridCellArray* apCellGrid) {
             removeBodyA.Add(pbody);
         }
     }
-    for (uint32_t k = 0; k < removeBodyA.iSize; ++k) {
-        HitMap.RemoveAt(removeBodyA.GetAt(static_cast<int32_t>(k)));
+    for (bhkRigidBody* pBody : removeBodyA) {
+        HitMap.RemoveAt(pBody);
     }
 }
 
@@ -470,11 +468,11 @@ void LoadedAreaBound::SetBodiesMotionOutsideAABB(
     alignas(16) hkArray<hkpRigidBody*, hkContainerHeapAllocator> bodiesToBeWarped;
     bodiesToBeWarped.~hkArray<hkpRigidBody*, hkContainerHeapAllocator>();
     ::new (&bodiesToBeWarped) hkArray<hkpRigidBody*, hkContainerHeapAllocator>;
-    for (int32_t i = 0; i < arSimIslandA.getSize(); ++i) {
-        pworld = arSimIslandA.operator[]<hkpSimulationIsland*>(i)->getWorld();
-        const hkArray<hkpEntity*>& entitiesA = arSimIslandA.operator[]<hkpSimulationIsland*>(i)->getEntities();
-        for (int32_t j = 0; j < entitiesA.getSize(); ++j) {
-            const hkpCollidable* pcol = entitiesA.operator[]<hkpEntity*>(j)->getCollidable();
+    for (hkpSimulationIsland* pIsland : arSimIslandA) {
+        pworld = pIsland->getWorld();
+        const hkArray<hkpEntity*>& entitiesA = pIsland->getEntities();
+        for (hkpEntity* pEntity : entitiesA) {
+            const hkpCollidable* pcol = pEntity->getCollidable();
             if (pcol->hkpCdBody::getShape()) {
                 hkpBroadPhase* pBroadPhase = pworld->getBroadPhase();
                 pBroadPhase->getAabb(&pcol->m_broadPhaseHandle, aabb);
@@ -493,18 +491,17 @@ void LoadedAreaBound::SetBodiesMotionOutsideAABB(
     hkArray<hkpRigidBody*, hkContainerHeapAllocator> warpedChildBodies;
     warpedChildBodies.~hkArray<hkpRigidBody*, hkContainerHeapAllocator>();
     ::new (&warpedChildBodies) hkArray<hkpRigidBody*, hkContainerHeapAllocator>;
-    for (int32_t i = 0; i < bodiesToBeWarped.getSize(); ++i) {
-        if (warpedChildBodies.indexOf(bodiesToBeWarped.operator[]<hkpRigidBody*>(i), 0, -1) != -1) {
+    for (hkpRigidBody* prb : bodiesToBeWarped) {
+        if (warpedChildBodies.indexOf(prb, 0, -1) != -1) {
             continue;
         }
-        bhkRigidBody* pbhkRb =
-            static_cast<bhkRigidBody*>(bhkEntity::Getbhk(bodiesToBeWarped.operator[]<hkpRigidBody*>(i)));
+        bhkRigidBody* pbhkRb = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(prb));
         hkArray<hkpRigidBody*, hkContainerHeapAllocator> warpedBodies;
         warpedBodies.~hkArray<hkpRigidBody*, hkContainerHeapAllocator>();
         ::new (&warpedBodies) hkArray<hkpRigidBody*, hkContainerHeapAllocator>;
         WarpBody(pbhkRb, warpedBodies);
-        for (int32_t j = 0; j < warpedBodies.getSize(); ++j) {
-            warpedChildBodies.pushBack(warpedBodies.operator[]<hkpRigidBody*>(j));
+        for (hkpRigidBody* pWarpedBody : warpedBodies) {
+            warpedChildBodies.pushBack(pWarpedBody);
         }
     }
 }
@@ -565,28 +562,27 @@ void LoadedAreaBound::WarpBody(bhkRigidBody* apBody, hkArray<hkpRigidBody*, hkCo
         hkAabb constrainedSystemAabb;
         constrainedSystemAabb.setEmpty();
         const hkpWorld* pworld = apBody->GethkWorld();
-        for (int32_t i = 0; i < pbodyA.getSize(); ++i) {
+        for (const hkpRigidBody* phkBody : pbodyA) {
             hkAabb aabb;
             const hkpBroadPhase* pBroadPhase = pworld->getBroadPhase();
-            pBroadPhase->getAabb(&pbodyA.operator[]<const hkpRigidBody*>(i)->getCollidable()->m_broadPhaseHandle, aabb);
+            pBroadPhase->getAabb(&phkBody->getCollidable()->m_broadPhaseHandle, aabb);
             constrainedSystemAabb.includePoint(aabb.m_max);
             constrainedSystemAabb.includePoint(aabb.m_min);
         }
         float& rfDiffZ = warpDiff[2];
         const float& rfMaxZ = constrainedSystemAabb.m_max.operator()(2);
         rfDiffZ = rfMaxZ - constrainedSystemAabb.m_min.operator()(2) + rfDiffZ;
-        for (int32_t j = 0; j < pbodyA.getSize(); ++j) {
+        for (const hkpRigidBody*& rphkBody : pbodyA) {
             // Takes apBody's transform for every body of the system, as the game does.
             hkTransform hkchildTransf;
             apBody->GetTransform(hkchildTransf);
             NiTransform nichildTransf;
             HK2NI(nichildTransf, hkchildTransf);
             NiPoint3 childWarpLoc = nichildTransf.m_Translate + warpDiff;
-            bhkRigidBody* pbody =
-                static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pbodyA.operator[]<const hkpRigidBody*>(j)));
+            bhkRigidBody* pbody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(rphkBody));
             if (apBody != pbody) {
                 // Passes the element's own address on.
-                arWarpedBodies.pushBack(const_cast<hkpRigidBody* const&>(pbodyA.operator[]<const hkpRigidBody*>(j)));
+                arWarpedBodies.pushBack(const_cast<hkpRigidBody* const&>(rphkBody));
             }
             pbody->SetPosition(childWarpLoc);
             hkVector4 upVel(0.0f, 0.0f, 0.01f, 0.0f);

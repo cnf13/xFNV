@@ -1645,13 +1645,11 @@ hkpInertiaTensorComputer::combineMassProperties(const hkArray<hkpMassElement>& e
     if (elements.m_size <= 0) {
         return HK_FAILURE;
     }
-    for (int32_t i = 0; i < elements.m_size; ++i) {
-        const hkpMassElement& rElement = elements.m_data[i];
+    for (const hkpMassElement& rElement : elements) {
         lTransformedCom.setTransformedPos(rElement.m_transform, rElement.m_properties.m_centerOfMass);
-        const hkpMassElement& rReloaded = elements.m_data[i];
-        const float fMass = rReloaded.m_properties.m_mass;
+        const float fMass = rElement.m_properties.m_mass;
         fTotalMass = fTotalMass + fMass;
-        fTotalVolume = rReloaded.m_properties.m_volume + fTotalVolume;
+        fTotalVolume = rElement.m_properties.m_volume + fTotalVolume;
         lCenterOfMass.addMul4(fMass, lTransformedCom);
     }
     // Continues only when the total mass is greater than zero (not when NaN).
@@ -1664,17 +1662,15 @@ hkpInertiaTensorComputer::combineMassProperties(const hkArray<hkpMassElement>& e
     result.m_centerOfMass.m_quad = lCenterOfMass.m_quad;
     result.m_volume = fTotalVolume;
     result.m_inertiaTensor.setZero();
-    for (int32_t i = 0; i < elements.m_size; ++i) {
-        const hkpMassElement& rElement = elements.m_data[i];
+    for (const hkpMassElement& rElement : elements) {
         alignas(16) hkMatrix3 lInertia;
         lInertia.m_col0.m_quad = rElement.m_properties.m_inertiaTensor.m_col0.m_quad;
         lInertia.m_col1.m_quad = rElement.m_properties.m_inertiaTensor.m_col1.m_quad;
         lInertia.m_col2.m_quad = rElement.m_properties.m_inertiaTensor.m_col2.m_quad;
         lInertia.changeBasis(rElement.m_transform.getRotation());
-        const hkpMassElement& rReloaded = elements.m_data[i];
-        lTransformedCom.setTransformedPos(rReloaded.m_transform, rReloaded.m_properties.m_centerOfMass);
+        lTransformedCom.setTransformedPos(rElement.m_transform, rElement.m_properties.m_centerOfMass);
         lTransformedCom.sub4(lCenterOfMass);
-        shiftInertiaFromCom(lTransformedCom, elements.m_data[i].m_properties.m_mass, lInertia);
+        shiftInertiaFromCom(lTransformedCom, rElement.m_properties.m_mass, lInertia);
         result.m_inertiaTensor.add(lInertia);
     }
     return HK_SUCCESS;

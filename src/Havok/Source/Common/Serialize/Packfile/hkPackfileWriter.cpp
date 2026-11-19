@@ -62,8 +62,8 @@ hkPackfileWriter::hkPackfileWriter()
 
 // The section tags it duplicated are freed; the containers free their own storage.
 hkPackfileWriter::~hkPackfileWriter() {
-    for (int32_t i = 0; i < m_knownSections.m_size; ++i) {
-        hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), m_knownSections.m_data[i]);
+    for (char* pSection : m_knownSections) {
+        hkMemoryRouter::easyFree(hkMemoryRouter::getInstance().heap(), pSection);
     }
 }
 
@@ -226,8 +226,7 @@ void hkPackfileWriter::addObject(
     kRelocs.~hkRelocationInfo();
     ::new (&kRelocs) hkRelocationInfo;
     chasePointers(pObject, *pClass, kRelocs);
-    for (int32_t i = 0; i < kRelocs.m_global.getSize(); ++i) {
-        const hkRelocationInfo::Global& kGlobal = kRelocs.m_global.m_data[i];
+    for (const hkRelocationInfo::Global& kGlobal : kRelocs.m_global) {
         const hkClass* pToClass = kGlobal.m_toClass;
         void* pToAddress = kGlobal.m_toAddress;
         if (pToClass == nullptr || pToAddress == nullptr) {

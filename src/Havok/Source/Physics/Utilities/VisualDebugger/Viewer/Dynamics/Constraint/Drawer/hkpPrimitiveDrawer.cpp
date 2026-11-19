@@ -342,8 +342,7 @@ void hkMonitorStreamColorTable::addColorPair(const char* apColorName, uint32_t a
 // not have yet, then does the same for the grandchildren.
 void hkMakeSumRecursive(hkMonitorStreamAnalyzer::Node* sum, hkMonitorStreamAnalyzer::Node* tree) {
     // The child count compare is signed.
-    for (int32_t i = 0; i < tree->m_children.m_size; ++i) {
-        hkMonitorStreamAnalyzer::Node* pChild = tree->m_children.m_data[i];
+    for (hkMonitorStreamAnalyzer::Node* pChild : tree->m_children) {
         hkMonitorStreamAnalyzer::Node* pSumChild = hkFindChildByName(sum, pChild->m_name, false);
         if (!pSumChild) {
             // Takes the node from the router's heap through the allocator's own blockAlloc.

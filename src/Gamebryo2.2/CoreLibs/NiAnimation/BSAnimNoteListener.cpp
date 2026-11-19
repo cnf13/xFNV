@@ -12,8 +12,8 @@ BSAnimNoteListener::BSAnimNoteListener() : ReceiverA(0, 1) {}
 
 // The receivers are freed; the array's own destructor frees its buffer.
 BSAnimNoteListener::~BSAnimNoteListener() {
-    for (uint32_t i = 0; i < ReceiverA.m_usSize; ++i) {
-        MemoryManager_Singleton.Deallocate(ReceiverA.m_pBase[i]);
+    for (BSAnimReceiverType* pReceiver : ReceiverA) {
+        MemoryManager_Singleton.Deallocate(pReceiver);
     }
 }
 

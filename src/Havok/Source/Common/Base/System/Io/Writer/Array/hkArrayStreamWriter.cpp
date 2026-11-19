@@ -40,11 +40,10 @@ hkMemoryTrack::~hkMemoryTrack() {
 }
 
 void hkMemoryTrack::clear() {
-    for (int32_t i = 0; i < m_sectors.m_size; ++i) {
+    for (char* pSector : m_sectors) {
         int32_t m_numBytesPerSector = this->m_numBytesPerSector;
-        char* v4 = m_sectors.m_data[i];
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-        Instance->m_heap->blockFree(v4, m_numBytesPerSector);
+        Instance->m_heap->blockFree(pSector, m_numBytesPerSector);
     }
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t m_capacityAndFlags = m_sectors.m_capacityAndFlags;

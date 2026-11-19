@@ -43,8 +43,8 @@ NavMeshPtr NavMeshArray::GetNavMeshByIndex(uint32_t aiNavMeshIndex) {
 }
 
 void NavMeshArray::AddToGarbageCollector() {
-    for (uint32_t uiIndex = 0; uiIndex < NavMeshes.iSize; ++uiIndex) {
-        GarbageCollector::Add(NavMeshes.GetAt(uiIndex));
+    for (NavMeshPtr& spNavMesh : NavMeshes) {
+        GarbageCollector::Add(spNavMesh);
     }
     NavMeshes.Clear(true);
 }

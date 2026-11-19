@@ -242,9 +242,8 @@ void hkJobQueue::updateJobQueryRules() {
             m_cpuThreadIndexToSemaphoreIndex[i] = -1;
         }
         for (int32_t c = 0; c < caches.m_size; ++c) {
-            for (int32_t j = 0; j < caches.m_data[c].m_size; ++j) {
-                m_cpuThreadIndexToSemaphoreIndex[caches.m_data[c].m_data[j]] =
-                    static_cast<int8_t>(m_cpuCacheQueuesBegin + c);
+            for (int32_t threadIndex : caches.m_data[c]) {
+                m_cpuThreadIndexToSemaphoreIndex[threadIndex] = static_cast<int8_t>(m_cpuCacheQueuesBegin + c);
             }
         }
     }
@@ -560,9 +559,9 @@ void hkJobQueue::addJobBatch(const hkArrayBase<hkJob*>& jobs, hkJobQueue::JobPri
     // The SDK's lock storage: a 16-aligned byte buffer lockQueue builds the DynamicData in.
     alignas(16) char dynamicDataStorage[sizeof(DynamicData)];
     DynamicData* data = lockQueue(dynamicDataStorage);
-    for (int32_t i = 0; i < jobs.m_size; ++i) {
+    for (hkJob* pJob : jobs) {
         JobQueueEntry entry;
-        hkString::memCpy(&entry, jobs.m_data[i], jobs.m_data[i]->m_size);
+        hkString::memCpy(&entry, pJob, pJob->m_size);
         const int32_t queueIndex = getQueueIndexForJob(entry);
         hkQueue<JobQueueEntry>& queue = data->m_jobQueue[queueIndex];
         if (priority == JOB_HIGH_PRIORITY) {

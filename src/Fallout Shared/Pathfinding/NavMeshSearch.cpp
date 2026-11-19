@@ -198,9 +198,9 @@ bool NavMeshSearch::GetNodeConnections(
         }
         float fbadNodeMultiplier = 1.0f;
         if (pBadNodes) {
-            for (uint32_t j = 0; j < pBadNodes->iSize; ++j) {
-                if ((*pBadNodes)[j].sTriangle == apNode->tNodeData.sTriangle &&
-                    (*pBadNodes)[j].pNavMesh == apNode->tNodeData.pNavMesh && (*pBadNodes)[j].iEdgeIndex == i) {
+            for (const NavMeshSearchLink& rBadNode : *pBadNodes) {
+                if (rBadNode.sTriangle == apNode->tNodeData.sTriangle &&
+                    rBadNode.pNavMesh == apNode->tNodeData.pNavMesh && rBadNode.iEdgeIndex == i) {
                     fbadNodeMultiplier = 100.0f;
                     break;
                 }
@@ -224,8 +224,8 @@ bool NavMeshSearch::GetNodeConnections(
             staticNodes_t staticNodes;
             if (static_cast<uint8_t>(potherMesh->GetStaticAvoidNodesForTri(usotherTri, staticNodes))) {
                 float ftotalStaticCost = 0.0f;
-                for (uint32_t uiIndex = 0; uiIndex < staticNodes.iSize; ++uiIndex) {
-                    ftotalStaticCost = staticNodes.GetAt(static_cast<int32_t>(uiIndex))->fCost + ftotalStaticCost;
+                for (NavMeshStaticAvoidNode* pStaticNode : staticNodes) {
+                    ftotalStaticCost = pStaticNode->fCost + ftotalStaticCost;
                 }
                 fcost = fcost * ftotalStaticCost;
             }

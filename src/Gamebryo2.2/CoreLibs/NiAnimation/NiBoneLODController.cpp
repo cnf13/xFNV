@@ -109,8 +109,7 @@ void NiBoneLODController::LoadBinary(NiStream& kStream) {
 void NiBoneLODController::LinkObject(NiStream& kStream) {
     NiTimeController::LinkObject(kStream);
 
-    for (uint32_t i = 0; i < m_kBoneArray.GetSize(); i++) {
-        NiTPrimitiveSet<NiNode*>* pkBones = m_kBoneArray.GetAt(i);
+    for (NiTPrimitiveSet<NiNode*>* pkBones : m_kBoneArray) {
         if (!pkBones) {
             continue;
         }
@@ -119,8 +118,7 @@ void NiBoneLODController::LinkObject(NiStream& kStream) {
         }
     }
 
-    for (uint32_t i = 0; i < m_kSkinArray.GetSize(); i++) {
-        NiTPrimitiveSet<SkinInfo*>* pkSkins = m_kSkinArray.GetAt(i);
+    for (NiTPrimitiveSet<SkinInfo*>* pkSkins : m_kSkinArray) {
         if (!pkSkins) {
             continue;
         }
@@ -142,8 +140,7 @@ bool NiBoneLODController::RegisterStreamables(NiStream& kStream) {
         return false;
     }
 
-    for (uint32_t i = 0; i < m_kSkinArray.GetSize(); i++) {
-        NiTPrimitiveSet<SkinInfo*>* pkSkins = m_kSkinArray.GetAt(i);
+    for (NiTPrimitiveSet<SkinInfo*>* pkSkins : m_kSkinArray) {
         if (!pkSkins) {
             continue;
         }
@@ -165,8 +162,7 @@ void NiBoneLODController::SaveBinary(NiStream& kStream) {
 
     uint32_t uiNumBoneSets = m_kBoneArray.GetSize();
     NiStreamSaveBinary(kStream, uiNumBoneSets);
-    for (uint32_t i = 0; i < m_kBoneArray.GetSize(); i++) {
-        NiTPrimitiveSet<NiNode*>* pkBones = m_kBoneArray.GetAt(i);
+    for (NiTPrimitiveSet<NiNode*>* pkBones : m_kBoneArray) {
         if (pkBones) {
             uint32_t uiNumBones = pkBones->GetSize();
             NiStreamSaveBinary(kStream, uiNumBones);
@@ -182,8 +178,7 @@ void NiBoneLODController::SaveBinary(NiStream& kStream) {
 
     uint32_t uiNumSkinSets = m_kSkinArray.GetSize();
     NiStreamSaveBinary(kStream, uiNumSkinSets);
-    for (uint32_t i = 0; i < m_kSkinArray.GetSize(); i++) {
-        NiTPrimitiveSet<SkinInfo*>* pkSkins = m_kSkinArray.GetAt(i);
+    for (NiTPrimitiveSet<SkinInfo*>* pkSkins : m_kSkinArray) {
         if (pkSkins) {
             uint32_t uiNumSkins = pkSkins->GetSize();
             NiStreamSaveBinary(kStream, uiNumSkins);
@@ -437,21 +432,19 @@ bool NiBoneLODController::SetBoneLOD(int32_t iLOD) {
 // Frees every bone set and skin set (each skin info releasing its skin instance), then empties both arrays and the skin
 // set.
 void NiBoneLODController::CleanUp() {
-    for (uint32_t i = 0; i < m_kBoneArray.m_usSize; ++i) {
-        NiTPrimitiveSet<NiNode*>* pkBones = m_kBoneArray.m_pBase[i];
+    for (NiTPrimitiveSet<NiNode*>* pkBones : m_kBoneArray) {
         if (pkBones) {
             _NiFree(pkBones->m_pBase);
             MemoryManager_Singleton.Deallocate(pkBones);
         }
     }
-    for (uint16_t j = 0; j < m_kBoneArray.m_usSize; ++j) {
-        m_kBoneArray.m_pBase[j] = nullptr;
+    for (NiTPrimitiveSet<NiNode*>*& pkBones : m_kBoneArray) {
+        pkBones = nullptr;
     }
     m_kBoneArray.m_usSize = 0;
     m_kBoneArray.m_usESize = 0;
 
-    for (uint32_t i = 0; i < m_kSkinArray.m_usSize; ++i) {
-        NiTPrimitiveSet<SkinInfo*>* pkSkins = m_kSkinArray.m_pBase[i];
+    for (NiTPrimitiveSet<SkinInfo*>* pkSkins : m_kSkinArray) {
         if (pkSkins) {
             for (uint32_t j = 0; j < pkSkins->m_uiUsed; ++j) {
                 SkinInfo* pkInfo = pkSkins->m_pBase[j];
@@ -467,8 +460,8 @@ void NiBoneLODController::CleanUp() {
             MemoryManager_Singleton.Deallocate(pkSkins);
         }
     }
-    for (uint16_t j = 0; j < m_kSkinArray.m_usSize; ++j) {
-        m_kSkinArray.m_pBase[j] = nullptr;
+    for (NiTPrimitiveSet<SkinInfo*>*& pkSkins : m_kSkinArray) {
+        pkSkins = nullptr;
     }
     m_kSkinArray.m_usSize = 0;
     m_kSkinArray.m_usESize = 0;

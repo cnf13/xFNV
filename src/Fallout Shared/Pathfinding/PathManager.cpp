@@ -258,8 +258,8 @@ uint8_t PathingTaskData::GetWaitingForRayCasts() {
 
 bool PathingTaskData::AllRayCastPathComputed() {
     RayCastLock.Lock(nullptr);
-    for (uint32_t uiIndex = 0; uiIndex < RayCastPaths.iSize; ++uiIndex) {
-        if (!RayCastPaths.GetAt(uiIndex)->eResult) {
+    for (RayCastPath* pPath : RayCastPaths) {
+        if (!pPath->eResult) {
             RayCastLock.Unlock();
             return false;
         }

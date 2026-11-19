@@ -400,8 +400,8 @@ bhkRagdollController::bhkRagdollController(NiAVObject* apObject, NiAVObject* apP
 // pose array and share data from their maps when only the map and this controller still hold them; the members
 // release the rest.
 bhkRagdollController::~bhkRagdollController() {
-    for (int32_t i = 0; i < LegInfoA.m_size; ++i) {
-        LegInfoA.m_data[i].pSolver->removeReference();
+    for (const FootIkLegInfo& rLeg : LegInfoA) {
+        rLeg.pSolver->removeReference();
     }
     LegInfoA.m_size = 0;
     if (pRagdollRBController) {
@@ -820,10 +820,8 @@ void bhkRagdollController::InitFootIK(BSSimpleArray<const char*, 1024>& arboneNa
             }
         }
         if (spRagdollSharedData.m_pObject->pSGToRagdoll) {
-            for (int32_t j = 0; j < spRagdollSharedData.m_pObject->pSGToRagdoll->m_mapping.m_simpleMappings.m_size;
-                 ++j) {
-                const hkaSkeletonMapperData::SimpleMapping& rMapping =
-                    spRagdollSharedData.m_pObject->pSGToRagdoll->m_mapping.m_simpleMappings.m_data[j];
+            for (const hkaSkeletonMapperData::SimpleMapping& rMapping :
+                 spRagdollSharedData.m_pObject->pSGToRagdoll->m_mapping.m_simpleMappings) {
                 if (rMapping.m_boneA == setupData.m_ankleIndex) {
                     LegInfoA.m_data[i].RagdollFootIdx = rMapping.m_boneB;
                 }
@@ -2839,8 +2837,7 @@ void bhkRagdollController::CreateSGSkeleton() {
                 spRagdollSharedData.m_pObject->pHighSkel->m_parentIndices.m_data[i] = kBones.pBuffer[i]->parentIndice;
             }
         }
-        for (uint32_t i = 0; i < kBones.iSize; ++i) {
-            bhkRagdollController::bhkSkeletonBone* pBone = kBones.pBuffer[i];
+        for (bhkRagdollController::bhkSkeletonBone* pBone : kBones) {
             if (pBone) {
                 // An aligned block: the byte in front of the bone holds the padding up to the block's start.
                 uint8_t* pMemory = static_cast<uint8_t*>(static_cast<void*>(pBone));
@@ -3323,8 +3320,7 @@ void bhkRagdollController::CreateSGSkeletonRec(
     if (!pnode) {
         return;
     }
-    for (uint32_t i = 0; i < pnode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pchild = pnode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pchild : pnode->m_kChildren) {
         bhkBlendCollisionObject* pchildBlendCol = nullptr;
         bool bWeapon = false;
         if (pchild) {
@@ -3375,10 +3371,9 @@ void bhkRagdollController::ResetPose(
     bool abPrevUseVel,
     hkpMotion::MotionType aePrevMotion
 ) {
-    for (uint32_t ui = 0; ui < arPoseA.iSize; ++ui) {
-        BoneTransf& rBone = arPoseA.pBuffer[ui];
+    for (BoneTransf& rBone : arPoseA) {
         rBone.pObj->m_kLocal.m_Translate = rBone.LocalTransform.m_Translate;
-        arPoseA.pBuffer[ui].pObj->m_kLocal.m_Rotate = arPoseA.pBuffer[ui].LocalTransform.m_Rotate;
+        rBone.pObj->m_kLocal.m_Rotate = rBone.LocalTransform.m_Rotate;
     }
     NiUpdateData data;
     // EXE-INLINED 0x43D410
@@ -3421,8 +3416,7 @@ void bhkRagdollController::CopyPoseTo3DRec(
     }
     NiNode* pnode = apPose->IsNode();
     if (pnode) {
-        for (uint32_t i = 0; i < pnode->m_kChildren.m_usSize; ++i) {
-            NiAVObject* pChild = pnode->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* pChild : pnode->m_kChildren) {
             if (pChild) {
                 CopyPoseTo3DRec(apSkeleton, pChild, arPoseA);
             }
@@ -3504,8 +3498,8 @@ void bhkRagdollController::FindBones(
     }
     NiNode* pnode = static_cast<NiNode*>(apObject->DynamicCastMember(&NiNode::ms_RTTI));
     if (pnode) {
-        for (uint32_t I = 0; I < pnode->m_kChildren.m_usSize; ++I) {
-            FindBones(pnode->m_kChildren.m_pBase[I].m_pObject, arRigidBodies, arConstraints);
+        for (NiAVObject* pChild : pnode->m_kChildren) {
+            FindBones(pChild, arRigidBodies, arConstraints);
         }
     }
 }

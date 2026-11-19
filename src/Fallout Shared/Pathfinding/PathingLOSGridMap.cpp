@@ -265,8 +265,7 @@ PathingLOSGrid::PathingLOSGrid(const NavMeshPtr& aspNavMesh) : LOSGridCells(), p
 
 // The grid owns its cells.
 PathingLOSGrid::~PathingLOSGrid() {
-    for (uint32_t i = 0; i < LOSGridCells.iSize; ++i) {
-        PathingLOSGridCell* pCell = LOSGridCells.GetAt(i);
+    for (PathingLOSGridCell* pCell : LOSGridCells) {
         if (pCell) {
             delete pCell;
         }
@@ -281,8 +280,7 @@ bool PathingLOSGrid::SetLocationSeen(const PathingLocation& arLocation, bool abS
         uint16_t Triangle = arLocation.GetTriangle();
         spmesh.m_pObject->GetGridIndicesForTriangle(Triangle, &gridCells);
         bool bresult = false;
-        for (uint32_t iindex = 0; iindex < gridCells.iSize; ++iindex) {
-            uint32_t uiIndex = gridCells[iindex];
+        for (uint32_t uiIndex : gridCells) {
             if (uiIndex < LOSGridCells.iSize &&
                 LOSGridCells.GetAt(static_cast<int32_t>(uiIndex))->SetLocationSeen(arLocation, abSeen)) {
                 bresult = true;
@@ -434,14 +432,14 @@ bool PathingLOSGridCell::SetLOSMapFromSeenTriangles(NiPointer<PathingLOSMap>& as
         (ptriangles = spmesh.m_pObject->GetTrianglesForGridCell(iNavMeshGridCellIndex)) != nullptr) {
         if (SeenTriangleList.IsEmpty()) {
             if (bAllSeen) {
-                for (uint32_t i_2 = 0; i_2 < ptriangles->iSize; ++i_2) {
-                    pdestArray[ptriangles->GetAt(static_cast<int32_t>(i_2))] = 3;
+                for (uint16_t usTriangle : *ptriangles) {
+                    pdestArray[usTriangle] = 3;
                 }
             }
             else {
-                for (uint32_t i_3 = 0; i_3 < ptriangles->iSize; ++i_3) {
-                    if (pdestArray[ptriangles->GetAt(static_cast<int32_t>(i_3))] == 127) {
-                        pdestArray[ptriangles->GetAt(static_cast<int32_t>(i_3))] = 0;
+                for (uint16_t usTriangle : *ptriangles) {
+                    if (pdestArray[usTriangle] == 127) {
+                        pdestArray[usTriangle] = 0;
                     }
                 }
             }

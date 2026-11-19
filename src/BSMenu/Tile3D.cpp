@@ -71,8 +71,7 @@ void Tile3D::SetAlphaAndColor(NiNode* apNode, float afAlpha, const NiColorA& aCo
     if (!apNode) {
         return;
     }
-    for (uint32_t i = 0; i < apNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* pChild = apNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* pChild : apNode->m_kChildren) {
         if (!pChild) {
             continue;
         }

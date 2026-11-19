@@ -80,8 +80,7 @@ int32_t au_re_InterlockedExchange(volatile int32_t* apTarget, int32_t aiValue) {
 
 // Each element is copied into the local spObject and released at the end of each pass.
 void MoveQueuedNiAVObjects(NiTObjectArray<NiPointer<NiAVObject>>* a1, NiTObjectArray<NiPointer<NiAVObject>>* a2) {
-    for (uint32_t uiIndex = 0; uiIndex < a1->m_usSize; ++uiIndex) {
-        NiPointer<NiAVObject> spObject((*a1)[uiIndex]);
+    for (NiPointer<NiAVObject> spObject : *a1) {
         if (spObject.m_pObject) {
             NiAVObjectArray_Add(a2, spObject);
         }
@@ -89,8 +88,7 @@ void MoveQueuedNiAVObjects(NiTObjectArray<NiPointer<NiAVObject>>* a1, NiTObjectA
 }
 
 void MoveQueuedNavMeshes(BSSimpleArray<NavMesh*, 1024>* apSource, BSSimpleArray<NavMesh*, 1024>* apTarget) {
-    for (uint32_t i = 0; i < apSource->iSize; ++i) {
-        NavMesh* pNavMesh = (*apSource)[i];
+    for (NavMesh* pNavMesh : *apSource) {
         if (pNavMesh) {
             apTarget->Add(pNavMesh);
         }
@@ -102,8 +100,7 @@ void MoveQueuedTempEffects(
     NiTObjectArray<NiPointer<BSTempEffect>>* apSource,
     NiTObjectArray<NiPointer<BSTempEffect>>* apTarget
 ) {
-    for (uint32_t uiIndex = 0; uiIndex < apSource->m_usSize; ++uiIndex) {
-        NiPointer<BSTempEffect> spEffect((*apSource)[uiIndex]);
+    for (NiPointer<BSTempEffect> spEffect : *apSource) {
         if (spEffect.m_pObject) {
             apTarget->Add(spEffect);
         }
@@ -313,9 +310,9 @@ void GarbageCollector::ClearAll(bool abTryEnter) {
                 pModelLoader->UnlockModelMap();
             }
             if (!GarbageCollectorCS::GetFlag(2u)) {
-                for (uint32_t j = 0; j < GarbageCollector::Actor3DGarbageA.m_usSize; ++j) {
-                    if ((&GarbageCollector::Actor3DGarbageA[j])->m_pObject) {
-                        (&GarbageCollector::Actor3DGarbageA[j])->m_pObject->RemoveGarbageMark();
+                for (const NiPointer<NiAVObject>& spObject : GarbageCollector::Actor3DGarbageA) {
+                    if (spObject.m_pObject) {
+                        spObject.m_pObject->RemoveGarbageMark();
                     }
                 }
                 GarbageCollector::Actor3DGarbageA.RemoveAll();
@@ -495,8 +492,7 @@ void GarbageCollector::ClearTempEffects() {
 }
 
 void GarbageCollector::CopyArrays(NiTObjectArray<TESObjectREFR*>* apSource, NiTObjectArray<TESObjectREFR*>* apTarget) {
-    for (uint32_t i = 0; i < apSource->GetSize(); ++i) {
-        TESObjectREFR* pElement = (*apSource)[i];
+    for (TESObjectREFR* pElement : *apSource) {
         if (pElement) {
             apTarget->Add(pElement);
         }
@@ -504,8 +500,7 @@ void GarbageCollector::CopyArrays(NiTObjectArray<TESObjectREFR*>* apSource, NiTO
 }
 
 void GarbageCollector::CopyArrays(NiTObjectArray<BipedAnim*>* apSource, NiTObjectArray<BipedAnim*>* apTarget) {
-    for (uint32_t i = 0; i < apSource->GetSize(); ++i) {
-        BipedAnim* pElement = (*apSource)[i];
+    for (BipedAnim* pElement : *apSource) {
         if (pElement) {
             apTarget->Add(pElement);
         }

@@ -4041,13 +4041,13 @@ void CaravanMenu::PrepareGameMenu() {
     BSSimpleList<TESCaravanCard*>* inactiveList = pPlayer->GetCaravanCards1();
     activeList->RemoveAll();
     inactiveList->RemoveAll();
-    for (int32_t i = 0; i < pDeckArray.iSize; ++i) {
-        if (pDeckArray[i]->bIsActive) {
-            activeList->AddHead(pDeckArray[i]);
-            pPlayerDeck.Add(pDeckArray[i]);
+    for (TESCaravanCard* pCard : pDeckArray) {
+        if (pCard->bIsActive) {
+            activeList->AddHead(pCard);
+            pPlayerDeck.Add(pCard);
         }
         else {
-            inactiveList->AddHead(pDeckArray[i]);
+            inactiveList->AddHead(pCard);
         }
     }
     while (pDeckParam && pDeckParam->m_item) {
@@ -4878,8 +4878,8 @@ CaravanAIPackage* CaravanMenu::ProcessAI(CaravanAIPackage* apResult) {
         if (iDiffLevel >= 1) {
             if (iDiffLevel >= 3) {
                 int32_t numcards = 0;
-                for (uint32_t i = 0; i < pNPCHand.iSize; ++i) {
-                    if (pNPCHand[i]->data.iFaceValue <= 10) {
+                for (TESCaravanCard* pCard : pNPCHand) {
+                    if (pCard->data.iFaceValue <= 10) {
                         ++numcards;
                     }
                 }
@@ -4917,11 +4917,11 @@ CaravanAIPackage* CaravanMenu::ProcessAI(CaravanAIPackage* apResult) {
             else {
                 int32_t hicards = 0;
                 int32_t lowcards = 0;
-                for (uint32_t i = 0; i < pNPCHand.iSize; ++i) {
-                    if (pNPCHand[i]->data.iFaceValue > 5 && pNPCHand[i]->data.iFaceValue <= 10) {
+                for (TESCaravanCard* pCard : pNPCHand) {
+                    if (pCard->data.iFaceValue > 5 && pCard->data.iFaceValue <= 10) {
                         ++hicards;
                     }
-                    else if (pNPCHand[i]->data.iFaceValue < 4) {
+                    else if (pCard->data.iFaceValue < 4) {
                         ++lowcards;
                     }
                 }
@@ -5444,8 +5444,8 @@ CaravanAIPackage* CaravanMenu::ProcessAI(CaravanAIPackage* apResult) {
             }
             else {
                 int32_t numKings = 0;
-                for (uint32_t i = 0; i < pNPCDeck.iSize; ++i) {
-                    if (pNPCDeck[i]->data.iFaceValue == 12) {
+                for (TESCaravanCard* pCard : pNPCDeck) {
+                    if (pCard->data.iFaceValue == 12) {
                         ++numKings;
                     }
                 }
@@ -5464,8 +5464,8 @@ CaravanAIPackage* CaravanMenu::ProcessAI(CaravanAIPackage* apResult) {
     // Counts the packages that share the highest priority and never uses the count, as the game does.
     int32_t highestpriority = (*pPackageList)[0]->iPriority;
     int32_t highestindex = 0;
-    for (uint32_t i = 0; i < pPackageList->iSize; ++i) {
-        if ((*pPackageList)[i]->iPriority != highestpriority) {
+    for (CaravanAIPackage* pListedPackage : *pPackageList) {
+        if (pListedPackage->iPriority != highestpriority) {
             break;
         }
         ++highestindex;
@@ -5546,12 +5546,12 @@ void CaravanMenu::Close() {
             BSSimpleList<TESCaravanCard*>* pInact = pPlayer->GetCaravanCards1();
             pAct->RemoveAll();
             pInact->RemoveAll();
-            for (int32_t i = 0; i < CaravanMenu::pMe->pDeckArray.iSize; ++i) {
-                if (CaravanMenu::pMe->pDeckArray[i]->bIsActive) {
-                    pAct->AddHead(CaravanMenu::pMe->pDeckArray[i]);
+            for (TESCaravanCard* pCard : CaravanMenu::pMe->pDeckArray) {
+                if (pCard->bIsActive) {
+                    pAct->AddHead(pCard);
                 }
                 else {
-                    pInact->AddHead(CaravanMenu::pMe->pDeckArray[i]);
+                    pInact->AddHead(pCard);
                 }
             }
         }

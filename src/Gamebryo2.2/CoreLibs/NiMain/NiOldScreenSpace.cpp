@@ -787,14 +787,12 @@ void NiScreenSpaceCamera::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) 
 // NiAVObject's processing, then each polygon's and texture's.
 void NiScreenSpaceCamera::ProcessClone(NiCloningProcess& kCloning) {
     NiCamera::ProcessClone(kCloning);
-    for (uint32_t i = 0; i < m_kScreenPolygons.m_usSize; i++) {
-        NiScreenPolygon* pkPolygon = m_kScreenPolygons.m_pBase[i];
+    for (NiScreenPolygon* pkPolygon : m_kScreenPolygons) {
         if (pkPolygon) {
             pkPolygon->ProcessClone(kCloning);
         }
     }
-    for (uint32_t i = 0; i < m_kScreenTextures.m_usSize; i++) {
-        NiScreenTexture* pkTexture = m_kScreenTextures.m_pBase[i];
+    for (NiScreenTexture* pkTexture : m_kScreenTextures) {
         if (pkTexture) {
             pkTexture->ProcessClone(kCloning);
         }

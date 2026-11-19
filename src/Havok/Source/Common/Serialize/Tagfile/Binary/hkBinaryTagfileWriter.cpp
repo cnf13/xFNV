@@ -148,8 +148,7 @@ Writer::ListenerCache::ListenerCache(hkTagfileWriter::AddDataObjectListener* lis
 
 // The cached objects are heap hkDataObjects; their operator delete (the heap's blockFree) is written out.
 Writer::ListenerCache::~ListenerCache() {
-    for (int32_t i = 0; i < m_cachedObjects.m_size; ++i) {
-        hkDataObject* pObject = m_cachedObjects.m_data[i];
+    for (hkDataObject* pObject : m_cachedObjects) {
         if (pObject) {
             pObject->~hkDataObject();
             hkMemoryRouter::getInstance().m_heap->blockFree(pObject, sizeof(hkDataObject));

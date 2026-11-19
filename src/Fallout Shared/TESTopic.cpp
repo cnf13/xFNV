@@ -351,8 +351,8 @@ void TESTopic::InitItem() {
                 pInfo->infoLinkArray[i].pInfo = pTopicInfo;
                 if (pTopicInfo) {
                     bool bFound = false;
-                    for (uint32_t j = 0; j < pInfo->GetInfoArray()->GetSize(); ++j) {
-                        if (pInfo->GetInfoArray()->GetAt(j) == pTopicInfo) {
+                    for (TESTopicInfo* pExistingInfo : *pInfo->GetInfoArray()) {
+                        if (pExistingInfo == pTopicInfo) {
                             bFound = true;
                             break;
                         }

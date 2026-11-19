@@ -141,12 +141,11 @@ hkpMoppCode* hkpMoppCompiler::compile(hkpMoppMediator* mediator, char* buffer, i
             chunkOffsets.m_data[i + 1] = chunkOffsets.m_data[i] + iChunkSize;
         }
         // Patches each chunk's jump commands: the chunk id after the command byte becomes that chunk's offset.
-        for (int32_t i = 0; i < m_chunkInfo->m_chunks.getSize(); ++i) {
-            hkpMoppCompilerChunkInfo::Chunk* pChunk = &m_chunkInfo->m_chunks.m_data[i];
-            hkArray<hkpMoppCodeGenerator::JumpCommandInfo>& rJumps = pChunk->m_code->m_jumpCommands;
-            for (int32_t j = 0; j < rJumps.getSize(); ++j) {
-                hkpMoppCodeGenerator* pChunkCode = pChunk->m_code;
-                uint8_t* pCommand = pChunkCode->m_code - rJumps.m_data[j].m_position + pChunkCode->m_size;
+        for (const hkpMoppCompilerChunkInfo::Chunk& rChunk : m_chunkInfo->m_chunks) {
+            hkArray<hkpMoppCodeGenerator::JumpCommandInfo>& rJumps = rChunk.m_code->m_jumpCommands;
+            for (const hkpMoppCodeGenerator::JumpCommandInfo& rJump : rJumps) {
+                hkpMoppCodeGenerator* pChunkCode = rChunk.m_code;
+                uint8_t* pCommand = pChunkCode->m_code - rJump.m_position + pChunkCode->m_size;
                 int32_t iChunkId = readChunkId(pCommand);
                 writeChunkOffset(pCommand, chunkOffsets.m_data[iChunkId]);
             }

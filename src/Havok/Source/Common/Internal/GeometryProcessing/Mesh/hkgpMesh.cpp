@@ -1726,13 +1726,11 @@ float getLoopSurfaceArea(const hkArray<hkgpMeshBase::Edge, hkContainerHeapAlloca
     PointArray points;
     hkAabb aabb;
     points.reserve(2 * a1.m_size);
-    for (int32_t i = 0; i < a1.m_size; ++i) {
-        const hkgpMeshBase::Edge& rEdge = a1.m_data[i];
+    for (const hkgpMeshBase::Edge& rEdge : a1) {
         const hkVector4* pStart = &rEdge.m_triangle->m_vertices[rEdge.m_index]->m_position;
         points.pushBack(*pStart);
         // The edge's end: the vertex after m_index ((9 >> 2 * index) & 3 is index + 1 modulo 3).
-        const hkgpMeshBase::Edge& rNext = a1.m_data[i];
-        const hkVector4* pEnd = &rNext.m_triangle->m_vertices[(9 >> (2 * rNext.m_index)) & 3]->m_position;
+        const hkVector4* pEnd = &rEdge.m_triangle->m_vertices[(9 >> (2 * rEdge.m_index)) & 3]->m_position;
         points.pushBack(*pEnd);
     }
     hkAabbUtil::calcAabb(points.m_data, points.m_size, aabb);
@@ -2371,8 +2369,8 @@ int32_t hkgpMesh::removeButterflies(int32_t tag) {
                 pVertex->m_tag = tag;
                 pNewVertex->m_tag = tag;
                 pNewVertex->m_refs = ring.m_size;
-                for (int32_t k = 0; k < ring.m_size; ++k) {
-                    ring.m_data[k].m_triangle->m_vertices[ring.m_data[k].m_index] = pNewVertex;
+                for (const hkgpMeshBase::Edge& rRingEdge : ring) {
+                    rRingEdge.m_triangle->m_vertices[rRingEdge.m_index] = pNewVertex;
                 }
                 ++iNumFound;
             }
@@ -2409,13 +2407,13 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
         rebuildTrianglesTree();
         pairs.m_size = 0;
         QueryUtils::queryTreeCollision(&m_trianglesTree, &m_trianglesTree, &pairs);
-        for (int32_t j = 0; j < pairs.m_size; ++j) {
+        for (const QueryUtils::IdxPair& pair : pairs) {
             // A leaf's user data is the triangle's pointer.
             hkgpMeshBase::Triangle* pTriA = static_cast<hkgpMeshBase::Triangle*>(
-                m_trianglesTree.m_nodeManager.getNode(pairs.m_data[j].m_a)->m_leafData.m_userData
+                m_trianglesTree.m_nodeManager.getNode(pair.m_a)->m_leafData.m_userData
             );
             hkgpMeshBase::Triangle* pTriB = static_cast<hkgpMeshBase::Triangle*>(
-                m_trianglesTree.m_nodeManager.getNode(pairs.m_data[j].m_b)->m_leafData.m_userData
+                m_trianglesTree.m_nodeManager.getNode(pair.m_b)->m_leafData.m_userData
             );
             if (pTriB->m_partId == partA) {
                 hkgpMeshBase::Triangle* pSwap = pTriA;
@@ -2713,12 +2711,10 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
             QueryUtils::TreeTreeNodePairCollector kCollector(&pairs);
             QueryUtils::queryTreeCollision(&pMesh->m_trianglesTree, &pMesh->m_trianglesTree, &kCollector);
         }
-        for (int32_t i = 0; i < pairs.m_size; ++i) {
+        for (const QueryUtils::NodePair& pair : pairs) {
             // A leaf's user data is the triangle's address.
-            hkgpMeshBase::Triangle* pA =
-                static_cast<hkgpMeshBase::Triangle*>(pairs.m_data[i].m_a->m_leafData.m_userData);
-            hkgpMeshBase::Triangle* pB =
-                static_cast<hkgpMeshBase::Triangle*>(pairs.m_data[i].m_b->m_leafData.m_userData);
+            hkgpMeshBase::Triangle* pA = static_cast<hkgpMeshBase::Triangle*>(pair.m_a->m_leafData.m_userData);
+            hkgpMeshBase::Triangle* pB = static_cast<hkgpMeshBase::Triangle*>(pair.m_b->m_leafData.m_userData);
             if (clipTriangles(this, pA, pMesh, pB, 0.01f)) {
                 bClipped = true;
                 bAnyClipped = true;
@@ -2746,12 +2742,10 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
     rebuildTrianglesTree();
     QueryUtils::TreeTreeNodePairCollector kCollector(&overlaps);
     QueryUtils::queryTreeCollision(&m_trianglesTree, &pMesh->m_trianglesTree, &kCollector);
-    for (int32_t i = 0; i < overlaps.m_size; ++i) {
+    for (const QueryUtils::NodePair& pair : overlaps) {
         // A leaf's user data is the triangle's address.
-        hkgpMeshBase::Triangle* pA =
-            static_cast<hkgpMeshBase::Triangle*>(overlaps.m_data[i].m_a->m_leafData.m_userData);
-        hkgpMeshBase::Triangle* pB =
-            static_cast<hkgpMeshBase::Triangle*>(overlaps.m_data[i].m_b->m_leafData.m_userData);
+        hkgpMeshBase::Triangle* pA = static_cast<hkgpMeshBase::Triangle*>(pair.m_a->m_leafData.m_userData);
+        hkgpMeshBase::Triangle* pB = static_cast<hkgpMeshBase::Triangle*>(pair.m_b->m_leafData.m_userData);
         if (removed.indexOf(pA) != -1) {
             continue;
         }
@@ -3017,8 +3011,8 @@ float hkgpMesh::projectPointOnSurface(float maxDistance, hkVector4& point, int32
         ++samples.m_size;
     }
     point.m_quad = hkVector4Zero.m_quad;
-    for (int32_t i = 0; i < samples.m_size; ++i) {
-        point.m_quad = _mm_add_ps(point.m_quad, samples.m_data[i].m_quad);
+    for (const hkVector4& sample : samples) {
+        point.m_quad = _mm_add_ps(point.m_quad, sample.m_quad);
     }
     const float invCount = 1.0 / static_cast<double>(samples.m_size);
     point.m_quad = _mm_mul_ps(_mm_set1_ps(invCount), point.m_quad);
@@ -4254,9 +4248,8 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
             pTriangle->m_partId = !(fSum >= 0.0f) ? 1 : 0;
         }
     }
-    for (int32_t j = 0; j < toDelete.m_size; ++j) {
+    for (hkgpMeshBase::Triangle* pTriangle : toDelete) {
         for (int32_t k = 0; k < 3; ++k) {
-            hkgpMeshBase::Triangle* pTriangle = toDelete.m_data[j];
             const uintptr_t uiLink = pTriangle->m_links[k];
             if (uiLink & ~uintptr_t(3)) {
                 unpack(uiLink)->m_links[pTriangle->m_links[k] & 3] = 0;
@@ -4265,8 +4258,7 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
         }
     }
     if (toDelete.m_size > 0) {
-        for (int32_t j = 0; j < toDelete.m_size; ++j) {
-            hkgpMeshBase::Triangle* pTriangle = toDelete.m_data[j];
+        for (hkgpMeshBase::Triangle* pTriangle : toDelete) {
             hkgpMeshBase::Triangle* pNext = pTriangle->m_next;
             hkgpMeshBase::Triangle* pPrev = pTriangle->m_prev;
             if (pNext) {
@@ -5043,10 +5035,9 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
             EdgeBucket* pBucket =
                 &edges.m_buckets.m_data[static_cast<uint32_t>(iHash) % static_cast<uint32_t>(edges.m_buckets.m_size)];
             hkgpMesh::SingleEdge* pEdge = nullptr;
-            for (int32_t j = 0; j < pBucket->m_size; ++j) {
-                hkgpMesh::SingleEdge* const pEntry = pBucket->m_data + j;
-                if ((pA == pEntry->m_a && pB == pEntry->m_b) || (pA == pEntry->m_b && pB == pEntry->m_a)) {
-                    pEdge = pEntry;
+            for (hkgpMesh::SingleEdge& entry : *pBucket) {
+                if ((pA == entry.m_a && pB == entry.m_b) || (pA == entry.m_b && pB == entry.m_a)) {
+                    pEdge = &entry;
                     break;
                 }
             }
@@ -5108,9 +5099,8 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
             );
         }
     }
-    for (int32_t i = 0; i < invalid.m_size; ++i) {
+    for (hkgpMeshBase::Triangle* const pInvalid : invalid) {
         for (int32_t k = 0; k < 3; ++k) {
-            hkgpMeshBase::Triangle* const pInvalid = invalid.m_data[i];
             const uintptr_t uiLink = pInvalid->m_links[k];
             // The tagged link's triangle address (its low two bits are the edge index).
             if (uiLink & ~static_cast<uintptr_t>(3)) {
@@ -5305,8 +5295,7 @@ void hkgpMesh::simplify(const hkgpMesh::SimplifyConfig& config) {
                 }
                 // An open ring (a naked edge or a naked next edge in any of its triangles) is never collapsed.
                 bool bOpen = false;
-                for (int32_t k = 0; k < ring.m_size; ++k) {
-                    const hkgpMeshBase::Edge& kRingEdge = ring.m_data[k];
+                for (const hkgpMeshBase::Edge& kRingEdge : ring) {
                     if (!(kRingEdge.m_triangle->m_links[kRingEdge.m_index] & ~static_cast<uintptr_t>(3)) ||
                         !(kRingEdge.m_triangle->m_links[(9 >> (kRingEdge.m_index * 2)) & 3] &
                           ~static_cast<uintptr_t>(3))) {
@@ -5358,25 +5347,20 @@ void hkgpMesh::simplify(const hkgpMesh::SimplifyConfig& config) {
                 }
                 // Tags the end vertices of both rings: 1 for the start's ring, 2 for the end's; a vertex of both
                 // gets 3.
-                for (int32_t k = 0; k < ring.m_size; ++k) {
-                    const hkgpMeshBase::Edge& kRingEdge = ring.m_data[k];
+                for (const hkgpMeshBase::Edge& kRingEdge : ring) {
                     kRingEdge.m_triangle->m_vertices[(9 >> (kRingEdge.m_index * 2)) & 3]->m_tag = 0;
                 }
-                for (int32_t k = 0; k < twinRing.m_size; ++k) {
-                    const hkgpMeshBase::Edge& kRingEdge = twinRing.m_data[k];
+                for (const hkgpMeshBase::Edge& kRingEdge : twinRing) {
                     kRingEdge.m_triangle->m_vertices[(9 >> (kRingEdge.m_index * 2)) & 3]->m_tag = 0;
                 }
-                for (int32_t k = 0; k < ring.m_size; ++k) {
-                    const hkgpMeshBase::Edge& kRingEdge = ring.m_data[k];
+                for (const hkgpMeshBase::Edge& kRingEdge : ring) {
                     kRingEdge.m_triangle->m_vertices[(9 >> (kRingEdge.m_index * 2)) & 3]->m_tag += 1;
                 }
-                for (int32_t k = 0; k < twinRing.m_size; ++k) {
-                    const hkgpMeshBase::Edge& kRingEdge = twinRing.m_data[k];
+                for (const hkgpMeshBase::Edge& kRingEdge : twinRing) {
                     kRingEdge.m_triangle->m_vertices[(9 >> (kRingEdge.m_index * 2)) & 3]->m_tag += 2;
                 }
                 int32_t iShared = 0;
-                for (int32_t k = 0; k < ring.m_size; ++k) {
-                    const hkgpMeshBase::Edge& kRingEdge = ring.m_data[k];
+                for (const hkgpMeshBase::Edge& kRingEdge : ring) {
                     if (kRingEdge.m_triangle->m_vertices[(9 >> (kRingEdge.m_index * 2)) & 3]->m_tag == 3) {
                         ++iShared;
                     }
@@ -6199,8 +6183,7 @@ void hkgpMesh::flipPartOrientation(int32_t a1) {
         pTriangle->m_vertices[0] = pTriangle->m_vertices[1];
         pTriangle->m_vertices[1] = pFirst;
     }
-    for (int32_t j = 0; j < edges.m_size; ++j) {
-        hkgpMeshBase::Edge& rEdge = edges.m_data[j];
+    for (const hkgpMeshBase::Edge& rEdge : edges) {
         const uintptr_t uiLink = rEdge.m_triangle->m_links[rEdge.m_index];
         if (uiLink & kTriangleMask) {
             reinterpret_cast<hkgpMeshBase::Triangle*>(uiLink & kTriangleMask)->m_links[uiLink & 3] = 0;
@@ -6228,12 +6211,12 @@ void hkgpMesh::enumerateTriangleOverlaps(
     alignas(16) hkgpMeshInternals::SimpleCollector collector;
     hkAabbUtil::calcAabb(vertices, 3, aabb);
     queryAabb(&m_trianglesTree, &aabb.m_min.m_quad, &collector);
-    for (int32_t i = 0; i < collector.m_triangles.m_size; ++i) {
-        triangle[0] = collector.m_triangles.m_data[i]->m_vertices[0]->m_position;
-        triangle[1] = collector.m_triangles.m_data[i]->m_vertices[1]->m_position;
-        triangle[2] = collector.m_triangles.m_data[i]->m_vertices[2]->m_position;
+    for (hkgpMeshBase::Triangle* pFound : collector.m_triangles) {
+        triangle[0] = pFound->m_vertices[0]->m_position;
+        triangle[1] = pFound->m_vertices[1]->m_position;
+        triangle[2] = pFound->m_vertices[2]->m_position;
         if (hkGeometryProcessing::checkTrianglesIntersection(vertices, triangle)) {
-            triangles.pushBack(collector.m_triangles.m_data[i]);
+            triangles.pushBack(pFound);
         }
     }
 }
@@ -6363,13 +6346,13 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
     RawTriangleArray cuts;
     RawTriangleArray pieces;
     hkgpMeshInternals::SimpleCollector collector;
-    for (int32_t iSource = 0; iSource < a2.m_triangles.m_size; ++iSource) {
+    for (const hkGeometry::Triangle& rSourceTriangle : a2.m_triangles) {
         cuts.m_size = 0;
         collector.m_triangles.m_size = 0;
         RawTriangle kSource;
-        kSource.m_vertices[0].setTransformedPos(a1, a2.m_vertices.m_data[a2.m_triangles.m_data[iSource].m_a]);
-        kSource.m_vertices[1].setTransformedPos(a1, a2.m_vertices.m_data[a2.m_triangles.m_data[iSource].m_b]);
-        kSource.m_vertices[2].setTransformedPos(a1, a2.m_vertices.m_data[a2.m_triangles.m_data[iSource].m_c]);
+        kSource.m_vertices[0].setTransformedPos(a1, a2.m_vertices.m_data[rSourceTriangle.m_a]);
+        kSource.m_vertices[1].setTransformedPos(a1, a2.m_vertices.m_data[rSourceTriangle.m_b]);
+        kSource.m_vertices[2].setTransformedPos(a1, a2.m_vertices.m_data[rSourceTriangle.m_c]);
         cuts.pushBack(kSource);
         hkAabb aabb;
         hkAabbUtil::calcAabb(kSource.m_vertices, 3, aabb);
@@ -6389,10 +6372,10 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                 --i;
             }
         }
-        for (int32_t iPlane = 0; iPlane < collector.m_triangles.m_size; ++iPlane) {
-            const hkVector4 plane = collector.m_triangles.m_data[iPlane]->m_plane;
-            for (int32_t iCut = 0; iCut < cuts.m_size; ++iCut) {
-                hkVector4* const pCut = cuts.m_data[iCut].m_vertices;
+        for (const hkgpMeshBase::Triangle* pFound : collector.m_triangles) {
+            const hkVector4 plane = pFound->m_plane;
+            for (RawTriangle& rCutTriangle : cuts) {
+                hkVector4* const pCut = rCutTriangle.m_vertices;
                 const hkVector4 kA = pCut[0];
                 const hkVector4 kB = pCut[1];
                 const hkVector4 kC = pCut[2];
@@ -6494,12 +6477,12 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
         }
         x1.m_vertices.reserve(3 * cuts.m_size + x1.m_vertices.m_size);
         x1.m_triangles.reserve(x1.m_triangles.m_size + cuts.m_size);
-        for (int32_t iCut = 0; iCut < cuts.m_size; ++iCut) {
+        for (const RawTriangle& rCutTriangle : cuts) {
             const int32_t iBase = x1.m_vertices.m_size;
             hkVector4* const pVertices = x1.m_vertices.expandBy(3);
-            pVertices[0].setTransformedPos(x0, cuts.m_data[iCut].m_vertices[0]);
-            pVertices[1].setTransformedPos(x0, cuts.m_data[iCut].m_vertices[1]);
-            pVertices[2].setTransformedPos(x0, cuts.m_data[iCut].m_vertices[2]);
+            pVertices[0].setTransformedPos(x0, rCutTriangle.m_vertices[0]);
+            pVertices[1].setTransformedPos(x0, rCutTriangle.m_vertices[1]);
+            pVertices[2].setTransformedPos(x0, rCutTriangle.m_vertices[2]);
             hkGeometry::Triangle* const pTriangle = &x1.m_triangles.expandOne();
             pTriangle->m_a = iBase;
             pTriangle->m_b = iBase + 1;
@@ -6695,11 +6678,10 @@ void hkgpMesh::fixTJunctions(float a1, bool a2) {
                 aabb.m_max.m_quad = _mm_add_ps(kRadius, _mm_max_ps(kStart, kEnd));
                 aabb.m_min.m_quad = _mm_sub_ps(_mm_min_ps(kStart, kEnd), kRadius);
                 queryAabb(&m_trianglesTree, &aabb.m_min.m_quad, &collector);
-                for (int32_t i = 0; i < collector.m_triangles.m_size; ++i) {
+                for (hkgpMeshBase::Triangle* const pOther : collector.m_triangles) {
                     if (bChanged) {
                         break;
                     }
-                    hkgpMeshBase::Triangle* const pOther = collector.m_triangles.m_data[i];
                     if (pOther == pTriangle) {
                         continue;
                     }
@@ -7063,8 +7045,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(
         hkArray<hkgpMesh*> newParts;
         pClone->floodFillDetachedParts();
         pClone->explodeParts(newParts, true, true);
-        for (int32_t i = 0; i < newParts.m_size; ++i) {
-            const hkgpConvexHull* const pHull = newParts.m_data[i]->getConvexHull();
+        for (hkgpMesh* const pPart : newParts) {
+            const hkgpConvexHull* const pHull = pPart->getConvexHull();
             if (!pHull) {
                 apResult->m_value = INVALID_SUB_PARTS;
             }
@@ -7073,16 +7055,15 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(
             }
         }
         if (apResult->m_value != SUCCESS) {
-            for (int32_t i = 0; i < newParts.m_size; ++i) {
-                hkgpMesh* const pPart = newParts.m_data[i];
+            for (hkgpMesh* const pPart : newParts) {
                 if (pPart) {
                     delete pPart;
                 }
             }
         }
         else {
-            for (int32_t i = 0; i < newParts.m_size; ++i) {
-                parts.pushBack(newParts.m_data[i]);
+            for (hkgpMesh* const pPart : newParts) {
+                parts.pushBack(pPart);
             }
         }
     }
@@ -7169,8 +7150,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                 }
                 // The ring's vertices, each segment's start.
                 ringVertices.m_size = 0;
-                for (int32_t k = 0; k < pRing->m_segments.m_size; ++k) {
-                    const Segment& segment = pRing->m_segments.m_data[k];
+                for (const Segment& segment : pRing->m_segments) {
                     ringVertices.pushBack(segment.m_edge.m_triangle->m_vertices[segment.m_edge.m_index]);
                 }
                 hkgpConvexHull hull;
@@ -7456,8 +7436,8 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                             else {
                                 // Some edge stayed open: the new triangles and vertices go again.
                                 bOk = false;
-                                for (int32_t k = 0; k < created.m_size; ++k) {
-                                    removeTriangle(created.m_data[k]);
+                                for (hkgpMeshBase::Triangle* pCreated : created) {
+                                    removeTriangle(pCreated);
                                 }
                                 for (int32_t k = iFirstNew; k < ringVertices.m_size; ++k) {
                                     hkgpMeshBase::Vertex* pVertex = ringVertices.m_data[k];
@@ -7759,8 +7739,7 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
     hkArray<hkgpMeshBase::Triangle*> triangles;
     fetchAreaSortedTriangles(triangles, true);
     hkArray<hkgpMeshBase::Edge> stack;
-    for (int32_t i = 0; i < triangles.m_size; ++i) {
-        hkgpMeshBase::Triangle* const pRoot = triangles.m_data[i];
+    for (hkgpMeshBase::Triangle* const pRoot : triangles) {
         if (pRoot->m_planeId >= 0) {
             continue;
         }
@@ -7981,9 +7960,9 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
     cut(apResult, cutplane, true);
     if (apResult->m_value == SUCCESS) {
         for (int32_t i = 0; bClosed && i < 2;) {
-            for (int32_t j = 0; j < rings.m_size; ++j) {
-                if (rings.m_data[j]) {
-                    deleteRing(rings.m_data[j]);
+            for (Ring* pRing : rings) {
+                if (pRing) {
+                    deleteRing(pRing);
                 }
             }
             rings.m_size = 0;
@@ -8001,10 +7980,9 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                         continue;
                     }
                     bool bKnown = false;
-                    for (int32_t k = 0; k < rings.m_size; ++k) {
-                        const Ring* pRing = rings.m_data[k];
-                        for (int32_t s = 0; s < pRing->m_segments.m_size; ++s) {
-                            if (edgeKey(pRing->m_segments.m_data[s].m_edge) == reinterpret_cast<uintptr_t>(t) + e) {
+                    for (const Ring* pRing : rings) {
+                        for (const Segment& segment : pRing->m_segments) {
+                            if (edgeKey(segment.m_edge) == reinterpret_cast<uintptr_t>(t) + e) {
                                 bKnown = true;
                                 break;
                             }
@@ -8133,10 +8111,8 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             // EXE-INLINED none: the triangulator's transform to its quantized frame (m_worldToLocal; the x and y
             // rounded half away from zero, clamped to the margin). The exe stores the projection's bit-field dword
             // from a frame dword nothing writes (KEEP above).
-            for (int32_t k = 0; k < rings.m_size; ++k) {
-                Ring* pRing = rings.m_data[k];
-                for (int32_t s = 0; s < pRing->m_segments.m_size; ++s) {
-                    Segment& segment = pRing->m_segments.m_data[s];
+            for (Ring* pRing : rings) {
+                for (Segment& segment : pRing->m_segments) {
                     const __m128 p = segment.m_tranformed.m_quad;
                     hkVector4 local;
                     local.m_quad = _mm_add_ps(
@@ -8185,14 +8161,12 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                 continue;
             }
             // Segments of one point, in any ring, share the first one's vertex.
-            for (int32_t k = 0; k < rings.m_size; ++k) {
-                const Ring* pRing = rings.m_data[k];
-                for (int32_t s = 0; s < pRing->m_segments.m_size; ++s) {
-                    const Segment* pA = &pRing->m_segments.m_data[s];
-                    for (int32_t k2 = 0; k2 < rings.m_size; ++k2) {
-                        const Ring* pOther = rings.m_data[k2];
-                        for (int32_t s2 = 0; s2 < pOther->m_segments.m_size; ++s2) {
-                            const Segment* pB = &pOther->m_segments.m_data[s2];
+            for (const Ring* pRing : rings) {
+                for (const Segment& segmentA : pRing->m_segments) {
+                    const Segment* pA = &segmentA;
+                    for (const Ring* pOther : rings) {
+                        for (const Segment& segmentB : pOther->m_segments) {
+                            const Segment* pB = &segmentB;
                             if (pA == pB || pA->m_projection.m_x != pB->m_projection.m_x ||
                                 pA->m_projection.m_y != pB->m_projection.m_y) {
                                 continue;
@@ -8211,8 +8185,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             bool bFailed = false;
             for (int32_t k = 0; !bFailed && k < rings.m_size; ++k) {
                 const Ring* pRing = rings.m_data[k];
-                for (int32_t s = 0; s < pRing->m_segments.m_size; ++s) {
-                    const Segment& segment = pRing->m_segments.m_data[s];
+                for (const Segment& segment : pRing->m_segments) {
                     const int32_t x = segment.m_projection.m_x;
                     const int32_t y = segment.m_projection.m_y;
                     hkgpDefaultTriangulatorType::Location location;
@@ -8255,8 +8228,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             triangulator.partition();
             // Each triangulator ring edge mapped to its segment's edge.
             EdgeMap edgeMap;
-            for (int32_t k = 0; k < rings.m_size; ++k) {
-                const Ring* pRing = rings.m_data[k];
+            for (const Ring* pRing : rings) {
                 for (int32_t s = 0; s < pRing->m_segments.m_size; ++s) {
                     const Segment* pSegments = pRing->m_segments.m_data;
                     const hkgpMeshBase::Edge segmentEdge = pSegments[s].m_edge;
@@ -8327,9 +8299,9 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
             }
         }
     }
-    for (int32_t j = 0; j < rings.m_size; ++j) {
-        if (rings.m_data[j]) {
-            deleteRing(rings.m_data[j]);
+    for (Ring* pRing : rings) {
+        if (pRing) {
+            deleteRing(pRing);
         }
     }
     rings.m_size = 0;

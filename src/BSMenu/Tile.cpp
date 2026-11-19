@@ -786,8 +786,7 @@ void Tile::SetAlphaAndColor(NiNode* apNode, float afAlpha, const NiColorA& aColo
     if (!apNode) {
         return;
     }
-    for (uint32_t i = 0; i < apNode->m_kChildren.m_usSize; ++i) {
-        NiAVObject* child = apNode->m_kChildren.m_pBase[i].m_pObject;
+    for (NiAVObject* child : apNode->m_kChildren) {
         NiGeometry* geometry = child ? child->IsGeometry() : nullptr;
         if (geometry) {
             // Every geometry of a tile carries a tile shader property.
@@ -2182,8 +2181,7 @@ void Tile::Release() {
     this->uiFlags |= RELEASED;
     this->SeverExtraData();
     this->SetParent(nullptr, nullptr);
-    for (uint32_t i = 0; i < this->xTraits.iSize; ++i) {
-        Value* value = this->xTraits.pBuffer[i];
+    for (Value* value : this->xTraits) {
         if (value) {
             value->~Value();
             MemoryManager_Singleton.Deallocate(value);

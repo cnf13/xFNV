@@ -115,8 +115,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         m_displayHandler->setGeometryColor(HK_DEFAULT_SWEPT_TRANSFORM_COLOR_T1, id + 2, m_tag);
     }
 
-    for (int32_t i = 0; i < displayGeometries.m_size; i++) {
-        hkDisplayGeometry* geometry = displayGeometries.m_data[i];
+    for (hkDisplayGeometry* geometry : displayGeometries) {
         if (geometry) {
             delete geometry;
         }
@@ -150,10 +149,9 @@ void hkpSweptTransformDisplayViewer::entityRemovedCallback(hkpEntity* entity) {
 // treated as an untyped number.
 void hkpSweptTransformDisplayViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpSweptTransformDisplayViewer", this);
-    for (int32_t i = 0; i < world->m_activeSimulationIslands.m_size; i++) {
-        const hkArrayBase<hkpEntity*>& entities = world->m_activeSimulationIslands.m_data[i]->m_entities;
-        for (int32_t j = 0; j < entities.m_size; j++) {
-            hkpEntity* entity = entities.m_data[j];
+    for (hkpSimulationIsland* island : world->m_activeSimulationIslands) {
+        const hkArrayBase<hkpEntity*>& entities = island->m_entities;
+        for (hkpEntity* entity : entities) {
             const hkSweptTransform& swept = entity->m_motion.m_motionState.m_sweptTransform;
             const hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable);
             hkTransform trans;
@@ -321,8 +319,8 @@ void hkpSweptTransformDisplayViewer::removeWorld(int32_t i) {
 
 void hkpSweptTransformDisplayViewer::removeAllGeometries(int32_t worldIndex) {
     hkpSweptTransformDisplayViewer::WorldToEntityData* v3 = m_worldEntities.m_data[worldIndex];
-    for (int32_t i = 0; i < v3->entitiesCreated.m_size; ++i) {
-        m_displayHandler->removeGeometry(v3->entitiesCreated.m_data[i], m_tag, 0);
+    for (hkUlong id : v3->entitiesCreated) {
+        m_displayHandler->removeGeometry(id, m_tag, 0);
     }
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
     int32_t v6 = v3->entitiesCreated.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;

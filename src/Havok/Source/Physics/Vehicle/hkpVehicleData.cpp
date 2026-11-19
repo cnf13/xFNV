@@ -371,8 +371,8 @@ void hkpVehicleData::init(
         }
         m_numWheelsPerAxle.m_size = numAxles;
     }
-    for (int32_t i = 0; i < m_numWheelsPerAxle.m_size; ++i) {
-        m_numWheelsPerAxle.m_data[i] = 0;
+    for (int8_t& numWheels : m_numWheelsPerAxle) {
+        numWheels = 0;
     }
     for (int32_t i = 0; i < m_numWheels; ++i) {
         ++m_numWheelsPerAxle.m_data[m_wheelParams.m_data[i].m_axle];

@@ -260,17 +260,16 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathFromNavMeshSearchGoal(
     if (eClosestEdges != Pathing::FIND_CLOSEST_EDGES_OK) {
         return RCP_FAILED;
     }
-    for (uint32_t uiIndex = 0; uiIndex < aRetEdges.iSize; ++uiIndex) {
-        NiPoint3 deltaToEdge = pLastNodeLoc->GetLocation() - aRetEdges.GetAt(static_cast<int32_t>(uiIndex)).Location;
+    for (const NavMeshEdgeLocation& rEdge : aRetEdges) {
+        NiPoint3 deltaToEdge = pLastNodeLoc->GetLocation() - rEdge.Location;
         // The squared distance and the radius are kept as doubles, and the radius is squared in double precision.
         double dSqrDistance = deltaToEdge.SqrXYLength();
         double dRadius = pRequest.m_pObject->fTargetRadius;
         if (pRequest.m_pObject->fTargetRadius * dRadius > dSqrDistance && deltaToEdge.z > -64.0 &&
             deltaToEdge.z < 180.0) {
-            uint16_t usTriangle = aRetEdges.GetAt(static_cast<int32_t>(uiIndex)).usTriangle;
-            NavMeshInfo* pNavMeshInfo = aRetEdges.GetAt(static_cast<int32_t>(uiIndex)).pNavMeshInfo;
-            NavMeshEdgeLocation* pEdge = &aRetEdges.GetAt(static_cast<int32_t>(uiIndex));
-            PathingLocation retPathLoc(pEdge->Location, pNavMeshInfo, usTriangle);
+            uint16_t usTriangle = rEdge.usTriangle;
+            NavMeshInfo* pNavMeshInfo = rEdge.pNavMeshInfo;
+            PathingLocation retPathLoc(rEdge.Location, pNavMeshInfo, usTriangle);
             aRetPath.Add(retPathLoc);
             return RCP_SUCCESS;
         }
@@ -351,8 +350,8 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
             return false;
         }
         if (res == RCP_SUCCESS) {
-            for (uint32_t i = 0; i < rayCastPath.iSize; ++i) {
-                pSolution.m_pObject->AddPathingNode(rayCastPath.GetAt(static_cast<int32_t>(i)), NiPoint3_ZERO);
+            for (const PathingLocation& rLocation : rayCastPath) {
+                pSolution.m_pObject->AddPathingNode(rLocation, NiPoint3_ZERO);
             }
             VirtualPathingNode* plastVirtualNode = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
             if (plastVirtualNode->IsTransitionNode()) {
@@ -426,8 +425,8 @@ bool PathBuilder::BuildNavMeshPathForVirtualNodes(uint32_t aiFirstVirtualNodeInd
         RAYCASTPATH_RESULT res_3 = BuildStraightPathUsingRayCasts(pStartNode_2->Location, *pGoalLoc_2, rayCastPath_2);
         if (res_3 == RCP_SUCCESS) {
             pSolution.m_pObject->SetIncomplete(false);
-            for (uint32_t i_3 = 0; i_3 < rayCastPath_2.iSize; ++i_3) {
-                pSolution.m_pObject->AddPathingNode(rayCastPath_2.GetAt(static_cast<int32_t>(i_3)), NiPoint3_ZERO);
+            for (const PathingLocation& rLocation : rayCastPath_2) {
+                pSolution.m_pObject->AddPathingNode(rLocation, NiPoint3_ZERO);
             }
             bool bComplete = !pSolution.m_pObject->IsIncomplete();
             return bComplete;

@@ -222,8 +222,7 @@ void BSPortalGraph::AttachQAlwaysRenderChild(NiAVObject* pkChild) {
         return;
     }
     bool bFound = false;
-    for (uint32_t i = 0; i < m_kAlwaysRenderChildren.m_usSize; ++i) {
-        NiPointer<NiAVObject> spEntry = m_kAlwaysRenderChildren.m_pBase[i];
+    for (const NiPointer<NiAVObject>& spEntry : m_kAlwaysRenderChildren) {
         if (spEntry.m_pObject && spEntry.m_pObject == pkChild) {
             bFound = true;
         }
@@ -281,13 +280,11 @@ void BSPortalGraph::RemovePortal(BSPortal* apPortal) {
 }
 
 void BSPortalGraph::RemoveAllAlwaysRenderChildren() {
-    for (uint32_t i = 0; i < m_kAlwaysRenderChildren.m_usSize; ++i) {
-        NiAVObject* m_pObject = m_kAlwaysRenderChildren.m_pBase[i].m_pObject;
-        if (m_pObject) {
-            NiAVObject* v2 = m_kAlwaysRenderChildren.m_pBase[i].m_pObject;
-            NiIncRefCount(m_pObject);
-            m_pObject->m_uFlags &= ~1u;
-            NiDecRefCount(m_pObject);
+    for (NiAVObject* pChild : m_kAlwaysRenderChildren) {
+        if (pChild) {
+            NiIncRefCount(pChild);
+            pChild->m_uFlags &= ~1u;
+            NiDecRefCount(pChild);
         }
     }
     m_kAlwaysRenderChildren.RemoveAll();

@@ -36,15 +36,14 @@ hkTypeInfo hkpSerializedSubTrack1nInfoTypeInfo = {
 hkpSerializedTrack1nInfo::~hkpSerializedTrack1nInfo() {
     hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
     if (m_sectors.m_capacityAndFlags >= 0) {
-        for (int32_t i = 0; i < m_sectors.m_size; ++i) {
-            if (m_sectors.m_data[i]) {
-                pHeap->blockFree(m_sectors.m_data[i], sizeof(hkpAgent1nSector));
+        for (hkpAgent1nSector* pSector : m_sectors) {
+            if (pSector) {
+                pHeap->blockFree(pSector, sizeof(hkpAgent1nSector));
             }
         }
     }
     if ((m_subTracks.m_capacityAndFlags & hkArrayBase<hkpSerializedSubTrack1nInfo*>::DONT_DEALLOCATE_FLAG) == 0) {
-        for (int32_t i = 0; i < m_subTracks.m_size; ++i) {
-            hkpSerializedSubTrack1nInfo* pSubTrack = m_subTracks.m_data[i];
+        for (hkpSerializedSubTrack1nInfo* pSubTrack : m_subTracks) {
             if (pSubTrack) {
                 pSubTrack->~hkpSerializedSubTrack1nInfo();
                 pHeap->blockFree(pSubTrack, sizeof(hkpSerializedSubTrack1nInfo));

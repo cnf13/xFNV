@@ -64,8 +64,8 @@ static void cleanupLoadedObjecthkpPhysicsSystemWithContacts(void* p) {
 
 // Each saved contact loses its reference; the array's storage goes with m_contacts.
 hkpPhysicsSystemWithContacts::~hkpPhysicsSystemWithContacts() {
-    for (int32_t i = 0; i < m_contacts.m_size; ++i) {
-        m_contacts.m_data[i]->removeReference();
+    for (hkpSerializedAgentNnEntry* pContact : m_contacts) {
+        pContact->removeReference();
     }
 }
 

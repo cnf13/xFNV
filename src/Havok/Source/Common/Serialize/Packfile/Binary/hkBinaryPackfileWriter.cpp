@@ -194,13 +194,11 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
         doneClasses.insert(reinterpret_cast<hkUlong>(pClass->getName()), 1);
         writeClassName(context, *pClass, pTypesHeader->m_absoluteDataStart);
     }
-    for (int32_t i = 0; i < m_pendingWrites.m_size; ++i) {
-        hkBool bDone = doneClasses.isValid(
-            doneClasses.findKey(reinterpret_cast<hkUlong>(m_pendingWrites.m_data[i].m_klass->getName()))
-        );
+    for (const PendingWrite& rWrite : m_pendingWrites) {
+        hkBool bDone = doneClasses.isValid(doneClasses.findKey(reinterpret_cast<hkUlong>(rWrite.m_klass->getName())));
         if (!bDone.m_bool) {
-            doneClasses.insert(reinterpret_cast<hkUlong>(m_pendingWrites.m_data[i].m_klass->getName()), 1);
-            writeClassName(context, *m_pendingWrites.m_data[i].m_klass, pTypesHeader->m_absoluteDataStart);
+            doneClasses.insert(reinterpret_cast<hkUlong>(rWrite.m_klass->getName()), 1);
+            writeClassName(context, *rWrite.m_klass, pTypesHeader->m_absoluteDataStart);
         }
     }
     padUp(16, context.m_stream);
@@ -265,9 +263,9 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
         }
 
         // The local fixups become offsets from the section's start.
-        for (int32_t j = 0; j < relocs.m_local.m_size; ++j) {
-            relocs.m_local.m_data[j].m_fromOffset -= pHeader->m_absoluteDataStart;
-            relocs.m_local.m_data[j].m_toOffset -= pHeader->m_absoluteDataStart;
+        for (hkRelocationInfo::Local& rLocal : relocs.m_local) {
+            rLocal.m_fromOffset -= pHeader->m_absoluteDataStart;
+            rLocal.m_toOffset -= pHeader->m_absoluteDataStart;
         }
         // A global fixup whose target is an import becomes an import, its fixup removed (the last one moved in).
         for (int32_t g = relocs.m_global.m_size - 1; g >= 0; --g) {
@@ -329,8 +327,7 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
             }
 
             pHeader->m_importsOffset = context.m_stream->tell() - pHeader->m_absoluteDataStart;
-            for (int32_t k = 0; k < relocs.m_imports.m_size; ++k) {
-                const hkRelocationInfo::Import& rImport = relocs.m_imports.m_data[k];
+            for (const hkRelocationInfo::Import& rImport : relocs.m_imports) {
                 oa.write32(rImport.m_fromOffset);
                 oa.writeRaw(rImport.m_identifier, hkString::strLen(rImport.m_identifier) + 1);
                 padUp(4, context.m_stream);
@@ -376,10 +373,10 @@ void hkBinaryPackfileWriter::doDeferredWrites(
             }
             globalFixups.m_size = iNumWords;
             int32_t iWord = 0;
-            for (int32_t j = 0; j < rGlobals.m_size; ++j) {
-                int32_t iIndex = m_knownObjects.getWithDefault(rGlobals.m_data[j].m_toAddress, INDEX_ERROR);
+            for (const hkRelocationInfo::Global& rGlobal : rGlobals) {
+                int32_t iIndex = m_knownObjects.getWithDefault(rGlobal.m_toAddress, INDEX_ERROR);
                 if (iIndex >= 0 && context.m_locations.m_data[iIndex].m_section >= 0) {
-                    globalFixups.m_data[iWord] = rGlobals.m_data[j].m_fromOffset - rHeader.m_absoluteDataStart;
+                    globalFixups.m_data[iWord] = rGlobal.m_fromOffset - rHeader.m_absoluteDataStart;
                     globalFixups.m_data[iWord + 1] = context.m_locations.m_data[iIndex].m_section;
                     globalFixups.m_data[iWord + 2] = context.m_locations.m_data[iIndex].m_offset;
                     iWord += 3;
@@ -417,12 +414,10 @@ void hkBinaryPackfileWriter::doDeferredWrites(
         archive.writeArray32u(virtualFixups.m_data, virtualFixups.m_size);
     }
     context.m_stream->seek(sectionHeadersStart, hkStreamWriter::STREAM_SET);
-    for (int32_t i = 0; i < context.m_sectionHeaders.m_size; ++i) {
+    for (const hkPackfileSectionHeader& rHeader : context.m_sectionHeaders) {
         hkRelocationInfo reloc;
         hkObjectWriter* pWriter = &context.m_writer;
-        pWriter->writeObject(
-            context.m_stream, &context.m_sectionHeaders.m_data[i], hkPackfileSectionHeaderClass, reloc
-        );
+        pWriter->writeObject(context.m_stream, &rHeader, hkPackfileSectionHeaderClass, reloc);
     }
     context.m_stream->seek(offsetof(hkPackfileHeader, m_contentsSectionIndex), hkStreamWriter::STREAM_SET);
     bool bSwap =

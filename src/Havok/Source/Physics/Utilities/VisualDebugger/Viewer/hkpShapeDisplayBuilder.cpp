@@ -430,8 +430,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
             hkVector4 offset;
             offset.set(0.01f, 0.0f, 0.0f, 0.0f);
             int32_t lastVertex = 2;
-            for (int32_t i = 0; i < multiRay->m_rays.m_size; i++) {
-                const hkpMultiRayShape::Ray ray = multiRay->m_rays.m_data[i];
+            for (const hkpMultiRayShape::Ray& ray : multiRay->m_rays) {
                 hkVector4* start = geom->m_vertices.expandBy(1);
                 *start = ray.m_start;
                 start->setTransformedPos(transform, *start);

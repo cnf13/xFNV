@@ -231,15 +231,15 @@ void hkpShapeCollectionAgent::updateShapeCollectionFilter(
 
 // Every child agent's tim is invalid.
 void hkpShapeCollectionAgent::invalidateTim(const hkpCollisionInput& input) {
-    for (int32_t i = 0; i < m_agents.getSize(); ++i) {
-        m_agents.m_data[i].m_agent->invalidateTim(input);
+    for (const KeyAgentPair& pair : m_agents) {
+        pair.m_agent->invalidateTim(input);
     }
 }
 
 // Every child agent is warped by the same times; the array is indexed inline.
 void hkpShapeCollectionAgent::warpTime(float oldTime, float newTime, const hkpCollisionInput& input) {
-    for (int32_t i = 0; i < m_agents.getSize(); ++i) {
-        m_agents.m_data[i].m_agent->warpTime(oldTime, newTime, input);
+    for (const KeyAgentPair& pair : m_agents) {
+        pair.m_agent->warpTime(oldTime, newTime, input);
     }
 }
 

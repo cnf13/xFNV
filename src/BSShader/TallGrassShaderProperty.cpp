@@ -466,8 +466,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         // The root's first geometry child; the root keeps being scanned while it has none.
         NiGeometry* pGrassGeom = nullptr;
         while (pGrassNode) {
-            for (uint32_t i = 0; i < pGrassNode->m_kChildren.m_usSize; ++i) {
-                NiAVObject* pChild = pGrassNode->m_kChildren.m_pBase[i].m_pObject;
+            for (NiAVObject* pChild : pGrassNode->m_kChildren) {
                 if (pChild) {
                     pGrassGeom = pChild->IsGeometry();
                     if (pGrassGeom) {

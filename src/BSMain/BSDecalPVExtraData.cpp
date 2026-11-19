@@ -162,8 +162,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
         static_cast<BSDecalPlacementVectorExtraData*>(apRootObject->GetExtraData(*sDVPG));
     NiNode* v24 = static_cast<NiNode*>(apObject);
     if (!apObject->m_kName.GetHandle() || !BSstristr(v24->m_kName.GetHandle(), "DecalPlacementVectorGroup")) {
-        for (uint32_t i = 0; i < v24->m_kChildren.m_usSize; ++i) {
-            NiAVObject* child = v24->m_kChildren.m_pBase[i].m_pObject;
+        for (NiAVObject* child : v24->m_kChildren) {
             if (child) {
                 BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(child, apRootObject);
             }

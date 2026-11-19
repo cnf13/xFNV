@@ -1423,8 +1423,8 @@ void hkpWorld::calcContentStatistics(hkStatisticsCollector* collector, const hkC
             static_cast<int32_t>(sizeof(*m_phantoms.m_data)) * m_phantoms.m_size, v11
         );
     }
-    for (int32_t k = 0; k < m_phantoms.m_size; ++k) {
-        collector->addReferencedObject("Phantoms", m_phantoms.m_data[k], 0);
+    for (hkpPhantom* phantom : m_phantoms) {
+        collector->addReferencedObject("Phantoms", phantom, 0);
     }
     hkCriticalSection* m_modifyConstraintCriticalSection = this->m_modifyConstraintCriticalSection;
     if (m_modifyConstraintCriticalSection) {
@@ -2129,9 +2129,9 @@ void hkpWorld::updateCollisionFilterOnPhantom(
     m_broadPhase->reQuerySingleObject(pPhantomHandle, pairsOut);
 
     HK_TIMER_SPLIT_LIST("UpdateOverlaps");
-    for (int32_t i = 0; i < pairsOut.m_size; ++i) {
-        if (pairsOut.m_data[i].m_b != pPhantomHandle) {
-            hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(pairsOut.m_data[i].m_b);
+    for (const hkpBroadPhaseHandlePair& pair : pairsOut) {
+        if (pair.m_b != pPhantomHandle) {
+            hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(pair.m_b);
             hkpCollidable* pCollidable = static_cast<hkpCollidable*>(pHandle->getOwner());
             hkWorld_updateFilterOnSinglePhantom(m_collisionFilter, phantom, pCollidable);
         }
@@ -2357,19 +2357,17 @@ void hkpWorld::shiftBroadPhase(
         if (fixedIsland) {
             *dst++ = fixedIsland;
         }
-        for (int32_t i = 0; i < m_activeSimulationIslands.m_size; ++i) {
-            *dst++ = m_activeSimulationIslands.m_data[i];
+        for (hkpSimulationIsland* island : m_activeSimulationIslands) {
+            *dst++ = island;
         }
-        for (int32_t i = 0; i < m_inactiveSimulationIslands.m_size; ++i) {
-            *dst++ = m_inactiveSimulationIslands.m_data[i];
+        for (hkpSimulationIsland* island : m_inactiveSimulationIslands) {
+            *dst++ = island;
         }
         // The entities with a shape, island by island.
-        for (int32_t i = 0; i < islands.m_size; ++i) {
-            hkpSimulationIsland* island = islands.m_data[i];
-            for (int32_t j = 0; j < island->m_entities.m_size; ++j) {
-                hkpEntity** pEntry = &island->m_entities.m_data[j];
-                if ((*pEntry)->m_collidable.m_shape) {
-                    entities.pushBack(*pEntry);
+        for (hkpSimulationIsland* island : islands) {
+            for (hkpEntity* entity : island->m_entities) {
+                if (entity->m_collidable.m_shape) {
+                    entities.pushBack(entity);
                 }
             }
         }
@@ -3149,8 +3147,8 @@ void hkpWorld::activateRegion(const hkAabb& aabb) {
     }
     hkArray<hkpBroadPhaseHandlePair, hkContainerHeapAllocator> pairsOut;
     m_broadPhase->querySingleAabb(aabb, pairsOut);
-    for (int32_t i = 0; i < pairsOut.m_size; ++i) {
-        hkpTypedBroadPhaseHandle* handle = static_cast<hkpTypedBroadPhaseHandle*>(pairsOut.m_data[i].m_b);
+    for (const hkpBroadPhaseHandlePair& pair : pairsOut) {
+        hkpTypedBroadPhaseHandle* handle = static_cast<hkpTypedBroadPhaseHandle*>(pair.m_b);
         hkpCollidable* collidable = static_cast<hkpCollidable*>(handle->getOwner());
         hkpEntity* entity = hkpGetRigidBody(collidable);
         if (entity) {
@@ -3674,8 +3672,8 @@ void hkpWorld::getClosestPoints(
             queryAabbToArray(inactiveTree, aabb, &hits);
             HK_TIMER_SPLIT_LIST("AabbTreeNp");
             const hkpShapeType typeA = collA->getShape()->m_type;
-            for (int32_t i = 0; i < hits.m_size; ++i) {
-                const hkpCollidable* collB = static_cast<const hkpCollidable*>(hits.m_data[i]);
+            for (void* hit : hits) {
+                const hkpCollidable* collB = static_cast<const hkpCollidable*>(hit);
                 if (collA == collB) {
                     continue;
                 }
@@ -3695,9 +3693,9 @@ void hkpWorld::getClosestPoints(
             hkKdTreeAabbQueryUtils::queryAabbIterative(kdTree, aabb, hits);
             HK_TIMER_SPLIT_LIST("KdTreeNp");
             const hkpShapeType typeA = collA->getShape()->m_type;
-            for (int32_t i = 0; i < hits.m_size; ++i) {
+            for (hkUlong hit : hits) {
                 // The SDK's cast: a kd-tree hit is an hkPrimitiveId, the collidable's address.
-                const hkpCollidable* collB = reinterpret_cast<const hkpCollidable*>(hits.m_data[i]);
+                const hkpCollidable* collB = reinterpret_cast<const hkpCollidable*>(hit);
                 if (collA == collB) {
                     continue;
                 }
@@ -4220,18 +4218,17 @@ hkBool enumerateAllActiveEntitiesInWorld(const hkpWorld* apWorld, hkpPhysicsSyst
 void enumerateAllPhantomsInWorld(const hkpWorld* world, hkpPhysicsSystem* sys) {
     hkpBroadPhaseBorder* BroadPhaseBorder = world->getBroadPhaseBorder();
     if (BroadPhaseBorder) {
-        for (int32_t i = 0; i < world->m_phantoms.m_size; ++i) {
-            hkpPhantom* v4 = world->m_phantoms.m_data[i];
-            if (v4 != BroadPhaseBorder->m_phantoms[0] && v4 != BroadPhaseBorder->m_phantoms[1] &&
-                v4 != BroadPhaseBorder->m_phantoms[2] && v4 != BroadPhaseBorder->m_phantoms[3] &&
-                v4 != BroadPhaseBorder->m_phantoms[4] && v4 != BroadPhaseBorder->m_phantoms[5]) {
-                sys->addPhantom(world->m_phantoms.m_data[i]);
+        for (hkpPhantom* phantom : world->m_phantoms) {
+            if (phantom != BroadPhaseBorder->m_phantoms[0] && phantom != BroadPhaseBorder->m_phantoms[1] &&
+                phantom != BroadPhaseBorder->m_phantoms[2] && phantom != BroadPhaseBorder->m_phantoms[3] &&
+                phantom != BroadPhaseBorder->m_phantoms[4] && phantom != BroadPhaseBorder->m_phantoms[5]) {
+                sys->addPhantom(phantom);
             }
         }
     }
     else {
-        for (int32_t j = 0; j < world->m_phantoms.m_size; ++j) {
-            sys->addPhantom(world->m_phantoms.m_data[j]);
+        for (hkpPhantom* phantom : world->m_phantoms) {
+            sys->addPhantom(phantom);
         }
     }
 }

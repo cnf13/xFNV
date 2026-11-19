@@ -33,8 +33,8 @@
 hkpWeldingViewer::hkpWeldingViewer(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts)
   : hkpWorldViewerBase(contexts), hkpWorldPostSimulationListener() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
-            m_context->m_worlds.m_data[i]->addWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->addWorldPostSimulationListener(this);
         }
     }
 }
@@ -42,8 +42,8 @@ hkpWeldingViewer::hkpWeldingViewer(const hkArray<hkProcessContext*, hkContainerH
 // Removes the viewer from the context's worlds.
 hkpWeldingViewer::~hkpWeldingViewer() {
     if (m_context) {
-        for (int32_t i = 0; i < m_context->m_worlds.m_size; ++i) {
-            m_context->m_worlds.m_data[i]->removeWorldPostSimulationListener(this);
+        for (hkpWorld* world : m_context->m_worlds) {
+            world->removeWorldPostSimulationListener(this);
         }
     }
 }

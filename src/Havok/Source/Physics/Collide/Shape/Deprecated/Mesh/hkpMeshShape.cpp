@@ -283,8 +283,7 @@ hkpMeshShape::hkpMeshShape(hkFinishLoadedObjectFlag flag)
   : hkpShapeCollection(flag), m_subparts(flag), m_weldingInfo(flag) {
     if (flag.m_finishing) {
         // Subparts saved before the striding type existed get the 8-bit material indices.
-        for (int32_t i = 0; i < m_subparts.m_size; ++i) {
-            Subpart& kPart = m_subparts.m_data[i];
+        for (Subpart& kPart : m_subparts) {
             if (kPart.m_materialIndexStridingType.m_storage == MATERIAL_INDICES_INVALID) {
                 kPart.m_materialIndexStridingType.m_storage = MATERIAL_INDICES_INT8;
             }
@@ -325,8 +324,7 @@ void hkpMeshShape::getAabbImpl(const hkTransform& localToWorld, float tolerance,
         &reinterpret_cast<float*>(&out.m_max.m_quad)[0],
         _mm_setr_ps(-0x1.FFFFDCp+127f, -0x1.FFFFDCp+127f, -0x1.FFFFDCp+127f, 0.0f)
     );
-    for (int32_t s = 0; s < m_subparts.m_size; ++s) {
-        const Subpart& part = m_subparts.m_data[s];
+    for (const Subpart& part : m_subparts) {
         for (int32_t i = 0; i < part.m_numTriangles; ++i) {
             // The index and vertex buffers are untyped strided memory (void* and byte strides).
             const uint8_t* pTriangle = static_cast<const uint8_t*>(part.m_indexBase) + i * part.m_indexStriding;

@@ -132,8 +132,8 @@ hkReferencedObject* hkxAttributeHolder::findAttributeObjectByName(const char* na
 // hkVariant.
 hkRefVariant hkxAttributeHolder::findAttributeVariantByName(const char* name) const {
     if (name) {
-        for (int32_t i = 0; i < m_attributeGroups.m_size; ++i) {
-            hkRefVariant variant = m_attributeGroups.m_data[i].findAttributeVariantByName(name);
+        for (const hkxAttributeGroup& group : m_attributeGroups) {
+            hkRefVariant variant = group.findAttributeVariantByName(name);
             if (variant.m_pntr) {
                 return variant;
             }

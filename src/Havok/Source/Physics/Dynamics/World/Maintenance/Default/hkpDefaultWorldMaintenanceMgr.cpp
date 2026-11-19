@@ -59,16 +59,15 @@ void hkpDefaultWorldMaintenanceMgr::resetWorldTime(hkpWorld* world, hkStepInfo& 
     if (-1.0f != m_simulation->m_simulateUntilTime) {
         world->m_simulation->m_simulateUntilTime = world->m_simulation->m_simulateUntilTime + v5;
     }
-    for (int32_t i = 0; i < world->m_activeSimulationIslands.m_size; ++i) {
+    for (hkpSimulationIsland* pIsland : world->m_activeSimulationIslands) {
         hkpEntity* v9;
-        hkpSimulationIsland* v7 = world->m_activeSimulationIslands.m_data[i];
-        for (int32_t j = 0; j < v7->m_entities.m_size;
+        for (int32_t j = 0; j < pIsland->m_entities.m_size;
              v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad[3] =
                  v5 + v9->m_motion.m_motionState.m_sweptTransform.m_centerOfMass0.m_quad[3]) {
-            v9 = v7->m_entities.m_data[j++];
+            v9 = pIsland->m_entities.m_data[j++];
         }
         hkpWorldAgentUtil::warpTime(
-            v7, stepInfo.m_endTime, world->m_dynamicsStepInfo.m_stepInfo.m_endTime, *world->m_collisionInput
+            pIsland, stepInfo.m_endTime, world->m_dynamicsStepInfo.m_stepInfo.m_endTime, *world->m_collisionInput
         );
         v5 = stepInfoa;
     }

@@ -133,8 +133,8 @@ void hkpPhantomDisplayViewer::phantomAddedCallback(hkpPhantom* phantom) {
             displayGeometries, *collidable->m_motion.pMotion, id, m_tag, reinterpret_cast<hkUlong>(shape)
         );
         m_displayHandler->setGeometryColor(s_phantomColor, id, m_tag);
-        for (int32_t i = 0; i < displayGeometries.m_size; ++i) {
-            delete displayGeometries.m_data[i];
+        for (hkDisplayGeometry* geometry : displayGeometries) {
+            delete geometry;
         }
     }
 }
@@ -183,8 +183,7 @@ void hkpPhantomDisplayViewer::postSimulationCallback(hkpWorld* world) {
     }
     m_displayHandler->displayGeometry(phantomAabbPtrs, s_phantomColor, 0, m_tag);
 
-    for (int32_t j = 0; j < m_phantomShapesCreated.m_size; ++j) {
-        hkpWorldObject* phantom = m_phantomShapesCreated.m_data[j];
+    for (hkpWorldObject* phantom : m_phantomShapesCreated) {
         m_displayHandler->updateGeometry(
             phantom->m_collidable.m_motion.pState->m_transform, reinterpret_cast<hkUlong>(&phantom->m_collidable),
             hkpPhantomDisplayViewer::m_tag

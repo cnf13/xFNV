@@ -80,8 +80,7 @@ static void* copyObjectsToChunk(
     hkOstream out(buffer);
     hkRelocationInfo reloc;
     hkPointerMap<void*, int32_t> offsets;
-    for (int32_t i = 0; i < r_eax->m_size; ++i) {
-        int32_t index = r_eax->m_data[i];
+    for (int32_t index : *r_eax) {
         const hkVariant& oldVariant = a1->m_data[index];
         hkStructureLayout layoutOut(hkStructureLayout::HostLayoutRules);
         hkStructureLayout layoutIn(hkStructureLayout::HostLayoutRules);
@@ -102,18 +101,16 @@ static void* copyObjectsToChunk(
         pChunk = static_cast<char*>(pRouter->m_heap->blockAlloc(size));
         a3->addChunk(pChunk, buffer.m_size, 5);
         hkString::memCpy(pChunk, buffer.m_data, buffer.m_size);
-        for (int32_t i = 0; i < r_eax->m_size; ++i) {
-            hkVariant& variant = a2->m_data[r_eax->m_data[i]];
+        for (int32_t index : *r_eax) {
+            hkVariant& variant = a2->m_data[index];
             // The buffer offset the pointer holds becomes the copy's address in the chunk.
             variant.m_object = pChunk + reinterpret_cast<uintptr_t>(variant.m_object);
         }
-        for (int32_t i = 0; i < reloc.m_local.m_size; ++i) {
-            const hkRelocationInfo::Local& local = reloc.m_local.m_data[i];
+        for (const hkRelocationInfo::Local& local : reloc.m_local) {
             // The chunk is untyped copied data: a pointer slot at a byte offset.
             *reinterpret_cast<void**>(pChunk + local.m_fromOffset) = pChunk + local.m_toOffset;
         }
-        for (int32_t i = 0; i < reloc.m_global.m_size; ++i) {
-            const hkRelocationInfo::Global& global = reloc.m_global.m_data[i];
+        for (const hkRelocationInfo::Global& global : reloc.m_global) {
             a3->objectPointedBy(global.m_toAddress, pChunk + global.m_fromOffset);
         }
     }

@@ -198,8 +198,8 @@ void hkpEntity::deallocateInternalArrays() {
     }
     // Removed listeners leave null entries: an array is freed only when all of them are null.
     bool contactListenersLeft = false;
-    for (int32_t i = 0; i < m_contactListeners.m_size; ++i) {
-        if (m_contactListeners.m_data[i]) {
+    for (hkpContactListener* listener : m_contactListeners) {
+        if (listener) {
             contactListenersLeft = true;
             break;
         }
@@ -210,8 +210,8 @@ void hkpEntity::deallocateInternalArrays() {
     ExtendedListeners* extendedListeners = m_extendedListeners;
     bool activationListenersLeft = false;
     if (extendedListeners) {
-        for (int32_t i = 0; i < extendedListeners->m_activationListeners.m_size; ++i) {
-            if (extendedListeners->m_activationListeners.m_data[i]) {
+        for (hkpEntityActivationListener* listener : extendedListeners->m_activationListeners) {
+            if (listener) {
                 activationListenersLeft = true;
                 break;
             }
@@ -223,8 +223,8 @@ void hkpEntity::deallocateInternalArrays() {
     extendedListeners = m_extendedListeners;
     bool entityListenersLeft = false;
     if (extendedListeners) {
-        for (int32_t i = 0; i < extendedListeners->m_entityListeners.m_size; ++i) {
-            if (extendedListeners->m_entityListeners.m_data[i]) {
+        for (hkpEntityListener* listener : extendedListeners->m_entityListeners) {
+            if (listener) {
                 entityListenersLeft = true;
                 break;
             }
@@ -613,9 +613,9 @@ void hkpEntity::sortConstraintsSlavesDeterministically() {
         for (int32_t i = 0; i < m_constraintsSlave.m_size; ++i) {
             hkpConstraintInstance* constraint = m_constraintsSlave.m_data[i];
             hkSmallArray<hkConstraintInternal>& masters = constraint->getOtherEntity(this)->m_constraintsMaster;
-            for (int32_t j = 0; j < masters.m_size; ++j) {
-                if (masters.m_data[j].m_constraint == constraint) {
-                    masters.m_data[j].m_slaveIndex = static_cast<uint16_t>(i);
+            for (hkConstraintInternal& master : masters) {
+                if (master.m_constraint == constraint) {
+                    master.m_slaveIndex = static_cast<uint16_t>(i);
                     break;
                 }
             }
