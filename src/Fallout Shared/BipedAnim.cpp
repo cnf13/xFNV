@@ -1032,11 +1032,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
             pNode->DetachChild(pChild);
             continue;
         }
-        const char* pChildName;
-        if (abFirstPerson) {
-            pChildName = pChild->GetName();
-        }
-        if (abFirstPerson && pChildName) {
+        if (abFirstPerson && pChild->GetName()) {
             // BSstrlen is evaluated first, then the name, as the game does.
             uint32_t uiUpperLength = BSstrlen(bipedObjectName[BO_UPPER_BODY]);
             const char* pUpperName;

@@ -450,25 +450,24 @@ void HighProcess::Update(MobileObject* apRef, float fTimeDelta) {
                     uint32_t Count = pPack->ePROCEDURE_TYPE;
                     switch (Procedure_Action[Count][GetProcedureIndexRunning()]) {
                         case PROCEDURE_TRAVEL: {
-                            TESObjectREFR* LocReference;
                             if (ploc) {
-                                LocReference = ploc->GetLocReference();
+                                pRef = ploc->GetLocReference();
                             }
-                            if (!LocReference) {
-                                LocReference = GetGenericLocation();
+                            if (!pRef) {
+                                pRef = GetGenericLocation();
                             }
                             if (pPack->IsActorAtLocation(apActor, false, -1.0f, false)) {
                                 TESBoundObject* ObjectReference;
                                 AddToProcedureIndexRunning(apActor, 1);
                                 bevalflag = false;
-                                if ((LocReference &&
-                                     (ObjectReference = LocReference->GetObjectReference(),
+                                if ((pRef &&
+                                     (ObjectReference = pRef->GetObjectReference(),
                                       ObjectReference == pXMarkerHeading)) ||
                                     (pPack->pPackLoc &&
                                      (pPack->pPackLoc->GetLocType() == PLT_EDITORLOC && !DidPathingFail(apActor)))) {
                                     float ftargetangle = 0.0f;
-                                    if (LocReference) {
-                                        ftargetangle = (&LocReference->GetAngleOnReference())->z;
+                                    if (pRef) {
+                                        ftargetangle = (&pRef->GetAngleOnReference())->z;
                                     }
                                     else {
                                         ftargetangle = apActor->GetStartingAngle().z;
@@ -3616,7 +3615,6 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
 void HighProcess::ProcessFlee(Actor* apActor) {
     float fFleeDoneDist;
     float fFleeStartDist;
-    float FormFlags;
     FleePackage* ppackFlee = nullptr;
     TESPackage* pbasepack = GetPackageThatIsRunning();
     if ((pbasepack) && (pbasepack->GetPackType() == PACKAGE_TYPE_FLEE)) {
@@ -3675,7 +3673,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
         fFleeDoneDist = fFleeDoneDistanceExterior.Float();
     }
     if ((ppackFlee->GetPackageTarget()) && (static_cast<double>(ppackFlee->GetPackageTarget()->iValue) > 0.0)) {
-        FormFlags = static_cast<float>(ppackFlee->GetPackageTarget()->iValue);
+        fFleeDoneDist = static_cast<float>(ppackFlee->GetPackageTarget()->iValue);
     }
 
     if ((pfleeToRef || !pavoidRef) && (ppackFlee->GetMustComplete() || ppackFlee->GetMustReachLocation())) {
@@ -3738,7 +3736,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
         fleeRequest.SetTargetRadius(a2b);
         PathingAvoidNodeArray* AvoidNodeArray = ppackFlee->CreateAvoidNodeArray();
         fleeRequest.SetAvoidNodeArray(AvoidNodeArray);
-        fleeRequest.SetMinFleeDistance(FormFlags);
+        fleeRequest.SetMinFleeDistance(fFleeDoneDist);
         float a2c = apActor->GetHeading(false);
         fleeRequest.SetInitialPathHeading(a2c);
         if (ppackFlee->GetRefFleeTo()) {
@@ -3837,7 +3835,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                     }
                     float a2e = static_cast<float>(ppackFlee->GetLocationRadius(apActor));
                     fleeRequest_2.SetTargetRadius(a2e);
-                    fleeRequest_2.SetMinFleeDistance(FormFlags);
+                    fleeRequest_2.SetMinFleeDistance(fFleeDoneDist);
                     PathingAvoidNodeArray* v5 = ppackFlee->CreateAvoidNodeArray();
                     fleeRequest_2.SetAvoidNodeArray(v5);
                     float a2f = apActor->GetHeading(false);
@@ -3891,7 +3889,7 @@ void HighProcess::ProcessFlee(Actor* apActor) {
                         }
                         float a2j = static_cast<float>(ppackFlee->GetLocationRadius(apActor));
                         kRequest.SetTargetRadius(a2j);
-                        kRequest.SetMinFleeDistance(FormFlags);
+                        kRequest.SetMinFleeDistance(fFleeDoneDist);
                         PathingAvoidNodeArray* v8 = ppackFlee->CreateAvoidNodeArray();
                         kRequest.SetAvoidNodeArray(v8);
                         DoorTeleportData* v9 = pteleportData->pLinkedDoor->GetTeleport();

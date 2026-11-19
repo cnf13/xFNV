@@ -8137,7 +8137,6 @@ uint16_t MiddleHighProcess::GetCharControllerSaveSize(MobileObject* pmob) {
 }
 
 bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
-    float v59;
     Script* v54 = nullptr;
     TESPackage* pPack = GetPackageThatIsRunning();
     if (!pPack) {
@@ -8193,7 +8192,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
             ipackdist = 200;
         }
         if (pTarget == pPlayer && fwaitdistance == 0.0) {
-            v59 = static_cast<float>(ipackdist);
+            fwaitdistance = static_cast<float>(ipackdist);
         }
         else {
             if (fwaitdistance == 0.0 && apActor->GetParentCell()->GetInterior()) {
@@ -8340,7 +8339,7 @@ bool MiddleHighProcess::ProcessEscortOneHour(Actor* apActor) {
             return false;
         }
         double v14 = distance.Length();
-        if (!(v59 >= v14)) {
+        if (!(fwaitdistance >= v14)) {
             goto LABEL_108;
         }
         double v24 = fMydistance.Length();
