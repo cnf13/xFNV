@@ -103,9 +103,9 @@ BGSTerrainNode::BGSTerrainNode(
 
 BGSTerrainNode::~BGSTerrainNode() {
     UnloadData(UNLOAD_ALL);
-    for (int32_t i = 0; i < 4; ++i) {
-        if (pChildren[i]) {
-            delete pChildren[i];
+    for (BGSTerrainNode*& pChild : pChildren) {
+        if (pChild) {
+            delete pChild;
         }
     }
 }
@@ -118,8 +118,8 @@ BGSTerrainChunk* BGSTerrainNode::GetChunkForPoint(const NiPoint3& aPoint) {
         }
 
         if (pChildren[0u]) {
-            for (int32_t i = 0; i < 4; ++i) {
-                pchunk = pChildren[i]->GetChunkForPoint(aPoint);
+            for (BGSTerrainNode* pChild : pChildren) {
+                pchunk = pChild->GetChunkForPoint(aPoint);
                 if (pchunk) {
                     break;
                 }
@@ -139,8 +139,8 @@ BGSDistantTreeBlock* BGSTerrainNode::GetTreeBlockForPoint(const NiPoint3& aPoint
 
         uint32_t v3 = iLevel;
         if ((v3 > BGSTerrainManager::GetTreeLevel()) && (pChildren[0u])) {
-            for (int32_t i = 0; i < 4; ++i) {
-                pBlock = pChildren[i]->GetTreeBlockForPoint(aPoint);
+            for (BGSTerrainNode* pChild : pChildren) {
+                pBlock = pChild->GetTreeBlockForPoint(aPoint);
                 if (pBlock) {
                     break;
                 }
@@ -158,9 +158,9 @@ void BGSTerrainNode::TriggerApocalypseRecurse() {
     else {
         uint32_t v2 = iLevel;
         if (v2 > pManager->iBlockLevel) {
-            for (int32_t i = 0; i < 4; ++i) {
-                if (pChildren[i]) {
-                    pChildren[i]->TriggerApocalypseRecurse();
+            for (BGSTerrainNode* pChild : pChildren) {
+                if (pChild) {
+                    pChild->TriggerApocalypseRecurse();
                 }
             }
         }
@@ -171,9 +171,9 @@ void BGSTerrainNode::UnloadDataRecurse(DATA_TO_UNLOAD aeDataToUnload) {
     if (pChunk || pBlock) {
         UnloadData(aeDataToUnload);
     }
-    for (int32_t i = 0; i < 4; ++i) {
-        if (pChildren[i]) {
-            pChildren[i]->UnloadDataRecurse(aeDataToUnload);
+    for (BGSTerrainNode* pChild : pChildren) {
+        if (pChild) {
+            pChild->UnloadDataRecurse(aeDataToUnload);
         }
     }
     bChildrenLoaded = false;
@@ -244,8 +244,8 @@ void BGSTerrainNode::UpdateMorphParameters(const NiPoint3& aViewPosition) {
     if (QPersistentNode() || !bSplitNode) {
     LABEL_13:;
         if (pChildren[0]) {
-            for (int32_t i = 0; i < 4; ++i) {
-                pChildren[i]->UpdateMorphParameters(aViewPosition);
+            for (BGSTerrainNode* pChild : pChildren) {
+                pChild->UpdateMorphParameters(aViewPosition);
             }
         }
     }
@@ -518,9 +518,9 @@ void BGSTerrainNode::DestroyRecurse() {
         pChunk = nullptr;
     }
 
-    for (int32_t i = 0; i < 4; ++i) {
-        if (pChildren[i]) {
-            pChildren[i]->DestroyRecurse();
+    for (BGSTerrainNode* pChild : pChildren) {
+        if (pChild) {
+            pChild->DestroyRecurse();
         }
     }
 }
@@ -549,15 +549,15 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
             }
             this->pChunk = pChunk;
         }
-        for (int32_t i = 0; i < 4; ++i) {
-            if (pChildren[i]) {
-                pChildren[i]->UpdateTerrain(aViewPosition, abUpdateWaterVisibility);
+        for (BGSTerrainNode* pChild : pChildren) {
+            if (pChild) {
+                pChild->UpdateTerrain(aViewPosition, abUpdateWaterVisibility);
             }
         }
         if ((this->pChunk) && (CheckMeshSolidUnderMe(true))) {
-            for (int32_t i_2 = 0; i_2 < 4; ++i_2) {
-                if ((pChildren[i_2]->pChunk) && (pChildren[i_2]->pChunk->bDoneLoading)) {
-                    pChildren[i_2]->StartTextureMorph();
+            for (BGSTerrainNode* pChild : pChildren) {
+                if ((pChild->pChunk) && (pChild->pChunk->bDoneLoading)) {
+                    pChild->StartTextureMorph();
                 }
             }
             UnloadData(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
@@ -605,9 +605,9 @@ void BGSTerrainNode::UpdateTerrain(const NiPoint3& aViewPosition, bool abUpdateW
                 this->pChunk = v8;
             }
             if (this->pChunk->GetAttached() && bChildrenLoaded) {
-                for (int32_t i_3 = 0; i_3 < 4; ++i_3) {
-                    if (pChildren[i_3]) {
-                        pChildren[i_3]->UnloadDataRecurse(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
+                for (BGSTerrainNode* pChild : pChildren) {
+                    if (pChild) {
+                        pChild->UnloadDataRecurse(BGSTerrainNode::UNLOAD_TERRAIN_ONLY);
                     }
                 }
                 bChildrenLoaded = false;
@@ -699,9 +699,9 @@ void BGSTerrainNode::UpdateBlocks(const NiPoint3& aViewPosition, bool abUpdateVi
     else {
         uint32_t v4 = iLevel;
         if (v4 > pManager->iBlockLevel) {
-            for (int32_t i = 0; i < 4; ++i) {
-                if (pChildren[i]) {
-                    pChildren[i]->UpdateBlocks(aViewPosition, abUpdateVisibility);
+            for (BGSTerrainNode* pChild : pChildren) {
+                if (pChild) {
+                    pChild->UpdateBlocks(aViewPosition, abUpdateVisibility);
                 }
             }
         }
@@ -750,9 +750,9 @@ void BGSTerrainNode::UpdateTrees(const NiPoint3& aViewPosition) {
     else {
         uint32_t v3 = iLevel;
         if (v3 > BGSTerrainManager::GetTreeLevel()) {
-            for (int32_t i = 0; i < 4; ++i) {
-                if (pChildren[i]) {
-                    pChildren[i]->UpdateTrees(aViewPosition);
+            for (BGSTerrainNode* pChild : pChildren) {
+                if (pChild) {
+                    pChild->UpdateTrees(aViewPosition);
                 }
             }
         }

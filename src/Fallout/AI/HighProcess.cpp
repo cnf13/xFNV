@@ -7351,19 +7351,18 @@ void HighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             this->GetPathLookAtTarget()->SetTargeted(true);
         }
     }
-    for (uint32_t i = 0; i < 6; ++i) {
+    for (TESObjectREFR*& pTarget : HeadTrackingTargets) {
         TESObjectREFR* v15;
-        if (HeadTrackingTargets[i]) {
-            TESForm* v8 =
-                TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(HeadTrackingTargets[i])));
+        if (pTarget) {
+            TESForm* v8 = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTarget)));
             v15 = dynamic_cast<TESObjectREFR*>(v8);
         }
         else {
             v15 = nullptr;
         }
-        HeadTrackingTargets[i] = v15;
-        if (HeadTrackingTargets[i]) {
-            HeadTrackingTargets[i]->SetTargeted(true);
+        pTarget = v15;
+        if (pTarget) {
+            pTarget->SetTargeted(true);
         }
     }
     BSSimpleList<Actor*>* plist = &AggroRadiusList;
@@ -7946,8 +7945,7 @@ void HighProcess::NotifyGuardAboutActivation(Actor* apActor, TESObjectREFR* apAc
         ActorPackage* pPackages[2];
         pPackages[0] = &RunOncePackage;
         pPackages[1] = &CurrentPackage;
-        for (int32_t i = 0; i < 2; ++i) {
-            ActorPackage* pPackage = pPackages[i];
+        for (ActorPackage* pPackage : pPackages) {
             TESPackage* pActorPackage = pPackage->pPackage;
             if (pActorPackage &&
                 (pActorPackage->GetProcedureType() == PACKAGE_PROCEDURE_GUARD &&

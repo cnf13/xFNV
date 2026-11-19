@@ -205,8 +205,8 @@ bool CharGenMenu::DoGamepadUpEvent(int32_t a1, float a2) {
 }
 
 char CharGenMenu::HasTiles() {
-    for (int32_t i = 0; i < 7; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return 0;
         }
     }

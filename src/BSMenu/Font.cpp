@@ -801,17 +801,17 @@ void Font::Load() {
     fFontHeight = 0.0f;
     float fMaxHeight = 0.0f;
     fMaxDrop = 0.0f;
-    for (int32_t i = 0; i < 256; ++i) {
-        float fLetterHeight = pFontData->fBaseLine - pFontData->pFontLetters[i].fTopEdge;
-        fLetterHeight = fLetterHeight + pFontData->pFontLetters[i].fHeight;
+    for (const FontLetter& rLetter : pFontData->pFontLetters) {
+        float fLetterHeight = pFontData->fBaseLine - rLetter.fTopEdge;
+        fLetterHeight = fLetterHeight + rLetter.fHeight;
         // The asm keeps the new value unless it is below the old one (an unordered compare keeps it too).
         float fLargest = fFontHeight;
         fFontHeight = fLetterHeight < fLargest ? fLargest : fLetterHeight;
-        float fHeight = pFontData->pFontLetters[i].fHeight;
+        float fHeight = rLetter.fHeight;
         fMaxHeight = fHeight < fMaxHeight ? fMaxHeight : fHeight;
         // Here the new value is kept unless it is above the old one.
         float fSmallest = fMaxDrop;
-        float fDrop = pFontData->pFontLetters[i].fTopEdge - pFontData->pFontLetters[i].fHeight;
+        float fDrop = rLetter.fTopEdge - rLetter.fHeight;
         fMaxDrop = fDrop > fSmallest ? fSmallest : fDrop;
     }
 
@@ -1569,8 +1569,8 @@ FontManager::TextPage::TextPage(
     int32_t aiPageHeight
 )
   : iHeight(0), iPageWidth(aiPageWidth), iPageHeight(aiPageHeight), iLastFontHeight(35), pDoc(apDoc) {
-    for (int32_t i = 0; i < 8; ++i) {
-        pCharsPerFont[i] = 0;
+    for (int32_t& riChars : pCharsPerFont) {
+        riChars = 0;
     }
     AddChar(apChar, 0);
 }
@@ -1586,8 +1586,8 @@ FontManager::TextPage::TextPage(
     pDoc(apDoc) {
     xLines.AddTail(apLine);
     apLine->pPage = this;
-    for (int32_t i = 0; i < 8; ++i) {
-        pCharsPerFont[i] = 0;
+    for (int32_t& riChars : pCharsPerFont) {
+        riChars = 0;
     }
 }
 
@@ -1940,8 +1940,8 @@ FontManager::FontManager() {
     pFont[7] = new Font(8, sFont_8_Filename.uValue.str, true);
     bUseNewFonts = false;
     bool bHasFontData = false;
-    for (int32_t i = 0; i < 8; ++i) {
-        if (pFont[i]->pFontData) {
+    for (Font* pkFont : pFont) {
+        if (pkFont->pFontData) {
             bHasFontData = true;
             break;
         }
@@ -1953,9 +1953,9 @@ FontManager::FontManager() {
 }
 
 FontManager::~FontManager() {
-    for (int32_t i = 0; i < 8; ++i) {
-        delete pFont[i];
-        pFont[i] = nullptr;
+    for (Font*& rpFont : pFont) {
+        delete rpFont;
+        rpFont = nullptr;
     }
 }
 

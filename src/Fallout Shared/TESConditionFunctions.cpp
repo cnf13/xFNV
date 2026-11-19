@@ -1093,9 +1093,9 @@ bool Script::GetLOSConditionFunction(
                     fzs[0] = fTargetHeight * 0.75 + destPoint.z;
                     fzs[1] = fTargetHeight * 0.5 + destPoint.z;
                     fzs[2] = fTargetHeight * 0.25 + destPoint.z;
-                    for (int32_t i = 0; i < 3; ++i) {
+                    for (float fZ : fzs) {
                         TESObjectREFR* phitref;
-                        destPoint.z = fzs[i];
+                        destPoint.z = fZ;
                         pickRes.NiSetTo(destPoint);
                         NiAVObject* phit = TES::pInstance->Pick(pickRes);
                         if (phit) {

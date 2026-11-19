@@ -40,10 +40,10 @@ bool BGSImpactDataSet::Load(TESFile* apFile) {
                 TESFile::WidenFormIDRecords(ppImpactData, IMP_MAT_COUNT, 4, sizeof(BGSImpactData*), {{0, 0}});
 #endif
                 if (apFile->QEndian()) {
-                    for (int32_t i = 0; i < IMP_MAT_COUNT; ++i) {
+                    for (BGSImpactData*& pImpactData : ppImpactData) {
                         // Until InitItem resolves it, each slot holds an untyped form ID, which is swapped as a 32-bit
                         // value.
-                        ENDIAN(reinterpret_cast<uint32_t&>(ppImpactData[i]), false);
+                        ENDIAN(reinterpret_cast<uint32_t&>(pImpactData), false);
                     }
                 }
                 break;
@@ -321,11 +321,11 @@ void ImpactSwap::IMPACT_SWAP_DATA::Endian() {
 ImpactSwap::ImpactSwap() : pRemappedData{}, pAltFootstepMaterialNames{} {}
 
 ImpactSwap::~ImpactSwap() {
-    for (int32_t i = 0; i < 12; ++i) {
-        if (pRemappedData[i]) {
-            delete pRemappedData[i];
+    for (auto& pRemap : pRemappedData) {
+        if (pRemap) {
+            delete pRemap;
         }
-        pRemappedData[i] = nullptr;
+        pRemap = nullptr;
     }
 }
 
@@ -417,12 +417,12 @@ void ImpactSwap::Copy(ImpactSwap* apSwap) {
     BGSImpactData* pnewdata;
     BGSImpactData* polddata;
     BSMapItem<BGSImpactData*, BGSImpactData*>* iter;
-    for (int32_t i = 0; i < 12; ++i) {
-        BSMap<BGSImpactData*, BGSImpactData*>* v3 = pRemappedData[i];
+    for (auto& pRemap : pRemappedData) {
+        BSMap<BGSImpactData*, BGSImpactData*>* v3 = pRemap;
         if (v3) {
             delete v3;
         }
-        pRemappedData[i] = nullptr;
+        pRemap = nullptr;
     }
     for (BGSImpactDataSet::IMPACT_MATERIAL_TYPE i_2 = BGSImpactDataSet::IMP_MAT_STONE;
          i_2 < BGSImpactDataSet::IMP_MAT_COUNT; i_2 = static_cast<BGSImpactDataSet::IMPACT_MATERIAL_TYPE>(i_2 + 1)) {

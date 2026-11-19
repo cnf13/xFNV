@@ -162,35 +162,35 @@ const NiRTTI* ShadowLightShader::GetRTTI() const {
 // Releases every shader, pass and constant map entry the class holds and clears the per-pass constant flags.
 bool ShadowLightShader::Initialize() {
     BSShader::Initialize();
-    for (uint32_t i = 0; i < 156; ++i) {
-        NiD3DVertexShader* pShader = ShadowLightShader::spVertexShaders[i];
+    for (NiD3DVertexShader*& rpShader : ShadowLightShader::spVertexShaders) {
+        NiD3DVertexShader* pShader = rpShader;
         if (pShader) {
             pShader->DecRefCount();
-            ShadowLightShader::spVertexShaders[i] = nullptr;
+            rpShader = nullptr;
         }
     }
-    for (uint32_t i = 0; i < 208; ++i) {
-        NiD3DPixelShader* pShader = ShadowLightShader::spPixelShaders[i];
+    for (NiD3DPixelShader*& rpShader : ShadowLightShader::spPixelShaders) {
+        NiD3DPixelShader* pShader = rpShader;
         if (pShader) {
             pShader->DecRefCount();
-            ShadowLightShader::spPixelShaders[i] = nullptr;
+            rpShader = nullptr;
         }
     }
-    for (uint32_t i = 0; i < 759; ++i) {
-        ShadowLightShader::spPass[i] = nullptr;
+    for (NiPointer<NiD3DPass>& spEntry : ShadowLightShader::spPass) {
+        spEntry = nullptr;
     }
-    for (uint32_t i = 0; i < 22; ++i) {
-        NiShaderConstantMapEntry* pEntry = ShadowLightShader::spVertexConstantMapEntries[i];
+    for (NiShaderConstantMapEntry*& rpEntry : ShadowLightShader::spVertexConstantMapEntries) {
+        NiShaderConstantMapEntry* pEntry = rpEntry;
         if (pEntry) {
             pEntry->DecRefCount();
-            ShadowLightShader::spVertexConstantMapEntries[i] = nullptr;
+            rpEntry = nullptr;
         }
     }
-    for (uint32_t i = 0; i < 22; ++i) {
-        NiShaderConstantMapEntry* pEntry = ShadowLightShader::spPixelConstantMapEntries[i];
+    for (NiShaderConstantMapEntry*& rpEntry : ShadowLightShader::spPixelConstantMapEntries) {
+        NiShaderConstantMapEntry* pEntry = rpEntry;
         if (pEntry) {
             pEntry->DecRefCount();
-            ShadowLightShader::spPixelConstantMapEntries[i] = nullptr;
+            rpEntry = nullptr;
         }
     }
     std::memset(ShadowLightShader::ulVertexConstantFlags, 0, sizeof(ShadowLightShader::ulVertexConstantFlags));
@@ -824,15 +824,13 @@ void ShadowLightShader::PostGeometry(const NiPropertyState* apState) {
 // Walks 156 vertex shaders (only with a shader declaration) and 208 pixel shaders, then the base.
 void ShadowLightShader::RecreateRendererData() {
     if (m_spShaderDecl.m_pObject) {
-        for (uint32_t i = 0; i < 156; ++i) {
-            NiD3DVertexShader* pkVertexShader = ShadowLightShader::spVertexShaders[i];
+        for (NiD3DVertexShader* pkVertexShader : ShadowLightShader::spVertexShaders) {
             if (pkVertexShader) {
                 pkVertexShader->RecreateRendererData();
             }
         }
     }
-    for (uint32_t j = 0; j < 208; ++j) {
-        NiD3DPixelShader* pkPixelShader = ShadowLightShader::spPixelShaders[j];
+    for (NiD3DPixelShader* pkPixelShader : ShadowLightShader::spPixelShaders) {
         if (pkPixelShader) {
             pkPixelShader->RecreateRendererData();
         }
@@ -1954,8 +1952,8 @@ void ShadowLightShader::ReloadShaders() {
 }
 
 void ShadowLightShader::ClearPassStages() {
-    for (uint32_t i = 0; i < 759; ++i) {
-        ClearPass(spPass[i].m_pObject);
+    for (const NiPointer<NiD3DPass>& spEntry : spPass) {
+        ClearPass(spEntry.m_pObject);
     }
 }
 

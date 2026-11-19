@@ -189,10 +189,10 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
     using ClassNameMap_t = hkCachedHashMap<hkStringMapOperations, hkContainerHeapAllocator>;
     ClassNameMap_t doneClasses;
     const hkClass* const apClasses[4] = {&hkClassClass, &hkClassMemberClass, &hkClassEnumClass, &hkClassEnumItemClass};
-    for (int32_t i = 0; i < 4; ++i) {
+    for (const hkClass* pClass : apClasses) {
         // The map's keys are hkUlong words holding the name pointers.
-        doneClasses.insert(reinterpret_cast<hkUlong>(apClasses[i]->getName()), 1);
-        writeClassName(context, *apClasses[i], pTypesHeader->m_absoluteDataStart);
+        doneClasses.insert(reinterpret_cast<hkUlong>(pClass->getName()), 1);
+        writeClassName(context, *pClass, pTypesHeader->m_absoluteDataStart);
     }
     for (int32_t i = 0; i < m_pendingWrites.m_size; ++i) {
         hkBool bDone = doneClasses.isValid(

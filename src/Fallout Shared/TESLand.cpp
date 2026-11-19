@@ -156,8 +156,8 @@ TESObjectLAND::~TESObjectLAND() {
         ourFree(TESObjectLAND::pDefNormalBLOCK);
         ourFree(TESObjectLAND::pDefTextureBLOCK);
         ourFree(TESObjectLAND::pDefNormalSetBLOCK);
-        for (int32_t i = 0; i < 4; ++i) {
-            ourFree(TESObjectLAND::ppDefVertexBLOCK[i]);
+        for (NiPoint3* pVertexBlock : TESObjectLAND::ppDefVertexBLOCK) {
+            ourFree(pVertexBlock);
         }
         TESObjectLAND::bStaticsDefined = false;
         TESObjectLAND::spTexturingProperty = static_cast<NiTexturingProperty*>(nullptr);
@@ -2489,12 +2489,12 @@ char TESObjectLAND::CalculateGrassParams() {
                             }
                             apParam[iParam]->pfDensity[8] = v12;
                             float v43 = 0.0f;
-                            for (int32_t m = 0; m < 9; ++m) {
-                                v43 = v43 + apParam[iParam]->pfDensity[m];
+                            for (float fDensity : apParam[iParam]->pfDensity) {
+                                v43 = v43 + fDensity;
                             }
                             if (v42 > v43 / 9.0) {
-                                for (int32_t n = 0; n < 9; ++n) {
-                                    apParam[iParam]->pfDensity[n] = 0.0f;
+                                for (float& fDensity : apParam[iParam]->pfDensity) {
+                                    fDensity = 0.0f;
                                 }
                             }
                             ++iParam;
@@ -2623,12 +2623,12 @@ char TESObjectLAND::CalculateGrassParams() {
                                 }
                                 apParam[iParam]->pfDensity[6] = v2;
                                 float v44 = 0.0f;
-                                for (int32_t jj = 0; jj < 9; ++jj) {
-                                    v44 = v44 + apParam[iParam]->pfDensity[jj];
+                                for (float fDensity : apParam[iParam]->pfDensity) {
+                                    v44 = v44 + fDensity;
                                 }
                                 if (v42 > v44 / 9.0) {
-                                    for (int32_t kk = 0; kk < 9; ++kk) {
-                                        apParam[iParam]->pfDensity[kk] = 0.0f;
+                                    for (float& fDensity : apParam[iParam]->pfDensity) {
+                                        fDensity = 0.0f;
                                     }
                                 }
                                 ++iParam;
@@ -3986,8 +3986,8 @@ TESObjectLAND::LoadedLandData::LoadedLandData()
   : ppMesh(nullptr), ppVertices(nullptr), ppNormals(nullptr), ppColorsA(nullptr), ppNormalsSet(nullptr),
     spBorder(nullptr), HeightExtents(3.4028235e+38f, -3.4028235e+38f), pQuadTextureArray(), ppPercentArrays(),
     pMoppCode(nullptr), pmGrassMap(), spLandRB(nullptr), fBaseHeight(0.0f) {
-    for (int32_t i = 0; i < 4; ++i) {
-        pDefQuadTexture[i] = TESObjectLAND::pDefText;
+    for (TESLandTexture*& pTexture : pDefQuadTexture) {
+        pTexture = TESObjectLAND::pDefText;
     }
 }
 

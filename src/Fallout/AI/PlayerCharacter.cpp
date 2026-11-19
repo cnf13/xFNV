@@ -961,8 +961,8 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(true) {
     pInitialStateBuffer = nullptr;
     iTotalPlayingTime = 0;
     ResetLastPlayingTimeUpdate();
-    for (int32_t j = 0; j < 5; ++j) {
-        pCrimeCounts[j] = 0;
+    for (uint32_t& uiCrimeCount : pCrimeCounts) {
+        uiCrimeCount = 0;
     }
     iCharacterSeed = std::time(nullptr);
     SetAIControlledToPosition(false);
@@ -1001,8 +1001,8 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(true) {
     bShowQuestItemsInInventory = true;
     iSelectedSpellCastSoundID = 0;
     SelectedSpellCastSound = BSSoundHandle();
-    for (int32_t k = 0; k < 6; ++k) {
-        MagicFailureSounds[k] = BSSoundHandle();
+    for (BSSoundHandle& rSound : MagicFailureSounds) {
+        rSound = BSSoundHandle();
     }
     pLastExtDoorActivated = nullptr;
     DroppedRefList.RemoveAll();
@@ -1059,11 +1059,11 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(true) {
     pContinuousBeamPersistant = nullptr;
     bIsAcousticSpaceTransition = false;
     fLastHelloTime = -1.0f;
-    for (int32_t m = 0; m < 3; ++m) {
-        PlayerAchievements[m].bUnlocked = false;
-        PlayerAchievements[m].iCurrentValue = 0;
+    for (AchievementInstance& rAchievement : PlayerAchievements) {
+        rAchievement.bUnlocked = false;
+        rAchievement.iCurrentValue = 0;
         // The stored value is ~(cFlags & 2) != 0, which is always true, so bTracking is set to true as the game does.
-        PlayerAchievements[m].bTracking = true;
+        rAchievement.bTracking = true;
     }
     pClosestAudioMarkerInfo = nullptr;
     fCounterAttackTimer = 0.0f;
@@ -1863,8 +1863,8 @@ void PlayerCharacter::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveDataEndian(&bHostileDetection, 1u, 0);
     apSaveGameBuffer->SaveDataEndian(&iSandmanDetection, 4u, 0);
     apSaveGameBuffer->SaveDataEndian(&fBlockActivateTimer, 4u, 0);
-    for (uint32_t i_4 = 0; i_4 < 5; ++i_4) {
-        apSaveGameBuffer->SaveDataEndian(&pCrimeCounts[i_4], 4u, 0);
+    for (uint32_t& uiCrimeCount : pCrimeCounts) {
+        apSaveGameBuffer->SaveDataEndian(&uiCrimeCount, 4u, 0);
     }
     CharacterProgressionInfo.SaveGame(apSaveGameBuffer);
     TESForm* pplayerMarkerSpace = nullptr;

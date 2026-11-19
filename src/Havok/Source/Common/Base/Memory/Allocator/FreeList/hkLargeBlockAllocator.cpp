@@ -236,8 +236,8 @@ void hkLargeBlockAllocator::_init() {
     m_sumAllocatedWithMgrOverhead = 0;
     m_treemap = 0;
     m_leastAddr = nullptr;
-    for (int32_t i = 0; i < 32; ++i) {
-        m_treebins[i] = nullptr;
+    for (hkMemTreeChunk*& pBin : m_treebins) {
+        pBin = nullptr;
     }
     m_zeroChunk.prevFoot = 0;
     m_topsize = 0;

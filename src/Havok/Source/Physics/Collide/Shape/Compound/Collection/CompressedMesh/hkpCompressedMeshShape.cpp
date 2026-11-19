@@ -636,7 +636,7 @@ const hkpShape* hkpCompressedMeshShape::getChildShape(uint32_t aKey, char (&arBu
         hkpConvexVerticesShape::FourVectors* pOut = &s_convexVertices[0];
         for (int32_t iBlock = 0; iBlock < iNumBlocks; ++iBlock) {
             hkVector4 akVertices[4];
-            for (int32_t i = 0; i < 4; ++i) {
+            for (hkVector4& vertex : akVertices) {
                 const float fX = static_cast<float>(pVertices[0]);
                 const float fY = static_cast<float>(pVertices[1]);
                 const float fZ = static_cast<float>(pVertices[2]);
@@ -652,7 +652,7 @@ const hkpShape* hkpCompressedMeshShape::getChildShape(uint32_t aKey, char (&arBu
                     ),
                     pPiece->m_offset.m_quad
                 );
-                akVertices[i].setTransformedPos(kTransform, kQuantized);
+                vertex.setTransformedPos(kTransform, kQuantized);
                 kMin = _mm_min_ps(kMin, kQuantized.m_quad);
                 kMax = _mm_max_ps(kMax, kQuantized.m_quad);
                 if (iVertex < iNumVertices - 1) {

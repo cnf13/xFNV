@@ -462,18 +462,18 @@ bool NiMatrix3::operator==(const NiMatrix3& mat) const {
 }
 
 void NiMatrix3::LoadBinary(NiStream& stream) {
-    for (int32_t iRow = 0; iRow < 3; iRow++) {
-        for (int32_t iCol = 0; iCol < 3; iCol++) {
-            NiStreamLoadBinary(stream, m_pEntry[iRow][iCol]);
+    for (auto& afRow : m_pEntry) {
+        for (float& fEntry : afRow) {
+            NiStreamLoadBinary(stream, fEntry);
         }
     }
 }
 
 void NiMatrix3::SaveBinary(NiStream& stream) {
     Snap();
-    for (int32_t iRow = 0; iRow < 3; iRow++) {
-        for (int32_t iCol = 0; iCol < 3; iCol++) {
-            NiStreamSaveBinary(stream, m_pEntry[iRow][iCol]);
+    for (auto& afRow : m_pEntry) {
+        for (float& fEntry : afRow) {
+            NiStreamSaveBinary(stream, fEntry);
         }
     }
 }
@@ -534,11 +534,11 @@ void NiMatrix3::GetRow_005DF560(int32_t a2, float* a3, float* a4, float* a5) {
 
 // Each entry whose magnitude is at most 1e-8 (NaN excluded) and which is not already zero becomes zero.
 void NiMatrix3::Snap() {
-    for (int32_t iRow = 0; iRow < 3; iRow++) {
-        for (int32_t iCol = 0; iCol < 3; iCol++) {
-            float fAbs = fabsf(m_pEntry[iRow][iCol]);
-            if (fAbs <= 1e-08f && m_pEntry[iRow][iCol] != 0.0f) {
-                m_pEntry[iRow][iCol] = 0.0f;
+    for (auto& afRow : m_pEntry) {
+        for (float& fEntry : afRow) {
+            float fAbs = fabsf(fEntry);
+            if (fAbs <= 1e-08f && fEntry != 0.0f) {
+                fEntry = 0.0f;
             }
         }
     }

@@ -2328,8 +2328,7 @@ void hkpWorld::shiftBroadPhase(
     // The border's six phantoms move with the broad phase: an AABB phantom's box, a shape phantom's translation.
     hkpBroadPhaseBorder* border = m_broadPhaseBorder;
     if (border) {
-        for (int32_t i = 0; i < 6; ++i) {
-            hkpPhantom* phantom = border->m_phantoms[i];
+        for (hkpPhantom* phantom : border->m_phantoms) {
             switch (phantom->getType()) {
                 case HK_PHANTOM_AABB: {
                     hkAabb& aabb = static_cast<hkpAabbPhantom*>(phantom)->m_aabb;

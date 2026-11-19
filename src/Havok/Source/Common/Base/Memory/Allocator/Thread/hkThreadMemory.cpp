@@ -6,9 +6,9 @@
 // Sets up 17 empty free lists (MEMORY_MAX_ALL_ROW rows), the lookup tables, then a cleared memory system with a limit
 // of 8 blocks per free list.
 hkThreadMemory::hkThreadMemory() {
-    for (int32_t i = 0; i < MEMORY_MAX_ALL_ROW; ++i) {
-        m_free_list[i].m_head = nullptr;
-        m_free_list[i].m_numElem = 0;
+    for (FreeList& rFreeList : m_free_list) {
+        rFreeList.m_head = nullptr;
+        rFreeList.m_numElem = 0;
     }
     initLookupTables();
     setMemory(nullptr, 8);
@@ -17,9 +17,9 @@ hkThreadMemory::hkThreadMemory() {
 // Sets up 17 empty free lists, the lookup tables, then memoryInstance as the memory with a limit of 8 blocks per free
 // list.
 hkThreadMemory::hkThreadMemory(hkMemoryAllocator* memoryInstance) {
-    for (int32_t i = 0; i < MEMORY_MAX_ALL_ROW; ++i) {
-        m_free_list[i].m_head = nullptr;
-        m_free_list[i].m_numElem = 0;
+    for (FreeList& rFreeList : m_free_list) {
+        rFreeList.m_head = nullptr;
+        rFreeList.m_numElem = 0;
     }
     initLookupTables();
     setMemory(memoryInstance, 8);

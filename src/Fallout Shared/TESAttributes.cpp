@@ -15,9 +15,8 @@ TESAttributes::TESAttributes() {
 TESAttributes::~TESAttributes() {}
 
 void TESAttributes::InitializeDataComponent() {
-    int32_t i;
-    for (i = 0; i < 7; ++i) {
-        cAttribute[i] = (uint8_t)5;
+    for (uint8_t& cValue : cAttribute) {
+        cValue = (uint8_t)5;
     }
 }
 

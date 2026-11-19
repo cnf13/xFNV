@@ -40,25 +40,25 @@
 static uint32_t data_11A427C;
 
 void FreeCombatActions() {
-    for (uint32_t i = 0; i < 27; ++i) {
-        if (CombatAction::pCombatActions[i]) {
-            delete CombatAction::pCombatActions[i];
+    for (CombatAction*& pAction : CombatAction::pCombatActions) {
+        if (pAction) {
+            delete pAction;
         }
     }
-    for (uint32_t j = 0; j < 20; ++j) {
-        if (CombatAction::pPerStateLists[j]) {
-            CombatAction::pPerStateLists[j]->RemoveAll();
-            if (CombatAction::pPerStateLists[j]) {
-                delete CombatAction::pPerStateLists[j];
+    for (BSSimpleList<CombatAction*>*& pList : CombatAction::pPerStateLists) {
+        if (pList) {
+            pList->RemoveAll();
+            if (pList) {
+                delete pList;
             }
         }
     }
 }
 
 char SetCombatActionCost(char* apName, float afCost) {
-    for (uint32_t i = 0; i < 27; ++i) {
-        if (!BSstricmp(CombatAction::kDescriptors[i].pName, apName)) {
-            CombatAction::kDescriptors[i].fCost = afCost;
+    for (CombatAction::Descriptor& rDescriptor : CombatAction::kDescriptors) {
+        if (!BSstricmp(rDescriptor.pName, apName)) {
+            rDescriptor.fCost = afCost;
             return 1;
         }
     }

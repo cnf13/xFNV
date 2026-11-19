@@ -200,8 +200,8 @@ bool TESRace::Load(TESFile* apFile) {
                     uint32_t auiVoiceIDs[2];
                     apFile->GetChunkData(auiVoiceIDs, 8);
                     if (apFile->QEndian()) {
-                        for (int32_t i = 0; i < 2; ++i) {
-                            ENDIAN(auiVoiceIDs[i], false);
+                        for (uint32_t& uiVoiceID : auiVoiceIDs) {
+                            ENDIAN(uiVoiceID, false);
                         }
                     }
                     // Kept as form IDs until InitItem: the raw IDs are stored in the pointers.
@@ -233,8 +233,8 @@ bool TESRace::Load(TESFile* apFile) {
                 uint32_t auiHairIDs[2] = {0, 0};
                 apFile->GetChunkData(auiHairIDs, 8);
                 if (apFile->QEndian()) {
-                    for (int32_t i = 0; i < 2; ++i) {
-                        ENDIAN(auiHairIDs[i], false);
+                    for (uint32_t& uiHairID : auiHairIDs) {
+                        ENDIAN(uiHairID, false);
                     }
                 }
                 // Kept as form IDs until InitItem: the raw IDs are stored in the pointers.
@@ -462,8 +462,8 @@ TESRace::~TESRace() {
 // The component setters are called virtually, as the game does.
 void TESRace::InitializeData() {
     ourMemset(&Data, 0, sizeof(RACE_DATA));
-    for (uint32_t i = 0; i < 7; ++i) {
-        Data.eSkillBonus[i].eSkill = -1;
+    for (SKILL_BONUS& kSkillBonus : Data.eSkillBonus) {
+        kSkillBonus.eSkill = -1;
     }
     for (uint32_t i = 0; i < 2; ++i) {
         Data.fWeight[i] = 1.0f;

@@ -272,9 +272,9 @@ hkpRagdollConstraintData::hkpRagdollConstraintData() {
 }
 
 hkpRagdollConstraintData::~hkpRagdollConstraintData() {
-    for (int32_t i = 0; i < 3; ++i) {
-        if (m_atoms.m_ragdollMotors.m_motors[i]) {
-            m_atoms.m_ragdollMotors.m_motors[i]->removeReference();
+    for (hkpConstraintMotor* pMotor : m_atoms.m_ragdollMotors.m_motors) {
+        if (pMotor) {
+            pMotor->removeReference();
         }
     }
 }

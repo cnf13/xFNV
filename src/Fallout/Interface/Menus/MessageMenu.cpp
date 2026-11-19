@@ -435,8 +435,8 @@ void MessageMenu::LoadNextMessage() {
 }
 
 bool MessageMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 6; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

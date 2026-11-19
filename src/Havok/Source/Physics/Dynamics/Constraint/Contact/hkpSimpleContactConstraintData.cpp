@@ -50,8 +50,8 @@ hkpSimpleContactConstraintData::hkpSimpleContactConstraintData(
     );
     m_atom->m_info.m_flags = 0;
     m_atom->m_info.m_index = 3;
-    for (int32_t i = 0; i < 7; ++i) {
-        m_atom->m_info.m_data[i] = 0;
+    for (uint32_t& word : m_atom->m_info.m_data) {
+        word = 0;
     }
     m_atomSize = m_atom->m_sizeOfAllAtoms;
 }

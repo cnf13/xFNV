@@ -84,8 +84,8 @@ BSMultiBoundShape::BSMBIntersectResult BSMultiBoundSphere::CheckBound(const BSMu
         NiPoint3 akVertices[8];
         static_cast<BSMultiBoundAABB*>(aTargetBound.spShape.m_pObject)->GetVertices(akVertices);
         float fSqrRadius = Radius * Radius;
-        for (int32_t i = 0; i < 8; ++i) {
-            NiPoint3 kDelta = Center - akVertices[i];
+        for (const NiPoint3& rVertex : akVertices) {
+            NiPoint3 kDelta = Center - rVertex;
             float fSqrDist = kDelta.SqrLength();
             if (fSqrRadius < fSqrDist) {
                 return BS_INTERSECT_NONE;
@@ -97,8 +97,8 @@ BSMultiBoundShape::BSMBIntersectResult BSMultiBoundSphere::CheckBound(const BSMu
         NiPoint3 akVertices[8];
         static_cast<BSMultiBoundOBB*>(aTargetBound.spShape.m_pObject)->GetVertices(akVertices);
         float fSqrRadius = Radius * Radius;
-        for (int32_t i = 0; i < 8; ++i) {
-            NiPoint3 kDelta = Center - akVertices[i];
+        for (const NiPoint3& rVertex : akVertices) {
+            NiPoint3 kDelta = Center - rVertex;
             float fSqrDist = kDelta.SqrLength();
             if (fSqrRadius < fSqrDist) {
                 return BS_INTERSECT_NONE;

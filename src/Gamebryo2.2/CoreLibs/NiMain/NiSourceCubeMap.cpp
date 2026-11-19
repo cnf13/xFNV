@@ -48,8 +48,8 @@ void NiSourceCubeMap::LoadBinary(NiStream& kStream) {
     uint8_t bLoadFromFiles = 0;
     NiStreamLoadBinary(kStream, bLoadFromFiles);
     char* apcFilename[FACE_NUM] = {};
-    for (uint32_t ui = 0; ui < FACE_NUM; ++ui) {
-        kStream.LoadCString(apcFilename[ui]);
+    for (char*& pcFilename : apcFilename) {
+        kStream.LoadCString(pcFilename);
     }
     kStream.SetNumberOfLinkIDs(FACE_NUM);
     for (uint32_t ui = 0; ui < FACE_NUM; ++ui) {
@@ -61,8 +61,8 @@ void NiSourceCubeMap::LoadBinary(NiStream& kStream) {
             apcFilename[FACE_POS_Z], apcFilename[FACE_NEG_Z], *kStream.m_pkSearchPath
         );
     }
-    for (uint32_t ui = 0; ui < FACE_NUM; ++ui) {
-        _NiFree(apcFilename[ui]);
+    for (char* pcFilename : apcFilename) {
+        _NiFree(pcFilename);
     }
     uint32_t uiPixelLayout;
     NiStreamLoadBinary(kStream, uiPixelLayout);
@@ -88,8 +88,8 @@ void NiSourceCubeMap::LinkObject(NiStream& kStream) {
     NiTexture::LinkObject(kStream);
     NiPointer<NiPixelData> aspRaw[FACE_NUM];
     if (kStream.GetNumberOfLinkIDs() == FACE_NUM) {
-        for (uint32_t ui = 0; ui < FACE_NUM; ++ui) {
-            aspRaw[ui] = static_cast<NiPixelData*>(kStream.GetObjectFromLinkID());
+        for (NiPointer<NiPixelData>& spRaw : aspRaw) {
+            spRaw = static_cast<NiPixelData*>(kStream.GetObjectFromLinkID());
         }
     }
     if (!m_spSrcPixelData.m_pObject) {

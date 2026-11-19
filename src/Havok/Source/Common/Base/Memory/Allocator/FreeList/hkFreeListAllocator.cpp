@@ -24,8 +24,8 @@ hkFreeListAllocator::hkFreeListAllocator(hkMemoryBlockServer* server)
     m_numFreeLists(0), m_topFreeList(m_freeListMemory), m_lastFreeList(m_freeListMemory + MAX_UNIQUE_FREELISTS),
     m_incrementalFreeListIndex(0) {
     hkFreeListAllocator::setMemorySoftLimit(0x7FFFFFFFu);
-    for (int32_t i = 0; i < MAX_FREELISTS; ++i) {
-        m_sizeToFreeList[i] = nullptr;
+    for (hkFreeList*& pFreeList : m_sizeToFreeList) {
+        pFreeList = nullptr;
     }
     m_sizeToFreeList[32] = _newFreeList(512u, 128u, 0x10000u);
     m_sizeToFreeList[16] = _newFreeList(256u, 32u, 0x8000u);

@@ -140,8 +140,8 @@ CombatGroupStrategy* InitNthCombatGroupStrategy(CombatGroupStrategy::COMBAT_GROU
 }
 
 void DestroyCombatGroupStrategies() {
-    for (uint32_t i = 0; i < 4; ++i) {
-        ourFree(CombatGroupStrategy::pCombatGroupStrategies[i]);
+    for (CombatGroupStrategy* pStrategy : CombatGroupStrategy::pCombatGroupStrategies) {
+        ourFree(pStrategy);
     }
 }
 

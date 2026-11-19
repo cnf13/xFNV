@@ -58,8 +58,8 @@ void BSShaderTextureSet::LoadBinary(NiStream& kStream) {
 void BSShaderTextureSet::SaveBinary(NiStream& kStream) {
     NiObject::SaveBinary(kStream);
     NiStreamSaveBinary(kStream, uint32_t(6));
-    for (uint32_t i = 0; i < 6; ++i) {
-        kStream.SaveCString(pTextureNames[i].pString);
+    for (const BSStringT<char>& rName : pTextureNames) {
+        kStream.SaveCString(rName.pString);
     }
 }
 

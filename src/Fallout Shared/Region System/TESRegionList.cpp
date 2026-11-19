@@ -13,15 +13,15 @@
 TESRegionList::TESRegionList(bool abOwnsRegionMemory) : BSSimpleList(), bOwnsRegionMemory(abOwnsRegionMemory) {
     if (bOwnsRegionMemory) {
         if (!iOwnLists) {
-            for (uint32_t i = 0; i < 9; ++i) {
-                TESRegionData* pdataDelete = kCachedData[i].pData;
+            for (CachedData& kData : kCachedData) {
+                TESRegionData* pdataDelete = kData.pData;
                 if (pdataDelete) {
-                    kCachedData[i].pData = nullptr;
+                    kData.pData = nullptr;
                     delete pdataDelete;
                 }
-                TESRegionList* plistDelete = kCachedData[i].pList;
+                TESRegionList* plistDelete = kData.pList;
                 if (plistDelete) {
-                    kCachedData[i].pList = nullptr;
+                    kData.pList = nullptr;
                     delete plistDelete;
                 }
             }
@@ -33,15 +33,15 @@ TESRegionList::TESRegionList(bool abOwnsRegionMemory) : BSSimpleList(), bOwnsReg
 TESRegionList::~TESRegionList() {
     Clear();
     if (bOwnsRegionMemory && !--iOwnLists) {
-        for (uint32_t i = 0; i < 9; ++i) {
-            TESRegionData* pdataDelete = kCachedData[i].pData;
+        for (CachedData& kData : kCachedData) {
+            TESRegionData* pdataDelete = kData.pData;
             if (pdataDelete) {
-                kCachedData[i].pData = nullptr;
+                kData.pData = nullptr;
                 delete pdataDelete;
             }
-            TESRegionList* plistDelete = kCachedData[i].pList;
+            TESRegionList* plistDelete = kData.pList;
             if (plistDelete) {
-                kCachedData[i].pList = nullptr;
+                kData.pList = nullptr;
                 delete plistDelete;
             }
         }

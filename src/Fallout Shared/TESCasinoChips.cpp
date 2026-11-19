@@ -213,11 +213,11 @@ TESCasino::~TESCasino() {
 
 void TESCasino::InitializeData() {
     ourMemset(&data, 0, sizeof(data));
-    for (int32_t i = 0; i < 10; ++i) {
-        modelArrayList[i].InitializeDataComponent();
+    for (TESModelTextureSwap& kModel : modelArrayList) {
+        kModel.InitializeDataComponent();
     }
-    for (int32_t j = 0; j < 11; ++j) {
-        textureArrayList[j].InitializeDataComponent();
+    for (TESTexture& kTexture : textureArrayList) {
+        kTexture.InitializeDataComponent();
     }
 }
 

@@ -33,9 +33,9 @@ NiRenderedCubeMap::Create(uint32_t uiSize, NiRenderer* apkRenderer, const NiText
     }
     NiRenderedCubeMap* pkCubeMap = new NiRenderedCubeMap;
     pkCubeMap->m_kFormatPrefs = kPrefs;
-    for (uint32_t i = 0; i < FACE_NUM; ++i) {
+    for (NiPointer<Ni2DBuffer>& spFaceBuffer : pkCubeMap->m_aspFaceBuffers) {
         Ni2DBuffer* pkBuffer = Ni2DBuffer::Create_(uiSize, uiSize);
-        pkCubeMap->m_aspFaceBuffers[i] = pkBuffer;
+        spFaceBuffer = pkBuffer;
     }
     pkCubeMap->bForceD3DFormat = NiRenderedTexture::bStaticForceD3DFormat;
     pkCubeMap->iForcedD3DFormat = NiRenderedTexture::iStaticForcedD3DFormat;

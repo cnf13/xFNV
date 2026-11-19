@@ -234,9 +234,9 @@ ComputersMenu::ComputersMenu()
 ComputersMenu::~ComputersMenu() {
     ComputersMenu::pMe = nullptr;
     ComputersMenu::AnimatingTextManager::DeleteInstance();
-    for (int32_t i = 0; i < 3; ++i) {
-        Sounds[i].Stop();
-        Sounds[i].Release();
+    for (BSSoundHandle& rSound : Sounds) {
+        rSound.Stop();
+        rSound.Release();
     }
     SystemColorManager::GetInstance()->SetColor(3, ComputersMenu::SaveColor);
 }

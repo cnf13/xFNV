@@ -28,8 +28,7 @@ NiDX9IndexBufferManager::~NiDX9IndexBufferManager() {
             NiDX9IBInfo* pkIBInfo;
             pkMap->GetNext(pkPos, uiIBID, pkIBInfo);
             if (pkIBInfo) {
-                for (uint32_t j = 0; j < 5; ++j) {
-                    NiDX9IBResource* pkIBRes = pkIBInfo->m_apkIBRes[j];
+                for (NiDX9IBResource* pkIBRes : pkIBInfo->m_apkIBRes) {
                     if (pkIBRes) {
                         if (pkIBRes->m_pkIB) {
                             pkIBRes->m_pkIB->Release();
@@ -258,8 +257,7 @@ void NiDX9IndexBufferManager::DestroyDefaultBuffers() {
         NiDX9IBInfo* pkIBInfo;
         m_kDefaultResources.GetNext(pkPos, uiIBID, pkIBInfo);
         if (pkIBInfo) {
-            for (uint32_t i = 0; i < 5; ++i) {
-                NiDX9IBResource* pkIBRes = pkIBInfo->m_apkIBRes[i];
+            for (NiDX9IBResource* pkIBRes : pkIBInfo->m_apkIBRes) {
                 if (pkIBRes) {
                     if (pkIBRes->m_pkIB) {
                         pkIBRes->m_pkIB->Release();

@@ -62,8 +62,8 @@ hkpSerializedAgentNnEntry::hkpSerializedAgentNnEntry()
     m_atom.m_type.m_storage = 22;
     m_atom.m_info.m_flags = 0;
     m_atom.m_info.m_index = 3;
-    for (int32_t i = 0; i < 7; i++) {
-        m_atom.m_info.m_data[i] = 0;
+    for (uint32_t& data : m_atom.m_info.m_data) {
+        data = 0;
     }
     m_endianCheckBuffer[0] = ENDIAN_CHECK_VALUE & 0xFF;
     m_endianCheckBuffer[1] = ENDIAN_CHECK_VALUE >> 8;

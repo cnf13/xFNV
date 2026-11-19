@@ -244,12 +244,12 @@ void BGSLoadGameSubBuffer::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 BGSSaveLoadQueuedSubBufferMap::BGSSaveLoadQueuedSubBufferMap() {}
 
 BGSSaveLoadQueuedSubBufferMap::~BGSSaveLoadQueuedSubBufferMap() {
-    for (uint32_t i = 0; i < 3; ++i) {
-        NiTMapItem<TESForm*, BGSLoadGameSubBuffer>* it = QueuedSubBuffers[i].GetFirstPos();
+    for (auto& rMap : QueuedSubBuffers) {
+        NiTMapItem<TESForm*, BGSLoadGameSubBuffer>* it = rMap.GetFirstPos();
         while (it) {
             TESForm* pForm = nullptr;
             BGSLoadGameSubBuffer kSubBuffer;
-            QueuedSubBuffers[i].GetNext(it, pForm, kSubBuffer);
+            rMap.GetNext(it, pForm, kSubBuffer);
             kSubBuffer.DeleteBuffer();
         }
     }

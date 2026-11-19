@@ -224,16 +224,16 @@ bool TESWeather::Load(TESFile* apFile) {
             case HNAM_ID:
                 apFile->GetChunkData(fHDRData, 0x38);
                 if (apFile->QEndian()) {
-                    for (int32_t i = 0; i < 14; ++i) {
-                        ENDIAN(fHDRData[i], false);
+                    for (float& fHDR : fHDRData) {
+                        ENDIAN(fHDR, false);
                     }
                 }
                 break;
             case INAM_ID:
                 apFile->GetChunkData(pImageSpaceParameterMods, 0x130);
                 if (apFile->QEndian()) {
-                    for (int32_t i = 0; i < 2; ++i) {
-                        pImageSpaceParameterMods[i].Endian();
+                    for (ImageSpaceParameterData& kMods : pImageSpaceParameterMods) {
+                        kMods.Endian();
                     }
                 }
                 break;
@@ -279,14 +279,14 @@ void TESWeather::Save() {
     // The float array is passed to the uint32_t-array overload as raw data.
     TESForm::AddChunkArray(FNAM_ID, reinterpret_cast<const uint32_t*>(fFogData), 6);
     if (TESForm::QEndianSwapOnSave()) {
-        for (uint32_t j = 0; j < 2; ++j) {
-            pImageSpaceParameterMods[j].Endian();
+        for (ImageSpaceParameterData& kMods : pImageSpaceParameterMods) {
+            kMods.Endian();
         }
     }
     TESForm::__AddChunkData(INAM_ID, pImageSpaceParameterMods, 0x130);
     if (TESForm::QEndianSwapOnSave()) {
-        for (uint32_t k = 0; k < 2; ++k) {
-            pImageSpaceParameterMods[k].Endian();
+        for (ImageSpaceParameterData& kMods : pImageSpaceParameterMods) {
+            kMods.Endian();
         }
     }
     TESForm::AddChunkArray(DATA_ID, reinterpret_cast<const char*>(ucWeatherData), 0xF);

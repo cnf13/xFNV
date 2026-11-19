@@ -161,9 +161,9 @@ InventoryMenu::InventoryMenu() : Menu(), iCurrTab(0) {
     InventoryMenu::iUT_CurrentTab = Tile::TextToTrait("_CurrentTab");
     InventoryMenu::iUT_KeyringOpen = Tile::TextToTrait("_KeyringOpen");
     InventoryMenu::iUT_EquippableItem = Tile::TextToTrait("_EquippableItem");
-    for (int32_t i = 0; i < 6; ++i) {
-        pPageStatesA[i].iHighlightIndex = -1;
-        pPageStatesA[i].iScrollIndex = 0;
+    for (InventoryMenu::sPageState& rPageState : pPageStatesA) {
+        rPageState.iHighlightIndex = -1;
+        rPageState.iScrollIndex = 0;
     }
 }
 
@@ -840,8 +840,8 @@ void InventoryMenu::SelectCurrentItem() {
 }
 
 bool InventoryMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 23; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

@@ -249,8 +249,8 @@ StatsMenu::BodyPartController::BodyPartController() : eCurrentBodyPart(SM_HEAD),
 }
 
 StatsMenu::BodyPartController::~BodyPartController() {
-    for (int32_t i = 0; i < 6; ++i) {
-        listFlashingTiles[i].RemoveAll();
+    for (BSSimpleList<Tile*>& rList : listFlashingTiles) {
+        rList.RemoveAll();
     }
 }
 

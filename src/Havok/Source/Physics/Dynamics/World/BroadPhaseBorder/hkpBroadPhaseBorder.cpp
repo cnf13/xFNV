@@ -85,10 +85,10 @@ hkpBroadPhaseBorder::hkpBroadPhaseBorder(
 
 // The SDK's destructor: each phantom's reference is dropped; the compiler frees the exiting entities' array.
 hkpBroadPhaseBorder::~hkpBroadPhaseBorder() {
-    for (int32_t i = 0; i < 6; ++i) {
-        if (m_phantoms[i]) {
-            m_phantoms[i]->removeReference();
-            m_phantoms[i] = nullptr;
+    for (hkpPhantom*& pPhantom : m_phantoms) {
+        if (pPhantom) {
+            pPhantom->removeReference();
+            pPhantom = nullptr;
         }
     }
 }

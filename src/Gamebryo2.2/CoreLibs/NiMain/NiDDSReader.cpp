@@ -89,9 +89,9 @@ void Read32Bit(
     // are written.
     const uint32_t* puiSrc = reinterpret_cast<const uint32_t*>(pucDest);
     bool bAlpha = false;
-    for (uint32_t i = 0; i < 4; ++i) {
-        if (kSrcFmt.m_akComponents[i].m_eComponent == NiPixelFormat::COMP_ALPHA) {
-            bAlpha = kSrcFmt.m_akComponents[i].m_ucBitsPerComponent != 0;
+    for (const NiPixelFormat::NiComponentSpec& kComp : kSrcFmt.m_akComponents) {
+        if (kComp.m_eComponent == NiPixelFormat::COMP_ALPHA) {
+            bAlpha = kComp.m_ucBitsPerComponent != 0;
             break;
         }
     }

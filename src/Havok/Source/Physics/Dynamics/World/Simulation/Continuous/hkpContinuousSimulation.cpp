@@ -732,8 +732,7 @@ hkResult hkLs_localizedSolveToi(
     toBeActivated.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG | 64;
     event.m_contactMgr->confirmToi(event, rotateNormal, toBeActivated);
     if (!toBeActivated.m_size) {
-        for (int32_t e = 0; e < 2; e++) {
-            hkpEntity* entity = event.m_entities[e];
+        for (hkpEntity* entity : event.m_entities) {
             if (entity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
                 continue;
             }

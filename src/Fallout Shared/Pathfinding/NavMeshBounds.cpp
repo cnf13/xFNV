@@ -196,8 +196,8 @@ void NavMeshBounds::FillBoundsChunk(char* apChunkBuffer) {
     ourMemcpy(pTriangles, &Triangles.GetAt(0), uiBytes);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            for (int32_t j = 0; j < 3; ++j) {
-                ENDIAN(pTriangles[i].Vertices[j], false);
+            for (uint16_t& usVertex : pTriangles[i].Vertices) {
+                ENDIAN(usVertex, false);
             }
         }
     }

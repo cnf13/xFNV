@@ -2796,8 +2796,8 @@ void CombatGroup::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     AvoidThreatDialogueTimer.SaveGame(apSaveGameBuffer);
     ClusterUpdateTimer.SaveGame(apSaveGameBuffer);
     TargetUpdateTimer.SaveGame(apSaveGameBuffer);
-    for (uint32_t i_2 = 0; i_2 < 10; ++i_2) {
-        DetectionDialogueTimers[i_2].SaveGame(apSaveGameBuffer);
+    for (CombatTimer& rTimer : DetectionDialogueTimers) {
+        rTimer.SaveGame(apSaveGameBuffer);
     }
     apSaveGameBuffer->SaveDataEndian(&iSearchCount, 4u, 0);
     if (this->GetSearchCount()) {
@@ -2887,8 +2887,8 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     AvoidThreatDialogueTimer.LoadGame(apLoadGameBuffer);
     ClusterUpdateTimer.LoadGame(apLoadGameBuffer);
     TargetUpdateTimer.LoadGame(apLoadGameBuffer);
-    for (uint32_t i_4 = 0; i_4 < 10; ++i_4) {
-        DetectionDialogueTimers[i_4].LoadGame(apLoadGameBuffer);
+    for (CombatTimer& rTimer : DetectionDialogueTimers) {
+        rTimer.LoadGame(apLoadGameBuffer);
     }
     apLoadGameBuffer->LoadData(&iSearchCount, 4u);
     if (this->GetSearchCount()) {

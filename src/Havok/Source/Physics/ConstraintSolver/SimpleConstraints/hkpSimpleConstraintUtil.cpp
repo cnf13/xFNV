@@ -73,8 +73,7 @@ void hkSimpleConstraintUtil_InitInfo(
     );
 
     const hkpSimpleConstraintInfoInitInput* pBody = &bodyA;
-    for (int32_t iBody = 0; iBody < 2; ++iBody) {
-        hkpSimpleConstraintInfo::BodyInfo& info = out.m_bodyInfo[iBody];
+    for (hkpSimpleConstraintInfo::BodyInfo& info : out.m_bodyInfo) {
         hkVector4* pJacT = &info.m_jacT.m_col0;
 
         for (int32_t j = 0; j < 3; ++j) {

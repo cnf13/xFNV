@@ -1081,8 +1081,8 @@ void BSShaderPPLightingProperty::SetRefractionStrength(float fStrength) {
 
 void BSShaderPPLightingProperty::LoadTextureSet(const char*, BSTextureSet* apTextureSet) {
     BSTextureSet* pSet = apTextureSet ? apTextureSet : spTextureSet.m_pObject;
-    for (uint32_t i = 0; i < 6; ++i) {
-        spTextures[i][0] = nullptr;
+    for (NiPointer<NiTexture>* pspTextures : spTextures) {
+        pspTextures[0] = nullptr;
     }
     if (pSet) {
         for (int32_t j = 0; j < 6; ++j) {

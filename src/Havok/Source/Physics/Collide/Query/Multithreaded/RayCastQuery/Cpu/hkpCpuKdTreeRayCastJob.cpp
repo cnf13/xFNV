@@ -22,8 +22,8 @@
 hkKdTreeCpuBroadphaseBundleCastCollector::hkKdTreeCpuBroadphaseBundleCastCollector() : m_command(nullptr) {
     m_workInput.m_filterInfo = 0;
     m_workInput.m_rayShapeCollectionFilter = nullptr;
-    for (int32_t i = 0; i < 4; i++) {
-        m_numHits[i] = 0;
+    for (int32_t& numHits : m_numHits) {
+        numHits = 0;
     }
 }
 

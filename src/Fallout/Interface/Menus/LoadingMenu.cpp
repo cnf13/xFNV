@@ -170,8 +170,8 @@ LoadingMenu::LoadingMenu()
   : pTiles{}, SaveBackgroundColor(0.0f, 0.0f, 0.0f, 0.0f), pNextLoadScreen(&LoadScreens), uiNextBackgroundSwap(0),
     uiFadeInComplete(0), pLocation(nullptr), pSlide1TSP(nullptr), pSlide2TSP(nullptr), uiCurrTextureIndex(0),
     usCurIndex(0), usFlags(0), m_TileCrossFadeStartTime(0), m_SlideCount(0), m_DelayedTipMatteUpdate(0) {
-    for (int32_t j = 0; j < 43; ++j) {
-        eIDOrder[j] = MiscStatManager::MS_EQUIPMENT_DAMAGE_REPAIRED;
+    for (MiscStatManager::MiscStatID& eID : eIDOrder) {
+        eID = MiscStatManager::MS_EQUIPMENT_DAMAGE_REPAIRED;
     }
     NiRenderer::GetRenderer()->GetBackgroundColor(SaveBackgroundColor);
     SetFlag(LoadingMenu::LM_INITLOAD_COMPLETE, !LoadingMenu::bInitialLoad);
@@ -187,9 +187,9 @@ LoadingMenu::LoadingMenu()
 
 LoadingMenu::~LoadingMenu() {
     LoadingMenu::SuspendBackgroundThread();
-    for (int32_t i = 0; i < 4; ++i) {
-        if (spHoldTexture[i].m_pObject) {
-            BSTexturePalette::RemoveTexture(spHoldTexture[i].m_pObject);
+    for (const NiPointer<NiTexture>& spTexture : spHoldTexture) {
+        if (spTexture.m_pObject) {
+            BSTexturePalette::RemoveTexture(spTexture.m_pObject);
         }
     }
     Interface::bIsLoadingNewGame = false;

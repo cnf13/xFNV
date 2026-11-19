@@ -599,8 +599,8 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
         else if (eType == CSpeedTreeRT::CO_BOX) {
             alignas(16) uint8_t aTransformInfoStorage[sizeof(hkTransformShapeCinfo)];
             hkTransformShapeCinfo* pTransformInfo = ::new (aTransformInfoStorage) hkTransformShapeCinfo;
-            for (int32_t i = 0; i < 3; ++i) {
-                afDimensions[i] = afDimensions[i] * 0.5;
+            for (float& fDimension : afDimensions) {
+                fDimension = fDimension * 0.5;
             }
             float fCenterZ = afPosition[2] + afDimensions[2];
             alignas(16) hkVector4 kTranslation(afPosition[0], afPosition[1], fCenterZ, 0.0f);

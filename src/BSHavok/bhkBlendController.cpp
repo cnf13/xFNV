@@ -88,8 +88,8 @@ void bhkBlendController::DoKnockDown(
                     akKeys[1].fVelGain = 0.0f;
                     akKeys[1].fTime = fBlend;
                     pcon->pBlendKeyA.SetSize(2);
-                    for (int32_t i = 0; i < 2; ++i) {
-                        pcon->AddKey(akKeys[i]);
+                    for (const BLENDKEY& rKey : akKeys) {
+                        pcon->AddKey(rKey);
                     }
                     uint16_t usFlags = pcon->m_usFlags;
                     pcon->m_fLoKeyTime = afTime;
@@ -321,8 +321,8 @@ void bhkBlendController::DoGetUpRecursive(NiAVObject* apObject, float afTime) {
                 akKeys[1].fVelGain = fVelGain;
                 akKeys[1].fTime = fGetUpTime;
                 pkController->pBlendKeyA.SetSize(2);
-                for (int32_t i = 0; i < 2; ++i) {
-                    pkController->AddKey(akKeys[i]);
+                for (const BLENDKEY& rKey : akKeys) {
+                    pkController->AddKey(rKey);
                 }
                 uint16_t usFlags = pkController->m_usFlags;
                 pkController->m_fLoKeyTime = afTime;

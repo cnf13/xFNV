@@ -114,8 +114,8 @@ void MessageHandler::SetWarningQueueing(bool abQueueToggle) {
 }
 
 void MessageHandler::EnableWarningMessageBoxes() {
-    for (int32_t i = 0; i < 24; ++i) {
-        BSCoreMessage::bWarningsDisabled[i] = false;
+    for (bool& rbDisabled : BSCoreMessage::bWarningsDisabled) {
+        rbDisabled = false;
     }
     bDisableWarningMessageBox = false;
 }
@@ -160,8 +160,8 @@ void MessageHandler::Init(
     bSkipProgramFlows = abSkipProgramFlows;
     bSkipInitializationFlows = abSkipInitializationFlows;
     pMessageBoxCallback = apMessageBoxCallback;
-    for (int32_t i = 0; i < 24; ++i) {
-        BSCoreMessage::bWarningsDisabled[i] = false;
+    for (bool& rbDisabled : BSCoreMessage::bWarningsDisabled) {
+        rbDisabled = false;
     }
     BSCoreMessage::pHandler = pHandler;
 }

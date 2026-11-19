@@ -91,14 +91,14 @@ void BSCubeMapCamera::Click(int32_t aiFace) {
         this->spRenderedCubeMap = nullptr;
     }
     // Releases the six pointers: decrement the count, then delete through the object's virtual DeleteThis.
-    for (int32_t i = 0; i < 6; ++i) {
-        NiRefObject* pObject = this->spRenderedTexture[i];
+    for (NiRefObject*& rpTexture : this->spRenderedTexture) {
+        NiRefObject* pObject = rpTexture;
         if (pObject) {
             // The count is the raw 32-bit value the InterlockedDecrement import takes.
             if (!InterlockedDecrementInt32(reinterpret_cast<int32_t*>(&pObject->m_uiRefCount))) {
                 pObject->DeleteThis();
             }
-            this->spRenderedTexture[i] = nullptr;
+            rpTexture = nullptr;
         }
     }
 }

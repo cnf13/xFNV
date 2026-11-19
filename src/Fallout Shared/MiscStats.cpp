@@ -143,9 +143,9 @@ void MiscStatManager::Destruct([[maybe_unused]] MiscStatManager* apThis) {
 }
 
 void MiscStatManager::ReleaseMemory() {
-    for (int32_t i = 0; i < 43; ++i) {
-        if (MiscStatManager::StatList[i]) {
-            MiscStat* v0 = MiscStatManager::StatList[i];
+    for (MiscStat*& pStat : MiscStatManager::StatList) {
+        if (pStat) {
+            MiscStat* v0 = pStat;
             if (v0) {
                 delete v0;
             }

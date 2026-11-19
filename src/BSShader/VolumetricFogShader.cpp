@@ -99,8 +99,8 @@ void VolumetricFogShader::ReloadShaders() {
 }
 
 void VolumetricFogShader::ClearPassStages() {
-    for (uint32_t i = 0; i < 3; ++i) {
-        ClearPass(spPass[i].m_pObject);
+    for (const NiPointer<NiD3DPass>& spStagePass : spPass) {
+        ClearPass(spStagePass.m_pObject);
     }
 }
 

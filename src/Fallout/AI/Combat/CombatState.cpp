@@ -3210,8 +3210,8 @@ void CombatState::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     uint8_t csavedData;
     apSaveGameBuffer->SaveDataEndian(this, 1u, 0);
     apSaveGameBuffer->SaveDataEndian(&iLocationUnreachable, 4u, 0);
-    for (uint32_t i = 0; i < 6; ++i) {
-        apSaveGameBuffer->SaveFormID(pCombatWeapons[i], 0);
+    for (TESObjectWEAP* pWeapon : pCombatWeapons) {
+        apSaveGameBuffer->SaveFormID(pWeapon, 0);
     }
     // The address &EmbeddedWeaponsArray is never null, so it is not tested.
     isaveGameCount = EmbeddedWeaponsArray.iSize;
@@ -3221,8 +3221,8 @@ void CombatState::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     }
     apSaveGameBuffer->SaveFormID(pCurrentEmbeddedWeapon, 0);
     apSaveGameBuffer->SaveDataEndian(&iHasCombatWeapon, 4u, 0);
-    for (uint32_t j = 0; j < 7; ++j) {
-        apSaveGameBuffer->SaveDataEndian(&fCombatWeaponsDPS[j], 4u, 0);
+    for (float& fWeaponDPS : fCombatWeaponsDPS) {
+        apSaveGameBuffer->SaveDataEndian(&fWeaponDPS, 4u, 0);
     }
     apSaveGameBuffer->SaveDataEndian(&fMaxCombatWeaponDPS, 4u, 0);
     apSaveGameBuffer->SaveDataEndian(&fMaxRangedWeaponDPS, 4u, 0);
@@ -3318,10 +3318,10 @@ void CombatState::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         }
     }
     apSaveGameBuffer->SaveDataEndian(&ccombatItems, 1u, 0);
-    for (uint32_t i_5 = 0; i_5 < 5; ++i_5) {
-        if (pCombatItems[i_5]) {
-            apSaveGameBuffer->SaveFormID(pCombatItems[i_5]->pRef, 0);
-            apSaveGameBuffer->SaveFormID(pCombatItems[i_5]->pObject, 0);
+    for (CombatState::TargetedObject*& pItem : pCombatItems) {
+        if (pItem) {
+            apSaveGameBuffer->SaveFormID(pItem->pRef, 0);
+            apSaveGameBuffer->SaveFormID(pItem->pObject, 0);
         }
     }
     for (uint32_t i_6 = 0; i_6 < 2; ++i_6) {
@@ -3353,10 +3353,10 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (iLocationUnreachable == -1) {
         iLocationUnreachable = 0;
     }
-    for (uint32_t i = 0; i < 6; ++i) {
+    for (TESObjectWEAP*& pWeapon : pCombatWeapons) {
         uint32_t FormID_0 = apLoadGameBuffer->LoadFormID();
         TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
-        pCombatWeapons[i] = dynamic_cast<TESObjectWEAP*>(FormByNumericID);
+        pWeapon = dynamic_cast<TESObjectWEAP*>(FormByNumericID);
     }
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     EmbeddedWeaponsArray.SetSize(isaveGameCount, true);
@@ -3370,8 +3370,8 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESForm* v7 = TESForm::GetFormByNumericID(v6);
     pCurrentEmbeddedWeapon = dynamic_cast<TESObjectWEAP*>(v7);
     apLoadGameBuffer->LoadData(&iHasCombatWeapon, 4u);
-    for (uint32_t i_3 = 0; i_3 < 7; ++i_3) {
-        apLoadGameBuffer->LoadData(&fCombatWeaponsDPS[i_3], 4u);
+    for (float& fWeaponDPS : fCombatWeaponsDPS) {
+        apLoadGameBuffer->LoadData(&fWeaponDPS, 4u);
     }
     apLoadGameBuffer->LoadData(&fMaxCombatWeaponDPS, 4u);
     apLoadGameBuffer->LoadData(&fMaxRangedWeaponDPS, 4u);
@@ -3539,21 +3539,20 @@ void CombatState::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (pLocationTarget) {
         pLocationTarget->InitLoadGame(apLoadGameBuffer);
     }
-    for (uint32_t i = 0; i < 5; ++i) {
-        if (pCombatItems[i]) {
+    for (CombatState::TargetedObject*& pItem : pCombatItems) {
+        if (pItem) {
             TESForm* v5;
-            if (pCombatItems[i]->pRef) {
-                TESForm* FormByNumericID = TESForm::GetFormByNumericID(
-                    static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pCombatItems[i]->pRef))
-                );
+            if (pItem->pRef) {
+                TESForm* FormByNumericID =
+                    TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pItem->pRef)));
                 v5 = dynamic_cast<TESObjectREFR*>(FormByNumericID);
             }
             else {
                 v5 = nullptr;
             }
-            pCombatItems[i]->pRef = v5;
-            if (pCombatItems[i]->pRef) {
-                static_cast<TESObjectREFR*>(pCombatItems[i]->pRef)->TESObjectREFR::SetTargeted(true);
+            pItem->pRef = v5;
+            if (pItem->pRef) {
+                static_cast<TESObjectREFR*>(pItem->pRef)->TESObjectREFR::SetTargeted(true);
             }
         }
     }
@@ -3571,8 +3570,8 @@ void CombatState::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (iQueuedPathCheck != -1) {
         QueuePathCheck(iQueuedPathCheck);
     }
-    for (uint32_t i_2 = 0; i_2 < 7; ++i_2) {
-        fMaxModifiedCombatWeaponDPS = BSMAX(fMaxModifiedCombatWeaponDPS, fCombatWeaponsDPS[i_2]);
+    for (float fWeaponDPS : fCombatWeaponsDPS) {
+        fMaxModifiedCombatWeaponDPS = BSMAX(fMaxModifiedCombatWeaponDPS, fWeaponDPS);
     }
 }
 

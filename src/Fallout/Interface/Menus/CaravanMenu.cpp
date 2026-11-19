@@ -99,8 +99,8 @@ CaravanMenu::~CaravanMenu() {
     }
     pTableGeometry = nullptr;
     pCameraAnimManager = nullptr;
-    for (int32_t i = 0; i < 4; ++i) {
-        pCameraAnimations[i] = nullptr;
+    for (NiControllerSequence*& pAnimation : pCameraAnimations) {
+        pAnimation = nullptr;
     }
     CaravanMenu::spModel = nullptr;
     CaravanMenu::pMe = nullptr;
@@ -149,14 +149,14 @@ CaravanMenu::~CaravanMenu() {
             pInactiveDeckAnimations[i] = nullptr;
             pActiveDeckAnimations[i] = nullptr;
         }
-        for (int32_t i = 0; i < 96; ++i) {
-            deckFaceShaders[i] = nullptr;
+        for (BSShaderPPLightingProperty*& pShader : deckFaceShaders) {
+            pShader = nullptr;
         }
     }
     else if (eActiveMenu == CaravanMenu::CA_GAME_MENU || eActiveMenu == CaravanMenu::CA_RESULTS_MENU) {
         char acFile[264];
-        for (int32_t i = 0; i < 2; ++i) {
-            pHandAnimManager[i] = nullptr;
+        for (NiControllerManager*& pManager : pHandAnimManager) {
+            pManager = nullptr;
         }
         for (int32_t i = 0; i < 6; ++i) {
             for (int32_t j = 0; j < 7; ++j) {
@@ -199,8 +199,8 @@ CaravanMenu::~CaravanMenu() {
         pModelLoader->ReleaseFile(acFile);
         pHandGeometry[0] = nullptr;
         pHandGeometry[1] = nullptr;
-        for (int32_t i = 0; i < 6; ++i) {
-            pTrackGrids[i] = nullptr;
+        for (NiAVObject*& pGrid : pTrackGrids) {
+            pGrid = nullptr;
         }
         for (int32_t i = 0; i < 3; ++i) {
             for (int32_t j = 0; j < 7; ++j) {
@@ -2911,8 +2911,8 @@ void CaravanMenu::LoadNifs() {
         pInactiveDeckAnimManager->DeactivateAll(0.0f);
         NiTimeController::StartAnimations(pInactiveDeckGeometry);
     }
-    for (int32_t i = 0; i < 96; ++i) {
-        deckFaceShaders[i] = nullptr;
+    for (BSShaderPPLightingProperty*& pShader : deckFaceShaders) {
+        pShader = nullptr;
     }
     for (int32_t j = 0; j < 24; ++j) {
         if (j >= 9) {

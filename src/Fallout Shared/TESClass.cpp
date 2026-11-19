@@ -22,16 +22,16 @@
 // The service flags first, then the tag skills; the class flags are left alone.
 void CLASS_DATA::Endian() {
     ENDIAN(iServiceFlags, false);
-    for (int32_t i = 0; i < 4; ++i) {
-        ENDIAN(eTagSkills[i], false);
+    for (int32_t& eTagSkill : eTagSkills) {
+        ENDIAN(eTagSkill, false);
     }
 }
 
 // The service flags first, then the three tag skills; the class flags are deliberately left alone, as the game does.
 void OLD_CLASS_DATA::Endian() {
     ENDIAN(iServiceFlags, false);
-    for (int32_t i = 0; i < 3; ++i) {
-        ENDIAN(eTagSkills[i], false);
+    for (int32_t& eTagSkill : eTagSkills) {
+        ENDIAN(eTagSkill, false);
     }
 }
 
@@ -153,8 +153,8 @@ void TESClass::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     TESForm::SaveGame(apSaveGameBuffer);
     BGSChangeFlags* v2 = &(result = apSaveGameBuffer->GetChangeFlags());
     if (v2->CheckFlags(2)) {
-        for (uint32_t i = 0; i < 4; ++i) {
-            apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&data.eTagSkills[i]), 4u, 0);
+        for (int32_t& eTagSkill : data.eTagSkills) {
+            apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&eTagSkill), 4u, 0);
         }
     }
 }
@@ -164,8 +164,8 @@ void TESClass::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     TESForm::LoadGame(apLoadGameBuffer);
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(2)) {
         // The index is compared unsigned.
-        for (uint32_t i = 0; i < 4; ++i) {
-            apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&data.eTagSkills[i]), 4);
+        for (int32_t& eTagSkill : data.eTagSkills) {
+            apLoadGameBuffer->LoadData(reinterpret_cast<char*>(&eTagSkill), 4);
         }
     }
 }

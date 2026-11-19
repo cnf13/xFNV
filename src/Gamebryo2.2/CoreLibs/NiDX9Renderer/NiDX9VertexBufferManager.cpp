@@ -596,8 +596,7 @@ void NiDX9VertexBufferManager::DestroyDefaultBuffers() {
         NiDX9VBInfo* pkInfo;
         m_kDefaultResources.GetNext(pkPos, uiVBID, pkInfo);
         if (pkInfo) {
-            for (uint32_t i = 0; i < 5; ++i) {
-                NiDX9VBResource* pkRes = pkInfo->m_pkVBRes[i];
+            for (NiDX9VBResource* pkRes : pkInfo->m_pkVBRes) {
                 if (pkRes) {
                     if (pkRes->m_pkVB) {
                         pkRes->m_pkVB->Release();

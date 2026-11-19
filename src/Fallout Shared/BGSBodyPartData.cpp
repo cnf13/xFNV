@@ -115,8 +115,7 @@ bool BGSBodyPartData::Load(TESFile* apFile) {
 
 void BGSBodyPartData::InitItem() {
     if (!GetInitialized()) {
-        for (int32_t i = 0; i < 15; ++i) {
-            BGSBodyPart* ppart = pPartArray[i];
+        for (BGSBodyPart* ppart : pPartArray) {
             if (ppart) {
                 ppart->InitItem(this);
             }
@@ -265,10 +264,9 @@ void BGSBodyPartData::AddBodyPart(BGSBodyPart* apPart) {
 
 BGSBodyPart* BGSBodyPartData::GetBodyPart_005E5130(ActorValue::Index aeIndex) {
     BGSBodyPart* v6 = nullptr;
-    for (int32_t i = 0; i < 15; ++i) {
-        BGSBodyPart* v4 = pPartArray[i];
-        if (v4 && v4->GetActorValue() == aeIndex) {
-            return v4;
+    for (BGSBodyPart* pPart : pPartArray) {
+        if (pPart && pPart->GetActorValue() == aeIndex) {
+            return pPart;
         }
     }
     return v6;

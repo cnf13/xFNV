@@ -452,14 +452,14 @@ void StartMenu::DoClick(int32_t aiID, Tile* apTarget) {
             pOptionLBs[1] = (ListBox<StartMenu::Option*>*)&lbSettings;
             pOptionLBs[2] = (ListBox<StartMenu::Option*>*)&lbConfirm;
             pOptionLBs[3] = (ListBox<StartMenu::Option*>*)&lbOptions;
-            for (uint32_t i = 0; i < 4; ++i) {
-                StartMenu::Option* popt = pOptionLBs[i]->GetDataFor(apTarget);
+            for (ListBox<StartMenu::Option*>*& pListBox : pOptionLBs) {
+                StartMenu::Option* popt = pListBox->GetDataFor(apTarget);
                 if (popt && popt->pfChooseFn) {
                     if (popt->pfChooseFn != &StartMenu::ChooseActionMap) {
-                        pOptionLBs[i]->Select(apTarget);
+                        pListBox->Select(apTarget);
                     }
-                    if (pOptionLBs[i] != &lbConfirm && popt->pfChooseFn != &StartMenu::ChooseBack) {
-                        pOptionLBs[i]->SetEnabled(false);
+                    if (pListBox != &lbConfirm && popt->pfChooseFn != &StartMenu::ChooseBack) {
+                        pListBox->SetEnabled(false);
                     }
                     popt->pfChooseFn();
                     g_startMenuLastControllerInputTime = BSGetTickCount();

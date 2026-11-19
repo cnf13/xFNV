@@ -391,9 +391,9 @@ static void printSingleNodeValues(hkOstream& a1, float a2, const hkMonitorStream
         hkString::snprintf(a1a, 200, "%s (%i) %4.1f%%", a3->m_name, v5, a3->m_value[1] * 100.0 / a2);
     }
     a1.printf("%-34s%s", a1a, "\t\t\t");
-    for (int32_t i = 0; i < 8; ++i) {
+    for (float fValue : a3->m_value) {
         if (*m_count) {
-            a1.printf("% 12.3f: ", a3->m_value[i]);
+            a1.printf("% 12.3f: ", fValue);
         }
         ++m_count;
     }

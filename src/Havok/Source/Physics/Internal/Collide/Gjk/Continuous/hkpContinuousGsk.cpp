@@ -736,8 +736,8 @@ void hk4dGskCollideCalcToi(
         properties.m_maxImpulse.m_value = 0;
         properties.m_flags = 0;
         properties.m_internalDataA = 321.0f;
-        for (int32_t i = 0; i < 7; ++i) {
-            properties.m_extendedUserDatas[i] = 0;
+        for (uint32_t& extendedUserData : properties.m_extendedUserDatas) {
+            extendedUserData = 0;
         }
         alignas(16) hkGskCache16 cache;
         gsk.exitAndExportCacheImpl(cache);
@@ -1133,8 +1133,8 @@ void findToi(
     properties.m_maxImpulse.m_value = 0;
     properties.m_flags = 0;
     properties.m_internalDataA = 321.0f;
-    for (int32_t i = 0; i < 7; ++i) {
-        properties.m_extendedUserDatas[i] = 0;
+    for (uint32_t& extendedUserData : properties.m_extendedUserDatas) {
+        extendedUserData = 0;
     }
     alignas(16) hkGskCache16 cache;
     gsk->exitAndExportCacheImpl(cache);

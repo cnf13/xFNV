@@ -14,8 +14,8 @@ BSWin32TaskletManager::BSWin32TaskletManager(uint32_t auiNumThreads)
   : hInitThreadHandle(nullptr), uiNumThreads(auiNumThreads <= 6 ? auiNumThreads : 6), uiNumThreadsCreated(0),
     bTerminated(false), kStartSemaphore(0, 0x7FFFFFFF) {
     InitializeCriticalSection(&kQueueLock);
-    for (uint32_t i = 0; i < 64; ++i) {
-        pQueueHead[i] = nullptr;
+    for (BSWin32TaskletData*& pHead : pQueueHead) {
+        pHead = nullptr;
     }
     for (uint32_t i = 0; i < 6; ++i) {
         hThreadHandles[i] = nullptr;
@@ -61,8 +61,8 @@ void BSWin32TaskletManager::ShutdownAllTasks() {
 
 // Whether the thread is one of the six workers.
 bool BSWin32TaskletManager::IsTaskletThread(uint32_t auiThreadID) {
-    for (uint32_t i = 0; i < 6; ++i) {
-        if (uiThreadIDs[i] == auiThreadID) {
+    for (uint32_t uiThreadID : uiThreadIDs) {
+        if (uiThreadID == auiThreadID) {
             return true;
         }
     }

@@ -110,8 +110,7 @@ void hkpToiCountViewer::init() {
 // with one of each and the viewer listens for its removal.
 void hkpToiCountViewer::contactPointCallback(const hkpContactPointEvent& event) {
     if (event.m_type <= hkpContactPointEvent::TYPE_TOI) {
-        for (int32_t i = 0; i < 2; ++i) {
-            hkpRigidBody* body = event.m_bodies[i];
+        for (hkpRigidBody* body : event.m_bodies) {
             int32_t it = m_toiCounts.findKey(body);
             if (m_toiCounts.isValid(it)) {
                 uintptr_t& value = m_toiCounts.m_map.m_elem[it].val;

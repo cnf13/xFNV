@@ -59,13 +59,13 @@ DebugLine::DebugLine() : fX(0.0f), fY(0.0f), iJustify(0), fDie(-1.0f) {}
 DebugLine::~DebugLine() {}
 
 DebugText::DebugText() : iFontHeight(0) {
-    for (int32_t a = 0; a < 200; ++a) {
-        pDebugTextList[a].fX = 0.0f;
-        pDebugTextList[a].fY = 0.0f;
-        pDebugTextList[a].iJustify = 0;
-        pDebugTextList[a].spNode = nullptr;
-        pDebugTextList[a].pText.Set(nullptr, 0);
-        pDebugTextList[a].fDie = -1.0f;
+    for (DebugLine& rLine : pDebugTextList) {
+        rLine.fX = 0.0f;
+        rLine.fY = 0.0f;
+        rLine.iJustify = 0;
+        rLine.spNode = nullptr;
+        rLine.pText.Set(nullptr, 0);
+        rLine.fDie = -1.0f;
     }
     for (int32_t i = 0; i < 3; ++i) {
         iHeight[i] = 0;
@@ -105,11 +105,11 @@ void DebugText::Reset() {
         fBaseLine = 0.0f;
     }
     iFontHeight = static_cast<int32_t>(fBaseLine + 3.0);
-    for (int32_t i = 0; i < 3; ++i) {
+    for (int32_t& riHeight : iHeight) {
         Setting::Info* v4;
         // The setting's address is never null.
         v4 = &iDebugTextTopBottomOffset.uValue;
-        iHeight[i] = v4->uint + iFontHeight * (GetIsFullHelp() ? 4 : 1);
+        riHeight = v4->uint + iFontHeight * (GetIsFullHelp() ? 4 : 1);
     }
     // The setting's address is never null.
     v3 = &iDebugTextLeftRightOffset.uValue;
@@ -737,19 +737,19 @@ void DebugText::Idle() {
     DebugText::DebugTextData* pitem;
     if (!Interface::IsInMenuMode()) {
         DebugText* pme = DebugText::Instance(true);
-        for (int32_t a = 0; a < 200; ++a) {
-            if (pme->pDebugTextList[a].fDie > 0.0) {
-                pme->pDebugTextList[a].fDie = pme->pDebugTextList[a].fDie - appTimer.fDelta;
-                if ((pme->pDebugTextList[a].fDie <= 0.0) && (pme->pDebugTextList[a].spNode.m_pObject)) {
+        for (DebugLine& rLine : pme->pDebugTextList) {
+            if (rLine.fDie > 0.0) {
+                rLine.fDie = rLine.fDie - appTimer.fDelta;
+                if ((rLine.fDie <= 0.0) && (rLine.spNode.m_pObject)) {
                     DebugText::Lock();
                     NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
-                    DebugTextRoot->DetachChild(pme->pDebugTextList[a].spNode.m_pObject);
-                    pme->pDebugTextList[a].spNode = static_cast<NiNode*>(nullptr);
-                    pme->pDebugTextList[a].iJustify = 0;
-                    pme->pDebugTextList[a].fX = 0.0f;
-                    pme->pDebugTextList[a].fY = 0.0f;
-                    pme->pDebugTextList[a].pText.Set(nullptr, 0);
-                    pme->pDebugTextList[a].fDie = -1.0f;
+                    DebugTextRoot->DetachChild(rLine.spNode.m_pObject);
+                    rLine.spNode = static_cast<NiNode*>(nullptr);
+                    rLine.iJustify = 0;
+                    rLine.fX = 0.0f;
+                    rLine.fY = 0.0f;
+                    rLine.pText.Set(nullptr, 0);
+                    rLine.fDie = -1.0f;
                     DebugText::Unlock();
                 }
             }

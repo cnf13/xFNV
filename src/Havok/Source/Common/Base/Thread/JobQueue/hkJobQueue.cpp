@@ -367,8 +367,8 @@ hkJobQueue::hkJobQueue(const hkJobQueueCinfo& acinfo)
     pData->m_outOfMemory = false;
     pData->m_waitPolicy = WAIT_UNTIL_ALL_WORK_COMPLETE;
     m_hwSetup = acinfo.m_jobQueueHwSetup;
-    for (int32_t i = 0; i < MAX_NUM_QUEUES; ++i) {
-        pData->m_jobQueue[i].setCapacity(JOB_QUEUE_ENTRY_SIZE);
+    for (Queue& rQueue : pData->m_jobQueue) {
+        rQueue.setCapacity(JOB_QUEUE_ENTRY_SIZE);
     }
     pData->m_masterThreadFinishingFlags = 0;
     for (int32_t i = 0; i < m_numJobTypes; ++i) {

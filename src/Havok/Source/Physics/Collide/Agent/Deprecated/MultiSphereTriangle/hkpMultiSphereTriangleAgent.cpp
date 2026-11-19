@@ -31,8 +31,8 @@ hkpMultiSphereTriangleAgent::hkpMultiSphereTriangleAgent(
     hkpContactMgr* mgr
 )
   : hkpIterativeLinearCastAgent(mgr) {
-    for (int32_t i = 0; i < 8; i++) {
-        m_contactPointId[i] = 0xFFFF;
+    for (uint16_t& id : m_contactPointId) {
+        id = 0xFFFF;
     }
     const hkpTriangleShape* triB = static_cast<const hkpTriangleShape*>(bodyB.m_shape);
     hkpCollideTriangleUtil::setupClosestPointTriangleCache(&triB->m_vertexA, m_closestPointTriangleCache);

@@ -83,12 +83,12 @@ void CBillboardLeaf::SetColor(const CVec3& cColor, bool bApplyDimming) {
         float cScaledColor = static_cast<double>(m_ucColorScale) / 255.0;
         cScaledColor_2 *= cScaledColor;
     }
-    for (int32_t i = 0; i < 3; ++i) {
-        if (cScaledColor_2.m_afData[i] > 1.0) {
-            cScaledColor_2.m_afData[i] = 1.0f;
+    for (float& fComponent : cScaledColor_2.m_afData) {
+        if (fComponent > 1.0) {
+            fComponent = 1.0f;
         }
-        if (cScaledColor_2.m_afData[i] < 0.0) {
-            cScaledColor_2.m_afData[i] = 0.0f;
+        if (fComponent < 0.0) {
+            fComponent = 0.0f;
         }
     }
     m_lColor = (static_cast<int32_t>(cScaledColor_2.m_afData[1] * 255.0) << 8) +

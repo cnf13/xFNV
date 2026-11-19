@@ -809,11 +809,11 @@ void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
     pActor->GetCurrentAIProcess()->UpdateReparentWeapon(pActor);
     pActor->GetCurrentAIProcess()->ClearPostAnimationActions();
     pActor->GetCurrentAIProcess()->SetAnimAction(ANIM_ACTION_NONE, nullptr);
-    for (uint32_t i = 0; i < ANIM_GROUP_SECTION_COUNT; ++i) {
-        if (pCurrentSequence[i]) {
-            float fOffset = pCurrentSequence[i]->GetOffset();
-            float fNewOffset = pCurrentSequence[i]->GetEndKeyTime() + fOffset;
-            pCurrentSequence[i]->SetOffset(fNewOffset);
+    for (BSAnimGroupSequence*& pSequence : pCurrentSequence) {
+        if (pSequence) {
+            float fOffset = pSequence->GetOffset();
+            float fNewOffset = pSequence->GetEndKeyTime() + fOffset;
+            pSequence->SetOffset(fNewOffset);
         }
     }
     UpdateBipOnly(time, &AccumRootTranslate, true);
@@ -1375,9 +1375,9 @@ void Animation::ReloadTargets(bool abReload) {
                 }
             }
         }
-        for (int32_t n_3 = 0; n_3 < 8; ++n_3) {
-            if (pCurrentSequence[n_3]) {
-                spManager.m_pObject->ActivateSequence(pCurrentSequence[n_3], 0, false, 1.0f, 0.0f, nullptr);
+        for (BSAnimGroupSequence* pSequence : pCurrentSequence) {
+            if (pSequence) {
+                spManager.m_pObject->ActivateSequence(pSequence, 0, false, 1.0f, 0.0f, nullptr);
             }
         }
     }
@@ -2149,30 +2149,28 @@ LABEL_27:;
         pactor = static_cast<Actor*>(ownerObject);
     }
 
-    for (int32_t i = 0; i < 2; ++i) {
-        if (spAnimIdleFreeWhenInactiveA[i].m_pObject) {
-            if (spAnimIdleFreeWhenInactiveA[i].m_pObject->GetSequence()) {
-                if (spAnimIdleFreeWhenInactiveA[i].m_pObject->GetSequence()->GetState() ==
-                    NiControllerSequence::kAnimating) {
-                    TESIdleForm* IdleForm = spAnimIdleFreeWhenInactiveA[i].m_pObject->pIdleForm;
-                    const char* afTime =
-                        (&spAnimIdleFreeWhenInactiveA[i].m_pObject->GetSequence()->m_kName)->GetHandleString();
+    for (NiPointer<AnimIdle>& spAnimIdle : spAnimIdleFreeWhenInactiveA) {
+        if (spAnimIdle.m_pObject) {
+            if (spAnimIdle.m_pObject->GetSequence()) {
+                if (spAnimIdle.m_pObject->GetSequence()->GetState() == NiControllerSequence::kAnimating) {
+                    TESIdleForm* IdleForm = spAnimIdle.m_pObject->pIdleForm;
+                    const char* afTime = (&spAnimIdle.m_pObject->GetSequence()->m_kName)->GetHandleString();
                     const char* arg8 = IdleForm->GetFormEditorID();
                     Warning(
                         "'%s' is trying to free a special idle '%s' sequence '%s' that is animating.",
                         pActorRef->GetFormEditorID(), arg8, afTime
                     );
-                    spAnimIdleFreeWhenInactiveA[i] = static_cast<AnimIdle*>(nullptr);
+                    spAnimIdle = static_cast<AnimIdle*>(nullptr);
                 }
                 else {
-                    if (!spAnimIdleFreeWhenInactiveA[i].m_pObject->GetSequence()->GetState()) {
-                        AnimIdleFree(spAnimIdleFreeWhenInactiveA[i]);
+                    if (!spAnimIdle.m_pObject->GetSequence()->GetState()) {
+                        AnimIdleFree(spAnimIdle);
                     }
                 }
             }
             else {
-                if (spAnimIdleFreeWhenInactiveA[i].m_pObject->eFlags) {
-                    AnimIdleFree(spAnimIdleFreeWhenInactiveA[i]);
+                if (spAnimIdle.m_pObject->eFlags) {
+                    AnimIdleFree(spAnimIdle);
                 }
             }
         }
@@ -3903,10 +3901,10 @@ uint16_t Animation::GetAnimationSaveSize(TESObjectREFR* apRef) {
 void Animation::ShutdownAllAnimIdles() {
     bShutDown = true;
     SpecialIdleFree(true, true);
-    for (uint32_t i = 0; i < 2; ++i) {
-        if (spAnimIdleFreeWhenInactiveA[i]) {
-            AnimIdleFree(spAnimIdleFreeWhenInactiveA[i]);
-            spAnimIdleFreeWhenInactiveA[i] = static_cast<AnimIdle*>(nullptr);
+    for (NiPointer<AnimIdle>& spAnimIdle : spAnimIdleFreeWhenInactiveA) {
+        if (spAnimIdle) {
+            AnimIdleFree(spAnimIdle);
+            spAnimIdle = static_cast<AnimIdle*>(nullptr);
         }
     }
 }

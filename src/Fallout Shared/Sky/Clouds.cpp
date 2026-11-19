@@ -224,8 +224,8 @@ NiGeometry* Clouds::GetCloudsGeo(int32_t aiLayer) {
 }
 
 void Clouds::ZeroGeo() {
-    for (int32_t i = 0; i < MAX_LAYERS; ++i) {
-        spClouds[i] = nullptr;
+    for (NiPointer<NiGeometry>& spCloud : spClouds) {
+        spCloud = nullptr;
     }
 }
 

@@ -1075,8 +1075,8 @@ void MapMenu::SetPageNumber(int32_t aiTab) {
 }
 
 bool MapMenu::AreAllTilesNonNull() {
-    for (int32_t i = 0; i < 21; ++i) {
-        if (!this->pTiles[i]) {
+    for (Tile* pTile : this->pTiles) {
+        if (!pTile) {
             return false;
         }
     }

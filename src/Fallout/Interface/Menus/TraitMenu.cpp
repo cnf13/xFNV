@@ -201,8 +201,8 @@ bool TraitMenu::DoGamepadUpEvent(int32_t a1, float a2) {
 }
 
 bool TraitMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 9; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

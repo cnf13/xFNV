@@ -359,8 +359,7 @@ bhkRagdollController::bhkRagdollController(NiAVObject* apObject, NiAVObject* apP
     iEditorForcePoseIdx(-1), bInitRagdollFeedback(false), bEnableRagdollFeedback(false), bActiveRagdollFeedback(false),
     bEaseOutFeedback(false), fCurrFeedbackInterp(1.0f), uiFeedbackTimeoutCount(0), spRagdollSharedData(nullptr) {
     // PoseMatchTimer and FeedbackTimer clear themselves (BSPrecisionTimer's constructor).
-    for (int32_t i = 0; i < NUM_LOOKIK_BONES; ++i) {
-        LookIKBoneParams& rBone = BoneParamA[i];
+    for (LookIKBoneParams& rBone : BoneParamA) {
         rBone.fLookAtMaxAngle = 1.0471976f;
         rBone.ssBoneIdx = -1;
         rBone.ssParentIdx = -1;
@@ -2231,11 +2230,11 @@ bool bhkRagdollController::InitGrabIK() {
             }
         }
     }
-    for (int32_t i = 0; i < 2; ++i) {
-        GrabIKState[i].fIntrpGain = 0.0f;
-        GrabIKState[i].pTarget = nullptr;
-        GrabIKState[i].fReachWeight = 0.0f;
-        GrabIKState[i].bEnabled = false;
+    for (GrabIKInfo& rState : GrabIKState) {
+        rState.fIntrpGain = 0.0f;
+        rState.pTarget = nullptr;
+        rState.fReachWeight = 0.0f;
+        rState.bEnabled = false;
     }
     return bret;
 }

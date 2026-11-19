@@ -11502,8 +11502,8 @@ bool ExtraRoomRefData::Compare(BSExtraData* apCompare) {
 }
 
 void OcclusionPlaneLinkedRefData::Endian() {
-    for (int32_t i = 0; i < 4; ++i) {
-        ENDIAN<TESObjectREFR*>(pLinkedRefs[i], false);
+    for (TESObjectREFR*& pLinkedRef : pLinkedRefs) {
+        ENDIAN<TESObjectREFR*>(pLinkedRef, false);
     }
 }
 

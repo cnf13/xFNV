@@ -434,8 +434,8 @@ void ProcessLists::SortActorsCloseToPlayer() {
 }
 
 void ProcessLists::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
-    for (uint32_t i = 0; i < 5; ++i) {
-        for (BSSimpleList<Crime*>* pIter = GlobalCrimeListArray[i]; pIter;) {
+    for (BSSimpleList<Crime*>* pCrimeList : GlobalCrimeListArray) {
+        for (BSSimpleList<Crime*>* pIter = pCrimeList; pIter;) {
             Crime* pCrime;
             pCrime = pIter->GetItem();
             if (pCrime) {
@@ -4173,13 +4173,12 @@ void ProcessLists::NullOutActorInCrimeList(TESObjectREFR* apRef) {
 
 int16_t ProcessLists::GetCrimesSaveSize() {
     int16_t v5 = 4;
-    for (int32_t i = 0; i < 5; ++i) {
-        BSSimpleList<Crime*>* ecx0 = GlobalCrimeListArray[i];
+    for (BSSimpleList<Crime*>* pNode : GlobalCrimeListArray) {
         v5 += 2;
-        while (ecx0 && !ecx0->IsEmpty()) {
-            Crime* v3 = ecx0->m_item;
+        while (pNode && !pNode->IsEmpty()) {
+            Crime* v3 = pNode->m_item;
             v5 += v3->GetSaveSize();
-            ecx0 = ecx0->m_pkNext;
+            pNode = pNode->m_pkNext;
         }
     }
     return v5;

@@ -87,8 +87,8 @@ static void cleanupLoadedObjecthkpGroupFilter(void* p) {
 
 hkpGroupFilter::hkpGroupFilter() : m_nextFreeSystemGroup(0) {
     m_type.m_storage = HK_FILTER_GROUP;
-    for (int32_t i = 0; i < 32; i++) {
-        m_collisionLookupTable[i] = 0xFFFFFFFFu;
+    for (uint32_t& entry : m_collisionLookupTable) {
+        entry = 0xFFFFFFFFu;
     }
 }
 

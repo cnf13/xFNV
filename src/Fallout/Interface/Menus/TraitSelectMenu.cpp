@@ -226,8 +226,8 @@ void TraitSelectMenu::ClearCheckBox() {
 }
 
 bool TraitSelectMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 18; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

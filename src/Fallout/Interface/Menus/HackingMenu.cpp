@@ -210,8 +210,8 @@ uint32_t HackingMenu::GridRow::GetMaxTally() {
             ++apDest[ucData[i]];
         }
     }
-    for (uint32_t j = 0; j < 32; ++j) {
-        v5 = Max(v5, apDest[j]);
+    for (uint8_t ucCount : apDest) {
+        v5 = Max(v5, ucCount);
     }
     return v5;
 }

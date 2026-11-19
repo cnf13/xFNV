@@ -187,8 +187,8 @@ Sky::Sky()
     fAccelBeginPct(0.0f), uiFlags(0), pCurrentWeatherImageSpaceMod(nullptr), pCurrentWeatherImageSpaceMod2(nullptr),
     pLastWeatherImageSpaceMod(nullptr), pLastWeatherImageSpaceMod2(nullptr), fHighNoon(12.0f), fMidnightWax(23.99f),
     fMidnightWane(0.0f) {
-    for (int32_t i = 0; i < 10; ++i) {
-        SkyColor[i] = NiColor_WHITE;
+    for (NiColor& kColor : SkyColor) {
+        kColor = NiColor_WHITE;
     }
     UpdateMoonPhase(true);
 }

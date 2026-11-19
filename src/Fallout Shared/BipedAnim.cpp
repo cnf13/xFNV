@@ -533,9 +533,9 @@ void BipedAnim::RemoveBipedWeapon() {
 
     if (bufferedObjects[5].pParent) {
         TESForm* pParent = bufferedObjects[5].pParent;
-        for (int32_t i = 0; i < 20; ++i) {
-            if (bufferedObjects[i].pParent == pParent) {
-                RemovePart(&bufferedObjects[i], true, 0);
+        for (BIPOBJECT& rObject : bufferedObjects) {
+            if (rObject.pParent == pParent) {
+                RemovePart(&rObject, true, 0);
             }
         }
     }
@@ -754,8 +754,8 @@ void BipedAnim::InitNaked(TESRace* apRace, TESActorBase::SEX aeSex) {
         return;
     }
     bool bBufferEmpty = true;
-    for (int32_t i = 0; i < BIPED_OBJECT_COUNT; ++i) {
-        if (this->bufferedObjects[i].pParent) {
+    for (BIPOBJECT& rObject : this->bufferedObjects) {
+        if (rObject.pParent) {
             bBufferEmpty = false;
         }
     }
@@ -773,11 +773,9 @@ void BipedAnim::InitNaked(TESRace* apRace, TESActorBase::SEX aeSex) {
         }
         ourMemset(this->object, 0, sizeof(this->object));
     }
-    for (int32_t i = 0; i < 3; ++i) {
-        if (objToBone[naked[i]] == BIPED_BONE_NONE || (this->bone[objToBone[naked[i]]].cFlags & 1)) {
-            this->SetBipedPart(
-                apRace, static_cast<TESModelTextureSwap*>(apRace->GetPartModel(aeSex, naked[i])), naked[i]
-            );
+    for (BIPED_OBJECT eSlot : naked) {
+        if (objToBone[eSlot] == BIPED_BONE_NONE || (this->bone[objToBone[eSlot]].cFlags & 1)) {
+            this->SetBipedPart(apRace, static_cast<TESModelTextureSwap*>(apRace->GetPartModel(aeSex, eSlot)), eSlot);
         }
     }
 }

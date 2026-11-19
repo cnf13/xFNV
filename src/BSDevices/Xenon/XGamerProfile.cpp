@@ -91,8 +91,8 @@ XGamerProfile::XGamerProfile()
     iCurrentPlayerLevel(1), iCurrentPlayerAlignment(1), iDifficultyDefault(-1), iControllerSensitivityDefault(-1),
     bUsesDifficultyDefault(true), bRumbleDefault(1), bInvertYDefault(false), bForcePresenceUpdate(1), bIsPlayingGame(0),
     m_DownloadedContent(), unk3B4(0), unk14278(0) {
-    for (int32_t igamePad = 0; igamePad < 4; ++igamePad) {
-        m_bSignedIn[igamePad] = false;
+    for (bool& rbSignedIn : m_bSignedIn) {
+        rbSignedIn = false;
     }
     std::memset(&m_EventData, 0, sizeof(m_EventData));
     std::memset(unk3B8, 0, sizeof(unk3B8));

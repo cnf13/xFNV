@@ -481,8 +481,8 @@ void ParallaxShader::ReloadShaders() {
 }
 
 void ParallaxShader::ClearPassStages() {
-    for (uint32_t i = 0; i < 33; ++i) {
-        ClearPass(spPass[i].m_pObject);
+    for (const NiPointer<NiD3DPass>& spEntry : spPass) {
+        ClearPass(spEntry.m_pObject);
     }
 }
 

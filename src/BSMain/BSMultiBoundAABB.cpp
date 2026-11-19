@@ -185,8 +185,8 @@ bool BSMultiBoundAABB::CompletelyWithinFrustum(const NiFrustumPlanes& aPlanes) {
     GetVertices(akVertices);
     for (int32_t i = 0; i < 6; ++i) {
         if ((aPlanes.m_uiActivePlanes & (1 << i)) != 0) {
-            for (int32_t j = 0; j < 8; ++j) {
-                if (aPlanes.m_akCullingPlanes[i].WhichSide(akVertices[j]) == NiPlane::NEGATIVE_SIDE) {
+            for (const NiPoint3& rVertex : akVertices) {
+                if (aPlanes.m_akCullingPlanes[i].WhichSide(rVertex) == NiPlane::NEGATIVE_SIDE) {
                     return false;
                 }
             }

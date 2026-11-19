@@ -8,10 +8,10 @@
 hkpCharacterStateManager::hkpCharacterStateManager() : m_registeredState{} {}
 
 hkpCharacterStateManager::~hkpCharacterStateManager() {
-    for (int32_t i = 0; i < HK_CHARACTER_MAX_STATE_ID; i++) {
-        if (m_registeredState[i]) {
-            m_registeredState[i]->removeReference();
-            m_registeredState[i] = nullptr;
+    for (hkpCharacterState*& pState : m_registeredState) {
+        if (pState) {
+            pState->removeReference();
+            pState = nullptr;
         }
     }
 }

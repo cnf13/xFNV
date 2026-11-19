@@ -24,8 +24,8 @@ void SKILL_DATA::Endian() {
     ENDIAN(eIndex, false);
     ENDIAN(eAttribute, false);
     ENDIAN(eSpecialization, false);
-    for (int32_t i = 0; i < 2; ++i) {
-        ENDIAN(fActionValue[i], false);
+    for (float& fValue : fActionValue) {
+        ENDIAN(fValue, false);
     }
 }
 
@@ -135,16 +135,14 @@ bool TESSkill::Compare(TESForm* apCompare) {
 }
 
 void TESSkill::ResetData() {
-    int32_t j;
-    int32_t i;
     kData.eIndex = static_cast<ActorValue::Index>(-1);
     kData.eSpecialization = SPECIALIZATION_COMBAT;
     kData.eAttribute = ActorValue::STRENGTH;
-    for (i = 0; i < 2; ++i) {
-        kData.fActionValue[i] = (float)1.0;
+    for (float& fValue : kData.fActionValue) {
+        fValue = (float)1.0;
     }
-    for (j = 0; j < 4; ++j) {
-        (&kDescriptions[j])->InitializeDataComponent();
+    for (TESDescription& kDescription : kDescriptions) {
+        (&kDescription)->InitializeDataComponent();
     }
     SetAltered(false);
     TESForm::ClearFiles();

@@ -34,11 +34,11 @@ BSDecalPlacementVectorExtraData::BSDecalPlacementVectorExtraData(const int32_t i
 // Eight slots, whatever usGroupCount says; each group's memory goes back to the engine's heap and the slot is
 // cleared either way. The skinned-object list's destructor frees its items.
 BSDecalPlacementVectorExtraData::~BSDecalPlacementVectorExtraData() {
-    for (int32_t i = 0; i < 8; ++i) {
-        if (pDecalPlacementGroups[i]) {
-            MemoryManager_Singleton.Deallocate(pDecalPlacementGroups[i]);
+    for (DECAL_PLACEMENT_VECTOR_GROUP_DATA*& rpGroup : pDecalPlacementGroups) {
+        if (rpGroup) {
+            MemoryManager_Singleton.Deallocate(rpGroup);
         }
-        pDecalPlacementGroups[i] = nullptr;
+        rpGroup = nullptr;
     }
 }
 

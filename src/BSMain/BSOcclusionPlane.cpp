@@ -507,8 +507,8 @@ bool BSOcclusionPlane::CompletelyWithinFrustum(const NiFrustumPlanes& aPlanes) {
     GetVertices(kVerts);
     for (int32_t j = 0; j < 6; ++j) {
         if (((&aPlanes)->GetActivePlaneState() & 1 << j) != 0) {
-            for (int32_t k = 0; k < 4; ++k) {
-                if (aPlanes.m_akCullingPlanes[j].WhichSide(kVerts[k]) == 2) {
+            for (const NiPoint3& rVert : kVerts) {
+                if (aPlanes.m_akCullingPlanes[j].WhichSide(rVert) == 2) {
                     return false;
                 }
             }

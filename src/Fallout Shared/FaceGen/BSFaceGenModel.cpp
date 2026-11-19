@@ -528,11 +528,11 @@ bool BSFaceGenModel::ApplyCoordinateToExistingMesh(
 
     // The vertices every mode has offsets for.
     uint32_t uiVerts = apMesh->GetVertexCount();
-    for (uint32_t isymm = 0; isymm < FANSYMM_SIZE; ++isymm) {
-        uint32_t uiModes = pMeshData->pEGMData->EGMBasis[isymm].size();
+    for (const auto& rBasis : pMeshData->pEGMData->EGMBasis) {
+        uint32_t uiModes = rBasis.size();
         for (uint32_t imode = 0; imode < uiModes; ++imode) {
-            if (pMeshData->pEGMData->EGMBasis[isymm][imode].vertPos.size() < uiVerts) {
-                uiVerts = pMeshData->pEGMData->EGMBasis[isymm][imode].vertPos.size();
+            if (rBasis[imode].vertPos.size() < uiVerts) {
+                uiVerts = rBasis[imode].vertPos.size();
             }
         }
     }
@@ -674,10 +674,10 @@ uint32_t BSFaceGenModel::GetEGMDataSize() {
     uint32_t size = 0;
     if ((pMeshData) && (pMeshData->pEGMData)) {
         size = 52;
-        for (uint32_t i = 0; i < 2; ++i) {
-            size += 24 * pMeshData->pEGMData->EGMBasis[i].size();
-            for (uint32_t a2 = 0; a2 < pMeshData->pEGMData->EGMBasis[i].size(); ++a2) {
-                FffModeGS* v1 = &pMeshData->pEGMData->EGMBasis[i][a2];
+        for (auto& rBasis : pMeshData->pEGMData->EGMBasis) {
+            size += 24 * rBasis.size();
+            for (uint32_t a2 = 0; a2 < rBasis.size(); ++a2) {
+                FffModeGS* v1 = &rBasis[a2];
                 size += 6 * v1->vertPos.size();
             }
         }
@@ -692,10 +692,10 @@ uint32_t BSFaceGenModel::GetEGTDataSize() {
     uint32_t size = 0;
     if ((pTextureData) && (pTextureData->pEGTData)) {
         size = sizeof(EGTData);
-        for (uint32_t i = 0; i < 2; ++i) {
-            size += static_cast<uint32_t>(sizeof(FffModeTexS) * pTextureData->pEGTData->EGTBasis[i].size());
-            for (uint32_t j = 0; j < pTextureData->pEGTData->EGTBasis[i].size(); ++j) {
-                const FffModeTexS& rMode = pTextureData->pEGTData->EGTBasis[i][j];
+        for (const auto& rBasis : pTextureData->pEGTData->EGTBasis) {
+            size += static_cast<uint32_t>(sizeof(FffModeTexS) * rBasis.size());
+            for (uint32_t j = 0; j < rBasis.size(); ++j) {
+                const FffModeTexS& rMode = rBasis[j];
                 size += static_cast<uint32_t>(3 * rMode.img[0].size());
             }
         }

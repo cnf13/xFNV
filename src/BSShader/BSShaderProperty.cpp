@@ -295,8 +295,8 @@ bool BSShaderProperty::RegisterStreamables(NiStream& kStream) {
 void BSShaderProperty::SaveBinary(NiStream& kStream) {
     NiShadeProperty::SaveBinary(kStream);
     NiStreamSaveBinary(kStream, iShader);
-    for (uint32_t i = 0; i < 2; ++i) {
-        NiStreamSaveBinary(kStream, ulFlags[i]);
+    for (const uint32_t& rulFlags : ulFlags) {
+        NiStreamSaveBinary(kStream, rulFlags);
     }
     NiStreamSaveBinary(kStream, fEnvmapScale);
 }

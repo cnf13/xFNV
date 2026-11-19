@@ -640,8 +640,7 @@ uint16_t* NiSkinPartition::Partition::CreateVertexMap(
     for (uint32_t t = 0; t < m_usTriangles; ++t) {
         uint16_t ausTriangle[3];
         pkTriData->GetTriangleIndices(kTriangles.m_pBase[t], ausTriangle[0], ausTriangle[1], ausTriangle[2]);
-        for (uint32_t k = 0; k < 3; ++k) {
-            uint32_t uiVert = ausTriangle[k];
+        for (uint32_t uiVert : ausTriangle) {
             if (pusVertexPartitionIndex[uiVert] == 0xFFFF) {
                 pusVertexPartitionIndex[uiVert] = uiPartitionVertices++;
             }

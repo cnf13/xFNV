@@ -59,8 +59,8 @@ float* CTreeFileAccess::ParseVector3(float* a1) {
     afValue[2] = 0.0f;
     afValue[1] = 0.0f;
     afValue[0] = 0.0f;
-    for (int32_t i = 0; i < 3; ++i) {
-        afValue[i] = ParseFloat();
+    for (float& fValue : afValue) {
+        fValue = ParseFloat();
     }
     a1[0] = afValue[0];
     a1[1] = afValue[1];

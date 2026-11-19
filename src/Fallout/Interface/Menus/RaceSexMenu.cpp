@@ -2726,15 +2726,15 @@ void RaceSexMenu::Close() {
                 TESTopic* Topic = TESTopic::GetTopic(DT_SERVICE, 4);
                 DialogMenu::ServiceEnd(Topic);
             }
-            for (int32_t i = 0; i < 20; ++i) {
-                if (RaceSexMenu::pEquippedInventoryListA[i]) {
-                    TESBoundObject* FormFlags = RaceSexMenu::pEquippedInventoryListA[i]->pContainerObj;
+            for (ItemChange*& pItem : RaceSexMenu::pEquippedInventoryListA) {
+                if (pItem) {
+                    TESBoundObject* FormFlags = pItem->pContainerObj;
                     pPlayer->EquipObject(FormFlags, 1, nullptr, true, false, true);
-                    ItemChange* apThis = RaceSexMenu::pEquippedInventoryListA[i];
+                    ItemChange* apThis = pItem;
                     if (apThis) {
                         delete apThis;
                     }
-                    RaceSexMenu::pEquippedInventoryListA[i] = nullptr;
+                    pItem = nullptr;
                 }
             }
             pPlayer->SetWantWeaponDrawn(RaceSexMenu::bWantedWeaponOut);

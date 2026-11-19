@@ -638,8 +638,8 @@ void RecipeMenu::PopulateItemStatsDisplay(TESForm* apCurrItem, Tile* apDisplayTi
 }
 
 bool RecipeMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 14; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

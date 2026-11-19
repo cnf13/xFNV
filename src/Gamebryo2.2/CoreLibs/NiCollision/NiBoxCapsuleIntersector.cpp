@@ -16,8 +16,8 @@ NiBoxCapsuleIntersector::NiBoxCapsuleIntersector(
 )
   : NiIntersector(fMaxTime, fDerivativeTimeStep, fPseudodistanceThreshold, iMaxIterations), m_kBox(kBox),
     m_kCapsule(kCapsule), m_fInvRadiusSqr(1.0 / (kCapsule.m_kCapsule.m_fRadius * kCapsule.m_kCapsule.m_fRadius)) {
-    for (int32_t i = 0; i < 3; i++) {
-        m_afParameter[i] = 3.4028235e+38f;
+    for (float& fParameter : m_afParameter) {
+        fParameter = 3.4028235e+38f;
     }
 }
 

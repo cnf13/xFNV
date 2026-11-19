@@ -196,8 +196,8 @@ void ScreenSplatter::Shutdown() {
         ScreenSplatter::spCamera = static_cast<NiCamera*>(nullptr);
     }
     ScreenSplatter::bEnabled = false;
-    for (int32_t i = 0; i < 3; ++i) {
-        ScreenSplatter::spTextures[i] = static_cast<NiTexture*>(nullptr);
+    for (NiPointer<NiTexture>& spTexture : ScreenSplatter::spTextures) {
+        spTexture = static_cast<NiTexture*>(nullptr);
     }
 }
 

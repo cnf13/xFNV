@@ -189,8 +189,8 @@ hkpListShape::hkpListShape(
   : hkpShapeCollection(HK_SHAPE_LIST, COLLECTION_LIST), m_flags(0), m_numDisabledChildren(0) {
     m_childInfo.reserve(4);
     setShapes(apShapes, aiNumShapes, nullptr, aePolicy);
-    for (int32_t i = 0; i < 8; ++i) {
-        m_enabledChildren[i] = 0xFFFFFFFF;
+    for (uint32_t& enabled : m_enabledChildren) {
+        enabled = 0xFFFFFFFF;
     }
 }
 

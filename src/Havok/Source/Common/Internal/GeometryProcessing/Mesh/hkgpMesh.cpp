@@ -1966,9 +1966,9 @@ bool hkgpMesh::PrismPolicy::addHit(
     hkgpMeshBase::Triangle* triangleA = static_cast<hkgpMeshBase::Triangle*>(a1->m_leafData.m_userData);
     hkgpMeshBase::Triangle* triangleB = static_cast<hkgpMeshBase::Triangle*>(a2->m_leafData.m_userData);
     ++m_numFalseChecks;
-    for (int32_t i = 0; i < 3; ++i) {
-        for (int32_t j = 0; j < 3; ++j) {
-            if (triangleA->m_vertices[i] == triangleB->m_vertices[j]) {
+    for (hkgpMeshBase::Vertex* pVertexA : triangleA->m_vertices) {
+        for (hkgpMeshBase::Vertex* pVertexB : triangleB->m_vertices) {
+            if (pVertexA == pVertexB) {
                 return true;
             }
         }
@@ -2147,11 +2147,11 @@ void hkgpMesh::reset() {
 void hkgpMesh::replaceVertex(hkgpMeshBase::Vertex* src, hkgpMeshBase::Vertex* dst) {
     hkArray<hkgpMeshBase::Triangle*> toGlue;
     for (hkgpMeshBase::Triangle* t = static_cast<hkgpMeshBase::Triangle*>(m_triangles.m_used); t; t = t->m_next) {
-        for (int32_t i = 0; i < 3; ++i) {
-            hkgpMeshBase::Vertex* pVertex = t->m_vertices[i];
+        for (hkgpMeshBase::Vertex*& rVertex : t->m_vertices) {
+            hkgpMeshBase::Vertex* pVertex = rVertex;
             if (pVertex == src) {
                 toGlue.pushBack(t);
-                t->m_vertices[i] = dst;
+                rVertex = dst;
             }
             else if (pVertex == dst) {
                 toGlue.pushBack(t);
@@ -2481,10 +2481,10 @@ void hkgpMesh::splitPartIntersections(int32_t partA, int32_t partB) {
                 fMz = kV2[2] * kN[2];
                 afDist[2] = (fMy + fMx) + (fMz + kN[3]);
             }
-            for (int32_t k = 0; k < 3; ++k) {
-                float fAbs = __builtin_fabsf(afDist[k]);
+            for (float& rDist : afDist) {
+                float fAbs = __builtin_fabsf(rDist);
                 if (fEpsilon >= fAbs) {
-                    afDist[k] = 0.0f;
+                    rDist = 0.0f;
                 }
             }
             const hkQuadReal& kOne = hkQuadReal1111_0;
@@ -3883,8 +3883,8 @@ int32_t hkgpMesh::floodFillDetachedParts() {
             pOther->m_partId = numParts - 1;
             // The other triangle's next and previous edges: (9 >> 2i) & 3 and (18 >> 2i) & 3.
             const uint32_t aNextIndices[2] = {(9u >> (2 * otherIndex)) & 3, (18u >> (2 * otherIndex)) & 3};
-            for (uint32_t i = 0; i < 2; ++i) {
-                stack.pushBack(hkgpMeshBase::Edge{{pOther, aNextIndices[i]}});
+            for (uint32_t uiNext : aNextIndices) {
+                stack.pushBack(hkgpMeshBase::Edge{{pOther, uiNext}});
             }
         }
         while (stack.m_size);
@@ -3972,8 +3972,8 @@ int32_t hkgpMesh::segregateVerticesBasedOnPartId() {
         }
     }
     for (hkgpMeshBase::Triangle* t = m_triangles.m_used; t; t = t->m_next) {
-        for (int32_t k = 0; k < 3; ++k) {
-            t->m_vertices[k] = map.getWithDefault(t->m_vertices[k], nullptr)->m_data[t->m_partId];
+        for (hkgpMeshBase::Vertex*& rVertex : t->m_vertices) {
+            rVertex = map.getWithDefault(rVertex, nullptr)->m_data[t->m_partId];
         }
     }
     for (int32_t it = map.getIterator(); map.isValid(it); it = map.getNext(it)) {
@@ -4027,8 +4027,8 @@ int32_t hkgpMesh::floodFillDetachedOrMaterialBoundariesParts() {
             pOther->m_partId = numParts - 1;
             // The other triangle's next and previous edges: (9 >> 2i) & 3 and (18 >> 2i) & 3.
             const uint32_t aNextIndices[2] = {(9u >> (2 * otherIndex)) & 3, (18u >> (2 * otherIndex)) & 3};
-            for (uint32_t i = 0; i < 2; ++i) {
-                stack.pushBack(hkgpMeshBase::Edge{{pOther, aNextIndices[i]}});
+            for (uint32_t uiNext : aNextIndices) {
+                stack.pushBack(hkgpMeshBase::Edge{{pOther, uiNext}});
             }
         }
         while (stack.m_size);
@@ -4289,11 +4289,11 @@ hkgpMesh::sResult* hkgpMesh::cut(sResult* arResult, const hkVector4& plane, bool
     if (detachParts) {
         for (hkgpMeshBase::Triangle* pTriangle = static_cast<hkgpMeshBase::Triangle*>(m_triangles.m_used); pTriangle;
              pTriangle = pTriangle->m_next) {
-            for (int32_t k = 0; k < 3; ++k) {
-                const uintptr_t uiLink = pTriangle->m_links[k];
+            for (uintptr_t& rLink : pTriangle->m_links) {
+                const uintptr_t uiLink = rLink;
                 if ((uiLink & ~uintptr_t(3)) && pTriangle->m_partId != unpack(uiLink)->m_partId) {
-                    unpack(uiLink)->m_links[pTriangle->m_links[k] & 3] = 0;
-                    pTriangle->m_links[k] = 0;
+                    unpack(uiLink)->m_links[rLink & 3] = 0;
+                    rLink = 0;
                 }
             }
         }
@@ -6399,9 +6399,9 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                 __m128 side[3] = {
                     plane.dot4xyz1(kA).getQuad(), plane.dot4xyz1(kB).getQuad(), plane.dot4xyz1(kC).getQuad()
                 };
-                for (int32_t k = 0; k < 3; ++k) {
-                    if (fEpsilon >= __builtin_fabsf(_mm_cvtss_f32(side[k]))) {
-                        side[k] = _mm_set_ss(0.0f);
+                for (__m128& rSide : side) {
+                    if (fEpsilon >= __builtin_fabsf(_mm_cvtss_f32(rSide))) {
+                        rSide = _mm_set_ss(0.0f);
                     }
                 }
                 // The crossing point of each edge: t = d0 / (d0 - d1), (1 - t) * start + t * end.
@@ -7019,8 +7019,8 @@ void hkgpMesh::append(hkgpMesh* other) {
         }
         ++m_triangles.m_numUsed;
         m_triangles.m_used = pNew;
-        for (int32_t k = 0; k < 3; ++k) {
-            pNew->m_vertices[k] = vertexMap.getWithDefault(pNew->m_vertices[k], nullptr);
+        for (hkgpMeshBase::Vertex*& rVertex : pNew->m_vertices) {
+            rVertex = vertexMap.getWithDefault(rVertex, nullptr);
         }
         for (uint32_t k = 0; k < 3; ++k) {
             // An edge uid packs the triangle's address with the edge index (hkgpTopology's Uid).

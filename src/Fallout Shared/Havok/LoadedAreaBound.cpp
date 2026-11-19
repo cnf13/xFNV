@@ -67,8 +67,8 @@ LoadedAreaBound::LoadedAreaBound(float a1, float a2, float a3, float a4)
 
 // The phantoms go before the hit map is emptied.
 LoadedAreaBound::~LoadedAreaBound() {
-    for (int32_t i = 0; i < 6; ++i) {
-        spPhantomA[i] = nullptr;
+    for (NiPointer<bhkAabbPhantom>& spPhantom : spPhantomA) {
+        spPhantom = nullptr;
     }
     HitMap.RemoveAll();
 }
@@ -76,8 +76,8 @@ LoadedAreaBound::~LoadedAreaBound() {
 void LoadedAreaBound::Clear() {
     pCurrentCell = nullptr;
 
-    for (int32_t i = 0; i < 6; ++i) {
-        spPhantomA[i] = nullptr;
+    for (NiPointer<bhkAabbPhantom>& spPhantom : spPhantomA) {
+        spPhantom = nullptr;
     }
 
     HitMap.RemoveAll();
@@ -441,9 +441,9 @@ void LoadedAreaBound::CheckForDynamicBodiesOutsideBound() {
     alignas(16) hkVector4 maxExtent;
     maxExtent.setAll(-3.40282e+38f);
     minExtent.setAll(3.40282e+38f);
-    for (uint32_t ui = 0; ui < 6; ++ui) {
+    for (const NiPointer<bhkAabbPhantom>& spPhantom : this->spPhantomA) {
         hkAabb phantomAABB;
-        this->spPhantomA[ui]->GetAabb(phantomAABB);
+        spPhantom->GetAabb(phantomAABB);
         maxExtent.setMax4(maxExtent, phantomAABB.m_max);
         minExtent.setMin4(minExtent, phantomAABB.m_min);
     }

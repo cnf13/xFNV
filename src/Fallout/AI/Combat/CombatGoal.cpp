@@ -81,9 +81,9 @@ void CombatGoal::InitGoals() {
 }
 
 void CombatGoal::DeleteGoals() {
-    for (uint32_t i = 0; i < 16; ++i) {
-        if (CombatPlan::pGoals[i]) {
-            delete CombatPlan::pGoals[i];
+    for (CombatGoal*& pGoal : CombatPlan::pGoals) {
+        if (pGoal) {
+            delete pGoal;
         }
     }
 }

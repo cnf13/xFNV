@@ -130,18 +130,18 @@ BSMultiBoundShape::BSMBIntersectResult BSMultiBoundOBB::CheckBound(const BSMulti
             }
             NiPlane akPlanes[3];
             GetPlanes(akPlanes);
-            for (int32_t i = 0; i < 8; ++i) {
-                float fDelta = akPlanes[0].m_kNormal.Dot(akVertices[i]) - akPlanes[0].m_fConstant;
+            for (const NiPoint3& rVertex : akVertices) {
+                float fDelta = akPlanes[0].m_kNormal.Dot(rVertex) - akPlanes[0].m_fConstant;
                 float fDist = std::fabs(static_cast<double>(fDelta));
                 if (fDist - HalfExtents.x > 0.0) {
                     return BS_INTERSECT_NONE;
                 }
-                fDelta = akPlanes[1].m_kNormal.Dot(akVertices[i]) - akPlanes[1].m_fConstant;
+                fDelta = akPlanes[1].m_kNormal.Dot(rVertex) - akPlanes[1].m_fConstant;
                 fDist = std::fabs(static_cast<double>(fDelta));
                 if (fDist - HalfExtents.y > 0.0) {
                     return BS_INTERSECT_NONE;
                 }
-                fDelta = akPlanes[2].m_kNormal.Dot(akVertices[i]) - akPlanes[2].m_fConstant;
+                fDelta = akPlanes[2].m_kNormal.Dot(rVertex) - akPlanes[2].m_fConstant;
                 fDist = std::fabs(static_cast<double>(fDelta));
                 if (fDist - HalfExtents.z > 0.0) {
                     return BS_INTERSECT_NONE;
@@ -186,8 +186,8 @@ bool BSMultiBoundOBB::CompletelyWithinFrustum(const NiFrustumPlanes& aPlanes) {
     GetVertices(akVertices);
     for (int32_t i = 0; i < 6; ++i) {
         if ((aPlanes.m_uiActivePlanes & (1 << i)) != 0) {
-            for (int32_t j = 0; j < 8; ++j) {
-                if (aPlanes.m_akCullingPlanes[i].WhichSide(akVertices[j]) == NiPlane::NEGATIVE_SIDE) {
+            for (const NiPoint3& rVertex : akVertices) {
+                if (aPlanes.m_akCullingPlanes[i].WhichSide(rVertex) == NiPlane::NEGATIVE_SIDE) {
                     return false;
                 }
             }

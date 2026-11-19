@@ -313,10 +313,10 @@ hkpConstraintData* hkpConstraintDataCloningUtil::cloneIfCanHaveMotors(const hkpC
             hkpRagdollConstraintData* pNewData = ::new (pMemory) hkpRagdollConstraintData;
             pNewData->m_atoms = static_cast<const hkpRagdollConstraintData*>(data)->m_atoms;
             pNewData->m_userData = data->m_userData;
-            for (int32_t i = 0; i < 3; ++i) {
-                hkpConstraintMotor* pMotor = pNewData->m_atoms.m_ragdollMotors.m_motors[i];
+            for (hkpConstraintMotor*& rMotor : pNewData->m_atoms.m_ragdollMotors.m_motors) {
+                hkpConstraintMotor* pMotor = rMotor;
                 if (pMotor) {
-                    pNewData->m_atoms.m_ragdollMotors.m_motors[i] = pMotor->clone();
+                    rMotor = pMotor->clone();
                 }
             }
             return pNewData;

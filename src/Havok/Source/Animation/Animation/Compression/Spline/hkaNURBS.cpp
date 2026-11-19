@@ -1504,17 +1504,17 @@ void hkaNURBS::DegreeElevateCurve(
     hkaNURBS::Point kMulPrev;
     float bezalfs[4][4];
     float alfs[4];
-    for (int32_t i = 0; i < 4; ++i) {
-        bpts[i].~Point();
-        ::new (&bpts[i]) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
+    for (hkaNURBS::Point& rPoint : bpts) {
+        rPoint.~Point();
+        ::new (&rPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
     }
-    for (int32_t i = 0; i < 4; ++i) {
-        ebpts[i].~Point();
-        ::new (&ebpts[i]) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
+    for (hkaNURBS::Point& rPoint : ebpts) {
+        rPoint.~Point();
+        ::new (&rPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
     }
-    for (int32_t i = 0; i < 4; ++i) {
-        Nextbpts[i].~Point();
-        ::new (&Nextbpts[i]) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
+    for (hkaNURBS::Point& rPoint : Nextbpts) {
+        rPoint.~Point();
+        ::new (&rPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
     }
     int32_t nh = nOld + t * (UniqueKnotCount(U, m) - 1);
 
@@ -1731,9 +1731,9 @@ float projectPointToCurve(
     }
     for (int32_t iIteration = 0; iIteration < iMaxIterations; ++iIteration) {
         hkaNURBS::Point aDerivs[3];
-        for (int32_t k = 0; k < 3; ++k) {
-            aDerivs[k].~Point();
-            ::new (&aDerivs[k]) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
+        for (hkaNURBS::Point& rDeriv : aDerivs) {
+            rDeriv.~Point();
+            ::new (&rDeriv) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
         }
         hkaNURBS::CurveDerivs(n, p, *U, *P, u, 2, aDerivs);
         aDerivs[0] -= *apPoint;

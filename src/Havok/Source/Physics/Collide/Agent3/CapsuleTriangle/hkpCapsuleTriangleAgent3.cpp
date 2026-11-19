@@ -68,10 +68,10 @@ hkpAgentData* hkCapsuleTriangleAgent3::cleanup(
     hkpConstraintOwner& constraintOwner
 ) {
     hkpCapsuleTriangleCache3* cache = static_cast<hkpCapsuleTriangleCache3*>(agentData);
-    for (int32_t i = 0; i < 3; i++) {
-        if (cache->m_contactPointId[i] != HK_INVALID_CONTACT_POINT) {
-            mgr->removeContactPoint(cache->m_contactPointId[i], constraintOwner);
-            cache->m_contactPointId[i] = HK_INVALID_CONTACT_POINT;
+    for (uint16_t& id : cache->m_contactPointId) {
+        if (id != HK_INVALID_CONTACT_POINT) {
+            mgr->removeContactPoint(id, constraintOwner);
+            id = HK_INVALID_CONTACT_POINT;
         }
     }
     return static_cast<uint8_t*>(agentData) + ((sizeof(hkpCapsuleTriangleCache3) + 15) & ~static_cast<size_t>(15));

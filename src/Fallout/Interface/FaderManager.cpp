@@ -35,20 +35,20 @@ FaderDataArray FaderData = {
 };
 
 FaderManager::FaderManager() : pRootBelowMenus(nullptr), pRootAboveMenus(nullptr) {
-    for (int32_t n = 0; n < 3; ++n) {
-        FaderData[n].bFadingIn = false;
-        FaderData[n].pRoot = nullptr;
-        FaderData[n].fAlpha = 0.0f;
-        FaderData[n].spTileShaderProp = nullptr;
+    for (FADER_DATA& rFader : FaderData) {
+        rFader.bFadingIn = false;
+        rFader.pRoot = nullptr;
+        rFader.fAlpha = 0.0f;
+        rFader.spTileShaderProp = nullptr;
     }
 }
 
 FaderManager::~FaderManager() {
-    for (int32_t n = 0; n < 3; ++n) {
-        FaderData[n].bFadingIn = false;
-        FaderData[n].pRoot = nullptr;
-        FaderData[n].fAlpha = 0.0f;
-        FaderData[n].spTileShaderProp = nullptr;
+    for (FADER_DATA& rFader : FaderData) {
+        rFader.bFadingIn = false;
+        rFader.pRoot = nullptr;
+        rFader.fAlpha = 0.0f;
+        rFader.spTileShaderProp = nullptr;
     }
 }
 
@@ -217,8 +217,8 @@ void FaderManager::UpdateFaders(bool abUpdateLoading) {
     AutoMemContext* pMemContext = ::new (kMemContext) AutoMemContext(
         MEM_CONTEXT_INTERFACE, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Interface\\FaderManager.cpp", 266
     );
-    for (int32_t i = 0; i < FADER_COUNT; ++i) {
-        FADER_DATA* pFader = &FaderData[i];
+    for (FADER_DATA& rFader : FaderData) {
+        FADER_DATA* pFader = &rFader;
         if (!pFader->pRoot) {
             continue;
         }

@@ -1133,8 +1133,8 @@ void hkGeometryProcessing::buildTransposedArray(
     hkArray<TransposedVectors>& output
 ) {
     hkVector4 aVertices[4];
-    for (int32_t i = 0; i < 4; ++i) {
-        aVertices[i] = hkVector4Zero;
+    for (hkVector4& vertex : aVertices) {
+        vertex = hkVector4Zero;
     }
     const int32_t iNumBlocks = (vertices.m_size + 3) >> 2;
     int32_t iUsed = 0;

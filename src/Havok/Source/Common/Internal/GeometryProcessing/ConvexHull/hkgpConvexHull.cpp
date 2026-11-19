@@ -877,8 +877,8 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
             corners[5].m_quad = _mm_sub_ps(p1.m_quad, perpendicular.m_quad);
             corners[6].m_quad = _mm_add_ps(cross.m_quad, p1.m_quad);
             corners[7].m_quad = _mm_sub_ps(p1.m_quad, cross.m_quad);
-            for (int32_t i = 0; i < 8; i++) {
-                points.pushBack(corners[i]);
+            for (const hkVector4& corner : corners) {
+                points.pushBack(corner);
             }
             vertices.m_vertices = reinterpret_cast<const float*>(points.m_data);
             vertices.m_numVertices = points.m_size;
@@ -4080,8 +4080,7 @@ void hkgpConvexHullImpl::buildIndices() {
                 seed->m_plane.m_index = m_planes.m_size;
                 m_planes.pushBack(*pSeedPlane);
                 edges.clear();
-                for (int32_t k = 0; k < 3; ++k) {
-                    const uintptr_t link = seed->m_links[k];
+                for (const uintptr_t link : seed->m_links) {
                     // A link packs the neighbour's address with the shared edge's index in its low two bits
                     // (hkgpTopology's Uid), an integer that is masked apart.
                     Edge neighbour;
@@ -4114,8 +4113,8 @@ void hkgpConvexHullImpl::buildIndices() {
                         (9 >> (2 * static_cast<int32_t>(edge.m_index))) & 3,
                         (0x12 >> (2 * static_cast<int32_t>(edge.m_index))) & 3
                     };
-                    for (int32_t k = 0; k < 2; ++k) {
-                        const uintptr_t link = t->m_links[aiOther[k]];
+                    for (const int32_t iOther : aiOther) {
+                        const uintptr_t link = t->m_links[iOther];
                         // The link decoded as above.
                         Edge neighbour;
                         neighbour.m_triangle = reinterpret_cast<Triangle*>(link & ~static_cast<uintptr_t>(3));
@@ -4752,10 +4751,8 @@ hkgpConvexHullImpl* hkgpConvexHullImpl::clone() const {
         }
         for (; t; t = t->m_prev) {
             Triangle* pNew = pClone->m_mesh.m_triangles.allocate(*t);
-            for (int32_t k = 0; k < 3; ++k) {
-                pNew->m_vertices[k] = reinterpret_cast<Vertex*>(
-                    vertexMap.getWithDefault(reinterpret_cast<hkUlong>(pNew->m_vertices[k]), 0)
-                );
+            for (Vertex*& pVertex : pNew->m_vertices) {
+                pVertex = reinterpret_cast<Vertex*>(vertexMap.getWithDefault(reinterpret_cast<hkUlong>(pVertex), 0));
             }
             // An edge's uid is its triangle's address with the edge index in the low two bits; a link (copied from
             // the old triangle) is the uid of the old twin edge, decoded into its triangle and index and encoded again.

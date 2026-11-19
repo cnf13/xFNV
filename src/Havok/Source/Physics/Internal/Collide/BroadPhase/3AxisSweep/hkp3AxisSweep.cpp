@@ -180,8 +180,8 @@ void hkp3AxisSweep::calcContentStatistics(hkStatisticsCollector* collector, cons
             static_cast<int32_t>(m_nodes.m_size * sizeof(hkpBpNode)), iAllocated
         );
     }
-    for (int32_t i = 0; i < 3; ++i) {
-        const hkArray<hkpBpEndPoint>& kEndPoints = m_axis[i].m_endPoints;
+    for (const hkpBpAxis& rAxis : m_axis) {
+        const hkArray<hkpBpEndPoint>& kEndPoints = rAxis.m_endPoints;
         iCapacity = kEndPoints.m_capacityAndFlags;
         if (iCapacity >= 0 || collector->m_includeUnmanagedArrayMemory) {
             int32_t iAllocated = hkStatisticsCollector::getAllocatedSize(
@@ -2144,8 +2144,8 @@ void hkp3AxisSweep::defragment() {
             }
         }
 
-        for (int32_t axis = 0; axis < 3; ++axis) {
-            hkArray<hkpBpEndPoint>& endPoints = m_axis[axis].m_endPoints;
+        for (hkpBpAxis& rAxis : m_axis) {
+            hkArray<hkpBpEndPoint>& endPoints = rAxis.m_endPoints;
             for (int32_t i = 0; i < endPoints.m_size; ++i) {
                 endPoints.m_data[i].m_nodeIndex =
                     static_cast<uint16_t>(newIndex.m_data[endPoints.m_data[i].m_nodeIndex]);
@@ -4311,8 +4311,8 @@ hkp3AxisSweep::hkp3AxisSweep(const hkVector4& worldMin, const hkVector4& worldMa
     hkpBpEndPoint ep;
     ep.m_value = AABB_MIN_VALUE;
     ep.m_nodeIndex = 0;
-    for (int32_t axis = 0; axis < 3; axis++) {
-        m_axis[axis].m_endPoints.pushBack(ep);
+    for (hkpBpAxis& rAxis : m_axis) {
+        rAxis.m_endPoints.pushBack(ep);
     }
 
     // Each marker gets a node of its own on x; its handle word is the marker's byte offset with bit 0 set.
@@ -4351,8 +4351,8 @@ hkp3AxisSweep::hkp3AxisSweep(const hkVector4& worldMin, const hkVector4& worldMa
     // Each axis ends with the sentinel's max end, above AABB_MAX_VALUE.
     ep.m_value = AABB_MAX_VALUE + 1;
     ep.m_nodeIndex = 0;
-    for (int32_t axis = 0; axis < 3; axis++) {
-        m_axis[axis].m_endPoints.pushBack(ep);
+    for (hkpBpAxis& rAxis : m_axis) {
+        rAxis.m_endPoints.pushBack(ep);
     }
 }
 

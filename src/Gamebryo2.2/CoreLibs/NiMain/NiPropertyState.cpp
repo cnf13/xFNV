@@ -22,8 +22,8 @@ NiPropertyState::NiPropertyState(const NiPropertyState& kState) {
 
 // Releases and clears each slot; the member NiPointers' destructors then find them empty.
 NiPropertyState::~NiPropertyState() {
-    for (uint32_t i = 0; i < 7; ++i) {
-        m_aspProps[i] = nullptr;
+    for (NiPointer<NiProperty>& spProperty : m_aspProps) {
+        spProperty = nullptr;
     }
 }
 

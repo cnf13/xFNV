@@ -191,8 +191,8 @@ void BSShaderBloodSplatter::ReloadShaders() {
 }
 
 void BSShaderBloodSplatter::ClearPassStages() {
-    for (int32_t i = 0; i < 2; ++i) {
-        ClearPass(spPass[i].m_pObject);
+    for (const NiPointer<NiD3DPass>& spEntry : spPass) {
+        ClearPass(spEntry.m_pObject);
     }
 }
 

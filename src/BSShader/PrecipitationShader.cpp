@@ -37,11 +37,11 @@ PrecipitationShader::PrecipitationShader()
 }
 
 PrecipitationShader::~PrecipitationShader() {
-    for (int32_t i = 0; i < PRECIP_VSH_COUNT; ++i) {
-        spVertexShader[i] = nullptr;
+    for (NiPointer<NiD3DVertexShader>& spShader : spVertexShader) {
+        spShader = nullptr;
     }
-    for (int32_t i = 0; i < PRECIP_PSH_COUNT; ++i) {
-        spPixelShader[i] = nullptr;
+    for (NiPointer<NiD3DPixelShader>& spShader : spPixelShader) {
+        spShader = nullptr;
     }
     spPass[PRECIP_PASS_RAIN] = nullptr;
 }
@@ -52,11 +52,11 @@ const NiRTTI* PrecipitationShader::GetRTTI() const {
 
 bool PrecipitationShader::Initialize() {
     bool retval = BSShader::Initialize();
-    for (int32_t i = 0; i < PRECIP_VSH_COUNT; ++i) {
-        PrecipitationShader::spVertexShader[i] = nullptr;
+    for (NiPointer<NiD3DVertexShader>& spShader : PrecipitationShader::spVertexShader) {
+        spShader = nullptr;
     }
-    for (int32_t i = 0; i < PRECIP_PSH_COUNT; ++i) {
-        PrecipitationShader::spPixelShader[i] = nullptr;
+    for (NiPointer<NiD3DPixelShader>& spShader : PrecipitationShader::spPixelShader) {
+        spShader = nullptr;
     }
     NiD3DPass* pPass = PrecipitationShader::spPass[PRECIP_PASS_RAIN].m_pObject;
     if (pPass) {

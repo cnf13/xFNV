@@ -28,8 +28,8 @@ void hkDisplayConvex::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemo
             int32_t iB = kTriangle.m_b;
             int32_t iC = kTriangle.m_c;
             const int32_t aiEdgeEnds[6] = {iA, iB, iA, iC, iB, iC};
-            for (int32_t j = 0; j < 6; ++j) {
-                const hkVector4* pVertex = &this->m_geometry->m_vertices.m_data[aiEdgeEnds[j]];
+            for (int32_t iEdgeEnd : aiEdgeEnds) {
+                const hkVector4* pVertex = &this->m_geometry->m_vertices.m_data[iEdgeEnd];
                 lines._pushBack(a, *pVertex);
             }
         }

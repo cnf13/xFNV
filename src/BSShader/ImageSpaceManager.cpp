@@ -147,10 +147,9 @@
 #include <utility>
 
 void ImageSpaceParameterData::Endian() {
-    for (int32_t j = 0; j < 15; ++j) {
-        pfHDRData[j] = std::bit_cast<float>(
-            static_cast<uint32_t>(__builtin_bswap32((uint32_t)std::bit_cast<uint32_t>(pfHDRData[j])))
-        );
+    for (float& rfData : pfHDRData) {
+        rfData =
+            std::bit_cast<float>(static_cast<uint32_t>(__builtin_bswap32((uint32_t)std::bit_cast<uint32_t>(rfData))));
     }
     uint32_t* pfBloomData = reinterpret_cast<uint32_t*>(this->pfBloomData);
     int32_t v3 = 3;

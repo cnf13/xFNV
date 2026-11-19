@@ -108,8 +108,8 @@ NiD3DRenderState::NiD3DRenderState(NiDX9Renderer* pkD3DRenderer)
     }
     NiD3DTextureStageGroup::textureStageTypes[7] = 24;
     // Sampler state type -> cache slot.
-    for (int32_t i = 0; i < 14; ++i) {
-        ms_auiSamplesStatesRevMappings[i] = 0xFFFF;
+    for (uint16_t& usMapping : ms_auiSamplesStatesRevMappings) {
+        usMapping = 0xFFFF;
     }
     ms_auiSamplesStatesRevMappings[1] = 0;
     ms_auiSamplesStatesRevMappings[2] = 1;

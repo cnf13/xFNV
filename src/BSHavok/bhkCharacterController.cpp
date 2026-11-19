@@ -3239,11 +3239,11 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
             }
             else {
                 uint32_t outputShapeKey = HK_INVALID_SHAPE_KEY;
-                for (int32_t j = 0; j < hkpShapeRayCastOutput::MAX_HIERARCHY_DEPTH; ++j) {
-                    if (rco.m_shapeKeys[j] == HK_INVALID_SHAPE_KEY) {
+                for (uint32_t uiShapeKey : rco.m_shapeKeys) {
+                    if (uiShapeKey == HK_INVALID_SHAPE_KEY) {
                         break;
                     }
-                    outputShapeKey = rco.m_shapeKeys[j];
+                    outputShapeKey = uiShapeKey;
                 }
                 bstep = !IsShapeConsideredPenetrating(pShapeB, true, bstairMaterialOnly, outputShapeKey);
             }

@@ -56,8 +56,8 @@ void NiLookAtInterpolator::LoadBinary(NiStream& kStream) {
         kStream.LoadFixedString(m_kLookAtName);
     }
     m_kTransformValue.LoadBinary(kStream);
-    for (uint32_t i = 0; i < 3; i++) {
-        m_aspInterpolators[i] = static_cast<NiInterpolator*>(kStream.ResolveLinkID());
+    for (NiPointer<NiInterpolator>& spInterpolator : m_aspInterpolators) {
+        spInterpolator = static_cast<NiInterpolator*>(kStream.ResolveLinkID());
     }
 }
 
@@ -70,8 +70,8 @@ bool NiLookAtInterpolator::RegisterStreamables(NiStream& kStream) {
         return false;
     }
 
-    for (uint32_t i = 0; i < 3; i++) {
-        if (m_aspInterpolators[i] && !m_aspInterpolators[i]->RegisterStreamables(kStream)) {
+    for (NiInterpolator* pkInterpolator : m_aspInterpolators) {
+        if (pkInterpolator && !pkInterpolator->RegisterStreamables(kStream)) {
             return false;
         }
     }
@@ -87,8 +87,8 @@ void NiLookAtInterpolator::SaveBinary(NiStream& kStream) {
     kStream.SaveLinkID(m_pkLookAt);
     kStream.SaveFixedString(m_kLookAtName);
     m_kTransformValue.SaveBinary(kStream);
-    for (uint32_t i = 0; i < 3; i++) {
-        kStream.SaveLinkID(m_aspInterpolators[i]);
+    for (NiInterpolator* pkInterpolator : m_aspInterpolators) {
+        kStream.SaveLinkID(pkInterpolator);
     }
 }
 
@@ -132,9 +132,9 @@ void NiLookAtInterpolator::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings)
     pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
     pkStrings->Add(NiGetViewerString("m_pkLookAt", static_cast<const void*>(m_pkLookAt)));
     m_kTransformValue.GetViewerStrings(pkStrings);
-    for (uint32_t i = 0; i < 3; i++) {
-        if (m_aspInterpolators[i]) {
-            m_aspInterpolators[i]->GetViewerStrings(pkStrings);
+    for (NiInterpolator* pkInterpolator : m_aspInterpolators) {
+        if (pkInterpolator) {
+            pkInterpolator->GetViewerStrings(pkStrings);
         }
     }
 }
@@ -323,9 +323,9 @@ bool NiLookAtInterpolator::Update(float fTime, NiObjectNET* pkInterpTarget, NiQu
 }
 
 void NiLookAtInterpolator::Collapse() {
-    for (uint32_t i = 0; i < 3; i++) {
-        if (m_aspInterpolators[i]) {
-            m_aspInterpolators[i]->Collapse();
+    for (NiInterpolator* pkInterpolator : m_aspInterpolators) {
+        if (pkInterpolator) {
+            pkInterpolator->Collapse();
         }
     }
 }
@@ -334,11 +334,11 @@ void NiLookAtInterpolator::Collapse() {
 void NiLookAtInterpolator::GetActiveTimeRange(float& fBeginKeyTime, float& fEndKeyTime) const {
     fBeginKeyTime = FLT_MAX;
     fEndKeyTime = -FLT_MAX;
-    for (uint32_t i = 0; i < 3; i++) {
-        if (m_aspInterpolators[i]) {
+    for (NiInterpolator* pkInterpolator : m_aspInterpolators) {
+        if (pkInterpolator) {
             float fBegin;
             float fEnd;
-            m_aspInterpolators[i]->GetActiveTimeRange(fBegin, fEnd);
+            pkInterpolator->GetActiveTimeRange(fBegin, fEnd);
             if (fBegin != fEnd) {
                 if (fBegin < fBeginKeyTime) {
                     fBeginKeyTime = fBegin;
@@ -357,9 +357,9 @@ void NiLookAtInterpolator::GetActiveTimeRange(float& fBeginKeyTime, float& fEndK
 }
 
 void NiLookAtInterpolator::GuaranteeTimeRange(float fStartTime, float fEndTime) {
-    for (uint32_t i = 0; i < 3; i++) {
-        if (m_aspInterpolators[i]) {
-            m_aspInterpolators[i]->GuaranteeTimeRange(fStartTime, fEndTime);
+    for (NiInterpolator* pkInterpolator : m_aspInterpolators) {
+        if (pkInterpolator) {
+            pkInterpolator->GuaranteeTimeRange(fStartTime, fEndTime);
         }
     }
 }

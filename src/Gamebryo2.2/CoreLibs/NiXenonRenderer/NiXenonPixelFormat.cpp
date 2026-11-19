@@ -33,9 +33,9 @@ uint32_t NiPixelFormat::GetMask(Component eComp) const {
 }
 
 uint8_t NiPixelFormat::GetBits(Component eComp) const {
-    for (uint32_t uiComponent = 0; uiComponent < NUM_COMPS; ++uiComponent) {
-        if (m_akComponents[uiComponent].m_eComponent == eComp) {
-            return m_akComponents[uiComponent].m_ucBitsPerComponent;
+    for (const NiComponentSpec& kComponent : m_akComponents) {
+        if (kComponent.m_eComponent == eComp) {
+            return kComponent.m_ucBitsPerComponent;
         }
     }
     return 0;

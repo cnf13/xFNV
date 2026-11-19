@@ -140,8 +140,8 @@ BSFaceGenModelMap::Entry::Entry() {}
 BSFaceGenModelMap::Entry::~Entry() {}
 
 BSFaceGenModelMap::BSFaceGenModelMap() : Map(37u, true), bHasFaceGenData(false) {
-    for (uint32_t cnt = 0; cnt < 2; ++cnt) {
-        uiMaxDataSize[cnt] = 0x10000000;
+    for (uint32_t& uiDataSize : uiMaxDataSize) {
+        uiDataSize = 0x10000000;
     }
 }
 

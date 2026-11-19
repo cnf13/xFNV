@@ -338,11 +338,11 @@ MemoryPoolStats* MemoryPool::GetStats(MemoryPoolStats* apResult) const {
 }
 
 void MemoryPool::InitPools() {
-    for (uint32_t i = 0; i < 0x100; ++i) {
-        pMemoryPoolsBySize[i] = nullptr;
+    for (MemoryPool*& rpPool : pMemoryPoolsBySize) {
+        rpPool = nullptr;
     }
-    for (uint32_t i = 0; i < 0x100; ++i) {
-        pMemoryPoolsByAddress[i] = nullptr;
+    for (MemoryPool*& rpPool : pMemoryPoolsByAddress) {
+        rpPool = nullptr;
     }
 }
 
@@ -350,8 +350,7 @@ void MemoryPool::InitPools() {
 void MemoryPool::CheckPools() {
     static BSCriticalSection localCriticalSection;
     EnterCriticalSection(&localCriticalSection.CriticalSection);
-    for (int32_t i = 0; i < 256; ++i) {
-        MemoryPool* pcurrentPool = MemoryPool::pMemoryPoolsBySize[i];
+    for (MemoryPool* pcurrentPool : MemoryPool::pMemoryPoolsBySize) {
         if (pcurrentPool) {
             pcurrentPool->CheckFreeBlocks();
         }
@@ -373,13 +372,13 @@ void MemoryPool::SortFreeBlocks(int32_t aiIndex) {
 }
 
 void MemoryPool::DeletePools() {
-    for (uint32_t i = 0; i < 256; ++i) {
-        MemoryPool* Block = MemoryPool::pMemoryPoolsBySize[i];
+    for (MemoryPool*& rpPool : MemoryPool::pMemoryPoolsBySize) {
+        MemoryPool* Block = rpPool;
         if (Block) {
             Block->~MemoryPool();
             MemoryManager_Singleton.Deallocate(Block);
         }
-        MemoryPool::pMemoryPoolsBySize[i] = nullptr;
+        rpPool = nullptr;
     }
 }
 
@@ -387,9 +386,9 @@ void MemoryPool::DeletePools() {
 void MemoryPool::FreeUnusedPagesForAllPools() {
     static BSCriticalSection localCriticalSection;
     EnterCriticalSection(&localCriticalSection.CriticalSection);
-    for (uint32_t i = 0; i < 256; ++i) {
-        if (MemoryPool::pMemoryPoolsBySize[i]) {
-            MemoryPool::pMemoryPoolsBySize[i]->FreeUnusedPages();
+    for (MemoryPool* pPool : MemoryPool::pMemoryPoolsBySize) {
+        if (pPool) {
+            pPool->FreeUnusedPages();
         }
     }
     LeaveCriticalSection(&localCriticalSection.CriticalSection);

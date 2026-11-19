@@ -905,9 +905,9 @@ void Script::InitItem(TESForm* apOwner) {
     if (GetHeader()->bIsQuestScript && fQuestScriptDelayTime.Float() > 0.0) {
         float ftmpTime = fQuestScriptDelayTime.Float();
         if (iquestScriptCount == 0) {
-            for (int32_t n = 0; n < 8; ++n) {
+            for (float& fDelayTime : fdelayTimes) {
                 ftmpTime = static_cast<float>(ftmpTime / 2.0);
-                fdelayTimes[n] = ftmpTime;
+                fDelayTime = ftmpTime;
             }
         }
         // the low 8 bits of the count pick which halvings this script's first delay adds up

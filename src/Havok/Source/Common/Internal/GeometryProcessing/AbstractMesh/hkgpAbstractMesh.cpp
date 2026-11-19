@@ -25,8 +25,8 @@ template <>
 __attribute__((no_builtin("memset"))) void hkgpDefaultTriangulatorType::reset(bool createDomainTriangulation) {
     hkgpTriangulatorAbstractMesh* pMesh = &m_mesh;
     pMesh->reset();
-    for (int32_t i = 0; i < 256; ++i) {
-        m_roots[i] = nullptr;
+    for (Triangle*& pRoot : m_roots) {
+        pRoot = nullptr;
     }
     // EXE-INLINED 0xE27400
     if (m_edgeData) {

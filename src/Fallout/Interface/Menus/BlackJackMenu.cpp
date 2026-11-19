@@ -963,8 +963,8 @@ void BlackJackMenu::DoIdle() {
                         else {
                             eBlackJackState = BlackJackMenu::BL_IDLE;
                         }
-                        for (int32_t i_5 = 0; i_5 < 3; ++i_5) {
-                            iAnimIndex[i_5] = 1;
+                        for (int32_t& iAnim : iAnimIndex) {
+                            iAnim = 1;
                         }
                     }
                 }
@@ -1464,8 +1464,8 @@ bool BlackJackMenu::InitCasinoData() {
         pBack->~NiPointer<NiSourceTexture>();
     }
     iCardsRemaining = 52 * iNumOfDecks;
-    for (int32_t n = 0; n < 3; ++n) {
-        iAnimIndex[n] = 1;
+    for (int32_t& iAnim : iAnimIndex) {
+        iAnim = 1;
     }
     bRunScriptOnExit = false;
     pCard->~BlackJackCard();

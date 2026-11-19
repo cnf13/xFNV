@@ -5,8 +5,8 @@
 #include "SDK/MSVC/string.h"
 
 BSSystemUtilitiesStrings::BSSystemUtilitiesStrings() {
-    for (uint32_t i = 0; i < 8; ++i) {
-        pcStrings[i] = nullptr;
+    for (char*& pcString : pcStrings) {
+        pcString = nullptr;
     }
 }
 
@@ -17,10 +17,10 @@ void BSSystemUtilitiesStrings::Initialize() {
 }
 
 void BSSystemUtilitiesStrings::Destroy() {
-    for (uint32_t i = 0; i < 8; ++i) {
-        if (pcStrings[i]) {
-            MemoryManager_Singleton.Deallocate(pcStrings[i]);
-            pcStrings[i] = nullptr;
+    for (char*& pcString : pcStrings) {
+        if (pcString) {
+            MemoryManager_Singleton.Deallocate(pcString);
+            pcString = nullptr;
         }
     }
 }

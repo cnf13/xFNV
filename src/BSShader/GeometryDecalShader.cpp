@@ -302,8 +302,8 @@ void GeometryDecalShader::ReloadShaders() {
 }
 
 void GeometryDecalShader::ClearPassStages() {
-    for (int32_t i = 0; i < 2; ++i) {
-        ClearPass(spGeometryDecalPass[i].m_pObject);
+    for (const NiPointer<NiD3DPass>& spEntry : spGeometryDecalPass) {
+        ClearPass(spEntry.m_pObject);
     }
 }
 

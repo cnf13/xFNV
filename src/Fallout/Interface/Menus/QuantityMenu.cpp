@@ -131,8 +131,8 @@ bool QuantityMenu::DoGamepadUpEvent(int32_t a2, float a3) {
 }
 
 bool QuantityMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 6; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

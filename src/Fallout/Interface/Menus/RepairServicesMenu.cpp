@@ -307,8 +307,8 @@ void RepairServicesMenu::RepairItem(ItemChange* apBrokenItem) {
 }
 
 bool RepairServicesMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 16; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

@@ -666,10 +666,10 @@ int32_t ActorValue::CompareForSorting(ListBoxItem<ActorValue::Index>* a1, ListBo
 }
 
 void ActorValue::FreeActorValues() {
-    for (int32_t i = 0; i < 77; ++i) {
-        if (ActorValue::Instance.pActorValueInfo[i]) {
-            delete ActorValue::Instance.pActorValueInfo[i];
-            ActorValue::Instance.pActorValueInfo[i] = nullptr;
+    for (ActorValueInfo*& pInfo : ActorValue::Instance.pActorValueInfo) {
+        if (pInfo) {
+            delete pInfo;
+            pInfo = nullptr;
         }
     }
     bActorValuesRegistered = false;
@@ -711,8 +711,8 @@ ActorValueInfo::ActorValueInfo(ActorValue::Index aiWhich, char* apScriptName)
         TESForm::SetFormEditorID(acEditorID);
     }
     sAbbreviation = "";
-    for (int32_t i = 0; i < 15; ++i) {
-        DependentActorValues[i] = ActorValue::ACTOR_VALUE_COUNT;
+    for (int32_t& iDependent : DependentActorValues) {
+        iDependent = ActorValue::ACTOR_VALUE_COUNT;
     }
 }
 

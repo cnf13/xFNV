@@ -177,9 +177,9 @@ void hkpSimpleCollisionResponse::solveSingleContact2(
     }
 
     hkpVelocityAccumulator* body = bodyA;
-    for (int32_t i = 0; i < 2; i++) {
+    for (const hkpBodyVelocity& velocity : vel) {
         // The angular velocity back into world space.
-        body->m_angularVel.setRotatedDir(body->m_scratch123, vel[i].m_angular);
+        body->m_angularVel.setRotatedDir(body->m_scratch123, velocity.m_angular);
         body = bodyB;
     }
 }

@@ -576,8 +576,8 @@ void BarterMenu::UpdateCapsLabels() {
 }
 
 bool BarterMenu::AreAllTilesNonNull() {
-    for (int32_t i = 0; i < 22; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

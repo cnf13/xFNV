@@ -99,8 +99,8 @@ SandBoxActorPackageData::SandBoxActorPackageData()
     bShouldPickNewProcedure(true), bFood(false), bChair(false), bBed(false), pCurrentTargetObject(nullptr),
     cCurrentTargetMarker(127), pPrevTargetObject(nullptr), iActivityStartDay(0), fActivityDuration(0.0f),
     fActivityStartHour(0.0f), eActivity(SANDBOX_ACTIVITY_NONE) {
-    for (int32_t i = 0; i < 6; ++i) {
-        cProcedureWeight[i] = (uint8_t)(-128);
+    for (uint8_t& cWeight : cProcedureWeight) {
+        cWeight = (uint8_t)(-128);
     }
 }
 

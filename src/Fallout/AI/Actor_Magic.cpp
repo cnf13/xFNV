@@ -793,8 +793,8 @@ void Actor::CastPermanentMagic(bool abWornEnchantmentsOnly) {
     else {
         InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(this);
         TESBoundObject* pusedSources[BIPED_OBJECT_COUNT];
-        for (int32_t i = 0; i < BIPED_OBJECT_COUNT; ++i) {
-            pusedSources[i] = nullptr;
+        for (TESBoundObject*& pSource : pusedSources) {
+            pSource = nullptr;
         }
         for (int32_t i = BO_HEAD; i < BIPED_OBJECT_COUNT; ++i) {
             ItemChange* pitem = pinventory->GetWornItem(static_cast<BIPED_OBJECT>(i), false);
@@ -862,8 +862,8 @@ void Actor::PreloadPermanentMagic() {
         }
     }
     InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(this);
-    for (int32_t i = 0; static_cast<uint32_t>(i) < sizeof(WornBodyParts) / sizeof(WornBodyParts[0]); ++i) {
-        ItemChange* pitem = pinventory->GetWornItem(WornBodyParts[i], false);
+    for (BIPED_OBJECT eBodyPart : WornBodyParts) {
+        ItemChange* pitem = pinventory->GetWornItem(eBodyPart, false);
         TESEnchantableForm* penchantable =
             pitem ? dynamic_cast<TESEnchantableForm*>(pitem->GetContainerObject()) : nullptr;
         EnchantmentItem* penchantment = penchantable ? penchantable->GetFormEnchanting() : nullptr;
@@ -908,10 +908,10 @@ void Actor::UnloadPermanentMagic() {
         }
     }
     InventoryChanges* pinventory = InventoryChanges::GetInventoryChanges(this);
-    for (uint32_t i = 0; i < 5; ++i) {
+    for (BIPED_OBJECT eBodyPart : WornBodyParts) {
         EnchantmentItem* FormEnchanting;
         TESEnchantableForm* penchantable;
-        ItemChange* pitem = pinventory->GetWornItem(WornBodyParts[i], false);
+        ItemChange* pitem = pinventory->GetWornItem(eBodyPart, false);
         if (pitem) {
             penchantable = dynamic_cast<TESEnchantableForm*>(pitem->pContainerObj);
         }

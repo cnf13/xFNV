@@ -2859,10 +2859,10 @@ uint32_t InterfaceManager::TutorialManager::GetSaveLoadSize() {
 }
 
 void InterfaceManager::TutorialManager::Reset() {
-    for (uint32_t i = 0; i < 41; ++i) {
-        tMessages[i].bShowMessage = 0;
-        tMessages[i].bMessageShown = 0;
-        tMessages[i].uiShowDelay = 0;
+    for (MessageData& rMessage : tMessages) {
+        rMessage.bShowMessage = 0;
+        rMessage.bMessageShown = 0;
+        rMessage.uiShowDelay = 0;
     }
     uiNextDisplay = 0;
     eDisplayID = Interface::TUT_COUNT;

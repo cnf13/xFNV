@@ -153,8 +153,8 @@ bool TESWaterForm::Load(TESFile* apFile) {
                 TESFile::WidenFormIDRecords(pWaterWeatherControl, 3, 4, sizeof(TESWaterForm*), {{0, 0}});
 #endif
                 if (apFile->QEndian()) {
-                    for (int32_t i = 0; i < 3; ++i) {
-                        ENDIAN(pWaterWeatherControl[i], false);
+                    for (TESWaterForm*& pControl : pWaterWeatherControl) {
+                        ENDIAN(pControl, false);
                     }
                 }
             }
@@ -274,15 +274,14 @@ TESWaterForm::~TESWaterForm() {
 }
 
 void TESWaterForm::InitializeData() {
-    int32_t i;
     cAlpha = (uint8_t)75;
     cFlags = (uint8_t)0;
     pWaterSound = nullptr;
     (&cMaterialID)->Set(nullptr, (uint32_t)0);
     WaterShaderData* visData = GetData();
     visData->Initialize();
-    for (i = 0; i < 3; ++i) {
-        pWaterWeatherControl[i] = nullptr;
+    for (TESWaterForm*& pControl : pWaterWeatherControl) {
+        pControl = nullptr;
     }
 }
 

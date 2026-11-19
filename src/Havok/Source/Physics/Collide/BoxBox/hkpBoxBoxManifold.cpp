@@ -6,8 +6,8 @@
 
 // No points: every slot's contact point id cleared, the counts zero and the manifold not complete.
 hkpBoxBoxManifold::hkpBoxBoxManifold() : m_faceVertexFeatureCount(0), m_numPoints(0), m_isComplete(false) {
-    for (int32_t i = 0; i < HK_BOXBOX_MANIFOLD_MAX_POINTS; ++i) {
-        m_contactPoints[i].m_contactPointId = 0;
+    for (hkpFeatureContactPoint& point : m_contactPoints) {
+        point.m_contactPointId = 0;
     }
 }
 

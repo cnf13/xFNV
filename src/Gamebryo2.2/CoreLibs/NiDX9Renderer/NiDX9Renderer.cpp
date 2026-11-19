@@ -267,8 +267,8 @@ NiDX9Renderer::~NiDX9Renderer() {
     delete m_pkLightManager;
     m_pkLightManager = nullptr;
 
-    for (uint32_t i = 0; i < 256; ++i) {
-        ms_aspDeclarations[i] = nullptr;
+    for (NiPointer<NiD3DShaderDeclaration>& spDeclaration : ms_aspDeclarations) {
+        spDeclaration = nullptr;
     }
 
     if (m_pkD3DDevice9) {
@@ -746,8 +746,8 @@ bool NiDX9Renderer::PurgeTexture(NiTexture* apTexture) {
         if (static_cast<NiDX9TextureData*>(pkData)->GetAsRenderedTexture()) {
             if (apTexture->IsKindOf(&NiRenderedCubeMap::ms_RTTI)) {
                 NiRenderedCubeMap* pkCubeMap = static_cast<NiRenderedCubeMap*>(apTexture);
-                for (uint32_t i = 0; i < 6; i++) {
-                    pkCubeMap->m_aspFaceBuffers[i]->m_spRendererData = nullptr;
+                for (Ni2DBuffer* pkFaceBuffer : pkCubeMap->m_aspFaceBuffers) {
+                    pkFaceBuffer->m_spRendererData = nullptr;
                 }
             }
             else {
@@ -2254,9 +2254,9 @@ bool NiDX9Renderer::GenerateDefaultTextureData() {
     TexFormat aeFormats[6] = {TEX_RGB565, TEX_RGB555, TEX_RGB888, TEX_RGBA4444, TEX_RGBA5551, TEX_RGBA8888};
     for (uint32_t i = 0; i < 4; i++) {
         m_apkDefaultTextureFormat[i] = nullptr;
-        for (uint32_t j = 0; j < 6; j++) {
-            if (m_aapkTextureFormats[i][aeFormats[j]]) {
-                m_apkDefaultTextureFormat[i] = m_aapkTextureFormats[i][aeFormats[j]];
+        for (TexFormat eFormat : aeFormats) {
+            if (m_aapkTextureFormats[i][eFormat]) {
+                m_apkDefaultTextureFormat[i] = m_aapkTextureFormats[i][eFormat];
                 break;
             }
         }

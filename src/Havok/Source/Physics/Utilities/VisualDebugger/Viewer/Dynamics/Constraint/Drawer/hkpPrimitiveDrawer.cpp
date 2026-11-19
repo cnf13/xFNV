@@ -301,9 +301,9 @@ void hkpPrimitiveDrawer::displayPlane(
     q90.setAxisAngle(planeNormal, 1.5707964f);
     q45.setAxisAngle(planeNormal, 0.7853982f);
     pVec.setRotatedDir(q45, pVec);
-    for (int32_t i = 0; i < 4; ++i) {
-        points[i].m_quad = startPos.m_quad;
-        points[i].m_quad = _mm_add_ps(points[i].m_quad, pVec.m_quad);
+    for (hkVector4& point : points) {
+        point.m_quad = startPos.m_quad;
+        point.m_quad = _mm_add_ps(point.m_quad, pVec.m_quad);
         pVec.setRotatedDir(q90, pVec);
     }
     m_displayHandler->displayLine(points[0], points[1], color, id, tag);

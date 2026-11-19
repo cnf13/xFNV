@@ -553,10 +553,10 @@ void ImpactMixer::InitFootsteps() {
 void ImpactMixer::InitGunshots() {
     if (!ImpactMixer::GetGunshotsInitialized()) {
         ImpactMixer::SetGunshotsInitialized(true);
-        for (int32_t i = 0; i < 20; ++i) {
-            ImpactMixer::GunshotHandles[i].uiIdentifier = nullptr;
-            ImpactMixer::GunshotHandles[i].uiTimestamp = 0;
-            ImpactMixer::GunshotHandles[i].fRelativeDistance = 3.4028235e+38f;
+        for (WeaponNearFarSound& rHandle : ImpactMixer::GunshotHandles) {
+            rHandle.uiIdentifier = nullptr;
+            rHandle.uiTimestamp = 0;
+            rHandle.fRelativeDistance = 3.4028235e+38f;
         }
     }
 }

@@ -642,8 +642,8 @@ bool ContainerMenu::PickpocketCheck(Actor* apActor, int32_t aiStealValue) {
 }
 
 bool ContainerMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 19; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }

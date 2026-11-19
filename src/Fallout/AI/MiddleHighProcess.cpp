@@ -5003,8 +5003,8 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     pAnimFace = nullptr;
     pLastIdlePlayed = nullptr;
     pCurrentIdle = nullptr;
-    for (int32_t i = 0; i < 3; ++i) {
-        pAimSequence[i] = nullptr;
+    for (BSAnimGroupSequence*& pSequence : pAimSequence) {
+        pSequence = nullptr;
     }
     if ((apLoadGameBuffer->GetOldChangeFlags().CheckFlags(0x10000000)) && (pAnimation)) {
         pAnimation->Revert(apLoadGameBuffer);

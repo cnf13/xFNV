@@ -326,8 +326,8 @@ CSpeedTreeRT::CSpeedTreeRT()
         m_pTreeSizes[STS_MAX_BOX + 1] = 1.0f;
         m_pTreeSizes[STS_MAX_BOX + 2] = 1.0f;
         m_pTreeSizes[STS_BB_SIZE] = 1.0f;
-        for (int32_t i = 0; i < 12; ++i) {
-            m_afHorizontalCoords[i] = 0.0f;
+        for (float& fCoord : m_afHorizontalCoords) {
+            fCoord = 0.0f;
         }
     }
     catch (rt::exception& cException) {
@@ -3329,8 +3329,8 @@ void CLightingEngine::Parse(CTreeFileAccess& cFile) {
                 break;
             }
             case File_BranchMaterial: {
-                for (int32_t i = 0; i < 13; ++i) {
-                    m_afBranchMaterial[i] = cFile.ParseFloat();
+                for (float& fParam : m_afBranchMaterial) {
+                    fParam = cFile.ParseFloat();
                 }
                 break;
             }
@@ -3339,8 +3339,8 @@ void CLightingEngine::Parse(CTreeFileAccess& cFile) {
                 break;
             }
             case File_LeafMaterial: {
-                for (int32_t i_2 = 0; i_2 < 13; ++i_2) {
-                    m_afLeafMaterial[i_2] = cFile.ParseFloat();
+                for (float& fParam : m_afLeafMaterial) {
+                    fParam = cFile.ParseFloat();
                 }
                 break;
             }
@@ -3357,8 +3357,8 @@ void CLightingEngine::Parse(CTreeFileAccess& cFile) {
                 break;
             }
             case File_FrondMaterial: {
-                for (int32_t i_3 = 0; i_3 < 13; ++i_3) {
-                    m_afFrondMaterial[i_3] = cFile.ParseFloat();
+                for (float& fParam : m_afFrondMaterial) {
+                    fParam = cFile.ParseFloat();
                 }
                 break;
             }

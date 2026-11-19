@@ -672,8 +672,8 @@ SlotMachineMenu::SlotResults SlotMachineMenu::SpinReels() {
 
 SlotMachineMenu::SlotResults SlotMachineMenu::InterpretSpin() {
     int32_t v3 = 0;
-    for (int32_t i = 0; i < 3; ++i) {
-        if (eReelResults[i] == 12) {
+    for (SlotMachineMenu::ReelSymbols eResult : eReelResults) {
+        if (eResult == 12) {
             ++v3;
         }
     }
@@ -744,8 +744,8 @@ char SlotMachineMenu::IsWellFormedMenu() {
 char SlotMachineMenu::SetupActiveReels() {
     uint32_t v13[7];
     int32_t v12 = 0;
-    for (int32_t i = 0; i < 28; ++i) {
-        eActiveReelSymbols[i] = NUM_SYMBOLS;
+    for (SlotMachineMenu::ReelSymbols& eSymbol : eActiveReelSymbols) {
+        eSymbol = NUM_SYMBOLS;
     }
     uint32_t v14 = 0;
     int32_t iSlotStop_A = (&SlotMachineMenu::pCasino->data)->iSlotStop_A;
@@ -763,8 +763,8 @@ char SlotMachineMenu::SetupActiveReels() {
     iSlotStop_A = (&SlotMachineMenu::pCasino->data)->iSlotStop_W;
     v13[6] = iSlotStop_A;
     iNumActiveSymbols = 7;
-    for (int32_t j = 0; j < 7; ++j) {
-        if (!v13[j]) {
+    for (uint32_t uiSymbol : v13) {
+        if (!uiSymbol) {
             --iNumActiveSymbols;
         }
     }
@@ -1439,9 +1439,9 @@ void SlotMachineMenu::SwapFrontfacingTextures() {
     if (iLuckSkill - 5 < 0) {
         if (static_cast<int32_t>(a2) >= 4) {
             if (static_cast<int32_t>(a2) <= 5) {
-                for (int32_t i = 0; i < 3; ++i) {
-                    if (eReelResults[i] == SlotMachineMenu::SL_WILD) {
-                        eReelResults[i] = SlotMachineMenu::SL_WILDB;
+                for (SlotMachineMenu::ReelSymbols& eResult : eReelResults) {
+                    if (eResult == SlotMachineMenu::SL_WILD) {
+                        eResult = SlotMachineMenu::SL_WILDB;
                     }
                 }
                 bLucky = true;

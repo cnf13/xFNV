@@ -115,10 +115,10 @@ hkJobQueue::JobStatus hkCpuKdTreeBuildFastDistributedJob(hkJobQueue& jobQueue, h
         // The SDK's storage for the queue's locked data.
         alignas(16) char dynamicDataStorage[sizeof(hkJobQueue::DynamicData)];
         hkJobQueue::DynamicData* data = jobQueue.lockQueue(dynamicDataStorage);
-        for (int32_t i = 0; i < 4; i++) {
+        for (hkpKdTreeBuildDistributedSubJob& subJob : subJobs) {
             // The queue takes the job as an entry: its hkJob base is the entry's.
             jobQueue.addJobQueueLocked(
-                data, static_cast<const hkJobQueue::JobQueueEntry&>(static_cast<const hkJob&>(subJobs[i])),
+                data, static_cast<const hkJobQueue::JobQueueEntry&>(static_cast<const hkJob&>(subJob)),
                 hkJobQueue::JOB_HIGH_PRIORITY
             );
         }

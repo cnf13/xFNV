@@ -575,8 +575,8 @@ void ScreenCustomSplatter::Shutdown() {
         ScreenCustomSplatter::spCamera = static_cast<NiCamera*>(nullptr);
     }
     ScreenCustomSplatter::bEnabled = false;
-    for (int32_t i = 0; i < 3; ++i) {
-        ScreenCustomSplatter::spTextures[i] = static_cast<NiTexture*>(nullptr);
+    for (NiPointer<NiTexture>& spTexture : ScreenCustomSplatter::spTextures) {
+        spTexture = static_cast<NiTexture*>(nullptr);
     }
 }
 

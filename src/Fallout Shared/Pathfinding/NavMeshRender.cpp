@@ -193,8 +193,8 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             else {
                 triVertList.SetSize(uiTotalSize + 3, true);
                 triColorList.SetSize(uiTotalSize + 3, true);
-                for (uint32_t iCorner = 0; iCorner < 3; ++iCorner) {
-                    NiPoint3& rCorner = triVertList.GetAt(ausTriVertices[iCorner]);
+                for (uint16_t usVertex : ausTriVertices) {
+                    NiPoint3& rCorner = triVertList.GetAt(usVertex);
                     triVertList.GetAt(static_cast<int32_t>(uiTotalSize)) = rCorner;
                     triColorList.GetAt(static_cast<int32_t>(uiTotalSize)) = ColorValues[eColor];
                     pusTriList[uiCopy++] = static_cast<uint16_t>(uiTotalSize++);

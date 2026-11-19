@@ -90,11 +90,11 @@ Lighting30Shader::Lighting30Shader(
     spSkinnedShaderDeclVCNC(apSkinnedShaderDeclVC), pLastGeometryBufferData(nullptr), iZWriteEnable(1) {
     iShaderType = 17;
     m_spShaderDecl = apShaderDecl;
-    for (int32_t i = 0; i < 17; ++i) {
-        bVSConstantEnable[i] = 0;
+    for (uint8_t& rbEnable : bVSConstantEnable) {
+        rbEnable = 0;
     }
-    for (int32_t i = 0; i < 10; ++i) {
-        bPSConstantEnable[i] = false;
+    for (bool& rbEnable : bPSConstantEnable) {
+        rbEnable = false;
     }
     if (BSShaderManager::eShaderLevel < 7) {
         iMaxLights = 5;
@@ -104,20 +104,20 @@ Lighting30Shader::Lighting30Shader(
 // Releases the shared (static) shaders, passes and constant map entries and refills both constant tables with black;
 // the declaration and constant map members, and the base's shader declaration, are released by their destructors.
 Lighting30Shader::~Lighting30Shader() {
-    for (uint32_t i = 0; i < 57; ++i) {
-        spVertexShaders[i] = nullptr;
+    for (NiPointer<NiD3DVertexShader>& spShader : spVertexShaders) {
+        spShader = nullptr;
     }
     for (int32_t i = 0; i < 50; ++i) {
         spPixelShaders[i] = nullptr;
         spPixelShadersLowLight[i] = nullptr;
     }
-    for (uint32_t i = 0; i < 112; ++i) {
-        spPass[i] = nullptr;
+    for (NiPointer<NiD3DPass>& spEntry : spPass) {
+        spEntry = nullptr;
     }
-    for (uint32_t i = 0; i < 17; ++i) {
-        if (pVertexConstantMapEntry[i]) {
-            pVertexConstantMapEntry[i]->DecRefCount();
-            pVertexConstantMapEntry[i] = nullptr;
+    for (NiShaderConstantMapEntry*& rpEntry : pVertexConstantMapEntry) {
+        if (rpEntry) {
+            rpEntry->DecRefCount();
+            rpEntry = nullptr;
         }
     }
     // Walks only the first 10 of the 11 pixel entries, deliberately, as the game does.
@@ -128,11 +128,11 @@ Lighting30Shader::~Lighting30Shader() {
         }
     }
     const NiColorA kBlack = NiColorA_BLACK;
-    for (uint32_t i = 0; i < 164; ++i) {
-        kVSConstants[i].x = kBlack.r;
-        kVSConstants[i].y = kBlack.g;
-        kVSConstants[i].z = kBlack.b;
-        kVSConstants[i].w = kBlack.a;
+    for (NiVector4& rConstant : kVSConstants) {
+        rConstant.x = kBlack.r;
+        rConstant.y = kBlack.g;
+        rConstant.z = kBlack.b;
+        rConstant.w = kBlack.a;
     }
     for (uint32_t i = 0; i < 63; ++i) {
         kPSConstants[i].x = kBlack.r;
@@ -150,8 +150,8 @@ const NiRTTI* Lighting30Shader::GetRTTI() const {
 // constant tables with black, as the destructor does.
 bool Lighting30Shader::Initialize() {
     BSShader::Initialize();
-    for (uint32_t i = 0; i < 57; ++i) {
-        spVertexShaders[i] = nullptr;
+    for (NiPointer<NiD3DVertexShader>& spShader : spVertexShaders) {
+        spShader = nullptr;
     }
     for (int32_t i = 0; i < 50; ++i) {
         NiD3DPixelShader* pShader = spPixelShaders[i].m_pObject;
@@ -165,14 +165,14 @@ bool Lighting30Shader::Initialize() {
             spPixelShadersLowLight[i].m_pObject = nullptr;
         }
     }
-    for (uint32_t i = 0; i < 112; ++i) {
-        spPass[i] = nullptr;
+    for (NiPointer<NiD3DPass>& spEntry : spPass) {
+        spEntry = nullptr;
     }
-    for (uint32_t i = 0; i < 17; ++i) {
-        NiShaderConstantMapEntry* pEntry = pVertexConstantMapEntry[i];
+    for (NiShaderConstantMapEntry*& rpEntry : pVertexConstantMapEntry) {
+        NiShaderConstantMapEntry* pEntry = rpEntry;
         if (pEntry) {
             pEntry->DecRefCount();
-            pVertexConstantMapEntry[i] = nullptr;
+            rpEntry = nullptr;
         }
     }
     // Walks only the first 10 of the 11 pixel entries, deliberately, as the game does.
@@ -1015,8 +1015,8 @@ void Lighting30Shader::ReloadShaders() {
 }
 
 void Lighting30Shader::ClearPassStages() {
-    for (uint32_t i = 0; i < 112; ++i) {
-        ClearPass(spPass[i].m_pObject);
+    for (const NiPointer<NiD3DPass>& spEntry : spPass) {
+        ClearPass(spEntry.m_pObject);
     }
 }
 

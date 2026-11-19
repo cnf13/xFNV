@@ -123,14 +123,14 @@ void hkpSimplexSolver::solve() {
                 m_output->m_velocity.m_quad = velocity.m_quad;
                 // Drop the plane with the worst status (the first of them), then clear the status of the three kept.
                 hkpSurfaceConstraintInteraction::hkpStatus maxStatus = hkpSurfaceConstraintInteraction::HK_STATUS_OK;
-                for (int32_t j = 0; j < 4; ++j) {
-                    if (m_supportPlanes[j].m_interaction->m_status >= maxStatus) {
-                        maxStatus = m_supportPlanes[j].m_interaction->m_status;
+                for (const SupportPlane& plane : m_supportPlanes) {
+                    if (plane.m_interaction->m_status >= maxStatus) {
+                        maxStatus = plane.m_interaction->m_status;
                     }
                 }
-                for (int32_t j = 0; j < 4; ++j) {
-                    if (maxStatus == m_supportPlanes[j].m_interaction->m_status) {
-                        m_supportPlanes[j] = m_supportPlanes[3];
+                for (SupportPlane& plane : m_supportPlanes) {
+                    if (maxStatus == plane.m_interaction->m_status) {
+                        plane = m_supportPlanes[3];
                         break;
                     }
                 }

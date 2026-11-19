@@ -130,8 +130,8 @@ RouletteMenu::~RouletteMenu() {
     }
     pBetList = nullptr;
     pTableAnimManager = nullptr;
-    for (int32_t i = 0; i < 3; ++i) {
-        pTableAnimations[i] = nullptr;
+    for (NiControllerSequence*& pAnimation : pTableAnimations) {
+        pAnimation = nullptr;
     }
     for (int32_t i = 0; i < 10; ++i) {
         pBetGeometry[i] = nullptr;
@@ -1122,8 +1122,8 @@ NiCamera* RouletteMenu::Create3DCamera() {
 }
 
 bool RouletteMenu::IsWellFormedMenu() {
-    for (int32_t i = 0; i < 11; ++i) {
-        if (!pTiles[i]) {
+    for (Tile* pTile : pTiles) {
+        if (!pTile) {
             return false;
         }
     }
@@ -1231,8 +1231,8 @@ void RouletteMenu::SetupPossibleBets() {
     char v141 = 65;
     char v140 = 48;
     char v136 = 49;
-    for (int32_t i = 0; i < 159; ++i) {
-        NiPoint3* p_location = &betTileInfoArray[i].location;
+    for (RouletteMenu::BetTileInfo& rInfo : betTileInfoArray) {
+        NiPoint3* p_location = &rInfo.location;
         p_location->x = NiPoint3_ZERO.x;
         p_location->y = NiPoint3_ZERO.y;
         p_location->z = NiPoint3_ZERO.z;

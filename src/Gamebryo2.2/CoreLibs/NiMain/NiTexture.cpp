@@ -36,15 +36,15 @@ void NiTexture::RendererData::_SDMInit() {
 
 // Each dropped texture goes through DeleteThis.
 void NiTexture::RendererData::_SDMShutdown() {
-    for (uint32_t ui = 0; ui < 10; ++ui) {
-        ms_aspReplacementData[ui] = nullptr;
+    for (NiPointer<NiPixelData>& spReplacementData : ms_aspReplacementData) {
+        spReplacementData = nullptr;
     }
 }
 
 void NiTexture::RendererData::SetTextureReplacementFormat(const NiPixelFormat& kFormat) {
     ms_kReplacementFormat = kFormat;
-    for (uint32_t i = 0; i < 10; ++i) {
-        ms_aspReplacementData[i] = nullptr;
+    for (NiPointer<NiPixelData>& spReplacementData : ms_aspReplacementData) {
+        spReplacementData = nullptr;
     }
 }
 
@@ -399,15 +399,15 @@ NiTexture* NiTexture::GetListHead() {
 // The executable accumulates the shift and the component-width sum in byte registers, not bools.
 uint8_t NiPixelFormat::GetShift(Component eComp) const {
     uint8_t ucShift = 0;
-    for (uint32_t uiComponent = 0; uiComponent < NUM_COMPS; ++uiComponent) {
-        if (m_akComponents[uiComponent].m_eComponent == eComp) {
+    for (const NiComponentSpec& kComp : m_akComponents) {
+        if (kComp.m_eComponent == eComp) {
             if ((m_uFlags & 1) == 0) {
-                const uint8_t ucEnd = ucShift + m_akComponents[uiComponent].m_ucBitsPerComponent;
+                const uint8_t ucEnd = ucShift + kComp.m_ucBitsPerComponent;
                 return m_ucBitsPerPixel - ucEnd;
             }
             return ucShift;
         }
-        ucShift += m_akComponents[uiComponent].m_ucBitsPerComponent;
+        ucShift += kComp.m_ucBitsPerComponent;
     }
     return 0;
 }

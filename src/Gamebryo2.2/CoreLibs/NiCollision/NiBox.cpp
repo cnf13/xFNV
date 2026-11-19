@@ -22,16 +22,16 @@ bool NiBox::operator==(const NiBox& kBox) const {
 // The centre and the three axes, then the three extents in one read.
 void NiBox::LoadBinary(NiStream& stream) {
     m_kCenter.LoadBinary(stream);
-    for (uint32_t i = 0; i < 3; ++i) {
-        m_akAxis[i].LoadBinary(stream);
+    for (NiPoint3& kAxis : m_akAxis) {
+        kAxis.LoadBinary(stream);
     }
     NiStreamLoadBinary(stream, m_afExtent, 3);
 }
 
 void NiBox::SaveBinary(NiStream& stream) {
     m_kCenter.SaveBinary(stream);
-    for (uint32_t i = 0; i < 3; ++i) {
-        m_akAxis[i].SaveBinary(stream);
+    for (NiPoint3& kAxis : m_akAxis) {
+        kAxis.SaveBinary(stream);
     }
     NiStreamSaveBinary(stream, m_afExtent, 3);
 }
