@@ -520,12 +520,12 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
         NiPointer<NiTexture> spTexture(nullptr);
         BSTextureSet* pTextureSet = arDecalData.pTexSet;
         pTextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTexture);
-        NiTexture* pTexture = spTexture.operator->();
+        NiTexture* pTexture = spTexture;
         if (NiObject::IsKindOf_0(&NiSourceTexture::ms_RTTI, pTexture)) {
             spDiffuseTexture = static_cast<NiSourceTexture*>(pTexture);
         }
     }
-    if (!spDiffuseTexture.operator->()) {
+    if (!spDiffuseTexture) {
         return false;
     }
     if (!arDecalData.pAVObj) {
@@ -616,10 +616,10 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                 : nullptr;
             {
                 NiPointer<BSTempEffectGeometryDecal> spNewDecal(pNewDecal);
-                BSTempEffect* pEffect = spNewDecal.operator->();
+                BSTempEffect* pEffect = spNewDecal;
                 pEffect->Initialize();
                 // The compare is signed.
-                if (spNewDecal.operator->()->GetNumVerts() <= 0) {
+                if (spNewDecal->GetNumVerts() <= 0) {
                     return true;
                 }
                 if (!arDecalData.pSkinnedDecalNode) {
@@ -633,11 +633,11 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                         Warning("DECAL: Placing Skin Decal #%d", iSkinnedDecalCount);
                     }
                 }
-                pEffect = spNewDecal.operator->();
+                pEffect = spNewDecal;
                 NiAVObject* pDecal3D = pEffect->Get3D();
                 arDecalData.pSkinnedDecalNode->AttachChild(pDecal3D, true);
                 NiNode* pSkinnedDecalNode = arDecalData.pSkinnedDecalNode;
-                spNewDecal.operator->()->SetDecalParent(pSkinnedDecalNode);
+                spNewDecal->SetDecalParent(pSkinnedDecalNode);
                 {
                     NiPointer<NiRefObject> spDecal(spNewDecal.operator->());
                     pDecalNode->pDecalList->AddHead(spDecal);
@@ -646,7 +646,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                 kUpdateData.~NiUpdateData();
                 ::new (&kUpdateData) NiUpdateData(0.0f, false, false);
                 pDecalNode->Update(kUpdateData);
-                ReferenceProcessLists.AddTempEffect(spNewDecal.operator->());
+                ReferenceProcessLists.AddTempEffect(spNewDecal);
                 spTempEffectDecal = spNewDecal.operator->();
             }
         }
@@ -692,8 +692,8 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                             BSTempEffect* pEffect = pNewDecal;
                             pEffect->Initialize();
                         }
-                        if (spCloneDecal.operator->()) {
-                            ReferenceProcessLists.AddTempEffect(spCloneDecal.operator->());
+                        if (spCloneDecal) {
+                            ReferenceProcessLists.AddTempEffect(spCloneDecal);
                         }
                     }
                 }
@@ -717,7 +717,7 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     NiMatrix3 kzrot;
     normal = apDecal->GetDirection();
     normal.Unitize();
-    normal.operator*=(50.0f);
+    normal *= 50.0f;
     NiPoint3 pos = apDecal->GetOrigin() + normal;
     NiPoint3 afTime_4 = -normal;
     ::new (&rot) NiMatrix3(BSUtilities::GetRotationZToVector(afTime_4));
@@ -771,9 +771,8 @@ void BGSDecalManager::IssueDecalOcclusionQuery(BSTempEffectSimpleDecal* apDecal)
     if (!spQueryTexture.m_pObject) {
         NiDX9Renderer* fR_4 = BSShaderManager::GetRenderer();
         BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-        spQueryTexture.operator=(
-            TextureManager->BorrowRenderedTexture(fR_4, BSTextureManager::TEX_DECAL_OCCLUSION, 0, nullptr, 0)
-        );
+        spQueryTexture =
+            TextureManager->BorrowRenderedTexture(fR_4, BSTextureManager::TEX_DECAL_OCCLUSION, 0, nullptr, 0);
     }
     if (apDecal->bClearQueryTexture) {
         NiRenderTargetGroup* Group = spQueryTexture.m_pObject->GetGroup();
@@ -982,7 +981,7 @@ void BGSDecalEmitter::Update() {
     if (MenuConsole::Instance(true)->IsVisible() || StartMenu::PauseMenuIsActive()) {
         return;
     }
-    if (!spParticleData.operator->()->GetCell() || !spParticleData.operator->()->GetParticleObject()) {
+    if (!spParticleData->GetCell() || !spParticleData->GetParticleObject()) {
         bFinished = true;
         return;
     }
@@ -990,18 +989,18 @@ void BGSDecalEmitter::Update() {
         bFinished = true;
         return;
     }
-    double dAge = spParticleData.operator->()->GetAge();
+    double dAge = spParticleData->GetAge();
     // The emitter finishes when the lifetime is below the age or either is NaN.
-    if (!(spParticleData.operator->()->GetLifetime() >= dAge)) {
+    if (!(spParticleData->GetLifetime() >= dAge)) {
         bFinished = true;
         return;
     }
     NiPoint3 kDirection;
     kDirection.~NiPoint3();
     ::new (&kDirection) NiPoint3;
-    spParticleData.operator->()->GetParticleObject()->GetLocalTransform().m_Rotate.GetRow(2, kDirection);
+    spParticleData->GetParticleObject()->GetLocalTransform().m_Rotate.GetRow(2, kDirection);
     kDirection.Unitize();
-    NiPoint3 kFrom = spParticleData.operator->()->GetParticleObject()->GetTranslate();
+    NiPoint3 kFrom = spParticleData->GetParticleObject()->GetTranslate();
     float fMaxWidth = pDecalImpactData->GetDecalMaxWidth();
     float fMinWidth = (float)pDecalImpactData->GetMinWidth();
     float fWidth = RandomFloat(fMinWidth, fMaxWidth);
@@ -1009,7 +1008,7 @@ void BGSDecalEmitter::Update() {
     pCaster->SetCustomPickCollisions(DecalCaster::CUSTOM_PICK_ACTORS);
     pCaster->SetCollision(L_BIPED, false);
     pCaster->SetCollision(L_DEADBIP, false);
-    TESObjectCELL* pCell = spParticleData.operator->()->GetCell();
+    TESObjectCELL* pCell = spParticleData->GetCell();
     bhkWorld* pWorld = pCell ? pCell->GetbhkWorld() : nullptr;
     alignas(16) bhkPickData kPick;
     kPick.~bhkPickData();
@@ -1025,8 +1024,8 @@ void BGSDecalEmitter::Update() {
     kTo.z = RandomFloat(-20.0f, 20.0f) + kTo.z;
     // The drop is computed in double (the age over the lifetime, times the negated gravity) and rounded to float.
     double dGravity = -(double)fSprayDecalsGravity.Float();
-    double dDropAge = spParticleData.operator->()->GetAge();
-    float fDrop = (float)(dDropAge / spParticleData.operator->()->GetLifetime() * dGravity);
+    double dDropAge = spParticleData->GetAge();
+    float fDrop = (float)(dDropAge / spParticleData->GetLifetime() * dGravity);
     kTo.z = kTo.z + fDrop;
     // The compare is signed.
     if ((int32_t)iSprayDecalsDebug.UInt() > 0) {

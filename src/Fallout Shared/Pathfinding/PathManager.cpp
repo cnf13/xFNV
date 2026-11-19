@@ -316,8 +316,8 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPath(
     }
     RayCastPathRequest* prequest_2 = prequest;
     prequest->pInitialPathRequest = spRequest.m_pObject;
-    prequest_2->StartLocation.operator=(aStartLocation);
-    prequest_2->GoalLocation.operator=(aGoalLocation);
+    prequest_2->StartLocation = aStartLocation;
+    prequest_2->GoalLocation = aGoalLocation;
     prequest_2->eType = RCRT_NOMESH;
     RayCastPath* v8 = static_cast<RayCastPath*>(ourMalloc(sizeof(RayCastPath)));
     if (v8) {
@@ -376,7 +376,7 @@ RAYCASTPATH_RESULT PathingTaskData::GetRayCastPathToNavmesh(
     }
     RayCastPathRequest* prequest_2 = prequest;
     prequest->pInitialPathRequest = spRequest.m_pObject;
-    prequest_2->GoalLocation.operator=(aGoalLocation);
+    prequest_2->GoalLocation = aGoalLocation;
     aEdges.CopyTo(&prequest_2->Edges);
     prequest_2->eType = static_cast<RAYCAST_REQUEST_TYPE>(!abStart);
     RayCastPath* v9 = static_cast<RayCastPath*>(ourMalloc(sizeof(RayCastPath)));
@@ -401,7 +401,7 @@ void PathingTaskData::Setup(
     const NiPointer<PathingRequest>& aspRequest,
     NiPointer<ActorPathingMessageQueue> aspMessageQueue
 ) {
-    spRequest.operator=(aspRequest);
+    spRequest = aspRequest;
     spMessageQueue.SetPointer_(&aspMessageQueue);
 }
 

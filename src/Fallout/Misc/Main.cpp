@@ -834,19 +834,19 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
             BSRenderedTexture* yd = Main::spMenuBGTexture.m_pObject;
             BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
             TextureManager->ReturnRenderedTexture(yd);
-            Main::spMenuBGTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+            Main::spMenuBGTexture = static_cast<BSRenderedTexture*>(nullptr);
         }
         if (Main::spInterfaceFXTex.m_pObject) {
             BSRenderedTexture* ye = Main::spInterfaceFXTex.m_pObject;
             BSTextureManager* v44 = BSShaderManager::TextureManagerPtr();
             v44->ReturnRenderedTexture(ye);
-            Main::spInterfaceFXTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
+            Main::spInterfaceFXTex = static_cast<BSRenderedTexture*>(nullptr);
         }
         if (Main::spVATSTex.m_pObject) {
             BSRenderedTexture* yf = Main::spVATSTex.m_pObject;
             BSTextureManager* v45 = BSShaderManager::TextureManagerPtr();
             v45->ReturnRenderedTexture(yf);
-            Main::spVATSTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
+            Main::spVATSTex = static_cast<BSRenderedTexture*>(nullptr);
         }
         TaskQueueInterface::SetActive(false);
         if (NiParallelUpdateTaskManager::Get()) {
@@ -1489,7 +1489,7 @@ void Main::InitSceneGraph() {
         pSceneGraph = nullptr;
     }
     NiRefObject* v73 = (NiRefObject*)pSceneGraph;
-    Main::spWorldRoot.operator=(static_cast<BSSceneGraph*>(pSceneGraph));
+    Main::spWorldRoot = static_cast<BSSceneGraph*>(pSceneGraph);
     ShadowSceneNode* v70 = static_cast<ShadowSceneNode*>(NiMemObject::operator new(sizeof(ShadowSceneNode)));
     if (v70) {
         pshadowSceneNode = ::new (v70) ShadowSceneNode;
@@ -1529,7 +1529,7 @@ void Main::InitSceneGraph() {
     BSShaderManager::uiObjectTypeShadowMask = iShadowCasters;
     BSShaderManager::SetObjectTypeCallback(&TESObjectREFR::GetLightingObjectType);
     ShadowLightShader::fWaterDepthRange = 0.0f;
-    BSShaderManager::spMainCamera.operator=(Main::spWorldRoot.m_pObject->GetCamera());
+    BSShaderManager::spMainCamera = Main::spWorldRoot.m_pObject->GetCamera();
     SceneGraph* v32 = static_cast<SceneGraph*>(Main::spWorldRoot.m_pObject);
     v32->AttachChild(pshadowSceneNode, 1);
     BSFogProperty* v68 = static_cast<BSFogProperty*>(NiMemObject::operator new(sizeof(BSFogProperty)));
@@ -1540,7 +1540,7 @@ void Main::InitSceneGraph() {
         pFogProp = nullptr;
     }
     NiRefObject* v69 = (NiRefObject*)pFogProp;
-    Main::spFog.operator=(pFogProp);
+    Main::spFog = pFogProp;
     Main::spFog.m_pObject->SetFog(true);
     Main::spFog.m_pObject->SetDepth(1.0f);
     BSShaderManager::SetFogProperty(0, Main::spFog.m_pObject);
@@ -1552,7 +1552,7 @@ void Main::InitSceneGraph() {
         Sky_ = nullptr;
     }
     NiRefObject* v67 = (NiRefObject*)Sky_;
-    Main::spSkyRoot.operator=(static_cast<NiNode*>(Sky_));
+    Main::spSkyRoot = static_cast<NiNode*>(Sky_);
     static_cast<BSMultiBoundNode*>(Main::spSkyRoot.m_pObject)
         ->BSMultiBoundNode::SetCullingMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     Main::spSkyRoot.m_pObject->SetFixedBound(true);
@@ -1567,7 +1567,7 @@ void Main::InitSceneGraph() {
         v28 = nullptr;
     }
     NiRefObject* v64 = (NiRefObject*)v28;
-    Main::spWeatherRoot.operator=(v28);
+    Main::spWeatherRoot = v28;
     Main::spWeatherRoot.m_pObject->SetAlwaysDraw(true);
     Main::spWeatherRoot.m_pObject->SetFixedBound(true);
     Main::spWeatherRoot.m_pObject->SetName("Weather");
@@ -1656,7 +1656,7 @@ void Main::InitSceneGraph() {
         BSParticleSystemManager_ = nullptr;
     }
     NiRefObject* v43 = (NiRefObject*)BSParticleSystemManager_;
-    Main::spParticleSystemManager.operator=(BSParticleSystemManager_);
+    Main::spParticleSystemManager = BSParticleSystemManager_;
     Main::spParticleSystemManager.m_pObject->SetName("Master Particle Systems");
     BSParticleSystemManager* a4b = Main::spParticleSystemManager.m_pObject;
     pshadowSceneNode->SetAt(5u, a4b);
@@ -1688,7 +1688,7 @@ void Main::InitSceneGraph() {
         else {
             pScreenElements = nullptr;
         }
-        Main::spMenuBGGeometry.operator=(pScreenElements);
+        Main::spMenuBGGeometry = pScreenElements;
         Main::spMenuBGGeometry.m_pObject->Insert(4, 0, nullptr);
         Main::spMenuBGGeometry.m_pObject->SetRectangle(0, 0.0f, 0.0f, 1.0f, 1.0f);
         Main::spMenuBGGeometry.m_pObject->UpdateBound();
@@ -1842,7 +1842,7 @@ void Main::OnIdle() {
         GetWorldSceneGraph()->SetCameraFOV(fWorldFOV, false, nullptr, true);
     }
     BSShaderManager::SetFOV(pPlayer->GetWorldFOV());
-    NiCamera* pSceneCamera = spWorldRoot.operator->()->GetCamera();
+    NiCamera* pSceneCamera = spWorldRoot->GetCamera();
     NiCamera* pCullCamera = nullptr;
     TES::pInstance->ResetAllMultiBoundNodes(true, true);
     NiCamera* pOcclusionCamera = pCullCamera ? pCullCamera : pSceneCamera;
@@ -2347,7 +2347,7 @@ void Main::Swap() {
         BSRenderedTexture* v15 = Main::spInterfaceFXTex.m_pObject;
         BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
         TextureManager->ReturnRenderedTexture(v15);
-        Main::spInterfaceFXTex.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        Main::spInterfaceFXTex = static_cast<BSRenderedTexture*>(nullptr);
     }
     Controls* Instance = Controls::GetInstance();
     if (Instance->GetUserAction(Controls::UACTN_SCREENSHOT, 1)) {
@@ -2356,7 +2356,7 @@ void Main::Swap() {
             bMultiScreenshotQueued = !bMultiScreenshotQueued;
             if (bMultiScreenshotQueued) {
                 iIdleSectionCount = 0;
-                gs_iTake_CameraPath.operator=(gs_iTake_CameraPath.Int() + 1);
+                gs_iTake_CameraPath = gs_iTake_CameraPath.Int() + 1;
                 BSsprintf(PathName, 260, "%s%03d", gs_sDirectoryName_CameraPath.String(), gs_iTake_CameraPath.Int());
                 std::error_code kError;
                 std::filesystem::create_directory(platform::NativePath(PathName), kError);
@@ -2713,7 +2713,7 @@ void Main::DrawWorld_End(
                 0x80000000u, 800, 600
             );
         }
-        BSShaderAccumulator::spRenderPassesScenegraph.operator=(static_cast<NiNode*>(nullptr));
+        BSShaderAccumulator::spRenderPassesScenegraph = static_cast<NiNode*>(nullptr);
     }
     BSBatchRenderer::EndPass();
 }
@@ -2917,7 +2917,7 @@ void Main::KillMenuBGTexture() {
         v4 = (&Main::spMenuBGTexture)->operator->();
         textureManager = BSShaderManager::TextureManagerPtr();
         textureManager->ReturnRenderedTexture(v4);
-        (&Main::spMenuBGTexture)->operator=(nullptr);
+        Main::spMenuBGTexture = nullptr;
         imageSpaceManager = BSShaderManager::GetImageSpaceManager();
         imageSpaceManager->SetMenuBGBlendValue(0.0);
         v3 = BSShaderManager::GetImageSpaceManager();
@@ -2944,7 +2944,7 @@ void Main::RenderMenuBackground() {
     static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer())->LockRenderer();
     Tile::Lock();
     MTRenderingSystem::QInstance()->StartThreads();
-    if (spMenuBGTexture.operator->()) {
+    if (spMenuBGTexture) {
         BSRenderedTexture* pOldTexture = spMenuBGTexture.operator->();
         BSShaderManager::TextureManagerPtr()->ReturnRenderedTexture(pOldTexture);
     }
@@ -3036,7 +3036,7 @@ void Main::UpdateOffscreenInterface() {
         if (Interface::IsInMenuMode()) {
             Interface::LastMinuteUpdate();
         }
-        if (!spInterfaceFXTex.operator->()) {
+        if (!spInterfaceFXTex) {
             NiRenderer* pRenderer = NiRenderer::GetRenderer();
             BSTextureManager* pTextureManager = BSShaderManager::TextureManagerPtr();
             spInterfaceFXTex = pTextureManager->BorrowRenderedTexture(
@@ -3178,7 +3178,7 @@ void Main::DrawWorld_ScreenSplatter(NiDX9Renderer* apRenderer) {
     bool bResetCameraPos = ScreenSplatter::bResetCameraPos;
     ScreenSplatter::bResetCameraPos = false;
     apRenderer->SetCameraData(ScreenSplatter::GetCamera());
-    spScreenSplatterAccum.operator->()->RenderScreenSplatter();
+    spScreenSplatterAccum->RenderScreenSplatter();
     ScreenSplatter::bResetCameraPos = bResetCameraPos;
 }
 
@@ -3245,15 +3245,15 @@ BSRenderedTexture* Main::DrawWorld_InitRenderTexture(
 bool Main::DrawWorld_VATSOcclusionQuery() {
     bool bIssued = false;
     if (Interface::GetVATSEffect()->GetTarget()) {
-        if (!spVATSTex.operator->()) {
+        if (!spVATSTex) {
             NiRenderer* pRenderer = NiRenderer::GetRenderer();
             BSTextureManager* pTextureManager = BSShaderManager::TextureManagerPtr();
             spVATSTex = pTextureManager->BorrowRenderedTexture(
                 static_cast<NiDX9Renderer*>(pRenderer), BSTextureManager::TEX_INTERFACE_VATS, 0, nullptr, 0
             );
         }
-        if (!Interface::GetVATSEffect()->GetEffectMode() && spVATSTex.operator->() &&
-            Interface::GetVATSEffect()->GetTarget() && Interface::GetVATSEffect()->OcclusionEnabled()) {
+        if (!Interface::GetVATSEffect()->GetEffectMode() && spVATSTex && Interface::GetVATSEffect()->GetTarget() &&
+            Interface::GetVATSEffect()->OcclusionEnabled()) {
             BSRenderedTexture* pTexture = spVATSTex.operator->();
             Interface::GetVATSEffect()->DrawTargetToTexture(
                 pTexture, FOVATSEffectManager::VATS_OCCLUSION_QUERY_NONE, true,
@@ -3322,7 +3322,7 @@ void Main::DrawWorld_ImageSpace(
         !pSaveLoadGame->GetSaveGameLoading() && !pSaveLoadGame->GetSaveGameSaving() && !bRenderingMenuBG) {
         Interface::Accumulate();
     }
-    if (spVATSTex.operator->()) {
+    if (spVATSTex) {
         BSRenderedTexture* pMask = spVATSTex.operator->();
         Interface::GetVATSEffect()->PrepareEffect(apRenderTexture, pMask, nullptr, false);
     }
@@ -3335,7 +3335,7 @@ void Main::DrawWorld_ImageSpace(
     }
     BSShaderManager::spCamera = GetWorldSceneGraph()->GetCamera();
     BSShaderManager::RenderImageSpaceEffects(apRenderer, apRenderTexture, apDestination);
-    if (spVATSTex.operator->()) {
+    if (spVATSTex) {
         Interface::GetVATSEffect()->ShutdownEffect();
         BSRenderedTexture* pMask = spVATSTex.operator->();
         BSShaderManager::TextureManagerPtr()->ReturnRenderedTexture(pMask);
@@ -4137,7 +4137,7 @@ void Main::DrawWorld_MTRender1stPerson(
             BSShaderUtil::AccumulateScene(sp1stPersonAdjustedCamera.m_pObject, v18->GetScreenGeometry(), *apCuller);
             BSShaderUtil::RenderScene(sp1stPersonAdjustedCamera.m_pObject, sptempaccum.m_pObject, false);
             apCuller->SetAccumulator(nullptr);
-            sptempaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+            sptempaccum = static_cast<BSShaderAccumulator*>(nullptr);
             apCuller->PopCullMode();
             if (Interface::IsInPipboyMenu() && pPlayer->IsRefractive()) {
                 FORenderedMenu* v19 = Interface::GetCurrentRenderedMenu();
@@ -4191,7 +4191,7 @@ void Main::DrawWorld_MTRender1stPerson(
             }
             apCullingProcess->SetAccumulator(nullptr);
             sptempaccum_2.m_pObject->b1stPerson = false;
-            sptempaccum_2.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+            sptempaccum_2 = static_cast<BSShaderAccumulator*>(nullptr);
             pcamera_2->SetWorldTranslate(cameraPos);
         }
     }
@@ -4247,7 +4247,7 @@ void Main::DrawWorld_MTRender1stPerson(
         BSShaderUtil::RenderScene(pcamera_3, pGlowNode0b, false);
         apCuller_2->SetAccumulator(nullptr);
         sptempaccum_4.m_pObject->b1stPerson = false;
-        sptempaccum_4.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+        sptempaccum_4 = static_cast<BSShaderAccumulator*>(nullptr);
         apSun->GetSunGlareNode()->SetAppCulled(bcull);
     }
 
@@ -4661,11 +4661,11 @@ void Main::SetOpenConsole(bool abValue) {
 }
 
 void Main::DestroyInterfaceSceneGraph() {
-    Main::spMenuRoot.operator=(static_cast<NiNode*>(nullptr));
+    Main::spMenuRoot = static_cast<NiNode*>(nullptr);
 }
 
 void Main::DestroyInterface3DSceneGraph() {
-    Main::sp3DMenuRoot.operator=(static_cast<NiNode*>(nullptr));
+    Main::sp3DMenuRoot = static_cast<NiNode*>(nullptr);
 }
 
 bool Main::ResetDeviceCallback(bool abBeforeReset, [[maybe_unused]] void* apData) {
@@ -4915,7 +4915,7 @@ void BSFadeNodeCuller::operator delete(void* apMemory) {
 
 // The width of rendered texture aiIndex through its virtual GetWidth, 0 when it is missing.
 uint32_t BSRenderedTexture::GetWidth(int32_t aiIndex) {
-    if (!spTexture[aiIndex].operator->()) {
+    if (!spTexture[aiIndex]) {
         return 0;
     }
     NiRenderedTexture* pTexture = spTexture[aiIndex].operator->();
@@ -4924,7 +4924,7 @@ uint32_t BSRenderedTexture::GetWidth(int32_t aiIndex) {
 
 // The height of rendered texture auiIndex through its virtual GetHeight, 0 when it is missing.
 uint32_t BSRenderedTexture::GetHeight(int32_t aiIndex) {
-    if (!spTexture[aiIndex].operator->()) {
+    if (!spTexture[aiIndex]) {
         return 0;
     }
     NiRenderedTexture* pTexture = spTexture[aiIndex].operator->();
@@ -4933,7 +4933,7 @@ uint32_t BSRenderedTexture::GetHeight(int32_t aiIndex) {
 
 // Copies the pre-restore group into the first target group when one exists.
 void BSRenderedTexture::UsePreRestoreGroup() {
-    if (spPreRestoreGroup.operator->()) {
+    if (spPreRestoreGroup) {
         spGroup[0] = spPreRestoreGroup;
     }
 }
@@ -5005,13 +5005,13 @@ void BGSDestructibleObjectForm::SetLastUpdateTime(float afTime) {
 }
 
 void BGSTerrainManager::SetTreeNode(NiNode* apTreeNode) {
-    BGSTerrainManager::spTreeNode.operator=(apTreeNode);
+    BGSTerrainManager::spTreeNode = apTreeNode;
 }
 
 void BGSTerrainManager::DeallocateStaticNodes() {
-    BGSTerrainManager::spTreeNode.operator=(static_cast<NiNode*>(nullptr));
-    BGSTerrainManager::spRootLandLODNode.operator=(static_cast<NiNode*>(nullptr));
-    BGSTerrainManager::spRootObjectLODNode.operator=(static_cast<NiNode*>(nullptr));
+    BGSTerrainManager::spTreeNode = static_cast<NiNode*>(nullptr);
+    BGSTerrainManager::spRootLandLODNode = static_cast<NiNode*>(nullptr);
+    BGSTerrainManager::spRootObjectLODNode = static_cast<NiNode*>(nullptr);
 }
 
 void BSFaceGenManager::SetCamera(NiCamera* apCamera) {

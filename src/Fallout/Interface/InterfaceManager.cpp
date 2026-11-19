@@ -688,12 +688,12 @@ void InterfaceManager::ToggleSafeZone(int32_t abForceSetTo) {
 
 void InterfaceManager::UpdateScreenShape(int32_t isizex, int32_t isizey) {
     if (isizex > 0) {
-        iSafeZoneX.operator=(isizex);
+        iSafeZoneX = isizex;
         if (isizey <= 0) {
-            iSafeZoneY.operator=(isizex);
+            iSafeZoneY = isizex;
         }
         else {
-            iSafeZoneY.operator=(isizey);
+            iSafeZoneY = isizey;
         }
     }
     float afValue = InterfaceManager::GetScreenSafeX();
@@ -726,7 +726,7 @@ void InterfaceManager::SetCursorPos(float afX, float afY) {
     double z = sCursorPos.z;
     double RealScreenHeight = InterfaceManager::GetRealScreenHeight();
     xnewpos.z = v9 - RealScreenHeight / InterfaceManager::GetScreenHeight() * z;
-    if (xnewpos.operator!=(xLastPos)) {
+    if (xnewpos != xLastPos) {
         xLastPos = xnewpos;
         xnewpos.y = pCursor->GetFloat(4013) * -0.00800000037997961;
         sRealCursorPos = xnewpos;
@@ -4487,7 +4487,7 @@ void InterfaceManager::SetLockpickControlsDisable(bool abDisable) {
 }
 
 void InterfaceManager::Disable360Controller(bool abDisable) {
-    static_cast<SettingT<INIPrefSettingCollection>*>(&gs_bDisable360Controller)->operator=(abDisable);
+    *static_cast<SettingT<INIPrefSettingCollection>*>(&gs_bDisable360Controller) = abDisable;
     InterfaceManager* singleton = InterfaceManager::Instance();
     singleton->HandleControllerStateChange(((uint8_t)abDisable) == 0);
     Controls* controls = appMain->GetControls();
@@ -5395,8 +5395,8 @@ bool EditableTextField::StringIsOk(char* sString) {
 }
 
 void EditableTextField::SetText(const char* sDefaultText) {
-    sText.operator=(sDefaultText);
-    sDisplayText.operator=(sDefaultText);
+    sText = sDefaultText;
+    sDisplayText = sDefaultText;
 }
 
 void EditableTextField::SetEditing(bool bEditingText) {
@@ -5441,9 +5441,9 @@ char* EditableTextField::GetDisplayText() {
         apString[v3++] = Destination[v4++];
     }
     apString[v3] = 0;
-    sDisplayText.operator=(apString);
+    sDisplayText = apString;
     if (!sDisplayText.GetLength()) {
-        sDisplayText.operator=(" ");
+        sDisplayText = " ";
     }
     return sDisplayText.pString;
 }

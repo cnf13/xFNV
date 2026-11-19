@@ -4550,7 +4550,7 @@ bool TESDataHandler::ClearData() {
     }
     int32_t iSize = arrayInteriorCells.m_usSize;
     for (int32_t i = 0; i < iSize; ++i) {
-        TESObjectCELL* pCell = arrayInteriorCells.operator[](i);
+        TESObjectCELL* pCell = arrayInteriorCells[i];
         if (pCell) {
             delete pCell;
         }
@@ -4930,11 +4930,11 @@ void TESDataHandler::SortInteriorCells() {
     arrayInteriorCells.Compact();
     int32_t icellCount = arrayInteriorCells.m_usESize;
     for (int32_t iouter = 0; iouter < icellCount - 1; ++iouter) {
-        TESObjectCELL* poutterCell = arrayInteriorCells.operator[](iouter);
+        TESObjectCELL* poutterCell = arrayInteriorCells[iouter];
         TESObjectCELL* pcurrentCell = poutterCell;
         int32_t icurrent = iouter;
         for (int32_t iinner = iouter + 1; iinner < icellCount; ++iinner) {
-            TESObjectCELL* pinnerCell = arrayInteriorCells.operator[](iinner);
+            TESObjectCELL* pinnerCell = arrayInteriorCells[iinner];
             if (pcurrentCell && pinnerCell) {
                 const char* CellName = pcurrentCell->GetCellName();
                 const char* v1 = pinnerCell->GetCellName();

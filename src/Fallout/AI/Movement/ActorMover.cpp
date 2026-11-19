@@ -111,7 +111,7 @@ float PathingSolution::ComputeSplineLength(int32_t aiNodeIndex) {
         pNode = GetNode(aiNodeIndex);
         v6 = &pNode->PathingNode::GetLocation();
         v7 = &(v14 = v6->GetLocation());
-        v8 = &(v12 = v7->operator-(*location));
+        v8 = &(v12 = *v7 - *location);
         return v8->Length();
     }
 
@@ -147,14 +147,14 @@ void PathingSolution::Save(BGSSaveFormBuffer* a2) {
     FormFlags = VirtualPathingNodes.iSize;
     a2->SaveVariableSizedValue(FormFlags);
     for (uint32_t aiIndex = 0; aiIndex < FormFlags; ++aiIndex) {
-        VirtualPathingNode* v12 = &VirtualPathingNodes.operator[](aiIndex);
+        VirtualPathingNode* v12 = &VirtualPathingNodes[aiIndex];
         v12->Save(a2);
     }
     // The address &CurrentPathingNodes is never null, so it is not tested.
     v4 = CurrentPathingNodes.iSize;
     a2->SaveVariableSizedValue(v4);
     for (uint32_t i = 0; i < v4; ++i) {
-        PathingNode* v10 = &CurrentPathingNodes.operator[](i);
+        PathingNode* v10 = &CurrentPathingNodes[i];
         v10->SaveGame(a2);
     }
     PathingAvoidNodeArray apMemory;
@@ -167,7 +167,7 @@ void PathingSolution::Save(BGSSaveFormBuffer* a2) {
     v2 = DoorIDs.iSize;
     a2->SaveVariableSizedValue(v2);
     for (uint32_t j = 0; j < v2; ++j) {
-        a2->SaveFormID(DoorIDs.operator[](j), 0);
+        a2->SaveFormID(DoorIDs[j], 0);
     }
 }
 
@@ -426,7 +426,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if ((v19 & 1) != 0) {
         ctype = 0;
         apLoadGameBuffer->LoadData(&ctype, 1u);
-        spCurrentRequest.operator=(PathingRequest::CreatePathingRequest(static_cast<PATHING_REQUEST_TYPE>(ctype)));
+        spCurrentRequest = PathingRequest::CreatePathingRequest(static_cast<PATHING_REQUEST_TYPE>(ctype));
         PathingRequest* v11 = spCurrentRequest.m_pObject;
         v11->LoadGame(apLoadGameBuffer);
         if ((pActor) && (pActor->pCurrentProcess) &&
@@ -444,7 +444,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         else {
             v10 = nullptr;
         }
-        spCurrentPath.operator=(v10);
+        spCurrentPath = v10;
         spCurrentPath.m_pObject->LoadGame(apLoadGameBuffer);
         for (uint32_t i = 0; i < spCurrentPath.m_pObject->GetVirtualNodeCount(); ++i) {
             VirtualPathingNode* VirtualNode = spCurrentPath.m_pObject->GetVirtualNode(i);
@@ -531,7 +531,7 @@ void ActorMover::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (!bWaitingForPath) {
         return;
     }
-    if (!spCurrentRequest.operator->()) {
+    if (!spCurrentRequest) {
         return;
     }
     bool bHideFailed = false;
@@ -542,13 +542,13 @@ void ActorMover::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             bHideFailed = true;
         }
     }
-    if (!spMessageQueue.operator->()) {
+    if (!spMessageQueue) {
         void* pMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
         ActorPathingMessageQueue* pMessageQueue = nullptr;
         if (pMemory) {
             pMessageQueue = ::new (pMemory) ActorPathingMessageQueue;
         }
-        spMessageQueue.operator=(pMessageQueue);
+        spMessageQueue = pMessageQueue;
     }
     if ((!bHideFailed) && (PathManager::QInstance()->BuildPath(spCurrentRequest, spMessageQueue, true)))
     // BuildPath takes both smart pointers by value and releases them.
@@ -571,11 +571,11 @@ void ActorMover::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         else {
             v2 = nullptr;
         }
-        spMessageQueue.operator=(v2);
+        spMessageQueue = v2;
     }
     eState = ACTOR_MOVER_STATE_INVALID;
-    spCurrentRequest.operator=(static_cast<PathingRequest*>(nullptr));
-    spCurrentPath.operator=(static_cast<PathingSolution*>(nullptr));
+    spCurrentRequest = static_cast<PathingRequest*>(nullptr);
+    spCurrentPath = static_cast<PathingSolution*>(nullptr);
     if (pCurrentPathHandler) {
         delete pCurrentPathHandler;
     }
@@ -626,7 +626,7 @@ bool ActorMover::GetCurrentGoal(PathingLocation* apRetLocation) {
     if (!pnode) {
         return false;
     }
-    apRetLocation->operator=(*&pnode->Location);
+    *apRetLocation = *&pnode->Location;
     return true;
 }
 
@@ -638,8 +638,7 @@ uint32_t ActorMover::GetCurrentNodeIndex() {
 }
 
 bool ActorMover::GetLocationAt(uint32_t auiNodeIndex, NiPoint3* apLocation) {
-    return spCurrentPath.operator->() && pCurrentPathHandler &&
-        pCurrentPathHandler->GetNodeLocation(auiNodeIndex, *apLocation);
+    return spCurrentPath && pCurrentPathHandler && pCurrentPathHandler->GetNodeLocation(auiNodeIndex, *apLocation);
 }
 
 void ActorMover::SetLookAtTarget(NiPoint3 aPoint) {
@@ -666,8 +665,8 @@ void ActorMover::SetLookAtTarget(NiPoint3 aPoint) {
 // the forced move mode.
 void ActorMover::ClearCurrentData() {
     eState = ACTOR_MOVER_STATE_FINISHED;
-    spCurrentRequest.operator=(nullptr);
-    spCurrentPath.operator=(nullptr);
+    spCurrentRequest = nullptr;
+    spCurrentPath = nullptr;
     if (pCurrentPathHandler) {
         ActorPathHandler* pPathHandler = pCurrentPathHandler;
         delete pPathHandler;
@@ -679,7 +678,7 @@ void ActorMover::ClearCurrentData() {
         if (pMemory) {
             pMessageQueue = ::new (pMemory) ActorPathingMessageQueue;
         }
-        spMessageQueue.operator=(pMessageQueue);
+        spMessageQueue = pMessageQueue;
         bWaitingForPath = false;
     }
     ActorMover* pMover = this;
@@ -704,10 +703,10 @@ bool ActorMover::IsPathingComplete() {
     if (eState == ACTOR_MOVER_STATE_FINISHED || eState == ACTOR_MOVER_STATE_FAILED) {
         return true;
     }
-    if (!spCurrentPath.operator->()) {
+    if (!spCurrentPath) {
         return eState != ACTOR_MOVER_STATE_ROTATING;
     }
-    if (spCurrentPath.operator->()->IsValid()) {
+    if (spCurrentPath->IsValid()) {
         return false;
     }
     return eState != ACTOR_MOVER_STATE_ROTATING;
@@ -723,7 +722,7 @@ PathingLocation* ActorMover::GetFailedPathDestination() {
 
 bool ActorMover::IsPathValid() {
     uint8_t result = 0;
-    if (!(&spCurrentPath)->operator->()) {
+    if (!spCurrentPath) {
         return (bool)result;
     }
     PathingSolution* v1 = (&spCurrentPath)->operator->();
@@ -749,8 +748,8 @@ void ActorMover::FinishMoving(bool abClearHandler) {
     if (eState < ACTOR_MOVER_STATE_FAILED || eState > ACTOR_MOVER_STATE_FAILED_PROCESS_UPDATE) {
         this->eState = ACTOR_MOVER_STATE_FINISHED;
     }
-    spCurrentRequest.operator=(static_cast<PathingRequest*>(nullptr));
-    spCurrentPath.operator=(static_cast<PathingSolution*>(nullptr));
+    spCurrentRequest = static_cast<PathingRequest*>(nullptr);
+    spCurrentPath = static_cast<PathingSolution*>(nullptr);
     if ((pCurrentPathHandler) && (abClearHandler)) {
         pCurrentPathHandler->ClearMovement();
     }
@@ -765,7 +764,7 @@ void ActorMover::FinishMoving(bool abClearHandler) {
         else {
             v2 = nullptr;
         }
-        spMessageQueue.operator=(v2);
+        spMessageQueue = v2;
         bWaitingForPath = 0;
     }
     SetPathingFailed(false);
@@ -795,10 +794,10 @@ bool ActorMover::IsPathing() {
     if (bWaitingForPath) {
         return true;
     }
-    if (!spCurrentPath.operator->()) {
+    if (!spCurrentPath) {
         return false;
     }
-    if (!spCurrentPath.operator->()->IsValid()) {
+    if (!spCurrentPath->IsValid()) {
         return false;
     }
     if (!bPathingFailed) {
@@ -809,10 +808,9 @@ bool ActorMover::IsPathing() {
 
 bool ActorMover::IsWaitingForAvoidance() {
     PathingSolution* v1;
-    uint8_t result =
-        (uint8_t)(((!pCurrentPathHandler) ||
-                   ((!(&spCurrentPath)->operator->()) || ((v1 = (&spCurrentPath)->operator->()), (!v1->IsValid())))) ||
-                  pCurrentPathHandler->IsWaitingForAvoidance());
+    uint8_t result = (uint8_t)(((!pCurrentPathHandler) ||
+                                ((!spCurrentPath) || ((v1 = (&spCurrentPath)->operator->()), (!v1->IsValid())))) ||
+                               pCurrentPathHandler->IsWaitingForAvoidance());
     return (bool)result;
 }
 
@@ -1058,19 +1056,19 @@ void ActorMover::ClearDataForNewPathingRequest(bool abClearWaitingFlag) {
     bStopMovementNextUpdate = false;
     ActorMover* pMover = this;
     pMover->ClearForcedMoveMode();
-    spCurrentRequest.operator=(nullptr);
+    spCurrentRequest = nullptr;
     if (bWaitingForPath) {
         void* pMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
         ActorPathingMessageQueue* pMessageQueue = nullptr;
         if (pMemory) {
             pMessageQueue = ::new (pMemory) ActorPathingMessageQueue;
         }
-        spMessageQueue.operator=(pMessageQueue);
+        spMessageQueue = pMessageQueue;
         if (abClearWaitingFlag) {
             bWaitingForPath = false;
         }
     }
-    spCurrentPath.operator=(nullptr);
+    spCurrentPath = nullptr;
     SetPathingFailed(false);
 }
 
@@ -1099,7 +1097,7 @@ void ActorMover::OnMoveToHigh() {
             else {
                 if (pCurrentPathHandler && !IsPathingComplete()) {
                     if (bActorChangedProcessLevel && pCurrentPathHandler->IsDetailedPathHandler()) {
-                        if (spCurrentPath.operator->()) {
+                        if (spCurrentPath) {
                             uint32_t iPreviousNode;
                             PathingSolution* v2;
                             if (this->iPreviousNode != iNextNode ||
@@ -1238,7 +1236,7 @@ bool ActorMover::RequestRotateActor(float afTargetAngle, bool abForceTurn) {
 bool ActorMover::RequestRotateActor(NiPoint3 akTargetPos, bool abForceTurn) {
     NiPoint3 a1;
     const NiPoint3* v3 = &pActor->GetLocationOnReference();
-    (a1 = (&akTargetPos)->operator-(*v3));
+    (a1 = akTargetPos - *v3);
     float afRotation = GetZAngleFromVector(a1);
     return (bool)((uint8_t)RequestRotateActor(afRotation, abForceTurn));
 }
@@ -1261,9 +1259,8 @@ PathingRequest* ActorMover::GetCurrentRequest() {
 
 bool ActorMover::ComputePathPassesThroughPlayersArea() {
     PathingSolution* v1;
-    uint8_t result =
-        (uint8_t)(((&spCurrentPath)->operator->() && ((v1 = (&spCurrentPath)->operator->()), v1->IsValid())) &&
-                  pCurrentPathHandler->ComputePathPassesThroughPlayersArea());
+    uint8_t result = (uint8_t)((spCurrentPath && ((v1 = (&spCurrentPath)->operator->()), v1->IsValid())) &&
+                               pCurrentPathHandler->ComputePathPassesThroughPlayersArea());
     return (bool)result;
 }
 
@@ -1274,8 +1271,7 @@ void ActorMover::SetInDialog(bool abVal) {
 bool ActorMover::IsMovementBlocked() const {
     PathingSolution* v1;
     uint8_t result =
-        (uint8_t)((pCurrentPathHandler &&
-                   ((&spCurrentPath)->operator->() && ((v1 = (&spCurrentPath)->operator->()), v1->IsValid()))) &&
+        (uint8_t)((pCurrentPathHandler && (spCurrentPath && ((v1 = (&spCurrentPath)->operator->()), v1->IsValid()))) &&
                   pCurrentPathHandler->IsMovementBlocked());
     return (bool)result;
 }
@@ -1736,15 +1732,14 @@ void ActorMover::WarpToNextNode() {
     NiPoint3 v43;
     NiPoint3 v45;
     NiPoint3 result;
-    if (pCurrentPathHandler && (pCurrentPathHandler->spPath.operator->() && pCurrentPathHandler->WarpToNextNode())) {
+    if (pCurrentPathHandler && (pCurrentPathHandler->spPath && pCurrentPathHandler->WarpToNextNode())) {
         DebugOnEvent();
         return;
     }
     char v59 = 0;
     if (spCurrentRequest.m_pObject) {
         if (pActor->IsFollowAccompanyPackageTarget(pPlayer)) {
-            if ((pCurrentPathHandler) && (spCurrentPath.operator->()) &&
-                (!pCurrentPathHandler->IsDetailedPathHandler())) {
+            if ((pCurrentPathHandler) && (spCurrentPath) && (!pCurrentPathHandler->IsDetailedPathHandler())) {
                 PathingSolution* v1 = spCurrentPath.operator->();
                 if (!v1->IsIncomplete()) {
                     pActor->InitiateMovementBlockedPackage();

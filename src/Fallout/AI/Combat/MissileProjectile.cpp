@@ -486,7 +486,7 @@ bool MissileProjectile::ProcessBounce() {
             reflectedVelocity = accum + vton;
             float* v5 = &fArrowBounceLinearSpeed.Float();
             float v12 = GetProjectileBase()->GetSpeed() * *v5;
-            reflectedVelocity.operator*=(v12);
+            reflectedVelocity *= v12;
             TESHavokUtilities::AddVelocity(p3d, reflectedVelocity, true);
             NiPoint3 angularVelocity = NiPoint3_ZERO;
             NiNode* v6 = Get3D();
@@ -501,7 +501,7 @@ bool MissileProjectile::ProcessBounce() {
             NiPoint3::UnitizeVector(force);
             NiPoint3 angle(-force.z, 0.0f, -force.x);
             angularVelocity = (&p3d->GetWorldTransform())->m_Rotate * angle;
-            angularVelocity.operator*=(fArrowBounceLinearSpeed.Float());
+            angularVelocity *= fArrowBounceLinearSpeed.Float();
             TESHavokUtilities::AddAngularVelocity(p3d, angularVelocity, true);
         }
     }
@@ -667,9 +667,9 @@ void MissileProjectile::ProcessImpale() {
                                 alignas(16) hkHingeConstraintCinfo ci;
                                 ci.hkHingeConstraintCinfo::CreateData();
                                 ci.SetEntities(plimbRB, pprojectileRB);
-                                const hkTransform* Transform = &plimbRB->operator*()->getTransform();
+                                const hkTransform* Transform = &(**plimbRB)->getTransform();
                                 hkTransform fixPointa(*Transform);
-                                const hkTransform* v10 = &pprojectileRB->operator*()->getTransform();
+                                const hkTransform* v10 = &(**pprojectileRB)->getTransform();
                                 hkTransform fixPointb(*v10);
                                 (&fixPointa)->m_rotation.renormalize();
                                 (&fixPointb)->m_rotation.renormalize();
@@ -987,7 +987,7 @@ void hkConstraintCinfo::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
 void hkConstraintCinfo::SetEntityB(bhkEntity* apEntity) {
     hkpEntity* v2;
     if (apEntity) {
-        v2 = static_cast<hkpEntity*>(apEntity->operator*());
+        v2 = static_cast<hkpEntity*>(**apEntity);
     }
     else {
         v2 = nullptr;
@@ -998,7 +998,7 @@ void hkConstraintCinfo::SetEntityB(bhkEntity* apEntity) {
 void hkConstraintCinfo::SetEntityA(bhkEntity* apEntity) {
     hkpEntity* v2;
     if (apEntity) {
-        v2 = static_cast<hkpEntity*>(apEntity->operator*());
+        v2 = static_cast<hkpEntity*>(**apEntity);
     }
     else {
         v2 = nullptr;

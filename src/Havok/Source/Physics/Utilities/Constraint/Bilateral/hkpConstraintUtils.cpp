@@ -38,7 +38,7 @@ CopyAtomsAddMotorRef(hkpLimitedHingeConstraintData::Atoms* r_esi, const hkpLimit
 // The atoms are copied from r_eax (operator=), then a reference is taken on the copied angular motor.
 static void
 CopyAtomsAddMotorRef(hkpLimitedHingeConstraintData::Atoms* r_esi, const hkpLimitedHingeConstraintData::Atoms* r_eax) {
-    r_esi->operator=(*r_eax);
+    *r_esi = *r_eax;
     hkpConstraintMotor* pMotor = r_esi->m_angMotor.m_motor;
     if (pMotor) {
         pMotor->addReference();

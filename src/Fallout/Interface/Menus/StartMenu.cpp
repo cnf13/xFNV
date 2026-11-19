@@ -3279,7 +3279,7 @@ void StartMenu::SetKillCam(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetCrosshair(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bCrossHair_GamePlay.operator=(apUOpt->iVal == 1);
+        gs_bCrossHair_GamePlay = apUOpt->iVal == 1;
         uint32_t v1 = gs_bCrossHair_GamePlay.operator uint32_t();
         HUDMainMenu::SetVisibilityFlag(64, v1);
     }
@@ -3291,7 +3291,7 @@ void StartMenu::SetCrosshair(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetSaveOnRest(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bSaveOnRest_GamePlay.operator=(apUOpt->iVal == 1);
+        gs_bSaveOnRest_GamePlay = apUOpt->iVal == 1;
     }
     else {
         apUOpt->iVal = gs_bSaveOnRest_GamePlay.operator bool();
@@ -3301,7 +3301,7 @@ void StartMenu::SetSaveOnRest(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetSaveOnWait(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bSaveOnWait_GamePlay.operator=(apUOpt->iVal == 1);
+        gs_bSaveOnWait_GamePlay = apUOpt->iVal == 1;
     }
     else {
         apUOpt->iVal = gs_bSaveOnWait_GamePlay.operator bool();
@@ -3311,7 +3311,7 @@ void StartMenu::SetSaveOnWait(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetSaveOnTravel(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bSaveOnTravel_GamePlay.operator=(apUOpt->iVal == 1);
+        gs_bSaveOnTravel_GamePlay = apUOpt->iVal == 1;
     }
     else {
         apUOpt->iVal = gs_bSaveOnTravel_GamePlay.operator bool();
@@ -3321,7 +3321,7 @@ void StartMenu::SetSaveOnTravel(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetDialogSubtitles(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bDialogueSubtitles_GamePlay.operator=(apUOpt->iVal == 1);
+        gs_bDialogueSubtitles_GamePlay = apUOpt->iVal == 1;
     }
     else {
         apUOpt->iVal = gs_bDialogueSubtitles_GamePlay.operator bool();
@@ -3342,7 +3342,7 @@ void StartMenu::SetGeneralSubtitles(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetTrueIronSights(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bTrueIronSights_GamePlay.operator=(apUOpt->iVal == 1);
+        gs_bTrueIronSights_GamePlay = apUOpt->iVal == 1;
     }
     else {
         apUOpt->iVal = gs_bTrueIronSights_GamePlay.operator bool();
@@ -3427,7 +3427,7 @@ void StartMenu::SetMasterVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float v8 = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float afNearesta = (&gs_fDefaultMasterVolume_Audio.operator=(v8))->operator float();
+            float afNearesta = (gs_fDefaultMasterVolume_Audio = v8).operator float();
             BSAudio* v2 = &BSAudio::QInstance();
             v2->SetMasterVolume(afNearesta);
         }
@@ -3450,7 +3450,7 @@ void StartMenu::SetFootstepVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float v8 = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float afNearesta = (&gs_fDefaultFootVolume_Audio.operator=(v8))->operator float();
+            float afNearesta = (gs_fDefaultFootVolume_Audio = v8).operator float();
             BSAudio* v2 = &BSAudio::QInstance();
             v2->SetFootVolume(afNearesta);
         }
@@ -3473,7 +3473,7 @@ void StartMenu::SetMusicVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float v8 = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float afNearesta = (&gs_fDefaultMusicVolume_Audio.operator=(v8))->operator float();
+            float afNearesta = (gs_fDefaultMusicVolume_Audio = v8).operator float();
             BSAudio* v2 = &BSAudio::QInstance();
             v2->SetMusicVolume(afNearesta);
         }
@@ -3496,7 +3496,7 @@ void StartMenu::SetVoiceVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float v8 = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float afNearesta = (&gs_fDefaultVoiceVolume_Audio.operator=(v8))->operator float();
+            float afNearesta = (gs_fDefaultVoiceVolume_Audio = v8).operator float();
             BSAudio* v2 = &BSAudio::QInstance();
             v2->SetVoiceVolume(afNearesta);
         }
@@ -3519,7 +3519,7 @@ void StartMenu::SetFXVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float v8 = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float afNearesta = (&gs_fDefaultEffectsVolume_Audio.operator=(v8))->operator float();
+            float afNearesta = (gs_fDefaultEffectsVolume_Audio = v8).operator float();
             BSAudio* v2 = &BSAudio::QInstance();
             v2->SetEffectVolume(afNearesta);
         }
@@ -3542,7 +3542,7 @@ void StartMenu::SetRadioVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float v8 = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float afNearesta = (&gs_fDefaultRadioVolume_Audio.operator=(v8))->operator float();
+            float afNearesta = (gs_fDefaultRadioVolume_Audio = v8).operator float();
             BSAudio* v2 = &BSAudio::QInstance();
             v2->SetRadioVolume(afNearesta);
         }
@@ -3563,7 +3563,7 @@ void StartMenu::SetRadioVol(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetCameraPitch(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bInvertYValues_Controls.operator=(apUOpt->iVal == 1);
+        gs_bInvertYValues_Controls = apUOpt->iVal == 1;
     }
     else {
         apUOpt->iVal = gs_bInvertYValues_Controls.operator bool();
@@ -3900,7 +3900,7 @@ float Get_fGamma() {
 
 void SetTextureSize(StartMenu::UserOption* a1) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        Renderer::iTexMipMapSkip.operator=(a1->iVal);
+        Renderer::iTexMipMapSkip = a1->iVal;
         StartMenu::pMe->SetFlag(StartMenu::FLAG_RESTART_REQUIRED, NiDX9SourceTextureData::uiMipMapSkip != a1->iVal);
     }
     else {
@@ -3916,7 +3916,7 @@ void SetActorFade(StartMenu::UserOption* a1) {
         float v5 = static_cast<double>(a1->iVal) / static_cast<double>(a1->iNumSettings - 1);
         float v6 = (fActorLODMax - fActorLODMin) * v5 + fActorLODMin;
         BSFadeNode::SetFadeOutMultiplier(LOD_MULT_ACTORS, v6);
-        fLODFadeOutMultActors.operator=(v6);
+        fLODFadeOutMultActors = v6;
     }
     else {
         float v3 = (BSFadeNode::QFadeOutMultiplier(LOD_MULT_ACTORS) - fActorLODMin) / (fActorLODMax - fActorLODMin);

@@ -67,7 +67,7 @@ BGSDistantTreeBlock::TreeType* BGSDistantTreeBlock::TreeType::Equal(const BGSDis
     kSize = a2->kSize;
     kPosMin = a2->kPosMin;
     kPosMax = a2->kPosMax;
-    spSharedModelData.operator=(a2->spSharedModelData);
+    spSharedModelData = a2->spSharedModelData;
     return this;
 }
 
@@ -234,8 +234,8 @@ void BGSDistantTreeBlock::TreeType::InitValues(BGSDistantTreeBlock::TreeType* ap
     }
     NiPointer<NiTriShapeData> v22(v2);
     v22->SetAdditionalGeometryData(additionalGeo);
-    apTreeType->spSharedModelData.operator=(v22);
-    v22.operator=(static_cast<NiTriShapeData*>(nullptr));
+    apTreeType->spSharedModelData = v22;
+    v22 = static_cast<NiTriShapeData*>(nullptr);
 }
 
 void BGSDistantTreeBlock::TreeType::operator delete(void* apMemory) {
@@ -334,7 +334,7 @@ void BGSDistantTreeBlock::FinishLoad() {
     bDoneLoading = true;
     BGSTerrainManager* v1 = pNode->GetManager();
     v1->SetNeedsImmediateUpdate(true);
-    spLoadTask.operator=(static_cast<QueuedFile*>(nullptr));
+    spLoadTask = static_cast<QueuedFile*>(nullptr);
 }
 
 void BGSDistantTreeBlock::AddTree(const uint32_t uiType, const BGSDistantTreeBlock::InstanceData& apInstanceData) {
@@ -384,7 +384,7 @@ void BGSDistantTreeBlock::ClearTrees() {
         if (TreeGroups.GetAt(i)->spGeometry.m_pObject) {
             NiNode* TreeNode = pNode->pManager->GetTreeNode();
             TreeNode->DetachChild(TreeGroups.GetAt(i)->spGeometry.m_pObject);
-            TreeGroups.GetAt(i)->spGeometry.operator=(static_cast<BSResizableTriShape*>(nullptr));
+            TreeGroups.GetAt(i)->spGeometry = static_cast<BSResizableTriShape*>(nullptr);
         }
         BGSDistantTreeBlock::TreeGroup* v3 = TreeGroups.GetAt(i);
         if (v3) {
@@ -471,7 +471,7 @@ void BGSDistantTreeBlock::Attach() {
                 v9 = nullptr;
             }
             NiRefObject* v15 = v9;
-            group->spGeometry.operator=(v9);
+            group->spGeometry = v9;
             uint32_t v2 = group->Instances.iSize;
             group->spGeometry.m_pObject->uiNumPrimitives = 4 * v2;
             BSDistantTreeShaderProperty* v12 = static_cast<BSDistantTreeShaderProperty*>(
@@ -550,24 +550,24 @@ void BGSDistantTreeBlock::AllocateStaticData(TESWorldSpace* apWorld) {
     char acPath[0x104];
     BSsprintf(acPath, sizeof(acPath), "\\Data\\Textures\\Landscape\\Trees\\%s", pTextureName);
     TES::pInstance->CreateTextureImage(acPath, spAtlasTexture, true, true);
-    if (!spAtlasTexture.operator->()) {
+    if (!spAtlasTexture) {
         Warning("LOD tree texture atlas not found!");
     }
-    BSDistantTreeShader::SetTextureAtlas(spAtlasTexture.operator->());
+    BSDistantTreeShader::SetTextureAtlas(spAtlasTexture);
     bStaticDataLoaded = true;
 
     void* pStencilMemory = NiMemObject::operator new(sizeof(NiStencilProperty));
     NiStencilProperty* pStencil = pStencilMemory ? ::new (pStencilMemory) NiStencilProperty : nullptr;
     spSharedStencil = pStencil;
-    spSharedStencil.operator->()->SetDrawMode(NiStencilProperty::DRAW_BOTH);
+    spSharedStencil->SetDrawMode(NiStencilProperty::DRAW_BOTH);
 
     void* pAlphaMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
     NiAlphaProperty* pAlpha = pAlphaMemory ? ::new (pAlphaMemory) NiAlphaProperty : nullptr;
     spSharedAlpha = pAlpha;
-    spSharedAlpha.operator->()->SetAlphaTesting(true);
-    spSharedAlpha.operator->()->SetAlphaBlending(false);
-    spSharedAlpha.operator->()->SetTestRef(0x80);
-    spSharedAlpha.operator->()->SetTestMode(NiAlphaProperty::TEST_GREATER);
+    spSharedAlpha->SetAlphaTesting(true);
+    spSharedAlpha->SetAlphaBlending(false);
+    spSharedAlpha->SetTestRef(0x80);
+    spSharedAlpha->SetTestMode(NiAlphaProperty::TEST_GREATER);
 }
 
 void BGSDistantTreeBlock::ReadTypes(NiFile* apInputFile) {
@@ -582,7 +582,7 @@ void BGSDistantTreeBlock::ReadTypes(NiFile* apInputFile) {
     for (uint32_t i = 0; i < uinumTypes; ++i) {
         BGSDistantTreeBlock::TreeType newType;
         apInputFile->Read(&newType, 32u);
-        newType.spSharedModelData.operator=(static_cast<NiTriShapeData*>(nullptr));
+        newType.spSharedModelData = static_cast<NiTriShapeData*>(nullptr);
         BGSDistantTreeBlock::AddType(newType);
     }
 }
@@ -612,11 +612,11 @@ void BGSDistantTreeBlock::operator delete(void* apMemory) {
 void BGSDistantTreeBlock::DeallocateStaticData() {
     for (uint32_t i = 0; i < BGSDistantTreeBlock::TreeTypes.iSize; ++i) {
         BGSDistantTreeBlock::TreeType* v0 = &BGSDistantTreeBlock::TreeTypes.GetAt(i);
-        v0->spSharedModelData.operator=(static_cast<NiTriShapeData*>(nullptr));
+        v0->spSharedModelData = static_cast<NiTriShapeData*>(nullptr);
     }
-    BGSDistantTreeBlock::spSharedStencil.operator=(static_cast<NiStencilProperty*>(nullptr));
-    BGSDistantTreeBlock::spSharedAlpha.operator=(static_cast<NiAlphaProperty*>(nullptr));
-    BGSDistantTreeBlock::spAtlasTexture.operator=(static_cast<NiSourceTexture*>(nullptr));
+    BGSDistantTreeBlock::spSharedStencil = static_cast<NiStencilProperty*>(nullptr);
+    BGSDistantTreeBlock::spSharedAlpha = static_cast<NiAlphaProperty*>(nullptr);
+    BGSDistantTreeBlock::spAtlasTexture = static_cast<NiSourceTexture*>(nullptr);
     BSDistantTreeShader::SetTextureAtlas(nullptr);
     BGSDistantTreeBlock::bStaticDataLoaded = false;
 }
@@ -712,5 +712,5 @@ void BGSDistantTreeBlockLoadTask::operator delete(void* apMemory) {
 }
 
 void BSDistantTreeShader::SetTextureAtlas(NiTexture* apTextureAtlas) {
-    BSDistantTreeShader::spTextureAtlas.operator=(apTextureAtlas);
+    BSDistantTreeShader::spTextureAtlas = apTextureAtlas;
 }

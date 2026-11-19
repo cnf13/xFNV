@@ -74,12 +74,12 @@ void PathingRequestCoveredMove::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = UnreachableCoverLocations.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t auiIndex = 0; auiIndex < isaveGameCount; ++auiIndex) {
-        apSaveGameBuffer->SaveDataEndian(&UnreachableCoverLocations.operator[](auiIndex), 4u, 0);
+        apSaveGameBuffer->SaveDataEndian(&UnreachableCoverLocations[auiIndex], 4u, 0);
     }
     isaveGameCount_2 = TargetLocations.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_2);
     for (uint32_t i = 0; i < isaveGameCount_2; ++i) {
-        apSaveGameBuffer->SaveDataEndian(&TargetLocations.operator[](i), 12u, 0);
+        apSaveGameBuffer->SaveDataEndian(&TargetLocations[i], 12u, 0);
     }
 }
 
@@ -97,12 +97,12 @@ void PathingRequestCoveredMove::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     UnreachableCoverLocations.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        apLoadGameBuffer->LoadData(&UnreachableCoverLocations.operator[](i), 4u);
+        apLoadGameBuffer->LoadData(&UnreachableCoverLocations[i], 4u);
     }
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
     TargetLocations.SetSize(isaveGameCount_2, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
-        apLoadGameBuffer->LoadData(&TargetLocations.operator[](i_2), 12u);
+        apLoadGameBuffer->LoadData(&TargetLocations[i_2], 12u);
     }
 }
 

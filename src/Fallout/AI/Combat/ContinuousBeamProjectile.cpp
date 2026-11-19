@@ -86,9 +86,9 @@ void ContinuousBeamProjectile::Initialize() {
     Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, true);
     iShotsFired = 0;
     Projectile::Initialize();
-    if (spBeamProperty.operator->()) {
+    if (spBeamProperty) {
         float fRange = GetRange();
-        spBeamProperty.operator->()->SetLength(fRange);
+        spBeamProperty->SetLength(fRange);
     }
     Actor* pShooterActor = static_cast<Actor*>(GetShooter());
     if (pShooterActor) {
@@ -293,7 +293,7 @@ void ContinuousBeamProjectile::ScaleBeam3D(NiAVObject* ap3D, float afDesiredLeng
         if (afCurrentLength > 0.0) {
             float fscale = afDesiredLength / afCurrentLength;
             NiPoint3 location = ap3D->GetTranslate();
-            location.operator*=(fscale);
+            location *= fscale;
             ap3D->SetTranslate(location);
         }
         if (NiObject::IsKindOf_0(&NiGeometry::ms_RTTI, ap3D)) {
@@ -330,7 +330,7 @@ void ContinuousBeamProjectile::ScaleBeamGeometryLength(NiGeometry* apGeometry, f
     if (apGeometry) {
         float* pRadius = &apGeometry->GetModelBound().m_fRadius;
         *pRadius = *pRadius * afScaleFactor;
-        apGeometry->GetModelBound().m_kCenter.operator*=(afScaleFactor);
+        apGeometry->GetModelBound().m_kCenter *= afScaleFactor;
         NiGeometryData* pdata = apGeometry->GetModelData();
         if (pdata) {
             if (NiObject::IsKindOf_0(&NiPSysData::ms_RTTI, pdata)) {

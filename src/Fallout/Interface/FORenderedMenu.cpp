@@ -125,14 +125,13 @@ void FORenderedMenu::Draw(
         NiCamera* pcamera = pscene_graph->GetCamera();
         NiPointer<BSRenderedTexture> sptempRenderTarget(static_cast<BSRenderedTexture*>(nullptr));
         if (apSwapTarget) {
-            sptempRenderTarget.operator=(apSwapTarget);
+            sptempRenderTarget = apSwapTarget;
         }
         else {
             NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
             BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-            sptempRenderTarget.operator=(
-                TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_INTERFACE_TEMP, 0, nullptr, 0)
-            );
+            sptempRenderTarget =
+                TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_INTERFACE_TEMP, 0, nullptr, 0);
         }
         if (BSRenderedTexture::QOutsideFrame()) {
             NiRenderTargetGroup* Group = sptempRenderTarget.m_pObject->GetGroup();
@@ -304,7 +303,7 @@ void FORenderedMenu::Initialize() {
     else {
         v2 = nullptr;
     }
-    spAccumulator.operator=(static_cast<NiRefObject*>(v2));
+    spAccumulator = static_cast<NiRefObject*>(v2);
     static_cast<BSShaderAccumulator*>(spAccumulator.m_pObject)
         ->BSShaderAccumulator::SetRenderMode(BSShaderManager::BSSM_RENDER_INTERFACE);
     NiPointer<NiTexture> spDefaultTex(static_cast<NiTexture*>(nullptr));
@@ -341,7 +340,7 @@ void FORenderedMenu::OnMenuOpen() {
     }
     Tile* MenusRoot = Interface::GetMenusRoot();
     MenusRoot->UpdateClipwindows();
-    if (spLight.operator->()) {
+    if (spLight) {
         NiAVObject* v4 = static_cast<NiAVObject*>(spLight.operator->());
         v4->SetAppCulled(false);
     }
@@ -353,7 +352,7 @@ void FORenderedMenu::OnMenuClose() {
     bMenuRendering = (uint8_t)0;
     bBurstActive = false;
     bVertHoldActive = false;
-    if ((&spLight)->operator->()) {
+    if (spLight) {
         v1 = (&spLight)->operator->();
         static_cast<NiAVObject*>(v1)->SetAppCulled(true);
     }
@@ -463,8 +462,8 @@ void FORenderedMenu::DoEffect(
     ImageSpaceEffectInterface::fBlurIntensity = fBlurIntensity;
     ImageSpaceEffectInterface::fScanlineFrequency = fScanlineScale;
     ImageSpaceEffectInterface::fVerticalHold = 0.0f;
-    ImageSpaceEffectInterface::spScanlinesTexture.operator=(spScanlinesTexture);
-    ImageSpaceEffectInterface::spMaskTexture.operator=(static_cast<NiTexture*>(apSource->GetTexture(0)));
+    ImageSpaceEffectInterface::spScanlinesTexture = spScanlinesTexture;
+    ImageSpaceEffectInterface::spMaskTexture = static_cast<NiTexture*>(apSource->GetTexture(0));
     if (this == Interface::GetPipboy()) {
         ImageSpaceEffectInterface::fTextureUsedPart = UI_717860();
     }
@@ -513,7 +512,7 @@ void FORenderedMenu::DoEffect(
     NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
     ImageSpaceManager* v6 = BSShaderManager::GetImageSpaceManager();
     v6->RenderEffect(ImageSpaceManager::EFFECT_INTERFACE, Renderer_, apSource, apDest, nullptr, 1);
-    ImageSpaceEffectInterface::spMaskTexture.operator=(static_cast<NiTexture*>(nullptr));
+    ImageSpaceEffectInterface::spMaskTexture = static_cast<NiTexture*>(nullptr);
 }
 
 bool FORenderedMenu::GetInitialized() {
@@ -678,7 +677,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
             else {
                 v9 = nullptr;
             }
-            spLight.operator=(static_cast<NiRefObject*>(v9));
+            spLight = static_cast<NiRefObject*>(v9);
             NiPoint3 lightpos = plightNode->GetTranslate();
             static_cast<NiAVObject*>(spLight.m_pObject)->NiAVObject::SetTranslate(lightpos);
             NiLight* v4 = static_cast<NiLight*>(spLight.m_pObject);
@@ -698,7 +697,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
         NiAVObject* pMenuNode = FORenderedMenu::GetParentNodeToRender();
         NiAVObject* plight = pMenuNode->GetObjectByName("RenderedMenuLight");
         if (plight) {
-            spLight.operator=(static_cast<NiRefObject*>(NiObject::DynamicCastStatic(&NiPointLight::ms_RTTI, plight)));
+            spLight = static_cast<NiRefObject*>(NiObject::DynamicCastStatic(&NiPointLight::ms_RTTI, plight));
             if (spLight.m_pObject) {
                 return true;
             }
@@ -746,7 +745,7 @@ void FORenderedMenu::UnhideMessageQuantityTutorialMenus() {
 }
 
 void FORenderedMenu::SetCamera(NiCamera* apCamera) {
-    (&spCamera)->operator=(apCamera);
+    spCamera = apCamera;
 }
 
 void FORenderedMenu::HideMessageQuantityTutorialMenus() {

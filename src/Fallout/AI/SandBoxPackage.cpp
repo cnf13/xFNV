@@ -124,7 +124,7 @@ void SandBoxActorPackageData::HandleDeletedReference(TESObjectREFR* pDeletedObj)
         int32_t count = PotentialTargets.iSize;
         int32_t i = 0;
         while (i < count) {
-            if ((&PotentialTargets.operator[](i))->pTarget == pDeletedObj) {
+            if ((&PotentialTargets[i])->pTarget == pDeletedObj) {
                 breset = true;
                 PotentialTargets.RemoveFast(i, 1u);
                 --count;
@@ -179,7 +179,7 @@ void SandBoxActorPackageData::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = PotentialTargets.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        SandBoxChoiceListItem* potentialTarget = &PotentialTargets.operator[](i);
+        SandBoxChoiceListItem* potentialTarget = &PotentialTargets[i];
         potentialTarget->SaveGame(apSaveGameBuffer);
     }
 }
@@ -215,7 +215,7 @@ void SandBoxActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     PotentialTargets.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        SandBoxChoiceListItem* potentialTarget = &PotentialTargets.operator[](i);
+        SandBoxChoiceListItem* potentialTarget = &PotentialTargets[i];
         potentialTarget->LoadGame(apLoadGameBuffer);
     }
 }
@@ -259,7 +259,7 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
     }
     uint32_t isaveGameCount = PotentialTargets.iSize;
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        SandBoxChoiceListItem* potentialTarget = &PotentialTargets.operator[](i);
+        SandBoxChoiceListItem* potentialTarget = &PotentialTargets[i];
         potentialTarget->InitLoadGame(apLoadGameBuffer);
     }
     int32_t count = PotentialTargets.iSize;
@@ -267,7 +267,7 @@ void SandBoxActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) 
     bool breset = false;
     while (i_2 < count) {
         SANDBOX_PROCEDURE FormHealth_0;
-        SandBoxChoiceListItem* item = &PotentialTargets.operator[](i_2);
+        SandBoxChoiceListItem* item = &PotentialTargets[i_2];
         if (item->pTarget ||
             (FormHealth_0 = item->eProcedure, !SandBoxActorPackageData::IsTargetNeededForProcedure(FormHealth_0))) {
             ++i_2;
@@ -574,7 +574,7 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
     // A choice that fails a test gets a full score of 0; one out of the package's cell or worldspace keeps its old
     // full score.
     for (i = 0; i < inumTargets; ++i) {
-        SandBoxChoiceListItem* item = &PotentialTargets.operator[](static_cast<uint32_t>(i));
+        SandBoxChoiceListItem* item = &PotentialTargets[static_cast<uint32_t>(i)];
         int32_t score = isandboxProceduresProbabilities[item->eProcedure] * item->iBaseScore;
         score = BSMAX(score, 0);
         TESPackage* pcurrentPack = apActor->GetCurrentPackage();
@@ -638,14 +638,14 @@ void SandBoxActorPackageData::PickProcedure(Actor* apActor, TESPackage* apOrigin
         int32_t iIndex;
         int32_t irandom = rt::rand() % itotalProb;
         for (i = 0; i < inumTargets; ++i) {
-            SandBoxChoiceListItem* item_2 = &PotentialTargets.operator[](static_cast<uint32_t>(i));
+            SandBoxChoiceListItem* item_2 = &PotentialTargets[static_cast<uint32_t>(i)];
             int32_t CastingType = item_2->iFullScore;
             irandom -= CastingType;
             if (irandom < 0) {
                 break;
             }
         }
-        SandBoxChoiceListItem ritem = PotentialTargets.operator[](static_cast<uint32_t>(i));
+        SandBoxChoiceListItem ritem = PotentialTargets[static_cast<uint32_t>(i)];
         eProcedure = ritem.eProcedure;
         pCurrentTargetObject = ritem.pTarget;
         if (pCurrentTargetObject) {

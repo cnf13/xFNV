@@ -59,7 +59,7 @@ void BSPortal::SetMultiBoundRoomRight(BSMultiBoundRoom* apRoom) {
 }
 
 void BSPortal::SetSharedGeometryNode(BSPortalSharedNode* apNode) {
-    (&spSharedGeometry)->operator=(apNode);
+    spSharedGeometry = apNode;
 }
 
 uint32_t BSPortal::AnyRoomsVisible() {

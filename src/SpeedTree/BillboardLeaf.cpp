@@ -81,7 +81,7 @@ void CBillboardLeaf::SetColor(const CVec3& cColor, bool bApplyDimming) {
     CVec3 cScaledColor_2 = cColor;
     if (bApplyDimming) {
         float cScaledColor = static_cast<double>(m_ucColorScale) / 255.0;
-        cScaledColor_2.operator*=(cScaledColor);
+        cScaledColor_2 *= cScaledColor;
     }
     for (int32_t i = 0; i < 3; ++i) {
         if (cScaledColor_2.m_afData[i] > 1.0) {
@@ -105,7 +105,7 @@ CBillboardLeaf* CBillboardLeaf::Clone() const {
     else {
         pClone = nullptr;
     }
-    pClone->operator=(*this);
+    *pClone = *this;
     return pClone;
 }
 

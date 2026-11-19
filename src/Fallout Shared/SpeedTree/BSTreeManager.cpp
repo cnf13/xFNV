@@ -281,7 +281,7 @@ void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<B
             BSTreeModel* ptree = pmodelarray[i].m_pObject;
             if (ptree) {
                 if (ptree->iSeed == aiSeed) {
-                    sprettree.operator=(ptree);
+                    sprettree = ptree;
                     bfound = true;
                     break;
                 }
@@ -302,16 +302,16 @@ void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<B
                 else {
                     v4 = nullptr;
                 }
-                sprettree.operator=(v4);
-                pmodelarray[iemptyslot].operator=(sprettree);
+                sprettree = v4;
+                pmodelarray[iemptyslot] = sprettree;
             }
             else {
-                sprettree.operator=(*pmodelarray);
+                sprettree = *pmodelarray;
             }
         }
     }
     BSTreeManager::kModelCriticalSection.Leave();
-    aspBSTreeModel.operator=(sprettree);
+    aspBSTreeModel = sprettree;
 }
 
 void BSTreeManager::UpdateWindMatrices() {
@@ -422,7 +422,7 @@ void BSTreeManager::ClearModelCache(bool abClearManagerOnlyHeldOnly) {
                                 bOnlyHeldHere = false;
                             }
                             else {
-                                pModelArray[i].operator=(static_cast<BSTreeModel*>(nullptr));
+                                pModelArray[i] = static_cast<BSTreeModel*>(nullptr);
                             }
                         }
                     }
@@ -504,7 +504,7 @@ NiTexture* BSTreeManager::GetCanopyShadow() {
             );
         }
         else {
-            BSTreeManager::GetInstance(true)->spCanopyShadow.operator=(static_cast<NiSourceTexture*>(nullptr));
+            BSTreeManager::GetInstance(true)->spCanopyShadow = static_cast<NiSourceTexture*>(nullptr);
         }
         BSTreeManager* v1 = BSTreeManager::GetInstance(true);
         BSShaderManager::SetProjectedShadowTexture(v1->spCanopyShadow.m_pObject);
@@ -530,7 +530,7 @@ NiTexture* BSTreeManager::GetCanopyShadow() {
         NiFixedString apString("CanopyShadowTexture");
         const char* HandleString = apString.GetHandleString();
         NiSourceTexture* v5 = NiSourceTexture::Create(ppixeldata, HandleString, NiSourceTexture::ms_kDefaultPrefs);
-        BSTreeManager::GetInstance(true)->spCanopyShadow.operator=(v5);
+        BSTreeManager::GetInstance(true)->spCanopyShadow = v5;
         BSTreeManager* v3 = BSTreeManager::GetInstance(true);
         BSShaderManager::SetProjectedShadowTexture(v3->spCanopyShadow.m_pObject);
     }
@@ -614,8 +614,8 @@ void BSTreeManager::operator delete(void* apMemory) {
 }
 
 void BSTreeManager::ClearCanopyShadow_004F3310() {
-    TESRegionDataLandscape::spDefaultFullMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(nullptr));
-    TESRegionDataLandscape::spDefaultEmptyMaskTextureProp.operator=(static_cast<NiTexturingProperty*>(nullptr));
+    TESRegionDataLandscape::spDefaultFullMaskTextureProp = static_cast<NiTexturingProperty*>(nullptr);
+    TESRegionDataLandscape::spDefaultEmptyMaskTextureProp = static_cast<NiTexturingProperty*>(nullptr);
 }
 
 void BSTreeManager::Destroy() {

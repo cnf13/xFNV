@@ -52,9 +52,8 @@ hkResource* hkSerializeDeprecated::loadOldPackfile(
 ) {
     if (errorOut) {
         errorOut->id.m_storage = 7;
-        errorOut->defaultMessage.operator=(
-            "Call hkSerializeDeprecated::initDeprecated() to include loading support for this file"
-        );
+        errorOut->defaultMessage =
+            "Call hkSerializeDeprecated::initDeprecated() to include loading support for this file";
     }
     return nullptr;
 }
@@ -66,9 +65,8 @@ hkObjectResource* hkSerializeDeprecated::loadOldPackfileOnHeap(
 ) {
     if (errorOut) {
         errorOut->id.m_storage = 7;
-        errorOut->defaultMessage.operator=(
-            "Call hkSerializeDeprecated::initDeprecated() to include loading support for this file"
-        );
+        errorOut->defaultMessage =
+            "Call hkSerializeDeprecated::initDeprecated() to include loading support for this file";
     }
     return nullptr;
 }

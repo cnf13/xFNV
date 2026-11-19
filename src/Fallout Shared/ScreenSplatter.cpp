@@ -87,7 +87,7 @@ void ScreenSplatter::Clear() {
 }
 
 bool ScreenSplatter::IsActiveSplatter() {
-    if (!(&ScreenSplatter::spRoot)->operator->()) {
+    if (!ScreenSplatter::spRoot) {
         return false;
     }
     NiNode* v1 = (&ScreenSplatter::spRoot)->operator->();
@@ -168,7 +168,7 @@ void ScreenSplatter::Init() {
             v5 = nullptr;
         }
         NiRefObject* v10 = v5;
-        ScreenSplatter::spCamera.operator=(v5);
+        ScreenSplatter::spCamera = v5;
         NiPoint3* v0 = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.00001f);
         ScreenSplatter::spCamera.m_pObject->SetTranslate(*v0);
         NiUpdateData UpdateData1(0.0f, false, false);
@@ -194,7 +194,7 @@ void ScreenSplatter::Init() {
         else {
             v4 = nullptr;
         }
-        ScreenSplatter::spRoot.operator=(v4);
+        ScreenSplatter::spRoot = v4;
         ScreenSplatter::uiCount = 0;
         const char* v1 = sBloodSplatterAlpha01OPTFilename.String();
         SkyTextureManager::LoadTextureInBackground(&ScreenSplatter::spTextures[1], v1);
@@ -210,12 +210,12 @@ void ScreenSplatter::Init() {
 void ScreenSplatter::Shutdown() {
     if (ScreenSplatter::bEnabled) {
         ScreenSplatter::spRoot.m_pObject->RemoveAllChildren();
-        ScreenSplatter::spRoot.operator=(static_cast<NiNode*>(nullptr));
-        ScreenSplatter::spCamera.operator=(static_cast<NiCamera*>(nullptr));
+        ScreenSplatter::spRoot = static_cast<NiNode*>(nullptr);
+        ScreenSplatter::spCamera = static_cast<NiCamera*>(nullptr);
     }
     ScreenSplatter::bEnabled = false;
     for (int32_t i = 0; i < 3; ++i) {
-        ScreenSplatter::spTextures[i].operator=(static_cast<NiTexture*>(nullptr));
+        ScreenSplatter::spTextures[i] = static_cast<NiTexture*>(nullptr);
     }
 }
 

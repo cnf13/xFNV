@@ -85,7 +85,7 @@ void PathingLOSGridMap::Clear() {
 
 void PathingLOSGridMap::Initialize(const PathingLocation& arCenter, float afRadius) {
     Lock.LockForWrite();
-    Center.operator=(arCenter);
+    Center = arCenter;
     fRadius = afRadius;
     using a3_t = BSScrapArray<NavMeshPtr, 1024>;
     a3_t a3;
@@ -282,7 +282,7 @@ bool PathingLOSGrid::SetLocationSeen(const PathingLocation& arLocation, bool abS
         spmesh.m_pObject->GetGridIndicesForTriangle(Triangle, &gridCells);
         bool bresult = false;
         for (uint32_t iindex = 0; iindex < gridCells.iSize; ++iindex) {
-            uint32_t uiIndex = gridCells.operator[](iindex);
+            uint32_t uiIndex = gridCells[iindex];
             if (uiIndex < LOSGridCells.iSize &&
                 LOSGridCells.GetAt(static_cast<int32_t>(uiIndex))->SetLocationSeen(arLocation, abSeen)) {
                 bresult = true;
@@ -308,7 +308,7 @@ void PathingLOSGrid::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     LOSGridCells.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         PathingLOSGridCell* v4;
-        PathingLOSGridCell** plosGridCell = &LOSGridCells.operator[](i);
+        PathingLOSGridCell** plosGridCell = &LOSGridCells[i];
         PathingLOSGridCell* v6 = static_cast<PathingLOSGridCell*>(ourMalloc(sizeof(PathingLOSGridCell)));
         if (v6) {
             v4 = ::new (v6) PathingLOSGridCell;
@@ -340,7 +340,7 @@ void PathingLOSGrid::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     }
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        LOSGridCells.operator[](i)->SaveGame(apSaveGameBuffer);
+        LOSGridCells[i]->SaveGame(apSaveGameBuffer);
     }
 }
 
@@ -544,7 +544,7 @@ uint32_t PathingLOSGridCell::Load(BGSLoadGameBuffer* a1) {
             if (aiIndex >= auiNewSize) {
                 break;
             }
-            char* v4 = &SeenTriangleList.operator[](aiIndex);
+            char* v4 = &SeenTriangleList[aiIndex];
             a1->LoadData(v4, 1u);
         }
     }
@@ -580,7 +580,7 @@ void PathingLOSGridCell::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         isaveGameCount = SeenTriangleList.iSize;
         apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
         for (uint32_t i = 0; i < isaveGameCount; ++i) {
-            char* v4 = &SeenTriangleList.operator[](i);
+            char* v4 = &SeenTriangleList[i];
             apSaveGameBuffer->SaveDataEndian(v4, 1u, 0);
         }
     }

@@ -59,7 +59,7 @@ void ObjectArray_SetAt(
             ++apArray->m_usESize;
         }
     }
-    apArray->m_pBase[auiIndex].operator=(arElement);
+    apArray->m_pBase[auiIndex] = arElement;
 }
 
 uint32_t ObjectArray_Add(NiTPrimitiveArray<NiPointer<NiAVObject>>* apArray, const NiPointer<NiAVObject>& arElement) {
@@ -79,7 +79,7 @@ void ObjectArray_Compact(NiTPrimitiveArray<NiPointer<NiAVObject>>* apArray) {
             while (v4 < static_cast<int32_t>(apArray->m_usSize)) {
                 if (apArray->m_pBase[v4].m_pObject) {
                     if (apArray->m_pBase[v3].m_pObject != apArray->m_pBase[v4].m_pObject) {
-                        apArray->m_pBase[v3].operator=(apArray->m_pBase[v4]);
+                        apArray->m_pBase[v3] = apArray->m_pBase[v4];
                     }
                     ++v3;
                 }
@@ -93,7 +93,7 @@ void ObjectArray_Compact(NiTPrimitiveArray<NiPointer<NiAVObject>>* apArray) {
             apArray->m_pBase =
                 static_cast<NiPointer<NiAVObject>*>(_NiMalloc(sizeof(NiPointer<NiAVObject>) * apArray->m_usMaxSize));
             for (uint16_t i = 0; i < static_cast<int32_t>(apArray->m_usSize); ++i) {
-                apArray->m_pBase[i].operator=(pvMem[i]);
+                apArray->m_pBase[i] = pvMem[i];
             }
         }
         else {

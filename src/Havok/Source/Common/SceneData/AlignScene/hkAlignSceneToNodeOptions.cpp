@@ -88,7 +88,7 @@ hkAlignSceneToNodeOptions::hkAlignSceneToNodeOptions() : m_nodeName() {}
 hkAlignSceneToNodeOptions::~hkAlignSceneToNodeOptions() {}
 
 void hkAlignSceneToNodeOptions::setNodeName(const char* name) {
-    m_nodeName.operator=(name);
+    m_nodeName = name;
 }
 
 const hkStringPtr& hkAlignSceneToNodeOptions::getNodeName() {

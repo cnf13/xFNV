@@ -97,7 +97,7 @@ void MagicLight::Init(uint32_t aiLightID, NiAVObject* apObj) {
         else {
             v8 = nullptr;
         }
-        LightData.spLight.operator=(static_cast<NiLight*>(v8));
+        LightData.spLight = static_cast<NiLight*>(v8);
         LightData.fWantDimmer = 1.0f;
         uint32_t ucolor = pLightObject->GetColor();
         float z = static_cast<float>(static_cast<uint8_t>(ucolor >> 16));
@@ -113,7 +113,7 @@ void MagicLight::Init(uint32_t aiLightID, NiAVObject* apObj) {
         if (pnode) {
             pnode->AddLight(LightData.spLight.m_pObject, true);
         }
-        pParent.operator=(static_cast<NiNode*>(apObj));
+        pParent = static_cast<NiNode*>(apObj);
         NiNode* v7 = pParent.m_pObject;
         v7->AttachChild(LightData.spLight.m_pObject, 1);
     }
@@ -121,7 +121,7 @@ void MagicLight::Init(uint32_t aiLightID, NiAVObject* apObj) {
 
 void MagicLight::Transfer(NiAVObject* apNode) {
     if (pLightObject) {
-        pParent.operator=(static_cast<NiNode*>(apNode));
+        pParent = static_cast<NiNode*>(apNode);
         NiNode* v3 = pParent.m_pObject;
         v3->AttachChild(LightData.spLight.m_pObject, 1);
     }

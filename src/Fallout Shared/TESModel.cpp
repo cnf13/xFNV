@@ -304,7 +304,7 @@ uint32_t TESModel::GetModelLength_00489540(TESForm* apObj) {
 
 // The group's master archive from the first set, else from the second.
 Archive* ArchiveManager::GetMasterArchive(ARCHIVE_TYPE_INDEX aeTypeIndex) {
-    NiPointer<Archive>& spMaster = spMasterArchives[0][aeTypeIndex].operator->() ? spMasterArchives[0][aeTypeIndex]
-                                                                                 : spMasterArchives[1][aeTypeIndex];
-    return spMaster.operator->();
+    NiPointer<Archive>& spMaster =
+        spMasterArchives[0][aeTypeIndex] ? spMasterArchives[0][aeTypeIndex] : spMasterArchives[1][aeTypeIndex];
+    return spMaster;
 }

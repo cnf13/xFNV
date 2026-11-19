@@ -1242,8 +1242,7 @@ void MiddleHighProcess::ResolveEquipmentQueue(Actor* apActor) {
     while (pIter && pIter->GetItem()) {
         QueuedItem* pQueued = pIter->GetItem();
         bool bDone = false;
-        if (pQueued &&
-            (!pQueued->spQueuedFiles.operator->() || pQueued->spQueuedFiles.operator->()->GetAllChildrenFinished())) {
+        if (pQueued && (!pQueued->spQueuedFiles.operator->() || pQueued->spQueuedFiles->GetAllChildrenFinished())) {
             bDone = true;
             if (pQueued->bEquip) {
                 if (apActor->GetAnimAction() == ANIM_ACTION_BLOCK && !apActor->GetCurrentWeapon()) {
@@ -3258,7 +3257,7 @@ void MiddleHighProcess::UpdateKnockState(Actor* apActor) {
                                     NiAVObject* p180Test = apActor->GetActorBone(pav_3, *Bip01_Spine);
                                     if ((p180Test) &&
                                         (bhkNiCollisionObject::GetFaceUp(static_cast<NiNode*>(p180Test), nullptr))) {
-                                        movedir.operator*=(-1.0f);
+                                        movedir *= -1.0f;
                                     }
                                 }
                                 float ftargetAngle = GetZAngleFromVector(movedir);
@@ -5545,7 +5544,7 @@ void MiddleHighProcess::TryReserveProjectileClones(Actor* apActor) {
                     else {
                         v4 = nullptr;
                     }
-                    spReserveProjectileClones.operator=(v4);
+                    spReserveProjectileClones = v4;
                 }
             }
         }
@@ -5576,8 +5575,8 @@ void MiddleHighProcess::DeferHideDismemberedLimb(
     plimb->fDismemberTimer = 0.0f;
     plimb_2->bExplosion = abExplosion;
     plimb_2->eLimbIndex = aeLimbIndex;
-    plimb_2->spDismemberedLimbRoot.operator=(apDismemberedLimbRoot);
-    plimb_2->spReplacementLimb.operator=(static_cast<NiNode*>(apReplacementLimb));
+    plimb_2->spDismemberedLimbRoot = apDismemberedLimbRoot;
+    plimb_2->spReplacementLimb = static_cast<NiNode*>(apReplacementLimb);
     DeferredHideLimbList.AddHead(*reinterpret_cast<void**>(&plimb_2));
 }
 
@@ -7995,7 +7994,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     ourMemcpy(pDamageRootNode, apProcess->pDamageRootNode, sizeof(pDamageRootNode));
     pHeadNode = apProcess->pHeadNode;
     pTorsoNode = apProcess->pTorsoNode;
-    pLightingProperty.operator=(apProcess->GetLightingShaderProperty());
+    pLightingProperty = apProcess->GetLightingShaderProperty();
     pActiveEffectList->RemoveAll();
     for (BSSimpleList<ActiveEffect*>* plist = apProcess->GetActiveEffectList(); plist && !plist->IsEmpty();
          plist = plist->m_pkNext) {
@@ -8005,7 +8004,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     }
     pCommandingActor = apProcess->pCommandingActor;
     pLastBoundWeapon = apProcess->pLastBoundWeapon;
-    spCharController.operator=(apProcess->spCharController);
+    spCharController = apProcess->spCharController;
     bCheckMagicNode = apProcess->bCheckMagicNode;
     pCurrentWeaponEffect = apProcess->pCurrentWeaponEffect;
     fAlphaMult = apProcess->fAlphaMult;
@@ -8019,7 +8018,7 @@ void MiddleHighProcess::MiddleHighCopy(MiddleHighProcess* apProcess) {
     fPackageIdleTimer = apProcess->fPackageIdleTimer;
     pAttachedArrowList = apProcess->pAttachedArrowList;
     apProcess->pAttachedArrowList = nullptr;
-    spWeaponPreload.operator=(apProcess->spWeaponPreload);
+    spWeaponPreload = apProcess->spWeaponPreload;
     spReserveProjectileClones.SetPointer_(&apProcess->spReserveProjectileClones);
     bIronSights = apProcess->bIronSights;
     iAnimActionSuccess = apProcess->iAnimActionSuccess;
@@ -9025,7 +9024,7 @@ bool MiddleHighProcess::EvaluateReferenceforSitSleep(TESObjectREFR* apRef, void*
 }
 
 void bhkCharacterController::SetSupportNormal(const hkVector4& arNormal) {
-    hkSupportNorm.operator=(arNormal);
+    hkSupportNorm = arNormal;
 }
 
 bool MagicSystem::CheckFlareFlag(FlareType aeFlareType, uint32_t aiFlareFlags) {

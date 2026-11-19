@@ -381,12 +381,12 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                         continue;
                     }
                     void* pStripsMemory = NiMemObject::operator new(sizeof(NiTriStrips));
-                    spStrips = pStripsMemory ? ::new (pStripsMemory) NiTriStrips(spStripsData.operator->()) : nullptr;
+                    spStrips = pStripsMemory ? ::new (pStripsMemory) NiTriStrips(spStripsData) : nullptr;
                     spStrips->SetTranslate(kPos);
                     spStrips->AttachProperty(pMaskProp);
-                    BSShaderManager::PrepareObject(spStrips.operator->(), 0, 0);
-                    NiNode* pRoot = spRoot.operator->();
-                    pRoot->AttachChild(spStrips.operator->(), true);
+                    BSShaderManager::PrepareObject(spStrips, 0, 0);
+                    NiNode* pRoot = spRoot;
+                    pRoot->AttachChild(spStrips, true);
                     kPos.y = static_cast<float>(kPos.y + 1.0);
                 }
                 kPos.x = static_cast<float>(kPos.x + 1.0);
@@ -407,8 +407,8 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                 spCameraRoot = pCameraRootMemory ? ::new (pCameraRootMemory) NiNode(0) : nullptr;
                 void* pCameraMemory = NiMemObject::operator new(sizeof(NiCamera));
                 spCamera = pCameraMemory ? ::new (pCameraMemory) NiCamera : nullptr;
-                NiNode* pCameraRoot = spCameraRoot.operator->();
-                pCameraRoot->AttachChild(spCamera.operator->(), true);
+                NiNode* pCameraRoot = spCameraRoot;
+                pCameraRoot->AttachChild(spCamera, true);
                 spCameraRoot->SetTranslate(0.0f, 0.0f, 1.0f);
                 NiUpdateData kCameraRootUpdate;
                 kCameraRootUpdate.~NiUpdateData();
@@ -437,7 +437,7 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                 spLight = pLightMemory ? ::new (pLightMemory) NiDirectionalLight : nullptr;
                 spLight->SetAmbientColor(NiColor_WHITE);
                 spLight->SetDiffuseColor(NiColor_WHITE);
-                spLight->AttachAffectedNode(spRoot.operator->());
+                spLight->AttachAffectedNode(spRoot);
                 void* pMaterialMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
                 NiMaterialProperty* pMaterial = pMaterialMemory ? ::new (pMaterialMemory) NiMaterialProperty : nullptr;
                 pMaterial->SetAmbientColor(NiColor_WHITE);
@@ -449,7 +449,7 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                 pStencil->SetDrawMode(NiStencilProperty::DRAW_BOTH);
                 spRoot->AttachProperty(pStencil);
                 // SWEEP-INLINE 0x822510
-                if (spTexRendered.operator==(nullptr)) {
+                if (spTexRendered == nullptr) {
                     NiRenderer* pRenderer = NiRenderer::GetRenderer();
                     BSTextureManager* pTextureManager = BSShaderManager::TextureManagerPtr();
                     spTexRendered = pTextureManager->BorrowRenderedTexture(
@@ -486,13 +486,13 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                     uint8_t aAccumulatorStorage[sizeof(NiPointer<BSShaderAccumulator>)];
                 NiPointer<BSShaderAccumulator>& spCustomAccumulator =
                     *::new (aAccumulatorStorage) NiPointer<BSShaderAccumulator>(pCustomAccumulator);
-                pCuller->SetAccumulator(spCustomAccumulator.operator->());
+                pCuller->SetAccumulator(spCustomAccumulator);
                 spCustomAccumulator->SetAccumulate(false);
                 BSRenderedTexture::StartOffscreen(NiRenderer::CLEAR_ALL, spTexRendered->GetGroup());
-                NiNode* pScene = spRoot.operator->();
-                BSShaderUtil::AccumulateScene(spCamera.operator->(), pScene, *pCuller);
-                BSShaderAccumulator* pDrawAccumulator = spCustomAccumulator.operator->();
-                BSShaderUtil::RenderScene(spCamera.operator->(), pDrawAccumulator, false);
+                NiNode* pScene = spRoot;
+                BSShaderUtil::AccumulateScene(spCamera, pScene, *pCuller);
+                BSShaderAccumulator* pDrawAccumulator = spCustomAccumulator;
+                BSShaderUtil::RenderScene(spCamera, pDrawAccumulator, false);
                 BSRenderedTexture::StopOffscreen();
                 pCuller->SetAccumulator(nullptr);
                 spCustomAccumulator = nullptr;

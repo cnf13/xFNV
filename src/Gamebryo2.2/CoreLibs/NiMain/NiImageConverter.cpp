@@ -81,7 +81,7 @@ NiPixelData* NiImageConverter::ReadImageFile(const char* pcFilename, NiPixelData
 }
 
 bool NiImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, const NiPixelFormat& kDestFmt) const {
-    return (bool)((uint8_t)(&kSrcFmt)->operator==(kDestFmt));
+    return (bool)((uint8_t)(kSrcFmt == kDestFmt));
 }
 
 NiPixelData* NiImageConverter::ConvertPixelData(
@@ -90,14 +90,14 @@ NiPixelData* NiImageConverter::ConvertPixelData(
     NiPixelData* pkOptDest,
     bool bMipmap
 ) {
-    if (kSrc.m_kPixelFormat.operator!=(kDestFmt)) {
+    if (kSrc.m_kPixelFormat != kDestFmt) {
         return nullptr;
     }
     if (pkOptDest) {
         if (pkOptDest == &kSrc) {
             return pkOptDest;
         }
-        if (pkOptDest->m_kPixelFormat.operator==(kDestFmt) && *pkOptDest->m_puiWidth == *kSrc.m_puiWidth &&
+        if (pkOptDest->m_kPixelFormat == kDestFmt && *pkOptDest->m_puiWidth == *kSrc.m_puiWidth &&
             *pkOptDest->m_puiHeight == *kSrc.m_puiHeight) {
             uint32_t m_uiMipmapLevels = pkOptDest->m_uiMipmapLevels;
             if (m_uiMipmapLevels <= kSrc.m_uiMipmapLevels) {
@@ -121,7 +121,7 @@ NiPixelData* NiImageConverter::ConvertPixelData(
                         }
                         return pkOptDest;
                     }
-                    m_pObject->operator=(*kSrc.m_spPalette.m_pObject);
+                    *m_pObject = *kSrc.m_spPalette.m_pObject;
                 }
                 return pkOptDest;
             }

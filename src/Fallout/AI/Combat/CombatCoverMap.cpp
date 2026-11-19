@@ -72,7 +72,7 @@ void CoverReservationInfo::CalculateSegmentInfo(PathingCoverLocation* apCoverLoc
     float v3;
     float v5;
     NiPoint3 result;
-    (result = (&apCoverLocation->LeftVertex)->operator-(apCoverLocation->RightVertex));
+    (result = apCoverLocation->LeftVertex - apCoverLocation->RightVertex);
     float fWidth = (&result)->Length();
     if (!(fWidth <= 256.0)) {
         v5 = (float)(fWidth / 32.0);
@@ -239,7 +239,7 @@ void ReservedCoverLocation::ReserveCoverLocation(
 ) {
     uint32_t i_2 = 0;
     for (uint32_t i = Reservations.iSize; i_2 < i; i = Reservations.iSize) {
-        CoverReservation* coverReservation = &Reservations.operator[](i_2);
+        CoverReservation* coverReservation = &Reservations[i_2];
         if (coverReservation->pCombatController == apCombatController) {
             return;
         }
@@ -260,7 +260,7 @@ bool ReservedCoverLocation::TryReserveCoverLocation(
 ) {
     uint32_t i_2 = 0;
     for (uint32_t i = Reservations.iSize; i_2 < i; i = Reservations.iSize) {
-        CoverReservation* coverReservation = &Reservations.operator[](i_2);
+        CoverReservation* coverReservation = &Reservations[i_2];
         if (coverReservation->pCombatController == apCombatController) {
             return false;
         }
@@ -286,7 +286,7 @@ bool ReservedCoverLocation::CanReserveCoverLocation(CombatController* apCombatCo
     uint32_t i;
     if (apCombatController) {
         for (i = 0; i < Reservations.iSize; ++i) {
-            pReservation = &(&Reservations)->operator[](i);
+            pReservation = &Reservations[i];
             if (pReservation->pCombatController == apCombatController) {
                 return false;
             }
@@ -314,7 +314,7 @@ bool ReservedCoverLocation::UnreserveCoverLocation(
         if (i >= isize) {
             return false;
         }
-        if ((&Reservations.operator[](i))->pCombatController == apCombatController) {
+        if ((&Reservations[i])->pCombatController == apCombatController) {
             break;
         }
     }

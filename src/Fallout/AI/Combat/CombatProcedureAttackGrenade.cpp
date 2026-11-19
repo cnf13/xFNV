@@ -67,7 +67,7 @@ void CombatProcedureAttackGrenade::Update() {
             const NiPoint3* v2 = &pattacker->GetLocationOnReference();
             NiPoint3 targetVector = TargetedPoint - *v2;
             if (!(fabsoluteMaxRange * fabsoluteMaxRange < targetVector.SqrXYLength())) {
-                if (TargetedPoint.operator!=(NiPoint3_ZERO)) {
+                if (TargetedPoint != NiPoint3_ZERO) {
                     SetLookAtTarget(TargetedPoint, 4);
                 }
                 if (eState != CombatProcedureAttackGrenade::ATTACK_STATE_ATTACKING ||

@@ -147,7 +147,7 @@ bool NiUnionBV::operator==(const NiBoundingVolume& kABV) const {
 }
 
 bool NiUnionBV::operator!=(const NiBoundingVolume& kABV) const {
-    return !operator==(kABV);
+    return !(*this == kABV);
 }
 
 // The type, then each member's strings under a "   child <i>" prefix (the prefix block is never freed).

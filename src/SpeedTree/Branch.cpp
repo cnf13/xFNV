@@ -1086,7 +1086,7 @@ void CRotTransform::RotateX(float fAngle) {
     apMemory.m_afData[2][0] = (float)0.0;
     apMemory.m_afData[2][1] = (-v2);
     apMemory.m_afData[2][2] = v8;
-    __builtin_memcpy(this, &(result = (&apMemory)->operator*(*this)), sizeof(CRotTransform));
+    __builtin_memcpy(this, &(result = apMemory * *this), sizeof(CRotTransform));
 }
 
 // The rotation of fAngle degrees about the unit axis cAxis, multiplied into this from the left. The angle is divided by
@@ -1198,7 +1198,7 @@ void CRotTransform::RotateZ(float fAngle) {
     cRotMatrix.m_afData[2][0] = (float)0.0;
     cRotMatrix.m_afData[2][1] = (float)0.0;
     cRotMatrix.m_afData[2][2] = (float)1.0;
-    __builtin_memcpy(this, &(result = (&cRotMatrix)->operator*(*this)), sizeof(CRotTransform));
+    __builtin_memcpy(this, &(result = cRotMatrix * *this), sizeof(CRotTransform));
 }
 
 // The transform is the identity through its own constructor.

@@ -182,7 +182,7 @@ void FOCollisionListener::DealObjectDamage() {
             TESObjectREFR* pref;
             NiAVObject* pav;
             bhkCollisionObject* pcol;
-            hkpRigidBody* pbody = pdata->spBody.m_pObject->operator*();
+            hkpRigidBody* pbody = **pdata->spBody.m_pObject;
             if (pbody) {
                 pcol = bhkCollisionObject::Getbhk(pbody);
             }
@@ -280,14 +280,14 @@ void FOCollisionListener::StoreObjectDamage(
                     pdata = nullptr;
                 }
                 FOCollisionListener::ObjectDamageImpactData* pdata_2 = pdata;
-                pdata->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyA)));
+                pdata->spBody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyA));
                 pdata->fDamage = fdamage;
                 if (apRefB) {
                     ActorCause* apObject = apRefB->GetActorCause();
-                    pdata_2->spCause.operator=(apObject);
+                    pdata_2->spCause = apObject;
                 }
                 else {
-                    pdata_2->spCause.operator=(static_cast<ActorCause*>(nullptr));
+                    pdata_2->spCause = static_cast<ActorCause*>(nullptr);
                 }
                 DamageImpacts.AddHead(pdata_2);
             }
@@ -314,14 +314,14 @@ void FOCollisionListener::StoreObjectDamage(
                     pdata_3 = nullptr;
                 }
                 FOCollisionListener::ObjectDamageImpactData* pdata_4 = pdata_3;
-                pdata_3->spBody.operator=(static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyB)));
+                pdata_3->spBody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(apBodyB));
                 pdata_3->fDamage = fdamage_2;
                 if (apRefA) {
                     ActorCause* v6 = apRefA->GetActorCause();
-                    pdata_4->spCause.operator=(v6);
+                    pdata_4->spCause = v6;
                 }
                 else {
-                    pdata_4->spCause.operator=(static_cast<ActorCause*>(nullptr));
+                    pdata_4->spCause = static_cast<ActorCause*>(nullptr);
                 }
                 DamageImpacts.AddHead(pdata_4);
             }

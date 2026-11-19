@@ -266,7 +266,7 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                     }
                     NiPick activatePick(0, 8u);
                     activatePick.SetObserveAppCullFlag(true);
-                    activatePick.SetTarget(Pages[eState].Buttons.operator[](iindex)->spButton.m_pObject);
+                    activatePick.SetTarget(Pages[eState].Buttons[iindex]->spButton.m_pObject);
                     activatePick.m_eSortType = NiPick::SORT;
                     activatePick.SetIsReturnTexture(true);
                     LoveTesterMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin, dir, nullptr);
@@ -274,8 +274,8 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                         uint32_t ipickIndex = 0;
                         if ((&activatePick.m_pickResults)->GetAt(ipickIndex)) {
                             // Fetches the argument before the callback.
-                            LoveTesterButton* pButton = Pages[eState].Buttons.operator[](iindex);
-                            Pages[eState].Buttons.operator[](iindex)->pfButtonClick(pButton);
+                            LoveTesterButton* pButton = Pages[eState].Buttons[iindex];
+                            Pages[eState].Buttons[iindex]->pfButtonClick(pButton);
                             break;
                         }
                     }
@@ -289,15 +289,15 @@ void LoveTesterMenu::DoClick(int32_t a1, Tile* a2) {
                     }
                     NiPick activatePick_2(0, 8u);
                     activatePick_2.SetObserveAppCullFlag(true);
-                    activatePick_2.SetTarget(GlobalPage.Buttons.operator[](iindex_2)->spButton.m_pObject);
+                    activatePick_2.SetTarget(GlobalPage.Buttons[iindex_2]->spButton.m_pObject);
                     activatePick_2.m_eSortType = NiPick::SORT;
                     activatePick_2.SetIsReturnTexture(true);
                     LoveTesterMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin_2, dir_2, nullptr);
                     if (activatePick_2.PickObjects(origin_2, dir_2, false)) {
                         uint32_t v37 = 0;
                         if ((&activatePick_2.m_pickResults)->GetAt(v37)) {
-                            LoveTesterButton* pButton = GlobalPage.Buttons.operator[](iindex_2);
-                            GlobalPage.Buttons.operator[](iindex_2)->pfButtonClick(pButton);
+                            LoveTesterButton* pButton = GlobalPage.Buttons[iindex_2];
+                            GlobalPage.Buttons[iindex_2]->pfButtonClick(pButton);
                             return;
                         }
                     }
@@ -577,34 +577,32 @@ void LoveTesterMenu::RefreshPage() {
                 v11 = pPlayer->GetPermanentActorValue(SelectedSPECIAL);
             }
             for (uint32_t auiIndex = 0; auiIndex < LoveTesterMenu::pInstance->LightBulbs.iSize; ++auiIndex) {
-                int32_t nThreshold = LoveTesterMenu::pInstance->LightBulbs.operator[](auiIndex)->nThreshold;
-                LoveTesterMenu::pInstance->LightBulbs.operator[](auiIndex);
+                int32_t nThreshold = LoveTesterMenu::pInstance->LightBulbs[auiIndex]->nThreshold;
+                LoveTesterMenu::pInstance->LightBulbs[auiIndex];
             }
             for (uint32_t i = 0; i < LoveTesterMenu::pInstance->LightBulbGlows.iSize; ++i) {
-                int32_t m_nValueToGlowAt = LoveTesterMenu::pInstance->LightBulbGlows.operator[](i)->m_nValueToGlowAt;
-                if (LoveTesterMenu::pInstance->LightBulbGlows.operator[](i)->m_GlowCard) {
-                    LoveTesterMenu::pInstance->LightBulbGlows.operator[](i)->m_GlowCard->SetAppCulled(
-                        v11 < m_nValueToGlowAt
-                    );
+                int32_t m_nValueToGlowAt = LoveTesterMenu::pInstance->LightBulbGlows[i]->m_nValueToGlowAt;
+                if (LoveTesterMenu::pInstance->LightBulbGlows[i]->m_GlowCard) {
+                    LoveTesterMenu::pInstance->LightBulbGlows[i]->m_GlowCard->SetAppCulled(v11 < m_nValueToGlowAt);
                 }
             }
         }
         // Each callback's argument is fetched before the callback itself, as the game does.
         for (uint32_t j = 0; j < Pages[eState].TextItems.iSize; ++j) {
-            LoveTesterTextItem* pItem = Pages[eState].TextItems.operator[](j);
-            Pages[eState].TextItems.operator[](j)->pfRefreshField(pItem);
+            LoveTesterTextItem* pItem = Pages[eState].TextItems[j];
+            Pages[eState].TextItems[j]->pfRefreshField(pItem);
         }
         for (uint32_t k = 0; k < Pages[eState].Buttons.iSize; ++k) {
-            LoveTesterButton* pButton = Pages[eState].Buttons.operator[](k);
-            Pages[eState].Buttons.operator[](k)->pfRefresh(pButton);
+            LoveTesterButton* pButton = Pages[eState].Buttons[k];
+            Pages[eState].Buttons[k]->pfRefresh(pButton);
         }
         for (uint32_t m = 0; m < GlobalPage.TextItems.iSize; ++m) {
-            LoveTesterTextItem* pItem = GlobalPage.TextItems.operator[](m);
-            GlobalPage.TextItems.operator[](m)->pfRefreshField(pItem);
+            LoveTesterTextItem* pItem = GlobalPage.TextItems[m];
+            GlobalPage.TextItems[m]->pfRefreshField(pItem);
         }
         for (uint32_t n = 0; n < GlobalPage.Buttons.iSize; ++n) {
-            LoveTesterButton* pButton = GlobalPage.Buttons.operator[](n);
-            GlobalPage.Buttons.operator[](n)->pfRefresh(pButton);
+            LoveTesterButton* pButton = GlobalPage.Buttons[n];
+            GlobalPage.Buttons[n]->pfRefresh(pButton);
         }
     }
 }
@@ -1171,29 +1169,28 @@ void LoveTesterMenu::Close() {
         v3->RemoveAllLights();
         LoveTesterMenu::pInstance->pDynamicGeometry = nullptr;
         LoveTesterMenu::pInstance->pCabinetGeometry = nullptr;
-        LoveTesterMenu::sp3DCamera.operator=(static_cast<NiCamera*>(nullptr));
+        LoveTesterMenu::sp3DCamera = static_cast<NiCamera*>(nullptr);
         for (int32_t i = 0; i < 9; ++i) {
             for (uint32_t auiIndex = 0; auiIndex < LoveTesterMenu::pInstance->Pages[i].Buttons.iSize; ++auiIndex) {
-                LoveTesterMenu::LoveTesterButton* apThis =
-                    LoveTesterMenu::pInstance->Pages[i].Buttons.operator[](auiIndex);
+                LoveTesterMenu::LoveTesterButton* apThis = LoveTesterMenu::pInstance->Pages[i].Buttons[auiIndex];
                 if (apThis) {
                     delete apThis;
                 }
             }
             for (uint32_t j = 0; j < LoveTesterMenu::pInstance->Pages[i].TextItems.iSize; ++j) {
-                ourFree(LoveTesterMenu::pInstance->Pages[i].TextItems.operator[](j));
+                ourFree(LoveTesterMenu::pInstance->Pages[i].TextItems[j]);
             }
             LoveTesterMenu::pInstance->Pages[i].Buttons.Clear(true);
             LoveTesterMenu::pInstance->Pages[i].TextItems.Clear(true);
         }
         for (uint32_t k = 0; k < LoveTesterMenu::pInstance->GlobalPage.Buttons.iSize; ++k) {
-            LoveTesterMenu::LoveTesterButton* v4 = LoveTesterMenu::pInstance->GlobalPage.Buttons.operator[](k);
+            LoveTesterMenu::LoveTesterButton* v4 = LoveTesterMenu::pInstance->GlobalPage.Buttons[k];
             if (v4) {
                 delete v4;
             }
         }
         for (uint32_t m = 0; m < LoveTesterMenu::pInstance->GlobalPage.TextItems.iSize; ++m) {
-            ourFree(LoveTesterMenu::pInstance->GlobalPage.TextItems.operator[](m));
+            ourFree(LoveTesterMenu::pInstance->GlobalPage.TextItems[m]);
         }
         LoveTesterMenu::pInstance->GlobalPage.Buttons.Clear(true);
         LoveTesterMenu::pInstance->GlobalPage.TextItems.Clear(true);
@@ -1211,7 +1208,7 @@ void LoveTesterMenu::Close() {
 void LoveTesterMenu::RefreshActorValue(LoveTesterTextItem* apTextItem) {
     // The ActorValueOwner base is reached without a null check, as the game does: cast through a reference.
     int32_t iValue = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(apTextItem->eActorValue);
-    NiSourceTexture* pTexture = pInstance->spAVValues[iValue].operator->();
+    NiSourceTexture* pTexture = pInstance->spAVValues[iValue];
     static_cast<BSShaderPPLightingProperty*>(apTextItem->pText[0])
         ->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, pTexture);
 }
@@ -1240,7 +1237,7 @@ void LoveTesterMenu::Create(int32_t aiTotalPoints) {
         if (static_cast<LoveTesterMenu*>(pmenu)->LoveTesterMenu::CheckTilesExist(&imissingIndex)) {
             LoveTesterMenu::pInstance->iAvailablePoints = aiTotalPoints;
             LoveTesterMenu::pInstance->InitMachine();
-            LoveTesterMenu::sp3DCamera.operator=(LoveTesterMenu::pInstance->SetupCamera());
+            LoveTesterMenu::sp3DCamera = LoveTesterMenu::pInstance->SetupCamera();
             HUDMainMenu::ForceObjectiveReminders(true);
             pmenu->PrepForVisibility(false);
         }

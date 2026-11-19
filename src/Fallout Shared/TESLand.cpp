@@ -110,7 +110,7 @@ int32_t TESObjectLAND::iGrassEvalSize = gs_iGrassDensityEvalSize_Grass.Int();
 // On x64 the m_kBound field is read directly from the model data.
 NiBound& NiGeometry::GetModelBound() {
 #if XFNV_64BIT
-    return this->m_spModelData.operator->()->m_kBound;
+    return this->m_spModelData->m_kBound;
 #else
     return *static_cast<NiBound*>(
         static_cast<void*>(static_cast<TESDataHandler*>(static_cast<void*>(this->m_spModelData.operator->()))
@@ -251,7 +251,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                 else {
                                     v25 = nullptr;
                                 }
-                                spQueuedTextures.operator=(v25);
+                                spQueuedTextures = v25;
                             }
                             QueuedFile* a6d = spQueuedTextures.m_pObject;
                             ptex_2->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6d);
@@ -282,7 +282,7 @@ bool TESObjectLAND::Load(TESFile* pFile) {
                                     else {
                                         v26 = nullptr;
                                     }
-                                    spQueuedTextures.operator=(v26);
+                                    spQueuedTextures = v26;
                                 }
                                 TESLandTexture* ptex = this->pLoadedData->pDefQuadTexture[texdata.cBlock];
                                 QueuedFile* a6a = spQueuedTextures.m_pObject;
@@ -1140,7 +1140,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
         if (pNode) {
             if (pLoadedData->spBorder.m_pObject) {
                 pNode->DetachChild(pLoadedData->spBorder.m_pObject);
-                pLoadedData->spBorder.operator=(static_cast<NiLines*>(nullptr));
+                pLoadedData->spBorder = static_cast<NiLines*>(nullptr);
             }
             if (bShow) {
                 BSShaderNoLightingProperty* pshprop;
@@ -1230,7 +1230,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                 else {
                     pBorder = nullptr;
                 }
-                pLoadedData->spBorder.operator=(pBorder);
+                pLoadedData->spBorder = pBorder;
                 pLoadedData->spBorder.m_pObject->SetTranslate(worldshift);
                 NiTexturingProperty* v24 =
                     static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
@@ -1569,7 +1569,7 @@ bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, Ni
     NiPoint3 ecx0 = *::new (&dst) NiPoint3(x, v36, static_cast<float>(0.0));
     v78 = a4 + ecx0;
     v78.z = 0.0;
-    if (v78.operator==(result)) {
+    if (v78 == result) {
         GetNormal(cdata.iBlock, cdata.iVertidx, aNormal);
         aFaceNormal = aNormal;
     }
@@ -1619,10 +1619,10 @@ bool TESObjectLAND::GetLandNormal(const COORD_DATA& cdata, NiPoint3& aNormal, Ni
         aNormal.Unitize();
         GetVertex(cdata.iBlock, cdata.iTrivertidx[0u], arOut);
         GetVertex(cdata.iBlock, cdata.iTrivertidx[1], vert);
-        arOut.operator-=(vert);
+        arOut -= vert;
         GetVertex(cdata.iBlock, cdata.iTrivertidx[0u], v68);
         GetVertex(cdata.iBlock, cdata.iTrivertidx[2], pt);
-        v68.operator-=(pt);
+        v68 -= pt;
         if ((!cdata.bTriright || cdata.bTriupper) && (cdata.bTriright || !cdata.bTriupper)) {
             aFaceNormal = v68.UnitCross(arOut);
         }
@@ -2011,7 +2011,7 @@ bool TESObjectLAND::VertexInRect(tagRECT* apRect, const NiPoint3& aPoint) {
     float y = (float)(GetWorldCellY() + 2048.0);
     float x = (float)(GetWorldCellX() + 2048.0);
     ::new (&dst) NiColor(x, y, 0.0);
-    &(&dst)->operator+=(aPoint);
+    &(dst += aPoint);
     if ((dst.x > ((double)apRect->right)) || (dst.y > ((double)apRect->top))) {
         return false;
     }
@@ -2928,7 +2928,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                 else {
                                     v31 = nullptr;
                                 }
-                                spQueuedTextures.operator=(v31);
+                                spQueuedTextures = v31;
                             }
                             QueuedFile* a6d = spQueuedTextures.m_pObject;
                             ptex_2->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6d);
@@ -2960,7 +2960,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
                                     else {
                                         v32 = nullptr;
                                     }
-                                    spQueuedTextures.operator=(v32);
+                                    spQueuedTextures = v32;
                                 }
                                 QueuedFile* a6a = spQueuedTextures.m_pObject;
                                 ptex->QueueTexture(IO_TASK_PRIORITY_VERY_LOW, a6a);
@@ -3172,7 +3172,7 @@ bool TESObjectLAND::LoadVerticesIntoArrays() {
 }
 
 void TESObjectLAND::Detach3D() {
-    spQueuedTextures.operator=(static_cast<QueuedFile*>(nullptr));
+    spQueuedTextures = static_cast<QueuedFile*>(nullptr);
     if (pLoadedData) {
         if (pLoadedData->ppMesh) {
             bhkWorld* phw;
@@ -3182,11 +3182,11 @@ void TESObjectLAND::Detach3D() {
             else {
                 phw = nullptr;
             }
-            if ((phw) && (pLoadedData->spLandRB.operator!=(nullptr))) {
+            if ((phw) && (pLoadedData->spLandRB != nullptr)) {
                 phw->RemoveBody(pLoadedData->spLandRB.m_pObject);
             }
 
-            pLoadedData->spLandRB.operator=(static_cast<bhkRigidBody*>(nullptr));
+            pLoadedData->spLandRB = static_cast<bhkRigidBody*>(nullptr);
             for (int32_t iblock = 0; iblock < 4; ++iblock) {
                 if (pLoadedData->ppMesh[iblock]) {
                     pLoadedData->ppVertices[iblock] = nullptr;
@@ -3208,7 +3208,7 @@ void TESObjectLAND::Detach3D() {
             if (pParent) {
                 pParent->DetachChild(pLoadedData->spBorder.m_pObject);
             }
-            pLoadedData->spBorder.operator=(static_cast<NiLines*>(nullptr));
+            pLoadedData->spBorder = static_cast<NiLines*>(nullptr);
         }
     }
 }
@@ -3327,13 +3327,13 @@ void TESObjectLAND::InvalidateNormals(tagRECT* apInvalidateRect) {
                 normal = e1.Cross(e2);
                 NiPoint3::UnitizeVector(normal);
                 if (!apInvalidateRect || VertexInRect(apInvalidateRect, pLoadedData->ppVertices[i][i0])) {
-                    pLoadedData->ppNormals[i][i0].operator+=(normal);
+                    pLoadedData->ppNormals[i][i0] += normal;
                 }
                 if (!apInvalidateRect || VertexInRect(apInvalidateRect, pLoadedData->ppVertices[i][i1])) {
-                    pLoadedData->ppNormals[i][i1].operator+=(normal);
+                    pLoadedData->ppNormals[i][i1] += normal;
                 }
                 if (!apInvalidateRect || VertexInRect(apInvalidateRect, pLoadedData->ppVertices[i][i2])) {
-                    pLoadedData->ppNormals[i][i2].operator+=(normal);
+                    pLoadedData->ppNormals[i][i2] += normal;
                 }
             }
             NiPoint3::UnitizeVectors(pLoadedData->ppNormals[i], 289u, 12u);
@@ -3923,7 +3923,7 @@ void TESObjectLAND::InitializeStatics() {
     else {
         NiTexturingProperty_ = nullptr;
     }
-    TESObjectLAND::spTexturingProperty.operator=(NiTexturingProperty_);
+    TESObjectLAND::spTexturingProperty = NiTexturingProperty_;
     TESObjectLAND::spTexturingProperty.m_pObject->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
     TESObjectLAND::spTexturingProperty.m_pObject->SetBaseMap(pdefmap);
     // Six indices for each of the 16x16 quads.

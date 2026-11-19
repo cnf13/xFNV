@@ -47,5 +47,5 @@ void PathingRequestHide::SetMinHideDistance(float afDistance) {
 }
 
 void PathingRequestHide::SetThreatLocation(const PathingLocation& aThreatLocation) {
-    &(&ThreatLocation)->operator=(aThreatLocation);
+    &(ThreatLocation = aThreatLocation);
 }

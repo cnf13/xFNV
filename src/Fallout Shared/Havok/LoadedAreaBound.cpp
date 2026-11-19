@@ -56,8 +56,8 @@
 #include <cmath>
 
 hkAabb* hkAabb_operator_assign(hkAabb* apThis, const hkAabb& arThat) {
-    apThis->m_min.operator=(arThat.m_min);
-    apThis->m_max.operator=(arThat.m_max);
+    apThis->m_min = arThat.m_min;
+    apThis->m_max = arThat.m_max;
     return apThis;
 }
 
@@ -87,7 +87,7 @@ void LoadedAreaBound::Clear() {
 bool LoadedAreaBound::GetBoundFromCell(TESObjectCELL* apCell, GridCellArray* apCellGrid, hkAabb& arBound) {
     bool bResult = false;
     bhkWorld* pbhkWorld = apCell->GetbhkWorld();
-    ahkpWorld* pWorld = pbhkWorld ? pbhkWorld->operator*() : nullptr;
+    ahkpWorld* pWorld = pbhkWorld ? **pbhkWorld : nullptr;
     if (pWorld) {
         // The local's declaration runs the empty hkAabb default constructor, which stores nothing; a further
         // hkAabb::Construct would construct the box twice.
@@ -122,7 +122,7 @@ bool LoadedAreaBound::GetBoundFromCell(TESObjectCELL* apCell, GridCellArray* apC
                     }
                     NiTObjectArray<NiPointer<bhkRigidBody>>& rBodies = pGridCell->pCell->GetCellMopp()->GetRigidBodyA();
                     for (uint32_t j = 0; j < rBodies.GetSize(); ++j) {
-                        const hkpCollidable* pCollidable = rBodies[j].operator->()->GetCollidable();
+                        const hkpCollidable* pCollidable = rBodies[j]->GetCollidable();
                         if (!pCollidable->hkpCdBody::getShape()) {
                             continue;
                         }
@@ -135,8 +135,8 @@ bool LoadedAreaBound::GetBoundFromCell(TESObjectCELL* apCell, GridCellArray* apC
                             alignas(16) hkTransform kTransform;
                             kTransform.~hkTransform();
                             ::new (&kTransform) hkTransform;
-                            rBodies[j].operator->()->GetTransform(kTransform);
-                            hkpShape* pShape = rBodies[j].operator->()->GetShape()->Gethk();
+                            rBodies[j]->GetTransform(kTransform);
+                            hkpShape* pShape = rBodies[j]->GetShape()->Gethk();
                             pShape->getAabb(kTransform, 0.1f, kAabb);
                         }
                         kMax.setMax4(kMax, kAabb.m_max);
@@ -343,7 +343,7 @@ void LoadedAreaBound::Create(TESObjectCELL* apCell, const hkAabb& arboundAABB) {
         float fheightOffset;
         alignas(16) hkVector4 minExtent;
         alignas(16) hkVector4 maxExtent;
-        this->spPhantomA[ui].operator=(static_cast<bhkAabbPhantom*>(nullptr));
+        this->spPhantomA[ui] = static_cast<bhkAabbPhantom*>(nullptr);
         hkAabbPhantomCinfo ci;
         hkAabb bound;
         if (apCell->GetInterior()) {
@@ -424,14 +424,14 @@ void LoadedAreaBound::Create(TESObjectCELL* apCell, const hkAabb& arboundAABB) {
                 break;
             }
         }
-        bound.m_max.operator=(maxExtent);
-        bound.m_min.operator=(minExtent);
+        bound.m_max = maxExtent;
+        bound.m_min = minExtent;
         hkAabb_operator_assign(&ci.aabb, bound);
         uint32_t uiSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
         ci.m_collisionFilterInfo = CFilter(L_UNIDENTIFIED, uiSystemGroup, P_OTHER).iFilter;
         void* pMemory = NiMemObject::operator new(sizeof(bhkAabbPhantom));
         bhkAabbPhantom* pPhantom = pMemory ? ::new (pMemory) bhkAabbPhantom(ci) : nullptr;
-        this->spPhantomA[ui].operator=(pPhantom);
+        this->spPhantomA[ui] = pPhantom;
         pworld->Add(this->spPhantomA[ui].m_pObject);
     }
 }
@@ -448,10 +448,10 @@ void LoadedAreaBound::CheckForDynamicBodiesOutsideBound() {
         maxExtent.setMax4(maxExtent, phantomAABB.m_max);
         minExtent.setMin4(minExtent, phantomAABB.m_min);
     }
-    boundAABB.m_min.operator=(minExtent);
-    boundAABB.m_max.operator=(maxExtent);
+    boundAABB.m_min = minExtent;
+    boundAABB.m_max = maxExtent;
     bhkWorld* pbhkWorld = this->pCurrentCell->GetbhkWorld();
-    hkpWorld* pworld = pbhkWorld ? pbhkWorld->operator*() : nullptr;
+    hkpWorld* pworld = pbhkWorld ? **pbhkWorld : nullptr;
     if (pworld) {
         const hkArray<hkpPhantom*, hkContainerHeapAllocator>& rPhantoms = pworld->getPhantoms();
         this->CheckPhantomsOutsideAABB(boundAABB, rPhantoms, pworld);
@@ -620,7 +620,7 @@ void LoadedAreaBound::WarpBody(bhkRigidBody* apBody, hkArray<hkpRigidBody*, hkCo
 }
 
 void bhkAabbPhantom::GetAabb(hkAabb& arB) {
-    hkpAabbPhantom* pPhantom = operator*();
+    hkpAabbPhantom* pPhantom = **this;
     if (pPhantom) {
         MarkRead();
         hkAabb_operator_assign(&arB, pPhantom->m_aabb);

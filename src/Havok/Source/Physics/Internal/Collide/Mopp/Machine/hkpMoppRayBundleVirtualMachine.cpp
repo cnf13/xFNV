@@ -768,10 +768,8 @@ void hkpMoppRayBundleVirtualMachine::queryRayOnTree(
                 // This is HK_ERROR; execution goes on with the same command after it.
                 char acBuffer[512];
                 hkErrStream kStream(acBuffer, 512);
-                kStream.operator<<(
-                    "Unknown command - This mopp data has been corrupted (check for memory trashing), or an "
-                    "hkpMoppBvTreeShape has been pointed at invalid mopp data.\n"
-                );
+                kStream << "Unknown command - This mopp data has been corrupted (check for memory trashing), or an "
+                           "hkpMoppBvTreeShape has been pointed at invalid mopp data.\n";
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, acBuffer,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppRayBundleVirtualMachine.cpp", 838

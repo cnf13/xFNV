@@ -578,8 +578,7 @@ bool CombatState::CheckTargetsCoverLOS(PathingLocation& arCoverPathingLocation, 
 
 bool CombatState::IsCoverLocationUnreachable(uint32_t aiCoverKey) {
     for (int32_t i = 0; i < UnreachableCoverLocations.iSize; ++i) {
-        UnreachableCoverLocation* unreachableCoverLocation =
-            &UnreachableCoverLocations.operator[](static_cast<uint32_t>(i));
+        UnreachableCoverLocation* unreachableCoverLocation = &UnreachableCoverLocations[static_cast<uint32_t>(i)];
         if (!(unreachableCoverLocation->fTimeStamp.ElapsedTime() > 10.0)) {
             if (unreachableCoverLocation->iCoverKey == aiCoverKey) {
                 return true;
@@ -1176,7 +1175,7 @@ void CombatState::UpdatePeriodicData() {
                 if (bforceSwitch && pCurrentEmbeddedWeapon) {
                     int32_t iembeddedWeaponIndex = RandomInt(0, inumEmbeddedWeapons - 1);
                     for (uint32_t apThis_16 = 0; apThis_16 < EmbeddedWeaponsArray.iSize; ++apThis_16) {
-                        TESObjectWEAP* apThis_12 = EmbeddedWeaponsArray.operator[](apThis_16);
+                        TESObjectWEAP* apThis_12 = EmbeddedWeaponsArray[apThis_16];
                         if (apThis_12 != pCurrentEmbeddedWeapon) {
                             if (!iembeddedWeaponIndex) {
                                 v20 = apThis_12;
@@ -1188,7 +1187,7 @@ void CombatState::UpdatePeriodicData() {
                 }
                 else {
                     uint32_t apThis_8 = RandomInt(0, inumEmbeddedWeapons);
-                    v20 = EmbeddedWeaponsArray.operator[](apThis_8);
+                    v20 = EmbeddedWeaponsArray[apThis_8];
                 }
                 if (v20 != pCurrentEmbeddedWeapon) {
                     pCurrentEmbeddedWeapon = v20;
@@ -1261,7 +1260,7 @@ void CombatState::UpdatePeriodicData() {
                 iQueuedPathCheck = -1;
             }
             if (iQueuedPathCheck == -1) {
-                spPathCheckQueue.operator=(static_cast<ActorPathingMessageQueue*>(nullptr));
+                spPathCheckQueue = static_cast<ActorPathingMessageQueue*>(nullptr);
             }
         }
     }
@@ -2406,7 +2405,7 @@ bool CombatState::FindBestCoverLocation(
                             pTarget, fMinDistToShootFrom, arfMaxRange, estate, fsquaredDistToTarget, v43
                         )) {
                         coverLoc->cState = 19;
-                        apCombatCoverLocation->CoverLocation.operator=(*coverLoc);
+                        apCombatCoverLocation->CoverLocation = *coverLoc;
                         apCombatCoverLocation->iCoverLocationKey = icoverKey;
                         apCombatCoverLocation->iCoverLocationLastMovedTimeStamp = ilastMoveTime;
                         apCombatCoverLocation->ReservationInfo = reservationInfo;
@@ -2557,7 +2556,7 @@ bool CombatState::FindCoveredMoveLocation(
         pSecondaryCoverLocation->iCoverLocationKey = pSecondaryCoverLocation->CoverLocation.GetKey();
         pSecondaryCoverLocation->iCoverLocationLastMovedTimeStamp =
             pSecondaryCoverLocation->CoverLocation.GetDynamicCoverObstacleTimeStamp();
-        apCoverLocation->operator=(pSecondaryCoverLocation->CoverLocation);
+        *apCoverLocation = pSecondaryCoverLocation->CoverLocation;
         return true;
     }
 
@@ -2689,7 +2688,7 @@ bool CombatState::FindBestFleeLocation(CombatCoverLocation* arg0, CombatLocation
                     if (i >= FormFlags) {
                         break;
                     }
-                    TESObjectREFR* pdoor = v37.operator[](i);
+                    TESObjectREFR* pdoor = v37[i];
                     if (!pdoor->GetDisabledOrDeleted() && pdoor->iFormID != iLastFleeDoor) {
                         DoorTeleportData* pteleportData = pdoor->GetTeleport();
                         TESObjectREFR* plinkedDoor = pteleportData->pLinkedDoor;
@@ -3124,8 +3123,7 @@ void CombatState::AddUnreachableCoverLocation(uint32_t aiCoverKey) {
 void CombatState::BuildUnreachableCoverLocationsArray(BSSimpleArray<uint32_t, 1024>* apUnreachableCoverLocationsArray) {
     apUnreachableCoverLocationsArray->SetReservedSize(UnreachableCoverLocations.iSize);
     for (int32_t i = 0; i < UnreachableCoverLocations.iSize; ++i) {
-        UnreachableCoverLocation* unreachableCoverLocation =
-            &UnreachableCoverLocations.operator[](static_cast<uint32_t>(i));
+        UnreachableCoverLocation* unreachableCoverLocation = &UnreachableCoverLocations[static_cast<uint32_t>(i)];
         if (!(unreachableCoverLocation->fTimeStamp.ElapsedTime() > 10.0)) {
             apUnreachableCoverLocationsArray->Add(unreachableCoverLocation->iCoverKey);
         }
@@ -3144,7 +3142,7 @@ bool CombatState::IsLocationUnreachable(const BGSWorldLocation& arWorldLocation,
         fradiusSquared = afRadius * afRadius;
     }
     for (int32_t i = 0; i < UnreachableLocations.iSize; ++i) {
-        UnreachableLocation* unreachableLocation = &UnreachableLocations.operator[](i);
+        UnreachableLocation* unreachableLocation = &UnreachableLocations[i];
         if (!(unreachableLocation->fTimeStamp.ElapsedTime() > 10.0)) {
             if (fradiusSquared > unreachableLocation->Location.GetDistanceSquared(arWorldLocation)) {
                 return true;
@@ -3175,7 +3173,7 @@ bool CombatState::QueuePathCheck(int32_t aiLocation) {
         else {
             pQueue = nullptr;
         }
-        this->spPathCheckQueue.operator=(pQueue);
+        this->spPathCheckQueue = pQueue;
     }
     if (aiLocation) {
         if (aiLocation == 1) {
@@ -3237,7 +3235,7 @@ void CombatState::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = EmbeddedWeaponsArray.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t auiIndex = 0; auiIndex < isaveGameCount; ++auiIndex) {
-        apSaveGameBuffer->SaveFormID(EmbeddedWeaponsArray.operator[](auiIndex), 0);
+        apSaveGameBuffer->SaveFormID(EmbeddedWeaponsArray[auiIndex], 0);
     }
     apSaveGameBuffer->SaveFormID(pCurrentEmbeddedWeapon, 0);
     apSaveGameBuffer->SaveDataEndian(&iHasCombatWeapon, 4u, 0);
@@ -3321,13 +3319,13 @@ void CombatState::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount_2 = UnreachableCoverLocations.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_2);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
-        UnreachableCoverLocations.operator[](i_2).SaveGame(apSaveGameBuffer);
+        UnreachableCoverLocations[i_2].SaveGame(apSaveGameBuffer);
     }
     // No null test is needed: the address &UnreachableLocations is never null.
     isaveGameCount_3 = UnreachableLocations.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_3);
     for (uint32_t i_3 = 0; i_3 < isaveGameCount_3; ++i_3) {
-        (&UnreachableLocations.operator[](i_3))->SaveGame(apSaveGameBuffer);
+        (&UnreachableLocations[i_3])->SaveGame(apSaveGameBuffer);
     }
     fLastDodgeSearch.SaveGame(apSaveGameBuffer);
     apSaveGameBuffer->SaveDataEndian(&cLastDodgeDirection, 1u, 0);
@@ -3381,7 +3379,7 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     EmbeddedWeaponsArray.SetSize(isaveGameCount, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount; ++i_2) {
-        TESObjectWEAP** pembeddedWeapon = &EmbeddedWeaponsArray.operator[](i_2);
+        TESObjectWEAP** pembeddedWeapon = &EmbeddedWeaponsArray[i_2];
         uint32_t v4 = apLoadGameBuffer->LoadFormID();
         TESForm* v5 = TESForm::GetFormByNumericID(v4);
         *pembeddedWeapon = dynamic_cast<TESObjectWEAP*>(v5);
@@ -3500,12 +3498,12 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
     UnreachableCoverLocations.SetSize(isaveGameCount_2, true);
     for (uint32_t i_4 = 0; i_4 < isaveGameCount_2; ++i_4) {
-        (&UnreachableCoverLocations.operator[](i_4))->LoadGame(apLoadGameBuffer);
+        (&UnreachableCoverLocations[i_4])->LoadGame(apLoadGameBuffer);
     }
     uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
     UnreachableLocations.SetSize(isaveGameCount_3, true);
     for (uint32_t i_5 = 0; i_5 < isaveGameCount_3; ++i_5) {
-        (&UnreachableLocations.operator[](i_5))->LoadGame(apLoadGameBuffer);
+        (&UnreachableLocations[i_5])->LoadGame(apLoadGameBuffer);
     }
     fLastDodgeSearch.LoadGame(apLoadGameBuffer);
     apLoadGameBuffer->LoadData(&cLastDodgeDirection, 1u);
@@ -3655,7 +3653,7 @@ bool CombatState::CheckTargetsCoverLOS_0(
         if (auiIndex >= FormFlags) {
             break;
         }
-        arTargetLocation = *static_cast<NiPoint3*>(&apLocationsArray->operator[](auiIndex));
+        arTargetLocation = *static_cast<NiPoint3*>(&(*apLocationsArray)[auiIndex]);
         if (CombatState::CheckCoverLOS(arCoverPathingLocation, arTargetLocation, false)) {
             return true;
         }
@@ -3958,7 +3956,7 @@ void CombatCoverSearchInfo::LoadGameBGS(BGSLoadGameBuffer* a2) {
     uint32_t aiNewSize = a2->LoadVariableSizedValue();
     kCoverLocations.SetSize(aiNewSize, true);
     for (uint32_t aiIndex = 0; aiIndex < aiNewSize; ++aiIndex) {
-        PathingCoverLocation* v3 = &kCoverLocations.operator[](aiIndex);
+        PathingCoverLocation* v3 = &kCoverLocations[aiIndex];
         v3->LoadGame(a2);
     }
 }
@@ -3976,7 +3974,7 @@ void CombatCoverSearchInfo::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = kCoverLocations.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        PathingCoverLocation* coverLocation = &kCoverLocations.operator[](i);
+        PathingCoverLocation* coverLocation = &kCoverLocations[i];
         coverLocation->SaveGame(apSaveGameBuffer);
     }
 }

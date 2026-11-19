@@ -47,9 +47,9 @@ BSMultiBoundShape* BGSPrimitive::MakeMultiBoundShape(NiPoint3& akAngle) {
 }
 
 void BGSPrimitive::ClearObjects() {
-    (&spGeometry)->operator=(nullptr);
-    (&spFrame)->operator=(nullptr);
-    (&spNode)->operator=(nullptr);
+    spGeometry = nullptr;
+    spFrame = nullptr;
+    spNode = nullptr;
 }
 
 BGSPrimitive* BGSPrimitive::CreateAbstract(PRIMITIVE_TYPE eType, NiPoint3& aRadii, NiColorA& aColor) {
@@ -127,7 +127,7 @@ BGSPrimitiveBox* BGSPrimitive::CreateBox(NiPoint3& aSize, NiColorA& aColor) {
     }
     v6 = (-1);
     v3->SetColor(aColor);
-    (result = (&aSize)->operator*(0x1p-1f));
+    (result = aSize * 0x1p-1f);
     v3->SetRadii(result);
     v3->eType = BGSPrimitive::PRIMITIVE_BOX;
     return v3;
@@ -166,7 +166,7 @@ void BGSPrimitivePlane::Build() {
     }
     NiRefObject* v8 = v4;
     v9 = (-1);
-    (&spNode)->operator=(v4);
+    spNode = v4;
     NiFixedString* a2 = ::new (static_cast<void*>(&apString)) NiFixedString(const_cast<char*>("Plane"));
     v9 = 1;
     BSFadeNode* v1 = (&spNode)->m_pObject;
@@ -223,55 +223,55 @@ void BGSPrimitivePlane::SetRadii(NiPoint3& aRadii) {
     NiPoint3 v86;
     NiPoint3 v87;
     NiPoint3 dst;
-    float* v2 = &aRadii.operator[](0);
+    float* v2 = &aRadii[0];
     float v71 = std::fabs(*v2);
-    aRadii.operator[](0) = v71;
-    aRadii.operator[](1) = 0.0f;
-    float* v3 = &aRadii.operator[](2);
+    aRadii[0] = v71;
+    aRadii[1] = 0.0f;
+    float* v3 = &aRadii[2];
     float v70 = std::fabs(*v3);
-    aRadii.operator[](2) = v70;
+    aRadii[2] = v70;
     Radii = aRadii;
     if (spGeometry.m_pObject) {
         NiGeometryData* pgeomdata = spGeometry.m_pObject->GetModelData();
         NiPoint3* pverts = pgeomdata->m_pkVertex;
-        float a1 = Radii.operator[](2);
-        float y = Radii.operator[](1);
-        float x = -Radii.operator[](0);
+        float a1 = Radii[2];
+        float y = Radii[1];
+        float x = -Radii[0];
         NiPoint3* v4 = ::new (&dst) NiPoint3(x, y, a1);
         *pverts = *v4;
-        float a1a = Radii.operator[](2);
-        float ya = Radii.operator[](1);
-        float* v5 = &Radii.operator[](0);
+        float a1a = Radii[2];
+        float ya = Radii[1];
+        float* v5 = &Radii[0];
         NiPoint3* v6 = ::new (&v87) NiPoint3(*v5, ya, a1a);
         pverts[1] = *v6;
-        float a1b = Radii.operator[](2);
-        float yb = -Radii.operator[](1);
-        float* v7 = &Radii.operator[](0);
+        float a1b = Radii[2];
+        float yb = -Radii[1];
+        float* v7 = &Radii[0];
         NiPoint3* v8 = ::new (&v86) NiPoint3(*v7, yb, a1b);
         pverts[2] = *v8;
-        float a1c = Radii.operator[](2);
-        float yc = -Radii.operator[](1);
-        float xa = -Radii.operator[](0);
+        float a1c = Radii[2];
+        float yc = -Radii[1];
+        float xa = -Radii[0];
         NiPoint3* v9 = ::new (&v85) NiPoint3(xa, yc, a1c);
         pverts[3] = *v9;
-        float a1d = -Radii.operator[](2);
-        float yd = Radii.operator[](1);
-        float xb = -Radii.operator[](0);
+        float a1d = -Radii[2];
+        float yd = Radii[1];
+        float xb = -Radii[0];
         NiPoint3* v10 = ::new (&v84) NiPoint3(xb, yd, a1d);
         pverts[4] = *v10;
-        float a1e = -Radii.operator[](2);
-        float ye = Radii.operator[](1);
-        float* v11 = &Radii.operator[](0);
+        float a1e = -Radii[2];
+        float ye = Radii[1];
+        float* v11 = &Radii[0];
         NiPoint3* v12 = ::new (&v83) NiPoint3(*v11, ye, a1e);
         pverts[5] = *v12;
-        float a1f = -Radii.operator[](2);
-        float yf = -Radii.operator[](1);
-        float* v13 = &Radii.operator[](0);
+        float a1f = -Radii[2];
+        float yf = -Radii[1];
+        float* v13 = &Radii[0];
         NiPoint3* v14 = ::new (&v82) NiPoint3(*v13, yf, a1f);
         pverts[6] = *v14;
-        float a1g = -Radii.operator[](2);
-        float yg = -Radii.operator[](1);
-        float xc = -Radii.operator[](0);
+        float a1g = -Radii[2];
+        float yg = -Radii[1];
+        float xc = -Radii[0];
         NiPoint3* v15 = ::new (&v81) NiPoint3(xc, yg, a1g);
         pverts[7] = *v15;
         pgeomdata->MarkAsChanged(1);
@@ -279,45 +279,45 @@ void BGSPrimitivePlane::SetRadii(NiPoint3& aRadii) {
     if (spFrame.m_pObject) {
         NiGeometryData* pgeomdata_2 = static_cast<NiGeometry*>(spFrame.m_pObject)->GetModelData();
         NiPoint3* pverts_2 = pgeomdata_2->m_pkVertex;
-        float a1h = Radii.operator[](2);
-        float yh = Radii.operator[](1);
-        float xd = -Radii.operator[](0);
+        float a1h = Radii[2];
+        float yh = Radii[1];
+        float xd = -Radii[0];
         NiPoint3* v16 = ::new (&v80) NiPoint3(xd, yh, a1h);
         *pverts_2 = *v16;
-        float a1i = Radii.operator[](2);
-        float yi = Radii.operator[](1);
-        float* v17 = &Radii.operator[](0);
+        float a1i = Radii[2];
+        float yi = Radii[1];
+        float* v17 = &Radii[0];
         NiPoint3* v18 = ::new (&v79) NiPoint3(*v17, yi, a1i);
         pverts_2[1] = *v18;
-        float a1j = Radii.operator[](2);
-        float yj = -Radii.operator[](1);
-        float* v19 = &Radii.operator[](0);
+        float a1j = Radii[2];
+        float yj = -Radii[1];
+        float* v19 = &Radii[0];
         NiPoint3* v20 = ::new (&v78) NiPoint3(*v19, yj, a1j);
         pverts_2[2] = *v20;
-        float a1k = Radii.operator[](2);
-        float yk = -Radii.operator[](1);
-        float xe = -Radii.operator[](0);
+        float a1k = Radii[2];
+        float yk = -Radii[1];
+        float xe = -Radii[0];
         NiPoint3* v21 = ::new (&v77) NiPoint3(xe, yk, a1k);
         pverts_2[3] = *v21;
         pverts_2[4] = *pverts_2;
-        float a1l = -Radii.operator[](2);
-        float yl = Radii.operator[](1);
-        float xf = -Radii.operator[](0);
+        float a1l = -Radii[2];
+        float yl = Radii[1];
+        float xf = -Radii[0];
         NiPoint3* v22 = ::new (&v76) NiPoint3(xf, yl, a1l);
         pverts_2[5] = *v22;
-        float a1m = -Radii.operator[](2);
-        float ym = -Radii.operator[](1);
-        float xg = -Radii.operator[](0);
+        float a1m = -Radii[2];
+        float ym = -Radii[1];
+        float xg = -Radii[0];
         NiPoint3* v23 = ::new (&v75) NiPoint3(xg, ym, a1m);
         pverts_2[6] = *v23;
-        float a1n = -Radii.operator[](2);
-        float yn = -Radii.operator[](1);
-        float* v24 = &Radii.operator[](0);
+        float a1n = -Radii[2];
+        float yn = -Radii[1];
+        float* v24 = &Radii[0];
         NiPoint3* v25 = ::new (&v74) NiPoint3(*v24, yn, a1n);
         pverts_2[7] = *v25;
-        float a1o = -Radii.operator[](2);
-        float yo = Radii.operator[](1);
-        float* v26 = &Radii.operator[](0);
+        float a1o = -Radii[2];
+        float yo = Radii[1];
+        float* v26 = &Radii[0];
         NiPoint3* v27 = ::new (&v73) NiPoint3(*v26, yo, a1o);
         pverts_2[8] = *v27;
         pverts_2[9] = pverts_2[5];
@@ -404,7 +404,7 @@ void BGSPrimitiveBox::Build() {
         }
         v8 = v4;
         v9 = (-1);
-        (&spNode)->operator=(v4);
+        spNode = v4;
         a2 = ::new (static_cast<void*>(&apString)) NiFixedString(const_cast<char*>("Box"));
         v9 = 1;
         v1 = (&spNode)->m_pObject;
@@ -461,7 +461,7 @@ void BGSPrimitiveBox::SetRadii(NiPoint3& aRadii) {
     fAbs = std::fabs(aRadii[2]);
     aRadii[2] = fAbs;
     Radii = aRadii;
-    if (spGeometry.operator->()) {
+    if (spGeometry) {
         NiGeometryData* pData = spGeometry->GetModelData();
         NiPoint3* pVertices = pData->GetVertices();
         float fZ = Radii[2];
@@ -498,7 +498,7 @@ void BGSPrimitiveBox::SetRadii(NiPoint3& aRadii) {
         pVertices[7] = NiPoint3(fX, fY, fZ);
         pData->MarkAsChanged(NiGeometryData::VERTEX_MASK);
     }
-    if (spFrame.operator->()) {
+    if (spFrame) {
         NiGeometryData* pFrameData = static_cast<NiGeometry*>(spFrame.operator->())->GetModelData();
         NiPoint3* pFrameVertices = pFrameData->GetVertices();
         NiPoint3 kScale = aRadii;
@@ -544,7 +544,7 @@ void BGSPrimitiveBox::SetRadii(NiPoint3& aRadii) {
     }
     alignas(NiUpdateData) uint8_t aUpdateStorage[sizeof(NiUpdateData)];
     NiUpdateData* pUpdateData = ::new (aUpdateStorage) NiUpdateData(0.0f, false, false);
-    if (spNode.operator->()) {
+    if (spNode) {
         float fRadius = aRadii.x;
         if (aRadii.x < aRadii.y && aRadii.z < aRadii.y) {
             fRadius = aRadii.y;
@@ -614,7 +614,7 @@ BGSPrimitiveSphere::~BGSPrimitiveSphere() {}
 
 void BGSPrimitiveSphere::Build() {
     if (spGeometry.m_pObject) {
-        float* v3 = &Radii.operator[](0);
+        float* v3 = &Radii[0];
         SetRadius(*v3);
         SetColor(Color);
     }
@@ -676,7 +676,7 @@ void BGSPrimitiveSphere::Build() {
         pshprop->SetShader(33);
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
-        spGeometry.operator=(ptri);
+        spGeometry = ptri;
         void* apMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
         if (apMemory) {
             NiAlphaProperty_ = ::new (apMemory) NiAlphaProperty;
@@ -699,7 +699,7 @@ void BGSPrimitiveSphere::Build() {
             BSFadeNode_ = nullptr;
         }
         NiRefObject* v19 = BSFadeNode_;
-        spNode.operator=(BSFadeNode_);
+        spNode = BSFadeNode_;
         BSFadeNode* v5 = spNode.m_pObject;
         v5->AttachChild(spGeometry.m_pObject, 1);
         spNode.m_pObject->SetName("Sphere");
@@ -760,7 +760,7 @@ void BGSPrimitiveSphere::SetRadius(float afRadius) {
             pverts[i].y = v5;
             float v4 = pSphereVertices[i][2];
             pverts[i].z = v4;
-            pverts[i].operator*=(fRadius);
+            pverts[i] *= fRadius;
         }
         pgeomdata->MarkAsChanged(1);
     }

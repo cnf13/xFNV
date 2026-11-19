@@ -354,7 +354,7 @@ bool SummonCreatureEffect::CheckSummonLocation(Actor* apSummoned, NiPoint3& loca
     CFilter ifilter(L_PATHINGPICK, 0, P_OTHER);
     hkSimpleShapePhantomCinfo csi;
     csi.m_collisionFilterInfo = ifilter.iFilter;
-    csi.m_shape = pshape->operator*();
+    csi.m_shape = **pshape;
     csi.m_transform.setIdentity();
     bhkSimpleShapePhantom spShapePhantom(csi);
     if (pownerActor->GetParentCell()) {

@@ -560,7 +560,7 @@ void HitData::SetTargetedLimb(Projectile* apProjectile) {
                     this->kHitDirection = apProjectile->GetMovementDirection();
                     this->kHitDirection.Unitize();
                     NiPoint3* fScalar = &(v65 = -pimpactData->kNormal);
-                    this->kHitDirection.operator+=(*fScalar);
+                    this->kHitDirection += *fScalar;
                     this->kHitDirection.Unitize();
                 }
             }

@@ -86,16 +86,16 @@ void BSOcclusionPlane::GetVertices(NiPoint3* apPoints) {
         kPoint1.x = (float)0.0;
         kPoint1.y = (float)0.0;
         kPoint1.z = y;
-        kPoint0 = *&(v17 = (&kRotation)->operator*(kPoint0));
-        kPoint1 = *&(v16 = (&kRotation)->operator*(kPoint1));
-        v2 = &(v15 = (&kCenter)->operator-(kPoint0));
-        apPoints[3] = *&(v14 = v2->operator+(kPoint1));
-        v3 = &(v13 = (&kCenter)->operator-(kPoint0));
-        apPoints[2] = *&(v12 = v3->operator-(kPoint1));
-        v4 = &(v11 = (&kCenter)->operator+(kPoint0));
-        apPoints[1] = *&(v10 = v4->operator-(kPoint1));
-        v5 = &(v9 = (&kCenter)->operator+(kPoint0));
-        *apPoints = *&(v8 = v5->operator+(kPoint1));
+        kPoint0 = *&(v17 = kRotation * kPoint0);
+        kPoint1 = *&(v16 = kRotation * kPoint1);
+        v2 = &(v15 = kCenter - kPoint0);
+        apPoints[3] = *&(v14 = *v2 + kPoint1);
+        v3 = &(v13 = kCenter - kPoint0);
+        apPoints[2] = *&(v12 = *v3 - kPoint1);
+        v4 = &(v11 = kCenter + kPoint0);
+        apPoints[1] = *&(v10 = *v4 - kPoint1);
+        v5 = &(v9 = kCenter + kPoint0);
+        *apPoints = *&(v8 = *v5 + kPoint1);
         rt::memcpy(kCachedVertices, apPoints, sizeof(kCachedVertices));
         bDirtyVertices = false;
     }
@@ -386,8 +386,8 @@ bool BSOcclusionPlane::TestIntersection(const NiBound& aBound) {
         (&inv)->MakeZero();
     }
     __builtin_memcpy(&v23, &inv, sizeof(v23));
-    NiPoint3* v2 = &(result = (&(&aBound)->m_kCenter)->operator-(kCenter));
-    (v21 = (&v23)->operator*(*v2));
+    NiPoint3* v2 = &(result = (&aBound)->m_kCenter - kCenter);
+    (v21 = v23 * *v2);
     float v11 = (float)std::fabs((double)v21.x);
     v21.x = v11;
     float v10 = (float)std::fabs((double)v21.y);
@@ -431,7 +431,7 @@ bool BSOcclusionPlane::TestLineSegmentAllPlanes(
     int32_t i;
     NiPoint3 v12;
     NiPoint3 v15;
-    (v15 = (&akPoint1)->operator-(akPoint0));
+    (v15 = akPoint1 - akPoint0);
     NiPoint3 kNormal = (&akPlane0)->m_kNormal;
     float v16 = (&kNormal)->Dot(v15);
     if (v16 == 0.0) {
@@ -443,8 +443,8 @@ bool BSOcclusionPlane::TestLineSegmentAllPlanes(
     if ((!(v14 >= 0.0)) || (!(v14 <= 1.0))) {
         return false;
     }
-    NiPoint3* v7 = &(v10 = (&v15)->operator*(v14));
-    (v12 = (&akPoint0)->operator+(*v7));
+    NiPoint3* v7 = &(v10 = v15 * v14);
+    (v12 = akPoint0 + *v7);
     for (i = 0; i < 6; ++i) {
         if (((&akPlanes)->m_uiActivePlanes & (1 << i)) != 0) {
             v8 = (&akPlanes)->m_akCullingPlanes[i].m_fConstant;
@@ -664,7 +664,7 @@ bool BSOcclusionPlane::TestLineSegment(NiPoint3* a1, NiPoint3* a2, float* a3, Ni
     NiPoint3 v12;
     NiPoint3 v13;
     NiPoint3 v15;
-    (v15 = a2->operator-(*a1));
+    (v15 = *a2 - *a1);
     v13.x = (*a3);
     v13.y = a3[1];
     v13.z = a3[2];
@@ -677,8 +677,8 @@ bool BSOcclusionPlane::TestLineSegment(NiPoint3* a1, NiPoint3* a2, float* a3, Ni
     float v14 = (float)((v10 - v6) / v16);
     uint8_t result = 0;
     if ((v14 >= 0.0) && (v14 <= 1.0)) {
-        v7 = &(v11 = (&v15)->operator*(v14));
-        (v12 = a1->operator+(*v7));
+        v7 = &(v11 = v15 * v14);
+        (v12 = *a1 + *v7);
         x = a4[1].x;
         if ((a4->Dot(v12) - x) >= (-0.0001)) {
             v8 = a5[1].x;

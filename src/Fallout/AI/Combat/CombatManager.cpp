@@ -104,7 +104,7 @@ void CombatManager::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         delete ptempMap;
     }
     for (uint32_t i = 0; i < CombatGroups.m_usSize; ++i) {
-        CombatGroup* pgroup = CombatGroups.operator[](i);
+        CombatGroup* pgroup = CombatGroups[i];
         if (pgroup) {
             pgroup->InitLoadGame(apLoadGameBuffer);
         }
@@ -121,7 +121,7 @@ void CombatManager::Update(bool abTimeStopped) {
         float afElapsedTime = appTimer.fDelta;
         CombatTimer::UpdateTimer(afElapsedTime);
         for (uint32_t i = 0; i < CombatGroups.GetSize(); ++i) {
-            CombatGroup* pgroup = CombatGroups.operator[](i);
+            CombatGroup* pgroup = CombatGroups[i];
             if ((pgroup) && (!pgroup->IsEmpty())) {
                 pgroup->Update();
             }
@@ -152,7 +152,7 @@ void CombatManager::UpdateMainThread(bool abTimeStopped) {
     uint32_t igroupCount = CombatGroups.m_usSize;
     if (igroupCount) {
         for (uint32_t i = 0; i < igroupCount; ++i) {
-            CombatGroup* pgroup = CombatGroups.operator[](i);
+            CombatGroup* pgroup = CombatGroups[i];
             if ((pgroup) && (pgroup->IsEmpty())) {
                 CombatGroup* pDeleted = pgroup;
                 if (pDeleted) {
@@ -173,7 +173,7 @@ void CombatManager::UpdateMainThread(bool abTimeStopped) {
             if (i_2 >= igroupCount_2) {
                 break;
             }
-            CombatGroup* pgroup_3 = CombatGroups.operator[](i_2);
+            CombatGroup* pgroup_3 = CombatGroups[i_2];
             if (pgroup_3) {
                 uint32_t imemberCount = pgroup_3->GetMemberCount();
                 for (uint32_t j = 0; j < imemberCount; ++j) {
@@ -309,7 +309,7 @@ uint32_t CombatManager::GetCombatantCount(Actor* apActor, uint32_t* apNumLost) {
         if (i >= Size) {
             break;
         }
-        CombatGroup* pgroup = CombatGroups.operator[](i);
+        CombatGroup* pgroup = CombatGroups[i];
         if ((pgroup) && (!apActor || pgroup->IsTarget(apActor))) {
             uint32_t igroupCount = pgroup->GetMemberCount();
             if (igroupCount) {
@@ -378,7 +378,7 @@ void CombatManager::ClearReferencePointers(TESObjectREFR* apRef) {
 CombatGroup* CombatManager::GetCombatGroup(uint32_t aiGroupID) {
     uint32_t i_2 = 0;
     for (uint32_t i = CombatGroups.m_usSize; i_2 < i; i = CombatGroups.m_usSize) {
-        CombatGroup* pgroup = CombatGroups.operator[](i_2);
+        CombatGroup* pgroup = CombatGroups[i_2];
         if (pgroup && pgroup->iGroupID == aiGroupID) {
             return pgroup;
         }
@@ -441,7 +441,7 @@ void CombatManager::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     CombatGroup* v4;
     uint32_t v5 = 0;
     for (i = (uint32_t)(&CombatGroups)->m_usSize; v5 < i; i = (uint32_t)(&CombatGroups)->m_usSize) {
-        v4 = (&CombatGroups)->operator[](v5);
+        v4 = CombatGroups[v5];
         if (v4) {
             v4->FinishLoadGame(apLoadGameBuffer);
         }
@@ -563,7 +563,7 @@ void CombatManager::InitializeData() {
 void CombatManager::ClearData(bool abNotifyGroupMembers) {
     uint32_t i_2 = 0;
     for (uint32_t i = CombatGroups.m_usSize; i_2 < i; i = CombatGroups.m_usSize) {
-        CombatGroup* pgroup = CombatGroups.operator[](i_2);
+        CombatGroup* pgroup = CombatGroups[i_2];
         if (pgroup) {
             if (abNotifyGroupMembers) {
                 pgroup->RemoveFromMembers();
@@ -591,13 +591,13 @@ void CombatManager::ClearData(bool abNotifyGroupMembers) {
         Parent->DetachChild(spDebugGeometry.m_pObject);
     }
 
-    spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
+    spDebugGeometry = static_cast<NiNode*>(nullptr);
 }
 
 void CombatManager::UpdateDebugGeometry() {
     NiPoint3 actorLoc;
     for (uint32_t i = 0; i < CombatGroups.m_usSize; ++i) {
-        CombatGroup* pgroup = CombatGroups.operator[](i);
+        CombatGroup* pgroup = CombatGroups[i];
         if (pgroup) {
             pgroup->CreateDebugGeometry(eFalse);
             uint32_t imemberCount = pgroup->GetMemberCount();
@@ -614,7 +614,7 @@ void CombatManager::UpdateDebugGeometry() {
         Parent->DetachChild(spDebugGeometry.m_pObject);
     }
 
-    spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
+    spDebugGeometry = static_cast<NiNode*>(nullptr);
     if ((pPlayer->GetParentCell()) && (pPlayer->GetParentCell()->GetMarkerNode())) {
         if (bDebugCombatDetectionEvents.Bool()) {
             if (!spDebugGeometry.m_pObject) {
@@ -626,7 +626,7 @@ void CombatManager::UpdateDebugGeometry() {
                 else {
                     v7 = nullptr;
                 }
-                spDebugGeometry.operator=(v7);
+                spDebugGeometry = v7;
             }
             uint32_t inumHighActors = (&ReferenceProcessLists.MobProcessArray)->GetProcessLevelTail(PROCESS_TYPE_HIGH);
             for (uint32_t i_2 = 0; i_2 < inumHighActors + 1; ++i_2) {
@@ -832,7 +832,7 @@ bool CombatManager::ShouldPlayCombatMusic() {
         if (i >= Size) {
             break;
         }
-        CombatGroup* pgroup = CombatGroups.operator[](i);
+        CombatGroup* pgroup = CombatGroups[i];
         if (pgroup) {
             if (pgroup->IsSearching() || (!pgroup->GetTargetCount() || pgroup->IsFleeing())) {
                 continue;
@@ -934,7 +934,7 @@ void CombatManager::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         if (i >= Size) {
             break;
         }
-        CombatGroup* pgroup = CombatGroups.operator[](i);
+        CombatGroup* pgroup = CombatGroups[i];
         if (pgroup) {
             igroupNum = pgroup->iGroupNum;
             apSaveGameBuffer->SaveDataEndian(&igroupNum, 4u, 0);

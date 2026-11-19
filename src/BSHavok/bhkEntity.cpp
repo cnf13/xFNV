@@ -132,7 +132,7 @@ void bhkEntity::UpdateCFilter() {
 }
 
 void bhkEntity::AddEntityListener(hkpEntityListener* apListener) {
-    hkpRigidBody* hkReferencedObject = static_cast<bhkRigidBody*>(this)->operator*();
+    hkpRigidBody* hkReferencedObject = **static_cast<bhkRigidBody*>(this);
     if (hkReferencedObject) {
         hkReferencedObject->hkpEntity::addEntityListener(apListener);
     }
@@ -146,14 +146,14 @@ void bhkEntity::RemoveEntityListener(hkpEntityListener* apList) {
 }
 
 void bhkEntity::AddEntityActivationListener(hkpEntityActivationListener* apList) {
-    hkpRigidBody* hkReferencedObject = static_cast<bhkRigidBody*>(this)->operator*();
+    hkpRigidBody* hkReferencedObject = **static_cast<bhkRigidBody*>(this);
     if (hkReferencedObject) {
         hkReferencedObject->hkpEntity::addEntityActivationListener(apList);
     }
 }
 
 void bhkEntity::AddContactListener(hkpContactListener* apList) {
-    hkpRigidBody* hkReferencedObject = static_cast<bhkRigidBody*>(this)->operator*();
+    hkpRigidBody* hkReferencedObject = **static_cast<bhkRigidBody*>(this);
     if (hkReferencedObject) {
         hkReferencedObject->hkpEntity::addContactListener(apList);
     }

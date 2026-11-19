@@ -320,7 +320,7 @@ void Explosion::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     iactorCauseID = -1;
     apLoadGameBuffer->LoadData(&iactorCauseID, 4u);
     ActorCause* ActorCauseByID = ActorCause::GetActorCauseByID(iactorCauseID);
-    spActorCause.operator=(ActorCauseByID);
+    spActorCause = ActorCauseByID;
     bhasCaster = true;
     if (apLoadGameBuffer->GetVersion() >= 7u) {
         apLoadGameBuffer->LoadData(&bhasCaster, 1u);
@@ -412,7 +412,7 @@ void Explosion::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     bTargetsFound = false;
     bTargetsProcessed = false;
     bForcesApplied = false;
-    spActorCause.operator=(static_cast<ActorCause*>(nullptr));
+    spActorCause = static_cast<ActorCause*>(nullptr);
     fWeaponCondition = 1.0f;
     bIgnoreImageSpaceSwap = false;
     bUnderWater = false;
@@ -437,7 +437,7 @@ void Explosion::SetActorCause(ActorCause* apActorCause) {
 }
 
 ActorCause* Explosion::GetActorCause() {
-    return spActorCause.operator->();
+    return spActorCause;
 }
 
 // The caster's MagicCaster part, or null when the explosion has no caster.
@@ -450,7 +450,7 @@ MagicCaster* Explosion::GetMagicCaster() {
 }
 
 void Explosion::InitHavok() {
-    if ((spPhantom.operator==(static_cast<bhkSimpleShapePhantom*>(nullptr))) && (this->GetParentCell()) &&
+    if ((spPhantom == static_cast<bhkSimpleShapePhantom*>(nullptr)) && (this->GetParentCell()) &&
         (this->GetParentCell()->GetbhkWorld())) {
         bhkSimpleShapePhantom* v6;
         bhkSphereShape* pshape;
@@ -463,7 +463,7 @@ void Explosion::InitHavok() {
         else {
             pshape = nullptr;
         }
-        info.m_shape = pshape->operator*();
+        info.m_shape = **pshape;
         uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
         info.m_collisionFilterInfo = CFilter(L_SPELLEXPLOSION, NewSystemGroup, P_OTHER).iFilter;
         if (this->Get3D()) {
@@ -481,7 +481,7 @@ void Explosion::InitHavok() {
         else {
             v6 = nullptr;
         }
-        this->spPhantom.operator=(v6);
+        this->spPhantom = v6;
         bhkSimpleShapePhantom* v5 = this->spPhantom.m_pObject;
         bhkWorld* v3 = this->GetParentCell()->GetbhkWorld();
         v5->Add(v3);
@@ -749,7 +749,7 @@ void Explosion::ApplyImpactDecals() {
             NiPoint3 pickLength = 2.0f * (contactPoint - origin);
             if (pickLength.Length() < 1.0) {
                 NiPoint3* v10 = ::new (&v109) NiPoint3(contactNormal * 16.0f);
-                origin.operator-=(*v10);
+                origin -= *v10;
                 pickLength = contactNormal * 32.0f;
             }
             pd.NiSetFrom(origin);
@@ -810,7 +810,7 @@ void Explosion::ApplyImpactDecals() {
             this->ClosestPoint.x = contactPoint.x;
             p_ClosestPoint->y = contactPoint.y;
             p_ClosestPoint->z = contactPoint.z;
-            if (this->ClosestPointNormal.operator==(NiPoint3_ZERO)) {
+            if (this->ClosestPointNormal == NiPoint3_ZERO) {
                 this->ClosestPointNormal = contactNormal;
             }
             if (iExplosionDebug.Int() > 1) {
@@ -1017,10 +1017,10 @@ void Explosion::UpdateNonRenderSafeMovement(float afDelta) {
 
 // The age is doubled and divided at double precision; the dimmer is rounded to float before it is clamped.
 void Explosion::UpdateLight() {
-    if (spLight.operator->()) {
+    if (spLight) {
         float fDimmer = 1.0 - GetAge() * 2.0 / GetLifetime();
         float fClamped = BSMAX(0.0f, BSMIN(1.0f, fDimmer));
-        spLight.operator->()->SetDimmer(fClamped);
+        spLight->SetDimmer(fClamped);
     }
 }
 
@@ -1288,7 +1288,7 @@ void Explosion::Init3D() {
                 paddon->iValue = 14;
                 pthing_2->AttachChild(paddon_2, 1);
                 hkLiquidActionCinfo info;
-                info.m_body = pbody_2->operator*();
+                info.m_body = **pbody_2;
                 info.fInitialStickForce = f5000_0;
                 info.fStickStrength = f15_0_;
                 info.fNeighborDistance = f64_0;
@@ -1641,7 +1641,7 @@ void Explosion::AttachLight() {
     if ((Get3D()) && (GetExplosionBase()->Data.pLight)) {
         NiNode* v2 = Get3D();
         TESObjectLIGH* WaterType = GetExplosionBase()->Data.pLight;
-        spLight.operator=(static_cast<NiPointLight*>(WaterType->GenDynamic(this, v2, false)));
+        spLight = static_cast<NiPointLight*>(WaterType->GenDynamic(this, v2, false));
     }
 }
 
@@ -1740,7 +1740,7 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
         fltr.SetGroup(NewSystemGroup);
     }
     float* v20 = &fExplosionLOSBufferDistance.Float();
-    aLocation.operator+=(*::new (&v47) NiPoint3(this->ClosestPointNormal * *v20));
+    aLocation += *::new (&v47) NiPoint3(this->ClosestPointNormal * *v20);
     pd.SetFilter(fltr);
     pd.NiSetFrom(aLocation);
     pd.NiSetTo(*targetLocation);
@@ -1757,7 +1757,7 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
         hkpWorldRayCastOutput point(*v22);
         NiPoint3 length = *targetLocation - aLocation;
         NiPoint3 toHit = point.m_hitFraction * length;
-        if (this->ClosestPointNormal.operator[](2) < -0.98) {
+        if (this->ClosestPointNormal[2] < -0.98) {
             double v40 = toHit.Length();
             if (fExplosionLOSBuffer.Float() > v40) {
                 continue;
@@ -1792,7 +1792,7 @@ bool Explosion::RunLOSPick(NiPoint3 aLocation, TESObjectREFR* apTarget) {
                 hkpWorldRayCastOutput point_2(*v25);
                 NiPoint3 length_2 = targetLocation[i_3] - aLocation;
                 NiPoint3 toHit_2 = point_2.m_hitFraction * length_2;
-                if (this->ClosestPointNormal.operator[](2) < -0.98) {
+                if (this->ClosestPointNormal[2] < -0.98) {
                     double v27 = toHit_2.Length();
                     if (fExplosionLOSBuffer.Float() > v27) {
                         continue;
@@ -1824,7 +1824,7 @@ bool Explosion::TestExplosionUnderWater() {
             hkpWorld* phkworld;
             bhkWorld* pworld = pcell->GetbhkWorld();
             if (pworld) {
-                phkworld = pworld->operator*();
+                phkworld = **pworld;
             }
             else {
                 phkworld = nullptr;
@@ -1849,7 +1849,7 @@ bool Explosion::TestExplosionUnderWater() {
                 alignas(16) hits_t hits(0);
                 pbroadphase->querySingleAabb(aabb, hits);
                 for (int32_t i = 0; !binWater && i < hits.m_size; ++i) {
-                    hkpBroadPhaseHandlePair* v13 = &hits.operator[](i);
+                    hkpBroadPhaseHandlePair* v13 = &hits[i];
                     const hkpCollidable* collB = static_cast<const hkpCollidable*>(
                         static_cast<hkpTypedBroadPhaseHandle*>(v13->m_b)->hkpTypedBroadPhaseHandle::getOwner()
                     );
@@ -1928,12 +1928,12 @@ void Explosion::PushRigidBody(bhkRigidBody* apRigidBody) {
             direction.Unitize();
             CFilter kFilter;
             if (apRigidBody->GetCollisionFilter(&kFilter)->QBipLayer()) {
-                float* pfZ = &direction.operator[](2);
+                float* pfZ = &direction[2];
                 *pfZ = *pfZ + fExplosionForceClutterUpBias.Float();
             }
             uint8_t bSourceRef = 0;
             if (this->pExplodedRef) {
-                bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(apRigidBody->operator*());
+                bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(**apRigidBody);
                 NiAVObject* pav;
                 if (pcol) {
                     pav = pcol->m_pkSceneObject;
@@ -1994,7 +1994,7 @@ void Explosion::DetachLight() {
         NiLight* v2 = spLight.m_pObject;
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
         ShadowSceneNode_->RemoveLight(v2);
-        spLight.operator=(static_cast<NiPointLight*>(nullptr));
+        spLight = static_cast<NiPointLight*>(nullptr);
     }
 }
 
@@ -2136,7 +2136,7 @@ void hkAlgorithm::quickSort(hkpRootCdPoint* pArr, int32_t iSize) {
 }
 
 void bhkRigidBody::ApplyLinearImpulse(const hkVector4& arImpulse) {
-    hkpRigidBody* pBody = operator*();
+    hkpRigidBody* pBody = **this;
     if (pBody) {
         MarkWrite();
         pBody->applyLinearImpulse(arImpulse);
@@ -2145,7 +2145,7 @@ void bhkRigidBody::ApplyLinearImpulse(const hkVector4& arImpulse) {
 }
 
 void bhkRigidBody::ApplyAngularImpulse(const hkVector4& arImpulse) {
-    hkpRigidBody* pBody = operator*();
+    hkpRigidBody* pBody = **this;
     if (pBody) {
         MarkWrite();
         pBody->applyAngularImpulse(arImpulse);
@@ -2160,7 +2160,7 @@ void bhkRigidBody::ApplyAngularImpulse(const NiPoint3& arImpulse) {
 
 hkArray<hkpSimpleShapePhantom::CollisionDetail, hkContainerHeapAllocator>&
 bhkSimpleShapePhantom::GetCollisionDetails() {
-    return static_cast<hkpSimpleShapePhantom*>(operator*())->getCollisionDetails();
+    return static_cast<hkpSimpleShapePhantom*>(**this)->getCollisionDetails();
 }
 
 bhkTransform& bhkTransform::NI2HK(const NiTransform& arNiTran) {

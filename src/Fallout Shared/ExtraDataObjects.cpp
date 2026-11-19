@@ -1956,7 +1956,7 @@ ExtraDismemberedLimbs::~ExtraDismemberedLimbs() {
 
 void ExtraDismemberedLimbs::RemoveLimb(BGSBodyPart::LIMB_ENUM aeLimb, bool abRemoved) {
     for (uint32_t i = 0; i < DismemberedLimbs.iSize; ++i) {
-        DismemberedLimb* pdismemberedLimb = DismemberedLimbs.operator[](i);
+        DismemberedLimb* pdismemberedLimb = DismemberedLimbs[i];
         if ((pdismemberedLimb) && (pdismemberedLimb->cLimb == aeLimb)) {
             pdismemberedLimb->bLimbRemoved = abRemoved;
         }
@@ -1964,7 +1964,7 @@ void ExtraDismemberedLimbs::RemoveLimb(BGSBodyPart::LIMB_ENUM aeLimb, bool abRem
 }
 
 DismemberedLimb* ExtraDismemberedLimbs::GetDismemberedLimb(uint32_t aiIndex) {
-    return *static_cast<DismemberedLimb**>(&DismemberedLimbs.operator[](aiIndex));
+    return *static_cast<DismemberedLimb**>(&DismemberedLimbs[aiIndex]);
 }
 
 uint32_t ExtraDismemberedLimbs::GetDismemberedLimbCount() {
@@ -2002,7 +2002,7 @@ void ExtraDismemberedLimbs::Dismember(TESObjectREFR* a1, BGSBodyPart::LIMB_ENUM 
                 pnpc->BuildObjectArray(a1, v4, p_ObjectArray);
                 if (iindex) {
                     for (int32_t i = iindex - 1; i >= 0; --i) {
-                        DismemberedLimb* pprevDismemberedLimb = DismemberedLimbs.operator[](i);
+                        DismemberedLimb* pprevDismemberedLimb = DismemberedLimbs[i];
                         if (!pprevDismemberedLimb->bObjectArrayIdentical) {
                             if (pprevDismemberedLimb->ObjectArray.CompareArrays(pdismemberedLimb_2->ObjectArray)) {
                                 pdismemberedLimb_2->bObjectArrayIdentical = true;
@@ -2026,8 +2026,8 @@ bool ExtraDismemberedLimbs::CheckDismemberedLimbsIdentical(ExtraDismemberedLimbs
         return false;
     }
     for (uint32_t i = 0; i < DismemberedLimbs.iSize; ++i) {
-        DismemberedLimb* pdismemberedLimb1 = DismemberedLimbs.operator[](i);
-        DismemberedLimb* pdismemberedLimb2 = apDismemberedLimbs->DismemberedLimbs.operator[](i);
+        DismemberedLimb* pdismemberedLimb1 = DismemberedLimbs[i];
+        DismemberedLimb* pdismemberedLimb2 = apDismemberedLimbs->DismemberedLimbs[i];
         if (pdismemberedLimb1->cLimb != pdismemberedLimb2->cLimb) {
             return false;
         }
@@ -2156,7 +2156,7 @@ ExtraRefractionProperty::ExtraRefractionProperty(float afRefractionPower)
 ExtraActorCause::ExtraActorCause() : BSExtraData(0x60u), spActorCause(nullptr) {}
 
 void ExtraActorCause::SetActorCause(ActorCause* apCause) {
-    (&spActorCause)->operator=(apCause);
+    spActorCause = apCause;
 }
 
 ExtraAudioBuoyMarker::ExtraAudioBuoyMarker(AudioBuoyMarkerData* apAudioBuoyData)
@@ -2754,8 +2754,7 @@ bool ExtraGuardedRefData::Compare(BSExtraData* apCompare) {
         return true;
     }
     for (uint32_t i = 0; i < Guards.iSize; ++i) {
-        if (pcomp->Guards.Find(Guards.operator[](i), 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress) ==
-            -1) {
+        if (pcomp->Guards.Find(Guards[i], 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress) == -1) {
             return true;
         }
     }
@@ -2771,7 +2770,7 @@ void ExtraGuardedRefData::AddGuard(Actor* apActor) {
 
 void ExtraGuardedRefData::NotifyGuardsAboutActivation(TESObjectREFR* apObject, TESObjectREFR* apActionRef) {
     for (uint32_t i = 0; i < Guards.iSize; ++i) {
-        Actor* pactor = static_cast<Actor*>(TESForm::GetFormByNumericID(Guards.operator[](i)));
+        Actor* pactor = static_cast<Actor*>(TESForm::GetFormByNumericID(Guards[i]));
         if ((pactor) && (pactor->IsReference() && pactor->IsActor())) {
             BaseProcess* pproc = pactor->pCurrentProcess;
             if (pproc) {

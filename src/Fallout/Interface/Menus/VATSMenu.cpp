@@ -2160,7 +2160,7 @@ bool VATSMenu::PrecalcTargetHitChances() {
             FOVATSEffectManager* v16 = Interface::GetVATSEffect();
             if (v16->GetVATSGeometryOcclusionPercent(eBodyPart, a3)) {
                 pBodyPart->fPercentVisible = a3;
-                if (pBodyPart->kPos.operator==(NiPoint3_ZERO)) {
+                if (pBodyPart->kPos == NiPoint3_ZERO) {
                     PrepareMeters();
                 }
                 if (LimbOnScreen(pBodyPart)) {
@@ -3344,7 +3344,7 @@ bool VATSMenu::Create() {
         NiFixedString kFilename("Textures\\Interface\\HUD\\hud_compass_alphamap.dds");
         spAlphaMap = NiSourceTexture::Create(kFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
     }
-    NiSourceTexture* pAlphaMap = spAlphaMap.operator->();
+    NiSourceTexture* pAlphaMap = spAlphaMap;
     VATSMenu::pVatsMenu->pTiles[23]->GetShaderProperty()->SetAlphaMap(pAlphaMap);
     VATSMenu::pVatsMenu->pTiles[23]->GetShaderProperty()->SetUseTexScroll(true);
     int32_t iMissingTile;

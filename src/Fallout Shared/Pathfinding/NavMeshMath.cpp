@@ -254,7 +254,7 @@ NiPoint3 NavMeshMath::ClosestPointOnSegmentToLine3(
     NiPoint3 v12;
     NiPoint3 dst;
     NiPoint3 resulta;
-    if (aSegmentStart.operator==(aSegmentEnd)) {
+    if (aSegmentStart == aSegmentEnd) {
         result = aSegmentStart;
         return result;
     }
@@ -381,8 +381,8 @@ bool NavMeshMath::CircleSegmentIntersection(
     relativeSegment = aSegment;
     relativeSegment.Offset(-aCircle.Center);
     float fradius = 1.0f;
-    relativeSegment.Start.operator/=(aCircle.fRadius);
-    relativeSegment.End.operator/=(aCircle.fRadius);
+    relativeSegment.Start /= aCircle.fRadius;
+    relativeSegment.End /= aCircle.fRadius;
     NiPoint3 delta = relativeSegment.Delta();
     float fr2 = fradius * fradius;
     if (delta.y != 0.0 || delta.x == 0.0) {
@@ -421,12 +421,12 @@ bool NavMeshMath::CircleSegmentIntersection(
             v27.fCos = (-fnom_2 * fm - fsqrtDelta) * finvDenom_2;
             v27.fSin = (fnom_2 - fm * fsqrtDelta) * finvDenom_2;
             if (!(delta.x < 0.0)) {
-                result0->CircleParam.operator=(v27);
-                result1->CircleParam.operator=(v28);
+                result0->CircleParam = v27;
+                result1->CircleParam = v28;
             }
             else {
-                result0->CircleParam.operator=(v28);
-                result1->CircleParam.operator=(v27);
+                result0->CircleParam = v28;
+                result1->CircleParam = v27;
             }
             result0->fSegmentParam = (fradius * result0->CircleParam.fCos - relativeSegment.Start.x) * finvDeltaX;
             result1->fSegmentParam = (fradius * result1->CircleParam.fCos - relativeSegment.Start.x) * finvDeltaX;
@@ -438,7 +438,7 @@ bool NavMeshMath::CircleSegmentIntersection(
             float fnom = fp * fradius;
             resultParam.fCos = -fnom * fm * finvDenom;
             resultParam.fSin = fnom * finvDenom;
-            result0->CircleParam.operator=(resultParam);
+            result0->CircleParam = resultParam;
             result0->fSegmentParam = (fradius * result0->CircleParam.fCos - relativeSegment.Start.x) * finvDeltaX;
         }
     }
@@ -466,12 +466,12 @@ bool NavMeshMath::CircleSegmentIntersection(
             v14.fCos = (v17 - v21 * fsqrtDelta_2) * v18;
             v14.fSin = (-v17 * v21 - fsqrtDelta_2) * v18;
             if (!(delta.y < 0.0)) {
-                result0->CircleParam.operator=(v14);
-                result1->CircleParam.operator=(v15);
+                result0->CircleParam = v14;
+                result1->CircleParam = v15;
             }
             else {
-                result0->CircleParam.operator=(v15);
-                result1->CircleParam.operator=(v14);
+                result0->CircleParam = v15;
+                result1->CircleParam = v14;
             }
             result0->fSegmentParam = (fradius * result0->CircleParam.fSin - relativeSegment.Start.y) * finvDeltaY;
             result1->fSegmentParam = (fradius * result1->CircleParam.fSin - relativeSegment.Start.y) * finvDeltaY;
@@ -482,7 +482,7 @@ bool NavMeshMath::CircleSegmentIntersection(
             float v19 = v22 * fradius;
             resultParamY.fCos = v19 * finvDenomY;
             resultParamY.fSin = -v19 * v21 * finvDenomY;
-            result0->CircleParam.operator=(resultParamY);
+            result0->CircleParam = resultParamY;
             result0->fSegmentParam = (fradius * result0->CircleParam.fSin - relativeSegment.Start.y) * finvDeltaY;
         }
     }
@@ -569,13 +569,13 @@ NavMeshMath::CIRCLE_CIRCLE_TANGENT NavMeshMath::ComputeTangentPoints(
         if (aCircle1.fRadius != 0.0) {
             fradius1 = 1.0f;
             fradius2 = aCircle2.fRadius / aCircle1.fRadius;
-            v.operator/=(aCircle1.fRadius);
+            v /= aCircle1.fRadius;
         }
     }
     else {
         fradius2 = 1.0f;
         fradius1 = aCircle1.fRadius / aCircle2.fRadius;
-        v.operator/=(aCircle2.fRadius);
+        v /= aCircle2.fRadius;
     }
     float sqr_length = v.SqrXYLength();
     if (sqr_length == 0.0) {
@@ -877,7 +877,7 @@ char NavMeshMath::LineSegmentToLine2DIntersection(
 
 char NavMeshMath::ComputeTangentPointsToCircleFromPoint(NiPoint3* pt, float a2, NiPoint3* a3, float* a4, float* a5) {
     NiPoint3 result;
-    (result = a3->operator-(*pt));
+    (result = *a3 - *pt);
     float v9 = (&result)->SqrXYLength();
     float v10 = a2 * a2;
     if (!(v10 <= ((double)v9))) {
@@ -902,8 +902,8 @@ char NavMeshMath::ComputeTangentPointsToCircleFromPoint(NiPoint3* pt, float a2, 
 Segment::Segment(const NiPoint3& aSegment, const NiPoint3& a2) : Start(aSegment), End(a2) {}
 
 void Segment::Offset(const NiPoint3& aOffset) {
-    Start.operator+=(aOffset);
-    End.operator+=(aOffset);
+    Start += aOffset;
+    End += aOffset;
 }
 
 NiPoint3 Segment::Delta() {

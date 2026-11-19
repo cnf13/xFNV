@@ -69,7 +69,7 @@ void BSCullingProcess::Process(const NiCamera* pkCamera, NiAVObject* pkScene, Ni
         if (!m_pkVisibleSet) {
             spSorter.SetPointer_(&spAccumulator);
             if (!spSorter.m_pObject) {
-                spSorter.operator=(NiRenderer::ms_pkRenderer->m_spAccum.m_pObject);
+                spSorter = NiRenderer::ms_pkRenderer->m_spAccum.m_pObject;
             }
             if (spSorter.m_pObject) {
                 spSorter.m_pObject->StartAccumulating(pkCamera);

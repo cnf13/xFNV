@@ -7790,7 +7790,7 @@ TESObjectREFR* InventoryChanges::DropItemIntoWorld(
         NiPoint3 v13 = a1->GetAngleOnReference();
         rot.FromEulerAnglesXYZ(v13.x, v13.y, v13.z);
         NiPoint3 inFrontAndUp(0.0f, 50.0f, 30.0f);
-        point.operator+=((inFrontAndUp_2 = rot * inFrontAndUp));
+        point += (inFrontAndUp_2 = rot * inFrontAndUp);
     }
     if (a6) {
         v11 = a6;

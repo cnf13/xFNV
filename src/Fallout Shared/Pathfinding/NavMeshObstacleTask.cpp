@@ -37,7 +37,7 @@ void ObstacleTaskData::Process() {
         else {
             v11 = nullptr;
         }
-        spNewNavMesh.operator=(NavMeshPtr::MakeNavMeshPtr(v11));
+        spNewNavMesh = NavMeshPtr::MakeNavMeshPtr(v11);
         spSrcMesh.m_pObject->MakeCopyForObstacle(spNewNavMesh);
         SortOperations();
         for (int32_t a2 = 0;; ++a2) {
@@ -136,18 +136,18 @@ bool ObstacleTaskData::ReplaceNavMesh() {
     if (!bReplace) {
         return false;
     }
-    uint32_t uiFormID = spSrcMesh.operator->()->GetFormID();
-    TESObjectCELL* pCell = spSrcMesh.operator->()->GetParentCell();
+    uint32_t uiFormID = spSrcMesh->GetFormID();
+    TESObjectCELL* pCell = spSrcMesh->GetParentCell();
     if (pCell) {
         // SWEEP-INLINE 0x42FA20
         pCell->GetNavMeshArray()->AddNavMesh(spNewNavMesh);
         // SWEEP-INLINE 0x42FA20
         pCell->GetNavMeshArray()->RemoveNavMesh(spSrcMesh);
     }
-    spSrcMesh.operator->()->ForceSetFormID(0);
-    spSrcMesh.operator->()->SetNavMeshInfo(nullptr);
-    spNewNavMesh.operator->()->ForceSetFormID(uiFormID);
-    spNewNavMesh.operator->()->SetNavMeshInfo(pInfo);
+    spSrcMesh->ForceSetFormID(0);
+    spSrcMesh->SetNavMeshInfo(nullptr);
+    spNewNavMesh->ForceSetFormID(uiFormID);
+    spNewNavMesh->SetNavMeshInfo(pInfo);
     pInfo->SetNavMesh(static_cast<NavMesh*>(spNewNavMesh));
     return true;
 }
@@ -165,7 +165,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
                 if (auiIndex >= Operations.iSize) {
                     goto LABEL_35;
                 }
-                if ((&Operations.GetAt(static_cast<int32_t>(auiIndex)))->spObstacle.operator==(apObstacle) &&
+                if ((&Operations.GetAt(static_cast<int32_t>(auiIndex)))->spObstacle == apObstacle &&
                     ((&Operations.GetAt(static_cast<int32_t>(auiIndex)))->eType & 48) == 16) {
                     break;
                 }
@@ -177,7 +177,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
         case OBSTACLE_TASK_TYPE_REMOVE_OBSTACLE_FOR_UPDATE: {
             char v11 = 1;
             for (int32_t a2 = 0; a2 < Operations.iSize; ++a2) {
-                if ((&Operations.GetAt(a2))->spObstacle.operator==(apObstacle)) {
+                if ((&Operations.GetAt(a2))->spObstacle == apObstacle) {
                     if (((&Operations.GetAt(a2))->eType & 48) == 16) {
                         InitializationFlow(
                             "Removing previous operation ADD for Task on Navmesh 0x%08x (srcptr = 0x%08x)",
@@ -201,7 +201,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
                 if (i >= Operations.iSize) {
                     goto LABEL_35;
                 }
-                if ((&Operations.GetAt(static_cast<int32_t>(i)))->spObstacle.operator==(apObstacle) &&
+                if ((&Operations.GetAt(static_cast<int32_t>(i)))->spObstacle == apObstacle &&
                     (&Operations.GetAt(static_cast<int32_t>(i)))->eType == OBSTACLE_TASK_TYPE_ADD_DOOR) {
                     break;
                 }
@@ -211,7 +211,7 @@ bool ObstacleTaskData::AddOperation(const NiPointer<ObstacleData>& apObstacle, O
         }
         case OBSTACLE_TASK_TYPE_REMOVE_DOOR: {
             for (uint32_t j = 0; j < Operations.iSize; ++j) {
-                if ((&Operations.GetAt(static_cast<int32_t>(j)))->spObstacle.operator==(apObstacle) &&
+                if ((&Operations.GetAt(static_cast<int32_t>(j)))->spObstacle == apObstacle &&
                     (&Operations.GetAt(static_cast<int32_t>(j)))->eType == OBSTACLE_TASK_TYPE_REMOVE_DOOR) {
                     return false;
                 }

@@ -55,7 +55,7 @@ void CellMopp::Remove() {
     bhkWorldM* v5 = GetParent();
     if (v5) {
         for (i = 0; i < ((uint32_t)((int32_t)(&spRigidBodyA)->m_usESize)); ++i) {
-            v1 = &(&spRigidBodyA)->operator[](i);
+            v1 = &spRigidBodyA[i];
             a1 = v1->m_pObject;
             if (a1) {
                 v5->RemoveBody(a1);
@@ -71,13 +71,13 @@ bhkWorldM* CellMopp::GetParent() {
     if (!(&spRigidBodyA)->m_usESize) {
         return nullptr;
     }
-    v1 = &(&spRigidBodyA)->operator[](0);
+    v1 = &spRigidBodyA[0];
     bool vCondition1;
-    vCondition1 = !v1->operator->();
+    vCondition1 = !*v1;
     if (vCondition1) {
         return nullptr;
     }
-    v2 = &(&spRigidBodyA)->operator[](0);
+    v2 = &spRigidBodyA[0];
     v5 = v2->operator->();
     const hkpWorld* v3 = v5->GethkWorld();
     return static_cast<bhkWorldM*>(bhkWorld::Getbhk(v3));
@@ -93,7 +93,7 @@ bool CellMopp::Make(bhkWorld* apWorld, const NiPoint3& arPosition, const NiQuate
         for (uint32_t I = 0; I < 2; ++I) {
             float fx = -2048.0f;
             for (uint32_t J = 0; J < 2; ++J) {
-                NiPointer<bhkRigidBody>* v6 = &spRigidBodyA.operator[](K++);
+                NiPointer<bhkRigidBody>* v6 = &spRigidBodyA[K++];
                 bhkRigidBody* prb = v6->m_pObject;
                 NiPoint3 pos = arPosition;
                 pos.x = pos.x + fx;
@@ -106,7 +106,7 @@ bool CellMopp::Make(bhkWorld* apWorld, const NiPoint3& arPosition, const NiQuate
         }
         if (!GetParent()) {
             for (uint32_t I_2 = 0; I_2 < spRigidBodyA.m_usESize; ++I_2) {
-                bhkRigidBody* prb_2 = (&spRigidBodyA.operator[](I_2))->m_pObject;
+                bhkRigidBody* prb_2 = (&spRigidBodyA[I_2])->m_pObject;
                 apWorld->Add(prb_2);
                 uint32_t v4 = hkColor::rgbFromChars(220, 150, 40, 255);
                 apWorld->SetDebugObjectColor(prb_2, v4);

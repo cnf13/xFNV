@@ -116,7 +116,7 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
         }
         pLocalSurf->UnlockRect();
         pLocalSurf->Release();
-        sptexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        sptexture = static_cast<BSRenderedTexture*>(nullptr);
         if ((apScreenshotFileName) && (BSstrlen(apScreenshotFileName))) {
             BSFile* pfile;
             BSSystemFile::DeleteFileA(apScreenshotFileName);

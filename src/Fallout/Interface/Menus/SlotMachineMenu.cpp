@@ -815,7 +815,7 @@ void SlotMachineMenu::Prepare3DElements() {
         v18 = nullptr;
     }
     NiRefObject* v27 = (NiRefObject*)v18;
-    SlotMachineMenu::spSlotModel.operator=(v18);
+    SlotMachineMenu::spSlotModel = v18;
     NiNode* v17 = SlotMachineMenu::spSlotModel.m_pObject;
     v17->AttachChild(pSlotMachineGeometry, 1);
     NiNode* v16 = SlotMachineMenu::spSlotModel.m_pObject;
@@ -864,7 +864,7 @@ void SlotMachineMenu::Prepare3DElements() {
     }
     NiUpdateData arUpdateData(0.0f, false, false);
     SlotMachineMenu::spSlotModel.m_pObject->Update(arUpdateData);
-    SlotMachineMenu::sp3DCamera.operator=(Create3DCamera());
+    SlotMachineMenu::sp3DCamera = Create3DCamera();
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     ShadowSceneNode_->AttachChild(SlotMachineMenu::spSlotModel.m_pObject, 1);
     const NiBound* WorldBound = &SlotMachineMenu::spSlotModel.m_pObject->GetWorldBound();
@@ -1633,7 +1633,7 @@ void SlotMachineMenu::DrawScene() {
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
     BSShaderUtil::RenderScene(v6, v3, false);
     a1->SetAccumulator(nullptr);
-    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
+    apMemory = static_cast<NiRefObject*>(nullptr);
     a1->PopCullMode();
 }
 

@@ -342,21 +342,21 @@ void DebugText::HandleQueuedPrints() {
                         DebugText::Lock();
                         NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
                         DebugTextRoot->DetachChild(pDebugTextList[a_2].spNode.m_pObject);
-                        pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(nullptr));
+                        pDebugTextList[a_2].spNode = static_cast<NiNode*>(nullptr);
                         DebugText::Unlock();
                     }
                 }
                 if (!btext_is_the_same_2) {
                     DebugText::Lock();
                     if (bempty_text) {
-                        pDebugTextList[a_2].spNode.operator=(static_cast<NiNode*>(nullptr));
+                        pDebugTextList[a_2].spNode = static_cast<NiNode*>(nullptr);
                     }
                     else {
                         NiNode* DebugText_ = CreateDebugText(
                             string.pString, xPrintData.pBuffer[i]->pTextData->fX, xPrintData.pBuffer[i]->pTextData->fY,
                             xPrintData.pBuffer[i]->pTextData->iJustify, ifont, &xPrintData.pBuffer[i]->pTextData->Color
                         );
-                        pDebugTextList[a_2].spNode.operator=(DebugText_);
+                        pDebugTextList[a_2].spNode = DebugText_;
                     }
                     if (pDebugTextList[a_2].spNode.m_pObject) {
                         pDebugTextList[a_2].pText.Set(string);
@@ -388,7 +388,7 @@ void DebugText::HandleQueuedPrints() {
                 DebugText::Lock();
                 NiNode* v9 = Interface::GetDebugTextRoot();
                 v9->DetachChild(pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.m_pObject);
-                pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode.operator=(static_cast<NiNode*>(nullptr));
+                pDebugTextList[xPrintData.pBuffer[i]->iIndex].spNode = static_cast<NiNode*>(nullptr);
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].iJustify = 0;
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].fX = 0.0f;
                 pDebugTextList[xPrintData.pBuffer[i]->iIndex].fY = 0.0f;
@@ -514,7 +514,7 @@ void DebugText::DeleteAllDebugText() {
         if (pDebugTextList[i].spNode.m_pObject) {
             debugTextRoot = Interface::GetDebugTextRoot();
             debugTextRoot->DetachChild(pDebugTextList[i].spNode.m_pObject);
-            (&pDebugTextList[i].spNode)->operator=(nullptr);
+            pDebugTextList[i].spNode = nullptr;
             pDebugTextList[i].iJustify = 0;
             pDebugTextList[i].fX = (float)0.0;
             pDebugTextList[i].fY = (float)0.0;
@@ -750,7 +750,7 @@ void DebugText::Idle() {
                     DebugText::Lock();
                     NiNode* DebugTextRoot = Interface::GetDebugTextRoot();
                     DebugTextRoot->DetachChild(pme->pDebugTextList[a].spNode.m_pObject);
-                    pme->pDebugTextList[a].spNode.operator=(static_cast<NiNode*>(nullptr));
+                    pme->pDebugTextList[a].spNode = static_cast<NiNode*>(nullptr);
                     pme->pDebugTextList[a].iJustify = 0;
                     pme->pDebugTextList[a].fX = 0.0f;
                     pme->pDebugTextList[a].fY = 0.0f;
@@ -771,7 +771,7 @@ void DebugText::Idle() {
                     if (pitem->fDie < 0.0) {
                         DebugText::Lock();
                         pitem->spNode.m_pObject->m_pkParent->DetachChild(pitem->spNode.m_pObject);
-                        pitem->spNode.operator=(static_cast<NiNode*>(nullptr));
+                        pitem->spNode = static_cast<NiNode*>(nullptr);
                         DebugText::Unlock();
                         DebugText::DebugTextData* apThis = pme->xFloatingTextList.Remove(pitem);
                         if (apThis) {

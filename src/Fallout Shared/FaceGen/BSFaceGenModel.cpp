@@ -304,10 +304,10 @@ bool BSFaceGenModel::LoadModelMesh(
         BSCloningProcess* pCloneProc = ::new (acCloneProc) BSCloningProcess(1.0f);
         NiObject* pCopy = TES::pInstance->CreateDeepCopySameTextures(pNode, *pCloneProc);
         pMeshData->spModelRoot = static_cast<NiNode*>(pCopy);
-        if (pMeshData->spModelRoot.operator->()) {
-            uint32_t uiCount = pMeshData->spModelRoot.operator->()->GetArrayCount();
+        if (pMeshData->spModelRoot) {
+            uint32_t uiCount = pMeshData->spModelRoot->GetArrayCount();
             for (uint32_t i = 0; i < uiCount; ++i) {
-                NiAVObject* pChild = pMeshData->spModelRoot.operator->()->GetAt(i);
+                NiAVObject* pChild = pMeshData->spModelRoot->GetAt(i);
                 if (pChild) {
                     bool bByName = aeHairPart == HAIR_PART_HAT || (aeHairPart == HAIR_PART_NORMAL && uiCount != 1);
                     // SWEEP-INLINE 0x43B1B0
@@ -315,22 +315,22 @@ bool BSFaceGenModel::LoadModelMesh(
                         pMeshData->spModel = pChild->IsTriBasedGeom();
                     }
                 }
-                if (pMeshData->spModel.operator->()) {
+                if (pMeshData->spModel) {
                     break;
                 }
             }
-            if (pMeshData->spModel.operator->()) {
+            if (pMeshData->spModel) {
                 if (!abIsAccessory) {
                     int32_t iType = NiTexturingProperty::GetType();
-                    pMeshData->spModel.operator->()->RemoveProperty(iType);
+                    pMeshData->spModel->RemoveProperty(iType);
                 }
-                pMeshData->spModel.operator->()->RemoveAllControllers();
-                pMeshData->spModel.operator->()->RemoveAllExtraData();
-                if (pMeshData->spModel.operator->()->GetSkinInstance()) {
+                pMeshData->spModel->RemoveAllControllers();
+                pMeshData->spModel->RemoveAllExtraData();
+                if (pMeshData->spModel->GetSkinInstance()) {
                     NiAVObject* pRootParent = pMeshData->spModel.operator->();
-                    pMeshData->spModel.operator->()->GetSkinInstance()->SetRootParent(pRootParent);
+                    pMeshData->spModel->GetSkinInstance()->SetRootParent(pRootParent);
                 }
-                pMeshData->spModel.operator->()->SetSelectiveUpdate(true);
+                pMeshData->spModel->SetSelectiveUpdate(true);
             }
             pNode->UpdateProperties();
             alignas(NiUpdateData) char acUpdateData[sizeof(NiUpdateData)];
@@ -346,7 +346,7 @@ bool BSFaceGenModel::LoadModelMesh(
         std::string* pTriName = ::new (acTriName) std::string(apTRIFilename);
         bool bLoaded = false;
         if (fffReadTriFile(*pTriName, *pTriData)) {
-            uint32_t uiModelVertices = pMeshData->spModel.operator->()->GetVertexCount();
+            uint32_t uiModelVertices = pMeshData->spModel->GetVertexCount();
             if (uiModelVertices == pTriData->numModelVtx()) {
                 bLoaded = true;
             }
@@ -365,10 +365,9 @@ bool BSFaceGenModel::LoadModelMesh(
                     pHeadMemory ? ::new (pHeadMemory) BSFaceGenMorphDataHead(pTriData) : nullptr;
                 pMeshData->spMorph = pHead;
                 uint32_t uiTriVertices = pTriData->vtxListSize();
-                if (uiTriVertices > pMeshData->spModel.operator->()->GetVertexCount()) {
+                if (uiTriVertices > pMeshData->spModel->GetVertexCount()) {
                     uiTriVertices = pTriData->vtxListSize();
-                    pMeshData->iAdditionalVerticesCount =
-                        uiTriVertices - pMeshData->spModel.operator->()->GetVertexCount();
+                    pMeshData->iAdditionalVerticesCount = uiTriVertices - pMeshData->spModel->GetVertexCount();
                     uint32_t uiCount = pMeshData->iAdditionalVerticesCount;
                     void* pVertexMemory =
                         ourMalloc(uiCount > SIZE_MAX / sizeof(NiPoint3) ? SIZE_MAX : sizeof(NiPoint3) * uiCount);
@@ -395,8 +394,8 @@ bool BSFaceGenModel::LoadModelMesh(
             delete pTriData;
         }
     }
-    if (pMeshData && pMeshData->spModel.operator->()) {
-        pMeshData->spModel.operator->()->SetConsistency(NiGeometryData::MUTABLE);
+    if (pMeshData && pMeshData->spModel) {
+        pMeshData->spModel->SetConsistency(NiGeometryData::MUTABLE);
     }
     pMemContext->~AutoMemContext();
     return true;
@@ -423,21 +422,21 @@ bool BSFaceGenModel::LoadModelTexture(const char* apEGTFilename) {
 bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
     NiPointer<NiGeometryData> spdata(static_cast<NiGeometryData*>(nullptr));
     NiPointer<NiSkinPartition> spskinPartition(static_cast<NiSkinPartition*>(nullptr));
-    aspReturnMesh.operator=(static_cast<NiTriBasedGeom*>(nullptr));
+    aspReturnMesh = static_cast<NiTriBasedGeom*>(nullptr);
     if (pMeshData && (pMeshData->spModel.m_pObject && pMeshData->spModel.m_pObject->GetModelData())) {
         BSFaceGenModelExtraData* pmorphBase_2;
         BSFaceGenBaseMorphExtraData* pmorphBase;
-        aspReturnMesh.operator=(static_cast<NiTriBasedGeom*>(pMeshData->spModel.m_pObject->Clone()));
+        aspReturnMesh = static_cast<NiTriBasedGeom*>(pMeshData->spModel.m_pObject->Clone());
         NiPointer<NiObject> spTempObject(static_cast<NiObject*>(nullptr));
         pMeshData->spModel.m_pObject->GetModelData()->CreateDeepCopy(spTempObject);
-        spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
+        spdata = static_cast<NiGeometryData*>(spTempObject.m_pObject);
         NiTriBasedGeom* v6 = aspReturnMesh.m_pObject;
         v6->SetModelData(spdata.m_pObject);
         NiSkinInstance* pskin = aspReturnMesh.m_pObject->GetSkinInstance();
         if ((pskin) && (pskin->GetSkinPartition())) {
             NiPointer<NiObject> spTempSkinObject(static_cast<NiObject*>(nullptr));
             pskin->GetSkinPartition()->CreateDeepCopy(spTempSkinObject);
-            spskinPartition.operator=(static_cast<NiSkinPartition*>(spTempSkinObject.m_pObject));
+            spskinPartition = static_cast<NiSkinPartition*>(spTempSkinObject.m_pObject);
             NiSkinPartition* v3 = spskinPartition.m_pObject;
             pskin->SetSkinPartition(v3);
         }
@@ -696,7 +695,7 @@ uint32_t BSFaceGenModel::GetEGMDataSize() {
         for (uint32_t i = 0; i < 2; ++i) {
             size += 24 * pMeshData->pEGMData->EGMBasis[i].size();
             for (uint32_t a2 = 0; a2 < pMeshData->pEGMData->EGMBasis[i].size(); ++a2) {
-                FffModeGS* v1 = &pMeshData->pEGMData->EGMBasis[i].operator[](a2);
+                FffModeGS* v1 = &pMeshData->pEGMData->EGMBasis[i][a2];
                 size += 6 * v1->vertPos.size();
             }
         }
@@ -743,7 +742,7 @@ bool BSFaceGenModel::HasEGTData() const {
 NiSkinInstance* BSFaceGenModel::GetSkinInstance() const {
     NiTriBasedGeom* v1;
     bool vCondition1;
-    vCondition1 = (!pMeshData) || (!(&pMeshData->spModel)->operator->());
+    vCondition1 = (!pMeshData) || (!pMeshData->spModel);
     if (vCondition1) {
         return nullptr;
     }
@@ -780,7 +779,7 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
     uint32_t ibasisSize;
     NiPointer<BSFaceGenImage> spimageOut(static_cast<BSFaceGenImage*>(nullptr));
     BSFaceGenRGBAVector::iterator kPixelIter;
-    aspReturnBaseMod.operator=(static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture()));
+    aspReturnBaseMod = static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture());
     if (!pTextureData) {
         return false;
     }
@@ -838,7 +837,7 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
     else {
         pImage = nullptr;
     }
-    spimageOut.operator=(pImage);
+    spimageOut = pImage;
     spimageOut.m_pObject->iWidth = ibasisHeight;
     spimageOut.m_pObject->iHeight = ibasisWidth;
     BSFaceGenRGBAVector* pvecOut = spimageOut.m_pObject->GetUncompressedImage();
@@ -896,9 +895,8 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
         }
     }
     ourFree(iptr);
-    aspReturnBaseMod.operator=(
-        static_cast<NiTexture*>(spimageOut.m_pObject->GetCompressedImage(-255.0f, 255.0f, 0.5f, NiPixelFormat_RGBA32))
-    );
+    aspReturnBaseMod =
+        static_cast<NiTexture*>(spimageOut.m_pObject->GetCompressedImage(-255.0f, 255.0f, 0.5f, NiPixelFormat_RGBA32));
     BSFaceGenManager::UnlockFaceGenAccess();
     return true;
 }

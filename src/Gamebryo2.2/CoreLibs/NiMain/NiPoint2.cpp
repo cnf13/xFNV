@@ -10,7 +10,7 @@ float NiPoint2::SqrLength() const {
 }
 
 bool NiPoint2::operator!=(const NiPoint2& pt) const {
-    return (bool)((uint8_t)(!operator==(pt)));
+    return (bool)((uint8_t)(!(*this == pt)));
 }
 
 void NiPoint2::LoadBinary(NiStream& arStream) {
@@ -60,7 +60,7 @@ NiPoint2 NiPoint2::operator-(const NiPoint2& pt) const {
 }
 
 NiPoint2* NiPoint2::Scale_(NiPoint2* apResult, float afScale, NiPoint2* apSource) {
-    ::new (static_cast<void*>(apResult)) NiPoint2(apSource->operator*(afScale));
+    ::new (static_cast<void*>(apResult)) NiPoint2(*apSource * afScale);
     return apResult;
 }
 

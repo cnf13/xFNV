@@ -225,7 +225,7 @@ void FOVATSEffectManager::SetTarget(TESObjectREFR* apTarget, BGSBodyPart::LIMB_E
     else {
         pTarget3D = nullptr;
     }
-    SingleTarget.spObj.operator=(pTarget3D);
+    SingleTarget.spObj = pTarget3D;
     bWaitingForOcclusionQuery[aeLimb] = false;
     bValidOcclusionResult[aeLimb] = 0;
     if (aeLimb != BGSBodyPart::LIMB_NONE) {
@@ -250,7 +250,7 @@ void FOVATSEffectManager::ClearMultiTargets() {
     int32_t i;
     for (i = 0; i < iNumMultiTargets; ++i) {
         pMultiTargets[i].pRef = nullptr;
-        (&pMultiTargets[i].spObj)->operator=(nullptr);
+        pMultiTargets[i].spObj = nullptr;
     }
     iNumMultiTargets = 0;
     iSelectedMultiTarget = (-1);
@@ -394,12 +394,12 @@ void FOVATSEffectManager::SetMultiTarget(TESObjectREFR* apTarget) {
     if (iNumMultiTargets + 1 < 32) {
         pMultiTargets[iNumMultiTargets].pRef = apTarget;
         NiNode* v2 = apTarget->Get3D();
-        pMultiTargets[iNumMultiTargets].spObj.operator=(v2);
+        pMultiTargets[iNumMultiTargets].spObj = v2;
         ++iNumMultiTargets;
         if (!SingleTarget.pRef) {
             SingleTarget.pRef = apTarget;
             NiNode* v3 = apTarget->Get3D();
-            SingleTarget.spObj.operator=(v3);
+            SingleTarget.spObj = v3;
         }
         NiAVObject* v4 = pMultiTargets[iNumMultiTargets].spObj.m_pObject;
         BSShaderProperty::SetFlagRecurse(v4, BSShaderProperty::BSSP_FLAG_VATS_SELECTION, 0);
@@ -437,7 +437,7 @@ void FOVATSEffectManager::PrepareHighlightEffect(
     ImageSpaceEffectInterface::eMode = 1;
     ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
     ImageSpaceManager_->GetEffect(ImageSpaceManager::EFFECT_INTERFACE)->bIsActive = true;
-    ImageSpaceEffectInterface::spMaskTexture.operator=(static_cast<NiTexture*>(apSourceMask->GetTexture(0)));
+    ImageSpaceEffectInterface::spMaskTexture = static_cast<NiTexture*>(apSourceMask->GetTexture(0));
     if (bDistortActive) {
         ImageSpaceEffectInterface::fDistortVerticalScale = gs_fDistortVerticalScale_VATS.Float();
         ImageSpaceEffectInterface::fDistortHorizontalScale = gs_fDistortHorizontalScale_VATS.Float();
@@ -450,7 +450,7 @@ void FOVATSEffectManager::PrepareHighlightEffect(
         ImageSpaceEffectInterface::fDistortVerticalPosition = -1.0f;
     }
     ImageSpaceEffectInterface::fVerticalHold = 0.0f;
-    ImageSpaceEffectInterface::spScanlinesTexture.operator=(spScanlinesTexture);
+    ImageSpaceEffectInterface::spScanlinesTexture = spScanlinesTexture;
     ImageSpaceEffectInterface::kTint = newcolor;
     ImageSpaceEffectInterface::fBlurIntensity = gs_fBlurIntensity_VATS.Float();
     ImageSpaceEffectInterface::fBlurRadius = gs_fBlurRadius_VATS.Float();
@@ -481,8 +481,8 @@ void FOVATSEffectManager::PrepareScanEffect(
     ImageSpaceEffectVATSScan::fScanVerticalScale = gs_fScanModeVerticalScale_VATS.Float();
     ImageSpaceEffectVATSScan::fScanlineFrequency = gs_fScanModeScanlineFrequency_VATS.Float();
     ImageSpaceEffectVATSScan::kTint = newcolor;
-    ImageSpaceEffectVATSScan::spScanlinesTexture.operator=(spScanlinesTexture);
-    ImageSpaceEffectVATSScan::spMaskTexture.operator=(static_cast<NiTexture*>(apSourceMask->GetTexture(0)));
+    ImageSpaceEffectVATSScan::spScanlinesTexture = spScanlinesTexture;
+    ImageSpaceEffectVATSScan::spMaskTexture = static_cast<NiTexture*>(apSourceMask->GetTexture(0));
     ImageSpaceManager* ImageSpaceManager_ = BSShaderManager::GetImageSpaceManager();
     ImageSpaceManager_->GetEffect(ImageSpaceManager::EFFECT_VATS_SCAN)->bIsActive = true;
 }

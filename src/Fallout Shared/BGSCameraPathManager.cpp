@@ -15,7 +15,7 @@ BGSCameraPathManager::BGSCameraPathManager() : PathArray(), LoadedPathArray(0, 1
 void BGSCameraPathManager::InitLoadedPaths() {
     uint32_t isize = LoadedPathArray.m_usSize;
     for (uint32_t i = 0; i < isize; ++i) {
-        BGSCameraPath* ppath = LoadedPathArray.operator[](i);
+        BGSCameraPath* ppath = LoadedPathArray[i];
         if (!ppath || ppath->GetInitialized()) {
             BGSCameraPath* ppath_2 = nullptr;
             LoadedPathArray.SetAt(i, ppath_2);
@@ -92,7 +92,7 @@ void BGSCameraPathManager::DestroyRootPathArrayForms() {
     }
     uint32_t isize = LoadedPathArray.m_usSize;
     for (uint32_t i_2 = 0; i_2 < isize; ++i_2) {
-        BGSCameraPath* ppath_2 = LoadedPathArray.operator[](i_2);
+        BGSCameraPath* ppath_2 = LoadedPathArray[i_2];
         if (ppath_2) {
             delete ppath_2;
         }

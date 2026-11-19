@@ -160,7 +160,7 @@ void Precipitation::Load(const char* apFilename) {
         pParent->DetachChild(spCurrentPrecipRoot.m_pObject);
         spLastPrecipRoot = spCurrentPrecipRoot;
         pParent->AttachChild(spLastPrecipRoot.m_pObject, 1);
-        spCurrentPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
+        spCurrentPrecipRoot = static_cast<NiNode*>(nullptr);
     }
     if ((apFilename) && (*apFilename)) {
         NiNode* pprecipNode = pModelLoader->LoadFile(apFilename, LOD_MULT_NONE, true, false, false, false);
@@ -176,7 +176,7 @@ void Precipitation::Load(const char* apFilename) {
             else {
                 v6 = nullptr;
             }
-            spCurrentPrecipRoot.operator=(v6);
+            spCurrentPrecipRoot = v6;
             fBirthRate = 0.0f;
             for (uint32_t i = 0; i < pprecipNode->GetChildCount(); ++i) {
                 NiParticleSystem* pps;
@@ -242,11 +242,11 @@ void Precipitation::Update(float afSecondsPassed) {
     if (pSaveLoadGameOLD->GetLoading()) {
         if (spLastPrecipRoot.m_pObject) {
             pParent->DetachChild(spLastPrecipRoot.m_pObject);
-            spLastPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
+            spLastPrecipRoot = static_cast<NiNode*>(nullptr);
         }
         if (spCurrentPrecipRoot.m_pObject) {
             pParent->DetachChild(spCurrentPrecipRoot.m_pObject);
-            spCurrentPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
+            spCurrentPrecipRoot = static_cast<NiNode*>(nullptr);
         }
         if (pSky->pLastWeather) {
             TESModel* ScriptList = &pSky->pLastWeather->precipNIF;
@@ -291,7 +291,7 @@ void Precipitation::Update(float afSecondsPassed) {
     }
     if ((fCurrentPct >= 1.0) && (spLastPrecipRoot.m_pObject)) {
         pParent->DetachChild(spLastPrecipRoot.m_pObject);
-        spLastPrecipRoot.operator=(static_cast<NiNode*>(nullptr));
+        spLastPrecipRoot = static_cast<NiNode*>(nullptr);
     }
 
     fBirthRate = 0.0f;
@@ -946,7 +946,7 @@ NiAVObject* NiPSysMeshUpdateModifier::GetMeshAt(uint32_t uiIndex) {
     if (uiIndex >= m_kMeshes.GetSize()) {
         return nullptr;
     }
-    return m_kMeshes[uiIndex].operator->();
+    return m_kMeshes[uiIndex];
 }
 
 NiPSysModifier* NiParticleSystem::GetModifierAt(uint32_t uiIndex) {

@@ -371,7 +371,7 @@ SettingT<RendererSettingCollection> fLODFadeOutMultObjects("fLODFadeOutMultObjec
 // the field is read directly.
 uint16_t NiGeometry::GetVertexCount() {
 #if XFNV_64BIT
-    return this->m_spModelData.operator->()->m_usVertices;
+    return this->m_spModelData->m_usVertices;
 #else
     return static_cast<TESActorBaseData*>(static_cast<void*>(this->m_spModelData.operator->()))
         ->TESActorBaseData::GetFatigue();
@@ -392,7 +392,7 @@ void MakeNewGeomData(NiAVObject* apObject) {
                 }
                 else {
                     spdata.m_pObject->CreateDeepCopy(spTempObject);
-                    spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
+                    spdata = static_cast<NiGeometryData*>(spTempObject.m_pObject);
                     NiGeometryData* v3 = spdata.m_pObject;
                     pgeom->SetModelData(v3);
                 }
@@ -544,10 +544,10 @@ TES::TES(const char* apPathname, NiNode* apRoot, NiNode* apLODLandRoot, Sky* apS
     BGSSaveLoadManager::Create();
     int32_t iGrids = uGridsToLoad.Int();
     if (uExteriorCellBuffer.operator uint32_t() < static_cast<uint32_t>(iGrids * iGrids + iGrids + iGrids + 1)) {
-        uExteriorCellBuffer.operator=(iGrids + iGrids * iGrids + iGrids + 1);
+        uExteriorCellBuffer = iGrids + iGrids * iGrids + iGrids + 1;
     }
     if (!TES::uInteriorCellBufferGeneral.operator uint32_t()) {
-        TES::uInteriorCellBufferGeneral.operator=(1);
+        TES::uInteriorCellBufferGeneral = 1;
     }
     pInteriorBuffer =
         static_cast<TESObjectCELL**>(ourMalloc(TES::uInteriorCellBufferGeneral.UInt() * sizeof(TESObjectCELL*)));
@@ -1453,7 +1453,7 @@ int32_t TES::UpdateCurrentGridCell(const NiPoint3* apPos, bool abAllowPartialRem
         float y = v5->y;
         BSShaderManager::kGridArrayCenter.x = v5->x;
         BSShaderManager::kGridArrayCenter.y = y;
-        if (BSShaderManager::kOldGridArrayCenter.operator==(NiPoint2::ZERO) ||
+        if (BSShaderManager::kOldGridArrayCenter == NiPoint2::ZERO ||
             (std::abs(ideltaX) > 1 || std::abs(ideltaY) > 1)) {
             BSShaderManager::kOldGridArrayCenter = BSShaderManager::kGridArrayCenter;
         }
@@ -2656,7 +2656,7 @@ void TES::CreateFurnitureList() {
 // load's reference) and queues every other addon node's model under spPreloadedAddonNodes. AutoMemContext as in
 // InitializeWater.
 void TES::PreloadAddonNodes() {
-    if (spPreloadedAddonNodes.operator->()) {
+    if (spPreloadedAddonNodes) {
         return;
     }
 
@@ -2701,7 +2701,7 @@ void TES::PreloadAddonNodes() {
 // Queues the files of every body part data form and of the fists under spPreloadedForms. AutoMemContext as in
 // InitializeWater.
 void TES::PreloadForms() {
-    if (spPreloadedForms.operator->()) {
+    if (spPreloadedForms) {
         return;
     }
 
@@ -2808,7 +2808,7 @@ void TES::AddTemporaryParticleObjectToCache(NiAVObject* apObject) {
     }
 
     for (ParticleObjectCache* pcache = pParticleCacheHead; pcache; pcache = pcache->QNext()) {
-        if (pcache->spModel.operator==(apObject)) {
+        if (pcache->spModel == apObject) {
             return;
         }
     }
@@ -2980,7 +2980,7 @@ void TES::UpdateMultiBoundVisibility(NiCamera* apCamera) {
             float fNear = apCamera->GetViewFrustum().m_fNear;
             NiPoint3 kMaxViewPos = apCamera->GetWorldDirection() * fNear;
             NiPoint3 kFrustumEndPos = apCamera->GetWorldTranslate() + kMaxViewPos;
-            if (spPortalRoom.operator->()) {
+            if (spPortalRoom) {
                 BSMultiBoundRoom* pRoom = spPortalRoom.operator->();
                 if (pRoom->QPointWithin(kFrustumEndPos)) {
                     const NiFrustumPlanes& kPlanes = kCuller.GetFrustumPlanes();
@@ -2994,7 +2994,7 @@ void TES::UpdateMultiBoundVisibility(NiCamera* apCamera) {
             }
 
             bool bAddIntersection = true;
-            if (!spPortalRoom.operator->()) {
+            if (!spPortalRoom) {
                 const NiTPointerList<NiPointer<BSMultiBoundRoom>>& kMultiBoundList =
                     pSceneNode->GetPortalGraph()->QRooms();
                 if (!kMultiBoundList.IsEmpty()) {
@@ -3006,7 +3006,7 @@ void TES::UpdateMultiBoundVisibility(NiCamera* apCamera) {
                             const NiFrustumPlanes& kPlanes = kCuller.GetFrustumPlanes();
                             const NiCamera* pCullerCam = kCuller.GetCamera();
                             pSceneNode->UpdateRoomAndPortalVisibility(pRoom, pCullerCam, kPlanes, bAddIntersection);
-                            if (!spPortalRoom.operator->()) {
+                            if (!spPortalRoom) {
                                 spPortalRoom = pRoom;
                                 bAddIntersection = false;
                             }
@@ -3015,7 +3015,7 @@ void TES::UpdateMultiBoundVisibility(NiCamera* apCamera) {
                 }
             }
 
-            if (!spPortalRoom.operator->()) {
+            if (!spPortalRoom) {
                 const NiFrustumPlanes& kPlanes = kCuller.GetFrustumPlanes();
                 const NiCamera* pCullerCam = kCuller.GetCamera();
                 pSceneNode->UpdateRoomAndPortalVisibility(nullptr, pCullerCam, kPlanes, bAddIntersection);
@@ -3118,13 +3118,13 @@ void TES::ResetAllMultiBoundNodes(bool abLandscape, bool abRooms) {
             NiTListItem<NiPointer<BSMultiBoundRoom>>* kRoomIter = kRooms.GetHeadPos();
             while (kRoomIter) {
                 NiPointer<BSMultiBoundRoom> spRoom(kRooms.GetNext(kRoomIter));
-                if (spRoom.operator->()) {
-                    spRoom.operator->()->UpdateWorldBound();
-                    spRoom.operator->()->SetCullResult(BSMultiBoundShape::BS_CULL_OCCLUDED);
-                    spRoom.operator->()->SetCompoundFrustum(nullptr);
-                    NiTListItem<BSPortal*>* kPortalIter = spRoom.operator->()->QPortalList().GetHeadPos();
+                if (spRoom) {
+                    spRoom->UpdateWorldBound();
+                    spRoom->SetCullResult(BSMultiBoundShape::BS_CULL_OCCLUDED);
+                    spRoom->SetCompoundFrustum(nullptr);
+                    NiTListItem<BSPortal*>* kPortalIter = spRoom->QPortalList().GetHeadPos();
                     while (kPortalIter) {
-                        BSPortal* pPortal = spRoom.operator->()->QPortalList().GetNext(kPortalIter);
+                        BSPortal* pPortal = spRoom->QPortalList().GetNext(kPortalIter);
                         if (pPortal) {
                             pPortal->ResetCullResult();
                             if (pPortal->QSharedGeometryNode()->QCompoundFrustum()) {
@@ -3133,10 +3133,9 @@ void TES::ResetAllMultiBoundNodes(bool abLandscape, bool abRooms) {
                         }
                     }
 
-                    NiTListItem<BSOcclusionPlane*>* kRoomOccluderIter =
-                        spRoom.operator->()->GetOccluders().GetHeadPos();
+                    NiTListItem<BSOcclusionPlane*>* kRoomOccluderIter = spRoom->GetOccluders().GetHeadPos();
                     while (kRoomOccluderIter) {
-                        BSOcclusionPlane* pOccluder = spRoom.operator->()->GetOccluders().GetNext(kRoomOccluderIter);
+                        BSOcclusionPlane* pOccluder = spRoom->GetOccluders().GetNext(kRoomOccluderIter);
                         if (pOccluder) {
                             pOccluder->ResetCullResult();
                         }
@@ -4622,10 +4621,10 @@ void TES::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 
 uint32_t TES::GetUnusedCachedParticleObject(NiAVObject* apModel, NiPointer<NiAVObject>& arInstance) {
     TES::ParticleObjectCache* pcache;
-    arInstance.operator=(static_cast<NiAVObject*>(nullptr));
+    arInstance = static_cast<NiAVObject*>(nullptr);
     uint32_t iresult = 0;
     for (pcache = pParticleCacheHead; pcache; pcache = pcache->pNext) {
-        if (pcache->spModel.operator==(apModel)) {
+        if (pcache->spModel == apModel) {
             iresult = 1;
             break;
         }
@@ -4633,7 +4632,7 @@ uint32_t TES::GetUnusedCachedParticleObject(NiAVObject* apModel, NiPointer<NiAVO
     if (pcache && pcache->pspClones) {
         for (int32_t i = 0; i < 3; ++i) {
             if (pcache->pspClones[i].m_pObject && !pcache->pspClones[i].m_pObject->m_pkParent) {
-                arInstance.operator=(pcache->pspClones[i]);
+                arInstance = pcache->pspClones[i];
                 return 2;
             }
         }

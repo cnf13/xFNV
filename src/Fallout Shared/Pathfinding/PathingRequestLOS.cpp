@@ -44,7 +44,7 @@ void PathingRequestLOS::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = IgnoreLocations.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        apSaveGameBuffer->SaveDataEndian(&IgnoreLocations.operator[](i), 12u, 0);
+        apSaveGameBuffer->SaveDataEndian(&IgnoreLocations[i], 12u, 0);
     }
     apSaveGameBuffer->SaveDataEndian(&fIgnoreLocationRadius, 4u, 0);
     apSaveGameBuffer->SaveDataEndian(&SearchCenter, 12u, 0);
@@ -56,7 +56,7 @@ void PathingRequestLOS::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     IgnoreLocations.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        apLoadGameBuffer->LoadData(&IgnoreLocations.operator[](i), 12u);
+        apLoadGameBuffer->LoadData(&IgnoreLocations[i], 12u);
     }
     apLoadGameBuffer->LoadData(&fIgnoreLocationRadius, 4u);
     apLoadGameBuffer->LoadData(&SearchCenter, 12u);

@@ -392,10 +392,10 @@ SettingT<GameSettingCollection> fAVDUnarmedDamageMult("fAVDUnarmedDamageMult", 0
 SettingT<GameSettingCollection> fAVDUnarmedDamageBase("fAVDUnarmedDamageBase", 2.0f);
 
 int32_t CompareFollowerDist(const void* a1, const void* a2) {
-    if (static_cast<const FollowerDist*>(a1)->operator>(*static_cast<const FollowerDist*>(a2))) {
+    if (*static_cast<const FollowerDist*>(a1) > *static_cast<const FollowerDist*>(a2)) {
         return 1;
     }
-    if (static_cast<const FollowerDist*>(a2)->operator>(*static_cast<const FollowerDist*>(a1))) {
+    if (*static_cast<const FollowerDist*>(a2) > *static_cast<const FollowerDist*>(a1)) {
         return -1;
     }
     return 0;

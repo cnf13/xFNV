@@ -261,8 +261,8 @@ void PathSmootherPOVSearch::AddPOVsFromAvoidNodes() {
     NiPointer<PathingAvoidNodeArray>* pspNodes =
         NiPointer_PathingAvoidNodeArray_Construct(aNodesStorage, pRequest->GetAvoidNodeArray());
     if (pspNodes->operator->()) {
-        for (uint32_t i = 0; i < pspNodes->operator->()->iSize; ++i) {
-            PathingAvoidNode* pNode = &pspNodes->operator->()->GetAt(i);
+        for (uint32_t i = 0; i < (*pspNodes)->iSize; ++i) {
+            PathingAvoidNode* pNode = &(*pspNodes)->GetAt(i);
             void* pMemory = ourMalloc(sizeof(PathSmootherPOV));
             PathSmootherPOV* pPOV = pMemory ? ::new (pMemory) PathSmootherPOV : nullptr;
             pPOV->eType = PathSmootherPOV::POV_TYPE_AVOIDNODE;
@@ -476,7 +476,7 @@ bool PathSmootherPOVSearch::CheckArcAgainstNavMesh(
     }
     AngleSinCos angleStep(fStep);
     AngleSinCos currentStartAngle;
-    currentStartAngle.operator=(aArc.Start);
+    currentStartAngle = aArc.Start;
     // The sum is built in currentGoalAngle itself.
     AngleSinCos currentGoalAngle = currentStartAngle + angleStep;
     NiPoint3 currentGoalLoc = aSphere.Center + currentGoalAngle.ComputePoint3(aSphere.fRadius);
@@ -492,8 +492,8 @@ bool PathSmootherPOVSearch::CheckArcAgainstNavMesh(
             return false;
         }
         currentStartLocation.Copy(currentEndLocation);
-        currentStartAngle.operator=(currentGoalAngle);
-        currentGoalAngle.operator=(currentStartAngle + angleStep);
+        currentStartAngle = currentGoalAngle;
+        currentGoalAngle = currentStartAngle + angleStep;
         currentGoalLoc = aSphere.Center + currentGoalAngle.ComputePoint3(aSphere.fRadius);
         iIgnoreEdge = currentEndLocation.iEdgeIndex;
         ++icount;
@@ -583,7 +583,7 @@ bool PathSmootherPOVSearch::CheckSegmentAgainstNavMesh(
             currentStart = NavMeshMath::ClosestPointOnSegmentToLine3(
                 otherEdgeVerts.Vertices[0]->Location, otherEdgeVerts.Vertices[1]->Location, start, end
             );
-            currentStart.operator+=((v17 = (center - currentStart) * 0.01f));
+            currentStart += (v17 = (center - currentStart) * 0.01f);
         }
         currentEdge.Copy(otherEdge);
     }
@@ -1074,16 +1074,16 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
                 double v14 = deltaAngle.GetAngle();
                 float v46 = Nodes.GetAt(static_cast<int32_t>(i)).pPOV->fRadius * v14;
                 float flength_2 = std::fabs(v46);
-                exitTangent.operator*=(flength_2);
+                exitTangent *= flength_2;
             }
             else {
-                exitTangent.operator*=(Nodes.GetAt(0).pPOV->fRadius);
+                exitTangent *= Nodes.GetAt(0).pPOV->fRadius;
             }
-            exitTangent.operator*=(3.0f);
+            exitTangent *= 3.0f;
             double v15 = exitTangent.SqrLength();
             if (flength * flength < v15) {
                 exitTangent.Unitize();
-                exitTangent.operator*=(flength);
+                exitTangent *= flength;
             }
             pSolution->AddPathingNode(exitLoc, exitTangent);
         }
@@ -1107,7 +1107,7 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
             Links.GetAt(static_cast<int32_t>(i)).ExitLocation.pNavMesh, usTriangle, *pExitPoint_2, *pEntryPoint
         );
         if (i >= Links.iSize - 1) {
-            entryTangent.operator*=(Nodes.GetAt(static_cast<int32_t>(i + 1)).pPOV->fRadius);
+            entryTangent *= Nodes.GetAt(static_cast<int32_t>(i + 1)).pPOV->fRadius;
         }
         else {
             AngleSinCos* pEntryAngle = &Links.GetAt(static_cast<int32_t>(i)).EntryAngle;
@@ -1115,13 +1115,13 @@ void PathSmootherPOVSearch::CreatePathingNodes(bool abFailed) {
             double v26 = deltaAngle_2.GetAngle();
             float v45 = Nodes.GetAt(static_cast<int32_t>(i + 1)).pPOV->fRadius * v26;
             float flength_3 = std::fabs(v45);
-            entryTangent.operator*=(flength_3);
+            entryTangent *= flength_3;
         }
-        entryTangent.operator*=(3.0f);
+        entryTangent *= 3.0f;
         double v27 = entryTangent.SqrLength();
         if (flength * flength < v27) {
             entryTangent.Unitize();
-            entryTangent.operator*=(flength);
+            entryTangent *= flength;
         }
         pSolution->AddPathingNode(entryLoc, entryTangent);
     }
@@ -1633,8 +1633,8 @@ bool PathSmootherPOVSearch::CheckAndAddNodeConnection(
             case 1:
                 pnode->ParentLink.ExitLocation.Copy(exitLocation);
                 pnode->ParentLink.EntryLocation.Copy(entryLocation);
-                pnode->ParentLink.ExitAngle.operator=(tangentResults.Results[e].Circle1Param);
-                pnode->ParentLink.EntryAngle.operator=(tangentResults.Results[e].Circle2Param);
+                pnode->ParentLink.ExitAngle = tangentResults.Results[e].Circle1Param;
+                pnode->ParentLink.EntryAngle = tangentResults.Results[e].Circle2Param;
                 apRetNodes->Add(pnode);
                 break;
             default: break;

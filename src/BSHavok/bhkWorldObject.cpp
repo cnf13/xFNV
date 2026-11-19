@@ -527,7 +527,7 @@ hkpShape* bhkWorldObject::GethkShape() {
 
 hkpCollidable* bhkWorldObject::GetCollidableRw() {
     hkpLinkedCollidable* pCollideRw = nullptr;
-    hkpWorldObject* pwo = operator*();
+    hkpWorldObject* pwo = **this;
     if (pwo) {
         pCollideRw = &pwo->m_collidable;
     }

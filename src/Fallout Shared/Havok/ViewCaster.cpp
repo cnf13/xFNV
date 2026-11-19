@@ -87,7 +87,7 @@ void ViewCaster::Init(float afRadius, uint32_t aiGroup) {
     ifilter.SetGroup(aiGroup);
     iGroup = static_cast<int32_t>(aiGroup);
     csi.m_collisionFilterInfo = ifilter.iFilter;
-    csi.m_shape = pshape->operator*();
+    csi.m_shape = **pshape;
     csi.m_transform.setIdentity();
     bhkSimpleShapePhantom* pPhantom;
     bhkSimpleShapePhantom* pPhantomMemory =
@@ -98,7 +98,7 @@ void ViewCaster::Init(float afRadius, uint32_t aiGroup) {
     else {
         pPhantom = nullptr;
     }
-    spShapePhantom.operator=(static_cast<bhkShapePhantom*>(pPhantom));
+    spShapePhantom = static_cast<bhkShapePhantom*>(pPhantom);
     bInit = true;
 }
 
@@ -173,7 +173,7 @@ TESObjectREFR* ViewCaster::FindActivateREFR(
         hkpLinearCastInput input;
         input.m_startPointTolerance = 0.01f;
         input.m_maxExtraPenetration = 0.01f;
-        input.m_to.operator=(hkto);
+        input.m_to = hkto;
         SetCustomPickCollisions();
         static_cast<bhkShapePhantom*>(GetObject())->SetPositionAndLinearCast(hkfrom, input, PointCollector, nullptr);
         if (PointCollector.hasHit().operator bool()) {

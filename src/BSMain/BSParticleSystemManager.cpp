@@ -117,7 +117,7 @@ void BSParticleSystemManager::DetachChild(NiAVObject* apChild, NiPointer<NiAVObj
     if (spChild.m_pObject) {
         aIndexToChildLookup[static_cast<BSMasterParticleSystem*>(spChild.m_pObject)->uiIndex] = -1;
     }
-    arspAVObject.operator=(spChild);
+    arspAVObject = spChild;
 }
 
 void BSParticleSystemManager::DetachChild(NiAVObject* apChild) {
@@ -126,7 +126,7 @@ void BSParticleSystemManager::DetachChild(NiAVObject* apChild) {
 }
 
 void BSParticleSystemManager::DetachChildAt(uint32_t auiIndex, NiPointer<NiAVObject>& arspAVObject) {
-    (&arspAVObject)->operator=(nullptr);
+    arspAVObject = nullptr;
 }
 
 void BSParticleSystemManager::DetachChildAt(uint32_t auiIndex) {
@@ -135,7 +135,7 @@ void BSParticleSystemManager::DetachChildAt(uint32_t auiIndex) {
 }
 
 void BSParticleSystemManager::SetAt(uint32_t auiIndex, NiAVObject* apChild, NiPointer<NiAVObject>& arspAVObject) {
-    arspAVObject.operator=(static_cast<NiAVObject*>(nullptr));
+    arspAVObject = static_cast<NiAVObject*>(nullptr);
 }
 
 void BSParticleSystemManager::SetAt(uint32_t auiIndex, NiAVObject* apChild) {

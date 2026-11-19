@@ -254,7 +254,7 @@ void PathingRequest::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         else {
             v2 = nullptr;
         }
-        spAvoidNodeArray.operator=(v2);
+        spAvoidNodeArray = v2;
         spAvoidNodeArray.m_pObject->SetSize(isaveGameCount, true);
         for (uint32_t i = 0; i < isaveGameCount; ++i) {
             PathingAvoidNode* avoidNode = &spAvoidNodeArray.m_pObject->GetAt(i);

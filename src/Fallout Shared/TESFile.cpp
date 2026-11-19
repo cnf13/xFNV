@@ -1331,7 +1331,7 @@ TESFile* TESFile::GetThreadSafeFileForThread(uint32_t aiThreadID) {
 }
 
 void TESFile::SetDescription(const char* apDescription) {
-    (&cSummary)->operator=(apDescription);
+    cSummary = apDescription;
 }
 
 void TESFile::SetMaybeShouldBeReloaded(bool abReload) {
@@ -1558,7 +1558,7 @@ void TESFile::RemoveFromOwnedIDMap() {
                 }
             }
             for (uint32_t i = 0; i < iindex; ++i) {
-                uint32_t uiID = ownedIDs.operator[](i);
+                uint32_t uiID = ownedIDs[i];
                 TESFile::pOwnedTempIDMap->RemoveAt(uiID);
             }
         }

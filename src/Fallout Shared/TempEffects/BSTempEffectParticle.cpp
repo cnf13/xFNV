@@ -78,8 +78,8 @@ const NiRTTI* BSTempEffectParticle::GetRTTI() const {
 void BSTempEffectParticle::Detach() {
     NiNode* v1;
     NiRefObject* v2;
-    if ((&spParticleObject)->operator->()) {
-        v2 = (&spParticleObject)->operator->();
+    if (spParticleObject) {
+        v2 = spParticleObject;
         v1 = static_cast<NiNode*>(v2)->IsNode();
     }
     else {
@@ -101,28 +101,28 @@ bool BSTempEffectParticle::Update(float afTime) {
     NiTransform kDest;
     uint8_t v12 = (uint8_t)BSTempEffect::Update(afTime);
     NiRefObject* vCondition1;
-    vCondition1 = (&spFollowObject)->operator->();
+    vCondition1 = spFollowObject;
     if (vCondition1) {
-        v2 = (&spFollowObject)->operator->();
+        v2 = spFollowObject;
         if (v2->NiRefObject::GetRefCount() == 1) {
-            (&spFollowObject)->operator=(nullptr);
+            spFollowObject = nullptr;
         }
     }
     NiRefObject* vCondition2;
-    vCondition2 = (&spParticleObject)->operator->();
+    vCondition2 = spParticleObject;
     if (vCondition2) {
         NiRefObject* vCondition3;
-        vCondition3 = (&spFollowObject)->operator->();
+        vCondition3 = spFollowObject;
         if (vCondition3) {
-            v3 = static_cast<NiAVObject*>((&spFollowObject)->operator->());
+            v3 = static_cast<NiAVObject*>(spFollowObject);
             worldTransform = &v3->GetWorldTransform();
-            (kDest = worldTransform->operator*(kFollowOffset));
-            v5 = static_cast<NiAVObject*>((&spParticleObject)->operator->());
+            (kDest = *worldTransform * kFollowOffset);
+            v5 = static_cast<NiAVObject*>(spParticleObject);
             v5->SetTranslate(kDest.m_Translate);
-            v6 = static_cast<NiAVObject*>((&spParticleObject)->operator->());
+            v6 = static_cast<NiAVObject*>(spParticleObject);
             v6->SetRotate(kDest.m_Rotate);
             x = kDest.m_fScale;
-            v7 = static_cast<NiAVObject*>((&spParticleObject)->operator->());
+            v7 = static_cast<NiAVObject*>(spParticleObject);
             v7->SetScale(x);
         }
     }
@@ -134,7 +134,7 @@ TEMP_EFFECT_TYPE BSTempEffectParticle::GetType() {
 }
 
 bool BSTempEffectParticle::CheckShouldSave() {
-    return pFilename && spParticleObject.operator->();
+    return pFilename && spParticleObject;
 }
 
 uint16_t BSTempEffectParticle::GetSaveSize() {
@@ -151,7 +151,7 @@ uint16_t BSTempEffectParticle::GetSaveSize() {
     sSize += 12;
     sSize += 4;
     sSize += 2;
-    NiObjectNET* pParticleObject = static_cast<NiObjectNET*>(spParticleObject.operator->());
+    NiObjectNET* pParticleObject = static_cast<NiObjectNET*>(spParticleObject);
     NiTimeController* pControllers = pParticleObject->GetControllers();
     NiControllerManager* pManager =
         static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pControllers));
@@ -303,7 +303,7 @@ bool BSTempEffectParticle::LoadGame() {
     if (bvalid) {
         NiNode* pnode = pModelLoader->LoadFile(modelPath, LOD_MULT_NONE, true, false, false, false);
         if (pnode) {
-            spParticleObject.operator=(static_cast<NiAVObject*>(pnode->Clone()));
+            spParticleObject = static_cast<NiAVObject*>(pnode->Clone());
             if (spParticleObject.m_pObject) {
                 NiPointer<Model> spmodel;
                 pModelLoader->FindModel(modelPath, spmodel);
@@ -418,7 +418,7 @@ void BSTempEffectParticle::Init(
         static_cast<NiAVObject*>(pModelLoader->LoadFile(pFilename, LOD_MULT_NONE, true, false, false, true))
     );
     if (spmodel.m_pObject) {
-        spParticleObject.operator=(static_cast<NiAVObject*>(nullptr));
+        spParticleObject = static_cast<NiAVObject*>(nullptr);
         uint32_t iresult = 0;
         if (((aiFlags & 1) != 0) && (TES::pInstance)) {
             iresult = TES::pInstance->GetUnusedCachedParticleObject(spmodel.m_pObject, spParticleObject);
@@ -428,7 +428,7 @@ void BSTempEffectParticle::Init(
             if (spmodel.m_pObject->m_uiRefCount > 2) {
                 if ((aiFlags & 2) != 0) {
                     BSCloningProcess cloneProcess(1.0f);
-                    spParticleObject.operator=(static_cast<NiAVObject*>(spmodel.m_pObject->Clone(cloneProcess)));
+                    spParticleObject = static_cast<NiAVObject*>(spmodel.m_pObject->Clone(cloneProcess));
                 }
             }
             else {
@@ -526,7 +526,7 @@ void BSTempEffectParticle::PlaySequence(const char* apcSequenceName) {
     float endKeyTime;
     NiControllerSequence* a1;
     int32_t v10;
-    v2 = static_cast<NiObjectNET*>((&spParticleObject)->operator->());
+    v2 = static_cast<NiObjectNET*>(spParticleObject);
     NiTimeController* controllers = v2->NiObjectNET::GetControllers();
     NiControllerManager* v9 =
         static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, controllers));
@@ -546,11 +546,11 @@ void BSTempEffectParticle::PlaySequence(const char* apcSequenceName) {
 }
 
 NiAVObject* BSTempEffectParticle::GetParticleObject() {
-    return static_cast<NiAVObject*>(spParticleObject.operator->());
+    return static_cast<NiAVObject*>(spParticleObject);
 }
 
 NiAVObject* BSTempEffectParticle::GetFollowObject() {
-    return spFollowObject.operator->();
+    return spFollowObject;
 }
 
 void BSTempEffectParticle::StopSounds() {
@@ -594,7 +594,7 @@ void BSTempEffectParticle::ResetGravityRecursive(
                 if (pgrav) {
                     bool badd = true;
                     for (int32_t c = aiCount - 1; badd && c >= 0; --c) {
-                        NiAVObject** v6 = &iArray.operator[](c);
+                        NiAVObject** v6 = &iArray[c];
                         if (*v6 == pgrav->m_pkGravityObj) {
                             badd = false;
                         }
@@ -630,7 +630,7 @@ void BSTempEffectParticle::ResetGravity(NiAVObject* apObject) {
         if (i >= Size) {
             break;
         }
-        NiAVObject* pobj = array.operator[](i);
+        NiAVObject* pobj = array[i];
         if (pobj) {
             NiMatrix3 mat2;
             (&pobj->m_pkParent->GetWorldTransform())->m_Rotate.Inverse(&mat);

@@ -221,7 +221,7 @@ void BSMultiBoundNode::SetCullingMode(BSCullingProcess::BSCPCullingType aCulling
 
 void BSMultiBoundNode::CopyMembers(BSMultiBoundNode* pDest, NiCloningProcess& arCloneData) {
     BSNiNode::CopyMembers(pDest, arCloneData);
-    pDest->spMultiBound.operator=(static_cast<BSMultiBound*>(spMultiBound.m_pObject->CreateClone(arCloneData)));
+    pDest->spMultiBound = static_cast<BSMultiBound*>(spMultiBound.m_pObject->CreateClone(arCloneData));
     pDest->CullingMode = CullingMode;
 }
 

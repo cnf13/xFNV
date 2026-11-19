@@ -169,7 +169,7 @@ bool SeenData::UpdateSeenData(const NiPoint3& aCoord, const NiPoint3& aSeenStart
         else {
             NiPoint3 result;
             SeenData::GetPosOffset(a1, a2);
-            a2.operator+=(aSeenStart);
+            a2 += aSeenStart;
             result = a2 - aCoord;
             double v5 = result.Length();
             if (TESObjectCELL::GetSeenDataUpdateRadius() > v5) {

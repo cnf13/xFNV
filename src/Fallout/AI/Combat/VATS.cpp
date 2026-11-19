@@ -1343,7 +1343,7 @@ void VATS::UpdateVATSLight(TESObjectREFR* apVictim) {
             vec_2.Unitize();
             vec_2 = vec_2 * rotmat;
             float a2b = gs_fVATSLightDistance_VATS.operator float();
-            vec_2.operator*=(a2b);
+            vec_2 *= a2b;
             pos = pos + vec_2;
             double v4 = gs_fVATSLightElevation_VATS.operator float();
             pos.z = v4 + pos.z;
@@ -1413,7 +1413,7 @@ NiPoint3 VATS::GetCamshotTargetPos() {
     if (pCamera) {
         v10 = pCamera->GetTargetPos();
     }
-    if (v10.operator==(NiPoint3_ZERO)) {
+    if (v10 == NiPoint3_ZERO) {
         NiPoint3 result;
         float z = pPlayer->GetEyeHeight();
         NiPoint3* za = ::new (&dst) NiPoint3(static_cast<float>(0.0), static_cast<float>(0.0), z);
@@ -1490,12 +1490,12 @@ bool VATS::GetLineOfSight(VATS_COMMAND* apCommand) {
 }
 
 void VATS::SetVATSLight(NiLight* apLight, bool abRemoveOld) {
-    if (abRemoveOld && spVATSLight.operator!=(static_cast<ShadowSceneLight*>(nullptr))) {
-        spVATSLight.operator=(static_cast<ShadowSceneLight*>(nullptr));
+    if (abRemoveOld && spVATSLight != static_cast<ShadowSceneLight*>(nullptr)) {
+        spVATSLight = static_cast<ShadowSceneLight*>(nullptr);
     }
     if (apLight) {
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-        spVATSLight.operator=(ShadowSceneNode_->AddLight(apLight, true));
+        spVATSLight = ShadowSceneNode_->AddLight(apLight, true);
         ShadowSceneNode* v4 = BSShaderManager::GetShadowSceneNode(0);
         v4->AttachChild(apLight, 1);
     }

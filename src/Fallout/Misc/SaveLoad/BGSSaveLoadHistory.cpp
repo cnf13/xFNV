@@ -53,7 +53,7 @@ uint32_t BGSSaveLoadHistory::GetCount() {
 }
 
 const char* BGSSaveLoadHistory::GetNote(uint32_t aiIndex) {
-    return Notes.operator[](aiIndex);
+    return Notes[aiIndex];
 }
 
 void BGSSaveLoadHistory::Save(BGSSaveLoadFile* apFile) {
@@ -63,7 +63,7 @@ void BGSSaveLoadHistory::Save(BGSSaveLoadFile* apFile) {
     icount = Notes.iSize;
     apSaveGameBuffer->SaveDataEndian(&icount, 4u, 0);
     for (uint32_t i = 0; i < icount; ++i) {
-        char* v2 = Notes.operator[](i);
+        char* v2 = Notes[i];
         apSaveGameBuffer->SaveString(v2, 0);
     }
     saveBuffer.Save(apFile);
@@ -86,7 +86,7 @@ void BGSSaveLoadHistory::Rewind(uint32_t aiCount) {
     uint32_t Count = GetCount();
     if (aiCount < Count) {
         for (uint32_t auiIndex = aiCount; auiIndex < Count; ++auiIndex) {
-            ourFree(Notes.operator[](auiIndex));
+            ourFree(Notes[auiIndex]);
         }
         Notes.RemoveFast(aiCount, Count - aiCount);
     }
@@ -95,7 +95,7 @@ void BGSSaveLoadHistory::Rewind(uint32_t aiCount) {
 void BGSSaveLoadHistory::Clear() {
     uint32_t i_2 = 0;
     for (uint32_t i = Notes.iSize; i_2 < i; i = Notes.iSize) {
-        ourFree(Notes.operator[](i_2++));
+        ourFree(Notes[i_2++]);
     }
     Notes.SetSize(0, false);
 }

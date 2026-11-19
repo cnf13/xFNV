@@ -203,7 +203,7 @@ void NavMeshGrid::SetBoundingExtents(const NiPoint3& aMin, const NiPoint3& aMax,
     else {
         iGridSize = 1;
     }
-    sections.operator/=(static_cast<float>(iGridSize));
+    sections /= static_cast<float>(iGridSize);
     fColumnSectionLen = std::fabs(sections.x);
     fRowSectionLen = std::fabs(sections.y);
     uint32_t itotal = iGridSize * iGridSize;

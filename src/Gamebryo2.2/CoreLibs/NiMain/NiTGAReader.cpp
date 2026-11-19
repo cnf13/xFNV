@@ -70,7 +70,7 @@ LABEL_9:;
     NiPixelData* v9 = pkOptDest;
     if (pkOptDest &&
         (*pkOptDest->m_puiWidth == this->m_usWidth &&
-         (*pkOptDest->m_puiHeight == m_usHeight && pkOptDest->m_kPixelFormat.operator==(m_kFormat)))) {
+         (*pkOptDest->m_puiHeight == m_usHeight && pkOptDest->m_kPixelFormat == m_kFormat))) {
         kIsta = pkOptDest;
     }
     else {

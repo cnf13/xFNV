@@ -189,8 +189,8 @@ BSAnimGroupSequence* AnimIdle::GetSequence() {
 uint16_t AnimIdle::GetSaveSize() {
     BSAnimGroupSequence* v1;
     int16_t v4 = 13;
-    if ((&pSeq)->operator->()) {
-        v1 = (&pSeq)->operator->();
+    if (pSeq) {
+        v1 = pSeq;
         return (int16_t)(v1->GetSaveSize() + 14);
     }
     return v4;
@@ -208,7 +208,7 @@ void AnimIdle::Loaded(KFModel* apKFModel) {
     AutoMemContext tempMemContext(
         MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 0x1101
     );
-    spKFModel.operator=(apKFModel);
+    spKFModel = apKFModel;
     if (!apKFModel) {
         eFlags = AnimIdle::ANIM_IDLE_QUEUED;
         goto LABEL_35;
@@ -224,7 +224,7 @@ void AnimIdle::Loaded(KFModel* apKFModel) {
                 v2 =
                     static_cast<NiNode*>(BipedAnim::LoadAndAttachAddOn(pAnimObj[n], nullptr, BO_NONE, pActor, nullptr));
             }
-            spAddOnObj[n].operator=(v2);
+            spAddOnObj[n] = v2;
             Animation* v3 = pActor->GetAnimation();
             NiControllerManager* ControllerManager = v3->GetControllerManager();
             NiDefaultAVObjectPalette* apPalette =
@@ -282,7 +282,7 @@ TESIdleForm* AnimIdle::GetIdleForm() {
 }
 
 void AnimIdle::SetSequence(BSAnimGroupSequence* apSeq) {
-    pSeq.operator=(apSeq);
+    pSeq = apSeq;
 }
 
 void AnimIdle::LoadGame(BGSLoadFormBuffer* apBuffer, Animation* apAnimation) {
@@ -293,8 +293,8 @@ void AnimIdle::LoadGame(BGSLoadFormBuffer* apBuffer, Animation* apAnimation) {
     if (eFlags == ANIM_IDLE_QUEUED) {
         eFlags = ANIM_IDLE_LOADED;
     }
-    if ((eFlags == ANIM_IDLE_PLAYING) && ((&spKFModel)->operator->())) {
-        v3 = (&spKFModel)->operator->();
+    if ((eFlags == ANIM_IDLE_PLAYING) && (spKFModel)) {
+        v3 = spKFModel;
         apAnimation->AddAnimation(v3, false);
     }
 }
@@ -334,7 +334,7 @@ bool AnimIdle::PlayAnim(BSAnimGroupSequence* apSeq) {
     pSeq = apSeq;
     eFlags = ANIM_IDLE_PLAYING;
     if (eType == PLAY_TYPE_AUTO_EXCLUSIVE) {
-        pActor->SetAnimAction(ANIM_ACTION_WAIT_FOR_SPECIAL_IDLE, pSeq.operator->());
+        pActor->SetAnimAction(ANIM_ACTION_WAIT_FOR_SPECIAL_IDLE, pSeq);
     }
     return true;
 }
@@ -343,9 +343,9 @@ void AnimIdle::Update(Animation* apAnimation) {
     if (eFlags != ANIM_IDLE_PLAYING) {
         return;
     }
-    if (pSeq.operator->()) {
+    if (pSeq) {
         pSeq.operator->();
-        if (pSeq.operator->()->GetState() != NiControllerSequence::kInactive) {
+        if (pSeq->GetState() != NiControllerSequence::kInactive) {
             return;
         }
     }
@@ -377,7 +377,7 @@ void AnimIdle::LoadGameTES(float a1, Animation* a2) {
                     ANIM_GROUP_SECTION afTime = eSection;
                     uint16_t v8 = spKFModel.m_pObject->GetAnimGroup()->GetType();
                     BSAnimGroupSequence* v4 = panimSeq->GetSequenceToPlay(csequenceIndex);
-                    pSeq.operator=(a2->StartGroup(v4, v8, afTime));
+                    pSeq = a2->StartGroup(v4, v8, afTime);
                 }
             }
             else {
@@ -387,7 +387,7 @@ void AnimIdle::LoadGameTES(float a1, Animation* a2) {
                         uint16_t v9 = spKFModel.m_pObject->GetAnimGroup()->GetType();
                         NiTPointerMap<uint16_t, AnimSequenceBase*>* v5 = a2->GetMapAnimSequenceBase();
                         if (v5->GetAt(v9, panimSeq_2)) {
-                            pSeq.operator=(panimSeq_2->GetSequenceToPlay(csequenceIndex));
+                            pSeq = panimSeq_2->GetSequenceToPlay(csequenceIndex);
                         }
                     }
                 }
@@ -536,7 +536,7 @@ void AnimIdle::FreeAnimIdleData(AnimIdle* apFreeIdle) {
                 }
                 const char* v6 = apFreeIdle->pAnimObj[n]->GetModel();
                 pModelLoader->ReleaseFile(v6);
-                apFreeIdle->spAddOnObj[n].operator=(static_cast<NiNode*>(nullptr));
+                apFreeIdle->spAddOnObj[n] = static_cast<NiNode*>(nullptr);
                 if (apFreeIdle->pSeq.m_pObject) {
                     apFreeIdle->pSeq.m_pObject->ValidateTargets();
                 }
@@ -783,7 +783,7 @@ void Animation::ClearBlendInterps() {
 // the idle replay delays, the special idle, the sequences of each section (a section whose saved sequence is gone still
 // has its data read into a throwaway sequence), the anim action and the idle's sequence, and updates the bip nodes.
 void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
-    if (!pAnimRoot.operator->()) {
+    if (!pAnimRoot) {
         return;
     }
     Actor* pActor = apBuffer->GetActor();
@@ -825,18 +825,18 @@ void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
     }
     UpdateBipOnly(time, &AccumRootTranslate, true);
     static_cast<BSBipNode*>(pAnimRoot.operator->())->UpdateAllButBip(time);
-    bhkNiCollisionObject* pCollisionObject = bhkUtilFunctions::FindNextCollisionObject(pAnimRoot.operator->());
+    bhkNiCollisionObject* pCollisionObject = bhkUtilFunctions::FindNextCollisionObject(pAnimRoot);
     bool bUseVelocity = pCollisionObject ? pCollisionObject->GetUseVelocity() : false;
     if (bUseVelocity) {
-        bhkUtilFunctions::SetUseVelocityRecurse(false, pAnimRoot.operator->());
+        bhkUtilFunctions::SetUseVelocityRecurse(false, pAnimRoot);
     }
     UpdateSceneGraphNoController();
     if (bUseVelocity) {
-        bhkUtilFunctions::SetUseVelocityRecurse(bUseVelocity, pAnimRoot.operator->());
+        bhkUtilFunctions::SetUseVelocityRecurse(bUseVelocity, pAnimRoot);
     }
     ClearGroup(AGS_WHOLE_BODY, 0.0f);
     ZeroGlobalTransform();
-    if (spManager.operator->()) {
+    if (spManager) {
         spManager->DeactivateAll(0.0f);
     }
     // LoadData copies raw bytes into each field, passed by address as an untyped buffer.
@@ -917,7 +917,7 @@ void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
     }
     char cIdleSequence = -1;
     apBuffer->LoadData(&cIdleSequence, 1);
-    if (spAnimIdle.operator->()) {
+    if (spAnimIdle) {
         if (cIdleSequence != -1) {
             spAnimIdle->SetSequence(pCurrentSequence[cIdleSequence]);
         }
@@ -1040,10 +1040,10 @@ LABEL_51:;
 }
 
 bool Animation::SpecialIdlePlaying() {
-    if (!(&spAnimIdle)->operator->()) {
+    if (!spAnimIdle) {
         return false;
     }
-    AnimIdle* v2 = (&spAnimIdle)->operator->();
+    AnimIdle* v2 = spAnimIdle;
     return (bool)((uint8_t)(((int32_t)v2->AnimIdle::GetFlag()) == 2u));
 }
 
@@ -1079,10 +1079,10 @@ int16_t Animation::GetGroupSpeed(uint16_t asAnimGroup) {
 }
 
 TESIdleForm* Animation::GetSpecialIdleForm() {
-    if (!(&spAnimIdle)->operator->()) {
+    if (!spAnimIdle) {
         return nullptr;
     }
-    AnimIdle* v1 = (&spAnimIdle)->operator->();
+    AnimIdle* v1 = spAnimIdle;
     return v1->GetIdleForm();
 }
 
@@ -1164,45 +1164,44 @@ void Animation::SpecialIdleAuto(
 
 bool Animation::IsIdleNotLoaded(TESIdleForm* apIdle) {
     AnimIdle* v10;
-    if (spAnimIdle.operator->()) {
-        AnimIdle* v2 = spAnimIdle.operator->();
+    if (spAnimIdle) {
+        AnimIdle* v2 = spAnimIdle;
         if (v2->GetIdleForm() == apIdle) {
-            AnimIdle* v3 = spAnimIdle.operator->();
+            AnimIdle* v3 = spAnimIdle;
             if (v3->GetFlag() != AnimIdle::ANIM_IDLE_LOADED) {
                 return true;
             }
         }
     }
-    if (spAnimIdleQueued.operator->()) {
-        AnimIdle* v5 = spAnimIdleQueued.operator->();
+    if (spAnimIdleQueued) {
+        AnimIdle* v5 = spAnimIdleQueued;
         if (v5->GetIdleForm() == apIdle) {
-            AnimIdle* v6 = spAnimIdleQueued.operator->();
+            AnimIdle* v6 = spAnimIdleQueued;
             if (v6->GetFlag() != AnimIdle::ANIM_IDLE_LOADED) {
                 return true;
             }
         }
     }
-    if (spAnimIdleFreeWhenInactiveA->operator->()) {
-        AnimIdle* v7 = spAnimIdleFreeWhenInactiveA->operator->();
+    if (*spAnimIdleFreeWhenInactiveA) {
+        AnimIdle* v7 = *spAnimIdleFreeWhenInactiveA;
         if (v7->GetIdleForm() == apIdle) {
             return true;
         }
         if (pVATS.GetMode() == VATS::VATS_PLAYBACK) {
-            AnimIdle* v8 = spAnimIdleFreeWhenInactiveA->operator->();
+            AnimIdle* v8 = *spAnimIdleFreeWhenInactiveA;
             if (v8->GetSequence()) {
                 return true;
             }
         }
     }
-    if (!spAnimIdleFreeWhenInactiveA[1].operator->()) {
+    if (!spAnimIdleFreeWhenInactiveA[1]) {
         return false;
     }
-    AnimIdle* v9 = spAnimIdleFreeWhenInactiveA[1].operator->();
+    AnimIdle* v9 = spAnimIdleFreeWhenInactiveA[1];
     if (v9->GetIdleForm() == apIdle) {
         return true;
     }
-    if (pVATS.GetMode() == VATS::VATS_PLAYBACK &&
-        (v10 = spAnimIdleFreeWhenInactiveA[1].operator->(), v10->GetSequence())) {
+    if (pVATS.GetMode() == VATS::VATS_PLAYBACK && (v10 = spAnimIdleFreeWhenInactiveA[1], v10->GetSequence())) {
         return true;
     }
 
@@ -1240,17 +1239,17 @@ char Animation::FindSwitchKey(float* pTime) {
 }
 
 bool Animation::SpecialIdleDonePlaying() {
-    if ((&spAnimIdleQueued)->operator->()) {
+    if (spAnimIdleQueued) {
         return false;
     }
-    if (!(&spAnimIdle)->operator->()) {
+    if (!spAnimIdle) {
         return true;
     }
-    AnimIdle* v2 = (&spAnimIdle)->operator->();
+    AnimIdle* v2 = spAnimIdle;
     if (!v2->AnimIdle::GetSequence()) {
         return false;
     }
-    AnimIdle* v3 = (&spAnimIdle)->operator->();
+    AnimIdle* v3 = spAnimIdle;
     return (bool)((uint8_t)(((int32_t)v3->AnimIdle::GetFlag()) == 3));
 }
 
@@ -1336,7 +1335,7 @@ uint32_t Animation::GetAnimsLoadingCount() {
 }
 
 NiControllerManager* Animation::GetControllerManager() {
-    return this->spManager.operator->();
+    return this->spManager;
 }
 
 void Animation::ReloadTargets(bool abReload) {
@@ -1529,13 +1528,13 @@ void Animation::ClearGroup(ANIM_GROUP_SECTION aeSection, float afEaseOutTime) {
             eSection = AGS_WEAPON;
             break;
     }
-    if (spManager.operator->() && eSection < ANIM_GROUP_SECTION_COUNT && pCurrentSequence[eSection] &&
+    if (spManager && eSection < ANIM_GROUP_SECTION_COUNT && pCurrentSequence[eSection] &&
         pCurrentSequence[eSection]->GetState()) {
         if (pCurrentSequence[eSection]->GetPartnerSequence()) {
             NiControllerSequence* pPartner = pCurrentSequence[eSection]->GetPartnerSequence();
-            spManager.operator->()->DeactivateSequence(pPartner, afEaseOutTime);
+            spManager->DeactivateSequence(pPartner, afEaseOutTime);
         }
-        spManager.operator->()->DeactivateSequence(pCurrentSequence[eSection], afEaseOutTime);
+        spManager->DeactivateSequence(pCurrentSequence[eSection], afEaseOutTime);
         if (eSection == AGS_MOVEMENT) {
             pLastMovementSequence = pCurrentSequence[eSection];
         }
@@ -1556,48 +1555,46 @@ float Animation::GetTime(NiControllerSequence* apSequence) {
 }
 
 bool Animation::SpecialIdleLoaded() {
-    if (!spAnimIdle.operator->()) {
+    if (!spAnimIdle) {
         return false;
     }
-    return spAnimIdle.operator->()->GetFlag() == 1;
+    return spAnimIdle->GetFlag() == 1;
 }
 
 bool Animation::SpecialIdleWorking(BSAnimGroupSequence* apSeq) {
-    if (spAnimIdle.operator->() && spAnimIdle.operator->()->AnimIdle::GetSequence() == apSeq) {
+    if (spAnimIdle && spAnimIdle->AnimIdle::GetSequence() == apSeq) {
         return true;
     }
-    if (spAnimIdleQueued.operator->() && spAnimIdleQueued.operator->()->AnimIdle::GetSequence() == apSeq) {
+    if (spAnimIdleQueued && spAnimIdleQueued->AnimIdle::GetSequence() == apSeq) {
         return true;
     }
-    if (spAnimIdleFreeWhenInactiveA[0].operator->() &&
-        spAnimIdleFreeWhenInactiveA[0].operator->()->AnimIdle::GetSequence() == apSeq) {
+    if (spAnimIdleFreeWhenInactiveA[0] && spAnimIdleFreeWhenInactiveA[0]->AnimIdle::GetSequence() == apSeq) {
         return true;
     }
-    if (spAnimIdleFreeWhenInactiveA[1].operator->() &&
-        spAnimIdleFreeWhenInactiveA[1].operator->()->AnimIdle::GetSequence() == apSeq) {
+    if (spAnimIdleFreeWhenInactiveA[1] && spAnimIdleFreeWhenInactiveA[1]->AnimIdle::GetSequence() == apSeq) {
         return true;
     }
     return false;
 }
 
 bool Animation::SpecialIdleWorking() {
-    if (spAnimIdle.operator->()) {
-        if (!spAnimIdle.operator->()->AnimIdle::GetSequence()) {
+    if (spAnimIdle) {
+        if (!spAnimIdle->AnimIdle::GetSequence()) {
             // The idle's KF model is still loading unless the idle is done playing.
-            return spAnimIdle.operator->()->GetFlag() != 3;
+            return spAnimIdle->GetFlag() != 3;
         }
-        NiControllerSequence::State eState = spAnimIdle.operator->()->AnimIdle::GetSequence()->GetState();
+        NiControllerSequence::State eState = spAnimIdle->AnimIdle::GetSequence()->GetState();
         if (eState == NiControllerSequence::kEaseIn || eState == NiControllerSequence::kTransDest) {
             return true;
         }
     }
-    if (!spAnimIdleQueued.operator->()) {
+    if (!spAnimIdleQueued) {
         return false;
     }
-    if (!spAnimIdleQueued.operator->()->AnimIdle::GetSequence()) {
+    if (!spAnimIdleQueued->AnimIdle::GetSequence()) {
         return true;
     }
-    NiControllerSequence::State eState = spAnimIdleQueued.operator->()->AnimIdle::GetSequence()->GetState();
+    NiControllerSequence::State eState = spAnimIdleQueued->AnimIdle::GetSequence()->GetState();
     return eState == NiControllerSequence::kEaseIn || eState == NiControllerSequence::kTransDest;
 }
 
@@ -1884,7 +1881,7 @@ LABEL_33:;
     if (cblendFrames) {
         fduration = static_cast<double>(cblendFrames) / 30.0;
     }
-    if ((Interface::IsInMenuMode() && pAnimRoot.operator==(pPlayer->GetInventory3D())) ||
+    if ((Interface::IsInMenuMode() && pAnimRoot == pPlayer->GetInventory3D()) ||
         Interface::IsMenuIDVisible(Interface::eRaceSexMenu, 0)) {
         fduration = fMenuModeAnimBlend.Float();
     }
@@ -2176,7 +2173,7 @@ LABEL_27:;
                         "'%s' is trying to free a special idle '%s' sequence '%s' that is animating.",
                         pActorRef->GetFormEditorID(), arg8, afTime
                     );
-                    spAnimIdleFreeWhenInactiveA[i].operator=(static_cast<AnimIdle*>(nullptr));
+                    spAnimIdleFreeWhenInactiveA[i] = static_cast<AnimIdle*>(nullptr);
                 }
                 else {
                     if (!spAnimIdleFreeWhenInactiveA[i].m_pObject->GetSequence()->GetState()) {
@@ -3048,11 +3045,11 @@ bool Animation::Init(BSSimpleList<const char*>* apFileList, NiNode* apRoot, TESO
             pSoundPriorityBone[i] = apRef->GetActorBone(apRoot, pSoundPriorityBoneName[i]);
         }
     }
-    pAnimRoot.operator->()->SetSelectiveUpdate(false);
+    pAnimRoot->SetSelectiveUpdate(false);
     void* pMemory = NiMemObject::operator new(sizeof(NiControllerManager));
     NiControllerManager* pManager = nullptr;
     if (pMemory) {
-        pManager = ::new (pMemory) NiControllerManager(pAnimRoot.operator->(), true);
+        pManager = ::new (pMemory) NiControllerManager(pAnimRoot, true);
     }
     spManager = pManager;
     bool bDelaySequenceClone = ShouldQueueSequenceCloning();
@@ -3078,7 +3075,7 @@ bool Animation::Init(BSSimpleList<const char*>* apFileList, NiNode* apRoot, TESO
             pPlay->Activate(100, true, 1.0f, 0.0f, nullptr, false);
             alignas(NiUpdateData) uint8_t aucUpdateData[sizeof(NiUpdateData)];
             NiUpdateData* pUpdateData = ::new (aucUpdateData) NiUpdateData(0.0f, true, false);
-            pAnimRoot.operator->()->Update(*pUpdateData);
+            pAnimRoot->Update(*pUpdateData);
             static_cast<NiControllerSequence*>(pPlay)->Deactivate(0.0f, false);
         }
     }
@@ -3109,8 +3106,7 @@ bool Animation::ShouldQueueSequenceCloning() {
     }
     else if (
         pAnimRoot.operator->() == pPlayer->PlayerCharacter::Get3D(false) ||
-        pAnimRoot.operator->() == pPlayer->PlayerCharacter::Get3D(true) ||
-        pAnimRoot.operator==(pPlayer->GetInventory3D())
+        pAnimRoot.operator->() == pPlayer->PlayerCharacter::Get3D(true) || pAnimRoot == pPlayer->GetInventory3D()
     ) {
         if (!Interface::IsMenuIDVisible(Interface::eRaceSexMenu, 0)) {
             bCanClone = false;
@@ -3325,7 +3321,7 @@ bool Animation::GetMoved() {
 // the game does. The reference is an actor.
 void Animation::UpdateMovementNoWorldUpdate(TESObjectREFR* apRefObject) {
     Actor* apRef = static_cast<Actor*>(apRefObject);
-    if (!pAnimRoot.operator->() || !pAccumRoot) {
+    if (!pAnimRoot || !pAccumRoot) {
         return;
     }
     if (GetMoved()) {
@@ -3382,13 +3378,13 @@ float Animation::GetSmallestHavokBlendValue(NiNode* apNode) {
 }
 
 bool Animation::SpecialIdleReplace() {
-    if (!spAnimIdleQueued.operator->()) {
+    if (!spAnimIdleQueued) {
         return false;
     }
-    if (spAnimIdleQueued.operator->()->GetFlag() != 1) {
+    if (spAnimIdleQueued->GetFlag() != 1) {
         return false;
     }
-    if (!AddAnimation(spAnimIdleQueued.operator->()->GetKFModel(), false)) {
+    if (!AddAnimation(spAnimIdleQueued->GetKFModel(), false)) {
         return false;
     }
     spAnimIdleQueued = nullptr;
@@ -3477,7 +3473,7 @@ void Animation::InitGroupSpeed(TESAnimGroup* apAnimGroup) {
                         if (quatStart.IsTranslateValid() && quatStop.IsTranslateValid()) {
                             ::new (&delta) NiPoint3((&quatStop)->m_kTranslate - (&quatStart)->m_kTranslate);
                             float v9 = fstopTime__pinterp - fstartTime;
-                            delta.operator/=(v9);
+                            delta /= v9;
                             apAnimGroup->SetSpeed(&delta);
                         }
                         break;
@@ -3539,12 +3535,12 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
             }
             else {
                 spAnimIdleFreeWhenInactiveA[1] = spAnimIdle;
-                spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
+                spAnimIdle = static_cast<AnimIdle*>(nullptr);
             }
         }
         else {
             *spAnimIdleFreeWhenInactiveA = spAnimIdle;
-            spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
+            spAnimIdle = static_cast<AnimIdle*>(nullptr);
         }
     }
     if (abFreeQueued && spAnimIdleQueued.m_pObject) {
@@ -3580,17 +3576,17 @@ void Animation::SpecialIdleFree(bool abFreeQueued, bool abForceDelete) {
             }
             else {
                 spAnimIdleFreeWhenInactiveA[1] = spAnimIdleQueued;
-                spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+                spAnimIdleQueued = static_cast<AnimIdle*>(nullptr);
             }
         }
         else {
             *spAnimIdleFreeWhenInactiveA = spAnimIdleQueued;
-            spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+            spAnimIdleQueued = static_cast<AnimIdle*>(nullptr);
         }
     }
     else {
         spAnimIdle = spAnimIdleQueued;
-        spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+        spAnimIdleQueued = static_cast<AnimIdle*>(nullptr);
     }
 }
 
@@ -3607,10 +3603,10 @@ void Animation::SkipNextBlend() {
 }
 
 BSAnimGroupSequence* Animation::SpecialIdleGetSequence() {
-    if (!(&spAnimIdle)->operator->()) {
+    if (!spAnimIdle) {
         return nullptr;
     }
-    AnimIdle* v2 = (&spAnimIdle)->operator->();
+    AnimIdle* v2 = spAnimIdle;
     return v2->AnimIdle::GetSequence();
 }
 
@@ -3623,10 +3619,10 @@ void Animation::ClearDelta() {
 }
 
 BSAnimGroupSequence* Animation::GetSpecialIdleSequence() {
-    if (!(&spAnimIdle)->operator->()) {
+    if (!spAnimIdle) {
         return nullptr;
     }
-    AnimIdle* v1 = (&spAnimIdle)->operator->();
+    AnimIdle* v1 = spAnimIdle;
     return v1->AnimIdle::GetSequence();
 }
 
@@ -3661,14 +3657,14 @@ void Animation::SetDelayUpdateScenegraph(bool abFlag) {
 void Animation::RevertTES(TESObjectREFR* apRef) {
     ClearGroup(AGS_WHOLE_BODY, 0.0);
     ZeroGlobalTransform();
-    if (spAnimIdle.operator->()) {
+    if (spAnimIdle) {
         AnimIdleFree(spAnimIdle);
     }
-    spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
-    if (spAnimIdleQueued.operator->()) {
+    spAnimIdle = static_cast<AnimIdle*>(nullptr);
+    if (spAnimIdleQueued) {
         AnimIdleFree(spAnimIdleQueued);
     }
-    spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+    spAnimIdleQueued = static_cast<AnimIdle*>(nullptr);
     pCurrentSequence[7] = nullptr;
     ClearGroup(AGS_SPECIAL_IDLE, 0.0);
     if (spManager.m_pObject) {
@@ -3688,11 +3684,11 @@ void Animation::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
     if (spAnimIdle.m_pObject) {
         AnimIdleFree(spAnimIdle);
     }
-    spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
+    spAnimIdle = static_cast<AnimIdle*>(nullptr);
     if (spAnimIdleQueued.m_pObject) {
         AnimIdleFree(spAnimIdleQueued);
     }
-    spAnimIdleQueued.operator=(static_cast<AnimIdle*>(nullptr));
+    spAnimIdleQueued = static_cast<AnimIdle*>(nullptr);
     pCurrentSequence[7] = nullptr;
     ClearGroup(AGS_SPECIAL_IDLE, 0.0f);
     if (spManager.m_pObject) {
@@ -3843,13 +3839,13 @@ void Animation::SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeS
                 AnimIdleFree(spAnimIdle);
             }
             else {
-                spAnimIdleFreeWhenInactiveA[1].operator=(spAnimIdle);
-                spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
+                spAnimIdleFreeWhenInactiveA[1] = spAnimIdle;
+                spAnimIdle = static_cast<AnimIdle*>(nullptr);
             }
         }
         else {
-            spAnimIdleFreeWhenInactiveA->operator=(spAnimIdle);
-            spAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
+            *spAnimIdleFreeWhenInactiveA = spAnimIdle;
+            spAnimIdle = static_cast<AnimIdle*>(nullptr);
         }
     }
     AnimIdle* v7 = static_cast<AnimIdle*>(NiMemObject::operator new(sizeof(AnimIdle)));
@@ -3860,7 +3856,7 @@ void Animation::SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeS
     else {
         v4 = nullptr;
     }
-    spAnimIdle.operator=(v4);
+    spAnimIdle = v4;
 }
 
 uint16_t Animation::GetAnimationSaveSize(TESObjectREFR* apRef) {
@@ -3943,9 +3939,9 @@ void Animation::ShutdownAllAnimIdles() {
     bShutDown = true;
     SpecialIdleFree(true, true);
     for (uint32_t i = 0; i < 2; ++i) {
-        if (spAnimIdleFreeWhenInactiveA[i].operator->()) {
+        if (spAnimIdleFreeWhenInactiveA[i]) {
             AnimIdleFree(spAnimIdleFreeWhenInactiveA[i]);
-            spAnimIdleFreeWhenInactiveA[i].operator=(static_cast<AnimIdle*>(nullptr));
+            spAnimIdleFreeWhenInactiveA[i] = static_cast<AnimIdle*>(nullptr);
         }
     }
 }
@@ -4026,9 +4022,9 @@ bool Animation::SpecialIdlePlay(Actor* apActor) {
     if (!SpecialIdlePlay()) {
         return false;
     }
-    AnimIdle* v2 = spAnimIdle.operator->();
+    AnimIdle* v2 = spAnimIdle;
     v2->pActor = apActor;
-    AnimIdle* v3 = spAnimIdle.operator->();
+    AnimIdle* v3 = spAnimIdle;
     BSAnimGroupSequence* Sequence = v3->GetSequence();
     apActor->SetAnimAction(ANIM_ACTION_WAIT_FOR_SPECIAL_IDLE, Sequence);
     return true;
@@ -4075,7 +4071,7 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
     }
 
     if (!panimSeq) {
-        spfadeSeq.operator=(aspAnimIdle.m_pObject->GetSequence());
+        spfadeSeq = aspAnimIdle.m_pObject->GetSequence();
     }
     if (!bShutDown) {
         if (panimSeq) {
@@ -4087,7 +4083,7 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
         }
         else {
             if (spfadeSeq.m_pObject) {
-                if (spfadeSeq.operator==(pLastMovementSequence)) {
+                if (spfadeSeq == pLastMovementSequence) {
                     pLastMovementSequence = nullptr;
                 }
                 spManager.m_pObject->RemoveSequence(spfadeSeq.m_pObject);
@@ -4095,7 +4091,7 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
         }
     }
     AnimIdle::FreeAnimIdleData(aspAnimIdle.m_pObject);
-    aspAnimIdle.operator=(static_cast<AnimIdle*>(nullptr));
+    aspAnimIdle = static_cast<AnimIdle*>(nullptr);
     if (panimSeq) {
         pAnimSequenceMap->RemoveAt(sanimGroup);
         if (panimSeq) {
@@ -4331,9 +4327,9 @@ void Animation::LoadGameTES(TESObjectREFR* apref) {
             }
         }
     }
-    spAnimIdle.operator=(AnimIdle::LoadAnimIdle(apActor, this, time));
+    spAnimIdle = AnimIdle::LoadAnimIdle(apActor, this, time);
     if (pSaveLoadGameOLD->GetCurrentVersion() < 76u) {
-        spAnimIdleQueued.operator=(AnimIdle::LoadAnimIdle(apActor, this, time));
+        spAnimIdleQueued = AnimIdle::LoadAnimIdle(apActor, this, time);
     }
     if ((spAnimIdle.m_pObject) && (spAnimIdle.m_pObject->eFlags == AnimIdle::ANIM_IDLE_LOADED)) {
         pCurrentSequence[7] = nullptr;
@@ -4828,7 +4824,7 @@ uint32_t NiControllerManager::GetSequenceCount() {
 }
 
 NiControllerSequence* NiControllerManager::GetSequenceAt(uint32_t uiIndex) {
-    return m_kSequenceArray[uiIndex].operator->();
+    return m_kSequenceArray[uiIndex];
 }
 
 NiAVObject* NiControllerManager::GetAccumRoot() const {
@@ -4847,19 +4843,19 @@ float NiControllerSequence::GetLastScaledTime() {
 }
 
 NiInterpolator* NiControllerSequence::GetInterpolatorAt(uint32_t uiIndex) {
-    return m_pkInterpArray[uiIndex].m_spInterpolator.operator->();
+    return m_pkInterpArray[uiIndex].m_spInterpolator;
 }
 
 // The index is re-read and the controller fetched again for the GetTarget call, as the game does.
 NiObjectNET* NiControllerSequence::GetTargetAt(uint32_t uiIndex) {
-    if (m_pkInterpArray[uiIndex].m_spInterpCtlr.operator->()) {
-        return m_pkInterpArray[uiIndex].m_spInterpCtlr.operator->()->GetTarget();
+    if (m_pkInterpArray[uiIndex].m_spInterpCtlr) {
+        return m_pkInterpArray[uiIndex].m_spInterpCtlr->GetTarget();
     }
     return nullptr;
 }
 
 NiTextKeyExtraData* NiControllerSequence::GetTextKeys() {
-    return m_spTextKeys.operator->();
+    return m_spTextKeys;
 }
 
 NiControllerSequence* NiControllerSequence::GetPartnerSequence() {

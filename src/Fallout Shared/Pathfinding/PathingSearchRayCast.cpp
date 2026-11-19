@@ -153,7 +153,7 @@ RAYCASTPATH_RESULT PathingSearchRayCast::BuildPath(RayCastPathRequest& aRequest,
                 NiPoint3 v35;
                 NiPoint3 pointOnEdge = edge.Location;
                 NiPoint3 center_2 = spmesh.m_pObject->GetCenter(edge.usTriangle);
-                pointOnEdge.operator+=((v35 = (center_2 - pointOnEdge) * 0.1f));
+                pointOnEdge += (v35 = (center_2 - pointOnEdge) * 0.1f);
                 PathingLocation startLoc(pointOnEdge, edge.pNavMeshInfo, edge.usTriangle);
                 aRetPath.Nodes.Add(GoalLocation);
                 aRetPath.Nodes.Add(startLoc);
@@ -190,11 +190,11 @@ void PathingSearchRayCast::CreateCache() {
     TESObjectCELL* Cell = (&this->pRequest->Origin)->GetCell();
     bhkWorld* pw = Cell->GetbhkWorld();
     pw->MarkForWrite();
-    hkpBroadPhase* NumberOfItemsActivated = pw->operator*()->m_broadPhase;
+    hkpBroadPhase* NumberOfItemsActivated = (**pw)->m_broadPhase;
     int32_t icacheSize = NumberOfItemsActivated->getAabbCacheSize();
     char* v2 = hkAllocateStack<char>(icacheSize, nullptr);
     this->pCache = v2;
-    hkpBroadPhase* v3 = pw->operator*()->m_broadPhase;
+    hkpBroadPhase* v3 = (**pw)->m_broadPhase;
     v3->calcAabbCache(aabb, this->pCache);
     pw->MarkForWrite();
 }

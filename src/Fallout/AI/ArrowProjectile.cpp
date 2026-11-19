@@ -1242,7 +1242,7 @@ void ArrowProjectile::CollideActor(const NiPoint3& aContactPoint, const NiPoint3
         }
         if (ptmpBody) {
             RigidBody = ptmpBody;
-            bhkCollisionObject* pcol_2 = bhkCollisionObject::Getbhk(ptmpBody->operator*());
+            bhkCollisionObject* pcol_2 = bhkCollisionObject::Getbhk(**ptmpBody);
             if (pcol_2) {
                 NiMatrix3 invertRot_2;
                 ptargetObject = pcol_2->m_pkSceneObject;
@@ -1323,7 +1323,7 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
     this->psCollisionData = v24;
     alignas(16) NiPoint3 move = this->DeltaS;
     NiPoint3::UnitizeVector(move);
-    move.operator*=(24.0f);
+    move *= 24.0f;
     this->psCollisionData->eCollisionType = 2;
     this->psCollisionData->pClosestObject = nullptr;
     this->psCollisionData->pCollidee = nullptr;
@@ -1415,13 +1415,13 @@ void ArrowProjectile::CollideTerrain(const NiPoint3& aContactPoint, const NiPoin
 void ArrowProjectile::Bounce(const NiPoint3& aContactPoint, const NiPoint3& aContactNormal) {
     NiPoint3 v11;
     if (psCollisionData) {
-        if (aContactNormal.operator!=(NiPoint3_ZERO)) {
+        if (aContactNormal != NiPoint3_ZERO) {
             float* p_x = &this->psCollisionData->kNormal.x;
             *p_x = aContactNormal.x;
             p_x[1] = aContactNormal.y;
             p_x[2] = aContactNormal.z;
         }
-        if (aContactPoint.operator!=(NiPoint3_ZERO)) {
+        if (aContactPoint != NiPoint3_ZERO) {
             this->psCollisionData->kPoint = aContactPoint;
         }
         this->psCollisionData->eCollisionType = 3;
@@ -1629,7 +1629,7 @@ bool ArrowProjectile::ProcessBounce(bhkRigidBody* apArrowRB) {
         NiPoint3::UnitizeVector(psCollisionData->kNormal);
         float fnormalDotDirection = psCollisionData->kNormal.Dot(accum);
         NiPoint3 vton = 2.0f * (fnormalDotDirection * psCollisionData->kNormal - accum);
-        accum.operator+=(vton);
+        accum += vton;
         float v22 = fArrowBounceLinearSpeed.Float() * fSpeed;
         apArrowRB->SetLinearVelocity(v22 * accum);
         NiNode* v10 = Get3D();
@@ -1862,7 +1862,7 @@ NiAVObject* ArrowProjectile::PickSceneGraph(
                 }
                 kInput.m_from.setTransformedInversePos(kTransform, kFrom);
                 kInput.m_to.setTransformedInversePos(kTransform, kTo);
-                pShape->operator*()->castRay(kInput, kOutput);
+                (**pShape)->castRay(kInput, kOutput);
                 if (kOutput.hasHit()) {
                     afPickLength = afPickLength * kOutput.m_hitFraction;
                     bHit = true;

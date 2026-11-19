@@ -158,9 +158,9 @@ void NavMeshInfo::CreateFromNavMesh(NavMesh* apNavMesh) {
     uint32_t iverts = apNavMesh->GetVertexCount();
     if (iverts) {
         for (uint32_t i_3 = 0; i_3 < iverts; ++i_3) {
-            ApproxLocation.operator+=(apNavMesh->GetVertex(i_3)->Location);
+            ApproxLocation += apNavMesh->GetVertex(i_3)->Location;
         }
-        ApproxLocation.operator/=(static_cast<float>(iverts));
+        ApproxLocation /= static_cast<float>(iverts);
     }
     uint32_t itrisize = apNavMesh->GetTriangleCount();
     if (itrisize) {

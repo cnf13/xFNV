@@ -63,7 +63,7 @@ AngleSinCos AngleSinCos::operator-(const AngleSinCos& aSinCos) const {
     AngleSinCos ecx0a;
     ecx0a.fCos = fCos * aSinCos.fCos + fSin * aSinCos.fSin;
     ecx0a.fSin = fSin * aSinCos.fCos - fCos * aSinCos.fSin;
-    result.operator=(ecx0a);
+    result = ecx0a;
     return result;
 }
 
@@ -172,7 +172,7 @@ bool NavMesh::ReconnectEnabledPortals() {
 
 uint32_t NavMesh::GetUndoDataIndexForObstacle(const NiPointer<ObstacleData>& apObstacle) {
     for (uint32_t i = 0; i < Obstacles.iSize; ++i) {
-        if ((&Obstacles.GetAt(static_cast<int32_t>(i)))->m_pObject->spObstacle.operator==(apObstacle)) {
+        if ((&Obstacles.GetAt(static_cast<int32_t>(i)))->m_pObject->spObstacle == apObstacle) {
             return i;
         }
     }
@@ -216,7 +216,7 @@ bool NavMesh::RemoveObstacle(uint32_t aiUndoIndex, TaskPortalSwap& aPortalSwaps)
                     if (iobstacleIndex > aiUndoIndex) {
                         NiPointer<ObstacleData>* p_spObstacle =
                             &(&Obstacles.GetAt(static_cast<int32_t>(iobstacleIndex)))->m_pObject->spObstacle;
-                        obstaclesToReAdd[iobstacleToReAddCount++].operator=(*p_spObstacle);
+                        obstaclesToReAdd[iobstacleToReAddCount++] = *p_spObstacle;
                     }
                 }
                 cutter_3.ResetNavMeshFromObstacleUndoData(
@@ -1456,7 +1456,7 @@ bool NavMesh::FindRandomPointWithinRadius(const NiPoint3& aStartLocation, float 
     if (!IsPointInsideNavmesh) {
         return false;
     }
-    aLocation.operator+=(aStartLocation);
+    aLocation += aStartLocation;
     *apRet1 = MoveAwayFromEdge(aLocation, 64.0f);
     return true;
 }
@@ -1487,7 +1487,7 @@ NiPoint3 NavMesh::MoveAwayFromEdge(const NiPoint3& aLocation, float afDistance) 
                         triangleNormal.Cross(vertices.Vertices[0]->Location - vertices.Vertices[1]->Location);
                     rightAngleVector.Unitize();
                     float fScalar = afDistance - fdistanceFromEdge;
-                    retLoc.operator+=((v12 = rightAngleVector * fScalar));
+                    retLoc += (v12 = rightAngleVector * fScalar);
                 }
             }
             else {
@@ -1511,7 +1511,7 @@ NiPoint3 NavMesh::MoveAwayFromEdge(const NiPoint3& aLocation, float afDistance) 
                             triangleNormal_2.Cross(vertices_2.Vertices[0]->Location - vertices_2.Vertices[1]->Location);
                         rightAngleVector_2.Unitize();
                         float v7 = afDistance - fdistanceFromEdge_2;
-                        retLoc.operator+=((v10 = rightAngleVector_2 * v7));
+                        retLoc += (v10 = rightAngleVector_2 * v7);
                     }
                 }
             }
@@ -1578,7 +1578,7 @@ NavMesh::FIEResult* NavMesh::FindInterectingEdge2(
             if (i_2 == 2) {
                 j = 0;
             }
-            if (!edgeVerts[i_2].operator==(edgeVerts[j])) {
+            if (!(edgeVerts[i_2] == edgeVerts[j])) {
                 v12.~FIEResult();
                 ::new (&v12) NavMesh::FIEResult;
                 if (NavMeshMath::Find2DIntersectionStable(
@@ -1718,7 +1718,7 @@ void NavMesh::FixPortalsFromNavMeshDeletion(NavMeshInfo* apNavmeshInfo) {
                     if (!pinfo->GetNavMeshEvenDisabled(spnavmesh)) {
                         TESForm* pnavmeshForm = TESForm::GetFormByNumericID(pinfo->NavMeshID);
                         NavMesh* pnavmesh = dynamic_cast<NavMesh*>(pnavmeshForm);
-                        spnavmesh.operator=(NavMeshPtr::MakeNavMeshPtr(pnavmesh));
+                        spnavmesh = NavMeshPtr::MakeNavMeshPtr(pnavmesh);
                     }
                     if (spnavmesh.operator NavMesh*()) {
                         NavMesh* Object = spnavmesh.m_pObject;

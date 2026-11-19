@@ -145,7 +145,7 @@ void bhkUnaryAction::ProcessEntity(bhkWorld* apWorld) {
                 {
                     char acBuffer[512];
                     hkOstream kStream(acBuffer, 512, true);
-                    kStream.operator<<("A unary action is being added to the world before its target entities.\n");
+                    kStream << "A unary action is being added to the world before its target entities.\n";
                     hkError::s_instance->message(
                         hkError::MESSAGE_WARNING, 0x234F24FC, acBuffer,
                         "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkUnaryAction.cpp", 200

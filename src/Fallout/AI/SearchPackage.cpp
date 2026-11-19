@@ -25,7 +25,7 @@ void SearchPackage::SetCenterLocaiton(NiPoint3 point) {
 NiPoint3 SearchPackage::LookForTarget(TESObjectREFR* a2) {
     NiPoint3 arg0;
     arg0 = this->LocationCenter;
-    if (this->LocationCenter.operator==(NiPoint3_ZERO)) {
+    if (this->LocationCenter == NiPoint3_ZERO) {
         NiPoint3 v20 = a2->GetLocationOnReference();
         this->LocationCenter = HighProcess::ComputeRandomPoint(v20, 800.0f, 1000.0f, false);
         const NiPoint3* afMaxRadius = &a2->GetLocationOnReference();
@@ -49,7 +49,7 @@ NiPoint3 SearchPackage::LookForTarget(TESObjectREFR* a2) {
         Pathing::FindPointOnNavMesh(v6, v8, arg0, 300.0f, &arg0);
     }
     else {
-        PathingCoverLocation* v5 = &coverPoints.operator[](static_cast<uint32_t>(iCurrentCover));
+        PathingCoverLocation* v5 = &coverPoints[static_cast<uint32_t>(iCurrentCover)];
         PathingCoverLocation v16(*v5);
         ++iCurrentCover;
         arg0 = v16.GetLocation();

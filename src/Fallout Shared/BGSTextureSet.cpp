@@ -235,7 +235,7 @@ void BGSTextureSet::GetTexture(BSShaderProperty::TextureTypeEnum aiType, NiPoint
         BSShaderManager::GetTexture(Src, true, sptexture, true, false);
     }
 
-    aspTexture.operator=(sptexture);
+    aspTexture = sptexture;
 }
 
 // Implements the BSTextureSet function, using the same slot order as GetTextureFilename.

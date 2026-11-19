@@ -149,12 +149,12 @@ bool ImageSpaceModifierInstanceForm::StartTransition(
     }
     pLastImageSpaceMod = pImageSpaceMod;
     fLastStrength = fStrength;
-    spLastTarget.operator=(spTarget);
+    spLastTarget = spTarget;
     fStartTime = TESImageSpaceModifier::GetTickCount();
     fTransitionTime = afTransitionTime;
     pImageSpaceMod = apMod;
     fStrength = afStrength;
-    spTarget.operator=(apTarget);
+    spTarget = apTarget;
     return true;
 }
 
@@ -411,10 +411,10 @@ void ImageSpaceModifierInstanceRB::Apply() {
             fStartTime = TESImageSpaceModifier::GetTickCount();
         }
         ImageSpaceManager* pManager = BSShaderManager::GetImageSpaceManager();
-        if (spTarget.operator->()) {
+        if (spTarget) {
             NiAVObject* pTarget = spTarget.operator->();
             pTarget->UpdateWorldBound();
-            const NiBound& kBound = spTarget.operator->()->GetWorldBound();
+            const NiBound& kBound = spTarget->GetWorldBound();
             pManager->ApplyRadialBlurParamModifier(fStrength, fRampup, fStart, fRampdown, fDownStart, kBound);
         }
         else {

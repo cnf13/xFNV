@@ -537,18 +537,18 @@ hkpShapeCollection* bhkShapeCollection::operator*() const {
 
 // The container base is taken without a null test, as the game does, so it goes through a reference.
 uint32_t bhkShapeCollection::GetFirstKey() {
-    const hkpShapeContainer& kContainer = *operator*();
+    const hkpShapeContainer& kContainer = ***this;
     return kContainer.getFirstKey();
 }
 
 uint32_t bhkShapeCollection::GetNextKey(uint32_t aiOldKey) {
-    const hkpShapeContainer& kContainer = *operator*();
+    const hkpShapeContainer& kContainer = ***this;
     return kContainer.getNextKey(aiOldKey);
 }
 
 void NiAVObject::SetCollisionObject(NiCollisionObject* pkCollisionObject) {
     m_spCollisionObject = static_cast<bhkNiCollisionObject*>(pkCollisionObject);
-    if (m_spCollisionObject.operator->()) {
+    if (m_spCollisionObject) {
         NiCollisionObject* pkCollision = m_spCollisionObject.operator->();
         if (pkCollision->GetSceneGraphObject() != this) {
             pkCollision = m_spCollisionObject.operator->();

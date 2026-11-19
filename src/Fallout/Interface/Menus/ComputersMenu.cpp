@@ -729,14 +729,14 @@ void ComputersMenu::Redisplay(Tile* apTile, TERMINAL_MENU_ITEM* apMenuItem) {
                 idefault = 2;
                 apMenuItem->SetSelected(false);
             }
-            strtmp.operator+=(static_cast<const char*>(apMenuItem->ResponseText.pString));
+            strtmp += static_cast<const char*>(apMenuItem->ResponseText.pString);
         }
         else {
             if (apMenuItem) {
                 bgo = false;
             }
             else {
-                strtmp.operator+=(sComputersBack.String());
+                strtmp += sComputersBack.String();
             }
         }
         apTile->Set(4054, idefault);

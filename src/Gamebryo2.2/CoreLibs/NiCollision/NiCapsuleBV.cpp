@@ -115,7 +115,7 @@ bool NiCapsuleBV::operator==(const NiBoundingVolume& kABV) const {
 }
 
 bool NiCapsuleBV::operator!=(const NiBoundingVolume& kABV) const {
-    return !operator==(kABV);
+    return !(*this == kABV);
 }
 
 void NiCapsuleBV::AddViewerStrings(const char* pcPrefix, NiTPrimitiveArray<char*>* pkStrings) const {

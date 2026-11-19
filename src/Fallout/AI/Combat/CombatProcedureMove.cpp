@@ -91,7 +91,7 @@ void CombatProcedureMove::Update() {
                         NiPoint3* ScriptList = &prequest->CoverLocation;
                         CurrentDestination.SetLocation(*ScriptList, a2);
                         if (!pcombatState->TryReserveSecondaryCoverLocation()) {
-                            spQueuedPathingRequest.operator=(static_cast<PathingRequest*>(nullptr));
+                            spQueuedPathingRequest = static_cast<PathingRequest*>(nullptr);
                             CurrentDestination.Point.x = Destination.Point.x;
                             CurrentDestination.Point.y = Destination.Point.y;
                             CurrentDestination.Point.z = Destination.Point.z;
@@ -119,7 +119,7 @@ void CombatProcedureMove::Update() {
                     }
                 }
 
-                spQueuedPathingRequest.operator=(static_cast<PathingRequest*>(nullptr));
+                spQueuedPathingRequest = static_cast<PathingRequest*>(nullptr);
             }
             if (pattacker->DidPathingFail()) {
                 if (!pattacker->IsPathValid()) {
@@ -273,7 +273,7 @@ void CombatProcedureMove::Update() {
                                     float flength = vec.UnitizeGetLength();
                                     if (fpathLength + flength > 1536.0) {
                                         float v25 = 1536.0 - fpathLength;
-                                        vec.operator*=(v25);
+                                        vec *= v25;
                                         nextNodeLocation = previousNodeLocation + vec;
                                         bdone = true;
                                     }
@@ -567,7 +567,7 @@ void CombatProcedureMove::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     pTargetRef = v3;
     if (bHasQueuedPathingRequest) {
-        spQueuedPathingRequest.operator=(pattacker->GetCurrentPathingRequest());
+        spQueuedPathingRequest = pattacker->GetCurrentPathingRequest();
     }
 }
 
@@ -631,7 +631,7 @@ bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoid
                     else {
                         v17 = nullptr;
                     }
-                    arspAvoidNodeArray.operator=(v17);
+                    arspAvoidNodeArray = v17;
                 }
                 float a3a = fMovementNearTargetAvoidCost.Float();
                 float afRadiusa = fMovementNearTargetAvoidRadius.Float();
@@ -669,7 +669,7 @@ bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoid
     }
     if (pattacker->SetPathfindingGoal(prequest)) {
         iCurrentNode = -1;
-        spQueuedPathingRequest.operator=(pattacker->GetCurrentPathingRequest());
+        spQueuedPathingRequest = pattacker->GetCurrentPathingRequest();
         SetMoveMode(ecombatMoveMode);
         return true;
     }
@@ -683,7 +683,7 @@ void CombatProcedureMove::CreateAvoidNodeArray(NiPointer<PathingAvoidNodeArray>&
     CombatState* pcombatState = pCombatController->pCombatState;
     const NiPoint3* v2 = &pattacker->GetLocationOnReference();
     PathingAvoidNodeArray* AvoidNodeArray = pCombatManager->pThreatMap->CreateAvoidNodeArray(*v2, pattacker, -1.0f);
-    arspAvoidNodeArray.operator=(AvoidNodeArray);
+    arspAvoidNodeArray = AvoidNodeArray;
     float a2 = CombatTimer::GetTimer();
     pcombatState->SetThreatsConsideredTimeStamp(a2);
     Actor* pignoreActor = nullptr;
@@ -698,7 +698,7 @@ void CombatProcedureMove::CreateAvoidNodeArray(NiPointer<PathingAvoidNodeArray>&
                     pCombatController->pCombatGroup->CreateFlankingAvoidNodeArray(
                         pattacker, (&Destination)->Point, 0.0f, arspAvoidNodeArray.m_pObject
                     );
-                arspAvoidNodeArray.operator=(FlankingAvoidNodeArray);
+                arspAvoidNodeArray = FlankingAvoidNodeArray;
             }
         }
     }
@@ -706,7 +706,7 @@ void CombatProcedureMove::CreateAvoidNodeArray(NiPointer<PathingAvoidNodeArray>&
         PathingAvoidNodeArray* MovementAvoidNodeArray = pCombatController->pCombatGroup->CreateMovementAvoidNodeArray(
             pattacker, (&Destination)->Point, 0.0f, arspAvoidNodeArray.m_pObject, pignoreActor
         );
-        arspAvoidNodeArray.operator=(MovementAvoidNodeArray);
+        arspAvoidNodeArray = MovementAvoidNodeArray;
     }
 }
 

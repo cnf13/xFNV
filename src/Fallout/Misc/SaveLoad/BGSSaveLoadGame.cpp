@@ -618,7 +618,7 @@ void BGSSaveLoadGame::InitForms(bool abLoadModels) {
         pIOManager->ForceHighestPriority();
     }
     for (uint32_t i = 0; i < this->FormBufferArray.iSize; ++i) {
-        BGSLoadFormBuffer* ploadFormBuffer = this->FormBufferArray.operator[](i);
+        BGSLoadFormBuffer* ploadFormBuffer = this->FormBufferArray[i];
         if (ploadFormBuffer) {
             TESForm* pform = ploadFormBuffer->GetForm();
             if (pform) {
@@ -645,7 +645,7 @@ void BGSSaveLoadGame::InitForms(bool abLoadModels) {
     }
     this->pQueuedSubBuffersMap->LoadAllQueuedSubBuffers();
     for (uint32_t i_2 = 0; i_2 < this->FormBufferArray.iSize; ++i_2) {
-        BGSLoadFormBuffer* ploadFormBuffer_2 = this->FormBufferArray.operator[](i_2);
+        BGSLoadFormBuffer* ploadFormBuffer_2 = this->FormBufferArray[i_2];
         if (ploadFormBuffer_2) {
             TESForm* pform_2 = ploadFormBuffer_2->GetForm();
             if (pform_2) {

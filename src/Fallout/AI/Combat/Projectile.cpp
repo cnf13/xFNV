@@ -411,7 +411,7 @@ void Projectile::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     iactorCauseID = -1;
     apLoadGameBuffer->LoadData(&iactorCauseID, 4u);
     ActorCause* ActorCauseByID = ActorCause::GetActorCauseByID(iactorCauseID);
-    spActorCause.operator=(ActorCauseByID);
+    spActorCause = ActorCauseByID;
     if (apLoadGameBuffer->GetVersion() >= 3u) {
         bhasSecondaryItemChange = false;
         apLoadGameBuffer->LoadData(&bhasSecondaryItemChange, 1u);
@@ -514,9 +514,9 @@ void Projectile::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     pWeaponSource = nullptr;
     pShooter = nullptr;
     pDesiredTarget = nullptr;
-    spLight.operator=(static_cast<NiLight*>(nullptr));
-    spPickCache.operator=(static_cast<ProjectilePickCache*>(nullptr));
-    spActorCause.operator=(static_cast<ActorCause*>(nullptr));
+    spLight = static_cast<NiLight*>(nullptr);
+    spPickCache = static_cast<ProjectilePickCache*>(nullptr);
+    spActorCause = static_cast<ActorCause*>(nullptr);
     bSendAlarm = false;
     fDecalSize = 0.0f;
     fExplosionTimer = 3.4028235e+38f;
@@ -1069,7 +1069,7 @@ void Projectile::CleanUpPointersOnDisable() {
         }
         ImpactList.RemoveHead();
     }
-    spActorCause.operator=(static_cast<ActorCause*>(nullptr));
+    spActorCause = static_cast<ActorCause*>(nullptr);
     if (pTarget) {
         ProjectileTarget* CurrentFurniture = pTarget;
         if (CurrentFurniture) {
@@ -1191,7 +1191,7 @@ void Projectile::Initialize() {
         NiNode* v6 = Get3D();
         v6->UpdateSelectedDownwardPass(UpdateData, 0);
     }
-    spPickCache.operator=(static_cast<ProjectilePickCache*>(nullptr));
+    spPickCache = static_cast<ProjectilePickCache*>(nullptr);
 }
 
 bool Projectile::ProcessImpacts() {
@@ -1412,8 +1412,8 @@ bool Projectile::RunTargetPick() {
             kFilter.SetGroup(bhkCollisionFilter::GetNewSystemGroup());
         }
     }
-    if (spPickCache.operator->() && spPickCache.operator->()->GetCache()) {
-        kPickData.SetCache(spPickCache.operator->()->GetCache());
+    if (spPickCache.operator->() && spPickCache->GetCache()) {
+        kPickData.SetCache(spPickCache->GetCache());
     }
     float fLength = GetRange() - GetDistanceMoved();
     NiPoint3 kLength = kForward * fLength;
@@ -2075,7 +2075,7 @@ float Projectile::GetAlpha() {
 void Projectile::UpdateLight() {
     if (spLight.operator->() && IsFlagSet(FADING)) {
         float fDimmer = BSMAX(0.0f, BSMIN(1.0f, fAlpha));
-        spLight.operator->()->SetDimmer(fDimmer);
+        spLight->SetDimmer(fDimmer);
     }
 }
 
@@ -2130,7 +2130,7 @@ void Projectile::ApplyImpactForce(
     ::new (&kForce) hkSimdReal(fForce);
     kImpulse.mul4(kForce);
     pWorld->markForWrite();
-    pRigidBody->operator*()->applyPointImpulse(kImpulse, kPoint);
+    (**pRigidBody)->applyPointImpulse(kImpulse, kPoint);
     pWorld->unmarkForWrite();
 }
 
@@ -2296,7 +2296,7 @@ void Projectile::DetachLight() {
         v2 = (&spLight)->m_pObject;
         shadowSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
         shadowSceneNode->RemoveLight(v2);
-        (&spLight)->operator=(nullptr);
+        spLight = nullptr;
     }
 }
 
@@ -2305,7 +2305,7 @@ void Projectile::AimAtPoint(NiPoint3 aTargetLocation) {
     float v5;
     NiPoint3 result;
     const NiPoint3* v2 = &GetLocationOnReference();
-    (result = (&aTargetLocation)->operator-(*v2));
+    (result = aTargetLocation - *v2);
     NiPoint3 arVector = result;
     (&arVector)->Unitize();
     float v7 = GetHeading(false);
@@ -2390,7 +2390,7 @@ void Projectile::AddInitialVelocity() {
                 bhkWorld::Enable(abReset, true, true, true);
                 (&abReset->GetWorldTransform())->m_Rotate.GetCol(1u, a3);
                 float a2 = GetSpeed();
-                a3.operator*=(a2);
+                a3 *= a2;
                 TESHavokUtilities::AddVelocity(abReset, a3, true);
                 AddChange(4);
             }
@@ -2448,7 +2448,7 @@ bool Projectile::TestProjectileInTriggerZone() {
         if (!pworld) {
             return btriggerFound;
         }
-        hkpWorld* phkworld = (hkpWorld*)pworld->operator*();
+        hkpWorld* phkworld = (hkpWorld*)**pworld;
         if (phkworld) {
             pbroadphase = phkworld->m_broadPhase;
         }
@@ -2473,7 +2473,7 @@ bool Projectile::TestProjectileInTriggerZone() {
             if (i >= FormHealth_0) {
                 break;
             }
-            hkpBroadPhaseHandlePair* ppair = &hits.operator[](i);
+            hkpBroadPhaseHandlePair* ppair = &hits[i];
             hkpTypedBroadPhaseHandle* tp = static_cast<hkpTypedBroadPhaseHandle*>(ppair->m_b);
             const hkpCollidable* collB = static_cast<const hkpCollidable*>(tp->getOwner());
             NiAVObject* pav = GetAVObjectForCollidable(collB);
@@ -2857,7 +2857,7 @@ void Projectile::AttachLight() {
     if ((Get3D()) && (GetProjectileBase()->Data.pLight) && (!GetDelete())) {
         NiNode* v2 = Get3D();
         TESObjectLIGH* v1 = GetProjectileBase()->Data.pLight;
-        spLight.operator=(v1->GenDynamic(this, v2, false));
+        spLight = v1->GenDynamic(this, v2, false);
     }
 }
 
@@ -3286,10 +3286,10 @@ bool Projectile::PickSceneGraph(bhkPickData* apPickData, NiAVObject* apObject, b
                 ::new (&kOutput) hkpShapeRayCastOutput;
                 kInput.m_from.setTransformedInversePos(kTransform, *apPickData->GethkFrom());
                 kInput.m_to.setTransformedInversePos(kTransform, apPickData->GethkTo());
-                pShape->operator*()->castRay(kInput, kOutput);
+                (**pShape)->castRay(kInput, kOutput);
                 if (kOutput.hasHit()) {
                     hkpRayHitCollector* pCollector = apPickData->GetAllCollector();
-                    const hkpCollidable* pCollidable = pWorldObject->operator*()->getCollidable();
+                    const hkpCollidable* pCollidable = (**pWorldObject)->getCollidable();
                     pCollector->addRayHit(*pCollidable, kOutput);
                     bHit = true;
                 }
@@ -3470,8 +3470,8 @@ NiAVObject* Projectile::ProcessTargetPick(
                                     bhkPickData pd;
                                     apPickData->GetFrom(from);
                                     apPickData->GetLength(length);
-                                    pickLength.operator*=(2.0f);
-                                    length.operator*=(2.0f);
+                                    pickLength *= 2.0f;
+                                    length *= 2.0f;
                                     CFilter* v12 = apPickData->GetFilter(&kPickFilter);
                                     pd.SetFilter(*v12);
                                     pd.NiSetFrom(from);
@@ -3482,7 +3482,7 @@ NiAVObject* Projectile::ProcessTargetPick(
                                         (&pd.pAllCollector->getHits())->m_size > 0) {
                                         const hkpWorldRayCastOutput* v13 =
                                             &(&pd.pAllCollector->getHits())->operator[]<hkpWorldRayCastOutput>(0);
-                                        point.operator=(*v13);
+                                        point = *v13;
                                         v75 = 1;
                                     }
                                 }
@@ -3667,7 +3667,7 @@ hkpWorldRayCastOutput& hkpWorldRayCastOutput::operator=(const hkpWorldRayCastOut
 
 hkpShapeRayCastCollectorOutput&
 hkpShapeRayCastCollectorOutput::operator=(const hkpShapeRayCastCollectorOutput& arOther) {
-    m_normal.operator=(arOther.m_normal);
+    m_normal = arOther.m_normal;
     m_hitFraction = arOther.m_hitFraction;
     m_extraInfo = arOther.m_extraInfo;
     for (uint32_t i = 0; i < 2; ++i) {

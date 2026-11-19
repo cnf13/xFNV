@@ -81,7 +81,7 @@ int32_t au_re_InterlockedExchange(volatile int32_t* apTarget, int32_t aiValue) {
 // Each element is copied into the local spObject and released at the end of each pass.
 void MoveQueuedNiAVObjects(NiTObjectArray<NiPointer<NiAVObject>>* a1, NiTObjectArray<NiPointer<NiAVObject>>* a2) {
     for (uint32_t uiIndex = 0; uiIndex < a1->m_usSize; ++uiIndex) {
-        NiPointer<NiAVObject> spObject(a1->operator[](uiIndex));
+        NiPointer<NiAVObject> spObject((*a1)[uiIndex]);
         if (spObject.m_pObject) {
             NiAVObjectArray_Add(a2, spObject);
         }
@@ -148,7 +148,7 @@ void GarbageCollector::Update() {
             while (inumObjects && iremovecount) {
                 --inumObjects;
                 --iremovecount;
-                Animation* panim = GarbageCollector::AnimGarbageA.operator[](inumObjects);
+                Animation* panim = GarbageCollector::AnimGarbageA[inumObjects];
                 GarbageCollector::AnimGarbageA.RemoveAt(inumObjects);
                 if (panim) {
                     delete panim;
@@ -165,7 +165,7 @@ void GarbageCollector::Update() {
                 while (inumObjects && iremovecount) {
                     --inumObjects;
                     --iremovecount;
-                    BipedAnim* pbiped = GarbageCollector::kBipedAnims.operator[](inumObjects);
+                    BipedAnim* pbiped = GarbageCollector::kBipedAnims[inumObjects];
                     GarbageCollector::kBipedAnims.RemoveAt(inumObjects);
                     if (pbiped) {
                         delete pbiped;
@@ -210,7 +210,7 @@ void GarbageCollector::Update() {
                                 while (inumObjects && (iremovecount && iActors)) {
                                     --inumObjects;
                                     --iremovecount;
-                                    TESObjectREFR* pref = GarbageCollector::ObjectGarbageA.operator[](0);
+                                    TESObjectREFR* pref = GarbageCollector::ObjectGarbageA[0];
                                     if (pref->IsActor() || pref->GetTargeted()) {
                                         --iActors;
                                     }
@@ -293,7 +293,7 @@ void GarbageCollector::ClearAll(bool abTryEnter) {
             if (!GarbageCollectorCS::GetFlag(8u) && pModelLoader->TryLockModelMap()) {
                 uint32_t icount = GarbageCollector::AnimGarbageA.m_usSize;
                 for (uint32_t uiIndex = 0; uiIndex < icount; ++uiIndex) {
-                    Animation* panim = GarbageCollector::AnimGarbageA.operator[](uiIndex);
+                    Animation* panim = GarbageCollector::AnimGarbageA[uiIndex];
                     if (panim) {
                         delete panim;
                     }
@@ -304,7 +304,7 @@ void GarbageCollector::ClearAll(bool abTryEnter) {
             if (!GarbageCollectorCS::GetFlag(4u) && pModelLoader->TryLockModelMap()) {
                 uint32_t icount_2 = GarbageCollector::kBipedAnims.m_usSize;
                 for (uint32_t i = 0; i < icount_2; ++i) {
-                    BipedAnim* pbiped = GarbageCollector::kBipedAnims.operator[](i);
+                    BipedAnim* pbiped = GarbageCollector::kBipedAnims[i];
                     if (pbiped) {
                         delete pbiped;
                     }
@@ -314,15 +314,15 @@ void GarbageCollector::ClearAll(bool abTryEnter) {
             }
             if (!GarbageCollectorCS::GetFlag(2u)) {
                 for (uint32_t j = 0; j < GarbageCollector::Actor3DGarbageA.m_usSize; ++j) {
-                    if ((&GarbageCollector::Actor3DGarbageA.operator[](j))->m_pObject) {
-                        (&GarbageCollector::Actor3DGarbageA.operator[](j))->m_pObject->RemoveGarbageMark();
+                    if ((&GarbageCollector::Actor3DGarbageA[j])->m_pObject) {
+                        (&GarbageCollector::Actor3DGarbageA[j])->m_pObject->RemoveGarbageMark();
                     }
                 }
                 GarbageCollector::Actor3DGarbageA.RemoveAll();
             }
             if (!GarbageCollectorCS::GetFlag(1u) && pModelLoader->TryLockModelMap()) {
                 while (GarbageCollector::ObjectGarbageA.m_usSize) {
-                    TESObjectREFR* pref = GarbageCollector::ObjectGarbageA.operator[](0);
+                    TESObjectREFR* pref = GarbageCollector::ObjectGarbageA[0];
                     if (pref) {
                         delete pref;
                     }

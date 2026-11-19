@@ -269,7 +269,7 @@ void CombatController::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = BackgroundProcedures.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        SaveProcedure(BackgroundProcedures.operator[](i), apSaveGameBuffer);
+        SaveProcedure(BackgroundProcedures[i], apSaveGameBuffer);
     }
     apData = pCombatPlan != nullptr;
     apSaveGameBuffer->SaveDataEndian(&apData, 1u, 0);
@@ -320,7 +320,7 @@ void CombatController::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     BackgroundProcedures.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        LoadProcedure(BackgroundProcedures.operator[](i), apLoadGameBuffer);
+        LoadProcedure(BackgroundProcedures[i], apLoadGameBuffer);
     }
     bhasPlan = false;
     apLoadGameBuffer->LoadData(&bhasPlan, 1u);
@@ -396,7 +396,7 @@ void CombatController::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     uint32_t FormFlags = BackgroundProcedures.iSize;
     for (uint32_t auiIndex = 0; auiIndex < FormFlags; ++auiIndex) {
-        CombatProcedure** pbackgroundProcedure = &BackgroundProcedures.operator[](auiIndex);
+        CombatProcedure** pbackgroundProcedure = &BackgroundProcedures[auiIndex];
         (*pbackgroundProcedure)->InitLoadGame(apLoadGameBuffer);
     }
     pCombatState->InitLoadGame(apLoadGameBuffer);
@@ -700,7 +700,7 @@ void CombatController::SetActualMoveMode(uint32_t aiMoveMode) {
 
 CombatProcedure* CombatController::GetBackgroundProcedure(int32_t aiProcedureType) {
     for (uint32_t auiIndex = 0; auiIndex < BackgroundProcedures.iSize; ++auiIndex) {
-        CombatProcedure* v4 = BackgroundProcedures.operator[](auiIndex);
+        CombatProcedure* v4 = BackgroundProcedures[auiIndex];
         if (v4->GetType() == aiProcedureType) {
             return v4;
         }
@@ -970,8 +970,8 @@ uint8_t CombatController::HasLineOfSight() {
 }
 
 void CombatController::SetIsBlocking(char a2) {
-    reinterpret_cast<hkEnum<hkpWorldObject::BroadPhaseType, int8_t>*>(pCombatState)
-        ->operator=(static_cast<hkpWorldObject::BroadPhaseType>(a2));
+    *reinterpret_cast<hkEnum<hkpWorldObject::BroadPhaseType, int8_t>*>(pCombatState) =
+        static_cast<hkpWorldObject::BroadPhaseType>(a2);
 }
 
 char CombatController::IsBlocking() {
@@ -1240,7 +1240,7 @@ void CombatController::Update() {
                                 }
                                 if (pattacker->IsInCombat()) {
                                     for (int32_t i = 0; i < BackgroundProcedures.iSize; ++i) {
-                                        CombatProcedure* pbackgroundProcedure = BackgroundProcedures.operator[](i);
+                                        CombatProcedure* pbackgroundProcedure = BackgroundProcedures[i];
                                         pbackgroundProcedure->Update();
                                         if (pbackgroundProcedure->GetFinished() || pbackgroundProcedure->GetFailed()) {
                                             if (pbackgroundProcedure->GetFailed()) {
@@ -1591,7 +1591,7 @@ int32_t CombatController::GetAttackSkill() {
 
 void CombatController::AddBackgroundProcedure(CombatProcedure* apBackgroundProcedure) {
     for (uint32_t i = 0; i < BackgroundProcedures.iSize; ++i) {
-        CombatProcedure* pbackgroundProcedure = BackgroundProcedures.operator[](i);
+        CombatProcedure* pbackgroundProcedure = BackgroundProcedures[i];
         CombatProcedure::COMBAT_PROCEDURES v2 = pbackgroundProcedure->GetType();
         if (v2 == apBackgroundProcedure->GetType()) {
             pbackgroundProcedure->Shutdown();

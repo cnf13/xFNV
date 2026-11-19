@@ -21,7 +21,7 @@ void SkyObject::Initialize(NiNode* apSkyRoot) {
     else {
         NiNode_ = nullptr;
     }
-    spRoot.operator=(NiNode_);
+    spRoot = NiNode_;
     spRoot.m_pObject->SetSelectiveUpdate(true);
     spRoot.m_pObject->SetDisplayObject(true);
     apSkyRoot->AttachChild(spRoot.m_pObject, 1);

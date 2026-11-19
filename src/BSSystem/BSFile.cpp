@@ -223,7 +223,7 @@ uint32_t BSFile::Read(BSStringT<char16_t>& arString, uint32_t aiMaxLength) {
         }
         while (ibuffer != 260 && v7);
         if (itotal) {
-            arString.operator+=(static_cast<const char16_t*>(String));
+            arString += static_cast<const char16_t*>(String);
         }
         else {
             arString.Set(String, 0);
@@ -265,7 +265,7 @@ uint32_t BSFile::Read(BSStringT<char>& arString, uint32_t aiMaxLength) {
         while (v11 != 259 && v7);
         apString[v11] = 0;
         if (v9) {
-            arString.operator+=(apString);
+            arString += apString;
         }
         else {
             arString.Set(apString, 0u);

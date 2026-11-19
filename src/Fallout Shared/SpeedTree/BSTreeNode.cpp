@@ -580,10 +580,10 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             pTransformInfo->m_transform.Trans = kTranslation;
             void* pMemory = NiMemObject::operator new(sizeof(bhkSphereShape));
             bhkSphereShape* pSphere = pMemory ? ::new (pMemory) bhkSphereShape(afDimensions[0], false) : nullptr;
-            pTransformInfo->m_childShape = pSphere->operator*();
+            pTransformInfo->m_childShape = **pSphere;
             pMemory = NiMemObject::operator new(sizeof(bhkTransformShape));
             bhkShape* pTransformShape = pMemory ? ::new (pMemory) bhkTransformShape(*pTransformInfo) : nullptr;
-            pPhantomInfo->m_shape = pTransformShape->operator*();
+            pPhantomInfo->m_shape = **pTransformShape;
         }
         else if (eType == CSpeedTreeRT::CO_CYLINDER) {
             alignas(16) uint8_t aCapsuleInfoStorage[sizeof(hkCapsuleShapeCinfo)];
@@ -597,7 +597,7 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             pCapsuleInfo->m_radius = afDimensions[0];
             void* pMemory = NiMemObject::operator new(sizeof(bhkCapsuleShape));
             bhkShape* pCapsule = pMemory ? ::new (pMemory) bhkCapsuleShape(*pCapsuleInfo) : nullptr;
-            pPhantomInfo->m_shape = pCapsule->operator*();
+            pPhantomInfo->m_shape = **pCapsule;
         }
         else if (eType == CSpeedTreeRT::CO_BOX) {
             alignas(16) uint8_t aTransformInfoStorage[sizeof(hkTransformShapeCinfo)];
@@ -611,10 +611,10 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             pTransformInfo->m_transform.Trans = kTranslation;
             void* pMemory = NiMemObject::operator new(sizeof(bhkBoxShape));
             bhkShape* pBox = pMemory ? ::new (pMemory) bhkBoxShape(kHalfExtents) : nullptr;
-            pTransformInfo->m_childShape = pBox->operator*();
+            pTransformInfo->m_childShape = **pBox;
             pMemory = NiMemObject::operator new(sizeof(bhkTransformShape));
             bhkShape* pTransformShape = pMemory ? ::new (pMemory) bhkTransformShape(*pTransformInfo) : nullptr;
-            pPhantomInfo->m_shape = pTransformShape->operator*();
+            pPhantomInfo->m_shape = **pTransformShape;
         }
     }
     else {
@@ -638,7 +638,7 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
         }
         void* pMemory = NiMemObject::operator new(sizeof(bhkMultiSphereShape));
         bhkShape* pMulti = pMemory ? ::new (pMemory) bhkMultiSphereShape(*pMultiInfo) : nullptr;
-        pPhantomInfo->m_shape = pMulti->operator*();
+        pPhantomInfo->m_shape = **pMulti;
         pMultiInfo->~hkMultiSphereShapeCinfo();
     }
     CFilter kFilter;

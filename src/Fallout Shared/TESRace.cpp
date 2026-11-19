@@ -1208,9 +1208,9 @@ bool TESRace::GetBodyTexture(
         esex = TESActorBase::SEX_MALE;
     }
     BSStringT<char> fileEGT;
-    aspOutBaseTexture.operator=(static_cast<NiTexture*>(nullptr));
+    aspOutBaseTexture = static_cast<NiTexture*>(nullptr);
     if (!abForceCreate && apNPC != pPlayer->GetObjectReference()) {
-        aspOutModTexture.operator=(static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture()));
+        aspOutModTexture = static_cast<NiTexture*>(BSFaceGenManager::GetBaseTexture());
     }
     bool bResult = false;
     if (!GetBodyTextureFileName(apNPC, aePart, path)) {
@@ -1233,7 +1233,7 @@ bool TESRace::GetBodyTexture(
             pcString, reinterpret_cast<NiPointer<NiSourceTexture>&>(aspOutModTexture), true, false
         );
     }
-    if (aspOutModTexture.operator==(static_cast<NiTexture*>(nullptr)) || abForceCreate) {
+    if (aspOutModTexture == static_cast<NiTexture*>(nullptr) || abForceCreate) {
         if (!abForceCreate && apNPC != pPlayer->GetObjectReference()) {
             Warning(
                 "Failed to find body mod texture '%s' for '%s' (%08X). Creating from scratch.", Path, GetFormEditorID(),
@@ -1255,9 +1255,7 @@ bool TESRace::GetBodyTexture(
         BSstrcpy(acModelPath, 260, "Meshes\\");
         BSstrcat(acModelPath, 260, pmodel->GetModel());
         const char* pEGTFile = BSFaceGenManager::GetAsEGTFile(fileEGT, acModelPath);
-        pmodelFG.operator=(
-            BSFaceGenManager::GetFaceGenModel(nullptr, nullptr, nullptr, pEGTFile, true, HAIR_PART_NONE, false)
-        );
+        pmodelFG = BSFaceGenManager::GetFaceGenModel(nullptr, nullptr, nullptr, pEGTFile, true, HAIR_PART_NONE, false);
         if (!pmodelFG.m_pObject) {
             goto done;
         }

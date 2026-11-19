@@ -165,10 +165,10 @@ bool DoorTeleportData::Compare(DoorTeleportData* apCompare) {
     if (LinkedDoor != apCompare->pLinkedDoor) {
         return true;
     }
-    if ((&position)->operator!=(*&apCompare->position)) {
+    if (position != *&apCompare->position) {
         return true;
     }
-    if ((&rotation)->operator!=(*&apCompare->rotation)) {
+    if (rotation != *&apCompare->rotation) {
         return true;
     }
     return cFlags != apCompare->cFlags;

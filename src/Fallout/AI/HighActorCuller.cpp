@@ -79,7 +79,7 @@ void HighActorCuller::Init(NiCamera* apCamera) {
     else {
         v9 = nullptr;
     }
-    (&spMBSphere)->operator=(v9);
+    spMBSphere = v9;
     void* v12 = NiMemObject::operator new(sizeof(BSMultiBound));
     if (v12) {
         v8 = ::new (v12) BSMultiBound;
@@ -87,7 +87,7 @@ void HighActorCuller::Init(NiCamera* apCamera) {
     else {
         v8 = nullptr;
     }
-    (&spMB)->operator=(v8);
+    spMB = v8;
     void* apMemory = NiMemObject::operator new(sizeof(BSMultiBoundNode));
     if (apMemory) {
         v7 = ::new (apMemory) BSMultiBoundNode;
@@ -95,7 +95,7 @@ void HighActorCuller::Init(NiCamera* apCamera) {
     else {
         v7 = nullptr;
     }
-    (&spMBNode)->operator=(v7);
+    spMBNode = v7;
     BSMultiBoundSphere* v5 = (&spMBSphere)->m_pObject;
     BSMultiBound* v3 = (&spMB)->m_pObject;
     v3->SetShape(v5);
@@ -105,7 +105,7 @@ void HighActorCuller::Init(NiCamera* apCamera) {
 }
 
 void HighActorCuller::Run(NiCamera* apCamera) {
-    if (spMBSphere.operator==(nullptr)) {
+    if (spMBSphere == nullptr) {
         Init(apCamera);
     }
     else {

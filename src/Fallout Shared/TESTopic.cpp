@@ -1028,13 +1028,13 @@ TESTopicInfo* TESTopic::GetMatchingInfo(
             }
             uint32_t maxLinkSize = pQuestInfo->infoLinkArray.iSize;
             for (uint32_t infolinkiter = 0; infolinkiter < maxLinkSize; ++infolinkiter) {
-                if ((&pQuestInfo->infoLinkArray.operator[](infolinkiter))->pInfo) {
+                if ((&pQuestInfo->infoLinkArray[infolinkiter])->pInfo) {
                     uint32_t CastingType;
-                    int32_t insertIdx = (&pQuestInfo->infoLinkArray.operator[](infolinkiter))->nDesiredIndex;
+                    int32_t insertIdx = (&pQuestInfo->infoLinkArray[infolinkiter])->nDesiredIndex;
                     if (insertIdx < 0 || (CastingType = BuiltArray.m_uiSize, insertIdx > CastingType)) {
                         insertIdx = BuiltArray.m_uiSize;
                     }
-                    TESTopicInfo* pInfo = (&pQuestInfo->infoLinkArray.operator[](infolinkiter))->pInfo;
+                    TESTopicInfo* pInfo = (&pQuestInfo->infoLinkArray[infolinkiter])->pInfo;
                     BuiltArray.InsertInfoAt(insertIdx, pInfo);
                 }
             }

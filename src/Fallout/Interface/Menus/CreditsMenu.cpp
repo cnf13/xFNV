@@ -281,7 +281,7 @@ void CreditsMenu::InitCreditsRoot() {
                 v15 = nullptr;
             }
             NiRefObject* v25 = (NiRefObject*)v15;
-            spScrollRoot.operator=(v15);
+            spScrollRoot = v15;
             NiPoint3* v4 = ::new (&dst) NiPoint3(0.0f, 0.0f, -1020.0f);
             spScrollRoot.m_pObject->SetTranslate(*v4);
             NiDX9Renderer* NIRenderer = Renderer::GetNIRenderer();

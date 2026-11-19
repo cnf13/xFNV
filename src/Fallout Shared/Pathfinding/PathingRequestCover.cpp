@@ -187,8 +187,8 @@ PathingCoverLocation& PathingCoverLocation::operator=(const PathingCoverLocation
 bool PathingCoverLocation::IsLeftSideClosest(const NiPoint3& arPoint) {
     NiPoint3 v5;
     NiPoint3 v6;
-    (v5 = (&LeftVertex)->operator-(arPoint));
-    (v6 = (&RightVertex)->operator-(arPoint));
+    (v5 = LeftVertex - arPoint);
+    (v6 = RightVertex - arPoint);
     double v3 = (double)(&v5)->SqrLength();
     return (bool)((uint8_t)((&v6)->SqrLength() > v3));
 }

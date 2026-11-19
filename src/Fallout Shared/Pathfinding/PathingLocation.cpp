@@ -446,7 +446,7 @@ const NavMeshInfo* PathingLocation::GetBestNavMeshInfo() {
         return nullptr;
     }
     if (QAllMeshesReachable()) {
-        return pNavMeshes->operator[](0);
+        return (*pNavMeshes)[0];
     }
     return nullptr;
 }
@@ -474,7 +474,7 @@ bool PathingLocation::IsCloseTo(const PathingLocation& aOtherLoc, float afTolera
             return false;
         }
     }
-    NiPoint3* v4 = &(v5 = (&(&aOtherLoc)->Location)->operator-(Location));
+    NiPoint3* v4 = &(v5 = (&aOtherLoc)->Location - Location);
     return (bool)((uint8_t)(!((afTolerance * afTolerance) < v4->SqrLength())));
 }
 
@@ -660,12 +660,12 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
         a3[0] = -1;
         bpointInside_2 = false;
         NavMeshPtr spmesh_2;
-        const NavMeshInfo* pinfo = pNavMeshes->operator[](i);
+        const NavMeshInfo* pinfo = (*pNavMeshes)[i];
         if (pinfo->GetDisabled() ||
             (!pinfo->GetNavMesh(spmesh_2) ||
              spmesh_2.m_pObject->FindClosestTriangleForLocation(Location, a3, &bpointInside_2))) {
             if (bpointInside_2) {
-                pNavMesh = pNavMeshes->operator[](i);
+                pNavMesh = (*pNavMeshes)[i];
                 pNavMeshes = nullptr;
                 usTriangle = a3[0];
                 bool v13 = true;
@@ -708,7 +708,7 @@ bool PathingLocation::ResolveToClosestNavmeshAndTriangle() {
         return false;
     }
 
-    pNavMesh = pNavMeshes->operator[](ibestNavMesh);
+    pNavMesh = (*pNavMeshes)[ibestNavMesh];
     pNavMeshes = nullptr;
     usTriangle = usbestTri;
     NavMeshPtr spmesh_3;
@@ -820,7 +820,7 @@ void PathingLocation::PrintDebugText(char* apBuffer, int32_t aiMaxSize) {
                 if (i >= FormFlags) {
                     break;
                 }
-                BSsprintf(Src, 64, "%08x", pNavMeshes->operator[](i)->NavMeshID);
+                BSsprintf(Src, 64, "%08x", (*pNavMeshes)[i]->NavMeshID);
                 BSstrcat(navmeshBuffer, 256, Src);
                 uint32_t v4 = pNavMeshes->iSize;
                 if (i < v4 - 1) {
@@ -828,8 +828,8 @@ void PathingLocation::PrintDebugText(char* apBuffer, int32_t aiMaxSize) {
                 }
             }
             BSstrcat(navmeshBuffer, 256, "]");
-            TESWorldSpace* pspace = pNavMeshes->operator[](0)->GetWorldSpace();
-            TESObjectCELL* pcell_2 = pNavMeshes->operator[](0)->GetCell();
+            TESWorldSpace* pspace = (*pNavMeshes)[0]->GetWorldSpace();
+            TESObjectCELL* pcell_2 = (*pNavMeshes)[0]->GetCell();
             if (pspace) {
                 const char* v5;
                 int32_t v17 = static_cast<int32_t>(Location.x) >> 12;

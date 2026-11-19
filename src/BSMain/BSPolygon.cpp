@@ -155,7 +155,7 @@ void BSPolygon2D::Triangulate() {
     int32_t i = 2;
     NiPoint3 vert = pVertexSimpleArray->pBuffer[2];
     NiPoint3 first = *pVertexSimpleArray->pBuffer;
-    while (!vert.operator==(first) && indexlist.iSize > 3) {
+    while (!(vert == first) && indexlist.iSize > 3) {
         int32_t j = i - 2;
         int32_t k = i - 1;
         int32_t iCount = indexlist.iSize;
@@ -314,7 +314,7 @@ void BSPolygon2D::Triangulate() {
     if (iTriangleCount > 0) {
         NiNode* v1;
         NiTriShapeData* data = CreateTriData();
-        sp3D.operator=(CreateTriShape(data));
+        sp3D = CreateTriShape(data);
         NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
         if (apMemory) {
             v1 = ::new (apMemory) NiNode(0);
@@ -322,7 +322,7 @@ void BSPolygon2D::Triangulate() {
         else {
             v1 = nullptr;
         }
-        spRootNode.operator=(v1);
+        spRootNode = v1;
         spRootNode.m_pObject->AttachChild(sp3D.m_pObject, 1);
         if (sp3D.m_pObject) {
             pVertexArray = nullptr;
@@ -474,7 +474,7 @@ void BSPolygon2D::CenterAroundOrigin() {
     NiPoint3 result;
     NiPoint3 v7 = NiPoint3_ZERO;
     for (int32_t i = 0; i < iVertexCount; ++i) {
-        v7.operator+=(pVertexSimpleArray->pBuffer[i]);
+        v7 += pVertexSimpleArray->pBuffer[i];
     }
     float fScalar = static_cast<float>(iVertexCount);
     result = v7 / fScalar;

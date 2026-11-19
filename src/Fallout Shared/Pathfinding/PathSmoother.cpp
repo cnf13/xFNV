@@ -608,15 +608,15 @@ char PathSmoother::PushPoint(
     int8_t v27;
     TESWorldSpace* worldSpace = aTri.pNavMeshInfo->GetWorldSpace();
     TESObjectCELL* parentCell = aTri.pNavMeshInfo->GetCell();
-    NiPoint3* v8 = &(result = aPushDelta->operator*(0.009999999776482582f));
-    NiPoint3* v9 = &(v25 = aPoint->operator+(*v8));
-    NiPoint3* v10 = &(v24 = v9->operator+(NiPoint3_UNIT_X));
+    NiPoint3* v8 = &(result = *aPushDelta * 0.009999999776482582f);
+    NiPoint3* v9 = &(v25 = *aPoint + *v8);
+    NiPoint3* v10 = &(v24 = *v9 + NiPoint3_UNIT_X);
     PathingLocation aStartLocation(v10, parentCell, worldSpace);
     int32_t v31 = 0;
     TESWorldSpace* v18 = aTri.pNavMeshInfo->GetWorldSpace();
     TESObjectCELL* v16 = aTri.pNavMeshInfo->GetCell();
-    NiPoint3* v11 = &(v23 = aPoint->operator-(*aPushDelta));
-    NiPoint3* v12 = &(v22 = v11->operator+(NiPoint3_UNIT_X));
+    NiPoint3* v11 = &(v23 = *aPoint - *aPushDelta);
+    NiPoint3* v12 = &(v22 = *v11 + NiPoint3_UNIT_X);
     PathingLocation aGoalLocation(v12, v16, v18);
     v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)1));
     PathingLocation apReturnIntersectionLocation;
@@ -639,7 +639,7 @@ char PathSmoother::PushPoint(
             return 0;
         }
 
-        *aRetLocation = *&(v21 = aPoint->operator+(*aPushDelta));
+        *aRetLocation = *&(v21 = *aPoint + *aPushDelta);
         v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)1));
         v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)0));
         v31 = (-1);
@@ -647,7 +647,7 @@ char PathSmoother::PushPoint(
     }
 
     location = &(v20 = (&apReturnIntersectionLocation)->GetLocation());
-    *aRetLocation = *&(v19 = location->operator+(*aPushDelta));
+    *aRetLocation = *&(v19 = *location + *aPushDelta);
     v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)1));
     v31 = static_cast<int32_t>((static_cast<uint32_t>(v31) & 0xffffff00u) | static_cast<uint32_t>((uint8_t)0));
     v31 = (-1);
@@ -790,27 +790,27 @@ void PathSmoother::BuildBestPointOnEdge() {
             int32_t iedgeIndex = offset + i;
             if (offset + i == -1) {
                 ++ipointCountBefore;
-                averagePointBefore.operator+=(StartLocation);
+                averagePointBefore += StartLocation;
             }
             else {
                 uint32_t v2 = PathEdges.iSize;
                 if (iedgeIndex == v2) {
                     ++ipointCountBefore;
-                    averagePointBefore.operator+=(GoalLocation);
+                    averagePointBefore += GoalLocation;
                 }
                 else {
                     if (iedgeIndex >= 0) {
                         int32_t v3 = PathEdges.iSize;
                         if (iedgeIndex < v3) {
                             ++ipointCountBefore;
-                            averagePointBefore.operator+=(PathEdges.GetAt(iedgeIndex)->Center);
+                            averagePointBefore += PathEdges.GetAt(iedgeIndex)->Center;
                         }
                     }
                 }
             }
         }
         if (ipointCountBefore) {
-            averagePointBefore.operator/=(static_cast<float>(ipointCountBefore));
+            averagePointBefore /= static_cast<float>(ipointCountBefore);
         }
         else {
             averagePointBefore = StartLocation;
@@ -821,27 +821,27 @@ void PathSmoother::BuildBestPointOnEdge() {
             int32_t iedgeIndex_2 = offset_2 + i;
             if (offset_2 + i == -1) {
                 ++ipointCountAfter;
-                averagePointAfter.operator+=(StartLocation);
+                averagePointAfter += StartLocation;
             }
             else {
                 uint32_t v4 = PathEdges.iSize;
                 if (iedgeIndex_2 == v4) {
                     ++ipointCountAfter;
-                    averagePointAfter.operator+=(GoalLocation);
+                    averagePointAfter += GoalLocation;
                 }
                 else {
                     if (iedgeIndex_2 >= 0) {
                         int32_t v5 = PathEdges.iSize;
                         if (iedgeIndex_2 < v5) {
                             ++ipointCountAfter;
-                            averagePointAfter.operator+=(PathEdges.GetAt(iedgeIndex_2)->Center);
+                            averagePointAfter += PathEdges.GetAt(iedgeIndex_2)->Center;
                         }
                     }
                 }
             }
         }
         if (ipointCountAfter) {
-            averagePointAfter.operator/=(static_cast<float>(ipointCountAfter));
+            averagePointAfter /= static_cast<float>(ipointCountAfter);
         }
         else {
             averagePointAfter = GoalLocation;
@@ -854,8 +854,8 @@ void PathSmoother::BuildBestPointOnEdge() {
         );
         PathEdges.GetAt(i)->BestPointOnEdge = *v6;
         NiPoint3* a1b = &PathEdges.GetAt(i)->LeftShrunkLocation;
-        if (PathEdges.GetAt(i)->BestPointOnEdge.operator==(*a1b) ||
-            (a1c = &PathEdges.GetAt(i)->RightShrunkLocation, PathEdges.GetAt(i)->BestPointOnEdge.operator==(*a1c))) {
+        if (PathEdges.GetAt(i)->BestPointOnEdge == *a1b ||
+            (a1c = &PathEdges.GetAt(i)->RightShrunkLocation, PathEdges.GetAt(i)->BestPointOnEdge == *a1c)) {
             float a1e;
             NiPoint3 averagePointDelta = averagePointAfter - averagePointBefore;
             averagePointDelta.Unitize();
@@ -865,19 +865,19 @@ void PathSmoother::BuildBestPointOnEdge() {
             if (i <= 0 ||
                 (a1e = averagePointDelta.Dot(segmentDelta), (v7 = std::fabs(a1e), !(v7 > 0.800000011920929)))) {
                 NiPoint3* a1j = &PathEdges.GetAt(i)->LeftShrunkLocation;
-                if (PathEdges.GetAt(i)->BestPointOnEdge.operator==(*a1j)) {
+                if (PathEdges.GetAt(i)->BestPointOnEdge == *a1j) {
                     NiPoint3* a1k = &PathEdges.GetAt(i)->LeftShrunkLocation;
                     NiPoint3 delta = PathEdges.GetAt(i)->RightShrunkLocation - *a1k;
                     NiPoint3* v11 = ::new (&v39) NiPoint3(delta * 0.01f);
-                    PathEdges.GetAt(i)->BestPointOnEdge.operator+=(*v11);
+                    PathEdges.GetAt(i)->BestPointOnEdge += *v11;
                 }
                 else {
                     NiPoint3* a1l = &PathEdges.GetAt(i)->RightShrunkLocation;
-                    if (PathEdges.GetAt(i)->BestPointOnEdge.operator==(*a1l)) {
+                    if (PathEdges.GetAt(i)->BestPointOnEdge == *a1l) {
                         NiPoint3* a1m = &PathEdges.GetAt(i)->RightShrunkLocation;
                         NiPoint3 delta_2 = PathEdges.GetAt(i)->LeftShrunkLocation - *a1m;
                         NiPoint3* v12 = ::new (&v38) NiPoint3(delta_2 * 0.01f);
-                        PathEdges.GetAt(i)->BestPointOnEdge.operator+=(*v12);
+                        PathEdges.GetAt(i)->BestPointOnEdge += *v12;
                     }
                 }
             }
@@ -912,7 +912,7 @@ void PathSmoother::BuildBestPointOnEdge() {
         frandomness = std::fabs(frandomness);
         float v31 = frandomness * 0.5;
         NiPoint3* v13 = ::new (&v34) NiPoint3(v31 * deltaToVert);
-        PathEdges.GetAt(i)->BestPointOnEdge.operator+=(*v13);
+        PathEdges.GetAt(i)->BestPointOnEdge += *v13;
     }
 }
 
@@ -1474,7 +1474,7 @@ PathSmoother::UniqueVert* PathSmoother::SplitBoundsEdge(uint32_t aiEdgeIndex, bo
     else {
         pEdges = &RightEdges;
     }
-    PathSmoother::BoundsEdge* pEdge = pEdges->operator[](aiEdgeIndex);
+    PathSmoother::BoundsEdge* pEdge = (*pEdges)[aiEdgeIndex];
     PathSmoother::UniqueVert* pStartVert = pEdge->pStartVert;
     PathSmoother::UniqueVert* pEndVert = pEdge->pEndVert;
     PathSmoother::PathEdge* pPathEdge;
@@ -1496,9 +1496,9 @@ PathSmoother::UniqueVert* PathSmoother::SplitBoundsEdge(uint32_t aiEdgeIndex, bo
     PathSmoother::BoundsEdge* pBoundsEdge = CreateBoundsEdge();
     pBoundsEdge->pStartVert = pStartVert;
     pBoundsEdge->pEndVert = pNewVert;
-    pBoundsEdge->hNavMeshEdge.Copy(pEdges->operator[](aiEdgeIndex)->hNavMeshEdge);
-    pBoundsEdge->bOpenEdge = pEdges->operator[](aiEdgeIndex)->bOpenEdge;
-    pEdges->operator[](aiEdgeIndex)->pStartVert = pNewVert;
+    pBoundsEdge->hNavMeshEdge.Copy((*pEdges)[aiEdgeIndex]->hNavMeshEdge);
+    pBoundsEdge->bOpenEdge = (*pEdges)[aiEdgeIndex]->bOpenEdge;
+    (*pEdges)[aiEdgeIndex]->pStartVert = pNewVert;
     InsertBoundsEdge(aiEdgeIndex, pBoundsEdge, abLeft);
     PathSmoother::PathEdge* pNewPathEdge = CreatePathEdge();
     pNewPathEdge->fTriangleNormalDelta = 1.0f;

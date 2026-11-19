@@ -78,9 +78,9 @@ void BeamProjectile::Initialize() {
     Projectile::SetFlag(Projectile::POST_PROCESS, true);
     Projectile::SetFlag(Projectile::SPAWN_EXPLOSION_AT_IMPACT, true);
     Projectile::Initialize();
-    if (spBeamProperty.operator->()) {
+    if (spBeamProperty) {
         float fRange = GetRange();
-        spBeamProperty.operator->()->SetLength(fRange);
+        spBeamProperty->SetLength(fRange);
     }
 }
 
@@ -141,9 +141,9 @@ void BeamProjectile::UpdateProjectile(float afDelta) {
         pRootNode->SetTranslate(pProjectileNode->GetWorldTranslate());
         SetLocationOnReference(pProjectileNode->GetWorldTranslate());
     }
-    if (spBeamProperty.operator->()) {
+    if (spBeamProperty) {
         float fAlpha = GetAlpha();
-        spBeamProperty.operator->()->SetAlpha(fAlpha);
+        spBeamProperty->SetAlpha(fAlpha);
     }
     if (GetAge() > 5.0) {
         Kill();
@@ -240,7 +240,7 @@ void BeamProjectile::ScaleBeamGeometryLength(NiGeometry* apObject, float afValue
     if (apObject) {
         float* pfRadius = &apObject->GetModelBound().m_fRadius;
         *pfRadius = *pfRadius * afValue;
-        (&apObject->GetModelBound())->m_kCenter.operator*=(afValue);
+        (&apObject->GetModelBound())->m_kCenter *= afValue;
         NiGeometryData* a2 = apObject->GetModelData();
         if (a2) {
             if (NiObject::IsKindOf_0(&NiPSysData::ms_RTTI, a2)) {
@@ -297,7 +297,7 @@ void BeamProjectile::ScaleBeam3D(NiAVObject* ap3D, float afDesiredLength, float 
         if (afCurrentLength > 0.0) {
             float fscale = afDesiredLength / afCurrentLength;
             NiPoint3 location = ap3D->GetTranslate();
-            location.operator*=(fscale);
+            location *= fscale;
             ap3D->SetTranslate(location);
         }
         if (NiObject::IsKindOf_0(&NiGeometry::ms_RTTI, ap3D)) {

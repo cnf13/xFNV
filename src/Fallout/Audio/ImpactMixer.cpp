@@ -101,7 +101,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
     if ((&BSAudio::QInstance())->pListener) {
         BSAudioListener* pListener = (&BSAudio::QInstance())->pListener;
         NiPoint3 kListenerPos = pListener->GetPosition();
-        kListenerPos.operator-=(kRefPos);
+        kListenerPos -= kRefPos;
         fListenerDistance = kListenerPos.Length();
         double v2 = kListenerPos.Length();
         if (fMaxFootstepDistance < v2) {
@@ -789,7 +789,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     if ((&BSAudio::QInstance())->pListener) {
         BSAudioListener* v47 = (&BSAudio::QInstance())->pListener;
         NiPoint3 listenPt = v47->GetPosition();
-        listenPt.operator-=(loc);
+        listenPt -= loc;
         fdistance = listenPt.Length();
         double fdistance_2 = listenPt.Length();
         if (ftestDistance < fdistance_2) {

@@ -872,10 +872,10 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
                 else {
                     NiPoint3 delta = apDoor2->GetDeltaForAngle(f180);
                     if (pbasedoor2->IsAutomatic()) {
-                        delta.operator*=(fautodist);
+                        delta *= fautodist;
                     }
                     else {
-                        delta.operator*=(fdefdist);
+                        delta *= fdefdist;
                     }
                     const NiPoint3* v3 = &apDoor2->GetLocationOnReference();
                     ptel1->SetTeleportPosition(*v3 + delta);
@@ -895,10 +895,10 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
                 else {
                     NiPoint3 delta_2 = apDoor1->GetDeltaForAngle(f180);
                     if (pbasedoor1->IsAutomatic()) {
-                        delta_2.operator*=(fautodist);
+                        delta_2 *= fautodist;
                     }
                     else {
-                        delta_2.operator*=(fdefdist);
+                        delta_2 *= fdefdist;
                     }
                     const NiPoint3* v8 = &apDoor1->GetLocationOnReference();
                     ptel2->SetTeleportPosition(*v8 + delta_2);

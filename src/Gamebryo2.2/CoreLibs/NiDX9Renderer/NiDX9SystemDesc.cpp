@@ -507,7 +507,7 @@ NiDX9AdapterDesc* NiDX9SystemDesc::GetAdapter(uint32_t a2) {
         return nullptr;
     }
 
-    return m_kAdapterList.operator[](a2);
+    return m_kAdapterList[a2];
 }
 
 // One adapter description per adapter, stored with the array's SetAt.

@@ -65,9 +65,9 @@ bool NiTextureTransform::operator!=(const NiTextureTransform& kXform) const {
     return (bool)((uint8_t)(((&kXform)->m_fRotate != m_fRotate) ||
                             (((&kXform)->m_kTranslate.x != m_kTranslate.x) ||
                              (((&kXform)->m_kTranslate.y != m_kTranslate.y) ||
-                              ((&m_kScale)->operator!=((&kXform)->m_kScale) ||
+                              (m_kScale != (&kXform)->m_kScale ||
                                ((((int32_t)m_eMethod) != ((int32_t)(&kXform)->m_eMethod)) ||
-                                (&m_kCenter)->operator!=((&kXform)->m_kCenter)))))));
+                                m_kCenter != (&kXform)->m_kCenter))))));
 }
 
 void NiTextureTransform::SetTranslate(const NiPoint2& kTranslate) {

@@ -195,10 +195,10 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
             falpha = falpha / fmult;
         }
     }
-    if ((ParticlePropertyArray.iSize) && (spParticleNode.operator!=(static_cast<NiNode*>(nullptr)))) {
+    if ((ParticlePropertyArray.iSize) && (spParticleNode != static_cast<NiNode*>(nullptr))) {
         float flastParticleCount = 0.0f;
         for (int32_t i = 0; i < ParticlePropertyArray.iSize; ++i) {
-            double BranchDimming = (&ParticlePropertyArray.operator[](i))->m_pObject->fMaxParticleRatio;
+            double BranchDimming = (&ParticlePropertyArray[i])->m_pObject->fMaxParticleRatio;
             flastParticleCount =
                 static_cast<double>(ParticleShader::GetMaxInstanceSize()) * BranchDimming + flastParticleCount;
         }
@@ -211,7 +211,7 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
             float a2a = static_cast<float>(ParticleShader::GetMaxInstanceSize());
             float fparticleCountForThisPass = BSMIN(fparticleCount, a2a);
             fparticleCount = fparticleCount - fparticleCountForThisPass;
-            ParticleShaderProperty* pparticleProp = (&ParticlePropertyArray.operator[](i_2))->m_pObject;
+            ParticleShaderProperty* pparticleProp = (&ParticlePropertyArray[i_2])->m_pObject;
             float v18 = fparticleCountForThisPass / static_cast<double>(ParticleShader::GetMaxInstanceSize());
             pparticleProp->SetMaxParticleRatio(v18);
             pparticleProp->SetFade(falpha);
@@ -256,11 +256,11 @@ bool MagicShaderHitEffect::Update(float afTimeDelta) {
             float fscaleLow = BSMAX(0.01f, a2);
             float fscale = (1.0f - fscaleLow) * fAddonScale + fscaleLow;
             for (uint32_t j = 0; j < AddOnObjects.iSize; ++j) {
-                NiAVObject* v12 = (&AddOnObjects.operator[](j))->m_pObject;
+                NiAVObject* v12 = (&AddOnObjects[j])->m_pObject;
                 float a2d = fAddonAlpha;
                 NiNode* v3 = v12->IsNode();
                 BSShaderUtil::RecursiveSetPropertyFadeAlpha(v3, a2d);
-                (&AddOnObjects.operator[](j))->m_pObject->SetScale(fscale);
+                (&AddOnObjects[j])->m_pObject->SetScale(fscale);
             }
         }
     }
@@ -442,19 +442,17 @@ bool MagicShaderHitEffect::Init() {
     if (!bdoParticles || pEffectData->IsFlagSet(TESEffectShader::DISABLE_PARTICLE_SHADER)) {
         if ((ParticlePropertyArray.iSize) && (spParticleNode.m_pObject)) {
             for (int32_t i_2 = 0; i_2 < ParticlePropertyArray.iSize; ++i_2) {
-                pEffectData->StopParticleShader(
-                    spParticleNode.m_pObject, (&ParticlePropertyArray.operator[](i_2))->m_pObject
-                );
+                pEffectData->StopParticleShader(spParticleNode.m_pObject, (&ParticlePropertyArray[i_2])->m_pObject);
             }
             ParticlePropertyArray.Clear(true);
             if (spParticleNode.m_pObject) {
                 spParticleNode.m_pObject->AttachParent(nullptr);
             }
-            spParticleNode.operator=(static_cast<NiNode*>(nullptr));
+            spParticleNode = static_cast<NiNode*>(nullptr);
         }
     }
     else {
-        if (spParticleNode.operator==(static_cast<NiNode*>(nullptr))) {
+        if (spParticleNode == static_cast<NiNode*>(nullptr)) {
             NiNode* v29;
             void* apMemory = NiMemObject::operator new(sizeof(NiNode));
             if (apMemory) {
@@ -463,7 +461,7 @@ bool MagicShaderHitEffect::Init() {
             else {
                 v29 = nullptr;
             }
-            spParticleNode.operator=(v29);
+            spParticleNode = v29;
             spParticleNode.m_pObject->SetName("ParticleShader Geometry");
             spParticleNode.m_pObject->SetRotate(NiMatrix3_IDENTITY);
         }
@@ -491,7 +489,7 @@ bool MagicShaderHitEffect::Init() {
             if (i >= FormFlags) {
                 break;
             }
-            ParticleShaderProperty* particleProperty_2 = (&ParticlePropertyArray.operator[](i))->m_pObject;
+            ParticleShaderProperty* particleProperty_2 = (&ParticlePropertyArray[i])->m_pObject;
             if (bsword) {
                 particleProperty_2->SetEmitterTypeRay(fswordLength);
             }
@@ -520,7 +518,7 @@ bool MagicShaderHitEffect::Init() {
         UpdatePosition();
     }
     if (!pEffectData->IsFlagSet(TESEffectShader::DISABLE_TEXTURE_SHADER)) {
-        if (spTexEffectData.operator==(static_cast<BSShaderPPLightingProperty::TextureEffectData*>(nullptr))) {
+        if (spTexEffectData == static_cast<BSShaderPPLightingProperty::TextureEffectData*>(nullptr)) {
             NiPointer<NiSourceTexture> sptexture_2(static_cast<NiSourceTexture*>(nullptr));
             if (pEffectData->GetTextureShaderTexture()->GetTextureNameLength()) {
                 BSsprintf(v47, 260, "%s\\%s", "Textures", pEffectData->GetTextureShaderTexture()->GetTextureName());
@@ -533,7 +531,7 @@ bool MagicShaderHitEffect::Init() {
             }
             NiSourceTexture* arPos_8b = spblockoutTexture.m_pObject;
             NiSourceTexture* arPos_4b = sptexture_2.m_pObject;
-            spTexEffectData.operator=(pEffectData->CreateTextureShaderData(pmembraneRoot, arPos_4b, arPos_8b));
+            spTexEffectData = pEffectData->CreateTextureShaderData(pmembraneRoot, arPos_4b, arPos_8b);
             if ((spTexEffectData.m_pObject) && (spTexEffectData.m_pObject->spBlockOutTexture.m_pObject) && (pTarget) &&
                 (pTarget->IsActor() && static_cast<Actor*>(pTarget)->Actor::GetAlphaMult() > 0.9900000095367432)) {
                 static_cast<Actor*>(pTarget)->Actor::SetAlphaMult(0.99f);
@@ -544,9 +542,8 @@ bool MagicShaderHitEffect::Init() {
         pEffectData->StartTextureShader(pmembraneRoot, arPos_8c);
     }
     if ((!switching && !AddOnObjects.iSize) && (pEffectData) && (pEffectData->Data.pAddonModels) &&
-        (ParticlePropertyArray.iSize) && ((&ParticlePropertyArray.operator[](0))->m_pObject)) {
-        NiTObjectArray<NiPointer<NiAVObject>>* TargetArray =
-            (&ParticlePropertyArray.operator[](0))->m_pObject->GetTargetArray();
+        (ParticlePropertyArray.iSize) && ((&ParticlePropertyArray[0])->m_pObject)) {
+        NiTObjectArray<NiPointer<NiAVObject>>* TargetArray = (&ParticlePropertyArray[0])->m_pObject->GetTargetArray();
         if (TargetArray->m_usSize) {
             BSWeightedRandom<char*> randomDebris;
             for (BSSimpleList<BGSDebrisData*>* pdebrisList = pEffectData->Data.pAddonModels->GetData();
@@ -556,14 +553,14 @@ bool MagicShaderHitEffect::Init() {
                 uint32_t arPos_8d = pdebrisList->m_item->cPercentage;
                 randomDebris.AddWeightedResult(pdebrisList->m_item->pFileName, arPos_8d);
             }
-            ParticleShaderProperty* pparticleProp = (&ParticlePropertyArray.operator[](0))->m_pObject;
+            ParticleShaderProperty* pparticleProp = (&ParticlePropertyArray[0])->m_pObject;
             for (int32_t i_3 = 0;; ++i_3) {
                 NiTObjectArray<NiPointer<NiAVObject>>* v9 = pparticleProp->GetTargetArray();
                 uint32_t Size = v9->m_usSize;
                 if (i_3 >= Size) {
                     break;
                 }
-                NiAVObject* pobject = (&pparticleProp->GetTargetArray()->operator[](i_3))->m_pObject;
+                NiAVObject* pobject = (&(*pparticleProp->GetTargetArray())[i_3])->m_pObject;
                 if (pobject->IsNode()) {
                     NiPointer<Model> spmodel;
                     char* v11 = randomDebris.PickResult();
@@ -623,19 +620,17 @@ void MagicShaderHitEffect::ClearTarget() {
             }
         }
     }
-    if (spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) {
+    if (spParticleNode != static_cast<NiNode*>(nullptr)) {
         for (int32_t i = 0; i < ParticlePropertyArray.iSize; ++i) {
-            pEffectData->StopParticleShader(
-                spParticleNode.m_pObject, (&ParticlePropertyArray.operator[](i))->m_pObject
-            );
+            pEffectData->StopParticleShader(spParticleNode.m_pObject, (&ParticlePropertyArray[i])->m_pObject);
         }
     }
     ParticlePropertyArray.Clear(true);
-    if (spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) {
+    if (spParticleNode != static_cast<NiNode*>(nullptr)) {
         spParticleNode.m_pObject->AttachParent(nullptr);
     }
-    spParticleNode.operator=(static_cast<NiNode*>(nullptr));
-    spTexEffectData.operator=(static_cast<BSShaderPPLightingProperty::TextureEffectData*>(nullptr));
+    spParticleNode = static_cast<NiNode*>(nullptr);
+    spTexEffectData = static_cast<BSShaderPPLightingProperty::TextureEffectData*>(nullptr);
     pTarget = nullptr;
 }
 
@@ -672,7 +667,7 @@ void MagicShaderHitEffect::UpdatePosition() {
             ptarget_2 = pTarget->Get3D();
         }
     }
-    if ((spParticleNode.operator!=(static_cast<NiNode*>(nullptr))) && (ptarget_2)) {
+    if ((spParticleNode != static_cast<NiNode*>(nullptr)) && (ptarget_2)) {
         const void* WorldTransform;
         if (bWeaponEnchantment) {
             WorldTransform = &ptarget_2->GetWorldTransform();
@@ -873,7 +868,7 @@ void MagicShaderHitEffect::ResetAlphaTimer() {
         fAlphaTimer = v4 / pEffectData->Data.fFillAlphaFullPercent * BeginKeyTime;
     }
     for (uint32_t auiIndex = 0; auiIndex < ParticlePropertyArray.iSize; ++auiIndex) {
-        (&ParticlePropertyArray.operator[](auiIndex))->m_pObject->RewindTimer(fAlphaTimer);
+        (&ParticlePropertyArray[auiIndex])->m_pObject->RewindTimer(fAlphaTimer);
     }
 }
 

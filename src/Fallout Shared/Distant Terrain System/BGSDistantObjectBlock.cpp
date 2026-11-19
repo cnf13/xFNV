@@ -135,7 +135,7 @@ void BGSDistantObjectBlock::TriggerApocalypse(
             ::new (pMemory) BGSDistantObjectBlockLoadTask(this, apWorld, asCellX, asCellY, aiLevel, true, true, false);
     }
     spLoadTask = pTask;
-    spLoadTask.operator->()->QueueMe();
+    spLoadTask->QueueMe();
     bDoneLoading = false;
     bAttached = false;
     pContext->~AutoMemContext();
@@ -156,12 +156,12 @@ void BGSDistantObjectBlock::SwitchToHigh(
     );
     spOldMesh = spMesh;
     spNodeStingerOld = spNodeStinger;
-    if (spLoadTask.operator->()) {
-        pIOManager->CancelTask(spLoadTask.operator->(), nullptr);
+    if (spLoadTask) {
+        pIOManager->CancelTask(spLoadTask, nullptr);
         spLoadTask = nullptr;
     }
-    if (spLoadTaskStinger.operator->()) {
-        pIOManager->CancelTask(spLoadTaskStinger.operator->(), nullptr);
+    if (spLoadTaskStinger) {
+        pIOManager->CancelTask(spLoadTaskStinger, nullptr);
         spLoadTaskStinger = nullptr;
     }
     void* pMemory = ourMalloc(sizeof(BGSDistantObjectBlockLoadTask));
@@ -172,7 +172,7 @@ void BGSDistantObjectBlock::SwitchToHigh(
     }
     spLoadTask = pTask;
     nDetachCount = 0;
-    spLoadTask.operator->()->QueueMe();
+    spLoadTask->QueueMe();
     bDoneLoading = false;
     bAttached = false;
     bHighPriority = true;
@@ -228,7 +228,7 @@ BSMultiBoundNode* BGSDistantObjectBlock::GetNode(bool abStingerVersion) {
     else {
         p_spStingerBlock = &spNode;
     }
-    return p_spStingerBlock->operator->();
+    return *p_spStingerBlock;
 }
 
 bool BGSDistantObjectBlock::GetHighPriority() {
@@ -277,9 +277,9 @@ void BGSDistantObjectBlock::RemoveFromList() {
 }
 
 void BGSDistantObjectBlock::Prepare() {
-    bool bUseNormalLOD = !bPrepared || (spMesh.m_pObject && (spOldMesh.m_pObject && spMesh.operator!=(spOldMesh)));
-    bool bUseStinger = !bPrepared ||
-        (spNodeStinger.m_pObject && (spNodeStingerOld.m_pObject && spNodeStinger.operator!=(spNodeStingerOld)));
+    bool bUseNormalLOD = !bPrepared || (spMesh.m_pObject && (spOldMesh.m_pObject && spMesh != spOldMesh));
+    bool bUseStinger =
+        !bPrepared || (spNodeStinger.m_pObject && (spNodeStingerOld.m_pObject && spNodeStinger != spNodeStingerOld));
     if ((bUseNormalLOD) && (spMesh.m_pObject)) {
         NiAlphaProperty* palpha;
         spMesh.m_pObject->RemoveProperty(NiAlphaProperty::GetType());
@@ -407,19 +407,19 @@ void BGSDistantObjectBlock::Detach() {
         NiNode* v10 = v5->GetLODObjectRoot();
         NiAVObject* v6 = spOldMesh.m_pObject;
         v10->DetachChild(v6);
-        spNode.operator=(static_cast<BSMultiBoundNode*>(nullptr));
-        spMesh.operator=(static_cast<NiGeometry*>(nullptr));
-        spOldMesh.operator=(static_cast<NiGeometry*>(nullptr));
-        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        spNode = static_cast<BSMultiBoundNode*>(nullptr);
+        spMesh = static_cast<NiGeometry*>(nullptr);
+        spOldMesh = static_cast<NiGeometry*>(nullptr);
+        spLoadTask = static_cast<BGSDistantObjectBlockLoadTask*>(nullptr);
     }
     if (spNodeStinger.m_pObject) {
         BGSTerrainManager* v7 = pNode->GetManager();
         NiNode* v9 = v7->GetLODObjectRoot();
         NiAVObject* v8 = spNodeStinger.m_pObject;
         v9->DetachChild(v8);
-        spNodeStinger.operator=(static_cast<BSMultiBoundNode*>(nullptr));
-        spNodeStingerOld.operator=(static_cast<BSMultiBoundNode*>(nullptr));
-        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        spNodeStinger = static_cast<BSMultiBoundNode*>(nullptr);
+        spNodeStingerOld = static_cast<BSMultiBoundNode*>(nullptr);
+        spLoadTaskStinger = static_cast<BGSDistantObjectBlockLoadTask*>(nullptr);
     }
     bDetachFlag = false;
 }
@@ -515,8 +515,8 @@ void BGSDistantObjectBlock::Attach() {
         if ((spMesh.m_pObject || spNodeStinger.m_pObject) && !IsInList()) {
             AddToList();
         }
-        spOldMesh.operator=(static_cast<NiGeometry*>(nullptr));
-        spNodeStingerOld.operator=(static_cast<BSMultiBoundNode*>(nullptr));
+        spOldMesh = static_cast<NiGeometry*>(nullptr);
+        spNodeStingerOld = static_cast<BSMultiBoundNode*>(nullptr);
         bAttached = true;
     }
 }
@@ -537,12 +537,12 @@ void BGSDistantObjectBlock::SwitchToLow(
     if (spLoadTask.m_pObject) {
         BGSDistantObjectBlockLoadTask* v6 = spLoadTask.m_pObject;
         pIOManager->CancelTask(v6, nullptr);
-        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        spLoadTask = static_cast<BGSDistantObjectBlockLoadTask*>(nullptr);
     }
     if (spLoadTaskStinger.m_pObject) {
         BGSDistantObjectBlockLoadTask* v7 = spLoadTaskStinger.m_pObject;
         pIOManager->CancelTask(v7, nullptr);
-        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        spLoadTaskStinger = static_cast<BGSDistantObjectBlockLoadTask*>(nullptr);
     }
     BGSDistantObjectBlockLoadTask* v11 =
         static_cast<BGSDistantObjectBlockLoadTask*>(ourMalloc(sizeof(BGSDistantObjectBlockLoadTask)));
@@ -554,7 +554,7 @@ void BGSDistantObjectBlock::SwitchToLow(
     else {
         Task = nullptr;
     }
-    spLoadTask.operator=(Task);
+    spLoadTask = Task;
     nDetachCount = 0;
     BGSDistantObjectBlockLoadTask* v8 = spLoadTask.m_pObject;
     v8->QueueMe();
@@ -570,7 +570,7 @@ void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
             spLoadTask.m_pObject->GetMesh(spMesh);
             spLoadTask.m_pObject->GetNode(spNode);
         }
-        spLoadTask.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        spLoadTask = static_cast<BGSDistantObjectBlockLoadTask*>(nullptr);
         if (!spLoadTaskStinger.m_pObject) {
             bDoneLoading = true;
         }
@@ -580,7 +580,7 @@ void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
         if (abLoadData) {
             spLoadTaskStinger.m_pObject->GetNode(spNodeStinger);
         }
-        spLoadTaskStinger.operator=(static_cast<BGSDistantObjectBlockLoadTask*>(nullptr));
+        spLoadTaskStinger = static_cast<BGSDistantObjectBlockLoadTask*>(nullptr);
         if (!spLoadTask.m_pObject) {
             bDoneLoading = true;
         }
@@ -744,11 +744,11 @@ void BGSDistantObjectBlockLoadTask::Run() {
     if (iload && stream.BSStream::Load(pFileName, pfile)) {
         NiObject* ObjectAt = stream.GetObjectAt(0);
         if (ObjectAt->IsNode()) {
-            spNode.operator=(static_cast<BSMultiBoundNode*>(stream.GetObjectAt(0)));
-            spMesh.operator=(static_cast<NiGeometry*>(spNode.m_pObject->GetAtChecked(0)));
+            spNode = static_cast<BSMultiBoundNode*>(stream.GetObjectAt(0));
+            spMesh = static_cast<NiGeometry*>(spNode.m_pObject->GetAtChecked(0));
         }
         else {
-            spMesh.operator=(static_cast<NiGeometry*>(stream.GetObjectAt(0)));
+            spMesh = static_cast<NiGeometry*>(stream.GetObjectAt(0));
         }
     }
     else {
@@ -761,8 +761,8 @@ void BGSDistantObjectBlockLoadTask::Run() {
 void BGSDistantObjectBlockLoadTask::Finish() {
     if (spMesh.m_pObject) {
         if (bCanceled) {
-            spMesh.operator=(static_cast<NiGeometry*>(nullptr));
-            spNode.operator=(static_cast<BSMultiBoundNode*>(nullptr));
+            spMesh = static_cast<NiGeometry*>(nullptr);
+            spNode = static_cast<BSMultiBoundNode*>(nullptr);
         }
         else {
             pBlock->LoadFromTask(eTrue);
@@ -844,11 +844,11 @@ uint8_t BGSDistantObjectBlockLoadTask::GetFileIndex() {
 }
 
 void BGSDistantObjectBlockLoadTask::GetMesh(NiPointer<NiGeometry>& aspMesh) {
-    aspMesh.operator=(spMesh);
+    aspMesh = spMesh;
 }
 
 void BGSDistantObjectBlockLoadTask::GetNode(NiPointer<BSMultiBoundNode>& aspNode) {
-    aspNode.operator=(spNode);
+    aspNode = spNode;
 }
 
 void BGSDistantObjectBlockLoadTask::GetBuildingsPath(char* apDest, TESWorldSpace* apWorldspace) {

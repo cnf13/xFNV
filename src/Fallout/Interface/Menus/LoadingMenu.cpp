@@ -585,10 +585,10 @@ void LoadingMenu::SetNextSlide(TileShaderProperty* apTSP) {
         if (this->uiCurrTextureIndex >= 4) {
             this->uiCurrTextureIndex = 0;
         }
-        if (pspHoldTexture->operator->()) {
-            BSTexturePalette::RemoveTexture(pspHoldTexture->operator->());
+        if (*pspHoldTexture) {
+            BSTexturePalette::RemoveTexture(*pspHoldTexture);
         }
-        NiSourceTexture* pTexture = spTexture.operator->();
+        NiSourceTexture* pTexture = spTexture;
         *pspHoldTexture = pTexture;
         // Odd slides go to the second slide tile.
         if (this->m_SlideCount % 2) {
@@ -598,7 +598,7 @@ void LoadingMenu::SetNextSlide(TileShaderProperty* apTSP) {
             apTSP = this->pTiles[32]->GetShaderProperty();
         }
         if (apTSP) {
-            apTSP->SetTileTexture(spTexture.operator->());
+            apTSP->SetTileTexture(spTexture);
         }
     }
     pContext->~AutoMemContext();

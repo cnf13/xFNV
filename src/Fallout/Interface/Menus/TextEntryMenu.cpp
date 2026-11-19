@@ -86,7 +86,7 @@ const char* TextEditMenu::GetText() {
 }
 
 BSStringT<char>* TextEditMenu::ResetText() {
-    return &sEnteredText.operator=(nullptr);
+    return &(sEnteredText = nullptr);
 }
 
 int32_t TextEditMenu::GetMenuID() {

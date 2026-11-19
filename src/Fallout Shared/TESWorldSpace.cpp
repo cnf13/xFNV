@@ -154,7 +154,7 @@ void TESWorldSpace::InitializeData() {
 }
 
 void TESWorldSpace::ClearData() {
-    (&spPortalGraph)->operator=(nullptr);
+    spPortalGraph = nullptr;
     if (pImpactSwap) {
         delete pImpactSwap;
     }
@@ -1220,8 +1220,8 @@ void TESWorldSpace::AdjustMapMarkerCoord(NiPoint3& aMapCoord, bool abInverse) {
         ecx0a.x = (MinimumCoords.X + MaximumCoords.X);
         ecx0a.y = (MinimumCoords.Y + MaximumCoords.Y);
         ecx0a.z = (float)0.0;
-        (&ecx0a)->operator*=(0x1p-1f);
-        (result = aMapCoord.operator-(ecx0a));
+        ecx0a *= 0x1p-1f;
+        (result = aMapCoord - ecx0a);
         if (abInverse) {
             fadeDuration = 1.0 / WorldMapOffsetData.fMapScale;
         }
@@ -1229,8 +1229,8 @@ void TESWorldSpace::AdjustMapMarkerCoord(NiPoint3& aMapCoord, bool abInverse) {
             fadeDuration = (double)WorldMapOffsetData.fMapScale;
         }
         v3 = (float)fadeDuration;
-        (&result)->operator*=(v3);
-        aMapCoord = *&(v6 = (&ecx0a)->operator+(result));
+        result *= v3;
+        aMapCoord = *&(v6 = ecx0a + result);
     }
     if (!abInverse) {
         aMapCoord.x = (WorldMapOffsetData.fCellOffsetX + aMapCoord.x);
@@ -2046,7 +2046,7 @@ BSPortalGraph* TESWorldSpace::GetPortalGraph() {
         else {
             v2 = nullptr;
         }
-        (&spPortalGraph)->operator=(v2);
+        spPortalGraph = v2;
     }
     return (&spPortalGraph)->m_pObject;
 }
@@ -2065,7 +2065,7 @@ void TESWorldSpace::ClearPortalGraph() {
                 v4 = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
                 v4->SetPortalGraph(nullptr);
             }
-            (&spPortalGraph)->operator=(nullptr);
+            spPortalGraph = nullptr;
         }
     }
 }

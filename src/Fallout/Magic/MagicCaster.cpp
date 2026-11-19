@@ -1008,7 +1008,7 @@ void MagicCaster::FireProjectile() {
                 NiPoint3* v3 = &(v24 = pcasterObject->GetBoundMax());
                 float casterHeight = v3->z - pcasterObject->GetBoundMin().z;
                 vect.z = casterHeight * 0.699999988079071;
-                origin.operator+=(vect);
+                origin += vect;
             }
             else {
                 double MaximumLeafAngle = pavEffect->data.fSpeed;
@@ -1375,7 +1375,7 @@ MagicCaster* MagicCaster::GetMagicCasterByNumericID(uint32_t aiFormID) {
 
 // A box phantom wraps an hkpAabbPhantom; its overlap array's getter is a trivial accessor (this + 0xD0).
 hkArray<hkpCollidable*, hkContainerHeapAllocator>* bhkAabbPhantom::GetOverlappingCollidables() {
-    hkpAabbPhantom* pphantom = static_cast<hkpAabbPhantom*>(operator*());
+    hkpAabbPhantom* pphantom = static_cast<hkpAabbPhantom*>(**this);
     if (pphantom) {
         return &pphantom->m_overlappingCollidables;
     }

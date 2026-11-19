@@ -99,7 +99,7 @@ void Stars::Update(Sky* apSky, float afSecondsPassed) {
                                 pStarsProp_2 = nullptr;
                             }
                             if (pStarsProp_2) {
-                                if (colorLastFrame.operator!=(pt)) {
+                                if (colorLastFrame != pt) {
                                     pStarsProp_2->VertexColor.r = pt.x;
                                     pStarsProp_2->VertexColor.g = pt.y;
                                     pStarsProp_2->VertexColor.b = pt.z;
@@ -154,7 +154,7 @@ void Stars::LoadGeometry(const char* apFilename) {
             spRoot.m_pObject->SetDisplayObject(true);
             NiNode* v4 = spRoot.m_pObject;
             v4->DetachChild(spStars.m_pObject);
-            spStars.operator=(v6.GetModel());
+            spStars = v6.GetModel();
             spStars.m_pObject->SetSelectiveUpdate(true);
             NiNode* v3 = spRoot.m_pObject;
             v3->AttachChild(spStars.m_pObject, 1);

@@ -160,7 +160,7 @@ bool BSFaceGenAnimationData::GetModifierValuesAsRotation(NiQuaternion& arQuat) {
     float fRoll = (float)v4;
     float fYaw = (float)v6;
     (&arQuat)->FromEulerAnglesXYZ(fYaw, fRoll, fPitch);
-    return (&arQuat)->operator!=(NiQuaternion_IDENTITY);
+    return arQuat != NiQuaternion_IDENTITY;
 }
 
 void BSFaceGenAnimationData::SetModifierValue(BS_FACEGEN_MODIFIER aeModifier, float afValue) {
@@ -342,11 +342,11 @@ void BSFaceGenAnimationData::ResetAnimCurrentMorphs(
 }
 
 void BSFaceGenAnimationData::SetHeadTrackVector(NiPoint3 aPoint, bool abInstant) {
-    if ((&HeadTrackVector)->operator==(NiPoint3_ZERO) && (&aPoint)->operator!=(NiPoint3_ZERO)) {
+    if (HeadTrackVector == NiPoint3_ZERO && aPoint != NiPoint3_ZERO) {
         TrackingState = ETrackingState_JustAcquired;
         fJustAcquiredTimer = (float)0.0;
     }
-    if ((&aPoint)->operator==(NiPoint3_ZERO)) {
+    if (aPoint == NiPoint3_ZERO) {
         TrackingState = ETrackingState_None;
     }
     HeadTrackVector = aPoint;

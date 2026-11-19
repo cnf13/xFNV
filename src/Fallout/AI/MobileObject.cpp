@@ -1144,7 +1144,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
         }
         rot_2.MakeZRotation(v23);
         NiMatrix3* v8 = rot_2.Inverse(&v82);
-        arDeltaMove.operator+=(*::new (&largeDelta_2) NiPoint3(*v8 * largeDelta));
+        arDeltaMove += *::new (&largeDelta_2) NiPoint3(*v8 * largeDelta);
     }
     if (pactor) {
         bisImmobile = pactor->IsImmobile();
@@ -1185,7 +1185,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
                  : v25 = pactor_2->MobileObject::GetHeading(false),
              (rot_3.MakeZRotation(v25),
               (tmpMove = rot_3 * tmpMove,
-               (&tmpLoc.operator+=(tmpMove),
+               (&(tmpLoc += tmpMove),
                 (pws = pactor_2->GetWorldSpace(),
                  (pc = pactor_2->GetParentCell(),
                   !Pathing::GetNavMeshZForLocation(tmpLoc, pc, pws, fheightNavMesh)))))))))))) {
@@ -1209,7 +1209,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
                 }
                 rot_5.MakeZRotation(v30);
                 arDeltaMove = rot_5 * arDeltaMove;
-                pos.operator+=(arDeltaMove);
+                pos += arDeltaMove;
             }
             else {
                 md.~MoveData();
@@ -1250,7 +1250,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
                     }
                     rot_4.MakeZRotation(v27);
                     arDeltaMove = rot_4 * arDeltaMove;
-                    pos.operator+=(arDeltaMove);
+                    pos += arDeltaMove;
                     pcon->GetPosition(oldPos);
                     arDeltaMove = pos - oldPos;
                     NiMatrix3* v14 = rot_4.Inverse(&v46);
@@ -1319,7 +1319,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
                 }
                 rot_6.MakeZRotation(v31);
                 arDeltaMove = rot_6 * arDeltaMove;
-                pos.operator+=(arDeltaMove);
+                pos += arDeltaMove;
             }
         }
         if (eSitSleepState || v77) {
@@ -1347,7 +1347,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
             }
             rot_7.MakeZRotation(v32);
             arDeltaMove = rot_7 * arDeltaMove;
-            pos.operator+=(arDeltaMove);
+            pos += arDeltaMove;
         }
         pactor_2->SetLocationOnReference(pos);
         return pcon;
@@ -2175,8 +2175,8 @@ void MobileObject::SetPosition(const NiPoint3& arPos) {
         pController->QHitDamage();
         pController->ClearManifold();
     }
-    if (pLoadedData && pLoadedData->m_spData3D.operator->()) {
-        pLoadedData->m_spData3D.operator->()->SetTranslate(arPos);
+    if (pLoadedData && pLoadedData->m_spData3D) {
+        pLoadedData->m_spData3D->SetTranslate(arPos);
     }
 }
 
@@ -2243,7 +2243,7 @@ TESObjectREFR* MobileObject::GetCurrentTarget() {
 bool MobileObject::IsAtPoint(const NiPoint3& aPoint, float afRadius, bool abExpandRadius, bool abAlwaysTestHeight) {
     NiPoint3 v6;
     NiPoint3 v7 = GetLocationOnReference();
-    (v6 = (&v7)->operator-(aPoint));
+    (v6 = v7 - aPoint);
     float v10 = 0x1p+7f;
     float v9 = (float)(v7.z - 30.0);
     float v8 = (float)((v7.z + 0x1p+7f) + 30.0);

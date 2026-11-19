@@ -74,7 +74,7 @@ void CombatTargetMap::RemoveTargetAttacker(Actor* apTarget, Actor* apAttacker) {
     CombatTargetData* ptargetData = nullptr;
     if (GetAt(apTarget, ptargetData)) {
         for (uint32_t i = 0; i < ptargetData->Attackers.iSize; ++i) {
-            if (ptargetData->Attackers.operator[](i) == apAttacker) {
+            if (ptargetData->Attackers[i] == apAttacker) {
                 if (ptargetData->Attackers.iSize == 1) {
                     if (ptargetData) {
                         delete ptargetData;

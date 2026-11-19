@@ -387,7 +387,7 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
                 ScrollLog(3u, ptmp);
                 if (iNumGuesses == 1) {
                     const char* pWarning = sHackingWarning.operator const char*();
-                    IOLines[1]->Animation.operator=(pWarning);
+                    IOLines[1]->Animation = pWarning;
                     IOLines[1]->Animation.ForceFinish();
                     IOLines[1]->Animation.SetShouldBlink(true);
                 }
@@ -436,7 +436,7 @@ void HackingMenu::DoClick(int32_t a1, Tile* a2) {
         else {
             if (iNumGuesses == 1) {
                 const char* pHeader = sHackingHeader2.operator const char*();
-                IOLines[1]->Animation.operator=(pHeader);
+                IOLines[1]->Animation = pHeader;
                 IOLines[1]->Animation.SetShouldBlink(false);
                 IOLines[1]->Animation.ForceFinish();
             }
@@ -844,7 +844,7 @@ void HackingMenu::Prepare(uint32_t aiWordsWant) {
     if (!iWordLength) {
         return;
     }
-    strDictFilename.operator=("Data\\Menus\\FalloutDict.txt");
+    strDictFilename = "Data\\Menus\\FalloutDict.txt";
     // The misc archives (type 0x100) with a 0x4000-byte buffer.
     pdictFile = static_cast<BSFile*>(FileFinder::GetFile(strDictFilename.pString, NiFile::READ_ONLY, 0x4000, 0x100));
     if (!pdictFile || !pdictFile->Open(false, false)) {
@@ -1279,11 +1279,11 @@ void HackingMenu::DoInGame() {
                         HackingMenu::GetGarbageString(floatingText, &v2[SelectedTileIndex]);
                     }
                 }
-                if (xEntryText.operator!=(floatingText)) {
-                    xEntryText.operator=(floatingText);
+                if (xEntryText != floatingText) {
+                    xEntryText = floatingText;
                     // 0xFFFFFFFF: the ID of an empty handle, which ends the queue.
                     for (BSSimpleList<BSSoundHandle>* pnode_2 = &HackingMenu::listSoundsToPlay;
-                         pnode_2 && pnode_2->m_item.operator!=(0xFFFFFFFFu); pnode_2 = pnode_2->m_pkNext) {
+                         pnode_2 && pnode_2->m_item != 0xFFFFFFFFu; pnode_2 = pnode_2->m_pkNext) {
                         pnode_2->m_item.Release();
                     }
                     HackingMenu::listSoundsToPlay.RemoveAll();
@@ -1782,5 +1782,5 @@ void HackingText::SetDisplayInterval(uint32_t aiInterval) {
 }
 
 bool HackingText::operator!=(const char* apString) {
-    return strText.operator!=(apString);
+    return strText != apString;
 }

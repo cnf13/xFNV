@@ -89,13 +89,13 @@ void FORenderedMenuRaceSex::Draw(BSRenderedTexture* a1, NiRenderer::ClearFlags a
     BSShaderUtil::RenderScene(spClonedPlayerCamera.m_pObject, spaccum.m_pObject, false);
     a12.PopCullMode();
     a12.SetAccumulator(nullptr);
-    spaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+    spaccum = static_cast<BSShaderAccumulator*>(nullptr);
     BSRenderedTexture::StopOffscreen();
     FORenderedMenu::Draw(a1, NiRenderer::CLEAR_NONE, spswap.m_pObject);
     BSRenderedTexture* fB = spswap.m_pObject;
     BSTextureManager* v11 = BSShaderManager::TextureManagerPtr();
     v11->ReturnRenderedTexture(fB);
-    spswap.operator=(static_cast<BSRenderedTexture*>(nullptr));
+    spswap = static_cast<BSRenderedTexture*>(nullptr);
 }
 
 bool FORenderedMenuRaceSex::OnIdle() {
@@ -188,7 +188,7 @@ void FORenderedMenuRaceSex::Initialize() {
         RaceSexMenu* pRaceSexMenu = static_cast<RaceSexMenu*>(pMenuTile->GetMenu());
         const char* v4 = pRaceSexMenu->GetProjectorFile();
         pgeom = static_cast<BSFadeNode*>(pModelLoader->LoadFile(v4, LOD_MULT_NONE, true, false, false, false));
-        spGeometry.operator=(static_cast<NiNode*>(pgeom));
+        spGeometry = static_cast<NiNode*>(pgeom);
         SwapPlatformLanguageTextures(pgeom);
     }
     float* v5 = &fRaceSexMenuScale.Float();
@@ -197,16 +197,16 @@ void FORenderedMenuRaceSex::Initialize() {
     NiAVObject* pscreen = pgeom->GetObjectByName("Screen");
     SetScreenTexture(nullptr);
     bPulseAffectsLight = 0;
-    spPlayer3D.operator=(static_cast<NiNode*>(nullptr));
-    spClonedPlayerCamera.operator=(static_cast<NiCamera*>(nullptr));
-    spButtons->operator=(pgeom->GetObjectByName("SexBtn:0"));
-    spButtons[1].operator=(pgeom->GetObjectByName("RaceBtn:0"));
-    spButtons[2].operator=(pgeom->GetObjectByName("FaceBtn:0"));
-    spButtons[3].operator=(pgeom->GetObjectByName("BodyBtn:0"));
-    spBtnGlow->operator=(pgeom->GetObjectByName("SexGlow:0"));
-    spBtnGlow[1].operator=(pgeom->GetObjectByName("RaceGlow:0"));
-    spBtnGlow[2].operator=(pgeom->GetObjectByName("FaceGlow:0"));
-    spBtnGlow[3].operator=(pgeom->GetObjectByName("BodyGlow:0"));
+    spPlayer3D = static_cast<NiNode*>(nullptr);
+    spClonedPlayerCamera = static_cast<NiCamera*>(nullptr);
+    *spButtons = pgeom->GetObjectByName("SexBtn:0");
+    spButtons[1] = pgeom->GetObjectByName("RaceBtn:0");
+    spButtons[2] = pgeom->GetObjectByName("FaceBtn:0");
+    spButtons[3] = pgeom->GetObjectByName("BodyBtn:0");
+    *spBtnGlow = pgeom->GetObjectByName("SexGlow:0");
+    spBtnGlow[1] = pgeom->GetObjectByName("RaceGlow:0");
+    spBtnGlow[2] = pgeom->GetObjectByName("FaceGlow:0");
+    spBtnGlow[3] = pgeom->GetObjectByName("BodyGlow:0");
     fDistortStart = 0.0f;
     fDistortPos = 0.0f;
     SetNextDistortTime(0.0f);
@@ -362,12 +362,12 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
         Animation* v5 = pPlayer->GetAnimation(false);
         v5->PlayGroup(0, ACTION_START, -1, AGS_NONE);
         pPlayer->Update(0.0f);
-        spPlayer3D.operator=(static_cast<NiNode*>(pPlayer->Get3D(false)));
+        spPlayer3D = static_cast<NiNode*>(pPlayer->Get3D(false));
         ptSavedPlayerTranslation = spPlayer3D.m_pObject->GetTranslate();
         mtxSavedPlayerRotation = (*&spPlayer3D.m_pObject->m_kLocal).m_Rotate;
         NiNode* v22 = spPlayer3D.m_pObject;
         ptSavedBip01Translation = v22->GetObjectByName("Bip01")->GetTranslate();
-        spPlayer3DParent.operator=(spPlayer3D.m_pObject->m_pkParent);
+        spPlayer3DParent = spPlayer3D.m_pObject->m_pkParent;
         bPlayer3DCulled = spPlayer3D.m_pObject->GetAppCulled();
         void* apMemory = NiMemObject::operator new(sizeof(NiNode));
         if (apMemory) {
@@ -377,12 +377,12 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
             v20 = nullptr;
         }
         NiRefObject* v29 = (NiRefObject*)v20;
-        spPlayerParent.operator=(v20);
+        spPlayerParent = v20;
         ShadowSceneNode* v6 = BSShaderManager::GetShadowSceneNode(3);
         v6->AttachChild(spPlayerParent.m_pObject, 1);
-        spPlayerLights.operator=(static_cast<NiAVObject*>(pModelLoader->LoadFile(
+        spPlayerLights = static_cast<NiAVObject*>(pModelLoader->LoadFile(
             "Meshes\\Terminals\\PlayerFaceLights01.NIF", LOD_MULT_NONE, true, false, false, false
-        )));
+        ));
         NiNode* v19 = spPlayerParent.m_pObject;
         v19->AttachChild(spPlayer3D.m_pObject, 1);
         NiNode* v18 = spPlayerParent.m_pObject;
@@ -408,7 +408,7 @@ void FORenderedMenuRaceSex::OnMenuOpen() {
             v16 = nullptr;
         }
         NiRefObject* v27 = (NiRefObject*)v16;
-        spClonedPlayerCamera.operator=(v16);
+        spClonedPlayerCamera = v16;
         ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
         spClonedPlayerCamera.m_pObject->SetViewPort(port);
         spClonedPlayerCamera.m_pObject->SetMinNearPlaneDist(1.0f);
@@ -452,7 +452,7 @@ void FORenderedMenuRaceSex::OnMenuClose() {
         v9->DetachChild(spPlayer3D.m_pObject);
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(3);
         ShadowSceneNode_->DetachChild(spPlayerParent.m_pObject);
-        spPlayerParent.operator=(static_cast<NiNode*>(nullptr));
+        spPlayerParent = static_cast<NiNode*>(nullptr);
         ShadowSceneNode* v2 = BSShaderManager::GetShadowSceneNode(1);
         v2->DetachChild(FORenderedMenu::GetParentNodeToRender());
         NiNode* v8 = spPlayer3DParent.m_pObject;
@@ -463,15 +463,15 @@ void FORenderedMenuRaceSex::OnMenuClose() {
         spPlayer3D.m_pObject->SetRotate(mtxSavedPlayerRotation);
         spPlayer3D.m_pObject->SetTranslate(ptSavedPlayerTranslation);
         spPlayer3D.m_pObject->SetAppCulled(bPlayer3DCulled);
-        spPlayer3D.operator=(static_cast<NiNode*>(nullptr));
-        spClonedPlayerCamera.operator=(static_cast<NiCamera*>(nullptr));
-        spGeometry.operator=(static_cast<NiNode*>(nullptr));
+        spPlayer3D = static_cast<NiNode*>(nullptr);
+        spClonedPlayerCamera = static_cast<NiCamera*>(nullptr);
+        spGeometry = static_cast<NiNode*>(nullptr);
         ShadowSceneNode* v4 = BSShaderManager::GetShadowSceneNode(1);
         v4->RemoveAllLights();
         FORenderedMenu::OnMenuClose();
         // No button lit.
         LightButton(static_cast<uint32_t>(-1));
-        spPlayerLights.operator=(static_cast<NiAVObject*>(nullptr));
+        spPlayerLights = static_cast<NiAVObject*>(nullptr);
     }
 }
 
@@ -547,8 +547,8 @@ void FORenderedMenuRaceSex::SetupLights(float afScale) {
 // The index compare is unsigned.
 void FORenderedMenuRaceSex::LightButton(uint32_t aiButton) {
     for (uint32_t i = 0; i < 4; ++i) {
-        if (spBtnGlow[i].operator->()) {
-            spBtnGlow[i].operator->()->SetAppCulled(i != aiButton);
+        if (spBtnGlow[i]) {
+            spBtnGlow[i]->SetAppCulled(i != aiButton);
         }
     }
 }

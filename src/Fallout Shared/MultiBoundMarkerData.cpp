@@ -61,11 +61,11 @@ void MultiBoundMarkerData::Save() {
 }
 
 bool MultiBoundMarkerData::Compare(MultiBoundMarkerData* apCompare) {
-    return !apCompare || HalfExtents.operator!=(apCompare->HalfExtents);
+    return !apCompare || HalfExtents != apCompare->HalfExtents;
 }
 
 bool MultiBoundMarkerData::IsDefault() {
-    return !HalfExtents.operator!=(DefHalfExtents);
+    return !(HalfExtents != DefHalfExtents);
 }
 
 BSMultiBound* MultiBoundMarkerData::CreateMultiBoundForRef(TESObjectREFR* apRef) {
@@ -214,11 +214,11 @@ bool MultiBoundMarkerData::MultiBoundIntersectsCell(TESObjectREFR* apRef, int32_
         NiPoint3 pos = apRef->GetLocationOnReference();
         NiMatrix3 rot = apRef->GetOrientation();
         rot.GetCol(0, kX);
-        kX.operator*=(ext.x);
+        kX *= ext.x;
         rot.GetCol(1u, kY);
-        kY.operator*=(ext.y);
+        kY *= ext.y;
         rot.GetCol(2u, kZ);
-        kZ.operator*=(ext.z);
+        kZ *= ext.z;
         boundverts[0] = pos + kX + kY + kZ;
         boundverts[1] = pos + kX + kY - kZ;
         boundverts[2] = pos + kX - kY + kZ;

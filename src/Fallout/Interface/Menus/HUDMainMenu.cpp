@@ -4433,8 +4433,8 @@ void HUDMainMenu::SetMenuMode(HUD_MENU_MODE aeMenuMode) {
         }
     }
 
-    if (eMode == HMM_IRON_SIGHTS && HUDMainMenu::spScopeModel.operator->() &&
-        HUDMainMenu::spScopeModel.operator->()->GetAtChecked(0) && pPlayer->IsWeaponDrawn()) {
+    if (eMode == HMM_IRON_SIGHTS && HUDMainMenu::spScopeModel && HUDMainMenu::spScopeModel->GetAtChecked(0) &&
+        pPlayer->IsWeaponDrawn()) {
         eMode = HMM_SNIPER_RIFLE;
     }
 
@@ -4622,7 +4622,7 @@ void HUDMainMenu::SetMenuMode(HUD_MENU_MODE aeMenuMode) {
 void HUDMainMenu::SetGunScopeVisible(bool abVisibleFlag) {
     NiNode* v1;
     NiNode* v2;
-    if ((HUDMainMenu::pme) && ((&HUDMainMenu::spScopeModel)->operator->())) {
+    if ((HUDMainMenu::pme) && (HUDMainMenu::spScopeModel)) {
         v1 = (&HUDMainMenu::spScopeModel)->operator->();
         if (v1->GetAtChecked(0)) {
             HUDMainMenu::pme->bScopeVisible = (bool)((uint8_t)abVisibleFlag);
@@ -4701,7 +4701,7 @@ void HUDMainMenu::SetEnemyActor(Actor* apActor) {
 }
 
 void HUDMainMenu::Draw3DElements() {
-    if (!HUDMainMenu::spScopeModel.operator->()) {
+    if (!HUDMainMenu::spScopeModel) {
         return;
     }
     if (HUDMainMenu::pme && !HUDMainMenu::pme->bScopeVisible) {
@@ -5315,7 +5315,7 @@ float HUDMainMenu::HeadingBetweenLocations(const NiPoint3& aStart, const NiPoint
     float v5;
     NiPoint3 result;
     float afAngle = (float)0.0;
-    (result = (&aDest)->operator-(aStart));
+    (result = aDest - aStart);
     if (result.y == 0.0) {
         if (result.x < 0.0) {
             afAngle = 3.1415927410125732f;

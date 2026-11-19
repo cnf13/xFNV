@@ -882,7 +882,7 @@ void ActiveEffect::StartSound() {
                     PersistentSound.Stop();
                     PersistentSound.Release();
                 }
-                PersistentSound.operator=(soundHandle);
+                PersistentSound = soundHandle;
             }
         }
     }

@@ -378,7 +378,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     else {
         v72 = nullptr;
     }
-    spMoonMesh.operator=(v72);
+    spMoonMesh = v72;
     spMoonMesh.m_pObject->SetSelectiveUpdate(true);
     NiTriShape* v91 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
     if (v91) {
@@ -390,7 +390,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     else {
         NiTriShape_ = nullptr;
     }
-    spShadowMesh.operator=(NiTriShape_);
+    spShadowMesh = NiTriShape_;
     spShadowMesh.m_pObject->SetSelectiveUpdate(true);
     NiAlphaProperty* v90 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
     if (v90) {
@@ -406,7 +406,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         spAlpha.m_pObject->SetDestBlendMode(NiAlphaProperty::ALPHA_ONE);
         spAlpha.m_pObject->SetNoSorter(true);
         spMoonMesh.m_pObject->AttachProperty(spAlpha.m_pObject);
-        spAlpha.operator=(static_cast<NiAlphaProperty*>(nullptr));
+        spAlpha = static_cast<NiAlphaProperty*>(nullptr);
     }
     BSShaderData bsshaderdata;
     bsshaderdata.eLightingShader = BSShaderData::LS_SKY;
@@ -433,7 +433,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     else {
         v69 = nullptr;
     }
-    spMoonNode.operator=(v69);
+    spMoonNode = v69;
     NiNode* v88 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
     if (v88) {
         v68 = ::new (v88) NiNode(0);
@@ -441,7 +441,7 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     else {
         v68 = nullptr;
     }
-    spShadowNode.operator=(v68);
+    spShadowNode = v68;
     spMoonNode.m_pObject->SetSelectiveUpdate(true);
     spShadowNode.m_pObject->SetSelectiveUpdate(true);
     NiNode* v67 = spMoonNode.m_pObject;

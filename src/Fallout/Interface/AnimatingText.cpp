@@ -73,8 +73,7 @@ char HackingText::Update() {
             pTileValueVisibility->SetFloat(0.0f, true);
         }
 
-        if (pTileText &&
-            (pCurrentlyDisplayedText && strText.operator!=(static_cast<const char*>(pCurrentlyDisplayedText)))) {
+        if (pTileText && (pCurrentlyDisplayedText && strText != static_cast<const char*>(pCurrentlyDisplayedText))) {
             uint32_t v3;
             uint32_t v6 = BSstrlen(pCurrentlyDisplayedText);
             if (uiNextDisplayTime) {

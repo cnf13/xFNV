@@ -75,8 +75,8 @@ bool RagDollData::UpdateReferenceFromData(TESObjectREFR* apRef) {
         bUpdated = UpdateNodeFromRagDollData(static_cast<NiNode*>(a1), aiBoneIndex);
         if (pRoot) {
             NiMatrix3* v2;
-            if ((&pRoot->GetTranslate())->operator!=(apRef->GetLocationOnReference()) ||
-                (v2 = &(result = apRef->GetOrientation()), (&pRoot->m_kLocal)->m_Rotate.operator!=(*v2))) {
+            if (pRoot->GetTranslate() != apRef->GetLocationOnReference() ||
+                (v2 = &(result = apRef->GetOrientation()), (&pRoot->m_kLocal)->m_Rotate != *v2)) {
                 const NiPoint3* v3 = &apRef->GetLocationOnReference();
                 pRoot->SetTranslate(*v3);
                 pRoot->SetRotate(apRef->GetOrientation());
@@ -238,7 +238,7 @@ void RagDollData::UpdateBip01NodeFromRagdollData(TESObjectREFR* apRef) {
     NiAVObject* v7;
     NiNode* v8;
     NiNode* v9;
-    if ((&Bip01Rot)->operator!=(NiPoint3_ZERO)) {
+    if (Bip01Rot != NiPoint3_ZERO) {
         if (apRef && apRef->IsActor()) {
             v3 = apRef->Get3D();
         }
@@ -281,7 +281,7 @@ void RagDollData::Save() {
             }
         }
     }
-    if (Bip01Rot.operator!=(NiPoint3_ZERO)) {
+    if (Bip01Rot != NiPoint3_ZERO) {
         TESForm::AddChunkArray(XRGB_ID, &Bip01Rot.x, 3u);
     }
 }
@@ -293,7 +293,7 @@ bool RagDollData::Compare(RagDollData* apCompare) {
     if (iBoneCount != apCompare->iBoneCount) {
         return true;
     }
-    if (Bip01Rot.operator!=(apCompare->Bip01Rot)) {
+    if (Bip01Rot != apCompare->Bip01Rot) {
         return true;
     }
     return iBoneCount && std::memcmp(pBoneArray, apCompare->pBoneArray, sizeof(RagDollBone) * iBoneCount);

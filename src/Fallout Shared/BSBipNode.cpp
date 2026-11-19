@@ -126,7 +126,7 @@ void NiAVObject::UpdateObjectControllers(NiUpdateData& UpdateData, bool bPropert
         auto* pkPosition = m_kPropertyList.GetHeadPos();
         while (pkPosition) {
             NiPointer<NiProperty>& spProperty = m_kPropertyList.GetNext(pkPosition);
-            NiProperty* pkProperty = spProperty.operator->();
+            NiProperty* pkProperty = spProperty;
             if (pkProperty && pkProperty->GetControllers()) {
                 pkProperty->Update(UpdateData);
             }

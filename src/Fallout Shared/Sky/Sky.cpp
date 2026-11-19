@@ -639,9 +639,9 @@ void Sky::HandleClimateChange() {
             if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
                 NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
                 const char* v1 = ptestexture->GetDefaultPath();
-                strfilename.operator=(v1);
+                strfilename = v1;
                 const char* pTextureName = ptestexture->GetTextureName();
-                strfilename.operator+=(pTextureName);
+                strfilename += pTextureName;
                 BSShaderManager::GetTexture(strfilename.pString, true, spTex, true, false);
                 ptex = spTex.m_pObject;
                 if (ptex) {
@@ -656,12 +656,12 @@ void Sky::HandleClimateChange() {
             if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
                 if (BSShaderManager::bHDR || BSstricmp(ptestexture->GetTextureName(), "Sky\\SunGlare.dds")) {
                     const char* v5 = ptestexture->GetDefaultPath();
-                    strfilename.operator=(v5);
+                    strfilename = v5;
                     const char* v6 = ptestexture->GetTextureName();
-                    strfilename.operator+=(v6);
+                    strfilename += v6;
                 }
                 else {
-                    strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
+                    strfilename = "Textures\\Sky\\SunGlareNonHDR.dds";
                 }
                 NiPointer<NiTexture> spTex_2(static_cast<NiTexture*>(nullptr));
                 BSShaderManager::GetTexture(strfilename.pString, true, spTex_2, true, false);
@@ -1733,9 +1733,9 @@ void Sky::ReloadAllTextures() {
         const TESTexture* ptestexture = pCurrentClimate->GetTexture(TESClimate::TX_SUN);
         if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
             const char* v5 = ptestexture->GetDefaultPath();
-            strfilename.operator=(v5);
+            strfilename = v5;
             const char* pTextureName = ptestexture->GetTextureName();
-            strfilename.operator+=(pTextureName);
+            strfilename += pTextureName;
             BSShaderManager::GetTexture(strfilename.pString, true, spTex_3, true, false);
             ptex_3 = spTex_3.m_pObject;
             if (ptex_3) {
@@ -1750,12 +1750,12 @@ void Sky::ReloadAllTextures() {
         if ((ptestexture) && (ptestexture->GetTextureNameLength())) {
             if (BSShaderManager::bHDR || BSstricmp(ptestexture->GetTextureName(), "Sky\\SunGlare.dds")) {
                 const char* v9 = ptestexture->GetDefaultPath();
-                strfilename.operator=(v9);
+                strfilename = v9;
                 const char* v10 = ptestexture->GetTextureName();
-                strfilename.operator+=(v10);
+                strfilename += v10;
             }
             else {
-                strfilename.operator=("Textures\\Sky\\SunGlareNonHDR.dds");
+                strfilename = "Textures\\Sky\\SunGlareNonHDR.dds";
             }
             NiPointer<NiTexture> spTex_4(static_cast<NiTexture*>(nullptr));
             BSShaderManager::GetTexture(strfilename.pString, true, spTex_4, true, false);

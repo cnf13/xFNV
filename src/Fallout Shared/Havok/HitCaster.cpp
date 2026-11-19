@@ -53,8 +53,8 @@ void HitCaster::SetCustomPickCollisions() {
 // Casts the shape phantom from aOrigin towards aOrigin + aDirection * afPickDistance, sorts the contact points it found
 // and reports whether it hit anything.
 bool HitCaster::CastShape(const NiPoint3& aOrigin, const NiPoint3& aDirection, float afPickDistance) {
-    NiPoint3 kOffset = aDirection.operator*(afPickDistance);
-    NiPoint3 kTarget = aOrigin.operator+(kOffset);
+    NiPoint3 kOffset = aDirection * afPickDistance;
+    NiPoint3 kTarget = aOrigin + kOffset;
     SetCustomPickCollisions();
     if (spShapePhantom.operator->()) {
         hkVector4 kStart;
@@ -119,7 +119,7 @@ void HitCaster::Init(float afRadius, uint32_t aiGroup) {
     ifilter.SetGroup(aiGroup);
     iGroup = aiGroup;
     csi.m_collisionFilterInfo = ifilter.iFilter;
-    csi.m_shape = pshape->operator*();
+    csi.m_shape = **pshape;
     csi.m_transform.setIdentity();
     bhkSimpleShapePhantom* pPhantomMemory =
         static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
@@ -130,7 +130,7 @@ void HitCaster::Init(float afRadius, uint32_t aiGroup) {
     else {
         pPhantom = nullptr;
     }
-    spShapePhantom.operator=(pPhantom);
+    spShapePhantom = pPhantom;
     bInit = true;
 }
 

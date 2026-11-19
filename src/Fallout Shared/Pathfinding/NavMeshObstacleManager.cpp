@@ -275,9 +275,9 @@ void NavMeshObstacleManager::RemoveObstacleForReference(TESObjectREFR* apRef) {
     }
     NiPointer<ReferenceObstacleArray> spObstacleArray(nullptr);
     if (FormIDMap.GetAt(apRef->GetFormID(), spObstacleArray)) {
-        for (uint32_t i = 0; i < spObstacleArray.operator->()->Obstacles.GetSize(); ++i) {
-            NiPointer<ObstacleData>& spObstacle = spObstacleArray.operator->()->Obstacles.GetAt(i);
-            RemoveActivationListener(spObstacle.operator->()->pRigidBody.operator->());
+        for (uint32_t i = 0; i < spObstacleArray->Obstacles.GetSize(); ++i) {
+            NiPointer<ObstacleData>& spObstacle = spObstacleArray->Obstacles.GetAt(i);
+            RemoveActivationListener(spObstacle->pRigidBody.operator->());
         }
         uint32_t uiRemoveID = apRef->GetFormID();
         QueuedListOfRefsToRemove.AddTail(uiRemoveID);
@@ -584,8 +584,8 @@ void NavMeshObstacleManager::ProcessRemovedReferences() {
         pIter = pIter->GetNext();
         NiPointer<ReferenceObstacleArray> spObstacleArray(nullptr);
         if (FormIDMap.GetAt(uiFormID, spObstacleArray)) {
-            for (uint32_t i = 0; i < spObstacleArray.operator->()->Obstacles.GetSize(); ++i) {
-                ObstaclesUpdateList.Remove(spObstacleArray.operator->()->Obstacles.GetAt(i));
+            for (uint32_t i = 0; i < spObstacleArray->Obstacles.GetSize(); ++i) {
+                ObstaclesUpdateList.Remove(spObstacleArray->Obstacles.GetAt(i));
             }
         }
         ReallyRemoveObstaclesForReference(uiFormID);
@@ -624,8 +624,8 @@ void NavMeshObstacleManager::ProcessAllObstacles() {
         NiPointer<ReferenceObstacleArray> spObstacleArray(nullptr);
         uint32_t uiFormID;
         FormIDMap.GetNext(pPos, uiFormID, spObstacleArray);
-        for (uint32_t i = 0; i < spObstacleArray.operator->()->Obstacles.GetSize(); ++i) {
-            NiPointer<ObstacleData> spObstacle(spObstacleArray.operator->()->Obstacles.GetAt(i));
+        for (uint32_t i = 0; i < spObstacleArray->Obstacles.GetSize(); ++i) {
+            NiPointer<ObstacleData> spObstacle(spObstacleArray->Obstacles.GetAt(i));
             UpdateObstacle(spObstacle);
         }
     }
@@ -648,13 +648,13 @@ void NavMeshObstacleManager::ProcessMovingReferences() {
         NiPointer<ObstacleData>& spObstacle = *reinterpret_cast<NiPointer<ObstacleData>*>(aObstacleStorage);
         spObstacle.SetPointer(&pIter->GetItem());
         pIter = pIter->GetNext();
-        hkpRigidBody* phkRigidBody = spObstacle.operator->()->pRigidBody.operator->()->Gethk();
+        hkpRigidBody* phkRigidBody = spObstacle->pRigidBody->Gethk();
         hkVector4 kHavokPos(phkRigidBody->getTranslation());
         NiPoint3 kPos;
         HK2NI(kPos, kHavokPos);
-        if ((kPos - spObstacle.operator->()->Center).SqrLength() > 25.0f) {
+        if ((kPos - spObstacle->Center).SqrLength() > 25.0f) {
             uint32_t uiTime = appTimer.GetTime();
-            if (uiTime - spObstacle.operator->()->iLastUpdateTime >= uiUpdateDelta) {
+            if (uiTime - spObstacle->iLastUpdateTime >= uiUpdateDelta) {
                 UpdateObstacle(spObstacle);
             }
         }
@@ -764,7 +764,7 @@ void NavMeshObstacleManager::ReallyAddObstaclesForReference(TESObjectREFR* apRef
         else {
             pArray = nullptr;
         }
-        spArray.operator=(pArray);
+        spArray = pArray;
         NavMeshObstacleManager::GetObstacleDataForReference(apRef, spArray);
         FormIDMap.SetAt(apRef->iFormID, spArray);
     }
@@ -850,18 +850,14 @@ bool NavMeshObstacleManager::ReconnectPortals() {
             alignas(NavMeshEdgeHandle) uint8_t aEdgeStorage[sizeof(NavMeshEdgeHandle)];
             NavMeshEdgeHandle& kEdge =
                 *::new (aEdgeStorage) NavMeshEdgeHandle(pPortalSwaps->PotentialChildren.GetAt(uiChild));
-            if (kEdge.usTriangle >= pTask->spNewNavMesh.operator->()->GetTriangleCount()) {
+            if (kEdge.usTriangle >= pTask->spNewNavMesh->GetTriangleCount()) {
                 Warning("PATHFINDING: (NavMesh Obstacle Manager) Bad triangle index while trying to reconnect portals");
                 continue;
             }
-            NiPoint3 kEdgeStart = pTask->spNewNavMesh.operator->()
-                                      ->GetEdgeVertices(kEdge.usTriangle, kEdge.iEdgeIndex)
-                                      .Vertices[0]
-                                      ->Location;
-            NiPoint3 kEdgeEnd = pTask->spNewNavMesh.operator->()
-                                    ->GetEdgeVertices(kEdge.usTriangle, kEdge.iEdgeIndex)
-                                    .Vertices[1]
-                                    ->Location;
+            NiPoint3 kEdgeStart =
+                pTask->spNewNavMesh->GetEdgeVertices(kEdge.usTriangle, kEdge.iEdgeIndex).Vertices[0]->Location;
+            NiPoint3 kEdgeEnd =
+                pTask->spNewNavMesh->GetEdgeVertices(kEdge.usTriangle, kEdge.iEdgeIndex).Vertices[1]->Location;
             bool bConnected = false;
             for (uint32_t j = 0; j < uiTaskCount; ++j) {
                 if (j == i) {
@@ -877,21 +873,21 @@ bool NavMeshObstacleManager::ReconnectPortals() {
                     alignas(NavMeshEdgeHandle) uint8_t aOtherStorage[sizeof(NavMeshEdgeHandle)];
                     NavMeshEdgeHandle& kOtherEdge =
                         *::new (aOtherStorage) NavMeshEdgeHandle(pOtherSwaps->PotentialChildren.GetAt(k));
-                    if (kOtherEdge.usTriangle >= pOtherTask->spNewNavMesh.operator->()->GetTriangleCount()) {
+                    if (kOtherEdge.usTriangle >= pOtherTask->spNewNavMesh->GetTriangleCount()) {
                         Warning(
                             "PATHFINDING: (NavMesh Obstacle Manager) Bad triangle index while trying to "
                             "reconnect portals"
                         );
                         continue;
                     }
-                    NiPoint3 kOtherStart = pOtherTask->spNewNavMesh.operator->()
-                                               ->GetEdgeVertices(kOtherEdge.usTriangle, kOtherEdge.iEdgeIndex)
-                                               .Vertices[0]
-                                               ->Location;
-                    NiPoint3 kOtherEnd = pOtherTask->spNewNavMesh.operator->()
-                                             ->GetEdgeVertices(kOtherEdge.usTriangle, kOtherEdge.iEdgeIndex)
-                                             .Vertices[1]
-                                             ->Location;
+                    NiPoint3 kOtherStart =
+                        pOtherTask->spNewNavMesh->GetEdgeVertices(kOtherEdge.usTriangle, kOtherEdge.iEdgeIndex)
+                            .Vertices[0]
+                            ->Location;
+                    NiPoint3 kOtherEnd =
+                        pOtherTask->spNewNavMesh->GetEdgeVertices(kOtherEdge.usTriangle, kOtherEdge.iEdgeIndex)
+                            .Vertices[1]
+                            ->Location;
                     if ((kEdgeEnd - kOtherStart).SqrXYLength() < 2500.0f &&
                         (kEdgeStart - kOtherEnd).SqrXYLength() < 2500.0f) {
                         CreatePortal(pTask->spNewNavMesh, kEdge, pOtherTask->spNewNavMesh, kOtherEdge);
@@ -918,7 +914,7 @@ bool NavMeshObstacleManager::ReconnectPortals() {
                     *::new (aParentStorage) NavMeshEdgeHandle(pPortalSwaps->PotentialParents.GetAt(uiParent));
                 alignas(NavMeshEdgeHandle) uint8_t aMatchStorage[sizeof(NavMeshEdgeHandle)];
                 NavMeshEdgeHandle& kMatchEdge = *::new (aMatchStorage) NavMeshEdgeHandle;
-                if (!pTask->spSrcMesh.operator->()->GetMatchingEdge(kParentEdge, &kMatchEdge)) {
+                if (!pTask->spSrcMesh->GetMatchingEdge(kParentEdge, &kMatchEdge)) {
                     continue;
                 }
                 if (kParentEdge.pNavMeshInfo == kMatchEdge.pNavMeshInfo) {
@@ -945,7 +941,7 @@ bool NavMeshObstacleManager::ReconnectPortals() {
                     NavMeshEdgeHandle& kOldEdge =
                         *::new (aOldStorage) NavMeshEdgeHandle(pPortalSwaps->PotentialParents.GetAt(uiParent));
                     EdgeExtraInfo* pExtraInfo =
-                        pTask->spSrcMesh.operator->()->GetEdgeExtraInfo(kOldEdge.usTriangle, kOldEdge.iEdgeIndex);
+                        pTask->spSrcMesh->GetEdgeExtraInfo(kOldEdge.usTriangle, kOldEdge.iEdgeIndex);
                     if (pExtraInfo) {
                         alignas(NavMeshTriHandle) uint8_t aTriStorage[sizeof(NavMeshTriHandle)];
                         NavMeshTriHandle& kOldTri =
@@ -961,24 +957,18 @@ bool NavMeshObstacleManager::ReconnectPortals() {
                     spMatchMesh = nullptr;
                     continue;
                 }
-                if (kMatchEdge.usTriangle >= spMatchMesh.operator->()->GetTriangleCount()) {
+                if (kMatchEdge.usTriangle >= spMatchMesh->GetTriangleCount()) {
                     spMatchMesh = nullptr;
                     continue;
                 }
-                if (spMatchMesh.operator->()
-                        ->GetTriangle(kMatchEdge.usTriangle)
-                        ->GetFlag(NavMeshTriangle::NAV_TRI_DISABLED)) {
+                if (spMatchMesh->GetTriangle(kMatchEdge.usTriangle)->GetFlag(NavMeshTriangle::NAV_TRI_DISABLED)) {
                     spMatchMesh = nullptr;
                     continue;
                 }
-                NiPoint3 kMatchStart = spMatchMesh.operator->()
-                                           ->GetEdgeVertices(kMatchEdge.usTriangle, kMatchEdge.iEdgeIndex)
-                                           .Vertices[0]
-                                           ->Location;
-                NiPoint3 kMatchEnd = spMatchMesh.operator->()
-                                         ->GetEdgeVertices(kMatchEdge.usTriangle, kMatchEdge.iEdgeIndex)
-                                         .Vertices[1]
-                                         ->Location;
+                NiPoint3 kMatchStart =
+                    spMatchMesh->GetEdgeVertices(kMatchEdge.usTriangle, kMatchEdge.iEdgeIndex).Vertices[0]->Location;
+                NiPoint3 kMatchEnd =
+                    spMatchMesh->GetEdgeVertices(kMatchEdge.usTriangle, kMatchEdge.iEdgeIndex).Vertices[1]->Location;
                 if ((kEdgeEnd - kMatchStart).SqrXYLength() < 2500.0f &&
                     (kEdgeStart - kMatchEnd).SqrXYLength() < 2500.0f) {
                     CreatePortal(pTask->spNewNavMesh, kEdge, spMatchMesh, kMatchEdge);
@@ -1011,15 +1001,15 @@ bool NavMeshObstacleManager::CreatePortal(
     EdgeExtraInfo& kInfo1 = *::new (aInfo1Storage) EdgeExtraInfo;
     kInfo1.Portal.pOtherMesh = aEdge2.pNavMeshInfo;
     kInfo1.Portal.sTriangle = aEdge2.usTriangle;
-    uint16_t usInfo1 = aspNavMesh1.operator->()->AddExtraEdgeInfo(kInfo1);
-    aspNavMesh1.operator->()->GetTriangle(aEdge1.usTriangle)->SetEdgeExtraInfo(aEdge1.iEdgeIndex, usInfo1);
+    uint16_t usInfo1 = aspNavMesh1->AddExtraEdgeInfo(kInfo1);
+    aspNavMesh1->GetTriangle(aEdge1.usTriangle)->SetEdgeExtraInfo(aEdge1.iEdgeIndex, usInfo1);
 
     alignas(EdgeExtraInfo) uint8_t aInfo2Storage[sizeof(EdgeExtraInfo)];
     EdgeExtraInfo& kInfo2 = *::new (aInfo2Storage) EdgeExtraInfo;
     kInfo2.Portal.pOtherMesh = aEdge1.pNavMeshInfo;
     kInfo2.Portal.sTriangle = aEdge1.usTriangle;
-    uint16_t usInfo2 = aspNavMesh2.operator->()->AddExtraEdgeInfo(kInfo2);
-    aspNavMesh2.operator->()->GetTriangle(aEdge2.usTriangle)->SetEdgeExtraInfo(aEdge2.iEdgeIndex, usInfo2);
+    uint16_t usInfo2 = aspNavMesh2->AddExtraEdgeInfo(kInfo2);
+    aspNavMesh2->GetTriangle(aEdge2.usTriangle)->SetEdgeExtraInfo(aEdge2.iEdgeIndex, usInfo2);
     return true;
 }
 
@@ -1033,8 +1023,8 @@ bool NavMeshObstacleManager::CreateOneWayPortal(
     EdgeExtraInfo& kInfo = *::new (aInfoStorage) EdgeExtraInfo;
     kInfo.Portal.pOtherMesh = aTri2.pNavMeshInfo;
     kInfo.Portal.sTriangle = aTri2.usTriangle;
-    uint16_t usInfo = aspNavMesh1.operator->()->AddExtraEdgeInfo(kInfo);
-    aspNavMesh1.operator->()->GetTriangle(aEdge1.usTriangle)->SetEdgeExtraInfo(aEdge1.iEdgeIndex, usInfo);
+    uint16_t usInfo = aspNavMesh1->AddExtraEdgeInfo(kInfo);
+    aspNavMesh1->GetTriangle(aEdge1.usTriangle)->SetEdgeExtraInfo(aEdge1.iEdgeIndex, usInfo);
     return true;
 }
 
@@ -1152,16 +1142,16 @@ void NavMeshObstacleManager::ClearAllObstacles() {
     while (pPos) {
         uint32_t uiFormID;
         FormIDMap.GetNext(pPos, uiFormID, spObstacleArray);
-        for (uint32_t i = 0; i < spObstacleArray.operator->()->Obstacles.GetSize(); ++i) {
-            NiPointer<ObstacleData> spObstacle(spObstacleArray.operator->()->Obstacles.GetAt(static_cast<int32_t>(i)));
+        for (uint32_t i = 0; i < spObstacleArray->Obstacles.GetSize(); ++i) {
+            NiPointer<ObstacleData> spObstacle(spObstacleArray->Obstacles.GetAt(static_cast<int32_t>(i)));
             if (!QueuedListOfRefsToRemove.IsInList(uiFormID)) {
-                RemoveActivationListener(spObstacle.operator->()->pRigidBody.operator->());
+                RemoveActivationListener(spObstacle->pRigidBody.operator->());
             }
-            for (uint32_t j = 0; j < spObstacle.operator->()->Navmeshes.GetSize(); ++j) {
+            for (uint32_t j = 0; j < spObstacle->Navmeshes.GetSize(); ++j) {
                 NavMeshPtr spNavMesh;
-                NavMeshInfo* pNavMeshInfo = spObstacle.operator->()->Navmeshes.GetAt(static_cast<int32_t>(j));
+                NavMeshInfo* pNavMeshInfo = spObstacle->Navmeshes.GetAt(static_cast<int32_t>(j));
                 if (pNavMeshInfo->GetNavMeshEvenDisabled(spNavMesh)) {
-                    spNavMesh.operator->()->NavMesh::ClearAllObstacles();
+                    spNavMesh->NavMesh::ClearAllObstacles();
                 }
             }
         }
@@ -1237,7 +1227,7 @@ void NavMeshObstacleManager::DrawObstacles(bool abDraw) {
                 v8 = nullptr;
             }
             NiRefObject* v16 = (NiRefObject*)v8;
-            spObstacleRootNode.operator=(v8);
+            spObstacleRootNode = v8;
             NiAlphaProperty* v13 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
             if (v13) {
                 v7 = (void*)::new (v13) NiAlphaProperty;
@@ -1325,7 +1315,7 @@ void NavMeshObstacleManager::RemoveBoundingBox3DNode(const NiPointer<ObstacleDat
     if ((spObstacleRootNode.m_pObject) && (aBox.m_pObject->sp3DNode.m_pObject)) {
         NiNode* v2 = spObstacleRootNode.m_pObject;
         v2->DetachChild(aBox.m_pObject->sp3DNode.m_pObject);
-        aBox.m_pObject->sp3DNode.operator=(static_cast<NiTriShape*>(nullptr));
+        aBox.m_pObject->sp3DNode = static_cast<NiTriShape*>(nullptr);
     }
 }
 
@@ -1344,7 +1334,7 @@ void NavMeshObstacleManager::UpdateObstacleActiveStatus(NiPointer<ObstacleData>&
     NiPoint3 kAABB;
     NiPoint3* kAABBMin = &(&aspObstacle)->m_pObject->aabbMin;
     ObstacleData* pData = (&aspObstacle)->m_pObject;
-    (kAABB = (&pData->aabbMax)->operator-(*kAABBMin));
+    (kAABB = pData->aabbMax - *kAABBMin);
     (&aspObstacle)->m_pObject->bActive = (bool)((uint8_t)((!(kAABB.z < 48.0f)) &&
                                                           (((v3 = 48.0f + 48.0f), (!(kAABB.z < ((double)v3)))) ||
                                                            ((!(kAABB.x < 0x1p+4f)) || (!(kAABB.y < 0x1p+4f))))));
@@ -1394,7 +1384,7 @@ bool NavMeshObstacleManager::FindFirstObstacleFor3D(NiAVObject* ap3D, ObstacleDa
            (layer == L_CLUTTER ||
             (layer == L_PROPS || (layer == L_DEBRIS_LARGE || layer == L_TRANSPARENT_SMALL_ANIM))))))) {
         apRetObstacle->spParentArray = nullptr;
-        apRetObstacle->pRigidBody.operator=(prb);
+        apRetObstacle->pRigidBody = prb;
         NavMeshObstacleManager::UpdateObstacleData(apRetObstacle);
         return true;
     }
@@ -1436,10 +1426,10 @@ bool NavMeshObstacleManager::AddObstaclesFor3DRecursive(
                 ObstacleData* pObstacle = pMemory ? ::new (pMemory) ObstacleData : nullptr;
                 NiPointer<ObstacleData> spObstacleData(pObstacle);
                 ReferenceObstacleArray* pParentArray = apRetObstacleArray.operator->();
-                spObstacleData.operator->()->spParentArray = pParentArray;
-                spObstacleData.operator->()->pRigidBody = static_cast<bhkRigidBody*>(pWorldObject);
+                spObstacleData->spParentArray = pParentArray;
+                spObstacleData->pRigidBody = static_cast<bhkRigidBody*>(pWorldObject);
                 UpdateObstacleData(spObstacleData.operator->());
-                apRetObstacleArray.operator->()->Obstacles.Add(spObstacleData);
+                apRetObstacleArray->Obstacles.Add(spObstacleData);
             }
         }
     }
@@ -1586,7 +1576,7 @@ bool NavMeshObstacleManager::GetObstacleDataForReference(
     NiPointer<ReferenceObstacleArray>& apRetObstacleArray
 ) {
     uint32_t uiFormID = apRef->GetFormID();
-    apRetObstacleArray.operator->()->iFormID = uiFormID;
+    apRetObstacleArray->iFormID = uiFormID;
     return UpdateObstacleDataForReference(apRef, apRetObstacleArray);
 }
 
@@ -1595,7 +1585,7 @@ bool NavMeshObstacleManager::UpdateObstacleDataForReference(
     TESObjectREFR* apRef,
     NiPointer<ReferenceObstacleArray>& apRetObstacleArray
 ) {
-    apRetObstacleArray.operator->()->Obstacles.Clear(true);
+    apRetObstacleArray->Obstacles.Clear(true);
     if (!apRef->Get3D()) {
         return false;
     }

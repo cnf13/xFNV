@@ -295,7 +295,7 @@ void NiAVObjectArray_SetSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray, uin
             for (i = auiSize; i < static_cast<int32_t>(apArray->m_usSize); ++i) {
                 bool v8 = apArray->m_pBase[i] != NiPointer<NiAVObject>(nullptr);
                 if (v8) {
-                    apArray->m_pBase[i].operator=(NiPointer<NiAVObject>(nullptr));
+                    apArray->m_pBase[i] = NiPointer<NiAVObject>(nullptr);
                     --apArray->m_usESize;
                 }
             }
@@ -306,12 +306,12 @@ void NiAVObjectArray_SetSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray, uin
         if (auiSize) {
             apArray->m_pBase = NiTNewInterface<NiPointer<NiAVObject>>::Allocate(apArray->m_usMaxSize);
             for (i = 0; i < static_cast<int32_t>(apArray->m_usSize); ++i) {
-                apArray->m_pBase[i].operator=(pSaveBase[i]);
+                apArray->m_pBase[i] = pSaveBase[i];
             }
             for (i = apArray->m_usSize; i < static_cast<int32_t>(apArray->m_usMaxSize); ++i) {
                 NiPointer<NiAVObject> v5(nullptr);
                 NiPointer<NiAVObject>* v2 = &v5;
-                apArray->m_pBase[i].operator=(*v2);
+                apArray->m_pBase[i] = *v2;
             }
         }
         else {

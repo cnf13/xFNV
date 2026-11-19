@@ -548,7 +548,7 @@ bool Pathing::CheckLineOfSight(
 ) {
     uint16_t usgoalTri;
     if (apReturnIntersectionLocation) {
-        apReturnIntersectionLocation->operator=(aStartLocation);
+        *apReturnIntersectionLocation = aStartLocation;
     }
     if (!aGoalLocation.ResolveNavMeshInfo(nullptr)) {
         return !aStartLocation.ResolveNavMeshInfo(nullptr);
@@ -784,8 +784,8 @@ bool Pathing::BuildFleePathNoNavMesh(PathingRequestFlee* apRequest, PathingSolut
         fleeToPoint = *startLocation - fleeFromPoint;
         fleeToPoint.Unitize();
         float a2 = apRequest->GetMinFleeDistance();
-        fleeToPoint.operator*=(a2);
-        fleeToPoint.operator+=(*startLocation);
+        fleeToPoint *= a2;
+        fleeToPoint += *startLocation;
     }
     if (pcell) {
         float height;
@@ -1138,7 +1138,7 @@ bool Pathing::BuildCoveredMovePath(PathingRequestCoveredMove* apRequest, Pathing
                 }
             }
             ++icurrentNode;
-            previousNodeLocation.operator=(nextNodeLocation);
+            previousNodeLocation = nextNodeLocation;
         }
         requestCopy.ClearCombatCoverData();
         if (pcombatCoverLocation) {
@@ -1498,7 +1498,7 @@ bool Pathing::FindNavmeshesForLocation(
         return false;
     }
     for (uint32_t n = 0; n < apRetNavMeshes->iSize; ++n) {
-        NavMeshPtr spcurrentMesh(apRetNavMeshes->operator[](n));
+        NavMeshPtr spcurrentMesh((*apRetNavMeshes)[n]);
         uint32_t isize = spcurrentMesh.m_pObject->GetNavMeshInfo()->AdjacentNavMeshes.iSize;
         uint32_t ipreferredSize = spcurrentMesh.m_pObject->GetNavMeshInfo()->PreferredAdjacentNavMeshes.iSize;
         for (uint32_t i_2 = 0; i_2 < ipreferredSize + isize; ++i_2) {
@@ -1993,7 +1993,7 @@ bool Pathing::CheckLineOfSight(
 ) {
     uint16_t usstartTri;
     if (apReturnIntersectionLocation) {
-        apReturnIntersectionLocation->operator=(aStartLocation);
+        *apReturnIntersectionLocation = aStartLocation;
     }
     if (!aStartLocation.ResolveNavMeshInfo(nullptr)) {
         return apGoalNavMesh == nullptr;
@@ -2044,7 +2044,7 @@ bool Pathing::CheckLineOfSight(
             }
             return false;
         }
-        if (potherMesh.operator!=(pcurrentNavMesh)) {
+        if (potherMesh != pcurrentNavMesh) {
             NavMeshEdgeVertices otherEdgeVerts =
                 potherMesh.m_pObject->GetEdgeVertices(arOtherTriangleIndex, arOtherEdgeIndex);
             NiPoint2 otherEdgeVert1(otherEdgeVerts.Vertices[0]->Location.x, otherEdgeVerts.Vertices[0]->Location.y);
@@ -2052,7 +2052,7 @@ bool Pathing::CheckLineOfSight(
             intersection = NavMeshMath::ClosestPointOnSegmentToLine(otherEdgeVert1, otherEdgeVert2, intersection, end);
         }
         uscurrentTriangle = arOtherTriangleIndex;
-        pcurrentNavMesh.operator=(potherMesh);
+        pcurrentNavMesh = potherMesh;
         NiPoint2 newIntersection;
         currentEdgeIndex = potherMesh.m_pObject->FindInterectingEdge(
             arOtherTriangleIndex, arOtherEdgeIndex, intersection, end, &newIntersection
@@ -2071,7 +2071,7 @@ bool Pathing::CheckLineOfSight(
     if (pcurrentNavMesh.m_pObject == apGoalNavMesh && uscurrentTriangle == ausGoalTriangle) {
         if (apReturnIntersectionLocation) {
             PathingLocation goalLoc(aGoalLocation, apGoalNavMesh->GetNavMeshInfo(), ausGoalTriangle);
-            apReturnIntersectionLocation->operator=(goalLoc);
+            *apReturnIntersectionLocation = goalLoc;
         }
         return true;
     }
@@ -2103,7 +2103,7 @@ bool Pathing::ComputeLineOfSightMap(
         float fheading__goalLoc_2;
         PathingLocation* fheading__goalLoc = &aLocations.GetAt(l);
         if (apHeadings) {
-            fheading__goalLoc_2 = apHeadings->operator[](l);
+            fheading__goalLoc_2 = (*apHeadings)[l];
         }
         else {
             fheading__goalLoc_2 = -1.0f;
@@ -2502,7 +2502,7 @@ NiPoint3 Pathing::ComputeInitialTangentForActor(
         }
     }
     NiPoint3* v16 = ::new (&v32) NiPoint3(direction * afRadius * 1.2f);
-    end.operator-=(*v16);
+    end -= *v16;
     PathingLocation nextLoc(aNextLocation);
     NiPoint3 next = nextLoc.GetLocation();
     PathingLocation retIntersection2;

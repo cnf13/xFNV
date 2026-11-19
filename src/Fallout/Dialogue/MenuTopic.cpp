@@ -370,7 +370,7 @@ void MenuTopic::SaveGame() {
 TESTopicInfo* MenuTopic::LoadGame_0083FBE0(BGSLoadGameBuffer* a1) {
     char apString[508];
     a1->LoadString(apString);
-    cTopicText.operator=(apString);
+    cTopicText = apString;
     a1->LoadData(&bTopicIsChoice, 1u);
     a1->LoadData(&bGeneralTopic, 1u);
     a1->LoadData(&bTopicIsNew, 1u);

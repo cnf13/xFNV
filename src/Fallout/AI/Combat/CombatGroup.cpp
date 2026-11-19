@@ -537,7 +537,7 @@ void CombatGroup::GetTargetDetectionLevel(
 void CombatGroup::RemoveTarget(Actor* apActor) {
     uint32_t a2;
     for (a2 = 0; a2 < (&TargetArray)->BSSimpleArray<CombatTarget>::GetSize(); ++a2) {
-        if ((&(&TargetArray)->operator[](a2))->pActor == apActor) {
+        if ((&TargetArray[a2])->pActor == apActor) {
             RemoveTarget(a2);
             return;
         }
@@ -545,7 +545,7 @@ void CombatGroup::RemoveTarget(Actor* apActor) {
 }
 
 void CombatGroup::RemoveTarget(uint32_t aiIndex) {
-    Actor* pActor = (&TargetArray.operator[](aiIndex))->pActor;
+    Actor* pActor = (&TargetArray[aiIndex])->pActor;
     pCombatManager->NotifyCombatGroupRemovedTarget(this, pActor);
     TargetArray.RemoveFast(aiIndex, 1u);
 }
@@ -564,7 +564,7 @@ uint32_t CombatGroup::GetMemberGroupStrategyAssignment(uint32_t aiIndex) {
 }
 
 CombatMember* CombatGroup::GetCombatMember(uint32_t aiIndex) {
-    return &(&MemberArray)->operator[](aiIndex);
+    return &MemberArray[aiIndex];
 }
 
 void CombatGroup::UpdateAttackerCounts() {
@@ -766,7 +766,7 @@ CombatSearchDoor* CombatGroup::GetCombatSearchDoor(TESObjectREFR* apDoor) {
     CombatSearchDoor* v4;
     uint32_t i;
     for (i = 0; i < (&SearchTeleportDoors)->iSize; ++i) {
-        v4 = &(&SearchTeleportDoors)->operator[](i);
+        v4 = &SearchTeleportDoors[i];
         if ((v4->pDoor == apDoor) || (v4->pLinkedDoor == apDoor)) {
             return v4;
         }
@@ -1004,7 +1004,7 @@ char CombatGroup::GetClusterIndex(CombatGroupCluster* apCluster) {
 
 CombatGroupCluster* CombatGroup::GetCluster(char acIndex) {
     if (acIndex >= 0) {
-        return *static_cast<CombatGroupCluster**>(&ClusterArray.operator[](acIndex));
+        return *static_cast<CombatGroupCluster**>(&ClusterArray[acIndex]);
     }
 
     return nullptr;
@@ -1026,7 +1026,7 @@ void CombatGroup::SetMemberGroupStrategyAssignment(Actor* a2, uint32_t a3) {
 }
 
 void* CombatGroup::SetGroupStrategyAssignment(int32_t aiIndex, uint32_t auiAssignment) {
-    CombatMember* result = &(&MemberArray)->operator[](aiIndex);
+    CombatMember* result = &MemberArray[aiIndex];
     result->iGroupStrategyAssignment = (uint32_t)((int32_t)auiAssignment);
     return result;
 }
@@ -1035,7 +1035,7 @@ void CombatGroup::RemoveMember(Actor* apActor) {
     NiNode* v2;
     uint32_t arg0;
     for (arg0 = 0; arg0 < (&MemberArray)->iSize; ++arg0) {
-        if ((&(&MemberArray)->operator[](arg0))->pActor == apActor) {
+        if ((&MemberArray[arg0])->pActor == apActor) {
             pCombatManager->CombatManager::NotifyCombatGroupRemovedMember(this, apActor);
             MemberArray.RemoveFast(arg0, 1u);
             if (pSearchingMember == apActor) {
@@ -1053,7 +1053,7 @@ void CombatGroup::RemoveMember(Actor* apActor) {
 
 CombatTarget* CombatGroup::GetCombatTargetForNumericID(uint32_t aiTargetID) {
     for (uint32_t auiIndex = 0; auiIndex < TargetArray.GetSize(); ++auiIndex) {
-        CombatTarget* v4 = &TargetArray.operator[](auiIndex);
+        CombatTarget* v4 = &TargetArray[auiIndex];
         if (v4->pActor->GetFormID() == aiTargetID) {
             return v4;
         }
@@ -1065,7 +1065,7 @@ CombatMember* CombatGroup::GetCombatMemberForNumericID(uint32_t auiRefID) {
     CombatMember* v4;
     uint32_t i;
     for (i = 0; i < (&MemberArray)->iSize; ++i) {
-        v4 = &(&MemberArray)->operator[](i);
+        v4 = &MemberArray[i];
         if (v4->pActor->TESForm::GetFormID() == auiRefID) {
             return v4;
         }
@@ -1074,7 +1074,7 @@ CombatMember* CombatGroup::GetCombatMemberForNumericID(uint32_t auiRefID) {
 }
 
 Actor* CombatGroup::GetMember(uint32_t aiIndex) {
-    return (&(&MemberArray)->operator[](aiIndex))->pActor;
+    return (&MemberArray[aiIndex])->pActor;
 }
 
 // Whether the members and the targets are mixed: with both groups' positions measured along the line from the members'
@@ -1132,7 +1132,7 @@ bool CombatGroup::CheckMemberTargetIntersection() {
 }
 
 CombatTarget* CombatGroup::GetCombatTarget(uint32_t aiIndex) {
-    return &(&TargetArray)->operator[](aiIndex);
+    return &TargetArray[aiIndex];
 }
 
 Actor* CombatGroup::FindMemberNearLocation(const BGSWorldLocation& arWorldLoc, float afRadius, Actor* apIgnoreMember) {
@@ -1280,7 +1280,7 @@ void CombatGroup::FillTargetArray(BSSimpleArray<Actor*, 1024>* apActorArray) {
     uint32_t formFlags = (&TargetArray)->BSSimpleArray<CombatTarget>::GetSize();
     apActorArray->SetSize(formFlags, true);
     for (a2 = 0; a2 < (&TargetArray)->BSSimpleArray<CombatTarget>::GetSize(); ++a2) {
-        combatTarget = &(&TargetArray)->operator[](a2);
+        combatTarget = &TargetArray[a2];
         apActorArray->SetAt(a2, combatTarget->pActor);
     }
 }
@@ -1434,7 +1434,7 @@ void CombatGroup::FillMemberArray(BSSimpleArray<Actor*, 1024>* apActorArray) {
     uint32_t formFlags = (&MemberArray)->iSize;
     apActorArray->SetSize(formFlags, true);
     for (a2 = 0; a2 < (&MemberArray)->iSize; ++a2) {
-        v3 = &(&MemberArray)->operator[](a2);
+        v3 = &MemberArray[a2];
         apActorArray->SetAt(a2, v3->pActor);
     }
 }
@@ -1616,9 +1616,9 @@ void CombatGroup::BuildSearchTeleportDoorArray() {
         return CompareUInt(static_cast<const uint32_t*>(apOne), static_cast<const uint32_t*>(apTwo));
     });
     for (uint32_t i_2 = 0; i_2 < doorArray.iSize; ++i_2) {
-        TESObjectREFR* pdoor = doorArray.operator[](i_2);
+        TESObjectREFR* pdoor = doorArray[i_2];
         uint32_t inumDuplicates = 0;
-        for (uint32_t j_2 = i_2 + 1; j_2 < doorArray.iSize && pdoor == doorArray.operator[](j_2); ++j_2) {
+        for (uint32_t j_2 = i_2 + 1; j_2 < doorArray.iSize && pdoor == doorArray[j_2]; ++j_2) {
             ++inumDuplicates;
         }
         if (inumDuplicates) {
@@ -1626,13 +1626,13 @@ void CombatGroup::BuildSearchTeleportDoorArray() {
         }
     }
     for (uint32_t j = 0; j < doorArray.iSize; ++j) {
-        AddSearchDoor(doorArray.operator[](j));
+        AddSearchDoor(doorArray[j]);
     }
 }
 
 void CombatGroup::UpdateSearchLocations() {
     for (uint32_t i = 0; i < SearchLocations.iSize; ++i) {
-        CombatSearchLocation* searchLocation = &SearchLocations.operator[](i);
+        CombatSearchLocation* searchLocation = &SearchLocations[i];
         float fscore = searchLocation->GetScore();
         if (fscore < 0.0 || searchLocation->iTargetID) {
             SearchLocations.RemoveFast(i--, 1u);
@@ -1664,11 +1664,10 @@ void CombatGroup::UpdateSearchLocations() {
                         (Space = otherLoc.pSpace, Space == pcombatTarget->LastNoticedLocation.pSpace)) {
                         NiPoint3 v8;
                         NiPoint3 interpolatedPoint = otherLoc.Point * fotherScore;
-                        interpolatedPoint.operator+=(
-                            *::new (&v8) NiPoint3(pcombatTarget->LastNoticedLocation.Point * fnoticedScore)
-                        );
+                        interpolatedPoint +=
+                            *::new (&v8) NiPoint3(pcombatTarget->LastNoticedLocation.Point * fnoticedScore);
                         float v6 = fotherScore + fnoticedScore;
-                        interpolatedPoint.operator/=(v6);
+                        interpolatedPoint /= v6;
                         BGSWorldLocation interpolatedLocation(
                             interpolatedPoint, pcombatTarget->LastNoticedLocation.pSpace
                         );
@@ -1880,7 +1879,7 @@ void CombatGroup::UpdateClusters() {
                 if (i_2 >= FormFlags) {
                     break;
                 }
-                CombatGroupCluster* pcluster = ClusterArray.operator[](i_2);
+                CombatGroupCluster* pcluster = ClusterArray[i_2];
                 if (!pcluster->iMemberCount) {
                     ClusterArray.RemoveFast(i_2, 1u);
                     ourFree(pcluster);
@@ -1924,7 +1923,7 @@ void CombatGroup::UpdateClusters() {
                     clusterData[clusterData[i_4].cClosestMember].pCombatMember->pCluster = pcluster_3;
                     NiPoint3* a2 = &(&clusterData[clusterData[i_4].cClosestMember].WorldLoc)->Point;
                     NiPoint3 center = clusterData[i_4].WorldLoc.Point + *a2;
-                    center.operator/=(2.0f);
+                    center /= 2.0f;
                     TESForm* a2a = clusterData[i_4].WorldLoc.pSpace;
                     pcluster_3->Center.SetLocation(center, a2a);
                 }
@@ -1934,13 +1933,13 @@ void CombatGroup::UpdateClusters() {
                 if (i_5 >= v4) {
                     break;
                 }
-                CombatGroupCluster* pcluster1 = ClusterArray.operator[](i_5);
+                CombatGroupCluster* pcluster1 = ClusterArray[i_5];
                 for (uint32_t j_2 = i_5 + 1;; ++j_2) {
                     uint32_t v5 = ClusterArray.iSize;
                     if (j_2 >= v5) {
                         break;
                     }
-                    CombatGroupCluster* pcluster2 = ClusterArray.operator[](j_2);
+                    CombatGroupCluster* pcluster2 = ClusterArray[j_2];
                     if (fClusterDistance * fClusterDistance > pcluster1->Center.GetDistanceSquared(pcluster2->Center)) {
                         for (uint32_t k = 0; k < imemberCount_2; ++k) {
                             if (clusterData[k].pCombatMember->pCluster == pcluster2) {
@@ -1980,7 +1979,7 @@ void CombatGroup::UpdateClusterCenters() {
     NiPoint3 centerPoint_2;
     NiPoint3 centerPoint;
     for (uint32_t i = 0; i < ClusterArray.iSize; ++i) {
-        CombatGroupCluster* pcluster = ClusterArray.operator[](i);
+        CombatGroupCluster* pcluster = ClusterArray[i];
         pcluster->Center.SetPoint(NiPoint3_ZERO);
         pcluster->iMemberCount = 0;
     }
@@ -1989,7 +1988,7 @@ void CombatGroup::UpdateClusterCenters() {
         CombatMember* pcombatMember = GetCombatMember(i_2);
         if (pcombatMember->pCluster) {
             centerPoint = pcombatMember->pCluster->Center.Point;
-            centerPoint.operator+=(pcombatMember->pActor->GetLocationOnReference());
+            centerPoint += pcombatMember->pActor->GetLocationOnReference();
             pcombatMember->pCluster->Center.SetPoint(centerPoint);
             ++pcombatMember->pCluster->iMemberCount;
         }
@@ -1999,9 +1998,9 @@ void CombatGroup::UpdateClusterCenters() {
         if (i_3 >= FormFlags) {
             break;
         }
-        CombatGroupCluster* pcluster_2 = ClusterArray.operator[](i_3);
+        CombatGroupCluster* pcluster_2 = ClusterArray[i_3];
         centerPoint_2 = pcluster_2->Center.Point;
-        centerPoint_2.operator/=(static_cast<float>(pcluster_2->iMemberCount));
+        centerPoint_2 /= static_cast<float>(pcluster_2->iMemberCount);
         pcluster_2->Center.SetPoint(centerPoint_2);
     }
 }
@@ -2089,13 +2088,13 @@ bool CombatGroup::CheckRemoveCombatTarget(CombatTarget* apCombatTarget) {
 bool CombatGroup::MergeGroup(CombatGroup* apCombatGroup) {
     BSSimpleArray<CombatTarget, 1024>* pnewTargetArray = &apCombatGroup->TargetArray;
     for (uint32_t i = 0; i < pnewTargetArray->iSize; ++i) {
-        CombatTarget* combatTarget = &pnewTargetArray->operator[](i);
+        CombatTarget* combatTarget = &(*pnewTargetArray)[i];
         if (!CanAddTarget(combatTarget->pActor)) {
             return false;
         }
     }
     for (uint32_t i_2 = 0; i_2 < TargetArray.iSize; ++i_2) {
-        CombatTarget* combatTarget_2 = &TargetArray.operator[](i_2);
+        CombatTarget* combatTarget_2 = &TargetArray[i_2];
         if (!apCombatGroup->CanAddTarget(combatTarget_2->pActor)) {
             return false;
         }
@@ -2111,7 +2110,7 @@ bool CombatGroup::MergeGroup(CombatGroup* apCombatGroup) {
     apCombatGroup->ClearClusterArray();
     BSSimpleArray<CombatMember, 1024>* pnewMemberArray = &apCombatGroup->MemberArray;
     for (uint32_t i_4 = 0; i_4 < pnewMemberArray->iSize; ++i_4) {
-        CombatMember* combatMember = &pnewMemberArray->operator[](i_4);
+        CombatMember* combatMember = &(*pnewMemberArray)[i_4];
         if (AddMember(combatMember->pActor)) {
             combatMember->pActor->SetCombatGroup(this);
             CombatMember* pcombatMember = GetCombatMemberForActor(combatMember->pActor);
@@ -2125,7 +2124,7 @@ bool CombatGroup::MergeGroup(CombatGroup* apCombatGroup) {
         }
     }
     for (uint32_t i_5 = 0; i_5 < pnewTargetArray->iSize; ++i_5) {
-        CombatTarget* combatTarget_3 = &pnewTargetArray->operator[](i_5);
+        CombatTarget* combatTarget_3 = &(*pnewTargetArray)[i_5];
         if (AddTarget(combatTarget_3->pActor)) {
             CombatTarget* pcombatTarget = GetCombatTargetForActor(combatTarget_3->pActor);
             if (pcombatTarget) {
@@ -2240,7 +2239,7 @@ void CombatGroup::ComputeMemberBoundingBox(NiPoint3* arPoints, bool a3) {
                 else {
                     v3 = 3.4028235e+38f;
                 }
-                arPoints[j].operator[](a2) = v3;
+                arPoints[j][a2] = v3;
             }
         }
     }
@@ -2250,15 +2249,15 @@ void CombatGroup::ComputeMemberBoundingBox(NiPoint3* arPoints, bool a3) {
         NiPoint3 v9 = Member->GetLocationOnReference();
         for (uint32_t k = 0; k < 8; ++k) {
             for (uint32_t i = 0; i < 3; ++i) {
-                float v5 = v9.operator[](i);
+                float v5 = v9[i];
                 if (CombatGroup_BoundsCornerIsMax[k][i]) {
-                    if (arPoints[k].operator[](i) < static_cast<double>(v5)) {
-                        arPoints[k].operator[](i) = v5;
+                    if (arPoints[k][i] < static_cast<double>(v5)) {
+                        arPoints[k][i] = v5;
                     }
                 }
                 else {
-                    if (arPoints[k].operator[](i) > static_cast<double>(v5)) {
-                        arPoints[k].operator[](i) = v5;
+                    if (arPoints[k][i] > static_cast<double>(v5)) {
+                        arPoints[k][i] = v5;
                     }
                 }
             }
@@ -2371,7 +2370,7 @@ void CombatGroup::UpdateSearch() {
                                 else {
                                     v8 = nullptr;
                                 }
-                                spPathingLOSGridMap.operator=(v8);
+                                spPathingLOSGridMap = v8;
                             }
                             spPathingLOSGridMap.m_pObject->Initialize(searchPathingCenter, fSearchRadius);
                             float* v3 = &fCombatSearchSightRadius.Float();
@@ -2383,7 +2382,7 @@ void CombatGroup::UpdateSearch() {
             }
             else {
                 if (spPathingLOSGridMap.m_pObject) {
-                    spPathingLOSGridMap.operator=(static_cast<PathingLOSGridMap*>(nullptr));
+                    spPathingLOSGridMap = static_cast<PathingLOSGridMap*>(nullptr);
                 }
             }
             if (spPathingLOSGridMap.m_pObject) {
@@ -2477,8 +2476,8 @@ void CombatGroup::GetMinMaxSearchRadius(BGSWorldLocation& arSearchLocation, floa
 
 void CombatGroup::ClearSearch() {
     CombatTimer apMemory;
-    spPathingLOSGridMap.operator=(static_cast<PathingLOSGridMap*>(nullptr));
-    spSearchDebugGeometry.operator=(static_cast<NiRefObject*>(nullptr));
+    spPathingLOSGridMap = static_cast<PathingLOSGridMap*>(nullptr);
+    spSearchDebugGeometry = static_cast<NiRefObject*>(nullptr);
     bUpdateSearchDebugGeometry = false;
     SearchUpdateTimer.Clear();
     SearchAreaUpdateTimer.Clear();
@@ -2560,7 +2559,7 @@ TESObjectREFR* CombatGroup::FindSearchDoor(Actor* apMember, float afMaxDistance,
         if (i >= FormFlags) {
             break;
         }
-        CombatSearchDoor* searchDoor = &SearchTeleportDoors.operator[](i);
+        CombatSearchDoor* searchDoor = &SearchTeleportDoors[i];
         if ((searchDoor->pDoor) && (searchDoor->pLinkedDoor)) {
             uint32_t cFailedAttempts = searchDoor->cFailedAttempts;
             if (cFailedAttempts <= iCombatSearchMaxSearchDoorFailure.Int() && !searchDoor->bReserved &&
@@ -2789,7 +2788,7 @@ void CombatGroup::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     uint32_t aiVariableValue = isaveGameCount;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t auiIndex = 0; auiIndex < aiVariableValue; ++auiIndex) {
-        CombatGroupCluster** pcluster = &ClusterArray.operator[](auiIndex);
+        CombatGroupCluster** pcluster = &ClusterArray[auiIndex];
         (*pcluster)->SaveGame(apSaveGameBuffer, this);
     }
     // The address &TargetArray is never null, so it is not tested.
@@ -2797,14 +2796,14 @@ void CombatGroup::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     uint32_t auiSize = isaveGameCount_2;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_2);
     for (int32_t a2 = 0; a2 < auiSize; ++a2) {
-        CombatTarget* combatTarget = &TargetArray.operator[](a2);
+        CombatTarget* combatTarget = &TargetArray[a2];
         combatTarget->SaveGame(apSaveGameBuffer, this);
     }
     // The address &MemberArray is never null, so it is not tested.
     isaveGameCount_3 = MemberArray.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_3);
     for (uint32_t i = 0; i < isaveGameCount_3; ++i) {
-        CombatMember* combatMember = &MemberArray.operator[](i);
+        CombatMember* combatMember = &MemberArray[i];
         combatMember->SaveGame(apSaveGameBuffer, this);
     }
     if (pGroupStrategy) {
@@ -2840,7 +2839,7 @@ void CombatGroup::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         isaveGameCount_4 = SearchLocations.iSize;
         apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_4);
         for (uint32_t j = 0; j < isaveGameCount_4; ++j) {
-            CombatSearchLocation* searchLoc = &SearchLocations.operator[](j);
+            CombatSearchLocation* searchLoc = &SearchLocations[j];
             searchLoc->WorldLoc.SaveGame(apSaveGameBuffer);
             apSaveGameBuffer->SaveDataEndian(&searchLoc->fScore, 4u, 0);
             apSaveGameBuffer->SaveFormID(searchLoc->iTargetID, 0);
@@ -2849,7 +2848,7 @@ void CombatGroup::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
         isaveGameCount_5 = SearchTeleportDoors.iSize;
         apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_5);
         for (uint32_t k = 0; k < isaveGameCount_5; ++k) {
-            CombatSearchDoor* searchDoor = &SearchTeleportDoors.operator[](k);
+            CombatSearchDoor* searchDoor = &SearchTeleportDoors[k];
             apSaveGameBuffer->SaveFormID(searchDoor->pDoor, 0);
             apSaveGameBuffer->SaveFormID(searchDoor->pLinkedDoor, 0);
             apSaveGameBuffer->SaveDataEndian(&searchDoor->cFailedAttempts, 1u, 0);
@@ -2878,7 +2877,7 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     ClusterArray.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         CombatGroupCluster* v7;
-        CombatGroupCluster** pcluster = &ClusterArray.operator[](i);
+        CombatGroupCluster** pcluster = &ClusterArray[i];
         CombatGroupCluster* apMemory = static_cast<CombatGroupCluster*>(ourMalloc(sizeof(CombatGroupCluster)));
         if (apMemory) {
             v7 = ::new (apMemory) CombatGroupCluster;
@@ -2892,13 +2891,13 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
     TargetArray.SetSize(isaveGameCount_2, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
-        CombatTarget* combatTarget = &TargetArray.operator[](i_2);
+        CombatTarget* combatTarget = &TargetArray[i_2];
         combatTarget->LoadGame(apLoadGameBuffer, this);
     }
     uint32_t isaveGameCount_3 = apLoadGameBuffer->LoadVariableSizedValue();
     MemberArray.SetSize(isaveGameCount_3, true);
     for (uint32_t i_3 = 0; i_3 < isaveGameCount_3; ++i_3) {
-        CombatMember* combatMember = &MemberArray.operator[](i_3);
+        CombatMember* combatMember = &MemberArray[i_3];
         combatMember->LoadGame(apLoadGameBuffer, this);
     }
     cgroupStrategyType = -1;
@@ -2931,7 +2930,7 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         uint32_t isaveGameCount_4 = apLoadGameBuffer->LoadVariableSizedValue();
         SearchLocations.SetSize(isaveGameCount_4, true);
         for (uint32_t i_5 = 0; i_5 < isaveGameCount_4; ++i_5) {
-            CombatSearchLocation* searchLoc = &SearchLocations.operator[](i_5);
+            CombatSearchLocation* searchLoc = &SearchLocations[i_5];
             searchLoc->WorldLoc.LoadGame(apLoadGameBuffer);
             apLoadGameBuffer->LoadData(&searchLoc->fScore, 4u);
             apLoadGameBuffer->LoadFormID(searchLoc->iTargetID);
@@ -2940,7 +2939,7 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         uint32_t isaveGameCount_5 = apLoadGameBuffer->LoadVariableSizedValue();
         SearchTeleportDoors.SetSize(isaveGameCount_5, true);
         for (uint32_t i_6 = 0; i_6 < isaveGameCount_5; ++i_6) {
-            CombatSearchDoor* searchDoor = &SearchTeleportDoors.operator[](i_6);
+            CombatSearchDoor* searchDoor = &SearchTeleportDoors[i_6];
             uint32_t FormID_0 = apLoadGameBuffer->LoadFormID();
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(FormID_0);
             searchDoor->pDoor = dynamic_cast<TESObjectREFR*>(FormByNumericID);
@@ -2963,7 +2962,7 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             else {
                 v6 = nullptr;
             }
-            spPathingLOSGridMap.operator=(v6);
+            spPathingLOSGridMap = v6;
             spPathingLOSGridMap.m_pObject->LoadGame(apLoadGameBuffer);
         }
         bUpdateSearchDebugGeometry = true;
@@ -2981,7 +2980,7 @@ void CombatGroup::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = TargetArray.iSize;
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         bool bremove = false;
-        CombatTarget* combatTarget = &TargetArray.operator[](i);
+        CombatTarget* combatTarget = &TargetArray[i];
         combatTarget->InitLoadGame(apLoadGameBuffer, this);
         if (combatTarget->pActor) {
             pCombatManager->TargetLocalActor(combatTarget->pActor, this);
@@ -2996,7 +2995,7 @@ void CombatGroup::InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     }
     uint32_t isaveGameCount_2 = MemberArray.iSize;
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
-        CombatMember* combatMember = &MemberArray.operator[](i_2);
+        CombatMember* combatMember = &MemberArray[i_2];
         combatMember->InitLoadGame(apLoadGameBuffer, this);
         if (!combatMember->pActor) {
             MemberArray.RemoveFast(i_2--, 1u);
@@ -3039,7 +3038,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
         }
     }
 
-    spDebugGeometry.operator=(static_cast<NiNode*>(nullptr));
+    spDebugGeometry = static_cast<NiNode*>(nullptr);
     if (abClear != eFalse) {
         return;
     }
@@ -3057,7 +3056,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
     }
     if (bDebugCombatGroupClusters.Bool() && !CombatGroup::bUseSimpleCombatGroupClustering && pDebugActor) {
         for (uint32_t i = 0; i < ClusterArray.iSize; ++i) {
-            CombatGroupCluster* pCluster = ClusterArray.operator[](i);
+            CombatGroupCluster* pCluster = ClusterArray[i];
             if (!spDebugGeometry.m_pObject) {
                 NiNode* pNode;
                 void* pMemory = NiMemObject::operator new(sizeof(NiNode));
@@ -3067,7 +3066,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
                 else {
                     pNode = nullptr;
                 }
-                spDebugGeometry.operator=(pNode);
+                spDebugGeometry = pNode;
             }
             NiColorA kClusterColor(0.5f, 0.0f, 0.5f, 0.5f);
             bool bHasMembers = false;
@@ -3109,7 +3108,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             else {
                 pNode = nullptr;
             }
-            spDebugGeometry.operator=(pNode);
+            spDebugGeometry = pNode;
         }
         uint32_t uiMemberCount = GetMemberCount();
         for (uint32_t i = 0; i < uiMemberCount; ++i) {
@@ -3136,7 +3135,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             else {
                 pNode = nullptr;
             }
-            spDebugGeometry.operator=(pNode);
+            spDebugGeometry = pNode;
         }
         uint32_t uiNumSearchLocations = GetNumSearchLocations();
         for (uint32_t i = 0; i < uiNumSearchLocations; ++i) {
@@ -3150,7 +3149,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             }
         }
         for (uint32_t i = 0; i < SearchTeleportDoors.iSize; ++i) {
-            CombatSearchDoor& rDoor = SearchTeleportDoors.operator[](i);
+            CombatSearchDoor& rDoor = SearchTeleportDoors[i];
             TESObjectREFR* pDoor = nullptr;
             if (rDoor.pDoor && rDoor.pDoor->GetSpace() == pSpace) {
                 pDoor = rDoor.pDoor;
@@ -3192,7 +3191,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             }
             NiPointer<PathingLOSMap> spLOSMap = pLOSMap;
             spPathingLOSGridMap.m_pObject->SetLOSMapFromSeenTriangles(spLOSMap);
-            spSearchDebugGeometry.operator=(static_cast<NiRefObject*>(spLOSMap.m_pObject->CreateDebugGeometry()));
+            spSearchDebugGeometry = static_cast<NiRefObject*>(spLOSMap.m_pObject->CreateDebugGeometry());
             bUpdateSearchDebugGeometry = false;
         }
         pSearchGeometry = static_cast<NiAVObject*>(spSearchDebugGeometry.m_pObject);

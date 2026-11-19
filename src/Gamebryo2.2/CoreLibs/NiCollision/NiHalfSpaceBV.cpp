@@ -83,7 +83,7 @@ bool NiHalfSpaceBV::operator==(const NiBoundingVolume& kABV) const {
 }
 
 bool NiHalfSpaceBV::operator!=(const NiBoundingVolume& kABV) const {
-    return !operator==(kABV);
+    return !(*this == kABV);
 }
 
 void NiHalfSpaceBV::AddViewerStrings(const char* pcPrefix, NiTPrimitiveArray<char*>* pkStrings) const {

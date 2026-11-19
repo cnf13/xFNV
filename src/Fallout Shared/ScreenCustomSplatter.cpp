@@ -277,7 +277,7 @@ void ScreenCustomSplatter::Init() {
             NiCamera_ = nullptr;
         }
         NiRefObject* v10 = NiCamera_;
-        ScreenCustomSplatter::spCamera.operator=(NiCamera_);
+        ScreenCustomSplatter::spCamera = NiCamera_;
         NiPoint3* v0 = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.00001f);
         ScreenCustomSplatter::spCamera.m_pObject->SetTranslate(*v0);
         NiUpdateData UpdateData1(0.0f, false, false);
@@ -305,7 +305,7 @@ void ScreenCustomSplatter::Init() {
         else {
             v4 = nullptr;
         }
-        ScreenCustomSplatter::spRoot.operator=(v4);
+        ScreenCustomSplatter::spRoot = v4;
         ScreenCustomSplatter::uiCount = 0;
         const char* v1 = sBloodSplatterAlpha01OPTFilename.String();
         SkyTextureManager::LoadTextureInBackground(&ScreenCustomSplatter::spTextures[1], v1);
@@ -319,19 +319,19 @@ void ScreenCustomSplatter::Init() {
 }
 
 NiCamera* ScreenCustomSplatter::GetCamera() {
-    return (&ScreenCustomSplatter::spCamera)->operator->();
+    return ScreenCustomSplatter::spCamera;
 }
 
 bool ScreenCustomSplatter::IsActiveSplatter() {
-    if (!(&ScreenCustomSplatter::spRoot)->operator->()) {
+    if (!ScreenCustomSplatter::spRoot) {
         return false;
     }
-    NiNode* v1 = (&ScreenCustomSplatter::spRoot)->operator->();
+    NiNode* v1 = ScreenCustomSplatter::spRoot;
     return (v1->GetChildCount() != 0);
 }
 
 NiNode* ScreenCustomSplatter::GetCurrentRoot() {
-    return (&ScreenCustomSplatter::spRoot)->operator->();
+    return ScreenCustomSplatter::spRoot;
 }
 
 NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScale, float fOpacityScale) {
@@ -623,12 +623,12 @@ char ScreenCustomSplatter::SetCustomSplatterTexture(char* a1, uint8_t arg4) {
 void ScreenCustomSplatter::Shutdown() {
     if (ScreenCustomSplatter::bEnabled) {
         ScreenCustomSplatter::spRoot.m_pObject->RemoveAllChildren();
-        ScreenCustomSplatter::spRoot.operator=(static_cast<NiNode*>(nullptr));
-        ScreenCustomSplatter::spCamera.operator=(static_cast<NiCamera*>(nullptr));
+        ScreenCustomSplatter::spRoot = static_cast<NiNode*>(nullptr);
+        ScreenCustomSplatter::spCamera = static_cast<NiCamera*>(nullptr);
     }
     ScreenCustomSplatter::bEnabled = false;
     for (int32_t i = 0; i < 3; ++i) {
-        ScreenCustomSplatter::spTextures[i].operator=(static_cast<NiTexture*>(nullptr));
+        ScreenCustomSplatter::spTextures[i] = static_cast<NiTexture*>(nullptr);
     }
 }
 

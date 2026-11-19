@@ -218,15 +218,15 @@ bool CameraCaster::KeepOutOfCharacter(
     }
     NI2HK(cameraPos, arPoint);
     const hkVector4* pCapsule = &apController->GethkPosition();
-    capsulePos.operator=(*pCapsule);
+    capsulePos = *pCapsule;
     bhkSimpleShapePhantom* pphantom = nullptr;
     if (apController == pPlayer->GetCharController()) {
         pphantom = spPlayerShapePhantom.m_pObject;
         double fCameraZ = cameraPos.getSimdAt(2).operator float();
         if (capsulePos.getSimdAt(2).operator float() < fCameraZ) {
-            float* pCameraZ = &cameraPos.operator()(2);
+            float* pCameraZ = &cameraPos(2);
             *pCameraZ = *pCameraZ - NI2HK(afScaleOffset);
-            float* pCapsuleZ = &capsulePos.operator()(2);
+            float* pCapsuleZ = &capsulePos(2);
             *pCapsuleZ = *pCapsuleZ - NI2HK(afScaleOffset);
         }
     }
@@ -242,12 +242,12 @@ bool CameraCaster::KeepOutOfCharacter(
     bhkWorld* pw = apController->GetWorld();
     if (pw) {
         pw->MarkForRead();
-        hkpCollisionDispatcher* pdis = pw->operator*()->m_collisionDispatcher;
+        hkpCollisionDispatcher* pdis = (**pw)->m_collisionDispatcher;
         pw->MarkForRead();
         if (pdis) {
             input.m_dispatcher = pdis;
             pw->MarkForRead();
-            input.m_filter = pw->operator*()->m_collisionFilter;
+            input.m_filter = (**pw)->m_collisionFilter;
             pw->MarkForRead();
             pphantom->SetPosition(cameraPos);
             hkpSphereShape* ps = static_cast<hkpSphereShape*>(pphantom->GethkShape());
@@ -285,7 +285,7 @@ void CameraCaster::Init(float afRadius, uint32_t aiGroup) {
     ihorseFilter.SetLayer(L_CAMERA);
     ihorseFilter.SetGroup(bhkCollisionFilter::GetNewSystemGroup());
     csi1.m_collisionFilterInfo = iplayerFilter.iFilter;
-    csi1.m_shape = pplayerShape->operator*();
+    csi1.m_shape = **pplayerShape;
     csi1.m_transform.setIdentity();
     bhkSimpleShapePhantom* pPlayerPhantom;
     bhkSimpleShapePhantom* pPlayerMemory =
@@ -298,7 +298,7 @@ void CameraCaster::Init(float afRadius, uint32_t aiGroup) {
     }
     spPlayerShapePhantom = pPlayerPhantom;
     csi2.m_collisionFilterInfo = ihorseFilter.iFilter;
-    csi2.m_shape = pplayerShape->operator*();
+    csi2.m_shape = **pplayerShape;
     csi2.m_transform.setIdentity();
     bhkSimpleShapePhantom* pHorsePhantom;
     bhkSimpleShapePhantom* pHorseMemory =
@@ -395,7 +395,7 @@ hkpRootCdPoint::hkpRootCdPoint() {}
 hkpRootCdPoint::hkpRootCdPoint(const hkpRootCdPoint& __that) = default;
 
 hkpRootCdPoint& hkpRootCdPoint::Assign(const hkpRootCdPoint& __that) {
-    m_contact.operator=(__that.m_contact);
+    m_contact = __that.m_contact;
     m_rootCollidableA = __that.m_rootCollidableA;
     m_shapeKeyA = __that.m_shapeKeyA;
     for (uint32_t S1 = 0; S1 < 8; ++S1) {

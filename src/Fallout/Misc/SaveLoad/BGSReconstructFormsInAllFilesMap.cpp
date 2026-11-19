@@ -613,10 +613,10 @@ TESForm* BGSReconstructedForms::GetForm(uint32_t aiIndex) {
     ReconstructFormData* v2;
     uint32_t iforms1Count = Forms1.iSize;
     if (aiIndex >= iforms1Count) {
-        v2 = &Forms2.operator[](aiIndex - iforms1Count);
+        v2 = &Forms2[aiIndex - iforms1Count];
     }
     else {
-        v2 = &Forms1.operator[](aiIndex);
+        v2 = &Forms1[aiIndex];
     }
     return v2->pForm;
 }

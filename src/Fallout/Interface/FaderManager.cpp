@@ -222,7 +222,7 @@ void FaderManager::CreateFader(FADER_ENUM aeFader, float afFadeSpeed, bool abBeg
     ptsp->TexClampMode = NiTexturingProperty::WRAP_S_WRAP_T;
     ptsp->SetTileAlpha(falpha);
     ptri->AttachProperty(ptsp);
-    FaderData[aeFader].spTileShaderProp.operator=(ptsp);
+    FaderData[aeFader].spTileShaderProp = ptsp;
     BSShaderManager::PrepareObject(ptri, 0, 0);
     NiBound* ModelBound = &ptri->GetModelBound();
     ModelBound->ComputeFromData(4, pvertices);
@@ -257,7 +257,7 @@ void FaderManager::UpdateFaders(bool abUpdateLoading) {
                 }
                 if (pFader->spTileShaderProp.operator->()) {
                     float fAlpha = pFader->fAlpha;
-                    pFader->spTileShaderProp.operator->()->SetTileAlpha(fAlpha);
+                    pFader->spTileShaderProp->SetTileAlpha(fAlpha);
                 }
             }
         }
@@ -274,7 +274,7 @@ void FaderManager::UpdateFaders(bool abUpdateLoading) {
             }
             if (pFader->spTileShaderProp.operator->()) {
                 float fAlpha = pFader->fAlpha;
-                pFader->spTileShaderProp.operator->()->SetTileAlpha(fAlpha);
+                pFader->spTileShaderProp->SetTileAlpha(fAlpha);
             }
         }
         else {
@@ -311,7 +311,7 @@ void FaderManager::RemoveFader(FADER_ENUM aeFader, bool abForce) {
             Parent->DetachChild(FaderData[aeFader].pRoot);
             FaderData[aeFader].pRoot = nullptr;
             FaderData[aeFader].fAlpha = 0.0f;
-            FaderData[aeFader].spTileShaderProp.operator=(static_cast<TileShaderProperty*>(nullptr));
+            FaderData[aeFader].spTileShaderProp = static_cast<TileShaderProperty*>(nullptr);
             TES::pInstance->ShowLoadingMenu(false, nullptr, false);
         }
         else {

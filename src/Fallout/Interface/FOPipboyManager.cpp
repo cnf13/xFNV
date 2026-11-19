@@ -112,14 +112,14 @@ void FOPipboyManager::Initialize() {
         SetMenuRoot(InterfaceManager::Instance()->GetSceneGraph());
         if (pPipboyNode) {
             pPipboyScreen = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
-            spPipboyRoot.operator=(pPipboyNode->m_pkParent);
+            spPipboyRoot = pPipboyNode->m_pkParent;
         }
         else {
             NiAVObject* v9 = pPlayer->Get3D(true);
             NiAVObject* v3 = v9->GetObjectByName("pipboyscreen:0");
             pPipboyScreen = static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, v3));
             if (pPipboyScreen) {
-                spPipboyRoot.operator=(pPipboyScreen->m_pkParent);
+                spPipboyRoot = pPipboyScreen->m_pkParent;
             }
         }
         SetScreenParent(pPlayer->Get3D(true));
@@ -127,14 +127,14 @@ void FOPipboyManager::Initialize() {
             NiGeometry* pPipboyScreen_2 = static_cast<NiGeometry*>(pPipboyNode->GetAtChecked(0));
             p3rdPersonScreenGeom =
                 static_cast<NiGeometry*>(NiObject::DynamicCastStatic(&NiGeometry::ms_RTTI, pPipboyScreen_2));
-            sp3rdPersonPipboyRoot.operator=(pPipboyNode->m_pkParent);
-            sp3rdPersonScreen.operator=(static_cast<NiAVObject*>(p3rdPersonScreenGeom));
+            sp3rdPersonPipboyRoot = pPipboyNode->m_pkParent;
+            sp3rdPersonScreen = static_cast<NiAVObject*>(p3rdPersonScreenGeom);
         }
         else {
             if (pPipboyScreen) {
                 p3rdPersonScreenGeom = pPipboyScreen;
-                sp3rdPersonPipboyRoot.operator=(pPipboyScreen->m_pkParent);
-                sp3rdPersonScreen.operator=(static_cast<NiAVObject*>(p3rdPersonScreenGeom));
+                sp3rdPersonPipboyRoot = pPipboyScreen->m_pkParent;
+                sp3rdPersonScreen = static_cast<NiAVObject*>(p3rdPersonScreenGeom);
             }
         }
         if ((pPipboyScreen) && (p3rdPersonScreenGeom)) {
@@ -175,18 +175,18 @@ void FOPipboyManager::Initialize() {
 
 void FOPipboyManager::Shutdown() {
     int32_t i;
-    (&spPipboyRoot)->operator=(nullptr);
-    (&sp3rdPersonPipboyRoot)->operator=(nullptr);
-    (&spPartialScreenGeometry)->operator=(nullptr);
+    spPipboyRoot = nullptr;
+    sp3rdPersonPipboyRoot = nullptr;
+    spPartialScreenGeometry = nullptr;
     for (i = 0; i < 3; ++i) {
-        (&spButtons[i])->operator=(nullptr);
-        (&spButtonGlow[i])->operator=(nullptr);
-        (&spKnobs[i])->operator=(nullptr);
+        spButtons[i] = nullptr;
+        spButtonGlow[i] = nullptr;
+        spKnobs[i] = nullptr;
         fKnobPositions[i] = (float)0.0;
         fKnobTargets[i] = (float)0.0;
         fKnobRates[i] = (float)0.0;
     }
-    (&sp3rdPersonScreen)->operator=(nullptr);
+    sp3rdPersonScreen = nullptr;
     FORenderedMenu::Shutdown();
 }
 
@@ -374,17 +374,17 @@ void FOPipboyManager::ActivateButton(const uint32_t aiButton) {
     if (!this->GetInitialized()) {
         return;
     }
-    if (this->spButtonGlow[0].operator->()) {
+    if (this->spButtonGlow[0]) {
         this->spButtonGlow[0]->SetAppCulled(true);
     }
-    if (this->spButtonGlow[1].operator->()) {
+    if (this->spButtonGlow[1]) {
         this->spButtonGlow[1]->SetAppCulled(true);
     }
-    if (this->spButtonGlow[2].operator->()) {
+    if (this->spButtonGlow[2]) {
         this->spButtonGlow[2]->SetAppCulled(true);
     }
     // The buttons count from 1.
-    if (aiButton > 0 && this->spButtonGlow[aiButton - 1].operator->()) {
+    if (aiButton > 0 && this->spButtonGlow[aiButton - 1]) {
         this->spButtonGlow[aiButton - 1]->SetAppCulled(false);
     }
 }
@@ -623,7 +623,7 @@ void FOPipboyManager::InitButtons() {
     p3D = pPlayer->Get3D(true);
     NiFixedString kGlow1("StatsGlow");
     this->spButtonGlow[0] = p3D->GetObjectByName(kGlow1);
-    if (!this->spButtonGlow[0].operator->()) {
+    if (!this->spButtonGlow[0]) {
         p3D = pPlayer->Get3D(true);
         NiFixedString kGlow10("StatsGlow:0");
         this->spButtonGlow[0] = p3D->GetObjectByName(kGlow10);
@@ -631,7 +631,7 @@ void FOPipboyManager::InitButtons() {
     p3D = pPlayer->Get3D(true);
     NiFixedString kGlow2("ItemsGlow");
     this->spButtonGlow[1] = p3D->GetObjectByName(kGlow2);
-    if (!this->spButtonGlow[1].operator->()) {
+    if (!this->spButtonGlow[1]) {
         p3D = pPlayer->Get3D(true);
         NiFixedString kGlow20("ItemsGlow:0");
         this->spButtonGlow[1] = p3D->GetObjectByName(kGlow20);
@@ -639,7 +639,7 @@ void FOPipboyManager::InitButtons() {
     p3D = pPlayer->Get3D(true);
     NiFixedString kGlow3("DataGlow");
     this->spButtonGlow[2] = p3D->GetObjectByName(kGlow3);
-    if (!this->spButtonGlow[2].operator->()) {
+    if (!this->spButtonGlow[2]) {
         p3D = pPlayer->Get3D(true);
         NiFixedString kGlow30("DataGlow:0");
         this->spButtonGlow[2] = p3D->GetObjectByName(kGlow30);
@@ -656,8 +656,8 @@ void FOPipboyManager::FadeLight(float afTime) {
         fFade = 1.0f - fFade;
     }
     LightRefData* pLight = pPlayer->GetSpellEffectLight();
-    if (pLight && pLight->spLight.operator->()) {
-        pLight->spLight.operator->()->SetDimmer(fFade);
+    if (pLight && pLight->spLight) {
+        pLight->spLight->SetDimmer(fFade);
     }
 }
 
@@ -748,24 +748,24 @@ void FOPipboyManager::InitKnobs() {
     }
     if ((pGeometry) && (pGeometry->IsNode())) {
         NiNode* v1 = pGeometry->IsNode();
-        spKnobs->operator=(static_cast<NiGeometry*>(v1->GetAt(0)));
+        *spKnobs = static_cast<NiGeometry*>(v1->GetAt(0));
     }
 
     NiAVObject* v12 = pPlayer->Get3D(true);
-    spKnobs[1].operator=(static_cast<NiGeometry*>(v12->GetObjectByName("RadNeedle")));
+    spKnobs[1] = static_cast<NiGeometry*>(v12->GetObjectByName("RadNeedle"));
     if (!spKnobs[1].m_pObject) {
         NiAVObject* v10 = pPlayer->Get3D(true);
         NiFixedString v21("RadNeedle:0");
         NiFixedString* v9 = &v21;
-        spKnobs[1].operator=(static_cast<NiGeometry*>(v10->GetObjectByName(*v9)));
+        spKnobs[1] = static_cast<NiGeometry*>(v10->GetObjectByName(*v9));
     }
     NiAVObject* v8 = pPlayer->Get3D(true);
-    spKnobs[2].operator=(static_cast<NiGeometry*>(v8->GetObjectByName("TabKnob")));
+    spKnobs[2] = static_cast<NiGeometry*>(v8->GetObjectByName("TabKnob"));
     if (!spKnobs[2].m_pObject) {
         NiAVObject* v6 = pPlayer->Get3D(true);
         NiFixedString v19("TabKnob:0");
         NiFixedString* v5 = &v19;
-        spKnobs[2].operator=(static_cast<NiGeometry*>(v6->GetObjectByName(*v5)));
+        spKnobs[2] = static_cast<NiGeometry*>(v6->GetObjectByName(*v5));
     }
     fTabKnobPositions[0] = fTabKnobMinPosition.Float();
     fTabKnobPositions[4] = fTabKnobMaxPosition.Float();

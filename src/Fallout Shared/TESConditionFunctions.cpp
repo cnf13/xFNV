@@ -3185,7 +3185,7 @@ bool Script::GetHeadingAngleConditionFunction(
     TESObjectREFR* pTarget = static_cast<TESObjectREFR*>(apParam1);
     if (pMobile && pTarget) {
         const NiPoint3* pMobileLocation = &pMobile->GetLocationOnReference();
-        NiPoint3 kDirection = pTarget->GetLocationOnReference().operator-(*pMobileLocation);
+        NiPoint3 kDirection = pTarget->GetLocationOnReference() - *pMobileLocation;
         float fZAngle = GetZAngleFromVector(kDirection);
         afReturnValue = static_cast<double>(fZAngle) - static_cast<double>(pMobile->GetHeading(false));
         while (afReturnValue < -3.1415927410125732) {

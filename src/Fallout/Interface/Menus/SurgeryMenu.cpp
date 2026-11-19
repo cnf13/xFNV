@@ -80,7 +80,7 @@ BSSimpleList<SurgeryMenu::LimbWound*> SurgeryMenu::xLimbWounds;
 // horizontal offset is the third argument, the player is scaled by Scale * afScale, and the scene graph is updated at
 // time 0.
 void SetTerminalMenuPos(float afX, float afY, float afScale) {
-    if (!SurgeryMenu::spPlayer3D.operator->()) {
+    if (!SurgeryMenu::spPlayer3D) {
         return;
     }
     NiAVObject* pPlayer = SurgeryMenu::spPlayer3D.operator->();
@@ -571,7 +571,7 @@ void SurgeryMenu::UpdateToolLocation(bool abBurning) {
         fmouseSpeedScalar = FLerp(fMouseMinPercent, fMouseMaxPercent, 0.0f, 1.0f, fmouseSpeedScalar);
         Resistance.x = fnoise;
         Resistance.y = fnoise2;
-        ToolLocation.operator+=(Resistance);
+        ToolLocation += Resistance;
         Controls* pcontrols = appMain->GetControls();
         InterfaceManager::Instance();
         if (InterfaceManager::Has360Controller()) {
@@ -584,13 +584,13 @@ void SurgeryMenu::UpdateToolLocation(bool abBurning) {
                 static_cast<float>(static_cast<int32_t>(fXenonMenuMouseXYMult.Float() * static_cast<double>(-iDeltaX)));
             float a1a = FLerp(0.25f, 0.5f, 0.0f, 1.0f, fmouseSpeedScalar);
             NiPoint2* v4 = ::new (&result) NiPoint2(delta * a1a);
-            ToolLocation.operator+=(*v4);
+            ToolLocation += *v4;
         }
         else {
             delta.x = static_cast<float>(pcontrols->GetMouseAxis(1));
             delta.y = static_cast<float>(pcontrols->GetMouseAxis(2));
             NiPoint2* v5 = NiPoint2::Scale_(&apResult, fmouseSpeedScalar, &delta);
-            ToolLocation.operator+=(*v5);
+            ToolLocation += *v5;
         }
         // The product is kept as a double across the Length call.
         double fspeed = fmagnitude * fmouseSpeedScalar;
@@ -1046,7 +1046,7 @@ void SurgeryMenu::PlaceToolInWindow(int32_t aiX, int32_t aiY) {
     Vector.y = static_cast<float>(aiY - icenterY);
     if (static_cast<double>(radius) < Vector.Length()) {
         Vector.Unitize();
-        Vector.operator*=(static_cast<float>(radius));
+        Vector *= static_cast<float>(radius);
     }
     float afValue = static_cast<double>(icenterX) + Vector.x;
     pTiles[6]->Set(4001, afValue, true);
@@ -1128,7 +1128,7 @@ void SurgeryMenu::Draw3DElements() {
         BSShaderAccumulator* v5 = spaccum.m_pObject;
         BSShaderUtil::RenderScene(pcam, v5, false);
         apCuller->SetAccumulator(nullptr);
-        spaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+        spaccum = static_cast<BSShaderAccumulator*>(nullptr);
         apCuller->PopCullMode();
     }
 }
@@ -1379,9 +1379,9 @@ void SurgeryMenu::Shutdown3DElements() {
     v4->RemoveProperty(TagSkillCount);
     NiAVObject* v5 = SurgeryMenu::spPlayer3D.m_pObject;
     v5->UpdateProperties();
-    SurgeryMenu::sp3DCamera.operator=(static_cast<NiCamera*>(nullptr));
-    SurgeryMenu::sp3DSkin.operator=(static_cast<NiNode*>(nullptr));
-    SurgeryMenu::spPlayer3D.operator=(static_cast<NiAVObject*>(nullptr));
+    SurgeryMenu::sp3DCamera = static_cast<NiCamera*>(nullptr);
+    SurgeryMenu::sp3DSkin = static_cast<NiNode*>(nullptr);
+    SurgeryMenu::spPlayer3D = static_cast<NiAVObject*>(nullptr);
 }
 
 // Compares each bone's distance and, when it is the nearest so far, computes it again to store it.

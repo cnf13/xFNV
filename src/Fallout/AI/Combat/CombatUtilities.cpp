@@ -153,7 +153,7 @@ double NiATan(float afX) {
 // Calls hkVector4's non-const operator() on the returned gravity.
 void CombatUtilities::Init() {
     hkVector4& kGravity = const_cast<hkVector4&>(TESObjectCELL::ExteriorWorld()->GetGravity());
-    fWorldGravity = -HK2NI(kGravity.operator()(2));
+    fWorldGravity = -HK2NI(kGravity(2));
 }
 
 bool CombatUtilities::IsTargetWithinStrikeAngle(Actor* apAttacker, TESObjectREFR* apTarget, float* afDelta) {
@@ -352,7 +352,7 @@ NiPoint3 CombatUtilities::ComputeFaceTargetLocation(
         targetVector_2.Unitize();
     }
     float fScaledReach = CombatUtilities::ComputeFaceTargetDistance(apAttacker, apTarget, afAttackerReach);
-    targetVector.operator*=(fScaledReach);
+    targetVector *= fScaledReach;
     result = arTargetLocation + targetVector;
     return result;
 }
@@ -1521,7 +1521,7 @@ bool CombatUtilities::CalculateAttackerCombatPositions(Actor* apTarget, Actor* a
         uint32_t inumAttackers_2 = BSMIN(inumAttackers, 64u);
         for (uint32_t i = 0; i < inumAttackers_2; ++i) {
             CombatController* pcombatController;
-            Actor* pattacker = pattackerArray->Attackers.operator[](i);
+            Actor* pattacker = pattackerArray->Attackers[i];
             if (pattacker) {
                 pcombatController = pattacker->GetCombatController();
             }

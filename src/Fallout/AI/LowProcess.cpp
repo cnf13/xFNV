@@ -4578,7 +4578,7 @@ double LowProcess::Patrol_TravelingToNextRefLow(Actor* apActor, PatrolActorPacka
                     const NiPoint3* v13 = &apRef->GetLocationOnReference();
                     NiPoint3 v14 = *v13;
                     const NiPoint3* v5 = &apActor->GetLocationOnReference();
-                    v14.operator-=(*v5);
+                    v14 -= *v5;
                     v15 = v14.Length();
                 }
                 else {
@@ -4642,7 +4642,7 @@ double LowProcess::Patrol_AtRefLow(Actor* apActor, PatrolActorPackageData* apDat
             TESObjectREFR* v9 = apData->GetCurrentReference();
             NiPoint3 v12 = v9->GetLocationOnReference();
             const NiPoint3* v8 = &CurrentReference->GetLocationOnReference();
-            v12.operator-=(*v8);
+            v12 -= *v8;
             if (v12.SqrLength() < 0.0010000000474974513) {
                 v14 = 0.0;
             }

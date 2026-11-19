@@ -90,7 +90,7 @@ uint32_t DecalCaster::Pick(const NiPoint3& arFrom, const NiPoint3& arTo, float a
     }
     SetCustomPickCollisions(CUSTOM_PICK_ACTORS);
     static_cast<hkpCdPointCollector*>(&PointCollector)->reset();
-    if (!spShapePhantom.operator->()) {
+    if (!spShapePhantom) {
         return QNumCollisions();
     }
     hkVector4 kStart;
@@ -100,7 +100,7 @@ uint32_t DecalCaster::Pick(const NiPoint3& arFrom, const NiPoint3& arTo, float a
     ::new (&kInput) hkpLinearCastInput;
     NI2HK(kStart, arFrom);
     NI2HK(kInput.m_to, arTo);
-    bhkShapePhantom* pPhantom = spShapePhantom.operator->();
+    bhkShapePhantom* pPhantom = spShapePhantom;
     pPhantom->SetPositionAndLinearCast(kStart, kInput, PointCollector, nullptr);
     hkBool kHit = PointCollector.hasHit();
     // The result is deliberately discarded, as the game does.
@@ -148,7 +148,7 @@ void DecalCaster::Init(float afRadius, uint32_t aiGroup) {
     ifilter.SetLayer(L_CUSTOMPICK1);
     ifilter.SetGroup(aiGroup);
     csi.m_collisionFilterInfo = ifilter.iFilter;
-    csi.m_shape = pshape->operator*();
+    csi.m_shape = **pshape;
     csi.m_transform.setIdentity();
     bhkSimpleShapePhantom* pPhantomMemory =
         static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
@@ -257,14 +257,14 @@ void DecalCaster::ClearInstance() {
 }
 
 void bhkShapePhantom::GetPenetrations(hkpCdBodyPairCollector* arCollector) {
-    hkpSimpleShapePhantom* v3 = static_cast<hkpSimpleShapePhantom*>(operator*());
+    hkpSimpleShapePhantom* v3 = static_cast<hkpSimpleShapePhantom*>(**this);
     if ((v3) && (v3->m_world)) {
         v3->getPenetrations(*arCollector, nullptr);
     }
 }
 
 void bhkWorldObject::SetName(const char* apName) {
-    hkpWorldObject* pObject = operator*();
+    hkpWorldObject* pObject = **this;
     if (pObject) {
         MarkWrite();
         pObject->setName(apName);

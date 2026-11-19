@@ -1871,14 +1871,14 @@ void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
                 double v9;
                 if (static_cast<uint8_t>(apTarget->GetHit())) {
                     const hkVector4* LinearVelocity = &ptrapRB->getLinearVelocity();
-                    trapVel.operator=(*LinearVelocity);
+                    trapVel = *LinearVelocity;
                     Translation = &ptrapRB->getTranslation();
                 }
                 else {
-                    trapVel.operator=(apTarget->VelocityAtHit);
+                    trapVel = apTarget->VelocityAtHit;
                     Translation = &apTarget->PositionAtHit;
                 }
-                trapLoc.operator=(*Translation);
+                trapLoc = *Translation;
                 if (fminVelocity == 0.0 ||
                     (v8 = ::new (&result) hkSimdReal(trapVel.length3()),
                      (v9 = v8->operator float(), fminVelocity <= v9))) {
@@ -1886,7 +1886,7 @@ void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
                         float fmax;
                         hkVector4 targetVel;
                         const hkVector4* v10 = &pcon->GethkLinearVelocity();
-                        targetVel.operator=(*v10);
+                        targetVel = *v10;
                         targetVel.sub4(trapVel);
                         if (fminVelocity == 0.0) {
                             fmax = 10.0f;
@@ -1908,15 +1908,15 @@ void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
             else {
                 if (static_cast<uint8_t>(apTarget->GetHit())) {
                     // The trap's collidable has no rigid body: its position is its motion's transform.
-                    trapLoc.operator=(apTrap->pCollidable->m_motion.pMotion->getTranslation());
+                    (trapLoc = apTrap->pCollidable->m_motion.pMotion->getTranslation());
                 }
                 else {
-                    trapLoc.operator=(apTarget->PositionAtHit);
+                    trapLoc = apTarget->PositionAtHit;
                 }
                 const NiPoint3* v15 = &this->GetLocationOnReference();
                 NI2HK(trapVel, *v15);
                 trapVel.sub4(trapLoc);
-                float* v53 = &trapVel.operator()(2);
+                float* v53 = &trapVel(2);
                 float v52 = this->GetHeight() / 2.0;
                 *v53 = NI2HK(v52) + *v53;
             }
@@ -1990,7 +1990,7 @@ void Actor::DoTrap(TrapEntry* apTrap, TargetEntry* apTarget) {
                                 NiPoint3 dir;
                                 HK2NI(dir, trapVel);
                                 dir.Unitize();
-                                dir.operator*=(fpushBack);
+                                dir *= fpushBack;
                                 pcon->SetVelocityModifier(dir, 0.5f);
                             }
                         }
@@ -2123,7 +2123,7 @@ NiPoint3 Actor::GetLookingAtLocation() {
         }
     }
     if (ParentBone) {
-        v12.operator+=(ParentBone->GetWorldTranslate());
+        v12 += ParentBone->GetWorldTranslate();
         if (pRagdollController) {
             NiPoint3 ecx0;
             if (pRagdollController->GetEyeOffset(ecx0)) {
@@ -2133,7 +2133,7 @@ NiPoint3 Actor::GetLookingAtLocation() {
     }
     else {
         v12.z = GetHeight() * 0.8999999761581421 + v12.z;
-        v12.operator+=(GetLocationOnReference());
+        v12 += GetLocationOnReference();
     }
     result = v12;
     return result;
@@ -3936,7 +3936,7 @@ float Actor::SpeakSoundFunction(
     }
     BaseProcess* v32 = this->pCurrentProcess;
     BSSoundHandle kVoiceHandle;
-    kVoiceHandle.operator=(aSoundHand);
+    kVoiceHandle = aSoundHand;
     v32->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, kVoiceHandle);
     if (panim) {
         BaseProcess* v30 = this->pCurrentProcess;
@@ -4535,8 +4535,8 @@ void Actor::Update(float afDelta) {
                 pCurrentProcess->UpdateAimSequences(this);
             }
             LightRefData* pLight = GetLight();
-            if (pLight && pLight->spLight.operator->()) {
-                NiLight* pNiLight = pLight->spLight.operator->();
+            if (pLight && pLight->spLight) {
+                NiLight* pNiLight = pLight->spLight;
                 BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->UpdateLight_0(pNiLight);
             }
             NiBlendTransformInterpolator::SetAlwaysBlend(false);
@@ -4682,13 +4682,11 @@ void Actor::Update(float afDelta) {
                         // A flyer floating in shallow water is pushed toward 5 units below the water surface.
                         if (pCharController->GetState() == HK_CHARACTER_USER_STATE_0 &&
                             pCharController->fVelocityTime < 0.009999999776482582 && bInWaterNow && !bDeep) {
-                            float fRotCenterZ = pCharController->GetRotCenter()->operator()(2);
+                            float fRotCenterZ = (*pCharController->GetRotCenter())(2);
                             // The subtraction and addition are done at double precision before the one float store.
                             // GethkPosition returns the position const; its z is read through the non-const operator().
                             float fFloatHeight =
-                                static_cast<double>(
-                                    const_cast<hkVector4&>(pCharController->GethkPosition()).operator()(2)
-                                ) -
+                                static_cast<double>(const_cast<hkVector4&>(pCharController->GethkPosition())(2)) -
                                 fRotCenterZ + fRotCenterZ * 0.10000000149011612 * pCharController->fScale;
                             float fWaterOffset = pCharController->fWaterHeight - 5.0;
                             float fDiff = fFloatHeight - NI2HK(fWaterOffset);
@@ -6822,7 +6820,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                     bVoiceFileDone = false;
                     // The by-value handle argument is deliberately built with operator=, as the game does.
                     BSSoundHandle kArgument;
-                    kArgument.operator=(handle);
+                    kArgument = handle;
                     pCurrentProcess->SetSoundHandle(ACTOR_SOUND_HANDLE_VOICE, kArgument);
                     fDuration = static_cast<float>(handle.GetDuration());
                 }
@@ -6835,7 +6833,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                 // Reads the position before it builds the by-value handle argument with operator=.
                 NiPoint3 kSpeakerLoc = pRef->GetLocationOnReference();
                 BSSoundHandle kArgument;
-                kArgument.operator=(handle);
+                kArgument = handle;
                 Interface::ShowSubtitle(pResponse->cText.pString, kArgument, kSpeakerLoc, apTarget, true);
             }
         }
@@ -7001,7 +6999,7 @@ void Actor::InitiateSearchForAttacker(TESObjectREFR* apAttacker, NiPoint3 apLoca
     BaseProcess* v6 = pCurrentProcess;
     v6->ResetSearchTimer();
     PutCreatedPackage(v11, true, true);
-    if (apLocation.operator!=(NiPoint3_ZERO)) {
+    if (apLocation != NiPoint3_ZERO) {
         v11->SetCenterLocaiton(apLocation);
     }
     if (abAttacked) {
@@ -7569,7 +7567,7 @@ void Actor::HitMe(
             kSphere.setRadius(30.0f);
             bhkRigidBody* pBody = bhkUtilFunctions::GetClosestBody(p3D, kSphere, false);
             if (pBody) {
-                bhkCollisionObject* pCollision = bhkCollisionObject::Getbhk(pBody->operator*());
+                bhkCollisionObject* pCollision = bhkCollisionObject::Getbhk(**pBody);
                 if (pCollision) {
                     pSpot = pCollision->GetSceneGraphObject();
                 }
@@ -8232,7 +8230,7 @@ void Actor::GetEyeVector(NiPoint3& aOrigin, NiPoint3& aDirection, bool abInclude
         aOrigin.z = GetEyeLevel() + aOrigin.z;
     }
     if (abIncludeCameraOffset && this == pPlayer && pPlayer->IsActually3rdPerson()) {
-        aOrigin.operator+=(pPlayer->GetCamera3rdPersonShoulderOffset());
+        aOrigin += pPlayer->GetCamera3rdPersonShoulderOffset();
     }
     float a2 = GetHeading(false);
     rot.MakeZRotation(a2);
@@ -9368,9 +9366,9 @@ void Actor::HitMe(HitData* apData, char cMeleeEffect) {
                             }
                             alignas(16) hkSimdReal kImpulse(static_cast<float>(static_cast<int64_t>(uiImpulse)));
                             kDirection.mul4(kImpulse);
-                            pWorld->operator*()->markForWrite();
+                            (**pWorld)->markForWrite();
                             pBody->applyLinearImpulse(kDirection);
-                            pWorld->operator*()->unmarkForWrite();
+                            (**pWorld)->unmarkForWrite();
                         }
                     }
                 }
@@ -9975,7 +9973,7 @@ void Actor::Kill(Actor* apAttacker, float afDamage) {
                         bhkWorld::SetMotion(p3dObj_2, hkpMotion::MOTION_DYNAMIC, true, true, true);
                         alignas(16) NiUpdateData update(0.0f, false, false);
                         p3dObj_2->Update(update);
-                        direction.operator*=(fDeathForceForceMin.Float());
+                        direction *= fDeathForceForceMin.Float();
                         TESHavokUtilities::AddVelocity(p3dObj_2, direction, false);
                         this->AddChange(4);
                     }
@@ -12736,10 +12734,10 @@ bool Actor::IsPlayingLowerBodySpecialIdle() {
         return bResult;
     }
     ANIM_GROUP_SECTION eSection = AGS_NONE;
-    if (IsAnimIdleQuequed() && pAnimation->spAnimIdleQueued.operator->()) {
+    if (IsAnimIdleQuequed() && pAnimation->spAnimIdleQueued) {
         eSection = pAnimation->spAnimIdleQueued->GetSection();
     }
-    else if ((pAnimation->SpecialIdlePlaying()) && (pAnimation->spAnimIdle.operator->())) {
+    else if ((pAnimation->SpecialIdlePlaying()) && (pAnimation->spAnimIdle)) {
         eSection = pAnimation->spAnimIdle->GetSection();
     }
 
@@ -13770,7 +13768,7 @@ bool Actor::ObjectHit(bool abPowerAttack) {
             }
         }
         fWeight = BSMIN(fWeight, fWeaponClutterKnockMaxWeaponMass.Float());
-        NiPoint3 kImpulse = kHitDirection.operator*(fWeaponClutterKnockMult.Float()).operator*(fWeight);
+        NiPoint3 kImpulse = kHitDirection * fWeaponClutterKnockMult.Float() * fWeight;
         float fMass = pBody->getMass();
         // Scaled only when the minimum is greater (not when equal or unordered).
         if (fWeaponClutterKnockMinClutterMass.Float() > fMass) {
@@ -15620,7 +15618,7 @@ bool Actor::LineOfSight(
                 else {
                     NI2HKNS(temp, destPoint);
                     double v25 = v41 * fzs[i] + z;
-                    temp.operator()(2) = v25;
+                    temp(2) = v25;
                 }
                 aabb.m_min.setMin4(aabb.m_min, temp);
                 aabb.m_max.setMax4(aabb.m_max, temp);
@@ -15694,7 +15692,7 @@ bool Actor::IsPointInViewCone(const NiPoint3& arPoint, float afConeFOV) {
     float afOutDir;
     NiPoint3 arVector;
     NiPoint3* kPos = TESObjectREFR::QLocationOnReference();
-    (arVector = (&arPoint)->operator-(*kPos));
+    (arVector = arPoint - *kPos);
     float afTargetAngle = GetZAngleFromVector(arVector);
     float afStartAngle = GetHeading(false);
     float angleDelta = GetAngleDelta(afStartAngle, afTargetAngle, afOutDir);
@@ -18081,10 +18079,10 @@ bool Actor::IsEscorterBehind() {
             if (pTarget) {
                 locationCoord = &(kPos = pPackage->GetLocationCoord(this));
                 pPos = &GetLocationOnReference();
-                ecx0 = *&(result = pPos->operator-(*locationCoord));
+                ecx0 = *&(result = *pPos - *locationCoord);
                 v8 = &(v12 = pPackage->GetLocationCoord(this));
                 v2 = &pTarget->GetLocationOnReference();
-                v15 = *&(v11 = v2->operator-(*v8));
+                v15 = *&(v11 = *v2 - *v8);
                 if (pPlayer->TESObjectREFR::GetParentCell() &&
                     (((parentCell = pPlayer->TESObjectREFR::GetParentCell()), parentCell->GetInterior()) &&
                      (pPackage->GetLocationCell(this) &&
@@ -21376,7 +21374,7 @@ void Actor::ProcessDamageImpacts() {
             bhkCollisionObject* pcol;
             DamageImpactData* phit = phits->m_item;
             if (phit->spBody.m_pObject) {
-                pcol = bhkCollisionObject::Getbhk(phit->spBody.m_pObject->operator*());
+                pcol = bhkCollisionObject::Getbhk(**phit->spBody.m_pObject);
             }
             else {
                 pcol = nullptr;
@@ -23981,7 +23979,7 @@ void bhkRagdollController::SetPoseMatchEnable(bool abEnable) {
 }
 
 void bhkRagdollController::SetPhantom(bhkShapePhantom* apPhantom) {
-    pControllerPhantom = static_cast<hkpCachingShapePhantomRay*>(apPhantom->operator*());
+    pControllerPhantom = static_cast<hkpCachingShapePhantomRay*>(**apPhantom);
 }
 
 bool bhkRagdollController::QRagdollFeedbackEnable() {
@@ -24017,7 +24015,7 @@ void* bhkRagdollController::operator new(size_t blocksize) {
 }
 
 bhkRagdollTemplateData* bhkRagdollTemplate::GetRagdollTemplateData(uint32_t aiIndex) {
-    return RagdollTemplateA[aiIndex].operator->();
+    return RagdollTemplateA[aiIndex];
 }
 
 void Animation::SetGlobalTimeMultiplier(float fValue) {
@@ -24231,7 +24229,7 @@ void hkSphere::setPosition(const hkVector4& newPos) {
 
 // Sets w through hkVector4::operator().
 void hkSphere::setRadius(float newRadius) {
-    m_pos.operator()(3) = newRadius;
+    m_pos(3) = newRadius;
 }
 
 const hkClass& hkSphere::staticClass() {

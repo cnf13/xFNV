@@ -174,7 +174,7 @@ void BGSTerrainManager::Update(const NiPoint3& aViewPosition, BGSTerrainManager:
                         uint32_t uisize_2 = tempTreeList.iSize;
                         TreesQueuedToHide.SetSize(uisize_2, true);
                         for (uint32_t i_2 = 0; i_2 < uisize_2; ++i_2) {
-                            TreesQueuedToHide.SetAt(i_2, tempTreeList.operator[](i_2));
+                            TreesQueuedToHide.SetAt(i_2, tempTreeList[i_2]);
                         }
                     }
                 }

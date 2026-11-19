@@ -95,10 +95,10 @@ void HotKeysWheel::UpdateHotkeyList() {
             if (ihotkeyCt != 1) {
                 ItemChange* pcurrHotkeyedItem_2 = pcurrHotkeyedItem[ihotkeyCt];
                 if (pcurrHotkeyedItem_2) {
-                    strtemp.operator=("Interface\\Icons\\");
+                    strtemp = "Interface\\Icons\\";
                     BGSEquipType::EQUIP_TYPE EquipType = BGSEquipType::GetEquipType(pcurrHotkeyedItem_2->pContainerObj);
                     const char* EquipTypeIconFilename = BGSEquipType::GetEquipTypeIconFilename(EquipType);
-                    strtemp.operator+=(EquipTypeIconFilename);
+                    strtemp += EquipTypeIconFilename;
                     char* v7 = strtemp.pString;
                     int32_t v3 = Tile::TextToTrait("_HotKeyIcon");
                     pHotkeyTilesA[ihotkeyCt]->Set(v3, v7, true);
@@ -106,7 +106,7 @@ void HotKeysWheel::UpdateHotkeyList() {
                     pHotkeyTilesA[ihotkeyCt]->Set(v4, 1);
                     if (pcurrHotkeyedItem_2->iNumber <= 1) {
                         const char* FullName = pcurrHotkeyedItem_2->GetFullName();
-                        strtemp.operator=(FullName);
+                        strtemp = FullName;
                     }
                     else {
                         uint32_t FormHealth_0 = pcurrHotkeyedItem_2->iNumber;

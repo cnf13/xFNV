@@ -1639,10 +1639,10 @@ uint32_t BlackJackMenu::DealCard(BSSimpleList<BlackJackMenu::BlackJackCard*>* pH
         this->iCardsRemaining = aiMax - 1;
         cardindex = RandomInt(0, aiMax);
     }
-    card.operator=(pDeckOfCards[cardindex]);
-    tCard.operator=(pDeckOfCards[this->iCardsRemaining]);
-    pDeckOfCards[this->iCardsRemaining].operator=(card);
-    pDeckOfCards[cardindex].operator=(tCard);
+    card = pDeckOfCards[cardindex];
+    tCard = pDeckOfCards[this->iCardsRemaining];
+    pDeckOfCards[this->iCardsRemaining] = card;
+    pDeckOfCards[cardindex] = tCard;
     uint32_t iCardsRemaining = this->iCardsRemaining;
     this->iCardsRemaining = iCardsRemaining - 1;
     return iCardsRemaining;
@@ -1710,9 +1710,7 @@ void BlackJackMenu::LoadNifs() {
         "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Dealer.NIF", LOD_MULT_NONE, true, false, false, false
     );
     NiAVObject* pTableGeometry = this->pTableGeometry;
-    BlackJackMenu::spCamera.operator=(
-        static_cast<NiCamera*>(BSUtilities::GetObjectByName(this->pTableGeometry, "object1"))
-    );
+    BlackJackMenu::spCamera = static_cast<NiCamera*>(BSUtilities::GetObjectByName(this->pTableGeometry, "object1"));
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         v45 = ::new (apMemory) NiNode(0);
@@ -1721,7 +1719,7 @@ void BlackJackMenu::LoadNifs() {
         v45 = nullptr;
     }
     NiRefObject* v75 = (NiRefObject*)v45;
-    BlackJackMenu::spSceneRoot.operator=(v45);
+    BlackJackMenu::spSceneRoot = v45;
     NiNode* v44 = BlackJackMenu::spSceneRoot.m_pObject;
     v44->AttachChild(this->pTableGeometry, 1);
     NiNode* v43 = BlackJackMenu::spSceneRoot.m_pObject;
@@ -1799,7 +1797,7 @@ void BlackJackMenu::LoadNifs() {
     NiUpdateData arData(0.0f, false, false);
     BlackJackMenu::spSceneRoot.m_pObject->Update(arData);
     if (!BlackJackMenu::spCamera.m_pObject) {
-        BlackJackMenu::spCamera.operator=(SetupCamera());
+        BlackJackMenu::spCamera = SetupCamera();
     }
     NiNode* ObjectByName = static_cast<NiNode*>(BSUtilities::GetObjectByName(this->pTableGeometry, "Deck:0"));
     // Shader property types 8 to 12 are the per-pixel lighting properties; the type check fetches the property again
@@ -2450,7 +2448,7 @@ void BlackJackMenu::DrawScene() {
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
     BSShaderUtil::RenderScene(v6, v3, false);
     pCullingProcess->SetAccumulator(nullptr);
-    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
+    apMemory = static_cast<NiRefObject*>(nullptr);
     pCullingProcess->PopCullMode();
 }
 

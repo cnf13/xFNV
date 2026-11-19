@@ -768,11 +768,11 @@ NiRenderedTexture* BSRenderedTexture::GetTexture(int32_t aiIndex) {
 BGSTextureUseMap::BGSTextureUseMap() : UserMap(37u) {}
 
 NiPoint3* NiGeometry::GetNormals() {
-    return m_spModelData.operator->()->GetNormals();
+    return m_spModelData->GetNormals();
 }
 
 NiColorA* NiGeometry::GetColors() {
-    return m_spModelData.operator->()->GetColors();
+    return m_spModelData->GetColors();
 }
 
 NiPoint2* NiGeometry::GetTextures() {

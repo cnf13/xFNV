@@ -3208,9 +3208,9 @@ void CLightingEngine::ComputeLeafStaticLighting(
                 if (hProcess == apMemory) {
                     break;
                 }
-                const CVec3* cNormal = &hProcess.operator*()->m_cNormal;
-                const CVec3* cVertex = &hProcess.operator*()->m_cPosition;
-                CVec3 cDiffuseColor = hProcess.operator*()->GetColor();
+                const CVec3* cNormal = &(*hProcess)->m_cNormal;
+                const CVec3* cVertex = &(*hProcess)->m_cPosition;
+                CVec3 cDiffuseColor = (*hProcess)->GetColor();
                 cDominantLight.m_afData[2] = 0.0f;
                 cDominantLight.m_afData[1] = 0.0f;
                 cDominantLight.m_afData[0] = 0.0f;
@@ -3234,7 +3234,7 @@ void CLightingEngine::ComputeLeafStaticLighting(
                         }
                         CVec3 cLightVector = *p_cLightPos;
                         cLightVector.Normalize();
-                        float fDotProduct = cLightVector.operator*(*cNormal);
+                        float fDotProduct = cLightVector * *cNormal;
                         if (fMaxDotProduct <= static_cast<double>(fDotProduct)) {
                             fMaxDotProduct = fDotProduct;
                             cDominantLight = cLightPos;
@@ -3279,7 +3279,7 @@ void CLightingEngine::ComputeLeafStaticLighting(
                             CVec3* v4 = cAmbient.Add(&apResult, &cDiffuse);
                             CVec3* v5 = v4->Scale(&v21, v7);
                             CVec3* v6 = cEmissive.Add(&v20, v5);
-                            cColor.operator+=(*v6);
+                            cColor += *v6;
                         }
                     }
                 }
@@ -3308,14 +3308,12 @@ void CLightingEngine::ComputeLeafStaticLighting(
                     cColor.m_afData[2] = 0.0f;
                 }
                 if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_USE_LIGHT_SOURCES) != 0) {
-                    hProcess.operator*()->SetColor(cColor, false);
+                    (*hProcess)->SetColor(cColor, false);
                 }
                 if ((m_eStaticLightingStyle & CSpeedTreeRT::SLS_SIMULATE_SHADOWS) != 0) {
-                    hProcess.operator*()->AdjustStaticLighting(
-                        cTreeCenter, cDominantLight, m_fLeafLightingAdjustmentScalar
-                    );
+                    (*hProcess)->AdjustStaticLighting(cTreeCenter, cDominantLight, m_fLeafLightingAdjustmentScalar);
                 }
-                hProcess.operator++();
+                ++hProcess;
             }
         }
     }

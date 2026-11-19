@@ -40,7 +40,7 @@ TESIdleManager::~TESIdleManager() {
 void TESIdleManager::InitLoadedIdles() {
     uint32_t isize = LoadedIdleArray.m_usSize;
     for (uint32_t i = 0; i < isize; ++i) {
-        TESIdleForm* pidle = LoadedIdleArray.operator[](i);
+        TESIdleForm* pidle = LoadedIdleArray[i];
         if (!pidle || pidle->GetInitialized()) {
             TESIdleForm* pignore = nullptr;
             LoadedIdleArray.SetAt(i, pignore);
@@ -50,7 +50,7 @@ void TESIdleManager::InitLoadedIdles() {
         }
     }
     for (uint32_t i_2 = 0; i_2 < isize; ++i_2) {
-        TESIdleForm* pidle_2 = LoadedIdleArray.operator[](i_2);
+        TESIdleForm* pidle_2 = LoadedIdleArray[i_2];
         if ((pidle_2) && (pidle_2->InitParents())) {
             TESIdleForm* proot = nullptr;
             LoadedIdleArray.SetAt(i_2, proot);
@@ -271,7 +271,7 @@ void TESIdleManager::DestroyRootIdleArrays() {
     }
     uint32_t isize = LoadedIdleArray.m_usSize;
     for (uint32_t uiIndex = 0; uiIndex < isize; ++uiIndex) {
-        TESIdleForm* pidle_3 = LoadedIdleArray.operator[](uiIndex);
+        TESIdleForm* pidle_3 = LoadedIdleArray[uiIndex];
         if (pidle_3) {
             delete pidle_3;
         }

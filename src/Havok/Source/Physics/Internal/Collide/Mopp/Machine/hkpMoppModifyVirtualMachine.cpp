@@ -336,10 +336,8 @@ hkBool hkpMoppModifyVirtualMachine::queryModicationPointsRecursive(
                 // HK_ERROR; the same command is then read again, as the game does.
                 alignas(16) char buf[512];
                 hkErrStream kStream(buf, 512);
-                kStream.operator<<(
-                    "Unknown command - This mopp data has been corrupted (check for memory trashing), or an "
-                    "hkpMoppBvTreeShape has been pointed at invalid mopp data.\n"
-                );
+                kStream << "Unknown command - This mopp data has been corrupted (check for memory trashing), or an "
+                           "hkpMoppBvTreeShape has been pointed at invalid mopp data.\n";
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x1298FEDD, buf,
                         ".\\Collide\\Mopp\\Machine\\hkpMoppModifyVirtualMachine.cpp", 293

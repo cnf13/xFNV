@@ -288,7 +288,7 @@ void GrenadeProjectile::ReportCollision(hkpContactPointAddedEvent& arEvent) {
         pcollidee = prefB;
         HK2NI(contactPoint, arEvent.m_contactPoint->getPosition());
         HK2NI(contactNormal, arEvent.m_contactPoint->getNormal());
-        contactNormal.operator*=(-1.0f);
+        contactNormal *= -1.0f;
         pcollidable = arEvent.m_bodyB->getRootCollidable();
         ikey = arEvent.m_bodyB->m_shapeKey;
     }

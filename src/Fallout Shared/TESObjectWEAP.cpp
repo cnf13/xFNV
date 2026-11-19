@@ -1962,7 +1962,7 @@ void TESObjectWEAP::Fire(TESObjectREFR* apSource) {
                 }
                 if (pattachNode) {
                     NiPointer<NiAVObject> splaserSight = pattachNode->GetObjectByName(FixedStrings::QLaserSightsName());
-                    if (!splaserSight.operator->()) {
+                    if (!splaserSight) {
                         NiColorA color;
                         color.~NiColorA();
                         ::new (&color) NiColorA(1.0f, 0.0f, 0.0f, 1.0f);
@@ -2029,7 +2029,7 @@ void TESObjectWEAP::Fire(TESObjectREFR* apSource) {
                 NiAVObject* pattachNode = pactor->GetParentCell()->GetMarkerNode();
                 if (pattachNode) {
                     NiPointer<NiAVObject> spaimSight = pattachNode->GetObjectByName(FixedStrings::QAimSightsName());
-                    if (spaimSight.operator->()) {
+                    if (spaimSight) {
                         NiNode* pParent = spaimSight->GetParent();
                         pParent->DetachChild(spaimSight.operator->());
                     }

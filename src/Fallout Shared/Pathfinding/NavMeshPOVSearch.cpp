@@ -96,10 +96,10 @@ bool NavMeshPOVSearch::GetNodeConnections(
                     AngleSinCos parentAnglePlusPI;
                     parentAnglePlusPI = parentPOVLink->EntryAngle;
                     if (parentPOVNode->Direction == AD_CCW) {
-                        parentAnglePlusPI.operator+=(AngleSinCos(4.712389f));
+                        parentAnglePlusPI += AngleSinCos(4.712389f);
                     }
                     else {
-                        parentAnglePlusPI.operator-=(AngleSinCos(4.712389f));
+                        parentAnglePlusPI -= AngleSinCos(4.712389f);
                     }
                     AngleSinCosArc arc;
                     arc.~AngleSinCosArc();
@@ -370,7 +370,7 @@ bool NavMeshPOVSearch::CheckArcAgainstNavMesh2(
         kStep.~AngleSinCos();
         ::new (&kStep) AngleSinCos(0.2617994f);
     }
-    kCurrent.operator=(aArc.Start);
+    kCurrent = aArc.Start;
     // operator+ builds its result in kNext.
     AngleSinCos kNext = kCurrent + kStep;
     NiPoint3 kPoint = aSphere.Center + kCurrent.ComputePoint3(aSphere.fRadius);
@@ -385,7 +385,7 @@ bool NavMeshPOVSearch::CheckArcAgainstNavMesh2(
             return false;
         }
         kStartLocation.Copy(kReturnLocation);
-        kCurrent.operator=(kNext);
+        kCurrent = kNext;
         // The sum is built in a temporary, then assigned through operator=.
         kNext = kCurrent + kStep;
         kPoint = aSphere.Center + kNext.ComputePoint3(aSphere.fRadius);
@@ -630,7 +630,7 @@ bool NavMeshPOVSearch::BuildPath(
     pSolution = apSolution;
     if (NavMeshPOVSearch::bDrawDebugData) {
         NiNode* v33;
-        if (NavMeshPOVSearch::spRootDrawNode.operator!=(static_cast<NiNode*>(nullptr))) {
+        if (NavMeshPOVSearch::spRootDrawNode != static_cast<NiNode*>(nullptr)) {
             PathManager* v6 = PathManager::QInstance();
             v6->DrawPath(NavMeshPOVSearch::spRootDrawNode, false);
         }
@@ -642,7 +642,7 @@ bool NavMeshPOVSearch::BuildPath(
             v33 = nullptr;
         }
         NiRefObject* v48 = (NiRefObject*)v33;
-        NavMeshPOVSearch::spRootDrawNode.operator=(v33);
+        NavMeshPOVSearch::spRootDrawNode = v33;
     }
     BuildPOVListForTriangles(*apList, POVs);
     if (NavMeshPOVSearch::bDrawDebugData) {
@@ -692,8 +692,8 @@ bool NavMeshPOVSearch::BuildPath(
             }
         }
     }
-    StartLocation.operator=(aStartLocation);
-    GoalLocation.operator=(aGoalLocation);
+    StartLocation = aStartLocation;
+    GoalLocation = aGoalLocation;
     StartLocation.ResolveNavMeshInfo(nullptr);
     if (!StartLocation.HasNavMeshData()) {
         return false;
@@ -801,16 +801,16 @@ void NavMeshPOVSearch::DrawArc(
         aAngleStep.~AngleSinCos();
         ::new (&aAngleStep) AngleSinCos(0.2617994f);
     }
-    currentStartAngle.operator=(aStartAngle);
+    currentStartAngle = aStartAngle;
     AngleSinCos currentGoalAngle = currentStartAngle + aAngleStep;
     NiPoint3 currentStartLoc = aCenter + currentStartAngle.ComputePoint3(afRadius);
     NiPoint3 currentGoalLoc = aCenter + currentGoalAngle.ComputePoint3(afRadius);
     for (icount = 0; arc.WithinRange(currentGoalAngle) && icount < 24; ++icount) {
         NavMeshPOVSearch::DrawLine(currentStartLoc, currentGoalLoc, aColor);
         currentStartLoc = currentGoalLoc;
-        currentStartAngle.operator=(currentGoalAngle);
+        currentStartAngle = currentGoalAngle;
         // The sum goes into a temporary, then through operator= into currentGoalAngle.
-        currentGoalAngle.operator=(currentStartAngle + aAngleStep);
+        currentGoalAngle = currentStartAngle + aAngleStep;
         currentGoalLoc = aCenter + currentGoalAngle.ComputePoint3(afRadius);
     }
     if (icount != 24) {
@@ -826,7 +826,7 @@ AngleSinCos AngleSinCos::operator+(const AngleSinCos& aSinCos) const {
     lSum.fCos = fCos * aSinCos.fCos - fSin * aSinCos.fSin;
     lSum.fSin = fSin * aSinCos.fCos + fCos * aSinCos.fSin;
     AngleSinCos lResult;
-    lResult.operator=(lSum);
+    lResult = lSum;
     return lResult;
 }
 
@@ -906,7 +906,7 @@ bool AngleSinCosArc::WithinRange(const AngleSinCos& aAngle) const {
     }
     AngleSinCos Delta = *ccwEnd - *ccwStart;
     AngleSinCos relativeAngle = aAngle - *ccwStart;
-    return relativeAngle.operator<=(Delta);
+    return relativeAngle <= Delta;
 }
 
 double AngleSinCosArc::GetLength(float a1) {

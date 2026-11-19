@@ -166,12 +166,12 @@ void BSTempEffectDebris::Init(
             TES::pInstance->GetUnusedCachedParticleObject(pmodel, sp3D);
         }
         else {
-            sp3D.operator=(static_cast<NiAVObject*>(nullptr));
+            sp3D = static_cast<NiAVObject*>(nullptr);
         }
     }
     else {
         BSCloningProcess cloneProcess(1.0f);
-        sp3D.operator=(static_cast<NiAVObject*>(pmodel->Clone(cloneProcess)));
+        sp3D = static_cast<NiAVObject*>(pmodel->Clone(cloneProcess));
     }
     if ((sp3D.m_pObject) && (pCell)) {
         NiNode* psceneParent = static_cast<NiNode*>(pCell->GetDynamicNode());

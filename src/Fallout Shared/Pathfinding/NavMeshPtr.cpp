@@ -35,5 +35,5 @@ NavMeshPtr NavMeshPtr::MakeNavMeshPtr(NavMesh* apNavMesh) {
 
 void NavMeshPtr::MakeNavMeshPtr(NavMeshPtr& arPtr, NavMesh* apNavMesh) {
     NavMeshPtr apMemory(apNavMesh);
-    arPtr.operator=(apMemory);
+    arPtr = apMemory;
 }

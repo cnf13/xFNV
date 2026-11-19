@@ -1019,7 +1019,7 @@ void MapMenu::ZoomMap(bool abZoomIn, float afZoomDelta) {
         double v10 = pMapTile->GetFloat(4045);
         double v31 = v10 * fnewMagnification;
         float v30 = v31 / pMapTile->GetFloat(4017);
-        MapCenter.operator*=(v30);
+        MapCenter *= v30;
         pMapTile->Set(MapMenu::iUT_Magnification, fnewMagnification, true);
         if (iCurrentPage == 32) {
             NiNode* pmapModel = pMapTile->GetModel();
@@ -1109,7 +1109,7 @@ void MapMenu::HighlightCenterMarker() {
                 float x = pcurrTile->GetFloat(MapMenu::iUT_X);
                 NiPoint2 currPoint(x, y);
                 float fcurrDist = 0.0f;
-                currPoint.operator*=(pMapTile->GetFloat(4017));
+                currPoint *= pMapTile->GetFloat(4017);
                 fcurrDist = (highlightCenter - currPoint).Length();
                 if (fshortestDist > static_cast<double>(fcurrDist)) {
                     double v5 = pTiles[6]->GetFloat(4016);
@@ -2816,7 +2816,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
                     float v54 = static_cast<double>(y_2) * fpossize;
                     float v53 = static_cast<double>(x_2) * fpossize;
                     NiPoint3 worldcoord(v53, v54, 0.0f);
-                    worldcoord.operator+=(sectoffset);
+                    worldcoord += sectoffset;
                     float fseenval = 4.0f;
                     if (MapMenu::pMe->bFogOfWarEnabled) {
                         fseenval = static_cast<float>(TESObjectCELL::GetSeenValue(worldcoord));
@@ -2878,7 +2878,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
             ptsp->TexClampMode = NiTexturingProperty::CLAMP_S_CLAMP_T;
             ptsp->SetTintColor(tintColor);
             ptsp->SetUseVertexColors(true);
-            spmaptex.operator=(static_cast<NiTexture*>(nullptr));
+            spmaptex = static_cast<NiTexture*>(nullptr);
             pnewGrid->AttachProperty(ptsp);
             NiAlphaProperty* v69 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
             if (v69) {

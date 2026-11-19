@@ -601,8 +601,8 @@ BGSWorldLocation CombatGroup::GetSearchCenter() {
 
 float CombatGroup::GetSearchPercent() {
     float fPercent;
-    if (spPathingLOSGridMap.operator->()) {
-        fPercent = spPathingLOSGridMap.operator->()->GetSeenPercent();
+    if (spPathingLOSGridMap) {
+        fPercent = spPathingLOSGridMap->GetSeenPercent();
     }
     else {
         fPercent = -1.0f;

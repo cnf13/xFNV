@@ -530,7 +530,7 @@ void CaravanMenu::DoIdle() {
                             v70->GetSoundHandleByName("GAMECaravanSwitchCard", 289u).Play(false);
                             SelectDeckCard(false);
                             if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
-                                pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
+                                pPlayerHand[iSelectedDeckCard]->data.iFaceValue > 10) {
                                 SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                             }
                             else {
@@ -683,7 +683,7 @@ void CaravanMenu::DoIdle() {
                     break;
                 }
                 NiUpdateData v131(CaravanMenu::fTimeDelta, 1, 0);
-                pListOfBills.operator[](i)->Update(v131);
+                pListOfBills[i]->Update(v131);
             }
             for (int32_t i_2 = iCoinIndexToAnim;; ++i_2) {
                 uint32_t v23 = pListOfCoins.iSize;
@@ -691,7 +691,7 @@ void CaravanMenu::DoIdle() {
                     break;
                 }
                 NiUpdateData v130(CaravanMenu::fTimeDelta, 1, 0);
-                pListOfCoins.operator[](i_2)->Update(v130);
+                pListOfCoins[i_2]->Update(v130);
             }
             if (CaravanMenu::fTimeDelta > 1.0) {
                 SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
@@ -1019,7 +1019,7 @@ void CaravanMenu::DoIdle() {
                         iSelectedDeckCard = pPlayerHand.iSize - 1;
                         SelectDeckCard(false);
                         if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
-                            pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
+                            pPlayerHand[iSelectedDeckCard]->data.iFaceValue > 10) {
                             SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                         }
                     }
@@ -1087,7 +1087,7 @@ void CaravanMenu::DoIdle() {
                         iSelectedDeckCard = pPlayerHand.iSize - 1;
                         SelectDeckCard(false);
                         if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
-                            pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
+                            pPlayerHand[iSelectedDeckCard]->data.iFaceValue > 10) {
                             SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                         }
                     }
@@ -1177,7 +1177,7 @@ void CaravanMenu::DoIdle() {
                 iSelectedDeckCard = pPlayerHand.iSize - 1;
                 SelectDeckCard(false);
                 if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
-                    pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
+                    pPlayerHand[iSelectedDeckCard]->data.iFaceValue > 10) {
                     SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                 }
             LABEL_225:;
@@ -1207,18 +1207,18 @@ void CaravanMenu::DoIdle() {
             pTiles[isAI_3 + 29]->Set(CaravanMenu::iUT_Value, v97);
             eGameState = static_cast<CaravanMenu::CaravanState>(2 * (pSelectedCard->data.iFaceValue != 12) + 17);
             if (eGameState == CaravanMenu::CA_GAME_JOKER_CLEAR_ANIM) {
-                int32_t faceValue = pCardTracks[iSelectedTrack][iSelectedRow].operator[](0)->data.iFaceValue;
-                int32_t suitValue = pCardTracks[iSelectedTrack][iSelectedRow].operator[](0)->data.iCardSuit;
+                int32_t faceValue = pCardTracks[iSelectedTrack][iSelectedRow][0]->data.iFaceValue;
+                int32_t suitValue = pCardTracks[iSelectedTrack][iSelectedRow][0]->data.iCardSuit;
                 for (int32_t iTrack = 0; iTrack < 6; ++iTrack) {
                     for (int32_t iRow = 0; iRow < 7 && pCardTracks[iTrack][iRow].iSize; ++iRow) {
                         if (faceValue == 1) {
-                            int32_t CostOverride = pCardTracks[iTrack][iRow].operator[](0)->data.iCardSuit;
+                            int32_t CostOverride = pCardTracks[iTrack][iRow][0]->data.iCardSuit;
                             if (CostOverride == suitValue && (iTrack != iSelectedTrack || iRow != iSelectedRow)) {
                                 jokerLocations[iTrack].Add(iRow);
                             }
                         }
                         else {
-                            int32_t PackageEvaluateHour = pCardTracks[iTrack][iRow].operator[](0)->data.iFaceValue;
+                            int32_t PackageEvaluateHour = pCardTracks[iTrack][iRow][0]->data.iFaceValue;
                             if (PackageEvaluateHour == faceValue &&
                                 (iTrack != iSelectedTrack || iRow != iSelectedRow)) {
                                 jokerLocations[iTrack].Add(iRow);
@@ -1287,7 +1287,7 @@ void CaravanMenu::DoIdle() {
                     eGameState = CaravanMenu::CA_GAME_PROCESS_AI;
                     iSelectedDeckCard = pPlayerHand.iSize - 1;
                     if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP) &&
-                        pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue > 10) {
+                        pPlayerHand[iSelectedDeckCard]->data.iFaceValue > 10) {
                         SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                     }
                     if ((isAI_4 == 1 && !this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) ||
@@ -1426,7 +1426,7 @@ void CaravanMenu::DoIdle() {
                                         if (j_2 >= v63) {
                                             break;
                                         }
-                                        TESCaravanCard** Xe = &pCardArray_2->operator[](j_2);
+                                        TESCaravanCard** Xe = &(*pCardArray_2)[j_2];
                                         pCardTracks[iSelectedTrack][i_13].Add(*Xe);
                                         UpdateTrackCardTexture(iSelectedTrack, i_13, j_2);
                                     }
@@ -1434,7 +1434,7 @@ void CaravanMenu::DoIdle() {
                                 jokerLocations[iSelectedTrack].Remove(0, true);
                                 if (jokerLocations[iSelectedTrack].iSize) {
                                     int32_t iTmp = iSelRowTmp;
-                                    iSelRowTmp = jokerLocations[iSelectedTrack].operator[](0);
+                                    iSelRowTmp = jokerLocations[iSelectedTrack][0];
                                     if (iSelRowTmp > iTmp) {
                                         --iSelRowTmp;
                                     }
@@ -1454,7 +1454,7 @@ void CaravanMenu::DoIdle() {
                                     if (j >= v62) {
                                         break;
                                     }
-                                    TESCaravanCard** Xd = &pCardArray->operator[](j);
+                                    TESCaravanCard** Xd = &(*pCardArray)[j];
                                     pCardTracks[iSelectedTrack][i_12].Add(*Xd);
                                     UpdateTrackCardTexture(iSelectedTrack, i_12, j);
                                 }
@@ -1543,7 +1543,7 @@ void CaravanMenu::DoIdle() {
                 ++iSelectedTrack;
             }
             if (iSelectedTrack < 6) {
-                iSelectedRow = jokerLocations[iSelectedTrack].operator[](0);
+                iSelectedRow = jokerLocations[iSelectedTrack][0];
                 eGameState = CaravanMenu::CA_GAME_JACK_CLEAR_ANIM;
             }
             else {
@@ -1564,10 +1564,10 @@ void CaravanMenu::DoIdle() {
                     if (this->IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) {
                         if (aiPackage.iActionType == 6) {
                             iSelectedDeckCard = aiPackage.iDeckCard;
-                            pSelectedCard = pNPCHand.operator[](iSelectedDeckCard);
+                            pSelectedCard = pNPCHand[iSelectedDeckCard];
                             // Both cards are read into locals; the hand card's is never read again.
-                            TESCaravanCard* pDeckCard = pNPCDeck.operator[](this->iNextNPCCard);
-                            TESCaravanCard* pHandCard = pNPCHand.operator[](iSelectedDeckCard);
+                            TESCaravanCard* pDeckCard = pNPCDeck[this->iNextNPCCard];
+                            TESCaravanCard* pHandCard = pNPCHand[iSelectedDeckCard];
                             (void)pHandCard;
                             pNPCHand.Remove(iSelectedDeckCard, true);
                             pNPCHand.Add(pDeckCard);
@@ -1587,13 +1587,13 @@ void CaravanMenu::DoIdle() {
                             iSelectedDeckCard = aiPackage.iDeckCard;
                             iSelectedRow = 0;
                             iSelectedColumn = pCardTracks[iTrack_2][iSelectedRow].iSize;
-                            pSelectedCard = pNPCHand.operator[](iSelectedDeckCard);
+                            pSelectedCard = pNPCHand[iSelectedDeckCard];
                             aiPackage.iTrack = iTrack_2;
                             aiPackage.iRow = 0;
                             if (CaravanMenu::bDebugAI) {
                                 aiPackage.Print_WhatIsHeThinking(&pNPCHand);
                             }
-                            TESCaravanCard* pTrackCard = pNPCHand.operator[](iSelectedDeckCard);
+                            TESCaravanCard* pTrackCard = pNPCHand[iSelectedDeckCard];
                             pNPCHand.Remove(iSelectedDeckCard, true);
                             pCardTracks[iTrack_2][iSelectedRow].Add(pTrackCard);
                             eGameState = CaravanMenu::CA_GAME_INTRO_DEAL_ANIM;
@@ -1605,15 +1605,15 @@ void CaravanMenu::DoIdle() {
                             if (this->iNextNPCCard == -1) {
                                 iSelectedDeckCard = aiPackage.iDeckCard;
                                 // The discarded card is kept in a local that is never read again, as the game does.
-                                pHandCard = pNPCHand.operator[](iSelectedDeckCard);
+                                pHandCard = pNPCHand[iSelectedDeckCard];
                                 (void)pHandCard;
                                 pNPCHand.Remove(iSelectedDeckCard, true);
                                 UpdateDealCardTexture(false);
                             }
                             else {
                                 iSelectedDeckCard = aiPackage.iDeckCard;
-                                TESCaravanCard* pDeckCard = pNPCDeck.operator[](this->iNextNPCCard);
-                                TESCaravanCard* pDiscardCard = pNPCHand.operator[](iSelectedDeckCard);
+                                TESCaravanCard* pDeckCard = pNPCDeck[this->iNextNPCCard];
+                                TESCaravanCard* pDiscardCard = pNPCHand[iSelectedDeckCard];
                                 (void)pDiscardCard;
                                 pNPCHand.Remove(iSelectedDeckCard, true);
                                 pNPCHand.Add(pDeckCard);
@@ -1667,8 +1667,8 @@ void CaravanMenu::DoIdle() {
                                     iSelectedRow = aiPackage.iRow;
                                     iSelectedColumn = pCardTracks[iSelectedTrack][iSelectedRow].iSize;
                                     iSelectedDeckCard = aiPackage.iDeckCard;
-                                    pSelectedCard = pNPCHand.operator[](iSelectedDeckCard);
-                                    TESCaravanCard* pTrackCard_2 = pNPCHand.operator[](iSelectedDeckCard);
+                                    pSelectedCard = pNPCHand[iSelectedDeckCard];
+                                    TESCaravanCard* pTrackCard_2 = pNPCHand[iSelectedDeckCard];
                                     pNPCHand.Remove(iSelectedDeckCard, true);
                                     if (CaravanMenu::bDebugAI) {
                                         aiPackage.Print_WhatIsHeThinking(&pNPCHand);
@@ -1680,9 +1680,9 @@ void CaravanMenu::DoIdle() {
                                     iSelectedRow = aiPackage.iRow;
                                     iSelectedColumn = pCardTracks[iSelectedTrack][iSelectedRow].iSize;
                                     iSelectedDeckCard = aiPackage.iDeckCard;
-                                    pSelectedCard = pNPCHand.operator[](iSelectedDeckCard);
-                                    TESCaravanCard* pDeckCard = pNPCDeck.operator[](this->iNextNPCCard);
-                                    pHandCard = pNPCHand.operator[](iSelectedDeckCard);
+                                    pSelectedCard = pNPCHand[iSelectedDeckCard];
+                                    TESCaravanCard* pDeckCard = pNPCDeck[this->iNextNPCCard];
+                                    pHandCard = pNPCHand[iSelectedDeckCard];
                                     pNPCHand.Remove(iSelectedDeckCard, true);
                                     pNPCHand.Add(pDeckCard);
                                     if (CaravanMenu::bDebugAI) {
@@ -1871,7 +1871,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                 pTiles[8]->Poke(CaravanMenu::iUT_Value, 1.0f);
                 pTiles[8]->Set(CaravanMenu::iUT_Value, iCardsInDeck);
                 int32_t index = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-                pDeckArray.operator[](index)->bIsActive = true;
+                pDeckArray[index]->bIsActive = true;
                 bhandled = true;
                 eGameState = CaravanMenu::CA_DECK_FLIP_ANIM;
                 goto LABEL_135;
@@ -1902,7 +1902,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                         SetFlag(CaravanMenu::CAF_SELECT_TRACK, false);
                         DeselectTrackCard();
                         eGameState = CaravanMenu::CA_GAME_INTRO_DEAL_ANIM;
-                        TESCaravanCard* pTrackCard = pPlayerHand.operator[](iSelectedDeckCard);
+                        TESCaravanCard* pTrackCard = pPlayerHand[iSelectedDeckCard];
                         pPlayerHand.Remove(iSelectedDeckCard, true);
                         pCardTracks[iSelectedTrack][iSelectedRow].Add(pTrackCard);
                     }
@@ -1943,13 +1943,13 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                             }
                         }
                         if (iNextPlayerCard == -1) {
-                            TESCaravanCard* pTrackCard_3 = pPlayerHand.operator[](iSelectedDeckCard);
+                            TESCaravanCard* pTrackCard_3 = pPlayerHand[iSelectedDeckCard];
                             pPlayerHand.Remove(iSelectedDeckCard, true);
                             pCardTracks[iSelectedTrack][iSelectedRow].Add(pTrackCard_3);
                         }
                         else {
-                            TESCaravanCard* pDeckCard = pPlayerDeck.operator[](iNextPlayerCard);
-                            TESCaravanCard* pTrackCard_2 = pPlayerHand.operator[](iSelectedDeckCard);
+                            TESCaravanCard* pDeckCard = pPlayerDeck[iNextPlayerCard];
+                            TESCaravanCard* pTrackCard_2 = pPlayerHand[iSelectedDeckCard];
                             pPlayerHand.Remove(iSelectedDeckCard, true);
                             pPlayerHand.Add(pDeckCard);
                             pPlayerDeck.Remove(iNextPlayerCard, true);
@@ -2003,7 +2003,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     pTiles[8]->Poke(CaravanMenu::iUT_Value, 1.0f);
                     pTiles[8]->Set(CaravanMenu::iUT_Value, iCardsInDeck);
                     uint32_t Float = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-                    pDeckArray.operator[](Float)->bIsActive = false;
+                    pDeckArray[Float]->bIsActive = false;
                     bhandled = true;
                     eGameState = CaravanMenu::CA_DECK_FLIP_ANIM;
                 }
@@ -2066,12 +2066,12 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                                                             : CaravanMenu::CA_GAME_DISCARDCARD_ANIM
                 );
                 if (iNextPlayerCard == -1) {
-                    TESCaravanCard* pTrackCard_4 = pPlayerHand.operator[](iSelectedDeckCard);
+                    TESCaravanCard* pTrackCard_4 = pPlayerHand[iSelectedDeckCard];
                     pPlayerHand.Remove(iSelectedDeckCard, true);
                 }
                 else {
-                    TESCaravanCard* pDeckCard_2 = pPlayerDeck.operator[](iNextPlayerCard);
-                    TESCaravanCard* pTrackCard_5 = pPlayerHand.operator[](iSelectedDeckCard);
+                    TESCaravanCard* pDeckCard_2 = pPlayerDeck[iNextPlayerCard];
+                    TESCaravanCard* pTrackCard_5 = pPlayerHand[iSelectedDeckCard];
                     pPlayerHand.Remove(iSelectedDeckCard, true);
                     pPlayerHand.Add(pDeckCard_2);
                     pPlayerDeck.Remove(iNextPlayerCard, true);
@@ -2142,7 +2142,7 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     int32_t isize = pDeckArray.iSize;
                     for (i = 0; i < isize; ++i) {
                         randomints.Add(i);
-                        pDeckArray.operator[](i)->bIsActive = false;
+                        pDeckArray[i]->bIsActive = false;
                         iCardsInDeck = 0;
                     }
                     if (isize <= 30) {
@@ -2154,11 +2154,11 @@ bool CaravanMenu::DoGamepad(int32_t a1, float a2) {
                     for (int32_t i_2 = 0; i_2 < numcards; ++i_2) {
                         uint32_t v14 = randomints.iSize;
                         int32_t j = RandomInt(0, v14);
-                        int32_t k = randomints.operator[](j);
+                        int32_t k = randomints[j];
                         randomints.Remove(j, true);
-                        if (!pDeckArray.operator[](k)->bIsActive) {
+                        if (!pDeckArray[k]->bIsActive) {
                             ++iCardsInDeck;
-                            pDeckArray.operator[](k)->bIsActive = true;
+                            pDeckArray[k]->bIsActive = true;
                         }
                     }
                     randomints.Clear(true);
@@ -2454,7 +2454,7 @@ void CaravanMenu::UpdateCaravanFlags() {
             uint32_t Float = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
             // bIsActive is tested as a whole byte: read it as a byte, or clang merges the branches and passes a non-0/1
             // bool on to SetFlag.
-            if (pDeckArray.operator[](Float)->bIsActive != 0) {
+            if (pDeckArray[Float]->bIsActive != 0) {
                 SetFlag(CaravanMenu::CAF_DISABLE_A, true);
                 SetFlag(CaravanMenu::CAF_DISABLE_X, false);
             }
@@ -2737,7 +2737,7 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         }
         uint32_t v4 = intlistbills.iSize;
         int32_t index_10 = RandomInt(0, v4);
-        int32_t locindex = intlistbills.operator[](index_10);
+        int32_t locindex = intlistbills[index_10];
         intlistbills.RemoveFast(index_10, 1u);
         BSsprintf(blockName, 260, "Bill-Placement_0%i:0", locindex + 1);
         NiAVObject* avobj = BSUtilities::GetObjectByName(pBillsGrid, static_cast<const char*>(blockName));
@@ -2746,10 +2746,10 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         float y = WorldBound->m_kCenter.y;
         float z = WorldBound->m_kCenter.z;
         mat = (*&avobj->m_kLocal).m_Rotate;
-        pListOfBills.operator[](i)->SetRotate(mat);
-        pListOfBills.operator[](i)->SetTranslate(x, y, z);
+        pListOfBills[i]->SetRotate(mat);
+        pListOfBills[i]->SetTranslate(x, y, z);
         NiUpdateData update2(0.0f, 0, 0);
-        pListOfBills.operator[](i)->Update(update2);
+        pListOfBills[i]->Update(update2);
     }
     for (int32_t i_2 = iCoinIndexToAnim;; ++i_2) {
         uint32_t v7 = pListOfCoins.iSize;
@@ -2758,7 +2758,7 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         }
         uint32_t v8 = intlistcoins.iSize;
         int32_t index_11 = RandomInt(0, v8);
-        int32_t v32 = intlistcoins.operator[](index_11);
+        int32_t v32 = intlistcoins[index_11];
         intlistcoins.RemoveFast(index_11, 1u);
         if (v32 + 1 >= 10) {
             BSsprintf(blockName, 260, "Coin-Placement_%i:0", v32 + 1);
@@ -2772,10 +2772,10 @@ void CaravanMenu::UpdateBettingUI(int32_t maxraise, int32_t raise) {
         float v34 = v9->m_kCenter.y;
         float v35 = v9->m_kCenter.z;
         mat_2 = (*&avobj_2->m_kLocal).m_Rotate;
-        pListOfCoins.operator[](i_2)->SetRotate(mat_2);
-        pListOfCoins.operator[](i_2)->SetTranslate(v33, v34, v35);
+        pListOfCoins[i_2]->SetRotate(mat_2);
+        pListOfCoins[i_2]->SetTranslate(v33, v34, v35);
         NiUpdateData update2_2(0.0f, 0, 0);
-        pListOfCoins.operator[](i_2)->Update(update2_2);
+        pListOfCoins[i_2]->Update(update2_2);
     }
     if (BSMAX(icoins, ibills) > 0) {
         eGameState = CaravanMenu::CA_ANTE_MONEYIN_ANIM;
@@ -2798,7 +2798,7 @@ void CaravanMenu::UpdateTrackValue(int32_t aiTrack) {
             break;
         }
         for (uint32_t auiIndex = 0; auiIndex < pCardTracks[aiTrack][i].iSize; ++auiIndex) {
-            CARAVANCARDDATA* MuzzleFlashModel = &pCardTracks[aiTrack][i].operator[](auiIndex)->data;
+            CARAVANCARDDATA* MuzzleFlashModel = &pCardTracks[aiTrack][i][auiIndex]->data;
             if (auiIndex) {
                 if (MuzzleFlashModel->iFaceValue == 14) {
                     iFaceValue *= 2;
@@ -2815,26 +2815,26 @@ void CaravanMenu::UpdateTrackValue(int32_t aiTrack) {
         // The track's last card slot and the one before it.
         BSSimpleArray<TESCaravanCard*>& rLastSlot = pCardTracks[aiTrack][i - 1];
         if (i == 1) {
-            trackInfo[aiTrack].eCardSuit = pCardTracks[aiTrack]->operator[](0)->data.iCardSuit;
+            trackInfo[aiTrack].eCardSuit = (*pCardTracks[aiTrack])[0]->data.iCardSuit;
             for (uint32_t j = 1; j < rLastSlot.iSize; ++j) {
-                if (rLastSlot.operator[](j)->data.iFaceValue == 13) {
-                    trackInfo[aiTrack].eCardSuit = rLastSlot.operator[](j)->data.iCardSuit;
+                if (rLastSlot[j]->data.iFaceValue == 13) {
+                    trackInfo[aiTrack].eCardSuit = rLastSlot[j]->data.iCardSuit;
                 }
             }
             trackInfo[aiTrack].eDirection = 0;
         }
         else {
-            int32_t PackageEvaluateHour = rLastSlot.operator[](0)->data.iFaceValue;
-            if (PackageEvaluateHour <= pCardTracks[aiTrack][i - 2].operator[](0)->data.iFaceValue) {
+            int32_t PackageEvaluateHour = rLastSlot[0]->data.iFaceValue;
+            if (PackageEvaluateHour <= pCardTracks[aiTrack][i - 2][0]->data.iFaceValue) {
                 trackInfo[aiTrack].eDirection = -1;
             }
             else {
                 trackInfo[aiTrack].eDirection = 1;
             }
-            trackInfo[aiTrack].eCardSuit = rLastSlot.operator[](0)->data.iCardSuit;
+            trackInfo[aiTrack].eCardSuit = rLastSlot[0]->data.iCardSuit;
             for (uint32_t k = 1; k < rLastSlot.iSize; ++k) {
-                if (rLastSlot.operator[](k)->data.iFaceValue == 13) {
-                    trackInfo[aiTrack].eCardSuit = rLastSlot.operator[](k)->data.iCardSuit;
+                if (rLastSlot[k]->data.iFaceValue == 13) {
+                    trackInfo[aiTrack].eCardSuit = rLastSlot[k]->data.iCardSuit;
                     trackInfo[aiTrack].eDirection = -trackInfo[aiTrack].eDirection;
                 }
             }
@@ -3267,11 +3267,10 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                 pActiveDeckGeometry->Update(v32);
                 // The value is read and never used, as the game does.
                 [[maybe_unused]] float DataFogFarPlane = deckFaceShaders[i]->fAlpha;
-                if (pDeckArray.operator[](auiIndex)->bIsActive) {
+                if (pDeckArray[auiIndex]->bIsActive) {
                     NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
                     BSsprintf(
-                        apInPath, 260, "%s%s", "Textures\\",
-                        (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                        apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->faceTexture)->GetTextureName()
                     );
                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                     TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
@@ -3280,8 +3279,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                         deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4n);
                     }
                     BSsprintf(
-                        apInPath, 260, "%s%s", "Textures\\",
-                        (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                        apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->backTexture)->GetTextureName()
                     );
                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                     TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
@@ -3290,8 +3288,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                         deckFaceShaders[i + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4o);
                     }
                     BSsprintf(
-                        apInPath, 260, "%s%s", "Textures\\",
-                        (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                        apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->backTexture)->GetTextureName()
                     );
                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                     TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
@@ -3300,8 +3297,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                         deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4p);
                     }
                     BSsprintf(
-                        apInPath, 260, "%s%s", "Textures\\",
-                        (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                        apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->faceTexture)->GetTextureName()
                     );
                     SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                     TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
@@ -3312,12 +3308,11 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                 }
                 else {
                     // Only the call is kept: the card's faceTexture address tested after it is never null.
-                    pDeckArray.operator[](auiIndex);
+                    pDeckArray[auiIndex];
                     {
                         NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
                         BSsprintf(
-                            apInPath, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                            apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->faceTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                         TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
@@ -3326,8 +3321,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                             deckFaceShaders[i + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4r);
                         }
                         BSsprintf(
-                            apInPath, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                            apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->backTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                         TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
@@ -3336,8 +3330,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                             deckFaceShaders[i + 72]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4s);
                         }
                         BSsprintf(
-                            apInPath, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](auiIndex)->backTexture)->GetTextureName()
+                            apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->backTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                         TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
@@ -3346,8 +3339,7 @@ void CaravanMenu::SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrollin
                             deckFaceShaders[i]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, a4t);
                         }
                         BSsprintf(
-                            apInPath, 260, "%s%s", "Textures\\",
-                            (&pDeckArray.operator[](auiIndex)->faceTexture)->GetTextureName()
+                            apInPath, 260, "%s%s", "Textures\\", (&pDeckArray[auiIndex]->faceTexture)->GetTextureName()
                         );
                         SwapPlatformLanguageTexturePath(apInPath, acPath, 260u);
                         TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
@@ -3495,10 +3487,10 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
         if (FormFlags > 4) {
             const char* TextureName;
             if (abPlayer) {
-                TextureName = (&pPlayerHand.operator[](4u)->faceTexture)->GetTextureName();
+                TextureName = (&pPlayerHand[4u]->faceTexture)->GetTextureName();
             }
             else {
-                TextureName = (&pNPCHand.operator[](4u)->backTexture)->GetTextureName();
+                TextureName = (&pNPCHand[4u]->backTexture)->GetTextureName();
             }
             BSsprintf(blockName, 260, "%s%s", "Textures\\", TextureName);
             SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
@@ -3536,18 +3528,13 @@ void CaravanMenu::UpdateDealCardTexture(bool abPlayer) {
         faceshader_3 = nullptr;
     }
     faceshader_2 = faceshader_3;
-    textptr.operator=(static_cast<NiSourceTexture*>(nullptr));
+    textptr = static_cast<NiSourceTexture*>(nullptr);
     if (faceshader_3 && (!abPlayer ? v7 = pNPCDeck.iSize != 0 : v7 = pPlayerDeck.iSize != 0, v7)) {
         if (abPlayer) {
-            BSsprintf(
-                blockName, 260, "Textures\\%s",
-                (&pPlayerDeck.operator[](iNextPlayerCard)->backTexture)->GetTextureName()
-            );
+            BSsprintf(blockName, 260, "Textures\\%s", (&pPlayerDeck[iNextPlayerCard]->backTexture)->GetTextureName());
         }
         else {
-            BSsprintf(
-                blockName, 260, "Textures\\%s", (&pNPCDeck.operator[](iNextNPCCard)->backTexture)->GetTextureName()
-            );
+            BSsprintf(blockName, 260, "Textures\\%s", (&pNPCDeck[iNextNPCCard]->backTexture)->GetTextureName());
         }
         SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
         TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
@@ -3578,7 +3565,7 @@ void CaravanMenu::SelectDeckCard(bool abUnselectOnly) {
         pSelectedObject = BSUtilities::GetObjectByName(pHandGeometry[0], static_cast<const char*>(blockName));
         BSsprintf(blockName, 30, "Player-Deck_0%i_Shadow:0", iSelectedDeckCard + 1);
         pSelectedShadow = BSUtilities::GetObjectByName(pHandGeometry[0], static_cast<const char*>(blockName));
-        pSelectedCard = pPlayerHand.operator[](iSelectedDeckCard);
+        pSelectedCard = pPlayerHand[iSelectedDeckCard];
         pSelectedObject->SetTranslate(0.0f, (&pSelectedObject->GetTranslate())->y, 1.0f);
         NiUpdateData kUpdate3(0.0f, false, false);
         pSelectedObject->Update(kUpdate3);
@@ -3696,7 +3683,7 @@ void CaravanMenu::DeselectWholeTrack(int32_t a1) {
 void CaravanMenu::HandleTrackSelection(int32_t aiXShift, int32_t aiYShift) {
     int32_t iSelectedTrack = this->iSelectedTrack;
     int32_t iSelectedRow = this->iSelectedRow;
-    bool v12 = pPlayerHand.operator[](iSelectedDeckCard)->data.iFaceValue <= 10;
+    bool v12 = pPlayerHand[iSelectedDeckCard]->data.iFaceValue <= 10;
     if (aiXShift) {
         if (iSelectedTrack >= 3) {
             this->iSelectedTrack -= aiXShift;
@@ -3851,7 +3838,7 @@ uint32_t CaravanMenu::LoadNifs2() {
         v11 = nullptr;
     }
     NiRefObject* v17 = (NiRefObject*)v11;
-    CaravanMenu::spModel.operator=(v11);
+    CaravanMenu::spModel = v11;
     NiNode* v10 = CaravanMenu::spModel.m_pObject;
     v10->AttachChild(pTableGeometry, 1);
     NiUpdateData arData(0.0f, false, false);
@@ -3867,9 +3854,9 @@ uint32_t CaravanMenu::LoadNifs2() {
         NiTimeController::StartAnimations(pTableGeometry);
     }
     NiNode* a1 = static_cast<NiNode*>(pTableGeometry);
-    CaravanMenu::sp3DCamera.operator=(static_cast<NiCamera*>(BSUtilities::GetObjectByName(a1, "object0")));
+    CaravanMenu::sp3DCamera = static_cast<NiCamera*>(BSUtilities::GetObjectByName(a1, "object0"));
     if (!CaravanMenu::sp3DCamera.m_pObject) {
-        CaravanMenu::sp3DCamera.operator=(Create3DCamera());
+        CaravanMenu::sp3DCamera = Create3DCamera();
     }
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     ShadowSceneNode_->AttachChild(CaravanMenu::spModel.m_pObject, 1);
@@ -4067,12 +4054,12 @@ void CaravanMenu::PrepareGameMenu() {
     activeList->RemoveAll();
     inactiveList->RemoveAll();
     for (int32_t i = 0; i < pDeckArray.iSize; ++i) {
-        if (pDeckArray.operator[](i)->bIsActive) {
-            activeList->AddHead(pDeckArray.operator[](i));
-            pPlayerDeck.Add(pDeckArray.operator[](i));
+        if (pDeckArray[i]->bIsActive) {
+            activeList->AddHead(pDeckArray[i]);
+            pPlayerDeck.Add(pDeckArray[i]);
         }
         else {
-            inactiveList->AddHead(pDeckArray.operator[](i));
+            inactiveList->AddHead(pDeckArray[i]);
         }
     }
     while (pDeckParam && pDeckParam->m_item) {
@@ -4082,11 +4069,11 @@ void CaravanMenu::PrepareGameMenu() {
     for (int32_t i_2 = 0; i_2 < 8; ++i_2) {
         uint32_t FormFlags = pPlayerDeck.iSize;
         int32_t index = RandomInt(0, FormFlags);
-        pPlayerHand.Add(pPlayerDeck.operator[](index));
+        pPlayerHand.Add(pPlayerDeck[index]);
         pPlayerDeck.RemoveFast(index, 1);
         uint32_t v2 = pNPCDeck.iSize;
         index = RandomInt(0, v2);
-        pNPCHand.Add(pNPCDeck.operator[](index));
+        pNPCHand.Add(pNPCDeck[index]);
         pNPCDeck.RemoveFast(index, 1);
     }
     uint32_t v3 = pPlayerDeck.iSize;
@@ -4370,35 +4357,27 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
         // Language-swapped path buffer.
         char acPath[268];
         int32_t index = static_cast<int32_t>(pTiles[15]->GetFloat(CaravanMenu::iUT_CurrentValue));
-        if (pDeckArray.operator[](index)->bIsActive) {
+        if (pDeckArray[index]->bIsActive) {
             NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
-            BSsprintf(
-                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-            );
+            BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->faceTexture)->GetTextureName());
             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
             TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
             if (textptr.m_pObject) {
                 deckFaceShaders[aiTarget]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
             }
-            BSsprintf(
-                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-            );
+            BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->backTexture)->GetTextureName());
             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
             TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
             if (textptr.m_pObject) {
                 deckFaceShaders[aiTarget + 24]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
             }
-            BSsprintf(
-                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-            );
+            BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->backTexture)->GetTextureName());
             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
             TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
             if (textptr.m_pObject) {
                 deckFaceShaders[aiTarget + 48]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr.m_pObject);
             }
-            BSsprintf(
-                apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-            );
+            BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->faceTexture)->GetTextureName());
             SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
             TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
             if (textptr.m_pObject) {
@@ -4407,12 +4386,10 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
         }
         else {
             // Only the call is kept: the card's faceTexture address tested after it is never null.
-            pDeckArray.operator[](index);
+            pDeckArray[index];
             {
                 NiPointer<NiSourceTexture> textptr_2(static_cast<NiSourceTexture*>(nullptr));
-                BSsprintf(
-                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-                );
+                BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->faceTexture)->GetTextureName());
                 SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
                 TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                 if (textptr_2.m_pObject) {
@@ -4420,9 +4397,7 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                         BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
                     );
                 }
-                BSsprintf(
-                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-                );
+                BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->backTexture)->GetTextureName());
                 SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
                 TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                 if (textptr_2.m_pObject) {
@@ -4430,17 +4405,13 @@ void CaravanMenu::FlipSelectedCardTextures(int32_t aiTarget) {
                         BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject
                     );
                 }
-                BSsprintf(
-                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->backTexture)->GetTextureName()
-                );
+                BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->backTexture)->GetTextureName());
                 SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
                 TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                 if (textptr_2.m_pObject) {
                     deckFaceShaders[aiTarget]->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, textptr_2.m_pObject);
                 }
-                BSsprintf(
-                    apDest, 260, "%s%s", "Textures\\", (&pDeckArray.operator[](index)->faceTexture)->GetTextureName()
-                );
+                BSsprintf(apDest, 260, "%s%s", "Textures\\", (&pDeckArray[index]->faceTexture)->GetTextureName());
                 SwapPlatformLanguageTexturePath(apDest, acPath, 260u);
                 TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
                 if (textptr_2.m_pObject) {
@@ -4645,20 +4616,14 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
             NiPointer<NiSourceTexture> textptr(static_cast<NiSourceTexture*>(nullptr));
             if (faceshader_2) {
                 if (abPlayer) {
-                    BSsprintf(
-                        blockName, 260, "Textures\\%s", (&pPlayerHand.operator[](i)->faceTexture)->GetTextureName()
-                    );
+                    BSsprintf(blockName, 260, "Textures\\%s", (&pPlayerHand[i]->faceTexture)->GetTextureName());
                 }
                 else {
                     if (CaravanMenu::bDebugAI) {
-                        BSsprintf(
-                            blockName, 260, "Textures\\%s", (&pNPCHand.operator[](i)->faceTexture)->GetTextureName()
-                        );
+                        BSsprintf(blockName, 260, "Textures\\%s", (&pNPCHand[i]->faceTexture)->GetTextureName());
                     }
                     else {
-                        BSsprintf(
-                            blockName, 260, "Textures\\%s", (&pNPCHand.operator[](i)->backTexture)->GetTextureName()
-                        );
+                        BSsprintf(blockName, 260, "Textures\\%s", (&pNPCHand[i]->backTexture)->GetTextureName());
                     }
                 }
                 SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
@@ -4713,15 +4678,11 @@ void CaravanMenu::UpdateGameHandTextures(bool abPlayer, bool bStartup) {
             if (v9) {
                 if (abPlayer) {
                     BSsprintf(
-                        blockName, 260, "Textures\\%s",
-                        (&pPlayerDeck.operator[](iNextPlayerCard)->backTexture)->GetTextureName()
+                        blockName, 260, "Textures\\%s", (&pPlayerDeck[iNextPlayerCard]->backTexture)->GetTextureName()
                     );
                 }
                 else {
-                    BSsprintf(
-                        blockName, 260, "Textures\\%s",
-                        (&pNPCDeck.operator[](iNextNPCCard)->backTexture)->GetTextureName()
-                    );
+                    BSsprintf(blockName, 260, "Textures\\%s", (&pNPCDeck[iNextNPCCard]->backTexture)->GetTextureName());
                 }
                 SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
                 TES::pInstance->CreateTextureImage(acPath, textptr_2, false, false);
@@ -4817,7 +4778,7 @@ void CaravanMenu::UpdateTrackCardTexture(int32_t aiTrack, int32_t aiRow, int32_t
     if (faceshader_3) {
         BSsprintf(
             blockName, 260, "%s%s", "Textures\\",
-            (&pCardTracks[aiTrack][aiRow].operator[](aiColumn)->faceTexture)->GetTextureName()
+            (&pCardTracks[aiTrack][aiRow][aiColumn]->faceTexture)->GetTextureName()
         );
         SwapPlatformLanguageTexturePath(blockName, acPath, 260u);
         TES::pInstance->CreateTextureImage(acPath, textptr, false, false);
@@ -4831,9 +4792,9 @@ int32_t CaravanMenu::GetRowValue(int32_t aiTrack, int32_t aiRow) {
     int32_t iValue = 0;
     int32_t iSize = pCardTracks[aiTrack][aiRow].iSize;
     if (iSize > 0) {
-        iValue = pCardTracks[aiTrack][aiRow].operator[](0)->data.iFaceValue;
+        iValue = pCardTracks[aiTrack][aiRow][0]->data.iFaceValue;
         for (int32_t i = 1; i < iSize; ++i) {
-            if (pCardTracks[aiTrack][aiRow].operator[](i)->data.iFaceValue == 14) {
+            if (pCardTracks[aiTrack][aiRow][i]->data.iFaceValue == 14) {
                 iValue *= 2;
             }
         }
@@ -4858,17 +4819,17 @@ bool CaravanMenu::IsValidCardPlacement(int32_t aiTrack, int32_t aiRow, int32_t a
     }
     int32_t iFaceValue;
     if (abIsNPC) {
-        iFaceValue = pNPCHand.operator[](aiDeckCard)->data.iFaceValue;
+        iFaceValue = pNPCHand[aiDeckCard]->data.iFaceValue;
     }
     else {
-        iFaceValue = pPlayerHand.operator[](aiDeckCard)->data.iFaceValue;
+        iFaceValue = pPlayerHand[aiDeckCard]->data.iFaceValue;
     }
     int32_t iCardSuit;
     if (abIsNPC) {
-        iCardSuit = pNPCHand.operator[](aiDeckCard)->data.iCardSuit;
+        iCardSuit = pNPCHand[aiDeckCard]->data.iCardSuit;
     }
     else {
-        iCardSuit = pPlayerHand.operator[](aiDeckCard)->data.iCardSuit;
+        iCardSuit = pPlayerHand[aiDeckCard]->data.iCardSuit;
     }
     if (IsFlagSet(CaravanMenu::CAF_TRACK_SETUP)) {
         return !pCardTracks[aiTrack][aiRow].iSize && iFaceValue <= 10;
@@ -4887,7 +4848,7 @@ bool CaravanMenu::IsValidCardPlacement(int32_t aiTrack, int32_t aiRow, int32_t a
             if (!pCardTracks[aiTrack][aiRow - 1].iSize) {
                 return false;
             }
-            int32_t iPrevValue = pCardTracks[aiTrack][aiRow - 1].operator[](0)->data.iFaceValue;
+            int32_t iPrevValue = pCardTracks[aiTrack][aiRow - 1][0]->data.iFaceValue;
             if (iPrevValue == iFaceValue) {
                 return false;
             }
@@ -5538,7 +5499,7 @@ int32_t CaravanMenu::GetValueOfCardValueInTrack(int32_t aiTrack, int32_t aiFaceV
     int32_t iRow = 0;
     int32_t iCount = 0;
     while (iRow < 7 && pCardTracks[aiTrack][iRow].iSize) {
-        if (pCardTracks[aiTrack][iRow].operator[](0)->data.iFaceValue == aiFaceValue) {
+        if (pCardTracks[aiTrack][iRow][0]->data.iFaceValue == aiFaceValue) {
             ++iCount;
         }
         ++iRow;
@@ -5550,8 +5511,8 @@ int32_t CaravanMenu::GetSumCardsB44WithSuit(int32_t a1, uint32_t a2) {
     int32_t v5 = 0;
     int32_t v6 = 0;
     while (v5 < 7 && pCardTracks[a1][v5].iSize) {
-        if (pCardTracks[a1][v5].operator[](0)->data.iCardSuit == a2) {
-            v6 += pCardTracks[a1][v5].operator[](0)->data.iFaceValue;
+        if (pCardTracks[a1][v5][0]->data.iCardSuit == a2) {
+            v6 += pCardTracks[a1][v5][0]->data.iFaceValue;
         }
         ++v5;
     }
@@ -5598,11 +5559,11 @@ void CaravanMenu::Close() {
             pAct->RemoveAll();
             pInact->RemoveAll();
             for (int32_t i = 0; i < CaravanMenu::pMe->pDeckArray.iSize; ++i) {
-                if (CaravanMenu::pMe->pDeckArray.operator[](i)->bIsActive) {
-                    pAct->AddHead(CaravanMenu::pMe->pDeckArray.operator[](i));
+                if (CaravanMenu::pMe->pDeckArray[i]->bIsActive) {
+                    pAct->AddHead(CaravanMenu::pMe->pDeckArray[i]);
                 }
                 else {
-                    pInact->AddHead(CaravanMenu::pMe->pDeckArray.operator[](i));
+                    pInact->AddHead(CaravanMenu::pMe->pDeckArray[i]);
                 }
             }
         }
@@ -5645,7 +5606,7 @@ void CaravanMenu::Draw3DElements() {
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
     BSShaderUtil::RenderScene(v6, v3, false);
     a1->SetAccumulator(nullptr);
-    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
+    apMemory = static_cast<NiRefObject*>(nullptr);
     a1->PopCullMode();
 }
 
@@ -5729,7 +5690,7 @@ Tile* CaravanMenu::Create(
 
 void CaravanAIPackage::Print_WhatIsHeThinking(BSSimpleArray<TESCaravanCard*, 1024>* pNPCHandArray) {
     if (pNPCHandArray) {
-        TESCaravanCard* v2 = pNPCHandArray->operator[](iDeckCard);
+        TESCaravanCard* v2 = (*pNPCHandArray)[iDeckCard];
         InitializationFlow(
             "track:%i row:%i dcard:%i goal:%i calcresult:%i priority:%i card:%s", iTrack, iRow, iDeckCard, iValueGoal,
             iCalcResults, iPriority, v2->GetFormEditorID()

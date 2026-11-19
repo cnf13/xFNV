@@ -124,7 +124,7 @@ void RecipeMenu::DoClick(int32_t a1, Tile* a2) {
                 else {
                     uint32_t v8 = g_currentRecipeMenuCategory;
                     BSSimpleArray<TESRecipeCategory*, 1024>* v5 = get_g_RecipeMenuCategories();
-                    pTiles[1]->Set(4036, v5->operator[](v8)->GetFullName(), true);
+                    pTiles[1]->Set(4036, (*v5)[v8]->GetFullName(), true);
                 }
                 Tile* v7 = pRecipeBase->GetTileAt(0, false);
                 pRecipeBase->Highlight(v7);

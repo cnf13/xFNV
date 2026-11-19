@@ -224,7 +224,7 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathFromNavMeshSearchGoal(
             if (!pLastNode->IsTransitionNode()) {
                 PathingLocation exitLoc;
                 if (FindExitPoint(pLastNode, pNextNode, exitLoc)) {
-                    pLastNode->Location.operator=(exitLoc);
+                    pLastNode->Location = exitLoc;
                     aRetPath.Add(exitLoc);
                     return RCP_SUCCESS;
                 }
@@ -234,7 +234,7 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathFromNavMeshSearchGoal(
             if (pNextNode->HasActualLocation()) {
                 PathingLocation exitLoc;
                 if (FindExitPoint(pLastNode, pNextNode, exitLoc)) {
-                    pLastNode->Location.operator=(exitLoc);
+                    pLastNode->Location = exitLoc;
                     aRetPath.Add(exitLoc);
                     return RCP_SUCCESS;
                 }
@@ -295,8 +295,8 @@ RAYCASTPATH_RESULT PathBuilder::BuildStraightPathUsingRayCasts(
     }
 
     RayCastPathRequest aRequest;
-    aRequest.StartLocation.operator=(aStartLocation);
-    aRequest.GoalLocation.operator=(aGoalLocation);
+    aRequest.StartLocation = aStartLocation;
+    aRequest.GoalLocation = aGoalLocation;
     aRequest.eType = RCRT_NOMESH;
     aRequest.pInitialPathRequest = pRequest.m_pObject;
     RayCastPath v10;
@@ -586,7 +586,7 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
             if (!pRequest.m_pObject->bAllowIncompletePath) {
                 return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
             }
-            smoothingGoalLocation.operator=(lastLoc);
+            smoothingGoalLocation = lastLoc;
         }
         icurrentNodeCount = pSolution.m_pObject->GetNodeCount();
         if (RunPathSmoother(smoothingStartLocation, smoothingGoalLocation, BadNodes, nodes, links)) {
@@ -965,7 +965,7 @@ bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLoc
                         &pt
                     )) {
                     NiPoint3 v18;
-                    pt.operator+=(*::new (&v18) NiPoint3((v26 - pt) * 0.1f));
+                    pt += *::new (&v18) NiPoint3((v26 - pt) * 0.1f);
                 }
                 float v23 = (pt - aStartLocation.GetLocation()).SqrLength();
                 if (v34 > static_cast<double>(v23)) {
@@ -981,7 +981,7 @@ bool PathBuilder::FindClosestOpenEdge(PathingLocation aStartLocation, PathingLoc
         return false;
     }
 
-    aRetLocation.operator=(PathingLocation(arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35));
+    aRetLocation = PathingLocation(arLocation, v32.GetAt(static_cast<int32_t>(v36)), v35);
     return true;
 }
 
@@ -1129,7 +1129,7 @@ bool PathBuilder::FindEntryPoint(
             NiPoint3* v11 = ::new (&v31) NiPoint3((point1 + point2) * 0.45f + *fScalar);
             PathingLocation apLocation(*v11, NavMeshInfo_, v21);
             PathingLocation* aLoc = &apLocation;
-            aRetLocation.operator=(*aLoc);
+            aRetLocation = *aLoc;
             return true;
         }
     }
@@ -1164,7 +1164,7 @@ bool PathBuilder::FindEntryPoint(
             NiPoint3* v16 = ::new (&v27) NiPoint3(pcurrentMesh.m_pObject->GetCenter(static_cast<uint16_t>(ibestTri)));
             PathingLocation v28(*v16, v19, v22);
             PathingLocation* v23 = &v28;
-            aRetLocation.operator=(*v23);
+            aRetLocation = *v23;
             return true;
         }
     }
@@ -1203,7 +1203,7 @@ RAYCASTPATH_RESULT PathBuilder::BuildPathToValidNavMeshTriangle(
             );
         }
         RayCastPathRequest rayCastRequest;
-        rayCastRequest.GoalLocation.operator=(aStartLocation);
+        rayCastRequest.GoalLocation = aStartLocation;
         rayCastRequest.eType = static_cast<RAYCAST_REQUEST_TYPE>(!abStart);
         rayCastRequest.pInitialPathRequest = pRequest.m_pObject;
         aRetEdges.CopyTo(&rayCastRequest.Edges);
@@ -1245,7 +1245,7 @@ bool PathBuilder::CheckClosestEdgeToGoal(
     NavMeshPtr* pspNavMesh = ::new (aNavMeshStorage) NavMeshPtr;
     bool bResult = false;
     if (pEdge->pNavMeshInfo->GetNavMesh(*pspNavMesh)) {
-        pspNavMesh->operator->()->GetEdgeVertices(pEdge->usTriangle, pEdge->iEdgeIndex, pVert1, pVert2);
+        (*pspNavMesh)->GetEdgeVertices(pEdge->usTriangle, pEdge->iEdgeIndex, pVert1, pVert2);
         NiPoint3 kNodeLocation =
             pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex)->GetLocation().GetLocation();
         NiPoint3 kPoint = NavMeshMath::ProjectPointOntoSegment(kNodeLocation, *pVert1, *pVert2);
@@ -1254,7 +1254,7 @@ bool PathBuilder::CheckClosestEdgeToGoal(
         double dRadius = pRequest.m_pObject->GetTargetRadius();
         if (pRequest.m_pObject->GetTargetRadius() * dRadius > dSqrDistance && (kPoint - kNodeLocation).z > -64.0 &&
             (kPoint - kNodeLocation).z < 180.0) {
-            NiPoint3 kCenter = pspNavMesh->operator->()->GetCenter(pEdge->usTriangle);
+            NiPoint3 kCenter = (*pspNavMesh)->GetCenter(pEdge->usTriangle);
             kPoint += (kCenter - kPoint) * 0.1f;
             aEndNodes.Clear(false);
             alignas(PathingLocation) uint8_t aLocationStorage[sizeof(PathingLocation)];
@@ -1541,7 +1541,7 @@ bool PathBuilder::FindExitPoint(
             NavMeshInfo* NavMeshInfo_ = pcurrentMesh.m_pObject->GetNavMeshInfo();
             PathingLocation apLocation(loc, NavMeshInfo_, fScalarb);
             PathingLocation* aLoc = &apLocation;
-            aRetLocation.operator=(*aLoc);
+            aRetLocation = *aLoc;
             return true;
         }
         return false;
@@ -1582,7 +1582,7 @@ bool PathBuilder::FindExitPoint(
     const NavMeshInfo* v18 = (&apCurrentNode->Location)->GetBestNavMeshInfo();
     PathingLocation v27(loc_2, v18, fScalarc);
     PathingLocation* v23 = &v27;
-    aRetLocation.operator=(*v23);
+    aRetLocation = *v23;
     return true;
 }
 

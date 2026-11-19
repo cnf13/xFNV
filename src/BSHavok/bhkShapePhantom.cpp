@@ -129,7 +129,7 @@ void bhkShapePhantom::CopyCinfo(hkShapePhantomCinfo& arInfo) {
 }
 
 void bhkShapePhantom::setTransform(hkTransform* a2) {
-    hkpShapePhantom* v3 = static_cast<hkpShapePhantom*>(operator*());
+    hkpShapePhantom* v3 = static_cast<hkpShapePhantom*>(**this);
     if (v3) {
         v3->setTransform(*a2);
     }

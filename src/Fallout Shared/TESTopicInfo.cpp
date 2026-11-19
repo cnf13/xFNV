@@ -871,9 +871,9 @@ void TESTopicInfo::SetConditions(TESCondition* apCondition) {
 void TESTopicInfo::GetInfoDisplayText(BSStringT<char>& aString, bool abFirstOnly) {
     aString.Set(static_cast<const char*>(nullptr), 0u);
     for (TESResponse* plist = GetResponseList(nullptr)->pHead; plist; plist = plist->pNext) {
-        aString.operator+=(plist->GetResponseText());
+        aString += plist->GetResponseText();
         if (plist->pNext) {
-            aString.operator+=(" | ");
+            aString += " | ";
         }
         if (abFirstOnly) {
             break;

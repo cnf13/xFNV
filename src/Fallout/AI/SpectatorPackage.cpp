@@ -266,7 +266,7 @@ SpectatorThreatInfo* SpectatorThreatInfo::Assign(SpectatorThreatInfo* apThis, co
     apThis->LastKnownPosTarget = arOther.LastKnownPosTarget;
     apThis->bHasSource = arOther.bHasSource;
     apThis->bHasTarget = arOther.bHasTarget;
-    apThis->spDebugGeometry.operator=(arOther.spDebugGeometry);
+    apThis->spDebugGeometry = arOther.spDebugGeometry;
     return apThis;
 }
 
@@ -301,7 +301,7 @@ void SpectatorPackage::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = kThreatInfos.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        SpectatorThreatInfo* threatInfo = &kThreatInfos.operator[](i);
+        SpectatorThreatInfo* threatInfo = &kThreatInfos[i];
         threatInfo->SaveGame(apSaveGameBuffer);
     }
 }
@@ -321,7 +321,7 @@ void SpectatorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     kThreatInfos.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        SpectatorThreatInfo* threatInfo = &kThreatInfos.operator[](i);
+        SpectatorThreatInfo* threatInfo = &kThreatInfos[i];
         threatInfo->LoadGame(apLoadGameBuffer);
     }
 }
@@ -352,8 +352,8 @@ void SpectatorPackage::Copy(TESForm* apCopy) {
         int32_t isize = pcopy->kThreatInfos.iSize;
         kThreatInfos.SetSize(static_cast<uint32_t>(isize), true);
         for (int32_t i = 0; i < isize; ++i) {
-            SpectatorThreatInfo* v3 = &pcopy->kThreatInfos.operator[](i);
-            SpectatorThreatInfo* v2 = &kThreatInfos.operator[](i);
+            SpectatorThreatInfo* v3 = &pcopy->kThreatInfos[i];
+            SpectatorThreatInfo* v2 = &kThreatInfos[i];
             SpectatorThreatInfo::Assign(v2, *v3);
         }
     }
@@ -384,7 +384,7 @@ void SpectatorPackage::AddThreatFromActorToCombatTarget(Actor& aSourceActor) {
     int32_t isize = kThreatInfos.iSize;
     SpectatorThreatInfo* pstoredInfo = nullptr;
     for (int32_t i = 0; i < isize; ++i) {
-        SpectatorThreatInfo* scanInfo = &kThreatInfos.operator[](i);
+        SpectatorThreatInfo* scanInfo = &kThreatInfos[i];
         if (scanInfo->pSource == &aSourceActor && scanInfo->pTarget == ptargetActor) {
             pstoredInfo = scanInfo;
             break;
@@ -393,7 +393,7 @@ void SpectatorPackage::AddThreatFromActorToCombatTarget(Actor& aSourceActor) {
     if (!pstoredInfo) {
         int32_t index = kThreatInfos.iSize;
         kThreatInfos.SetSize(index + 1, true);
-        pstoredInfo = &kThreatInfos.operator[](index);
+        pstoredInfo = &kThreatInfos[index];
     }
     pstoredInfo->SetupThreatFromActorToCombatTarget(aSourceActor);
     ComputeCenterPoint();
@@ -429,7 +429,7 @@ void SpectatorPackage::ComputeCenterPoint() {
         NiPoint3 minPoint = NiPoint3_ZERO;
         bool bInitialized = false;
         for (i = 0; i < isize; ++i) {
-            SpectatorThreatInfo* info = &kThreatInfos.operator[](i);
+            SpectatorThreatInfo* info = &kThreatInfos[i];
             if (info->bHasSource && info->bHasTarget) {
                 float X = info->GetLastKnownPosTarget().x;
                 maxPoint.x = BSMAX(info->GetLastKnownPosSource().x, X);
@@ -461,7 +461,7 @@ void SpectatorPackage::ComputeCenterPoint() {
         }
         ++i;
         while (i < isize) {
-            SpectatorThreatInfo* info_2 = &kThreatInfos.operator[](i);
+            SpectatorThreatInfo* info_2 = &kThreatInfos[i];
             if (info_2->bHasSource) {
                 maxPoint.x = BSMAX(maxPoint.x, info_2->GetLastKnownPosSource().x);
                 maxPoint.y = BSMAX(maxPoint.y, info_2->GetLastKnownPosSource().y);
@@ -484,12 +484,12 @@ void SpectatorPackage::ComputeCenterPoint() {
         }
         if (icount) {
             NiPoint3 centerPoint = maxPoint;
-            centerPoint.operator+=(minPoint);
-            centerPoint.operator*=(0.5f);
+            centerPoint += minPoint;
+            centerPoint *= 0.5f;
             float fdistanceSquared = 0.0f;
             float ffarthestDistanceSquared = 0.0f;
             for (i = 0; i < isize; ++i) {
-                SpectatorThreatInfo* info_3 = &kThreatInfos.operator[](i);
+                SpectatorThreatInfo* info_3 = &kThreatInfos[i];
                 if (info_3->bHasSource || info_3->bHasTarget) {
                     if (info_3->bHasSource) {
                         fdistanceSquared = (centerPoint - info_3->GetLastKnownPosSource()).SqrLength();
@@ -574,7 +574,7 @@ void SpectatorPackage::Update(Actor* pOwner) {
     char v18 = 0;
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
-        SpectatorThreatInfo* info = &kThreatInfos.operator[](i);
+        SpectatorThreatInfo* info = &kThreatInfos[i];
         if ((info->pSource) && (info->pTarget)) {
             Actor* Source = info->pSource;
             Actor* pcurrentTarget = Source->GetCombatTarget();
@@ -586,7 +586,7 @@ void SpectatorPackage::Update(Actor* pOwner) {
     }
     int32_t isize_2 = kThreatInfos.iSize;
     for (int32_t i_2 = 0; i_2 < isize_2; ++i_2) {
-        SpectatorThreatInfo* info_2 = &kThreatInfos.operator[](i_2);
+        SpectatorThreatInfo* info_2 = &kThreatInfos[i_2];
         Actor* psource = info_2->pSource;
         Actor* ptarget = info_2->pTarget;
         uint32_t v2 = BSGetTickCount();
@@ -632,7 +632,7 @@ void SpectatorPackage::Update(Actor* pOwner) {
 void SpectatorPackage::HandleDeletedActor(void* a2) {
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
-        SpectatorThreatInfo* scanInfo = &kThreatInfos.operator[](i);
+        SpectatorThreatInfo* scanInfo = &kThreatInfos[i];
         if (scanInfo->pSource == a2) {
             kThreatInfos.RemoveFast(i, 1u);
             --isize;
@@ -650,7 +650,7 @@ void SpectatorPackage::HandleDeletedActor(void* a2) {
 void SpectatorPackage::RemoveActorAsThreatSourceOrTarget(Actor& aActor) {
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
-        SpectatorThreatInfo* scanInfo = &kThreatInfos.operator[](i);
+        SpectatorThreatInfo* scanInfo = &kThreatInfos[i];
         if (scanInfo->pSource == &aActor || scanInfo->pTarget == &aActor) {
             kThreatInfos.RemoveFast(static_cast<uint32_t>(i), 1u);
             --isize;
@@ -671,7 +671,7 @@ PathingAvoidNodeArray* SpectatorPackage::CreateAvoidNodeArray() {
     }
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
-        const SpectatorThreatInfo& scanInfo = kThreatInfos.operator[](i);
+        const SpectatorThreatInfo& scanInfo = kThreatInfos[i];
         int32_t nodeArrayIndex = pavoidNodeArray->iSize;
         pavoidNodeArray->SetSize(nodeArrayIndex + 1, true);
         PathingAvoidNode* v1 = &pavoidNodeArray->GetAt(nodeArrayIndex);

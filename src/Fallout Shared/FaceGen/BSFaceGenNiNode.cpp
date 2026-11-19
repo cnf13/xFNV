@@ -511,7 +511,7 @@ void BSFaceGenNiNode::CheckLOD(BS_FACEGEN_LOD aiForceLOD) {
     NiPoint3 cameraPosition = BSFaceGenManager::GetCameraPosition();
     float offset = 10.0f;
     const NiPoint3* worldTranslate = &NiAVObject::GetWorldTranslate();
-    NiPoint3* v3 = &(v5 = (&cameraPosition)->operator-(*worldTranslate));
+    NiPoint3* v3 = &(v5 = cameraPosition - *worldTranslate);
     float distance = v3->Length();
     if (((!(distance > (BSFaceGenManager::GetLodDistance() + offset))) || GetUsingLoResHead()) && aiForceLOD) {
         if (((distance < (BSFaceGenManager::GetLodDistance() - offset)) && GetUsingLoResHead()) || (aiForceLOD == 1)) {
@@ -542,7 +542,7 @@ void BSFaceGenNiNode::SetForceMorphUpdates(bool abForce) {
 void BSFaceGenNiNode::CopyMembers(BSFaceGenNiNode* apDest, NiCloningProcess& arCloneData) {
     if (apDest) {
         NiNode::CopyMembers(apDest, arCloneData);
-        (&apDest->spAnimationData)->operator=(spAnimationData);
+        apDest->spAnimationData = spAnimationData;
         __builtin_memcpy(
             &apDest->BaseRotation, &BaseRotation,
             offsetof(BSFaceGenNiNode, bApplyRotationToParent) - offsetof(BSFaceGenNiNode, BaseRotation)

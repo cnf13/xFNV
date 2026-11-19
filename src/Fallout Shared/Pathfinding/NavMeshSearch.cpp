@@ -324,7 +324,7 @@ bool NavMeshSearch::BuildNodePath(
         for (uint32_t i = 0; i < pHighLevelSolution->iSize; ++i) {
             NavMeshPtr spmesh;
             if ((*pHighLevelSolution)[i]->GetNavMesh(spmesh)) {
-                searchNavmeshes.GetAt(static_cast<int32_t>(i)).operator=(spmesh);
+                searchNavmeshes.GetAt(static_cast<int32_t>(i)) = spmesh;
             }
         }
     }

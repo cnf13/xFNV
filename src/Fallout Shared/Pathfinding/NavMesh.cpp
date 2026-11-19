@@ -771,7 +771,7 @@ bool NavMesh::GetMatchingEdge_0(
     if (!GetMatchingEdge(ausTriangleIndex, aiEdgeIndex, &pOtherNavMesh, apOtherTriangleIndex, apOtherEdgeIndex)) {
         return false;
     }
-    apReturnNavMesh->operator=(NavMeshPtr::MakeNavMeshPtr(pOtherNavMesh));
+    *apReturnNavMesh = NavMeshPtr::MakeNavMeshPtr(pOtherNavMesh);
     return true;
 }
 

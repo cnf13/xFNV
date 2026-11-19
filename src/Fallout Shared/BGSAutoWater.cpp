@@ -37,7 +37,7 @@
 
 NiPoint3* NiGeometry::GetVertices() {
 #if XFNV_64BIT
-    return this->m_spModelData.operator->()->m_pkVertex;
+    return this->m_spModelData->m_pkVertex;
 #else
     return static_cast<NiPoint3*>(
         static_cast<void*>(static_cast<TESObjectREFR*>(static_cast<void*>(this->m_spModelData.operator->()))
@@ -728,7 +728,7 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                     float v23 = maxy - halfextents.y;
                     float v22 = maxx - halfextents.x;
                     NiPoint3 center(v22, v23, v24);
-                    center.operator+=(worldtranslate);
+                    center += worldtranslate;
                     pmbshape->SetCenter(center);
                     pmbshape->SetHalfExtents(halfextents);
                     BSMultiBound* v36 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
@@ -776,7 +776,7 @@ bool BGSAutoWater::IsPolyonInsidePolygon(BSPolygon2D* apPoly1, BSPolygon2D* apPo
         if (i >= Target) {
             break;
         }
-        NiPoint3* v3 = &apPoly1->pVertexSimpleArray->operator[](i);
+        NiPoint3* v3 = &(*apPoly1->pVertexSimpleArray)[i];
         float z = v3->z;
         NiPoint2 vec2(v3->x, v3->y);
         if (apPoly2->IsPointInsidePoly(vec2)) {
@@ -791,7 +791,7 @@ int32_t BGSAutoWater::WhichCellEdge(TESObjectCELL* apCell, NiPoint3 arVert) {
     int32_t edgeFlags = 0;
     TESObjectLAND* Land = apCell->GetLand();
     offset = Land->GetWorldOffsetForBlock(0);
-    arVert.operator+=(offset);
+    arVert += offset;
     float a2 = static_cast<float>(apCell->GetDataY() << 12);
     float a1 = static_cast<float>(apCell->GetDataX() << 12);
     NiPoint2 corner1(a1, a2);

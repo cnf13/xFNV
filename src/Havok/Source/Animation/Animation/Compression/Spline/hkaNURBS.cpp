@@ -110,7 +110,7 @@ hkaNURBS::Point hkaNURBS::Point::Mul(float d) const {
     v9.point[3] = point[3];
     v9.point[1] = v3;
     v9.point[2] = v4;
-    return v9.operator*=(d);
+    return v9 *= d;
 }
 
 hkaNURBS::Point hkaNURBS::Point::Sub(const hkaNURBS::Point& a) const {
@@ -122,7 +122,7 @@ hkaNURBS::Point hkaNURBS::Point::Sub(const hkaNURBS::Point& a) const {
     v10.point[1] = v3;
     v10.point[3] = v5;
     v10.point[2] = v4;
-    return v10.operator-=(a);
+    return v10 -= a;
 }
 
 hkaNURBS::Point& hkaNURBS::Point::operator+=(const hkaNURBS::Point& a) {
@@ -152,7 +152,7 @@ hkaNURBS::Point hkaNURBS::Point::Add(const hkaNURBS::Point& a) const {
     v10.point[1] = v3;
     v10.point[3] = v5;
     v10.point[2] = v4;
-    return v10.operator+=(a);
+    return v10 += a;
 }
 
 hkaNURBS::Point hkaNURBS::Point::Div(float d) const {
@@ -163,7 +163,7 @@ hkaNURBS::Point hkaNURBS::Point::Div(float d) const {
     v9.point[3] = point[3];
     v9.point[1] = v3;
     v9.point[2] = v4;
-    return v9.operator/=(d);
+    return v9 /= d;
 }
 
 // KEEP: the exe's body never writes edx, and its callers keep edx live across the call (hkaNURBS::Dot 0xE535A0
@@ -188,11 +188,11 @@ float hkaNURBS::Point::Dot(const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
 hkaNURBS::Point hkaNURBS::Point::Max(const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
     hkaNURBS::Point result(0.0f, 0.0f, 0.0f, 0.0f);
     for (int32_t i = 0; i < 4; ++i) {
-        const float fP = P.operator[](i);
-        const float fQ = Q.operator[](i);
+        const float fP = P[i];
+        const float fQ = Q[i];
         const hkaNURBS::Point& rPick = (fQ < fP) ? P : Q;
-        const float fValue = rPick.operator[](i);
-        result.operator[](i) = fValue;
+        const float fValue = rPick[i];
+        result[i] = fValue;
     }
     return result;
 }
@@ -201,11 +201,11 @@ hkaNURBS::Point hkaNURBS::Point::Max(const hkaNURBS::Point& P, const hkaNURBS::P
 hkaNURBS::Point hkaNURBS::Point::Min(const hkaNURBS::Point& P, const hkaNURBS::Point& Q) {
     hkaNURBS::Point result(0.0f, 0.0f, 0.0f, 0.0f);
     for (int32_t i = 0; i < 4; ++i) {
-        const float fP = P.operator[](i);
-        const float fQ = Q.operator[](i);
+        const float fP = P[i];
+        const float fQ = Q[i];
         const hkaNURBS::Point& rPick = (fQ > fP) ? P : Q;
-        const float fValue = rPick.operator[](i);
-        result.operator[](i) = fValue;
+        const float fValue = rPick[i];
+        result[i] = fValue;
     }
     return result;
 }
@@ -408,7 +408,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
     U.m_data[m + 2] = pParams[m];
     for (int32_t i = 0; i <= m; ++i) {
         U.m_data[i + 1] = ub.m_data[i];
-        P.m_data[i].operator=(Q.m_data[i]);
+        P.m_data[i] = Q.m_data[i];
     }
 
     hkaNURBSFloatArray ek(m + 1, 0.0f);
@@ -710,7 +710,7 @@ hkaNURBS::Point hkaNURBS::CurvePoint(
     int32_t v7 = Span - p;
     hkaNURBS::Point C = mulScalarPoint(N[0], &P.m_data[v7]);
     for (int32_t i = 1; i <= p; ++i) {
-        C.operator+=(mulScalarPoint(N[i], &P.m_data[v7 + i]));
+        C += mulScalarPoint(N[i], &P.m_data[v7 + i]);
     }
     return C;
 }
@@ -1376,7 +1376,7 @@ hkBool hkaNURBS::LeastSquaresFit(
             }
         }
         for (int32_t i = 0; i < 4; ++i) {
-            float* pComponent = &kSum.operator[](i);
+            float* pComponent = &kSum[i];
             float& rElement = Rm(j - 1, i);
             rElement = *pComponent;
         }
@@ -1431,7 +1431,7 @@ hkBool hkaNURBS::LeastSquaresFit(
             for (int32_t j = 1; j < n; ++j) {
                 for (int32_t i = 0; i < 4; ++i) {
                     float& rElement = X(j - 1, i);
-                    float* pComponent = &Pn.m_data[j].operator[](i);
+                    float* pComponent = &Pn.m_data[j][i];
                     *pComponent = rElement;
                 }
             }
@@ -1922,10 +1922,10 @@ void approximateNURBSCurveImpl(
     for (int32_t i = 0; i < numSamples; ++i) {
         ub.m_data[i] = sampleTimes[i];
         hkaNURBS::Point& rPoint = Q.m_data[i];
-        rPoint.operator[](0) = sampleData[i](0);
-        rPoint.operator[](1) = sampleData[i](1);
-        rPoint.operator[](2) = sampleData[i](2);
-        rPoint.operator[](3) = sampleData[i](3);
+        rPoint[0] = sampleData[i](0);
+        rPoint[1] = sampleData[i](1);
+        rPoint[2] = sampleData[i](2);
+        rPoint[3] = sampleData[i](3);
     }
 
     hkArray<float, hkContainerHeapAllocator> U;
@@ -1937,10 +1937,10 @@ void approximateNURBSCurveImpl(
     *numKnotsOut = n + degree + 2;
     for (int32_t i = 0; i < *numPointsOut; ++i) {
         hkaNURBS::Point& rPoint = P.m_data[i];
-        pointsOut[i](0) = rPoint.operator[](0);
-        pointsOut[i](1) = rPoint.operator[](1);
-        pointsOut[i](2) = rPoint.operator[](2);
-        pointsOut[i](3) = rPoint.operator[](3);
+        pointsOut[i](0) = rPoint[0];
+        pointsOut[i](1) = rPoint[1];
+        pointsOut[i](2) = rPoint[2];
+        pointsOut[i](3) = rPoint[3];
     }
     for (int32_t i = 0; i < *numKnotsOut; ++i) {
         knotsOut[i] = U.m_data[i];

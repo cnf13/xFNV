@@ -320,13 +320,13 @@ void PathingSolution::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     VirtualPathingNodes.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        VirtualPathingNode* virtualNode = &VirtualPathingNodes.operator[](i);
+        VirtualPathingNode* virtualNode = &VirtualPathingNodes[i];
         virtualNode->LoadGame(apLoadGameBuffer);
     }
     uint32_t isaveGameCount_2 = apLoadGameBuffer->LoadVariableSizedValue();
     CurrentPathingNodes.SetSize(isaveGameCount_2, true);
     for (uint32_t i_2 = 0; i_2 < isaveGameCount_2; ++i_2) {
-        PathingNode* pathingNode = &CurrentPathingNodes.operator[](i_2);
+        PathingNode* pathingNode = &CurrentPathingNodes[i_2];
         pathingNode->LoadGame(apLoadGameBuffer);
     }
     PathingAvoidNodeArray avoidNodeArrayDummy;
@@ -340,7 +340,7 @@ void PathingSolution::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         uint32_t isaveGameCount_4 = apLoadGameBuffer->LoadVariableSizedValue();
         DoorIDs.SetSize(isaveGameCount_4, true);
         for (uint32_t i_4 = 0; i_4 < isaveGameCount_4; ++i_4) {
-            apLoadGameBuffer->LoadFormID(DoorIDs.operator[](i_4));
+            apLoadGameBuffer->LoadFormID(DoorIDs[i_4]);
         }
     }
 }

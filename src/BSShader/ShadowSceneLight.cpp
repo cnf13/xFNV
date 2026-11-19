@@ -1319,7 +1319,7 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
         if (!v23 && BSShaderManager::GetShadows()) {
             NiPoint3 result;
             NiUpdateData kUpdateData;
-            spShadowAccumulator.operator=(BSShaderManager::GetNextAvailableShadowMapAccumulator());
+            spShadowAccumulator = BSShaderManager::GetNextAvailableShadowMapAccumulator();
             spShadowAccumulator.m_pObject->eRenderMode = BSShaderManager::BSSM_RENDER_DEPTHMAP;
             NiPointer<NiCamera>* p_spShadowCamera = &spShadowCamera;
             if (!spShadowCamera.m_pObject) {
@@ -1331,7 +1331,7 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
                 else {
                     v27 = nullptr;
                 }
-                p_spShadowCamera->operator=(v27);
+                *p_spShadowCamera = v27;
             }
             NiCamera* v28 = p_spShadowCamera->m_pObject;
             float v29 = kLightPos.m_Translate.y;
@@ -1350,7 +1350,7 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
             NiNode* v32 = spShadowCaster.m_pObject;
             kWorldPt = v32->m_kWorld.m_Translate;
             BSBound* v33 = static_cast<BSBound*>(v32->GetExtraData(*BSBound::pTag));
-            kWorldPt.operator+=(*::new (&result) NiPoint3(v33->Center * spShadowCaster.m_pObject->m_kWorld.m_fScale));
+            kWorldPt += *::new (&result) NiPoint3(v33->Center * spShadowCaster.m_pObject->m_kWorld.m_fScale);
             ::new (&v62) NiPoint3(v33->Extents * spShadowCaster.m_pObject->m_kWorld.m_fScale);
             if (v62.y + v62.x < v62.z) {
                 v62.x = NiPoint3_UNIT_Z.x * 10.0;

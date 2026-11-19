@@ -3351,8 +3351,8 @@ void HighProcess::ProcessFollow(Actor* apActor, bool abflag, int32_t aemovemode,
             float fangle = pcombatController->GetCombatPosition();
             if (fangle > 0.0) {
                 NiPoint3 delta = ptarg->GetDeltaForAngle(fangle);
-                delta.operator*=(250.0f);
-                targetloc.operator+=(delta);
+                delta *= 250.0f;
+                targetloc += delta;
             }
         }
         if ((ptargactor) && (btargetSwimming || ptargactor->IsInWater())) {
@@ -4518,12 +4518,12 @@ void HighProcess::ProcessObserveCombat(Actor* apActor) {
             int32_t FormFlags = v18.iSize;
             if (FormFlags > 0) {
                 apActor->EndInterruptPackage(false);
-                apActor->InitiateFlee(v18.operator[](0), true, true, true, nullptr, nullptr, -1.0f, -1.0f);
+                apActor->InitiateFlee(v18[0], true, true, true, nullptr, nullptr, -1.0f, -1.0f);
                 TESPackage* CurrentPackage = apActor->GetCurrentPackage();
                 FleePackage* pflee = dynamic_cast<FleePackage*>(CurrentPackage);
                 if (pflee) {
                     for (int32_t i = 0; i < FormFlags; ++i) {
-                        pflee->AddAvoidedRef(v18.operator[](i));
+                        pflee->AddAvoidedRef(v18[i]);
                     }
                 }
                 return;
@@ -6316,7 +6316,7 @@ BSSoundHandle HighProcess::GetSoundHandle(ACTOR_SOUND_HANDLE aeType) {
 }
 
 void HighProcess::SetSoundHandle(ACTOR_SOUND_HANDLE aeType, BSSoundHandle aSound) {
-    SoundHandle[aeType].operator=(aSound);
+    SoundHandle[aeType] = aSound;
 }
 
 void HighProcess::StopSoundHandle(ACTOR_SOUND_HANDLE aeType) {
@@ -6327,7 +6327,7 @@ void HighProcess::StopSoundHandle(ACTOR_SOUND_HANDLE aeType) {
         SoundHandle[aeType].Release();
         BSSoundHandle th_s;
         BSSoundHandle* arHandle = &th_s;
-        SoundHandle[aeType].operator=(*arHandle);
+        SoundHandle[aeType] = *arHandle;
     }
 }
 
@@ -8350,19 +8350,19 @@ void HighProcess::SetCurrentProcessIdle(TESIdleForm* apIdle) {
 void HighProcess::SetCurrentProcessAnimIdleLoaded(AnimIdle* apAnimIdle, KFModel* apAnimIdleKF) {
     if (apAnimIdle || apAnimIdleKF) {
         if (spAnimIdleToPlay->m_pObject && apAnimIdle) {
-            spAnimIdleToPlay[1].operator=(apAnimIdle);
-            spAnimIdleKF[1].operator=(apAnimIdleKF);
+            spAnimIdleToPlay[1] = apAnimIdle;
+            spAnimIdleKF[1] = apAnimIdleKF;
         }
         else {
-            spAnimIdleToPlay->operator=(apAnimIdle);
-            spAnimIdleKF->operator=(apAnimIdleKF);
+            *spAnimIdleToPlay = apAnimIdle;
+            *spAnimIdleKF = apAnimIdleKF;
         }
     }
     else {
-        spAnimIdleToPlay->operator=(spAnimIdleToPlay[1]);
-        spAnimIdleKF->operator=(spAnimIdleKF[1]);
-        spAnimIdleToPlay[1].operator=(static_cast<AnimIdle*>(nullptr));
-        spAnimIdleKF[1].operator=(static_cast<KFModel*>(nullptr));
+        *spAnimIdleToPlay = spAnimIdleToPlay[1];
+        *spAnimIdleKF = spAnimIdleKF[1];
+        spAnimIdleToPlay[1] = static_cast<AnimIdle*>(nullptr);
+        spAnimIdleKF[1] = static_cast<KFModel*>(nullptr);
     }
 }
 
@@ -10943,7 +10943,7 @@ bool HighProcess::ProcessUseWeapon(Actor* apActor) {
                             pdetectState->bLineofSight && pdetectState->iLevel > 0) {
                             NiPoint3 toDetectedActor = pdetectState->LastPositionDetected;
                             const NiPoint3* v17 = &apActor->GetLocationOnReference();
-                            toDetectedActor.operator-=(*v17);
+                            toDetectedActor -= *v17;
                             double v18 = toDetectedActor.SqrLength();
                             if (!(fdistSquaredToTarget_2 <= v18)) {
                                 float fignore_2;
@@ -11787,7 +11787,7 @@ void HighProcess::ProcessDialogue(MobileObject* apMobile) {
             Actor* pTargetActor = static_cast<Actor*>(pTarget);
             // Reads the target's position first, then the starter's.
             const NiPoint3* pTargetPos = &pTarget->GetLocationOnReference();
-            NiPoint3 kDirection = pStarter->GetLocationOnReference().operator-(*pTargetPos);
+            NiPoint3 kDirection = pStarter->GetLocationOnReference() - *pTargetPos;
             float fZAngle = GetZAngleFromVector(kDirection);
             float fTurnDir = 0.0f;
             float fHeading = pStarter->GetHeading(false) + 3.1415927410125732;
@@ -11803,7 +11803,7 @@ void HighProcess::ProcessDialogue(MobileObject* apMobile) {
             if (!pStarterActor->IsTurning()) {
                 // Reads the starter's position first, then the target's.
                 const NiPoint3* pStarterPos = &pStarter->GetLocationOnReference();
-                NiPoint3 kDirection = pTarget->GetLocationOnReference().operator-(*pStarterPos);
+                NiPoint3 kDirection = pTarget->GetLocationOnReference() - *pStarterPos;
                 float fZAngle = GetZAngleFromVector(kDirection);
                 float fTurnDir = 0.0f;
                 float fHeading = pTarget->GetHeading(false) + 3.1415927410125732;
@@ -12087,7 +12087,7 @@ bool HighProcess::ProcessDialogueActivate(Actor* apActor) {
                 else {
                     apActor->GetCurrentPathfindingGoal_008B3840(&delta);
                     const NiPoint3* v8 = &pStartedConversation->GetLocationOnReference();
-                    delta.operator-=(*v8);
+                    delta -= *v8;
                     bpath = delta.SqrLength() > 10000.0;
                 }
                 if (bpath) {
@@ -12968,7 +12968,7 @@ void HighProcess::SetupPhantom(Actor* apActor) {
             }
             hkSimpleShapePhantomCinfo csi;
             csi.m_collisionFilterInfo = ifilter.iFilter;
-            csi.m_shape = pplayerShape->operator*();
+            csi.m_shape = **pplayerShape;
             const NiPoint3* v5 = &apActor->GetLocationOnReference();
             csi.m_transform.Trans.NI2HK(*v5);
             bhkSimpleShapePhantom* v9;
@@ -12980,7 +12980,7 @@ void HighProcess::SetupPhantom(Actor* apActor) {
             else {
                 v9 = nullptr;
             }
-            this->spShapePhantom.operator=(static_cast<bhkShapePhantom*>(v9));
+            this->spShapePhantom = static_cast<bhkShapePhantom*>(v9);
             float fTime = fINIDetectDoorsForPathingTime.Float();
             this->fDetectDoorForPathingTimer = fTime;
         }
@@ -13794,10 +13794,10 @@ bool HighProcess::ShouldWaitForEscortTarget(
         if (v29->TryPop(&apThis_8)) {
             ActorPathingMessageQueue* v28 = this->spEscortedToGoalMessageQueue.m_pObject;
             if (v28->TryPop(&v46)) {
-                this->spMeToGoalRequest.operator=(static_cast<PathingRequest*>(nullptr));
-                this->spEscortedToGoalRequest.operator=(static_cast<PathingRequest*>(nullptr));
-                this->spMeToGoalMessageQueue.operator=(static_cast<ActorPathingMessageQueue*>(nullptr));
-                this->spEscortedToGoalMessageQueue.operator=(static_cast<ActorPathingMessageQueue*>(nullptr));
+                this->spMeToGoalRequest = static_cast<PathingRequest*>(nullptr);
+                this->spEscortedToGoalRequest = static_cast<PathingRequest*>(nullptr);
+                this->spMeToGoalMessageQueue = static_cast<ActorPathingMessageQueue*>(nullptr);
+                this->spEscortedToGoalMessageQueue = static_cast<ActorPathingMessageQueue*>(nullptr);
                 if ((apThis_8.spSolution.m_pObject) && (v46.spSolution.m_pObject)) {
                     float distMeToGoal = apThis_8.spSolution.m_pObject->ComputeVirtualPathLength();
                     float distEscortedActorToGoal = v46.spSolution.m_pObject->ComputeVirtualPathLength();
@@ -13821,7 +13821,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
         else {
             v26 = nullptr;
         }
-        this->spMeToGoalRequest.operator=(v26);
+        this->spMeToGoalRequest = v26;
         this->spMeToGoalRequest.m_pObject->Initialize(apActor);
         this->spMeToGoalRequest.m_pObject->SetDestination(goalLoc);
         void* apMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
@@ -13832,7 +13832,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
         else {
             v25 = nullptr;
         }
-        this->spMeToGoalMessageQueue.operator=(v25);
+        this->spMeToGoalMessageQueue = v25;
         // Both smart pointers are passed by value and BuildPath releases them.
         PathManager::QInstance()->BuildPath(this->spMeToGoalRequest, this->spMeToGoalMessageQueue, true);
         PathingRequest* v38 = static_cast<PathingRequest*>(NiMemObject::operator new(sizeof(PathingRequest)));
@@ -13843,7 +13843,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
         else {
             v20 = nullptr;
         }
-        this->spEscortedToGoalRequest.operator=(v20);
+        this->spEscortedToGoalRequest = v20;
         this->spEscortedToGoalRequest.m_pObject->Initialize(apEscortedActor);
         this->spEscortedToGoalRequest.m_pObject->SetDestination(goalLoc);
         ActorPathingMessageQueue* v36 =
@@ -13855,7 +13855,7 @@ bool HighProcess::ShouldWaitForEscortTarget(
         else {
             v19 = nullptr;
         }
-        this->spEscortedToGoalMessageQueue.operator=(v19);
+        this->spEscortedToGoalMessageQueue = v19;
         PathManager::QInstance()->BuildPath(this->spEscortedToGoalRequest, this->spEscortedToGoalMessageQueue, true);
     }
     bool v33 = !apActor->IsPathing();
@@ -15130,7 +15130,7 @@ NiPoint3 bhkBoxShape::GetHalfExtents() {
 }
 
 const hkVector4& bhkBoxShape::GethkHalfExtents() {
-    hkpBoxShape* pb = static_cast<hkpBoxShape*>(operator*());
+    hkpBoxShape* pb = static_cast<hkpBoxShape*>(**this);
     if (pb) {
         return *&pb->m_halfExtents;
     }

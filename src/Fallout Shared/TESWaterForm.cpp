@@ -538,7 +538,7 @@ const char* TESWaterForm::GetNoiseTextureName() {
 }
 
 void TESWaterForm::SetNoiseTexture(NiTexture* apTexture) {
-    (&spNoiseTexture)->operator=(apTexture);
+    spNoiseTexture = apTexture;
 }
 
 void TESWaterForm::GetNoiseTexture(NiPointer<NiTexture>& aspTexture) {

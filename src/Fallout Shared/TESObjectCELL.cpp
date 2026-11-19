@@ -379,8 +379,8 @@ TESObjectCELL::QUEUED_ATTACH* TESObjectCELL::QUEUED_ATTACH::Copy(const TESObject
 }
 
 TESObjectCELL::QUEUED_ATTACH& TESObjectCELL::QUEUED_ATTACH::operator=(const TESObjectCELL::QUEUED_ATTACH& __that) {
-    spAttachChild.operator=(__that.spAttachChild);
-    spAttachNode.operator=(__that.spAttachNode);
+    spAttachChild = __that.spAttachChild;
+    spAttachNode = __that.spAttachNode;
     bFirstAvail = __that.bFirstAvail;
     return *this;
 }
@@ -3848,10 +3848,10 @@ void TESObjectCELL::TestObjectAgainstMultibounds(TESObjectREFR* apRef, bool abFo
                 pMultiboundsExaminedMap->GetAt(pboundref, battached)) {
                 continue;
             }
-            if (!bfindmultibound && abForceRoomTest && spnode.operator->()->GetMultiBoundRoom() == nullptr) {
+            if (!bfindmultibound && abForceRoomTest && spnode->GetMultiBoundRoom() == nullptr) {
                 continue;
             }
-            BSMultiBound* pbound = spnode.operator->()->QMultiBound();
+            BSMultiBound* pbound = spnode->QMultiBound();
             if (pbound == nullptr) {
                 continue;
             }
@@ -3863,7 +3863,7 @@ void TESObjectCELL::TestObjectAgainstMultibounds(TESObjectREFR* apRef, bool abFo
                     apRef->SetMultiBoundRef(pboundref);
                 }
             }
-            else if (spnode.operator->()->GetMultiBoundRoom() != nullptr) {
+            else if (spnode->GetMultiBoundRoom() != nullptr) {
                 if (TestObjectAgainstRoom(apRef, spref3d.operator->(), pboundref, btest, abMultipleRoomTest)) {
                     bfoundattach = true;
                     break;
@@ -5278,7 +5278,7 @@ void TESObjectCELL::InitHavok() {
             }
             TESObjectCELL::pIslandListener = v13;
         }
-        ahkpWorld* v3 = pw->operator*();
+        ahkpWorld* v3 = **pw;
         TESObjectCELL::pIslandListener->AddToWorld(v3);
         this->CalcRefCenterPoint(org);
         pw->SetOrigin(org);
@@ -6200,7 +6200,7 @@ void TESObjectCELL::Clear3D() {
     ahkpWorld* v1;
     bhkWorld* v3 = (&ExtraData)->GetbhkWorld();
     if ((v3) && (TESObjectCELL::pIslandListener)) {
-        v1 = v3->operator*();
+        v1 = **v3;
         TESObjectCELL::pIslandListener->RemoveFromWorld(v1);
     }
 
@@ -6392,7 +6392,7 @@ void TESObjectCELL::ClearPortalGraph() {
                 v3->SetPortalGraph(nullptr);
             }
         }
-        spPortalGraph.operator=(static_cast<BSPortalGraph*>(nullptr));
+        spPortalGraph = static_cast<BSPortalGraph*>(nullptr);
         if (GetWorldSpace()) {
             TESWorldSpace* WorldSpace = GetWorldSpace();
             WorldSpace->ClearPortalGraph();
@@ -6608,10 +6608,10 @@ void TESObjectCELL::GetExteriorLocalMapTexture(NiPointer<NiTexture>& aspTexture)
     if (!GetInterior()) {
         NiPointer<BSRenderedTexture> sprt(static_cast<BSRenderedTexture*>(nullptr));
         TakeExteriorLocalMapPicture(sprt);
-        sprettex.operator=(static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0)));
+        sprettex = static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0));
         sprt.m_pObject->ClearRenderedTextures();
     }
-    aspTexture.operator=(sprettex);
+    aspTexture = sprettex;
 }
 
 void TESObjectCELL::GetInteriorLocalMapTexture(
@@ -6624,10 +6624,10 @@ void TESObjectCELL::GetInteriorLocalMapTexture(
     if (GetInterior()) {
         NiPointer<BSRenderedTexture> sprt(static_cast<BSRenderedTexture*>(nullptr));
         TakeInteriorLocalMapPicture(aiSectionX, aiSectionY, sprt);
-        sprettex.operator=(static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0)));
+        sprettex = static_cast<NiTexture*>(sprt.m_pObject->GetTexture(0));
         sprt.m_pObject->ClearRenderedTextures();
     }
-    aspTexture.operator=(sprettex);
+    aspTexture = sprettex;
 }
 
 void TESObjectCELL::SaveReferences(TESFile* apFile) {
@@ -6661,9 +6661,9 @@ void TESObjectCELL::SaveReferences(TESFile* apFile) {
     saverefs.Compact();
     int32_t isize = saverefs.m_usESize;
     for (int32_t n = 0; n < isize; ++n) {
-        TESObjectREFR* pref_2 = saverefs.operator[](n);
+        TESObjectREFR* pref_2 = saverefs[n];
         for (int32_t m = n + 1; m < isize; ++m) {
-            TESObjectREFR* pref2 = saverefs.operator[](m);
+            TESObjectREFR* pref2 = saverefs[m];
             if (pref2->SavesBefore(pref_2)) {
                 saverefs.SetAt(n, pref2);
                 saverefs.SetAt(m, pref_2);
@@ -6672,7 +6672,7 @@ void TESObjectCELL::SaveReferences(TESFile* apFile) {
         }
     }
     for (int32_t i = 0; i < isize; ++i) {
-        TESObjectREFR* pref_3 = saverefs.operator[](i);
+        TESObjectREFR* pref_3 = saverefs[i];
         if (pref_3) {
             pref_3->TESForm::Save(apFile);
         }
@@ -6960,12 +6960,11 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
     NiPointer<BSRenderedTexture> sprendTextNormals(static_cast<BSRenderedTexture*>(nullptr));
     NiDX9Renderer* Renderer_ = BSShaderManager::GetRenderer();
     BSTextureManager* TextureManager = BSShaderManager::TextureManagerPtr();
-    sprendTextNormals.operator=(
-        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_LOCALMAP_NORMALS, 0, nullptr, 0)
-    );
+    sprendTextNormals =
+        TextureManager->BorrowRenderedTexture(Renderer_, BSTextureManager::TEX_LOCALMAP_NORMALS, 0, nullptr, 0);
     NiDX9Renderer* fR = BSShaderManager::GetRenderer();
     BSTextureManager* v4 = BSShaderManager::TextureManagerPtr();
-    sprendTextShader.operator=(v4->CreateRenderedTexture(fR, BSTextureManager::TEX_LOCALMAP_FINAL, nullptr, 0));
+    sprendTextShader = v4->CreateRenderedTexture(fR, BSTextureManager::TEX_LOCALMAP_FINAL, nullptr, 0);
     if ((sprendTextShader.m_pObject) && (sprendTextNormals.m_pObject)) {
         void* pCustomAccumulator;
         NiColorA oldColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -7016,7 +7015,7 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
         }
         BSShaderUtil::RenderScene(apCamera, spaccum.m_pObject, false);
         culler.SetAccumulator(nullptr);
-        spaccum.operator=(static_cast<BSShaderAccumulator*>(nullptr));
+        spaccum = static_cast<BSShaderAccumulator*>(nullptr);
         if (boutsideFrame) {
             BSRenderedTexture::StopOffscreen();
         }
@@ -7057,14 +7056,14 @@ void TESObjectCELL::TakeLocalMapPicture(NiCamera* apCamera, NiPointer<BSRendered
     BSRenderedTexture* v19 = sprendTextNormals.m_pObject;
     BSTextureManager* v11 = BSShaderManager::TextureManagerPtr();
     v11->ReturnRenderedTexture(v19);
-    aspRenderedTexture.operator=(sprendTextShader);
+    aspRenderedTexture = sprendTextShader;
     BSShaderManager::SetAccumulator(spoldAccum.m_pObject);
 }
 
 void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& aspRenderedTexture) {
     NiPoint2 result;
     if (GetInterior()) {
-        aspRenderedTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        aspRenderedTexture = static_cast<BSRenderedTexture*>(nullptr);
     }
     else {
         NiNode* v10;
@@ -7187,9 +7186,9 @@ void TESObjectCELL::TakeExteriorLocalMapPicture(NiPointer<BSRenderedTexture>& as
         UpdateTrees();
         NiNode* fZAngle = spcameraNode.m_pObject;
         pscene->DetachChild(fZAngle);
-        spcameraNode.operator=(static_cast<NiNode*>(nullptr));
-        spcamera.operator=(static_cast<NiCamera*>(nullptr));
-        aspRenderedTexture.operator=(sptexture);
+        spcameraNode = static_cast<NiNode*>(nullptr);
+        spcamera = static_cast<NiCamera*>(nullptr);
+        aspRenderedTexture = sptexture;
     }
 }
 
@@ -7302,12 +7301,12 @@ void TESObjectCELL::TakeInteriorLocalMapPicture(
         }
         NiNode* angle = spcameraNode.m_pObject;
         pscene->DetachChild(angle);
-        spcameraNode.operator=(static_cast<NiNode*>(nullptr));
-        spcamera.operator=(static_cast<NiCamera*>(nullptr));
-        aspRenderedTexture.operator=(sptexture);
+        spcameraNode = static_cast<NiNode*>(nullptr);
+        spcamera = static_cast<NiCamera*>(nullptr);
+        aspRenderedTexture = sptexture;
     }
     else {
-        aspRenderedTexture.operator=(static_cast<BSRenderedTexture*>(nullptr));
+        aspRenderedTexture = static_cast<BSRenderedTexture*>(nullptr);
     }
 }
 
@@ -7576,7 +7575,7 @@ uint32_t TESObjectCELL::GetHoursToRespawnCell() {
 void TESObjectCELL::KillStatics() {
     if (pIslandListener) {
         bhkWorld* pWorld = spExteriorWorld.operator->();
-        pIslandListener->RemoveFromWorld(pWorld->operator*());
+        pIslandListener->RemoveFromWorld(**pWorld);
         delete pIslandListener;
         pIslandListener = nullptr;
     }
@@ -7724,7 +7723,7 @@ void TESObjectCELL::SaveRenderFailureData(TESObjectCELL::RENDER_FAILURE_DATA* ap
 }
 
 void TESObjectCELL::UpdateExteriorWorld(float afTime) {
-    if (spExteriorWorld.operator->()) {
+    if (spExteriorWorld) {
         bhkWorld* pWorld = spExteriorWorld.operator->();
         pWorld->Update();
     }
@@ -7837,7 +7836,7 @@ void TESObjectCELL::MoveExteriorWorld(NiPoint3& arCenter) {
     AutoMemContext* pMemContext = ::new (aucMemContext) AutoMemContext(
         MEM_CONTEXT_HAVOK, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESObjectCELL.cpp", 15451
     );
-    spExteriorWorld.operator->()->CheckForMove(arCenter);
+    spExteriorWorld->CheckForMove(arCenter);
     pMemContext->~AutoMemContext();
 }
 
@@ -8339,7 +8338,7 @@ void TESObjectCELL::UpdateSeenDataForPlayer() {
     if (pPlayer) {
         NiPoint3 a1 = *pPlayer->QLocationOnReference();
         SeenData::ShiftCoordToSeenPos(a1);
-        if (a1.operator!=(pt)) {
+        if (a1 != pt) {
             pt = a1;
             TESObjectCELL* ParentCell = pPlayer->GetParentCell();
             if (ParentCell) {
@@ -8619,7 +8618,7 @@ bool TESObjectCELL::EnumReferencesCloseToPointFromInterior(
                     const NiPoint3* v19;
                     float afRadiusa;
                     if (afRadius2 == 3.4028234663852886e+38 ||
-                        ((afRadius2 == afRadius1 && aPoint1.operator==(aPoint2)) ||
+                        ((afRadius2 == afRadius1 && aPoint1 == aPoint2) ||
                          (afRadiusa = afRadius2,
                           (v19 = &aPoint2,
                            (v8 = &pref->GetLocationOnReference(),
@@ -8730,21 +8729,21 @@ bool bhkRagdollController::QRagdollAnim() {
 
 // The threading-check mark is empty in the game's build, so MarkForWrite and UnMarkForWrite compile to one function.
 void bhkWorld::MarkForWrite() {
-    ahkpWorld* pw = operator*();
+    ahkpWorld* pw = **this;
     if (pw) {
         pw->markForWrite();
     }
 }
 
 void bhkWorld::UnMarkForWrite() {
-    ahkpWorld* pw = operator*();
+    ahkpWorld* pw = **this;
     if (pw) {
         pw->unmarkForWrite();
     }
 }
 
 void bhkWorld::AddEntityListener(bhkEntityListener* apListener) {
-    ahkpWorld* pw = operator*();
+    ahkpWorld* pw = **this;
     if (pw) {
         MarkForWrite();
         pw->addEntityListener(apListener);
@@ -8754,7 +8753,7 @@ void bhkWorld::AddEntityListener(bhkEntityListener* apListener) {
 }
 
 void bhkWorld::AddContactListener(hkpContactListener* apListener) {
-    ahkpWorld* pw = operator*();
+    ahkpWorld* pw = **this;
     if (pw) {
         MarkForWrite();
         pw->addContactListener(apListener);
@@ -8765,7 +8764,7 @@ void bhkWorld::AddContactListener(hkpContactListener* apListener) {
 // The listener hears entities through the entity listeners and phantoms through its hkpPhantomListener base.
 void bhkWorld::AddTrapListener(bhkTrapListener* apListener) {
     AddEntityListener(apListener);
-    ahkpWorld* pw = operator*();
+    ahkpWorld* pw = **this;
     if (pw) {
         MarkForWrite();
         pw->addPhantomListener(apListener);

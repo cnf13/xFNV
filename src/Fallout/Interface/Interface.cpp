@@ -2567,11 +2567,11 @@ void Interface::GetControlPushTextFor(int32_t aiIndex, char* axReturn, bool abAd
         if (abAddPushText) {
             BSStringT<char> xtemp;
             if (*axReturn) {
-                xtemp.operator=(axReturn);
+                xtemp = axReturn;
             }
             else {
                 const char* v8 = sPCControlsTextNone.String();
-                xtemp.operator=(v8);
+                xtemp = v8;
             }
             if (pbuttonSetting && pbuttonSetting->Key() && BSstristr(pbuttonSetting->Key(), "trigger") != nullptr) {
                 std::sprintf(axReturn, "%s %s", sPCControlsTriggerPrefix.String(), xtemp.String());
@@ -2845,8 +2845,8 @@ uint8_t Controls::RemapAction(USERACTIONS eAction, uint32_t uiIndex) {
 // The terminal's fade is its geometry's last fade percent, or fully shown without geometry.
 float FORenderedTerminal::GetFadeAmount() {
     float fFade;
-    if (spGeometry.operator->()) {
-        fFade = spGeometry.operator->()->GetLastFadePercent();
+    if (spGeometry) {
+        fFade = spGeometry->GetLastFadePercent();
     }
     else {
         fFade = 1.0f;

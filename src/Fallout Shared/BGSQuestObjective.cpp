@@ -135,7 +135,7 @@ bool BGSQuestObjective::GetStatus(int32_t a2) {
 
 void BGSQuestObjective::InitializeData() {
     iIndex = (uint32_t)0;
-    (&cDisplayText)->operator=("");
+    cDisplayText = "";
     bInitialized = false;
     eState = QOS_DORMANT;
     pOwnerQuest = nullptr;

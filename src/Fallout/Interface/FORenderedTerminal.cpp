@@ -188,7 +188,7 @@ void FORenderedTerminal::Initialize() {
     else {
         pgeom =
             static_cast<BSFadeNode*>(pModelLoader->LoadFile(pTerminalFile, LOD_MULT_NONE, true, false, false, false));
-        FORenderedTerminal::spGeometry.operator=(pgeom);
+        FORenderedTerminal::spGeometry = pgeom;
         SwapPlatformLanguageTextures(pgeom);
         bloaded = true;
     }
@@ -201,11 +201,11 @@ void FORenderedTerminal::Initialize() {
     }
     NiAVObject* pexitButtonObj = pgeom->GetObjectByName("PowerButton");
     if (pexitButtonObj->IsGeometry()) {
-        spExitButton.operator=(static_cast<NiTriStrips*>(pexitButtonObj));
+        spExitButton = static_cast<NiTriStrips*>(pexitButtonObj);
     }
     else {
         NiNode* v3 = pexitButtonObj->IsNode();
-        spExitButton.operator=(static_cast<NiTriStrips*>(v3->GetAt(0)));
+        spExitButton = static_cast<NiTriStrips*>(v3->GetAt(0));
     }
     mat1.MakeYRotation(1.57f);
     mat2.MakeZRotation(1.57f);
@@ -380,9 +380,9 @@ void FORenderedTerminal::InitLight() {
 
 void FORenderedTerminal::ReleaseStaticGeometry() {
     BSFadeNode* vCondition1;
-    vCondition1 = (&FORenderedTerminal::spGeometry)->operator->();
+    vCondition1 = FORenderedTerminal::spGeometry;
     if (vCondition1) {
         pModelLoader->ReleaseModel(pTerminalFile, true, 1);
     }
-    (&FORenderedTerminal::spGeometry)->operator=(nullptr);
+    FORenderedTerminal::spGeometry = nullptr;
 }

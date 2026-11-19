@@ -15,8 +15,8 @@ void PathingSpline::SetParameter(float afParameter) {
 }
 
 void PathingSpline::SetKeys(const PathingSplineKey& aKey1, const PathingSplineKey& aKey2) {
-    (&Key1)->operator=(aKey1);
-    (&Key2)->operator=(aKey2);
+    Key1 = aKey1;
+    Key2 = aKey2;
 }
 
 void PathingSpline::ComputeHermiteBasis(float afParameter) {

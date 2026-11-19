@@ -260,7 +260,7 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
                     }
                     NiPick activatePick(0, 8u);
                     activatePick.SetObserveAppCullFlag(true);
-                    activatePick.SetTarget(Pages[eState].Buttons.operator[](iindex)->spButton.m_pObject);
+                    activatePick.SetTarget(Pages[eState].Buttons[iindex]->spButton.m_pObject);
                     activatePick.m_eSortType = NiPick::SORT;
                     activatePick.SetIsReturnTexture(true);
                     SPECIALBookMenu::sp3DCamera.m_pObject->WindowPointToRay(cx, cy, origin, dir, nullptr);
@@ -268,8 +268,8 @@ void SPECIALBookMenu::DoClick(int32_t a1, Tile* a2) {
                         uint32_t uiIndex = 0;
                         if ((&activatePick.m_pickResults)->GetAt(0)) {
                             // The button is fetched once for the argument and again for the callback, as the game does.
-                            SpecialBookButton* pButton = Pages[eState].Buttons.operator[](iindex);
-                            Pages[eState].Buttons.operator[](iindex)->pfButtonClick(pButton);
+                            SpecialBookButton* pButton = Pages[eState].Buttons[iindex];
+                            Pages[eState].Buttons[iindex]->pfButtonClick(pButton);
                             return;
                         }
                     }
@@ -415,7 +415,7 @@ void SPECIALBookMenu::Exit() {
         ShadowSceneNode* v3 = BSShaderManager::GetShadowSceneNode(1);
         v3->RemoveAllLights();
         SPECIALBookMenu::pSPECIALBookMenu->pBookGeometry = nullptr;
-        SPECIALBookMenu::sp3DCamera.operator=(static_cast<NiCamera*>(nullptr));
+        SPECIALBookMenu::sp3DCamera = static_cast<NiCamera*>(nullptr);
         for (int32_t i = 0; i < 9; ++i) {
             SPECIALBookMenu::pSPECIALBookMenu->Pages[i].Buttons.Clear(true);
             SPECIALBookMenu::pSPECIALBookMenu->Pages[i].TextItems.Clear(true);
@@ -497,12 +497,12 @@ void SPECIALBookMenu::CallPageCallbacks() {
     if (eState < SPECIALBookMenu::SBMS_CLOSED) {
         for (uint32_t auiIndex = 0; auiIndex < Pages[eState].TextItems.iSize; ++auiIndex) {
             // Fetches the item for the argument first, then again for the callback, as the game does.
-            SpecialBookTextItem* pItem = Pages[eState].TextItems.operator[](auiIndex);
-            Pages[eState].TextItems.operator[](auiIndex)->pfRefreshField(pItem);
+            SpecialBookTextItem* pItem = Pages[eState].TextItems[auiIndex];
+            Pages[eState].TextItems[auiIndex]->pfRefreshField(pItem);
         }
         for (uint32_t i = 0; i < Pages[eState].Buttons.iSize; ++i) {
-            SpecialBookButton* pButton = Pages[eState].Buttons.operator[](i);
-            Pages[eState].Buttons.operator[](i)->pfRefresh(pButton);
+            SpecialBookButton* pButton = Pages[eState].Buttons[i];
+            Pages[eState].Buttons[i]->pfRefresh(pButton);
         }
     }
 }
@@ -1136,12 +1136,12 @@ void SPECIALBookMenu::InitBook() {
     // Every page's refresh callbacks, each item and button fetched once for the argument and once for the call.
     for (int32_t i = 0; i < 9; ++i) {
         for (uint32_t uiItem = 0; uiItem < Pages[i].TextItems.iSize; ++uiItem) {
-            SpecialBookTextItem* pItem = Pages[i].TextItems.operator[](uiItem);
-            Pages[i].TextItems.operator[](uiItem)->pfRefreshField(pItem);
+            SpecialBookTextItem* pItem = Pages[i].TextItems[uiItem];
+            Pages[i].TextItems[uiItem]->pfRefreshField(pItem);
         }
         for (uint32_t uiButton = 0; uiButton < Pages[i].Buttons.iSize; ++uiButton) {
-            SpecialBookButton* pButton = Pages[i].Buttons.operator[](uiButton);
-            Pages[i].Buttons.operator[](uiButton)->pfRefresh(pButton);
+            SpecialBookButton* pButton = Pages[i].Buttons[uiButton];
+            Pages[i].Buttons[uiButton]->pfRefresh(pButton);
         }
     }
 }
@@ -1261,7 +1261,7 @@ void SPECIALBookMenu::Create(int32_t aiTotalPoints) {
         if (static_cast<LoveTesterMenu*>(pmenu)->LoveTesterMenu::CheckTilesExist(&imissingIndex)) {
             SPECIALBookMenu::pSPECIALBookMenu->iAvailablePoints = aiTotalPoints;
             SPECIALBookMenu::pSPECIALBookMenu->InitBook();
-            SPECIALBookMenu::sp3DCamera.operator=(SPECIALBookMenu::pSPECIALBookMenu->InitCamera());
+            SPECIALBookMenu::sp3DCamera = SPECIALBookMenu::pSPECIALBookMenu->InitCamera();
             HUDMainMenu::ForceObjectiveReminders(true);
             pmenu->PrepForVisibility(false);
         }
@@ -1329,7 +1329,7 @@ void SPECIALBookMenu::PreviousPage(SpecialBookButton* apButton) {
 void SPECIALBookMenu::RefreshActorValue(SpecialBookTextItem* apTextItem) {
     // The player is cast to ActorValueOwner through a reference, without a null check, as the game does.
     int32_t iValue = static_cast<ActorValueOwner&>(*pPlayer).GetPermanentActorValue(apTextItem->eActorValue);
-    NiSourceTexture* pTexture = pSPECIALBookMenu->spAVValues[iValue].operator->();
+    NiSourceTexture* pTexture = pSPECIALBookMenu->spAVValues[iValue];
     static_cast<BSShaderPPLightingProperty*>(apTextItem->pText[0])
         ->SetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0, pTexture);
 }

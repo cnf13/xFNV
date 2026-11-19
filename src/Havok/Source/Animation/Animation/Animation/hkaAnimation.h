@@ -88,7 +88,7 @@ public:
     ) const {
         char buf[512];
         hkErrStream kStream(buf, 512);
-        kStream.operator<<("samplePartialPose not implemented for this type of animation");
+        kStream << "samplePartialPose not implemented for this type of animation";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x54E32123, buf,
                 "d:\\Projects\\fallout\\code\\Havok\\Source\\Animation/Animation/Animation/hkaAnimation.inl", 25
@@ -117,7 +117,7 @@ public:
     getDataChunks(uint32_t frame, float delta, hkaAnimation::DataChunk* dataChunks, int32_t numDataChunks) const {
         char buf[512];
         hkErrStream kStream(buf, 512);
-        kStream.operator<<("getDataChunks not implemented for this type of animation");
+        kStream << "getDataChunks not implemented for this type of animation";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x54E32124, buf,
                 "d:\\Projects\\fallout\\code\\Havok\\Source\\Animation/Animation/Animation/hkaAnimation.inl", 37

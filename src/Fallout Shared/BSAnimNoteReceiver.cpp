@@ -24,9 +24,9 @@ BSAnimNoteReceiver::~BSAnimNoteReceiver() {
 
 void BSAnimNoteReceiver::Update(BSAnimNote* apNote) {
     for (uint32_t ui = 0; ui < CallTypeA.m_usSize; ++ui) {
-        BSAnimNoteReceiverType* ptype = CallTypeA.operator[](ui);
+        BSAnimNoteReceiverType* ptype = CallTypeA[ui];
         if (ptype->eType == apNote->eType) {
-            CallTypeA.operator[](ui)->pCallback(pObjRefr, apNote);
+            CallTypeA[ui]->pCallback(pObjRefr, apNote);
         }
     }
 }

@@ -195,7 +195,7 @@ void TESObjectTREE::Save() {
         );
         ourMemset(pdata, 0, sizeof(uint32_t) * inumSeeds);
         for (uint32_t i = 0; i < inumSeeds; ++i) {
-            uint32_t ival = SeedArray.operator[](i);
+            uint32_t ival = SeedArray[i];
             if (ival) {
                 pdata[i] = ival;
             }
@@ -231,7 +231,7 @@ void TESObjectTREE::Copy(TESForm* apCopy) {
         uint32_t isize = ptree->SeedArray.m_usSize;
         SeedArray.RemoveAll();
         for (uint32_t i = 0; i < isize; ++i) {
-            SeedArray.AddFirstEmpty(ptree->SeedArray.operator[](i));
+            SeedArray.AddFirstEmpty(ptree->SeedArray[i]);
         }
         Data = *ptree->GetData();
         float y = ptree->BillboardSize.y;
@@ -249,7 +249,7 @@ bool TESObjectTREE::Compare(TESForm* apCompare) {
     if (std::memcmp(&Data, v3, sizeof(Data))) {
         return true;
     }
-    if (BillboardSize.operator!=(pcomp->BillboardSize)) {
+    if (BillboardSize != pcomp->BillboardSize) {
         return true;
     }
     uint32_t isize = SeedArray.m_usSize;
@@ -257,8 +257,8 @@ bool TESObjectTREE::Compare(TESForm* apCompare) {
         return true;
     }
     for (uint32_t i = 0; i < isize; ++i) {
-        uint32_t* v4 = &SeedArray.operator[](i);
-        if (*v4 != pcomp->SeedArray.operator[](i)) {
+        uint32_t* v4 = &SeedArray[i];
+        if (*v4 != pcomp->SeedArray[i]) {
             return true;
         }
     }
@@ -596,7 +596,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
         v31 = nullptr;
     }
     NiPointer<NiTriShapeData> spgeomData(static_cast<NiTriShapeData*>(v31));
-    aspTriShapeData.operator=(spgeomData);
+    aspTriShapeData = spgeomData;
 }
 
 NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
@@ -646,7 +646,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     pbillboardProp->SetClampNI(NiTexturingProperty::CLAMP_S_CLAMP_T);
     NiPointer<NiTexture> spTempTexture(nullptr);
     ptextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, spTempTexture);
-    if (spTempTexture.operator==(nullptr)) {
+    if (spTempTexture == nullptr) {
         return nullptr;
     }
 

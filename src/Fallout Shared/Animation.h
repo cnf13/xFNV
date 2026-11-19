@@ -225,7 +225,7 @@ public:
 
     // Returns the animated root node, pAnimRoot.
     NiNode* GetSceneRoot() {
-        return pAnimRoot.operator->();
+        return pAnimRoot;
     }
 
     // The multiplier of the time the animations advance by.

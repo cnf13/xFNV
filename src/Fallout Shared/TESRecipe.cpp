@@ -423,7 +423,7 @@ bool TESRecipe::ShouldHideItem(TESRecipe* a1) {
         return false;
     }
     TESRecipeCategory* SubCategory = a1->GetSubCategory();
-    return SubCategory != get_g_RecipeMenuCategories()->operator[](static_cast<uint32_t>(g_currentRecipeMenuCategory));
+    return SubCategory != (*get_g_RecipeMenuCategories())[static_cast<uint32_t>(g_currentRecipeMenuCategory)];
 }
 
 void RECIPE_CATEGORY_DATA::Endian() {}

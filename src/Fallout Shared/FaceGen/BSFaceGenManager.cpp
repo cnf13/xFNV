@@ -354,7 +354,7 @@ void BSFaceGenModelMap::UnloadAllEGMAndEGTData(bool abForce) {
             if (spEntry->spModel->GetRefCount() == 1) {
                 Map.RemoveAt(pKey);
             }
-            else if ((spEntry.operator->()) && (spEntry->spModel.operator->())) {
+            else if ((spEntry) && (spEntry->spModel)) {
                 if (!spEntry->spModel->UnloadEGMData()) {
                     bKeepData = true;
                 }
@@ -450,7 +450,7 @@ void BSFaceGenModelMap::FreeLRUData(BSFaceGenModelMap::DataType aDataType, BSFac
     iter = Map.GetFirstPos();
     while (iter) {
         Map.GetNext(iter, pkey, spentry);
-        if (!spentry.operator==(aspNewEntry)) {
+        if (!(spentry == aspNewEntry)) {
             uint32_t dataSize;
             if (aDataType) {
                 if (aDataType == BSFaceGenModelMap::DATA_TYPE_EGT) {
@@ -469,12 +469,12 @@ void BSFaceGenModelMap::FreeLRUData(BSFaceGenModelMap::DataType aDataType, BSFac
                     uint32_t v4 = curTime - v3->uiTime;
                     BSFaceGenModelMap::Entry* v5 = spLRU.m_pObject;
                     if (v4 > curTime - v5->uiTime) {
-                        spLRU.operator=(spentry);
+                        spLRU = spentry;
                         pLRUkey = pkey;
                     }
                 }
                 else {
-                    spLRU.operator=(spentry);
+                    spLRU = spentry;
                     pLRUkey = pkey;
                 }
             }
@@ -594,10 +594,10 @@ FR2MatrixVTC<float>* ConcatRows(FR2MatrixVTC<float>* a1, FR2MatrixVTC<float>* hP
     rt::memcpy(v19, v21, sizeof(float) * (v12 * v13));
     uint32_t v10 = arg8->nrows;
     uint32_t v9 = arg8->ncols;
-    FR2MatrixVTC<float>::RowT* v8 = &(result = arg8->operator[](0));
+    FR2MatrixVTC<float>::RowT* v8 = &(result = (*arg8)[0]);
     v8->p;
     float* p = v8->p;
-    rt::memcpy(apMemory.operator[](hProcess->nrows).p, p, sizeof(float) * (v9 * v10));
+    rt::memcpy(apMemory[hProcess->nrows].p, p, sizeof(float) * (v9 * v10));
     ::new (a1) FR2MatrixVTC<float>(apMemory);
     return a1;
 }
@@ -615,7 +615,7 @@ FanLinCtlS* CopyOpt(
     ptrdiff_t iBytes = static_cast<char*>(static_cast<void*>(_Last)) - static_cast<char*>(static_cast<void*>(_First));
     FanLinCtlS* result = _Dest + iBytes / static_cast<ptrdiff_t>(sizeof(FanLinCtlS));
     for (; _First != _Last; ++_Dest, ++_First) {
-        _Dest->ctl.operator=(_First->ctl);
+        _Dest->ctl = _First->ctl;
         _Dest->label.assign(_First->label, 0, std::string::npos);
     }
     return result;
@@ -656,7 +656,7 @@ float FanGenCtlsGrpC::getAttribute(
     if (initialized) {
         float v11 = 0.0f;
         FR2MatrixVTC<float>* v7 = attr[race][att][type].ctl.Mul(&apResult, (*coord)[2 * type]);
-        v11 = *v7->operator[](0).p;
+        v11 = *(*v7)[0].p;
         return v11 + attr[race][att][type].off;
     }
 
@@ -698,7 +698,7 @@ void FanGenCtlsGrpC::setAttributes(FanRaceE race, FanTypeE type, const float* va
         for (aa = 0; aa < 2; ++aa) {
             FR2MatrixVTC<float>* v7 = attr[race][aa][type].ctl.transpose(&apResult);
             FR2MatrixVTC<float>* m = v7->MulScalar(&v9, *(&delta.x1 + aa));
-            (*coord)[2 * type].operator+=(*m);
+            (*coord)[2 * type] += *m;
         }
     }
 }
@@ -738,10 +738,10 @@ FanGenCtlsGrpC::getCaricature(FanRaceE race, FanTypeE type, FanSymmE symm, const
     coord[type][symm].Sub(&v26, distrib[race].mean[type]);
     for (uint32_t i = 0; i < 2; ++i) {
         FR2MatrixVTC<float>* v11 = basis[4 * race + 2 * type + i].Mul(&apResult, v26);
-        float v23 = *(::new (&a2a) FR2MatrixVTC<float>::RowT(v11->operator[](0u)))->p;
+        float v23 = *(::new (&a2a) FR2MatrixVTC<float>::RowT((*v11)[0u]))->p;
         FR2MatrixVTC<float>* v10 = basis[4 * race + 2 * type + i].transpose(&v20);
         FR2MatrixVTC<float>* v9 = v10->MulScalar(&v19, v23);
-        v26.operator-=(*v9);
+        v26 -= *v9;
     }
     distrib[race].invEigBasis[type].Mul(&apThis, v26);
     float v16 = apThis.lengthSqr();
@@ -787,7 +787,7 @@ void FanGenCtlsGrpC::setCaricature(
             float v30 = v14 / v13;
             if (v30 > 0.0) {
                 float v12 = val / v30;
-                coord[type][symm].operator*=(v12);
+                coord[type][symm] *= v12;
             }
         }
         else {
@@ -803,20 +803,20 @@ void FanGenCtlsGrpC::setCaricature(
                 apMemory.setZero();
                 for (uint32_t i = 0; i < 2; ++i) {
                     FR2MatrixVTC<float>* v11 = basis[4 * race + 2 * type + i].Mul(&apResult, m);
-                    float v25 = *(::new (&result) FR2MatrixVTC<float>::RowT(v11->operator[](0u)))->p;
+                    float v25 = *(::new (&result) FR2MatrixVTC<float>::RowT((*v11)[0u]))->p;
                     FR2MatrixVTC<float>* v10 = basis[4 * race + 2 * type + i].transpose(&v22);
                     FR2MatrixVTC<float>* v9 = v10->MulScalar(&v21, v25);
-                    apMemory.operator+=(*v9);
+                    apMemory += *v9;
                 }
-                m.operator-=(apMemory);
+                m -= apMemory;
                 float v27 = getCaricature(race, type, symm, coord);
                 if (!(v27 > 0.0)) {}
                 else {
                     float v8 = val / v27;
-                    m.operator*=(v8);
+                    m *= v8;
                     FR2MatrixVTC<float>* v7 = m.Add(&v20, apMemory);
                     FR2MatrixVTC<float>* hProcess = v7->Add(&v19, distrib[race].mean[type]);
-                    coord[type][symm].operator=(*hProcess);
+                    coord[type][symm] = *hProcess;
                 }
             }
         }
@@ -841,7 +841,7 @@ double FanGenCtlsGrpC::getRace(int32_t race1, int32_t race2, const FR2MatrixVTC<
     float v11 = 0.0f;
     for (uint32_t i = 0; i < 2; ++i) {
         FR2MatrixVTC<float>* v6 = race[race1][race2].ctl[i].Mul(&apResult, coord[i][0]);
-        float** v5 = &(::new (&a2a) FR2MatrixVTC<float>::RowT(v6->operator[](0u)))->p;
+        float** v5 = &(::new (&a2a) FR2MatrixVTC<float>::RowT((*v6)[0u]))->p;
         v11 = **v5 + v11;
     }
     return (v11 + race[race1][race2].off);
@@ -864,7 +864,7 @@ void FanGenCtlsGrpC::setRace(int32_t race1, int32_t race2, float val, FR2MatrixV
         for (uint32_t i = 0; i < 2; ++i) {
             FR2MatrixVTC<float>* v6 = race[race1][race2].ctl[i].transpose(&apResult);
             FR2MatrixVTC<float>* m = v6->MulScalar(&v8, s);
-            coord[i][0].operator+=(*m);
+            coord[i][0] += *m;
         }
     }
 }
@@ -884,7 +884,7 @@ void FanGenCtlsGrpC::random(int32_t a1, FR2MatrixVTC<float>* a2) {
         for (uint32_t j = 0; j < 2; ++j) {
             for (uint32_t k = 0; k < 2; ++k) {
                 for (uint32_t i = 0; i < a2[2 * j + k].nrows; ++i) {
-                    FR2MatrixVTC<float>::RowT* v10 = &(a2a = a2[2 * j + k].operator[](i));
+                    FR2MatrixVTC<float>::RowT* v10 = &(a2a = a2[2 * j + k][i]);
                     v10->p;
                     float* p = v10->p;
                     *p = RngStdNormal();
@@ -893,15 +893,15 @@ void FanGenCtlsGrpC::random(int32_t a1, FR2MatrixVTC<float>* a2) {
         }
         ConcatRows(&v20, a2, a2 + 2);
         FR2MatrixVTC<float>* hProcess = distrib[a1].eigBasis.Mul(&apResult, v20);
-        v20.operator=(*hProcess);
+        v20 = *hProcess;
         uint32_t nr = a2->nrows;
         uint32_t nrows = a2[2].nrows;
         FR2MatrixVTC<float>* v6 = v20.subMatrix(&v14, 0, 0, nr, 1u);
         FR2MatrixVTC<float>* v5 = v6->Add(&v13, *distrib[a1].mean);
-        a2->operator=(*v5);
+        *a2 = *v5;
         FR2MatrixVTC<float>* v4 = v20.subMatrix(&v12, nr, 0, nrows, 1u);
         FR2MatrixVTC<float>* v3 = v4->Add(&v11, distrib[a1].mean[1]);
-        (a2 + 2)->operator=(*v3);
+        *(a2 + 2) = *v3;
     }
 }
 
@@ -922,12 +922,12 @@ void FanGenCtlsGrpC::geneticRandom(
             for (uint32_t i = 0; i < (*apSourceCoord)[j][k].nrows; ++i) {
                 for (uint32_t m = 0; m < (*apSourceCoord)[j][k].ncols; ++m) {
                     if (k) {
-                        (*apOutCoord)[j][k].operator[](i).p[m] = 0.0f;
+                        (*apOutCoord)[j][k][i].p[m] = 0.0f;
                     }
                     else {
                         double v15 = RngStdNormal() * afGeneticVariation * 1.5;
-                        float* v7 = &(*apSourceCoord)[j][k].operator[](i).p[m];
-                        FR2MatrixVTC<float>::RowT* v6 = &(result = (*apOutCoord)[j][k].operator[](i));
+                        float* v7 = &(*apSourceCoord)[j][k][i].p[m];
+                        FR2MatrixVTC<float>::RowT* v6 = &(result = (*apOutCoord)[j][k][i]);
                         float v4 = *v7 + v15;
                         v6->p[m] = v4;
                     }
@@ -947,10 +947,10 @@ void FanGenCtlsGrpC::reflect(FanRaceE race, FR2MatrixVTC<float> (*coord)[2]) {
     if (initialized) {
         for (uint32_t i = 0; i < 2; ++i) {
             FR2MatrixVTC<float>* hProcess = coord[i][1].MulScalar(&apResult, -1.0f);
-            coord[i][1].operator=(*hProcess);
+            coord[i][1] = *hProcess;
             FR2MatrixVTC<float>* v4 = distrib[race].mean[i].MulScalar(&v8, 2.0f);
             FR2MatrixVTC<float>* v3 = v4->Sub(&v7, coord[i][0]);
-            coord[i][0].operator=(*v3);
+            coord[i][0] = *v3;
         }
     }
 }
@@ -984,7 +984,7 @@ void FanGenCtlsGrpC::tween(
     FR2MatrixVTC<float>* v9 = parent2[type][symm].MulScalar(&apResult, s);
     FR2MatrixVTC<float>* v8 = parent1[type][symm].MulScalar(&v14, ratio);
     FR2MatrixVTC<float>* hProcess = v8->Add(&v12, *v9);
-    child[type][symm].operator=(*hProcess);
+    child[type][symm] = *hProcess;
     setCaricature(FANRACE_ALL, type, symm, v15, child);
 }
 
@@ -1223,8 +1223,8 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                 else {
                     ishaderindex = 14;
                 }
-                if ((arNpcData.pModel.operator[](ipart)) && (arNpcData.pTexture.operator[](ipart))) {
-                    NiAVObject* pobj = apNode->GetObjectByName(arNpcData.pHeadPartNodeName.operator[](ipart));
+                if ((arNpcData.pModel[ipart]) && (arNpcData.pTexture[ipart])) {
+                    NiAVObject* pobj = apNode->GetObjectByName(arNpcData.pHeadPartNodeName[ipart]);
                     if (pobj) {
                         NiTriBasedGeom* pgeom = pobj->IsTriBasedGeom();
                         if (pgeom) {
@@ -1246,33 +1246,33 @@ void BSFaceGenManager::PrepareHeadForShaders(BSFaceGenNiNode* apNode, FaceGenNpc
                                 if (pshaderpropLighting) {
                                     const char* Xa;
                                     if ((arNpcData.spTexBaseMod.m_usSize) && (arNpcData.bFaceGenTexturing)) {
-                                        sptexBaseMod.operator=(arNpcData.spTexBaseMod.operator[](ipart));
+                                        sptexBaseMod = arNpcData.spTexBaseMod[ipart];
                                     }
 
                                     if (ipart ||
                                         (cage < 0 ||
-                                         (Xa = arNpcData.pTexture.operator[](ipart)->GetTextureName(),
+                                         (Xa = arNpcData.pTexture[ipart]->GetTextureName(),
                                           !BSFaceGenManager::GetAsNearestDetailDDSFile(
                                               fileDetail, arNpcData.eSex, static_cast<uint8_t>(cage), Xa
                                           )))) {
                                         if (!arNpcData.spTexBaseMod.m_usSize ||
-                                            !(&arNpcData.spTexBaseMod.operator[](ipart))->m_pObject) {
+                                            !(&arNpcData.spTexBaseMod[ipart])->m_pObject) {
                                             uint32_t Xb = BSFaceGenManager::GetEGTClampSize();
                                             pmodelFG->ApplyCoordinateTexturingToMesh(
                                                 &(&arNpcData)->FaceCoord, sptexBaseMod, Xb
                                             );
                                         }
                                         BSStringT<char> tempstr;
-                                        TESTexture* pTexture = arNpcData.pTexture.operator[](ipart);
+                                        TESTexture* pTexture = arNpcData.pTexture[ipart];
                                         pTexture->GetAsNormalFile(tempstr);
                                         if (tempstr.pString) {
-                                            fileSpecular.operator=("Textures\\");
-                                            fileSpecular.operator+=(static_cast<const char*>(tempstr.pString));
+                                            fileSpecular = "Textures\\";
+                                            fileSpecular += static_cast<const char*>(tempstr.pString);
                                         }
                                     }
                                     else {
                                         if (!arNpcData.spTexBaseMod.m_usSize ||
-                                            !(&arNpcData.spTexBaseMod.operator[](ipart))->m_pObject) {
+                                            !(&arNpcData.spTexBaseMod[ipart])->m_pObject) {
                                             uint32_t EGTClampSize = BSFaceGenManager::GetEGTClampSize();
                                             pmodelFG->ApplyCoordinateTexturingToMesh(
                                                 &(&arNpcData)->FaceCoord, sptexBaseMod, EGTClampSize
@@ -1822,8 +1822,8 @@ void BSFaceGenManager::AttachHairToHead(
                 }
             }
             pmodelFG = nullptr;
-            spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
-            sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
+            spshape = static_cast<NiTriBasedGeom*>(nullptr);
+            sptexBase = static_cast<NiSourceTexture*>(nullptr);
         }
     }
 }
@@ -1905,7 +1905,7 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
         else {
             v17 = nullptr;
         }
-        spnewModel.operator=(v17);
+        spnewModel = v17;
         if (spnewModel.m_pObject->LoadModel(
                 apEGMFilename, apNIFFilename, apTRIFilename, apEGTFilename, aeHairPart, abIsAccessory
             )) {
@@ -1921,7 +1921,7 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
             v12->pModelMap->SetAt(apcKey, v15);
         }
         else {
-            spnewModel.operator=(static_cast<BSFaceGenModel*>(nullptr));
+            spnewModel = static_cast<BSFaceGenModel*>(nullptr);
         }
     }
     BSFaceGenModel* v19 = spnewModel.m_pObject;
@@ -1941,7 +1941,7 @@ NiAlphaProperty* BSFaceGenManager::GetHairTeethAlphaProperty() {
         pspProperty = ::new (aNullStorage) NiPointer<NiAlphaProperty>(nullptr);
         bConstructed = true;
     }
-    NiAlphaProperty* pProperty = pspProperty->operator->();
+    NiAlphaProperty* pProperty = *pspProperty;
     if (bConstructed) {
         pspProperty->~NiPointer<NiAlphaProperty>();
     }
@@ -2433,7 +2433,7 @@ void BSFaceGenManager::OffsetFaceGenCoord(
                 if (irows && icols) {
                     (*apCopyToCoord)[etype][esymm].resize(static_cast<int32_t>(irows), static_cast<int32_t>(icols));
                     if (etype == 1 && abNoTextureOffset) {
-                        (*apCopyToCoord)[etype][esymm].operator=((*apCopyCoordOld)[etype][esymm]);
+                        (*apCopyToCoord)[etype][esymm] = (*apCopyCoordOld)[etype][esymm];
                     }
                     else {
                         uint32_t isize = icols * irows;
@@ -2465,7 +2465,7 @@ void BSFaceGenManager::ScaleFaceCoord(
             for (int32_t j = 0; j < 2; ++j) {
                 if (((*apCoordToScale)[i][j].nrows) && ((*apCoordToScale)[i][j].ncols) &&
                     (!i || ((i == 1 && abNoTextureScale) || !abNoTextureScale))) {
-                    (*apCoordToScale)[i][j].operator*=(afScaleAmount);
+                    (*apCoordToScale)[i][j] *= afScaleAmount;
                 }
             }
         }
@@ -2572,10 +2572,10 @@ bool BSFaceGenManager::CreateFaceGenHead(
     BSStringT<char> fileLowLOD;
     matrot.MakeYRotation(-1.5707964f);
     for (uint32_t ipart = 0; ipart < 8; ++ipart) {
-        if ((arNpcData.pModel.m_usSize) && (arNpcData.pModel.operator[](ipart)) &&
-            (arNpcData.pModel.operator[](ipart)->GetModelLength()) && (arNpcData.pTexture.m_usSize) &&
-            (arNpcData.pTexture.operator[](ipart)) && (arNpcData.pTexture.operator[](ipart)->GetTextureNameLength())) {
-            TESModel* v32 = arNpcData.pModel.operator[](ipart);
+        if ((arNpcData.pModel.m_usSize) && (arNpcData.pModel[ipart]) && (arNpcData.pModel[ipart]->GetModelLength()) &&
+            (arNpcData.pTexture.m_usSize) && (arNpcData.pTexture[ipart]) &&
+            (arNpcData.pTexture[ipart]->GetTextureNameLength())) {
+            TESModel* v32 = arNpcData.pModel[ipart];
             filename.SPrintF("Meshes\\%s", v32->GetModel());
             if (arNpcData.eLod == BS_FACEGEN_LOD_LOW && !ipart) {
                 BSFaceGenManager::GetAsNIFFileLowLOD(fileLowLOD, filename.pString);
@@ -2629,14 +2629,14 @@ bool BSFaceGenManager::CreateFaceGenHead(
             if ((pmodelFG) && (pmodelFG->ApplyCoordinateToNewMesh(&(&arNpcData)->FaceCoord, spshape)) &&
                 (spshape.m_pObject)) {
                 int32_t v27;
-                spshape.m_pObject->SetName(arNpcData.pHeadPartNodeName.operator[](ipart));
+                spshape.m_pObject->SetName(arNpcData.pHeadPartNodeName[ipart]);
                 if (!ipart) {
                     pshapeHead = spshape.m_pObject;
                 }
                 if (ipart == 1) {
                     pshapeEars = spshape.m_pObject;
                 }
-                filename.SPrintF("Textures\\%s", arNpcData.pTexture.operator[](ipart)->GetTextureName());
+                filename.SPrintF("Textures\\%s", arNpcData.pTexture[ipart]->GetTextureName());
                 char* v21 = filename.pString;
                 TES::pInstance->CreateTextureImage(v21, sptexBase, false, false);
                 if (sptexBase.m_pObject) {
@@ -2723,8 +2723,8 @@ bool BSFaceGenManager::CreateFaceGenHead(
                     pppprop->UseDefaultNormalMap();
                 }
                 pmodelFG = nullptr;
-                sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
-                spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
+                sptexBase = static_cast<NiSourceTexture*>(nullptr);
+                spshape = static_cast<NiTriBasedGeom*>(nullptr);
             }
         }
     }
@@ -2835,8 +2835,8 @@ void BSFaceGenManager::AttachEyesToHead(
             }
         }
         pmodelFG = nullptr;
-        spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
-        sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
+        spshape = static_cast<NiTriBasedGeom*>(nullptr);
+        sptexBase = static_cast<NiSourceTexture*>(nullptr);
     }
     if (aNpcData.pRightEye) {
         const char* v5 = aNpcData.pRightEye->GetModel();
@@ -2894,8 +2894,8 @@ void BSFaceGenManager::AttachEyesToHead(
             }
         }
         pmodelFG = nullptr;
-        spshape.operator=(static_cast<NiTriBasedGeom*>(nullptr));
-        sptexBase.operator=(static_cast<NiSourceTexture*>(nullptr));
+        spshape = static_cast<NiTriBasedGeom*>(nullptr);
+        sptexBase = static_cast<NiSourceTexture*>(nullptr);
     }
 }
 
@@ -2977,7 +2977,7 @@ float BSFaceGenManager::GetFaceCoordValue(
             BSFaceGenManager* v5 = BSFaceGenManager::GetInstance();
             FanLinCtlS* v6 = &v5->LinCtrls.grp[aeFanType][aeFanSymm][aiCtrlID];
             FR2MatrixVTC<float>* v10 = v6->ctl.Mul(&apResult, (*apCoord)[aeFanType][aeFanSymm]);
-            FR2MatrixVTC<float>::RowT row = v10->operator[](0u);
+            FR2MatrixVTC<float>::RowT row = (*v10)[0u];
             fcurrpos = row[0u];
         }
     }
@@ -3002,7 +3002,7 @@ void BSFaceGenManager::SetFaceCoordValue(
             FanLinCtlS* v7 = &v6->LinCtrls.grp[aeFanType][aeFanSymm][aiCtrlID];
             FR2MatrixVTC<float>* v10 = v7->ctl.transpose(&apResult);
             FR2MatrixVTC<float>* m = v10->MulScalar(&v11, fdelta);
-            (*apCoord)[aeFanType][aeFanSymm].operator+=(*m);
+            (*apCoord)[aeFanType][aeFanSymm] += *m;
         }
     }
 }
@@ -3056,10 +3056,10 @@ const char* BSFaceGenModel::GetEGTFilename() {
 // Without mesh data the morph is read through a null temporary smart pointer, as the game does.
 BSFaceGenMorphData* BSFaceGenModel::GetMorph() {
     if (pMeshData) {
-        return pMeshData->spMorph.operator->();
+        return pMeshData->spMorph;
     }
     NiPointer<BSFaceGenMorphData> spNull(nullptr);
-    BSFaceGenMorphData* pMorph = spNull.operator->();
+    BSFaceGenMorphData* pMorph = spNull;
     return pMorph;
 }
 

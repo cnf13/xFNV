@@ -248,13 +248,13 @@ bool BGSCameraShot::IsStartAtTimeZero() {
 }
 
 void BGSCameraShot::FreeCamera() {
-    spLocationNode.operator=(static_cast<NiAVObject*>(nullptr));
-    spTargetNode.operator=(static_cast<NiAVObject*>(nullptr));
+    spLocationNode = static_cast<NiAVObject*>(nullptr);
+    spTargetNode = static_cast<NiAVObject*>(nullptr);
     pTargetRef = nullptr;
-    spImagespaceTarget.operator=(static_cast<NiAVObject*>(nullptr));
+    spImagespaceTarget = static_cast<NiAVObject*>(nullptr);
     bCameraTooClose = false;
     if (spCameraNode.m_pObject) {
-        spCameraNode.operator=(static_cast<NiNode*>(nullptr));
+        spCameraNode = static_cast<NiNode*>(nullptr);
         const char* v1 = GetModel();
         pModelLoader->ReleaseFile(v1);
     }
@@ -297,7 +297,7 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
     NiRefObject* a2;
     int32_t v11;
     if (GetPosFollowsTarget()) {
-        (&spLocationNode)->operator=(apLocation);
+        spLocationNode = apLocation;
     }
     else {
         if (apLocation) {
@@ -311,7 +311,7 @@ void BGSCameraShot::SetCameraLocation(NiAVObject* apLocation) {
             }
             a2 = v6;
             v11 = (-1);
-            (&spLocationNode)->operator=(v6);
+            spLocationNode = v6;
             if (pTargetRef) {
                 orientation = &(result = pTargetRef->GetOrientation());
                 v2 = (&spLocationNode)->m_pObject;
@@ -332,7 +332,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
     NiFrustum vatsFrustum;
     if (GetModelLength()) {
         const char* v3 = GetModel();
-        spCameraNode.operator=(pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, true, false, false));
+        spCameraNode = pModelLoader->LoadFile(v3, LOD_MULT_NONE, true, true, false, false);
     }
     if (spCameraNode.m_pObject) {
         NiAVObject* v4 = spCameraNode.m_pObject->GetAtChecked(0);
@@ -346,7 +346,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
             "DEFAULT: VATS Camera '%s' doesn't have an NiCamera as the first child. This camera will not be used.",
             GetModel()
         );
-        spCameraNode.operator=(static_cast<NiNode*>(nullptr));
+        spCameraNode = static_cast<NiNode*>(nullptr);
         const char* v5 = GetModel();
         pModelLoader->ReleaseFile(v5);
     }
@@ -389,7 +389,7 @@ void BGSCameraShot::InitCamera(TESObjectREFR* a1, int32_t a2) {
                 }
             }
         }
-        if ((&spCameraNode.m_pObject->GetTranslate())->operator==(NiPoint3_ZERO)) {
+        if (spCameraNode.m_pObject->GetTranslate() == NiPoint3_ZERO) {
             Warning("DEFAULT: VATS Camera '%s' doesn't have any position data.", GetModel());
         }
         vatsFrustum = pcamera->GetViewFrustum();
@@ -451,7 +451,7 @@ void BGSCameraShot::SetCameraTarget(NiAVObject* apTarget) {
     if (apTarget) {
         NiNode* i;
         if (GetRotFollowsTarget()) {
-            spTargetNode.operator=(apTarget);
+            spTargetNode = apTarget;
         }
         else {
             NiNode* v2;
@@ -462,23 +462,23 @@ void BGSCameraShot::SetCameraTarget(NiAVObject* apTarget) {
             else {
                 v2 = nullptr;
             }
-            spTargetNode.operator=(v2);
+            spTargetNode = v2;
             spTargetNode.m_pObject->SetWorldTranslate(apTarget->GetWorldTranslate());
         }
         for (i = static_cast<NiNode*>(apTarget); i && !i->IsFadeNode(); i = i->m_pkParent) {
             ;
         }
         if (i) {
-            spImagespaceTarget.operator=(i);
+            spImagespaceTarget = i;
         }
         else {
-            spImagespaceTarget.operator=(apTarget);
+            spImagespaceTarget = apTarget;
         }
         PlayerCharacter::bSnapChaseCamera = true;
     }
     else {
-        spTargetNode.operator=(static_cast<NiAVObject*>(nullptr));
-        spImagespaceTarget.operator=(static_cast<NiAVObject*>(nullptr));
+        spTargetNode = static_cast<NiAVObject*>(nullptr);
+        spImagespaceTarget = static_cast<NiAVObject*>(nullptr);
     }
 }
 
@@ -521,12 +521,12 @@ void BGSCameraShot::Update(float afTime) {
             }
             if (spLocationNode.m_pObject) {
                 bool bplayZoomSound = false;
-                if (dollyStartingPos.operator==(NiPoint3_ZERO)) {
+                if (dollyStartingPos == NiPoint3_ZERO) {
                     dollyStartingPos = chaseCameraPos;
                     bplayZoomSound = true;
                 }
                 targetPos = spLocationNode.m_pObject->GetWorldTranslate();
-                cameraPos.operator+=(targetPos);
+                cameraPos += targetPos;
                 pPlayer->UpdateChaseCamera(&cameraPos, &targetPos, false);
                 chaseCameraPos = cameraPos;
                 if (bDollyToNewPos) {

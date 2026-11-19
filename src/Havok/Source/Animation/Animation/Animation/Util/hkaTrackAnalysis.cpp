@@ -31,92 +31,92 @@ void hkaTrackAnalysis::AnalysisStats::displayReport() {
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValue = m_numTransformDOFS + m_numFloatDOFS;
-        hkOstream* v2 = &apThis.operator<<("Total DOFs ");
-        v2->operator<<(afValue);
+        hkOstream* v2 = &(apThis << "Total DOFs ");
+        *v2 << afValue;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 47);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuea = m_staticPosDOF;
-        hkOstream* v3 = &apThis.operator<<("Static position DOFs ");
-        v3->operator<<(afValuea);
+        hkOstream* v3 = &(apThis << "Static position DOFs ");
+        *v3 << afValuea;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 48);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValueb = m_staticRotDOF;
-        hkOstream* v4 = &apThis.operator<<("Static rotation DOFs ");
-        v4->operator<<(afValueb);
+        hkOstream* v4 = &(apThis << "Static rotation DOFs ");
+        *v4 << afValueb;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 49);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuec = m_staticSclDOF;
-        hkOstream* v5 = &apThis.operator<<("Static scale DOFs ");
-        v5->operator<<(afValuec);
+        hkOstream* v5 = &(apThis << "Static scale DOFs ");
+        *v5 << afValuec;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 50);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValued = m_staticFloatDOF;
-        hkOstream* v6 = &apThis.operator<<("Static float DOFs ");
-        v6->operator<<(afValued);
+        hkOstream* v6 = &(apThis << "Static float DOFs ");
+        *v6 << afValued;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 51);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuee = m_clearPosDOF;
-        hkOstream* v7 = &apThis.operator<<("Clear position DOFs ");
-        v7->operator<<(afValuee);
+        hkOstream* v7 = &(apThis << "Clear position DOFs ");
+        *v7 << afValuee;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 52);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuef = m_clearRotDOF;
-        hkOstream* v8 = &apThis.operator<<("Clear rotation DOFs ");
-        v8->operator<<(afValuef);
+        hkOstream* v8 = &(apThis << "Clear rotation DOFs ");
+        *v8 << afValuef;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 53);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValueg = m_clearSclDOF;
-        hkOstream* v9 = &apThis.operator<<("Clear scale DOFs ");
-        v9->operator<<(afValueg);
+        hkOstream* v9 = &(apThis << "Clear scale DOFs ");
+        *v9 << afValueg;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 54);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValueh = m_dynamicPosDOF;
-        hkOstream* v10 = &apThis.operator<<("Dynamic position DOFs ");
-        v10->operator<<(afValueh);
+        hkOstream* v10 = &(apThis << "Dynamic position DOFs ");
+        *v10 << afValueh;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 55);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuei = m_dynamicRotDOF;
-        hkOstream* v11 = &apThis.operator<<("Dynamic rotation DOFs ");
-        v11->operator<<(afValuei);
+        hkOstream* v11 = &(apThis << "Dynamic rotation DOFs ");
+        *v11 << afValuei;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 56);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuej = m_dynamicSclDOF;
-        hkOstream* v12 = &apThis.operator<<("Dynamic scale DOFs ");
-        v12->operator<<(afValuej);
+        hkOstream* v12 = &(apThis << "Dynamic scale DOFs ");
+        *v12 << afValuej;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 57);
     }
     {
         hkErrStream apThis(buf, 512);
         uint32_t afValuek = m_dynamicFloatDOF;
-        hkOstream* v13 = &apThis.operator<<("Dynamic float DOFs ");
-        v13->operator<<(afValuek);
+        hkOstream* v13 = &(apThis << "Dynamic float DOFs ");
+        *v13 << afValuek;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 58);
     }
     {
         hkErrStream apThis(buf, 512);
         float afValuel = m_ratio;
-        hkOstream* v14 = &apThis.operator<<("Redundancy ");
-        v14->operator<<(afValuel);
+        hkOstream* v14 = &(apThis << "Redundancy ");
+        *v14 << afValuel;
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\Animation\\Util\\hkaTrackAnalysis.cpp", 59);
     }
     hkError::s_instance->sectionEnd();

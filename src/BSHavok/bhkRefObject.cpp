@@ -95,7 +95,7 @@ void bhkRefObject::Link(bool abAttach) {
 }
 
 int32_t bhkRefObject::GetMotionType() {
-    hkpRigidBody* v3 = static_cast<hkpRigidBody*>(this->operator*());
+    hkpRigidBody* v3 = static_cast<hkpRigidBody*>(**this);
     if (v3) {
         return (int32_t)v3->getMotionType();
     }
@@ -109,7 +109,7 @@ void* bhkRefObject::GetLinearVelocityNi(NiPoint3* apVelocity) {
 }
 
 void bhkRefObject::SetMass(float a2) {
-    hkpRigidBody* pBody = static_cast<bhkRigidBody*>(this)->operator*();
+    hkpRigidBody* pBody = **static_cast<bhkRigidBody*>(this);
     if (pBody) {
         pBody->setMass(a2);
     }

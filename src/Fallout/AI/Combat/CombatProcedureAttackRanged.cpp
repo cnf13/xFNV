@@ -217,7 +217,7 @@ void CombatProcedureAttackRanged::Update() {
             float* v11 = &fCombatFiringArcStationaryTurnMult.Float();
             ffiringArc = ffiringArc * *v11;
         }
-        if (TargetedPoint.operator!=(NiPoint3_ZERO) &&
+        if (TargetedPoint != NiPoint3_ZERO &&
             CombatUtilities::IsTargetWithinFiringArc(pattacker, TargetedPoint, ffiringArc, 3.4028235e+38f)) {
             pCombatController->SetIgnoreLookAtTarget(4);
         }
@@ -230,8 +230,7 @@ void CombatProcedureAttackRanged::Update() {
             (!pcombatState->bTargetSpaceDifferent &&
              ((pcombatState->GetHasTarget360LineOfSight() ||
                (pcombatState->GetHasBuffered360LineOfSight() && pcombatState->GetHasBufferedDetection())) &&
-              (TargetedPoint.operator!=(NiPoint3_ZERO) ||
-               pcombatState->GetLastSeenTargetFiringLocation(TargetedPoint))))) {
+              (TargetedPoint != NiPoint3_ZERO || pcombatState->GetLastSeenTargetFiringLocation(TargetedPoint))))) {
             SetLookAtTarget(TargetedPoint, 2);
         }
         else {
@@ -239,10 +238,10 @@ void CombatProcedureAttackRanged::Update() {
         }
         return;
     }
-    if (TargetedPoint.operator==(NiPoint3_ZERO)) {
+    if (TargetedPoint == NiPoint3_ZERO) {
         TargetedPoint = targetPoint;
     }
-    if (TargetedPoint.operator!=(NiPoint3_ZERO)) {
+    if (TargetedPoint != NiPoint3_ZERO) {
         SetLookAtTarget(TargetedPoint, 4);
     }
     if (this->eState != CombatProcedureAttackRanged::ATTACK_STATE_COOLDOWN && (AimAtTarget() || btooCloseToTarget) &&
@@ -506,7 +505,7 @@ void CombatProcedureAttackRanged::DisplayDebugText(
         );
     }
     TESObjectWEAP* pweapon = pCombatController->GetCurrentWeapon();
-    if ((TargetedPoint.operator!=(NiPoint3_ZERO)) && (pweapon) && (pweapon->GetAimArc() > 0.0)) {
+    if ((TargetedPoint != NiPoint3_ZERO) && (pweapon) && (pweapon->GetAimArc() > 0.0)) {
         NiPoint3 rot = CombatUtilities::GetAngleToProjectedPoint(pattacker, TargetedPoint);
         float fheading = pattacker->GetActualHeading();
         rot.z = ClampAngle(rot.z);

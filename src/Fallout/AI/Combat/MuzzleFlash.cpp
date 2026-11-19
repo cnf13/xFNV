@@ -162,7 +162,7 @@ void MuzzleFlash::DetachLight() {
         v2 = (&spLight)->m_pObject;
         shadowSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
         shadowSceneNode->RemoveLight(v2);
-        (&spLight)->operator=(nullptr);
+        spLight = nullptr;
     }
 }
 
@@ -172,7 +172,7 @@ void MuzzleFlash::Init(TESObjectREFR* apParentRef) {
         const char* v2 = pModel->GetModel();
         NiNode* pObject = pModelLoader->LoadFile(v2, LOD_MULT_NONE, true, false, false, false);
         if (pObject) {
-            spAVObject.operator=(static_cast<NiAVObject*>(pObject->Clone()));
+            spAVObject = static_cast<NiAVObject*>(pObject->Clone());
         }
     }
 
@@ -228,7 +228,7 @@ void MuzzleFlash::Position3D(TESObjectREFR* apParentRef) {
                     kplayerInvTransform.m_fScale = 1.0 / (&psceneParent->GetWorldTransform())->m_fScale;
                     kplayerInvTransform.m_Translate = -(&psceneParent->GetWorldTransform())->m_Translate;
                     kplayerInvTransform.m_Translate = kplayerInvTransform.m_Rotate * kplayerInvTransform.m_Translate;
-                    kplayerInvTransform.m_Translate.operator*=(kplayerInvTransform.m_fScale);
+                    kplayerInvTransform.m_Translate *= kplayerInvTransform.m_fScale;
                 }
                 ktrans = *::new (&kDest) NiTransform(kplayerInvTransform * pprojectileNode->GetWorldTransform());
                 bupdate = true;
@@ -300,7 +300,7 @@ void MuzzleFlash::AttachLight() {
     if ((spAVObject.m_pObject) && (pProjectile->Data.pMuzzleFlashLight)) {
         NiAVObject* v2 = spAVObject.m_pObject;
         TESObjectLIGH* FormOne = pProjectile->Data.pMuzzleFlashLight;
-        spLight.operator=(FormOne->GenDynamic(nullptr, v2, true));
+        spLight = FormOne->GenDynamic(nullptr, v2, true);
     }
 }
 

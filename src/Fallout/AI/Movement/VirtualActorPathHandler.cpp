@@ -39,7 +39,7 @@ VirtualActorPathHandler::~VirtualActorPathHandler() {
 ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::Init(float afPercentTraveled, float afDeltaT) {
     iCurrentNodeIndex = static_cast<int64_t>(afPercentTraveled);
     fDistanceTraveled = 0.0;
-    PathingSolution* v3 = spPath.operator->();
+    PathingSolution* v3 = spPath;
     fPathLength = v3->ComputeVirtualPathLength();
     if (afPercentTraveled == 0.0) {
         return Update(afDeltaT);
@@ -153,10 +153,10 @@ ActorPathHandler::PATH_HANDLER_RESULT VirtualActorPathHandler::UpdateWhilePlayer
 }
 
 float VirtualActorPathHandler::GetPercentTraveled() {
-    if (!(&spPath)->operator->()) {
+    if (!spPath) {
         return 0.0;
     }
-    PathingSolution* v2 = (&spPath)->operator->();
+    PathingSolution* v2 = spPath;
     if ((iCurrentNodeIndex >= v2->GetVirtualNodeCount()) || (fPathLength <= 0.0)) {
         return 1.0;
     }
@@ -181,14 +181,14 @@ NiPoint3 VirtualActorPathHandler::GetNextNodeLocation() {
 
 bool VirtualActorPathHandler::GetNodeLocation(uint32_t aiIndex, NiPoint3& arLocation) {
     NiPoint3 result;
-    if (!spPath.operator->()) {
+    if (!spPath) {
         return false;
     }
-    PathingSolution* v3 = spPath.operator->();
+    PathingSolution* v3 = spPath;
     if (aiIndex >= v3->GetVirtualNodeCount()) {
         return false;
     }
-    PathingSolution* v4 = spPath.operator->();
+    PathingSolution* v4 = spPath;
     VirtualPathingNode* VirtualNode = v4->GetVirtualNode(aiIndex);
     PathingLocation* ActorPackageThatIsRunning = static_cast<PathingLocation*>(&VirtualNode->GetLocation());
     arLocation = (result = ActorPackageThatIsRunning->GetLocation());
@@ -239,8 +239,8 @@ void VirtualActorPathHandler::PrintCurrentStatus(
 }
 
 void VirtualActorPathHandler::ClearMovement() {
-    (&spPath)->operator=(nullptr);
-    (&spRequest)->operator=(nullptr);
+    spPath = nullptr;
+    spRequest = nullptr;
     iCurrentNodeIndex = 0;
 }
 

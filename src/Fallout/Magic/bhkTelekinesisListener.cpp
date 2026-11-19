@@ -85,7 +85,7 @@ void bhkTelekinesisListener::Remove(bhkTelekinesisListener* apListener, hkpEntit
 }
 
 void bhkTelekinesisListener::AllowToFinish(bhkRigidBody* apBody) {
-    hkpRigidBody* a2 = apBody->operator*();
+    hkpRigidBody* a2 = **apBody;
     int32_t i_2 = 0;
     for (hkpEntity::ExtendedListeners* i = a2->getExtendedListeners(); i_2 < i->m_activationListeners.m_size;
          i = a2->getExtendedListeners()) {

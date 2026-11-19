@@ -530,9 +530,9 @@ NiAVObject* TESBoundObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
             alignas(NiPointer<Model>) uint8_t aScaledModelStorage[sizeof(NiPointer<Model>)];
             NiPointer<Model>& spScaledModel = *::new (aScaledModelStorage) NiPointer<Model>(nullptr);
             pModelLoader->FindModel(cScaledPath, spScaledModel);
-            if (spScaledModel.operator->()) {
-                if (spScaledModel.operator->()->GetModel()) {
-                    double dLocalScale = spScaledModel.operator->()->GetModel()->GetScale();
+            if (spScaledModel) {
+                if (spScaledModel->GetModel()) {
+                    double dLocalScale = spScaledModel->GetModel()->GetScale();
                     if (dLocalScale == pRequester->GetScale()) {
                         NiAVObject* pResult = Clone3D(pRequester, deepCopy);
                         NiPointer<Model>::Destroy(&spScaledModel);
@@ -546,7 +546,7 @@ NiAVObject* TESBoundObject::Clone3D(TESObjectREFR* pRequester, bool deepCopy) {
                 Model* pScaledModel =
                     pMemory ? ::new (pMemory) Model(cScaledPath, static_cast<NiNode*>(pNode)) : nullptr;
                 spScaledModel = pScaledModel;
-                spScaledModel.operator->()->IncManualRefCount();
+                spScaledModel->IncManualRefCount();
                 if (pModelLoader->AddModel(cScaledPath, spScaledModel.operator->())) {
                     ++iNumScaledModelsAdded;
                 }
@@ -734,12 +734,12 @@ TESObject* TESObjectList::lnk_GetPrev(TESObject* lpNode) {
 
 void BSBound::GetBoundMin(NiPoint3& arPoint) {
     NiPoint3 v2;
-    arPoint = *&(v2 = (&Center)->operator-(Extents));
+    arPoint = *&(v2 = Center - Extents);
 }
 
 void BSBound::GetBoundMax(NiPoint3& arPoint) {
     NiPoint3 v2;
-    arPoint = *&(v2 = (&Center)->operator+(Extents));
+    arPoint = *&(v2 = Center + Extents);
 }
 
 const NiFixedString& BSBound::Tag() {

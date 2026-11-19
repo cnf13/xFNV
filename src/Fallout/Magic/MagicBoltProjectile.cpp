@@ -285,7 +285,7 @@ void MagicBoltProjectile::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags) {
             if (pav) {
                 NiFixedString apString("Bip01 Spine2");
                 NiFixedString* v7 = &apString;
-                spTarget.operator=(pav->GetObjectByName(*v7));
+                spTarget = pav->GetObjectByName(*v7);
             }
         }
     }
@@ -622,10 +622,10 @@ void MagicBoltProjectile::Update(float afDelta) {
                         else {
                             pAreaBolts = pbranch->pNext;
                         }
-                        pbranch->spBoltNode.operator=(static_cast<NiNode*>(nullptr));
-                        pbranch->spBoltProperty.operator=(static_cast<BoltShaderProperty*>(nullptr));
-                        pbranch->spSource.operator=(static_cast<NiAVObject*>(nullptr));
-                        pbranch->spTarget.operator=(static_cast<NiAVObject*>(nullptr));
+                        pbranch->spBoltNode = static_cast<NiNode*>(nullptr);
+                        pbranch->spBoltProperty = static_cast<BoltShaderProperty*>(nullptr);
+                        pbranch->spSource = static_cast<NiAVObject*>(nullptr);
+                        pbranch->spTarget = static_cast<NiAVObject*>(nullptr);
                         MagicBoltProjectile::AreaBolt* v30 = pbranch;
                         MagicBoltProjectile::AreaBolt* pbranch_2 = pbranch;
                         if (pbranch) {
@@ -775,7 +775,7 @@ void MagicBoltProjectile::Collide(
             if (pav_2) {
                 NiFixedString apString("Bip01 Spine2");
                 NiFixedString* v22 = &apString;
-                spTarget.operator=(pav_2->GetObjectByName(*v22));
+                spTarget = pav_2->GetObjectByName(*v22);
             }
         }
 
@@ -909,10 +909,10 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
             else {
                 pnewBolt = nullptr;
             }
-            pnewBolt->spBoltProperty.operator=(pprop);
-            pnewBolt->spBoltNode.operator=(pnode);
-            pnewBolt->spSource.operator=(psource);
-            pnewBolt->spTarget.operator=(ptarget);
+            pnewBolt->spBoltProperty = pprop;
+            pnewBolt->spBoltNode = pnode;
+            pnewBolt->spSource = psource;
+            pnewBolt->spTarget = ptarget;
             pnewBolt->SourceLoc = location;
             pnewBolt->pNext = pAreaBolts;
             UpdateBranch(0.0f, pnewBolt);
@@ -1012,7 +1012,7 @@ void MagicBoltProjectile::Init3D() {
         v22 = nullptr;
     }
     NiRefObject* v31 = (NiRefObject*)v22;
-    spSoundNode.operator=(v22);
+    spSoundNode = v22;
     const NiPoint3* v1 = &GetLocationOnReference();
     spSoundNode.m_pObject->SetWorldTranslate(*v1);
     NiNode* v28 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
@@ -1023,7 +1023,7 @@ void MagicBoltProjectile::Init3D() {
         v21 = nullptr;
     }
     NiRefObject* v29 = (NiRefObject*)v21;
-    spBoltNode.operator=(v21);
+    spBoltNode = v21;
     const NiPoint3* v2 = &GetLocationOnReference();
     spBoltNode.m_pObject->SetTranslate(*v2);
     const NiFixedString* v3 = &BSXFlags::Tag();
@@ -1042,11 +1042,11 @@ void MagicBoltProjectile::Init3D() {
         spBoltNode.m_pObject->AddExtraData(*v4, pextra_2);
     }
     pextra->SetFlags(1u, true);
-    spBoltProperty.operator=(static_cast<BoltShaderProperty*>(nullptr));
+    spBoltProperty = static_cast<BoltShaderProperty*>(nullptr);
     NiPoint3 v33 = GetAngleOnReference();
     rot.FromEulerAnglesZXY(v33.z, v33.x, v33.y);
     spBoltNode.m_pObject->SetRotate(rot);
-    spBoltProperty.operator=(BoltShader::Start(spBoltNode.m_pObject, true));
+    spBoltProperty = BoltShader::Start(spBoltNode.m_pObject, true);
     if (spBoltProperty.m_pObject) {
         spBoltProperty.m_pObject->SetAbsorbNumBolts(iShockNumBolts.Int());
         float* v5 = &fShockBoltsRadius.Float();

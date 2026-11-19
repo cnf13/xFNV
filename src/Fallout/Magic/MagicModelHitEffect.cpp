@@ -145,7 +145,7 @@ uint16_t MagicModelHitEffect::GetSaveSize(ActiveEffect* apEffect, TESObjectREFR*
     uint16_t usSize = 0;
     usSize += MagicHitEffect::GetSaveSize(apEffect, apTarget);
     usSize += 2;
-    if (spObject.operator->()) {
+    if (spObject) {
         NiTimeController* pControllers = spObject->GetControllers();
         NiControllerManager* pManager =
             static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pControllers));
@@ -171,8 +171,8 @@ void MagicModelHitEffect::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     MagicHitEffect::SaveGame(apSaveGameBuffer);
     apSaveGameBuffer->SaveString(pFilename, 0);
     NiControllerManager* pManager = nullptr;
-    if (spObject.operator->()) {
-        NiTimeController* pControllers = spObject.operator->()->GetControllers();
+    if (spObject) {
+        NiTimeController* pControllers = spObject->GetControllers();
         pManager =
             static_cast<NiControllerManager*>(NiObject::DynamicCastStatic(&NiControllerManager::ms_RTTI, pControllers));
     }
@@ -408,7 +408,7 @@ bool MagicModelHitEffect::Init() {
             }
         }
     }
-    spObject.operator=(static_cast<NiNode*>(MagicProjectile::Clone3D(pFilename)));
+    spObject = static_cast<NiNode*>(MagicProjectile::Clone3D(pFilename));
     pModelLoader->ReleaseModel(pFilename, false, 1u);
     if (!spObject.m_pObject) {
         return false;
@@ -473,7 +473,7 @@ void MagicModelHitEffect::UpdatePosition() {
                     else {
                         paccum = nullptr;
                     }
-                    if ((paccum) && ((&paccum->GetTranslate())->operator!=(NiPoint3_ZERO))) {
+                    if ((paccum) && (paccum->GetTranslate() != NiPoint3_ZERO)) {
                         buseShift = false;
                     }
                 }

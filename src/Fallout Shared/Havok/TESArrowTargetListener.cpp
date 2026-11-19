@@ -30,7 +30,7 @@ void TESArrowTargetListener::entityRemovedCallback(hkpEntity* apEntity) {
     bhkRigidBody* pb = static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pe));
     if ((pb) && (pb->GetFlag(bhkWorldObject::STICKING_TARGET))) {
         NiAVObject* pav;
-        bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(pb->operator*());
+        bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(**pb);
         if (pcol) {
             pav = pcol->m_pkSceneObject;
         }
@@ -64,7 +64,7 @@ void TESArrowTargetListener::entityDeletedCallback(hkpEntity* apEntity) {
     bhkRigidBody* pb = static_cast<bhkRigidBody*>(NiObject::DynamicCastStatic(&bhkRigidBody::ms_RTTI, pe));
     if ((pb) && (pb->GetFlag(bhkWorldObject::STICKING_TARGET))) {
         NiAVObject* pav;
-        bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(pb->operator*());
+        bhkCollisionObject* pcol = bhkCollisionObject::Getbhk(**pb);
         if (pcol) {
             pav = pcol->m_pkSceneObject;
         }
@@ -151,8 +151,8 @@ void TESArrowTargetListener::AddArrowTarget(hkVector4& aArrowCenterOfMassWorld, 
     kInvMass.~hkSimdReal();
     ::new (&kInvMass) hkSimdReal(fInvMass);
     kNewCenter.mul4(kInvMass);
-    pBody->operator*()->setCenterOfMassLocal(kNewCenter);
-    pBody->operator*()->activate();
+    (**pBody)->setCenterOfMassLocal(kNewCenter);
+    (**pBody)->activate();
     pGroup->fTotalMass = fTotalMass + fArrowFakeMass.Float();
     pGroup->iArrowCount = pGroup->iArrowCount + 1;
 }
@@ -211,7 +211,7 @@ void TESArrowTargetListener::RemoveArrowTarget(hkVector4& aArrowCenterOfMassWorl
     kInvMass.~hkSimdReal();
     ::new (&kInvMass) hkSimdReal(fInvMass);
     kNewCenter.mul4(kInvMass);
-    pBody->operator*()->setCenterOfMassLocal(kNewCenter);
+    (**pBody)->setCenterOfMassLocal(kNewCenter);
     alignas(16) hkVector4 kPush;
     kPush.~hkVector4();
     ::new (&kPush) hkVector4;

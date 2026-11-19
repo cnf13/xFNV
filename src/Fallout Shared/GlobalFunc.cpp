@@ -557,7 +557,7 @@ bool FixNormals(
     // Gets the source's transform before the destination's.
     const NiTransform& rSourceWorld = apSource->GetWorldTransform();
     NiMatrix3 kDestInverse;
-    *pMatrix = apDest->GetWorldTransform().m_Rotate.Inverse(&kDestInverse)->operator*(rSourceWorld.m_Rotate);
+    *pMatrix = *apDest->GetWorldTransform().m_Rotate.Inverse(&kDestInverse) * rSourceWorld.m_Rotate;
     for (uint32_t i = 0; i < uiDestCount; ++i) {
         uint32_t uiNearest = uiSourceCount;
         // A negative or NaN tolerance means any distance.
@@ -1238,7 +1238,7 @@ bool SwapPlatformLanguageTextures(NiAVObject* ap3D) {
                     NiPointer<NiSourceTexture>* pspTexture =
                         ::new (aTextureStorage) NiPointer<NiSourceTexture>(nullptr);
                     TES::pInstance->CreateTextureImage(acPath, *pspTexture, false, false);
-                    if (pspTexture->operator->()) {
+                    if (*pspTexture) {
                         pShaderProperty->SetTexture(eType, i, pspTexture->operator->());
                         bSwapped = true;
                     }
@@ -2259,7 +2259,7 @@ void TintScenegraph(NiAVObject* apRoot, NiColor& aColor, void* apTextureEffectDa
         else {
             v11 = nullptr;
         }
-        spdata.operator=(v11);
+        spdata = v11;
         apTextureEffectData = (void*)spdata.m_pObject;
         NiColorA v15(aColor.r, aColor.g, aColor.b, 0.5f);
         NiColorA* v3 = &v15;
@@ -2611,7 +2611,7 @@ hkMouseSpringActionCinfo::hkMouseSpringActionCinfo()
 // The mass is rounded to a float local and returned from there.
 float bhkRigidBody::GetMass() {
     float fMass;
-    hkpRigidBody* v4 = operator*();
+    hkpRigidBody* v4 = **this;
     if (v4) {
         fMass = v4->getMass();
     }

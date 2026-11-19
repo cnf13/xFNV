@@ -146,7 +146,7 @@ void LightEffect::DetachLight() {
         if (TargetAsActor) {
             TargetAsActor->KillLight(true);
         }
-        spPointLight.operator=(static_cast<NiPointLight*>(nullptr));
+        spPointLight = static_cast<NiPointLight*>(nullptr);
         if (--LightEffect::iLightCount < 0) {
             LightEffect::iLightCount = 0;
         }
@@ -176,12 +176,12 @@ void LightEffect::AttachLight() {
                 else {
                     v16 = nullptr;
                 }
-                spPointLight.operator=(v16);
+                spPointLight = v16;
                 uint32_t ucolor = plight->GetColor();
                 float b = static_cast<float>(static_cast<uint8_t>(ucolor >> 16));
                 float g = static_cast<float>(static_cast<uint8_t>(ucolor >> 8));
                 NiColor color(static_cast<float>(static_cast<uint8_t>(ucolor)), g, b);
-                color.operator/=(255.0f);
+                color /= 255.0f;
                 spPointLight.m_pObject->SetDiffuseColor(color);
                 float* v2 = &fMagicLightRadiusBase.Float();
                 double v15 = fMagnitude + *v2;

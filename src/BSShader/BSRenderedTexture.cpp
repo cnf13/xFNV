@@ -74,7 +74,7 @@ NiRenderTargetGroup* BSRenderedTexture::GetGroup() {
 void BSRenderedTexture::ClearRenderedTextures() {
     int32_t i;
     for (i = 0; i < 4; ++i) {
-        (&spTexture[i])->operator=(nullptr);
+        spTexture[i] = nullptr;
     }
 }
 

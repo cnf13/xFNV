@@ -285,7 +285,7 @@ bool BSTempEffectSimpleDecal::ProcessGeometry(NiAVObject* apAVObj) {
             }
             ResizeDataArrays();
             NiTriShapeData* data = CreateTriData();
-            sp3D.operator=(static_cast<NiAVObject*>(NiTriShape::Create(data)));
+            sp3D = static_cast<NiAVObject*>(NiTriShape::Create(data));
             if (sp3D.m_pObject) {
                 pFinalVertexArray = nullptr;
                 pFinalNormalArray = nullptr;
@@ -771,7 +771,7 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
         BSStream stream;
         if (stream.BSStream::Load("Data\\Meshes\\Decals\\DebugDecalBox.NIF", nullptr)) {
             if (stream.GetObjectCount() == 1) {
-                BGSDecalManager::spDebugDecalBox.operator=(static_cast<NiAVObject*>(stream.GetObjectAt(0)));
+                BGSDecalManager::spDebugDecalBox = static_cast<NiAVObject*>(stream.GetObjectAt(0));
             }
             NiFixedString apString("Debug Decal Box");
             NiFixedString* kName = &apString;
@@ -810,7 +810,7 @@ void BSTempEffectSimpleDecal::CreateDebugBox(NiColorA& arColor, bool abWireframe
             pDecalNormal.z = 0.0f;
         }
         NiPoint3 decalnormal = pDecalNormal;
-        if (decalnormal.operator==(NiPoint3_ZERO)) {
+        if (decalnormal == NiPoint3_ZERO) {
             decalnormal = pVector;
             if (bModelSpace) {
                 kobjrot = (*&spTargetNode.m_pObject->m_kLocal).m_Rotate;
@@ -1043,7 +1043,7 @@ int32_t BSTempEffectSimpleDecal::ClipPolygonAgainstPlane(
             if (!v67[v62]) {
                 v60 = apInVertex[v62];
                 pt = apInVertex[j];
-                (v61 = (&v60)->operator-(pt));
+                (v61 = v60 - pt);
                 v9 = apPlane;
                 v55.x = v9->m_kNormal.x;
                 v55.y = v9->m_kNormal.y;
@@ -1074,17 +1074,17 @@ int32_t BSTempEffectSimpleDecal::ClipPolygonAgainstPlane(
                     fScalar = (float)0.0;
                 }
                 apOutIndex[result] = (-1);
-                fScalar_4 = &(v46 = (&pt)->operator*(fScalar));
+                fScalar_4 = &(v46 = pt * fScalar);
                 v32 = (float)(1.0 - fScalar);
-                v10 = &(v47 = (&v60)->operator*(v32));
-                v11 = &(v45 = v10->operator+(*fScalar_4));
+                v10 = &(v47 = v60 * v32);
+                v11 = &(v45 = *v10 + *fScalar_4);
                 apOutVertex[result] = *v11;
                 v59 = apInNormal[v62];
                 v57 = apInNormal[j];
-                fScalar_4a = &(v43 = (&v59)->operator*(fScalar));
+                fScalar_4a = &(v43 = v59 * fScalar);
                 v31 = (float)(1.0 - fScalar);
-                v12 = &(v44 = (&v57)->operator*(v31));
-                v13 = &(v42 = v12->operator+(*fScalar_4a));
+                v12 = &(v44 = v57 * v31);
+                v13 = &(v42 = *v12 + *fScalar_4a);
                 apOutNormal[result++] = *v13;
             }
         }
@@ -1092,7 +1092,7 @@ int32_t BSTempEffectSimpleDecal::ClipPolygonAgainstPlane(
             if (v67[v62]) {
                 v53 = apInVertex[j];
                 v51 = apInVertex[v62];
-                (v54 = (&v53)->operator-(v51));
+                (v54 = v53 - v51);
                 v14 = apPlane;
                 v48.x = v14->m_kNormal.x;
                 v48.y = v14->m_kNormal.y;
@@ -1119,17 +1119,17 @@ int32_t BSTempEffectSimpleDecal::ClipPolygonAgainstPlane(
                     v49 = (float)0.0;
                 }
                 apOutIndex[result] = (-1);
-                fScalar_4b = &(v40 = (&v51)->operator*(v49));
+                fScalar_4b = &(v40 = v51 * v49);
                 v28 = (float)(1.0 - v49);
-                v15 = &(v41 = (&v53)->operator*(v28));
-                v16 = &(v39 = v15->operator+(*fScalar_4b));
+                v15 = &(v41 = v53 * v28);
+                v16 = &(v39 = *v15 + *fScalar_4b);
                 apOutVertex[result] = *v16;
                 v52 = apInNormal[j];
                 v50 = apInNormal[v62];
-                fScalar_4c = &(v37 = (&v52)->operator*(v49));
+                fScalar_4c = &(v37 = v52 * v49);
                 v27 = (float)(1.0 - v49);
-                v17 = &(v38 = (&v50)->operator*(v27));
-                v18 = &(v36 = v17->operator+(*fScalar_4c));
+                v17 = &(v38 = v50 * v27);
+                v18 = &(v36 = *v17 + *fScalar_4c);
                 apOutNormal[result++] = *v18;
             }
             apOutIndex[result] = apInIndex[j];
@@ -1163,12 +1163,12 @@ void BSTempEffectSimpleDecal::PreloadDecalData() {
         else {
             v0 = nullptr;
         }
-        BSTempEffectSimpleDecal::spPreloadedDecalTextureSets.operator=(v0);
+        BSTempEffectSimpleDecal::spPreloadedDecalTextureSets = v0;
     }
 }
 
 void BSTempEffectSimpleDecal::UnloadDecalData() {
-    BSTempEffectSimpleDecal::spPreloadedDecalTextureSets.operator=(static_cast<QueuedFile*>(nullptr));
+    BSTempEffectSimpleDecal::spPreloadedDecalTextureSets = static_cast<QueuedFile*>(nullptr);
 }
 
 void NiAVObject::DetachAllProperties() {

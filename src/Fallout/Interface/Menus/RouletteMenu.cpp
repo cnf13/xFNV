@@ -1033,7 +1033,7 @@ void RouletteMenu::Prepare3DElements() {
         pBetShadowGeometry[i] = static_cast<NiAVObject*>(pBetShadowGeometry[0]->Clone());
     }
     NiNode* pTableNode = static_cast<NiNode*>(pRouletteTableGeometry);
-    RouletteMenu::sp3DCamera.operator=(static_cast<NiCamera*>(BSUtilities::GetObjectByName(pTableNode, "object4")));
+    RouletteMenu::sp3DCamera = static_cast<NiCamera*>(BSUtilities::GetObjectByName(pTableNode, "object4"));
     void* apMemory = NiMemObject::operator new(sizeof(NiNode));
     if (apMemory) {
         v17 = ::new (apMemory) NiNode(0);
@@ -1042,7 +1042,7 @@ void RouletteMenu::Prepare3DElements() {
         v17 = nullptr;
     }
     NiRefObject* v26 = (NiRefObject*)v17;
-    RouletteMenu::spModel.operator=(v17);
+    RouletteMenu::spModel = v17;
     NiNode* v16 = RouletteMenu::spModel.m_pObject;
     v16->AttachChild(pRouletteTableGeometry, 1);
     NiNode* v15 = RouletteMenu::spModel.m_pObject;
@@ -1072,7 +1072,7 @@ void RouletteMenu::Prepare3DElements() {
         NiTimeController::StartAnimations(pRouletteTableGeometry);
     }
     if (!RouletteMenu::sp3DCamera.m_pObject) {
-        RouletteMenu::sp3DCamera.operator=(Create3DCamera());
+        RouletteMenu::sp3DCamera = Create3DCamera();
     }
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     ShadowSceneNode_->AttachChild(RouletteMenu::spModel.m_pObject, 1);
@@ -1852,7 +1852,7 @@ void RouletteMenu::DrawScene() {
     BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
     BSShaderUtil::RenderScene(v6, v3, false);
     a1->SetAccumulator(nullptr);
-    apMemory.operator=(static_cast<NiRefObject*>(nullptr));
+    apMemory = static_cast<NiRefObject*>(nullptr);
     a1->PopCullMode();
 }
 

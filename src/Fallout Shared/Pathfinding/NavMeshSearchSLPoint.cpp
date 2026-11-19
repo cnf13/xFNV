@@ -28,12 +28,12 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
     NiPoint3 targetLoc = TargetLocation.GetLocation();
     NiPoint3 nodeToTargetVec = targetLoc;
     pmesh->GetCircumCenter2D(itriIndex, circumCenter);
-    nodeToTargetVec.operator-=(circumCenter);
+    nodeToTargetVec -= circumCenter;
     float fdistanceSqr = nodeToTargetVec.SqrXYLength();
     NavMeshTriangle* Triangle = pmesh->GetTriangle(itriIndex);
     uint16_t Vert = Triangle->GetVert(0);
     NiPoint3 circumCenterToVert0Vec = pmesh->GetVertex(Vert)->Location;
-    circumCenterToVert0Vec.operator-=(circumCenter);
+    circumCenterToVert0Vec -= circumCenter;
     float ftriangleRadius = circumCenterToVert0Vec.Length();
     float fradii = fMaxValidRadius + ftriangleRadius;
     float fradiiSqr = fradii * fradii;
@@ -53,12 +53,12 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
             const NavMeshVertex* apVerts[3];
             pmesh->GetTriangleVertices(itriIndex, apVerts[0], apVerts[1], apVerts[2]);
             NiPoint3 targetToVertVec = apVerts[0]->Location;
-            targetToVertVec.operator-=(targetLoc);
+            targetToVertVec -= targetLoc;
             float fmaxDotLen = targetToVertVec.Dot(RightUnitVector);
             float fminDotLen = fmaxDotLen;
             for (int32_t j = 1; j < 3; ++j) {
                 targetToVertVec = apVerts[j]->Location;
-                targetToVertVec.operator-=(targetLoc);
+                targetToVertVec -= targetLoc;
                 float fdotLen = targetToVertVec.Dot(RightUnitVector);
                 if (!(fmaxDotLen < static_cast<double>(fdotLen))) {
                     if (fminDotLen > static_cast<double>(fdotLen)) {
@@ -72,7 +72,7 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
             NiPoint3 translatedStartTestPoint = TestStartPoint + RightUnitVector * fminDotLen;
             NiPoint3 translatedEndTestPoint = TestStartPoint + RightUnitVector * fmaxDotLen;
             NiPoint3 translatedTestVec = translatedEndTestPoint;
-            translatedTestVec.operator-=(translatedStartTestPoint);
+            translatedTestVec -= translatedStartTestPoint;
             float fvecLen = translatedTestVec.UnitizeGetLength();
             float fsamples = fvecLen / fActorRadius;
             float fcount = std::ceilf(fsamples);
@@ -82,7 +82,7 @@ bool NavMeshSearchSLPoint::IsGoalNode(const AStarNode<NavMeshSearchNode, NavMesh
             NiPoint3 testPoint;
             for (int32_t i = 0; i < icount; ++i) {
                 testPoint = translatedTestVec * fsamplePoint;
-                testPoint.operator+=(translatedStartTestPoint);
+                testPoint += translatedStartTestPoint;
                 if (CheckPointOnGoalCircle(testPoint, targetLoc, pmesh, validPoint)) {
                     GoalLocation = validPoint;
                     return true;
@@ -126,7 +126,7 @@ bool NavMeshSearchSLPoint::BuildPathToSafeStraightLine(
     BSSimpleArray<NavMeshSearchLink, 1024>* apLinks
 ) {
     PathingLocation* LocalTransform = (&apRequest->GetDestination());
-    TargetLocation.operator=(*LocalTransform);
+    TargetLocation = *LocalTransform;
     fTargetRadius = apRequest->GetTargetRadius();
     double LastFadePercent = apRequest->GetMaxDistance();
     fMaxValidRadius = apRequest->GetTargetRadius() + LastFadePercent;
@@ -153,12 +153,12 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
     NiPoint3 arLocatiom;
     NiPoint3 pt;
     NiPoint3 v47 = aCheck;
-    v47.operator-=(aTarget);
+    v47 -= aTarget;
     float v49 = v47.Length();
     if (v49 < 9.999999747378752e-05) {
         v47 = aCheck;
         v47.x = v47.x + 10.0;
-        v47.operator-=(aTarget);
+        v47 -= aTarget;
         v49 = v47.Length();
     }
     float v42 = fMaxValidRadius / v49;
@@ -166,8 +166,8 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
     arLocatiom = v47 * v42;
     TestStartPoint = v47 * v45;
     NiPoint3 aLocation = aTarget;
-    arLocatiom.operator+=(aTarget);
-    TestStartPoint.operator+=(aTarget);
+    arLocatiom += aTarget;
+    TestStartPoint += aTarget;
     RightUnitVector = v47.UnitCross(NiPoint3_UNIT_Z);
     pt = RightUnitVector * fActorRadius;
     NavMeshInfo* NavMeshInfo_ = apMesh->GetNavMeshInfo();
@@ -211,11 +211,11 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
         float v28;
         float v29;
         a2 = aTarget;
-        a2.operator-=(arLocatiom);
+        a2 -= arLocatiom;
         v29 = a2.Length();
         v27 = v29 - fTargetRadius - fActorRadius;
         v13 = v27 / v29;
-        a2.operator*=(v13);
+        a2 *= v13;
         v21 = arLocatiom + a2;
         ::new (&v24) NiPoint2(a2.x, a2.y);
         v26 = v24.Unitize();
@@ -227,7 +227,7 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
             return false;
         }
         float v25 = v26 - v28;
-        v24.operator*=(v25);
+        v24 *= v25;
         arLocatiom.x = arLocatiom.x + v24.x;
         arLocatiom.y = arLocatiom.y + v24.y;
     }

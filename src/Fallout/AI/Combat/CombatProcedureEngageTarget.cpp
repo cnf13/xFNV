@@ -650,7 +650,7 @@ bool CombatProcedureEngageTarget::CanAttackerSneak() {
     NiPoint3 v6 = shader->GetLocationOnReference();
     Actor* packageOwner = pCombatController->GetAttacker();
     NiPoint3 v7 = packageOwner->GetLocationOnReference();
-    (v5 = (&v6)->operator-(v7));
+    (v5 = v6 - v7);
     return (bool)((uint8_t)(!((&v5)->SqrLength() < 65536.0)));
 }
 

@@ -201,7 +201,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Init(float afPer
                 dirVec = TetherTargetPoint;
             }
             const NiPoint3* v6 = &pActor->GetLocationOnReference();
-            dirVec.operator-=(*v6);
+            dirVec -= *v6;
             double v7 = dirVec.Length() * 0.949999988079071;
             if (!(std::fabs(dirVec.z) >= v7)) {
                 fgoalAngle = GetZAngleFromVector(dirVec);
@@ -244,8 +244,8 @@ bool DetailedActorPathHandler::InitRotationOnly(float afTargetAngle, bool abForc
     fAvoidanceDetectionValue = 0.0;
     fDistanceTraveled = 0.0;
     fPathLength = 0.0;
-    spPath.operator=(static_cast<PathingSolution*>(nullptr));
-    spRequest.operator=(static_cast<PathingRequest*>(nullptr));
+    spPath = static_cast<PathingSolution*>(nullptr);
+    spRequest = static_cast<PathingRequest*>(nullptr);
     bIgnoreInitialRotation = false;
     bIgnoreInitialRotationKeepActorHeading = false;
     fIgnoreInitialRotationTetherParam = 0.0;
@@ -418,7 +418,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
                             eState = DetailedActorPathHandler::DAP_GOAL_REACHED;
                         }
                         if (bWaitingForUpdate) {
-                            spPath.operator=(static_cast<PathingSolution*>(nullptr));
+                            spPath = static_cast<PathingSolution*>(nullptr);
                             if (eState == DetailedActorPathHandler::DAP_WAITING_FOR_UPDATED_PATH) {
                                 ResetMoveModeAndDelta();
                                 return ActorPathHandler::PATH_HANDLER_RESULT_OK;
@@ -448,7 +448,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
     pActor->SetHeading(fnewHeading_2);
     pActorMover->DebugOnEvent();
     if (fslowDown > 0.0) {
-        MoveDelta.operator*=(fslowDown);
+        MoveDelta *= fslowDown;
     }
     RotateMoveDelta(afDeltaT);
     fLastFrameMinMoveDelta = MoveDelta.XYLength();
@@ -505,8 +505,8 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
                 break;
             }
             case DetailedActorPathHandler::DAP_GOAL_REACHED: {
-                spPath.operator=(static_cast<PathingSolution*>(nullptr));
-                spRequest.operator=(static_cast<PathingRequest*>(nullptr));
+                spPath = static_cast<PathingSolution*>(nullptr);
+                spRequest = static_cast<PathingRequest*>(nullptr);
             LABEL_11:;
                 if (!pActorMover->HasLookAtTarget()) {
                     MoveMode = pActorMover->GetPreferredMoveModeType();
@@ -869,7 +869,7 @@ void DetailedActorPathHandler::SetWaitForUpdatedPath(PathingRequest* apRequest) 
                         bool bSetInitialTangent = true;
                         float v13 = fCurrentSplineT + 0.10000000149011612;
                         spPath.m_pObject->ComputeLocationFromParameter(v13, tetherTangent);
-                        tetherTangent.operator-=(TetherTargetPoint);
+                        tetherTangent -= TetherTargetPoint;
                         float finitialAngle = GetZAngleFromVector(tetherTangent);
                         if (!ActorAvoidList.IsEmpty()) {
                             BSSimpleList<Actor*>* plist = &ActorAvoidList;
@@ -1048,7 +1048,7 @@ void DetailedActorPathHandler::HandleDeletedReference(TESObjectREFR* apRef) {
     }
     if (apRef->IsActor()) {
         for (uint32_t i = 0; i < DetailedActorPathHandler::uiAvoidanceCandidatesSize; ++i) {
-            if (DetailedActorPathHandler::AvoidanceCandidates.operator[](i) == apRef) {
+            if (DetailedActorPathHandler::AvoidanceCandidates[i] == apRef) {
                 DetailedActorPathHandler::AvoidanceCandidates.RemoveAt(i);
                 DetailedActorPathHandler::AvoidanceCandidates.Compact();
                 --DetailedActorPathHandler::uiAvoidanceCandidatesSize;
@@ -1159,8 +1159,8 @@ void DetailedActorPathHandler::ClearMovement() {
     MoveDelta = NiPoint3_ZERO;
     MoveMode = pActorMover->GetPreferredMoveModeType();
     fDistanceTraveled = (float)0.0;
-    (&spPath)->operator=(nullptr);
-    (&spRequest)->operator=(nullptr);
+    spPath = nullptr;
+    spRequest = nullptr;
     bWaitingForUpdate = false;
     eDoorState = PATH_HANDLER_DOOR_STATE_NONE;
     pCurrentDoor = nullptr;
@@ -1898,7 +1898,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
         if (pActorMover->HasLookAtTarget()) {
             pActorMover->GetLookAtPoint(ecx0);
             const NiPoint3* v3 = &pActor->GetLocationOnReference();
-            ecx0.operator-=(*v3);
+            ecx0 -= *v3;
             ZAngleFromVector = GetZAngleFromVector(ecx0);
         }
         else {
@@ -1911,7 +1911,7 @@ bool DetailedActorPathHandler::ComputeMoveMode(float afDeltaT) {
                 PathingSolution* v4 = spPath.operator->();
                 v4->ComputeLocationFromParameter(X_4, ecx0);
                 const NiPoint3* v5 = &pActor->GetLocationOnReference();
-                ecx0.operator-=(*v5);
+                ecx0 -= *v5;
                 ZAngleFromVector = GetZAngleFromVector(ecx0);
             }
         }
@@ -2024,11 +2024,11 @@ void DetailedActorPathHandler::RotateMoveDelta(float afDeltaT) {
         if (CharController) {
             double v9 = pActor->GetHeight() * 0.5;
             pt.z = CharController->QSwimFloatHeight() * v9 + pt.z;
-            aVal.operator-=(pt);
+            aVal -= pt;
         }
         else {
             const NiPoint3* v2 = &pActor->GetLocationOnReference();
-            aVal.operator-=(*v2);
+            aVal -= *v2;
         }
         double Height = pActor->GetHeight();
         if (TetherTargetPoint.z >= pt.z - Height && pt.z > static_cast<double>(TetherTargetPoint.z)) {
@@ -2067,7 +2067,7 @@ void DetailedActorPathHandler::RotateMoveDelta(float afDeltaT) {
         }
         NiPoint3 a1 = *p_BlockedTargetPoint;
         const NiPoint3* v4 = &pActor->GetLocationOnReference();
-        a1.operator-=(*v4);
+        a1 -= *v4;
         a1.z = 0.0;
         float ZAngleFromVector = GetZAngleFromVector(a1);
         switch (GetMoveMode() & 15) {
@@ -2158,7 +2158,7 @@ void DetailedActorPathHandler::UpdateTether(float afDeltaT) {
                 NiPoint3 tetherDelta = TetherTargetPoint - *v4;
                 float v19 = fCurrentSplineT + 0.10000000149011612;
                 spPath.m_pObject->ComputeLocationFromParameter(v19, nextTetherDelta);
-                nextTetherDelta.operator-=(TetherTargetPoint);
+                nextTetherDelta -= TetherTargetPoint;
                 tetherDelta.z = 0.0;
                 float fdot = worldSpaceMoveDir.Dot(tetherDelta);
                 float ftetherDot = nextTetherDelta.Dot(tetherDelta);
@@ -2177,7 +2177,7 @@ void DetailedActorPathHandler::UpdateTether(float afDeltaT) {
                         spPath.m_pObject->ComputeLocationFromParameter(fCurrentSplineT, TetherTargetPoint);
                         float v17 = fCurrentSplineT + 0.10000000149011612;
                         spPath.m_pObject->ComputeLocationFromParameter(v17, nextTetherDelta);
-                        nextTetherDelta.operator-=(TetherTargetPoint);
+                        nextTetherDelta -= TetherTargetPoint;
                         const NiPoint3* v7 = &pActor->GetLocationOnReference();
                         NiPoint3* v8 = ::new (&v22) NiPoint3(TetherTargetPoint - *v7);
                         tetherDelta.x = v8->x;
@@ -2203,7 +2203,7 @@ void DetailedActorPathHandler::UpdateTether(float afDeltaT) {
                             spPath.m_pObject->ComputeLocationFromParameter(fCurrentSplineT, TetherTargetPoint);
                             float v16 = fCurrentSplineT + 0.10000000149011612;
                             spPath.m_pObject->ComputeLocationFromParameter(v16, nextTetherDelta);
-                            nextTetherDelta.operator-=(TetherTargetPoint);
+                            nextTetherDelta -= TetherTargetPoint;
                             const NiPoint3* v11 = &pActor->GetLocationOnReference();
                             NiPoint3* v12 = ::new (&v21) NiPoint3(TetherTargetPoint - *v11);
                             tetherDelta.x = v12->x;
@@ -2786,10 +2786,10 @@ void DetailedActorPathHandler::BuildAvoidanceList(
     }
     DetailedActorPathHandler::UpdateAvoidanceCandidateList();
     for (uint32_t i = 0; i < DetailedActorPathHandler::uiAvoidanceCandidatesSize; ++i) {
-        Actor* pact = DetailedActorPathHandler::AvoidanceCandidates.operator[](i);
+        Actor* pact = DetailedActorPathHandler::AvoidanceCandidates[i];
         if (pact != apActor) {
             NiPoint3 toOtherActor = pact->GetLocationOnReference();
-            toOtherActor.operator-=(currentPos);
+            toOtherActor -= currentPos;
             float fflatDist2 = toOtherActor.SqrXYLength();
             if (!(fflatDist2 > 1e+06)) {
                 float ftheirRadius = pact->GetRadius();
@@ -2803,14 +2803,14 @@ void DetailedActorPathHandler::BuildAvoidanceList(
                         targetRot.MakeZRotationQ(fAnglea);
                         NiPoint3* ActorMoverOverrideMovement = pact->GetActorMoverOverrideMovement();
                         NiPoint3 targetWorldSpaceMoveDir = targetRot * *ActorMoverOverrideMovement;
-                        relativeMoveDir.operator-=(targetWorldSpaceMoveDir);
+                        relativeMoveDir -= targetWorldSpaceMoveDir;
                     }
                     float fmoveLength = relativeMoveDir.UnitizeGetLength();
                     float* v8 = &gs_fAvoidanceAvoidAllRadius_Pathfinding.Float();
                     float* v9 = &gs_fAvoidanceAvoidAllRadius_Pathfinding.Float();
                     if (!(fflatDist2 > *v8 * *v9) ||
                         (toTarget = pact->GetLocationOnReference(),
-                         (&toTarget.operator-=(currentPos),
+                         (&(toTarget -= currentPos),
                           (unitToTarget = toTarget,
                            (unitToTarget.Unitize(), !(unitToTarget.Dot(unitWorldSpaceMoveDir) < 0.0)))))) {
                         float fmoveSpeed = fmoveLength / fmoveTime;

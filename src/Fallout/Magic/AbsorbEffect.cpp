@@ -179,7 +179,7 @@ void AbsorbEffect::Finish() {
         if (pparent) {
             pparent->DetachChild(spBoltNode.m_pObject);
         }
-        spBoltNode.operator=(static_cast<NiNode*>(nullptr));
+        spBoltNode = static_cast<NiNode*>(nullptr);
     }
 }
 
@@ -194,7 +194,7 @@ void AbsorbEffect::Start3D() {
     else {
         v29 = nullptr;
     }
-    spBoltNode.operator=(v29);
+    spBoltNode = v29;
     const NiFixedString* v1 = &BSXFlags::Tag();
     BSXFlags* pextra = static_cast<BSXFlags*>(spBoltNode.m_pObject->GetExtraData(*v1));
     if (!pextra) {
@@ -228,24 +228,24 @@ void AbsorbEffect::Start3D() {
     if ((ptarget) && (pcaster)) {
         NiNode* pparentNode = static_cast<NiNode*>(ptarget->GetParentCell()->GetDynamicNode());
         pparentNode->AttachChild(spBoltNode.m_pObject, 1);
-        spBoltProperty.operator=(static_cast<BSShaderProperty*>(nullptr));
-        spBoltProperty.operator=(static_cast<BSShaderProperty*>(BoltShader::Start(spBoltNode.m_pObject, true)));
+        spBoltProperty = static_cast<BSShaderProperty*>(nullptr);
+        spBoltProperty = static_cast<BSShaderProperty*>(BoltShader::Start(spBoltNode.m_pObject, true));
         Animation* panim = pcaster->GetAnimation();
         if (panim) {
             NiControllerManager* ControllerManager = panim->GetControllerManager();
             NiAVObjectPalette* ObjectPalette = ControllerManager->GetObjectPalette();
-            spSource.operator=(static_cast<NiNode*>(ObjectPalette->GetAVObject("Bip01 Spine1")));
-            if (spSource.operator==(static_cast<NiNode*>(nullptr))) {
-                spSource.operator=(ptarget->Get3D());
+            spSource = static_cast<NiNode*>(ObjectPalette->GetAVObject("Bip01 Spine1"));
+            if (spSource == static_cast<NiNode*>(nullptr)) {
+                spSource = ptarget->Get3D();
             }
         }
         Animation* v40 = ptarget->GetAnimation();
         if (v40) {
             NiControllerManager* v4 = v40->GetControllerManager();
             NiAVObjectPalette* v21 = v4->GetObjectPalette();
-            spTarget.operator=(static_cast<NiNode*>(v21->GetAVObject("Bip01 Spine1")));
-            if (spTarget.operator==(static_cast<NiNode*>(nullptr))) {
-                spTarget.operator=(pcaster->Get3D());
+            spTarget = static_cast<NiNode*>(v21->GetAVObject("Bip01 Spine1"));
+            if (spTarget == static_cast<NiNode*>(nullptr)) {
+                spTarget = pcaster->Get3D();
             }
         }
         if (spBoltProperty.m_pObject) {

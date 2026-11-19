@@ -180,7 +180,7 @@ bool TeleportDoorSearch::BuildNodePath(
 ) {
     // Pointer-sized, as AStarNode::iKey: the space's whole address on x64.
     uintptr_t istartKey;
-    StartLocation.operator=(aStartLocation);
+    StartLocation = aStartLocation;
     if (aStartLocation.pWorldSpace) {
         StartNode.pWorldSpace = aStartLocation.pWorldSpace;
         StartNode.bWorldSpace = true;

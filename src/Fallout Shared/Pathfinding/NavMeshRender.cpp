@@ -573,8 +573,8 @@ void NavMeshRender::Update() {
             v7->DetachChild(v6);
         }
     }
-    (&spSelectedPathGeometry)->operator=(nullptr);
-    (&spLOSMapGeometry)->operator=(nullptr);
+    spSelectedPathGeometry = nullptr;
+    spLOSMapGeometry = nullptr;
 }
 
 // Showing updates the root draw node; hiding also detaches its children and forgets the cells drawn.

@@ -72,7 +72,7 @@ bool BSAnimGroupSequence::Deactivate(float afEaseOutTime, bool abTransition) {
     // The holster and unequip groups put back the objects their controllers drove, through the bone LOD controller
     // the sequence's accumulation root carries.
     if (m_pkAccumRoot) {
-        const int32_t eType = spAnimGroup.operator->()->GetType();
+        const int32_t eType = spAnimGroup->GetType();
         if (eType >= 0x17 && eType <= 0x19) {
             NiBSBoneLODController* pBoneLOD =
                 static_cast<NiBSBoneLODController*>(m_pkAccumRoot->GetController(&NiBSBoneLODController::ms_RTTI));
@@ -123,7 +123,7 @@ void BSAnimGroupSequence::LoadGame(BGSLoadGameBuffer* apBuffer, float afTime) {
 }
 
 TESAnimGroup* BSAnimGroupSequence::GetAnimGroup() {
-    return spAnimGroup.operator->();
+    return spAnimGroup;
 }
 
 uint16_t BSAnimGroupSequence::GetSaveSize() {
@@ -182,7 +182,7 @@ uint8_t BSAnimGroupSequence::GetInterpolatorPriority(uint32_t a2) {
 }
 
 void BSAnimGroupSequence::SetAnimGroup(TESAnimGroup* apAnimGroup) {
-    (&spAnimGroup)->operator=(apAnimGroup);
+    spAnimGroup = apAnimGroup;
 }
 
 void BSAnimGroupSequence::ClearBlendInterp() {
@@ -213,7 +213,7 @@ void BSAnimGroupSequence::ValidateTargets() {
             NiAVObject* v1 = pdefaultObjectPalette->GetScene();
             if (!v1->GetObjectByName(kIDTag->m_kAVObjectName)) {
                 pdefaultObjectPalette->SetAVObject(kIDTag->m_kAVObjectName, nullptr);
-                m_pkInterpArray[ui].m_spInterpCtlr.operator=(static_cast<NiInterpController*>(nullptr));
+                m_pkInterpArray[ui].m_spInterpCtlr = static_cast<NiInterpController*>(nullptr);
                 m_pkInterpArray[ui].m_pkBlendInterp = nullptr;
                 m_pkInterpArray[ui].m_ucBlendIdx = -1;
             }
@@ -231,7 +231,7 @@ void BSAnimGroupSequence::ValidateTargetsFromPalette() {
         const NiControllerSequence::IDTag* kIDTag = &m_pkIDTagArray[ui];
         if (!kIDTag->m_kAVObjectName.GetHandleString() ||
             !pdefaultObjectPalette->GetAVObject(kIDTag->m_kAVObjectName)) {
-            m_pkInterpArray[ui].m_spInterpCtlr.operator=(static_cast<NiInterpController*>(nullptr));
+            m_pkInterpArray[ui].m_spInterpCtlr = static_cast<NiInterpController*>(nullptr);
             m_pkInterpArray[ui].m_pkBlendInterp = nullptr;
             m_pkInterpArray[ui].m_ucBlendIdx = -1;
         }
@@ -1021,7 +1021,7 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
     else {
         v3 = nullptr;
     }
-    aspControllerSequence.operator=(static_cast<NiControllerSequence*>(v3));
+    aspControllerSequence = static_cast<NiControllerSequence*>(v3);
 }
 
 NiFixedString& FixedStrings::QAttachSound() {

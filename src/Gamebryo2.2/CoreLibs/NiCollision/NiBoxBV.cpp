@@ -111,7 +111,7 @@ bool NiBoxBV::operator==(const NiBoundingVolume& kABV) const {
 
 // Shared by every bounding volume class.
 bool NiBoxBV::operator!=(const NiBoundingVolume& kABV) const {
-    return !operator==(kABV);
+    return !(*this == kABV);
 }
 
 void NiBoxBV::AddViewerStrings(const char* pcPrefix, NiTPrimitiveArray<char*>* pkStrings) const {

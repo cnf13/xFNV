@@ -82,7 +82,7 @@ bool NiSphereBV::operator==(const NiBoundingVolume& kABV) const {
 }
 
 bool NiSphereBV::operator!=(const NiBoundingVolume& kABV) const {
-    return !operator==(kABV);
+    return !(*this == kABV);
 }
 
 // The type, the centre, and the radius cut to two decimals.

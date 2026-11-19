@@ -63,7 +63,7 @@ void PatrolActorPackageData::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     isaveGameCount = References.iSize;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-        apSaveGameBuffer->SaveFormID(References.operator[](i), 0);
+        apSaveGameBuffer->SaveFormID(References[i], 0);
     }
 }
 
@@ -91,7 +91,7 @@ void PatrolActorPackageData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     References.SetSize(isaveGameCount, true);
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         // Each slot holds the reference's form ID until InitLoadGame resolves it.
-        apLoadGameBuffer->LoadFormID(References.operator[](i));
+        apLoadGameBuffer->LoadFormID(References[i]);
     }
 }
 
@@ -100,7 +100,7 @@ void PatrolActorPackageData::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     for (uint32_t i = 0; i < isaveGameCount; ++i) {
         TESObjectREFR* pResolved;
         bool bremove = false;
-        TESObjectREFR** ppatrolRef = &References.operator[](i);
+        TESObjectREFR** ppatrolRef = &References[i];
         // The slot holds the form ID LoadGame read into it.
         if (*ppatrolRef) {
             TESForm* FormByNumericID = TESForm::GetFormByNumericID(*reinterpret_cast<uint32_t*>(ppatrolRef));

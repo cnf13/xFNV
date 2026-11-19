@@ -61,9 +61,7 @@ void NiAVObjectArray_InsertAt(
 
 void NiAVObjectArray_UpdateSize(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
     while (apArray->m_usSize) {
-        bool v3 = apArray->m_pBase[apArray->m_usSize - 1].operator!=(
-            NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr))
-        );
+        bool v3 = apArray->m_pBase[apArray->m_usSize - 1] != NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
         if (v3) {
             break;
         }
@@ -273,7 +271,7 @@ void NiNode::ApplyTransform(const NiMatrix3& kMat, const NiPoint3& kTrn, bool bO
     NiMatrix3 result;
     float bOnLefta;
     if (bOnLeft) {
-        v6 = &(result = (&kMat)->operator*(m_kLocal.m_Rotate));
+        v6 = &(result = kMat * m_kLocal.m_Rotate);
         (v24 = (&m_kLocal.m_Rotate)->TransposeTimes(*v6));
         v11 =
             (((&kMat)->m_pEntry[0][1] * m_kLocal.m_Translate.y) + (m_kLocal.m_Translate.x * (&kMat)->m_pEntry[0][0])) +
@@ -1037,24 +1035,24 @@ void NiAVObjectArray_SetAt(
     // `tcmp` is NiTArray::SetAt's guarded null element.
     static NiPointer<NiAVObject> tcmp = static_cast<NiAVObject*>(nullptr);
     if (auiIndex < apArray->m_usSize) {
-        if (apElement->operator!=(tcmp)) {
-            if (apArray->m_pBase[auiIndex].operator==(tcmp)) {
+        if (*apElement != tcmp) {
+            if (apArray->m_pBase[auiIndex] == tcmp) {
                 ++apArray->m_usESize;
             }
         }
         else {
-            if (apArray->m_pBase[auiIndex].operator!=(tcmp)) {
+            if (apArray->m_pBase[auiIndex] != tcmp) {
                 --apArray->m_usESize;
             }
         }
     }
     else {
         apArray->m_usSize = auiIndex + 1;
-        if (apElement->operator!=(tcmp)) {
+        if (*apElement != tcmp) {
             ++apArray->m_usESize;
         }
     }
-    apArray->m_pBase[auiIndex].operator=(*apElement);
+    apArray->m_pBase[auiIndex] = *apElement;
 }
 
 void NiAVObjectArray_Deallocate(NiPointer<NiAVObject>* apArray) {
@@ -1109,10 +1107,10 @@ void NiAVObjectArray_Compact(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
             uint16_t v6 = 0;
             uint16_t v5 = 0;
             while (v6 < static_cast<int32_t>(apArray->m_usSize)) {
-                bool v3 = apArray->m_pBase[v6].operator!=(NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr)));
+                bool v3 = apArray->m_pBase[v6] != NiPointer<NiAVObject>(static_cast<NiAVObject*>(nullptr));
                 if (v3) {
-                    if (apArray->m_pBase[v5].operator!=(apArray->m_pBase[v6])) {
-                        apArray->m_pBase[v5].operator=(apArray->m_pBase[v6]);
+                    if (apArray->m_pBase[v5] != apArray->m_pBase[v6]) {
+                        apArray->m_pBase[v5] = apArray->m_pBase[v6];
                     }
                     ++v5;
                 }
@@ -1125,7 +1123,7 @@ void NiAVObjectArray_Compact(NiTObjectArray<NiPointer<NiAVObject>>* apArray) {
         if (apArray->m_usMaxSize) {
             apArray->m_pBase = NiTNewInterface<NiPointer<NiAVObject>>::Allocate(apArray->m_usMaxSize);
             for (uint16_t i = 0; i < static_cast<int32_t>(apArray->m_usSize); ++i) {
-                apArray->m_pBase[i].operator=(pSaveBase[i]);
+                apArray->m_pBase[i] = pSaveBase[i];
             }
         }
         else {

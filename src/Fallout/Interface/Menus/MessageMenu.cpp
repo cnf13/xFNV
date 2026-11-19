@@ -115,7 +115,7 @@ bool MessageMenu::DoKey(int32_t aiKey) {
                     using strtemp_t = std::basic_string<char, std::char_traits<char>, std::allocator<char>>;
                     strtemp_t strtemp(static_cast<const char*>(v5->strHotkeys.pString));
                     for (uint32_t hotkeyIndex = 0; hotkeyIndex < strtemp.size(); ++hotkeyIndex) {
-                        char* v6 = &strtemp.operator[](hotkeyIndex);
+                        char* v6 = &strtemp[hotkeyIndex];
                         int32_t v7 = std::toupper(*v6);
                         if (v7 == std::toupper(aiKey)) {
                             Tile* v8 = pbuttons->GetTileAt(hotkeyIndex, false);
@@ -465,7 +465,7 @@ void MessageMenu::ProcessYesToAll() {
         MessageHandler::SetYesToAll(true);
         for (int32_t imessageCt = MessageMenu::iStartIndex; imessageCt < MessageMenu::xEntryList.iSize; ++imessageCt) {
             if (MessageMenu::xEntryList.GetAt(imessageCt)->iWarningContext == disableContext) {
-                MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList.operator[](imessageCt);
+                MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList[imessageCt];
                 if (v0) {
                     delete v0;
                 }
@@ -511,10 +511,10 @@ bool MessageMenu::AddMessageToQueue(
     pnewMessage_2->fpResultCallback = afpResult;
     pnewMessage_2->cFirstButtonResult = aiFirstButtonResult;
     pnewMessage_2->iWarningContext = static_cast<WARNING_TYPES>(aiWarningContext);
-    pnewMessage_2->strIconFilename.operator=(apcIconFilename);
-    pnewMessage_2->strHotkeys.operator=("");
-    pnewMessage_2->strMessageText.operator=(axText);
-    pnewMessage_2->strAudioOverride.operator=(apcSound);
+    pnewMessage_2->strIconFilename = apcIconFilename;
+    pnewMessage_2->strHotkeys = "";
+    pnewMessage_2->strMessageText = axText;
+    pnewMessage_2->strAudioOverride = apcSound;
     pnewMessage_2->bIsModal = abModal;
     pnewMessage_2->iXPosOverride = aiXPosOverride;
     pnewMessage_2->iYPosOverride = aiYPosOverride;
@@ -545,16 +545,16 @@ bool MessageMenu::AddMessageToQueue(
             result_1 = strtemp.substr(hotkeyIndex + 1, 1u);
             std::string* v22 = &result_1;
             const char* v15 = v22->c_str();
-            pnewMessage_2->strHotkeys.operator+=(v15);
+            pnewMessage_2->strHotkeys += v15;
             strtemp.replace(hotkeyIndex, 1u, "");
         }
         const char* v16 = strtemp.c_str();
         if (BSstrcmp(v16, " ")) {
             const char* v17 = strtemp.c_str();
-            pnewMessage_2->strButtonsText.operator+=(v17);
+            pnewMessage_2->strButtonsText += v17;
         }
-        pnewMessage_2->strButtonsText.operator+=(";");
-        strbuttonName.operator=(va_arg(*axList, const char*));
+        pnewMessage_2->strButtonsText += ";";
+        strbuttonName = va_arg(*axList, const char*);
     }
     if (MessageMenu::xEntryList.iSize) {
         for (int32_t i = 0;; ++i) {
@@ -667,7 +667,7 @@ bool MessageMenu::Create() {
 
 void MessageMenu::ClearMessageQueueHead() {
     if (MessageMenu::GetQueueHead()) {
-        MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList.operator[](MessageMenu::iStartIndex);
+        MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList[MessageMenu::iStartIndex];
         if (v0) {
             delete v0;
         }
@@ -685,7 +685,7 @@ void MessageMenu::ClearMessageQueueHead() {
 
 void MessageMenu::ClearMessageQueue() {
     for (uint32_t i = 0; i < MessageMenu::xEntryList.iSize; ++i) {
-        MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList.operator[](i);
+        MessageMenu::MessageMenuEntry* v0 = MessageMenu::xEntryList[i];
         if (v0) {
             delete v0;
         }
@@ -713,10 +713,10 @@ bool MessageMenu::AddMessageToQueue(
     pnewMessage->fpResultCallback = &MessageMenu::HandlePerkActivationResults;
     pnewMessage_2->cFirstButtonResult = 0;
     pnewMessage_2->iWarningContext = WARN_DEFAULT;
-    pnewMessage_2->strIconFilename.operator=(nullptr);
-    pnewMessage_2->strHotkeys.operator=("");
+    pnewMessage_2->strIconFilename = nullptr;
+    pnewMessage_2->strHotkeys = "";
     const char* v2 = sActivationChoiceMessage.String();
-    pnewMessage_2->strMessageText.operator=(v2);
+    pnewMessage_2->strMessageText = v2;
     while (apChoiceList && !apChoiceList->IsEmpty()) {
         BSstrcpy(Dst, 260, apChoiceList->m_item->pActivateChoiceLabel);
         BGSEntryPointFunctionDataActivateChoice* m_item = apChoiceList->m_item;
@@ -740,14 +740,14 @@ bool MessageMenu::AddMessageToQueue(
                         _Result = strtemp.substr(hotkeyIndex + 1, 1u);
                         std::string* v20 = &_Result;
                         const char* v5 = v20->c_str();
-                        pnewMessage_2->strHotkeys.operator+=(v5);
+                        pnewMessage_2->strHotkeys += v5;
                         strtemp.replace(hotkeyIndex, 1u, "");
                     }
                     const char* v6 = strtemp.c_str();
                     if (BSstrcmp(v6, " ")) {
                         const char* v7 = strtemp.c_str();
-                        pnewMessage_2->strButtonsText.operator+=(v7);
-                        pnewMessage_2->strButtonsText.operator+=(";");
+                        pnewMessage_2->strButtonsText += v7;
+                        pnewMessage_2->strButtonsText += ";";
                     }
                 }
             }
@@ -818,14 +818,14 @@ bool MessageMenu::AddMessageToQueue(
             v23 = strtemp_2.substr(hotkeyIndex_2 + 1, 1u);
             std::string* v16 = &v23;
             const char* v12 = v16->c_str();
-            pnewMessage_2->strHotkeys.operator+=(v12);
+            pnewMessage_2->strHotkeys += v12;
             strtemp_2.replace(hotkeyIndex_2, 1u, "");
         }
         const char* v13 = strtemp_2.c_str();
         if (BSstrcmp(v13, " ")) {
             const char* v14 = strtemp_2.c_str();
-            pnewMessage_2->strButtonsText.operator+=(v14);
-            pnewMessage_2->strButtonsText.operator+=(";");
+            pnewMessage_2->strButtonsText += v14;
+            pnewMessage_2->strButtonsText += ";";
         }
     }
     MessageMenu::PerkActivation* pperk_3 =
@@ -851,12 +851,12 @@ bool MessageMenu::AddMessageToQueue(
 void MessageMenu::HandlePerkActivationResults() {
     uint32_t auiIndex = Interface::GetMessageMenuResult();
     if (auiIndex == MessageMenu::xPerkActivations.iSize - 1) {
-        int32_t a5 = MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject->GetCount();
-        MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject->Activate(pPlayer, false, nullptr, a5);
+        int32_t a5 = MessageMenu::xPerkActivations[auiIndex]->pActivatedObject->GetCount();
+        MessageMenu::xPerkActivations[auiIndex]->pActivatedObject->Activate(pPlayer, false, nullptr, a5);
     }
     else {
-        MessageMenu::xPerkActivations.operator[](auiIndex)->pScript->Run(
-            MessageMenu::xPerkActivations.operator[](auiIndex)->pActivatedObject, nullptr, nullptr, false
+        MessageMenu::xPerkActivations[auiIndex]->pScript->Run(
+            MessageMenu::xPerkActivations[auiIndex]->pActivatedObject, nullptr, nullptr, false
         );
     }
     MessageMenu::xPerkActivations.Clear(true);

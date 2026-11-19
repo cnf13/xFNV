@@ -198,8 +198,8 @@ void Sun::Initialize(NiNode* apSkyRoot) {
         spSunBaseNode = pSunBaseNode;
         spSunBaseNode->SetSelectiveUpdate(true);
         spSunBaseNode->SetMode(NiBillboardNode::RIGID_FACE_CAMERA);
-        NiNode* pParent = spSunBaseNode.operator->();
-        pParent->AttachChild(spSunBase.operator->(), true);
+        NiNode* pParent = spSunBaseNode;
+        pParent->AttachChild(spSunBase, true);
 
         pMemory = NiMemObject::operator new(sizeof(NiTriShape));
         NiTriShape* pSunGlare = pMemory ? ::new (pMemory) NiTriShape(
@@ -218,11 +218,11 @@ void Sun::Initialize(NiNode* apSkyRoot) {
     spSunGlareNode->SetMode(NiBillboardNode::RIGID_FACE_CAMERA);
     float fScale = fGlareScale;
     spSunGlareNode->SetScale(fScale);
-    NiNode* pParent = spSunGlareNode.operator->();
-    pParent->AttachChild(spSunGlare.operator->(), true);
+    NiNode* pParent = spSunGlareNode;
+    pParent->AttachChild(spSunGlare, true);
     // SkyObject keeps spRoot as a raw pointer.
     pParent = spRoot;
-    pParent->AttachChild(spSunBaseNode.operator->(), true);
+    pParent->AttachChild(spSunBaseNode, true);
 
     pMemory = NiMemObject::operator new(sizeof(NiDirectionalLight));
     NiDirectionalLight* pLight = pMemory ? ::new (pMemory) NiDirectionalLight : nullptr;
@@ -232,7 +232,7 @@ void Sun::Initialize(NiNode* apSkyRoot) {
     spLight->SetDiffuseColor(NiColor_WHITE);
     // SkyObject keeps spRoot as a raw pointer.
     pParent = spRoot;
-    pParent->AttachChild(spLight.operator->(), true);
+    pParent->AttachChild(spLight, true);
 
     pMemory = ourMalloc(sizeof(NiPick));
     pSunGlarePick = pMemory ? ::new (pMemory) NiPick(0, 8) : nullptr;
@@ -245,9 +245,9 @@ void Sun::Initialize(NiNode* apSkyRoot) {
     BSShaderData* pbsshaderdata = ::new (aShaderDataStorage) BSShaderData;
     pbsshaderdata->eLightingShader = BSShaderData::LS_SKY;
     pbsshaderdata->iSkyTYpe = SkyShaderProperty::SO_SUN;
-    pbsshaderdata->Convert(spSunBase.operator->(), BSShaderData::PROP_SHADER);
+    pbsshaderdata->Convert(spSunBase, BSShaderData::PROP_SHADER);
     pbsshaderdata->iSkyTYpe = SkyShaderProperty::SO_SUN_GLARE;
-    pbsshaderdata->Convert(spSunGlare.operator->(), BSShaderData::PROP_SHADER);
+    pbsshaderdata->Convert(spSunGlare, BSShaderData::PROP_SHADER);
 }
 
 void Sun::Update(Sky* apSky, float afSecondsPassed) {
@@ -567,7 +567,7 @@ void Sun::RemoveTextures() {
 
 void Sun::StartSunOcclusion() {
     bDoOcclusionTests = true;
-    BSShaderAccumulator* v1 = (&spSunAccumulator)->operator->();
+    BSShaderAccumulator* v1 = spSunAccumulator;
     if (v1) {
         v1->ResetSunOcclusion();
     }
@@ -582,7 +582,7 @@ void Sun::CalculateSunGlare(uint32_t aiTestNumber, BSShaderAccumulator* apAccumu
         MEM_CONTEXT_SKY, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Sky\\Sun.cpp", 546
     );
     if ((GetBase()) && (bDoOcclusionTests) && (apAccumulator)) {
-        spSunAccumulator.operator=(apAccumulator);
+        spSunAccumulator = apAccumulator;
         NiTriShape* pSunBase = static_cast<NiTriShape*>(GetBase());
         float worldScale = pSunBase->GetWorldScale() / 25.0;
         pSunBase->SetWorldScale(worldScale);

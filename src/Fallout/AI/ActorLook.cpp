@@ -17,7 +17,7 @@ void bhkMouseSpringAction::SetMousePosition(const NiPoint3& arPos) {
 
 // Sets the wrapped action's target to arPos when there is a wrapped action.
 void bhkMouseSpringAction::SetMousePosition(const hkVector4& arPos) {
-    hkpMouseSpringAction* pm = operator*();
+    hkpMouseSpringAction* pm = **this;
     if (pm) {
         pm->setMousePosition(arPos);
     }

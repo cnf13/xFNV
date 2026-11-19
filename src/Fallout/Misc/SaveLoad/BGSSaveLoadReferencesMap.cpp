@@ -96,7 +96,7 @@ void BGSSaveLoadReferencesMap::LoadReferencesForCell(
         pnumericIDArray = nullptr;
         if (pcellNumericIDArrayMap->GetAt(icellID, pnumericIDArray)) {
             for (uint32_t i = 0; i < pnumericIDArray->iSize; ++i) {
-                LoadChangedReference(pnumericIDArray->operator[](i), apReconstructForms);
+                LoadChangedReference((*pnumericIDArray)[i], apReconstructForms);
             }
             pcellNumericIDArrayMap->RemoveAt(icellID);
             if (pnumericIDArray) {

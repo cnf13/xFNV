@@ -385,7 +385,7 @@ bool TESResponse::TestAudioFullPath(
     BSstrcat(pout, 260, apFileName);
     BSstrcat(pout, 260, ".");
     BSstrcat(pout, 260, apFileExt);
-    aFullPath.operator=(&result[1]);
+    aFullPath = &result[1];
     return true;
 }
 

@@ -247,7 +247,7 @@ void TelekinesisEffect::DoThrow() {
         NI2HK(kImpulse, kVelocity);
         hkSimdReal kMass(pBody->GetMass());
         kImpulse.mul4(kMass);
-        pBody->operator*()->applyLinearImpulse(kImpulse);
+        (**pBody)->applyLinearImpulse(kImpulse);
     }
     else {
         pBody->SetLinearVelocity(NiPoint3_ZERO);
@@ -286,7 +286,7 @@ void TelekinesisEffect::CreateSpring() {
             bhkTelekinesisListener* v9;
             NiPoint3 dir;
             NiPoint3 origin;
-            hkpRigidBody* v28 = pbody->operator*();
+            hkpRigidBody* v28 = **pbody;
             void* apMemory = ourMalloc(sizeof(bhkTelekinesisListener));
             if (apMemory) {
                 CFilter* CollisionFilter = pbody->GetCollisionFilter(&v14);
@@ -314,7 +314,7 @@ void TelekinesisEffect::CreateSpring() {
                 NiPoint3 originToRef = location - origin;
                 fHoldDistance = dir.Dot(originToRef);
                 pPlayer->SetTelekinesisDistance(fHoldDistance);
-                dir.operator*=(fHoldDistance);
+                dir *= fHoldDistance;
             }
             EffectSetting* EffectSetting_ = GetEffectSetting();
             if (EffectSetting_->data.pEffectShader) {

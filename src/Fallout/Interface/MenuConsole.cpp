@@ -1082,7 +1082,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                             xstr_2.Copy(xInputs.Get(static_cast<NiTListItem<BSStringT<char>>*>(xelem_2)));
                         }
                         else {
-                            xstr_2.operator=("");
+                            xstr_2 = "";
                         }
                         if (xstr_2.GetLength()) {
                             v32 = xstr_2.pString;
@@ -1188,7 +1188,7 @@ void MenuConsole::PrintLine(const char* apString, va_list xlist) {
             for (int32_t a = 0; a < inum_lines; ++a) {
                 bool bat_end = iLastString == xStrings.m_uiCount;
                 BSStringT<char> psave_me;
-                psave_me.operator=(pstring);
+                psave_me = pstring;
                 xStrings.AddTail(psave_me);
                 if (bat_end) {
                     iLastString = xStrings.m_uiCount;

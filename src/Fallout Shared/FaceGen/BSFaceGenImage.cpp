@@ -154,7 +154,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                 int32_t v18 = static_cast<int32_t>((v14 - afUncompressedMin) * afScale);
                 pbuffer[3] = v18;
                 pbuffer += 4;
-                v65.operator++(0);
+                v65++;
             }
         }
         else {
@@ -224,7 +224,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                 int32_t v43 = static_cast<int32_t>((v10 - afUncompressedMin) * afScale);
                 pbuffer[2] = v43;
                 pbuffer += 3;
-                v65.operator++(0);
+                v65++;
             }
         }
         if (gs_bFaceMipMaps_General.operator bool()) {
@@ -235,23 +235,23 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
             if (BSShaderManager::GetTintMipMaps()) {
                 BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldataDest);
             }
-            sptex.operator=(NiSourceTexture::Create(ppixeldataDest, nullptr, NiSourceTexture::ms_kDefaultPrefs));
+            sptex = NiSourceTexture::Create(ppixeldataDest, nullptr, NiSourceTexture::ms_kDefaultPrefs);
         }
         else {
             if (BSShaderManager::GetTintMipMaps()) {
                 BSShaderUtil::TintUncompressedPixelDataByMipMap(ppixeldata);
             }
-            sptex.operator=(NiSourceTexture::Create(ppixeldata, nullptr, NiSourceTexture::ms_kDefaultPrefs));
+            sptex = NiSourceTexture::Create(ppixeldata, nullptr, NiSourceTexture::ms_kDefaultPrefs);
         }
         if (aFormat.m_eFormat != NiPixelFormat::FORMAT_RGBA && aFormat.m_eFormat) {
             NiSourceTexture* x = BSShaderUtil::ConvertTexture(sptex.m_pObject, aFormat);
-            this->spCompressedImage.operator=(x);
+            this->spCompressedImage = x;
         }
         else {
-            this->spCompressedImage.operator=(sptex);
+            this->spCompressedImage = sptex;
         }
         if (!this->spCompressedImage.m_pObject) {
-            this->spCompressedImage.operator=(sptex);
+            this->spCompressedImage = sptex;
         }
     }
 

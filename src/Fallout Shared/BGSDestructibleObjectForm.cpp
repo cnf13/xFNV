@@ -936,7 +936,7 @@ void BGSDestructibleObjectForm::UnloadReplacementModels() {
     if ((pData) && (pData->spPreloadedReplacementModels.m_pObject)) {
         NiAtomicDecrement(pData->iReplacementModelRefCount);
         if (pData->iReplacementModelRefCount <= 0) {
-            pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(nullptr));
+            pData->spPreloadedReplacementModels = static_cast<QueuedFile*>(nullptr);
         }
     }
 }
@@ -952,10 +952,10 @@ void BGSDestructibleObjectForm::PreloadReplacementModels(TESBoundObject* apObjec
             else {
                 v2 = nullptr;
             }
-            pData->spPreloadedReplacementModels.operator=(v2);
+            pData->spPreloadedReplacementModels = v2;
             QueueFiles(apObject, IO_TASK_PRIORITY_VERY_LOW, pData->spPreloadedReplacementModels.m_pObject);
             if (!pData->spPreloadedReplacementModels.m_pObject->GetChildCount()) {
-                pData->spPreloadedReplacementModels.operator=(static_cast<QueuedFile*>(nullptr));
+                pData->spPreloadedReplacementModels = static_cast<QueuedFile*>(nullptr);
             }
         }
         if (pData->spPreloadedReplacementModels.m_pObject) {

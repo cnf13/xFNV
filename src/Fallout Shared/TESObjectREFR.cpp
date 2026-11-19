@@ -2230,7 +2230,7 @@ void TESObjectREFR::Copy(TESForm* apCopy) {
         for (BSSimpleList<TESObjectREFR*>* pWaterRefs = GetExtra()->GetLitWaterRefs();
              pWaterRefs && pWaterRefs->GetItem(); pWaterRefs = pWaterRefs->GetNext()) {
             LightRefData* pLightData = GetExtra()->GetLight();
-            if (pLightData && pLightData->spLight.operator->()) {
+            if (pLightData && pLightData->spLight) {
                 TESObjectREFR* pWater = pWaterRefs->GetItem();
                 if (pWater->Get3D() && TES::pInstance->GetWaterSystem()) {
                     TESObjectREFR* pWaterRef = pWaterRefs->GetItem();
@@ -2265,7 +2265,7 @@ void TESObjectREFR::Copy(TESForm* apCopy) {
         for (BSSimpleList<TESObjectREFR*>* pWaterRefs = pCopy->GetExtra()->GetLitWaterRefs();
              pWaterRefs && pWaterRefs->GetItem(); pWaterRefs = pWaterRefs->GetNext()) {
             LightRefData* pLightData = GetExtra()->GetLight();
-            if (pLightData && pLightData->spLight.operator->()) {
+            if (pLightData && pLightData->spLight) {
                 TESObjectREFR* pWater = pWaterRefs->GetItem();
                 if (pWater->Get3D() && TES::pInstance->GetWaterSystem()) {
                     TESObjectREFR* pWaterRef = pWaterRefs->GetItem();
@@ -3242,21 +3242,21 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
     alignas(NiPointer<NiAVObject>) uint8_t aNodeStorage[sizeof(NiPointer<NiAVObject>)];
     // SWEEP-INLINE 0x633C90
     NiPointer<NiAVObject>& spNode = *::new (aNodeStorage) NiPointer<NiAVObject>(TESObjectREFR::Get3D());
-    bool bNoNode = spNode.operator==(nullptr);
-    if (!spNode.operator->() || GetExtra()->GetPrimitive()) {
+    bool bNoNode = spNode == nullptr;
+    if (!spNode || GetExtra()->GetPrimitive()) {
         TESBoundObject* pObject = data.pObjectReference;
         if (data.pObjectReference) {
             BGSPrimitive* pPrimitive = GetExtra()->GetPrimitive();
             if (pPrimitive) {
                 pPrimitive->Build();
                 spNode = pPrimitive->GetNode();
-                if (bPrimitivesOn.operator!()) {
+                if (!bPrimitivesOn) {
                     NiColorA kColor = pPrimitive->GetColor();
                     kColor.a = 0.0f;
                     pPrimitive->SetColor(kColor);
                 }
-                if ((GetObjectReference() != pCollisionMarker) && (spNode.operator->())) {
-                    spNode.operator->()->SetAppCulled(true);
+                if ((GetObjectReference() != pCollisionMarker) && (spNode)) {
+                    spNode->SetAppCulled(true);
                 }
 
                 SetLoadedDataFlag(4, true);
@@ -3266,16 +3266,16 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
             }
             if (abBackgroundLoading) {
                 SetBackgroundLoadingRef(this, static_cast<NiNode*>(spNode.operator->()));
-                if (spNode.operator->()) {
-                    spNode.operator->()->IncRefCount();
+                if (spNode) {
+                    spNode->IncRefCount();
                 }
             }
             else {
                 Set3DSimple(spNode.operator->());
             }
             bool bHaveFlames = false;
-            if (spNode.operator->()) {
-                NiNode* pAddonRoot = spNode.operator->()->IsNode();
+            if (spNode) {
+                NiNode* pAddonRoot = spNode->IsNode();
                 bHaveFlames = HasAddonFlags(pAddonRoot);
                 SetLoadedDataFlag(2, bHaveFlames);
             }
@@ -3283,7 +3283,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 static_cast<BSFadeNode*>(spNode.operator->())->TurnFadeNodeOn();
                 SetDisableFade(false);
             }
-            if ((GetDestructible()) && (spNode.operator->())) {
+            if ((GetDestructible()) && (spNode)) {
                 if (GetExtra()->GetObjectHealth() != 0.0) {
                     TESBoundObject* pPreloadTarget = GetObjectReference();
                     BGSDestructibleObjectForm::GetDestructionForm(GetObjectReference())
@@ -3301,15 +3301,15 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
             }
 
             TESModelTextureSwap* pModelSwap = dynamic_cast<TESModelTextureSwap*>(GetTESModel());
-            if ((pModelSwap) && (spNode.operator->())) {
-                NiNode* pSwapRoot = spNode.operator->()->IsNode();
+            if ((pModelSwap) && (spNode)) {
+                NiNode* pSwapRoot = spNode->IsNode();
                 pModelSwap->SwapTextures(pSwapRoot);
             }
 
             if (GetObjectReference() && GetObjectReference()->GetHasPLSpecTex()) {
                 SwapPlatformLanguageTextures(spNode.operator->());
             }
-            if (spNode.operator->()) {
+            if (spNode) {
                 Creature* pCreature = nullptr;
                 if (IsActor() && data.pObjectReference->GetFormType() == CREA_ID) {
                     pCreature = static_cast<Creature*>(this);
@@ -3325,7 +3325,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 }
                 if (HasRandomAnim()) {
                     float fPhase = static_cast<float>(static_cast<double>(Random() % 1000) / 100.0);
-                    RandomizeAddons(spNode.operator->()->IsNode(), fPhase);
+                    RandomizeAddons(spNode->IsNode(), fPhase);
                 }
                 if (pObject->GetFormType() == WEAP_ID) {
                     // The weapon's 3D is passed unchecked, as the game does; RemoveScabard walks it as a node.
@@ -3333,26 +3333,26 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 }
                 bool bMotionBlur = GetMotionBlur();
                 BSShaderProperty::SetMotionBlurRecurse(spNode.operator->(), bMotionBlur);
-                spNode.operator->()->SetTranslate(data.kPosition);
+                spNode->SetTranslate(data.kPosition);
                 NiMatrix3 kRotate = GetOrientation();
-                spNode.operator->()->SetRotate(kRotate);
+                spNode->SetRotate(kRotate);
                 if (GetCenterOnCreation()) {
                     bhkWorld::Enable(spNode.operator->(), false, true, true);
                     NiUpdateData kUpdateData;
                     kUpdateData.~NiUpdateData();
                     ::new (&kUpdateData) NiUpdateData(0.0f, false, false);
-                    spNode.operator->()->Update(kUpdateData);
+                    spNode->Update(kUpdateData);
                     NiUpdateData kUpdateData2;
                     kUpdateData2.~NiUpdateData();
                     ::new (&kUpdateData2) NiUpdateData(0.0f, false, false);
-                    spNode.operator->()->Update(kUpdateData2);
+                    spNode->Update(kUpdateData2);
                     bhkWorld::Enable(spNode.operator->(), true, true, true);
-                    NiPoint3 kOffset = data.kPosition - spNode.operator->()->GetWorldBound().GetCenter();
+                    NiPoint3 kOffset = data.kPosition - spNode->GetWorldBound().GetCenter();
                     data.kPosition += kOffset;
-                    spNode.operator->()->SetTranslate(data.kPosition);
+                    spNode->SetTranslate(data.kPosition);
                 }
                 bhkNiCollisionObject::ResetSim(static_cast<NiNode*>(spNode.operator->()), true);
-                NiNode* pNode = spNode.operator->()->IsNode();
+                NiNode* pNode = spNode->IsNode();
                 if ((pNode) && (pNode->IsFadeNode()))
                 // Tests IsFadeNode's result on pNode but stores through spNode's object, as the game does.
                 {
@@ -3361,7 +3361,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
 
                 BSShaderManager::SetObjectType(spNode.operator->());
                 if (data.pObjectReference == pDoorMarker || data.pObjectReference == pTravelMarker) {
-                    spNode.operator->()->SetAppCulled(true);
+                    spNode->SetAppCulled(true);
                 }
                 // The NPC base object is fetched here and never used; the three getter calls are kept deliberately, as
                 // the game does.
@@ -3373,7 +3373,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                 }
 
                 float fScale = GetScale();
-                spNode.operator->()->SetScale(fScale);
+                spNode->SetScale(fScale);
                 InitAnimation();
                 if (IsActor() && data.pObjectReference->GetFormType() == NPC__ID) {
                     BSFaceGenAnimationData* pFaceData = GetFaceAnimationData(nullptr);
@@ -3382,7 +3382,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
                     }
                     static_cast<TESNPC*>(data.pObjectReference)->FixNPCNormals(this);
                 }
-                spNode.operator->()->UpdateProperties();
+                spNode->UpdateProperties();
                 if (IsActor()) {
                     Actor* pActor = static_cast<Actor*>(this);
                     HighProcess* pHighProcess = nullptr;
@@ -3470,7 +3470,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
         }
         BSSimpleList<TESObjectREFR*>* pLitWaterRefs = GetExtra()->GetLitWaterRefs();
         LightRefData* pLightData = GetLight();
-        if ((pLightData && pLightData->spLight.operator->()) && (!GetTemporary())) {
+        if ((pLightData && pLightData->spLight) && (!GetTemporary())) {
             for (; pLitWaterRefs && pLitWaterRefs->GetItem(); pLitWaterRefs = pLitWaterRefs->GetNext()) {
                 TESObjectREFR* pWaterRef = pLitWaterRefs->GetItem();
                 if (pWaterRef->Get3D()) {
@@ -3498,7 +3498,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
         BSSimpleList<TESObjectREFR*>* pWaterLightRefs = GetExtra()->GetWaterLightRefs();
         for (; pWaterLightRefs && pWaterLightRefs->GetItem(); pWaterLightRefs = pWaterLightRefs->GetNext()) {
             LightRefData* pLightData = static_cast<TESObjectREFR*>(pWaterLightRefs->GetItem())->GetLight();
-            if ((pLightData && pLightData->spLight.operator->()) && (!GetTemporary() && Get3D())) {
+            if ((pLightData && pLightData->spLight) && (!GetTemporary() && Get3D())) {
                 NiAVObject* pWaterGeometry = TES::pInstance->GetWaterSystem()->GetWaterGeometry(this);
                 BSShader* pShader = static_cast<NiGeometry*>(pWaterGeometry)->GetShader();
                 if (pShader &&
@@ -3541,7 +3541,7 @@ NiAVObject* TESObjectREFR::Load3D(bool abBackgroundLoading) {
     if ((bNoNode) && (GetObjectReference()) && (GetObjectReference()->GetFormType() == PWAT_ID) &&
         (!static_cast<BGSPlaceableWater*>(GetObjectReference())->IsAutomaticWater())) {
         bool bUpdated = UpdateMultiboundShapeTransformsRecursive(spNode.operator->());
-        spNode.operator->()->UpdateWorldBound();
+        spNode->UpdateWorldBound();
         if (!bUpdated) {
             uint32_t uiFormID = GetFormID();
             const char* pEditorID = GetFormEditorID();
@@ -3584,7 +3584,7 @@ void TESObjectREFR::Set3D(NiAVObject* apObject, bool abTestProcessLevel) {
     if (TESObjectREFR::Get3D() && !TESObjectREFR::Get3D()->GetParent()) {
         pModelLoader->CancelReference(this);
     }
-    if (pLoadedData && pLoadedData->m_spData3D.operator->() && !apObject && IsActor()) {
+    if (pLoadedData && pLoadedData->m_spData3D && !apObject && IsActor()) {
         Actor* pActor = static_cast<Actor*>(this);
         if (pActor->GetCurrentAIProcess() && pActor->GetCurrentProcessType() <= PROCESS_TYPE_MIDDLE_HIGH) {
             if (abTestProcessLevel) {
@@ -3633,8 +3633,8 @@ void TESObjectREFR::Set3D(NiAVObject* apObject, bool abTestProcessLevel) {
     }
     alignas(NiPointer<NiNode>) uint8_t aOld3DStorage[sizeof(NiPointer<NiNode>)];
     NiPointer<NiNode>& spOld3D = *::new (aOld3DStorage) NiPointer<NiNode>(TESObjectREFR::Get3D());
-    if (spOld3D.operator->()) {
-        pParent = spOld3D.operator->()->GetParent();
+    if (spOld3D) {
+        pParent = spOld3D->GetParent();
         if (pParent) {
             // a temporary tree's 3D stays attached
             if (!GetTemporary() || !data.pObjectReference || data.pObjectReference->GetFormType() != TREE_ID) {
@@ -3646,9 +3646,9 @@ void TESObjectREFR::Set3D(NiAVObject* apObject, bool abTestProcessLevel) {
                     pParent->DetachChild(spOld3D.operator->());
                 }
             }
-            kTranslate = spOld3D.operator->()->GetTranslate();
-            kRotate = spOld3D.operator->()->GetLocalTransform().m_Rotate;
-            fScale = spOld3D.operator->()->GetScale();
+            kTranslate = spOld3D->GetTranslate();
+            kRotate = spOld3D->GetLocalTransform().m_Rotate;
+            fScale = spOld3D->GetScale();
         }
         NiNode* pOld3D = spOld3D.operator->();
         BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->RemoveObject(pOld3D);
@@ -3658,13 +3658,13 @@ void TESObjectREFR::Set3D(NiAVObject* apObject, bool abTestProcessLevel) {
         }
         if (!apObject) {
             bool bHasMovingSound = false;
-            BSFadeNode* pFadeNode = spOld3D.operator->()->IsFadeNode();
+            BSFadeNode* pFadeNode = spOld3D->IsFadeNode();
             if (pFadeNode) {
                 pFadeNode->SetUserData(nullptr);
                 bHasMovingSound = pFadeNode->QHasMovingSound();
             }
-            if (spOld3D.operator->()->QHasMovingSound()) {
-                RemoveSounds(spOld3D.operator->()->IsNode());
+            if (spOld3D->QHasMovingSound()) {
+                RemoveSounds(spOld3D->IsNode());
             }
             FreeUpAllMarkers();
             pVATS.ClearTarget(this);
@@ -3711,7 +3711,7 @@ void TESObjectREFR::Set3D(NiAVObject* apObject, bool abTestProcessLevel) {
                 RemoveAmmo();
             }
             SetBiped(nullptr);
-            bool bHasAddons = HasAddonFlags(spOld3D.operator->()->IsNode());
+            bool bHasAddons = HasAddonFlags(spOld3D->IsNode());
             // LOADED_REF_DATA flag 2: the 3D carries addon nodes
             SetLoadedDataFlag(2, bHasAddons);
             if (bHasAddons) {
@@ -5827,7 +5827,7 @@ bool TESObjectREFR::UpdateMultiboundShapeTransformsRecursive(NiAVObject* apObjec
         }
         pshape->SetCenter(v29);
         float a1a = pmbnode->m_kWorld.m_fScale;
-        extents.operator*=(a1a);
+        extents *= a1a;
         if (paabb) {
             paabb->SetHalfExtents(extents);
         }
@@ -7690,7 +7690,7 @@ void TESObjectREFR::Enable() {
         if (GetParentCell()->GetAttached() && Get3D() && GetObjectReference() &&
             GetObjectReference()->GetFormType() == LIGH_ID) {
             LightRefData* pLight = GetLight();
-            if (pLight && pLight->spLight.operator->()) {
+            if (pLight && pLight->spLight) {
                 NiLight* pNiLight = pLight->spLight.operator->();
                 BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->UpdateLight_0(pNiLight);
             }
@@ -8342,7 +8342,7 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
                         else {
                             v13 = nullptr;
                         }
-                        spsoundHandleExtra.operator=(v13);
+                        spsoundHandleExtra = v13;
                         if (TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags)) {
                             isoundFlags = TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags) |
                                 BSGameSound::SOUND_FLAG_IS_3D;
@@ -8390,7 +8390,7 @@ void TESObjectREFR::AddLight(bool abMagic) {
     else {
         pLight = GetExtra()->GetLight();
     }
-    if (!pLight || !pLight->spLight.operator->()) {
+    if (!pLight || !pLight->spLight) {
         return;
     }
     if (!GetExtra()->GetLitWaterRefs() || (GetExtra()->GetLitWaterRefs() && GetExtra()->GetLitWaterRefs()->IsEmpty())) {
@@ -8682,7 +8682,7 @@ void TESObjectREFR::KillLight(bool abMagic) {
     if (!pLight) {
         return;
     }
-    if (pLight->spLight.operator->()) {
+    if (pLight->spLight) {
         BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->RemoveLight(pLight->spLight.operator->());
         pLight->spLight = nullptr;
     }
@@ -8852,11 +8852,11 @@ void TESObjectREFR::SetLocationOnReference(const NiPoint3& arPoint) {
         if (Get3D()) {
             Get3D()->SetTranslate(kStartingPos);
             bhkNiCollisionObject::ResetSim(pLoadedData->m_spData3D.operator->(), true);
-            pLoadedData->m_spData3D.operator->()->UpdateProperties();
+            pLoadedData->m_spData3D->UpdateProperties();
             NiUpdateData kUpdateData;
             kUpdateData.~NiUpdateData();
             ::new (&kUpdateData) NiUpdateData(0.0f, false, false);
-            pLoadedData->m_spData3D.operator->()->Update(kUpdateData);
+            pLoadedData->m_spData3D->Update(kUpdateData);
         }
     }
     if (pWorldSpace) {
@@ -9426,7 +9426,7 @@ void TESObjectREFR::InitHavokForPrimitiveTrigger() {
     pFlags->SetFlags(BSXFlags::HAVOK, true);
     Get3D()->AddExtraData(pFlags);
     NiNode* p3D = Get3D();
-    pLoadedData->spPhantom.operator->()->SetAVObject(p3D, 0);
+    pLoadedData->spPhantom->SetAVObject(p3D, 0);
     pHavokWorld->Add(pLoadedData->spPhantom.operator->());
 }
 
@@ -10473,7 +10473,7 @@ void TESObjectREFR::SetSpellEffectLight(NiPointLight* pLight) {
     else {
         light = nullptr;
     }
-    light->spLight.operator=(static_cast<NiLight*>(pLight));
+    light->spLight = static_cast<NiLight*>(pLight);
     light->fWantDimmer = 1.0f;
     (&m_Extra)->SetSpellEffectLightPtr(light);
 }
@@ -10610,7 +10610,7 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
     bool abForceHeadTrack
 ) {
     int32_t ioldLipDistance = iSpeakSoundLipDistance.Int();
-    iSpeakSoundLipDistance.operator=(0x7FFFFFFF);
+    iSpeakSoundLipDistance = 0x7FFFFFFF;
     Actor* pactor = nullptr;
     if (IsActor()) {
         pactor = static_cast<Actor*>(this);
@@ -10676,7 +10676,7 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
         }
     }
     SetHasSpokenFlag(true);
-    iSpeakSoundLipDistance.operator=(ioldLipDistance);
+    iSpeakSoundLipDistance = ioldLipDistance;
     ReferenceProcessLists.SortActorsCloseToPlayer();
 }
 
@@ -12004,7 +12004,7 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
                         if (pstatic3D) {
                             const NiBound* WorldBound = &pstatic3D->GetWorldBound();
                             NiBound kBound = *WorldBound;
-                            if ((&kBound.m_kCenter)->operator!=(NiPoint3_ZERO)) {
+                            if (kBound.m_kCenter != NiPoint3_ZERO) {
                                 NiPoint3* v4 = &kBound.m_kCenter;
                                 double fHeightDiff = v4->z - (&pav->GetWorldTranslate())->z;
                                 if (kBound.m_fRadius < fHeightDiff) {
@@ -12306,12 +12306,12 @@ void bhkNiCollisionObject::SetNotify(bool abTF) {
 }
 
 const hkVector4& bhkRigidBody::GetLinearVelocity() {
-    hkpRigidBody* pBody = operator*();
+    hkpRigidBody* pBody = **this;
     return pBody ? pBody->getLinearVelocity() : hkVector4::getZero();
 }
 
 const hkVector4& bhkRigidBody::GetAngularVelocity() {
-    hkpRigidBody* pBody = operator*();
+    hkpRigidBody* pBody = **this;
     return pBody ? pBody->getAngularVelocity() : hkVector4::getZero();
 }
 
@@ -12320,7 +12320,7 @@ void bhkRigidBody::GetAngularVelocity(NiPoint3& arPos) {
 }
 
 void bhkRigidBody::SetLinearVelocity(const hkVector4& arVel) {
-    hkpRigidBody* pBody = operator*();
+    hkpRigidBody* pBody = **this;
     if (pBody) {
         MarkWrite();
         pBody->setLinearVelocity(arVel);
@@ -12329,7 +12329,7 @@ void bhkRigidBody::SetLinearVelocity(const hkVector4& arVel) {
 }
 
 void bhkRigidBody::SetAngularVelocity(const hkVector4& arVel) {
-    hkpRigidBody* pBody = operator*();
+    hkpRigidBody* pBody = **this;
     if (pBody) {
         MarkWrite();
         pBody->setAngularVelocity(arVel);
@@ -12350,7 +12350,7 @@ void bhkRigidBody::SetAngularVelocity(const NiPoint3& arVel) {
 }
 
 bool bhkRigidBody::IsActive() {
-    hkpEntity* v4 = operator*();
+    hkpEntity* v4 = **this;
     if (!v4) {
         return false;
     }
@@ -12359,7 +12359,7 @@ bool bhkRigidBody::IsActive() {
 
 float bhkRigidBody::GethkMaxLinearVelocity() {
     hkUFloat8 apMemory;
-    hkpRigidBody* pb = operator*();
+    hkpRigidBody* pb = **this;
     if (pb) {
         hkUFloat8* p_m_maxLinearVelocity;
         hkpMotion* pdm = pb->getStoredDynamicMotion();
@@ -12386,7 +12386,7 @@ void bhkRigidBodyCinfo::SetRotation(const hkQuaternion& arRot) {
 }
 
 void bhkRigidBodyCinfo::SetShape(const bhkShape* apShape) {
-    m_shape = apShape->operator*();
+    m_shape = **apShape;
     hk.m_shape = m_shape;
 }
 
@@ -12495,7 +12495,7 @@ void CheckWithinMultiBoundTask::Finish() {
 void CheckWithinMultiBoundTask::PostProcess() {
     if (bWithin) {
         BSFadeNode* pFadeNode;
-        if (sp3D.operator->()) {
+        if (sp3D) {
             NiAVObject* p3D = sp3D.operator->();
             pFadeNode = p3D->IsFadeNode();
         }
@@ -12642,7 +12642,7 @@ bool NiControllerManager::GetCumulativeAnimations() {
 void NiNode::DetachAllChildren() {
     uint32_t icount = m_kChildren.m_usSize;
     for (uint32_t i = 0; i < icount; ++i) {
-        NiAVObject* pchild = (&m_kChildren.operator[](i))->m_pObject;
+        NiAVObject* pchild = (&m_kChildren[i])->m_pObject;
         if (pchild) {
             pchild->DetachParent();
         }

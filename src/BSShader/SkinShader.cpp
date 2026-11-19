@@ -243,8 +243,8 @@ void SkinShader::InitPass(uint32_t auiCurrentPass) {
             NiD3DShader::m_spCurrentPass = SkinShader::kPasses[8].m_pObject;
             m_spShaderDecl.SetNew(spShaderDecl.m_pObject);
         LABEL_37:;
-            m_spPixelConstantMap.operator=(spDefaultPixelConstantMap);
-            m_spVertexConstantMap.operator=(spDefaultVertexConstantMap);
+            m_spPixelConstantMap = spDefaultPixelConstantMap;
+            m_spVertexConstantMap = spDefaultVertexConstantMap;
             return;
         }
         switch (auiCurrentPass) {

@@ -192,13 +192,13 @@ NiLight* FindLight(NiNode* apNode) {
 
 bool GetAttenuationSettings() {
     ATTENUATION_SETTINGS::cUsageFlags = 0;
-    if (gs_bUseConstant_bLightAttenuation.operator==(1)) {
+    if (gs_bUseConstant_bLightAttenuation == 1) {
         ATTENUATION_SETTINGS::cUsageFlags |= 1u;
     }
-    if (gs_bUseLinear_bLightAttenuation.operator==(1)) {
+    if (gs_bUseLinear_bLightAttenuation == 1) {
         ATTENUATION_SETTINGS::cUsageFlags |= 2u;
     }
-    if (gs_bUseQuadratic_bLightAttenuation.operator==(1)) {
+    if (gs_bUseQuadratic_bLightAttenuation == 1) {
         ATTENUATION_SETTINGS::cUsageFlags |= 4u;
     }
     if (!ATTENUATION_SETTINGS::cUsageFlags) {
@@ -206,19 +206,19 @@ bool GetAttenuationSettings() {
     }
     if ((gs_uLinearMethod_bLightAttenuation.Int()) &&
         (gs_uLinearMethod_bLightAttenuation.Int() != 1 && gs_uLinearMethod_bLightAttenuation.Int() != 2)) {
-        gs_uLinearMethod_bLightAttenuation.operator=(1);
+        gs_uLinearMethod_bLightAttenuation = 1;
     }
 
     if ((gs_uQuadraticMethod_bLightAttenuation.Int()) &&
         (gs_uQuadraticMethod_bLightAttenuation.Int() != 1 && gs_uQuadraticMethod_bLightAttenuation.Int() != 2)) {
-        gs_uQuadraticMethod_bLightAttenuation.operator=(2);
+        gs_uQuadraticMethod_bLightAttenuation = 2;
     }
 
     if (gs_fLinearRadiusMult_bLightAttenuation.Float() == 0.0) {
-        gs_fLinearRadiusMult_bLightAttenuation.operator=(1.0f);
+        gs_fLinearRadiusMult_bLightAttenuation = 1.0f;
     }
     if (gs_fQuadraticRadiusMult_bLightAttenuation.Float() == 0.0) {
-        gs_fQuadraticRadiusMult_bLightAttenuation.operator=(1.0f);
+        gs_fQuadraticRadiusMult_bLightAttenuation = 1.0f;
     }
     return true;
 }
@@ -492,7 +492,7 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
     NiAVObject* pClone = nullptr;
     NiPointer<NiAVObject> spUnused(nullptr);
     NiPointer<NiAVObject> spGraphics(LoadGraphics(pRequester));
-    if (!spGraphics.operator->()) {
+    if (!spGraphics) {
         return nullptr;
     }
     uint32_t uiBufferSize = GetFormEditorIDLength() + 16;
@@ -517,7 +517,7 @@ NiAVObject* TESObjectLIGH::Clone3D(TESObjectREFR* pRequester) {
     kCloning.~BSCloningProcess();
     ::new (&kCloning) BSCloningProcess(fScale);
     if (static_cast<TESModelTextureSwap*>(this)->TESModel::GetModelLength()) {
-        pClone = static_cast<NiAVObject*>(spGraphics.operator->()->Clone(kCloning));
+        pClone = static_cast<NiAVObject*>(spGraphics->Clone(kCloning));
     }
     else if (!pClone) {
         void* pMemory = NiMemObject::operator new(sizeof(BSFadeNode));

@@ -292,8 +292,8 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                             ::new (&cloneData) BSCloningProcess(1.0f);
                             NiPointer<NiObject> spdeepCopy(static_cast<NiObject*>(nullptr));
                             if (HasMorpherController(pNode)) {
-                                spdeepCopy.operator=(
-                                    static_cast<NiObject*>(TES::pInstance->CreateDeepCopySameTextures(pNode, cloneData))
+                                spdeepCopy = static_cast<NiObject*>(
+                                    TES::pInstance->CreateDeepCopySameTextures(pNode, cloneData)
                                 );
                                 pClone = spdeepCopy.m_pObject;
                             }
@@ -355,9 +355,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                         NiPointer<NiObject> spTempObject;
                                                         NiPointer<NiGeometryData> spdata;
                                                         ptri->GetModelData()->CreateDeepCopy(spTempObject);
-                                                        spdata.operator=(
-                                                            static_cast<NiGeometryData*>(spTempObject.m_pObject)
-                                                        );
+                                                        spdata = static_cast<NiGeometryData*>(spTempObject.m_pObject);
                                                         NiGeometryData* fScale = spdata.m_pObject;
                                                         ptri->SetModelData(fScale);
                                                         pnpc_3->GetFaceCoord((&fgcoord)->kFaceGens);
@@ -506,7 +504,7 @@ void BipedAnim::InitRoot(NiNode* apNode) {
     this->root = static_cast<NiNode*>(BSUtilities::GetObjectByName(apNode, "Bip01"));
     for (int32_t i = 0; i < BIPED_BONE_COUNT; ++i) {
         NiPointer<NiAVObject> spBone = BSUtilities::GetObjectByName(apNode, bipedBoneName[i]);
-        if (spBone.operator->() && spBone->IsNode()) {
+        if (spBone && spBone->IsNode()) {
             this->bone[i].cFlags |= 1;
             this->bone[i].pParent = static_cast<NiNode*>(spBone.operator->());
         }
@@ -740,7 +738,7 @@ void BipedAnim::QueueHelmetLoad(
     NiPointer<QueuedHelmet>& aspQueuedHelmet,
     BIPED_OBJECT aeBipedObject
 ) {
-    if (aspQueuedHelmet.operator->()) {
+    if (aspQueuedHelmet) {
         return;
     }
     if (this->object[aeBipedObject].pPart && this->object[aeBipedObject].pPart != reinterpret_cast<TESModel*>(-1)) {
@@ -1231,7 +1229,7 @@ void BipedAnim::AdjustSkinComplexion(NiAVObject* apObj, bool abForceReadjust) {
             if (acNormalName[0]) {
                 NiPointer<NiTexture> spNormalTexture = nullptr;
                 BSShaderManager::GetTexture(acNormalName, bLoadFile, spNormalTexture, true, false);
-                if (spNormalTexture.operator->()) {
+                if (spNormalTexture) {
                     pShaderProp->SetNormalTexture(0, spNormalTexture.operator->());
                 }
             }
@@ -1289,7 +1287,7 @@ NiNode* BipedAnim::CloneHelmet(BSFaceGenModel* apfgModel, NiNode* apNode, BIPED_
     ::new (&cloneData) BSCloningProcess(1.0f);
     NiPointer<NiObject> spdeepCopy(nullptr);
     if (HasMorpherController(apNode)) {
-        spdeepCopy.operator=(static_cast<NiObject*>(TES::pInstance->CreateDeepCopySameTextures(apNode, cloneData)));
+        spdeepCopy = static_cast<NiObject*>(TES::pInstance->CreateDeepCopySameTextures(apNode, cloneData));
         pClone = spdeepCopy.m_pObject;
     }
     else {
@@ -1399,9 +1397,7 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
     ::new (&cloneData) BSCloningProcess(1.0f);
     NiPointer<NiObject> spdeepCopy(nullptr);
     if (HasMorpherController(pparentNode)) {
-        spdeepCopy.operator=(
-            static_cast<NiObject*>(TES::pInstance->CreateDeepCopySameTextures(pparentNode, cloneData))
-        );
+        spdeepCopy = static_cast<NiObject*>(TES::pInstance->CreateDeepCopySameTextures(pparentNode, cloneData));
         pClone = spdeepCopy.m_pObject;
     }
     else {
@@ -1426,7 +1422,7 @@ NiAVObject* BipedAnim::LoadAndAttachAddOn(
         NiExtraData* a2a = pextra.m_pObject;
         const NiFixedString* TagKey = BSDecalPlacementVectorExtraData::GetTag();
         pfadeNode->AddExtraData(*TagKey, a2a);
-        pextra.operator=(static_cast<NiExtraData*>(nullptr));
+        pextra = static_cast<NiExtraData*>(nullptr);
     }
     if (pfadeNode) {
         if (NiObject::IsKindOf_0(&BSFadeNode::ms_RTTI, pfadeNode)) {

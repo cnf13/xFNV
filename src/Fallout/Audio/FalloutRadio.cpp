@@ -1803,7 +1803,7 @@ void FalloutRadio::PipboyUpdate(bool abForceUpdate) {
         if ((pcurrentItem->GetCurrentResponse()) && ((&pcurrentItem->GetCurrentResponse()->cText)->pString)) {
             uint32_t ivoiceTextLength = BSstrlen((&pcurrentItem->GetCurrentResponse()->cText)->pString);
             int32_t v28 = ivoiceTextLength > 2 &&
-                pcurrentItem->GetCurrentResponse()->GetVoice()->operator!=(static_cast<const char*>(nullptr));
+                *pcurrentItem->GetCurrentResponse()->GetVoice() != static_cast<const char*>(nullptr);
             v46 = v28;
             if ((!v28) && (pcurrentItem->GetCurrentResponse()->pVoiceSound)) {
                 const char* Filename = pcurrentItem->GetCurrentResponse()->pVoiceSound->GetFilename();

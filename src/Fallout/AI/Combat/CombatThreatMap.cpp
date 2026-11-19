@@ -241,7 +241,7 @@ PathingAvoidNode* CombatThreat::GetAvoidNode(PathingAvoidNode* apResult, Actor* 
         float v22 = 0.0f;
         float fnegativeExtrudeTime = BSMAX(0.0f, 0.0f);
         float v14 = fvelocityMagnitude_2 * fnegativeExtrudeTime - fRadius;
-        threatLocation.operator+=((v18 = linearVelocity * v14));
+        threatLocation += (v18 = linearVelocity * v14);
         double v13 = fRadius * 2.0;
         float* v7 = &fCombatThreatExtrudeTime.Float();
         float v12 = (*v7 - fnegativeExtrudeTime) * fvelocityMagnitude_2 + v13;

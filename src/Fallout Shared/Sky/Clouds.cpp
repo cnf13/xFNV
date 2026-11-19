@@ -55,7 +55,7 @@ void Clouds::Initialize(NiNode* apSkyRoot) {
         for (int32_t i = 0; i < apMemory_24; ++i) {
             NiAVObject* v3 = apMemory_20->GetAt(static_cast<uint32_t>(i));
             if (v3->IsGeometry()) {
-                spClouds[i].operator=(static_cast<NiGeometry*>(apMemory_20->GetAt(static_cast<uint32_t>(i))));
+                spClouds[i] = static_cast<NiGeometry*>(apMemory_20->GetAt(static_cast<uint32_t>(i)));
                 NiNode* v2 = spRoot.m_pObject;
                 v2->AttachChild(spClouds[i].m_pObject, 1);
                 ++apMemory_16;
@@ -130,14 +130,14 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                     const TESTexture* ptestexture = pCurrentWeather->GetCloudTexture(i_3);
                     if (ptestexture && ptestexture->GetTextureNameLength()) {
                         const char* v11 = ptestexture->GetDefaultPath();
-                        strfilename.operator=(v11);
+                        strfilename = v11;
                         const char* Model_0 = ptestexture->GetTextureName();
-                        strfilename.operator+=(Model_0);
+                        strfilename += Model_0;
                         char* fWeatherPercent = strfilename.pString;
                         SkyTextureManager::LoadTextureInBackground(&spTransTexture[i_3], fWeatherPercent);
                     }
                     else {
-                        spTransTexture[i_3].operator=(static_cast<NiTexture*>(nullptr));
+                        spTransTexture[i_3] = static_cast<NiTexture*>(nullptr);
                     }
                 }
             }
@@ -154,9 +154,9 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                         const TESTexture* ptestexture_2 = pCurrentWeather->GetCloudTexture(i_4);
                         if ((ptestexture_2) && (ptestexture_2->GetTextureNameLength())) {
                             const char* v14 = ptestexture_2->GetDefaultPath();
-                            strfilename_2.operator=(v14);
+                            strfilename_2 = v14;
                             const char* v15 = ptestexture_2->GetTextureName();
-                            strfilename_2.operator+=(v15);
+                            strfilename_2 += v15;
                             NiPointer<NiTexture> spTex(static_cast<NiTexture*>(nullptr));
                             BSShaderManager::GetTexture(strfilename_2.pString, true, spTex, true, false);
                             NiTexture* ptex = spTex.m_pObject;
@@ -188,7 +188,7 @@ void Clouds::Update(Sky* apSky, float afSecondsPassed) {
                 if (!pLastWeather) {
                     NiTexture* fWeatherPercentc = spTransTexture[i_5].m_pObject;
                     pskyprop->SetTexture(static_cast<NiSourceTexture*>(fWeatherPercentc));
-                    spTransTexture[i_5].operator=(static_cast<NiTexture*>(nullptr));
+                    spTransTexture[i_5] = static_cast<NiTexture*>(nullptr);
                     pskyprop->SetBlendTexture(nullptr);
                     pskyprop->SetBlendValue(0.0f);
                 }
@@ -232,8 +232,8 @@ void Clouds::ZeroGeo() {
 void Clouds::ClearTransTextures() {
     for (int32_t i = 0; i < GetNumLayers(); ++i) {
         spTransTexture[i] = nullptr;
-        if (spClouds[i].operator->()) {
-            NiProperty* pProperty = spClouds[i].operator->()->GetProperty(NiProperty::SHADE);
+        if (spClouds[i]) {
+            NiProperty* pProperty = spClouds[i]->GetProperty(NiProperty::SHADE);
             SkyShaderProperty* pShader =
                 static_cast<SkyShaderProperty*>(NiObject::DynamicCastStatic(&SkyShaderProperty::ms_RTTI, pProperty));
             if (pShader) {
@@ -246,8 +246,8 @@ void Clouds::ClearTransTextures() {
 
 void Clouds::RemoveTextures() {
     for (int32_t i = 0; i < GetNumLayers(); ++i) {
-        if (spClouds[i].operator->()) {
-            NiProperty* pProperty = spClouds[i].operator->()->GetProperty(NiProperty::SHADE);
+        if (spClouds[i]) {
+            NiProperty* pProperty = spClouds[i]->GetProperty(NiProperty::SHADE);
             SkyShaderProperty* pShader =
                 static_cast<SkyShaderProperty*>(NiObject::DynamicCastStatic(&SkyShaderProperty::ms_RTTI, pProperty));
             if (pShader) {

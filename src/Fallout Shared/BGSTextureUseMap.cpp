@@ -107,7 +107,7 @@ void BGSTextureUseMap::AddTexUse(NiTexture* apTex, uint32_t aulMemorySize, TESFo
             }
             pdata = pdata_2;
             UserMap.SetAt(apTex, pdata_2);
-            pdata->spTexture.operator=(apTex);
+            pdata->spTexture = apTex;
             pdata->ulTextureSize = aulMemorySize;
         }
         if (!pdata->UserList.IsInList(apForm)) {

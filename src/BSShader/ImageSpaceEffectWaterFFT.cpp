@@ -158,9 +158,9 @@ void ImageSpaceEffectWaterFFT::Render(
     peffect_3->SetTexture(1, &pScrambleMap, NiTexturingProperty::FILTER_NEAREST);
     peffect_3->SetTexture(2, &pFourierSpectrum, NiTexturingProperty::FILTER_NEAREST);
     peffect_3->Render(apGeometry, apRenderer, v12, 1);
-    tmpptr.operator=(psrc);
-    psrc.operator=(pdst);
-    pdst.operator=(tmpptr);
+    tmpptr = psrc;
+    psrc = pdst;
+    pdst = tmpptr;
     ImageSpaceEffect* v13 = pEffectList.m_pBase[1].m_pObject;
     if (!v13 || v13 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
         peffect_4 = nullptr;
@@ -179,9 +179,9 @@ void ImageSpaceEffectWaterFFT::Render(
             peffect_4->SetTexture(1, &pIFFTButterflyMap, NiTexturingProperty::FILTER_NEAREST);
             peffect_4->SetTexture(2, &psrc, NiTexturingProperty::FILTER_NEAREST);
             peffect_4->Render(apGeometry, apRenderer, pparam_2, 1);
-            tmpptr.operator=(psrc);
-            psrc.operator=(pdst);
-            pdst.operator=(tmpptr);
+            tmpptr = psrc;
+            psrc = pdst;
+            pdst = tmpptr;
             apParams = ++v6;
         }
         while (v6 < iLog2Resolution);
@@ -199,9 +199,9 @@ void ImageSpaceEffectWaterFFT::Render(
     peffect_5->SetTexture(2, &psrc, NiTexturingProperty::FILTER_NEAREST);
     NiDX9Renderer* v19 = apRenderer;
     peffect_5->Render(apGeometry, apRenderer, v18, 1);
-    tmpptr.operator=(psrc);
-    psrc.operator=(pdst);
-    pdst.operator=(tmpptr);
+    tmpptr = psrc;
+    psrc = pdst;
+    pdst = tmpptr;
     ImageSpaceEffect* v20 = pEffectList.m_pBase[2].m_pObject;
     if (!v20 || v20 == reinterpret_cast<ImageSpaceEffect*>(static_cast<uintptr_t>(108))) {
         peffect_6 = nullptr;
@@ -228,9 +228,9 @@ void ImageSpaceEffectWaterFFT::Render(
             peffect_6->SetTexture(2, &psrc, NiTexturingProperty::FILTER_NEAREST);
             peffect_6->Render(apGeometry, apRenderer, pparam_3, 1);
             if (v22 != v23) {
-                tmpptr.operator=(psrc);
-                psrc.operator=(pdst);
-                pdst.operator=(tmpptr);
+                tmpptr = psrc;
+                psrc = pdst;
+                pdst = tmpptr;
             }
             v30 = ++v22;
         }

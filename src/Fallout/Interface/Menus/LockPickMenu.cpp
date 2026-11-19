@@ -735,7 +735,7 @@ void LockPickMenu::Prepare3DElements() {
         v14 = nullptr;
     }
     NiRefObject* v23 = v14;
-    LockPickMenu::spCameraRoot.operator=(v14);
+    LockPickMenu::spCameraRoot = v14;
     NiNode* v13 = LockPickMenu::spCameraRoot.m_pObject;
     v13->AttachChild(plockGeometry, 1);
     NiNode* v12 = LockPickMenu::spCameraRoot.m_pObject;
@@ -775,7 +775,7 @@ void LockPickMenu::Prepare3DElements() {
         }
         NiTimeController::StartAnimations(ppickGeometry);
     }
-    LockPickMenu::spCamera.operator=(Create3DCamera());
+    LockPickMenu::spCamera = Create3DCamera();
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(1);
     ShadowSceneNode_->AttachChild(LockPickMenu::spCameraRoot.m_pObject, 1);
     const NiBound* WorldBound = &LockPickMenu::spCameraRoot.m_pObject->GetWorldBound();
@@ -1123,7 +1123,7 @@ void LockPickMenu::Draw3DElements() {
         BSShaderAccumulator* v3 = static_cast<BSShaderAccumulator*>(apMemory.m_pObject);
         BSShaderUtil::RenderScene(v6, v3, false);
         a1->SetAccumulator(nullptr);
-        apMemory.operator=(static_cast<NiRefObject*>(nullptr));
+        apMemory = static_cast<NiRefObject*>(nullptr);
         a1->PopCullMode();
     }
 }

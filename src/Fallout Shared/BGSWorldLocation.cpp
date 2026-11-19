@@ -49,7 +49,7 @@ float BGSWorldLocation::GetDistanceSquared(const BGSWorldLocation& arWorldLocati
     if (pSpace != (&arWorldLocation)->pSpace) {
         return 0x1.fffffe0000000p+127f;
     }
-    NiPoint3* v3 = &(v4 = (&(&arWorldLocation)->Point)->operator-(Point));
+    NiPoint3* v3 = &(v4 = (&arWorldLocation)->Point - Point);
     return v3->SqrLength();
 }
 
@@ -77,7 +77,7 @@ float BGSWorldLocation::GetDistance(const BGSWorldLocation& arWorldLocation) con
     NiPoint3* v3;
     NiPoint3 v5;
     if (pSpace == (&arWorldLocation)->pSpace) {
-        v3 = &(v5 = (&(&arWorldLocation)->Point)->operator-(Point));
+        v3 = &(v5 = (&arWorldLocation)->Point - Point);
         return v3->Length();
     }
 
@@ -92,7 +92,7 @@ float BGSWorldLocation::GetModifiedDistanceSquared(
     if (pSpace != (&arWorldLocation)->pSpace) {
         return 0x1.fffffe0000000p+127f;
     }
-    (v4 = (&(&arWorldLocation)->Point)->operator-(Point));
+    (v4 = (&arWorldLocation)->Point - Point);
     v4.x = (v4.x * (&arCoordMult)->x);
     v4.y = (v4.y * (&arCoordMult)->y);
     v4.z = (v4.z * (&arCoordMult)->z);

@@ -209,7 +209,7 @@ void SkyShaderProperty::SetBlendTexture(NiTexture* apTexture) {
 }
 
 NiTexture* SkyShaderProperty::GetBaseTexture() const {
-    return (&spBaseMap)->operator->();
+    return spBaseMap;
 }
 
 // Copies this property's members into pDest.

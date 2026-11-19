@@ -515,7 +515,7 @@ TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* 
     }
     int32_t fillTextureRGB = Data.iFillColor;
     int32_t UnderwaterState = Data.iEdgeColor;
-    pData->spTexture.operator=(static_cast<NiTexture*>(nullptr));
+    pData->spTexture = static_cast<NiTexture*>(nullptr);
     float fB = static_cast<float>(static_cast<uint8_t>(fillTextureRGB >> 16));
     float fG = static_cast<float>(static_cast<uint8_t>(fillTextureRGB >> 8));
     float fR = static_cast<float>(static_cast<uint8_t>(fillTextureRGB));
@@ -538,8 +538,8 @@ TESEffectShader::CreateTextureShaderData(NiAVObject* apObject, NiSourceTexture* 
     pData->eBlendOperation = Data.eTextureBlendOperation;
     D3DCMPFUNC Target = Data.eTextureZTestFunction;
     pData->eZTestFunction = Target;
-    pData->spTexture.operator=(static_cast<NiTexture*>(apTex));
-    pData->spBlockOutTexture.operator=(static_cast<NiTexture*>(apBlockOutTex));
+    pData->spTexture = static_cast<NiTexture*>(apTex);
+    pData->spBlockOutTexture = static_cast<NiTexture*>(apBlockOutTex);
     int64_t ReloadSpeed = static_cast<int64_t>(Data.fAlphaTestStartValue);
     pData->iAlphaTest = ReloadSpeed;
     if (IsFlagSet(TESEffectShader::EDGECOLOR_SUBTRACTIVE)) {

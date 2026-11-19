@@ -2052,7 +2052,7 @@ bool RaceSexMenu::RotatePlayer(float afRadians, bool abForce) {
     (&mat)->SetEntry(1u, 1u, a4a);
     float a4b = pPlayerBase->GetHeight();
     (&mat)->SetEntry(2u, 2u, a4b);
-    __builtin_memcpy(&akRot, &(result = (&akRot)->operator*(mat)), sizeof(akRot));
+    __builtin_memcpy(&akRot, &(result = akRot * mat), sizeof(akRot));
     NiAVObject* v5 = (&spPlayerNode)->m_pObject;
     v5->SetRotate(akRot);
     NiUpdatePlayer3D();
@@ -2295,11 +2295,11 @@ bool RaceSexMenu::UpdatePlayerEyes() {
             NiAVObject* pobj = v3->GetAt(ichild);
             const char* HandleString = (&pobj->m_kName)->GetHandleString();
             if (!BSstrcmp(HandleString, "FaceGenEyeLeft")) {
-                spLeftEye.operator=(pobj->IsTriBasedGeom());
+                spLeftEye = pobj->IsTriBasedGeom();
             }
             const char* v5 = (&pobj->m_kName)->GetHandleString();
             if (!BSstrcmp(v5, "FaceGenEyeRight")) {
-                spRightEye.operator=(pobj->IsTriBasedGeom());
+                spRightEye = pobj->IsTriBasedGeom();
             }
         }
         if ((spLeftEye.m_pObject) && (spRightEye.m_pObject)) {
@@ -2583,11 +2583,11 @@ Tile* RaceSexMenu::Create(RaceSexMenuContext aeContext) {
         RaceSexMenu::pMe->SetMenuTile(static_cast<TileMenu*>(ptile), false);
         if (!RaceSexMenu::strDoneCaps.pString) {
             const char* v4 = sDone.String();
-            RaceSexMenu::strDoneCaps.operator=(v4);
+            RaceSexMenu::strDoneCaps = v4;
             const char* v5 = sNext.String();
-            RaceSexMenu::strNextCaps.operator=(v5);
+            RaceSexMenu::strNextCaps = v5;
             const char* v6 = sBack.String();
-            RaceSexMenu::strBackCaps.operator=(v6);
+            RaceSexMenu::strBackCaps = v6;
             if (GetCurrentTexLanguage() != LANGUAGE_SPANISH) {
                 RaceSexMenu::strDoneCaps.MakeUpper();
                 RaceSexMenu::strNextCaps.MakeUpper();

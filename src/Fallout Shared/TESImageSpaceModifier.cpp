@@ -1814,17 +1814,17 @@ TESImageSpaceModifier* TESImageSpaceModifier::GetExplosionInFace() {
 // Hands the keys to the color data, creating it on first use.
 void NiColorInterpolator::ReplaceKeys(NiColorKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
     if (uiNumKeys) {
-        if (!m_spColorData.operator->()) {
+        if (!m_spColorData) {
             void* pMemory = NiMemObject::operator new(sizeof(NiColorData));
             NiColorData* pkColorData = pMemory ? ::new (pMemory) NiColorData : nullptr;
             m_spColorData = pkColorData;
         }
-        m_spColorData.operator->()->ReplaceAnim(pkKeys, uiNumKeys, eType);
+        m_spColorData->ReplaceAnim(pkKeys, uiNumKeys, eType);
         m_uiLastIdx = 0;
     }
     else {
-        if (m_spColorData.operator->()) {
-            m_spColorData.operator->()->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
+        if (m_spColorData) {
+            m_spColorData->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
         }
     }
 }
@@ -1838,17 +1838,17 @@ NiFloatKey* NiFloatData::GetAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& e
 
 void NiFloatInterpolator::ReplaceKeys(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
     if (uiNumKeys) {
-        if (!m_spFloatData.operator->()) {
+        if (!m_spFloatData) {
             void* pMemory = NiMemObject::operator new(sizeof(NiFloatData));
             NiFloatData* pkData = pMemory ? ::new (pMemory) NiFloatData : nullptr;
             m_spFloatData = pkData;
         }
-        m_spFloatData.operator->()->ReplaceAnim(pkKeys, uiNumKeys, eType);
+        m_spFloatData->ReplaceAnim(pkKeys, uiNumKeys, eType);
         m_uiLastIdx = 0;
     }
     else {
-        if (m_spFloatData.operator->()) {
-            m_spFloatData.operator->()->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
+        if (m_spFloatData) {
+            m_spFloatData->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
         }
     }
 }
@@ -1865,5 +1865,5 @@ NiColorA NiColorA::operator*(float fScalar) const {
 }
 
 NiColorA NiColorA::Multiply(float afScalar, const NiColorA* apColor) {
-    return apColor->operator*(afScalar);
+    return *apColor * afScalar;
 }

@@ -112,7 +112,7 @@ void Atmosphere::Initialize(NiNode* apSkyRoot, BSFogProperty* apFog) {
         else {
             v8 = nullptr;
         }
-        spSkyQuadNode.operator=(v8);
+        spSkyQuadNode = v8;
         spSkyQuadNode.m_pObject->SetSelectiveUpdate(true);
         NiNode* v7 = spSkyQuadNode.m_pObject;
         v7->AttachChild(spSkyQuad.m_pObject, 1);
@@ -139,12 +139,12 @@ void Atmosphere::Initialize(NiNode* apSkyRoot, BSFogProperty* apFog) {
             Warning("Cannot load the atmosphere model.");
             return;
         }
-        spAtmosphere.operator=(ptrishape);
+        spAtmosphere = ptrishape;
         spAtmosphere.m_pObject->SetSelectiveUpdate(true);
         NiNode* v5 = spRoot.m_pObject;
         v5->AttachChild(spAtmosphere.m_pObject, 1);
     }
-    spFog.operator=(apFog);
+    spFog = apFog;
     BSShaderManager::SetFogProperty(0, apFog);
 }
 

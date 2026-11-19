@@ -11,7 +11,7 @@ PathingSplineKey PathingNode::GetSplineKey() {
     PathingSplineKey apMemory;
     apMemory.Location = (resulta = Location.GetLocation());
     apMemory.Tangent = Tangent;
-    result.operator=(apMemory);
+    result = apMemory;
     return result;
 }
 
@@ -37,8 +37,8 @@ NiPoint3 PathingSpline::InterpolateNoZ(const PathingSplineKey& aKey1, const Path
 
 NiPoint3 PathingSpline::Interpolate(const PathingSplineKey& aKey1, const PathingSplineKey& aKey2) {
     NiPoint3 result;
-    Key1.operator=(aKey1);
-    Key2.operator=(aKey2);
+    Key1 = aKey1;
+    Key2 = aKey2;
     result = InterpolateNoZ(aKey1, aKey2);
     return result;
 }

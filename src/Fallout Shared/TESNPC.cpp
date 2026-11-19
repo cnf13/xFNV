@@ -719,9 +719,8 @@ void TESNPC::Save() {
         float* pfloats = static_cast<float*>(ourMalloc(sizeof(float) * isize));
         ourMemset(pfloats, 0, imemsize);
         for (uint32_t i = 0; i < isize; ++i) {
-            FR2MatrixVTC<float>::RowT* v3 =
-                ::new (&a2) FR2MatrixVTC<float>::RowT(RaceFaceOffsetCoord[0][0].operator[](i));
-            float* v4 = &v3->operator[](0);
+            FR2MatrixVTC<float>::RowT* v3 = ::new (&a2) FR2MatrixVTC<float>::RowT(RaceFaceOffsetCoord[0][0][i]);
+            float* v4 = &(*v3)[0];
             pfloats[i] = *v4;
         }
         TESForm::AddChunkArray(FGGS_ID, pfloats, isize);
@@ -734,9 +733,8 @@ void TESNPC::Save() {
         float* pfloats_2 = static_cast<float*>(ourMalloc(sizeof(float) * isize));
         ourMemset(pfloats_2, 0, imemsize_2);
         for (uint32_t i_2 = 0; i_2 < isize; ++i_2) {
-            FR2MatrixVTC<float>::RowT* v5 =
-                ::new (&result) FR2MatrixVTC<float>::RowT(RaceFaceOffsetCoord[0][1].operator[](i_2));
-            float* v6 = &v5->operator[](0);
+            FR2MatrixVTC<float>::RowT* v5 = ::new (&result) FR2MatrixVTC<float>::RowT(RaceFaceOffsetCoord[0][1][i_2]);
+            float* v6 = &(*v5)[0];
             pfloats_2[i_2] = *v6;
         }
         TESForm::AddChunkArray(FGGA_ID, pfloats_2, isize);
@@ -749,9 +747,8 @@ void TESNPC::Save() {
         float* pfloats_3 = static_cast<float*>(ourMalloc(sizeof(float) * isize));
         ourMemset(pfloats_3, 0, imemsize_3);
         for (uint32_t i_3 = 0; i_3 < isize; ++i_3) {
-            FR2MatrixVTC<float>::RowT* v7 =
-                ::new (&v11) FR2MatrixVTC<float>::RowT(RaceFaceOffsetCoord[1][0].operator[](i_3));
-            float* v8 = &v7->operator[](0);
+            FR2MatrixVTC<float>::RowT* v7 = ::new (&v11) FR2MatrixVTC<float>::RowT(RaceFaceOffsetCoord[1][0][i_3]);
+            float* v8 = &(*v7)[0];
             pfloats_3[i_3] = *v8;
         }
         TESForm::AddChunkArray(FGTS_ID, pfloats_3, isize);
@@ -803,8 +800,7 @@ void TESNPC::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                 for (uint32_t k = 0; k < inumrows; ++k) {
                     for (uint32_t l = 0; l < inumcolumns; ++l) {
                         FR2MatrixVTC<float>::RowT a2;
-                        foffset = (::new (&a2) FR2MatrixVTC<float>::RowT(pfaceCoords[2 * i + j].operator[](k)))
-                                      ->operator[](l);
+                        foffset = (*(::new (&a2) FR2MatrixVTC<float>::RowT(pfaceCoords[2 * i + j][k])))[l];
                         apSaveGameBuffer->SaveDataEndian(&foffset, 4u, 0);
                     }
                 }
@@ -909,11 +905,9 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                         FR2MatrixVTC<float>::RowT v22;
                         foffset = 0.0f;
                         apLoadGameBuffer->LoadData(&foffset, sizeof(foffset));
-                        double v9 = (::new (&v22) FR2MatrixVTC<float>::RowT(pfaceCoords[2 * i + j].operator[](k)))
-                                        ->operator[](l);
+                        double v9 = (*(::new (&v22) FR2MatrixVTC<float>::RowT(pfaceCoords[2 * i + j][k])))[l];
                         if (foffset != v9) {
-                            float* v10 = &(::new (&v21) FR2MatrixVTC<float>::RowT(pfaceCoords[2 * i + j].operator[](k)))
-                                              ->operator[](l);
+                            float* v10 = &(*(::new (&v21) FR2MatrixVTC<float>::RowT(pfaceCoords[2 * i + j][k])))[l];
                             *v10 = foffset;
                             cresetFlags |= 8u;
                         }
@@ -1877,11 +1871,11 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
             pobj = spHeadBiped.m_pObject->GetAt(ichild);
             const char* HandleString = (&pobj->m_kName)->GetHandleString();
             if (!BSstrcmp(HandleString, "FaceGenEyeLeft")) {
-                spLeftEye.operator=(pobj->IsTriBasedGeom());
+                spLeftEye = pobj->IsTriBasedGeom();
             }
             const char* v3 = (&pobj->m_kName)->GetHandleString();
             if (!BSstrcmp(v3, "FaceGenEyeRight")) {
-                spRightEye.operator=(pobj->IsTriBasedGeom());
+                spRightEye = pobj->IsTriBasedGeom();
             }
         }
         if (spLeftEye.m_pObject && spRightEye.m_pObject) {
@@ -2020,13 +2014,13 @@ float TESNPC::GetRaceHeight() {
 }
 
 void TESNPC::ClearHead() {
-    NiPointer<BSFaceGenNiNode>* v1 = &(&spHeadBiped)->operator=(nullptr);
-    (&spHeadSkinned)->operator=(*v1);
+    NiPointer<BSFaceGenNiNode>* v1 = &(spHeadBiped = nullptr);
+    spHeadSkinned = *v1;
 }
 
 void TESNPC::InitHead(BSFaceGenNiNode*& apOutNodeBiped, BSFaceGenNiNode*& apOutNodeSkinned) {
-    spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
-    spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
+    spHeadBiped = static_cast<BSFaceGenNiNode*>(nullptr);
+    spHeadSkinned = static_cast<BSFaceGenNiNode*>(nullptr);
     if ((!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) && (GetFormRace())) {
         TESRace* FormHealth_0 = GetFormRace();
         FormHealth_0->CreateHead(apOutNodeBiped, apOutNodeSkinned, this, true, false, TESActorBase::SEX_MALE);
@@ -2757,16 +2751,16 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                             pgeom = nullptr;
                         }
                         pgeom_2 = pgeom;
-                        if ((pgeom) && (spHeadBiped.operator!=(pfaceBiped))) {
+                        if ((pgeom) && (spHeadBiped != pfaceBiped)) {
                             pgeom_2->GetModelData()->CreateDeepCopy(spTempObject);
-                            spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
+                            spdata = static_cast<NiGeometryData*>(spTempObject.m_pObject);
                             if (spdata.m_pObject) {
                                 NiGeometryData* fScale = spdata.m_pObject;
                                 pgeom_2->SetModelData(fScale);
                             }
                         }
                     }
-                    if (spHeadBiped.operator!=(pfaceBiped)) {
+                    if (spHeadBiped != pfaceBiped) {
                         BSFaceGenAnimationData* v6 = pfaceBiped->GetAnimationData();
                         panimdata = v6->CreateCopyBS();
                         if (panimdata) {
@@ -2794,9 +2788,9 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                         }
                         pgeom_2 = pgeom_3;
                         if (pgeom_3) {
-                            if (spHeadSkinned.operator!=(pfaceSkinned)) {
+                            if (spHeadSkinned != pfaceSkinned) {
                                 pgeom_2->GetModelData()->CreateDeepCopy(spTempObject);
-                                spdata.operator=(static_cast<NiGeometryData*>(spTempObject.m_pObject));
+                                spdata = static_cast<NiGeometryData*>(spTempObject.m_pObject);
                                 if (spdata.m_pObject) {
                                     NiGeometryData* afScale = spdata.m_pObject;
                                     pgeom_2->SetModelData(afScale);
@@ -2827,7 +2821,7 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                                     );
                                 }
                                 pgeom_2->GetSkinInstance()->GetSkinPartition()->CreateDeepCopy(spTempObject);
-                                spskinpart.operator=(static_cast<NiSkinPartition*>(spTempObject.m_pObject));
+                                spskinpart = static_cast<NiSkinPartition*>(spTempObject.m_pObject);
                                 if (spskinpart.m_pObject) {
                                     NiSkinPartition* v11 = spskinpart.m_pObject;
                                     pgeom_2->GetSkinInstance()->SetSkinPartition(v11);
@@ -2835,7 +2829,7 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                             }
                         }
                     }
-                    if (spHeadSkinned.operator!=(pfaceSkinned)) {
+                    if (spHeadSkinned != pfaceSkinned) {
                         if (panimdata) {
                             pfaceSkinned->SetAnimationData(panimdata);
                         }
@@ -2851,8 +2845,8 @@ void TESNPC::LinearFaceGenHeadLoad(TESObjectREFR* apRef, BipedAnim* apBipedAnim)
                 if ((!spHeadBiped.m_pObject && !spHeadSkinned.m_pObject) && (pFormRace)) {
                     pFormRace->CreateHead(pfaceBiped, pfaceSkinned, this, false, false, TESActorBase::SEX_MALE);
                     sLastRaceFaceNum = pFormRace->GetFaceCoordNum();
-                    spHeadBiped.operator=(pfaceBiped);
-                    spHeadSkinned.operator=(pfaceSkinned);
+                    spHeadBiped = pfaceBiped;
+                    spHeadSkinned = pfaceSkinned;
                 }
 
                 if (!pfaceBiped && !pfaceSkinned) {
@@ -3079,7 +3073,7 @@ void TESNPC::RandomizeHead(bool a2, bool a3, bool a4) {
     if (BSFaceGenManager::CompareFaceGenCoord(&v21, OffsetFaceCoord)) {
         FR2MatrixVTC<float>(*v9)[2][2] = GetOffsetFaceCoord();
         BSFaceGenManager::CopyFaceGenCoord(&v21, v9, false, false);
-        spBodyModTexture.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
+        spBodyModTexture = static_cast<BSFaceGenNiNode*>(nullptr);
     }
 }
 
@@ -3096,7 +3090,7 @@ void TESNPC::LoadObjectArray(
     }
 
     for (uint32_t i = 0; i < apObjectArray->iSize; ++i) {
-        TESBoundObject* pboundObject = apObjectArray->operator[](i);
+        TESBoundObject* pboundObject = (*apObjectArray)[i];
         InitWornObject(apRef, apBipedAnim, pboundObject);
     }
     FixDisplayedHeadParts(apRef, nullptr);
@@ -3139,7 +3133,7 @@ void TESNPC::FixNPCNormals(TESObjectREFR* apRef) {
     if ((apRef) && (BSFaceGenManager::GetFixNormals())) {
         NiAVObject* pobj = (NiAVObject*)apRef->Get3D();
         uint32_t ichildren = 0;
-        BSFaceGenNiNode* phead = (&spHeadSkinned.operator=(apRef->GetFaceNode(nullptr)))->m_pObject;
+        BSFaceGenNiNode* phead = (&(spHeadSkinned = apRef->GetFaceNode(nullptr)))->m_pObject;
         const char* HeadPartNodeName = TESRace::GetHeadPartNodeName(RHP_HEAD);
         NiAVObject* ptemp = BSUtilities::GetObjectByName(pobj, HeadPartNodeName);
         NiTriBasedGeom* pface = ptemp ? ptemp->IsTriBasedGeom() : nullptr;
@@ -3298,7 +3292,7 @@ void TESNPC::SaveFaceGen(Character* apCharacter) {
             for (uint32_t k = 0; k < inumrows; ++k) {
                 for (uint32_t l = 0; l < inumcolumns; ++l) {
                     FR2MatrixVTC<float>::RowT result;
-                    foffset = (&(result = RaceFaceOffsetCoord[i][j].operator[](k)))->operator[](l);
+                    foffset = (result = RaceFaceOffsetCoord[i][j][k])[l];
                     SaveGameDataOLD(&foffset, 4);
                 }
             }
@@ -3326,8 +3320,8 @@ void TESNPC::SaveFaceGen(Character* apCharacter) {
 }
 
 void TESNPC::ClearFaceGenModels() {
-    spHeadBiped.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
-    spHeadSkinned.operator=(static_cast<BSFaceGenNiNode*>(nullptr));
+    spHeadBiped = static_cast<BSFaceGenNiNode*>(nullptr);
+    spHeadSkinned = static_cast<BSFaceGenNiNode*>(nullptr);
 }
 
 uint16_t TESNPC::GetFaceGenSaveSize(Character* apCharacter) {
