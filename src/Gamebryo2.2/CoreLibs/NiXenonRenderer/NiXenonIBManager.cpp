@@ -80,16 +80,7 @@ NiDX9IndexBufferManager::GetIndexBuffer(uint32_t auiLength, uint32_t auiUsage, D
             }
         }
         else {
-            NiDX9IndexBufferManager::NiDX9IBResource* v11 = static_cast<NiDX9IndexBufferManager::NiDX9IBResource*>(
-                NiMemObject::operator new(sizeof(NiDX9IndexBufferManager::NiDX9IBResource))
-            );
-            v9 = v11;
-            if (v11) {
-                ::new (v11) NiDX9IndexBufferManager::NiDX9IBResource;
-            }
-            else {
-                v9 = nullptr;
-            }
+            v9 = new NiDX9IndexBufferManager::NiDX9IBResource;
             v9->m_ePool = aePool;
             v10 = auiLength;
             v9->m_uiUsage = auiUsage;
@@ -277,7 +268,7 @@ void NiDX9IndexBufferManager::DestroyDefaultBuffers() {
                     NiMemObject::operator delete(pkIBRes, sizeof(NiDX9IBResource));
                 }
             }
-            NiMemObject::operator delete(pkIBInfo, sizeof(NiDX9IBInfo));
+            delete pkIBInfo;
         }
     }
     m_kDefaultResources.RemoveAll();

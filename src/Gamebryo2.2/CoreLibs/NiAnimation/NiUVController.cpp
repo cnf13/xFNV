@@ -28,13 +28,7 @@ NiUVController::~NiUVController() {
 }
 
 NiObject* NiUVController::CreateClone(NiCloningProcess& kCloning) {
-    NiUVController* pkClone = static_cast<NiUVController*>(NiMemObject::operator new(sizeof(NiUVController)));
-    if (pkClone) {
-        ::new (pkClone) NiUVController;
-    }
-    else {
-        pkClone = nullptr;
-    }
+    NiUVController* pkClone = new NiUVController;
     CopyMembers(pkClone, kCloning);
     pkClone->m_uiLastUOffsetIdx = m_uiLastUOffsetIdx;
     pkClone->m_uiLastVOffsetIdx = m_uiLastVOffsetIdx;
@@ -315,9 +309,5 @@ void NiUVController::SetUVData(NiUVData* a1) {
 }
 
 NiObject* NiUVController::CreateObject() {
-    NiUVController* v1 = static_cast<NiUVController*>(NiMemObject::operator new(sizeof(NiUVController)));
-    if (!v1) {
-        return nullptr;
-    }
-    return ::new (v1) NiUVController;
+    return new NiUVController;
 }

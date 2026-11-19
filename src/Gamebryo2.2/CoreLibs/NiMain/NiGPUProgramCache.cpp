@@ -419,8 +419,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
     for (uint32_t ui = 0; ui < uiResCount; ++ui) {
         uint32_t uiValue;
         if (!bSkip) {
-            void* pvMemory = NiMemObject::operator new(sizeof(NiMaterialResource));
-            NiMaterialResource* pkRes = pvMemory ? ::new (pvMemory) NiMaterialResource : nullptr;
+            NiMaterialResource* pkRes = new NiMaterialResource;
 
             ReadString();
             pkRes->SetType(acBuffer);

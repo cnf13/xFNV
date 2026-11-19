@@ -710,7 +710,7 @@ uint8_t apCallback(ItemChange* apItem, BSStringT<char>* apData) {
         uint32_t uiFormID = apItem->pContainerObj->iFormID;
         const char* pFullName = apItem->GetFullName();
         BSsprintf(acBuffer, 260, "%s%i %s (%08X),", pWorn, apItem->iNumber, pFullName, uiFormID);
-        apData->operator+=(static_cast<const char*>(acBuffer));
+        *apData += static_cast<const char*>(acBuffer);
     }
 
     return 0;
@@ -1915,7 +1915,7 @@ void PlayerCharacter::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     uint32_t aiVariableValue = isaveGameCount_2;
     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount_2);
     for (uint32_t i_5 = 0; i_5 < aiVariableValue; ++i_5) {
-        ItemChange** pchange = &RockItLauncherAmmoList.operator[](i_5);
+        ItemChange** pchange = &RockItLauncherAmmoList[i_5];
         (*pchange)->SaveGame(apSaveGameBuffer);
     }
     uint32_t isaveGameCount_3 = 0;
@@ -3527,13 +3527,13 @@ void PlayerCharacter::UpdateRefLight() {
     if (plightData) {
         NiAVObject* v1;
         if (plightData->spLight == sp1stPersonLight && (v1 = Get3D(true), v1->GetAppCulled())) {
-            plightData->spLight.operator=(sp3rdPersonLight);
+            plightData->spLight = sp3rdPersonLight;
         }
         else {
             if (plightData->spLight == sp3rdPersonLight) {
                 NiAVObject* v2 = Get3D(false);
                 if (v2->GetAppCulled()) {
-                    plightData->spLight.operator=(sp1stPersonLight);
+                    plightData->spLight = sp1stPersonLight;
                 }
             }
         }
@@ -3792,17 +3792,15 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         DecalCaster::GetInstance(DecalCaster::GetMaxDecalWidthSmall(), true)->Add(pWorld);
     }
 
-    if (spCameraRigidBody.operator==(static_cast<bhkRigidBody*>(nullptr))) {
+    if (spCameraRigidBody == static_cast<bhkRigidBody*>(nullptr)) {
         hkVector4 hkv;
-        bhkSphereShape* pSphereMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-        bhkSphereShape* pSphere = pSphereMemory ? ::new (pSphereMemory) bhkSphereShape : nullptr;
+        bhkSphereShape* pSphere = new bhkSphereShape;
         pSphere->Init(0.001f);
         bhkRigidBodyCinfo kInfo;
         kInfo.SetShape(pSphere);
         kInfo.SetCollisionFilter(0x30021u);
-        bhkRigidBody* pBodyMemory = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-        bhkRigidBody* pBody = pBodyMemory ? ::new (pBodyMemory) bhkRigidBody(kInfo) : nullptr;
-        spCameraRigidBody.operator=(pBody);
+        bhkRigidBody* pBody = new bhkRigidBody(kInfo);
+        spCameraRigidBody = pBody;
         spCameraRigidBody.m_pObject->SetActive(true);
         bhkRigidBody* pCameraBody = spCameraRigidBody.m_pObject;
         pCameraBody->SetMotionType(hkpMotion::MOTION_KEYFRAMED);
@@ -3968,7 +3966,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
         }
         else {
             NiPoint3 kOffset = GetLocationOnReference();
-            kOffset.operator-=(LastKnownGoodPosition);
+            kOffset -= LastKnownGoodPosition;
             if (kOffset.Length() > 2048.0) {
                 bReturnToLastKnownGoodPosition = true;
             }
@@ -4162,7 +4160,7 @@ void PlayerCharacter::Update(float afDelta) {
     iActorsDismemberedThisFrame = 0;
     TESObjectREFR* phitRef = TESObjectREFR::FindReferenceFor3D(this->spTargeted3D.m_pObject);
     HUDMainMenu::HandleHealthbarForCrosshairActor(phitRef, this->bTarget3DDistant);
-    this->spTargeted3D.operator=(static_cast<NiAVObject*>(nullptr));
+    this->spTargeted3D = static_cast<NiAVObject*>(nullptr);
     this->ResetCachedGunSkill();
     alignas(16) AutoMemContext tempMemContext(
         MEM_CONTEXT_PLAYER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\AI\\PlayerCharacter.cpp", 3137
@@ -5088,7 +5086,7 @@ void PlayerCharacter::Update(float afDelta) {
                         kMoveVec = kMoveVec * rot;
                     }
                     kMoveVec *= 4.25f;
-                    currentPos.operator+=(kMoveVec);
+                    currentPos += kMoveVec;
                     sideVec = kMoveVec;
                 }
                 else {
@@ -5142,12 +5140,12 @@ void PlayerCharacter::Update(float afDelta) {
                     }
                     float CurrentSpeed = this->GetCurrentSpeed();
                     float v200 = CurrentSpeed * PlayerCharacter::fWalkSpeedMult;
-                    sideVec.operator*=(v200);
+                    sideVec *= v200;
                     float v199 = CurrentSpeed * PlayerCharacter::fWalkSpeedMult;
-                    forwardVec__motionVec.operator*=(v199);
+                    forwardVec__motionVec *= v199;
                     if (pcontrols->GetUserAction(Controls::UACTN_FORWARD, 1) ||
                         pcontrols->GetUserAction(Controls::UACTN_FORWARD, 0)) {
-                        currentPos.operator+=(forwardVec__motionVec);
+                        currentPos += forwardVec__motionVec;
                         if ((smoveMode & 512) == 0) {
                             smoveMode = static_cast<int32_t>(
                                 (static_cast<uint32_t>(smoveMode) & 0xFFFF0000u) |
@@ -5161,7 +5159,7 @@ void PlayerCharacter::Update(float afDelta) {
                     }
                     if (pcontrols->GetUserAction(Controls::UACTN_BACK, 1) ||
                         pcontrols->GetUserAction(Controls::UACTN_BACK, 0)) {
-                        currentPos.operator-=(forwardVec__motionVec);
+                        currentPos -= forwardVec__motionVec;
                         if ((smoveMode & 512) == 0) {
                             smoveMode = static_cast<int32_t>(
                                 (static_cast<uint32_t>(smoveMode) & 0xFFFF0000u) |
@@ -5175,7 +5173,7 @@ void PlayerCharacter::Update(float afDelta) {
                     }
                     if (pcontrols->GetUserAction(Controls::UACTN_SLDLEFT, 1) ||
                         pcontrols->GetUserAction(Controls::UACTN_SLDLEFT, 0)) {
-                        currentPos.operator-=(sideVec);
+                        currentPos -= sideVec;
                         if ((smoveMode & 512) == 0) {
                             smoveMode = static_cast<int32_t>(
                                 (static_cast<uint32_t>(smoveMode) & 0xFFFF0000u) |
@@ -5189,7 +5187,7 @@ void PlayerCharacter::Update(float afDelta) {
                     }
                     if (pcontrols->GetUserAction(Controls::UACTN_SLDRIGHT, 1) ||
                         pcontrols->GetUserAction(Controls::UACTN_SLDRIGHT, 0)) {
-                        currentPos.operator+=(sideVec);
+                        currentPos += sideVec;
                         if ((smoveMode & 512) == 0) {
                             smoveMode = static_cast<int32_t>(
                                 (static_cast<uint32_t>(smoveMode) & 0xFFFF0000u) |
@@ -5444,7 +5442,7 @@ void PlayerCharacter::Update(float afDelta) {
                         this->SetNoCollision(true);
                     }
                     alignas(16) NiPoint3 delta = currentPos - oldPos;
-                    delta.operator*=(afDelta);
+                    delta *= afDelta;
                     NiPoint3* v69 = ::new (&v187) NiPoint3(0.0f, 0.0f, delta.z);
                     this->SetPosition(oldPos + *v69);
                 }
@@ -5750,7 +5748,7 @@ void PlayerCharacter::Update(float afDelta) {
                         else {
                             PlayerCharacter::fAutoVanityDelay = PlayerCharacter::fAutoVanityDelay + afDelta;
                         }
-                        if (bDisableAutoVanityMode.operator!() &&
+                        if (!bDisableAutoVanityMode &&
                             fVanityModeAutoDelay.Float() < static_cast<double>(PlayerCharacter::fAutoVanityDelay) &&
                             !this->GetControlsDisabled(PlayerCharacter::DPC_POV_SWITCH)) {
                             PlayerCharacter::fAutoVanityModeDistRevert = PlayerCharacter::kVanityModePos.y;
@@ -6667,7 +6665,7 @@ TESObjectREFR* PlayerCharacter::DropObject(
             NiPoint3 location = pobjREFR->GetLocationOnReference();
             const NiBound* WorldBound = &pav->GetWorldBound();
             NiPoint3 shift = location - WorldBound->m_kCenter;
-            location.operator+=(shift);
+            location += shift;
             pav->SetTranslate(location);
             pobjREFR->SetLocationOnReference(location);
             bhkNiCollisionObject::ResetSim(pav, true);
@@ -7110,9 +7108,7 @@ void PlayerCharacter::AddGunWobble() {
                     }
                 }
                 if (!pwobbleObj->GetCollisionObject()) {
-                    void* pMemory = NiMemObject::operator new(sizeof(bhkBlendCollisionObjectAddRotation));
-                    bhkBlendCollisionObjectAddRotation* pnewBlendCol =
-                        pMemory ? ::new (pMemory) bhkBlendCollisionObjectAddRotation : nullptr;
+                    bhkBlendCollisionObjectAddRotation* pnewBlendCol = new bhkBlendCollisionObjectAddRotation;
                     pwobbleObj->SetCollisionObject(pnewBlendCol);
                 }
                 else {
@@ -7123,9 +7119,7 @@ void PlayerCharacter::AddGunWobble() {
                         NiObject* pAddRotation =
                             NiObject::DynamicCastStatic(&bhkBlendCollisionObjectAddRotation::ms_RTTI, pblendCol);
                         if (!pAddRotation) {
-                            void* pMemory = NiMemObject::operator new(sizeof(bhkBlendCollisionObjectAddRotation));
-                            bhkBlendCollisionObjectAddRotation* pnewBlendCol =
-                                pMemory ? ::new (pMemory) bhkBlendCollisionObjectAddRotation : nullptr;
+                            bhkBlendCollisionObjectAddRotation* pnewBlendCol = new bhkBlendCollisionObjectAddRotation;
                             pnewBlendCol->CopyFrom(pblendCol);
                             pwobbleObj->SetCollisionObject(pnewBlendCol);
                         }
@@ -7180,9 +7174,7 @@ void PlayerCharacter::AddGunWobble() {
                 }
                 if (pwobbleObj) {
                     if (!pwobbleObj->GetCollisionObject()) {
-                        void* pMemory = NiMemObject::operator new(sizeof(bhkBlendCollisionObjectAddRotation));
-                        bhkBlendCollisionObjectAddRotation* pnewBlendCol =
-                            pMemory ? ::new (pMemory) bhkBlendCollisionObjectAddRotation : nullptr;
+                        bhkBlendCollisionObjectAddRotation* pnewBlendCol = new bhkBlendCollisionObjectAddRotation;
                         pwobbleObj->SetCollisionObject(pnewBlendCol);
                     }
                     bhkBlendCollisionObjectAddRotation* pblendColObj =
@@ -7405,7 +7397,7 @@ NiPoint3 PlayerCharacter::CalculateAnticipatedLocation(float afDeltaT) {
         bhkCharacterController* pController = GetCharController();
         pController->GetLinearVelocity(kVelocity);
         NiPoint3* v4 = &(result = kVelocity * afDeltaT);
-        kPos.operator+=(*v4);
+        kPos += *v4;
     }
 
     a2 = kPos;
@@ -7694,14 +7686,7 @@ bool PlayerCharacter::GetDropPoint(
         }
         if (bvalidDirection) {
             bhkSphereShape* pshape;
-            bhkSphereShape* pmemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-            if (pmemory) {
-                float fradius = fobjectSize / 2.0;
-                pshape = ::new (pmemory) bhkSphereShape(fradius, true);
-            }
-            else {
-                pshape = nullptr;
-            }
+            pshape = new bhkSphereShape(fobjectSize / 2.0, true);
             NiPointer<bhkSphereShape> spshape = pshape;
             CFilter kplayerFilter2;
             pPlayer->MobileObject::GetCollisionFilter(&kplayerFilter2.iFilter);
@@ -7709,7 +7694,7 @@ bool PlayerCharacter::GetDropPoint(
             alignas(16) CFilter ifilter(L_DROPPINGPICK, igroup, P_OTHER);
             alignas(16) hkSimpleShapePhantomCinfo info;
             info.m_collisionFilterInfo = ifilter.iFilter;
-            info.m_shape = spshape->operator*();
+            info.m_shape = **spshape;
             info.m_transform.setIdentity();
             alignas(16) hkVector4 location;
             NI2HK(location, aPoint);
@@ -8296,14 +8281,11 @@ bool PlayerCharacter::SetFirstPerson(bool abFirst) {
     if (bWant3rdPerson && static_cast<Actor*>(this)->IsDead(false)) {
         kVanityModePos.y = fVanityModeWheelDeadMin.Float();
     }
-    if (!bVanityMode && (&sp1stPerson3D)->operator->() && bWant3rdPerson && bWasWanted) {
+    if (!bVanityMode && sp1stPerson3D && bWant3rdPerson && bWasWanted) {
         chaseCameraPos = p1stPersonCamera->GetWorldTranslate();
         this->Show1stPerson(!bWant3rdPerson);
     }
-    else if (
-        (!bVanityMode) && ((&sp1stPerson3D)->operator->()) && ((&sp1stPerson3D)->operator->()->GetAppCulled()) &&
-        (!bWant3rdPerson)
-    ) {
+    else if ((!bVanityMode) && (sp1stPerson3D) && (sp1stPerson3D->GetAppCulled()) && (!bWant3rdPerson)) {
         b3rdPerson = true;
     }
 
@@ -8821,7 +8803,7 @@ NiAVObject* PlayerCharacter::GetCurrent3D() {
         return TESObjectREFR::Get3D();
     }
 
-    return (&sp1stPerson3D)->operator->();
+    return sp1stPerson3D;
 }
 
 bool PlayerCharacter::IsSleeping() {
@@ -9173,7 +9155,7 @@ void PlayerCharacter::UpdateAutoAimActor() {
         else {
             phitRef = nullptr;
         }
-        this->spTargeted3D.operator=(phit);
+        this->spTargeted3D = phit;
         if (phitRef) {
             v84 = phitRef;
         }
@@ -9345,7 +9327,7 @@ void PlayerCharacter::ApplyAutoAimActor(
                 delta = WorldBound->m_kCenter - *x;
             }
             else {
-                if (BulletAutoAim.operator!=(NiPoint3_ZERO)) {
+                if (BulletAutoAim != NiPoint3_ZERO) {
                     NiAVObject* v16 = Get3D(false);
                     const NiBound* v17 = &v16->GetWorldBound();
                     delta = BulletAutoAim - v17->m_kCenter;
@@ -9354,7 +9336,7 @@ void PlayerCharacter::ApplyAutoAimActor(
         LABEL_62:;
             bool v54 =
                 apProjectile || (afStartLooking != 1.1754943508222875e-38 && afStartHeading != 1.1754943508222875e-38);
-            if (delta.operator!=(NiPoint3_ZERO)) {
+            if (delta != NiPoint3_ZERO) {
                 TESObjectWEAP* CurrentWeapon;
                 TESObjectWEAP* v31;
                 float fheading;
@@ -9639,7 +9621,7 @@ void PlayerCharacter::ApplyAutoAimActor(
                 delta = v26->m_kCenter - startPos;
             }
             else {
-                if (BulletAutoAim.operator!=(NiPoint3_ZERO)) {
+                if (BulletAutoAim != NiPoint3_ZERO) {
                     delta = BulletAutoAim - startPos;
                 }
             }
@@ -9679,7 +9661,7 @@ void PlayerCharacter::ApplyAutoAimActor(
                 if ((apProjectile) && (apProjectile->pTarget)) {
                     ProjectileTarget* ptarget = apProjectile->pTarget;
                     ptarget->pReference = pcurrentVATSAction->pTarget;
-                    ptarget->spPart.operator=(pvatsTarget3d);
+                    ptarget->spPart = pvatsTarget3d;
                     ptarget->kOffset = localPoint;
                 }
 
@@ -9904,7 +9886,7 @@ void PlayerCharacter::PositionPlayer(NiPoint3 aPos, NiPoint3 aAngle, TESObjectCE
         paccum->ClearAllBoundVolumes();
     }
 
-    if (sp1stPerson3D.operator->()) {
+    if (sp1stPerson3D) {
         Interface::GetPipboy()->ReInitialize();
         BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD)->ProcessQueuedLights();
         if (!pSaveLoadGame->GetSaveGameLoading()) {
@@ -9941,12 +9923,12 @@ void PlayerCharacter::PositionPlayer(NiPoint3 aPos, NiPoint3 aAngle, TESObjectCE
         UpdateAnimationMovement(GetAnimation(!b3rdPerson), 0.0f);
         UpdateCamera(false, false);
     }
-    if (spCameraRigidBody.operator->()) {
+    if (spCameraRigidBody) {
         // Converts the position into hkv and then moves the body by the game-unit position, as the game does.
         hkVector4 hkv;
         NiPoint3 loc = GetLocationOnReference();
         NI2HK(hkv, loc);
-        spCameraRigidBody.operator->()->SetPosition(loc);
+        spCameraRigidBody->SetPosition(loc);
     }
     BSTreeManager::Update(Main::WorldRootCamera(), false);
     TES::pInstance->UpdateCellAnimations(appTimer.GetSeconds());
@@ -10281,11 +10263,11 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
             cameraPos = targetPos + cameraRot * (*v15 + shoulderOffset);
             NiPoint3 cameraTarget = targetPos + cameraRot * shoulderLookAt_2;
             Setup3rdPersonCameraCaster();
-            targetPos.operator+=(*::new (&shoulderOffset_2) NiPoint3(cameraRot * shoulderOffset));
+            targetPos += *::new (&shoulderOffset_2) NiPoint3(cameraRot * shoulderOffset);
             NiPoint3 newTargetPos(data.kPosition.x, data.kPosition.y, targetPos.z);
             UpdateChaseCamera(&cameraPos, &newTargetPos, abForce);
             NiPoint3* v19 = ::new (&shoulderOffset_3) NiPoint3(cameraRot * shoulderOffset);
-            targetPos.operator-=(*v19);
+            targetPos -= *v19;
             currentPos = cameraPos;
             shoulderLookAt_2 = targetPos + shoulderLookAt_2;
             kCamera3rdPersonShoulderOffset = cameraRot * shoulderOffset;
@@ -10323,13 +10305,13 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                     float v50 = fOverShoulderOffsetPointZoomingY.Float();
                     float* v22 = &fOverShoulderOffsetPointZoomingX.Float();
                     NiPoint3* v23 = ::new (&v100) NiPoint3(*v22, v50, v53);
-                    shoulderOffset.operator+=(*::new (&v99) NiPoint3(*v23 * v76));
+                    shoulderOffset += *::new (&v99) NiPoint3(*v23 * v76);
                 }
                 rotMod.MakeXRotation(PlayerCharacter::fCameraLooking);
                 shoulderOffset = rotMod * shoulderOffset;
                 shoulderOffset = shoulderRot * shoulderOffset;
                 float v75 = 1.0 - fOverShoulderRotMult.Float();
-                targetPos.operator+=(*::new (&v94) NiPoint3(shoulderOffset * v75));
+                targetPos += *::new (&v94) NiPoint3(shoulderOffset * v75);
             }
             chaseCamera.SetTranslate(currentPos);
             NiUpdateData UpdateData_3(0.0f, false, false);
@@ -10370,8 +10352,8 @@ void PlayerCharacter::UpdateCamera(bool abForce, bool abSkipUpdateLOD) {
                 NiPoint3 posDelta = p3rdPersonCamera->GetWorldTranslate() - currentPos;
                 float* v7 = &fFirstPersonCameraMult.Float();
                 float v82 = *v7 * fblendValue;
-                posDelta.operator*=(v82);
-                currentPos.operator+=(posDelta);
+                posDelta *= v82;
+                currentPos += posDelta;
                 if (p1stPersonBip) {
                     p1stPersonBip->SetTranslate(
                         p1stPersonBip->GetTranslate() + (posDelta * (&sp1stPerson3D.m_pObject->m_kLocal)->m_Rotate)
@@ -11325,9 +11307,9 @@ void PlayerCharacter::UpdateFlyCamera(float afDelta, bool abFreezeTime) {
         }
         float CurrentSpeed = GetCurrentSpeed();
         float v21 = CurrentSpeed * PlayerCharacter::fWalkSpeedMult;
-        sideVec.operator*=(v21);
+        sideVec *= v21;
         float v20 = CurrentSpeed * PlayerCharacter::fWalkSpeedMult;
-        forwardVec.operator*=(v20);
+        forwardVec *= v20;
         pActorMover->ForceMoveMode(smoveMode);
         if (v53) {
             SetWalkRunFlagDirty();
@@ -12362,7 +12344,7 @@ Animation* PlayerCharacter::GetAnimation(bool abFirstPerson) {
 
 NiAVObject* PlayerCharacter::Get3D(bool abFirstPerson) {
     if (abFirstPerson) {
-        return (&sp1stPerson3D)->operator->();
+        return sp1stPerson3D;
     }
 
     return TESObjectREFR::Get3D();
@@ -12654,7 +12636,7 @@ void PlayerCharacter::Show1stPerson(bool abFirstPerson) {
                     }
                     NiPointer<NiAVObject> pchild(static_cast<NiAVObject*>(nullptr));
                     pnodeFrom->DetachChildAt(I, pchild);
-                    if (pchild.operator!=(static_cast<NiAVObject*>(nullptr))) {
+                    if (pchild != static_cast<NiAVObject*>(nullptr)) {
                         NiAVObject* v19 = pchild.m_pObject;
                         pnodeTo->AttachChild(v19, 1);
                     }
@@ -13202,7 +13184,7 @@ bool PlayerCharacter::IsStandingOnFurniture() {
         bhkRigidBody* pSupportBody = pController->GetSupportBody();
         bhkCollisionObject* pCollisionObject;
         if (pSupportBody) {
-            pCollisionObject = bhkCollisionObject::Getbhk(pSupportBody->operator*());
+            pCollisionObject = bhkCollisionObject::Getbhk(**pSupportBody);
         }
         else {
             pCollisionObject = nullptr;
@@ -13233,7 +13215,7 @@ TESObjectREFR* PlayerCharacter::GetBumpedRef() {
     bhkRigidBody* pBumpedBody = pController->GetBumpedBody();
     bhkCollisionObject* pCollisionObject;
     if (pBumpedBody) {
-        pCollisionObject = bhkCollisionObject::Getbhk(pBumpedBody->operator*());
+        pCollisionObject = bhkCollisionObject::Getbhk(**pBumpedBody);
     }
     else {
         pCollisionObject = nullptr;
@@ -13414,7 +13396,7 @@ void PlayerCharacter::DestroyMouseSpring() {
         }
     }
     RemovePlayerAction(PLAYER_ACTION_Z_KEY_OBJECT, nullptr);
-    spGrabSpring.operator=(static_cast<bhkMouseSpringAction*>(nullptr));
+    spGrabSpring = static_cast<bhkMouseSpringAction*>(nullptr);
     eGrabType = PlayerCharacter::GRAB_NONE;
     fGrabObjectWeight = 0.0f;
     if ((pGrabbedObject) && (pGrabbedObject->IsReference())) {
@@ -13430,14 +13412,14 @@ void PlayerCharacter::DestroyMouseSpring() {
 // heavier contacts. afTimeDelta is unused. The collector's destructor runs where its scope ends, after
 // DestroyMouseSpring on each early return.
 void PlayerCharacter::UpdateMouseSpring(float afTimeDelta) {
-    if (!pGrabbedObject || !spGrabSpring.operator->() || !spGrabSpring.operator->()->GetWorldObject()) {
+    if (!pGrabbedObject || !spGrabSpring || !spGrabSpring->GetWorldObject()) {
         DestroyMouseSpring();
         return;
     }
     bhkCharacterController* pCharController = static_cast<bhkCharacterController*>(GetCharController());
     if (pCharController) {
         bhkRigidBody* pSupportBody = pCharController->GetSupportBody();
-        if (pSupportBody == spGrabSpring.operator->()->GetWorldObject() && pCharController->GetSupportCount() == 1) {
+        if (pSupportBody == spGrabSpring->GetWorldObject() && pCharController->GetSupportCount() == 1) {
             DestroyMouseSpring();
             return;
         }
@@ -13451,7 +13433,7 @@ void PlayerCharacter::UpdateMouseSpring(float afTimeDelta) {
 
     bhkPickData kPick;
     bhkPickData* pPick = &kPick;
-    hkpEntity* pEntity = spGrabSpring.operator->()->GetEntity();
+    hkpEntity* pEntity = spGrabSpring->GetEntity();
     bhkEntity* pBody = bhkEntity::Getbhk(pEntity);
     CFilter kFilter;
     pBody->GetCollisionFilter(&kFilter);
@@ -13516,8 +13498,8 @@ void PlayerCharacter::UpdateMouseSpring(float afTimeDelta) {
     hkTransform kTransform;
     kTransform.~hkTransform();
     ::new (&kTransform) hkTransform;
-    spGrabSpring.operator->()->GetMousePositionInWorld(kWorld);
-    spGrabSpring.operator->()->GetMousePositionInRBLocal(kLocal);
+    spGrabSpring->GetMousePositionInWorld(kWorld);
+    spGrabSpring->GetMousePositionInRBLocal(kLocal);
     // Slot 61 (+0xF4) through the entity's wrapper.
     static_cast<bhkRigidBody*>(pBody)->GetTransform(kTransform);
     kDiff.setTransformedPos(kTransform, kLocal);
@@ -13607,7 +13589,7 @@ void PlayerCharacter::UpdateMouseSpring(float afTimeDelta) {
             TESHavokUtilities::AddVelocity(pRefNode, kVelocity, false);
         }
         else {
-            hkpEntity* pSpringEntity = spGrabSpring.operator->()->GetEntity();
+            hkpEntity* pSpringEntity = spGrabSpring->GetEntity();
             if (pSpringEntity) {
                 bhkRigidBody* pSpringBody = static_cast<bhkRigidBody*>(bhkEntity::Getbhk(pSpringEntity));
                 hkVector4 kVelocity;
@@ -13635,7 +13617,7 @@ void PlayerCharacter::UpdateMouseSpring(float afTimeDelta) {
             }
         }
     }
-    spGrabSpring.operator->()->SetMousePosition(kTarget);
+    spGrabSpring->SetMousePosition(kTarget);
 }
 
 void PlayerCharacter::SetSpeaking(bool abValue) {
@@ -13789,7 +13771,7 @@ void PlayerCharacter::SetPCCanUsePowerArmor(bool abVal) {
 }
 
 void* PlayerCharacter::GetCameraRigidBody() {
-    return (&spCameraRigidBody)->operator->();
+    return spCameraRigidBody;
 }
 
 bool PlayerCharacter::GetMegatonDestroyed() {
@@ -14519,7 +14501,7 @@ void PlayerCharacter::CreateMouseSpring(
                         }
                         v74.m_mousePositionInWorld.NI2HK(mousePoint);
                         bhkRigidBody* pfuzzyBody = ViewCaster::GetFuzzyBody();
-                        v74.m_body = pfuzzyBody->operator*();
+                        v74.m_body = **pfuzzyBody;
                         v69 = 1;
                     }
                     else {
@@ -14560,14 +14542,14 @@ void PlayerCharacter::CreateMouseSpring(
                 }
 
                 if (!v69) {
-                    v74.m_mousePositionInWorld.operator=(hkvCenterOfMass);
+                    v74.m_mousePositionInWorld = hkvCenterOfMass;
                     if (v75) {
                         hkVector4 addition;
                         NiPoint3* v10 = ::new (&v49) NiPoint3((&pav->GetWorldTransform())->m_Rotate * NiPoint3_UNIT_Z);
                         NI2HKNS(addition, *v10);
                         v74.m_mousePositionInWorld.ToHK(tmphk);
                         tmphk.add4(addition);
-                        v74.m_mousePositionInWorld.operator=(tmphk);
+                        v74.m_mousePositionInWorld = tmphk;
                     }
                     if (!pSaveLoadGame->GetSaveGameLoading()) {
                         NiPoint3 mousePoint_2;
@@ -14576,7 +14558,7 @@ void PlayerCharacter::CreateMouseSpring(
                         double v13 = (mousePoint_2 - point).Length();
                         this->fGrabDistance = v13;
                     }
-                    v74.m_body = pbody->operator*();
+                    v74.m_body = **pbody;
                 }
                 if (this->eGrabType == PlayerCharacter::GRAB_NORMAL) {
                     this->AddPlayerAction(PLAYER_ACTION_Z_KEY_OBJECT, 20.0f, apObject);
@@ -14631,7 +14613,7 @@ void PlayerCharacter::CreateMouseSpring(
                                     break;
                                 }
                                 hkSmallArray<hkConstraintInternal>* v15 = &phkbody->m_constraintsMaster;
-                                hkpConstraintData* DataCalled = (&v15->operator[](i))->m_constraint->m_data;
+                                hkpConstraintData* DataCalled = (*v15)[i].m_constraint->m_data;
                                 bonlyContactConstraints =
                                     DataCalled->getType() == hkpConstraintData::CONSTRAINT_TYPE_CONTACT;
                             }
@@ -14660,17 +14642,10 @@ void PlayerCharacter::CreateMouseSpring(
                     const hkTransform* a1 = &phkbody->getTransform();
                     hkVector4* v20 = &v74.m_positionInRbLocal.ToHK(hkv);
                     v20->setRotatedInverseDir(a1->m_rotation, hktemp);
-                    v74.m_positionInRbLocal.operator=(hkv);
+                    v74.m_positionInRbLocal = hkv;
                     this->pGrabbedObject->GetParentCell()->GetbhkWorld()->MarkForWrite();
-                    bhkMouseSpringAction* v30 =
-                        static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
-                    if (v30) {
-                        v29 = ::new (v30) bhkMouseSpringAction(v74);
-                    }
-                    else {
-                        v29 = nullptr;
-                    }
-                    this->spGrabSpring.operator=(v29);
+                    v29 = new bhkMouseSpringAction(v74);
+                    this->spGrabSpring = v29;
                     bhkMouseSpringAction* v28 = this->spGrabSpring.m_pObject;
                     bhkWorld* v21 = this->pGrabbedObject->GetParentCell()->GetbhkWorld();
                     v28->Add(v21);
@@ -14988,14 +14963,7 @@ void PlayerCharacter::SpotterEffectNearbyEnemies() {
             CompassTarget* pact = plist->m_item;
             if (pact->bIsHostile) {
                 MagicHitEffect* peffect;
-                MagicShaderHitEffect* apMemory =
-                    static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-                if (apMemory) {
-                    peffect = ::new (apMemory) MagicShaderHitEffect(pact->pTarget, pEffectData, -1.0f);
-                }
-                else {
-                    peffect = nullptr;
-                }
+                peffect = new MagicShaderHitEffect(pact->pTarget, pEffectData, -1.0f);
                 if (peffect->Init()) {
                     ReferenceProcessLists.AddTempEffect(peffect);
                 }
@@ -15023,14 +14991,7 @@ void PlayerCharacter::ShaderNearbyItems() {
     if (a2) {
         while (pLoadedReferenceCollection->GetNextObject(arIterator, arpRef, arpItemChange, 3u)) {
             MagicShaderHitEffect* v4;
-            MagicShaderHitEffect* v9 =
-                static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-            if (v9) {
-                v4 = ::new (v9) MagicShaderHitEffect(arpRef, a2, a3);
-            }
-            else {
-                v4 = nullptr;
-            }
+            v4 = new MagicShaderHitEffect(arpRef, a2, a3);
             if (v4->Init()) {
                 ReferenceProcessLists.AddTempEffect(v4);
             }
@@ -15042,14 +15003,7 @@ void PlayerCharacter::ShaderNearbyItems() {
         }
         while (pLoadedReferenceCollection->GetNextObject(apMemory, arpRef, arpItemChange, 3u)) {
             MagicShaderHitEffect* v3;
-            MagicShaderHitEffect* v8 =
-                static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-            if (v8) {
-                v3 = ::new (v8) MagicShaderHitEffect(arpRef, a2, a3);
-            }
-            else {
-                v3 = nullptr;
-            }
+            v3 = new MagicShaderHitEffect(arpRef, a2, a3);
             if (v3->Init()) {
                 ReferenceProcessLists.AddTempEffect(v3);
             }
@@ -15061,14 +15015,7 @@ void PlayerCharacter::ShaderNearbyItems() {
         }
         while (pLoadedReferenceCollection->GetNextObject(v17, arpRef, arpItemChange, 3u)) {
             MagicShaderHitEffect* v2;
-            MagicShaderHitEffect* v7 =
-                static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-            if (v7) {
-                v2 = ::new (v7) MagicShaderHitEffect(arpRef, a2, a3);
-            }
-            else {
-                v2 = nullptr;
-            }
+            v2 = new MagicShaderHitEffect(arpRef, a2, a3);
             if (v2->Init()) {
                 ReferenceProcessLists.AddTempEffect(v2);
             }
@@ -15080,14 +15027,7 @@ void PlayerCharacter::ShaderNearbyItems() {
         }
         while (pLoadedReferenceCollection->GetNextObject(apThis, arpRef, arpItemChange, 3u)) {
             MagicShaderHitEffect* v1;
-            MagicShaderHitEffect* v6 =
-                static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-            if (v6) {
-                v1 = ::new (v6) MagicShaderHitEffect(arpRef, a2, a3);
-            }
-            else {
-                v1 = nullptr;
-            }
+            v1 = new MagicShaderHitEffect(arpRef, a2, a3);
             if (v1->Init()) {
                 ReferenceProcessLists.AddTempEffect(v1);
             }
@@ -15137,7 +15077,7 @@ void PlayerCharacter::CheckBorderRegion() {
                 TESRegionPoint testPoint(*QLocationOnReference());
                 uint32_t icount = pBorderRegions->m_usSize;
                 for (uint32_t i = 0; i < icount; ++i) {
-                    TESRegion* pregion = pBorderRegions->operator[](i);
+                    TESRegion* pregion = (*pBorderRegions)[i];
                     if (!pregion->GetDelete()) {
                         for (BSSimpleList<TESRegionPointList*>* plist = pregion->pPointLists;
                              !binBorderRegion && (plist && !plist->IsEmpty()); plist = plist->m_pkNext) {
@@ -15251,10 +15191,10 @@ void PlayerCharacter::HandleFlycamMovement() {
     }
     uiLastFlycamTime = v30;
     float X_4 = afA * 10.0;
-    pt.operator*=(X_4);
+    pt *= X_4;
     pt = result * pt;
-    pt.operator*=(fUFOCamSpeedMult.Float());
-    UFOCameraPos.operator+=(pt);
+    pt *= fUFOCamSpeedMult.Float();
+    UFOCameraPos += pt;
     BSSceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
     NiNode* CameraRoot = WorldSceneGraph->GetCameraRoot();
     CameraRoot->SetTranslate(UFOCameraPos);
@@ -15453,7 +15393,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             if (pfacenode_4) {
                 pfacenode_4->UpdateAllChildrenMorphData(true);
             }
-            spInventoryPC.operator=(static_cast<NiNode*>(nullptr));
+            spInventoryPC = static_cast<NiNode*>(nullptr);
             MagicShaderHitEffect* peffect = GetMagicShaderHitEffect();
             if (peffect) {
                 delete peffect;
@@ -15502,7 +15442,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
         else {
             v39 = nullptr;
         }
-        spInventoryPC.operator=(v39);
+        spInventoryPC = v39;
         spInventoryPC.m_pObject->RemoveAllControllers();
         Animation::ClearControllersInterpolators(spInventoryPC.m_pObject);
         spInventoryPC.m_pObject->RemoveProperty(NiAlphaProperty::GetType());
@@ -15513,14 +15453,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
         static_cast<TESNPC*>(GetObjectReference())->TESNPC::FixDisplayedHeadParts(this, spInventoryPC.m_pObject);
         rot = NiMatrix3_IDENTITY;
         spInventoryPC.m_pObject->SetRotate(MultipleMatrixByRace(rot));
-        BSFaceGenAnimationData* v44 =
-            static_cast<BSFaceGenAnimationData*>(NiMemObject::operator new(sizeof(BSFaceGenAnimationData)));
-        if (v44) {
-            v38 = ::new (v44) BSFaceGenAnimationData;
-        }
-        else {
-            v38 = nullptr;
-        }
+        v38 = new BSFaceGenAnimationData;
         NiPointer<BSFaceGenAnimationData> spanimdata(v38);
         NiNode* v37 = spInventoryPC.m_pObject;
         NiFixedString* v6 = &FixedStrings::QRaceHeadBiped();
@@ -15541,7 +15474,7 @@ NiNode* PlayerCharacter::CloneInventory3D(bool abFlag) {
             pfacenode_2->SetAnimationData(a2b);
             pfacenode_2->UpdateAllChildrenMorphData(true);
         }
-        spanimdata.operator=(static_cast<BSFaceGenAnimationData*>(nullptr));
+        spanimdata = static_cast<BSFaceGenAnimationData*>(nullptr);
         NiNode* v35 = spInventoryPC.m_pObject;
         NiFixedString* v8 = &FixedStrings::QArrowBone();
         NiAVObject* parrowObj = v35->GetObjectByName(*v8);

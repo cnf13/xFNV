@@ -203,12 +203,10 @@ void NiGeometry::ProcessClone(NiCloningProcess& kCloning) {
     NiGeometry* pkGeom = static_cast<NiGeometry*>(pkObject);
     if (pkSkin) {
         if (kCloning.m_pkCloneMap->GetAt(pkSkin, pkObject)) {
-            pkGeom->m_spSkinInstance.operator=(static_cast<NiSkinInstance*>(pkObject));
+            pkGeom->m_spSkinInstance = static_cast<NiSkinInstance*>(pkObject);
         }
         else {
-            pkGeom->m_spSkinInstance.operator=(
-                static_cast<NiSkinInstance*>(m_spSkinInstance.m_pObject->CreateClone(kCloning))
-            );
+            pkGeom->m_spSkinInstance = static_cast<NiSkinInstance*>(m_spSkinInstance.m_pObject->CreateClone(kCloning));
             m_spSkinInstance.m_pObject->ProcessClone(kCloning);
         }
     }
@@ -216,11 +214,7 @@ void NiGeometry::ProcessClone(NiCloningProcess& kCloning) {
         if (GetShader()->GetRTTI() == &NiShader::ms_RTTI) {
             // A plain NiShader is copied: a new one with its name and implementation id. It is stored in the clone's
             // m_spShader as it is.
-            NiShader* pkShader = nullptr;
-            NiShader* pkMemory = static_cast<NiShader*>(NiMemObject::operator new(sizeof(NiShader)));
-            if (pkMemory) {
-                pkShader = ::new (pkMemory) NiShader;
-            }
+            NiShader* pkShader = new NiShader;
             pkShader->SetName(GetShader()->m_kName);
             pkShader->m_uiImplementation = GetShader()->m_uiImplementation;
             pkGeom->m_spShader = static_cast<BSShader*>(pkShader);
@@ -553,19 +547,19 @@ void NiGeometry::CopyMembers(NiGeometry* pkDest, NiCloningProcess& kCloning) {
 }
 
 NiSkinInstance* NiGeometry::GetSkinInstance() const {
-    return (&m_spSkinInstance)->operator->();
+    return m_spSkinInstance;
 }
 
 void NiGeometry::SetSkinInstance(NiSkinInstance* pSkinInstance) {
-    (&m_spSkinInstance)->operator=(pSkinInstance);
+    m_spSkinInstance = pSkinInstance;
 }
 
 uint16_t NiGeometry::GetActiveVertexCount() const {
-    NiGeometryData* v2 = (&m_spModelData)->operator->();
+    NiGeometryData* v2 = m_spModelData;
     return v2->GetActiveVertexCount();
 }
 
 void NiGeometry::SetAdditionalGeometryData(NiAdditionalGeometryData* pkData) {
-    NiGeometryData* v2 = (&m_spModelData)->operator->();
+    NiGeometryData* v2 = m_spModelData;
     v2->SetAdditionalGeometryData(pkData);
 }

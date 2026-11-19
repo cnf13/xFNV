@@ -405,7 +405,7 @@ void hkpEntity::addContactListener(hkpContactListener* cl) {
 uint8_t* hkpEntity::setMaxLinearVelocity(float afMaxLinearVelocity) {
     hkpMotion* RagdollList = getMotion();
     hkMotionState* FollowUpInfoList = &RagdollList->m_motionState;
-    return &(&FollowUpInfoList->m_maxLinearVelocity.operator=(afMaxLinearVelocity))->m_value;
+    return &(FollowUpInfoList->m_maxLinearVelocity = afMaxLinearVelocity).m_value;
 }
 
 void hkpEntity::removeEntityListener(hkpEntityListener* el) {

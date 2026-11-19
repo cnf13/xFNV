@@ -818,11 +818,7 @@ NiPixelData* NiDX9Renderer::TakeScreenShot(const NiRect<uint32_t>* apScreenRect,
         return nullptr;
     }
 
-    void* pvMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pkPixels = nullptr;
-    if (pvMemory) {
-        pkPixels = ::new (pvMemory) NiPixelData(uiWidth, uiHeight, *pkTarget->GetPixelFormat(0), 1, 1);
-    }
+    NiPixelData* pkPixels = new NiPixelData(uiWidth, uiHeight, *pkTarget->GetPixelFormat(0), 1, 1);
     if (!pkPixels) {
         pkSurface->UnlockRect();
         return nullptr;
@@ -1161,8 +1157,7 @@ bool NiDX9Renderer::UnLockDynamicTexture(const NiTexture::RendererData* apRender
 
 // A new fragment shader for the material descriptor (null when the allocation fails).
 NiShader* NiDX9Renderer::GetFragmentShader(NiMaterialDescriptor* apMaterialDescriptor) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiDX9FragmentShader));
-    return pvMemory ? ::new (pvMemory) NiDX9FragmentShader(apMaterialDescriptor) : nullptr;
+    return new NiDX9FragmentShader(apMaterialDescriptor);
 }
 
 // Draw indexed triangles using the renderer's device and the caller's index range.
@@ -1203,9 +1198,6 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
         NiDynamicEffectState* pkOldEffects = m_pkCurrEffects;
         if (!m_spScreenTexturePropertyState) {
             NiPropertyState* v5;
-            NiVertexColorProperty* v7;
-            NiAlphaProperty* v9;
-            NiZBufferProperty* v11;
             NiPropertyState* v4 =
                 static_cast<NiPropertyState*>(MemoryManager_Singleton.Allocate(sizeof(NiPropertyState)));
             if (v4) {
@@ -1215,33 +1207,13 @@ void NiDX9Renderer::Do_RenderScreenTexture(NiScreenTexture* apScreenTexture) {
                 v5 = nullptr;
             }
             m_spScreenTexturePropertyState = v5;
-            NiVertexColorProperty* v6 =
-                static_cast<NiVertexColorProperty*>(NiMemObject::operator new(sizeof(NiVertexColorProperty)));
-            if (v6) {
-                v7 = ::new (v6) NiVertexColorProperty;
-            }
-            else {
-                v7 = nullptr;
-            }
+            NiVertexColorProperty* v7 = new NiVertexColorProperty;
             v7->m_uFlags = (v7->m_uFlags & 0xFFC7) | 16;
             m_spScreenTexturePropertyState->SetProperty(v7);
-            NiAlphaProperty* v8 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (v8) {
-                v9 = ::new (v8) NiAlphaProperty;
-            }
-            else {
-                v9 = nullptr;
-            }
+            NiAlphaProperty* v9 = new NiAlphaProperty;
             v9->m_uFlags = (v9->m_uFlags & 0xFE00) | 237;
             m_spScreenTexturePropertyState->SetProperty(v9);
-            NiZBufferProperty* v10 =
-                static_cast<NiZBufferProperty*>(NiMemObject::operator new(sizeof(NiZBufferProperty)));
-            if (v10) {
-                v11 = ::new (v10) NiZBufferProperty;
-            }
-            else {
-                v11 = nullptr;
-            }
+            NiZBufferProperty* v11 = new NiZBufferProperty;
             v11->m_uFlags &= 0xFFFCu;
             m_spScreenTexturePropertyState->SetProperty(v11);
         }
@@ -1862,25 +1834,16 @@ bool NiDX9Renderer::Initialize(
 
     m_pkRenderState = NiDX9RenderState::Create(this, &m_kD3DCaps9, true);
     NiD3DShaderInterface::InitializeShaderSystem(this);
-    NiDX9VertexBufferManager* pkVBManager =
-        static_cast<NiDX9VertexBufferManager*>(NiMemObject::operator new(sizeof(NiDX9VertexBufferManager)));
-    m_pkVBManager = pkVBManager ? ::new (pkVBManager) NiDX9VertexBufferManager(m_pkD3DDevice9) : nullptr;
-    NiDX9IndexBufferManager* pkIBManager =
-        static_cast<NiDX9IndexBufferManager*>(NiMemObject::operator new(sizeof(NiDX9IndexBufferManager)));
-    m_pkIBManager = pkIBManager ? ::new (pkIBManager) NiDX9IndexBufferManager(m_pkD3DDevice9) : nullptr;
-    NiDX9TextureManager* pkTextureManager =
-        static_cast<NiDX9TextureManager*>(NiMemObject::operator new(sizeof(NiDX9TextureManager)));
-    m_pkTextureManager = pkTextureManager ? ::new (pkTextureManager) NiDX9TextureManager(this) : nullptr;
+    m_pkVBManager = new NiDX9VertexBufferManager(m_pkD3DDevice9);
+    m_pkIBManager = new NiDX9IndexBufferManager(m_pkD3DDevice9);
+    m_pkTextureManager = new NiDX9TextureManager(this);
     m_pkGeometryGroupManager = NiD3DGeometryGroupManager::Create(m_pkD3DDevice9, m_pkVBManager);
     m_pkGeometryGroupManager->SetHWSkinning((GetFlags() & NiRenderer::CAPS_HARDWARESKINNING) != 0);
     m_pkDefaultGroup =
         static_cast<NiUnsharedGeometryGroup*>(m_pkGeometryGroupManager->CreateGroup(NiGeometryGroupManager::UNSHARED));
     m_pkDynamicGroup =
         static_cast<NiDynamicGeometryGroup*>(m_pkGeometryGroupManager->CreateGroup(NiGeometryGroupManager::DYNAMIC));
-    NiDX9LightManager* pkLightManager =
-        static_cast<NiDX9LightManager*>(NiMemObject::operator new(sizeof(NiDX9LightManager)));
-    m_pkLightManager =
-        pkLightManager ? ::new (pkLightManager) NiDX9LightManager(m_pkRenderState, m_pkD3DDevice9) : nullptr;
+    m_pkLightManager = new NiDX9LightManager(m_pkRenderState, m_pkD3DDevice9);
     if (pkBackData->m_kD3DPresentParams.MultiSampleType) {
         m_pkRenderState->SetAntiAlias(true);
     }
@@ -1903,11 +1866,7 @@ bool NiDX9Renderer::Initialize(
     m_pkCurrRenderTargetGroup = nullptr;
     m_pkCurrOnscreenRenderTargetGroup = nullptr;
     NiShaderFactory::GetInstance();
-    NiDX9ErrorShader* pkErrorShader = nullptr;
-    NiDX9ErrorShader* pkMemory = static_cast<NiDX9ErrorShader*>(NiMemObject::operator new(sizeof(NiDX9ErrorShader)));
-    if (pkMemory) {
-        pkErrorShader = ::new (pkMemory) NiDX9ErrorShader;
-    }
+    NiDX9ErrorShader* pkErrorShader = new NiDX9ErrorShader;
     pkErrorShader->Initialize();
     SetErrorShader(pkErrorShader);
     return true;
@@ -2302,9 +2261,7 @@ bool NiDX9Renderer::GenerateDefaultTextureData() {
             }
         }
         if (m_apkDefaultTextureFormat[i]) {
-            void* pvMemory = NiMemObject::operator new(sizeof(NiPixelData));
-            m_aspDefaultTextureData[i] =
-                pvMemory ? ::new (pvMemory) NiPixelData(4, 4, *m_apkDefaultTextureFormat[i], 1, 1) : nullptr;
+            m_aspDefaultTextureData[i] = new NiPixelData(4, 4, *m_apkDefaultTextureFormat[i], 1, 1);
             NiPixelData* pkData = m_aspDefaultTextureData[i];
             std::memset(pkData->m_pucPixels + pkData->m_puiOffsetInBytes[0], 0xFF, pkData->m_uiPixelStride << 4);
         }
@@ -2376,8 +2333,7 @@ bool NiDX9Renderer::InitializeTextureDefaults() {
     GenerateDefaultTextureData();
 
     const NiPixelFormat* pkFormat = m_apkDefaultTextureFormat[0];
-    void* pvMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> spPixels = pvMemory ? ::new (pvMemory) NiPixelData(2, 1, *pkFormat, 1, 1) : nullptr;
+    NiPointer<NiPixelData> spPixels = new NiPixelData(2, 1, *pkFormat, 1, 1);
     uint8_t* pucPixels = spPixels->m_pucPixels + spPixels->m_puiOffsetInBytes[0];
     uint8_t ucBitsPerPixel = pkFormat->m_ucBitsPerPixel;
     if (ucBitsPerPixel == 16) {
@@ -2994,8 +2950,7 @@ void NiDX9Renderer::_SDMShutdown() {
     }
     NiDX9SystemDesc* pkSystemDesc = ms_pkSystemDesc;
     if (pkSystemDesc) {
-        pkSystemDesc->~NiDX9SystemDesc();
-        NiMemObject::operator delete(pkSystemDesc, sizeof(NiDX9SystemDesc));
+        delete pkSystemDesc;
     }
     ms_pkSystemDesc = nullptr;
     if (ms_hDXLib) {
@@ -3028,8 +2983,7 @@ NiDX9Renderer* NiDX9Renderer::Create(
         Error("NiDX9Renderer::Create> Invalid device ID specified - FAILING\n");
         return nullptr;
     }
-    void* pvMem = NiMemObject::operator new(sizeof(NiDX9Renderer));
-    NiDX9Renderer* pkR = pvMem ? ::new (pvMem) NiDX9Renderer : nullptr;
+    NiDX9Renderer* pkR = new NiDX9Renderer;
     if (!pkR->Initialize(
             auiWidth, auiHeight, auiUseFlags, akWndDevice, akWndFocus, auiAdapter, aeDesc, aeFBFormat, aeDSFormat,
             aePresentationInterval, aeSwapEffect, auiFBMode, auiBackBufferCount, auiRefreshRate

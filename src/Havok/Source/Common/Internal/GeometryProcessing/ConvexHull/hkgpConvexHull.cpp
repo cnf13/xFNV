@@ -208,9 +208,9 @@ float hkgpConvexHull::getVolume() const {
     {
         hkErrStream apThis(buf, 512);
         uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No mass properties available (");
+        hkOstream* v4 = &(*v3 << m_uid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
@@ -231,9 +231,9 @@ float hkgpConvexHull::getSurfaceArea() const {
     {
         hkErrStream apThis(buf, 512);
         uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No mass properties available (");
+        hkOstream* v4 = &(*v3 << m_uid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
@@ -263,9 +263,9 @@ int32_t hkgpConvexHull::getNumPlanes() const {
     {
         hkErrStream apThis(buf, 512);
         uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No index available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No index available (");
+        hkOstream* v4 = &(*v3 << m_uid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
@@ -281,9 +281,9 @@ const hkVector4& hkgpConvexHull::getPlane(int32_t index) const {
         char buf[512];
         hkErrStream apThis(buf, 512);
         uint32_t m_uid = m_data->m_uid;
-        hkOstream* v4 = &apThis.operator<<("No index available (");
-        hkOstream* v5 = &v4->operator<<(m_uid);
-        v5->operator<<(")");
+        hkOstream* v4 = &(apThis << "No index available (");
+        hkOstream* v5 = &(*v4 << m_uid);
+        *v5 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
             )) {
@@ -592,9 +592,9 @@ void hkgpConvexHull::absoluteScale(float offset, const AbsoluteScaleConfig& conf
         hkErrStream kStream(acBuffer, 0x200);
         // m_uid is read before the first operator<<.
         const uint32_t uiUid = pImpl->m_uid;
-        hkOstream* pStream = &kStream.operator<<("No index available (");
-        pStream = &pStream->operator<<(uiUid);
-        pStream->operator<<(")");
+        hkOstream* pStream = &(kStream << "No index available (");
+        pStream = &(*pStream << uiUid);
+        *pStream << ")";
         // A handler that returns nonzero asks for the break.
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
@@ -710,9 +710,9 @@ const hkVector4& hkgpConvexHull::getCenterOfMass() const {
         char buf[512];
         hkErrStream apThis(buf, 512);
         uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No mass properties available (");
+        hkOstream* v4 = &(*v3 << m_uid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
@@ -987,9 +987,9 @@ const hkMatrix3& hkgpConvexHull::getWorldInertia() const {
         char buf[512];
         hkErrStream apThis(buf, 512);
         uint32_t m_uid = m_data->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No mass properties available (");
-        hkOstream* v4 = &v3->operator<<(m_uid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No mass properties available (");
+        hkOstream* v4 = &(*v3 << m_uid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
             )) {
@@ -1270,9 +1270,9 @@ int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Vertex* a1) const {
     {
         hkErrStream apThis(buf, 512);
         uint32_t uiUid = pData->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No index available (");
-        hkOstream* v4 = &v3->operator<<(uiUid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No index available (");
+        hkOstream* v4 = &(*v3 << uiUid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
@@ -1294,9 +1294,9 @@ int32_t hkgpConvexHull::getIndex(const hkgpConvexHull::Triangle* a1) const {
     {
         hkErrStream apThis(buf, 512);
         uint32_t uiUid = pData->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No index available (");
-        hkOstream* v4 = &v3->operator<<(uiUid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No index available (");
+        hkOstream* v4 = &(*v3 << uiUid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
@@ -1318,9 +1318,9 @@ int32_t hkgpConvexHull::getPlaneIndex(const hkgpConvexHull::Triangle* triangle) 
     {
         hkErrStream apThis(buf, 512);
         uint32_t uiUid = pData->m_uid;
-        hkOstream* v3 = &apThis.operator<<("No index available (");
-        hkOstream* v4 = &v3->operator<<(uiUid);
-        v4->operator<<(")");
+        hkOstream* v3 = &(apThis << "No index available (");
+        hkOstream* v4 = &(*v3 << uiUid);
+        *v4 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D886u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 328
@@ -1361,9 +1361,9 @@ hkVector4 hkgpConvexHull::getMajorPlane() const {
     if (!pData->m_hasMassProperties.m_bool) {
         alignas(16) hkErrStream kErrStream(buf, 512);
         uint32_t uiUid = pData->m_uid;
-        hkOstream* v4 = &kErrStream.operator<<("No mass properties available (");
-        hkOstream* v5 = &v4->operator<<(uiUid);
-        v5->operator<<(")");
+        hkOstream* v4 = &(kErrStream << "No mass properties available (");
+        hkOstream* v5 = &(*v4 << uiUid);
+        *v5 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D887u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
@@ -1481,9 +1481,9 @@ void hkgpConvexHull::getMajorPlanes(hkVector4* planes) const {
     if (!pData->m_hasMassProperties.m_bool) {
         alignas(16) hkErrStream kErrStream(buf, 512);
         uint32_t uiUid = pData->m_uid;
-        hkOstream* v4 = &kErrStream.operator<<("No mass properties available (");
-        hkOstream* v5 = &v4->operator<<(uiUid);
-        v5->operator<<(")");
+        hkOstream* v4 = &(kErrStream << "No mass properties available (");
+        hkOstream* v5 = &(*v4 << uiUid);
+        *v5 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, static_cast<int32_t>(0x79F9D887u), buf,
                 ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 334
@@ -1664,9 +1664,9 @@ void hkgpConvexHull::getLocalInertia(hkTransform& inertiaSpace, hkVector4& inert
         hkErrStream kStream(acBuffer, 0x200);
         // m_uid is read before the first operator<<.
         const uint32_t uiUid = pImpl->m_uid;
-        hkOstream* pStream = &kStream.operator<<("No mass properties available (");
-        pStream = &pStream->operator<<(uiUid);
-        pStream->operator<<(")");
+        hkOstream* pStream = &(kStream << "No mass properties available (");
+        pStream = &(*pStream << uiUid);
+        *pStream << ")";
         // A handler that returns nonzero asks for the break.
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D887, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
@@ -2418,7 +2418,7 @@ int32_t hkgpConvexHullImpl::build(
                 if (boxMin.m_quad[k] < -3.402820018375656e+38 || boxMax.m_quad[k] > 3.402820018375656e+38) {
                     char buf[512];
                     hkErrStream errStream(buf, 512);
-                    errStream.operator<<("Input domain out of range");
+                    errStream << "Input domain out of range";
                     if (hkError::s_instance->message(
                             hkError::MESSAGE_ERROR, 0x405A2174, buf,
                             ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 552
@@ -2942,7 +2942,7 @@ bool hkgpConvexHullImpl::flushPending() {
     if (numPendings < 4) {
         char buf[512];
         hkErrStream errStream(buf, 512);
-        errStream.operator<<("Internal error");
+        errStream << "Internal error";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x642CF968, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 756
             )) {
@@ -3881,9 +3881,9 @@ hkResult hkgpConvexHullImpl::buildMassProperties() {
         alignas(16) char buf[512];
         hkErrStream apThis_(buf, 512);
         uint32_t m_uid = this->m_uid;
-        hkOstream* v31 = &apThis_.operator<<("Failed to diagonalize inertia matrix (");
-        hkOstream* v32 = &v31->operator<<(m_uid);
-        v32->operator<<(")");
+        hkOstream* v31 = &(apThis_ << "Failed to diagonalize inertia matrix (");
+        hkOstream* v32 = &(*v31 << m_uid);
+        *v32 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x45465, buf, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp", 1753
             )) {
@@ -4273,9 +4273,9 @@ void hkgpConvexHullImpl::fetchBevelPlanes(
         alignas(16) char acBuffer[512];
         alignas(16) hkErrStream kStream(acBuffer, 512);
         const uint32_t uiUid = m_uid;
-        hkOstream* pStream = &kStream.operator<<("No index available (");
-        pStream = &pStream->operator<<(uiUid);
-        pStream->operator<<(")");
+        hkOstream* pStream = &(kStream << "No index available (");
+        pStream = &(*pStream << uiUid);
+        *pStream << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",
                 328
@@ -5178,9 +5178,9 @@ bool hkgpConvexHullImpl::clipLine(const hkVector4& a, const hkVector4& b, float&
         alignas(16) hkErrStream kStream(acBuffer, 0x200);
         // m_uid is read before the first operator<<.
         const uint32_t uiUid = m_uid;
-        hkOstream* pStream = &kStream.operator<<("No index available (");
-        pStream = &pStream->operator<<(uiUid);
-        pStream->operator<<(")");
+        hkOstream* pStream = &(kStream << "No index available (");
+        pStream = &(*pStream << uiUid);
+        *pStream << ")";
         // A handler that returns nonzero asks for the break.
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x79F9D886, acBuffer, ".\\GeometryProcessing\\ConvexHull\\hkgpConvexHull.cpp",

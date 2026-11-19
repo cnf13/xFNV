@@ -346,21 +346,20 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
             }
         }
     }
-    if (!spRenderer.operator->()) {
+    if (!spRenderer) {
         SetErrorString("Unknown error creating the Gamebryo Renderer.");
         return nullptr;
     }
-    NiDX9Renderer* pRenderer = spRenderer.operator->();
+    NiDX9Renderer* pRenderer = spRenderer;
     pRenderer->SetBackgroundColor(*BSShaderManager::GetBackgroundColor());
     if (bNPatch) {
-        IDirect3DDevice9* pDevice = spRenderer.operator->()->GetD3DDevice();
+        IDirect3DDevice9* pDevice = spRenderer->GetD3DDevice();
         if (pDevice) {
             // The segment count is converted as a signed int.
             pDevice->SetNPatchMode(static_cast<float>(GetNPatchSegments()));
         }
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiDevImageConverter));
-    NiDevImageConverter* pConverter = pMemory ? ::new (pMemory) NiDevImageConverter : nullptr;
+    NiDevImageConverter* pConverter = new NiDevImageConverter;
     NiImageConverter::SetImageConverter(pConverter);
     NiSourceTexture::SetUsePreloading(true);
     NiTexture::SetMipmapByDefault(false);
@@ -681,7 +680,7 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
     BSShaderManager::fpInterfaceTint = NiColorA(fTintR, fTintG, fTintB, 1.0f);
     BSShaderManager::SetShadowFilter(static_cast<int32_t>(iShadowFilter.UInt()));
     BSShaderManager::b30GrassVS = b30GrassVS.Bool();
-    return spRenderer.operator->();
+    return spRenderer;
 }
 
 // The launcher's resolution, for a platform with no launcher: [Display] iSize W and iSize H of the prefs file at
@@ -789,7 +788,7 @@ HWND__* Renderer::GetHWND() {
 }
 
 NiDX9Renderer* Renderer::GetNIRenderer() {
-    return (&Renderer::spRenderer)->operator->();
+    return Renderer::spRenderer;
 }
 
 uint32_t Renderer::GetAdapterIndex() {
@@ -842,8 +841,8 @@ bool Renderer::GetMultiSampleEnabled() {
 
 void Renderer::Reposition(int32_t aiX, int32_t aiY) {
     if (!Renderer::GetFullScreen()) {
-        Renderer::iLocationX.operator=(aiX);
-        Renderer::iLocationY.operator=(aiY);
+        Renderer::iLocationX = aiX;
+        Renderer::iLocationY = aiY;
     }
 }
 

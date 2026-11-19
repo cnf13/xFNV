@@ -1769,7 +1769,7 @@ hkResult hkpInertiaTensorComputer::computeBoxSurfaceMassProperties(
     hkpInertiaTensorComputer::computeBoxVolumeMassProperties(halfExtents, bigMass, resultBig);
     hkpInertiaTensorComputer::computeBoxVolumeMassProperties(halfExtentsSmall, smallMass, resultSmall);
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
-    result.m_inertiaTensor.operator=(resultBig.m_inertiaTensor);
+    result.m_inertiaTensor = resultBig.m_inertiaTensor;
     result.m_inertiaTensor.sub(resultSmall.m_inertiaTensor);
     result.m_mass = resultBig.m_mass - resultSmall.m_mass;
     result.m_volume = resultBig.m_volume - resultSmall.m_volume;

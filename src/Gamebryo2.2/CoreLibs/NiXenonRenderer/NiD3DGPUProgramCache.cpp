@@ -186,11 +186,7 @@ NiGPUProgram* NiD3DGPUProgramCache::GenerateProgram(
     }
 
     if (spProgram && PruneUnusedConstants(spProgram, kUniforms)) {
-        NiGPUProgramCache::NiGPUProgramDesc* pkDesc = nullptr;
-        void* pvMemory = NiMemObject::operator new(sizeof(NiGPUProgramCache::NiGPUProgramDesc));
-        if (pvMemory) {
-            pkDesc = ::new (pvMemory) NiGPUProgramCache::NiGPUProgramDesc;
-        }
+        NiGPUProgramCache::NiGPUProgramDesc* pkDesc = new NiGPUProgramCache::NiGPUProgramDesc;
         for (uint32_t ui = 0; ui < kUniforms.m_uiUsed; ++ui) {
             pkDesc->m_kUniforms.Add(kUniforms.m_pBase[ui]);
         }

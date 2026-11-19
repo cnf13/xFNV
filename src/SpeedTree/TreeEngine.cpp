@@ -111,7 +111,7 @@ bool CTreeEngine::Parse(CTreeFileAccess& cFile) {
         cFile.ParseInt();
         ParseLeafCluster(cFile);
     }
-    CIdvFilename* v3 = &v5.operator=(m_sTreeInfo.m_strBranchTextureFilename);
+    CIdvFilename* v3 = &(v5 = m_sTreeInfo.m_strBranchTextureFilename);
     m_sTreeInfo.m_strBranchTextureFilename.assign(*v3);
     // SetLeafTextures(m_sLeafInfo.m_vLeafTextures): the leaf textures' operator=.
     m_sLeafInfo.m_vLeafTextures = std::as_const(m_sLeafInfo.m_vLeafTextures);

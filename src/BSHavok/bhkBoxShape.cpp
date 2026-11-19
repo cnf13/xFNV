@@ -61,12 +61,8 @@ const NiRTTI* bhkBoxShape::GetRTTI() const {
 // whole body charges its allocations to Havok's heap context.
 NiObject* bhkBoxShape::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-    bhkBoxShape* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkBoxShape* pShape = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-    if (pShape) {
-        pClone = ::new (pShape) bhkBoxShape;
-    }
+    bhkBoxShape* pClone = new bhkBoxShape;
     // CopyMembers is called through a base pointer so that the call stays virtual.
     bhkShape* pThisShape = this;
     pThisShape->CopyMembers(pClone, arCloneData);
@@ -258,11 +254,7 @@ void bhkBoxShape::Init(const hkVector4& arExt) {
 
 // A new default-constructed box shape, or null when the allocation fails.
 NiObject* bhkBoxShape::CreateObject() {
-    bhkBoxShape* pShape = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-    if (pShape) {
-        return ::new (pShape) bhkBoxShape;
-    }
-    return nullptr;
+    return new bhkBoxShape;
 }
 
 hkBoxShapeCinfo::hkBoxShapeCinfo() {

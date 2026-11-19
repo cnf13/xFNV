@@ -394,8 +394,7 @@ void NiD3DShaderFactory::_SDMShutdown() {
 // then reported through an empty stub.
 void NiD3DShaderFactory::_SDMInit() {
     if (!NiD3DShaderFactory::ms_pkD3DShaderFactory) {
-        void* pvMemory = NiMemObject::operator new(sizeof(NiD3DShaderFactory));
-        NiD3DShaderFactory* pkFactory = pvMemory ? ::new (pvMemory) NiD3DShaderFactory : nullptr;
+        NiD3DShaderFactory* pkFactory = new NiD3DShaderFactory;
         NiD3DShaderFactory::ms_pkD3DShaderFactory = pkFactory;
         NiShaderFactory::ms_pkShaderFactory = pkFactory;
     }

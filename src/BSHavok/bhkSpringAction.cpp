@@ -38,10 +38,7 @@ const NiRTTI* bhkSpringAction::GetRTTI() const {
 
 NiObject* bhkSpringAction::CreateClone(NiCloningProcess& arCloneData) {
     bhkSerializable::CloneCritLock();
-    bhkSpringAction* pClone = static_cast<bhkSpringAction*>(NiMemObject::operator new(sizeof(bhkSpringAction)));
-    if (pClone) {
-        ::new (pClone) bhkSpringAction;
-    }
+    bhkSpringAction* pClone = new bhkSpringAction;
     // Called through the base, so the class's CopyMembers is reached through the vtable.
     static_cast<bhkBinaryAction*>(this)->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -199,11 +196,7 @@ void bhkSpringAction::CopyCinfo(hkSpringActionCinfo& arInfo) {
 }
 
 NiObject* bhkSpringAction::CreateObject() {
-    bhkSpringAction* pObject = static_cast<bhkSpringAction*>(NiMemObject::operator new(sizeof(bhkSpringAction)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkSpringAction;
+    return new bhkSpringAction;
 }
 
 // hkBinaryActionCinfo's constructor clears the user data and the bodies, bhkVector4's zeroes the pivots.

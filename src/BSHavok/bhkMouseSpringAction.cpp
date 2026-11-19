@@ -48,11 +48,7 @@ bhkMouseSpringAction::~bhkMouseSpringAction() {
 NiObject* bhkMouseSpringAction::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkSerializable::CloneCritLock();
-    bhkMouseSpringAction* pClone =
-        static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
-    if (pClone) {
-        ::new (pClone) bhkMouseSpringAction;
-    }
+    bhkMouseSpringAction* pClone = new bhkMouseSpringAction;
     // The base body is called directly, not through the vtable, so the call is qualified.
     bhkUnaryAction::CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -219,7 +215,7 @@ hkSerializableCinfo& bhkMouseSpringAction::CreateCinfo(bool& arCreated) {
 }
 
 hkpEntity* bhkMouseSpringAction::GetEntity() {
-    hkpMouseSpringAction* pMouseSpringAction = operator*();
+    hkpMouseSpringAction* pMouseSpringAction = **this;
     if (pMouseSpringAction) {
         return static_cast<hkpEntity*>(pMouseSpringAction->GetEntity());
     }
@@ -261,10 +257,5 @@ bhkWorldObject* bhkMouseSpringAction::GetWorldObject() {
 }
 
 NiObject* bhkMouseSpringAction::CreateObject() {
-    bhkMouseSpringAction* pObject =
-        static_cast<bhkMouseSpringAction*>(NiMemObject::operator new(sizeof(bhkMouseSpringAction)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkMouseSpringAction;
+    return new bhkMouseSpringAction;
 }

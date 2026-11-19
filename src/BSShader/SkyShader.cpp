@@ -308,20 +308,12 @@ void SkyShader::InitPass(uint32_t auiCurrentPass) {
 // position and the vertex parameters) when they are missing.
 void SkyShader::CreateConstantMaps() {
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("Params", 0x10000005, 0, 4, 1, "", 8, 4, &Params, false);
     }
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -1383,11 +1375,8 @@ void SkyShader::CreateSkyQuad(NiPointer<NiTriShape>& aspTriShape) {
     pColors[1] = NiColorA_BLACK;
     pColors[2] = NiColorA_BLACK;
     pColors[3] = NiColorA_BLACK;
-    void* pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-    NiTriShape* pShape = pMemory
-        ? ::new (pMemory)
-              NiTriShape(4, pVertices, nullptr, pColors, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 2, pTriangles)
-        : nullptr;
+    NiTriShape* pShape =
+        new NiTriShape(4, pVertices, nullptr, pColors, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 2, pTriangles);
     NiPointer<NiTriShape> spShape(pShape);
     NiGeometryData* pData = pShape->m_spModelData.m_pObject;
     pData->m_kBound.m_kCenter.x = 0.0f;
@@ -1416,10 +1405,7 @@ BSShader* SkyShader::CreateShader() {
     v1->SetEntry(1u, 5u, NiShaderDeclaration::SHADERPARAM_NI_COLOR, NiShaderDeclaration::SPTYPE_FLOAT4, 0u);
     v1->SetEntry(2u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0u);
     v1->GetD3DDeclaration();
-    SkyShader* v2 = static_cast<SkyShader*>(NiMemObject::operator new(sizeof(SkyShader)));
-    if (v2) {
-        v0 = ::new (v2) SkyShader;
-    }
+    v0 = new SkyShader;
     v0->Initialize();
     v0->LoadShaders();
     v0->LoadStagesAndPasses();

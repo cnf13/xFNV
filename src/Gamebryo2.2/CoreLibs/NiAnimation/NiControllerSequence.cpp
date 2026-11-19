@@ -458,11 +458,7 @@ const NiRTTI* NiControllerSequence::GetRTTI() const {
 
 // The members are copied even when the allocation failed.
 NiObject* NiControllerSequence::CreateClone(NiCloningProcess& kCloning) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiControllerSequence));
-    NiControllerSequence* pClone = nullptr;
-    if (pvMemory) {
-        pClone = ::new (pvMemory) NiControllerSequence;
-    }
+    NiControllerSequence* pClone = new NiControllerSequence;
     CopyMembers(pClone, kCloning);
     return pClone;
 }
@@ -2162,11 +2158,8 @@ bool NiControllerSequence::ResolveTransformInterpolators(
             }
         }
         else if (!spMTCtlr) {
-            NiMultiTargetTransformController* pkNewCtlr = static_cast<NiMultiTargetTransformController*>(
-                NiMemObject::operator new(sizeof(NiMultiTargetTransformController))
-            );
+            NiMultiTargetTransformController* pkNewCtlr = new NiMultiTargetTransformController(usTransformInterpCount);
             if (pkNewCtlr) {
-                pkNewCtlr = ::new (pkNewCtlr) NiMultiTargetTransformController(usTransformInterpCount);
                 spMTCtlr = pkNewCtlr;
             }
             spMTCtlr->SetTarget(pkRoot);
@@ -2180,14 +2173,10 @@ bool NiControllerSequence::ResolveTransformInterpolators(
         }
 
         if (usTreadInterpCount && !spTreadCtlr) {
-            BSMultiTargetTreadTransfController* pkNewCtlr = static_cast<BSMultiTargetTreadTransfController*>(
-                NiMemObject::operator new(sizeof(BSMultiTargetTreadTransfController))
-            );
+            BSMultiTargetTreadTransfController* pkNewCtlr =
+                new BSMultiTargetTreadTransfController(usTreadInterpCount, usLinkCount);
             if (pkNewCtlr) {
-                pkNewCtlr = ::new (pkNewCtlr) BSMultiTargetTreadTransfController(usTreadInterpCount, usLinkCount);
-                if (pkNewCtlr) {
-                    spTreadCtlr = pkNewCtlr;
-                }
+                spTreadCtlr = pkNewCtlr;
             }
             spTreadCtlr->SetTarget(pkRoot);
             spTreadCtlr->m_usFlags |= NiTimeController::MANAGERCONTROLLED_MASK;
@@ -2550,10 +2539,5 @@ void NiControllerSequence::ConvertOldSequence(
 }
 
 NiObject* NiControllerSequence::CreateObject() {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiControllerSequence));
-    NiControllerSequence* pSequence = static_cast<NiControllerSequence*>(pvMemory);
-    if (!pSequence) {
-        return nullptr;
-    }
-    return ::new (pSequence) NiControllerSequence;
+    return new NiControllerSequence;
 }

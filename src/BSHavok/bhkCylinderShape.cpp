@@ -49,12 +49,8 @@ NiObject* bhkCylinderShape::CreateClone(NiCloningProcess& arCloneData) {
     TLSData* v3 = GetThreadTLSData();
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;
-    bhkCylinderShape* pobj = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkCylinderShape* v6 = static_cast<bhkCylinderShape*>(NiMemObject::operator new(sizeof(bhkCylinderShape)));
-    if (v6) {
-        pobj = ::new (v6) bhkCylinderShape;
-    }
+    bhkCylinderShape* pobj = new bhkCylinderShape;
     CopyMembers(pobj, arCloneData);
     bhkSerializable::CloneCritUnlock();
     v3->eMemContext = eMemContext;
@@ -326,11 +322,7 @@ void bhkCylinderShape::CopyCinfo(hkCylinderShapeCinfo& arInfo) {
 
 // The stream's object factory: allocates with NiNew, then runs the default constructor over the memory.
 NiObject* bhkCylinderShape::CreateObject() {
-    bhkCylinderShape* pObject = static_cast<bhkCylinderShape*>(NiMemObject::operator new(sizeof(bhkCylinderShape)));
-    if (pObject) {
-        return ::new (pObject) bhkCylinderShape;
-    }
-    return nullptr;
+    return new bhkCylinderShape;
 }
 
 // Scales both end points (all four lanes) and the cylinder radius by afScale.

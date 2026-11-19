@@ -38,11 +38,7 @@ const NiRTTI* bhkOrientHingedBodyAction::GetRTTI() const {
 NiObject* bhkOrientHingedBodyAction::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkSerializable::CloneCritLock();
-    bhkOrientHingedBodyAction* pkClone =
-        static_cast<bhkOrientHingedBodyAction*>(NiMemObject::operator new(sizeof(bhkOrientHingedBodyAction)));
-    if (pkClone) {
-        ::new (pkClone) bhkOrientHingedBodyAction;
-    }
+    bhkOrientHingedBodyAction* pkClone = new bhkOrientHingedBodyAction;
     CopyMembers(pkClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pkClone;
@@ -199,10 +195,5 @@ void bhkOrientHingedBodyAction::SetTargetDir(const hkVector4& arDir) {
 
 // The class loader's factory: a new object, or null when the allocation fails.
 NiObject* bhkOrientHingedBodyAction::CreateObject() {
-    bhkOrientHingedBodyAction* pkObject =
-        static_cast<bhkOrientHingedBodyAction*>(NiMemObject::operator new(sizeof(bhkOrientHingedBodyAction)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkOrientHingedBodyAction;
+    return new bhkOrientHingedBodyAction;
 }

@@ -80,10 +80,7 @@ NiObject* WeaponObject::CreateClone(NiCloningProcess& arCloneData) {
     int32_t& riMemContext = GetThreadMemContext();
     int32_t iSavedContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
-    WeaponObject* pkClone = static_cast<WeaponObject*>(NiMemObject::operator new(sizeof(WeaponObject)));
-    if (pkClone) {
-        ::new (pkClone) WeaponObject;
-    }
+    WeaponObject* pkClone = new WeaponObject;
     CopyMembers(pkClone, arCloneData);
     riMemContext = iSavedContext;
     return pkClone;
@@ -93,8 +90,8 @@ void WeaponObject::UpdateWorldData(NiUpdateData& a2) {
     NiAVObject* m_pkSceneObject;
     m_pkSceneObject = this->m_pkSceneObject;
     if ((m_pkSceneObject) &&
-        ((&m_pkSceneObject->m_kLocal.m_Translate)->operator!=(NiPoint3_ZERO) ||
-         (!(&m_pkSceneObject->m_kLocal.m_Rotate)->operator==(NiMatrix3_IDENTITY)))) {
+        (m_pkSceneObject->m_kLocal.m_Translate != NiPoint3_ZERO ||
+         (!(m_pkSceneObject->m_kLocal.m_Rotate == NiMatrix3_IDENTITY)))) {
         __builtin_memcpy(&m_pkSceneObject->m_kLocal, &NiMatrix3_IDENTITY, 0x24u);
         m_pkSceneObject->m_kLocal.m_Translate = NiPoint3_ZERO;
     }
@@ -197,14 +194,7 @@ void WeaponObject::Init(
         }
         NiTimeController* pcon = psceneObject->GetController(&bhkBlendController::ms_RTTI);
         if (!pcon) {
-            bhkBlendController* v17 =
-                static_cast<bhkBlendController*>(NiMemObject::operator new(sizeof(bhkBlendController)));
-            if (v17) {
-                pcon = ::new (v17) bhkBlendController;
-            }
-            else {
-                pcon = nullptr;
-            }
+            pcon = new bhkBlendController;
         }
         pcon->m_usFlags |= 8u;
         pcon->SetTarget(psceneObject);
@@ -325,13 +315,8 @@ WeaponObject* WeaponObject::CreateWeaponObject(
         riMemContext = iSavedContext;
         return nullptr;
     }
-    WeaponObject* pkObject = static_cast<WeaponObject*>(NiMemObject::operator new(sizeof(WeaponObject)));
-    if (!pkObject) {
-        riMemContext = iSavedContext;
-        return nullptr;
-    }
     // The found collision object is passed on unchanged; the constructor takes it as a collision object.
-    WeaponObject* pkResult = ::new (pkObject) WeaponObject(
+    WeaponObject* pkResult = new WeaponObject(
         aOwnerFilter, apOwner3d, apObject, static_cast<bhkCollisionObject*>(pkCollisionObject), abDefaultKeyframed
     );
     riMemContext = iSavedContext;
@@ -590,8 +575,7 @@ void WeaponObject::Constrain(
             fixPointa, fixPointb, fixPointa.m_translation, axis
         );
 
-        void* pMemory = NiMemObject::operator new(sizeof(bhkLimitedHingeConstraint));
-        bhkLimitedHingeConstraint* ph = pMemory ? ::new (pMemory) bhkLimitedHingeConstraint(ci) : nullptr;
+        bhkLimitedHingeConstraint* ph = new bhkLimitedHingeConstraint(ci);
         prba->AddAction(ph);
         // The merged filter: the source's bits 0xE080, aOwnerFilter's bits 0xFFFF1400, the target's layer, and
         // 0x1400.

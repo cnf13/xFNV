@@ -887,7 +887,7 @@ void BSAudioManager::ComposeMessage(
                 pMsg->iID = aiID;
                 pMsg->iData = aiData;
                 pMsg->pData = apPointerData;
-                pMsg->spData.operator=(spData);
+                pMsg->spData = spData;
                 pMsg->vector3[0] = aVector.x;
                 pMsg->vector3[1] = aVector.y;
                 pMsg->vector3[2] = aVector.z;
@@ -1373,14 +1373,14 @@ void BSAudioManager::SetVoiceState(uint32_t aiID, BSGameSound* apSound) {
 
 void BSAudioManager::FreeMessage(BSSoundMessage* apMsgToFree) {
     NiPointer<NiAVObject> spAVObject;
-    spAVObject.operator=(apMsgToFree->spData);
+    spAVObject = apMsgToFree->spData;
     if (spAVObject.m_pObject) {
         {
             NiPointer<NiAVObject> spAVObject_2;
-            apMsgToFree->spData.operator=(spAVObject_2);
+            apMsgToFree->spData = spAVObject_2;
         }
         NiObjectGarbage::Add(spAVObject.m_pObject);
-        spAVObject.operator=(static_cast<NiAVObject*>(nullptr));
+        spAVObject = nullptr;
     }
     {
         NiPointer<NiAVObject> ptr;
@@ -1389,7 +1389,7 @@ void BSAudioManager::FreeMessage(BSSoundMessage* apMsgToFree) {
         apMsgToFree->iID = 0;
         apMsgToFree->iData = 0;
         apMsgToFree->pData = nullptr;
-        apMsgToFree->spData.operator=(ptr);
+        apMsgToFree->spData = ptr;
         apMsgToFree->vector3[0] = v11.x;
         apMsgToFree->vector3[1] = v11.y;
         apMsgToFree->vector3[2] = v11.z;
@@ -1399,14 +1399,14 @@ void BSAudioManager::FreeMessage(BSSoundMessage* apMsgToFree) {
 
 void BSAudioManager::FreeQueueMessage(BSSoundMessage* apMsgToFree) {
     NiPointer<NiAVObject> spAVObject;
-    spAVObject.operator=(apMsgToFree->spData);
+    spAVObject = apMsgToFree->spData;
     if (spAVObject.m_pObject) {
         {
             NiPointer<NiAVObject> spAVObject_2;
-            apMsgToFree->spData.operator=(spAVObject_2);
+            apMsgToFree->spData = spAVObject_2;
         }
         NiObjectGarbage::Add(spAVObject.m_pObject);
-        spAVObject.operator=(static_cast<NiAVObject*>(nullptr));
+        spAVObject = nullptr;
     }
     {
         NiPointer<NiAVObject> ptr;
@@ -1415,7 +1415,7 @@ void BSAudioManager::FreeQueueMessage(BSSoundMessage* apMsgToFree) {
         apMsgToFree->iID = 0;
         apMsgToFree->iData = 0;
         apMsgToFree->pData = nullptr;
-        apMsgToFree->spData.operator=(ptr);
+        apMsgToFree->spData = ptr;
         apMsgToFree->vector3[0] = v11.x;
         apMsgToFree->vector3[1] = v11.y;
         apMsgToFree->vector3[2] = v11.z;
@@ -1815,7 +1815,7 @@ void BSAudioManager::ProcessSoundUpdates() {
                 MovingRefrList.RemoveAt(psound->iSoundID);
                 if (spobj.m_pObject) {
                     NiObjectGarbage::Add(spobj.m_pObject);
-                    spobj.operator=(static_cast<NiAVObject*>(nullptr));
+                    spobj = nullptr;
                 }
                 if (psound->QueuedMessages.m_uiCount) {
                     NiTPointerList<BSSoundMessage*>* pmsgQueue_2 = &psound->QueuedMessages;
@@ -2688,14 +2688,14 @@ bool BSAudioManager::ProcessMessage(BSSoundMessage* apMsg) {
                 }
                 else if ((ptmpSoundPtr->iStateFlags & BSGameSound::STATE_STOPPED) == 0) {
                     NiPointer<NiAVObject> spData;
-                    spData.operator=(apMsg->spData);
+                    spData = apMsg->spData;
                     NiPoint3 kVector;
                     kVector.x = apMsg->vector3[0];
                     kVector.y = apMsg->vector3[1];
                     kVector.z = apMsg->vector3[2];
                     ComposeMessage(MSET_BEAM_END, apMsg->iID, apMsg->iData, apMsg->pData, spData, kVector);
                     NiPointer<NiAVObject> spNull;
-                    apMsg->spData.operator=(spNull);
+                    apMsg->spData = spNull;
                 }
             }
             break;
@@ -2812,18 +2812,18 @@ bool BSAudioManager::ProcessMessage(BSSoundMessage* apMsg) {
         // spData is the object the sound follows; it replaces the one registered for the sound.
         case MREGISTER_MOVING_SOUND: {
             NiPointer<NiAVObject> spObj;
-            spObj.operator=(apMsg->spData);
+            spObj = apMsg->spData;
             NiPointer<NiAVObject> spobjTest;
             if (MovingRefrList.GetAt(apMsg->iID, spobjTest)) {
                 MovingRefrList.RemoveAt(apMsg->iID);
                 if (spobjTest->m_uiRefCount == 1) {
                     NiObjectGarbage::Add(spobjTest.m_pObject);
                 }
-                spobjTest.operator=(static_cast<NiAVObject*>(nullptr));
+                spobjTest = nullptr;
             }
             MovingRefrList.SetAt(apMsg->iID, spObj);
             NiPointer<NiAVObject> spNull;
-            apMsg->spData.operator=(spNull);
+            apMsg->spData = spNull;
             break;
         }
         case MPURGE_MOVING_SOUNDS: {
@@ -2842,7 +2842,7 @@ bool BSAudioManager::ProcessMessage(BSSoundMessage* apMsg) {
                 if (spObj->m_uiRefCount == 1) {
                     NiObjectGarbage::Add(spObj.m_pObject);
                 }
-                spObj.operator=(static_cast<NiAVObject*>(nullptr));
+                spObj = nullptr;
                 SoundList.GetAt(ikey, ptmpSoundPtr);
                 if (ptmpSoundPtr) {
                     ptmpSoundPtr->Stop();
@@ -2855,7 +2855,7 @@ bool BSAudioManager::ProcessMessage(BSSoundMessage* apMsg) {
         // spData is the object whose sounds stop; pData the sound types to stop (none: all of them).
         case MSTOP_MOVING_SOUNDS: {
             NiPointer<NiAVObject> spTarget;
-            spTarget.operator=(apMsg->spData);
+            spTarget = apMsg->spData;
             NiPointer<NiAVObject> spObj;
             uint32_t uiflags = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(apMsg->pData));
             NiTMapItem<int32_t, NiPointer<NiAVObject>>* pPos = nullptr;
@@ -3484,7 +3484,7 @@ BSSoundMessage* BSSoundMessage::Assign(BSSoundMessage* apThis, const BSSoundMess
     apThis->iID = arOther.iID;
     apThis->iData = arOther.iData;
     apThis->pData = arOther.pData;
-    apThis->spData.operator=(arOther.spData);
+    apThis->spData = arOther.spData;
     for (uint32_t S2 = 0; S2 < 3; ++S2) {
         apThis->vector3[S2] = (&arOther)->vector3[S2];
     }

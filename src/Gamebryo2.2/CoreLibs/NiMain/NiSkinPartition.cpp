@@ -1677,11 +1677,7 @@ void NiSkinPartition::CreateInitialBoneSets(
 }
 
 NiObject* NiSkinPartition::CreateObject() {
-    NiSkinPartition* pkObject = static_cast<NiSkinPartition*>(NiMemObject::operator new(sizeof(NiSkinPartition)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSkinPartition;
+    return new NiSkinPartition;
 }
 
 int32_t NiSkinPartition::AssignTriangle(

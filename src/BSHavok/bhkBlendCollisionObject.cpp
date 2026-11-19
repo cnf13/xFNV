@@ -109,11 +109,7 @@ bhkBlendCollisionObject::~bhkBlendCollisionObject() {
 }
 
 NiObject* bhkBlendCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
-    bhkBlendCollisionObject* pkClone =
-        static_cast<bhkBlendCollisionObject*>(NiMemObject::operator new(sizeof(bhkBlendCollisionObject)));
-    if (pkClone) {
-        ::new (pkClone) bhkBlendCollisionObject;
-    }
+    bhkBlendCollisionObject* pkClone = new bhkBlendCollisionObject;
     CopyMembers(pkClone, arCloneData);
     pkClone->fVelGain = fVelGain;
     pkClone->fHeirGain = fHeirGain;
@@ -576,12 +572,7 @@ void bhkBlendCollisionObject::DecForceAdd() {
 
 // The class loader's factory.
 NiObject* bhkBlendCollisionObject::CreateObject() {
-    bhkBlendCollisionObject* pkObject =
-        static_cast<bhkBlendCollisionObject*>(NiMemObject::operator new(sizeof(bhkBlendCollisionObject)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkBlendCollisionObject;
+    return new bhkBlendCollisionObject;
 }
 
 // The blend value of the blend collision object on apRoot, or on the child named apName; 1.0 when there is none.

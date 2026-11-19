@@ -39,11 +39,7 @@ NiObject* bhkExtraData::CreateClone(NiCloningProcess& arCloneData) {
     MEM_CONTEXT eOldMemContext = static_cast<MEM_CONTEXT>(iMemContext);
     iMemContext = MEM_CONTEXT_HAVOK;
 
-    bhkExtraData* pkClone = nullptr;
-    void* pvMemory = NiMemObject::operator new(sizeof(bhkExtraData));
-    if (pvMemory) {
-        pkClone = ::new (pvMemory) bhkExtraData;
-    }
+    bhkExtraData* pkClone = new bhkExtraData;
     CopyMembers(pkClone, arCloneData);
 
     iMemContext = eOldMemContext;
@@ -183,11 +179,7 @@ void bhkExtraData::CopyMembers(bhkExtraData* pDest, NiCloningProcess& arCloneDat
 // The class' stream loader entry: a bhkExtraData from the engine heap, named with the empty string. SetName is called
 // even when the allocation failed, as the game does.
 NiObject* bhkExtraData::CreateObject() {
-    void* pvMemory = NiMemObject::operator new(sizeof(bhkExtraData));
-    bhkExtraData* pkObject = nullptr;
-    if (pvMemory) {
-        pkObject = ::new (pvMemory) bhkExtraData;
-    }
+    bhkExtraData* pkObject = new bhkExtraData;
     pkObject->SetName(EmptyFS);
     return pkObject;
 }

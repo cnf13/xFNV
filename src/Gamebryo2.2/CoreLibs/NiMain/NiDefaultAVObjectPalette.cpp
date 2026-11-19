@@ -311,12 +311,7 @@ void NiDefaultAVObjectPalette::ResetAndFillFromScenegraph() {
 }
 
 NiObject* NiDefaultAVObjectPalette::CreateObject() {
-    NiDefaultAVObjectPalette* pkObject =
-        static_cast<NiDefaultAVObjectPalette*>(NiMemObject::operator new(sizeof(NiDefaultAVObjectPalette)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiDefaultAVObjectPalette;
+    return new NiDefaultAVObjectPalette;
 }
 
 void RecurseAndAddObjectsToPalette(NiAVObject* apObj3D, NiDefaultAVObjectPalette* apPalette) {

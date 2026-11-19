@@ -51,11 +51,7 @@ NiObject* bhkPrismaticConstraint::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
 
     bhkSerializable::CloneCritLock();
-    bhkPrismaticConstraint* pkClone =
-        static_cast<bhkPrismaticConstraint*>(NiMemObject::operator new(sizeof(bhkPrismaticConstraint)));
-    if (pkClone) {
-        ::new (pkClone) bhkPrismaticConstraint;
-    }
+    bhkPrismaticConstraint* pkClone = new bhkPrismaticConstraint;
     CopyCloneMembers(pkClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pkClone;
@@ -124,12 +120,7 @@ hkSerializableCinfo& bhkPrismaticConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkPrismaticConstraint::CreateObject() {
-    bhkPrismaticConstraint* pkObject =
-        static_cast<bhkPrismaticConstraint*>(NiMemObject::operator new(sizeof(bhkPrismaticConstraint)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkPrismaticConstraint;
+    return new bhkPrismaticConstraint;
 }
 
 // hkConstraintCinfo's constructor sets no data, PSI priority and no entities.

@@ -528,13 +528,10 @@ NiTriShape* Font::MakeTriShape(int32_t aiChars, const NiColorA& axColor, bool ab
     );
     uint16_t* pvert_order = static_cast<uint16_t*>(_NiMalloc(aiChars * 6 * sizeof(uint16_t)));
 
-    void* pMemory = NiMemObject::operator new(sizeof(BSScissorTriShape));
-    NiTriShape* pshape = pMemory
-        ? ::new (pMemory) BSScissorTriShape(
-              static_cast<uint16_t>(iverts), pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE,
-              static_cast<uint16_t>(aiChars * 2), pvert_order, 0, 0, 0, 0
-          )
-        : nullptr;
+    NiTriShape* pshape = new BSScissorTriShape(
+        static_cast<uint16_t>(iverts), pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE,
+        static_cast<uint16_t>(aiChars * 2), pvert_order, 0, 0, 0, 0
+    );
     NiGeometryData* pd = pshape->m_spModelData.m_pObject;
     pd->m_ucKeepFlags = 0;
     pd->m_ucCompressFlags = 1;
@@ -546,8 +543,7 @@ NiTriShape* Font::MakeTriShape(int32_t aiChars, const NiColorA& axColor, bool ab
     }
     pshape->m_spModelData.m_pObject->SetConsistency(NiGeometryData::STATIC);
 
-    pMemory = NiMemObject::operator new(sizeof(TileShaderProperty));
-    TileShaderProperty* ptsp = pMemory ? ::new (pMemory) TileShaderProperty(false) : nullptr;
+    TileShaderProperty* ptsp = new TileShaderProperty(false);
     pshape->AttachProperty(ptsp);
     ptsp->TintColor = axColor;
     if (abPrepareObject) {
@@ -597,28 +593,16 @@ NiTriShape* Font::MakeIconsTriShape() {
         ptextures = nullptr;
     }
     uint16_t* pvert_order = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t) * ButtonIcons.iSize));
-    void* apMemory = NiMemObject::operator new(sizeof(BSScissorTriShape));
-    if (apMemory) {
-        pshape = ::new (apMemory) BSScissorTriShape(
-            iverts, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2 * ButtonIcons.iSize,
-            pvert_order, 0, 0, 0, 0
-        );
-    }
-    else {
-        pshape = nullptr;
-    }
+    pshape = new BSScissorTriShape(
+        iverts, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2 * ButtonIcons.iSize,
+        pvert_order, 0, 0, 0, 0
+    );
     NiTriShapeData* pd = static_cast<NiTriShapeData*>(pshape->m_spModelData.m_pObject);
     pd->m_ucKeepFlags = 0;
     pd->m_ucCompressFlags = NiGeometryData::VERTEX_MASK;
     pshape->SetName("Interface: TextIcons");
     pshape->m_spModelData.m_pObject->SetConsistency(NiGeometryData::STATIC);
-    TileShaderProperty* v14 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-    if (v14) {
-        ptsp = ::new (v14) TileShaderProperty(false);
-    }
-    else {
-        ptsp = nullptr;
-    }
+    ptsp = new TileShaderProperty(false);
     pshape->AttachProperty(ptsp);
     ptsp->TintColor = NiColorA_WHITE;
     BSShaderManager::PrepareObject(pshape, 0, 0);
@@ -780,7 +764,7 @@ void Font::AddTextIcon(const char* astrIcon) {
 void Font::KillData() {
     int32_t i;
     for (i = 0; pFontData && (i < pFontData->iTextureCount); ++i) {
-        (&pTextureData[i])->operator=(nullptr);
+        pTextureData[i] = nullptr;
     }
     (&MemoryManager_Singleton)->Deallocate(pFontData);
     pFontData = nullptr;
@@ -886,9 +870,7 @@ void Font::Load() {
         uint32_t auiSize[2];
         pTexFile->NiBinaryStream::Read(auiSize, sizeof(auiSize));
         NiTexture::FormatPrefs kPrefs;
-        void* pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-        NiPixelData* pPixelData =
-            pMemory ? ::new (pMemory) NiPixelData(auiSize[0], auiSize[1], NiPixelFormat_RGBA32, 1, 1) : nullptr;
+        NiPixelData* pPixelData = new NiPixelData(auiSize[0], auiSize[1], NiPixelFormat_RGBA32, 1, 1);
         uint32_t uiBytes = auiSize[0] * auiSize[1] * 4;
         // GetPixels(0, 0).
         // EXE-INLINED 0x64DAC0
@@ -896,11 +878,7 @@ void Font::Load() {
             pPixelData->m_puiOffsetInBytes[0];
         pTexFile->NiBinaryStream::Read(pPixels, uiBytes);
         pPixelData->bNoConvert = true;
-        pMemory = NiMemObject::operator new(sizeof(NiTexturingProperty));
-        NiTexturingProperty* pTexProp = nullptr;
-        if (pMemory) {
-            pTexProp = ::new (pMemory) NiTexturingProperty(pPixelData, pFontFile, kPrefs);
-        }
+        NiTexturingProperty* pTexProp = new NiTexturingProperty(pPixelData, pFontFile, kPrefs);
         delete pTexFile;
         pTexProp->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);
         pTextureData[j] = pTexProp;
@@ -1204,7 +1182,7 @@ int32_t Font::LineBreakText(
                             }
                             if (v13 + 1 < axTextString.sMaxLen) {
                                 size_t v10;
-                                axTextString.operator+=("\n");
+                                axTextString += "\n";
                                 if (axTextString.sLen == 0xFFFF) {
                                     v10 = std::strlen(axTextString.pString);
                                 }
@@ -1216,7 +1194,7 @@ int32_t Font::LineBreakText(
                             else {
                                 size_t v11;
                                 size_t v12;
-                                axTextString.operator+=("\n\n");
+                                axTextString += "\n\n";
                                 if (axTextString.sLen == 0xFFFF) {
                                     v12 = std::strlen(axTextString.pString);
                                 }
@@ -2754,22 +2732,10 @@ NiTriShape* FontManager::MakeImage(BSStringT<char> axFilename, NiPoint3 axPos, i
     pvert_order[3] = 2;
     pvert_order[4] = 1;
     pvert_order[5] = 3;
-    void* apMemory = NiMemObject::operator new(sizeof(BSScissorTriShape));
-    if (apMemory) {
-        pshape = (NiTriShape*)::new (apMemory) BSScissorTriShape(
-            4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvert_order, 0, 0, 0, 0
-        );
-    }
-    else {
-        pshape = nullptr;
-    }
-    TileShaderProperty* v43 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-    if (v43) {
-        ptsp = ::new (v43) TileShaderProperty(false);
-    }
-    else {
-        ptsp = nullptr;
-    }
+    pshape = new BSScissorTriShape(
+        4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvert_order, 0, 0, 0, 0
+    );
+    ptsp = new TileShaderProperty(false);
     ptsp->SetTileTexture(ptex);
     pshape->AttachProperty(ptsp);
     NiD3DShader* pshader = (NiD3DShader*)BSShaderManager::GetShader(32);

@@ -1826,7 +1826,7 @@ hkgpMesh::IConvexOverlap::IConvexShape::~IConvexShape() {}
 int32_t hkgpMesh::IConvexOverlap::IConvexShape::getMaxIndex() const {
     char buf[512];
     hkErrStream apThis(buf, 512);
-    apThis.operator<<("Not implemented");
+    apThis << "Not implemented";
     if (hkError::s_instance->message(
             hkError::MESSAGE_ERROR, -0x30582034, buf,
             "d:\\build\\20091222_000100_AiAnBeClDePh\\Source\\Common/Internal/GeometryProcessing/Mesh/hkgpMesh.h", 280
@@ -4358,7 +4358,7 @@ void hkgpMesh::locate(const hkVector4& x, hkgpMesh::Location& location) const {
     if (!m_hasPerVertexNormals.m_bool) {
         alignas(16) char buf[512];
         hkErrStream errStream(buf, 512);
-        errStream.operator<<("assignVertexNormals not called");
+        errStream << "assignVertexNormals not called";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x672B48D7, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 1317
             )) {
@@ -6118,9 +6118,9 @@ bool hkgpMesh::hasValidTopology(bool a1) const {
     if ((a1) && (v2)) {
         char buf[512];
         hkErrStream apThis(buf, 512);
-        hkOstream* v4 = &apThis.operator<<("Invalid mesh topology (");
-        hkOstream* v5 = &v4->operator<<(v2);
-        v5->operator<<(")");
+        hkOstream* v4 = &(apThis << "Invalid mesh topology (");
+        hkOstream* v5 = &(*v4 << v2);
+        *v5 << ")";
         if (hkError::s_instance->message(
                 hkError::MESSAGE_ERROR, 0x4C5C2AFA, buf, ".\\GeometryProcessing\\Mesh\\hkgpMesh.cpp", 2857
             )) {
@@ -8772,7 +8772,7 @@ void hkAlgorithm::quickSortRecursive(hkgpMeshBase::Triangle** apArr, int32_t aiL
 void hkGskShape::convertVertexIdsToVertices(uint8_t* ids, int32_t numVerts, hkVector4* verticesOut) const {
     char buf[512];
     hkErrStream apThis(buf, 512);
-    apThis.operator<<("Need to be implemented when using cache");
+    apThis << "Need to be implemented when using cache";
     if (hkError::s_instance->message(
             hkError::MESSAGE_ERROR, 0x50CC4DA8, buf,
             "d:\\build\\20091222_000100_AiAnBeClDePh\\Source\\Common/Internal/Collide/Gsk/hkGsk.h", 44

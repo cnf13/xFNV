@@ -79,8 +79,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     {
         hkErrStream apThis(buf, 512);
         int32_t m_numCollapsedShapes = this->m_numCollapsedShapes;
-        hkOstream* v2 = &apThis.operator<<("Number of collapsed shapes :");
-        v2->operator<<(m_numCollapsedShapes);
+        apThis << "Number of collapsed shapes :" << m_numCollapsedShapes;
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp",
             57
@@ -89,8 +88,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     {
         hkErrStream apThis(buf, 512);
         int32_t m_numIdentityTransformsRemoved = this->m_numIdentityTransformsRemoved;
-        hkOstream* v3 = &apThis.operator<<("Number of identity transforms removed : ");
-        v3->operator<<(m_numIdentityTransformsRemoved);
+        apThis << "Number of identity transforms removed : " << m_numIdentityTransformsRemoved;
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp",
             58
@@ -99,8 +97,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     {
         hkErrStream apThis(buf, 512);
         int32_t m_numSpecializedTransformShapes = this->m_numSpecializedTransformShapes;
-        hkOstream* v4 = &apThis.operator<<("Number of specialized transform shapes : ");
-        v4->operator<<(m_numSpecializedTransformShapes);
+        apThis << "Number of specialized transform shapes : " << m_numSpecializedTransformShapes;
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp",
             59
@@ -109,8 +106,7 @@ void hkpTransformCollapseUtil::Results::report() const {
     {
         hkErrStream apThis(buf, 512);
         int32_t m_numPropagatedTransformsToLists = this->m_numPropagatedTransformsToLists;
-        hkOstream* v5 = &apThis.operator<<("Number of propagated transforms to lists : ");
-        v5->operator<<(m_numPropagatedTransformsToLists);
+        apThis << "Number of propagated transforms to lists : " << m_numPropagatedTransformsToLists;
         hkError::s_instance->message(
             hkError::MESSAGE_REPORT, -1, buf, ".\\Collide\\ShapeUtils\\CollapseTransform\\hkpTransformCollapseUtil.cpp",
             60

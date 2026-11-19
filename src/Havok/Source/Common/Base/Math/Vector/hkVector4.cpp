@@ -288,7 +288,7 @@ hkBool hkVector4::isNormalized4(float eps) const {
 }
 
 double hkVector4::getNextW() const {
-    return (this + 1)->operator()(3);
+    return this[1](3);
 }
 
 void hkVector4::sub_D53060(hkRotation* a1, hkRotation* arg4, hkVector4* a3) {

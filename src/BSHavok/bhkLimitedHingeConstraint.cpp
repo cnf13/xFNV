@@ -63,14 +63,7 @@ NiObject* bhkLimitedHingeConstraint::CreateClone(NiCloningProcess& arCloneData) 
     MEM_CONTEXT eMemContext = v3->eMemContext;
     v3->eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkLimitedHingeConstraint* pClone =
-        static_cast<bhkLimitedHingeConstraint*>(NiMemObject::operator new(sizeof(bhkLimitedHingeConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkLimitedHingeConstraint;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkLimitedHingeConstraint* pClone = new bhkLimitedHingeConstraint;
     bhkConstraint::CopyCloneMembers(pClone, arCloneData);
     // EXE-INLINED 0x887A10
     hkpConstraintData* pData = nullptr;
@@ -137,7 +130,7 @@ void bhkLimitedHingeConstraint::SetEntityB(hkpEntity* apEntity) {
 // The constraint instance's data as the limited hinge's, else the data of the creation info the constraint was
 // loaded with, else null.
 hkpLimitedHingeConstraintData* bhkLimitedHingeConstraint::GetMotor() {
-    hkpConstraintInstance* pConstraint = operator*();
+    hkpConstraintInstance* pConstraint = **this;
     if (pConstraint) {
         return static_cast<hkpLimitedHingeConstraintData*>(pConstraint->getDataRw());
     }
@@ -165,11 +158,7 @@ void bhkLimitedHingeConstraint::SetMotorTargetAngle(float afAngle) {
 
 // The factory the stream's type table holds: a new constraint in Gamebryo's heap, built by the default constructor.
 NiObject* bhkLimitedHingeConstraint::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkLimitedHingeConstraint));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) bhkLimitedHingeConstraint;
+    return new bhkLimitedHingeConstraint;
 }
 
 hkLimitedHingeConstraintCinfo::~hkLimitedHingeConstraintCinfo() {}

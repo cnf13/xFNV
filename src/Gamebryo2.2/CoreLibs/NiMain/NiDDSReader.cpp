@@ -177,19 +177,13 @@ NiPixelData* NiDDSReader::ReadFile(NiFile& a1, NiPixelData* a2) {
     if (!a2 ||
         (*a2->m_puiWidth != v3->m_uiWidth ||
          (*a2->m_puiHeight != v3->m_uiHeight ||
-          (!a2->m_kPixelFormat.operator==(kFmt) ||
+          (!(a2->m_kPixelFormat == kFmt) ||
            (pkDest->m_uiMipmapLevels != v3->m_uiMipmapLevels || pkDest->m_uiFaces != uiNumFaces))))) {
-        NiPixelData* v7 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        if (v7) {
-            pkDest = ::new (v7) NiPixelData(v3->m_uiWidth, v3->m_uiHeight, kFmt, v3->m_uiMipmapLevels, uiNumFaces);
-        }
-        else {
-            pkDest = nullptr;
-        }
+        pkDest = new NiPixelData(v3->m_uiWidth, v3->m_uiHeight, kFmt, v3->m_uiMipmapLevels, uiNumFaces);
     }
     uint32_t m_uiMipmapLevels = pkDest->m_uiMipmapLevels;
     uint32_t v28 = m_uiMipmapLevels;
-    if (kFmt.operator==(v3->m_kOriginalFormat)) {
+    if (kFmt == v3->m_kOriginalFormat) {
         if (uiNumFaces) {
             int32_t v9 = -1;
             int32_t kIst = -1;

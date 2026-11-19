@@ -941,11 +941,7 @@ void WaterShader::CreateConstantMaps() {
     MEM_CONTEXT eMemContext = pTLS->eMemContext;
     pTLS->eMemContext = MEM_CONTEXT_WATER;
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         NiShaderConstantMapEntry* pEntry = nullptr;
         NiShaderConstantMapEntry* pOldEntry = nullptr;
@@ -994,11 +990,7 @@ void WaterShader::CreateConstantMaps() {
         }
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         NiShaderConstantMapEntry* pEntry = nullptr;
         NiShaderConstantMapEntry* pOldEntry = nullptr;
@@ -2144,10 +2136,7 @@ BSShader* WaterShader::CreateShader() {
     v3->SetEntry(2u, 5u, NiShaderDeclaration::SHADERPARAM_NI_COLOR, NiShaderDeclaration::SPTYPE_UBYTECOLOR, 0u);
     v3->SetEntry(3u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0u);
     v3->GetD3DDeclaration();
-    WaterShader* v4 = static_cast<WaterShader*>(NiMemObject::operator new(sizeof(WaterShader)));
-    if (v4) {
-        v2 = ::new (v4) WaterShader;
-    }
+    v2 = new WaterShader;
     v2->Initialize();
     v2->LoadShaders();
     v2->LoadStagesAndPasses();

@@ -160,10 +160,10 @@ void GetTotalMassData(NiAVObject* a1, hkVector4* arMassCenter, float* a3) {
 }
 
 NiQuaternion* HK2NI_QUATERNION(NiQuaternion* a1, hkQuaternion* a2) {
-    a1->SetX(a2->operator()(0));
-    a1->SetY(a2->operator()(1));
-    a1->SetZ(a2->operator()(2));
-    a1->SetW(a2->operator()(3));
+    a1->SetX((*a2)(0));
+    a1->SetY((*a2)(1));
+    a1->SetZ((*a2)(2));
+    a1->SetW((*a2)(3));
     return a1;
 }
 
@@ -189,10 +189,7 @@ NiObject* bhkRigidBody::CreateClone(NiCloningProcess& arCloneData) {
     iContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
     SetHavokAssertState(false);
-    bhkRigidBody* pClone = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-    if (pClone) {
-        ::new (pClone) bhkRigidBody;
-    }
+    bhkRigidBody* pClone = new bhkRigidBody;
     CopyMembers(pClone, arCloneData);
     SetHavokAssertState(true);
     bhkSerializable::CloneCritUnlock();
@@ -1012,7 +1009,7 @@ float bhkRigidBody::GetDynamicMass() {
 }
 
 hkpMotion* bhkRigidBody::GetStoredDynamicMotion() {
-    hkpRigidBody* v3 = operator*();
+    hkpRigidBody* v3 = **this;
     if (v3) {
         return v3->getStoredDynamicMotion();
     }
@@ -1048,7 +1045,7 @@ void bhkRigidBody::AddAction(bhkSerializable* apAction) {
 }
 
 void bhkRigidBody::SetActive(bool abTF) {
-    hkpRigidBody* v3 = operator*();
+    hkpRigidBody* v3 = **this;
     if (v3) {
         bhkWorldObject::MarkWrite();
         if (abTF) {
@@ -1149,7 +1146,7 @@ void bhkRigidBody::SetRotation(const NiQuaternion& arRot) {
 }
 
 void bhkRigidBody::SethkMaxLinearVelocity(float afVel) {
-    hkpRigidBody* result = operator*();
+    hkpRigidBody* result = **this;
     if (result) {
         result->hkpEntity::setMaxLinearVelocity(afVel);
         return;
@@ -1274,7 +1271,7 @@ const float bhkRigidBody::GetMaxAngularVelocity() {
         hkUFloat8 v5;
         float afValue = hkUFloat8_intToReal[static_cast<hkpRigidBody*>(phkObject)
                                                 ->m_motion.m_motionState.m_maxAngularVelocity.m_value];
-        v5.operator=(afValue);
+        v5 = afValue;
         return hkUFloat8_intToReal[v5.m_value];
     }
 
@@ -1596,11 +1593,7 @@ bool bhkRigidBody::IsMotionTypeDynamic(const hkpMotion::MotionType& areMotion) {
 
 // The class loader's factory.
 NiObject* bhkRigidBody::CreateObject() {
-    bhkRigidBody* pObject = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkRigidBody;
+    return new bhkRigidBody;
 }
 
 // Adds the MOTION line for aeType to the viewer strings.

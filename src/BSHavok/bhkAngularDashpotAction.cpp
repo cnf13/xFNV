@@ -36,11 +36,7 @@ const NiRTTI* bhkAngularDashpotAction::GetRTTI() const {
 // Built as in CreateObject, then the members copied through a virtual call.
 NiObject* bhkAngularDashpotAction::CreateClone(NiCloningProcess& arCloneData) {
     bhkSerializable::CloneCritLock();
-    bhkAngularDashpotAction* pClone =
-        static_cast<bhkAngularDashpotAction*>(NiMemObject::operator new(sizeof(bhkAngularDashpotAction)));
-    if (pClone) {
-        ::new (pClone) bhkAngularDashpotAction;
-    }
+    bhkAngularDashpotAction* pClone = new bhkAngularDashpotAction;
     bhkBinaryAction* pAction = this;
     pAction->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -151,12 +147,7 @@ void bhkAngularDashpotAction::CopyCinfo(hkAngularDashpotActionCinfo& arInfo) {
 }
 
 NiObject* bhkAngularDashpotAction::CreateObject() {
-    bhkAngularDashpotAction* pObject =
-        static_cast<bhkAngularDashpotAction*>(NiMemObject::operator new(sizeof(bhkAngularDashpotAction)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkAngularDashpotAction;
+    return new bhkAngularDashpotAction;
 }
 
 // The base's fields cleared by its constructor, the identity quaternion and the default strength and damping.

@@ -368,8 +368,7 @@ uint32_t NiParticleSystem::GetModifierCount() {
 }
 
 uint16_t NiParticleSystem::GetMaxNumParticles() {
-    NiGeometryData* v2 = (&m_spModelData)->operator->();
-    return v2->NiGeometryData::GetVertexCount();
+    return m_spModelData->NiGeometryData::GetVertexCount();
 }
 
 // NiParticles' copy is the engine's NiTriShape::CopyMembers. Each modifier's clone is held in a NiPointer
@@ -413,10 +412,5 @@ void NiParticleSystem::PerformSystemReset() {
 }
 
 NiObject* NiParticleSystem::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiParticleSystem));
-    if (v0) {
-        return ::new (v0) NiParticleSystem;
-    }
-
-    return nullptr;
+    return new NiParticleSystem;
 }

@@ -480,7 +480,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
                 // The twelve reals returned by asVec are read as an hkMatrix3.
                 const hkMatrix3* pValue = reinterpret_cast<const hkMatrix3*>(srcArray.access(i).asVec(12));
-                pDst->m_data[i].operator=(*pValue);
+                pDst->m_data[i] = *pValue;
             }
             break;
         }
@@ -506,7 +506,7 @@ hkResult Copier::copyIntoNativeArray(void* address, const hkClassMember& member,
             for (int32_t i = 0; i < srcArray.getSize(); ++i) {
                 // The sixteen reals returned by asVec are read as an hkMatrix4.
                 const hkMatrix4* pValue = reinterpret_cast<const hkMatrix4*>(srcArray.access(i).asVec(16));
-                pDst->m_data[i].operator=(*pValue);
+                pDst->m_data[i] = *pValue;
             }
             break;
         }
@@ -1079,7 +1079,7 @@ hkResult Copier::fillNativeArrayElement(
             return HK_SUCCESS;
         case hkClassMember::TYPE_MATRIX3:
             // The twelve reals returned by asVec are read as an hkMatrix3.
-            static_cast<hkMatrix3*>(address)->operator=(*reinterpret_cast<const hkMatrix3*>(value.asVec(12)));
+            *static_cast<hkMatrix3*>(address) = *reinterpret_cast<const hkMatrix3*>(value.asVec(12));
             return HK_SUCCESS;
         case hkClassMember::TYPE_ROTATION:
         case hkClassMember::TYPE_QSTRANSFORM:
@@ -1089,7 +1089,7 @@ hkResult Copier::fillNativeArrayElement(
             return HK_SUCCESS;
         case hkClassMember::TYPE_MATRIX4:
             // The sixteen reals returned by asVec are read as an hkMatrix4.
-            static_cast<hkMatrix4*>(address)->operator=(*reinterpret_cast<const hkMatrix4*>(value.asVec(16)));
+            *static_cast<hkMatrix4*>(address) = *reinterpret_cast<const hkMatrix4*>(value.asVec(16));
             return HK_SUCCESS;
         case hkClassMember::TYPE_TRANSFORM:
             // The sixteen reals returned by asVec are read as an hkTransform.
@@ -1231,7 +1231,7 @@ hkResult Copier::fillNativeSimpleMember(
             return HK_SUCCESS;
         case hkClassMember::TYPE_MATRIX3:
             // The twelve reals returned by asVec are read as an hkMatrix3.
-            static_cast<hkMatrix3*>(address)->operator=(*reinterpret_cast<const hkMatrix3*>(value.asVec(12)));
+            *static_cast<hkMatrix3*>(address) = *reinterpret_cast<const hkMatrix3*>(value.asVec(12));
             return HK_SUCCESS;
         case hkClassMember::TYPE_ROTATION:
         case hkClassMember::TYPE_QSTRANSFORM:
@@ -1241,7 +1241,7 @@ hkResult Copier::fillNativeSimpleMember(
             return HK_SUCCESS;
         case hkClassMember::TYPE_MATRIX4:
             // The sixteen reals returned by asVec are read as an hkMatrix4.
-            static_cast<hkMatrix4*>(address)->operator=(*reinterpret_cast<const hkMatrix4*>(value.asVec(16)));
+            *static_cast<hkMatrix4*>(address) = *reinterpret_cast<const hkMatrix4*>(value.asVec(16));
             return HK_SUCCESS;
         case hkClassMember::TYPE_TRANSFORM:
             // The sixteen reals returned by asVec are read as an hkTransform.

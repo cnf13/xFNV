@@ -114,8 +114,7 @@ bool NiPSysMeshEmitter::NiSkinnedEmitterData::CreatePartition(NiGeometry* pkGeom
         if (uiMaxNumMatrices < 4) {
             uiMaxNumMatrices = 4;
         }
-        NiSkinPartition* v6 = static_cast<NiSkinPartition*>(NiMemObject::operator new(sizeof(NiSkinPartition)));
-        pkPartition = v6 ? ::new (v6) NiSkinPartition : nullptr;
+        pkPartition = new NiSkinPartition;
         if (!pkPartition->MakePartitions(
                 static_cast<NiTriBasedGeomData*>(pkGeom->m_spModelData.m_pObject), m_pObject->m_spSkinData.m_pObject,
                 uiMaxNumMatrices, 4, 0, nullptr, nullptr, nullptr
@@ -123,7 +122,7 @@ bool NiPSysMeshEmitter::NiSkinnedEmitterData::CreatePartition(NiGeometry* pkGeom
             return false;
         }
     }
-    m_spSkinPartition.operator=(pkPartition);
+    m_spSkinPartition = pkPartition;
     return true;
 }
 
@@ -135,14 +134,7 @@ NiPSysMeshEmitter::NiPSysMeshEmitter()
 NiPSysMeshEmitter::~NiPSysMeshEmitter() {}
 
 NiObject* NiPSysMeshEmitter::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysMeshEmitter* pkObject;
-    NiPSysMeshEmitter* v3 = static_cast<NiPSysMeshEmitter*>(NiMemObject::operator new(sizeof(NiPSysMeshEmitter)));
-    if (v3) {
-        pkObject = ::new (v3) NiPSysMeshEmitter;
-    }
-    else {
-        pkObject = nullptr;
-    }
+    NiPSysMeshEmitter* pkObject = new NiPSysMeshEmitter;
     CopyMembers(pkObject, kCloning);
     pkObject->m_kGeomEmitterArray.SetSize(m_kGeomEmitterArray.m_usSize);
     pkObject->m_eInitVelocityType = m_eInitVelocityType;
@@ -359,8 +351,7 @@ void NiPSysMeshEmitter::AddGeometryEmitter(NiGeometry* pkGeomEmitter) {
 
     NiSkinInstance* pkSkin = pkGeomEmitter->m_spSkinInstance.m_pObject;
     NiSkinPartition* pkPartition = pkSkin ? pkSkin->m_spSkinPartition.m_pObject : nullptr;
-    void* pvMemory = NiMemObject::operator new(sizeof(NiSkinnedEmitterData));
-    NiSkinnedEmitterData* pkSkinData = pvMemory ? ::new (pvMemory) NiSkinnedEmitterData : nullptr;
+    NiSkinnedEmitterData* pkSkinData = new NiSkinnedEmitterData;
     if (pkPartition) {
         pkSkinData->m_spSkinPartition = pkPartition;
     }
@@ -1005,10 +996,5 @@ void NiPSysMeshEmitter::TransformIntoCoordinateSpace(NiAVObject* pkObj, NiPoint3
 }
 
 NiObject* NiPSysMeshEmitter::CreateObject() {
-    NiPSysMeshEmitter* v0 = static_cast<NiPSysMeshEmitter*>(NiMemObject::operator new(sizeof(NiPSysMeshEmitter)));
-    if (v0) {
-        return ::new (v0) NiPSysMeshEmitter;
-    }
-
-    return nullptr;
+    return new NiPSysMeshEmitter;
 }

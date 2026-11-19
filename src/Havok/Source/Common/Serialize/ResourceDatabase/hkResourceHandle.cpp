@@ -100,7 +100,7 @@ const char* hkMemoryResourceHandle::getName(hkStringBuf& buffer) const {
 }
 
 void hkMemoryResourceHandle::setName(const char* name) {
-    &(&m_name)->operator=(name);
+    m_name = name;
 }
 
 void* hkMemoryResourceHandle::getObject() const {
@@ -131,8 +131,8 @@ void hkMemoryResourceHandle::addExternalLink(const char* memberName, const char*
     int32_t v7 = p_m_references->m_size;
     hkStringPtr* v8 = &p_m_references->m_data[v7].m_memberName;
     p_m_references->m_size = v7 + 1;
-    v8->operator=(memberName);
-    (v8 + 1)->operator=(externalId);
+    *v8 = memberName;
+    *(v8 + 1) = externalId;
 }
 
 // The first link of memberName is destroyed and the last link moved into its slot.
@@ -276,8 +276,8 @@ void hkResourceContainer::getPath(hkStringBuf& pathOut) {
     }
     hkStringBuf apMemory;
     const char* v4 = getName(apMemory);
-    pathOut.operator+=("/");
-    pathOut.operator+=(v4);
+    pathOut += "/";
+    pathOut += v4;
 }
 
 hkMemoryResourceContainer::hkMemoryResourceContainer(const char* a1) : m_name(a1), m_parent(nullptr) {}
@@ -395,10 +395,10 @@ hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
             hkErrStream apThis(buf, 512);
             const char* Name = v14->getName();
             const char* v19 = klass->getName();
-            hkOstream* v16 = &apThis.operator<<("Class mismatch, cannot resolve link: ");
-            hkOstream* v17 = &v16->operator<<(v19);
-            hkOstream* v18 = &v17->operator<<(" != ");
-            v18->operator<<(Name);
+            hkOstream* v16 = &(apThis << "Class mismatch, cannot resolve link: ");
+            hkOstream* v17 = &(*v16 << v19);
+            hkOstream* v18 = &(*v17 << " != ");
+            *v18 << Name;
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, -0xFCB12DE, buf, ".\\ResourceDatabase\\hkResourceHandle.cpp", 312
             );

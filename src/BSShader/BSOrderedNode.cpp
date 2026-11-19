@@ -25,8 +25,7 @@ const NiRTTI* BSOrderedNode::GetRTTI() const {
 }
 
 NiObject* BSOrderedNode::CreateClone(NiCloningProcess& kCloning) {
-    void* pMemory = NiMemObject::operator new(sizeof(BSOrderedNode));
-    BSOrderedNode* pkClone = pMemory ? ::new (pMemory) BSOrderedNode : nullptr;
+    BSOrderedNode* pkClone = new BSOrderedNode;
     CopyMembers(pkClone, kCloning);
     return pkClone;
 }
@@ -114,9 +113,5 @@ void BSOrderedNode::CopyMembers(BSOrderedNode* apDest, NiCloningProcess& arClone
 
 // Stream factory for this class: a new node built by BSOrderedNode::BSOrderedNode, or null.
 NiObject* BSOrderedNode::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(BSOrderedNode));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) BSOrderedNode;
+    return new BSOrderedNode;
 }

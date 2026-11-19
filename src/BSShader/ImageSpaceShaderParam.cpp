@@ -21,15 +21,10 @@ ImageSpaceShaderParam::~ImageSpaceShaderParam() {
 
 void ImageSpaceShaderParam::InitConstantMap(int32_t aiVSize, int32_t aiPSize) {
     ClearConstantGroups();
-    void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-    NiD3DShaderConstantMap* pMap = pMemory
-        ? ::new (pMemory) NiD3DShaderConstantMap(BSShaderManager::pRenderer.m_pObject, NiGPUProgram::PROGRAM_VERTEX)
-        : nullptr;
+    NiD3DShaderConstantMap* pMap =
+        new NiD3DShaderConstantMap(BSShaderManager::pRenderer.m_pObject, NiGPUProgram::PROGRAM_VERTEX);
     spVertexConstantMap = pMap;
-    pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-    pMap = pMemory ? ::new (pMemory)
-                         NiD3DShaderConstantMap(BSShaderManager::pRenderer.m_pObject, NiGPUProgram::PROGRAM_PIXEL)
-                   : nullptr;
+    pMap = new NiD3DShaderConstantMap(BSShaderManager::pRenderer.m_pObject, NiGPUProgram::PROGRAM_PIXEL);
     spPixelConstantMap = pMap;
 
     iVSize = aiVSize + 3;

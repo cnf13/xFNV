@@ -684,9 +684,5 @@ void NiPathController::GetPathData(
 }
 
 NiObject* NiPathController::CreateObject() {
-    NiPathController* pkObject = static_cast<NiPathController*>(NiMemObject::operator new(sizeof(NiPathController)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPathController;
+    return new NiPathController;
 }

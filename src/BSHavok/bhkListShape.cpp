@@ -50,13 +50,8 @@ NiObject* bhkListShape::CreateClone(NiCloningProcess& arCloneData) {
     int32_t& iContext = GetThreadMemContext();
     int32_t iSavedContext = iContext;
     iContext = MEM_CONTEXT_HAVOK;
-    bhkListShape* pkClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkListShape* pkMemory = static_cast<bhkListShape*>(NiMemObject::operator new(sizeof(bhkListShape)));
-    if (pkMemory) {
-        ::new (pkMemory) bhkListShape;
-        pkClone = pkMemory;
-    }
+    bhkListShape* pkClone = new bhkListShape;
     // Calls the shape's CopyMembers through the vtable.
     bhkShape* pkThisShape = this;
     pkThisShape->CopyMembers(pkClone, arCloneData);
@@ -102,8 +97,7 @@ void bhkListShape::LinkObject(NiStream& arStream) {
         }
         if (pShape->DynamicCast(&bhkNiTriStripsShape::ms_RTTI) ||
             pShape->DynamicCastMember(&bhkPackedNiTriStripsShape::ms_RTTI)) {
-            void* pMemory = NiMemObject::operator new(sizeof(bhkMoppBvTreeShape));
-            bhkMoppBvTreeShape* pTree = pMemory ? ::new (pMemory) bhkMoppBvTreeShape(pShape) : nullptr;
+            bhkMoppBvTreeShape* pTree = new bhkMoppBvTreeShape(pShape);
             if (pTree) {
                 pShape = pTree;
             }
@@ -425,7 +419,7 @@ HavokMaterialType bhkListShape::QSubMaterial(uint32_t aiKey) {
 }
 
 hkpShape* bhkListShape::GetChildhkShape(int32_t aiAt) {
-    hkpListShape* v4 = static_cast<hkpListShape*>(operator*());
+    hkpListShape* v4 = static_cast<hkpListShape*>(**this);
     if (v4) {
         // GetChildhkShape returns hkpShape*, but getChildShapeInl returns a const one, so the const is cast away.
         return const_cast<hkpShape*>(v4->getChildShapeInl(aiAt));
@@ -547,9 +541,5 @@ void bhkListShape::RembhkShapeRef() {
 
 // Builds an empty list shape.
 NiObject* bhkListShape::CreateObject() {
-    bhkListShape* pkShape = static_cast<bhkListShape*>(NiMemObject::operator new(sizeof(bhkListShape)));
-    if (!pkShape) {
-        return nullptr;
-    }
-    return ::new (pkShape) bhkListShape;
+    return new bhkListShape;
 }

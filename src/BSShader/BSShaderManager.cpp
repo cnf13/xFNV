@@ -150,8 +150,7 @@ void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
             pNewMatProp = pMatProp;
         }
         else {
-            void* pMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
-            pNewMatProp = pMemory ? ::new (pMemory) NiMaterialProperty : nullptr;
+            pNewMatProp = new NiMaterialProperty;
             // EXE-INLINED none: NiMaterialProperty::SetSpecular, GetEmittance, SetEmittance, SetEmitMult, SetShineness,
             // SetAlpha (each bumps m_uiRevID)
             pNewMatProp->m_spec = pMatProp->m_spec;
@@ -342,9 +341,7 @@ void BSShaderManager::Initialize() {
     }
     spShadowAccumulators = pAccumulators;
     for (uint32_t i = 0; i < iMaxShadowMapAccumulators; ++i) {
-        void* pAccumulatorMemory = NiMemObject::operator new(sizeof(BSShaderAccumulator));
-        BSShaderAccumulator* pAccumulator =
-            pAccumulatorMemory ? ::new (pAccumulatorMemory) BSShaderAccumulator(99, 1, 759) : nullptr;
+        BSShaderAccumulator* pAccumulator = new BSShaderAccumulator(99, 1, 759);
         spShadowAccumulators[i] = pAccumulator;
     }
     pTLSData->eMemContext = eOldContext;
@@ -429,11 +426,8 @@ BSShaderPPLightingProperty::TangentSpaceData* BSShaderManager::CreateTangentSpac
     if (pcName) {
         _strnicmp(pcName, "STBB", 4u);
     }
-    BSShaderPPLightingProperty::TangentSpaceData* pTangentSpaceData = nullptr;
-    void* pMemory = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty::TangentSpaceData));
-    if (pMemory) {
-        pTangentSpaceData = ::new (pMemory) BSShaderPPLightingProperty::TangentSpaceData(true);
-    }
+    BSShaderPPLightingProperty::TangentSpaceData* pTangentSpaceData =
+        new BSShaderPPLightingProperty::TangentSpaceData(true);
     NiExtraData* pExtraData = apGeom->GetExtraData("Tangent space (binormal & tangent vectors)");
     if (pExtraData) {
         uint32_t uiVertices = apGeom->m_spModelData.m_pObject->m_usVertices;
@@ -1072,9 +1066,7 @@ void BSShaderManager::PrepareGeometry(
             pbssprop = pnewbssprop;
             apGeometry->AttachProperty(pnewbssprop);
             if (pnewbssprop->Type() <= 7) {
-                apGeometry->m_PropertyState.m_aspProps[pnewbssprop->Type()].operator=(
-                    static_cast<NiProperty*>(pnewbssprop)
-                );
+                apGeometry->m_PropertyState.m_aspProps[pnewbssprop->Type()] = static_cast<NiProperty*>(pnewbssprop);
             }
         }
         if (pbssprop->iShader) {
@@ -1418,8 +1410,7 @@ void BSShaderManager::GetTexture(
 // (signed).
 void BSShaderManager::GenerateNormalizationCubeMap() {
     NiPixelFormat kCubeFormat = NiPixelFormat_BGRA8888;
-    void* pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pCubePixels = pMemory ? ::new (pMemory) NiPixelData(128, 128, kCubeFormat, 1, 6) : nullptr;
+    NiPointer<NiPixelData> pCubePixels = new NiPixelData(128, 128, kCubeFormat, 1, 6);
     // EXE-INLINED 0x4F31B0
     ++pCubePixels->m_uiRevID;
 
@@ -1585,9 +1576,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
 
     // Default error map: opaque red (RGBA 0xFF 0 0 0xFF).
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pErrorPixels =
-        pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pErrorPixels = new NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pErrorPixels->m_pucPixels + pErrorPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1605,9 +1594,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
         NiSourceTexture::Create(pErrorPixels, NiFixedString("BSShader_DefErrorMap"), NiSourceTexture::ms_kDefaultPrefs);
 
     // Default normal map: the flat normal (RGB 0x80 0x80 0xFF).
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pNormalPixels =
-        pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pNormalPixels = new NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pNormalPixels->m_pucPixels + pNormalPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1625,9 +1612,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     );
 
     // Default normal-gloss map: the flat normal with gloss 0x40.
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pGlossPixels =
-        pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pGlossPixels = new NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pGlossPixels->m_pucPixels + pGlossPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1646,8 +1631,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     );
 
     // Default height map: black, held in the normal map's smart pointer.
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pHeightPixels = pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1) : nullptr;
+    NiPixelData* pHeightPixels = new NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1);
     pNormalPixels = pHeightPixels;
     // EXE-INLINED 0x64DAC0
     pucPixels = pNormalPixels->m_pucPixels + pNormalPixels->m_puiOffsetInBytes[0];
@@ -1669,9 +1653,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     GetTexture("Data\\Textures\\Effects\\WindowEnvironmentMap02.dds", true, spWindowEnvironmentMap02, true, false);
 
     // Hide-secret map: black with alpha 0x40. The revision is advanced before the no-convert flag is set.
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pHideSecretPixels =
-        pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pHideSecretPixels = new NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pHideSecretPixels->m_pucPixels + pHideSecretPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1690,9 +1672,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     );
 
     // Default texture effect map: opaque black.
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pTexEffectPixels =
-        pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pTexEffectPixels = new NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pTexEffectPixels->m_pucPixels + pTexEffectPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1734,9 +1714,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pNoiseMap = pTexture;
 
     // Empty noise map: opaque grey 0x8F.
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pEmptyNoisePixels =
-        pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pEmptyNoisePixels = new NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pEmptyNoisePixels->m_pucPixels + pEmptyNoisePixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1756,9 +1734,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
 
     // Attenuation map: per texel u and v run from 1 at the edges to 0 at the centre (63.5); the grey level is
     // u^2 + v^2 clamped to [0, 1] (inverted for shader level 1), times 255, floored.
-    pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPointer<NiPixelData> pAttenuationPixels =
-        pMemory ? ::new (pMemory) NiPixelData(128, 128, NiPixelFormat_RGB24, 1, 1) : nullptr;
+    NiPointer<NiPixelData> pAttenuationPixels = new NiPixelData(128, 128, NiPixelFormat_RGB24, 1, 1);
     // EXE-INLINED 0x64DAC0
     pucPixels = pAttenuationPixels->m_pucPixels + pAttenuationPixels->m_puiOffsetInBytes[0];
     for (int32_t iRow = 0; iRow < 128; ++iRow) {
@@ -5083,7 +5059,7 @@ void BSShaderManager::Shutdown(eBool a1) {
         }
     }
 
-    Renderer::spRenderer.operator=(static_cast<NiDX9Renderer*>(nullptr));
+    Renderer::spRenderer = static_cast<NiDX9Renderer*>(nullptr);
 }
 
 // Loads the shader package apFileName: a 12-byte header (version 100, the shader count, the size of the rest), then

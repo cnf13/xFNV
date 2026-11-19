@@ -90,11 +90,7 @@ void BoltShader::RecreateRendererData() {
 // when they are missing. An empty string is passed as the variable names.
 void BoltShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -112,11 +108,7 @@ void BoltShader::CreateConstantMaps() {
         );
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("CoreColor", 0x10000007, 0, 0, 1, "", 0x10, 4, &CoreColor, false);
         m_spPixelConstantMap.m_pObject->AddEntry("GlowColor", 0x10000007, 0, 1, 1, "", 0x10, 4, &GlowColor, false);
@@ -415,10 +407,7 @@ BSShader* BoltShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_COLOR, 1u, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     spShaderDecl->GetD3DDeclaration();
-    BoltShader* v2 = static_cast<BoltShader*>(NiMemObject::operator new(sizeof(BoltShader)));
-    if (v2) {
-        pshader = ::new (v2) BoltShader(spShaderDecl);
-    }
+    pshader = new BoltShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

@@ -65,11 +65,7 @@ NiObject* bhkMoppBvTreeShape::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
 
     bhkSerializable::CloneCritLock();
-    bhkMoppBvTreeShape* pClone =
-        static_cast<bhkMoppBvTreeShape*>(NiMemObject::operator new(sizeof(bhkMoppBvTreeShape)));
-    if (pClone) {
-        ::new (pClone) bhkMoppBvTreeShape;
-    }
+    bhkMoppBvTreeShape* pClone = new bhkMoppBvTreeShape;
     // The clone is filled through this object's virtual bhkShape::CopyMembers.
     CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -333,11 +329,7 @@ void bhkMoppBvTreeShape::CopyCinfo(hkMoppBvTreeShapeCinfo& arInfo) {
 }
 
 NiObject* bhkMoppBvTreeShape::CreateObject() {
-    bhkMoppBvTreeShape* pThis = static_cast<bhkMoppBvTreeShape*>(NiMemObject::operator new(sizeof(bhkMoppBvTreeShape)));
-    if (!pThis) {
-        return nullptr;
-    }
-    return ::new (pThis) bhkMoppBvTreeShape;
+    return new bhkMoppBvTreeShape;
 }
 
 // The MOPP tree over apCode, keeping a reference to the unscaled code apOriginal.

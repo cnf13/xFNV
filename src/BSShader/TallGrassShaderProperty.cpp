@@ -106,11 +106,7 @@ TallGrassShaderProperty::~TallGrassShaderProperty() {
 NiObject* TallGrassShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_GRASS;
-    TallGrassShaderProperty* pClone = nullptr;
-    void* pMemory = NiMemObject::operator new(sizeof(TallGrassShaderProperty));
-    if (pMemory) {
-        pClone = ::new (pMemory) TallGrassShaderProperty;
-    }
+    TallGrassShaderProperty* pClone = new TallGrassShaderProperty;
     this->CopyMembers(pClone, arCloneData);
     GetThreadMemContext() = iOldMemContext;
     return pClone;
@@ -382,11 +378,7 @@ void TallGrassShaderProperty::SetFadeParameters(
 
 // The stream's factory: a property built in freshly allocated memory, or null.
 NiObject* TallGrassShaderProperty::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(TallGrassShaderProperty));
-    if (pMemory) {
-        return ::new (pMemory) TallGrassShaderProperty;
-    }
-    return nullptr;
+    return new TallGrassShaderProperty;
 }
 
 // Builds the guarded static pmCachedGeometryMap on first use.
@@ -413,8 +405,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
     }
     NiPointer<CachedGeometry> spCachedGeom;
     if (!GetCachedGeometryMap()->GetAt(apGrassParam->pcGeomFilename, spCachedGeom)) {
-        void* pMemory = NiMemObject::operator new(sizeof(CachedGeometry));
-        CachedGeometry* pNewGeom = pMemory ? ::new (pMemory) CachedGeometry : nullptr;
+        CachedGeometry* pNewGeom = new CachedGeometry;
         spCachedGeom.SetNew(pNewGeom);
         CachedGeometry* pCachedGeom = spCachedGeom.m_pObject;
         pCachedGeom->bQueued = true;
@@ -422,7 +413,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         // The map gets its own reference: a copy of the smart pointer, passed by value.
         GetCachedGeometryMap()->SetAt(apGrassParam->pcGeomFilename, spCachedGeom);
         if (bUseBackgroundLoading) {
-            pMemory = MemoryManager_Singleton.Allocate(sizeof(GrassLoadTask));
+            void* pMemory = MemoryManager_Singleton.Allocate(sizeof(GrassLoadTask));
             GrassLoadTask* pTask = pMemory ? ::new (pMemory) GrassLoadTask(apGrassParam->pcGeomFilename) : nullptr;
             pCachedGeom->spGrassLoadTask = pTask;
             pIOManager->AddTask(pCachedGeom->spGrassLoadTask.m_pObject);
@@ -566,13 +557,11 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
                 }
             }
             usInstanceTriCount = static_cast<uint16_t>(iTriListLength / 3);
-            void* pDataMemory = NiMemObject::operator new(sizeof(NiTriShapeDynamicData));
-            pTriData = pDataMemory ? ::new (pDataMemory) NiTriShapeDynamicData(
-                                         usMaxInstanceCount * iVertices, pkVertex, pkNormal, pkColor, pkTexture, 1,
-                                         NiGeometryData::NBT_METHOD_NONE, usMaxInstanceCount * (iTriListLength / 3),
-                                         pusIndices, usMaxInstanceCount * iVertices, 0
-                                     )
-                                   : nullptr;
+            pTriData = new NiTriShapeDynamicData(
+                usMaxInstanceCount * iVertices, pkVertex, pkNormal, pkColor, pkTexture, 1,
+                NiGeometryData::NBT_METHOD_NONE, usMaxInstanceCount * (iTriListLength / 3), pusIndices,
+                usMaxInstanceCount * iVertices, 0
+            );
         }
         else {
             // One copy of the (single) strip per instance, each joined to the next by degenerate triangles: the
@@ -658,13 +647,10 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             int32_t iLength = pusStripLengths[0];
             usInstanceTriCount =
                 iLength % 2 == 1 ? static_cast<uint16_t>(iLength + 3) : static_cast<uint16_t>(iLength + 2);
-            void* pDataMemory = NiMemObject::operator new(sizeof(NiTriStripsDynamicData));
-            pTriData = pDataMemory
-                ? ::new (pDataMemory) NiTriStripsDynamicData(
-                      usMaxInstanceCount * iVertices, pkVertex, pkNormal, pkColor, pkTexture, 1, 0, iIndex - 2, 1,
-                      pusOutStripLengths, pusIndices, usMaxInstanceCount * iVertices, 0
-                  )
-                : nullptr;
+            pTriData = new NiTriStripsDynamicData(
+                usMaxInstanceCount * iVertices, pkVertex, pkNormal, pkColor, pkTexture, 1, 0, iIndex - 2, 1,
+                pusOutStripLengths, pusIndices, usMaxInstanceCount * iVertices, 0
+            );
         }
         NiTexture* pBaseTexture = nullptr;
         // A tall grass shader property (shader property type 4) gives the base texture.

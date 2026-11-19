@@ -481,7 +481,7 @@ void Lighting30Shader::InitPass(uint32_t auiCurrentPass) {
     }
     else {
         m_spPixelConstantMap.operator=(spDefaultPixelConstantMap);
-        m_spVertexConstantMap.operator=(spDefaultVertexConstantMap);
+        m_spVertexConstantMap = spDefaultVertexConstantMap;
     }
 }
 
@@ -724,11 +724,7 @@ NiD3DShaderDeclaration* Lighting30Shader::GetShaderDecl(NiGeometry* apGeometry, 
 void Lighting30Shader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject && !bvscminitialized) {
         bvscminitialized = true;
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap.SetNew(pMap);
         m_spVertexConstantMap.m_pObject->AddPredefinedEntry(
             "WorldViewProjTranspose", 0x20000009, 0, "", 0, 0, nullptr, false
@@ -824,19 +820,11 @@ void Lighting30Shader::CreateConstantMaps() {
         SetVertexConstantMapEntry(
             &pVertexConstantMapEntry[14], m_spVertexConstantMap.m_pObject->GetEntry("SkinToCubeMap")
         );
-        pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap.SetNew(pMap);
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry(
             "ambientcolor", 0x10000007, 0, 0, 1, "", 0x10, 4, &kPSConstants[0], false
@@ -978,21 +966,13 @@ void Lighting30Shader::CreateConstantMaps() {
                 pEntry->IncRefCount();
             }
         }
-        pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
     }
     spDefaultVertexConstantMap = m_spVertexConstantMap;
     spDefaultPixelConstantMap = m_spPixelConstantMap;
     if (!spTexEffectVConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         spTexEffectVConstantMap = pMap;
         spTexEffectVConstantMap.m_pObject->AddPredefinedEntry(
             "WorldViewProjTranspose", 0x20000009, 0, "", 0, 0, nullptr, false
@@ -1021,11 +1001,7 @@ void Lighting30Shader::CreateConstantMaps() {
         );
     }
     if (!spTexEffectPConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         spTexEffectPConstantMap = pMap;
         spTexEffectPConstantMap.m_pObject->AddEntry("Fill Color", 0x10000007, 0, 0, 1, "", 0x10, 4, &FillColor, false);
         spTexEffectPConstantMap.m_pObject->AddEntry("Rim Color", 0x10000007, 0, 1, 1, "", 0x10, 4, &RimColor, false);
@@ -3763,8 +3739,8 @@ void Lighting30Shader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlpha
     Lighting30Shader* pkThis = static_cast<Lighting30Shader*>(BSShaderManager::GetShader(29));
     uint32_t v3 = auiPassEnum;
     if (pkThis && (auiPassEnum == 480 || auiPassEnum == 481)) {
-        pkThis->m_spPixelConstantMap.operator=(pkThis->spTexEffectPConstantMap);
-        pkThis->m_spVertexConstantMap.operator=(pkThis->spTexEffectVConstantMap);
+        pkThis->m_spPixelConstantMap = pkThis->spTexEffectPConstantMap;
+        pkThis->m_spVertexConstantMap = pkThis->spTexEffectVConstantMap;
         return;
     }
     NiD3DShaderConstantMap* m_pObject = pkThis->m_spPixelConstantMap.m_pObject;
@@ -4156,13 +4132,7 @@ BSShader* Lighting30Shader::CreateShader() {
     );
     pskinnedShaderDeclVC->GetD3DDeclaration();
     pskinnedShaderDeclVCNC->GetD3DDeclaration();
-    Lighting30Shader* v4 = static_cast<Lighting30Shader*>(NiMemObject::operator new(sizeof(Lighting30Shader)));
-    if (v4) {
-        pshader = ::new (v4) Lighting30Shader(pshaderDecl, pskinnedShaderDecl, pshaderDeclVC, pskinnedShaderDeclVC);
-    }
-    else {
-        pshader = nullptr;
-    }
+    pshader = new Lighting30Shader(pshaderDecl, pskinnedShaderDecl, pshaderDeclVC, pskinnedShaderDeclVC);
     pshader->Initialize();
     NiDX9ShaderDeclaration* m_pObject = pshader->spShaderDeclNC.m_pObject;
     if (m_pObject != pshaderDeclNC) {

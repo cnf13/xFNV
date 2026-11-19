@@ -53,13 +53,7 @@ BSMasterParticleSystem::~BSMasterParticleSystem() {
 
 NiObject* BSMasterParticleSystem::CreateClone(NiCloningProcess& kCloning) {
     BSMasterParticleSystem* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSMasterParticleSystem));
-    if (v5) {
-        v3 = ::new (v5) BSMasterParticleSystem;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSMasterParticleSystem;
     CopyMembers(v3, kCloning);
     return v3;
 }
@@ -399,12 +393,7 @@ void BSMasterParticleSystem::GetDebugInfo(BSMasterParticleSystem::DebugInfo& apI
 }
 
 NiObject* BSMasterParticleSystem::CreateObject() {
-    void* v2 = NiMemObject::operator new(sizeof(BSMasterParticleSystem));
-    if (v2) {
-        return ::new (v2) BSMasterParticleSystem;
-    }
-
-    return nullptr;
+    return new BSMasterParticleSystem;
 }
 
 bool BSMasterParticleSystem::IsMasterParticleSystem(NiParticles* apSystem) {

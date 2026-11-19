@@ -269,22 +269,18 @@ NiShaderConstantMap* NiDX9FragmentShader::CreateShaderConstantMap(uint32_t uiPas
         if (pkSCM) {
             return pkSCM;
         }
-        void* pvMem = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        pkSCM = pvMem ? ::new (pvMem) NiD3DShaderConstantMap(
-                            static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), NiGPUProgram::PROGRAM_VERTEX
-                        )
-                      : nullptr;
+        pkSCM = new NiD3DShaderConstantMap(
+            static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), NiGPUProgram::PROGRAM_VERTEX
+        );
         pkPass->SetVertexConstantMap(pkSCM);
         return pkSCM;
     }
     if (uiProgramId == 1) {
         pkSCM = pkPass->m_spPixelConstantMap.m_pObject;
         if (!pkSCM) {
-            void* pvMem = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-            pkSCM = pvMem ? ::new (pvMem) NiD3DShaderConstantMap(
-                                static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), NiGPUProgram::PROGRAM_PIXEL
-                            )
-                          : nullptr;
+            pkSCM = new NiD3DShaderConstantMap(
+                static_cast<NiDX9Renderer*>(NiRenderer::ms_pkRenderer), NiGPUProgram::PROGRAM_PIXEL
+            );
             pkPass->SetPixelConstantMap(pkSCM);
         }
     }

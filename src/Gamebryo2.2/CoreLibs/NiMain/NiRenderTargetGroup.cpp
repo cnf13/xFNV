@@ -127,8 +127,7 @@ NiRenderTargetGroup* NiRenderTargetGroup::Create(uint32_t uiNumBuffers, NiRender
     if (apkRenderer->GetMaxBuffersPerRenderTargetGroup() < uiNumBuffers || uiNumBuffers > 4) {
         return nullptr;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiRenderTargetGroup));
-    NiRenderTargetGroup* pkGroup = pMemory ? ::new (pMemory) NiRenderTargetGroup : nullptr;
+    NiRenderTargetGroup* pkGroup = new NiRenderTargetGroup;
     pkGroup->m_uiNumBuffers = uiNumBuffers;
     return pkGroup;
 }
@@ -141,8 +140,7 @@ NiRenderTargetGroup::Create(Ni2DBuffer* pkBuffer, NiRenderer* apkRenderer, NiDep
     if (!pkBuffer || apkRenderer->GetMaxBuffersPerRenderTargetGroup() < 1) {
         return nullptr;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiRenderTargetGroup));
-    NiRenderTargetGroup* pkGroup = pMemory ? ::new (pMemory) NiRenderTargetGroup : nullptr;
+    NiRenderTargetGroup* pkGroup = new NiRenderTargetGroup;
     pkGroup->m_uiNumBuffers = 1;
     pkGroup->AttachBuffer(pkBuffer, 0);
     if (pkDSBuffer) {

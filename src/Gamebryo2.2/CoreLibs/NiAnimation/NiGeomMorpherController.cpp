@@ -394,12 +394,7 @@ NiInterpolator* NiGeomMorpherController::CreatePoseInterpolator(uint16_t usIndex
     if (m_pkInterpItems) {
         m_fWeight = m_pkInterpItems[usIndex].m_fWeight;
     }
-    void* v3 = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-    if (v3) {
-        return ::new (v3) NiFloatInterpolator(m_fWeight);
-    }
-
-    return nullptr;
+    return new NiFloatInterpolator(m_fWeight);
 }
 
 // Sets a float interpolator's pose value to the target's current weight. Any other interpolator (or null) is passed
@@ -419,8 +414,7 @@ NiBlendInterpolator* NiGeomMorpherController::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
-    return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
+    return new NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 void NiGeomMorpherController::GuaranteeTimeRange(float fStartTime, float fEndTime) {
@@ -573,9 +567,5 @@ void NiGeomMorpherController::AllocateInterpArray() {
 }
 
 NiObject* NiGeomMorpherController::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiGeomMorpherController));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiGeomMorpherController;
+    return new NiGeomMorpherController;
 }

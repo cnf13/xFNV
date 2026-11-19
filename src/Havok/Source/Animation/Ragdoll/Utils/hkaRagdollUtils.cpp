@@ -135,7 +135,7 @@ hkResult alignConstraintSpacesToChildren(const hkArrayBase<hkpConstraintInstance
         if (pConstraint->getDataRw()->getType() == hkpConstraintData::CONSTRAINT_TYPE_STIFFSPRING) {
             alignas(16) char buf[512];
             hkErrStream apThis(buf, 512);
-            apThis.operator<<("Unusual : Aligning constraint spaces of a stiff spring.");
+            apThis << "Unusual : Aligning constraint spaces of a stiff spring.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, -0x54457893, buf, ".\\Utils\\hkaRagdollUtils.cpp", 308
             );
@@ -546,7 +546,7 @@ hkaSkeleton* hkaRagdollUtils::constructSkeletonForRagdoll(
             else {
                 alignas(16) char buf[512];
                 hkErrStream errStream(buf, 512);
-                errStream.operator<<("Rigid Body name could not be found");
+                errStream << "Rigid Body name could not be found";
                 hkError::s_instance->message(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBACC14), buf, ".\\Utils\\hkaRagdollUtils.cpp",
                     558
@@ -560,7 +560,7 @@ hkaSkeleton* hkaRagdollUtils::constructSkeletonForRagdoll(
         while (m_size_9 < m_size_1);
     }
     if (v3->m_bones.m_size > 0) {
-        v3->m_name.operator=(v3->m_bones.begin()->m_name);
+        v3->m_name = v3->m_bones.begin()->m_name;
     }
     return v3;
 }
@@ -599,7 +599,7 @@ hkVector4* hkaRagdollUtils::_accessConstraintPivotA(hkpConstraintInstance* apCon
         default: {
             char buf[512];
             hkErrStream apThis(buf, 512);
-            apThis.operator<<("Unsupported type of constraint in rag doll");
+            apThis << "Unsupported type of constraint in rag doll";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, -0x544540C5, buf, ".\\Utils\\hkaRagdollUtils.cpp", 180
             );
@@ -644,7 +644,7 @@ hkVector4* hkaRagdollUtils::_accessConstraintPivotB(hkpConstraintInstance* apCon
         default: {
             char buf[512];
             hkErrStream apThis(buf, 512);
-            apThis.operator<<("Unsupported type of constraint in rag doll.");
+            apThis << "Unsupported type of constraint in rag doll.";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, -0x544540C5, buf, ".\\Utils\\hkaRagdollUtils.cpp", 230
             );

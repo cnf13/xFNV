@@ -737,10 +737,5 @@ void Lighting30ShaderProperty::CopyMembers(Lighting30ShaderProperty* pDest, NiCl
 
 // The stream's factory: runs the class's default constructor in an engine block.
 NiObject* Lighting30ShaderProperty::CreateObject() {
-    Lighting30ShaderProperty* pProperty =
-        static_cast<Lighting30ShaderProperty*>(NiMemObject::operator new(sizeof(Lighting30ShaderProperty)));
-    if (pProperty) {
-        pProperty = ::new (pProperty) Lighting30ShaderProperty;
-    }
-    return pProperty;
+    return new Lighting30ShaderProperty;
 }

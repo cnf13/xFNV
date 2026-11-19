@@ -204,7 +204,7 @@ hkpRagdollConstraintData::Atoms::Atoms() {
 }
 
 void hkpRagdollConstraintData::Atoms::CopyAndAddMotorRefs(const Atoms& other) {
-    operator=(other);
+    *this = other;
     hkpConstraintMotor** ppMotor = m_ragdollMotors.m_motors;
     int32_t iCount = 3;
     do {

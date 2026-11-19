@@ -684,7 +684,7 @@ hkpAction* hkpVehicleInstance::clone(
     hkpVehicleInstance* v6 = static_cast<hkpVehicleInstance*>(Instance->m_heap->blockAlloc(sizeof(hkpVehicleInstance)));
     v6->m_memSizeAndFlags = sizeof(hkpVehicleInstance);
     hkpVehicleInstance* hkpVehicleInstance_ = ::new (v6) hkpVehicleInstance(chassis);
-    hkpVehicleInstance_->operator=(*this);
+    *hkpVehicleInstance_ = *this;
     hkpVehicleInstance_->m_world = nullptr;
     hkpVehicleInstance_->m_island = nullptr;
     hkpVehicleInstance_->m_entity = chassis;

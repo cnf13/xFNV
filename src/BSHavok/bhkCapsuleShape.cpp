@@ -69,12 +69,8 @@ bhkCapsuleShape::bhkCapsuleShape(const hkVector4& arTop, const hkVector4& arBott
 // The clone is built on the Havok heap's context; the clone lock keeps two clones' cinfo copying apart.
 NiObject* bhkCapsuleShape::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-    bhkCapsuleShape* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    void* pMemory = NiMemObject::operator new(sizeof(bhkCapsuleShape));
-    if (pMemory != nullptr) {
-        pClone = ::new (pMemory) bhkCapsuleShape;
-    }
+    bhkCapsuleShape* pClone = new bhkCapsuleShape;
     // CopyMembers is called through a bhkShape pointer so the call stays virtual; bhkShape declares the virtual, while
     // bhkSerializable's CopyMembers is a different, non-virtual function.
     bhkShape* pShape = this;
@@ -332,9 +328,5 @@ bool bhkCapsuleShape::GetClosestPoints(const hkSphere& arSphere, const hkTransfo
 }
 
 NiObject* bhkCapsuleShape::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkCapsuleShape));
-    if (pMemory != nullptr) {
-        return ::new (pMemory) bhkCapsuleShape;
-    }
-    return nullptr;
+    return new bhkCapsuleShape;
 }

@@ -79,19 +79,8 @@ bool DebugShader::Initialize() {
     kUpdateData.bFoundParticles = false;
     kUpdateData.bFoundMorphController = false;
     kUpdateData.bSceneGraphChange = false;
-    void* pMemory = NiMemObject::operator new(sizeof(NiScreenElements));
-    NiScreenElements* pScreenElements;
-    if (pMemory) {
-        void* pDataMemory = NiMemObject::operator new(sizeof(NiScreenElementsData));
-        NiScreenElementsData* pData = nullptr;
-        if (pDataMemory) {
-            pData = ::new (pDataMemory) NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1);
-        }
-        pScreenElements = ::new (pMemory) NiScreenElements(pData);
-    }
-    else {
-        pScreenElements = nullptr;
-    }
+    NiScreenElements* pScreenElements =
+        new NiScreenElements(new NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1));
     // Assigns the smart pointer member by hand: release the old object, store, take a reference.
     NiScreenElements* pOld = spScreenTriShape;
     if (pOld != pScreenElements) {
@@ -112,14 +101,7 @@ bool DebugShader::Initialize() {
     spScreenTriShape->UpdateProperties();
     spScreenTriShape->Update(kUpdateData);
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMapMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap;
-        if (pMapMemory) {
-            pMap = ::new (pMapMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
-        else {
-            pMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("ChannelMask", 0x10000007, 0, 5, 1, "", 16, 4, fChannelMask, false);
     }
@@ -506,15 +488,11 @@ bool DebugShader::LoadStagesAndPasses() {
 }
 
 BSShader* DebugShader::CreateShader() {
-    DebugShader* v0 = nullptr;
     NiDX9ShaderDeclaration* v1 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 2u, 1u);
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->SetEntry(1u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0u);
     v1->GetD3DDeclaration();
-    DebugShader* v2 = static_cast<DebugShader*>(NiMemObject::operator new(sizeof(DebugShader)));
-    if (v2) {
-        v0 = ::new (v2) DebugShader;
-    }
+    DebugShader* v0 = new DebugShader;
     v0->Initialize();
     v0->LoadShaders();
     v0->LoadStagesAndPasses();
