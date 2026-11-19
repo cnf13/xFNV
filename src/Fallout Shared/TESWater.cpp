@@ -611,8 +611,7 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                     NiColorA* pcolors;
                     void* v55 = ourMalloc(4 * sizeof(NiColorA));
                     if (v55) {
-                        rt::eh_vector_constructor_iterator(v55, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
-                        pcolors = static_cast<NiColorA*>(v55);
+                        pcolors = ::new (v55) NiColorA[4];
                     }
                     else {
                         pcolors = nullptr;

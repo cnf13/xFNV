@@ -1090,8 +1090,7 @@ int8_t TESObjectLAND::CreateLandscape(TESObjectLAND* apFrom) {
         pLoadedData->ppVertices[iblock] = v5;
         void* v9 = ourMalloc(289 * sizeof(NiColorA));
         if (v9) {
-            rt::eh_vector_constructor_iterator(v9, sizeof(NiColorA), 289, &xfnv::constructElement<NiColorA>);
-            v4 = static_cast<NiColorA*>(v9);
+            v4 = ::new (v9) NiColorA[289];
         }
         else {
             v4 = nullptr;
@@ -1159,8 +1158,7 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                 }
                 void* v31 = ourMalloc(128 * sizeof(NiColorA));
                 if (v31) {
-                    rt::eh_vector_constructor_iterator(v31, sizeof(NiColorA), 128, &xfnv::constructElement<NiColorA>);
-                    lineclr = static_cast<NiColorA*>(v31);
+                    lineclr = ::new (v31) NiColorA[128];
                 }
                 else {
                     lineclr = nullptr;
@@ -3965,8 +3963,7 @@ void TESObjectLAND::InitializeStatics() {
     // The vertex blocks hold 17x17 = 289 vertices.
     void* ptr = ourMalloc(289 * sizeof(NiColorA));
     if (ptr) {
-        rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 289, &xfnv::constructElement<NiColorA>);
-        pColorBlock = static_cast<NiColorA*>(ptr);
+        pColorBlock = ::new (ptr) NiColorA[289];
     }
     else {
         pColorBlock = nullptr;

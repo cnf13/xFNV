@@ -627,8 +627,7 @@ void BGSPrimitiveSphere::Build() {
         NiColorA* pcolors;
         void* ptr = ourMalloc(112 * sizeof(NiColorA));
         if (ptr) {
-            rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 112, &xfnv::constructElement<NiColorA>);
-            pcolors = static_cast<NiColorA*>(ptr);
+            pcolors = ::new (ptr) NiColorA[112];
         }
         else {
             pcolors = nullptr;

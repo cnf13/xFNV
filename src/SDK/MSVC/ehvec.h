@@ -10,8 +10,7 @@
 namespace rt {
 
     // The callback type of the three iterators, the exe CRT's thiscall `void (*)(void*)`: the constructor or destructor
-    // of any item type, its result ignored. The xfnv::constructElement and destructElement callbacks passed to them
-    // have it.
+    // of any item type, its result ignored.
     using EhVectorCallback = void (*)(void*);
 
     // The copy constructor callback of the copy iterator, the exe CRT's thiscall `void (*)(void*, void*)`: the copy

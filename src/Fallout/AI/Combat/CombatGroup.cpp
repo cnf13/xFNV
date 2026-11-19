@@ -1613,7 +1613,9 @@ void CombatGroup::BuildSearchTeleportDoorArray() {
             );
         }
     }
-    doorArray.Sort(&xfnv::callFunction<&CompareUInt>);
+    doorArray.Sort([](const void* apOne, const void* apTwo) {
+        return CompareUInt(static_cast<const uint32_t*>(apOne), static_cast<const uint32_t*>(apTwo));
+    });
     for (uint32_t i_2 = 0; i_2 < doorArray.iSize; ++i_2) {
         TESObjectREFR* pdoor = doorArray.operator[](i_2);
         uint32_t inumDuplicates = 0;
@@ -1859,9 +1861,6 @@ void CombatGroup::UpdateClusters() {
             float fclusterDistanceSquared = fClusterDistance * fClusterDistance * 4.0;
             // BSMIN is the int instantiation here, so the compare is signed.
             uint32_t imemberCount_2 = BSMIN(static_cast<int32_t>(GetMemberCount()), 63);
-            rt::eh_vector_constructor_iterator(
-                clusterData, sizeof(ClusterData), 64, &xfnv::constructElement<ClusterData>
-            );
             ourMemset(clusterData, 0, sizeof(clusterData));
             ourMemset(fdistanceSqrArray, 0, sizeof(fdistanceSqrArray));
             for (uint32_t i = 0; i < imemberCount_2; ++i) {

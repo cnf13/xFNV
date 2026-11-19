@@ -50,10 +50,7 @@ void NiSkinData::LoadBinary(NiStream& kStream) {
     void* pvMemory = MemoryManager_Singleton.Allocate(stSize);
     BoneData* pkBoneData = nullptr;
     if (pvMemory) {
-        rt::eh_vector_constructor_iterator(
-            pvMemory, sizeof(BoneData), static_cast<int32_t>(uiCount), &xfnv::constructElement<NiSkinData::BoneData>
-        );
-        pkBoneData = static_cast<BoneData*>(pvMemory);
+        pkBoneData = ::new (pvMemory) BoneData[uiCount];
     }
     m_pkBoneData = pkBoneData;
 

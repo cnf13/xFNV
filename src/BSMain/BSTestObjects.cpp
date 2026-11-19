@@ -16,7 +16,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cmath>
@@ -626,8 +625,7 @@ NiAVObject* BSTestObjects::CreateBox(
         NiColorA* colors;
         void* ptr = MemoryManager_Singleton.Allocate(8 * sizeof(NiColorA));
         if (ptr) {
-            rt::eh_vector_constructor_iterator(ptr, sizeof(NiColorA), 8, &xfnv::constructElement<NiColorA>);
-            colors = static_cast<NiColorA*>(ptr);
+            colors = ::new (ptr) NiColorA[8];
         }
         else {
             colors = nullptr;

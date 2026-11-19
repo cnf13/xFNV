@@ -20,7 +20,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstring>
@@ -256,7 +255,7 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
         int32_t iNumObjs = m_usVertices;
         pkColor = static_cast<NiColorA*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiColorA)));
         if (pkColor) {
-            rt::eh_vector_constructor_iterator(pkColor, sizeof(NiColorA), iNumObjs, &xfnv::constructElement<NiColorA>);
+            ::new (static_cast<void*>(pkColor)) NiColorA[iNumObjs];
         }
         else {
             pkColor = nullptr;
@@ -304,9 +303,7 @@ void NiPSysData::CopyMembers(NiPSysData* pkDest, NiCloningProcess& kCloning) {
         pkParticleInfo =
             static_cast<NiParticleInfo*>(MemoryManager_Singleton.Allocate(m_usVertices * sizeof(NiParticleInfo)));
         if (pkParticleInfo) {
-            rt::eh_vector_constructor_iterator(
-                pkParticleInfo, sizeof(NiParticleInfo), iNumInfos, &xfnv::constructElement<NiParticleInfo>
-            );
+            ::new (static_cast<void*>(pkParticleInfo)) NiParticleInfo[iNumInfos];
         }
         else {
             pkParticleInfo = nullptr;

@@ -31,7 +31,6 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 
 #include <bit>
@@ -58,7 +57,7 @@ float FastSqrt(float afValue) {
 
 // The NiPointer<NiGeometry> arrays' new[]: the count cookie, then each element through NiPointer's default constructor.
 // The size saturates on overflow, so the allocation fails rather than comes back short. The block is raw MemoryManager
-// memory: the cookie (one size_t, xfnv::arrayCount's layout), then the elements.
+// memory: the cookie (one size_t), then the elements.
 NiPointer<NiGeometry>* NewGeometryPointerArray(uint32_t numObjs) {
     size_t stSize =
         numObjs > SIZE_MAX / sizeof(NiPointer<NiGeometry>) ? SIZE_MAX : sizeof(NiPointer<NiGeometry>) * numObjs;
@@ -69,10 +68,9 @@ NiPointer<NiGeometry>* NewGeometryPointerArray(uint32_t numObjs) {
     }
     NiPointer<NiGeometry>* pArray = reinterpret_cast<NiPointer<NiGeometry>*>(puiCookie + 1);
     *puiCookie = numObjs;
-    rt::eh_vector_constructor_iterator(
-        pArray, sizeof(NiPointer<NiGeometry>), static_cast<int32_t>(numObjs),
-        &xfnv::constructElement<NiPointer<NiRefObject>>
-    );
+    for (int32_t iItem = 0; iItem < static_cast<int32_t>(numObjs); ++iItem) {
+        ::new (static_cast<void*>(pArray + iItem)) NiPointer<NiGeometry>;
+    }
     return pArray;
 }
 
@@ -87,10 +85,9 @@ NiPointer<NiObject>* NewObjectPointerArray(uint32_t numObjs) {
     }
     NiPointer<NiObject>* pArray = reinterpret_cast<NiPointer<NiObject>*>(puiCookie + 1);
     *puiCookie = numObjs;
-    rt::eh_vector_constructor_iterator(
-        pArray, sizeof(NiPointer<NiObject>), static_cast<int32_t>(numObjs),
-        &xfnv::constructElement<NiPointer<NiRefObject>>
-    );
+    for (int32_t iItem = 0; iItem < static_cast<int32_t>(numObjs); ++iItem) {
+        ::new (static_cast<void*>(pArray + iItem)) NiPointer<NiObject>;
+    }
     return pArray;
 }
 

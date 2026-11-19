@@ -186,7 +186,6 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
@@ -230,7 +229,6 @@ BipedAnim::~BipedAnim() {
 }
 
 void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
-    FaceGenDatas fgcoord;
     BSCloningProcess cloneData;
     float fzoom;
     bool bfirstPerson = false;
@@ -353,11 +351,7 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                     (m_pRequester->GetObjectReference()->GetFormType() == NPC__ID)) {
                                                     TESNPC* pnpc_3 =
                                                         static_cast<TESNPC*>(m_pRequester->GetObjectReference());
-                                                    rt::eh_vector_constructor_iterator(
-                                                        &fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                        &xfnv::constructElement<FR2MatrixVTC<float>>,
-                                                        &xfnv::destructElement<FR2MatrixVTC<float>>
-                                                    );
+                                                    FaceGenDatas fgcoord;
                                                     {
                                                         NiPointer<NiObject> spTempObject;
                                                         NiPointer<NiGeometryData> spdata;
@@ -377,10 +371,6 @@ void BipedAnim::LoadBipedParts(bool abForceLoadImmediate) {
                                                             ptri->SetRotate((&ptri->m_kLocal)->m_Rotate * matrot);
                                                         }
                                                     }
-                                                    rt::eh_vector_destructor_iterator(
-                                                        &fgcoord, sizeof(FR2MatrixVTC<float>), 4,
-                                                        &xfnv::destructElement<FR2MatrixVTC<float>>
-                                                    );
                                                 }
                                             }
                                         }

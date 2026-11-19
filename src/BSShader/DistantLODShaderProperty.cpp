@@ -58,7 +58,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsDynamicData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
@@ -251,10 +250,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                     MemoryManager_Singleton.Allocate(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
                 NiColorA* pgcolor = nullptr;
                 if (pColorMemory) {
-                    rt::eh_vector_constructor_iterator(
-                        pColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiCount), &xfnv::constructElement<NiColorA>
-                    );
-                    pgcolor = static_cast<NiColorA*>(pColorMemory);
+                    pgcolor = ::new (pColorMemory) NiColorA[uiCount];
                 }
                 // EXE-INLINED none: operator new[] (the overflow-checked NiPoint2 count)
                 ullBytes = uint64_t(uiCount) * sizeof(NiPoint2);
@@ -343,10 +339,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                     MemoryManager_Singleton.Allocate(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
                 NiColorA* pgcolor = nullptr;
                 if (pColorMemory) {
-                    rt::eh_vector_constructor_iterator(
-                        pColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiCount), &xfnv::constructElement<NiColorA>
-                    );
-                    pgcolor = static_cast<NiColorA*>(pColorMemory);
+                    pgcolor = ::new (pColorMemory) NiColorA[uiCount];
                 }
                 // EXE-INLINED none: operator new[] (the overflow-checked NiPoint2 count)
                 ullBytes = uint64_t(uiCount) * sizeof(NiPoint2);

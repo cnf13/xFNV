@@ -2062,7 +2062,12 @@ void hkpContinuousSimulation::collideEntitiesNarrowPhaseDiscrete(
     const hkpProcessCollisionInput& input
 ) {
     processAgentsOfEntities(
-        entities, numEntities, input, &xfnv::callMember<&hkpContinuousSimulation::processAgentCollideContinuous>,
+        entities, numEntities, input,
+        [](hkpSimulation* simulation, hkpAgentNnEntry* entry, const hkpProcessCollisionInput& processInput,
+           hkpProcessCollisionOutput& processOutput) {
+            static_cast<hkpContinuousSimulation*>(simulation)
+                ->processAgentCollideContinuous(entry, processInput, processOutput);
+        },
         hkpSimulation::FIND_CONTACTS_DEFAULT
     );
 }

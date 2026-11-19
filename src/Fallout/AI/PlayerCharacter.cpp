@@ -7961,7 +7961,12 @@ void PlayerCharacter::ExportProgressData(PROGRESS_EVENT aeEvent) {
     InventoryChanges* pInventory = InventoryChanges::GetInventoryChanges(this);
     if (pInventory) {
         pString->Set("\"", 0);
-        pInventory->IterateInventory(&xfnv::callFunction<&apCallback>, pString, 0);
+        pInventory->IterateInventory(
+            [](ItemChange* apItem, void* apData) {
+                return static_cast<bool>(apCallback(apItem, static_cast<BSStringT<char>*>(apData)));
+            },
+            pString, 0
+        );
         *pString += "\"\t";
     }
     else {

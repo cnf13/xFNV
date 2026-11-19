@@ -938,7 +938,9 @@ HWND__* GetActiveWindow_SDL() {
 void Main_ShaderInit() {
     InitializationFlow("Initializing Shader System...");
     BSShaderManager::SetShaderErrorCallback(nullptr);
-    BSShaderManager::SetTimerFunc(&xfnv::callFunction<&BSShaderManager::CalculateTime>);
+    BSShaderManager::SetTimerFunc([](int32_t iDelta) {
+        return static_cast<float>(BSShaderManager::CalculateTime(iDelta));
+    });
     BSShaderManager::SetUseHardDriveCache(bUseHardDriveCache.Bool());
     BSShaderManager::bDisplayLODLand = bDisplayLODLandINI.Bool();
     BSShaderManager::fLocalTreeMipMapLODBias = static_cast<float>(fLocalTreeMipMapLODBiasINI);
@@ -1178,8 +1180,11 @@ int32_t MessageBoxA_0(const char* apText, const char* apCaption, uint32_t aiType
 Main::Main(HWND__* ahWnd, HINSTANCE__* ahInstance)
   : bQuitGame(false), bResetGame(false), bGameActive(false), bOnIdle(false), bReloadContent(false), bFlyCamera(false),
     bFreezeTime(false), hWnd(ahWnd), hInstance(ahInstance), uiThreadID(BSGetCurrentThreadID()), hThreadHandle(nullptr),
-    kTaskQueue(&kPackedTaskHeap, &xfnv::callFunction<&TaskQueueInterface::TaskUnpackFunc>),
-    kSecondaryTaskQueue(&kSecondaryPackedTaskHeap, &xfnv::callFunction<&TaskQueueInterface::TaskUnpackFunc>),
+    kTaskQueue(&kPackedTaskHeap, [](BSPackedTask* apTask) { TaskQueueInterface::TaskUnpackFunc(*apTask); }),
+    kSecondaryTaskQueue(
+        &kSecondaryPackedTaskHeap,
+        [](BSPackedTask* apTask) { TaskQueueInterface::TaskUnpackFunc(*apTask); }
+    ),
     bRenderingMenuBG(false) {
     Main::spInterfaceFXTex = nullptr;
     spDrawWorldAccum = new BSShaderAccumulator(99, 1u, 759u);
@@ -1300,7 +1305,10 @@ void Main::Main_AudioInit() {
     BSAudio::QInstance().pfnIDCallback = &FalloutAudio::ResolveSoundID;
     BSAudio::QInstance().pfnNameCallback = &FalloutAudio::ResolveSoundName;
     BSAudio::QInstance().pfnRandomFilenameCallback = &TESSound::PickRandomFilename;
-    BSAudio::QInstance().pfnSettingsCallback = &xfnv::callFunction<&FalloutAudio::ApplySettingsFromMasterFile>;
+    BSAudio::QInstance().pfnSettingsCallback = [](BSSoundHandle* apSoundHandle, void* apSettingsContext,
+                                                  uint32_t* apOutFlags) {
+        return FalloutAudio::ApplySettingsFromMasterFile(*apSoundHandle, apSettingsContext, apOutFlags);
+    };
     BSAudio::QInstance().pfnSynchPausedCallback = &FalloutRadio::RadioSynchPaused;
     BSAudio::QInstance().pfnSynchUnPausedCallback = &FalloutRadio::RadioSynchUnPaused;
     BSAudio* pAudio = &BSAudio::QInstance();

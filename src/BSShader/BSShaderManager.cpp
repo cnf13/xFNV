@@ -91,7 +91,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <bit>
@@ -346,11 +345,8 @@ void BSShaderManager::Initialize() {
     NiPointer<BSShaderAccumulator>* pAccumulators = nullptr;
     if (puiCookie) {
         *puiCookie = uiCount;
-        pAccumulators = reinterpret_cast<NiPointer<BSShaderAccumulator>*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pAccumulators, sizeof(NiPointer<BSShaderAccumulator>), static_cast<int32_t>(uiCount),
-            &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
-        );
+        pAccumulators =
+            ::new (static_cast<void*>(puiCookie + 1)) NiPointer<BSShaderAccumulator>[static_cast<int32_t>(uiCount)];
     }
     spShadowAccumulators = pAccumulators;
     for (uint32_t i = 0; i < iMaxShadowMapAccumulators; ++i) {
@@ -5169,11 +5165,9 @@ void BSShaderManager::Free(eBool abFinal) {
     NiPointer<BSShaderAccumulator>* pAccumulators = spShadowAccumulators;
     if (pAccumulators) {
         // delete[]: the element count new[] stored in front of the array is freed with it.
-        rt::eh_vector_destructor_iterator(
-            pAccumulators, sizeof(NiPointer<BSShaderAccumulator>),
-            static_cast<int32_t>(reinterpret_cast<size_t*>(pAccumulators)[-1]),
-            &xfnv::destructElement<NiPointer<NiRefObject>>
-        );
+        for (int32_t iItem = static_cast<int32_t>(reinterpret_cast<size_t*>(pAccumulators)[-1]); iItem-- > 0;) {
+            pAccumulators[iItem].~NiPointer<BSShaderAccumulator>();
+        }
         MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pAccumulators) - 1);
     }
 }

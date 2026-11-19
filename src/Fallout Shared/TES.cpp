@@ -262,7 +262,6 @@
 #include "Havok/Source/Common/Base/System/Io/FileSystem/hkFileSystem.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/stdlib.h"
@@ -2825,11 +2824,7 @@ void TES::AddTemporaryParticleObjectToCache(NiAVObject* apObject) {
     NiPointer<NiAVObject>* pspClones = nullptr;
     if (pArray) {
         pArray[0] = 3;
-        pspClones = reinterpret_cast<NiPointer<NiAVObject>*>(pArray + 1);
-        rt::eh_vector_constructor_iterator(
-            pspClones, sizeof(NiPointer<NiAVObject>), 3, &xfnv::constructElement<NiPointer<NiRefObject>>,
-            &xfnv::destructElement<NiPointer<NiRefObject>>
-        );
+        pspClones = ::new (static_cast<void*>(pArray + 1)) NiPointer<NiAVObject>[3];
     }
 
     pnew->pspClones = pspClones;

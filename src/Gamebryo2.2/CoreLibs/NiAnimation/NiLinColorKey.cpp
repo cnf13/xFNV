@@ -12,7 +12,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
@@ -40,10 +39,7 @@ NiAnimationKey* NiLinColorKey::CreateArray(uint32_t uiNumKeys) {
         return nullptr;
     }
     *puiCookie = uiNumKeys;
-    NiLinColorKey* pkKeys = reinterpret_cast<NiLinColorKey*>(puiCookie + 1);
-    rt::eh_vector_constructor_iterator(
-        pkKeys, sizeof(NiLinColorKey), uiNumKeys, &xfnv::constructElement<NiLinColorKey>
-    );
+    NiLinColorKey* pkKeys = ::new (static_cast<void*>(puiCookie + 1)) NiLinColorKey[uiNumKeys];
     return pkKeys;
 }
 
@@ -57,10 +53,7 @@ NiAnimationKey* NiLinColorKey::CreateFromStream(NiStream& kStream, uint32_t uiNu
     NiLinColorKey* pkLinColorKeys;
     if (puiCookie) {
         *puiCookie = uiNumKeys;
-        pkLinColorKeys = reinterpret_cast<NiLinColorKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkLinColorKeys, sizeof(NiLinColorKey), uiNumKeys, &xfnv::constructElement<NiLinColorKey>
-        );
+        pkLinColorKeys = ::new (static_cast<void*>(puiCookie + 1)) NiLinColorKey[uiNumKeys];
     }
     else {
         pkLinColorKeys = nullptr;
@@ -89,10 +82,7 @@ bool NiLinColorKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNum
     NiLinColorKey* pkNewKeys;
     if (puiCookie) {
         *puiCookie = uiNewNumKeys;
-        pkNewKeys = reinterpret_cast<NiLinColorKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiLinColorKey), uiNewNumKeys, &xfnv::constructElement<NiLinColorKey>
-        );
+        pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiLinColorKey[uiNewNumKeys];
     }
     else {
         pkNewKeys = nullptr;

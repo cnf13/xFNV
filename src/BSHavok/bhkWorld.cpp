@@ -157,7 +157,6 @@
 #include "Havok/Source/Physics/Utilities/Weapons/hkpGravityGun.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpMountedBallGun.h"
 #include "Havok/Source/Physics/Utilities/Weapons/hkpProjectileGun.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 
 #include <bit>
@@ -2839,10 +2838,9 @@ void bhkTaskletManagerCallback::bhkThreadState::CreateThreadMemory() {
 }
 
 void bhkTaskletManagerCallback::bhkThreadState::Destruct(bhkThreadState* apThis) {
-    rt::eh_vector_destructor_iterator(
-        apThis->Elem, sizeof(bhkThreadStateElem), 16,
-        &xfnv::destructElement<bhkTaskletManagerCallback::bhkThreadStateElem>
-    );
+    for (int32_t i = 16; i-- > 0;) {
+        apThis->Elem[i].~bhkThreadStateElem();
+    }
     DeleteCriticalSection(&apThis->StateLock);
 }
 

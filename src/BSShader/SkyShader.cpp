@@ -38,7 +38,6 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderDeclaration.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStage.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DVertexShader.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
@@ -1378,8 +1377,7 @@ void SkyShader::CreateSkyQuad(NiPointer<NiTriShape>& aspTriShape) {
     void* pColorMemory = MemoryManager_Singleton.Allocate(4 * sizeof(NiColorA));
     NiColorA* pColors = nullptr;
     if (pColorMemory) {
-        rt::eh_vector_constructor_iterator(pColorMemory, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
-        pColors = static_cast<NiColorA*>(pColorMemory);
+        pColors = ::new (pColorMemory) NiColorA[4];
     }
     pColors[0] = NiColorA_BLACK;
     pColors[1] = NiColorA_BLACK;

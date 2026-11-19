@@ -13,7 +13,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
@@ -30,8 +29,7 @@ NiAnimationKey* NiStepColorKey::CreateArray(uint32_t uiNumKeys) {
         return nullptr;
     }
     *puiCookie = uiNumKeys;
-    NiColorKey* pkKeys = reinterpret_cast<NiColorKey*>(puiCookie + 1);
-    rt::eh_vector_constructor_iterator(pkKeys, sizeof(NiColorKey), uiNumKeys, &xfnv::constructElement<NiColorKey>);
+    NiColorKey* pkKeys = ::new (static_cast<void*>(puiCookie + 1)) NiColorKey[uiNumKeys];
     return pkKeys;
 }
 
@@ -59,8 +57,7 @@ NiAnimationKey* NiStepColorKey::CreateFromStream(NiStream& kStream, uint32_t uiN
     NiColorKey* pkKeys;
     if (puiCookie) {
         *puiCookie = uiNumKeys;
-        pkKeys = reinterpret_cast<NiColorKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(pkKeys, sizeof(NiColorKey), uiNumKeys, &xfnv::constructElement<NiColorKey>);
+        pkKeys = ::new (static_cast<void*>(puiCookie + 1)) NiColorKey[uiNumKeys];
     }
     else {
         pkKeys = nullptr;
@@ -89,10 +86,7 @@ bool NiStepColorKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNu
     NiColorKey* pkNewKeys;
     if (puiCookie) {
         *puiCookie = uiNewNumKeys;
-        pkNewKeys = reinterpret_cast<NiColorKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiColorKey), uiNewNumKeys, &xfnv::constructElement<NiColorKey>
-        );
+        pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiColorKey[uiNewNumKeys];
     }
     else {
         pkNewKeys = nullptr;

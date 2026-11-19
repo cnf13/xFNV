@@ -6,7 +6,6 @@
 #include "Fallout Shared/TESConditionItem.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESObjectREFR.h"
-#include "SDK/MSVC/ehvec.h"
 
 // BSSimpleList<void*>::IsEmpty: a node is empty when it holds no item and no next node.
 static bool BSSimpleList_IsEmpty(const BSSimpleList<void*>* apList) {
@@ -218,10 +217,9 @@ void TESCondition::ClearAllConditionItems() {
 // from that cookie.
 void* TESCondition::DeleteArray(uint32_t auiFlags) {
     if ((auiFlags & 2) != 0) {
-        rt::eh_vector_destructor_iterator(
-            this, sizeof(TESCondition), static_cast<int32_t>(reinterpret_cast<size_t*>(this)[-1]),
-            &xfnv::destructElement<TESCondition>
-        );
+        for (int32_t iItem = static_cast<int32_t>(reinterpret_cast<size_t*>(this)[-1]); iItem-- > 0;) {
+            this[iItem].~TESCondition();
+        }
         if ((auiFlags & 1) != 0) {
             ourFree(reinterpret_cast<size_t*>(this) - 1);
         }

@@ -5,6 +5,12 @@
 
 class NiRotKey : public NiAnimationKey {
 public:
+    // Only the key's quaternion is zeroed. Every rotation key's default constructor is this one (the exe folds them
+    // into one function, 0xA2BDB0).
+    NiRotKey() {
+        m_quat.SetValues(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+
     NiRotKey* GetKeyAt(uint32_t uiIndex, uint8_t ucKeySize) const {
         return static_cast<NiRotKey*>(NiAnimationKey::GetKeyAt(uiIndex, ucKeySize));
     }

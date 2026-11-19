@@ -201,7 +201,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/exception.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
@@ -893,12 +892,9 @@ void TESNPC::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
                 if (pBlock) {
                     // new[]'s cookie: the element count stored just before the array.
                     pBlock[0] = 4;
-                    rt::eh_vector_constructor_iterator(
-                        pBlock + 1, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                        &xfnv::destructElement<FR2MatrixVTC<float>>
-                    );
-                    // The matrices follow the cookie: raw new[] memory treated as the array.
-                    pNew = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(pBlock + 1);
+                    // The matrices follow the cookie, built as one run of four and treated as the [2][2] array.
+                    FR2MatrixVTC<float>* pMatrices = ::new (static_cast<void*>(pBlock + 1)) FR2MatrixVTC<float>[4];
+                    pNew = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(pMatrices);
                 }
                 pAlternateFaceOffsetCoord = pNew;
                 BSFaceGenManager::InitFaceGenCoord(pAlternateFaceOffsetCoord);

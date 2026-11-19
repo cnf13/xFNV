@@ -644,10 +644,9 @@ void NiBlendInterpolator::CopyMembers(NiBlendInterpolator* pkDest, NiCloningProc
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkInterpArray, sizeof(InterpArrayItem), uiCount,
-            &xfnv::constructElement<NiBlendInterpolator::InterpArrayItem>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiCount); ++iItem) {
+            ::new (static_cast<void*>(pkInterpArray + iItem)) InterpArrayItem;
+        }
     }
     pkDest->m_pkInterpArray = pkInterpArray;
     pkDest->m_fWeightThreshold = m_fWeightThreshold;

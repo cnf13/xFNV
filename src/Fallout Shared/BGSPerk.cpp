@@ -773,13 +773,9 @@ BGSPerkEntry* BGSEntryPointPerkEntry::Duplicate() {
                 : v1 + sizeof(size_t)
         ));
         if (v6) {
-            *v6 = cNumConditions;
-            rt::eh_vector_constructor_iterator(
-                v6 + 1, sizeof(TESCondition), cNumConditions, &xfnv::constructElement<TESCondition>,
-                &xfnv::destructElement<TESCondition>
-            );
             // new[]'s array cookie: the count is in the 4 bytes before the elements.
-            v3 = reinterpret_cast<TESCondition*>(v6 + 1);
+            *v6 = cNumConditions;
+            v3 = ::new (static_cast<void*>(v6 + 1)) TESCondition[cNumConditions];
         }
         else {
             v3 = nullptr;
@@ -919,13 +915,9 @@ bool BGSEntryPointPerkEntry::Load(TESFile* apFile) {
                                 : v3 + sizeof(size_t)
                         ));
                         if (v6) {
-                            *v6 = cNumConditions;
-                            rt::eh_vector_constructor_iterator(
-                                v6 + 1, sizeof(TESCondition), cNumConditions, &xfnv::constructElement<TESCondition>,
-                                &xfnv::destructElement<TESCondition>
-                            );
                             // new[]'s array cookie: the count is in the 4 bytes before the elements.
-                            v4 = reinterpret_cast<TESCondition*>(v6 + 1);
+                            *v6 = cNumConditions;
+                            v4 = ::new (static_cast<void*>(v6 + 1)) TESCondition[cNumConditions];
                         }
                         else {
                             v4 = nullptr;

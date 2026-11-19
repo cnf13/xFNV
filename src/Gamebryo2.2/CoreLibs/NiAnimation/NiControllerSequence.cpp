@@ -506,10 +506,9 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkInterpArray, sizeof(InterpArrayItem), uiCount,
-            &xfnv::constructElement<NiControllerSequence::InterpArrayItem>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiCount); ++iItem) {
+            ::new (static_cast<void*>(pkInterpArray + iItem)) InterpArrayItem;
+        }
     }
     m_pkInterpArray = pkInterpArray;
 
@@ -522,9 +521,9 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkIDTagArray = reinterpret_cast<IDTag*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkIDTagArray, sizeof(IDTag), uiCount, &xfnv::constructElement<NiControllerSequence::IDTag>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiCount); ++iItem) {
+            ::new (static_cast<void*>(pkIDTagArray + iItem)) IDTag;
+        }
     }
     m_pkIDTagArray = pkIDTagArray;
 
@@ -595,9 +594,9 @@ void NiControllerSequence::LoadBinary(NiStream& kStream) {
             if (pvMemory) {
                 *static_cast<size_t*>(pvMemory) = uiCount;
                 pspAnimNotes = reinterpret_cast<NiPointer<BSAnimNote>*>(static_cast<size_t*>(pvMemory) + 1);
-                rt::eh_vector_constructor_iterator(
-                    pspAnimNotes, sizeof(NiPointer<BSAnimNote>), uiCount, &xfnv::constructElement<NiPointer<BSAnimNote>>
-                );
+                for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiCount); ++iItem) {
+                    ::new (static_cast<void*>(pspAnimNotes + iItem)) NiPointer<BSAnimNote>;
+                }
             }
             spAnimNotesA = pspAnimNotes;
         }
@@ -1071,10 +1070,9 @@ void NiControllerSequence::CopyMembers(NiControllerSequence* pkDest, NiCloningPr
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkInterpArray, sizeof(InterpArrayItem), uiCount,
-            &xfnv::constructElement<NiControllerSequence::InterpArrayItem>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiCount); ++iItem) {
+            ::new (static_cast<void*>(pkInterpArray + iItem)) InterpArrayItem;
+        }
     }
     pkDest->m_pkInterpArray = pkInterpArray;
 
@@ -1087,9 +1085,9 @@ void NiControllerSequence::CopyMembers(NiControllerSequence* pkDest, NiCloningPr
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiCount;
         pkIDTagArray = reinterpret_cast<IDTag*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkIDTagArray, sizeof(IDTag), uiCount, &xfnv::constructElement<NiControllerSequence::IDTag>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiCount); ++iItem) {
+            ::new (static_cast<void*>(pkIDTagArray + iItem)) IDTag;
+        }
     }
     pkDest->m_pkIDTagArray = pkIDTagArray;
 
@@ -1326,10 +1324,9 @@ bool NiControllerSequence::ReallocateArrays() {
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiNewSize;
         pkNewInterpArray = reinterpret_cast<InterpArrayItem*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewInterpArray, sizeof(InterpArrayItem), uiNewSize,
-            &xfnv::constructElement<NiControllerSequence::InterpArrayItem>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiNewSize); ++iItem) {
+            ::new (static_cast<void*>(pkNewInterpArray + iItem)) InterpArrayItem;
+        }
     }
 
     ullSize = uint64_t{sizeof(IDTag)} * uiNewSize;
@@ -1340,9 +1337,9 @@ bool NiControllerSequence::ReallocateArrays() {
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiNewSize;
         pkNewIDTagArray = reinterpret_cast<IDTag*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewIDTagArray, sizeof(IDTag), uiNewSize, &xfnv::constructElement<NiControllerSequence::IDTag>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiNewSize); ++iItem) {
+            ::new (static_cast<void*>(pkNewIDTagArray + iItem)) IDTag;
+        }
     }
 
     // m_uiArraySize is read again on every pass.

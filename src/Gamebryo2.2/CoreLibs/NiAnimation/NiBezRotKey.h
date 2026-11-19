@@ -12,7 +12,7 @@ class NiStream;
 // A rotation key with a second quaternion, m_IntQuat, after the key's own rotation.
 class NiBezRotKey : public NiRotKey {
 public:
-    // Zeroes m_quat through NiQuaternion::SetValues; new[]'s vector constructor iterator runs it.
+    // NiRotKey's constructor zeroes m_quat; new[]'s vector constructor iterator runs it.
     NiBezRotKey();
 
     static void Copy(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey);

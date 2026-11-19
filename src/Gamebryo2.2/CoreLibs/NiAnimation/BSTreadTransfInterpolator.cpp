@@ -72,10 +72,9 @@ void BSTreadTransfInterpolator::LoadBinary(NiStream& arStream) {
         *puiCookie = uiCount;
         // Raw new[] memory: the LinkInfo array starts right after the element-count cookie.
         pLinks = reinterpret_cast<BSTreadTransfInterpolator::LinkInfo*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pLinks, sizeof(BSTreadTransfInterpolator::LinkInfo), static_cast<int32_t>(uiCount),
-            &xfnv::constructElement<BSTreadTransfInterpolator::LinkInfo>
-        );
+        for (int32_t i = 0; i < static_cast<int32_t>(uiCount); ++i) {
+            ::new (static_cast<void*>(pLinks + i)) BSTreadTransfInterpolator::LinkInfo;
+        }
     }
     else {
         pLinks = nullptr;
@@ -221,10 +220,9 @@ void BSTreadTransfInterpolator::CopyMembers(BSTreadTransfInterpolator* pkDest, N
         // Raw new[] memory: the LinkInfo array starts right after the element-count cookie.
         pNewLinks = reinterpret_cast<BSTreadTransfInterpolator::LinkInfo*>(puiNewCookie + 1);
         *puiNewCookie = uiNumLinks;
-        rt::eh_vector_constructor_iterator(
-            pNewLinks, sizeof(BSTreadTransfInterpolator::LinkInfo), static_cast<int32_t>(uiNumLinks),
-            &xfnv::constructElement<BSTreadTransfInterpolator::LinkInfo>
-        );
+        for (int32_t i = 0; i < static_cast<int32_t>(uiNumLinks); ++i) {
+            ::new (static_cast<void*>(pNewLinks + i)) BSTreadTransfInterpolator::LinkInfo;
+        }
     }
     else {
         pNewLinks = nullptr;

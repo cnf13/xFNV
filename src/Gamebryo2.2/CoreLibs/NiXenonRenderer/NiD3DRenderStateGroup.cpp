@@ -11,7 +11,6 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgram.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStageGroup.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 
 #include <cstdint>
 #include <xmmintrin.h>
@@ -30,11 +29,10 @@ NiD3DRenderStateGroup* NiTNewInterface<NiD3DRenderStateGroup>::Allocate(uint32_t
     *puiCookie = auiCount;
     // The memory after the count cookie is the NiD3DRenderStateGroup array (the vector new's own layout).
     NiD3DRenderStateGroup* pkArray = reinterpret_cast<NiD3DRenderStateGroup*>(puiCookie + 1);
-    // eh_vector_constructor_iterator takes the element count as an int.
-    rt::eh_vector_constructor_iterator(
-        pkArray, sizeof(NiD3DRenderStateGroup), static_cast<int32_t>(auiCount),
-        &xfnv::constructElement<NiD3DRenderStateGroup>
-    );
+    // The constructor loop takes the element count as an int.
+    for (int32_t i = 0; i < static_cast<int32_t>(auiCount); ++i) {
+        ::new (static_cast<void*>(pkArray + i)) NiD3DRenderStateGroup;
+    }
     return pkArray;
 }
 
@@ -59,10 +57,8 @@ NiD3DRenderStateGroup::NiD3DRSEntry* NiTNewInterface<NiD3DRenderStateGroup::NiD3
     size_t stSize = auiCount <= SIZE_MAX / sizeof(NiD3DRSEntry) ? sizeof(NiD3DRSEntry) * auiCount : SIZE_MAX;
     NiD3DRSEntry* pkArray = static_cast<NiD3DRSEntry*>(NiMemObject::operator new[](stSize));
     if (pkArray) {
-        // eh_vector_constructor_iterator takes the element count as an int.
-        rt::eh_vector_constructor_iterator(
-            pkArray, sizeof(NiD3DRSEntry), static_cast<int32_t>(auiCount), &xfnv::constructElement<NiD3DRSEntry>
-        );
+        // The element count is taken as an int.
+        ::new (static_cast<void*>(pkArray)) NiD3DRSEntry[static_cast<int32_t>(auiCount)];
     }
     return pkArray;
 }

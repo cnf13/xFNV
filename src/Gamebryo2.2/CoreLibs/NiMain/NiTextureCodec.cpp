@@ -188,15 +188,21 @@ NiPixelData* NiTextureCodec::ExpandCompressedData(const NiPixelData& kSrc) {
     switch (kSrc.m_kPixelFormat.m_eFormat) {
         case NiPixelFormat::FORMAT_DXT1:
             m_pfnAlphaBlockDecoder = nullptr;
-            m_pfnColorBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeColorAlphaBlock>;
+            m_pfnColorBlockDecoder = [](NiTextureCodec* apThis, uint8_t* apDest) {
+                apThis->DecodeColorAlphaBlock(apDest);
+            };
             break;
         case NiPixelFormat::FORMAT_DXT3:
-            m_pfnAlphaBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeT3AlphaBlock>;
-            m_pfnColorBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeColorBlock>;
+            m_pfnAlphaBlockDecoder = [](NiTextureCodec* apThis, uint8_t* apDest) {
+                apThis->DecodeT3AlphaBlock(apDest);
+            };
+            m_pfnColorBlockDecoder = [](NiTextureCodec* apThis, uint8_t* apDest) { apThis->DecodeColorBlock(apDest); };
             break;
         case NiPixelFormat::FORMAT_DXT5:
-            m_pfnAlphaBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeT5AlphaBlock>;
-            m_pfnColorBlockDecoder = &xfnv::callMember<&NiTextureCodec::DecodeColorBlock>;
+            m_pfnAlphaBlockDecoder = [](NiTextureCodec* apThis, uint8_t* apDest) {
+                apThis->DecodeT5AlphaBlock(apDest);
+            };
+            m_pfnColorBlockDecoder = [](NiTextureCodec* apThis, uint8_t* apDest) { apThis->DecodeColorBlock(apDest); };
             break;
         default: return nullptr;
     }

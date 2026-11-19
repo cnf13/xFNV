@@ -29,7 +29,6 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstring>
@@ -81,11 +80,7 @@ void bhkBlendController::DoKnockDown(
                 pcon->ClearKeys();
                 pcon->iPriority = 2;
                 if (pcon->pBlendKeyA.m_uiESize == 0) {
-                    // The two keys are built with BLENDKEY::BLENDKEY through the eh vector constructor iterator, in a
-                    // 16-aligned slot: typed storage for which C++ runs no constructor.
-                    using BLENDKEYArray2 = BLENDKEY[2];
-                    alignas(16) XFNV_INLINED_LOCAL(BLENDKEYArray2, akKeys, std::nullopt, std::nullopt);
-                    rt::eh_vector_constructor_iterator(akKeys, sizeof(BLENDKEY), 2, &xfnv::constructElement<BLENDKEY>);
+                    alignas(16) BLENDKEY akKeys[2];
                     akKeys[0].fGain = fHeirGain;
                     akKeys[0].fVelGain = fVelGain;
                     akKeys[0].fTime = 0.0f;
@@ -318,10 +313,7 @@ void bhkBlendController::DoGetUpRecursive(NiAVObject* apObject, float afTime) {
             pkController->ClearKeys();
             pkController->iPriority = 2;
             if (pkController->pBlendKeyA.m_uiESize == 0) {
-                alignas(BLENDKEY) uint8_t aKeyStorage[2 * sizeof(BLENDKEY)];
-                rt::eh_vector_constructor_iterator(aKeyStorage, sizeof(BLENDKEY), 2, &xfnv::constructElement<BLENDKEY>);
-                // Raw memory the constructor has just built into two keys.
-                BLENDKEY* akKeys = reinterpret_cast<BLENDKEY*>(aKeyStorage);
+                BLENDKEY akKeys[2];
                 akKeys[0].fGain = 0.0f;
                 akKeys[0].fVelGain = 0.0f;
                 akKeys[0].fTime = 0.0f;
@@ -747,13 +739,7 @@ void bhkBlendController::DoHit(NiAVObject* apObject, float afTime, int32_t abQua
                     bool v16 = pcon->pBlendKeyA.m_uiESize == 0;
                     pcon->iPriority = 1;
                     if (v16) {
-                        // The three keys are built with BLENDKEY::BLENDKEY through the eh vector constructor
-                        // iterator, because keys is typed storage for which C++ runs no constructor.
-                        using BLENDKEYArray3 = BLENDKEY[3];
-                        XFNV_INLINED_LOCAL(BLENDKEYArray3, keys, std::nullopt, std::nullopt);
-                        rt::eh_vector_constructor_iterator(
-                            keys, sizeof(BLENDKEY), 3, &xfnv::constructElement<BLENDKEY>
-                        );
+                        BLENDKEY keys[3];
                         keys[0].fGain = v26;
                         float v27 = v13;
                         keys[0].fVelGain = v27;

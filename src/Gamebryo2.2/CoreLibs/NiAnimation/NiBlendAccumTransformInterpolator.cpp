@@ -79,11 +79,7 @@ void NiBlendAccumTransformInterpolator::LoadBinary(NiStream& kStream) {
     void* pvMemory = MemoryManager_Singleton.Allocate(stSize);
     AccumArrayItem* pkAccumArray = nullptr;
     if (pvMemory) {
-        rt::eh_vector_constructor_iterator(
-            pvMemory, sizeof(AccumArrayItem), uiCount,
-            &xfnv::constructElement<NiBlendAccumTransformInterpolator::AccumArrayItem>
-        );
-        pkAccumArray = static_cast<AccumArrayItem*>(pvMemory);
+        pkAccumArray = ::new (pvMemory) AccumArrayItem[uiCount];
     }
     m_pkAccumArray = pkAccumArray;
     for (uint8_t uc = 0; uc < m_ucArraySize; uc++) {
@@ -216,11 +212,7 @@ bool NiBlendAccumTransformInterpolator::ReallocateArrays() {
         void* pvMemory = MemoryManager_Singleton.Allocate(stSize);
         AccumArrayItem* pkNewAccumArray = nullptr;
         if (pvMemory) {
-            rt::eh_vector_constructor_iterator(
-                pvMemory, sizeof(AccumArrayItem), uiCount,
-                &xfnv::constructElement<NiBlendAccumTransformInterpolator::AccumArrayItem>
-            );
-            pkNewAccumArray = static_cast<AccumArrayItem*>(pvMemory);
+            pkNewAccumArray = ::new (pvMemory) AccumArrayItem[uiCount];
         }
         for (uint8_t uc = 0; uc < ucOldArraySize; uc++) {
             pkNewAccumArray[uc] = m_pkAccumArray[uc];
@@ -572,11 +564,7 @@ void NiBlendAccumTransformInterpolator::CopyMembers(
     void* pvMemory = MemoryManager_Singleton.Allocate(stSize);
     AccumArrayItem* pkAccumArray = nullptr;
     if (pvMemory) {
-        rt::eh_vector_constructor_iterator(
-            pvMemory, sizeof(AccumArrayItem), uiCount,
-            &xfnv::constructElement<NiBlendAccumTransformInterpolator::AccumArrayItem>
-        );
-        pkAccumArray = static_cast<AccumArrayItem*>(pvMemory);
+        pkAccumArray = ::new (pvMemory) AccumArrayItem[uiCount];
     }
     pkDest->m_pkAccumArray = pkAccumArray;
     for (uint8_t uc = 0; uc < m_ucArraySize; uc++) {

@@ -78,7 +78,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/tchar.h"
 
 static SettingT<INISettingCollection> gs_fRSMStartingZoom_Interface("fRSMStartingZoom:Interface", 0.7f);
@@ -1641,7 +1640,6 @@ void RaceSexMenu::SynchronizeFaceSliders(RaceSexMenu::OptionID aeSliderType) {
 }
 
 void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone) {
-    FaceGenDatas diffcoord;
     if ((pPlayer->GetFaceNodeBiped(nullptr)) && (pPlayer->GetFaceNodeSkinned(nullptr))) {
         pPlayerBase->AddChange(CHANGE_NPC_FACE);
         if (abChangeRace) {
@@ -1700,10 +1698,7 @@ void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone)
         }
         else {
             FR2MatrixVTC<float> currcord[2][2];
-            rt::eh_vector_constructor_iterator(
-                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
+            FaceGenDatas diffcoord;
             pPlayerBase->GetFaceCoord(currcord);
             if (abShape) {
                 BSFaceGenManager::OffsetFaceGenCoord(&LastFaceCoord, &currcord, &diffcoord.kFaceGens, false);
@@ -1774,9 +1769,6 @@ void RaceSexMenu::UpdatePlayerHead(bool abChangeRace, bool abShape, bool abTone)
                 }
                 pfacenode = pPlayer->GetFaceNodeSkinned(nullptr);
             }
-            rt::eh_vector_destructor_iterator(
-                diffcoord.kFaceGens, sizeof(FR2MatrixVTC<float>), 4, &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
         }
         NiUpdatePlayer3D();
     }

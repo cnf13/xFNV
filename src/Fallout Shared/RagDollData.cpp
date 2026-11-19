@@ -108,10 +108,7 @@ bool RagDollData::Load(TESFile* apFile) {
             void* pMemory = ourMalloc(uiCount * sizeof(RagDollBone));
             RagDollBone* pBones = nullptr;
             if (pMemory) {
-                rt::eh_vector_constructor_iterator(
-                    pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
-                );
-                pBones = static_cast<RagDollBone*>(pMemory);
+                pBones = ::new (pMemory) RagDollBone[uiCount];
             }
             pBoneArray = pBones;
             apFile->GetChunkData(pBoneArray, uiSize);
@@ -145,10 +142,7 @@ void RagDollData::Copy(RagDollData* apCopy) {
         void* pMemory = ourMalloc(uiCount * sizeof(RagDollBone));
         RagDollBone* pBones = nullptr;
         if (pMemory) {
-            rt::eh_vector_constructor_iterator(
-                pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
-            );
-            pBones = static_cast<RagDollBone*>(pMemory);
+            pBones = ::new (pMemory) RagDollBone[uiCount];
         }
         pBoneArray = pBones;
         ourMemcpy(pBoneArray, apCopy->pBoneArray, iBoneCount * sizeof(RagDollBone));
@@ -169,10 +163,7 @@ void RagDollData::CreateRagDollBoneArray(TESObjectREFR* apRef) {
             void* pMemory = ourMalloc(uiCount * sizeof(RagDollBone));
             RagDollBone* pBones = nullptr;
             if (pMemory) {
-                rt::eh_vector_constructor_iterator(
-                    pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
-                );
-                pBones = static_cast<RagDollBone*>(pMemory);
+                pBones = ::new (pMemory) RagDollBone[uiCount];
             }
             pBoneArray = pBones;
             uint32_t uiBoneIndex = 0;
@@ -233,10 +224,7 @@ void RagDollData::LoadGame() {
     void* pMemory = ourMalloc(uiCount * sizeof(RagDollBone));
     RagDollBone* pBones = nullptr;
     if (pMemory) {
-        rt::eh_vector_constructor_iterator(
-            pMemory, sizeof(RagDollBone), static_cast<int32_t>(uiCount), &xfnv::constructElement<REF_DECAL_DATA>
-        );
-        pBones = static_cast<RagDollBone*>(pMemory);
+        pBones = ::new (pMemory) RagDollBone[uiCount];
     }
     pBoneArray = pBones;
     pSaveLoadGameOLD->LoadGameDataOLD(pBoneArray, iBoneCount * sizeof(RagDollBone));

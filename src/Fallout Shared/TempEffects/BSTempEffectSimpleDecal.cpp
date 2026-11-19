@@ -936,8 +936,7 @@ void BSTempEffectSimpleDecal::ResizeDataArrays() {
     void* v7 =
         ourMalloc(iDecalVertexCount <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * iDecalVertexCount : SIZE_MAX);
     if (v7) {
-        rt::eh_vector_constructor_iterator(v7, sizeof(NiColorA), iDecalVertexCount, &xfnv::constructElement<NiColorA>);
-        v2 = static_cast<NiColorA*>(v7);
+        v2 = ::new (v7) NiColorA[iDecalVertexCount];
     }
     else {
         v2 = nullptr;

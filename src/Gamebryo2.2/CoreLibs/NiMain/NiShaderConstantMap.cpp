@@ -470,10 +470,9 @@ void NiShaderConstantMap::_SDMInit() {
         // new[]'s cookie: the element count stored just before the array, written untyped.
         puiBlock[0] = SCM_DEF_COUNT + 20;
         pkMappings = reinterpret_cast<PredefinedMapping*>(puiBlock + 1);
-        rt::eh_vector_constructor_iterator(
-            pkMappings, sizeof(PredefinedMapping), SCM_DEF_COUNT + 20,
-            &xfnv::constructElement<NiShaderConstantMap::PredefinedMapping>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(SCM_DEF_COUNT + 20); ++iItem) {
+            ::new (static_cast<void*>(pkMappings + iItem)) PredefinedMapping;
+        }
     }
     ms_pkPredefinedMappings = pkMappings;
 
@@ -625,10 +624,9 @@ void NiShaderConstantMap::_SDMInit() {
         // new[]'s cookie, as above.
         puiBlock[0] = SCM_OBJ_COUNT;
         pkMappings = reinterpret_cast<PredefinedMapping*>(puiBlock + 1);
-        rt::eh_vector_constructor_iterator(
-            pkMappings, sizeof(PredefinedMapping), SCM_OBJ_COUNT,
-            &xfnv::constructElement<NiShaderConstantMap::PredefinedMapping>
-        );
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(SCM_OBJ_COUNT); ++iItem) {
+            ::new (static_cast<void*>(pkMappings + iItem)) PredefinedMapping;
+        }
     }
     ms_pkObjectMappings = pkMappings;
 

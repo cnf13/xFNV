@@ -9,7 +9,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderDeclaration.h"
-#include "SDK/MSVC/ehvec.h"
 
 namespace {
 
@@ -222,12 +221,6 @@ bool NiD3DShaderDeclaration::Initialize(
     m_uiMaxStreamEntryCount = uiMaxStreamEntryCount;
     m_uiStreamCount = uiStreamCount;
     ShaderRegisterStream* pkStreams = new ShaderRegisterStream[uiStreamCount];
-    if (pkStreams) {
-        rt::eh_vector_constructor_iterator(
-            pkStreams, sizeof(ShaderRegisterStream), static_cast<int32_t>(uiStreamCount),
-            &xfnv::constructElement<NiD3DShaderDeclaration::ShaderRegisterStream>
-        );
-    }
     m_pkStreamEntries = pkStreams;
 
     for (uint32_t i = 0; i < m_uiStreamCount; i++) {

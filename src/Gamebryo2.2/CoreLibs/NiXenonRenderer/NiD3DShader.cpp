@@ -356,14 +356,30 @@ void NiD3DShader::_SDMInit() {
         }
     }
     ms_apfnDynEffectPackers[NiTextureEffect::WORLD_PARALLEL] =
-        &xfnv::callFunction<&NiD3DShader::PackWorldParallelEffect>;
+        [](const NiMatrix3& kWorldMat, const NiPoint3& kWorldTrans, NiD3DTextureStage* pkStage, int32_t bSave,
+           NiDX9Renderer* pkD3DRenderer) {
+            NiD3DShader::PackWorldParallelEffect(kWorldMat, kWorldTrans, pkStage, bSave != 0, pkD3DRenderer);
+        };
     ms_apfnDynEffectPackers[NiTextureEffect::WORLD_PERSPECTIVE] =
-        &xfnv::callFunction<&NiD3DShader::PackWorldPerspectiveEffect>;
-    ms_apfnDynEffectPackers[NiTextureEffect::SPHERE_MAP] = &xfnv::callFunction<&NiD3DShader::PackWorldSphereEffect>;
+        [](const NiMatrix3& kWorldMat, const NiPoint3& kWorldTrans, NiD3DTextureStage* pkStage, int32_t bSave,
+           NiDX9Renderer* pkD3DRenderer) {
+            NiD3DShader::PackWorldPerspectiveEffect(kWorldMat, kWorldTrans, pkStage, bSave != 0, pkD3DRenderer);
+        };
+    ms_apfnDynEffectPackers[NiTextureEffect::SPHERE_MAP] = [](const NiMatrix3& kWorldMat, const NiPoint3& kWorldTrans,
+                                                              NiD3DTextureStage* pkStage, int32_t bSave,
+                                                              NiDX9Renderer* pkD3DRenderer) {
+        NiD3DShader::PackWorldSphereEffect(kWorldMat, kWorldTrans, pkStage, bSave != 0, pkD3DRenderer);
+    };
     ms_apfnDynEffectPackers[NiTextureEffect::SPECULAR_CUBE_MAP] =
-        &xfnv::callFunction<&NiD3DShader::PackSpecularCubeEffect>;
+        [](const NiMatrix3& kWorldMat, const NiPoint3& kWorldTrans, NiD3DTextureStage* pkStage, int32_t bSave,
+           NiDX9Renderer* pkD3DRenderer) {
+            NiD3DShader::PackSpecularCubeEffect(kWorldMat, kWorldTrans, pkStage, bSave != 0, pkD3DRenderer);
+        };
     ms_apfnDynEffectPackers[NiTextureEffect::DIFFUSE_CUBE_MAP] =
-        &xfnv::callFunction<&NiD3DShader::PackDiffuseCubeEffect>;
+        [](const NiMatrix3& kWorldMat, const NiPoint3& kWorldTrans, NiD3DTextureStage* pkStage, int32_t bSave,
+           NiDX9Renderer* pkD3DRenderer) {
+            NiD3DShader::PackDiffuseCubeEffect(kWorldMat, kWorldTrans, pkStage, bSave != 0, pkD3DRenderer);
+        };
 }
 
 // Interns nothing and drops the shader map name's old handle. It skips everything for a null handle, interns null, and

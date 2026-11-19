@@ -62,7 +62,6 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/RayCollector/hkpAllRayHitCollector.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 
 #include <cmath>
 #include <cstdint>
@@ -1515,9 +1514,6 @@ bool CombatUtilities::CalculateAttackerCombatPositions(Actor* apTarget, Actor* a
     if (pattackerArray) {
         MeleeAttackerData attackerData[64];
         NiPoint3 targetLocation = *apTarget->QLocationOnReference();
-        rt::eh_vector_constructor_iterator(
-            attackerData, sizeof(MeleeAttackerData), 64, &xfnv::constructElement<WORLD_LOCATION>
-        );
         ourMemset(attackerData, 0, sizeof(attackerData));
         uint32_t imeleeAttackers = 0;
         uint32_t imeleeAttackersInMelee = 0;

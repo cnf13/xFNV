@@ -11,7 +11,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 NiRTTI NiAdditionalGeometryData::ms_RTTI("NiAdditionalGeometryData", &NiObject::ms_RTTI);
@@ -753,11 +752,7 @@ void NiAdditionalGeometryData::LoadBinary(NiStream& kStream) {
         void* pvMemory = MemoryManager_Singleton.Allocate(stSize);
         NiAGDDataStream* pkEntries = nullptr;
         if (pvMemory) {
-            rt::eh_vector_constructor_iterator(
-                pvMemory, sizeof(NiAGDDataStream), static_cast<int32_t>(uiCount),
-                &xfnv::constructElement<NiAdditionalGeometryData::NiAGDDataStream>
-            );
-            pkEntries = static_cast<NiAGDDataStream*>(pvMemory);
+            pkEntries = ::new (pvMemory) NiAGDDataStream[uiCount];
         }
         m_pkDataStreamEntries = pkEntries;
         for (uint32_t i = 0; i < m_uiDataStreamCount; i++) {
@@ -894,10 +889,7 @@ void NiAdditionalGeometryData::SetDataStreamCount(uint32_t uiCount) {
         ));
     NiAdditionalGeometryData::NiAGDDataStream* v5 = v4;
     if (v4) {
-        rt::eh_vector_constructor_iterator(
-            v4, sizeof(NiAGDDataStream), static_cast<int32_t>(uiCount),
-            &xfnv::constructElement<NiAdditionalGeometryData::NiAGDDataStream>
-        );
+        ::new (static_cast<void*>(v4)) NiAdditionalGeometryData::NiAGDDataStream[uiCount];
     }
     else {
         v5 = nullptr;

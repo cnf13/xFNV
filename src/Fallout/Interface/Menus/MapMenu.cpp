@@ -2785,10 +2785,7 @@ void MapMenu::RenderLocalMapGrid(bool abSaveToDisk) {
             int32_t inumVerts_5 = inumVerts;
             void* v76 = ourMalloc(inumVerts <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * inumVerts : SIZE_MAX);
             if (v76) {
-                rt::eh_vector_constructor_iterator(
-                    v76, sizeof(NiColorA), inumVerts_5, &xfnv::constructElement<NiColorA>
-                );
-                pcolor = static_cast<NiColorA*>(v76);
+                pcolor = ::new (v76) NiColorA[inumVerts_5];
             }
             else {
                 pcolor = nullptr;

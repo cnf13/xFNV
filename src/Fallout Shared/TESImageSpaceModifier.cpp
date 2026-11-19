@@ -100,7 +100,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
@@ -178,11 +177,7 @@ void TESImageSpaceModifier::InitializeData() {
             pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
             if (pMemory) {
                 *static_cast<size_t*>(pMemory) = 2;
-                rt::eh_vector_constructor_iterator(
-                    static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-                    &xfnv::destructElement<NiLinFloatKey>
-                );
-                pppFloatKey[i][j] = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                pppFloatKey[i][j] = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
             }
             else {
                 pppFloatKey[i][j] = nullptr;
@@ -199,11 +194,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinColorKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinColorKey), 2, &xfnv::constructElement<NiLinColorKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pTintColorKey = reinterpret_cast<NiLinColorKey*>(static_cast<size_t*>(pMemory) + 1);
+        pTintColorKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinColorKey[2];
     }
     else {
         pTintColorKey = nullptr;
@@ -219,11 +210,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinColorKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinColorKey), 2, &xfnv::constructElement<NiLinColorKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pFadeColorKey = reinterpret_cast<NiLinColorKey*>(static_cast<size_t*>(pMemory) + 1);
+        pFadeColorKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinColorKey[2];
     }
     else {
         pFadeColorKey = nullptr;
@@ -239,11 +226,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pBlurFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pBlurFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pBlurFloatKey = nullptr;
@@ -258,11 +241,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDoubleFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDoubleFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pDoubleFloatKey = nullptr;
@@ -277,11 +256,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurStrengthFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pRadialBlurStrengthFloatKey = nullptr;
@@ -298,11 +273,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurRampupFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurRampupFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pRadialBlurRampupFloatKey = nullptr;
@@ -319,11 +290,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurStartFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurStartFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pRadialBlurStartFloatKey = nullptr;
@@ -340,11 +307,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurRampDownFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurRampDownFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pRadialBlurRampDownFloatKey = nullptr;
@@ -361,11 +324,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurDownStartFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurDownStartFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pRadialBlurDownStartFloatKey = nullptr;
@@ -382,11 +341,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDepthOfFieldStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDepthOfFieldStrengthFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pDepthOfFieldStrengthFloatKey = nullptr;
@@ -403,11 +358,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDepthOfFieldDistanceFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDepthOfFieldDistanceFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pDepthOfFieldDistanceFloatKey = nullptr;
@@ -424,11 +375,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDepthOfFieldRangeFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDepthOfFieldRangeFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pDepthOfFieldRangeFloatKey = nullptr;
@@ -445,11 +392,7 @@ void TESImageSpaceModifier::InitializeData() {
     pMemory = ourMalloc(2 * sizeof(NiLinFloatKey) + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = 2;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), 2, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pMotionBlurStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pMotionBlurStrengthFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[2];
     }
     else {
         pMotionBlurStrengthFloatKey = nullptr;
@@ -545,11 +488,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pBlurFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pBlurFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pBlurFloatKey = nullptr;
@@ -571,11 +511,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pDoubleFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pDoubleFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pDoubleFloatKey = nullptr;
@@ -597,11 +534,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pRadialBlurStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pRadialBlurStrengthFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pRadialBlurStrengthFloatKey = nullptr;
@@ -625,11 +559,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pRadialBlurRampupFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pRadialBlurRampupFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pRadialBlurRampupFloatKey = nullptr;
@@ -651,11 +582,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pRadialBlurStartFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pRadialBlurStartFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pRadialBlurStartFloatKey = nullptr;
@@ -677,11 +605,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pRadialBlurRampDownFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pRadialBlurRampDownFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pRadialBlurRampDownFloatKey = nullptr;
@@ -705,11 +630,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pRadialBlurDownStartFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pRadialBlurDownStartFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pRadialBlurDownStartFloatKey = nullptr;
@@ -733,11 +655,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinColorKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinColorKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pTintColorKey = reinterpret_cast<NiLinColorKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pTintColorKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinColorKey[uiNumKeys];
                 }
                 else {
                     pTintColorKey = nullptr;
@@ -759,11 +678,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinColorKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinColorKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pFadeColorKey = reinterpret_cast<NiLinColorKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pFadeColorKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinColorKey[uiNumKeys];
                 }
                 else {
                     pFadeColorKey = nullptr;
@@ -785,11 +701,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pDepthOfFieldStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pDepthOfFieldStrengthFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pDepthOfFieldStrengthFloatKey = nullptr;
@@ -813,11 +726,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pDepthOfFieldDistanceFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pDepthOfFieldDistanceFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pDepthOfFieldDistanceFloatKey = nullptr;
@@ -841,11 +751,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pDepthOfFieldRangeFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pDepthOfFieldRangeFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pDepthOfFieldRangeFloatKey = nullptr;
@@ -869,11 +776,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                 if (pMemory) {
                     *static_cast<size_t*>(pMemory) = uiNumKeys;
-                    rt::eh_vector_constructor_iterator(
-                        static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                        &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                    );
-                    pMotionBlurStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                    pMotionBlurStrengthFloatKey =
+                        ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                 }
                 else {
                     pMotionBlurStrengthFloatKey = nullptr;
@@ -901,12 +805,8 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                     void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
                     if (pMemory) {
                         *static_cast<size_t*>(pMemory) = uiNumKeys;
-                        rt::eh_vector_constructor_iterator(
-                            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                            &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                        );
                         pppFloatKey[uiIndex][uiOp] =
-                            reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
                     }
                     else {
                         pppFloatKey[uiIndex][uiOp] = nullptr;
@@ -1144,9 +1044,9 @@ void TESImageSpaceModifier::InitItem() {
     SetInitialized(true);
 }
 
-// Each key array is a new[] of the source's key count, as Load builds it (the count ahead of the keys, then the
-// constructor iterator), filled from the source's keys and handed to its interpolator. The new[] block is raw memory:
-// the keys start one count in, hence the reinterpret_casts.
+// Each key array is a new[] of the source's key count, as Load builds it (the count ahead of the keys, then the keys),
+// filled from the source's keys and handed to its interpolator. The new[] block is raw memory: the keys start one
+// count in.
 void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     TESImageSpaceModifier* pCopy = dynamic_cast<TESImageSpaceModifier*>(apCopy);
     if (!pCopy) {
@@ -1164,11 +1064,7 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     void* pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pBlurFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pBlurFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pBlurFloatKey = nullptr;
@@ -1181,11 +1077,7 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDoubleFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDoubleFloatKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pDoubleFloatKey = nullptr;
@@ -1198,11 +1090,7 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinColorKey), uiNumKeys, &xfnv::constructElement<NiLinColorKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pTintColorKey = reinterpret_cast<NiLinColorKey*>(static_cast<size_t*>(pMemory) + 1);
+        pTintColorKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinColorKey[uiNumKeys];
     }
     else {
         pTintColorKey = nullptr;
@@ -1215,11 +1103,7 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinColorKey), uiNumKeys, &xfnv::constructElement<NiLinColorKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pFadeColorKey = reinterpret_cast<NiLinColorKey*>(static_cast<size_t*>(pMemory) + 1);
+        pFadeColorKey = ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinColorKey[uiNumKeys];
     }
     else {
         pFadeColorKey = nullptr;
@@ -1232,11 +1116,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurStrengthFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pRadialBlurStrengthFloatKey = nullptr;
@@ -1249,11 +1130,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurRampupFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurRampupFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pRadialBlurRampupFloatKey = nullptr;
@@ -1266,11 +1144,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurStartFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurStartFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pRadialBlurStartFloatKey = nullptr;
@@ -1283,11 +1158,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurRampDownFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurRampDownFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pRadialBlurRampDownFloatKey = nullptr;
@@ -1300,11 +1172,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pRadialBlurDownStartFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pRadialBlurDownStartFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pRadialBlurDownStartFloatKey = nullptr;
@@ -1317,11 +1186,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDepthOfFieldStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDepthOfFieldStrengthFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pDepthOfFieldStrengthFloatKey = nullptr;
@@ -1334,11 +1200,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDepthOfFieldDistanceFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDepthOfFieldDistanceFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pDepthOfFieldDistanceFloatKey = nullptr;
@@ -1351,11 +1214,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pDepthOfFieldRangeFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pDepthOfFieldRangeFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pDepthOfFieldRangeFloatKey = nullptr;
@@ -1368,11 +1228,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
     pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
     if (pMemory) {
         *static_cast<size_t*>(pMemory) = uiNumKeys;
-        rt::eh_vector_constructor_iterator(
-            static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys, &xfnv::constructElement<NiLinFloatKey>,
-            &xfnv::destructElement<NiLinFloatKey>
-        );
-        pMotionBlurStrengthFloatKey = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+        pMotionBlurStrengthFloatKey =
+            ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
     }
     else {
         pMotionBlurStrengthFloatKey = nullptr;
@@ -1387,11 +1244,8 @@ void TESImageSpaceModifier::Copy(TESForm* apCopy) {
             pMemory = ourMalloc(uiBytes > 0xFFFFFFFBu ? 0xFFFFFFFFu : uiBytes + sizeof(size_t));
             if (pMemory) {
                 *static_cast<size_t*>(pMemory) = uiNumKeys;
-                rt::eh_vector_constructor_iterator(
-                    static_cast<size_t*>(pMemory) + 1, sizeof(NiLinFloatKey), uiNumKeys,
-                    &xfnv::constructElement<NiLinFloatKey>, &xfnv::destructElement<NiLinFloatKey>
-                );
-                pppFloatKey[i][j] = reinterpret_cast<NiLinFloatKey*>(static_cast<size_t*>(pMemory) + 1);
+                pppFloatKey[i][j] =
+                    ::new (static_cast<void*>(static_cast<size_t*>(pMemory) + 1)) NiLinFloatKey[uiNumKeys];
             }
             else {
                 pppFloatKey[i][j] = nullptr;

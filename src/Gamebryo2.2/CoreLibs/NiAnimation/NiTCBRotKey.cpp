@@ -19,7 +19,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
@@ -178,11 +177,7 @@ NiAnimationKey* NiTCBRotKey::CreateArray(uint32_t uiNumKeys) {
         return nullptr;
     }
     *puiCookie = uiNumKeys;
-    NiTCBRotKey* pkKeys = reinterpret_cast<NiTCBRotKey*>(puiCookie + 1);
-    rt::eh_vector_constructor_iterator(
-        pkKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNumKeys), &xfnv::constructElement<NiBezRotKey>
-    );
-    return pkKeys;
+    return ::new (static_cast<void*>(puiCookie + 1)) NiTCBRotKey[static_cast<int32_t>(uiNumKeys)];
 }
 
 // Allocates NiNew NiTCBRotKey[uiNumKeys + 1] and releases the old array with NiDelete[] by hand: through MemoryManager,
@@ -201,10 +196,7 @@ bool NiTCBRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKe
     NiTCBRotKey* pkNewKeys;
     if (puiCookie) {
         *puiCookie = uiNewNumKeys;
-        pkNewKeys = reinterpret_cast<NiTCBRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNewNumKeys), &xfnv::constructElement<NiBezRotKey>
-        );
+        pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiTCBRotKey[static_cast<int32_t>(uiNewNumKeys)];
     }
     else {
         pkNewKeys = nullptr;
@@ -240,10 +232,7 @@ NiAnimationKey* NiTCBRotKey::CreateFromStream(NiStream& kStream, uint32_t uiNumK
     NiTCBRotKey* pkKeys;
     if (puiCookie) {
         *puiCookie = uiNumKeys;
-        pkKeys = reinterpret_cast<NiTCBRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkKeys, sizeof(NiTCBRotKey), static_cast<int32_t>(uiNumKeys), &xfnv::constructElement<NiBezRotKey>
-        );
+        pkKeys = ::new (static_cast<void*>(puiCookie + 1)) NiTCBRotKey[static_cast<int32_t>(uiNumKeys)];
     }
     else {
         pkKeys = nullptr;

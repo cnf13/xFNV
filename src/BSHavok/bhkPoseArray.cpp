@@ -11,7 +11,6 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaSkeleton.h"
 #include "Havok/Source/Common/Base/Math/QsTransform/hkQsTransform.h"
-#include "SDK/MSVC/ehvec.h"
 
 NiRTTI bhkPoseArray::ms_RTTI("bhkPoseArray", &NiObject::ms_RTTI);
 
@@ -68,13 +67,9 @@ void bhkPoseArray::LoadBinary(NiStream& arStream) {
         NiFixedString* pBoneNames = nullptr;
         if (puiHeader != nullptr) {
             *puiHeader = uiNameCount;
-            // The allocation is raw memory laid out as new[] lays it out: the count, then the names, which the iterator
-            // constructs in place; Destruct reads the same layout back.
-            pBoneNames = reinterpret_cast<NiFixedString*>(puiHeader + 1);
-            rt::eh_vector_constructor_iterator(
-                pBoneNames, sizeof(NiFixedString), static_cast<int32_t>(uiNameCount),
-                &xfnv::constructElement<NiFixedString>, &xfnv::destructElement<NiFixedString>
-            );
+            // The allocation is raw memory laid out as new[] lays it out: the count, then the names, constructed in
+            // place; Destruct reads the same layout back.
+            pBoneNames = ::new (static_cast<void*>(puiHeader + 1)) NiFixedString[static_cast<int32_t>(uiNameCount)];
         }
         BoneNameA = pBoneNames;
     }

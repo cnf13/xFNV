@@ -40,7 +40,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
-#include "SDK/MSVC/ehvec.h"
 
 NiRTTI BSShaderPPLightingProperty::ms_RTTI("BSShaderPPLightingProperty", &BSShaderLightingProperty::ms_RTTI);
 
@@ -830,10 +829,9 @@ void BSShaderPPLightingProperty::CopyToMembers(BSShaderPPLightingProperty* pDest
         for (uint32_t i = 0; i < 6; ++i) {
             NiPointer<NiTexture>* pOld = pDest->spTextures[i];
             if (pOld) {
-                rt::eh_vector_destructor_iterator(
-                    pOld, sizeof(NiPointer<NiTexture>), static_cast<int32_t>(reinterpret_cast<size_t*>(pOld)[-1]),
-                    &xfnv::destructElement<NiPointer<NiRefObject>>
-                );
+                for (int32_t iItem = static_cast<int32_t>(reinterpret_cast<size_t*>(pOld)[-1]); iItem-- > 0;) {
+                    pOld[iItem].~NiPointer<NiTexture>();
+                }
                 MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pOld) - 1);
             }
             const uint32_t uiCount = iTextureCount;
@@ -843,11 +841,7 @@ void BSShaderPPLightingProperty::CopyToMembers(BSShaderPPLightingProperty* pDest
             NiPointer<NiTexture>* pNew = nullptr;
             if (piBlock) {
                 piBlock[0] = static_cast<int32_t>(uiCount);
-                pNew = reinterpret_cast<NiPointer<NiTexture>*>(piBlock + 1);
-                rt::eh_vector_constructor_iterator(
-                    pNew, sizeof(NiPointer<NiTexture>), static_cast<int32_t>(uiCount),
-                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
-                );
+                pNew = ::new (static_cast<void*>(piBlock + 1)) NiPointer<NiTexture>[static_cast<int32_t>(uiCount)];
             }
             pDest->spTextures[i] = pNew;
         }
@@ -1204,11 +1198,7 @@ void BSShaderPPLightingProperty::FillTextureArray() {
         if (pBlock) {
             // new[]'s cookie: the element count stored just before the array.
             pBlock[0] = 10;
-            pNew = reinterpret_cast<NiPointer<NiTexture>*>(pBlock + 1);
-            rt::eh_vector_constructor_iterator(
-                pNew, sizeof(NiPointer<NiTexture>), 10, &xfnv::constructElement<NiPointer<NiRefObject>>,
-                &xfnv::destructElement<NiPointer<NiRefObject>>
-            );
+            pNew = ::new (static_cast<void*>(pBlock + 1)) NiPointer<NiTexture>[10];
         }
         aspNewTextures[i] = pNew;
         for (int32_t j = 0; j < iTextureCount; ++j) {
@@ -1224,10 +1214,9 @@ void BSShaderPPLightingProperty::FillTextureArray() {
         if (pOld) {
             // The element count comes from the new[] cookie stored before the elements, which is read as untyped
             // memory.
-            rt::eh_vector_destructor_iterator(
-                pOld, sizeof(NiPointer<NiTexture>), static_cast<int32_t>(reinterpret_cast<size_t*>(pOld)[-1]),
-                &xfnv::destructElement<NiPointer<NiRefObject>>
-            );
+            for (int32_t iItem = static_cast<int32_t>(reinterpret_cast<size_t*>(pOld)[-1]); iItem-- > 0;) {
+                pOld[iItem].~NiPointer<NiTexture>();
+            }
             MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pOld) - 1);
         }
         spTextures[i] = aspNewTextures[i];

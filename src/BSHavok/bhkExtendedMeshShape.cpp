@@ -23,7 +23,6 @@
 #include "Havok/Source/Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Collection/Mesh/hkpMeshMaterial.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
-#include "SDK/MSVC/ehvec.h"
 
 #include <xmmintrin.h>
 
@@ -190,12 +189,8 @@ void bhkExtendedMeshShapeData::LoadBinary(NiStream& arStream) {
     bhkExtendedMeshSubPart* pEntries;
     if (puiCookie) {
         *puiCookie = uiCount;
-        // The entries follow the count in the untyped block; the constructor iterator builds them there.
-        pEntries = reinterpret_cast<bhkExtendedMeshSubPart*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pEntries, sizeof(bhkExtendedMeshSubPart), uiCount, &xfnv::constructElement<bhkExtendedMeshSubPart>,
-            &xfnv::destructElement<bhkExtendedMeshSubPart>
-        );
+        // The entries follow the count in the untyped block.
+        pEntries = ::new (static_cast<void*>(puiCookie + 1)) bhkExtendedMeshSubPart[uiCount];
     }
     else {
         pEntries = nullptr;
@@ -563,11 +558,7 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
     bhkExtendedMeshSubPart* pParts = nullptr;
     if (pCount) {
         *pCount = uiNumParts;
-        pParts = reinterpret_cast<bhkExtendedMeshSubPart*>(pCount + 1);
-        rt::eh_vector_constructor_iterator(
-            pParts, sizeof(bhkExtendedMeshSubPart), static_cast<int32_t>(uiNumParts),
-            &xfnv::constructElement<bhkExtendedMeshSubPart>, &xfnv::destructElement<bhkExtendedMeshSubPart>
-        );
+        pParts = ::new (static_cast<void*>(pCount + 1)) bhkExtendedMeshSubPart[static_cast<int32_t>(uiNumParts)];
     }
     pdata->pSubDataA = pParts;
     pdata->uiNumSubParts = pSrcData->usPartCount;

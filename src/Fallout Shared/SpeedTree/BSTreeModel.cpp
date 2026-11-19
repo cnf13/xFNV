@@ -1121,11 +1121,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             if (pDataBlock) {
                 // new[]'s cookie: the element count stored just before the array.
                 pDataBlock[0] = slevels;
-                pNewData = reinterpret_cast<NiPointer<NiTriStripsData>*>(pDataBlock + 1);
-                rt::eh_vector_constructor_iterator(
-                    pNewData, sizeof(NiPointer<NiTriStripsData>), slevels,
-                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
-                );
+                pNewData = ::new (static_cast<void*>(pDataBlock + 1)) NiPointer<NiTriStripsData>[slevels];
             }
             pspBranchData = pNewData;
             NiPointer<SpeedTreeBranchShaderProperty>* pNewProperties = nullptr;
@@ -1135,11 +1131,8 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             if (pPropertyBlock) {
                 // new[]'s cookie: the element count stored just before the array.
                 pPropertyBlock[0] = slevels;
-                pNewProperties = reinterpret_cast<NiPointer<SpeedTreeBranchShaderProperty>*>(pPropertyBlock + 1);
-                rt::eh_vector_constructor_iterator(
-                    pNewProperties, sizeof(NiPointer<SpeedTreeBranchShaderProperty>), slevels,
-                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
-                );
+                pNewProperties =
+                    ::new (static_cast<void*>(pPropertyBlock + 1)) NiPointer<SpeedTreeBranchShaderProperty>[slevels];
             }
             pspBranchShaderProperties = pNewProperties;
             for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
@@ -1166,11 +1159,7 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             if (pDataBlock) {
                 // new[]'s cookie: the element count stored just before the array.
                 pDataBlock[0] = slevels;
-                pNewData = reinterpret_cast<NiPointer<NiTriShapeData>*>(pDataBlock + 1);
-                rt::eh_vector_constructor_iterator(
-                    pNewData, sizeof(NiPointer<NiTriShapeData>), slevels,
-                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
-                );
+                pNewData = ::new (static_cast<void*>(pDataBlock + 1)) NiPointer<NiTriShapeData>[slevels];
             }
             pspLeafData = pNewData;
             NiPointer<SpeedTreeLeafShaderProperty>* pNewProperties = nullptr;
@@ -1180,11 +1169,8 @@ bool BSTreeModel::InitAsInstance(BSTreeModel* apInstanceFrom) {
             if (pPropertyBlock) {
                 // new[]'s cookie: the element count stored just before the array.
                 pPropertyBlock[0] = slevels;
-                pNewProperties = reinterpret_cast<NiPointer<SpeedTreeLeafShaderProperty>*>(pPropertyBlock + 1);
-                rt::eh_vector_constructor_iterator(
-                    pNewProperties, sizeof(NiPointer<SpeedTreeLeafShaderProperty>), slevels,
-                    &xfnv::constructElement<NiPointer<NiRefObject>>, &xfnv::destructElement<NiPointer<NiRefObject>>
-                );
+                pNewProperties =
+                    ::new (static_cast<void*>(pPropertyBlock + 1)) NiPointer<SpeedTreeLeafShaderProperty>[slevels];
             }
             pspLeafShaderProperties = pNewProperties;
             for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {

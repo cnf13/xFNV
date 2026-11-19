@@ -44,8 +44,7 @@ NiGeometry* MakeRectangle(float afDrawSize, NiColorA* aColor, bool abWithNoLight
     }
     void* v22 = ourMalloc(4 * sizeof(NiColorA));
     if (v22) {
-        rt::eh_vector_constructor_iterator(v22, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
-        plineclrs = static_cast<NiColorA*>(v22);
+        plineclrs = ::new (v22) NiColorA[4];
     }
     else {
         plineclrs = nullptr;

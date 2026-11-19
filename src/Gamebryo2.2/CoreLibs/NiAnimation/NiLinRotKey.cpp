@@ -8,7 +8,6 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiStepPosKey.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
@@ -25,9 +24,7 @@ NiAnimationKey* NiLinRotKey::CreateArray(uint32_t uiNumKeys) {
         return nullptr;
     }
     *puiCookie = uiNumKeys;
-    NiLinRotKey* pkKeys = reinterpret_cast<NiLinRotKey*>(puiCookie + 1);
-    rt::eh_vector_constructor_iterator(pkKeys, sizeof(NiLinRotKey), uiNumKeys, &xfnv::constructElement<NiBezRotKey>);
-    return pkKeys;
+    return ::new (static_cast<void*>(puiCookie + 1)) NiLinRotKey[uiNumKeys];
 }
 
 void NiLinRotKey::Interpolate(float fTime, const NiAnimationKey* pKey0, const NiAnimationKey* pKey1, void* pResult) {
@@ -46,10 +43,7 @@ NiAnimationKey* NiLinRotKey::CreateFromStream(NiStream& stream, uint32_t uiNumKe
     NiLinRotKey* pkLinRotKeys;
     if (puiCookie) {
         *puiCookie = uiNumKeys;
-        pkLinRotKeys = reinterpret_cast<NiLinRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkLinRotKeys, sizeof(NiLinRotKey), uiNumKeys, &xfnv::constructElement<NiBezRotKey>
-        );
+        pkLinRotKeys = ::new (static_cast<void*>(puiCookie + 1)) NiLinRotKey[uiNumKeys];
     }
     else {
         pkLinRotKeys = nullptr;
@@ -78,10 +72,7 @@ bool NiLinRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKe
     NiLinRotKey* pkNewKeys;
     if (puiCookie) {
         *puiCookie = uiNewNumKeys;
-        pkNewKeys = reinterpret_cast<NiLinRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiLinRotKey), uiNewNumKeys, &xfnv::constructElement<NiBezRotKey>
-        );
+        pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiLinRotKey[uiNewNumKeys];
     }
     else {
         pkNewKeys = nullptr;

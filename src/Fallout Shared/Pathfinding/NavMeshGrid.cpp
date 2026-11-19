@@ -100,7 +100,9 @@ void NavMeshGrid::GetTriangleDataForAABB(
         }
     }
     if (!apReturnArray->IsEmpty()) {
-        apReturnArray->Sort(&xfnv::callFunction<&CompareUShort>);
+        apReturnArray->Sort([](const void* apOne, const void* apTwo) {
+            return CompareUShort(static_cast<const uint16_t*>(apOne), static_cast<const uint16_t*>(apTwo));
+        });
         indicesToRemove_t indicesToRemove;
         for (uint32_t i_2 = 0;; ++i_2) {
             uint32_t FormFlags = apReturnArray->iSize;

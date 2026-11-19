@@ -2022,8 +2022,7 @@ bool Cmd_ShowPivot(
         }
         void* v44 = ourMalloc(6 * sizeof(NiColorA));
         if (v44) {
-            rt::eh_vector_constructor_iterator(v44, sizeof(NiColorA), 6, &xfnv::constructElement<NiColorA>);
-            pkColor = static_cast<NiColorA*>(v44);
+            pkColor = ::new (v44) NiColorA[6];
         }
         else {
             pkColor = nullptr;
@@ -4371,7 +4370,6 @@ bool Cmd_NonDefault_Parse(
         if (a5) {
             SCRIPT_WORD aButtons[10];
             int32_t v12 = 0;
-            rt::eh_vector_constructor_iterator(aButtons, sizeof(SCRIPT_WORD), 10, &xfnv::constructElement<SCRIPT_WORD>);
             do {
                 aCount = ScriptCompiler::GetNextWord(
                     apCompileData, &aButtons[v12], apScriptLine->pLine, apScriptLine->uiOffset, false, false
@@ -12036,11 +12034,7 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
         size_t* pCookie = static_cast<size_t*>(ourMalloc(sizeof(size_t) + sizeof(FR2MatrixVTC<float>[2][2])));
         if (pCookie) {
             *pCookie = 4;
-            rt::eh_vector_constructor_iterator(
-                &pCookie[1], sizeof(FR2MatrixVTC<float>), 4, &xfnv::constructElement<FR2MatrixVTC<float>>,
-                &xfnv::destructElement<FR2MatrixVTC<float>>
-            );
-            pNewCoord = reinterpret_cast<FR2MatrixVTC<float>(*)[2][2]>(&pCookie[1]);
+            pNewCoord = ::new (static_cast<void*>(&pCookie[1])) FR2MatrixVTC<float>[1][2][2];
         }
         else {
             pNewCoord = nullptr;
@@ -17860,8 +17854,7 @@ bool Script::TestLocalMap(
         int32_t iarraysize_5 = iarraysize;
         void* v63 = ourMalloc(iarraysize <= SIZE_MAX / sizeof(NiColorA) ? sizeof(NiColorA) * iarraysize : SIZE_MAX);
         if (v63) {
-            rt::eh_vector_constructor_iterator(v63, sizeof(NiColorA), iarraysize_5, &xfnv::constructElement<NiColorA>);
-            pcolor = static_cast<NiColorA*>(v63);
+            pcolor = ::new (v63) NiColorA[iarraysize_5];
         }
         else {
             pcolor = nullptr;

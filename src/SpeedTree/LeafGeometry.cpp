@@ -518,12 +518,7 @@ void CLeafGeometry::InitLods(
             // Array cookie: the element count, before the elements.
             size_t* pCookie = static_cast<size_t*>(pMemory);
             *pCookie = uiCount;
-            rt::eh_vector_constructor_iterator(
-                pCookie + 1, sizeof(SLodGeometry), static_cast<int32_t>(uiCount),
-                &xfnv::constructElement<CLeafGeometry::SLodGeometry>,
-                &xfnv::destructElement<CLeafGeometry::SLodGeometry>
-            );
-            pLods = static_cast<SLodGeometry*>(static_cast<void*>(pCookie + 1));
+            pLods = ::new (static_cast<void*>(pCookie + 1)) SLodGeometry[static_cast<int32_t>(uiCount)];
         }
         else {
             pLods = nullptr;

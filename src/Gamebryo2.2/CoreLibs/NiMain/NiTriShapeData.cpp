@@ -93,10 +93,7 @@ void NiTriShapeData::LoadBinary(NiStream& kStream) {
         MemoryManager_Singleton.Allocate(sizeof(SharedNormalArray) * m_usSharedNormalsArraySize)
     );
     if (pkArrays) {
-        rt::eh_vector_constructor_iterator(
-            pkArrays, sizeof(SharedNormalArray), m_usSharedNormalsArraySize,
-            &xfnv::constructElement<NiTriShapeData::SharedNormalArray>
-        );
+        ::new (static_cast<void*>(pkArrays)) SharedNormalArray[m_usSharedNormalsArraySize];
     }
     m_pkSharedNormals = pkArrays;
 

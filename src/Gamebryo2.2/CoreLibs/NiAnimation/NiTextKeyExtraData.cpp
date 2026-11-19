@@ -59,7 +59,9 @@ void NiTextKeyExtraData::LoadBinary(NiStream& stream) {
     if (puiCookie) {
         pKeys = reinterpret_cast<NiTextKey*>(puiCookie + 1);
         *puiCookie = uiNumKeys;
-        rt::eh_vector_constructor_iterator(pKeys, sizeof(NiTextKey), uiNumKeys, &xfnv::constructElement<NiTextKey>);
+        for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiNumKeys); ++iItem) {
+            ::new (static_cast<void*>(pKeys + iItem)) NiTextKey;
+        }
     }
     for (uint32_t i = 0; i < uiNumKeys; i++) {
         pKeys[i].LoadBinary(stream);
@@ -161,7 +163,9 @@ void NiTextKeyExtraData::CopyMembers(NiTextKeyExtraData* pDest, NiCloningProcess
         if (puiCookie) {
             pKeys = reinterpret_cast<NiTextKey*>(puiCookie + 1);
             *puiCookie = uiNumKeys;
-            rt::eh_vector_constructor_iterator(pKeys, sizeof(NiTextKey), uiNumKeys, &xfnv::constructElement<NiTextKey>);
+            for (int32_t iItem = 0; iItem < static_cast<int32_t>(uiNumKeys); ++iItem) {
+                ::new (static_cast<void*>(pKeys + iItem)) NiTextKey;
+            }
         }
         uint32_t uiI = 0;
         for (pDest->m_pKeys = pKeys; uiI < this->m_uiNumKeys; ++uiI) {

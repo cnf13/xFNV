@@ -25,7 +25,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 
 #include <cstdint>
@@ -294,9 +293,7 @@ void NiScreenGeometryData::LoadBinary(NiStream& kStream) {
         if (ucColors) {
             NiColorA* pkNewColors = NewArray<NiColorA>(usNumVerts);
             if (pkNewColors) {
-                rt::eh_vector_constructor_iterator(
-                    pkNewColors, sizeof(NiColorA), usNumVerts, &xfnv::constructElement<NiColorA>
-                );
+                ::new (static_cast<void*>(pkNewColors)) NiColorA[usNumVerts];
                 pkColors = pkNewColors;
             }
             else {
@@ -497,13 +494,12 @@ NiScreenGeometryData::ScreenElement* AllocateScreenElements(uint32_t uiCount) {
         return nullptr;
     }
     *puiCookie = uiCount;
-    // The untyped block after the cookie, where the constructor iterator builds the elements.
+    // The untyped block after the cookie, where the elements are built.
     NiScreenGeometryData::ScreenElement* pkArray =
         reinterpret_cast<NiScreenGeometryData::ScreenElement*>(puiCookie + 1);
-    rt::eh_vector_constructor_iterator(
-        pkArray, sizeof(NiScreenGeometryData::ScreenElement), static_cast<int32_t>(uiCount),
-        &xfnv::constructElement<NiScreenGeometryData::ScreenElement>
-    );
+    for (int32_t i = 0; i < static_cast<int32_t>(uiCount); ++i) {
+        ::new (static_cast<void*>(pkArray + i)) NiScreenGeometryData::ScreenElement;
+    }
     return pkArray;
 }
 

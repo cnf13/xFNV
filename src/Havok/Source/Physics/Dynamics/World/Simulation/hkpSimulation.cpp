@@ -388,7 +388,11 @@ void hkpSimulation::resetCollisionInformationForEntities(
     if (resetInfo & RESET_TIM) {
         processAgentsOfEntities(
             entities, numEntities, *world->m_collisionInput,
-            &xfnv::callMember<&hkpSimulation::processAgentResetCollisionInformation>, FIND_CONTACTS_DEFAULT
+            [](hkpSimulation* simulation, hkpAgentNnEntry* entry, const hkpProcessCollisionInput& processInput,
+               hkpProcessCollisionOutput& processOutput) {
+                simulation->processAgentResetCollisionInformation(entry, processInput, processOutput);
+            },
+            FIND_CONTACTS_DEFAULT
         );
     }
     if (resetInfo & RESET_AABB) {
@@ -542,7 +546,12 @@ void hkpSimulation::collideEntitiesNarrowPhaseDiscrete(
     FindContacts findExtraContacts
 ) {
     processAgentsOfEntities(
-        entities, numEntities, input, &xfnv::callMember<&hkpSimulation::processAgentCollideDiscrete>, findExtraContacts
+        entities, numEntities, input,
+        [](hkpSimulation* simulation, hkpAgentNnEntry* entry, const hkpProcessCollisionInput& processInput,
+           hkpProcessCollisionOutput& processOutput) {
+            simulation->processAgentCollideDiscrete(entry, processInput, processOutput);
+        },
+        findExtraContacts
     );
 }
 

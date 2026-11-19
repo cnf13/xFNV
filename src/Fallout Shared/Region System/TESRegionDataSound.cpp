@@ -69,10 +69,7 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* a1) {
                     uicount <= SIZE_MAX / sizeof(TESRegionSound) ? sizeof(TESRegionSound) * uicount : SIZE_MAX
                 ));
                 if (tmpArray) {
-                    rt::eh_vector_constructor_iterator(
-                        tmpArray, sizeof(TESRegionSound), uicount, &xfnv::constructElement<TESRegionSound>
-                    );
-                    tmpArray_2 = tmpArray;
+                    tmpArray_2 = ::new (static_cast<void*>(tmpArray)) TESRegionSound[uicount];
                 }
                 else {
                     tmpArray_2 = nullptr;
@@ -186,11 +183,7 @@ void TESRegionDataSound::Save() {
             ourMalloc(uicount_2 <= SIZE_MAX / sizeof(TESRegionSound) ? sizeof(TESRegionSound) * uicount_2 : SIZE_MAX)
         );
         if (tmpArray) {
-            rt::eh_vector_constructor_iterator(
-                tmpArray, sizeof(TESRegionSound), static_cast<int32_t>(uicount_2),
-                &xfnv::constructElement<TESRegionSound>
-            );
-            tmpArray_2 = tmpArray;
+            tmpArray_2 = ::new (static_cast<void*>(tmpArray)) TESRegionSound[static_cast<int32_t>(uicount_2)];
         }
         else {
             tmpArray_2 = nullptr;

@@ -337,9 +337,9 @@ void BSTexturePalette::Init() {
     PathMap* pPathMap = static_cast<PathMap*>(MemoryManager_Singleton.Allocate(sizeof(PathMap)));
     if (pPathMap) {
         pPathMap->uiSize = 7;
-        rt::eh_vector_constructor_iterator(
-            pPathMap->kGroups, sizeof(BSTexMap), 7, &xfnv::callMember<&BSTexMap::Create>
-        );
+        rt::eh_vector_constructor_iterator(pPathMap->kGroups, sizeof(BSTexMap), 7, [](void* apMap) {
+            static_cast<BSTexMap*>(apMap)->Create();
+        });
         BSTexturePalette::pTexMap = pPathMap->kGroups;
         pTLSData->eMemContext = eMemContext;
     }

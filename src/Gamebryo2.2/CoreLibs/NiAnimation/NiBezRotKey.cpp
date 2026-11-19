@@ -7,15 +7,12 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiStepPosKey.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <bit>
 
-// Only the key's quaternion is zeroed.
-NiBezRotKey::NiBezRotKey() {
-    m_quat.SetValues(0.0f, 0.0f, 0.0f, 0.0f);
-}
+// NiRotKey's constructor zeroes the key's quaternion.
+NiBezRotKey::NiBezRotKey() {}
 
 void NiBezRotKey::Copy(NiAnimationKey* pkNewKey, const NiAnimationKey* pkOrigKey) {
     pkNewKey->m_fTime = pkOrigKey->m_fTime;
@@ -47,10 +44,7 @@ bool NiBezRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumKe
     NiBezRotKey* pkNewKeys;
     if (puiCookie) {
         *puiCookie = uiNewNumKeys;
-        pkNewKeys = reinterpret_cast<NiBezRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiBezRotKey), uiNewNumKeys, &xfnv::constructElement<NiBezRotKey>
-        );
+        pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiBezRotKey[uiNewNumKeys];
     }
     else {
         pkNewKeys = nullptr;
@@ -150,11 +144,8 @@ NiAnimationKey* NiBezRotKey::CreateArray(uint32_t uiNumKeys) {
         return nullptr;
     }
     // new[]'s block, treated as untyped raw memory: the count cookie, then the keys.
-    NiAnimationKey* v3 = reinterpret_cast<NiAnimationKey*>(v2 + 1);
     *v2 = uiNumKeys;
-    rt::eh_vector_constructor_iterator(
-        v2 + 1, sizeof(NiBezRotKey), static_cast<int32_t>(uiNumKeys), &xfnv::constructElement<NiBezRotKey>
-    );
+    NiAnimationKey* v3 = ::new (static_cast<void*>(v2 + 1)) NiBezRotKey[static_cast<int32_t>(uiNumKeys)];
     return v3;
 }
 
@@ -169,10 +160,7 @@ NiAnimationKey* NiBezRotKey::CreateFromStream(NiStream& stream, uint32_t uiNumKe
     NiBezRotKey* pkBezRotKeys;
     if (puiCookie) {
         *puiCookie = uiNumKeys;
-        pkBezRotKeys = reinterpret_cast<NiBezRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkBezRotKeys, sizeof(NiBezRotKey), uiNumKeys, &xfnv::constructElement<NiBezRotKey>
-        );
+        pkBezRotKeys = ::new (static_cast<void*>(puiCookie + 1)) NiBezRotKey[uiNumKeys];
     }
     else {
         pkBezRotKeys = nullptr;

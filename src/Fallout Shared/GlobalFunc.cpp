@@ -347,7 +347,7 @@ NiLines* MakeLine(
     pverts_2[1] = aEnd;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(2 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 2, &xfnv::constructElement<NiColorA>);
+        ::new (static_cast<void*>(pcolors)) NiColorA[2];
         pcolors_2 = pcolors;
     }
     else {
@@ -416,7 +416,7 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
     pverts[5] = *v8;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(6 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 6, &xfnv::constructElement<NiColorA>);
+        ::new (static_cast<void*>(pcolors)) NiColorA[6];
         pcolors_2 = pcolors;
     }
     else {
@@ -1946,7 +1946,7 @@ NiTriShape* MakeQuadBox(
     pverts_2[7] = aPoint8;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(8 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 8, &xfnv::constructElement<NiColorA>);
+        ::new (static_cast<void*>(pcolors)) NiColorA[8];
         pcolors_2 = pcolors;
     }
     else {
@@ -2075,7 +2075,7 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
     pverts_2[2] = aPt3;
     NiColorA* pcolors = static_cast<NiColorA*>(ourMalloc(3 * sizeof(NiColorA)));
     if (pcolors) {
-        rt::eh_vector_constructor_iterator(pcolors, sizeof(NiColorA), 3, &xfnv::constructElement<NiColorA>);
+        ::new (static_cast<void*>(pcolors)) NiColorA[3];
         pcolors_2 = pcolors;
     }
     else {

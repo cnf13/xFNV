@@ -53,7 +53,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiVector4.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 NiRTTI TallGrassShaderProperty::ms_RTTI("TallGrassShaderProperty", &BSShaderLightingProperty::ms_RTTI);
@@ -529,10 +528,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             void* pColorMemory =
                 MemoryManager_Singleton.Allocate(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
             if (pColorMemory) {
-                rt::eh_vector_constructor_iterator(
-                    pColorMemory, sizeof(NiColorA), uiTotalVertices, &xfnv::constructElement<NiColorA>
-                );
-                pkColor = static_cast<NiColorA*>(pColorMemory);
+                pkColor = ::new (pColorMemory) NiColorA[uiTotalVertices];
             }
             else {
                 pkColor = nullptr;
@@ -609,10 +605,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             void* pColorMemory =
                 MemoryManager_Singleton.Allocate(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
             if (pColorMemory) {
-                rt::eh_vector_constructor_iterator(
-                    pColorMemory, sizeof(NiColorA), uiTotalVertices, &xfnv::constructElement<NiColorA>
-                );
-                pkColor = static_cast<NiColorA*>(pColorMemory);
+                pkColor = ::new (pColorMemory) NiColorA[uiTotalVertices];
             }
             else {
                 pkColor = nullptr;

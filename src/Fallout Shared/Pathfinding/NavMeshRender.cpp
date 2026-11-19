@@ -377,11 +377,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             void* pEdgeColorMemory = ourMalloc(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
             NiColorA* pEdgeColors;
             if (pEdgeColorMemory) {
-                rt::eh_vector_constructor_iterator(
-                    pEdgeColorMemory, sizeof(NiColorA), static_cast<int32_t>(iEdgeCopy),
-                    &xfnv::constructElement<NiColorA>
-                );
-                pEdgeColors = static_cast<NiColorA*>(pEdgeColorMemory);
+                pEdgeColors = ::new (pEdgeColorMemory) NiColorA[static_cast<int32_t>(iEdgeCopy)];
             }
             else {
                 pEdgeColors = nullptr;
@@ -425,11 +421,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
                 void* pConColorMemory = ourMalloc(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
                 NiColorA* pConColors;
                 if (pConColorMemory) {
-                    rt::eh_vector_constructor_iterator(
-                        pConColorMemory, sizeof(NiColorA), static_cast<int32_t>(iConnectionCopy),
-                        &xfnv::constructElement<NiColorA>
-                    );
-                    pConColors = static_cast<NiColorA*>(pConColorMemory);
+                    pConColors = ::new (pConColorMemory) NiColorA[static_cast<int32_t>(iConnectionCopy)];
                 }
                 else {
                     pConColors = nullptr;
@@ -472,11 +464,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             void* pTriColorMemory = ourMalloc(ullBytes > UINT32_MAX ? size_t(-1) : size_t(ullBytes));
             NiColorA* pTriColors;
             if (pTriColorMemory) {
-                rt::eh_vector_constructor_iterator(
-                    pTriColorMemory, sizeof(NiColorA), static_cast<int32_t>(uiTotalSize),
-                    &xfnv::constructElement<NiColorA>
-                );
-                pTriColors = static_cast<NiColorA*>(pTriColorMemory);
+                pTriColors = ::new (pTriColorMemory) NiColorA[static_cast<int32_t>(uiTotalSize)];
             }
             else {
                 pTriColors = nullptr;

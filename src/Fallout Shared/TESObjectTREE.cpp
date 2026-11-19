@@ -563,8 +563,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
     ptext[3].y = v23;
     void* v42 = ourMalloc(4 * sizeof(NiColorA));
     if (v42) {
-        rt::eh_vector_constructor_iterator(v42, sizeof(NiColorA), 4, &xfnv::constructElement<NiColorA>);
-        pcol = static_cast<NiColorA*>(v42);
+        pcol = ::new (v42) NiColorA[4];
     }
     else {
         pcol = nullptr;

@@ -252,16 +252,22 @@ bool NiTGAReader::ReadHeader(
                     if (!m_bColormapped) {
                         goto LABEL_34;
                     }
-                    m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack4BitSourceRowPal>;
+                    m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                        pkReader->Unpack4BitSourceRowPal(pucSrc, pucDest);
+                    };
                     break;
                 }
                 case 8: {
                     m_uiBytesPerPixel = 1;
                     if (m_bColormapped) {
-                        m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack8BitSourceRowPal>;
+                        m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                            pkReader->Unpack8BitSourceRowPal(pucSrc, pucDest);
+                        };
                     }
                     else {
-                        m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack8BitSourceRowGray>;
+                        m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                            pkReader->Unpack8BitSourceRowGray(pucSrc, pucDest);
+                        };
                     }
                     break;
                 }
@@ -270,25 +276,35 @@ bool NiTGAReader::ReadHeader(
                     m_uiBytesPerPixel = 2;
                     if (m_bColormapped) {
                         if (m_ucCoSize == 32) {
-                            m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack16BitSourceRowIndexedAlpha>;
+                            m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                                pkReader->Unpack16BitSourceRowIndexedAlpha(pucSrc, pucDest);
+                            };
                         }
                         else {
-                            m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack16BitSourceRowIndexed>;
+                            m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                                pkReader->Unpack16BitSourceRowIndexed(pucSrc, pucDest);
+                            };
                         }
                     }
                     else {
-                        m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack16BitSourceRowRGB>;
+                        m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                            pkReader->Unpack16BitSourceRowRGB(pucSrc, pucDest);
+                        };
                     }
                     break;
                 }
                 case 24: {
                     m_uiBytesPerPixel = 3;
-                    m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack24BitSourceRow>;
+                    m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                        pkReader->Unpack24BitSourceRow(pucSrc, pucDest);
+                    };
                     break;
                 }
                 case 32: {
                     m_uiBytesPerPixel = 4;
-                    m_pfnUnpacker = &xfnv::callMember<&NiTGAReader::Unpack32BitSourceRow>;
+                    m_pfnUnpacker = [](NiTGAReader* pkReader, uint8_t* pucSrc, uint8_t* pucDest) {
+                        pkReader->Unpack32BitSourceRow(pucSrc, pucDest);
+                    };
                     break;
                 }
                 default: {

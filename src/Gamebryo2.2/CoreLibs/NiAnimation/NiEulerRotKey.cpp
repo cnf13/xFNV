@@ -8,12 +8,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 
 #include <cstdint>
 
 NiEulerRotKey::NiEulerRotKey() {
-    m_quat.SetValues(0.0f, 0.0f, 0.0f, 0.0f);
     m_uiNumKeys[0] = 0;
     m_uiNumKeys[1] = 0;
     m_uiNumKeys[2] = 0;
@@ -208,10 +206,7 @@ NiAnimationKey* NiEulerRotKey::CreateArray(uint32_t uiNumKeys) {
         return nullptr;
     }
     *puiCookie = uiNumKeys;
-    NiEulerRotKey* pkKeys = reinterpret_cast<NiEulerRotKey*>(puiCookie + 1);
-    rt::eh_vector_constructor_iterator(
-        pkKeys, sizeof(NiEulerRotKey), uiNumKeys, &xfnv::constructElement<NiEulerRotKey>
-    );
+    NiEulerRotKey* pkKeys = ::new (static_cast<void*>(puiCookie + 1)) NiEulerRotKey[uiNumKeys];
     return pkKeys;
 }
 
@@ -226,10 +221,7 @@ bool NiEulerRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNum
         NiEulerRotKey* pkNewKeys;
         if (puiCookie) {
             *puiCookie = 1;
-            pkNewKeys = reinterpret_cast<NiEulerRotKey*>(puiCookie + 1);
-            rt::eh_vector_constructor_iterator(
-                pkNewKeys, sizeof(NiEulerRotKey), 1, &xfnv::constructElement<NiEulerRotKey>
-            );
+            pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiEulerRotKey[1];
         }
         else {
             pkNewKeys = nullptr;
@@ -271,10 +263,7 @@ NiAnimationKey* NiEulerRotKey::CreateFromStream(NiStream& stream, uint32_t uiNum
     NiEulerRotKey* pkEulerRotKeys;
     if (puiCookie) {
         *puiCookie = uiNumKeys;
-        pkEulerRotKeys = reinterpret_cast<NiEulerRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkEulerRotKeys, sizeof(NiEulerRotKey), uiNumKeys, &xfnv::constructElement<NiEulerRotKey>
-        );
+        pkEulerRotKeys = ::new (static_cast<void*>(puiCookie + 1)) NiEulerRotKey[uiNumKeys];
     }
     else {
         pkEulerRotKeys = nullptr;

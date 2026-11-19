@@ -14,7 +14,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
@@ -37,10 +36,7 @@ bool NiStepRotKey::Insert(float fTime, NiAnimationKey*& pkKeys, uint32_t& uiNumK
     NiRotKey* pkNewKeys;
     if (puiCookie) {
         *puiCookie = uiNewNumKeys;
-        pkNewKeys = reinterpret_cast<NiRotKey*>(puiCookie + 1);
-        rt::eh_vector_constructor_iterator(
-            pkNewKeys, sizeof(NiRotKey), uiNewNumKeys, &xfnv::constructElement<NiBezRotKey>
-        );
+        pkNewKeys = ::new (static_cast<void*>(puiCookie + 1)) NiRotKey[uiNewNumKeys];
     }
     else {
         pkNewKeys = nullptr;

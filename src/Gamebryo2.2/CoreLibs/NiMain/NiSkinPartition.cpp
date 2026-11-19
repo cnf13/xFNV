@@ -35,7 +35,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Reconstruction.hpp"
-#include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
@@ -980,10 +979,9 @@ NiSkinPartition::CreateVertexInteractions(uint32_t uiVertices, const NiSkinData*
     if (pvMemory) {
         *static_cast<size_t*>(pvMemory) = uiVertices;
         pkVertexInteraction = reinterpret_cast<VertexInteractions*>(static_cast<size_t*>(pvMemory) + 1);
-        rt::eh_vector_constructor_iterator(
-            pkVertexInteraction, sizeof(VertexInteractions), static_cast<int32_t>(uiVertices),
-            &xfnv::constructElement<NiSkinPartition::VertexInteractions>
-        );
+        for (int32_t i = 0; i < static_cast<int32_t>(uiVertices); ++i) {
+            ::new (static_cast<void*>(pkVertexInteraction + i)) VertexInteractions;
+        }
     }
 
     uint32_t uiBones = pkSkinData->m_uiBones;
