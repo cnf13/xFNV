@@ -35,12 +35,7 @@ BSShaderBloodSplatterProperty::~BSShaderBloodSplatterProperty() {
 
 // Constructs an empty property, then copies the members into it.
 NiObject* BSShaderBloodSplatterProperty::CreateClone(NiCloningProcess& arCloneData) {
-    BSShaderBloodSplatterProperty* pClone =
-        static_cast<BSShaderBloodSplatterProperty*>(NiMemObject::operator new(sizeof(BSShaderBloodSplatterProperty)));
-    BSShaderBloodSplatterProperty* pResult = nullptr;
-    if (pClone) {
-        pResult = ::new (pClone) BSShaderBloodSplatterProperty;
-    }
+    BSShaderBloodSplatterProperty* pResult = new BSShaderBloodSplatterProperty;
     CopyMembers(pResult, arCloneData);
     return pResult;
 }

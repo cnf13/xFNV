@@ -51,10 +51,7 @@ NiObject* bhkSphereShape::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkSphereShape* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkSphereShape* pObject = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-    if (pObject) {
-        pClone = ::new (pObject) bhkSphereShape;
-    }
+    pClone = new bhkSphereShape;
     // CopyMembers is called through a base pointer so the call stays virtual.
     bhkShape* pThis = this;
     pThis->CopyMembers(pClone, arCloneData);
@@ -158,11 +155,7 @@ void bhkSphereShape::Init(float afRadius) {
 
 // The engine's factory for the class: a bare shape that has no creation info yet.
 NiObject* bhkSphereShape::CreateObject() {
-    bhkSphereShape* pObject = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-    if (pObject) {
-        return ::new (pObject) bhkSphereShape;
-    }
-    return nullptr;
+    return new bhkSphereShape;
 }
 
 hkSphereShapeCinfo::hkSphereShapeCinfo() {}

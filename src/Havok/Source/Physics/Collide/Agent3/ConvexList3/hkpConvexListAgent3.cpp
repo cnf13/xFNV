@@ -325,7 +325,7 @@ void hkpProcessCollisionOutputBackup::rollbackOutput(
 ) {
     if (output.m_toi.m_time.m_storage != m_toi.m_time.m_storage) {
         mgr->removeToi(*output.m_constraintOwner.m_storage, output.m_toi.m_properties);
-        output.m_toi.operator=(m_toi);
+        output.m_toi = m_toi;
     }
     output.m_firstFreeContactPoint.m_storage = m_firstPoint;
     hkpProcessCollisionOutput::PotentialInfo* potentialContacts = output.m_potentialContacts.m_storage;

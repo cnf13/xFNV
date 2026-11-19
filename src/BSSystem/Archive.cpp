@@ -1477,14 +1477,7 @@ ArchiveManager::OpenArchive(const char* apArchiveName, uint16_t aiForceArchiveTy
     else {
         strcpy_s(cCachedName, 260, pcDest);
     }
-    void* pMemory = NiMemObject::operator new(sizeof(Archive));
-    Archive* pArchive;
-    if (pMemory) {
-        pArchive = ::new (pMemory) Archive(cCachedName, 0x40000, false, abInvalidateOtherArchives);
-    }
-    else {
-        pArchive = nullptr;
-    }
+    Archive* pArchive = new Archive(cCachedName, 0x40000, false, abInvalidateOtherArchives);
     if (!pArchive || !pArchive->m_bGood || (pArchive->cArchiveFlags & Archive::ARCHIVE_FLAG_DISABLED)) {
         if (pArchive) {
             delete pArchive;
@@ -2150,7 +2143,7 @@ bool ArchiveManager::OpenMasterArchives() {
             for (uint32_t archiveType = 0; archiveType < 9; ++archiveType) {
                 if ((static_cast<uint16_t>(1 << archiveType) & pArchive->iArchiveType) != 0 &&
                     !ArchiveManager::spMasterArchives[0][archiveType].m_pObject) {
-                    ArchiveManager::spMasterArchives[0][archiveType].operator=(pArchive);
+                    ArchiveManager::spMasterArchives[0][archiveType] = pArchive;
                     if (MasterArchiveBufferSize[archiveType] > pArchive->m_uiBufferAllocSize) {
                         pArchive->ChangeBufferSize(MasterArchiveBufferSize[archiveType]);
                     }

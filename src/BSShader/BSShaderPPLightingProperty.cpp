@@ -46,8 +46,7 @@ NiRTTI BSShaderPPLightingProperty::ms_RTTI("BSShaderPPLightingProperty", &BSShad
 namespace {
 
     BSShaderProperty* NewLighting30(BSShaderPPLightingProperty* apSource) {
-        void* pMemory = NiMemObject::operator new(sizeof(Lighting30ShaderProperty));
-        return pMemory ? ::new (pMemory) Lighting30ShaderProperty(apSource) : nullptr;
+        return new Lighting30ShaderProperty(apSource);
     }
 
     // "<label> = <file name>", or the texture's address when it has no name.
@@ -112,11 +111,7 @@ BSShaderPPLightingProperty::~BSShaderPPLightingProperty() {
 }
 
 NiObject* BSShaderPPLightingProperty::CreateClone(NiCloningProcess& arCloneData) {
-    void* v3 = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty));
-    BSShaderPPLightingProperty* v4 = nullptr;
-    if (v3) {
-        v4 = ::new (v3) BSShaderPPLightingProperty;
-    }
+    BSShaderPPLightingProperty* v4 = new BSShaderPPLightingProperty;
     BSShaderLightingProperty::CopyMembers(v4, arCloneData);
     CopyToMembers(v4);
     return v4;
@@ -253,8 +248,7 @@ void BSShaderPPLightingProperty::PostLinkObject(NiStream& kStream) {
     // BSSP_FLAG_MULTIPLE_TEXTURES
     if (!(ulFlags[0] & 0x1000000)) {
         if (!spTextureSet) {
-            void* pMemory = NiMemObject::operator new(sizeof(BSShaderTextureSet));
-            spTextureSet = pMemory ? ::new (pMemory) BSShaderTextureSet : nullptr;
+            spTextureSet = new BSShaderTextureSet;
         }
         LoadTextureSet(kStream.m_acFileName, nullptr);
     }
@@ -733,8 +727,7 @@ BSShaderProperty* BSShaderPPLightingProperty::ClarifyShader(NiGeometry* apGeomet
     if (pAlpha || bDynamicAlpha) {
         if (!pAlpha) {
             // Never attached or released, so it leaks, and written even if the allocation failed, as the game does.
-            void* pMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-            pAlpha = pMemory ? ::new (pMemory) NiAlphaProperty : nullptr;
+            pAlpha = new NiAlphaProperty;
             pAlpha->m_uFlags &= ~NiAlphaProperty::ALPHA_BLEND_MASK;
         }
         if ((pAlpha->m_uFlags & NiAlphaProperty::ALPHA_BLEND_MASK) || GetFlag(BSSP_FLAG_DECAL) ||
@@ -928,9 +921,8 @@ NiAdditionalGeometryData* BSShaderPPLightingProperty::CreateRendererSpecificProp
         }
         ulFlags[0] &= ~(1u << BSSP_FLAG_LANDSCAPE);
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiAdditionalGeometryData));
     // Used unchecked if the allocation failed.
-    NiAdditionalGeometryData* pAdditional = pMemory ? ::new (pMemory) NiAdditionalGeometryData(usVertices) : nullptr;
+    NiAdditionalGeometryData* pAdditional = new NiAdditionalGeometryData(usVertices);
     pAdditional->SetDataBlockCount(2);
     pAdditional->SetDataStreamCount(2);
     pAdditional->SetDataBlock(1, reinterpret_cast<uint8_t*>(pTextureSplatVertexData), usVertices * 32, false);
@@ -1153,21 +1145,21 @@ void BSShaderPPLightingProperty::SetParallaxOccScale(float afParallaxOccScale) {
 }
 
 NiTexture* BSShaderPPLightingProperty::GetDiffuseTextures(int32_t a2) {
-    return (&spTextures[0][a2])->operator->();
+    return spTextures[0][a2];
 }
 
 NiTexture* BSShaderPPLightingProperty::GetNormalTexture(uint32_t aiIndex) {
-    return (&spTextures[1][aiIndex])->operator->();
+    return spTextures[1][aiIndex];
 }
 
 void BSShaderPPLightingProperty::SetTextureSet(BSTextureSet* apTextureSet) {
-    (&spTextureSet)->operator=(static_cast<BSShaderTextureSet*>(apTextureSet));
+    spTextureSet = static_cast<BSShaderTextureSet*>(apTextureSet);
 }
 
 void BSShaderPPLightingProperty::StoreExtraDataPointers(
     BSShaderPPLightingProperty::TangentSpaceData* aspTangentSpaceData
 ) {
-    (&spTangentSpaceData)->operator=(aspTangentSpaceData);
+    spTangentSpaceData = aspTangentSpaceData;
 }
 
 BSShaderPPLightingProperty::TangentSpaceData* BSShaderPPLightingProperty::GetExtraDataPointers() {
@@ -1343,13 +1335,7 @@ void BSShaderPPLightingProperty::SetForceNoProjectedShadowTexture(bool abForce) 
 }
 
 NiObject* BSShaderPPLightingProperty::CreateObject() {
-    BSShaderPPLightingProperty* v0 =
-        static_cast<BSShaderPPLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderPPLightingProperty)));
-    if (v0) {
-        return ::new (v0) BSShaderPPLightingProperty;
-    }
-
-    return nullptr;
+    return new BSShaderPPLightingProperty;
 }
 
 BSShaderPPLightingProperty::TextureEffectData::TextureEffectData()

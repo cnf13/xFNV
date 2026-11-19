@@ -216,9 +216,5 @@ void NiRangeLODData::CopyMembers(NiRangeLODData* pkDest, NiCloningProcess&) {
 }
 
 NiObject* NiRangeLODData::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiRangeLODData));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiRangeLODData;
+    return new NiRangeLODData;
 }

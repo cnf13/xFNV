@@ -402,22 +402,11 @@ void SpeedTreeBranchShader::SetupPassConstants(uint32_t auiCurrentPass) {
 
 void SpeedTreeBranchShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
-        else {
-            pMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
     }
     spDefaultPixelConstantMap = m_spPixelConstantMap;
@@ -2426,11 +2415,7 @@ BSShader* SpeedTreeBranchShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_BLENDINDICES, 0, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     spShaderDecl->GetD3DDeclaration();
-    SpeedTreeBranchShader* v2 =
-        static_cast<SpeedTreeBranchShader*>(NiMemObject::operator new(sizeof(SpeedTreeBranchShader)));
-    if (v2) {
-        pshader = ::new (v2) SpeedTreeBranchShader(spShaderDecl);
-    }
+    pshader = new SpeedTreeBranchShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

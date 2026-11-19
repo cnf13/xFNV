@@ -113,10 +113,7 @@ NiObject* bhkLiquidAction::CreateClone(NiCloningProcess& arCloneData) {
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkLiquidAction* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    void* pMemory = NiMemObject::operator new(sizeof(bhkLiquidAction));
-    if (pMemory) {
-        pClone = ::new (pMemory) bhkLiquidAction;
-    }
+    pClone = new bhkLiquidAction;
     this->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     GetThreadMemContext() = iMemContext;
@@ -501,11 +498,7 @@ void bhkLiquidAction::SetTargetObject(NiAVObject* apObject) {
 
 // The factory: a new action in the engine's heap, built in place.
 NiObject* bhkLiquidAction::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkLiquidAction));
-    if (pMemory) {
-        return ::new (pMemory) bhkLiquidAction;
-    }
-    return nullptr;
+    return new bhkLiquidAction;
 }
 
 hkLiquidActionCinfo::hkLiquidActionCinfo()

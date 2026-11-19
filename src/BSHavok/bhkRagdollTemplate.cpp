@@ -283,12 +283,9 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
         switch (ConstraintTypeA.pBuffer[i]) {
             case hkpConstraintData::CONSTRAINT_TYPE_BALLANDSOCKET: {
                 hkBallAndSocketConstraintCinfo::ApplyScale(afScale, ConstraintsA.pBuffer[i]->pData);
-                void* pvConstraint = NiMemObject::operator new(sizeof(bhkBallAndSocketConstraint));
-                if (pvConstraint) {
-                    pConstraint = ::new (pvConstraint) bhkBallAndSocketConstraint(
-                        *static_cast<hkBallAndSocketConstraintCinfo*>(ConstraintsA.pBuffer[i])
-                    );
-                }
+                pConstraint = new bhkBallAndSocketConstraint(
+                    *static_cast<hkBallAndSocketConstraintCinfo*>(ConstraintsA.pBuffer[i])
+                );
                 if (0.0f != afScale) {
                     hkpConstraintData* pClone = bhkConstraintManager::Clone(ConstraintsA.pBuffer[i]->pData, kCloning);
                     if (pClone) {
@@ -302,10 +299,7 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
             }
             case hkpConstraintData::CONSTRAINT_TYPE_HINGE: {
                 hkHingeConstraintCinfo::ApplyScale(afScale, ConstraintsA.pBuffer[i]->pData);
-                void* pvConstraint = NiMemObject::operator new(sizeof(bhkHingeConstraint));
-                if (pvConstraint) {
-                    pConstraint = ::new (pvConstraint) bhkHingeConstraint(ConstraintsA.pBuffer[i]);
-                }
+                pConstraint = new bhkHingeConstraint(ConstraintsA.pBuffer[i]);
                 if (0.0f != afScale) {
                     hkpConstraintData* pClone = bhkConstraintManager::Clone(ConstraintsA.pBuffer[i]->pData, kCloning);
                     if (pClone) {
@@ -320,12 +314,9 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
             case hkpConstraintData::CONSTRAINT_TYPE_LIMITEDHINGE: {
                 // A limited hinge's data is scaled with the hinge's ApplyScale, as the game does.
                 hkHingeConstraintCinfo::ApplyScale(afScale, ConstraintsA.pBuffer[i]->pData);
-                void* pvConstraint = NiMemObject::operator new(sizeof(bhkLimitedHingeConstraint));
-                if (pvConstraint) {
-                    pConstraint = ::new (pvConstraint) bhkLimitedHingeConstraint(
-                        *static_cast<hkLimitedHingeConstraintCinfo*>(ConstraintsA.pBuffer[i])
-                    );
-                }
+                pConstraint = new bhkLimitedHingeConstraint(
+                    *static_cast<hkLimitedHingeConstraintCinfo*>(ConstraintsA.pBuffer[i])
+                );
                 if (0.0f != afScale) {
                     hkpConstraintData* pClone = bhkConstraintManager::Clone(ConstraintsA.pBuffer[i]->pData, kCloning);
                     if (pClone) {
@@ -340,11 +331,8 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
             case hkpConstraintData::CONSTRAINT_TYPE_RAGDOLL: {
                 // A ragdoll constraint's data is scaled with the hinge's ApplyScale too, as the game does.
                 hkHingeConstraintCinfo::ApplyScale(afScale, ConstraintsA.pBuffer[i]->pData);
-                void* pvConstraint = NiMemObject::operator new(sizeof(bhkRagdollConstraint));
-                if (pvConstraint) {
-                    pConstraint = ::new (pvConstraint)
-                        bhkRagdollConstraint(*static_cast<hkRagdollConstraintCinfo*>(ConstraintsA.pBuffer[i]));
-                }
+                pConstraint =
+                    new bhkRagdollConstraint(*static_cast<hkRagdollConstraintCinfo*>(ConstraintsA.pBuffer[i]));
                 if (0.0f != afScale) {
                     hkpConstraintData* pClone = bhkConstraintManager::Clone(ConstraintsA.pBuffer[i]->pData, kCloning);
                     if (pClone) {
@@ -358,11 +346,8 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
             }
             case hkpConstraintData::CONSTRAINT_TYPE_MALLEABLE: {
                 hkMalleableConstraintCinfo::ApplyScale(afScale, ConstraintsA.pBuffer[i]->pData);
-                void* pvConstraint = NiMemObject::operator new(sizeof(bhkMalleableConstraint));
-                if (pvConstraint) {
-                    pConstraint = ::new (pvConstraint)
-                        bhkMalleableConstraint(*static_cast<hkMalleableConstraintCinfo*>(ConstraintsA.pBuffer[i]));
-                }
+                pConstraint =
+                    new bhkMalleableConstraint(*static_cast<hkMalleableConstraintCinfo*>(ConstraintsA.pBuffer[i]));
                 if (0.0f != afScale) {
                     hkpConstraintData* pClone = bhkConstraintManager::Clone(ConstraintsA.pBuffer[i]->pData, kCloning);
                     if (pClone) {
@@ -404,11 +389,7 @@ const NiFixedString& bhkRagdollTemplateData::GetName() const {
 }
 
 NiObject* bhkRagdollTemplateData::CreateObject() {
-    void* pvMemory = NiMemObject::operator new(sizeof(bhkRagdollTemplateData));
-    if (!pvMemory) {
-        return nullptr;
-    }
-    return ::new (pvMemory) bhkRagdollTemplateData;
+    return new bhkRagdollTemplateData;
 }
 
 bhkRagdollTemplate::bhkRagdollTemplate() {}
@@ -491,11 +472,7 @@ uint32_t bhkRagdollTemplate::QNumTemplates() {
 
 // Names the object the empty string unconditionally, a failed allocation included, as the game does.
 NiObject* bhkRagdollTemplate::CreateObject() {
-    void* pvMemory = NiMemObject::operator new(sizeof(bhkRagdollTemplate));
-    bhkRagdollTemplate* pObject = nullptr;
-    if (pvMemory) {
-        pObject = ::new (pvMemory) bhkRagdollTemplate;
-    }
+    bhkRagdollTemplate* pObject = new bhkRagdollTemplate;
     pObject->SetName(EmptyFS);
     return pObject;
 }

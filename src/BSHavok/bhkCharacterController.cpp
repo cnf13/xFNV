@@ -335,8 +335,7 @@ void bhkCharacterController::Init(bhkCharacterControllerCinfo& rInfo) {
         kCinfo.m_collisionFilterInfo = rInfo.iColFilter.iFilter;
         bhkShape* pShape = GetShape();
         kCinfo.m_shape = pShape ? static_cast<hkpShape*>(pShape->phkObject) : nullptr;
-        void* pMemory = NiMemObject::operator new(sizeof(bhkCachingShapePhantom));
-        bhkCachingShapePhantom* pPhantom = pMemory ? ::new (pMemory) bhkCachingShapePhantom(&kCinfo) : nullptr;
+        bhkCachingShapePhantom* pPhantom = new bhkCachingShapePhantom(&kCinfo);
         // EXE-INLINED none: NiPointer<bhkCachingShapePhantom>::operator=
         bhkCachingShapePhantom* pOld = spShapePhantom;
         if (pOld != pPhantom) {
@@ -656,7 +655,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
         }
         if (gElevator && !(iFlags & JUMPING)) {
             UnMarkWrite();
-            hkpCharacterProxy* pProxy = operator*();
+            hkpCharacterProxy* pProxy = **this;
             hkVector4 kPosition = pProxy->getPosition();
             const float fRise = gElevator->m_motion.m_linearVelocity.m_quad[2] * StepInfo.m_deltaTime;
             kPosition.m_quad[2] = RotCenter.m_quad[2] + gHeightOfFloor + fRise;
@@ -750,8 +749,7 @@ void bhkCharacterController::BuildDisplayGeometry(NiNode* apNode) {
         }
     }
     if (GetShape()) {
-        NiNode* pMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        NiNode* pchar = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* pchar = new NiNode(0);
         pParent->AttachChild(pchar, 1);
         pchar->SetName("bhkColDisp");
         const float fInvScale = 1.0 / pParent->m_kWorld.m_fScale;
@@ -1820,7 +1818,7 @@ void bhkCharacterController::SetPosition(const hkVector4& arPos) {
 // The hkVector4 local is left uninitialised by its constructor, and the proxy comes from the null-safe getter.
 void bhkCharacterController::SetLinearVelocityNi(const NiPoint3& arVelocity) {
     hkVector4 kVelocity;
-    hkpCharacterProxy* pProxy = operator*();
+    hkpCharacterProxy* pProxy = **this;
     if (pProxy != nullptr) {
         pProxy->setVelocity(&NI2HK(kVelocity, arVelocity));
     }
@@ -2528,9 +2526,8 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                                     *spShapes = v78;
                                     if (v8->bUseDefaultShape) {
                                         if (!bhkCharacterController::spDefaultConvexShape.m_pObject) {
-                                            bhkCharacterController::spDefaultConvexShape.operator=(
-                                                MakeConvex(top, bottom, frad, v2->fStepHeight)
-                                            );
+                                            bhkCharacterController::spDefaultConvexShape =
+                                                MakeConvex(top, bottom, frad, v2->fStepHeight);
                                         }
                                         v2->spShapes[1] = bhkCharacterController::spDefaultConvexShape;
                                         v79 = fBS2HkScaleSC;
@@ -2571,14 +2568,7 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                         lsi.m_childShapeFilterInfo.m_data = nullptr;
                         lsi.m_childShapeFilterInfo.m_size = 0;
                         lsi.m_childShapeFilterInfo.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-                        bhkCapsuleShape* v45 =
-                            static_cast<bhkCapsuleShape*>(NiMemObject::operator new(sizeof(bhkCapsuleShape)));
-                        if (v45) {
-                            pcs0 = (bhkShape*)::new (v45) bhkCapsuleShape(top, bottom, frad);
-                        }
-                        else {
-                            pcs0 = nullptr;
-                        }
+                        pcs0 = new bhkCapsuleShape(top, bottom, frad);
                         top2.x = top.x;
                         top.y = top.y - 8.0;
                         top2.y = top.y;

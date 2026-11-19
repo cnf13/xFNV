@@ -292,7 +292,7 @@ hkDataObject Reader::readObject(int32_t aiType) {
         else {
             char buf[512];
             hkErrStream errStream(buf, 512);
-            errStream.operator<<("corrupt file");
+            errStream << "corrupt file";
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x484994D5, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 376
                 )) {
@@ -389,7 +389,7 @@ hkDataObject Reader::readObjectTree() {
                         }
                         {
                             hkErrStream apThis(buf, 512);
-                            apThis.operator<<("Unrecognised tagfile version.");
+                            apThis << "Unrecognised tagfile version.";
                             hkError::s_instance->message(
                                 hkError::MESSAGE_WARNING, 0x2AB6036F, buf,
                                 ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 473
@@ -423,7 +423,7 @@ hkDataObject Reader::readObjectTree() {
     }
     else {
         hkErrStream apThis2(buf, 512);
-        apThis2.operator<<("This does not look like a binary tagfile (magic number mismatch)");
+        apThis2 << "This does not look like a binary tagfile (magic number mismatch)";
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, 0x2AB6036F, buf, ".\\Tagfile\\Binary\\hkBinaryTagfileReader.cpp", 453
         );

@@ -99,8 +99,8 @@ void BSTempEffectGeometryDecal::Initialize() {
             }
         }
         BSTempEffect::Initialize();
-        spTargetGeom.operator=(static_cast<NiTriBasedGeom*>(nullptr));
-        spParent.operator=(static_cast<NiNode*>(nullptr));
+        spTargetGeom = static_cast<NiTriBasedGeom*>(nullptr);
+        spParent = static_cast<NiNode*>(nullptr);
     }
 }
 
@@ -378,7 +378,7 @@ bool BSTempEffectGeometryDecal::ShouldAddTriangle(
 // vertex data, and when no vertex is kept it leaks the new partitions, as the game does. The new[] allocations of
 // 16-bit counts keep a size overflow check only where a count can overflow it.
 void BSTempEffectGeometryDecal::InitializeUsingAGD() {
-    NiSkinInstance* pSkinInstance = spTargetGeom.operator->()->GetSkinInstance();
+    NiSkinInstance* pSkinInstance = spTargetGeom->GetSkinInstance();
     if (!NiObject::IsExactKindOf(&BSDismemberSkinInstance::ms_RTTI, pSkinInstance)) {
         return;
     }
@@ -389,7 +389,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     NiMatrix3 kProjection;
     kProjection.~NiMatrix3();
     ::new (&kProjection) NiMatrix3;
-    NiTriBasedGeom* pTargetGeom = spTargetGeom.operator->();
+    NiTriBasedGeom* pTargetGeom = spTargetGeom;
     const NiTransform* pkWorldTransform;
     pkWorldTransform = &pTargetGeom->GetWorldTransform();
     NiMatrix3 kWorldRotate = pkWorldTransform->m_Rotate;
@@ -404,7 +404,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     ::new (&kZRotation) NiMatrix3;
     kZRotation.MakeZRotation(fRotation);
     kProjection = kZRotation * BSUtilities::GetRotationZToVector(pVector);
-    pTargetGeom = spTargetGeom.operator->();
+    pTargetGeom = spTargetGeom;
     pkWorldTransform = &pTargetGeom->GetWorldTransform();
     NiTransform kWorld = *pkWorldTransform;
     kWorld.m_Translate -= pOrigin;
@@ -414,7 +414,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     NiGeometryDataIteratorNiPoint2 kTextureIter;
     NiGeometryDataIteratorNiBlendWeights kWeightIter;
     NiGeometryDataIteratorNiBlendIndices kIndexIter;
-    NiAdditionalGeometryData* pAdditionalData = spTargetGeom.operator->()->GetModelData()->GetAdditionalGeometryData();
+    NiAdditionalGeometryData* pAdditionalData = spTargetGeom->GetModelData()->GetAdditionalGeometryData();
     int32_t iBones = 0;
     NiSkinData::BoneData* pSkinBoneData = nullptr;
     NiSkinData::BoneData* pBoneData = nullptr;
@@ -426,12 +426,12 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     }
     int32_t iVertexCount = pAdditionalData->GetVertexCount();
     uint32_t uiVertexCount = static_cast<uint32_t>(iVertexCount);
-    bool bLocked = spTargetGeom.operator->()->GetModelData()->LockPackedVertexData(false);
-    spTargetGeom.operator->()->GetModelData()->GetVerticesIterator(kVertexIter);
-    spTargetGeom.operator->()->GetModelData()->GetNormalsIterator(kNormalIter);
-    spTargetGeom.operator->()->GetModelData()->GetTextureSetIterator(0, kTextureIter);
-    spTargetGeom.operator->()->GetModelData()->GetBlendWeightsIterator(kWeightIter);
-    spTargetGeom.operator->()->GetModelData()->GetBlendIndicesIterator(kIndexIter);
+    bool bLocked = spTargetGeom->GetModelData()->LockPackedVertexData(false);
+    spTargetGeom->GetModelData()->GetVerticesIterator(kVertexIter);
+    spTargetGeom->GetModelData()->GetNormalsIterator(kNormalIter);
+    spTargetGeom->GetModelData()->GetTextureSetIterator(0, kTextureIter);
+    spTargetGeom->GetModelData()->GetBlendWeightsIterator(kWeightIter);
+    spTargetGeom->GetModelData()->GetBlendIndicesIterator(kIndexIter);
 
     // Counts the triangles and partitions of the body parts the decal covers. A body part above 1000 is divided by 1000
     // and one above 100 reduced below 101; iBodyParts holds bit (part + 1) for each covered part, with the shift count
@@ -789,14 +789,14 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
         }
         if (pNewSkinPartition) {
             CreateGeometry(
-                spTargetGeom.operator->(), usNewVertexCount, usNewIndexCount, pGeomVertex, pGeomTexCoord, pGeomIndex,
-                pBoneData, pNewSkinPartition, pBodyPartIndex
+                spTargetGeom, usNewVertexCount, usNewIndexCount, pGeomVertex, pGeomTexCoord, pGeomIndex, pBoneData,
+                pNewSkinPartition, pBodyPartIndex
             );
         }
         else {
             CreateGeometry(
-                spTargetGeom.operator->(), usNewVertexCount, usNewIndexCount, pGeomVertex, pGeomTexCoord, pGeomIndex,
-                pBoneData, nullptr, nullptr
+                spTargetGeom, usNewVertexCount, usNewIndexCount, pGeomVertex, pGeomTexCoord, pGeomIndex, pBoneData,
+                nullptr, nullptr
             );
         }
         iNumVerts = usNewVertexCount;
@@ -820,7 +820,7 @@ void BSTempEffectGeometryDecal::InitializeUsingAGD() {
     ourFree(pucPartBones);
     ourFree(pBodyPartIndex);
     if (bLocked) {
-        spTargetGeom.operator->()->GetModelData()->UnlockPackedVertexData();
+        spTargetGeom->GetModelData()->UnlockPackedVertexData();
     }
 }
 
@@ -832,7 +832,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
     if (!iBodyParts) {
         return;
     }
-    NiSkinInstance* pSkinInstance = spTargetGeom.operator->()->GetSkinInstance();
+    NiSkinInstance* pSkinInstance = spTargetGeom->GetSkinInstance();
     BSDismemberSkinInstance* pDismemberSkinInstance = nullptr;
     if (!NiObject::IsExactKindOf(&BSDismemberSkinInstance::ms_RTTI, pSkinInstance)) {
         return;
@@ -844,7 +844,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
     NiMatrix3 kProjection;
     kProjection.~NiMatrix3();
     ::new (&kProjection) NiMatrix3;
-    NiTriBasedGeom* pTargetGeom = spTargetGeom.operator->();
+    NiTriBasedGeom* pTargetGeom = spTargetGeom;
     const NiTransform* pkWorldTransform;
     pkWorldTransform = &pTargetGeom->GetWorldTransform();
     NiMatrix3 kWorldRotate = pkWorldTransform->m_Rotate;
@@ -859,7 +859,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
     ::new (&kZRotation) NiMatrix3;
     kZRotation.MakeZRotation(fRotation);
     kProjection = kZRotation * BSUtilities::GetRotationZToVector(pVector);
-    pTargetGeom = spTargetGeom.operator->();
+    pTargetGeom = spTargetGeom;
     pkWorldTransform = &pTargetGeom->GetWorldTransform();
     NiTransform kWorld = *pkWorldTransform;
     kWorld.m_Translate -= pOrigin;
@@ -873,7 +873,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
     NiSkinData::BoneData* pBoneData = nullptr;
     NiSkinData* pSkinData = nullptr;
     NiSkinPartition::Partition* pPartitions = nullptr;
-    int32_t iVertexCount = spTargetGeom.operator->()->GetModelData()->GetVertexCount();
+    int32_t iVertexCount = spTargetGeom->GetModelData()->GetVertexCount();
     uint32_t uiVertexCount = static_cast<uint32_t>(iVertexCount);
     uint16_t usTriangles = 0;
     uint16_t* pusTriList = nullptr;
@@ -968,7 +968,7 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
         pNormals = static_cast<NiPoint3*>(pMemory);
     }
     pSkinInstance->Deform(
-        spTargetGeom.operator->()->GetModelData(), pVertices, pNormals, static_cast<NiPoint3*>(nullptr),
+        spTargetGeom->GetModelData(), pVertices, pNormals, static_cast<NiPoint3*>(nullptr),
         static_cast<NiPoint3*>(nullptr), sizeof(NiPoint3)
     );
 
@@ -1175,9 +1175,9 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
             ourMalloc(uiCount <= SIZE_MAX / sizeof(uint16_t) ? sizeof(uint16_t) * uiCount : SIZE_MAX)
         );
         ourMemcpy(pusGeomIndex, pusNewIndex, usNewIndices * sizeof(uint16_t));
-        NiPoint3* pModelVertices = spTargetGeom.operator->()->GetModelData()->GetVertices();
+        NiPoint3* pModelVertices = spTargetGeom->GetModelData()->GetVertices();
         // The normals are read but the texture coordinates are used as the decal's second array, as the game does.
-        [[maybe_unused]] NiPoint3* pModelNormals = spTargetGeom.operator->()->GetModelData()->GetNormals();
+        [[maybe_unused]] NiPoint3* pModelNormals = spTargetGeom->GetModelData()->GetNormals();
         uiCount = usNewVertices;
         pMemory = ourMalloc(uiCount > SIZE_MAX / sizeof(NiPoint3) ? SIZE_MAX : sizeof(NiPoint3) * uiCount);
         NiPoint3* pGeomVertex = nullptr;
@@ -1233,14 +1233,14 @@ void BSTempEffectGeometryDecal::InitializeUsingData() {
         }
         if (pSkinPartition) {
             CreateGeometry(
-                spTargetGeom.operator->(), usNewVertices, usNewIndices, pGeomVertex, pGeomTexCoord, pusGeomIndex,
-                pBoneData, pSkinPartition, pusBodyParts
+                spTargetGeom, usNewVertices, usNewIndices, pGeomVertex, pGeomTexCoord, pusGeomIndex, pBoneData,
+                pSkinPartition, pusBodyParts
             );
         }
         else {
             CreateGeometry(
-                spTargetGeom.operator->(), usNewVertices, usNewIndices, pGeomVertex, pGeomTexCoord, pusGeomIndex,
-                pBoneData, nullptr, nullptr
+                spTargetGeom, usNewVertices, usNewIndices, pGeomVertex, pGeomTexCoord, pusGeomIndex, pBoneData, nullptr,
+                nullptr
             );
         }
         iNumVerts = usNewVertices;
@@ -1284,43 +1284,23 @@ void BSTempEffectGeometryDecal::CreateGeometry(
     GeometryDecalShaderProperty* pshaderprop;
     NiTriShape* pnewDecal;
     uint32_t ibodyPartsA[15];
-    NiTriShape* v31 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v31) {
-        pnewDecal = ::new (v31) NiTriShape(
-            aiNewVertex, apGeomVertex, apGeomTexCoord, nullptr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE,
-            aiNewIndex / 3, apGeomIndex
-        );
-    }
-    else {
-        pnewDecal = nullptr;
-    }
+    pnewDecal = new NiTriShape(
+        aiNewVertex, apGeomVertex, apGeomTexCoord, nullptr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, aiNewIndex / 3,
+        apGeomIndex
+    );
     pnewDecal->SetName(*FixedStrings::GetDecal());
-    GeometryDecalShaderProperty* apMemory =
-        static_cast<GeometryDecalShaderProperty*>(NiMemObject::operator new(sizeof(GeometryDecalShaderProperty)));
-    if (apMemory) {
-        pshaderprop = ::new (apMemory) GeometryDecalShaderProperty;
-    }
-    else {
-        pshaderprop = nullptr;
-    }
+    pshaderprop = new GeometryDecalShaderProperty;
     pnewDecal->AttachProperty(pshaderprop);
     pshaderprop->SetDepthBias(1.0f);
     NiPointer<NiTexture> sptexture(static_cast<NiTexture*>(nullptr));
     pTextureSet->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, sptexture);
     NiTexture* ptexture = sptexture.m_pObject;
     if (NiObject::IsKindOf_0(&NiSourceTexture::ms_RTTI, ptexture)) {
-        pshaderprop->spDecalTexture.operator=(static_cast<NiSourceTexture*>(ptexture));
+        pshaderprop->spDecalTexture = static_cast<NiSourceTexture*>(ptexture);
     }
     NiSkinInstance* pskin = apGeometry->GetSkinInstance();
     int32_t iboneCount = pskin->GetSkinData()->m_uiBones;
-    NiSkinData* v29 = static_cast<NiSkinData*>(NiMemObject::operator new(sizeof(NiSkinData)));
-    if (v29) {
-        NiTransform* v13 = &pskin->GetSkinData()->m_kRootParentToSkin;
-        pnewSkinData = ::new (v29) NiSkinData(iboneCount, apGeomBoneData, *v13, apGeomVertex);
-    }
-    else {
-        pnewSkinData = nullptr;
-    }
+    pnewSkinData = new NiSkinData(iboneCount, apGeomBoneData, pskin->GetSkinData()->m_kRootParentToSkin, apGeomVertex);
     NiAVObject** ppbones = pskin->m_ppkBones;
     // Checked array allocation: the count is taken unsigned.
     NiAVObject** ppnewBones = static_cast<NiAVObject**>(ourMalloc(
@@ -1362,29 +1342,15 @@ void BSTempEffectGeometryDecal::CreateGeometry(
         }
         ppartitionExtraDataArray[i].usBodyPartNum = v10;
     }
-    BSDismemberSkinInstance* v28 =
-        static_cast<BSDismemberSkinInstance*>(NiMemObject::operator new(sizeof(BSDismemberSkinInstance)));
-    if (v28) {
-        NiAVObject* v11 = pskin->m_pkRootParent;
-        pnewSkinInstance =
-            ::new (v28) BSDismemberSkinInstance(pnewSkinData, v11, ppnewBones, ppartitionExtraDataArray, icount);
-    }
-    else {
-        pnewSkinInstance = nullptr;
-    }
+    pnewSkinInstance =
+        new BSDismemberSkinInstance(pnewSkinData, pskin->m_pkRootParent, ppnewBones, ppartitionExtraDataArray, icount);
     if (apPartition) {
         pnewSkinInstance->SetSkinPartition(apPartition);
         pnewDecal->SetSkinInstance(pnewSkinInstance);
     }
     else {
         NiSkinPartition* ppartition;
-        NiSkinPartition* v27 = static_cast<NiSkinPartition*>(NiMemObject::operator new(sizeof(NiSkinPartition)));
-        if (v27) {
-            ppartition = ::new (v27) NiSkinPartition;
-        }
-        else {
-            ppartition = nullptr;
-        }
+        ppartition = new NiSkinPartition;
         if (ppartition->MakePartitions(
                 static_cast<NiTriBasedGeomData*>(pnewDecal->GetModelData()), pnewSkinData, 18, 4, 1, nullptr, nullptr,
                 nullptr
@@ -1416,7 +1382,7 @@ void BSTempEffectGeometryDecal::CreateGeometry(
     pnewDecal->UpdateWorldBound();
     pnewDecal->UpdateProperties();
     BSShaderManager::PrepareObject(pnewDecal, 0, 0);
-    spDecalGeometry.operator=(static_cast<NiTriBasedGeom*>(pnewDecal));
+    spDecalGeometry = static_cast<NiTriBasedGeom*>(pnewDecal);
     pGeometry = spTargetGeom.m_pObject;
 }
 
@@ -1432,10 +1398,10 @@ uint16_t NiAdditionalGeometryData::GetVertexCount() const {
 
 // The additional geometry data of the model data, null without model data.
 NiAdditionalGeometryData* NiGeometry::GetAdditionalGeometryData() {
-    if (!m_spModelData.operator->()) {
+    if (!m_spModelData) {
         return nullptr;
     }
-    return m_spModelData.operator->()->GetAdditionalGeometryData();
+    return m_spModelData->GetAdditionalGeometryData();
 }
 
 NiSkinData::BoneData* NiSkinData::GetBoneData() const {

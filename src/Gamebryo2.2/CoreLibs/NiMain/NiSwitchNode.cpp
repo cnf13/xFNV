@@ -29,8 +29,7 @@ const NiRTTI* NiSwitchNode::GetRTTI() const {
 }
 
 NiObject* NiSwitchNode::CreateClone(NiCloningProcess& kCloning) {
-    void* pMemory = NiMemObject::operator new(sizeof(NiSwitchNode));
-    NiSwitchNode* pkClone = pMemory ? ::new (pMemory) NiSwitchNode : nullptr;
+    NiSwitchNode* pkClone = new NiSwitchNode;
     NiNode::CopyMembers(pkClone, kCloning);
     pkClone->m_uFlags = m_uFlags;
     pkClone->m_iIndex = m_iIndex;
@@ -289,10 +288,5 @@ void NiSwitchNode::CopyMembers(NiSwitchNode* pkDest, NiCloningProcess& kCloning)
 }
 
 NiObject* NiSwitchNode::CreateObject() {
-    NiSwitchNode* v0 = static_cast<NiSwitchNode*>(NiMemObject::operator new(sizeof(NiSwitchNode)));
-    if (v0) {
-        return ::new (v0) NiSwitchNode;
-    }
-
-    return nullptr;
+    return new NiSwitchNode;
 }

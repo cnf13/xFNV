@@ -399,11 +399,7 @@ void NiParticlesData::ReplaceRotationAxes(NiPoint3* pkRotationAxes) {
 }
 
 NiObject* NiParticlesData::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiParticlesData));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiParticlesData;
+    return new NiParticlesData;
 }
 
 // The loader of "NiRotatingParticlesData": a NiParticlesData flagged as an old rotating-particles object. The flag is

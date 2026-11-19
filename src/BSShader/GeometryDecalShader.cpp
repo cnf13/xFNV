@@ -236,22 +236,14 @@ NiD3DShaderDeclaration* GeometryDecalShader::GetShaderDecl(NiGeometry* apGeometr
 // holds a reference on each entry it keeps. The variable names passed are empty strings.
 void GeometryDecalShader::CreateConstantMaps() {
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry(
             "Decal Offset", 0x10000007, 0, 0xF, 1, "", 0x10, 4, &pDecalOffset, false
         );
     }
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -547,10 +539,7 @@ BSShader* GeometryDecalShader::CreateShader() {
     static_cast<NiShaderDeclaration*>(GeometryDecalShader::spShaderDeclarationSkinned.m_pObject)
         ->SetEntry(3u, 3u, NiShaderDeclaration::SHADERPARAM_NI_NORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0);
     GeometryDecalShader::spShaderDeclarationSkinned.m_pObject->GetD3DDeclaration();
-    GeometryDecalShader* v5 = static_cast<GeometryDecalShader*>(NiMemObject::operator new(sizeof(GeometryDecalShader)));
-    if (v5) {
-        pshader = ::new (v5) GeometryDecalShader;
-    }
+    pshader = new GeometryDecalShader;
     pshader->Initialize();
     pshader->LoadShaders();
     NiPointer<NiD3DPass>* spGeometryDecalPass = pshader->spGeometryDecalPass;

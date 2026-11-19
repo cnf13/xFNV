@@ -254,13 +254,7 @@ BSShaderProperty::~BSShaderProperty() {
 NiObject* BSShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
     BSShaderProperty* v4;
     double fFadeAlpha;
-    void* v3 = NiMemObject::operator new(sizeof(BSShaderProperty));
-    if (v3) {
-        v4 = ::new (v3) BSShaderProperty;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new BSShaderProperty;
     NiShadeProperty::CopyMembers(v4, arCloneData);
     v4->ulFlags[0] = ulFlags[0];
     v4->ulFlags[1] = ulFlags[1];
@@ -2725,9 +2719,5 @@ void BSShaderProperty::SetFlagRecurse(NiAVObject* apObject, EShaderPropertyFlag 
 }
 
 NiObject* BSShaderProperty::CreateObject() {
-    BSShaderProperty* pObject = static_cast<BSShaderProperty*>(NiMemObject::operator new(sizeof(BSShaderProperty)));
-    if (pObject) {
-        return ::new (pObject) BSShaderProperty;
-    }
-    return nullptr;
+    return new BSShaderProperty;
 }

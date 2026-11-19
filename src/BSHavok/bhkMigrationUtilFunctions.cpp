@@ -19,8 +19,7 @@ void bhkMigrationUtilFunctions::PrepareDebugGeom(
     if (bhkShape::bMaterialColor) {
         bhkShape::GetMaterialColor(auiMaterial, clr);
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
-    NiMaterialProperty* pmat = pMemory ? ::new (pMemory) NiMaterialProperty : nullptr;
+    NiMaterialProperty* pmat = new NiMaterialProperty;
     // EXE-INLINED 0x4BC450
     pmat->m_emit = clr;
     ++pmat->m_uiRevID;

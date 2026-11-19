@@ -34,11 +34,7 @@ bhkPCollisionObject::bhkPCollisionObject(NiAVObject* apObject) : bhkNiCollisionO
 NiObject* bhkPCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
-    bhkPCollisionObject* pClone =
-        static_cast<bhkPCollisionObject*>(NiMemObject::operator new(sizeof(bhkPCollisionObject)));
-    if (pClone) {
-        ::new (pClone) bhkPCollisionObject;
-    }
+    bhkPCollisionObject* pClone = new bhkPCollisionObject;
     // Copies even into a null clone, as the game does.
     CopyMembers(pClone, arCloneData);
     GetThreadMemContext() = iOldMemContext;
@@ -189,10 +185,5 @@ void bhkPCollisionObject::CopyMembers(bhkPCollisionObject* apDest, NiCloningProc
 
 // The class loader's factory: a bare bhkPCollisionObject block, or null when the allocation fails.
 NiObject* bhkPCollisionObject::CreateObject() {
-    bhkPCollisionObject* pObject =
-        static_cast<bhkPCollisionObject*>(NiMemObject::operator new(sizeof(bhkPCollisionObject)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkPCollisionObject;
+    return new bhkPCollisionObject;
 }

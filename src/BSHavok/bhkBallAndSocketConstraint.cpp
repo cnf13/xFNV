@@ -40,11 +40,7 @@ bhkBallAndSocketConstraint::~bhkBallAndSocketConstraint() {
 NiObject* bhkBallAndSocketConstraint::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkSerializable::CloneCritLock();
-    bhkBallAndSocketConstraint* pClone =
-        static_cast<bhkBallAndSocketConstraint*>(NiMemObject::operator new(sizeof(bhkBallAndSocketConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkBallAndSocketConstraint;
-    }
+    bhkBallAndSocketConstraint* pClone = new bhkBallAndSocketConstraint;
     bhkConstraint::CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -92,11 +88,7 @@ hkSerializableCinfo& bhkBallAndSocketConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkBallAndSocketConstraint::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkBallAndSocketConstraint));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) bhkBallAndSocketConstraint;
+    return new bhkBallAndSocketConstraint;
 }
 
 hkBallAndSocketConstraintCinfo::~hkBallAndSocketConstraintCinfo() {}

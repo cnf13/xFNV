@@ -161,7 +161,7 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
     int32_t m_ucBitsPerPixel = kDestFmt.m_ucBitsPerPixel;
     kDestBits.~PixelBits();
     ::new (&kDestBits) NiDevImageConverter::PixelBits(kDestFmt);
-    if (kSrcFmt.operator==(kDestFmt)) {
+    if (kSrcFmt == kDestFmt) {
         return true;
     }
     if ((kSrcFmt.m_uFlags & 1) == 0) {
@@ -178,21 +178,21 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
         (kDestBits.m_uiGM != 0x00FF00 || (kDestBits.m_uiRM != 0x0000FF && kDestBits.m_uiRM != 0xFF0000))) {
         return false;
     }
-    if (kSrcFmt.operator==(NiPixelFormat_PAL4) || kSrcFmt.operator==(NiPixelFormat_PALA4)) {
+    if (kSrcFmt == NiPixelFormat_PAL4 || kSrcFmt == NiPixelFormat_PALA4) {
         if (m_eFormat == NiPixelFormat::FORMAT_RGB || m_eFormat == NiPixelFormat::FORMAT_RGBA) {
             return m_ucBitsPerPixel == 24 || m_ucBitsPerPixel == 32;
         }
-        if (!kDestFmt.operator!=(NiPixelFormat_PAL4)) {
+        if (!(kDestFmt != NiPixelFormat_PAL4)) {
             return true;
         }
-        v7 = kDestFmt.operator!=(NiPixelFormat_PALA4);
+        v7 = kDestFmt != NiPixelFormat_PALA4;
     }
     else {
-        if (!kSrcFmt.operator==(NiPixelFormat_PAL8) && !kSrcFmt.operator==(NiPixelFormat_PALA8)) {
-            if (!kSrcFmt.operator==(NiPixelFormat_RGB24) &&
-                (!kSrcFmt.operator==(NiPixelFormat_RGBA32) && !static_cast<uint8_t>(kSrcFmt.GetCompressed()))) {
-                if (!kSrcFmt.operator==(NiPixelFormat_BUMP16) && !kSrcFmt.operator==(NiPixelFormat_BUMPLUMA32)) {
-                    if (!kSrcFmt.operator==(NiPixelFormat_RGBA16) && !kSrcFmt.operator==(NiPixelFormat_BGRA16)) {
+        if (!(kSrcFmt == NiPixelFormat_PAL8) && !(kSrcFmt == NiPixelFormat_PALA8)) {
+            if (!(kSrcFmt == NiPixelFormat_RGB24) &&
+                (!(kSrcFmt == NiPixelFormat_RGBA32) && !static_cast<uint8_t>(kSrcFmt.GetCompressed()))) {
+                if (!(kSrcFmt == NiPixelFormat_BUMP16) && !(kSrcFmt == NiPixelFormat_BUMPLUMA32)) {
+                    if (!(kSrcFmt == NiPixelFormat_RGBA16) && !(kSrcFmt == NiPixelFormat_BGRA16)) {
                         return false;
                     }
                     return m_ucBitsPerPixel == 16;
@@ -214,10 +214,10 @@ bool NiDevImageConverter::CanConvertPixelData(const NiPixelFormat& kSrcFmt, cons
         if (m_eFormat == NiPixelFormat::FORMAT_RGB || m_eFormat == NiPixelFormat::FORMAT_RGBA) {
             goto LABEL_24;
         }
-        if (!kDestFmt.operator!=(NiPixelFormat_PAL8)) {
+        if (!(kDestFmt != NiPixelFormat_PAL8)) {
             return true;
         }
-        v7 = kDestFmt.operator!=(NiPixelFormat_PALA8);
+        v7 = kDestFmt != NiPixelFormat_PALA8;
     }
     return !v7;
 }
@@ -272,15 +272,8 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
             pkSrc = spBumpTmp.m_pObject;
         }
     }
-    NiPixelData* pkMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-    NiPixelData* pkDest;
-    if (pkMemory) {
-        pkDest = ::new (pkMemory)
-            NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, kDestFmt, pkSrc->m_uiMipmapLevels, pkSrc->m_uiFaces);
-    }
-    else {
-        pkDest = nullptr;
-    }
+    NiPixelData* pkDest =
+        new NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, kDestFmt, pkSrc->m_uiMipmapLevels, pkSrc->m_uiFaces);
     // A failed conversion returns null and leaves pkDest allocated, as the game does.
     bool bConverted = ConvertPixelDataFormat(*pkDest, *pkSrc, -1);
     return bConverted ? pkDest : nullptr;
@@ -356,15 +349,9 @@ NiPixelData* NiDevImageConverter::GenerateMipmapLevels(const NiPixelData* pkSrc,
     NiPixelData* pkDest = pkOptDest;
     kDestFmt = *v5;
     if (!pkOptDest ||
-        (!pkOptDest->m_kPixelFormat.operator==(kDestFmt) ||
+        (!(pkOptDest->m_kPixelFormat == kDestFmt) ||
          (pkOptDest->m_uiMipmapLevels <= 1 || pkOptDest->m_uiFaces != pkSrc->m_uiFaces))) {
-        NiPixelData* v7 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        if (v7) {
-            pkDest = ::new (v7) NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, kDestFmt, 0, pkSrc->m_uiFaces);
-        }
-        else {
-            pkDest = nullptr;
-        }
+        pkDest = new NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, kDestFmt, 0, pkSrc->m_uiFaces);
     }
     uint32_t m_uiMipmapLevels = pkDest->m_uiMipmapLevels;
     uint32_t v52 = m_uiMipmapLevels;
@@ -374,7 +361,7 @@ NiPixelData* NiDevImageConverter::GenerateMipmapLevels(const NiPixelData* pkSrc,
     uint32_t apkOptDesta = 0;
     if (pkSrc->m_uiFaces) {
         while (true) {
-            if (kDestFmt.operator==(NiPixelFormat_RGB24)) {
+            if (kDestFmt == NiPixelFormat_RGB24) {
                 uint32_t v10 = 1;
                 int32_t v61 = 1;
                 if (m_uiMipmapLevels > 1) {
@@ -459,7 +446,7 @@ NiPixelData* NiDevImageConverter::GenerateMipmapLevels(const NiPixelData* pkSrc,
                 }
             }
             else {
-                if (!kDestFmt.operator==(NiPixelFormat_RGBA32)) {
+                if (!(kDestFmt == NiPixelFormat_RGBA32)) {
                     goto LABEL_56;
                 }
                 uint32_t v31 = 1;
@@ -969,9 +956,8 @@ NiPixelData* NiDevImageConverter::GenerateBumpMap(const NiPixelData& kSrc, const
     uint32_t l;
     uint32_t i;
     uint32_t j;
-    if (kSrc.m_kPixelFormat.operator==(NiPixelFormat_RGBA32)) {
-        NiPixelData* pkMem = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        pkDest = pkMem ? ::new (pkMem) NiPixelData(uiWidth, uiHeight, NiPixelFormat_BUMPLUMA32, uiLevels, 1u) : nullptr;
+    if (kSrc.m_kPixelFormat == NiPixelFormat_RGBA32) {
+        pkDest = new NiPixelData(uiWidth, uiHeight, NiPixelFormat_BUMPLUMA32, uiLevels, 1u);
         for (l = 0; l < uiLevels; l++) {
             uint8_t* pucDest = &pkDest->m_pucPixels[pkDest->m_puiOffsetInBytes[l]];
             uiWidth = kSrc.m_puiWidth[l];
@@ -989,10 +975,9 @@ NiPixelData* NiDevImageConverter::GenerateBumpMap(const NiPixelData& kSrc, const
         uiSrcPixelStride = 4;
         uiDestPixelStride = 4;
     }
-    else if (kSrc.m_kPixelFormat.operator==(NiPixelFormat_RGB24) && kDestFmt.operator==(NiPixelFormat_BUMPLUMA32)) {
+    else if (kSrc.m_kPixelFormat == NiPixelFormat_RGB24 && kDestFmt == NiPixelFormat_BUMPLUMA32) {
         // The NiOutputDebugString warning is deliberately omitted here, as the game does.
-        NiPixelData* pkMem = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        pkDest = pkMem ? ::new (pkMem) NiPixelData(uiWidth, uiHeight, NiPixelFormat_BUMPLUMA32, uiLevels, 1u) : nullptr;
+        pkDest = new NiPixelData(uiWidth, uiHeight, NiPixelFormat_BUMPLUMA32, uiLevels, 1u);
         for (l = 0; l < uiLevels; l++) {
             uint8_t* pucDest = &pkDest->m_pucPixels[pkDest->m_puiOffsetInBytes[l]];
             uiWidth = kSrc.m_puiWidth[l];
@@ -1010,9 +995,8 @@ NiPixelData* NiDevImageConverter::GenerateBumpMap(const NiPixelData& kSrc, const
         uiSrcPixelStride = 3;
         uiDestPixelStride = 4;
     }
-    else if (kSrc.m_kPixelFormat.operator==(NiPixelFormat_RGB24)) {
-        NiPixelData* pkMem = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        pkDest = pkMem ? ::new (pkMem) NiPixelData(uiWidth, uiHeight, NiPixelFormat_BUMP16, uiLevels, 1u) : nullptr;
+    else if (kSrc.m_kPixelFormat == NiPixelFormat_RGB24) {
+        pkDest = new NiPixelData(uiWidth, uiHeight, NiPixelFormat_BUMP16, uiLevels, 1u);
         uiSrcPixelStride = 3;
         uiDestPixelStride = 2;
     }
@@ -1160,20 +1144,13 @@ NiPixelData* NiDevImageConverter::ConvertForPlatform(
     if (!v8) {
         return nullptr;
     }
-    if (v8->operator==(*p_m_kPixelFormat)) {
+    if (*v8 == *p_m_kPixelFormat) {
         return const_cast<NiPixelData*>(pkSrc);
     }
     if (!CanConvertPixelData(*p_m_kPixelFormat, *v9)) {
         return nullptr;
     }
-    void* pkSrca = NiMemObject::operator new(sizeof(NiPixelData));
-    if (pkSrca) {
-        v11 = ::new (pkSrca)
-            NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, *v9, pkSrc->m_uiMipmapLevels, pkSrc->m_uiFaces);
-    }
-    else {
-        v11 = nullptr;
-    }
+    v11 = new NiPixelData(*pkSrc->m_puiWidth, *pkSrc->m_puiHeight, *v9, pkSrc->m_uiMipmapLevels, pkSrc->m_uiFaces);
     return ConvertPixelDataFormat(*v11, *pkSrc, (-1)) ? v11 : nullptr;
 }
 

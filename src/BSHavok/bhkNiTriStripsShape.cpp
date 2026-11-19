@@ -54,11 +54,7 @@ NiObject* bhkNiTriStripsShape::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkNiTriStripsShape* pClone =
-        static_cast<bhkNiTriStripsShape*>(NiMemObject::operator new(sizeof(bhkNiTriStripsShape)));
-    if (pClone) {
-        ::new (pClone) bhkNiTriStripsShape;
-    }
+    bhkNiTriStripsShape* pClone = new bhkNiTriStripsShape;
     // Called through the base, so the class's CopyMembers is reached through the vtable.
     static_cast<bhkShape*>(this)->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -514,8 +510,7 @@ void bhkNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& ar
         if (!pRTTI) {
             continue;
         }
-        void* pMemory = NiMemObject::operator new(sizeof(NiTriStrips));
-        NiTriStrips* pStrips = pMemory ? ::new (pMemory) NiTriStrips(pData) : nullptr;
+        NiTriStrips* pStrips = new NiTriStrips(pData);
         pStrips->SetName("bhkNiTriStripsShape");
         float fScale = __builtin_fabsf(GetScale());
         pStrips->m_kLocal.m_fScale = fScale;
@@ -583,12 +578,7 @@ float bhkNiTriStripsShape::GetScale() const {
 }
 
 NiObject* bhkNiTriStripsShape::CreateObject() {
-    bhkNiTriStripsShape* pObject =
-        static_cast<bhkNiTriStripsShape*>(NiMemObject::operator new(sizeof(bhkNiTriStripsShape)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkNiTriStripsShape;
+    return new bhkNiTriStripsShape;
 }
 
 // hkShapeCinfo's constructor clears the user data.

@@ -196,13 +196,7 @@ NiSequence* NiSequence::ConvertSequence(const NiStream& kStream, uint32_t uiInde
         pcSequenceName = pkContainer->m_kName.GetHandle();
     }
     NiSequence* pkSequence;
-    NiSequence* pkNew = static_cast<NiSequence*>(NiMemObject::operator new(sizeof(NiSequence)));
-    if (pkNew) {
-        pkSequence = ::new (pkNew) NiSequence(pcSequenceName, 12u, 12u);
-    }
-    else {
-        pkSequence = nullptr;
-    }
+    pkSequence = new NiSequence(pcSequenceName, 12u, 12u);
     pkSequence->m_uiTextKeyReference = 0;
 
     for (uint32_t i = 0; i < pkContainer->m_usExtraDataSize; ++i) {
@@ -272,12 +266,7 @@ NiSequence* NiSequence::ConvertSequence(const NiStream& kStream, uint32_t uiInde
 }
 
 NiObject* NiSequence::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiSequence));
-    if (v0) {
-        return ::new (v0) NiSequence(nullptr, 0xCu, 0xCu);
-    }
-
-    return nullptr;
+    return new NiSequence(nullptr, 0xCu, 0xCu);
 }
 
 void NiSequence::CreateFromKFFile(

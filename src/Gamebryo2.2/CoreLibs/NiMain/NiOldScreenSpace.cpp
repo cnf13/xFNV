@@ -139,10 +139,7 @@ const NiRTTI* NiScreenGeometry::GetRTTI() const {
 
 // A new empty shape, then the members copied.
 NiObject* NiScreenGeometry::CreateClone(NiCloningProcess& kCloning) {
-    NiScreenGeometry* pkClone = static_cast<NiScreenGeometry*>(NiMemObject::operator new(sizeof(NiScreenGeometry)));
-    if (pkClone) {
-        ::new (pkClone) NiScreenGeometry;
-    }
+    NiScreenGeometry* pkClone = new NiScreenGeometry;
     // Calls BSResizableTriShape::CopyMembers on the same object, a class this one does not derive from, as the game
     // does; its body only calls NiTriShape::CopyMembers.
     static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(this))
@@ -177,11 +174,7 @@ void NiScreenGeometry::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 
 // An empty triangle shape.
 NiObject* NiScreenGeometry::CreateObject() {
-    NiScreenGeometry* pkObject = static_cast<NiScreenGeometry*>(NiMemObject::operator new(sizeof(NiScreenGeometry)));
-    if (pkObject) {
-        return ::new (pkObject) NiScreenGeometry;
-    }
-    return nullptr;
+    return new NiScreenGeometry;
 }
 
 // An empty element.
@@ -450,11 +443,7 @@ void NiScreenGeometryData::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings)
 
 // An empty screen geometry data, built by the class's constructor.
 NiObject* NiScreenGeometryData::CreateObject() {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiScreenGeometryData));
-    if (pvMemory) {
-        return ::new (pvMemory) NiScreenGeometryData;
-    }
-    return nullptr;
+    return new NiScreenGeometryData;
 }
 
 // The element pool, made in place: an empty free list, no containers yet, and 8 as both the current and the initial
@@ -522,10 +511,7 @@ const NiRTTI* NiScreenPolygon::GetRTTI() const {
 // A new empty polygon (its property state left unset), the members copied, then a copy of the property state of its
 // own.
 NiObject* NiScreenPolygon::CreateClone(NiCloningProcess& kCloning) {
-    NiScreenPolygon* pkClone = static_cast<NiScreenPolygon*>(NiMemObject::operator new(sizeof(NiScreenPolygon)));
-    if (pkClone) {
-        ::new (pkClone) NiScreenPolygon;
-    }
+    NiScreenPolygon* pkClone = new NiScreenPolygon;
     NiObject::CopyMembers(pkClone, kCloning);
     NiPropertyState* pkState = static_cast<NiPropertyState*>(MemoryManager_Singleton.Allocate(sizeof(NiPropertyState)));
     if (pkState) {
@@ -717,11 +703,7 @@ void NiScreenPolygon::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 
 // An empty polygon.
 NiObject* NiScreenPolygon::CreateObject() {
-    NiScreenPolygon* pkObject = static_cast<NiScreenPolygon*>(NiMemObject::operator new(sizeof(NiScreenPolygon)));
-    if (pkObject) {
-        return ::new (pkObject) NiScreenPolygon;
-    }
-    return nullptr;
+    return new NiScreenPolygon;
 }
 
 // Both screen arrays hold 5 slots and grow by 5; the camera is orthographic and its world data and bound are
@@ -860,10 +842,5 @@ void NiScreenSpaceCamera::CopyMembers(NiScreenSpaceCamera* pkDest, NiCloningProc
 }
 
 NiObject* NiScreenSpaceCamera::CreateObject() {
-    NiScreenSpaceCamera* v0 = static_cast<NiScreenSpaceCamera*>(NiMemObject::operator new(sizeof(NiScreenSpaceCamera)));
-    if (v0) {
-        return ::new (v0) NiScreenSpaceCamera;
-    }
-
-    return nullptr;
+    return new NiScreenSpaceCamera;
 }

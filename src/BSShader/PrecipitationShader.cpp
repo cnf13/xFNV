@@ -70,23 +70,12 @@ bool PrecipitationShader::Initialize() {
 
 void PrecipitationShader::CreateConstantMaps() {
     if (!m_spPixelConstantMap) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap->AddEntry("ambient color", 0x10000006, 0, 0, 1, "", 12, 4, &AmbientColor, false);
     }
     if (!m_spVertexConstantMap) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
-        else {
-            pMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap->AddEntry("WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false);
         m_spVertexConstantMap->AddEntry("eye pos", 0x10000006, 0, 8, 1, "", 12, 4, &pEyePosition, false);
@@ -221,10 +210,7 @@ BSShader* PrecipitationShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_TEXCOORD, 1u, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     pshaderDecl->GetD3DDeclaration();
-    PrecipitationShader* v2 = static_cast<PrecipitationShader*>(NiMemObject::operator new(sizeof(PrecipitationShader)));
-    if (v2) {
-        pshader = ::new (v2) PrecipitationShader;
-    }
+    pshader = new PrecipitationShader;
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

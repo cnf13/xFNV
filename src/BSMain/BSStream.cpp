@@ -89,10 +89,7 @@ bool BSStream::RegisterSaveObject(NiObject* apObject) {
         }
     }
     if (pFound) {
-        BSReference* pNewRef = static_cast<BSReference*>(NiMemObject::operator new(sizeof(BSReference)));
-        if (pNewRef) {
-            ::new (pNewRef) BSReference(pNET->m_kName.GetHandle());
-        }
+        BSReference* pNewRef = new BSReference(pNET->m_kName.GetHandle());
         spRef = pNewRef;
         pkObject = spRef.m_pObject;
     }
@@ -220,10 +217,7 @@ bool BSStream::LoadStream() {
 
 bool BSStream::SaveStream() {
     if (pObjectRefMap) {
-        BSNodeReferences* pRefs = static_cast<BSNodeReferences*>(NiMemObject::operator new(sizeof(BSNodeReferences)));
-        if (pRefs) {
-            ::new (pRefs) BSNodeReferences;
-        }
+        BSNodeReferences* pRefs = new BSNodeReferences;
         spNodeReferences = pRefs;
         InsertObject(static_cast<NiObject*>(spNodeReferences.m_pObject));
     }
@@ -269,9 +263,8 @@ void BSStream::LoadShaderTextures(char* apcName) {
         NiPointer<NiTexture> sptexture;
         BSTexturePalette::GetTexture(cPath, sptexture);
         if (!sptexture.m_pObject && NiFile::Access(cPath, NiFile::READ_ONLY)) {
-            sptexture.operator=(
-                static_cast<NiTexture*>(NiSourceTexture::Create(cPath, NiSourceTexture::ms_kDefaultPrefs, true, false))
-            );
+            sptexture =
+                static_cast<NiTexture*>(NiSourceTexture::Create(cPath, NiSourceTexture::ms_kDefaultPrefs, true, false));
             if (sptexture.m_pObject) {
                 BSTexturePalette::SetTexture(sptexture.m_pObject, nullptr);
             }

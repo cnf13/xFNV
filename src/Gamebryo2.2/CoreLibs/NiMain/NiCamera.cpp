@@ -860,10 +860,5 @@ double NiCamera::retn_0_75() {
 }
 
 NiObject* NiCamera::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiCamera));
-    if (v0) {
-        return ::new (v0) NiCamera;
-    }
-
-    return nullptr;
+    return new NiCamera;
 }

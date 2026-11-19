@@ -131,7 +131,7 @@ void hkVisualDebugger::pollForNewClients() {
                 char buf[512];
                 {
                     hkErrStream apThis(buf, 512);
-                    apThis.operator<<("A new network client has been received (host name not available at present)");
+                    apThis << "A new network client has been received (host name not available at present)";
                     hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 232);
                 }
                 createClient(v3, &v3->m_reader, &v3->m_writer);
@@ -383,7 +383,7 @@ void hkVisualDebugger::shutdown() {
         writeStep(i, 0.0f);
         deleteClient(i);
         hkErrStream apThis(buf, 512);
-        apThis.operator<<("Client deleted.");
+        apThis << "Client deleted.";
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 81);
     }
     hkSocket* m_server = this->m_server;
@@ -391,7 +391,7 @@ void hkVisualDebugger::shutdown() {
         delete m_server;
         this->m_server = nullptr;
         hkErrStream apThis(buf, 512);
-        apThis.operator<<("Server deleted.");
+        apThis << "Server deleted.";
         hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 88);
     }
     hkError::s_instance->sectionEnd();
@@ -411,7 +411,7 @@ void hkVisualDebugger::addDefaultProcess(const char* viewerName) {
     int32_t m_size = p_m_defaultProcesses->m_size;
     hkStringPtr* v6 = &p_m_defaultProcesses->m_data[m_size];
     p_m_defaultProcesses->m_size = m_size + 1;
-    v6->operator=(viewerName);
+    *v6 = viewerName;
 }
 
 // Tracks obj: appends its record, then tells every callback.
@@ -441,9 +441,9 @@ void hkVisualDebugger::removeDefaultProcess(const char* processName) {
         hkError::s_instance->sectionBegin(0x76565454, "removeDefaultProcess");
         {
             hkErrStream apThis(buf, 512);
-            hkOstream* v4 = &apThis.operator<<("The default Process'");
-            hkOstream* v5 = &v4->operator<<(processName);
-            v5->operator<<("', cannot not be removed from the default process list as it cannot be found!");
+            hkOstream* v4 = &(apThis << "The default Process'");
+            hkOstream* v5 = &(*v4 << processName);
+            *v5 << "', cannot not be removed from the default process list as it cannot be found!";
             hkError::s_instance->message(hkError::MESSAGE_REPORT, -1, buf, ".\\hkVisualDebugger.cpp", 318);
         }
         hkError::s_instance->sectionEnd();

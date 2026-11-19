@@ -1165,7 +1165,7 @@ uint8_t bhkRagdollController::GetEaseOutLookAtIK() {
 
 void bhkRagdollController::SetLookAtTarget(NiPoint3* apTarget, bool abEnable) {
     NI2HK(CurrentTargetWS, *apTarget);
-    CurrentTargetWS.operator()(3) = 0.0;
+    CurrentTargetWS(3) = 0.0;
     if (abEnable) {
         SetLookIKActive(true);
         bEaseOutLookIK = false;
@@ -2898,11 +2898,7 @@ void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkelet
     }
     SkeletonMap.GetAt(SkeletonShareName.GetHandle(), spRagdollSharedData);
     if (!spRagdollSharedData.m_pObject) {
-        bhkRagdollShareData* pNewShareData =
-            static_cast<bhkRagdollShareData*>(NiMemObject::operator new(sizeof(bhkRagdollShareData)));
-        if (pNewShareData) {
-            ::new (pNewShareData) bhkRagdollShareData;
-        }
+        bhkRagdollShareData* pNewShareData = new bhkRagdollShareData;
         spRagdollSharedData = pNewShareData;
         SkeletonMap.SetAt(SkeletonShareName.GetHandle(), spRagdollSharedData);
     }

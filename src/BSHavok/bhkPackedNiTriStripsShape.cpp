@@ -54,11 +54,7 @@ NiObject* bhkPackedNiTriStripsShape::CreateClone(NiCloningProcess& arCloneData) 
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkPackedNiTriStripsShape* pClone =
-        static_cast<bhkPackedNiTriStripsShape*>(NiMemObject::operator new(sizeof(bhkPackedNiTriStripsShape)));
-    if (pClone) {
-        ::new (pClone) bhkPackedNiTriStripsShape;
-    }
+    bhkPackedNiTriStripsShape* pClone = new bhkPackedNiTriStripsShape;
     // Called through the base so that the class's CopyMembers is reached by virtual dispatch.
     static_cast<bhkShape*>(this)->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -311,8 +307,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
             }
             while (us0 < usvertCount + pdata->paSubPartData[i].uiNumVerts && uscurrentKey < pdata->uiKeyCount);
 
-            void* pMemory = NiMemObject::operator new(sizeof(NiTriShapeData));
-            NiTriShapeData* ptsd = pMemory ? ::new (pMemory) NiTriShapeData : nullptr;
+            NiTriShapeData* ptsd = new NiTriShapeData;
             uint16_t uspartVerts = static_cast<uint16_t>(pdata->paSubPartData[i].uiNumVerts);
             uint64_t ullSize = static_cast<uint64_t>(uspartVerts) * sizeof(NiPoint3);
             NiPoint3* verts = static_cast<NiPoint3*>(
@@ -338,8 +333,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
             rt::memcpy(ptriList, shapeArray.m_pBase, shapeArray.m_usSize * sizeof(uint16_t));
             ptsd->SetData(usnumTris, ptriList);
 
-            pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-            NiTriShape* ptriShape = pMemory ? ::new (pMemory) NiTriShape(ptsd) : nullptr;
+            NiTriShape* ptriShape = new NiTriShape(ptsd);
             alignas(16) NiFixedString kName("bhkPackedNiTriStripsShape");
             ptriShape->SetName(kName);
             float fScale = GetScale();
@@ -347,8 +341,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
             ptriShape->m_kLocal.m_fScale = fScale;
             shapeArray.RemoveAll();
 
-            pMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
-            NiMaterialProperty* pmat = pMemory ? ::new (pMemory) NiMaterialProperty : nullptr;
+            NiMaterialProperty* pmat = new NiMaterialProperty;
             // EXE-INLINED 0x4BC450
             pmat->m_emit = arDefColor;
             ++pmat->m_uiRevID;
@@ -407,12 +400,7 @@ float bhkPackedNiTriStripsShape::GetScale() {
 }
 
 NiObject* bhkPackedNiTriStripsShape::CreateObject() {
-    bhkPackedNiTriStripsShape* pObject =
-        static_cast<bhkPackedNiTriStripsShape*>(NiMemObject::operator new(sizeof(bhkPackedNiTriStripsShape)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkPackedNiTriStripsShape;
+    return new bhkPackedNiTriStripsShape;
 }
 
 // hkShapeCinfo's constructor clears the user data; spData's own destructor releases the data.

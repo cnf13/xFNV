@@ -59,10 +59,7 @@ NiObject* bhkCharacterProxy::CreateClone(NiCloningProcess& arCloneData) {
     iMemContext = MEM_CONTEXT_HAVOK;
     bhkCharacterProxy* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    void* pMemory = NiMemObject::operator new(sizeof(bhkCharacterProxy));
-    if (pMemory) {
-        pClone = ::new (pMemory) bhkCharacterProxy;
-    }
+    pClone = new bhkCharacterProxy;
     bhkSerializable::CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     iMemContext = iSavedMemContext;

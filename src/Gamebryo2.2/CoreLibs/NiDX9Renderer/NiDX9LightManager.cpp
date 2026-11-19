@@ -229,7 +229,7 @@ void NiDX9LightManager::RemoveLight(NiLight* apLight) {
         m_kDeviceLights.Remove(apLight);
         apLight->m_pvRendererData = nullptr;
         m_auiValidIndices[static_cast<uint32_t>(pkEntry->m_iIndex) >> 5] &= ~(1u << (pkEntry->m_iIndex & 31));
-        NiMemObject::operator delete(pkEntry, sizeof(LightEntry));
+        delete pkEntry;
     }
     else if (m_kLights.GetAt(apLight, pkFound)) {
         m_kLights.RemoveAt(apLight);
@@ -260,7 +260,7 @@ void NiDX9LightManager::ReleaseLights() {
 
         pkLight->m_pvRendererData = nullptr;
 
-        NiMemObject::operator delete(pkLightEntry, sizeof(LightEntry));
+        delete pkLightEntry;
     }
 }
 
@@ -339,13 +339,7 @@ void NiDX9LightManager::UpdateLights(const NiDynamicEffectState* pkState) {
                 if (uiIndex == 0xFFFFFFFFu) {
                     continue;
                 }
-                void* pvMemory = NiMemObject::operator new(sizeof(LightEntry));
-                if (pvMemory) {
-                    pkEntry = ::new (pvMemory) LightEntry(*pkLight, static_cast<int32_t>(uiIndex));
-                }
-                else {
-                    pkEntry = nullptr;
-                }
+                pkEntry = new LightEntry(*pkLight, static_cast<int32_t>(uiIndex));
                 m_kLights.SetAt(pkLight, pkEntry);
                 pkLight->m_pvRendererData = pkEntry;
                 bChanged = true;

@@ -1355,7 +1355,7 @@ void hkpContinuousSimulation::simulateToi(
     stepInfo.m_invDeltaTime = 1.0f / stepInfo.m_deltaTime;
 
     alignas(16) hkpSolverInfo solverInfo;
-    solverInfo.operator=(world->m_dynamicsStepInfo.m_solverInfo);
+    solverInfo = world->m_dynamicsStepInfo.m_solverInfo;
     solverInfo.m_invNumSteps = 1.0f;
     solverInfo.m_deltaTime = physicsDeltaTime;
     solverInfo.m_numSteps = 1;

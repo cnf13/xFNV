@@ -135,9 +135,7 @@ bool NiControllerManager::RegisterStreamables(NiStream& kStream) {
         pkPalette->RegisterStreamables(kStream);
         return true;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiDefaultAVObjectPalette));
-    NiDefaultAVObjectPalette* pkNewPalette =
-        pMemory ? ::new (pMemory) NiDefaultAVObjectPalette(static_cast<NiAVObject*>(m_pkTarget), 37) : nullptr;
+    NiDefaultAVObjectPalette* pkNewPalette = new NiDefaultAVObjectPalette(static_cast<NiAVObject*>(m_pkTarget), 37);
     m_spObjectPalette = pkNewPalette;
     return true;
 }
@@ -301,10 +299,7 @@ NiControllerSequence* NiControllerManager::CreateTempBlendSequence(
 
     bool bRemInterps = false;
     if (!pkTempSequence) {
-        void* pvMem = NiMemObject::operator new(sizeof(NiControllerSequence));
-        if (pvMem) {
-            pkTempSequence = ::new (pvMem) NiControllerSequence("__TempBlendSequence__", uiArraySize, 12);
-        }
+        pkTempSequence = new NiControllerSequence("__TempBlendSequence__", uiArraySize, 12);
 
         // The set receives a smart-pointer temporary.
         m_kTempBlendSeqs.Add(pkTempSequence);
@@ -640,12 +635,7 @@ bool NiControllerManager::AddSequence(
 }
 
 NiObject* NiControllerManager::CreateObject() {
-    NiControllerManager* v0 = static_cast<NiControllerManager*>(NiMemObject::operator new(sizeof(NiControllerManager)));
-    if (v0) {
-        return ::new (v0) NiControllerManager;
-    }
-
-    return nullptr;
+    return new NiControllerManager;
 }
 
 NiAVObjectPalette::~NiAVObjectPalette() {}

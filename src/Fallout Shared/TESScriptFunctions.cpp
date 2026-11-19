@@ -2063,15 +2063,9 @@ bool Cmd_ShowPivot(
         pkVertex[4] = *v20;
         NiPoint3* v21 = ::new (&v31) NiPoint3(0.0f, 0.0f, v50);
         pkVertex[5] = *v21;
-        NiLines* v30 = static_cast<NiLines*>(NiMemObject::operator new(sizeof(NiLines)));
-        if (v30) {
-            v27 = ::new (v30) NiLines(
-                6, pkVertex, pkColor, nullptr, 1, NiGeometryData::NBT_METHOD_NONE, reinterpret_cast<uint8_t*>(v43)
-            );
-        }
-        else {
-            v27 = nullptr;
-        }
+        v27 = new NiLines(
+            6, pkVertex, pkColor, nullptr, 1, NiGeometryData::NBT_METHOD_NONE, reinterpret_cast<uint8_t*>(v43)
+        );
         const NiPoint3* v22 = &apRefObject->GetLocationOnReference();
         v27->SetTranslate(*v22);
         TES::pInstance->AddTempDebugObject(v27, 20.0f);
@@ -4434,13 +4428,13 @@ bool Cmd_EssentialDeathReload_Execute(
     if (pSaveLoadGameOLD->GetMostRecentSaveGame()) {
         Interface::CreateMessageMenu(
             a8, static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), &PlayerCharacter::ForceReload, 1,
-            0, 0.0f, 0.0f, sOk.operator const char*(), nullptr
+            0, 0.0f, 0.0f, static_cast<const char*>(sOk), nullptr
         );
     }
     else {
         Interface::CreateMessageMenu(
             a8, static_cast<const char*>(nullptr), static_cast<const char*>(nullptr), &PlayerCharacter::ForceRestart, 1,
-            0, 0.0f, 0.0f, sOk.operator const char*(), nullptr
+            0, 0.0f, 0.0f, static_cast<const char*>(sOk), nullptr
         );
     }
     return true;
@@ -4512,7 +4506,7 @@ bool Cmd_OutputTextureUseMap(
         size >>= 20;
         string.SPrintF("%d MB", size);
     }
-    string.operator+=(" textures in use.");
+    string += " textures in use.";
     Interface::PrintLine(static_cast<const char*>(string.pString));
     return true;
 }
@@ -5689,7 +5683,7 @@ bool Cmd_SetGameSetting(
         switch (Type) {
             case 3: {
                 int32_t afValue = std::atoi(String);
-                Ptr->operator=(afValue);
+                *Ptr = afValue;
                 if (GetThreadTLSData()->bSystemOutput) {
                     int32_t afValuea = Ptr->Int();
                     Interface::PrintLine("GameSetting %s >> %i", Ptr->Key(), afValuea);
@@ -5698,7 +5692,7 @@ bool Cmd_SetGameSetting(
             }
             case 5: {
                 float v14 = std::atof(String);
-                Ptr->operator=(v14);
+                *Ptr = v14;
                 if (GetThreadTLSData()->bSystemOutput) {
                     float* v10 = &Ptr->Float();
                     Interface::PrintLine("GameSetting %s >> %.2f", Ptr->Key(), *v10);
@@ -5706,7 +5700,7 @@ bool Cmd_SetGameSetting(
                 break;
             }
             case 6: {
-                Ptr->operator=(static_cast<const char*>(String));
+                *Ptr = static_cast<const char*>(String);
                 if (GetThreadTLSData()->bSystemOutput) {
                     const char* v11 = Ptr->String();
                     Interface::PrintLine("GameSetting %s >> '%s'", Ptr->Key(), v11);
@@ -5804,7 +5798,7 @@ bool Cmd_SetINISetting(
         switch (Ptr->GetType()) {
             case 0: {
                 int32_t afValue = std::atoi(String);
-                Ptr->operator=(afValue);
+                *Ptr = afValue;
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("INISetting %s >> %i", a8, Ptr->Bool());
                 }
@@ -5812,7 +5806,7 @@ bool Cmd_SetINISetting(
             }
             case 3: {
                 int32_t afValuea = std::atoi(String);
-                Ptr->operator=(afValuea);
+                *Ptr = afValuea;
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("INISetting %s >> %i", a8, Ptr->Int());
                 }
@@ -5820,14 +5814,14 @@ bool Cmd_SetINISetting(
             }
             case 5: {
                 float v13 = std::atof(String);
-                Ptr->operator=(v13);
+                *Ptr = v13;
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("INISetting %s >> %.2f", a8, Ptr->Float());
                 }
                 break;
             }
             case 6: {
-                Ptr->operator=(static_cast<const char*>(String));
+                *Ptr = static_cast<const char*>(String);
                 if (GetThreadTLSData()->bSystemOutput) {
                     Interface::PrintLine("INISetting %s >> '%s'", a8, Ptr->Int());
                 }
@@ -6560,7 +6554,7 @@ bool Cmd_SayTo_Execute(
         bForceSubtitles = true;
     }
     int32_t aiValue = iSpeakSoundLipDistance.Int();
-    iSpeakSoundLipDistance.operator=(0x7FFFFFFF);
+    iSpeakSoundLipDistance = 0x7FFFFFFF;
     Actor* pSpeaker = nullptr;
     if (apRefObject->IsActor()) {
         pSpeaker = static_cast<Actor*>(apRefObject);
@@ -6623,7 +6617,7 @@ bool Cmd_SayTo_Execute(
             );
         }
     }
-    iSpeakSoundLipDistance.operator=(aiValue);
+    iSpeakSoundLipDistance = aiValue;
     return true;
 }
 
@@ -9183,14 +9177,7 @@ bool Cmd_PlayMagicShaderVisuals_Execute(
         0x409C
     );
     BSTempEffect* apEffect = nullptr;
-    MagicShaderHitEffect* v10 =
-        static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-    if (v10) {
-        v9 = ::new (v10) MagicShaderHitEffect(apRefObject, TESEffectShader_, duration);
-    }
-    else {
-        v9 = nullptr;
-    }
+    v9 = new MagicShaderHitEffect(apRefObject, TESEffectShader_, duration);
     apEffect = v9;
     if (v9->Init()) {
         ReferenceProcessLists.AddTempEffect(apEffect);
@@ -11396,7 +11383,7 @@ bool Cmd_ShowQuestStages(
             char cBuffer[32];
             TESQuestStage* pStage = pStageIter->m_item;
             BSsprintf(cBuffer, 31, "Stage %d: %d ", pStage->m_Data.ucIndex, pStage->m_Data.bIsDone != 0);
-            kStages.operator=(cBuffer);
+            kStages = cBuffer;
             // Tests the item list's second link rather than its first item, as the game does.
             if (pStage->listStageItems.m_pkNext) {
                 kStages += " (";
@@ -13763,12 +13750,12 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
                     moveVec.y = rotMatrix.GetEntry(1u, 0);
                     moveVec.z = rotMatrix.GetEntry(2u, 0);
                 }
-                moveVec.operator*=(static_cast<float>(aiDistance));
+                moveVec *= static_cast<float>(aiDistance);
                 if (aiDirection <= 0 || aiDirection > 2) {
-                    pos.operator+=(moveVec);
+                    pos += moveVec;
                 }
                 else {
-                    pos.operator-=(moveVec);
+                    pos -= moveVec;
                 }
             }
         }
@@ -13839,7 +13826,7 @@ TESObjectREFR* Script::PlaceAtMeFunctionBase(
                         v32.NiSetTo(to);
                         TES::pInstance->Pick(v32);
                         hkBool v28 = v32.hasHit();
-                        if (v28.operator bool()) {
+                        if (v28) {
                             NiPoint3 delta = to - from;
                             delta.Unitize();
                             pos = to - delta * pboundobj->GetBoundSize();
@@ -17456,9 +17443,9 @@ bool Script::OutputMemStats(
             }
             if (idx != -1) {
                 for (int32_t i_2 = 2047; i_2 > idx; --i_2) {
-                    pLargestTex[i_2].operator=(pLargestTex[i_2 - 1]);
+                    pLargestTex[i_2] = pLargestTex[i_2 - 1];
                 }
-                pLargestTex[idx].operator=(pTex);
+                pLargestTex[idx] = pTex;
             }
         }
     }
@@ -17747,13 +17734,7 @@ bool Script::TestLocalMap(
         )) {
         return false;
     }
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        pnode = ::new (apMemory) NiNode(0);
-    }
-    else {
-        pnode = nullptr;
-    }
+    pnode = new NiNode(0);
     NiPoint3 playerloc = pPlayer->GetLocationOnReference();
     playerloc.z = playerloc.z + 10.0;
     int32_t itrisize = 64;
@@ -17888,7 +17869,7 @@ bool Script::TestLocalMap(
                     float v42 = static_cast<double>(y_2) * fpossize;
                     float v41 = static_cast<double>(x_2) * fpossize;
                     NiPoint3 worldcoord(v41, v42, 0.0f);
-                    worldcoord.operator+=(sectoffset);
+                    worldcoord += sectoffset;
                     float fseenval = static_cast<float>(TESObjectCELL::GetSeenValue(worldcoord));
                     float v40 = fseenval / 4.0;
                     NiColorA kSeenColor(v40, v40, v40, 0.0f);
@@ -17930,16 +17911,10 @@ bool Script::TestLocalMap(
                 ptrilist[index++] = v20;
             }
         }
-        NiTriShape* v57 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-        if (v57) {
-            ptri = ::new (v57) NiTriShape(
-                iarraysize, pverts_2, pnorm_2, pcolor_2, ptex_2, 1, NiGeometryData::NBT_METHOD_NONE, 2 * itilecount,
-                ptrilist
-            );
-        }
-        else {
-            ptri = nullptr;
-        }
+        ptri = new NiTriShape(
+            iarraysize, pverts_2, pnorm_2, pcolor_2, ptex_2, 1, NiGeometryData::NBT_METHOD_NONE, 2 * itilecount,
+            ptrilist
+        );
         NiTriShape* v58 = ptri;
         NiTriShape* ptri_2 = ptri;
         pnode->AttachChild(ptri, 1);
@@ -17950,14 +17925,7 @@ bool Script::TestLocalMap(
         ptri_2->SetTranslate(v37, v38, 0.0f);
         if (spmaptex.m_pObject) {
             NiTexturingProperty* ptexprop;
-            NiTexturingProperty* v55 =
-                static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-            if (v55) {
-                ptexprop = ::new (v55) NiTexturingProperty;
-            }
-            else {
-                ptexprop = nullptr;
-            }
+            ptexprop = new NiTexturingProperty;
             NiTexturingProperty* v56 = ptexprop;
             NiProperty* ptexprop_2 = ptexprop;
             NiTexture* a4 = spmaptex.m_pObject;
@@ -17966,7 +17934,7 @@ bool Script::TestLocalMap(
                 ->NiTexturingProperty::SetBaseClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
             static_cast<NiTexturingProperty*>(ptexprop_2)->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
             ptri_2->AttachProperty(ptexprop_2);
-            spmaptex.operator=(static_cast<NiTexture*>(nullptr));
+            spmaptex = static_cast<NiTexture*>(nullptr);
         }
     }
     NiPoint3 playerpos = pPlayer->GetLocationOnReference();
@@ -18284,7 +18252,7 @@ bool Script::ShowViewerStrings(
         }
         v18->GetViewerStrings(v11);
         for (uint32_t uiIndex = 0; uiIndex < v11->m_usSize; ++uiIndex) {
-            Interface::PrintLine(static_cast<const char*>(v11->operator[](uiIndex)));
+            Interface::PrintLine(static_cast<const char*>((*v11)[uiIndex]));
         }
         v11->RemoveAll();
         if (v18->GetCollisionObject()) {
@@ -18293,7 +18261,7 @@ bool Script::ShowViewerStrings(
                 bhkRigidBody* pBody = static_cast<bhkCollisionObject*>(v14)->GetRigidBody();
                 pBody->GetViewerStrings(v11);
                 for (uint32_t j = 0; j < v11->m_usSize; ++j) {
-                    Interface::PrintLine(static_cast<const char*>(v11->operator[](j)));
+                    Interface::PrintLine(static_cast<const char*>((*v11)[j]));
                 }
                 v11->RemoveAll();
             }
@@ -18416,8 +18384,8 @@ bool Script::SetLODObjectDistanceFunction(
     if (!pm) {
         return true;
     }
-    fBlockLoadDistanceLow.operator=(f0);
-    fBlockLoadDistance.operator=(f1);
+    fBlockLoadDistanceLow = f0;
+    fBlockLoadDistance = f1;
     NiPoint3 updatePos = NiPoint3_ZERO;
     if (appMain->bFlyCamera) {
         SceneGraph* WorldSceneGraph = Main::GetWorldSceneGraph();
@@ -18573,13 +18541,7 @@ bool Script::AddOcclusionPlane(
     kcamerarot = Main::GetWorldSceneGraph()->GetCamera()->GetWorldTransform().m_Rotate;
     kcamerafunk.MakeZRotation(1.5707963f);
     kcamerarot = *::new (&kcamerafunk_2) NiMatrix3(kcamerarot * kcamerafunk);
-    BSOcclusionPlane* apMemory = static_cast<BSOcclusionPlane*>(NiMemObject::operator new(sizeof(BSOcclusionPlane)));
-    if (apMemory) {
-        v15 = ::new (apMemory) BSOcclusionPlane(&kpos, &ksize, &kcamerarot);
-    }
-    else {
-        v15 = nullptr;
-    }
+    v15 = new BSOcclusionPlane(&kpos, &ksize, &kcamerarot);
     NiPointer<BSOcclusionPlane> spoccluder(v15);
     BSOcclusionPlane* angle = spoccluder.m_pObject;
     ShadowSceneNode* v12 = BSShaderManager::GetShadowSceneNode(0);
@@ -19969,16 +19931,16 @@ bool Script::CalcLowPathToPointFunction(
             if (v107->GetLock()) {
                 LockData* Lock = v107->GetLock();
                 if (Lock->IsLocked()) {
-                    v106.operator+=("-Locked");
+                    v106 += "-Locked";
                 }
             }
             if (v107->GetDisabled() || Teleport->pLinkedDoor->GetDisabled()) {
-                v106.operator+=("-Disabled");
+                v106 += "-Disabled";
             }
             if (static_cast<TESObjectDOOR*>(v107->GetObjectReference())->TESObjectDOOR::IsMinimalUse() ||
                 static_cast<TESObjectDOOR*>(Teleport->pLinkedDoor->GetObjectReference())
                     ->TESObjectDOOR::IsMinimalUse()) {
-                v106.operator+=("-MinUse");
+                v106 += "-MinUse";
             }
             TESObjectREFR* v65 = (&kPath.Doors.GetAt(a2))->pDoor;
             const char* afTime_4g = v106.String();
@@ -21228,7 +21190,7 @@ bool Script::SayFunction(
     bool balwaysplay = iAlwaysPlay > 0;
     Actor* pactor = dynamic_cast<Actor*>(apRefObject);
     int32_t ioldLipDistance = iSpeakSoundLipDistance.Int();
-    iSpeakSoundLipDistance.operator=(INT32_MAX);
+    iSpeakSoundLipDistance = INT32_MAX;
     if (!ptopic) {
         goto LABEL_37;
     }
@@ -21321,7 +21283,7 @@ bool Script::SayFunction(
             v17->ProcessGreet(pactor, ptopic, bforcesub, false, true, true);
         }
     LABEL_37:;
-        iSpeakSoundLipDistance.operator=(ioldLipDistance);
+        iSpeakSoundLipDistance = ioldLipDistance;
         return true;
     }
     if (!iPCHead) {
@@ -22057,8 +22019,7 @@ bool Script::SwapTextureOnRef(
             apParameters, apCompiledParams, auiOffset, apRefObject, apContainer, apScript, apScriptLocals, &pRef,
             GeometryName, TextureName
         ) &&
-        ((&BSGeometryName.operator=(GeometryName),
-          (&BSTextureName.operator=(TextureName), BSGeometryName.GetLength())) &&
+        ((&(BSGeometryName = GeometryName), (&(BSTextureName = TextureName), BSGeometryName.GetLength())) &&
          BSTextureName.GetLength())) {
         if (pRef) {
             NiAVObject* pMesh = (NiAVObject*)pRef->Get3D();
@@ -23557,7 +23518,7 @@ bool Script::AttachAshPileFunction(
         v34.NiSetTo(v31);
         TES::pInstance->Pick(v34);
         hkBool v30 = v34.hasHit();
-        if (v30.operator bool()) {
+        if (v30) {
             NiPoint3 v19;
             const hkpShape* Shape = v34.m_rootCollidable->m_shape;
             bhkShape* v27 = bhkShape::Getbhk(Shape);
@@ -23578,7 +23539,7 @@ bool Script::AttachAshPileFunction(
                     v24 = v34.m_shapeKeys[i];
                     v25 = v26;
                     const hkpShapeContainer* v21 = v26->getContainer();
-                    char (*v12)[512] = &v23.operator[](i);
+                    char (*v12)[512] = &v23[i];
                     v26 = v21->getChildShape(v34.m_shapeKeys[i], *v12);
                 }
                 bhkShape* v20 = bhkShape::Getbhk(v25);
@@ -23977,13 +23938,7 @@ bool Script::TestSeenData(
 ) {
     NiNode* pnode;
     NiMatrix3 rot;
-    NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (apMemory) {
-        pnode = ::new (apMemory) NiNode(0);
-    }
-    else {
-        pnode = nullptr;
-    }
+    pnode = new NiNode(0);
     TESObjectCELL* pcell = pPlayer->GetParentCell();
     if (pcell->GetInterior()) {
         SeenData* pdata = pcell->GetSeenData();
@@ -25413,11 +25368,11 @@ void* hkStackMemory::allocateStack(int32_t numBytes, const char* what) {
 }
 
 void hkStackMemory::deallocateStack(void* p) {
-    m_next.operator=(static_cast<char*>(p));
+    m_next = static_cast<char*>(p);
 }
 
 void hkStackMemory::initMemory(void* p, int32_t size) {
     m_start.m_storage = p;
-    m_next.operator=(static_cast<char*>(p));
+    m_next = static_cast<char*>(p);
     m_end.m_storage = hkAddByteOffset<char>(static_cast<char*>(p), size);
 }

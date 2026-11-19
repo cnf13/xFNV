@@ -295,8 +295,7 @@ void bhkNiCollisionObject::SetDebugDisplay(bool abTF) {
         if (!pParent) {
             pParent = pSceneObject->m_pkParent;
         }
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* pNode = new NiNode(0);
         NiFixedString kName("bhkColDisp");
         pNode->SetName(kName);
         if (pParent) {

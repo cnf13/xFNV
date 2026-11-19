@@ -315,12 +315,5 @@ void NiPersistentSrcTextureRendererData::ResetStreamingFunctions() {
 }
 
 NiObject* NiPersistentSrcTextureRendererData::CreateObject() {
-    NiPersistentSrcTextureRendererData* v0 = static_cast<NiPersistentSrcTextureRendererData*>(
-        NiMemObject::operator new(sizeof(NiPersistentSrcTextureRendererData))
-    );
-    if (v0) {
-        return ::new (v0) NiPersistentSrcTextureRendererData;
-    }
-
-    return nullptr;
+    return new NiPersistentSrcTextureRendererData;
 }

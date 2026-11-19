@@ -1095,7 +1095,7 @@ LABEL_20:;
     }
     else {
         m_spPixelConstantMap.operator=(spDefaultPixelConstantMap);
-        m_spVertexConstantMap.operator=(spDefaultVertexConstantMap);
+        m_spVertexConstantMap = spDefaultVertexConstantMap;
     }
 }
 
@@ -1277,11 +1277,7 @@ NiD3DShaderDeclaration* ShadowLightShader::GetShaderDecl(NiGeometry* apGeometry,
 // effect maps when missing. An empty string is passed as the variable names.
 void ShadowLightShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddPredefinedEntry(
             "WorldViewProjTranspose", 0x20000009, 0, "", 0, 0, nullptr, false
@@ -1617,11 +1613,7 @@ void ShadowLightShader::CreateConstantMaps() {
         spDefaultVertexConstantMap = m_spVertexConstantMap;
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("eye dir", 0x10000007, 0, 0, 1, "", 0x10, 4, &pEyeVector, false);
         m_spPixelConstantMap.m_pObject->AddEntry(
@@ -1892,11 +1884,7 @@ void ShadowLightShader::CreateConstantMaps() {
         spDefaultPixelConstantMap = m_spPixelConstantMap;
     }
     if (!spTexEffectVConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         spTexEffectVConstantMap = pMap;
         spTexEffectVConstantMap.m_pObject->AddPredefinedEntry(
             "WorldViewProjTranspose", 0x20000009, 0, "", 0, 0, nullptr, false
@@ -1925,11 +1913,7 @@ void ShadowLightShader::CreateConstantMaps() {
         );
     }
     if (!spTexEffectPConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         spTexEffectPConstantMap = pMap;
         spTexEffectPConstantMap.m_pObject->AddEntry("Fill Color", 0x10000007, 0, 0, 1, "", 0x10, 4, &kFillColor, false);
         spTexEffectPConstantMap.m_pObject->AddEntry("Rim Color", 0x10000007, 0, 1, 1, "", 0x10, 4, &kRimColor, false);
@@ -11959,20 +11943,20 @@ void ShadowLightShader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlph
     HairShader* pkhairShader = static_cast<HairShader*>(BSShaderManager::GetShader(13));
     if (auiPassEnum - 590 > 3) {
         if (pkshadowLightShader) {
-            pkshadowLightShader->m_spPixelConstantMap.operator=(pkshadowLightShader->spDefaultPixelConstantMap);
-            pkshadowLightShader->m_spVertexConstantMap.operator=(pkshadowLightShader->spDefaultVertexConstantMap);
+            pkshadowLightShader->m_spPixelConstantMap = pkshadowLightShader->spDefaultPixelConstantMap;
+            pkshadowLightShader->m_spVertexConstantMap = pkshadowLightShader->spDefaultVertexConstantMap;
         }
         if (pkskinShader) {
-            pkskinShader->m_spPixelConstantMap.operator=(pkskinShader->spDefaultPixelConstantMap);
-            pkskinShader->m_spVertexConstantMap.operator=(pkskinShader->spDefaultVertexConstantMap);
+            pkskinShader->m_spPixelConstantMap = pkskinShader->spDefaultPixelConstantMap;
+            pkskinShader->m_spVertexConstantMap = pkskinShader->spDefaultVertexConstantMap;
         }
         if (pkparralaxShader) {
-            pkparralaxShader->m_spPixelConstantMap.operator=(pkparralaxShader->spDefaultPixelConstantMap);
-            pkparralaxShader->m_spVertexConstantMap.operator=(pkparralaxShader->spDefaultVertexConstantMap);
+            pkparralaxShader->m_spPixelConstantMap = pkparralaxShader->spDefaultPixelConstantMap;
+            pkparralaxShader->m_spVertexConstantMap = pkparralaxShader->spDefaultVertexConstantMap;
         }
         if (pkhairShader) {
-            pkhairShader->m_spPixelConstantMap.operator=(pkhairShader->spDefaultPixelConstantMap);
-            pkhairShader->m_spVertexConstantMap.operator=(pkhairShader->spDefaultVertexConstantMap);
+            pkhairShader->m_spPixelConstantMap = pkhairShader->spDefaultPixelConstantMap;
+            pkhairShader->m_spVertexConstantMap = pkhairShader->spDefaultVertexConstantMap;
         }
         if (BSShaderManager::eShaderLevel < 2) {
             if (BSShaderManager::eShaderLevel == 1) {
@@ -11985,20 +11969,20 @@ void ShadowLightShader::EnableConstantsForPass(uint32_t auiPassEnum, bool abAlph
     }
     else {
         if (pkshadowLightShader) {
-            pkshadowLightShader->m_spPixelConstantMap.operator=(pkshadowLightShader->spTexEffectPConstantMap);
-            pkshadowLightShader->m_spVertexConstantMap.operator=(pkshadowLightShader->spTexEffectVConstantMap);
+            pkshadowLightShader->m_spPixelConstantMap = pkshadowLightShader->spTexEffectPConstantMap;
+            pkshadowLightShader->m_spVertexConstantMap = pkshadowLightShader->spTexEffectVConstantMap;
         }
         if (pkskinShader) {
-            pkskinShader->m_spPixelConstantMap.operator=(pkskinShader->spTexEffectPConstantMap);
-            pkskinShader->m_spVertexConstantMap.operator=(pkskinShader->spTexEffectVConstantMap);
+            pkskinShader->m_spPixelConstantMap = pkskinShader->spTexEffectPConstantMap;
+            pkskinShader->m_spVertexConstantMap = pkskinShader->spTexEffectVConstantMap;
         }
         if (pkparralaxShader) {
-            pkparralaxShader->m_spPixelConstantMap.operator=(pkparralaxShader->spTexEffectPConstantMap);
-            pkparralaxShader->m_spVertexConstantMap.operator=(pkparralaxShader->spTexEffectVConstantMap);
+            pkparralaxShader->m_spPixelConstantMap = pkparralaxShader->spTexEffectPConstantMap;
+            pkparralaxShader->m_spVertexConstantMap = pkparralaxShader->spTexEffectVConstantMap;
         }
         if (pkhairShader) {
-            pkhairShader->m_spPixelConstantMap.operator=(pkhairShader->spTexEffectPConstantMap);
-            pkhairShader->m_spVertexConstantMap.operator=(pkhairShader->spTexEffectVConstantMap);
+            pkhairShader->m_spPixelConstantMap = pkhairShader->spTexEffectPConstantMap;
+            pkhairShader->m_spVertexConstantMap = pkhairShader->spTexEffectVConstantMap;
         }
     }
     if (auiPassEnum < 759) {
@@ -12232,14 +12216,8 @@ BSShader* ShadowLightShader::CreateShader() {
         NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     pSplatTexturingShaderDecl->GetD3DDeclaration();
-    ShadowLightShader* v4 = static_cast<ShadowLightShader*>(NiMemObject::operator new(sizeof(ShadowLightShader)));
-    if (v4) {
-        pshader = ::new (v4)
-            ShadowLightShader(spShaderDecl, pSkinnedShaderDecl, pModelSpaceNormShaderDecl, pSplatTexturingShaderDecl);
-    }
-    else {
-        pshader = nullptr;
-    }
+    pshader =
+        new ShadowLightShader(spShaderDecl, pSkinnedShaderDecl, pModelSpaceNormShaderDecl, pSplatTexturingShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

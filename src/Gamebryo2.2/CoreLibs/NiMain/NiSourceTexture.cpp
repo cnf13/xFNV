@@ -387,7 +387,7 @@ void NiSourceTexture::LoadPixelDataFromFile() {
         NiPointer<NiPixelData> spFileData =
             pConverter->ReadImageFile(m_kPlatformFilename.GetHandle(), m_spSrcPixelData.m_pObject, nullptr);
         if (!m_spSrcPixelData.m_pObject || spFileData.m_pObject != m_spSrcPixelData.m_pObject) {
-            m_spSrcPixelData.operator=(spFileData);
+            m_spSrcPixelData = spFileData;
         }
     }
 }
@@ -440,13 +440,12 @@ void NiSourceTexture::SetFilename(const NiFixedString& kFilename) {
 }
 
 void* NiSourceTexture::GetSrcPixelData() {
-    return (&m_spSrcPixelData)->operator->();
+    return m_spSrcPixelData;
 }
 
 // A texture of apRawData named apcName (no name when null); as the file-name overload otherwise.
 NiSourceTexture* NiSourceTexture::Create(NiPixelData* apRawData, const char* apcName, NiTexture::FormatPrefs& arPrefs) {
-    void* pMemory = NiMemObject::operator new(sizeof(NiSourceTexture));
-    NiSourceTexture* pkTexture = pMemory ? ::new (pMemory) NiSourceTexture : nullptr;
+    NiSourceTexture* pkTexture = new NiSourceTexture;
     pkTexture->m_kFormatPrefs = arPrefs;
     pkTexture->m_spSrcPixelData = apRawData;
     if (apcName) {
@@ -468,8 +467,7 @@ NiSourceTexture* NiSourceTexture::Create(
     bool bLoadDirectToRendererHint,
     bool bSrcRendererDataIsPersistent
 ) {
-    void* pMemory = NiMemObject::operator new(sizeof(NiSourceTexture));
-    NiSourceTexture* pkTexture = pMemory ? ::new (pMemory) NiSourceTexture : nullptr;
+    NiSourceTexture* pkTexture = new NiSourceTexture;
     pkTexture->m_kFormatPrefs = kPrefs;
     pkTexture->m_bLoadDirectToRendererHint = bLoadDirectToRendererHint;
     pkTexture->m_bSrcRendererDataIsPersistent = bSrcRendererDataIsPersistent;
@@ -491,8 +489,7 @@ NiSourceTexture* NiSourceTexture::Create(
     NiTexture::FormatPrefs& kPrefs,
     bool bLoadDirectToRendererHint
 ) {
-    void* pMemory = NiMemObject::operator new(sizeof(NiSourceTexture));
-    NiSourceTexture* pkTexture = pMemory ? ::new (pMemory) NiSourceTexture : nullptr;
+    NiSourceTexture* pkTexture = new NiSourceTexture;
     pkTexture->m_kFormatPrefs = kPrefs;
     pkTexture->m_bLoadDirectToRendererHint = bLoadDirectToRendererHint;
     pkTexture->m_pFile = pFile;
@@ -511,10 +508,5 @@ NiSourceTexture* NiSourceTexture::Create(
 }
 
 NiObject* NiSourceTexture::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiSourceTexture));
-    if (v0) {
-        return ::new (v0) NiSourceTexture;
-    }
-
-    return nullptr;
+    return new NiSourceTexture;
 }

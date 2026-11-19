@@ -275,9 +275,5 @@ void BSStripPSysData::CopyMembers(BSStripPSysData* pkDest, NiCloningProcess& kCl
 }
 
 NiObject* BSStripPSysData::CreateObject() {
-    BSStripPSysData* pkObject = static_cast<BSStripPSysData*>(NiMemObject::operator new(sizeof(BSStripPSysData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSStripPSysData;
+    return new BSStripPSysData;
 }

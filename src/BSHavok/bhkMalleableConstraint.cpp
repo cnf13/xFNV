@@ -203,11 +203,7 @@ NiObject* bhkMalleableConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkMalleableConstraint* pClone =
-        static_cast<bhkMalleableConstraint*>(NiMemObject::operator new(sizeof(bhkMalleableConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkMalleableConstraint;
-    }
+    bhkMalleableConstraint* pClone = new bhkMalleableConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     GetThreadMemContext() = iOldMemContext;
@@ -265,10 +261,5 @@ hkSerializableCinfo& bhkMalleableConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkMalleableConstraint::CreateObject() {
-    bhkMalleableConstraint* pThis =
-        static_cast<bhkMalleableConstraint*>(NiMemObject::operator new(sizeof(bhkMalleableConstraint)));
-    if (!pThis) {
-        return nullptr;
-    }
-    return ::new (pThis) bhkMalleableConstraint;
+    return new bhkMalleableConstraint;
 }

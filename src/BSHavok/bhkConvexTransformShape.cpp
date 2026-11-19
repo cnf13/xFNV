@@ -44,12 +44,7 @@ const NiRTTI* bhkConvexTransformShape::GetRTTI() const {
 NiObject* bhkConvexTransformShape::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkSerializable::CloneCritLock();
-    bhkConvexTransformShape* pClone = nullptr;
-    bhkConvexTransformShape* pObject =
-        static_cast<bhkConvexTransformShape*>(NiMemObject::operator new(sizeof(bhkConvexTransformShape)));
-    if (pObject) {
-        pClone = ::new (pObject) bhkConvexTransformShape;
-    }
+    bhkConvexTransformShape* pClone = new bhkConvexTransformShape;
     // CopyMembers is called through a base reference so that it dispatches virtually.
     bhkShape& rShape = *this;
     rShape.CopyMembers(pClone, arCloneData);
@@ -304,11 +299,7 @@ void bhkConvexTransformShape::BuildDisplayGeometry(NiNode* apNode, const NiColor
     alignas(16) NiPoint3 kTranslate;
     HK2NI(kRotate, kTransform.getRotation());
     HK2NI(kTranslate, kTransform.getTranslation());
-    NiNode* pNode = nullptr;
-    void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (pMemory) {
-        pNode = ::new (pMemory) NiNode(0);
-    }
+    NiNode* pNode = new NiNode(0);
     pNode->SetName(NiFixedString("bhkConvexTransformShape"));
     apNode->AttachChild(pNode, true);
     pNode->m_kLocal.m_Translate = kTranslate;
@@ -347,10 +338,5 @@ void bhkConvexTransformShape::RembhkShapeRef() {
 
 // The class's factory entry: a default constructed shape, the engine's NiImplementCreateObject body.
 NiObject* bhkConvexTransformShape::CreateObject() {
-    bhkConvexTransformShape* pObject =
-        static_cast<bhkConvexTransformShape*>(NiMemObject::operator new(sizeof(bhkConvexTransformShape)));
-    if (pObject) {
-        return ::new (pObject) bhkConvexTransformShape;
-    }
-    return nullptr;
+    return new bhkConvexTransformShape;
 }

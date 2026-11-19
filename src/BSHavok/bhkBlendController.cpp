@@ -444,12 +444,7 @@ void bhkBlendController::SaveBinary(NiStream& arStream) {
 
 // The stream's factory: allocates the object and runs the constructor on it.
 NiObject* bhkBlendController::CreateObject() {
-    bhkBlendController* pkObject =
-        static_cast<bhkBlendController*>(NiMemObject::operator new(sizeof(bhkBlendController)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkBlendController;
+    return new bhkBlendController;
 }
 
 // Drives the target's blend collision object from the key list, and at the list's last key drops the keys and the
@@ -571,11 +566,7 @@ void bhkBlendController::DoGetUp(NiAVObject* apObject, float afTime) {
 NiObject* bhkBlendController::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
 
-    bhkBlendController* pkClone = nullptr;
-    bhkBlendController* pkNew = static_cast<bhkBlendController*>(NiMemObject::operator new(sizeof(bhkBlendController)));
-    if (pkNew) {
-        pkClone = ::new (pkNew) bhkBlendController;
-    }
+    bhkBlendController* pkClone = new bhkBlendController;
     CopyMembers(pkClone, arCloneData);
     return pkClone;
 }

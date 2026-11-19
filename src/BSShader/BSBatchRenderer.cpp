@@ -378,13 +378,7 @@ void BSBatchRenderer::GeometryGroup::RegisterPass(BSShaderProperty::RenderPass* 
     else {
         if (!pBatchRenderer) {
             BSBatchRenderer* v5;
-            BSBatchRenderer* v4 = static_cast<BSBatchRenderer*>(NiMemObject::operator new(sizeof(BSBatchRenderer)));
-            if (v4) {
-                v5 = ::new (v4) BSBatchRenderer(uiPassCount, 100);
-            }
-            else {
-                v5 = nullptr;
-            }
+            v5 = new BSBatchRenderer(uiPassCount, 100);
             pBatchRenderer = v5;
         }
         pBatchRenderer->RegisterPass(apRenderPass, apRenderPass->usPassEnum);

@@ -438,7 +438,7 @@ void getSimpleTypeName(hkStringBuf& ret, int32_t nelem, hkClassMember::Type type
         ret.printf("%s[%i]", ClassMemberProperties[type].m_name, nelem);
     }
     else {
-        ret.operator=(ClassMemberProperties[type].m_name);
+        ret = ClassMemberProperties[type].m_name;
     }
 }
 

@@ -10,7 +10,7 @@ havokToPlatformConvert_t s_havokToPlatformConvert{&hkNativeFileSystem::nativeHav
 hkNativeFileSystem::~hkNativeFileSystem() {}
 
 const char* hkNativeFileSystem::nativeHavokToPlatformConvertPath(const char* pathIn, hkStringBuf& buffer) {
-    buffer.operator=(pathIn);
+    buffer = pathIn;
     buffer.replace('/', '\\', hkStringBuf::REPLACE_ALL);
     return buffer.m_string.m_data;
 }
@@ -18,7 +18,7 @@ const char* hkNativeFileSystem::nativeHavokToPlatformConvertPath(const char* pat
 // Stores the path in the buffer, rewrites its separators as slashes, collapses "/./" and drops a leading "./", then
 // returns the buffer's characters; the replacement's results are deliberately ignored, as the game does.
 const char* hkNativeFileSystem::nativePlatformToHavokConvertPath(const char* pathIn, hkStringBuf& buffer) {
-    buffer.operator=(pathIn);
+    buffer = pathIn;
     buffer.replace('\\', '/', hkStringBuf::REPLACE_ALL);
     replace(&buffer, "/./", "/", 1);
     if (buffer.startsWith("./") != 0) {

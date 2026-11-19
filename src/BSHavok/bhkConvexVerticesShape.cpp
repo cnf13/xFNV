@@ -49,13 +49,8 @@ const NiRTTI* bhkConvexVerticesShape::GetRTTI() const {
 // context.
 NiObject* bhkConvexVerticesShape::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-    bhkConvexVerticesShape* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkConvexVerticesShape* pObject =
-        static_cast<bhkConvexVerticesShape*>(NiMemObject::operator new(sizeof(bhkConvexVerticesShape)));
-    if (pObject) {
-        pClone = ::new (pObject) bhkConvexVerticesShape;
-    }
+    bhkConvexVerticesShape* pClone = new bhkConvexVerticesShape;
     CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -259,12 +254,7 @@ void bhkConvexVerticesShape::CopyCinfo(hkConvexVerticesShapeCinfo& arInfo) {
 
 // The stream's object factory: NiNew 0x14 bytes, then the default constructor over them.
 NiObject* bhkConvexVerticesShape::CreateObject() {
-    bhkConvexVerticesShape* pObject =
-        static_cast<bhkConvexVerticesShape*>(NiMemObject::operator new(sizeof(bhkConvexVerticesShape)));
-    if (pObject) {
-        return ::new (pObject) bhkConvexVerticesShape;
-    }
-    return nullptr;
+    return new bhkConvexVerticesShape;
 }
 
 // The body is empty because the two hkArray members' destructors (plane equations, then vertices) run automatically in

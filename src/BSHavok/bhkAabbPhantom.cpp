@@ -51,13 +51,7 @@ const NiRTTI* bhkAabbPhantom::GetRTTI() const {
 // called, not the serializable one.
 NiObject* bhkAabbPhantom::CreateClone(NiCloningProcess& arCloneData) {
     bhkSerializable::CloneCritLock();
-    bhkAabbPhantom* pClone = static_cast<bhkAabbPhantom*>(NiMemObject::operator new(sizeof(bhkAabbPhantom)));
-    if (pClone) {
-        ::new (pClone) bhkAabbPhantom;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkAabbPhantom* pClone = new bhkAabbPhantom;
     bhkWorldObject::CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -174,9 +168,5 @@ void bhkAabbPhantom::CopyCinfo(hkAabbPhantomCinfo& arInfo) {
 
 // Builds a bare wrapper using the default constructor.
 NiObject* bhkAabbPhantom::CreateObject() {
-    bhkAabbPhantom* pObject = static_cast<bhkAabbPhantom*>(NiMemObject::operator new(sizeof(bhkAabbPhantom)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkAabbPhantom;
+    return new bhkAabbPhantom;
 }

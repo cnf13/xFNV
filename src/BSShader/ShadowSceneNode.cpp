@@ -1272,8 +1272,7 @@ void ShadowSceneNode::SetFogProperty(BSFogProperty* apFog) {
         return;
     }
 
-    void* pMemory = NiMemObject::operator new(sizeof(BSFogProperty));
-    BSFogProperty* pNewFog = pMemory ? ::new (pMemory) BSFogProperty : nullptr;
+    BSFogProperty* pNewFog = new BSFogProperty;
     BSFogProperty* pOldFog = spFog;
     if (pOldFog != pNewFog) {
         if (pOldFog) {
@@ -1309,8 +1308,7 @@ void ShadowSceneNode::SetSunLight(NiDirectionalLight* apLight) {
 
     NiDirectionalLight* pLight = apLight;
     if (!pLight) {
-        void* pLightMemory = NiMemObject::operator new(sizeof(NiDirectionalLight));
-        pLight = pLightMemory ? ::new (pLightMemory) NiDirectionalLight : nullptr;
+        pLight = new NiDirectionalLight;
         // Same as SetAmbientColor and SetDiffuseColor: each copies the colour and bumps the revision.
         pLight->m_kAmb = NiColor_BLACK;
         pLight->m_uiRevID++;
@@ -1318,8 +1316,7 @@ void ShadowSceneNode::SetSunLight(NiDirectionalLight* apLight) {
         pLight->m_uiRevID++;
     }
 
-    void* pMemory = NiMemObject::operator new(sizeof(ShadowSceneLight));
-    ShadowSceneLight* pSceneLight = pMemory ? ::new (pMemory) ShadowSceneLight : nullptr;
+    ShadowSceneLight* pSceneLight = new ShadowSceneLight;
     pSunLight = pSceneLight;
     pSceneLight->SetLight(pLight);
 }
@@ -1397,8 +1394,7 @@ ShadowSceneLight* ShadowSceneNode::AddLight(NiLight* apLight, bool abDynamic) {
     }
 
     SSNLightQueueCrit.Lock(nullptr);
-    void* pMemory = NiMemObject::operator new(sizeof(ShadowSceneLight));
-    ShadowSceneLight* pSceneLight = pMemory ? ::new (pMemory) ShadowSceneLight : nullptr;
+    ShadowSceneLight* pSceneLight = new ShadowSceneLight;
     pSceneLight->SetLight(apLight);
     pSceneLight->bDynamicLight = abDynamic;
     {
@@ -1468,8 +1464,7 @@ ShadowSceneLight* ShadowSceneNode::AddShadowLight(NiAVObject* apObject) {
     }
 
     SSNLightQueueCrit.Lock(nullptr);
-    void* pMemory = NiMemObject::operator new(sizeof(ShadowSceneLight));
-    ShadowSceneLight* pSceneLight = pMemory ? ::new (pMemory) ShadowSceneLight : nullptr;
+    ShadowSceneLight* pSceneLight = new ShadowSceneLight;
     pSceneLight->SetShadowCaster(static_cast<NiNode*>(apObject));
     pSceneLight->SetCastShadow(true);
     {
@@ -1486,8 +1481,7 @@ ShadowSceneLight* ShadowSceneNode::AddShadowLight(NiAVObject* apObject) {
 // Turns apLight into a dynamic shadow-casting point light (a new, visible NiPointLight) and lists it at once.
 ShadowSceneLight* ShadowSceneNode::AddQueuedShadowLight(ShadowSceneLight* apLight) {
     apLight->bDynamicLight = true;
-    void* pMemory = NiMemObject::operator new(sizeof(NiPointLight));
-    NiPointLight* pPointLight = pMemory ? ::new (pMemory) NiPointLight : nullptr;
+    NiPointLight* pPointLight = new NiPointLight;
     pPointLight->m_uFlags = static_cast<NiAVObject::NiFlags>(pPointLight->m_uFlags & ~NiAVObject::APP_CULLED);
     apLight->SetLight(pPointLight);
     apLight->SetCastShadow(true);
@@ -2204,13 +2198,7 @@ void ShadowSceneNode::UpdateDynamicShadows(BSCullingProcess& arCuller) {
     BSCubeMapCamera* spCubeMapCamera = this->spCubeMapCamera;
     if (!spCubeMapCamera) {
         BSCubeMapCamera* v5;
-        BSCubeMapCamera* v4 = static_cast<BSCubeMapCamera*>(NiMemObject::operator new(sizeof(BSCubeMapCamera)));
-        if (v4) {
-            v5 = ::new (v4) BSCubeMapCamera(0);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new BSCubeMapCamera(0);
         BSCubeMapCamera* v6 = v2->spCubeMapCamera;
         if (v6 == v5) {
             goto LABEL_11;

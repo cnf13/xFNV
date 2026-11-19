@@ -497,7 +497,7 @@ void NiMatrix3::MakeZero() {
 }
 
 bool NiMatrix3::operator!=(const NiMatrix3& mat) const {
-    return (bool)((uint8_t)(!operator==(mat)));
+    return (bool)((uint8_t)(!(*this == mat)));
 }
 
 float NiMatrix3::GetEntry(uint32_t uiRow, uint32_t uiCol) const {

@@ -40,8 +40,7 @@ NiNode* Tile3D::MakeNode() {
         spModel.m_pObject->m_pkParent = nullptr;
         spModel = nullptr;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+    NiNode* pNode = new NiNode(0);
     spModel = pNode;
     UpdateNIF();
     if (spModel.m_pObject) {
@@ -50,8 +49,7 @@ NiNode* Tile3D::MakeNode() {
             pParentModel = Interface::GetInterfaceRoot();
         }
         pParentModel->AttachChild(spModel.m_pObject, true);
-        pMemory = NiMemObject::operator new(sizeof(Extra));
-        Extra* pExtra = pMemory ? ::new (pMemory) Extra(this, spModel.m_pObject) : nullptr;
+        Extra* pExtra = new Extra(this, spModel.m_pObject);
         spModel.m_pObject->AddExtraData(pExtra);
     }
     return spModel.m_pObject;
@@ -274,8 +272,7 @@ void Tile3D::SetupShaderPropertiesRecurse(NiNode* apNode) {
         if (pGeometry) {
             NiShadeProperty* pShade = static_cast<NiShadeProperty*>(pGeometry->GetProperty(NiProperty::SHADE));
             if (pShade && pShade->iShaderPropertyType != 0x13) {
-                void* pMemory = NiMemObject::operator new(sizeof(TileShaderProperty));
-                TileShaderProperty* pTileShader = pMemory ? ::new (pMemory) TileShaderProperty(false) : nullptr;
+                TileShaderProperty* pTileShader = new TileShaderProperty(false);
                 pGeometry->RemoveProperty(NiProperty::SHADE);
                 pGeometry->AttachProperty(pTileShader);
                 NiTexturingProperty* pTexturing =

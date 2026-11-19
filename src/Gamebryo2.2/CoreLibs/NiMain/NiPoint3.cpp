@@ -175,7 +175,7 @@ int32_t NiPoint3::IsMagnitudeLongerThanRadius(const NiPoint3* apPoint, float fRa
 
 int32_t NiPoint3::IsDistanceLongerThanRadius(const NiPoint3* apPoint1, const NiPoint3* apPoint2, float afRadius) {
     NiPoint3 v5;
-    NiPoint3* v3 = &(v5 = apPoint1->operator-(*apPoint2));
+    NiPoint3* v3 = &(v5 = *apPoint1 - *apPoint2);
     return NiPoint3::IsMagnitudeLongerThanRadius(v3, afRadius);
 }
 

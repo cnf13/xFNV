@@ -42,10 +42,7 @@ const NiRTTI* bhkMotorAction::GetRTTI() const {
 NiObject* bhkMotorAction::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext memContext(MEM_CONTEXT_HAVOK);
     bhkSerializable::CloneCritLock();
-    bhkMotorAction* pClone = static_cast<bhkMotorAction*>(NiMemObject::operator new(sizeof(bhkMotorAction)));
-    if (pClone) {
-        ::new (pClone) bhkMotorAction;
-    }
+    bhkMotorAction* pClone = new bhkMotorAction;
     bhkUnaryAction::CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -208,9 +205,5 @@ void bhkMotorAction::CopyCinfo(hkMotorActionCinfo& arInfo) {
 
 // The creation info starts null.
 NiObject* bhkMotorAction::CreateObject() {
-    bhkMotorAction* pThis = static_cast<bhkMotorAction*>(NiMemObject::operator new(sizeof(bhkMotorAction)));
-    if (!pThis) {
-        return nullptr;
-    }
-    return ::new (pThis) bhkMotorAction;
+    return new bhkMotorAction;
 }

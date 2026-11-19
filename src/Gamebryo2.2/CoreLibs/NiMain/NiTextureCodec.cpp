@@ -207,12 +207,9 @@ NiPixelData* NiTextureCodec::ExpandCompressedData(const NiPixelData& kSrc) {
         default: return nullptr;
     }
 
-    NiPixelData* pkDest = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-    if (pkDest) {
-        pkDest = ::new (pkDest) NiPixelData(
-            *kSrc.m_puiWidth, *kSrc.m_puiHeight, NiPixelFormat_RGBA32, kSrc.m_uiMipmapLevels, kSrc.m_uiFaces
-        );
-    }
+    NiPixelData* pkDest = new NiPixelData(
+        *kSrc.m_puiWidth, *kSrc.m_puiHeight, NiPixelFormat_RGBA32, kSrc.m_uiMipmapLevels, kSrc.m_uiFaces
+    );
 
     uint32_t uiMipmapLevels = kSrc.m_uiMipmapLevels;
     uint32_t uiNumFaces = kSrc.m_uiFaces;

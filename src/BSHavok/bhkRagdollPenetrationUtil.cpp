@@ -246,11 +246,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
                         cinfo.m_collisionFilterInfo = iGroup << 16 | L_CHARCONTROLLER;
                         cinfo.aabb.m_min = minExtent;
                         cinfo.aabb.m_max = maxExtent;
-                        bhkAabbPhantom* pPhantom =
-                            static_cast<bhkAabbPhantom*>(NiMemObject::operator new(sizeof(bhkAabbPhantom)));
-                        if (pPhantom) {
-                            pPhantom = ::new (pPhantom) bhkAabbPhantom(cinfo);
-                        }
+                        bhkAabbPhantom* pPhantom = new bhkAabbPhantom(cinfo);
                         pconstrainedSystem->pBoundingPhantom = pPhantom;
                         hkpRigidBody* pWorldBody = pconstrainedSystem->pRagdollInstance->m_rigidBodies.m_data[0];
                         if (pWorldBody && pWorldBody->m_world) {
@@ -853,7 +849,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
             const char* rbodyName = rbody->m_name.cString();
             if (rbodyName) {
                 hkStringPtr* pBoneName = &pskeleton->m_bones.m_data[b].m_name;
-                pBoneName->operator=(hkString::strDup(rbodyName));
+                *pBoneName = hkString::strDup(rbodyName);
             }
             else {
                 {
@@ -865,7 +861,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
                         "D:\\_Fallout3\\Platforms\\Common\\Code\\BSHavok\\bhkRagdollPenetrationUtil.cpp", 721
                     );
                 }
-                pskeleton->m_bones.m_data[b].m_name.operator=(static_cast<const char*>(nullptr));
+                pskeleton->m_bones.m_data[b].m_name = static_cast<const char*>(nullptr);
             }
             const bool bLockTranslation = b != 0;
             pskeleton->m_bones.m_data[b].m_lockTranslation.m_bool = bLockTranslation;
@@ -927,7 +923,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
         }
         strcat_s(boneName, 45, " Nub");
         hkStringPtr* pNubName = &pskeleton->m_bones.m_data[iskeletonBoneIdx].m_name;
-        pNubName->operator=(hkString::strDup(boneName));
+        *pNubName = hkString::strDup(boneName);
         pskeleton->m_bones.m_data[iskeletonBoneIdx].m_lockTranslation.m_bool = 1;
         pskeleton->m_parentIndices.m_data[iskeletonBoneIdx] = static_cast<int16_t>(inumbIdx);
         hkQsTransform* pNubPose = &pskeleton->m_referencePose.m_data[iskeletonBoneIdx];
@@ -935,10 +931,10 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
         pskeleton->m_referencePose.m_data[iskeletonBoneIdx].m_translation = boneTranslation;
     }
     if (pskeleton->m_bones.m_size == 0) {
-        pskeleton->m_name.operator=(static_cast<const char*>(nullptr));
+        pskeleton->m_name = static_cast<const char*>(nullptr);
     }
     else {
-        pskeleton->m_name.operator=(pskeleton->m_bones.m_data[0].m_name);
+        pskeleton->m_name = pskeleton->m_bones.m_data[0].m_name;
     }
     return pskeleton;
 }

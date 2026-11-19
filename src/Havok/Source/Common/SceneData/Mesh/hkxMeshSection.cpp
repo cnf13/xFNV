@@ -64,7 +64,7 @@ static void cleanupLoadedObjecthkxMeshSection(void* p) {
 
 // A reference count of 1 and empty members (the base's and members' constructors), then everything from other.
 hkxMeshSection::hkxMeshSection(const hkxMeshSection& other) : hkReferencedObject() {
-    operator=(other);
+    *this = other;
 }
 
 // The SDK's finish constructor: a loaded object keeps the fields the load wrote.

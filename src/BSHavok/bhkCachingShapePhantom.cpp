@@ -94,10 +94,7 @@ NiObject* bhkCachingShapePhantom::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkCachingShapePhantom* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    void* pvMemory = NiMemObject::operator new(sizeof(bhkCachingShapePhantom));
-    if (pvMemory) {
-        pClone = ::new (pvMemory) bhkCachingShapePhantom;
-    }
+    pClone = new bhkCachingShapePhantom;
     CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -118,11 +115,7 @@ void bhkCachingShapePhantom::GetViewerStrings(NiTPrimitiveArray<char*>* apString
 
 // The class's factory: allocates the 0x18-byte phantom and constructs it in place.
 NiObject* bhkCachingShapePhantom::CreateObject() {
-    void* pvMemory = NiMemObject::operator new(sizeof(bhkCachingShapePhantom));
-    if (pvMemory) {
-        return ::new (pvMemory) bhkCachingShapePhantom;
-    }
-    return nullptr;
+    return new bhkCachingShapePhantom;
 }
 
 // Casts the ray into each cached collidable's space and against its shape, from the last detail to the first,

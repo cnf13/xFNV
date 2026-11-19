@@ -181,7 +181,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
     else if (type == hkaSkeletonMapperData::HK_RETARGETING_MAPPING) {
         if (tolerance < 0.0f) {
             alignas(16) hkErrStream kErrStream(buf, 512);
-            kErrStream.operator<<("Tolerance must be positive");
+            kErrStream << "Tolerance must be positive";
             hkError::s_instance->message(
                 hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA39C3u), buf,
                 ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 846
@@ -203,8 +203,8 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
         if (bZeroA || bZeroB) {
             if (bZeroA != bZeroB) {
                 alignas(16) hkErrStream kErrStream(buf, 512);
-                kErrStream.operator<<("Attempt to map a zero length bone to a non-zero length bone.  This may result "
-                                      "in poor accuracy.");
+                kErrStream << "Attempt to map a zero length bone to a non-zero length bone.  This may result "
+                              "in poor accuracy.";
                 hkError::s_instance->message(
                     hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA2B94u), buf,
                     ".\\Mapper\\hkaSkeletonMapperUtils.cpp", 860
@@ -226,7 +226,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
     }
     else {
         alignas(16) hkErrStream kErrStream(buf, 512);
-        kErrStream.operator<<("Unsupported mapping type");
+        kErrStream << "Unsupported mapping type";
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBAEF91u), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             876
@@ -234,7 +234,7 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
     }
     if (!mapOut.isOk().m_bool) {
         alignas(16) hkErrStream kErrStream(buf, 512);
-        kErrStream.operator<<("Mapping is invalid");
+        kErrStream << "Mapping is invalid";
         hkError::s_instance->message(
             hkError::MESSAGE_WARNING, static_cast<int32_t>(0xABBA10FCu), buf, ".\\Mapper\\hkaSkeletonMapperUtils.cpp",
             881

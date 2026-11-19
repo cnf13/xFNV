@@ -63,10 +63,7 @@ NiObject* NiSkinInstance::CreateClone(NiCloningProcess& kCloning) {
     }
 
     // The default constructor, as in CreateObject.
-    NiSkinInstance* pkClone = static_cast<NiSkinInstance*>(NiMemObject::operator new(sizeof(NiSkinInstance)));
-    if (pkClone) {
-        ::new (pkClone) NiSkinInstance;
-    }
+    NiSkinInstance* pkClone = new NiSkinInstance;
     CopyMembers(pkClone, kCloning);
 
     NiObject* pkClonedObject = nullptr;
@@ -271,9 +268,5 @@ bool NiSkinInstance::NeedClone(NiCloningProcess& kCloning) {
 // NiSkinInstance::UpdateModelBound is in Xenon/NiSkinInstance_Xenon.cpp. The default constructor: no skin data,
 // partition, root or bones; no bone matrices yet (frame ID -1).
 NiObject* NiSkinInstance::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiSkinInstance));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSkinInstance;
+    return new NiSkinInstance;
 }

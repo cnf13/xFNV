@@ -60,12 +60,7 @@ BSShaderNoLightingProperty::~BSShaderNoLightingProperty() {
 
 // Constructs an empty property, then copies the members into it.
 NiObject* BSShaderNoLightingProperty::CreateClone(NiCloningProcess& arCloneData) {
-    BSShaderNoLightingProperty* pClone =
-        static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-    BSShaderNoLightingProperty* pResult = nullptr;
-    if (pClone) {
-        pResult = ::new (pClone) BSShaderNoLightingProperty;
-    }
+    BSShaderNoLightingProperty* pResult = new BSShaderNoLightingProperty;
     CopyMembers(pResult, arCloneData);
     return pResult;
 }
@@ -155,8 +150,7 @@ bool BSShaderNoLightingProperty::SetupGeometry(NiGeometry* apGeometry) {
     if (apGeometry->GetProperty(NiProperty::ALPHA)) {
         apGeometry->RemoveProperty(NiProperty::ALPHA);
     }
-    void* pvMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-    NiAlphaProperty* pNew = pvMemory ? ::new (pvMemory) NiAlphaProperty : nullptr;
+    NiAlphaProperty* pNew = new NiAlphaProperty;
     // pOld is read afresh before each call, as the game does (the removal above may have released it).
     pNew->SetAlphaBlending((pOld->m_uFlags & 1) != 0);
     pNew->SetAlphaTesting(((pOld->m_uFlags >> 9) & 1) != 0);
@@ -356,12 +350,7 @@ void BSShaderNoLightingProperty::SetFalloffData(const NiColorA& aFalloffData) {
 
 // The stream factory: creates a new property.
 NiObject* BSShaderNoLightingProperty::CreateObject() {
-    BSShaderNoLightingProperty* pProperty =
-        static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-    if (pProperty) {
-        return ::new (pProperty) BSShaderNoLightingProperty;
-    }
-    return nullptr;
+    return new BSShaderNoLightingProperty;
 }
 
 // A start angle of exactly -1 turns the falloff off (NaN turns it on, as the game does); a change of the falloff flag
@@ -455,14 +444,7 @@ NiPixelFormat* NiDX9RenderedCubeMapData::CreateSurf(NiRenderedCubeMap* pkTexture
 // from the face buffer the cube map holds. The two statistics count the six faces' bytes and the page rounding the
 // allocator adds.
 NiDX9RenderedCubeMapData* NiDX9RenderedCubeMapData::Create(NiRenderedCubeMap* apCubeMap, NiDX9Renderer* apRenderer) {
-    NiDX9RenderedCubeMapData* pThis =
-        static_cast<NiDX9RenderedCubeMapData*>(NiMemObject::operator new(sizeof(NiDX9RenderedCubeMapData)));
-    if (pThis) {
-        pThis = ::new (pThis) NiDX9RenderedCubeMapData(apCubeMap, apRenderer);
-    }
-    else {
-        pThis = nullptr;
-    }
+    NiDX9RenderedCubeMapData* pThis = new NiDX9RenderedCubeMapData(apCubeMap, apRenderer);
     NiPixelFormat* pkFmt = pThis->CreateSurf(apCubeMap);
     if (!pkFmt) {
         delete pThis;

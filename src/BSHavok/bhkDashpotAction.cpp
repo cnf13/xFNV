@@ -47,13 +47,7 @@ NiObject* bhkDashpotAction::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iSavedMemContext = eMemContext;
     eMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkDashpotAction* pClone = static_cast<bhkDashpotAction*>(NiMemObject::operator new(sizeof(bhkDashpotAction)));
-    if (pClone) {
-        ::new (pClone) bhkDashpotAction;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkDashpotAction* pClone = new bhkDashpotAction;
     static_cast<bhkBinaryAction*>(this)->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     eMemContext = iSavedMemContext;
@@ -259,9 +253,5 @@ void bhkDashpotAction::CopyCinfo(hkDashpotActionCinfo& arInfo) {
 }
 
 NiObject* bhkDashpotAction::CreateObject() {
-    bhkDashpotAction* pObject = static_cast<bhkDashpotAction*>(NiMemObject::operator new(sizeof(bhkDashpotAction)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkDashpotAction;
+    return new bhkDashpotAction;
 }

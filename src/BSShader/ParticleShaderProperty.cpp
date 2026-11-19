@@ -81,11 +81,7 @@ ParticleShaderProperty::~ParticleShaderProperty() {
 
 // The clone is built in an engine block through the constructor, then the copy body fills it in.
 NiObject* ParticleShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    ParticleShaderProperty* pClone =
-        static_cast<ParticleShaderProperty*>(NiMemObject::operator new(sizeof(ParticleShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) ParticleShaderProperty;
-    }
+    ParticleShaderProperty* pClone = new ParticleShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }

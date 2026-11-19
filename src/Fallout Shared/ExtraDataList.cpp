@@ -811,8 +811,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             if (apFile->QEndian()) {
                 kPlaneData.Endian();
             }
-            void* pMemory = NiMemObject::operator new(sizeof(BSOcclusionPlane));
-            BSOcclusionPlane* pPlane = pMemory ? ::new (pMemory) BSOcclusionPlane : nullptr;
+            BSOcclusionPlane* pPlane = new BSOcclusionPlane;
             pPlane->SetHalfExtents(kPlaneData.rHalfExtents);
             pPlane->SetCenter(kPlaneData.rCenter);
             NiMatrix3 kRotation;
@@ -1881,7 +1880,7 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                     uint32_t isaveGameCount = pHits ? pHits->iSize : 0;
                     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
                     for (uint32_t i = 0; i < isaveGameCount; ++i) {
-                        CombatTimeStamp* ptimeStamp = &pextraFriendHits->Hits.operator[](i);
+                        CombatTimeStamp* ptimeStamp = &pextraFriendHits->Hits[i];
                         ptimeStamp->SaveGame(apSaveGameBuffer);
                     }
                     break;
@@ -1962,7 +1961,7 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                     uint32_t isaveGameCount = pLimbs ? pLimbs->GetSize() : 0;
                     apSaveGameBuffer->SaveVariableSizedValue(isaveGameCount);
                     for (uint32_t j = 0; j < isaveGameCount; ++j) {
-                        DismemberedLimb** ppLimb = &pextraDismemberedLimbs->DismemberedLimbs.operator[](j);
+                        DismemberedLimb** ppLimb = &pextraDismemberedLimbs->DismemberedLimbs[j];
                         apSaveGameBuffer->SaveDataEndian(&(*ppLimb)->cLimb, 1, 0);
                         apSaveGameBuffer->SaveDataEndian(&(*ppLimb)->bLimbExploded, 1, 0);
                         apSaveGameBuffer->SaveDataEndian(&(*ppLimb)->bObjectArrayIdentical, 1, 0);
@@ -1971,7 +1970,7 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                         uint32_t iobjectCount = pObjects ? pObjects->GetSize() : 0;
                         apSaveGameBuffer->SaveVariableSizedValue(iobjectCount);
                         for (uint32_t k = 0; k < iobjectCount; ++k) {
-                            TESBoundObject** ppForm = &(*ppLimb)->ObjectArray.operator[](k);
+                            TESBoundObject** ppForm = &(*ppLimb)->ObjectArray[k];
                             apSaveGameBuffer->SaveFormID(*ppForm, 0);
                         }
                     }
@@ -2047,7 +2046,7 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
                     uint32_t auiSize = pGuards ? pGuards->iSize : 0;
                     apSaveGameBuffer->SaveVariableSizedValue(auiSize);
                     for (uint32_t m = 0; m < auiSize; ++m) {
-                        uint32_t* iguardID = &pextraGuardedRefData->Guards.operator[](m);
+                        uint32_t* iguardID = &pextraGuardedRefData->Guards[m];
                         apSaveGameBuffer->SaveFormID(*iguardID, 0);
                     }
                     break;
@@ -4965,7 +4964,7 @@ BSMultiBound* ExtraDataList::GetMultiBound() {
     if (!pExtra) {
         return nullptr;
     }
-    return pExtra->spBound.operator->();
+    return pExtra->spBound;
 }
 
 void ExtraDataList::SetMultiBound(BSMultiBound* apBound) {
@@ -5330,7 +5329,7 @@ void ExtraDataList::AddExtraCopy(BSExtraData* apCopy) {
             SetHeadTrackTargetExtra(static_cast<ExtraHeadingTarget*>(apCopy)->pHeadingTarget);
             break;
         case EXTRA_POISON: SetPoison(static_cast<ExtraPoison*>(apCopy)->pPoison); break;
-        case EXTRA_CELL3D: SetCell3D(static_cast<ExtraCell3D*>(apCopy)->spCellNode.operator->()); break;
+        case EXTRA_CELL3D: SetCell3D(static_cast<ExtraCell3D*>(apCopy)->spCellNode); break;
         case EXTRA_WATERTYPE: SetWaterType(static_cast<ExtraCellWaterType*>(apCopy)->pWater); break;
         case EXTRA_CELLMUSICTYPE: SetMusicType(static_cast<ExtraCellMusicType*>(apCopy)->pType); break;
         case EXTRA_CELL_ACOUSTIC_SPACE: SetAcousticSpace(static_cast<ExtraCellAcousticSpace*>(apCopy)->pSpace); break;
@@ -5338,7 +5337,7 @@ void ExtraDataList::AddExtraCopy(BSExtraData* apCopy) {
             auto* pCopy = static_cast<ExtraCellCanopyShadowMask*>(apCopy);
             // Deliberately left unset, as the game does: SetCanopyShadowMask writes it only for a nonzero state.
             D3DLOCKED_RECT* pRect;
-            SetCanopyShadowMask(pCopy->eState, pCopy->spMask.operator->(), pRect);
+            SetCanopyShadowMask(pCopy->eState, pCopy->spMask, pRect);
             pRect->pBits = pCopy->Rect.pBits;
             pRect->Pitch = pCopy->Rect.Pitch;
             break;
@@ -5482,8 +5481,8 @@ void ExtraDataList::AddExtraCopy(BSExtraData* apCopy) {
         }
         case EXTRA_NAVMESH_PORTAL: SetNavMeshPortal(static_cast<ExtraNavMeshPortal*>(apCopy)); break;
         case EXTRA_PRIMITIVE: AddPrimitive(BGSPrimitive::Copy(static_cast<ExtraPrimitive*>(apCopy)->pPrimitive)); break;
-        case EXTRA_MULTIBOUND: SetMultiBound(static_cast<ExtraMultiBound*>(apCopy)->spBound.operator->()); break;
-        case EXTRA_ROOM: SetRoom(static_cast<ExtraRoom*>(apCopy)->spRoom.operator->()); break;
+        case EXTRA_MULTIBOUND: SetMultiBound(static_cast<ExtraMultiBound*>(apCopy)->spBound); break;
+        case EXTRA_ROOM: SetRoom(static_cast<ExtraRoom*>(apCopy)->spRoom); break;
         case EXTRA_PATROL_REF_DATA: {
             void* pMemory = ourMalloc(sizeof(PatrolRefData));
             PatrolRefData* pData = pMemory ? ::new (pMemory) PatrolRefData : nullptr;
@@ -5537,7 +5536,7 @@ void ExtraDataList::AddExtraCopy(BSExtraData* apCopy) {
             break;
         case EXTRA_PORTAL:
             // apCopy is never null here, so there is no fallback for a null apCopy.
-            SetPortal(static_cast<ExtraPortal*>(apCopy)->spPortal.operator->());
+            SetPortal(static_cast<ExtraPortal*>(apCopy)->spPortal);
             break;
         case EXTRA_IGNORED_BY_SANDBOX: SetIgnoredBySandbox(true); break;
         case EXTRA_FOLLOWER_SWIM_BREADCRUMBS: {
@@ -6855,7 +6854,7 @@ void ExtraDataList::SetCell3D(NiNode* apObjectRoot) {
     if (apObjectRoot) {
         goto LABEL_6;
     }
-    if ((pExtra) && (pExtra->spCellNode.operator==(nullptr))) {
+    if ((pExtra) && (pExtra->spCellNode == nullptr)) {
         RemoveExtra(pExtra, true);
         pExtra = nullptr;
     }
@@ -6874,7 +6873,7 @@ void ExtraDataList::SetCell3D(NiNode* apObjectRoot) {
             pExtra = pExtra_2;
             AddExtra(pExtra_2);
         }
-        pExtra->spCellNode.operator=(apObjectRoot);
+        pExtra->spCellNode = apObjectRoot;
     }
 }
 
@@ -6883,7 +6882,7 @@ void ExtraDataList::SetCanopyShadowMask(int32_t aeState, NiRenderedTexture* apTe
     if (aeState) {
         if (pExtra) {
             pExtra->eState = static_cast<ExtraCellCanopyShadowMask::CELL_STATE>(aeState);
-            pExtra->spMask.operator=(apTex);
+            pExtra->spMask = apTex;
         }
         else {
             ExtraCellCanopyShadowMask* pExtra_2;
@@ -8233,7 +8232,7 @@ void ExtraDataList::GetCreatureAwakeSound(BSSoundHandle& result) {
 void ExtraDataList::GetWeaponAttackSound(BSSoundHandle& result) {
     ExtraWeaponAttackSound* pSound = static_cast<ExtraWeaponAttackSound*>(GetExtraData(134));
     if (pSound) {
-        result.operator=(pSound->pHandle);
+        result = pSound->pHandle;
     }
     else {
         result.Clear();
@@ -8374,7 +8373,7 @@ void ExtraDataList::SetPortal(BSPortal* apPortal) {
     if (apPortal) {
         ExtraPortal* pextra = static_cast<ExtraPortal*>(GetExtraData(120));
         if (pextra) {
-            pextra->spPortal.operator=(apPortal);
+            pextra->spPortal = apPortal;
         }
         else {
             ExtraPortal* pextra_2;
@@ -8385,7 +8384,7 @@ void ExtraDataList::SetPortal(BSPortal* apPortal) {
             else {
                 pextra_2 = nullptr;
             }
-            pextra_2->spPortal.operator=(apPortal);
+            pextra_2->spPortal = apPortal;
             AddExtra(pextra_2);
         }
     }
@@ -8417,7 +8416,7 @@ BSMultiBoundRoom* ExtraDataList::GetRoom() {
     if (!pExtra) {
         return nullptr;
     }
-    return pExtra->spRoom.operator->();
+    return pExtra->spRoom;
 }
 
 BSPortal* ExtraDataList::GetPortal() {
@@ -8454,7 +8453,7 @@ void ExtraDataList::SetOcclusionPlane(BSOcclusionPlane* apPlane) {
     if (apPlane) {
         ExtraOcclusionPlane* pextra = static_cast<ExtraOcclusionPlane*>(GetExtraData(113));
         if (pextra) {
-            pextra->spPlane.operator=(apPlane);
+            pextra->spPlane = apPlane;
         }
         else {
             ExtraOcclusionPlane* pextra_2;
@@ -8465,7 +8464,7 @@ void ExtraDataList::SetOcclusionPlane(BSOcclusionPlane* apPlane) {
             else {
                 pextra_2 = nullptr;
             }
-            pextra_2->spPlane.operator=(apPlane);
+            pextra_2->spPlane = apPlane;
             AddExtra(pextra_2);
         }
     }
@@ -8485,7 +8484,7 @@ void ExtraDataList::RemoveSpellEffectLightPtr() {
 void ExtraDataList::GetCreatureMovementSound(BSSoundHandle& result) {
     ExtraCreatureMovementSound* pSound = static_cast<ExtraCreatureMovementSound*>(GetExtraData(138));
     if (pSound) {
-        result.operator=(pSound->pHandle);
+        result = pSound->pHandle;
     }
     else {
         result.Clear();
@@ -10226,7 +10225,7 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                 uint32_t isaveGameCount_5 = a1->LoadVariableSizedValue();
                 pextraFriendHits_2->Hits.SetSize(isaveGameCount_5, true);
                 for (uint32_t i_2 = 0; i_2 < isaveGameCount_5; ++i_2) {
-                    CombatTimeStamp* ftimeStamp = &pextraFriendHits_2->Hits.operator[](i_2);
+                    CombatTimeStamp* ftimeStamp = &pextraFriendHits_2->Hits[i_2];
                     ftimeStamp->LoadGame(a1);
                 }
                 if (!pextraFriendHits_2->Hits.iSize) {
@@ -10609,7 +10608,7 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                 pextraDismemberedLimbs_2->DismemberedLimbs.SetSize(isaveGameCount_8, true);
                 for (uint32_t i_4 = 0; i_4 < isaveGameCount_8; ++i_4) {
                     DismemberedLimb* v90;
-                    DismemberedLimb** pdismemberedLimb = &pextraDismemberedLimbs_2->DismemberedLimbs.operator[](i_4);
+                    DismemberedLimb** pdismemberedLimb = &pextraDismemberedLimbs_2->DismemberedLimbs[i_4];
                     DismemberedLimb* v223 = static_cast<DismemberedLimb*>(ourMalloc(sizeof(DismemberedLimb)));
                     if (v223) {
                         v90 = ::new (v223) DismemberedLimb;
@@ -10628,14 +10627,14 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                     uint32_t isaveGameCount_9 = a1->LoadVariableSizedValue();
                     (*pdismemberedLimb)->ObjectArray.SetSize(isaveGameCount_9, true);
                     for (uint32_t i_5 = 0; i_5 < isaveGameCount_9; ++i_5) {
-                        TESBoundObject** pForm_2 = &(*pdismemberedLimb)->ObjectArray.operator[](i_5);
+                        TESBoundObject** pForm_2 = &(*pdismemberedLimb)->ObjectArray[i_5];
                         a1->LoadFormID(*pForm_2);
                     }
                     uint32_t isaveGameCount_10 = (*pdismemberedLimb)->ObjectArray.iSize;
                     for (uint32_t i_6 = 0; i_6 < isaveGameCount_10; ++i_6) {
                         TESBoundObject* v89;
                         bool bRemove = false;
-                        TESBoundObject** pForm_3 = &(*pdismemberedLimb)->ObjectArray.operator[](i_6);
+                        TESBoundObject** pForm_3 = &(*pdismemberedLimb)->ObjectArray[i_6];
                         if (*pForm_3) {
                             TESForm* v46 = TESForm::GetFormByNumericID(
                                 static_cast<uint32_t>(reinterpret_cast<uintptr_t>(*pForm_3))
@@ -10692,7 +10691,7 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                 iactorCauseID = -1;
                 a1->LoadData(&iactorCauseID, 4u);
                 ActorCause* ActorCauseByID = ActorCause::GetActorCauseByID(iactorCauseID);
-                pextraActorCause_2->spActorCause.operator=(ActorCauseByID);
+                pextraActorCause_2->spActorCause = ActorCauseByID;
                 if (!pextraActorCause_2->spActorCause.m_pObject) {
                     this->RemoveExtra(96);
                 }
@@ -10888,7 +10887,7 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                 uint32_t isaveGameCount_7 = a1->LoadVariableSizedValue();
                 pextraGuardedRefData_2->Guards.SetSize(isaveGameCount_7, true);
                 for (uint32_t i_3 = 0; i_3 < isaveGameCount_7; ++i_3) {
-                    uint32_t* iguardID = (uint32_t*)&pextraGuardedRefData_2->Guards.operator[](i_3);
+                    uint32_t* iguardID = (uint32_t*)&pextraGuardedRefData_2->Guards[i_3];
                     a1->LoadFormID(*iguardID);
                 }
                 break;
@@ -11082,7 +11081,7 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
 void ExtraDataList::GetWeaponIdleSound(BSSoundHandle& result) {
     ExtraWeaponIdleSound* pSound = static_cast<ExtraWeaponIdleSound*>(GetExtraData(131));
     if (pSound) {
-        result.operator=(pSound->pHandle);
+        result = pSound->pHandle;
     }
     else {
         result.Clear();
@@ -11115,7 +11114,7 @@ void ExtraDataList::SetWeaponIdleSound(const BSSoundHandle& afSound) {
 void ExtraDataList::GetActivateLoopSound(BSSoundHandle& result) {
     ExtraActivateLoopSound* pSound = static_cast<ExtraActivateLoopSound*>(GetExtraData(135));
     if (pSound) {
-        result.operator=(pSound->pHandle);
+        result = pSound->pHandle;
     }
     else {
         result.Clear();

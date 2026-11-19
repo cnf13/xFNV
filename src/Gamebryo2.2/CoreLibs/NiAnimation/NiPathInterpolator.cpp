@@ -817,10 +817,5 @@ void NiPathInterpolator::CopyMembers(NiPathInterpolator* apDest, NiCloningProces
 }
 
 NiObject* NiPathInterpolator::CreateObject() {
-    NiPathInterpolator* v0 = static_cast<NiPathInterpolator*>(NiMemObject::operator new(sizeof(NiPathInterpolator)));
-    if (v0) {
-        return ::new (v0) NiPathInterpolator(nullptr, nullptr);
-    }
-
-    return nullptr;
+    return new NiPathInterpolator(nullptr, nullptr);
 }

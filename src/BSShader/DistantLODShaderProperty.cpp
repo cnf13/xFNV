@@ -125,11 +125,7 @@ DistantLODShaderProperty::~DistantLODShaderProperty() {
 
 // The clone is built in an engine block by the class's constructor; the copy body fills in the members.
 NiObject* DistantLODShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    DistantLODShaderProperty* pClone =
-        static_cast<DistantLODShaderProperty*>(NiMemObject::operator new(sizeof(DistantLODShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) DistantLODShaderProperty;
-    }
+    DistantLODShaderProperty* pClone = new DistantLODShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -286,14 +282,11 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                 }
                 int32_t iTriangles = iindices / 3;
                 usinstanceTriCount = static_cast<uint16_t>(iTriangles);
-                void* pMemory = NiMemObject::operator new(sizeof(NiTriShapeDynamicData));
-                if (pMemory) {
-                    pnewTriData = ::new (pMemory) NiTriShapeDynamicData(
-                        static_cast<uint16_t>(inuminstances * ivertices), pgvertex, pgnormal, pgcolor, pgtex, 1,
-                        NiGeometryData::NBT_METHOD_NONE, static_cast<uint16_t>(iTriangles * inuminstances), pgindex,
-                        static_cast<uint16_t>(inuminstances * ivertices), 0
-                    );
-                }
+                pnewTriData = new NiTriShapeDynamicData(
+                    static_cast<uint16_t>(inuminstances * ivertices), pgvertex, pgnormal, pgcolor, pgtex, 1,
+                    NiGeometryData::NBT_METHOD_NONE, static_cast<uint16_t>(iTriangles * inuminstances), pgindex,
+                    static_cast<uint16_t>(inuminstances * ivertices), 0
+                );
             }
             else {
                 bstrips = true;
@@ -395,14 +388,11 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                 striplength = *pusStripLengths;
                 usinstanceTriCount = (striplength % 2 == 1) ? static_cast<uint16_t>(striplength + 3)
                                                             : static_cast<uint16_t>(striplength + 2);
-                void* pMemory = NiMemObject::operator new(sizeof(NiTriStripsDynamicData));
-                if (pMemory) {
-                    pnewTriData = ::new (pMemory) NiTriStripsDynamicData(
-                        static_cast<uint16_t>(inuminstances * ivertices), pgvertex, pgnormal, pgcolor, pgtex, 1, 0,
-                        static_cast<uint16_t>(newinstanceindexcount - 2), 1, pusNewStripLengths, pgindex,
-                        static_cast<uint16_t>(inuminstances * ivertices), 0
-                    );
-                }
+                pnewTriData = new NiTriStripsDynamicData(
+                    static_cast<uint16_t>(inuminstances * ivertices), pgvertex, pgnormal, pgcolor, pgtex, 1, 0,
+                    static_cast<uint16_t>(newinstanceindexcount - 2), 1, pusNewStripLengths, pgindex,
+                    static_cast<uint16_t>(inuminstances * ivertices), 0
+                );
             }
             NiPointer<NiTexture> pbasetexture;
             if (plodgeom->GetProperty(NiProperty::SHADE) &&
@@ -439,11 +429,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
             palphanoblend->m_ucAlphaTestRef = 0;
             NiStencilProperty* pstencil = static_cast<NiStencilProperty*>(plodgeom->GetProperty(NiProperty::STENCIL));
             float fBoundRadius = plodgeom->m_spModelData.m_pObject->m_kBound.m_fRadius;
-            CachedGeometry* pCachedGeom =
-                static_cast<CachedGeometry*>(NiMemObject::operator new(sizeof(CachedGeometry)));
-            if (pCachedGeom) {
-                pCachedGeom = ::new (pCachedGeom) CachedGeometry;
-            }
+            CachedGeometry* pCachedGeom = new CachedGeometry;
             spCachedGeom = pCachedGeom;
             pCachedGeom->bTristrip = bstrips;
             pCachedGeom->spTriGeomData = pnewTriData;

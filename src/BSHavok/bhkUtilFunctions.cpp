@@ -470,8 +470,7 @@ void bhkUtilFunctions::ReplaceConstraints(NiAVObject* apObject, hkpConstraintDat
                         // EXE-INLINED none: hkStiffSpringConstraintCinfo::SetSpringLength
                         static_cast<hkpStiffSpringConstraintData*>(cinfo.pData)->m_atoms.m_spring.m_length = flen;
                     }
-                    void* pMemory = NiMemObject::operator new(sizeof(bhkStiffSpringConstraint));
-                    bhkConstraint* pspring = pMemory ? ::new (pMemory) bhkStiffSpringConstraint(&cinfo) : nullptr;
+                    bhkConstraint* pspring = new bhkStiffSpringConstraint(&cinfo);
                     const hkpWorld* phkWorld = prbA->GethkWorld();
                     bhkWorld* pw = phkWorld
                         ? static_cast<bhkWorld*>(static_cast<const ahkpWorld*>(phkWorld)->m_userData)
@@ -771,8 +770,7 @@ bhkRigidBody* bhkUtilFunctions::CreateCapsuleBody(float afHeight, float afRadius
     rkCapsule.m_vertexB.fY = 0.0f;
     rkCapsule.m_vertexB.fZ = fRadius;
     rkCapsule.m_radius = fRadius;
-    void* pMemory = NiMemObject::operator new(sizeof(bhkCapsuleShape));
-    bhkCapsuleShape* pShape = pMemory ? ::new (pMemory) bhkCapsuleShape(rkCapsule) : nullptr;
+    bhkCapsuleShape* pShape = new bhkCapsuleShape(rkCapsule);
     if (!pShape) {
         return nullptr;
     }
@@ -787,8 +785,7 @@ bhkRigidBody* bhkUtilFunctions::CreateCapsuleBody(float afHeight, float afRadius
     rkBody.hk.m_collisionFilterInfo = 0x40009;
     rkBody.m_shape = pkShape;
     rkBody.hk.m_shape = pkShape;
-    void* pBodyMemory = NiMemObject::operator new(sizeof(bhkRigidBody));
-    bhkRigidBody* pBody = pBodyMemory ? ::new (pBodyMemory) bhkRigidBody(rkBody) : nullptr;
+    bhkRigidBody* pBody = new bhkRigidBody(rkBody);
     // EXE-INLINED none: hkArray<hkpProperty>::~hkArray. The exe scales the capacity by 8 bytes per element, as
     // in bhkWorldObject::LoadBinary; the body info's own destructor is not called.
     hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();

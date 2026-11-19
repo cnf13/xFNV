@@ -204,8 +204,8 @@ void hkFreeListMemorySystem::threadQuit(hkMemoryRouter& router, hkFlags<hkMemory
 // Prints the overview header, then hkMemorySystem's statistics over the heap allocator, the free-list allocator's soft
 // limit and the thread memory and stack of each slot in use.
 void hkFreeListMemorySystem::printStatistics(hkOstream& ostr) {
-    ostr.operator<<("hkFreeListMemorySystem memory overview:\n");
-    ostr.operator<<("=======================================\n\n");
+    ostr << "hkFreeListMemorySystem memory overview:\n";
+    ostr << "=======================================\n\n";
     // The SDK's inline constructor: no allocator, empty arrays, zero figures.
     hkMemorySystem::_PrintStatisticsInput kInput;
     kInput.m_heapAllocator = nullptr;

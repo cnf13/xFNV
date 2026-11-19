@@ -19,7 +19,7 @@ void hkBsdNetworkInit() {
         if (WSAStartup(0x202, &wsaData) == -1) {
             char buf[512];
             hkErrStream apThis(buf, 512);
-            apThis.operator<<("(Windows)WSAStartup failed with error!");
+            apThis << "(Windows)WSAStartup failed with error!";
             if (hkError::s_instance->message(
                     hkError::MESSAGE_ERROR, 0x321825F8, buf, ".\\System\\Io\\Socket\\Bsd\\hkBsdSocket.cpp", 72
                 )) {

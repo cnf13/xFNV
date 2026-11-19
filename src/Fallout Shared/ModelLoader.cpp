@@ -341,20 +341,13 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
         if (pNewObject && pNewObject->IsNode()) {
             const char* pname = (&pNewObject->m_kName)->GetHandleString();
             if (pname && WildCard::Match(pname, "Bip[0-9][0-9]")) {
-                NiObject* pNewObject_2;
-                NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                if (apMemory) {
-                    pNewObject_2 = (NiObject*)::new (apMemory) NiNode(0);
-                }
-                else {
-                    pNewObject_2 = nullptr;
-                }
-                spObject3D.operator=(static_cast<NiNode*>(pNewObject_2));
+                NiObject* pNewObject_2 = new NiNode(0);
+                spObject3D = static_cast<NiNode*>(pNewObject_2);
                 NiNode* v11 = spObject3D.m_pObject;
                 v11->SetAt(0, pNewObject);
             }
             else {
-                spObject3D.operator=(pNewObject);
+                spObject3D = pNewObject;
             }
             bLoaded = true;
         }
@@ -364,15 +357,8 @@ void Model::InitModel(const char* apFilename, BSStream* apStream, bool abPrepare
                 NiAVObject* pChild = static_cast<NiAVObject*>(apStream->GetObjectAt(iIndex));
                 if ((pChild) && (pChild->IsNode() || pChild->IsGeometry())) {
                     if (!spObject3D.m_pObject) {
-                        NiObject* pNewObject_3;
-                        NiNode* v14 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                        if (v14) {
-                            pNewObject_3 = (NiObject*)::new (v14) NiNode(0);
-                        }
-                        else {
-                            pNewObject_3 = nullptr;
-                        }
-                        spObject3D.operator=(static_cast<NiNode*>(pNewObject_3));
+                        NiObject* pNewObject_3 = new NiNode(0);
+                        spObject3D = static_cast<NiNode*>(pNewObject_3);
                     }
                     NiNode* v9 = spObject3D.m_pObject;
                     v9->SetAt(iChild++, pChild);
@@ -448,10 +434,10 @@ void AttachDistant3DTask::PostProcess() {
     NiNode* v1;
     TESObjectCELL* parentCell;
     if (IOTask::IsCancelled() || ((!pRef) || pRef->TESObjectREFR::Get3D())) {
-        (&spNode)->operator=(nullptr);
+        spNode = nullptr;
     }
     else {
-        v1 = (&spNode)->operator->();
+        v1 = spNode;
         pRef->Set3DSimple(v1);
         parentCell = pRef->TESObjectREFR::GetParentCell();
         TES::pInstance->AttachModel(pRef, parentCell, nullptr, false);
@@ -531,20 +517,14 @@ void QueuedFileLoad::Run() {
     );
     char* ProcessLevel = pFileName;
     LoadedFile* LoadedFileFromMap = pModelLoader->GetLoadedFileFromMap(ProcessLevel);
-    spLoadedFile.operator=(LoadedFileFromMap);
+    spLoadedFile = LoadedFileFromMap;
     if (!spLoadedFile.m_pObject) {
         ARCHIVE_TYPE_INDEX ArchiveType = QueuedFileLoad::GetArchiveType(eFileIndex);
         BSFile* pfile = GetFile(ArchiveType, ARCHIVE_TYPE_ALL);
         if (pfile) {
             LoadedFile* v4;
-            LoadedFile* v6 = static_cast<LoadedFile*>(NiMemObject::operator new(sizeof(LoadedFile)));
-            if (v6) {
-                v4 = ::new (v6) LoadedFile(pFileName, pfile);
-            }
-            else {
-                v4 = nullptr;
-            }
-            spLoadedFile.operator=(v4);
+            v4 = new LoadedFile(pFileName, pfile);
+            spLoadedFile = v4;
         }
         else {
             Warning("MODELS: Could not get file for %s.", pFileName);
@@ -646,14 +626,14 @@ void QueuedTexture::Run() {
                 NiDX9Renderer* Renderer_ = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
                 NiFixedString apString(pfileName);
                 NiFixedString* a1 = &apString;
-                spTexture.operator=(static_cast<NiTexture*>(
+                spTexture = static_cast<NiTexture*>(
                     NiSourceCubeMap::CreateTexture(a1, pfile, Renderer_, &NiSourceTexture::ms_kDefaultPrefs)
-                ));
+                );
             }
             else {
-                spTexture.operator=(static_cast<NiTexture*>(
+                spTexture = static_cast<NiTexture*>(
                     NiSourceTexture::Create(pfile, pfileName, NiSourceTexture::ms_kDefaultPrefs, true)
-                ));
+                );
             }
             NiTexture::SetLoadMethod(iloadMethod);
         }
@@ -679,15 +659,15 @@ void QueuedTexture::Finish() {
     NiTexture* v2;
     BSFileEntry* v3;
     BSFileEntry* location;
-    if ((!GetAlreadyInPalette()) && ((&spTexture)->operator->())) {
+    if ((!GetAlreadyInPalette()) && (spTexture)) {
         if (QueuedFileEntry::GetFileEntry()) {
             location = QueuedFileEntry::GetFileEntry();
-            v1 = (&spTexture)->operator->();
+            v1 = spTexture;
             BSTexturePalette::SetTexture(v1, location);
         }
         else {
             if (pFileName) {
-                v2 = (&spTexture)->operator->();
+                v2 = spTexture;
                 BSTexturePalette::SetTexture(v2, nullptr);
             }
         }
@@ -828,7 +808,7 @@ void QueuedModel::Run() {
             else {
                 v5 = nullptr;
             }
-            spModel.operator=(v5);
+            spModel = v5;
         }
         else {
             const char* v4;
@@ -1057,7 +1037,7 @@ void QueuedKF::Run() {
     );
     char* ProcessLevel = pFileName;
     KFModel* KFModel_ = pModelLoader->FindKFModel(ProcessLevel);
-    spKFModel.operator=(KFModel_);
+    spKFModel = KFModel_;
     if (spKFModel.m_pObject) {
         SetAlreadyInKFMap(true);
     }
@@ -1073,7 +1053,7 @@ void QueuedKF::Run() {
             else {
                 v4 = nullptr;
             }
-            spKFModel.operator=(v4);
+            spKFModel = v4;
         }
         else {
             const char* v3;
@@ -1095,7 +1075,7 @@ void QueuedKF::Finish() {
         if (!pModelLoader->AddKF(ProcessLevel, v3)) {
             char* v4 = pFileName;
             KFModel* KFModel_ = pModelLoader->FindKFModel(v4);
-            spKFModel.operator=(KFModel_);
+            spKFModel = KFModel_;
         }
     }
 
@@ -1143,7 +1123,7 @@ QueuedAnimIdle::~QueuedAnimIdle() {}
 
 void QueuedAnimIdle::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     QueuedFile::Cancel(aePreviousState, apTaskOwner);
-    pModelLoader->RemoveAnimIdleFromMap(spAnimIdle.operator->());
+    pModelLoader->RemoveAnimIdleFromMap(spAnimIdle);
 }
 
 bool QueuedAnimIdle::GetDescription(char* apDescription, uint32_t aiBufferSize) {
@@ -1152,12 +1132,12 @@ bool QueuedAnimIdle::GetDescription(char* apDescription, uint32_t aiBufferSize) 
 
 // Hands a loaded animation to its idle unless the load was cancelled, then drops the idle from the queued map.
 void QueuedAnimIdle::PostProcess() {
-    if ((spKFModel.operator->()) && (!IOTask::IsCancelled())) {
-        KFModel* pKFModel = spKFModel.operator->();
-        spAnimIdle.operator->()->Loaded(pKFModel);
+    if ((spKFModel) && (!IOTask::IsCancelled())) {
+        KFModel* pKFModel = spKFModel;
+        spAnimIdle->Loaded(pKFModel);
     }
 
-    pModelLoader->RemoveAnimIdleFromMap(spAnimIdle.operator->());
+    pModelLoader->RemoveAnimIdleFromMap(spAnimIdle);
 }
 
 void QueuedAnimIdle::QueueMe() {
@@ -1205,7 +1185,7 @@ void QueuedHelmet::Run() {
 }
 
 void QueuedHelmet::Finish() {
-    if ((!(&spParent)->operator->()) && (!IOTask::IsCancelled())) {
+    if ((!spParent) && (!IOTask::IsCancelled())) {
         IOTask::AddToPostProcessQueue();
     }
     QueuedFile::Finish();
@@ -1263,7 +1243,7 @@ void QueuedHelmet::CheckFinished() {
                             NiNode* Controllers = v2->GetModel();
                             NiNode* afAnglea =
                                 pBipedAnim->CloneHelmet(spHelmetFaceGenModel[n].m_pObject, Controllers, afAngle);
-                            spClonedHelmetNode[n].operator=(afAnglea);
+                            spClonedHelmetNode[n] = afAnglea;
                             if (spClonedHelmetNode[n].m_pObject) {
                                 bool bskin = false;
                                 for (int32_t i = 0;; ++i) {
@@ -1312,9 +1292,7 @@ void QueuedHelmet::CheckFinished() {
                                                         static_cast<NiGeometryData*>(nullptr)
                                                     );
                                                     ptri_2->GetModelData()->CreateDeepCopy(spTempObject);
-                                                    spdata.operator=(
-                                                        static_cast<NiGeometryData*>(spTempObject.m_pObject)
-                                                    );
+                                                    spdata = static_cast<NiGeometryData*>(spTempObject.m_pObject);
                                                     NiGeometryData* afAngleb = spdata.m_pObject;
                                                     ptri_2->SetModelData(afAngleb);
                                                     pnpc_2->GetFaceCoord(fgcoord);
@@ -1571,7 +1549,7 @@ void QueuedReference::Cancel(BS_TASK_STATE aePreviousState, void* apTaskOwner) {
     if (spCloned3D.m_pObject) {
         NiAVObject* v4 = spCloned3D.m_pObject;
         pRef->Set3DVerySimple(v4);
-        spCloned3D.operator=(static_cast<NiAVObject*>(nullptr));
+        spCloned3D = static_cast<NiAVObject*>(nullptr);
         pRef->Set3D(nullptr, false);
     }
     pModelLoader->RemoveReferenceFromMap(pRef);
@@ -1632,7 +1610,7 @@ void QueuedReference::CheckFinished() {
     if (IsTaskFinished() && GetAllChildrenFinished() && !IsCancelled()) {
         if ((spQueuedModel.m_pObject) && (!spModel.m_pObject)) {
             Model* AdditionalGeometryData = spQueuedModel.m_pObject->GetModel();
-            spModel.operator=(AdditionalGeometryData);
+            spModel = AdditionalGeometryData;
         }
 
         bool bCanBeCloned = false;
@@ -1726,7 +1704,7 @@ void QueuedReference::AttachDistant3D(NiNode* apNode) {
         else {
             v8 = nullptr;
         }
-        spAttachDistant3DTask.operator=(v8);
+        spAttachDistant3DTask = v8;
         AttachDistant3DTask* Xa = spAttachDistant3DTask.m_pObject;
         pModelLoader->QueueAttachDistant3DTask(Xa);
     }
@@ -1741,7 +1719,7 @@ bool QueuedReference::BackgroundClone() {
     if (TES::pInstance->IsCellLoaded(pCell, false)) {
         if (TES::pInstance->CanAttach3D(pRef) && !pRef->TESObjectREFR::Get3D()) {
             NiAVObject* pCloned = pRef->Load3D(true);
-            spCloned3D.operator=(pCloned);
+            spCloned3D = pCloned;
             if (spCloned3D.m_pObject) {
                 NiRefObject* v3 = spCloned3D.m_pObject;
                 v3->DecRefCount();
@@ -1944,11 +1922,11 @@ bool LockFreeMap_GetFirst_906AF0(
             bResult = false;
             break;
         }
-        static_cast<QueuedReferenceMap*>(apThis->pOwner)->CopyKeyDirect(apThis->Current.operator->()->kKey, arKey);
-        arData = apThis->Current.operator->()->kData;
+        static_cast<QueuedReferenceMap*>(apThis->pOwner)->CopyKeyDirect(apThis->Current->kKey, arKey);
+        arData = apThis->Current->kData;
         bResult = true;
         InitializationFlow();
-        if (!apThis->Current.operator->()->GetMark()) {
+        if (!apThis->Current->GetMark()) {
             break;
         }
     }
@@ -1973,14 +1951,14 @@ bool LockFreeMap_GetNext_906C10(
             bResult = false;
             break;
         }
-        if (pEntry->operator->()->GetMark()) {
+        if ((*pEntry)->GetMark()) {
             continue;
         }
-        static_cast<QueuedReferenceMap*>(apThis->pOwner)->CopyKeyDirect(pEntry->operator->()->kKey, arKey);
-        arData = pEntry->operator->()->kData;
+        static_cast<QueuedReferenceMap*>(apThis->pOwner)->CopyKeyDirect((*pEntry)->kKey, arKey);
+        arData = (*pEntry)->kData;
         bResult = true;
         InitializationFlow();
-        if (!pEntry->operator->()->GetMark()) {
+        if (!(*pEntry)->GetMark()) {
             break;
         }
         arData = static_cast<QueuedReference*>(nullptr);
@@ -2476,7 +2454,7 @@ void ModelLoader::QueueTreeModel(
     QueuedModel* v7 = spqueuedTreeModel.m_pObject;
     v7->QueueMe();
     NiPointer<QueuedModel>* p_spqueuedTreeModel = &spqueuedTreeModel;
-    aspQueuedModel.operator=(spqueuedTreeModel);
+    aspQueuedModel = spqueuedTreeModel;
 }
 
 void ModelLoader::QueueBoundObject(
@@ -3901,7 +3879,7 @@ void ModelLoader::QueueReplacementKFList(
                             else {
                                 v10 = nullptr;
                             }
-                            spreplacementKFList.operator=(v10);
+                            spreplacementKFList = v10;
                         }
                         QueuedReplacementKF* v12 =
                             static_cast<QueuedReplacementKF*>(ourMalloc(sizeof(QueuedReplacementKF)));
@@ -3932,7 +3910,7 @@ void ModelLoader::QueueReplacementKFList(
                 v7->CheckFinished();
             }
             else {
-                spreplacementKFList.operator=(static_cast<QueuedReplacementKFList*>(nullptr));
+                spreplacementKFList = static_cast<QueuedReplacementKFList*>(nullptr);
             }
         }
     }
@@ -4250,8 +4228,8 @@ void QueuedFile::NotifyChildFinished(QueuedFile* apChild) {
 
 void QueuedFile::SetParent(QueuedFile* apParent) {
     this->spParent = apParent;
-    if (this->spParent.operator->()) {
-        this->spParent.operator->()->AddChild(this);
+    if (this->spParent) {
+        this->spParent->AddChild(this);
     }
 }
 
@@ -4419,9 +4397,9 @@ void KFModel::InitSequence(const char* apFilename) {
         }
         // A KFModel's sequence is always a BSAnimGroupSequence (CreateSequenceFromFile wraps it in one); the field
         // holds it as an NiControllerSequence.
-        spAnimGroup.operator=(static_cast<TESAnimGroup*>(
+        spAnimGroup = static_cast<TESAnimGroup*>(
             BSAnimGroupSequence::InitAnimGroup(static_cast<BSAnimGroupSequence*>(spSequence.m_pObject), apFilename)
-        ));
+        );
         if (NiObject::IsKindOf_0(&BSAnimGroupSequence::ms_RTTI, spSequence.m_pObject)) {
             static_cast<BSAnimGroupSequence*>(GetSequence())->BSAnimGroupSequence::SetAnimGroup(spAnimGroup.m_pObject);
         }
@@ -4469,7 +4447,7 @@ QueuedReplacementKF::~QueuedReplacementKF() {}
 // A loaded replacement goes to the post-processing queue, counted by its owner list, unless it was cancelled.
 void QueuedReplacementKF::Finish() {
     QueuedKF::Finish();
-    if ((spKFModel.operator->()) && (!IOTask::IsCancelled())) {
+    if ((spKFModel) && (!IOTask::IsCancelled())) {
         if (pOwner) {
             pOwner->AddPostProcessingChild();
         }
@@ -4479,7 +4457,7 @@ void QueuedReplacementKF::Finish() {
 
 void QueuedReplacementKF::PostProcess() {
     if (!IOTask::IsCancelled()) {
-        pAnim->QueueReplacementAnimation(spKFModel.operator->());
+        pAnim->QueueReplacementAnimation(spKFModel);
         if (pOwner) {
             pOwner->NotifyChildFinishedPostProcessing();
         }
@@ -4655,7 +4633,7 @@ void TESObjectREFR::ClearBackgroundLoadingRef() {
 }
 
 NiAVObjectPalette* NiControllerManager::GetObjectPalette() {
-    return m_spObjectPalette.operator->();
+    return m_spObjectPalette;
 }
 
 void NiControllerSequence::SetName(const NiFixedString& kName) {
@@ -4752,11 +4730,11 @@ NiUpdateData::NiUpdateData(float afTime, bool abUpdateControllers, bool abParall
     bFoundMorphController(false), bSceneGraphChange(false) {}
 
 NiVertexColorProperty* NiVertexColorProperty::GetDefault() {
-    return (&ms_spDefault)->operator->();
+    return ms_spDefault;
 }
 
 NiZBufferProperty* NiZBufferProperty::GetDefault() {
-    return (&ms_spDefault)->operator->();
+    return ms_spDefault;
 }
 
 // The empty string's handle has no reference count. The count is raw memory, the untyped word GetRealBufferStart
@@ -4779,7 +4757,7 @@ uint32_t NiStream::GetObjectCount() {
 
 NiObject* NiStream::GetObjectAt(uint32_t i) {
     NiPointer<NiObject>& spObject = m_kTopObjects.GetAt(i);
-    return spObject.operator->();
+    return spObject;
 }
 
 NiTimeController* NiTimeController::GetNext() {

@@ -119,7 +119,7 @@ int32_t hkStructureLayout::getMemberSize(
             char buf[512];
             {
                 hkErrStream apThis(buf, 512);
-                apThis.operator<<("Unknown class member type in structureLayout::getMemberSize().");
+                apThis << "Unknown class member type in structureLayout::getMemberSize().";
                 if (hkError::s_instance->message(
                         hkError::MESSAGE_ERROR, 0x50A18B58, buf, ".\\Util\\hkStructureLayout.cpp", 195
                     )) {

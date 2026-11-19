@@ -33,15 +33,11 @@ const NiRTTI* bhkPlaneShape::GetRTTI() const {
 }
 
 // A new default-constructed plane shape built under the engine's clone critical section and filled from this one; the
-// whole body charges its allocations to Havok's heap context. Its cleanup-only unwind frame is left out.
+// whole body charges its allocations to Havok's heap context.
 NiObject* bhkPlaneShape::CreateClone(NiCloningProcess& arCloning) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
     bhkSerializable::CloneCritLock();
-    bhkPlaneShape* pClone = nullptr;
-    bhkPlaneShape* pShape = static_cast<bhkPlaneShape*>(NiMemObject::operator new(sizeof(bhkPlaneShape)));
-    if (pShape) {
-        pClone = ::new (pShape) bhkPlaneShape;
-    }
+    bhkPlaneShape* pClone = new bhkPlaneShape;
     // CopyMembers is called virtually through a base pointer.
     static_cast<bhkShape*>(this)->CopyMembers(pClone, arCloning);
     bhkSerializable::CloneCritUnlock();
@@ -261,13 +257,9 @@ void bhkPlaneShape::CopyCinfo(hkPlaneShapeCinfo& arInfo) {
     }
 }
 
-// A new default-constructed plane shape, or null when the allocation fails. Its cleanup-only unwind frame is left
-// out.
+// A new default-constructed plane shape, or null when the allocation fails.
 NiObject* bhkPlaneShape::CreateObject() {
-    bhkPlaneShape* pShape = static_cast<bhkPlaneShape*>(NiMemObject::operator new(sizeof(bhkPlaneShape)));
-    if (pShape) {
-        ::new (pShape) bhkPlaneShape;
-    }
+    bhkPlaneShape* pShape = new bhkPlaneShape;
     return pShape;
 }
 

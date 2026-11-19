@@ -276,11 +276,7 @@ void ParticleShader::SetupPassConstants(uint32_t auiCurrentPass) {
 
 void ParticleShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         // Each entry's variable name is an empty string.
         m_spVertexConstantMap.m_pObject->AddPredefinedEntry(
@@ -309,14 +305,7 @@ void ParticleShader::CreateConstantMaps() {
         );
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
-        else {
-            pMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
     }
 }
@@ -688,34 +677,16 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
             while (v25);
             inumVertices_2 = inumVertices;
         }
-        NiTriShapeData* v10 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-        NiTriShapeData* pnewShapeData = nullptr;
-        if (v10) {
-            pnewShapeData = ::new (v10) NiTriShapeData(
-                inumVertices_2, pvertex, nullptr, nullptr, ptex, 1, NiGeometryData::NBT_METHOD_NONE, usTriangles,
-                pusTriList
-            );
-        }
-        NiAdditionalGeometryData* v12 =
-            static_cast<NiAdditionalGeometryData*>(NiMemObject::operator new(sizeof(NiAdditionalGeometryData)));
-        if (v12) {
-            pdata = ::new (v12) NiAdditionalGeometryData(inumVertices_2, 1u);
-        }
-        else {
-            pdata = nullptr;
-        }
+        NiTriShapeData* pnewShapeData = new NiTriShapeData(
+            inumVertices_2, pvertex, nullptr, nullptr, ptex, 1, NiGeometryData::NBT_METHOD_NONE, usTriangles, pusTriList
+        );
+        pdata = new NiAdditionalGeometryData(inumVertices_2, 1u);
         pdata->SetDataBlockCount(1u);
         uint8_t* v14 = ParticleShaderProperty::GetInstanceIndex();
         pdata->SetDataBlock(0, v14, 4 * inumVertices_2, true);
         pdata->SetDataStream(0, 0, 0, 1u, inumVertices_2, 4u, 4u);
         pnewShapeData->SetAdditionalGeometryData(pdata);
-        NiTriShape* v15 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-        if (v15) {
-            pnewGeometry = ::new (v15) NiTriShape(pnewShapeData);
-        }
-        else {
-            pnewGeometry = nullptr;
-        }
+        pnewGeometry = new NiTriShape(pnewShapeData);
         NiGeometryData* m_pObject = pnewGeometry->m_spModelData.m_pObject;
         float x = m_pObject->m_kBound.m_kCenter.x;
         int32_t m_iRadiusAsInt = m_pObject->m_kBound.m_iRadiusAsInt;
@@ -725,14 +696,7 @@ NiGeometry* ParticleShader::GetParticleGeometry() {
         m_pObject->m_kBound.m_kCenter.x = x;
         m_pObject->m_kBound.m_kCenter.y = y;
         m_pObject->m_kBound.m_kCenter.z = z;
-        ParticleShaderProperty* v22 =
-            static_cast<ParticleShaderProperty*>(NiMemObject::operator new(sizeof(ParticleShaderProperty)));
-        if (v22) {
-            pprop = ::new (v22) ParticleShaderProperty;
-        }
-        else {
-            pprop = nullptr;
-        }
+        pprop = new ParticleShaderProperty;
         pnewGeometry->AttachProperty(pprop);
         result = ParticleShader::spBaseGeometry.m_pObject;
         if (ParticleShader::spBaseGeometry.m_pObject != pnewGeometry) {
@@ -761,10 +725,7 @@ BSShader* ParticleShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_COLOR, 1u, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     spShaderDecl->GetD3DDeclaration();
-    ParticleShader* v2 = static_cast<ParticleShader*>(NiMemObject::operator new(sizeof(ParticleShader)));
-    if (v2) {
-        pshader = ::new (v2) ParticleShader(spShaderDecl);
-    }
+    pshader = new ParticleShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

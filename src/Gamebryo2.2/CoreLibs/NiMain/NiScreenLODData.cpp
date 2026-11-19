@@ -223,10 +223,5 @@ void NiScreenLODData::AutoSetBound(NiLODNode* pkLOD) {
 }
 
 NiObject* NiScreenLODData::CreateObject() {
-    NiScreenLODData* v0 = static_cast<NiScreenLODData*>(NiMemObject::operator new(sizeof(NiScreenLODData)));
-    if (v0) {
-        return ::new (v0) NiScreenLODData;
-    }
-
-    return nullptr;
+    return new NiScreenLODData;
 }

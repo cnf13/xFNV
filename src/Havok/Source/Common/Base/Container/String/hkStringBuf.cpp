@@ -337,7 +337,7 @@ hkStringBuf* hkStringBuf::constructFrom(const hkStringPtr& arString) {
     m_string.m_data = m_string.m_storage;
     m_string.m_size = 0;
     m_string.m_capacityAndFlags = hkArrayBase<char>::DONT_DEALLOCATE_FLAG | 128;
-    operator=(arString.cString());
+    *this = arString.cString();
     return this;
 }
 

@@ -45,10 +45,7 @@ NiObject* bhkTriangleShape::CreateClone(NiCloningProcess& arCloneData) {
 
     bhkTriangleShape* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkTriangleShape* pShape = static_cast<bhkTriangleShape*>(NiMemObject::operator new(sizeof(bhkTriangleShape)));
-    if (pShape) {
-        pClone = ::new (pShape) bhkTriangleShape;
-    }
+    pClone = new bhkTriangleShape;
     // CopyMembers is called virtually, so the call stays indirect through a base pointer.
     bhkShape* pBase = this;
     pBase->CopyMembers(pClone, arCloneData);
@@ -203,11 +200,7 @@ void bhkTriangleShape::CopyCinfo(hkTriangleShapeCinfo& arInfo) {
 
 // Factory: allocates the shape and constructs it in place; the caller has already entered its memory context.
 NiObject* bhkTriangleShape::CreateObject() {
-    bhkTriangleShape* pShape = static_cast<bhkTriangleShape*>(NiMemObject::operator new(sizeof(bhkTriangleShape)));
-    if (pShape) {
-        return ::new (pShape) bhkTriangleShape;
-    }
-    return nullptr;
+    return new bhkTriangleShape;
 }
 
 // KEEP: the exe's only caller, bhkTriangleShape::CopyMembers (0xCCAAF0), loads apCloneProc into edx before the call

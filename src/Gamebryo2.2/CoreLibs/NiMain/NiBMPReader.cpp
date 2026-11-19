@@ -42,8 +42,7 @@ NiPixelData* NiBMPReader::ReadFile(NiFile& kIst, NiPixelData* pkOptDest) {
         pkDest = pkOptDest;
     }
     else {
-        NiPixelData* pkMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        pkDest = pkMemory ? ::new (pkMemory) NiPixelData(m_uiWidth, m_uiHeight, m_kFormat, 1u, 1u) : nullptr;
+        pkDest = new NiPixelData(m_uiWidth, m_uiHeight, m_kFormat, 1u, 1u);
     }
 
     if (m_kFormat == NiPixelFormat_PAL8) {
@@ -61,8 +60,7 @@ NiPixelData* NiBMPReader::ReadFile(NiFile& kIst, NiPixelData* pkOptDest) {
             pkPal++;
         }
 
-        NiPalette* pkMemory = static_cast<NiPalette*>(NiMemObject::operator new(sizeof(NiPalette)));
-        NiPalette* pkPalette = pkMemory ? ::new (pkMemory) NiPalette(false, 256u, akSrcPal) : nullptr;
+        NiPalette* pkPalette = new NiPalette(false, 256u, akSrcPal);
         // EXE-INLINED 0xA76A60
         pkDest->m_spPalette = pkPalette;
     }

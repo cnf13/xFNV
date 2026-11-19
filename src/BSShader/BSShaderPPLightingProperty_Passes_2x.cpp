@@ -704,7 +704,7 @@ PickPass:;
                     goto SpecularPass;
                 }
             }
-            if (apSunlight->spLight.m_pObject->m_kDiff.operator!=(NiColor_BLACK) || !pShaderProp->GetFlag(37u) ||
+            if (apSunlight->spLight.m_pObject->m_kDiff != NiColor_BLACK || !pShaderProp->GetFlag(37u) ||
                 (pAlpha && (pAlpha->m_uFlags & 512) != 0 && pShaderProp->fFadeAlpha < 1.0f) || GetFlag(7u) ||
                 GetFlag(21u) || GetFlag(17u) || pShaderProp->GetFlag(26u) || pShaderProp->GetFlag(27u)) {
             SpecularPass:;
@@ -766,7 +766,7 @@ PickPass:;
             goto DiffusePass;
         }
     }
-    if (apSunlight->spLight.m_pObject->m_kDiff.operator!=(NiColor_BLACK) || !pShaderProp->GetFlag(37u) ||
+    if (apSunlight->spLight.m_pObject->m_kDiff != NiColor_BLACK || !pShaderProp->GetFlag(37u) ||
         pShaderProp->fFadeAlpha < 1.0f || GetFlag(7u) || GetFlag(21u) || GetFlag(17u) || pShaderProp->GetFlag(26u) ||
         pShaderProp->GetFlag(27u)) {
     DiffusePass:;

@@ -1329,11 +1329,7 @@ void BSShaderAccumulator::AddAndUpdateBoundVolume(uint32_t auiReferenceID, const
 
 // Builds the empty "RenderPasses" child the accumulated geometry hangs under and updates it.
 NiNode* BSShaderAccumulator::CreateRenderPassTree() {
-    NiNode* pNode = nullptr;
-    void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (pMemory) {
-        pNode = ::new (pMemory) NiNode(0);
-    }
+    NiNode* pNode = new NiNode(0);
 
     // The interned handle is kept in a NiFixedString local and its reference is dropped the way the destructor does it:
     // the handle is checked against NULL_STRING, then the count 8 bytes before the characters is dropped. That count is
@@ -1501,7 +1497,7 @@ void BSShaderAccumulator::FinishAccumulating_Standard_PreResolveDepth(BSShaderAc
             else {
                 apAccumulator->RenderGeometryGroup(10u, 0);
                 if (BSShaderAccumulator::bShowRenderPassesScenegraph && apAccumulator->eRenderMode != 7) {
-                    BSShaderAccumulator::spRenderPassesScenegraph.operator=(apAccumulator->CreateRenderPassTree());
+                    BSShaderAccumulator::spRenderPassesScenegraph = apAccumulator->CreateRenderPassTree();
                     BSShaderAccumulator::bShowRenderPassesScenegraph = false;
                 }
                 if (apAccumulator->bWaterReflection) {
@@ -1919,7 +1915,7 @@ bool BSShaderAccumulator::RegisterObject_Interface(
 void BSShaderAccumulator::FinishAccumulating_FirstPerson(BSShaderAccumulator* apAccumulator) {
     if (apAccumulator->m_pkCamera) {
         if (BSShaderAccumulator::bShowRenderPassesScenegraph) {
-            BSShaderAccumulator::spRenderPassesScenegraph.operator=(apAccumulator->CreateRenderPassTree());
+            BSShaderAccumulator::spRenderPassesScenegraph = apAccumulator->CreateRenderPassTree();
             BSShaderAccumulator::bShowRenderPassesScenegraph = false;
         }
         apAccumulator->m_kItemsToSortAndRender = nullptr;

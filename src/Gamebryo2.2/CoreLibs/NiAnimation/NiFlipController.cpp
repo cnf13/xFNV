@@ -67,11 +67,7 @@ void NiFlipController::LoadBinary(NiStream& kStream) {
     NiStreamLoadBinary(kStream, fSecsPerFrame);
     uint32_t uiNumTextures = kStream.ReadMultipleLinkIDs();
 
-    void* pkFloatMemory = NiMemObject::operator new(sizeof(NiFloatData));
-    NiFloatData* pkFloatData = nullptr;
-    if (pkFloatMemory) {
-        pkFloatData = ::new (pkFloatMemory) NiFloatData;
-    }
+    NiFloatData* pkFloatData = new NiFloatData;
 
     if (uiNumTextures > 0) {
         // EXE-INLINED none: NiNew NiStepFloatKey[uiNumTextures + 1] (the overflow-clamped size, the count cookie and
@@ -115,9 +111,7 @@ void NiFlipController::LoadBinary(NiStream& kStream) {
         m_fHiKeyTime = fAccumTime;
     }
 
-    NiFloatInterpolator* pkMemory =
-        static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-    NiFloatInterpolator* pkInterp = pkMemory ? ::new (pkMemory) NiFloatInterpolator(pkFloatData) : nullptr;
+    NiFloatInterpolator* pkInterp = new NiFloatInterpolator(pkFloatData);
     m_spInterpolator = pkInterp;
     m_spInterpolator->Collapse();
 }
@@ -232,11 +226,7 @@ NiBlendInterpolator* NiFlipController::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    NiBlendFloatInterpolator* pkMemory =
-        static_cast<NiBlendFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBlendFloatInterpolator)));
-    NiBlendInterpolator* pkInterp = pkMemory
-        ? ::new (pkMemory) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize)
-        : nullptr;
+    NiBlendInterpolator* pkInterp = new NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
     pkInterp->m_uFlags |= NiBlendInterpolator::ONLY_USE_HIGHEST_WEIGHT_MASK;
     return pkInterp;
 }
@@ -275,12 +265,7 @@ void NiFlipController::AttachTexture(NiTexture* pkTexture, uint32_t uiIndex) {
 }
 
 NiObject* NiFlipController::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiFlipController));
-    if (v0) {
-        return ::new (v0) NiFlipController;
-    }
-
-    return nullptr;
+    return new NiFlipController;
 }
 
 uint32_t NiTexturingProperty::GetShaderArrayCount() const {

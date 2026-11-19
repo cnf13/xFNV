@@ -41,15 +41,7 @@ NiPSysSpawnModifier::NiPSysSpawnModifier()
 NiPSysSpawnModifier::~NiPSysSpawnModifier() {}
 
 NiObject* NiPSysSpawnModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysSpawnModifier* pkObject =
-        static_cast<NiPSysSpawnModifier*>(NiMemObject::operator new(sizeof(NiPSysSpawnModifier)));
-    NiPSysSpawnModifier* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiPSysSpawnModifier;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiPSysSpawnModifier* pkObject_2 = new NiPSysSpawnModifier;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_usNumSpawnGenerations = m_usNumSpawnGenerations;
     pkObject_2->m_fPercentageSpawned = m_fPercentageSpawned;
@@ -314,10 +306,5 @@ void NiPSysSpawnModifier::SetLifeSpan(float fLifeSpan) {
 }
 
 NiObject* NiPSysSpawnModifier::CreateObject() {
-    NiPSysSpawnModifier* pkObject =
-        static_cast<NiPSysSpawnModifier*>(NiMemObject::operator new(sizeof(NiPSysSpawnModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysSpawnModifier;
+    return new NiPSysSpawnModifier;
 }

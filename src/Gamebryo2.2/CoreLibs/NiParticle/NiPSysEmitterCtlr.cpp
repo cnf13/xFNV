@@ -77,9 +77,7 @@ void NiPSysEmitterCtlr::LinkObject(NiStream& kStream) {
             return;
         }
 
-        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-        NiFloatInterpolator* pkBirthRate =
-            pvMem ? ::new (pvMem) NiFloatInterpolator(static_cast<NiFloatData*>(nullptr)) : nullptr;
+        NiFloatInterpolator* pkBirthRate = new NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
         pkBirthRate->ReplaceKeys(spData->m_pkBirthRateKeys, spData->m_uiNumBirthRateKeys, spData->m_eBirthRateKeyType);
         spData->m_uiNumBirthRateKeys = 0;
         spData->m_pkBirthRateKeys = nullptr;
@@ -87,8 +85,7 @@ void NiPSysEmitterCtlr::LinkObject(NiStream& kStream) {
         spData->m_ucBirthRateSize = 0;
         SetInterpolator(pkBirthRate, 0);
 
-        pvMem = NiMemObject::operator new(sizeof(NiBoolInterpolator));
-        NiBoolInterpolator* pkActive = pvMem ? ::new (pvMem) NiBoolInterpolator(nullptr) : nullptr;
+        NiBoolInterpolator* pkActive = new NiBoolInterpolator(nullptr);
         pkActive->ReplaceKeys(
             spData->m_pkEmitterActiveKeys, spData->m_eEmitterActiveKeyType, spData->m_uiNumEmitterActiveKeys
         );
@@ -464,12 +461,10 @@ void NiPSysEmitterCtlr::ResetTimeExtrema() {
 // Poses a zero birth rate or an inactive emitter.
 NiInterpolator* NiPSysEmitterCtlr::CreatePoseInterpolator(uint16_t usIndex) {
     if (usIndex == 0) {
-        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-        return pvMem ? ::new (pvMem) NiFloatInterpolator(0.0f) : nullptr;
+        return new NiFloatInterpolator(0.0f);
     }
     if (usIndex == 1) {
-        void* pvMem = NiMemObject::operator new(sizeof(NiBoolInterpolator));
-        return pvMem ? ::new (pvMem) NiBoolInterpolator(false) : nullptr;
+        return new NiBoolInterpolator(false);
     }
     return nullptr;
 }
@@ -482,14 +477,10 @@ NiBlendInterpolator* NiPSysEmitterCtlr::CreateBlendInterpolator(
     int32_t ucArraySize
 ) const {
     if (usIndex == 0) {
-        void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
-        return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize)
-                     : nullptr;
+        return new NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
     }
     if (usIndex == 1) {
-        void* pvMem = NiMemObject::operator new(sizeof(NiBlendBoolInterpolator));
-        return pvMem ? ::new (pvMem) NiBlendBoolInterpolator(bManagerControlled, fWeightThreshold, ucArraySize)
-                     : nullptr;
+        return new NiBlendBoolInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
     }
     return nullptr;
 }
@@ -640,9 +631,5 @@ void NiPSysEmitterCtlr::SetParticlesLimit(uint16_t asLimit) {
 }
 
 NiObject* NiPSysEmitterCtlr::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiPSysEmitterCtlr));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysEmitterCtlr;
+    return new NiPSysEmitterCtlr;
 }

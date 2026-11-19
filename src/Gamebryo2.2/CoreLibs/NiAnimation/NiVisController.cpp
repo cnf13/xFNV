@@ -51,14 +51,7 @@ void NiVisController::LinkObject(NiStream& kStream) {
     if ((&kStream)->GetFileVersion() < 0xA010068) {
         NiBoolInterpolator* v5;
         NiBoolData* pkBoolData = static_cast<NiBoolData*>(kStream.GetObjectFromLinkID());
-        NiBoolInterpolator* v4 =
-            static_cast<NiBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBoolInterpolator)));
-        if (v4) {
-            v5 = ::new (v4) NiBoolInterpolator(pkBoolData);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiBoolInterpolator(pkBoolData);
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -129,9 +122,5 @@ void NiVisController::GetTargetBoolValue(bool& bValue) {
 }
 
 NiObject* NiVisController::CreateObject() {
-    NiVisController* v0 = static_cast<NiVisController*>(NiMemObject::operator new(sizeof(NiVisController)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiVisController;
+    return new NiVisController;
 }

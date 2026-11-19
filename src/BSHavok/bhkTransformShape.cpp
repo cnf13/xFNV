@@ -57,10 +57,7 @@ NiObject* bhkTransformShape::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkTransformShape* pClone = static_cast<bhkTransformShape*>(NiMemObject::operator new(sizeof(bhkTransformShape)));
-    if (pClone) {
-        ::new (pClone) bhkTransformShape;
-    }
+    bhkTransformShape* pClone = new bhkTransformShape;
     bhkShape* pThis = this;
     pThis->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -318,11 +315,7 @@ void bhkTransformShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDe
     alignas(16) NiPoint3 kTranslate;
     HK2NI(kRotate, kTransform.m_rotation);
     HK2NI(kTranslate, kTransform.m_translation);
-    NiNode* pNode = nullptr;
-    void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (pMemory) {
-        pNode = ::new (pMemory) NiNode(0);
-    }
+    NiNode* pNode = new NiNode(0);
     alignas(16) NiFixedString kName;
     kName.SetHandle(NiGlobalStringTable::AddString("bhkTransformShape"));
     pNode->SetName(kName);
@@ -376,19 +369,15 @@ void bhkTransformShape::CopyCinfo(hkTransformShapeCinfo& arInfo) {
     kCol1.m_quad = pTransform->m_rotation.m_col1.m_quad;
     kCol2.m_quad = pTransform->m_rotation.m_col2.m_quad;
     kTranslation.m_quad = pTransform->m_translation.m_quad;
-    arInfo.m_transform.Rot.Col0.operator=(kCol0);
-    arInfo.m_transform.Rot.Col1.operator=(kCol1);
-    arInfo.m_transform.Rot.Col2.operator=(kCol2);
-    arInfo.m_transform.Trans.operator=(kTranslation);
+    arInfo.m_transform.Rot.Col0 = kCol0;
+    arInfo.m_transform.Rot.Col1 = kCol1;
+    arInfo.m_transform.Rot.Col2 = kCol2;
+    arInfo.m_transform.Trans = kTranslation;
 }
 
 // The streaming factory: a new shape with no Havok object yet.
 NiObject* bhkTransformShape::CreateObject() {
-    bhkTransformShape* pObject = static_cast<bhkTransformShape*>(NiMemObject::operator new(sizeof(bhkTransformShape)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkTransformShape;
+    return new bhkTransformShape;
 }
 
 void bhkMatrix3::Renormalize() {
@@ -421,7 +410,7 @@ void bhkMatrix3::Renormalize() {
         _mm_unpacklo_ps(v12, v8)
     );
     a3.renormalize();
-    Col0.operator=(a3.m_col0);
-    p_Col1->operator=(a3.m_col1);
-    p_Col2->operator=(a3.m_col2);
+    Col0 = a3.m_col0;
+    *p_Col1 = a3.m_col1;
+    *p_Col2 = a3.m_col2;
 }

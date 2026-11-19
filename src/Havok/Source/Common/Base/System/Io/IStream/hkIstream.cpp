@@ -317,8 +317,8 @@ hkIstream& hkIstream::operator>>(uint64_t& u) {
 
 hkIstream& hkIstream::operator>>(hkStringPtr& str) {
     hkStringBuf s;
-    this->operator>>(s);
-    str.operator=(s.m_string.begin());
+    *this >> s;
+    str = s.m_string.begin();
     return *this;
 }
 

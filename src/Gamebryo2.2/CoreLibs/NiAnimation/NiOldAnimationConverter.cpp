@@ -123,11 +123,7 @@ void NiOldAnimationConverter::ConvertRollController(NiRollController* pkControll
 
         NiLookAtInterpolator* pkLookAtInterp = static_cast<NiLookAtInterpolator*>(pkInterp);
         NiFloatData* pkData = pkController->m_spFloatData.m_pObject;
-        NiFloatInterpolator* pkRollInterp =
-            static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-        if (pkRollInterp) {
-            pkRollInterp = ::new (pkRollInterp) NiFloatInterpolator(pkData);
-        }
+        NiFloatInterpolator* pkRollInterp = new NiFloatInterpolator(pkData);
         pkLookAtInterp->SetRollInterpolator(pkRollInterp);
         SynchronizeTimeControllers(pkController, pkTransformController);
         float fStart;
@@ -163,19 +159,11 @@ void NiOldAnimationConverter::ConvertLookAtController(NiLookAtController* pkCont
     }
     if (!bHasTransformInterp) {
         bNewController = true;
-        pkTransformController =
-            static_cast<NiTransformController*>(NiMemObject::operator new(sizeof(NiTransformController)));
-        if (pkTransformController) {
-            pkTransformController = ::new (pkTransformController) NiTransformController;
-        }
+        pkTransformController = new NiTransformController;
         SynchronizeTimeControllers(pkController, pkTransformController);
     }
 
-    NiLookAtInterpolator* pkLookAtInterp =
-        static_cast<NiLookAtInterpolator*>(NiMemObject::operator new(sizeof(NiLookAtInterpolator)));
-    if (pkLookAtInterp) {
-        pkLookAtInterp = ::new (pkLookAtInterp) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
-    }
+    NiLookAtInterpolator* pkLookAtInterp = new NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
     pkLookAtInterp->m_pkLookAt = pkController->m_pkLookAt;
     pkLookAtInterp->SetLookAtName(EmptyFS);
     if (pkController->m_uFlags & NiLookAtInterpolator::FLIP_MASK) {
@@ -198,12 +186,7 @@ void NiOldAnimationConverter::ConvertLookAtController(NiLookAtController* pkCont
             NiTransformInterpolator* pkOldTransformInterp = static_cast<NiTransformInterpolator*>(pkOldInterp);
             NiTransformData* pkData = pkOldTransformInterp->m_spData.m_pObject;
             if (pkData && pkData->m_usNumPosKeys) {
-                NiPoint3Interpolator* pkTranslateInterp =
-                    static_cast<NiPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiPoint3Interpolator)));
-                if (pkTranslateInterp) {
-                    pkTranslateInterp =
-                        ::new (pkTranslateInterp) NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
-                }
+                NiPoint3Interpolator* pkTranslateInterp = new NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
                 uint32_t uiNumKeys;
                 NiAnimationKey::KeyType eType;
                 uint8_t ucSize;
@@ -214,11 +197,7 @@ void NiOldAnimationConverter::ConvertLookAtController(NiLookAtController* pkCont
             }
             pkData = pkOldTransformInterp->m_spData.m_pObject;
             if (pkData && pkData->m_usNumScaleKeys) {
-                NiFloatInterpolator* pkScaleInterp =
-                    static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-                if (pkScaleInterp) {
-                    pkScaleInterp = ::new (pkScaleInterp) NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
-                }
+                NiFloatInterpolator* pkScaleInterp = new NiFloatInterpolator(static_cast<NiFloatData*>(nullptr));
                 uint32_t uiNumKeys;
                 NiAnimationKey::KeyType eType;
                 uint8_t ucSize;
@@ -254,11 +233,7 @@ void NiOldAnimationConverter::ConvertPathController(NiPathController* pkControll
     }
 
     NiPathInterpolator* pkInterp =
-        static_cast<NiPathInterpolator*>(NiMemObject::operator new(sizeof(NiPathInterpolator)));
-    if (pkInterp) {
-        pkInterp = ::new (pkInterp)
-            NiPathInterpolator(pkController->m_spPathData.m_pObject, pkController->m_spPctData.m_pObject);
-    }
+        new NiPathInterpolator(pkController->m_spPathData.m_pObject, pkController->m_spPctData.m_pObject);
     if (pkController->m_uFlags & NiPathController::ALLOW_FLIP_MASK) {
         pkInterp->m_uFlags |= NiPathInterpolator::ALLOW_FLIP_MASK;
     }
@@ -307,11 +282,7 @@ void NiOldAnimationConverter::ConvertPathController(NiPathController* pkControll
         SynchronizeTimeControllers(pkController, pkTransformController);
     }
     else {
-        NiTransformController* pkNew =
-            static_cast<NiTransformController*>(NiMemObject::operator new(sizeof(NiTransformController)));
-        if (pkNew) {
-            pkNew = ::new (pkNew) NiTransformController;
-        }
+        NiTransformController* pkNew = new NiTransformController;
         if (pkTransformController != pkNew) {
             if (pkTransformController) {
                 pkTransformController->DecRefCount();
@@ -396,10 +367,7 @@ void NiFloatInterpolator::SetKeys(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnim
         return;
     }
     if (!m_spFloatData.m_pObject) {
-        NiFloatData* pkData = static_cast<NiFloatData*>(NiMemObject::operator new(sizeof(NiFloatData)));
-        if (pkData) {
-            ::new (pkData) NiFloatData;
-        }
+        NiFloatData* pkData = new NiFloatData;
         m_spFloatData = pkData;
     }
     m_spFloatData.m_pObject->SetAnim(pkKeys, uiNumKeys, eType);
@@ -471,10 +439,7 @@ void NiPoint3Interpolator::SetKeys(NiPosKey* pkKeys, uint32_t uiNumKeys, NiAnima
         return;
     }
     if (!m_spPoint3Data.m_pObject) {
-        NiPosData* pkData = static_cast<NiPosData*>(NiMemObject::operator new(sizeof(NiPosData)));
-        if (pkData) {
-            ::new (pkData) NiPosData;
-        }
+        NiPosData* pkData = new NiPosData;
         m_spPoint3Data.SetNew(pkData);
     }
     m_spPoint3Data.m_pObject->SetAnim(pkKeys, uiNumKeys, eType);

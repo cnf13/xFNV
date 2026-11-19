@@ -127,11 +127,7 @@ NiObject* bhkStiffSpringConstraint::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
 
     bhkSerializable::CloneCritLock();
-    bhkStiffSpringConstraint* pkClone =
-        static_cast<bhkStiffSpringConstraint*>(NiMemObject::operator new(sizeof(bhkStiffSpringConstraint)));
-    if (pkClone) {
-        ::new (pkClone) bhkStiffSpringConstraint;
-    }
+    bhkStiffSpringConstraint* pkClone = new bhkStiffSpringConstraint;
     CopyCloneMembers(pkClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pkClone;
@@ -176,10 +172,5 @@ hkSerializableCinfo& bhkStiffSpringConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkStiffSpringConstraint::CreateObject() {
-    bhkStiffSpringConstraint* pkObject =
-        static_cast<bhkStiffSpringConstraint*>(NiMemObject::operator new(sizeof(bhkStiffSpringConstraint)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkStiffSpringConstraint;
+    return new bhkStiffSpringConstraint;
 }

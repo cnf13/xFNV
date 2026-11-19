@@ -229,12 +229,7 @@ bool bhkExtendedMeshShapeData::IsEqual(NiObject* apObject) {
 }
 
 NiObject* bhkExtendedMeshShapeData::CreateObject() {
-    bhkExtendedMeshShapeData* pObject =
-        static_cast<bhkExtendedMeshShapeData*>(NiMemObject::operator new(sizeof(bhkExtendedMeshShapeData)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkExtendedMeshShapeData;
+    return new bhkExtendedMeshShapeData;
 }
 
 // Holds a reference on apData; hkShapeCinfo's constructor clears the user data.
@@ -277,11 +272,7 @@ NiObject* bhkExtendedMeshShape::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iSavedMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkExtendedMeshShape* pClone =
-        static_cast<bhkExtendedMeshShape*>(NiMemObject::operator new(sizeof(bhkExtendedMeshShape)));
-    if (pClone) {
-        ::new (pClone) bhkExtendedMeshShape;
-    }
+    bhkExtendedMeshShape* pClone = new bhkExtendedMeshShape;
     CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     riMemContext = iSavedMemContext;
@@ -539,11 +530,7 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
     uint32_t uiVertOffset = 0;
     uint32_t uiTri = 0;
 
-    bhkExtendedMeshShapeData* pdata =
-        static_cast<bhkExtendedMeshShapeData*>(NiMemObject::operator new(sizeof(bhkExtendedMeshShapeData)));
-    if (pdata) {
-        ::new (pdata) bhkExtendedMeshShapeData;
-    }
+    bhkExtendedMeshShapeData* pdata = new bhkExtendedMeshShapeData;
 
     // new bhkExtendedMeshSubPart[usPartCount]: the count is stored before the array, and the byte count is saturated as
     // operator new[] does. The block is raw memory written as the count and the array after it.
@@ -673,10 +660,5 @@ void bhkExtendedMeshShape::CCBCE0(hkExtendedMeshShapeCinfo* apInfo) {
 }
 
 NiObject* bhkExtendedMeshShape::CreateObject() {
-    bhkExtendedMeshShape* pObject =
-        static_cast<bhkExtendedMeshShape*>(NiMemObject::operator new(sizeof(bhkExtendedMeshShape)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkExtendedMeshShape;
+    return new bhkExtendedMeshShape;
 }

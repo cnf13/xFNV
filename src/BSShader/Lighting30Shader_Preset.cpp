@@ -837,22 +837,8 @@ void Lighting30Shader::BuildPerPassConstantMaps() {
         if (iPass == 102 || iPass == 103) {
             continue;
         }
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pVertexMap;
-        if (pMemory) {
-            pVertexMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
-        else {
-            pVertexMap = nullptr;
-        }
-        pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pPixelMap;
-        if (pMemory) {
-            pPixelMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
-        else {
-            pPixelMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pVertexMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
+        NiD3DShaderConstantMap* pPixelMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         // The bit is shifted left before each test, so entry j is selected by bit j + 1; it never wraps.
         uint32_t uiBit = 1;
         for (uint32_t i = 0; i < 17; ++i) {

@@ -53,15 +53,7 @@ NiObject* bhkTriSampledHeightFieldBvTreeShape::CreateClone(NiCloningProcess& arC
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkTriSampledHeightFieldBvTreeShape* pClone = static_cast<bhkTriSampledHeightFieldBvTreeShape*>(
-        NiMemObject::operator new(sizeof(bhkTriSampledHeightFieldBvTreeShape))
-    );
-    if (pClone) {
-        ::new (pClone) bhkTriSampledHeightFieldBvTreeShape;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkTriSampledHeightFieldBvTreeShape* pClone = new bhkTriSampledHeightFieldBvTreeShape;
     CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     GetThreadMemContext() = iOldMemContext;
