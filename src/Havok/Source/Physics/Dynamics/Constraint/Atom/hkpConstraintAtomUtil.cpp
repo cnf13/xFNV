@@ -42,8 +42,7 @@ hkpSimpleContactConstraintAtom* hkpSimpleContactConstraintAtomUtil::allocateAtom
     atom->m_info.m_data[4] = 0;
     atom->m_info.m_data[5] = 0;
     atom->m_info.m_data[6] = 0;
-    // EXE-INLINED none: hkEnum<hkpConstraintAtom::AtomType, uint16_t>::operator=
-    atom->m_type.m_storage = hkpConstraintAtom::TYPE_CONTACT;
+    atom->m_type = hkpConstraintAtom::TYPE_CONTACT;
     atom->m_numContactPoints = 0;
     return atom;
 }
@@ -171,8 +170,7 @@ hkpSimpleContactConstraintAtom* hkpSimpleContactConstraintAtomUtil::expandOne(
         const int32_t allocatedSize =
             hkpSimpleContactConstraintAtomUtil::getAllocatedAtomSize(oldAtom_mightGetDeallocated->m_sizeOfAllAtoms);
         hkMemoryRouter::getInstance().m_heap->blockFree(oldAtom_mightGetDeallocated, allocatedSize);
-        // EXE-INLINED none: hkPadSpu<hkBool>::operator=
-        atomReallocated.m_storage = true;
+        atomReallocated = true;
     }
     atom->m_numContactPoints = static_cast<uint16_t>(numContactPoints + 1);
     // HK_HINT_SIZE16: the index and the striding are multiplied as 16-bit signed values.

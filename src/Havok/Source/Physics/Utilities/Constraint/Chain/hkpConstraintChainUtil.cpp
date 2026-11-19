@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Utilities/Constraint/Chain/hkpConstraintChainUtil.h"
 
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
@@ -148,25 +149,16 @@ hkpConstraintChainInstance* hkpConstraintChainUtil::buildPoweredChain(
 }
 
 // The SDK's addConstraintToBallSocketChain: a link from the chain's last body to entityToAppend at the world point
-// pivotWs, its pivot in each body's space, then entityToAppend appended. The bodies are the collidables'
-// owners when they are entities, else null.
+// pivotWs, its pivot in each body's space, then entityToAppend appended.
 void hkpConstraintChainUtil::addConstraintToBallSocketChain(
     hkpConstraintChainInstance* instance,
     hkpEntity* entityToAppend,
     const hkVector4& pivotWs
 ) {
     hkpBallSocketChainData* pData = static_cast<hkpBallSocketChainData*>(instance->getDataRw());
-    const hkpCollidable& kCollidableA =
-        instance->m_chainedEntities.m_data[instance->m_chainedEntities.m_size - 1]->m_collidable;
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* pBodyA = kCollidableA.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpRigidBody*>(kCollidableA.getOwner())
-        : nullptr;
-    const hkpCollidable& kCollidableB = entityToAppend->m_collidable;
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* pBodyB = kCollidableB.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpRigidBody*>(kCollidableB.getOwner())
-        : nullptr;
+    hkpRigidBody* pBodyA =
+        hkpGetRigidBody(&instance->m_chainedEntities.m_data[instance->m_chainedEntities.m_size - 1]->m_collidable);
+    hkpRigidBody* pBodyB = hkpGetRigidBody(&entityToAppend->m_collidable);
     hkVector4 pivotInA;
     pivotInA.setTransformedInversePos(pBodyA->m_motion.m_motionState.m_transform, pivotWs);
     hkVector4 pivotInB;
@@ -186,17 +178,9 @@ void hkpConstraintChainUtil::addConstraintToPoweredChain(
     hkpConstraintMotor* motor2
 ) {
     hkpPoweredChainData* pData = static_cast<hkpPoweredChainData*>(instance->getDataRw());
-    const hkpCollidable& kCollidableA =
-        instance->m_chainedEntities.m_data[instance->m_chainedEntities.m_size - 1]->m_collidable;
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* pBodyA = kCollidableA.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpRigidBody*>(kCollidableA.getOwner())
-        : nullptr;
-    const hkpCollidable& kCollidableB = entityToAppend->m_collidable;
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* pBodyB = kCollidableB.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpRigidBody*>(kCollidableB.getOwner())
-        : nullptr;
+    hkpRigidBody* pBodyA =
+        hkpGetRigidBody(&instance->m_chainedEntities.m_data[instance->m_chainedEntities.m_size - 1]->m_collidable);
+    hkpRigidBody* pBodyB = hkpGetRigidBody(&entityToAppend->m_collidable);
     hkVector4 pivotInA;
     pivotInA.setTransformedInversePos(pBodyA->m_motion.m_motionState.m_transform, pivotWs);
     hkVector4 pivotInB;

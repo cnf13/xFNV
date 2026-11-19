@@ -468,13 +468,10 @@ static void castRayBundleInternal(
 
 hkCpuWorldRayCastCollector::~hkCpuWorldRayCastCollector() {}
 
-// The handle is taken as an hkpTypedBroadPhaseHandle and its owner is the collidable: the handle's address as untyped
-// bytes plus its signed byte m_ownerOffset, as void*.
+// The handle is taken as an hkpTypedBroadPhaseHandle and its owner is the collidable.
 float hkCpuWorldRayCastCollector::addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) {
     const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle);
-    // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-    const void* pOwner = reinterpret_cast<const char*>(pHandle) + pHandle->m_ownerOffset;
-    testCollidable(static_cast<const hkpCollidable*>(pOwner));
+    testCollidable(static_cast<const hkpCollidable*>(const_cast<hkpTypedBroadPhaseHandle*>(pHandle)->getOwner()));
     return m_hitFraction;
 }
 

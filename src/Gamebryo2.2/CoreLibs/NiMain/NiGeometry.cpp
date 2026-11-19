@@ -410,15 +410,7 @@ void NiGeometry::UpdatePropertiesDownward(NiPropertyState* pkParentState) {
         pkPos = pkPos->m_pkNext;
         if (pkProperty && pkProperty->Type() <= 7) {
             NiPointer<NiProperty>* pspSlot = m_PropertyState.m_aspProps + pkProperty->Type();
-            NiProperty* pkOld = pspSlot->m_pObject;
-            // EXE-INLINED 0x66B0D0
-            if (pkOld != pkProperty) {
-                if (pkOld) {
-                    pkOld->DecRefCount();
-                }
-                pspSlot->m_pObject = pkProperty;
-                pkProperty->IncRefCount();
-            }
+            *pspSlot = pkProperty;
         }
     }
     // EXE-INLINED none: BSSpinLock::Unlock
@@ -521,15 +513,7 @@ void NiGeometry::SetModelData(NiGeometryData* pkModelData) {
         kUpdateData.bSceneGraphChange = false;
         m_spCollisionObject.m_pObject->UpdateWorldData(kUpdateData);
     }
-    NiGeometryData* pkOld = m_spModelData.m_pObject;
-    // EXE-INLINED 0x66B0D0
-    if (pkOld != pkModelData) {
-        if (pkOld) {
-            pkOld->DecRefCount();
-        }
-        m_spModelData.m_pObject = pkModelData;
-        pkModelData->IncRefCount();
-    }
+    m_spModelData = pkModelData;
 }
 
 void NiGeometry::CalculateNormals() {

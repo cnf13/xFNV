@@ -1632,8 +1632,7 @@ void hkpVehicleInstance::getAxleParams(
         if (!body) {
             // EXE-INLINED none: hkpVelocityAccumulator::setFixed
             accum->m_gravityFactor = 0.0f;
-            // EXE-INLINED none: hkEnum<hkpAccumulatorType, uint8_t>::operator=
-            accum->m_type.m_storage = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
+            accum->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
             accum->m_invMasses.m_quad = _mm_setzero_ps();
             accum->m_linearVel.m_quad = _mm_setzero_ps();
             accum->m_angularVel.m_quad = _mm_setzero_ps();

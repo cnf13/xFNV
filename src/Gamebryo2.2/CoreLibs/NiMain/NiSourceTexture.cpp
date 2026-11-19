@@ -434,18 +434,7 @@ bool NiSourceTexture::CreateRendererData() {
 
 // Takes kFilename, standardizes it and derives the platform-specific name.
 void NiSourceTexture::SetFilename(const NiFixedString& kFilename) {
-    NiGlobalStringTable::GlobalStringHandle kHandle = kFilename.GetHandle();
-    // EXE-INLINED 0x43BA10
-    if (m_kFilename.GetHandle() != kHandle) {
-        if (kHandle != NiGlobalStringTable::NULL_STRING) {
-            InterlockedIncrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kHandle) - 8));
-        }
-        NiGlobalStringTable::GlobalStringHandle kOld = m_kFilename.GetHandle();
-        if (kOld != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kOld) - 8));
-        }
-        m_kFilename.SetHandle(kHandle);
-    }
+    m_kFilename.Assign(kFilename);
     NiStandardizeFilePath(m_kFilename);
     NiImageConverter::ConvertFilenameToPlatformSpecific(m_kFilename, m_kPlatformFilename);
 }
@@ -461,14 +450,8 @@ NiSourceTexture* NiSourceTexture::Create(NiPixelData* apRawData, const char* apc
     pkTexture->m_kFormatPrefs = arPrefs;
     pkTexture->m_spSrcPixelData = apRawData;
     if (apcName) {
-        NiGlobalStringTable::GlobalStringHandle kHandle = NiGlobalStringTable::AddString(apcName);
-        NiFixedString kName;
-        kName.SetHandle(kHandle);
+        NiFixedString kName(apcName);
         pkTexture->SetFilename(kName);
-        // EXE-INLINED 0x4381B0
-        if (kHandle != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kHandle) - 8));
-        }
     }
     if (ms_bPreload && !pkTexture->CreateRendererData()) {
         delete pkTexture;
@@ -491,18 +474,7 @@ NiSourceTexture* NiSourceTexture::Create(
     pkTexture->m_bLoadDirectToRendererHint = bLoadDirectToRendererHint;
     pkTexture->m_bSrcRendererDataIsPersistent = bSrcRendererDataIsPersistent;
     // EXE-INLINED 0xA5FBA0
-    // EXE-INLINED 0x43BA10
-    NiGlobalStringTable::GlobalStringHandle kHandle = kFilename.GetHandle();
-    if (pkTexture->m_kFilename.GetHandle() != kHandle) {
-        if (kHandle != NiGlobalStringTable::NULL_STRING) {
-            InterlockedIncrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kHandle) - 8));
-        }
-        NiGlobalStringTable::GlobalStringHandle kOld = pkTexture->m_kFilename.GetHandle();
-        if (kOld != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kOld) - 8));
-        }
-        pkTexture->m_kFilename.SetHandle(kHandle);
-    }
+    pkTexture->m_kFilename.Assign(kFilename);
     NiStandardizeFilePath(pkTexture->m_kFilename);
     NiImageConverter::ConvertFilenameToPlatformSpecific(pkTexture->m_kFilename, pkTexture->m_kPlatformFilename);
     if (ms_bPreload && !pkTexture->CreateRendererData()) {
@@ -525,25 +497,11 @@ NiSourceTexture* NiSourceTexture::Create(
     pkTexture->m_bLoadDirectToRendererHint = bLoadDirectToRendererHint;
     pkTexture->m_pFile = pFile;
     if (apFileName) {
-        NiGlobalStringTable::GlobalStringHandle kName = NiGlobalStringTable::AddString(apFileName);
+        NiFixedString kName(apFileName);
         // EXE-INLINED 0xA5FBA0
-        // EXE-INLINED 0x43BA10
-        if (pkTexture->m_kFilename.GetHandle() != kName) {
-            if (kName != NiGlobalStringTable::NULL_STRING) {
-                InterlockedIncrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kName) - 8));
-            }
-            NiGlobalStringTable::GlobalStringHandle kOld = pkTexture->m_kFilename.GetHandle();
-            if (kOld != NiGlobalStringTable::NULL_STRING) {
-                InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kOld) - 8));
-            }
-            pkTexture->m_kFilename.SetHandle(kName);
-        }
+        pkTexture->m_kFilename.Assign(kName);
         NiStandardizeFilePath(pkTexture->m_kFilename);
         NiImageConverter::ConvertFilenameToPlatformSpecific(pkTexture->m_kFilename, pkTexture->m_kPlatformFilename);
-        // EXE-INLINED 0x4381B0
-        if (kName != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kName) - 8));
-        }
     }
     if (ms_bPreload && !pkTexture->CreateRendererData()) {
         delete pkTexture;

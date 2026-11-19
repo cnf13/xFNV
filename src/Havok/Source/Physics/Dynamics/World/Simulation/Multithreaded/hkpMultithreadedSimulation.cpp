@@ -125,18 +125,11 @@ hkCpuBuildAccumulatorsJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQ
     return jobQueue.finishJobAndGetNextJob(&nextJobOut, nextJobOut, hkJobQueue::WAIT_FOR_NEXT_JOB);
 }
 
-// Orders the cross-island pairs by the uid of their A entities, then of their B entities. The handle's owner is
-// hkAddByteOffset of the handle and its signed byte m_ownerOffset, untyped address arithmetic, hence the casts through
-// uint8_t*. hkpEntity::m_uid is unsigned, but the uids are compared signed, as the game does.
+// Orders the cross-island pairs by the uid of their A entities, then of their B entities. hkpEntity::m_uid is
+// unsigned, but the uids are compared signed, as the game does.
 bool pairLessThan(const hkpTypedBroadPhaseHandlePair& a1, const hkpTypedBroadPhaseHandlePair& a2) {
-    hkpTypedBroadPhaseHandle* pHandleA1 = a1.getElementA();
-    hkpTypedBroadPhaseHandle* pHandleA2 = a2.getElementA();
-    // EXE-INLINED 0x9B2C90
-    const hkpCollidable* pCollidableA1 =
-        reinterpret_cast<const hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA1) + pHandleA1->m_ownerOffset);
-    // EXE-INLINED 0x9B2C90
-    const hkpCollidable* pCollidableA2 =
-        reinterpret_cast<const hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA2) + pHandleA2->m_ownerOffset);
+    const hkpCollidable* pCollidableA1 = static_cast<const hkpCollidable*>(a1.getElementA()->getOwner());
+    const hkpCollidable* pCollidableA2 = static_cast<const hkpCollidable*>(a2.getElementA()->getOwner());
     int32_t iUidA1 = static_cast<int32_t>(static_cast<const hkpEntity*>(pCollidableA1->getOwner())->getUid());
     int32_t iUidA2 = static_cast<int32_t>(static_cast<const hkpEntity*>(pCollidableA2->getOwner())->getUid());
     if (iUidA1 < iUidA2) {
@@ -145,14 +138,8 @@ bool pairLessThan(const hkpTypedBroadPhaseHandlePair& a1, const hkpTypedBroadPha
     if (iUidA1 != iUidA2) {
         return false;
     }
-    hkpTypedBroadPhaseHandle* pHandleB1 = a1.getElementB();
-    hkpTypedBroadPhaseHandle* pHandleB2 = a2.getElementB();
-    // EXE-INLINED 0x9B2C90
-    const hkpCollidable* pCollidableB1 =
-        reinterpret_cast<const hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB1) + pHandleB1->m_ownerOffset);
-    // EXE-INLINED 0x9B2C90
-    const hkpCollidable* pCollidableB2 =
-        reinterpret_cast<const hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB2) + pHandleB2->m_ownerOffset);
+    const hkpCollidable* pCollidableB1 = static_cast<const hkpCollidable*>(a1.getElementB()->getOwner());
+    const hkpCollidable* pCollidableB2 = static_cast<const hkpCollidable*>(a2.getElementB()->getOwner());
     return static_cast<int32_t>(static_cast<const hkpEntity*>(pCollidableB1->getOwner())->getUid()) <
         static_cast<int32_t>(static_cast<const hkpEntity*>(pCollidableB2->getOwner())->getUid());
 }
@@ -161,9 +148,8 @@ hkBool less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulat
     return (*a->m_entities.begin())->getUid() < (*b->m_entities.begin())->getUid();
 }
 
-// Puts each pair's lower broad phase id first, then sorts the pairs with pairLessThan. The handle's owner is
-// hkAddByteOffset of the handle and its signed byte m_ownerOffset, untyped address arithmetic, hence the casts through
-// uint8_t*. The ids are unsigned but are compared signed, as the game does.
+// Puts each pair's lower broad phase id first, then sorts the pairs with pairLessThan. The ids are unsigned but are
+// compared signed, as the game does.
 void sortPairList(hkArray<hkpTypedBroadPhaseHandlePair, hkContainerHeapAllocator>& pairs) {
     // The end address is computed as an integer and the addresses are compared unsigned, so an end that wraps skips the
     // loop, as the game does. A pointer compare would let clang assume no wrap and run it anyway, so the addresses are
@@ -173,12 +159,8 @@ void sortPairList(hkArray<hkpTypedBroadPhaseHandlePair, hkContainerHeapAllocator
     for (hkpTypedBroadPhaseHandlePair* pPair = pairs.m_data; reinterpret_cast<uintptr_t>(pPair) < endAddress; ++pPair) {
         hkpTypedBroadPhaseHandle* pHandleA = pPair->getElementA();
         hkpTypedBroadPhaseHandle* pHandleB = pPair->getElementB();
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pHandleA->getOwner());
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pHandleB->getOwner());
         if (static_cast<int32_t>(pCollidableA->getBroadPhaseHandle()->m_id) >
             static_cast<int32_t>(pCollidableB->getBroadPhaseHandle()->m_id)) {
             pPair->m_a = pHandleB;
@@ -243,23 +225,15 @@ hkpIslandsAgentEntriesInfo* getIslandEntriesInfo(
 
 // The broad phase's entity pair listener. While the simulation collects cross-island pairs, a pair of two movable
 // entities in different islands is queued in m_addedCrossIslandPairs; any other pair gets its agent at once, with the
-// predictive flag of the pair's collision quality, unless the quality table says the pair does not collide. A handle's
-// owner is Havok's hkAddByteOffset of the handle's address and its signed byte m_ownerOffset, which is untyped address
-// arithmetic, hence the casts through uint8_t*.
+// predictive flag of the pair's collision quality, unless the quality table says the pair does not collide.
 void hkpMultiThreadedSimulation::MtEntityEntityBroadPhaseListener::addCollisionPair(
     hkpTypedBroadPhaseHandlePair& pair
 ) {
     hkpMultiThreadedSimulation* pSimulation = m_simulation;
-    hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
-    // EXE-INLINED 0x9B2C90
-    hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(
-        reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset)
-    );
-    hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
-    // EXE-INLINED 0x9B2C90
-    hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(
-        reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset)
-    );
+    hkpLinkedCollidable* collA =
+        static_cast<hkpLinkedCollidable*>(static_cast<hkpCollidable*>(pair.getElementA()->getOwner()));
+    hkpLinkedCollidable* collB =
+        static_cast<hkpLinkedCollidable*>(static_cast<hkpCollidable*>(pair.getElementB()->getOwner()));
     hkpEntity* entityA = static_cast<hkpEntity*>(collA->getOwner());
     hkpEntity* entityB = static_cast<hkpEntity*>(collB->getOwner());
     // EXE-INLINED none: hkpEntity::isFixed
@@ -292,22 +266,15 @@ void hkpMultiThreadedSimulation::MtEntityEntityBroadPhaseListener::addCollisionP
 
 // Called by the broad phase when two entities' aabbs stop overlapping. While cross-island pairs are being collected, a
 // pair of non-fixed entities in different islands is queued in m_removedCrossIslandPairs; any other pair has its agent,
-// if one exists, removed at once. A handle's owner is Havok's hkAddByteOffset of the handle's address and its signed
-// byte m_ownerOffset, hence the casts through uint8_t*.
+// if one exists, removed at once.
 void hkpMultiThreadedSimulation::MtEntityEntityBroadPhaseListener::removeCollisionPair(
     hkpTypedBroadPhaseHandlePair& pair
 ) {
     hkpMultiThreadedSimulation* pSimulation = m_simulation;
-    hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
-    // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-    hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(
-        reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset)
-    );
-    hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
-    // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-    hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(
-        reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset)
-    );
+    hkpLinkedCollidable* collA =
+        static_cast<hkpLinkedCollidable*>(static_cast<hkpCollidable*>(pair.getElementA()->getOwner()));
+    hkpLinkedCollidable* collB =
+        static_cast<hkpLinkedCollidable*>(static_cast<hkpCollidable*>(pair.getElementB()->getOwner()));
     hkpEntity* entityA = static_cast<hkpEntity*>(collA->getOwner());
     hkpEntity* entityB = static_cast<hkpEntity*>(collB->getOwner());
     // EXE-INLINED none: hkpEntity::isFixed
@@ -335,35 +302,20 @@ void hkpMultiThreadedSimulation::MtEntityEntityBroadPhaseListener::removeCollisi
 }
 
 // The broad phase's phantom listener: when one handle of the pair is a phantom, the other handle's collidable is added
-// to that phantom's overlaps, A's phantom first. The owners are Havok's hkAddByteOffset of the object's address and its
-// signed byte m_ownerOffset (untyped address arithmetic, hence the casts through uint8_t*).
+// to that phantom's overlaps, A's phantom first.
 void hkpMultiThreadedSimulation::MtPhantomBroadPhaseListener::addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
     hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
     if (pHandleA->m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
-        // EXE-INLINED 0x4B59D0
-        hkpPhantom* pPhantom =
-            reinterpret_cast<hkpPhantom*>(reinterpret_cast<uint8_t*>(pCollidableA) + pCollidableA->m_ownerOffset);
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pHandleA->getOwner());
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pair.getElementB()->getOwner());
+        hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableA->getOwner());
         pPhantom->addOverlappingCollidable(pCollidableB);
     }
     hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
     if (pHandleB->m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        // EXE-INLINED 0x4B59D0
-        hkpPhantom* pPhantom =
-            reinterpret_cast<hkpPhantom*>(reinterpret_cast<uint8_t*>(pCollidableB) + pCollidableB->m_ownerOffset);
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pHandleB->getOwner());
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pair.getElementA()->getOwner());
+        hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableB->getOwner());
         pPhantom->addOverlappingCollidable(pCollidableA);
     }
 }
@@ -372,38 +324,22 @@ void hkpMultiThreadedSimulation::MtPhantomBroadPhaseListener::addCollisionPair(h
 void hkpMultiThreadedSimulation::MtPhantomBroadPhaseListener::removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
     hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
     if (pHandleA->m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
-        // EXE-INLINED 0x4B59D0
-        hkpPhantom* pPhantom =
-            reinterpret_cast<hkpPhantom*>(reinterpret_cast<uint8_t*>(pCollidableA) + pCollidableA->m_ownerOffset);
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pHandleA->getOwner());
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pair.getElementB()->getOwner());
+        hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableA->getOwner());
         pPhantom->removeOverlappingCollidable(pCollidableB);
     }
     hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
     if (pHandleB->m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
-        // EXE-INLINED none: hkpTypedBroadPhaseHandle::getOwner
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        // EXE-INLINED 0x4B59D0
-        hkpPhantom* pPhantom =
-            reinterpret_cast<hkpPhantom*>(reinterpret_cast<uint8_t*>(pCollidableB) + pCollidableB->m_ownerOffset);
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pHandleB->getOwner());
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pair.getElementA()->getOwner());
+        hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableB->getOwner());
         pPhantom->removeOverlappingCollidable(pCollidableA);
     }
 }
 
 // The broad phase's border listener: when one handle of the pair is a border phantom, the other handle's collidable is
-// added to that border's overlaps, A's border first; a pair of two borders is left alone. The handle's owner is Havok's
-// hkAddByteOffset of the handle's address and its signed byte m_ownerOffset (untyped address arithmetic, hence the
-// casts through uint8_t*).
+// added to that border's overlaps, A's border first; a pair of two borders is left alone.
 void hkpMultiThreadedSimulation::MtBroadPhaseBorderListener::addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
     hkpTypedBroadPhaseHandle* pHandleA = pair.getElementA();
     if (pHandleA->m_type == hkpWorldObject::BROAD_PHASE_BORDER &&
@@ -411,25 +347,15 @@ void hkpMultiThreadedSimulation::MtBroadPhaseBorderListener::addCollisionPair(hk
         return;
     }
     if (pHandleA->m_type == hkpWorldObject::BROAD_PHASE_BORDER) {
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pHandleA->getOwner());
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pair.getElementB()->getOwner());
         hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableA->getOwner());
         pPhantom->addOverlappingCollidable(pCollidableB);
     }
     hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
     if (pHandleB->m_type == hkpWorldObject::BROAD_PHASE_BORDER) {
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleA2 = pair.getElementA();
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA2) + pHandleA2->m_ownerOffset);
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pHandleB->getOwner());
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pair.getElementA()->getOwner());
         hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableB->getOwner());
         pPhantom->addOverlappingCollidable(pCollidableA);
     }
@@ -443,25 +369,15 @@ void hkpMultiThreadedSimulation::MtBroadPhaseBorderListener::removeCollisionPair
         return;
     }
     if (pHandleA->m_type == hkpWorldObject::BROAD_PHASE_BORDER) {
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA) + pHandleA->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pHandleA->getOwner());
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pair.getElementB()->getOwner());
         hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableA->getOwner());
         pPhantom->removeOverlappingCollidable(pCollidableB);
     }
     hkpTypedBroadPhaseHandle* pHandleB = pair.getElementB();
     if (pHandleB->m_type == hkpWorldObject::BROAD_PHASE_BORDER) {
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableB =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleB) + pHandleB->m_ownerOffset);
-        hkpTypedBroadPhaseHandle* pHandleA2 = pair.getElementA();
-        // EXE-INLINED 0x9B2C90
-        hkpCollidable* pCollidableA =
-            reinterpret_cast<hkpCollidable*>(reinterpret_cast<uint8_t*>(pHandleA2) + pHandleA2->m_ownerOffset);
+        hkpCollidable* pCollidableB = static_cast<hkpCollidable*>(pHandleB->getOwner());
+        hkpCollidable* pCollidableA = static_cast<hkpCollidable*>(pair.getElementA()->getOwner());
         hkpPhantom* pPhantom = static_cast<hkpPhantom*>(pCollidableB->getOwner());
         pPhantom->removeOverlappingCollidable(pCollidableA);
     }
@@ -1114,13 +1030,8 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
             processOutput.m_toi.m_properties.m_internalSolverData = 0.0f;
             for (int32_t i = 0; i < m_addedCrossIslandPairs.m_size; ++i) {
                 hkpTypedBroadPhaseHandlePair& pair = m_addedCrossIslandPairs.m_data[i];
-                hkpTypedBroadPhaseHandle* handleA = pair.getElementA();
-                hkpTypedBroadPhaseHandle* handleB = pair.getElementB();
-                // The handle's owner (its collidable) sits m_ownerOffset bytes from it: an untyped byte offset.
-                // EXE-INLINED 0x9B2C90
-                void* ownerB = reinterpret_cast<char*>(handleB) + handleB->m_ownerOffset;
-                // EXE-INLINED 0x9B2C90
-                void* ownerA = reinterpret_cast<char*>(handleA) + handleA->m_ownerOffset;
+                void* ownerB = pair.getElementB()->getOwner();
+                void* ownerA = pair.getElementA()->getOwner();
                 hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(ownerB);
                 hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(ownerA);
                 hkpEntity* entityB = static_cast<hkpEntity*>(collB->getOwner());
@@ -1174,13 +1085,8 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
         HK_TIMER_SPLIT_LIST("removeAgt");
         for (int32_t i = 0; i < m_removedCrossIslandPairs.m_size; ++i) {
             hkpTypedBroadPhaseHandlePair& pair = m_removedCrossIslandPairs.m_data[i];
-            hkpTypedBroadPhaseHandle* handleA = pair.getElementA();
-            // The handle's owner (its collidable) sits m_ownerOffset bytes from it: an untyped byte offset.
-            // EXE-INLINED 0x9B2C90
-            void* ownerA = reinterpret_cast<char*>(handleA) + handleA->m_ownerOffset;
-            hkpTypedBroadPhaseHandle* handleB = pair.getElementB();
-            // EXE-INLINED 0x9B2C90
-            void* ownerB = reinterpret_cast<char*>(handleB) + handleB->m_ownerOffset;
+            void* ownerA = pair.getElementA()->getOwner();
+            void* ownerB = pair.getElementB()->getOwner();
             hkpAgentNnEntry* entry = hkAgentNnMachine_FindAgent(
                 static_cast<hkpLinkedCollidable*>(ownerA), static_cast<hkpLinkedCollidable*>(ownerB)
             );

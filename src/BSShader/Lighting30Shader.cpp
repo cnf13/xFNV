@@ -837,17 +837,7 @@ void Lighting30Shader::CreateConstantMaps() {
         if (pMemory) {
             pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         }
-        // EXE-INLINED 0x66B0D0
-        NiD3DShaderConstantMap* pOld = m_spPixelConstantMap.m_pObject;
-        if (pOld != pMap) {
-            if (pOld && InterlockedDecrementUInt32(&pOld->m_uiRefCount) == 0) {
-                pOld->DeleteThis();
-            }
-            m_spPixelConstantMap.m_pObject = pMap;
-            if (pMap) {
-                InterlockedIncrementUInt32(&pMap->m_uiRefCount);
-            }
-        }
+        m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry(
             "ambientcolor", 0x10000007, 0, 0, 1, "", 0x10, 4, &kPSConstants[0], false
         );
@@ -993,17 +983,7 @@ void Lighting30Shader::CreateConstantMaps() {
         if (pMemory) {
             pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         }
-        // EXE-INLINED 0x66B0D0
-        pOld = m_spPixelConstantMap.m_pObject;
-        if (pOld != pMap) {
-            if (pOld && InterlockedDecrementUInt32(&pOld->m_uiRefCount) == 0) {
-                pOld->DeleteThis();
-            }
-            m_spPixelConstantMap.m_pObject = pMap;
-            if (pMap) {
-                InterlockedIncrementUInt32(&pMap->m_uiRefCount);
-            }
-        }
+        m_spPixelConstantMap = pMap;
     }
     spDefaultVertexConstantMap = m_spVertexConstantMap;
     spDefaultPixelConstantMap = m_spPixelConstantMap;

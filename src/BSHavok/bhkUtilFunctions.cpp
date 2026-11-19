@@ -122,10 +122,7 @@ bhkShapeCollection* bhkUtilFunctions::FindbhkShapeCollection(const hkpCdBody* ar
 // is an untyped word holding the collision object, read by its low 32 bits.
 NiAVObject* bhkUtilFunctions::GetNiAVObject(const hkpCollidable* apCollidable) {
     hkpPropertyValue kProperty;
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* pBody = apCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(apCollidable->getOwner()))
-        : nullptr;
+    hkpRigidBody* pBody = hkpGetRigidBody(apCollidable);
     if (pBody) {
         auto* pCollisionObject = reinterpret_cast<bhkNiCollisionObject*>(static_cast<uintptr_t>(
             bhkWorldObject::GetProperty(&kProperty, pBody, bhkPropertyKey(bhkNiCollisionObject::ms_RTTI))->m_data

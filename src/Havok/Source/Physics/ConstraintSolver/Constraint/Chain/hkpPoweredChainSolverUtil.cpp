@@ -186,14 +186,14 @@ void hkPoweredChain_ScanAndEnableMotors(
     hkVector8 resultVelocityVec;
     hkMatrix6 offDiagTransp;
 
-    hkVector8* gTemp = info.m_gTempBuffer.m_storage;
-    hkMatrix6SetMulV(mulResult, info.m_triples.m_storage[info.m_numConstraints.m_storage - 1].m_upper, tmp);
-    int32_t i = info.m_numConstraints.m_storage - 1;
+    hkVector8* gTemp = info.m_gTempBuffer;
+    hkMatrix6SetMulV(mulResult, info.m_triples[info.m_numConstraints - 1].m_upper, tmp);
+    int32_t i = info.m_numConstraints - 1;
     tmp.m_lin.setSub4(gTemp[i + 1].m_lin, mulResult.m_lin);
     tmp.m_ang.setSub4(gTemp[i + 1].m_ang, mulResult.m_ang);
     for (; i >= 0; --i) {
         const int32_t prev = i - 1;
-        const hkpConstraintChainMatrix6Triple* pPrev = &info.m_triples.m_storage[static_cast<int16_t>(prev)];
+        const hkpConstraintChainMatrix6Triple* pPrev = &info.m_triples[static_cast<int16_t>(prev)];
         impLeft = impCenter;
         impCenter = tmp;
         if (prev >= 0) {
@@ -237,7 +237,7 @@ void hkPoweredChain_ScanAndEnableMotors(
         resultVelocityVec.m_lin.add4(mulResult.m_lin);
         resultVelocityVec.m_ang.add4(mulResult.m_ang);
 
-        const hkp3dAngularMotorSolverInfo& state = info.m_motorsState.m_storage[i];
+        const hkp3dAngularMotorSolverInfo& state = info.m_motorsState[i];
         const int32_t status = state.m_broken;
         for (int32_t j = 0; j < 3; ++j) {
             const int32_t motorState = (status >> (2 * j)) & hkp3dAngularMotorSolverInfo::ANGULAR_1ST;
@@ -258,7 +258,7 @@ void hkPoweredChain_ScanAndEnableMotors(
             const hkVector4 scratchA = accA->m_scratch123.m_col0;
             const hkVector4 scratchB = accB->m_scratch123.m_col0;
             const float tauFactor = info.m_solverInfo.m_invIntegrateVelocityFactor(0) * tau;
-            const hkp2AngJacobian& jac = info.m_jAng.m_storage[3 * i + j];
+            const hkp2AngJacobian& jac = info.m_jAng[3 * i + j];
             const __m128 damping = _mm_shuffle_ps(_mm_load_ss(&motor.m_damping), _mm_load_ss(&motor.m_damping), 0);
             const __m128 tauSplat = _mm_shuffle_ps(_mm_set_ss(tauFactor), _mm_set_ss(tauFactor), 0);
             const __m128 velPart = _mm_mul_ps(
@@ -305,7 +305,7 @@ void hkPoweredChain_ScanAndEnableMotors(
     }
 
     if (constraintIndex >= 0) {
-        uint8_t& broken = info.m_motorsState.m_storage[constraintIndex].m_broken;
+        uint8_t& broken = info.m_motorsState[constraintIndex].m_broken;
         const int32_t shift = 2 * coordinate;
         broken = static_cast<uint8_t>(
             (broken & ~(hkp3dAngularMotorSolverInfo::ANGULAR_1ST << shift)) |

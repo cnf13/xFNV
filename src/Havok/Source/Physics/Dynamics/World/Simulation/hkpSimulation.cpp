@@ -510,8 +510,7 @@ void hkpSimulation::collideInternal(const hkStepInfo& stepInfoIn) {
             HK_TIMER_BEGIN("NarrowPhase", nullptr);
             input->m_collisionQualityInfo =
                 input->m_dispatcher->getCollisionQualityInfo(hkpCollisionDispatcher::COLLISION_QUALITY_PSI);
-            // EXE-INLINED none: hkPadSpu<int>::operator=
-            input->m_createPredictiveAgents.m_storage = 0;
+            input->m_createPredictiveAgents = 0;
             hkAgentNnMachine_ProcessTrack(activeIsland, activeIsland->m_agentTrack, *input);
             HK_TIMER_END();
             if (hkOutOfMemoryState == hkMemoryAllocator::MEMORY_STATE_OUT_OF_MEMORY) {

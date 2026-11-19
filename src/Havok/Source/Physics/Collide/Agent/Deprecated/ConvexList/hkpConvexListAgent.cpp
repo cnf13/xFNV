@@ -223,18 +223,8 @@ void hkpConvexListAgent::processCollision(
                     goto end;
                 }
                 // The smaller allowed penetration depth of the two root collidables.
-                // EXE-INLINED 0x624020
-                const hkpCdBody* rootB = &bodyB;
-                while (rootB->m_parent) {
-                    rootB = rootB->m_parent;
-                }
-                float allowedB = static_cast<const hkpCollidable*>(rootB)->getAllowedPenetrationDepth();
-                // EXE-INLINED 0x624020
-                const hkpCdBody* rootA = &bodyA;
-                while (rootA->m_parent) {
-                    rootA = rootA->m_parent;
-                }
-                float allowedA = static_cast<const hkpCollidable*>(rootA)->getAllowedPenetrationDepth();
+                float allowedB = bodyB.getRootCollidable()->getAllowedPenetrationDepth();
+                float allowedA = bodyA.getRootCollidable()->getAllowedPenetrationDepth();
                 float allowedPenetration = allowedA < allowedB ? allowedA : allowedB;
                 float twiceAllowed = allowedPenetration + allowedPenetration;
                 if (!(m_separatingNormal.m_quad[3] < -twiceAllowed)) {

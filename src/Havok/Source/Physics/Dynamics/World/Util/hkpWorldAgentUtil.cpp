@@ -180,17 +180,10 @@ void hkpWorldAgentUtil::updateEntityShapeCollectionFilter(hkpEntity* entity, hkp
         }
         hkpLinkedCollidable* collA = entry->m_collidable[0];
         hkpLinkedCollidable* collB = entry->m_collidable[1];
-        // The owner sits m_ownerOffset bytes from the collidable, as raw memory.
-        // EXE-INLINED 0x4B59D0
-        hkpEntity* entityA = static_cast<hkpEntity*>(
-            reinterpret_cast<hkpWorldObject*>(reinterpret_cast<uint8_t*>(collA) + collA->m_ownerOffset)
-        );
+        hkpEntity* entityA = static_cast<hkpEntity*>(collA->getOwner());
         hkpSimulationIsland* island;
         if (entityA->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
-            // EXE-INLINED 0x4B59D0
-            hkpEntity* entityB = static_cast<hkpEntity*>(
-                reinterpret_cast<hkpWorldObject*>(reinterpret_cast<uint8_t*>(collB) + collB->m_ownerOffset)
-            );
+            hkpEntity* entityB = static_cast<hkpEntity*>(collB->getOwner());
             island = entityB->m_simulationIsland;
         }
         else {

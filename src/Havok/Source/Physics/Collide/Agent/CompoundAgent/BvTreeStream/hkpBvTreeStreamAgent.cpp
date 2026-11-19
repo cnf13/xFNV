@@ -214,8 +214,7 @@ void hkpBvTreeStreamAgent::processCollision(
     __m128 kMax;
     __m128 kExtent;
     __m128 kMotion = kTimInB;
-    // EXE-INLINED none: hkPadSpu<int>::operator int
-    if (input.m_collisionQualityInfo->m_useContinuousPhysics.m_storage != 0) {
+    if (input.m_collisionQualityInfo->m_useContinuousPhysics) {
         const float fRadiusB = msB->m_deltaAngle.m_quad[3] * msB->m_deltaAngle.m_quad[3] * msB->m_objectRadius;
         const float fRadiusA = (msA->m_deltaAngle.m_quad[3] + msB->m_deltaAngle.m_quad[3]) * msA->m_objectRadius;
         const float fTolerance = fRadiusA + fRadiusB + input.m_tolerance * 0.5;

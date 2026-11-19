@@ -2800,9 +2800,8 @@ NiAVObject* bhkPickData::GetNiAVObject() {
 // The rigid body owning the hit's root collidable, or null when there is none or its owner is not an entity.
 hkpRigidBody* bhkPickData::GethkRigidBody() {
     hkpCollidable* pCollidable = m_rootCollidable;
-    // EXE-INLINED 0x4B59F0
-    if (pCollidable && pCollidable->m_broadPhaseHandle.m_type == 1) {
-        return static_cast<hkpRigidBody*>(pCollidable->getOwner());
+    if (pCollidable) {
+        return hkpGetRigidBody(pCollidable);
     }
     return nullptr;
 }
@@ -2827,8 +2826,7 @@ void bhkTaskletManagerCallback::bhkThreadState::CreateThreadMemory() {
         void* pStack = pElem->LocalRouter.m_heap->blockAlloc(0x5000);
         pElem->pStackBuffer = pStack;
         pElem->LocalRouter.m_stack.m_start.m_storage = pStack;
-        // EXE-INLINED none: hkPadSpu<char*>::operator=
-        pElem->LocalRouter.m_stack.m_next.m_storage = static_cast<char*>(pStack);
+        pElem->LocalRouter.m_stack.m_next = static_cast<char*>(pStack);
         pElem->LocalRouter.m_stack.m_end.m_storage = static_cast<char*>(pStack) + 0x5000;
         pElem->ThreadID = GetCurrentThreadId();
         ++iNumElem;

@@ -409,17 +409,7 @@ void TallGrassShader::CreateConstantMaps() {
         if (pMemory) {
             pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         }
-        // EXE-INLINED none: NiPointer::operator=
-        NiD3DShaderConstantMap* pOld = m_spVertexConstantMap.m_pObject;
-        if (pOld != pMap) {
-            if (pOld && InterlockedDecrementUInt32(&pOld->m_uiRefCount) == 0) {
-                static_cast<NiRefObject*>(pOld)->DeleteThis();
-            }
-            m_spVertexConstantMap.m_pObject = pMap;
-            if (pMap) {
-                pMap->IncRefCount();
-            }
-        }
+        m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 9, 4, nullptr, 0, 0, nullptr, false
         );
@@ -453,17 +443,7 @@ void TallGrassShader::CreateConstantMaps() {
     else {
         pMap = nullptr;
     }
-    // EXE-INLINED none: NiPointer::operator=
-    NiD3DShaderConstantMap* pOld = m_spPixelConstantMap.m_pObject;
-    if (pOld != pMap) {
-        if (pOld && InterlockedDecrementUInt32(&pOld->m_uiRefCount) == 0) {
-            static_cast<NiRefObject*>(pOld)->DeleteThis();
-        }
-        m_spPixelConstantMap.m_pObject = pMap;
-        if (pMap) {
-            pMap->IncRefCount();
-        }
-    }
+    m_spPixelConstantMap = pMap;
     m_spPixelConstantMap.m_pObject->AddEntry(
         "point light color", 0x10000007, 0, 2, 1, "", 16, 4, &pfPointLightColor, false
     );

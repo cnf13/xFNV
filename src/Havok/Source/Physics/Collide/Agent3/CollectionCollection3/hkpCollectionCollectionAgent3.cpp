@@ -531,8 +531,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
         rAxisStream.setEnd(reinterpret_cast<char*>(h + 1));
     }
     hkPadSpu<int32_t> numPairsSkipped;
-    // EXE-INLINED none: hkPadSpu<int>::operator=
-    numPairsSkipped.m_storage = 0;
+    numPairsSkipped = 0;
     // The pairs are written as hk1AxisSweep's key pairs into the same untyped stack block.
     hkKeyPair* pPairsOut = reinterpret_cast<hkKeyPair*>(pHitStorage);
     int32_t iNumHits;

@@ -25,8 +25,7 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
     code.m_data.m_data = const_cast<uint8_t*>(job.m_moppCodeData);
     code.m_data.m_size = 512;
     code.m_data.m_capacityAndFlags = 512;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    code.m_buildType.m_storage = static_cast<int8_t>(hkpMoppCode::BUILD_NOT_SET);
+    code.m_buildType = hkpMoppCode::BUILD_NOT_SET;
     for (int32_t i = 0; i < job.m_numCommands; i++) {
         const hkpMoppAabbCommand* command = &job.m_commandArray[i];
         // The results array over the command's buffer, which is treated as untyped memory: the command declares shape

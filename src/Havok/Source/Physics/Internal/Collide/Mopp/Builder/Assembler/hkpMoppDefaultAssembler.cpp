@@ -764,8 +764,7 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
         int32_t resolution = static_cast<int32_t>(1u << (significantBits & 31));
         for (int32_t axis = 0; axis < 3; axis++) {
             if (!a1->m_assemblerData.m_scaleIsValid.m_bool) {
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                a1->m_assemblerData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_CUT8;
+                a1->m_assemblerData.m_cutCommandType[axis] = hkpMoppAssemblerData::HK_MOPP_CUT8;
             }
             float axisTolerance = m_params.m_absoluteFitToleranceOfAxisAlignedTriangles(axis);
             float extent = a1->m_extents.m_extent[axis].m_max - a1->m_extents.m_extent[axis].m_min;
@@ -774,8 +773,7 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
                 float scaledTolerance = axisTolerance * scale;
                 if (hkMath::hkFloatToInt(scaledTolerance) << 7 < resolution) {
                     if (!a1->m_assemblerData.m_scaleIsValid.m_bool) {
-                        // EXE-INLINED none: hkEnum<E, S>::operator=
-                        a1->m_assemblerData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_CUT24;
+                        a1->m_assemblerData.m_cutCommandType[axis] = hkpMoppAssemblerData::HK_MOPP_CUT24;
                     }
                 }
                 else {
@@ -798,8 +796,7 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
     }
 
     if (!a1->m_assemblerData.m_scaleIsValid.m_bool && a3.m_level < m_halfTreeDepth && calcRescaleBits(a2, a3) > 2) {
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        a1->m_assemblerData.m_rescaleCommandType.m_storage = hkpMoppAssemblerData::HK_MOPP_RESCALE;
+        a1->m_assemblerData.m_rescaleCommandType = hkpMoppAssemblerData::HK_MOPP_RESCALE;
     }
     if (a1->m_assemblerData.m_rescaleCommandType.m_storage == hkpMoppAssemblerData::HK_MOPP_RESCALE) {
         hkpMoppAssemblerRescaleCommand rescaleCommand;
@@ -838,13 +835,11 @@ int32_t hkpMoppDefaultAssembler::preCalcScale(
         }
         if (!a1->m_assemblerData.m_scaleIsValid.m_bool) {
             if (childBits[i] < significantBits) {
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                child->m_assemblerData.m_rescaleCommandType.m_storage = hkpMoppAssemblerData::HK_MOPP_RESCALE;
+                child->m_assemblerData.m_rescaleCommandType = hkpMoppAssemblerData::HK_MOPP_RESCALE;
             }
         }
         else if ((!child->m_assemblerData.m_scaleIsValid.m_bool) && (childBits[i] < result)) {
-            // EXE-INLINED none: hkEnum<E, S>::operator=
-            child->m_assemblerData.m_rescaleCommandType.m_storage = hkpMoppAssemblerData::HK_MOPP_RESCALE;
+            child->m_assemblerData.m_rescaleCommandType = hkpMoppAssemblerData::HK_MOPP_RESCALE;
         }
 
         if (child->m_assemblerData.m_rescaleCommandType.m_storage == hkpMoppAssemblerData::HK_MOPP_NO_RESCALE &&
@@ -1081,8 +1076,7 @@ void hkpMoppDefaultAssembler::preCalcCutPositions(
                     if (data.m_cutCommandType[axis].m_storage >= hkpMoppAssemblerData::HK_MOPP_CUT8) {
                         cut = data.m_cutCommandType[axis].m_storage;
                     }
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    data.m_cutCommandType[axis].m_storage = cut;
+                    data.m_cutCommandType[axis] = static_cast<hkpMoppAssemblerData::hkpCutCommandType>(cut);
                     childData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_NO_CUT;
                 }
             }
@@ -1091,8 +1085,7 @@ void hkpMoppDefaultAssembler::preCalcCutPositions(
                 (childData.m_minCutPlanePosition[axis] <= currentInfo.m_extents[axis][0] &&
                  childData.m_maxCutPlanePosition[axis] >= currentInfo.m_extents[axis][1])
             ) {
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                data.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_CUT24;
+                data.m_cutCommandType[axis] = hkpMoppAssemblerData::HK_MOPP_CUT24;
                 childData.m_cutCommandType[axis].m_storage = hkpMoppAssemblerData::HK_MOPP_NO_CUT;
             }
 

@@ -425,8 +425,7 @@ void bhkExtendedMeshShape::Init(const hkSerializableCinfo& arInfo) {
         // holds at the call.
         // EXE-INLINED none: hkpExtendedMeshShape::TrianglesSubpart::TrianglesSubpart
         hkpExtendedMeshShape::TrianglesSubpart kPart;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        kPart.m_type.m_storage = static_cast<int8_t>(hkpExtendedMeshShape::SUBPART_TRIANGLES);
+        kPart.m_type = hkpExtendedMeshShape::SUBPART_TRIANGLES;
         kPart.m_materialIndexBase = nullptr;
         kPart.m_materialClass = nullptr;
         kPart.m_extrusion.setZero4();
@@ -435,16 +434,14 @@ void bhkExtendedMeshShape::Init(const hkSerializableCinfo& arInfo) {
         kPart.m_vertexBase = rSubPart.pVertexBaseA;
         kPart.m_numVertices = static_cast<int32_t>(rSubPart.uiNumVerts);
         kPart.m_numTriangleShapes = static_cast<int32_t>(rSubPart.uiNumTris);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        kPart.m_stridingType.m_storage = static_cast<int8_t>(hkpExtendedMeshShape::INDICES_INT16);
+        kPart.m_stridingType = hkpExtendedMeshShape::INDICES_INT16;
         kPart.m_indexStriding = 3 * sizeof(uint16_t);
         kPart.m_indexBase = rSubPart.pIndexBaseA;
         kPart.m_numMaterials = 1;
         kPart.m_materialStriding = static_cast<int16_t>(sizeof(hkpExtendedMaterial));
         kPart.m_materialBase = rSubPart.pMat;
         kPart.m_materialIndexStriding = 1;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        kPart.m_materialIndexStridingType.m_storage = static_cast<int8_t>(hkpExtendedMeshShape::MATERIAL_INDICES_INT8);
+        kPart.m_materialIndexStridingType = hkpExtendedMeshShape::MATERIAL_INDICES_INT8;
         kPart.m_userData = 0;
         pShape->addTrianglesSubpart(kPart);
     }

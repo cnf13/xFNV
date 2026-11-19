@@ -1187,8 +1187,7 @@ void bhkRigidBody::CopyMembers(bhkSerializable* apDest, NiCloningProcess& arClon
     bool bCreated;
     bhkRigidBodyCinfo* pInfo = static_cast<bhkRigidBodyCinfo*>(&CreateCinfo(bCreated));
     if ((iFlags & KEYFRAMED_BY_LOADEDAREABOUND) != 0) {
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        pInfo->hk.m_motionType.m_storage = hkpMotion::MOTION_DYNAMIC;
+        pInfo->hk.m_motionType = hkpMotion::MOTION_DYNAMIC;
     }
     // The cloning process is a BSCloningProcess: its scale's x (+0x10; NiCloningProcess is 0x10 bytes).
     float fScale = static_cast<BSCloningProcess&>(arCloneData).Scale.x;

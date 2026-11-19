@@ -130,37 +130,13 @@ hkpCollisionAgent* hkpPhantomAgent::createPhantomAgent(
         // The SDK's const_cast: m_shapeA is a non-const pointer and phantomEnterEvent a non-const member.
         hkpPhantomCallbackShape* shapeA =
             const_cast<hkpPhantomCallbackShape*>(static_cast<const hkpPhantomCallbackShape*>(bodyA.m_shape));
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = &bodyB;
-        while (rootB->m_parent != nullptr) {
-            rootB = rootB->m_parent;
-        }
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = &bodyA;
-        while (rootA->m_parent != nullptr) {
-            rootA = rootA->m_parent;
-        }
-        shapeA->phantomEnterEvent(
-            static_cast<const hkpCollidable*>(rootA), static_cast<const hkpCollidable*>(rootB), input
-        );
+        shapeA->phantomEnterEvent(bodyA.getRootCollidable(), bodyB.getRootCollidable(), input);
         agent->m_shapeA = shapeA;
     }
     if (agent->m_bodyTypeB == HK_SHAPE_PHANTOM_CALLBACK) {
         hkpPhantomCallbackShape* shapeB =
             const_cast<hkpPhantomCallbackShape*>(static_cast<const hkpPhantomCallbackShape*>(bodyB.m_shape));
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = &bodyA;
-        while (rootA->m_parent != nullptr) {
-            rootA = rootA->m_parent;
-        }
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = &bodyB;
-        while (rootB->m_parent != nullptr) {
-            rootB = rootB->m_parent;
-        }
-        shapeB->phantomEnterEvent(
-            static_cast<const hkpCollidable*>(rootB), static_cast<const hkpCollidable*>(rootA), input
-        );
+        shapeB->phantomEnterEvent(bodyB.getRootCollidable(), bodyA.getRootCollidable(), input);
         agent->m_shapeB = shapeB;
     }
     return agent;
@@ -177,36 +153,12 @@ hkpCollisionAgent* hkpPhantomAgent::createNoPhantomAgent(
     if (bodyA.m_shape->m_type.m_storage == HK_SHAPE_PHANTOM_CALLBACK) {
         hkpPhantomCallbackShape* shapeA =
             const_cast<hkpPhantomCallbackShape*>(static_cast<const hkpPhantomCallbackShape*>(bodyA.m_shape));
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = &bodyB;
-        while (rootB->m_parent != nullptr) {
-            rootB = rootB->m_parent;
-        }
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = &bodyA;
-        while (rootA->m_parent != nullptr) {
-            rootA = rootA->m_parent;
-        }
-        shapeA->phantomEnterEvent(
-            static_cast<const hkpCollidable*>(rootA), static_cast<const hkpCollidable*>(rootB), input
-        );
+        shapeA->phantomEnterEvent(bodyA.getRootCollidable(), bodyB.getRootCollidable(), input);
     }
     if (bodyB.m_shape->m_type.m_storage == HK_SHAPE_PHANTOM_CALLBACK) {
         hkpPhantomCallbackShape* shapeB =
             const_cast<hkpPhantomCallbackShape*>(static_cast<const hkpPhantomCallbackShape*>(bodyB.m_shape));
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = &bodyA;
-        while (rootA->m_parent != nullptr) {
-            rootA = rootA->m_parent;
-        }
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = &bodyB;
-        while (rootB->m_parent != nullptr) {
-            rootB = rootB->m_parent;
-        }
-        shapeB->phantomEnterEvent(
-            static_cast<const hkpCollidable*>(rootB), static_cast<const hkpCollidable*>(rootA), input
-        );
+        shapeB->phantomEnterEvent(bodyB.getRootCollidable(), bodyA.getRootCollidable(), input);
     }
     return nullptr;
 }

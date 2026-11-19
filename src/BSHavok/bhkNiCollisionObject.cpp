@@ -206,11 +206,7 @@ bool bhkNiCollisionObject::QKeyframe() {
         hkpWorldObject* pHkObject = static_cast<hkpWorldObject*>(pWorldObject->phkObject);
         // EXE-INLINED 0x43B560
         const hkpCollidable* pCollidable = pHkObject ? pHkObject->getCollidable() : nullptr;
-        // EXE-INLINED 0x4B59F0
-        // EXE-INLINED 0x4B59C0
-        hkpRigidBody* pBody = pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-            ? static_cast<hkpRigidBody*>(pCollidable->getOwner())
-            : nullptr;
+        hkpRigidBody* pBody = hkpGetRigidBody(pCollidable);
         if (pBody) {
             uint8_t ucType = pBody->m_motion.m_type.m_storage;
             return ucType == hkpMotion::MOTION_KEYFRAMED || ucType == hkpMotion::MOTION_FIXED;

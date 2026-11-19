@@ -16,6 +16,7 @@
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
+#include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
@@ -138,13 +139,7 @@ hkBool bhkRagdollPenetrationUtil::castRay(
         apPhantomIn->castRay(sinput, rayCollector);
         for (int32_t i = 0; i < rayCollector.m_hits.m_size && !bFound; ++i) {
             const hkpWorldRayCastOutput& rHit = rayCollector.m_hits.m_data[i];
-            const hkpCollidable* pRoot = rHit.m_rootCollidable;
-            // EXE-INLINED 0x4B59F0
-            if (pRoot->m_broadPhaseHandle.m_type != hkpWorldObject::BROAD_PHASE_ENTITY) {
-                continue;
-            }
-            const hkpRigidBody* pBody =
-                static_cast<const hkpRigidBody*>(static_cast<hkpWorldObject*>(pRoot->getOwner()));
+            const hkpRigidBody* pBody = hkpGetRigidBody(rHit.m_rootCollidable);
             if (!pBody) {
                 continue;
             }

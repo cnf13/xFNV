@@ -46,12 +46,7 @@ bhkCharacterPointCollector::~bhkCharacterPointCollector() {
 // hit; a hit on a triangle gets shape key A 2, or 1 where the triangle's normal, turned to face the contact's
 // separating normal, is within half a degree of it, and then the hits are filtered (filterOutEdgeHits).
 void bhkCharacterPointCollector::addCdPoint(const hkpCdPoint& event) {
-    // EXE-INLINED 0x624020
-    const hkpCdBody* pRootB = event.m_cdBodyB;
-    while (pRootB->m_parent) {
-        pRootB = pRootB->m_parent;
-    }
-    hkpWorldObject* pObject = static_cast<hkpWorldObject*>(static_cast<const hkpCollidable*>(pRootB)->getOwner());
+    hkpWorldObject* pObject = static_cast<hkpWorldObject*>(event.m_cdBodyB->getRootCollidable()->getOwner());
     if (!pObject) {
         return;
     }
@@ -78,19 +73,9 @@ void bhkCharacterPointCollector::addCdPoint(const hkpCdPoint& event) {
 
         hkpRootCdPoint kPoint;
         kPoint.m_contact = event.m_contact;
-        // EXE-INLINED 0x624020
-        const hkpCdBody* pRootA = event.m_cdBodyA;
-        while (pRootA->m_parent) {
-            pRootA = pRootA->m_parent;
-        }
-        kPoint.m_rootCollidableA = static_cast<const hkpCollidable*>(pRootA);
+        kPoint.m_rootCollidableA = event.m_cdBodyA->getRootCollidable();
         kPoint.m_shapeKeyA = event.m_cdBodyA->m_shapeKey;
-        // EXE-INLINED 0x624020
-        const hkpCdBody* pPointRootB = event.m_cdBodyB;
-        while (pPointRootB->m_parent) {
-            pPointRootB = pPointRootB->m_parent;
-        }
-        kPoint.m_rootCollidableB = static_cast<const hkpCollidable*>(pPointRootB);
+        kPoint.m_rootCollidableB = event.m_cdBodyB->getRootCollidable();
         kPoint.m_shapeKeyB = event.m_cdBodyB->m_shapeKey;
         // EXE-INLINED none: hkArray<hkpRootCdPoint>::pushBack
         hkMemoryRouter& rPointRouter = hkMemoryRouter::getInstance();
@@ -133,18 +118,8 @@ void bhkCharacterPointCollector::addCdPoint(const hkpCdPoint& event) {
     }
     hkpRootCdPoint& rHit = m_hits.m_data[m_hits.m_size++];
     rHit.m_contact = event.m_contact;
-    // EXE-INLINED 0x624020
-    const hkpCdBody* pHitRootA = event.m_cdBodyA;
-    while (pHitRootA->m_parent) {
-        pHitRootA = pHitRootA->m_parent;
-    }
-    rHit.m_rootCollidableA = static_cast<const hkpCollidable*>(pHitRootA);
-    // EXE-INLINED 0x624020
-    const hkpCdBody* pHitRootB = event.m_cdBodyB;
-    while (pHitRootB->m_parent) {
-        pHitRootB = pHitRootB->m_parent;
-    }
-    rHit.m_rootCollidableB = static_cast<const hkpCollidable*>(pHitRootB);
+    rHit.m_rootCollidableA = event.m_cdBodyA->getRootCollidable();
+    rHit.m_rootCollidableB = event.m_cdBodyB->getRootCollidable();
     rHit.m_shapeKeyA = CONTACTFEATURE_INVALID;
     rHit.m_shapeKeyB = event.m_cdBodyB->m_shapeKey;
     // cos(0.5 degrees), using the float nearest 0.5 degrees in radians.

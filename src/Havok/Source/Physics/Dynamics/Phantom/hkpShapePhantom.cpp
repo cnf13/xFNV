@@ -78,8 +78,7 @@ hkWorldOperation::Result hkpShapePhantom::setShape(const hkpShape* shape) {
     if (pWorld) {
         if (pWorld->m_criticalOperationsLockCount) {
             hkWorldOperation::SetWorldObjectShape op;
-            // EXE-INLINED none: hkEnum<hkWorldOperation::Type, uint8_t>::operator=
-            op.m_type.m_storage = hkWorldOperation::WORLD_OBJECT_SET_SHAPE;
+            op.m_type = hkWorldOperation::WORLD_OBJECT_SET_SHAPE;
             op.m_worldObject = this;
             op.m_shape = shape;
             pWorld->queueOperation(op);

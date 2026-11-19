@@ -219,7 +219,6 @@ void DebugShader::RenderEffect(BSRenderedTexture* apDstBuffer) {
     if (!(apTexturea < 1.0f)) {
         v14 = apTexturea;
     }
-    NiScreenElements* pScreenTriShape = nullptr;
     float apTextured = v14;
     float apTexturee = 1.0 / apTextured;
     NiRect<float> kPort;
@@ -228,12 +227,7 @@ void DebugShader::RenderEffect(BSRenderedTexture* apDstBuffer) {
     kPort.m_right = width_1a;
     kPort.m_top = apTexturee - 0.05000000074505806;
     kPort.m_bottom = 0.0f;
-    // EXE-INLINED none: NiPointer<NiScreenElements>::NiPointer
-    NiScreenElements* pShape = this->spScreenTriShape;
-    if (pShape) {
-        pScreenTriShape = pShape;
-        pShape->IncRefCount();
-    }
+    NiPointer<NiScreenElements> pScreenTriShape = this->spScreenTriShape;
     this->curTexIdx = 0;
     do {
         NiRenderedTexture* pTexture = spTextureToRender[this->curTexIdx];
@@ -319,9 +313,6 @@ void DebugShader::RenderEffect(BSRenderedTexture* apDstBuffer) {
         ++this->curTexIdx;
     }
     while (this->curTexIdx < 16);
-    if (pScreenTriShape) {
-        pScreenTriShape->DecRefCount();
-    }
 }
 
 // Picks the first free slot of the 16 texture-to-render slots (-1 when none is free), then holds apTexture there when

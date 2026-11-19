@@ -2,6 +2,7 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/Array/hkSmallArray.h"
@@ -2164,11 +2165,7 @@ void hkpWorld::updateCollisionFilterOnPhantom(
     for (int32_t i = 0; i < pairsOut.m_size; ++i) {
         if (pairsOut.m_data[i].m_b != pPhantomHandle) {
             hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(pairsOut.m_data[i].m_b);
-            // The owner sits m_ownerOffset bytes from the handle, an untyped byte offset.
-            // EXE-INLINED 0x9B2C90
-            hkpCollidable* pCollidable = static_cast<hkpCollidable*>(
-                static_cast<void*>(static_cast<char*>(static_cast<void*>(pHandle)) + pHandle->m_ownerOffset)
-            );
+            hkpCollidable* pCollidable = static_cast<hkpCollidable*>(pHandle->getOwner());
             hkWorld_updateFilterOnSinglePhantom(m_collisionFilter, phantom, pCollidable);
         }
     }
@@ -2228,11 +2225,7 @@ void hkpWorld::updateCollisionFilterOnEntity(
         HK_TIMER_SPLIT_LIST("phantom");
         for (int32_t i = 0; i < newPairs.m_size; ++i) {
             hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(newPairs.m_data[i].m_b);
-            // The owner sits m_ownerOffset bytes from the handle, an untyped byte offset.
-            // EXE-INLINED 0x9B2C90
-            hkpCollidable* pCollidable = static_cast<hkpCollidable*>(
-                static_cast<void*>(static_cast<char*>(static_cast<void*>(pHandle)) + pHandle->m_ownerOffset)
-            );
+            hkpCollidable* pCollidable = static_cast<hkpCollidable*>(pHandle->getOwner());
             // EXE-INLINED 0x4B5950
             hkpPhantom* phantom = nullptr;
             if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
@@ -2487,12 +2480,10 @@ void hkpWorld::addEntityBatch(
     // Either lock queues the batch instead.
     if (m_criticalOperationsLockCount) {
         hkWorldOperation::AddEntityBatch operation;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        operation.m_type.m_storage = hkWorldOperation::ENTITY_BATCH_ADD;
+        operation.m_type = hkWorldOperation::ENTITY_BATCH_ADD;
         operation.m_entities = const_cast<hkpEntity**>(entityBatch);
         operation.m_numEntities = static_cast<uint16_t>(numEntities);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        operation.m_activation.m_storage = static_cast<uint8_t>(initialActivationState);
+        operation.m_activation = initialActivationState;
         queueOperation(operation);
         return;
     }
@@ -3311,17 +3302,11 @@ void hkpWorld::activateRegion(const hkAabb& aabb) {
     hkArray<hkpBroadPhaseHandlePair, hkContainerHeapAllocator> pairsOut;
     m_broadPhase->querySingleAabb(aabb, pairsOut);
     for (int32_t i = 0; i < pairsOut.m_size; ++i) {
-        // EXE-INLINED 0x9B2C90
         hkpTypedBroadPhaseHandle* handle = static_cast<hkpTypedBroadPhaseHandle*>(pairsOut.m_data[i].m_b);
-        // The owner sits m_ownerOffset bytes from the handle: byte arithmetic on raw memory, as the SDK's getOwner.
-        void* owner = reinterpret_cast<char*>(handle) + handle->m_ownerOffset;
-        hkpCollidable* collidable = static_cast<hkpCollidable*>(owner);
-        // EXE-INLINED 0x4B59F0
-        if (collidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-            hkpEntity* entity = static_cast<hkpEntity*>(collidable->getOwner());
-            if (entity) {
-                entity->activate();
-            }
+        hkpCollidable* collidable = static_cast<hkpCollidable*>(handle->getOwner());
+        hkpEntity* entity = hkpGetRigidBody(collidable);
+        if (entity) {
+            entity->activate();
         }
     }
 }
@@ -3348,11 +3333,7 @@ void hkpWorld::getPenetrations(
     hkpBroadPhaseHandlePair* pair = hits.m_data;
     for (int32_t i = hits.m_size - 1; i >= 0; ++pair, --i) {
         hkpTypedBroadPhaseHandle* handleB = static_cast<hkpTypedBroadPhaseHandle*>(pair->m_b);
-        // The owner sits m_ownerOffset bytes from the handle, an untyped byte offset.
-        // EXE-INLINED 0x9B2C90
-        const hkpCollidable* collB = static_cast<hkpCollidable*>(
-            static_cast<void*>(static_cast<char*>(static_cast<void*>(handleB)) + handleB->m_ownerOffset)
-        );
+        const hkpCollidable* collB = static_cast<hkpCollidable*>(handleB->getOwner());
         if (collA == collB) {
             continue;
         }
@@ -3675,10 +3656,8 @@ void hkpWorld::getClosestPointsMt(
     // EXE-INLINED none: hkpWorldGetClosestPointsJob::hkpWorldGetClosestPointsJob
     hkpWorldGetClosestPointsJob job;
     job.m_jobSubType = hkpCollisionQueryJob::COLLISION_QUERY_WORLD_GET_CLOSEST_POINTS;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    job.m_jobType.m_storage = HK_JOB_TYPE_COLLISION_QUERY;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    job.m_jobSpuType.m_storage = HK_JOB_SPU_TYPE_DISABLED;
+    job.m_jobType = HK_JOB_TYPE_COLLISION_QUERY;
+    job.m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
     job.m_size = sizeof(hkpWorldGetClosestPointsJob);
     job.m_threadAffinity = -1;
     job.m_semaphore = semaphore;
@@ -3902,12 +3881,8 @@ void hkpWorld::getClosestPoints(
         const hkpShapeType typeA = collA->getShape()->m_type;
         HK_TIMER_SPLIT_LIST("3AxisNp");
         for (int32_t i = hits.m_size - 1; i >= 0; --i, ++pair) {
-            const hkpTypedBroadPhaseHandle* handle = static_cast<const hkpTypedBroadPhaseHandle*>(pair->m_b);
-            // The owner sits m_ownerOffset bytes from the handle, an untyped byte offset.
-            // EXE-INLINED 0x9B2C90
-            const hkpCollidable* collB = static_cast<const hkpCollidable*>(static_cast<const void*>(
-                static_cast<const char*>(static_cast<const void*>(handle)) + handle->m_ownerOffset
-            ));
+            hkpTypedBroadPhaseHandle* handle = static_cast<hkpTypedBroadPhaseHandle*>(pair->m_b);
+            const hkpCollidable* collB = static_cast<const hkpCollidable*>(handle->getOwner());
             if (collA == collB) {
                 continue;
             }
@@ -4033,8 +4008,7 @@ void hkpWorld::linearCastMt(
     // EXE-INLINED none: hkpWorldLinearCastJob::hkpWorldLinearCastJob
     hkpWorldLinearCastJob job;
     job.m_jobSubType = hkpCollisionQueryJob::COLLISION_QUERY_WORLD_LINEAR_CAST;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    job.m_jobType.m_storage = HK_JOB_TYPE_COLLISION_QUERY;
+    job.m_jobType = HK_JOB_TYPE_COLLISION_QUERY;
     job.m_size = sizeof(hkpWorldLinearCastJob);
     job.m_threadAffinity = -1;
     job.m_semaphore = semaphore;
@@ -4056,8 +4030,7 @@ void hkpWorld::linearCastMt(
         job.m_kdTree = m_kdTreeManager->m_kdTree;
     }
     // The job runs on the SPU.
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    job.m_jobSpuType.m_storage = HK_JOB_SPU_TYPE_ENABLED;
+    job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
 
     while (job.m_numCommands > 0) {
         hkpWorldLinearCastJob subJob = job;
@@ -4108,10 +4081,8 @@ void hkpWorld::castRayMt(
     // EXE-INLINED none: hkpWorldRayCastJob::hkpWorldRayCastJob
     hkpWorldRayCastJob job;
     job.m_jobSubType = hkpRayCastQueryJob::RAYCAST_QUERY_WORLD_RAYCAST;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    job.m_jobType.m_storage = HK_JOB_TYPE_RAYCAST_QUERY;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    job.m_jobSpuType.m_storage = HK_JOB_SPU_TYPE_ENABLED;
+    job.m_jobType = HK_JOB_TYPE_RAYCAST_QUERY;
+    job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
     job.m_size = sizeof(hkpWorldRayCastJob);
     job.m_threadAffinity = -1;
     job.m_semaphore = semaphore;

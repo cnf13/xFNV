@@ -216,8 +216,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
                 motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fAngDamp), motion->m_angularVelocity.m_quad);
 
                 accumulatorsOut->m_scratch123.setTranspose(ms.m_transform.m_rotation);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                accumulatorsOut->m_type.m_storage = hkpVelocityAccumulator::HK_RIGID_BODY;
+                accumulatorsOut->m_type = hkpVelocityAccumulator::HK_RIGID_BODY;
                 accumulatorsOut->m_invMasses = motion->m_inertiaAndMassInv;
                 accumulatorsOut->m_linearVel = motion->m_linearVelocity;
                 {
@@ -251,8 +250,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
             }
             case hkpMotion::MOTION_SPHERE_INERTIA:
             case hkpMotion::MOTION_CHARACTER: {
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                accumulatorsOut->m_type.m_storage = motion->getType() == hkpMotion::MOTION_CHARACTER
+                accumulatorsOut->m_type = motion->getType() == hkpMotion::MOTION_CHARACTER
                     ? hkpVelocityAccumulator::HK_NO_GRAVITY_RIGID_BODY
                     : hkpVelocityAccumulator::HK_RIGID_BODY;
                 // Damping, as above.
@@ -298,8 +296,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
             case hkpMotion::MOTION_KEYFRAMED: {
                 // No damping; infinite masses, the centre of mass at the step's end, an identity frame. The
                 // deactivation class is left as it was.
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                accumulatorsOut->m_type.m_storage = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
+                accumulatorsOut->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
                 accumulatorsOut->m_invMasses.setZero4();
                 accumulatorsOut->m_scratch0 = st.m_centerOfMass1;
                 accumulatorsOut->m_angularVel = motion->m_angularVelocity;
@@ -319,8 +316,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
             case hkpMotion::MOTION_FIXED: {
                 // All zero but the type; the deactivation class is left as it was.
                 accumulatorsOut->m_gravityFactor = 0.0f;
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                accumulatorsOut->m_type.m_storage = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
+                accumulatorsOut->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
                 accumulatorsOut->m_invMasses.setZero4();
                 accumulatorsOut->m_linearVel.setZero4();
                 accumulatorsOut->m_angularVel.setZero4();

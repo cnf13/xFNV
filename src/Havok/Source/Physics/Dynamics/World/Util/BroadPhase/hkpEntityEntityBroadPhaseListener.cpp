@@ -19,15 +19,8 @@ hkpEntityEntityBroadPhaseListener::~hkpEntityEntityBroadPhaseListener() {}
 void hkpEntityEntityBroadPhaseListener::addCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
     hkpTypedBroadPhaseHandle* handleA = pair.getElementA();
     hkpTypedBroadPhaseHandle* handleB = pair.getElementB();
-    // The owner sits m_ownerOffset bytes from the handle, computed with untyped byte arithmetic.
-    // EXE-INLINED 0x9B2C90
-    hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(
-        static_cast<void*>(reinterpret_cast<char*>(handleA) + handleA->m_ownerOffset)
-    );
-    // EXE-INLINED 0x9B2C90
-    hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(
-        static_cast<void*>(reinterpret_cast<char*>(handleB) + handleB->m_ownerOffset)
-    );
+    hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(handleA->getOwner());
+    hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(handleB->getOwner());
     hkpProcessCollisionInput* input = m_world->m_collisionInput;
     hkpCollisionDispatcher* dispatcher = input->m_dispatcher;
     int8_t qualityIndex = dispatcher->m_collisionQualityTable[collA->m_broadPhaseHandle.m_objectQualityType]
@@ -42,15 +35,8 @@ void hkpEntityEntityBroadPhaseListener::addCollisionPair(hkpTypedBroadPhaseHandl
 void hkpEntityEntityBroadPhaseListener::removeCollisionPair(hkpTypedBroadPhaseHandlePair& pair) {
     hkpTypedBroadPhaseHandle* handleA = pair.getElementA();
     hkpTypedBroadPhaseHandle* handleB = pair.getElementB();
-    // The owner sits m_ownerOffset bytes from the handle, computed with untyped byte arithmetic.
-    // EXE-INLINED 0x9B2C90
-    hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(
-        static_cast<void*>(reinterpret_cast<char*>(handleA) + handleA->m_ownerOffset)
-    );
-    // EXE-INLINED 0x9B2C90
-    hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(
-        static_cast<void*>(reinterpret_cast<char*>(handleB) + handleB->m_ownerOffset)
-    );
+    hkpLinkedCollidable* collA = static_cast<hkpLinkedCollidable*>(handleA->getOwner());
+    hkpLinkedCollidable* collB = static_cast<hkpLinkedCollidable*>(handleB->getOwner());
     hkpAgentNnEntry* entry = hkAgentNnMachine_FindAgent(collA, collB);
     if (entry) {
         hkpWorldAgentUtil::removeAgent(entry);

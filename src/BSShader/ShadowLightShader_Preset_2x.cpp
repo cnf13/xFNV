@@ -9187,15 +9187,9 @@ void ShadowLightShader::PresetWaterFogPasses_2x() {
 
 // The depth passes (487 to 489): opaque, depth-tested less-or-equal and depth-written with the depth bias unit, vertex
 // shaders 126 to 128 and the shared pixel shader 126. The depth bias is fDepthBiasUnit's bits, stored to a float local
-// first. The pass pointer's release stays at the end. The D3D values FALSE and TRUE are written as 0 and 1. The pass
-// pointer is held as a raw pointer and released without a null check (the pass was dereferenced first), as the game
-// does.
+// first. The D3D values FALSE and TRUE are written as 0 and 1.
 void ShadowLightShader::PresetDepthPasses_2x() {
-    // EXE-INLINED none: NiPointer<NiD3DPass> constructor
-    NiD3DPass* pD3DPass = spPass[487].m_pObject;
-    if (pD3DPass) {
-        pD3DPass->IncRefCount();
-    }
+    NiPointer<NiD3DPass> pD3DPass = spPass[487];
     pD3DPass->m_spVertexShader = spVertexShaders[126];
     pD3DPass->m_spPixelShader = spPixelShaders[126];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9208,14 +9202,7 @@ void ShadowLightShader::PresetDepthPasses_2x() {
     ulVertexConstantFlags[487] = 0x84000;
     ulPixelConstantFlags[487] = 0;
 
-    // EXE-INLINED none: NiPointer<NiD3DPass>::operator=
-    if (pD3DPass != spPass[488].m_pObject) {
-        pD3DPass->DecRefCount();
-        pD3DPass = spPass[488].m_pObject;
-        if (pD3DPass) {
-            pD3DPass->IncRefCount();
-        }
-    }
+    pD3DPass = spPass[488];
     pD3DPass->m_spVertexShader = spVertexShaders[127];
     pD3DPass->m_spPixelShader = spPixelShaders[126];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9228,14 +9215,7 @@ void ShadowLightShader::PresetDepthPasses_2x() {
     ulVertexConstantFlags[488] = 0x88800;
     ulPixelConstantFlags[488] = 0;
 
-    // EXE-INLINED none: NiPointer<NiD3DPass>::operator=
-    if (pD3DPass != spPass[489].m_pObject) {
-        pD3DPass->DecRefCount();
-        pD3DPass = spPass[489].m_pObject;
-        if (pD3DPass) {
-            pD3DPass->IncRefCount();
-        }
-    }
+    pD3DPass = spPass[489];
     pD3DPass->m_spVertexShader = spVertexShaders[128];
     pD3DPass->m_spPixelShader = spPixelShaders[126];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9247,19 +9227,12 @@ void ShadowLightShader::PresetDepthPasses_2x() {
     pD3DPass->SetRenderState(D3DRS_DEPTHBIAS, std::bit_cast<uint32_t>(fDepthBias));
     ulVertexConstantFlags[489] = 0x84000;
     ulPixelConstantFlags[489] = 0;
-    // EXE-INLINED none: NiPointer<NiD3DPass> destructor
-    pD3DPass->DecRefCount();
 }
 
 // The velocity passes (490 and 491): opaque, depth-tested and depth-written, no culling, each with its own vertex
-// shader and the shared pixel shader 127. The D3D values FALSE and TRUE are written as 0 and 1. The pass pointer is
-// released unchecked, as in PresetDepthPasses_2x.
+// shader and the shared pixel shader 127. The D3D values FALSE and TRUE are written as 0 and 1.
 void ShadowLightShader::PresetVelocityPasses_2x() {
-    // EXE-INLINED none: NiPointer<NiD3DPass> constructor
-    NiD3DPass* pD3DPass = spPass[490].m_pObject;
-    if (pD3DPass) {
-        pD3DPass->IncRefCount();
-    }
+    NiPointer<NiD3DPass> pD3DPass = spPass[490];
     pD3DPass->m_spVertexShader = spVertexShaders[129];
     pD3DPass->m_spPixelShader = spPixelShaders[127];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9273,14 +9246,7 @@ void ShadowLightShader::PresetVelocityPasses_2x() {
     ulVertexConstantFlags[490] = 0x384000;
     ulPixelConstantFlags[490] = 0;
 
-    // EXE-INLINED none: NiPointer<NiD3DPass>::operator=
-    if (pD3DPass != spPass[491].m_pObject) {
-        pD3DPass->DecRefCount();
-        pD3DPass = spPass[491].m_pObject;
-        if (pD3DPass) {
-            pD3DPass->IncRefCount();
-        }
-    }
+    pD3DPass = spPass[491];
     pD3DPass->m_spVertexShader = spVertexShaders[130];
     pD3DPass->m_spPixelShader = spPixelShaders[127];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9293,19 +9259,12 @@ void ShadowLightShader::PresetVelocityPasses_2x() {
     pD3DPass->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
     ulVertexConstantFlags[491] = 0x389800;
     ulPixelConstantFlags[491] = 0;
-    // EXE-INLINED none: NiPointer<NiD3DPass> destructor
-    pD3DPass->DecRefCount();
 }
 
 // The local map passes (492 to 494): opaque and depth-written; the first two test less-or-equal with pixel shader 135,
-// the last always passes with pixel shader 136. The D3D values FALSE and TRUE are written as 0 and 1. The pass pointer
-// is released unchecked, as in PresetDepthPasses_2x.
+// the last always passes with pixel shader 136. The D3D values FALSE and TRUE are written as 0 and 1.
 void ShadowLightShader::PresetLocalMapPasses_2x() {
-    // EXE-INLINED none: NiPointer<NiD3DPass> constructor
-    NiD3DPass* pD3DPass = spPass[492].m_pObject;
-    if (pD3DPass) {
-        pD3DPass->IncRefCount();
-    }
+    NiPointer<NiD3DPass> pD3DPass = spPass[492];
     pD3DPass->m_spVertexShader = spVertexShaders[137];
     pD3DPass->m_spPixelShader = spPixelShaders[135];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9316,14 +9275,7 @@ void ShadowLightShader::PresetLocalMapPasses_2x() {
     ulVertexConstantFlags[492] = 0x4000;
     ulPixelConstantFlags[492] = 0;
 
-    // EXE-INLINED none: NiPointer<NiD3DPass>::operator=
-    if (pD3DPass != spPass[493].m_pObject) {
-        pD3DPass->DecRefCount();
-        pD3DPass = spPass[493].m_pObject;
-        if (pD3DPass) {
-            pD3DPass->IncRefCount();
-        }
-    }
+    pD3DPass = spPass[493];
     pD3DPass->m_spVertexShader = spVertexShaders[138];
     pD3DPass->m_spPixelShader = spPixelShaders[135];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9334,14 +9286,7 @@ void ShadowLightShader::PresetLocalMapPasses_2x() {
     ulVertexConstantFlags[493] = 0x8800;
     ulPixelConstantFlags[493] = 0;
 
-    // EXE-INLINED none: NiPointer<NiD3DPass>::operator=
-    if (pD3DPass != spPass[494].m_pObject) {
-        pD3DPass->DecRefCount();
-        pD3DPass = spPass[494].m_pObject;
-        if (pD3DPass) {
-            pD3DPass->IncRefCount();
-        }
-    }
+    pD3DPass = spPass[494];
     pD3DPass->m_spVertexShader = spVertexShaders[139];
     pD3DPass->m_spPixelShader = spPixelShaders[136];
     pD3DPass->SetRenderState(D3DRS_ALPHABLENDENABLE, 0);
@@ -9351,6 +9296,4 @@ void ShadowLightShader::PresetLocalMapPasses_2x() {
     pD3DPass->SetRenderState(D3DRS_ZWRITEENABLE, 1);
     ulVertexConstantFlags[494] = 0;
     ulPixelConstantFlags[494] = 0;
-    // EXE-INLINED none: NiPointer<NiD3DPass> destructor
-    pD3DPass->DecRefCount();
 }

@@ -5,6 +5,7 @@
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkWaterListener.h"
 #include "BSHavok/bhkWorld.h"
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpCollisionInput.h"
@@ -56,10 +57,7 @@ void bhkWaterPhantomCallbackShape::phantomLeaveEvent(
     if (pworld) {
         pworld->QWaterListener()->contactPointRemovedCallback(point);
     }
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* prb = collidableB->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(collidableB->getOwner()))
-        : nullptr;
+    hkpRigidBody* prb = hkpGetRigidBody(collidableB);
     if (prb) {
         // EXE-INLINED 0x4B5A80
         bhkRigidBody* pbhkrba = static_cast<bhkRigidBody*>(prb->getUserData());

@@ -106,18 +106,8 @@ gskMode:
                 goto done;
             }
             // Back to stream mode when the bodies penetrate deeper than twice the smaller allowed penetration.
-            // EXE-INLINED 0x624020
-            const hkpCdBody* rootB = input.m_bodyB;
-            while (rootB->m_parent != nullptr) {
-                rootB = rootB->m_parent;
-            }
-            float penetrationB = static_cast<const hkpCollidable*>(rootB)->getAllowedPenetrationDepth();
-            // EXE-INLINED 0x624020
-            const hkpCdBody* rootA = input.m_bodyA;
-            while (rootA->m_parent != nullptr) {
-                rootA = rootA->m_parent;
-            }
-            float penetrationA = static_cast<const hkpCollidable*>(rootA)->getAllowedPenetrationDepth();
+            float penetrationB = input.m_bodyB->getRootCollidable()->getAllowedPenetrationDepth();
+            float penetrationA = input.m_bodyA->getRootCollidable()->getAllowedPenetrationDepth();
             // EXE-INLINED none: hkMath::min2 (B's on a tie or a NaN)
             float minPenetration = (penetrationB > penetrationA) ? penetrationA : penetrationB;
             float twicePenetration = minPenetration + minPenetration;

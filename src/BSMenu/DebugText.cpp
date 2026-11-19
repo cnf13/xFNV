@@ -1091,12 +1091,7 @@ NiBillboardNode* DebugText::CreateBillboardText(
 ) {
     void* pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
     NiBillboardNode* pNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
-    // EXE-INLINED none: the NiFixedString(const char*) constructor and destructor of the name temporary
-    NiFixedString kName;
-    kName.SetHandle(NiGlobalStringTable::AddString("FloatingText"));
-    pNode->SetName(kName);
-    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-    NiGlobalStringTable::DecHandleRefCount(kHandle);
+    pNode->SetName(NiFixedString("FloatingText"));
     int32_t iWidth = 10000;
     BSStringT<char> kString;
     // SWEEP-INLINE 0x40C0E0

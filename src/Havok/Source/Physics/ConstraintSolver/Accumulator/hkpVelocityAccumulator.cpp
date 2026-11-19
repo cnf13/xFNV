@@ -4,8 +4,7 @@
 
 // Copies member by member, so the padding after m_type and after m_gravityFactor keeps its bytes.
 void hkpVelocityAccumulator::copyVelocityAndScratch(const hkpVelocityAccumulator& arSource) {
-    // EXE-INLINED none: hkEnum<hkpAccumulatorType, uint8_t>::operator=
-    m_type.m_storage = arSource.m_type.m_storage;
+    m_type = arSource.m_type;
     m_deactivationClass = arSource.m_deactivationClass;
     float fGravityFactor = arSource.m_gravityFactor;
     m_gravityFactor = fGravityFactor;
@@ -15,8 +14,7 @@ void hkpVelocityAccumulator::copyVelocityAndScratch(const hkpVelocityAccumulator
 
 // Copies member by member, so the padding after m_type and after m_gravityFactor keeps its bytes.
 hkpVelocityAccumulator& hkpVelocityAccumulator::operator=(const hkpVelocityAccumulator& arSource) {
-    // EXE-INLINED none: hkEnum<hkpAccumulatorType, uint8_t>::operator=
-    m_type.m_storage = arSource.m_type.m_storage;
+    m_type = arSource.m_type;
     m_deactivationClass = arSource.m_deactivationClass;
     float fGravityFactor = arSource.m_gravityFactor;
     m_gravityFactor = fGravityFactor;

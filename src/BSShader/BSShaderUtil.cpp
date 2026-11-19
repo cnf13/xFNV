@@ -32,6 +32,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiVisibleArray.h"
 #include "SDK/MSVC/string.h"
 
+#include <new>
+
 void BSShaderUtil::AccumulateScene(NiCamera* apCamera, NiAVObject* apScene, BSCullingProcess& aCuller) {
     NiRenderer* v3 = NiRenderer::ms_pkRenderer;
     if ((NiRenderer::ms_pkRenderer) && (apCamera) && (apScene)) {
@@ -100,8 +102,7 @@ void BSShaderUtil::RecursiveSetPropertyWireframe(NiAVObject* apObject, int32_t a
 void BSShaderUtil::InitSDM() {
     NiFixedString* pName = static_cast<NiFixedString*>(MemoryManager_Singleton.Allocate(sizeof(NiFixedString)));
     if (pName) {
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        pName->SetHandle(NiGlobalStringTable::AddString("ConvertedTexture"));
+        ::new (pName) NiFixedString("ConvertedTexture");
     }
     else {
         pName = nullptr;
@@ -109,8 +110,7 @@ void BSShaderUtil::InitSDM() {
     pConvertedTextureName = pName;
     NiFixedString* pBGName = static_cast<NiFixedString*>(MemoryManager_Singleton.Allocate(sizeof(NiFixedString)));
     if (pBGName) {
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        pBGName->SetHandle(NiGlobalStringTable::AddString("BackgroundConvertedTexture"));
+        ::new (pBGName) NiFixedString("BackgroundConvertedTexture");
         pBGConvertedTextureName = pBGName;
     }
     else {
@@ -129,11 +129,7 @@ void BSShaderUtil::AccumulateSceneList(
     if (!pRenderer || !apCamera) {
         return;
     }
-    // EXE-INLINED none: NiPointer<NiAccumulator> copy constructor
-    NiAccumulator* pOldSorter = pRenderer->m_spAccum.m_pObject;
-    if (pOldSorter) {
-        pOldSorter->IncRefCount();
-    }
+    NiPointer<NiAccumulator> spOldSorter(pRenderer->m_spAccum);
     NiRenderer::ms_pkRenderer->SetSorter(aCuller.spAccumulator.m_pObject);
     BSShaderManager::SetAccumulator(static_cast<BSShaderAccumulator*>(aCuller.spAccumulator.m_pObject));
     NiCullingProcess* pCuller = &aCuller;
@@ -157,10 +153,6 @@ void BSShaderUtil::AccumulateSceneList(
             }
             while (pObject);
         }
-    }
-    // EXE-INLINED none: NiPointer<NiAccumulator> destructor
-    if (pOldSorter) {
-        pOldSorter->DecRefCount();
     }
 }
 

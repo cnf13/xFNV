@@ -869,8 +869,7 @@ void hkaSplineCompressedAnimation::initialize(
     const hkaSplineCompressedAnimation::PerTrackCompressionParams& trackParams,
     const hkaSplineCompressedAnimation::AnimationCompressionParams& animationParams
 ) {
-    // EXE-INLINED none: hkEnum<hkaAnimation::AnimationType, int32_t>::operator=
-    m_type.m_storage = HK_SPLINE_COMPRESSED_ANIMATION;
+    m_type = HK_SPLINE_COMPRESSED_ANIMATION;
     m_endian = 0;
     m_maxFramesPerBlock = animationParams.m_maxFramesPerBlock;
     const uint8_t enableSampleSingleTracks = animationParams.m_enableSampleSingleTracks.m_bool;

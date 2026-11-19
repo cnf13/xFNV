@@ -281,17 +281,7 @@ void ParticleShader::CreateConstantMaps() {
         if (pMemory) {
             pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         }
-        // EXE-INLINED none: NiPointer::operator=
-        NiD3DShaderConstantMap* pOld = m_spVertexConstantMap.m_pObject;
-        if (pOld != pMap) {
-            if (pOld && InterlockedDecrementUInt32(&pOld->m_uiRefCount) == 0) {
-                static_cast<NiRefObject*>(pOld)->DeleteThis();
-            }
-            m_spVertexConstantMap.m_pObject = pMap;
-            if (pMap) {
-                pMap->IncRefCount();
-            }
-        }
+        m_spVertexConstantMap = pMap;
         // Each entry's variable name is an empty string.
         m_spVertexConstantMap.m_pObject->AddPredefinedEntry(
             "WorldViewProjTranspose", 0x20000009, 0, "", 0, 0, nullptr, false
@@ -327,17 +317,7 @@ void ParticleShader::CreateConstantMaps() {
         else {
             pMap = nullptr;
         }
-        // EXE-INLINED none: NiPointer::operator=
-        NiD3DShaderConstantMap* pOld = m_spPixelConstantMap.m_pObject;
-        if (pOld != pMap) {
-            if (pOld && InterlockedDecrementUInt32(&pOld->m_uiRefCount) == 0) {
-                static_cast<NiRefObject*>(pOld)->DeleteThis();
-            }
-            m_spPixelConstantMap.m_pObject = pMap;
-            if (pMap) {
-                pMap->IncRefCount();
-            }
-        }
+        m_spPixelConstantMap = pMap;
     }
 }
 

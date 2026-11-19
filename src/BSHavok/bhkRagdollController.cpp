@@ -3013,21 +3013,10 @@ void bhkRagdollController::CreateSGSkeleton() {
 }
 
 void bhkRagdollController::Init(NiAVObject* apObject, const char* apScaledSkeletonName) {
-    // EXE-INLINED none: NiFixedString::operator=(const char*)
-    const char* pOldName = SkeletonShareName.GetHandle();
-    if (pOldName != apScaledSkeletonName) {
-        SkeletonShareName.m_kHandle = NiGlobalStringTable::AddString(apScaledSkeletonName);
-        NiGlobalStringTable::ReleaseHandle(pOldName);
-    }
+    SkeletonShareName = apScaledSkeletonName;
     // Without a scaled skeleton name, the object's own name keys the shared data.
     if (!apScaledSkeletonName) {
-        // EXE-INLINED 0x43BA10 (NiFixedString::operator=)
-        const char* pName = apObject->m_kName.GetHandle();
-        if (SkeletonShareName.GetHandle() != pName) {
-            NiGlobalStringTable::AcquireHandle(pName);
-            NiGlobalStringTable::ReleaseHandle(SkeletonShareName.GetHandle());
-            SkeletonShareName.m_kHandle = pName;
-        }
+        SkeletonShareName.Assign(apObject->m_kName);
     }
     SkeletonMap.GetAt(SkeletonShareName.GetHandle(), spRagdollSharedData);
     if (!spRagdollSharedData.m_pObject) {

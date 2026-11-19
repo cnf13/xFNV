@@ -309,16 +309,7 @@ void bhkConvexTransformShape::BuildDisplayGeometry(NiNode* apNode, const NiColor
     if (pMemory) {
         pNode = ::new (pMemory) NiNode(0);
     }
-    // kName is 16-aligned deliberately, as the game keeps the name's handle.
-    alignas(16) NiFixedString kName;
-    kName.SetHandle(NiGlobalStringTable::AddString("bhkConvexTransformShape"));
-    pNode->SetName(kName);
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-    if (kHandle != NiGlobalStringTable::NULL_STRING) {
-        // The reference count is the first word of the string's buffer, 8 bytes before the characters.
-        InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kHandle) - 8));
-    }
+    pNode->SetName(NiFixedString("bhkConvexTransformShape"));
     apNode->AttachChild(pNode, true);
     pNode->m_kLocal.m_Translate = kTranslate;
     pNode->m_kLocal.m_Rotate = kRotate;

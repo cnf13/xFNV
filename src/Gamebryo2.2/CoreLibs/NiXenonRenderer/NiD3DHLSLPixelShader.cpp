@@ -67,36 +67,17 @@ bool NiD3DHLSLPixelShader::SetShaderConstant(
         pvDataSource = pkEntry->m_pvDataSource;
     }
     if (!pkEntry->m_bVariableHookupValid) {
-        // EXE-INLINED 0x48AF40
-        // The reference count is the untyped word 8 bytes before the characters (GetRealBufferStart).
-        NiGlobalStringTable::GlobalStringHandle kHandle = pkEntry->m_kVariableName.GetHandle();
-        if (kHandle != NiGlobalStringTable::NULL_STRING) {
-            InterlockedIncrementUInt32(
-                reinterpret_cast<volatile uint32_t*>(
-                    const_cast<char*>(NiGlobalStringTable::GetRealBufferStart(kHandle))
-                )
-            );
-        }
-        NiFixedString kVariableName;
-        kVariableName.SetHandle(pkEntry->m_kVariableName.GetHandle());
+        NiFixedString kVariableName(pkEntry->m_kVariableName);
         if (kVariableName.GetHandle() == NiGlobalStringTable::NULL_STRING) {
             kVariableName.Assign(pkEntry->m_kKey);
             pkEntry->SetVariableName(kVariableName);
         }
         D3DXHANDLE pkVariable = m_pkConstantTable->GetConstantByName(nullptr, kVariableName.GetHandle());
-        kHandle = kVariableName.GetHandle();
         if (!pkVariable) {
             NiRenderer::Error(
-                "NiD3DHLSLPixelShader::SetShaderConstant - %s - variable %s not found\n", m_pszName, kHandle
+                "NiD3DHLSLPixelShader::SetShaderConstant - %s - variable %s not found\n", m_pszName,
+                kVariableName.GetHandle()
             );
-            // EXE-INLINED 0x4381B0
-            if (kHandle != NiGlobalStringTable::NULL_STRING) {
-                InterlockedDecrementUInt32(
-                    reinterpret_cast<volatile uint32_t*>(
-                        const_cast<char*>(NiGlobalStringTable::GetRealBufferStart(kHandle))
-                    )
-                );
-            }
             return false;
         }
         D3DXCONSTANT_DESC kDesc;
@@ -105,14 +86,6 @@ bool NiD3DHLSLPixelShader::SetShaderConstant(
         pkEntry->m_uiShaderRegister = kDesc.RegisterIndex;
         pkEntry->m_uiRegisterCount = kDesc.RegisterCount;
         pkEntry->m_bVariableHookupValid = true;
-        // EXE-INLINED 0x4381B0
-        if (kHandle != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(
-                reinterpret_cast<volatile uint32_t*>(
-                    const_cast<char*>(NiGlobalStringTable::GetRealBufferStart(kHandle))
-                )
-            );
-        }
     }
     NiDX9RenderState* pkRenderState = static_cast<NiDX9RenderState*>(m_pkD3DRenderState);
     bool bReturn = false;

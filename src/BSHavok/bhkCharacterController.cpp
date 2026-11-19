@@ -930,11 +930,7 @@ void bhkCharacterController::processConstraintsCallback(
         hkpSurfaceConstraintInfo& rsurface = arInput.m_constraints[i];
         const hkpRootCdPoint& rpnt = arManifold.m_data[i];
         const hkpCollidable* pcollB = rpnt.m_rootCollidableB;
-        // EXE-INLINED 0x4B59F0
-        // EXE-INLINED 0x4B59C0
-        hkpRigidBody* pbody = pcollB->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-            ? static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pcollB->getOwner()))
-            : nullptr;
+        hkpRigidBody* pbody = hkpGetRigidBody(pcollB);
         const uint32_t ifilter = pcollB->m_broadPhaseHandle.m_collisionFilterInfo;
         // A hurtful body moving into the character is recorded as a hit, with its velocity less the part along the
         // character's own velocity when that part points the same way.
@@ -1070,11 +1066,7 @@ void bhkCharacterController::processConstraintsCallback(
                 worldEnd.m_quad = _mm_sub_ps(worldStart.m_quad, endAdj);
                 for (int32_t j = 0; j < theDetails.m_size; ++j) {
                     hkpCollidable* pcl = theDetails.m_data[j].m_collidable;
-                    // EXE-INLINED 0x4B59F0
-                    // EXE-INLINED 0x4B59C0
-                    hkpRigidBody* phrb = pcl->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-                        ? static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pcl->getOwner()))
-                        : nullptr;
+                    hkpRigidBody* phrb = hkpGetRigidBody(pcl);
                     if (!phrb || phrb->m_motion.m_type.m_storage != hkpMotion::MOTION_KEYFRAMED) {
                         continue;
                     }
@@ -3197,11 +3189,7 @@ void bhkCharacterController::ClearHurtfulHits() {
     while (DamageImpacts.GetNext() || DamageImpacts.m_item) {
         DamageImpactData* pImpact = DamageImpacts.m_item;
         if (pImpact) {
-            // EXE-INLINED none: DamageImpactData's destructor, NiPointer's release of spBody.
-            bhkRigidBody* pBody = pImpact->spBody;
-            if (pBody) {
-                NiDecRefCount(pBody);
-            }
+            pImpact->~DamageImpactData();
             MemoryManager_Singleton.Deallocate(pImpact);
         }
         BSSimpleList<DamageImpactData*>* m_pkNext = DamageImpacts.GetNext();
@@ -3305,11 +3293,7 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
     if (arPoint.m_rootCollidableA->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
         pp = static_cast<hkpShapePhantom*>(static_cast<hkpWorldObject*>(arPoint.m_rootCollidableA->getOwner()));
     }
-    // EXE-INLINED 0x4B59F0
-    hkpRigidBody* prb = nullptr;
-    if (arPoint.m_rootCollidableB->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        prb = static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(arPoint.m_rootCollidableB->getOwner()));
-    }
+    hkpRigidBody* prb = hkpGetRigidBody(arPoint.m_rootCollidableB);
     bool bstep = false;
     uint32_t uiclosestFBIdx = 0;
     if (prb) {
@@ -3615,27 +3599,11 @@ void bhkCharacterController::SetSupportMaterial(const hkpRootCdPoint& arManifold
         const hkpCdBody* pb = arManifold.m_rootCollidableB;
         HavokMaterialType econtactMaterial = BHK_MATERIAL_MAX;
         if (pb) {
-            // EXE-INLINED 0x624020
-            const hkpCdBody* pLayerBody = pb;
-            while (pLayerBody->m_parent) {
-                pLayerBody = pLayerBody->m_parent;
-            }
             // EXE-INLINED 0x43B4D0
-            COL_LAYER v7 = static_cast<COL_LAYER>(
-                static_cast<const hkpCollidable*>(pLayerBody)->m_broadPhaseHandle.m_collisionFilterInfo & 0x7F
-            );
+            COL_LAYER v7 =
+                static_cast<COL_LAYER>(pb->getRootCollidable()->m_broadPhaseHandle.m_collisionFilterInfo & 0x7F);
             eSupportLayer = v7;
-            // EXE-INLINED 0x624020
-            const hkpCdBody* pOwnerBody = pb;
-            while (pOwnerBody->m_parent) {
-                pOwnerBody = pOwnerBody->m_parent;
-            }
-            const hkpCollidable* pRoot = static_cast<const hkpCollidable*>(pOwnerBody);
-            // EXE-INLINED 0x4B59F0
-            // EXE-INLINED 0x4B59C0
-            hkpRigidBody* pBody = pRoot->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-                ? static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pRoot->getOwner()))
-                : nullptr;
+            hkpRigidBody* pBody = hkpGetRigidBody(pb->getRootCollidable());
             const hkVector4* v12 = pBody ? &pBody->getLinearVelocity() : &hkVector4Zero;
             hkSupportVelocity.m_quad = v12->m_quad;
             if (arManifold.m_shapeKeyB == -1) {

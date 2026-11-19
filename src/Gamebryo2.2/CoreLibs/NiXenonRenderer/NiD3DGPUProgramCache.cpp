@@ -195,23 +195,9 @@ NiGPUProgram* NiD3DGPUProgramCache::GenerateProgram(
             pkDesc->m_kUniforms.Add(kUniforms.m_pBase[ui]);
         }
 
-        // EXE-INLINED none: NiPointer<NiGPUProgram>::operator=
-        NiGPUProgram* pkOldProgram = pkDesc->m_spProgram;
-        NiGPUProgram* pkNewProgram = spProgram;
-        if (pkOldProgram != pkNewProgram) {
-            if ((pkOldProgram) && (!InterlockedDecrementUInt32(&pkOldProgram->m_uiRefCount))) {
-                pkOldProgram->DeleteThis();
-            }
+        pkDesc->m_spProgram = static_cast<NiGPUProgram*>(spProgram);
 
-            pkDesc->m_spProgram.m_pObject = pkNewProgram;
-            if (pkNewProgram) {
-                InterlockedIncrementUInt32(&pkNewProgram->m_uiRefCount);
-            }
-        }
-
-        // EXE-INLINED 0x438170: NiFixedString::NiFixedString(const char*)
-        NiFixedString kName;
-        kName.SetHandle(pcName ? NiGlobalStringTable::AddString(pcName) : NiGlobalStringTable::NULL_STRING);
+        NiFixedString kName(pcName);
 
         if (m_bAutoWriteCacheToDisk) {
             AppendEntry(pkDesc, kName);

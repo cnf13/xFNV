@@ -14,18 +14,8 @@
 void _setHit(hkpRootCdPoint* insertAt, const hkpCdPoint* event) {
     insertAt->m_contact.m_position = event->m_contact.m_position;
     insertAt->m_contact.m_separatingNormal = event->m_contact.m_separatingNormal;
-    // EXE-INLINED 0x624020
-    const hkpCdBody* rootA = event->m_cdBodyA;
-    while (rootA->m_parent) {
-        rootA = rootA->m_parent;
-    }
-    insertAt->m_rootCollidableA = static_cast<const hkpCollidable*>(rootA);
-    // EXE-INLINED 0x624020
-    const hkpCdBody* rootB = event->m_cdBodyB;
-    while (rootB->m_parent) {
-        rootB = rootB->m_parent;
-    }
-    insertAt->m_rootCollidableB = static_cast<const hkpCollidable*>(rootB);
+    insertAt->m_rootCollidableA = event->m_cdBodyA->getRootCollidable();
+    insertAt->m_rootCollidableB = event->m_cdBodyB->getRootCollidable();
     insertAt->m_shapeKeyA = event->m_cdBodyA->m_shapeKey;
     insertAt->m_shapeKeyB = event->m_cdBodyB->m_shapeKey;
     int32_t depth = 0;

@@ -18,11 +18,9 @@
 // dispatcher's linear cast function for the two shape types.
 float hkpWorldLinearCaster::addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) {
     const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle);
-    // The owner sits m_ownerOffset bytes from the handle (getOwner: a byte offset over untyped memory).
-    // EXE-INLINED 0x9B2C90
-    const hkpCollidable* col = static_cast<const hkpCollidable*>(
-        static_cast<const void*>(static_cast<const char*>(static_cast<const void*>(pHandle)) + pHandle->m_ownerOffset)
-    );
+    // The owner is the collidable. getOwner is non-const here, hence the const_cast.
+    const hkpCollidable* col =
+        static_cast<const hkpCollidable*>(const_cast<hkpTypedBroadPhaseHandle*>(pHandle)->getOwner());
     const hkpShape* shapeB = col->m_shape;
     if (!shapeB) {
         return m_castCollector->m_earlyOutDistance;

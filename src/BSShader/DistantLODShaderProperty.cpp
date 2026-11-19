@@ -404,7 +404,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                     );
                 }
             }
-            NiTexture* pbasetexture = nullptr;
+            NiPointer<NiTexture> pbasetexture;
             if (plodgeom->GetProperty(NiProperty::SHADE) &&
                 static_cast<NiShadeProperty*>(plodgeom->GetProperty(NiProperty::SHADE))->iShaderPropertyType ==
                     BSShaderManager::BSSM_PROPERTYTYPE_SPEEDTREEBILLBOARD) {
@@ -413,9 +413,7 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                 if (pprop) {
                     NiTexture* pTexture = pprop->GetTexture(BSShaderProperty::TEXTYPE_DIFFUSE, 0);
                     if (pTexture) {
-                        // EXE-INLINED 0x66B0D0
                         pbasetexture = pTexture;
-                        pbasetexture->IncRefCount();
                     }
                 }
             }
@@ -452,25 +450,8 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
             pCachedGeom->pInstanceIndex = pinstance;
             pCachedGeom->iVertices = ivertices;
             pCachedGeom->spBaseTexture = pbasetexture;
-            // The two alpha properties were written above, so their references are taken without a null test.
-            // EXE-INLINED 0x66B0D0
-            NiAlphaProperty* pOldAlpha = pCachedGeom->spAlphaNoBlend.m_pObject;
-            if (pOldAlpha != palphanoblend) {
-                if (pOldAlpha) {
-                    pOldAlpha->DecRefCount();
-                }
-                pCachedGeom->spAlphaNoBlend.m_pObject = palphanoblend;
-                palphanoblend->IncRefCount();
-            }
-            // EXE-INLINED 0x66B0D0
-            pOldAlpha = pCachedGeom->spAlphaBlend.m_pObject;
-            if (pOldAlpha != palphablend) {
-                if (pOldAlpha) {
-                    pOldAlpha->DecRefCount();
-                }
-                pCachedGeom->spAlphaBlend.m_pObject = palphablend;
-                palphablend->IncRefCount();
-            }
+            pCachedGeom->spAlphaNoBlend = palphanoblend;
+            pCachedGeom->spAlphaBlend = palphablend;
             pCachedGeom->spStencil = pstencil;
             pCachedGeom->fBoundRadius = fBoundRadius;
             pCachedGeom->iMaxInstanceCount = inuminstances;
@@ -480,10 +461,6 @@ DistantLODShaderProperty::GetCachedGeometry(DistantLODParam* apDistantLODParam) 
                 pCachedGeom->bBillboard = true;
             }
             GetCachedGeometryMap()->SetAt(apDistantLODParam->iBaseObjectID, NiPointer<CachedGeometry>(pCachedGeom));
-            // The billboard texture's smart pointer goes out of scope.
-            if (pbasetexture) {
-                pbasetexture->DecRefCount();
-            }
         }
     }
     NiRefObject* pResult = spCachedGeom.m_pObject;

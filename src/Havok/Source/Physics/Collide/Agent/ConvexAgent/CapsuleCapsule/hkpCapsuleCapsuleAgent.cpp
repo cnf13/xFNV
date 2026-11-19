@@ -411,8 +411,7 @@ void hkpCapsuleCapsuleAgent::staticGetPenetrations(
     // The sum is a float local. The pair is reported only when the squared distance is below its square (not when
     // equal, above or NaN).
     const float radiusSum = capsB->m_radius + capsA->m_radius;
-    // EXE-INLINED none: hkPadSpu<float>::operator float (a load)
-    if (result.m_distanceSquared.m_storage < radiusSum * radiusSum) {
+    if (result.m_distanceSquared < radiusSum * radiusSum) {
         collector.addCdBodyPair(bodyA, bodyB);
     }
     HK_TIMER_END();

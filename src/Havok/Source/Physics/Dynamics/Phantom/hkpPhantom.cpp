@@ -178,8 +178,7 @@ void hkpPhantom::updateBroadPhase(const hkAabb& aabb) {
     }
     if (pWorld->m_criticalOperationsLockCount + pWorld->m_criticalOperationsLockCountForPhantoms) {
         hkWorldOperation::UpdatePhantomBP op;
-        // EXE-INLINED none: hkEnum<hkWorldOperation::Type, uint8_t>::operator=
-        op.m_type.m_storage = hkWorldOperation::PHANTOM_UPDATE_BROAD_PHASE;
+        op.m_type = hkWorldOperation::PHANTOM_UPDATE_BROAD_PHASE;
         op.m_phantom = this;
         op.m_aabb = const_cast<hkAabb*>(&aabb);
         pWorld->queueOperation(op);

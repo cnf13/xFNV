@@ -1,6 +1,7 @@
 #include "Havok/Source/Physics/Utilities/Weapons/hkpFirstPersonGun.h"
 
 #include "BSCore/RTTI.h"
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Queue/hkQueue.h"
 #include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
@@ -215,11 +216,7 @@ hkResult hkpFirstPersonGun::sweepSphere(
     if (kCollector.m_hitPoint.m_rootCollidableA) {
         out.m_contactPoint.m_position.m_quad = kCollector.m_hitPoint.m_contact.m_position.m_quad;
         out.m_contactPoint.m_separatingNormal.m_quad = kCollector.m_hitPoint.m_contact.m_separatingNormal.m_quad;
-        const hkpCollidable* pHit = kCollector.m_hitPoint.m_rootCollidableB;
-        // EXE-INLINED 0x4B59F0
-        out.m_body = pHit->getType() == hkpWorldObject::BROAD_PHASE_ENTITY
-            ? static_cast<hkpRigidBody*>(pHit->getOwner())
-            : nullptr;
+        out.m_body = hkpGetRigidBody(kCollector.m_hitPoint.m_rootCollidableB);
         out.m_shapeKey = kCollector.m_hitPoint.m_shapeKeyB;
         return HK_SUCCESS;
     }

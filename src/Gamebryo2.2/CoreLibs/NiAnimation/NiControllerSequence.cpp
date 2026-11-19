@@ -1604,16 +1604,7 @@ bool NiControllerSequence::ConvertOldNameControllerPair(const char* pcObjectName
         uint32_t uiArrayIndex = AddInterpolator(pkInterpolator, kIDTag, 0xFF);
         bool bAdded = uiArrayIndex != 0xFFFFFFFFu;
         if (bAdded) {
-            // EXE-INLINED none: NiPointer<NiInterpController>::operator=
-            NiPointer<NiInterpController>& rspCtlr = m_pkInterpArray[uiArrayIndex].m_spInterpCtlr;
-            NiInterpController* pkOldCtlr = rspCtlr.m_pObject;
-            if (pkOldCtlr != pkController) {
-                if (pkOldCtlr) {
-                    pkOldCtlr->DecRefCount();
-                }
-                rspCtlr.m_pObject = pkController;
-                pkController->IncRefCount();
-            }
+            m_pkInterpArray[uiArrayIndex].m_spInterpCtlr = pkController;
         }
 
         if (!bAdded) {

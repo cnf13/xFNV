@@ -94,12 +94,7 @@ void hkLs_collectAgentEntriesToProcess(
         if (minPriorityToProcess > static_cast<int32_t>(entry.m_agentEntry->m_collisionQualityIndex)) {
             continue;
         }
-        hkpLinkedCollidable* partner = entry.m_partner;
-        // The owner sits m_ownerOffset bytes from the collidable, as raw memory.
-        // EXE-INLINED 0x4B59D0
-        hkpEntity* otherEntity = static_cast<hkpEntity*>(
-            reinterpret_cast<hkpWorldObject*>(reinterpret_cast<uint8_t*>(partner) + partner->m_ownerOffset)
-        );
+        hkpEntity* otherEntity = static_cast<hkpEntity*>(entry.m_partner->getOwner());
         if (otherEntity->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
             if (entityState.m_data.m_storage[otherEntity->m_storageIndex] >= 8) {
                 continue;

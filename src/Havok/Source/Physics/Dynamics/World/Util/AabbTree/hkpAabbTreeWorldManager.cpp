@@ -566,10 +566,8 @@ void hkpAabbTreeWorldManager::buildKdTree(
         hkpKdTreeBuildCoordinatorJob& job = static_cast<hkpKdTreeBuildCoordinatorJob&>(static_cast<hkJob&>(jobEntry));
         // EXE-INLINED none: hkpKdTreeBuildCoordinatorJob::hkpKdTreeBuildCoordinatorJob
         job.m_jobSubType = hkpRayCastQueryJob::RAYCAST_QUERY_KD_TREE_BUILD_COORDINATOR_JOB;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        job.m_jobType.m_storage = HK_JOB_TYPE_RAYCAST_QUERY;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        job.m_jobSpuType.m_storage = HK_JOB_SPU_TYPE_ENABLED;
+        job.m_jobType = HK_JOB_TYPE_RAYCAST_QUERY;
+        job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
         job.m_size = sizeof(hkpKdTreeBuildCoordinatorJob);
         job.m_threadAffinity = -1;
         job.m_semaphore = m_kdTreeSemaphore;

@@ -106,13 +106,7 @@ const NiFixedString& NiExtraData::GetName() const {
 }
 
 void NiExtraData::SetName(const NiFixedString& kName) {
-    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-    if (m_kName.GetHandle() != kHandle) {
-        // EXE-INLINED 0x43BA10
-        NiGlobalStringTable::AcquireHandle(kHandle);
-        NiGlobalStringTable::ReleaseHandle(m_kName.GetHandle());
-        m_kName.SetHandle(kHandle);
-    }
+    m_kName.Assign(kName);
 }
 
 void NiExtraData::ClearName() {

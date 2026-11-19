@@ -649,8 +649,7 @@ void hkAgentNnMachine_ProcessAgent(
 
                 float distAtT1;
                 if (input.m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
-                    // EXE-INLINED none: hkPadSpu<int>::operator int
-                    if (!input.m_collisionQualityInfo->m_useContinuousPhysics.m_storage) {
+                    if (!input.m_collisionQualityInfo->m_useContinuousPhysics) {
                         // No continuous physics: no separating normal, and the agent always runs.
                         timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
                         timEntry->m_separatingNormal.setZero4();
@@ -694,17 +693,15 @@ void hkAgentNnMachine_ProcessAgent(
                         // Still separated at the step's end: the agent does not run.
                         timEntry->m_separatingNormal.m_quad[3] = distAtT1;
                         if (entry->m_numContactPoints) {
-                            // EXE-INLINED none: hkPadSpu<hkpConstraintOwner*>::operator hkpConstraintOwner*
                             input.m_dispatcher->m_agent3Func[entry->m_agentType].m_cleanupFunc(
-                                entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner.m_storage
+                                entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner
                             );
                         }
                         return;
                     }
                 }
             processAgent:
-                // EXE-INLINED none: hkPadSpu<float>::operator=
-                in3.m_distAtT1.m_storage = distAtT1;
+                in3.m_distAtT1 = distAtT1;
                 in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
                 input.m_dispatcher->m_agent3Func[entry->m_agentType].m_processFunc(
                     in3, entry, timEntry + 1, &timEntry->m_separatingNormal, output
@@ -1137,8 +1134,7 @@ void hkAgentNnMachine_InlineProcessAgent(
 
                 float distAtT1;
                 if (input.m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
-                    // EXE-INLINED none: hkPadSpu<int>::operator int
-                    if (!input.m_collisionQualityInfo->m_useContinuousPhysics.m_storage) {
+                    if (!input.m_collisionQualityInfo->m_useContinuousPhysics) {
                         // No continuous physics: no separating normal, and the agent always runs.
                         timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
                         timEntry->m_separatingNormal.setZero4();
@@ -1182,9 +1178,8 @@ void hkAgentNnMachine_InlineProcessAgent(
                         // Still separated at the step's end: the agent does not run, and counts as skipped.
                         timEntry->m_separatingNormal.m_quad[3] = distAtT1;
                         if (entry->m_numContactPoints) {
-                            // EXE-INLINED none: hkPadSpu<hkpConstraintOwner*>::operator hkpConstraintOwner*
                             input.m_dispatcher->m_agent3Func[entry->m_agentType].m_cleanupFunc(
-                                entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner.m_storage
+                                entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner
                             );
                         }
                         numTim++;
@@ -1192,8 +1187,7 @@ void hkAgentNnMachine_InlineProcessAgent(
                     }
                 }
             processAgent:
-                // EXE-INLINED none: hkPadSpu<float>::operator=
-                in3.m_distAtT1.m_storage = distAtT1;
+                in3.m_distAtT1 = distAtT1;
                 in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
                 input.m_dispatcher->m_agent3Func[entry->m_agentType].m_processFunc(
                     in3, entry, timEntry + 1, &timEntry->m_separatingNormal, output

@@ -108,8 +108,7 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
                 if (constraintOwner.m_constraintAddRemoveCounter.m_storage > 0) {
                     // EXE-INLINED none: hkpAddConstraintToCriticalLockedIslandPhysicsCommand's constructor
                     hkpAddConstraintToCriticalLockedIslandPhysicsCommand command;
-                    // EXE-INLINED none: hkEnum<hkpPhysicsCommand::TYPE, uint8_t>::operator=
-                    command.m_type.m_storage = hkpPhysicsCommand::TYPE_ADD_CONSTRAINT_TO_LOCKED_ISLAND;
+                    command.m_type = hkpPhysicsCommand::TYPE_ADD_CONSTRAINT_TO_LOCKED_ISLAND;
                     command.m_object0 = constraintOwner.m_constraintForCommand;
                     command.m_object1 = constraintOwner.m_callbackRequestForAddConstraint.m_storage;
                     constraintOwner.m_commandQueue.addCommand(command);
@@ -118,8 +117,7 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
                 else {
                     // EXE-INLINED none: hkpRemoveConstraintFromCriticalLockedIslandPhysicsCommand's constructor
                     hkpRemoveConstraintFromCriticalLockedIslandPhysicsCommand command;
-                    // EXE-INLINED none: hkEnum<hkpPhysicsCommand::TYPE, uint8_t>::operator=
-                    command.m_type.m_storage = hkpPhysicsCommand::TYPE_REMOVE_CONSTRAINT_FROM_LOCKED_ISLAND;
+                    command.m_type = hkpPhysicsCommand::TYPE_REMOVE_CONSTRAINT_FROM_LOCKED_ISLAND;
                     command.m_object = constraintOwner.m_constraintForCommand;
                     constraintOwner.m_commandQueue.addCommand(command);
                 }
@@ -248,8 +246,7 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
                 if (constraintOwner.m_constraintAddRemoveCounter.m_storage > 0) {
                     // EXE-INLINED none: hkpAddConstraintToCriticalLockedIslandPhysicsCommand's constructor
                     hkpAddConstraintToCriticalLockedIslandPhysicsCommand command;
-                    // EXE-INLINED none: hkEnum<hkpPhysicsCommand::TYPE, uint8_t>::operator=
-                    command.m_type.m_storage = hkpPhysicsCommand::TYPE_ADD_CONSTRAINT_TO_LOCKED_ISLAND;
+                    command.m_type = hkpPhysicsCommand::TYPE_ADD_CONSTRAINT_TO_LOCKED_ISLAND;
                     command.m_object0 = constraintOwner.m_constraintForCommand;
                     command.m_object1 = constraintOwner.m_callbackRequestForAddConstraint.m_storage;
                     constraintOwner.m_commandQueue.addCommand(command);
@@ -258,8 +255,7 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
                 else {
                     // EXE-INLINED none: hkpRemoveConstraintFromCriticalLockedIslandPhysicsCommand's constructor
                     hkpRemoveConstraintFromCriticalLockedIslandPhysicsCommand command;
-                    // EXE-INLINED none: hkEnum<hkpPhysicsCommand::TYPE, uint8_t>::operator=
-                    command.m_type.m_storage = hkpPhysicsCommand::TYPE_REMOVE_CONSTRAINT_FROM_LOCKED_ISLAND;
+                    command.m_type = hkpPhysicsCommand::TYPE_REMOVE_CONSTRAINT_FROM_LOCKED_ISLAND;
                     command.m_object = constraintOwner.m_constraintForCommand;
                     constraintOwner.m_commandQueue.addCommand(command);
                 }

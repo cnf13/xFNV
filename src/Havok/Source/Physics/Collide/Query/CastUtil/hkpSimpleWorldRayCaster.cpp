@@ -23,11 +23,7 @@
 // hit, the root collidable and the normal are turned back into world space.
 float hkpSimpleWorldRayCaster::addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) {
     const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle);
-    // The owner sits m_ownerOffset bytes from the handle (getOwner: a byte offset over untyped memory).
-    // EXE-INLINED 0x9B2C90
-    hkpCollidable* col = static_cast<hkpCollidable*>(static_cast<void*>(
-        const_cast<char*>(static_cast<const char*>(static_cast<const void*>(pHandle))) + pHandle->m_ownerOffset
-    ));
+    hkpCollidable* col = static_cast<hkpCollidable*>(const_cast<hkpTypedBroadPhaseHandle*>(pHandle)->getOwner());
     const hkpShape* shape = col->m_shape;
     if (shape) {
         if (!m_filter->isCollisionEnabled(m_input[castIndex], *col).m_bool) {

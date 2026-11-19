@@ -223,8 +223,7 @@ uint32_t hkMoppBvTreeShapeBase::queryAabbImpl(const hkAabb& aAabb, uint32_t* hit
     code.m_data.m_data = const_cast<uint8_t*>(m_moppData);
     code.m_data.m_size = m_moppDataSize;
     code.m_data.m_capacityAndFlags = m_moppDataSize;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    code.m_buildType.m_storage = static_cast<int8_t>(hkpMoppCode::BUILD_NOT_SET);
+    code.m_buildType = hkpMoppCode::BUILD_NOT_SET;
     // The results array over the caller's buffer, which is treated as untyped memory: the caller passes shape keys, the
     // query writes 4-byte primitive infos into it. The array is 16-aligned.
     // EXE-INLINED 0x62E230
@@ -312,8 +311,7 @@ hkBool hkpMoppBvTreeShape::castRayImpl(const hkpShapeRayCastInput& input, hkpSha
     // EXE-INLINED 0x632CA0
     machine.m_ray.m_filterInfo = 0;
     machine.m_ray.m_rayShapeCollectionFilter = nullptr;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    code.m_buildType.m_storage = static_cast<int8_t>(hkpMoppCode::BUILD_NOT_SET);
+    code.m_buildType = hkpMoppCode::BUILD_NOT_SET;
     // The child is the shape collection the code was built over; the SDK casts it down.
     const hkpShapeCollection* collection = static_cast<const hkpShapeCollection*>(m_child.m_childShape);
     hkBool result = machine.queryLongRay_00DD2DF0(collection, &code, input, results);
@@ -351,8 +349,7 @@ void hkpMoppBvTreeShape::castRayWithCollectorImpl(
     // EXE-INLINED 0x632CA0
     machine.m_ray.m_filterInfo = 0;
     machine.m_ray.m_rayShapeCollectionFilter = nullptr;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    code.m_buildType.m_storage = static_cast<int8_t>(hkpMoppCode::BUILD_NOT_SET);
+    code.m_buildType = hkpMoppCode::BUILD_NOT_SET;
     // EXE-INLINED none: hkpCdBody::setShape
     body.m_shape = pChild;
     body.m_shapeKey = 0;
@@ -383,8 +380,7 @@ hkVector4Comparison hkpMoppBvTreeShape::castRayBundleImpl(
     code.m_data.m_data = const_cast<uint8_t*>(m_moppData);
     code.m_data.m_size = m_moppDataSize;
     code.m_data.m_capacityAndFlags = m_moppDataSize;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    code.m_buildType.m_storage = static_cast<int8_t>(hkpMoppCode::BUILD_NOT_SET);
+    code.m_buildType = hkpMoppCode::BUILD_NOT_SET;
     // The child is the shape collection the code was built over; the SDK casts it down.
     const hkpShapeCollection* collection = static_cast<const hkpShapeCollection*>(m_child.m_childShape);
     hkpMoppRayBundleVirtualMachine machine;

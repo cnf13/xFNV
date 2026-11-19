@@ -425,38 +425,18 @@ bool NiLookAtInterpolator::ResolveDependencies(NiAVObjectPalette* pkPalette) {
 bool NiLookAtInterpolator::SetUpDependencies() {
     const char* pcName = m_pkLookAt->m_kName.GetHandle();
     if (pcName) {
-        NiGlobalStringTable::GlobalStringHandle kName = NiGlobalStringTable::AddString(pcName);
-        // EXE-INLINED 0x43BA10
-        if (m_kLookAtName.GetHandle() != kName) {
-            NiGlobalStringTable::AcquireHandle(kName);
-            NiGlobalStringTable::ReleaseHandle(m_kLookAtName.GetHandle());
-            m_kLookAtName.m_kHandle = kName;
-        }
-        // EXE-INLINED 0x4381B0
-        NiGlobalStringTable::ReleaseHandle(kName);
+        m_kLookAtName.Assign(NiFixedString(pcName));
         m_pkLookAt = nullptr;
         return true;
     }
 
-    NiGlobalStringTable::GlobalStringHandle kEmpty = EmptyFS.GetHandle();
-    // EXE-INLINED 0x43BA10
-    if (m_kLookAtName.GetHandle() != kEmpty) {
-        NiGlobalStringTable::AcquireHandle(kEmpty);
-        NiGlobalStringTable::ReleaseHandle(m_kLookAtName.GetHandle());
-        m_kLookAtName.m_kHandle = kEmpty;
-    }
+    m_kLookAtName.Assign(EmptyFS);
     return false;
 }
 
 // The NiFixedString assignment: the new handle is taken before the old one is released.
 void NiLookAtInterpolator::SetLookAtName(const NiFixedString& kName) {
-    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-    // EXE-INLINED 0x43BA10
-    if (m_kLookAtName.GetHandle() != kHandle) {
-        NiGlobalStringTable::AcquireHandle(kHandle);
-        NiGlobalStringTable::ReleaseHandle(m_kLookAtName.GetHandle());
-        m_kLookAtName.m_kHandle = kHandle;
-    }
+    m_kLookAtName.Assign(kName);
 }
 
 // The clone's name is set to the empty string (SetUpDependencies/ResolveDependencies carry the target), and each
@@ -478,13 +458,7 @@ void NiLookAtInterpolator::CopyMembers(NiLookAtInterpolator* pkDest, NiCloningPr
     pkDest->m_uFlags = uNewFlags;
     pkDest->m_uFlags ^= (m_uFlags ^ uNewFlags) & AXIS_MASK;
     pkDest->m_pkLookAt = m_pkLookAt;
-    NiGlobalStringTable::GlobalStringHandle kEmpty = EmptyFS.GetHandle();
-    // EXE-INLINED 0x43BA10
-    if (pkDest->m_kLookAtName.GetHandle() != kEmpty) {
-        NiGlobalStringTable::AcquireHandle(kEmpty);
-        NiGlobalStringTable::ReleaseHandle(pkDest->m_kLookAtName.GetHandle());
-        pkDest->m_kLookAtName.m_kHandle = kEmpty;
-    }
+    pkDest->m_kLookAtName.Assign(EmptyFS);
     pkDest->m_kTransformValue = m_kTransformValue;
 
     for (uint32_t i = 0; i < 3; i++) {

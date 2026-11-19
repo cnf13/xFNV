@@ -205,16 +205,7 @@ NiAVObject* bhkRigidBodyT::CreateDisplayGeometry(NiNode* apNode) {
             pNode = ::new (pMemory) NiNode(0);
         }
     }
-    alignas(16) NiFixedString kName;
-    kName.SetHandle(NiGlobalStringTable::AddString(bhkRigidBodyT_Name));
-    pNode->SetName(kName);
-    // The temporary's destructor: the handle is reloaded after SetName and its count (8 bytes before the characters)
-    // dropped unless it is the null string. The string table's buffer header is raw untyped memory, hence the cast.
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-    if (kHandle != NiGlobalStringTable::NULL_STRING) {
-        NiAtomicDecrement(*reinterpret_cast<uint32_t*>(const_cast<char*>(kHandle) - 8));
-    }
+    pNode->SetName(NiFixedString(bhkRigidBodyT_Name));
     hkRotation kRotation;
     kRotation.set(kLocalRot);
     hkVector4 kPosition;

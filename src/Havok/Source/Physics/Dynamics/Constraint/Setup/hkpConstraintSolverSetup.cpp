@@ -115,8 +115,7 @@ void hkpConstraintSolverSetup::internalAddAccumulators(
         hkpVelocityAccumulator* fixedAcc = s.m_accumulatorsCurrent;
         // EXE-INLINED none: hkpVelocityAccumulator::setFixed
         fixedAcc->m_gravityFactor = 0.0f;
-        // EXE-INLINED none: hkEnum::operator= (a byte store)
-        fixedAcc->m_type.m_storage = static_cast<uint8_t>(hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY);
+        fixedAcc->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
         const hkQuadReal zero = {0.0f, 0.0f, 0.0f, 0.0f};
         fixedAcc->m_invMasses.m_quad = zero;
         fixedAcc->m_linearVel.m_quad = zero;
@@ -152,8 +151,7 @@ void hkpConstraintSolverSetup::internalAddAccumulators(
         acc->m_scratch0.m_quad = zero;
         acc->m_scratch123.m_col0.m_quad = zero;
     }
-    // EXE-INLINED none: hkEnum::operator= (a byte store)
-    s.m_accumulatorsCurrent->m_type.m_storage = static_cast<uint8_t>(hkpVelocityAccumulator::HK_END);
+    s.m_accumulatorsCurrent->m_type = hkpVelocityAccumulator::HK_END;
 }
 
 // Builds one constraint's Jacobian at a time: it points the query in at the constraint's two accumulators (restoring
@@ -365,8 +363,7 @@ int32_t hkpConstraintSolverSetup::solve(
     hkpVelocityAccumulator* fixedAcc = accumulators;
     // EXE-INLINED none: hkpVelocityAccumulator::setFixed
     fixedAcc->m_gravityFactor = 0.0f;
-    // EXE-INLINED none: hkEnum::operator= (a byte store)
-    fixedAcc->m_type.m_storage = static_cast<uint8_t>(hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY);
+    fixedAcc->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
     const hkQuadReal zero = {0.0f, 0.0f, 0.0f, 0.0f};
     fixedAcc->m_invMasses.m_quad = zero;
     fixedAcc->m_linearVel.m_quad = zero;
@@ -385,11 +382,10 @@ int32_t hkpConstraintSolverSetup::solve(
     }
     hkpVelocityAccumulator* firstAcc = accumulators + 1;
     // Havok's motionsOffset convention: the entity pointers stand for their motions at +0xE0.
-    // EXE-INLINED none: hkEnum::operator= (a byte store)
     hkRigidMotionUtilApplyForcesAndBuildAccumulators(
         stepInfo, reinterpret_cast<hkpMotion* const*>(bodies), numBodies, offsetof(hkpEntity, m_motion), firstAcc
     )
-        ->m_type.m_storage = static_cast<uint8_t>(hkpVelocityAccumulator::HK_END);
+        ->m_type = hkpVelocityAccumulator::HK_END;
     // Raw buffer memory: the element temps follow the schemas.
     hkpSolverElemTemp* elemTemp = reinterpret_cast<hkpSolverElemTemp*>(elemTempBegin);
     for (int32_t i = 0; i < island.m_constraintInfo.m_numSolverElemTemps; ++i) {
@@ -438,8 +434,7 @@ int32_t hkpConstraintSolverSetup::solve(
                     ci->m_constraint->m_data->buildJacobianCallback(constraintQueryIn);
                 }
             }
-            // EXE-INLINED none: hkEnum::operator< (a byte compare)
-            if (ci->m_priority.m_storage >= hkpConstraintInstance::PRIORITY_TOI_HIGHER) {
+            if (ci->m_priority >= hkpConstraintInstance::PRIORITY_TOI_HIGHER) {
                 // EXE-INLINED none: hkArray<hkConstraintInternal*>::pushBack (the router is fetched even when it fits)
                 hkMemoryRouter& router = hkMemoryRouter::getInstance();
                 if (deferred.m_size ==
@@ -677,8 +672,7 @@ int32_t hkpConstraintSolverSetup::calcBufferOffsetsForSolve(
         hkpVelocityAccumulator* fixedAcc = taskHeader.m_accumulatorsBase;
         // EXE-INLINED none: hkpVelocityAccumulator::setFixed
         fixedAcc->m_gravityFactor = 0.0f;
-        // EXE-INLINED none: hkEnum::operator= (a byte store)
-        fixedAcc->m_type.m_storage = static_cast<uint8_t>(hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY);
+        fixedAcc->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
         const hkQuadReal zero = {0.0f, 0.0f, 0.0f, 0.0f};
         fixedAcc->m_invMasses.m_quad = zero;
         fixedAcc->m_linearVel.m_quad = zero;
@@ -687,8 +681,7 @@ int32_t hkpConstraintSolverSetup::calcBufferOffsetsForSolve(
         fixedAcc->m_scratch123.m_col0.m_quad = zero;
         fixedAcc->m_scratch123.m_col1.m_quad = zero;
         fixedAcc->m_scratch123.m_col2.m_quad = zero;
-        // EXE-INLINED none: hkEnum::operator= (a byte store)
-        fixedAcc[numEntities + 1].m_type.m_storage = static_cast<uint8_t>(hkpVelocityAccumulator::HK_END);
+        fixedAcc[numEntities + 1].m_type = hkpVelocityAccumulator::HK_END;
     }
     return totalSize;
 }
@@ -756,9 +749,7 @@ hkBool hkpConstraintSolverSetup::internalIsMemoryOkForNewJacobianSchemas(
     );
     auto addConstraint = [&schemas, &elemTemp](hkpConstraintInstance* pInstance) {
         hkConstraintInternal* pInternal = pInstance->getInternal();
-        // EXE-INLINED none: hkEnum::operator>= (an unsigned byte compare)
-        const int32_t iSchemaSet =
-            pInstance->m_priority.m_storage >= hkpConstraintInstance::PRIORITY_TOI_FORCED ? 1 : 0;
+        const int32_t iSchemaSet = pInstance->m_priority >= hkpConstraintInstance::PRIORITY_TOI_FORCED ? 1 : 0;
         schemas[iSchemaSet] += pInternal->m_sizeOfSchemas;
         elemTemp += pInternal->m_numSolverElemTemps;
     };

@@ -562,8 +562,7 @@ hkSerializeUtil::detectFormat(hkEnum<hkSerializeUtil::FormatType, int32_t>* apRe
 
 // The bytes read are compared with the magic numbers that hkPackfileHeader's constructor sets.
 void hkSerializeUtil::detectFormat(hkStreamReader* reader, hkSerializeUtil::FormatDetails& details) {
-    // EXE-INLINED none: hkEnum<hkSerializeUtil::FormatType, int32_t>::operator=
-    details.m_formatType.m_storage = FORMAT_ERROR;
+    details.m_formatType = FORMAT_ERROR;
     details.m_version = static_cast<const char*>(nullptr);
     hkMemUtil::memSet(&details.m_layoutRules, 0, sizeof(hkStructureLayout::LayoutRules));
     char buf[128];
@@ -581,14 +580,12 @@ void hkSerializeUtil::detectFormat(hkStreamReader* reader, hkSerializeUtil::Form
     const hkPackfileHeader* header = reinterpret_cast<const hkPackfileHeader*>(buf);
     uint8_t isTagfile;
     if (nbytes >= 8 && *hkBinaryTagfile::isBinaryMagic(&isTagfile, header->m_magic[0], header->m_magic[1])) {
-        // EXE-INLINED none: hkEnum<hkSerializeUtil::FormatType, int32_t>::operator=
-        details.m_formatType.m_storage = FORMAT_TAGFILE_BINARY;
+        details.m_formatType = FORMAT_TAGFILE_BINARY;
         return;
     }
     if (nbytes >= static_cast<int32_t>(sizeof(hkPackfileHeader)) && header->m_magic[0] == magic.m_magic[0] &&
         header->m_magic[1] == magic.m_magic[1]) {
-        // EXE-INLINED none: hkEnum<hkSerializeUtil::FormatType, int32_t>::operator=
-        details.m_formatType.m_storage = FORMAT_PACKFILE_BINARY;
+        details.m_formatType = FORMAT_PACKFILE_BINARY;
         details.m_version = header->m_contentsVersion;
         hkMemUtil::memCpy(&details.m_layoutRules, header->m_layoutRules, sizeof(hkStructureLayout::LayoutRules));
         return;
@@ -596,8 +593,7 @@ void hkSerializeUtil::detectFormat(hkStreamReader* reader, hkSerializeUtil::Form
     if (!hkString::strStr(buf, "<hkpackfile ") && !hkString::strStr(buf, "<hkpackfile>")) {
         return;
     }
-    // EXE-INLINED none: hkEnum<hkSerializeUtil::FormatType, int32_t>::operator=
-    details.m_formatType.m_storage = FORMAT_PACKFILE_XML;
+    details.m_formatType = FORMAT_PACKFILE_XML;
     hkStringBuf tag(hkString::strStr(buf, "<hkpackfile"));
     hkStringPtr classVersion;
     int32_t version;

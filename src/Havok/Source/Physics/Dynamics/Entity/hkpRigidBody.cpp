@@ -690,8 +690,7 @@ void hkpRigidBody::updateBroadphaseAndResetCollisionInformationOfWarpedBody(hkpE
     }
     if (pWorld->m_criticalOperationsLockCount) {
         hkWorldOperation::UpdateMovedBodyInfo kOperation;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        kOperation.m_type.m_storage = hkWorldOperation::UPDATE_MOVED_BODY_INFO;
+        kOperation.m_type = hkWorldOperation::UPDATE_MOVED_BODY_INFO;
         kOperation.m_entity = entity;
         pWorld->queueOperation(kOperation);
         return;

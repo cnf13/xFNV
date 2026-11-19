@@ -45,13 +45,8 @@ void hkpAllRayHitCollector::addRayHit(const hkpCdBody& cdBody, const hkpShapeRay
     rRayHit.m_pad[0] = hitInfo.m_pad[0];
     rRayHit.m_pad[1] = hitInfo.m_pad[1];
     hkpRayHitCollector::shapeKeysFromCdBody(rRayHit.m_shapeKeys, 8, cdBody);
-    // EXE-INLINED 0x624020
-    const hkpCdBody* pRoot = &cdBody;
-    while (pRoot->m_parent) {
-        pRoot = pRoot->m_parent;
-    }
     // m_rootCollidable is not const here because its game users take it non-const, hence the const_cast.
-    rRayHit.m_rootCollidable = const_cast<hkpCollidable*>(static_cast<const hkpCollidable*>(pRoot));
+    rRayHit.m_rootCollidable = const_cast<hkpCollidable*>(cdBody.getRootCollidable());
 }
 
 hkpAllRayHitCollector::~hkpAllRayHitCollector() {}

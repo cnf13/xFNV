@@ -224,16 +224,16 @@ hkJobQueue::JobStatus hkCpuWorldLinearCastJob(hkJobQueue& jobQueue, hkJobQueue::
 
 hkCpuWorldLinearCastCollector::~hkCpuWorldLinearCastCollector() {}
 
-// The handle is taken as an hkpTypedBroadPhaseHandle and its owner is the collidable: the handle's address as untyped
-// bytes plus its signed byte m_ownerOffset.
+// The handle is taken as an hkpTypedBroadPhaseHandle and its owner is the collidable. getOwner is non-const here, hence
+// the const_cast.
 float hkCpuWorldLinearCastCollector::addBroadPhaseHandle(
     const hkpBroadPhaseHandle* broadPhaseHandle,
     int32_t castIndex
 ) {
     const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle);
-    // EXE-INLINED 0x9B2C90
-    const void* pOwner = reinterpret_cast<const char*>(pHandle) + pHandle->m_ownerOffset;
-    return testCollidable(static_cast<const hkpCollidable*>(pOwner));
+    return testCollidable(
+        static_cast<const hkpCollidable*>(const_cast<hkpTypedBroadPhaseHandle*>(pHandle)->getOwner())
+    );
 }
 
 // The k-d tree primitive id is the collidable; the cast always reports a hit.

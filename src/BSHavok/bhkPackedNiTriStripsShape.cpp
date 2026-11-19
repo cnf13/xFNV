@@ -389,9 +389,7 @@ void bhkPackedNiTriStripsShape::BuildDisplayGeometry(NiNode* apNode, const NiCol
 
             pMemory = NiMemObject::operator new(sizeof(NiTriShape));
             NiTriShape* ptriShape = pMemory ? ::new (pMemory) NiTriShape(ptsd) : nullptr;
-            alignas(16) NiFixedString kName;
-            // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-            kName.SetHandle(NiGlobalStringTable::AddString("bhkPackedNiTriStripsShape"));
+            alignas(16) NiFixedString kName("bhkPackedNiTriStripsShape");
             ptriShape->SetName(kName);
             float fScale = GetScale();
             fScale = __builtin_fabsf(fScale);

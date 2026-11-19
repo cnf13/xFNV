@@ -373,8 +373,8 @@ void bhkWorldObject::CopyCinfo(hkWorldObjectCinfo& arInfo) {
     auto* pkObject = static_cast<hkpWorldObject*>(phkObject);
     if (pkObject) {
         arInfo.m_shape = pkObject->m_collidable.m_shape;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        arInfo.m_broadPhaseType.m_storage = pkObject->m_collidable.m_broadPhaseHandle.m_type;
+        arInfo.m_broadPhaseType =
+            static_cast<hkpWorldObject::BroadPhaseType>(pkObject->m_collidable.m_broadPhaseHandle.m_type);
     }
     arInfo.m_properties.m_size = 0;
     // Re-reads the wrapped object here.

@@ -872,8 +872,7 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 						}
 					}
 				processTim:
-					// EXE-INLINED none: hkPadSpu<float>::operator=
-					in3.m_distAtT1.m_storage = distAtT1;
+					in3.m_distAtT1 = distAtT1;
 					extractShapes();
 					currentData = static_cast<uint8_t*>(dispatcher->m_agent3Func[entry->m_agentType].m_processFunc(in3,
 						entry, timEntry + 1, &timEntry->m_separatingNormal, output));
@@ -930,8 +929,7 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 					}
 				processTimFlipped:
 					{
-						// EXE-INLINED none: hkPadSpu<float>::operator=
-						flippedTimInput.m_distAtT1.m_storage = distAtT1;
+						flippedTimInput.m_distAtT1 = distAtT1;
 						extractShapes();
 						hkpProcessCdPoint* pp = output.m_firstFreeContactPoint.m_storage;
 						const float oldToi = output.m_toi.m_time.m_storage;

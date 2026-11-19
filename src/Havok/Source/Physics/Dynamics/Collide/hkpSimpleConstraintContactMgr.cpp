@@ -519,12 +519,7 @@ hkpRigidBody* hkpSimpleConstraintContactMgr::setContactPointProperties(
     float restitutionScaled = restitution * 128.0;
     cpi->m_restitution = static_cast<uint8_t>(hkMath::hkToIntFast(restitutionScaled));
     cpi->m_maxImpulse.m_value = 0;
-    // EXE-INLINED 0x624020
-    const hkpCdBody* root = &a;
-    while (root->m_parent) {
-        root = root->m_parent;
-    }
-    hkpRigidBody* rbOfA = static_cast<hkpRigidBody*>(static_cast<const hkpCollidable*>(root)->getOwner());
+    hkpRigidBody* rbOfA = static_cast<hkpRigidBody*>(a.getRootCollidable()->getOwner());
     hkpSimpleContactConstraintAtom* atom = m_contactConstraintData.m_atom;
     int32_t numA = atom->m_numUserDatasForBodyA;
     int32_t numB = atom->m_numUserDatasForBodyB;

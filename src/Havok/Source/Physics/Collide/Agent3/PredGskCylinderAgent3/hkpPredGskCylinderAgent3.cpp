@@ -326,18 +326,8 @@ hkpAgentData* hkPredGskCylinderAgent3::process(
     const hkpProcessCollisionInput* processInput = input.m_input;
     const hkpCollisionQualityInfo& qualityInfo = *processInput->m_collisionQualityInfo;
     if (qualityInfo.m_useContinuousPhysics.m_storage) {
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = input.m_bodyA;
-        while (rootA->m_parent) {
-            rootA = rootA->m_parent;
-        }
-        const float depthA = static_cast<const hkpCollidable*>(rootA)->m_allowedPenetrationDepth;
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = input.m_bodyB;
-        while (rootB->m_parent) {
-            rootB = rootB->m_parent;
-        }
-        const float depthB = static_cast<const hkpCollidable*>(rootB)->m_allowedPenetrationDepth;
+        const float depthA = input.m_bodyA->getRootCollidable()->m_allowedPenetrationDepth;
+        const float depthB = input.m_bodyB->getRootCollidable()->m_allowedPenetrationDepth;
         // EXE-INLINED 0xC9E0F0
         const float allowedPenetrationDepth = (depthA < depthB) ? depthA : depthB;
         const float distAtT0 = (*separatingNormal)(3);

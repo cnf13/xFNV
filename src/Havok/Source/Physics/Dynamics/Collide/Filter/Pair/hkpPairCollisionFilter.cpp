@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Dynamics/Collide/Filter/Pair/hkpPairCollisionFilter.h"
 
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -21,6 +22,7 @@
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
 #include <new>
@@ -66,16 +68,8 @@ hkpPairCollisionFilter::isCollisionEnabled(const hkpCollidable& collidableA, con
         result.m_bool = 0;
         return result;
     }
-    const hkpEntity* entityA = nullptr;
-    // EXE-INLINED 0x4B59F0
-    if (collidableA.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        entityA = static_cast<const hkpEntity*>(collidableA.getOwner());
-    }
-    const hkpEntity* entityB = nullptr;
-    // EXE-INLINED 0x4B59F0
-    if (collidableB.m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        entityB = static_cast<const hkpEntity*>(collidableB.getOwner());
-    }
+    const hkpEntity* entityA = hkpGetRigidBody(&collidableA);
+    const hkpEntity* entityB = hkpGetRigidBody(&collidableB);
     result = isCollisionEnabled(entityA, entityB);
     return result;
 }

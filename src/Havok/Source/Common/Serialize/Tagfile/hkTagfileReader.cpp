@@ -11,19 +11,16 @@ hkTagfileReader::detectFormat(hkEnum<hkTagfileReader::FormatType, int32_t>* apRe
     int32_t buf[4];
     stream->setMark(16);
     if (stream->read(buf, 16) != 16) {
-        // EXE-INLINED none: hkEnum<hkTagfileReader::FormatType, int32_t>::operator=
-        apResult->m_storage = FORMAT_ERROR;
+        *apResult = FORMAT_ERROR;
         return apResult;
     }
     stream->rewindToMark();
     uint8_t ucIsBinary;
     if (*hkBinaryTagfile::isBinaryMagic(&ucIsBinary, buf[0], buf[1])) {
-        // EXE-INLINED none: hkEnum<hkTagfileReader::FormatType, int32_t>::operator=
-        apResult->m_storage = FORMAT_BINARY;
+        *apResult = FORMAT_BINARY;
     }
     else {
-        // EXE-INLINED none: hkEnum<hkTagfileReader::FormatType, int32_t>::operator=
-        apResult->m_storage = FORMAT_UNKNOWN;
+        *apResult = FORMAT_UNKNOWN;
     }
     return apResult;
 }

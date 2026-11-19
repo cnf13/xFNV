@@ -1078,8 +1078,7 @@ void hkpWorldOperationUtil::removeAttachedActionsFromFixedIsland(
 void hkpWorldOperationUtil::updateEntityBP(hkpWorld* world, hkpEntity* entity) {
     if (world->m_criticalOperationsLockCount) {
         hkWorldOperation::UpdateEntityBP op;
-        // EXE-INLINED none: hkEnum<hkWorldOperation::Type, uint8_t>::operator=
-        op.m_type.m_storage = hkWorldOperation::ENTITY_UPDATE_BROAD_PHASE;
+        op.m_type = hkWorldOperation::ENTITY_UPDATE_BROAD_PHASE;
         op.m_entity = entity;
         world->queueOperation(op);
         return;

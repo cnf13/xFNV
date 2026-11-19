@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Utilities/VisualDebugger/Viewer/Utilities/hkpMousePickingViewer.h"
 
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
@@ -90,27 +91,23 @@ hkBool hkpMousePickingViewer::pickObject(uint64_t id, const hkVector4& worldPosi
     }
     // The id is the collidable's address as an integer, and the collidable is read through it.
     hkpCollidable* collidable = reinterpret_cast<hkpCollidable*>(address);
-    // The rigid body owning an entity's collidable, as the SDK's hkGetRigidBody does it.
-    // EXE-INLINED 0x4B59F0
-    if (collidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        hkpRigidBody* rb = static_cast<hkpRigidBody*>(collidable->getOwner());
-        if (rb) {
-            hkpWorld* world = rb->m_world;
-            m_currentWorld = world;
-            if (rb->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED && rb->m_world == world) {
-                hkVector4 positionInRbLocal;
-                positionInRbLocal.setTransformedInversePos(rb->m_motion.m_motionState.m_transform, worldPosition);
-                hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-                hkpMouseSpringAction* memory =
-                    static_cast<hkpMouseSpringAction*>(Instance->m_heap->blockAlloc(sizeof(hkpMouseSpringAction)));
-                memory->m_memSizeAndFlags = sizeof(hkpMouseSpringAction);
-                hkpMouseSpringAction* mouseSpring = ::new (memory)
-                    hkpMouseSpringAction(positionInRbLocal, worldPosition, 0.5f, 0.3f, 0.95f, rb, nullptr);
-                float maxRelativeForce = m_mouseSpringMaxRelativeForce;
-                m_mouseSpring = mouseSpring;
-                mouseSpring->setMaxRelativeForce(maxRelativeForce);
-                m_currentWorld->addAction(m_mouseSpring);
-            }
+    hkpRigidBody* rb = hkpGetRigidBody(collidable);
+    if (rb) {
+        hkpWorld* world = rb->m_world;
+        m_currentWorld = world;
+        if (rb->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED && rb->m_world == world) {
+            hkVector4 positionInRbLocal;
+            positionInRbLocal.setTransformedInversePos(rb->m_motion.m_motionState.m_transform, worldPosition);
+            hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+            hkpMouseSpringAction* memory =
+                static_cast<hkpMouseSpringAction*>(Instance->m_heap->blockAlloc(sizeof(hkpMouseSpringAction)));
+            memory->m_memSizeAndFlags = sizeof(hkpMouseSpringAction);
+            hkpMouseSpringAction* mouseSpring =
+                ::new (memory) hkpMouseSpringAction(positionInRbLocal, worldPosition, 0.5f, 0.3f, 0.95f, rb, nullptr);
+            float maxRelativeForce = m_mouseSpringMaxRelativeForce;
+            m_mouseSpring = mouseSpring;
+            mouseSpring->setMaxRelativeForce(maxRelativeForce);
+            m_currentWorld->addAction(m_mouseSpring);
         }
     }
     return true;

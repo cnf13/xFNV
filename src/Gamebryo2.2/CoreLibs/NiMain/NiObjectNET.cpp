@@ -471,20 +471,7 @@ void NiObjectNET::RemoveAllControllers() {
 void NiObjectNET::CopyMembers(NiObjectNET* pkDest, NiCloningProcess& kCloning) {
     NiObject::CopyMembers(pkDest, kCloning);
     if (kCloning.m_eCopyType == COPY_EXACT) {
-        // EXE-INLINED none: NiFixedString::operator=
-        NiGlobalStringTable::GlobalStringHandle kHandle = m_kName.GetHandle();
-        if (pkDest->m_kName.GetHandle() != kHandle) {
-            if (kHandle != NiGlobalStringTable::NULL_STRING) {
-                // EXE-INLINED 0x438210
-                InterlockedIncrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kHandle - 8)));
-            }
-            NiGlobalStringTable::GlobalStringHandle kOld = pkDest->m_kName.GetHandle();
-            if (kOld != NiGlobalStringTable::NULL_STRING) {
-                // EXE-INLINED 0x438210
-                InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kOld - 8)));
-            }
-            pkDest->m_kName.SetHandle(kHandle);
-        }
+        pkDest->m_kName = m_kName;
     }
     else if ((kCloning.m_eCopyType == COPY_UNIQUE) && (m_kName.GetHandle())) {
         size_t stQuantity = strlen(m_kName.GetHandle()) + 2;
@@ -492,18 +479,7 @@ void NiObjectNET::CopyMembers(NiObjectNET* pkDest, NiCloningProcess& kCloning) {
         strcpy_s(pcNamePlus, stQuantity, m_kName.GetHandle());
         pcNamePlus[stQuantity - 2] = kCloning.m_cAppendChar;
         pcNamePlus[stQuantity - 1] = 0;
-        // The temporary NiFixedString(pcNamePlus).
-        // EXE-INLINED 0x438170
-        NiGlobalStringTable::GlobalStringHandle kNew =
-            pcNamePlus ? NiGlobalStringTable::AddString(pcNamePlus) : NiGlobalStringTable::NULL_STRING;
-        NiFixedString kName;
-        kName.SetHandle(kNew);
-        pkDest->SetName(kName);
-        // EXE-INLINED 0x4381B0
-        if (kNew != NiGlobalStringTable::NULL_STRING) {
-            // EXE-INLINED 0x438210
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kNew - 8)));
-        }
+        pkDest->SetName(NiFixedString(pcNamePlus));
         _NiFree(pcNamePlus);
     }
 
@@ -617,19 +593,7 @@ bool NiObjectNET::AddExtraData(NiExtraData* pkExtra) {
             char* pcGeneratedKey = static_cast<char*>(_NiMalloc(uiLen));
             NiStrncpy(pcGeneratedKey, uiLen, pcRTTI, uiStrLength);
             strcat_s(pcGeneratedKey, uiLen, pcSuffix);
-            NiFixedString kName(pcGeneratedKey);
-            pkExtra->SetName(kName);
-            // Drops the temporary's reference unless it is the null handle. The count is the untyped first 32-bit word
-            // of the interned buffer, decremented as raw memory.
-            // EXE-INLINED 0x4381B0
-            NiGlobalStringTable::GlobalStringHandle kHandle = kName.GetHandle();
-            if (kHandle != NiGlobalStringTable::NULL_STRING) {
-                InterlockedDecrementUInt32(
-                    reinterpret_cast<volatile uint32_t*>(
-                        const_cast<char*>(NiGlobalStringTable::GetRealBufferStart(kHandle))
-                    )
-                );
-            }
+            pkExtra->SetName(NiFixedString(pcGeneratedKey));
             _NiFree(pcGeneratedKey);
         }
     }
@@ -653,13 +617,7 @@ bool NiObjectNET::AddExtraData(const NiFixedString& kKey, NiExtraData* pkExtra) 
 }
 
 void NiObjectNET::SetName(const NiFixedString& strName) {
-    NiGlobalStringTable::GlobalStringHandle kHandle = strName.GetHandle();
-    if (m_kName.GetHandle() != kHandle) {
-        // EXE-INLINED 0x43BA10
-        NiGlobalStringTable::AcquireHandle(kHandle);
-        NiGlobalStringTable::ReleaseHandle(m_kName.GetHandle());
-        m_kName.SetHandle(kHandle);
-    }
+    m_kName.Assign(strName);
 }
 
 void NiObjectNET::SetDefaultCopyType(CopyType eCopyType) {

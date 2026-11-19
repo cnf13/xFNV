@@ -87,12 +87,7 @@ hkBool hkpGroupCollisionFilter::isCollisionEnabled(
     uint32_t bKey
 ) const {
     uint32_t CollisionFilterInfo = bContainer.getCollisionFilterInfo(bKey);
-    // EXE-INLINED 0x624020
-    const hkpCdBody* root = &a;
-    while (root->m_parent) {
-        root = root->m_parent;
-    }
-    const hkpCollidable* rootCollidable = static_cast<const hkpCollidable*>(root);
+    const hkpCollidable* rootCollidable = a.getRootCollidable();
     return isCollisionEnabled(rootCollidable->m_broadPhaseHandle.m_collisionFilterInfo, CollisionFilterInfo);
 }
 

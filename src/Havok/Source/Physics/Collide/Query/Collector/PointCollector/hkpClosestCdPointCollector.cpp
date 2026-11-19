@@ -23,12 +23,7 @@ void hkpClosestCdPointCollector::addCdPoint(const hkpCdPoint& event) {
     if (!m_hitPoint.m_rootCollidableA ||
         m_hitPoint.m_contact.m_separatingNormal.m_quad[3] > event.m_contact.m_separatingNormal.m_quad[3]) {
         m_hitPoint.m_contact = event.m_contact;
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = event.m_cdBodyA;
-        while (rootA->m_parent != nullptr) {
-            rootA = rootA->m_parent;
-        }
-        m_hitPoint.m_rootCollidableA = static_cast<const hkpCollidable*>(rootA);
+        m_hitPoint.m_rootCollidableA = event.m_cdBodyA->getRootCollidable();
         m_hitPoint.m_shapeKeyA = event.m_cdBodyA->m_shapeKey;
         int32_t depthA = 0;
         for (const hkpCdBody* pParent = event.m_cdBodyA->m_parent; pParent; pParent = pParent->m_parent) {
@@ -40,12 +35,7 @@ void hkpClosestCdPointCollector::addCdPoint(const hkpCdPoint& event) {
             m_hitPoint.m_shapeKeysA[i] = pBodyA->m_shapeKey;
             pBodyA = pBodyA->m_parent;
         }
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = event.m_cdBodyB;
-        while (rootB->m_parent != nullptr) {
-            rootB = rootB->m_parent;
-        }
-        m_hitPoint.m_rootCollidableB = static_cast<const hkpCollidable*>(rootB);
+        m_hitPoint.m_rootCollidableB = event.m_cdBodyB->getRootCollidable();
         m_hitPoint.m_shapeKeyB = event.m_cdBodyB->m_shapeKey;
         int32_t depthB = 0;
         for (const hkpCdBody* pParent = event.m_cdBodyB->m_parent; pParent; pParent = pParent->m_parent) {

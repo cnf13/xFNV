@@ -145,8 +145,7 @@ hkSerializableCinfo& bhkAabbPhantom::CreateCinfo(bool& arCreated) {
         pInfo->m_properties.m_capacityAndFlags = hkArrayBase<hkWorldObjectCinfo::Property>::DONT_DEALLOCATE_FLAG;
         pInfo->m_collisionFilterInfo = 0;
         pInfo->m_shape = nullptr;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        pInfo->m_broadPhaseType.m_storage = hkpWorldObject::BROAD_PHASE_PHANTOM;
+        pInfo->m_broadPhaseType = hkpWorldObject::BROAD_PHASE_PHANTOM;
         pInfo->aabb.m_min.setZero4();
         pInfo->aabb.m_max.setZero4();
         this->pInfo = pInfo;

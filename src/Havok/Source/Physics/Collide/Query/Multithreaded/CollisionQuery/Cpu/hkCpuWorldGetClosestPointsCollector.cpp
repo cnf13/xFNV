@@ -31,10 +31,8 @@ float hkCpuWorldGetClosestPointsCollector::addBroadPhaseHandle(
     int32_t castIndex
 ) {
     const hkpTypedBroadPhaseHandle* pHandle = static_cast<const hkpTypedBroadPhaseHandle*>(broadphaseHandle);
-    // getOwner: adds the handle's signed byte offset to its address as raw bytes.
-    // EXE-INLINED 0x9B2C90
     const hkpCollidable* pCollidable =
-        reinterpret_cast<const hkpCollidable*>(reinterpret_cast<const char*>(pHandle) + pHandle->m_ownerOffset);
+        static_cast<const hkpCollidable*>(const_cast<hkpTypedBroadPhaseHandle*>(pHandle)->getOwner());
     return testCollidable(pCollidable);
 }
 

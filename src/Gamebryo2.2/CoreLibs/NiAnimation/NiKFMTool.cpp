@@ -12,12 +12,5 @@ void NiStandardizeFilePath(NiFixedString& kString) {
     char acPath[0x104];
     strcpy_s(acPath, sizeof(acPath), kString);
     NiPath::Standardize(acPath);
-    NiGlobalStringTable::GlobalStringHandle kOld = kString.GetHandle();
-    // EXE-INLINED none: NiFixedString::operator=(const char*)
-    if (kOld != acPath) {
-        kString.SetHandle(NiGlobalStringTable::AddString(acPath));
-        if (kOld != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<volatile uint32_t*>(const_cast<char*>(kOld) - 8));
-        }
-    }
+    kString = acPath;
 }

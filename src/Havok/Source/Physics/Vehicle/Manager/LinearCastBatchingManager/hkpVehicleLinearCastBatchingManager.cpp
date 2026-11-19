@@ -136,8 +136,7 @@ int32_t hkpVehicleLinearCastBatchingManager::buildAndAddCastJobs(
         // EXE-INLINED none: hkpPairLinearCastJob::hkpPairLinearCastJob
         hkpPairLinearCastJob job;
         job.m_jobSubType = hkpCollisionQueryJob::COLLISION_QUERY_PAIR_LINEAR_CAST;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        job.m_jobType.m_storage = HK_JOB_TYPE_COLLISION_QUERY;
+        job.m_jobType = HK_JOB_TYPE_COLLISION_QUERY;
         job.m_jobSpuType.m_storage = HK_JOB_SPU_TYPE_DISABLED;
         job.m_size = sizeof(hkpPairLinearCastJob);
         job.m_threadAffinity = -1;

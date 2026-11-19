@@ -221,8 +221,7 @@ void hkpStorageMeshShape::addSubpart(const hkpMeshShape::Subpart& partIn) {
     hkpMeshShape::Subpart* pNew = m_subparts.m_data + m_subparts.m_size;
     if (pNew != nullptr) {
         // EXE-INLINED none: hkpMeshShape::Subpart::Subpart
-        // EXE-INLINED none: hkEnum<MeshShapeMaterialIndexStridingType, int8_t>::operator=
-        pNew->m_materialIndexStridingType.m_storage = hkpMeshShape::MATERIAL_INDICES_INT8;
+        pNew->m_materialIndexStridingType = hkpMeshShape::MATERIAL_INDICES_INT8;
         pNew->m_materialIndexStriding = 0;
         pNew->m_materialStriding = 0;
         pNew->m_numMaterials = 1;

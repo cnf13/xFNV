@@ -219,8 +219,7 @@ hkSerializableCinfo& bhkMotorAction::CreateCinfo(bool& arCreated) {
 // goes through bhkVector4::operator=.
 void bhkMotorAction::CopyCinfo(hkMotorActionCinfo& arInfo) {
     bhkUnaryAction::CopyCinfo(arInfo);
-    // EXE-INLINED none: hkBool::operator=
-    arInfo.m_active.m_bool = 1;
+    arInfo.m_active = true;
     // EXE-INLINED none: bhkMotorAction::GethkAxis
     const hkVector4* pAxis = (this && phkObject) ? &static_cast<hkpMotorAction*>(phkObject)->m_axis : &hkVector4Zero;
     arInfo.m_axis = *pAxis;

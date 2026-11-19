@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Utilities/CharacterControl/CharacterProxy/hkpCharacterProxy.h"
 
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/LocalArray/hkLocalArray.h"
@@ -198,12 +199,7 @@ void hkpCharacterProxy::calcContentStatistics(hkStatisticsCollector* collector, 
 void hkpCharacterProxy::entityRemovedCallback(hkpEntity* entity) {
     entity->removeEntityListener(this);
     for (int32_t i = m_manifold.m_size - 1; i >= 0; --i) {
-        const hkpCollidable* pRoot = m_manifold.m_data[i].m_rootCollidableB;
-        // EXE-INLINED 0x4B59F0
-        hkpEntity* pManifoldEntity = pRoot->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-            ? static_cast<hkpEntity*>(static_cast<hkpWorldObject*>(pRoot->getOwner()))
-            : nullptr;
-        if (pManifoldEntity == entity) {
+        if (hkpGetRigidBody(m_manifold.m_data[i].m_rootCollidableB) == entity) {
             // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points' empty
             // destruct there)
             m_manifold.m_size--;
@@ -400,31 +396,27 @@ void hkpCharacterProxy::updateManifold(
 
     // The proxy listens to every body and phantom the manifold touches.
     for (int32_t i = 0; i < m_manifold.m_size; ++i) {
-        const hkpCollidable* pRoot = m_manifold.m_data[i].m_rootCollidableB;
-        // EXE-INLINED 0x4B59F0
-        if (pRoot->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-            hkpRigidBody* pBody = static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pRoot->getOwner()));
-            if (pBody != nullptr) {
-                // EXE-INLINED 0x629F10
-                int32_t index = -1;
-                for (int32_t k = 0; k < m_bodies.m_size; ++k) {
-                    if (m_bodies.m_data[k] == pBody) {
-                        index = k;
-                        break;
-                    }
+        hkpRigidBody* pBody = hkpGetRigidBody(m_manifold.m_data[i].m_rootCollidableB);
+        if (pBody != nullptr) {
+            // EXE-INLINED 0x629F10
+            int32_t index = -1;
+            for (int32_t k = 0; k < m_bodies.m_size; ++k) {
+                if (m_bodies.m_data[k] == pBody) {
+                    index = k;
+                    break;
                 }
-                if (index == -1) {
-                    if (!isMultithreaded.m_bool) {
-                        pBody->addEntityListener(this);
-                    }
-                    // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-                    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                    if (m_bodies.m_size == (m_bodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*pHeap, &m_bodies, static_cast<int32_t>(sizeof(hkpRigidBody*)));
-                    }
-                    m_bodies.m_data[m_bodies.m_size] = pBody;
-                    m_bodies.m_size++;
+            }
+            if (index == -1) {
+                if (!isMultithreaded.m_bool) {
+                    pBody->addEntityListener(this);
                 }
+                // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
+                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
+                if (m_bodies.m_size == (m_bodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
+                    hkArrayUtil::_reserveMore(*pHeap, &m_bodies, static_cast<int32_t>(sizeof(hkpRigidBody*)));
+                }
+                m_bodies.m_data[m_bodies.m_size] = pBody;
+                m_bodies.m_size++;
             }
         }
         const hkpCollidable* pRootB = m_manifold.m_data[i].m_rootCollidableB;
@@ -475,46 +467,42 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
     surface.m_velocity.m_quad = _mm_setzero_ps();
     surface.m_extraDownStaticFriction = m_extraDownStaticFriction;
     surface.m_priority = 0;
-    const hkpCollidable* pRoot = hit.m_rootCollidableB;
-    // EXE-INLINED 0x4B59F0
-    if (pRoot->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        hkpRigidBody* pBody = static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pRoot->getOwner()));
-        if (pBody) {
-            uint8_t motionType = pBody->m_motion.m_type.m_storage;
-            if (motionType == hkpMotion::MOTION_FIXED || motionType == hkpMotion::MOTION_KEYFRAMED) {
-                pBody->getPointVelocity(hit.m_contact.m_position, surface.m_velocity);
-            }
-            else {
-                const hkSweptTransform& swept = pBody->m_motion.m_motionState.m_sweptTransform;
-                float invDeltaTime = swept.m_centerOfMass1.m_quad[3];
-                __m128 linVel = _mm_mul_ps(
-                    _mm_sub_ps(swept.m_centerOfMass1.m_quad, swept.m_centerOfMass0.m_quad),
-                    _mm_shuffle_ps(_mm_set_ss(invDeltaTime), _mm_set_ss(invDeltaTime), 0)
-                );
-                float invDeltaTime2 = swept.m_centerOfMass1.m_quad[3];
-                __m128 angVel = _mm_mul_ps(
-                    _mm_shuffle_ps(_mm_set_ss(invDeltaTime2), _mm_set_ss(invDeltaTime2), 0),
-                    pBody->m_motion.m_motionState.m_deltaAngle.m_quad
-                );
-                __m128 arm = _mm_sub_ps(hit.m_contact.m_position.m_quad, swept.m_centerOfMass1.m_quad);
-                surface.m_velocity.m_quad = _mm_sub_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(angVel, angVel, 0xC9), _mm_shuffle_ps(arm, arm, 0xD2)),
-                    _mm_mul_ps(_mm_shuffle_ps(angVel, angVel, 0xD2), _mm_shuffle_ps(arm, arm, 0xC9))
-                );
-                surface.m_velocity.m_quad = _mm_add_ps(surface.m_velocity.m_quad, linVel);
-            }
-            // EXE-INLINED none: hkVector4::dot3
-            __m128 prod = _mm_mul_ps(surface.m_velocity.m_quad, surface.m_plane.m_quad);
-            float velDot = _mm_cvtss_f32(
-                _mm_add_ss(_mm_shuffle_ps(prod, prod, 0xAA), _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod))
+    hkpRigidBody* pBody = hkpGetRigidBody(hit.m_rootCollidableB);
+    if (pBody) {
+        uint8_t motionType = pBody->m_motion.m_type.m_storage;
+        if (motionType == hkpMotion::MOTION_FIXED || motionType == hkpMotion::MOTION_KEYFRAMED) {
+            pBody->getPointVelocity(hit.m_contact.m_position, surface.m_velocity);
+        }
+        else {
+            const hkSweptTransform& swept = pBody->m_motion.m_motionState.m_sweptTransform;
+            float invDeltaTime = swept.m_centerOfMass1.m_quad[3];
+            __m128 linVel = _mm_mul_ps(
+                _mm_sub_ps(swept.m_centerOfMass1.m_quad, swept.m_centerOfMass0.m_quad),
+                _mm_shuffle_ps(_mm_set_ss(invDeltaTime), _mm_set_ss(invDeltaTime), 0)
             );
-            surface.m_plane.m_quad[3] = surface.m_plane.m_quad[3] - velDot * timeTravelled;
-            if (pBody->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
-                surface.m_priority = 2;
-            }
-            if (pBody->m_motion.m_type.m_storage == hkpMotion::MOTION_KEYFRAMED) {
-                surface.m_priority = 1;
-            }
+            float invDeltaTime2 = swept.m_centerOfMass1.m_quad[3];
+            __m128 angVel = _mm_mul_ps(
+                _mm_shuffle_ps(_mm_set_ss(invDeltaTime2), _mm_set_ss(invDeltaTime2), 0),
+                pBody->m_motion.m_motionState.m_deltaAngle.m_quad
+            );
+            __m128 arm = _mm_sub_ps(hit.m_contact.m_position.m_quad, swept.m_centerOfMass1.m_quad);
+            surface.m_velocity.m_quad = _mm_sub_ps(
+                _mm_mul_ps(_mm_shuffle_ps(angVel, angVel, 0xC9), _mm_shuffle_ps(arm, arm, 0xD2)),
+                _mm_mul_ps(_mm_shuffle_ps(angVel, angVel, 0xD2), _mm_shuffle_ps(arm, arm, 0xC9))
+            );
+            surface.m_velocity.m_quad = _mm_add_ps(surface.m_velocity.m_quad, linVel);
+        }
+        // EXE-INLINED none: hkVector4::dot3
+        __m128 prod = _mm_mul_ps(surface.m_velocity.m_quad, surface.m_plane.m_quad);
+        float velDot = _mm_cvtss_f32(
+            _mm_add_ss(_mm_shuffle_ps(prod, prod, 0xAA), _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod))
+        );
+        surface.m_plane.m_quad[3] = surface.m_plane.m_quad[3] - velDot * timeTravelled;
+        if (pBody->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
+            surface.m_priority = 2;
+        }
+        if (pBody->m_motion.m_type.m_storage == hkpMotion::MOTION_KEYFRAMED) {
+            surface.m_priority = 1;
         }
     }
     if (surface.m_plane.m_quad[3] < -1.1920929e-07f) {
@@ -550,21 +538,13 @@ float hkpCharacterProxy::surfaceDistance(const hkpRootCdPoint& p1, const hkpRoot
     hkVector4 velocity1;
     velocity1.m_quad = _mm_setzero_ps();
     velocity2.m_quad = _mm_setzero_ps();
-    const hkpCollidable* pRoot2 = p1.m_rootCollidableB;
-    // EXE-INLINED 0x4B59F0
-    if (pRoot2->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        hkpRigidBody* pBody2 = static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pRoot2->getOwner()));
-        if (pBody2 != nullptr) {
-            pBody2->getPointVelocity(p1.m_contact.m_position, velocity2);
-        }
+    hkpRigidBody* pBody2 = hkpGetRigidBody(p1.m_rootCollidableB);
+    if (pBody2 != nullptr) {
+        pBody2->getPointVelocity(p1.m_contact.m_position, velocity2);
     }
-    const hkpCollidable* pRoot1 = p2.m_rootCollidableB;
-    // EXE-INLINED 0x4B59F0
-    if (pRoot1->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        hkpRigidBody* pBody1 = static_cast<hkpRigidBody*>(static_cast<hkpWorldObject*>(pRoot1->getOwner()));
-        if (pBody1 != nullptr) {
-            pBody1->getPointVelocity(p2.m_contact.m_position, velocity1);
-        }
+    hkpRigidBody* pBody1 = hkpGetRigidBody(p2.m_rootCollidableB);
+    if (pBody1 != nullptr) {
+        pBody1->getPointVelocity(p2.m_contact.m_position, velocity1);
     }
     const __m128 velocityDelta = _mm_sub_ps(velocity2.m_quad, velocity1.m_quad);
     const __m128 velocityProduct = _mm_mul_ps(velocityDelta, velocityDelta);

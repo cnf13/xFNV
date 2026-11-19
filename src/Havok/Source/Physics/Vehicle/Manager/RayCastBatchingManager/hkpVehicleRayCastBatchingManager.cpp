@@ -138,8 +138,7 @@ int32_t hkpVehicleRayCastBatchingManager::buildAndAddCastJobs(
             // EXE-INLINED none: hkpShapeRayCastJob::hkpShapeRayCastJob
             hkpShapeRayCastJob job;
             job.m_jobSubType = hkpRayCastQueryJob::RAYCAST_QUERY_SHAPE_RAYCAST;
-            // EXE-INLINED none: hkEnum<E, S>::operator=
-            job.m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_RAYCAST_QUERY);
+            job.m_jobType = HK_JOB_TYPE_RAYCAST_QUERY;
             job.m_size = sizeof(hkpShapeRayCastJob);
             job.m_threadAffinity = -1;
             job.m_semaphore = semaphore;
@@ -149,8 +148,7 @@ int32_t hkpVehicleRayCastBatchingManager::buildAndAddCastJobs(
             job.m_numCommandsPerTask = hkpShapeRayCastJob::MAXIMUM_NUMBER_OF_COMMANDS_PER_TASK;
             job.m_commandArray = commandStorage;
             job.m_numCommands = numCommandsInJob;
-            // EXE-INLINED none: hkEnum<E, S>::operator=
-            job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+            job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
             jobHeader->m_openJobs =
                 (numCommandsInJob - 1) / hkpShapeRayCastJob::MAXIMUM_NUMBER_OF_COMMANDS_PER_TASK + 1;
             job.setRunsOnSpuOrPpu();

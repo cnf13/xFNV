@@ -103,10 +103,8 @@ hkCpuSolveConstraintsJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQu
         hkpIntegrateMotionJob& integrateJob = static_cast<hkpIntegrateMotionJob&>(static_cast<hkJob&>(entry));
         hkpBuildJacobianTaskHeader* taskHeader = job.m_taskHeader;
         integrateJob.m_jobSubType = hkpDynamicsJob::DYNAMICS_JOB_INTEGRATE_MOTION;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        integrateJob.m_jobType.m_storage = HK_JOB_TYPE_DYNAMICS;
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        integrateJob.m_jobSpuType.m_storage = HK_JOB_SPU_TYPE_DISABLED;
+        integrateJob.m_jobType = HK_JOB_TYPE_DYNAMICS;
+        integrateJob.m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
         integrateJob.m_size = sizeof(hkpIntegrateMotionJob);
         integrateJob.m_threadAffinity = -1;
         integrateJob.m_islandIndex = job.m_islandIndex;

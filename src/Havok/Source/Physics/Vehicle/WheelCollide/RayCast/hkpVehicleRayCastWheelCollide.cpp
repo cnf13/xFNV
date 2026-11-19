@@ -1,6 +1,7 @@
 #include "Havok/Source/Physics/Vehicle/WheelCollide/RayCast/hkpVehicleRayCastWheelCollide.h"
 
 #include "BSCore/RTTI.h"
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
@@ -345,15 +346,7 @@ void hkpVehicleRayCastWheelCollide::getCollisionOutputFromCastResult(
     cdInfo.m_contactShapeKey[5] = rayCastOutput.m_shapeKeys[5];
     cdInfo.m_contactShapeKey[6] = rayCastOutput.m_shapeKeys[6];
     cdInfo.m_contactShapeKey[7] = rayCastOutput.m_shapeKeys[7];
-    // EXE-INLINED 0x4B59F0
-    const hkpCollidable* rootCollidable = rayCastOutput.m_rootCollidable;
-    hkpRigidBody* contactBody;
-    if (rootCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        contactBody = static_cast<hkpRigidBody*>(rootCollidable->getOwner());
-    }
-    else {
-        contactBody = nullptr;
-    }
+    hkpRigidBody* contactBody = hkpGetRigidBody(rayCastOutput.m_rootCollidable);
     cdInfo.m_contactBody = contactBody;
     float radius = vehicle->m_data->m_wheelParams.m_data[wheelInfoNum].m_radius;
     float hitDistance = (radius + suspensionLength) * rayCastOutput.m_hitFraction;

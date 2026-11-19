@@ -20,6 +20,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAlphaProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
@@ -281,14 +282,7 @@ BSShaderProperty* BSShaderData::GetShaderProperty() {
 void BSShaderData::SetupTexturesTileShader(TileShaderProperty* pTileShaderProp) {
     if (pTextureSet) {
         const char* pcFilename = pTextureSet->GetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE);
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        NiGlobalStringTable::GlobalStringHandle kFilename =
-            pcFilename ? NiGlobalStringTable::AddString(pcFilename) : NiGlobalStringTable::NULL_STRING;
-        pTileShaderProp->TextureFilename.Set(kFilename, 0);
-        // EXE-INLINED none: NiFixedString::~NiFixedString (the refcount sits 8 bytes before the characters)
-        if (kFilename != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<uint32_t*>(const_cast<char*>(kFilename - 8)));
-        }
+        pTileShaderProp->TextureFilename.Set(NiFixedString(pcFilename), 0);
         pTileShaderProp->TexClampMode = eClampMode;
     }
 }
@@ -296,28 +290,14 @@ void BSShaderData::SetupTexturesTileShader(TileShaderProperty* pTileShaderProp) 
 void BSShaderData::SetupTexturesTallGrassShader(TallGrassShaderProperty* pTGShaderProp) {
     if (pTextureSet) {
         const char* pcFilename = pTextureSet->GetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE);
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        NiGlobalStringTable::GlobalStringHandle kFilename =
-            pcFilename ? NiGlobalStringTable::AddString(pcFilename) : NiGlobalStringTable::NULL_STRING;
-        pTGShaderProp->TextureFilename.Set(kFilename, 0);
-        // EXE-INLINED none: NiFixedString::~NiFixedString (the refcount sits 8 bytes before the characters)
-        if (kFilename != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<uint32_t*>(const_cast<char*>(kFilename - 8)));
-        }
+        pTGShaderProp->TextureFilename.Set(NiFixedString(pcFilename), 0);
     }
 }
 
 void BSShaderData::SetupTexturesSkyShader(SkyShaderProperty* pSkyShaderProp) {
     if (pTextureSet) {
         const char* pcFilename = pTextureSet->GetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE);
-        // EXE-INLINED none: NiFixedString::NiFixedString(const char*)
-        NiGlobalStringTable::GlobalStringHandle kFilename =
-            pcFilename ? NiGlobalStringTable::AddString(pcFilename) : NiGlobalStringTable::NULL_STRING;
-        pSkyShaderProp->TextureFilename.Set(kFilename, 0);
-        // EXE-INLINED none: NiFixedString::~NiFixedString (the refcount sits 8 bytes before the characters)
-        if (kFilename != NiGlobalStringTable::NULL_STRING) {
-            InterlockedDecrementUInt32(reinterpret_cast<uint32_t*>(const_cast<char*>(kFilename - 8)));
-        }
+        pSkyShaderProp->TextureFilename.Set(NiFixedString(pcFilename), 0);
         pSkyShaderProp->SetClampNI(eClampMode);
     }
 }

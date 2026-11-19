@@ -1,6 +1,7 @@
 #include "Havok/Source/Physics/Dynamics/SaveContactPoints/hkpSaveContactPointsUtil.h"
 
 #include "BSCore/MemoryManager.h"
+#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
@@ -200,11 +201,7 @@ void hkpSaveContactPointsUtil::saveContactPoints(
     int32_t numEntries,
     hkpPhysicsSystemWithContacts* sys
 ) {
-    // EXE-INLINED 0x4B59F0
-    const hkpLinkedCollidable* collidable = entries[0]->m_collidable[0];
-    hkpEntity* entity = collidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY
-        ? static_cast<hkpEntity*>(collidable->getOwner())
-        : nullptr;
+    hkpEntity* entity = hkpGetRigidBody(entries[0]->m_collidable[0]);
     hkpWorld* world = entity->m_world;
     for (int32_t i = 0; i < numEntries; ++i) {
         // EXE-INLINED none: hkpSerializedAgentNnEntry::operator new
@@ -245,8 +242,7 @@ hkResult hkpSaveContactPointsUtil::serializeCollisionEntry(
         )) {
         return HK_FAILURE;
     }
-    // EXE-INLINED none: hkEnum<hkpSerializedAgentNnEntry::SerializedAgentType, int8_t>::operator=
-    serializedEntryOut.m_agentType.m_storage = static_cast<int8_t>(agentType);
+    serializedEntryOut.m_agentType = agentType;
     if (sizeOfThisEntry) {
         hkString::memCpy(serializedEntryOut.m_nnEntryData, entry, sizeOfThisEntry);
     }
@@ -627,16 +623,8 @@ hkResult hkpSaveContactPointsUtil::deserializeCollisionEntry(
         return HK_FAILURE;
     }
 
-    // EXE-INLINED none: hkpGetRigidBody
     hkpLinkedCollidable* pCollidableA = entry->m_collidable[0];
-    hkpWorldObject* pOwnerA = nullptr;
-    if (pCollidableA->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-        // EXE-INLINED 0x4B59D0
-        // The owner is the collidable moved by its byte offset: untyped arithmetic, as in the exe.
-        pOwnerA =
-            reinterpret_cast<hkpWorldObject*>(reinterpret_cast<uint8_t*>(pCollidableA) + pCollidableA->m_ownerOffset);
-    }
-    if (static_cast<hkpWorldObject*>(entityA) != pOwnerA) {
+    if (entityA != hkpGetRigidBody(pCollidableA)) {
         entry->m_collidable[0] = entry->m_collidable[1];
         entry->m_collidable[1] = pCollidableA;
         const uint16_t usIndex = entry->m_agentIndexOnCollidable[0];
@@ -680,16 +668,7 @@ hkResult hkpSaveContactPointsUtil::deserializeCollisionEntry(
     }
 
     if (pMgr->m_contactConstraintData.m_atom->m_numContactPoints == 0) {
-        // EXE-INLINED none: hkpGetRigidBody
-        hkpLinkedCollidable* pCollidable = entry->m_collidable[0];
-        hkpWorldObject* pOwner = nullptr;
-        if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
-            // EXE-INLINED 0x4B59D0
-            // The owner is the collidable moved by its byte offset: untyped arithmetic, as in the exe.
-            pOwner =
-                reinterpret_cast<hkpWorldObject*>(reinterpret_cast<uint8_t*>(pCollidable) + pCollidable->m_ownerOffset);
-        }
-        hkpWorld* pWorld = pOwner->m_world;
+        hkpWorld* pWorld = hkpGetRigidBody(entry->m_collidable[0])->m_world;
         pWorld->m_criticalOperationsLockCount--;
         pWorld->m_blockExecutingPendingOperations.m_bool = true;
         hkpWorldOperationUtil::addConstraintImmediately(

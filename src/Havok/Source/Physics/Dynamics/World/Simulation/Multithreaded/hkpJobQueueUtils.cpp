@@ -27,10 +27,8 @@ void spawnSplitSimulationIslandJob(
         alignas(16) hkpSplitSimulationIslandJob splitJob;
         // EXE-INLINED none: hkpSplitSimulationIslandJob::hkpSplitSimulationIslandJob
         splitJob.m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SPLIT_ISLAND);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        splitJob.m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        splitJob.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+        splitJob.m_jobType = HK_JOB_TYPE_DYNAMICS;
+        splitJob.m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
         splitJob.m_size = static_cast<uint16_t>(sizeof(hkpSplitSimulationIslandJob));
         splitJob.m_threadAffinity = -1;
         splitJob.m_islandIndex = dynamicsJob->m_islandIndex;
@@ -58,10 +56,8 @@ void spawnBuildJacobiansJobs(
         hkpBuildJacobiansJob* job = static_cast<hkpBuildJacobiansJob*>(storage);
         // EXE-INLINED none: hkpBuildJacobiansJob::hkpBuildJacobiansJob
         job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_BUILD_JACOBIANS);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+        job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+        job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
         job->m_size = static_cast<uint16_t>(sizeof(hkpBuildJacobiansJob));
         job->m_threadAffinity = -1;
         job->m_islandIndex = dynamicsJob.m_islandIndex;
@@ -74,8 +70,7 @@ void spawnBuildJacobiansJobs(
     }
     taskHeader.m_openJobs = taskHeader.m_tasks.m_numBuildJacobianTasks;
     newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-    // EXE-INLINED none: hkEnum<E, S>::operator=
-    newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+    newJobCreated.m_job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
 }
 
 // The queue's pop callback for the integrate jobs: the job taken is a copy of the queue entry with its island looked
@@ -271,10 +266,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishCollideJob(
         hkpPostCollideJob* postCollideJob = static_cast<hkpPostCollideJob*>(storage);
         // EXE-INLINED none: hkpPostCollideJob::hkpPostCollideJob
         postCollideJob->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_POST_COLLIDE);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        postCollideJob->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-        // EXE-INLINED none: hkEnum<E, S>::operator=
-        postCollideJob->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+        postCollideJob->m_jobType = HK_JOB_TYPE_DYNAMICS;
+        postCollideJob->m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
         postCollideJob->m_size = static_cast<uint16_t>(sizeof(hkpPostCollideJob));
         postCollideJob->m_threadAffinity = -1;
         // The island index is stored twice (the base's copy, then the job's own), the same value both times.
@@ -317,10 +310,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 hkpFireJacobianSetupCallback* job = static_cast<hkpFireJacobianSetupCallback*>(storage);
                 // EXE-INLINED none: hkpFireJacobianSetupCallback::hkpFireJacobianSetupCallback
                 job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_FIRE_JACOBIAN_SETUP_CALLBACK);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+                job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                job->m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
                 job->m_size = static_cast<uint16_t>(sizeof(hkpFireJacobianSetupCallback));
                 job->m_threadAffinity = -1;
                 job->m_islandIndex = dynamicsJob.m_islandIndex;
@@ -345,10 +336,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     hkpSolveConstraintsJob* job = static_cast<hkpSolveConstraintsJob*>(storage);
                     // EXE-INLINED none: hkpSolveConstraintsJob::hkpSolveConstraintsJob
                     job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_CONSTRAINTS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                    job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                    job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                     job->m_size = static_cast<uint16_t>(sizeof(hkpSolveConstraintsJob));
                     job->m_threadAffinity = -1;
                     job->m_islandIndex = dynamicsJob.m_islandIndex;
@@ -375,21 +364,17 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     createdJob = job;
                 }
                 newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(
-                    taskHeader->m_solveInSingleThreadOnPpuOnly.m_bool != 0 ? HK_JOB_SPU_TYPE_DISABLED
-                                                                           : HK_JOB_SPU_TYPE_ENABLED
-                );
+                newJobCreated.m_job.m_jobSpuType = taskHeader->m_solveInSingleThreadOnPpuOnly.m_bool != 0
+                    ? HK_JOB_SPU_TYPE_DISABLED
+                    : HK_JOB_SPU_TYPE_ENABLED;
             }
             else {
                 if (storage != nullptr) {
                     hkpSolveApplyGravityJob* job = static_cast<hkpSolveApplyGravityJob*>(storage);
                     // EXE-INLINED none: hkpSolveApplyGravityJob::hkpSolveApplyGravityJob
                     job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_APPLY_GRAVITY);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                    job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                    job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                     job->m_size = static_cast<uint16_t>(sizeof(hkpSolveApplyGravityJob));
                     job->m_threadAffinity = -1;
                     job->m_islandIndex = dynamicsJob.m_islandIndex;
@@ -401,8 +386,7 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     createdJob = job;
                 }
                 newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                newJobCreated.m_job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                 taskHeader->m_openJobs = taskHeader->m_numApplyGravityJobs;
             }
             if (taskHeader->m_splitCheckRequested != 0) {
@@ -410,10 +394,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 hkpSplitSimulationIslandJob splitJob;
                 // EXE-INLINED none: hkpSplitSimulationIslandJob::hkpSplitSimulationIslandJob
                 splitJob.m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SPLIT_ISLAND);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                splitJob.m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                splitJob.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+                splitJob.m_jobType = HK_JOB_TYPE_DYNAMICS;
+                splitJob.m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
                 splitJob.m_size = static_cast<uint16_t>(sizeof(hkpSplitSimulationIslandJob));
                 splitJob.m_threadAffinity = -1;
                 splitJob.m_islandIndex = createdJob->m_islandIndex;
@@ -439,10 +421,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 hkpSolveConstraintBatchJob* job = static_cast<hkpSolveConstraintBatchJob*>(storage);
                 // EXE-INLINED none: hkpSolveConstraintBatchJob::hkpSolveConstraintBatchJob
                 job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_CONSTRAINT_BATCH);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                 job->m_size = static_cast<uint16_t>(sizeof(hkpSolveConstraintBatchJob));
                 job->m_threadAffinity = -1;
                 job->m_islandIndex = dynamicsJob.m_islandIndex;
@@ -454,8 +434,7 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 job->m_currentSolverMicroStep = 0;
             }
             newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-            // EXE-INLINED none: hkEnum<E, S>::operator=
-            newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+            newJobCreated.m_job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
             taskHeader->m_openJobs = taskHeader->m_solveTasks.m_firstBatchSize;
             return hkJobQueue::JOB_CREATED;
         }
@@ -472,10 +451,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     hkpSolveConstraintBatchJob* job = static_cast<hkpSolveConstraintBatchJob*>(storage);
                     // EXE-INLINED none: hkpSolveConstraintBatchJob::hkpSolveConstraintBatchJob
                     job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_CONSTRAINT_BATCH);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                    job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                    job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                     job->m_size = static_cast<uint16_t>(sizeof(hkpSolveConstraintBatchJob));
                     job->m_threadAffinity = -1;
                     job->m_islandIndex = batchJob.m_islandIndex;
@@ -493,10 +470,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     hkpSolveConstraintBatchJob* job = static_cast<hkpSolveConstraintBatchJob*>(storage);
                     // EXE-INLINED none: hkpSolveConstraintBatchJob::hkpSolveConstraintBatchJob
                     job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_CONSTRAINT_BATCH);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                    job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                    job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                     job->m_size = static_cast<uint16_t>(sizeof(hkpSolveConstraintBatchJob));
                     job->m_threadAffinity = -1;
                     job->m_islandIndex = batchJob.m_islandIndex;
@@ -516,10 +491,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     hkpSolveIntegrateVelocitiesJob* job = static_cast<hkpSolveIntegrateVelocitiesJob*>(storage);
                     // EXE-INLINED none: hkpSolveIntegrateVelocitiesJob::hkpSolveIntegrateVelocitiesJob
                     job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_INTEGRATE_VELOCITIES);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                    job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                    job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                     job->m_size = static_cast<uint16_t>(sizeof(hkpSolveIntegrateVelocitiesJob));
                     job->m_threadAffinity = -1;
                     job->m_islandIndex = batchJob.m_islandIndex;
@@ -534,8 +507,7 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 numOpenJobs = taskHeader->m_numIntegrateVelocitiesJobs;
             }
             newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-            // EXE-INLINED none: hkEnum<E, S>::operator=
-            newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+            newJobCreated.m_job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
             taskHeader->m_openJobs = numOpenJobs;
             return hkJobQueue::JOB_CREATED;
         }
@@ -551,10 +523,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     hkpSolveConstraintBatchJob* job = static_cast<hkpSolveConstraintBatchJob*>(storage);
                     // EXE-INLINED none: hkpSolveConstraintBatchJob::hkpSolveConstraintBatchJob
                     job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_SOLVE_CONSTRAINT_BATCH);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                    // EXE-INLINED none: hkEnum<E, S>::operator=
-                    job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                    job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                    job->m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                     job->m_size = static_cast<uint16_t>(sizeof(hkpSolveConstraintBatchJob));
                     job->m_threadAffinity = -1;
                     job->m_islandIndex = velocitiesJob.m_islandIndex;
@@ -566,8 +536,7 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                     job->m_currentSolverMicroStep = 0;
                 }
                 newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+                newJobCreated.m_job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
                 taskHeader->m_openJobs = taskHeader->m_solveTasks.m_firstBatchSize;
                 return hkJobQueue::JOB_CREATED;
             }
@@ -576,10 +545,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 hkpIntegrateMotionJob* job = static_cast<hkpIntegrateMotionJob*>(storage);
                 // EXE-INLINED none: hkpIntegrateMotionJob::hkpIntegrateMotionJob
                 job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_INTEGRATE_MOTION);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+                job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                job->m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
                 job->m_size = static_cast<uint16_t>(sizeof(hkpIntegrateMotionJob));
                 job->m_threadAffinity = -1;
                 job->m_islandIndex = velocitiesJob.m_islandIndex;
@@ -593,8 +560,7 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 job->m_applyForcesAndStepMotionOnly.m_bool = 0;
             }
             newJobCreated.m_jobPriority.m_storage = hkJobQueue::JOB_HIGH_PRIORITY;
-            // EXE-INLINED none: hkEnum<E, S>::operator=
-            newJobCreated.m_job.m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_ENABLED);
+            newJobCreated.m_job.m_jobSpuType = HK_JOB_SPU_TYPE_ENABLED;
             taskHeader->m_openJobs = taskHeader->m_tasks.m_numBuildJacobianTasks;
             return hkJobQueue::JOB_CREATED;
         }
@@ -635,10 +601,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 hkpBroadPhaseJob* job = static_cast<hkpBroadPhaseJob*>(storage);
                 // EXE-INLINED none: hkpBroadPhaseJob::hkpBroadPhaseJob
                 job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_BROADPHASE);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+                job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                job->m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
                 job->m_size = static_cast<uint16_t>(sizeof(hkpBroadPhaseJob));
                 job->m_threadAffinity = -1;
                 job->m_islandIndex = dynamicsJob.m_islandIndex;
@@ -663,10 +627,8 @@ hkJobQueue::JobCreationStatus hkpJobQueueUtils::finishIntegrateJob(
                 hkpPostCollideJob* job = static_cast<hkpPostCollideJob*>(storage);
                 // EXE-INLINED none: hkpPostCollideJob::hkpPostCollideJob
                 job->m_jobSubType = static_cast<uint8_t>(hkpDynamicsJob::DYNAMICS_JOB_POST_COLLIDE);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobType.m_storage = static_cast<uint8_t>(HK_JOB_TYPE_DYNAMICS);
-                // EXE-INLINED none: hkEnum<E, S>::operator=
-                job->m_jobSpuType.m_storage = static_cast<uint8_t>(HK_JOB_SPU_TYPE_DISABLED);
+                job->m_jobType = HK_JOB_TYPE_DYNAMICS;
+                job->m_jobSpuType = HK_JOB_SPU_TYPE_DISABLED;
                 job->m_size = static_cast<uint16_t>(sizeof(hkpPostCollideJob));
                 job->m_threadAffinity = -1;
                 // The island index is stored twice (the base's copy, then the job's own), the same value both times.

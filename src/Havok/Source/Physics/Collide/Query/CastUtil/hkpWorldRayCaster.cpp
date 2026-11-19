@@ -26,13 +26,12 @@ hkpWorldRayCaster::~hkpWorldRayCaster() {}
 // and cast against its shape into that ray's collector. The ray's start is taken from the first input (m_input->m_from)
 // and its end from the cast's own input, as the game does.
 float hkpWorldRayCaster::addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPhaseHandle, int32_t castIndex) {
-    // The owner offset and the collector stride are byte distances added to untyped addresses (hkAddByteOffset).
-    // EXE-INLINED 0x9B2C90
-    const hkpCollidable* col = reinterpret_cast<const hkpCollidable*>(
-        reinterpret_cast<const char*>(broadPhaseHandle) +
-        static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle)->m_ownerOffset
+    const hkpCollidable* col = static_cast<const hkpCollidable*>(
+        const_cast<hkpTypedBroadPhaseHandle*>(static_cast<const hkpTypedBroadPhaseHandle*>(broadPhaseHandle))
+            ->getOwner()
     );
     const hkpShape* shape = col->m_shape;
+    // The collector stride is a byte distance added to an untyped address (hkAddByteOffset).
     // EXE-INLINED none: hkAddByteOffset<hkpRayHitCollector>
     hkpRayHitCollector* collector = reinterpret_cast<hkpRayHitCollector*>(
         reinterpret_cast<char*>(m_collectorBase) + castIndex * m_collectorStriding

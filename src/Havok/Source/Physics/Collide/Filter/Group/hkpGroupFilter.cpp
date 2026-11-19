@@ -116,12 +116,7 @@ hkBool hkpGroupFilter::isCollisionEnabled(
 ) const {
     uint32_t infoB = bContainer.getCollisionFilterInfo(bKey);
     if (infoB == USE_COLLIDABLE_FILTER_INFO) {
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = &b;
-        while (rootB->m_parent) {
-            rootB = rootB->m_parent;
-        }
-        infoB = static_cast<const hkpCollidable*>(rootB)->getCollisionFilterInfo();
+        infoB = b.getRootCollidable()->getCollisionFilterInfo();
     }
     uint32_t infoA;
     if (a.m_parent == nullptr) {
@@ -145,12 +140,7 @@ hkBool hkpGroupFilter::isCollisionEnabled(
                 break;
             }
             if (dispatcher->hasAlternateType(type, HK_SHAPE_MULTI_SPHERE)) {
-                // EXE-INLINED 0x624020
-                const hkpCdBody* rootA = &a;
-                while (rootA->m_parent) {
-                    rootA = rootA->m_parent;
-                }
-                infoA = static_cast<const hkpCollidable*>(rootA)->getCollisionFilterInfo();
+                infoA = a.getRootCollidable()->getCollisionFilterInfo();
                 break;
             }
             if (dispatcher->hasAlternateType(type, HK_SHAPE_CONVEX_LIST)) {
@@ -181,21 +171,11 @@ hkBool hkpGroupFilter::isCollisionEnabled(
 ) const {
     uint32_t infoA = containerShapeA.getCollisionFilterInfo(keyA);
     if (infoA == USE_COLLIDABLE_FILTER_INFO) {
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootA = &collectionBodyA;
-        while (rootA->m_parent) {
-            rootA = rootA->m_parent;
-        }
-        infoA = static_cast<const hkpCollidable*>(rootA)->getCollisionFilterInfo();
+        infoA = collectionBodyA.getRootCollidable()->getCollisionFilterInfo();
     }
     uint32_t infoB = containerShapeB.getCollisionFilterInfo(keyB);
     if (infoB == USE_COLLIDABLE_FILTER_INFO) {
-        // EXE-INLINED 0x624020
-        const hkpCdBody* rootB = &collectionBodyB;
-        while (rootB->m_parent) {
-            rootB = rootB->m_parent;
-        }
-        infoB = static_cast<const hkpCollidable*>(rootB)->getCollisionFilterInfo();
+        infoB = collectionBodyB.getRootCollidable()->getCollisionFilterInfo();
     }
     return isCollisionEnabled(infoA, infoB);
 }

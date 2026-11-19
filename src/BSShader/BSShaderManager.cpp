@@ -140,11 +140,8 @@ void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
     if (!apObject) {
         return;
     }
-    NiMaterialProperty* pMatProp = static_cast<NiMaterialProperty*>(apObject->GetProperty(NiProperty::MATERIAL));
-    // EXE-INLINED none: NiPointer<NiMaterialProperty> constructor
-    if (pMatProp) {
-        pMatProp->IncRefCount();
-    }
+    NiPointer<NiMaterialProperty> pMatProp =
+        static_cast<NiMaterialProperty*>(apObject->GetProperty(NiProperty::MATERIAL));
     if (pMatProp) {
         apObject->DetachProperty(pMatProp);
         NiCloningProcess kCloneProc(257);
@@ -180,10 +177,6 @@ void MakeUniqueMaterial_Recurse(NiAVObject* apObject) {
                 MakeUniqueMaterial_Recurse(pChild);
             }
         }
-    }
-    // EXE-INLINED none: NiPointer<NiMaterialProperty> destructor
-    if (pMatProp) {
-        pMatProp->DecRefCount();
     }
 }
 
@@ -296,8 +289,7 @@ void BSShaderManager::Initialize() {
         pTextureManager->PrecreateTextures(pRenderer.m_pObject);
         NiFixedString* pTag = static_cast<NiFixedString*>(MemoryManager_Singleton.Allocate(sizeof(NiFixedString)));
         if (pTag) {
-            // EXE-INLINED 0x438170
-            pTag->SetHandle(NiGlobalStringTable::AddString("TEX%"));
+            ::new (pTag) NiFixedString("TEX%");
         }
         pTexPercTag = pTag;
         bInitialized = true;
@@ -1426,15 +1418,11 @@ void BSShaderManager::GetTexture(
 // component is stored as a float; the double casts keep the unrounded intermediates, which are exact here (integer
 // coordinates, products of floats). Each byte is truncated to a 32-bit integer and its low byte kept. The cube map's
 // loop counters are ints converted to float and compared as floats with 128.0f; the attenuation loops compare the ints
-// (signed). The pixel data releases at the end have no null test, as the game does.
+// (signed).
 void BSShaderManager::GenerateNormalizationCubeMap() {
     NiPixelFormat kCubeFormat = NiPixelFormat_BGRA8888;
     void* pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pCubePixels = pMemory ? ::new (pMemory) NiPixelData(128, 128, kCubeFormat, 1, 6) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pCubePixels) {
-        pCubePixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pCubePixels = pMemory ? ::new (pMemory) NiPixelData(128, 128, kCubeFormat, 1, 6) : nullptr;
     // EXE-INLINED 0x4F31B0
     ++pCubePixels->m_uiRevID;
 
@@ -1601,11 +1589,8 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
 
     // Default error map: opaque red (RGBA 0xFF 0 0 0xFF).
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pErrorPixels = pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pErrorPixels) {
-        pErrorPixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pErrorPixels =
+        pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1) : nullptr;
     // EXE-INLINED 0x64DAC0
     pucPixels = pErrorPixels->m_pucPixels + pErrorPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1619,19 +1604,13 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pErrorPixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pErrorPixels->m_uiRevID;
-    NiGlobalStringTable::GlobalStringHandle kHandle = NiGlobalStringTable::AddString("BSShader_DefErrorMap");
-    NiSourceTexture* pTexture = NiSourceTexture::Create(pErrorPixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    spDefaultErrorMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    spDefaultErrorMap =
+        NiSourceTexture::Create(pErrorPixels, NiFixedString("BSShader_DefErrorMap"), NiSourceTexture::ms_kDefaultPrefs);
 
     // Default normal map: the flat normal (RGB 0x80 0x80 0xFF).
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pNormalPixels = pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pNormalPixels) {
-        pNormalPixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pNormalPixels =
+        pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1) : nullptr;
     // EXE-INLINED 0x64DAC0
     pucPixels = pNormalPixels->m_pucPixels + pNormalPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1644,29 +1623,14 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pNormalPixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pNormalPixels->m_uiRevID;
-    kHandle = NiGlobalStringTable::AddString("BSShader_DefNormalMap");
-    pTexture = NiSourceTexture::Create(pNormalPixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    // EXE-INLINED 0x66B0D0
-    if (spDefaultNormalMap.m_pObject != pTexture) {
-        NiTexture* pOld = spDefaultNormalMap.m_pObject;
-        if (pOld) {
-            pOld->DecRefCount();
-        }
-        spDefaultNormalMap.m_pObject = pTexture;
-        if (pTexture) {
-            pTexture->IncRefCount();
-        }
-    }
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    spDefaultNormalMap = NiSourceTexture::Create(
+        pNormalPixels, NiFixedString("BSShader_DefNormalMap"), NiSourceTexture::ms_kDefaultPrefs
+    );
 
     // Default normal-gloss map: the flat normal with gloss 0x40.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pGlossPixels = pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pGlossPixels) {
-        pGlossPixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pGlossPixels =
+        pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGBA32, 1, 1) : nullptr;
     // EXE-INLINED 0x64DAC0
     pucPixels = pGlossPixels->m_pucPixels + pGlossPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1680,24 +1644,14 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pGlossPixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pGlossPixels->m_uiRevID;
-    kHandle = NiGlobalStringTable::AddString("BSShader_DefNormalGlossMap");
-    pTexture = NiSourceTexture::Create(pGlossPixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    spDefaultNormalGlossMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    spDefaultNormalGlossMap = NiSourceTexture::Create(
+        pGlossPixels, NiFixedString("BSShader_DefNormalGlossMap"), NiSourceTexture::ms_kDefaultPrefs
+    );
 
-    // Default height map: black, held in the normal map's smart pointer (the old pixel data is known non-null, so it is
-    // released without a null test).
+    // Default height map: black, held in the normal map's smart pointer.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
     NiPixelData* pHeightPixels = pMemory ? ::new (pMemory) NiPixelData(16, 16, NiPixelFormat_RGB24, 1, 1) : nullptr;
-    // EXE-INLINED 0x66B0D0
-    if (pNormalPixels != pHeightPixels) {
-        pNormalPixels->DecRefCount();
-        pNormalPixels = pHeightPixels;
-        if (pHeightPixels) {
-            pHeightPixels->IncRefCount();
-        }
-    }
+    pNormalPixels = pHeightPixels;
     // EXE-INLINED 0x64DAC0
     pucPixels = pNormalPixels->m_pucPixels + pNormalPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 16; ++i) {
@@ -1710,22 +1664,17 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pNormalPixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pNormalPixels->m_uiRevID;
-    kHandle = NiGlobalStringTable::AddString("BSShader_DefHeightMap");
-    pTexture = NiSourceTexture::Create(pNormalPixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    spDefaultHeightMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    spDefaultHeightMap = NiSourceTexture::Create(
+        pNormalPixels, NiFixedString("BSShader_DefHeightMap"), NiSourceTexture::ms_kDefaultPrefs
+    );
 
     GetTexture("Data\\Textures\\Effects\\WindowEnvironmentMap01.dds", true, spWindowEnvironmentMap01, true, false);
     GetTexture("Data\\Textures\\Effects\\WindowEnvironmentMap02.dds", true, spWindowEnvironmentMap02, true, false);
 
     // Hide-secret map: black with alpha 0x40. The revision is advanced before the no-convert flag is set.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pHideSecretPixels = pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pHideSecretPixels) {
-        pHideSecretPixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pHideSecretPixels =
+        pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
     // EXE-INLINED 0x64DAC0
     pucPixels = pHideSecretPixels->m_pucPixels + pHideSecretPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1739,29 +1688,14 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     // EXE-INLINED 0x4F31B0
     ++pHideSecretPixels->m_uiRevID;
     pHideSecretPixels->bNoConvert = true;
-    kHandle = NiGlobalStringTable::AddString("BSShader_HideSecretMap");
-    pTexture = NiSourceTexture::Create(pHideSecretPixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    // EXE-INLINED 0x66B0D0
-    if (pHideSecretMap.m_pObject != pTexture) {
-        NiTexture* pOld = pHideSecretMap.m_pObject;
-        if (pOld) {
-            pOld->DecRefCount();
-        }
-        pHideSecretMap.m_pObject = pTexture;
-        if (pTexture) {
-            pTexture->IncRefCount();
-        }
-    }
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    pHideSecretMap = NiSourceTexture::Create(
+        pHideSecretPixels, NiFixedString("BSShader_HideSecretMap"), NiSourceTexture::ms_kDefaultPrefs
+    );
 
     // Default texture effect map: opaque black.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pTexEffectPixels = pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pTexEffectPixels) {
-        pTexEffectPixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pTexEffectPixels =
+        pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
     // EXE-INLINED 0x64DAC0
     pucPixels = pTexEffectPixels->m_pucPixels + pTexEffectPixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1775,11 +1709,9 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pTexEffectPixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pTexEffectPixels->m_uiRevID;
-    kHandle = NiGlobalStringTable::AddString("BSShader_DefTexEffectMap");
-    pTexture = NiSourceTexture::Create(pTexEffectPixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    spDefaultTexEffectMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    spDefaultTexEffectMap = NiSourceTexture::Create(
+        pTexEffectPixels, NiFixedString("BSShader_DefTexEffectMap"), NiSourceTexture::ms_kDefaultPrefs
+    );
 
     // The reflection cube maps: each face is the same file.
     char acFilename[260];
@@ -1798,7 +1730,7 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
 
     // The anisotropic and noise maps, loaded from their files.
     BSsprintf(acFilename, sizeof(acFilename), "%saniso.dds", "Data\\Textures\\Effects\\");
-    pTexture = NiSourceTexture::Create(acFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
+    NiSourceTexture* pTexture = NiSourceTexture::Create(acFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
     spAnisotropicMap = pTexture;
     BSsprintf(acFilename, sizeof(acFilename), "%sNoiseMap.dds", "Data\\Textures\\Effects\\");
     pTexture = NiSourceTexture::Create(acFilename, NiSourceTexture::ms_kDefaultPrefs, true, false);
@@ -1806,11 +1738,8 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
 
     // Empty noise map: opaque grey 0x8F.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pEmptyNoisePixels = pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pEmptyNoisePixels) {
-        pEmptyNoisePixels->IncRefCount();
-    }
+    NiPointer<NiPixelData> pEmptyNoisePixels =
+        pMemory ? ::new (pMemory) NiPixelData(4, 4, NiPixelFormat_RGBA32, 1, 1) : nullptr;
     // EXE-INLINED 0x64DAC0
     pucPixels = pEmptyNoisePixels->m_pucPixels + pEmptyNoisePixels->m_puiOffsetInBytes[0];
     for (int32_t i = 0; i < 4; ++i) {
@@ -1824,21 +1753,15 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pEmptyNoisePixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pEmptyNoisePixels->m_uiRevID;
-    kHandle = NiGlobalStringTable::AddString("BSShader_EmptyNoiseMap");
-    pTexture = NiSourceTexture::Create(pEmptyNoisePixels, kHandle, NiSourceTexture::ms_kDefaultPrefs);
-    pEmptyNoiseMap = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
+    pEmptyNoiseMap = NiSourceTexture::Create(
+        pEmptyNoisePixels, NiFixedString("BSShader_EmptyNoiseMap"), NiSourceTexture::ms_kDefaultPrefs
+    );
 
     // Attenuation map: per texel u and v run from 1 at the edges to 0 at the centre (63.5); the grey level is
     // u^2 + v^2 clamped to [0, 1] (inverted for shader level 1), times 255, floored.
     pMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    NiPixelData* pAttenuationPixels =
+    NiPointer<NiPixelData> pAttenuationPixels =
         pMemory ? ::new (pMemory) NiPixelData(128, 128, NiPixelFormat_RGB24, 1, 1) : nullptr;
-    // EXE-INLINED none: NiPointer<NiPixelData>::NiPointer(NiPixelData*)
-    if (pAttenuationPixels) {
-        pAttenuationPixels->IncRefCount();
-    }
     // EXE-INLINED 0x64DAC0
     pucPixels = pAttenuationPixels->m_pucPixels + pAttenuationPixels->m_puiOffsetInBytes[0];
     for (int32_t iRow = 0; iRow < 128; ++iRow) {
@@ -1884,33 +1807,11 @@ void BSShaderManager::GenerateNormalizationCubeMap() {
     pAttenuationPixels->bNoConvert = true;
     // EXE-INLINED 0x4F31B0
     ++pAttenuationPixels->m_uiRevID;
-    kHandle = NiGlobalStringTable::AddString("BSShader_AttenuationXYZ");
-    pTexture = NiSourceTexture::Create(pAttenuationPixels, kHandle, kPrefs);
-    pAttenuationXY = pTexture;
-    // EXE-INLINED 0x4381B0
-    NiGlobalStringTable::ReleaseHandle(kHandle);
-    // The Z map shares the XY map; pAttenuationXY is read again after the release, as the game does.
-    // EXE-INLINED 0xC663D0
-    if (pAttenuationZ != pAttenuationXY) {
-        NiSourceTexture* pOld = pAttenuationZ;
-        if (pOld) {
-            pOld->DecRefCount();
-        }
-        pAttenuationZ.m_pObject = pAttenuationXY;
-        if (pAttenuationZ) {
-            pAttenuationZ->IncRefCount();
-        }
-    }
+    pAttenuationXY = NiSourceTexture::Create(pAttenuationPixels, NiFixedString("BSShader_AttenuationXYZ"), kPrefs);
+    // The Z map shares the XY map.
+    pAttenuationZ = pAttenuationXY;
 
     // The pixel data smart pointers go out of scope, last made first.
-    pAttenuationPixels->DecRefCount();
-    pEmptyNoisePixels->DecRefCount();
-    pTexEffectPixels->DecRefCount();
-    pHideSecretPixels->DecRefCount();
-    pGlossPixels->DecRefCount();
-    pNormalPixels->DecRefCount();
-    pErrorPixels->DecRefCount();
-    pCubePixels->DecRefCount();
 }
 
 void BSShaderManager::GetModifiedTextureFilename(
@@ -5142,13 +5043,7 @@ void BSShaderManager::Free(eBool abFinal) {
         }
         NiFixedString* pTag = pTexPercTag;
         if (pTag) {
-            // EXE-INLINED 0x4381B0
-            // The string's reference count is the untyped first word of its buffer, 8 bytes before the characters.
-            if (pTag->GetHandle() != NiGlobalStringTable::NULL_STRING) {
-                InterlockedDecrementUInt32(
-                    reinterpret_cast<volatile uint32_t*>(const_cast<char*>(pTag->GetHandle() - 8))
-                );
-            }
+            pTag->~NiFixedString();
             MemoryManager_Singleton.Deallocate(pTag);
         }
         pTexPercTag = nullptr;

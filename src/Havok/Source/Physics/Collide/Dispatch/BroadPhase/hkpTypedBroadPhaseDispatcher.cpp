@@ -229,16 +229,9 @@ void hkpTypedBroadPhaseDispatcher::addPairs(
 ) const {
     for (int32_t i = numNewPairs - 1; i >= 0; --i) {
         hkpTypedBroadPhaseHandle* handleA = newPairs->getElementA();
-        // The owner sits m_ownerOffset bytes from the handle, an untyped byte offset.
         hkpTypedBroadPhaseHandle* handleB = newPairs->getElementB();
-        // EXE-INLINED 0x9B2C90
-        const hkpCollidable* collA = static_cast<const hkpCollidable*>(
-            static_cast<void*>(reinterpret_cast<char*>(handleA) + handleA->m_ownerOffset)
-        );
-        // EXE-INLINED 0x9B2C90
-        const hkpCollidable* collB = static_cast<const hkpCollidable*>(
-            static_cast<void*>(reinterpret_cast<char*>(handleB) + handleB->m_ownerOffset)
-        );
+        const hkpCollidable* collA = static_cast<const hkpCollidable*>(handleA->getOwner());
+        const hkpCollidable* collB = static_cast<const hkpCollidable*>(handleB->getOwner());
         if (filter->isCollisionEnabled(*collA, *collB).m_bool) {
             // Reloads both handles after the filter's call.
             int32_t typeA = newPairs->getElementA()->getType();

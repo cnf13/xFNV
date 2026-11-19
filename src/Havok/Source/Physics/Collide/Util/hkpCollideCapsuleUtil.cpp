@@ -46,8 +46,7 @@ hkResult hkCollideCapsuleUtilClostestPointCapsVsCaps(
 
     const float fRadiusSum = capsARadius + capsBRadius;
     const float fMaxDistance = fRadiusSum + collisionTolerance;
-    // EXE-INLINED none: hkPadSpu<float>::operator float
-    const float fDistanceSquared = result.m_distanceSquared.m_storage;
+    const float fDistanceSquared = result.m_distanceSquared;
     if (fDistanceSquared > static_cast<double>(fMaxDistance) * fMaxDistance) {
         return static_cast<hkResult>(1);
     }
@@ -942,8 +941,7 @@ void hkCollideCapsuleUtilCapsVsTri(
             }
             const float fLimit = pPoint->m_separatingNormal.m_quad[3] + fRadiusSum;
             const float fLimitSquared = fLimit * fLimit;
-            // EXE-INLINED none: hkPadSpu<float>::operator float
-            const float fDistanceSquared = result.m_distanceSquared.m_storage;
+            const float fDistanceSquared = result.m_distanceSquared;
             if (!(fLimitSquared > fDistanceSquared)) {
                 continue;
             }
