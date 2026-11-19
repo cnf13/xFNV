@@ -28,18 +28,11 @@ NiBoxSphereIntersector::~NiBoxSphereIntersector() {}
 // mutable in Gamebryo, hence the const_casts.
 float NiBoxSphereIntersector::Pseudodistance(const NiPoint3& kV0, const NiPoint3& kV1, float fTime) const {
     NiBox kMBox = m_kBox.m_kBox;
-    // EXE-INLINED 0x4A3760
-    NiPoint3 kOffset;
-    kOffset.x = kV0.x * fTime;
-    kOffset.y = kV0.y * fTime;
-    kOffset.z = kV0.z * fTime;
+    NiPoint3 kOffset = fTime * kV0;
     kMBox.m_kCenter.x = kOffset.x + kMBox.m_kCenter.x;
     kMBox.m_kCenter.y = kMBox.m_kCenter.y + kOffset.y;
     kMBox.m_kCenter.z = kMBox.m_kCenter.z + kOffset.z;
-    // EXE-INLINED 0x4A3760
-    kOffset.x = kV1.x * fTime;
-    kOffset.y = kV1.y * fTime;
-    kOffset.z = kV1.z * fTime;
+    kOffset = fTime * kV1;
     const NiPoint3& kCenter = m_kSphere.m_kSphere.m_kCenter;
     NiPoint3 kMCenter;
     kMCenter.y = kCenter.y + kOffset.y;
@@ -58,11 +51,7 @@ float NiBoxSphereIntersector::Pseudodistance(const NiPoint3& kV0, const NiPoint3
 void NiBoxSphereIntersector::ComputeContactInformation(const NiPoint3& kV0, const NiPoint3& kV1) {
     NiPoint3 kTmp;
     if (m_eIntersectionType == IT_CONTACT) {
-        // EXE-INLINED 0x4A3760
-        float fContactTime = m_fContactTime;
-        kTmp.x = kV0.x * fContactTime;
-        kTmp.y = kV0.y * fContactTime;
-        kTmp.z = fContactTime * kV0.z;
+        kTmp = m_fContactTime * kV0;
         const NiPoint3& kBoxCenter = m_kBox.m_kBox.m_kCenter;
         NiPoint3 kPoint;
         kPoint.x = kTmp.x + kBoxCenter.x;
@@ -70,21 +59,12 @@ void NiBoxSphereIntersector::ComputeContactInformation(const NiPoint3& kV0, cons
         kPoint.z = kBoxCenter.z + kTmp.z;
         m_kContactPoint = kPoint;
         for (int32_t i = 0; i < 3; i++) {
-            // EXE-INLINED 0x4A3760
-            float fParameter = m_afParameter[i];
-            const NiPoint3& kAxis = m_kBox.m_kBox.m_akAxis[i];
-            kTmp.x = kAxis.x * fParameter;
-            kTmp.y = kAxis.y * fParameter;
-            kTmp.z = fParameter * kAxis.z;
+            kTmp = m_afParameter[i] * m_kBox.m_kBox.m_akAxis[i];
             m_kContactPoint.x = m_kContactPoint.x + kTmp.x;
             m_kContactPoint.y = m_kContactPoint.y + kTmp.y;
             m_kContactPoint.z = kTmp.z + m_kContactPoint.z;
         }
-        // EXE-INLINED 0x4A3760
-        fContactTime = m_fContactTime;
-        kTmp.x = kV1.x * fContactTime;
-        kTmp.y = kV1.y * fContactTime;
-        kTmp.z = fContactTime * kV1.z;
+        kTmp = m_fContactTime * kV1;
         const NiPoint3& kSphereCenter = m_kSphere.m_kSphere.m_kCenter;
         NiPoint3 kMCenter;
         kMCenter.x = kSphereCenter.x + kTmp.x;
@@ -100,19 +80,15 @@ void NiBoxSphereIntersector::ComputeContactInformation(const NiPoint3& kV0, cons
     }
 
     float fEpsilon = 1e-05f;
-    // EXE-INLINED none: NiPoint3::SqrLength
-    float fV1SqrLength = kV1.x * kV1.x + kV1.y * kV1.y + kV1.z * kV1.z;
-    float fV0SqrLength = kV0.x * kV0.x + kV0.y * kV0.y + kV0.z * kV0.z;
+    float fV1SqrLength = kV1.SqrLength();
+    float fV0SqrLength = kV0.SqrLength();
     float fDeltaVSqr = fV1SqrLength - fV0SqrLength;
     if (fDeltaVSqr < -fEpsilon) {
         NiPoint3 kV0Unit = kV0;
         kV0Unit.Unitize();
         const NiSphere& kSphere = m_kSphere.m_kSphere;
         float fDiameter = kSphere.m_fRadius + kSphere.m_fRadius;
-        // EXE-INLINED 0x4A3760
-        kTmp.x = kV0Unit.x * fDiameter;
-        kTmp.y = kV0Unit.y * fDiameter;
-        kTmp.z = fDiameter * kV0Unit.z;
+        kTmp = fDiameter * kV0Unit;
         const NiPoint3& kBoxCenter = m_kBox.m_kBox.m_kCenter;
         NiPoint3 kOffset;
         kOffset.x = kBoxCenter.x - kTmp.x;
@@ -124,11 +100,7 @@ void NiBoxSphereIntersector::ComputeContactInformation(const NiPoint3& kV0, cons
         kNormal1.y = kOffset.y - kSphereCenter.y;
         kNormal1.z = kOffset.z - kSphereCenter.z;
         kNormal1.Unitize();
-        // EXE-INLINED 0x45BB20
-        float fRadius = kSphere.m_fRadius;
-        kTmp.x = kNormal1.x * fRadius;
-        kTmp.y = kNormal1.y * fRadius;
-        kTmp.z = kNormal1.z * fRadius;
+        kTmp = kNormal1 * kSphere.m_fRadius;
         NiPoint3 kPoint;
         kPoint.x = kSphereCenter.x + kTmp.x;
         kPoint.y = kSphereCenter.y + kTmp.y;
@@ -146,12 +118,7 @@ void NiBoxSphereIntersector::ComputeContactInformation(const NiPoint3& kV0, cons
     if (fDeltaVSqr > fEpsilon) {
         m_kContactPoint = m_kBox.m_kBox.m_kCenter;
         for (int32_t i = 0; i < 3; i++) {
-            // EXE-INLINED 0x4A3760
-            float fParameter = m_afParameter[i];
-            const NiPoint3& kAxis = m_kBox.m_kBox.m_akAxis[i];
-            kTmp.x = kAxis.x * fParameter;
-            kTmp.y = kAxis.y * fParameter;
-            kTmp.z = fParameter * kAxis.z;
+            kTmp = m_afParameter[i] * m_kBox.m_kBox.m_akAxis[i];
             m_kContactPoint.x = m_kContactPoint.x + kTmp.x;
             m_kContactPoint.y = m_kContactPoint.y + kTmp.y;
             m_kContactPoint.z = kTmp.z + m_kContactPoint.z;

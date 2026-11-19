@@ -107,7 +107,6 @@ void hkBallSocketChainBuildJacobian(
                             _mm_mul_ps(pNext[m].m_linear0.m_quad, pJac[k].m_linear0.m_quad)
                         )
                     );
-                    // EXE-INLINED 0x5770E0
                     kOffDiag(k, m) = _mm_shuffle_ps(v, v, 0xAA)[0] + static_cast<float>(v[1] + v[0]);
                 }
             }
@@ -315,7 +314,6 @@ void buildBlockTridiagonalLu(
                             _mm_mul_ps(pNext[m].m_linear0.m_quad, pJac[k].m_linear0.m_quad)
                         )
                     );
-                    // EXE-INLINED 0x5770E0
                     kOffDiag(k, m) =
                         _mm_add_ss(_mm_shuffle_ps(v, v, 0xAA), _mm_add_ss(_mm_shuffle_ps(v, v, 0x55), v))[0];
                 }

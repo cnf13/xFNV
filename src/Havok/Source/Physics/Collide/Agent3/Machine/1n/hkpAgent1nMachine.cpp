@@ -336,19 +336,12 @@ void hkAgent1nMachine_Weld(
         int32_t bestI = 0;
         int32_t bestJ = 1;
         for (int32_t a = 0; a < numConflicts; a++) {
-            const hkQuadReal normalA =
-                potentialInfo.m_potentialContacts[conflicts[a]].m_contactPoint->m_contact.m_separatingNormal.m_quad;
+            const hkVector4& normalA =
+                potentialInfo.m_potentialContacts[conflicts[a]].m_contactPoint->m_contact.m_separatingNormal;
             for (int32_t b = a + 1; b < numConflicts; b++) {
-                const hkQuadReal normalB =
-                    potentialInfo.m_potentialContacts[conflicts[b]].m_contactPoint->m_contact.m_separatingNormal.m_quad;
-                // EXE-INLINED 0x62B0A0
-                // hkVector4::dot3 (normalB.dot3(normalA)): src's builds its result through the out-of-line
-                // hkSimdReal::Construct, which the exe's Havok code does not call.
-                const hkQuadReal product = _mm_mul_ps(normalB, normalA);
-                const hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(product, product, _MM_SHUFFLE(1, 1, 1, 1)), product);
-                const hkQuadReal xyzSum = _mm_add_ss(_mm_shuffle_ps(product, product, _MM_SHUFFLE(2, 2, 2, 2)), xySum);
-                float dot;
-                _mm_store_ss(&dot, xyzSum);
+                const hkVector4& normalB =
+                    potentialInfo.m_potentialContacts[conflicts[b]].m_contactPoint->m_contact.m_separatingNormal;
+                const float dot = normalB.dot3(normalA);
                 if (bestDot > dot) {
                     bestDot = dot;
                     bestI = a;

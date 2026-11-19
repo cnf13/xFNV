@@ -127,30 +127,16 @@ bool NiSphereBV::SphereTriTestIntersect(
     float fSqrDist;
     NiTrigon kTri;
     kTri.m_kOrigin = kVert0;
-    // EXE-INLINED 0x439EF0
-    kTri.m_kEdge0.x = kVert1.x - kVert0.x;
-    kTri.m_kEdge0.y = kVert1.y - kVert0.y;
-    kTri.m_kEdge0.z = kVert1.z - kVert0.z;
-    // EXE-INLINED 0x439EF0
-    kTri.m_kEdge1.x = kVert2.x - kVert0.x;
-    kTri.m_kEdge1.y = kVert2.y - kVert0.y;
-    kTri.m_kEdge1.z = kVert2.z - kVert0.z;
+    kTri.m_kEdge0 = kVert1 - kVert0;
+    kTri.m_kEdge1 = kVert2 - kVert0;
 
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDeltaV;
-    kDeltaV.x = kV0.x - kV1.x;
-    kDeltaV.y = kV0.y - kV1.y;
-    kDeltaV.z = kV0.z - kV1.z;
+    NiPoint3 kDeltaV = kV0 - kV1;
 
-    // EXE-INLINED 0x439090
-    if (NiPoint3_ZERO.x != kDeltaV.x || NiPoint3_ZERO.y != kDeltaV.y || NiPoint3_ZERO.z != kDeltaV.z) {
+    if (NiPoint3_ZERO != kDeltaV) {
         float fS0;
         NiSegment kSeg;
         kSeg.m_kOrigin = kSphABV.m_kSphere.m_kCenter;
-        // EXE-INLINED 0x4A3760
-        kSeg.m_kDirection.x = fTime * kDeltaV.x;
-        kSeg.m_kDirection.y = fTime * kDeltaV.y;
-        kSeg.m_kDirection.z = fTime * kDeltaV.z;
+        kSeg.m_kDirection = fTime * kDeltaV;
 
         fSqrDist = NiSqrDistance::Compute(kSeg, kTri, fS0, fT0, fT1);
     }
@@ -240,11 +226,7 @@ bool NiSphereBV::SphereTriFindIntersect(
         kIntrPt.z = v74.z;
         if (bCalcNormals) {
             kNormal1 = kTri.GetNormal();
-            // EXE-INLINED 0x4A0BD0
-            v74.x = -kNormal1.x;
-            v74.y = -kNormal1.y;
-            v74.z = -kNormal1.z;
-            kNormal0 = v74;
+            kNormal0 = -kNormal1;
             return true;
         }
         return true;
@@ -328,11 +310,7 @@ bool NiSphereBV::SphereTriFindIntersect(
     kIntrPt = kIntersector.GetContactPoint();
     if (bCalcNormals) {
         kNormal0 = kIntersector.GetContactNormal();
-        // EXE-INLINED 0x4A0BD0
-        v40.x = -kNormal0.x;
-        v40.y = -kNormal0.y;
-        v40.z = -kNormal0.z;
-        kNormal1 = v40;
+        kNormal1 = -kNormal0;
     }
     return true;
 }

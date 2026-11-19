@@ -216,11 +216,7 @@ BSShaderProperty::RenderPassArray* Lighting30ShaderProperty::GetRenderPasses(
             pWorldBound = &NiAVObject::NullBoundS;
         }
         const NiBound kBound = *pWorldBound;
-        // EXE-INLINED 0x439EF0
-        NiPoint3 kDiff;
-        kDiff.x = kBound.m_kCenter.x - kEyePos.x;
-        kDiff.y = kBound.m_kCenter.y - kEyePos.y;
-        kDiff.z = kBound.m_kCenter.z - kEyePos.z;
+        NiPoint3 kDiff = kBound.m_kCenter - kEyePos;
         fCameraDistance = kDiff.Length() - kBound.m_fRadius;
         if (BSShaderManager::GetAccumulator()->m_pkCamera) {
             fCameraDistance = BSShaderManager::GetAccumulator()->m_pkCamera->m_fLODAdjust * fCameraDistance;

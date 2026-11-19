@@ -1,5 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiPathInterpolator.h"
 
+#include "Fallout Shared/Magic/EffectSetting.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiFloatData.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiFloatKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiInterpolator.h"
@@ -186,9 +187,7 @@ void NiPathInterpolator::ProcessClone(NiCloningProcess& kCloning) {
 // m_fLastTime. The rotation is only produced when following the path.
 bool NiPathInterpolator::Update(float fTime, NiObjectNET*, NiQuatTransform& kValue) {
     if (fTime == NiInterpolator::m_fLastTime) {
-        // EXE-INLINED 0x4390C0
-        if (m_kPosition.x == INVALID_POINT3.x && m_kPosition.y == INVALID_POINT3.y &&
-            m_kPosition.z == INVALID_POINT3.z) {
+        if (m_kPosition == INVALID_POINT3) {
             kValue.m_kTranslate.x = -FLT_MAX;
             kValue.m_kRotate.m_fX = -FLT_MAX;
             kValue.m_fScale = -FLT_MAX;
@@ -521,10 +520,10 @@ void NiPathInterpolator::CalcRefFrame(uint32_t ui1, uint32_t ui2, float afNormTi
                 mat.m_pEntry[0][1] = kUp.x;
                 mat.m_pEntry[1][1] = kUp.y;
                 mat.m_pEntry[2][1] = kUp.z;
-                // EXE-INLINED none: NiPoint3::Cross (kTangent x kUp)
-                mat.m_pEntry[0][2] = kUp.z * kTangent.y - kUp.y * kTangent.z;
-                mat.m_pEntry[1][2] = kTangent.z * kUp.x - kUp.z * kTangent.x;
-                mat.m_pEntry[2][2] = kUp.y * kTangent.x - kUp.x * kTangent.y;
+                NiPoint3 kCross = kTangent.Cross(kUp);
+                mat.m_pEntry[0][2] = kCross.x;
+                mat.m_pEntry[1][2] = kCross.y;
+                mat.m_pEntry[2][2] = kCross.z;
                 y = kTangent.y;
                 z = kTangent.z;
                 x = kTangent.x;
@@ -666,9 +665,7 @@ float NiPathInterpolator::PathSpeed(int32_t iI0, int32_t iI1, float fTime) const
         [static_cast<uint32_t>(NiAnimationKey::POSKEY) * NiAnimationKey::NUMKEYTYPES + ePathType];
     NiPoint3 kDeriv;
     interpD1(fTime, pkPathKeys->GetKeyAt(iI0, ucSize), pkPathKeys->GetKeyAt(iI1, ucSize), &kDeriv);
-    // EXE-INLINED none: NiPoint3::Length (the sum rounded to float, then the exe's __CIsqrt)
-    float fSqrLength = kDeriv.x * kDeriv.x + kDeriv.y * kDeriv.y + kDeriv.z * kDeriv.z;
-    return std::sqrt(fSqrLength);
+    return kDeriv.Length();
 }
 
 float NiPathInterpolator::PathLength(int32_t iI0, int32_t iI1, float fTime) const {
@@ -725,8 +722,7 @@ void NiPathInterpolator::GetPercentLoc(float fPercent, uint32_t& uiI1, uint32_t&
     }
     for (int32_t i = 0; i < 32; i++) {
         float fDiff = PathLength(ui0, ui1, fTime) - fDist;
-        // EXE-INLINED none: NiAbs
-        float fAbs = __builtin_fabsf(fDiff);
+        float fAbs = NiAbs(fDiff);
         if (fAbs <= 9.999999747378752e-05) {
             break;
         }

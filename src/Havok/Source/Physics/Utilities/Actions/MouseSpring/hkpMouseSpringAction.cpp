@@ -195,12 +195,8 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
 
     alignas(16) hkVector4 pointWs;
     pointWs.setTransformedPos(pRb->m_motion.m_motionState.m_transform, m_positionInRbLocal);
-    // EXE-INLINED none: hkVector4::setSub4
     alignas(16) hkVector4 posError;
-    posError.m_quad[0] = pointWs.m_quad[0] - m_mousePositionInWorld.m_quad[0];
-    posError.m_quad[1] = pointWs.m_quad[1] - m_mousePositionInWorld.m_quad[1];
-    posError.m_quad[2] = pointWs.m_quad[2] - m_mousePositionInWorld.m_quad[2];
-    posError.m_quad[3] = pointWs.m_quad[3] - m_mousePositionInWorld.m_quad[3];
+    posError.setSub4(pointWs, m_mousePositionInWorld);
 
     hkpMotion* pMotion;
     if (pRb->getStoredDynamicMotion()) {
@@ -212,13 +208,8 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
     // EXE-INLINED none: hkpMotion::getMassInv
     float massInv = pMotion->m_inertiaAndMassInv.m_quad[3];
 
-    // EXE-INLINED none: hkVector4::setSub4
     alignas(16) hkVector4 rel;
-    const hkVector4& com = pRb->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1;
-    rel.m_quad[0] = pointWs.m_quad[0] - com.m_quad[0];
-    rel.m_quad[1] = pointWs.m_quad[1] - com.m_quad[1];
-    rel.m_quad[2] = pointWs.m_quad[2] - com.m_quad[2];
-    rel.m_quad[3] = pointWs.m_quad[3] - com.m_quad[3];
+    rel.setSub4(pointWs, pRb->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1);
     alignas(16) hkMatrix3 rhat;
     rhat.setCrossSkewSymmetric(rel);
 
@@ -275,14 +266,8 @@ void hkpMouseSpringAction::applyAction(const hkStepInfo& stepInfo) {
 
     alignas(16) hkVector4 impulse;
     impulse.setMul3(mass, deltaV);
-    // EXE-INLINED none: hkVector4::setNeg4 (xorps with the sign mask at 0x10C44D0)
-    impulse.m_quad[0] = -impulse.m_quad[0];
-    impulse.m_quad[1] = -impulse.m_quad[1];
-    impulse.m_quad[2] = -impulse.m_quad[2];
-    impulse.m_quad[3] = -impulse.m_quad[3];
-    // EXE-INLINED none: hkVector4::lengthSquared3
-    float impulseLen2 = (impulse.m_quad[1] * impulse.m_quad[1] + impulse.m_quad[0] * impulse.m_quad[0]) +
-        impulse.m_quad[2] * impulse.m_quad[2];
+    impulse.setNeg4(impulse);
+    float impulseLen2 = impulse.lengthSquared3();
 
     float maxImpulse = pMotion->getMass();
     maxImpulse = stepInfo.m_deltaTime * maxImpulse * m_maxRelativeForce;

@@ -226,31 +226,11 @@ void bhkCapsuleShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDefC
     hkDisplayCapsule* pMemory =
         static_cast<hkDisplayCapsule*>(hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkDisplayCapsule)));
     pMemory->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkDisplayCapsule));
-    // The end points as Havok vectors, each component copied as its bits.
-    // EXE-INLINED 0x4B4D10
+    // The end points as Havok vectors.
     hkVector4 kBottom;
-    kBottom.m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexB.fX))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexB.fZ)))
-        ),
-        _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexB.fY))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexB.fW)))
-        )
-    );
-    // EXE-INLINED 0x4B4D10
+    kCinfo.m_vertexB.ToHK(kBottom);
     hkVector4 kTop;
-    kTop.m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexA.fX))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexA.fZ)))
-        ),
-        _mm_unpacklo_ps(
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexA.fY))),
-            _mm_set_ss(std::bit_cast<float>(std::bit_cast<uint32_t>(kCinfo.m_vertexA.fW)))
-        )
-    );
+    kCinfo.m_vertexA.ToHK(kTop);
     hkDisplayCapsule* pDisplay = ::new (pMemory) hkDisplayCapsule(kTop, kBottom, kCinfo.m_radius, 6, 1);
     pDisplay->buildGeometry();
     hkGeometry* pGeometry = pDisplay->m_geometry;

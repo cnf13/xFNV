@@ -166,34 +166,10 @@ void hkpBallSocketChainData::buildJacobian(const hkpConstraintQueryIn& inChain, 
         const ConstraintInfo& info = m_infos.m_data[i];
         in2.m_transformB = &entity->m_motion.m_motionState.m_transform;
 
-        // EXE-INLINED 0xC7F640
-        const hkTransform& transformA = *in2.m_transformA;
-        const __m128 pA = info.m_pivotInA.m_quad;
         hkVector4 pivotWsA;
-        pivotWsA.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pA, pA, 0x55), transformA.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(pA, pA, 0x00), transformA.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pA, pA, 0xAA), transformA.m_rotation.m_col2.m_quad),
-                transformA.m_translation.m_quad
-            )
-        );
-        // EXE-INLINED 0xC7F640
-        const hkTransform& transformB = entity->m_motion.m_motionState.m_transform;
-        const __m128 pB = info.m_pivotInB.m_quad;
+        pivotWsA.setTransformedPos(*in2.m_transformA, info.m_pivotInA);
         hkVector4 pivotWsB;
-        pivotWsB.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pB, pB, 0x55), transformB.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(pB, pB, 0x00), transformB.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pB, pB, 0xAA), transformB.m_rotation.m_col2.m_quad),
-                transformB.m_translation.m_quad
-            )
-        );
+        pivotWsB.setTransformedPos(entity->m_motion.m_motionState.m_transform, info.m_pivotInB);
 
         hkStabilizedBallSocketConstraintBuildJacobian_noSchema(pivotWsA, pivotWsB, m_maxErrorDistance, in2, jac);
         jac += 3;

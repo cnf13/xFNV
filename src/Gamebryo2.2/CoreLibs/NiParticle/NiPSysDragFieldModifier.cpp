@@ -207,10 +207,7 @@ void NiPSysDragFieldModifier::UpdateNoAttenuationNoDirNoDist(float fTime, NiPSys
         float fFactor = (fTime - pkInfo->m_fLastUpdate) * m_fMagnitude;
         if (fFactor < 1.0f) {
             float fScale = 1.0f - fFactor;
-            // EXE-INLINED 0x439180
-            pkInfo->m_kVelocity.x = pkInfo->m_kVelocity.x * fScale;
-            pkInfo->m_kVelocity.y = pkInfo->m_kVelocity.y * fScale;
-            pkInfo->m_kVelocity.z = pkInfo->m_kVelocity.z * fScale;
+            pkInfo->m_kVelocity *= fScale;
         }
         else {
             pkInfo->m_kVelocity = NiPoint3_ZERO;

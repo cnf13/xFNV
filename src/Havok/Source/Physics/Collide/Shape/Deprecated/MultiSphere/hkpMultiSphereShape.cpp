@@ -253,16 +253,7 @@ void hkpMultiSphereShape::castRayWithCollectorImpl(
         output.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
         output.m_shapeKeyIndex = 0;
         const int32_t iHit = findClosestHit(m_spheres, afHitFractions, aiSphereIndices, iNumHits, &inputLocal, &output);
-        // EXE-INLINED 0xC7F700
-        const hkRotation& rRotation = cdBody.m_motion.pMotion->getRotation();
-        const __m128 kNormal = output.m_normal.m_quad;
-        output.m_normal.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0x55), rRotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0x00), rRotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0xAA), rRotation.m_col2.m_quad)
-        );
+        output.m_normal.setRotatedDir(cdBody.m_motion.pMotion->getRotation(), output.m_normal);
         collector.addRayHit(cdBody, output);
         afHitFractions[iHit] = afHitFractions[iNumHits - 1];
         aiSphereIndices[iHit] = aiSphereIndices[iNumHits - 1];

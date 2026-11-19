@@ -162,8 +162,7 @@ void bhkBoxShape::Init(const hkSerializableCinfo& arInfo) {
     // Writes the allocated size into the block before the constructor runs.
     pShape->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpBoxShape));
     hkVector4 kHalfExtents;
-    // EXE-INLINED 0x4B4D10
-    kHalfExtents.set(rInfo.m_halfExtents.fX, rInfo.m_halfExtents.fY, rInfo.m_halfExtents.fZ, rInfo.m_halfExtents.fW);
+    rInfo.m_halfExtents.ToHK(kHalfExtents);
     pShape = ::new (pShape) hkpBoxShape(kHalfExtents, 0.1f);
     bhkSerializable& rThis = *this;
     rThis.SethkObject(pShape);
@@ -235,10 +234,7 @@ void bhkBoxShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& apColor) {
     hkVector4 he = *pHalfExtents;
     NiPoint3 bsHE;
     HK2NI(bsHE, he);
-    // EXE-INLINED 0x439180
-    bsHE.x = bsHE.x * 2.0;
-    bsHE.y = bsHE.y * 2.0;
-    bsHE.z = 2.0 * bsHE.z;
+    bsHE *= 2.0f;
     NiAVObject* pav = BSTestObjects::CreateBox(bsHE, nullptr);
     if (pav) {
         static NiFixedString dbgGeomNameSC("bhkBoxShape");

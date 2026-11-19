@@ -59,11 +59,7 @@ hkBool hkpConstraintUtils::checkAndFixConstraint(
     if (getConstraintPivots(constraint, pivotA, pivotB) != HK_SUCCESS) {
         return false;
     }
-    // EXE-INLINED 0x630100: hkVector4::lengthSquared3
-    const __m128 pivotSq = _mm_mul_ps(pivotA.m_quad, pivotA.m_quad);
-    const float fPivotLenSq = _mm_cvtss_f32(
-        _mm_add_ss(_mm_shuffle_ps(pivotSq, pivotSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(pivotSq, pivotSq, 0x55), pivotSq))
-    );
+    const float fPivotLenSq = pivotA.lengthSquared3();
     if (fPivotLenSq > 1e-06f) {
         alignas(16) char buf[512];
         alignas(16) hkErrStream stream(buf, 512);
@@ -79,12 +75,9 @@ hkBool hkpConstraintUtils::checkAndFixConstraint(
     pivotBWorld.setTransformedPos(pParent->m_motion.m_motionState.m_transform, pivotB);
     hkVector4 pivotAWorld;
     pivotAWorld.setTransformedPos(pChild->m_motion.m_motionState.m_transform, pivotA);
-    // EXE-INLINED 0x630100: hkVector4::lengthSquared3
-    const __m128 diff = _mm_sub_ps(pivotBWorld.m_quad, pivotAWorld.m_quad);
-    const __m128 diffSq = _mm_mul_ps(diff, diff);
-    const float fDistSq = _mm_cvtss_f32(
-        _mm_add_ss(_mm_shuffle_ps(diffSq, diffSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(diffSq, diffSq, 0x55), diffSq))
-    );
+    hkVector4 diff;
+    diff.m_quad = _mm_sub_ps(pivotBWorld.m_quad, pivotAWorld.m_quad);
+    const float fDistSq = diff.lengthSquared3();
     // The squared error stays on the x87 stack.
     if (!(fDistSq > maxAllowedError * maxAllowedError)) {
         return false;
@@ -292,17 +285,8 @@ void hkpConstraintUtils::setHingePivotToOptimalPosition(hkpConstraintInstance* c
     const float inertiaA2 = inertiaA.m_col2(2) + inertiaA.m_col2(1);
     const float inertiaA1 = inertiaA.m_col1(2) + inertiaA.m_col1(1);
     float weightA = inertiaA2 + inertiaA1;
-    // EXE-INLINED 0x458700
-    if (_mm_cvtss_f32(_mm_shuffle_ps(
-            bodyA->getRigidMotion()->m_inertiaAndMassInv.m_quad, bodyA->getRigidMotion()->m_inertiaAndMassInv.m_quad,
-            0xFF
-        )) > 1.1920929e-07f) {
-        // EXE-INLINED 0x458700
-        weightA = weightA /
-            _mm_cvtss_f32(_mm_shuffle_ps(
-                bodyA->getRigidMotion()->m_inertiaAndMassInv.m_quad,
-                bodyA->getRigidMotion()->m_inertiaAndMassInv.m_quad, 0xFF
-            ));
+    if (bodyA->getRigidMotion()->m_inertiaAndMassInv.getSimdAt(3) > 1.1920929e-07f) {
+        weightA = weightA / bodyA->getRigidMotion()->m_inertiaAndMassInv.getSimdAt(3);
     }
 
     hkMatrix3 inertiaB;
@@ -313,17 +297,8 @@ void hkpConstraintUtils::setHingePivotToOptimalPosition(hkpConstraintInstance* c
     const float inertiaB2 = inertiaB.m_col2(2) + inertiaB.m_col2(1);
     const float inertiaB1 = inertiaB.m_col1(2) + inertiaB.m_col1(1);
     float weightB = inertiaB2 + inertiaB1;
-    // EXE-INLINED 0x458700
-    if (_mm_cvtss_f32(_mm_shuffle_ps(
-            bodyB->getRigidMotion()->m_inertiaAndMassInv.m_quad, bodyB->getRigidMotion()->m_inertiaAndMassInv.m_quad,
-            0xFF
-        )) > 1.1920929e-07f) {
-        // EXE-INLINED 0x458700
-        weightB = weightB /
-            _mm_cvtss_f32(_mm_shuffle_ps(
-                bodyB->getRigidMotion()->m_inertiaAndMassInv.m_quad,
-                bodyB->getRigidMotion()->m_inertiaAndMassInv.m_quad, 0xFF
-            ));
+    if (bodyB->getRigidMotion()->m_inertiaAndMassInv.getSimdAt(3) > 1.1920929e-07f) {
+        weightB = weightB / bodyB->getRigidMotion()->m_inertiaAndMassInv.getSimdAt(3);
     }
 
     const float inverseSum = 1.0f / (weightA + weightB);
@@ -333,19 +308,11 @@ void hkpConstraintUtils::setHingePivotToOptimalPosition(hkpConstraintInstance* c
     const hkVector4& axisA = transforms.m_transformA.getRotation().getColumn(0);
     hkVector4 relA;
     relA.setSub4(transforms.m_transformA.getTranslation(), centerA);
-    const hkQuadReal productA = _mm_mul_ps(axisA.m_quad, relA.m_quad);
-    // EXE-INLINED 0x62B0A0
-    const float distanceA = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(productA, productA, 0xAA), _mm_add_ss(_mm_shuffle_ps(productA, productA, 0x55), productA)
-    ));
+    const float distanceA = axisA.dot3(relA);
     const hkVector4& axisB = transforms.m_transformB.getRotation().getColumn(0);
     hkVector4 relB;
     relB.setSub4(transforms.m_transformB.getTranslation(), bodyB->getRigidMotion()->getCenterOfMassLocal());
-    const hkQuadReal productB = _mm_mul_ps(axisB.m_quad, relB.m_quad);
-    // EXE-INLINED 0x62B0A0
-    const float distanceB = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(productB, productB, 0xAA), _mm_add_ss(_mm_shuffle_ps(productB, productB, 0x55), productB)
-    ));
+    const float distanceB = axisB.dot3(relB);
 
     const float difference = distanceA - distanceB;
     const float shiftB = weightB * difference * inverseSum;

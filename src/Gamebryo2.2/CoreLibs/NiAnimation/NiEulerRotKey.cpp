@@ -4,6 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiAnimationKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiPosKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiStepPosKey.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
@@ -89,28 +90,23 @@ void NiEulerRotKey::Interpolate(
     float fSin2;
     float fCos2;
     float fHalf0 = afAngles[0] * 0.5;
-    // EXE-INLINED 0x4169A0
-    fSin0 = std::sin(fHalf0);
-    fCos0 = std::cos(fHalf0);
+    NiSinCos(fHalf0, fSin0, fCos0);
     float fHalf1 = afAngles[1] * 0.5;
-    // EXE-INLINED 0x4169A0
-    fSin1 = std::sin(fHalf1);
-    fCos1 = std::cos(fHalf1);
+    NiSinCos(fHalf1, fSin1, fCos1);
     float fHalf2 = afAngles[2] * 0.5;
-    // EXE-INLINED 0x4169A0
-    fSin2 = std::sin(fHalf2);
-    fCos2 = std::cos(fHalf2);
+    NiSinCos(fHalf2, fSin2, fCos2);
 
     NiQuaternion* pkQuat = static_cast<NiQuaternion*>(pkResult);
     double dSin2Sin1 = static_cast<double>(fSin2) * fSin1;
     double dCos2Cos1 = static_cast<double>(fCos2) * fCos1;
     double dSin1Cos2 = static_cast<double>(fSin1) * fCos2;
     double dSin2Cos1 = static_cast<double>(fSin2) * fCos1;
-    // EXE-INLINED 0xA6DB50
-    pkQuat->m_fW = static_cast<float>(fCos0 * dCos2Cos1 + fSin0 * dSin2Sin1);
-    pkQuat->m_fX = static_cast<float>(dCos2Cos1 * fSin0 - dSin2Sin1 * fCos0);
-    pkQuat->m_fY = static_cast<float>(fCos0 * dSin1Cos2 + fSin0 * dSin2Cos1);
-    pkQuat->m_fZ = static_cast<float>(dSin2Cos1 * fCos0 - dSin1Cos2 * fSin0);
+    pkQuat->SetValues(
+        static_cast<float>(fCos0 * dCos2Cos1 + fSin0 * dSin2Sin1),
+        static_cast<float>(dCos2Cos1 * fSin0 - dSin2Sin1 * fCos0),
+        static_cast<float>(fCos0 * dSin1Cos2 + fSin0 * dSin2Cos1),
+        static_cast<float>(dSin2Cos1 * fCos0 - dSin1Cos2 * fSin0)
+    );
 }
 
 void NiEulerRotKey::SaveToStream(NiStream& stream, NiAnimationKey* pkKeys, uint32_t uiNumKeys) {

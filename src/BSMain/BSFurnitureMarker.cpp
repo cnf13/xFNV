@@ -23,9 +23,7 @@ NiRTTI BSFurnitureMarker::ms_RTTI("BSFurnitureMarker", &NiExtraData::ms_RTTI);
 
 // Compares x, y, z each for equality (NaN unequal), then the number and heading.
 bool FurnitureMark::operator==(const FurnitureMark& arSource) const {
-    // EXE-INLINED 0x4390C0
-    bool bSamePosition =
-        Position.x == arSource.Position.x && Position.y == arSource.Position.y && Position.z == arSource.Position.z;
+    bool bSamePosition = Position == arSource.Position;
     return bSamePosition && cNumber == arSource.cNumber && sHeading == arSource.sHeading;
 }
 

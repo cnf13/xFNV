@@ -40,36 +40,8 @@ float hkpWorldRayCaster::addBroadPhaseHandle(const hkpBroadPhaseHandle* broadPha
         const hkpWorldRayCastInput& input = m_input[castIndex];
         if (m_filter->isCollisionEnabled(input, *col).m_bool) {
             const hkTransform& trans = col->m_motion.pState->m_transform;
-            const hkVector4& c0 = trans.m_rotation.m_col0;
-            const hkVector4& c1 = trans.m_rotation.m_col1;
-            const hkVector4& c2 = trans.m_rotation.m_col2;
-            // EXE-INLINED 0xC7F690
-            __m128 from = _mm_sub_ps(m_input->m_from.m_quad, trans.m_translation.m_quad);
-            __m128 lo = _mm_unpacklo_ps(c0.m_quad, c1.m_quad);
-            __m128 lo2 = _mm_movelh_ps(lo, c2.m_quad);
-            m_shapeInput.m_from.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(from, from, 85), _mm_shuffle_ps(_mm_movehl_ps(lo2, lo), c2.m_quad, 212)),
-                    _mm_mul_ps(_mm_shuffle_ps(from, from, 0), lo2)
-                ),
-                _mm_mul_ps(
-                    _mm_shuffle_ps(_mm_unpackhi_ps(c0.m_quad, c1.m_quad), c2.m_quad, 228),
-                    _mm_shuffle_ps(from, from, 170)
-                )
-            );
-            // EXE-INLINED 0xC7F690
-            __m128 to = _mm_sub_ps(input.m_to.m_quad, trans.m_translation.m_quad);
-            __m128 tlo = _mm_unpacklo_ps(c0.m_quad, c1.m_quad);
-            __m128 tlo2 = _mm_movelh_ps(tlo, c2.m_quad);
-            m_shapeInput.m_to.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(to, to, 85), _mm_shuffle_ps(_mm_movehl_ps(tlo2, tlo), c2.m_quad, 212)),
-                    _mm_mul_ps(_mm_shuffle_ps(to, to, 0), tlo2)
-                ),
-                _mm_mul_ps(
-                    _mm_shuffle_ps(_mm_unpackhi_ps(c0.m_quad, c1.m_quad), c2.m_quad, 228), _mm_shuffle_ps(to, to, 170)
-                )
-            );
+            m_shapeInput.m_from.setTransformedInversePos(trans, m_input->m_from);
+            m_shapeInput.m_to.setTransformedInversePos(trans, input.m_to);
             m_shapeInput.m_filterInfo = input.m_filterInfo;
             shape->castRayWithCollectorImpl(m_shapeInput, *col, *collector);
         }

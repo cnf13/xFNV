@@ -16,95 +16,23 @@ NiMatrix3::NiMatrix3(const NiPoint3& col0, const NiPoint3& col1, const NiPoint3&
     SetCol(2, col2);
 }
 
-// The three rotations are built inline, then multiplied together.
 void NiMatrix3::FromEulerAnglesZXY(float fZAngle, float fXAngle, float fYAngle) {
     NiMatrix3 kXRot;
     NiMatrix3 kYRot;
     NiMatrix3 kZRot;
-    float fSin;
-    float fCos;
-    // EXE-INLINED 0x524AC0
-    fSin = std::sin(fXAngle);
-    fCos = std::cos(fXAngle);
-    kXRot.m_pEntry[0][0] = 1.0f;
-    kXRot.m_pEntry[0][1] = 0.0f;
-    kXRot.m_pEntry[0][2] = 0.0f;
-    kXRot.m_pEntry[1][0] = 0.0f;
-    kXRot.m_pEntry[1][1] = fCos;
-    kXRot.m_pEntry[1][2] = fSin;
-    kXRot.m_pEntry[2][0] = 0.0f;
-    kXRot.m_pEntry[2][1] = -fSin;
-    kXRot.m_pEntry[2][2] = fCos;
-    // EXE-INLINED 0x43F850
-    fSin = std::sin(fYAngle);
-    fCos = std::cos(fYAngle);
-    kYRot.m_pEntry[0][0] = fCos;
-    kYRot.m_pEntry[0][1] = 0.0f;
-    kYRot.m_pEntry[0][2] = -fSin;
-    kYRot.m_pEntry[1][0] = 0.0f;
-    kYRot.m_pEntry[1][1] = 1.0f;
-    kYRot.m_pEntry[1][2] = 0.0f;
-    kYRot.m_pEntry[2][0] = fSin;
-    kYRot.m_pEntry[2][1] = 0.0f;
-    kYRot.m_pEntry[2][2] = fCos;
-    // EXE-INLINED 0x4A0C90
-    fSin = std::sin(fZAngle);
-    fCos = std::cos(fZAngle);
-    kZRot.m_pEntry[0][0] = fCos;
-    kZRot.m_pEntry[0][1] = fSin;
-    kZRot.m_pEntry[0][2] = 0.0f;
-    kZRot.m_pEntry[1][0] = -fSin;
-    kZRot.m_pEntry[1][1] = fCos;
-    kZRot.m_pEntry[1][2] = 0.0f;
-    kZRot.m_pEntry[2][0] = 0.0f;
-    kZRot.m_pEntry[2][1] = 0.0f;
-    kZRot.m_pEntry[2][2] = 1.0f;
+    kXRot.MakeXRotation(fXAngle);
+    kYRot.MakeYRotation(fYAngle);
+    kZRot.MakeZRotation(fZAngle);
     *this = kZRot * (kXRot * kYRot);
 }
 
-// The three rotations are built inline, then multiplied together.
 void NiMatrix3::FromEulerAnglesZYX(float fZAngle, float fYAngle, float fXAngle) {
     NiMatrix3 kXRot;
     NiMatrix3 kYRot;
     NiMatrix3 kZRot;
-    float fSin;
-    float fCos;
-    // EXE-INLINED 0x524AC0
-    fSin = std::sin(fXAngle);
-    fCos = std::cos(fXAngle);
-    kXRot.m_pEntry[0][0] = 1.0f;
-    kXRot.m_pEntry[0][1] = 0.0f;
-    kXRot.m_pEntry[0][2] = 0.0f;
-    kXRot.m_pEntry[1][0] = 0.0f;
-    kXRot.m_pEntry[1][1] = fCos;
-    kXRot.m_pEntry[1][2] = fSin;
-    kXRot.m_pEntry[2][0] = 0.0f;
-    kXRot.m_pEntry[2][1] = -fSin;
-    kXRot.m_pEntry[2][2] = fCos;
-    // EXE-INLINED 0x43F850
-    fSin = std::sin(fYAngle);
-    fCos = std::cos(fYAngle);
-    kYRot.m_pEntry[0][0] = fCos;
-    kYRot.m_pEntry[0][1] = 0.0f;
-    kYRot.m_pEntry[0][2] = -fSin;
-    kYRot.m_pEntry[1][0] = 0.0f;
-    kYRot.m_pEntry[1][1] = 1.0f;
-    kYRot.m_pEntry[1][2] = 0.0f;
-    kYRot.m_pEntry[2][0] = fSin;
-    kYRot.m_pEntry[2][1] = 0.0f;
-    kYRot.m_pEntry[2][2] = fCos;
-    // EXE-INLINED 0x4A0C90
-    fSin = std::sin(fZAngle);
-    fCos = std::cos(fZAngle);
-    kZRot.m_pEntry[0][0] = fCos;
-    kZRot.m_pEntry[0][1] = fSin;
-    kZRot.m_pEntry[0][2] = 0.0f;
-    kZRot.m_pEntry[1][0] = -fSin;
-    kZRot.m_pEntry[1][1] = fCos;
-    kZRot.m_pEntry[1][2] = 0.0f;
-    kZRot.m_pEntry[2][0] = 0.0f;
-    kZRot.m_pEntry[2][1] = 0.0f;
-    kZRot.m_pEntry[2][2] = 1.0f;
+    kXRot.MakeXRotation(fXAngle);
+    kYRot.MakeYRotation(fYAngle);
+    kZRot.MakeZRotation(fZAngle);
     *this = kZRot * (kYRot * kXRot);
 }
 
@@ -357,49 +285,13 @@ bool NiMatrix3::ToEulerAnglesZXY(float& rfZAngle, float& rfXAngle, float& rfYAng
     return true;
 }
 
-// The three rotations are built inline, then multiplied together.
 void NiMatrix3::FromEulerAnglesXYZ(float fXAngle, float fYAngle, float fZAngle) {
     NiMatrix3 kXRot;
     NiMatrix3 kYRot;
     NiMatrix3 kZRot;
-    float fSin;
-    float fCos;
-    // EXE-INLINED 0x524AC0
-    fSin = std::sin(fXAngle);
-    fCos = std::cos(fXAngle);
-    kXRot.m_pEntry[0][0] = 1.0f;
-    kXRot.m_pEntry[0][1] = 0.0f;
-    kXRot.m_pEntry[0][2] = 0.0f;
-    kXRot.m_pEntry[1][0] = 0.0f;
-    kXRot.m_pEntry[1][1] = fCos;
-    kXRot.m_pEntry[1][2] = fSin;
-    kXRot.m_pEntry[2][0] = 0.0f;
-    kXRot.m_pEntry[2][1] = -fSin;
-    kXRot.m_pEntry[2][2] = fCos;
-    // EXE-INLINED 0x43F850
-    fSin = std::sin(fYAngle);
-    fCos = std::cos(fYAngle);
-    kYRot.m_pEntry[0][0] = fCos;
-    kYRot.m_pEntry[0][1] = 0.0f;
-    kYRot.m_pEntry[0][2] = -fSin;
-    kYRot.m_pEntry[1][0] = 0.0f;
-    kYRot.m_pEntry[1][1] = 1.0f;
-    kYRot.m_pEntry[1][2] = 0.0f;
-    kYRot.m_pEntry[2][0] = fSin;
-    kYRot.m_pEntry[2][1] = 0.0f;
-    kYRot.m_pEntry[2][2] = fCos;
-    // EXE-INLINED 0x4A0C90
-    fSin = std::sin(fZAngle);
-    fCos = std::cos(fZAngle);
-    kZRot.m_pEntry[0][0] = fCos;
-    kZRot.m_pEntry[0][1] = fSin;
-    kZRot.m_pEntry[0][2] = 0.0f;
-    kZRot.m_pEntry[1][0] = -fSin;
-    kZRot.m_pEntry[1][1] = fCos;
-    kZRot.m_pEntry[1][2] = 0.0f;
-    kZRot.m_pEntry[2][0] = 0.0f;
-    kZRot.m_pEntry[2][1] = 0.0f;
-    kZRot.m_pEntry[2][2] = 1.0f;
+    kXRot.MakeXRotation(fXAngle);
+    kYRot.MakeYRotation(fYAngle);
+    kZRot.MakeZRotation(fZAngle);
     *this = kXRot * (kYRot * kZRot);
 }
 
@@ -481,18 +373,7 @@ void NiMatrix3::MakeRotation(float fAngle, float x, float y, float z) {
 void NiMatrix3::ExtractAngleAndAxis(float& fAngle, float& fX, float& fY, float& fZ) const {
     float fTrace = static_cast<float>(static_cast<double>(m_pEntry[0][0]) + m_pEntry[1][1] + m_pEntry[2][2]);
     float fCos = static_cast<float>((static_cast<double>(fTrace) - 1.0) * 0.5);
-    float fACos;
-    // EXE-INLINED 0xA58510
-    if (!(fCos > -1.0)) {
-        fACos = 3.1415927f;
-    }
-    else if (!(1.0 > fCos)) {
-        fACos = 0.0f;
-    }
-    else {
-        fACos = std::acos(fCos);
-    }
-    fAngle = fACos;
+    fAngle = NiACos(fCos);
     fX = m_pEntry[1][2] - m_pEntry[2][1];
     fY = m_pEntry[2][0] - m_pEntry[0][2];
     float fZDiff = m_pEntry[0][1] - m_pEntry[1][0];
@@ -500,8 +381,7 @@ void NiMatrix3::ExtractAngleAndAxis(float& fAngle, float& fX, float& fY, float& 
     float fSqrLength = static_cast<float>(
         static_cast<double>(fY) * fY + static_cast<double>(fX) * fX + static_cast<double>(fZDiff) * fZDiff
     );
-    // EXE-INLINED none: NiSqrt (the exe's __CIsqrt)
-    float fLength = std::sqrt(fSqrLength);
+    float fLength = NiSqrt(fSqrLength);
     if (fLength > 1e-06f) {
         float fInvLength = static_cast<float>(1.0 / static_cast<double>(fLength));
         fX = fX * fInvLength;
@@ -515,12 +395,9 @@ void NiMatrix3::ExtractAngleAndAxis(float& fAngle, float& fX, float& fY, float& 
         fZ = 0.0f;
         return;
     }
-    // EXE-INLINED none: NiSqrt (the exe's __CIsqrt)
-    fX = std::sqrt(static_cast<float>((static_cast<double>(m_pEntry[0][0]) + 1.0) * 0.5));
-    // EXE-INLINED none: NiSqrt (the exe's __CIsqrt)
-    fY = std::sqrt(static_cast<float>((static_cast<double>(m_pEntry[1][1]) + 1.0) * 0.5));
-    // EXE-INLINED none: NiSqrt (the exe's __CIsqrt)
-    float fZRoot = std::sqrt(static_cast<float>((static_cast<double>(m_pEntry[2][2]) + 1.0) * 0.5));
+    fX = NiSqrt(static_cast<float>((static_cast<double>(m_pEntry[0][0]) + 1.0) * 0.5));
+    fY = NiSqrt(static_cast<float>((static_cast<double>(m_pEntry[1][1]) + 1.0) * 0.5));
+    float fZRoot = NiSqrt(static_cast<float>((static_cast<double>(m_pEntry[2][2]) + 1.0) * 0.5));
     fZ = fZRoot;
     float tx = static_cast<float>(
         static_cast<double>(fX) * m_pEntry[0][0] + static_cast<double>(m_pEntry[0][1]) * fY +

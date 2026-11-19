@@ -1,5 +1,6 @@
 #include "Havok/Source/Common/Internal/KdTree/Build/hkKdTreeBuilder.h"
 
+#include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Internal/KdTree/hkKdTree.h"
@@ -894,8 +895,7 @@ void hkKdTreeBuilder<const hkKdTreeProjectedEntry*, hkKdTreeProjectedEntry*, 0>:
     // The node and its two children: each an inner node splitting on bestAxis, its children 0x10 bytes (two nodes)
     // on from node 0 and node 2, 0x18 bytes on from node 3; node 1 is not written. The split words are the right
     // child's lower and the left child's upper bound.
-    // EXE-INLINED none: hkMath::max2
-    const uint16_t uiMax01 = (childMax[1] > childMax[0]) ? childMax[1] : childMax[0];
+    const uint16_t uiMax01 = hkMath::max2(childMax[1], childMax[0]);
     // EXE-INLINED none: hkMath::min2
     const uint16_t uiMin23 = (childMin[2] < childMin[3]) ? childMin[2] : childMin[3];
     treeOut[0].m_data.m_node.m_splitMin = uiMin23;

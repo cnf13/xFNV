@@ -99,16 +99,9 @@ void bhkTransformShape::LinkObject(NiStream& arStream) {
 
 // Registers the child shape's wrapper, when there is one, then the base's part.
 bool bhkTransformShape::RegisterStreamables(NiStream& arStream) {
-    // EXE-INLINED 0x4D8630
-    hkpTransformShape* pShape = this ? static_cast<hkpTransformShape*>(phkObject) : nullptr;
-    if (pShape) {
-        const hkpShape* pChildShape = pShape->m_childShape.m_childShape;
-        if (pChildShape) {
-            bhkShape* ps = pChildShape->m_userData;
-            if (ps) {
-                ps->RegisterStreamables(arStream);
-            }
-        }
+    bhkShape* ps = GetChildShape();
+    if (ps) {
+        ps->RegisterStreamables(arStream);
     }
     return bhkShape::RegisterStreamables(arStream);
 }
@@ -116,11 +109,7 @@ bool bhkTransformShape::RegisterStreamables(NiStream& arStream) {
 // The child's link ID, then the base's part with the creation info's child cleared and its transform byte-swapped
 // for a big-endian save; the transform is swapped back afterwards.
 void bhkTransformShape::SaveBinary(NiStream& arStream) {
-    // EXE-INLINED 0x4D8630
-    hkpTransformShape* pShape = this ? static_cast<hkpTransformShape*>(phkObject) : nullptr;
-    const hkpShape* pChildShape = pShape ? pShape->m_childShape.m_childShape : nullptr;
-    bhkShape* ps = pChildShape ? pChildShape->m_userData : nullptr;
-    arStream.SaveLinkID(ps);
+    arStream.SaveLinkID(GetChildShape());
     bool bCreated;
     hkTransformShapeCinfo& rCinfo = static_cast<hkTransformShapeCinfo&>(CreateCinfo(bCreated));
     rCinfo.m_childShape = nullptr;
@@ -161,16 +150,9 @@ void bhkTransformShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     apStrings->Add(pcString);
     pcString = kRotate.GetViewerString("Rot");
     apStrings->Add(pcString);
-    // EXE-INLINED 0x4D8630
-    pShape = this ? static_cast<hkpTransformShape*>(phkObject) : nullptr;
-    if (pShape) {
-        const hkpShape* pChildShape = pShape->m_childShape.m_childShape;
-        if (pChildShape) {
-            bhkShape* pChildBhk = pChildShape->m_userData;
-            if (pChildBhk) {
-                pChildBhk->GetViewerStrings(apStrings);
-            }
-        }
+    bhkShape* pChildBhk = GetChildShape();
+    if (pChildBhk) {
+        pChildBhk->GetViewerStrings(apStrings);
     }
 }
 
@@ -178,16 +160,9 @@ void bhkTransformShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
 void bhkTransformShape::Link(bool abAttach) {
     if (abAttach) {
         // EXE-INLINED none: bhkTransformShape::AddbhkShapeRef
-        // EXE-INLINED 0x4D8630
-        hkpTransformShape* pShape = this ? static_cast<hkpTransformShape*>(phkObject) : nullptr;
-        if (pShape) {
-            const hkpShape* pChildShape = pShape->m_childShape.m_childShape;
-            if (pChildShape) {
-                bhkShape* pChild = pChildShape->m_userData;
-                if (pChild) {
-                    pChild->IncRefCount();
-                }
-            }
+        bhkShape* pChild = GetChildShape();
+        if (pChild) {
+            pChild->IncRefCount();
         }
     }
     else {
@@ -318,16 +293,9 @@ void bhkTransformShape::CopyMembers(bhkSerializable* apDest, NiCloningProcess& a
 bool bhkTransformShape::CanShare(NiCloningProcess& arCloneData) {
     bool bres = bhkShape::CanShare(arCloneData);
     if (bres) {
-        // EXE-INLINED 0x4D8630
-        hkpTransformShape* pShape = this ? static_cast<hkpTransformShape*>(phkObject) : nullptr;
-        if (pShape) {
-            const hkpShape* pChildShape = pShape->m_childShape.m_childShape;
-            if (pChildShape) {
-                bhkShape* ps = pChildShape->m_userData;
-                if (ps) {
-                    return ps->CanShare(arCloneData);
-                }
-            }
+        bhkShape* ps = GetChildShape();
+        if (ps) {
+            return ps->CanShare(arCloneData);
         }
     }
     return bres;
@@ -361,16 +329,9 @@ void bhkTransformShape::BuildDisplayGeometry(NiNode* apNode, const NiColor& arDe
     apNode->AttachChild(pNode, true);
     pNode->m_kLocal.m_Translate = kTranslate;
     pNode->m_kLocal.m_Rotate = kRotate;
-    // EXE-INLINED 0x4D8630
-    pShape = this ? static_cast<hkpTransformShape*>(phkObject) : nullptr;
-    if (pShape) {
-        const hkpShape* pChildShape = pShape->m_childShape.m_childShape;
-        if (pChildShape) {
-            bhkShape* pChildBhk = pChildShape->m_userData;
-            if (pChildBhk) {
-                pChildBhk->BuildDisplayGeometry(pNode, arDefColor);
-            }
-        }
+    bhkShape* pChildBhk = GetChildShape();
+    if (pChildBhk) {
+        pChildBhk->BuildDisplayGeometry(pNode, arDefColor);
     }
 }
 

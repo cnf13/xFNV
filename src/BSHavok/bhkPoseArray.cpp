@@ -216,12 +216,7 @@ void bhkPoseArray::CreatePoseForRagdoll(
                 }
             }
             if (bFound) {
-                // EXE-INLINED 0xC6CD30
-                const hkQsTransform& rPose = PoseA[uiPoseIdx]->BoneTransfA[uiName - 1];
-                hkQsTransform& rDest = apPoseTransfA[iBone];
-                rDest.m_translation.m_quad = rPose.m_translation.m_quad;
-                rDest.m_rotation.m_vec.m_quad = rPose.m_rotation.m_vec.m_quad;
-                rDest.m_scale.m_quad = rPose.m_scale.m_quad;
+                apPoseTransfA[iBone] = PoseA[uiPoseIdx]->BoneTransfA[uiName - 1];
             }
         }
     }

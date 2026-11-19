@@ -67,12 +67,7 @@ void hkaSkeletonUtils::transformLocalPoseToWorldPose(
         const hkQsTransform& rParent = iParent == -1 ? worldFromModel : poseWorldOut[iParent];
         const hkQsTransform& rLocal = poseLocal[i];
         hkQsTransform& rWorld = poseWorldOut[i];
-        // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(rParent.m_rotation, rLocal.m_translation);
-        rWorld.m_translation.m_quad = _mm_add_ps(kRotated.m_quad, rParent.m_translation.m_quad);
-        rWorld.m_rotation.setMul(rParent.m_rotation, rLocal.m_rotation);
-        rWorld.m_scale.m_quad = _mm_mul_ps(rLocal.m_scale.m_quad, rParent.m_scale.m_quad);
+        rWorld.setMul(rParent, rLocal);
     }
 }
 
@@ -87,52 +82,12 @@ void hkaSkeletonUtils::transformWorldPoseToLocalPose(
     for (int32_t i = 0; i < numTransforms; ++i) {
         const int32_t iParent = parentIndices[i];
         const hkQsTransform& rParent = iParent == -1 ? worldFromModel : poseWorld[iParent];
-        // EXE-INLINED none: hkQsTransform::setInverse
-        hkVector4 kInvTranslation;
-        kInvTranslation.setRotatedInverseDir(rParent.m_rotation, rParent.m_translation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&kInvTranslation.m_quad)[0],
-            _mm_xor_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&kInvTranslation.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0])
-            )
-        );
-        hkQuaternion kInvRotation;
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&kInvRotation.m_vec.m_quad)[0],
-            _mm_xor_ps(
-                _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_rotation.m_vec.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<float*>(&rdata_10C4C00)[0])
-            )
-        );
-        // EXE-INLINED none: hkVector4::setReciprocal3 (x, y, z, 1 through rcpps and one Newton step, then masked)
-        const __m128 kScale = _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_scale.m_quad)[0]);
-        const __m128 kScaleXYZ1 = _mm_shuffle_ps(
-            kScale, _mm_unpackhi_ps(kScale, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadReal1111)[0])), 0xC4
-        );
-        const __m128 kRcp = _mm_rcp_ps(kScaleXYZ1);
-        const __m128 kInvScale = _mm_and_ps(
-            _mm_sub_ps(_mm_add_ps(kRcp, kRcp), _mm_mul_ps(_mm_mul_ps(kRcp, kScaleXYZ1), kRcp)),
-            _mm_load_ps(&reinterpret_cast<float*>(&rdata_10C4C10)[0])
-        );
+        hkQsTransform kInverse;
+        kInverse.setInverse(rParent);
 
         const hkQsTransform& rWorld = poseWorld[i];
         hkQsTransform& rLocal = poseLocalOut[i];
-        // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(kInvRotation, rWorld.m_translation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rLocal.m_translation.m_quad)[0],
-            _mm_add_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&kRotated.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<float*>(&kInvTranslation.m_quad)[0])
-            )
-        );
-        rLocal.m_rotation.setMul(kInvRotation, rWorld.m_rotation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rLocal.m_scale.m_quad)[0],
-            _mm_mul_ps(_mm_load_ps(&reinterpret_cast<const float*>(&rWorld.m_scale.m_quad)[0]), kInvScale)
-        );
+        rLocal.setMul(kInverse, rWorld);
     }
 }
 
@@ -384,7 +339,6 @@ void hkaSkeletonUtils::enforcePoseConstraintsModelSpace(
             }
             else {
                 const hkQsTransform& rParent = poseModelInOut[parent];
-                // EXE-INLINED none: hkVector4::setRotatedDir
                 hkVector4 kRotated;
                 kRotated.setRotatedDir(rParent.m_rotation, rConstraint.m_translation);
                 translation = _mm_add_ps(kRotated.m_quad, rParent.m_translation.m_quad);

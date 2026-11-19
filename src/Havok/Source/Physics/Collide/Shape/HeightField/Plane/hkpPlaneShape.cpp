@@ -123,12 +123,11 @@ hkBool hkpPlaneShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRay
     result.m_bool = false;
     if (fFromDist >= 0.0f && fToDist < 0.0f) {
         const float fFraction = fFromDist / (fFromDist - fToDist);
-        // EXE-INLINED none: hkVector4::setInterpolate4, sub4, setAbs4, compareLessThanEqual4
-        const __m128 kT = _mm_set1_ps(fFraction);
-        const __m128 kOneMinusT = _mm_sub_ps(hkQuadReal1111_0, kT);
-        const __m128 kHit = _mm_add_ps(_mm_mul_ps(kOneMinusT, kFrom), _mm_mul_ps(kTo, kT));
-        const __m128 kOffset = _mm_and_ps(_mm_sub_ps(kHit, m_aabbCenter.m_quad), hkVector4_setAbs4_absMask);
-        if ((_mm_movemask_ps(_mm_cmple_ps(kOffset, m_aabbHalfExtents.m_quad)) & 7) == 7) {
+        hkVector4 hitPoint;
+        hitPoint.setInterpolate4(input.m_from, input.m_to, fFraction);
+        hitPoint.sub4(m_aabbCenter);
+        hitPoint.setAbs4(hitPoint);
+        if (hitPoint.compareLessThanEqual4(m_aabbHalfExtents).allAreSet(hkVector4Comparison::MASK_XYZ)) {
             results.m_hitFraction = fFraction;
             results.m_normal.m_quad = m_plane.m_quad;
             // EXE-INLINED none: hkpShapeRayCastOutput::setKey

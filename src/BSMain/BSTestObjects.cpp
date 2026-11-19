@@ -374,12 +374,9 @@ NiAVObject* BSTestObjects::CreateTorus(
             MemoryManager_Singleton.Allocate(ullSize >> 32 ? 0xFFFFFFFF : static_cast<uint32_t>(ullSize))
         );
         if (pkColor) {
-            // EXE-INLINED none: NiColorA's constructor, run on each element of the array new
+            // NiColorA's constructor, run on each element of the array new.
             for (int32_t i = static_cast<int32_t>(uiVertices) - 1; i >= 0; --i) {
-                pkColor[uiVertices - 1 - i].r = 0.0f;
-                pkColor[uiVertices - 1 - i].g = 0.0f;
-                pkColor[uiVertices - 1 - i].b = 0.0f;
-                pkColor[uiVertices - 1 - i].a = 0.0f;
+                ::new (&pkColor[uiVertices - 1 - i]) NiColorA();
             }
         }
     }

@@ -46,12 +46,10 @@ void hkpLimitedHingeDrawer::drawConstraint(
     float lineLength = m_lineLength * m_scale;
     const float axisPlus = static_cast<float>(0.75 * lineLength);
     const float axisMinus = static_cast<float>(lineLength * -0.75);
-    // EXE-INLINED none: hkVector4::setAddMul4
     alignas(16) hkVector4 axisEnd;
-    axisEnd.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(axisPlus), axisInWorld.m_quad), m_bodyBWPivot.m_quad);
-    // EXE-INLINED none: hkVector4::setAddMul4
+    axisEnd.setAddMul4(m_bodyBWPivot, axisInWorld, axisPlus);
     alignas(16) hkVector4 axisStart;
-    axisStart.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(axisMinus), axisInWorld.m_quad), m_bodyBWPivot.m_quad);
+    axisStart.setAddMul4(m_bodyBWPivot, axisInWorld, axisMinus);
     displayHandler->displayLine(axisStart, axisEnd, hkColor::rgbFromFloats(0.0f, 0.5f, 1.0f, 1.0f), id, tag);
 
     // Body A's hinge axis through the A pivot.
@@ -60,12 +58,10 @@ void hkpLimitedHingeDrawer::drawConstraint(
     lineLength = m_lineLength * m_scale;
     const float attPlus = static_cast<float>(0.75 * lineLength);
     const float attMinus = static_cast<float>(lineLength * -0.75);
-    // EXE-INLINED none: hkVector4::setAddMul4
     alignas(16) hkVector4 attAxisEnd;
-    attAxisEnd.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(attPlus), attAxisInWorld.m_quad), m_bodyAWPivot.m_quad);
-    // EXE-INLINED none: hkVector4::setAddMul4
+    attAxisEnd.setAddMul4(m_bodyAWPivot, attAxisInWorld, attPlus);
     alignas(16) hkVector4 attAxisStart;
-    attAxisStart.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(attMinus), attAxisInWorld.m_quad), m_bodyAWPivot.m_quad);
+    attAxisStart.setAddMul4(m_bodyAWPivot, attAxisInWorld, attMinus);
     displayHandler->displayLine(attAxisStart, attAxisEnd, hkColor::rgbFromFloats(0.0f, 0.5f, 1.0f, 1.0f), id, tag);
 
     // The angular limit's arc, where the limit is on and its range below 1e14.
@@ -90,9 +86,8 @@ void hkpLimitedHingeDrawer::drawConstraint(
     const float perpLength = static_cast<float>(lineLength * 0.5);
     alignas(16) hkVector4 perpStart;
     perpStart.m_quad = m_bodyBWPivot.m_quad;
-    // EXE-INLINED none: hkVector4::setAddMul4
     alignas(16) hkVector4 perpEnd;
-    perpEnd.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(perpLength), perpInWorld.m_quad), perpStart.m_quad);
+    perpEnd.setAddMul4(perpStart, perpInWorld, perpLength);
     displayHandler->displayLine(perpStart, perpEnd, static_cast<int32_t>(hkColor::YELLOW), id, tag);
 
     // Body A's direction from the A pivot, normalized.
@@ -100,19 +95,10 @@ void hkpLimitedHingeDrawer::drawConstraint(
     attInWorld.setRotatedDir(m_RA, baseA.m_rotation.m_col2);
     lineLength = m_lineLength * m_scale;
     const float attLength = static_cast<float>(lineLength * 0.75);
-    // EXE-INLINED 0x62AEA0
-    const __m128 squares = _mm_mul_ps(attInWorld.m_quad, attInWorld.m_quad);
-    const __m128 length2 =
-        _mm_add_ss(_mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares));
-    const __m128 estimate = _mm_rsqrt_ss(length2);
-    const __m128 zeroMask = _mm_cmpeq_ss(length2, _mm_set_ss(0.0f));
-    const __m128 step = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, estimate), estimate));
-    const __m128 inverse = _mm_andnot_ps(zeroMask, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), estimate), step));
-    attInWorld.m_quad = _mm_mul_ps(_mm_shuffle_ps(inverse, inverse, 0), attInWorld.m_quad);
+    attInWorld.normalize3();
     alignas(16) hkVector4 attStart;
     attStart.m_quad = m_bodyAWPivot.m_quad;
-    // EXE-INLINED none: hkVector4::setAddMul4
     alignas(16) hkVector4 attEnd;
-    attEnd.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(attLength), attInWorld.m_quad), attStart.m_quad);
+    attEnd.setAddMul4(attStart, attInWorld, attLength);
     displayHandler->displayLine(attStart, attEnd, static_cast<int32_t>(hkColor::YELLOW), id, tag);
 }

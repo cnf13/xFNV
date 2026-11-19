@@ -149,19 +149,13 @@ void NiPSysDragModifier::Update(float fTime, NiPSysData* pkData) {
 
     NiPoint3 kDir = kTrans.m_Rotate * m_kDragAxis;
     kDir.Unitize();
-    // EXE-INLINED 0x4A7290
-    float fDirSqrLength = kDir.x * kDir.x + kDir.y * kDir.y + kDir.z * kDir.z;
+    float fDirSqrLength = kDir.SqrLength();
     float fFalloffWidth = m_fFalloff - m_fRange;
 
     for (uint16_t i = 0; i < pkData->m_usActive; i++) {
-        // EXE-INLINED 0x439EF0
-        const NiPoint3& kPos = pkData->m_pkVertex[i];
-        float fDiffX = kPos.x - kTrans.m_Translate.x;
-        float fDiffY = kPos.y - kTrans.m_Translate.y;
-        float fDiffZ = kPos.z - kTrans.m_Translate.z;
+        NiPoint3 kDiff = pkData->m_pkVertex[i] - kTrans.m_Translate;
         NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[i];
-        // EXE-INLINED 0x4A7290
-        float fSqrDist = fDiffX * fDiffX + fDiffY * fDiffY + fDiffZ * fDiffZ;
+        float fSqrDist = kDiff.SqrLength();
         float fDist = std::sqrt(fSqrDist);
         float fPercentage = m_fPercentage;
         float fSteps = (fTime - pkInfo->m_fLastUpdate) / 0.03333330154418945;
@@ -176,8 +170,7 @@ void NiPSysDragModifier::Update(float fTime, NiPSysData* pkData) {
         }
 
         NiPoint3& kVelocity = pkInfo->m_kVelocity;
-        // EXE-INLINED 0x4B6190
-        float fDot = kVelocity.x * kDir.x + kVelocity.y * kDir.y + kVelocity.z * kDir.z;
+        float fDot = kVelocity.Dot(kDir);
         float fScale;
         if (fSteps * fPercentage > 1.0) {
             fScale = -fDot / fDirSqrLength;
@@ -185,14 +178,7 @@ void NiPSysDragModifier::Update(float fTime, NiPSysData* pkData) {
         else {
             fScale = fSteps * -fPercentage * (fDot / fDirSqrLength);
         }
-        // EXE-INLINED 0x45BB20
-        float fAddX = kDir.x * fScale;
-        float fAddY = kDir.y * fScale;
-        float fAddZ = kDir.z * fScale;
-        // EXE-INLINED 0x63C8A0
-        kVelocity.x += fAddX;
-        kVelocity.y += fAddY;
-        kVelocity.z += fAddZ;
+        kVelocity += kDir * fScale;
     }
 }
 

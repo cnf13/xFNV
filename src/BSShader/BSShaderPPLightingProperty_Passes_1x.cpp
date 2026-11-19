@@ -1155,9 +1155,8 @@ void BSShaderPPLightingProperty::AddLandscapePasses_1x(NiGeometry* apGeom, Shado
 		void* pIter;
 		for (ShadowSceneLight* pLight = GetFirstActiveNonShadowLight(pIter); pLight;
 			pLight = GetNextActiveNonShadowLight(pIter)) {
-			// EXE-INLINED none: NiColor::operator!= (the exe compares the three fields inline)
 			const NiColor& kDiff = pLight->spLight.m_pObject->m_kDiff;
-			if (NiColor_BLACK.r != kDiff.r || NiColor_BLACK.g != kDiff.g || NiColor_BLACK.b != kDiff.b) {
+			if (NiColor_BLACK != kDiff) {
 				if (ucUpdateList == 1) {
 					pRenderPassList->Add(apGeom, 495, abFirst, 1, pLight, nullptr, nullptr, nullptr);
 				} else {
@@ -1193,9 +1192,8 @@ void BSShaderPPLightingProperty::AddLandscapePasses_1x(NiGeometry* apGeom, Shado
 			void* pIter;
 			for (ShadowSceneLight* pLight = GetFirstActiveNonShadowLight(pIter); pLight;
 				pLight = GetNextActiveNonShadowLight(pIter)) {
-				// EXE-INLINED none: NiColor::operator!= (the exe compares the three fields inline)
 				const NiColor& kDiff = pLight->spLight.m_pObject->m_kDiff;
-				if (NiColor_BLACK.r != kDiff.r || NiColor_BLACK.g != kDiff.g || NiColor_BLACK.b != kDiff.b) {
+				if (NiColor_BLACK != kDiff) {
 					if (ucUpdateList == 1) {
 						pRenderPassList->Add(apGeom, 501, abFirst, 1, pLight, nullptr, nullptr, nullptr);
 						pRenderPassList->pPassA.m_pBase[pRenderPassList->iSize - 1]->ucExtraParam = i + 1;

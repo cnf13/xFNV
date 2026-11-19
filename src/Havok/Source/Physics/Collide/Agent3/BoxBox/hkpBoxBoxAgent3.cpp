@@ -35,13 +35,11 @@ hkpAgentData* hkBoxBoxAgent3::process(
     const hkpBoxShape* boxB = static_cast<const hkpBoxShape*>(input.m_bodyB->m_shape);
 
     hkVector4 rA;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    rA.m_quad = _mm_add_ps(_mm_set1_ps(boxA->m_radius), boxA->m_halfExtents.m_quad);
+    rA.setAll(boxA->m_radius);
+    rA.add4(boxA->m_halfExtents);
     hkVector4 rB;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    rB.m_quad = _mm_add_ps(_mm_set1_ps(boxB->m_radius), boxB->m_halfExtents.m_quad);
+    rB.setAll(boxB->m_radius);
+    rB.add4(boxB->m_halfExtents);
 
     const float tolerance = input.m_input->m_tolerance;
     // EXE-INLINED none: hkpBoxBoxCollisionDetection::hkpBoxBoxCollisionDetection

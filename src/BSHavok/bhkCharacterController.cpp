@@ -475,17 +475,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
         fRotMod = 0.0f;
         fRotModTime = 0.0f;
     }
-    const __m128 kEpsilon = _mm_set1_ps(0.001f);
-    const __m128 kAbsMask = _mm_load_ps(&reinterpret_cast<const float*>(&hkVector4_setAbs4_absMask)[0]);
-    // EXE-INLINED 0x458900
-    const __m128 kModDiff = _mm_and_ps(
-        _mm_sub_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&VelocityMod.m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&hkVector4Zero.m_quad)[0])
-        ),
-        kAbsMask
-    );
-    bNoMove &= (_mm_movemask_ps(_mm_cmple_ps(kModDiff, kEpsilon)) & 7) == 7;
+    bNoMove &= VelocityMod.equals3(hkVector4Zero, 0.001f);
     if (bNoMove) {
         iFlags &= ~NO_FRICTION;
     }
@@ -526,32 +516,13 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
     hkVector4 kForward;
     _mm_store_ps(&reinterpret_cast<float*>(&kForward.m_quad)[0], _mm_setr_ps(0.0f, -1.0f, 0.0f, 0.0f));
     hkVector4 kDown;
-    // EXE-INLINED none: hkVector4::setNeg4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&kDown.m_quad)[0],
-        _mm_xor_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&UpVec.m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0])
-        )
-    );
+    kDown.setNeg4(UpVec);
     if (((uiPitchFlags >> 25) & 1) || ((uiPitchFlags >> 26) & 1) || (iFlags & QUADRUPED)) {
         ApplyPitchAndRoll(kRotation);
     }
     hkVector4 kNewForward;
     kNewForward.setRotatedDir(kRotation, kForward);
-    if (!bNoMove
-        // EXE-INLINED 0x458900
-        || (_mm_movemask_ps(_mm_cmple_ps(
-                _mm_and_ps(
-                    _mm_sub_ps(
-                        _mm_load_ps(&reinterpret_cast<float*>(&kNewForward.m_quad)[0]),
-                        _mm_load_ps(&reinterpret_cast<float*>(&ForwardVec.m_quad)[0])
-                    ),
-                    kAbsMask
-                ),
-                kEpsilon
-            )) &
-            7) != 7) {
+    if (!bNoMove || !kNewForward.equals3(ForwardVec, 0.001f)) {
         fCalculatePitchTimer = fCalculatePitchTimeOut;
     }
     // The Havok proxy, read once here.
@@ -573,19 +544,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
             OutVelocity.m_quad[2] = 0.0f;
         }
         if (arData.bVisible || hkpCharacterContext::getState() != HK_CHARACTER_ON_GROUND ||
-            !(*pDisplacement == NiPoint3_ZERO)
-            // EXE-INLINED 0x561730
-            || (_mm_movemask_ps(_mm_cmple_ps(
-                    _mm_and_ps(
-                        _mm_sub_ps(
-                            _mm_load_ps(&reinterpret_cast<float*>(&hkSupportNorm.m_quad)[0]),
-                            _mm_load_ps(&reinterpret_cast<float*>(&hkVector4Zero.m_quad)[0])
-                        ),
-                        kAbsMask
-                    ),
-                    kEpsilon
-                )) &
-                0xF) == 0xF) {
+            !(*pDisplacement == NiPoint3_ZERO) || hkSupportNorm.equals4(hkVector4Zero, 0.001f)) {
             iFlags &= ~(SUPPORT2 | CANJUMP);
             iFlags |= CHECKSUPPORT;
             InitFrontBack();
@@ -602,14 +561,8 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
                     iFlags &= ~JUMPING;
                 }
                 else {
-                    // EXE-INLINED none: hkVector4::length3
                     const __m128 kVel = _mm_load_ps(&reinterpret_cast<float*>(&OutVelocity.m_quad)[0]);
-                    const __m128 kSquares = _mm_mul_ps(kVel, kVel);
-                    const __m128 kSum = _mm_add_ps(
-                        _mm_shuffle_ps(kSquares, kSquares, 0xAA),
-                        _mm_add_ps(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-                    );
-                    const float fSpeed = _mm_cvtss_f32(_mm_sqrt_ss(kSum));
+                    const float fSpeed = OutVelocity.length3();
                     // A NaN speed stops here.
                     if (fSpeed > 0.0f) {
                         const float fInvSpeed = 1.0f / fSpeed;
@@ -659,40 +612,17 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
             int32_t iPoint = 0;
             while (iPoint < pCharProxy->GetCdPoints()->m_size) {
                 const hkpRootCdPoint* pPoints = pCharProxy->GetCdPoints()->m_data;
-                // EXE-INLINED 0x561730
-                if ((_mm_movemask_ps(_mm_cmple_ps(
-                         _mm_and_ps(
-                             _mm_sub_ps(
-                                 _mm_load_ps(&reinterpret_cast<float*>(&LastManifold.m_data[iPoint]
-                                                                            .m_contact.m_position.m_quad)[0]),
-                                 _mm_load_ps(&reinterpret_cast<const float*>(&pPoints[iPoint]
-                                                                                  .m_contact.m_position.m_quad)[0])
-                             ),
-                             kAbsMask
-                         ),
-                         kEpsilon
-                     )) &
-                     0xF) != 0xF) {
+                if (!LastManifold.m_data[iPoint].m_contact.m_position.equals4(
+                        pPoints[iPoint].m_contact.m_position, 0.001f
+                    )) {
                     bChanged = 1;
                 }
                 else {
                     pPoints = pCharProxy->GetCdPoints()->m_data;
                     const hkpRootCdPoint* pLast = &LastManifold.m_data[iPoint];
-                    // EXE-INLINED 0x561730
-                    if ((_mm_movemask_ps(_mm_cmple_ps(
-                             _mm_and_ps(
-                                 _mm_sub_ps(
-                                     _mm_load_ps(&reinterpret_cast<const float*>(&pLast->m_contact.m_separatingNormal
-                                                                                      .m_quad)[0]),
-                                     _mm_load_ps(&reinterpret_cast<const float*>(
-                                         &pPoints[iPoint].m_contact.m_separatingNormal.m_quad
-                                     )[0])
-                                 ),
-                                 kAbsMask
-                             ),
-                             kEpsilon
-                         )) &
-                         0xF) != 0xF) {
+                    if (!pLast->m_contact.m_separatingNormal.equals4(
+                            pPoints[iPoint].m_contact.m_separatingNormal, 0.001f
+                        )) {
                         bChanged = 1;
                     }
                     else if (pLast->m_rootCollidableA != pCharProxy->GetCdPoints()->m_data[iPoint].m_rootCollidableA) {
@@ -1181,19 +1111,7 @@ void bhkCharacterController::processConstraintsCallback(
                     }
                     tempSupportNormal.m_quad[2] = 1.0f;
                     iFlags |= TRY_STEP | CANJUMP;
-                    // EXE-INLINED 0x62AEA0
-                    const __m128 kNormal = tempSupportNormal.m_quad;
-                    const __m128 sq = _mm_mul_ps(kNormal, kNormal);
-                    const __m128 len2 =
-                        _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-                    const __m128 approx = _mm_rsqrt_ss(len2);
-                    const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(zero));
-                    const __m128 refined = _mm_mul_ss(
-                        _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                        _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-                    );
-                    const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-                    tempSupportNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), kNormal);
+                    tempSupportNormal.normalize3();
                     rsurface.m_plane.m_quad = tempSupportNormal.m_quad;
                 }
                 else {
@@ -1207,20 +1125,8 @@ void bhkCharacterController::processConstraintsCallback(
                         hkpSurfaceConstraintInfo::Assign(newConstraint, rsurface);
                         newConstraint->m_velocity.m_quad = kZero.m_quad;
                         newConstraint->m_plane.m_quad[2] = 0.0f;
-                        // EXE-INLINED 0x62AEA0
-                        const __m128 kPlane = newConstraint->m_plane.m_quad;
-                        const __m128 sq = _mm_mul_ps(kPlane, kPlane);
-                        const __m128 len2 =
-                            _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-                        const __m128 approx = _mm_rsqrt_ss(len2);
-                        const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(zero));
-                        const __m128 refined = _mm_mul_ss(
-                            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-                        );
-                        const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
+                        newConstraint->m_plane.normalize3();
                         ++inewConstraintsAdded;
-                        newConstraint->m_plane.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), kPlane);
                         ++arInput.m_numConstraints;
                         if (bsupported) {
                             ++inumInvalid;
@@ -1352,21 +1258,8 @@ void bhkCharacterController::characterInteractionCallback(
     hkVector4 kNormal;
     kNormal.m_quad = arContact.m_separatingNormal.m_quad;
     kNormal.m_quad[2] = 0.0f;
-    {
-        // EXE-INLINED 0x62B0A0
-        const __m128 sq = _mm_mul_ps(kNormal.m_quad, kNormal.m_quad);
-        const __m128 len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-        if (_mm_cvtss_f32(len2) > 0.0f) {
-            // EXE-INLINED 0x62AEA0
-            const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(zero));
-            const __m128 approx = _mm_rsqrt_ss(len2);
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            );
-            const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-            kNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), kNormal.m_quad);
-        }
+    if (kNormal.dot3(kNormal) > 0.0f) {
+        kNormal.normalize3();
     }
     // This character's horizontal speed, 20 more while it is resizing; the push is a quarter of it, backwards.
     hkVector4 kVelocity;
@@ -1398,25 +1291,9 @@ void bhkCharacterController::characterInteractionCallback(
     hkVector4 kProj;
     kProj.m_quad = pcc->ForwardVec.m_quad;
     kProj.m_quad[2] = 0.0f;
-    __m128 forward;
-    {
-        // EXE-INLINED 0x62AEA0
-        const __m128 sq = _mm_mul_ps(kProj.m_quad, kProj.m_quad);
-        const __m128 len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-        const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(zero));
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-        forward = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), kProj.m_quad);
-    }
-    // EXE-INLINED 0x62B0A0
-    const __m128 sqD = _mm_mul_ps(forward, kDiff.m_quad);
-    const float fAlong =
-        _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(sqD, sqD, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqD, sqD, 0x55), sqD)));
-    kProj.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fAlong), _mm_set_ss(fAlong), 0), forward);
+    kProj.normalize3();
+    const float fAlong = kProj.dot3(kDiff);
+    kProj.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fAlong), _mm_set_ss(fAlong), 0), kProj.m_quad);
     const __m128 sqP = _mm_mul_ps(kProj.m_quad, kProj.m_quad);
     const float fProjLen = _mm_cvtss_f32(
         _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sqP, sqP, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqP, sqP, 0x55), sqP)))
@@ -1426,19 +1303,7 @@ void bhkCharacterController::characterInteractionCallback(
     hkVector4 kSepNormal;
     kSepNormal.m_quad = arContact.m_separatingNormal.m_quad;
     kSepNormal.m_quad[2] = 0.0f;
-    {
-        // EXE-INLINED 0x62AEA0
-        const __m128 sq = _mm_mul_ps(kSepNormal.m_quad, kSepNormal.m_quad);
-        const __m128 len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-        const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(zero));
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-        kSepNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), kSepNormal.m_quad);
-    }
+    kSepNormal.normalize3();
     // How fast this character moves against the contact normal, horizontally (0 when it stands still).
     kVelocity.m_quad = GethkLinearVelocity().m_quad;
     kVelocity.m_quad[2] = 0.0f;
@@ -3324,16 +3189,8 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
                 FrontBack[ui].m_quad[2] = FrontBack[ui].m_quad[2] + fStepHeight;
                 diffs[ui].m_quad = _mm_sub_ps(contactPos.m_quad, FrontBack[ui].m_quad);
             }
-            // EXE-INLINED 0x62B0A0
-            const __m128 sq0 = _mm_mul_ps(diffs[0].m_quad, diffs[0].m_quad);
-            const float dist0 = _mm_cvtss_f32(
-                _mm_add_ss(_mm_shuffle_ps(sq0, sq0, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq0, sq0, 0x55), sq0))
-            );
-            // EXE-INLINED 0x62B0A0
-            const __m128 sq1 = _mm_mul_ps(diffs[1].m_quad, diffs[1].m_quad);
-            const float dist1 = _mm_cvtss_f32(
-                _mm_add_ss(_mm_shuffle_ps(sq1, sq1, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq1, sq1, 0x55), sq1))
-            );
+            const float dist0 = diffs[0].dot3(diffs[0]);
+            const float dist1 = diffs[1].dot3(diffs[1]);
             // Picks the back point on a tie or NaN.
             uiclosestFBIdx = (dist1 > dist0) ? 0 : 1;
             rayFrom.m_quad[0] = FrontBack[uiclosestFBIdx].m_quad[0];
@@ -3344,19 +3201,7 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
         contactNorm.m_quad = _mm_sub_ps(rayFrom.m_quad, contactPos.m_quad);
         contactNorm.m_quad[2] = 0.0f;
         rayFrom.m_quad[2] = rayFrom.m_quad[2] + fStepHeight;
-        // EXE-INLINED 0x62AEA0
-        {
-            const __m128 sq = _mm_mul_ps(contactNorm.m_quad, contactNorm.m_quad);
-            const __m128 len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-            const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(zero));
-            const __m128 approx = _mm_rsqrt_ss(len2);
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            );
-            const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-            contactNorm.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), contactNorm.m_quad);
-        }
+        contactNorm.normalize3();
         contactPos.m_quad[2] = rayFrom.m_quad[2];
         // How far the contact lies above the raised feet; a contact above them counts only by stair materials.
         float fhitHeight = fhitz - rayFrom.m_quad[2];
@@ -3385,18 +3230,9 @@ bool bhkCharacterController::IsStep(const hkpRootCdPoint& arPoint) {
             alignas(16) char buf[512];
             const hkpTriangleShape* psub = static_cast<const hkpTriangleShape*>(ps->getChildShape(uiKey, buf));
             const hkTransform& rBody = prb->getTransform();
-            const __m128 col0 = rBody.m_rotation.m_col0.m_quad;
-            const __m128 col1 = rBody.m_rotation.m_col1.m_quad;
-            const __m128 col2 = rBody.m_rotation.m_col2.m_quad;
-            const __m128 trans = rBody.m_translation.m_quad;
             hkVector4 triVertices[3];
             for (int32_t i = 2; i >= 0; --i) {
-                const __m128 v = psub->getVertex(i).m_quad;
-                // EXE-INLINED 0xC7F640
-                triVertices[i].m_quad = _mm_add_ps(
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), col0)),
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), trans)
-                );
+                triVertices[i].setTransformedPos(rBody, psub->getVertex(i));
             }
             hkpCollideTriangleUtil::PointTriangleDistanceCache cache;
             hkpCollideTriangleUtil::setupPointTriangleDistanceCache(triVertices, cache);

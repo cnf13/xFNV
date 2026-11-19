@@ -29,21 +29,14 @@ NiSphereTriIntersector::~NiSphereTriIntersector() {}
 // The squared distance from the moved sphere centre to the moved triangle, scaled so that 0 is touching. The scalar
 // products and sums are each rounded to float. The parameters are mutable in Gamebryo, hence the const_casts.
 float NiSphereTriIntersector::Pseudodistance(const NiPoint3& kV0, const NiPoint3& kV1, float fTime) const {
-    // EXE-INLINED 0x4A3760
-    NiPoint3 kOffset;
-    kOffset.x = kV0.x * fTime;
-    kOffset.y = kV0.y * fTime;
-    kOffset.z = kV0.z * fTime;
+    NiPoint3 kOffset = fTime * kV0;
     const NiPoint3& kCenter = m_kSphere.m_kSphere.m_kCenter;
     NiPoint3 kMCenter;
     kMCenter.y = kCenter.y + kOffset.y;
     kMCenter.z = kCenter.z + kOffset.z;
     kMCenter.x = kCenter.x + kOffset.x;
     NiTrigon kMTri = m_kTri;
-    // EXE-INLINED 0x4A3760
-    kOffset.x = kV1.x * fTime;
-    kOffset.y = kV1.y * fTime;
-    kOffset.z = kV1.z * fTime;
+    kOffset = fTime * kV1;
     kMTri.m_kOrigin.x = kOffset.x + kMTri.m_kOrigin.x;
     kMTri.m_kOrigin.y = kMTri.m_kOrigin.y + kOffset.y;
     kMTri.m_kOrigin.z = kMTri.m_kOrigin.z + kOffset.z;

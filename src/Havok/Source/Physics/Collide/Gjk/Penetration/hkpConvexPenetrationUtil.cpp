@@ -194,23 +194,12 @@ static void findNearestTrianglePair(
         }
     }
 LABEL_25:;
-    // EXE-INLINED none: hkVector4::normalize3
     __m128 v31 = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v53), _mm_set_ss(v53), 0), (*a4)->m_normal.m_quad);
     a3->m_quad = v31;
     __m128 v32 =
         _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(v54), _mm_set_ss(v54), 0), (*a5)->m_normal.m_quad), v31);
-    __m128 v33 = _mm_mul_ps(v32, v32);
-    float v34 = _mm_shuffle_ps(v33, v33, 85)[0] + v33[0];
-    __m128 v35 = _mm_shuffle_ps(v33, v33, 170);
-    v35[0] = v35[0] + v34;
-    float v36 = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(v35[0])));
-    __m128 v37 = _mm_setzero_ps();
-    __m128 v38 = _mm_cmpeq_ss(v35, v37);
-    v37[0] = 3.0f - ((v35[0] * v36) * v36);
-    __m128 v39 = _mm_setzero_ps();
-    v39[0] = (0.5f * v36) * v37[0];
-    __m128 v40 = _mm_andnot_ps(v38, v39);
-    a3->m_quad = _mm_mul_ps(_mm_shuffle_ps(v40, v40, 0), v32);
+    a3->m_quad = v32;
+    a3->normalize3();
     if (!(v47 < 0.0f)) {
         v5 = v47;
     }
@@ -230,26 +219,8 @@ static void updateBestSupportPair(
     hkpCdVertex vertexA;
     negDirection.m_quad = _mm_xor_ps(direction->m_quad, hkQuadRealNegateMask);
     shapeA->getSupportingVertexImpl(negDirection, vertexA);
-    // EXE-INLINED none: hkVector4::_setRotatedInverseDir
-    const __m128 col0 = transform->m_rotation.m_col0.m_quad;
-    const __m128 col1 = transform->m_rotation.m_col1.m_quad;
-    const __m128 col2 = transform->m_rotation.m_col2.m_quad;
-    const __m128 lo = _mm_unpacklo_ps(col0, col1);
-    const __m128 rows0 = _mm_movelh_ps(lo, col2);
     hkVector4 directionInB;
-    directionInB.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(
-                _mm_shuffle_ps(direction->m_quad, direction->m_quad, 85),
-                _mm_shuffle_ps(_mm_movehl_ps(rows0, lo), col2, 212)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(direction->m_quad, direction->m_quad, 0), rows0)
-        ),
-        _mm_mul_ps(
-            _mm_shuffle_ps(direction->m_quad, direction->m_quad, 170),
-            _mm_shuffle_ps(_mm_unpackhi_ps(col0, col1), col2, 228)
-        )
-    );
+    directionInB._setRotatedInverseDir(transform->m_rotation, *direction);
     hkpCdVertex vertexB;
     shapeB->getSupportingVertexImpl(directionInB, vertexB);
     const __m128 b = vertexB.m_quad;
@@ -297,12 +268,6 @@ static hkpGskOut* sampleSupportPenetration(
         updateBestSupportPair(shapeA, shapeB, &best, &direction, transform);
     }
     const __m128 zero = _mm_setzero_ps();
-    __m128 zeroS = _mm_setzero_ps();
-    zeroS[0] = 0.0f;
-    __m128 three = _mm_setzero_ps();
-    three[0] = 3.0f;
-    __m128 half = _mm_setzero_ps();
-    half[0] = 0.5f;
     float scale = 1.0f;
     while (true) {
         float step = scale * 0.9900000095367432;
@@ -326,39 +291,22 @@ static hkpGskOut* sampleSupportPenetration(
         perp.m_quad = zero;
         perp.m_quad[i0] = best.m_direction.m_quad[i1];
         perp.m_quad[i1] = -best.m_direction.m_quad[i0];
-        // EXE-INLINED none: hkVector4::normalize3
-        __m128 len2 = _mm_mul_ps(perp.m_quad, perp.m_quad);
-        len2 = _mm_add_ss(_mm_shuffle_ps(len2, len2, 170), _mm_add_ss(_mm_shuffle_ps(len2, len2, 85), len2));
-        __m128 r = _mm_rsqrt_ss(len2);
-        __m128 isZero = _mm_cmpeq_ss(len2, zeroS);
-        __m128 refined = _mm_mul_ss(_mm_mul_ss(half, r), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(len2, r), r)));
-        __m128 inv = _mm_andnot_ps(isZero, refined);
-        const __m128 perpN = _mm_mul_ps(_mm_shuffle_ps(inv, inv, 0), perp.m_quad);
+        perp.normalize3();
+        const __m128 perpN = perp.m_quad;
         const __m128 stepV = _mm_set1_ps(step);
         const __m128 offset = _mm_mul_ps(stepV, perpN);
         const __m128 bd = best.m_direction.m_quad;
-        // EXE-INLINED none: hkVector4::setCross
-        const __m128 cross = _mm_mul_ps(
-            _mm_sub_ps(
-                _mm_mul_ps(_mm_shuffle_ps(bd, bd, 201), _mm_shuffle_ps(perpN, perpN, 210)),
-                _mm_mul_ps(_mm_shuffle_ps(bd, bd, 210), _mm_shuffle_ps(perpN, perpN, 201))
-            ),
-            stepV
-        );
-        const __m128 moved = _mm_add_ps(bd, offset);
-        // EXE-INLINED none: hkVector4::lengthInverse3
-        len2 = _mm_mul_ps(moved, moved);
-        len2 = _mm_add_ss(_mm_shuffle_ps(len2, len2, 170), _mm_add_ss(_mm_shuffle_ps(len2, len2, 85), len2));
-        r = _mm_rsqrt_ss(len2);
-        isZero = _mm_cmpeq_ss(len2, zeroS);
-        refined = _mm_mul_ss(_mm_mul_ss(half, r), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(len2, r), r)));
-        inv = _mm_andnot_ps(isZero, refined);
-        inv = _mm_shuffle_ps(inv, inv, 0);
+        hkVector4 perpCross;
+        perpCross.setCross(best.m_direction, perp);
+        const __m128 cross = _mm_mul_ps(perpCross.m_quad, stepV);
+        hkVector4 moved;
+        moved.m_quad = _mm_add_ps(bd, offset);
+        const __m128 inv = moved.lengthInverse3().broadcast().m_quad;
         hkVector4 direction0;
         hkVector4 direction1;
         hkVector4 direction2;
         hkVector4 direction3;
-        direction0.m_quad = _mm_mul_ps(inv, moved);
+        direction0.m_quad = _mm_mul_ps(inv, moved.m_quad);
         direction1.m_quad = _mm_mul_ps(_mm_sub_ps(bd, offset), inv);
         direction2.m_quad = _mm_mul_ps(_mm_add_ps(cross, bd), inv);
         direction3.m_quad = _mm_mul_ps(_mm_sub_ps(bd, cross), inv);
@@ -486,16 +434,16 @@ hkResult hkCalcMultiPenetrationDepth(
     }
     while (expanded);
 
-    // EXE-INLINED none: hkVector4::setNeg4
-    const __m128 normal = _mm_xor_ps(plane.m_quad, hkQuadRealNegateMask);
+    hkVector4 normal;
+    normal.setNeg4(plane);
     const float planeDistance = -plane(3);
     // x87 copy of shapeA->m_radius.
     const float radiusA = shapeA->m_radius;
     if (numShapeBs > 0) {
         const double distance = static_cast<double>(planeDistance) - radiusA;
-        const __m128 normalY = _mm_shuffle_ps(normal, normal, 0x55);
-        const __m128 normalX = _mm_shuffle_ps(normal, normal, 0x00);
-        const __m128 normalZ = _mm_shuffle_ps(normal, normal, 0xAA);
+        const __m128 normalY = _mm_shuffle_ps(normal.m_quad, normal.m_quad, 0x55);
+        const __m128 normalX = _mm_shuffle_ps(normal.m_quad, normal.m_quad, 0x00);
+        const __m128 normalZ = _mm_shuffle_ps(normal.m_quad, normal.m_quad, 0xAA);
         hkCalcMultiPenetrationDepthWork* current = workData;
         int32_t remaining = numShapeBs;
         do {
@@ -560,8 +508,7 @@ hkpGskStatus hkCalculatePenetrationDepth(
 void hkpConvexPenetrationUtil::getPointForSimplex(const hkVector4& direction, hkpWingedEdge::Vertex& result) {
     m_shapeA.m_storage->getSupportingVertexImpl(direction, result.m_pointAinA);
     alignas(16) hkVector4 negDirection;
-    // EXE-INLINED none: hkVector4::setNeg4
-    negDirection.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
+    negDirection.setNeg4(direction);
     alignas(16) hkVector4 negDirectionInB;
     negDirectionInB._setRotatedInverseDir(m_aTb.m_rotation, negDirection);
     m_shapeB.m_storage->getSupportingVertexImpl(negDirectionInB, result.m_pointBinB);
@@ -593,33 +540,18 @@ void hkpConvexPenetrationUtil::findBestProjection(
     float& bestDistanceOut
 ) {
     alignas(16) hkVector4 directionNeg;
-    // EXE-INLINED none: hkVector4::setNeg4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&directionNeg.m_quad)[0],
-        _mm_xor_ps(
-            _mm_load_ps(&reinterpret_cast<const float*>(&direction.m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0])
-        )
-    );
+    directionNeg.setNeg4(direction);
     alignas(16) hkpWingedEdge::Vertex pA;
     getPointForSimplex(direction, pA);
     getPointForSimplex(directionNeg, result);
 
     const __m128 kFrom = _mm_load_ps(&reinterpret_cast<const float*>(&from.m_quad)[0]);
-    // EXE-INLINED none: hkVector4::dot3
-    const __m128 kA = _mm_mul_ps(
-        _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&pA.m_position.m_quad)[0]), kFrom),
-        _mm_load_ps(&reinterpret_cast<const float*>(&direction.m_quad)[0])
-    );
-    const float fDistA =
-        (_mm_cvtss_f32(_mm_shuffle_ps(kA, kA, 0x55)) + _mm_cvtss_f32(kA)) + _mm_cvtss_f32(_mm_shuffle_ps(kA, kA, 0xAA));
-    // EXE-INLINED none: hkVector4::dot3
-    const __m128 kB = _mm_mul_ps(
-        _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&result.m_position.m_quad)[0]), kFrom),
-        _mm_load_ps(&reinterpret_cast<float*>(&directionNeg.m_quad)[0])
-    );
-    const float fDistB =
-        (_mm_cvtss_f32(_mm_shuffle_ps(kB, kB, 0x55)) + _mm_cvtss_f32(kB)) + _mm_cvtss_f32(_mm_shuffle_ps(kB, kB, 0xAA));
+    hkVector4 kA;
+    kA.m_quad = _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&pA.m_position.m_quad)[0]), kFrom);
+    const float fDistA = kA.dot3(direction);
+    hkVector4 kB;
+    kB.m_quad = _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&result.m_position.m_quad)[0]), kFrom);
+    const float fDistB = kB.dot3(directionNeg);
 
     if (!(fDistB <= fDistA)) {
         bestDistanceOut = fDistB;
@@ -673,14 +605,7 @@ void hkpConvexPenetrationUtil::convertResultToFeature(
     );
     _mm_store_ps(&reinterpret_cast<float*>(&output.m_pointAinA.m_quad)[0], kSum);
     output.m_distance.m_storage = -nearestTriangle->m_distanceToOrigin;
-    // EXE-INLINED none: hkVector4::setNeg4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&output.m_normalInA.m_quad)[0],
-        _mm_xor_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&nearestTriangle->m_normal.m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0])
-        )
-    );
+    output.m_normalInA.setNeg4(nearestTriangle->m_normal);
 }
 
 void hkpConvexPenetrationUtil::addPointToSimplex(const hkpWingedEdge::Vertex& p) {
@@ -717,23 +642,16 @@ hkResult hkpConvexPenetrationUtil::builtTetrahedron(hkpGskOut& output, hkpGskSta
 simplex4:
     {
         const hkVector4* simplex = m_simplex.m_storage;
-        const __m128 e0 = _mm_sub_ps(simplex[0].m_quad, simplex[1].m_quad);
-        const __m128 e1 = _mm_sub_ps(simplex[1].m_quad, simplex[2].m_quad);
-        // EXE-INLINED none: hkVector4::setCross
-        const __m128 n = _mm_sub_ps(
-            _mm_mul_ps(
-                _mm_shuffle_ps(e0, e0, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(e1, e1, _MM_SHUFFLE(3, 1, 0, 2))
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(e0, e0, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(e1, e1, _MM_SHUFFLE(3, 0, 2, 1)))
-        );
-        // EXE-INLINED 0x62B0A0
-        const __m128 nn = _mm_mul_ps(n, n);
-        const float areaSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(nn, nn, 0xAA), _mm_add_ss(_mm_shuffle_ps(nn, nn, 0x55), nn)));
-        // EXE-INLINED 0x62B0A0
-        const __m128 hn = _mm_mul_ps(_mm_sub_ps(simplex[3].m_quad, simplex[0].m_quad), n);
-        const float height =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(hn, hn, 0xAA), _mm_add_ss(_mm_shuffle_ps(hn, hn, 0x55), hn)));
+        hkVector4 e0;
+        e0.m_quad = _mm_sub_ps(simplex[0].m_quad, simplex[1].m_quad);
+        hkVector4 e1;
+        e1.m_quad = _mm_sub_ps(simplex[1].m_quad, simplex[2].m_quad);
+        hkVector4 n;
+        n.setCross(e0, e1);
+        const float areaSq = n.dot3(n);
+        hkVector4 h;
+        h.m_quad = _mm_sub_ps(simplex[3].m_quad, simplex[0].m_quad);
+        const float height = h.dot3(n);
         const float scaledAreaSq = m_epsTolSqrd.m_storage * areaSq;
         if (!(scaledAreaSq >= static_cast<double>(height) * height)) {
             gjkStatus = HK_GSK_OK;
@@ -749,29 +667,17 @@ simplex4:
 simplex3:
     {
         const hkVector4* simplex = m_simplex.m_storage;
-        const __m128 e0 = _mm_sub_ps(simplex[0].m_quad, simplex[1].m_quad);
-        const __m128 e1 = _mm_sub_ps(simplex[1].m_quad, simplex[2].m_quad);
-        // EXE-INLINED none: hkVector4::setCross
-        const __m128 n = _mm_sub_ps(
-            _mm_mul_ps(
-                _mm_shuffle_ps(e0, e0, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(e1, e1, _MM_SHUFFLE(3, 1, 0, 2))
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(e0, e0, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(e1, e1, _MM_SHUFFLE(3, 0, 2, 1)))
-        );
-        // EXE-INLINED 0x62B0A0
-        const __m128 nn = _mm_mul_ps(n, n);
-        const __m128 len2 = _mm_add_ss(_mm_shuffle_ps(nn, nn, 0xAA), _mm_add_ss(_mm_shuffle_ps(nn, nn, 0x55), nn));
+        hkVector4 e0;
+        e0.m_quad = _mm_sub_ps(simplex[0].m_quad, simplex[1].m_quad);
+        hkVector4 e1;
+        e1.m_quad = _mm_sub_ps(simplex[1].m_quad, simplex[2].m_quad);
+        hkVector4 n;
+        n.setCross(e0, e1);
+        const float len2 = n.dot3(n);
         // A NaN area counts as a face, as the game does.
-        if (_mm_cvtss_f32(len2) != 0.0f) {
-            alignas(16) hkVector4 normal;
-            // EXE-INLINED 0x62AEA0
-            const __m128 approx = _mm_rsqrt_ss(len2);
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            );
-            const __m128 lenInv = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_set_ss(0.0f)), refined);
-            normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), n);
+        if (len2 != 0.0f) {
+            alignas(16) hkVector4 normal = n;
+            normal.normalize3();
             dimension = 3;
             hkpWingedEdge::Vertex& vertex = vertexA;
             float distance;
@@ -820,30 +726,16 @@ simplex3:
             output.m_normalInA.m_quad = _mm_setzero_ps();
             output.m_normalInA(i0) = edge(i2);
             output.m_normalInA(i2) = -edge(i0);
-            // EXE-INLINED 0x62AEA0
-            const __m128 v = output.m_normalInA.m_quad;
-            const __m128 vv = _mm_mul_ps(v, v);
-            const __m128 vLen2 = _mm_add_ss(_mm_shuffle_ps(vv, vv, 0xAA), _mm_add_ss(_mm_shuffle_ps(vv, vv, 0x55), vv));
-            const __m128 approx = _mm_rsqrt_ss(vLen2);
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(vLen2, approx), approx))
-            );
-            const __m128 lenInv = _mm_andnot_ps(_mm_cmpeq_ss(vLen2, _mm_set_ss(0.0f)), refined);
-            output.m_normalInA.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), v);
-            // EXE-INLINED none: hkVector4::setAbs4
-            // The sign bits cleared: andnps with -0.0 is the exe's andps with 0x7fffffff (0x1017D10), bit for bit.
-            const __m128 a = _mm_andnot_ps(_mm_set1_ps(-0.0f), m_simplex.m_storage[0].m_quad);
+            output.m_normalInA.normalize3();
+            hkVector4 abs;
+            abs.setAbs4(m_simplex.m_storage[0]);
+            const __m128 a = abs.m_quad;
             const float sumAbs =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(a, a, 0xAA), _mm_add_ss(_mm_shuffle_ps(a, a, 0x55), a)));
             const float t =
                 static_cast<float>(sumAbs / (static_cast<double>(sumAbs) + sumAbs + 1.1920928955078125e-07));
             const hkpCdVertex* pointsA = m_pointsAinA.m_storage;
-            const __m128 tq = _mm_set1_ps(t);
-            // EXE-INLINED 0x5DBF70
-            output.m_pointAinA.m_quad = _mm_add_ps(
-                _mm_mul_ps(_mm_sub_ps(_mm_set1_ps(1.0f), tq), pointsA[0].m_quad), _mm_mul_ps(pointsA[1].m_quad, tq)
-            );
+            output.m_pointAinA.setInterpolate4(pointsA[0], pointsA[1], t);
             gjkStatus = HK_GSK_OK;
             return HK_FAILURE;
         }
@@ -852,11 +744,9 @@ simplex3:
 
 simplex2:
     {
-        const __m128 e = _mm_sub_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[1].m_quad);
-        // EXE-INLINED 0x62B0A0
-        const __m128 ee = _mm_mul_ps(e, e);
-        const float lengthSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(ee, ee, 0xAA), _mm_add_ss(_mm_shuffle_ps(ee, ee, 0x55), ee)));
+        hkVector4 e;
+        e.m_quad = _mm_sub_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[1].m_quad);
+        const float lengthSq = e.dot3(e);
         if (m_epsTolSqrd.m_storage >= lengthSq) {
             if (dimension >= 1) {
                 gjkStatus = HK_GSK_PD_DISTANCE_TOO_BIG;
@@ -889,39 +779,10 @@ simplex2:
         perpendicular.m_quad = _mm_setzero_ps();
         perpendicular(i0) = edge(i2);
         perpendicular(i2) = -edge(i0);
-        const __m128 p = perpendicular.m_quad;
-        // EXE-INLINED none: hkVector4::setCross
-        const __m128 c = _mm_sub_ps(
-            _mm_mul_ps(
-                _mm_shuffle_ps(edge.m_quad, edge.m_quad, _MM_SHUFFLE(3, 0, 2, 1)),
-                _mm_shuffle_ps(p, p, _MM_SHUFFLE(3, 1, 0, 2))
-            ),
-            _mm_mul_ps(
-                _mm_shuffle_ps(edge.m_quad, edge.m_quad, _MM_SHUFFLE(3, 1, 0, 2)),
-                _mm_shuffle_ps(p, p, _MM_SHUFFLE(3, 0, 2, 1))
-            )
-        );
-        // EXE-INLINED 0x62AEA0
-        const __m128 pp = _mm_mul_ps(p, p);
-        const __m128 pLen2 = _mm_add_ss(_mm_shuffle_ps(pp, pp, 0xAA), _mm_add_ss(_mm_shuffle_ps(pp, pp, 0x55), pp));
-        const __m128 pApprox = _mm_rsqrt_ss(pLen2);
-        const __m128 pRefined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), pApprox),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(pLen2, pApprox), pApprox))
-        );
-        const __m128 pLenInv = _mm_andnot_ps(_mm_cmpeq_ss(pLen2, _mm_set_ss(0.0f)), pRefined);
-        perpendicular.m_quad = _mm_mul_ps(_mm_shuffle_ps(pLenInv, pLenInv, 0), p);
-        // EXE-INLINED 0x62AEA0
         alignas(16) hkVector4 crossDirection;
-        const __m128 cc = _mm_mul_ps(c, c);
-        const __m128 cLen2 = _mm_add_ss(_mm_shuffle_ps(cc, cc, 0xAA), _mm_add_ss(_mm_shuffle_ps(cc, cc, 0x55), cc));
-        const __m128 cApprox = _mm_rsqrt_ss(cLen2);
-        const __m128 cRefined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), cApprox),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(cLen2, cApprox), cApprox))
-        );
-        const __m128 cLenInv = _mm_andnot_ps(_mm_cmpeq_ss(cLen2, _mm_set_ss(0.0f)), cRefined);
-        crossDirection.m_quad = _mm_mul_ps(_mm_shuffle_ps(cLenInv, cLenInv, 0), c);
+        crossDirection.setCross(edge, perpendicular);
+        perpendicular.normalize3();
+        crossDirection.normalize3();
         hkpWingedEdge::Vertex& vertex1 = vertexA;
         alignas(16) float distance1;
         findBestProjection(perpendicular, m_simplex.m_storage[0], vertex1, distance1);
@@ -939,10 +800,7 @@ simplex2:
 
 simplex1:
     {
-        // EXE-INLINED 0x62B0A0
-        const __m128 s = _mm_mul_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[0].m_quad);
-        const float lengthSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(s, s, 0xAA), _mm_add_ss(_mm_shuffle_ps(s, s, 0x55), s)));
+        const float lengthSq = m_simplex.m_storage[0].dot3(m_simplex.m_storage[0]);
         if (m_epsTolSqrd.m_storage >= lengthSq) {
             if (dimension >= 0) {
                 gjkStatus = HK_GSK_PD_DISTANCE_TOO_BIG;
@@ -956,21 +814,16 @@ simplex1:
         dimension = 1;
         hkpWingedEdge::Vertex& vertexAlong = vertexB;
         getPointForSimplex(simplex[0], vertexAlong);
-        // EXE-INLINED 0x62B0A0
-        const __m128 dA = _mm_sub_ps(vertexAlong.m_position.m_quad, m_simplex.m_storage[0].m_quad);
-        const __m128 dA2 = _mm_mul_ps(dA, dA);
-        const float distanceAlongSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(dA2, dA2, 0xAA), _mm_add_ss(_mm_shuffle_ps(dA2, dA2, 0x55), dA2)));
+        hkVector4 dA;
+        dA.m_quad = _mm_sub_ps(vertexAlong.m_position.m_quad, m_simplex.m_storage[0].m_quad);
+        const float distanceAlongSq = dA.dot3(dA);
         alignas(16) hkVector4 negDirection;
-        // EXE-INLINED none: hkVector4::setNeg4
-        negDirection.m_quad = _mm_xor_ps(simplex[0].m_quad, hkQuadRealNegateMask);
+        negDirection.setNeg4(simplex[0]);
         hkpWingedEdge::Vertex& vertexAgainst = vertexA;
         getPointForSimplex(negDirection, vertexAgainst);
-        // EXE-INLINED 0x62B0A0
-        const __m128 dB = _mm_sub_ps(vertexAgainst.m_position.m_quad, m_simplex.m_storage[0].m_quad);
-        const __m128 dB2 = _mm_mul_ps(dB, dB);
-        const float distanceAgainstSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(dB2, dB2, 0xAA), _mm_add_ss(_mm_shuffle_ps(dB2, dB2, 0x55), dB2)));
+        hkVector4 dB;
+        dB.m_quad = _mm_sub_ps(vertexAgainst.m_position.m_quad, m_simplex.m_storage[0].m_quad);
+        const float distanceAgainstSq = dB.dot3(dB);
         if (distanceAgainstSq <= distanceAlongSq) {
             addPointToSimplex(vertexAlong);
         }
@@ -982,32 +835,20 @@ simplex1:
 
 simplex0:
     {
-        // EXE-INLINED 0x62B0A0
-        const __m128 tt = _mm_mul_ps(m_aTb.m_translation.m_quad, m_aTb.m_translation.m_quad);
-        const float translationSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(tt, tt, 0xAA), _mm_add_ss(_mm_shuffle_ps(tt, tt, 0x55), tt)));
+        const float translationSq = m_aTb.m_translation.dot3(m_aTb.m_translation);
         // The support point against B's offset, along y where the offset is within the tolerance.
         alignas(16) hkVector4 direction;
-        // EXE-INLINED none: hkVector4::setNeg4
-        direction.m_quad = _mm_xor_ps(m_aTb.m_translation.m_quad, hkQuadRealNegateMask);
+        direction.setNeg4(m_aTb.m_translation);
         if (m_epsTolSqrd.m_storage >= translationSq) {
             direction.m_quad = hkTransformIdentity.m_rotation.m_col1.m_quad;
         }
         hkpWingedEdge::Vertex& vertex = vertexA;
         getPointForSimplex(direction, vertex);
         addPointToSimplex(vertex);
-        // EXE-INLINED 0x62B0A0
-        const __m128 s = _mm_mul_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[0].m_quad);
-        const float lengthSq =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(s, s, 0xAA), _mm_add_ss(_mm_shuffle_ps(s, s, 0x55), s)));
+        const float lengthSq = m_simplex.m_storage[0].dot3(m_simplex.m_storage[0]);
         if (m_epsTolSqrd.m_storage >= lengthSq) {
             // The shapes touch at that point.
-            // EXE-INLINED 0x630B40
-            const __m128 s0 = m_simplex.m_storage[0].m_quad;
-            const __m128 s02 = _mm_mul_ps(s0, s0);
-            output.m_distance.m_storage = _mm_cvtss_f32(
-                _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(s02, s02, 0xAA), _mm_add_ss(_mm_shuffle_ps(s02, s02, 0x55), s02)))
-            );
+            output.m_distance.m_storage = m_simplex.m_storage[0].length3();
             output.m_normalInA.m_quad = direction.m_quad;
             output.m_pointAinA.m_quad = vertex.m_pointAinA.m_quad;
             gjkStatus = HK_GSK_OK;

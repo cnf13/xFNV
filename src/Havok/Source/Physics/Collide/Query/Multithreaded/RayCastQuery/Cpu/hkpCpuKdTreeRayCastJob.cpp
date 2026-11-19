@@ -51,13 +51,8 @@ void hkKdTreeCpuBroadphaseBundleCastCollector::addMidPhaseHit(hkPrimitiveId prim
     hkVector4 kFrom[4];
     hkVector4 kTo[4];
     for (int32_t i = 0; i < 4; ++i) {
-        hkVector4 kRelative;
-        // EXE-INLINED 0xC7F690
-        kRelative.m_quad = _mm_sub_ps(m_originalInput[i].m_from.m_quad, rTransform.m_translation.m_quad);
-        kFrom[i]._setRotatedInverseDir(rTransform.m_rotation, kRelative);
-        // EXE-INLINED 0xC7F690
-        kRelative.m_quad = _mm_sub_ps(m_originalInput[i].m_to.m_quad, rTransform.m_translation.m_quad);
-        kTo[i]._setRotatedInverseDir(rTransform.m_rotation, kRelative);
+        kFrom[i].setTransformedInversePos(rTransform, m_originalInput[i].m_from);
+        kTo[i].setTransformedInversePos(rTransform, m_originalInput[i].m_to);
     }
     // Coordinate c of the four ends in m_from[c] and m_to[c]; the w lanes are dropped.
     hkQuadReal kFrom0 = kFrom[0].m_quad;
@@ -91,15 +86,7 @@ void hkKdTreeCpuBroadphaseBundleCastCollector::addMidPhaseHit(hkPrimitiveId prim
             // EXE-INLINED 0x9C1A70
             rResult.hkpShapeRayCastOutput::operator=(rOutput);
             m_command->m_results[i].m_rootCollidable = pCollidable;
-            const hkQuadReal kNormal = rOutput.m_normal.m_quad;
-            // EXE-INLINED 0xC7F700
-            m_command->m_results[i].m_normal.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0x00), rTransform.m_rotation.m_col0.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0x55), rTransform.m_rotation.m_col1.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0xAA), rTransform.m_rotation.m_col2.m_quad)
-            );
+            m_command->m_results[i].m_normal.setRotatedDir(rTransform.m_rotation, rOutput.m_normal);
             hkKdTreeRayCastBundleCommand* pCommand = m_command;
             const float fFraction = pCommand->m_stopAfterFirstHit.m_bool ? 0.0f : pCommand->m_results[i].m_hitFraction;
             pCommand->m_results[i].m_hitFraction = fFraction;

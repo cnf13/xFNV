@@ -1,3 +1,4 @@
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
@@ -5,9 +6,9 @@
 NiQuaternion NiQuaternion::Exp(const NiQuaternion& q) {
     float fSqrLength = q.m_fY * q.m_fY + q.m_fX * q.m_fX + q.m_fZ * q.m_fZ;
     float fAngle = std::sqrt(fSqrLength);
-    // EXE-INLINED 0x4169A0
-    float fCos = std::cos(fAngle);
-    float fSin = std::sin(fAngle);
+    float fSin;
+    float fCos;
+    NiSinCos(fAngle, fSin, fCos);
     float fAbsSin = __builtin_fabsf(fSin);
     float fCoeff = fAbsSin < 0.001f ? 1.0f : fSin / fAngle;
     float fZ = q.m_fZ * fCoeff;

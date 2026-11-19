@@ -107,10 +107,7 @@ void hkpPredGskfAgent::processCollision(
         timInfo(3) = f0 * msA.m_deltaAngle(3) * msA.m_objectRadius + f1 * msB.m_deltaAngle(3) * msB.m_objectRadius;
 
         const hkpCollisionQualityInfo& qi = *input.m_collisionQualityInfo;
-        // EXE-INLINED 0x62B0A0: hkVector4::dot3, its addss sums (y + x, then z + that) rounded to a float.
-        const hkQuadReal x2 = _mm_mul_ps(timInfo.m_quad, m_separatingNormal.m_quad);
-        const hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(1, 1, 1, 1)), x2);
-        float timDot = _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(2, 2, 2, 2)), xySum));
+        float timDot = timInfo.dot3(m_separatingNormal);
         // The projected distance is rounded to a float before the compares.
         float dist = m_separatingNormal(3) - timDot - timInfo(3);
 

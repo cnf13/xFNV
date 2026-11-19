@@ -638,24 +638,8 @@ hkpStepResult hkpSimulation::integrateInternal(const hkStepInfo& stepInfoIn) {
     hkpSolverInfo& solverInfo = m_world->m_dynamicsStepInfo.m_solverInfo;
     solverInfo.m_deltaTime = solverInfo.m_invNumSteps * stepInfoIn.m_deltaTime;
     solverInfo.m_invDeltaTime = static_cast<float>(solverInfo.m_numSteps) * stepInfoIn.m_invDeltaTime;
-    // EXE-INLINED 0x630AE0
-    {
-        const float subStepDeltaTime = solverInfo.m_deltaTime;
-        const hkQuadReal& gravity = m_world->m_gravity.m_quad;
-        solverInfo.m_globalAccelerationPerSubStep.m_quad[0] = subStepDeltaTime * gravity[0];
-        solverInfo.m_globalAccelerationPerSubStep.m_quad[1] = subStepDeltaTime * gravity[1];
-        solverInfo.m_globalAccelerationPerSubStep.m_quad[2] = subStepDeltaTime * gravity[2];
-        solverInfo.m_globalAccelerationPerSubStep.m_quad[3] = subStepDeltaTime * gravity[3];
-    }
-    // EXE-INLINED 0x630AE0
-    {
-        const float stepDeltaTime = stepInfoIn.m_deltaTime;
-        const hkQuadReal& gravity = m_world->m_gravity.m_quad;
-        solverInfo.m_globalAccelerationPerStep.m_quad[0] = stepDeltaTime * gravity[0];
-        solverInfo.m_globalAccelerationPerStep.m_quad[1] = stepDeltaTime * gravity[1];
-        solverInfo.m_globalAccelerationPerStep.m_quad[2] = stepDeltaTime * gravity[2];
-        solverInfo.m_globalAccelerationPerStep.m_quad[3] = stepDeltaTime * gravity[3];
-    }
+    solverInfo.m_globalAccelerationPerSubStep.setMul4(solverInfo.m_deltaTime, m_world->m_gravity);
+    solverInfo.m_globalAccelerationPerStep.setMul4(stepInfoIn.m_deltaTime, m_world->m_gravity);
     hkSolveUpload();
     hkpWorldOperationUtil::cleanupDirtyIslands(m_world);
     hkpWorld::MemUsageInfo memUsage;
@@ -794,21 +778,22 @@ void hkpSimulation::processAgentsOfEntities(
                 // The contact normal, pointing away from the entity's side of the agent.
                 hkVector4 normal = contact.m_separatingNormal;
                 if (centry.m_agentEntry->m_collidable[0] != lColl) {
-                    // EXE-INLINED none: hkVector4::setNeg4
-                    normal.m_quad = _mm_xor_ps(contact.m_separatingNormal.m_quad, hkQuadRealNegateMask);
+                    normal.setNeg4(contact.m_separatingNormal);
                 }
-                // EXE-INLINED 0x458A10
-                const __m128 arm = _mm_sub_ps(ms.m_sweptTransform.m_centerOfMass1.m_quad, contact.m_position.m_quad);
+                hkVector4 arm;
+                arm.setSub4(ms.m_sweptTransform.m_centerOfMass1, contact.m_position);
                 const __m128 n = normal.m_quad;
                 // The axis normal x arm.
                 // EXE-INLINED 0x630DF0
                 hkVector4 axis;
                 axis.m_quad = _mm_sub_ps(
                     _mm_mul_ps(
-                        _mm_shuffle_ps(n, n, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(arm, arm, _MM_SHUFFLE(3, 1, 0, 2))
+                        _mm_shuffle_ps(n, n, _MM_SHUFFLE(3, 0, 2, 1)),
+                        _mm_shuffle_ps(arm.m_quad, arm.m_quad, _MM_SHUFFLE(3, 1, 0, 2))
                     ),
                     _mm_mul_ps(
-                        _mm_shuffle_ps(n, n, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(arm, arm, _MM_SHUFFLE(3, 0, 2, 1))
+                        _mm_shuffle_ps(n, n, _MM_SHUFFLE(3, 1, 0, 2)),
+                        _mm_shuffle_ps(arm.m_quad, arm.m_quad, _MM_SHUFFLE(3, 0, 2, 1))
                     )
                 );
                 // The lengths and the dot product: the SDK's length3 and dot3 (the lanes summed y + x, then z + that;
@@ -822,7 +807,7 @@ void hkpSimulation::processAgentsOfEntities(
                         _mm_add_ps(_mm_shuffle_ps(axisSq, axisSq, _MM_SHUFFLE(1, 1, 1, 1)), axisSq)
                     ))
                 );
-                const __m128 armDotNormal = _mm_mul_ps(arm, n);
+                const __m128 armDotNormal = _mm_mul_ps(arm.m_quad, n);
                 float dot;
                 _mm_store_ss(
                     &dot,
@@ -831,7 +816,7 @@ void hkpSimulation::processAgentsOfEntities(
                         _mm_add_ps(_mm_shuffle_ps(armDotNormal, armDotNormal, _MM_SHUFFLE(1, 1, 1, 1)), armDotNormal)
                     )
                 );
-                const __m128 armSq = _mm_mul_ps(arm, arm);
+                const __m128 armSq = _mm_mul_ps(arm.m_quad, arm.m_quad);
                 float armLength;
                 _mm_store_ss(
                     &armLength,
@@ -860,34 +845,12 @@ void hkpSimulation::processAgentsOfEntities(
                     float asinAngle = hkMath::asin(cosAngle);
                     const float angle = asinAngle - hkMath::asin(cosLimited);
                     const float invAxisLength = 1.0f / axisLength;
-                    // EXE-INLINED 0x627920
-                    axis.m_quad = _mm_mul_ps(_mm_set1_ps(invAxisLength), axis.m_quad);
+                    axis.mul4(invAxisLength);
                     hkQuaternion turn;
                     turn.setAxisAngle(axis, angle);
                     hkQuaternion rotation;
                     rotation.setMul(turn, ms.m_sweptTransform.m_rotation1);
-                    // EXE-INLINED 0xCF8B60
-                    ms.m_transform.m_rotation.set(rotation);
-                    __m128 comLocal = ms.m_sweptTransform.m_centerOfMassLocal.m_quad;
-                    ms.m_transform.m_translation.m_quad = _mm_sub_ps(
-                        ms.m_sweptTransform.m_centerOfMass1.m_quad,
-                        _mm_add_ps(
-                            _mm_add_ps(
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(1, 1, 1, 1)),
-                                    ms.m_transform.m_rotation.m_col1.m_quad
-                                ),
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(0, 0, 0, 0)),
-                                    ms.m_transform.m_rotation.m_col0.m_quad
-                                )
-                            ),
-                            _mm_mul_ps(
-                                _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(2, 2, 2, 2)),
-                                ms.m_transform.m_rotation.m_col2.m_quad
-                            )
-                        )
-                    );
+                    setRotationAroundCentreOfMass(static_cast<hkpRigidBody*>(entity), rotation);
                     hkAgentNnMachine_InvalidateTimInAgent(agentEntry, input);
                     processFunc(this, agentEntry, input, processOutput);
 
@@ -903,73 +866,19 @@ void hkpSimulation::processAgentsOfEntities(
                             _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(n, n, _MM_SHUFFLE(3, 0, 2, 1))
                         )
                     );
-                    // EXE-INLINED 0x62AEA0
-                    const __m128 perpSq = _mm_mul_ps(perp, perp);
-                    const __m128 len2 = _mm_add_ps(
-                        _mm_shuffle_ps(perpSq, perpSq, _MM_SHUFFLE(2, 2, 2, 2)),
-                        _mm_add_ps(_mm_shuffle_ps(perpSq, perpSq, _MM_SHUFFLE(1, 1, 1, 1)), perpSq)
-                    );
-                    const __m128 approx = _mm_rsqrt_ss(len2);
-                    const __m128 len2IsZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-                    const __m128 refined = _mm_mul_ps(
-                        _mm_mul_ps(_mm_set_ss(0.5f), approx),
-                        _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(len2, approx), approx))
-                    );
-                    const __m128 invLength = _mm_andnot_ps(len2IsZero, refined);
                     hkVector4 perpAxis;
-                    perpAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, _MM_SHUFFLE(0, 0, 0, 0)), perp);
+                    perpAxis.m_quad = perp;
+                    perpAxis.normalize3();
                     hkQuaternion perpTurn;
                     perpTurn.setAxisAngle(perpAxis, angle);
                     hkQuaternion perpRotation;
                     perpRotation.setMul(perpTurn, origRotation);
-                    // EXE-INLINED 0xCF8B60
-                    ms.m_transform.m_rotation.set(perpRotation);
-                    comLocal = ms.m_sweptTransform.m_centerOfMassLocal.m_quad;
-                    ms.m_transform.m_translation.m_quad = _mm_sub_ps(
-                        ms.m_sweptTransform.m_centerOfMass1.m_quad,
-                        _mm_add_ps(
-                            _mm_add_ps(
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(1, 1, 1, 1)),
-                                    ms.m_transform.m_rotation.m_col1.m_quad
-                                ),
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(0, 0, 0, 0)),
-                                    ms.m_transform.m_rotation.m_col0.m_quad
-                                )
-                            ),
-                            _mm_mul_ps(
-                                _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(2, 2, 2, 2)),
-                                ms.m_transform.m_rotation.m_col2.m_quad
-                            )
-                        )
-                    );
+                    setRotationAroundCentreOfMass(static_cast<hkpRigidBody*>(entity), perpRotation);
                     hkAgentNnMachine_InvalidateTimInAgent(agentEntry, input);
                     processFunc(this, agentEntry, input, processOutput);
 
                     perpRotation.setInverseMul(perpTurn, origRotation);
-                    // EXE-INLINED 0xCF8B60
-                    ms.m_transform.m_rotation.set(perpRotation);
-                    comLocal = ms.m_sweptTransform.m_centerOfMassLocal.m_quad;
-                    ms.m_transform.m_translation.m_quad = _mm_sub_ps(
-                        ms.m_sweptTransform.m_centerOfMass1.m_quad,
-                        _mm_add_ps(
-                            _mm_add_ps(
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(1, 1, 1, 1)),
-                                    ms.m_transform.m_rotation.m_col1.m_quad
-                                ),
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(0, 0, 0, 0)),
-                                    ms.m_transform.m_rotation.m_col0.m_quad
-                                )
-                            ),
-                            _mm_mul_ps(
-                                _mm_shuffle_ps(comLocal, comLocal, _MM_SHUFFLE(2, 2, 2, 2)),
-                                ms.m_transform.m_rotation.m_col2.m_quad
-                            )
-                        )
-                    );
+                    setRotationAroundCentreOfMass(static_cast<hkpRigidBody*>(entity), perpRotation);
                     hkAgentNnMachine_InvalidateTimInAgent(agentEntry, input);
                     processFunc(this, agentEntry, input, processOutput);
 

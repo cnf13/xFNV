@@ -158,23 +158,14 @@ void hkpMoppCachedShapeMediator::addConvexShape(
             fAbsMax = 0.0f;
         }
         else {
-            const __m128 kDirection = a3[i].m_direction.m_quad;
+            const hkVector4& kDirection = a3[i].m_direction;
             float fRadius = pSpheres[0].m_pos.m_quad[3];
-            // EXE-INLINED 0x62B0A0
-            const __m128 kProduct = _mm_mul_ps(pSpheres[0].m_pos.m_quad, kDirection);
-            const float fDot = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(kProduct, kProduct, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProduct, kProduct, 0x55), kProduct)
-            ));
+            const float fDot = pSpheres[0].m_pos.dot3(kDirection);
             fAbsMin = fDot - fRadius;
             fAbsMax = fDot + fRadius;
             for (int32_t j = 1; j < iNumSpheres; j++) {
                 fRadius = pSpheres[j].m_pos.m_quad[3];
-                // EXE-INLINED 0x62B0A0
-                const __m128 kProductJ = _mm_mul_ps(pSpheres[j].m_pos.m_quad, kDirection);
-                const float fDotJ = _mm_cvtss_f32(_mm_add_ss(
-                    _mm_shuffle_ps(kProductJ, kProductJ, 0xAA),
-                    _mm_add_ss(_mm_shuffle_ps(kProductJ, kProductJ, 0x55), kProductJ)
-                ));
+                const float fDotJ = pSpheres[j].m_pos.dot3(kDirection);
                 const float fMin = fDotJ - fRadius;
                 const float fMax = fDotJ + fRadius;
                 if (fAbsMin > fMin) {

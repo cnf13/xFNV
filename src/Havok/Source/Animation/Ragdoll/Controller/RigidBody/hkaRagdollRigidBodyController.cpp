@@ -106,11 +106,7 @@ void hkaRagdollRigidBodyController::driveToPose(
         for (int32_t i = 0; i < m_ragdollInstance->m_skeleton->m_bones.m_size; ++i) {
             const int32_t rb = m_ragdollInstance->m_boneToRigidBodyMap.m_data[i];
             if (rb >= 0) {
-                // EXE-INLINED 0xC6CD30: hkQsTransform::operator= (three movaps copies)
-                hkQsTransform& rDest = poseLocalSpace.m_data[rb];
-                rDest.m_translation.m_quad = poseLocal[i].m_translation.m_quad;
-                rDest.m_rotation.m_vec.m_quad = poseLocal[i].m_rotation.m_vec.m_quad;
-                rDest.m_scale.m_quad = poseLocal[i].m_scale.m_quad;
+                poseLocalSpace.m_data[rb] = poseLocal[i];
             }
         }
         keyFrameData.m_desiredPoseLocalSpace = poseLocalSpace.m_data;

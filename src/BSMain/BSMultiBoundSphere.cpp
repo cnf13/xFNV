@@ -64,8 +64,7 @@ bool BSMultiBoundSphere::IsEqual(NiObject* apObject) {
     }
 
     BSMultiBoundSphere* pkOther = static_cast<BSMultiBoundSphere*>(apObject);
-    // EXE-INLINED 0x4390C0
-    bool bCenter = pkOther->Center.x == Center.x && pkOther->Center.y == Center.y && pkOther->Center.z == Center.z;
+    bool bCenter = pkOther->Center == Center;
     return bCenter & (pkOther->Radius == Radius);
 }
 

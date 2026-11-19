@@ -122,18 +122,10 @@ void hkpHeightFieldAgent::processCollision(
         int32_t i = nSpheres - 1;
         do {
             const hkQuadReal s = spheres[i].m_pos.m_quad;
-            // EXE-INLINED 0xC7F640
-            const hkQuadReal p = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0x55), bTa.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0x00), bTa.m_rotation.m_col0.m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0xAA), bTa.m_rotation.m_col2.m_quad), bTa.m_translation.m_quad
-                )
-            );
+            hkVector4 p;
+            p.setTransformedPos(bTa, spheres[i].m_pos);
             // x, y and z of the moved centre, w (the radius) of the sphere.
-            sphereBuffer[i].m_pos.m_quad = _mm_shuffle_ps(p, _mm_unpackhi_ps(p, s), 0xC4);
+            sphereBuffer[i].m_pos.m_quad = _mm_shuffle_ps(p.m_quad, _mm_unpackhi_ps(p.m_quad, s), 0xC4);
         }
         while (--i >= 0);
 
@@ -161,19 +153,10 @@ void hkpHeightFieldAgent::processCollision(
             const float negRadius = -sphere->m_pos(3);
             const hkQuadReal r = _mm_set_ss(negRadius);
             const hkQuadReal o = output->m_quad;
-            const hkQuadReal cpPos = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), o), sphere->m_pos.m_quad);
+            hkVector4 cpPos;
+            cpPos.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), o), sphere->m_pos.m_quad);
             const hkTransform& hfTransform = hfBody.m_motion.pState->m_transform;
-            // EXE-INLINED 0xC7F640
-            point->m_contact.m_position.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0x55), hfTransform.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0x00), hfTransform.m_rotation.m_col0.m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0xAA), hfTransform.m_rotation.m_col2.m_quad),
-                    hfTransform.m_translation.m_quad
-                )
-            );
+            point->m_contact.m_position.setTransformedPos(hfTransform, cpPos);
             // EXE-INLINED none: hkVector4::_setRotatedDir
             const hkRotation& hfRotation = hfBody.m_motion.pState->m_transform.m_rotation;
             const hkQuadReal n = output->m_quad;
@@ -238,22 +221,10 @@ void hkpHeightFieldAgent::staticGetPenetrations(
 
         // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
         {
-            const hkQuadReal col0 = bTa.m_rotation.m_col0.m_quad;
-            const hkQuadReal col1 = bTa.m_rotation.m_col1.m_quad;
-            const hkQuadReal col2 = bTa.m_rotation.m_col2.m_quad;
-            const hkQuadReal translation = bTa.m_translation.m_quad;
             int32_t i = nSpheres - 1;
             do {
-                const hkQuadReal pos = spheres[i].m_pos.m_quad;
-                // EXE-INLINED 0xC7F640
                 hkVector4 v;
-                v.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1)), col1),
-                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0)), col0)
-                    ),
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
-                );
+                v.setTransformedPos(bTa, spheres[i].m_pos);
                 v.setW(spheres[i].m_pos);
                 sphereBuffer[i].m_pos = v;
             }
@@ -309,22 +280,10 @@ void hkpHeightFieldAgent::staticGetClosestPoints(
         HK_TIMER_SPLIT_LIST("transform");
         // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
         {
-            const hkQuadReal col0 = bTa.m_rotation.m_col0.m_quad;
-            const hkQuadReal col1 = bTa.m_rotation.m_col1.m_quad;
-            const hkQuadReal col2 = bTa.m_rotation.m_col2.m_quad;
-            const hkQuadReal translation = bTa.m_translation.m_quad;
             int32_t i = nSpheres - 1;
             do {
-                const hkQuadReal pos = spheres[i].m_pos.m_quad;
-                // EXE-INLINED 0xC7F640
                 hkVector4 v;
-                v.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1)), col1),
-                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0)), col0)
-                    ),
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
-                );
+                v.setTransformedPos(bTa, spheres[i].m_pos);
                 v.setW(spheres[i].m_pos);
                 sphereBuffer[i].m_pos = v;
             }
@@ -350,46 +309,15 @@ void hkpHeightFieldAgent::staticGetClosestPoints(
                 // radius and distance.
                 const float scale = -sphere->m_pos(3) - (*output)(3);
                 const hkQuadReal normal = output->m_quad;
-                const hkQuadReal pointInB = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), normal), sphere->m_pos.m_quad);
+                hkVector4 pointInB;
+                pointInB.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), normal), sphere->m_pos.m_quad);
 
                 hkpCdPoint event;
                 event.m_cdBodyA = &csBody;
                 event.m_cdBodyB = &hfBody;
                 const hkTransform& transformB = *hfBody.m_motion.pMotion;
-                // EXE-INLINED 0xC7F640
-                event.m_contact.m_position.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(1, 1, 1, 1)),
-                            transformB.m_rotation.m_col1.m_quad
-                        ),
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(0, 0, 0, 0)),
-                            transformB.m_rotation.m_col0.m_quad
-                        )
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(2, 2, 2, 2)),
-                            transformB.m_rotation.m_col2.m_quad
-                        ),
-                        transformB.m_translation.m_quad
-                    )
-                );
-                // EXE-INLINED 0xC7F700
-                event.m_contact.m_separatingNormal.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(1, 1, 1, 1)), transformB.m_rotation.m_col1.m_quad
-                        ),
-                        _mm_mul_ps(
-                            _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(0, 0, 0, 0)), transformB.m_rotation.m_col0.m_quad
-                        )
-                    ),
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(2, 2, 2, 2)), transformB.m_rotation.m_col2.m_quad
-                    )
-                );
+                event.m_contact.m_position.setTransformedPos(transformB, pointInB);
+                event.m_contact.m_separatingNormal.setRotatedDir(transformB.m_rotation, *output);
                 event.m_contact.m_separatingNormal(3) = (*output)(3);
                 collector.addCdPoint(event);
             }
@@ -443,27 +371,13 @@ void hkpHeightFieldAgent::staticLinearCast(
     hkHeightFieldRayForwardingCollector rayCollector(input.m_path, csBody, collector);
 
     for (int32_t i = 0; i < nSpheres; ++i) {
-        const hkQuadReal pos = spheres->m_pos.m_quad;
         // The SDK's hkSphere::getRadius, inline: the w component.
         ray.m_radius = spheres->m_pos(3);
-        const hkQuadReal x = _mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0));
-        const hkQuadReal y = _mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1));
-        const hkQuadReal z = _mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2));
-        // EXE-INLINED 0xC7F640
-        ray.m_from.m_quad = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(x, bTa.m_rotation.m_col0.m_quad), _mm_mul_ps(y, bTa.m_rotation.m_col1.m_quad)),
-            _mm_add_ps(_mm_mul_ps(z, bTa.m_rotation.m_col2.m_quad), bTa.m_translation.m_quad)
-        );
+        ray.m_from.setTransformedPos(bTa, spheres->m_pos);
         ray.m_to.setAdd4(ray.m_from, pathLocal);
         const hkTransform& aTransform = *csBody.m_motion.pMotion;
         rayCollector.m_currentRadius = spheres->m_pos(3);
-        // EXE-INLINED 0xC7F640
-        rayCollector.m_currentFrom.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(aTransform.m_rotation.m_col1.m_quad, y), _mm_mul_ps(x, aTransform.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(aTransform.m_rotation.m_col2.m_quad, z), aTransform.m_translation.m_quad)
-        );
+        rayCollector.m_currentFrom.setTransformedPos(aTransform, spheres->m_pos);
         hfShape->castSphere(ray, hfBody, rayCollector);
         ++spheres;
     }

@@ -102,10 +102,8 @@ void bhkForceController::ApplyForce() {
     if (!phk) {
         return;
     }
-    // EXE-INLINED 0x5DBF20
-    // EXE-INLINED 0x627920
-    alignas(16) hkVector4 scaleForce;
-    scaleForce.m_quad = _mm_mul_ps(_mm_set1_ps(100.0f), Force.m_quad);
+    alignas(16) hkVector4 scaleForce = Force;
+    scaleForce.mul4(100.0f);
     phk->applyForce(fDeltaTime, scaleForce);
 }
 
@@ -155,7 +153,7 @@ void bhkForceController::TestForce(NiAVObject* apObject, hkVector4& arForce, NiA
             static_cast<bhkCollisionObject*>(pCollisionObject->DynamicCastMember(&bhkCollisionObject::ms_RTTI));
     }
     alignas(16) hkVector4 kForce = arForce;
-    __m128 kResult = kForce.m_quad;
+    hkVector4 kResult = kForce;
     if (pBhkObject) {
         bhkRigidBody* pRigidBody = pBhkObject->spWorldObject;
         if (pRigidBody) {
@@ -163,10 +161,9 @@ void bhkForceController::TestForce(NiAVObject* apObject, hkVector4& arForce, NiA
             float fMassScale = 1.0f * fMass;
             hkpRigidBody* phkBody = static_cast<hkpRigidBody*>(pRigidBody->phkObject);
             float fDamping = phkBody->m_motion.m_motionState.m_linearDamping * 0.75;
-            // EXE-INLINED none: hkVector4::setMul4
-            __m128 kScaled = _mm_mul_ps(_mm_set1_ps(fMassScale), kForce.m_quad);
-            // EXE-INLINED none: hkVector4::setAddMul4
-            kResult = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fDamping), kScaled), kScaled);
+            hkVector4 kScaled;
+            kScaled.setMul4(fMassScale, kForce);
+            kResult.setAddMul4(kScaled, kScaled, fDamping);
         }
     }
     pController->m_fLoKeyTime = 0.0f;
@@ -175,7 +172,7 @@ void bhkForceController::TestForce(NiAVObject* apObject, hkVector4& arForce, NiA
     pController->m_usFlags = static_cast<uint16_t>((pController->m_usFlags & 0xFFF5) | 5);
     pController->m_fPhase = 0.0f;
     pController->m_fFrequency = 1.0f;
-    static_cast<bhkForceController*>(pController)->Force.m_quad = kResult;
+    static_cast<bhkForceController*>(pController)->Force.m_quad = kResult.m_quad;
     pController->Start(-3.4028235e+38f);
 }
 
@@ -203,18 +200,17 @@ void bhkForceController::TestForce2(NiAVObject* apObject, hkVector4& arForce, fl
             static_cast<bhkCollisionObject*>(pCollisionObject->DynamicCastMember(&bhkCollisionObject::ms_RTTI));
     }
     alignas(16) hkVector4 kForce = arForce;
-    __m128 kResult = kForce.m_quad;
+    hkVector4 kResult = kForce;
     if (pBhkObject) {
         bhkRigidBody* pRigidBody = pBhkObject->spWorldObject;
         if (pRigidBody) {
             float fMass = pRigidBody->GetDynamicMass();
             float fMassScale = 1.0f * fMass;
             hkpRigidBody* phkBody = static_cast<hkpRigidBody*>(pRigidBody->phkObject);
-            // EXE-INLINED none: hkVector4::setMul4
-            __m128 kScaled = _mm_mul_ps(_mm_set1_ps(fMassScale), kForce.m_quad);
+            hkVector4 kScaled;
+            kScaled.setMul4(fMassScale, kForce);
             float fDamping = phkBody->m_motion.m_motionState.m_linearDamping * 0.75;
-            // EXE-INLINED none: hkVector4::setAddMul4
-            kResult = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fDamping), arForce.m_quad), kScaled);
+            kResult.setAddMul4(kScaled, arForce, fDamping);
         }
     }
     pController->m_fLoKeyTime = 0.0f;
@@ -223,7 +219,7 @@ void bhkForceController::TestForce2(NiAVObject* apObject, hkVector4& arForce, fl
     pController->m_usFlags = static_cast<uint16_t>((pController->m_usFlags & 0xFFF5) | 5);
     pController->m_fPhase = 0.0f;
     pController->m_fFrequency = 1.0f;
-    static_cast<bhkForceController*>(pController)->Force.m_quad = kResult;
+    static_cast<bhkForceController*>(pController)->Force.m_quad = kResult.m_quad;
     pController->Start(-3.4028235e+38f);
     GetThreadMemContext() = iOldMemContext;
 }

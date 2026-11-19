@@ -245,12 +245,7 @@ void NiParticleSystem::UpdateWorldBound() {
         if (m_bDynamicBounds) {
             *m_kWorldBound = rkModelBound;
             float fScale = m_kWorld.m_fScale;
-            // EXE-INLINED 0x45BB20
-            NiPoint3 kCenter;
-            kCenter.x = m_kWorldBound->m_kCenter.x * fScale;
-            kCenter.y = m_kWorldBound->m_kCenter.y * fScale;
-            kCenter.z = m_kWorldBound->m_kCenter.z * fScale;
-            m_kWorldBound->m_kCenter = kCenter;
+            m_kWorldBound->m_kCenter = m_kWorldBound->m_kCenter * fScale;
             m_kWorldBound->m_fRadius *= m_kWorld.m_fScale;
         }
         else {

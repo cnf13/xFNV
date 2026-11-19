@@ -409,21 +409,7 @@ void hkPoweredChain_BuildConstraintMatrixAndLuDecomposition(
             }
         }
 
-        // EXE-INLINED 0xCD4BA0
-        hkMatrix3& upperRight = mtxDiag.m_m[0][1];
-        const hkMatrix3& lowerLeft = mtxDiag.m_m[1][0];
-        upperRight.m_col0.m_quad[0] = lowerLeft.m_col0.m_quad[0];
-        upperRight.m_col1.m_quad[1] = lowerLeft.m_col1.m_quad[1];
-        upperRight.m_col2.m_quad[2] = lowerLeft.m_col2.m_quad[2];
-        upperRight.m_col0.m_quad[3] = 0.0f;
-        upperRight.m_col1.m_quad[3] = 0.0f;
-        upperRight.m_col2.m_quad[3] = 0.0f;
-        upperRight.m_col0.m_quad[1] = lowerLeft.m_col1.m_quad[0];
-        upperRight.m_col1.m_quad[0] = lowerLeft.m_col0.m_quad[1];
-        upperRight.m_col0.m_quad[2] = lowerLeft.m_col2.m_quad[0];
-        upperRight.m_col2.m_quad[0] = lowerLeft.m_col0.m_quad[2];
-        upperRight.m_col1.m_quad[2] = lowerLeft.m_col2.m_quad[1];
-        upperRight.m_col2.m_quad[1] = lowerLeft.m_col1.m_quad[2];
+        mtxDiag.m_m[0][1].setTranspose(mtxDiag.m_m[1][0]);
 
         hkMatrix6& mtxNextOffdiag = triple.m_mtxNextOffdiag;
         if (row >= numConstraints - 1) {

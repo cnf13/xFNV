@@ -73,21 +73,9 @@ void hkBallSocketChainCinfo::CloneData(hkpConstraintData* apData, NiCloningProce
     float fScale = static_cast<BSCloningProcess&>(arCloneData).Scale.x;
     if (fScale != 1.0f) {
         for (int32_t i = 0; i < pDest->m_infos.m_size; ++i) {
-            const __m128 kScale = _mm_set1_ps(fScale);
-            // EXE-INLINED 0x627920
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&pDest->m_infos.m_data[i].m_pivotInA.m_quad)[0],
-                _mm_mul_ps(
-                    _mm_load_ps(&reinterpret_cast<float*>(&pDest->m_infos.m_data[i].m_pivotInA.m_quad)[0]), kScale
-                )
-            );
-            // EXE-INLINED 0x627920
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&pDest->m_infos.m_data[i].m_pivotInB.m_quad)[0],
-                _mm_mul_ps(
-                    _mm_load_ps(&reinterpret_cast<float*>(&pDest->m_infos.m_data[i].m_pivotInB.m_quad)[0]), kScale
-                )
-            );
+            const hkSimdReal kScale(fScale);
+            pDest->m_infos.m_data[i].m_pivotInA.mul4(kScale);
+            pDest->m_infos.m_data[i].m_pivotInB.mul4(kScale);
         }
     }
     hkConstraintCinfo::CloneData(pDest, arCloneData);

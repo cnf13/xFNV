@@ -93,16 +93,8 @@ void hkpShapeDisplayBuilder::buildDisplayGeometries(
     const hkpShape* shape,
     hkArray<hkDisplayGeometry*>& displayGeometries
 ) {
-    // EXE-INLINED none: hkTransform::setIdentity
     alignas(16) hkTransform transform;
-    const __m128 kZero = _mm_setzero_ps();
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_rotation.m_col0.m_quad)[0], kZero);
-    transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_rotation.m_col1.m_quad)[0], kZero);
-    transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_rotation.m_col2.m_quad)[0], kZero);
-    transform.m_rotation.m_col2.m_quad[2] = 1.0f;
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_translation.m_quad)[0], kZero);
+    transform.setIdentity();
     resetCurrentRawGeometry();
     displayGeometries.clear();
     buildShapeDisplay(shape, transform, displayGeometries);
@@ -161,11 +153,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
             face->m_b = numVertices + 1;
             face->m_c = numVertices + 2;
             face->m_material = -1;
-            // EXE-INLINED 0x630B40: hkVector4::length3 (z + (y + x), then the square root)
-            const hkQuadReal squares = _mm_mul_ps(triangle->m_extrusion.m_quad, triangle->m_extrusion.m_quad);
-            const float extrusionLength = _mm_cvtss_f32(_mm_sqrt_ss(_mm_add_ss(
-                _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-            )));
+            const float extrusionLength = triangle->m_extrusion.length3();
             if (extrusionLength > 0.0f) {
                 // The extruded copy of the triangle and the six side triangles joining it to the original.
                 hkVector4 extrudedA;
@@ -304,15 +292,8 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
         }
         case HK_SHAPE_CONVEX_TRANSLATE: {
             const hkpConvexTranslateShape* translateShape = static_cast<const hkpConvexTranslateShape*>(shape);
-            // EXE-INLINED 0x577070: hkTransform::setIdentity
             hkTransform translation;
-            translation.m_rotation.m_col0.setZero4();
-            translation.m_rotation.m_col0(0) = 1.0f;
-            translation.m_rotation.m_col1.setZero4();
-            translation.m_rotation.m_col1(1) = 1.0f;
-            translation.m_rotation.m_col2.setZero4();
-            translation.m_rotation.m_col2(2) = 1.0f;
-            translation.m_translation.setZero4();
+            translation.setIdentity();
             translation.m_translation = translateShape->m_translation;
             hkTransform childTransform;
             childTransform.setMul(transform, translation);
@@ -436,15 +417,8 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
                 displaySphere->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkDisplaySphere));
                 displaySphere = ::new (displaySphere)
                     hkDisplaySphere(sphere, m_environment.m_sphereThetaRes, m_environment.m_spherePhiRes);
-                // EXE-INLINED 0x577070: hkTransform::setIdentity
                 hkTransform& sphereTransform = displaySphere->m_transform;
-                sphereTransform.m_rotation.m_col0.setZero4();
-                sphereTransform.m_rotation.m_col1.setZero4();
-                sphereTransform.m_rotation.m_col2.setZero4();
-                sphereTransform.m_rotation.m_col0(0) = 1.0f;
-                sphereTransform.m_rotation.m_col1(1) = 1.0f;
-                sphereTransform.m_rotation.m_col2(2) = 1.0f;
-                sphereTransform.m_translation.setZero4();
+                sphereTransform.setIdentity();
                 sphereTransform.m_translation = spheres[i];
                 displayGeometries.pushBack(displaySphere);
             }
@@ -491,8 +465,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
             perpToNormal.setZero4();
             perpToNormal(ext.getMajorAxis()) = 1.0f;
             hkVector4 extents;
-            // EXE-INLINED 0x630AE0: hkVector4::setMul4
-            extents.m_quad = _mm_mul_ps(_mm_set1_ps(0.5f), ext.m_quad);
+            extents.setMul4(hkSimdReal(0.5f), ext);
             hkVector4 center;
             center.setAdd4(extents, localAabb.m_min);
             // EXE-INLINED 0x56D280

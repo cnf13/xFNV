@@ -354,11 +354,11 @@ void hkGskManifold_verifyAndGetPoints(
                     break;
                 }
                 sums[0] = sums[0] / (sums[0] + sums[1]);
-                const hkQuadReal t = _mm_shuffle_ps(sums, sums, 0);
-                // EXE-INLINED 0x5DBF70
-                const hkQuadReal pointB =
-                    _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), rB0), _mm_mul_ps(rB1, t));
-                aMinusB = _mm_sub_ps(pointA, pointB);
+                hkVector4 pointB;
+                pointB.setInterpolate4(
+                    reinterpret_cast<const hkVector4&>(rB0), reinterpret_cast<const hkVector4&>(rB1), hkSimdReal(sums)
+                );
+                aMinusB = _mm_sub_ps(pointA, pointB.m_quad);
                 invalid = 0;
                 break;
             }
@@ -378,14 +378,10 @@ void hkGskManifold_verifyAndGetPoints(
                 const hkQuadReal e01 = _mm_sub_ps(rB1, rB0);
                 aMinusB = _mm_sub_ps(pointA, rB0);
                 const hkQuadReal cross = _mm_sub_ps(_mm_mul_ps(e12Yzx, e20Zxy), _mm_mul_ps(e12Zxy, e20Yzx));
-                // EXE-INLINED 0x62AEA0
-                const hkQuadReal cross2 = _mm_mul_ps(cross, cross);
-                const float fLen2 = (cross2[2] + static_cast<float>(cross2[1] + cross2[0]));
-                const float fApprox = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(fLen2)));
-                const float fRefined = (0.5f * fApprox) * (3.0f - (static_cast<float>(fLen2 * fApprox) * fApprox));
-                const hkQuadReal invLen =
-                    _mm_andnot_ps(_mm_cmpeq_ss(_mm_set_ss(fLen2), _mm_set_ss(0.0f)), _mm_set_ss(fRefined));
-                triNormal = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0), cross);
+                hkVector4 normalized;
+                normalized.m_quad = cross;
+                normalized.normalize3();
+                triNormal = normalized.m_quad;
                 const hkQuadReal toB1 = _mm_sub_ps(pointA, rB1);
                 const hkQuadReal toB2 = _mm_sub_ps(pointA, rB2);
                 const hkQuadReal c1 = _mm_mul_ps(
@@ -445,9 +441,11 @@ void hkGskManifold_verifyAndGetPoints(
                     break;
                 }
                 sums[0] = sums[0] / (sums[0] + sums[1]);
-                const hkQuadReal t = _mm_shuffle_ps(sums, sums, 0);
-                // EXE-INLINED 0x5DBF70
-                pointA = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), rA1), _mm_mul_ps(t, rA0));
+                hkVector4 interpolated;
+                interpolated.setInterpolate4(
+                    reinterpret_cast<const hkVector4&>(rA1), reinterpret_cast<const hkVector4&>(rA0), hkSimdReal(sums)
+                );
+                pointA = interpolated.m_quad;
                 aMinusB = _mm_sub_ps(pointA, rB0);
                 invalid = 0;
                 break;
@@ -489,16 +487,18 @@ void hkGskManifold_verifyAndGetPoints(
                 }
                 hkQuadReal tA = sums;
                 tA[0] = sums[0] / (sums[0] - sums[2]);
-                tA = _mm_shuffle_ps(tA, tA, 0);
-                // EXE-INLINED 0x5DBF70
-                pointA = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tA), rA0), _mm_mul_ps(tA, rA1));
+                hkVector4 interpolatedA;
+                interpolatedA.setInterpolate4(
+                    reinterpret_cast<const hkVector4&>(rA0), reinterpret_cast<const hkVector4&>(rA1), hkSimdReal(tA)
+                );
+                pointA = interpolatedA.m_quad;
                 hkQuadReal tB = _mm_shuffle_ps(sums, sums, 85);
                 tB[0] = tB[0] / (tB[0] - sums[3]);
-                tB = _mm_shuffle_ps(tB, tB, 0);
-                // EXE-INLINED 0x5DBF70
-                const hkQuadReal pointB =
-                    _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tB), rB0), _mm_mul_ps(tB, rB1));
-                aMinusB = _mm_sub_ps(pointA, pointB);
+                hkVector4 pointB;
+                pointB.setInterpolate4(
+                    reinterpret_cast<const hkVector4&>(rB0), reinterpret_cast<const hkVector4&>(rB1), hkSimdReal(tB)
+                );
+                aMinusB = _mm_sub_ps(pointA, pointB.m_quad);
                 invalid = 0;
                 break;
             }
@@ -516,17 +516,13 @@ void hkGskManifold_verifyAndGetPoints(
                 const hkQuadReal e20Yzx = _mm_shuffle_ps(e20, e20, 201);
                 const hkQuadReal e12Zxy = _mm_shuffle_ps(e12, e12, 210);
                 const hkQuadReal cross = _mm_sub_ps(_mm_mul_ps(e12Yzx, e20Zxy), _mm_mul_ps(e12Zxy, e20Yzx));
-                // EXE-INLINED 0x62AEA0
-                const hkQuadReal cross2 = _mm_mul_ps(cross, cross);
-                const float fLen2 = (cross2[2] + static_cast<float>(cross2[1] + cross2[0]));
-                const float fApprox = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(fLen2)));
-                const float fRefined = (0.5f * fApprox) * (3.0f - (static_cast<float>(fLen2 * fApprox) * fApprox));
-                const hkQuadReal invLen =
-                    _mm_andnot_ps(_mm_cmpeq_ss(_mm_set_ss(fLen2), _mm_set_ss(0.0f)), _mm_set_ss(fRefined));
+                hkVector4 normalized;
+                normalized.m_quad = cross;
+                normalized.normalize3();
                 const hkQuadReal fromA2 = _mm_sub_ps(rB0, rA2);
                 const hkQuadReal fromA0 = _mm_sub_ps(rB0, rA0);
                 aMinusB = _mm_sub_ps(rA0, rB0);
-                triNormal = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0), cross);
+                triNormal = normalized.m_quad;
                 const hkQuadReal fromA1 = _mm_sub_ps(rB0, rA1);
                 const hkQuadReal c1 = _mm_mul_ps(
                     _mm_sub_ps(
@@ -701,16 +697,10 @@ int32_t hkGskManifold_convertFeature(
             const __m128 e20Zxy = _mm_shuffle_ps(e20, e20, 210);
             const __m128 e01 = _mm_sub_ps(pB1, pB0);
             const __m128 cross = _mm_sub_ps(_mm_mul_ps(e12Yzx, e20Zxy), _mm_mul_ps(e12Zxy, e20Yzx));
-            // EXE-INLINED 0x62AEA0
-            const __m128 crossSq = _mm_mul_ps(cross, cross);
-            const __m128 lengthSq = _mm_add_ss(
-                _mm_shuffle_ps(crossSq, crossSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(crossSq, crossSq, 0x55), crossSq)
-            );
-            const float approx = _mm_cvtss_f32(_mm_rsqrt_ss(lengthSq));
-            const float lengthSqValue = _mm_cvtss_f32(lengthSq);
-            const float refined = (0.5f * approx) * (3.0f - (static_cast<float>(lengthSqValue * approx) * approx));
-            const __m128 invLength = _mm_andnot_ps(_mm_cmpeq_ss(lengthSq, _mm_setzero_ps()), _mm_set_ss(refined));
-            const __m128 triNormal = _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, 0), cross);
+            hkVector4 normalized;
+            normalized.m_quad = cross;
+            normalized.normalize3();
+            const __m128 triNormal = normalized.m_quad;
             const __m128 toB2 = _mm_sub_ps(pA, pB2);
             const __m128 toB1 = _mm_sub_ps(pA, pB1);
             const __m128 toB0 = _mm_sub_ps(pA, pB0);
@@ -831,19 +821,15 @@ int32_t hkGskManifold_convertFeature(
             if (signs != 3 && signs != 12) {
                 break;
             }
-            __m128 tA = _mm_div_ss(sums, _mm_sub_ss(sums, _mm_shuffle_ps(sums, sums, 0xAA)));
-            tA = _mm_shuffle_ps(tA, tA, 0);
-            // EXE-INLINED 0x5DBF70
-            const __m128 pointOnA =
-                _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tA), pA0), _mm_mul_ps(tA, a1.m_quad));
+            const __m128 tA = _mm_div_ss(sums, _mm_sub_ss(sums, _mm_shuffle_ps(sums, sums, 0xAA)));
+            hkVector4 pointOnA;
+            pointOnA.setInterpolate4(a0, a1, hkSimdReal(tA));
             const __m128 sumsY = _mm_shuffle_ps(sums, sums, 0x55);
-            __m128 tB = _mm_div_ss(sumsY, _mm_sub_ss(sumsY, _mm_shuffle_ps(sums, sums, 0xFF)));
-            out.m_pointOnA.m_quad = pointOnA;
-            tB = _mm_shuffle_ps(tB, tB, 0);
-            // EXE-INLINED 0x5DBF70
-            const __m128 pointOnB =
-                _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tB), b0.m_quad), _mm_mul_ps(tB, b1.m_quad));
-            out.m_AminusB.m_quad = _mm_sub_ps(pointOnA, pointOnB);
+            const __m128 tB = _mm_div_ss(sumsY, _mm_sub_ss(sumsY, _mm_shuffle_ps(sums, sums, 0xFF)));
+            out.m_pointOnA = pointOnA;
+            hkVector4 pointOnB;
+            pointOnB.setInterpolate4(b0, b1, hkSimdReal(tB));
+            out.m_AminusB.m_quad = _mm_sub_ps(pointOnA.m_quad, pointOnB.m_quad);
             return HK_FEATURE_OK;
         }
         case 13: {
@@ -864,16 +850,10 @@ int32_t hkGskManifold_convertFeature(
             const __m128 e20Yzx = _mm_shuffle_ps(e20, e20, 201);
             const __m128 e20Zxy = _mm_shuffle_ps(e20, e20, 210);
             const __m128 cross = _mm_sub_ps(_mm_mul_ps(e12Yzx, e20Zxy), _mm_mul_ps(e12Zxy, e20Yzx));
-            // EXE-INLINED 0x62AEA0
-            const __m128 crossSq = _mm_mul_ps(cross, cross);
-            const __m128 lengthSq = _mm_add_ss(
-                _mm_shuffle_ps(crossSq, crossSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(crossSq, crossSq, 0x55), crossSq)
-            );
-            const float approx = _mm_cvtss_f32(_mm_rsqrt_ss(lengthSq));
-            const float lengthSqValue = _mm_cvtss_f32(lengthSq);
-            const float refined = (0.5f * approx) * (3.0f - (static_cast<float>(lengthSqValue * approx) * approx));
-            const __m128 invLength = _mm_andnot_ps(_mm_cmpeq_ss(lengthSq, _mm_setzero_ps()), _mm_set_ss(refined));
-            const __m128 triNormal = _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, 0), cross);
+            hkVector4 normalized;
+            normalized.m_quad = cross;
+            normalized.normalize3();
+            const __m128 triNormal = normalized.m_quad;
             const __m128 fromA1 = _mm_sub_ps(pB, pA1);
             const __m128 fromA2 = _mm_sub_ps(pB, a2.m_quad);
             const __m128 fromA0 = _mm_sub_ps(pB, a0.m_quad);

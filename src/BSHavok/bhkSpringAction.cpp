@@ -147,11 +147,9 @@ void bhkSpringAction::Init(const hkSerializableCinfo& arInfo) {
     pAction->m_onCompression.m_bool = rInfo.m_onCompression.m_bool;
     pAction->m_onExtension.m_bool = rInfo.m_onExtension.m_bool;
     alignas(16) hkVector4 kPivotB;
-    // EXE-INLINED 0x4B4D10
-    kPivotB.set(rInfo.m_pivotB.fX, rInfo.m_pivotB.fY, rInfo.m_pivotB.fZ, rInfo.m_pivotB.fW);
+    rInfo.m_pivotB.ToHK(kPivotB);
     alignas(16) hkVector4 kPivotA;
-    // EXE-INLINED 0x4B4D10
-    kPivotA.set(rInfo.m_pivotA.fX, rInfo.m_pivotA.fY, rInfo.m_pivotA.fZ, rInfo.m_pivotA.fW);
+    rInfo.m_pivotA.ToHK(kPivotA);
     pAction->setPositionsInBodySpace(kPivotA, kPivotB);
     bhkSerializable* pSerializable = this;
     pSerializable->SethkObject(pAction);

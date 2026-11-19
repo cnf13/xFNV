@@ -47,10 +47,8 @@ bool BSBound::IsEqual(NiObject* apObject) {
     bool bEqual = NiExtraData::IsEqual(apObject);
     if (bEqual) {
         BSBound* pOther = static_cast<BSBound*>(apObject);
-        // EXE-INLINED 0x4390C0
-        bEqual = Center.x == pOther->Center.x && Center.y == pOther->Center.y && Center.z == pOther->Center.z;
-        // EXE-INLINED 0x4390C0
-        bEqual &= Extents.x == pOther->Extents.x && Extents.y == pOther->Extents.y && Extents.z == pOther->Extents.z;
+        bEqual = Center == pOther->Center;
+        bEqual &= Extents == pOther->Extents;
     }
     return bEqual;
 }

@@ -347,61 +347,14 @@ void hkpRagdollConstraintData::setInWorldSpace(
     const hkVector4& twistAxisW,
     const hkVector4& planeAxisW
 ) {
-    // EXE-INLINED 0x62B0A0
-    // hkVector4::dot3: mulps, then y + x and z + that (addss), in the low lane.
-    auto dot3 = [](__m128 a, __m128 b) {
-        const __m128 p = _mm_mul_ps(a, b);
-        return _mm_add_ss(_mm_shuffle_ps(p, p, 0xAA), _mm_add_ss(_mm_shuffle_ps(p, p, 0x55), p));
-    };
-    // EXE-INLINED 0x62AEA0
-    // hkVector4::normalize3: rsqrtss refined once (0.5 r (3 - len2 r r)), zero for a zero length, times the vector.
-    auto normalize3 = [&dot3](__m128 v) {
-        const __m128 len2 = dot3(v, v);
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 lenInv = _mm_andnot_ps(
-            _mm_cmpeq_ss(len2, _mm_setzero_ps()),
-            _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            )
-        );
-        return _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), v);
-    };
-    // EXE-INLINED none: hkVector4::setCross
-    auto cross = [](__m128 v0, __m128 v1) {
-        return _mm_sub_ps(
-            _mm_mul_ps(
-                _mm_shuffle_ps(v0, v0, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(3, 1, 0, 2))
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(v0, v0, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(3, 0, 2, 1)))
-        );
-    };
-    // EXE-INLINED 0xCD4BF0
-    // hkMatrix3::setMulInverseMul: out = a's transpose times b, a's transpose built first, column by column.
-    auto setMulInverseMul = [](hkRotation& arOut, const hkRotation& a, const hkRotation& b) {
-        const __m128 col1 = a.m_col1.m_quad;
-        const __m128 col2 = a.m_col2.m_quad;
-        const __m128 lo = _mm_unpacklo_ps(a.m_col0.m_quad, col1);
-        const __m128 hi = _mm_unpackhi_ps(a.m_col0.m_quad, col1);
-        const __m128 row0 = _mm_movelh_ps(lo, col2);
-        const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, 212);
-        const __m128 row2 = _mm_shuffle_ps(hi, col2, 228);
-        for (int32_t i = 0; i < 3; ++i) {
-            const __m128 col = (&b.m_col0)[i].m_quad;
-            (&arOut.m_col0)[i].m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(col, col, 85), row1), _mm_mul_ps(_mm_shuffle_ps(col, col, 0), row0)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(col, col, 170), row2)
-            );
-        }
-    };
     hkRotation constraintBaseInW;
-    constraintBaseInW.m_col0.m_quad = normalize3(twistAxisW.m_quad);
-    constraintBaseInW.m_col1.m_quad = normalize3(planeAxisW.m_quad);
-    constraintBaseInW.m_col2.m_quad = cross(constraintBaseInW.m_col0.m_quad, constraintBaseInW.m_col1.m_quad);
-    setMulInverseMul(m_atoms.m_transforms.m_transformA.m_rotation, bodyATransform.m_rotation, constraintBaseInW);
-    setMulInverseMul(m_atoms.m_transforms.m_transformB.m_rotation, bodyBTransform.m_rotation, constraintBaseInW);
+    constraintBaseInW.m_col0 = twistAxisW;
+    constraintBaseInW.m_col0.normalize3();
+    constraintBaseInW.m_col1 = planeAxisW;
+    constraintBaseInW.m_col1.normalize3();
+    constraintBaseInW.m_col2.setCross(constraintBaseInW.m_col0, constraintBaseInW.m_col1);
+    m_atoms.m_transforms.m_transformA.m_rotation.setMulInverseMul(bodyATransform.m_rotation, constraintBaseInW);
+    m_atoms.m_transforms.m_transformB.m_rotation.setMulInverseMul(bodyBTransform.m_rotation, constraintBaseInW);
     m_atoms.m_transforms.m_transformA.m_translation.setTransformedInversePos(bodyATransform, pivot);
     m_atoms.m_transforms.m_transformB.m_translation.setTransformedInversePos(bodyBTransform, pivot);
     m_atoms.m_ragdollMotors.m_target_bRca.m_col0 = m_atoms.m_transforms.m_transformB.m_rotation.m_col0;

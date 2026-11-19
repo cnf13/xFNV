@@ -65,22 +65,23 @@ hkResult hkCollideCapsuleUtilClostestPointCapsVsCaps(
         const __m128 kA = _mm_load_ps(&reinterpret_cast<float*>(&dA.m_quad)[0]);
         const __m128 kB = _mm_load_ps(&reinterpret_cast<float*>(&dB.m_quad)[0]);
         const __m128 kProduct = _mm_mul_ps(_mm_shuffle_ps(kB, kB, 0xC9), _mm_shuffle_ps(kA, kA, 0xD2));
-        __m128 kCross = _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(kB, kB, 0xD2), _mm_shuffle_ps(kA, kA, 0xC9)), kProduct);
-        const __m128 kSquares = _mm_mul_ps(kCross, kCross);
+        hkVector4 kCross;
+        kCross.m_quad = _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(kB, kB, 0xD2), _mm_shuffle_ps(kA, kA, 0xC9)), kProduct);
+        const __m128 kSquares = _mm_mul_ps(kCross.m_quad, kCross.m_quad);
         const float fLengthSquared = _mm_cvtss_f32(_mm_add_ps(
             _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ps(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
         ));
         if (1.1920929e-07f < fLengthSquared) {
-            const __m128 kDot =
-                _mm_mul_ps(kCross, _mm_load_ps(&reinterpret_cast<float*>(&result.m_closestAminusClosestB.m_quad)[0]));
+            const __m128 kDot = _mm_mul_ps(
+                kCross.m_quad, _mm_load_ps(&reinterpret_cast<float*>(&result.m_closestAminusClosestB.m_quad)[0])
+            );
             const float fDot = _mm_cvtss_f32(
                 _mm_add_ps(_mm_shuffle_ps(kDot, kDot, 0xAA), _mm_add_ps(_mm_shuffle_ps(kDot, kDot, 0x55), kDot))
             );
             if (0.0f > fDot) {
-                // EXE-INLINED none: hkVector4::setNeg4
-                kCross = _mm_xor_ps(kCross, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0]));
+                kCross.setNeg4(kCross);
             }
-            _mm_store_ps(pNormal, kCross);
+            _mm_store_ps(pNormal, kCross.m_quad);
             bHaveNormal = true;
         }
     }
@@ -107,18 +108,8 @@ hkResult hkCollideCapsuleUtilClostestPointCapsVsCaps(
         pNormal[iSecond] = -pA[iFirst];
     }
 
-    // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, zero for a zero vector)
-    const __m128 kNormal = _mm_load_ps(pNormal);
     const float fRadiusBMinusDistance = capsBRadius - fDistance;
-    const __m128 kSquares = _mm_mul_ps(kNormal, kNormal);
-    const __m128 kLengthSquared = _mm_add_ps(
-        _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ps(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-    );
-    const __m128 kEstimate = _mm_rsqrt_ss(kLengthSquared);
-    const __m128 kZeroMask = _mm_cmpeq_ss(kLengthSquared, _mm_set_ss(0.0f));
-    const __m128 kStep = _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kLengthSquared, kEstimate), kEstimate));
-    const __m128 kScale = _mm_andnot_ps(kZeroMask, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimate), kStep));
-    _mm_store_ps(pNormal, _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), kNormal));
+    cpoint.m_separatingNormal.normalize3();
     _mm_store_ps(
         &reinterpret_cast<float*>(&cpoint.m_position.m_quad)[0],
         _mm_add_ps(
@@ -678,11 +669,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                             );
                         }
                         else {
-                            // EXE-INLINED none: hkVector4::setNeg4
-                            _mm_store_ps(
-                                &reinterpret_cast<float*>(&cp.m_separatingNormal.m_quad)[0],
-                                _mm_xor_ps(kNormal, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0]))
-                            );
+                            cp.m_separatingNormal.setNeg4(normal);
                             const float fScale = -triBRadius - projected[i].m_quad[3];
                             cp.m_separatingNormal.m_quad[3] = fDistance;
                             _mm_store_ps(
@@ -733,21 +720,8 @@ void hkCollideCapsuleUtilCapsVsTri(
                     &reinterpret_cast<float*>(&cp.m_separatingNormal.m_quad)[0],
                     _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fW), kEdgePlane), _mm_mul_ps(_mm_set1_ps(fNegD), kNormal))
                 );
-                // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, zero for a zero vector)
-                const __m128 kSeparating = _mm_load_ps(&reinterpret_cast<float*>(&cp.m_separatingNormal.m_quad)[0]);
-                const __m128 kSquares = _mm_mul_ps(kSeparating, kSeparating);
-                const __m128 kLength2 = _mm_add_ps(
-                    _mm_shuffle_ps(kSquares, kSquares, 0xAA),
-                    _mm_add_ps(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-                );
-                const __m128 kEstimate = _mm_rsqrt_ss(kLength2);
-                const __m128 kZeroMask = _mm_cmpeq_ss(kLength2, _mm_set_ss(0.0f));
-                const __m128 kStep =
-                    _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kLength2, kEstimate), kEstimate));
-                const __m128 kScale =
-                    _mm_andnot_ps(kZeroMask, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimate), kStep));
-                const __m128 kSeparatingNormal = _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), kSeparating);
-                _mm_store_ps(&reinterpret_cast<float*>(&cp.m_separatingNormal.m_quad)[0], kSeparatingNormal);
+                cp.m_separatingNormal.normalize3();
+                const __m128 kSeparatingNormal = cp.m_separatingNormal.m_quad;
                 const __m128 kProject = _mm_set1_ps(project);
                 const float fDistance = std::sqrt(fDistanceSquared);
                 const float fNegDistance = -fDistance;
@@ -868,7 +842,7 @@ void hkCollideCapsuleUtilCapsVsTri(
             if ((iOutside & 7) == 7) {
                 const float fW = projected[iPoint].m_quad[3];
                 const __m128 kFaceNormal = _mm_load_ps(&reinterpret_cast<float*>(&normal.m_quad)[0]);
-                __m128 kSeparating;
+                hkVector4 kSeparating;
                 float fDistance;
                 if (iOutside & 8) {
                     const float fScale = -triBRadius - fW;
@@ -880,9 +854,7 @@ void hkCollideCapsuleUtilCapsVsTri(
                             _mm_load_ps(&reinterpret_cast<const float*>(&capsAPoints[iPoint].m_quad)[0])
                         )
                     );
-                    // EXE-INLINED none: hkVector4::setNeg4
-                    kSeparating =
-                        _mm_xor_ps(kFaceNormal, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0]));
+                    kSeparating.setNeg4(normal);
                 }
                 else {
                     const float fScale = triBRadius - fW;
@@ -894,9 +866,9 @@ void hkCollideCapsuleUtilCapsVsTri(
                             _mm_load_ps(&reinterpret_cast<const float*>(&capsAPoints[iPoint].m_quad)[0])
                         )
                     );
-                    kSeparating = kFaceNormal;
+                    kSeparating.m_quad = kFaceNormal;
                 }
-                _mm_store_ps(&reinterpret_cast<float*>(&pPoint->m_separatingNormal.m_quad)[0], kSeparating);
+                _mm_store_ps(&reinterpret_cast<float*>(&pPoint->m_separatingNormal.m_quad)[0], kSeparating.m_quad);
                 pPoint->m_separatingNormal.m_quad[3] = fDistance - fRadiusSum;
                 if (featuresOut) {
                     featuresOut[iPoint].numFeatures = 3;
@@ -984,17 +956,10 @@ void hkCollideCapsuleUtilCapsVsTri(
                 ));
                 kCandidate = !(fCrossLength2 <= 1.4210855e-14f) ? kCross : kReference;
             }
-            // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, zero for a zero vector)
-            const __m128 kSquares = _mm_mul_ps(kCandidate, kCandidate);
-            const __m128 kLength2 = _mm_add_ps(
-                _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ps(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-            );
-            const __m128 kEstimate = _mm_rsqrt_ss(kLength2);
-            const __m128 kZeroMask = _mm_cmpeq_ss(kLength2, _mm_set_ss(0.0f));
-            const __m128 kStep = _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kLength2, kEstimate), kEstimate));
-            const __m128 kScale = _mm_andnot_ps(kZeroMask, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimate), kStep));
-            __m128 kSeparating = _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), kCandidate);
-            const __m128 kDotProduct = _mm_mul_ps(kReference, kSeparating);
+            hkVector4 kSeparating;
+            kSeparating.m_quad = kCandidate;
+            kSeparating.normalize3();
+            const __m128 kDotProduct = _mm_mul_ps(kReference, kSeparating.m_quad);
             const float fDot = _mm_cvtss_f32(_mm_add_ps(
                 _mm_shuffle_ps(kDotProduct, kDotProduct, 0xAA),
                 _mm_add_ps(_mm_shuffle_ps(kDotProduct, kDotProduct, 0x55), kDotProduct)
@@ -1002,18 +967,17 @@ void hkCollideCapsuleUtilCapsVsTri(
             float fDistance = fDot;
             if (0.0f > fDot) {
                 fDistance = -fDot;
-                // EXE-INLINED none: hkVector4::setNeg4
-                kSeparating = _mm_xor_ps(kSeparating, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0]));
+                kSeparating.setNeg4(kSeparating);
             }
             const float fScale = triBRadius - fDistance;
             _mm_store_ps(
                 &reinterpret_cast<float*>(&pPoint->m_position.m_quad)[0],
                 _mm_add_ps(
-                    _mm_mul_ps(_mm_set1_ps(fScale), kSeparating),
+                    _mm_mul_ps(_mm_set1_ps(fScale), kSeparating.m_quad),
                     _mm_load_ps(&reinterpret_cast<float*>(&result.m_closestPointA.m_quad)[0])
                 )
             );
-            _mm_store_ps(&reinterpret_cast<float*>(&pPoint->m_separatingNormal.m_quad)[0], kSeparating);
+            _mm_store_ps(&reinterpret_cast<float*>(&pPoint->m_separatingNormal.m_quad)[0], kSeparating.m_quad);
             pPoint->m_separatingNormal.m_quad[3] = fDistance - fRadiusSum;
         }
         if (bSinglePoint) {

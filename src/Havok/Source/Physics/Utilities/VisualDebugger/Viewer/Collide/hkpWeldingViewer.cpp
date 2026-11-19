@@ -85,18 +85,7 @@ void hkpWeldingViewer::postSimulationCallback(hkpWorld* world) {
             const uint16_t weldingInfo = triangle->m_weldingInfo;
             hkVector4 vertices[3];
             for (int32_t k = 0; k < 3; k++) {
-                const hkQuadReal p = triangle->getVertex(k).m_quad;
-                // EXE-INLINED 0xC7F640
-                vertices[k].m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), transform.m_rotation.m_col0.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), transform.m_rotation.m_col1.m_quad)
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), transform.m_rotation.m_col2.m_quad),
-                        transform.m_translation.m_quad
-                    )
-                );
+                vertices[k].setTransformedPos(transform, triangle->getVertex(k));
             }
             m_displayHandler->displayLine(vertices[0], vertices[1], static_cast<int32_t>(hkColor::RED), id, m_tag);
             m_displayHandler->displayLine(vertices[1], vertices[2], static_cast<int32_t>(hkColor::RED), id, m_tag);
@@ -115,30 +104,13 @@ void hkpWeldingViewer::postSimulationCallback(hkpWorld* world) {
                 const hkVector4& v1 = vertices[(e + 1) % 3];
 
                 hkVector4 edge;
-                {
-                    const hkQuadReal d = _mm_sub_ps(v1.m_quad, v0.m_quad);
-                    // EXE-INLINED 0x62AEA0
-                    const hkQuadReal d2 = _mm_mul_ps(d, d);
-                    const hkQuadReal len2 =
-                        _mm_add_ss(_mm_shuffle_ps(d2, d2, 0xAA), _mm_add_ss(_mm_shuffle_ps(d2, d2, 0x55), d2));
-                    const hkQuadReal approx = _mm_rsqrt_ss(len2);
-                    const hkQuadReal refined = _mm_mul_ss(
-                        _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                        _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-                    );
-                    const hkQuadReal factor = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_setzero_ps()), refined);
-                    edge.m_quad = _mm_mul_ps(_mm_shuffle_ps(factor, factor, 0x00), d);
-                }
+                edge.m_quad = _mm_sub_ps(v1.m_quad, v0.m_quad);
+                edge.normalize3();
 
                 const int32_t sector = getSectorFromWeldingInfo(weldingInfo, static_cast<char>(e));
 
-                // EXE-INLINED 0x5DBF70
                 hkVector4 start;
-                {
-                    const hkQuadReal t = _mm_set1_ps(0.48f);
-                    start.m_quad =
-                        _mm_add_ps(_mm_mul_ps(_mm_sub_ps(_mm_set1_ps(1.0f), t), v0.m_quad), _mm_mul_ps(t, v1.m_quad));
-                }
+                start.setInterpolate4(v0, v1, 0.48f);
 
                 const hkpWeldingUtility::SinCosTableEntry& entry = hkpWeldingUtility::m_sinCosTable[sector];
                 const uint8_t type = triangle->m_weldingType.m_storage;
@@ -147,23 +119,10 @@ void hkpWeldingViewer::postSimulationCallback(hkpWorld* world) {
                 hkVector4 perp;
                 perp.setCross(edge, normal);
                 hkVector4 dir;
-                {
-                    const hkQuadReal d = _mm_add_ps(
-                        _mm_mul_ps(perp.m_quad, _mm_set1_ps(sinAccept)),
-                        _mm_mul_ps(_mm_set1_ps(cosAccept), normal.m_quad)
-                    );
-                    // EXE-INLINED 0x62AEA0
-                    const hkQuadReal d2 = _mm_mul_ps(d, d);
-                    const hkQuadReal len2 =
-                        _mm_add_ss(_mm_shuffle_ps(d2, d2, 0xAA), _mm_add_ss(_mm_shuffle_ps(d2, d2, 0x55), d2));
-                    const hkQuadReal approx = _mm_rsqrt_ss(len2);
-                    const hkQuadReal refined = _mm_mul_ss(
-                        _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                        _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-                    );
-                    const hkQuadReal factor = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_setzero_ps()), refined);
-                    dir.m_quad = _mm_mul_ps(_mm_shuffle_ps(factor, factor, 0x00), d);
-                }
+                dir.m_quad = _mm_add_ps(
+                    _mm_mul_ps(perp.m_quad, _mm_set1_ps(sinAccept)), _mm_mul_ps(_mm_set1_ps(cosAccept), normal.m_quad)
+                );
+                dir.normalize3();
                 if (type == hkpWeldingUtility::WELDING_TYPE_CLOCKWISE) {
                     normal.setNeg3(normal);
                 }
@@ -190,24 +149,8 @@ void hkpWeldingViewer::postSimulationCallback(hkpWorld* world) {
                     // Divides by the double 10.0 and stores the step as a float.
                     const float fT = static_cast<double>(j + 1) / 10.0;
                     hkVector4 cur;
-                    {
-                        // EXE-INLINED 0x5DBF70
-                        const hkQuadReal t = _mm_set1_ps(fT);
-                        const hkQuadReal d = _mm_add_ps(
-                            _mm_mul_ps(_mm_sub_ps(_mm_set1_ps(1.0f), t), dir.m_quad), _mm_mul_ps(t, normal.m_quad)
-                        );
-                        // EXE-INLINED 0x62AEA0
-                        const hkQuadReal d2 = _mm_mul_ps(d, d);
-                        const hkQuadReal len2 =
-                            _mm_add_ss(_mm_shuffle_ps(d2, d2, 0xAA), _mm_add_ss(_mm_shuffle_ps(d2, d2, 0x55), d2));
-                        const hkQuadReal approx = _mm_rsqrt_ss(len2);
-                        const hkQuadReal refined = _mm_mul_ss(
-                            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-                        );
-                        const hkQuadReal factor = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_setzero_ps()), refined);
-                        cur.m_quad = _mm_mul_ps(_mm_shuffle_ps(factor, factor, 0x00), d);
-                    }
+                    cur.setInterpolate4(dir, normal, fT);
+                    cur.normalize3();
                     hkVector4 lineStart;
                     lineStart.setAdd4(start, prev);
                     hkVector4 lineEnd;

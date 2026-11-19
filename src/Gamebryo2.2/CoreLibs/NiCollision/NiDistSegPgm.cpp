@@ -17,23 +17,12 @@ float NiSqrDistance::Compute(
     float& fPgmParam0,
     float& fPgmParam1
 ) {
-    // EXE-INLINED 0x4B3800
-    NiPoint3 kNormal;
-    kNormal.x = kPgm.m_kEdge0.y * kPgm.m_kEdge1.z - kPgm.m_kEdge0.z * kPgm.m_kEdge1.y;
-    kNormal.y = kPgm.m_kEdge0.z * kPgm.m_kEdge1.x - kPgm.m_kEdge0.x * kPgm.m_kEdge1.z;
-    kNormal.z = kPgm.m_kEdge0.x * kPgm.m_kEdge1.y - kPgm.m_kEdge0.y * kPgm.m_kEdge1.x;
+    NiPoint3 kNormal = kPgm.m_kEdge0.Cross(kPgm.m_kEdge1);
 
-    // EXE-INLINED 0x4B6190
-    float fNormalDotDir =
-        kNormal.x * kSeg.m_kDirection.x + kNormal.y * kSeg.m_kDirection.y + kNormal.z * kSeg.m_kDirection.z;
+    float fNormalDotDir = kNormal.Dot(kSeg.m_kDirection);
     float fAbsNormalDotDir = __builtin_fabsf(fNormalDotDir);
-    // EXE-INLINED 0x457990
-    float fNormalSqrLength = kNormal.x * kNormal.x + kNormal.y * kNormal.y + kNormal.z * kNormal.z;
-    float fNormalLength = std::sqrt(fNormalSqrLength);
-    // EXE-INLINED 0x457990
-    float fDirSqrLength = kSeg.m_kDirection.x * kSeg.m_kDirection.x + kSeg.m_kDirection.y * kSeg.m_kDirection.y +
-        kSeg.m_kDirection.z * kSeg.m_kDirection.z;
-    float fDirLength = std::sqrt(fDirSqrLength);
+    float fNormalLength = kNormal.Length();
+    float fDirLength = kSeg.m_kDirection.Length();
     float fParallelTolerance = fDirLength * fNormalLength * 9.999999747378752e-06;
 
     NiSegment kSegPgm;
@@ -44,38 +33,19 @@ float NiSqrDistance::Compute(
     float fT0;
 
     if (fAbsNormalDotDir > fParallelTolerance) {
-        // EXE-INLINED 0x439EF0
-        NiPoint3 kDiff;
-        kDiff.x = kPgm.m_kOrigin.x - kSeg.m_kOrigin.x;
-        kDiff.y = kPgm.m_kOrigin.y - kSeg.m_kOrigin.y;
-        kDiff.z = kPgm.m_kOrigin.z - kSeg.m_kOrigin.z;
-        // EXE-INLINED 0x4B6190
-        float fA00 = kSeg.m_kDirection.x * kSeg.m_kDirection.x + kSeg.m_kDirection.y * kSeg.m_kDirection.y +
-            kSeg.m_kDirection.z * kSeg.m_kDirection.z;
-        // EXE-INLINED 0x4B6190
-        float fDot01 = kPgm.m_kEdge0.x * kSeg.m_kDirection.x + kPgm.m_kEdge0.y * kSeg.m_kDirection.y +
-            kPgm.m_kEdge0.z * kSeg.m_kDirection.z;
+        NiPoint3 kDiff = kPgm.m_kOrigin - kSeg.m_kOrigin;
+        float fA00 = kSeg.m_kDirection.Dot(kSeg.m_kDirection);
+        float fDot01 = kPgm.m_kEdge0.Dot(kSeg.m_kDirection);
         float fA01 = -fDot01;
-        // EXE-INLINED 0x4B6190
-        float fDot02 = kPgm.m_kEdge1.x * kSeg.m_kDirection.x + kPgm.m_kEdge1.y * kSeg.m_kDirection.y +
-            kPgm.m_kEdge1.z * kSeg.m_kDirection.z;
+        float fDot02 = kPgm.m_kEdge1.Dot(kSeg.m_kDirection);
         float fA02 = -fDot02;
-        // EXE-INLINED 0x4B6190
-        float fA11 =
-            kPgm.m_kEdge0.x * kPgm.m_kEdge0.x + kPgm.m_kEdge0.y * kPgm.m_kEdge0.y + kPgm.m_kEdge0.z * kPgm.m_kEdge0.z;
-        // EXE-INLINED 0x4B6190
-        float fA12 =
-            kPgm.m_kEdge1.x * kPgm.m_kEdge0.x + kPgm.m_kEdge1.y * kPgm.m_kEdge0.y + kPgm.m_kEdge1.z * kPgm.m_kEdge0.z;
-        // EXE-INLINED 0x4B6190
-        float fA22 =
-            kPgm.m_kEdge1.x * kPgm.m_kEdge1.x + kPgm.m_kEdge1.y * kPgm.m_kEdge1.y + kPgm.m_kEdge1.z * kPgm.m_kEdge1.z;
-        // EXE-INLINED 0x4B6190
-        float fDot0 = kDiff.x * kSeg.m_kDirection.x + kDiff.y * kSeg.m_kDirection.y + kDiff.z * kSeg.m_kDirection.z;
+        float fA11 = kPgm.m_kEdge0.Dot(kPgm.m_kEdge0);
+        float fA12 = kPgm.m_kEdge1.Dot(kPgm.m_kEdge0);
+        float fA22 = kPgm.m_kEdge1.Dot(kPgm.m_kEdge1);
+        float fDot0 = kDiff.Dot(kSeg.m_kDirection);
         float fB0 = -fDot0;
-        // EXE-INLINED 0x4B6190
-        float fB1 = kPgm.m_kEdge0.x * kDiff.x + kPgm.m_kEdge0.y * kDiff.y + kPgm.m_kEdge0.z * kDiff.z;
-        // EXE-INLINED 0x4B6190
-        float fB2 = kPgm.m_kEdge1.x * kDiff.x + kPgm.m_kEdge1.y * kDiff.y + kPgm.m_kEdge1.z * kDiff.z;
+        float fB1 = kPgm.m_kEdge0.Dot(kDiff);
+        float fB2 = kPgm.m_kEdge1.Dot(kDiff);
         float fCof00 = fA11 * fA22 - fA12 * fA12;
         float fCof01 = fA02 * fA12 - fA01 * fA22;
         float fCof02 = fA01 * fA12 - fA02 * fA11;
@@ -584,11 +554,7 @@ float NiSqrDistance::Compute(
         fPgmParam1 = fT0;
     }
 
-    // EXE-INLINED 0x439E90
-    NiPoint3 kOrigin1;
-    kOrigin1.x = kPgm.m_kEdge1.x + kPgm.m_kOrigin.x;
-    kOrigin1.y = kPgm.m_kEdge1.y + kPgm.m_kOrigin.y;
-    kOrigin1.z = kPgm.m_kEdge1.z + kPgm.m_kOrigin.z;
+    NiPoint3 kOrigin1 = kPgm.m_kEdge1 + kPgm.m_kOrigin;
     kSegPgm.m_kOrigin = kOrigin1;
     kSegPgm.m_kDirection = kPgm.m_kEdge0;
     fSqrDist0 = Compute(kSeg, kSegPgm, fR0, fS0);
@@ -600,11 +566,7 @@ float NiSqrDistance::Compute(
         fPgmParam1 = fT0;
     }
 
-    // EXE-INLINED 0x439E90
-    NiPoint3 kOrigin0;
-    kOrigin0.x = kPgm.m_kEdge0.x + kPgm.m_kOrigin.x;
-    kOrigin0.y = kPgm.m_kEdge0.y + kPgm.m_kOrigin.y;
-    kOrigin0.z = kPgm.m_kEdge0.z + kPgm.m_kOrigin.z;
+    NiPoint3 kOrigin0 = kPgm.m_kEdge0 + kPgm.m_kOrigin;
     kSegPgm.m_kOrigin = kOrigin0;
     kSegPgm.m_kDirection = kPgm.m_kEdge1;
     fSqrDist0 = Compute(kSeg, kSegPgm, fR0, fT0);
@@ -625,11 +587,7 @@ float NiSqrDistance::Compute(
         fPgmParam1 = fT0;
     }
 
-    // EXE-INLINED 0x439E90
-    NiPoint3 kPnt;
-    kPnt.x = kSeg.m_kOrigin.x + kSeg.m_kDirection.x;
-    kPnt.y = kSeg.m_kDirection.y + kSeg.m_kOrigin.y;
-    kPnt.z = kSeg.m_kDirection.z + kSeg.m_kOrigin.z;
+    NiPoint3 kPnt = kSeg.m_kOrigin + kSeg.m_kDirection;
     fSqrDist0 = Compute(kPnt, kPgm, fS0, fT0);
     fR0 = 1.0f;
     if (fSqrDist0 < fSqrDist) {

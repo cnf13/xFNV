@@ -223,14 +223,7 @@ void NiPSysVortexFieldModifier::UpdateNoAttenuationNoDist(float fTime, NiPSysDat
 
     NiPoint3 kOrigin = kFieldToPSys.m_Translate;
     const NiMatrix3& kRotate = kFieldToPSys.m_Rotate;
-    NiPoint3 kAxis;
-    // EXE-INLINED 0x4B4500
-    kAxis.x = kRotate.m_pEntry[0][0] * m_kDirection.x + kRotate.m_pEntry[0][1] * m_kDirection.y +
-        kRotate.m_pEntry[0][2] * m_kDirection.z;
-    kAxis.y = kRotate.m_pEntry[1][0] * m_kDirection.x + kRotate.m_pEntry[1][1] * m_kDirection.y +
-        kRotate.m_pEntry[1][2] * m_kDirection.z;
-    kAxis.z = kRotate.m_pEntry[2][0] * m_kDirection.x + kRotate.m_pEntry[2][1] * m_kDirection.y +
-        kRotate.m_pEntry[2][2] * m_kDirection.z;
+    NiPoint3 kAxis = kRotate * m_kDirection;
     kAxis.Unitize();
 
     for (uint16_t i = 0; i < pkData->m_usActive; i++) {

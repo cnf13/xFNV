@@ -1862,11 +1862,7 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
     uint32_t uinumlights = 0;
     float fdirlum = (dirlightcolor.g + dirlightcolor.r + dirlightcolor.b) / 3.0;
     if (fdirlum > 0.4) {
-        // EXE-INLINED 0x4A0BD0
-        NiPoint3 lightdir;
-        lightdir.x = -pdirlight->m_kWorldDir.x;
-        lightdir.y = -pdirlight->m_kWorldDir.y;
-        lightdir.z = -pdirlight->m_kWorldDir.z;
+        NiPoint3 lightdir = -pdirlight->m_kWorldDir;
         lightdir.Unitize();
         // EXE-INLINED 0x45BB20
         blendedVect.x = lightdir.x * 1000.0;
@@ -1889,15 +1885,10 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
         while (plight && uinumlights < 100) {
             NiLight* pLight = plight->spLight.m_pObject;
             if (!(pLight->m_uFlags & NiAVObject::APP_CULLED)) {
-                // EXE-INLINED 0x439EF0
-                NiPoint3 kvect;
-                kvect.x = pLight->m_kWorld.m_Translate.x - aTargetCenter.x;
-                kvect.y = pLight->m_kWorld.m_Translate.y - aTargetCenter.y;
-                kvect.z = pLight->m_kWorld.m_Translate.z - aTargetCenter.z;
+                NiPoint3 kvect = pLight->m_kWorld.m_Translate - aTargetCenter;
                 NiPoint3 knormvect = kvect;
                 knormvect.Unitize();
-                // EXE-INLINED 0x4B6190
-                float fdot = aTargetDir.x * knormvect.x + aTargetDir.y * knormvect.y + aTargetDir.z * knormvect.z;
+                float fdot = aTargetDir.Dot(knormvect);
                 if (fdot < 0.0f) {
                     fdot = 0.0f;
                 }
@@ -1911,9 +1902,7 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
                 plightColor.b = fLightDimmer * pColorLight->m_kDiff.b;
                 float flum = (plightColor.g + plightColor.r + plightColor.b) / 3.0;
 
-                // EXE-INLINED 0x457990: the sum of squares is stored as a float before the CRT's sqrt.
-                float fSqrLength = kvect.x * kvect.x + kvect.y * kvect.y + kvect.z * kvect.z;
-                float fLength = std::sqrt(fSqrLength);
+                float fLength = kvect.Length();
                 float fatten = 1.0f - (fLength - fbradius) / pLight->m_kSpec.r;
                 if (fatten < 0.0) {
                     fatten = 0.0f;
@@ -1947,25 +1936,14 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
             for (uint32_t i = 0; i < uinumlights; ++i) {
                 float fblend = pfscale[i] / ftotalscale;
                 if (fblend > 0.0f) {
-                    // EXE-INLINED 0x45BB20
-                    NiPoint3 kvector;
-                    kvector.x = plightVecA[i].x * fblend;
-                    kvector.y = plightVecA[i].y * fblend;
-                    kvector.z = plightVecA[i].z * fblend;
-                    // EXE-INLINED 0x63C8A0
-                    blendedVect.x = kvector.x + blendedVect.x;
-                    blendedVect.y = blendedVect.y + kvector.y;
-                    blendedVect.z = blendedVect.z + kvector.z;
+                    NiPoint3 kvector = plightVecA[i] * fblend;
+                    blendedVect += kvector;
                 }
             }
         }
         else {
             NiDirectionalLight* pSun = static_cast<NiDirectionalLight*>(pSunLight->spLight.m_pObject);
-            // EXE-INLINED 0x4A0BD0
-            NiPoint3 lightdir;
-            lightdir.x = -pSun->m_kWorldDir.x;
-            lightdir.y = -pSun->m_kWorldDir.y;
-            lightdir.z = -pSun->m_kWorldDir.z;
+            NiPoint3 lightdir = -pSun->m_kWorldDir;
             lightdir.Unitize();
             // EXE-INLINED 0x45BB20
             blendedVect.x = lightdir.x * 1000.0;
@@ -1975,12 +1953,7 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
         }
     }
 
-    // EXE-INLINED 0x439E90: the sum is built on the stack, then copied to aLoc.
-    NiPoint3 kLoc;
-    kLoc.x = aTargetCenter.x + blendedVect.x;
-    kLoc.y = aTargetCenter.y + blendedVect.y;
-    kLoc.z = aTargetCenter.z + blendedVect.z;
-    aLoc = kLoc;
+    aLoc = aTargetCenter + blendedVect;
     return uinumlights > 0;
 }
 

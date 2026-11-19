@@ -117,14 +117,11 @@ void bhkTriangleShape::Init(const hkSerializableCinfo& arInfo) {
     // Writes the allocated size into the block before the constructor runs.
     po->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpTriangleShape));
     hkVector4 hka;
-    // EXE-INLINED 0x4B4D10
-    hka.set(cinfo.m_vertexA.fX, cinfo.m_vertexA.fY, cinfo.m_vertexA.fZ, cinfo.m_vertexA.fW);
+    cinfo.m_vertexA.ToHK(hka);
     hkVector4 hkb;
-    // EXE-INLINED 0x4B4D10
-    hkb.set(cinfo.m_vertexB.fX, cinfo.m_vertexB.fY, cinfo.m_vertexB.fZ, cinfo.m_vertexB.fW);
+    cinfo.m_vertexB.ToHK(hkb);
     hkVector4 hkc;
-    // EXE-INLINED 0x4B4D10
-    hkc.set(cinfo.m_vertexC.fX, cinfo.m_vertexC.fY, cinfo.m_vertexC.fZ, cinfo.m_vertexC.fW);
+    cinfo.m_vertexC.ToHK(hkc);
     // The constructor's radius is its default argument, hkConvexShapeDefaultRadius.
     ::new (po) hkpTriangleShape(hka, hkb, hkc, hkConvexShapeDefaultRadius);
     po->m_radius = cinfo.m_radius;

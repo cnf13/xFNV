@@ -99,8 +99,7 @@ void BSParentVelocityModifier::Update(float afTime, NiPSysData* apData) {
         return;
     }
 
-    // EXE-INLINED 0x4390C0
-    if (pntLast.x == NiPoint3_ZERO.x && pntLast.y == NiPoint3_ZERO.y && pntLast.z == NiPoint3_ZERO.z) {
+    if (pntLast == NiPoint3_ZERO) {
         velLast = NiPoint3_ZERO;
         fTimeLast = afTime;
         pntLast = pkParent->m_kWorld.m_Translate;

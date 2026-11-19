@@ -227,10 +227,6 @@ hkBool hkpConvexVerticesShape::castRayImpl(const hkpShapeRayCastInput& input, hk
             const uint16_t* pFaceOffset = pPiece->m_faceOffsets.m_data;
             int32_t iNumFaces = pPiece->m_faceOffsets.m_size - 1;
             if (iNumFaces > 0) {
-                // normalize3's constants, each in lane 0 of an otherwise zero vector.
-                const __m128 kZero = _mm_set_ss(0.0f);
-                const __m128 kThree = _mm_set_ss(3.0f);
-                const __m128 kHalf = _mm_set_ss(0.5f);
                 do {
                     const uint8_t* pFace = &pPiece->m_faceVertices.m_data[*pFaceOffset];
                     const FourVectors* pVertices = m_rotatedVertices.m_data;
@@ -252,28 +248,17 @@ hkBool hkpConvexVerticesShape::castRayImpl(const hkpShapeRayCastInput& input, hk
                     v2[0] = pBlock->m_x.m_quad[uiId & 3];
                     v2[1] = pBlock->m_y.m_quad[uiId & 3];
                     v2[2] = pBlock->m_z.m_quad[uiId & 3];
-                    const __m128 e1 = _mm_sub_ps(v1, v0);
-                    const __m128 e2 = _mm_sub_ps(v2, v0);
-                    // EXE-INLINED none: hkVector4::setCross
-                    const __m128 cross = _mm_sub_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(e2, e2, 0xD2), _mm_shuffle_ps(e1, e1, 0xC9)),
-                        _mm_mul_ps(_mm_shuffle_ps(e2, e2, 0xC9), _mm_shuffle_ps(e1, e1, 0xD2))
-                    );
-                    // EXE-INLINED 0x62AEA0
-                    const __m128 sq = _mm_mul_ps(cross, cross);
-                    const __m128 len2 =
-                        _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-                    const __m128 r = _mm_rsqrt_ss(len2);
-                    const __m128 isZero = _mm_cmpeq_ss(len2, kZero);
-                    const __m128 refine = _mm_sub_ss(kThree, _mm_mul_ss(_mm_mul_ss(len2, r), r));
-                    const __m128 invLen = _mm_andnot_ps(isZero, _mm_mul_ss(_mm_mul_ss(kHalf, r), refine));
-                    __m128 plane = _mm_mul_ps(_mm_shuffle_ps(invLen, invLen, 0x00), cross);
-                    const __m128 d = _mm_mul_ps(plane, v0);
+                    hkVector4 e1;
+                    e1.m_quad = _mm_sub_ps(v1, v0);
+                    hkVector4 e2;
+                    e2.m_quad = _mm_sub_ps(v2, v0);
+                    hkVector4 planeEquation;
+                    planeEquation.setCross(e1, e2);
+                    planeEquation.normalize3();
+                    const __m128 d = _mm_mul_ps(planeEquation.m_quad, v0);
                     const __m128 dot =
                         _mm_add_ss(_mm_shuffle_ps(d, d, 0xAA), _mm_add_ss(_mm_shuffle_ps(d, d, 0x55), d));
-                    plane[3] = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
-                    hkVector4 planeEquation;
-                    planeEquation.m_quad = plane;
+                    planeEquation.m_quad[3] = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
                     m_planeEquations.pushBack(planeEquation);
                     ++pFaceOffset;
                 }
@@ -455,18 +440,10 @@ void hkpConvexVerticesShape::transformVerticesAndPlaneEquations(const hkTransfor
     hkLocalArray<hkVector4> vertices(numVertices);
     getOriginalVertices(vertices);
 
-    const __m128 col0 = t.m_rotation.m_col0.m_quad;
-    const __m128 col1 = t.m_rotation.m_col1.m_quad;
-    const __m128 col2 = t.m_rotation.m_col2.m_quad;
-    const __m128 translation = t.m_translation.m_quad;
     int32_t i = vertices.m_size - 1;
     hkVector4* pVertex = &vertices.m_data[i];
     do {
-        // EXE-INLINED 0xC7F640
-        const __m128 v = pVertex->m_quad;
-        const __m128 xy =
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), col0));
-        pVertex->m_quad = _mm_add_ps(xy, _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation));
+        pVertex->setTransformedPos(t, *pVertex);
         --i;
         --pVertex;
     }
@@ -475,7 +452,6 @@ void hkpConvexVerticesShape::transformVerticesAndPlaneEquations(const hkTransfor
 
     hkVector4* pPlane = m_planeEquations.m_data;
     int32_t remaining = m_planeEquations.m_size - 1;
-    // EXE-INLINED none: hkVector4::setNeg4
     hkVector4 negTranslation;
     negTranslation.setNeg4(t.m_translation);
     hkRotation rotation;

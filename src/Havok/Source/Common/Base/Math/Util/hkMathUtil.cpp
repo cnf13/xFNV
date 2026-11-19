@@ -57,55 +57,32 @@ void hkMathUtil::decompose4x4ColTransform(const float* matrixIn, Decomposition& 
     decompOut.m_basis.m_col1.m_quad = qCur.m_col1.m_quad;
     decompOut.m_basis.m_col2.m_quad = qCur.m_col2.m_quad;
 
-    // EXE-INLINED 0x62AEA0 (hkVector4::normalize3, three times): one Newton step on rsqrtss of the squared length
-    // (y + x, then z + that), a zero length giving a zero column.
-    const __m128 zero = _mm_set_ss(0.0f);
-    __m128 v = decompOut.m_basis.m_col0.m_quad;
-    __m128 sq = _mm_mul_ps(v, v);
-    __m128 len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq);
-    len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), len2);
-    __m128 r = _mm_rsqrt_ss(len2);
-    __m128 inv =
-        _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), r), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, r), r)));
-    inv = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), inv);
-    __m128 c0 = _mm_mul_ps(_mm_shuffle_ps(inv, inv, 0), v);
-
-    v = decompOut.m_basis.m_col1.m_quad;
-    sq = _mm_mul_ps(v, v);
-    len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq);
-    len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), len2);
-    r = _mm_rsqrt_ss(len2);
-    inv = _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), r), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, r), r)));
-    inv = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), inv);
-    const __m128 c1 = _mm_mul_ps(_mm_shuffle_ps(inv, inv, 0), v);
-
-    v = decompOut.m_basis.m_col2.m_quad;
-    sq = _mm_mul_ps(v, v);
-    len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq);
-    len2 = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), len2);
-    r = _mm_rsqrt_ss(len2);
-    inv = _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), r), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, r), r)));
-    inv = _mm_andnot_ps(_mm_cmpeq_ss(len2, zero), inv);
-    const __m128 c2 = _mm_mul_ps(_mm_shuffle_ps(inv, inv, 0), v);
+    // The basis's columns, normalized.
+    hkVector4 c0 = decompOut.m_basis.m_col0;
+    c0.normalize3();
+    hkVector4 c1 = decompOut.m_basis.m_col1;
+    c1.normalize3();
+    hkVector4 c2 = decompOut.m_basis.m_col2;
+    c2.normalize3();
 
     // c0 . (c1 x c2), summed y + x, then z + that.
     __m128 cross = _mm_sub_ps(
-        _mm_mul_ps(_mm_shuffle_ps(c2, c2, 0xD2), _mm_shuffle_ps(c1, c1, 0xC9)),
-        _mm_mul_ps(_mm_shuffle_ps(c2, c2, 0xC9), _mm_shuffle_ps(c1, c1, 0xD2))
+        _mm_mul_ps(_mm_shuffle_ps(c2.m_quad, c2.m_quad, 0xD2), _mm_shuffle_ps(c1.m_quad, c1.m_quad, 0xC9)),
+        _mm_mul_ps(_mm_shuffle_ps(c2.m_quad, c2.m_quad, 0xC9), _mm_shuffle_ps(c1.m_quad, c1.m_quad, 0xD2))
     );
-    __m128 dots = _mm_mul_ps(cross, c0);
+    __m128 dots = _mm_mul_ps(cross, c0.m_quad);
     __m128 det = _mm_add_ss(_mm_shuffle_ps(dots, dots, 0x55), dots);
     det = _mm_add_ss(_mm_shuffle_ps(dots, dots, 0xAA), det);
     const float fDet = _mm_cvtss_f32(det);
     if (fDet < 0.0f) {
-        c0 = _mm_mul_ps(_mm_set1_ps(-1.0f), c0);
+        c0.m_quad = _mm_mul_ps(_mm_set1_ps(-1.0f), c0.m_quad);
     }
     decompOut.m_flips.m_bool = fDet < 0.0f;
 
     hkTransform t;
-    t.m_rotation.m_col0.m_quad = c0;
-    t.m_rotation.m_col1.m_quad = c1;
-    t.m_rotation.m_col2.m_quad = c2;
+    t.m_rotation.m_col0.m_quad = c0.m_quad;
+    t.m_rotation.m_col1.m_quad = c1.m_quad;
+    t.m_rotation.m_col2.m_quad = c2.m_quad;
     hkQuaternion q;
     q.set(t.m_rotation);
     decompOut.m_rotation.m_vec.m_quad = q.m_vec.m_quad;

@@ -1,5 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
@@ -237,18 +238,7 @@ void NiQuaternion::ToAngleAxis(float& angle, NiPoint3& axis) const {
         axis.z = 0.0f;
         return;
     }
-    float fW = m_fW;
-    float fHalfAngle;
-    // EXE-INLINED none: NiACos
-    if (!(fW > -1.0)) {
-        fHalfAngle = 3.1415927f;
-    }
-    else if (!(1.0 > fW)) {
-        fHalfAngle = 0.0f;
-    }
-    else {
-        fHalfAngle = std::acos(fW);
-    }
+    float fHalfAngle = NiACos(m_fW);
     angle = fHalfAngle + fHalfAngle;
     float fInvLength = 1.0f / fLength;
     axis.x = m_fX * fInvLength;
@@ -323,18 +313,7 @@ NiQuaternion NiQuaternion::UnitInverse(const NiQuaternion& p) {
 
 // w <= -1 (or NaN) gives pi, w >= 1 gives 0. A NaN |sin| still divides, as the game does.
 NiQuaternion NiQuaternion::Log(const NiQuaternion& q) {
-    float fW = q.m_fW;
-    float fAngle;
-    // EXE-INLINED none: NiACos
-    if (!(fW > -1.0)) {
-        fAngle = 3.1415927f;
-    }
-    else if (!(1.0 > fW)) {
-        fAngle = 0.0f;
-    }
-    else {
-        fAngle = std::acos(fW);
-    }
+    float fAngle = NiACos(q.m_fW);
     float fSin = std::sin(fAngle);
     float fAbsSin = __builtin_fabsf(fSin);
     float fCoeff = fAbsSin < 0.001f ? 1.0f : fAngle / fSin;

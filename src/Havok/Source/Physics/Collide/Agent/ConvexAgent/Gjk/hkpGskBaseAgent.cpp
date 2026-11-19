@@ -314,15 +314,7 @@ hkBool hkpGskBaseAgent::_getClosestPoint(
     gsk.convertFeatureToClosestDistance(separatingNormal, output);
     const float fGskDistance = output.m_distance.m_storage;
     const hkQuadReal n = output.m_normalInA.m_quad;
-    // EXE-INLINED 0xC7F700
-    const hkRotation& rWa = bodyA.m_motion.pMotion->getRotation();
-    output.m_normalInWorld.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), rWa.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), rWa.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), rWa.m_col2.m_quad)
-    );
+    output.m_normalInWorld.setRotatedDir(bodyA.m_motion.pMotion->getRotation(), output.m_normalInA);
     const float fDistance = fGskDistance - shapeA->m_radius - shapeB->m_radius;
     output.m_distance.m_storage = fDistance;
     if (!(input.m_tolerance > fDistance)) {
@@ -476,19 +468,7 @@ void hkpGskBaseAgent::staticGetClosestPoints(
                 hkpCdPoint event;
                 event.m_cdBodyA = &bodyA;
                 event.m_cdBodyB = &bodyB;
-                // EXE-INLINED 0xC7F640
-                const hkTransform& transformB = *bodyB.m_motion.pMotion;
-                __m128 v = pointInB.m_quad;
-                event.m_contact.m_position.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1)), transformB.m_rotation.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0)), transformB.m_rotation.m_col0.m_quad)
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2)), transformB.m_rotation.m_col2.m_quad),
-                        transformB.m_translation.m_quad
-                    )
-                );
+                event.m_contact.m_position.setTransformedPos(*bodyB.m_motion.pMotion, pointInB);
                 event.m_contact.m_separatingNormal.m_quad = normal.m_quad;
                 event.m_contact.m_separatingNormal(3) = out.m_distance.m_storage;
                 collector.addCdPoint(event);

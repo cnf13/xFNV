@@ -586,10 +586,7 @@ void WeaponObject::Constrain(
         // The hinge axis: the first column of the source object's world rotation.
         NiPoint3 xAxisWorld;
         const NiMatrix3& kRotate = psourceCol->m_pkSceneObject->m_kWorld.m_Rotate;
-        // EXE-INLINED 0x439F50
-        xAxisWorld.x = kRotate.m_pEntry[0][0];
-        xAxisWorld.y = kRotate.m_pEntry[1][0];
-        xAxisWorld.z = kRotate.m_pEntry[2][0];
+        kRotate.GetCol(0, xAxisWorld);
         hkVector4 axis;
         axis.set(xAxisWorld.x, xAxisWorld.y, xAxisWorld.z, 0.0f);
         axis.normalize3();

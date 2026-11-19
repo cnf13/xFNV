@@ -204,29 +204,17 @@ bool NiLookAtInterpolator::Update(float fTime, NiObjectNET* pkInterpTarget, NiQu
         kParentRot = pkParent->m_kWorld.m_Rotate;
         float fParentScale = pkParent->m_kWorld.m_fScale;
         NiPoint3 kRotated = kParentRot * kTranslate;
-        // EXE-INLINED 0x45BB20
-        NiPoint3 kScaled;
-        kScaled.x = kRotated.x * fParentScale;
-        kScaled.y = kRotated.y * fParentScale;
-        kScaled.z = kRotated.z * fParentScale;
-        // EXE-INLINED 0x439E90
-        kWorldTranslate.x = pkParent->m_kWorld.m_Translate.x + kScaled.x;
-        kWorldTranslate.y = pkParent->m_kWorld.m_Translate.y + kScaled.y;
-        kWorldTranslate.z = pkParent->m_kWorld.m_Translate.z + kScaled.z;
+        NiPoint3 kScaled = kRotated * fParentScale;
+        kWorldTranslate = pkParent->m_kWorld.m_Translate + kScaled;
     }
     else {
         kParentRot = NiMatrix3_IDENTITY;
         kWorldTranslate = kTranslate;
     }
 
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kAt;
-    kAt.x = kLookAtPos.x - kWorldTranslate.x;
-    kAt.y = kLookAtPos.y - kWorldTranslate.y;
-    kAt.z = kLookAtPos.z - kWorldTranslate.z;
+    NiPoint3 kAt = kLookAtPos - kWorldTranslate;
     NiMatrix3 kRot;
-    // EXE-INLINED 0x4A7290
-    float fSqrLength = kAt.x * kAt.x + kAt.y * kAt.y + kAt.z * kAt.z;
+    float fSqrLength = kAt.SqrLength();
     if (fSqrLength < 0.001f) {
         kRot.m_pEntry[0][0] = 1.0f;
         kRot.m_pEntry[0][1] = 0.0f;
@@ -252,29 +240,15 @@ bool NiLookAtInterpolator::Update(float fTime, NiObjectNET* pkInterpTarget, NiQu
             kUp = NiPoint3_UNIT_Z;
             fDot = kAt.z;
         }
-        // EXE-INLINED 0x45BB20
-        NiPoint3 kAlong;
-        kAlong.x = kAt.x * fDot;
-        kAlong.y = kAt.y * fDot;
-        kAlong.z = kAt.z * fDot;
-        // EXE-INLINED 0x439EF0
-        kUp.x = kUp.x - kAlong.x;
-        kUp.y = kUp.y - kAlong.y;
-        kUp.z = kUp.z - kAlong.z;
+        NiPoint3 kAlong = kAt * fDot;
+        kUp = kUp - kAlong;
         kUp.Unitize();
 
         if (!(m_uFlags & FLIP_MASK)) {
-            // EXE-INLINED 0x4A0BD0
-            kAt.x = -kAt.x;
-            kAt.y = -kAt.y;
-            kAt.z = -kAt.z;
+            kAt = -kAt;
         }
 
-        // EXE-INLINED 0x4B3800
-        NiPoint3 kRight;
-        kRight.x = kUp.y * kAt.z - kUp.z * kAt.y;
-        kRight.y = kUp.z * kAt.x - kUp.x * kAt.z;
-        kRight.z = kUp.x * kAt.y - kUp.y * kAt.x;
+        NiPoint3 kRight = kUp.Cross(kAt);
         // The fourth axis value leaves kRot unwritten, deliberately, as the game does.
         switch ((m_uFlags & AXIS_MASK) >> AXIS_POS) {
             case X:

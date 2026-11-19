@@ -133,16 +133,14 @@ void hkLs_doSimpleCollisionResponse(
     params.m_externalSeperatingVelocity = event.m_seperatingVelocity;
     params.m_extraSeparatingVelocity = 0.1f;
     params.m_extraSlope = rotateNormal;
-    // EXE-INLINED 0x577BF0
-    params.m_friction = hkUFloat8_intToReal[event.m_properties.m_friction.m_value];
+    params.m_friction = event.m_properties.m_friction;
     params.m_restitution = static_cast<float>(static_cast<int32_t>(event.m_properties.m_restitution) * 0.0078125);
     uint8_t ucMaxImpulse = event.m_properties.m_maxImpulse.m_value;
     if (ucMaxImpulse == 0) {
         params.m_maxImpulse = 3.40282e+38f;
     }
     else {
-        // EXE-INLINED 0x577BF0
-        params.m_maxImpulse = hkUFloat8_intToReal[ucMaxImpulse];
+        params.m_maxImpulse = event.m_properties.m_maxImpulse;
     }
     hkpSimpleCollisionResponse::SolveSingleOutput output;
     hkpSimpleCollisionResponse::solveSingleContact(
@@ -628,20 +626,9 @@ void hkLs_restoreTransformOnBodiesWithUpdatedTransform(
             const hkSweptTransform& sweptTransform = motionState->m_sweptTransform;
             hkTransform& transform = motionState->m_transform;
             transform.m_rotation.set(sweptTransform.m_rotation1);
-            // EXE-INLINED 0xC7F700
-            const hkQuadReal local = sweptTransform.m_centerOfMassLocal.m_quad;
-            const hkQuadReal centerShift = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(local, local, _MM_SHUFFLE(1, 1, 1, 1)), transform.m_rotation.m_col1.m_quad
-                    ),
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(local, local, _MM_SHUFFLE(0, 0, 0, 0)), transform.m_rotation.m_col0.m_quad
-                    )
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(local, local, _MM_SHUFFLE(2, 2, 2, 2)), transform.m_rotation.m_col2.m_quad)
-            );
-            transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift);
+            hkVector4 centerShift;
+            centerShift.setRotatedDir(transform.m_rotation, sweptTransform.m_centerOfMassLocal);
+            transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift.m_quad);
         }
         if (state == HK_TOI_ENTITY_STATE_MANIFOLD_UPDATED || state == HK_TOI_ENTITY_STATE_TOUCHED) {
             hkpEntity* entity = island->m_entities.m_data[i];
@@ -775,20 +762,9 @@ hkResult hkLs_localizedSolveToi(
             const hkSweptTransform& sweptTransform = entity->m_motion.m_motionState.m_sweptTransform;
             hkTransform& transform = entity->m_motion.m_motionState.m_transform;
             transform.m_rotation.set(sweptTransform.m_rotation1);
-            // EXE-INLINED 0xC7F700
-            const hkQuadReal local = sweptTransform.m_centerOfMassLocal.m_quad;
-            const hkQuadReal centerShift = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(local, local, _MM_SHUFFLE(1, 1, 1, 1)), transform.m_rotation.m_col1.m_quad
-                    ),
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(local, local, _MM_SHUFFLE(0, 0, 0, 0)), transform.m_rotation.m_col0.m_quad
-                    )
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(local, local, _MM_SHUFFLE(2, 2, 2, 2)), transform.m_rotation.m_col2.m_quad)
-            );
-            transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift);
+            hkVector4 centerShift;
+            centerShift.setRotatedDir(transform.m_rotation, sweptTransform.m_centerOfMassLocal);
+            transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift.m_quad);
         }
         return HK_FAILURE;
     }

@@ -47,44 +47,8 @@ hkJobQueue::JobStatus hkCpuShapeRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
             const hkTransform& transform = *collidable->m_motion.pMotion;
 
             // The ray's ends in the shape's space: the transposed rotation times the end less the translation.
-            {
-                // EXE-INLINED 0xC7F690
-                __m128 col0 = transform.m_rotation.m_col0.m_quad;
-                __m128 col1 = transform.m_rotation.m_col1.m_quad;
-                __m128 col2 = transform.m_rotation.m_col2.m_quad;
-                __m128 v = _mm_sub_ps(command->m_rayInput.m_to.m_quad, transform.m_translation.m_quad);
-                __m128 lo = _mm_unpacklo_ps(col0, col1);
-                __m128 hi = _mm_unpackhi_ps(col0, col1);
-                __m128 row0 = _mm_movelh_ps(lo, col2);
-                __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, _MM_SHUFFLE(3, 1, 1, 0));
-                __m128 row2 = _mm_shuffle_ps(hi, col2, _MM_SHUFFLE(3, 2, 1, 0));
-                rayInput.m_to.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(row1, _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1))),
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0)), row0)
-                    ),
-                    _mm_mul_ps(row2, _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2)))
-                );
-            }
-            {
-                // EXE-INLINED 0xC7F690
-                __m128 col0 = transform.m_rotation.m_col0.m_quad;
-                __m128 col1 = transform.m_rotation.m_col1.m_quad;
-                __m128 col2 = transform.m_rotation.m_col2.m_quad;
-                __m128 v = _mm_sub_ps(command->m_rayInput.m_from.m_quad, transform.m_translation.m_quad);
-                __m128 lo = _mm_unpacklo_ps(col0, col1);
-                __m128 hi = _mm_unpackhi_ps(col0, col1);
-                __m128 row0 = _mm_movelh_ps(lo, col2);
-                __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, _MM_SHUFFLE(3, 1, 1, 0));
-                __m128 row2 = _mm_shuffle_ps(hi, col2, _MM_SHUFFLE(3, 2, 1, 0));
-                rayInput.m_from.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(row1, _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1))),
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0)), row0)
-                    ),
-                    _mm_mul_ps(row2, _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2)))
-                );
-            }
+            rayInput.m_to.setTransformedInversePos(transform, command->m_rayInput.m_to);
+            rayInput.m_from.setTransformedInversePos(transform, command->m_rayInput.m_from);
 
             // EXE-INLINED 0x62A2B0
             output.m_rootCollidable = nullptr;
@@ -126,16 +90,7 @@ hkJobQueue::JobStatus hkCpuShapeRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
                 continue;
             }
 
-            // EXE-INLINED 0xC7F700
-            const hkRotation& rotation = transform.m_rotation;
-            __m128 n = output.m_normal.m_quad;
-            output.m_normal.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 0, 0, 0)), rotation.m_col0.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(n, n, _MM_SHUFFLE(1, 1, 1, 1)), rotation.m_col1.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 2, 2, 2)), rotation.m_col2.m_quad)
-            );
+            output.m_normal.setRotatedDir(transform.m_rotation, output.m_normal);
 
             // EXE-INLINED 0x9C1AA0
             dest->m_normal.m_quad = output.m_normal.m_quad;

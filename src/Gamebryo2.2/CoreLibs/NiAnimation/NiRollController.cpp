@@ -72,22 +72,7 @@ void NiRollController::Update(NiUpdateData& UpdateData) {
 
     NiMatrix3 kRot = static_cast<NiAVObject*>(m_pkTarget)->m_kLocal.m_Rotate;
     NiMatrix3 kRoll;
-    float fSine;
-    float fCosine;
-    // EXE-INLINED 0x4A0C90
-    float fAngle = -fRoll;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRoll.m_pEntry[0][0] = fCosine;
-    kRoll.m_pEntry[0][1] = fSine;
-    kRoll.m_pEntry[0][2] = 0.0f;
-    kRoll.m_pEntry[1][0] = -fSine;
-    kRoll.m_pEntry[1][1] = fCosine;
-    kRoll.m_pEntry[1][2] = 0.0f;
-    kRoll.m_pEntry[2][0] = 0.0f;
-    kRoll.m_pEntry[2][1] = 0.0f;
-    kRoll.m_pEntry[2][2] = 1.0f;
+    kRoll.MakeZRotation(-fRoll);
     kRot = kRot * kRoll;
     static_cast<NiAVObject*>(m_pkTarget)->m_kLocal.m_Rotate = kRot;
 }

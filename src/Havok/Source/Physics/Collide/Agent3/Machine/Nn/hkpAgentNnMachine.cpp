@@ -312,23 +312,10 @@ const hkpCdBody* hkAgentMachine_processTransformedShapes(
             ms->m_sweptTransform.m_centerOfMass1 = parent->m_sweptTransform.m_centerOfMass1;
             ms->m_sweptTransform.m_rotation0.setMul(parent->m_sweptTransform.m_rotation0, transformShape->m_rotation);
             ms->m_sweptTransform.m_rotation1.setMul(parent->m_sweptTransform.m_rotation1, transformShape->m_rotation);
-            // EXE-INLINED none: hkVector4::_setRotatedInverseDir of (centre of mass local - the translation)
-            __m128 r0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-            __m128 r1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-            __m128 r2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-            __m128 v = _mm_sub_ps(
-                _mm_load_ps(&reinterpret_cast<const float*>(&parent->m_sweptTransform.m_centerOfMassLocal.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0])
-            );
-            __m128 lo = _mm_unpacklo_ps(r0, r1);
-            __m128 hi = _mm_unpackhi_ps(r0, r1);
-            __m128 rowX = _mm_movelh_ps(lo, r2);
-            __m128 rowY = _mm_shuffle_ps(_mm_movehl_ps(rowX, lo), r2, 0xD4);
-            __m128 rowZ = _mm_shuffle_ps(hi, r2, 0xE4);
-            __m128 local =
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), rowY), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), rowX));
-            local = _mm_add_ps(local, _mm_mul_ps(rowZ, _mm_shuffle_ps(v, v, 0xAA)));
-            _mm_store_ps(&reinterpret_cast<float*>(&ms->m_sweptTransform.m_centerOfMassLocal.m_quad)[0], local);
+            // The centre of mass local is taken into the transform shape's space.
+            hkVector4 kOffset;
+            kOffset.setSub4(parent->m_sweptTransform.m_centerOfMassLocal, t.m_translation);
+            ms->m_sweptTransform.m_centerOfMassLocal._setRotatedInverseDir(t.m_rotation, kOffset);
             ms->m_deltaAngle = parent->m_deltaAngle;
             ms->m_objectRadius = parent->m_objectRadius;
             if (newCdBodies) {

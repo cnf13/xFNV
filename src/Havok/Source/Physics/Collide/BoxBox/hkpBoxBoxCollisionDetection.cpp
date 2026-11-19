@@ -565,17 +565,7 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
                 _mm_or_ps(_mm_and_ps(_mm_set1_ps(1e-05f), inside), _mm_andnot_ps(inside, _mm_set1_ps(-1e-05f)));
             const __m128 offset = _mm_add_ps(_mm_mul_ps(boundary, _mm_set1_ps(fpp.m_normalSign)), row);
             fpp.m_vB.m_quad = _mm_xor_ps(_mm_and_ps(offset, hkQuadRealNegateMask), fpp.m_vB.m_quad);
-            const __m128 vB = fpp.m_vB.m_quad;
-            // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-            fpp.m_vA.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0x55), m_aTb.getColumn(1).m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0), m_aTb.getColumn(0).m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0xAA), m_aTb.getColumn(2).m_quad), m_aTb.getTranslation().m_quad
-                )
-            );
+            fpp.m_vA.setTransformedPos(m_aTb, fpp.m_vB);
             const uint8_t featureIdB = static_cast<uint8_t>(
                 ((_mm_movemask_ps(_mm_cmplt_ps(fpp.m_vB.m_quad, _mm_setzero_ps())) & 7) << 4) |
                 ((std::bit_cast<uint32_t>(fpp.m_normalSign) >> 28) & 8)
@@ -616,17 +606,7 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
                 _mm_or_ps(_mm_and_ps(_mm_set1_ps(-1e-05f), inside), _mm_andnot_ps(inside, _mm_set1_ps(1e-05f)));
             const __m128 offset = _mm_add_ps(_mm_mul_ps(boundary, _mm_set1_ps(negSign)), column);
             fpp.m_vA.m_quad = _mm_xor_ps(_mm_and_ps(offset, hkQuadRealNegateMask), fpp.m_vA.m_quad);
-            // EXE-INLINED 0xC7F690: hkVector4::setTransformedInversePos
-            const __m128 p = _mm_sub_ps(fpp.m_vA.m_quad, m_aTb.getTranslation().m_quad);
-            const __m128 lo = _mm_unpacklo_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-            const __m128 hi = _mm_unpackhi_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-            const __m128 row0 = _mm_movelh_ps(lo, m_aTb.getColumn(2).m_quad);
-            const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), m_aTb.getColumn(2).m_quad, 0xD4);
-            const __m128 row2 = _mm_shuffle_ps(hi, m_aTb.getColumn(2).m_quad, 0xE4);
-            fpp.m_vB.m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(row1, _mm_shuffle_ps(p, p, 0x55)), _mm_mul_ps(_mm_shuffle_ps(p, p, 0), row0)),
-                _mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), row2)
-            );
+            fpp.m_vB.setTransformedInversePos(m_aTb, fpp.m_vA);
             const uint8_t featureIdB = static_cast<uint8_t>(
                 ((_mm_movemask_ps(_mm_cmplt_ps(fpp.m_vA.m_quad, _mm_setzero_ps())) & 7) << 4) |
                 ((std::bit_cast<uint32_t>(fpp.m_normalSign) >> 28) & 8)
@@ -669,17 +649,7 @@ int32_t hkpBoxBoxCollisionDetection::findClosestPoint(
             fpp.m_vA = normal;
             __m128 signsA = fpp.m_vA.m_quad;
             signsA[edgeA] = 1.0f;
-            // EXE-INLINED 0x4B4AB0: hkVector4::setRotatedInverseDir
-            const __m128 n = normal.m_quad;
-            const __m128 lo = _mm_unpacklo_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-            const __m128 hi = _mm_unpackhi_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-            const __m128 row0 = _mm_movelh_ps(lo, m_aTb.getColumn(2).m_quad);
-            const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), m_aTb.getColumn(2).m_quad, 0xD4);
-            const __m128 row2 = _mm_shuffle_ps(hi, m_aTb.getColumn(2).m_quad, 0xE4);
-            fpp.m_vB.m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(row1, _mm_shuffle_ps(n, n, 0x55)), _mm_mul_ps(_mm_shuffle_ps(n, n, 0), row0)),
-                _mm_mul_ps(row2, _mm_shuffle_ps(n, n, 0xAA))
-            );
+            fpp.m_vB.setRotatedInverseDir(m_aTb.getRotation(), normal);
             __m128 signsB = fpp.m_vB.m_quad;
             signsB[edgeB] = 1.0f;
             // The vertex bits: A's from the normal's signs (bit 7 set), B's from the inverted signs.
@@ -929,16 +899,7 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
             const float normalSign = std::bit_cast<float>(std::bit_cast<uint32_t>(1.0f) | ((featureIdB & ~7u) << 28));
             const __m128 vB = _mm_mul_ps(vertexSignArray[(featureIdB & 0x70) >> 4], m_radiusB.m_quad);
             fpp.m_vB.m_quad = vB;
-            // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-            fpp.m_vA.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(m_aTb.getColumn(1).m_quad, _mm_shuffle_ps(vB, vB, 0x55)),
-                    _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0x00), m_aTb.getColumn(0).m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(m_aTb.getColumn(2).m_quad, _mm_shuffle_ps(vB, vB, 0xAA)), m_aTb.getTranslation().m_quad
-                )
-            );
+            fpp.m_vA.setTransformedPos(m_aTb, fpp.m_vB);
             fpp.m_normalSign = normalSign;
             hkVector4 absA;
             absA.setAbs4(fpp.m_vA);
@@ -950,22 +911,13 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
         else if (featureIdA <= HK_BOXBOX_FACE_B_Z) {
             // A's vertex in B's space, within B's keep radii.
             const float normalSign = std::bit_cast<float>(std::bit_cast<uint32_t>(1.0f) | ((featureIdB & ~7u) << 28));
-            const __m128 vA = _mm_mul_ps(vertexSignArray[(featureIdB & 0x70) >> 4], m_radiusA.m_quad);
-            // EXE-INLINED 0xC7F690: hkVector4::setTransformedInversePos
-            const __m128 p = _mm_sub_ps(vA, m_aTb.getTranslation().m_quad);
-            const __m128 lo = _mm_unpacklo_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-            const __m128 hi = _mm_unpackhi_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-            const __m128 row0 = _mm_movelh_ps(lo, m_aTb.getColumn(2).m_quad);
-            const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), m_aTb.getColumn(2).m_quad, 0xD4);
-            const __m128 row2 = _mm_shuffle_ps(hi, m_aTb.getColumn(2).m_quad, 0xE4);
-            fpp.m_vB.m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(row1, _mm_shuffle_ps(p, p, 0x55)), _mm_mul_ps(_mm_shuffle_ps(p, p, 0), row0)),
-                _mm_mul_ps(row2, _mm_shuffle_ps(p, p, 0xAA))
-            );
+            hkVector4 vA;
+            vA.m_quad = _mm_mul_ps(vertexSignArray[(featureIdB & 0x70) >> 4], m_radiusA.m_quad);
+            fpp.m_vB.setTransformedInversePos(m_aTb, vA);
             fpp.m_normalSign = normalSign;
             hkVector4 absB;
             absB.setAbs4(fpp.m_vB);
-            fpp.m_vA.m_quad = vA;
+            fpp.m_vA = vA;
             valid = (_mm_movemask_ps(_mm_cmplt_ps(absB.m_quad, m_keepRadiusB.m_quad)) & 7) == 7;
             if (valid) {
                 const float negSign = -normalSign;
@@ -1016,16 +968,9 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
         normalInB(1) = (static_cast<int32_t>((packed >> 8) & 0xFF) - 0x80) * 0.008593750186264515;
         normalInB(2) = (static_cast<int32_t>((packed >> 16) & 0xFF) - 0x80) * 0.008593750186264515;
         normalInB(3) = (static_cast<int32_t>(packed >> 24) - 0x80) * 0.008593750186264515;
-        const __m128 n = normalInB.m_quad;
-        // EXE-INLINED 0xC7F700: hkVector4::setRotatedDir
-        const __m128 normalInA = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), m_aTb.getColumn(1).m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), m_aTb.getColumn(0).m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), m_aTb.getColumn(2).m_quad)
-        );
-        const __m128 prod = _mm_mul_ps(normalInA, manifold.m_manifoldNormalA.m_quad);
+        hkVector4 normalInA;
+        normalInA.setRotatedDir(m_aTb.getRotation(), normalInB);
+        const __m128 prod = _mm_mul_ps(normalInA.m_quad, manifold.m_manifoldNormalA.m_quad);
         const float dot = _mm_cvtss_f32(
             _mm_add_ss(_mm_shuffle_ps(prod, prod, 0xAA), _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod))
         );
@@ -1128,38 +1073,17 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
 
     // addPoint: a face point of the manifold within the tolerance of the closest point already covers it.
     if (fcp.m_featureIdA <= HK_BOXBOX_FACE_B_Z) {
-        __m128 position;
+        hkVector4 position;
         if (fcp.m_featureIdA <= HK_BOXBOX_FACE_A_Z) {
-            const __m128 v = fpp.m_vB.m_quad;
-            const hkTransform* wTb = m_wTb;
-            // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-            position = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), wTb->m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), wTb->m_rotation.m_col0.m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), wTb->m_rotation.m_col2.m_quad), wTb->m_translation.m_quad
-                )
-            );
+            position.setTransformedPos(*m_wTb, fpp.m_vB);
         }
         else {
-            const __m128 v = fpp.m_vA.m_quad;
-            const hkTransform* wTa = m_wTa;
-            // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-            position = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), wTa->m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), wTa->m_rotation.m_col0.m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), wTa->m_rotation.m_col2.m_quad), wTa->m_translation.m_quad
-                )
-            );
+            position.setTransformedPos(*m_wTa, fpp.m_vA);
         }
         for (int32_t c = 0; c < manifold.m_numPoints; c++) {
             if (manifold.m_contactPoints[c].m_featureIdA <= HK_BOXBOX_FACE_B_Z) {
-                const __m128 diff = _mm_sub_ps(position, m_result->m_contactPoints[c].m_contact.m_position.m_quad);
+                const __m128 diff =
+                    _mm_sub_ps(position.m_quad, m_result->m_contactPoints[c].m_contact.m_position.m_quad);
                 const __m128 sq = _mm_mul_ps(diff, diff);
                 const float distSq = _mm_cvtss_f32(
                     _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq))
@@ -1313,16 +1237,7 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
         const float normalSign = std::bit_cast<float>(std::bit_cast<uint32_t>(1.0f) | ((featureIdB & ~7u) << 28));
         const __m128 vB = _mm_mul_ps(vertexSignArray[(featureIdB & 0x70) >> 4], m_radiusB.m_quad);
         fpp.m_vB.m_quad = vB;
-        // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-        fpp.m_vA.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(m_aTb.getColumn(1).m_quad, _mm_shuffle_ps(vB, vB, 0x55)),
-                _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0x00), m_aTb.getColumn(0).m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(m_aTb.getColumn(2).m_quad, _mm_shuffle_ps(vB, vB, 0xAA)), m_aTb.getTranslation().m_quad
-            )
-        );
+        fpp.m_vA.setTransformedPos(m_aTb, fpp.m_vB);
         hkVector4 absVA;
         absVA.setAbs4(fpp.m_vA);
         fpp.m_normalSign = normalSign;
@@ -1336,39 +1251,18 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
             continue;
         }
         if (fcpTry.m_featureIdA <= HK_BOXBOX_FACE_B_Z) {
-            __m128 position;
+            hkVector4 position;
             if (fcpTry.m_featureIdA <= HK_BOXBOX_FACE_A_Z) {
-                const hkTransform* wTb = m_wTb;
-                // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-                position = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(wTb->m_rotation.m_col1.m_quad, _mm_shuffle_ps(vB, vB, 0x55)),
-                        _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0x00), wTb->m_rotation.m_col0.m_quad)
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(wTb->m_rotation.m_col2.m_quad, _mm_shuffle_ps(vB, vB, 0xAA)),
-                        wTb->m_translation.m_quad
-                    )
-                );
+                position.setTransformedPos(*m_wTb, fpp.m_vB);
             }
             else {
-                const __m128 v = fpp.m_vA.m_quad;
-                const hkTransform* wTa = m_wTa;
-                // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-                position = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), wTa->m_rotation.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), wTa->m_rotation.m_col0.m_quad)
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), wTa->m_rotation.m_col2.m_quad), wTa->m_translation.m_quad
-                    )
-                );
+                position.setTransformedPos(*m_wTa, fpp.m_vA);
             }
             bool covered = false;
             for (int32_t c = 0; c < manifold.m_numPoints; c++) {
                 if (manifold.m_contactPoints[c].m_featureIdA <= HK_BOXBOX_FACE_B_Z) {
-                    const __m128 diff = _mm_sub_ps(position, m_result->m_contactPoints[c].m_contact.m_position.m_quad);
+                    const __m128 diff =
+                        _mm_sub_ps(position.m_quad, m_result->m_contactPoints[c].m_contact.m_position.m_quad);
                     const __m128 sq = _mm_mul_ps(diff, diff);
                     const float distSq = _mm_cvtss_f32(
                         _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq))
@@ -1435,25 +1329,17 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
         const uint32_t featureIdB = fcpTry.m_featureIdB;
         const int32_t featureIdA = fcpTry.m_featureIdA;
         const float normalSign = std::bit_cast<float>(std::bit_cast<uint32_t>(1.0f) | ((featureIdB & ~7u) << 28));
-        const __m128 vA = _mm_mul_ps(vertexSignArray[(featureIdB & 0x70) >> 4], m_radiusA.m_quad);
-        // EXE-INLINED 0xC7F690: hkVector4::setTransformedInversePos
-        const __m128 p = _mm_sub_ps(vA, m_aTb.getTranslation().m_quad);
-        const __m128 lo = _mm_unpacklo_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-        const __m128 hi = _mm_unpackhi_ps(m_aTb.getColumn(0).m_quad, m_aTb.getColumn(1).m_quad);
-        const __m128 row0 = _mm_movelh_ps(lo, m_aTb.getColumn(2).m_quad);
-        const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), m_aTb.getColumn(2).m_quad, 0xD4);
-        const __m128 row2 = _mm_shuffle_ps(hi, m_aTb.getColumn(2).m_quad, 0xE4);
-        const __m128 vB = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(row1, _mm_shuffle_ps(p, p, 0x55)), _mm_mul_ps(_mm_shuffle_ps(p, p, 0), row0)),
-            _mm_mul_ps(row2, _mm_shuffle_ps(p, p, 0xAA))
-        );
+        hkVector4 vA;
+        vA.m_quad = _mm_mul_ps(vertexSignArray[(featureIdB & 0x70) >> 4], m_radiusA.m_quad);
+        hkVector4 vB;
+        vB.setTransformedInversePos(m_aTb, vA);
         hkVector4 absVB;
-        absVB.m_quad = vB;
+        absVB.m_quad = vB.m_quad;
         absVB.setAbs4(absVB);
         fpp.m_normalSign = normalSign;
         fpp.m_featureIndexA = featureIdA;
-        fpp.m_vA.m_quad = vA;
-        fpp.m_vB.m_quad = vB;
+        fpp.m_vA = vA;
+        fpp.m_vB = vB;
         if ((_mm_movemask_ps(_mm_cmplt_ps(absVB.m_quad, m_keepRadiusB.m_quad)) & 7) != 7) {
             continue;
         }
@@ -1465,39 +1351,18 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
             continue;
         }
         if (fcpTry.m_featureIdA <= HK_BOXBOX_FACE_B_Z) {
-            __m128 position;
+            hkVector4 position;
             if (fcpTry.m_featureIdA <= HK_BOXBOX_FACE_A_Z) {
-                const hkTransform* wTb = m_wTb;
-                // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-                position = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0x55), wTb->m_rotation.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0x00), wTb->m_rotation.m_col0.m_quad)
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(vB, vB, 0xAA), wTb->m_rotation.m_col2.m_quad),
-                        wTb->m_translation.m_quad
-                    )
-                );
+                position.setTransformedPos(*m_wTb, vB);
             }
             else {
-                const hkTransform* wTa = m_wTa;
-                // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-                position = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(vA, vA, 0x55), wTa->m_rotation.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(vA, vA, 0x00), wTa->m_rotation.m_col0.m_quad)
-                    ),
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(vA, vA, 0xAA), wTa->m_rotation.m_col2.m_quad),
-                        wTa->m_translation.m_quad
-                    )
-                );
+                position.setTransformedPos(*m_wTa, vA);
             }
             bool covered = false;
             for (int32_t c = 0; c < manifold.m_numPoints; c++) {
                 if (manifold.m_contactPoints[c].m_featureIdA <= HK_BOXBOX_FACE_B_Z) {
-                    const __m128 diff = _mm_sub_ps(position, m_result->m_contactPoints[c].m_contact.m_position.m_quad);
+                    const __m128 diff =
+                        _mm_sub_ps(position.m_quad, m_result->m_contactPoints[c].m_contact.m_position.m_quad);
                     const __m128 sq = _mm_mul_ps(diff, diff);
                     const float distSq = _mm_cvtss_f32(
                         _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq))
@@ -1722,56 +1587,21 @@ void hkpBoxBoxCollisionDetection::checkCompleteness(
     if (fpp.m_featureIndexA <= HK_BOXBOX_FACE_A_Z) {
         const float negSign = -fpp.m_normalSign;
         ccpOut.m_contactPointId.m_storage = fcp.m_contactPointId;
-        const __m128 v = fpp.m_vB.m_quad;
-        const hkTransform* wTb = m_wTb;
-        // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-        ccpOut.m_contact.m_position.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), wTb->m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), wTb->m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), wTb->m_rotation.m_col2.m_quad), wTb->m_translation.m_quad)
-        );
+        ccpOut.m_contact.m_position.setTransformedPos(*m_wTb, fpp.m_vB);
         normal = _mm_mul_ps(_mm_set1_ps(negSign), m_wTa->getColumn(fcp.m_featureIdA).m_quad);
     }
     else if (fpp.m_featureIndexA <= HK_BOXBOX_FACE_B_Z) {
         const float negSign = -fpp.m_normalSign;
         ccpOut.m_contactPointId.m_storage = fcp.m_contactPointId;
-        const __m128 v = fpp.m_vA.m_quad;
-        const hkTransform* wTa = m_wTa;
-        // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-        ccpOut.m_contact.m_position.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), wTa->m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), wTa->m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), wTa->m_rotation.m_col2.m_quad), wTa->m_translation.m_quad)
-        );
+        ccpOut.m_contact.m_position.setTransformedPos(*m_wTa, fpp.m_vA);
         normal = _mm_mul_ps(_mm_set1_ps(negSign), m_wTb->getColumn(fcp.m_featureIdA - HK_BOXBOX_FACE_B_X).m_quad);
     }
     else {
         ccpOut.m_contactPointId.m_storage = fcp.m_contactPointId;
-        const __m128 v = fpp.m_vA.m_quad;
-        const hkTransform* wTa = m_wTa;
-        // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-        ccpOut.m_contact.m_position.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), wTa->m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), wTa->m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), wTa->m_rotation.m_col2.m_quad), wTa->m_translation.m_quad)
-        );
-        // m_wTa is loaded again for the normal.
-        const hkTransform* wTaNormal = m_wTa;
-        const __m128 n = fpp.m_nA.m_quad;
-        // EXE-INLINED 0xC7F700: hkVector4::setRotatedDir
-        normal = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), wTaNormal->m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), wTaNormal->m_rotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), wTaNormal->m_rotation.m_col2.m_quad)
-        );
+        ccpOut.m_contact.m_position.setTransformedPos(*m_wTa, fpp.m_vA);
+        hkVector4 normalWs;
+        normalWs.setRotatedDir(m_wTa->getRotation(), fpp.m_nA);
+        normal = normalWs.m_quad;
     }
     ccpOut.m_contact.m_separatingNormal.m_quad = normal;
     ccpOut.m_contact.m_separatingNormal(3) = fpp.m_distance;

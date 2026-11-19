@@ -101,11 +101,7 @@ bool NiBSplineCompPoint3Interpolator::Update(float fTime, NiObjectNET*, NiPoint3
             fNormTime, afValue, 3, m_spBasisData, m_kPoint3CPHandle, m_afCompScalars[POINT3_OFFSET],
             m_afCompScalars[POINT3_RANGE]
         );
-        NiPoint3 kValue;
-        // EXE-INLINED 0x416870
-        kValue.x = afValue[0];
-        kValue.y = afValue[1];
-        kValue.z = afValue[2];
+        NiPoint3 kValue(afValue[0], afValue[1], afValue[2]);
         m_kPoint3Value = kValue;
     }
 

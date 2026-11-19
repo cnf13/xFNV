@@ -179,14 +179,7 @@ int32_t NiPoint3::IsDistanceLongerThanRadius(const NiPoint3* apPoint1, const NiP
 // Reads and writes the points in the order of this loop for every uiVerts.
 void NiPoint3::PointsPlusEqualFloatTimesPoints(NiPoint3* pkDst, float f, const NiPoint3* pkSrc, uint32_t uiVerts) {
     for (uint32_t i = 0; i < uiVerts; i++) {
-        // EXE-INLINED 0x4A3760
-        const float fX = pkSrc[i].x * f;
-        const float fY = pkSrc[i].y * f;
-        const float fZ = pkSrc[i].z * f;
-        // EXE-INLINED 0x63C8A0
-        pkDst[i].x += fX;
-        pkDst[i].y += fY;
-        pkDst[i].z += fZ;
+        pkDst[i] += f * pkSrc[i];
     }
 }
 

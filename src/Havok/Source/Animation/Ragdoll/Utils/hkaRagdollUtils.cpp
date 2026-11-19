@@ -86,14 +86,8 @@ static int32_t moveRigidBodyPivot(hkQsTransform* r_eax, hkpRigidBody* r_esi) {
     }
     hkQsTransform bodyTransform;
     bodyTransform.setFromTransformNoScale(r_esi->m_motion.m_motionState.m_transform);
-    // EXE-INLINED none: hkQsTransform::setMul
     hkQsTransform newTransform;
-    hkVector4 extraTrans;
-    extraTrans.setRotatedDir(bodyTransform.m_rotation, r_eax->m_translation);
-    newTransform.m_translation.setAdd4(bodyTransform.m_translation, extraTrans);
-    newTransform.m_rotation.setMul(bodyTransform.m_rotation, r_eax->m_rotation);
-    newTransform.m_scale.setMul4(bodyTransform.m_scale, r_eax->m_scale);
-    // EXE-INLINED none: hkQsTransform::setInverse
+    newTransform.setMul(bodyTransform, *r_eax);
     hkQsTransform inverse;
     inverse.setInverse(*r_eax);
     const hkVector4 oldCenterOfMass = r_esi->m_motion.m_motionState.m_sweptTransform.m_centerOfMass1;

@@ -1295,15 +1295,7 @@ void bhkRagdollController::GetSGPoseLocalSpace() {
             }
             else {
                 const hkQsTransform& rParentMS = getBoneModelSpace(arPose, parentIdx);
-                // EXE-INLINED none: hkQsTransform::setMulInverseMul
-                hkQsTransform kInverse;
-                kInverse.setInverse(rParentMS);
-                // EXE-INLINED none: hkQsTransform::setMul
-                hkVector4 kExtraTrans;
-                kExtraTrans.setRotatedDir(kInverse.m_rotation, pModelPose[boneIdx].m_translation);
-                rLocal.m_translation.setAdd4(kInverse.m_translation, kExtraTrans);
-                rLocal.m_rotation.setMul(kInverse.m_rotation, pModelPose[boneIdx].m_rotation);
-                rLocal.m_scale.setMul4(kInverse.m_scale, pModelPose[boneIdx].m_scale);
+                rLocal.setMulInverseMul(rParentMS, pModelPose[boneIdx]);
             }
             arPose.m_boneFlags.m_data[boneIdx] &= ~static_cast<uint32_t>(hkaPose::F_BONE_LOCAL_DIRTY);
         }
@@ -1373,15 +1365,7 @@ void bhkRagdollController::SetSGPoseLocalSpace() {
             }
             else {
                 const hkQsTransform& rParentMS = getBoneModelSpace(arPose, parentIdx);
-                // EXE-INLINED none: hkQsTransform::setMulInverseMul
-                hkQsTransform kInverse;
-                kInverse.setInverse(rParentMS);
-                // EXE-INLINED none: hkQsTransform::setMul
-                hkVector4 kExtraTrans;
-                kExtraTrans.setRotatedDir(kInverse.m_rotation, pModelPose[boneIdx].m_translation);
-                rLocal.m_translation.setAdd4(kInverse.m_translation, kExtraTrans);
-                rLocal.m_rotation.setMul(kInverse.m_rotation, pModelPose[boneIdx].m_rotation);
-                rLocal.m_scale.setMul4(kInverse.m_scale, pModelPose[boneIdx].m_scale);
+                rLocal.setMulInverseMul(rParentMS, pModelPose[boneIdx]);
             }
             arPose.m_boneFlags.m_data[boneIdx] &= ~static_cast<uint32_t>(hkaPose::F_BONE_LOCAL_DIRTY);
         }
@@ -1433,10 +1417,7 @@ void bhkRagdollController::UpdateRagdollRigidBodies(const hkQsTransform* apRagdo
     }
     if (apRagdollPoseLS) {
         for (int32_t i = 0; i < iNumBones; ++i) {
-            // EXE-INLINED 0xC6CD30
-            pPoseLocal[i].m_translation.m_quad = apRagdollPoseLS[i].m_translation.m_quad;
-            pPoseLocal[i].m_rotation.m_vec.m_quad = apRagdollPoseLS[i].m_rotation.m_vec.m_quad;
-            pPoseLocal[i].m_scale.m_quad = apRagdollPoseLS[i].m_scale.m_quad;
+            pPoseLocal[i] = apRagdollPoseLS[i];
         }
     }
     else {
@@ -1492,7 +1473,6 @@ void bhkRagdollController::UpdateRagdollRigidBodies(const hkQsTransform* apRagdo
                         __m128 kVelocitySq = _mm_mul_ps(
                             pBody->m_motion.m_linearVelocity.m_quad, pBody->m_motion.m_linearVelocity.m_quad
                         );
-                        // EXE-INLINED 0x577BF0
                         float fMaxVelocity = pBody->m_motion.m_motionState.m_maxLinearVelocity;
                         __m128 kSpeedSq = _mm_add_ss(
                             _mm_shuffle_ps(kVelocitySq, kVelocitySq, 0xAA),
@@ -1872,10 +1852,7 @@ void bhkRagdollController::DoFootIK(hkQsTransform& arWorldFromModel) {
         bUseCurrAnkleTransf = false;
     }
     const float fBias = bDownCastFoot ? 1.0f : gs_fPelvisUpDownBias_FootIK.uValue.f;
-    // EXE-INLINED 0xC9E0F0
-    const float fError0 = LegInfoA.m_data[0].fResultError;
-    const float fError1 = LegInfoA.m_data[1].fResultError;
-    const float fMinError = (fError0 < fError1) ? fError0 : fError1;
+    const float fMinError = hkMath::min2(LegInfoA.m_data[0].fResultError, LegInfoA.m_data[1].fResultError);
     // EXE-INLINED 0xC98210
     const float fError0b = LegInfoA.m_data[0].fResultError;
     const float fError1b = LegInfoA.m_data[1].fResultError;
@@ -1889,8 +1866,7 @@ void bhkRagdollController::DoFootIK(hkQsTransform& arWorldFromModel) {
     const float fError = fVertFootIkError;
     // EXE-INLINED 0xC98210
     const float fAboveMin = (fError > -5.0f) ? fError : -5.0f;
-    // EXE-INLINED 0xC9E0F0
-    const float fClamped = (fAboveMin < 5.0f) ? fAboveMin : 5.0f;
+    const float fClamped = hkMath::min2(fAboveMin, 5.0f);
     fVertFootIkError = fClamped;
     if (bEaseOut) {
         fVertFootIkError = fClamped * 0.800000011920929;
@@ -2076,21 +2052,11 @@ void bhkRagdollController::DoLookAtIK(hkQsTransform& arWorldFromModel) {
     const hkQsTransform& rEyeMS = getBoneModelSpace(*pHeadPose, 1);
     hkVector4 kFwd;
     kFwd.setRotatedDir(rEyeMS.m_rotation, kY);
-    // EXE-INLINED 0x62B0A0
-    __m128 kDownProd = _mm_mul_ps(kFwd.m_quad, kDown.m_quad);
-    const float fDownDot = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(kDownProd, kDownProd, _MM_SHUFFLE(2, 2, 2, 2)),
-        _mm_add_ss(_mm_shuffle_ps(kDownProd, kDownProd, _MM_SHUFFLE(1, 1, 1, 1)), kDownProd)
-    ));
+    const float fDownDot = kFwd.dot3(kDown);
     const float fDownAngle = std::acos(fDownDot);
     const float fHeading = 1.5707963705062866 - fDownAngle;
-    // EXE-INLINED 0x62B0A0
-    __m128 kXProd = _mm_mul_ps(kFwd.m_quad, kX.m_quad);
     fEyeHeading = fHeading;
-    const float fXDot = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(kXProd, kXProd, _MM_SHUFFLE(2, 2, 2, 2)),
-        _mm_add_ss(_mm_shuffle_ps(kXProd, kXProd, _MM_SHUFFLE(1, 1, 1, 1)), kXProd)
-    ));
+    const float fXDot = kFwd.dot3(kX);
     const float fXAngle = std::acos(fXDot);
     const float fPitch = 1.5707963705062866 - fXAngle;
     fEyePitch = fPitch;
@@ -3218,17 +3184,9 @@ bool bhkRagdollController::ExtractBipedSetupData(
 
     // The foot capsule's axis, vertex A minus vertex B.
     hkVector4 cStartFoot;
-    // EXE-INLINED 0x4B4D10
-    cStartFoot.set(
-        pfootCapsuleInfo->m_vertexA.fX, pfootCapsuleInfo->m_vertexA.fY, pfootCapsuleInfo->m_vertexA.fZ,
-        pfootCapsuleInfo->m_vertexA.fW
-    );
+    pfootCapsuleInfo->m_vertexA.ToHK(cStartFoot);
     hkVector4 cEndFoot;
-    // EXE-INLINED 0x4B4D10
-    cEndFoot.set(
-        pfootCapsuleInfo->m_vertexB.fX, pfootCapsuleInfo->m_vertexB.fY, pfootCapsuleInfo->m_vertexB.fZ,
-        pfootCapsuleInfo->m_vertexB.fW
-    );
+    pfootCapsuleInfo->m_vertexB.ToHK(cEndFoot);
     hkVector4 cEndFootFromAnkle;
     cEndFootFromAnkle.setSub4(cStartFoot, cEndFoot);
     float fAnklAdj = gs_fAnkleOffset_FootIK.Float() + cAnklPos(0);

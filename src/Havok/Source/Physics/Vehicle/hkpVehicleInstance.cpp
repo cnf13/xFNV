@@ -717,30 +717,18 @@ void hkpVehicleInstance::init() {
     if (!data->m_alreadyInitialised.m_bool) {
         data->init(m_suspension->m_wheelParams, static_cast<hkpRigidBody*>(m_entity));
     }
-    // EXE-INLINED none: hkVector4::setAbs4 and the inertia sum over the chassis orientation's columns
     const hkpVehicleData* d = m_data;
-    const __m128 yaw = _mm_set_ss(d->m_chassisUnitInertiaYaw);
-    const __m128 roll = _mm_set_ss(d->m_chassisUnitInertiaRoll);
-    const __m128 pitch = _mm_set_ss(d->m_chassisUnitInertiaPitch);
-    __m128 sum = _mm_add_ps(
-        _mm_mul_ps(
-            _mm_and_ps(d->m_chassisOrientation.m_col0.m_quad, hkVector4_setAbs4_absMask), _mm_shuffle_ps(yaw, yaw, 0)
-        ),
-        _mm_mul_ps(
-            _mm_and_ps(d->m_chassisOrientation.m_col1.m_quad, hkVector4_setAbs4_absMask), _mm_shuffle_ps(roll, roll, 0)
-        )
-    );
-    sum = _mm_add_ps(
-        sum,
-        _mm_mul_ps(
-            _mm_and_ps(d->m_chassisOrientation.m_col2.m_quad, hkVector4_setAbs4_absMask),
-            _mm_shuffle_ps(pitch, pitch, 0)
-        )
-    );
-    const float mass = m_entity->m_motion.getMass();
-    const __m128 massSplat = _mm_set_ss(mass);
+    hkVector4 absCol0;
+    absCol0.setAbs4(d->m_chassisOrientation.m_col0);
+    hkVector4 absCol1;
+    absCol1.setAbs4(d->m_chassisOrientation.m_col1);
+    hkVector4 absCol2;
+    absCol2.setAbs4(d->m_chassisOrientation.m_col2);
     hkVector4 diagonal;
-    diagonal.m_quad = _mm_mul_ps(_mm_shuffle_ps(massSplat, massSplat, 0), sum);
+    diagonal.setMul4(d->m_chassisUnitInertiaYaw, absCol0);
+    diagonal.addMul4(d->m_chassisUnitInertiaRoll, absCol1);
+    diagonal.addMul4(d->m_chassisUnitInertiaPitch, absCol2);
+    diagonal.mul4(m_entity->m_motion.getMass());
     // EXE-INLINED none: hkMatrix3::setDiagonal
     hkMatrix3 inertia;
     inertia.m_col0.m_quad = _mm_setzero_ps();
@@ -835,25 +823,10 @@ void hkpVehicleInstance::calcCurrentPositionAndRotation(
     if (suspensionLength < 0.0) {
         suspensionLength = 0.0f;
     }
-    // EXE-INLINED 0xC7F640
-    const hkTransform& transform = chassis->m_motion.m_motionState.m_transform;
-    const hkQuadReal hardpoint = suspension->m_wheelParams.m_data[wheelNo].m_hardpointChassisSpace.m_quad;
-    const hkQuadReal hardpointWs = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(hardpoint, hardpoint, 0x55), transform.m_rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(hardpoint, hardpoint, 0x00), transform.m_rotation.m_col0.m_quad)
-        ),
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(hardpoint, hardpoint, 0xAA), transform.m_rotation.m_col2.m_quad),
-            transform.m_translation.m_quad
-        )
+    posOut.setTransformedPos(
+        chassis->m_motion.m_motionState.m_transform, suspension->m_wheelParams.m_data[wheelNo].m_hardpointChassisSpace
     );
-    posOut.m_quad = hardpointWs;
-    // EXE-INLINED none: hkVector4::addMul4(const hkSimdReal&, const hkVector4&)
-    const hkQuadReal length = _mm_set_ss(suspensionLength);
-    posOut.m_quad = _mm_add_ps(
-        _mm_mul_ps(_mm_shuffle_ps(length, length, 0), wheelInfo.m_suspensionDirectionWs.m_quad), hardpointWs
-    );
+    posOut.addMul4(suspensionLength, wheelInfo.m_suspensionDirectionWs);
 }
 
 float hkpVehicleInstance::calcRPM() const {
@@ -1122,35 +1095,11 @@ void hkpVehicleInstance::updateWheels(
             m_suspension->m_wheelParams.m_data[w_it].m_directionChassisSpace.m_quad
         );
         steering(3) = 1.0f;
-        // EXE-INLINED 0x5611E0
-        __m128 q = steering.m_quad;
-        __m128 lengthSquared = _mm_mul_ps(q, q);
-        __m128 pairSums = _mm_add_ps(_mm_shuffle_ps(lengthSquared, lengthSquared, 0x4E), lengthSquared);
-        __m128 sum = _mm_add_ps(_mm_shuffle_ps(pairSums, pairSums, 0xB1), pairSums);
-        __m128 approx = _mm_rsqrt_ss(sum);
-        __m128 isZero = _mm_cmpeq_ss(sum, _mm_set_ss(0.0f));
-        __m128 newton = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(sum, approx), approx));
-        __m128 invLength = _mm_andnot_ps(isZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), approx), newton));
-        wheelInfo.m_steeringOrientationChassisSpace.m_vec.m_quad =
-            _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, 0), q);
+        steering.normalize4();
+        wheelInfo.m_steeringOrientationChassisSpace.m_vec = steering;
         wheelInfo.m_spinAxisChassisSpace = m_data->m_chassisOrientation.m_col2;
-        // EXE-INLINED 0x630BB0
-        // The SDK's setRotatedDir(quat, dir) with the exe's SSE steps: 2 * ((dir.zxy * q.yzx - dir.yzx * q.zxy) * w
-        // + (w * w + hkQuadRealMinusHalf) * dir + (z + (y + x) of dir * q) * q).
-        const __m128 quat = wheelInfo.m_steeringOrientationChassisSpace.m_vec.m_quad;
-        const __m128 dir = wheelInfo.m_spinAxisChassisSpace.m_quad;
-        const __m128 products = _mm_mul_ps(dir, quat);
-        const __m128 sumXY = _mm_add_ss(_mm_shuffle_ps(products, products, 0x55), products);
-        const __m128 dot = _mm_add_ss(_mm_shuffle_ps(products, products, 0xAA), sumXY);
-        const __m128 crossB = _mm_mul_ps(_mm_shuffle_ps(dir, dir, 0xC9), _mm_shuffle_ps(quat, quat, 0xD2));
-        const __m128 crossA = _mm_mul_ps(_mm_shuffle_ps(dir, dir, 0xD2), _mm_shuffle_ps(quat, quat, 0xC9));
-        const __m128 w = _mm_shuffle_ps(quat, quat, 0xFF);
-        const __m128 crossW = _mm_mul_ps(_mm_sub_ps(crossA, crossB), w);
-        const __m128 scaledDir = _mm_mul_ps(_mm_add_ps(_mm_mul_ps(w, w), hkQuadRealMinusHalf), dir);
-        const __m128 dotQ = _mm_mul_ps(_mm_shuffle_ps(dot, dot, 0), quat);
-        const __m128 total = _mm_add_ps(crossW, _mm_add_ps(scaledDir, dotQ));
         hkVector4 spinAxisCs;
-        spinAxisCs.m_quad = _mm_add_ps(total, total);
+        spinAxisCs.setRotatedDir(wheelInfo.m_steeringOrientationChassisSpace, wheelInfo.m_spinAxisChassisSpace);
         wheelInfo.m_spinAxisWs.setRotatedDir(motionState->m_transform.m_rotation, spinAxisCs);
     }
 }
@@ -1175,21 +1124,8 @@ void hkpVehicleInstance::applyResultsToGround(
         hkpMotion* motion = body->getMotion();
         const hkpVelocityAccumulator* accum = axleParams[ax_it].m_groundObject;
         const float maxVelocityChange = deltaTime * 10.0;
-        // EXE-INLINED 0x4B4AD0
-        const hkRotation& coreFromWorld = accum->m_scratch123;
-        const hkQuadReal col0 = coreFromWorld.m_col0.m_quad;
-        const hkQuadReal col1 = coreFromWorld.m_col1.m_quad;
-        const hkQuadReal col2 = coreFromWorld.m_col2.m_quad;
-        const hkQuadReal low = _mm_unpacklo_ps(col0, col1);
-        const hkQuadReal row0 = _mm_movelh_ps(low, col2);
-        const hkQuadReal row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, low), col2, _MM_SHUFFLE(3, 1, 1, 0));
-        const hkQuadReal row2 = _mm_shuffle_ps(_mm_unpackhi_ps(col0, col1), col2, _MM_SHUFFLE(3, 2, 1, 0));
-        const hkQuadReal w = accum->m_angularVel.m_quad;
         hkVector4 angularVel;
-        angularVel.m_quad = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(w, w, 0x55), row1), _mm_mul_ps(_mm_shuffle_ps(w, w, 0x00), row0)),
-            _mm_mul_ps(_mm_shuffle_ps(w, w, 0xAA), row2)
-        );
+        angularVel._setRotatedInverseDir(accum->m_scratch123, accum->m_angularVel);
         hkVector4 linearVel = accum->m_linearVel;
         const hkQuadReal maxChange = _mm_shuffle_ps(_mm_set_ss(maxVelocityChange), _mm_set_ss(maxVelocityChange), 0);
         const hkQuadReal minChange = _mm_xor_ps(maxChange, hkQuadRealNegateMask);
@@ -1529,34 +1465,8 @@ void hkpVehicleInstance::getAxleParams(
 ) {
     for (int32_t ax_it = 0; ax_it < m_data->m_numWheelsPerAxle.m_size; ++ax_it) {
         hkpVehicleFrictionSolverAxleParams& axle = axleParams[ax_it];
-        {
-            // EXE-INLINED 0x62AEA0
-            const hkQuadReal v = axle.m_constraintNormalWs.m_quad;
-            const hkQuadReal x2 = _mm_mul_ps(v, v);
-            const hkQuadReal len2 =
-                _mm_add_ss(_mm_shuffle_ps(x2, x2, 0xAA), _mm_add_ss(_mm_shuffle_ps(x2, x2, 0x55), x2));
-            const hkQuadReal approx = _mm_rsqrt_ss(len2);
-            const hkQuadReal refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            );
-            const hkQuadReal lenInv = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_set_ss(0.0f)), refined);
-            axle.m_constraintNormalWs.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), v);
-        }
-        {
-            // EXE-INLINED 0x62AEA0
-            const hkQuadReal v = axle.m_forwardDirWs.m_quad;
-            const hkQuadReal x2 = _mm_mul_ps(v, v);
-            const hkQuadReal len2 =
-                _mm_add_ss(_mm_shuffle_ps(x2, x2, 0xAA), _mm_add_ss(_mm_shuffle_ps(x2, x2, 0x55), x2));
-            const hkQuadReal approx = _mm_rsqrt_ss(len2);
-            const hkQuadReal refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            );
-            const hkQuadReal lenInv = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_set_ss(0.0f)), refined);
-            axle.m_forwardDirWs.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), v);
-        }
+        axle.m_constraintNormalWs.normalize3();
+        axle.m_forwardDirWs.normalize3();
         hkpVelocityAccumulator* accum = &groundAccum[ax_it];
         axle.m_groundObject = accum;
         axle.m_groundObjectAtLastIntegration = accum;
@@ -1600,19 +1510,12 @@ void hkpVehicleInstance::getAxleParams(
         const hkQuadReal invDt = _mm_shuffle_ps(_mm_set_ss(invDeltaTime), _mm_set_ss(invDeltaTime), 0);
         const hkQuadReal linearVel =
             _mm_mul_ps(_mm_sub_ps(swept.m_centerOfMass1.m_quad, swept.m_centerOfMass0.m_quad), invDt);
-        const hkQuadReal angularVel = _mm_mul_ps(invDt, motion->m_motionState.m_deltaAngle.m_quad);
+        hkVector4 angularVel;
+        angularVel.m_quad = _mm_mul_ps(invDt, motion->m_motionState.m_deltaAngle.m_quad);
         hkpVelocityAccumulator* accumAtIntegration = &groundAccumAtIntegration[ax_it];
         *accumAtIntegration = *accum;
         axle.m_groundObjectAtLastIntegration = accumAtIntegration;
-        // EXE-INLINED 0xC7F700
-        const hkRotation& coreFromWorld = accum->m_scratch123;
-        accumAtIntegration->m_angularVel.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(angularVel, angularVel, 0x55), coreFromWorld.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(angularVel, angularVel, 0x00), coreFromWorld.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(angularVel, angularVel, 0xAA), coreFromWorld.m_col2.m_quad)
-        );
+        accumAtIntegration->m_angularVel.setRotatedDir(accum->m_scratch123, angularVel);
         accumAtIntegration->m_linearVel.m_quad = linearVel;
     }
 }
@@ -1634,16 +1537,9 @@ void hkpVehicleInstance::applyFrictionSolver(
 // set on the chassis's motion through its vtable.
 void hkpVehicleInstance::applyResultsToChassis(const hkpVelocityAccumulator& accumulatorForChassis) {
     hkpEntity* chassis = m_entity;
-    // EXE-INLINED 0xC7F700
-    const hkRotation& rotation = chassis->m_motion.m_motionState.m_transform.m_rotation;
-    const hkQuadReal w = accumulatorForChassis.m_angularVel.m_quad;
     hkVector4 angularVel;
-    angularVel.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(w, w, 0x55), rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(w, w, 0x00), rotation.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(w, w, 0xAA), rotation.m_col2.m_quad)
+    angularVel.setRotatedDir(
+        chassis->m_motion.m_motionState.m_transform.m_rotation, accumulatorForChassis.m_angularVel
     );
     hkpMotion* motion = chassis->getMotion();
     motion->setAngularVelocity(angularVel);
@@ -1678,12 +1574,7 @@ void hkpVehicleInstance::applyResultsToWheelInfo(
         forwardWs.setRotatedDir(
             m_entity->m_motion.m_motionState.m_transform.m_rotation, m_data->m_chassisOrientation.m_col1
         );
-        // EXE-INLINED 0x62B0A0
-        const hkQuadReal chassisProducts = _mm_mul_ps(m_entity->m_motion.m_linearVelocity.m_quad, forwardWs.m_quad);
-        const float chassisForwardVel = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(chassisProducts, chassisProducts, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(chassisProducts, chassisProducts, 0x55), chassisProducts)
-        ));
+        const float chassisForwardVel = m_entity->m_motion.m_linearVelocity.dot3(forwardWs);
         if (m_isFixed.m_data[w_it].m_bool) {
             wheelInfo.m_spinVelocity = 0.0f;
             continue;
@@ -1691,12 +1582,7 @@ void hkpVehicleInstance::applyResultsToWheelInfo(
         float virtualForwardVel = chassisForwardVel + wheelInfo.m_forwardSlipVelocity;
         if (groundBody[axle]) {
             const hkVector4 groundVel = frictionParams.m_axleParams[axle].m_groundObject->m_linearVel;
-            // EXE-INLINED 0x62B0A0
-            const hkQuadReal groundProducts = _mm_mul_ps(groundVel.m_quad, forwardWs.m_quad);
-            const float groundForwardVel = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(groundProducts, groundProducts, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(groundProducts, groundProducts, 0x55), groundProducts)
-            ));
+            const float groundForwardVel = groundVel.dot3(forwardWs);
             virtualForwardVel = virtualForwardVel - groundForwardVel;
         }
         const float spinVelocity = virtualForwardVel / m_data->m_wheelParams.m_data[w_it].m_radius;

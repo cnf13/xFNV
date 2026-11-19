@@ -496,43 +496,35 @@ void NiCamera::ViewPointToRay(float fVx, float fVy, NiPoint3& kOrigin, NiPoint3&
         kDir.z = kRot.m_pEntry[2][0];
         kDir.Unitize();
         // EXE-INLINED 0x4E9C10
-        // EXE-INLINED 0x45BB20
-        float fUpX = kRot.m_pEntry[0][1] * fVy;
-        float fUpY = kRot.m_pEntry[1][1] * fVy;
-        float fUpZ = kRot.m_pEntry[2][1] * fVy;
+        const NiPoint3 kUpVector(kRot.m_pEntry[0][1], kRot.m_pEntry[1][1], kRot.m_pEntry[2][1]);
+        const NiPoint3 kUp = kUpVector * fVy;
         // EXE-INLINED 0x4E9C50
-        // EXE-INLINED 0x45BB20
-        float fRightX = kRot.m_pEntry[0][2] * fVx;
-        float fRightY = kRot.m_pEntry[1][2] * fVx;
-        float fRightZ = kRot.m_pEntry[2][2] * fVx;
-        float fSumX = m_kWorld.m_Translate.x + fRightX;
-        float fSumY = m_kWorld.m_Translate.y + fRightY;
-        float fSumZ = m_kWorld.m_Translate.z + fRightZ;
-        float fOriginX = fSumX + fUpX;
-        float fOriginY = fSumY + fUpY;
-        float fOriginZ = fSumZ + fUpZ;
+        const NiPoint3 kRightVector(kRot.m_pEntry[0][2], kRot.m_pEntry[1][2], kRot.m_pEntry[2][2]);
+        const NiPoint3 kRight = kRightVector * fVx;
+        float fSumX = m_kWorld.m_Translate.x + kRight.x;
+        float fSumY = m_kWorld.m_Translate.y + kRight.y;
+        float fSumZ = m_kWorld.m_Translate.z + kRight.z;
+        float fOriginX = fSumX + kUp.x;
+        float fOriginY = fSumY + kUp.y;
+        float fOriginZ = fSumZ + kUp.z;
         kOrigin.x = fOriginX;
         kOrigin.y = fOriginY;
         kOrigin.z = fOriginZ;
     }
     else {
         // EXE-INLINED 0x4E9C10
-        // EXE-INLINED 0x45BB20
-        float fUpX = kRot.m_pEntry[0][1] * fVy;
-        float fUpY = kRot.m_pEntry[1][1] * fVy;
-        float fUpZ = kRot.m_pEntry[2][1] * fVy;
+        const NiPoint3 kUpVector(kRot.m_pEntry[0][1], kRot.m_pEntry[1][1], kRot.m_pEntry[2][1]);
+        const NiPoint3 kUp = kUpVector * fVy;
         // EXE-INLINED 0x4E9C50
-        // EXE-INLINED 0x45BB20
-        float fRightX = kRot.m_pEntry[0][2] * fVx;
-        float fRightY = kRot.m_pEntry[1][2] * fVx;
-        float fRightZ = kRot.m_pEntry[2][2] * fVx;
+        const NiPoint3 kRightVector(kRot.m_pEntry[0][2], kRot.m_pEntry[1][2], kRot.m_pEntry[2][2]);
+        const NiPoint3 kRight = kRightVector * fVx;
         // EXE-INLINED 0x45BBA0
-        float fSumX = kRot.m_pEntry[0][0] + fRightX;
-        float fSumY = kRot.m_pEntry[1][0] + fRightY;
-        float fSumZ = kRot.m_pEntry[2][0] + fRightZ;
-        float fDirX = fSumX + fUpX;
-        float fDirY = fSumY + fUpY;
-        float fDirZ = fSumZ + fUpZ;
+        float fSumX = kRot.m_pEntry[0][0] + kRight.x;
+        float fSumY = kRot.m_pEntry[1][0] + kRight.y;
+        float fSumZ = kRot.m_pEntry[2][0] + kRight.z;
+        float fDirX = fSumX + kUp.x;
+        float fDirY = fSumY + kUp.y;
+        float fDirZ = fSumZ + kUp.z;
         kDir.x = fDirX;
         kDir.y = fDirY;
         kDir.z = fDirZ;

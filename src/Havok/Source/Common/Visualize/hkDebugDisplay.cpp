@@ -82,9 +82,8 @@ void hkDebugDisplay::displayLine(const hkVector4& start, const hkVector4& end, i
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
 
-// The vector code is written as lane operations with intrinsics; the three-lane sums are packed, as only lane 0 is
-// read. The normalize3 Newton step uses the constants 0.0, 3.0 and 0.5; 0.85 and the head's 0.15 offsets (1 - 0.85) are
-// float constants.
+// The direction's squared length is written as lane operations with intrinsics; its three-lane sum is packed, as only
+// lane 0 is read. 0.85 and the head's 0.15 offsets (1 - 0.85) are float constants.
 void hkDebugDisplay::displayArrow(const hkVector4& from, const hkVector4& dir, int32_t color, int32_t id, int32_t tag) {
     const __m128 kDir = _mm_load_ps(&reinterpret_cast<const float*>(&dir.m_quad)[0]);
     const __m128 kDirSquares = _mm_mul_ps(kDir, kDir);
@@ -124,50 +123,23 @@ void hkDebugDisplay::displayArrow(const hkVector4& from, const hkVector4& dir, i
     (&reinterpret_cast<float*>(&ort.m_quad)[0])[iFirst] = pDir[iSecond];
     (&reinterpret_cast<float*>(&ort.m_quad)[0])[iSecond] = -pDir[iFirst];
 
-    // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, zero for a zero vector)
-    const __m128 kOrt = _mm_load_ps(&reinterpret_cast<float*>(&ort.m_quad)[0]);
-    const __m128 kOrtSquares = _mm_mul_ps(kOrt, kOrt);
-    const __m128 kOrtLengthSquared = _mm_add_ps(
-        _mm_shuffle_ps(kOrtSquares, kOrtSquares, 0xAA),
-        _mm_add_ps(_mm_shuffle_ps(kOrtSquares, kOrtSquares, 0x55), kOrtSquares)
-    );
-    const __m128 kEstimate = _mm_rsqrt_ss(kOrtLengthSquared);
-    const __m128 kZeroMask = _mm_cmpeq_ss(kOrtLengthSquared, _mm_set_ss(0.0f));
-    const __m128 kStep = _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kOrtLengthSquared, kEstimate), kEstimate));
-    const __m128 kScale = _mm_andnot_ps(kZeroMask, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimate), kStep));
-    const __m128 kOrtUnit = _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), kOrt);
+    ort.normalize3();
+    hkVector4 ort2;
+    ort2.setCross(dir, ort);
 
-    // EXE-INLINED none: hkVector4::setCross
-    const __m128 kOrt2 = _mm_sub_ps(
-        _mm_mul_ps(_mm_shuffle_ps(kDir, kDir, 0xC9), _mm_shuffle_ps(kOrtUnit, kOrtUnit, 0xD2)),
-        _mm_mul_ps(_mm_shuffle_ps(kDir, kDir, 0xD2), _mm_shuffle_ps(kOrtUnit, kOrtUnit, 0xC9))
-    );
-    // EXE-INLINED 0x630B40
-    const __m128 kDirLength = _mm_sqrt_ss(kDirLengthSquared);
-    const __m128 kOrtScaled = _mm_mul_ps(_mm_shuffle_ps(kDirLength, kDirLength, 0), kOrtUnit);
+    ort.mul4(dir.length3());
 
-    // EXE-INLINED none: hkVector4::setInterpolate4
-    const float fC = 0.85f;
-    const __m128 kC = _mm_set1_ps(fC);
-    const __m128 kP = _mm_add_ps(
-        _mm_mul_ps(
-            _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&hkQuadReal1111_0)[0]), kC),
-            _mm_load_ps(&reinterpret_cast<const float*>(&from.m_quad)[0])
-        ),
-        _mm_mul_ps(kC, _mm_load_ps(&reinterpret_cast<float*>(&to.m_quad)[0]))
-    );
-
-    // EXE-INLINED none: hkVector4::setAddMul4
-    const __m128 kSide = _mm_set1_ps(0.1499999761581421f);
-    const __m128 kNegSide = _mm_set1_ps(-0.1499999761581421f);
+    const float c = 0.85f;
+    hkVector4 p;
+    p.setInterpolate4(from, to, c);
     hkVector4 p0;
-    _mm_store_ps(&reinterpret_cast<float*>(&p0.m_quad)[0], _mm_add_ps(_mm_mul_ps(kSide, kOrtScaled), kP));
+    p0.setAddMul4(p, ort, 0.1499999761581421f);
     hkVector4 p1;
-    _mm_store_ps(&reinterpret_cast<float*>(&p1.m_quad)[0], _mm_add_ps(_mm_mul_ps(kNegSide, kOrtScaled), kP));
+    p1.setAddMul4(p, ort, -0.1499999761581421f);
     hkVector4 p2;
-    _mm_store_ps(&reinterpret_cast<float*>(&p2.m_quad)[0], _mm_add_ps(_mm_mul_ps(kSide, kOrt2), kP));
+    p2.setAddMul4(p, ort2, 0.1499999761581421f);
     hkVector4 p3;
-    _mm_store_ps(&reinterpret_cast<float*>(&p3.m_quad)[0], _mm_add_ps(_mm_mul_ps(kNegSide, kOrt2), kP));
+    p3.setAddMul4(p, ort2, -0.1499999761581421f);
 
     displayLine(from, to, color, id, tag);
     displayLine(to, p0, color, id, tag);
@@ -364,24 +336,7 @@ void hkDebugDisplay::displayLocalSpacePose(
         const hkQsTransform& rParent = iParent == -1 ? hkQsTransformIdentity : pModelSpacePose[iParent];
         const hkQsTransform& rLocal = localSpacePose[i];
         hkQsTransform& rModel = pModelSpacePose[i];
-        // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(rParent.m_rotation, rLocal.m_translation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rModel.m_translation.m_quad)[0],
-            _mm_add_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&kRotated.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_translation.m_quad)[0])
-            )
-        );
-        rModel.m_rotation.setMul(rParent.m_rotation, rLocal.m_rotation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rModel.m_scale.m_quad)[0],
-            _mm_mul_ps(
-                _mm_load_ps(&reinterpret_cast<const float*>(&rLocal.m_scale.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_scale.m_quad)[0])
-            )
-        );
+        rModel.setMul(rParent, rLocal);
     }
     displayModelSpacePose(
         numTransforms, parentIndices, pModelSpacePose, worldFromModel, id, tag, color, boneAxisSize, showRootTranslation
@@ -424,24 +379,14 @@ void hkDebugDisplay::displayLitTriangle(const hkVector4& a, const hkVector4& b, 
     const __m128 kZero = _mm_setzero_ps();
     const __m128 kThree = _mm_set_ss(3.0f);
     const __m128 kHalf = _mm_set_ss(0.5f);
-    // EXE-INLINED none: hkVector4::setCross
-    const __m128 kAC = _mm_sub_ps(c.m_quad, a.m_quad);
-    const __m128 kAB = _mm_sub_ps(b.m_quad, a.m_quad);
-    const __m128 kCross = _mm_sub_ps(
-        _mm_mul_ps(_mm_shuffle_ps(kAC, kAC, 0xD2), _mm_shuffle_ps(kAB, kAB, 0xC9)),
-        _mm_mul_ps(_mm_shuffle_ps(kAC, kAC, 0xC9), _mm_shuffle_ps(kAB, kAB, 0xD2))
-    );
-    // EXE-INLINED none: hkVector4::normalize3
-    const __m128 kCrossSq = _mm_mul_ps(kCross, kCross);
-    const __m128 kCrossLen2 = _mm_add_ss(
-        _mm_shuffle_ps(kCrossSq, kCrossSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kCrossSq, kCrossSq, 0x55), kCrossSq)
-    );
-    const __m128 kCrossR = _mm_rsqrt_ss(kCrossLen2);
-    const __m128 kCrossInv = _mm_andnot_ps(
-        _mm_cmpeq_ss(kCrossLen2, kZero),
-        _mm_mul_ss(_mm_mul_ss(kHalf, kCrossR), _mm_sub_ss(kThree, _mm_mul_ss(_mm_mul_ss(kCrossLen2, kCrossR), kCrossR)))
-    );
-    const __m128 kNormal = _mm_mul_ps(_mm_shuffle_ps(kCrossInv, kCrossInv, 0), kCross);
+    hkVector4 ac;
+    ac.m_quad = _mm_sub_ps(c.m_quad, a.m_quad);
+    hkVector4 ab;
+    ab.m_quad = _mm_sub_ps(b.m_quad, a.m_quad);
+    hkVector4 normal;
+    normal.setCross(ab, ac);
+    normal.normalize3();
+    const __m128 kNormal = normal.m_quad;
 
     // The lights' directions, each normalised.
     const __m128 kLight0 = _mm_setr_ps(0.5f, 2.0f, 1.0f, 0.0f);

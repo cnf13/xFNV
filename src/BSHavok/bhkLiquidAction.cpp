@@ -361,34 +361,17 @@ void bhkLiquidAction::Update(float afDelta) {
                 }
             }
             float fdampeningFactor;
-            // EXE-INLINED 0x4390C0
-            if (NiPoint3_ZERO.x == StickPoint.x && NiPoint3_ZERO.y == StickPoint.y && NiPoint3_ZERO.z == StickPoint.z) {
+            if (NiPoint3_ZERO == StickPoint) {
                 fdampeningFactor = fdampenNormal;
             }
             else {
-                // EXE-INLINED 0x439EF0
-                NiPoint3 toStick;
-                toStick.x = StickPoint.x - pos.x;
+                NiPoint3 toStick = StickPoint - pos;
                 bantiGrav = true;
                 bsticking = true;
-                toStick.y = StickPoint.y - pos.y;
-                toStick.z = StickPoint.z - pos.z;
-                // EXE-INLINED 0x457990
-                float flength = toStick.x * toStick.x + toStick.y * toStick.y + toStick.z * toStick.z;
-                flength = std::sqrt(flength);
+                float flength = toStick.Length();
                 if (flength > zero) {
-                    // EXE-INLINED 0x4B6190
-                    float fstickFactor =
-                        StickNormal.y * toStick.y + StickNormal.x * toStick.x + StickNormal.z * toStick.z;
-                    // EXE-INLINED 0x45BB20
-                    NiPoint3 stickForce;
-                    stickForce.x = StickNormal.x * fstickFactor;
-                    stickForce.y = StickNormal.y * fstickFactor;
-                    stickForce.z = fstickFactor * StickNormal.z;
-                    // EXE-INLINED 0x63C8A0
-                    force.x = force.x + stickForce.x;
-                    force.y = force.y + stickForce.y;
-                    force.z = force.z + stickForce.z;
+                    float fstickFactor = StickNormal.Dot(toStick);
+                    force += StickNormal * fstickFactor;
                 }
                 fdampeningFactor = fdampenStick;
             }
@@ -433,11 +416,7 @@ void bhkLiquidAction::Update(float afDelta) {
                     neighborPos.x = fX * bhkConvert::fHk2BSScaleSC;
                     neighborPos.y = fY * bhkConvert::fHk2BSScaleSC;
                     neighborPos.z = bhkConvert::fHk2BSScaleSC * fZ;
-                    // EXE-INLINED 0x439EF0
-                    alignas(16) NiPoint3 fromNeighbor;
-                    fromNeighbor.x = pos.x - neighborPos.x;
-                    fromNeighbor.y = pos.y - neighborPos.y;
-                    fromNeighbor.z = pos.z - neighborPos.z;
+                    alignas(16) NiPoint3 fromNeighbor = pos - neighborPos;
                     float flength = fromNeighbor.UnitizeGetLength();
                     if (flength > 0.0f && fNeighborDistance + fNeighborDistance > flength) {
                         float fneighborFactor =
@@ -449,29 +428,12 @@ void bhkLiquidAction::Update(float afDelta) {
                             fneighborFactor = -0.5f;
                         }
                         fneighborFactor = fNeighborStrength * fneighborFactor;
-                        // EXE-INLINED 0x45BB20
-                        NiPoint3 neighborForce;
-                        neighborForce.x = fromNeighbor.x * fneighborFactor;
-                        neighborForce.y = fromNeighbor.y * fneighborFactor;
-                        neighborForce.z = fneighborFactor * fromNeighbor.z;
+                        NiPoint3 neighborForce = fromNeighbor * fneighborFactor;
                         if (bsticking) {
-                            // EXE-INLINED 0x4B6190
-                            float fdot = StickNormal.y * neighborForce.y + neighborForce.x * StickNormal.x +
-                                StickNormal.z * neighborForce.z;
-                            // EXE-INLINED 0x45BB20
-                            NiPoint3 projection;
-                            projection.x = StickNormal.x * fdot;
-                            projection.y = StickNormal.y * fdot;
-                            projection.z = fdot * StickNormal.z;
-                            // EXE-INLINED 0x4578C0
-                            neighborForce.x = neighborForce.x - projection.x;
-                            neighborForce.y = neighborForce.y - projection.y;
-                            neighborForce.z = neighborForce.z - projection.z;
+                            float fdot = StickNormal.Dot(neighborForce);
+                            neighborForce -= StickNormal * fdot;
                         }
-                        // EXE-INLINED 0x63C8A0
-                        force.x = neighborForce.x + force.x;
-                        force.y = neighborForce.y + force.y;
-                        force.z = neighborForce.z + force.z;
+                        force += neighborForce;
                     }
                     pliquidList = pliquidList->GetNext();
                 }
@@ -481,25 +443,9 @@ void bhkLiquidAction::Update(float afDelta) {
             if (pTarget) {
                 // The stick force along the target's z axis, decaying each step.
                 float fstick = -fInitialStickForce;
-                // EXE-INLINED 0x45BB20
-                NiPoint3 projection;
-                projection.x = fstick * NiPoint3_UNIT_Z.x;
-                projection.y = fstick * NiPoint3_UNIT_Z.y;
-                projection.z = fstick * NiPoint3_UNIT_Z.z;
-                const NiMatrix3& rkRotate = pTarget->m_kWorld.m_Rotate;
-                // EXE-INLINED 0x4B4500
-                NiPoint3 targetForce;
-                targetForce.x = rkRotate.m_pEntry[0][1] * projection.y + rkRotate.m_pEntry[0][0] * projection.x +
-                    rkRotate.m_pEntry[0][2] * projection.z;
-                targetForce.y = rkRotate.m_pEntry[1][1] * projection.y + rkRotate.m_pEntry[1][0] * projection.x +
-                    rkRotate.m_pEntry[1][2] * projection.z;
-                targetForce.z = projection.x * rkRotate.m_pEntry[2][0] + projection.y * rkRotate.m_pEntry[2][1] +
-                    projection.z * rkRotate.m_pEntry[2][2];
+                NiPoint3 targetForce = pTarget->m_kWorld.m_Rotate * (NiPoint3_UNIT_Z * fstick);
                 fInitialStickForce = fInitialStickForce * 0.8999999761581421;
-                // EXE-INLINED 0x63C8A0
-                force.x = targetForce.x + force.x;
-                force.y = targetForce.y + force.y;
-                force.z = targetForce.z + force.z;
+                force += targetForce;
             }
             hkVector4 forceHK;
             forceHK.set(
@@ -507,8 +453,7 @@ void bhkLiquidAction::Update(float afDelta) {
                 bhkConvert::fBS2HkScaleSC * force.z, 0.0f
             );
             static_cast<hkLiquidAction*>(phkObject)->Force.m_quad = forceHK.m_quad;
-            // EXE-INLINED 0x439090
-            if (NiPoint3_ZERO.x != force.x || NiPoint3_ZERO.y != force.y || NiPoint3_ZERO.z != force.z) {
+            if (NiPoint3_ZERO != force) {
                 hkpEntity* phkEntity = static_cast<hkpEntity*>(pbody->phkObject);
                 if (phkEntity) {
                     pbody->MarkWrite();

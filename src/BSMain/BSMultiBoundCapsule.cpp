@@ -63,10 +63,8 @@ bool BSMultiBoundCapsule::IsEqual(NiObject* apObject) {
     }
 
     BSMultiBoundCapsule* pkOther = static_cast<BSMultiBoundCapsule*>(apObject);
-    // EXE-INLINED 0x4390C0
-    bool bPointA = PointA.x == pkOther->PointA.x && PointA.y == pkOther->PointA.y && PointA.z == pkOther->PointA.z;
-    // EXE-INLINED 0x4390C0
-    bool bPointB = PointB.x == pkOther->PointB.x && PointB.y == pkOther->PointB.y && PointB.z == pkOther->PointB.z;
+    bool bPointA = PointA == pkOther->PointA;
+    bool bPointB = PointB == pkOther->PointB;
     bool bRadius = Radius == pkOther->Radius;
     return bPointA & bPointB & bRadius;
 }

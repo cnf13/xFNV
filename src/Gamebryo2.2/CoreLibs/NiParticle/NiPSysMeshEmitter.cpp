@@ -569,11 +569,7 @@ bool NiPSysMeshEmitter::EmitFromEdge(NiGeometry* pkGeomEmitter, NiPoint3& kPosit
     }
     NiPoint3 kVert0 = pkVertex[usIndex0];
     NiPoint3 kVert1 = pkVertex[usIndex1];
-    // EXE-INLINED 0x439E90
-    NiPoint3 kSum;
-    kSum.x = kVert1.x + kVert0.x;
-    kSum.y = kVert0.y + kVert1.y;
-    kSum.z = kVert0.z + kVert1.z;
+    NiPoint3 kSum = kVert0 + kVert1;
     // Multiplies by the double 0.5 and rounds each product to float.
     kPosition.x = static_cast<float>(kSum.x * 0.5);
     kPosition.y = static_cast<float>(kSum.y * 0.5);
@@ -582,10 +578,7 @@ bool NiPSysMeshEmitter::EmitFromEdge(NiGeometry* pkGeomEmitter, NiPoint3& kPosit
     if (m_eInitVelocityType == NI_VELOCITY_USE_NORMALS && pkNormal) {
         NiPoint3 kNormal0 = pkNormal[usIndex0];
         NiPoint3 kNormal1 = pkNormal[usIndex1];
-        // EXE-INLINED 0x439E90
-        kSum.x = kNormal1.x + kNormal0.x;
-        kSum.y = kNormal0.y + kNormal1.y;
-        kSum.z = kNormal0.z + kNormal1.z;
+        kSum = kNormal0 + kNormal1;
         NiPoint3 kNormal;
         kNormal.x = static_cast<float>(kSum.x * 0.5);
         kNormal.y = static_cast<float>(kSum.y * 0.5);
@@ -723,27 +716,13 @@ bool NiPSysMeshEmitter::EmitFromSkinnedFace(
     DeformBySkin(kVert1, kNormal1, pkTriGeom, pkSkin, pkPart, uiIndex1);
     DeformBySkin(kVert2, kNormal2, pkTriGeom, pkSkin, pkPart, uiIndex2);
 
-    // EXE-INLINED 0x439E90
-    NiPoint3 kSum;
-    kSum.x = kVert0.x + kVert1.x;
-    kSum.y = kVert0.y + kVert1.y;
-    kSum.z = kVert0.z + kVert1.z;
-    // EXE-INLINED 0x439E90
-    NiPoint3 kTotal;
-    kTotal.x = kSum.x + kVert2.x;
-    kTotal.y = kSum.y + kVert2.y;
-    kTotal.z = kSum.z + kVert2.z;
+    NiPoint3 kSum = kVert0 + kVert1;
+    NiPoint3 kTotal = kSum + kVert2;
     kPosition = kTotal / 3.0f;
 
     if (m_eInitVelocityType == NI_VELOCITY_USE_NORMALS) {
-        // EXE-INLINED 0x439E90
-        kSum.x = kNormal0.x + kNormal1.x;
-        kSum.y = kNormal0.y + kNormal1.y;
-        kSum.z = kNormal0.z + kNormal1.z;
-        // EXE-INLINED 0x439E90
-        kTotal.x = kSum.x + kNormal2.x;
-        kTotal.y = kSum.y + kNormal2.y;
-        kTotal.z = kSum.z + kNormal2.z;
+        kSum = kNormal0 + kNormal1;
+        kTotal = kSum + kNormal2;
         NiPoint3 kNormal = kTotal / 3.0f;
         NiPoint3::UnitizeVector(kNormal);
         float fSpeed = kVelocity.Length();
@@ -766,15 +745,8 @@ bool NiPSysMeshEmitter::EmitFromSkinnedFace(
         kDiff.y = kScaled.y - kEdge1.y;
         kDiff.z = kScaled.z - kEdge1.z;
         NiPoint3 kOffset = fScale * kDiff;
-        // EXE-INLINED 0x439E90
-        NiPoint3 kPoint;
-        kPoint.x = kOffset.x + kVert0.x;
-        kPoint.y = kOffset.y + kVert0.y;
-        kPoint.z = kOffset.z + kVert0.z;
-        // EXE-INLINED 0x439E90
-        kPosition.x = kPoint.x + kEdge1.x;
-        kPosition.y = kPoint.y + kEdge1.y;
-        kPosition.z = kPoint.z + kEdge1.z;
+        NiPoint3 kPoint = kOffset + kVert0;
+        kPosition = kPoint + kEdge1;
     }
     TransformIntoCoordinateSpace(pkGeomEmitter, kPosition, kVelocity);
     return true;
@@ -835,18 +807,11 @@ bool NiPSysMeshEmitter::EmitFromSkinnedEdge(
     DeformBySkin(kVert0, kNormal0, pkTriGeom, pkSkin, pkPart, uiIndex0);
     DeformBySkin(kVert1, kNormal1, pkTriGeom, pkSkin, pkPart, uiIndex1);
 
-    // EXE-INLINED 0x439E90
-    NiPoint3 kSum;
-    kSum.x = kVert0.x + kVert1.x;
-    kSum.y = kVert0.y + kVert1.y;
-    kSum.z = kVert0.z + kVert1.z;
+    NiPoint3 kSum = kVert0 + kVert1;
     kPosition = kSum / 2.0f;
 
     if (m_eInitVelocityType == NI_VELOCITY_USE_NORMALS) {
-        // EXE-INLINED 0x439E90
-        kSum.x = kNormal0.x + kNormal1.x;
-        kSum.y = kNormal0.y + kNormal1.y;
-        kSum.z = kNormal0.z + kNormal1.z;
+        kSum = kNormal0 + kNormal1;
         NiPoint3 kNormal = kSum / 2.0f;
         NiPoint3::UnitizeVector(kNormal);
         float fSpeed = kVelocity.Length();
@@ -863,10 +828,7 @@ bool NiPSysMeshEmitter::EmitFromSkinnedEdge(
         kOffset.x = kEdge.x * fT;
         kOffset.y = kEdge.y * fT;
         kOffset.z = fT * kEdge.z;
-        // EXE-INLINED 0x439E90
-        kPosition.x = kOffset.x + kVert0.x;
-        kPosition.y = kOffset.y + kVert0.y;
-        kPosition.z = kOffset.z + kVert0.z;
+        kPosition = kOffset + kVert0;
     }
     TransformIntoCoordinateSpace(pkGeomEmitter, kPosition, kVelocity);
     return true;

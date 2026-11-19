@@ -196,15 +196,7 @@ namespace {
     RotateNormalHitCollector::addRayHit(const hkpCdBody& arCdBody, const hkpShapeRayCastCollectorOutput& arHitInfo) {
         hkpShapeRayCastCollectorOutput kNewInfo = arHitInfo;
         const hkRotation& kRotation = arCdBody.m_motion.pMotion->m_rotation;
-        const hkQuadReal kDir = arHitInfo.m_normal.m_quad;
-        // EXE-INLINED 0xC7F700
-        kNewInfo.m_normal.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kDir, kDir, _MM_SHUFFLE(1, 1, 1, 1)), kRotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(kDir, kDir, _MM_SHUFFLE(0, 0, 0, 0)), kRotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(kDir, kDir, _MM_SHUFFLE(2, 2, 2, 2)), kRotation.m_col2.m_quad)
-        );
+        kNewInfo.m_normal.setRotatedDir(kRotation, arHitInfo.m_normal);
         m_collector.addRayHit(arCdBody, kNewInfo);
     }
 
@@ -496,8 +488,7 @@ void hkpSampledHeightFieldShape::castRayInternal(
             goto end;
         }
         hkpShapeRayCastOutput output;
-        // EXE-INLINED 0x4589C0
-        output.m_normal.m_quad = _mm_set_ps1(1.0f);
+        output.m_normal.setAll(1.0f);
         float subX = rayFrom(0) - static_cast<double>(cell[0]);
         float subZ = rayFrom(2) - static_cast<double>(cell[2]);
         const hkBool cellFlip = getTriangleFlip();
@@ -562,25 +553,9 @@ void hkpSampledHeightFieldShape::castRayInternal(
         }
         if (collector.m_earlyOutHitFraction > hitFraction) {
             output.m_hitFraction = hitFraction;
-            // EXE-INLINED 0x62AEA0: src's normalize3 builds its results through hkSimdReal::Construct (0x4A3C90),
-            // which the exe's inlined copy does not call.
-            const hkQuadReal n = _mm_mul_ps(output.m_normal.m_quad, m_floatToIntScale.m_quad);
-            const hkQuadReal n2 = _mm_mul_ps(n, n);
-            const hkQuadReal len2 = _mm_add_ps(
-                _mm_shuffle_ps(n2, n2, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_add_ps(_mm_shuffle_ps(n2, n2, _MM_SHUFFLE(1, 1, 1, 1)), n2)
-            );
-            const hkQuadReal approx = _mm_rsqrt_ss(len2);
-            const hkQuadReal isZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-            const hkQuadReal lenInv = _mm_andnot_ps(
-                isZero,
-                _mm_mul_ps(
-                    _mm_mul_ps(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(len2, approx), approx))
-                )
-            );
+            output.m_normal.m_quad = _mm_mul_ps(output.m_normal.m_quad, m_floatToIntScale.m_quad);
+            output.m_normal.normalize3();
             output.m_extraInfo = triangleIndex + 2 * (cell[0] + (cell[2] << 15));
-            output.m_normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), n);
             collector.addRayHit(cdBody, output);
         }
     }
@@ -611,11 +586,8 @@ void hkpSampledHeightFieldShape::castRayInternal(
             clipped = true;
         }
         if (clipped) {
-            const hkQuadReal t = _mm_set_ps1(clipT);
             tNext[0] = clipT + tDelta[0];
-            // EXE-INLINED 0x5DBF70
-            pos.m_quad =
-                _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), rayFrom.m_quad), _mm_mul_ps(rayTo.m_quad, t));
+            pos.setInterpolate4(rayFrom, rayTo, clipT);
             cell[2] = cell[2] + step[2] * hkMath::hkToIntFast(clipT * absDirZ) - 2;
             while (static_cast<double>(cell[2]) <= pos(2)) {
                 cell[2]++;
@@ -648,11 +620,8 @@ void hkpSampledHeightFieldShape::castRayInternal(
             clipped = true;
         }
         if (clipped) {
-            const hkQuadReal t = _mm_set_ps1(clipT);
             tNext[2] = clipT + tDelta[2];
-            // EXE-INLINED 0x5DBF70
-            pos.m_quad =
-                _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), rayFrom.m_quad), _mm_mul_ps(rayTo.m_quad, t));
+            pos.setInterpolate4(rayFrom, rayTo, clipT);
             cell[0] = startX + step[0] * hkMath::hkToIntFast(clipT * absDirX) - 2;
             while (static_cast<double>(cell[0]) <= pos(0)) {
                 cell[0]++;
@@ -752,13 +721,7 @@ void hkpSampledHeightFieldShape::castRayInternal(
                 goto end;
             }
             float t = tNext[axis];
-            {
-                const hkQuadReal tq = _mm_set_ps1(t);
-                // EXE-INLINED 0x5DBF70
-                pos.m_quad = _mm_add_ps(
-                    _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tq), rayFrom.m_quad), _mm_mul_ps(rayTo.m_quad, tq)
-                );
-            }
+            { pos.setInterpolate4(rayFrom, rayTo, t); }
             const int32_t prevX = cell[0] - step[0];
 
             // The surface's height where the ray crosses the grid line: between the line's two grid points.
@@ -891,29 +854,13 @@ void hkpSampledHeightFieldShape::castRayInternal(
                 output.m_normal(0) = static_cast<double>(step[0]) * normalX;
                 output.m_normal(2) = static_cast<double>(step[2]) * normalZ;
                 output.m_hitFraction = hitT;
-                // EXE-INLINED 0x62AEA0: src's normalize3 builds its results through hkSimdReal::Construct
-                // (0x4A3C90), which the exe's inlined copy does not call.
-                const hkQuadReal n = _mm_mul_ps(m_floatToIntScale.m_quad, output.m_normal.m_quad);
-                const hkQuadReal n2 = _mm_mul_ps(n, n);
-                const hkQuadReal len2 = _mm_add_ps(
-                    _mm_shuffle_ps(n2, n2, _MM_SHUFFLE(2, 2, 2, 2)),
-                    _mm_add_ps(_mm_shuffle_ps(n2, n2, _MM_SHUFFLE(1, 1, 1, 1)), n2)
-                );
-                const hkQuadReal approx = _mm_rsqrt_ss(len2);
-                const hkQuadReal isZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-                const hkQuadReal lenInv = _mm_andnot_ps(
-                    isZero,
-                    _mm_mul_ps(
-                        _mm_mul_ps(_mm_set_ss(0.5f), approx),
-                        _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(len2, approx), approx))
-                    )
-                );
+                output.m_normal.m_quad = _mm_mul_ps(m_floatToIntScale.m_quad, output.m_normal.m_quad);
+                output.m_normal.normalize3();
                 // The key of the cell behind the line: its x in the low 15 bits, its z above, times two plus the
                 // triangle.
                 const int32_t hitX = cell[0] - (step[0] >> 1) - 1;
                 const int32_t hitZ = cell[2] - (step[2] >> 1) - 1;
                 output.m_extraInfo = triangleIndex + 2 * (hitX + (hitZ << 15));
-                output.m_normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), n);
                 collector.addRayHit(cdBody, output);
             }
             if (reportPenetratingStartPosition.m_bool) {

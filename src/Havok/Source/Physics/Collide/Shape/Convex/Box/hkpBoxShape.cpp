@@ -108,10 +108,9 @@ hkBool hkpBoxShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCa
     const __m128 kExtents = _mm_add_ps(
         _mm_shuffle_ps(kRadius, kRadius, 0), _mm_load_ps(&reinterpret_cast<const float*>(&m_halfExtents.m_quad)[0])
     );
-    // EXE-INLINED none: hkVector4::setNeg4
-    const __m128 kNegExtents = _mm_xor_ps(kExtents, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0]));
     alignas(16) hkVector4 negExtents;
-    _mm_store_ps(&reinterpret_cast<float*>(&negExtents.m_quad)[0], kNegExtents);
+    negExtents.setNeg4(reinterpret_cast<const hkVector4&>(kExtents));
+    const __m128 kNegExtents = negExtents.m_quad;
     const __m128 kFrom = _mm_load_ps(&reinterpret_cast<const float*>(&input.m_from.m_quad)[0]);
     const __m128 kTo = _mm_load_ps(&reinterpret_cast<const float*>(&input.m_to.m_quad)[0]);
     const int32_t iFromMax = _mm_movemask_ps(_mm_cmple_ps(kExtents, kFrom)) & 7;

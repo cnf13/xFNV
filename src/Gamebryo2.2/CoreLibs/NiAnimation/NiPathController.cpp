@@ -1,5 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiPathController.h"
 
+#include "Fallout Shared/Magic/EffectSetting.h"
+
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiFloatData.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiFloatKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiPosData.h"
@@ -489,10 +491,10 @@ void NiPathController::CalcRefFrame(uint32_t ui1, uint32_t ui2, float fNormTime,
             kTm.m_pEntry[0][1] = kUp.x;
             kTm.m_pEntry[1][1] = kUp.y;
             kTm.m_pEntry[2][1] = kUp.z;
-            // EXE-INLINED 0x4B3800
-            kTm.m_pEntry[0][2] = kUp.z * kTangent.y - kUp.y * kTangent.z;
-            kTm.m_pEntry[1][2] = kTangent.z * kUp.x - kUp.z * kTangent.x;
-            kTm.m_pEntry[2][2] = kUp.y * kTangent.x - kUp.x * kTangent.y;
+            NiPoint3 kCross = kTangent.Cross(kUp);
+            kTm.m_pEntry[0][2] = kCross.x;
+            kTm.m_pEntry[1][2] = kCross.y;
+            kTm.m_pEntry[2][2] = kCross.z;
         }
 
         if (m_uFlags & FLIP_MASK) {
@@ -588,9 +590,7 @@ float NiPathController::PathSpeed(int32_t iI0, int32_t iI1, float fTime) const {
         [static_cast<uint32_t>(NiAnimationKey::POSKEY) * NiAnimationKey::NUMKEYTYPES + ePathType];
     NiPoint3 kDeriv;
     interpD1(fTime, pkPathKeys->GetKeyAt(iI0, ucSize), pkPathKeys->GetKeyAt(iI1, ucSize), &kDeriv);
-    // EXE-INLINED none: NiPoint3::Length (the sum rounded to float, then the exe's __CIsqrt)
-    float fSqrLength = kDeriv.x * kDeriv.x + kDeriv.y * kDeriv.y + kDeriv.z * kDeriv.z;
-    return std::sqrt(fSqrLength);
+    return kDeriv.Length();
 }
 
 float NiPathController::PathLength(int32_t iI0, int32_t iI1, float fTime) const {
@@ -649,8 +649,7 @@ void NiPathController::GetPercentLocFromLength(float afPercent, uint32_t& auiI1,
     }
     for (int32_t i = 0; i < 32; i++) {
         float fDiff = PathLength(ui0, ui1, fTime) - fDist;
-        // EXE-INLINED none: NiAbs
-        float fAbs = __builtin_fabsf(fDiff);
+        float fAbs = NiAbs(fDiff);
         if (fAbs <= 9.999999747378752e-05) {
             break;
         }

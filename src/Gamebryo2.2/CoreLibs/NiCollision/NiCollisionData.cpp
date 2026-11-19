@@ -198,12 +198,7 @@ void NiCollisionData::UpdateWorldData(NiUpdateData&) {
                 : nullptr;
             if (pkAncestorData) {
                 NiPoint3 kVelocity = pkParent->m_kWorld.m_Rotate * m_kLocalVelocity;
-                // EXE-INLINED 0x439E90
-                NiPoint3 kSum;
-                kSum.x = pkAncestorData->m_kWorldVelocity.x + kVelocity.x;
-                kSum.y = pkAncestorData->m_kWorldVelocity.y + kVelocity.y;
-                kSum.z = pkAncestorData->m_kWorldVelocity.z + kVelocity.z;
-                m_kWorldVelocity = kSum;
+                m_kWorldVelocity = pkAncestorData->m_kWorldVelocity + kVelocity;
             }
             else {
                 m_kWorldVelocity = pkParent->m_kWorld.m_Rotate * m_kLocalVelocity;

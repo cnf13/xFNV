@@ -67,13 +67,8 @@ void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, con
     hkVector4 from[4];
     hkVector4 to[4];
     for (int32_t i = 0; i < 4; ++i) {
-        hkVector4 rel;
-        rel.setSub4(input[i].m_from, transform.m_translation);
-        // EXE-INLINED 0xC7F690
-        from[i]._setRotatedInverseDir(transform.m_rotation, rel);
-        rel.setSub4(input[i].m_to, transform.m_translation);
-        // EXE-INLINED 0xC7F690
-        to[i]._setRotatedInverseDir(transform.m_rotation, rel);
+        from[i].setTransformedInversePos(transform, input[i].m_from);
+        to[i].setTransformedInversePos(transform, input[i].m_to);
     }
     hkpShapeRayBundleCastInput bundleInput;
     hkQuadReal from0 = from[0].m_quad;
@@ -112,15 +107,7 @@ void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, con
             }
             result.m_shapeKeyIndex = rayOutput.m_shapeKeyIndex;
             m_output[i].m_rootCollidable = collidable;
-            const hkQuadReal normal = rayOutput.m_normal.m_quad;
-            // EXE-INLINED 0xC7F700
-            m_output[i].m_normal.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0x55), transform.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0x00), transform.m_rotation.m_col0.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0xAA), transform.m_rotation.m_col2.m_quad)
-            );
+            m_output[i].m_normal.setRotatedDir(transform.m_rotation, rayOutput.m_normal);
         }
     }
 }
@@ -154,14 +141,8 @@ hkBool hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkPrimitiveId primitiveId) {
     const hkTransform& transform = *collidable->m_motion.pMotion;
     const hkpWorldRayCastInput* input = m_input;
     hkpShapeRayCastInput shapeInput;
-    hkVector4 from;
-    from.setSub4(input->m_from, transform.m_translation);
-    // EXE-INLINED 0xC7F690
-    shapeInput.m_from._setRotatedInverseDir(transform.m_rotation, from);
-    hkVector4 to;
-    to.setSub4(input->m_to, transform.m_translation);
-    // EXE-INLINED 0xC7F690
-    shapeInput.m_to._setRotatedInverseDir(transform.m_rotation, to);
+    shapeInput.m_from.setTransformedInversePos(transform, input->m_from);
+    shapeInput.m_to.setTransformedInversePos(transform, input->m_to);
     shapeInput.m_filterInfo = input->m_filterInfo;
     shapeInput.m_rayShapeCollectionFilter = m_collectionFilter;
     if (m_collector) {
@@ -173,15 +154,7 @@ hkBool hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkPrimitiveId primitiveId) {
     }
     m_output->m_rootCollidable = collidable;
     hkpWorldRayCastOutput* output = m_output;
-    const hkQuadReal normal = output->m_normal.m_quad;
-    // EXE-INLINED 0xC7F700
-    output->m_normal.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0x00), transform.m_rotation.m_col0.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0x55), transform.m_rotation.m_col1.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(normal, normal, 0xAA), transform.m_rotation.m_col2.m_quad)
-    );
+    output->m_normal.setRotatedDir(transform.m_rotation, output->m_normal);
     return true;
 }
 

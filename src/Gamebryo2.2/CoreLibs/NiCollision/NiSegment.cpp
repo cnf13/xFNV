@@ -2,11 +2,7 @@
 
 // The product is rounded to float in a temporary before the sum.
 NiPoint3 NiSegment::GetPoint(float fS) const {
-    // EXE-INLINED 0x4A3760
-    NiPoint3 kOffset;
-    kOffset.x = m_kDirection.x * fS;
-    kOffset.y = m_kDirection.y * fS;
-    kOffset.z = m_kDirection.z * fS;
+    NiPoint3 kOffset = fS * m_kDirection;
     NiPoint3 kPoint;
     kPoint.x = m_kOrigin.x + kOffset.x;
     kPoint.y = m_kOrigin.y + kOffset.y;

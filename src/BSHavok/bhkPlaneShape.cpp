@@ -168,9 +168,9 @@ uint32_t bhkPlaneShape::QCinfoSize() const {
     return (uint32_t)64;
 }
 
-// Builds the wrapped hkpPlaneShape from the cinfo's plane, centre and half extents (each copied lane by lane into a
-// 16-aligned stack vector), hands it to SethkObject and drops the constructor's reference, then the vtable's PostInit
-// with the same cinfo; all charged to Havok's heap context.
+// Builds the wrapped hkpPlaneShape from the cinfo's plane, centre and half extents (each converted with
+// bhkVector4::ToHK into a 16-aligned stack vector), hands it to SethkObject and drops the constructor's reference, then
+// the vtable's PostInit with the same cinfo; all charged to Havok's heap context.
 void bhkPlaneShape::Init(const hkSerializableCinfo& arInfo) {
     const hkPlaneShapeCinfo& rInfo = static_cast<const hkPlaneShapeCinfo&>(arInfo);
     AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
@@ -181,14 +181,9 @@ void bhkPlaneShape::Init(const hkSerializableCinfo& arInfo) {
     hkVector4 kHalfExtents;
     hkVector4 kCenter;
     hkVector4 kPlane;
-    // EXE-INLINED 0x4B4D10
-    kHalfExtents.set(
-        rInfo.m_aabbHalfExtents.fX, rInfo.m_aabbHalfExtents.fY, rInfo.m_aabbHalfExtents.fZ, rInfo.m_aabbHalfExtents.fW
-    );
-    // EXE-INLINED 0x4B4D10
-    kCenter.set(rInfo.m_aabbCenter.fX, rInfo.m_aabbCenter.fY, rInfo.m_aabbCenter.fZ, rInfo.m_aabbCenter.fW);
-    // EXE-INLINED 0x4B4D10
-    kPlane.set(rInfo.m_plane.fX, rInfo.m_plane.fY, rInfo.m_plane.fZ, rInfo.m_plane.fW);
+    rInfo.m_aabbHalfExtents.ToHK(kHalfExtents);
+    rInfo.m_aabbCenter.ToHK(kCenter);
+    rInfo.m_plane.ToHK(kPlane);
     // The SDK's hkpPlaneShape(direction, center, halfExtents) constructor.
     pShape = ::new (pShape) hkpPlaneShape(kPlane, kCenter, kHalfExtents);
     SethkObject(pShape);

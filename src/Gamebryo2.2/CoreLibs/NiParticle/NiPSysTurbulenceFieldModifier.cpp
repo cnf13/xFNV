@@ -129,7 +129,6 @@ void NiPSysTurbulenceFieldModifier::Update(float fTime, NiPSysData* pkData) {
         float fDiffY = kPos.y - kFieldToPSys.m_Translate.y;
         float fDiffZ = kPos.z - kFieldToPSys.m_Translate.z;
         float fDistSqr = fDiffX * fDiffX + fDiffY * fDiffY + fDiffZ * fDiffZ;
-        // EXE-INLINED 0xEC6040
         // The exe inlines fsqrt (__CIsqrt 0xEC6040) on the float reloaded from the stack.
         float fDist = std::sqrt(fDistSqr);
         if (m_bUseMaxDistance && !(m_fMaxDistance >= fDist)) {

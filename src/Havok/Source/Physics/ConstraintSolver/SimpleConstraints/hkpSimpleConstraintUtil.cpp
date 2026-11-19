@@ -52,7 +52,6 @@ void hkSimpleConstraintUtil_InitInfo(
 ) {
     const float fInvMassSum = bodyA.m_invMasses.m_quad[3] + bodyB.m_invMasses.m_quad[3];
     hkMatrix3& invMassMatrix = out.m_invMassMatrix;
-    hkVector4* pInvMassCols = &invMassMatrix.m_col0;
     const __m128 kZero = _mm_setzero_ps();
     _mm_store_ps(&reinterpret_cast<float*>(&invMassMatrix.m_col0.m_quad)[0], kZero);
     _mm_store_ps(&reinterpret_cast<float*>(&invMassMatrix.m_col1.m_quad)[0], kZero);
@@ -77,77 +76,18 @@ void hkSimpleConstraintUtil_InitInfo(
     for (int32_t iBody = 0; iBody < 2; ++iBody) {
         hkpSimpleConstraintInfo::BodyInfo& info = out.m_bodyInfo[iBody];
         hkVector4* pJacT = &info.m_jacT.m_col0;
-        hkVector4* pInvIjac = &info.m_invIjac.m_col0;
 
-        // EXE-INLINED none: hkVector4::setCross
         for (int32_t j = 0; j < 3; ++j) {
-            const __m128 kA = _mm_load_ps(&reinterpret_cast<const float*>(&pBody->m_massRelPos.m_quad)[0]);
-            const __m128 kB = _mm_load_ps(&reinterpret_cast<const float*>(&directions.getColumn(j).m_quad)[0]);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&pJacT[j].m_quad)[0],
-                _mm_sub_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(kA, kA, 0xC9), _mm_shuffle_ps(kB, kB, 0xD2)),
-                    _mm_mul_ps(_mm_shuffle_ps(kA, kA, 0xD2), _mm_shuffle_ps(kB, kB, 0xC9))
-                )
-            );
+            pJacT[j].setCross(pBody->m_massRelPos, directions.getColumn(j));
         }
 
-        // EXE-INLINED none: hkMatrix3::setMul
-        const __m128 kI0 = _mm_load_ps(&reinterpret_cast<const float*>(&pBody->m_invInertia.m_col0.m_quad)[0]);
-        const __m128 kI1 = _mm_load_ps(&reinterpret_cast<const float*>(&pBody->m_invInertia.m_col1.m_quad)[0]);
-        const __m128 kI2 = _mm_load_ps(&reinterpret_cast<const float*>(&pBody->m_invInertia.m_col2.m_quad)[0]);
-        for (int32_t k = 2; k >= 0; --k) {
-            const __m128 kV = _mm_load_ps(&reinterpret_cast<float*>(&pJacT[k].m_quad)[0]);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&pInvIjac[k].m_quad)[0],
-                _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0x55), kI1), _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0x00), kI0)
-                    ),
-                    _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0xAA), kI2)
-                )
-            );
-        }
+        info.m_invIjac.setMul(pBody->m_invInertia, info.m_jacT);
 
-        // EXE-INLINED none: hkMatrix3::transpose
-        float fSwap = pJacT[1].m_quad[0];
-        pJacT[1].m_quad[0] = pJacT[0].m_quad[1];
-        pJacT[0].m_quad[1] = fSwap;
-        fSwap = pJacT[2].m_quad[0];
-        pJacT[2].m_quad[0] = pJacT[0].m_quad[2];
-        pJacT[0].m_quad[2] = fSwap;
-        fSwap = pJacT[2].m_quad[1];
-        pJacT[2].m_quad[1] = pJacT[1].m_quad[2];
-        pJacT[1].m_quad[2] = fSwap;
+        info.m_jacT.transpose();
 
-        // EXE-INLINED none: hkMatrix3::setMul
-        const __m128 kJ0 = _mm_load_ps(&reinterpret_cast<float*>(&pJacT[0].m_quad)[0]);
-        const __m128 kJ1 = _mm_load_ps(&reinterpret_cast<float*>(&pJacT[1].m_quad)[0]);
-        const __m128 kJ2 = _mm_load_ps(&reinterpret_cast<float*>(&pJacT[2].m_quad)[0]);
         hkMatrix3 tmp;
-        hkVector4* pTmp = &tmp.m_col0;
-        for (int32_t k = 2; k >= 0; --k) {
-            const __m128 kV = _mm_load_ps(&reinterpret_cast<float*>(&pInvIjac[k].m_quad)[0]);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&pTmp[k].m_quad)[0],
-                _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0x00), kJ0), _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0x55), kJ1)
-                    ),
-                    _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0xAA), kJ2)
-                )
-            );
-        }
-        // EXE-INLINED none: hkMatrix3::add
-        for (int32_t k = 0; k < 3; ++k) {
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&pInvMassCols[k].m_quad)[0],
-                _mm_add_ps(
-                    _mm_load_ps(&reinterpret_cast<float*>(&pInvMassCols[k].m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<float*>(&pTmp[k].m_quad)[0])
-                )
-            );
-        }
+        tmp.setMul(info.m_jacT, info.m_invIjac);
+        invMassMatrix.add(tmp);
 
         _mm_store_ps(
             &reinterpret_cast<float*>(&info.m_invMasses.m_quad)[0],

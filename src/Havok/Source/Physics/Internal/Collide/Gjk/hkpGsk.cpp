@@ -1991,14 +1991,8 @@ void hkpGsk::handlePenetration(const hkpConvexShape* shapeA, const hkpConvexShap
 hkBool hkpGsk::castRay(const hkpConvexShape* shape, const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& output) {
     HK_TIMER_BEGIN("GJK Ray Cast", nullptr);
     hkpShapeRayCastOutput localOutput = output;
-    // EXE-INLINED none: hkMatrix3::setIdentity
     hkRotation identity;
-    identity.m_col0.m_quad = _mm_setzero_ps();
-    identity.m_col0.m_quad[0] = 1.0f;
-    identity.m_col1.m_quad = _mm_setzero_ps();
-    identity.m_col1.m_quad[1] = 1.0f;
-    identity.m_col2.m_quad = _mm_setzero_ps();
-    identity.m_col2.m_quad[2] = 1.0f;
+    identity.setIdentity();
     hkBool hit = linearCast(shape, nullptr, identity, input, localOutput);
     HK_TIMER_END();
     if (hit.m_bool && !(0.0f == localOutput.m_hitFraction)) {

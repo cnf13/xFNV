@@ -1192,28 +1192,12 @@ void hkGeometryProcessing::buildTransposedArray(
 // of each (A's edges outer, B's inner, edge i running from vertex i to vertex i + 1) and the nine differences A[i] -
 // B[j] (i outer). The spans' bounds are compared as floats, so a NaN projection leaves the bounds as they are.
 int32_t hkGeometryProcessing::checkTrianglesIntersection(const hkVector4* triangleA, const hkVector4* triangleB) {
-    // EXE-INLINED none: hkVector4::dot3
-    auto dot3 = [](__m128 a, __m128 b) __attribute__((always_inline)) {
-        const __m128 kProduct = _mm_mul_ps(a, b);
-        hkSimdReal kResult;
-        kResult.m_real = _mm_add_ss(
-            _mm_shuffle_ps(kProduct, kProduct, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProduct, kProduct, 0x55), kProduct)
-        );
-        return kResult;
-    };
-    // EXE-INLINED none: hkVector4::setCross
-    auto cross = [](__m128 a, __m128 b) __attribute__((always_inline)) {
-        return _mm_sub_ps(
-            _mm_mul_ps(_mm_shuffle_ps(a, a, 0xC9), _mm_shuffle_ps(b, b, 0xD2)),
-            _mm_mul_ps(_mm_shuffle_ps(a, a, 0xD2), _mm_shuffle_ps(b, b, 0xC9))
-        );
-    };
     // EXE-INLINED none: hkGeometryProcessing::Span<hkSimdReal>::setFromVertices
-    auto setFromVertices = [&dot3](Span<hkSimdReal>& span, __m128 direction, const hkVector4* vertices)
+    auto setFromVertices = [](Span<hkSimdReal>& span, const hkVector4& direction, const hkVector4* vertices)
                                __attribute__((always_inline)) {
-                                   span.m_bounds[0] = span.m_bounds[1] = dot3(direction, vertices[0].m_quad);
+                                   span.m_bounds[0] = span.m_bounds[1] = direction.dot3(vertices[0]);
                                    for (int32_t i = 1; i < 3; ++i) {
-                                       const hkSimdReal d = dot3(direction, vertices[i].m_quad);
+                                       const hkSimdReal d = direction.dot3(vertices[i]);
                                        if (static_cast<float>(d) < static_cast<float>(span.m_bounds[0])) {
                                            span.m_bounds[0] = d;
                                        }
@@ -1223,7 +1207,7 @@ int32_t hkGeometryProcessing::checkTrianglesIntersection(const hkVector4* triang
                                    }
                                };
     // EXE-INLINED none: hkGeometryProcessing::Span<hkSimdReal>::intersect
-    auto overlap = [&](__m128 axis) __attribute__((always_inline)) {
+    auto overlap = [&](const hkVector4& axis) __attribute__((always_inline)) {
         Span<hkSimdReal> spanA;
         Span<hkSimdReal> spanB;
         setFromVertices(spanA, axis, triangleA);
@@ -1237,23 +1221,29 @@ int32_t hkGeometryProcessing::checkTrianglesIntersection(const hkVector4* triang
         return true;
     };
 
+    hkVector4 edge0;
+    hkVector4 edge1;
+    hkVector4 axis;
     // The triangles' normals (the SDK's crossOffset of each).
-    if (!overlap(cross(
-            _mm_sub_ps(triangleA[1].m_quad, triangleA[0].m_quad), _mm_sub_ps(triangleA[2].m_quad, triangleA[0].m_quad)
-        ))) {
+    edge0.m_quad = _mm_sub_ps(triangleA[1].m_quad, triangleA[0].m_quad);
+    edge1.m_quad = _mm_sub_ps(triangleA[2].m_quad, triangleA[0].m_quad);
+    axis.setCross(edge0, edge1);
+    if (!overlap(axis)) {
         return 0;
     }
-    if (!overlap(cross(
-            _mm_sub_ps(triangleB[1].m_quad, triangleB[0].m_quad), _mm_sub_ps(triangleB[2].m_quad, triangleB[0].m_quad)
-        ))) {
+    edge0.m_quad = _mm_sub_ps(triangleB[1].m_quad, triangleB[0].m_quad);
+    edge1.m_quad = _mm_sub_ps(triangleB[2].m_quad, triangleB[0].m_quad);
+    axis.setCross(edge0, edge1);
+    if (!overlap(axis)) {
         return 0;
     }
     // The cross products of the edges (the SDK's crossEdges).
     for (int32_t i = 0; i < 3; ++i) {
-        const __m128 kEdgeA = _mm_sub_ps(triangleA[(i + 1) % 3].m_quad, triangleA[i].m_quad);
+        edge0.m_quad = _mm_sub_ps(triangleA[(i + 1) % 3].m_quad, triangleA[i].m_quad);
         for (int32_t j = 0; j < 3; ++j) {
-            const __m128 kEdgeB = _mm_sub_ps(triangleB[(j + 1) % 3].m_quad, triangleB[j].m_quad);
-            if (!overlap(cross(kEdgeA, kEdgeB))) {
+            edge1.m_quad = _mm_sub_ps(triangleB[(j + 1) % 3].m_quad, triangleB[j].m_quad);
+            axis.setCross(edge0, edge1);
+            if (!overlap(axis)) {
                 return 0;
             }
         }
@@ -1261,7 +1251,8 @@ int32_t hkGeometryProcessing::checkTrianglesIntersection(const hkVector4* triang
     // The differences of the vertices.
     for (int32_t i = 0; i < 3; ++i) {
         for (int32_t j = 0; j < 3; ++j) {
-            if (!overlap(_mm_sub_ps(triangleA[i].m_quad, triangleB[j].m_quad))) {
+            axis.m_quad = _mm_sub_ps(triangleA[i].m_quad, triangleB[j].m_quad);
+            if (!overlap(axis)) {
                 return 0;
             }
         }

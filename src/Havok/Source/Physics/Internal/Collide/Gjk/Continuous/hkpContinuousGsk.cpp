@@ -107,15 +107,10 @@ float hk4dGskCollidePointWithPlaneFinal(
         fTime = fFraction * endRt + (1.0 - fFraction) * startRt;
         hk4dGskCollideInitMatrices(input, fTime, kMatrices);
 
-        // EXE-INLINED none: hkVector4::dot4xyz1 (the plane's dot product with the point's offset, plus its w)
-        hkQuadReal offset =
-            _mm_mul_ps(_mm_sub_ps(vertexA.m_quad, kMatrices.m_pointOnPlane.m_quad), kMatrices.m_plane.m_quad);
-        hkQuadReal zw = _mm_add_ss(
-            _mm_shuffle_ps(offset, offset, _MM_SHUFFLE(2, 2, 2, 2)),
-            _mm_shuffle_ps(kMatrices.m_plane.m_quad, kMatrices.m_plane.m_quad, _MM_SHUFFLE(3, 3, 3, 3))
-        );
-        hkQuadReal xy = _mm_add_ss(_mm_shuffle_ps(offset, offset, _MM_SHUFFLE(1, 1, 1, 1)), offset);
-        float fDist = _mm_cvtss_f32(_mm_add_ps(zw, xy));
+        // The plane's dot product with the point's offset, plus its w.
+        hkVector4 offset;
+        offset.setSub4(vertexA, kMatrices.m_pointOnPlane);
+        float fDist = kMatrices.m_plane.dot4xyz1(offset);
 
         float fError = fDist - tol.m_toiSeparation.m_storage;
         float fAbsError = std::fabs(fError);
@@ -170,16 +165,11 @@ void hk4dGskCollidePointsWithPlane(
         float fBestRt = fRtEnd;
         for (; i >= 0; --i, ++pVertex) {
             const hkQuadReal v = pVertex->m_quad;
-            const hkQuadReal plane = kMatrices.m_plane.m_quad;
 
-            // EXE-INLINED none: hkVector4::dot4xyz1 (the plane's dot product with the vertex's offset, plus its w)
-            const hkQuadReal offset = _mm_mul_ps(_mm_sub_ps(v, kMatrices.m_pointOnPlane.m_quad), plane);
-            const hkQuadReal zw = _mm_add_ss(
-                _mm_shuffle_ps(offset, offset, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_shuffle_ps(plane, plane, _MM_SHUFFLE(3, 3, 3, 3))
-            );
-            const hkQuadReal xy = _mm_add_ss(_mm_shuffle_ps(offset, offset, _MM_SHUFFLE(1, 1, 1, 1)), offset);
-            const float fDist = _mm_cvtss_f32(_mm_add_ps(zw, xy));
+            // The plane's dot product with the vertex's offset, plus its w.
+            hkVector4 offset;
+            offset.setSub4(*pVertex, kMatrices.m_pointOnPlane);
+            const float fDist = kMatrices.m_plane.dot4xyz1(offset);
             if (tol.m_toiSeparation.m_storage + fMaxApproach < fDist) {
                 continue;
             }
@@ -209,13 +199,9 @@ void hk4dGskCollidePointsWithPlane(
                     _mm_shuffle_ps(ang1, ang1, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(rB, rB, _MM_SHUFFLE(3, 0, 2, 1))
                 )
             );
-            const hkQuadReal vel =
-                _mm_mul_ps(_mm_sub_ps(_mm_sub_ps(crossA, kMatrices.m_linearVel.m_quad), crossB), plane);
-            // EXE-INLINED 0x62B0A0
-            const float fProjVel = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(vel, vel, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_add_ss(_mm_shuffle_ps(vel, vel, _MM_SHUFFLE(1, 1, 1, 1)), vel)
-            ));
+            hkVector4 vel;
+            vel.m_quad = _mm_sub_ps(_mm_sub_ps(crossA, kMatrices.m_linearVel.m_quad), crossB);
+            const float fProjVel = vel.dot3(kMatrices.m_plane);
 
             const float fDistAtEnd = fDistToSep + fProjVel * fDeltaRt;
             const float fMaxDrop = fDeltaRt * 0.5 * fDeltaRt * input.m_maxAccel.m_storage;
@@ -377,26 +363,14 @@ void hk4dGskCollideCalcToi(
                 }
                 hkVector4 crossA;
                 crossA.setCross(sweepIn.m_deltaAngles[0], separatingNormal);
-                const hkQuadReal sqA = _mm_mul_ps(crossA.m_quad, crossA.m_quad);
-                // EXE-INLINED 0x630B40
-                const float fLenA = _mm_cvtss_f32(_mm_sqrt_ss(
-                    _mm_add_ss(_mm_shuffle_ps(sqA, sqA, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqA, sqA, 0x55), sqA))
-                ));
+                const float fLenA = crossA.length3();
                 const float fAngA = motionA->m_objectRadius * fLenA;
                 hkVector4 crossB;
                 crossB.setCross(sweepIn.m_deltaAngles[1], separatingNormal);
-                const hkQuadReal sqB = _mm_mul_ps(crossB.m_quad, crossB.m_quad);
-                // EXE-INLINED 0x630B40
-                const float fLenB = _mm_cvtss_f32(_mm_sqrt_ss(
-                    _mm_add_ss(_mm_shuffle_ps(sqB, sqB, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqB, sqB, 0x55), sqB))
-                ));
+                const float fLenB = crossB.length3();
                 const float fAngB = motionB->m_objectRadius * fLenB;
                 const float fAngular = fAngA + fAngB;
-                const hkQuadReal lin = _mm_mul_ps(in3.m_linearTimInfo.m_quad, separatingNormal.m_quad);
-                // EXE-INLINED 0x62B0A0
-                const float fLinear = _mm_cvtss_f32(
-                    _mm_add_ss(_mm_shuffle_ps(lin, lin, 0xAA), _mm_add_ss(_mm_shuffle_ps(lin, lin, 0x55), lin))
-                );
+                const float fLinear = in3.m_linearTimInfo.dot3(separatingNormal);
                 const float fApproach = fLinear + fAngular;
                 if (fApproach <= 0.0f) {
                     goto done;
@@ -466,16 +440,8 @@ void hk4dGskCollideCalcToi(
                 hkSweptTransformUtil::lerp2Ha(motionB->m_sweptTransform, input->m_stepInfo.m_startTime, fTAddOn, wTb);
                 aTb.setMulInverseMul(wTa, wTb);
                 gsk.getClosestFeature(shapeA, shapeB, aTb, sepOut);
-                // EXE-INLINED 0xC7F700
-                const hkRotation& rWa = wTa.getRotation();
                 const hkQuadReal s = sepOut.m_quad;
-                separatingNormal.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(s, s, 0x55), rWa.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(s, s, 0x00), rWa.m_col0.m_quad)
-                    ),
-                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0xAA), rWa.m_col2.m_quad)
-                );
+                separatingNormal.setRotatedDir(wTa.getRotation(), sepOut);
                 // The point on A of the simplex: A's vertex, else B's vertex moved back by the distance, else the
                 // closest point of the two edges.
                 if (gsk.m_dimA.m_storage == 1) {
@@ -493,14 +459,11 @@ void hk4dGskCollideCalcToi(
 
                 // B's plane for a vertex sweep: the point on B (A's point moved back by the distance) and the
                 // normal, both in B's space.
-                // EXE-INLINED 0xC7F690
                 const hkQuadReal w = _mm_shuffle_ps(s, s, _MM_SHUFFLE(3, 3, 3, 3));
-                hkVector4 pointBinA;
-                pointBinA.m_quad = _mm_sub_ps(
-                    _mm_sub_ps(pointOnA.m_quad, _mm_mul_ps(_mm_shuffle_ps(w, w, _MM_SHUFFLE(0, 0, 0, 0)), s)),
-                    aTb.m_translation.m_quad
-                );
-                sweepIn.m_pointOnPlaneB._setRotatedInverseDir(aTb.getRotation(), pointBinA);
+                hkVector4 pointOnB;
+                pointOnB.m_quad =
+                    _mm_sub_ps(pointOnA.m_quad, _mm_mul_ps(_mm_shuffle_ps(w, w, _MM_SHUFFLE(0, 0, 0, 0)), s));
+                sweepIn.m_pointOnPlaneB.setTransformedInversePos(aTb, pointOnB);
                 iFeatureChange = gsk.m_featureChange.m_storage;
                 separatingNormal.m_quad[3] = sepOut.m_quad[3] - shapeA->m_radius - shapeB->m_radius;
                 fDist = separatingNormal.m_quad[3];
@@ -578,22 +541,11 @@ void hk4dGskCollideCalcToi(
             }
             else {
                 // B's vertices moved into A's space by aTb, from the last down.
-                const hkQuadReal c0 = aTb.m_rotation.m_col0.m_quad;
-                const hkQuadReal c1 = aTb.m_rotation.m_col1.m_quad;
-                const hkQuadReal c2 = aTb.m_rotation.m_col2.m_quad;
-                const hkQuadReal t = aTb.m_translation.m_quad;
                 int32_t i = gsk.m_dimB.m_storage - 1;
                 const hkpCdVertex* pVertexB = gsk.m_verticesBinB + i;
                 hkVector4* pVertexA = gsk.m_verticesBinA + i;
                 do {
-                    const hkQuadReal v = pVertexB->m_quad;
-                    // EXE-INLINED 0xC7F640
-                    pVertexA->m_quad = _mm_add_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), c0)
-                        ),
-                        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), c2), t)
-                    );
+                    pVertexA->setTransformedPos(aTb, *pVertexB);
                     --i;
                     --pVertexB;
                     --pVertexA;
@@ -698,21 +650,15 @@ void hk4dGskCollideCalcToi(
         const hkMotionState* pMotionB = in3.m_bodyB->m_motion.pState;
         const float fRelA = (fToi - pMotionA->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
             pMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
-        // EXE-INLINED 0x5DBF70
-        const hkQuadReal relA = _mm_shuffle_ps(_mm_set_ss(fRelA), _mm_set_ss(fRelA), _MM_SHUFFLE(0, 0, 0, 0));
         hkVector4 centerA;
-        centerA.m_quad = _mm_add_ps(
-            _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, relA), pMotionA->m_sweptTransform.m_centerOfMass0.m_quad),
-            _mm_mul_ps(pMotionA->m_sweptTransform.m_centerOfMass1.m_quad, relA)
+        centerA.setInterpolate4(
+            pMotionA->m_sweptTransform.m_centerOfMass0, pMotionA->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelA)
         );
         const float fRelB = (fToi - pMotionB->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
             pMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-        // EXE-INLINED 0x5DBF70
-        const hkQuadReal relB = _mm_shuffle_ps(_mm_set_ss(fRelB), _mm_set_ss(fRelB), _MM_SHUFFLE(0, 0, 0, 0));
         hkVector4 centerB;
-        centerB.m_quad = _mm_add_ps(
-            _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, relB), pMotionB->m_sweptTransform.m_centerOfMass0.m_quad),
-            _mm_mul_ps(pMotionB->m_sweptTransform.m_centerOfMass1.m_quad, relB)
+        centerB.setInterpolate4(
+            pMotionB->m_sweptTransform.m_centerOfMass0, pMotionB->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelB)
         );
         hkVector4 armA;
         armA.m_quad = _mm_sub_ps(cp.m_position.m_quad, centerA.m_quad);
@@ -726,12 +672,7 @@ void hk4dGskCollideCalcToi(
         velB.setCross(sweepIn.m_deltaAngles[1], armB);
         hkVector4 vel;
         vel.m_quad = _mm_sub_ps(_mm_add_ps(velA.m_quad, negLinear.m_quad), velB.m_quad);
-        const hkQuadReal projected = _mm_mul_ps(vel.m_quad, cp.m_separatingNormal.m_quad);
-        // EXE-INLINED 0x62B0A0
-        float fProjectedVelocity = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(projected, projected, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(projected, projected, 0x55), projected)
-        ));
+        float fProjectedVelocity = vel.dot3(cp.m_separatingNormal);
 
         // A welded contact that separates: sweep A's spheres against B's vertex plane again from the TOI, and take
         // the earliest point that reaches it.
@@ -746,26 +687,14 @@ void hk4dGskCollideCalcToi(
             sweepIn2.m_deltaAngles[1].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtB2), pMotionB->m_deltaAngle.m_quad);
             hkVector4 crossA;
             crossA.setCross(sweepIn2.m_deltaAngles[0], cp.m_separatingNormal);
-            const hkQuadReal sqA = _mm_mul_ps(crossA.m_quad, crossA.m_quad);
-            // EXE-INLINED 0x630B40
-            const float fLenA = _mm_cvtss_f32(
-                _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sqA, sqA, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqA, sqA, 0x55), sqA)))
-            );
+            const float fLenA = crossA.length3();
             const float fAngA = pMotionA->m_objectRadius * fLenA;
             hkVector4 crossB;
             crossB.setCross(sweepIn2.m_deltaAngles[1], cp.m_separatingNormal);
-            const hkQuadReal sqB = _mm_mul_ps(crossB.m_quad, crossB.m_quad);
-            // EXE-INLINED 0x630B40
-            const float fLenB = _mm_cvtss_f32(
-                _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sqB, sqB, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqB, sqB, 0x55), sqB)))
-            );
+            const float fLenB = crossB.length3();
             const float fAngB = pMotionB->m_objectRadius * fLenB;
             const float fAngular = fAngA + fAngB;
-            const hkQuadReal lin = _mm_mul_ps(in3.m_linearTimInfo.m_quad, cp.m_separatingNormal.m_quad);
-            // EXE-INLINED 0x62B0A0
-            const float fLinear = _mm_cvtss_f32(
-                _mm_add_ss(_mm_shuffle_ps(lin, lin, 0xAA), _mm_add_ss(_mm_shuffle_ps(lin, lin, 0x55), lin))
-            );
+            const float fLinear = in3.m_linearTimInfo.dot3(cp.m_separatingNormal);
             sweepIn2.m_worstCaseApproachingDelta.m_storage = fAngular + fLinear;
             const hkpConvexShape* pSweepShapeA = static_cast<const hkpConvexShape*>(in3.m_bodyA->m_shape);
             const hkpConvexShape* pSweepShapeB = static_cast<const hkpConvexShape*>(in3.m_bodyB->m_shape);
@@ -1008,20 +937,11 @@ void findToi(
         }
         else {
             // B's vertices moved into A's space by aTb, from the last down.
-            const hkQuadReal c0 = aTb.m_rotation.m_col0.m_quad;
-            const hkQuadReal c1 = aTb.m_rotation.m_col1.m_quad;
-            const hkQuadReal c2 = aTb.m_rotation.m_col2.m_quad;
-            const hkQuadReal t = aTb.m_translation.m_quad;
             int32_t i = gsk->m_dimB.m_storage - 1;
             const hkpCdVertex* pVertexB = gsk->m_verticesBinB + i;
             hkVector4* pVertexA = gsk->m_verticesBinA + i;
             do {
-                const hkQuadReal v = pVertexB->m_quad;
-                // EXE-INLINED 0xC7F640
-                pVertexA->m_quad = _mm_add_ps(
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), c0)),
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), c2), t)
-                );
+                pVertexA->setTransformedPos(aTb, *pVertexB);
                 --i;
                 --pVertexB;
                 --pVertexA;
@@ -1126,21 +1046,15 @@ void findToi(
     const hkMotionState* pMotionB = in3.m_bodyB->m_motion.pState;
     const float fRelA = (fToi - pMotionA->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
         pMotionA->m_sweptTransform.m_centerOfMass1.m_quad[3];
-    // EXE-INLINED 0x5DBF70
-    const hkQuadReal relA = _mm_shuffle_ps(_mm_set_ss(fRelA), _mm_set_ss(fRelA), _MM_SHUFFLE(0, 0, 0, 0));
     hkVector4 centerA;
-    centerA.m_quad = _mm_add_ps(
-        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, relA), pMotionA->m_sweptTransform.m_centerOfMass0.m_quad),
-        _mm_mul_ps(pMotionA->m_sweptTransform.m_centerOfMass1.m_quad, relA)
+    centerA.setInterpolate4(
+        pMotionA->m_sweptTransform.m_centerOfMass0, pMotionA->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelA)
     );
     const float fRelB = (fToi - pMotionB->m_sweptTransform.m_centerOfMass0.m_quad[3]) *
         pMotionB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-    // EXE-INLINED 0x5DBF70
-    const hkQuadReal relB = _mm_shuffle_ps(_mm_set_ss(fRelB), _mm_set_ss(fRelB), _MM_SHUFFLE(0, 0, 0, 0));
     hkVector4 centerB;
-    centerB.m_quad = _mm_add_ps(
-        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, relB), pMotionB->m_sweptTransform.m_centerOfMass0.m_quad),
-        _mm_mul_ps(pMotionB->m_sweptTransform.m_centerOfMass1.m_quad, relB)
+    centerB.setInterpolate4(
+        pMotionB->m_sweptTransform.m_centerOfMass0, pMotionB->m_sweptTransform.m_centerOfMass1, hkSimdReal(fRelB)
     );
     hkVector4 armA;
     armA.m_quad = _mm_sub_ps(cp.m_position.m_quad, centerA.m_quad);
@@ -1154,11 +1068,7 @@ void findToi(
     velB.setCross(deltaAngles[1], armB);
     hkVector4 vel;
     vel.m_quad = _mm_sub_ps(_mm_add_ps(velA.m_quad, negLinear.m_quad), velB.m_quad);
-    const hkQuadReal projected = _mm_mul_ps(vel.m_quad, cp.m_separatingNormal.m_quad);
-    // EXE-INLINED 0x62B0A0
-    float fProjectedVelocity = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(projected, projected, 0xAA), _mm_add_ss(_mm_shuffle_ps(projected, projected, 0x55), projected)
-    ));
+    float fProjectedVelocity = vel.dot3(cp.m_separatingNormal);
 
     // A welded contact that separates: sweep A's spheres against B's vertex plane again from the TOI, and take the
     // earliest point that reaches it.
@@ -1173,25 +1083,14 @@ void findToi(
         sweepIn2.m_deltaAngles[1].m_quad = _mm_mul_ps(_mm_set_ps1(fDeltaRtB2), pMotionB->m_deltaAngle.m_quad);
         hkVector4 crossA;
         crossA.setCross(sweepIn2.m_deltaAngles[0], cp.m_separatingNormal);
-        const hkQuadReal sqA = _mm_mul_ps(crossA.m_quad, crossA.m_quad);
-        // EXE-INLINED 0x630B40
-        const float fLenA = _mm_cvtss_f32(
-            _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sqA, sqA, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqA, sqA, 0x55), sqA)))
-        );
+        const float fLenA = crossA.length3();
         const float fAngA = pMotionA->m_objectRadius * fLenA;
         hkVector4 crossB;
         crossB.setCross(sweepIn2.m_deltaAngles[1], cp.m_separatingNormal);
-        const hkQuadReal sqB = _mm_mul_ps(crossB.m_quad, crossB.m_quad);
-        // EXE-INLINED 0x630B40
-        const float fLenB = _mm_cvtss_f32(
-            _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sqB, sqB, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqB, sqB, 0x55), sqB)))
-        );
+        const float fLenB = crossB.length3();
         const float fAngB = pMotionB->m_objectRadius * fLenB;
         const float fAngular = fAngA + fAngB;
-        const hkQuadReal lin = _mm_mul_ps(in3.m_linearTimInfo.m_quad, cp.m_separatingNormal.m_quad);
-        // EXE-INLINED 0x62B0A0
-        const float fLinear =
-            _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(lin, lin, 0xAA), _mm_add_ss(_mm_shuffle_ps(lin, lin, 0x55), lin)));
+        const float fLinear = in3.m_linearTimInfo.dot3(cp.m_separatingNormal);
         sweepIn2.m_worstCaseApproachingDelta.m_storage = fAngular + fLinear;
         const hkpConvexShape* pSweepShapeA = static_cast<const hkpConvexShape*>(in3.m_bodyA->m_shape);
         const hkpConvexShape* pSweepShapeB = static_cast<const hkpConvexShape*>(in3.m_bodyB->m_shape);

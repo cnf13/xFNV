@@ -228,17 +228,7 @@ void hkpPointToPathConstraintData::buildJacobian(const hkpConstraintQueryIn& in,
     perpWs(iFirst) = tangentWs(iSecond);
     perpWs(iSecond) = -tangentWs(iFirst);
 
-    // EXE-INLINED 0x62AEA0
-    const __m128 kPerpSquares = _mm_mul_ps(perpWs.m_quad, perpWs.m_quad);
-    const __m128 kPerpLengthSquared = _mm_add_ps(
-        _mm_shuffle_ps(kPerpSquares, kPerpSquares, 0xAA),
-        _mm_add_ps(_mm_shuffle_ps(kPerpSquares, kPerpSquares, 0x55), kPerpSquares)
-    );
-    const __m128 kEstimate = _mm_rsqrt_ss(kPerpLengthSquared);
-    const __m128 kZeroMask = _mm_cmpeq_ss(kPerpLengthSquared, _mm_set_ss(0.0f));
-    const __m128 kStep = _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kPerpLengthSquared, kEstimate), kEstimate));
-    const __m128 kScale = _mm_andnot_ps(kZeroMask, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimate), kStep));
-    perpWs.m_quad = _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), perpWs.m_quad);
+    perpWs.normalize3();
 
     // EXE-INLINED 0x630DF0
     hkVector4 upWs;

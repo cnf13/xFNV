@@ -1,5 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiOBBox.h"
 
+#include "Fallout Shared/Magic/EffectSetting.h"
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiOBBRoot.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
@@ -834,18 +835,8 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
     float d1[3];
     float fDotV;
 
-    // EXE-INLINED 0x439EF0
-    NiPoint3 D;
-    D.x = box.m_wCenter.x - m_wCenter.x;
-    D.y = box.m_wCenter.y - m_wCenter.y;
-    D.z = box.m_wCenter.z - m_wCenter.z;
-    const NiPoint3& kBoxVelocity = box.m_pRoot->m_velocity;
-    const NiPoint3& kVelocity = m_pRoot->m_velocity;
-    // EXE-INLINED 0x439EF0
-    NiPoint3 V;
-    V.x = kBoxVelocity.x - kVelocity.x;
-    V.y = kBoxVelocity.y - kVelocity.y;
-    V.z = kBoxVelocity.z - kVelocity.z;
+    NiPoint3 D = box.m_wCenter - m_wCenter;
+    NiPoint3 V = box.m_pRoot->m_velocity - m_pRoot->m_velocity;
 
     float dt = m_pRoot->m_fDeltaTime;
 
@@ -855,156 +846,135 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
     float tmax = 0.0f;
 
     // A0
-    // EXE-INLINED 0x4B6190
-    C[0][0] = A[0].x * B[0].x + A[0].y * B[0].y + A[0].z * B[0].z;
-    C[0][1] = A[0].x * B[1].x + A[0].y * B[1].y + A[0].z * B[1].z;
-    C[0][2] = A[0].x * B[2].x + A[0].y * B[2].y + A[0].z * B[2].z;
-    u0 = d0[0] = A[0].x * D.x + A[0].y * D.y + A[0].z * D.z;
-    fDotV = V.x * A[0].x + V.y * A[0].y + V.z * A[0].z;
+    C[0][0] = A[0].Dot(B[0]);
+    C[0][1] = A[0].Dot(B[1]);
+    C[0][2] = A[0].Dot(B[2]);
+    u0 = d0[0] = A[0].Dot(D);
+    fDotV = V.Dot(A[0]);
     u1 = d1[0] = d0[0] + dt * fDotV;
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0]);
-    r1 = __builtin_fabsf(extB[0] * C[0][0]) + __builtin_fabsf(extB[1] * C[0][1]) + __builtin_fabsf(extB[2] * C[0][2]);
+    r0 = NiAbs(extA[0]);
+    r1 = NiAbs(extB[0] * C[0][0]) + NiAbs(extB[1] * C[0][1]) + NiAbs(extB[2] * C[0][2]);
     rsum = r0 + r1;
     UPDATE_TIME(intrA0);
 
     // A1
-    // EXE-INLINED 0x4B6190
-    C[1][0] = A[1].x * B[0].x + A[1].y * B[0].y + A[1].z * B[0].z;
-    C[1][1] = A[1].x * B[1].x + A[1].y * B[1].y + A[1].z * B[1].z;
-    C[1][2] = A[1].x * B[2].x + A[1].y * B[2].y + A[1].z * B[2].z;
-    d0[1] = A[1].x * D.x + A[1].y * D.y + A[1].z * D.z;
-    fDotV = A[1].x * V.x + A[1].y * V.y + A[1].z * V.z;
+    C[1][0] = A[1].Dot(B[0]);
+    C[1][1] = A[1].Dot(B[1]);
+    C[1][2] = A[1].Dot(B[2]);
+    d0[1] = A[1].Dot(D);
+    fDotV = A[1].Dot(V);
     d1[1] = d0[1] + dt * fDotV;
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[1]);
-    r1 = __builtin_fabsf(extB[0] * C[1][0]) + __builtin_fabsf(extB[1] * C[1][1]) + __builtin_fabsf(extB[2] * C[1][2]);
+    r0 = NiAbs(extA[1]);
+    r1 = NiAbs(extB[0] * C[1][0]) + NiAbs(extB[1] * C[1][1]) + NiAbs(extB[2] * C[1][2]);
     rsum = r0 + r1;
     UPDATE_TIME(intrA1);
 
     // A2
-    // EXE-INLINED 0x4B6190
-    C[2][0] = A[2].x * B[0].x + A[2].y * B[0].y + A[2].z * B[0].z;
-    C[2][1] = A[2].x * B[1].x + A[2].y * B[1].y + A[2].z * B[1].z;
-    C[2][2] = A[2].x * B[2].x + A[2].y * B[2].y + A[2].z * B[2].z;
-    d0[2] = A[2].x * D.x + A[2].y * D.y + A[2].z * D.z;
-    fDotV = A[2].x * V.x + A[2].y * V.y + A[2].z * V.z;
+    C[2][0] = A[2].Dot(B[0]);
+    C[2][1] = A[2].Dot(B[1]);
+    C[2][2] = A[2].Dot(B[2]);
+    d0[2] = A[2].Dot(D);
+    fDotV = A[2].Dot(V);
     d1[2] = d0[2] + dt * fDotV;
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[2]);
-    r1 = __builtin_fabsf(extB[0] * C[2][0]) + __builtin_fabsf(extB[1] * C[2][1]) + __builtin_fabsf(extB[2] * C[2][2]);
+    r0 = NiAbs(extA[2]);
+    r1 = NiAbs(extB[0] * C[2][0]) + NiAbs(extB[1] * C[2][1]) + NiAbs(extB[2] * C[2][2]);
     rsum = r0 + r1;
     UPDATE_TIME(intrA2);
 
     // B0
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[0][0]) + __builtin_fabsf(extA[1] * C[1][0]) + __builtin_fabsf(extA[2] * C[2][0]);
-    r1 = __builtin_fabsf(extB[0]);
+    r0 = NiAbs(extA[0] * C[0][0]) + NiAbs(extA[1] * C[1][0]) + NiAbs(extA[2] * C[2][0]);
+    r1 = NiAbs(extB[0]);
     rsum = r0 + r1;
-    // EXE-INLINED 0x4B6190
-    u0 = B[0].x * D.x + B[0].y * D.y + B[0].z * D.z;
-    fDotV = B[0].x * V.x + B[0].y * V.y + B[0].z * V.z;
+    u0 = B[0].Dot(D);
+    fDotV = B[0].Dot(V);
     u1 = u0 + dt * fDotV;
     UPDATE_TIME(intrB0);
 
     // B1
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[0][1]) + __builtin_fabsf(extA[1] * C[1][1]) + __builtin_fabsf(extA[2] * C[2][1]);
-    r1 = __builtin_fabsf(extB[1]);
+    r0 = NiAbs(extA[0] * C[0][1]) + NiAbs(extA[1] * C[1][1]) + NiAbs(extA[2] * C[2][1]);
+    r1 = NiAbs(extB[1]);
     rsum = r0 + r1;
-    // EXE-INLINED 0x4B6190
-    u0 = B[1].x * D.x + B[1].y * D.y + B[1].z * D.z;
-    fDotV = B[1].x * V.x + B[1].y * V.y + B[1].z * V.z;
+    u0 = B[1].Dot(D);
+    fDotV = B[1].Dot(V);
     u1 = u0 + dt * fDotV;
     UPDATE_TIME(intrB1);
 
     // B2
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[0][2]) + __builtin_fabsf(extA[1] * C[1][2]) + __builtin_fabsf(extA[2] * C[2][2]);
-    r1 = __builtin_fabsf(extB[2]);
+    r0 = NiAbs(extA[0] * C[0][2]) + NiAbs(extA[1] * C[1][2]) + NiAbs(extA[2] * C[2][2]);
+    r1 = NiAbs(extB[2]);
     rsum = r0 + r1;
-    // EXE-INLINED 0x4B6190
-    u0 = B[2].x * D.x + B[2].y * D.y + B[2].z * D.z;
-    fDotV = B[2].x * V.x + B[2].y * V.y + B[2].z * V.z;
+    u0 = B[2].Dot(D);
+    fDotV = B[2].Dot(V);
     u1 = u0 + dt * fDotV;
     UPDATE_TIME(intrB2);
 
     // A0xB0
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[1] * C[2][0]) + __builtin_fabsf(extA[2] * C[1][0]);
-    r1 = __builtin_fabsf(extB[1] * C[0][2]) + __builtin_fabsf(extB[2] * C[0][1]);
+    r0 = NiAbs(extA[1] * C[2][0]) + NiAbs(extA[2] * C[1][0]);
+    r1 = NiAbs(extB[1] * C[0][2]) + NiAbs(extB[2] * C[0][1]);
     rsum = r0 + r1;
     u0 = d0[2] * C[1][0] - d0[1] * C[2][0];
     u1 = d1[2] * C[1][0] - d1[1] * C[2][0];
     UPDATE_TIME(intrA0B0);
 
     // A0xB1
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[1] * C[2][1]) + __builtin_fabsf(extA[2] * C[1][1]);
-    r1 = __builtin_fabsf(extB[0] * C[0][2]) + __builtin_fabsf(extB[2] * C[0][0]);
+    r0 = NiAbs(extA[1] * C[2][1]) + NiAbs(extA[2] * C[1][1]);
+    r1 = NiAbs(extB[0] * C[0][2]) + NiAbs(extB[2] * C[0][0]);
     rsum = r0 + r1;
     u0 = d0[2] * C[1][1] - d0[1] * C[2][1];
     u1 = d1[2] * C[1][1] - d1[1] * C[2][1];
     UPDATE_TIME(intrA0B1);
 
     // A0xB2
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[1] * C[2][2]) + __builtin_fabsf(extA[2] * C[1][2]);
-    r1 = __builtin_fabsf(extB[0] * C[0][1]) + __builtin_fabsf(extB[1] * C[0][0]);
+    r0 = NiAbs(extA[1] * C[2][2]) + NiAbs(extA[2] * C[1][2]);
+    r1 = NiAbs(extB[0] * C[0][1]) + NiAbs(extB[1] * C[0][0]);
     rsum = r0 + r1;
     u0 = d0[2] * C[1][2] - d0[1] * C[2][2];
     u1 = d1[2] * C[1][2] - d1[1] * C[2][2];
     UPDATE_TIME(intrA0B2);
 
     // A1xB0
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[2][0]) + __builtin_fabsf(extA[2] * C[0][0]);
-    r1 = __builtin_fabsf(extB[1] * C[1][2]) + __builtin_fabsf(extB[2] * C[1][1]);
+    r0 = NiAbs(extA[0] * C[2][0]) + NiAbs(extA[2] * C[0][0]);
+    r1 = NiAbs(extB[1] * C[1][2]) + NiAbs(extB[2] * C[1][1]);
     rsum = r0 + r1;
     u0 = d0[0] * C[2][0] - d0[2] * C[0][0];
     u1 = d1[0] * C[2][0] - d1[2] * C[0][0];
     UPDATE_TIME(intrA1B0);
 
     // A1xB1
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[2][1]) + __builtin_fabsf(extA[2] * C[0][1]);
-    r1 = __builtin_fabsf(extB[0] * C[1][2]) + __builtin_fabsf(extB[2] * C[1][0]);
+    r0 = NiAbs(extA[0] * C[2][1]) + NiAbs(extA[2] * C[0][1]);
+    r1 = NiAbs(extB[0] * C[1][2]) + NiAbs(extB[2] * C[1][0]);
     rsum = r0 + r1;
     u0 = d0[0] * C[2][1] - d0[2] * C[0][1];
     u1 = d1[0] * C[2][1] - d1[2] * C[0][1];
     UPDATE_TIME(intrA1B1);
 
     // A1xB2
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[2][2]) + __builtin_fabsf(extA[2] * C[0][2]);
-    r1 = __builtin_fabsf(extB[0] * C[1][1]) + __builtin_fabsf(extB[1] * C[1][0]);
+    r0 = NiAbs(extA[0] * C[2][2]) + NiAbs(extA[2] * C[0][2]);
+    r1 = NiAbs(extB[0] * C[1][1]) + NiAbs(extB[1] * C[1][0]);
     rsum = r0 + r1;
     u0 = d0[0] * C[2][2] - d0[2] * C[0][2];
     u1 = d1[0] * C[2][2] - d1[2] * C[0][2];
     UPDATE_TIME(intrA1B2);
 
     // A2xB0
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[1][0]) + __builtin_fabsf(extA[1] * C[0][0]);
-    r1 = __builtin_fabsf(extB[1] * C[2][2]) + __builtin_fabsf(extB[2] * C[2][1]);
+    r0 = NiAbs(extA[0] * C[1][0]) + NiAbs(extA[1] * C[0][0]);
+    r1 = NiAbs(extB[1] * C[2][2]) + NiAbs(extB[2] * C[2][1]);
     rsum = r0 + r1;
     u0 = d0[1] * C[0][0] - d0[0] * C[1][0];
     u1 = d1[1] * C[0][0] - d1[0] * C[1][0];
     UPDATE_TIME(intrA2B0);
 
     // A2xB1
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[1][1]) + __builtin_fabsf(extA[1] * C[0][1]);
-    r1 = __builtin_fabsf(extB[0] * C[2][2]) + __builtin_fabsf(extB[2] * C[2][0]);
+    r0 = NiAbs(extA[0] * C[1][1]) + NiAbs(extA[1] * C[0][1]);
+    r1 = NiAbs(extB[0] * C[2][2]) + NiAbs(extB[2] * C[2][0]);
     rsum = r0 + r1;
     u0 = d0[1] * C[0][1] - d0[0] * C[1][1];
     u1 = d1[1] * C[0][1] - d1[0] * C[1][1];
     UPDATE_TIME(intrA2B1);
 
     // A2xB2
-    // EXE-INLINED 0x408820
-    r0 = __builtin_fabsf(extA[0] * C[1][2]) + __builtin_fabsf(extA[1] * C[0][2]);
-    r1 = __builtin_fabsf(extB[0] * C[2][1]) + __builtin_fabsf(extB[1] * C[2][0]);
+    r0 = NiAbs(extA[0] * C[1][2]) + NiAbs(extA[1] * C[0][2]);
+    r1 = NiAbs(extB[0] * C[2][1]) + NiAbs(extB[1] * C[2][0]);
     rsum = r0 + r1;
     u0 = d0[1] * C[0][2] - d0[0] * C[1][2];
     u1 = d1[1] * C[0][2] - d1[0] * C[1][2];
@@ -1061,13 +1031,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_MINUS_PLUS(y[1], side, C[0][2], extB[1]);
             GET_COEFF_PLUS_MINUS(y[2], side, C[0][1], extB[2]);
             div = 1.0f - C[0][0] * C[0][0];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[0].Dot(DTW);
                 tmp = C[1][0] * x[1] + C[2][0] * x[2] - bd;
                 ad = A[0].Dot(DTW);
@@ -1083,13 +1049,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_PLUS_MINUS(y[0], side, C[0][2], extB[0]);
             GET_COEFF_MINUS_PLUS(y[2], side, C[0][0], extB[2]);
             div = 1.0f - C[0][1] * C[0][1];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[1].Dot(DTW);
                 tmp = C[1][1] * x[1] + C[2][1] * x[2] - bd;
                 ad = A[0].Dot(DTW);
@@ -1105,13 +1067,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_MINUS_PLUS(y[0], side, C[0][1], extB[0]);
             GET_COEFF_PLUS_MINUS(y[1], side, C[0][0], extB[1]);
             div = 1.0f - C[0][2] * C[0][2];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[2].Dot(DTW);
                 tmp = C[1][2] * x[1] + C[2][2] * x[2] - bd;
                 ad = A[0].Dot(DTW);
@@ -1127,13 +1085,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_MINUS_PLUS(y[1], side, C[1][2], extB[1]);
             GET_COEFF_PLUS_MINUS(y[2], side, C[1][1], extB[2]);
             div = 1.0f - C[1][0] * C[1][0];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[0].Dot(DTW);
                 tmp = C[0][0] * x[0] + C[2][0] * x[2] - bd;
                 ad = A[1].Dot(DTW);
@@ -1149,13 +1103,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_PLUS_MINUS(y[0], side, C[1][2], extB[0]);
             GET_COEFF_MINUS_PLUS(y[2], side, C[1][0], extB[2]);
             div = 1.0f - C[1][1] * C[1][1];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[1].Dot(DTW);
                 tmp = C[0][1] * x[0] + C[2][1] * x[2] - bd;
                 ad = A[1].Dot(DTW);
@@ -1171,13 +1121,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_MINUS_PLUS(y[0], side, C[1][1], extB[0]);
             GET_COEFF_PLUS_MINUS(y[1], side, C[1][0], extB[1]);
             div = 1.0f - C[1][2] * C[1][2];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[2].Dot(DTW);
                 tmp = C[0][2] * x[0] + C[2][2] * x[2] - bd;
                 ad = A[1].Dot(DTW);
@@ -1193,13 +1139,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_MINUS_PLUS(y[1], side, C[2][2], extB[1]);
             GET_COEFF_PLUS_MINUS(y[2], side, C[2][1], extB[2]);
             div = 1.0f - C[2][0] * C[2][0];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[0].Dot(DTW);
                 tmp = C[0][0] * x[0] + C[1][0] * x[1] - bd;
                 ad = A[2].Dot(DTW);
@@ -1215,13 +1157,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_PLUS_MINUS(y[0], side, C[2][2], extB[0]);
             GET_COEFF_MINUS_PLUS(y[2], side, C[2][0], extB[2]);
             div = 1.0f - C[2][1] * C[2][1];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[1].Dot(DTW);
                 tmp = C[0][1] * x[0] + C[1][1] * x[1] - bd;
                 ad = A[2].Dot(DTW);
@@ -1237,13 +1175,9 @@ int32_t NiOBBox::FindIntersection(const NiOBBox& box, float& t, NiPoint3& p) {
             GET_COEFF_MINUS_PLUS(y[0], side, C[2][1], extB[0]);
             GET_COEFF_PLUS_MINUS(y[1], side, C[2][0], extB[1]);
             div = 1.0f - C[2][2] * C[2][2];
-            // EXE-INLINED 0x408820
-            if (__builtin_fabsf(div) > epsilon) {
+            if (NiAbs(div) > epsilon) {
                 kTV = tmax * V;
-                // EXE-INLINED 0x439E90
-                DTW.x = D.x + kTV.x;
-                DTW.y = D.y + kTV.y;
-                DTW.z = D.z + kTV.z;
+                DTW = D + kTV;
                 bd = B[2].Dot(DTW);
                 tmp = C[0][2] * x[0] + C[1][2] * x[1] - bd;
                 ad = A[2].Dot(DTW);

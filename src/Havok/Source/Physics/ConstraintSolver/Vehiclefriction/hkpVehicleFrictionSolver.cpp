@@ -38,18 +38,8 @@ void hkVehicleFrictionDescriptionInitValues(
     axle0.m_wheelSurfaceInertiaInv = 1.0 / axle0.m_wheelSurfaceInertia;
     axle1.m_wheelSurfaceInertiaInv = 1.0 / axle1.m_wheelSurfaceInertia;
 
-    // EXE-INLINED 0x62B0A0
-    const __m128 front0 = _mm_mul_ps(ci.m_directionFront.m_quad, ci.m_wheelPosition[0].m_quad);
-    const float d0 = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(front0, front0, _MM_SHUFFLE(2, 2, 2, 2)),
-        _mm_add_ss(_mm_shuffle_ps(front0, front0, _MM_SHUFFLE(1, 1, 1, 1)), front0)
-    ));
-    // EXE-INLINED 0x62B0A0
-    const __m128 front1 = _mm_mul_ps(ci.m_wheelPosition[1].m_quad, ci.m_directionFront.m_quad);
-    const float d1 = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(front1, front1, _MM_SHUFFLE(2, 2, 2, 2)),
-        _mm_add_ss(_mm_shuffle_ps(front1, front1, _MM_SHUFFLE(1, 1, 1, 1)), front1)
-    ));
+    const float d0 = ci.m_directionFront.dot3(ci.m_wheelPosition[0]);
+    const float d1 = ci.m_wheelPosition[1].dot3(ci.m_directionFront);
     const float diff = d0 - d1;
     const float distance = std::fabs(diff);
     out.m_wheelDistance = distance;
@@ -76,7 +66,8 @@ void hkVehicleFrictionDescriptionInitValues(
         );
         const __m128 right = ci.m_directionRight.m_quad;
         // EXE-INLINED 0x630DF0
-        const __m128 c = _mm_sub_ps(
+        hkVector4 c;
+        c.m_quad = _mm_sub_ps(
             _mm_mul_ps(
                 _mm_shuffle_ps(r, r, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(right, right, _MM_SHUFFLE(3, 1, 0, 2))
             ),
@@ -84,20 +75,9 @@ void hkVehicleFrictionDescriptionInitValues(
                 _mm_shuffle_ps(r, r, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(right, right, _MM_SHUFFLE(3, 0, 2, 1))
             )
         );
-        // EXE-INLINED 0xC7F750
-        const __m128 h = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(c, c, 0), inertiaInv.m_col0.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(c, c, _MM_SHUFFLE(1, 1, 1, 1)), inertiaInv.m_col1.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(c, c, _MM_SHUFFLE(2, 2, 2, 2)), inertiaInv.m_col2.m_quad)
-        );
-        // EXE-INLINED 0x62B0A0
-        const __m128 hc = _mm_mul_ps(h, c);
-        const float dot = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(hc, hc, _MM_SHUFFLE(2, 2, 2, 2)),
-            _mm_add_ss(_mm_shuffle_ps(hc, hc, _MM_SHUFFLE(1, 1, 1, 1)), hc)
-        ));
+        hkVector4 h;
+        h.setMul3(inertiaInv, c);
+        const float dot = h.dot3(c);
         massInvAtWheel[i] = out.m_chassisMassInv + dot;
     }
 

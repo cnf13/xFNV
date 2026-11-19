@@ -126,12 +126,10 @@ void hkpResponseModifier::setInvMassScalingForContact(
         hkpWorldConstraintUtil::addModifier(pInstance, constraintOwner, pAtom);
         if (body == pInstance->getEntityA()) {
             pAtom->m_factorA = factor;
-            // EXE-INLINED none: hkVector4::setAll
-            _mm_store_ps(&reinterpret_cast<float*>(&pAtom->m_factorB.m_quad)[0], _mm_set1_ps(1.0f));
+            pAtom->m_factorB.setAll(1.0f);
         }
         else {
-            // EXE-INLINED none: hkVector4::setAll
-            _mm_store_ps(&reinterpret_cast<float*>(&pAtom->m_factorA.m_quad)[0], _mm_set1_ps(1.0f));
+            pAtom->m_factorA.setAll(1.0f);
             pAtom->m_factorB = factor;
         }
     }

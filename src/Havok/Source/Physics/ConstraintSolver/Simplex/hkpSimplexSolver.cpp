@@ -180,30 +180,16 @@ void hkSimplexSolverSolve(const hkpSimplexSolverInput& input, hkpSimplexSolverOu
                 (solver.m_numSupportPlanes < 3 || solver.m_supportPlanes[2].m_index != i) &&
                 output.m_planeInteractions[i].m_status == hkpSurfaceConstraintInteraction::HK_STATUS_OK) {
                 const hkpSurfaceConstraintInfo* constraint = input.m_constraints + i;
-                const __m128 plane = _mm_load_ps(&reinterpret_cast<const float*>(&constraint->m_plane.m_quad)[0]);
-                // EXE-INLINED none: hkVector4::sub4, mul4, dot3
-                __m128 difference = _mm_sub_ps(
-                    _mm_load_ps(&reinterpret_cast<float*>(&output.m_velocity.m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&constraint->m_velocity.m_quad)[0])
-                );
-                __m128 product = _mm_mul_ps(difference, plane);
-                const float distance =
-                    -(_mm_cvtss_f32(_mm_shuffle_ps(product, product, 0xAA)) +
-                      (_mm_cvtss_f32(_mm_shuffle_ps(product, product, 0x55)) + _mm_cvtss_f32(product)));
+                hkVector4 difference = output.m_velocity;
+                difference.sub4(constraint->m_velocity);
+                const float distance = -difference.dot3(constraint->m_plane);
                 // The compare falls through for a NaN distance as well as for a positive one.
                 if (!(distance <= 0.0f)) {
-                    // EXE-INLINED none: hkVector4::setAll, mul4, add4, mul4, dot3
-                    __m128 scaled = _mm_mul_ps(
-                        _mm_set1_ps(-currentTime),
-                        _mm_load_ps(&reinterpret_cast<const float*>(&constraint->m_velocity.m_quad)[0])
-                    );
-                    __m128 offset =
-                        _mm_add_ps(scaled, _mm_load_ps(&reinterpret_cast<float*>(&output.m_position.m_quad)[0]));
-                    __m128 dot = _mm_mul_ps(offset, plane);
-                    // Adds the plane's w to the dot's z first, then the y and x pair.
-                    float timeToImpact = (_mm_cvtss_f32(_mm_shuffle_ps(dot, dot, 0xAA)) +
-                                          _mm_cvtss_f32(_mm_shuffle_ps(plane, plane, 0xFF))) +
-                        (_mm_cvtss_f32(_mm_shuffle_ps(dot, dot, 0x55)) + _mm_cvtss_f32(dot));
+                    hkVector4 offset;
+                    offset.setAll(-currentTime);
+                    offset.mul4(constraint->m_velocity);
+                    offset.add4(output.m_position);
+                    float timeToImpact = constraint->m_plane.dot4xyz1(offset);
                     // FLT_EPSILON.
                     if (timeToImpact <= 1.1920929e-07f) {
                         timeToImpact = 0.0f;
@@ -221,13 +207,10 @@ void hkSimplexSolverSolve(const hkpSimplexSolverInput& input, hkpSimplexSolverOu
         }
         if (static_cast<double>(bestTime) > 0.00009999999747378752) {
             solver.m_currentTime = static_cast<float>(static_cast<double>(currentTime) + static_cast<double>(bestTime));
-            // EXE-INLINED none: hkVector4::setAll, mul4, add4
-            __m128 scaledVelocity =
-                _mm_mul_ps(_mm_set1_ps(bestTime), _mm_load_ps(&reinterpret_cast<float*>(&output.m_velocity.m_quad)[0]));
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&output.m_position.m_quad)[0],
-                _mm_add_ps(scaledVelocity, _mm_load_ps(&reinterpret_cast<float*>(&output.m_position.m_quad)[0]))
-            );
+            hkVector4 scaledVelocity;
+            scaledVelocity.setAll(bestTime);
+            scaledVelocity.mul4(output.m_velocity);
+            output.m_position.add4(scaledVelocity);
             timeRemaining = static_cast<float>(static_cast<double>(timeRemaining) - static_cast<double>(bestTime));
             for (int32_t j = 0; j < solver.m_numSupportPlanes; ++j) {
                 hkpSurfaceConstraintInteraction* interaction = solver.m_supportPlanes[j].m_interaction;

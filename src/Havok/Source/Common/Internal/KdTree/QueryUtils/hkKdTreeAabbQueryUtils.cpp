@@ -145,8 +145,7 @@ void hkKdTreeAabbQueryUtils::_queryAabbRecursive(
     }
     const hkKdTreeProjectedEntry* pEntry = projectedEntries + (iHeader & 0x7FFFFFFF);
     for (int32_t i = 0; i < iNumPrimitives; ++i, ++pEntry) {
-        // EXE-INLINED 0xD1B280
-        const __m128 kScale = _mm_mul_ps(scale.m_quad, hkGetOneOver65K_x);
+        const __m128 kScale = _mm_mul_ps(scale.m_quad, hkGetOneOver65K_D1B280());
         const __m128 kMinWords = _mm_set_ps(
             static_cast<float>(pEntry->m_primIdHigh), static_cast<float>(pEntry->m_min[2]),
             static_cast<float>(pEntry->m_min[1]), static_cast<float>(pEntry->m_min[0])

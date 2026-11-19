@@ -204,17 +204,9 @@ void bhkMouseSpringAction::Init(const hkSerializableCinfo& arInfo) {
     );
     pAction->m_memSizeAndFlags = sizeof(hkpMouseSpringAction);
     hkVector4 kMousePositionInWorld;
-    // EXE-INLINED 0x4B4D10
-    kMousePositionInWorld.set(
-        cinfo.m_mousePositionInWorld.fX, cinfo.m_mousePositionInWorld.fY, cinfo.m_mousePositionInWorld.fZ,
-        cinfo.m_mousePositionInWorld.fW
-    );
+    cinfo.m_mousePositionInWorld.ToHK(kMousePositionInWorld);
     hkVector4 kPositionInRbLocal;
-    // EXE-INLINED 0x4B4D10
-    kPositionInRbLocal.set(
-        cinfo.m_positionInRbLocal.fX, cinfo.m_positionInRbLocal.fY, cinfo.m_positionInRbLocal.fZ,
-        cinfo.m_positionInRbLocal.fW
-    );
+    cinfo.m_positionInRbLocal.ToHK(kPositionInRbLocal);
     pAction = ::new (pAction) hkpMouseSpringAction(
         kPositionInRbLocal, kMousePositionInWorld, cinfo.m_springDamping, cinfo.m_springElasticity,
         cinfo.m_objectDamping, cinfo.m_body, nullptr
@@ -278,16 +270,8 @@ void bhkMouseSpringAction::CopyCinfo(hkMouseSpringActionCinfo& arInfo) {
         arInfo.m_maxRelativeForce = pAction->m_maxRelativeForce;
     }
     else {
-        // EXE-INLINED 0x4B4FC0
-        arInfo.m_positionInRbLocal.fX = 0.0f;
-        arInfo.m_positionInRbLocal.fY = 0.0f;
-        arInfo.m_positionInRbLocal.fZ = 0.0f;
-        arInfo.m_positionInRbLocal.fW = 0.0f;
-        // EXE-INLINED 0x4B4FC0
-        arInfo.m_mousePositionInWorld.fX = 0.0f;
-        arInfo.m_mousePositionInWorld.fY = 0.0f;
-        arInfo.m_mousePositionInWorld.fZ = 0.0f;
-        arInfo.m_mousePositionInWorld.fW = 0.0f;
+        arInfo.m_positionInRbLocal.setZero4();
+        arInfo.m_mousePositionInWorld.setZero4();
         arInfo.m_maxRelativeForce = 0.0f;
     }
 }

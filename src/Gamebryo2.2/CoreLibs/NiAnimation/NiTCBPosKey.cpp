@@ -164,17 +164,9 @@ float NiTCBPosKey::ComputeMaxCurvature(NiAnimationKey* pkKeys, uint32_t uiNumKey
             alignas(8) NiPoint3 d2;
             InterpolateD1(fTime, pTCB0, pTCB1, &d1);
             InterpolateD2(fTime, pTCB0, pTCB1, &d2);
-            // EXE-INLINED 0x4B3800
-            NiPoint3 kCross;
-            kCross.x = d1.y * d2.z - d1.z * d2.y;
-            kCross.y = d1.z * d2.x - d1.x * d2.z;
-            kCross.z = d1.x * d2.y - d1.y * d2.x;
-            // EXE-INLINED 0x457990
-            float fCrossSqrLength = kCross.x * kCross.x + kCross.y * kCross.y + kCross.z * kCross.z;
-            float fCrossLength = std::sqrt(fCrossSqrLength);
-            // EXE-INLINED 0x4A7290
-            float fSqrLength = d1.x * d1.x + d1.y * d1.y + d1.z * d1.z;
-            float fCurvature = fCrossLength / fSqrLength;
+            NiPoint3 kCross = d1.Cross(d2);
+            float fCrossLength = kCross.Length();
+            float fCurvature = fCrossLength / d1.SqrLength();
             if (fCurvature > fMaxCurvature) {
                 fMaxCurvature = fCurvature;
             }
@@ -317,14 +309,7 @@ void NiTCBPosKey::FillDerivedVals(NiAnimationKey* pkKeys, uint32_t uiNumKeys, ui
 
     if (uiNumKeys >= 2) {
         // The first key's tangents, with its mirrored neighbour 2 * P0 - P1.
-        // EXE-INLINED 0x45BB20
-        float fX2 = pkTCBPosKeys[0].m_Pos.x * 2.0f;
-        float fY2 = pkTCBPosKeys[0].m_Pos.y * 2.0f;
-        float fZ2 = 2.0f * pkTCBPosKeys[0].m_Pos.z;
-        // EXE-INLINED 0x439EF0
-        kPt.x = fX2 - pkTCBPosKeys[1].m_Pos.x;
-        kPt.y = fY2 - pkTCBPosKeys[1].m_Pos.y;
-        kPt.z = fZ2 - pkTCBPosKeys[1].m_Pos.z;
+        kPt = pkTCBPosKeys[0].m_Pos * 2.0f - pkTCBPosKeys[1].m_Pos;
         pkTCBPosKeys[0].CalculateDVals(kPt, pkTCBPosKeys[1].m_Pos, 1.0f, 1.0f);
 
         for (uint32_t i = 1; i < uiNumKeysM1; i++) {
@@ -339,14 +324,7 @@ void NiTCBPosKey::FillDerivedVals(NiAnimationKey* pkKeys, uint32_t uiNumKeys, ui
         // The last key's tangents, with its mirrored neighbour 2 * Pn-1 - Pn-2.
         NiTCBPosKey* pkLast = &pkTCBPosKeys[uiNumKeysM1];
         NiTCBPosKey* pkPrev = &pkTCBPosKeys[uiNumKeys - 2];
-        // EXE-INLINED 0x45BB20
-        fX2 = pkLast->m_Pos.x * 2.0f;
-        fY2 = pkLast->m_Pos.y * 2.0f;
-        fZ2 = 2.0f * pkLast->m_Pos.z;
-        // EXE-INLINED 0x439EF0
-        kPt.x = fX2 - pkPrev->m_Pos.x;
-        kPt.y = fY2 - pkPrev->m_Pos.y;
-        kPt.z = fZ2 - pkPrev->m_Pos.z;
+        kPt = pkLast->m_Pos * 2.0f - pkPrev->m_Pos;
         pkLast->CalculateDVals(pkPrev->m_Pos, kPt, 1.0f, 1.0f);
     }
 
@@ -358,19 +336,16 @@ void NiTCBPosKey::FillDerivedVals(NiAnimationKey* pkKeys, uint32_t uiNumKeys, ui
         float fDD2X = pTCB0->m_DD.x * 2.0f;
         float fDD2Y = pTCB0->m_DD.y * 2.0f;
         float fDD2Z = pTCB0->m_DD.z * 2.0f;
-        // EXE-INLINED 0x439E90
-        float fSumX = fDD2X + pTCB1->m_DS.x;
-        float fSumY = fDD2Y + pTCB1->m_DS.y;
-        float fSumZ = fDD2Z + pTCB1->m_DS.z;
+        NiPoint3 kSum = NiPoint3(fDD2X, fDD2Y, fDD2Z) + pTCB1->m_DS;
         float fDiffX = pTCB1->m_Pos.x - pTCB0->m_Pos.x;
         float fDiffY = pTCB1->m_Pos.y - pTCB0->m_Pos.y;
         float fDiffZ = pTCB1->m_Pos.z - pTCB0->m_Pos.z;
         float fDiff3X = fDiffX * 3.0f;
         float fDiff3Y = fDiffY * 3.0f;
         float fDiff3Z = fDiffZ * 3.0f;
-        pTCB0->m_A.x = fDiff3X - fSumX;
-        pTCB0->m_A.y = fDiff3Y - fSumY;
-        pTCB0->m_A.z = fDiff3Z - fSumZ;
+        pTCB0->m_A.x = fDiff3X - kSum.x;
+        pTCB0->m_A.y = fDiff3Y - kSum.y;
+        pTCB0->m_A.z = fDiff3Z - kSum.z;
 
         // m_B = (DD0 + DS1) - 2 * (P1 - P0); the difference is computed again.
         fDiffX = pTCB1->m_Pos.x - pTCB0->m_Pos.x;
@@ -379,9 +354,9 @@ void NiTCBPosKey::FillDerivedVals(NiAnimationKey* pkKeys, uint32_t uiNumKeys, ui
         float fDiff2X = fDiffX * 2.0f;
         float fDiff2Y = fDiffY * 2.0f;
         float fDiff2Z = fDiffZ * 2.0f;
-        fSumX = pTCB0->m_DD.x + pTCB1->m_DS.x;
-        fSumY = pTCB1->m_DS.y + pTCB0->m_DD.y;
-        fSumZ = pTCB1->m_DS.z + pTCB0->m_DD.z;
+        float fSumX = pTCB0->m_DD.x + pTCB1->m_DS.x;
+        float fSumY = pTCB1->m_DS.y + pTCB0->m_DD.y;
+        float fSumZ = pTCB1->m_DS.z + pTCB0->m_DD.z;
         kPt.x = fSumX - fDiff2X;
         pTCB0->m_B.x = kPt.x;
         kPt.y = fSumY - fDiff2Y;

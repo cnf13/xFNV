@@ -152,23 +152,7 @@ void hkpCompressedSampledHeightFieldShape::collideSpheres(
         (*output)(0) = -dx;
         (*output)(2) = -dz;
         output->mul4(m_floatToIntScale);
-        // EXE-INLINED 0x62AEA0 (hkVector4::normalize3; src's inline builds its result through the out-of-line
-        // hkSimdReal::Construct, which the exe does not call here). The exe's addss/mulss/subss are written as the
-        // _ps operations (only lane 0 is read): _mm_add_ss and its kin are scalar C, which this x87 body would compute
-        // on x87.
-        const hkQuadReal squares = _mm_mul_ps(output->m_quad, output->m_quad);
-        const hkQuadReal len2 = _mm_add_ps(
-            _mm_shuffle_ps(squares, squares, _MM_SHUFFLE(2, 2, 2, 2)),
-            _mm_add_ps(_mm_shuffle_ps(squares, squares, _MM_SHUFFLE(1, 1, 1, 1)), squares)
-        );
-        const hkQuadReal approx = _mm_rsqrt_ss(len2);
-        const hkQuadReal len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-        const hkQuadReal refined = _mm_mul_ps(
-            _mm_mul_ps(_mm_set_ss(0.5f), approx),
-            _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(len2, approx), approx))
-        );
-        const hkQuadReal lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-        output->m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, _MM_SHUFFLE(0, 0, 0, 0)), output->m_quad);
+        output->normalize3();
         float absoluteDepth;
         if (!m_useProjectionBasedHeight.m_bool) {
             absoluteDepth = (pos(1) - height) * m_intToFloatScale(1) - spheres->m_pos(3);
@@ -179,12 +163,7 @@ void hkpCompressedSampledHeightFieldShape::collideSpheres(
             hkVector4 vectorToTri;
             vectorToTri.setSub4(pos, triangleVert);
             vectorToTri.mul4(m_intToFloatScale);
-            // EXE-INLINED 0x62B0A0 (hkVector4::dot3; src's inline calls the out-of-line hkSimdReal::Construct)
-            const hkQuadReal products = _mm_mul_ps(vectorToTri.m_quad, output->m_quad);
-            const float distanceToTri = _mm_cvtss_f32(_mm_add_ps(
-                _mm_shuffle_ps(products, products, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_add_ps(_mm_shuffle_ps(products, products, _MM_SHUFFLE(1, 1, 1, 1)), products)
-            ));
+            const float distanceToTri = vectorToTri.dot3(*output);
             absoluteDepth = distanceToTri - spheres->m_pos(3);
         }
         (*output)(3) = absoluteDepth;

@@ -25,19 +25,7 @@ void NiLinPosKey::Interpolate(float fTime, const NiAnimationKey* pKey0, const Ni
     const NiPosKey* pPosKey1 = static_cast<const NiPosKey*>(pKey1);
     // 1 - fTime, each scaled point and each sum are stored as floats, as the game does.
     float fOneMinusTime = 1.0f - fTime;
-    // EXE-INLINED 0x4A3760
-    float fX0 = pPosKey0->m_Pos.x * fOneMinusTime;
-    float fY0 = pPosKey0->m_Pos.y * fOneMinusTime;
-    float fZ0 = fOneMinusTime * pPosKey0->m_Pos.z;
-    // EXE-INLINED 0x4A3760
-    float fX1 = pPosKey1->m_Pos.x * fTime;
-    float fY1 = pPosKey1->m_Pos.y * fTime;
-    float fZ1 = fTime * pPosKey1->m_Pos.z;
-    // EXE-INLINED 0x439E90
-    NiPoint3* pkResult = static_cast<NiPoint3*>(pResult);
-    pkResult->x = fX1 + fX0;
-    pkResult->y = fY0 + fY1;
-    pkResult->z = fZ1 + fZ0;
+    *static_cast<NiPoint3*>(pResult) = fOneMinusTime * pPosKey0->m_Pos + fTime * pPosKey1->m_Pos;
 }
 
 NiAnimationKey* NiLinPosKey::CreateFromStream(NiStream& stream, uint32_t uiNumKeys) {

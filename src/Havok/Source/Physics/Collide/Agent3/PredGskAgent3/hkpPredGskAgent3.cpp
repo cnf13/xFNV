@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
@@ -67,19 +68,16 @@ hkpAgentData* hkPredGskAgent3::process(
     if (qualityInfo.m_useContinuousPhysics.m_storage) {
         const float depthA = input.m_bodyA->getRootCollidable()->m_allowedPenetrationDepth;
         const float depthB = input.m_bodyB->getRootCollidable()->m_allowedPenetrationDepth;
-        // EXE-INLINED 0xC9E0F0
-        const float allowedPenetrationDepth = (depthA < depthB) ? depthA : depthB;
+        const float allowedPenetrationDepth = hkMath::min2(depthA, depthB);
         const float distAtT0 = (*separatingNormal)(3);
         const float minSeparationA = qualityInfo.m_minSeparation * allowedPenetrationDepth;
         const float minSeparationB = distAtT0 + qualityInfo.m_minExtraSeparation * allowedPenetrationDepth;
-        // EXE-INLINED 0xC9E0F0
-        const float minSeparation = (minSeparationA < minSeparationB) ? minSeparationA : minSeparationB;
+        const float minSeparation = hkMath::min2(minSeparationA, minSeparationB);
         // The TOI is searched unless distAtT1 reaches minSeparation (a NaN searches it).
         if (!(minSeparation <= distAtT1)) {
             const float toiSeparationA = qualityInfo.m_toiSeparation * allowedPenetrationDepth;
             const float toiSeparationB = distAtT0 + qualityInfo.m_toiExtraSeparation * allowedPenetrationDepth;
-            // EXE-INLINED 0xC9E0F0
-            const float toiSeparation = (toiSeparationA < toiSeparationB) ? toiSeparationA : toiSeparationB;
+            const float toiSeparation = hkMath::min2(toiSeparationA, toiSeparationB);
             hk4dGskCollideCalcToi(
                 input, allowedPenetrationDepth, minSeparation, toiSeparation, gskCache, *separatingNormal, result
             );
@@ -280,16 +278,7 @@ void hkPredGskAgent3::sepNormal(
         gsk.exitAndExportCacheImpl(cache);
     }
     float distance = separatingNormal.m_quad[3];
-    // EXE-INLINED 0xC7F700
-    const hkRotation& rotation = input.m_bodyA->m_motion.pMotion->m_rotation;
-    hkQuadReal n = separatingNormal.m_quad;
-    separatingNormalOut.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), rotation.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), rotation.m_col2.m_quad)
-    );
+    separatingNormalOut.setRotatedDir(input.m_bodyA->m_motion.pMotion->m_rotation, separatingNormal);
     separatingNormalOut.m_quad[3] = distance - (shapeB->m_radius + shapeA->m_radius);
 }
 

@@ -192,14 +192,7 @@ void hkpConvexListAgent::processCollision(
         // The separating plane moves by the bodies' motion over the step: while the hull stays apart past the
         // tolerance, the manifold's points go and nothing is collided.
         if (m_separatingNormal.m_quad[3] > input.m_tolerance) {
-            // EXE-INLINED none: hkVector4::dot4xyz1
-            __m128 x2 = _mm_mul_ps(m_separatingNormal.m_quad, timInfo.m_quad);
-            __m128 xySum = _mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(1, 1, 1, 1)), x2);
-            __m128 zwSum = _mm_add_ss(
-                _mm_shuffle_ps(x2, x2, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_shuffle_ps(timInfo.m_quad, timInfo.m_quad, _MM_SHUFFLE(3, 3, 3, 3))
-            );
-            float fDistChange = _mm_cvtss_f32(_mm_add_ss(zwSum, xySum));
+            float fDistChange = timInfo.dot4xyz1(m_separatingNormal);
             m_separatingNormal.m_quad[3] -= fDistChange;
             if (m_separatingNormal.m_quad[3] > input.m_tolerance) {
                 if (m_manifold.m_numContactPoints) {
@@ -238,13 +231,7 @@ void hkpConvexListAgent::processCollision(
 
     {
         StreamData& stream = getStream();
-        // EXE-INLINED none: hkVector4::length3
-        __m128 len2 = _mm_mul_ps(timInfo.m_quad, timInfo.m_quad);
-        __m128 lenSum = _mm_add_ss(
-            _mm_shuffle_ps(len2, len2, _MM_SHUFFLE(2, 2, 2, 2)),
-            _mm_add_ss(_mm_shuffle_ps(len2, len2, _MM_SHUFFLE(1, 1, 1, 1)), len2)
-        );
-        stream.m_inStreamModeTimDist -= _mm_cvtss_f32(_mm_sqrt_ss(lenSum));
+        stream.m_inStreamModeTimDist -= timInfo.length3();
 
         hkpAgent3ProcessInput in3;
         in3.m_overrideBodyA = nullptr;

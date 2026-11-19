@@ -268,14 +268,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
             mem->m_memSizeAndFlags = sizeof(hkDisplayConvex);
             hkDisplayConvex* convex =
                 ::new (mem) hkDisplayConvex(noDeleteGeometry ? noDeleteGeometry : overrideGeometry);
-            // EXE-INLINED 0x577070
-            convex->m_transform.m_rotation.m_col0.m_quad = _mm_setzero_ps();
-            convex->m_transform.m_rotation.m_col1.m_quad = _mm_setzero_ps();
-            convex->m_transform.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-            convex->m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-            convex->m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-            convex->m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
-            convex->m_transform.m_translation.m_quad = _mm_setzero_ps();
+            convex->m_transform.setIdentity();
             // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::pushBackUnchecked
             displayGeometries.m_data[displayGeometries.m_size] = convex;
             ++displayGeometries.m_size;

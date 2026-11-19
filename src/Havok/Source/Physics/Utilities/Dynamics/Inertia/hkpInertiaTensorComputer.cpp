@@ -182,18 +182,10 @@ void computeRecursiveShapeVolumeMassProperties(
             const __m128 kVertexB = _mm_load_ps(&reinterpret_cast<const float*>(&cylinder->m_vertexB.m_quad)[0]);
             const __m128 kVertexA = _mm_load_ps(&reinterpret_cast<const float*>(&cylinder->m_vertexA.m_quad)[0]);
             const float fRadius = cylinder->m_radius;
-            // EXE-INLINED none: hkVector4::normalize3 (rsqrtss, one Newton step, zero for a zero-length axis)
-            const __m128 kAxis = _mm_sub_ps(kVertexB, kVertexA);
-            const __m128 kSquares = _mm_mul_ps(kAxis, kAxis);
-            const __m128 kLength2 = _mm_add_ss(
-                _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-            );
-            const __m128 kEstimate = _mm_rsqrt_ss(kLength2);
-            const __m128 kIsZero = _mm_cmpeq_ss(kLength2, _mm_set_ss(0.0f));
-            const __m128 kRefine = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLength2, kEstimate), kEstimate));
-            const __m128 kInvLength =
-                _mm_andnot_ps(kIsZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kEstimate), kRefine));
-            const __m128 kDirection = _mm_mul_ps(_mm_shuffle_ps(kInvLength, kInvLength, 0), kAxis);
+            hkVector4 direction;
+            direction.m_quad = _mm_sub_ps(kVertexB, kVertexA);
+            direction.normalize3();
+            const __m128 kDirection = direction.m_quad;
             const __m128 kRadius = _mm_set1_ps(fRadius);
             alignas(16) hkVector4 startAxis;
             _mm_store_ps(
@@ -397,14 +389,7 @@ void computeRecursiveShapeVolumeMassProperties(
         hkpMassElement* pAccumulated = elements.m_data + elements.m_size;
         elements.m_size++;
         pAccumulated->m_properties = massPropertiesOut;
-        // EXE-INLINED none: hkTransform::setIdentity
-        _mm_store_ps(&reinterpret_cast<float*>(&pAccumulated->m_transform.m_rotation.m_col0.m_quad)[0], kZero);
-        _mm_store_ps(&reinterpret_cast<float*>(&pAccumulated->m_transform.m_rotation.m_col1.m_quad)[0], kZero);
-        _mm_store_ps(&reinterpret_cast<float*>(&pAccumulated->m_transform.m_rotation.m_col2.m_quad)[0], kZero);
-        pAccumulated->m_transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-        pAccumulated->m_transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-        pAccumulated->m_transform.m_rotation.m_col2.m_quad[2] = 1.0f;
-        _mm_store_ps(&reinterpret_cast<float*>(&pAccumulated->m_transform.m_translation.m_quad)[0], kZero);
+        pAccumulated->m_transform.setIdentity();
 
         // EXE-INLINED none: hkArray<hkpMassElement>::expandOne
         hkMemoryRouter& router2 = hkMemoryRouter::getInstance();
@@ -673,21 +658,19 @@ void InternalInertiaTensorComputer::compProjectionIntegrals(const hkVector4* v) 
 // Computes Mirtich's face integrals Fa..Fcca from the projection integrals P1..Pbbb.
 void InternalInertiaTensorComputer::compFaceIntegrals(const hkVector4* v, const hkVector4& n) {
     compProjectionIntegrals(v);
-    // EXE-INLINED none: hkVector4::operator()(int) const
-    const float* pNormal = &reinterpret_cast<const float*>(&n.m_quad)[0];
-    const float w = -pNormal[0] * v[0].m_quad[0] - v[0].m_quad[1] * pNormal[1] - v[0].m_quad[2] * pNormal[2];
-    const float k1 = 1.0f / pNormal[C];
+    const float w = -n(0) * v[0].m_quad[0] - v[0].m_quad[1] * n(1) - v[0].m_quad[2] * n(2);
+    const float k1 = 1.0f / n(C);
     const float k2 = k1 * k1;
     const float k3 = k2 * k1;
     Fa = Pa * k1;
     Fb = Pb * k1;
     const double dP1w = P1 * w;
     const float fNegK2 = -k2;
-    Fc = (pNormal[B] * Pb + pNormal[A] * Pa + dP1w) * fNegK2;
+    Fc = (n(B) * Pb + n(A) * Pa + dP1w) * fNegK2;
     Faa = Paa * k1;
     Fbb = Pbb * k1;
-    const float nA = pNormal[A];
-    const float nB = pNormal[B];
+    const float nA = n(A);
+    const float nB = n(B);
     const float fSqA = nA * nA;
     const float fSqB = nB * nB;
     Fcc = (nA * 2.0 * nB * Pab + fSqA * Paa + fSqB * Pbb + ((nB * Pb + nA * Pa) * 2.0 + dP1w) * w) * k3;
@@ -1032,11 +1015,8 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
         _mm_mul_ps(_mm_shuffle_ps(e0, e0, 0xD2), _mm_shuffle_ps(e1, e1, 0xC9)),
         _mm_mul_ps(_mm_shuffle_ps(e0, e0, 0xC9), _mm_shuffle_ps(e1, e1, 0xD2))
     );
-    // EXE-INLINED 0x630B40
-    __m128 nSq = _mm_mul_ps(normal.m_quad, normal.m_quad);
-    __m128 len2 = _mm_add_ss(_mm_shuffle_ps(nSq, nSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(nSq, nSq, 0x55), nSq));
     // Twice the triangle's area.
-    float doubleArea = _mm_cvtss_f32(_mm_sqrt_ss(len2));
+    float doubleArea = normal.length3();
     if (surfaceThickness < 1e-05f) {
         // A thin surface: the inertia of the triangle about the origin, then moved to its centre.
         com.m_quad = _mm_mul_ps(
@@ -1085,16 +1065,7 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
     }
     else {
         // A prism of the given thickness around the triangle, as a volume.
-        // EXE-INLINED 0x62AEA0
-        const __m128 half = _mm_set_ss(0.5f);
-        const __m128 three = _mm_set_ss(3.0f);
-        const __m128 zero = _mm_set_ss(0.0f);
-        const __m128 len2EqualsZero = _mm_cmpeq_ss(len2, zero);
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 refined =
-            _mm_mul_ss(_mm_mul_ss(half, approx), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(len2, approx), approx)));
-        const __m128 lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-        normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), normal.m_quad);
+        normal.normalize3();
 
         using VertexArray = hkInplaceArray<hkVector4, 6, hkContainerHeapAllocator>;
         VertexArray vertices;
@@ -1104,13 +1075,8 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
         // Each vertex once on either side of the triangle's plane.
         vertices.m_data[0] = v0;
         vertices.m_data[1] = v0;
-        // EXE-INLINED none: hkVector4::addMul4(const hkSimdReal&, const hkVector4&)
-        vertices.m_data[0].m_quad = _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(h), _mm_set_ss(h), 0), normal.m_quad), vertices.m_data[0].m_quad
-        );
-        vertices.m_data[1].m_quad = _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(nh), _mm_set_ss(nh), 0), normal.m_quad), vertices.m_data[1].m_quad
-        );
+        vertices.m_data[0].addMul4(h, normal);
+        vertices.m_data[1].addMul4(nh, normal);
         vertices.m_data[2] = v1;
         vertices.m_data[3] = v1;
         vertices.m_data[2].m_quad = _mm_add_ps(
@@ -1222,57 +1188,24 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
 
     alignas(16) hkVector4 axis;
     axis.setSub4(endAxis, startAxis);
-    // EXE-INLINED 0x630B40
-    const __m128 kSquares = _mm_mul_ps(axis.m_quad, axis.m_quad);
-    const float height = _mm_cvtss_f32(_mm_sqrt_ss(_mm_add_ss(
-        _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-    )));
+    const float height = axis.length3();
 
     alignas(16) hkRotation capsuleToLocal;
     bool bIdentity = true;
     if (height > 0.0f) {
-        // EXE-INLINED 0x62AEA0
-        const __m128 kLength2 = _mm_add_ss(
-            _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-        );
-        const __m128 kEstimate = _mm_rsqrt_ss(kLength2);
-        const __m128 kIsZero = _mm_cmpeq_ss(kLength2, _mm_set_ss(0.0f));
-        const __m128 kRefine = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLength2, kEstimate), kEstimate));
-        const __m128 kInvLength = _mm_andnot_ps(kIsZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kEstimate), kRefine));
-        axis.m_quad = _mm_mul_ps(_mm_shuffle_ps(kInvLength, kInvLength, 0), axis.m_quad);
+        axis.normalize3();
 
         alignas(16) hkVector4 canonicalZ;
         canonicalZ.set(0.0f, 0.0f, 1.0f, 0.0f);
-        // EXE-INLINED 0x62B0A0
-        const __m128 kProducts = _mm_mul_ps(canonicalZ.m_quad, axis.m_quad);
-        const float fDot = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(kProducts, kProducts, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(kProducts, kProducts, 0x55), kProducts)
-        ));
+        const float fDot = canonicalZ.dot3(axis);
         // EXE-INLINED none: hkMath::fabs (the fabs instruction on the float; compared with a double constant)
         if (__builtin_fabsf(fDot) < 0.9999899864196777) {
             bIdentity = false;
             alignas(16) hkVector4 rotAxis;
             rotAxis.setCross(canonicalZ, axis);
-            // EXE-INLINED 0x62AEA0
-            const __m128 kAxisSquares = _mm_mul_ps(rotAxis.m_quad, rotAxis.m_quad);
-            const __m128 kAxisLength2 = _mm_add_ss(
-                _mm_shuffle_ps(kAxisSquares, kAxisSquares, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(kAxisSquares, kAxisSquares, 0x55), kAxisSquares)
-            );
-            const __m128 kAxisEstimate = _mm_rsqrt_ss(kAxisLength2);
-            const __m128 kAxisIsZero = _mm_cmpeq_ss(kAxisLength2, _mm_set_ss(0.0f));
-            const __m128 kAxisRefine =
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kAxisLength2, kAxisEstimate), kAxisEstimate));
-            const __m128 kAxisInvLength =
-                _mm_andnot_ps(kAxisIsZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kAxisEstimate), kAxisRefine));
-            rotAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(kAxisInvLength, kAxisInvLength, 0), rotAxis.m_quad);
+            rotAxis.normalize3();
 
-            // EXE-INLINED 0x62B0A0
-            const float fCosAngle = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(kProducts, kProducts, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(kProducts, kProducts, 0x55), kProducts)
-            ));
+            const float fCosAngle = canonicalZ.dot3(axis);
             const float fAngle = hkMath::acos(fCosAngle);
             alignas(16) hkQuaternion q;
             q.setAxisAngle(rotAxis, fAngle);
@@ -1280,13 +1213,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
         }
     }
     if (bIdentity) {
-        // EXE-INLINED none: hkMatrix3::setIdentity
-        capsuleToLocal.m_col0.m_quad = _mm_setzero_ps();
-        capsuleToLocal.m_col0.m_quad[0] = 1.0f;
-        capsuleToLocal.m_col1.m_quad = _mm_setzero_ps();
-        capsuleToLocal.m_col1.m_quad[1] = 1.0f;
-        capsuleToLocal.m_col2.m_quad = _mm_setzero_ps();
-        capsuleToLocal.m_col2.m_quad[2] = 1.0f;
+        capsuleToLocal.setIdentity();
     }
 
     alignas(16) hkVector4 centre;
@@ -1446,69 +1373,31 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
 
     alignas(16) hkVector4 axis;
     axis.setSub4(endAxis, startAxis);
-    // EXE-INLINED 0x630B40
-    const __m128 kSquares = _mm_mul_ps(axis.m_quad, axis.m_quad);
-    const float height = _mm_cvtss_f32(_mm_sqrt_ss(_mm_add_ss(
-        _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-    )));
+    const float height = axis.length3();
     // A NaN height fails too.
     if (!(height > 0.0f)) {
         return HK_FAILURE;
     }
 
-    // EXE-INLINED 0x62AEA0
-    const __m128 kLength2 = _mm_add_ss(
-        _mm_shuffle_ps(kSquares, kSquares, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquares, kSquares, 0x55), kSquares)
-    );
-    const __m128 kEstimate = _mm_rsqrt_ss(kLength2);
-    const __m128 kIsZero = _mm_cmpeq_ss(kLength2, _mm_set_ss(0.0f));
-    const __m128 kRefine = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLength2, kEstimate), kEstimate));
-    const __m128 kInvLength = _mm_andnot_ps(kIsZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kEstimate), kRefine));
-    axis.m_quad = _mm_mul_ps(_mm_shuffle_ps(kInvLength, kInvLength, 0), axis.m_quad);
+    axis.normalize3();
 
     const hkVector4& canonicalZ = hkTransformIdentity.m_rotation.m_col2;
-    // EXE-INLINED 0x62B0A0
-    const __m128 kProducts = _mm_mul_ps(canonicalZ.m_quad, axis.m_quad);
-    const float fDot = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(kProducts, kProducts, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProducts, kProducts, 0x55), kProducts)
-    ));
+    const float fDot = canonicalZ.dot3(axis);
     alignas(16) hkRotation cylinderToLocal;
     // EXE-INLINED none: hkMath::fabs (the fabs instruction on the float; compared with a double constant)
     if (__builtin_fabsf(fDot) < 0.9999899864196777) {
         alignas(16) hkVector4 rotAxis;
         rotAxis.setCross(canonicalZ, axis);
-        // EXE-INLINED 0x62AEA0
-        const __m128 kAxisSquares = _mm_mul_ps(rotAxis.m_quad, rotAxis.m_quad);
-        const __m128 kAxisLength2 = _mm_add_ss(
-            _mm_shuffle_ps(kAxisSquares, kAxisSquares, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(kAxisSquares, kAxisSquares, 0x55), kAxisSquares)
-        );
-        const __m128 kAxisEstimate = _mm_rsqrt_ss(kAxisLength2);
-        const __m128 kAxisIsZero = _mm_cmpeq_ss(kAxisLength2, _mm_set_ss(0.0f));
-        const __m128 kAxisRefine =
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kAxisLength2, kAxisEstimate), kAxisEstimate));
-        const __m128 kAxisInvLength =
-            _mm_andnot_ps(kAxisIsZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kAxisEstimate), kAxisRefine));
-        rotAxis.m_quad = _mm_mul_ps(_mm_shuffle_ps(kAxisInvLength, kAxisInvLength, 0), rotAxis.m_quad);
+        rotAxis.normalize3();
 
-        // EXE-INLINED 0x62B0A0
-        const float fCosAngle = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(kProducts, kProducts, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(kProducts, kProducts, 0x55), kProducts)
-        ));
+        const float fCosAngle = canonicalZ.dot3(axis);
         const float fAngle = hkMath::acos(fCosAngle);
         alignas(16) hkQuaternion q;
         q.setAxisAngle(rotAxis, fAngle);
         cylinderToLocal.set(q);
     }
     else {
-        // EXE-INLINED none: hkMatrix3::setIdentity
-        cylinderToLocal.m_col0.m_quad = _mm_setzero_ps();
-        cylinderToLocal.m_col0.m_quad[0] = 1.0f;
-        cylinderToLocal.m_col1.m_quad = _mm_setzero_ps();
-        cylinderToLocal.m_col1.m_quad[1] = 1.0f;
-        cylinderToLocal.m_col2.m_quad = _mm_setzero_ps();
-        cylinderToLocal.m_col2.m_quad[2] = 1.0f;
+        cylinderToLocal.setIdentity();
     }
 
     alignas(16) hkVector4 centre;
@@ -1565,13 +1454,7 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
     rElement.m_transform.m_rotation.m_col2 = cylinderToLocal.m_col2;
     rElement.m_transform.m_translation = centre;
     rElement.m_properties.m_centerOfMass.set(0.0f, 0.0f, 0.0f, 0.0f);
-    // EXE-INLINED none: hkMatrix3::setIdentity
-    rElement.m_properties.m_inertiaTensor.m_col0.m_quad = _mm_setzero_ps();
-    rElement.m_properties.m_inertiaTensor.m_col1.m_quad = _mm_setzero_ps();
-    rElement.m_properties.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
-    rElement.m_properties.m_inertiaTensor.m_col0.m_quad[0] = 1.0f;
-    rElement.m_properties.m_inertiaTensor.m_col1.m_quad[1] = 1.0f;
-    rElement.m_properties.m_inertiaTensor.m_col2.m_quad[2] = 1.0f;
+    rElement.m_properties.m_inertiaTensor.setIdentity();
     const float fRadialInertia = height * (height * 0.5) * 0.5 / 3.0 + radius * radius * 0.25;
     rElement.m_properties.m_inertiaTensor.m_col0.m_quad[0] = fRadialInertia;
     rElement.m_properties.m_inertiaTensor.m_col1.m_quad[1] = fRadialInertia;
@@ -1641,24 +1524,8 @@ void hkpInertiaTensorComputer::computeGeometryVolumeMassProperties(
     aabbInertia.m_inertiaTensor.m_col2.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
     computeBoxVolumeMassProperties(aabbExtents, mass, aabbInertia);
     aabbInertia.m_centerOfMass.m_quad = aabbCenter.m_quad;
-    // EXE-INLINED none: hkVector4::setNeg4 (xorps with the sign mask)
     alignas(16) hkVector4 shift;
-    shift.m_quad[0] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[0]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[0])
-    );
-    shift.m_quad[1] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[1]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[1])
-    );
-    shift.m_quad[2] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[2]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[2])
-    );
-    shift.m_quad[3] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[3]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[3])
-    );
+    shift.setNeg4(aabbCenter);
     InternalInertiaTensorComputer computer;
     computer.compVolumeIntegrals(geom, shift);
     // The mesh's own properties are used only when its volume is greater than zero or NaN.
@@ -1676,11 +1543,7 @@ void hkpInertiaTensorComputer::computeGeometryVolumeMassProperties(
     result.m_mass = mass;
     const float fDensity = mass / fVolume;
     computer.computeInertialTensorInternal(mass, fDensity, result.m_centerOfMass, result.m_inertiaTensor);
-    // EXE-INLINED none: hkVector4::add4
-    result.m_centerOfMass.m_quad[0] = result.m_centerOfMass.m_quad[0] + aabbCenter.m_quad[0];
-    result.m_centerOfMass.m_quad[1] = result.m_centerOfMass.m_quad[1] + aabbCenter.m_quad[1];
-    result.m_centerOfMass.m_quad[2] = result.m_centerOfMass.m_quad[2] + aabbCenter.m_quad[2];
-    result.m_centerOfMass.m_quad[3] = result.m_centerOfMass.m_quad[3] + aabbCenter.m_quad[3];
+    result.m_centerOfMass.add4(aabbCenter);
     // Each principal moment is kept at a tenth of the AABB's at least; a raised one takes the AABB's centre on that
     // axis and drops the negative products of inertia on its row and column. The limit is 0.1f.
     hkVector4* pResultColumns = &result.m_inertiaTensor.m_col0;
@@ -1734,24 +1597,8 @@ hkResult hkpInertiaTensorComputer::computeGeometryVolumeMassPropertiesChecked(
     aabbInertia.m_inertiaTensor.m_col2.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
     computeBoxVolumeMassProperties(aabbExtents, mass, aabbInertia);
     aabbInertia.m_centerOfMass.m_quad = aabbCenter.m_quad;
-    // EXE-INLINED none: hkVector4::setNeg4 (xorps with the sign mask)
     alignas(16) hkVector4 shift;
-    shift.m_quad[0] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[0]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[0])
-    );
-    shift.m_quad[1] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[1]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[1])
-    );
-    shift.m_quad[2] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[2]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[2])
-    );
-    shift.m_quad[3] = __builtin_bit_cast(
-        float,
-        __builtin_bit_cast(uint32_t, aabbCenter.m_quad[3]) ^ __builtin_bit_cast(uint32_t, hkQuadRealNegateMask[3])
-    );
+    shift.setNeg4(aabbCenter);
     InternalInertiaTensorComputer computer;
     computer.compVolumeIntegrals(geom, shift);
     // Fails unless the mesh's volume is greater than zero or NaN.
@@ -1763,11 +1610,7 @@ hkResult hkpInertiaTensorComputer::computeGeometryVolumeMassPropertiesChecked(
     result.m_mass = mass;
     const float fDensity = mass / fVolume;
     computer.computeInertialTensorInternal(mass, fDensity, result.m_centerOfMass, result.m_inertiaTensor);
-    // EXE-INLINED none: hkVector4::add4
-    result.m_centerOfMass.m_quad[0] = result.m_centerOfMass.m_quad[0] + aabbCenter.m_quad[0];
-    result.m_centerOfMass.m_quad[1] = result.m_centerOfMass.m_quad[1] + aabbCenter.m_quad[1];
-    result.m_centerOfMass.m_quad[2] = result.m_centerOfMass.m_quad[2] + aabbCenter.m_quad[2];
-    result.m_centerOfMass.m_quad[3] = result.m_centerOfMass.m_quad[3] + aabbCenter.m_quad[3];
+    result.m_centerOfMass.add4(aabbCenter);
     // The same clamp as computeGeometryVolumeMassProperties.
     hkVector4* pResultColumns = &result.m_inertiaTensor.m_col0;
     const hkVector4* pAabbColumns = &aabbInertia.m_inertiaTensor.m_col0;
@@ -1796,14 +1639,11 @@ hkResult hkpInertiaTensorComputer::computeGeometryVolumeMassPropertiesChecked(
 
 hkResult
 hkpInertiaTensorComputer::combineMassProperties(const hkArray<hkpMassElement>& elements, hkpMassProperties& result) {
-    alignas(16) hkVector4 lZero;
     alignas(16) hkVector4 lCenterOfMass;
     alignas(16) hkVector4 lTransformedCom;
     float fTotalMass = 0.0f;
     float fTotalVolume = 0.0f;
-    // EXE-INLINED none: hkVector4::setZero4
-    lZero.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
-    lCenterOfMass.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
+    lCenterOfMass.setZero4();
     if (elements.m_size <= 0) {
         return HK_FAILURE;
     }
@@ -1814,11 +1654,7 @@ hkpInertiaTensorComputer::combineMassProperties(const hkArray<hkpMassElement>& e
         const float fMass = rReloaded.m_properties.m_mass;
         fTotalMass = fTotalMass + fMass;
         fTotalVolume = rReloaded.m_properties.m_volume + fTotalVolume;
-        // EXE-INLINED none: hkVector4::addMul4
-        lCenterOfMass.m_quad[0] = fMass * lTransformedCom.m_quad[0] + lCenterOfMass.m_quad[0];
-        lCenterOfMass.m_quad[1] = fMass * lTransformedCom.m_quad[1] + lCenterOfMass.m_quad[1];
-        lCenterOfMass.m_quad[2] = fMass * lTransformedCom.m_quad[2] + lCenterOfMass.m_quad[2];
-        lCenterOfMass.m_quad[3] = fMass * lTransformedCom.m_quad[3] + lCenterOfMass.m_quad[3];
+        lCenterOfMass.addMul4(fMass, lTransformedCom);
     }
     // Continues only when the total mass is greater than zero (not when NaN).
     if (!(fTotalMass > 0.0f)) {
@@ -1826,17 +1662,10 @@ hkpInertiaTensorComputer::combineMassProperties(const hkArray<hkpMassElement>& e
     }
     const float fInvMass = 1.0f / fTotalMass;
     result.m_mass = fTotalMass;
-    // EXE-INLINED none: hkVector4::setMul4
-    lCenterOfMass.m_quad[0] = fInvMass * lCenterOfMass.m_quad[0];
-    lCenterOfMass.m_quad[1] = fInvMass * lCenterOfMass.m_quad[1];
-    lCenterOfMass.m_quad[2] = fInvMass * lCenterOfMass.m_quad[2];
-    lCenterOfMass.m_quad[3] = fInvMass * lCenterOfMass.m_quad[3];
+    lCenterOfMass.setMul4(fInvMass, lCenterOfMass);
     result.m_centerOfMass.m_quad = lCenterOfMass.m_quad;
     result.m_volume = fTotalVolume;
-    // EXE-INLINED none: hkMatrix3::setZero
-    result.m_inertiaTensor.m_col0.m_quad = lZero.m_quad;
-    result.m_inertiaTensor.m_col1.m_quad = lZero.m_quad;
-    result.m_inertiaTensor.m_col2.m_quad = lZero.m_quad;
+    result.m_inertiaTensor.setZero();
     for (int32_t i = 0; i < elements.m_size; ++i) {
         const hkpMassElement& rElement = elements.m_data[i];
         alignas(16) hkMatrix3 lInertia;
@@ -1846,11 +1675,7 @@ hkpInertiaTensorComputer::combineMassProperties(const hkArray<hkpMassElement>& e
         lInertia.changeBasis(rElement.m_transform.getRotation());
         const hkpMassElement& rReloaded = elements.m_data[i];
         lTransformedCom.setTransformedPos(rReloaded.m_transform, rReloaded.m_properties.m_centerOfMass);
-        // EXE-INLINED none: hkVector4::sub4
-        lTransformedCom.m_quad[0] = lTransformedCom.m_quad[0] - lCenterOfMass.m_quad[0];
-        lTransformedCom.m_quad[1] = lTransformedCom.m_quad[1] - lCenterOfMass.m_quad[1];
-        lTransformedCom.m_quad[2] = lTransformedCom.m_quad[2] - lCenterOfMass.m_quad[2];
-        lTransformedCom.m_quad[3] = lTransformedCom.m_quad[3] - lCenterOfMass.m_quad[3];
+        lTransformedCom.sub4(lCenterOfMass);
         shiftInertiaFromCom(lTransformedCom, elements.m_data[i].m_properties.m_mass, lInertia);
         result.m_inertiaTensor.add(lInertia);
     }
@@ -1978,13 +1803,7 @@ void hkpInertiaTensorComputer::simplifyInertiaTensorToOrientedParticle(hkMatrix3
 // orthonormal again (column 0 normalised, column 1 = column 2 x column 0, column 2 = column 0 x column 1, each
 // normalised). Every scalar temporary is kept as a float, the sign of theta as a double.
 void hkpInertiaTensorComputer::convertInertiaTensorToPrincipleAxis(hkMatrix3& inertia, hkRotation& principleAxisOut) {
-    // EXE-INLINED none: hkMatrix3::setIdentity
-    principleAxisOut.m_col0.m_quad = _mm_setzero_ps();
-    principleAxisOut.m_col1.m_quad = _mm_setzero_ps();
-    principleAxisOut.m_col2.m_quad = _mm_setzero_ps();
-    principleAxisOut(0, 0) = 1.0f;
-    principleAxisOut(1, 1) = 1.0f;
-    principleAxisOut(2, 2) = 1.0f;
+    principleAxisOut.setIdentity();
     for (int32_t iteration = 5; iteration > 0; --iteration) {
         int32_t p = 0;
         int32_t q = 1;
@@ -2017,13 +1836,7 @@ void hkpInertiaTensorComputer::convertInertiaTensorToPrincipleAxis(hkMatrix3& in
         const float c = 1.0f / root2;
         const float s = c * t;
         hkMatrix3 rot;
-        // EXE-INLINED none: hkMatrix3::setIdentity
-        rot.m_col0.m_quad = _mm_setzero_ps();
-        rot.m_col1.m_quad = _mm_setzero_ps();
-        rot.m_col2.m_quad = _mm_setzero_ps();
-        rot(0, 0) = 1.0f;
-        rot(1, 1) = 1.0f;
-        rot(2, 2) = 1.0f;
+        rot.setIdentity();
         rot(p, p) = c;
         rot(q, q) = c;
         const float negS = -s;
@@ -2035,25 +1848,10 @@ void hkpInertiaTensorComputer::convertInertiaTensorToPrincipleAxis(hkMatrix3& in
         rot(q, p) = negS;
         inertia.setMul(tmp, rot);
         tmp.setMul(principleAxisOut, rot);
-        // EXE-INLINED 0xC6CD00
-        principleAxisOut.m_col0.m_quad = tmp.m_col0.m_quad;
-        principleAxisOut.m_col1.m_quad = tmp.m_col1.m_quad;
-        principleAxisOut.m_col2.m_quad = tmp.m_col2.m_quad;
+        static_cast<hkMatrix3&>(principleAxisOut) = tmp;
     }
     // EXE-INLINED none: hkRotation::renormalize
-    {
-        // EXE-INLINED 0x62AEA0
-        const __m128 col = principleAxisOut.m_col0.m_quad;
-        const __m128 square = _mm_mul_ps(col, col);
-        __m128 lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0x55), square);
-        lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0xAA), lengthSquare);
-        const __m128 r = _mm_rsqrt_ss(lengthSquare);
-        __m128 factor = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), r), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(lengthSquare, r), r))
-        );
-        factor = _mm_andnot_ps(_mm_cmpeq_ss(lengthSquare, _mm_setzero_ps()), factor);
-        principleAxisOut.m_col0.m_quad = _mm_mul_ps(_mm_shuffle_ps(factor, factor, 0), col);
-    }
+    principleAxisOut.m_col0.normalize3();
     {
         const __m128 col0 = principleAxisOut.m_col0.m_quad;
         const __m128 col2 = principleAxisOut.m_col2.m_quad;
@@ -2063,19 +1861,7 @@ void hkpInertiaTensorComputer::convertInertiaTensorToPrincipleAxis(hkMatrix3& in
             _mm_mul_ps(_mm_shuffle_ps(col0, col0, 0xC9), _mm_shuffle_ps(col2, col2, 0xD2))
         );
     }
-    {
-        // EXE-INLINED 0x62AEA0
-        const __m128 col = principleAxisOut.m_col1.m_quad;
-        const __m128 square = _mm_mul_ps(col, col);
-        __m128 lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0x55), square);
-        lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0xAA), lengthSquare);
-        const __m128 r = _mm_rsqrt_ss(lengthSquare);
-        __m128 factor = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), r), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(lengthSquare, r), r))
-        );
-        factor = _mm_andnot_ps(_mm_cmpeq_ss(lengthSquare, _mm_setzero_ps()), factor);
-        principleAxisOut.m_col1.m_quad = _mm_mul_ps(_mm_shuffle_ps(factor, factor, 0), col);
-    }
+    principleAxisOut.m_col1.normalize3();
     {
         const __m128 col0 = principleAxisOut.m_col0.m_quad;
         const __m128 col1 = principleAxisOut.m_col1.m_quad;
@@ -2085,19 +1871,7 @@ void hkpInertiaTensorComputer::convertInertiaTensorToPrincipleAxis(hkMatrix3& in
             _mm_mul_ps(_mm_shuffle_ps(col0, col0, 0xD2), _mm_shuffle_ps(col1, col1, 0xC9))
         );
     }
-    {
-        // EXE-INLINED 0x62AEA0
-        const __m128 col = principleAxisOut.m_col2.m_quad;
-        const __m128 square = _mm_mul_ps(col, col);
-        __m128 lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0x55), square);
-        lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0xAA), lengthSquare);
-        const __m128 r = _mm_rsqrt_ss(lengthSquare);
-        __m128 factor = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), r), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(lengthSquare, r), r))
-        );
-        factor = _mm_andnot_ps(_mm_cmpeq_ss(lengthSquare, _mm_setzero_ps()), factor);
-        principleAxisOut.m_col2.m_quad = _mm_mul_ps(_mm_shuffle_ps(factor, factor, 0), col);
-    }
+    principleAxisOut.m_col2.normalize3();
 }
 
 // The vertices go into a local hkArray<hkVector4> (w 0), the centre of mass is their mean and each vertex adds its
@@ -2116,19 +1890,12 @@ hkResult hkpInertiaTensorComputer::computeVertexCloudMassProperties(
     verts.setSize(numVertices);
     const float* pVertex = vertexIn;
     for (int32_t i = 0; i < numVertices; ++i) {
-        // EXE-INLINED none: hkVector4::set
-        verts.m_data[i](0) = pVertex[0];
-        verts.m_data[i](1) = pVertex[1];
-        verts.m_data[i](2) = pVertex[2];
-        verts.m_data[i](3) = 0.0f;
+        verts.m_data[i].set(pVertex[0], pVertex[1], pVertex[2], 0.0f);
         // The vertex buffer is untyped memory: the pointer steps by striding bytes (hkAddByteOffset).
         pVertex = reinterpret_cast<const float*>(reinterpret_cast<const char*>(pVertex) + striding);
     }
     result.m_mass = mass;
-    // EXE-INLINED none: hkMatrix3::setZero
-    result.m_inertiaTensor.m_col0.m_quad = _mm_setzero_ps();
-    result.m_inertiaTensor.m_col1.m_quad = _mm_setzero_ps();
-    result.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
+    result.m_inertiaTensor.setZero();
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
     const float fNumVertices = static_cast<float>(numVertices);
     const float massPerVertex = mass / fNumVertices;
@@ -2170,10 +1937,7 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
     if (mass <= 0.0f || surfaceThickness <= 0.0f) {
         return HK_FAILURE;
     }
-    // EXE-INLINED none: hkMatrix3::setZero
-    result.m_inertiaTensor.m_col0.m_quad = _mm_setzero_ps();
-    result.m_inertiaTensor.m_col1.m_quad = _mm_setzero_ps();
-    result.m_inertiaTensor.m_col2.m_quad = _mm_setzero_ps();
+    result.m_inertiaTensor.setZero();
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
     const int32_t numTriangles = geom->m_triangles.m_size;
     hkArray<float> triArea;
@@ -2189,11 +1953,9 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
             _mm_mul_ps(_mm_shuffle_ps(edgeAB, edgeAB, 0xD2), _mm_shuffle_ps(edgeCB, edgeCB, 0xC9)),
             _mm_mul_ps(_mm_shuffle_ps(edgeAB, edgeAB, 0xC9), _mm_shuffle_ps(edgeCB, edgeCB, 0xD2))
         );
-        // EXE-INLINED none: hkVector4::length3
-        const __m128 square = _mm_mul_ps(cross, cross);
-        __m128 lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0x55), square);
-        lengthSquare = _mm_add_ss(_mm_shuffle_ps(square, square, 0xAA), lengthSquare);
-        const float length = _mm_cvtss_f32(_mm_sqrt_ss(lengthSquare));
+        hkVector4 crossVector;
+        crossVector.m_quad = cross;
+        const float length = crossVector.length3();
         if (distributeUniformly.m_bool) {
             if (length < 1e-05f) {
                 triArea.m_data[i] = 5e-06f;
@@ -2226,10 +1988,7 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
         triProps.m_mass = 0.0f;
         hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(v0, v1, v2, triMass, surfaceThickness, triProps);
         hkMatrix3 triInertia;
-        // EXE-INLINED 0xC6CD00
-        triInertia.m_col0.m_quad = triProps.m_inertiaTensor.m_col0.m_quad;
-        triInertia.m_col1.m_quad = triProps.m_inertiaTensor.m_col1.m_quad;
-        triInertia.m_col2.m_quad = triProps.m_inertiaTensor.m_col2.m_quad;
+        triInertia = triProps.m_inertiaTensor;
         result.m_centerOfMass.m_quad = _mm_add_ps(
             _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(triMass), _mm_set_ss(triMass), 0), triProps.m_centerOfMass.m_quad),
             result.m_centerOfMass.m_quad
@@ -2257,10 +2016,7 @@ void hkpInertiaTensorComputer::calculatePrincipalAxis(
     hkVector4& minorAxis
 ) {
     hkMatrix3 tensor;
-    // EXE-INLINED 0xC6CD00
-    tensor.m_col0.m_quad = inertiaTensor.m_col0.m_quad;
-    tensor.m_col1.m_quad = inertiaTensor.m_col1.m_quad;
-    tensor.m_col2.m_quad = inertiaTensor.m_col2.m_quad;
+    tensor = inertiaTensor;
     uint8_t converged;
     hkVector4 eigenVector0;
     hkVector4 eigenVector1;

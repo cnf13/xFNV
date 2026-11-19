@@ -79,14 +79,7 @@ bool addMaxSlopePlane(
     int32_t r_eax,
     hkArray<hkpSurfaceConstraintInfo, hkContainerHeapAllocator>& r_edi
 ) {
-    // EXE-INLINED 0x62B0A0
-    // hkVector4::dot3: src's builds its result through the out-of-line hkSimdReal::Construct, which the exe's Havok
-    // code does not call.
-    const hkQuadReal product = _mm_mul_ps(r_edi.m_data[r_eax].m_plane.m_quad, up.m_quad);
-    const hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(product, product, _MM_SHUFFLE(1, 1, 1, 1)), product);
-    const hkQuadReal xyzSum = _mm_add_ss(_mm_shuffle_ps(product, product, _MM_SHUFFLE(2, 2, 2, 2)), xySum);
-    float surfaceVerticalComponent;
-    _mm_store_ss(&surfaceVerticalComponent, xyzSum);
+    const float surfaceVerticalComponent = r_edi.m_data[r_eax].m_plane.dot3(up);
     if (!(surfaceVerticalComponent > 0.01f && surfaceVerticalComponent < maxSlopeCos)) {
         return false;
     }
@@ -108,21 +101,9 @@ bool addMaxSlopePlane(
     newConstraint.m_priority = original.m_priority;
     // newConstraint.m_plane.addMul4(-surfaceVerticalComponent, arUp), with the negation rounded to a float.
     const float negVertical = -surfaceVerticalComponent;
-    const hkQuadReal plane = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(negVertical), up.m_quad), newConstraint.m_plane.m_quad);
-    // EXE-INLINED 0x62AEA0
-    // hkVector4::normalize3 (lengthInverse3 and broadcast inlined), written out for the same reason as dot3 above.
-    const hkQuadReal square = _mm_mul_ps(plane, plane);
-    const hkQuadReal len2 = _mm_add_ss(
-        _mm_shuffle_ps(square, square, _MM_SHUFFLE(2, 2, 2, 2)),
-        _mm_add_ss(_mm_shuffle_ps(square, square, _MM_SHUFFLE(1, 1, 1, 1)), square)
-    );
-    const hkQuadReal approx = _mm_rsqrt_ss(len2);
-    const hkQuadReal len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-    const hkQuadReal refined = _mm_mul_ss(
-        _mm_mul_ss(_mm_set_ss(0.5f), approx), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-    );
-    const hkQuadReal lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-    newConstraint.m_plane.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, _MM_SHUFFLE(0, 0, 0, 0)), plane);
+    newConstraint.m_plane.m_quad =
+        _mm_add_ps(_mm_mul_ps(_mm_set1_ps(negVertical), up.m_quad), newConstraint.m_plane.m_quad);
+    newConstraint.m_plane.normalize3();
     return true;
 }
 
@@ -396,11 +377,7 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
             );
             surface.m_velocity.m_quad = _mm_add_ps(surface.m_velocity.m_quad, linVel);
         }
-        // EXE-INLINED none: hkVector4::dot3
-        __m128 prod = _mm_mul_ps(surface.m_velocity.m_quad, surface.m_plane.m_quad);
-        float velDot = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(prod, prod, 0xAA), _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod))
-        );
+        float velDot = surface.m_velocity.dot3(surface.m_plane);
         surface.m_plane.m_quad[3] = surface.m_plane.m_quad[3] - velDot * timeTravelled;
         if (pBody->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
             surface.m_priority = 2;
@@ -427,13 +404,7 @@ void hkpCharacterProxy::extractSurfaceConstraintInfo(
 // the normals times the squared contact angle sensitivity times 10, plus the squared difference of the distances. Each
 // term is stored as a float.
 float hkpCharacterProxy::surfaceDistance(const hkpRootCdPoint& p1, const hkpRootCdPoint& p2) const {
-    // EXE-INLINED none: hkVector4::dot3
-    const __m128 normalProduct =
-        _mm_mul_ps(p1.m_contact.m_separatingNormal.m_quad, p2.m_contact.m_separatingNormal.m_quad);
-    const float cosAngle = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(normalProduct, normalProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(normalProduct, normalProduct, 0x55), normalProduct)
-    ));
+    const float cosAngle = p1.m_contact.m_separatingNormal.dot3(p2.m_contact.m_separatingNormal);
     const float oneMinusCos = 1.0f - cosAngle;
     const float angleDistance = m_contactAngleSensitivity * m_contactAngleSensitivity * oneMinusCos;
     const float distanceDelta = p1.m_contact.m_separatingNormal.m_quad[3] - p2.m_contact.m_separatingNormal.m_quad[3];
@@ -450,13 +421,9 @@ float hkpCharacterProxy::surfaceDistance(const hkpRootCdPoint& p1, const hkpRoot
     if (pBody1 != nullptr) {
         pBody1->getPointVelocity(p2.m_contact.m_position, velocity1);
     }
-    const __m128 velocityDelta = _mm_sub_ps(velocity2.m_quad, velocity1.m_quad);
-    const __m128 velocityProduct = _mm_mul_ps(velocityDelta, velocityDelta);
-    // EXE-INLINED none: hkVector4::lengthSquared3
-    const float velocityDistance = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(velocityProduct, velocityProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(velocityProduct, velocityProduct, 0x55), velocityProduct)
-    ));
+    hkVector4 velocityDelta;
+    velocityDelta.m_quad = _mm_sub_ps(velocity2.m_quad, velocity1.m_quad);
+    const float velocityDistance = velocityDelta.lengthSquared3();
     // One x87 sum of the double-constant products, rounded to float at the return.
     return velocityDistance * 0.10000000149011612 + angleDistance * 10.0 + distanceDistance;
 }
@@ -889,36 +856,17 @@ void hkpCharacterProxy::checkSupportWithCollector(
     hkSimplexSolverSolve(input, output);
     ground.m_surfaceVelocity.m_quad = _mm_setzero_ps();
     ground.m_surfaceNormal.m_quad = _mm_setzero_ps();
-    const __m128 dir = direction.m_quad;
-    const __m128 vel = output.m_velocity.m_quad;
-    // EXE-INLINED 0x458900: hkVector4::equals3 (the output velocity within 0.001 of direction: no support)
-    const __m128 absDiff = _mm_and_ps(_mm_sub_ps(vel, dir), hkVector4_setAbs4_absMask);
-    if ((_mm_movemask_ps(_mm_cmple_ps(absDiff, _mm_set1_ps(0.001f))) & 7) == 7) {
+    // The output velocity within 0.001 of direction: no support.
+    if (output.m_velocity.equals3(direction, 0.001f)) {
         ground.m_supportedState = hkpSurfaceInfo::UNSUPPORTED;
     }
     else {
-        // EXE-INLINED 0x630100: hkVector4::lengthSquared3
-        const __m128 velSq = _mm_mul_ps(vel, vel);
-        const __m128 velLenSq =
-            _mm_add_ss(_mm_shuffle_ps(velSq, velSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(velSq, velSq, 0x55), velSq));
-        if (_mm_cvtss_f32(velLenSq) < 0.001f) {
+        if (output.m_velocity.lengthSquared3() < 0.001f) {
             ground.m_supportedState = hkpSurfaceInfo::SUPPORTED;
         }
         else {
-            // EXE-INLINED 0x62AEA0: hkVector4::normalize3
-            const __m128 approx = _mm_rsqrt_ss(velLenSq);
-            const __m128 lenIsZero = _mm_cmpeq_ss(velLenSq, _mm_set_ss(zero));
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(f0_5_), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(velLenSq, approx), approx))
-            );
-            const __m128 lenInv = _mm_andnot_ps(lenIsZero, refined);
-            output.m_velocity.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), vel);
-            // EXE-INLINED 0x62B0A0: hkVector4::dot3
-            const __m128 dotProd = _mm_mul_ps(dir, output.m_velocity.m_quad);
-            const float fAngleSin = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(dotProd, dotProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(dotProd, dotProd, 0x55), dotProd)
-            ));
+            output.m_velocity.normalize3();
+            const float fAngleSin = direction.dot3(output.m_velocity);
             // Stores 1 - sin^2 as a float and compares it with the product of the slope cosine.
             const float fCosSqr = 1.0f - fAngleSin * fAngleSin;
             if (fCosSqr < m_maxSlopeCosine * m_maxSlopeCosine) {
@@ -933,12 +881,7 @@ void hkpCharacterProxy::checkSupportWithCollector(
         for (int32_t i = 0; i < input.m_numConstraints; ++i) {
             if (interactions.m_data[i].m_touched) {
                 const __m128 plane = constraints.m_data[i].m_plane.m_quad;
-                // EXE-INLINED 0x62B0A0: hkVector4::dot3
-                const __m128 planeDot = _mm_mul_ps(direction.m_quad, plane);
-                const float fDot = _mm_cvtss_f32(_mm_add_ss(
-                    _mm_shuffle_ps(planeDot, planeDot, 0xAA),
-                    _mm_add_ss(_mm_shuffle_ps(planeDot, planeDot, 0x55), planeDot)
-                ));
+                const float fDot = direction.dot3(constraints.m_data[i].m_plane);
                 if (fDot < -0.08f) {
                     ++iNumTouching;
                     ground.m_surfaceNormal.m_quad = _mm_add_ps(ground.m_surfaceNormal.m_quad, plane);
@@ -949,20 +892,7 @@ void hkpCharacterProxy::checkSupportWithCollector(
         }
         if (iNumTouching > 0) {
             const float fInvNumTouching = 1.0f / iNumTouching;
-            // EXE-INLINED 0x62AEA0: hkVector4::normalize3
-            const __m128 normal = ground.m_surfaceNormal.m_quad;
-            const __m128 normalSq = _mm_mul_ps(normal, normal);
-            const __m128 normalLenSq = _mm_add_ss(
-                _mm_shuffle_ps(normalSq, normalSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(normalSq, normalSq, 0x55), normalSq)
-            );
-            const __m128 approx = _mm_rsqrt_ss(normalLenSq);
-            const __m128 lenIsZero = _mm_cmpeq_ss(normalLenSq, _mm_set_ss(zero));
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(f0_5_), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(normalLenSq, approx), approx))
-            );
-            const __m128 lenInv = _mm_andnot_ps(lenIsZero, refined);
-            ground.m_surfaceNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), normal);
+            ground.m_surfaceNormal.normalize3();
             ground.m_surfaceVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fInvNumTouching), ground.m_surfaceVelocity.m_quad);
         }
         else {
@@ -1041,22 +971,14 @@ void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSu
     fireConstraintsProcessed(m_manifold, input);
     hkSimplexSolverSolve(input, output);
     output.m_velocity.m_quad = _mm_sub_ps(output.m_velocity.m_quad, m_velocity.m_quad);
-    // EXE-INLINED 0x62B0A0: hkVector4::dot3
-    const __m128 projProd = _mm_mul_ps(direction.m_quad, output.m_velocity.m_quad);
-    const float fProjectedVelocity = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(projProd, projProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(projProd, projProd, 0x55), projProd)
-    ));
+    const float fProjectedVelocity = direction.dot3(output.m_velocity);
     // Compares against 0.99f widened to double.
     ground.m_isSupported.m_bool = fProjectedVelocity < 0.9900000095367432;
     // The negated projection is stored as a float.
     const float fNegProjected = -fProjectedVelocity;
-    const __m128 across =
-        _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fNegProjected), direction.m_quad), output.m_velocity.m_quad);
-    // EXE-INLINED 0x630100: hkVector4::lengthSquared3
-    const __m128 acrossSq = _mm_mul_ps(across, across);
-    const float fAcrossLenSq = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(acrossSq, acrossSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(acrossSq, acrossSq, 0x55), acrossSq)
-    ));
+    hkVector4 across;
+    across.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fNegProjected), direction.m_quad), output.m_velocity.m_quad);
+    const float fAcrossLenSq = across.lengthSquared3();
     ground.m_isSliding.m_bool = fAcrossLenSq > 0.01f;
     ground.m_surfaceVelocity.m_quad = _mm_setzero_ps();
     ground.m_surfaceNormal.m_quad = _mm_setzero_ps();
@@ -1065,11 +987,7 @@ void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSu
     for (int32_t i = 0; i < input.m_numConstraints; ++i) {
         if (interactions.m_data[i].m_touched) {
             const __m128 plane = constraints.m_data[i].m_plane.m_quad;
-            // EXE-INLINED 0x62B0A0: hkVector4::dot3
-            const __m128 planeDot = _mm_mul_ps(plane, direction.m_quad);
-            const float fDot = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(planeDot, planeDot, 0xAA), _mm_add_ss(_mm_shuffle_ps(planeDot, planeDot, 0x55), planeDot)
-            ));
+            const float fDot = constraints.m_data[i].m_plane.dot3(direction);
             if (fDot < -0.08f) {
                 ground.m_surfaceNormal.m_quad = _mm_add_ps(plane, ground.m_surfaceNormal.m_quad);
                 ground.m_surfaceVelocity.m_quad =
@@ -1080,20 +998,7 @@ void hkpCharacterProxy::checkSupportDeprecated(const hkVector4& direction, hkpSu
     }
     if (iNumTouching > 0) {
         const float fInvNumTouching = 1.0f / iNumTouching;
-        // EXE-INLINED 0x62AEA0: hkVector4::normalize3
-        const __m128 normal = ground.m_surfaceNormal.m_quad;
-        const __m128 normalSq = _mm_mul_ps(normal, normal);
-        const __m128 normalLenSq = _mm_add_ss(
-            _mm_shuffle_ps(normalSq, normalSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(normalSq, normalSq, 0x55), normalSq)
-        );
-        const __m128 approx = _mm_rsqrt_ss(normalLenSq);
-        const __m128 lenIsZero = _mm_cmpeq_ss(normalLenSq, _mm_set_ss(zero));
-        const __m128 refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(f0_5_), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(normalLenSq, approx), approx))
-        );
-        const __m128 lenInv = _mm_andnot_ps(lenIsZero, refined);
-        ground.m_surfaceNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), normal);
+        ground.m_surfaceNormal.normalize3();
         ground.m_surfaceVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fInvNumTouching), ground.m_surfaceVelocity.m_quad);
     }
     else {
@@ -1270,12 +1175,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
             hkVector4 pointVel;
             body->m_motion.getPointVelocity(input.m_position, pointVel);
             pointVel.setSub4(pointVel, m_velocity);
-            // EXE-INLINED 0x62B0A0
-            const __m128 kVelProducts = _mm_mul_ps(pointVel.m_quad, input.m_normal.m_quad);
-            input.m_projectedVelocity = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(kVelProducts, kVelProducts, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(kVelProducts, kVelProducts, 0x55), kVelProducts)
-            ));
+            input.m_projectedVelocity = pointVel.dot3(input.m_normal);
             deltaVelocity = -input.m_projectedVelocity * 0.8999999761581421;
             if (input.m_position.m_quad[3] < 0.0f) {
                 deltaVelocity =
@@ -1296,12 +1196,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
             jacAng.setCross(r, input.m_normal);
             hkVector4 rc;
             rc.setMul3(inertiaInv, jacAng);
-            // EXE-INLINED 0x62B0A0
-            const __m128 kJacProducts = _mm_mul_ps(rc.m_quad, jacAng.m_quad);
-            input.m_objectMassInv = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(kJacProducts, kJacProducts, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(kJacProducts, kJacProducts, 0x55), kJacProducts)
-            ));
+            input.m_objectMassInv = rc.dot3(jacAng);
             input.m_objectMassInv = input.m_objectMassInv + body->m_motion.m_inertiaAndMassInv.m_quad[3];
             input.m_objectImpulse = deltaVelocity / input.m_objectMassInv;
             const float maxPushImpulse = -m_characterStrength * stepInfo.m_deltaTime;
@@ -1320,12 +1215,7 @@ void hkpCharacterProxy::applySurfaceInteractions(
             const float deltaTime = stepInfo.m_deltaTime;
             hkVector4 charVelDown;
             charVelDown.m_quad = _mm_mul_ps(_mm_set1_ps(deltaTime), worldGravity.m_quad);
-            // EXE-INLINED 0x62B0A0
-            const __m128 kDownProducts = _mm_mul_ps(charVelDown.m_quad, input.m_normal.m_quad);
-            float relVel = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(kDownProducts, kDownProducts, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(kDownProducts, kDownProducts, 0x55), kDownProducts)
-            ));
+            float relVel = charVelDown.dot3(input.m_normal);
             if (input.m_projectedVelocity < 0.0f) {
                 relVel = relVel - input.m_projectedVelocity;
             }
@@ -1372,11 +1262,7 @@ void hkpCharacterProxy::convertFractionToDistance(
     for (int32_t i = numHits - 1; i >= 0; --i) {
         float fraction = pHits->m_contact.m_separatingNormal.m_quad[3];
         pHits->m_contact.m_position.m_quad[3] = fraction;
-        // EXE-INLINED none: hkVector4::dot3
-        __m128 prod = _mm_mul_ps(pHits->m_contact.m_separatingNormal.m_quad, displacement.m_quad);
-        float projLength = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(prod, prod, 0xAA), _mm_add_ss(_mm_shuffle_ps(prod, prod, 0x55), prod))
-        );
+        float projLength = pHits->m_contact.m_separatingNormal.dot3(displacement);
         pHits->m_contact.m_separatingNormal.m_quad[3] = fraction * -projLength;
         pHits++;
     }

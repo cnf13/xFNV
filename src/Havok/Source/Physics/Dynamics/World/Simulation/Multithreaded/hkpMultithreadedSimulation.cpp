@@ -673,14 +673,8 @@ hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, floa
         // The step count is multiplied in double precision, unrounded.
         solverInfo.m_invDeltaTime =
             static_cast<float>(static_cast<double>(solverInfo.m_numSteps) * physicsStepInfo.m_invDeltaTime);
-        // EXE-INLINED 0x630AE0
-        const hkQuadReal subStepDeltaTime = _mm_load_ss(&solverInfo.m_deltaTime);
-        solverInfo.m_globalAccelerationPerSubStep.m_quad =
-            _mm_mul_ps(_mm_shuffle_ps(subStepDeltaTime, subStepDeltaTime, 0), m_world->m_gravity.m_quad);
-        // EXE-INLINED 0x630AE0
-        const hkQuadReal stepDeltaTime = _mm_load_ss(&physicsStepInfo.m_deltaTime);
-        solverInfo.m_globalAccelerationPerStep.m_quad =
-            _mm_mul_ps(_mm_shuffle_ps(stepDeltaTime, stepDeltaTime, 0), m_world->m_gravity.m_quad);
+        solverInfo.m_globalAccelerationPerSubStep.setMul4(solverInfo.m_deltaTime, m_world->m_gravity);
+        solverInfo.m_globalAccelerationPerStep.setMul4(physicsStepInfo.m_deltaTime, m_world->m_gravity);
     }
     m_world->m_violatedConstraintArray->m_nextFreeElement = 0;
     hkpMtThreadStructure* threadStructure = m_world->m_multithreadedSimulationJobData;

@@ -97,53 +97,23 @@ void hkpMultiRayConvexAgent::getClosestPoints(
     rayInput.m_filterInfo = 0;
     rayInput.m_rayShapeCollectionFilter = nullptr;
 
-    const __m128 col0 = aTb.m_rotation.m_col0.m_quad;
-    const __m128 col1 = aTb.m_rotation.m_col1.m_quad;
-    const __m128 col2 = aTb.m_rotation.m_col2.m_quad;
-    const __m128 col3 = aTb.m_translation.m_quad;
     for (; iNumRays > 0; --iNumRays, ++pRay) {
         hkpShapeRayCastOutput output;
-        // EXE-INLINED none: hkVector4::setTransformedPos
-        __m128 v = pRay->m_start.m_quad;
-        __m128 from = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), col0)),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), col3)
-        );
-        rayInput.m_from.m_quad = from;
-        // EXE-INLINED none: hkVector4::setTransformedPos
-        v = pRay->m_end.m_quad;
-        __m128 to = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), col0)),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), col3)
-        );
-        rayInput.m_to.m_quad = to;
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
 
         hkBool bHit = pConvex->castRayImpl(rayInput, output);
         if (bHit.m_bool) {
             const hkTransform& transformB = *bodyB.m_motion.pMotion;
             const float fFraction = output.m_hitFraction;
-            const __m128 b0 = transformB.m_rotation.m_col0.m_quad;
-            const __m128 b1 = transformB.m_rotation.m_col1.m_quad;
-            const __m128 b2 = transformB.m_rotation.m_col2.m_quad;
-            const __m128 b3 = transformB.m_translation.m_quad;
             // EXE-INLINED none: hkVector4::setInterpolate4
             __m128 t = _mm_set1_ps(fFraction);
-            __m128 p = _mm_add_ps(
+            hkVector4 p;
+            p.m_quad = _mm_add_ps(
                 _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), rayInput.m_from.m_quad), _mm_mul_ps(t, rayInput.m_to.m_quad)
             );
-            // EXE-INLINED none: hkVector4::setTransformedPos
-            __m128 pos = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), b1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0), b0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), b2), b3)
-            );
-            event.m_contact.m_position.m_quad = pos;
-            // EXE-INLINED none: hkVector4::setRotatedDir
-            __m128 n = output.m_normal.m_quad;
-            __m128 normal = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), b1), _mm_mul_ps(_mm_shuffle_ps(n, n, 0), b0)),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), b2)
-            );
-            event.m_contact.m_separatingNormal.m_quad = normal;
+            event.m_contact.m_position.setTransformedPos(transformB, p);
+            event.m_contact.m_separatingNormal.setRotatedDir(transformB.m_rotation, output.m_normal);
             event.m_contact.m_separatingNormal.m_quad[3] = static_cast<float>(
                 (static_cast<double>(fFraction) - 1.0) * pRay->m_start.m_quad[3] + pMultiRay->m_rayPenetrationDistance
             );
@@ -292,24 +262,8 @@ void hkpMultiRayConvexAgent::processCollision(
     const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
     for (int32_t i = 0; i < iNumRays; ++i, ++pRay) {
         hkpShapeRayCastOutput output;
-        // EXE-INLINED 0xC7F640
-        __m128 v = pRay->m_start.m_quad;
-        rayInput.m_from.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), aTb.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0), aTb.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), aTb.m_rotation.m_col2.m_quad), aTb.m_translation.m_quad)
-        );
-        // EXE-INLINED 0xC7F640
-        v = pRay->m_end.m_quad;
-        rayInput.m_to.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), aTb.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0), aTb.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), aTb.m_rotation.m_col2.m_quad), aTb.m_translation.m_quad)
-        );
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
         hkBool bHit = pConvex->castRayImpl(rayInput, output);
         if (bHit.m_bool) {
             hkpProcessCdPoint* pPoint = result.m_firstFreeContactPoint.m_storage;
@@ -384,24 +338,8 @@ void hkpMultiRayConvexAgent::staticGetPenetrations(
         if (collector.m_earlyOut.m_bool) {
             break;
         }
-        // EXE-INLINED 0xC7F640
-        __m128 v = pRay->m_start.m_quad;
-        rayInput.m_from.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), aTb.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0), aTb.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), aTb.m_rotation.m_col2.m_quad), aTb.m_translation.m_quad)
-        );
-        // EXE-INLINED 0xC7F640
-        v = pRay->m_end.m_quad;
-        rayInput.m_to.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), aTb.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, 0), aTb.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), aTb.m_rotation.m_col2.m_quad), aTb.m_translation.m_quad)
-        );
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
         hkBool bHit = pConvex->castRayImpl(rayInput, output);
         if (bHit.m_bool) {
             collector.addCdBodyPair(bodyA, bodyB);
@@ -446,57 +384,27 @@ void hkpMultiRayConvexAgent::staticGetClosestPoints(
     rayInput.m_filterInfo = 0;
     rayInput.m_rayShapeCollectionFilter = nullptr;
 
-    const __m128 col0 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_rotation.m_col0.m_quad)[0]);
-    const __m128 col1 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_rotation.m_col1.m_quad)[0]);
-    const __m128 col2 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_rotation.m_col2.m_quad)[0]);
-    const __m128 col3 = _mm_load_ps(&reinterpret_cast<float*>(&aTb.m_translation.m_quad)[0]);
     for (; iNumRays > 0; --iNumRays, ++pRay) {
         hkpShapeRayCastOutput output;
-        // EXE-INLINED none: hkVector4::setTransformedPos
-        __m128 v = _mm_load_ps(&reinterpret_cast<const float*>(&pRay->m_start.m_quad)[0]);
-        __m128 from = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), col0)),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), col3)
-        );
-        _mm_store_ps(&reinterpret_cast<float*>(&rayInput.m_from.m_quad)[0], from);
-        // EXE-INLINED none: hkVector4::setTransformedPos
-        v = _mm_load_ps(&reinterpret_cast<const float*>(&pRay->m_end.m_quad)[0]);
-        __m128 to = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), col0)),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), col3)
-        );
-        _mm_store_ps(&reinterpret_cast<float*>(&rayInput.m_to.m_quad)[0], to);
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
 
         hkBool bHit = pConvex->castRayImpl(rayInput, output);
         if (bHit.m_bool) {
             const hkTransform& transformB = *bodyB.m_motion.pMotion;
             const float fFraction = output.m_hitFraction;
-            const __m128 b0 = _mm_load_ps(&reinterpret_cast<const float*>(&transformB.m_rotation.m_col0.m_quad)[0]);
-            const __m128 b1 = _mm_load_ps(&reinterpret_cast<const float*>(&transformB.m_rotation.m_col1.m_quad)[0]);
-            const __m128 b2 = _mm_load_ps(&reinterpret_cast<const float*>(&transformB.m_rotation.m_col2.m_quad)[0]);
-            const __m128 b3 = _mm_load_ps(&reinterpret_cast<const float*>(&transformB.m_translation.m_quad)[0]);
             // EXE-INLINED none: hkVector4::setInterpolate4
             __m128 t = _mm_set1_ps(fFraction);
-            __m128 p = _mm_add_ps(
+            hkVector4 p;
+            p.m_quad = _mm_add_ps(
                 _mm_mul_ps(
                     _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&hkQuadReal1111_0)[0]), t),
                     _mm_load_ps(&reinterpret_cast<float*>(&rayInput.m_from.m_quad)[0])
                 ),
                 _mm_mul_ps(t, _mm_load_ps(&reinterpret_cast<float*>(&rayInput.m_to.m_quad)[0]))
             );
-            // EXE-INLINED none: hkVector4::setTransformedPos
-            __m128 pos = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), b1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0), b0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), b2), b3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_position.m_quad)[0], pos);
-            // EXE-INLINED none: hkVector4::setRotatedDir
-            __m128 n = _mm_load_ps(&reinterpret_cast<float*>(&output.m_normal.m_quad)[0]);
-            __m128 normal = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), b1), _mm_mul_ps(_mm_shuffle_ps(n, n, 0), b0)),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), b2)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&event.m_contact.m_separatingNormal.m_quad)[0], normal);
+            event.m_contact.m_position.setTransformedPos(transformB, p);
+            event.m_contact.m_separatingNormal.setRotatedDir(transformB.m_rotation, output.m_normal);
             event.m_contact.m_separatingNormal.m_quad[3] = static_cast<float>(
                 (static_cast<double>(fFraction) - 1.0) * pRay->m_start.m_quad[3] + pMultiRay->m_rayPenetrationDistance
             );

@@ -1114,10 +1114,8 @@ void bhkRigidBody::GetAabbLocal(hkAabb& arOut) {
         pShape->getAabbImpl(hkTransformIdentity, 0.001f, arOut);
     }
     else {
-        // EXE-INLINED 0x4B4D50
-        arOut.m_min.m_quad = hkQuadReal{-0.001f, -0.001f, -0.001f, 0.0f};
-        // EXE-INLINED 0x4B4D50
-        arOut.m_max.m_quad = hkQuadReal{0.001f, 0.001f, 0.001f, 0.0f};
+        arOut.m_min.set(-0.001f, -0.001f, -0.001f, 0.0f);
+        arOut.m_max.set(0.001f, 0.001f, 0.001f, 0.0f);
     }
 }
 
@@ -1316,12 +1314,8 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
     if (!pWorld || !pWorld->m_userData) {
         return;
     }
-    // EXE-INLINED 0x4A3E00
     hkVector4 hkpos;
-    float fX = arPos.x * bhkConvert::fBS2HkScaleSC;
-    float fY = arPos.y * bhkConvert::fBS2HkScaleSC;
-    float fZ = bhkConvert::fBS2HkScaleSC * arPos.z;
-    hkpos.m_quad = hkQuadReal{fX, fY, fZ, 0.0f};
+    NI2HK(hkpos, arPos);
     // EXE-INLINED none: NI2HK(hkQuaternion&, const NiQuaternion&), each lane copied with fld/fstp.
     hkQuaternion hkrot;
     hkrot.m_vec.m_quad = hkQuadReal{arRot.m_fX, arRot.m_fY, arRot.m_fZ, arRot.m_fW};
@@ -1375,8 +1369,7 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
     newCenterOfMassPosition.add4(hkpos);
     hkVector4 linearVelocity;
     linearVelocity.setSub4(newCenterOfMassPosition, GetCenterOfMassInWorld(hkcom));
-    // EXE-INLINED 0x630AE0
-    linearVelocity.m_quad = _mm_mul_ps(linearVelocity.m_quad, _mm_set1_ps(finvDelta));
+    linearVelocity.setMul4(finvDelta, linearVelocity);
     float linVelSq = linearVelocity.lengthSquared3();
     float fmaxLinVel = GethkMaxLinearVelocity();
     if (linVelSq > fmaxLinVel * fmaxLinVel) {
@@ -1415,8 +1408,7 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
     else {
         quatDif.getAxis(angularVelocity);
         float fScale = angle * finvDelta;
-        // EXE-INLINED 0x630AE0
-        angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fScale), angularVelocity.m_quad);
+        angularVelocity.setMul4(fScale, angularVelocity);
         SetAngularVelocity(angularVelocity);
     }
 }

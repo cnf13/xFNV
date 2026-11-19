@@ -42,52 +42,20 @@ void hkpRagdollDrawer::drawConstraint(
     alignas(16) hkVector4 refTwistAxisWorld;
     refTwistAxisWorld.setRotatedDir(m_RB, baseB.getColumn(atoms.m_twistLimit.m_twistAxis));
 
-    // EXE-INLINED none: hkVector4::setCross
-    const __m128 kRefB =
-        _mm_load_ps(&reinterpret_cast<const float*>(&baseB.getColumn(atoms.m_planesLimit.m_refAxisInB).m_quad)[0]);
-    const __m128 kTwistB =
-        _mm_load_ps(&reinterpret_cast<const float*>(&baseB.getColumn(atoms.m_planesLimit.m_twistAxisInA).m_quad)[0]);
-    const __m128 kCrossB = _mm_sub_ps(
-        _mm_mul_ps(_mm_shuffle_ps(kRefB, kRefB, 0xD2), _mm_shuffle_ps(kTwistB, kTwistB, 0xC9)),
-        _mm_mul_ps(_mm_shuffle_ps(kRefB, kRefB, 0xC9), _mm_shuffle_ps(kTwistB, kTwistB, 0xD2))
-    );
-    // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, zero for a zero vector)
-    const __m128 kSquaresB = _mm_mul_ps(kCrossB, kCrossB);
-    const __m128 kLengthSquaredB = _mm_add_ps(
-        _mm_shuffle_ps(kSquaresB, kSquaresB, 0xAA), _mm_add_ps(_mm_shuffle_ps(kSquaresB, kSquaresB, 0x55), kSquaresB)
-    );
-    const __m128 kEstimateB = _mm_rsqrt_ss(kLengthSquaredB);
-    const __m128 kZeroMaskB = _mm_cmpeq_ss(kLengthSquaredB, _mm_set_ss(0.0f));
-    const __m128 kStepB = _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kLengthSquaredB, kEstimateB), kEstimateB));
-    const __m128 kScaleB = _mm_andnot_ps(kZeroMaskB, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimateB), kStepB));
     alignas(16) hkVector4 refCrossedWorld;
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&refCrossedWorld.m_quad)[0], _mm_mul_ps(_mm_shuffle_ps(kScaleB, kScaleB, 0), kCrossB)
+    refCrossedWorld.setCross(
+        baseB.getColumn(atoms.m_planesLimit.m_twistAxisInA), baseB.getColumn(atoms.m_planesLimit.m_refAxisInB)
     );
+    refCrossedWorld.normalize3();
     refCrossedWorld.setRotatedDir(m_RB, refCrossedWorld);
     alignas(16) hkVector4 refPlaneNormalWorld;
     refPlaneNormalWorld.setRotatedDir(m_RB, baseB.getColumn(atoms.m_planesLimit.m_refAxisInB));
 
-    // EXE-INLINED none: hkVector4::setCross
-    const __m128 kTwistA =
-        _mm_load_ps(&reinterpret_cast<const float*>(&baseA.getColumn(atoms.m_planesLimit.m_twistAxisInA).m_quad)[0]);
-    const __m128 kRefA =
-        _mm_load_ps(&reinterpret_cast<const float*>(&baseA.getColumn(atoms.m_planesLimit.m_refAxisInB).m_quad)[0]);
-    const __m128 kCrossA = _mm_sub_ps(
-        _mm_mul_ps(_mm_shuffle_ps(kRefA, kRefA, 0xC9), _mm_shuffle_ps(kTwistA, kTwistA, 0xD2)),
-        _mm_mul_ps(_mm_shuffle_ps(kRefA, kRefA, 0xD2), _mm_shuffle_ps(kTwistA, kTwistA, 0xC9))
-    );
-    // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, zero for a zero vector)
-    const __m128 kSquaresA = _mm_mul_ps(kCrossA, kCrossA);
-    const __m128 kLengthSquaredA = _mm_add_ps(
-        _mm_shuffle_ps(kSquaresA, kSquaresA, 0xAA), _mm_add_ps(_mm_shuffle_ps(kSquaresA, kSquaresA, 0x55), kSquaresA)
-    );
-    const __m128 kEstimateA = _mm_rsqrt_ss(kLengthSquaredA);
-    const __m128 kZeroMaskA = _mm_cmpeq_ss(kLengthSquaredA, _mm_set_ss(0.0f));
-    const __m128 kStepA = _mm_sub_ps(_mm_set_ss(3.0f), _mm_mul_ps(_mm_mul_ps(kLengthSquaredA, kEstimateA), kEstimateA));
-    const __m128 kScaleA = _mm_andnot_ps(kZeroMaskA, _mm_mul_ps(_mm_mul_ps(_mm_set_ss(0.5f), kEstimateA), kStepA));
     alignas(16) hkVector4 cross;
-    _mm_store_ps(&reinterpret_cast<float*>(&cross.m_quad)[0], _mm_mul_ps(_mm_shuffle_ps(kScaleA, kScaleA, 0), kCrossA));
+    cross.setCross(
+        baseA.getColumn(atoms.m_planesLimit.m_refAxisInB), baseA.getColumn(atoms.m_planesLimit.m_twistAxisInA)
+    );
+    cross.normalize3();
     alignas(16) hkVector4 attCrossedWorld;
     attCrossedWorld.setRotatedDir(m_RA, cross);
     alignas(16) hkVector4 attTwistAxisWorld;
@@ -111,9 +79,8 @@ void hkpRagdollDrawer::drawConstraint(
 
     // EXE-INLINED none: hkpConstraintDrawer::getPlaneSizeForDraw (the exe multiplies the plane size by the scale)
     const float planeSize = m_planeSize * m_scale;
-    // EXE-INLINED none: hkVector4::setAll
     alignas(16) hkVector4 extent;
-    _mm_store_ps(&reinterpret_cast<float*>(&extent.m_quad)[0], _mm_set1_ps(planeSize));
+    extent.setAll(planeSize);
     m_plane.setParameters(refPlaneNormalWorld, refCrossedWorld, m_bodyBWPivot, extent);
 
     const float planeMinAngle = atoms.m_planesLimit.m_minAngle;
@@ -125,14 +92,7 @@ void hkpRagdollDrawer::drawConstraint(
 
     // EXE-INLINED none: hkpConstraintDrawer::getConeSizeForDraw
     coneSize = m_scale * m_coneSize;
-    // EXE-INLINED none: hkVector4::setNeg4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&refPlaneNormalWorld.m_quad)[0],
-        _mm_xor_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&refPlaneNormalWorld.m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&hkQuadRealNegateMask)[0])
-        )
-    );
+    refPlaneNormalWorld.setNeg4(refPlaneNormalWorld);
     const float absMinAngle = __builtin_fabsf(planeMinAngle);
     coneAngle = static_cast<float>(1.5707963705062866 - absMinAngle);
     m_planeCone2.setParameters(coneAngle, coneSize, m_numArcSegments, refPlaneNormalWorld, m_bodyBWPivot);

@@ -3,6 +3,7 @@
 #include "Havok/Source/Animation/Animation/Animation/hkaAnimation.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
 #include <stdint.h>
@@ -221,8 +222,7 @@ public:
         uint8_t& quantizedTimeOut
     ) const {
         blockOut = static_cast<int32_t>(frame / static_cast<uint32_t>(m_maxFramesPerBlock - 1));
-        // EXE-INLINED none: hkMath::max2<int>
-        blockOut = blockOut > 0 ? blockOut : 0;
+        blockOut = hkMath::max2(blockOut, 0);
         // EXE-INLINED none: hkMath::min2<int>
         blockOut = blockOut < m_numBlocks - 1 ? blockOut : m_numBlocks - 1;
         const uint32_t uiFirstFrameOfBlock = static_cast<uint32_t>(blockOut * (m_maxFramesPerBlock - 1));

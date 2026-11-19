@@ -883,59 +883,14 @@ bool DebugText::AddFloatingText(NiNode* apObject, const char* apText, int32_t ai
     }
     pNode->AttachChild(pShape, true);
     pExtra->xString.Set(apText, 0);
-    float fSine;
-    float fCosine;
     NiMatrix3 kRot;
-    // EXE-INLINED 0x524AC0
-    float fAngle = 1.5707964f;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRot.m_pEntry[0][0] = 1.0f;
-    kRot.m_pEntry[0][1] = 0.0f;
-    kRot.m_pEntry[0][2] = 0.0f;
-    kRot.m_pEntry[1][0] = 0.0f;
-    kRot.m_pEntry[1][1] = fCosine;
-    kRot.m_pEntry[1][2] = fSine;
-    kRot.m_pEntry[2][0] = 0.0f;
-    kRot.m_pEntry[2][1] = -fSine;
-    kRot.m_pEntry[2][2] = fCosine;
+    kRot.MakeXRotation(1.5707964f);
     pShape->m_kLocal.m_Rotate = kRot * pShape->m_kLocal.m_Rotate;
-    NiPoint3 kTranslate;
-    // EXE-INLINED 0x416870
-    kTranslate.x = 0.0f;
-    kTranslate.y = 0.0f;
-    kTranslate.z = static_cast<float>(iZ);
+    NiPoint3 kTranslate(0.0f, 0.0f, static_cast<float>(iZ));
     pNode->m_kLocal.m_Translate = kTranslate;
-    // EXE-INLINED 0x524AC0
-    fAngle = -1.5707964f;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRot.m_pEntry[0][0] = 1.0f;
-    kRot.m_pEntry[0][1] = 0.0f;
-    kRot.m_pEntry[0][2] = 0.0f;
-    kRot.m_pEntry[1][0] = 0.0f;
-    kRot.m_pEntry[1][1] = fCosine;
-    kRot.m_pEntry[1][2] = fSine;
-    kRot.m_pEntry[2][0] = 0.0f;
-    kRot.m_pEntry[2][1] = -fSine;
-    kRot.m_pEntry[2][2] = fCosine;
+    kRot.MakeXRotation(-1.5707964f);
     NiMatrix3 kRotY;
-    // EXE-INLINED 0x43F850
-    fAngle = 3.1415927f;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRotY.m_pEntry[0][0] = fCosine;
-    kRotY.m_pEntry[0][1] = 0.0f;
-    kRotY.m_pEntry[0][2] = -fSine;
-    kRotY.m_pEntry[1][0] = 0.0f;
-    kRotY.m_pEntry[1][1] = 1.0f;
-    kRotY.m_pEntry[1][2] = 0.0f;
-    kRotY.m_pEntry[2][0] = fSine;
-    kRotY.m_pEntry[2][1] = 0.0f;
-    kRotY.m_pEntry[2][2] = fCosine;
+    kRotY.MakeYRotation(3.1415927f);
     pNode->m_kLocal.m_Rotate = (kRot * kRotY) * pNode->m_kLocal.m_Rotate;
     pNode->m_kLocal.m_fScale = static_cast<float>(std::fabs(0.5));
     pExtra->pBillboard = pNode;
@@ -1107,58 +1062,13 @@ NiBillboardNode* DebugText::CreateBillboardText(
     NiNode* pBaseNode = pNode;
     pBaseNode->AttachChild(pShape, true);
     NiMatrix3 kRot;
-    float fSine;
-    float fCosine;
-    // EXE-INLINED 0x524AC0
-    float fAngle = 1.5707964f;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRot.m_pEntry[0][0] = 1.0f;
-    kRot.m_pEntry[0][1] = 0.0f;
-    kRot.m_pEntry[0][2] = 0.0f;
-    kRot.m_pEntry[1][0] = 0.0f;
-    kRot.m_pEntry[1][1] = fCosine;
-    kRot.m_pEntry[1][2] = fSine;
-    kRot.m_pEntry[2][0] = 0.0f;
-    kRot.m_pEntry[2][1] = -fSine;
-    kRot.m_pEntry[2][2] = fCosine;
+    kRot.MakeXRotation(1.5707964f);
     pShape->m_kLocal.m_Rotate = kRot * pShape->m_kLocal.m_Rotate;
-    NiPoint3 kTranslate;
-    // EXE-INLINED 0x416870
-    kTranslate.x = 0.0f;
-    kTranslate.y = 0.0f;
-    kTranslate.z = 0.0f;
+    NiPoint3 kTranslate(0.0f, 0.0f, 0.0f);
     pNode->m_kLocal.m_Translate = kTranslate;
-    // EXE-INLINED 0x524AC0
-    fAngle = -1.5707964f;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRot.m_pEntry[0][0] = 1.0f;
-    kRot.m_pEntry[0][1] = 0.0f;
-    kRot.m_pEntry[0][2] = 0.0f;
-    kRot.m_pEntry[1][0] = 0.0f;
-    kRot.m_pEntry[1][1] = fCosine;
-    kRot.m_pEntry[1][2] = fSine;
-    kRot.m_pEntry[2][0] = 0.0f;
-    kRot.m_pEntry[2][1] = -fSine;
-    kRot.m_pEntry[2][2] = fCosine;
+    kRot.MakeXRotation(-1.5707964f);
     NiMatrix3 kRotY;
-    // EXE-INLINED 0x43F850
-    fAngle = 3.1415927f;
-    // EXE-INLINED 0x4169A0
-    fSine = std::sin(fAngle);
-    fCosine = std::cos(fAngle);
-    kRotY.m_pEntry[0][0] = fCosine;
-    kRotY.m_pEntry[0][1] = 0.0f;
-    kRotY.m_pEntry[0][2] = -fSine;
-    kRotY.m_pEntry[1][0] = 0.0f;
-    kRotY.m_pEntry[1][1] = 1.0f;
-    kRotY.m_pEntry[1][2] = 0.0f;
-    kRotY.m_pEntry[2][0] = fSine;
-    kRotY.m_pEntry[2][1] = 0.0f;
-    kRotY.m_pEntry[2][2] = fCosine;
+    kRotY.MakeYRotation(3.1415927f);
     pNode->m_kLocal.m_Rotate = (kRot * kRotY) * pNode->m_kLocal.m_Rotate;
     // Widens the scale to double and calls the double fabs, not the float overload.
     float fScale = static_cast<float>(std::fabs(static_cast<double>(afScale)));

@@ -253,14 +253,8 @@ void hkpAabbPhantom::castRay(const hkpWorldRayCastInput& input, hkpRayHitCollect
         const hkpShape* pShape = (*ppCollidable)->m_shape;
         if (pShape) {
             const hkTransform& t = *(*ppCollidable)->m_motion.pMotion;
-            hkVector4 kFrom;
-            hkVector4 kTo;
-            // EXE-INLINED 0xC7F690
-            kFrom.setSub4(input.m_from, t.m_translation);
-            sinput.m_from._setRotatedInverseDir(t.m_rotation, kFrom);
-            // EXE-INLINED 0xC7F690
-            kTo.setSub4(input.m_to, t.m_translation);
-            sinput.m_to._setRotatedInverseDir(t.m_rotation, kTo);
+            sinput.m_from.setTransformedInversePos(t, input.m_from);
+            sinput.m_to.setTransformedInversePos(t, input.m_to);
             pShape->castRayWithCollectorImpl(sinput, **ppCollidable, collector);
         }
     }
@@ -297,12 +291,7 @@ void hkpAabbPhantom::linearCast(
     // EXE-INLINED none: hkpLinearCastCollisionInput::setPathAndTolerance
     __m128 path = _mm_sub_ps(input.m_to.m_quad, toBeCast->m_motion.pState->m_transform.m_translation.m_quad);
     lcInput.m_path.m_quad = path;
-    // EXE-INLINED none: hkVector4::length3
-    // The exe's addss steps (y + x, then z) are written packed: only lane 0 reaches sqrtss.
-    __m128 squares = _mm_mul_ps(path, path);
-    __m128 lengthSquared =
-        _mm_add_ps(_mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ps(_mm_shuffle_ps(squares, squares, 0x55), squares));
-    lcInput.m_cachedPathLength = _mm_cvtss_f32(_mm_sqrt_ss(lengthSquared));
+    lcInput.m_cachedPathLength = lcInput.m_path.length3();
     lcInput.m_tolerance = input.m_startPointTolerance;
     lcInput.m_maxExtraPenetration = input.m_maxExtraPenetration;
 
@@ -345,14 +334,8 @@ void hkpAabbPhantom::castRay(const hkpWorldRayCastInput& input, hkpWorldRayCastO
         const hkpShape* pShape = (*ppCollidable)->m_shape;
         if (pShape) {
             const hkTransform& t = *(*ppCollidable)->m_motion.pMotion;
-            hkVector4 kFrom;
-            hkVector4 kTo;
-            // EXE-INLINED 0xC7F690
-            kFrom.setSub4(input.m_from, t.m_translation);
-            sinput.m_from._setRotatedInverseDir(t.m_rotation, kFrom);
-            // EXE-INLINED 0xC7F690
-            kTo.setSub4(input.m_to, t.m_translation);
-            sinput.m_to._setRotatedInverseDir(t.m_rotation, kTo);
+            sinput.m_from.setTransformedInversePos(t, input.m_from);
+            sinput.m_to.setTransformedInversePos(t, input.m_to);
             if (pShape->castRay(sinput, output).m_bool) {
                 output.m_rootCollidable = *ppCollidable;
             }

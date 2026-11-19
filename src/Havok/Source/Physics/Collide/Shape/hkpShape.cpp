@@ -50,14 +50,7 @@ hkpShape::~hkpShape() {}
 float hkpShape::getMaximumProjection(const hkVector4& direction) const {
     hkAabb aabb;
     hkTransform localToWorld;
-    // EXE-INLINED 0x577070
-    localToWorld.m_rotation.m_col0.m_quad = _mm_setzero_ps();
-    localToWorld.m_rotation.m_col0.m_quad[0] = 1.0f;
-    localToWorld.m_rotation.m_col1.m_quad = _mm_setzero_ps();
-    localToWorld.m_rotation.m_col1.m_quad[1] = 1.0f;
-    localToWorld.m_rotation.m_col2.m_quad = _mm_setzero_ps();
-    localToWorld.m_rotation.m_col2.m_quad[2] = 1.0f;
-    localToWorld.m_translation.m_quad = _mm_setzero_ps();
+    localToWorld.setIdentity();
     getAabbImpl(localToWorld, 0.0f, aabb);
     // The half extents and the center, the half extents' signs flipped where direction's are set, then dot3 with
     // direction, summed y + x, then z + that.

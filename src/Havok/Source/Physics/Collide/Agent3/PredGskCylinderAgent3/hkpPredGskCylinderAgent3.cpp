@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -278,31 +279,9 @@ hkpAgentData* hkPredGskCylinderAgent3::process(
         const hkpCylinderShape* cylinder = static_cast<const hkpCylinderShape*>((*cdBodies[i])->m_shape);
         hkVector4 axis;
         axis.m_quad = _mm_sub_ps(cylinder->m_vertexB.m_quad, cylinder->m_vertexA.m_quad);
-        // EXE-INLINED 0x62AEA0
-        {
-            const hkQuadReal half = _mm_set_ss(0.5f);
-            const hkQuadReal three = _mm_set_ss(3.0f);
-            const hkQuadReal zero = _mm_set_ss(0.0f);
-            const hkQuadReal axisSquared = _mm_mul_ps(axis.m_quad, axis.m_quad);
-            const hkQuadReal len2 = _mm_add_ss(
-                _mm_shuffle_ps(axisSquared, axisSquared, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_add_ss(_mm_shuffle_ps(axisSquared, axisSquared, _MM_SHUFFLE(1, 1, 1, 1)), axisSquared)
-            );
-            const hkQuadReal len2EqualsZero = _mm_cmpeq_ss(len2, zero);
-            const hkQuadReal approx = _mm_rsqrt_ss(len2);
-            const hkQuadReal refined =
-                _mm_mul_ss(_mm_mul_ss(half, approx), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(len2, approx), approx)));
-            const hkQuadReal lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-            axis.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, _MM_SHUFFLE(0, 0, 0, 0)), axis.m_quad);
-        }
+        axis.normalize3();
         axis.setRotatedDir((*cdBodies[i])->m_motion.pMotion->getRotation(), axis);
-        // EXE-INLINED 0x62B0A0
-        const hkQuadReal products = _mm_mul_ps(separatingNormalOut.m_quad, axis.m_quad);
-        const hkQuadReal dot = _mm_add_ss(
-            _mm_shuffle_ps(products, products, _MM_SHUFFLE(2, 2, 2, 2)),
-            _mm_add_ss(_mm_shuffle_ps(products, products, _MM_SHUFFLE(1, 1, 1, 1)), products)
-        );
-        const float cosAngle = std::fabs(_mm_cvtss_f32(dot));
+        const float cosAngle = std::fabs(static_cast<float>(separatingNormalOut.dot3(axis)));
         if (isReplacedWithCapsule[i]) {
             if (cosAngle > 0.10000000149011612 &&
                 separatingDistanceUsingCapsuleRepresentations(input, entry, agentData) < 0.0f) {
@@ -328,19 +307,16 @@ hkpAgentData* hkPredGskCylinderAgent3::process(
     if (qualityInfo.m_useContinuousPhysics.m_storage) {
         const float depthA = input.m_bodyA->getRootCollidable()->m_allowedPenetrationDepth;
         const float depthB = input.m_bodyB->getRootCollidable()->m_allowedPenetrationDepth;
-        // EXE-INLINED 0xC9E0F0
-        const float allowedPenetrationDepth = (depthA < depthB) ? depthA : depthB;
+        const float allowedPenetrationDepth = hkMath::min2(depthA, depthB);
         const float distAtT0 = (*separatingNormal)(3);
         const float minSeparationA = qualityInfo.m_minSeparation * allowedPenetrationDepth;
         const float minSeparationB = distAtT0 + qualityInfo.m_minExtraSeparation * allowedPenetrationDepth;
-        // EXE-INLINED 0xC9E0F0
-        const float minSeparation = (minSeparationA < minSeparationB) ? minSeparationA : minSeparationB;
+        const float minSeparation = hkMath::min2(minSeparationA, minSeparationB);
         // The TOI is searched unless distAtT1 reaches minSeparation (a NaN searches it).
         if (!(minSeparation <= distAtT1)) {
             const float toiSeparationA = qualityInfo.m_toiSeparation * allowedPenetrationDepth;
             const float toiSeparationB = distAtT0 + qualityInfo.m_toiExtraSeparation * allowedPenetrationDepth;
-            // EXE-INLINED 0xC9E0F0
-            const float toiSeparation = (toiSeparationA < toiSeparationB) ? toiSeparationA : toiSeparationB;
+            const float toiSeparation = hkMath::min2(toiSeparationA, toiSeparationB);
             hk4dGskCollideCalcToi(
                 input, allowedPenetrationDepth, minSeparation, toiSeparation, gskCache, *separatingNormal, result
             );

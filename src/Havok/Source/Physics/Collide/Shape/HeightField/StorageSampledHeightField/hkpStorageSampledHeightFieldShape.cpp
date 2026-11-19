@@ -232,22 +232,7 @@ void hkpStorageSampledHeightFieldShape::collideSpheres(
         }
 
         output->mul4(m_floatToIntScale);
-        // EXE-INLINED 0x62AEA0
-        // hkVector4::normalize3: the inverse length from rsqrtss and one Newton step, 0 for a zero length.
-        const hkQuadReal scaled = output->m_quad;
-        const hkQuadReal squares = _mm_mul_ps(scaled, scaled);
-        const hkQuadReal len2 = _mm_add_ss(
-            _mm_shuffle_ps(squares, squares, _MM_SHUFFLE(2, 2, 2, 2)),
-            _mm_add_ss(_mm_shuffle_ps(squares, squares, _MM_SHUFFLE(1, 1, 1, 1)), squares)
-        );
-        const hkQuadReal approx = _mm_rsqrt_ss(len2);
-        const hkQuadReal len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-        const hkQuadReal refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const hkQuadReal lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-        output->m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, _MM_SHUFFLE(0, 0, 0, 0)), scaled);
+        output->normalize3();
 
         float absoluteDepth;
         if (!m_useProjectionBasedHeight.m_bool) {
@@ -261,13 +246,7 @@ void hkpStorageSampledHeightFieldShape::collideSpheres(
             vectorToTri.setSub4(pos, triangleVert);
             vectorToTri.mul4(m_intToFloatScale);
 
-            // EXE-INLINED 0x62B0A0
-            // hkVector4::dot3: the products' lanes summed, y + x, then z + that.
-            const hkQuadReal products = _mm_mul_ps(vectorToTri.m_quad, output->m_quad);
-            const float distanceToTri = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(products, products, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_add_ss(_mm_shuffle_ps(products, products, _MM_SHUFFLE(1, 1, 1, 1)), products)
-            ));
+            const float distanceToTri = vectorToTri.dot3(*output);
             absoluteDepth = distanceToTri - spheres->m_pos(3);
         }
         output[0](3) = absoluteDepth;

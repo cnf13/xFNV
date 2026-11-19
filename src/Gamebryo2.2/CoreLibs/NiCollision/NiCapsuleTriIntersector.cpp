@@ -34,18 +34,11 @@ NiCapsuleTriIntersector::~NiCapsuleTriIntersector() {}
 float NiCapsuleTriIntersector::Pseudodistance(const NiPoint3& kV0, const NiPoint3& kV1, float fTime) const {
     NiSegment kMSegment = m_kCapsule.m_kCapsule.m_kSegment;
     NiTrigon kMTri = m_kTri;
-    // EXE-INLINED 0x4A3760
-    NiPoint3 kOffset;
-    kOffset.x = kV0.x * fTime;
-    kOffset.y = kV0.y * fTime;
-    kOffset.z = kV0.z * fTime;
+    NiPoint3 kOffset = fTime * kV0;
     kMSegment.m_kOrigin.x = kOffset.x + kMSegment.m_kOrigin.x;
     kMSegment.m_kOrigin.y = kMSegment.m_kOrigin.y + kOffset.y;
     kMSegment.m_kOrigin.z = kMSegment.m_kOrigin.z + kOffset.z;
-    // EXE-INLINED 0x4A3760
-    kOffset.x = kV1.x * fTime;
-    kOffset.y = kV1.y * fTime;
-    kOffset.z = kV1.z * fTime;
+    kOffset = fTime * kV1;
     kMTri.m_kOrigin.x = kOffset.x + kMTri.m_kOrigin.x;
     kMTri.m_kOrigin.y = kMTri.m_kOrigin.y + kOffset.y;
     kMTri.m_kOrigin.z = kMTri.m_kOrigin.z + kOffset.z;

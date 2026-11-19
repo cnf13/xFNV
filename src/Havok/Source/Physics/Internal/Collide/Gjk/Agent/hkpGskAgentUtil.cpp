@@ -108,22 +108,12 @@ void hkGskAgentUtil_processCollisionNoTim(
             manifoldShapeA->convertVertexIdsToVerticesImpl(vertexIds, gskManifold.m_numVertsA, work.m_vertices);
             {
                 const hkTransform& transformA = *bodyA->m_motion.pMotion;
-                const __m128 col0 = transformA.getColumn(0).m_quad;
-                const __m128 col1 = transformA.getColumn(1).m_quad;
-                const __m128 col2 = transformA.getColumn(2).m_quad;
-                const __m128 translation = transformA.getTranslation().m_quad;
                 const int32_t numVertsA = gskManifold.m_numVertsA;
                 int32_t i = numVertsA - 1;
                 hkpCdVertex* vertex = &work.m_vertices[i];
-                // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos, on each vertex in place.
+                // Each vertex in place.
                 do {
-                    const __m128 v = vertex->m_quad;
-                    vertex->m_quad = _mm_add_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), col0)
-                        ),
-                        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation)
-                    );
+                    vertex->setTransformedPos(transformA, *vertex);
                     --i;
                     --vertex;
                 }
@@ -134,21 +124,11 @@ void hkGskAgentUtil_processCollisionNoTim(
                     vertexIds + numVertsA, gskManifold.m_numVertsB, verticesB
                 );
                 const hkTransform& transformB = *bodyB->m_motion.pMotion;
-                const __m128 colB0 = transformB.getColumn(0).m_quad;
-                const __m128 colB1 = transformB.getColumn(1).m_quad;
-                const __m128 colB2 = transformB.getColumn(2).m_quad;
-                const __m128 translationB = transformB.getTranslation().m_quad;
                 int32_t j = gskManifold.m_numVertsB - 1;
                 vertex = &verticesB[j];
-                // EXE-INLINED 0xC7F640: hkVector4::setTransformedPos, on each vertex in place.
+                // Each vertex in place.
                 do {
-                    const __m128 v = vertex->m_quad;
-                    vertex->m_quad = _mm_add_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), colB1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), colB0)
-                        ),
-                        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), colB2), translationB)
-                    );
+                    vertex->setTransformedPos(transformB, *vertex);
                     --j;
                     --vertex;
                 }

@@ -95,11 +95,7 @@ void NiPoint3Interpolator::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings)
 bool NiPoint3Interpolator::Update(float fTime, NiObjectNET*, NiPoint3& kValue) {
     if (m_fLastTime == fTime) {
         kValue = m_kPoint3Value;
-        // EXE-INLINED 0x4390C0
-        return !(
-            m_kPoint3Value.x == INVALID_POINT3.x && m_kPoint3Value.y == INVALID_POINT3.y &&
-            m_kPoint3Value.z == INVALID_POINT3.z
-        );
+        return !(m_kPoint3Value == INVALID_POINT3);
     }
 
     if (m_spPoint3Data) {
@@ -112,9 +108,7 @@ bool NiPoint3Interpolator::Update(float fTime, NiObjectNET*, NiPoint3& kValue) {
         }
     }
 
-    // EXE-INLINED 0x4390C0
-    if (m_kPoint3Value.x == INVALID_POINT3.x && m_kPoint3Value.y == INVALID_POINT3.y &&
-        m_kPoint3Value.z == INVALID_POINT3.z) {
+    if (m_kPoint3Value == INVALID_POINT3) {
         return false;
     }
     kValue = m_kPoint3Value;
@@ -208,11 +202,7 @@ bool NiPoint3Interpolator::GetChannelPosed(uint16_t) const {
     if (m_spPoint3Data) {
         return false;
     }
-    // EXE-INLINED 0x4390C0
-    return !(
-        m_kPoint3Value.x == INVALID_POINT3.x && m_kPoint3Value.y == INVALID_POINT3.y &&
-        m_kPoint3Value.z == INVALID_POINT3.z
-    );
+    return !(m_kPoint3Value == INVALID_POINT3);
 }
 
 void NiPoint3Interpolator::SetPoseValue(NiPoint3 kPoseValue) {

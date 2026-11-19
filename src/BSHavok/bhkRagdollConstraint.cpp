@@ -97,30 +97,7 @@ void hkRagdollConstraintCinfo::LoadBinary(NiStream& arStream) {
         &rAtoms.m_transforms.m_transformB.m_rotation.m_col1, &rAtoms.m_transforms.m_transformB.m_rotation.m_col0
     };
     for (hkVector4* pColumn : apColumns) {
-        // EXE-INLINED 0x62AEA0
-        // The squared length summed y + x, then + z; the SSE reciprocal square root estimate refined by one Newton
-        // step; zero for a zero vector (the exe masks the factor); all four lanes scaled. The exe's arithmetic is SSE
-        // single precision, so each operation is assigned to a float (src's floats evaluate as double).
-        hkQuadReal kV = pColumn->m_quad;
-        float fSqX = kV[0] * kV[0];
-        float fSqY = kV[1] * kV[1];
-        float fSqZ = kV[2] * kV[2];
-        float fSumXY = fSqY + fSqX;
-        float fLength2 = fSumXY + fSqZ;
-        float fEstimate = _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(fLength2)));
-        float fLengthEstimate = fLength2 * fEstimate;
-        float fLengthEstimate2 = fLengthEstimate * fEstimate;
-        float fCorrection = 3.0f - fLengthEstimate2;
-        float fHalfEstimate = 0.5f * fEstimate;
-        float fInverse = fHalfEstimate * fCorrection;
-        if (fLength2 == 0.0f) {
-            fInverse = 0.0f;
-        }
-        float fX = fInverse * kV[0];
-        float fY = fInverse * kV[1];
-        float fZ = fInverse * kV[2];
-        float fW = fInverse * kV[3];
-        pColumn->m_quad = hkQuadReal{fX, fY, fZ, fW};
+        pColumn->normalize3();
     }
     if (arStream.m_BSStreamHeader.uiVersion > 0x1D) {
         hkpConstraintMotor* pMotor = LoadMotor(arStream);

@@ -360,14 +360,9 @@ void hkpVehicleRayCastWheelCollide::getCollisionOutputFromCastResult(
         wheelInfo->m_hardPointWs.m_quad
     );
     cdInfo.m_contactPoint.m_separatingNormal.m_quad[3] = currentSuspensionLength;
-    __m128 normal = cdInfo.m_contactPoint.m_separatingNormal.m_quad;
+    hkVector4 normal = cdInfo.m_contactPoint.m_separatingNormal;
     cdInfo.m_contactFriction = cdInfo.m_contactBody->m_material.m_friction;
-    // EXE-INLINED 0x62B0A0
-    __m128 normalDotDir = _mm_mul_ps(normal, wheelInfo->m_suspensionDirectionWs.m_quad);
-    float denominator = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(normalDotDir, normalDotDir, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(normalDotDir, normalDotDir, 0x55), normalDotDir)
-    ));
+    float denominator = normal.dot3(wheelInfo->m_suspensionDirectionWs);
     if (!(-vehicle->m_data->m_normalClippingAngleCos > denominator)) {
         cdInfo.m_suspensionClosingSpeed = 0.0f;
         cdInfo.m_suspensionScalingFactor = 1.0 / vehicle->m_data->m_normalClippingAngleCos;
@@ -406,12 +401,9 @@ void hkpVehicleRayCastWheelCollide::getCollisionOutputFromCastResult(
             ),
             contactBody->m_motion.m_linearVelocity.m_quad
         );
-        // EXE-INLINED 0x62B0A0
-        __m128 relDotNormal = _mm_mul_ps(_mm_sub_ps(chassisVelocity, groundVelocity), normal);
-        float projVel = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(relDotNormal, relDotNormal, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(relDotNormal, relDotNormal, 0x55), relDotNormal)
-        ));
+        hkVector4 relVelocity;
+        relVelocity.m_quad = _mm_sub_ps(chassisVelocity, groundVelocity);
+        float projVel = relVelocity.dot3(normal);
         cdInfo.m_suspensionClosingSpeed = projVel * inv;
         cdInfo.m_suspensionScalingFactor = inv;
     }

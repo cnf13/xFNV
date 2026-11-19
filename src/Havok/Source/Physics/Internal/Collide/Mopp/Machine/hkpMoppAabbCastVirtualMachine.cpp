@@ -434,10 +434,10 @@ void hkpMoppAabbCastVirtualMachine::queryRayOnTree(
             if (fLeftHigh < fStart && fLeftHigh < fEnd) {
                 continue;
             }
-            const __m128 rayStart = fQuery->m_rayEnds[0].m_quad;
-            const __m128 rayEnd = fQuery->m_rayEnds[1].m_quad;
-            leftFloat.m_rayEnds[0].m_quad = rayStart;
-            leftFloat.m_rayEnds[1].m_quad = rayEnd;
+            const hkVector4 rayStart = fQuery->m_rayEnds[0];
+            const hkVector4 rayEnd = fQuery->m_rayEnds[1];
+            leftFloat.m_rayEnds[0].m_quad = rayStart.m_quad;
+            leftFloat.m_rayEnds[1].m_quad = rayEnd.m_quad;
             const float fStartAboveLeft = fStart - fLeftHigh;
             const float fStartAboveRight = fStart - fRightLow;
             const float fEndAboveLeft = fEnd - fLeftHigh;
@@ -447,33 +447,19 @@ void hkpMoppAabbCastVirtualMachine::queryRayOnTree(
                 // right child, with the part above its lower plane.
                 if (fEndAboveLeft * fStartAboveLeft < 0.0) {
                     const float t = fStartAboveLeft / (fStartAboveLeft - fEndAboveLeft);
-                    // EXE-INLINED 0x5DBF70
-                    const __m128 tt = _mm_set1_ps(t);
-                    leftFloat.m_rayEnds[1].m_quad =
-                        _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tt), rayStart), _mm_mul_ps(tt, rayEnd));
+                    leftFloat.m_rayEnds[1].setInterpolate4(rayStart, rayEnd, t);
                 }
                 queryRayOnTree(query, pChildren + iLeftOffset, &leftFloat, chunkOffset);
                 if (fEndAboveRight * fStartAboveRight < 0.0) {
                     const float t = fStartAboveRight / (fStartAboveRight - fEndAboveRight);
-                    // EXE-INLINED 0x5DBF70
-                    const __m128 tt = _mm_set1_ps(t);
-                    fQuery->m_rayEnds[0].m_quad = _mm_add_ps(
-                        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tt), fQuery->m_rayEnds[0].m_quad),
-                        _mm_mul_ps(fQuery->m_rayEnds[1].m_quad, tt)
-                    );
+                    fQuery->m_rayEnds[0].setInterpolate4(fQuery->m_rayEnds[0], fQuery->m_rayEnds[1], t);
                 }
                 // A hit in the left child lowered the early-out fraction: the segment now ends there.
                 if (m_refEarlyOutFraction > m_earlyOutFraction) {
                     m_refEarlyOutFraction = m_earlyOutFraction;
-                    // EXE-INLINED 0x5DBF70
-                    const __m128 fraction = _mm_set1_ps(m_earlyOutFraction);
-                    fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, fraction), m_input->m_from.m_quad),
-                            _mm_mul_ps(m_input->m_to.m_quad, fraction)
-                        ),
-                        m_code->m_info.m_offset.m_quad
-                    );
+                    hkVector4 earlyOutEnd;
+                    earlyOutEnd.setInterpolate4(m_input->m_from, m_input->m_to, m_earlyOutFraction);
+                    fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(earlyOutEnd.m_quad, m_code->m_info.m_offset.m_quad);
                     fQuery->m_rayEnds[1].m_quad =
                         _mm_mul_ps(_mm_set1_ps(query->m_FtoBScale), fQuery->m_rayEnds[1].m_quad);
                     fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(fQuery->m_rayEnds[1].m_quad, query->m_FtoBoffset.m_quad);
@@ -487,32 +473,18 @@ void hkpMoppAabbCastVirtualMachine::queryRayOnTree(
             // left child, with the part below its upper plane.
             if (fEndAboveRight * fStartAboveRight < 0.0) {
                 const float t = fStartAboveRight / (fStartAboveRight - fEndAboveRight);
-                // EXE-INLINED 0x5DBF70
-                const __m128 tt = _mm_set1_ps(t);
-                leftFloat.m_rayEnds[1].m_quad =
-                    _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tt), rayStart), _mm_mul_ps(tt, rayEnd));
+                leftFloat.m_rayEnds[1].setInterpolate4(rayStart, rayEnd, t);
             }
             queryRayOnTree(query, PC, &leftFloat, chunkOffset);
             if (fEndAboveLeft * fStartAboveLeft < 0.0) {
                 const float t = fStartAboveLeft / (fStartAboveLeft - fEndAboveLeft);
-                // EXE-INLINED 0x5DBF70
-                const __m128 tt = _mm_set1_ps(t);
-                fQuery->m_rayEnds[0].m_quad = _mm_add_ps(
-                    _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tt), fQuery->m_rayEnds[0].m_quad),
-                    _mm_mul_ps(tt, fQuery->m_rayEnds[1].m_quad)
-                );
+                fQuery->m_rayEnds[0].setInterpolate4(fQuery->m_rayEnds[0], fQuery->m_rayEnds[1], t);
             }
             if (m_refEarlyOutFraction > m_earlyOutFraction) {
                 m_refEarlyOutFraction = m_earlyOutFraction;
-                // EXE-INLINED 0x5DBF70
-                const __m128 fraction = _mm_set1_ps(m_earlyOutFraction);
-                fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, fraction), m_input->m_from.m_quad),
-                        _mm_mul_ps(m_input->m_to.m_quad, fraction)
-                    ),
-                    m_code->m_info.m_offset.m_quad
-                );
+                hkVector4 earlyOutEnd;
+                earlyOutEnd.setInterpolate4(m_input->m_from, m_input->m_to, m_earlyOutFraction);
+                fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(earlyOutEnd.m_quad, m_code->m_info.m_offset.m_quad);
                 fQuery->m_rayEnds[1].m_quad = _mm_mul_ps(_mm_set1_ps(query->m_FtoBScale), fQuery->m_rayEnds[1].m_quad);
                 fQuery->m_rayEnds[1].m_quad = _mm_sub_ps(fQuery->m_rayEnds[1].m_quad, query->m_FtoBoffset.m_quad);
                 if (iAxis < 3 && fLeftHigh < fQuery->m_rayEnds[1](iAxis)) {
@@ -538,25 +510,19 @@ void hkpMoppAabbCastVirtualMachine::queryRayOnTree(
                 }
                 iDown = 1;
             }
-            const __m128 rayStart = fQuery->m_rayEnds[0].m_quad;
-            const __m128 rayEnd = fQuery->m_rayEnds[1].m_quad;
+            const hkVector4 rayStart = fQuery->m_rayEnds[0];
+            const hkVector4 rayEnd = fQuery->m_rayEnds[1];
             const float fStartAboveHigh = fStart - fHigh;
             const float fEndAboveHigh = fEnd - fHigh;
             if (fEndAboveHigh * fStartAboveHigh < 0.0) {
                 const float t = fStartAboveHigh / (fStartAboveHigh - fEndAboveHigh);
-                // EXE-INLINED 0x5DBF70
-                const __m128 tt = _mm_set1_ps(t);
-                fQuery->m_rayEnds[1 - iDown].m_quad =
-                    _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tt), rayStart), _mm_mul_ps(rayEnd, tt));
+                fQuery->m_rayEnds[1 - iDown].setInterpolate4(rayStart, rayEnd, t);
             }
             const float fStartAboveLow = fStart - fLow;
             const float fEndAboveLow = fEnd - fLow;
             if (fEndAboveLow * fStartAboveLow < 0.0) {
                 const float t = fStartAboveLow / (fStartAboveLow - fEndAboveLow);
-                // EXE-INLINED 0x5DBF70
-                const __m128 tt = _mm_set1_ps(t);
-                fQuery->m_rayEnds[iDown].m_quad =
-                    _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tt), rayStart), _mm_mul_ps(tt, rayEnd));
+                fQuery->m_rayEnds[iDown].setInterpolate4(rayStart, rayEnd, t);
             }
             continue;
         }

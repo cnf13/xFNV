@@ -66,15 +66,11 @@ void hkpMotorAction::applyAction(const hkStepInfo& stepInfo) {
         hkpMotion* pMotion = pEntity->getMotion();
         hkVector4 currentAngVel;
         currentAngVel.setRotatedInverseDir(pMotion->m_motionState.m_transform.m_rotation, pMotion->m_angularVelocity);
-        // EXE-INLINED 0x62B0A0
-        __m128 product = _mm_mul_ps(m_axis.m_quad, currentAngVel.m_quad);
-        float fCurrentRate =
-            (_mm_shuffle_ps(product, product, 170)[0] + (_mm_shuffle_ps(product, product, 85)[0] + product[0]));
+        float fCurrentRate = m_axis.dot3(currentAngVel);
         float fTorque = m_spinRate - fCurrentRate;
         fTorque = fTorque * m_gain;
         hkVector4 torque;
-        // EXE-INLINED 0x630AE0
-        torque.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(fTorque), _mm_set_ss(fTorque), 0), m_axis.m_quad);
+        torque.setMul4(fTorque, m_axis);
         hkMatrix3 inertia;
         pMotion->getInertiaLocal(inertia);
         torque.setMul3(inertia, torque);

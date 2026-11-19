@@ -204,26 +204,6 @@ hkVector4 hkConvexPenetrationUtil::findBestProjection(
 // tolerance and output already holds the answer. HK_FAILURE with HK_GSK_PD_UNSOLVABLE: no tetrahedron.
 hkResult hkConvexPenetrationUtil::builtTetrahedron(hkGskOut& output, hkGskStatus& gjkStatus) {
     int32_t iStep = -1;
-    // EXE-INLINED 0x62B0A0
-    // hkVector4::dot3: mulps, then y + x and z + that (addss), in the low lane.
-    auto dot3 = [](__m128 a, __m128 b) {
-        const __m128 p = _mm_mul_ps(a, b);
-        return _mm_add_ss(_mm_shuffle_ps(p, p, 0xAA), _mm_add_ss(_mm_shuffle_ps(p, p, 0x55), p));
-    };
-    // EXE-INLINED 0x62AEA0
-    // hkVector4::normalize3: rsqrtss refined once (0.5 r (3 - len2 r r)), zero for a zero length, times the vector.
-    auto normalize3 = [&dot3](__m128 v) {
-        const __m128 len2 = dot3(v, v);
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 lenInv = _mm_andnot_ps(
-            _mm_cmpeq_ss(len2, _mm_setzero_ps()),
-            _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            )
-        );
-        return _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), v);
-    };
     hkVector4 triangleNormal;
     switch (m_simplexSize.m_storage) {
         case 0: goto empty;
@@ -245,9 +225,9 @@ tetrahedron:
         edge0.m_quad = _mm_sub_ps(pSimplex[0].m_quad, pSimplex[1].m_quad);
         edge1.m_quad = _mm_sub_ps(pSimplex[1].m_quad, pSimplex[2].m_quad);
         normal.setCross(edge0, edge1);
-        const float fNormalLength2 = _mm_cvtss_f32(dot3(normal.m_quad, normal.m_quad));
+        const float fNormalLength2 = normal.dot3(normal);
         toFourth.m_quad = _mm_sub_ps(pSimplex[3].m_quad, pSimplex[0].m_quad);
-        const float fDistance = _mm_cvtss_f32(dot3(toFourth.m_quad, normal.m_quad));
+        const float fDistance = toFourth.dot3(normal);
         // Rounds the limit to a float.
         const float fLimit = m_epsTolSqrd.m_storage * fNormalLength2;
         if (!(fLimit >= fDistance * fDistance)) {
@@ -269,7 +249,7 @@ triangle:
         edge0.m_quad = _mm_sub_ps(pSimplex[0].m_quad, pSimplex[1].m_quad);
         edge1.m_quad = _mm_sub_ps(pSimplex[1].m_quad, pSimplex[2].m_quad);
         triangleNormal.setCross(edge0, edge1);
-        const float fNormalLength2 = _mm_cvtss_f32(dot3(triangleNormal.m_quad, triangleNormal.m_quad));
+        const float fNormalLength2 = triangleNormal.dot3(triangleNormal);
         if (0.0f != fNormalLength2) {
             goto expandTriangle;
         }
@@ -296,7 +276,7 @@ triangle:
             perpendicular.m_quad = _mm_setzero_ps();
             perpendicular(iOk1) = edge(iOk2);
             perpendicular(iOk2) = -edge(iOk1);
-            perpendicular.m_quad = normalize3(perpendicular.m_quad);
+            perpendicular.normalize3();
             output.m_normalInA.m_quad = _mm_and_ps(perpendicular.m_quad, rdata_10C4C10);
             // The point on A at the ratio sum|s0| / (2 sum|s0| + FLT_EPSILON) from A's first point to its second.
             const __m128 absS0 = _mm_and_ps(m_simplex.m_storage[0].m_quad, hkVector4_setAbs4_absMask);
@@ -319,7 +299,7 @@ edge:
     {
         hkVector4 edge;
         edge.m_quad = _mm_sub_ps(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[1].m_quad);
-        const float fEdgeLength2 = _mm_cvtss_f32(dot3(edge.m_quad, edge.m_quad));
+        const float fEdgeLength2 = edge.dot3(edge);
         if (!(m_epsTolSqrd.m_storage >= fEdgeLength2)) {
             goto expandEdge;
         }
@@ -332,7 +312,7 @@ edge:
 
 point:
     {
-        const float fLength2 = _mm_cvtss_f32(dot3(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[0].m_quad));
+        const float fLength2 = m_simplex.m_storage[0].dot3(m_simplex.m_storage[0]);
         if (!(m_epsTolSqrd.m_storage >= fLength2)) {
             goto expandPoint;
         }
@@ -348,21 +328,19 @@ empty:
         // The first point along the negated translation, or along y where A and B are about centred.
         hkVector4 direction;
         hkWingedEdge::Vertex support;
-        const float fTranslationLength2 = _mm_cvtss_f32(dot3(m_aTb.m_translation.m_quad, m_aTb.m_translation.m_quad));
+        const float fTranslationLength2 = m_aTb.m_translation.dot3(m_aTb.m_translation);
         direction.m_quad = _mm_xor_ps(m_aTb.m_translation.m_quad, hkQuadRealNegateMask);
         if (m_epsTolSqrd.m_storage >= fTranslationLength2) {
             direction.m_quad = hkTransformIdentity.m_rotation.m_col1.m_quad;
         }
         getPointForSimplex(direction, support);
         addPointToSimplex(support);
-        const float fLength2 = _mm_cvtss_f32(dot3(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[0].m_quad));
+        const float fLength2 = m_simplex.m_storage[0].dot3(m_simplex.m_storage[0]);
         if (m_epsTolSqrd.m_storage >= fLength2) {
             // The shapes touch at that point: the normal is the direction, its w the distance.
-            // EXE-INLINED 0x630B40
-            const float fDistance =
-                _mm_cvtss_f32(_mm_sqrt_ss(dot3(m_simplex.m_storage[0].m_quad, m_simplex.m_storage[0].m_quad)));
+            const float fDistance = m_simplex.m_storage[0].length3();
             output.m_pointAinA.m_quad = support.m_pointAinA.m_quad;
-            direction.m_quad = normalize3(direction.m_quad);
+            direction.normalize3();
             const float fZ = direction(2);
             const float fY = direction(1);
             output.m_normalInA.m_quad = _mm_unpacklo_ps(
@@ -387,11 +365,11 @@ expandPoint:
         iStep = 1;
         getPointForSimplex(*pSimplex, along);
         offset.m_quad = _mm_sub_ps(along.m_position.m_quad, m_simplex.m_storage[0].m_quad);
-        const float fAlongDistance2 = _mm_cvtss_f32(dot3(offset.m_quad, offset.m_quad));
+        const float fAlongDistance2 = offset.dot3(offset);
         direction.m_quad = _mm_xor_ps(pSimplex->m_quad, hkQuadRealNegateMask);
         getPointForSimplex(direction, against);
         offset.m_quad = _mm_sub_ps(against.m_position.m_quad, m_simplex.m_storage[0].m_quad);
-        const float fAgainstDistance2 = _mm_cvtss_f32(dot3(offset.m_quad, offset.m_quad));
+        const float fAgainstDistance2 = offset.dot3(offset);
         if (!(fAgainstDistance2 <= fAlongDistance2)) {
             addPointToSimplex(against);
         }
@@ -430,8 +408,8 @@ expandEdge:
         perpendicular(iOk2) = -edge(iOk1);
         hkVector4 cross;
         cross.setCross(edge, perpendicular);
-        perpendicular.m_quad = normalize3(perpendicular.m_quad);
-        cross.m_quad = normalize3(cross.m_quad);
+        perpendicular.normalize3();
+        cross.normalize3();
         hkWingedEdge::Vertex alongPerpendicular;
         hkWingedEdge::Vertex alongCross;
         hkVector4 perpendicularDistance = findBestProjection(perpendicular, *pSimplex, alongPerpendicular);
@@ -451,7 +429,7 @@ expandTriangle:
         // origin's projection on the triangle is the answer.
         hkVector4* pSimplex = m_simplex.m_storage;
         hkWingedEdge::Vertex support;
-        triangleNormal.m_quad = normalize3(triangleNormal.m_quad);
+        triangleNormal.normalize3();
         iStep = 3;
         hkVector4 distance = findBestProjection(triangleNormal, *pSimplex, support);
         if ((_mm_movemask_ps(_mm_sub_ss(distance.m_quad, m_epsTol.m_quad)) & 1) == 0) {

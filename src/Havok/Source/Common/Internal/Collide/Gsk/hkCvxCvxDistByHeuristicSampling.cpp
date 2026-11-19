@@ -22,21 +22,8 @@ static void hkCvxCvxDistByHeuristicSamplingPerformSample(
     hkVector4 negDir;
     negDir.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
 
-    // EXE-INLINED none: hkVector4::_setRotatedInverseDir
-    const hkRotation& rotation = aTb.m_rotation;
-    __m128 c0c1Lo = _mm_unpacklo_ps(rotation.m_col0.m_quad, rotation.m_col1.m_quad);
-    __m128 c0c1Hi = _mm_unpackhi_ps(rotation.m_col0.m_quad, rotation.m_col1.m_quad);
-    __m128 row0 = _mm_movelh_ps(c0c1Lo, rotation.m_col2.m_quad);
-    __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, c0c1Lo), rotation.m_col2.m_quad, 0xD4);
-    __m128 row2 = _mm_shuffle_ps(c0c1Hi, rotation.m_col2.m_quad, 0xE4);
     hkVector4 dirB;
-    dirB.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(direction.m_quad, direction.m_quad, 0x55), row1),
-            _mm_mul_ps(_mm_shuffle_ps(direction.m_quad, direction.m_quad, 0x00), row0)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(direction.m_quad, direction.m_quad, 0xAA), row2)
-    );
+    dirB._setRotatedInverseDir(aTb.m_rotation, direction);
 
     hkVector4 vertexAinA;
     shapeA->getSupportingVertex(negDir, &vertexAinA);
@@ -124,18 +111,7 @@ void hkCvxCvxDistByHeuristicSampling(
         dir(i0) = normal(i1);
         dir(i1) = -normal(i0);
 
-        // EXE-INLINED none: hkVector4::normalize3
-        __m128 squares = _mm_mul_ps(dir.m_quad, dir.m_quad);
-        __m128 length2 = _mm_add_ss(
-            _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-        );
-        __m128 lengthInv = _mm_rsqrt_ss(length2);
-        __m128 isZero = _mm_cmpeq_ss(length2, zero);
-        __m128 scale = _mm_mul_ss(
-            _mm_mul_ss(half, lengthInv), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(length2, lengthInv), lengthInv))
-        );
-        scale = _mm_andnot_ps(isZero, scale);
-        dir.m_quad = _mm_mul_ps(_mm_shuffle_ps(scale, scale, 0x00), dir.m_quad);
+        dir.normalize3();
 
         __m128 angles = _mm_set1_ps(angle);
         __m128 tilt = _mm_mul_ps(angles, dir.m_quad);
@@ -145,13 +121,13 @@ void hkCvxCvxDistByHeuristicSampling(
 
         // EXE-INLINED none: hkVector4::normalize3 (the factor of normal + tilt scales all four directions)
         __m128 tilted = _mm_add_ps(normal.m_quad, tilt);
-        squares = _mm_mul_ps(tilted, tilted);
-        length2 = _mm_add_ss(
+        __m128 squares = _mm_mul_ps(tilted, tilted);
+        __m128 length2 = _mm_add_ss(
             _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
         );
-        lengthInv = _mm_rsqrt_ss(length2);
-        isZero = _mm_cmpeq_ss(length2, zero);
-        scale = _mm_mul_ss(
+        __m128 lengthInv = _mm_rsqrt_ss(length2);
+        __m128 isZero = _mm_cmpeq_ss(length2, zero);
+        __m128 scale = _mm_mul_ss(
             _mm_mul_ss(half, lengthInv), _mm_sub_ss(three, _mm_mul_ss(_mm_mul_ss(length2, lengthInv), lengthInv))
         );
         scale = _mm_andnot_ps(isZero, scale);

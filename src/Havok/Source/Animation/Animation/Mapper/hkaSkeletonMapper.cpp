@@ -152,24 +152,7 @@ void hkaSkeletonMapper::mapPose(
         const hkQsTransform& rA = poseAModelSpace[rSimple.m_boneA];
         hkQsTransform& rB = poseBModelSpace[rSimple.m_boneB];
         _mm_prefetch(reinterpret_cast<const char*>(&rMapping.m_simpleMappings.m_data[i + 2]), _MM_HINT_NTA);
-        // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(rA.m_rotation, rSimple.m_aFromBTransform.m_translation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rB.m_translation.m_quad)[0],
-            _mm_add_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&kRotated.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&rA.m_translation.m_quad)[0])
-            )
-        );
-        rB.m_rotation.setMul(rA.m_rotation, rSimple.m_aFromBTransform.m_rotation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rB.m_scale.m_quad)[0],
-            _mm_mul_ps(
-                _mm_load_ps(&reinterpret_cast<const float*>(&rA.m_scale.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&rSimple.m_aFromBTransform.m_scale.m_quad)[0])
-            )
-        );
+        rB.setMul(rA, rSimple.m_aFromBTransform);
         _mm_prefetch(reinterpret_cast<const char*>(&poseAModelSpace[rSimple.m_boneA + 2].m_scale), _MM_HINT_NTA);
         _mm_prefetch(reinterpret_cast<const char*>(&poseBModelSpace[rSimple.m_boneB + 2].m_scale), _MM_HINT_NTA);
     }
@@ -183,24 +166,7 @@ void hkaSkeletonMapper::mapPose(
         const int16_t iEndBoneB = rChain.m_endBoneB;
         const hkQsTransform& rStartA = poseAModelSpace[iStartBoneA];
         hkQsTransform& rStartB = poseBModelSpace[iStartBoneB];
-        // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(rStartA.m_rotation, rChain.m_startAFromBTransform.m_translation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rStartB.m_translation.m_quad)[0],
-            _mm_add_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&kRotated.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&rStartA.m_translation.m_quad)[0])
-            )
-        );
-        rStartB.m_rotation.setMul(rStartA.m_rotation, rChain.m_startAFromBTransform.m_rotation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&rStartB.m_scale.m_quad)[0],
-            _mm_mul_ps(
-                _mm_load_ps(&reinterpret_cast<const float*>(&rStartA.m_scale.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&rChain.m_startAFromBTransform.m_scale.m_quad)[0])
-            )
-        );
+        rStartB.setMul(rStartA, rChain.m_startAFromBTransform);
 
         // Skeleton B's bone chain, in a stack-allocated hkLocalArray of the start bone's address space.
         const int32_t iNumBones = static_cast<int32_t>(iEndBoneB) - static_cast<int32_t>(iStartBoneB) + 1;
@@ -304,24 +270,7 @@ void hkaSkeletonMapper::mapPose(
             const hkQsTransform& rParent = poseBModelSpace[kBones.m_data[i - 1]];
             const hkQsTransform& rLocal = originalPoseBLocalSpace[kBones.m_data[i]];
             hkQsTransform& rBone = poseBModelSpace[kBones.m_data[i]];
-            // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-            hkVector4 kRotatedBone;
-            kRotatedBone.setRotatedDir(rParent.m_rotation, rLocal.m_translation);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&rBone.m_translation.m_quad)[0],
-                _mm_add_ps(
-                    _mm_load_ps(&reinterpret_cast<float*>(&kRotatedBone.m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_translation.m_quad)[0])
-                )
-            );
-            rBone.m_rotation.setMul(rParent.m_rotation, rLocal.m_rotation);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&rBone.m_scale.m_quad)[0],
-                _mm_mul_ps(
-                    _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_scale.m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&rLocal.m_scale.m_quad)[0])
-                )
-            );
+            rBone.setMul(rParent, rLocal);
         }
     }
 
@@ -353,25 +302,7 @@ void hkaSkeletonMapper::mapPose(
                 const hkQsTransform& rParent = poseBModelSpace[iParent];
                 const hkQsTransform& rLocal = originalPoseBLocalSpace[iBone];
                 hkQsTransform& rBone = poseBModelSpace[iBone];
-                // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line
-                // call)
-                hkVector4 kRotatedBone;
-                kRotatedBone.setRotatedDir(rParent.m_rotation, rLocal.m_translation);
-                _mm_store_ps(
-                    &reinterpret_cast<float*>(&rBone.m_translation.m_quad)[0],
-                    _mm_add_ps(
-                        _mm_load_ps(&reinterpret_cast<float*>(&kRotatedBone.m_quad)[0]),
-                        _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_translation.m_quad)[0])
-                    )
-                );
-                rBone.m_rotation.setMul(rParent.m_rotation, rLocal.m_rotation);
-                _mm_store_ps(
-                    &reinterpret_cast<float*>(&rBone.m_scale.m_quad)[0],
-                    _mm_mul_ps(
-                        _mm_load_ps(&reinterpret_cast<const float*>(&rParent.m_scale.m_quad)[0]),
-                        _mm_load_ps(&reinterpret_cast<const float*>(&rLocal.m_scale.m_quad)[0])
-                    )
-                );
+                rBone.setMul(rParent, rLocal);
             }
         }
     }
@@ -422,24 +353,7 @@ void hkaSkeletonMapper::multiplyPoses(
 ) {
     if (!apIndices) {
         for (int32_t i = 0; i < aiNumTransforms; ++i) {
-            // EXE-INLINED none: hkQsTransform::setMul
-            hkVector4 kRotated;
-            kRotated.setRotatedDir(apA[i].m_rotation, apB[i].m_translation);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&apOut[i].m_translation.m_quad)[0],
-                _mm_add_ps(
-                    _mm_load_ps(&reinterpret_cast<float*>(&kRotated.m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&apA[i].m_translation.m_quad)[0])
-                )
-            );
-            apOut[i].m_rotation.setMul(apA[i].m_rotation, apB[i].m_rotation);
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&apOut[i].m_scale.m_quad)[0],
-                _mm_mul_ps(
-                    _mm_load_ps(&reinterpret_cast<const float*>(&apB[i].m_scale.m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&apA[i].m_scale.m_quad)[0])
-                )
-            );
+            apOut[i].setMul(apA[i], apB[i]);
         }
         return;
     }
@@ -461,24 +375,7 @@ void hkaSkeletonMapper::multiplyPoses(
             &reinterpret_cast<float*>(&kA.m_scale.m_quad)[0],
             _mm_load_ps(&reinterpret_cast<const float*>(&apA[j].m_scale.m_quad)[0])
         );
-        // EXE-INLINED none: hkQsTransform::setMul
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(kA.m_rotation, apB[i].m_translation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&apOut[j].m_translation.m_quad)[0],
-            _mm_add_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&kRotated.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<float*>(&kA.m_translation.m_quad)[0])
-            )
-        );
-        apOut[j].m_rotation.setMul(kA.m_rotation, apB[i].m_rotation);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&apOut[j].m_scale.m_quad)[0],
-            _mm_mul_ps(
-                _mm_load_ps(&reinterpret_cast<const float*>(&apB[i].m_scale.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<float*>(&kA.m_scale.m_quad)[0])
-            )
-        );
+        apOut[j].setMul(kA, apB[i]);
     }
 }
 
@@ -887,13 +784,7 @@ hkaSkeletonMapperData::ChainMapping::operator=(const hkaSkeletonMapperData::Chai
     m_endBoneA = other.m_endBoneA;
     m_startBoneB = other.m_startBoneB;
     m_endBoneB = other.m_endBoneB;
-    // EXE-INLINED 0xC6CD30
-    m_startAFromBTransform.m_translation = other.m_startAFromBTransform.m_translation;
-    m_startAFromBTransform.m_rotation.m_vec = other.m_startAFromBTransform.m_rotation.m_vec;
-    m_startAFromBTransform.m_scale = other.m_startAFromBTransform.m_scale;
-    // EXE-INLINED 0xC6CD30
-    m_endAFromBTransform.m_translation = other.m_endAFromBTransform.m_translation;
-    m_endAFromBTransform.m_rotation.m_vec = other.m_endAFromBTransform.m_rotation.m_vec;
-    m_endAFromBTransform.m_scale = other.m_endAFromBTransform.m_scale;
+    m_startAFromBTransform = other.m_startAFromBTransform;
+    m_endAFromBTransform = other.m_endAFromBTransform;
     return *this;
 }

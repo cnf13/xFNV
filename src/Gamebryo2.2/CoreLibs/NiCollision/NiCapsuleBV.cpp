@@ -129,21 +129,9 @@ void NiCapsuleBV::AddViewerStrings(const char* pcPrefix, NiTPrimitiveArray<char*
 // float in a temporary, and the direction is doubled with the double 2.0.
 void NiCapsuleBV::CalculateCapsule() {
     float fHalfLength = m_fExtent - m_kCapsule.m_fRadius;
-    // EXE-INLINED 0x45BB20
-    NiPoint3 kTmp;
-    kTmp.x = m_kAxis.x * fHalfLength;
-    kTmp.y = m_kAxis.y * fHalfLength;
-    kTmp.z = fHalfLength * m_kAxis.z;
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kOrigin;
-    kOrigin.x = m_kCenter.x - kTmp.x;
-    kOrigin.y = m_kCenter.y - kTmp.y;
-    kOrigin.z = m_kCenter.z - kTmp.z;
-    m_kCapsule.m_kSegment.m_kOrigin = kOrigin;
-    // EXE-INLINED 0x45BB20
-    kTmp.x = m_kAxis.x * fHalfLength;
-    kTmp.y = m_kAxis.y * fHalfLength;
-    kTmp.z = fHalfLength * m_kAxis.z;
+    NiPoint3 kTmp = m_kAxis * fHalfLength;
+    m_kCapsule.m_kSegment.m_kOrigin = m_kCenter - kTmp;
+    kTmp = m_kAxis * fHalfLength;
     m_kCapsule.m_kSegment.m_kDirection.x = kTmp.x * 2.0;
     m_kCapsule.m_kSegment.m_kDirection.y = kTmp.y * 2.0;
     m_kCapsule.m_kSegment.m_kDirection.z = kTmp.z * 2.0;
@@ -182,12 +170,7 @@ bool NiCapsuleBV::CapsuleSphereFindIntersect(
         kIntrPt = kIntersector.GetContactPoint();
         if (bCalcNormals) {
             kNormal0 = kIntersector.GetContactNormal();
-            // EXE-INLINED 0x4A0BD0
-            NiPoint3 kNegated;
-            kNegated.x = -kNormal0.x;
-            kNegated.y = -kNormal0.y;
-            kNegated.z = -kNormal0.z;
-            kNormal1 = kNegated;
+            kNormal1 = -kNormal0;
         }
         return true;
     }
@@ -217,12 +200,7 @@ bool NiCapsuleBV::CapsuleCapsuleFindIntersect(
         kIntrPt = kIntersector.GetContactPoint();
         if (bCalcNormals) {
             kNormal0 = kIntersector.GetContactNormal();
-            // EXE-INLINED 0x4A0BD0
-            NiPoint3 kNegated;
-            kNegated.x = -kNormal0.x;
-            kNegated.y = -kNormal0.y;
-            kNegated.z = -kNormal0.z;
-            kNormal1 = kNegated;
+            kNormal1 = -kNormal0;
         }
         return true;
     }
@@ -240,23 +218,15 @@ bool NiCapsuleBV::CapsuleSphereTestIntersect(
     const NiSphereBV& kSphABV = static_cast<const NiSphereBV&>(kABV1);
 
     // The relative velocity of the sphere with respect to the capsule.
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDeltaV;
-    kDeltaV.x = kV1.x - kV0.x;
-    kDeltaV.y = kV1.y - kV0.y;
-    kDeltaV.z = kV1.z - kV0.z;
+    NiPoint3 kDeltaV = kV1 - kV0;
     float fSqrDist;
     float fS0;
 
-    // EXE-INLINED 0x439090
-    if (!(NiPoint3_ZERO.x == kDeltaV.x && NiPoint3_ZERO.y == kDeltaV.y && NiPoint3_ZERO.z == kDeltaV.z)) {
+    if (NiPoint3_ZERO != kDeltaV) {
         // The sphere's centre swept over the time interval, against the capsule's segment.
         NiSegment kSegment;
         kSegment.m_kOrigin = kSphABV.m_kSphere.m_kCenter;
-        // EXE-INLINED 0x4A3760
-        kSegment.m_kDirection.x = fTime * kDeltaV.x;
-        kSegment.m_kDirection.y = fTime * kDeltaV.y;
-        kSegment.m_kDirection.z = fTime * kDeltaV.z;
+        kSegment.m_kDirection = fTime * kDeltaV;
         float fS1;
         fSqrDist = NiSqrDistance::Compute(kSegment, kCapABV.m_kCapsule.m_kSegment, fS0, fS1);
     }
@@ -281,24 +251,16 @@ bool NiCapsuleBV::CapsuleCapsuleTestIntersect(
     const NiCapsuleBV& kCapABV1 = static_cast<const NiCapsuleBV&>(kABV1);
 
     // The relative velocity of the second capsule with respect to the first, each component rounded to a float.
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDeltaV;
-    kDeltaV.x = kV1.x - kV0.x;
-    kDeltaV.y = kV1.y - kV0.y;
-    kDeltaV.z = kV1.z - kV0.z;
+    NiPoint3 kDeltaV = kV1 - kV0;
     float fSqrDist;
     float fS0;
 
-    // EXE-INLINED 0x439090
-    if (!(NiPoint3_ZERO.x == kDeltaV.x && NiPoint3_ZERO.y == kDeltaV.y && NiPoint3_ZERO.z == kDeltaV.z)) {
+    if (NiPoint3_ZERO != kDeltaV) {
         // The second capsule's segment swept over the time interval, against the first capsule's segment.
         NiParallelogram kPgm;
         kPgm.m_kOrigin = kCapABV1.m_kCapsule.m_kSegment.m_kOrigin;
         kPgm.m_kEdge0 = kCapABV1.m_kCapsule.m_kSegment.m_kDirection;
-        // EXE-INLINED 0x4A3760
-        kPgm.m_kEdge1.x = fTime * kDeltaV.x;
-        kPgm.m_kEdge1.y = fTime * kDeltaV.y;
-        kPgm.m_kEdge1.z = fTime * kDeltaV.z;
+        kPgm.m_kEdge1 = fTime * kDeltaV;
         float fP0;
         float fP1;
         fSqrDist = NiSqrDistance::Compute(kCapABV0.m_kCapsule.m_kSegment, kPgm, fS0, fP0, fP1);
@@ -327,42 +289,19 @@ bool NiCapsuleBV::CapsuleTriTestIntersect(
 
     NiTrigon kTri;
     kTri.m_kOrigin = kVert0;
-    // EXE-INLINED 0x439EF0
-    kTri.m_kEdge0.x = kVert1.x - kVert0.x;
-    kTri.m_kEdge0.y = kVert1.y - kVert0.y;
-    kTri.m_kEdge0.z = kVert1.z - kVert0.z;
-    // EXE-INLINED 0x439EF0
-    kTri.m_kEdge1.x = kVert2.x - kVert0.x;
-    kTri.m_kEdge1.y = kVert2.y - kVert0.y;
-    kTri.m_kEdge1.z = kVert2.z - kVert0.z;
+    kTri.m_kEdge0 = kVert1 - kVert0;
+    kTri.m_kEdge1 = kVert2 - kVert0;
 
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDeltaV;
-    kDeltaV.x = kV0.x - kV1.x;
-    kDeltaV.y = kV0.y - kV1.y;
-    kDeltaV.z = kV0.z - kV1.z;
+    NiPoint3 kDeltaV = kV0 - kV1;
 
     // The negated cross product of the edges.
-    // EXE-INLINED 0x4B3800
-    NiPoint3 kCross;
-    kCross.x = kTri.m_kEdge0.y * kTri.m_kEdge1.z - kTri.m_kEdge0.z * kTri.m_kEdge1.y;
-    kCross.y = kTri.m_kEdge0.z * kTri.m_kEdge1.x - kTri.m_kEdge0.x * kTri.m_kEdge1.z;
-    kCross.z = kTri.m_kEdge0.x * kTri.m_kEdge1.y - kTri.m_kEdge0.y * kTri.m_kEdge1.x;
-    // EXE-INLINED 0x4A0BD0
-    NiPoint3 kTriNormal;
-    kTriNormal.x = -kCross.x;
-    kTriNormal.y = -kCross.y;
-    kTriNormal.z = -kCross.z;
+    NiPoint3 kTriNormal = -kTri.m_kEdge0.Cross(kTri.m_kEdge1);
 
-    // EXE-INLINED 0x4B6190
-    float fNdotC =
-        kTriNormal.x * kCapABV.m_kCenter.x + kTriNormal.y * kCapABV.m_kCenter.y + kTriNormal.z * kCapABV.m_kCenter.z;
+    float fNdotC = kTriNormal.Dot(kCapABV.m_kCenter);
     float PseudoRadius =
         (kCapABV.m_fExtent > kCapABV.m_kCapsule.m_fRadius) ? kCapABV.m_fExtent : kCapABV.m_kCapsule.m_fRadius;
-    // EXE-INLINED 0x4B6190
-    float fNdotT = kTriNormal.x * kVert0.x + kTriNormal.y * kVert0.y + kTriNormal.z * kVert0.z;
-    // EXE-INLINED 0x4A7290
-    float fSqrLength = kTriNormal.x * kTriNormal.x + kTriNormal.y * kTriNormal.y + kTriNormal.z * kTriNormal.z;
+    float fNdotT = kTriNormal.Dot(kVert0);
+    float fSqrLength = kTriNormal.SqrLength();
     float fNormRadiusSqr = fSqrLength * PseudoRadius * PseudoRadius;
 
     // The capsule's bounding sphere lies off the triangle's plane: rule out a capsule moving away from it, or one
@@ -371,55 +310,25 @@ bool NiCapsuleBV::CapsuleTriTestIntersect(
     if (fDistCapTri * fDistCapTri > fNormRadiusSqr) {
         NiPoint3 kSurfacePt;
         kTriNormal.Unitize();
-        // EXE-INLINED 0x4B6190
-        float fVdotN = kDeltaV.x * kTriNormal.x + kDeltaV.y * kTriNormal.y + kDeltaV.z * kTriNormal.z;
+        float fVdotN = kDeltaV.Dot(kTriNormal);
         if (fNdotC > fNdotT) {
             if (fVdotN >= 0.0f) {
                 return false;
             }
-            // EXE-INLINED 0x4A3760
-            NiPoint3 kOffset;
-            kOffset.x = PseudoRadius * kTriNormal.x;
-            kOffset.y = PseudoRadius * kTriNormal.y;
-            kOffset.z = PseudoRadius * kTriNormal.z;
-            // EXE-INLINED 0x439EF0
-            kSurfacePt.x = kCapABV.m_kCenter.x - kOffset.x;
-            kSurfacePt.y = kCapABV.m_kCenter.y - kOffset.y;
-            kSurfacePt.z = kCapABV.m_kCenter.z - kOffset.z;
+            kSurfacePt = kCapABV.m_kCenter - PseudoRadius * kTriNormal;
         }
         else {
             if (fVdotN <= 0.0f) {
                 return false;
             }
-            // EXE-INLINED 0x4A3760
-            NiPoint3 kOffset;
-            kOffset.x = PseudoRadius * kTriNormal.x;
-            kOffset.y = PseudoRadius * kTriNormal.y;
-            kOffset.z = PseudoRadius * kTriNormal.z;
-            // EXE-INLINED 0x439E90
-            kSurfacePt.x = kCapABV.m_kCenter.x + kOffset.x;
-            kSurfacePt.y = kCapABV.m_kCenter.y + kOffset.y;
-            kSurfacePt.z = kCapABV.m_kCenter.z + kOffset.z;
+            kSurfacePt = kCapABV.m_kCenter + PseudoRadius * kTriNormal;
         }
 
-        // EXE-INLINED 0x4B6190
-        fNdotT = kTriNormal.x * kVert0.x + kTriNormal.y * kVert0.y + kTriNormal.z * kVert0.z;
+        fNdotT = kTriNormal.Dot(kVert0);
         const double fLimit = fNdotT + 0.0010000000474974513;
-        // EXE-INLINED 0x4B6190
-        float fNdotS = kTriNormal.x * kSurfacePt.x + kTriNormal.y * kSurfacePt.y + kTriNormal.z * kSurfacePt.z;
+        float fNdotS = kTriNormal.Dot(kSurfacePt);
         if (fNdotS > fLimit) {
-            // EXE-INLINED 0x4A3760
-            NiPoint3 kStep;
-            kStep.x = fTime * kDeltaV.x;
-            kStep.y = fTime * kDeltaV.y;
-            kStep.z = fTime * kDeltaV.z;
-            // EXE-INLINED 0x439E90
-            NiPoint3 kSwept;
-            kSwept.x = kStep.x + kSurfacePt.x;
-            kSwept.y = kStep.y + kSurfacePt.y;
-            kSwept.z = kStep.z + kSurfacePt.z;
-            // EXE-INLINED 0x4B6190
-            float fNdotSwept = kTriNormal.x * kSwept.x + kTriNormal.y * kSwept.y + kTriNormal.z * kSwept.z;
+            float fNdotSwept = kTriNormal.Dot(fTime * kDeltaV + kSurfacePt);
             if (fNdotSwept > fLimit) {
                 return false;
             }
@@ -429,16 +338,12 @@ bool NiCapsuleBV::CapsuleTriTestIntersect(
     float fSqrDist;
     float fT0;
     float fT1;
-    // EXE-INLINED 0x439090
-    if (!(NiPoint3_ZERO.x == kDeltaV.x && NiPoint3_ZERO.y == kDeltaV.y && NiPoint3_ZERO.z == kDeltaV.z)) {
+    if (NiPoint3_ZERO != kDeltaV) {
         // The triangle against the capsule's segment swept over the time interval.
         NiParallelogram kPgm;
         kPgm.m_kOrigin = kCapABV.m_kCapsule.m_kSegment.m_kOrigin;
         kPgm.m_kEdge0 = kCapABV.m_kCapsule.m_kSegment.m_kDirection;
-        // EXE-INLINED 0x4A3760
-        kPgm.m_kEdge1.x = fTime * kDeltaV.x;
-        kPgm.m_kEdge1.y = fTime * kDeltaV.y;
-        kPgm.m_kEdge1.z = fTime * kDeltaV.z;
+        kPgm.m_kEdge1 = fTime * kDeltaV;
         float fP0;
         float fP1;
         fSqrDist = NiSqrDistance::Compute(kTri, kPgm, fT0, fT1, fP0, fP1);
@@ -547,11 +452,7 @@ bool NiCapsuleBV::CapsuleTriFindIntersect(
         kIntrPt.z = v78.z;
         if (bCalcNormals) {
             kNormal1 = kTri.GetNormal();
-            // EXE-INLINED 0x4A0BD0
-            v78.x = -kNormal1.x;
-            v78.y = -kNormal1.y;
-            v78.z = -kNormal1.z;
-            kNormal0 = v78;
+            kNormal0 = -kNormal1;
             return true;
         }
         return true;
@@ -641,11 +542,7 @@ LABEL_16:;
     kIntrPt = kIntersector.GetContactPoint();
     if (bCalcNormals) {
         kNormal0 = kIntersector.GetContactNormal();
-        // EXE-INLINED 0x4A0BD0
-        kSurfacePt_2.x = -kNormal0.x;
-        kSurfacePt_2.y = -kNormal0.y;
-        kSurfacePt_2.z = -kNormal0.z;
-        kNormal1 = kSurfacePt_2;
+        kNormal1 = -kNormal0;
     }
     return true;
 }

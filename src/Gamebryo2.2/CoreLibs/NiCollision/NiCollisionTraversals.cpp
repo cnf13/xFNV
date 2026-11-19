@@ -474,35 +474,11 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
     NiPick* apPick = &kPick;
     NiTriStrips* apGeom = pkTBG;
     const NiTransform& kWorld = apGeom->m_kWorld;
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDiff;
-    kDiff.x = apOrigin->x - kWorld.m_Translate.x;
-    kDiff.y = apOrigin->y - kWorld.m_Translate.y;
-    kDiff.z = apOrigin->z - kWorld.m_Translate.z;
+    NiPoint3 kDiff = *apOrigin - kWorld.m_Translate;
     float fInvWorldScale = 1.0f / kWorld.m_fScale;
     const NiMatrix3& kRotate = kWorld.m_Rotate;
-    // EXE-INLINED 0x4B3AE0
-    NiPoint3 kRotated;
-    kRotated.x = kRotate.m_pEntry[0][0] * kDiff.x + kDiff.y * kRotate.m_pEntry[1][0] + kDiff.z * kRotate.m_pEntry[2][0];
-    kRotated.y = kDiff.x * kRotate.m_pEntry[0][1] + kDiff.y * kRotate.m_pEntry[1][1] + kRotate.m_pEntry[2][1] * kDiff.z;
-    kRotated.z = kDiff.x * kRotate.m_pEntry[0][2] + kDiff.y * kRotate.m_pEntry[1][2] + kDiff.z * kRotate.m_pEntry[2][2];
-    // EXE-INLINED 0x45BB20
-    NiPoint3 kModelOrigin;
-    kModelOrigin.x = kRotated.x * fInvWorldScale;
-    kModelOrigin.y = kRotated.y * fInvWorldScale;
-    kModelOrigin.z = kRotated.z * fInvWorldScale;
-    // EXE-INLINED 0x4B3AE0
-    kRotated.x =
-        apDir->y * kRotate.m_pEntry[1][0] + kRotate.m_pEntry[0][0] * apDir->x + kRotate.m_pEntry[2][0] * apDir->z;
-    kRotated.y =
-        apDir->x * kRotate.m_pEntry[0][1] + apDir->y * kRotate.m_pEntry[1][1] + kRotate.m_pEntry[2][1] * apDir->z;
-    kRotated.z =
-        kRotate.m_pEntry[1][2] * apDir->y + kRotate.m_pEntry[0][2] * apDir->x + kRotate.m_pEntry[2][2] * apDir->z;
-    // EXE-INLINED 0x45BB20
-    NiPoint3 kModelDir;
-    kModelDir.x = kRotated.x * fInvWorldScale;
-    kModelDir.y = kRotated.y * fInvWorldScale;
-    kModelDir.z = kRotated.z * fInvWorldScale;
+    NiPoint3 kModelOrigin = (kDiff * kRotate) * fInvWorldScale;
+    NiPoint3 kModelDir = (*apDir * kRotate) * fInvWorldScale;
 
     bool bFound = false;
     uint16_t usTris = static_cast<NiTriBasedGeomData*>(apGeom->m_spModelData.m_pObject)->GetActiveTriangleCount();
@@ -523,15 +499,8 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
     uint16_t* pusStrip = pkData->GetStripLists();
     if (!pusStrip || (!pkVertex && !kVertexIter.m_pvCurrentPosition)) {
         NiPick::Record* pkRecord = apPick->m_pickResults.AddNew(apGeom);
-        // EXE-INLINED 0x439EF0
-        NiPoint3 kDelta;
-        kDelta.x = kWorld.m_Translate.x - apOrigin->x;
-        kDelta.y = kWorld.m_Translate.y - apOrigin->y;
-        kDelta.z = kWorld.m_Translate.z - apOrigin->z;
-        // EXE-INLINED 0x457990
-        float fSqrLength = kDelta.x * kDelta.x + kDelta.y * kDelta.y + kDelta.z * kDelta.z;
-        float fLength = std::sqrt(fSqrLength);
-        pkRecord->m_fDistance = fLength;
+        NiPoint3 kDelta = kWorld.m_Translate - *apOrigin;
+        pkRecord->m_fDistance = kDelta.Length();
         return true;
     }
 
@@ -584,15 +553,7 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
         NiPick::Record* pkRecord = apPick->m_pickResults.AddNew(apGeom);
         if (apPick->m_eCoordinateType == NiPick::WORLD_COORDINATES) {
             NiPoint3 kRotatedIntersect = kWorld.m_Rotate * kIntersect;
-            float fScale = kWorld.m_fScale;
-            // EXE-INLINED 0x4A3760
-            float fScaledX = kRotatedIntersect.x * fScale;
-            float fScaledY = kRotatedIntersect.y * fScale;
-            float fScaledZ = fScale * kRotatedIntersect.z;
-            // EXE-INLINED 0x439E90
-            kIntersect.x = fScaledX + kWorld.m_Translate.x;
-            kIntersect.y = kWorld.m_Translate.y + fScaledY;
-            kIntersect.z = kWorld.m_Translate.z + fScaledZ;
+            kIntersect = kWorld.m_fScale * kRotatedIntersect + kWorld.m_Translate;
         }
         pkRecord->m_intersect = kIntersect;
         pkRecord->m_fDistance = fLineParam;
@@ -683,16 +644,8 @@ bool NiCollisionTraversals::FindIntersectionsOneStripFastPath(
                     kNormal = fTriParam0 * pkNormal[i0] + kScaled1 + kScaled2;
                 }
                 else {
-                    // EXE-INLINED 0x439EF0
-                    NiPoint3 kEdge1;
-                    kEdge1.x = kV1.x - kV0.x;
-                    kEdge1.y = kV1.y - kV0.y;
-                    kEdge1.z = kV1.z - kV0.z;
-                    // EXE-INLINED 0x439EF0
-                    NiPoint3 kEdge2;
-                    kEdge2.x = kV2.x - kV0.x;
-                    kEdge2.y = kV2.y - kV0.y;
-                    kEdge2.z = kV2.z - kV0.z;
+                    NiPoint3 kEdge1 = kV1 - kV0;
+                    NiPoint3 kEdge2 = kV2 - kV0;
                     kNormal = kEdge1.Cross(kEdge2);
                 }
             }

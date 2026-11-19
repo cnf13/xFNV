@@ -1602,21 +1602,11 @@ static void handlePenetration(
         apThis->m_verticesBinB[0] = apThis->m_verticesBinB[*a5];
     }
 
-    // B's points in A's space, last first: (y * col1 + x * col0) + (z * col2 + translation).
+    // B's points in A's space, last first.
     const hkTransform kATb = *a3;
     int32_t i = *a5 - 1;
     do {
-        const __m128 kB = apThis->m_verticesBinB[i].m_quad;
-        // EXE-INLINED 0xC7F640
-        apThis->m_verticesBinA[i].m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kB, kB, 0x55), kATb.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(kB, kB, 0x00), kATb.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kB, kB, 0xAA), kATb.m_rotation.m_col2.m_quad), kATb.m_translation.m_quad
-            )
-        );
+        apThis->m_verticesBinA[i].setTransformedPos(kATb, apThis->m_verticesBinB[i]);
         --i;
     }
     while (i >= 0);
@@ -3254,14 +3244,7 @@ void hkgpMesh::applyTransform(const hkTransform& trs) {
 void hkgpMesh::applyScale(const hkVector4& scl) {
     for (hkgpMeshBase::Vertex* pVertex = static_cast<hkgpMeshBase::Vertex*>(m_vertices.m_used); pVertex;
          pVertex = pVertex->m_next) {
-        // EXE-INLINED none: hkVector4::mul4(const hkVector4&)
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&pVertex->m_position.m_quad)[0],
-            _mm_mul_ps(
-                _mm_load_ps(&reinterpret_cast<float*>(&pVertex->m_position.m_quad)[0]),
-                _mm_load_ps(&reinterpret_cast<const float*>(&scl.m_quad)[0])
-            )
-        );
+        pVertex->m_position.mul4(scl);
     }
     updatePlaneEquations();
     invalidateConvexHull();
@@ -3481,15 +3464,7 @@ void hkgpMesh::assignVertexNormals() {
         }
     }
     for (hkgpMeshBase::Vertex* pVertex = m_vertices.m_used; pVertex; pVertex = pVertex->m_next) {
-        // EXE-INLINED none: hkVector4::normalize3 (23-bit accuracy, zero for a zero length)
-        const __m128 n = pVertex->m_normal.m_quad;
-        const __m128 sq = _mm_mul_ps(n, n);
-        const __m128 lengthSq = _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-        const __m128 r = _mm_rsqrt_ss(lengthSq);
-        const __m128 isZero = _mm_cmpeq_ss(lengthSq, _mm_setzero_ps());
-        const __m128 refine = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(lengthSq, r), r));
-        const __m128 invLength = _mm_andnot_ps(isZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), r), refine));
-        pVertex->m_normal.m_quad = _mm_mul_ps(_mm_shuffle_ps(invLength, invLength, 0), n);
+        pVertex->m_normal.normalize3();
         if (!pVertex->m_normal.isNormalized3(0.0001f).m_bool) {
             pVertex->m_normal.m_quad = hkVector4Zero.m_quad;
         }
@@ -4734,27 +4709,22 @@ float hkgpMesh::squaredDistanceToPoint(const hkVector4& x, hkVector4& normal, bo
 // and one Newton step on x, y, z, 1; no mask), then scale gets back the factor and center is negated. The convex hull
 // is rebuilt only when the mesh had one. The result is scale.x.
 float hkgpMesh::normalize(hkVector4& trs, hkVector4& scl, float baseScale) {
-    // EXE-INLINED 0x4589C0
-    _mm_store_ps(&reinterpret_cast<float*>(&trs.m_quad)[0], _mm_set1_ps(0.0f));
-    // EXE-INLINED 0x4589C0
-    _mm_store_ps(&reinterpret_cast<float*>(&scl.m_quad)[0], _mm_set1_ps(1.0f));
+    trs.setAll(0.0f);
+    scl.setAll(1.0f);
     if (m_vertices.m_numUsed != 0) {
         const bool bHadHull = m_convexHull != nullptr;
         hkgpMeshBase::Vertex* pVertex = static_cast<hkgpMeshBase::Vertex*>(m_vertices.m_used);
-        __m128 kMin = _mm_load_ps(&reinterpret_cast<float*>(&pVertex->m_position.m_quad)[0]);
-        __m128 kMax = kMin;
+        hkVector4 kMin = pVertex->m_position;
+        hkVector4 kMax = kMin;
         for (; pVertex; pVertex = pVertex->m_next) {
-            const __m128 kPosition = _mm_load_ps(&reinterpret_cast<float*>(&pVertex->m_position.m_quad)[0]);
-            // EXE-INLINED 0x6285E0
-            kMin = _mm_min_ps(kMin, kPosition);
-            // EXE-INLINED 0x628640
-            kMax = _mm_max_ps(kMax, kPosition);
+            const hkVector4& kPosition = pVertex->m_position;
+            kMin.setMin4(kMin, kPosition);
+            kMax.setMax4(kMax, kPosition);
         }
-        // EXE-INLINED 0x458880
-        const __m128 kSum = _mm_add_ps(kMax, kMin);
-        _mm_store_ps(&reinterpret_cast<float*>(&trs.m_quad)[0], _mm_mul_ps(_mm_set1_ps(-0.5f), kSum));
-        // EXE-INLINED 0x458A10
-        _mm_store_ps(&reinterpret_cast<float*>(&scl.m_quad)[0], _mm_sub_ps(kMax, kMin));
+        hkVector4 kSum;
+        kSum.setAdd4(kMax, kMin);
+        _mm_store_ps(&reinterpret_cast<float*>(&trs.m_quad)[0], _mm_mul_ps(_mm_set1_ps(-0.5f), kSum.m_quad));
+        scl.setSub4(kMax, kMin);
 
         float fExtent = scl.m_quad[0];
         const float fExtentY = scl.m_quad[1];
@@ -4768,15 +4738,7 @@ float hkgpMesh::normalize(hkVector4& trs, hkVector4& scl, float baseScale) {
         const __m128 kScale = _mm_mul_ps(_mm_set1_ps(fInvSize), _mm_load_ps(&reinterpret_cast<float*>(&scl.m_quad)[0]));
         _mm_store_ps(&reinterpret_cast<float*>(&scl.m_quad)[0], kScale);
 
-        // EXE-INLINED none: hkVector4::setReciprocal3 (x, y, z, 1 through rcpps and one Newton step)
-        const __m128 kScaleXYZ1 = _mm_shuffle_ps(
-            kScale, _mm_unpackhi_ps(kScale, _mm_load_ps(&reinterpret_cast<float*>(&hkQuadReal1111)[0])), 0xC4
-        );
-        const __m128 kRcp = _mm_rcp_ps(kScaleXYZ1);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&scl.m_quad)[0],
-            _mm_sub_ps(_mm_add_ps(kRcp, kRcp), _mm_mul_ps(_mm_mul_ps(kRcp, kScaleXYZ1), kRcp))
-        );
+        scl.setReciprocal3(scl);
 
         applyTranslation(trs);
         applyScale(scl);
@@ -4828,8 +4790,7 @@ void hkgpMesh::generateEmptySpaceSamples(
     const hkAabb* pBounds = getBoundingBox(box);
     stack.pushBack(*pBounds);
     hkgpMakeAabbCubic(stack.m_data);
-    // EXE-INLINED none: hkVector4::setInt24W
-    stack.m_data[0].m_min.m_quad[3] = std::bit_cast<float>(0x3F000000u);
+    stack.m_data[0].m_min.setInt24W(0);
 
     do {
         box = stack.m_data[stack.m_size - 1];
@@ -4843,8 +4804,7 @@ void hkgpMesh::generateEmptySpaceSamples(
         hkQuadReal kToCornerSq;
         _mm_store_ps(&reinterpret_cast<float*>(&kToCornerSq)[0], _mm_mul_ps(kToCorner, kToCorner));
         const float fHalfDiagonalSq = kToCornerSq[2] + (kToCornerSq[1] + kToCornerSq[0]);
-        // EXE-INLINED none: hkVector4::getInt24W
-        const int32_t iDepth = std::bit_cast<int32_t>(box.m_min.m_quad[3]) & ~0x3F000000;
+        const int32_t iDepth = box.m_min.getInt24W();
         bool bInside = false;
         hkVector4 normal;
         const float fSquaredDistance = squaredDistanceToPoint(center, normal, &bInside);
@@ -7860,11 +7820,7 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
             if (stopAtMaterialBoundaries && pOther->m_material != pRoot->m_material) {
                 continue;
             }
-            // EXE-INLINED none: hkVector4::dot3 (SSE, the products summed y + x, then + z)
-            const __m128 products = _mm_mul_ps(pOther->m_plane.m_quad, plane.m_quad);
-            const float dot = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(products, products, 0xAA), _mm_add_ss(_mm_shuffle_ps(products, products, 0x55), products)
-            ));
+            const float dot = pOther->m_plane.dot3(plane);
             if (!(minCosAngle <= dot)) {
                 continue;
             }

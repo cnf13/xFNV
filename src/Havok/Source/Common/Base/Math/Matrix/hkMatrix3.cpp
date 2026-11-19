@@ -283,13 +283,7 @@ hkMatrix3::diagonalizeSymmetric(hkMatrix3& eigenVec, hkVector4& eigenVal, int32_
     kM.m_col0.m_quad = m_col0.m_quad;
     kM.m_col1.m_quad = m_col1.m_quad;
     kM.m_col2.m_quad = m_col2.m_quad;
-    // EXE-INLINED none: hkRotation::setIdentity
-    eigenVec.m_col0.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
-    eigenVec.m_col1.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
-    eigenVec.m_col2.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
-    eigenVec.m_col0.m_quad[0] = 1.0f;
-    eigenVec.m_col1.m_quad[1] = 1.0f;
-    eigenVec.m_col2.m_quad[2] = 1.0f;
+    eigenVec.setIdentity();
     const float fThreshold = static_cast<float>(_frobeniusNorm(this) * epsilon);
     int32_t iIter = 0;
     float fOffDiag = static_cast<float>(kM._offDiagNorm());

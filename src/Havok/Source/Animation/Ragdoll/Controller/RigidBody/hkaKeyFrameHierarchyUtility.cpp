@@ -698,12 +698,7 @@ void calcComPoseUsingHierarchy(
         const int32_t iParent = bodyData.m_parentIndices[i];
         const hkQsTransform& rParentModel = iParent < 0 ? worldFromRoot : apOut[2 * iParent + 1];
         hkQsTransform& rModel = apOut[2 * i + 1];
-        // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
-        hkVector4 kRotated;
-        kRotated.setRotatedDir(rParentModel.m_rotation, rLocal.m_translation);
-        rModel.m_translation.m_quad = _mm_add_ps(kRotated.m_quad, rParentModel.m_translation.m_quad);
-        rModel.m_rotation.setMul(rParentModel.m_rotation, rLocal.m_rotation);
-        rModel.m_scale.m_quad = _mm_mul_ps(rParentModel.m_scale.m_quad, rLocal.m_scale.m_quad);
+        rModel.setMul(rParentModel, rLocal);
 
         hkVector4 kPosition = rModel.m_translation;
         hkQuaternion kRotation = rModel.m_rotation;
@@ -725,20 +720,10 @@ void calcComPoseUsingHierarchy(
             kParentCurrent.m_translation = pParentBody->m_motion.m_motionState.m_transform.m_translation;
             kParentCurrent.m_rotation = pParentBody->m_motion.m_motionState.m_sweptTransform.m_rotation1;
             kParentCurrent.m_scale.m_quad = _mm_set1_ps(1.0f);
-            // EXE-INLINED none: hkQsTransform::setMul (translation and scale; the rotation is the out-of-line call)
             hkQsTransform kTarget;
-            hkVector4 kTargetRotated;
-            kTargetRotated.setRotatedDir(kParentCurrent.m_rotation, rLocal.m_translation);
-            kTarget.m_translation.m_quad = _mm_add_ps(kTargetRotated.m_quad, kParentCurrent.m_translation.m_quad);
-            kTarget.m_rotation.setMul(kParentCurrent.m_rotation, rLocal.m_rotation);
-            kTarget.m_scale.m_quad = _mm_mul_ps(kParentCurrent.m_scale.m_quad, rLocal.m_scale.m_quad);
+            kTarget.setMul(kParentCurrent, rLocal);
             kRotation.setSlerp(kRotation, kTarget.m_rotation, fGain);
-            // EXE-INLINED none: hkVector4::setInterpolate4
-            const __m128 kT = _mm_set1_ps(fGain);
-            kPosition.m_quad = _mm_add_ps(
-                _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, kT), kPosition.m_quad),
-                _mm_mul_ps(kT, kTarget.m_translation.m_quad)
-            );
+            kPosition.setInterpolate4(kPosition, kTarget.m_translation, fGain);
         }
 
         const hkpRigidBody* pBody = bodyData.m_rigidBodies[i];

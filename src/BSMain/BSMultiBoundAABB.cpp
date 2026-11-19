@@ -69,11 +69,8 @@ bool BSMultiBoundAABB::IsEqual(NiObject* apObject) {
 
     BSMultiBoundAABB* pkOther = static_cast<BSMultiBoundAABB*>(apObject);
     // Both comparisons run; the result is their bitwise and.
-    // EXE-INLINED 0x4390C0
-    bool bEqual = Center.x == pkOther->Center.x && Center.y == pkOther->Center.y && Center.z == pkOther->Center.z;
-    // EXE-INLINED 0x4390C0
-    bool bHalfExtents = HalfExtents.x == pkOther->HalfExtents.x && HalfExtents.y == pkOther->HalfExtents.y &&
-        HalfExtents.z == pkOther->HalfExtents.z;
+    bool bEqual = Center == pkOther->Center;
+    bool bHalfExtents = HalfExtents == pkOther->HalfExtents;
     return bEqual & bHalfExtents;
 }
 

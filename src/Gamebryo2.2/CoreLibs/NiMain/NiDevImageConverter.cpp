@@ -248,9 +248,7 @@ NiPixelData* NiDevImageConverter::ConvertPixelData(
 
     NiPointer<NiPixelData> spMipmapTmp;
     if (bMipmap && pkSrc->m_uiMipmapLevels <= 1) {
-        // EXE-INLINED 0xA77920
-        uint32_t uiWidth = *pkSrc->m_puiWidth;
-        if (uiWidth && !(uiWidth & (uiWidth - 1)) && NiIsPowerOf2(*pkSrc->m_puiHeight)) {
+        if (NiIsPowerOf2(*pkSrc->m_puiWidth) && NiIsPowerOf2(*pkSrc->m_puiHeight)) {
             NiPixelFormat::Format eDestFormat = kDestFmt.m_eFormat;
             if (eDestFormat == NiPixelFormat::FORMAT_RGB || eDestFormat == NiPixelFormat::FORMAT_RGBA ||
                 eDestFormat == NiPixelFormat::FORMAT_BUMP || eDestFormat == NiPixelFormat::FORMAT_BUMPLUMA) {

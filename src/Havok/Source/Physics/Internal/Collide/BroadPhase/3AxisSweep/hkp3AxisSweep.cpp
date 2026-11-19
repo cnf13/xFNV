@@ -2669,25 +2669,10 @@ void hkp3AxisSweep::castAabb(
     // above 7.
     bitField[0] = 8;
 
-    // EXE-INLINED 0xD19D10
-    int32_t trailAxis;
-    if (trailCross[1] > trailCross[0]) {
-        trailAxis = trailCross[2] > trailCross[0] ? 0 : 2;
-    }
-    else {
-        trailAxis = trailCross[2] > trailCross[1] ? 1 : 2;
-    }
-    // EXE-INLINED 0xD19D10
-    int32_t leadAxis;
-    if (leadCross[1] > leadCross[0]) {
-        leadAxis = leadCross[2] > leadCross[0] ? 0 : 2;
-    }
-    else {
-        leadAxis = leadCross[2] > leadCross[1] ? 1 : 2;
-    }
-
     // getMinComponent's copy of the smallest crossing, which nothing reads here.
     float minCross;
+    int32_t trailAxis = getMinComponent(trailCross, &minCross);
+    int32_t leadAxis = getMinComponent(leadCross, &minCross);
     for (;;) {
         if (trailCross[trailAxis] > leadCross[leadAxis]) {
             int32_t axis = leadAxis;

@@ -190,23 +190,10 @@ void hkpBvTreeStreamAgent::processCollision(
     const hkMotionState* msA = bodyA.m_motion.pState;
     const hkMotionState* msB = bodyB.m_motion.pState;
     const hkRotation& rotB = msB->m_transform.m_rotation;
-    const __m128 kCol0 = rotB.m_col0.m_quad;
-    const __m128 kCol1 = rotB.m_col1.m_quad;
-    const __m128 kCol2 = rotB.m_col2.m_quad;
-    const __m128 kLo = _mm_unpacklo_ps(kCol0, kCol1);
-    const __m128 kHi = _mm_unpackhi_ps(kCol0, kCol1);
-    const __m128 kRow0 = _mm_movelh_ps(kLo, kCol2);
-    const __m128 kRow1 = _mm_shuffle_ps(_mm_movehl_ps(kRow0, kLo), kCol2, 0xD4);
-    const __m128 kRow2 = _mm_shuffle_ps(kHi, kCol2, 0xE4);
 
-    // EXE-INLINED none: hkVector4::_setRotatedInverseDir
-    const __m128 kTim = in3.m_linearTimInfo.m_quad;
-    const __m128 kTimInB = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(kTim, kTim, 0x55), kRow1), _mm_mul_ps(_mm_shuffle_ps(kTim, kTim, 0x00), kRow0)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(kTim, kTim, 0xAA), kRow2)
-    );
+    hkVector4 timInB;
+    timInB._setRotatedInverseDir(rotB, in3.m_linearTimInfo);
+    const __m128 kTimInB = timInB.m_quad;
 
     float fSpill;
     hkAabb aabb;
@@ -221,17 +208,11 @@ void hkpBvTreeStreamAgent::processCollision(
         bodyA.m_shape->getAabbImpl(bTa, fTolerance, aabb);
 
         const float fRadius = input.m_tolerance * 0.5 + msA->m_objectRadius + fRadiusB;
-        // EXE-INLINED none: hkVector4::setSub4
-        const __m128 kOffset =
-            _mm_sub_ps(msA->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_transform.m_translation.m_quad);
-        // EXE-INLINED none: hkVector4::_setRotatedInverseDir
-        const __m128 kCenter = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kOffset, kOffset, 0x55), kRow1),
-                _mm_mul_ps(_mm_shuffle_ps(kOffset, kOffset, 0x00), kRow0)
-            ),
-            _mm_mul_ps(kRow2, _mm_shuffle_ps(kOffset, kOffset, 0xAA))
-        );
+        hkVector4 offset;
+        offset.setSub4(msA->m_sweptTransform.m_centerOfMass1, msB->m_transform.m_translation);
+        hkVector4 center;
+        center._setRotatedInverseDir(rotB, offset);
+        const __m128 kCenter = center.m_quad;
         const __m128 kRadius = _mm_set1_ps(fRadius);
         kMin = _mm_max_ps(aabb.m_min.m_quad, _mm_sub_ps(kCenter, kRadius));
         kMax = _mm_min_ps(aabb.m_max.m_quad, _mm_add_ps(kCenter, kRadius));
@@ -240,14 +221,11 @@ void hkpBvTreeStreamAgent::processCollision(
 
         if (0.0f < msB->m_deltaAngle.m_quad[3]) {
             const float fScale = msB->m_sweptTransform.m_centerOfMass1.m_quad[3] * input.m_stepInfo.m_deltaTime;
-            const __m128 kArm = _mm_sub_ps(kCenter, msB->m_sweptTransform.m_centerOfMassLocal.m_quad);
-            const __m128 kAngle = msB->m_deltaAngle.m_quad;
-            // EXE-INLINED none: hkVector4::setCross
-            const __m128 kCross = _mm_sub_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kAngle, kAngle, 0xD2), _mm_shuffle_ps(kArm, kArm, 0xC9)),
-                _mm_mul_ps(_mm_shuffle_ps(kAngle, kAngle, 0xC9), _mm_shuffle_ps(kArm, kArm, 0xD2))
-            );
-            kMotion = _mm_add_ps(_mm_mul_ps(kCross, _mm_set1_ps(fScale)), kTimInB);
+            hkVector4 arm;
+            arm.m_quad = _mm_sub_ps(kCenter, msB->m_sweptTransform.m_centerOfMassLocal.m_quad);
+            hkVector4 cross;
+            cross.setCross(arm, msB->m_deltaAngle);
+            kMotion = _mm_add_ps(_mm_mul_ps(cross.m_quad, _mm_set1_ps(fScale)), kTimInB);
             fSpill = fScale;
         }
         const __m128 kZero = _mm_setzero_ps();
@@ -268,10 +246,7 @@ void hkpBvTreeStreamAgent::processCollision(
     bool bCacheHit = false;
     hkAabb* cachedAabb = &m_cachedAabb;
     if (cachedAabb) {
-        // EXE-INLINED none: hkAabb::contains
-        const __m128 kInside =
-            _mm_and_ps(_mm_cmple_ps(cachedAabb->m_min.m_quad, kMin), _mm_cmple_ps(kMax, cachedAabb->m_max.m_quad));
-        if ((_mm_movemask_ps(kInside) & 7) == 7) {
+        if (cachedAabb->contains(aabb)) {
             bCacheHit = true;
         }
         else {

@@ -231,12 +231,13 @@ void hkpCapsuleShape::getAabbImpl(const hkTransform& localToWorld, float toleran
 hkBool hkpCapsuleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const {
     HK_TIMER_BEGIN("rcCapsule", nullptr);
 
-    // EXE-INLINED none: hkVector4::dot3, the sum in lane 0
+    // hkVector4::dot3 on two quads, the sum in lane 0.
     auto dot3 = [](__m128 a, __m128 b) __attribute__((always_inline)) {
-        const __m128 kProduct = _mm_mul_ps(a, b);
-        return _mm_add_ss(
-            _mm_shuffle_ps(kProduct, kProduct, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProduct, kProduct, 0x55), kProduct)
-        );
+        hkVector4 kA;
+        kA.m_quad = a;
+        hkVector4 kB;
+        kB.m_quad = b;
+        return kA.dot3(kB).getQuad();
     };
     // EXE-INLINED none: the inverse length of hkVector4::normalize3, in all four lanes
     auto invLength = [](__m128 aLengthSq) __attribute__((always_inline)) {

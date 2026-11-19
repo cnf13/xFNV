@@ -30,35 +30,18 @@ NiRTTI NiPSysPlanarCollider::ms_RTTI("NiPSysPlanarCollider", &NiPSysCollider::ms
 // Whether kPoint lies inside the rectangle: its offset from the centre is projected on both rotated axes, and each
 // projection must be shorter than the half extent.
 static bool IsInsideRectangle(const NiPSysPlanarCollider& arCollider, const NiPoint3& kPoint) {
-    // EXE-INLINED 0x439EF0
-    float fDiffX = kPoint.x - arCollider.m_kPosition.x;
-    float fDiffY = kPoint.y - arCollider.m_kPosition.y;
-    float fDiffZ = kPoint.z - arCollider.m_kPosition.z;
+    NiPoint3 kDiff = kPoint - arCollider.m_kPosition;
     NiPoint3 kXAxis = arCollider.m_kRotation * arCollider.m_kXAxis;
     NiPoint3 kYAxis = arCollider.m_kRotation * arCollider.m_kYAxis;
 
-    // EXE-INLINED 0x4B6190
-    float fXDot = fDiffX * kXAxis.x + fDiffY * kXAxis.y + fDiffZ * kXAxis.z;
-    // EXE-INLINED 0x45BB20
-    float fXPartX = kXAxis.x * fXDot;
-    float fXPartY = kXAxis.y * fXDot;
-    float fXPartZ = kXAxis.z * fXDot;
-    // EXE-INLINED 0x4B6190
-    float fYDot = fDiffX * kYAxis.x + fDiffY * kYAxis.y + fDiffZ * kYAxis.z;
-    // EXE-INLINED 0x45BB20
-    float fYPartX = kYAxis.x * fYDot;
-    float fYPartY = kYAxis.y * fYDot;
-    float fYPartZ = kYAxis.z * fYDot;
+    NiPoint3 kXPart = kXAxis * kDiff.Dot(kXAxis);
+    NiPoint3 kYPart = kYAxis * kDiff.Dot(kYAxis);
 
-    // EXE-INLINED 0x4A7290
-    float fXSqrLength = fXPartX * fXPartX + fXPartY * fXPartY + fXPartZ * fXPartZ;
-    if (!(fXSqrLength < arCollider.m_fHalfSqScaledWidth)) {
+    if (!(kXPart.SqrLength() < arCollider.m_fHalfSqScaledWidth)) {
         return false;
     }
 
-    // EXE-INLINED 0x4A7290
-    float fYSqrLength = fYPartX * fYPartX + fYPartY * fYPartY + fYPartZ * fYPartZ;
-    return fYSqrLength < arCollider.m_fHalfSqScaledHeight;
+    return kYPart.SqrLength() < arCollider.m_fHalfSqScaledHeight;
 }
 
 NiPSysPlanarCollider::NiPSysPlanarCollider(
@@ -207,10 +190,7 @@ NiPSysPlanarCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPSysD
     NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[static_cast<uint16_t>(usCurParticle)];
     bool bCollision = false;
 
-    // EXE-INLINED 0x4B6160
-    float fPlaneDot =
-        m_kPlane.m_kNormal.x * kPosition.x + m_kPlane.m_kNormal.y * kPosition.y + m_kPlane.m_kNormal.z * kPosition.z;
-    float fDist = fPlaneDot - m_kPlane.m_fConstant;
+    float fDist = m_kPlane.Distance(kPosition);
     if (fDist < 0.001f && -fDist < 0.001f) {
         if (IsInsideRectangle(*this, kPosition)) {
             fCollisionTime = fInitialTime;
@@ -221,12 +201,8 @@ NiPSysPlanarCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPSysD
     }
     else {
         float fDeltaTime = fCollisionTime - fInitialTime;
-        // EXE-INLINED 0x45BB20
-        float fStepX = fDeltaTime * pkInfo->m_kVelocity.x;
-        float fStepY = fDeltaTime * pkInfo->m_kVelocity.y;
-        float fStepZ = fDeltaTime * pkInfo->m_kVelocity.z;
-        // EXE-INLINED 0x4B6190
-        float fStepDist = m_kPlane.m_kNormal.x * fStepX + m_kPlane.m_kNormal.y * fStepY + m_kPlane.m_kNormal.z * fStepZ;
+        NiPoint3 kStep = pkInfo->m_kVelocity * fDeltaTime;
+        float fStepDist = m_kPlane.m_kNormal.Dot(kStep);
         float fNewDist = fStepDist + fDist;
         float fAbsNewDist = std::fabs(fNewDist);
         if (fAbsNewDist < 0.001f) {
@@ -235,15 +211,7 @@ NiPSysPlanarCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPSysD
 
         if (fNewDist * fDist < 0.0) {
             float fTime = fDeltaTime * -fDist / fStepDist;
-            // Each product is stored as a float before the sum.
-            // EXE-INLINED 0x45BB20
-            float fMoveX = fTime * pkInfo->m_kVelocity.x;
-            float fMoveY = fTime * pkInfo->m_kVelocity.y;
-            float fMoveZ = fTime * pkInfo->m_kVelocity.z;
-            // EXE-INLINED 0x439E90
-            float fPointX = kPosition.x + fMoveX;
-            float fPointY = kPosition.y + fMoveY;
-            float fPointZ = kPosition.z + fMoveZ;
+            NiPoint3 kPoint = kPosition + pkInfo->m_kVelocity * fTime;
 
             // The static is initialized here, once the step is known to cross the plane.
             if (!(sfCollisionEpsilon_guard & 1)) {
@@ -251,41 +219,30 @@ NiPSysPlanarCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPSysD
                 sfCollisionEpsilon = static_cast<float>(std::pow(2.0, -21.0));
             }
 
-            // EXE-INLINED 0x4B6160
-            float fPointDot =
-                m_kPlane.m_kNormal.x * fPointX + m_kPlane.m_kNormal.y * fPointY + m_kPlane.m_kNormal.z * fPointZ;
-            float fPointDist = fPointDot - m_kPlane.m_fConstant;
+            float fPointDist = m_kPlane.Distance(kPoint);
             if (fPointDist * fDist < 0.0) {
-                float fAbsX = std::fabs(fPointX);
-                float fAbsY = std::fabs(fPointY);
+                float fAbsX = std::fabs(kPoint.x);
+                float fAbsY = std::fabs(kPoint.y);
                 float fMax = fAbsX < fAbsY ? fAbsY : fAbsX;
-                float fAbsZ = std::fabs(fPointZ);
+                float fAbsZ = std::fabs(kPoint.z);
                 if (fMax < fAbsZ) {
                     fMax = fAbsZ;
                 }
 
                 float fOffset = fMax * sfCollisionEpsilon;
-                // The normal scaled by the offset is stored as floats before the sum, as above.
-                // EXE-INLINED 0x45BB20
-                float fNudgeX = m_kPlane.m_kNormal.x * fOffset;
-                float fNudgeY = m_kPlane.m_kNormal.y * fOffset;
-                float fNudgeZ = m_kPlane.m_kNormal.z * fOffset;
+                NiPoint3 kNudge = m_kPlane.m_kNormal * fOffset;
                 if (fDist < 0.0f) {
-                    fPointX = fPointX - fNudgeX;
-                    fPointY = fPointY - fNudgeY;
-                    fPointZ = fPointZ - fNudgeZ;
+                    kPoint.x = kPoint.x - kNudge.x;
+                    kPoint.y = kPoint.y - kNudge.y;
+                    kPoint.z = kPoint.z - kNudge.z;
                 }
                 else {
-                    fPointX = fPointX + fNudgeX;
-                    fPointY = fPointY + fNudgeY;
-                    fPointZ = fPointZ + fNudgeZ;
+                    kPoint.x = kPoint.x + kNudge.x;
+                    kPoint.y = kPoint.y + kNudge.y;
+                    kPoint.z = kPoint.z + kNudge.z;
                 }
             }
 
-            NiPoint3 kPoint;
-            kPoint.x = fPointX;
-            kPoint.y = fPointY;
-            kPoint.z = fPointZ;
             if (IsInsideRectangle(*this, kPoint)) {
                 bCollision = true;
                 float fNewTime = fTime + fInitialTime;
@@ -309,35 +266,15 @@ NiPSysPlanarCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPSysD
 // difference is stored as a float.
 void NiPSysPlanarCollider::Update(float fTime, NiPSysData* pkData, int32_t usCurParticle) {
     NiPoint3& kVelocity = pkData->m_pkParticleInfo[static_cast<uint16_t>(usCurParticle)].m_kVelocity;
-    // EXE-INLINED 0x4B6190
-    float fDot =
-        m_kPlane.m_kNormal.x * kVelocity.x + m_kPlane.m_kNormal.y * kVelocity.y + m_kPlane.m_kNormal.z * kVelocity.z;
-    // EXE-INLINED 0x45BB20
-    float fNormalX = m_kPlane.m_kNormal.x * fDot;
-    float fNormalY = m_kPlane.m_kNormal.y * fDot;
-    float fNormalZ = m_kPlane.m_kNormal.z * fDot;
+    float fDot = m_kPlane.m_kNormal.Dot(kVelocity);
+    NiPoint3 kNormal = m_kPlane.m_kNormal * fDot;
     if (fTime == m_fCollisionTime && fDot < 0.001f) {
-        // EXE-INLINED 0x439EF0
-        kVelocity.x = kVelocity.x - fNormalX;
-        kVelocity.y = kVelocity.y - fNormalY;
-        kVelocity.z = kVelocity.z - fNormalZ;
+        kVelocity = kVelocity - kNormal;
     }
     else {
-        float fTwiceX = fNormalX * 2.0f;
-        float fTwiceY = fNormalY * 2.0f;
-        float fTwiceZ = fNormalZ * 2.0f;
-        // EXE-INLINED 0x439EF0
-        float fNewX = kVelocity.x - fTwiceX;
-        kVelocity.x = fNewX;
-        float fNewY = kVelocity.y - fTwiceY;
-        kVelocity.y = fNewY;
-        float fNewZ = kVelocity.z - fTwiceZ;
-        kVelocity.z = fNewZ;
-        // EXE-INLINED 0x439180
-        float fBounce = m_fBounce;
-        kVelocity.x = fNewX * fBounce;
-        kVelocity.y = fNewY * fBounce;
-        kVelocity.z = fNewZ * fBounce;
+        NiPoint3 kTwice(kNormal.x * 2.0f, kNormal.y * 2.0f, kNormal.z * 2.0f);
+        kVelocity = kVelocity - kTwice;
+        kVelocity *= m_fBounce;
     }
 
     NiPSysCollider::Update(fTime, pkData, usCurParticle);

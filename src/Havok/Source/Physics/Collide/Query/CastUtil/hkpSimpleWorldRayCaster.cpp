@@ -31,51 +31,15 @@ float hkpSimpleWorldRayCaster::addBroadPhaseHandle(const hkpBroadPhaseHandle* br
         }
         const hkTransform& trans = col->m_motion.pState->m_transform;
         const hkpWorldRayCastInput& input = m_input[castIndex];
-        // EXE-INLINED 0xC7F690
-        {
-            __m128 col0 = trans.m_rotation.m_col0.m_quad;
-            __m128 col1 = trans.m_rotation.m_col1.m_quad;
-            __m128 col2 = trans.m_rotation.m_col2.m_quad;
-            __m128 v = _mm_sub_ps(input.m_from.m_quad, trans.m_translation.m_quad);
-            __m128 lo = _mm_unpacklo_ps(col0, col1);
-            __m128 row0 = _mm_movelh_ps(lo, col2);
-            __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, 0xD4);
-            __m128 row2 = _mm_shuffle_ps(_mm_unpackhi_ps(col0, col1), col2, 0xE4);
-            m_shapeInput.m_from.m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), row1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), row0)),
-                _mm_mul_ps(row2, _mm_shuffle_ps(v, v, 0xAA))
-            );
-        }
-        // EXE-INLINED 0xC7F690
-        {
-            __m128 col0 = trans.m_rotation.m_col0.m_quad;
-            __m128 col1 = trans.m_rotation.m_col1.m_quad;
-            __m128 col2 = trans.m_rotation.m_col2.m_quad;
-            __m128 v = _mm_sub_ps(input.m_to.m_quad, trans.m_translation.m_quad);
-            __m128 lo = _mm_unpacklo_ps(col0, col1);
-            __m128 row0 = _mm_movelh_ps(lo, col2);
-            __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), col2, 0xD4);
-            __m128 row2 = _mm_shuffle_ps(_mm_unpackhi_ps(col0, col1), col2, 0xE4);
-            m_shapeInput.m_to.m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), row1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), row0)),
-                _mm_mul_ps(row2, _mm_shuffle_ps(v, v, 0xAA))
-            );
-        }
+        m_shapeInput.m_from.setTransformedInversePos(trans, input.m_from);
+        m_shapeInput.m_to.setTransformedInversePos(trans, input.m_to);
         m_shapeInput.m_filterInfo = input.m_filterInfo;
         if (!shape->castRay(m_shapeInput, *m_result).m_bool) {
             return m_result->m_hitFraction;
         }
         m_result->m_rootCollidable = col;
         hkpWorldRayCastOutput* pResult = m_result;
-        // EXE-INLINED 0xC7F700
-        __m128 n = pResult->m_normal.m_quad;
-        pResult->m_normal.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), trans.m_rotation.m_col0.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), trans.m_rotation.m_col1.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), trans.m_rotation.m_col2.m_quad)
-        );
+        pResult->m_normal.setRotatedDir(trans.m_rotation, pResult->m_normal);
     }
     return m_result->m_hitFraction;
 }

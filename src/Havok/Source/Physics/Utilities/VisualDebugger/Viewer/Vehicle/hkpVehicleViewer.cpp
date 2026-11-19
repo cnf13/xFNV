@@ -137,11 +137,9 @@ void hkpVehicleViewer::postSimulationCallback(hkpWorld* world) {
             );
 
             // The centre: the contact point moved up the suspension by the radius.
-            // EXE-INLINED none: hkVector4::setAddMul4(const hkVector4&, const hkVector4&, const hkSimdReal&)
             const float negRadius = -params.m_radius;
-            centers[w].m_quad = _mm_add_ps(
-                _mm_mul_ps(_mm_set1_ps(negRadius), wheelInfo.m_suspensionDirectionWs.m_quad),
-                wheelInfo.m_contactPoint.m_position.m_quad
+            centers[w].setAddMul4(
+                wheelInfo.m_contactPoint.m_position, wheelInfo.m_suspensionDirectionWs, hkSimdReal(negRadius)
             );
 
             // The spoke: the suspension direction turned by the wheel's spin angle, scaled to the radius.
@@ -149,22 +147,8 @@ void hkpVehicleViewer::postSimulationCallback(hkpWorld* world) {
             spin.setAxisAngle(wheelInfo.m_spinAxisWs, -wheelInfo.m_spinAngle);
             hkVector4 spoke;
             spoke.setRotatedDir(spin, wheelInfo.m_suspensionDirectionWs);
-            // EXE-INLINED 0x62AEA0
-            {
-                const hkQuadReal product = _mm_mul_ps(spoke.m_quad, spoke.m_quad);
-                const hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(product, product, _MM_SHUFFLE(1, 1, 1, 1)), product);
-                const hkQuadReal len2 = _mm_add_ss(_mm_shuffle_ps(product, product, _MM_SHUFFLE(2, 2, 2, 2)), xySum);
-                const hkQuadReal approx = _mm_rsqrt_ss(len2);
-                const hkQuadReal len2EqualsZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-                const hkQuadReal refined = _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-                );
-                const hkQuadReal lenInv = _mm_andnot_ps(len2EqualsZero, refined);
-                spoke.m_quad = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, _MM_SHUFFLE(0, 0, 0, 0)), spoke.m_quad);
-            }
-            // EXE-INLINED 0x627920
-            spoke.m_quad = _mm_mul_ps(spoke.m_quad, _mm_set1_ps(params.m_radius));
+            spoke.normalize3();
+            spoke.mul4(hkSimdReal(params.m_radius));
             hkVector4 spokeStart;
             spokeStart.setAdd4(centers[w], spoke);
             hkVector4 spokeEnd;
@@ -176,8 +160,7 @@ void hkpVehicleViewer::postSimulationCallback(hkpWorld* world) {
 
             // The rim: twelve points 30 degrees apart around the centre, each joined to the one before it.
             hkVector4 rim[12];
-            // EXE-INLINED 0x630AE0
-            rim[0].m_quad = _mm_mul_ps(_mm_set1_ps(params.m_radius), wheelInfo.m_suspensionDirectionWs.m_quad);
+            rim[0].setMul4(hkSimdReal(params.m_radius), wheelInfo.m_suspensionDirectionWs);
             hkQuaternion step;
             step.setAxisAngle(wheelInfo.m_spinAxisWs, 0.5235988f);
             for (int32_t s = 1; s < 14; ++s) {

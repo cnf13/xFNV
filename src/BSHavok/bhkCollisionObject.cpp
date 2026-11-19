@@ -194,11 +194,7 @@ void bhkCollisionObject::NitohkTransform() {
             pRigidBody->GetPosition(kBodyPos);
             hkVector4 kDiff;
             kDiff.setSub4(kTargetPos, kBodyPos);
-            // EXE-INLINED 0x630100: hkVector4::lengthSquared3
-            const __m128 kDiffSq = _mm_mul_ps(kDiff.m_quad, kDiff.m_quad);
-            const float fDistSq = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(kDiffSq, kDiffSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kDiffSq, kDiffSq, 0x55), kDiffSq)
-            ));
+            const float fDistSq = kDiff.lengthSquared3();
             if (!(fDistSq > 1.0f)) {
                 if (!pRigidBody->GetLinearVelocity().equals4(hkVector4Zero)) {
                     pRigidBody->SetLinearVelocity(hkVector4Zero);

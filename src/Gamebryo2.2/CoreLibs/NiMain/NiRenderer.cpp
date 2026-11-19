@@ -302,17 +302,7 @@ bool NiRenderer::PackParticleStripUtil_GetVerts(
             static_cast<double>(pkPrev->y) * aOutDir.y + static_cast<double>(pkPrev->x) * aOutDir.x +
             static_cast<double>(pkPrev->z) * aOutDir.z
         );
-        float fAngle;
-        // EXE-INLINED 0xA58510
-        if (!(fDot > -1.0)) {
-            fAngle = 3.1415927f;
-        }
-        else if (!(1.0 > fDot)) {
-            fAngle = 0.0f;
-        }
-        else {
-            fAngle = std::acos(fDot);
-        }
+        float fAngle = NiACos(fDot);
         kRot.MakeRotation(fAngle, kSide.x, kSide.y, kSide.z);
         // EXE-INLINED 0x4B4500
         const NiPoint3* pkPt = aPreviousDir[1];

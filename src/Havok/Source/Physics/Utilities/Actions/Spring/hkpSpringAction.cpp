@@ -221,23 +221,17 @@ void hkpSpringAction::applyAction(const hkStepInfo& stepInfo) {
     posA.setTransformedPos(ra->m_motion.m_motionState.m_transform, m_positionAinA);
     posB.setTransformedPos(rb->m_motion.m_motionState.m_transform, m_positionBinB);
 
-    // EXE-INLINED none: hkVector4::setSub4
-    __m128 dirAtoB = _mm_sub_ps(
-        _mm_load_ps(&reinterpret_cast<float*>(&posB.m_quad)[0]), _mm_load_ps(&reinterpret_cast<float*>(&posA.m_quad)[0])
-    );
-    // EXE-INLINED 0x630B40
-    __m128 sq = _mm_mul_ps(dirAtoB, dirAtoB);
-    __m128 sum = _mm_add_ss(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq), _mm_shuffle_ps(sq, sq, 0xAA));
-    float length = _mm_cvtss_f32(_mm_sqrt_ss(sum));
+    hkVector4 dirAtoB;
+    dirAtoB.setSub4(posB, posA);
+    float length = dirAtoB.length3();
     if (length < 0.001f) {
         return;
     }
 
     // The reciprocal is x87 (fld1; fdivrp), stored as a float before the SSE scale.
     float invLength = static_cast<float>(1.0 / static_cast<double>(length));
-    // EXE-INLINED 0x627920
-    dirAtoB = _mm_mul_ps(_mm_set1_ps(invLength), dirAtoB);
-    _mm_store_ps(&reinterpret_cast<float*>(&direction.m_quad)[0], dirAtoB);
+    dirAtoB.mul4(invLength);
+    _mm_store_ps(&reinterpret_cast<float*>(&direction.m_quad)[0], dirAtoB.m_quad);
 
     // EXE-INLINED 0x5609F0
     if (m_onCompression.m_bool == 0 && length < m_restLength) {
@@ -251,32 +245,24 @@ void hkpSpringAction::applyAction(const hkStepInfo& stepInfo) {
     ra->getPointVelocity(posA, velA);
     rb->getPointVelocity(posB, velB);
 
-    // EXE-INLINED 0x62B0A0
-    __m128 relVel = _mm_mul_ps(
-        _mm_sub_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&velB.m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&velA.m_quad)[0])
-        ),
-        dirAtoB
+    hkVector4 relVel;
+    relVel.m_quad = _mm_sub_ps(
+        _mm_load_ps(&reinterpret_cast<float*>(&velB.m_quad)[0]), _mm_load_ps(&reinterpret_cast<float*>(&velA.m_quad)[0])
     );
-    float relVelDot = _mm_cvtss_f32(
-        _mm_add_ss(_mm_add_ss(_mm_shuffle_ps(relVel, relVel, 0x55), relVel), _mm_shuffle_ps(relVel, relVel, 0xAA))
-    );
+    float relVelDot = relVel.dot3(dirAtoB);
     // The x87 chain: (length - restLength) * strength + damping * relVel, stored as a float.
     float force = static_cast<float>(
         (static_cast<double>(length) - m_restLength) * m_strength + static_cast<double>(m_damping) * relVelDot
     );
 
     float negForce = -force;
-    // EXE-INLINED 0x630AE0
-    _mm_store_ps(&reinterpret_cast<float*>(&m_lastForce.m_quad)[0], _mm_mul_ps(_mm_set1_ps(negForce), dirAtoB));
+    m_lastForce.setMul4(negForce, dirAtoB);
     float deltaTimeB = stepInfo.m_deltaTime;
     // EXE-INLINED 0x631140
     rb->activate();
     rb->getRigidMotion()->applyForce(deltaTimeB, m_lastForce, posB);
 
-    // EXE-INLINED 0x630AE0
-    _mm_store_ps(&reinterpret_cast<float*>(&m_lastForce.m_quad)[0], _mm_mul_ps(_mm_set1_ps(force), dirAtoB));
+    m_lastForce.setMul4(force, dirAtoB);
     float deltaTimeA = stepInfo.m_deltaTime;
     // EXE-INLINED 0x631140
     ra->activate();

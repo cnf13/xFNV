@@ -62,8 +62,7 @@ void hkpMoppShapeMediator::projectPrimitives(
     if (pChild) {
         fMax = pChild->getMaximumProjection(direction);
         hkVector4 negDirection;
-        // EXE-INLINED none: hkVector4::setNeg4
-        negDirection.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
+        negDirection.setNeg4(direction);
         fMin = -pChild->getMaximumProjection(negDirection);
     }
     else {
@@ -79,8 +78,7 @@ void hkpMoppShapeMediator::projectPrimitives(
         if (pChildI) {
             fMax = pChildI->getMaximumProjection(direction);
             hkVector4 negDirection;
-            // EXE-INLINED none: hkVector4::setNeg4
-            negDirection.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
+            negDirection.setNeg4(direction);
             fMin = -pChildI->getMaximumProjection(negDirection);
         }
         else {
@@ -116,8 +114,7 @@ void hkpMoppShapeMediator::findExtents(
     if (pChild) {
         fMax = pChild->getMaximumProjection(direction);
         hkVector4 negDirection;
-        // EXE-INLINED none: hkVector4::setNeg4
-        negDirection.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
+        negDirection.setNeg4(direction);
         fMin = -pChild->getMaximumProjection(negDirection);
     }
     else {
@@ -131,8 +128,7 @@ void hkpMoppShapeMediator::findExtents(
         if (pChildI) {
             fMax = pChildI->getMaximumProjection(direction);
             hkVector4 negDirection;
-            // EXE-INLINED none: hkVector4::setNeg4
-            negDirection.m_quad = _mm_xor_ps(direction.m_quad, hkQuadRealNegateMask);
+            negDirection.setNeg4(direction);
             fMin = -pChildI->getMaximumProjection(negDirection);
         }
         else {

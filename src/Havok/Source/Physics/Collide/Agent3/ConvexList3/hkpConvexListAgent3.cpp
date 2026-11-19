@@ -3,6 +3,7 @@
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
@@ -108,8 +109,7 @@ gskMode:
             // Back to stream mode when the bodies penetrate deeper than twice the smaller allowed penetration.
             float penetrationB = input.m_bodyB->getRootCollidable()->getAllowedPenetrationDepth();
             float penetrationA = input.m_bodyA->getRootCollidable()->getAllowedPenetrationDepth();
-            // EXE-INLINED none: hkMath::min2 (B's on a tie or a NaN)
-            float minPenetration = (penetrationB > penetrationA) ? penetrationA : penetrationB;
+            float minPenetration = hkMath::min2(penetrationA, penetrationB);
             float twicePenetration = minPenetration + minPenetration;
             if (!(-twicePenetration > separatingNormal->m_quad[3])) {
                 goto done;

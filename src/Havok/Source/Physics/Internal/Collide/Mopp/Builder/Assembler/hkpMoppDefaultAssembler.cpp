@@ -1478,12 +1478,9 @@ void hkpMoppDefaultAssembler::findPlanes(
         ),
         _mm_unpacklo_ps(_mm_cvtsi32_ss(_mm_setzero_ps(), a2.m_accumOffset[1]), _mm_set_ss(0.0f))
     );
-    __m128 vPoint = _mm_add_ps(_mm_mul_ps(vAccum, _mm_set1_ps(fInvScale)), m_codeInfo.m_offset.m_quad);
-    // EXE-INLINED 0x62B0A0
-    __m128 vProduct = _mm_mul_ps(vPoint, pPlane->m_direction.m_quad);
-    __m128 vSum = _mm_add_ss(_mm_shuffle_ps(vProduct, vProduct, _MM_SHUFFLE(1, 1, 1, 1)), vProduct);
-    vSum = _mm_add_ss(_mm_shuffle_ps(vProduct, vProduct, _MM_SHUFFLE(2, 2, 2, 2)), vSum);
-    float fDistance = _mm_cvtss_f32(vSum);
+    hkVector4 point;
+    point.m_quad = _mm_add_ps(_mm_mul_ps(vAccum, _mm_set1_ps(fInvScale)), m_codeInfo.m_offset.m_quad);
+    float fDistance = point.dot3(pPlane->m_direction);
     float fResolution = static_cast<float>(1 << a2.m_currentBitsResolution);
     double dRight = (fRight - fDistance) * fScale / fResolution;
     double dLeft = (fLeft - fDistance) * fScale / fResolution;

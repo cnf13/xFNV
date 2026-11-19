@@ -140,24 +140,7 @@ void hkpBvTreeAgent::processCollision(
 
         // The time info into bodyB's space; its w is overwritten with the rotated vector's, as the game does.
         const hkRotation& rotB = msB->m_transform.m_rotation;
-        {
-            // EXE-INLINED 0x4B4AD0
-            const hkQuadReal lo = _mm_unpacklo_ps(rotB.m_col0.m_quad, rotB.m_col1.m_quad);
-            const hkQuadReal row0 = _mm_movelh_ps(lo, rotB.m_col2.m_quad);
-            const hkQuadReal row1 =
-                _mm_shuffle_ps(_mm_movehl_ps(row0, lo), rotB.m_col2.m_quad, _MM_SHUFFLE(3, 1, 1, 0));
-            const hkQuadReal row2 = _mm_shuffle_ps(
-                _mm_unpackhi_ps(rotB.m_col0.m_quad, rotB.m_col1.m_quad), rotB.m_col2.m_quad, _MM_SHUFFLE(3, 2, 1, 0)
-            );
-            const hkQuadReal v = linearTimInfo.m_quad;
-            linearTimInfo.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(row1, _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1))),
-                    _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0)), row0)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2)), row2)
-            );
-        }
+        linearTimInfo._setRotatedInverseDir(rotB, linearTimInfo);
 
         hkAabb aabb;
         // The motion the box is grown by: the linear one, plus bodyB's rotation about bodyA's center where the
@@ -174,32 +157,16 @@ void hkpBvTreeAgent::processCollision(
             // The box is clipped to the sphere around bodyA's center of mass, in bodyB's space.
             const float radius = input.m_tolerance * 0.5 + msA->m_objectRadius + epsB;
             const hkQuadReal r = _mm_set1_ps(radius);
-            const hkQuadReal d =
-                _mm_sub_ps(msA->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_transform.m_translation.m_quad);
-            hkQuadReal center;
-            {
-                // EXE-INLINED 0x4B4AD0
-                const hkQuadReal lo = _mm_unpacklo_ps(rotB.m_col0.m_quad, rotB.m_col1.m_quad);
-                const hkQuadReal row0 = _mm_movelh_ps(lo, rotB.m_col2.m_quad);
-                const hkQuadReal row1 =
-                    _mm_shuffle_ps(_mm_movehl_ps(row0, lo), rotB.m_col2.m_quad, _MM_SHUFFLE(3, 1, 1, 0));
-                const hkQuadReal row2 = _mm_shuffle_ps(
-                    _mm_unpackhi_ps(rotB.m_col0.m_quad, rotB.m_col1.m_quad), rotB.m_col2.m_quad, _MM_SHUFFLE(3, 2, 1, 0)
-                );
-                center = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(row1, _mm_shuffle_ps(d, d, _MM_SHUFFLE(1, 1, 1, 1))),
-                        _mm_mul_ps(_mm_shuffle_ps(d, d, _MM_SHUFFLE(0, 0, 0, 0)), row0)
-                    ),
-                    _mm_mul_ps(_mm_shuffle_ps(d, d, _MM_SHUFFLE(2, 2, 2, 2)), row2)
-                );
-            }
-            aabb.m_min.m_quad = _mm_max_ps(aabb.m_min.m_quad, _mm_sub_ps(center, r));
-            aabb.m_max.m_quad = _mm_min_ps(aabb.m_max.m_quad, _mm_add_ps(center, r));
+            hkVector4 d;
+            d.m_quad = _mm_sub_ps(msA->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_transform.m_translation.m_quad);
+            hkVector4 center;
+            center._setRotatedInverseDir(rotB, d);
+            aabb.m_min.m_quad = _mm_max_ps(aabb.m_min.m_quad, _mm_sub_ps(center.m_quad, r));
+            aabb.m_max.m_quad = _mm_min_ps(aabb.m_max.m_quad, _mm_add_ps(center.m_quad, r));
             extent = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
 
             if (msB->m_deltaAngle.m_quad[3] > 0.0f) {
-                const hkQuadReal rel = _mm_sub_ps(center, msB->m_sweptTransform.m_centerOfMassLocal.m_quad);
+                const hkQuadReal rel = _mm_sub_ps(center.m_quad, msB->m_sweptTransform.m_centerOfMassLocal.m_quad);
                 const float scale = msB->m_sweptTransform.m_centerOfMass1.m_quad[3] * input.m_stepInfo.m_deltaTime;
                 const hkQuadReal dA = msB->m_deltaAngle.m_quad;
                 const hkQuadReal cross = _mm_sub_ps(
@@ -229,12 +196,7 @@ void hkpBvTreeAgent::processCollision(
         }
 
         if (cachedAabb) {
-            // EXE-INLINED 0x628D10
-            const hkQuadReal inside = _mm_and_ps(
-                _mm_cmple_ps(cachedAabb->m_min.m_quad, aabb.m_min.m_quad),
-                _mm_cmple_ps(aabb.m_max.m_quad, cachedAabb->m_max.m_quad)
-            );
-            if ((_mm_movemask_ps(inside) & 7) == 7) {
+            if (cachedAabb->contains(aabb).m_bool) {
                 goto queryDone;
             }
 
@@ -589,12 +551,7 @@ void hkpBvTreeAgent::prepareCollisionPartners(
         bodyA.m_shape->getAabbImpl(bTa, tolerance, aabb);
     }
     if (hkpBvTreeAgent::m_useAabbCaching) {
-        // EXE-INLINED 0x628D10
-        const hkQuadReal inside = _mm_and_ps(
-            _mm_cmple_ps(aabb.m_max.m_quad, m_cachedAabb.m_max.m_quad),
-            _mm_cmple_ps(m_cachedAabb.m_min.m_quad, aabb.m_min.m_quad)
-        );
-        if ((_mm_movemask_ps(inside) & 7) == 7) {
+        if (m_cachedAabb.contains(aabb).m_bool) {
             return;
         }
         m_cachedAabb.m_min.m_quad = aabb.m_min.m_quad;

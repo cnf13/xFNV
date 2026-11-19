@@ -19,12 +19,9 @@ public:
 
     // Copies the three columns into arDst's and returns arDst.
     hkRotation& ToHK(hkRotation& arDst) const {
-        // EXE-INLINED 0x4B4D10
-        arDst.m_col0.set(Col0.fX, Col0.fY, Col0.fZ, Col0.fW);
-        // EXE-INLINED 0x4B4D10
-        arDst.m_col1.set(Col1.fX, Col1.fY, Col1.fZ, Col1.fW);
-        // EXE-INLINED 0x4B4D10
-        arDst.m_col2.set(Col2.fX, Col2.fY, Col2.fZ, Col2.fW);
+        Col0.ToHK(arDst.m_col0);
+        Col1.ToHK(arDst.m_col1);
+        Col2.ToHK(arDst.m_col2);
         return arDst;
     }
 

@@ -102,13 +102,9 @@ void hkpSphereBoxAgent::getClosestPoints(
         const hkQuadReal len2 = _mm_add_ss(
             _mm_shuffle_ps(clipped2, clipped2, 0xAA), _mm_add_ss(_mm_shuffle_ps(clipped2, clipped2, 0x55), clipped2)
         );
-        // EXE-INLINED 0x62AF00
-        const hkQuadReal approx = _mm_rsqrt_ss(len2);
-        const hkQuadReal refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const hkQuadReal invLen = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_set_ss(0.0f)), refined);
+        hkVector4 clippedVector;
+        clippedVector.m_quad = clipped;
+        const hkQuadReal invLen = clippedVector.lengthInverse3().getQuad();
         const hkQuadReal invLen4 = _mm_shuffle_ps(invLen, invLen, 0x00);
         const float length = _mm_cvtss_f32(_mm_mul_ss(len2, invLen4));
         distance = length - (boxB->m_radius + sphereA->m_radius);
@@ -211,13 +207,9 @@ void hkpSphereBoxAgent::processCollision(
         const hkQuadReal len2 = _mm_add_ss(
             _mm_shuffle_ps(clipped2, clipped2, 0xAA), _mm_add_ss(_mm_shuffle_ps(clipped2, clipped2, 0x55), clipped2)
         );
-        // EXE-INLINED 0x62AF00
-        const hkQuadReal approx = _mm_rsqrt_ss(len2);
-        const hkQuadReal refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const hkQuadReal invLen = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_set_ss(0.0f)), refined);
+        hkVector4 clippedVector;
+        clippedVector.m_quad = clipped;
+        const hkQuadReal invLen = clippedVector.lengthInverse3().getQuad();
         const hkQuadReal invLen4 = _mm_shuffle_ps(invLen, invLen, 0x00);
         const float length = _mm_cvtss_f32(_mm_mul_ss(len2, invLen4));
         distance = length - (boxB->m_radius + sphereA->m_radius);
@@ -333,13 +325,9 @@ void hkpSphereBoxAgent::staticGetClosestPoints(
         const hkQuadReal len2 = _mm_add_ss(
             _mm_shuffle_ps(clipped2, clipped2, 0xAA), _mm_add_ss(_mm_shuffle_ps(clipped2, clipped2, 0x55), clipped2)
         );
-        // EXE-INLINED 0x62AF00
-        const hkQuadReal approx = _mm_rsqrt_ss(len2);
-        const hkQuadReal refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const hkQuadReal invLen = _mm_andnot_ps(_mm_cmpeq_ss(len2, _mm_set_ss(0.0f)), refined);
+        hkVector4 clippedVector;
+        clippedVector.m_quad = clipped;
+        const hkQuadReal invLen = clippedVector.lengthInverse3().getQuad();
         const hkQuadReal invLen4 = _mm_shuffle_ps(invLen, invLen, 0x00);
         const float length = _mm_cvtss_f32(_mm_mul_ss(len2, invLen4));
         distance = length - (boxB->m_radius + sphereA->m_radius);

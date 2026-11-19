@@ -137,10 +137,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
     switch (shapeType) {
         case HK_SHAPE_CONVEX_TRANSLATE: {
             const hkpConvexTranslateShape* pTranslate = static_cast<const hkpConvexTranslateShape*>(transformShape);
-            // EXE-INLINED 0x577070: hkTransform::setIdentity
-            parentFromChild.m_rotation.m_col0.m_quad = _mm_setr_ps(1.0f, 0.0f, 0.0f, 0.0f);
-            parentFromChild.m_rotation.m_col1.m_quad = _mm_setr_ps(0.0f, 1.0f, 0.0f, 0.0f);
-            parentFromChild.m_rotation.m_col2.m_quad = _mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f);
+            parentFromChild.setIdentity();
             parentFromChild.m_translation.m_quad = pTranslate->m_translation.m_quad;
             child = pTranslate->m_childShape.m_childShape;
             break;
@@ -334,20 +331,11 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                 hkArray<hkVector4> vertices;
                 pVertices->getOriginalVertices(vertices);
                 // Transforms the vertices last to first, the first one included even when there are none (a do-while),
-                // as the game does. EXE-INLINED 0xC7F640: hkVector4::setTransformedPos
-                const hkQuadReal col0 = parentFromChild.m_rotation.m_col0.m_quad;
-                const hkQuadReal col1 = parentFromChild.m_rotation.m_col1.m_quad;
-                const hkQuadReal col2 = parentFromChild.m_rotation.m_col2.m_quad;
-                const hkQuadReal translation = parentFromChild.m_translation.m_quad;
+                // as the game does.
                 int32_t index = vertices.m_size - 1;
                 hkVector4* pVertex = &vertices.m_data[index];
                 do {
-                    const hkQuadReal v = pVertex->m_quad;
-                    const hkQuadReal xy = _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), col0)
-                    );
-                    const hkQuadReal zt = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation);
-                    pVertex->m_quad = _mm_add_ps(xy, zt);
+                    pVertex->setTransformedPos(parentFromChild, *pVertex);
                     --index;
                     --pVertex;
                 }
@@ -615,11 +603,8 @@ const hkpShape* hkpTransformCollapseUtil::transformTransformShape(const hkpShape
                 break;
             }
             const hkpConvexTranslateShape* pTranslate = static_cast<const hkpConvexTranslateShape*>(shape);
-            // EXE-INLINED 0x577070: hkTransform::setIdentity
             hkTransform childFromGrandchild;
-            childFromGrandchild.m_rotation.m_col0.m_quad = _mm_setr_ps(1.0f, 0.0f, 0.0f, 0.0f);
-            childFromGrandchild.m_rotation.m_col1.m_quad = _mm_setr_ps(0.0f, 1.0f, 0.0f, 0.0f);
-            childFromGrandchild.m_rotation.m_col2.m_quad = _mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f);
+            childFromGrandchild.setIdentity();
             childFromGrandchild.m_translation.m_quad = pTranslate->m_translation.m_quad;
             hkTransform parentFromGrandchild;
             parentFromGrandchild.setMul(transform, childFromGrandchild);

@@ -229,9 +229,7 @@ void NiTransformInterpolator::Collapse() {
             bCollapse = true;
             for (uint32_t ui = 1; ui < pkData->m_usNumRotKeys && bCollapse; ui++) {
                 const NiQuaternion& kKey = pkRotKeys->GetKeyAt(ui, pkData->m_ucRotSize)->m_quat;
-                // EXE-INLINED 0xA92660
-                if (!(kKey.m_fW == kRot.m_fW && kKey.m_fX == kRot.m_fX && kKey.m_fY == kRot.m_fY &&
-                      kKey.m_fZ == kRot.m_fZ)) {
+                if (!(kKey == kRot)) {
                     bCollapse = false;
                 }
             }

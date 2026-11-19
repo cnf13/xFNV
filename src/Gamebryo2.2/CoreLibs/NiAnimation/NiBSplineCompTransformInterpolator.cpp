@@ -115,11 +115,7 @@ bool NiBSplineCompTransformInterpolator::Update(float fTime, NiObjectNET*, NiQua
             fNormTime, afValue, 3, m_spBasisData, m_kTransCPHandle, m_afCompScalars[POSITION_OFFSET],
             m_afCompScalars[POSITION_RANGE]
         );
-        NiPoint3 kTranslate;
-        // EXE-INLINED 0x416870
-        kTranslate.x = afValue[0];
-        kTranslate.y = afValue[1];
-        kTranslate.z = afValue[2];
+        NiPoint3 kTranslate(afValue[0], afValue[1], afValue[2]);
         m_kTransformValue.m_kTranslate = kTranslate;
     }
 

@@ -210,25 +210,17 @@ bool NiHalfSpaceBV::HalfSpaceCapsuleFindIntersect(
     const NiPoint3& kDirection = kCapsule.m_kSegment.m_kDirection;
     const NiPoint3& kNormal = kPlane.m_kNormal;
 
-    // EXE-INLINED none: NiPlane::Distance
-    float fDot = kNormal.x * kOrigin.x + kNormal.y * kOrigin.y + kNormal.z * kOrigin.z;
-    float fSignedDistance0 = fDot - kPlane.m_fConstant;
+    float fSignedDistance0 = kPlane.Distance(kOrigin);
     NiPoint3 kEnd;
     kEnd.x = kOrigin.x + kDirection.x;
     kEnd.y = kDirection.y + kOrigin.y;
     kEnd.z = kDirection.z + kOrigin.z;
-    // EXE-INLINED none: NiPlane::Distance
-    fDot = kNormal.x * kEnd.x + kNormal.y * kEnd.y + kNormal.z * kEnd.z;
-    float fSignedDistance1 = fDot - kPlane.m_fConstant;
+    float fSignedDistance1 = kPlane.Distance(kEnd);
     if (((fSignedDistance0 < 0.0f) && (fSignedDistance1 > 0.0f)) ||
         ((fSignedDistance0 > 0.0f) && (fSignedDistance1 < 0.0f))) {
         fIntrTime = 0.0f;
         float fRatio = fSignedDistance0 / (fSignedDistance0 - fSignedDistance1);
-        // EXE-INLINED 0x4A3760
-        NiPoint3 kTmp;
-        kTmp.x = kDirection.x * fRatio;
-        kTmp.y = kDirection.y * fRatio;
-        kTmp.z = fRatio * kDirection.z;
+        NiPoint3 kTmp = fRatio * kDirection;
         NiPoint3 kPoint;
         kPoint.x = kOrigin.x + kTmp.x;
         kPoint.y = kOrigin.y + kTmp.y;
@@ -268,13 +260,8 @@ bool NiHalfSpaceBV::HalfSpaceCapsuleFindIntersect(
                 fTime, kABV0, kV0, *pSphABV, kV1, fIntrTime, kIntrPt, bCalcNormals, kNormal0, kNormal1
             );
         }
-        // EXE-INLINED none: NiPoint3::operator-
-        NiPoint3 kDeltaV;
-        kDeltaV.x = kV1.x - kV0.x;
-        kDeltaV.y = kV1.y - kV0.y;
-        kDeltaV.z = kV1.z - kV0.z;
-        // EXE-INLINED none: NiPoint3::Dot
-        float fNdV = kNormal.x * kDeltaV.x + kNormal.y * kDeltaV.y + kNormal.z * kDeltaV.z;
+        NiPoint3 kDeltaV = kV1 - kV0;
+        float fNdV = kNormal.Dot(kDeltaV);
         if (fNdV <= 0.0f) {
             return false;
         }
@@ -302,11 +289,7 @@ bool NiHalfSpaceBV::HalfSpaceCapsuleFindIntersect(
         else {
             float fTime1 = -((fSignedDistance1 + kCapsule.m_fRadius) / fNdV);
             fIntrTime = fTime1;
-            // EXE-INLINED 0x45BB20
-            NiPoint3 kHalfDir;
-            kHalfDir.x = kDirection.x * 0.5;
-            kHalfDir.y = kDirection.y * 0.5;
-            kHalfDir.z = 0.5 * kDirection.z;
+            NiPoint3 kHalfDir = kDirection * 0.5f;
             NiPoint3 kH;
             kH.x = kOrigin.x + kHalfDir.x;
             kH.y = kOrigin.y + kHalfDir.y;

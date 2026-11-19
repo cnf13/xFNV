@@ -47,9 +47,7 @@ NiObject* NiBlendPoint3Interpolator::CreateClone(NiCloningProcess& kCloning) {
 void NiBlendPoint3Interpolator::LoadBinary(NiStream& kStream) {
     NiBlendInterpolator::LoadBinary(kStream);
     m_kPoint3Value.LoadBinary(kStream);
-    // EXE-INLINED 0x439090
-    if (m_kPoint3Value.x != INVALID_POINT3.x || m_kPoint3Value.y != INVALID_POINT3.y ||
-        m_kPoint3Value.z != INVALID_POINT3.z) {
+    if (m_kPoint3Value != INVALID_POINT3) {
         m_bValidValue = true;
     }
 }

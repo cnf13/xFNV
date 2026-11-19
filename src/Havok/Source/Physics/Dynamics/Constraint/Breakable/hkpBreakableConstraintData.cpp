@@ -156,27 +156,10 @@ void hkpBreakableConstraintData::buildJacobianCallback(const hkpConstraintQueryI
                 angVelB.set(
                     runtime->m_angularVelcityB[0], runtime->m_angularVelcityB[1], runtime->m_angularVelcityB[2], 0.0f
                 );
-                const __m128 kT = _mm_set1_ps(factor);
-                // EXE-INLINED 0x5DBF70
-                bodyA->m_linearVel.m_quad = _mm_add_ps(
-                    _mm_mul_ps(linVelA.m_quad, _mm_sub_ps(hkQuadReal1111_0, kT)),
-                    _mm_mul_ps(bodyA->m_linearVel.m_quad, kT)
-                );
-                // EXE-INLINED 0x5DBF70
-                bodyB->m_linearVel.m_quad = _mm_add_ps(
-                    _mm_mul_ps(linVelB.m_quad, _mm_sub_ps(hkQuadReal1111_0, kT)),
-                    _mm_mul_ps(bodyB->m_linearVel.m_quad, kT)
-                );
-                // EXE-INLINED 0x5DBF70
-                bodyA->m_angularVel.m_quad = _mm_add_ps(
-                    _mm_mul_ps(angVelA.m_quad, _mm_sub_ps(hkQuadReal1111_0, kT)),
-                    _mm_mul_ps(bodyA->m_angularVel.m_quad, kT)
-                );
-                // EXE-INLINED 0x5DBF70
-                bodyB->m_angularVel.m_quad = _mm_add_ps(
-                    _mm_mul_ps(angVelB.m_quad, _mm_sub_ps(hkQuadReal1111_0, kT)),
-                    _mm_mul_ps(kT, bodyB->m_angularVel.m_quad)
-                );
+                bodyA->m_linearVel.setInterpolate4(linVelA, bodyA->m_linearVel, factor);
+                bodyB->m_linearVel.setInterpolate4(linVelB, bodyB->m_linearVel, factor);
+                bodyA->m_angularVel.setInterpolate4(angVelA, bodyA->m_angularVel, factor);
+                bodyB->m_angularVel.setInterpolate4(angVelB, bodyB->m_angularVel, factor);
             }
         }
     }

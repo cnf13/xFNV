@@ -138,18 +138,7 @@ void hkpTransformAgent::processCollision(
     ms.m_sweptTransform.m_centerOfMass1.m_quad = msA->m_sweptTransform.m_centerOfMass1.m_quad;
     ms.m_sweptTransform.m_rotation0.setMul(msA->m_sweptTransform.m_rotation0, tShapeA->m_rotation);
     ms.m_sweptTransform.m_rotation1.setMul(msA->m_sweptTransform.m_rotation1, tShapeA->m_rotation);
-    // EXE-INLINED 0xC7F690
-    __m128 v = _mm_sub_ps(msA->m_sweptTransform.m_centerOfMassLocal.m_quad, tA.m_translation.m_quad);
-    __m128 lo = _mm_unpacklo_ps(tA.m_rotation.m_col0.m_quad, tA.m_rotation.m_col1.m_quad);
-    __m128 r0 = _mm_movelh_ps(lo, tA.m_rotation.m_col2.m_quad);
-    __m128 r1 = _mm_shuffle_ps(_mm_movehl_ps(r0, lo), tA.m_rotation.m_col2.m_quad, 212);
-    __m128 r2 = _mm_shuffle_ps(
-        _mm_unpackhi_ps(tA.m_rotation.m_col0.m_quad, tA.m_rotation.m_col1.m_quad), tA.m_rotation.m_col2.m_quad, 228
-    );
-    ms.m_sweptTransform.m_centerOfMassLocal.m_quad = _mm_add_ps(
-        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 85), r1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0), r0)),
-        _mm_mul_ps(r2, _mm_shuffle_ps(v, v, 170))
-    );
+    ms.m_sweptTransform.m_centerOfMassLocal.setTransformedInversePos(tA, msA->m_sweptTransform.m_centerOfMassLocal);
     ms.m_deltaAngle.m_quad = msA->m_deltaAngle.m_quad;
     ms.m_objectRadius = msA->m_objectRadius;
     newOperandA.m_motion.pState = &ms;

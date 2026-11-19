@@ -280,10 +280,7 @@ hkaSkeletonMapperData& hkaSkeletonMapperData::operator=(const hkaSkeletonMapperD
     m_chainMappings = __that.m_chainMappings;
     m_unmappedBones = __that.m_unmappedBones;
 
-    // EXE-INLINED 0xC6CD30
-    m_extractedMotionMapping.m_translation = __that.m_extractedMotionMapping.m_translation;
-    m_extractedMotionMapping.m_rotation.m_vec = __that.m_extractedMotionMapping.m_rotation.m_vec;
-    m_extractedMotionMapping.m_scale = __that.m_extractedMotionMapping.m_scale;
+    m_extractedMotionMapping = __that.m_extractedMotionMapping;
     m_keepUnmappedLocal.m_bool = __that.m_keepUnmappedLocal.m_bool;
     m_mappingType.m_storage = __that.m_mappingType.m_storage;
     return *this;

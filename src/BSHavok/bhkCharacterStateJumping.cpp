@@ -41,8 +41,7 @@ void bhkCharacterStateJumping::Update(bhkCharacterController& arInput) {
     float fRoot = std::sqrt(fSquare);
     float fSpeed = -fRoot;
     hkVector4 kJump;
-    // EXE-INLINED 0x630AE0
-    kJump.m_quad = _mm_mul_ps(_mm_set1_ps(fSpeed), kDirection.m_quad);
+    kJump.setMul4(fSpeed, kDirection);
     hkpCharacterProxy* phkObject = static_cast<hkpCharacterProxy*>(arInput.phkObject);
     const hkVector4* pLinearVelocity = &hkVector4Zero;
     if (phkObject) {

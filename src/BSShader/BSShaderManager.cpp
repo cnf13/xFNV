@@ -565,10 +565,7 @@ BSShaderPPLightingProperty::TangentSpaceData* BSShaderManager::CreateTangentSpac
         kTangent.x = kTangentSum.x - fProjX;
         kTangent.y = kTangentSum.y - fProjY;
         kTangent.z = kTangentSum.z - fProjZ;
-        // EXE-INLINED 0x4B3800
-        kBinormal.x = kTangent.z * kNormal.y - kNormal.z * kTangent.y;
-        kBinormal.y = kNormal.z * kTangent.x - kTangent.z * kNormal.x;
-        kBinormal.z = kNormal.x * kTangent.y - kNormal.y * kTangent.x;
+        kBinormal = kNormal.Cross(kTangent);
         kTangent.Unitize();
         kBinormal.Unitize();
     }

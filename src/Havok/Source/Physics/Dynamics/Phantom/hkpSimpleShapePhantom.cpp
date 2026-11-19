@@ -268,34 +268,23 @@ void hkpSimpleShapePhantom::setPositionAndLinearCast(
     hkpCdPointCollector& castCollector,
     hkpCdPointCollector* startCollector
 ) {
-    // EXE-INLINED none: hkTransform::setTranslation
-    m_motionState.m_transform.m_translation.m_quad = position.m_quad;
+    m_motionState.m_transform.setTranslation(position);
     const hkpShape* shape = m_collidable.m_shape;
     // The half tolerance is rounded to a float before the start point tolerance is added; 0.5 is a double constant.
     float halfTolerance = m_world->m_collisionInput->m_tolerance * 0.5;
     // The box is not default-constructed: it is uninitialised stack memory until getAabbImpl fills it.
     alignas(16) hkAabb aabb;
     shape->getAabbImpl(m_motionState.m_transform, halfTolerance + input.m_startPointTolerance, aabb);
-    // EXE-INLINED none: hkVector4::setSub4
-    __m128 path = _mm_sub_ps(
-        _mm_load_ps(&reinterpret_cast<const float*>(&input.m_to.m_quad)[0]),
-        _mm_load_ps(&reinterpret_cast<const float*>(&position.m_quad)[0])
-    );
-    __m128 zero = _mm_setzero_ps();
-    // EXE-INLINED none: hkVector4::setMin4
-    __m128 pathMin = _mm_min_ps(zero, path);
-    // EXE-INLINED none: hkVector4::setMax4
-    __m128 pathMax = _mm_max_ps(zero, path);
-    // EXE-INLINED none: hkVector4::add4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&aabb.m_min.m_quad)[0],
-        _mm_add_ps(pathMin, _mm_load_ps(&reinterpret_cast<float*>(&aabb.m_min.m_quad)[0]))
-    );
-    // EXE-INLINED none: hkVector4::add4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&aabb.m_max.m_quad)[0],
-        _mm_add_ps(pathMax, _mm_load_ps(&reinterpret_cast<float*>(&aabb.m_max.m_quad)[0]))
-    );
+    hkVector4 path;
+    path.setSub4(input.m_to, position);
+    hkVector4 zero;
+    zero.setZero4();
+    hkVector4 pathMin;
+    pathMin.setMin4(zero, path);
+    hkVector4 pathMax;
+    pathMax.setMax4(zero, path);
+    aabb.m_min.add4(pathMin);
+    aabb.m_max.add4(pathMax);
     updateBroadPhase(aabb);
 
     hkpWorld* world = m_world;
@@ -317,13 +306,8 @@ void hkpSimpleShapePhantom::setPositionAndLinearCast(
     linearCastInput.m_aabb32Info.m_bitScale.m_quad = collisionInput->m_aabb32Info.m_bitScale.m_quad;
     linearCastInput.m_config = collisionInput->m_config;
     // EXE-INLINED none: hkpLinearCastCollisionInput::setPathAndTolerance
-    _mm_store_ps(&reinterpret_cast<float*>(&linearCastInput.m_path.m_quad)[0], path);
-    // EXE-INLINED none: hkVector4::length3
-    // The exe's addss steps are written packed: only lane 0 reaches sqrtss.
-    __m128 squares = _mm_mul_ps(path, path);
-    __m128 lengthSquared =
-        _mm_add_ps(_mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ps(_mm_shuffle_ps(squares, squares, 0x55), squares));
-    linearCastInput.m_cachedPathLength = _mm_cvtss_f32(_mm_sqrt_ss(lengthSquared));
+    _mm_store_ps(&reinterpret_cast<float*>(&linearCastInput.m_path.m_quad)[0], path.m_quad);
+    linearCastInput.m_cachedPathLength = path.length3();
     linearCastInput.m_tolerance = input.m_startPointTolerance;
     linearCastInput.m_maxExtraPenetration = input.m_maxExtraPenetration;
 

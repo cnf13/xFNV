@@ -147,10 +147,8 @@ void bhkDashpotAction::Init(const hkSerializableCinfo& arInfo) {
     // EXE-INLINED none: hkReferencedObject::operator new
     static_cast<hkReferencedObject*>(pMemory)->m_memSizeAndFlags = sizeof(hkpDashpotAction);
     hkpDashpotAction* pAction = ::new (pMemory) hkpDashpotAction(rCinfo.m_bodyA, rCinfo.m_bodyB, 0);
-    // EXE-INLINED 0x4B4D10
-    pAction->m_point[1].set(rCinfo.m_pivotB.fX, rCinfo.m_pivotB.fY, rCinfo.m_pivotB.fZ, rCinfo.m_pivotB.fW);
-    // EXE-INLINED 0x4B4D10
-    pAction->m_point[0].set(rCinfo.m_pivotA.fX, rCinfo.m_pivotA.fY, rCinfo.m_pivotA.fZ, rCinfo.m_pivotA.fW);
+    rCinfo.m_pivotB.ToHK(pAction->m_point[1]);
+    rCinfo.m_pivotA.ToHK(pAction->m_point[0]);
     pAction->m_strength = rCinfo.m_strength;
     pAction->m_damping = rCinfo.m_damping;
     SethkObject(pAction);

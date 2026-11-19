@@ -121,22 +121,7 @@ void hkpSphereTriangleAgent::getPenetrations(
     const hkpConvexShape* sphereA = static_cast<const hkpConvexShape*>(bodyA.m_shape);
     const hkpTriangleShape* triB = static_cast<const hkpTriangleShape*>(bodyB.m_shape);
     hkVector4 position;
-    {
-        // EXE-INLINED 0xC7F690
-        const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 d = _mm_sub_ps(bodyA.m_motion.pMotion->m_translation.m_quad, t.m_translation.m_quad);
-        const __m128 lo = _mm_unpacklo_ps(c0, c1);
-        const __m128 row0 = _mm_movelh_ps(lo, c2);
-        const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), c2, 0xD4);
-        const __m128 row2 = _mm_shuffle_ps(_mm_unpackhi_ps(c0, c1), c2, 0xE4);
-        position.m_quad = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(d, d, 0x55), row1), _mm_mul_ps(_mm_shuffle_ps(d, d, 0x00), row0)),
-            _mm_mul_ps(row2, _mm_shuffle_ps(d, d, 0xAA))
-        );
-    }
+    position.setTransformedInversePos(*bodyB.m_motion.pMotion, bodyA.m_motion.pMotion->m_translation);
     hkpCollideTriangleUtil::ClosestPointTriangleResult result;
     hkpCollideTriangleUtil::closestPointTriangle(
         position, &triB->m_vertexA, m_closestPointTriangleCache, result, nullptr
@@ -262,21 +247,7 @@ void hkpSphereTriangleAgent::staticGetPenetrations(
     hkpCollideTriangleUtil::setupClosestPointTriangleCache(&triB->m_vertexA, cache);
 
     hkVector4 position;
-    {
-        const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 col1 = t.m_rotation.m_col1.m_quad;
-        const __m128 col2 = t.m_rotation.m_col2.m_quad;
-        // EXE-INLINED 0xC7F690
-        const __m128 d = _mm_sub_ps(bodyA.m_motion.pMotion->m_translation.m_quad, t.m_translation.m_quad);
-        const __m128 lo = _mm_unpacklo_ps(t.m_rotation.m_col0.m_quad, col1);
-        const __m128 rowX = _mm_movelh_ps(lo, col2);
-        const __m128 rowY = _mm_shuffle_ps(_mm_movehl_ps(rowX, lo), col2, 0xD4);
-        const __m128 rowZ = _mm_shuffle_ps(_mm_unpackhi_ps(t.m_rotation.m_col0.m_quad, col1), col2, 0xE4);
-        position.m_quad = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(d, d, 0x55), rowY), _mm_mul_ps(_mm_shuffle_ps(d, d, 0x00), rowX)),
-            _mm_mul_ps(rowZ, _mm_shuffle_ps(d, d, 0xAA))
-        );
-    }
+    position.setTransformedInversePos(*bodyB.m_motion.pMotion, bodyA.m_motion.pMotion->m_translation);
     hkpCollideTriangleUtil::ClosestPointTriangleResult result;
     hkpCollideTriangleUtil::closestPointTriangle(position, &triB->m_vertexA, cache, result, nullptr);
     // The radius sum (triangle plus sphere) is stored as a float; only radiusSum > distance (not NaN) reports the pair.

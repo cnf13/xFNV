@@ -506,20 +506,6 @@ float hkCpuWorldRayCastCollector::addLeaf(const hkAabbTree<hkAabbTreeData::hkAab
 // nearer. When choosing the farthest kept result, NaN keeps the current one; the replacement gives up unless the kept
 // one is farther than the hit (NaN gives up). The hit fraction and the replaced one are floats.
 hkBool hkCpuWorldRayCastCollector::testCollidable(const hkpCollidable* apCollidable) {
-    // EXE-INLINED 0xC7F690
-    auto transformedInversePos = [](const hkTransform& t, const hkVector4& v) {
-        const __m128 kD = _mm_sub_ps(v.m_quad, t.m_translation.m_quad);
-        const __m128 kLo = _mm_unpacklo_ps(t.m_rotation.m_col0.m_quad, t.m_rotation.m_col1.m_quad);
-        const __m128 kHi = _mm_unpackhi_ps(t.m_rotation.m_col0.m_quad, t.m_rotation.m_col1.m_quad);
-        const __m128 kRow0 = _mm_movelh_ps(kLo, t.m_rotation.m_col2.m_quad);
-        const __m128 kRow1 = _mm_shuffle_ps(_mm_movehl_ps(kRow0, kLo), t.m_rotation.m_col2.m_quad, 0xD4);
-        const __m128 kRow2 = _mm_shuffle_ps(kHi, t.m_rotation.m_col2.m_quad, 0xE4);
-        const __m128 kXY = _mm_add_ps(
-            _mm_mul_ps(kRow1, _mm_shuffle_ps(kD, kD, 0x55)), _mm_mul_ps(_mm_shuffle_ps(kD, kD, 0x00), kRow0)
-        );
-        return _mm_add_ps(kXY, _mm_mul_ps(kRow2, _mm_shuffle_ps(kD, kD, 0xAA)));
-    };
-
     const hkpShape* pShape = apCollidable->m_shape;
     // The result is false at once, the cast's result copied in after the cast.
     hkBool result;
@@ -536,8 +522,8 @@ hkBool hkCpuWorldRayCastCollector::testCollidable(const hkpCollidable* apCollida
     const hkTransform& kTransform = *apCollidable->m_motion.pMotion;
     hkpWorldRayCastOutput output;
     output.m_hitFraction = m_hitFraction;
-    m_workInput.m_from.m_quad = transformedInversePos(kTransform, m_originalInput->m_from);
-    m_workInput.m_to.m_quad = transformedInversePos(kTransform, m_originalInput->m_to);
+    m_workInput.m_from.setTransformedInversePos(kTransform, m_originalInput->m_from);
+    m_workInput.m_to.setTransformedInversePos(kTransform, m_originalInput->m_to);
 
     if (m_fixedBufferRayHitCollector) {
         pShape->castRayWithCollectorImpl(m_workInput, *apCollidable, *m_fixedBufferRayHitCollector);
@@ -575,14 +561,8 @@ hkBool hkCpuWorldRayCastCollector::testCollidable(const hkpCollidable* apCollida
         fFraction = pDest->m_hitFraction;
     }
     if (pDest) {
-        // EXE-INLINED none: hkVector4::setRotatedDir (the normal into world space)
-        const __m128 kN = output.m_normal.m_quad;
-        const __m128 kXY = _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(kN, kN, 0x55), kTransform.m_rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(kN, kN, 0x00), kTransform.m_rotation.m_col0.m_quad)
-        );
-        output.m_normal.m_quad =
-            _mm_add_ps(kXY, _mm_mul_ps(_mm_shuffle_ps(kN, kN, 0xAA), kTransform.m_rotation.m_col2.m_quad));
+        // The normal into world space.
+        output.m_normal.setRotatedDir(kTransform.m_rotation, output.m_normal);
         // EXE-INLINED none: hkpWorldRayCastOutput's implicit copy assignment (a 0x60-byte block copy)
         pDest->m_normal.m_quad = output.m_normal.m_quad;
         pDest->m_hitFraction = output.m_hitFraction;

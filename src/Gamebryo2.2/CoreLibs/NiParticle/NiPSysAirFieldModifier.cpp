@@ -260,9 +260,7 @@ void NiPSysAirFieldModifier::SetDirection(const NiPoint3& kDirection) {
     m_kDirection = kDirection;
     m_kUnitDirection = kDirection;
     m_kUnitDirection.Unitize();
-    // EXE-INLINED 0x4390C0
-    if (m_kUnitDirection.x == NiPoint3_ZERO.x && m_kUnitDirection.y == NiPoint3_ZERO.y &&
-        m_kUnitDirection.z == NiPoint3_ZERO.z) {
+    if (m_kUnitDirection == NiPoint3_ZERO) {
         m_kUnitDirection = NiPoint3_UNIT_X;
     }
 }

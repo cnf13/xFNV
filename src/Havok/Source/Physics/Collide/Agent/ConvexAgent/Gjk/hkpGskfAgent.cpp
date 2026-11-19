@@ -139,14 +139,8 @@ void hkpGskfAgent::processCollision(
             pStateB->m_deltaAngle(3) * f1 * pStateB->m_objectRadius;
 
         if (m_separatingNormal(3) > input.m_tolerance) {
-            // EXE-INLINED none: hkVector4::dot4xyz1 (timInfo's xyz against the normal's, plus timInfo's w)
-            const hkQuadReal x2 = _mm_mul_ps(m_separatingNormal.m_quad, timInfo.m_quad);
-            const hkQuadReal zwSum = _mm_add_ss(
-                _mm_shuffle_ps(x2, x2, _MM_SHUFFLE(2, 2, 2, 2)),
-                _mm_shuffle_ps(timInfo.m_quad, timInfo.m_quad, _MM_SHUFFLE(3, 3, 3, 3))
-            );
-            const hkQuadReal xySum = _mm_add_ss(_mm_shuffle_ps(x2, x2, _MM_SHUFFLE(1, 1, 1, 1)), x2);
-            const float fDot = _mm_cvtss_f32(_mm_add_ss(zwSum, xySum));
+            // timInfo's xyz against the normal's, plus timInfo's w.
+            const float fDot = timInfo.dot4xyz1(m_separatingNormal);
             m_separatingNormal(3) = m_separatingNormal(3) - fDot;
             if (m_separatingNormal(3) > input.m_tolerance) {
                 goto END;

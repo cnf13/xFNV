@@ -307,18 +307,9 @@ void hkpSphereCapsuleAgent::staticGetPenetrations(
     alignas(16) hkVector4 posB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
         const hkVector4* vertices = &capsB->m_vertexA;
         for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED 0xC7F640
-            posB[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
+            posB[i].setTransformedPos(t, vertices[i]);
         }
     }
 
@@ -327,12 +318,9 @@ void hkpSphereCapsuleAgent::staticGetPenetrations(
 
     // The radius sum is a float local.
     const float radiusSum = capsB->m_radius + sphereA->m_radius;
-    // EXE-INLINED none: hkVector4::lengthSquared3 (SSE: z + (y + x), each step a float)
     hkVector4 d;
     d.setSub4(result.m_pointOnEdge, posA);
-    const __m128 dd = _mm_mul_ps(d.m_quad, d.m_quad);
-    const __m128 xy = _mm_add_ss(_mm_shuffle_ps(dd, dd, 0x55), dd);
-    const float distSquared = _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(dd, dd, 0xAA), xy));
+    const float distSquared = d.lengthSquared3();
     const float radiusSumSquared = radiusSum * radiusSum;
     // The pair is reported only when the squared radius sum is above the squared distance (not when equal, below or
     // NaN).
@@ -387,22 +375,18 @@ void hkpSphereCapsuleAgent::staticGetClosestPoints(
     alignas(16) hkVector4 aMinusB;
     aMinusB.m_quad = _mm_sub_ps(posA.m_quad, result.m_pointOnEdge.m_quad);
     const float refDist = input.m_tolerance + radiusSum;
-    // EXE-INLINED none: hkVector4::lengthSquared3 (SSE: z + (y + x))
-    const __m128 squares = _mm_mul_ps(aMinusB.m_quad, aMinusB.m_quad);
-    const float distSquared = _mm_cvtss_f32(
-        _mm_add_ss(_mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares))
-    );
+    const float distSquared = aMinusB.lengthSquared3();
     // The squared reference distance is rounded to a float before the compare.
     const float refDistSquared = refDist * refDist;
     // The point is skipped when the squared reference distance is below or equal to the squared distance, taken
     // otherwise (NaN included).
     if (!(refDistSquared <= distSquared)) {
         float dist;
-        __m128 normal;
+        hkVector4 normal;
         // The square root is taken only for a squared distance above zero (not for NaN).
         if (distSquared > 0.0f) {
             dist = std::sqrt(distSquared);
-            normal = aMinusB.m_quad;
+            normal = aMinusB;
         }
         else {
             dist = 0.0f;
@@ -428,23 +412,10 @@ void hkpSphereCapsuleAgent::staticGetClosestPoints(
             event.m_contact.m_separatingNormal.m_quad = _mm_setzero_ps();
             event.m_contact.m_separatingNormal(ok1) = edge(ok2);
             event.m_contact.m_separatingNormal(ok2) = -edge(ok1);
-            normal = event.m_contact.m_separatingNormal.m_quad;
+            normal = event.m_contact.m_separatingNormal;
         }
-        // EXE-INLINED none: hkVector4::normalize3 (the broadcast inverse length: rsqrtss, one Newton step, 0 for a
-        // zero length, times the vector)
-        const __m128 normalSquares = _mm_mul_ps(normal, normal);
-        const __m128 len2 = _mm_add_ss(
-            _mm_shuffle_ps(normalSquares, normalSquares, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(normalSquares, normalSquares, 0x55), normalSquares)
-        );
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 len2IsZero = _mm_cmpeq_ss(len2, _mm_set_ss(0.0f));
-        const __m128 refined = _mm_mul_ss(
-            _mm_mul_ss(_mm_set_ss(0.5f), approx),
-            _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-        );
-        const __m128 lenInv = _mm_andnot_ps(len2IsZero, refined);
-        const __m128 unitNormal = _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), normal);
+        normal.normalize3();
+        const __m128 unitNormal = normal.m_quad;
         event.m_contact.m_separatingNormal.m_quad = unitNormal;
         // The point on the capsule's surface: posA + normal * (capsule radius - dist), from the normal before its w
         // takes the distance.

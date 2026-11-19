@@ -120,17 +120,12 @@ float hkpLinearParametricCurve::getNearestPoint(float t, const hkVector4& nearPo
     const hkVector4* points = m_points.m_data;
     float fraction;
     while (true) {
-        const __m128 kAb = _mm_sub_ps(points[ib].m_quad, points[ia].m_quad);
-        // EXE-INLINED none: hkVector4::dot3
-        const __m128 kApAb = _mm_mul_ps(_mm_sub_ps(kNear, points[ia].m_quad), kAb);
-        const float fApAb = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(kApAb, kApAb, 0xAA), _mm_add_ss(_mm_shuffle_ps(kApAb, kApAb, 0x55), kApAb))
-        );
-        // EXE-INLINED none: hkVector4::lengthSquared3
-        const __m128 kAbAb = _mm_mul_ps(kAb, kAb);
-        const float fAbAb = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(kAbAb, kAbAb, 0xAA), _mm_add_ss(_mm_shuffle_ps(kAbAb, kAbAb, 0x55), kAbAb))
-        );
+        hkVector4 ab;
+        ab.m_quad = _mm_sub_ps(points[ib].m_quad, points[ia].m_quad);
+        hkVector4 ap;
+        ap.m_quad = _mm_sub_ps(kNear, points[ia].m_quad);
+        const float fApAb = ap.dot3(ab);
+        const float fAbAb = ab.lengthSquared3();
         fraction = fApAb / fAbAb;
         if (fraction < 0.0f) {
             if (ia == 0) {
@@ -140,54 +135,26 @@ float hkpLinearParametricCurve::getNearestPoint(float t, const hkVector4& nearPo
             ib--;
             continue;
         }
-        const __m128 kBp = _mm_sub_ps(kNear, points[ib].m_quad);
-        // EXE-INLINED none: hkVector4::dot3
-        const __m128 kBpAb = _mm_mul_ps(kBp, kAb);
-        const float fBpAb = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(kBpAb, kBpAb, 0xAA), _mm_add_ss(_mm_shuffle_ps(kBpAb, kBpAb, 0x55), kBpAb))
-        );
+        hkVector4 bp;
+        bp.m_quad = _mm_sub_ps(kNear, points[ib].m_quad);
+        const float fBpAb = bp.dot3(ab);
         if (fBpAb <= 0.0f || ib + 1 >= numPoints) {
             break;
         }
-        const __m128 kBc = _mm_sub_ps(m_points.m_data[ib + 1].m_quad, m_points.m_data[ib].m_quad);
-        // EXE-INLINED none: hkVector4::dot3
-        const __m128 kBcBp = _mm_mul_ps(kBc, kBp);
-        const float fBcBp = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(kBcBp, kBcBp, 0xAA), _mm_add_ss(_mm_shuffle_ps(kBcBp, kBcBp, 0x55), kBcBp))
-        );
+        hkVector4 bc;
+        bc.m_quad = _mm_sub_ps(m_points.m_data[ib + 1].m_quad, m_points.m_data[ib].m_quad);
+        const float fBcBp = bc.dot3(bp);
         if (fBcBp > 0.0f) {
             ia++;
             ib++;
             continue;
         }
-        // EXE-INLINED none: hkVector4::normalize3
-        const __m128 kAbSq = _mm_mul_ps(kAb, kAb);
-        const __m128 kAbLengthSq =
-            _mm_add_ss(_mm_shuffle_ps(kAbSq, kAbSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kAbSq, kAbSq, 0x55), kAbSq));
-        const __m128 kAbRsqrt = _mm_rsqrt_ss(kAbLengthSq);
-        const __m128 kAbStep = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kAbLengthSq, kAbRsqrt), kAbRsqrt));
-        const __m128 kAbScale = _mm_andnot_ps(
-            _mm_cmpeq_ss(kAbLengthSq, _mm_setzero_ps()), _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kAbRsqrt), kAbStep)
-        );
-        // EXE-INLINED none: hkVector4::normalize3
-        const __m128 kBcSq = _mm_mul_ps(kBc, kBc);
-        const __m128 kBcLengthSq =
-            _mm_add_ss(_mm_shuffle_ps(kBcSq, kBcSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kBcSq, kBcSq, 0x55), kBcSq));
-        const __m128 kBcRsqrt = _mm_rsqrt_ss(kBcLengthSq);
-        const __m128 kBcStep = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kBcLengthSq, kBcRsqrt), kBcRsqrt));
-        const __m128 kBcScale = _mm_andnot_ps(
-            _mm_cmpeq_ss(kBcLengthSq, _mm_setzero_ps()), _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kBcRsqrt), kBcStep)
-        );
-        // EXE-INLINED none: hkVector4::dot3
-        const __m128 kAbNBp = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(kAbScale, kAbScale, 0x00), kAb), kBp);
-        const float fAbNBp = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(kAbNBp, kAbNBp, 0xAA), _mm_add_ss(_mm_shuffle_ps(kAbNBp, kAbNBp, 0x55), kAbNBp))
-        );
-        // EXE-INLINED none: hkVector4::dot3
-        const __m128 kBcNBp = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(kBcScale, kBcScale, 0x00), kBc), kBp);
-        const float fBcNBp = _mm_cvtss_f32(
-            _mm_add_ss(_mm_shuffle_ps(kBcNBp, kBcNBp, 0xAA), _mm_add_ss(_mm_shuffle_ps(kBcNBp, kBcNBp, 0x55), kBcNBp))
-        );
+        hkVector4 abN = ab;
+        abN.normalize3();
+        hkVector4 bcN = bc;
+        bcN.normalize3();
+        const float fAbNBp = abN.dot3(bp);
+        const float fBcNBp = bcN.dot3(bp);
         if (fAbNBp < -fBcNBp) {
             fraction = 0.99f;
         }
@@ -199,12 +166,7 @@ float hkpLinearParametricCurve::getNearestPoint(float t, const hkVector4& nearPo
         break;
     }
     float tOut = static_cast<double>(ia) + fraction;
-    const __m128 kT = _mm_set1_ps(fraction);
-    // EXE-INLINED 0x5DBF70
-    pointOnCurve.m_quad = _mm_add_ps(
-        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, kT), m_points.m_data[ia].m_quad),
-        _mm_mul_ps(m_points.m_data[ib].m_quad, kT)
-    );
+    pointOnCurve.setInterpolate4(m_points.m_data[ia], m_points.m_data[ib], fraction);
     if (m_closedLoop.m_bool) {
         float end = static_cast<float>(m_points.m_size - 1);
         const hkpParametricCurve* pCurve = this;
@@ -371,24 +333,9 @@ float hkpLinearParametricCurve::getLengthFromStart(float t) const {
 void hkpLinearParametricCurve::getBinormal(float t, hkVector4& up) const {
     alignas(16) hkVector4 kTangent;
     getTangent(t, kTangent);
-    const __m128 kT = _mm_load_ps(&reinterpret_cast<float*>(&kTangent.m_quad)[0]);
-    // EXE-INLINED none: hkVector4::dot3
-    const __m128 kProd =
-        _mm_mul_ps(_mm_load_ps(&reinterpret_cast<float*>(&hkTransformIdentity.m_rotation.m_col1.m_quad)[0]), kT);
-    const __m128 kDot =
-        _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0x55), kProd));
-    const float fDot = _mm_cvtss_f32(kDot);
+    const float fDot = hkTransformIdentity.m_rotation.m_col1.dot3(kTangent);
     if (fDot < 0.9800000190734863) {
-        // EXE-INLINED none: hkVector4::setCross
-        const __m128 kD =
-            _mm_load_ps(&reinterpret_cast<const float*>(&m_dirNotParallelToTangentAlongWholePath.m_quad)[0]);
-        _mm_store_ps(
-            &reinterpret_cast<float*>(&up.m_quad)[0],
-            _mm_sub_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kD, kD, 0xD2), _mm_shuffle_ps(kT, kT, 0xC9)),
-                _mm_mul_ps(_mm_shuffle_ps(kD, kD, 0xC9), _mm_shuffle_ps(kT, kT, 0xD2))
-            )
-        );
+        up.setCross(kTangent, m_dirNotParallelToTangentAlongWholePath);
     }
     else {
         float afAbs[3];
@@ -413,18 +360,7 @@ void hkpLinearParametricCurve::getBinormal(float t, hkVector4& up) const {
         (&reinterpret_cast<float*>(&up.m_quad)[0])[iFirst] = fSecond;
         (&reinterpret_cast<float*>(&up.m_quad)[0])[iSecond] = -(&reinterpret_cast<float*>(&kTangent.m_quad)[0])[iFirst];
     }
-    // EXE-INLINED none: hkVector4::normalize3
-    const __m128 kUp = _mm_load_ps(&reinterpret_cast<float*>(&up.m_quad)[0]);
-    const __m128 kSq = _mm_mul_ps(kUp, kUp);
-    const __m128 kLengthSq =
-        _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSq, kSq, 0x55), kSq));
-    const __m128 kRsqrt = _mm_rsqrt_ss(kLengthSq);
-    const __m128 kError = _mm_mul_ss(_mm_mul_ss(kLengthSq, kRsqrt), kRsqrt);
-    const __m128 kStep = _mm_sub_ss(_mm_set_ss(3.0f), kError);
-    const __m128 kScale = _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kRsqrt), kStep);
-    const __m128 kZero = _mm_cmpeq_ss(kLengthSq, _mm_setzero_ps());
-    const __m128 kMasked = _mm_andnot_ps(kZero, kScale);
-    _mm_store_ps(&reinterpret_cast<float*>(&up.m_quad)[0], _mm_mul_ps(_mm_shuffle_ps(kMasked, kMasked, 0x00), kUp));
+    up.normalize3();
 }
 
 hkBool hkpLinearParametricCurve::isClosedLoop() const {

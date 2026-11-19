@@ -158,8 +158,7 @@ void bhkMotorAction::Init(const hkSerializableCinfo& arInfo) {
         static_cast<hkpMotorAction*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpMotorAction)));
     pAction->m_memSizeAndFlags = sizeof(hkpMotorAction);
     hkVector4 kAxis;
-    // EXE-INLINED 0x4B4D10
-    kAxis.set(kCinfo.m_axis.fX, kCinfo.m_axis.fY, kCinfo.m_axis.fZ, kCinfo.m_axis.fW);
+    kCinfo.m_axis.ToHK(kAxis);
     pAction = ::new (pAction) hkpMotorAction(kCinfo.m_body, kAxis, kCinfo.m_spinRate, kCinfo.m_gain);
     static_cast<bhkSerializable*>(this)->SethkObject(pAction);
     pAction->removeReference();

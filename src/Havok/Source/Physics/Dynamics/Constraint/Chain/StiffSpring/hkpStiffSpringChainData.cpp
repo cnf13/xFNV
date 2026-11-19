@@ -201,23 +201,15 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
         info.m_pivotA.setTransformedPos(*in2.m_transformA, m_infos.m_data[i].m_pivotInA);
         info.m_pivotB.setTransformedPos(*in2.m_transformB, m_infos.m_data[i].m_pivotInB);
 
-        // EXE-INLINED none: hkVector4::normalizeWithLength3
-        // The exe's addss/mulss/subss are written as _ps operations on lane 0.
-        const __m128 sep = _mm_sub_ps(info.m_pivotA.m_quad, info.m_pivotB.m_quad);
-        const __m128 sq = _mm_mul_ps(sep, sep);
-        const __m128 len2v = _mm_add_ps(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ps(_mm_shuffle_ps(sq, sq, 0x55), sq));
-        const __m128 r = _mm_rsqrt_ss(len2v);
-        const __m128 h = _mm_sub_ps(_mm_set1_ps(3.0f), _mm_mul_ps(_mm_mul_ps(len2v, r), r));
-        const __m128 invRaw = _mm_mul_ps(_mm_mul_ps(_mm_set1_ps(0.5f), r), h);
-        const __m128 invMasked = _mm_andnot_ps(_mm_cmpeq_ss(len2v, _mm_setzero_ps()), invRaw);
-        const __m128 inv = _mm_shuffle_ps(invMasked, invMasked, 0);
-        float length = _mm_cvtss_f32(_mm_mul_ps(len2v, inv));
+        hkVector4 sep;
+        sep.setSub4(info.m_pivotA, info.m_pivotB);
+        float length = sep.normalizeWithLength3();
         if (!(length > 0.0f)) {
             length = 0.0f;
             info.m_constrainedDofW.m_quad = hkTransformIdentity.m_rotation.m_col0.m_quad;
         }
         else {
-            info.m_constrainedDofW.m_quad = _mm_mul_ps(inv, sep);
+            info.m_constrainedDofW = sep;
         }
 
         const float rhs = (m_infos.m_data[i].m_springLength - length);

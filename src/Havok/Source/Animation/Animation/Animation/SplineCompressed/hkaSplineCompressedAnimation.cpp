@@ -965,16 +965,8 @@ void hkaSplineCompressedAnimation::initialize(
                     hkVector4 minp = calcMin(samples[k]);
                     hkVector4 maxp = calcMax(samples[k]);
                     if (k == 1) {
-                        // EXE-INLINED none: hkVector4::normalize4 (the rotation's mean; 0 for a zero sum)
-                        const __m128 q = mean.m_quad;
-                        const __m128 sq = _mm_mul_ps(q, q);
-                        const __m128 sum2 = _mm_add_ps(_mm_shuffle_ps(sq, sq, 0x4E), sq);
-                        const __m128 len2 = _mm_add_ps(_mm_shuffle_ps(sum2, sum2, 0xB1), sum2);
-                        const __m128 r = _mm_rsqrt_ss(len2);
-                        const __m128 isZero = _mm_cmpeq_ss(len2, _mm_setzero_ps());
-                        const __m128 t = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, r), r));
-                        const __m128 inv = _mm_andnot_ps(isZero, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), r), t));
-                        mean.m_quad = _mm_mul_ps(_mm_shuffle_ps(inv, inv, 0), q);
+                        // The rotation's mean is normalized (0 for a zero sum).
+                        mean.normalize4();
                     }
                     uint8_t mask =
                         hkaSplineCompressedAnimation::isStatic(mean, minp, maxp, tolerances[k], clearValues[k]);

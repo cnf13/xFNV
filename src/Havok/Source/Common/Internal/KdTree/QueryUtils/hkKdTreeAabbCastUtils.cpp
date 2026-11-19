@@ -56,19 +56,10 @@ hkBool hkKdTreeAabbCastUtils::castAabb(
     alignas(16) float afHalfExtents[4];
     const __m128 kFrom = _mm_load_ps(&reinterpret_cast<float*>(&castInput.m_from.m_quad)[0]);
     _mm_store_ps(afFrom, kFrom);
-    const __m128 kDir = _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&castInput.m_to.m_quad)[0]), kFrom);
-    const __m128 kDir2 = _mm_mul_ps(kDir, kDir);
-    const __m128 kLen2 =
-        _mm_add_ss(_mm_shuffle_ps(kDir2, kDir2, 0xAA), _mm_add_ss(_mm_shuffle_ps(kDir2, kDir2, 0x55), kDir2));
-    // EXE-INLINED none: hkVector4::normalize3 (the SDK's sqrtInverse)
-    const __m128 kR = _mm_rsqrt_ss(kLen2);
-    const __m128 kLenZero = _mm_cmpeq_ss(kLen2, _mm_setzero_ps());
-    const __m128 kNewton = _mm_mul_ss(
-        _mm_mul_ss(_mm_set_ss(0.5f), kR), _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLen2, kR), kR))
-    );
-    const __m128 kInvLength = _mm_andnot_ps(kLenZero, kNewton);
-    const __m128 kDirN = _mm_mul_ps(_mm_shuffle_ps(kInvLength, kInvLength, 0x00), kDir);
-    const float fRayLength = _mm_cvtss_f32(_mm_mul_ss(kLen2, kInvLength));
+    hkVector4 dir;
+    dir.m_quad = _mm_sub_ps(_mm_load_ps(&reinterpret_cast<float*>(&castInput.m_to.m_quad)[0]), kFrom);
+    const float fRayLength = static_cast<float>(dir.normalizeWithLength3());
+    const __m128 kDirN = dir.m_quad;
     const __m128 kHalfExtents = _mm_load_ps(&reinterpret_cast<float*>(&castInput.m_halfExtents.m_quad)[0]);
     _mm_store_ps(afHalfExtents, kHalfExtents);
     const __m128 kExpand = _mm_add_ps(_mm_set1_ps(aabbCheckTolerance), kHalfExtents);
@@ -197,8 +188,7 @@ hkBool hkKdTreeAabbCastUtils::castAabb(
                 const hkKdTreeProjectedEntry* pEntry = pEntries + (iHeader & 0x7FFFFFFF);
                 int32_t iLeft = iNumPrimitives;
                 do {
-                    // EXE-INLINED 0xDF2740
-                    const __m128 kScale = _mm_mul_ps(kExtent, _mm_load_ps(&reinterpret_cast<float*>(&x)[0]));
+                    const __m128 kScale = _mm_mul_ps(kExtent, hkGetOneOver65K());
                     const __m128 kMinWords = _mm_set_ps(
                         static_cast<float>(pEntry->m_primIdHigh), static_cast<float>(pEntry->m_min[2]),
                         static_cast<float>(pEntry->m_min[1]), static_cast<float>(pEntry->m_min[0])

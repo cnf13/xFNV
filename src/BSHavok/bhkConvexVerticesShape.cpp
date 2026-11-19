@@ -274,8 +274,7 @@ hkConvexVerticesShapeCinfo::~hkConvexVerticesShapeCinfo() {}
 // Scales the vertices whole and the plane equations' distances (w) by afScale.
 void hkConvexVerticesShapeCinfo::Scale(float afScale) {
     for (int32_t i = 0; i < m_vertices.getSize(); i++) {
-        // EXE-INLINED none: hkVector4::mul4 (the broadcast scale first, as the exe's mulps)
-        m_vertices.m_data[i].m_quad = _mm_mul_ps(_mm_set_ps1(afScale), m_vertices.m_data[i].m_quad);
+        m_vertices.m_data[i].mul4(afScale);
     }
     for (int32_t i = 0; i < m_planeEquations.getSize(); i++) {
         m_planeEquations.m_data[i](3) = m_planeEquations.m_data[i](3) * afScale;

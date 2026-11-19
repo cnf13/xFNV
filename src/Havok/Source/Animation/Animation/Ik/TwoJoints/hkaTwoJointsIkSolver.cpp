@@ -52,12 +52,14 @@ hkBool hkaTwoJointsIkSolver::solve(const Setup& setup, hkaPose& poseInOut) {
         const __m128 xy = _mm_add_ps(_mm_shuffle_ps(p, p, 0x55), p);
         return _mm_add_ps(_mm_shuffle_ps(p, p, 0xAA), xy);
     };
-    // EXE-INLINED none: hkVector4::setCross
     auto cross = [](__m128 a, __m128 b) {
-        return _mm_sub_ps(
-            _mm_mul_ps(_mm_shuffle_ps(a, a, 0xC9), _mm_shuffle_ps(b, b, 0xD2)),
-            _mm_mul_ps(_mm_shuffle_ps(a, a, 0xD2), _mm_shuffle_ps(b, b, 0xC9))
-        );
+        hkVector4 kA;
+        kA.m_quad = a;
+        hkVector4 kB;
+        kB.m_quad = b;
+        hkVector4 kCross;
+        kCross.setCross(kA, kB);
+        return kCross.m_quad;
     };
     // EXE-INLINED none: hkVector4::setRotatedDir (quaternion): 2 * ((imag x dir) * w + ((w * w - 0.5) * dir +
     // (imag . dir) * quat)), the -0.5 lanes hkQuadRealMinusHalf.
@@ -101,16 +103,10 @@ hkBool hkaTwoJointsIkSolver::solve(const Setup& setup, hkaPose& poseInOut) {
             rotatedInverseDir(load(a.m_rotation.m_vec), load(a.m_translation)), loadQuad(hkQuadRealNegateMask)
         );
         const __m128 kRotation = _mm_xor_ps(load(a.m_rotation.m_vec), loadQuad(rdata_10C4C00));
-        // EXE-INLINED none: hkVector4::setReciprocal3 (w taken as 1, then masked off)
-        const __m128 kScale = load(a.m_scale);
-        const __m128 kScale3 = _mm_shuffle_ps(kScale, _mm_unpackhi_ps(kScale, loadQuad(hkQuadReal1111)), 0xC4);
-        const __m128 kRcp = _mm_rcp_ps(kScale3);
-        store(
-            arInverse.m_scale,
-            _mm_and_ps(
-                _mm_sub_ps(_mm_add_ps(kRcp, kRcp), _mm_mul_ps(_mm_mul_ps(kRcp, kScale3), kRcp)), loadQuad(rdata_10C4C10)
-            )
-        );
+        // The reciprocal's w masked off.
+        hkVector4 kRcp;
+        kRcp.setReciprocal3(a.m_scale);
+        store(arInverse.m_scale, _mm_and_ps(kRcp.m_quad, loadQuad(rdata_10C4C10)));
         store(arInverse.m_translation, kTranslation);
         store(arInverse.m_rotation.m_vec, kRotation);
         store(arOut.m_translation, _mm_add_ps(rotatedDir(kRotation, load(b.m_translation)), kTranslation));

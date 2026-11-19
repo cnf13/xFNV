@@ -25,18 +25,11 @@ NiCapsuleCapsuleIntersector::~NiCapsuleCapsuleIntersector() {}
 float NiCapsuleCapsuleIntersector::Pseudodistance(const NiPoint3& kV0, const NiPoint3& kV1, float fTime) const {
     NiSegment kSegment0 = m_kCapsule0.m_kCapsule.m_kSegment;
     NiSegment kSegment1 = m_kCapsule1.m_kCapsule.m_kSegment;
-    // EXE-INLINED 0x4A3760
-    NiPoint3 kOffset;
-    kOffset.x = kV0.x * fTime;
-    kOffset.y = kV0.y * fTime;
-    kOffset.z = kV0.z * fTime;
+    NiPoint3 kOffset = fTime * kV0;
     kSegment0.m_kOrigin.x = kOffset.x + kSegment0.m_kOrigin.x;
     kSegment0.m_kOrigin.y = kSegment0.m_kOrigin.y + kOffset.y;
     kSegment0.m_kOrigin.z = kSegment0.m_kOrigin.z + kOffset.z;
-    // EXE-INLINED 0x4A3760
-    kOffset.x = kV1.x * fTime;
-    kOffset.y = kV1.y * fTime;
-    kOffset.z = kV1.z * fTime;
+    kOffset = fTime * kV1;
     kSegment1.m_kOrigin.x = kOffset.x + kSegment1.m_kOrigin.x;
     kSegment1.m_kOrigin.y = kOffset.y + kSegment1.m_kOrigin.y;
     kSegment1.m_kOrigin.z = kOffset.z + kSegment1.m_kOrigin.z;
@@ -54,19 +47,11 @@ void NiCapsuleCapsuleIntersector::ComputeContactInformation(const NiPoint3& kV0,
     NiPoint3 kSeg1 = m_kCapsule1.m_kCapsule.m_kSegment.GetPoint(m_fParameter1);
     NiPoint3 kTmp;
     if (m_eIntersectionType == IT_CONTACT) {
-        // EXE-INLINED 0x4A3760
-        float fContactTime = m_fContactTime;
-        kTmp.x = kV0.x * fContactTime;
-        kTmp.y = kV0.y * fContactTime;
-        kTmp.z = fContactTime * kV0.z;
+        kTmp = m_fContactTime * kV0;
         kSeg0.x = kTmp.x + kSeg0.x;
         kSeg0.y = kSeg0.y + kTmp.y;
         kSeg0.z = kSeg0.z + kTmp.z;
-        // EXE-INLINED 0x4A3760
-        fContactTime = m_fContactTime;
-        kTmp.x = kV1.x * fContactTime;
-        kTmp.y = kV1.y * fContactTime;
-        kTmp.z = fContactTime * kV1.z;
+        kTmp = m_fContactTime * kV1;
         kSeg1.x = kTmp.x + kSeg1.x;
         kSeg1.y = kSeg1.y + kTmp.y;
         kSeg1.z = kSeg1.z + kTmp.z;
@@ -77,11 +62,7 @@ void NiCapsuleCapsuleIntersector::ComputeContactInformation(const NiPoint3& kV0,
         kTmp.z = kSeg1.z - kSeg0.z;
         m_kContactNormal.z = kTmp.z;
         m_kContactNormal.Unitize();
-        // EXE-INLINED 0x4A3760
-        float fRadius = m_kCapsule0.m_kCapsule.m_fRadius;
-        kTmp.x = m_kContactNormal.x * fRadius;
-        kTmp.y = m_kContactNormal.y * fRadius;
-        kTmp.z = fRadius * m_kContactNormal.z;
+        kTmp = m_kCapsule0.m_kCapsule.m_fRadius * m_kContactNormal;
         NiPoint3 kPoint;
         kPoint.x = kTmp.x + kSeg0.x;
         m_kContactPoint.x = kPoint.x;

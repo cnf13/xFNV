@@ -139,16 +139,8 @@ void hkpConvexRadiusBuilder::buildDisplayGeometries(
     const hkpShape* shape,
     hkArray<hkDisplayGeometry*>& displayGeometries
 ) {
-    // EXE-INLINED none: hkTransform::setIdentity
     alignas(16) hkTransform transform;
-    const __m128 kZero = _mm_setzero_ps();
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_rotation.m_col0.m_quad)[0], kZero);
-    transform.m_rotation.m_col0.m_quad[0] = 1.0f;
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_rotation.m_col1.m_quad)[0], kZero);
-    transform.m_rotation.m_col1.m_quad[1] = 1.0f;
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_rotation.m_col2.m_quad)[0], kZero);
-    transform.m_rotation.m_col2.m_quad[2] = 1.0f;
-    _mm_store_ps(&reinterpret_cast<float*>(&transform.m_translation.m_quad)[0], kZero);
+    transform.setIdentity();
     resetCurrentRawGeometry();
     displayGeometries.clear();
     buildShapeDisplay(shape, transform, displayGeometries);
@@ -162,13 +154,11 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
 ) {
     // A bounding plane's distance: minus the dot product (z + (y + x)) of its normal with point moved out along the
     // normal by radius, subtracted from a zero vector.
-    // EXE-INLINED 0x62B0A0
     auto planeDistance = [](const hkVector4& normal, const hkVector4& point, float radius) {
-        const __m128 products =
-            _mm_mul_ps(_mm_add_ps(_mm_mul_ps(_mm_set1_ps(radius), normal.m_quad), point.m_quad), normal.m_quad);
-        const __m128 xy = _mm_add_ss(_mm_shuffle_ps(products, products, 0x55), products);
-        const __m128 dot = _mm_add_ss(_mm_shuffle_ps(products, products, 0xAA), xy);
-        return _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
+        hkVector4 moved;
+        moved.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(radius), normal.m_quad), point.m_quad);
+        const hkSimdReal dot = moved.dot3(normal);
+        return _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot.getQuad()));
     };
 
     alignas(16) char shapeBuffer[512];
@@ -356,15 +346,8 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
         case HK_SHAPE_CONVEX_TRANSLATE: {
             const hkpConvexTranslateShape* translateShape = static_cast<const hkpConvexTranslateShape*>(shape);
             // The shape's translation with an identity rotation.
-            // EXE-INLINED none: hkRotation::setIdentity
             alignas(16) hkTransform translation;
-            const __m128 kZero = _mm_setzero_ps();
-            translation.m_rotation.m_col0.m_quad = kZero;
-            translation.m_rotation.m_col0(0) = 1.0f;
-            translation.m_rotation.m_col1.m_quad = kZero;
-            translation.m_rotation.m_col1(1) = 1.0f;
-            translation.m_rotation.m_col2.m_quad = kZero;
-            translation.m_rotation.m_col2(2) = 1.0f;
+            translation.m_rotation.setIdentity();
             translation.m_translation = translateShape->m_translation;
             childTransform.setMul(transform, translation);
             buildShapeDisplay(translateShape->getChildShape(), childTransform, displayGeometries);

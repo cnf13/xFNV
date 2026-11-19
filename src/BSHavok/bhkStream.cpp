@@ -69,28 +69,16 @@ void bhkStream::LoadBinary(NiStream& arStream, hkQsTransform& arTransf) {
     NiStreamLoadBinary(arStream, fX);
     NiStreamLoadBinary(arStream, fY);
     NiStreamLoadBinary(arStream, fZ);
-    // EXE-INLINED 0x4B4D50
-    arTransf.m_translation.m_quad[0] = fX;
-    arTransf.m_translation.m_quad[1] = fY;
-    arTransf.m_translation.m_quad[2] = fZ;
-    arTransf.m_translation.m_quad[3] = 0.0f;
+    arTransf.m_translation.set(fX, fY, fZ, 0.0f);
     NiStreamLoadBinary(arStream, fX);
     NiStreamLoadBinary(arStream, fY);
     NiStreamLoadBinary(arStream, fZ);
     NiStreamLoadBinary(arStream, fW);
-    // EXE-INLINED 0x4B4D50
-    arTransf.m_rotation.m_vec.m_quad[0] = fX;
-    arTransf.m_rotation.m_vec.m_quad[1] = fY;
-    arTransf.m_rotation.m_vec.m_quad[2] = fZ;
-    arTransf.m_rotation.m_vec.m_quad[3] = fW;
+    arTransf.m_rotation.m_vec.set(fX, fY, fZ, fW);
     NiStreamLoadBinary(arStream, fX);
     NiStreamLoadBinary(arStream, fY);
     NiStreamLoadBinary(arStream, fZ);
-    // EXE-INLINED 0x4B4D50
-    arTransf.m_scale.m_quad[0] = fX;
-    arTransf.m_scale.m_quad[1] = fY;
-    arTransf.m_scale.m_quad[2] = fZ;
-    arTransf.m_scale.m_quad[3] = 0.0f;
+    arTransf.m_scale.set(fX, fY, fZ, 0.0f);
 }
 
 // Each vector is copied to a 16-aligned local before it is written.

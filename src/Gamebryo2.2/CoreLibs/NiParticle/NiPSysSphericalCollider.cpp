@@ -150,42 +150,20 @@ NiPSysSphericalCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPS
     NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[static_cast<uint16_t>(usCurParticle)];
     bool bCollision = false;
 
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDiff;
-    kDiff.x = kPosition.x - m_kPosition.x;
-    kDiff.y = kPosition.y - m_kPosition.y;
-    kDiff.z = kPosition.z - m_kPosition.z;
-    // EXE-INLINED 0x4A7290
-    float fSqrDist = kDiff.x * kDiff.x + kDiff.y * kDiff.y + kDiff.z * kDiff.z;
+    NiPoint3 kDiff = kPosition - m_kPosition;
+    float fSqrDist = kDiff.SqrLength();
     float fDist = fSqrDist - m_fRadiusSq;
     bool bInside = -fDist > 0.001f;
     if (bInside || fDist > 0.001f) {
         NiPoint3& kVelocity = pkInfo->m_kVelocity;
-        // EXE-INLINED 0x4B6190
-        float fDot = kDiff.x * kVelocity.x + kDiff.y * kVelocity.y + kDiff.z * kVelocity.z;
+        float fDot = kDiff.Dot(kVelocity);
         float fB = -fDot;
         if (bInside || fB > 0.0f) {
-            // EXE-INLINED 0x4A7290
-            float fSqrSpeed = kVelocity.x * kVelocity.x + kVelocity.y * kVelocity.y + kVelocity.z * kVelocity.z;
+            float fSqrSpeed = kVelocity.SqrLength();
             float fClosestTime = fB / fSqrSpeed;
-            // EXE-INLINED 0x45BB20
-            NiPoint3 kStep;
-            kStep.x = kVelocity.x * fClosestTime;
-            kStep.y = kVelocity.y * fClosestTime;
-            kStep.z = kVelocity.z * fClosestTime;
-            // EXE-INLINED 0x439E90
-            NiPoint3 kClosest;
-            kClosest.x = kPosition.x + kStep.x;
-            kClosest.y = kPosition.y + kStep.y;
-            kClosest.z = kPosition.z + kStep.z;
-            // EXE-INLINED 0x439EF0
-            NiPoint3 kClosestDiff;
-            kClosestDiff.x = kClosest.x - m_kPosition.x;
-            kClosestDiff.y = kClosest.y - m_kPosition.y;
-            kClosestDiff.z = kClosest.z - m_kPosition.z;
-            // EXE-INLINED 0x4A7290
-            float fClosestSqrDist =
-                kClosestDiff.x * kClosestDiff.x + kClosestDiff.y * kClosestDiff.y + kClosestDiff.z * kClosestDiff.z;
+            NiPoint3 kClosest = kPosition + kVelocity * fClosestTime;
+            NiPoint3 kClosestDiff = kClosest - m_kPosition;
+            float fClosestSqrDist = kClosestDiff.SqrLength();
             if (bInside || fClosestSqrDist < m_fRadiusSq) {
                 float fRemainder = m_fRadiusSq - fClosestSqrDist;
                 float fQuotient = fRemainder / fSqrSpeed;
@@ -203,17 +181,7 @@ NiPSysSphericalCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPS
                     float fNewTime = fTime + fInitialTime;
                     fCollisionTime = fNewTime;
                     m_fCollisionTime = fNewTime;
-                    // EXE-INLINED 0x45BB20
-                    NiPoint3 kHitStep;
-                    kHitStep.x = kVelocity.x * fTime;
-                    kHitStep.y = kVelocity.y * fTime;
-                    kHitStep.z = kVelocity.z * fTime;
-                    // EXE-INLINED 0x439E90
-                    NiPoint3 kHit;
-                    kHit.x = kPosition.x + kHitStep.x;
-                    kHit.y = kPosition.y + kHitStep.y;
-                    kHit.z = kPosition.z + kHitStep.z;
-                    m_kCollisionPoint = kHit;
+                    m_kCollisionPoint = kPosition + kVelocity * fTime;
                 }
             }
         }
@@ -230,37 +198,15 @@ NiPSysSphericalCollider::Resolve(float fInitialTime, float& fCollisionTime, NiPS
 // Reflects the velocity about the surface normal at the collision point and damps it by the bounce.
 void NiPSysSphericalCollider::Update(float fTime, NiPSysData* pkData, int32_t usCurParticle) {
     NiPoint3& kVelocity = pkData->m_pkParticleInfo[static_cast<uint16_t>(usCurParticle)].m_kVelocity;
-    // EXE-INLINED 0x439EF0
-    NiPoint3 kDiff;
-    kDiff.x = m_kCollisionPoint.x - m_kPosition.x;
-    kDiff.y = m_kCollisionPoint.y - m_kPosition.y;
-    kDiff.z = m_kCollisionPoint.z - m_kPosition.z;
+    NiPoint3 kDiff = m_kCollisionPoint - m_kPosition;
     float fInvRadius = 1.0f / m_fScaledRadius;
     NiPoint3 kNormal;
     kNormal.x = kDiff.x * fInvRadius;
     kNormal.y = kDiff.y * fInvRadius;
     kNormal.z = kDiff.z * fInvRadius;
-    // EXE-INLINED 0x4B6190
-    float fDot = kVelocity.x * kNormal.x + kVelocity.y * kNormal.y + kVelocity.z * kNormal.z;
-    // EXE-INLINED 0x45BB20
-    NiPoint3 kNormalPart;
-    kNormalPart.x = kNormal.x * fDot;
-    kNormalPart.y = kNormal.y * fDot;
-    kNormalPart.z = kNormal.z * fDot;
-    // EXE-INLINED 0x45BB20
-    NiPoint3 kReflect;
-    kReflect.x = kNormalPart.x * 2.0f;
-    kReflect.y = kNormalPart.y * 2.0f;
-    kReflect.z = kNormalPart.z * 2.0f;
-    // EXE-INLINED 0x4578C0
-    kVelocity.x = kVelocity.x - kReflect.x;
-    kVelocity.y = kVelocity.y - kReflect.y;
-    kVelocity.z = kVelocity.z - kReflect.z;
-    // EXE-INLINED 0x439180
-    float fBounce = m_fBounce;
-    kVelocity.x = kVelocity.x * fBounce;
-    kVelocity.y = kVelocity.y * fBounce;
-    kVelocity.z = kVelocity.z * fBounce;
+    float fDot = kVelocity.Dot(kNormal);
+    kVelocity -= kNormal * fDot * 2.0f;
+    kVelocity *= m_fBounce;
     NiPSysCollider::Update(fTime, pkData, usCurParticle);
 }
 

@@ -220,29 +220,13 @@ void hkpGenericConstraintData::hatchScheme(
                 break;
             case hkpGenericConstraintDataScheme::e_setLinearDofA: {
                 currentCommand++;
-                const hkRotation& rot = vars.m_rbA->getRotation();
-                const hkQuadReal b = currentData->m_quad;
-                // EXE-INLINED none: hkVector4::setRotatedDir (rotation): the columns scaled by b's x, y and z, summed.
-                hkQuadReal r = _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(b, b, 0x55), rot.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(b, b, 0x00), rot.m_col0.m_quad)
-                );
-                r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(b, b, 0xAA), rot.m_col2.m_quad));
-                (&vars.m_linearBasisW.m_col0)[*currentCommand].m_quad = r;
+                (&vars.m_linearBasisW.m_col0)[*currentCommand].setRotatedDir(vars.m_rbA->getRotation(), *currentData);
                 currentData++;
                 break;
             }
             case hkpGenericConstraintDataScheme::e_setLinearDofB: {
                 currentCommand++;
-                const hkRotation& rot = vars.m_rbB->getRotation();
-                const hkQuadReal b = currentData->m_quad;
-                // EXE-INLINED none: hkVector4::setRotatedDir (rotation): the columns scaled by b's x, y and z, summed.
-                hkQuadReal r = _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(b, b, 0x55), rot.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(b, b, 0x00), rot.m_col0.m_quad)
-                );
-                r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(b, b, 0xAA), rot.m_col2.m_quad));
-                (&vars.m_linearBasisW.m_col0)[*currentCommand].m_quad = r;
+                (&vars.m_linearBasisW.m_col0)[*currentCommand].setRotatedDir(vars.m_rbB->getRotation(), *currentData);
                 currentData++;
                 break;
             }

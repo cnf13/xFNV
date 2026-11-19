@@ -387,24 +387,10 @@ void hkpCapsuleCapsuleAgent::staticGetPenetrations(
         }
     }
 
-    // EXE-INLINED none: hkVector4::setSub4
     alignas(16) hkVector4 dA;
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&dA.m_quad)[0],
-        _mm_sub_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&pointsA[1].m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&pointsA[0].m_quad)[0])
-        )
-    );
-    // EXE-INLINED none: hkVector4::setSub4
+    dA.setSub4(pointsA[1], pointsA[0]);
     alignas(16) hkVector4 dB;
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&dB.m_quad)[0],
-        _mm_sub_ps(
-            _mm_load_ps(&reinterpret_cast<float*>(&pointsB[1].m_quad)[0]),
-            _mm_load_ps(&reinterpret_cast<float*>(&pointsB[0].m_quad)[0])
-        )
-    );
+    dB.setSub4(pointsB[1], pointsB[0]);
     alignas(16) hkLineSegmentUtil::ClosestLineSegLineSegResult result;
     hkLineSegmentUtil::closestLineSegLineSeg(pointsA[0], dA, pointsB[0], dB, result);
 

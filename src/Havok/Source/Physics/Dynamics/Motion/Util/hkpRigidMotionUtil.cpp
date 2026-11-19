@@ -164,17 +164,9 @@ void hkRigidMotionUtilStep(
 
         // The translation is the centre of mass less the rotated local centre of mass, rotated as
         // (y * col1 + x * col0) + z * col2.
-        // EXE-INLINED 0xC7F700
-        const hkQuadReal local = st.m_centerOfMassLocal.m_quad;
-        const hkRotation& r = ms.m_transform.m_rotation;
-        const hkQuadReal shift = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(local, local, 0x55), r.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(local, local, 0), r.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(local, local, 0xaa), r.m_col2.m_quad)
-        );
-        ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift);
+        hkVector4 shift;
+        shift.setRotatedDir(ms.m_transform.m_rotation, st.m_centerOfMassLocal);
+        ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift.m_quad);
     }
 }
 
@@ -222,24 +214,12 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
                 {
                     // EXE-INLINED none: hkSweptTransform::getInterpolationValue
                     float fT = (info.m_startTime - st.m_centerOfMass0(3)) * st.m_centerOfMass1(3);
-                    const hkQuadReal t = _mm_set1_ps(fT);
-                    // EXE-INLINED 0x5DBF70
-                    accumulatorsOut->m_scratch0.m_quad = _mm_add_ps(
-                        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), st.m_centerOfMass0.m_quad),
-                        _mm_mul_ps(st.m_centerOfMass1.m_quad, t)
-                    );
+                    accumulatorsOut->m_scratch0.setInterpolate4(st.m_centerOfMass0, st.m_centerOfMass1, fT);
                 }
                 {
                     // The angular velocity in the inertia frame, (y * col1 + x * col0) + z * col2.
-                    // EXE-INLINED 0xC7F700
-                    const hkQuadReal av = motion->m_angularVelocity.m_quad;
-                    const hkRotation& r = accumulatorsOut->m_scratch123;
-                    accumulatorsOut->m_angularVel.m_quad = _mm_add_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_shuffle_ps(av, av, 0x55), r.m_col1.m_quad),
-                            _mm_mul_ps(_mm_shuffle_ps(av, av, 0), r.m_col0.m_quad)
-                        ),
-                        _mm_mul_ps(_mm_shuffle_ps(av, av, 0xaa), r.m_col2.m_quad)
+                    accumulatorsOut->m_angularVel.setRotatedDir(
+                        accumulatorsOut->m_scratch123, motion->m_angularVelocity
                     );
                 }
                 accumulatorsOut->m_deactivationClass = ms.m_deactivationClass;
@@ -271,22 +251,11 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
                 {
                     // EXE-INLINED none: hkSweptTransform::getInterpolationValue
                     float fT = (info.m_startTime - st.m_centerOfMass0(3)) * st.m_centerOfMass1(3);
-                    const hkQuadReal t = _mm_set1_ps(fT);
-                    // EXE-INLINED 0x5DBF70
-                    accumulatorsOut->m_scratch0.m_quad = _mm_add_ps(
-                        _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, t), st.m_centerOfMass0.m_quad),
-                        _mm_mul_ps(st.m_centerOfMass1.m_quad, t)
-                    );
+                    accumulatorsOut->m_scratch0.setInterpolate4(st.m_centerOfMass0, st.m_centerOfMass1, fT);
                 }
                 accumulatorsOut->m_angularVel = motion->m_angularVelocity;
                 accumulatorsOut->m_linearVel = motion->m_linearVelocity;
-                // EXE-INLINED none: hkMatrix3::setIdentity
-                accumulatorsOut->m_scratch123.m_col0.setZero4();
-                accumulatorsOut->m_scratch123.m_col1.setZero4();
-                accumulatorsOut->m_scratch123.m_col2.setZero4();
-                accumulatorsOut->m_scratch123.m_col0(0) = 1.0f;
-                accumulatorsOut->m_scratch123.m_col1(1) = 1.0f;
-                accumulatorsOut->m_scratch123.m_col2(2) = 1.0f;
+                accumulatorsOut->m_scratch123.setIdentity();
                 accumulatorsOut->m_deactivationClass = ms.m_deactivationClass;
                 // EXE-INLINED none: hkHalf::operator float
                 accumulatorsOut->m_gravityFactor =
@@ -301,13 +270,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
                 accumulatorsOut->m_scratch0 = st.m_centerOfMass1;
                 accumulatorsOut->m_angularVel = motion->m_angularVelocity;
                 accumulatorsOut->m_linearVel = motion->m_linearVelocity;
-                // EXE-INLINED none: hkMatrix3::setIdentity
-                accumulatorsOut->m_scratch123.m_col0.setZero4();
-                accumulatorsOut->m_scratch123.m_col1.setZero4();
-                accumulatorsOut->m_scratch123.m_col2.setZero4();
-                accumulatorsOut->m_scratch123.m_col0(0) = 1.0f;
-                accumulatorsOut->m_scratch123.m_col1(1) = 1.0f;
-                accumulatorsOut->m_scratch123.m_col2(2) = 1.0f;
+                accumulatorsOut->m_scratch123.setIdentity();
                 // EXE-INLINED none: hkHalf::operator float
                 accumulatorsOut->m_gravityFactor =
                     std::bit_cast<float>(static_cast<int32_t>(motion->m_gravityFactor.m_value) << 16);
@@ -472,18 +435,10 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
 
         // The translation is the centre of mass less the rotated local centre of mass, rotated as
         // (y * col1 + x * col0) + z * col2.
-        // EXE-INLINED 0xC7F700
         {
-            const hkQuadReal local = st.m_centerOfMassLocal.m_quad;
-            const hkRotation& r = ms.m_transform.m_rotation;
-            const hkQuadReal shift = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(local, local, 0x55), r.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(local, local, 0), r.m_col0.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(local, local, 0xaa), r.m_col2.m_quad)
-            );
-            ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift);
+            hkVector4 shift;
+            shift.setRotatedDir(ms.m_transform.m_rotation, st.m_centerOfMassLocal);
+            ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift.m_quad);
         }
 
         if (type == hkpMotion::MOTION_THIN_BOX_INERTIA) {
@@ -653,16 +608,7 @@ int32_t hkRigidMotionUtilApplyAccumulators(
             case hkpMotion::MOTION_BOX_INERTIA: {
                 motion->m_linearVelocity = accumulators->m_linearVel;
                 // The accumulator's angular velocity is in body space: rotated as (y * col1 + x * col0) + z * col2.
-                // EXE-INLINED 0xC7F700
-                const hkQuadReal av = accumulators->m_angularVel.m_quad;
-                const hkRotation& r = ms.m_transform.m_rotation;
-                motion->m_angularVelocity.m_quad = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(av, av, 0x55), r.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(av, av, 0), r.m_col0.m_quad)
-                    ),
-                    _mm_mul_ps(_mm_shuffle_ps(av, av, 0xaa), r.m_col2.m_quad)
-                );
+                motion->m_angularVelocity.setRotatedDir(ms.m_transform.m_rotation, accumulators->m_angularVel);
                 sumLinVel = accumulators->m_scratch0;
                 sumAngVel.setRotatedDir(ms.m_transform.m_rotation, accumulators->m_scratch123.m_col0);
                 break;
@@ -766,18 +712,10 @@ int32_t hkRigidMotionUtilApplyAccumulators(
 
             // The translation is the centre of mass less the rotated local centre of mass, rotated as
             // (y * col1 + x * col0) + z * col2.
-            // EXE-INLINED 0xC7F700
             {
-                const hkQuadReal local = st.m_centerOfMassLocal.m_quad;
-                const hkRotation& r = ms.m_transform.m_rotation;
-                const hkQuadReal shift = _mm_add_ps(
-                    _mm_add_ps(
-                        _mm_mul_ps(_mm_shuffle_ps(local, local, 0x55), r.m_col1.m_quad),
-                        _mm_mul_ps(_mm_shuffle_ps(local, local, 0), r.m_col0.m_quad)
-                    ),
-                    _mm_mul_ps(_mm_shuffle_ps(local, local, 0xaa), r.m_col2.m_quad)
-                );
-                ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift);
+                hkVector4 shift;
+                shift.setRotatedDir(ms.m_transform.m_rotation, st.m_centerOfMassLocal);
+                ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift.m_quad);
             }
         }
 

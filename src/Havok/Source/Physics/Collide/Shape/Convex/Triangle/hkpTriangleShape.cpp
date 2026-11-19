@@ -193,24 +193,10 @@ hkBool hkpTriangleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShape
     edge1.setSub4(m_vertexC, m_vertexA);
     hkVector4 normal;
     normal.setCross(edge0, edge1);
-    // EXE-INLINED 0x62B0A0
-    const __m128 planeProduct = _mm_mul_ps(m_vertexA.m_quad, normal.m_quad);
-    const float planeDist = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(planeProduct, planeProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(planeProduct, planeProduct, 0x55), planeProduct)
-    ));
-    // EXE-INLINED 0x62B0A0
-    const __m128 fromProduct = _mm_mul_ps(input.m_from.m_quad, normal.m_quad);
-    const float fromDot = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(fromProduct, fromProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(fromProduct, fromProduct, 0x55), fromProduct)
-    ));
+    const float planeDist = m_vertexA.dot3(normal);
+    const float fromDot = input.m_from.dot3(normal);
     const float fromDist = fromDot - planeDist;
-    // EXE-INLINED 0x62B0A0
-    const __m128 toProduct = _mm_mul_ps(input.m_to.m_quad, normal.m_quad);
-    const float toDot = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(toProduct, toProduct, 0xAA), _mm_add_ss(_mm_shuffle_ps(toProduct, toProduct, 0x55), toProduct)
-    ));
+    const float toDot = input.m_to.dot3(normal);
     const float toDist = toDot - planeDist;
     // Both ends on one side misses, unless only the start lies in the plane. The product is compared unrounded; the
     // double product of two floats is exact.
@@ -226,12 +212,7 @@ hkBool hkpTriangleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShape
         result.m_bool = 0;
         return result;
     }
-    // EXE-INLINED 0x62B0A0
-    const __m128 normalSquares = _mm_mul_ps(normal.m_quad, normal.m_quad);
-    const float normalLength2 = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(normalSquares, normalSquares, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(normalSquares, normalSquares, 0x55), normalSquares)
-    ));
+    const float normalLength2 = normal.dot3(normal);
     // EXE-INLINED 0x5DBF70
     const __m128 fraction = _mm_set1_ps(hitFraction);
     hkVector4 hitPoint;
@@ -248,49 +229,20 @@ hkBool hkpTriangleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShape
     // Each edge's side: the triple product of the normal with the vectors to the edge's ends.
     hkVector4 edgeCross;
     edgeCross.setCross(toA, toB);
-    // EXE-INLINED 0x62B0A0
-    const __m128 side0Product = _mm_mul_ps(edgeCross.m_quad, normal.m_quad);
-    const float side0 = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(side0Product, side0Product, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(side0Product, side0Product, 0x55), side0Product)
-    ));
+    const float side0 = edgeCross.dot3(normal);
     if (side0 >= tolerance) {
         edgeCross.setCross(toB, toC);
-        // EXE-INLINED 0x62B0A0
-        const __m128 side1Product = _mm_mul_ps(edgeCross.m_quad, normal.m_quad);
-        const float side1 = _mm_cvtss_f32(_mm_add_ss(
-            _mm_shuffle_ps(side1Product, side1Product, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(side1Product, side1Product, 0x55), side1Product)
-        ));
+        const float side1 = edgeCross.dot3(normal);
         if (side1 >= tolerance) {
             edgeCross.setCross(toC, toA);
-            // EXE-INLINED 0x62B0A0
-            const __m128 side2Product = _mm_mul_ps(edgeCross.m_quad, normal.m_quad);
-            const float side2 = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(side2Product, side2Product, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(side2Product, side2Product, 0x55), side2Product)
-            ));
+            const float side2 = edgeCross.dot3(normal);
             if (side2 >= tolerance) {
                 results.m_hitFraction = hitFraction;
                 if (!(fromDist > 0.0f)) {
                     normal.m_quad = _mm_xor_ps(normal.m_quad, hkQuadRealNegateMask);
                 }
                 results.m_normal = normal;
-                // EXE-INLINED 0x62AEA0
-                const __m128 squares = _mm_mul_ps(results.m_normal.m_quad, results.m_normal.m_quad);
-                const __m128 length2 = _mm_add_ss(
-                    _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-                );
-                const __m128 approx = _mm_rsqrt_ss(length2);
-                const __m128 lengthInverse = _mm_andnot_ps(
-                    _mm_cmpeq_ss(length2, _mm_setzero_ps()),
-                    _mm_mul_ss(
-                        _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                        _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-                    )
-                );
-                results.m_normal.m_quad =
-                    _mm_mul_ps(_mm_shuffle_ps(lengthInverse, lengthInverse, 0), results.m_normal.m_quad);
+                results.m_normal.normalize3();
                 results.m_shapeKeys[results.m_shapeKeyIndex] = HK_INVALID_SHAPE_KEY;
                 HK_TIMER_END();
                 result.m_bool = 1;
@@ -319,12 +271,7 @@ hkVector4Comparison hkpTriangleShape::castRayBundleImpl(
     edge1.setSub4(m_vertexC, m_vertexA);
     hkVector4 normal;
     normal.setCross(edge0, edge1);
-    // EXE-INLINED 0x62B0A0
-    const __m128 planeProduct = _mm_mul_ps(normal.m_quad, m_vertexA.m_quad);
-    const __m128 planeDot = _mm_add_ss(
-        _mm_shuffle_ps(planeProduct, planeProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(planeProduct, planeProduct, 0x55), planeProduct)
-    );
+    const __m128 planeDot = normal.dot3(m_vertexA).getQuad();
     const __m128 planeDist = _mm_shuffle_ps(planeDot, planeDot, 0);
     // The rays' ends' distances from the plane, one lane per ray (the ends are stored transposed).
     const __m128 zero = _mm_setzero_ps();
@@ -351,12 +298,7 @@ hkVector4Comparison hkpTriangleShape::castRayBundleImpl(
         ),
         planeDist
     );
-    // EXE-INLINED 0x62B0A0
-    const __m128 normalSquares = _mm_mul_ps(normal.m_quad, normal.m_quad);
-    const __m128 normalLength2 = _mm_add_ss(
-        _mm_shuffle_ps(normalSquares, normalSquares, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(normalSquares, normalSquares, 0x55), normalSquares)
-    );
+    const __m128 normalLength2 = normal.dot3(normal).getQuad();
     const __m128 tolerance = _mm_mul_ps(_mm_shuffle_ps(normalLength2, normalLength2, 0), _mm_set1_ps(-0.0001f));
     // The hit fractions: fromDist / (fromDist - toDist), through the reciprocal estimate refined by one Newton step.
     const __m128 denominator = _mm_sub_ps(fromDist.m_quad, toDist);
@@ -401,20 +343,7 @@ hkVector4Comparison hkpTriangleShape::castRayBundleImpl(
         if ((iHitBits & axisMaskBits_10C92E0[i]) != 0) {
             hkpShapeRayCastOutput& rOutput = output.m_outputs[i];
             rOutput.m_hitFraction = hitFractions.m_quad[i];
-            // EXE-INLINED 0x62AEA0
-            const __m128 squares = _mm_mul_ps(hitNormal.m_quad, hitNormal.m_quad);
-            const __m128 length2 = _mm_add_ss(
-                _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-            );
-            const __m128 approx = _mm_rsqrt_ss(length2);
-            const __m128 lengthInverse = _mm_andnot_ps(
-                _mm_cmpeq_ss(length2, _mm_setzero_ps()),
-                _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-                )
-            );
-            hitNormal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lengthInverse, lengthInverse, 0), hitNormal.m_quad);
+            hitNormal.normalize3();
             // The normal takes the sign of the start's distance, so that it faces the ray.
             startSide.setBroadcast(fromDist, i);
             rOutput.m_normal.m_quad = _mm_xor_ps(_mm_and_ps(startSide.m_quad, hkQuadRealNegateMask), hitNormal.m_quad);
@@ -485,12 +414,7 @@ void hkpTriangleShape::getSupportingVertexImpl(const hkVector4& aDirection, hkpC
     }
     supportingVertexOut.m_quad = getVertex(vertexId).m_quad;
     const __m128 extrusion = m_extrusion.m_quad;
-    // EXE-INLINED 0x62B0A0
-    const __m128 extrusionProduct = _mm_mul_ps(direction, extrusion);
-    const float extrusionDot = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(extrusionProduct, extrusionProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(extrusionProduct, extrusionProduct, 0x55), extrusionProduct)
-    ));
+    const float extrusionDot = aDirection.dot3(m_extrusion);
     if (extrusionDot > 0.0f) {
         vertexId += 3;
         supportingVertexOut.m_quad = _mm_add_ps(extrusion, supportingVertexOut.m_quad);
@@ -560,32 +484,12 @@ int32_t hkpTriangleShape::weldContactPointImpl(
     normalLocal._setRotatedInverseDir(thisObjTransform->m_rotation, separatingNormal);
     hkVector4 triangleNormal;
     calcTriangleNormal(&m_vertexA.m_quad, &m_vertexC.m_quad, &triangleNormal.m_quad, &m_vertexB);
-    // EXE-INLINED 0x62B0A0
-    const __m128 cosProduct = _mm_mul_ps(triangleNormal.m_quad, normalLocal.m_quad);
-    const float cosAngle = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(cosProduct, cosProduct, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(cosProduct, cosProduct, 0x55), cosProduct)
-    ));
+    const float cosAngle = triangleNormal.dot3(normalLocal);
     const float absCosAngle = std::fabs(cosAngle);
     float distance = absCosAngle * separatingNormal.m_quad[3];
     hkVector4 edge;
     edge.setSub4(getVertex(mod3Table[edgeId + 1]), getVertex(edgeId));
-    {
-        // EXE-INLINED 0x62AEA0
-        const __m128 squares = _mm_mul_ps(edge.m_quad, edge.m_quad);
-        const __m128 length2 = _mm_add_ss(
-            _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-        );
-        const __m128 approx = _mm_rsqrt_ss(length2);
-        const __m128 lengthInverse = _mm_andnot_ps(
-            _mm_cmpeq_ss(length2, _mm_setzero_ps()),
-            _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-            )
-        );
-        edge.m_quad = _mm_mul_ps(_mm_shuffle_ps(lengthInverse, lengthInverse, 0), edge.m_quad);
-    }
+    edge.normalize3();
     // EXE-INLINED 0xD1FEF0
     const int32_t edgeBitcode = (m_weldingInfo >> (5 * edgeId)) & 0x1F;
     // The SDK reads the edge's table entry as an array of reals, indexed by the sector or the welding type.
@@ -626,54 +530,14 @@ int32_t hkpTriangleShape::weldContactPointImpl(
             _mm_mul_ps(_mm_set1_ps(sinCosTableEntry[sector]), triangleNormal.m_quad),
             _mm_mul_ps(_mm_set1_ps(sinCosTableEntry[sector + 1]), orthNormalEdge.m_quad)
         );
-        {
-            // EXE-INLINED 0x62AEA0
-            const __m128 squares = _mm_mul_ps(snapVector.m_quad, snapVector.m_quad);
-            const __m128 length2 = _mm_add_ss(
-                _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-            );
-            const __m128 approx = _mm_rsqrt_ss(length2);
-            const __m128 lengthInverse = _mm_andnot_ps(
-                _mm_cmpeq_ss(length2, _mm_setzero_ps()),
-                _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-                )
-            );
-            snapVector.m_quad = _mm_mul_ps(_mm_shuffle_ps(lengthInverse, lengthInverse, 0), snapVector.m_quad);
-        }
-        // EXE-INLINED 0x62B0A0
-        const __m128 snapProduct = _mm_mul_ps(snapVector.m_quad, normalLocal.m_quad);
-        const __m128 snapDot = _mm_add_ss(
-            _mm_shuffle_ps(snapProduct, snapProduct, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(snapProduct, snapProduct, 0x55), snapProduct)
-        );
-        // EXE-INLINED 0x62B0A0
-        const __m128 edgeProduct = _mm_mul_ps(edge.m_quad, normalLocal.m_quad);
-        const __m128 edgeDot = _mm_add_ss(
-            _mm_shuffle_ps(edgeProduct, edgeProduct, 0xAA),
-            _mm_add_ss(_mm_shuffle_ps(edgeProduct, edgeProduct, 0x55), edgeProduct)
-        );
+        snapVector.normalize3();
+        const __m128 snapDot = snapVector.dot3(normalLocal).getQuad();
+        const __m128 edgeDot = edge.dot3(normalLocal).getQuad();
         normalLocal.m_quad = _mm_add_ps(
             _mm_mul_ps(_mm_shuffle_ps(snapDot, snapDot, 0), snapVector.m_quad),
             _mm_mul_ps(_mm_shuffle_ps(edgeDot, edgeDot, 0), edge.m_quad)
         );
-        {
-            // EXE-INLINED 0x62AEA0
-            const __m128 squares = _mm_mul_ps(normalLocal.m_quad, normalLocal.m_quad);
-            const __m128 length2 = _mm_add_ss(
-                _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-            );
-            const __m128 approx = _mm_rsqrt_ss(length2);
-            const __m128 lengthInverse = _mm_andnot_ps(
-                _mm_cmpeq_ss(length2, _mm_setzero_ps()),
-                _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-                )
-            );
-            normalLocal.m_quad = _mm_mul_ps(_mm_shuffle_ps(lengthInverse, lengthInverse, 0), normalLocal.m_quad);
-        }
+        normalLocal.normalize3();
         separatingNormal.setRotatedDir(thisObjTransform->m_rotation, normalLocal);
     }
     else {
@@ -691,23 +555,7 @@ int32_t hkpTriangleShape::weldContactPointImpl(
             _mm_mul_ps(_mm_set1_ps(sinCosTableEntry[weldingType]), triangleNormal.m_quad),
             _mm_mul_ps(_mm_set1_ps(sinCosTableEntry[weldingType + 1]), orthNormalEdge.m_quad)
         );
-        {
-            // EXE-INLINED 0x62AEA0
-            const __m128 squares = _mm_mul_ps(separatingNormal.m_quad, separatingNormal.m_quad);
-            const __m128 length2 = _mm_add_ss(
-                _mm_shuffle_ps(squares, squares, 0xAA), _mm_add_ss(_mm_shuffle_ps(squares, squares, 0x55), squares)
-            );
-            const __m128 approx = _mm_rsqrt_ss(length2);
-            const __m128 lengthInverse = _mm_andnot_ps(
-                _mm_cmpeq_ss(length2, _mm_setzero_ps()),
-                _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-                )
-            );
-            separatingNormal.m_quad =
-                _mm_mul_ps(_mm_shuffle_ps(lengthInverse, lengthInverse, 0), separatingNormal.m_quad);
-        }
+        separatingNormal.normalize3();
         separatingNormal.setRotatedDir(thisObjTransform->m_rotation, separatingNormal);
         if (m_isExtruded) {
             // The contact's distance below the triangle, along the normal the welding type faces.
@@ -715,13 +563,9 @@ int32_t hkpTriangleShape::weldContactPointImpl(
                 _mm_mul_ps(_mm_set1_ps(flipNormalBasedOnWeldingTypeTable[weldingType]), triangleNormal.m_quad);
             hkVector4 contactPointLocal;
             contactPointLocal.setTransformedInversePos(*thisObjTransform, contactPointWs);
-            // EXE-INLINED 0x62B0A0
-            const __m128 depthProduct =
-                _mm_mul_ps(_mm_sub_ps(contactPointLocal.m_quad, m_vertexA.m_quad), triangleNormal.m_quad);
-            const float depth = _mm_cvtss_f32(_mm_add_ss(
-                _mm_shuffle_ps(depthProduct, depthProduct, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(depthProduct, depthProduct, 0x55), depthProduct)
-            ));
+            hkVector4 toContact;
+            toContact.setSub4(contactPointLocal, m_vertexA);
+            const float depth = toContact.dot3(triangleNormal);
             distance = hkMath::min2(depth, distance);
         }
         else {
@@ -729,13 +573,9 @@ int32_t hkpTriangleShape::weldContactPointImpl(
             hkVector4 centre;
             collidingShape->getCentre(centre);
             centre.setTransformedPos(*collidingTransform, centre);
-            // EXE-INLINED 0x62B0A0
-            const __m128 centreProduct =
-                _mm_mul_ps(_mm_sub_ps(contactPointWs.m_quad, centre.m_quad), separatingNormal.m_quad);
-            const __m128 centreDot = _mm_add_ss(
-                _mm_shuffle_ps(centreProduct, centreProduct, 0xAA),
-                _mm_add_ss(_mm_shuffle_ps(centreProduct, centreProduct, 0x55), centreProduct)
-            );
+            hkVector4 fromCentre;
+            fromCentre.setSub4(contactPointWs, centre);
+            const __m128 centreDot = fromCentre.dot3(separatingNormal).getQuad();
             if ((_mm_movemask_ps(centreDot) & 1) == 0) {
                 return hkpConvexShape::WELD_RESULT_REJECT_CONTACT_POINT;
             }

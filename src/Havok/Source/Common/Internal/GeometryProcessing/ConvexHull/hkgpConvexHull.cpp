@@ -877,38 +877,12 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
             perpendicular.m_quad[iOk2] = -direction.m_quad[iOk1];
             hkVector4 cross;
             cross.setCross(direction, perpendicular);
-            // Both scaled to fHalf: normalize3 written out with intrinsics.
-            const __m128 kZero = _mm_set_ss(zero);
+            // Both normalized, then scaled to fHalf.
             const __m128 kHalfMargin = _mm_set1_ps(fHalf);
-            // EXE-INLINED 0x62AEA0
-            __m128 kSquared = _mm_mul_ps(perpendicular.m_quad, perpendicular.m_quad);
-            __m128 kLength2 = _mm_add_ss(
-                _mm_shuffle_ps(kSquared, kSquared, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquared, kSquared, 0x55), kSquared)
-            );
-            __m128 kApprox = _mm_rsqrt_ss(kLength2);
-            __m128 kInverse = _mm_andnot_ps(
-                _mm_cmpeq_ss(kLength2, kZero),
-                _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), kApprox),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLength2, kApprox), kApprox))
-                )
-            );
-            perpendicular.m_quad =
-                _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(kInverse, kInverse, 0), perpendicular.m_quad), kHalfMargin);
-            // EXE-INLINED 0x62AEA0
-            kSquared = _mm_mul_ps(cross.m_quad, cross.m_quad);
-            kLength2 = _mm_add_ss(
-                _mm_shuffle_ps(kSquared, kSquared, 0xAA), _mm_add_ss(_mm_shuffle_ps(kSquared, kSquared, 0x55), kSquared)
-            );
-            kApprox = _mm_rsqrt_ss(kLength2);
-            kInverse = _mm_andnot_ps(
-                _mm_cmpeq_ss(kLength2, kZero),
-                _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), kApprox),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLength2, kApprox), kApprox))
-                )
-            );
-            cross.m_quad = _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(kInverse, kInverse, 0), cross.m_quad), kHalfMargin);
+            perpendicular.normalize3();
+            perpendicular.m_quad = _mm_mul_ps(perpendicular.m_quad, kHalfMargin);
+            cross.normalize3();
+            cross.m_quad = _mm_mul_ps(cross.m_quad, kHalfMargin);
             // Each end moved both ways along the perpendicular, then along the cross product.
             hkVector4 corners[8];
             corners[0].m_quad = _mm_add_ps(perpendicular.m_quad, p0.m_quad);
@@ -2243,15 +2217,9 @@ void hkgpConvexHull::createVoronoiCells(
             const float fDistance = _mm_cvtss_f32(kLength2);
             // Only a point strictly beyond the radius cuts.
             if (fRadiusSquared < fDistance) {
-                // EXE-INLINED 0x62AEA0
-                const __m128 approx = _mm_rsqrt_ss(kLength2);
-                const __m128 refined = _mm_mul_ss(
-                    _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                    _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kLength2, approx), approx))
-                );
-                const __m128 inverse = _mm_andnot_ps(_mm_cmpeq_ss(kLength2, _mm_setzero_ps()), refined);
                 hkVector4 plane;
-                plane.m_quad = _mm_mul_ps(_mm_shuffle_ps(inverse, inverse, 0), kDelta);
+                plane.m_quad = kDelta;
+                plane.normalize3();
                 const __m128 dSite = _mm_mul_ps(plane.m_quad, kSite);
                 const __m128 dPoint = _mm_mul_ps(kPoint, plane.m_quad);
                 const __m128 kDotSite = _mm_add_ss(
@@ -4288,18 +4256,9 @@ void hkgpConvexHullImpl::buildIndices() {
             );
             hkVector4 axis;
             axis.setSub4(x1, x0);
-            // EXE-INLINED none: hkVector4::normalize3 (rsqrtss and one Newton step, 0 for a zero length)
-            const __m128 sq = _mm_mul_ps(axis.m_quad, axis.m_quad);
-            const __m128 lengthSquared =
-                _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-            const __m128 approx = _mm_rsqrt_ss(lengthSquared);
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(lengthSquared, approx), approx))
-            );
-            const __m128 inverse = _mm_andnot_ps(_mm_cmpeq_ss(lengthSquared, _mm_setzero_ps()), refined);
             hkVector4 plane;
-            plane.m_quad = _mm_mul_ps(_mm_shuffle_ps(inverse, inverse, 0), axis.m_quad);
+            plane.m_quad = axis.m_quad;
+            plane.normalize3();
             const __m128 d1 = _mm_mul_ps(x1.m_quad, plane.m_quad);
             const float fDot1 =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(d1, d1, 0xAA), _mm_add_ss(_mm_shuffle_ps(d1, d1, 0x55), d1)));
@@ -4551,13 +4510,8 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
                 const float fT = static_cast<float>(
                     static_cast<double>(pPrev->m_scratch) / (static_cast<double>(pPrev->m_scratch) - pVertex->m_scratch)
                 );
-                // EXE-INLINED 0x5DBF70: hkVector4::setInterpolate4
-                const hkQuadReal t = _mm_shuffle_ps(_mm_set_ss(fT), _mm_set_ss(fT), 0);
                 hkVector4 kCut;
-                kCut.m_quad = _mm_add_ps(
-                    _mm_mul_ps(_mm_sub_ps(_mm_set1_ps(1.0f), t), pPrev->m_source.m_quad),
-                    _mm_mul_ps(pVertex->m_source.m_quad, t)
-                );
+                kCut.setInterpolate4(pPrev->m_source, pVertex->m_source, hkSimdReal(fT));
                 belowPoints.pushBack(kCut);
                 abovePoints.pushBack(kCut);
             }
@@ -4665,13 +4619,8 @@ hkgpConvexHullImpl::splitByPlane(const hkVector4& plane, hkgpConvexHull** pos, h
                         continue;
                     }
                     const float fT = static_cast<float>(static_cast<double>(fA) / (static_cast<double>(fA) - fB));
-                    // EXE-INLINED 0x5DBF70: hkVector4::setInterpolate4
-                    const hkQuadReal t = _mm_shuffle_ps(_mm_set_ss(fT), _mm_set_ss(fT), 0);
                     hkVector4 kCut;
-                    kCut.m_quad = _mm_add_ps(
-                        _mm_mul_ps(_mm_sub_ps(_mm_set1_ps(1.0f), t), pA->m_source.m_quad),
-                        _mm_mul_ps(pB->m_source.m_quad, t)
-                    );
+                    kCut.setInterpolate4(pA->m_source, pB->m_source, hkSimdReal(fT));
                     hkMemoryAllocator* pMore = hkMemoryRouter::getInstance().m_heap;
                     if (abovePoints.m_size == (abovePoints.m_capacityAndFlags & PointArray::CAPACITY_MASK)) {
                         hkArrayUtil::_reserveMore(*pMore, &abovePoints, sizeof(hkVector4));
@@ -5052,18 +5001,9 @@ double hkgpConvexHullImpl::maxDistanceToTransformedPlanes(
                 _mm_mul_ps(_mm_shuffle_ps(e2, e2, 0xD2), _mm_shuffle_ps(e1, e1, 0xC9)),
                 _mm_mul_ps(_mm_shuffle_ps(e2, e2, 0xC9), _mm_shuffle_ps(e1, e1, 0xD2))
             );
-            // EXE-INLINED 0x62AEA0
-            const __m128 sq = _mm_mul_ps(normal, normal);
-            const __m128 length2 =
-                _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq));
-            const __m128 approx = _mm_rsqrt_ss(length2);
-            const __m128 refined = _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(length2, approx), approx))
-            );
-            const __m128 inverse = _mm_andnot_ps(_mm_cmpeq_ss(length2, _mm_setzero_ps()), refined);
             hkVector4 plane;
-            plane.m_quad = _mm_mul_ps(_mm_shuffle_ps(inverse, inverse, 0), normal);
+            plane.m_quad = normal;
+            plane.normalize3();
             const __m128 d0 = _mm_mul_ps(plane.m_quad, x[0]);
             const float fDot0 =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(d0, d0, 0xAA), _mm_add_ss(_mm_shuffle_ps(d0, d0, 0x55), d0)));

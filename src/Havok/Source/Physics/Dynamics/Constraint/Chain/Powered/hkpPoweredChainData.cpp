@@ -277,34 +277,10 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
         const ConstraintInfo& info = m_infos.m_data[i];
         in2.m_transformB = &entity->m_motion.m_motionState.m_transform;
 
-        // EXE-INLINED 0xC7F640
-        const hkTransform& transformA = *in2.m_transformA;
-        const __m128 pA = info.m_pivotInA.m_quad;
         hkVector4 pivotWsA;
-        pivotWsA.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pA, pA, 0x55), transformA.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(pA, pA, 0x00), transformA.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pA, pA, 0xAA), transformA.m_rotation.m_col2.m_quad),
-                transformA.m_translation.m_quad
-            )
-        );
-        // EXE-INLINED 0xC7F640
-        const hkTransform& transformB = entity->m_motion.m_motionState.m_transform;
-        const __m128 pB = info.m_pivotInB.m_quad;
+        pivotWsA.setTransformedPos(*in2.m_transformA, info.m_pivotInA);
         hkVector4 pivotWsB;
-        pivotWsB.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pB, pB, 0x55), transformB.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(pB, pB, 0x00), transformB.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pB, pB, 0xAA), transformB.m_rotation.m_col2.m_quad),
-                transformB.m_translation.m_quad
-            )
-        );
+        pivotWsB.setTransformedPos(entity->m_motion.m_motionState.m_transform, info.m_pivotInB);
 
         hkStabilizedBallSocketConstraintBuildJacobian_noSchema(pivotWsA, pivotWsB, m_maxErrorDistance, in2, linearJac);
         linearJac += 3;
@@ -328,10 +304,7 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
         float* pRuntimeQuat = getMotorRuntimeQuaternions(inNotValid.m_constraintRuntime.m_storage) + 4 * i;
         hkQuaternion target;
         target.m_vec.set(pRuntimeQuat[0], pRuntimeQuat[1], pRuntimeQuat[2], pRuntimeQuat[3]);
-        // EXE-INLINED 0x561440
-        const __m128 kSquares = _mm_mul_ps(target.m_vec.m_quad, target.m_vec.m_quad);
-        const __m128 kSum0 = _mm_add_ps(_mm_shuffle_ps(kSquares, kSquares, 0x4E), kSquares);
-        const float fLengthSquared = _mm_cvtss_f32(_mm_add_ps(_mm_shuffle_ps(kSum0, kSum0, 0xB1), kSum0));
+        const float fLengthSquared = target.m_vec.dot4(target.m_vec);
         if (fLengthSquared == 0.0f) {
             target = aTc;
         }

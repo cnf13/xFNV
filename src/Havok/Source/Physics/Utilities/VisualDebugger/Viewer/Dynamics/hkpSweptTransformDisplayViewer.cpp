@@ -104,30 +104,16 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         hkTransform trans0;
         // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
         trans0.m_rotation.set(swept.m_rotation0);
-        // EXE-INLINED 0xC7F700
-        const hkQuadReal local0 = swept.m_centerOfMassLocal.m_quad;
-        const hkQuadReal centerShift0 = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(1, 1, 1, 1)), trans0.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(0, 0, 0, 0)), trans0.m_rotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(2, 2, 2, 2)), trans0.m_rotation.m_col2.m_quad)
-        );
-        trans0.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0);
+        hkVector4 centerShift0;
+        centerShift0.setRotatedDir(trans0.m_rotation, swept.m_centerOfMassLocal);
+        trans0.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0.m_quad);
 
         hkTransform trans1;
         // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
         trans1.m_rotation.set(swept.m_rotation1);
-        // EXE-INLINED 0xC7F700
-        const hkQuadReal local1 = swept.m_centerOfMassLocal.m_quad;
-        const hkQuadReal centerShift1 = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(1, 1, 1, 1)), trans1.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(0, 0, 0, 0)), trans1.m_rotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(2, 2, 2, 2)), trans1.m_rotation.m_col2.m_quad)
-        );
-        trans1.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1);
+        hkVector4 centerShift1;
+        centerShift1.setRotatedDir(trans1.m_rotation, swept.m_centerOfMassLocal);
+        trans1.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1.m_quad);
 
         m_displayHandler->addGeometry(displayGeometries, trans0, id + 1, m_tag, 0);
         m_displayHandler->setGeometryColor(HK_DEFAULT_SWEPT_TRANSFORM_COLOR_T0, id + 1, m_tag);
@@ -181,30 +167,16 @@ void hkpSweptTransformDisplayViewer::postSimulationCallback(hkpWorld* world) {
 
             // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
             trans.m_rotation.set(swept.m_rotation0);
-            // EXE-INLINED 0xC7F700
-            const hkQuadReal local0 = swept.m_centerOfMassLocal.m_quad;
-            const hkQuadReal centerShift0 = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(1, 1, 1, 1)), trans.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(0, 0, 0, 0)), trans.m_rotation.m_col0.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(2, 2, 2, 2)), trans.m_rotation.m_col2.m_quad)
-            );
-            trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0);
+            hkVector4 centerShift0;
+            centerShift0.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
+            trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0.m_quad);
             m_displayHandler->updateGeometry(trans, id + 1, m_tag);
 
             // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
             trans.m_rotation.set(swept.m_rotation1);
-            // EXE-INLINED 0xC7F700
-            const hkQuadReal local1 = swept.m_centerOfMassLocal.m_quad;
-            const hkQuadReal centerShift1 = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(1, 1, 1, 1)), trans.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(0, 0, 0, 0)), trans.m_rotation.m_col0.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(2, 2, 2, 2)), trans.m_rotation.m_col2.m_quad)
-            );
-            trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1);
+            hkVector4 centerShift1;
+            centerShift1.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
+            trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1.m_quad);
             m_displayHandler->updateGeometry(trans, id + 2, m_tag);
         }
     }
@@ -232,30 +204,16 @@ void hkpSweptTransformDisplayViewer::inactiveEntityMovedCallback(hkpEntity* enti
 
     // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
     trans.m_rotation.set(swept.m_rotation0);
-    // EXE-INLINED 0xC7F700
-    const hkQuadReal local0 = swept.m_centerOfMassLocal.m_quad;
-    const hkQuadReal centerShift0 = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(1, 1, 1, 1)), trans.m_rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(0, 0, 0, 0)), trans.m_rotation.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(local0, local0, _MM_SHUFFLE(2, 2, 2, 2)), trans.m_rotation.m_col2.m_quad)
-    );
-    trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0);
+    hkVector4 centerShift0;
+    centerShift0.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
+    trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0.m_quad);
     m_displayHandler->updateGeometry(trans, id + 1, m_tag);
 
     // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
     trans.m_rotation.set(swept.m_rotation1);
-    // EXE-INLINED 0xC7F700
-    const hkQuadReal local1 = swept.m_centerOfMassLocal.m_quad;
-    const hkQuadReal centerShift1 = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(1, 1, 1, 1)), trans.m_rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(0, 0, 0, 0)), trans.m_rotation.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(local1, local1, _MM_SHUFFLE(2, 2, 2, 2)), trans.m_rotation.m_col2.m_quad)
-    );
-    trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1);
+    hkVector4 centerShift1;
+    centerShift1.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
+    trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1.m_quad);
     m_displayHandler->updateGeometry(trans, id + 2, m_tag);
 }
 

@@ -134,41 +134,20 @@ void NiPosKey::CoordinateFrame(
     d1Func(fTime, pKey0, pKey1, &d1);
     d2Func(fTime, pKey0, pKey1, &d2);
 
-    // EXE-INLINED none: NiPoint3::SqrLength
-    float fLengthSqr = d1.x * d1.x + d1.y * d1.y + d1.z * d1.z;
+    float fLengthSqr = d1.SqrLength();
     float fLength = std::sqrt(fLengthSqr);
     float fInvLength = 1.0f / fLength;
-    // EXE-INLINED none: operator*(float, const NiPoint3&)
-    tangent.x = fInvLength * d1.x;
-    tangent.y = fInvLength * d1.y;
-    tangent.z = fInvLength * d1.z;
+    tangent = fInvLength * d1;
 
-    // EXE-INLINED none: NiPoint3::Cross
-    NiPoint3 kCross;
-    kCross.x = d1.y * d2.z - d1.z * d2.y;
-    kCross.y = d1.z * d2.x - d1.x * d2.z;
-    kCross.z = d1.x * d2.y - d1.y * d2.x;
-    // EXE-INLINED none: NiPoint3::Length (the sum rounded to float, then the exe's __CIsqrt)
-    float fCrossLengthSqr = kCross.x * kCross.x + kCross.y * kCross.y + kCross.z * kCross.z;
-    float fCrossLength = std::sqrt(fCrossLengthSqr);
+    NiPoint3 kCross = d1.Cross(d2);
+    float fCrossLength = kCross.Length();
     float fCurvature = fCrossLength * fInvLength * fInvLength;
     curvature = fCurvature;
 
     const float epsilon = 1e-06f;
     if (std::fabs(fCurvature) > epsilon) {
-        // EXE-INLINED none: NiPoint3::Dot, operator*(float, const NiPoint3&), NiPoint3::operator-
-        float fDot = d1.x * d2.x + d1.y * d2.y + d1.z * d2.z;
-        NiPoint3 kDotD1;
-        kDotD1.x = fDot * d1.x;
-        kDotD1.y = fDot * d1.y;
-        kDotD1.z = fDot * d1.z;
-        NiPoint3 kLengthSqrD2;
-        kLengthSqrD2.x = fLengthSqr * d2.x;
-        kLengthSqrD2.y = fLengthSqr * d2.y;
-        kLengthSqrD2.z = fLengthSqr * d2.z;
-        normal.x = kLengthSqrD2.x - kDotD1.x;
-        normal.y = kLengthSqrD2.y - kDotD1.y;
-        normal.z = kLengthSqrD2.z - kDotD1.z;
+        float fDot = d1.Dot(d2);
+        normal = fLengthSqr * d2 - fDot * d1;
     }
     else {
         curvature = 0.0f;
@@ -185,13 +164,7 @@ void NiPosKey::CoordinateFrame(
     }
     normal.Unitize();
 
-    // EXE-INLINED none: NiPoint3::Cross (tangent x normal), every operand read before binormal is written
-    float fBinormalX = tangent.y * normal.z - tangent.z * normal.y;
-    float fBinormalY = tangent.z * normal.x - tangent.x * normal.z;
-    float fBinormalZ = tangent.x * normal.y - tangent.y * normal.x;
-    binormal.x = fBinormalX;
-    binormal.y = fBinormalY;
-    binormal.z = fBinormalZ;
+    binormal = tangent.Cross(normal);
 }
 
 void NiPosKey::SaveBinary(NiStream& stream, NiAnimationKey* pkKey) {

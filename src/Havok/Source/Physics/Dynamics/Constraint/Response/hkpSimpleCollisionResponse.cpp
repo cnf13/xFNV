@@ -229,16 +229,8 @@ void hkpSimpleCollisionResponse::solveSingleContact2(
 
     hkpVelocityAccumulator* body = bodyA;
     for (int32_t i = 0; i < 2; i++) {
-        // The angular velocity back into world space: (y * col1 + x * col0) + z * col2.
-        // EXE-INLINED 0xC7F700
-        const hkQuadReal angular = vel[i].m_angular.m_quad;
-        body->m_angularVel.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(angular, angular, 85), body->m_scratch123.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(angular, angular, 0), body->m_scratch123.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(angular, angular, 170), body->m_scratch123.m_col2.m_quad)
-        );
+        // The angular velocity back into world space.
+        body->m_angularVel.setRotatedDir(body->m_scratch123, vel[i].m_angular);
         body = bodyB;
     }
 }

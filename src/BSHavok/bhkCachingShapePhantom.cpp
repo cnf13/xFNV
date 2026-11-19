@@ -154,25 +154,8 @@ void hkpCachingShapePhantomRay::castRay(const hkpWorldRayCastInput& arInput, hkp
             continue;
         }
         const hkTransform& kTransform = *pCollidable->m_motion.pMotion;
-        const __m128 lo = _mm_unpacklo_ps(kTransform.m_rotation.m_col0.m_quad, kTransform.m_rotation.m_col1.m_quad);
-        const __m128 hi = _mm_unpackhi_ps(kTransform.m_rotation.m_col0.m_quad, kTransform.m_rotation.m_col1.m_quad);
-        const __m128 row0 = _mm_movelh_ps(lo, kTransform.m_rotation.m_col2.m_quad);
-        const __m128 row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), kTransform.m_rotation.m_col2.m_quad, 0xD4);
-        const __m128 row2 = _mm_shuffle_ps(hi, kTransform.m_rotation.m_col2.m_quad, 0xE4);
-        // EXE-INLINED 0xC7F690: hkVector4::setTransformedInversePos
-        const __m128 from = _mm_sub_ps(arInput.m_from.m_quad, kTransform.m_translation.m_quad);
-        sinput.m_from.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(from, from, 0x55), row1), _mm_mul_ps(_mm_shuffle_ps(from, from, 0x00), row0)
-            ),
-            _mm_mul_ps(row2, _mm_shuffle_ps(from, from, 0xAA))
-        );
-        // EXE-INLINED 0xC7F690: hkVector4::setTransformedInversePos
-        const __m128 to = _mm_sub_ps(arInput.m_to.m_quad, kTransform.m_translation.m_quad);
-        sinput.m_to.m_quad = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(to, to, 0x55), row1), _mm_mul_ps(_mm_shuffle_ps(to, to, 0x00), row0)),
-            _mm_mul_ps(row2, _mm_shuffle_ps(to, to, 0xAA))
-        );
+        sinput.m_from.setTransformedInversePos(kTransform, arInput.m_from);
+        sinput.m_to.setTransformedInversePos(kTransform, arInput.m_to);
         // EXE-INLINED 0x4A3D80
         sout.m_hitFraction = 1.0f;
         sout.m_extraInfo = -1;

@@ -163,8 +163,7 @@ void bhkRigidBodyT::PostInit(const hkSerializableCinfo& arInfo) {
     bhkRigidBodyCinfo& rTempCinfo = const_cast<bhkRigidBodyCinfo&>(rCinfo);
     kLocalPos = rCinfo.hk.m_position;
     kLocalRot = rCinfo.hk.m_rotation;
-    // EXE-INLINED 0x458B20
-    rTempCinfo.hk.m_position.m_quad = hkVector4Zero.m_quad;
+    rTempCinfo.hk.m_position = hkVector4::getZero();
     rTempCinfo.hk.m_rotation.setIdentity();
     bhkRigidBody::SetPosition(rTempCinfo.hk.m_position);
     bhkRigidBody::SetRotation(rTempCinfo.hk.m_rotation);

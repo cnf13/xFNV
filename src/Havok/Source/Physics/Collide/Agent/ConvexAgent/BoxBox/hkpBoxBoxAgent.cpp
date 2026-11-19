@@ -69,13 +69,11 @@ void hkpBoxBoxAgent::processCollision(
     const hkpBoxShape* boxB = static_cast<const hkpBoxShape*>(bodyB.m_shape);
 
     hkVector4 rA;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    rA.m_quad = _mm_add_ps(_mm_set1_ps(boxA->m_radius), boxA->m_halfExtents.m_quad);
+    rA.setAll(boxA->m_radius);
+    rA.add4(boxA->m_halfExtents);
     hkVector4 rB;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    rB.m_quad = _mm_add_ps(_mm_set1_ps(boxB->m_radius), boxB->m_halfExtents.m_quad);
+    rB.setAll(boxB->m_radius);
+    rB.add4(boxB->m_halfExtents);
 
     hkTransform aTb;
     aTb.setMulInverseMul(*bodyA.m_motion.pMotion, *bodyB.m_motion.pMotion);
@@ -117,13 +115,11 @@ void hkpBoxBoxAgent::staticGetPenetrations(
     const hkpBoxShape* boxB = static_cast<const hkpBoxShape*>(bodyB.m_shape);
 
     hkVector4 rA;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    rA.m_quad = _mm_add_ps(_mm_set1_ps(boxA->m_radius), boxA->m_halfExtents.m_quad);
+    rA.setAll(boxA->m_radius);
+    rA.add4(boxA->m_halfExtents);
     hkVector4 rB;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    rB.m_quad = _mm_add_ps(_mm_set1_ps(boxB->m_radius), boxB->m_halfExtents.m_quad);
+    rB.setAll(boxB->m_radius);
+    rB.add4(boxB->m_halfExtents);
 
     const hkTransform& wTa = *bodyA.m_motion.pMotion;
     const hkTransform& wTb = *bodyB.m_motion.pMotion;
@@ -155,23 +151,11 @@ void hkpBoxBoxAgent::staticGetClosestPoints(
     const hkpBoxShape* boxB = static_cast<const hkpBoxShape*>(bodyB.m_shape);
 
     hkVector4 rA;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&rA.m_quad)[0],
-        _mm_add_ps(
-            _mm_set1_ps(boxA->m_radius), _mm_load_ps(&reinterpret_cast<const float*>(&boxA->m_halfExtents.m_quad)[0])
-        )
-    );
+    rA.setAll(boxA->m_radius);
+    rA.add4(boxA->m_halfExtents);
     hkVector4 rB;
-    // EXE-INLINED 0x4589C0
-    // EXE-INLINED none: hkVector4::add4
-    _mm_store_ps(
-        &reinterpret_cast<float*>(&rB.m_quad)[0],
-        _mm_add_ps(
-            _mm_set1_ps(boxB->m_radius), _mm_load_ps(&reinterpret_cast<const float*>(&boxB->m_halfExtents.m_quad)[0])
-        )
-    );
+    rB.setAll(boxB->m_radius);
+    rB.add4(boxB->m_halfExtents);
 
     const hkTransform& wTa = *bodyA.m_motion.pMotion;
     const hkTransform& wTb = *bodyB.m_motion.pMotion;

@@ -86,16 +86,7 @@ void hkpConvexShape::castRayWithCollectorImpl(
     output.m_shapeKeys[0] = HK_INVALID_SHAPE_KEY;
     output.m_shapeKeyIndex = 0;
     if (castRayImpl(inputLocal, output).m_bool) {
-        // EXE-INLINED 0xC7F700
-        const hkRotation& rRotation = cdBody.m_motion.pState->m_transform.m_rotation;
-        const __m128 kNormal = output.m_normal.m_quad;
-        output.m_normal.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0x55), rRotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0x00), rRotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(kNormal, kNormal, 0xAA), rRotation.m_col2.m_quad)
-        );
+        output.m_normal.setRotatedDir(cdBody.m_motion.pState->m_transform.m_rotation, output.m_normal);
         collector.addRayHit(cdBody, output);
     }
 }
@@ -136,16 +127,8 @@ const hkpConvexShape* getClosestPointAndNormal(
     aTb.setMulInverseMul(*r_esi, *r_eax);
     hkVector4 sepOut;
     r_edi->getClosestFeature(a1, a2, aTb, sepOut);
-    // EXE-INLINED 0xC7F700
-    const hkRotation& rWa = r_esi->getRotation();
     const hkQuadReal s = sepOut.m_quad;
-    a3->m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(s, s, 0x55), rWa.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(s, s, 0x00), rWa.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(s, s, 0xAA), rWa.m_col2.m_quad)
-    );
+    a3->setRotatedDir(r_esi->getRotation(), sepOut);
     // The point on A of the simplex: A's vertex, else B's vertex moved back by the distance, else the closest point
     // of the two edges.
     hkVector4 pointOnA;
@@ -160,14 +143,11 @@ const hkpConvexShape* getClosestPointAndNormal(
     else {
         pointOnA = r_edi->m_closestLineLineResult.m_closestPointA;
     }
-    // EXE-INLINED 0xC7F690
+    // B's point: A's moved back along the normal by the distance.
     const hkQuadReal w = _mm_shuffle_ps(s, s, _MM_SHUFFLE(3, 3, 3, 3));
-    hkVector4 pointBinA;
-    pointBinA.m_quad = _mm_sub_ps(
-        _mm_sub_ps(pointOnA.m_quad, _mm_mul_ps(_mm_shuffle_ps(w, w, _MM_SHUFFLE(0, 0, 0, 0)), s)),
-        aTb.m_translation.m_quad
-    );
-    a4->_setRotatedInverseDir(aTb.getRotation(), pointBinA);
+    hkVector4 pointOnB;
+    pointOnB.m_quad = _mm_sub_ps(pointOnA.m_quad, _mm_mul_ps(_mm_shuffle_ps(w, w, _MM_SHUFFLE(0, 0, 0, 0)), s));
+    a4->setTransformedInversePos(aTb, pointOnB);
     a3->m_quad[3] = sepOut.m_quad[3] - a1->m_radius - a2->m_radius;
     return a1;
 }

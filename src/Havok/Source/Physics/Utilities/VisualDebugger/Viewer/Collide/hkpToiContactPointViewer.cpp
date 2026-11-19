@@ -69,36 +69,16 @@ void hkToiContactPointViewer_displayArrow(
     ort(iFirst) = dir(iSecond);
     ort(iSecond) = -dir(iFirst);
 
-    // EXE-INLINED 0x62AEA0
-    const __m128 kOrt = ort.m_quad;
-    const __m128 kOrtSquares = _mm_mul_ps(kOrt, kOrt);
-    const __m128 kOrtLengthSquared = _mm_add_ss(
-        _mm_shuffle_ps(kOrtSquares, kOrtSquares, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(kOrtSquares, kOrtSquares, 0x55), kOrtSquares)
-    );
-    const __m128 kEstimate = _mm_rsqrt_ss(kOrtLengthSquared);
-    const __m128 kZeroMask = _mm_cmpeq_ss(kOrtLengthSquared, _mm_set_ss(0.0f));
-    const __m128 kStep = _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(kOrtLengthSquared, kEstimate), kEstimate));
-    const __m128 kScale = _mm_andnot_ps(kZeroMask, _mm_mul_ss(_mm_mul_ss(_mm_set_ss(0.5f), kEstimate), kStep));
-    // EXE-INLINED 0x630B40
-    const __m128 kDirSquares2 = _mm_mul_ps(kDir, kDir);
-    const __m128 kDirLength = _mm_sqrt_ss(_mm_add_ss(
-        _mm_shuffle_ps(kDirSquares2, kDirSquares2, 0xAA),
-        _mm_add_ss(_mm_shuffle_ps(kDirSquares2, kDirSquares2, 0x55), kDirSquares2)
-    ));
-    // EXE-INLINED 0x627920
-    const __m128 kOrtScaled =
-        _mm_mul_ps(_mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), kOrt), _mm_shuffle_ps(kDirLength, kDirLength, 0));
+    ort.normalize3();
+    ort.mul4(dir.length3());
 
-    // EXE-INLINED 0x5DBF70
-    const __m128 kC = _mm_set1_ps(0.85f);
-    const __m128 kP = _mm_add_ps(_mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, kC), from.m_quad), _mm_mul_ps(kC, to.m_quad));
+    hkVector4 p;
+    p.setInterpolate4(from, to, hkSimdReal(0.85f));
 
-    // EXE-INLINED none: hkVector4::setAddMul4
     hkVector4 p1;
-    p1.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(0.14999998f), kOrtScaled), kP);
+    p1.setAddMul4(p, ort, hkSimdReal(0.14999998f));
     hkVector4 p2;
-    p2.m_quad = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(-0.14999998f), kOrtScaled), kP);
+    p2.setAddMul4(p, ort, hkSimdReal(-0.14999998f));
 
     handler->displayLine(from, to, color, id, tag);
     handler->displayLine(to, p1, color, id, tag);

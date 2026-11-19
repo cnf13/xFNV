@@ -168,45 +168,11 @@ void hkpTransformShape::getAabbImpl(const hkTransform& localToWorld, float toler
 // of the normal.
 hkBool hkpTransformShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const {
     HK_TIMER_BEGIN("rcTransform", nullptr);
-    hkVector4 v8;
-    hkVector4 v9;
-    hkVector4 v16;
-    hkVector4 v17;
-    hkVector4 v18;
-    hkVector4 v20;
-    v8.m_quad = m_transform.m_rotation.m_col1.m_quad;
-    v9.m_quad = m_transform.m_rotation.m_col2.m_quad;
-    __m128 v10 = _mm_sub_ps(input.m_from.m_quad, m_transform.m_translation.m_quad);
-    __m128 v11 = _mm_unpacklo_ps(m_transform.m_rotation.m_col0.m_quad, v8.m_quad);
-    __m128 v12 = _mm_unpackhi_ps(m_transform.m_rotation.m_col0.m_quad, v8.m_quad);
     hkpShapeRayCastInput subInput = input;
-    // EXE-INLINED 0xC7F690
-    __m128 v13 = _mm_movelh_ps(v11, v9.m_quad);
-    __m128 v14 = _mm_add_ps(
-        _mm_mul_ps(_mm_shuffle_ps(v10, v10, 85), _mm_shuffle_ps(_mm_movehl_ps(v13, v11), v9.m_quad, 212)),
-        _mm_mul_ps(_mm_shuffle_ps(v10, v10, 0), v13)
-    );
-    __m128 v15 = _mm_shuffle_ps(v12, v9.m_quad, 228);
-    v16.m_quad = m_transform.m_rotation.m_col2.m_quad;
-    v17.m_quad = _mm_add_ps(v14, _mm_mul_ps(v15, _mm_shuffle_ps(v10, v10, 170)));
-    v18.m_quad = m_transform.m_rotation.m_col1.m_quad;
-    __m128 v19 = _mm_sub_ps(input.m_to.m_quad, m_transform.m_translation.m_quad);
-    v20.m_quad = m_transform.m_rotation.m_col0.m_quad;
+    subInput.m_from.setTransformedInversePos(m_transform, input.m_from);
     ++results.m_shapeKeyIndex;
     const hkpShape* pChild = m_childShape.m_childShape;
-    subInput.m_from.m_quad = v17.m_quad;
-    // EXE-INLINED 0xC7F690
-    __m128 v22 = _mm_unpacklo_ps(v20.m_quad, v18.m_quad);
-    __m128 v23 = _mm_movelh_ps(v22, v16.m_quad);
-    subInput.m_to.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(v19, v19, 85), _mm_shuffle_ps(_mm_movehl_ps(v23, v22), v16.m_quad, 212)),
-            _mm_mul_ps(_mm_shuffle_ps(v19, v19, 0), v23)
-        ),
-        _mm_mul_ps(
-            _mm_shuffle_ps(_mm_unpackhi_ps(v20.m_quad, v18.m_quad), v16.m_quad, 228), _mm_shuffle_ps(v19, v19, 170)
-        )
-    );
+    subInput.m_to.setTransformedInversePos(m_transform, input.m_to);
     hkBool result = pChild->castRayImpl(subInput, results);
     --results.m_shapeKeyIndex;
     if (result.m_bool) {
@@ -226,44 +192,11 @@ void hkpTransformShape::castRayWithCollectorImpl(
     hkpRayHitCollector& collector
 ) const {
     HK_TIMER_BEGIN("rcTransform", nullptr);
-    hkVector4 v8;
-    hkVector4 v9;
-    hkVector4 v13;
-    hkVector4 v15;
     alignas(16) hkpCdBody childBody;
     hkTransform childTransform;
-    v8.m_quad = m_transform.m_rotation.m_col1.m_quad;
-    v9.m_quad = m_transform.m_rotation.m_col2.m_quad;
-    // EXE-INLINED 0xC7F690
-    __m128 v10 = _mm_sub_ps(input.m_from.m_quad, m_transform.m_translation.m_quad);
-    __m128 v11 = _mm_unpacklo_ps(m_transform.m_rotation.m_col0.m_quad, v8.m_quad);
-    __m128 v12 = _mm_movelh_ps(v11, v9.m_quad);
-    v13.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(v10, v10, 85), _mm_shuffle_ps(_mm_movehl_ps(v12, v11), v9.m_quad, 212)),
-            _mm_mul_ps(_mm_shuffle_ps(v10, v10, 0), v12)
-        ),
-        _mm_mul_ps(
-            _mm_shuffle_ps(_mm_unpackhi_ps(m_transform.m_rotation.m_col0.m_quad, v8.m_quad), v9.m_quad, 228),
-            _mm_shuffle_ps(v10, v10, 170)
-        )
-    );
-    __m128 v14 = _mm_sub_ps(input.m_to.m_quad, m_transform.m_translation.m_quad);
-    v15.m_quad = m_transform.m_rotation.m_col0.m_quad;
     hkpShapeRayCastInput subInput = input;
-    subInput.m_from.m_quad = v13.m_quad;
-    // EXE-INLINED 0xC7F690
-    __m128 v16 = _mm_unpacklo_ps(v15.m_quad, v8.m_quad);
-    __m128 v17 = _mm_movelh_ps(v16, v9.m_quad);
-    subInput.m_to.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(v14, v14, 85), _mm_shuffle_ps(_mm_movehl_ps(v17, v16), v9.m_quad, 212)),
-            _mm_mul_ps(_mm_shuffle_ps(v14, v14, 0), v17)
-        ),
-        _mm_mul_ps(
-            _mm_shuffle_ps(_mm_unpackhi_ps(v15.m_quad, v8.m_quad), v9.m_quad, 228), _mm_shuffle_ps(v14, v14, 170)
-        )
-    );
+    subInput.m_from.setTransformedInversePos(m_transform, input.m_from);
+    subInput.m_to.setTransformedInversePos(m_transform, input.m_to);
     childTransform.setMul(*cdBody.m_motion.pMotion, m_transform);
     childBody.m_motion.pMotion = &childTransform;
     const hkpShape* pChild = m_childShape.m_childShape;

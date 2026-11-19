@@ -17,17 +17,11 @@ void hkpGskCache::init(const hkpConvexShape* shapeA, const hkpConvexShape* shape
     shapeA->convertVertexIdsToVerticesImpl(ausVertexIds, 1, &kVertexA);
     shapeB->convertVertexIdsToVerticesImpl(ausVertexIds, 1, &kVertexB);
 
-    const hkQuadReal& rB = kVertexB.m_quad;
     const hkQuadReal& rC0 = aTb.m_rotation.m_col0.m_quad;
     const hkQuadReal& rC1 = aTb.m_rotation.m_col1.m_quad;
     const hkQuadReal& rC2 = aTb.m_rotation.m_col2.m_quad;
-    const hkQuadReal& rT = aTb.m_translation.m_quad;
-    // EXE-INLINED 0xC7F640
     hkVector4 kVertexBInA;
-    kVertexBInA.m_quad = _mm_add_ps(
-        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(rB, rB, 0x55), rC1), _mm_mul_ps(_mm_shuffle_ps(rB, rB, 0x00), rC0)),
-        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(rB, rB, 0xAA), rC2), rT)
-    );
+    kVertexBInA.setTransformedPos(aTb, kVertexB);
 
     hkVector4 kDirection;
     kDirection.m_quad = _mm_sub_ps(kVertexBInA.m_quad, kVertexA.m_quad);
@@ -104,11 +98,9 @@ void hkpGskCache::initTriangle(const hkpConvexShape* shapeA, const hkpTriangleSh
 
     hkpCdVertex vertexA;
     shapeA->convertVertexIdsToVerticesImpl(&m_vertices[1], 1, &vertexA);
-    // EXE-INLINED 0x62B0A0
-    hkQuadReal products = _mm_mul_ps(_mm_sub_ps(vertexA.m_quad, vertsInA[0].m_quad), normal.m_quad);
-    hkQuadReal distance = _mm_add_ss(
-        _mm_shuffle_ps(products, products, 0xAA), _mm_add_ss(_mm_shuffle_ps(products, products, 0x55), products)
-    );
+    hkVector4 toA;
+    toA.m_quad = _mm_sub_ps(vertexA.m_quad, vertsInA[0].m_quad);
+    const hkQuadReal distance = toA.dot3(normal).getQuad();
     hkVector4 direction;
     direction.m_quad =
         _mm_xor_ps(_mm_and_ps(_mm_shuffle_ps(distance, distance, 0x00), hkQuadRealNegateMask), normal.m_quad);

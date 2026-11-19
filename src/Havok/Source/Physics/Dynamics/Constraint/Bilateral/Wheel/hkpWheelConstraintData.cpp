@@ -244,26 +244,6 @@ void hkpWheelConstraintData::setInWorldSpace(
     const hkVector4& suspensionAxis,
     const hkVector4& steeringAxisTmp
 ) {
-    // EXE-INLINED 0x62B0A0
-    // hkVector4::dot3: mulps, then y + x and z + that (addss), in the low lane.
-    auto dot3 = [](__m128 a, __m128 b) {
-        const __m128 p = _mm_mul_ps(a, b);
-        return _mm_add_ss(_mm_shuffle_ps(p, p, 0xAA), _mm_add_ss(_mm_shuffle_ps(p, p, 0x55), p));
-    };
-    // EXE-INLINED 0x62AEA0
-    // hkVector4::normalize3: rsqrtss refined once (0.5 r (3 - len2 r r)), zero for a zero length, times the vector.
-    auto normalize3 = [&dot3](__m128 v) {
-        const __m128 len2 = dot3(v, v);
-        const __m128 approx = _mm_rsqrt_ss(len2);
-        const __m128 lenInv = _mm_andnot_ps(
-            _mm_cmpeq_ss(len2, _mm_setzero_ps()),
-            _mm_mul_ss(
-                _mm_mul_ss(_mm_set_ss(0.5f), approx),
-                _mm_sub_ss(_mm_set_ss(3.0f), _mm_mul_ss(_mm_mul_ss(len2, approx), approx))
-            )
-        );
-        return _mm_mul_ps(_mm_shuffle_ps(lenInv, lenInv, 0), v);
-    };
     // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
     // The lane of the smallest |x| is left zero; the other two are swapped, one negated.
     auto setPerpendicular = [](hkVector4& arOut, const hkVector4& arIn) {
@@ -285,21 +265,12 @@ void hkpWheelConstraintData::setInWorldSpace(
         arOut(iOk1) = arIn(iOk2);
         arOut(iOk2) = -arIn(iOk1);
     };
-    // EXE-INLINED none: hkVector4::setCross
-    auto cross = [](__m128 v0, __m128 v1) {
-        return _mm_sub_ps(
-            _mm_mul_ps(
-                _mm_shuffle_ps(v0, v0, _MM_SHUFFLE(3, 0, 2, 1)), _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(3, 1, 0, 2))
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(v0, v0, _MM_SHUFFLE(3, 1, 0, 2)), _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(3, 0, 2, 1)))
-        );
-    };
     hkVector4 axle;
     axle.m_quad = axleTmp.m_quad;
-    axle.m_quad = normalize3(axle.m_quad);
+    axle.normalize3();
     hkVector4 steeringAxis;
     steeringAxis.m_quad = steeringAxisTmp.m_quad;
-    steeringAxis.m_quad = normalize3(steeringAxis.m_quad);
+    steeringAxis.normalize3();
     // The suspension: the pivot in each body's space, frame A's rotation the identity.
     hkTransform& suspensionA = m_atoms.m_suspensionBase.m_transformA;
     hkTransform& suspensionB = m_atoms.m_suspensionBase.m_transformB;
@@ -316,9 +287,8 @@ void hkpWheelConstraintData::setInWorldSpace(
     suspensionA.m_rotation.m_col2(2) = 1.0f;
     suspensionB.m_rotation.m_col0.setRotatedInverseDir(bodyBTransform.m_rotation, suspensionAxis);
     setPerpendicular(suspensionB.m_rotation.m_col1, suspensionB.m_rotation.m_col0);
-    suspensionB.m_rotation.m_col1.m_quad = normalize3(suspensionB.m_rotation.m_col1.m_quad);
-    suspensionB.m_rotation.m_col2.m_quad =
-        cross(suspensionB.m_rotation.m_col0.m_quad, suspensionB.m_rotation.m_col1.m_quad);
+    suspensionB.m_rotation.m_col1.normalize3();
+    suspensionB.m_rotation.m_col2.setCross(suspensionB.m_rotation.m_col0, suspensionB.m_rotation.m_col1);
     // The steering bases.
     hkRotation& steeringA = m_atoms.m_steeringBase.m_rotationA;
     hkRotation& steeringB = m_atoms.m_steeringBase.m_rotationB;
@@ -328,8 +298,8 @@ void hkpWheelConstraintData::setInWorldSpace(
     steeringA.m_col1.setRotatedInverseDir(bodyATransform.m_rotation, steeringAxis);
     steeringB.m_col1.setRotatedInverseDir(bodyBTransform.m_rotation, steeringAxis);
     m_initialSteeringAxisInB = steeringB.m_col1;
-    steeringA.m_col2.m_quad = cross(steeringA.m_col0.m_quad, steeringA.m_col1.m_quad);
-    steeringB.m_col2.m_quad = cross(steeringB.m_col0.m_quad, steeringB.m_col1.m_quad);
+    steeringA.m_col2.setCross(steeringA.m_col0, steeringA.m_col1);
+    steeringB.m_col2.setCross(steeringB.m_col0, steeringB.m_col1);
 }
 
 void hkpWheelConstraintData::setInBodySpace(

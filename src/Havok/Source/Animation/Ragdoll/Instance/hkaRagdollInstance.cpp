@@ -343,32 +343,9 @@ void hkaRagdollInstance::setPoseAndVelocitiesModelSpace(
         if (!pRigidBody) {
             continue;
         }
-        const __m128 kMinusHalf = _mm_load_ps(&reinterpret_cast<const float*>(&hkQuadRealMinusHalf)[0]);
-
         alignas(16) hkQsTransform rbTransformA;
-        {
-            // EXE-INLINED none: hkVector4::setRotatedDir
-            const __m128 q = _mm_load_ps(&reinterpret_cast<const float*>(&worldFromModelA.m_rotation.m_vec.m_quad)[0]);
-            const __m128 v = _mm_load_ps(&reinterpret_cast<const float*>(&poseModelSpaceA[i].m_translation.m_quad)[0]);
-            const __m128 kProd = _mm_mul_ps(q, v);
-            const __m128 kDot =
-                _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0x55), kProd));
-            const __m128 kCross = _mm_sub_ps(
-                _mm_mul_ps(_mm_shuffle_ps(q, q, 0xC9), _mm_shuffle_ps(v, v, 0xD2)),
-                _mm_mul_ps(_mm_shuffle_ps(q, q, 0xD2), _mm_shuffle_ps(v, v, 0xC9))
-            );
-            const __m128 kW = _mm_shuffle_ps(q, q, 0xFF);
-            const __m128 kScaled = _mm_mul_ps(_mm_add_ps(_mm_mul_ps(kW, kW), kMinusHalf), v);
-            const __m128 kDotQ = _mm_mul_ps(_mm_shuffle_ps(kDot, kDot, 0), q);
-            const __m128 kSum = _mm_add_ps(_mm_mul_ps(kCross, kW), _mm_add_ps(kScaled, kDotQ));
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&rbTransformA.m_translation.m_quad)[0],
-                _mm_add_ps(
-                    _mm_add_ps(kSum, kSum),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&worldFromModelA.m_translation.m_quad)[0])
-                )
-            );
-        }
+        rbTransformA.m_translation.setRotatedDir(worldFromModelA.m_rotation, poseModelSpaceA[i].m_translation);
+        rbTransformA.m_translation.add4(worldFromModelA.m_translation);
         rbTransformA.m_rotation.setMul(worldFromModelA.m_rotation, poseModelSpaceA[i].m_rotation);
         _mm_store_ps(
             &reinterpret_cast<float*>(&rbTransformA.m_scale.m_quad)[0],
@@ -380,29 +357,8 @@ void hkaRagdollInstance::setPoseAndVelocitiesModelSpace(
         rbTransformA.m_rotation.normalize();
 
         alignas(16) hkQsTransform rbTransformB;
-        {
-            // EXE-INLINED none: hkVector4::setRotatedDir
-            const __m128 q = _mm_load_ps(&reinterpret_cast<const float*>(&worldFromModelB.m_rotation.m_vec.m_quad)[0]);
-            const __m128 v = _mm_load_ps(&reinterpret_cast<const float*>(&poseModelSpaceB[i].m_translation.m_quad)[0]);
-            const __m128 kProd = _mm_mul_ps(q, v);
-            const __m128 kDot =
-                _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0xAA), _mm_add_ss(_mm_shuffle_ps(kProd, kProd, 0x55), kProd));
-            const __m128 kCross = _mm_sub_ps(
-                _mm_mul_ps(_mm_shuffle_ps(q, q, 0xC9), _mm_shuffle_ps(v, v, 0xD2)),
-                _mm_mul_ps(_mm_shuffle_ps(q, q, 0xD2), _mm_shuffle_ps(v, v, 0xC9))
-            );
-            const __m128 kW = _mm_shuffle_ps(q, q, 0xFF);
-            const __m128 kScaled = _mm_mul_ps(_mm_add_ps(_mm_mul_ps(kW, kW), kMinusHalf), v);
-            const __m128 kDotQ = _mm_mul_ps(_mm_shuffle_ps(kDot, kDot, 0), q);
-            const __m128 kSum = _mm_add_ps(_mm_mul_ps(kCross, kW), _mm_add_ps(kScaled, kDotQ));
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&rbTransformB.m_translation.m_quad)[0],
-                _mm_add_ps(
-                    _mm_add_ps(kSum, kSum),
-                    _mm_load_ps(&reinterpret_cast<const float*>(&worldFromModelB.m_translation.m_quad)[0])
-                )
-            );
-        }
+        rbTransformB.m_translation.setRotatedDir(worldFromModelB.m_rotation, poseModelSpaceB[i].m_translation);
+        rbTransformB.m_translation.add4(worldFromModelB.m_translation);
         rbTransformB.m_rotation.setMul(worldFromModelB.m_rotation, poseModelSpaceB[i].m_rotation);
         _mm_store_ps(
             &reinterpret_cast<float*>(&rbTransformB.m_scale.m_quad)[0],
@@ -416,8 +372,6 @@ void hkaRagdollInstance::setPoseAndVelocitiesModelSpace(
         pRigidBody->setPositionAndRotation(rbTransformB.m_translation, rbTransformB.m_rotation);
 
         hkpMotion* pMotion = &pRigidBody->m_motion;
-        const __m128 kAbsMask = _mm_load_ps(&reinterpret_cast<const float*>(&hkVector4_setAbs4_absMask)[0]);
-        const __m128 kThreshold = _mm_set1_ps(0.001f);
         alignas(16) hkVector4 linearVelocity;
         _mm_store_ps(
             &reinterpret_cast<float*>(&linearVelocity.m_quad)[0],
@@ -429,18 +383,7 @@ void hkaRagdollInstance::setPoseAndVelocitiesModelSpace(
                 )
             )
         );
-        // EXE-INLINED none: hkVector4::equals4
-        if ((_mm_movemask_ps(_mm_cmple_ps(
-                 _mm_and_ps(
-                     _mm_sub_ps(
-                         _mm_load_ps(&reinterpret_cast<float*>(&linearVelocity.m_quad)[0]),
-                         _mm_load_ps(&reinterpret_cast<float*>(&pRigidBody->m_motion.m_linearVelocity.m_quad)[0])
-                     ),
-                     kAbsMask
-                 ),
-                 kThreshold
-             )) &
-             0xF) != 0xF) {
+        if (!linearVelocity.equals4(pRigidBody->m_motion.m_linearVelocity, 0.001f)) {
             // EXE-INLINED 0x5616D0
             pRigidBody->activate();
             pMotion->setLinearVelocity(linearVelocity);
@@ -466,18 +409,7 @@ void hkaRagdollInstance::setPoseAndVelocitiesModelSpace(
         else {
             _mm_store_ps(&reinterpret_cast<float*>(&angularVelocity.m_quad)[0], _mm_setzero_ps());
         }
-        // EXE-INLINED none: hkVector4::equals4
-        if ((_mm_movemask_ps(_mm_cmple_ps(
-                 _mm_and_ps(
-                     _mm_sub_ps(
-                         _mm_load_ps(&reinterpret_cast<float*>(&angularVelocity.m_quad)[0]),
-                         _mm_load_ps(&reinterpret_cast<float*>(&pRigidBody->m_motion.m_angularVelocity.m_quad)[0])
-                     ),
-                     kAbsMask
-                 ),
-                 kThreshold
-             )) &
-             0xF) != 0xF) {
+        if (!angularVelocity.equals4(pRigidBody->m_motion.m_angularVelocity, 0.001f)) {
             // EXE-INLINED 0x561800
             pRigidBody->activate();
             pMotion->setAngularVelocity(angularVelocity);

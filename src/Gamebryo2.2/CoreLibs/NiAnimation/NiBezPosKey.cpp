@@ -35,8 +35,7 @@ bool NiBezPosKey::Equal(const NiAnimationKey& key0, const NiAnimationKey& key1) 
     }
     const NiBezPosKey& bez0 = static_cast<const NiBezPosKey&>(key0);
     const NiBezPosKey& bez1 = static_cast<const NiBezPosKey&>(key1);
-    // EXE-INLINED 0x4390C0
-    if (!(bez0.m_InTan.x == bez1.m_InTan.x && bez0.m_InTan.y == bez1.m_InTan.y && bez0.m_InTan.z == bez1.m_InTan.z)) {
+    if (!(bez0.m_InTan == bez1.m_InTan)) {
         return false;
     }
     return bez0.m_OutTan == bez1.m_OutTan;
@@ -248,16 +247,9 @@ float NiBezPosKey::ComputeMaxCurvature(NiAnimationKey* pkKeys, uint32_t uiNumKey
             alignas(8) NiPoint3 d2;
             InterpolateD1(fTime, pBez0, pBez1, &d1);
             InterpolateD2(fTime, pBez0, pBez1, &d2);
-            // EXE-INLINED 0x4B3800
-            NiPoint3 kCross;
-            kCross.x = d1.y * d2.z - d1.z * d2.y;
-            kCross.y = d1.z * d2.x - d1.x * d2.z;
-            kCross.z = d1.x * d2.y - d1.y * d2.x;
-            // EXE-INLINED 0x457990
-            float fCrossSqrLength = kCross.x * kCross.x + kCross.y * kCross.y + kCross.z * kCross.z;
-            float fCrossLength = std::sqrt(fCrossSqrLength);
-            // EXE-INLINED 0x4A7290
-            float fSqrLength = d1.x * d1.x + d1.y * d1.y + d1.z * d1.z;
+            NiPoint3 kCross = d1.Cross(d2);
+            float fCrossLength = kCross.Length();
+            float fSqrLength = d1.SqrLength();
             float fCurvature = fCrossLength / fSqrLength;
             if (fCurvature > fMaxCurvature) {
                 fMaxCurvature = fCurvature;
