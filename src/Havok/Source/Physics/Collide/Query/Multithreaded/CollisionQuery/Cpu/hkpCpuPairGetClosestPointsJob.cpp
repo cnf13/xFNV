@@ -68,19 +68,9 @@ void hkCpuPairGetClosestPointsImplementation(
             const int32_t numHits = static_cast<uint16_t>(collector.m_numPoints.m_storage);
             command->m_numResultsOut = numHits;
             if (numHits > 0) {
-                // EXE-INLINED none: hkString::memCpy16NonEmpty, which copies the points as untyped 16-byte quads.
-                const uint32_t* src32 = static_cast<const uint32_t*>(static_cast<const void*>(pointsBuffer));
-                uint32_t* dst32 = static_cast<uint32_t*>(static_cast<void*>(dest));
-                int32_t numQuads = numHits * static_cast<int32_t>(sizeof(hkpRootCdPoint) / 16);
-                do {
-                    dst32[0] = src32[0];
-                    dst32[1] = src32[1];
-                    dst32[2] = src32[2];
-                    dst32[3] = src32[3];
-                    dst32 += 4;
-                    src32 += 4;
-                }
-                while (--numQuads > 0);
+                hkString::memCpy16NonEmpty(
+                    dest, pointsBuffer, numHits * static_cast<int32_t>(sizeof(hkpRootCdPoint) / 16)
+                );
             }
         }
     }

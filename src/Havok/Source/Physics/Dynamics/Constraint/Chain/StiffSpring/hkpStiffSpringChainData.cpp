@@ -191,23 +191,10 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
         // EXE-INLINED none: hkAddByteOffset<hkpVelocityAccumulator>
         in2.m_bodyB =
             reinterpret_cast<hkpVelocityAccumulator*>(reinterpret_cast<char*>(pAccumsBase) + pEntity->m_solverData);
-        const uint32_t uiOffset =
+        hkpVelocityAccumulatorOffset kOffset;
+        kOffset.m_offset =
             static_cast<uint32_t>(reinterpret_cast<char*>(in2.m_bodyB) - reinterpret_cast<char*>(pAccumsBase));
-        {
-            // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::pushBack
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            if (accumulators.m_size ==
-                (accumulators.m_capacityAndFlags & hkArrayBase<hkpVelocityAccumulatorOffset>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(
-                    heap, &accumulators, static_cast<int32_t>(sizeof(hkpVelocityAccumulatorOffset))
-                );
-            }
-            hkpVelocityAccumulatorOffset* pSlot = accumulators.m_data + accumulators.m_size;
-            if (pSlot) {
-                pSlot->m_offset = uiOffset;
-            }
-            ++accumulators.m_size;
-        }
+        accumulators.pushBack(kOffset);
         in2.m_transformB = &pEntity->getMotion()->getTransform();
 
         hkp1dLinearBilateralConstraintInfo info;

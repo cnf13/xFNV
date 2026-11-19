@@ -1565,16 +1565,8 @@ void NiDX9Renderer::PurgeAllD3DShaders() {
             }
         }
         pkItem->m_element = nullptr;
-        // EXE-INLINED 0x45CEE0
-        // The freed item's memory goes back to the pool untyped, as Deallocate's void* parameter takes it.
-        using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
-        PoolAllocator::Lock();
-        void* pFreedMemory = pkItem;
-        PoolAllocator::AllocNode* pkFreed = static_cast<PoolAllocator::AllocNode*>(pFreedMemory);
-        pkFreed->m_pkData = nullptr;
-        pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
-        PoolAllocator::ms_pkFreeMem = pkFreed;
-        PoolAllocator::Unlock();
+        // The node goes back to the node pool, called with the list's count field as its `this`.
+        reinterpret_cast<NiTPointerAllocator<uint32_t>&>(m_kD3DShaders.m_uiCount).Deallocate(pkItem);
         m_kD3DShaders.m_uiCount--;
     }
 }

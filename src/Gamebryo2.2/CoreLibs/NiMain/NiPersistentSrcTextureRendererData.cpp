@@ -10,6 +10,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
@@ -47,44 +48,27 @@ void NiPersistentSrcTextureRendererData::LoadBinary(NiStream& kStream) {
     uint32_t auiWidth[16];
     uint32_t auiHeight[16];
     uint32_t auiOffsetInBytes[17];
-    uint32_t uiSize;
     NiObject::LoadBinary(kStream);
     m_kPixelFormat.LoadBinary(kStream);
     kStream.ReadLinkID();
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    kStream.m_pkIstr->BinaryRead(&m_uiMipmapLevels, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    kStream.m_pkIstr->BinaryRead(&m_uiPixelStride, 4, &uiSize, 1);
+    NiStreamLoadBinary(kStream, m_uiMipmapLevels);
+    NiStreamLoadBinary(kStream, m_uiPixelStride);
     for (uint32_t i = 0; i < m_uiMipmapLevels; i++) {
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamLoadBinary
-        kStream.m_pkIstr->BinaryRead(&auiWidth[i], 4, &uiSize, 1);
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamLoadBinary
-        kStream.m_pkIstr->BinaryRead(&auiHeight[i], 4, &uiSize, 1);
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamLoadBinary
-        kStream.m_pkIstr->BinaryRead(&auiOffsetInBytes[i], 4, &uiSize, 1);
+        NiStreamLoadBinary(kStream, auiWidth[i]);
+        NiStreamLoadBinary(kStream, auiHeight[i]);
+        NiStreamLoadBinary(kStream, auiOffsetInBytes[i]);
     }
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    kStream.m_pkIstr->BinaryRead(&auiOffsetInBytes[m_uiMipmapLevels], 4, &uiSize, 1);
+    NiStreamLoadBinary(kStream, auiOffsetInBytes[m_uiMipmapLevels]);
     if (kStream.GetFileVersion() >= NiStream::GetVersion(20, 2, 0, 6)) {
         m_uiPadOffsetInBytes = 0;
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamLoadBinary
-        kStream.m_pkIstr->BinaryRead(&m_uiPadOffsetInBytes, 4, &uiSize, 1);
+        NiStreamLoadBinary(kStream, m_uiPadOffsetInBytes);
     }
     else {
         m_uiPadOffsetInBytes = auiOffsetInBytes[m_uiMipmapLevels];
     }
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    kStream.m_pkIstr->BinaryRead(&m_uiFaces, 4, &uiSize, 1);
+    NiStreamLoadBinary(kStream, m_uiFaces);
     PlatformID ePlatform;
-    uiSize = 4;
+    uint32_t uiSize = 4;
     // EXE-INLINED none: NiStreamLoadEnum
     kStream.m_pkIstr->BinaryRead(&ePlatform, 4, &uiSize, 1);
     m_eTargetPlatform = ePlatform;
@@ -94,9 +78,7 @@ void NiPersistentSrcTextureRendererData::LoadBinary(NiStream& kStream) {
     rt::memcpy(m_puiHeight, auiHeight, uiTableBytes);
     rt::memcpy(m_puiOffsetInBytes, auiOffsetInBytes, (m_uiMipmapLevels + 1) * sizeof(uint32_t));
     // The pixels go as one-byte components.
-    uint32_t uiByteSize = 1;
-    // EXE-INLINED none: NiStreamLoadBinary
-    kStream.m_pkIstr->BinaryRead(m_pucPixels, m_puiOffsetInBytes[m_uiMipmapLevels] * m_uiFaces, &uiByteSize, 1);
+    NiStreamLoadBinary(kStream, m_pucPixels, m_puiOffsetInBytes[m_uiMipmapLevels] * m_uiFaces);
     if (ms_bToolModeStreaming) {
         uint32_t uiMaxOffsetInBytes = m_puiOffsetInBytes[m_uiMipmapLevels];
         uint32_t uiTotalPixelMemory = uiMaxOffsetInBytes * m_uiFaces;
@@ -133,54 +115,31 @@ void NiPersistentSrcTextureRendererData::SaveBinary(NiStream& kStream) {
         m_uiPristinePadOffsetInBytes != 0 && m_pucPristinePixels != nullptr;
     m_kPixelFormat.SaveBinary(kStream);
     kStream.SaveLinkID(m_spPalette.m_pObject);
-    uint32_t uiSize = 4;
-    // EXE-INLINED none: NiStreamSaveBinary
-    kStream.m_pkOstr->BinaryWrite(&m_uiMipmapLevels, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamSaveBinary
-    kStream.m_pkOstr->BinaryWrite(&m_uiPixelStride, 4, &uiSize, 1);
+    NiStreamSaveBinary(kStream, m_uiMipmapLevels);
+    NiStreamSaveBinary(kStream, m_uiPixelStride);
     for (uint32_t i = 0; i < m_uiMipmapLevels; ++i) {
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_puiWidth[i], 4, &uiSize, 1);
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_puiHeight[i], 4, &uiSize, 1);
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_puiOffsetInBytes[i], 4, &uiSize, 1);
+        NiStreamSaveBinary(kStream, m_puiWidth[i]);
+        NiStreamSaveBinary(kStream, m_puiHeight[i]);
+        NiStreamSaveBinary(kStream, m_puiOffsetInBytes[i]);
     }
     if (bToolModeStreamingValid) {
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_uiPristineMaxOffsetInBytes, 4, &uiSize, 1);
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_uiPristinePadOffsetInBytes, 4, &uiSize, 1);
+        NiStreamSaveBinary(kStream, m_uiPristineMaxOffsetInBytes);
+        NiStreamSaveBinary(kStream, m_uiPristinePadOffsetInBytes);
     }
     else {
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_puiOffsetInBytes[m_uiMipmapLevels], 4, &uiSize, 1);
-        uiSize = 4;
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(&m_uiPadOffsetInBytes, 4, &uiSize, 1);
+        NiStreamSaveBinary(kStream, m_puiOffsetInBytes[m_uiMipmapLevels]);
+        NiStreamSaveBinary(kStream, m_uiPadOffsetInBytes);
     }
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamSaveBinary
-    kStream.m_pkOstr->BinaryWrite(&m_uiFaces, 4, &uiSize, 1);
-    uiSize = 4;
+    NiStreamSaveBinary(kStream, m_uiFaces);
+    uint32_t uiSize = 4;
     // EXE-INLINED none: NiStreamSaveEnum
     kStream.m_pkOstr->BinaryWrite(&m_eTargetPlatform, 4, &uiSize, 1);
     // The pixels go as one-byte components.
-    uint32_t uiByteSize = 1;
     if (bToolModeStreamingValid) {
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(m_pucPristinePixels, m_uiPristineMaxOffsetInBytes * m_uiFaces, &uiByteSize, 1);
+        NiStreamSaveBinary(kStream, m_pucPristinePixels, m_uiPristineMaxOffsetInBytes * m_uiFaces);
     }
     else {
-        // EXE-INLINED none: NiStreamSaveBinary
-        kStream.m_pkOstr->BinaryWrite(m_pucPixels, m_puiOffsetInBytes[m_uiMipmapLevels] * m_uiFaces, &uiByteSize, 1);
+        NiStreamSaveBinary(kStream, m_pucPixels, m_puiOffsetInBytes[m_uiMipmapLevels] * m_uiFaces);
     }
 }
 

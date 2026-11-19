@@ -763,21 +763,7 @@ void hkpMeshWeldingUtility::computeWeldingInfo(
     info.m_transform = hkTransformIdentity;
     info.m_shape = bvTree;
     hkLocalArray<hkpMeshWeldingUtility::ShapeInfo> shapes(1);
-    {
-        // EXE-INLINED none: hkArray<hkpMeshWeldingUtility::ShapeInfo>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (shapes.m_size ==
-            (shapes.m_capacityAndFlags & hkArrayBase<hkpMeshWeldingUtility::ShapeInfo>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(
-                *router.m_heap, &shapes, static_cast<int32_t>(sizeof(hkpMeshWeldingUtility::ShapeInfo))
-            );
-        }
-        hkpMeshWeldingUtility::ShapeInfo* pInfo = shapes.m_data + shapes.m_size;
-        if (pInfo) {
-            ::new (pInfo) hkpMeshWeldingUtility::ShapeInfo(info);
-        }
-        ++shapes.m_size;
-    }
+    shapes.pushBack(info);
     hkpMeshWeldingUtility::computeWeldingInfoMultiShape(
         hkTransformIdentity, collection, weldingType, shapes, weldOpenEdges
     );
@@ -968,20 +954,7 @@ float hkHistogram::evaluate() {
         else {
             fWidth = fSum;
         }
-        {
-            // EXE-INLINED none: hkArray<hkEntry>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (ranges.m_size == (ranges.m_capacityAndFlags & hkArrayBase<hkEntry>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &ranges, static_cast<int32_t>(sizeof(hkEntry)));
-            }
-            hkEntry* pRange = ranges.m_data + ranges.m_size;
-            if (pRange) {
-                pRange->m_lo = 0.0f;
-                pRange->m_hi = fWidth;
-                pRange->m_value = fValue;
-            }
-            ++ranges.m_size;
-        }
+        ranges.pushBack(hkEntry{0.0f, fWidth, fValue});
         iStart = i;
     }
     float fBest = 3.1415927f;

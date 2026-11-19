@@ -207,29 +207,8 @@ LABEL_21:;
 
 // Disables every device light enabled during the last frame and empties the device light list.
 void NiDX9LightManager::NextFrame() {
-    using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
     while (m_kDeviceLights.GetSize()) {
-        // EXE-INLINED 0x7B5390
-        NiTListItem<NiLight*>* pkNode = m_kDeviceLights.m_pkHead;
-        m_kDeviceLights.m_pkHead = pkNode->m_pkNext;
-        if (m_kDeviceLights.m_pkHead) {
-            m_kDeviceLights.m_pkHead->m_pkPrev = nullptr;
-        }
-        else {
-            m_kDeviceLights.m_pkTail = nullptr;
-        }
-        NiLight* pkActive = pkNode->m_element;
-        // EXE-INLINED none: NiTPointerListBase<NiLight*>::DeleteItem
-        pkNode->m_element = nullptr;
-        PoolAllocator::Lock();
-        // The freed node is raw pool memory again: the pool links it as an AllocNode, as the game does.
-        PoolAllocator::AllocNode* pkFreed = reinterpret_cast<PoolAllocator::AllocNode*>(pkNode);
-        pkFreed->m_pkData = nullptr;
-        pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
-        PoolAllocator::ms_pkFreeMem = pkFreed;
-        PoolAllocator::Unlock();
-        m_kDeviceLights.m_uiCount--;
-
+        NiLight* pkActive = m_kDeviceLights.RemoveHead();
         LightEntry* pkLightEntry = static_cast<LightEntry*>(pkActive->m_pvRendererData);
         m_pkD3DDevice9->LightEnable(pkLightEntry->m_iIndex, 0);
         pkLightEntry->m_bActive = false;
@@ -262,15 +241,7 @@ void NiDX9LightManager::RemoveLight(NiLight* apLight) {
 
 // Disables and frees every light entry of the light map and takes its light off the device light list.
 void NiDX9LightManager::ReleaseLights() {
-    using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
-    // EXE-INLINED 0xEE8AC0
-    NiTMapItem<NiLight*, LightEntry*>* kPos = nullptr;
-    for (uint32_t i = 0; i < m_kLights.m_uiHashSize; ++i) {
-        if (m_kLights.m_ppkHashTable[i]) {
-            kPos = m_kLights.m_ppkHashTable[i];
-            break;
-        }
-    }
+    NiTMapItem<NiLight*, LightEntry*>* kPos = m_kLights.GetFirstPos();
     while (kPos) {
         NiLight* pkLight;
         LightEntry* pkLightEntry = nullptr;
@@ -285,45 +256,7 @@ void NiDX9LightManager::ReleaseLights() {
 
         m_kLights.RemoveAt(pkLight);
 
-        // m_kDeviceLights.Remove(pkLight), written out in place.
-        // EXE-INLINED 0x57C730
-        NiTListItem<NiLight*>* pkHead = m_kDeviceLights.m_pkHead;
-        // EXE-INLINED 0x49C680
-        NiTListItem<NiLight*>* pkNode = nullptr;
-        for (NiTListItem<NiLight*>* pkItem = pkHead; pkItem; pkItem = pkItem->m_pkNext) {
-            if (pkLight == pkItem->m_element) {
-                pkNode = pkItem;
-                break;
-            }
-        }
-        if (pkNode) {
-            if (pkNode == pkHead) {
-                m_kDeviceLights.RemoveHead();
-            }
-            else if (pkNode == m_kDeviceLights.m_pkTail) {
-                m_kDeviceLights.RemoveTail();
-            }
-            else {
-                NiTListItem<NiLight*>* pkPrev = pkNode->m_pkPrev;
-                NiTListItem<NiLight*>* pkNext = pkNode->m_pkNext;
-                if (pkPrev) {
-                    pkPrev->m_pkNext = pkNext;
-                }
-                if (pkNext) {
-                    pkNext->m_pkPrev = pkPrev;
-                }
-                // EXE-INLINED none: NiTPointerListBase<NiLight*>::DeleteItem
-                pkNode->m_element = nullptr;
-                PoolAllocator::Lock();
-                // The freed node is raw pool memory again: the pool links it as an AllocNode, as the game does.
-                PoolAllocator::AllocNode* pkFreed = reinterpret_cast<PoolAllocator::AllocNode*>(pkNode);
-                pkFreed->m_pkData = nullptr;
-                pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
-                PoolAllocator::ms_pkFreeMem = pkFreed;
-                PoolAllocator::Unlock();
-                m_kDeviceLights.m_uiCount--;
-            }
-        }
+        m_kDeviceLights.Remove(pkLight);
 
         pkLight->m_pvRendererData = nullptr;
 

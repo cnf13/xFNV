@@ -68,6 +68,7 @@
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/LocalArray/hkLocalArray.h"
+#include "Havok/Source/Common/Base/Container/LocalArray/hkLocalBuffer.h"
 #include "Havok/Source/Common/Base/Container/PointerMap/hkPointerMap.h"
 #include "Havok/Source/Common/Base/Container/String/hkString.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
@@ -172,13 +173,7 @@ void AddRagdollData(
         return;
     }
     hkpRigidBody* phkBody = static_cast<hkpRigidBody*>(apBody->phkObject);
-    // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    if (arBones.m_size == (arBones.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*kRouter.m_heap, &arBones, sizeof(hkpRigidBody*));
-    }
-    arBones.m_data[arBones.m_size] = phkBody;
-    arBones.m_size += 1;
+    arBones.pushBack(phkBody);
     for (BSSimpleList<NiPointer<bhkSerializable>>* pNode = &apBody->kActionConstrants; pNode; pNode = pNode->m_pkNext) {
         bhkSerializable* pItem = pNode->m_item;
         if (!pItem) {
@@ -188,14 +183,7 @@ void AddRagdollData(
             pItem->IsKindOf(&bhkConstraint::ms_RTTI) ? static_cast<bhkConstraint*>(pItem) : nullptr;
         if (pConstraint) {
             hkpConstraintInstance* phkConstraint = static_cast<hkpConstraintInstance*>(pConstraint->phkObject);
-            // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-            hkMemoryRouter& kConstraintRouter = hkMemoryRouter::getInstance();
-            if (arConstraints.m_size ==
-                (arConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*kConstraintRouter.m_heap, &arConstraints, sizeof(hkpConstraintInstance*));
-            }
-            arConstraints.m_data[arConstraints.m_size] = phkConstraint;
-            arConstraints.m_size += 1;
+            arConstraints.pushBack(phkConstraint);
         }
     }
 }
@@ -923,29 +911,19 @@ void bhkRagdollController::InitPoseMatching(
         do {
             bhkPoseArray::bhkPose* pPose = spPoseA.m_pObject->PoseA[i];
             int32_t iNumBones = pskel->m_bones.m_size;
-            int32_t iBufferSize = (iNumBones * static_cast<int32_t>(sizeof(hkQsTransform)) + 0x7F) & ~0x7F;
-            // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-            hkMemoryRouter& kLocalRouter = hkMemoryRouter::getInstance();
-            char* pLocalBuffer = kLocalRouter.m_stack.m_next.m_storage;
-            kLocalRouter.m_stack.m_next.m_storage = pLocalBuffer + iBufferSize;
-            // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-            hkMemoryRouter& kModelRouter = hkMemoryRouter::getInstance();
-            char* pModelBuffer = kModelRouter.m_stack.m_next.m_storage;
-            kModelRouter.m_stack.m_next.m_storage = pModelBuffer + iBufferSize;
-            // The stack allocator's bytes are untyped memory; they are used as the poses.
-            hkQsTransform* pLocalPose = reinterpret_cast<hkQsTransform*>(pLocalBuffer);
-            hkQsTransform* pModelPose = reinterpret_cast<hkQsTransform*>(pModelBuffer);
-            for (int32_t iBone = 0; iBone < iNumBones; ++iBone) {
-                pLocalPose[iBone] = pPose->BoneTransfA[iBone];
+            {
+                hkLocalBuffer<hkQsTransform> kLocalPose(iNumBones, nullptr);
+                hkLocalBuffer<hkQsTransform> kModelPose(iNumBones, nullptr);
+                hkQsTransform* pLocalPose = kLocalPose.begin();
+                hkQsTransform* pModelPose = kModelPose.begin();
+                for (int32_t iBone = 0; iBone < iNumBones; ++iBone) {
+                    pLocalPose[iBone] = pPose->BoneTransfA[iBone];
+                }
+                hkaSkeletonUtils::transformLocalPoseToModelPose(
+                    iNumBones, pskel->m_parentIndices.m_data, pLocalPose, pModelPose
+                );
+                pMatchUtil->addCandidatePose(pModelPose, nullptr, 0.0f);
             }
-            hkaSkeletonUtils::transformLocalPoseToModelPose(
-                iNumBones, pskel->m_parentIndices.m_data, pLocalPose, pModelPose
-            );
-            pMatchUtil->addCandidatePose(pModelPose, nullptr, 0.0f);
-            // EXE-INLINED 0xC7B130
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pModelBuffer;
-            // EXE-INLINED 0xC7B130
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pLocalBuffer;
             ++i;
         }
         while (i < spPoseA.m_pObject->uiNumPose);
@@ -995,18 +973,10 @@ void bhkRagdollController::SetRagdollFeedbackActive(int32_t abActive) {
         FeedbackTimer.iTargetTime = 0;
     }
     int32_t iNumBones = pRagdollInstance->m_skeleton->m_bones.m_size;
-    int32_t iBufferSize = (iNumBones * static_cast<int32_t>(sizeof(hkVector4)) + 0x7F) & ~0x7F;
-    // EXE-INLINED none: hkLocalBuffer<hkVector4>::hkLocalBuffer
-    hkMemoryRouter& kLinearRouter = hkMemoryRouter::getInstance();
-    char* pLinearBuffer = kLinearRouter.m_stack.m_next.m_storage;
-    kLinearRouter.m_stack.m_next.m_storage = pLinearBuffer + iBufferSize;
-    // EXE-INLINED none: hkLocalBuffer<hkVector4>::hkLocalBuffer
-    hkMemoryRouter& kAngularRouter = hkMemoryRouter::getInstance();
-    char* pAngularBuffer = kAngularRouter.m_stack.m_next.m_storage;
-    kAngularRouter.m_stack.m_next.m_storage = pAngularBuffer + iBufferSize;
-    // The stack allocator's bytes are untyped memory; they are used as the velocities.
-    hkVector4* pLinearVelA = reinterpret_cast<hkVector4*>(pLinearBuffer);
-    hkVector4* pAngularVelA = reinterpret_cast<hkVector4*>(pAngularBuffer);
+    hkLocalBuffer<hkVector4> kLinearVel(iNumBones, nullptr);
+    hkLocalBuffer<hkVector4> kAngularVel(iNumBones, nullptr);
+    hkVector4* pLinearVelA = kLinearVel.begin();
+    hkVector4* pAngularVelA = kAngularVel.begin();
     hkString::memSet(pLinearVelA, 0, iNumBones * static_cast<int32_t>(sizeof(hkVector4)));
     hkString::memSet(pAngularVelA, 0, iNumBones * static_cast<int32_t>(sizeof(hkVector4)));
     for (int32_t i = 0; i < iNumBones; ++i) {
@@ -1081,10 +1051,6 @@ void bhkRagdollController::SetRagdollFeedbackActive(int32_t abActive) {
         }
     }
     bActiveRagdollFeedback = bActive;
-    // EXE-INLINED none: hkLocalBuffer<hkVector4>::~hkLocalBuffer
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pAngularBuffer;
-    // EXE-INLINED none: hkLocalBuffer<hkVector4>::~hkLocalBuffer
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pLinearBuffer;
 }
 
 void bhkRagdollController::DisableRagdollAnim(bool abUpdateConstraints) {
@@ -1286,12 +1252,8 @@ void bhkRagdollController::DoRagdollAnim(bool abUpdateBones) {
     }
     int32_t iNumBones = (int32_t)pRagdollInstance->m_skeleton->m_bones.m_size;
     bool bUseDrivePose = false;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    char* pBuffer = kRouter.m_stack.m_next.m_storage;
-    kRouter.m_stack.m_next.m_storage = pBuffer + ((iNumBones * 0x30 + 0x7F) & ~0x7F);
-    // The stack allocator's bytes are untyped memory; they are used as the poses.
-    hkQsTransform* pDrivePose = reinterpret_cast<hkQsTransform*>(pBuffer);
+    hkLocalBuffer<hkQsTransform> kDrivePose(iNumBones, nullptr);
+    hkQsTransform* pDrivePose = kDrivePose.begin();
     hkQsTransform* pRigidBodyPose = nullptr;
     if (bPoseMatching.uValue.b && bActivePoseMatch) {
         DoPoseMatching(WorldFromModel, pDrivePose, bUseDrivePose);
@@ -1308,8 +1270,6 @@ void bhkRagdollController::DoRagdollAnim(bool abUpdateBones) {
         UpdateDebugLines(SKEL_FINAL);
         SetSGPoseLocalSpace();
     }
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBuffer;
 }
 
 // Sets each bone of the scene graph pose from the scene graph bone's local transform (its translation scaled by the
@@ -1459,18 +1419,10 @@ void bhkRagdollController::SetSGPoseLocalSpace() {
 void bhkRagdollController::UpdateRagdollRigidBodies(const hkQsTransform* apRagdollPoseLS) {
     const hkaSkeleton* pSkeleton = pRagdollInstance->m_skeleton;
     int32_t iNumBones = pSkeleton->m_bones.m_size;
-    int32_t iBufferSize = (iNumBones * static_cast<int32_t>(sizeof(hkQsTransform)) + 0x7F) & ~0x7F;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kLocalRouter = hkMemoryRouter::getInstance();
-    char* pLocalBuffer = kLocalRouter.m_stack.m_next.m_storage;
-    kLocalRouter.m_stack.m_next.m_storage = pLocalBuffer + iBufferSize;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kModelRouter = hkMemoryRouter::getInstance();
-    char* pModelBuffer = kModelRouter.m_stack.m_next.m_storage;
-    kModelRouter.m_stack.m_next.m_storage = pModelBuffer + iBufferSize;
-    // The stack allocator's bytes are untyped memory; they are used as the poses.
-    hkQsTransform* pPoseLocal = reinterpret_cast<hkQsTransform*>(pLocalBuffer);
-    hkQsTransform* pPoseModel = reinterpret_cast<hkQsTransform*>(pModelBuffer);
+    hkLocalBuffer<hkQsTransform> kPoseLocal(iNumBones, nullptr);
+    hkLocalBuffer<hkQsTransform> kPoseModel(iNumBones, nullptr);
+    hkQsTransform* pPoseLocal = kPoseLocal.begin();
+    hkQsTransform* pPoseModel = kPoseModel.begin();
     RAGDOLL_UPDATE_TYPE ePrevMethod = eRBUpdateMethod;
     if (bQueuedWarp) {
         eRBUpdateMethod = WARP;
@@ -1517,12 +1469,8 @@ void bhkRagdollController::UpdateRagdollRigidBodies(const hkQsTransform* apRagdo
             hkaKeyFrameHierarchyUtility::Output* pStress;
             int32_t iStressCapacityAndFlags;
             if (iNumBones) {
-                // EXE-INLINED none: hkMemoryAllocator::_bufAlloc
-                // The byte count bufAlloc updates sits in a 16-aligned slot of the exe's realigned frame.
-                alignas(16) int32_t iStressBytes =
-                    iNumBones * hkSizeOfTypeOrVoid<hkaKeyFrameHierarchyUtility::Output>::val;
-                pStress = static_cast<hkaKeyFrameHierarchyUtility::Output*>(kHeap.bufAlloc(iStressBytes));
-                int32_t iNumStress = iStressBytes / hkSizeOfTypeOrVoid<hkaKeyFrameHierarchyUtility::Output>::val;
+                int32_t iNumStress = iNumBones;
+                pStress = kHeap._bufAlloc<hkaKeyFrameHierarchyUtility::Output>(iNumStress);
                 iStressCapacityAndFlags = iNumStress
                     ? iNumStress
                     : static_cast<int32_t>(hkArrayBase<hkaKeyFrameHierarchyUtility::Output>::DONT_DEALLOCATE_FLAG);
@@ -1579,10 +1527,6 @@ void bhkRagdollController::UpdateRagdollRigidBodies(const hkQsTransform* apRagdo
         eRBUpdateMethod = ePrevMethod;
         bQueuedWarp = false;
     }
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pModelBuffer;
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pLocalBuffer;
 }
 
 // The pose buffer is an hkLocalBuffer<hkQsTransform>: the thread's stack allocator hands out the bone count's poses
@@ -1605,13 +1549,8 @@ void bhkRagdollController::DoPoseMatching(
             PoseMatchRootLoc = pRagdollRoot->m_kWorld.m_Translate;
             const hkaSkeleton* pskel = pRagdollInstance->m_skeleton;
             int32_t iNumBones = pskel->m_bones.m_size;
-            hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-            // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-            char* pBuffer = kRouter.m_stack.m_next.m_storage;
-            kRouter.m_stack.m_next.m_storage =
-                pBuffer + ((iNumBones * static_cast<int32_t>(sizeof(hkQsTransform)) + 0x7F) & ~0x7F);
-            // The stack allocator's bytes are untyped memory; they are used as the poses.
-            hkQsTransform* pPoseMS = reinterpret_cast<hkQsTransform*>(pBuffer);
+            hkLocalBuffer<hkQsTransform> kPoseMS(iNumBones, nullptr);
+            hkQsTransform* pPoseMS = kPoseMS.begin();
             pRagdollInstance->getPoseModelSpace(pPoseMS, arWorldFromModel);
             int32_t imatchIdx = pMatchUtil->findBestCandidatePoseIndex(pPoseMS, fCurrentMatchError);
             if (!(f0_69999999 > static_cast<double>(fCurrentMatchError)) || imatchIdx == iCurrentMatchPoseIdx ||
@@ -1627,8 +1566,6 @@ void bhkRagdollController::DoPoseMatching(
                 eRBUpdateMethod = bhkRagdollController::DRIVE_CONSTRAINTS;
                 arbUseDrivePose = true;
             }
-            // EXE-INLINED 0xC7B130
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBuffer;
         }
         else {
             spPoseA.m_pObject->CreatePoseForRagdoll(
@@ -2180,35 +2117,20 @@ void bhkRagdollController::DoRagdollFeedback() {
     }
     const hkaSkeleton* pskel = pRagdollInstance->m_skeleton;
     int32_t inumRagdollBones = pskel->m_bones.m_size;
-    int32_t iBufferSize = (inumRagdollBones * static_cast<int32_t>(sizeof(hkQsTransform)) + 0x7F) & ~0x7F;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kRagdollLocalRouter = hkMemoryRouter::getInstance();
-    char* pRagdollLocalBuffer = kRagdollLocalRouter.m_stack.m_next.m_storage;
-    kRagdollLocalRouter.m_stack.m_next.m_storage = pRagdollLocalBuffer + iBufferSize;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kRagdollModelRouter = hkMemoryRouter::getInstance();
-    char* pRagdollModelBuffer = kRagdollModelRouter.m_stack.m_next.m_storage;
-    kRagdollModelRouter.m_stack.m_next.m_storage = pRagdollModelBuffer + iBufferSize;
-    // The stack allocator's bytes are untyped memory; they are used as the poses.
-    hkQsTransform* pRagdollPoseLS = reinterpret_cast<hkQsTransform*>(pRagdollLocalBuffer);
-    hkQsTransform* pRagdollPoseMS = reinterpret_cast<hkQsTransform*>(pRagdollModelBuffer);
-    pRagdollInstance->getPoseModelSpace(pRagdollPoseMS, WorldFromModel);
-    hkaSkeletonUtils::transformModelPoseToLocalPose(
-        inumRagdollBones, pskel->m_parentIndices.m_data, pRagdollPoseMS, pRagdollPoseLS
-    );
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pRagdollModelBuffer;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kLocalRouter = hkMemoryRouter::getInstance();
-    char* pLocalBuffer = kLocalRouter.m_stack.m_next.m_storage;
-    kLocalRouter.m_stack.m_next.m_storage = pLocalBuffer + iBufferSize;
-    // EXE-INLINED none: hkLocalBuffer<hkQsTransform>::hkLocalBuffer
-    hkMemoryRouter& kModelRouter = hkMemoryRouter::getInstance();
-    char* pModelBuffer = kModelRouter.m_stack.m_next.m_storage;
-    kModelRouter.m_stack.m_next.m_storage = pModelBuffer + iBufferSize;
-    // The stack allocator's bytes are untyped memory; they are used as the poses.
-    hkQsTransform* pPoseLS = reinterpret_cast<hkQsTransform*>(pLocalBuffer);
-    hkQsTransform* pPoseMS = reinterpret_cast<hkQsTransform*>(pModelBuffer);
+    hkLocalBuffer<hkQsTransform> kRagdollPoseLS(inumRagdollBones, nullptr);
+    hkQsTransform* pRagdollPoseLS = kRagdollPoseLS.begin();
+    {
+        hkLocalBuffer<hkQsTransform> kRagdollPoseMS(inumRagdollBones, nullptr);
+        hkQsTransform* pRagdollPoseMS = kRagdollPoseMS.begin();
+        pRagdollInstance->getPoseModelSpace(pRagdollPoseMS, WorldFromModel);
+        hkaSkeletonUtils::transformModelPoseToLocalPose(
+            inumRagdollBones, pskel->m_parentIndices.m_data, pRagdollPoseMS, pRagdollPoseLS
+        );
+    }
+    hkLocalBuffer<hkQsTransform> kPoseLS(inumRagdollBones, nullptr);
+    hkLocalBuffer<hkQsTransform> kPoseMS(inumRagdollBones, nullptr);
+    hkQsTransform* pPoseLS = kPoseLS.begin();
+    hkQsTransform* pPoseMS = kPoseMS.begin();
     hkaSkeletonUtils::transformLocalPoseToModelPose(
         inumRagdollBones, pskel->m_parentIndices.m_data, pskel->m_referencePose.m_data, pPoseMS
     );
@@ -2247,12 +2169,6 @@ void bhkRagdollController::DoRagdollFeedback() {
         hkaSkeletonMapper::CURRENT_POSE
     );
     pSGPose->accessUnsyncedPoseModelSpace();
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pModelBuffer;
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pLocalBuffer;
-    // EXE-INLINED 0xC7B130
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pRagdollLocalBuffer;
 }
 
 // Shows or hides the three debug line sets (a hidden object has flag bit 0 set) and attaches the debug node to the
@@ -2966,12 +2882,8 @@ void bhkRagdollController::CreateSGSkeleton() {
                 MemoryManager_Singleton.Deallocate(pMemory - pMemory[-1]);
             }
         }
-        // _Deallocate is called through the array's vtable: a pointer keeps the call indirect.
-        BoneArray* pBoneArray = &kBones;
         if (kBones.pBuffer) {
-            // EXE-INLINED 0x6A8500
-            pBoneArray->_Deallocate(kBones.pBuffer);
-            kBones.pBuffer = nullptr;
+            kBones._DeallocateBuffer();
             kBones.iReservedSize = 0;
             kBones.iSize = 0;
         }
@@ -3687,40 +3599,7 @@ bhkRagdollShareData::~bhkRagdollShareData() {
 // Copies arData into this: the dynamic bone indices, then the enabled flag and the feedback settings.
 void RagdollFeedbackData::Copy(const RagdollFeedbackData& arData) {
     uint32_t uiSize = arData.DynamicBoneIdxA.iSize;
-    // Calls _Allocate and _Deallocate through the array's vtable.
-    BSSimpleArray<int16_t>* pArray = &DynamicBoneIdxA;
-    // EXE-INLINED 0x5EEE80
-    if (!uiSize) {
-        if (pArray->pBuffer) {
-            pArray->_Deallocate(pArray->pBuffer);
-            pArray->pBuffer = nullptr;
-            pArray->iReservedSize = 0;
-            pArray->iSize = 0;
-        }
-    }
-    else {
-        uint32_t uiReservedSize = pArray->iReservedSize;
-        if (uiSize > uiReservedSize) {
-            if (uiReservedSize) {
-                pArray->_ReallocateBuffer(uiSize, pArray->iSize);
-            }
-            else {
-                pArray->pBuffer = pArray->_Allocate(uiSize);
-            }
-            pArray->iReservedSize = uiSize;
-            pArray->iSize = uiSize;
-        }
-        else if (uiSize >= pArray->iSize) {
-            pArray->iSize = uiSize;
-        }
-        else {
-            pArray->iSize = uiSize;
-            if (uiSize <= uiReservedSize >> 2) {
-                pArray->_ReallocateBuffer(uiSize, uiSize);
-                pArray->iReservedSize = uiSize;
-            }
-        }
-    }
+    DynamicBoneIdxA.SetSize(uiSize, true);
     for (uint32_t ui = 0; ui < arData.DynamicBoneIdxA.iSize; ++ui) {
         DynamicBoneIdxA.pBuffer[ui] = arData.DynamicBoneIdxA.pBuffer[ui];
     }

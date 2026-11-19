@@ -85,14 +85,8 @@ void hkaSkeletonMapper::initializeBindingMaps(
     for (int16_t s = 0; s < m_mapping.m_simpleMappings.m_size; ++s) {
         const hkaSkeletonMapperData::SimpleMapping& rSimple = m_mapping.m_simpleMappings.m_data[s];
         if (srcBoneToTrackIndicesOut.m_data[rSimple.m_boneA] >= 0) {
-            // EXE-INLINED none: hkArray<hkInt16>::pushBack
             const int16_t boneB = rSimple.m_boneB;
-            hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-            if (dstTrackToBoneIndicesOut.m_size == dstTrackToBoneIndicesOut.getCapacity()) {
-                hkArrayUtil::_reserveMore(alloc, &dstTrackToBoneIndicesOut, sizeof(int16_t));
-            }
-            dstTrackToBoneIndicesOut.m_data[dstTrackToBoneIndicesOut.m_size] = boneB;
-            dstTrackToBoneIndicesOut.m_size++;
+            dstTrackToBoneIndicesOut.pushBack(boneB);
         }
     }
 
@@ -111,13 +105,7 @@ void hkaSkeletonMapper::initializeBindingMaps(
             }
             if (allAnimated) {
                 for (int32_t i = 0; i < bonesB.m_size; ++i) {
-                    // EXE-INLINED none: hkArray<hkInt16>::pushBack
-                    hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-                    if (dstTrackToBoneIndicesOut.m_size == dstTrackToBoneIndicesOut.getCapacity()) {
-                        hkArrayUtil::_reserveMore(alloc, &dstTrackToBoneIndicesOut, sizeof(int16_t));
-                    }
-                    dstTrackToBoneIndicesOut.m_data[dstTrackToBoneIndicesOut.m_size] = bonesB.m_data[i];
-                    dstTrackToBoneIndicesOut.m_size++;
+                    dstTrackToBoneIndicesOut.pushBack(bonesB.m_data[i]);
                 }
             }
         }
@@ -879,7 +867,6 @@ void hkaSkeletonMapper::checkMappingLocalSpace(const hkaSkeletonMapperData& m_ma
             }
         }
     }
-    // EXE-INLINED none: hkLocalArray<int>::~hkLocalArray
 }
 
 void hkaSkeletonMapper::setMulWithScaling(

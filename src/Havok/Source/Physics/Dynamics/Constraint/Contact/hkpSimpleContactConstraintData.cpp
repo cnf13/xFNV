@@ -149,14 +149,7 @@ void hkpSimpleContactConstraintData::collisionResponseEndCallback(
     // EXE-INLINED none: hkpConstraintAtom::isModifierType
     while (pAtom->m_type.m_storage >= hkpConstraintAtom::TYPE_MODIFIER_SOFT_CONTACT) {
         hkpModifierConstraintAtom* pModifier = static_cast<hkpModifierConstraintAtom*>(pAtom);
-        // EXE-INLINED none: hkArray<hkpModifierConstraintAtom*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (modifiers.m_size ==
-            (modifiers.m_capacityAndFlags & hkArrayBase<hkpModifierConstraintAtom*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &modifiers, sizeof(hkpModifierConstraintAtom*));
-        }
-        modifiers.m_data[modifiers.m_size] = pModifier;
-        modifiers.m_size++;
+        modifiers.pushBack(pModifier);
         pAtom = pModifier->m_child;
     }
     for (int32_t i = modifiers.m_size - 1; i >= 0; --i) {

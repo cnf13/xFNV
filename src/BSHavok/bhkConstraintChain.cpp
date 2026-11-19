@@ -287,16 +287,8 @@ void bhkConstraintChain::CopyMembers(bhkSerializable* pDest, NiCloningProcess& a
             NiTPointerMap<NiObject*, NiObject*>* pCloneMap = arCloneData.m_pkCloneMap;
             NiObject* pkEntity = kEntities.m_data[i];
             // EXE-INLINED 0xA5D3F0
-            // EXE-INLINED 0xA53C30
-            NiTMapItem<NiObject*, NiObject*>* pkItem = pCloneMap->m_ppkHashTable[pCloneMap->KeyToHashIndex(pkEntity)];
-            while (pkItem && !pCloneMap->IsKeysEqual(pkEntity, pkItem->m_key)) {
-                pkItem = pkItem->m_pkNext;
-            }
             NiObject* pkClone;
-            if (pkItem) {
-                pkClone = pkItem->m_val;
-            }
-            else {
+            if (!pCloneMap->GetAt(pkEntity, pkClone)) {
                 pkClone = static_cast<NiObject*>(kEntities.m_data[i])->CreateClone(arCloneData);
             }
             pInfo->EntitiesA.m_data[i] = static_cast<hkpEntity*>(static_cast<bhkWorldObject*>(pkClone)->phkObject);

@@ -1504,10 +1504,7 @@ hkDataClassImpl* Cloner::findDestClass(const char* classname) {
         // The placement new of the element (with its null test): only the members array is initialised.
         hkDataClass::Cinfo* pNew = &cinfos.m_data[cinfos.m_size];
         if (pNew) {
-            // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member>::hkArray
-            pNew->members.m_data = nullptr;
-            pNew->members.m_size = 0;
-            pNew->members.m_capacityAndFlags = hkArrayBase<hkDataClass::Cinfo::Member>::DONT_DEALLOCATE_FLAG;
+            ::new (&pNew->members) hkArray<hkDataClass::Cinfo::Member>();
         }
         hkDataClass::Cinfo& rCinfo = cinfos.m_data[cinfos.m_size++];
         srcClass.getCinfo(rCinfo);
@@ -1708,41 +1705,12 @@ void Cloner::getClassMemberInfos(
     const hkDataClass& a2,
     const hkDataClass& a3
 ) {
-    hkArrayBase<hkDataClass::MemberInfo> srcInfos;
-    srcInfos.m_data = nullptr;
-    srcInfos.m_size = 0;
-    srcInfos.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
+    hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator> srcInfos;
     int32_t iNumSrc = a3.getNumMembers();
-    hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-    // EXE-INLINED none: hkArray::setSize
-    int32_t iCapacity = srcInfos.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK;
-    if (iCapacity < iNumSrc) {
-        int32_t iNewCapacity = 2 * iCapacity;
-        if (iNumSrc >= iNewCapacity) {
-            iNewCapacity = iNumSrc;
-        }
-        hkArrayUtil::_reserve(*pTemp, &srcInfos, iNewCapacity, sizeof(hkDataClass::MemberInfo));
-    }
-    for (int32_t i = srcInfos.m_size; i < iNumSrc; ++i) {
-        new (&srcInfos.m_data[i]) hkDataClass::MemberInfo();
-    }
-    srcInfos.m_size = iNumSrc;
+    srcInfos.setSize(iNumSrc);
     a3.getAllMemberInfo(srcInfos);
     int32_t iNumDst = a2.getNumMembers();
-    pTemp = hkMemoryRouter::getInstance().m_temp;
-    // EXE-INLINED none: hkArray::setSize
-    iCapacity = a1.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK;
-    if (iCapacity < iNumDst) {
-        int32_t iNewCapacity = 2 * iCapacity;
-        if (iNumDst >= iNewCapacity) {
-            iNewCapacity = iNumDst;
-        }
-        hkArrayUtil::_reserve(*pTemp, &a1, iNewCapacity, sizeof(hkDataClass::MemberInfo));
-    }
-    for (int32_t i = a1.m_size; i < iNumDst; ++i) {
-        new (&a1.m_data[i]) hkDataClass::MemberInfo();
-    }
-    a1.m_size = iNumDst;
+    a1.setSize(iNumDst);
     a2.getAllMemberInfo(a1);
     for (int32_t i = 0; i < a3.getNumMembers(); ++i) {
         const hkDataClassImpl* pSrcMemberClass = srcInfos.m_data[i].m_class;
@@ -1752,16 +1720,6 @@ void Cloner::getClassMemberInfos(
                 rDstInfo.m_class = findDestClass(pSrcMemberClass->getName());
             }
         }
-    }
-    // EXE-INLINED none: hkArray::~hkArray
-    pTemp = hkMemoryRouter::getInstance().m_temp;
-    srcInfos.m_size = 0;
-    if (srcInfos.m_capacityAndFlags >= 0) {
-        pTemp->bufFree(
-            srcInfos.m_data,
-            sizeof(hkDataClass::MemberInfo) *
-                (srcInfos.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK)
-        );
     }
 }
 

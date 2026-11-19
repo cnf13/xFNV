@@ -289,16 +289,10 @@ void hkpMoppObbVirtualMachine::queryAabbOnTree(
                 terminal = (((((PC[1] << 8) + PC[2]) << 8) + PC[3]) << 8) + PC[4];
             addTerminal:
                 {
-                    const uint32_t id = static_cast<uint32_t>(((chunkOffset >> 9) << 8) & m_reindexingMask.m_storage) |
+                    hkpMoppPrimitiveInfo info;
+                    info.ID = static_cast<uint32_t>(((chunkOffset >> 9) << 8) & m_reindexingMask.m_storage) |
                         (query->m_primitiveOffset + terminal);
-                    hkArray<hkpMoppPrimitiveInfo>* primitives = m_primitives_out;
-                    // EXE-INLINED none: hkArray<hkpMoppPrimitiveInfo>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(primitives);
-                    if (primitives->m_size ==
-                        (primitives->m_capacityAndFlags & hkArrayBase<hkpMoppPrimitiveInfo>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(alloc, primitives, sizeof(hkpMoppPrimitiveInfo));
-                    }
-                    primitives->m_data[primitives->m_size++].ID = id;
+                    m_primitives_out->pushBack(info);
                     return;
                 }
             case 96:

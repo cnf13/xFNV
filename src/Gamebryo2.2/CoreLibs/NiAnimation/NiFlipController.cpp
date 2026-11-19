@@ -271,11 +271,7 @@ void NiFlipController::AttachTexture(NiTexture* pkTexture, uint32_t uiIndex) {
         m_kTextures.SetSize(uiIndex + 1);
     }
     NiPointer<NiTexture> spTexture = pkTexture;
-    // EXE-INLINED 0x60BD90
-    if (uiIndex >= m_kTextures.m_usMaxSize) {
-        m_kTextures.SetSize(uiIndex + m_kTextures.m_usGrowBy);
-    }
-    m_kTextures.SetAt(uiIndex, spTexture);
+    m_kTextures.SetAtGrow(uiIndex, spTexture);
 }
 
 NiObject* NiFlipController::CreateObject() {

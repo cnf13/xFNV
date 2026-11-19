@@ -125,12 +125,7 @@ void hkpListAgent::processCollision(
     }
 
     int32_t numChildren = listShape->m_childInfo.m_size;
-    // The Havok stack is untyped bytes (a char* bump pointer) handed out as the hit list and taken back by address:
-    // hence the casts here and at the release.
-    // EXE-INLINED none: hkAllocateStack<hkpShapeKey>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    uint32_t* hitList = reinterpret_cast<uint32_t*>(stack.m_next.m_storage);
-    stack.m_next.m_storage += (sizeof(uint32_t) * (numChildren + 1) + 127) & ~static_cast<size_t>(127);
+    uint32_t* hitList = hkAllocateStack<uint32_t>(numChildren + 1, nullptr);
     int32_t numHits = 0;
     for (int32_t i = 0; i < numChildren; i++) {
         // EXE-INLINED none: hkpListShape::isChildEnabled (children past the first 256 are always enabled)
@@ -140,8 +135,7 @@ void hkpListAgent::processCollision(
     }
     hitList[numHits] = HK_INVALID_SHAPE_KEY;
     hkAgent1nMachine_Process(m_agentTrack, in3, listShape, hitList, result);
-    // EXE-INLINED none: hkDeallocateStack<hkpShapeKey>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(hitList);
+    hkDeallocateStack(hitList);
 }
 
 // The agent track does the work; the agent then deletes itself.

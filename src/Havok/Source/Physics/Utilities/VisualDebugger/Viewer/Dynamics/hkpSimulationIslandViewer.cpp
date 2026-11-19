@@ -52,61 +52,14 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
     if (m_showActiveIslands) {
         int32_t numIslands = world->m_activeSimulationIslands.m_size;
         if (numIslands > m_activeIslandDisplayGeometries.m_size) {
-            // EXE-INLINED none: hkArray<hkDisplayAABB>::setSize
-            hkArray<hkDisplayAABB>& geometries = m_activeIslandDisplayGeometries;
-            hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-            int32_t capacity =
-                static_cast<int32_t>(geometries.m_capacityAndFlags & hkArrayBase<hkDisplayAABB>::CAPACITY_MASK);
-            if (capacity < numIslands) {
-                int32_t newCapacity = capacity * 2;
-                if (numIslands >= newCapacity) {
-                    newCapacity = numIslands;
-                }
-                hkArrayUtil::_reserve(heap, &geometries, newCapacity, sizeof(hkDisplayAABB));
-            }
-            hkDisplayAABB* dead = geometries.m_data + numIslands;
-            for (int32_t k = geometries.m_size - numIslands; k > 0; k--) {
-                dead->~hkDisplayAABB();
-                dead++;
-            }
-            hkDisplayAABB* fresh = geometries.m_data + geometries.m_size;
-            for (int32_t k = numIslands - geometries.m_size; k > 0; k--) {
-                if (fresh != nullptr) {
-                    ::new (fresh) hkDisplayAABB;
-                }
-                fresh++;
-            }
-            geometries.m_size = numIslands;
+            m_activeIslandDisplayGeometries.setSize(numIslands);
         }
 
         hkArray<hkDisplayGeometry*, hkContainerTempAllocator> displayGeometries;
-        // EXE-INLINED none: hkArray<hkDisplayGeometry*, hkContainerTempAllocator>::setSize
-        numIslands = world->m_activeSimulationIslands.m_size;
-        hkMemoryAllocator* temp = hkMemoryRouter::getInstance().m_temp;
-        int32_t capacity =
-            static_cast<int32_t>(displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK);
-        if (capacity < numIslands) {
-            int32_t newCapacity = capacity * 2;
-            if (numIslands >= newCapacity) {
-                newCapacity = numIslands;
-            }
-            hkArrayUtil::_reserve(temp, &displayGeometries, newCapacity, sizeof(hkDisplayGeometry*));
-        }
-        displayGeometries.m_size = numIslands;
+        displayGeometries.setSize(world->m_activeSimulationIslands.m_size);
 
         hkArray<hkAabb, hkContainerTempAllocator> islandAabbs;
-        // EXE-INLINED none: hkArray<hkAabb, hkContainerTempAllocator>::setSize
-        numIslands = world->m_activeSimulationIslands.m_size;
-        temp = hkMemoryRouter::getInstance().m_temp;
-        capacity = static_cast<int32_t>(islandAabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK);
-        if (capacity < numIslands) {
-            int32_t newCapacity = capacity * 2;
-            if (numIslands >= newCapacity) {
-                newCapacity = numIslands;
-            }
-            hkArrayUtil::_reserve(temp, &islandAabbs, newCapacity, sizeof(hkAabb));
-        }
-        islandAabbs.m_size = numIslands;
+        islandAabbs.setSize(world->m_activeSimulationIslands.m_size);
 
         for (int32_t i = 0; i < world->m_activeSimulationIslands.m_size; i++) {
             hkpSimulationIsland* island = world->m_activeSimulationIslands.m_data[i];
@@ -134,47 +87,11 @@ void hkpSimulationIslandViewer::postSimulationCallback(hkpWorld* world) {
     if (m_showInactiveIslands) {
         int32_t numIslands = world->m_inactiveSimulationIslands.m_size;
         if (numIslands > m_inactiveIslandDisplayGeometries.m_size) {
-            // EXE-INLINED none: hkArray<hkDisplayAABB>::setSize
-            hkArray<hkDisplayAABB>& geometries = m_inactiveIslandDisplayGeometries;
-            hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-            int32_t capacity =
-                static_cast<int32_t>(geometries.m_capacityAndFlags & hkArrayBase<hkDisplayAABB>::CAPACITY_MASK);
-            if (capacity < numIslands) {
-                int32_t newCapacity = capacity * 2;
-                if (numIslands >= newCapacity) {
-                    newCapacity = numIslands;
-                }
-                hkArrayUtil::_reserve(heap, &geometries, newCapacity, sizeof(hkDisplayAABB));
-            }
-            hkDisplayAABB* dead = geometries.m_data + numIslands;
-            for (int32_t k = geometries.m_size - numIslands; k > 0; k--) {
-                dead->~hkDisplayAABB();
-                dead++;
-            }
-            hkDisplayAABB* fresh = geometries.m_data + geometries.m_size;
-            for (int32_t k = numIslands - geometries.m_size; k > 0; k--) {
-                if (fresh != nullptr) {
-                    ::new (fresh) hkDisplayAABB;
-                }
-                fresh++;
-            }
-            geometries.m_size = numIslands;
+            m_inactiveIslandDisplayGeometries.setSize(numIslands);
         }
 
         hkArray<hkDisplayGeometry*> displayGeometries;
-        // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
-        numIslands = world->m_inactiveSimulationIslands.m_size;
-        hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-        int32_t capacity =
-            static_cast<int32_t>(displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK);
-        if (capacity < numIslands) {
-            int32_t newCapacity = capacity * 2;
-            if (numIslands >= newCapacity) {
-                newCapacity = numIslands;
-            }
-            hkArrayUtil::_reserve(heap, &displayGeometries, newCapacity, sizeof(hkDisplayGeometry*));
-        }
-        displayGeometries.m_size = numIslands;
+        displayGeometries.setSize(world->m_inactiveSimulationIslands.m_size);
 
         for (int32_t i = 0; i < world->m_inactiveSimulationIslands.m_size; i++) {
             hkpSimulationIsland* island = world->m_inactiveSimulationIslands.m_data[i];

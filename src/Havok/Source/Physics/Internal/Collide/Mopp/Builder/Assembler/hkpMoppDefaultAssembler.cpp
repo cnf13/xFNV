@@ -119,8 +119,7 @@ int32_t copyCodeAndEmbedTerminals(
         router.m_stack.m_next.m_storage += (size + 127) & ~127;
         apChunkInfo->m_compressor->storePrimitives(apTerminals->m_data, apTerminals->m_size, pPrimitives);
         hkString::memCpy(&r_edi->m_code[r_edi->m_size - r_edi->m_pos], pPrimitives, size);
-        // EXE-INLINED 0x5E0B60
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pPrimitives);
+        hkDeallocateStack(reinterpret_cast<char*>(pPrimitives));
     }
     int32_t startPos = r_edi->m_pos;
     r_edi->pad(padding + apChunk->m_pos);
@@ -1205,13 +1204,7 @@ int32_t hkpMoppDefaultAssembler::calcChunkPoints(
         const int32_t iStart = m_code->m_pos;
         assembleCutAndTerminalCommand(currentNode, parentInfo, currentInfo);
         const int32_t iSize = m_code->m_pos - iStart;
-        hkpMoppCompilerPrimitive* pPrimitive = pTerminal->m_primitive;
-        // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (terminalsOut.m_size == (terminalsOut.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &terminalsOut, sizeof(uint32_t));
-        }
-        terminalsOut.m_data[terminalsOut.m_size++] = pPrimitive->m_primitiveID;
+        terminalsOut.pushBack(pTerminal->m_primitive->m_primitiveID);
         uint32_t uiPrimitiveId = pTerminal->m_primitive->m_primitiveID;
         if (m_chunkInfo->m_compressor) {
             return iSize + m_chunkInfo->m_compressor->calcPrimitivesSize(&uiPrimitiveId, 1);
@@ -1362,8 +1355,7 @@ void hkpMoppDefaultAssembler::assembleSubNodeIntoChunks(
         pChunkCode = ::new (pChunkCode) hkpMoppCodeGenerator(chunk.m_codeSize);
         chunk.m_code = pChunkCode;
         copyCodeAndEmbedTerminals(m_chunkInfo, m_code, &chunkTerminals, pChunkCode);
-        // EXE-INLINED none: hkArrayBase<hkpMoppCodeGenerator::JumpCommandInfo>::clear
-        m_code->m_jumpCommands.m_size = 0;
+        m_code->m_jumpCommands.clear();
         chunkTerminals.clearAndDeallocate();
         m_code = pCode;
         assembleJumpChunkCommand(currentNode);
@@ -1371,14 +1363,7 @@ void hkpMoppDefaultAssembler::assembleSubNodeIntoChunks(
     }
     if (currentNode->m_isTerminal.m_bool) {
         assembleCutAndTerminalCommand(currentNode, parentInfo, currentInfo);
-        const uint32_t* pOrigPrimitiveId =
-            &static_cast<hkpMoppTreeTerminal*>(currentNode)->m_primitive->m_origPrimitiveID;
-        // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (terminalsOut.m_size == (terminalsOut.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &terminalsOut, sizeof(uint32_t));
-        }
-        terminalsOut.m_data[terminalsOut.m_size++] = *pOrigPrimitiveId;
+        terminalsOut.pushBack(static_cast<hkpMoppTreeTerminal*>(currentNode)->m_primitive->m_origPrimitiveID);
         return;
     }
     hkpMoppAssemblerRescaleCommand rescaleCommandInfo;

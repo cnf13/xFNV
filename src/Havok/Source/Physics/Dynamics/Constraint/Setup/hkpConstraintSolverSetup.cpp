@@ -435,13 +435,7 @@ int32_t hkpConstraintSolverSetup::solve(
                 }
             }
             if (ci->m_priority >= hkpConstraintInstance::PRIORITY_TOI_HIGHER) {
-                // EXE-INLINED none: hkArray<hkConstraintInternal*>::pushBack (the router is fetched even when it fits)
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (deferred.m_size ==
-                    (deferred.m_capacityAndFlags & hkArrayBase<hkConstraintInternal*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_heap, &deferred, sizeof(hkConstraintInternal*));
-                }
-                deferred.m_data[deferred.m_size++] = ci;
+                deferred.pushBack(ci);
                 continue;
             }
             if (reinterpret_cast<uintptr_t>(out.m_jacobianSchemas) >= uiSchemasLimit) {

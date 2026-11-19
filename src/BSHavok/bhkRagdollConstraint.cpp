@@ -12,6 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
@@ -79,30 +80,14 @@ void hkRagdollConstraintCinfo::LoadBinary(NiStream& arStream) {
     hkConstraintCinfo::LoadBinary(arStream);
     hkpRagdollConstraintData* pRagdollData = static_cast<hkpRagdollConstraintData*>(pData);
     hkpRagdollConstraintData::Atoms& rAtoms = pRagdollData->m_atoms;
-    uint32_t uiSize = 0x40;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_transforms.m_transformA, 0x40, &uiSize, 1);
-    uiSize = 0x40;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_transforms.m_transformB, 0x40, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_coneLimit.m_maxAngle, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_planesLimit.m_minAngle, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_planesLimit.m_maxAngle, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_twistLimit.m_minAngle, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_twistLimit.m_maxAngle, 4, &uiSize, 1);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&rAtoms.m_angFriction.m_maxFrictionTorque, 4, &uiSize, 1);
+    NiStreamLoadBinary(arStream, rAtoms.m_transforms.m_transformA);
+    NiStreamLoadBinary(arStream, rAtoms.m_transforms.m_transformB);
+    NiStreamLoadBinary(arStream, rAtoms.m_coneLimit.m_maxAngle);
+    NiStreamLoadBinary(arStream, rAtoms.m_planesLimit.m_minAngle);
+    NiStreamLoadBinary(arStream, rAtoms.m_planesLimit.m_maxAngle);
+    NiStreamLoadBinary(arStream, rAtoms.m_twistLimit.m_minAngle);
+    NiStreamLoadBinary(arStream, rAtoms.m_twistLimit.m_maxAngle);
+    NiStreamLoadBinary(arStream, rAtoms.m_angFriction.m_maxFrictionTorque);
     if (0.0f == rAtoms.m_angFriction.m_maxFrictionTorque) {
         rAtoms.m_angFriction.m_maxFrictionTorque = 100.0f;
     }
@@ -143,9 +128,7 @@ void hkRagdollConstraintCinfo::LoadBinary(NiStream& arStream) {
         pRagdollData->setPlaneMotor(pMotor);
         pRagdollData->setConeMotor(pMotor);
         if (pMotor) {
-            uiSize = 1;
-            // EXE-INLINED none: NiStreamLoadBinary
-            arStream.m_pkIstr->BinaryRead(&rAtoms.m_ragdollMotors.m_isEnabled, 1, &uiSize, 1);
+            NiStreamLoadBinary(arStream, rAtoms.m_ragdollMotors.m_isEnabled);
             pMotor->removeReference();
         }
     }

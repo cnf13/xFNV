@@ -497,7 +497,6 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
     float inertiaFactorHint
 ) {
     using ChildArray = hkInplaceArray<const hkpConstraintInstance*, 16>;
-    using ChildArrayBase = hkArrayBase<const hkpConstraintInstance*>;
     alignas(16) ChildArray childConstraints;
     for (int32_t i = constraints.m_size - 1; i >= 0; --i) {
         const hkpConstraintInstance* ci = constraints.m_data[i];
@@ -514,21 +513,8 @@ float hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(
         if (!other) {
             continue;
         }
-        // EXE-INLINED none: hkArray<const hkpConstraintInstance*>::removeAt
-        const int32_t last = --constraints.m_size;
-        if (last != i) {
-            constraints.m_data[i] = constraints.m_data[last];
-        }
-        // EXE-INLINED none: hkArray<const hkpConstraintInstance*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (childConstraints.m_size ==
-            static_cast<int32_t>(childConstraints.m_capacityAndFlags & ChildArrayBase::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(
-                *router.m_heap, &childConstraints, static_cast<int32_t>(sizeof(const hkpConstraintInstance*))
-            );
-        }
-        childConstraints.m_data[childConstraints.m_size] = ci;
-        ++childConstraints.m_size;
+        constraints.removeAt(i);
+        childConstraints.pushBack(ci);
     }
     float sumInertia = 0.0f;
     float maxInertia = 0.0f;
@@ -1112,9 +1098,7 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
 
         using VertexArray = hkInplaceArray<hkVector4, 6, hkContainerHeapAllocator>;
         VertexArray vertices;
-        // EXE-INLINED none: hkArray<hkVector4>::setSize
-        vertices._reserve(*(&hkMemoryRouter::getInstance())->m_heap, 6);
-        vertices.m_size = 6;
+        vertices.setSize(6);
         float h = surfaceThickness * 0.5;
         float nh = -surfaceThickness * 0.5;
         // Each vertex once on either side of the triangle's plane.
@@ -1161,8 +1145,7 @@ hkResult hkpInertiaTensorComputer::computeTriangleSurfaceMassProperties(
         geom.m_triangles.m_data = nullptr;
         geom.m_triangles.m_size = 0;
         geom.m_triangles.m_capacityAndFlags = hkArrayBase<hkGeometry::Triangle>::DONT_DEALLOCATE_FLAG;
-        // EXE-INLINED none: hkArray<hkVector4>::operator=
-        geom.m_vertices.copyFromArray(*(&hkMemoryRouter::getInstance())->m_heap, vertices, hkTypeIsPod());
+        geom.m_vertices = vertices;
         // The prism's two faces and three sides, two triangles each.
         hkGeometry::Triangle* t = geom.m_triangles.expandBy(1);
         t->m_a = 0;
@@ -1355,25 +1338,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
     element.m_properties.m_mass = cylinderMass;
     element.m_properties.m_centerOfMass.setZero4();
 
-    // EXE-INLINED none: hkArray<hkpMassElement>::pushBack
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    if (elements.m_size == (elements.m_capacityAndFlags & hkArrayBase<hkpMassElement>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router.m_heap, &elements, sizeof(hkpMassElement));
-    }
-    hkpMassElement* pNew = elements.m_data + elements.m_size;
-    if (pNew) {
-        pNew->m_properties.m_volume = element.m_properties.m_volume;
-        pNew->m_properties.m_mass = element.m_properties.m_mass;
-        pNew->m_properties.m_centerOfMass = element.m_properties.m_centerOfMass;
-        pNew->m_properties.m_inertiaTensor.m_col0 = element.m_properties.m_inertiaTensor.m_col0;
-        pNew->m_properties.m_inertiaTensor.m_col1 = element.m_properties.m_inertiaTensor.m_col1;
-        pNew->m_properties.m_inertiaTensor.m_col2 = element.m_properties.m_inertiaTensor.m_col2;
-        pNew->m_transform.m_rotation.m_col0 = element.m_transform.m_rotation.m_col0;
-        pNew->m_transform.m_rotation.m_col1 = element.m_transform.m_rotation.m_col1;
-        pNew->m_transform.m_rotation.m_col2 = element.m_transform.m_rotation.m_col2;
-        pNew->m_transform.m_translation = element.m_transform.m_translation;
-    }
-    elements.m_size++;
+    elements.pushBack(element);
 
     // The upper hemisphere: half a sphere's inertia, moved from the sphere's centre to the hemisphere's centre of
     // mass 3/8 of the radius up the axis; the element sits at the top of the cylinder.
@@ -1416,25 +1381,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
         element.m_properties.m_mass = halfSphereMass;
     }
 
-    // EXE-INLINED none: hkArray<hkpMassElement>::pushBack
-    hkMemoryRouter& router2 = hkMemoryRouter::getInstance();
-    if (elements.m_size == (elements.m_capacityAndFlags & hkArrayBase<hkpMassElement>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router2.m_heap, &elements, sizeof(hkpMassElement));
-    }
-    pNew = elements.m_data + elements.m_size;
-    if (pNew) {
-        pNew->m_properties.m_volume = element.m_properties.m_volume;
-        pNew->m_properties.m_mass = element.m_properties.m_mass;
-        pNew->m_properties.m_centerOfMass = element.m_properties.m_centerOfMass;
-        pNew->m_properties.m_inertiaTensor.m_col0 = element.m_properties.m_inertiaTensor.m_col0;
-        pNew->m_properties.m_inertiaTensor.m_col1 = element.m_properties.m_inertiaTensor.m_col1;
-        pNew->m_properties.m_inertiaTensor.m_col2 = element.m_properties.m_inertiaTensor.m_col2;
-        pNew->m_transform.m_rotation.m_col0 = element.m_transform.m_rotation.m_col0;
-        pNew->m_transform.m_rotation.m_col1 = element.m_transform.m_rotation.m_col1;
-        pNew->m_transform.m_rotation.m_col2 = element.m_transform.m_rotation.m_col2;
-        pNew->m_transform.m_translation = element.m_transform.m_translation;
-    }
-    elements.m_size++;
+    elements.pushBack(element);
 
     // The lower hemisphere: the same, mirrored down the axis.
     {
@@ -1474,25 +1421,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
         element.m_properties.m_mass = halfSphereMass;
     }
 
-    // EXE-INLINED none: hkArray<hkpMassElement>::pushBack
-    hkMemoryRouter& router3 = hkMemoryRouter::getInstance();
-    if (elements.m_size == (elements.m_capacityAndFlags & hkArrayBase<hkpMassElement>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router3.m_heap, &elements, sizeof(hkpMassElement));
-    }
-    pNew = elements.m_data + elements.m_size;
-    if (pNew) {
-        pNew->m_properties.m_volume = element.m_properties.m_volume;
-        pNew->m_properties.m_mass = element.m_properties.m_mass;
-        pNew->m_properties.m_centerOfMass = element.m_properties.m_centerOfMass;
-        pNew->m_properties.m_inertiaTensor.m_col0 = element.m_properties.m_inertiaTensor.m_col0;
-        pNew->m_properties.m_inertiaTensor.m_col1 = element.m_properties.m_inertiaTensor.m_col1;
-        pNew->m_properties.m_inertiaTensor.m_col2 = element.m_properties.m_inertiaTensor.m_col2;
-        pNew->m_transform.m_rotation.m_col0 = element.m_transform.m_rotation.m_col0;
-        pNew->m_transform.m_rotation.m_col1 = element.m_transform.m_rotation.m_col1;
-        pNew->m_transform.m_rotation.m_col2 = element.m_transform.m_rotation.m_col2;
-        pNew->m_transform.m_translation = element.m_transform.m_translation;
-    }
-    elements.m_size++;
+    elements.pushBack(element);
 
     hkpInertiaTensorComputer::combineMassProperties(elements, result);
     return HK_SUCCESS;
@@ -2184,19 +2113,7 @@ hkResult hkpInertiaTensorComputer::computeVertexCloudMassProperties(
         return HK_FAILURE;
     }
     hkArray<hkVector4> verts;
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::setSize
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacity = static_cast<int32_t>(verts.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-        if (capacity < numVertices) {
-            int32_t newCapacity = capacity + capacity;
-            if (numVertices >= newCapacity) {
-                newCapacity = numVertices;
-            }
-            hkArrayUtil::_reserve(*pHeap, &verts, newCapacity, static_cast<int32_t>(sizeof(hkVector4)));
-        }
-        verts.m_size = numVertices;
-    }
+    verts.setSize(numVertices);
     const float* pVertex = vertexIn;
     for (int32_t i = 0; i < numVertices; ++i) {
         // EXE-INLINED none: hkVector4::set
@@ -2260,19 +2177,7 @@ hkResult hkpInertiaTensorComputer::computeGeometrySurfaceMassProperties(
     result.m_centerOfMass.m_quad = _mm_setzero_ps();
     const int32_t numTriangles = geom->m_triangles.m_size;
     hkArray<float> triArea;
-    {
-        // EXE-INLINED none: hkArray<float>::setSize
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacity = static_cast<int32_t>(triArea.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK);
-        if (capacity < numTriangles) {
-            int32_t newCapacity = capacity + capacity;
-            if (numTriangles >= newCapacity) {
-                newCapacity = numTriangles;
-            }
-            hkArrayUtil::_reserve(*pHeap, &triArea, newCapacity, static_cast<int32_t>(sizeof(float)));
-        }
-        triArea.m_size = numTriangles;
-    }
+    triArea.setSize(numTriangles);
     float totalArea = 0.0f;
     for (int32_t i = 0; i < geom->m_triangles.m_size; ++i) {
         const hkGeometry::Triangle& tri = geom->m_triangles.m_data[i];

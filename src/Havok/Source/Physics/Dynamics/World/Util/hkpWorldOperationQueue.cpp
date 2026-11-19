@@ -126,20 +126,7 @@ void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
         hkArray<hkpBodyOperationEntry> kOperations;
         kOperations.swap(m_pendingBodyOperations);
         m_world->m_pendingBodyOperationsCount = 0;
-        // EXE-INLINED none: hkArray::reserve(16)
-        hkMemoryAllocator* pHeap = &hkMemoryRouter::getInstance().heap();
-        const int32_t iCapacity = static_cast<int32_t>(
-            m_pendingBodyOperations.m_capacityAndFlags & hkArrayBase<hkpBodyOperationEntry>::CAPACITY_MASK
-        );
-        if (iCapacity < 16) {
-            int32_t iReserve = 2 * iCapacity;
-            if (iReserve <= 16) {
-                iReserve = 16;
-            }
-            hkArrayUtil::_reserve(
-                pHeap, &m_pendingBodyOperations, iReserve, static_cast<int32_t>(sizeof(hkpBodyOperationEntry))
-            );
-        }
+        m_pendingBodyOperations.reserve(16);
         const int32_t iCount = kOperations.m_size;
         if (iCount > 1) {
             hkAlgorithm::quickSortRecursive<hkpBodyOperationEntry, hkpBodyOperationEntryLess>(
@@ -667,22 +654,8 @@ void hkpWorldOperationQueue::queueOperation(const hkWorldOperation::BaseOperatio
             hkWorldOperation::MergeIslands& rMerge = static_cast<hkWorldOperation::MergeIslands&>(rBase);
             rMerge.m_entities[0]->addReference();
             rMerge.m_entities[1]->addReference();
-            // EXE-INLINED none: hkArray::pushBack
-            hkMemoryRouter& rMergeRouter = hkMemoryRouter::getInstance();
-            if (m_islandMerges.m_size ==
-                (m_islandMerges.m_capacityAndFlags & hkArrayBase<hkWorldOperation::BiggestOperation>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(
-                    rMergeRouter.heap(), &m_islandMerges,
-                    static_cast<int32_t>(sizeof(hkWorldOperation::BiggestOperation))
-                );
-            }
-            hkWorldOperation::BiggestOperation* pMerge = &m_islandMerges.m_data[m_islandMerges.m_size];
-            if (pMerge) {
-                *pMerge = rOp;
-            }
-            ++m_islandMerges.m_size;
-            // EXE-INLINED none: hkArray::popBack
-            --m_pending.m_size;
+            m_islandMerges.pushBack(rOp);
+            m_pending.popBack();
             break;
         }
         case hkWorldOperation::PHANTOM_ADD:

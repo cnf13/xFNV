@@ -1079,19 +1079,9 @@ void hkpSimulation::collideEntitiesBroadPhaseDiscrete(hkpEntity** delPairs, int3
 
     {
         // hkLocalBuffer<hkAabbUint32> aabbs(numEntities), keeping only its pointer.
-        // EXE-INLINED none: hkAllocateStack<hkAabbUint32>
-        hkStackMemory& rAabbStack = hkMemoryRouter::getInstance().m_stack;
-        void* pAabbBlock = rAabbStack.m_next.m_storage;
-        rAabbStack.m_next.m_storage =
-            static_cast<char*>(pAabbBlock) + ((numEntities * static_cast<int32_t>(sizeof(hkAabbUint32)) + 127) & ~127);
-        hkAabbUint32* aabbs = static_cast<hkAabbUint32*>(pAabbBlock);
+        hkAabbUint32* aabbs = hkAllocateStack<hkAabbUint32>(numEntities, nullptr);
         // hkLocalBuffer<hkpBroadPhaseHandle*> phandles(numEntities), keeping only its pointer.
-        // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandle *>
-        hkStackMemory& rHandleStack = hkMemoryRouter::getInstance().m_stack;
-        void* pHandleBlock = rHandleStack.m_next.m_storage;
-        rHandleStack.m_next.m_storage = static_cast<char*>(pHandleBlock) +
-            ((numEntities * static_cast<int32_t>(sizeof(hkpBroadPhaseHandle*)) + 127) & ~127);
-        hkpBroadPhaseHandle** phandles = static_cast<hkpBroadPhaseHandle**>(pHandleBlock);
+        hkpBroadPhaseHandle** phandles = hkAllocateStack<hkpBroadPhaseHandle*>(numEntities, nullptr);
 
         HK_TIMER_SPLIT_LIST("CalcAabbs");
         for (int32_t i = 0; i < numEntities; i++) {
@@ -1112,10 +1102,8 @@ void hkpSimulation::collideEntitiesBroadPhaseDiscrete(hkpEntity** delPairs, int3
         HK_TIMER_SPLIT_LIST("3AxisSweep");
         world->getBroadPhase()->updateAabbsUint32(phandles, aabbs, numEntities, addedPairs, removedPairs);
 
-        // EXE-INLINED none: hkDeallocateStack<hkpBroadPhaseHandle *>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pHandleBlock);
-        // EXE-INLINED none: hkDeallocateStack<hkAabbUint32>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pAabbBlock);
+        hkDeallocateStack(phandles);
+        hkDeallocateStack(aabbs);
     }
 
     if (addedPairs.m_size + removedPairs.m_size > 0) {

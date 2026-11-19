@@ -96,9 +96,7 @@ void bhkStream::LoadBinary(NiStream& arStream, hkQsTransform& arTransf) {
 // Each vector is copied to a 16-aligned local before it is written.
 int32_t bhkStream::SaveBinary(NiStream& arStream, hkArray<hkVector4>& arArray) {
     alignas(16) int32_t iSize = arArray.m_size;
-    alignas(16) uint32_t uiComponentSize = sizeof(int32_t);
-    // EXE-INLINED none: NiStreamSaveBinary
-    arStream.m_pkOstr->BinaryWrite(&iSize, sizeof(int32_t), &uiComponentSize, 1);
+    NiStreamSaveBinary(arStream, iSize);
     int32_t iBytes = iSize * static_cast<int32_t>(sizeof(hkVector4));
     for (int32_t i = 0; i < iSize; ++i) {
         alignas(16) hkVector4 kValue = arArray.m_data[i];
@@ -136,30 +134,16 @@ int32_t bhkStream::LoadBinary(NiStream& arStream, hkpMoppCode*& arMoppCode) {
     ::new (pMoppCode) hkpMoppCode;
     arMoppCode = pMoppCode;
     int32_t iSize = 0;
-    uint32_t uiComponentSize = 4;
-    // EXE-INLINED none: NiStreamLoadBinary
-    arStream.m_pkIstr->BinaryRead(&iSize, 4, &uiComponentSize, 1);
+    NiStreamLoadBinary(arStream, iSize);
     arStream.m_pkIstr->BinaryRead(&arMoppCode->m_info, 0x10, nullptr, 0);
     if (arStream.m_BSStreamHeader.uiVersion < 6 && iSize) {
         iSize -= 0x30;
         uint8_t aucLegacy[0x20];
-        uiComponentSize = 4;
+        uint32_t uiComponentSize = 4;
         arStream.m_pkIstr->BinaryRead(aucLegacy, 0x20, &uiComponentSize, 1);
     }
     if (iSize) {
-        hkArray<uint8_t>& rData = arMoppCode->m_data;
-        // EXE-INLINED none: hkArray<uint8_t>::setSize
-        int32_t iRequested = iSize;
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        int32_t iCapacity = rData.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
-        if (iCapacity < iRequested) {
-            int32_t iReserve = iCapacity * 2;
-            if (iRequested >= iReserve) {
-                iReserve = iRequested;
-            }
-            hkArrayUtil::_reserve(pHeap, &rData, iReserve, sizeof(uint8_t));
-        }
-        rData.m_size = iRequested;
+        arMoppCode->m_data.setSize(iSize);
         arStream.m_pkIstr->BinaryRead(arMoppCode->m_data.m_data, iSize, nullptr, 0);
     }
     // Compares the flag byte with 1, and swaps the info's four floats as raw 32-bit words.
@@ -257,19 +241,8 @@ int32_t bhkStream::LoadBinary(NiStream& arStream, hkArray<hkVector4>& arArray) {
     NiBinaryStream::NIBINARYSTREAMREADFN pfnRead = pIstr->m_pfnRead;
     uint32_t uiComponentSize = 4;
     pIstr->m_uiAbsoluteCurrentPos += pfnRead(pIstr, &ielements, 4, &uiComponentSize, 1);
-    // EXE-INLINED 0x66DAE0
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iCapacityAndFlags = arArray.m_capacityAndFlags;
-    arArray.m_size = 0;
-    if ((iCapacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-        pHeap->_bufFree<hkVector4>(arArray.m_data, iCapacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-    }
-    arArray.m_data = nullptr;
-    arArray.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArrayBase<hkVector4>::_setSize
-    int32_t iCount = static_cast<int32_t>(ielements);
-    arArray.reserve(iCount);
-    arArray.m_size = iCount;
+    arArray.clearAndDeallocate();
+    arArray.setSize(static_cast<int32_t>(ielements));
     int32_t isize = static_cast<int32_t>(ielements * sizeof(hkVector4));
     for (uint32_t I = 0; I < ielements; ++I) {
         NiBinaryStream* pElementIstr = arStream.Istr();

@@ -174,21 +174,9 @@ void hkxMeshSection::collectVertexPositions(hkArray<hkVector4, hkContainerHeapAl
     }
     const char* pSrc = static_cast<const char*>(pVertexBuffer->getVertexDataPtr(*pDecl));
     uint32_t stride = pDecl->m_byteStride;
-    int32_t first = verticesInOut.m_size;
-    int32_t newSize = first + numVerts;
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::expandBy
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacity = verticesInOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-    if (capacity < newSize) {
-        int32_t newCapacity = 2 * capacity;
-        if (newSize >= newCapacity) {
-            newCapacity = newSize;
-        }
-        hkArrayUtil::_reserve(*pHeap, &verticesInOut, newCapacity, sizeof(hkVector4));
-    }
-    verticesInOut.m_size = newSize;
+    hkVector4* pDst = verticesInOut.expandBy(numVerts);
     for (int32_t i = 0; i < numVerts; ++i) {
-        verticesInOut.m_data[first + i].m_quad = reinterpret_cast<const hkVector4*>(pSrc)->m_quad;
+        pDst[i].m_quad = reinterpret_cast<const hkVector4*>(pSrc)->m_quad;
         pSrc += stride;
     }
 }
@@ -241,51 +229,7 @@ hkxMeshSection& hkxMeshSection::operator=(const hkxMeshSection& other) {
         m_vertexBuffer.m_pntr->removeReference();
     }
     m_vertexBuffer.m_pntr = other.m_vertexBuffer.m_pntr;
-    // EXE-INLINED none: hkArray<hkRefPtr<hkxIndexBuffer>, hkContainerHeapAllocator>::operator=
-    {
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        int32_t oldSize = m_indexBuffers.m_size;
-        int32_t newSize = other.m_indexBuffers.m_size;
-        int32_t copiedSize = newSize > oldSize ? oldSize : newSize;
-        int32_t capacity = m_indexBuffers.m_capacityAndFlags & hkArrayBase<hkRefPtr<hkxIndexBuffer>>::CAPACITY_MASK;
-        if (capacity < newSize) {
-            int32_t newCapacity = 2 * capacity;
-            if (newSize >= newCapacity) {
-                newCapacity = newSize;
-            }
-            hkArrayUtil::_reserve(*pHeap, &m_indexBuffers, newCapacity, sizeof(hkRefPtr<hkxIndexBuffer>));
-        }
-        hkRefPtr<hkxIndexBuffer>* pExcess = m_indexBuffers.m_data + newSize;
-        for (int32_t i = 0; i < oldSize - newSize; ++i) {
-            if (pExcess[i].m_pntr) {
-                pExcess[i].m_pntr->removeReference();
-            }
-            pExcess[i].m_pntr = nullptr;
-        }
-        hkRefPtr<hkxIndexBuffer>* pDst = m_indexBuffers.m_data;
-        const hkRefPtr<hkxIndexBuffer>* pSrc = other.m_indexBuffers.m_data;
-        for (int32_t i = 0; i < copiedSize; ++i) {
-            if (pSrc[i].m_pntr) {
-                pSrc[i].m_pntr->addReference();
-            }
-            if (pDst[i].m_pntr) {
-                pDst[i].m_pntr->removeReference();
-            }
-            pDst[i].m_pntr = pSrc[i].m_pntr;
-        }
-        pDst = m_indexBuffers.m_data + copiedSize;
-        pSrc = other.m_indexBuffers.m_data + copiedSize;
-        for (int32_t i = 0; i < newSize - copiedSize; ++i) {
-            hkRefPtr<hkxIndexBuffer>* pNew = &pDst[i];
-            if (pNew) {
-                if (pSrc[i].m_pntr) {
-                    pSrc[i].m_pntr->addReference();
-                }
-                pNew->m_pntr = pSrc[i].m_pntr;
-            }
-        }
-        m_indexBuffers.m_size = newSize;
-    }
+    m_indexBuffers = other.m_indexBuffers;
     // EXE-INLINED none: hkRefPtr<hkxMaterial>::operator=
     if (other.m_material.m_pntr) {
         other.m_material.m_pntr->addReference();

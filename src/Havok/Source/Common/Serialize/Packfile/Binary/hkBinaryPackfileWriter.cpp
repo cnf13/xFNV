@@ -225,43 +225,7 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
     }
     context.m_locations.m_size = iNumWrites;
 
-    // EXE-INLINED none: hkArray<hkRelocationInfo>::setSize, with the exe's out-of-line destructor for the elements
-    // dropped and the constructor (hkRelocationInfo::Construct, 0xDBD870) inlined for the new ones.
-    const int32_t iNumSections = context.m_sectionHeaders.m_size;
-    hkMemoryAllocator* pHeap2 = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iRelocCap = context.m_relocsBySect.m_capacityAndFlags & hkArrayBase<hkRelocationInfo>::CAPACITY_MASK;
-    if (iRelocCap < iNumSections) {
-        int32_t iReq = 2 * iRelocCap;
-        if (iNumSections >= iReq) {
-            iReq = iNumSections;
-        }
-        hkArrayUtil::_reserve(*pHeap2, &context.m_relocsBySect, iReq, sizeof(hkRelocationInfo));
-    }
-    hkRelocationInfo* pDropped = context.m_relocsBySect.m_data + iNumSections;
-    for (int32_t iNum = context.m_relocsBySect.m_size - iNumSections; iNum > 0; --iNum) {
-        pDropped->~hkRelocationInfo();
-        ++pDropped;
-    }
-    hkRelocationInfo* pNew = context.m_relocsBySect.m_data + context.m_relocsBySect.m_size;
-    for (int32_t iNum = iNumSections - context.m_relocsBySect.m_size; iNum > 0; --iNum, ++pNew) {
-        // The placement new's null test kept.
-        if (pNew) {
-            pNew->m_local.m_data = nullptr;
-            pNew->m_local.m_size = 0;
-            pNew->m_local.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Local>::DONT_DEALLOCATE_FLAG;
-            pNew->m_global.m_data = nullptr;
-            pNew->m_global.m_size = 0;
-            pNew->m_global.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Global>::DONT_DEALLOCATE_FLAG;
-            pNew->m_finish.m_data = nullptr;
-            pNew->m_finish.m_size = 0;
-            pNew->m_finish.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Finish>::DONT_DEALLOCATE_FLAG;
-            pNew->m_imports.m_data = nullptr;
-            pNew->m_imports.m_size = 0;
-            pNew->m_imports.m_capacityAndFlags = hkArrayBase<hkRelocationInfo::Import>::DONT_DEALLOCATE_FLAG;
-            pNew->m_pool = nullptr;
-        }
-    }
-    context.m_relocsBySect.m_size = iNumSections;
+    context.m_relocsBySect.setSize(context.m_sectionHeaders.m_size);
 
     const int32_t iTypesSection = static_cast<int32_t>(sectionTagToIndex(hkPackfileWriter::SECTION_TAG_TYPES));
     for (int32_t iSection = 1; iSection < context.m_sectionHeaders.m_size; ++iSection) {
@@ -312,21 +276,11 @@ void hkBinaryPackfileWriter::writeAllObjects(hkBinaryPackfileWriter::SaveContext
                 continue;
             }
             const hkRelocationInfo::Global& rGlobal = relocs.m_global.m_data[g];
-            // EXE-INLINED none: hkArray<hkRelocationInfo::Import>::expandOne
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            if (relocs.m_imports.m_size ==
-                (relocs.m_imports.m_capacityAndFlags & hkArrayBase<hkRelocationInfo::Import>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouter.m_heap, &relocs.m_imports, sizeof(hkRelocationInfo::Import));
-            }
-            hkRelocationInfo::Import& rImport = relocs.m_imports.m_data[relocs.m_imports.m_size++];
+            hkRelocationInfo::Import& rImport = relocs.m_imports.expandOne();
             const int32_t iFrom = rGlobal.m_fromOffset - pHeader->m_absoluteDataStart;
             rImport.m_identifier = pImport;
             rImport.m_fromOffset = iFrom;
-            // EXE-INLINED none: hkArray<hkRelocationInfo::Global>::removeAt
-            const int32_t iLast = --relocs.m_global.m_size;
-            if (iLast != g) {
-                relocs.m_global.m_data[g] = relocs.m_global.m_data[iLast];
-            }
+            relocs.m_global.removeAt(g);
         }
 
         {
@@ -404,59 +358,46 @@ void hkBinaryPackfileWriter::doDeferredWrites(
         hkPackfileSectionHeader& rHeader = context.m_sectionHeaders.m_data[i];
         hkArray<hkRelocationInfo::Global, hkContainerHeapAllocator>& rGlobals =
             context.m_relocsBySect.m_data[i].m_global;
-        // The SDK's hkArray<hkUint32> globalFixups(3 * globals, -1), inline.
-        hkArrayBase<uint32_t> globalFixups;
-        globalFixups.m_data = nullptr;
-        globalFixups.m_size = 0;
-        globalFixups.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-        int32_t iNumWords = 3 * rGlobals.m_size;
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        int32_t iCapacity = globalFixups.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;
-        if (iCapacity < iNumWords) {
-            int32_t iNewCapacity = 2 * iCapacity;
-            if (iNumWords >= iNewCapacity) {
-                iNewCapacity = iNumWords;
+        {
+            // The SDK's hkArray<hkUint32> globalFixups(3 * globals, -1), inline after the empty array's construction.
+            hkArray<uint32_t> globalFixups;
+            int32_t iNumWords = 3 * rGlobals.m_size;
+            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
+            int32_t iCapacity = globalFixups.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;
+            if (iCapacity < iNumWords) {
+                int32_t iNewCapacity = 2 * iCapacity;
+                if (iNumWords >= iNewCapacity) {
+                    iNewCapacity = iNumWords;
+                }
+                hkArrayUtil::_reserve(*pHeap, &globalFixups, iNewCapacity, sizeof(uint32_t));
             }
-            hkArrayUtil::_reserve(*pHeap, &globalFixups, iNewCapacity, sizeof(uint32_t));
-        }
-        if (iNumWords - globalFixups.m_size > 0) {
-            hkString::memSet4(&globalFixups.m_data[globalFixups.m_size], -1, iNumWords - globalFixups.m_size);
-        }
-        globalFixups.m_size = iNumWords;
-        int32_t iWord = 0;
-        for (int32_t j = 0; j < rGlobals.m_size; ++j) {
-            int32_t iIndex = m_knownObjects.getWithDefault(rGlobals.m_data[j].m_toAddress, INDEX_ERROR);
-            if (iIndex >= 0 && context.m_locations.m_data[iIndex].m_section >= 0) {
-                globalFixups.m_data[iWord] = rGlobals.m_data[j].m_fromOffset - rHeader.m_absoluteDataStart;
-                globalFixups.m_data[iWord + 1] = context.m_locations.m_data[iIndex].m_section;
-                globalFixups.m_data[iWord + 2] = context.m_locations.m_data[iIndex].m_offset;
-                iWord += 3;
+            if (iNumWords - globalFixups.m_size > 0) {
+                hkString::memSet4(&globalFixups.m_data[globalFixups.m_size], -1, iNumWords - globalFixups.m_size);
             }
-        }
-        context.m_stream->seek(rHeader.m_absoluteDataStart + rHeader.m_globalFixupsOffset, hkStreamWriter::STREAM_SET);
-        archive.writeArray32u(globalFixups.m_data, globalFixups.m_size);
-        // EXE-INLINED none: hkArray::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        globalFixups.m_size = 0;
-        if (globalFixups.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                globalFixups.m_data,
-                sizeof(uint32_t) * (globalFixups.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)
+            globalFixups.m_size = iNumWords;
+            int32_t iWord = 0;
+            for (int32_t j = 0; j < rGlobals.m_size; ++j) {
+                int32_t iIndex = m_knownObjects.getWithDefault(rGlobals.m_data[j].m_toAddress, INDEX_ERROR);
+                if (iIndex >= 0 && context.m_locations.m_data[iIndex].m_section >= 0) {
+                    globalFixups.m_data[iWord] = rGlobals.m_data[j].m_fromOffset - rHeader.m_absoluteDataStart;
+                    globalFixups.m_data[iWord + 1] = context.m_locations.m_data[iIndex].m_section;
+                    globalFixups.m_data[iWord + 2] = context.m_locations.m_data[iIndex].m_offset;
+                    iWord += 3;
+                }
+            }
+            context.m_stream->seek(
+                rHeader.m_absoluteDataStart + rHeader.m_globalFixupsOffset, hkStreamWriter::STREAM_SET
             );
+            archive.writeArray32u(globalFixups.m_data, globalFixups.m_size);
         }
-        globalFixups.m_data = nullptr;
-        globalFixups.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
 
         hkArray<hkRelocationInfo::Finish, hkContainerHeapAllocator>& rFinishes =
             context.m_relocsBySect.m_data[i].m_finish;
         // The SDK's hkArray<hkUint32> virtualFixups; virtualFixups.setSize(3 * finishes), inline.
-        hkArrayBase<uint32_t> virtualFixups;
-        virtualFixups.m_data = nullptr;
-        virtualFixups.m_size = 0;
-        virtualFixups.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
-        iNumWords = 3 * rFinishes.m_size;
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        iCapacity = virtualFixups.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;
+        hkArray<uint32_t> virtualFixups;
+        int32_t iNumWords = 3 * rFinishes.m_size;
+        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
+        int32_t iCapacity = virtualFixups.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;
         if (iCapacity < iNumWords) {
             int32_t iNewCapacity = 2 * iCapacity;
             if (iNumWords >= iNewCapacity) {
@@ -474,17 +415,6 @@ void hkBinaryPackfileWriter::doDeferredWrites(
         }
         context.m_stream->seek(rHeader.m_absoluteDataStart + rHeader.m_virtualFixupsOffset, hkStreamWriter::STREAM_SET);
         archive.writeArray32u(virtualFixups.m_data, virtualFixups.m_size);
-        // EXE-INLINED none: hkArray::~hkArray
-        pHeap = hkMemoryRouter::getInstance().m_heap;
-        virtualFixups.m_size = 0;
-        if (virtualFixups.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(
-                virtualFixups.m_data,
-                sizeof(uint32_t) * (virtualFixups.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)
-            );
-        }
-        virtualFixups.m_data = nullptr;
-        virtualFixups.m_capacityAndFlags = hkArrayBase<uint32_t>::DONT_DEALLOCATE_FLAG;
     }
     context.m_stream->seek(sectionHeadersStart, hkStreamWriter::STREAM_SET);
     for (int32_t i = 0; i < context.m_sectionHeaders.m_size; ++i) {

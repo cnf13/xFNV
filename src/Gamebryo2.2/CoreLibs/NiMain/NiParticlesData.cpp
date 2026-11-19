@@ -62,9 +62,7 @@ void NiParticlesData::LoadBinary(NiStream& kStream) {
     m_pfRadii = static_cast<float*>(_NiMalloc(m_usVertices * sizeof(float)));
     if (kStream.GetFileVersion() < 0x0A00010D) {
         float fRadius;
-        uint32_t uiSize = sizeof(float);
-        // EXE-INLINED none: NiStreamLoadBinary
-        kStream.m_pkIstr->BinaryRead(&fRadius, sizeof(float), &uiSize, 1);
+        NiStreamLoadBinary(kStream, fRadius);
         for (uint16_t i = 0; i < m_usVertices; i++) {
             m_pfRadii[i] = fRadius;
         }
@@ -94,9 +92,7 @@ void NiParticlesData::LoadBinary(NiStream& kStream) {
     }
     m_pfSizes = static_cast<float*>(_NiMalloc(m_usVertices * sizeof(float)));
     if (bHasSizes && kStream.m_BSStreamHeader.uiVersion < 0x13) {
-        uint32_t uiSize = sizeof(float);
-        // EXE-INLINED none: NiStreamLoadBinary
-        kStream.m_pkIstr->BinaryRead(m_pfSizes, m_usVertices * sizeof(float), &uiSize, 1);
+        NiStreamLoadBinary(kStream, m_pfSizes, m_usVertices);
     }
     else {
         for (uint16_t i = 0; i < m_usVertices; i++) {
@@ -151,9 +147,7 @@ void NiParticlesData::LoadBinary(NiStream& kStream) {
             m_pfRotationAngles = static_cast<float*>(_NiMalloc(m_usVertices * sizeof(float)));
             if (kStream.m_BSStreamHeader.uiVersion < 0x13) {
                 for (uint16_t i = 0; i < m_usVertices; i++) {
-                    uint32_t uiSize = sizeof(float);
-                    // EXE-INLINED none: NiStreamLoadBinary
-                    kStream.m_pkIstr->BinaryRead(&m_pfRotationAngles[i], sizeof(float), &uiSize, 1);
+                    NiStreamLoadBinary(kStream, m_pfRotationAngles[i]);
                 }
             }
         }

@@ -97,7 +97,6 @@ void BSBound::InitSDM() {
 void BSBound::KillSDM() {
     NiFixedString* Block = BSBound::pTag;
     if (BSBound::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSBound::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

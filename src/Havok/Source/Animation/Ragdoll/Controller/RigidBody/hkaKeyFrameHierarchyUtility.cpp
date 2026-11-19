@@ -483,12 +483,7 @@ void hkaKeyFrameHierarchyUtility::applyKeyFrame(
     hkaKeyFrameHierarchyUtility::Output* output
 ) {
     const int32_t numBodies = bodydata.m_numRigidBodies;
-    // EXE-INLINED none: hkAllocateStack<hkQsTransform>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((numBodies * static_cast<int32_t>(2 * sizeof(hkQsTransform)) + 127) & ~127);
-    hkQsTransform* pDesired = static_cast<hkQsTransform*>(pBlock);
+    hkQsTransform* pDesired = hkAllocateStack<hkQsTransform>(numBodies * 2, nullptr);
     calcComPoseUsingHierarchy(pose.m_desiredPoseLocalSpace, bodydata, controlPalette, pose.m_worldFromRoot, pDesired);
 
     const float fInvDeltaTime = 1.0 / m_deltaTime;
@@ -641,8 +636,7 @@ void hkaKeyFrameHierarchyUtility::applyKeyFrame(
         }
     }
 
-    // EXE-INLINED none: hkDeallocateStack<hkQsTransform>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pBlock);
+    hkDeallocateStack(pDesired);
 }
 
 const hkClass& hkaKeyFrameHierarchyUtility::staticClass() {

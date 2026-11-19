@@ -166,17 +166,9 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
             jobInfo->m_constraintInfo = constraintOwner.m_constraintInfo;
             const int32_t size = static_cast<int32_t>(constraintOwner.m_commandQueue.m_size);
             if (size) {
-                // EXE-INLINED none: hkString::memCpy16 (the queues' buffers are untyped command bytes)
-                uint32_t* dst32 = reinterpret_cast<uint32_t*>(jobInfo->m_commandQueue.m_start.val());
-                const uint32_t* src32 = reinterpret_cast<const uint32_t*>(constraintOwner.m_commandQueue.m_start.val());
-                for (int32_t numQuads = size >> 4; numQuads > 0; --numQuads) {
-                    dst32[0] = src32[0];
-                    dst32[1] = src32[1];
-                    dst32[2] = src32[2];
-                    dst32[3] = src32[3];
-                    dst32 += 4;
-                    src32 += 4;
-                }
+                hkString::memCpy16(
+                    jobInfo->m_commandQueue.m_start.val(), constraintOwner.m_commandQueue.m_start.val(), size >> 4
+                );
                 jobInfo->m_commandQueue.m_size = static_cast<uint32_t>(size);
             }
         }
@@ -274,17 +266,9 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
         jobInfo->m_constraintInfo = constraintOwner.m_constraintInfo;
         const int32_t size = static_cast<int32_t>(constraintOwner.m_commandQueue.m_size);
         if (size) {
-            // EXE-INLINED none: hkString::memCpy16 (the queues' buffers are untyped command bytes)
-            uint32_t* dst32 = reinterpret_cast<uint32_t*>(jobInfo->m_commandQueue.m_start.val());
-            const uint32_t* src32 = reinterpret_cast<const uint32_t*>(constraintOwner.m_commandQueue.m_start.val());
-            for (int32_t numQuads = size >> 4; numQuads > 0; --numQuads) {
-                dst32[0] = src32[0];
-                dst32[1] = src32[1];
-                dst32[2] = src32[2];
-                dst32[3] = src32[3];
-                dst32 += 4;
-                src32 += 4;
-            }
+            hkString::memCpy16(
+                jobInfo->m_commandQueue.m_start.val(), constraintOwner.m_commandQueue.m_start.val(), size >> 4
+            );
             jobInfo->m_commandQueue.m_size = static_cast<uint32_t>(size);
         }
         HK_TIMER_NAMED_END("NarrowPhaseTOI");

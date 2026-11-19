@@ -138,26 +138,9 @@ void hkpSaveContactPointsUtil::saveContactPoints(
     hkpPhysicsSystemWithContacts* sys
 ) {
     hkArray<hkpSimulationIsland*> islands;
-    // EXE-INLINED none: hkArray<hkpSimulationIsland*>::operator=
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iCapacity =
-        static_cast<int32_t>(islands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK);
-    if (iCapacity < world->m_activeSimulationIslands.m_size) {
-        if (islands.m_capacityAndFlags >= 0) {
-            pHeap->bufFree(islands.m_data, sizeof(hkpSimulationIsland*) * iCapacity);
-        }
-        int32_t iNumBytes = sizeof(hkpSimulationIsland*) * world->m_activeSimulationIslands.m_size;
-        islands.m_data = static_cast<hkpSimulationIsland**>(pHeap->bufAlloc(iNumBytes));
-        islands.m_capacityAndFlags = static_cast<uint32_t>(iNumBytes / 4);
-    }
-    islands.m_size = world->m_activeSimulationIslands.m_size;
-    for (int32_t i = 0; i < islands.m_size; ++i) {
-        islands.m_data[i] = world->m_activeSimulationIslands.m_data[i];
-    }
-    // EXE-INLINED none: hkArray<hkpSimulationIsland*>::insertAt
-    islands._insertAt(
-        *hkMemoryRouter::getInstance().m_heap, islands.m_size, world->m_inactiveSimulationIslands.m_data,
-        world->m_inactiveSimulationIslands.m_size
+    islands = world->m_activeSimulationIslands;
+    islands.insertAt(
+        islands.m_size, world->m_inactiveSimulationIslands.m_data, world->m_inactiveSimulationIslands.m_size
     );
     for (int32_t i = 0; i < islands.m_size; ++i) {
         hkpSimulationIsland* pIsland = islands.m_data[i];
@@ -490,17 +473,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
     const hkpProcessCollisionInput* input,
     hkpSerializedTrack1nInfo& trackInfoOut
 ) {
-    // EXE-INLINED none: hkArray<hkpAgent1nSector*>::reserve
-    int32_t iNumSectors = sectorsIn.m_size;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iCapacity =
-        static_cast<int32_t>(trackInfoOut.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgent1nSector*>::CAPACITY_MASK);
-    if (iCapacity < iNumSectors) {
-        int32_t iDoubled = 2 * iCapacity;
-        hkArrayUtil::_reserve(
-            pHeap, &trackInfoOut.m_sectors, iNumSectors < iDoubled ? iDoubled : iNumSectors, sizeof(hkpAgent1nSector*)
-        );
-    }
+    trackInfoOut.m_sectors.reserve(sectorsIn.m_size);
     for (int32_t i = 0; i < sectorsIn.m_size; ++i) {
         hkpAgent1nSector* pSector = sectorsIn.m_data[i];
         // A sector's bytes are an untyped stream of variable-sized entries, walked as raw memory.
@@ -548,15 +521,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
                     pSubTrack->m_sectorIndex = i;
                     pSubTrack->m_offsetInSector =
                         static_cast<int32_t>(reinterpret_cast<const uint8_t*>(pTrack) - pSector->m_data);
-                    // EXE-INLINED none: hkArray<hkpSerializedSubTrack1nInfo*>::pushBack
-                    hkArray<hkpSerializedSubTrack1nInfo*>& subTracks = trackInfoOut.m_subTracks;
-                    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                    if (subTracks.m_size ==
-                        (subTracks.m_capacityAndFlags & hkArrayBase<hkpSerializedSubTrack1nInfo*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*router.m_heap, &subTracks, sizeof(hkpSerializedSubTrack1nInfo*));
-                    }
-                    subTracks.m_data[subTracks.m_size] = pSubTrack;
-                    ++subTracks.m_size;
+                    trackInfoOut.m_subTracks.pushBack(pSubTrack);
                 }
                 else {
                     pSubTrack->hkpSerializedTrack1nInfo::~hkpSerializedTrack1nInfo();
@@ -568,13 +533,7 @@ hkResult hkpSaveContactPointsUtil::serialize1nTrack(
             }
             while (pEntry < pEnd);
         }
-        // EXE-INLINED none: hkArray<hkpAgent1nSector*>::expandOne
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (trackInfoOut.m_sectors.m_size ==
-            (trackInfoOut.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgent1nSector*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &trackInfoOut.m_sectors, sizeof(hkpAgent1nSector*));
-        }
-        ++trackInfoOut.m_sectors.m_size;
+        trackInfoOut.m_sectors.expandOne();
         // EXE-INLINED none: hkpAgent1nSector::operator new
         void* pSectorMemory =
             hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(sizeof(hkpAgent1nSector)));
@@ -935,18 +894,7 @@ hkResult hkpSaveContactPointsUtil::deserialize1nTrack(
     const hkpProcessCollisionInput* input,
     hkArray<hkpAgent1nSector*, hkContainerHeapAllocator>& sectorsOut
 ) {
-    // EXE-INLINED none: hkArray<hkpAgent1nSector*>::setSize
-    int32_t iNumSectors = serializedTrack.m_sectors.m_size;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iCapacity =
-        static_cast<int32_t>(sectorsOut.m_capacityAndFlags & hkArrayBase<hkpAgent1nSector*>::CAPACITY_MASK);
-    if (iCapacity < iNumSectors) {
-        int32_t iDoubled = 2 * iCapacity;
-        hkArrayUtil::_reserve(
-            pHeap, &sectorsOut, iNumSectors < iDoubled ? iDoubled : iNumSectors, sizeof(hkpAgent1nSector*)
-        );
-    }
-    sectorsOut.m_size = iNumSectors;
+    sectorsOut.setSize(serializedTrack.m_sectors.m_size);
     for (int32_t i = 0; i < serializedTrack.m_sectors.m_size; ++i) {
         // EXE-INLINED none: hkpAgent1nSector::operator new, hkpAgent1nSector::hkpAgent1nSector
         hkpAgent1nSector* pSector =

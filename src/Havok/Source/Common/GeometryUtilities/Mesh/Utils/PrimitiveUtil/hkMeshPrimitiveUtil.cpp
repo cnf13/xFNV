@@ -324,13 +324,7 @@ void hkMeshPrimitiveUtil::appendTriangleIndices(
             );
             for (int32_t i = 0; i < section.m_numIndices; ++i) {
                 const uint32_t index = indices16.m_data[i];
-                // EXE-INLINED none: hkArray<hkUint32, hkContainerHeapAllocator>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (indicesOut.m_size == (indicesOut.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &indicesOut, sizeof(uint32_t));
-                }
-                indicesOut.m_data[indicesOut.m_size] = index;
-                ++indicesOut.m_size;
+                indicesOut.pushBack(index);
             }
             break;
         }

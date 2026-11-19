@@ -74,70 +74,13 @@ void hkPackfileData::callDestructors() {
     m_trackedTypes.m_map.clear();
 }
 
-// Performs impOut = m_imports; expOut = m_exports; with hkArray's operator= semantics: the storage grows to the
-// source's size (to twice its capacity when that is more), the elements the destination had are assigned, the others
-// copy-constructed behind placement new's null test. The second loop's count is the 32-bit difference of the sizes, and
-// the loop is skipped when that is not positive.
+// Copies the imports and the exports into impOut and expOut.
 void hkPackfileData::getImportsExports(
     hkArray<hkResource::Import, hkContainerHeapAllocator>& impOut,
     hkArray<hkResource::Export, hkContainerHeapAllocator>& expOut
 ) const {
-    // EXE-INLINED none: hkArray<hkResource::Import, hkContainerHeapAllocator>::operator=
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iNumImports = m_imports.getSize();
-    const int32_t iOldImports = impOut.getSize();
-    const int32_t iAssignedImports = iNumImports > iOldImports ? iOldImports : iNumImports;
-    const int32_t iImportCapacity = impOut.m_capacityAndFlags & hkArrayBase<hkResource::Import>::CAPACITY_MASK;
-    if (iImportCapacity < iNumImports) {
-        const int32_t iDoubled = 2 * iImportCapacity;
-        hkArrayUtil::_reserve(
-            *pHeap, &impOut, iNumImports < iDoubled ? iDoubled : iNumImports, sizeof(hkResource::Import)
-        );
-    }
-    // Takes both storage pointers once per loop, after the reserve.
-    hkResource::Import* pImport = impOut.m_data;
-    const hkResource::Import* pSourceImport = m_imports.m_data;
-    for (int32_t i = 0; i < iAssignedImports; ++i) {
-        pImport[i] = pSourceImport[i];
-    }
-    pImport = impOut.m_data + iAssignedImports;
-    pSourceImport = m_imports.m_data + iAssignedImports;
-    int32_t iNewImports =
-        static_cast<int32_t>(static_cast<uint32_t>(iNumImports) - static_cast<uint32_t>(iAssignedImports));
-    for (; iNewImports > 0; --iNewImports, ++pImport, ++pSourceImport) {
-        if (pImport) {
-            *pImport = *pSourceImport;
-        }
-    }
-    impOut.m_size = iNumImports;
-
-    // EXE-INLINED none: hkArray<hkResource::Export, hkContainerHeapAllocator>::operator=
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iNumExports = m_exports.getSize();
-    const int32_t iOldExports = expOut.getSize();
-    const int32_t iAssignedExports = iNumExports > iOldExports ? iOldExports : iNumExports;
-    const int32_t iExportCapacity = expOut.m_capacityAndFlags & hkArrayBase<hkResource::Export>::CAPACITY_MASK;
-    if (iExportCapacity < iNumExports) {
-        const int32_t iDoubled = 2 * iExportCapacity;
-        hkArrayUtil::_reserve(
-            *pHeap, &expOut, iNumExports < iDoubled ? iDoubled : iNumExports, sizeof(hkResource::Export)
-        );
-    }
-    hkResource::Export* pExport = expOut.m_data;
-    const hkResource::Export* pSourceExport = m_exports.m_data;
-    for (int32_t i = 0; i < iAssignedExports; ++i) {
-        pExport[i] = pSourceExport[i];
-    }
-    pExport = expOut.m_data + iAssignedExports;
-    pSourceExport = m_exports.m_data + iAssignedExports;
-    int32_t iNewExports =
-        static_cast<int32_t>(static_cast<uint32_t>(iNumExports) - static_cast<uint32_t>(iAssignedExports));
-    for (; iNewExports > 0; --iNewExports, ++pExport, ++pSourceExport) {
-        if (pExport) {
-            *pExport = *pSourceExport;
-        }
-    }
-    expOut.m_size = iNumExports;
+    impOut = m_imports;
+    expOut = m_exports;
 }
 
 // Returns null without a top-level object, or when typeName's class is not the top-level object's class or a base of
@@ -251,12 +194,7 @@ void hkPackfileData::setPackfileClassNameRegistry(const hkClassNameRegistry* cla
 void hkPackfileData::removeExport(void* object) {
     for (int32_t i = m_exports.getSize() - 1; i >= 0; --i) {
         if (m_exports.m_data[i].data == object) {
-            // EXE-INLINED none: hkArrayBase<hkResource::Export>::removeAt
-            m_exports.m_size--;
-            if (m_exports.getSize() != i) {
-                // EXE-INLINED 0x6267C0
-                m_exports.m_data[i] = m_exports.m_data[m_exports.getSize()];
-            }
+            m_exports.removeAt(i);
         }
     }
 }
@@ -265,12 +203,7 @@ void hkPackfileData::removeExport(void* object) {
 void hkPackfileData::removeImport(void** location) {
     for (int32_t i = m_imports.getSize() - 1; i >= 0; --i) {
         if (m_imports.m_data[i].location == location) {
-            // EXE-INLINED none: hkArrayBase<hkResource::Import>::removeAt
-            m_imports.m_size--;
-            if (m_imports.getSize() != i) {
-                // EXE-INLINED 0x6267C0
-                m_imports.m_data[i] = m_imports.m_data[m_imports.getSize()];
-            }
+            m_imports.removeAt(i);
             return;
         }
     }
@@ -305,21 +238,9 @@ void hkPackfileData::addImport(const char* symbolName, void** location) {
     rImport.location = location;
 }
 
-// The SDK's inline m_chunks.pushBack(Chunk(p, n, c)): the storage grows by one element when full, the chunk is
-// constructed behind placement new's null test, then the size goes up.
+// The SDK's m_chunks.pushBack(Chunk(p, n, c)).
 void hkPackfileData::addChunk(void* p, int32_t n, HK_MEMORY_CLASS c) {
-    // EXE-INLINED none: hkArray<hkPackfileData::Chunk, hkContainerHeapAllocator>::pushBack
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    if (m_chunks.m_size == (m_chunks.m_capacityAndFlags & hkArrayBase<hkPackfileData::Chunk>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_chunks, sizeof(hkPackfileData::Chunk));
-    }
-    hkPackfileData::Chunk* pChunk = &m_chunks.m_data[m_chunks.m_size];
-    if (pChunk) {
-        pChunk->pointer = p;
-        pChunk->numBytes = n;
-        pChunk->memClass = c;
-    }
-    ++m_chunks.m_size;
+    m_chunks.pushBack(Chunk{p, n, c});
 }
 
 void hkPackfileData::setContentsWithName(void* topLevelObject, const char* typeName) {

@@ -49,16 +49,7 @@ void deleteTaskHeaderResources(hkpBuildJacobianTaskHeader* taskHeader) {
 			taskHeader->m_entitiesCapacity);
 		taskHeader->m_allEntities = nullptr;
 	}
-	// EXE-INLINED none: hkArray<hkpSimulationIsland*>::clearAndDeallocate
-	hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-	const int32_t capacityAndFlags = taskHeader->m_newSplitIslands.m_capacityAndFlags;
-	taskHeader->m_newSplitIslands.m_size = 0;
-	if (capacityAndFlags >= 0) {
-		heap._bufFree<hkpSimulationIsland*>(taskHeader->m_newSplitIslands.m_data,
-			capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK);
-	}
-	taskHeader->m_newSplitIslands.m_data = nullptr;
-	taskHeader->m_newSplitIslands.m_capacityAndFlags = hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG;
+	taskHeader->m_newSplitIslands.clearAndDeallocate();
 	// EXE-INLINED none: hkpBuildJacobianTaskHeader::operator delete
 	hkMemoryRouter::getInstance().heap().blockFree(taskHeader, sizeof(hkpBuildJacobianTaskHeader));
 }
@@ -113,15 +104,8 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
 				pHeader = pHeader->m_next) {
 				iNumBreached += pHeader->m_numBreached;
 			}
-			// EXE-INLINED none: hkAllocateStack<hkpContactImpulseLimitBreachedListenerInfo>. The stack allocator hands
-			// out untyped bytes.
-			hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-			char* pBlock = stack.m_next.m_storage;
-			stack.m_next.m_storage = pBlock +
-				((iNumBreached * static_cast<int32_t>(sizeof(hkpContactImpulseLimitBreachedListenerInfo)) + 127) &
-					~127);
 			hkpContactImpulseLimitBreachedListenerInfo* pInfos =
-				reinterpret_cast<hkpContactImpulseLimitBreachedListenerInfo*>(pBlock);
+				hkAllocateStack<hkpContactImpulseLimitBreachedListenerInfo>(iNumBreached, nullptr);
 			// Each header's breached elements follow it, one info's size each.
 			int32_t iFirst = 0;
 			for (hkpImpulseLimitBreachedHeader* pHeader = taskHeader->m_impulseLimitsBreached; pHeader;
@@ -132,8 +116,7 @@ hkJobQueue::JobStatus hkpSingleThreadedJobsOnIsland::cpuBroadPhaseJob(hkpMtThrea
 				iFirst += pHeader->m_numBreached;
 			}
 			hkpWorldCallbackUtil::fireContactImpulseLimitBreached(tl.m_world, pInfos, iNumBreached);
-			// EXE-INLINED none: hkDeallocateStack<hkpContactImpulseLimitBreachedListenerInfo>
-			hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBlock;
+			hkDeallocateStack(pInfos);
 		}
 		*exportFinished = 2;
 	} else {

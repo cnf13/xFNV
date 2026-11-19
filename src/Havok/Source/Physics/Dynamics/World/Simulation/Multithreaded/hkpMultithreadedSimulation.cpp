@@ -250,17 +250,7 @@ void hkpMultiThreadedSimulation::MtEntityEntityBroadPhaseListener::addCollisionP
         }
     }
     else {
-        // EXE-INLINED none: hkArray<hkpTypedBroadPhaseHandlePair>::pushBack
-        hkArray<hkpTypedBroadPhaseHandlePair, hkContainerHeapAllocator>& pairs = pSimulation->m_addedCrossIslandPairs;
-        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&pairs);
-        if (pairs.m_size == pairs.getCapacity()) {
-            hkArrayUtil::_reserveMore(alloc, &pairs, sizeof(hkpTypedBroadPhaseHandlePair));
-        }
-        hkpTypedBroadPhaseHandlePair* pNew = pairs.m_data + pairs.m_size;
-        if (pNew) {
-            *pNew = pair;
-        }
-        pairs.m_size++;
+        pSimulation->m_addedCrossIslandPairs.pushBack(pair);
     }
 }
 
@@ -287,17 +277,7 @@ void hkpMultiThreadedSimulation::MtEntityEntityBroadPhaseListener::removeCollisi
         }
     }
     else {
-        // EXE-INLINED none: hkArray<hkpTypedBroadPhaseHandlePair>::pushBack
-        hkArray<hkpTypedBroadPhaseHandlePair, hkContainerHeapAllocator>& pairs = pSimulation->m_removedCrossIslandPairs;
-        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&pairs);
-        if (pairs.m_size == pairs.getCapacity()) {
-            hkArrayUtil::_reserveMore(alloc, &pairs, sizeof(hkpTypedBroadPhaseHandlePair));
-        }
-        hkpTypedBroadPhaseHandlePair* pNew = pairs.m_data + pairs.m_size;
-        if (pNew) {
-            *pNew = pair;
-        }
-        pairs.m_size++;
+        pSimulation->m_removedCrossIslandPairs.pushBack(pair);
     }
 }
 
@@ -459,16 +439,7 @@ void hkpMultiThreadedSimulation::collideEntitiesOfOneIslandNarrowPhaseContinuous
                 static_cast<int8_t>(entry.m_agentEntry->m_collisionQualityIndex)
             );
             if (qualityInfo->m_useContinuousPhysics.m_storage && !qualityInfo->m_useSimpleToiHandling.m_bool) {
-                // EXE-INLINED none: hkArray<hkpAgentNnEntry*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (agentEntries.m_size ==
-                    (agentEntries.m_capacityAndFlags & hkArrayBase<hkpAgentNnEntry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        *router.m_heap, &agentEntries, static_cast<int32_t>(sizeof(hkpAgentNnEntry*))
-                    );
-                }
-                agentEntries.m_data[agentEntries.m_size] = entry.m_agentEntry;
-                agentEntries.m_size++;
+                agentEntries.pushBack(entry.m_agentEntry);
             }
             else if (!entitiesNeedingPsiCollisionDetection.getWithDefault(entity->getUid(), nullptr)) {
                 entity->addReference();
@@ -588,12 +559,7 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
         firstEntryIdx += islandEntriesInfos.m_data[i].m_numEntries;
     }
 
-    // The thread's stack memory is untyped bytes (m_next is a char*), handed out in 128-byte steps.
-    // EXE-INLINED none: hkAllocateStack<hkpAgentNnEntry*>
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    hkpAgentNnEntry** allEntries = reinterpret_cast<hkpAgentNnEntry**>(pRouter->m_stack.m_next.m_storage);
-    pRouter->m_stack.m_next.m_storage +=
-        (sizeof(hkpAgentNnEntry*) * static_cast<uint32_t>(numAllEntries) + 127) & ~static_cast<size_t>(127);
+    hkpAgentNnEntry** allEntries = hkAllocateStack<hkpAgentNnEntry*>(numAllEntries, nullptr);
 
     for (int32_t i = 0; i < entriesAndIslands.m_size; ++i) {
         hkpAgentNnEntry* entry = entriesAndIslands.m_data[i].m_entry;
@@ -646,9 +612,7 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
         world->attemptToExecutePendingOperations();
     }
     HK_TIMER_END();
-    // The block goes back by resetting the untyped m_next to its start.
-    // EXE-INLINED none: hkDeallocateStack<hkpAgentNnEntry*>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(allEntries);
+    hkDeallocateStack(allEntries);
 }
 
 void hkpMultiThreadedSimulation::getMultithreadConfig(hkpMultithreadConfig& config) const {
@@ -866,12 +830,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntriesFromMultipleIslands(
     if (m_jobQueueHandleForToiSolve && numAllEntries > m_world->m_maxNumToiCollisionPairsSinglethreaded) {
         const int32_t numAgentNnEntriesPerTask = m_world->m_maxEntriesPerToiCollideTask;
         hkpIslandsAgentEntriesInfo* fixedIslandInfo = nullptr;
-        // EXE-INLINED none: hkAllocateStack<hkpAgentNnEntryJob>
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        char* stackMark = router.m_stack.m_next.m_storage;
-        router.m_stack.m_next.m_storage =
-            stackMark + ((numInfos * static_cast<int32_t>(sizeof(hkpAgentNnEntryJob)) + 127) & ~127);
-        hkpAgentNnEntryJob* jobs = static_cast<hkpAgentNnEntryJob*>(static_cast<void*>(stackMark));
+        hkpAgentNnEntryJob* jobs = hkAllocateStack<hkpAgentNnEntryJob>(numInfos, nullptr);
         for (int32_t i = 0; i < numInfos; ++i) {
             hkpIslandsAgentEntriesInfo& info = islandEntriesInfos[i];
             if (info.m_island == m_world->getFixedIsland()) {
@@ -969,8 +928,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntriesFromMultipleIslands(
                 fixedIslandInfo->m_island, hkBool(false)
             );
         }
-        // EXE-INLINED none: hkDeallocateStack<hkpAgentNnEntryJob>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackMark;
+        hkDeallocateStack(jobs);
     }
     else {
         for (int32_t i = 0; i < numInfos; ++i) {
@@ -1080,8 +1038,7 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
                 }
             }
         }
-        // EXE-INLINED none: hkArray<hkpTypedBroadPhaseHandlePair>::clear
-        m_addedCrossIslandPairs.m_size = 0;
+        m_addedCrossIslandPairs.clear();
         HK_TIMER_SPLIT_LIST("removeAgt");
         for (int32_t i = 0; i < m_removedCrossIslandPairs.m_size; ++i) {
             hkpTypedBroadPhaseHandlePair& pair = m_removedCrossIslandPairs.m_data[i];
@@ -1094,8 +1051,7 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
                 hkpWorldAgentUtil::removeAgentAndItsToiEvents(entry);
             }
         }
-        // EXE-INLINED none: hkArray<hkpTypedBroadPhaseHandlePair>::clear
-        m_removedCrossIslandPairs.m_size = 0;
+        m_removedCrossIslandPairs.clear();
         HK_TIMER_END_LIST();
     }
     m_crossIslandPairsCollectingActive.m_bool = false;

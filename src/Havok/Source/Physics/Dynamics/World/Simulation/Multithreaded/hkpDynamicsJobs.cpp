@@ -30,21 +30,7 @@ hkpBroadPhaseJob::popJobTask(hkArray<hkpSimulationIsland*, hkContainerHeapAlloca
             }
             p_m_activeSimulationIslands->m_data[p_m_activeSimulationIslands->m_size++] = pIsland;
         }
-        // EXE-INLINED 0x62A0B0
-        hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;
-        int32_t m_capacityAndFlags = m_taskHeader->m_newSplitIslands.m_capacityAndFlags;
-        m_taskHeader->m_newSplitIslands.m_size = 0;
-        if (m_capacityAndFlags >= 0) {
-            m_heap->bufFree(
-                m_taskHeader->m_newSplitIslands.m_data,
-                static_cast<int32_t>(
-                    sizeof(hkpSimulationIsland*) *
-                    (m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK)
-                )
-            );
-        }
-        m_taskHeader->m_newSplitIslands.m_data = nullptr;
-        m_taskHeader->m_newSplitIslands.m_capacityAndFlags = hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG;
+        m_taskHeader->m_newSplitIslands.clearAndDeallocate();
         return hkJobQueue::DO_NOT_POP_QUEUE_ENTRY;
     }
 

@@ -77,63 +77,9 @@ void bhkRagdollTemplateData::LoadBinary(NiStream& arStream) {
     uiComponentSize = 4;
     arStream.Istr()->BinaryRead(&uiConstraints, 4, &uiComponentSize, 1);
 
-    // EXE-INLINED none: BSSimpleArray<hkConstraintCinfo*, 1024>::SetSize
-    BSSimpleArray<hkConstraintCinfo*, 1024>* pConstraints = &ConstraintsA;
-    if (!uiConstraints) {
-        if (pConstraints->pBuffer) {
-            pConstraints->_Deallocate(pConstraints->pBuffer);
-            pConstraints->pBuffer = nullptr;
-            pConstraints->iReservedSize = 0;
-            pConstraints->iSize = 0;
-        }
-    }
-    else if (uiConstraints > pConstraints->iReservedSize) {
-        if (!pConstraints->iReservedSize) {
-            pConstraints->pBuffer = pConstraints->_Allocate(uiConstraints);
-        }
-        else {
-            pConstraints->_ReallocateBuffer(uiConstraints, pConstraints->iSize);
-        }
-        pConstraints->iSize = uiConstraints;
-        pConstraints->iReservedSize = uiConstraints;
-    }
-    else {
-        uint32_t uiOldSize = pConstraints->iSize;
-        pConstraints->iSize = uiConstraints;
-        if (uiConstraints < uiOldSize && uiConstraints <= pConstraints->iReservedSize >> 2) {
-            pConstraints->_ReallocateBuffer(uiConstraints, uiConstraints);
-            pConstraints->iReservedSize = uiConstraints;
-        }
-    }
+    ConstraintsA.SetSize(uiConstraints, true);
 
-    // EXE-INLINED none: BSSimpleArray<hkpConstraintData::ConstraintType, 1024>::SetSize
-    BSSimpleArray<hkpConstraintData::ConstraintType, 1024>* pTypes = &ConstraintTypeA;
-    if (!uiConstraints) {
-        if (pTypes->pBuffer) {
-            pTypes->_Deallocate(pTypes->pBuffer);
-            pTypes->pBuffer = nullptr;
-            pTypes->iReservedSize = 0;
-            pTypes->iSize = 0;
-        }
-    }
-    else if (uiConstraints > pTypes->iReservedSize) {
-        if (!pTypes->iReservedSize) {
-            pTypes->pBuffer = pTypes->_Allocate(uiConstraints);
-        }
-        else {
-            pTypes->_ReallocateBuffer(uiConstraints, pTypes->iSize);
-        }
-        pTypes->iSize = uiConstraints;
-        pTypes->iReservedSize = uiConstraints;
-    }
-    else {
-        uint32_t uiOldSize = pTypes->iSize;
-        pTypes->iSize = uiConstraints;
-        if (uiConstraints < uiOldSize && uiConstraints <= pTypes->iReservedSize >> 2) {
-            pTypes->_ReallocateBuffer(uiConstraints, uiConstraints);
-            pTypes->iReservedSize = uiConstraints;
-        }
-    }
+    ConstraintTypeA.SetSize(uiConstraints, true);
 
     // One slot for every read: a short read leaves the previous type (or, the first time, garbage) there.
     hkpConstraintData::ConstraintType eType;

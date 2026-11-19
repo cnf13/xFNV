@@ -27,22 +27,15 @@ hkPlatformObjectWriter::Cache::~Cache() {
 // The class converted for the layout: the cached copy when there is one, else a deep copy of the class (recorded in
 // the host-to-platform map), kept in m_allocations and laid out for the layout.
 hkClass* hkPlatformObjectWriter::Cache::get(const hkClass* klass, const hkStructureLayout& layout) {
-    using ClassMap = hkPointerMap<const void*, void*, hkContainerHeapAllocator>;
-    // EXE-INLINED none: hkPointerMap<const void*, void*, hkContainerHeapAllocator>::get
-    ClassMap::Storage uiFound;
-    if (m_platformClassFromHostClass.m_map.getWithDefaultStatus(ClassMap::ToMapInt(klass), &uiFound) == 0) {
-        return ClassMap::FromMapInt<hkClass*>(uiFound);
+    void* pFound;
+    if (m_platformClassFromHostClass.get(klass, &pFound) == HK_SUCCESS) {
+        return static_cast<hkClass*>(pFound);
     }
     hkClass* pKlass = static_cast<hkClass*>(hkDeepCopier::deepCopy(
         klass, hkClassClass, &m_platformClassFromHostClass, nullptr, nullptr,
         hkFlags<hkObjectCopier::ObjectCopierFlagBits, uint32_t>(0)
     ));
-    // EXE-INLINED 0x6299C0
-    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-    if (m_allocations.m_size == m_allocations.getCapacity()) {
-        hkArrayUtil::_reserveMore(kHeap, &m_allocations, sizeof(void*));
-    }
-    m_allocations.m_data[m_allocations.m_size++] = pKlass;
+    m_allocations.pushBack(pKlass);
     layout.computeMemberOffsetsInplace(*pKlass, m_platformClassComputed, 1);
     return pKlass;
 }

@@ -163,13 +163,7 @@ void hkKdTreeAabbQueryUtils::_queryAabbRecursive(
             continue;
         }
         const hkPrimitiveId uiPrimitiveId = pEntry->getPrimitiveId();
-        // EXE-INLINED none: hkArray<hkUlong, hkContainerTempAllocator>::pushBack
-        hkMemoryRouter& kTempRouter = hkMemoryRouter::getInstance();
-        if (hits.m_size == (hits.m_capacityAndFlags & hkArrayBase<void>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(kTempRouter.temp(), &hits, sizeof(hkUlong));
-        }
-        hits.m_data[hits.m_size] = uiPrimitiveId;
-        hits.m_size++;
+        hits.pushBack(uiPrimitiveId);
     }
 }
 
@@ -199,13 +193,7 @@ uint32_t hkKdTreeAabbQueryUtils::queryAabbInternal(
     // word (an inner node's two splits, a leaf's primitive count).
     int32_t iHeader = pNode->m_data.m_node.m_type_left_axis;
     uint32_t uiWord1 = pNode->m_data.m_leaf.m_numPrimitives;
-    // EXE-INLINED none: hkAllocateStack<const hkKdTreeNode*>
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    // EXE-INLINED 0x458B50
-    char* pStackMemory = kRouter.m_stack.m_next.m_storage;
-    kRouter.m_stack.m_next.m_storage = pStackMemory + ((stackSize * sizeof(const hkKdTreeNode*) + 0x7F) & ~0x7F);
-    // The stack allocator's bytes are untyped memory, used as the node stack.
-    const hkKdTreeNode** const pStackBase = reinterpret_cast<const hkKdTreeNode**>(pStackMemory);
+    const hkKdTreeNode** const pStackBase = hkAllocateStack<const hkKdTreeNode*>(stackSize, nullptr);
     const hkKdTreeNode** pTop = pStackBase;
     const hkAabb kAabb = aabbIn;
     int32_t iNumHits = 0;
@@ -267,13 +255,7 @@ uint32_t hkKdTreeAabbQueryUtils::queryAabbInternal(
                     }
                 }
                 else if (hitArray) {
-                    // EXE-INLINED none: hkArray<hkUlong, hkContainerTempAllocator>::pushBack
-                    hkMemoryRouter& kTempRouter = hkMemoryRouter::getInstance();
-                    if (hitArray->m_size == (hitArray->m_capacityAndFlags & hkArrayBase<void>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(kTempRouter.temp(), hitArray, sizeof(hkUlong));
-                    }
-                    hitArray->m_data[hitArray->m_size] = uiPrimitiveId;
-                    hitArray->m_size++;
+                    hitArray->pushBack(uiPrimitiveId);
                 }
                 else if (hitsOut) {
                     // Reads *hitsOut again for the increment, after the store.
@@ -296,8 +278,7 @@ uint32_t hkKdTreeAabbQueryUtils::queryAabbInternal(
     }
 
 done:
-    // EXE-INLINED none: hkDeallocateStack<const hkKdTreeNode*>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pStackMemory;
+    hkDeallocateStack(pStackBase);
     return iNumHits;
 }
 

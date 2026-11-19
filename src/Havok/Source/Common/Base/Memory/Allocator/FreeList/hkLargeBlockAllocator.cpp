@@ -726,12 +726,7 @@ void hkLargeBlockAllocator::forAllAllocs(void (*callback)(void*, uint32_t, void*
 // forAllAllocs' callback that collects the allocations: param is the hkArray<void*> they are appended to.
 void hkLargeBlockAllocator::_addAlloc(void* data, uint32_t size, void* param) {
     hkArray<void*>* pArray = static_cast<hkArray<void*>*>(param);
-    // EXE-INLINED 0x6299C0
-    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-    if (pArray->m_size == pArray->getCapacity()) {
-        hkArrayUtil::_reserveMore(kHeap, pArray, sizeof(void*));
-    }
-    pArray->m_data[pArray->m_size++] = data;
+    pArray->pushBack(data);
 }
 
 uint32_t hkLargeBlockAllocator::_bitToIndex(uint32_t x) {

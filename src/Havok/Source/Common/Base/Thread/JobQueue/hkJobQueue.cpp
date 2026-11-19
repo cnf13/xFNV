@@ -48,19 +48,12 @@ hkJobQueueHwSetup& hkJobQueueHwSetup::operator=(const hkJobQueueHwSetup& acSetup
     int32_t newSize = from.m_size;
     int32_t copiedSize = newSize > oldSize ? oldSize : newSize;
     caches._reserve(alloc, newSize);
-    // The destruct, constructWithArray and copy loops run over element counts, computed with wrapping subtractions, not
-    // over index ranges.
-    // EXE-INLINED none: hkArrayUtil::destruct<hkArray<int>>
-    hkArray<int32_t>* pSurplus = caches.m_data + newSize;
-    int32_t numSurplus = static_cast<int32_t>(static_cast<uint32_t>(oldSize) - static_cast<uint32_t>(newSize));
-    for (int32_t i = 0; i < numSurplus; ++i) {
-        pSurplus[i].clearAndDeallocate();
-    }
-    // EXE-INLINED none: hkArray<int>::operator=
+    hkArrayUtil::destruct(caches.m_data + newSize, oldSize - newSize, hkTypeIsClass());
     for (int32_t i = 0; i < copiedSize; ++i) {
-        hkArray<int32_t>& dst = caches.m_data[i];
-        dst.copyFromArray(hkContainerHeapAllocator().get(&dst), from.m_data[i], hkTypeIsPod());
+        caches.m_data[i] = from.m_data[i];
     }
+    // The constructWithArray loop runs over an element count computed with a wrapping subtraction, not over an index
+    // range.
     // EXE-INLINED none: hkArrayUtil::constructWithArray<hkArray<int>>
     hkArray<int32_t>* pNew = caches.m_data + copiedSize;
     const hkArray<int32_t>* pFrom = from.m_data + copiedSize;
@@ -111,30 +104,11 @@ hkJobQueue::JobStatus hkJobQueue::finishJobAndGetNextJob(
             if (m_finishJobFunc(*this, data, *oldJob, newJob) == JOB_CREATED) {
                 queueIndexOfNewJob = getQueueIndexForJob(newJob.m_job);
                 Queue& queue = data->m_jobQueue[queueIndexOfNewJob];
-                int32_t iCapacity = queue.m_capacity;
                 if (newJob.m_jobPriority.m_storage == JOB_HIGH_PRIORITY) {
-                    // EXE-INLINED 0xD057F0
-                    if (queue.m_elementsInUse >= iCapacity) {
-                        queue.setCapacity(iCapacity ? 2 * iCapacity : 8);
-                    }
-                    if (queue.m_head == 0) {
-                        queue.m_head = queue.m_capacity;
-                    }
-                    --queue.m_head;
-                    queue.m_data[queue.m_head] = newJob.m_job;
-                    ++queue.m_elementsInUse;
+                    queue.enqueueInFront(newJob.m_job);
                 }
                 else {
-                    // EXE-INLINED 0xD057A0
-                    if (queue.m_elementsInUse >= iCapacity) {
-                        queue.setCapacity(iCapacity ? 2 * iCapacity : 8);
-                    }
-                    if (queue.m_tail == queue.m_capacity) {
-                        queue.m_tail = 0;
-                    }
-                    queue.m_data[queue.m_tail] = newJob.m_job;
-                    ++queue.m_tail;
-                    ++queue.m_elementsInUse;
+                    queue.enqueue(newJob.m_job);
                 }
             }
             --data->m_numActiveJobs[oldJob->m_jobType.m_storage];
@@ -506,30 +480,11 @@ hkJobQueue::JobStatus hkJobQueue::finishAddAndGetNextJob(
             --data->m_numActiveJobs[oldJobType];
             queueIndexOfNewJob = getQueueIndexForJob(jobInOut);
             Queue& queue = data->m_jobQueue[queueIndexOfNewJob];
-            int32_t iCapacity = queue.m_capacity;
             if (priority == JOB_HIGH_PRIORITY) {
-                // EXE-INLINED 0xD057F0
-                if (queue.m_elementsInUse >= iCapacity) {
-                    queue.setCapacity(iCapacity ? 2 * iCapacity : 8);
-                }
-                if (queue.m_head == 0) {
-                    queue.m_head = queue.m_capacity;
-                }
-                --queue.m_head;
-                queue.m_data[queue.m_head] = jobInOut;
-                ++queue.m_elementsInUse;
+                queue.enqueueInFront(jobInOut);
             }
             else {
-                // EXE-INLINED 0xD057A0
-                if (queue.m_elementsInUse >= iCapacity) {
-                    queue.setCapacity(iCapacity ? 2 * iCapacity : 8);
-                }
-                if (queue.m_tail == queue.m_capacity) {
-                    queue.m_tail = 0;
-                }
-                queue.m_data[queue.m_tail] = jobInOut;
-                ++queue.m_tail;
-                ++queue.m_elementsInUse;
+                queue.enqueue(jobInOut);
             }
             bJobToAdd = false;
         }
@@ -610,30 +565,11 @@ void hkJobQueue::addJobBatch(const hkArrayBase<hkJob*>& jobs, hkJobQueue::JobPri
         hkString::memCpy(&entry, jobs.m_data[i], jobs.m_data[i]->m_size);
         const int32_t queueIndex = getQueueIndexForJob(entry);
         hkQueue<JobQueueEntry>& queue = data->m_jobQueue[queueIndex];
-        const int32_t capacity = queue.m_capacity;
         if (priority == JOB_HIGH_PRIORITY) {
-            // EXE-INLINED 0xD057F0: hkQueue<hkJobQueue::JobQueueEntry>::enqueueInFront
-            if (queue.m_elementsInUse >= capacity) {
-                queue.setCapacity(capacity ? 2 * capacity : 8);
-            }
-            if (!queue.m_head) {
-                queue.m_head = queue.m_capacity;
-            }
-            --queue.m_head;
-            queue.m_data[queue.m_head] = entry;
-            ++queue.m_elementsInUse;
+            queue.enqueueInFront(entry);
         }
         else {
-            // EXE-INLINED 0xD057A0: hkQueue<hkJobQueue::JobQueueEntry>::enqueue
-            if (queue.m_elementsInUse >= capacity) {
-                queue.setCapacity(capacity ? 2 * capacity : 8);
-            }
-            if (queue.m_tail == queue.m_capacity) {
-                queue.m_tail = 0;
-            }
-            queue.m_data[queue.m_tail] = entry;
-            ++queue.m_tail;
-            ++queue.m_elementsInUse;
+            queue.enqueue(entry);
         }
         checkQueueAndReleaseOneWaitingThread(queueIndex, data);
     }

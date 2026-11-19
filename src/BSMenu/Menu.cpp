@@ -502,7 +502,6 @@ void Menu::InitSDM() {
 void Menu::KillSDM() {
     NiFixedString* Block = Menu::pTileptrStr;
     if (Menu::pTileptrStr) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(Menu::pTileptrStr->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

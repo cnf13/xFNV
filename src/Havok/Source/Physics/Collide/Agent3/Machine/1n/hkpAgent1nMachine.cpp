@@ -612,18 +612,13 @@ void hkAgent1nMachine_Destroy(
     }
 }
 
-// Clears the track, reserves four sectors, appends one (expandOne written out) and fills it with a new sector
+// Clears the track, reserves four sectors, appends one and fills it with a new sector
 // (hkpAgent1nSector's class operator new from the heap and its constructor) whose only entry ends the stream. The
 // sector's data is an untyped byte stream of entries, hence the cast.
 void hkAgent1nMachine_Create(hkpAgent1nTrack& agentTrack) {
     agentTrack.m_sectors.clear();
     agentTrack.m_sectors.reserve(4);
-    // EXE-INLINED none: hkArray<hkpAgent1nSector*>::expandOne
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    if (agentTrack.m_sectors.m_size == agentTrack.m_sectors.getCapacity()) {
-        hkArrayUtil::_reserveMore(heap, &agentTrack.m_sectors, sizeof(hkpAgent1nSector*));
-    }
-    agentTrack.m_sectors.m_size++;
+    agentTrack.m_sectors.expandOne();
     // EXE-INLINED none: hkpAgent1nSector::operator new, hkpAgent1nSector::hkpAgent1nSector
     hkpAgent1nSector* sector =
         static_cast<hkpAgent1nSector*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpAgent1nSector)));

@@ -77,24 +77,14 @@ void hkpConvexRadiusViewer::entityAddedCallback(hkpEntity* entity) {
                 hkError::MESSAGE_REPORT, -1, buf, ".\\VisualDebugger\\Viewer\\Collide\\hkpConvexRadiusViewer.cpp", 0xA7
             );
             pError->~hkErrStream();
-            // EXE-INLINED none: hkArray::removeAt
-            uint32_t last = --displayGeometries.m_size;
-            if (static_cast<int32_t>(last) != i) {
-                displayGeometries.m_data[i] = displayGeometries.m_data[last];
-            }
+            displayGeometries.removeAt(i);
         }
     }
 
     if (displayGeometries.m_size > 0) {
         hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable) + 3;
         hkArray<hkUlong>& created = data->entitiesCreated;
-        // EXE-INLINED none: hkArray<hkUlong>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (created.m_size == (created.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &created, sizeof(hkUlong));
-        }
-        created.m_data[created.m_size] = id;
-        created.m_size++;
+        created.pushBack(id);
         m_displayHandler->addGeometry(displayGeometries, entity->m_motion.m_motionState.m_transform, id, m_tag, 0);
         if (entity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
             m_displayHandler->setGeometryColor(static_cast<int32_t>(m_fixedObjectColor), id, m_tag);
@@ -126,20 +116,9 @@ void hkpConvexRadiusViewer::entityRemovedCallback(hkpEntity* entity) {
     hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable) + 3;
     m_displayHandler->removeGeometry(id, m_tag, 0);
     hkArray<hkUlong>& created = data->entitiesCreated;
-    // EXE-INLINED none: hkArray<hkUlong>::indexOf
-    int32_t found = -1;
-    for (int32_t i = 0; i < created.m_size; i++) {
-        if (created.m_data[i] == id) {
-            found = i;
-            break;
-        }
-    }
+    int32_t found = created.indexOf(id);
     if (found >= 0) {
-        // EXE-INLINED none: hkArray<hkUlong>::removeAt
-        int32_t last = --created.m_size;
-        if (last != found) {
-            created.m_data[found] = created.m_data[last];
-        }
+        created.removeAt(found);
     }
 }
 

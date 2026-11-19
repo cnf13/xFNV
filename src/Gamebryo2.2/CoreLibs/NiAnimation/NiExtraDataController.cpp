@@ -138,7 +138,6 @@ void NiExtraDataController::CopyMembers(NiExtraDataController* pkDest, NiCloning
     NiGlobalStringTable::GlobalStringHandle kHandle = m_kExtraDataName.GetHandle();
     if (pkDest->m_kExtraDataName.GetHandle() != kHandle) {
         NiGlobalStringTable::AcquireHandle(kHandle);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(pkDest->m_kExtraDataName.GetHandle());
         pkDest->m_kExtraDataName.SetHandle(kHandle);
     }

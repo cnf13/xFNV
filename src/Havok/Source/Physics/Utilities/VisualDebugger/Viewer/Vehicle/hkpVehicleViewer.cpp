@@ -116,20 +116,14 @@ void hkpVehicleViewer::worldRemovedCallback(hkpWorld* w) {
 }
 
 // Draws each vehicle's wheels (the suspension line, a spoke and a 12-sided rim) and a line along each axle through its
-// wheels' centres. The wheel centres sit in a block of the thread's stack memory, taken and given back inline.
+// wheels' centres. The wheel centres sit in a block of the thread's stack memory.
 void hkpVehicleViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpVehicleViewer::step", nullptr);
     const int32_t numVehicles = m_vehicles.m_size;
     for (int32_t i = 0; i < numVehicles; ++i) {
         hkpVehicleInstance* vehicle = m_vehicles.m_data[i];
         const int32_t numWheels = vehicle->m_wheelsInfo.m_size;
-        // EXE-INLINED none: hkAllocateStack<hkVector4>
-        hkMemoryRouter* router = &hkMemoryRouter::getInstance();
-        char* stackBlock = router->m_stack.m_next.m_storage;
-        router->m_stack.m_next.m_storage =
-            stackBlock + ((numWheels * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
-        // The stack allocator hands out untyped bytes; they are used as the centres' array.
-        hkVector4* centers = reinterpret_cast<hkVector4*>(stackBlock);
+        hkVector4* centers = hkAllocateStack<hkVector4>(numWheels, nullptr);
         for (int32_t w = 0; w < numWheels; ++w) {
             const hkpVehicleData::WheelComponentParams& params = vehicle->m_data->m_wheelParams.m_data[w];
             const hkpVehicleInstance::WheelInfo& wheelInfo = vehicle->m_wheelsInfo.m_data[w];
@@ -238,8 +232,7 @@ void hkpVehicleViewer::postSimulationCallback(hkpWorld* world) {
                 }
             }
         }
-        // EXE-INLINED 0x5E0B60
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackBlock;
+        hkDeallocateStack(centers);
     }
     HK_TIMER_END();
 }

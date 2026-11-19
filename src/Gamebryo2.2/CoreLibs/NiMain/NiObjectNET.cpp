@@ -10,6 +10,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
@@ -113,9 +114,7 @@ void NiObjectNET::SaveBinary(NiStream& kStream) {
             ++uiExtraDataSize;
         }
     }
-    uint32_t uiSize = 4;
-    // EXE-INLINED none: NiStreamSaveBinary
-    kStream.m_pkOstr->BinaryWrite(&uiExtraDataSize, 4, &uiSize, 1);
+    NiStreamSaveBinary(kStream, uiExtraDataSize);
     for (uint16_t j = 0; j < m_usExtraDataSize; ++j) {
         NiExtraData* pkExtra = m_ppkExtra[j];
         if (pkExtra->IsStreamable()) {

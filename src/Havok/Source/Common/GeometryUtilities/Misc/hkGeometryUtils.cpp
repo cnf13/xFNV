@@ -46,19 +46,7 @@ static void weldGeometryVertices(
 ) {
     const int32_t numVertices = geom.m_vertices.m_size;
     const int32_t numTriangles = geom.m_triangles.m_size;
-    // EXE-INLINED none: hkArray<int>::setSize
-    {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = vertexRemapOut.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
-        if (capacity < numVertices) {
-            int32_t newCapacity = 2 * capacity;
-            if (numVertices >= newCapacity) {
-                newCapacity = numVertices;
-            }
-            hkArrayUtil::_reserve(heap, &vertexRemapOut, newCapacity, sizeof(int32_t));
-        }
-    }
-    vertexRemapOut.m_size = numVertices;
+    vertexRemapOut.setSize(numVertices);
     hkArray<hkVector4> uniqueVerts;
     weldVertexArray(geom.m_vertices, uniqueVerts, vertexRemapOut, threshold);
 
@@ -88,43 +76,14 @@ static void weldGeometryVertices(
             if (ordered == -1) {
                 ordered = orderedVerts.m_size;
                 uniqueToOrdered.m_data[unique] = ordered;
-                const hkVector4* pVertex = &uniqueVerts.m_data[unique];
-                // EXE-INLINED none: hkArray<hkVector4>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (orderedVerts.m_size == (orderedVerts.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &orderedVerts, sizeof(hkVector4));
-                }
-                orderedVerts.m_data[orderedVerts.m_size].m_quad = pVertex->m_quad;
-                ++orderedVerts.m_size;
+                orderedVerts.pushBack(uniqueVerts.m_data[unique]);
             }
             vertexRemapOut.m_data[i] = ordered;
         }
         pNewVerts = &orderedVerts;
     }
 
-    // EXE-INLINED none: hkArray<hkVector4>::operator= (geom.m_vertices = *pNewVerts)
-    {
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacityAndFlags = geom.m_vertices.m_capacityAndFlags;
-        const int32_t capacity = capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-        if (capacity < pNewVerts->m_size) {
-            if (capacityAndFlags >= 0) {
-                pHeap->bufFree(geom.m_vertices.m_data, capacity * static_cast<int32_t>(sizeof(hkVector4)));
-            }
-            int32_t numBytes = pNewVerts->m_size * static_cast<int32_t>(sizeof(hkVector4));
-            geom.m_vertices.m_data = static_cast<hkVector4*>(pHeap->bufAlloc(numBytes));
-            geom.m_vertices.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(hkVector4));
-        }
-        const int32_t newSize = pNewVerts->m_size;
-        hkVector4* pDst = geom.m_vertices.m_data;
-        geom.m_vertices.m_size = newSize;
-        const hkVector4* pSrc = pNewVerts->m_data;
-        for (int32_t i = newSize; i > 0; --i) {
-            pDst->m_quad = pSrc->m_quad;
-            ++pSrc;
-            ++pDst;
-        }
-    }
+    geom.m_vertices = *pNewVerts;
 
     for (int32_t i = 0; i < numTriangles; ++i) {
         hkGeometry::Triangle& triangle = geom.m_triangles.m_data[i];
@@ -133,19 +92,7 @@ static void weldGeometryVertices(
         triangle.m_c = vertexRemapOut.m_data[triangle.m_c];
     }
 
-    // EXE-INLINED none: hkArray<int>::setSize
-    {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = triangleRemapOut.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
-        if (capacity < numTriangles) {
-            int32_t newCapacity = 2 * capacity;
-            if (numTriangles >= newCapacity) {
-                newCapacity = numTriangles;
-            }
-            hkArrayUtil::_reserve(heap, &triangleRemapOut, newCapacity, sizeof(int32_t));
-        }
-    }
-    triangleRemapOut.m_size = numTriangles;
+    triangleRemapOut.setSize(numTriangles);
     hkGeometry::Triangle* pOut = geom.m_triangles.m_data;
     for (int32_t i = 0; i < numTriangles; ++i) {
         const hkGeometry::Triangle* pTriangle = &geom.m_triangles.m_data[i];
@@ -161,17 +108,7 @@ static void weldGeometryVertices(
         triangleRemapOut.m_data[i] = newIndex;
     }
     const int32_t numKept = static_cast<int32_t>(pOut - geom.m_triangles.m_data);
-    // EXE-INLINED none: hkArray<hkGeometry::Triangle>::setSize
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacity = geom.m_triangles.m_capacityAndFlags & hkArrayBase<hkGeometry::Triangle>::CAPACITY_MASK;
-    if (capacity < numKept) {
-        int32_t newCapacity = 2 * capacity;
-        if (numKept >= newCapacity) {
-            newCapacity = numKept;
-        }
-        hkArrayUtil::_reserve(heap, &geom.m_triangles, newCapacity, sizeof(hkGeometry::Triangle));
-    }
-    geom.m_triangles.m_size = numKept;
+    geom.m_triangles.setSize(numKept);
 }
 
 // Whether the triangle is degenerate: two of its vertex indices are the same.
@@ -195,19 +132,7 @@ static void weldVertexArray(
     float threshold
 ) {
     const int32_t numVertices = vertices.m_size;
-    // EXE-INLINED none: hkArray<int>::setSize
-    {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = remapOut.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
-        if (capacity < numVertices) {
-            int32_t newCapacity = 2 * capacity;
-            if (numVertices >= newCapacity) {
-                newCapacity = numVertices;
-            }
-            hkArrayUtil::_reserve(heap, &remapOut, newCapacity, sizeof(int32_t));
-        }
-        remapOut.m_size = numVertices;
-    }
+    remapOut.setSize(numVertices);
 
     // EXE-INLINED none: hkArray<hk1AxisSweep::AabbInt>::hkArray(int) (numVertices + 4)
     const int32_t iDontDeallocate = static_cast<int32_t>(hkArrayBase<hk1AxisSweep::AabbInt>::DONT_DEALLOCATE_FLAG);
@@ -247,13 +172,7 @@ static void weldVertexArray(
         }
         const __m128 vertex = vertices.m_data[key].m_quad;
         remapOut.m_data[key] = uniqueVertsOut.m_size;
-        // EXE-INLINED none: hkArray<hkVector4>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (uniqueVertsOut.m_size == (uniqueVertsOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &uniqueVertsOut, sizeof(hkVector4));
-        }
-        uniqueVertsOut.m_data[uniqueVertsOut.m_size].m_quad = vertex;
-        ++uniqueVertsOut.m_size;
+        uniqueVertsOut.pushBack(vertices.m_data[key]);
         for (int32_t j = i + 1; j < numVertices; ++j) {
             if (pAabbs[j].m_min[0] > pAabbs[i].m_max[0]) {
                 break;

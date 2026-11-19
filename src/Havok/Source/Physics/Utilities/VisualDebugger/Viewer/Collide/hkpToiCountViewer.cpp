@@ -57,14 +57,7 @@ void hkpToiCountViewer::worldRemovedCallback(hkpWorld* w) {
     for (int32_t it = m_toiCounts.getIterator(); m_toiCounts.isValid(it); it = m_toiCounts.getNext(it)) {
         hkpEntity* entity = m_toiCounts.getKey(it);
         if (entity->m_world == w) {
-            // EXE-INLINED 0x6299C0
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            if (entitiesToRemove.m_size ==
-                (entitiesToRemove.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(heap, &entitiesToRemove, sizeof(hkpEntity*));
-            }
-            entitiesToRemove.m_data[entitiesToRemove.m_size] = entity;
-            ++entitiesToRemove.m_size;
+            entitiesToRemove.pushBack(entity);
         }
     }
     for (int32_t i = 0; i < entitiesToRemove.m_size; ++i) {

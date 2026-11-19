@@ -79,22 +79,7 @@ void NiBoneLODController::LoadBinary(NiStream& kStream) {
         if (i >= m_kBoneArray.m_usMaxSize) {
             m_kBoneArray.SetSize(i + m_kBoneArray.m_usGrowBy);
         }
-        // EXE-INLINED 0xBA3AA0
-        if (i >= m_kBoneArray.m_usSize) {
-            m_kBoneArray.m_usSize = static_cast<uint16_t>(i + 1);
-            if (pkBones) {
-                ++m_kBoneArray.m_usESize;
-            }
-        }
-        else if (pkBones) {
-            if (!m_kBoneArray.m_pBase[i]) {
-                ++m_kBoneArray.m_usESize;
-            }
-        }
-        else if (m_kBoneArray.m_pBase[i]) {
-            --m_kBoneArray.m_usESize;
-        }
-        m_kBoneArray.m_pBase[i] = pkBones;
+        m_kBoneArray.SetAt(i, pkBones);
 
         uint32_t uiNumBones = 0;
         NiStreamLoadBinary(kStream, uiNumBones);
@@ -325,11 +310,7 @@ void NiBoneLODController::ProcessClone(NiCloningProcess& kCloning) {
             if (kCloning.m_pkCloneMap->GetAt(pkBone, pkCloneBone)) {
                 pkNewBone = static_cast<NiNode*>(pkCloneBone);
             }
-            // EXE-INLINED 0xA543B0
-            if (pkCloneBones->m_uiUsed == pkCloneBones->m_uiAlloced) {
-                pkCloneBones->Realloc(pkCloneBones->m_uiAlloced ? pkCloneBones->m_uiAlloced * 2 : 1);
-            }
-            pkCloneBones->m_pBase[pkCloneBones->m_uiUsed++] = pkNewBone;
+            pkCloneBones->Add(pkNewBone);
         }
     }
 

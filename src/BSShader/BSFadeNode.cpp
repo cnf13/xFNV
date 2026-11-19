@@ -645,7 +645,6 @@ void BSFadeNode::KillSDM() {
     BSFadeNode::spFadeAlpha = nullptr;
     NiFixedString* v1 = BSFadeNode::pFadeNodeAnimName;
     if (BSFadeNode::pFadeNodeAnimName) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSFadeNode::pFadeNodeAnimName->GetHandle());
         MemoryManager_Singleton.Deallocate(v1);
     }

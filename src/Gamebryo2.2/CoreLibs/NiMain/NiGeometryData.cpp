@@ -21,6 +21,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderDeclaration.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTConvertingStrideIterator.h"
@@ -1286,9 +1287,7 @@ int32_t NiGeometryData::FloatCompare(const float* pf0, const float* pf1, uint32_
     return 0;
 }
 
-// Reads all the values in one read, with 4-byte components.
+// Reads all the values in one read, as floats.
 void NiPoint2::LoadBinary(NiStream& stream, NiPoint2* pkValues, uint32_t uiNumValues) {
-    uint32_t uiSize = sizeof(float);
-    // EXE-INLINED none: NiStreamLoadBinary
-    stream.Istr()->BinaryRead(pkValues, sizeof(NiPoint2) * uiNumValues, &uiSize, 1);
+    NiStreamLoadBinary(stream, reinterpret_cast<float*>(pkValues), uiNumValues * 2);
 }

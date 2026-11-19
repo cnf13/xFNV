@@ -82,13 +82,7 @@ void NiBinaryStream::DoByteSwap(
                     break;
                 }
                 case 4u: {
-                    // EXE-INLINED 0xA62150
-                    char c = pcData[0];
-                    pcData[0] = pcData[3];
-                    pcData[3] = c;
-                    c = pcData[1];
-                    pcData[1] = pcData[2];
-                    pcData[2] = c;
+                    NiEndian::Swap32(pcData, 1);
                     break;
                 }
                 case 8u: {
@@ -97,16 +91,7 @@ void NiBinaryStream::DoByteSwap(
                 }
                 case 16u:
                 case 64u: {
-                    // EXE-INLINED 0xA62150
-                    uint32_t uiCount = uiCompSize >> 2;
-                    for (char* pcValue = pcData; uiCount; --uiCount, pcValue += 4) {
-                        char c = pcValue[0];
-                        pcValue[0] = pcValue[3];
-                        pcValue[3] = c;
-                        c = pcValue[1];
-                        pcValue[1] = pcValue[2];
-                        pcValue[2] = c;
-                    }
+                    NiEndian::Swap32(pcData, uiCompSize >> 2);
                     break;
                 }
                 default: {

@@ -184,7 +184,6 @@ void NiImageConverter::ConvertFilenameToPlatformSpecific(const NiFixedString& kP
         const char* v3 = (&kPath)->GetHandle();
         if ((&kPlatformPath)->GetHandle() != (&kPath)->GetHandle()) {
             NiGlobalStringTable::AcquireHandle(v3);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle((&kPlatformPath)->GetHandle());
             kPlatformPath.m_kHandle = v3;
         }

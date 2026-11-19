@@ -114,9 +114,7 @@ void removeNearDuplicateSortedVertices(float threshold, hkArray<hkVector4>* vert
     }
     const int32_t numKept = static_cast<int32_t>(out - vertices->m_data);
     *numOut = numKept;
-    // EXE-INLINED none: hkArray<hkVector4>::setSize
-    vertices->_reserve(hkMemoryRouter::getInstance().heap(), numKept);
-    vertices->m_size = numKept;
+    vertices->setSize(numKept);
 }
 
 // Collects into pointsOut the points where planes planeA and planeB meet each other plane that faces along dir (dot
@@ -168,29 +166,11 @@ hkBool findNextIntersectionPoints(
         const float absDelta = std::fabs(delta);
         if (!(absDelta < 9.999999747378752e-05)) {
             pointsOut.m_size = 0;
-            // EXE-INLINED none: hkArray<hkPlaneEquationUtil::IntersectionPoint>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (pointsOut.m_size == (pointsOut.m_capacityAndFlags & hkArrayBase<Point_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &pointsOut, sizeof(Point_t));
-            }
-            Point_t* pSlot = pointsOut.m_data + pointsOut.m_size;
-            if (pSlot) {
-                *pSlot = point;
-            }
-            ++pointsOut.m_size;
+            pointsOut.pushBack(point);
             nearest = distance;
         }
         else {
-            // EXE-INLINED none: hkArray<hkPlaneEquationUtil::IntersectionPoint>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (pointsOut.m_size == (pointsOut.m_capacityAndFlags & hkArrayBase<Point_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &pointsOut, sizeof(Point_t));
-            }
-            Point_t* pSlot = pointsOut.m_data + pointsOut.m_size;
-            if (pSlot) {
-                *pSlot = point;
-            }
-            ++pointsOut.m_size;
+            pointsOut.pushBack(point);
         }
     }
     return found;
@@ -223,29 +203,13 @@ void visitEdge(
     if (index != -1) {
         return;
     }
-    // EXE-INLINED none: hkArray<hkPlaneEquationUtil::VisitedEdge>::pushBack
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    if (visitedEdges.m_size == (visitedEdges.m_capacityAndFlags & hkArrayBase<Edge_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router.m_heap, &visitedEdges, sizeof(Edge_t));
-    }
-    Edge_t* pSlot = visitedEdges.m_data + visitedEdges.m_size;
-    if (pSlot) {
-        *pSlot = edge;
-    }
-    ++visitedEdges.m_size;
+    visitedEdges.pushBack(edge);
 
     hkArray<Point_t> points;
     if (findNextIntersectionPoints(
             edge.m_intersectionLineDir, planes, edge.m_planeA, edge.m_planeB, edge.m_fromPoint->m_location, points
         )) {
-        const Point_t* pFirst = points.m_data;
-        // EXE-INLINED none: hkArray<hkVector4>::pushBack
-        hkMemoryRouter& cloudRouter = hkMemoryRouter::getInstance();
-        if (vertexCloudOut.m_size == (vertexCloudOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*cloudRouter.m_heap, &vertexCloudOut, sizeof(hkVector4));
-        }
-        vertexCloudOut.m_data[vertexCloudOut.m_size].m_quad = pFirst->m_location.m_quad;
-        ++vertexCloudOut.m_size;
+        vertexCloudOut.pushBack(points.m_data[0].m_location);
         for (int32_t i = 0; i < points.m_size; ++i) {
             Point_t* pPoint = &points.m_data[i];
             Edge_t edgeAC;

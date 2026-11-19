@@ -842,16 +842,11 @@ void ShadowSceneNode::RemoveQueuedLight(const NiPointer<ShadowSceneLight>& apSSL
             if (pPortal) {
                 BSPortalSharedNode* pNode = pPortal->spSharedGeometry.m_pObject;
                 if (pNode->kLights.iSize) {
-                    // EXE-INLINED 0xB5A930
-                    uint32_t iSize = pNode->kLights.iSize;
-                    for (uint32_t j = 0; j < iSize; ++j) {
-                        ShadowSceneLight** pBuffer = pNode->kLights.pBuffer;
-                        if (pBuffer && pBuffer[j] == pLight) {
-                            if (static_cast<int32_t>(j) != -1) {
-                                pNode->kLights.Remove(j, true);
-                            }
-                            break;
-                        }
+                    int32_t iIndex = pNode->kLights.Find(
+                        pLight, 0, &BSSimpleArray<ShadowSceneLight*>::DefaultEqualFunctionByAddress
+                    );
+                    if (iIndex != -1) {
+                        pNode->kLights.Remove(iIndex, true);
                     }
                 }
             }

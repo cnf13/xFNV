@@ -146,9 +146,7 @@ void NiScreenTexture::CopyMembers(NiScreenTexture* pkDest, NiCloningProcess& kCl
         // (0xA95828, 0xA9582A); NiTSet::Add's m_pBase[m_uiUsed++] stores the count first.
         NiTPrimitiveSet<ScreenRect>& kDestRects = pkDest->m_kScreenRects;
         if (kDestRects.m_uiUsed == kDestRects.m_uiAlloced) {
-            // EXE-INLINED none: NiTSet::Realloc(). The exe doubles the size itself (0xA957F0-0xA957FD) and calls the
-            // out-of-line Realloc(uiNewSize) 0xA95520.
-            kDestRects.Realloc(kDestRects.m_uiAlloced ? kDestRects.m_uiAlloced * 2 : 1);
+            kDestRects.Realloc();
         }
         kDestRects.m_pBase[kDestRects.m_uiUsed] = kNewRect;
         kDestRects.m_uiUsed++;

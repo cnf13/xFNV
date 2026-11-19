@@ -236,10 +236,8 @@ hkpPhantom* hkpSimpleShapePhantom::clone() const {
     hkpSimpleShapePhantom* pClone = ::new (pMemory) hkpSimpleShapePhantom(
         m_collidable.m_shape, m_motionState.m_transform, m_collidable.m_broadPhaseHandle.m_collisionFilterInfo
     );
-    // EXE-INLINED none: hkArray<hkpPhantomOverlapListener*>::operator=
-    pClone->m_overlapListeners.copyFromArray(*hkMemoryRouter::getInstance().m_heap, m_overlapListeners, hkTypeIsPod());
-    // EXE-INLINED none: hkArray<hkpPhantomListener*>::operator=
-    pClone->m_phantomListeners.copyFromArray(*hkMemoryRouter::getInstance().m_heap, m_phantomListeners, hkTypeIsPod());
+    pClone->m_overlapListeners = m_overlapListeners;
+    pClone->m_phantomListeners = m_phantomListeners;
     pClone->copyProperties(this);
     return pClone;
 }

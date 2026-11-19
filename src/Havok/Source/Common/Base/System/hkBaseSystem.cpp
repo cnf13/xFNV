@@ -118,13 +118,7 @@ void hkBaseSystem::initSingletons() {
         if (*node->m_value == nullptr && node->m_createFunc) {
             hkReferencedObject* pObject = node->m_createFunc();
             if (!pObject) {
-                // EXE-INLINED none: hkArray<hkSingletonInitNode*, hkContainerTempAllocator>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (failed.m_size == (failed.m_capacityAndFlags & hkArrayBase<hkSingletonInitNode*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_temp, &failed, sizeof(hkSingletonInitNode*));
-                }
-                failed.m_data[failed.m_size] = node;
-                failed.m_size++;
+                failed.pushBack(node);
                 hkSingletonInitNode* next = node->m_next;
                 (*prevNext)->m_next = nullptr;
                 *prevNext = next;
@@ -144,11 +138,7 @@ void hkBaseSystem::initSingletons() {
                 *retry->m_value = pObject;
                 *prevNext = retry;
                 prevNext = &retry->m_next;
-                // EXE-INLINED none: hkArrayBase<hkSingletonInitNode*>::removeAt
-                const uint32_t last = --failed.m_size;
-                if (last != static_cast<uint32_t>(i)) {
-                    failed.m_data[i] = failed.m_data[last];
-                }
+                failed.removeAt(i);
             }
         }
     }
@@ -159,13 +149,7 @@ void hkBaseSystem::quitSingletons() {
     using nodes_t = hkInplaceArray<hkSingletonInitNode*, 128>;
     nodes_t nodes;
     for (hkSingletonInitNode* node = hkSingletonInitList; node; node = node->m_next) {
-        // EXE-INLINED none: hkArray<hkSingletonInitNode*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (nodes.m_size == (nodes.m_capacityAndFlags & hkArrayBase<hkSingletonInitNode*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &nodes, sizeof(hkSingletonInitNode*));
-        }
-        nodes.m_data[nodes.m_size] = node;
-        nodes.m_size++;
+        nodes.pushBack(node);
     }
     for (int32_t i = nodes.m_size - 1; i >= 0; --i) {
         hkReferencedObject* pObject = static_cast<hkReferencedObject*>(*nodes.m_data[i]->m_value);

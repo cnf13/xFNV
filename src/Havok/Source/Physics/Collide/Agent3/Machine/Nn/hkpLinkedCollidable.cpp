@@ -92,27 +92,10 @@ void hkpLinkedCollidable::setCollisionInfoFlags(uint32_t aiFlags) {
     (&m_broadPhaseHandle)->SetCollisionFilterInfo(aiFlags);
 }
 
-// entries = m_collisionEntries, the SDK's inline hkArray::operator= for an element type that is not plain data: the
-// storage grows through _reserve, the elements both arrays hold are assigned and the rest copy-constructed in place
-// (with the placement new's null test). Only a fixed entity's list is sorted then.
+// Copies the entries out; only a fixed entity's list is sorted then.
 void hkpLinkedCollidable::getCollisionEntriesSorted(hkArray<CollisionEntry>& entries) const {
-    // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::operator=
-    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&entries);
-    int32_t iOldSize = entries.m_size;
-    int32_t iNewSize = m_collisionEntries.m_size;
-    int32_t iCopied = (iNewSize > iOldSize) ? iOldSize : iNewSize;
-    entries._reserve(alloc, iNewSize);
-    hkArrayBase<CollisionEntry>::copy(entries.m_data, m_collisionEntries.m_data, iCopied);
-    const CollisionEntry* pSrc = m_collisionEntries.m_data + iCopied;
-    CollisionEntry* pDst = entries.m_data + iCopied;
-    for (int32_t i = iNewSize - iCopied; i > 0; --i) {
-        if (pDst != nullptr) {
-            *pDst = *pSrc;
-        }
-        ++pDst;
-        ++pSrc;
-    }
-    entries.m_size = iNewSize;
+    entries = m_collisionEntries;
+    const int32_t iNewSize = entries.getSize();
 
     // EXE-INLINED none: hkpEntity::isFixed
     const hkpEntity* pOwner = static_cast<const hkpEntity*>(getOwner());

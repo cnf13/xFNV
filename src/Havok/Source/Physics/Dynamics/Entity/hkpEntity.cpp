@@ -185,20 +185,7 @@ void hkpEntity::deallocateInternalArrays() {
         m_limitContactImpulseUtil = nullptr;
     }
     if (m_collidable.m_collisionEntries.m_size == 0) {
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::clearAndDeallocate
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        int32_t capacityAndFlags = m_collidable.m_collisionEntries.m_capacityAndFlags;
-        m_collidable.m_collisionEntries.m_size = 0;
-        if ((capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG) == 0) {
-            heap.bufFree(
-                m_collidable.m_collisionEntries.m_data,
-                static_cast<int32_t>(sizeof(hkpLinkedCollidable::CollisionEntry)) *
-                    (capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::CAPACITY_MASK)
-            );
-        }
-        m_collidable.m_collisionEntries.m_data = nullptr;
-        m_collidable.m_collisionEntries.m_capacityAndFlags =
-            hkArrayBase<hkpLinkedCollidable::CollisionEntry>::DONT_DEALLOCATE_FLAG;
+        m_collidable.m_collisionEntries.clearAndDeallocate();
     }
     if (m_constraintsMaster.m_size == 0) {
         m_constraintsMaster.clearAndDeallocate();
@@ -207,15 +194,7 @@ void hkpEntity::deallocateInternalArrays() {
         m_constraintsSlave.clearAndDeallocate();
     }
     if (m_constraintRuntime.m_size == 0) {
-        // EXE-INLINED 0x540B70
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        int32_t capacityAndFlags = m_constraintRuntime.m_capacityAndFlags;
-        m_constraintRuntime.m_size = 0;
-        if ((capacityAndFlags & hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG) == 0) {
-            heap.bufFree(m_constraintRuntime.m_data, capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK);
-        }
-        m_constraintRuntime.m_data = nullptr;
-        m_constraintRuntime.m_capacityAndFlags = hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
+        m_constraintRuntime.clearAndDeallocate();
     }
     // Removed listeners leave null entries: an array is freed only when all of them are null.
     bool contactListenersLeft = false;

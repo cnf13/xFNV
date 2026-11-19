@@ -65,18 +65,7 @@ void hkpHingeLimitsDrawer::drawConstraint(
     );
 
     alignas(16) hkArray<hkDisplayGeometry*> geometry;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacity =
-        static_cast<int32_t>(geometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK);
-    if (capacity < 1) {
-        int32_t newCapacity = capacity * 2;
-        if (newCapacity <= 1) {
-            newCapacity = 1;
-        }
-        hkArrayUtil::_reserve(heap, &geometry, newCapacity, sizeof(hkDisplayGeometry*));
-    }
-    geometry.m_size = 1;
+    geometry.setSize(1);
     geometry.m_data[0] = &m_angularLimit;
     displayHandler->displayGeometry(geometry, -1, id, tag);
 

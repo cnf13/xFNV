@@ -735,13 +735,9 @@ void hkpWorldObject::copyProperties(const hkpWorldObject* otherObj) {
     const int32_t copiedSize = newSize > oldSize ? oldSize : newSize;
     m_properties._reserve(alloc, newSize);
     hkArrayBase<hkpProperty>::copy(m_properties.m_data, otherObj->m_properties.m_data, copiedSize);
-    // EXE-INLINED none: hkArrayUtil::constructWithArray<hkpProperty>
-    hkpProperty* pDest = m_properties.m_data + copiedSize;
-    const hkpProperty* pSource = otherObj->m_properties.m_data + copiedSize;
-    for (int32_t i = 0; i < newSize - copiedSize; ++i) {
-        if (pDest + i) {
-            pDest[i] = pSource[i];
-        }
-    }
+    hkArrayUtil::constructWithArray(
+        m_properties.m_data + copiedSize, newSize - copiedSize, otherObj->m_properties.m_data + copiedSize,
+        hkTypeIsClass()
+    );
     m_properties.m_size = newSize;
 }

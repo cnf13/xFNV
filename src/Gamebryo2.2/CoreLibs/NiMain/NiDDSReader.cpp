@@ -8,6 +8,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStreamMacro.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiCriticalSection.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiEndian.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
@@ -333,9 +334,8 @@ bool NiDDSReader::ReadHeader(
     NiStreamLoadBinary(kIst, uiMagicNumber);
     if (uiMagicNumber != NI_DDS) {
         // A file written on the other endianness: swap and test again.
-        // EXE-INLINED none: NiEndian::Swap32 of one value (the exe swaps the bytes of a stack copy one by one)
-        uint32_t uiSwapped = (uiMagicNumber >> 24) | ((uiMagicNumber >> 8) & 0xFF00) |
-            ((uiMagicNumber << 8) & 0xFF0000) | (uiMagicNumber << 24);
+        uint32_t uiSwapped = uiMagicNumber;
+        NiEndian::Swap32(reinterpret_cast<char*>(&uiSwapped), 1);
         if (uiSwapped != NI_DDS) {
             m_kReadCriticalSection.Unlock();
             return false;

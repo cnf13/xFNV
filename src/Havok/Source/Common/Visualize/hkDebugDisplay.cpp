@@ -63,26 +63,12 @@ void hkDebugDisplay::addGeometry(
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
 
-// Finds the handler's index (the size and the element pointer read once, compared signed), then moves the last handler
-// into its slot.
+// Finds the handler's index, then removes it: the last handler moves into its slot.
 void hkDebugDisplay::removeDebugDisplayHandler(hkDebugDisplayHandler* debugDisplay) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    // EXE-INLINED none: hkArrayBase::indexOf
-    int32_t iIndex = -1;
-    const int32_t iSize = m_debugDisplayHandlers.getSize();
-    hkDebugDisplayHandler** ppHandlers = m_debugDisplayHandlers.m_data;
-    for (int32_t i = 0; i < iSize; ++i) {
-        if (ppHandlers[i] == debugDisplay) {
-            iIndex = i;
-            break;
-        }
-    }
+    const int32_t iIndex = m_debugDisplayHandlers.indexOf(debugDisplay);
     if (iIndex >= 0) {
-        // EXE-INLINED none: hkArrayBase::removeAt
-        --m_debugDisplayHandlers.m_size;
-        if (m_debugDisplayHandlers.m_size != iIndex) {
-            m_debugDisplayHandlers.m_data[iIndex] = m_debugDisplayHandlers.m_data[m_debugDisplayHandlers.m_size];
-        }
+        m_debugDisplayHandlers.removeAt(iIndex);
     }
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
@@ -273,14 +259,7 @@ void hkDebugDisplay::displayRayModelSpace(
 
 void hkDebugDisplay::addDebugDisplayHandler(hkDebugDisplayHandler* debugDisplay) {
     EnterCriticalSection(&m_arrayLock->m_section);
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    // EXE-INLINED none: hkArray::pushBack
-    if (m_debugDisplayHandlers.m_size ==
-        (m_debugDisplayHandlers.m_capacityAndFlags & hkArrayBase<hkDebugDisplayHandler*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*kRouter.m_heap, &m_debugDisplayHandlers, sizeof(hkDebugDisplayHandler*));
-    }
-    m_debugDisplayHandlers.m_data[m_debugDisplayHandlers.m_size] = debugDisplay;
-    m_debugDisplayHandlers.m_size++;
+    m_debugDisplayHandlers.pushBack(debugDisplay);
     LeaveCriticalSection(&m_arrayLock->m_section);
 }
 

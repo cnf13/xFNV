@@ -811,9 +811,7 @@ void Font::Load() {
     }
     pFontData = static_cast<FontData*>(MemoryManager_Singleton.Allocate(sizeof(FontData)));
     uint32_t uiFileSize = pFile->GetSize();
-    uint32_t uiComponentSize = 1;
-    // EXE-INLINED 0x462D80
-    pFile->BinaryRead(pFontData, uiFileSize, &uiComponentSize, 1);
+    pFile->NiBinaryStream::Read(pFontData, uiFileSize);
     delete pFile;
 
     fFontHeight = 0.0f;
@@ -886,9 +884,7 @@ void Font::Load() {
         }
         // The texture's width and height.
         uint32_t auiSize[2];
-        uiComponentSize = 1;
-        // EXE-INLINED 0x462D80
-        pTexFile->BinaryRead(auiSize, sizeof(auiSize), &uiComponentSize, 1);
+        pTexFile->NiBinaryStream::Read(auiSize, sizeof(auiSize));
         NiTexture::FormatPrefs kPrefs;
         void* pMemory = NiMemObject::operator new(sizeof(NiPixelData));
         NiPixelData* pPixelData =
@@ -898,9 +894,7 @@ void Font::Load() {
         // EXE-INLINED 0x64DAC0
         uint8_t* pPixels = pPixelData->m_pucPixels + pPixelData->m_puiOffsetInBytes[pPixelData->m_uiMipmapLevels] * 0 +
             pPixelData->m_puiOffsetInBytes[0];
-        uiComponentSize = 1;
-        // EXE-INLINED 0x462D80
-        pTexFile->BinaryRead(pPixels, uiBytes, &uiComponentSize, 1);
+        pTexFile->NiBinaryStream::Read(pPixels, uiBytes);
         pPixelData->bNoConvert = true;
         pMemory = NiMemObject::operator new(sizeof(NiTexturingProperty));
         NiTexturingProperty* pTexProp = nullptr;
@@ -2235,8 +2229,7 @@ BSStringT<char> FontManager::CollectTo(
 // <P> add one and two line breaks, <HR> a new page (two breaks for an unbounded height). The text without its tags is
 // written back to axTextString; axData gets the page count and the current page's line count, width and height.
 FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, FontManager::TextData& axData) {
-    // EXE-INLINED none: BSStringT<char>::Length
-    uint32_t uiLength = axTextString.sLen == 0xFFFF ? std::strlen(axTextString.pString) : axTextString.sLen;
+    uint32_t uiLength = axTextString.Length();
     char* pcText = static_cast<char*>(MemoryManager_Singleton.Allocate(uiLength + 1));
     std::memset(pcText, 0, uiLength + 1);
     std::strcpy(pcText, axTextString.pString);
@@ -2247,34 +2240,19 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
     // The text run read last, the tag name, the attribute name, the attribute value, and the text without its tags.
     alignas(BSStringT<char>) uint8_t aucText[sizeof(BSStringT<char>)];
     BSStringT<char>& kText = *static_cast<BSStringT<char>*>(static_cast<void*>(aucText));
-    // EXE-INLINED 0x403970
-    kText.pString = nullptr;
-    kText.sLen = 0;
-    kText.sMaxLen = 0;
+    kText.Init();
     alignas(BSStringT<char>) uint8_t aucTag[sizeof(BSStringT<char>)];
     BSStringT<char>& kTag = *static_cast<BSStringT<char>*>(static_cast<void*>(aucTag));
-    // EXE-INLINED 0x403970
-    kTag.pString = nullptr;
-    kTag.sLen = 0;
-    kTag.sMaxLen = 0;
+    kTag.Init();
     alignas(BSStringT<char>) uint8_t aucAttribute[sizeof(BSStringT<char>)];
     BSStringT<char>& kAttribute = *static_cast<BSStringT<char>*>(static_cast<void*>(aucAttribute));
-    // EXE-INLINED 0x403970
-    kAttribute.pString = nullptr;
-    kAttribute.sLen = 0;
-    kAttribute.sMaxLen = 0;
+    kAttribute.Init();
     alignas(BSStringT<char>) uint8_t aucValue[sizeof(BSStringT<char>)];
     BSStringT<char>& kValue = *static_cast<BSStringT<char>*>(static_cast<void*>(aucValue));
-    // EXE-INLINED 0x403970
-    kValue.pString = nullptr;
-    kValue.sLen = 0;
-    kValue.sMaxLen = 0;
+    kValue.Init();
     alignas(BSStringT<char>) uint8_t aucPlainText[sizeof(BSStringT<char>)];
     BSStringT<char>& kPlainText = *static_cast<BSStringT<char>*>(static_cast<void*>(aucPlainText));
-    // EXE-INLINED 0x403970
-    kPlainText.pString = nullptr;
-    kPlainText.sLen = 0;
-    kPlainText.sMaxLen = 0;
+    kPlainText.Init();
 
     alignas(CharData) uint8_t aucChar[sizeof(CharData)];
     CharData* pChar = static_cast<CharData*>(static_cast<void*>(aucChar));
@@ -2319,8 +2297,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                     pChar->xFilename.Set("", 0);
                 }
                 kPlainText += kText;
-                // EXE-INLINED none: BSStringT<char>::Length
-                for (uint32_t i = 0; i < (kText.sLen == 0xFFFF ? std::strlen(kText.pString) : kText.sLen); ++i) {
+                for (uint32_t i = 0; i < kText.Length(); ++i) {
                     pChar->SetChar(kText.pString[kText.pString ? i : 0]);
                     if (pChar->cChar == 1) {
                         // A button icon is as wide as its glyph plus its spacing.
@@ -2339,8 +2316,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
             }
             // The tag name, upper-cased.
             kTag.Set(CollectTo(pcText, iIndex, 6, 0, eMatch, cMatch, true));
-            // EXE-INLINED none: BSStringT<char>::Length
-            for (uint32_t i = 0; i < (kTag.sLen == 0xFFFF ? std::strlen(kTag.pString) : kTag.sLen); ++i) {
+            for (uint32_t i = 0; i < kTag.Length(); ++i) {
                 kTag.pString[kTag.pString ? i : 0] =
                     static_cast<char>(std::toupper(kTag.pString[kTag.pString ? i : 0]));
             }
@@ -2355,9 +2331,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                         break;
                     }
                     kAttribute.Set(CollectTo(pcText, iIndex, 0x16, 0, eMatch, cMatch, true));
-                    // EXE-INLINED none: BSStringT<char>::Length
-                    for (uint32_t i = 0;
-                         i < (kAttribute.sLen == 0xFFFF ? std::strlen(kAttribute.pString) : kAttribute.sLen); ++i) {
+                    for (uint32_t i = 0; i < kAttribute.Length(); ++i) {
                         kAttribute.pString[kAttribute.pString ? i : 0] =
                             static_cast<char>(std::toupper(kAttribute.pString[kAttribute.pString ? i : 0]));
                     }
@@ -2383,9 +2357,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                         }
                         else {
                             kValue.Set(CollectTo(pcText, iIndex, 6, 0, eMatch, cMatch, true));
-                            // EXE-INLINED none: BSStringT<char>::Length
-                            for (uint32_t i = 0;
-                                 i < (kValue.sLen == 0xFFFF ? std::strlen(kValue.pString) : kValue.sLen); ++i) {
+                            for (uint32_t i = 0; i < kValue.Length(); ++i) {
                                 kValue.pString[kValue.pString ? i : 0] =
                                     static_cast<char>(std::toupper(kValue.pString[kValue.pString ? i : 0]));
                             }
@@ -2450,9 +2422,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                                 }
                             }
                         }
-                        if (kAttribute.StrCmp("COLOR", true) == 0
-                            // EXE-INLINED none: BSStringT<char>::Length
-                            && (kValue.sLen == 0xFFFF ? std::strlen(kValue.pString) : kValue.sLen) == 6) {
+                        if (kAttribute.StrCmp("COLOR", true) == 0 && kValue.Length() == 6) {
                             // RRGGBB in hex, each channel clamped to 0..255. Each digit is upper-cased twice: once for
                             // the letter test, once for its value.
                             NiColorA kColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -2523,8 +2493,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
     MemoryManager_Singleton.Deallocate(pcText);
     if (pDoc) {
         axData.bIsHypertext = true;
-        // EXE-INLINED none: NiTListBase::GetSize
-        axData.iNumPages = pDoc->xPages.m_uiCount;
+        axData.iNumPages = pDoc->xPages.GetSize();
         TextPage* pPage = pDoc->CurrentPage();
         if (pPage) {
             axData.iHeight = 0;
@@ -2535,8 +2504,7 @@ FontManager::TextDoc* FontManager::PrepHypertext(BSStringT<char>& axTextString, 
                 axData.iHeight += pLine->iRise + pLine->iSkippedSpace;
                 axData.iWidth = axData.iWidth > pLine->iWidth ? axData.iWidth : pLine->iWidth;
             }
-            // EXE-INLINED none: NiTListBase::GetSize
-            axData.iNumLines = pPage->xLines.m_uiCount;
+            axData.iNumLines = pPage->xLines.GetSize();
         }
     }
     // The locals' strings are released with Set(nullptr, 0), the CharData's image name first.

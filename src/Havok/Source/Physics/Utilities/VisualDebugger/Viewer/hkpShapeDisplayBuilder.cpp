@@ -104,8 +104,7 @@ void hkpShapeDisplayBuilder::buildDisplayGeometries(
     transform.m_rotation.m_col2.m_quad[2] = 1.0f;
     _mm_store_ps(&reinterpret_cast<float*>(&transform.m_translation.m_quad)[0], kZero);
     resetCurrentRawGeometry();
-    // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::clear
-    displayGeometries.m_size = 0;
+    displayGeometries.clear();
     buildShapeDisplay(shape, transform, displayGeometries);
 }
 
@@ -234,23 +233,8 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
         case HK_SHAPE_CONVEX_VERTICES: {
             const hkpConvexVerticesShape* convexVertices = static_cast<const hkpConvexVerticesShape*>(shape);
             const int32_t numSpheres = convexVertices->getNumCollisionSpheresImpl();
-            alignas(16) hkLocalArray<hkSphere> sphereBuffer;
-            {
-                // EXE-INLINED none: hkLocalArray<hkSphere>::hkLocalArray(numSpheres) (hkAllocateStack)
-                sphereBuffer.m_data = nullptr;
-                sphereBuffer.m_size = 0;
-                sphereBuffer.m_capacityAndFlags = hkArrayBase<hkSphere>::DONT_DEALLOCATE_FLAG;
-                hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-                char* pBlock = stack.m_next.m_storage;
-                stack.m_next.m_storage = pBlock + ((numSpheres * static_cast<int32_t>(sizeof(hkSphere)) + 127) & ~127);
-                // The thread's stack allocator hands out untyped bytes; the array's storage is that block.
-                sphereBuffer.m_data = reinterpret_cast<hkSphere*>(pBlock);
-                sphereBuffer.m_capacityAndFlags = numSpheres | hkArrayBase<hkSphere>::DONT_DEALLOCATE_FLAG;
-                sphereBuffer.m_localMemory = sphereBuffer.m_data;
-            }
-            // EXE-INLINED none: hkArray<hkSphere>::setSize (hkSphere's construct is empty)
-            sphereBuffer.reserve(numSpheres);
-            sphereBuffer.setSizeUnchecked(numSpheres);
+            alignas(16) hkLocalArray<hkSphere> sphereBuffer(numSpheres);
+            sphereBuffer.setSize(numSpheres);
             const hkSphere* spheres = convexVertices->getCollisionSpheresImpl(sphereBuffer.m_data);
 
             alignas(16) hkArray<hkVector4> transformedVertices;
@@ -284,32 +268,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
                 static_cast<hkDisplayConvex*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkDisplayConvex)));
             displayConvex->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkDisplayConvex));
             displayGeometry = ::new (displayConvex) hkDisplayConvex(geom);
-            {
-                // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (displayGeometries.m_size ==
-                    (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-                }
-                displayGeometries.m_data[displayGeometries.m_size++] = displayGeometry;
-            }
-
-            {
-                // EXE-INLINED none: hkArray<hkVector4>::~hkArray
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                const int32_t capacityAndFlags = transformedVertices.m_capacityAndFlags;
-                transformedVertices.m_size = 0;
-                if (capacityAndFlags >= 0) {
-                    heap.bufFree(
-                        transformedVertices.m_data,
-                        static_cast<int32_t>(
-                            (capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                        )
-                    );
-                }
-                transformedVertices.m_data = nullptr;
-                transformedVertices.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-            }
+            displayGeometries.pushBack(displayGeometry);
             return;
         }
         case HK_SHAPE_COLLECTION:
@@ -459,13 +418,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
                 static_cast<hkDisplayConvex*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkDisplayConvex)));
             displayConvex->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkDisplayConvex));
             displayGeometry = ::new (displayConvex) hkDisplayConvex(geom);
-            // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            if (displayGeometries.m_size ==
-                (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-            }
-            displayGeometries.m_data[displayGeometries.m_size++] = displayGeometry;
+            displayGeometries.pushBack(displayGeometry);
             return;
         }
         case HK_SHAPE_MULTI_SPHERE: {
@@ -493,13 +446,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
                 sphereTransform.m_rotation.m_col2(2) = 1.0f;
                 sphereTransform.m_translation.setZero4();
                 sphereTransform.m_translation = spheres[i];
-                // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (displayGeometries.m_size ==
-                    (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-                }
-                displayGeometries.m_data[displayGeometries.m_size++] = displaySphere;
+                displayGeometries.pushBack(displaySphere);
             }
             return;
         }
@@ -571,13 +518,7 @@ void hkpShapeDisplayBuilder::buildShapeDisplay(
     }
 
     displayGeometry->m_transform.Assign(transform);
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    if (displayGeometries.m_size ==
-        (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-    }
-    displayGeometries.m_data[displayGeometries.m_size++] = displayGeometry;
+    displayGeometries.pushBack(displayGeometry);
 }
 
 void hkpShapeDisplayBuilder::resetCurrentRawGeometry() {
@@ -632,11 +573,7 @@ void hkpShapeDisplayBuilder::addObjectToDebugDisplay(const hkpShape* shape, hkTr
         if (geometry) {
             delete geometry;
         }
-        // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
-        if (--displayGeometries.m_size == 0) {
-            break;
-        }
-        displayGeometries.m_data[0] = displayGeometries.m_data[displayGeometries.m_size];
+        displayGeometries.removeAt(0);
     }
 }
 
@@ -659,16 +596,8 @@ void hkpUserShapeDisplayBuilder::registerUserShapeDisplayBuilder(
             return;
         }
     }
-    // EXE-INLINED none: hkArray<hkpUserShapeDisplayBuilder::UserShapeBuilder>::pushBack
-    hkArray<UserShapeBuilder>& builders = m_userShapeBuilders;
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    if (builders.m_size == (builders.m_capacityAndFlags & hkArrayBase<UserShapeBuilder>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(heap, &builders, sizeof(UserShapeBuilder));
-    }
-    UserShapeBuilder* pBuilder = &builders.m_data[builders.m_size];
-    if (pBuilder) {
-        pBuilder->f = f;
-        pBuilder->type = type;
-    }
-    ++builders.m_size;
+    UserShapeBuilder builder;
+    builder.f = f;
+    builder.type = type;
+    m_userShapeBuilders.pushBack(builder);
 }

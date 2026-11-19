@@ -135,7 +135,6 @@ NiObject* BSTextureData::CreateObject() {
 void BSTextureData::KillSDM() {
     NiFixedString* Block = BSTextureData::pTag;
     if (BSTextureData::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSTextureData::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

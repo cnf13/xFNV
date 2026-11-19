@@ -104,13 +104,7 @@ void bhkConvexListShape::LinkObject(NiStream& arStream) {
         bhkConvexShape* pShape = static_cast<bhkConvexShape*>(arStream.GetObjectFromLinkID());
         if (pShape) {
             const hkpConvexShape* phkShape = static_cast<const hkpConvexShape*>(pShape->phkObject);
-            // EXE-INLINED 0x6299C0
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            if (rShapes.m_size == (rShapes.m_capacityAndFlags & hkArrayBase<const hkpConvexShape*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(rRouter.heap(), &rShapes, sizeof(const hkpConvexShape*));
-            }
-            rShapes.m_data[rShapes.m_size] = phkShape;
-            ++rShapes.m_size;
+            rShapes.pushBack(phkShape);
         }
     }
     bhkShape::LinkObject(arStream);
@@ -146,24 +140,19 @@ void bhkConvexListShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkConvexListShapeCinfo& rInfo = static_cast<hkConvexListShapeCinfo&>(CreateCinfo(bCreated));
     hkArray<const hkpConvexShape*>& rShapes = rInfo.m_childShapes;
-    // EXE-INLINED none: hkArray<const hkpConvexShape*>::swap with an empty local array
-    const hkpConvexShape** ppShapes = rShapes.m_data;
-    int32_t iNumShapes = rShapes.m_size;
-    int32_t iCapacityAndFlags = rShapes.m_capacityAndFlags;
-    rShapes.m_data = nullptr;
-    rShapes.m_size = 0;
-    rShapes.m_capacityAndFlags = hkArrayBase<const hkpConvexShape*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkpConvexShape*> kShapes;
+    kShapes.swap(rShapes);
     if (!arStream.m_bSaveLittleEndian) {
         bhkStream::SwapHKArray(&rInfo, QCinfoSize(), &rShapes);
     }
-    NiStreamSaveBinary(arStream, iNumShapes);
+    NiStreamSaveBinary(arStream, kShapes.m_size);
     for (int32_t i = 0;; ++i) {
         hkReferencedObject* phkObject = this->phkObject;
         int32_t iCount = phkObject ? static_cast<hkpConvexListShape*>(phkObject)->getNumChildShapes() : 0;
         if (i >= iCount) {
             break;
         }
-        const hkpConvexShape* phkShape = ppShapes[i];
+        const hkpConvexShape* phkShape = kShapes[i];
         if (phkShape) {
             arStream.SaveLinkID(phkShape->m_userData);
         }
@@ -174,13 +163,6 @@ void bhkConvexListShape::SaveBinary(NiStream& arStream) {
     bhkConvexShape::SaveBinary(arStream);
     NiStreamSaveBinary(arStream, rInfo.m_useCachedAabb);
     NiStreamSaveBinary(arStream, rInfo.m_minDistanceToUseConvexHullForGetClosestPoints);
-    // EXE-INLINED none: ~hkArray<const hkpConvexShape*>
-    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-    if ((iCapacityAndFlags & hkArrayBase<const hkpConvexShape*>::DONT_DEALLOCATE_FLAG) == 0) {
-        rHeap._bufFree<const hkpConvexShape*>(
-            ppShapes, iCapacityAndFlags & hkArrayBase<const hkpConvexShape*>::CAPACITY_MASK
-        );
-    }
 }
 
 bool bhkConvexListShape::IsEqual(NiObject* apObject) {

@@ -30,11 +30,7 @@ void hkDisplayConvex::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemo
             const int32_t aiEdgeEnds[6] = {iA, iB, iA, iC, iB, iC};
             for (int32_t j = 0; j < 6; ++j) {
                 const hkVector4* pVertex = &this->m_geometry->m_vertices.m_data[aiEdgeEnds[j]];
-                // EXE-INLINED 0x66D9E0
-                if (lines.m_size == (lines.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(a, &lines, sizeof(hkVector4));
-                }
-                lines.m_data[lines.m_size++] = *pVertex;
+                lines._pushBack(a, *pVertex);
             }
         }
     }

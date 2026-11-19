@@ -165,79 +165,15 @@ void hkpPhantomDisplayViewer::phantomRemovedCallback(hkpPhantom* phantom) {
 }
 
 // Each phantom's AABB is drawn as an immediate display geometry, from two local arrays on the thread's stack allocator
-// (the AABBs and pointers to them), then each shape phantom's geometry follows its transform. The stack allocator's
-// bytes are untyped memory the arrays keep their elements in (the reinterpret_casts).
+// (the AABBs and pointers to them), then each shape phantom's geometry follows its transform.
 void hkpPhantomDisplayViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpPhantomDisplayViewer", this);
 
-    alignas(16) hkLocalArray<hkDisplayAABB> phantomAabbs;
-    {
-        // EXE-INLINED none: hkLocalArray<hkDisplayAABB>::hkLocalArray(phantoms.getSize()) (hkAllocateStack)
-        const int32_t capacity = world->m_phantoms.m_size;
-        phantomAabbs.m_data = nullptr;
-        phantomAabbs.m_size = 0;
-        phantomAabbs.m_capacityAndFlags = hkArrayBase<hkDisplayAABB>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((capacity * static_cast<int32_t>(sizeof(hkDisplayAABB)) + 127) & ~127);
-        phantomAabbs.m_capacityAndFlags = capacity | hkArrayBase<hkDisplayAABB>::DONT_DEALLOCATE_FLAG;
-        phantomAabbs.m_data = reinterpret_cast<hkDisplayAABB*>(pBlock);
-        phantomAabbs.m_localMemory = phantomAabbs.m_data;
-    }
-    {
-        // EXE-INLINED none: hkArray<hkDisplayAABB>::setSize(phantoms.getSize())
-        const int32_t size = world->m_phantoms.m_size;
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = phantomAabbs.m_capacityAndFlags & hkArrayBase<hkDisplayAABB>::CAPACITY_MASK;
-        if (capacity < size) {
-            const int32_t doubled = 2 * capacity;
-            hkArrayUtil::_reserve(
-                heap, &phantomAabbs, size < doubled ? doubled : size, static_cast<int32_t>(sizeof(hkDisplayAABB))
-            );
-        }
-        // EXE-INLINED none: hkArrayUtil::destruct<hkDisplayAABB> (each element's virtual destructor)
-        for (int32_t i = size; i < phantomAabbs.m_size; ++i) {
-            hkDisplayAABB* pAabb = &phantomAabbs.m_data[i];
-            pAabb->~hkDisplayAABB();
-        }
-        // EXE-INLINED none: hkArrayUtil::construct<hkDisplayAABB> (placement new, null-tested)
-        for (int32_t i = phantomAabbs.m_size; i < size; ++i) {
-            hkDisplayAABB* pAabb = &phantomAabbs.m_data[i];
-            if (pAabb) {
-                ::new (pAabb) hkDisplayAABB;
-            }
-        }
-        phantomAabbs.m_size = size;
-    }
+    alignas(16) hkLocalArray<hkDisplayAABB> phantomAabbs(world->m_phantoms.m_size);
+    phantomAabbs.setSize(world->m_phantoms.m_size);
 
-    alignas(16) hkLocalArray<hkDisplayGeometry*> phantomAabbPtrs;
-    {
-        // EXE-INLINED none: hkLocalArray<hkDisplayGeometry*>::hkLocalArray(phantoms.getSize()) (hkAllocateStack)
-        const int32_t capacity = world->m_phantoms.m_size;
-        phantomAabbPtrs.m_data = nullptr;
-        phantomAabbPtrs.m_size = 0;
-        phantomAabbPtrs.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((capacity * static_cast<int32_t>(sizeof(hkDisplayGeometry*)) + 127) & ~127);
-        phantomAabbPtrs.m_capacityAndFlags = capacity | hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
-        phantomAabbPtrs.m_data = reinterpret_cast<hkDisplayGeometry**>(pBlock);
-        phantomAabbPtrs.m_localMemory = phantomAabbPtrs.m_data;
-    }
-    {
-        // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize(phantoms.getSize())
-        const int32_t size = world->m_phantoms.m_size;
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = phantomAabbPtrs.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK;
-        if (capacity < size) {
-            const int32_t doubled = 2 * capacity;
-            hkArrayUtil::_reserve(
-                heap, &phantomAabbPtrs, size < doubled ? doubled : size,
-                static_cast<int32_t>(sizeof(hkDisplayGeometry*))
-            );
-        }
-        phantomAabbPtrs.m_size = size;
-    }
+    alignas(16) hkLocalArray<hkDisplayGeometry*> phantomAabbPtrs(world->m_phantoms.m_size);
+    phantomAabbPtrs.setSize(world->m_phantoms.m_size);
 
     for (int32_t i = 0; i < world->m_phantoms.m_size; ++i) {
         hkAabb aabb;

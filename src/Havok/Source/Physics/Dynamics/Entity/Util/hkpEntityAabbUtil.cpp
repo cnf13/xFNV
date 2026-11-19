@@ -86,16 +86,8 @@ void hkpEntityAabbUtil::entityBatchRecalcAabb(
             const hkpShapeContainer* container = shape->getContainer();
             const int32_t numChildShapes = container->getNumChildShapes();
 
-            // EXE-INLINED none: hkAllocateStack<hkAabbUint32>
-            hkStackMemory& aabbStack = hkMemoryRouter::getInstance().m_stack;
-            hkAabbUint32* childAabbs = reinterpret_cast<hkAabbUint32*>(aabbStack.m_next.m_storage);
-            aabbStack.m_next.m_storage = reinterpret_cast<char*>(childAabbs) +
-                ((numChildShapes * static_cast<int32_t>(sizeof(hkAabbUint32)) + 127) & ~127);
-            // EXE-INLINED none: hkAllocateStack<hkpShapeKey>
-            hkStackMemory& keyStack = hkMemoryRouter::getInstance().m_stack;
-            uint32_t* childKeys = reinterpret_cast<uint32_t*>(keyStack.m_next.m_storage);
-            keyStack.m_next.m_storage = reinterpret_cast<char*>(childKeys) +
-                ((numChildShapes * static_cast<int32_t>(sizeof(uint32_t)) + 127) & ~127);
+            hkAabbUint32* childAabbs = hkAllocateStack<hkAabbUint32>(numChildShapes, nullptr);
+            uint32_t* childKeys = hkAllocateStack<uint32_t>(numChildShapes, nullptr);
 
             hkpAgent3RootMotion rootMotion;
             hkpAgent3CalcRootMotion(&motionState, rootMotion);
@@ -214,11 +206,7 @@ void hkpEntityAabbUtil::entityBatchRecalcAabb(
             hkVector4Util::compressExpandedAabbUint32(compoundExpandedInt, bvdAabb);
 
             if (numChildShapes != 0) {
-                // EXE-INLINED none: hkAllocateStack<hkValueIndexPair>
-                hkStackMemory& pairStack = hkMemoryRouter::getInstance().m_stack;
-                hkValueIndexPair* pairs = reinterpret_cast<hkValueIndexPair*>(pairStack.m_next.m_storage);
-                pairStack.m_next.m_storage = reinterpret_cast<char*>(pairs) +
-                    ((numChildShapes * static_cast<int32_t>(sizeof(hkValueIndexPair)) + 127) & ~127);
+                hkValueIndexPair* pairs = hkAllocateStack<hkValueIndexPair>(numChildShapes, nullptr);
                 if (numChildShapes > 1) {
                     for (int32_t k = 0; k < numChildShapes; k++) {
                         pairs[k].m_index = k;
@@ -235,13 +223,10 @@ void hkpEntityAabbUtil::entityBatchRecalcAabb(
                     sortedAabbs[k] = childAabbs[pairs[k].m_index];
                     sortedKeys[k] = childKeys[pairs[k].m_index];
                 }
-                // EXE-INLINED 0x5E0B60
-                hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pairs);
+                hkDeallocateStack(pairs);
             }
-            // EXE-INLINED 0x5E0B60
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(childKeys);
-            // EXE-INLINED 0x5E0B60
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(childAabbs);
+            hkDeallocateStack(childKeys);
+            hkDeallocateStack(childAabbs);
         }
         else {
             hkAabb aabb;

@@ -139,22 +139,8 @@ void hkpTriSampledHeightFieldBvTreeShape::queryAabb(
         for (uint32_t x = uiMinX; x <= uiMaxX; ++x) {
             for (uint32_t z = uiMinZ; z <= uiMaxZ; ++z) {
                 const uint32_t uiKey = ((z << 15) + x) * 2;
-                {
-                    // EXE-INLINED none: hkArray<uint32_t>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&hits);
-                    if (hits.m_size == static_cast<uint32_t>(hits.getCapacity())) {
-                        hkArrayUtil::_reserveMore(alloc, &hits, sizeof(uint32_t));
-                    }
-                    hits.m_data[hits.m_size++] = uiKey;
-                }
-                {
-                    // EXE-INLINED none: hkArray<uint32_t>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&hits);
-                    if (hits.m_size == static_cast<uint32_t>(hits.getCapacity())) {
-                        hkArrayUtil::_reserveMore(alloc, &hits, sizeof(uint32_t));
-                    }
-                    hits.m_data[hits.m_size++] = uiKey | 1;
-                }
+                hits.pushBack(uiKey);
+                hits.pushBack(uiKey | 1);
                 if (bAabbAbove || bAabbBelow) {
                     float fHeight = pHeightField->getHeightAtImpl(static_cast<int32_t>(x), static_cast<int32_t>(z));
                     fHeight = pHeightField->m_intToFloatScale.m_quad[1] * fHeight;
@@ -199,22 +185,8 @@ void hkpTriSampledHeightFieldBvTreeShape::queryAabb(
         for (uint32_t x = uiMinX; x <= uiMaxX; ++x) {
             for (uint32_t z = uiMinZ; z <= uiMaxZ; ++z) {
                 const uint32_t uiKey = ((z << 15) + x) * 2;
-                {
-                    // EXE-INLINED none: hkArray<uint32_t>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&hits);
-                    if (hits.m_size == static_cast<uint32_t>(hits.getCapacity())) {
-                        hkArrayUtil::_reserveMore(alloc, &hits, sizeof(uint32_t));
-                    }
-                    hits.m_data[hits.m_size++] = uiKey;
-                }
-                {
-                    // EXE-INLINED none: hkArray<uint32_t>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&hits);
-                    if (hits.m_size == static_cast<uint32_t>(hits.getCapacity())) {
-                        hkArrayUtil::_reserveMore(alloc, &hits, sizeof(uint32_t));
-                    }
-                    hits.m_data[hits.m_size++] = uiKey | 1;
-                }
+                hits.pushBack(uiKey);
+                hits.pushBack(uiKey | 1);
             }
         }
     }

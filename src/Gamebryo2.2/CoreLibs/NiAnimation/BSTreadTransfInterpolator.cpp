@@ -202,7 +202,6 @@ void BSTreadTransfInterpolator::CopyMembers(BSTreadTransfInterpolator* pkDest, N
             &pOldLinks[static_cast<int32_t>(reinterpret_cast<size_t*>(pOldLinks)[-1])];
         for (int32_t i = static_cast<int32_t>(reinterpret_cast<size_t*>(pOldLinks)[-1]) - 1; i >= 0; --i) {
             --pLink;
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(pLink->Name.GetHandle());
         }
         MemoryManager_Singleton.Deallocate(reinterpret_cast<size_t*>(pOldLinks) - 1);

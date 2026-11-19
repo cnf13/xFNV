@@ -304,13 +304,11 @@ NiSourceTexture* BSShaderUtil::ConvertTexture(NiSourceTexture* apTex, const NiPi
 void BSShaderUtil::KillSDM() {
     NiFixedString* v0 = BSShaderUtil::pConvertedTextureName;
     if (BSShaderUtil::pConvertedTextureName) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSShaderUtil::pConvertedTextureName->GetHandle());
         MemoryManager_Singleton.Deallocate(v0);
     }
     NiFixedString* v1 = BSShaderUtil::pBGConvertedTextureName;
     if (BSShaderUtil::pBGConvertedTextureName) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSShaderUtil::pBGConvertedTextureName->GetHandle());
         MemoryManager_Singleton.Deallocate(v1);
     }

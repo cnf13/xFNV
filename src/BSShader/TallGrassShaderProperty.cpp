@@ -827,20 +827,7 @@ void TallGrassShaderProperty::RemoveFromTerrainChunk(int32_t alTerrainChunkSeed)
                                             m_pkNext->m_pkPrev = pkPrev;
                                         }
                                         *p_m_element = nullptr;
-                                        // EXE-INLINED 0x45CEE0
-                                        using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
-                                        PoolAllocator::ms_kSpinLock.Lock(nullptr);
-                                        // The pool treats a freed list item as untyped node storage, as the
-                                        // allocator's own Deallocate (NiTPointerAllocator) casts it.
-                                        PoolAllocator::AllocNode* pkFreed =
-                                            reinterpret_cast<PoolAllocator::AllocNode*>(v14);
-                                        pkFreed->m_pkData = nullptr;
-                                        pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
-                                        bool v17 = PoolAllocator::ms_kSpinLock.uiLockCount-- == 1;
-                                        PoolAllocator::ms_pkFreeMem = pkFreed;
-                                        if (v17) {
-                                            PoolAllocator::ms_kSpinLock.uiOwningThread = 0;
-                                        }
+                                        NiTPointerAllocator<uint32_t>().Deallocate(v14);
                                         --p_pLowGrassGroupList->m_uiCount;
                                     }
                                 }

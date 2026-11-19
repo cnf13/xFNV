@@ -252,15 +252,8 @@ void hkaWaveletCompressedAnimation::samplePartialTracks(
     getFrameAndDelta(time, frame, delta);
     const float oneMinusDelta = 1.0f - delta;
 
-    // The stack allocator hands out raw memory.
-    // EXE-INLINED none: hkAllocateStack<float>
-    hkMemoryRouter* router = &hkMemoryRouter::getInstance();
-    float* decompressed = reinterpret_cast<float*>(router->m_stack.m_next.m_storage);
-    router->m_stack.m_next.m_storage += (numD * static_cast<uint32_t>(m_blockSize) * 4 + 127) & ~127u;
-    // EXE-INLINED none: hkAllocateStack<float>
-    router = &hkMemoryRouter::getInstance();
-    float* interpolated = reinterpret_cast<float*>(router->m_stack.m_next.m_storage);
-    router->m_stack.m_next.m_storage += (numD * 4 + 127) & ~127u;
+    float* decompressed = hkAllocateStack<float>(static_cast<int32_t>(numD * m_blockSize), nullptr);
+    float* interpolated = hkAllocateStack<float>(static_cast<int32_t>(numD), nullptr);
 
     // The cache's chunks are untyped bytes.
     const float* data = nullptr;
@@ -332,11 +325,8 @@ void hkaWaveletCompressedAnimation::samplePartialTracks(
     hkaTrackAnalysis::recompose(compose, transformTracksOut, floatTracksOut);
     HK_TIMER_END_LIST();
 
-    // The stack allocator's next pointer is raw memory.
-    // EXE-INLINED none: hkDeallocateStack<float>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(interpolated);
-    // EXE-INLINED none: hkDeallocateStack<float>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(decompressed);
+    hkDeallocateStack(interpolated);
+    hkDeallocateStack(decompressed);
 }
 
 // Flushes every block's key from the cache. A key is getFullCacheKey's: the data's address as a 32-bit number plus

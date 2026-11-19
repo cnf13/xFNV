@@ -189,14 +189,7 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
     for (int32_t i = 0; i < m_constraints.getSize(); ++i) {
         hkpConstraintInstance* constraint = m_constraints.m_data[i];
         const hkpEntity* entityA = constraint->getEntityA();
-        // EXE-INLINED 0x629F10
-        int32_t indexA = -1;
-        for (int32_t j = 0; j < m_rigidBodies.getSize(); ++j) {
-            if (m_rigidBodies.m_data[j] == entityA) {
-                indexA = j;
-                break;
-            }
-        }
+        int32_t indexA = m_rigidBodies.indexOf(entityA);
         hkpRigidBody* newBodyA = newSystem->m_rigidBodies.m_data[indexA];
         hkpRigidBody* newBodyB;
         if (constraint->isConstrainedToWorld().m_bool) {
@@ -204,14 +197,7 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
         }
         else {
             const hkpEntity* entityB = constraint->getEntityB();
-            // EXE-INLINED 0x629F10
-            int32_t indexB = -1;
-            for (int32_t j = 0; j < m_rigidBodies.getSize(); ++j) {
-                if (m_rigidBodies.m_data[j] == entityB) {
-                    indexB = j;
-                    break;
-                }
-            }
+            int32_t indexB = m_rigidBodies.indexOf(entityB);
             newBodyB = newSystem->m_rigidBodies.m_data[indexB];
         }
         newSystem->m_constraints.m_data[i] =
@@ -229,14 +215,7 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
         newEntities.setSize(entities.getSize());
         for (int32_t j = 0; j < newEntities.getSize(); ++j) {
             const hkpEntity* entity = entities.m_data[j];
-            // EXE-INLINED 0x629F10
-            int32_t index = -1;
-            for (int32_t k = 0; k < m_rigidBodies.getSize(); ++k) {
-                if (m_rigidBodies.m_data[k] == entity) {
-                    index = k;
-                    break;
-                }
-            }
+            int32_t index = m_rigidBodies.indexOf(entity);
             newEntities.m_data[j] = newSystem->m_rigidBodies.m_data[index];
         }
         hkArray<hkpPhantom*> phantoms;
@@ -245,14 +224,7 @@ hkpPhysicsSystem* hkpPhysicsSystem::clone() const {
         newPhantoms.setSize(phantoms.getSize());
         for (int32_t j = 0; j < newPhantoms.getSize(); ++j) {
             const hkpPhantom* phantom = phantoms.m_data[j];
-            // EXE-INLINED 0x629F10
-            int32_t index = -1;
-            for (int32_t k = 0; k < m_phantoms.getSize(); ++k) {
-                if (m_phantoms.m_data[k] == phantom) {
-                    index = k;
-                    break;
-                }
-            }
+            int32_t index = m_phantoms.indexOf(phantom);
             newPhantoms.m_data[j] = newSystem->m_phantoms.m_data[index];
         }
         newSystem->m_actions.m_data[i] = action->clone(newEntities, newPhantoms);
@@ -408,14 +380,10 @@ void hkpPhysicsSystem::removeNullPhantoms() {
 // The SDK's member-wise copy: the four arrays through hkArray's inline operator=, then the name, the user data and
 // the active flag.
 void hkpPhysicsSystem::copy(const hkpPhysicsSystem& toCopy) {
-    // EXE-INLINED none: hkArray<hkpRigidBody*>::operator=
-    m_rigidBodies.copyFromArray(hkMemoryRouter::getInstance().heap(), toCopy.m_rigidBodies, hkTypeIsPod());
-    // EXE-INLINED none: hkArray<hkpPhantom*>::operator=
-    m_phantoms.copyFromArray(hkMemoryRouter::getInstance().heap(), toCopy.m_phantoms, hkTypeIsPod());
-    // EXE-INLINED none: hkArray<hkpConstraintInstance*>::operator=
-    m_constraints.copyFromArray(hkMemoryRouter::getInstance().heap(), toCopy.m_constraints, hkTypeIsPod());
-    // EXE-INLINED none: hkArray<hkpAction*>::operator=
-    m_actions.copyFromArray(hkMemoryRouter::getInstance().heap(), toCopy.m_actions, hkTypeIsPod());
+    m_rigidBodies = toCopy.m_rigidBodies;
+    m_phantoms = toCopy.m_phantoms;
+    m_constraints = toCopy.m_constraints;
+    m_actions = toCopy.m_actions;
     m_name = toCopy.m_name;
     m_userData = toCopy.m_userData;
     m_active.m_bool = toCopy.m_active.m_bool;

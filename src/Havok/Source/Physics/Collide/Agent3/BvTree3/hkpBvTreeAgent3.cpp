@@ -46,11 +46,7 @@ hkpAgentData* hkBvTreeAgent3::process(
 ) {
     HK_TIMER_BEGIN_LIST("BvTree3", "QueryTree");
 
-    // The Havok stack is untyped bytes: the hit list is cast out of it and back.
-    // EXE-INLINED none: hkAllocateStack<hkpShapeKey>
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    uint32_t* hitList = reinterpret_cast<uint32_t*>(router.m_stack.m_next.m_storage);
-    router.m_stack.m_next.m_storage += HK_MAX_NUM_HITS_PER_AABB_QUERY * sizeof(uint32_t);
+    uint32_t* hitList = hkAllocateStack<uint32_t>(HK_MAX_NUM_HITS_PER_AABB_QUERY, nullptr);
 
     hkTransform bTa;
     bTa.setInverse(input.m_aTb);
@@ -68,8 +64,7 @@ hkpAgentData* hkBvTreeAgent3::process(
     );
     HK_TIMER_END_LIST();
 
-    // EXE-INLINED none: hkDeallocateStack<hkpShapeKey>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(hitList);
+    hkDeallocateStack(hitList);
     return static_cast<char*>(agentData) + ((sizeof(hkpAgent1nTrack) + 15) & ~static_cast<size_t>(15));
 }
 

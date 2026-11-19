@@ -159,20 +159,9 @@ void hkpBallSocketChainData::buildJacobian(const hkpConstraintQueryIn& inChain, 
         in2.m_transformA = in2.m_transformB;
         hkpEntity* entity = instance->m_chainedEntities.m_data[i + 1];
         in2.m_bodyB = reinterpret_cast<hkpVelocityAccumulator*>(accumsBase + entity->m_solverData);
-        const uint32_t offset = static_cast<uint32_t>(reinterpret_cast<char*>(in2.m_bodyB) - accumsBase);
-
-        // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::pushBack
-        // The SDK's pushBack, inlined: the growth check, then the placement store with its null test.
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (accumulators.m_size ==
-            (accumulators.m_capacityAndFlags & hkArrayBase<hkpVelocityAccumulatorOffset>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &accumulators, sizeof(hkpVelocityAccumulatorOffset));
-        }
-        hkpVelocityAccumulatorOffset* pSlot = accumulators.m_data + accumulators.m_size;
-        if (pSlot) {
-            pSlot->m_offset = offset;
-        }
-        accumulators.m_size++;
+        hkpVelocityAccumulatorOffset offset;
+        offset.m_offset = static_cast<uint32_t>(reinterpret_cast<char*>(in2.m_bodyB) - accumsBase);
+        accumulators.pushBack(offset);
 
         const ConstraintInfo& info = m_infos.m_data[i];
         in2.m_transformB = &entity->m_motion.m_motionState.m_transform;

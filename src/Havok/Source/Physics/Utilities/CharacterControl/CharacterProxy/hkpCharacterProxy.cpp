@@ -200,24 +200,10 @@ void hkpCharacterProxy::entityRemovedCallback(hkpEntity* entity) {
     entity->removeEntityListener(this);
     for (int32_t i = m_manifold.m_size - 1; i >= 0; --i) {
         if (hkpGetRigidBody(m_manifold.m_data[i].m_rootCollidableB) == entity) {
-            // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points' empty
-            // destruct there)
-            m_manifold.m_size--;
-            if (m_manifold.m_size != i) {
-                hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                    m_manifold.m_data + i, m_manifold.m_data + m_manifold.m_size
-                );
-            }
+            m_manifold.removeAt(i);
         }
     }
-    // EXE-INLINED 0x629F10
-    int32_t index = -1;
-    for (int32_t i = 0; i < m_bodies.m_size; ++i) {
-        if (m_bodies.m_data[i] == entity) {
-            index = i;
-            break;
-        }
-    }
+    int32_t index = m_bodies.indexOf(entity);
     m_bodies.removeAt(index);
 }
 
@@ -232,24 +218,10 @@ void hkpCharacterProxy::phantomRemovedCallback(hkpPhantom* phantom) {
             ? static_cast<hkpPhantom*>(static_cast<hkpWorldObject*>(pRoot->getOwner()))
             : nullptr;
         if (pManifoldPhantom == phantom) {
-            // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points' empty
-            // destruct there)
-            m_manifold.m_size--;
-            if (m_manifold.m_size != i) {
-                hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                    m_manifold.m_data + i, m_manifold.m_data + m_manifold.m_size
-                );
-            }
+            m_manifold.removeAt(i);
         }
     }
-    // EXE-INLINED 0x629F10
-    int32_t index = -1;
-    for (int32_t i = 0; i < m_phantoms.m_size; ++i) {
-        if (m_phantoms.m_data[i] == phantom) {
-            index = i;
-            break;
-        }
-    }
+    int32_t index = m_phantoms.indexOf(phantom);
     m_phantoms.removeAt(index);
 }
 
@@ -273,10 +245,8 @@ void hkpCharacterProxy::updateManifold(
         }
     }
     float minimumPenetration = 3.40282e+38f;
-    // EXE-INLINED none: hkArray<hkpRigidBody*>::clear
-    m_bodies.m_size = 0;
-    // EXE-INLINED none: hkArray<hkpPhantom*>::clear
-    m_phantoms.m_size = 0;
+    m_bodies.clear();
+    m_phantoms.clear();
 
     const int32_t numStartHits = startPointCollector.m_hits.m_size;
     hkLocalArray<hkpRootCdPoint> startPointHits(numStartHits);
@@ -307,25 +277,11 @@ void hkpCharacterProxy::updateManifold(
                 fireContactAdded(hit);
             }
             current.Assign(hit);
-            // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points' empty
-            // destruct there)
-            startPointHits.m_size--;
-            if (startPointHits.m_size != bestIndex) {
-                hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                    startPointHits.m_data + bestIndex, startPointHits.m_data + startPointHits.m_size
-                );
-            }
+            startPointHits.removeAt(bestIndex);
         }
         else {
             fireContactRemoved(m_manifold.m_data[i]);
-            // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points' empty
-            // destruct there)
-            m_manifold.m_size--;
-            if (m_manifold.m_size != i) {
-                hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                    m_manifold.m_data + i, m_manifold.m_data + m_manifold.m_size
-                );
-            }
+            m_manifold.removeAt(i);
         }
     }
 
@@ -344,16 +300,7 @@ void hkpCharacterProxy::updateManifold(
             }
             else {
                 fireContactAdded(hit);
-                // EXE-INLINED none: hkArray<hkpRootCdPoint>::pushBack
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                if (m_manifold.m_size == (m_manifold.m_capacityAndFlags & hkArrayBase<hkpRootCdPoint>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*pHeap, &m_manifold, static_cast<int32_t>(sizeof(hkpRootCdPoint)));
-                }
-                hkpRootCdPoint* pNew = &m_manifold.m_data[m_manifold.m_size];
-                if (pNew != nullptr) {
-                    *pNew = hit;
-                }
-                m_manifold.m_size++;
+                m_manifold.pushBack(hit);
             }
         }
     }
@@ -363,16 +310,7 @@ void hkpCharacterProxy::updateManifold(
         const hkpRootCdPoint& hit = castCollector.m_hits.m_data[0];
         if (findSurface(hit) == -1) {
             fireContactAdded(hit);
-            // EXE-INLINED none: hkArray<hkpRootCdPoint>::pushBack
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            if (m_manifold.m_size == (m_manifold.m_capacityAndFlags & hkArrayBase<hkpRootCdPoint>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*pHeap, &m_manifold, static_cast<int32_t>(sizeof(hkpRootCdPoint)));
-            }
-            hkpRootCdPoint* pNew = &m_manifold.m_data[m_manifold.m_size];
-            if (pNew != nullptr) {
-                *pNew = hit;
-            }
-            m_manifold.m_size++;
+            m_manifold.pushBack(hit);
         }
     }
 
@@ -381,14 +319,7 @@ void hkpCharacterProxy::updateManifold(
         for (int32_t j = i - 1; j >= 0; --j) {
             if (surfaceDistance(m_manifold.m_data[i], m_manifold.m_data[j]) < 0.10000000149011612) {
                 fireContactRemoved(m_manifold.m_data[i]);
-                // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points' empty
-                // destruct there)
-                m_manifold.m_size--;
-                if (m_manifold.m_size != i) {
-                    hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                        m_manifold.m_data + i, m_manifold.m_data + m_manifold.m_size
-                    );
-                }
+                m_manifold.removeAt(i);
                 break;
             }
         }
@@ -398,25 +329,12 @@ void hkpCharacterProxy::updateManifold(
     for (int32_t i = 0; i < m_manifold.m_size; ++i) {
         hkpRigidBody* pBody = hkpGetRigidBody(m_manifold.m_data[i].m_rootCollidableB);
         if (pBody != nullptr) {
-            // EXE-INLINED 0x629F10
-            int32_t index = -1;
-            for (int32_t k = 0; k < m_bodies.m_size; ++k) {
-                if (m_bodies.m_data[k] == pBody) {
-                    index = k;
-                    break;
-                }
-            }
+            int32_t index = m_bodies.indexOf(pBody);
             if (index == -1) {
                 if (!isMultithreaded.m_bool) {
                     pBody->addEntityListener(this);
                 }
-                // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                if (m_bodies.m_size == (m_bodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*pHeap, &m_bodies, static_cast<int32_t>(sizeof(hkpRigidBody*)));
-                }
-                m_bodies.m_data[m_bodies.m_size] = pBody;
-                m_bodies.m_size++;
+                m_bodies.pushBack(pBody);
             }
         }
         const hkpCollidable* pRootB = m_manifold.m_data[i].m_rootCollidableB;
@@ -424,26 +342,12 @@ void hkpCharacterProxy::updateManifold(
         if (pRootB->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
             hkpPhantom* pPhantom = static_cast<hkpPhantom*>(static_cast<hkpWorldObject*>(pRootB->getOwner()));
             if (pPhantom != nullptr) {
-                // EXE-INLINED 0x629F10
-                int32_t index = -1;
-                for (int32_t k = 0; k < m_phantoms.m_size; ++k) {
-                    if (m_phantoms.m_data[k] == pPhantom) {
-                        index = k;
-                        break;
-                    }
-                }
+                int32_t index = m_phantoms.indexOf(pPhantom);
                 if (index == -1) {
                     if (!isMultithreaded.m_bool) {
                         pPhantom->addPhantomListener(this);
                     }
-                    // EXE-INLINED none: hkArray<hkpPhantom*>::pushBack
-                    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                    if (m_phantoms.m_size ==
-                        (m_phantoms.m_capacityAndFlags & hkArrayBase<hkpPhantom*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*pHeap, &m_phantoms, static_cast<int32_t>(sizeof(hkpPhantom*)));
-                    }
-                    m_phantoms.m_data[m_phantoms.m_size] = pPhantom;
-                    m_phantoms.m_size++;
+                    m_phantoms.pushBack(pPhantom);
                 }
             }
         }
@@ -631,22 +535,7 @@ void hkpCharacterProxy::integrateImplementation(
         updateManifold(startPointCollector, castCollector, hkBool(isMultithreaded));
 
         // The manifold's points as plane constraints, with room for the slope planes and the user planes.
-        alignas(16) hkLocalArray<hkpSurfaceConstraintInfo> surfaceConstraints;
-        {
-            // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInfo>::hkLocalArray (hkAllocateStack)
-            const int32_t iCapacity = m_manifold.m_size + m_userPlanes + 10;
-            surfaceConstraints.m_data = nullptr;
-            surfaceConstraints.m_size = 0;
-            surfaceConstraints.m_capacityAndFlags = hkArrayBase<hkpSurfaceConstraintInfo>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpSurfaceConstraintInfo)) + 127) & ~127);
-            surfaceConstraints.m_data = reinterpret_cast<hkpSurfaceConstraintInfo*>(pBlock);
-            surfaceConstraints.m_localMemory = surfaceConstraints.m_data;
-            surfaceConstraints.m_capacityAndFlags =
-                iCapacity | hkArrayBase<hkpSurfaceConstraintInfo>::DONT_DEALLOCATE_FLAG;
-        }
+        alignas(16) hkLocalArray<hkpSurfaceConstraintInfo> surfaceConstraints(m_manifold.m_size + m_userPlanes + 10);
         surfaceConstraints.setSizeUnchecked(m_manifold.m_size);
         for (int32_t i = 0; i < m_manifold.m_size; ++i) {
             extractSurfaceConstraintInfo(
@@ -663,22 +552,9 @@ void hkpCharacterProxy::integrateImplementation(
 
         HK_TIMER_SPLIT_LIST("SlexMove");
         // The solver's output per constraint.
-        alignas(16) hkLocalArray<hkpSurfaceConstraintInteraction> surfaceInteractions;
-        {
-            // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInteraction>::hkLocalArray (hkAllocateStack)
-            const int32_t iCapacity = surfaceConstraints.m_size + m_userPlanes;
-            surfaceInteractions.m_data = nullptr;
-            surfaceInteractions.m_size = 0;
-            surfaceInteractions.m_capacityAndFlags = hkArrayBase<hkpSurfaceConstraintInteraction>::DONT_DEALLOCATE_FLAG;
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            char* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpSurfaceConstraintInteraction)) + 127) & ~127);
-            surfaceInteractions.m_data = reinterpret_cast<hkpSurfaceConstraintInteraction*>(pBlock);
-            surfaceInteractions.m_localMemory = surfaceInteractions.m_data;
-            surfaceInteractions.m_capacityAndFlags =
-                iCapacity | hkArrayBase<hkpSurfaceConstraintInteraction>::DONT_DEALLOCATE_FLAG;
-        }
+        alignas(16) hkLocalArray<hkpSurfaceConstraintInteraction> surfaceInteractions(
+            surfaceConstraints.m_size + m_userPlanes
+        );
         // The hkpSimplexSolverInput constructor's defaults (zero position, up (0,0,1,0), epsilon surface velocity) are
         // all overwritten below, so they are left out.
         hkpSimplexSolverInput input;
@@ -729,12 +605,7 @@ void hkpCharacterProxy::integrateImplementation(
                 convertFractionToDistance(castCollector.m_hits.m_data, castCollector.m_hits.m_size, output.m_position);
                 // Hits already in the manifold are dropped; when none is left the solver's move stands.
                 while (findSurface(castCollector.m_hits.m_data[0]) != -1) {
-                    // EXE-INLINED none: hkArray<hkpRootCdPoint>::removeAtAndCopy(0)
-                    castCollector.m_hits.m_size--;
-                    hkMemUtil::memCpy<alignof(hkpRootCdPoint)>(
-                        castCollector.m_hits.m_data, castCollector.m_hits.m_data + 1,
-                        castCollector.m_hits.m_size * static_cast<int32_t>(sizeof(hkpRootCdPoint))
-                    );
+                    castCollector.m_hits.removeAtAndCopy(0);
                     if (castCollector.m_hits.m_size <= 0) {
                         simplexResultOk = 1;
                         break;
@@ -743,21 +614,7 @@ void hkpCharacterProxy::integrateImplementation(
                 if (castCollector.m_hits.m_size > 0) {
                     const hkpRootCdPoint& hit = castCollector.m_hits.m_data[0];
                     fireContactAdded(hit);
-                    {
-                        // EXE-INLINED none: hkArray<hkpRootCdPoint>::pushBack
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        if (m_manifold.m_size ==
-                            (m_manifold.m_capacityAndFlags & hkArrayBase<hkpRootCdPoint>::CAPACITY_MASK)) {
-                            hkArrayUtil::_reserveMore(
-                                *pHeap, &m_manifold, static_cast<int32_t>(sizeof(hkpRootCdPoint))
-                            );
-                        }
-                        hkpRootCdPoint* pNew = &m_manifold.m_data[m_manifold.m_size];
-                        if (pNew != nullptr) {
-                            *pNew = hit;
-                        }
-                        m_manifold.m_size++;
-                    }
+                    m_manifold.pushBack(hit);
                     if (!m_refreshManifoldInCheckSupport) {
                         const hkpCollidable* pRootB = hit.m_rootCollidableB;
                         // EXE-INLINED none: hkGetRigidBody
@@ -765,28 +622,12 @@ void hkpCharacterProxy::integrateImplementation(
                             ? static_cast<hkpRigidBody*>(pRootB->getOwner())
                             : nullptr;
                         if (body != nullptr) {
-                            // EXE-INLINED none: hkArray<hkpRigidBody*>::indexOf
-                            int32_t index = -1;
-                            for (int32_t i = 0; i < m_bodies.m_size; ++i) {
-                                if (m_bodies.m_data[i] == body) {
-                                    index = i;
-                                    break;
-                                }
-                            }
+                            int32_t index = m_bodies.indexOf(body);
                             if (index == -1) {
                                 if (!isMultithreaded) {
                                     body->addEntityListener(this);
                                 }
-                                // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-                                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                                if (m_bodies.m_size ==
-                                    (m_bodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-                                    hkArrayUtil::_reserveMore(
-                                        *pHeap, &m_bodies, static_cast<int32_t>(sizeof(hkpRigidBody*))
-                                    );
-                                }
-                                m_bodies.m_data[m_bodies.m_size] = body;
-                                m_bodies.m_size++;
+                                m_bodies.pushBack(body);
                             }
                         }
                         const hkpCollidable* pPhantomRootB = hit.m_rootCollidableB;
@@ -795,28 +636,12 @@ void hkpCharacterProxy::integrateImplementation(
                             ? static_cast<hkpPhantom*>(pPhantomRootB->getOwner())
                             : nullptr;
                         if (phantom != nullptr) {
-                            // EXE-INLINED none: hkArray<hkpPhantom*>::indexOf
-                            int32_t index = -1;
-                            for (int32_t i = 0; i < m_phantoms.m_size; ++i) {
-                                if (m_phantoms.m_data[i] == phantom) {
-                                    index = i;
-                                    break;
-                                }
-                            }
+                            int32_t index = m_phantoms.indexOf(phantom);
                             if (index == -1) {
                                 if (!isMultithreaded) {
                                     phantom->addPhantomListener(this);
                                 }
-                                // EXE-INLINED none: hkArray<hkpPhantom*>::pushBack
-                                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                                if (m_phantoms.m_size ==
-                                    (m_phantoms.m_capacityAndFlags & hkArrayBase<hkpPhantom*>::CAPACITY_MASK)) {
-                                    hkArrayUtil::_reserveMore(
-                                        *pHeap, &m_phantoms, static_cast<int32_t>(sizeof(hkpPhantom*))
-                                    );
-                                }
-                                m_phantoms.m_data[m_phantoms.m_size] = phantom;
-                                m_phantoms.m_size++;
+                                m_phantoms.pushBack(phantom);
                             }
                         }
                     }
@@ -1014,21 +839,7 @@ void hkpCharacterProxy::checkSupportWithCollector(
     if (m_refreshManifoldInCheckSupport) {
         refreshManifold(startPointCollector);
     }
-    alignas(16) hkLocalArray<hkpSurfaceConstraintInfo> constraints;
-    {
-        // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInfo>::hkLocalArray (hkAllocateStack)
-        const int32_t iCapacity = m_manifold.m_size + m_userPlanes + 10;
-        constraints.m_data = nullptr;
-        constraints.m_size = 0;
-        constraints.m_capacityAndFlags = hkArrayBase<hkpSurfaceConstraintInfo>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpSurfaceConstraintInfo)) + 127) & ~127);
-        constraints.m_data = reinterpret_cast<hkpSurfaceConstraintInfo*>(pBlock);
-        constraints.m_localMemory = constraints.m_data;
-        constraints.m_capacityAndFlags = iCapacity | hkArrayBase<hkpSurfaceConstraintInfo>::DONT_DEALLOCATE_FLAG;
-    }
+    alignas(16) hkLocalArray<hkpSurfaceConstraintInfo> constraints(m_manifold.m_size + m_userPlanes + 10);
     constraints.setSizeUnchecked(m_manifold.m_size);
     for (int32_t i = 0; i < m_manifold.m_size; ++i) {
         extractSurfaceConstraintInfo(m_manifold.m_data[i], constraints.m_data[i], 0.0f);
@@ -1042,37 +853,9 @@ void hkpCharacterProxy::checkSupportWithCollector(
         }
     }
     // The solver's output per constraint.
-    alignas(16) hkLocalArray<hkpSurfaceConstraintInteraction> interactions;
-    {
-        // EXE-INLINED none: hkLocalArray<hkpSurfaceConstraintInteraction>::hkLocalArray (hkAllocateStack)
-        const int32_t iCapacity = constraints.m_size + m_userPlanes;
-        interactions.m_data = nullptr;
-        interactions.m_size = 0;
-        interactions.m_capacityAndFlags = hkArrayBase<hkpSurfaceConstraintInteraction>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkpSurfaceConstraintInteraction)) + 127) & ~127);
-        interactions.m_capacityAndFlags =
-            iCapacity | hkArrayBase<hkpSurfaceConstraintInteraction>::DONT_DEALLOCATE_FLAG;
-        interactions.m_data = reinterpret_cast<hkpSurfaceConstraintInteraction*>(pBlock);
-        interactions.m_localMemory = interactions.m_data;
-    }
+    alignas(16) hkLocalArray<hkpSurfaceConstraintInteraction> interactions(constraints.m_size + m_userPlanes);
     // The constraints' velocities, kept to give the surface velocity of the supporting planes.
-    alignas(16) hkLocalArray<hkVector4> storedVelocities;
-    {
-        // EXE-INLINED none: hkLocalArray<hkVector4>::hkLocalArray (hkAllocateStack)
-        const int32_t iCapacity = constraints.m_size + m_userPlanes;
-        storedVelocities.m_data = nullptr;
-        storedVelocities.m_size = 0;
-        storedVelocities.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((iCapacity * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
-        storedVelocities.m_data = reinterpret_cast<hkVector4*>(pBlock);
-        storedVelocities.m_localMemory = storedVelocities.m_data;
-        storedVelocities.m_capacityAndFlags = iCapacity | hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-    }
+    alignas(16) hkLocalArray<hkVector4> storedVelocities(constraints.m_size + m_userPlanes);
     hkpSimplexSolverInput input;
     input.m_deltaTime = 0.016666668f;
     input.m_minDeltaTime = 0.016666668f;
@@ -1085,13 +868,9 @@ void hkpCharacterProxy::checkSupportWithCollector(
     hkpSimplexSolverOutput output;
     output.m_planeInteractions = interactions.m_data;
     fireConstraintsProcessed(m_manifold, input);
+    storedVelocities.setSize(input.m_numConstraints);
     // EXE-INLINED none: hkArray<T>::setSize, written as its reserve and size store (the element classes have no
     // hkArrayUtil::construct of their own).
-    {
-        const int32_t iNum = input.m_numConstraints;
-        storedVelocities.reserve(iNum);
-        storedVelocities.m_size = iNum;
-    }
     {
         const int32_t iNum = input.m_numConstraints;
         interactions.reserve(iNum);

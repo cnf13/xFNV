@@ -131,10 +131,7 @@ void hkpSimpleWorldRayCaster::castRayGroup(
     aabb.m_min.m_quad = vMin;
     aabb.m_max.m_quad = vMax;
     int32_t iCacheSize = broadphase.getAabbCacheSize();
-    // EXE-INLINED none: hkAllocateStack<char>
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    char* pCache = pRouter->m_stack.m_next.m_storage;
-    pRouter->m_stack.m_next.m_storage += (iCacheSize + 127) & ~127;
+    char* pCache = hkAllocateStack<char>(iCacheSize, nullptr);
     broadphase.calcAabbCache(aabb, pCache);
     const hkpWorldRayCastInput* pInput = inputArray;
     hkpWorldRayCastOutput* pOutput = outputs;
@@ -143,8 +140,7 @@ void hkpSimpleWorldRayCaster::castRayGroup(
         ++pOutput;
         ++pInput;
     }
-    // EXE-INLINED none: hkDeallocateStack<char>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pCache;
+    hkDeallocateStack(pCache);
     HK_TIMER_END();
 }
 

@@ -668,10 +668,7 @@ integrateJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::JobQueu
         taskHeader->m_bufferCapacity = 0;
         taskHeader->m_referenceCount = 1;
         taskHeader->m_numIslandsAfterSplit = 1;
-        // EXE-INLINED none: hkArray<hkpSimulationIsland*>::hkArray
-        taskHeader->m_newSplitIslands.m_data = nullptr;
-        taskHeader->m_newSplitIslands.m_size = 0;
-        taskHeader->m_newSplitIslands.m_capacityAndFlags = hkArrayBase<hkpSimulationIsland*>::DONT_DEALLOCATE_FLAG;
+        ::new (&taskHeader->m_newSplitIslands) hkArray<hkpSimulationIsland*>();
         taskHeader->m_tasks.m_buildJacobianTasks = nullptr;
         taskHeader->m_tasks.m_numBuildJacobianTasks = 0;
         taskHeader->m_tasks.m_callbackConstraints = nullptr;

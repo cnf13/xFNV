@@ -601,12 +601,7 @@ void bhkBlendController::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
     NiTimeController::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(ms_RTTI.GetName());
-    // EXE-INLINED none: NiTArray<char*>::Add
-    uint32_t uiIndex = apStrings->m_usSize;
-    if (uiIndex >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiIndex, pcString);
+    apStrings->Add(pcString);
     pcString = NiGetViewerString("iKeys", pBlendKeyA.m_uiESize);
     apStrings->Add(pcString);
     for (uint32_t i = 0; i < pBlendKeyA.m_uiESize; ++i) {
@@ -620,27 +615,7 @@ void bhkBlendController::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         }
         char* pcKey = static_cast<char*>(MemoryManager_Singleton.Allocate(stLength + 1));
         strcpy_s(pcKey, stLength + 1, acBuffer);
-        // EXE-INLINED none: NiTArray<char*>::Add
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= apStrings->m_usSize) {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcKey) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (pcKey) {
-            if (!apStrings->m_pBase[uiIndex]) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (apStrings->m_pBase[uiIndex]) {
-            --apStrings->m_usESize;
-        }
-        apStrings->m_pBase[uiIndex] = pcKey;
+        apStrings->Add(pcKey);
     }
     pTLSData->eMemContext = eMemContext;
 }

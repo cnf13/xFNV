@@ -20,24 +20,7 @@ hkpAllRayHitCollector::hkpAllRayHitCollector() : m_hits(0) {
 // The SDK's addRayHit: m_hits.expandOne(), the collector output copied into the new hit, its shape keys and its root
 // collidable.
 void hkpAllRayHitCollector::addRayHit(const hkpCdBody& cdBody, const hkpShapeRayCastCollectorOutput& hitInfo) {
-    hkInplaceArray<hkpWorldRayCastOutput, 8, hkContainerHeapAllocator>* pHits = &m_hits;
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    // EXE-INLINED none: hkArray<hkpWorldRayCastOutput>::expandOne
-    if (pHits->m_size == (pHits->m_capacityAndFlags & hkArrayBase<hkpWorldRayCastOutput>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*pRouter->m_heap, pHits, sizeof(hkpWorldRayCastOutput));
-    }
-    hkpWorldRayCastOutput* pNew = &pHits->m_data[pHits->m_size];
-    // EXE-INLINED none: hkpWorldRayCastOutput's constructor (the placement new)
-    if (pNew) {
-        pNew->m_hitFraction = 1.0f;
-        pNew->m_extraInfo = -1;
-        pNew->m_shapeKeyIndex = 0;
-        pNew->m_shapeKeys[0] = -1;
-        pNew->m_rootCollidable = nullptr;
-    }
-    int32_t iIndex = pHits->m_size;
-    pHits->m_size = iIndex + 1;
-    hkpWorldRayCastOutput& rRayHit = pHits->m_data[iIndex];
+    hkpWorldRayCastOutput& rRayHit = m_hits.expandOne();
     // EXE-INLINED 0x9C1B00
     rRayHit.m_normal = hitInfo.m_normal;
     rRayHit.m_hitFraction = hitInfo.m_hitFraction;

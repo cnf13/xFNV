@@ -201,16 +201,7 @@ void hkpWorldConstraintUtil::addConstraint(hkpWorld* world, hkpConstraintInstanc
 
     hkpEntity* slave = record->m_entities[1 - record->m_whoIsMaster];
     record->m_slaveIndex = static_cast<uint16_t>(slave->m_constraintsSlave.m_size);
-    {
-        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-        hkArray<hkpConstraintInstance*>& slaves = slave->m_constraintsSlave;
-        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&slaves);
-        if (slaves.m_size == slaves.getCapacity()) {
-            hkArrayUtil::_reserveMore(alloc, &slaves, sizeof(hkpConstraintInstance*));
-        }
-        slaves.m_data[slaves.m_size] = constraint;
-        slaves.m_size++;
-    }
+    slave->m_constraintsSlave.pushBack(constraint);
 }
 
 // Takes the constraint out of its island (which gets a split check), the island's and the constraint's solver info, the

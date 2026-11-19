@@ -2,6 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 
 NiPixelFormat NiPixelFormat_PAL4{
@@ -825,18 +826,10 @@ void NiPixelFormat::SaveBinary(NiStream& kStream) {
     // EXE-INLINED none: NiStreamSaveEnum
     uiSize = 4;
     kStream.Ostr()->BinaryWrite(&m_eFormat, sizeof(m_eFormat), &uiSize, 1);
-    // EXE-INLINED none: NiStreamSaveBinary
-    uiSize = 1;
-    kStream.Ostr()->BinaryWrite(&m_ucBitsPerPixel, sizeof(m_ucBitsPerPixel), &uiSize, 1);
-    // EXE-INLINED none: NiStreamSaveBinary
-    uiSize = 4;
-    kStream.Ostr()->BinaryWrite(&m_uiRendererHint, sizeof(m_uiRendererHint), &uiSize, 1);
-    // EXE-INLINED none: NiStreamSaveBinary
-    uiSize = 4;
-    kStream.Ostr()->BinaryWrite(&m_uiExtraData, sizeof(m_uiExtraData), &uiSize, 1);
-    // EXE-INLINED none: NiStreamSaveBinary
-    uiSize = 1;
-    kStream.Ostr()->BinaryWrite(&m_uFlags, sizeof(m_uFlags), &uiSize, 1);
+    NiStreamSaveBinary(kStream, m_ucBitsPerPixel);
+    NiStreamSaveBinary(kStream, m_uiRendererHint);
+    NiStreamSaveBinary(kStream, m_uiExtraData);
+    NiStreamSaveBinary(kStream, m_uFlags);
     // EXE-INLINED none: NiStreamSaveEnum
     uiSize = 4;
     kStream.Ostr()->BinaryWrite(&m_eTiling, sizeof(m_eTiling), &uiSize, 1);
@@ -848,14 +841,10 @@ void NiPixelFormat::SaveBinary(NiStream& kStream) {
         // EXE-INLINED none: NiStreamSaveEnum
         uiSize = 4;
         kStream.Ostr()->BinaryWrite(&kComp.m_eRepresentation, sizeof(kComp.m_eRepresentation), &uiSize, 1);
-        // EXE-INLINED none: NiStreamSaveBinary
-        uiSize = 1;
-        kStream.Ostr()->BinaryWrite(&kComp.m_ucBitsPerComponent, sizeof(kComp.m_ucBitsPerComponent), &uiSize, 1);
+        NiStreamSaveBinary(kStream, kComp.m_ucBitsPerComponent);
         // Copies the flag to a local byte and writes that.
         uint8_t kBool = kComp.m_bSigned;
-        // EXE-INLINED none: NiStreamSaveBinary
-        uiSize = 1;
-        kStream.Ostr()->BinaryWrite(&kBool, sizeof(kBool), &uiSize, 1);
+        NiStreamSaveBinary(kStream, kBool);
     }
 }
 
@@ -1008,23 +997,15 @@ void NiPixelFormat::LoadBinary(NiStream& kStream) {
         kStream.Istr()->BinaryRead(&uiFormat, sizeof(uiFormat), &uiSize, 1);
         m_eFormat = static_cast<Format>(uiFormat);
         for (uint32_t i = 0; i < 4; ++i) {
-            // EXE-INLINED none: NiStreamLoadBinary
-            uiSize = 4;
-            kStream.Istr()->BinaryRead(&auiColorMasks[i], sizeof(auiColorMasks[i]), &uiSize, 1);
+            NiStreamLoadBinary(kStream, auiColorMasks[i]);
         }
         uint32_t uiBPP;
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 4;
-        kStream.Istr()->BinaryRead(&uiBPP, sizeof(uiBPP), &uiSize, 1);
+        NiStreamLoadBinary(kStream, uiBPP);
         m_ucBitsPerPixel = static_cast<uint8_t>(uiBPP);
         // The two old fast-compare words go into one slot and are dropped.
         uint32_t uiOldFastCompare;
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 4;
-        kStream.Istr()->BinaryRead(&uiOldFastCompare, sizeof(uiOldFastCompare), &uiSize, 1);
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 4;
-        kStream.Istr()->BinaryRead(&uiOldFastCompare, sizeof(uiOldFastCompare), &uiSize, 1);
+        NiStreamLoadBinary(kStream, uiOldFastCompare);
+        NiStreamLoadBinary(kStream, uiOldFastCompare);
         if (kStream.GetFileVersion() >= NiStream::GetVersion(10, 0, 1, 11)) {
             // The tiling is read and dropped.
             uint32_t uiTiling;
@@ -1040,18 +1021,10 @@ void NiPixelFormat::LoadBinary(NiStream& kStream) {
         uiSize = 4;
         kStream.Istr()->BinaryRead(&uiFormat, sizeof(uiFormat), &uiSize, 1);
         m_eFormat = static_cast<Format>(uiFormat);
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 1;
-        kStream.Istr()->BinaryRead(&m_ucBitsPerPixel, sizeof(m_ucBitsPerPixel), &uiSize, 1);
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 4;
-        kStream.Istr()->BinaryRead(&m_uiRendererHint, sizeof(m_uiRendererHint), &uiSize, 1);
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 4;
-        kStream.Istr()->BinaryRead(&m_uiExtraData, sizeof(m_uiExtraData), &uiSize, 1);
-        // EXE-INLINED none: NiStreamLoadBinary
-        uiSize = 1;
-        kStream.Istr()->BinaryRead(&m_uFlags, sizeof(m_uFlags), &uiSize, 1);
+        NiStreamLoadBinary(kStream, m_ucBitsPerPixel);
+        NiStreamLoadBinary(kStream, m_uiRendererHint);
+        NiStreamLoadBinary(kStream, m_uiExtraData);
+        NiStreamLoadBinary(kStream, m_uFlags);
         uint32_t uiTiling;
         // EXE-INLINED none: NiStreamLoadEnum
         uiSize = 4;
@@ -1069,13 +1042,9 @@ void NiPixelFormat::LoadBinary(NiStream& kStream) {
             uiSize = 4;
             kStream.Istr()->BinaryRead(&uiRepresentation, sizeof(uiRepresentation), &uiSize, 1);
             kComp.m_eRepresentation = static_cast<Representation>(uiRepresentation);
-            // EXE-INLINED none: NiStreamLoadBinary
-            uiSize = 1;
-            kStream.Istr()->BinaryRead(&kComp.m_ucBitsPerComponent, sizeof(kComp.m_ucBitsPerComponent), &uiSize, 1);
+            NiStreamLoadBinary(kStream, kComp.m_ucBitsPerComponent);
             uint8_t kBool;
-            // EXE-INLINED none: NiStreamLoadBinary
-            uiSize = 1;
-            kStream.Istr()->BinaryRead(&kBool, sizeof(kBool), &uiSize, 1);
+            NiStreamLoadBinary(kStream, kBool);
             kComp.m_bSigned = kBool != 0;
         }
     }

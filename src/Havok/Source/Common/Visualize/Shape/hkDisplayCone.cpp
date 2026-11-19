@@ -74,14 +74,8 @@ void hkDisplayCone::buildGeometry() {
     }
     this->m_geometry = m_geometry_1;
     generateConeVertices(m_geometry_1->m_vertices);
-    // The apex: m_geometry->m_vertices.pushBack(m_startPos).
-    hkArray<hkVector4>& kVertices = this->m_geometry->m_vertices;
-    hkMemoryRouter* Instance_1 = &hkMemoryRouter::getInstance();
-    // EXE-INLINED 0x66D9B0
-    if (kVertices.m_size == (kVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*Instance_1->m_heap, &kVertices, sizeof(hkVector4));
-    }
-    kVertices.m_data[kVertices.m_size++] = m_startPos;
+    // The apex.
+    this->m_geometry->m_vertices.pushBack(m_startPos);
     int32_t m_numSegments = this->m_numSegments;
     hkArray<hkGeometry::Triangle>* p_m_triangles = &this->m_geometry->m_triangles;
     hkMemoryAllocator* m_heap = (&hkMemoryRouter::getInstance())->m_heap;

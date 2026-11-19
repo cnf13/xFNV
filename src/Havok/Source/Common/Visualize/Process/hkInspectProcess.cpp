@@ -170,11 +170,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
                 }
             }
             else if (bListed) {
-                // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::removeAt
-                --m_autoUpdateList.m_size;
-                if (m_autoUpdateList.m_size != index) {
-                    m_autoUpdateList.m_data[index] = m_autoUpdateList.m_data[m_autoUpdateList.m_size];
-                }
+                m_autoUpdateList.removeAt(index);
             }
             return;
         }
@@ -188,19 +184,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             m_inStream->readArrayGeneric(&numMembers, 2, 1);
             const int32_t pathLength = numMembers;
             hkArray<uint16_t> memberPath(pathLength);
-            {
-                // EXE-INLINED none: hkArray<hkUint16>::setSize
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                const int32_t capacity =
-                    static_cast<int32_t>(memberPath.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK);
-                if (capacity < pathLength) {
-                    const int32_t doubled = 2 * capacity;
-                    hkArrayUtil::_reserve(
-                        *pHeap, &memberPath, pathLength < doubled ? doubled : pathLength, sizeof(uint16_t)
-                    );
-                }
-                memberPath.m_size = pathLength;
-            }
+            memberPath.setSize(pathLength);
             for (int32_t i = 0; i < pathLength; ++i) {
                 uint16_t memberIndex;
                 m_inStream->readArrayGeneric(&memberIndex, 2, 1);
@@ -209,19 +193,8 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             int32_t dataSize;
             m_inStream->readArrayGeneric(&dataSize, 4, 1);
             hkArray<char> data(dataSize);
-            {
-                // EXE-INLINED none: hkArray<char>::setSize
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                const int32_t capacity =
-                    static_cast<int32_t>(data.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-                if (capacity < dataSize) {
-                    const int32_t doubled = 2 * capacity;
-                    hkArrayUtil::_reserve(*pHeap, &data, dataSize < doubled ? doubled : dataSize, sizeof(char));
-                }
-            }
-            char* pBytes = data.m_data;
-            data.m_size = dataSize;
-            m_inStream->readRaw(pBytes, dataSize);
+            data.setSize(dataSize);
+            m_inStream->readRaw(data.m_data, dataSize);
             if (id && classId && memberPath.m_size > 0 && dataSize) {
                 // The client's ids are the addresses of the object and its class.
                 hkClass* pClass = reinterpret_cast<hkClass*>(static_cast<hkUlong>(classId));
@@ -260,10 +233,7 @@ void hkInspectProcess::init() {
 void hkInspectProcess::step(float frameTimeInMs) {
     hkArray<ObjectPair> recursionStack;
     for (int32_t i = 0; i < m_autoUpdateList.m_size; ++i) {
-        // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::setSize(0): the heap is fetched for its reserve,
-        // which never runs (a capacity is never below 0).
-        hkMemoryRouter::getInstance();
-        recursionStack.m_size = 0;
+        recursionStack.setSize(0);
         writeObject(m_autoUpdateList.m_data[i].obj, *m_autoUpdateList.m_data[i].klass, false, recursionStack);
     }
 }
@@ -301,11 +271,7 @@ int32_t hkInspectProcess::removeTopLevelObject(void* ptr) {
         }
     }
     if (index < size) {
-        // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::removeAt
-        --m_autoUpdateList.m_size;
-        if (m_autoUpdateList.m_size != index) {
-            m_autoUpdateList.m_data[index] = m_autoUpdateList.m_data[m_autoUpdateList.m_size];
-        }
+        m_autoUpdateList.removeAt(index);
     }
     return 9;
 }
@@ -341,15 +307,7 @@ int32_t hkInspectProcess::writeObject(
             // Written already.
             return 0;
         }
-        // EXE-INLINED none: hkArray<hkInspectProcess::ObjectPair>::pushBack
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        if (recursionStack.m_size ==
-            static_cast<int32_t>(recursionStack.m_capacityAndFlags & hkArrayBase<ObjectPair>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*pHeap, &recursionStack, sizeof(ObjectPair));
-        }
-        ObjectPair& pair = recursionStack.m_data[recursionStack.m_size++];
-        pair.obj = ptr;
-        pair.klass = pClass;
+        recursionStack.pushBack(ObjectPair{ptr, pClass});
     }
     hkArray<char> buffer;
     int32_t result;

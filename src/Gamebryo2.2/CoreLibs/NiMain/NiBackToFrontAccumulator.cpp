@@ -107,24 +107,11 @@ void NiBackToFrontAccumulator::FinishAccumulating() {
 
 // Appends every geometry of the array to the item list.
 void NiBackToFrontAccumulator::RegisterObjectArray(NiVisibleArray& kArray) {
-    using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
     uint32_t uiCount = kArray.GetCount();
     for (uint32_t i = 0; i < uiCount; i++) {
         NiGeometry* pkGeometry = &kArray.GetAt(i);
-        // EXE-INLINED 0x43A010
-        PoolAllocator::Lock();
-        PoolAllocator::AllocNode* pkNew = PoolAllocator::ms_pkFreeMem;
-        if (!pkNew) {
-            PoolAllocator::CreateFreeMem();
-            pkNew = PoolAllocator::ms_pkFreeMem;
-        }
-        PoolAllocator::ms_pkFreeMem = pkNew->m_pkNext;
-        pkNew->m_element = 0;
-        pkNew->m_pkNext = nullptr;
-        pkNew->m_pkData = nullptr;
-        PoolAllocator::Unlock();
         // EXE-INLINED 0xB58570
-        NiTListItem<NiGeometry*>* pkItem = static_cast<NiTListItem<NiGeometry*>*>(static_cast<void*>(pkNew));
+        NiTListItem<NiGeometry*>* pkItem = m_kItems.NewItem();
         pkItem->m_element = pkGeometry;
         pkItem->m_pkNext = nullptr;
         pkItem->m_pkPrev = m_kItems.m_pkTail;

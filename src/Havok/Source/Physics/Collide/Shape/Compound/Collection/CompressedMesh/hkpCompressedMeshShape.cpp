@@ -451,17 +451,7 @@ void hkpCompressedMeshShape::ConvexPiece::getVertices(
     hkArray<hkVector4, hkContainerHeapAllocator>& vertices
 ) {
     int32_t iNumVertices = m_vertices.m_size / 3;
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::setSize
-    hkMemoryAllocator* pHeap = (&hkMemoryRouter::getInstance())->m_heap;
-    int32_t iCapacity = vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-    if (iCapacity < iNumVertices) {
-        int32_t iNewCapacity = 2 * iCapacity;
-        if (iNumVertices >= iNewCapacity) {
-            iNewCapacity = iNumVertices;
-        }
-        hkArrayUtil::_reserve(*pHeap, &vertices, iNewCapacity, sizeof(hkVector4));
-    }
-    vertices.m_size = iNumVertices;
+    vertices.setSize(iNumVertices);
     for (int32_t i = 0; i < m_vertices.m_size; i += 3) {
         uint16_t* pQuantized = m_vertices.begin();
         float fX = static_cast<float>(pQuantized[i]);

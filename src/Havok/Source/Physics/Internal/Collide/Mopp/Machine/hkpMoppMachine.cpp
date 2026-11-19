@@ -238,13 +238,7 @@ void hkpMoppUsingFloatAabbVirtualMachine<QueryType, QueryObject>::queryMoppTree(
                 {
                     hkArray<hkpMoppPrimitiveInfo>* primitives = m_primitives_out;
                     const uint32_t id = query->m_primitiveOffset + terminal;
-                    // EXE-INLINED none: hkArray<hkpMoppPrimitiveInfo>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(primitives);
-                    if (primitives->m_size ==
-                        (primitives->m_capacityAndFlags & hkArrayBase<hkpMoppPrimitiveInfo>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(alloc, primitives, sizeof(hkpMoppPrimitiveInfo));
-                    }
-                    primitives->m_data[primitives->m_size++].ID = id;
+                    primitives->pushBack(hkpMoppPrimitiveInfo{id});
                     return;
                 }
             case 96:

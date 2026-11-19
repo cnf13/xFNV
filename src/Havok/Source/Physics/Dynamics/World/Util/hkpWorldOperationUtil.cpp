@@ -99,20 +99,8 @@ void mergeSmallSubgroups(
     hkFixedArray<int8_t>& groupSparse
 ) {
     const int32_t numGroups = groupsSizes.m_size;
-    const size_t bufferBytes = (sizeof(int32_t) * numGroups + 127) & ~static_cast<size_t>(127);
-    // EXE-INLINED none: two hkLocalBuffer<int>s' constructors (hkAllocateStack, rounded up to 128 bytes)
-    int32_t* groupSize;
-    {
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        groupSize = static_cast<int32_t*>(static_cast<void*>(stack.m_next.m_storage));
-        stack.m_next.m_storage += bufferBytes;
-    }
-    hkFixedArray<int32_t> reindex;
-    {
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        reindex.m_data.m_storage = static_cast<int32_t*>(static_cast<void*>(stack.m_next.m_storage));
-        stack.m_next.m_storage += bufferBytes;
-    }
+    hkLocalBuffer<int32_t> groupSize(numGroups, nullptr);
+    hkLocalBuffer<int32_t> reindex(numGroups, nullptr);
     for (int32_t g = 0; g < numGroups; ++g) {
         reindex[g] = 0;
         groupSize[g] = 0;
@@ -183,10 +171,6 @@ void mergeSmallSubgroups(
         }
     }
     checker.reindex(reindex, numNewGroups, groupsSizes);
-    // EXE-INLINED none: two hkLocalBuffer<int>s' destructors (hkDeallocateStack)
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-        static_cast<char*>(static_cast<void*>(reindex.m_data.m_storage));
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(groupSize));
 }
 
 void findInactiveGroupsAndEstimateSolverSize(
@@ -321,13 +305,7 @@ void identifyDeactivatedSubgroups(
     hkFixedArray<int8_t>& groupSparse
 ) {
     const int32_t numGroups = groupsSizes.m_size;
-    // EXE-INLINED none: hkLocalBuffer<int>'s constructor (hkAllocateStack, rounded up to 128 bytes)
-    hkFixedArray<int32_t> isActive;
-    {
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        isActive.m_data.m_storage = static_cast<int32_t*>(static_cast<void*>(stack.m_next.m_storage));
-        stack.m_next.m_storage += (sizeof(int32_t) * numGroups + 127) & ~static_cast<size_t>(127);
-    }
+    hkLocalBuffer<int32_t> isActive(numGroups, nullptr);
     // EXE-INLINED 0xCB4080
     for (int32_t g = 0; g < numGroups; ++g) {
         isActive[g] = 0;
@@ -359,9 +337,6 @@ void identifyDeactivatedSubgroups(
     else {
         groupSparse[0] = 0;
     }
-    // EXE-INLINED none: hkLocalBuffer<int>'s destructor (hkDeallocateStack)
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-        static_cast<char*>(static_cast<void*>(isActive.m_data.m_storage));
 }
 
 hkBool worldOperationUtil_less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulationIsland* b) {
@@ -659,12 +634,7 @@ void hkpWorldOperationUtil::addPhantomBP(hkpWorld* world, hkpPhantom* phantom) {
     newPairs.m_data = nullptr;
     newPairs.m_size = 0;
     newPairs.m_capacityAndFlags = hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkAllocateStack<hkpBroadPhaseHandlePair>
-    hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = rStack.m_next.m_storage;
-    rStack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((iCapacity * static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair)) + 127) & ~127);
-    hkpBroadPhaseHandlePair* pLocal = static_cast<hkpBroadPhaseHandlePair*>(pBlock);
+    hkpBroadPhaseHandlePair* pLocal = hkAllocateStack<hkpBroadPhaseHandlePair>(iCapacity, nullptr);
     newPairs.m_data = pLocal;
     newPairs.m_capacityAndFlags = static_cast<int32_t>(
         static_cast<uint32_t>(iCapacity) | hkArrayBase<hkpBroadPhaseHandlePair>::DONT_DEALLOCATE_FLAG
@@ -950,13 +920,7 @@ void hkpWorldOperationUtil::removeAttachedActionsFromDynamicIsland(
         if (!allOthersFixed) {
             continue;
         }
-        // EXE-INLINED none: hkArray<hkpAction*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (actionsToBeMoved.m_size == (actionsToBeMoved.m_capacityAndFlags & hkArrayBase<hkpAction*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &actionsToBeMoved, sizeof(hkpAction*));
-        }
-        actionsToBeMoved.m_data[actionsToBeMoved.m_size] = action;
-        actionsToBeMoved.m_size++;
+        actionsToBeMoved.pushBack(action);
         action->addReference();
         island->removeAction(action);
         island->m_actionListCleanupNeeded = 1;
@@ -1443,47 +1407,41 @@ void hkpWorldOperationUtil::splitSimulationIsland(
         // other group gets its own.
         // EXE-INLINED 0xCB4890
         const int32_t numGroups = elementsPerGroup.m_size;
-        // EXE-INLINED none: hkLocalBuffer<int>'s constructor (hkAllocateStack, rounded up to 128 bytes)
-        hkFixedArray<int32_t> reindex;
         {
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            reindex.m_data.m_storage = static_cast<int32_t*>(static_cast<void*>(stack.m_next.m_storage));
-            stack.m_next.m_storage += (sizeof(int32_t) * numGroups + 127) & ~static_cast<size_t>(127);
-        }
-        // EXE-INLINED 0xCB4080
-        for (int32_t g = 0; g < numGroups; ++g) {
-            reindex[g] = 0;
-        }
-        const uint8_t* selectFlag = world->m_dynamicsStepInfo.m_solverInfo.m_deactivationNumInactiveFramesSelectFlag;
-        for (int32_t e = 0; e < currentIsland->m_entities.m_size; ++e) {
-            hkpEntity* entity = currentIsland->m_entities.m_data[e];
-            const int32_t frames1 = entity->m_motion.getNumInactiveFramesMt(1, selectFlag[1]);
-            const int32_t frames0 = entity->m_motion.getNumInactiveFramesMt(0, selectFlag[0]);
-            const int32_t numInactiveFrames = frames0 > frames1 ? frames0 : frames1;
-            if (numInactiveFrames <= 5) {
-                reindex[(*checkConnectivity.m_parents)[e]] = 1;
-            }
-        }
-        isSparse[0] = 1;
-        int32_t numNewGroups = 1;
-        for (int32_t g = 0; g < numGroups; ++g) {
-            if (reindex[g]) {
+            hkLocalBuffer<int32_t> reindex(numGroups, nullptr);
+            // EXE-INLINED 0xCB4080
+            for (int32_t g = 0; g < numGroups; ++g) {
                 reindex[g] = 0;
             }
+            const uint8_t* selectFlag =
+                world->m_dynamicsStepInfo.m_solverInfo.m_deactivationNumInactiveFramesSelectFlag;
+            for (int32_t e = 0; e < currentIsland->m_entities.m_size; ++e) {
+                hkpEntity* entity = currentIsland->m_entities.m_data[e];
+                const int32_t frames1 = entity->m_motion.getNumInactiveFramesMt(1, selectFlag[1]);
+                const int32_t frames0 = entity->m_motion.getNumInactiveFramesMt(0, selectFlag[0]);
+                const int32_t numInactiveFrames = frames0 > frames1 ? frames0 : frames1;
+                if (numInactiveFrames <= 5) {
+                    reindex[(*checkConnectivity.m_parents)[e]] = 1;
+                }
+            }
+            isSparse[0] = 1;
+            int32_t numNewGroups = 1;
+            for (int32_t g = 0; g < numGroups; ++g) {
+                if (reindex[g]) {
+                    reindex[g] = 0;
+                }
+                else {
+                    reindex[g] = numNewGroups;
+                    isSparse[numNewGroups++] = 0;
+                }
+            }
+            if (numNewGroups <= numGroups) {
+                checkConnectivity.reindex(reindex, numNewGroups, elementsPerGroup);
+            }
             else {
-                reindex[g] = numNewGroups;
-                isSparse[numNewGroups++] = 0;
+                isSparse[0] = 0;
             }
         }
-        if (numNewGroups <= numGroups) {
-            checkConnectivity.reindex(reindex, numNewGroups, elementsPerGroup);
-        }
-        else {
-            isSparse[0] = 0;
-        }
-        // EXE-INLINED none: hkLocalBuffer<int>'s destructor (hkDeallocateStack)
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-            static_cast<char*>(static_cast<void*>(reindex.m_data.m_storage));
         if (elementsPerGroup.m_size == 1) {
             bSplit = false;
         }
@@ -1495,20 +1453,8 @@ void hkpWorldOperationUtil::splitSimulationIsland(
         // deactivation), -2 once merged into an earlier group.
         // EXE-INLINED 0xCB49E0
         const int32_t numGroups = elementsPerGroup.m_size;
-        const size_t bufferBytes = (sizeof(int32_t) * numGroups + 127) & ~static_cast<size_t>(127);
-        // EXE-INLINED none: two hkLocalBuffer<int>s' constructors (hkAllocateStack, rounded up to 128 bytes)
-        int32_t* groupSize;
-        {
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            groupSize = static_cast<int32_t*>(static_cast<void*>(stack.m_next.m_storage));
-            stack.m_next.m_storage += bufferBytes;
-        }
-        hkFixedArray<int32_t> reindex;
-        {
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            reindex.m_data.m_storage = static_cast<int32_t*>(static_cast<void*>(stack.m_next.m_storage));
-            stack.m_next.m_storage += bufferBytes;
-        }
+        hkLocalBuffer<int32_t> groupSize(numGroups, nullptr);
+        hkLocalBuffer<int32_t> reindex(numGroups, nullptr);
         for (int32_t g = 0; g < numGroups; ++g) {
             reindex[g] = 0;
             groupSize[g] = 0;
@@ -1579,10 +1525,6 @@ void hkpWorldOperationUtil::splitSimulationIsland(
             }
         }
         checkConnectivity.reindex(reindex, numNewGroups, elementsPerGroup);
-        // EXE-INLINED none: two hkLocalBuffer<int>s' destructors (hkDeallocateStack)
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-            static_cast<char*>(static_cast<void*>(reindex.m_data.m_storage));
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(groupSize));
     }
 
     if (bSplit) {
@@ -1620,15 +1562,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                 newIsland->m_activeMark = 1;
                 newIsland->m_sparseEnabled = isSparse[g] != 0;
                 newIsland->m_storageIndex = static_cast<uint16_t>(newIslandsOut.m_size);
-                {
-                    // EXE-INLINED 0x6299C0
-                    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-                    if (newIslandsOut.m_size ==
-                        (newIslandsOut.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(heap, &newIslandsOut, sizeof(hkpSimulationIsland*));
-                    }
-                    newIslandsOut.m_data[newIslandsOut.m_size++] = newIsland;
-                }
+                newIslandsOut.pushBack(newIsland);
                 islands[g] = newIsland;
                 // Reserves exactly the group's size (no doubling).
                 newIsland->m_entities.reserveExactly(elementsPerGroup.m_data[g]);
@@ -1691,14 +1625,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                     }
                 }
                 action->m_island = actionIsland;
-                // EXE-INLINED 0x6299C0
-                hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-                hkArray<hkpAction*>& islandActions = actionIsland->m_actions;
-                if (islandActions.m_size ==
-                    (islandActions.m_capacityAndFlags & hkArrayBase<hkpAction*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(heap, &islandActions, sizeof(hkpAction*));
-                }
-                islandActions.m_data[islandActions.m_size++] = action;
+                actionIsland->m_actions.pushBack(action);
             }
 
             // Agents: when an eighth or more of the entities leave, every entry is relinked into its island's track and

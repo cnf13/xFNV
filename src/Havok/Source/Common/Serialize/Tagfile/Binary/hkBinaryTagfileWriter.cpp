@@ -183,14 +183,7 @@ hkDataObject Writer::ListenerCache::callListenerAndCache(const hkDataObject& h) 
             // EXE-INLINED none: hkDataObject::operator new
             void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkDataObject));
             hkDataObject* pCached = pMemory ? ::new (pMemory) hkDataObject(obj) : nullptr;
-            // EXE-INLINED none: hkArray<hkDataObject*, hkContainerTempAllocator>::pushBack
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            if (m_cachedObjects.m_size ==
-                (m_cachedObjects.m_capacityAndFlags & hkArrayBase<hkDataObject*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouter.m_temp, &m_cachedObjects, sizeof(hkDataObject*));
-            }
-            m_cachedObjects.m_data[m_cachedObjects.m_size] = pCached;
-            m_cachedObjects.m_size += 1;
+            m_cachedObjects.pushBack(pCached);
             return obj;
         }
     }
@@ -316,33 +309,7 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
     m_doneClasses.insert(reinterpret_cast<hkUlong>(klass.getName()), static_cast<hkUlong>(classIndex));
     const int32_t numMembers = klass.getNumDeclaredMembers();
 
-    // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::hkArray(int)
-    hkArrayBase<hkDataClass::MemberInfo> minfo;
-    minfo.m_data = nullptr;
-    minfo.m_size = 0;
-    minfo.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-    hkDataClass::MemberInfo* pData = nullptr;
-    int32_t numAllocated = numMembers;
-    if (numMembers != 0) {
-        pData = pTemp->_bufAlloc<hkDataClass::MemberInfo>(numAllocated);
-    }
-    minfo.m_data = pData;
-    minfo.m_size = numAllocated;
-    minfo.m_capacityAndFlags = numAllocated != 0
-        ? numAllocated
-        : static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG);
-    // EXE-INLINED none: hkDataClass::MemberInfo::MemberInfo (placement new, with its null test)
-    for (int32_t i = 0; i < numAllocated; ++i) {
-        hkDataClass::MemberInfo* pInfo = &pData[i];
-        if (pInfo) {
-            pInfo->m_name = nullptr;
-            pInfo->m_owner = nullptr;
-            pInfo->m_type = hkDataObject::TYPE_VOID;
-            pInfo->m_class = nullptr;
-            pInfo->m_tupleCount = 0;
-        }
-    }
+    hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator> minfo(numMembers);
     klass.getAllDeclaredMemberInfo(minfo);
 
     writeInt(hkBinaryTagfile::TAG_METADATA);
@@ -378,12 +345,6 @@ int32_t Writer::writeClass(const hkDataClass& klass) {
         }
     }
 
-    // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator* pTempFree = hkMemoryRouter::getInstance().m_temp;
-    minfo.m_size = 0;
-    if ((minfo.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG) == 0) {
-        pTempFree->_bufFree<hkDataClass::MemberInfo>(minfo.m_data, minfo.getCapacity());
-    }
     return classIndex;
 }
 
@@ -563,17 +524,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
                 using bytes_t = hkArray<uint8_t, hkContainerTempAllocator>;
                 bytes_t bytes;
                 int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
-                // EXE-INLINED none: hkArray<uint8_t, hkContainerTempAllocator>::setSize
-                hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
-                int32_t capacity = bytes.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
-                if (capacity < numBytes) {
-                    int32_t newCapacity = 2 * capacity;
-                    if (numBytes >= newCapacity) {
-                        newCapacity = numBytes;
-                    }
-                    hkArrayUtil::_reserve(*pTemp2, &bytes, newCapacity, sizeof(uint8_t));
-                }
-                bytes.m_size = numBytes;
+                bytes.setSize(numBytes);
                 flags.toBytes(bytes.m_data);
                 m_oa.writeRaw(bytes.m_data, bytes.m_size);
             }
@@ -646,48 +597,17 @@ void Writer::writeObject(const hkDataObject& objIn) {
     const int32_t numMembers = klass.getNumMembers();
     Writer::MemberWriteFlags flags(numMembers);
 
-    // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::hkArray(buffer, size, capacity)
-    // The object's flag bytes, an array over m_bitfieldBuf's storage that does not own it.
-    hkArrayBase<uint8_t> bits;
-    bits.m_data = &m_bitfieldBuf.m_data[pDetails->bitfieldStartIndex];
-    bits.m_size = ((flags.m_flags.m_size + 7) & ~7) / 8;
-    bits.m_capacityAndFlags = static_cast<int32_t>(bits.m_size | hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
-    m_oa.writeRaw(bits.m_data, bits.m_size);
-    flags.fromBytes(bits.m_data, bits.m_size);
-    // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator* pTempBits = hkMemoryRouter::getInstance().m_temp;
-    bits.m_size = 0;
-    if (bits.m_capacityAndFlags >= 0) {
-        pTempBits->bufFree(bits.m_data, bits.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK);
+    {
+        // The object's flag bytes, an array over m_bitfieldBuf's storage that does not own it.
+        const int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
+        hkArray<uint8_t, hkContainerTempAllocator> bits(
+            &m_bitfieldBuf.m_data[pDetails->bitfieldStartIndex], numBytes, numBytes
+        );
+        m_oa.writeRaw(bits.m_data, bits.m_size);
+        flags.fromBytes(bits.m_data, bits.m_size);
     }
 
-    // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::hkArray(int)
-    hkArrayBase<hkDataClass::MemberInfo> minfo;
-    minfo.m_data = nullptr;
-    minfo.m_size = 0;
-    minfo.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-    hkDataClass::MemberInfo* pData = nullptr;
-    int32_t numAllocated = numMembers;
-    if (numMembers != 0) {
-        pData = pTemp->_bufAlloc<hkDataClass::MemberInfo>(numAllocated);
-    }
-    minfo.m_data = pData;
-    minfo.m_size = numAllocated;
-    minfo.m_capacityAndFlags = numAllocated != 0
-        ? numAllocated
-        : static_cast<int32_t>(hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG);
-    // EXE-INLINED none: hkDataClass::MemberInfo::MemberInfo (placement new, with its null test)
-    for (int32_t i = 0; i < numAllocated; ++i) {
-        hkDataClass::MemberInfo* pInfo = &pData[i];
-        if (pInfo) {
-            pInfo->m_name = nullptr;
-            pInfo->m_owner = nullptr;
-            pInfo->m_type = hkDataObject::TYPE_VOID;
-            pInfo->m_class = nullptr;
-            pInfo->m_tupleCount = 0;
-        }
-    }
+    hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator> minfo(numMembers);
     klass.getAllMemberInfo(minfo);
 
     for (int32_t i = 0; i < numMembers; ++i) {
@@ -696,15 +616,4 @@ void Writer::writeObject(const hkDataObject& objIn) {
             writeBinaryValue(static_cast<const hkDataObject&>(obj).access(minfo.m_data[i].m_name), minfo.m_data[i]);
         }
     }
-
-    // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator* pTempInfo = hkMemoryRouter::getInstance().m_temp;
-    minfo.m_size = 0;
-    if ((minfo.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG) == 0) {
-        pTempInfo->_bufFree<hkDataClass::MemberInfo>(
-            minfo.m_data, minfo.m_capacityAndFlags & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK
-        );
-    }
-    minfo.m_data = nullptr;
-    minfo.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
 }

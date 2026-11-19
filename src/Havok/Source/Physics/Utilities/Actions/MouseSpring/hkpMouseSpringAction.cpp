@@ -333,10 +333,7 @@ hkpAction* hkpMouseSpringAction::clone(
     pAction->m_objectDamping = m_objectDamping;
     pAction->m_userData = m_userData;
     pAction->m_shapeKey = m_shapeKey;
-    // EXE-INLINED none: hkArray<hkpMouseSpringAction::ApplyCallback>::operator=
-    pAction->m_applyCallbacks.copyFromArray(
-        hkContainerHeapAllocator().get(&pAction->m_applyCallbacks), m_applyCallbacks, hkTypeIsPod()
-    );
+    pAction->m_applyCallbacks = m_applyCallbacks;
     return pAction;
 }
 

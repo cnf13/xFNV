@@ -45,25 +45,7 @@ void hkpBroadphaseViewer::postSimulationCallback(hkpWorld* world) {
     world->getBroadPhase()->getAllAabbs(allAabbs);
 
     if (allAabbs.m_size > m_broadPhaseDisplayGeometries.m_size) {
-        // The SDK's m_broadPhaseDisplayGeometries.setSize(allAabbs.getSize()): reserve, destroy the elements past the
-        // new size through the virtual destructor, construct the new ones in place.
-        // EXE-INLINED none: hkArrayBase<hkDisplayAABB>::_setSize
-        const int32_t newSize = allAabbs.m_size;
-        m_broadPhaseDisplayGeometries.reserve(newSize);
-        hkDisplayAABB* pDead = m_broadPhaseDisplayGeometries.m_data + newSize;
-        for (int32_t n = m_broadPhaseDisplayGeometries.m_size - newSize; n > 0; --n) {
-            pDead->~hkDisplayAABB();
-            ++pDead;
-        }
-        hkDisplayAABB* pNew = m_broadPhaseDisplayGeometries.m_data + m_broadPhaseDisplayGeometries.m_size;
-        for (int32_t n = newSize - m_broadPhaseDisplayGeometries.m_size; n > 0; --n) {
-            // Placement new's null test.
-            if (pNew) {
-                ::new (pNew) hkDisplayAABB;
-            }
-            ++pNew;
-        }
-        m_broadPhaseDisplayGeometries.m_size = newSize;
+        m_broadPhaseDisplayGeometries.setSize(allAabbs.m_size);
     }
 
     alignas(16) hkArray<hkDisplayGeometry*> displayGeometries;

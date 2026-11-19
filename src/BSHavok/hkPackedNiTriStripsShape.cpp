@@ -10,6 +10,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
@@ -126,27 +127,19 @@ bool hkPackedNiTriStripsData::RegisterStreamables(NiStream& arStream) {
 // Writes the triangles, the vertices (compressed to three 16-bit values each when there are compressed ones, behind a
 // flag byte) and the sub parts, each count first. No base call.
 void hkPackedNiTriStripsData::SaveBinary(NiStream& arStream) {
-    uint32_t uiSize = 4;
-    // EXE-INLINED none: NiStreamSaveBinary
-    arStream.m_pkOstr->BinaryWrite(&uiKeyCount, 4, &uiSize, 1);
+    NiStreamSaveBinary(arStream, uiKeyCount);
     arStream.m_pkOstr->BinaryWrite(paTriData, 8 * uiKeyCount, aswapSize1, 4);
-    uiSize = 4;
-    // EXE-INLINED none: NiStreamSaveBinary
-    arStream.m_pkOstr->BinaryWrite(&uiVertCount, 4, &uiSize, 1);
+    NiStreamSaveBinary(arStream, uiVertCount);
     uint8_t bCompressed = paCompressedVertData != nullptr;
-    uiSize = 1;
-    // EXE-INLINED none: NiStreamSaveBinary
-    arStream.m_pkOstr->BinaryWrite(&bCompressed, 1, &uiSize, 1);
+    NiStreamSaveBinary(arStream, bCompressed);
     if (bCompressed) {
-        uiSize = 2;
+        uint32_t uiSize = 2;
         arStream.m_pkOstr->BinaryWrite(paCompressedVertData, 6 * uiVertCount, &uiSize, 1);
     }
     else {
         arStream.m_pkOstr->BinaryWrite(paVertData, 12 * uiVertCount, aswapSize2, 1);
     }
-    uiSize = 2;
-    // EXE-INLINED none: NiStreamSaveBinary
-    arStream.m_pkOstr->BinaryWrite(&usPartCount, 2, &uiSize, 1);
+    NiStreamSaveBinary(arStream, usPartCount);
     arStream.m_pkOstr->BinaryWrite(paSubPartData, 12 * usPartCount, aswapSize2, 1);
 }
 

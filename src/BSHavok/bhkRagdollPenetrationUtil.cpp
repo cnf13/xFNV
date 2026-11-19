@@ -186,22 +186,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
                 ConstrainedSystem** ppSystem = &ActiveSystems.pBuffer[uj];
                 if (systemRoots.pBuffer[ui] == (*ppSystem)->pRoot3d &&
                     rbarray.m_size == (*ppSystem)->pRagdollInstance->m_rigidBodies.m_size) {
-                    // EXE-INLINED none: BSSimpleArray<bhkRagdollPenetrationUtil::ConstrainedSystem *,1024>::Add
-                    if (newSystems.iSize == newSystems.iReservedSize) {
-                        if (newSystems.iReservedSize) {
-                            uint32_t uiNewSize = newSystems.iReservedSize + 1024;
-                            if (newSystems.iReservedSize <= 1024) {
-                                uiNewSize = 2 * newSystems.iReservedSize;
-                            }
-                            newSystems._ReallocateBuffer(uiNewSize, newSystems.iSize);
-                            newSystems.iReservedSize = uiNewSize;
-                        }
-                        else {
-                            newSystems.pBuffer = newSystems._Allocate(4);
-                            newSystems.iReservedSize = 4;
-                        }
-                    }
-                    newSystems.pBuffer[newSystems.iSize++] = *ppSystem;
+                    newSystems.Add(*ppSystem);
                     bsystemMatch = true;
                 }
             }
@@ -316,14 +301,7 @@ bool bhkRagdollPenetrationUtil::Initialize(NiAVObject* apRoot, int32_t aiGroup) 
     // The watched systems not kept are deleted.
     for (uint32_t ui = 0; ui < ActiveSystems.iSize; ++ui) {
         ConstrainedSystem** ppSystem = &ActiveSystems.pBuffer[ui];
-        // EXE-INLINED none: BSSimpleArray<bhkRagdollPenetrationUtil::ConstrainedSystem *,1024>::Find
-        int32_t iIndex = -1;
-        for (uint32_t uk = 0; uk < newSystems.iSize; ++uk) {
-            if (newSystems.pBuffer && newSystems.pBuffer[uk] == *ppSystem) {
-                iIndex = static_cast<int32_t>(uk);
-                break;
-            }
-        }
+        int32_t iIndex = newSystems.Find(*ppSystem, 0, SystemArray::DefaultEqualFunctionByAddress);
         if (iIndex == -1) {
             ConstrainedSystem* pSystem = *ppSystem;
             if (pSystem) {
@@ -425,15 +403,9 @@ void bhkRagdollPenetrationUtil::Update() {
         kPose.m_modelInSync.m_bool = 0;
         kPose.m_localInSync.m_bool = 0;
         const int32_t iNumBones = kPose.m_skeleton->m_bones.m_size;
-        // EXE-INLINED none: hkArray<hkQsTransform>::setSize
-        kPose.m_modelPose.reserve(iNumBones);
-        kPose.m_modelPose.setSizeUnchecked(iNumBones);
-        // EXE-INLINED none: hkArray<hkQsTransform>::setSize
-        kPose.m_localPose.reserve(iNumBones);
-        kPose.m_localPose.setSizeUnchecked(iNumBones);
-        // EXE-INLINED none: hkArray<uint32_t>::setSize
-        kPose.m_boneFlags.reserve(iNumBones);
-        kPose.m_boneFlags.setSizeUnchecked(iNumBones);
+        kPose.m_modelPose.setSize(iNumBones);
+        kPose.m_localPose.setSize(iNumBones);
+        kPose.m_boneFlags.setSize(iNumBones);
         // The float slots' storage rounded up to a multiple of four (HK_NEXT_MULTIPLE_OF), then the values zeroed.
         kPose.m_floatSlotValues.reserveExactly((kPose.m_skeleton->m_floatSlots.m_size + 3) & ~3);
         const int32_t iNumFloatSlots = kPose.m_skeleton->m_floatSlots.m_size;
@@ -673,31 +645,7 @@ void bhkRagdollPenetrationUtil::FindSystems(NiAVObject* apObject, BSSimpleArray<
         }
     }
     if (bMastersOnlyContacts && bSlaveOfOther) {
-        // EXE-INLINED 0x7CB2E0
-        uint32_t uiReservedSize = apFound->iReservedSize;
-        if (apFound->iSize == uiReservedSize) {
-            if (!uiReservedSize) {
-                NiAVObject** pNewBuffer = apFound->_Allocate(4);
-                ++apFound->iSize;
-                apFound->pBuffer = pNewBuffer;
-                uint32_t uiSize = apFound->iSize;
-                NiAVObject** pBuffer = apFound->pBuffer;
-                apFound->iReservedSize = 4;
-                pBuffer[uiSize - 1] = apObject;
-            }
-            else {
-                uint32_t uiNewSize = uiReservedSize + 1024;
-                if (uiReservedSize <= 1024) {
-                    uiNewSize = 2 * uiReservedSize;
-                }
-                apFound->_ReallocateBuffer(uiNewSize, apFound->iSize);
-                apFound->iReservedSize = uiNewSize;
-                apFound->pBuffer[apFound->iSize++] = apObject;
-            }
-        }
-        else {
-            apFound->pBuffer[apFound->iSize++] = apObject;
-        }
+        apFound->Add(apObject);
     }
     NiNode* pNode = apObject->IsNode();
     if (pNode) {
@@ -725,30 +673,7 @@ void bhkRagdollPenetrationUtil::FindLeaves(
         if (!bonlyMasterContact && !bhasSlaveNonContact) {
             hkpRigidBody* pBody = arRigidBodies.m_data[i];
             bhkRigidBody* prb = pBody ? static_cast<bhkRigidBody*>(pBody->m_userData) : nullptr;
-            // EXE-INLINED 0x7CB2E0
-            BSSimpleArray<bhkRigidBody*, 1024>* pLeaves = &arLeaves;
-            if (pLeaves->iSize == pLeaves->iReservedSize) {
-                bhkRigidBody** ppNewBuffer;
-                if (!pLeaves->iReservedSize) {
-                    ppNewBuffer = pLeaves->_Allocate(4);
-                    pLeaves->iReservedSize = 4;
-                }
-                else {
-                    uint32_t uiNewSize =
-                        pLeaves->iReservedSize > 1024 ? pLeaves->iReservedSize + 1024 : pLeaves->iReservedSize * 2;
-                    if (pLeaves->pBuffer) {
-                        ppNewBuffer = pLeaves->_Reallocate(pLeaves->pBuffer, uiNewSize);
-                    }
-                    else {
-                        ppNewBuffer = pLeaves->_Allocate(uiNewSize);
-                        pLeaves->iReservedSize = uiNewSize;
-                    }
-                    pLeaves->iReservedSize = uiNewSize;
-                }
-                pLeaves->pBuffer = ppNewBuffer;
-            }
-            ++pLeaves->iSize;
-            pLeaves->pBuffer[pLeaves->iSize - 1] = prb;
+            arLeaves.Add(prb);
         }
     }
 }
@@ -803,33 +728,14 @@ void bhkRagdollPenetrationUtil::AddToArrays(
             continue;
         }
         hkpConstraintInstance* pConstraint = static_cast<hkpConstraintInstance*>(pcon->phkObject);
-        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        if (conA.m_size == (conA.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*pHeap, &conA, sizeof(hkpConstraintInstance*));
-        }
-        conA.m_data[conA.m_size] = pConstraint;
-        conA.m_size += 1;
+        conA.pushBack(pConstraint);
     }
     if ((!pweap || conA.m_size > 0) && !bcontainsBreakable) {
         hkpRigidBody* pBody = static_cast<hkpRigidBody*>(apRB->phkObject);
-        // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-        hkMemoryAllocator* pBodyHeap = hkMemoryRouter::getInstance().m_heap;
-        if (arRigidBodies.m_size == (arRigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*pBodyHeap, &arRigidBodies, sizeof(hkpRigidBody*));
-        }
-        arRigidBodies.m_data[arRigidBodies.m_size] = pBody;
-        arRigidBodies.m_size += 1;
+        arRigidBodies.pushBack(pBody);
         for (int32_t i = 0; i < conA.m_size; ++i) {
             hkpConstraintInstance** ppConstraint = &conA.m_data[i];
-            // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-            hkMemoryAllocator* pConstraintHeap = hkMemoryRouter::getInstance().m_heap;
-            if (arConstraints.m_size ==
-                (arConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*pConstraintHeap, &arConstraints, sizeof(hkpConstraintInstance*));
-            }
-            arConstraints.m_data[arConstraints.m_size] = *ppConstraint;
-            arConstraints.m_size += 1;
+            arConstraints.pushBack(*ppConstraint);
         }
     }
 }
@@ -884,28 +790,8 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
     ::new (pskeleton) hkaSkeleton;
     const int32_t inumRbs = arRigidBodies.m_size;
     const int32_t numBones = static_cast<int32_t>(inumRbs + arLeaves.iSize);
-    // EXE-INLINED none: hkArray<hkInt16>::setSize
-    hkMemoryAllocator* pParentsHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iParentsCapacity = pskeleton->m_parentIndices.m_capacityAndFlags & hkArrayBase<int16_t>::CAPACITY_MASK;
-    if (iParentsCapacity < numBones) {
-        int32_t iNewCapacity = 2 * iParentsCapacity;
-        if (numBones >= iNewCapacity) {
-            iNewCapacity = numBones;
-        }
-        hkArrayUtil::_reserve(*pParentsHeap, &pskeleton->m_parentIndices, iNewCapacity, sizeof(int16_t));
-    }
-    pskeleton->m_parentIndices.m_size = numBones;
-    // EXE-INLINED none: hkArray<hkQsTransform>::setSize
-    hkMemoryAllocator* pPoseHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iPoseCapacity = pskeleton->m_referencePose.m_capacityAndFlags & hkArrayBase<hkQsTransform>::CAPACITY_MASK;
-    if (iPoseCapacity < numBones) {
-        int32_t iNewCapacity = 2 * iPoseCapacity;
-        if (numBones >= iNewCapacity) {
-            iNewCapacity = numBones;
-        }
-        hkArrayUtil::_reserve(*pPoseHeap, &pskeleton->m_referencePose, iNewCapacity, sizeof(hkQsTransform));
-    }
-    pskeleton->m_referencePose.m_size = numBones;
+    pskeleton->m_parentIndices.setSize(numBones);
+    pskeleton->m_referencePose.setSize(numBones);
     // EXE-INLINED none: hkArray<hkaBone>::setSize
     hkMemoryAllocator* pBonesHeap = hkMemoryRouter::getInstance().m_heap;
     int32_t iBonesCapacity = pskeleton->m_bones.m_capacityAndFlags & hkArrayBase<hkaBone>::CAPACITY_MASK;

@@ -56,16 +56,7 @@ static hkMonitorStreamAnalyzer::Node* _newNode(
     if (apNames && apcName) {
         {
             hkStringPtr name(apcName);
-            // EXE-INLINED none: hkArray<hkStringPtr, hkContainerHeapAllocator>::pushBack
-            hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-            if (apNames->m_size == (apNames->m_capacityAndFlags & hkArrayBase<hkStringPtr>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(heap, apNames, sizeof(hkStringPtr));
-            }
-            hkStringPtr* pSlot = &apNames->m_data[apNames->m_size];
-            if (pSlot) {
-                ::new (pSlot) hkStringPtr(name);
-            }
-            ++apNames->m_size;
+            apNames->pushBack(name);
         }
         apcName = apNames->m_data[apNames->m_size - 1].cString();
     }

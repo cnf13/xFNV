@@ -139,18 +139,7 @@ void hkMemoryResourceHandle::addExternalLink(const char* memberName, const char*
 void hkMemoryResourceHandle::removeExternalLink(const char* memberName) {
     for (int32_t i = 0; i < m_references.m_size; ++i) {
         if (hkString::strCmp(m_references.m_data[i].m_memberName.cString(), memberName) == 0) {
-            // EXE-INLINED none: hkArrayBase<hkMemoryResourceHandle::ExternalLink>::removeAt
-            ExternalLink* pLink = &m_references.m_data[i];
-            pLink->m_externalId.~hkStringPtr();
-            pLink->m_memberName.~hkStringPtr();
-            const int32_t iLast = --m_references.m_size;
-            if (iLast != i) {
-                // EXE-INLINED 0x6267C0
-                ExternalLink* pDst = &m_references.m_data[i];
-                const ExternalLink* pSrc = &m_references.m_data[iLast];
-                pDst->m_memberName.m_stringAndFlag = pSrc->m_memberName.m_stringAndFlag;
-                pDst->m_externalId.m_stringAndFlag = pSrc->m_externalId.m_stringAndFlag;
-            }
+            m_references.removeAt(i);
             return;
         }
     }
@@ -161,20 +150,7 @@ void hkMemoryResourceHandle::removeExternalLink(const char* memberName) {
 // warning.
 void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& linksOut) {
     linksOut.m_size = 0;
-    int32_t iNumReferences = m_references.m_size;
-    // EXE-INLINED none: hkArray::reserve
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iCapacity = static_cast<int32_t>(linksOut.m_capacityAndFlags & hkArrayBase<Link>::CAPACITY_MASK);
-    if (iCapacity < iNumReferences) {
-        int32_t iNewCapacity = iCapacity * 2;
-        if (iNumReferences >= iNewCapacity) {
-            iNewCapacity = iNumReferences;
-        }
-        // The array is handed to the untyped hkArrayUtil::_reserve as a raw array.
-        hkArrayUtil::_reserve(
-            pHeap, static_cast<hkArrayBase<void>*>(static_cast<void*>(&linksOut)), iNewCapacity, sizeof(Link)
-        );
-    }
+    linksOut.reserve(m_references.getSize());
     char acMemberName[512];
     char acMessage[512];
     for (int32_t i = 0; i < m_references.m_size; ++i) {
@@ -358,15 +334,7 @@ void hkMemoryResourceContainer::destroyResource(hkResourceHandle* resourceHandle
     if (resourceHandle) {
         resourceHandle->addReference();
     }
-    // EXE-INLINED none: hkArrayBase<hkRefPtr<hkMemoryResourceHandle>>::indexOf
-    const int32_t iSize = m_resourceHandles.m_size;
-    int32_t index = -1;
-    for (int32_t i = 0; i < iSize; ++i) {
-        if (m_resourceHandles.m_data[i] == resourceHandle) {
-            index = i;
-            break;
-        }
-    }
+    const int32_t index = m_resourceHandles.indexOf(resourceHandle);
     if (resourceHandle) {
         resourceHandle->removeReference();
     }
@@ -580,19 +548,12 @@ hkResult hkMemoryResourceContainer::parentTo(hkResourceContainer* newParent) {
 
     // EXE-INLINED none: hkRefPtr<hkMemoryResourceContainer>::hkRefPtr
     addReference();
-    // EXE-INLINED none: hkArrayBase<hkRefPtr<hkMemoryResourceContainer>>::indexOf
+    // EXE-INLINED none: hkRefPtr<hkMemoryResourceContainer>::hkRefPtr / ~hkRefPtr (indexOf's argument; m_children is
+    // declared hkArray<T*>)
     if (this) {
         addReference();
     }
-    hkMemoryResourceContainer* pOldParent = m_parent;
-    const int32_t iSize = pOldParent->m_children.m_size;
-    int32_t index = -1;
-    for (int32_t i = 0; i < iSize; ++i) {
-        if (pOldParent->m_children.m_data[i] == this) {
-            index = i;
-            break;
-        }
-    }
+    const int32_t index = m_parent->m_children.indexOf(this);
     removeReference();
 
     // EXE-INLINED none: hkArrayBase<hkRefPtr<hkMemoryResourceContainer>>::removeAtAndCopy

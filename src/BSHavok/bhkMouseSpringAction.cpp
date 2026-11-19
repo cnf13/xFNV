@@ -6,6 +6,7 @@
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkSerializable.h"
+#include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -65,18 +66,8 @@ void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
-        // EXE-INLINED none: bhkStream::Endian
-        uint32_t* puiPositionInRbLocal = reinterpret_cast<uint32_t*>(&rInfo.m_positionInRbLocal);
-        puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
-        puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
-        puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
-        puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        uint32_t* puiMousePositionInWorld = reinterpret_cast<uint32_t*>(&rInfo.m_mousePositionInWorld);
-        puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
-        puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
-        puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
-        puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
+        bhkStream::Endian(rInfo.m_positionInRbLocal);
+        bhkStream::Endian(rInfo.m_mousePositionInWorld);
         // EXE-INLINED none: BSEndian
         uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
         *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
@@ -98,23 +89,13 @@ void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
 void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiPositionInRbLocal = reinterpret_cast<uint32_t*>(&rInfo.m_positionInRbLocal);
-    uint32_t* puiMousePositionInWorld = reinterpret_cast<uint32_t*>(&rInfo.m_mousePositionInWorld);
     uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
     uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
     uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
     uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
-        puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
-        puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
-        puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
-        puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
-        puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
-        puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
+        bhkStream::Endian(rInfo.m_positionInRbLocal);
+        bhkStream::Endian(rInfo.m_mousePositionInWorld);
         // EXE-INLINED none: BSEndian
         *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
         // EXE-INLINED none: BSEndian
@@ -126,16 +107,8 @@ void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiPositionInRbLocal[0] = __builtin_bswap32(puiPositionInRbLocal[0]);
-        puiPositionInRbLocal[1] = __builtin_bswap32(puiPositionInRbLocal[1]);
-        puiPositionInRbLocal[2] = __builtin_bswap32(puiPositionInRbLocal[2]);
-        puiPositionInRbLocal[3] = __builtin_bswap32(puiPositionInRbLocal[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiMousePositionInWorld[0] = __builtin_bswap32(puiMousePositionInWorld[0]);
-        puiMousePositionInWorld[1] = __builtin_bswap32(puiMousePositionInWorld[1]);
-        puiMousePositionInWorld[2] = __builtin_bswap32(puiMousePositionInWorld[2]);
-        puiMousePositionInWorld[3] = __builtin_bswap32(puiMousePositionInWorld[3]);
+        bhkStream::Endian(rInfo.m_positionInRbLocal);
+        bhkStream::Endian(rInfo.m_mousePositionInWorld);
         // EXE-INLINED none: BSEndian
         *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
         // EXE-INLINED none: BSEndian

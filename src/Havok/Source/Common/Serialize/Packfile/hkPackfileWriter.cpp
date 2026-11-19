@@ -143,13 +143,7 @@ uint32_t hkPackfileWriter::sectionTagToIndex(const char* sectionTag) {
     char* pTag = hkString::strDup(sectionTag);
     const int32_t iIndex = m_knownSections.getSize();
     m_sectionTagToIndex.insert(pTag, iIndex);
-    // EXE-INLINED none: hkArray<char*>::pushBack
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    if (m_knownSections.m_size == (m_knownSections.m_capacityAndFlags & hkArrayBase<char*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_knownSections, sizeof(char*));
-    }
-    m_knownSections.m_data[m_knownSections.m_size] = pTag;
-    m_knownSections.m_size++;
+    m_knownSections.pushBack(pTag);
     return iIndex;
 }
 
@@ -202,16 +196,8 @@ void hkPackfileWriter::addObject(
         );
         pStream->~hkErrStream();
         m_knownObjects.insert(pointerIn, -1);
-        // EXE-INLINED none: hkArray<hkVariant>::pushBack (the router is fetched before the capacity test).
-        hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-        if (m_objectsWithUnregisteredClass.m_size ==
-            (m_objectsWithUnregisteredClass.m_capacityAndFlags & hkArrayBase<hkVariant>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(kRouter.heap(), &m_objectsWithUnregisteredClass, sizeof(hkVariant));
-        }
-        hkVariant* pEntry = m_objectsWithUnregisteredClass.m_data + m_objectsWithUnregisteredClass.m_size;
-        pEntry->m_object = const_cast<void*>(pointerIn);
-        pEntry->m_class = &klassIn;
-        ++m_objectsWithUnregisteredClass.m_size;
+        const hkVariant kEntry = {const_cast<void*>(pointerIn), &klassIn};
+        m_objectsWithUnregisteredClass.pushBack(kEntry);
         return;
     }
     const void* pObject = pointerIn;

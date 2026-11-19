@@ -228,21 +228,11 @@ hkIstream& hkIstream::operator>>(hkStringBuf& str) {
         if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
             break;
         }
-        // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (buf.m_size == (buf.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_temp, &buf, sizeof(char));
-        }
-        buf.m_data[buf.m_size++] = static_cast<char>(c);
+        buf.pushBack(static_cast<char>(c));
         m_streamReader->setMark(1);
     }
     m_streamReader->rewindToMark();
-    // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::pushBack
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    if (buf.m_size == (buf.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router.m_temp, &buf, sizeof(char));
-    }
-    buf.m_data[buf.m_size++] = 0;
+    buf.pushBack('\0');
     return *this;
 }
 

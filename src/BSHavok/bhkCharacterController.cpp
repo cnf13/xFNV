@@ -744,18 +744,7 @@ MOVE_RESULTS bhkCharacterController::Move(MoveData& arData) {
                 LastManifold.m_data[iPoint].Assign(rSource);
             }
             else {
-                const hkpRootCdPoint* pSource = &pCharProxy->GetCdPoints()->m_data[iPoint];
-                // EXE-INLINED none: hkArray<hkpRootCdPoint>::pushBack
-                hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-                if (LastManifold.m_size ==
-                    (LastManifold.m_capacityAndFlags & hkArrayBase<hkpRootCdPoint>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(rRouter.heap(), &LastManifold, sizeof(hkpRootCdPoint));
-                }
-                hkpRootCdPoint* pDest = LastManifold.m_data + LastManifold.m_size;
-                if (pDest) {
-                    *pDest = *pSource;
-                }
-                ++LastManifold.m_size;
+                LastManifold.pushBack(pCharProxy->GetCdPoints()->m_data[iPoint]);
             }
         }
     }
@@ -1016,32 +1005,7 @@ void bhkCharacterController::processConstraintsCallback(
                 // actual class, as the game does.
                 hkpSimpleShapePhantom* pp =
                     static_cast<hkpSimpleShapePhantom*>(static_cast<hkpShapePhantom*>(spShapePhantom->phkObject));
-                // EXE-INLINED none: hkArray<hkpSimpleShapePhantom::CollisionDetail>::operator=, the SDK's copyFromArray
-                // for a class element type (src's hkArray has only the plain-data one): the common elements assigned,
-                // the rest copy-constructed.
-                hkMemoryAllocator& ralloc = *hkMemoryRouter::getInstance().m_heap;
-                const int32_t inumDetails = pp->m_collisionDetails.m_size;
-                int32_t icopied = theDetails.m_size;
-                if (inumDetails <= icopied) {
-                    icopied = inumDetails;
-                }
-                if (theDetails.getCapacity() < inumDetails) {
-                    int32_t icapacity = 2 * theDetails.getCapacity();
-                    if (inumDetails >= icapacity) {
-                        icapacity = inumDetails;
-                    }
-                    hkArrayUtil::_reserve(
-                        ralloc, &theDetails, icapacity, sizeof(hkpSimpleShapePhantom::CollisionDetail)
-                    );
-                }
-                for (int32_t k = 0; k < icopied; ++k) {
-                    theDetails.m_data[k] = pp->m_collisionDetails.m_data[k];
-                }
-                for (int32_t k = icopied; k < inumDetails; ++k) {
-                    ::new (&theDetails.m_data[k])
-                        hkpSimpleShapePhantom::CollisionDetail(pp->m_collisionDetails.m_data[k]);
-                }
-                theDetails.m_size = inumDetails;
+                theDetails = pp->m_collisionDetails;
                 // The ray's offsets from the contact, two guarded statics (guard bits 1 and 2), each built with the
                 // SDK's inline hkVector4::set.
                 int32_t iguard = startAdj_guard;
@@ -1131,17 +1095,6 @@ void bhkCharacterController::processConstraintsCallback(
                         }
                     }
                 }
-                // EXE-INLINED none: ~hkArray<hkpSimpleShapePhantom::CollisionDetail>, the SDK's _clearAndDeallocate
-                // (src has no destruct for the element type).
-                hkMemoryAllocator& rfree = *hkMemoryRouter::getInstance().m_heap;
-                theDetails.m_size = 0;
-                if ((theDetails.m_capacityAndFlags &
-                     hkArrayBase<hkpSimpleShapePhantom::CollisionDetail>::DONT_DEALLOCATE_FLAG) == 0) {
-                    rfree._bufFree<hkpSimpleShapePhantom::CollisionDetail>(theDetails.m_data, theDetails.getCapacity());
-                }
-                theDetails.m_data = nullptr;
-                theDetails.m_capacityAndFlags =
-                    hkArrayBase<hkpSimpleShapePhantom::CollisionDetail>::DONT_DEALLOCATE_FLAG;
             }
         }
         hkVector4 tempSupportNormal;

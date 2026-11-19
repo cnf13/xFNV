@@ -235,10 +235,7 @@ void hkStructureLayout::computeClassMemberOffsetsInplace(
             }
         }
     }
-    hkArrayBase<hkClass*> hierarchy;
-    hierarchy.m_data = nullptr;
-    hierarchy.m_size = 0;
-    hierarchy.m_capacityAndFlags = 0x80000000u;
+    hkArray<hkClass*, hkContainerTempAllocator> hierarchy;
     for (hkClass* pClass = &klass; pClass; pClass = const_cast<hkClass*>(pClass->getParent())) {
         hierarchy._insertAt(*hkMemoryRouter::getInstance().m_temp, 0, pClass);
     }
@@ -287,14 +284,5 @@ void hkStructureLayout::computeClassMemberOffsetsInplace(
         if (!rules.m_reusePaddingOptimization) {
             iOffset = iSize;
         }
-    }
-    // EXE-INLINED none: hkArray<hkClass*, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-    hierarchy.m_size = 0;
-    if (hierarchy.m_capacityAndFlags >= 0) {
-        pTemp->bufFree(
-            hierarchy.m_data,
-            sizeof(hkClass*) * static_cast<int32_t>(hierarchy.m_capacityAndFlags & hkArrayBase<hkClass*>::CAPACITY_MASK)
-        );
     }
 }

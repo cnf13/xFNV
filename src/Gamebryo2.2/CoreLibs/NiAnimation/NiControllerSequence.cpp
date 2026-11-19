@@ -295,7 +295,6 @@ NiControllerSequence::IDTag* NiControllerSequence::IDTag::Operator_Set(const NiC
     const char* m_kHandle = pkOther->m_kAVObjectName.GetHandle();
     if (m_kAVObjectName.GetHandle() != pkOther->m_kAVObjectName.GetHandle()) {
         NiGlobalStringTable::AcquireHandle(m_kHandle);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(m_kAVObjectName.GetHandle());
         m_kAVObjectName.m_kHandle = m_kHandle;
     }
@@ -340,15 +339,10 @@ void* NiControllerSequence::IDTag::Free(char a1) {
         for (int32_t i = iCount - 1; i >= 0; --i) {
             --pkTag;
             // EXE-INLINED 0xA30750
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(pkTag->m_kInterpolatorID.GetHandle());
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(pkTag->m_kCtlrID.GetHandle());
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(pkTag->m_kCtlrType.GetHandle());
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(pkTag->m_kPropertyType.GetHandle());
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle(pkTag->m_kAVObjectName.GetHandle());
         }
         if ((a1 & 1) != 0) {
@@ -2548,7 +2542,6 @@ void NiControllerSequence::ConvertOldSequence(
     const char* pcEmpty = EmptyFS.GetHandle();
     if (spNewSequence->m_kAccumRootName.GetHandle() != pcEmpty) {
         NiGlobalStringTable::AcquireHandle(pcEmpty);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(spNewSequence->m_kAccumRootName.GetHandle());
         spNewSequence->m_kAccumRootName.SetHandle(pcEmpty);
     }

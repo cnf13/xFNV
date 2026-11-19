@@ -333,12 +333,7 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
     AutoMemContext tempMemContext(MEM_CONTEXT_HAVOK);
     bhkEntity::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(bhkRigidBody::ms_RTTI.GetName());
-    // EXE-INLINED none: NiTArray<char*>::Add
-    uint32_t uiIndex = apStrings->m_usSize;
-    if (uiIndex >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiIndex, pcString);
+    apStrings->Add(pcString);
     bhkRigidBodyCinfo ci;
     CopyCinfo(ci);
     HK2NI(pnt, ci.hk.m_position);
@@ -403,27 +398,7 @@ void bhkRigidBody::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
         char pstr[128];
         BSsprintf(pstr, 128, "%s: 0x%8X", pItem->GetRTTI()->GetName(), pItem);
         pcString = NiGetViewerString("ACTCON", static_cast<const char*>(pstr));
-        // EXE-INLINED none: NiTArray<char*>::Add
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= apStrings->m_usSize) {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcString) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (pcString) {
-            if (!apStrings->m_pBase[uiIndex]) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (apStrings->m_pBase[uiIndex]) {
-            --apStrings->m_usESize;
-        }
-        apStrings->m_pBase[uiIndex] = pcString;
+        apStrings->Add(pcString);
     }
 }
 

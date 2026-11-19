@@ -156,7 +156,6 @@ NiObject* BSXFlags::CreateObject() {
 void BSXFlags::KillSDM() {
     NiFixedString* Block = BSXFlags::pTag;
     if (BSXFlags::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSXFlags::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

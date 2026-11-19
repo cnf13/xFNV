@@ -226,35 +226,9 @@ void hkaTrackAnalysis::analyze(
     }
 
     hkLocalArray<float> minValues(static_cast<int32_t>(finput.m_numberOfFloatTracks));
-    {
-        // EXE-INLINED none: hkArray<hkReal>::setSize(numFloatTracks)
-        const int32_t size = static_cast<int32_t>(finput.m_numberOfFloatTracks);
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacity = static_cast<int32_t>(minValues.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK);
-        if (capacity < size) {
-            int32_t request = 2 * capacity;
-            if (size >= request) {
-                request = size;
-            }
-            hkArrayUtil::_reserve(*pHeap, &minValues, request, static_cast<int32_t>(sizeof(float)));
-        }
-        minValues.m_size = size;
-    }
+    minValues.setSize(static_cast<int32_t>(finput.m_numberOfFloatTracks));
     hkLocalArray<float> maxValues(static_cast<int32_t>(finput.m_numberOfFloatTracks));
-    {
-        // EXE-INLINED none: hkArray<hkReal>::setSize(numFloatTracks)
-        const int32_t size = static_cast<int32_t>(finput.m_numberOfFloatTracks);
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacity = static_cast<int32_t>(maxValues.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK);
-        if (capacity < size) {
-            int32_t request = 2 * capacity;
-            if (size >= request) {
-                request = size;
-            }
-            hkArrayUtil::_reserve(*pHeap, &maxValues, request, static_cast<int32_t>(sizeof(float)));
-        }
-        maxValues.m_size = size;
-    }
+    maxValues.setSize(static_cast<int32_t>(finput.m_numberOfFloatTracks));
 
     for (uint32_t i = 0; i < finput.m_numberOfFloatTracks; ++i) {
         float fTolerance = finput.m_absoluteTolerance.m_data[i];
@@ -308,21 +282,7 @@ void hkaTrackAnalysis::analyzeQsTransform(
 ) {
     const int32_t numTracks = static_cast<int32_t>(input.m_numberOfTransformTracks);
     hkLocalArray<hkQsTransform> average(numTracks);
-    {
-        // EXE-INLINED none: hkArray<hkQsTransform>::setSize(numTracks)
-        const int32_t size = static_cast<int32_t>(input.m_numberOfTransformTracks);
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacity =
-            static_cast<int32_t>(average.m_capacityAndFlags & hkArrayBase<hkQsTransform>::CAPACITY_MASK);
-        if (capacity < size) {
-            int32_t request = 2 * capacity;
-            if (size >= request) {
-                request = size;
-            }
-            hkArrayUtil::_reserve(*pHeap, &average, request, static_cast<int32_t>(sizeof(hkQsTransform)));
-        }
-        average.m_size = size;
-    }
+    average.setSize(static_cast<int32_t>(input.m_numberOfTransformTracks));
 
     // The bounding box of every track's translation in every pose.
     hkVector4 minPos;

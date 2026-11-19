@@ -1853,12 +1853,7 @@ void hkpWorld::addPhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPhant
         phantom->calcAabb(addAabbList.m_data[i]);
         phantom->setBoundingVolumeData(addAabbList.m_data[i]);
         phantom->addReference();
-        // EXE-INLINED none: hkArray<hkpPhantom*>::pushBack
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        if (m_phantoms.m_size == (m_phantoms.m_capacityAndFlags & hkArrayBase<hkpPhantom*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(heap, &m_phantoms, sizeof(hkpPhantom*));
-        }
-        m_phantoms.m_data[m_phantoms.m_size++] = phantom;
+        m_phantoms.pushBack(phantom);
         hkpWorldCallbackUtil::firePhantomAdded(this, phantom);
         phantom->firePhantomAdded();
     }
@@ -2101,16 +2096,7 @@ void hkpWorld::updateCollisionFilterOnWorld(
                             }
                         }
                         else {
-                            // The router is fetched before the capacity test.
-                            // EXE-INLINED none: hkArray<hkpAgentNnEntry*>::pushBack
-                            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                            if (agentsToRemove.m_size ==
-                                (agentsToRemove.m_capacityAndFlags & hkArrayBase<hkpAgentNnEntry*>::CAPACITY_MASK)) {
-                                hkArrayUtil::_reserveMore(
-                                    heap, &agentsToRemove, static_cast<int32_t>(sizeof(hkpAgentNnEntry*))
-                                );
-                            }
-                            agentsToRemove.m_data[agentsToRemove.m_size++] = entry;
+                            agentsToRemove.pushBack(entry);
                             island->m_splitCheckRequested = 1;
                         }
                     }
@@ -2215,118 +2201,105 @@ void hkpWorld::updateCollisionFilterOnEntity(
         entity->m_collidable.sortEntries();
     }
 
-    hkInplaceArray<hkpBroadPhaseHandlePair, 128> newPairs;
-
-    if (updateMode == HK_UPDATE_FILTER_ON_ENTITY_FULL_CHECK) {
-        HK_TIMER_SPLIT_LIST("broadphase");
-        m_broadPhase->reQuerySingleObject(entity->m_collidable.getBroadPhaseHandle(), newPairs);
-
-        // The phantoms among the overlaps are updated here and leave the list.
-        HK_TIMER_SPLIT_LIST("phantom");
-        for (int32_t i = 0; i < newPairs.m_size; ++i) {
-            hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(newPairs.m_data[i].m_b);
-            hkpCollidable* pCollidable = static_cast<hkpCollidable*>(pHandle->getOwner());
-            // EXE-INLINED 0x4B5950
-            hkpPhantom* phantom = nullptr;
-            if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
-                phantom = static_cast<hkpPhantom*>(pCollidable->getOwner());
-            }
-            if (phantom) {
-                hkWorld_updateFilterOnSinglePhantom(m_collisionFilter, phantom, &entity->m_collidable);
-                if (updateShapeCollectionFilter) {
-                    phantom->updateShapeCollectionFilter();
-                }
-                // EXE-INLINED none: hkArrayBase<hkpBroadPhaseHandlePair>::removeAt
-                --newPairs.m_size;
-                if (newPairs.m_size != i) {
-                    newPairs.m_data[i] = newPairs.m_data[newPairs.m_size];
-                }
-                --i;
-            }
-        }
-
-        // The pairs that already have an agent leave the list.
-        {
-            hkArray<hkpLinkedCollidable::CollisionEntry>& entries =
-                entity->m_collidable.getCollisionEntriesDeterministicUnchecked();
-            hkInplaceArray<hkpBroadPhaseHandlePair, 128> existingPairs;
-            for (int32_t i = 0; i < entries.m_size; ++i) {
-                // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::expandOne
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (existingPairs.m_size ==
-                    (existingPairs.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        heap, &existingPairs, static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair))
-                    );
-                }
-                hkpBroadPhaseHandlePair& pair = existingPairs.m_data[existingPairs.m_size++];
-                pair.m_a = entries.m_data[i].m_agentEntry->m_collidable[0]->getBroadPhaseHandle();
-                pair.m_b = entries.m_data[i].m_agentEntry->m_collidable[1]->getBroadPhaseHandle();
-            }
-            hkpTypedBroadPhaseDispatcher::removeDuplicates(existingPairs, newPairs);
-        }
-    }
-
-    // The existing agents: removed where the filter or the quality table now rejects the pair, else their shape
-    // collection filters re-run when asked.
-    HK_TIMER_SPLIT_LIST("checkAgts");
     {
-        hkpLinkedCollidable* collidable = &entity->m_collidable;
-        const int32_t qualityA = collidable->m_broadPhaseHandle.m_objectQualityType;
-        hkArray<hkpLinkedCollidable::CollisionEntry>& entries = collidable->getCollisionEntriesDeterministicUnchecked();
-        for (int32_t i = 0; i < entries.m_size; ++i) {
-            hkpLinkedCollidable::CollisionEntry& entry = entries.m_data[i];
-            if (m_collisionFilter->isCollisionEnabled(*collidable, *entry.m_partner).m_bool &&
-                m_collisionDispatcher
-                        ->m_collisionQualityTable[qualityA][entry.m_partner->m_broadPhaseHandle.m_objectQualityType] !=
-                    0) {
-                if (updateShapeCollectionFilter == HK_UPDATE_COLLECTION_FILTER_PROCESS_SHAPE_COLLECTIONS) {
-                    // A fixed entity's agents run in its partner's island.
-                    hkpSimulationIsland* island;
-                    if (entity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
-                        island = static_cast<hkpEntity*>(entry.m_partner->getOwner())->m_simulationIsland;
+        hkInplaceArray<hkpBroadPhaseHandlePair, 128> newPairs;
+
+        if (updateMode == HK_UPDATE_FILTER_ON_ENTITY_FULL_CHECK) {
+            HK_TIMER_SPLIT_LIST("broadphase");
+            m_broadPhase->reQuerySingleObject(entity->m_collidable.getBroadPhaseHandle(), newPairs);
+
+            // The phantoms among the overlaps are updated here and leave the list.
+            HK_TIMER_SPLIT_LIST("phantom");
+            for (int32_t i = 0; i < newPairs.m_size; ++i) {
+                hkpTypedBroadPhaseHandle* pHandle = static_cast<hkpTypedBroadPhaseHandle*>(newPairs.m_data[i].m_b);
+                hkpCollidable* pCollidable = static_cast<hkpCollidable*>(pHandle->getOwner());
+                // EXE-INLINED 0x4B5950
+                hkpPhantom* phantom = nullptr;
+                if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_PHANTOM) {
+                    phantom = static_cast<hkpPhantom*>(pCollidable->getOwner());
+                }
+                if (phantom) {
+                    hkWorld_updateFilterOnSinglePhantom(m_collisionFilter, phantom, &entity->m_collidable);
+                    if (updateShapeCollectionFilter) {
+                        phantom->updateShapeCollectionFilter();
                     }
-                    else {
-                        island = entity->m_simulationIsland;
-                    }
-                    hkAgentNnMachine_UpdateShapeCollectionFilter(entry.m_agentEntry, *m_collisionInput, *island);
+                    newPairs.removeAt(i);
+                    --i;
                 }
             }
-            else {
-                hkpWorldAgentUtil::removeAgentAndItsToiEvents(entry.m_agentEntry);
-                --i;
-                entity->m_simulationIsland->m_splitCheckRequested = 1;
+
+            // The pairs that already have an agent leave the list.
+            {
+                hkArray<hkpLinkedCollidable::CollisionEntry>& entries =
+                    entity->m_collidable.getCollisionEntriesDeterministicUnchecked();
+                hkInplaceArray<hkpBroadPhaseHandlePair, 128> existingPairs;
+                for (int32_t i = 0; i < entries.m_size; ++i) {
+                    // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::expandOne
+                    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
+                    if (existingPairs.m_size ==
+                        (existingPairs.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK)) {
+                        hkArrayUtil::_reserveMore(
+                            heap, &existingPairs, static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair))
+                        );
+                    }
+                    hkpBroadPhaseHandlePair& pair = existingPairs.m_data[existingPairs.m_size++];
+                    pair.m_a = entries.m_data[i].m_agentEntry->m_collidable[0]->getBroadPhaseHandle();
+                    pair.m_b = entries.m_data[i].m_agentEntry->m_collidable[1]->getBroadPhaseHandle();
+                }
+                hkpTypedBroadPhaseDispatcher::removeDuplicates(existingPairs, newPairs);
             }
         }
-    }
 
-    if (newPairs.m_size > 0) {
-        HK_TIMER_SPLIT_LIST("addAgts");
-        hkpCollidableCollidableFilter* filter = m_collisionFilter;
-        m_broadPhaseDispatcher->addPairs(
-            static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.m_data), newPairs.m_size, filter
-        );
-    }
-
-    // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
-    if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
-        if (m_pendingOperationsCount) {
-            internal_executePendingOperations();
+        // The existing agents: removed where the filter or the quality table now rejects the pair, else their shape
+        // collection filters re-run when asked.
+        HK_TIMER_SPLIT_LIST("checkAgts");
+        {
+            hkpLinkedCollidable* collidable = &entity->m_collidable;
+            const int32_t qualityA = collidable->m_broadPhaseHandle.m_objectQualityType;
+            hkArray<hkpLinkedCollidable::CollisionEntry>& entries =
+                collidable->getCollisionEntriesDeterministicUnchecked();
+            for (int32_t i = 0; i < entries.m_size; ++i) {
+                hkpLinkedCollidable::CollisionEntry& entry = entries.m_data[i];
+                if (m_collisionFilter->isCollisionEnabled(*collidable, *entry.m_partner).m_bool &&
+                    m_collisionDispatcher->m_collisionQualityTable[qualityA][entry.m_partner->m_broadPhaseHandle
+                                                                                 .m_objectQualityType] != 0) {
+                    if (updateShapeCollectionFilter == HK_UPDATE_COLLECTION_FILTER_PROCESS_SHAPE_COLLECTIONS) {
+                        // A fixed entity's agents run in its partner's island.
+                        hkpSimulationIsland* island;
+                        if (entity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
+                            island = static_cast<hkpEntity*>(entry.m_partner->getOwner())->m_simulationIsland;
+                        }
+                        else {
+                            island = entity->m_simulationIsland;
+                        }
+                        hkAgentNnMachine_UpdateShapeCollectionFilter(entry.m_agentEntry, *m_collisionInput, *island);
+                    }
+                }
+                else {
+                    hkpWorldAgentUtil::removeAgentAndItsToiEvents(entry.m_agentEntry);
+                    --i;
+                    entity->m_simulationIsland->m_splitCheckRequested = 1;
+                }
+            }
         }
-        if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
-            internal_executePendingBodyOperations();
-        }
-    }
 
-    // EXE-INLINED 0x9B2DB0
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    newPairs.m_size = 0;
-    if (newPairs.m_capacityAndFlags >= 0) {
-        heap.bufFree(
-            newPairs.m_data,
-            (newPairs.m_capacityAndFlags & hkArrayBase<hkpBroadPhaseHandlePair>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkpBroadPhaseHandlePair))
-        );
+        if (newPairs.m_size > 0) {
+            HK_TIMER_SPLIT_LIST("addAgts");
+            hkpCollidableCollidableFilter* filter = m_collisionFilter;
+            m_broadPhaseDispatcher->addPairs(
+                static_cast<hkpTypedBroadPhaseHandlePair*>(newPairs.m_data), newPairs.m_size, filter
+            );
+        }
+
+        // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
+        if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
+            if (m_pendingOperationsCount) {
+                internal_executePendingOperations();
+            }
+            if (m_pendingOperationQueueCount == 1 && m_pendingBodyOperationsCount) {
+                internal_executePendingBodyOperations();
+            }
+        }
     }
     HK_TIMER_END_LIST();
 }
@@ -2443,12 +2416,7 @@ void hkpWorld::shiftBroadPhase(
             for (int32_t j = 0; j < island->m_entities.m_size; ++j) {
                 hkpEntity** pEntry = &island->m_entities.m_data[j];
                 if ((*pEntry)->m_collidable.m_shape) {
-                    // EXE-INLINED none: hkArray<hkpEntity*>::pushBack
-                    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                    if (entities.m_size == (entities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(heap, &entities, sizeof(hkpEntity*));
-                    }
-                    entities.m_data[entities.m_size++] = *pEntry;
+                    entities.pushBack(*pEntry);
                 }
             }
         }
@@ -2565,12 +2533,7 @@ void hkpWorld::addEntityBatch(
             hkArray<hkpSimulationIsland*>& islands = initialActivationState == HK_ENTITY_ACTIVATION_DO_ACTIVATE
                 ? m_activeSimulationIslands
                 : m_inactiveSimulationIslands;
-            // EXE-INLINED none: hkArray<hkpSimulationIsland*>::pushBack
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            if (islands.m_size == (islands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(heap, &islands, sizeof(hkpSimulationIsland*));
-            }
-            islands.m_data[islands.m_size++] = pIsland;
+            islands.pushBack(pIsland);
         }
         else {
             delete pIsland;
@@ -2690,8 +2653,7 @@ void hkpWorld::removeEntityBatch(hkpEntity* const* entityBatch, int32_t numEntit
     {
         // The broad-phase handles of the entities that have a shape, from the thread's temp allocator.
         hkArray<hkpBroadPhaseHandle*, hkContainerTempAllocator> removeList;
-        // EXE-INLINED none: hkArray<hkpBroadPhaseHandle*, hkContainerTempAllocator>::reserveExactly
-        removeList._reserveExactly(hkMemoryRouter::getInstance().temp(), numEntities);
+        removeList.reserveExactly(numEntities);
         for (hkpEntity* const* pEntity = entityBatch; pEntity != entityBatchEnd; ++pEntity) {
             if ((*pEntity)->m_collidable.m_shape) {
                 // EXE-INLINED none: hkArray<hkpBroadPhaseHandle*>::pushBackUnchecked
@@ -2765,19 +2727,9 @@ void hkpWorld::removePhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPh
     for (int32_t i = 0; i < numPhantoms; ++i) {
         hkpPhantom* phantom = phantomBatch[i];
         phantom->m_world = nullptr;
-        // EXE-INLINED none: hkArray<hkpPhantom*>::indexOf and removeAt (-1 when the phantom is not there; the last
-        // element moves into the hole)
-        int32_t index = -1;
-        for (int32_t j = 0; j < m_phantoms.m_size; ++j) {
-            if (m_phantoms.m_data[j] == phantom) {
-                index = j;
-                break;
-            }
-        }
-        const int32_t newSize = --m_phantoms.m_size;
-        if (newSize != index) {
-            m_phantoms.m_data[index] = m_phantoms.m_data[newSize];
-        }
+        // The last element moves into the hole.
+        const int32_t index = m_phantoms.indexOf(phantom);
+        m_phantoms.removeAt(index);
         if (!phantom->m_memSizeAndFlags) {
             phantom->deallocateInternalArrays();
         }
@@ -2890,13 +2842,7 @@ void hkpWorld::removeActionImmediately(hkpAction* action) {
     if (island->m_dirtyListIndex == 0xFFFF) {
         hkArray<hkpSimulationIsland*>& dirtyIslands = world->m_dirtySimulationIslands;
         island->m_dirtyListIndex = static_cast<uint16_t>(dirtyIslands.m_size);
-        // EXE-INLINED none: hkArray<hkpSimulationIsland*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (dirtyIslands.m_size ==
-            (dirtyIslands.m_capacityAndFlags & hkArrayBase<hkpSimulationIsland*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &dirtyIslands, static_cast<int32_t>(sizeof(hkpSimulationIsland*)));
-        }
-        dirtyIslands.m_data[dirtyIslands.m_size++] = island;
+        dirtyIslands.pushBack(island);
     }
     // EXE-INLINED none: hkpWorld::unlockAndAttemptToExecutePendingOperations
     if (--m_criticalOperationsLockCount == 0 && !m_blockExecutingPendingOperations.m_bool) {
@@ -3506,15 +3452,7 @@ void hkpWorld::removeContactListener(hkpContactListener* collisionListener) {
 // The index is -1 when the listener is absent, and the slot before the array's first element is then cleared,
 // deliberately, as Havok does.
 void hkpWorld::removeWorldDeletionListener(hkpWorldDeletionListener* worldListener) {
-    const int32_t size = m_worldDeletionListeners.m_size;
-    // EXE-INLINED 0x629F10
-    int32_t i = -1;
-    for (int32_t j = 0; j < size; ++j) {
-        if (m_worldDeletionListeners.m_data[j] == worldListener) {
-            i = j;
-            break;
-        }
-    }
+    const int32_t i = m_worldDeletionListeners.indexOf(worldListener);
     m_worldDeletionListeners.m_data[i] = nullptr;
 }
 
@@ -3923,24 +3861,7 @@ void hkpWorld::removePhysicsSystem(const hkpPhysicsSystem* sys) {
             removeAction(sys->m_actions.m_data[i]);
         }
     }
-    // EXE-INLINED none: hkArray<hkpRigidBody*>::indexOf(HK_NULL)
-    int32_t numBodies = sys->m_rigidBodies.m_size;
-    int32_t nullBody = 0;
-    if (numBodies <= 0) {
-        goto removeBodyBatch;
-    }
-    {
-        hkpRigidBody** body = sys->m_rigidBodies.m_data;
-        while (*body) {
-            ++nullBody;
-            ++body;
-            if (nullBody >= numBodies) {
-                goto removeBodyBatch;
-            }
-        }
-    }
-    if (nullBody == -1) {
-    removeBodyBatch:
+    if (sys->m_rigidBodies.indexOf(nullptr) == -1) {
         // The rigid body array is handed to the entity batch call unchanged: an hkpRigidBody is an hkpEntity and both
         // arrays hold pointers, so the same address is passed. The untyped local is that hand-over.
         void* pBatch = sys->m_rigidBodies.m_data;
@@ -3953,24 +3874,7 @@ void hkpWorld::removePhysicsSystem(const hkpPhysicsSystem* sys) {
             }
         }
     }
-    // EXE-INLINED none: hkArray<hkpPhantom*>::indexOf(HK_NULL)
-    int32_t numPhantoms = sys->m_phantoms.m_size;
-    int32_t nullPhantom = 0;
-    if (numPhantoms <= 0) {
-        goto removePhantomBatch;
-    }
-    {
-        hkpPhantom** phantom = sys->m_phantoms.m_data;
-        while (*phantom) {
-            ++nullPhantom;
-            ++phantom;
-            if (nullPhantom >= numPhantoms) {
-                goto removePhantomBatch;
-            }
-        }
-    }
-    if (nullPhantom == -1) {
-    removePhantomBatch:
+    if (sys->m_phantoms.indexOf(nullptr) == -1) {
         removePhantomBatch(sys->m_phantoms.m_data, sys->m_phantoms.m_size);
     }
     else {

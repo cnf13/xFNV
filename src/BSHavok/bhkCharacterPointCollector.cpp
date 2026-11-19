@@ -50,26 +50,10 @@ void bhkCharacterPointCollector::addCdPoint(const hkpCdPoint& event) {
     if (!pObject) {
         return;
     }
-    // EXE-INLINED none: hkArrayBase<hkpWorldObject*>::indexOf
-    int32_t iIndex = -1;
-    int32_t iCount = m_collidingObjects.getSize();
-    hkpWorldObject** ppObjects = m_collidingObjects.m_data;
-    for (int32_t i = 0; i < iCount; ++i) {
-        if (ppObjects[i] == pObject) {
-            iIndex = i;
-            break;
-        }
-    }
+    int32_t iIndex = m_collidingObjects.indexOf(pObject);
     if (iIndex == -1) {
         pObject->addReference();
-        // EXE-INLINED none: hkArray<hkpWorldObject*>::pushBack
-        hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-        if (m_collidingObjects.m_size ==
-            (m_collidingObjects.m_capacityAndFlags & hkArrayBase<hkpWorldObject*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rRouter.m_heap, &m_collidingObjects, sizeof(hkpWorldObject*));
-        }
-        m_collidingObjects.m_data[m_collidingObjects.m_size] = pObject;
-        m_collidingObjects.m_size++;
+        m_collidingObjects.pushBack(pObject);
 
         hkpRootCdPoint kPoint;
         kPoint.m_contact = event.m_contact;
@@ -77,28 +61,8 @@ void bhkCharacterPointCollector::addCdPoint(const hkpCdPoint& event) {
         kPoint.m_shapeKeyA = event.m_cdBodyA->m_shapeKey;
         kPoint.m_rootCollidableB = event.m_cdBodyB->getRootCollidable();
         kPoint.m_shapeKeyB = event.m_cdBodyB->m_shapeKey;
-        // EXE-INLINED none: hkArray<hkpRootCdPoint>::pushBack
-        hkMemoryRouter& rPointRouter = hkMemoryRouter::getInstance();
-        if (m_collisionPoints.m_size ==
-            (m_collisionPoints.m_capacityAndFlags & hkArrayBase<hkpRootCdPoint>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rPointRouter.m_heap, &m_collisionPoints, sizeof(hkpRootCdPoint));
-        }
-        hkpRootCdPoint* pNewPoint = &m_collisionPoints.m_data[m_collisionPoints.m_size];
-        if (pNewPoint) {
-            *pNewPoint = kPoint;
-        }
-        m_collisionPoints.m_size++;
-        // EXE-INLINED none: hkArray<bhkCharacterPointCollector::bhkCollisionObjectState>::pushBack
-        hkMemoryRouter& rStateRouter = hkMemoryRouter::getInstance();
-        if (m_collisionStates.m_size ==
-            (m_collisionStates.m_capacityAndFlags & hkArrayBase<bhkCollisionObjectState>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rStateRouter.m_heap, &m_collisionStates, sizeof(bhkCollisionObjectState));
-        }
-        bhkCollisionObjectState* pNewState = &m_collisionStates.m_data[m_collisionStates.m_size];
-        if (pNewState) {
-            *pNewState = COLLISION_OBJECT_NEW;
-        }
-        m_collisionStates.m_size++;
+        m_collisionPoints.pushBack(kPoint);
+        m_collisionStates.pushBack(COLLISION_OBJECT_NEW);
     }
     else {
         bhkCollisionObjectState& rState = m_collisionStates.m_data[iIndex];
@@ -111,12 +75,7 @@ void bhkCharacterPointCollector::addCdPoint(const hkpCdPoint& event) {
         (pObject->m_collidable.m_broadPhaseHandle.m_collisionFilterInfo & 0x7F) != L_CHARCONTROLLER) {
         return;
     }
-    // EXE-INLINED none: hkArray<hkpRootCdPoint>::expandOne
-    hkMemoryRouter& rHitRouter = hkMemoryRouter::getInstance();
-    if (m_hits.m_size == (m_hits.m_capacityAndFlags & hkArrayBase<hkpRootCdPoint>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rHitRouter.m_heap, &m_hits, sizeof(hkpRootCdPoint));
-    }
-    hkpRootCdPoint& rHit = m_hits.m_data[m_hits.m_size++];
+    hkpRootCdPoint& rHit = m_hits.expandOne();
     rHit.m_contact = event.m_contact;
     rHit.m_rootCollidableA = event.m_cdBodyA->getRootCollidable();
     rHit.m_rootCollidableB = event.m_cdBodyB->getRootCollidable();
@@ -171,14 +130,7 @@ void bhkCharacterPointCollector::filterOutEdgeHits() {
                 hkVector4 kOffset;
                 kOffset.setSub4(pHits[j].m_contact.m_position, pHits[i].m_contact.m_position);
                 if (static_cast<float>(kOffset.dot3(pHits[j].m_contact.m_separatingNormal)) > 0.0f) {
-                    // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the points'
-                    // empty destruct there)
-                    m_hits.m_size--;
-                    if (m_hits.m_size != i) {
-                        hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                            m_hits.m_data + i, m_hits.m_data + m_hits.m_size
-                        );
-                    }
+                    m_hits.removeAt(i);
                     break;
                 }
             }
@@ -199,14 +151,7 @@ void bhkCharacterPointCollector::filterOutEdgeHits() {
                     hkVector4 kOffset;
                     kOffset.setSub4(rStart.m_contact.m_position, rHit.m_contact.m_position);
                     if (static_cast<float>(kOffset.dot3(rStart.m_contact.m_separatingNormal)) > 0.0f) {
-                        // EXE-INLINED none: hkArrayBase<hkpRootCdPoint>::removeAt (the exe has no call of the
-                        // points' empty destruct there)
-                        m_hits.m_size--;
-                        if (m_hits.m_size != m) {
-                            hkMemUtil::memCpyOneAligned<sizeof(hkpRootCdPoint), alignof(hkpRootCdPoint)>(
-                                m_hits.m_data + m, m_hits.m_data + m_hits.m_size
-                            );
-                        }
+                        m_hits.removeAt(m);
                     }
                 }
             }

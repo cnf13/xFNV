@@ -282,45 +282,9 @@ hkDataClassImpl* hkDataWorldDict::copyClassFromWorld(const char* name, const hkD
     hkDataWorld* pWorld = this;
     hkDataClassImpl* pNewClass = pWorld->newClass(cinfo);
     int32_t iNumMembers = srcClass.getNumDeclaredMembers();
-    hkArrayBase<hkDataClass::MemberInfo> minfos;
-    // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>'s constructor of iNumMembers
-    // elements (the temp allocator's block, its capacity the elements the returned size holds)
-    minfos.m_data = nullptr;
-    minfos.m_size = 0;
-    minfos.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator& rTemp = hkMemoryRouter::getInstance().temp();
-    hkDataClass::MemberInfo* pData = nullptr;
-    int32_t iCapacity = 0;
-    if (iNumMembers) {
-        int32_t iBytes = iNumMembers * static_cast<int32_t>(sizeof(hkDataClass::MemberInfo));
-        pData = static_cast<hkDataClass::MemberInfo*>(rTemp.bufAlloc(iBytes));
-        iCapacity = iBytes / static_cast<int32_t>(sizeof(hkDataClass::MemberInfo));
-    }
-    minfos.m_data = pData;
-    minfos.m_size = iCapacity;
-    minfos.m_capacityAndFlags = iCapacity ? iCapacity : hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-    for (int32_t i = 0; i < iCapacity; ++i) {
-        hkDataClass::MemberInfo* pInfo = &pData[i];
-        if (pInfo) {
-            pInfo->m_name = nullptr;
-            pInfo->m_owner = nullptr;
-            pInfo->m_type = hkDataObject::TYPE_VOID;
-            pInfo->m_class = nullptr;
-            pInfo->m_tupleCount = 0;
-        }
-    }
+    hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator> minfos(iNumMembers);
     srcClass.getAllDeclaredMemberInfo(minfos);
-    int32_t iSize = minfos.m_size;
-    hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-    // EXE-INLINED none: hkArray<hkDataClass::Cinfo::Member>::reserve
-    int32_t iMemberCapacity = cinfo.members.m_capacityAndFlags & hkArrayBase<hkDataClass::Cinfo::Member>::CAPACITY_MASK;
-    if (iMemberCapacity < iSize) {
-        int32_t iNewCapacity = 2 * iMemberCapacity;
-        if (iSize >= iNewCapacity) {
-            iNewCapacity = iSize;
-        }
-        hkArrayUtil::_reserve(rHeap, &cinfo.members, iNewCapacity, sizeof(hkDataClass::Cinfo::Member));
-    }
+    cinfo.members.reserve(minfos.m_size);
     hkDataClass dstClass(pNewClass);
     for (int32_t i = 0; i < minfos.m_size; ++i) {
         const hkDataClass::MemberInfo& rInfo = minfos.m_data[i];
@@ -331,19 +295,6 @@ hkDataClassImpl* hkDataWorldDict::copyClassFromWorld(const char* name, const hkD
         }
         addClassMember(dstClass, rInfo.m_name, rInfo.m_type, pTypeName, rInfo.m_tupleCount);
     }
-    // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::~hkArray
-    hkMemoryAllocator& rTempFree = hkMemoryRouter::getInstance().temp();
-    int32_t iFlags = minfos.m_capacityAndFlags;
-    minfos.m_size = 0;
-    if (!(iFlags & hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG)) {
-        rTempFree.bufFree(
-            minfos.m_data,
-            (iFlags & hkArrayBase<hkDataClass::MemberInfo>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkDataClass::MemberInfo))
-        );
-    }
-    minfos.m_data = nullptr;
-    minfos.m_capacityAndFlags = hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
     return pNewClass;
 }
 
@@ -978,25 +929,14 @@ void hkDataWorldDict::ObjectTracker::findTrackedObjectsByBase(
     }
     for (int32_t i = m_objectsFromClass.find(pClass); i != -1; i = m_objectsFromClass.m_valueChain.m_data[i].next) {
         hkDataObjectImpl* pObject = m_objectsFromClass.m_valueChain.m_data[i].value;
-        // EXE-INLINED none: hkArray<hkDataObjectImpl*>::pushBack
-        hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-        if (objectsOut.m_size == (objectsOut.m_capacityAndFlags & hkArrayBase<hkDataObjectImpl*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*kRouter.m_heap, &objectsOut, sizeof(hkDataObjectImpl*));
-        }
-        objectsOut.m_data[objectsOut.m_size++] = pObject;
+        objectsOut.pushBack(pObject);
     }
     if (addStructs) {
         for (int32_t i = m_arraysFromClass.find(pClass); i != -1; i = m_arraysFromClass.m_valueChain.m_data[i].next) {
             hkDataArrayImpl* pArray = m_arraysFromClass.m_valueChain.m_data[i].value;
             for (int32_t j = 0; j < pArray->getSize(); ++j) {
                 hkDataObjectImpl* pObject = pArray->asObject(j);
-                // EXE-INLINED none: hkArray<hkDataObjectImpl*>::pushBack
-                hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-                if (objectsOut.m_size ==
-                    (objectsOut.m_capacityAndFlags & hkArrayBase<hkDataObjectImpl*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*kRouter.m_heap, &objectsOut, sizeof(hkDataObjectImpl*));
-                }
-                objectsOut.m_data[objectsOut.m_size++] = pObject;
+                objectsOut.pushBack(pObject);
             }
         }
     }
@@ -1080,13 +1020,7 @@ void hkDataWorldDict::ObjectTracker::removeClassContent(hkDataClassDict* klass) 
     hkLocalArray<hkDataObjectDict*> objects(512);
     do {
         hkDataObjectDict* pObject = m_objectsFromClass.m_valueChain.m_data[iObject].value;
-        // EXE-INLINED none: hkArray<hkDataObjectDict*>::pushBack
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        if (objects.m_size == (objects.m_capacityAndFlags & hkArrayBase<hkDataObjectDict*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*pHeap, &objects, sizeof(hkDataObjectDict*));
-        }
-        objects.m_data[objects.m_size] = pObject;
-        objects.m_size++;
+        objects.pushBack(pObject);
         iObject = m_objectsFromClass.m_valueChain.m_data[iObject].next;
     }
     while (iObject != -1);
@@ -1241,12 +1175,7 @@ void hkDataWorldDict::ObjectTracker::untrackClass(hkDataClassDict* klass) {
     if (hasChildren) {
         while (next != -1) {
             hkDataClassDict* child = m_derivedFromParent.m_valueChain.m_data[next].value;
-            // EXE-INLINED none: hkArray<hkDataClassDict*>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (children.m_size == (children.m_capacityAndFlags & hkArrayBase<hkDataClassDict*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &children, static_cast<int32_t>(sizeof(hkDataClassDict*)));
-            }
-            children.m_data[children.m_size++] = child;
+            children.pushBack(child);
             next = m_derivedFromParent.m_valueChain.m_data[next].next;
         }
     }
@@ -2104,13 +2033,7 @@ void StructArrayImplementation::removeMember(InternedString s) {
             if (--pValues->m_count == 0) {
                 delete pValues;
             }
-            --m_memberData.m_size;
-            // EXE-INLINED none: hkArray<MemberData>::removeAtAndCopy (a forward dword copy)
-            int32_t iNewSize = m_memberData.m_size;
-            MemberData* pData = m_memberData.m_data;
-            for (int32_t j = i; j < iNewSize; ++j) {
-                pData[j] = pData[j + 1];
-            }
+            m_memberData.removeAtAndCopy(i);
             return;
         }
     }

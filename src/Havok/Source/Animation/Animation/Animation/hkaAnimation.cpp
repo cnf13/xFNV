@@ -192,42 +192,6 @@ hkaAnnotationTrack::hkaAnnotationTrack(const hkaAnnotationTrack& other)
 hkaAnnotationTrack& hkaAnnotationTrack::operator=(const hkaAnnotationTrack& other) {
     m_trackName = other.m_trackName;
 
-    // EXE-INLINED none: hkArray<hkaAnnotationTrack::Annotation, hkContainerHeapAllocator>::operator=
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iOldSize = m_annotations.m_size;
-    const int32_t iNewSize = other.m_annotations.m_size;
-    int32_t iCopied = iOldSize;
-    if (iNewSize <= iOldSize) {
-        iCopied = iNewSize;
-    }
-    const int32_t iCapacity = m_annotations.m_capacityAndFlags & hkArrayBase<Annotation>::CAPACITY_MASK;
-    if (iCapacity < iNewSize) {
-        int32_t iReserve = 2 * iCapacity;
-        if (iNewSize >= iReserve) {
-            iReserve = iNewSize;
-        }
-        hkArrayUtil::_reserve(*pHeap, &m_annotations, iReserve, static_cast<int32_t>(sizeof(Annotation)));
-    }
-    Annotation* pDst = m_annotations.m_data + iNewSize;
-    for (int32_t i = iOldSize - iNewSize; i > 0; --i, ++pDst) {
-        pDst->m_text.~hkStringPtr();
-    }
-    const Annotation* pSrc = other.m_annotations.m_data;
-    pDst = m_annotations.m_data;
-    for (int32_t i = 0; i < iCopied; ++i) {
-        float fTime = pSrc[i].m_time;
-        pDst[i].m_time = fTime;
-        pDst[i].m_text = pSrc[i].m_text;
-    }
-    pSrc = other.m_annotations.m_data + iCopied;
-    pDst = m_annotations.m_data + iCopied;
-    for (int32_t i = iNewSize - iCopied; i > 0; --i, ++pSrc, ++pDst) {
-        if (pDst) {
-            float fTime = pSrc->m_time;
-            pDst->m_time = fTime;
-            ::new (&pDst->m_text) hkStringPtr(pSrc->m_text);
-        }
-    }
-    m_annotations.m_size = iNewSize;
+    m_annotations = other.m_annotations;
     return *this;
 }

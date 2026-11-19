@@ -419,11 +419,7 @@ void hk4dGskCollideCalcToi(
                         const int32_t iNumSpheres = pShapeA->getNumCollisionSpheresImpl();
                         sweepIn.m_allocatedNumVertices.m_storage = iNumSpheres;
                         sweepIn.m_numVertices.m_storage = iNumSpheres;
-                        // EXE-INLINED none: hkAllocateStack<hkVector4>
-                        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-                        void* pBlock = stack.m_next.m_storage;
-                        stack.m_next.m_storage = static_cast<char*>(pBlock) +
-                            ((iNumSpheres * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
+                        void* pBlock = hkAllocateStack<hkVector4>(iNumSpheres, nullptr);
                         sweepIn.m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
                         // The stack block is untyped memory the spheres are written to and read back as vectors.
                         pShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
@@ -781,11 +777,7 @@ void hk4dGskCollideCalcToi(
             const int32_t iNumSpheres = pSweepShapeA->getNumCollisionSpheresImpl();
             sweepIn2.m_allocatedNumVertices.m_storage = iNumSpheres;
             sweepIn2.m_numVertices.m_storage = iNumSpheres;
-            // EXE-INLINED none: hkAllocateStack<hkVector4>
-            hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-            void* pBlock = stack.m_next.m_storage;
-            stack.m_next.m_storage =
-                static_cast<char*>(pBlock) + ((iNumSpheres * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
+            void* pBlock = hkAllocateStack<hkVector4>(iNumSpheres, nullptr);
             sweepIn2.m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
             // The stack block is untyped memory the spheres are written to and read back as vectors.
             pSweepShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
@@ -800,9 +792,7 @@ void hk4dGskCollideCalcToi(
             if (sweepIn2.m_verticesA.m_storage) {
                 sweepOut.m_Rtoi.m_storage = 1.0f;
                 hk4dGskCollidePointsWithPlane(sweepIn2, tol, sweepOut);
-                // EXE-INLINED none: hkDeallocateStack<hkVector4>
-                hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-                    static_cast<char*>(static_cast<void*>(sweepIn2.m_verticesA.m_storage));
+                hkDeallocateStack(sweepIn2.m_verticesA.m_storage);
                 if (1.0f > sweepOut.m_Rtoi.m_storage) {
                     alignas(16) hkVector4 collidingPoint;
                     collidingPoint.setTransformedPos(wTa, sweepOut.m_collidingPoint);
@@ -858,9 +848,7 @@ void hk4dGskCollideCalcToi(
     }
 done:
     if (sweepIn.m_verticesA.m_storage) {
-        // EXE-INLINED none: hkDeallocateStack<hkVector4>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-            static_cast<char*>(static_cast<void*>(sweepIn.m_verticesA.m_storage));
+        hkDeallocateStack(sweepIn.m_verticesA.m_storage);
     }
     if (gsk.m_featureChange.m_storage) {
         gsk.exitAndExportCacheImpl(gskCache);
@@ -1215,11 +1203,7 @@ void findToi(
         const int32_t iNumSpheres = pSweepShapeA->getNumCollisionSpheresImpl();
         sweepIn2.m_allocatedNumVertices.m_storage = iNumSpheres;
         sweepIn2.m_numVertices.m_storage = iNumSpheres;
-        // EXE-INLINED none: hkAllocateStack<hkVector4>
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        void* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            static_cast<char*>(pBlock) + ((iNumSpheres * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
+        void* pBlock = hkAllocateStack<hkVector4>(iNumSpheres, nullptr);
         sweepIn2.m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
         // The stack block is untyped memory the spheres are written to and read back as vectors.
         pSweepShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
@@ -1235,9 +1219,7 @@ void findToi(
             alignas(16) hkp4dGskVertexCollidePointsOutput sweepOut;
             sweepOut.m_Rtoi.m_storage = 1.0f;
             hk4dGskCollidePointsWithPlane(sweepIn2, *tol, sweepOut);
-            // EXE-INLINED none: hkDeallocateStack<hkVector4>
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-                static_cast<char*>(static_cast<void*>(sweepIn2.m_verticesA.m_storage));
+            hkDeallocateStack(sweepIn2.m_verticesA.m_storage);
             if (1.0f > sweepOut.m_Rtoi.m_storage) {
                 alignas(16) hkVector4 collidingPoint;
                 collidingPoint.setTransformedPos(wTa, sweepOut.m_collidingPoint);

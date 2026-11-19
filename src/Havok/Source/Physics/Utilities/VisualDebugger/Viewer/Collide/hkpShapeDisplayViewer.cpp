@@ -246,11 +246,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
                             ".\\VisualDebugger\\Viewer\\Collide\\hkpShapeDisplayViewer.cpp", 316
                         );
                     }
-                    // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
-                    const int32_t last = --displayGeometries.m_size;
-                    if (last != i) {
-                        displayGeometries.m_data[i] = displayGeometries.m_data[last];
-                    }
+                    displayGeometries.removeAt(i);
                 }
             }
             // A display shape the entity was given for this shape is consumed here.
@@ -286,14 +282,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         }
     }
     const hkUlong id = hkpShapeDisplayViewer::getId(entity);
-    // EXE-INLINED none: hkArray<hkUlong>::pushBack
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    if (data->entitiesCreated.m_size ==
-        (data->entitiesCreated.m_capacityAndFlags & hkArrayBase<hkUlong>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router.m_heap, &data->entitiesCreated, sizeof(hkUlong));
-    }
-    data->entitiesCreated.m_data[data->entitiesCreated.m_size] = id;
-    ++data->entitiesCreated.m_size;
+    data->entitiesCreated.pushBack(id);
     // The SDK's shape id hint is the shape's address (hkUlong).
     const hkUlong shapeId = reinterpret_cast<hkUlong>(shape);
     if (geomId) {
@@ -358,14 +347,7 @@ void hkpShapeDisplayViewer::entityRemovedCallback(hkpEntity* entity) {
             m_instancedShapeToUsageCount.insert(shape, usageCount);
         }
     }
-    // EXE-INLINED none: hkArrayBase<hkUlong>::indexOf
-    int32_t index = -1;
-    for (int32_t i = 0; i < data->entitiesCreated.m_size; ++i) {
-        if (data->entitiesCreated.m_data[i] == id) {
-            index = i;
-            break;
-        }
-    }
+    int32_t index = data->entitiesCreated.indexOf(id);
     if (index >= 0) {
         data->entitiesCreated.removeAt(index);
     }
@@ -441,14 +423,7 @@ void hkpShapeDisplayViewer::addWorld(hkpWorld* world) {
         wed = mem;
     }
     wed->world = world;
-    // EXE-INLINED none: hkArray<hkpShapeDisplayViewer::WorldToEntityData*>::pushBack
-    hkMemoryRouter* router2 = &hkMemoryRouter::getInstance();
-    if (m_worldEntities.m_size ==
-        (m_worldEntities.m_capacityAndFlags & hkArrayBase<WorldToEntityData*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router2->m_heap, &m_worldEntities, sizeof(WorldToEntityData*));
-    }
-    m_worldEntities.m_data[m_worldEntities.m_size] = wed;
-    ++m_worldEntities.m_size;
+    m_worldEntities.pushBack(wed);
     for (int32_t i = 0; i < world->m_activeSimulationIslands.m_size; ++i) {
         hkInplaceArray<hkpEntity*, 1, hkContainerHeapAllocator>& entities =
             world->m_activeSimulationIslands.m_data[i]->m_entities;

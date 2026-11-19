@@ -120,17 +120,7 @@ void BSPortalGraph::AttachAlwaysRenderChild(NiAVObject* pkChild) {
         }
     }
     if (!pkPos) {
-        {
-            NiPointer<NiAVObject> spChild = pkChild;
-            // EXE-INLINED 0xA5A310
-            // The node comes from the node pool (0x43A010), called with the list's count field as its `this`: the
-            // exe treats that field as the allocator, which has no storage of its own.
-            NiTListItem<NiPointer<NiAVObject>>* pkNode = static_cast<NiTListItem<NiPointer<NiAVObject>>*>(
-                reinterpret_cast<NiTPointerAllocator<uint32_t>&>(kAttachAlwaysRenderQueue.m_uiCount).Allocate()
-            );
-            pkNode->m_element = spChild;
-            kAttachAlwaysRenderQueue.AddNodeTail(pkNode);
-        }
+        kAttachAlwaysRenderQueue.AddTail(pkChild);
         pkPos = kDetachAlwaysRenderQueue.m_pkHead;
         while (pkPos) {
             NiTListItem<NiPointer<NiAVObject>>* kPos = pkPos;
@@ -147,17 +137,7 @@ void BSPortalGraph::AttachAlwaysRenderChild(NiAVObject* pkChild) {
 
 void BSPortalGraph::DetachAlwaysRenderChild(NiAVObject* pkChild) {
     EnterCriticalSection(&BSPortalGraph::kAlwaysQueueCrit.CriticalSection);
-    {
-        NiPointer<NiAVObject> spChild = pkChild;
-        // EXE-INLINED 0xA5A310
-        // The node comes from the node pool (0x43A010), called with the list's count field as its `this`: the exe
-        // treats that field as the allocator, which has no storage of its own.
-        NiTListItem<NiPointer<NiAVObject>>* pkNode = static_cast<NiTListItem<NiPointer<NiAVObject>>*>(
-            reinterpret_cast<NiTPointerAllocator<uint32_t>&>(kDetachAlwaysRenderQueue.m_uiCount).Allocate()
-        );
-        pkNode->m_element = spChild;
-        kDetachAlwaysRenderQueue.AddNodeTail(pkNode);
-    }
+    kDetachAlwaysRenderQueue.AddTail(pkChild);
     NiTListItem<NiPointer<NiAVObject>>* pkPos = kAttachAlwaysRenderQueue.m_pkHead;
     while (pkPos) {
         NiTListItem<NiPointer<NiAVObject>>* kPos = pkPos;

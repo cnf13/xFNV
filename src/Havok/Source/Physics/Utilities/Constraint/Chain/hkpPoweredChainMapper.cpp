@@ -166,10 +166,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
     hkArray<int32_t> numTargets;
     {
         const int32_t numConstraints = allConstraints.m_size;
-        // EXE-INLINED none: hkArray<int>::setSize
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        numTargets._reserve(heap, numConstraints);
-        numTargets.m_size = numConstraints;
+        numTargets.setSize(numConstraints);
         hkString::memSet(numTargets.m_data, 0, numConstraints * static_cast<int32_t>(sizeof(int32_t)));
     }
     ConstraintIndexMap constraintToIndex;
@@ -226,15 +223,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
                 failed = true;
             }
             else {
-                {
-                    // EXE-INLINED none: hkArray<hkpConstraintChainInstance*>::pushBack
-                    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                    if (pMapper->m_chains.m_size == pMapper->m_chains.getCapacity()) {
-                        hkArrayUtil::_reserveMore(heap, &pMapper->m_chains, sizeof(hkpConstraintChainInstance*));
-                    }
-                    pMapper->m_chains.m_data[pMapper->m_chains.m_size] = pChain;
-                    pMapper->m_chains.m_size++;
-                }
+                pMapper->m_chains.pushBack(pChain);
                 for (int32_t j = 0; j < chainConstraints.m_size; ++j) {
                     const int32_t it = constraintToIndex.findKey(chainConstraints.m_data[j]);
                     if (!constraintToIndex.isValid(it)) {
@@ -314,14 +303,7 @@ hkpPoweredChainMapper* hkpPoweredChainMapper::buildChainMapper(
     if (unusedConstraints != nullptr) {
         for (int32_t i = 0; i < pMapper->m_links.m_size; ++i) {
             if (pMapper->m_links.m_data[i].m_numTargets == 0) {
-                hkpConstraintInstance* const* ppConstraint = &allConstraints.m_data[i];
-                // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (unusedConstraints->m_size == unusedConstraints->getCapacity()) {
-                    hkArrayUtil::_reserveMore(heap, unusedConstraints, sizeof(hkpConstraintInstance*));
-                }
-                unusedConstraints->m_data[unusedConstraints->m_size] = *ppConstraint;
-                unusedConstraints->m_size++;
+                unusedConstraints->pushBack(allConstraints.m_data[i]);
             }
         }
     }

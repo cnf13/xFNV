@@ -241,9 +241,6 @@ uint32_t hkMoppBvTreeShapeBase::queryAabbImpl(const hkAabb& aAabb, uint32_t* hit
     machine.queryAabb(&code, aabb, &primitives);
     // Equivalent to primitives.getSize(), read through the machine's pointer to the array.
     uint32_t uiNumHits = machine.m_primitives_out->m_size;
-    // The array's destructor.
-    // EXE-INLINED 0xC7B0F0
-    primitives.clearAndDeallocate();
     return uiNumHits;
 }
 

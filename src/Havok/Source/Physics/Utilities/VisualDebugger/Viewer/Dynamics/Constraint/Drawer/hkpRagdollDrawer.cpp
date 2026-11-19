@@ -147,40 +147,9 @@ void hkpRagdollDrawer::drawConstraint(
     planeGeometry.m_size = 0;
     planeGeometry.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
 
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacity =
-        static_cast<int32_t>(twistGeometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK);
-    if (capacity < 1) {
-        int32_t newCapacity = capacity * 2;
-        if (newCapacity <= 1) {
-            newCapacity = 1;
-        }
-        hkArrayUtil::_reserve(heap, &twistGeometry, newCapacity, sizeof(hkDisplayGeometry*));
-    }
-    twistGeometry.m_size = 1;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
-    heap = hkMemoryRouter::getInstance().m_heap;
-    capacity = static_cast<int32_t>(planeGeometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK);
-    if (capacity < 1) {
-        int32_t newCapacity = capacity * 2;
-        if (newCapacity <= 1) {
-            newCapacity = 1;
-        }
-        hkArrayUtil::_reserve(heap, &planeGeometry, newCapacity, sizeof(hkDisplayGeometry*));
-    }
-    planeGeometry.m_size = 1;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
-    heap = hkMemoryRouter::getInstance().m_heap;
-    capacity = static_cast<int32_t>(coneGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK);
-    if (capacity < 2) {
-        int32_t newCapacity = capacity * 2;
-        if (newCapacity <= 2) {
-            newCapacity = 2;
-        }
-        hkArrayUtil::_reserve(heap, &coneGeometries, newCapacity, sizeof(hkDisplayGeometry*));
-    }
-    coneGeometries.m_size = 2;
+    twistGeometry.setSize(1);
+    planeGeometry.setSize(1);
+    coneGeometries.setSize(2);
 
     twistGeometry.m_data[0] = &m_twistCone;
     coneGeometries.m_data[0] = &m_planeCone1;
@@ -191,30 +160,6 @@ void hkpRagdollDrawer::drawConstraint(
     const int32_t magenta = hkColor::rgbFromChars(0xFF, 0x00, 0xFF, 0xFF);
     displayHandler->displayGeometry(planeGeometry, magenta, id, tag);
 
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::clearAndDeallocate
-    heap = hkMemoryRouter::getInstance().m_heap;
-    planeGeometry.m_size = 0;
-    if (!(planeGeometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG)) {
-        heap->bufFree(
-            planeGeometry.m_data,
-            static_cast<int32_t>(
-                (planeGeometry.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) * 4
-            )
-        );
-    }
-    planeGeometry.m_data = nullptr;
-    planeGeometry.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::clearAndDeallocate
-    heap = hkMemoryRouter::getInstance().m_heap;
-    coneGeometries.m_size = 0;
-    if (!(coneGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG)) {
-        heap->bufFree(
-            coneGeometries.m_data,
-            static_cast<int32_t>(
-                (coneGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK) * 4
-            )
-        );
-    }
-    coneGeometries.m_data = nullptr;
-    coneGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
+    planeGeometry.clearAndDeallocate();
+    coneGeometries.clearAndDeallocate();
 }

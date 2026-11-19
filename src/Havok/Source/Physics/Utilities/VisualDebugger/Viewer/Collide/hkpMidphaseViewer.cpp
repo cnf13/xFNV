@@ -47,15 +47,7 @@ hkpMidphaseViewer::~hkpMidphaseViewer() {
 // and displays them in orange for this frame, under the viewer's timer.
 void hkpMidphaseViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpMidphaseViewer", this);
-    // EXE-INLINED none: hkArray<hkDisplayAABB>::clear
-    {
-        hkDisplayAABB* geometry = m_broadPhaseDisplayGeometries.m_data;
-        for (int32_t n = m_broadPhaseDisplayGeometries.m_size; n > 0; n--) {
-            geometry->~hkDisplayAABB();
-            ++geometry;
-        }
-        m_broadPhaseDisplayGeometries.m_size = 0;
-    }
+    m_broadPhaseDisplayGeometries.clear();
 
     const hkArray<hkpSimulationIsland*, hkContainerHeapAllocator>* islands = &world->m_activeSimulationIslands;
     for (int32_t pass = 2; pass != 0; pass--) {
@@ -125,45 +117,13 @@ void hkpMidphaseViewer::postSimulationCallback(hkpWorld* world) {
     }
 
     int32_t numGeometries = m_broadPhaseDisplayGeometries.m_size;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::hkArray(int)
-    hkArrayBase<hkDisplayGeometry*> displayGeometries;
-    displayGeometries.m_data = nullptr;
-    displayGeometries.m_size = 0;
-    displayGeometries.m_capacityAndFlags = hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    hkDisplayGeometry** data = nullptr;
-    int32_t count = numGeometries;
-    if (numGeometries) {
-        data = heap->_bufAlloc<hkDisplayGeometry*>(count);
-    }
-    displayGeometries.m_data = data;
-    displayGeometries.m_size = count;
-    displayGeometries.m_capacityAndFlags = count ? count : hkArrayBase<hkDisplayGeometry*>::DONT_DEALLOCATE_FLAG;
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::setSize
-    hkMemoryAllocator* reserveHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t geometryCapacity = displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK;
-    if (geometryCapacity < numGeometries) {
-        int32_t doubled = 2 * geometryCapacity;
-        hkArrayUtil::_reserve(
-            *reserveHeap, &displayGeometries, numGeometries < doubled ? doubled : numGeometries,
-            static_cast<int32_t>(sizeof(hkDisplayGeometry*))
-        );
-    }
-    displayGeometries.m_size = numGeometries;
+    hkArray<hkDisplayGeometry*> displayGeometries(numGeometries);
+    displayGeometries.setSize(numGeometries);
     for (int32_t i = 0; i < numGeometries; i++) {
         displayGeometries.m_data[i] = &m_broadPhaseDisplayGeometries.m_data[i];
     }
     m_displayHandler->displayGeometry(displayGeometries, static_cast<int32_t>(hkColor::ORANGE), 0, m_tag);
     HK_TIMER_END();
-    // EXE-INLINED none: hkArray<hkDisplayGeometry*>::~hkArray
-    hkMemoryAllocator* freeHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacityAndFlags = displayGeometries.m_capacityAndFlags;
-    displayGeometries.m_size = 0;
-    if (capacityAndFlags >= 0) {
-        freeHeap->_bufFree<hkDisplayGeometry*>(
-            displayGeometries.m_data, capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK
-        );
-    }
 }
 
 void hkpMidphaseViewer::worldAddedCallback(hkpWorld* world) {

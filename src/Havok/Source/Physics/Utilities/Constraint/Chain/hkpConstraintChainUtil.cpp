@@ -208,25 +208,8 @@ void hkpConstraintChainUtil::getAdjointEntities(
         if (pEntityA == entity || pInstance->m_entities[1] == entity) {
             hkpEntity* pOther =
                 hkSelectOther<hkpEntity*>(const_cast<hkpEntity*>(entity), pEntityA, pInstance->m_entities[1]);
-            {
-                // EXE-INLINED none: hkArray<hkpEntity*>::pushBack
-                hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-                if (entitiesOut.m_size == (entitiesOut.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*pRouter->m_heap, &entitiesOut, sizeof(hkpEntity*));
-                }
-                entitiesOut.m_data[entitiesOut.m_size] = pOther;
-                entitiesOut.m_size += 1;
-            }
-            {
-                // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-                hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-                if (constraintsOut.m_size ==
-                    (constraintsOut.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*pRouter->m_heap, &constraintsOut, sizeof(hkpConstraintInstance*));
-                }
-                constraintsOut.m_data[constraintsOut.m_size] = pInstance;
-                constraintsOut.m_size += 1;
-            }
+            entitiesOut.pushBack(pOther);
+            constraintsOut.pushBack(pInstance);
         }
     }
 }
@@ -275,14 +258,7 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
         for (int32_t e = 0; e < 2; ++e) {
             if (!entityToIndex.isValid(entityToIndex.findKey(pConstraint->m_entities[e]))) {
                 entityToIndex.insert(pConstraint->m_entities[e], entities.m_size);
-                hkpEntity* pEntity = pConstraint->m_entities[e];
-                // EXE-INLINED none: hkArray<hkpEntity*>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (entities.m_size == entities.getCapacity()) {
-                    hkArrayUtil::_reserveMore(heap, &entities, sizeof(hkpEntity*));
-                }
-                entities.m_data[entities.m_size] = pEntity;
-                entities.m_size++;
+                entities.pushBack(pConstraint->m_entities[e]);
             }
         }
     }
@@ -313,24 +289,8 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
     info.m_data[indexB].m_parent = -1;
     info.m_data[indexB].m_constraint = nullptr;
     info.m_data[indexB].m_depth = 0;
-    {
-        // EXE-INLINED none: hkArray<int>::pushBack
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        if (queues[0].m_size == queues[0].getCapacity()) {
-            hkArrayUtil::_reserveMore(heap, &queues[0], sizeof(int32_t));
-        }
-        queues[0].m_data[queues[0].m_size] = indexA;
-        queues[0].m_size++;
-    }
-    {
-        // EXE-INLINED none: hkArray<int>::pushBack
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        if (queues[1].m_size == queues[1].getCapacity()) {
-            hkArrayUtil::_reserveMore(heap, &queues[1], sizeof(int32_t));
-        }
-        queues[1].m_data[queues[1].m_size] = indexB;
-        queues[1].m_size++;
-    }
+    queues[0].pushBack(indexA);
+    queues[1].pushBack(indexB);
 
     // Where the searches meet: the length of each side's part of the path, its last body and the constraint between
     // the two parts.
@@ -369,15 +329,7 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
                 pLink = adjConstraints.m_data[j];
                 break;
             }
-            {
-                // EXE-INLINED none: hkArray<int>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (queues[side].m_size == queues[side].getCapacity()) {
-                    hkArrayUtil::_reserveMore(heap, &queues[side], sizeof(int32_t));
-                }
-                queues[side].m_data[queues[side].m_size] = next;
-                queues[side].m_size++;
-            }
+            queues[side].pushBack(next);
             info.m_data[next].m_side = side;
             info.m_data[next].m_parent = queues[side].m_data[queuePos[side]];
             info.m_data[next].m_constraint = adjConstraints.m_data[j];
@@ -392,19 +344,9 @@ hkResult hkpConstraintChainUtil::findConstraintLinkBetweenEntities(
         // constraint sits between its two bodies, the last slot (side 1's end, which has none) dropped.
         const int32_t numPathEntities = pathLength[0] + pathLength[1];
         entitiesOut.m_size = 0;
-        {
-            // EXE-INLINED none: hkArray<hkpEntity*>::setSize
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            entitiesOut._reserve(heap, numPathEntities);
-            entitiesOut.m_size = numPathEntities;
-        }
+        entitiesOut.setSize(numPathEntities);
         constraintsOut.m_size = 0;
-        {
-            // EXE-INLINED none: hkArray<hkpConstraintInstance*>::setSize
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            constraintsOut._reserve(heap, numPathEntities);
-            constraintsOut.m_size = numPathEntities;
-        }
+        constraintsOut.setSize(numPathEntities);
         int32_t node = meetIndex[0];
         for (int32_t i = pathLength[0] - 1; i > 0; --i) {
             entitiesOut.m_data[i] = entities.m_data[node];

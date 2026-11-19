@@ -4,6 +4,7 @@
 #include "BSCore/TLSData.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkSerializable.h"
+#include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
@@ -57,12 +58,7 @@ void bhkMotorAction::LoadBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkMotorActionCinfo& rInfo = static_cast<hkMotorActionCinfo&>(CreateCinfo(bCreated));
-        // EXE-INLINED none: bhkStream::Endian
-        uint32_t* puiAxis = reinterpret_cast<uint32_t*>(&rInfo.m_axis);
-        puiAxis[0] = __builtin_bswap32(puiAxis[0]);
-        puiAxis[1] = __builtin_bswap32(puiAxis[1]);
-        puiAxis[2] = __builtin_bswap32(puiAxis[2]);
-        puiAxis[3] = __builtin_bswap32(puiAxis[3]);
+        bhkStream::Endian(rInfo.m_axis);
         // EXE-INLINED none: BSEndian
         uint32_t* puiSpinRate = reinterpret_cast<uint32_t*>(&rInfo.m_spinRate);
         *puiSpinRate = __builtin_bswap32(*puiSpinRate);
@@ -78,15 +74,10 @@ void bhkMotorAction::LoadBinary(NiStream& arStream) {
 void bhkMotorAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkMotorActionCinfo& rInfo = static_cast<hkMotorActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiAxis = reinterpret_cast<uint32_t*>(&rInfo.m_axis);
     uint32_t* puiSpinRate = reinterpret_cast<uint32_t*>(&rInfo.m_spinRate);
     uint32_t* puiGain = reinterpret_cast<uint32_t*>(&rInfo.m_gain);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiAxis[0] = __builtin_bswap32(puiAxis[0]);
-        puiAxis[1] = __builtin_bswap32(puiAxis[1]);
-        puiAxis[2] = __builtin_bswap32(puiAxis[2]);
-        puiAxis[3] = __builtin_bswap32(puiAxis[3]);
+        bhkStream::Endian(rInfo.m_axis);
         // EXE-INLINED none: BSEndian
         *puiSpinRate = __builtin_bswap32(*puiSpinRate);
         // EXE-INLINED none: BSEndian
@@ -94,11 +85,7 @@ void bhkMotorAction::SaveBinary(NiStream& arStream) {
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiAxis[0] = __builtin_bswap32(puiAxis[0]);
-        puiAxis[1] = __builtin_bswap32(puiAxis[1]);
-        puiAxis[2] = __builtin_bswap32(puiAxis[2]);
-        puiAxis[3] = __builtin_bswap32(puiAxis[3]);
+        bhkStream::Endian(rInfo.m_axis);
         // EXE-INLINED none: BSEndian
         *puiSpinRate = __builtin_bswap32(*puiSpinRate);
         // EXE-INLINED none: BSEndian

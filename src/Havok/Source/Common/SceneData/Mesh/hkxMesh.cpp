@@ -112,24 +112,10 @@ void hkxMesh::appendGeometry(
         int32_t indexOffset = geometryInOut.m_vertices.m_size;
         if (materialsInOut) {
             hkxMaterial* pMaterial = m_sections.m_data[i].val()->m_material.val();
-            // EXE-INLINED none: hkArray<hkxMaterial*, hkContainerHeapAllocator>::indexOf
-            int32_t found = -1;
-            for (int32_t j = 0; j < materialsInOut->m_size; ++j) {
-                if (materialsInOut->m_data[j] == pMaterial) {
-                    found = j;
-                    break;
-                }
-            }
-            materialIndex = found;
-            if (found == -1) {
+            materialIndex = materialsInOut->indexOf(pMaterial);
+            if (materialIndex == -1) {
                 materialIndex = materialsInOut->m_size;
-                // EXE-INLINED none: hkArray<hkxMaterial*, hkContainerHeapAllocator>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (materialsInOut->m_size ==
-                    (materialsInOut->m_capacityAndFlags & hkArrayBase<hkxMaterial*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_heap, materialsInOut, sizeof(hkxMaterial*));
-                }
-                materialsInOut->m_data[materialsInOut->m_size++] = pMaterial;
+                materialsInOut->pushBack(pMaterial);
             }
         }
         hkGeometry geometry;

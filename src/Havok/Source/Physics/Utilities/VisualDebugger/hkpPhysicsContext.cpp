@@ -249,15 +249,7 @@ void hkpPhysicsContext::removeFromInspection(hkpWorld* w) {
         }
         if (m_owner && iWorld != -1) {
             m_owner->removeTrackedObject(&m_worldCinfos.m_data[iWorld]);
-            // EXE-INLINED none: hkArrayBase<hkpWorldCinfo>::removeAt (the element's destructor through its vtable)
-            hkpWorldCinfo* pCinfo = &m_worldCinfos.m_data[iWorld];
-            pCinfo->~hkpWorldCinfo();
-            --m_worldCinfos.m_size;
-            if (m_worldCinfos.m_size != iWorld) {
-                hkMemUtil::memCpyOneAligned<sizeof(hkpWorldCinfo), alignof(hkpWorldCinfo)>(
-                    &m_worldCinfos.m_data[iWorld], &m_worldCinfos.m_data[m_worldCinfos.m_size]
-                );
-            }
+            m_worldCinfos.removeAt(iWorld);
         }
         hkpPhysicsSystem* pSystem = w->getWorldAsOneSystem();
         for (int32_t i = 0; i < pSystem->m_rigidBodies.m_size; ++i) {

@@ -64,12 +64,7 @@ void* hkDeepCopier::deepCopy(
     // The objects still to copy, with their classes; dataIn first.
     hkArray<hkVariant> todo;
     {
-        // EXE-INLINED none: hkArray<hkVariant>::expandOne
-        hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-        if (todo.m_size == todo.getCapacity()) {
-            hkArrayUtil::_reserveMore(kHeap, &todo, sizeof(hkVariant));
-        }
-        hkVariant& v = todo.m_data[todo.m_size++];
+        hkVariant& v = todo.expandOne();
         v.m_object = const_cast<void*>(dataIn);
         v.m_class = &klassIn;
     }
@@ -96,21 +91,7 @@ void* hkDeepCopier::deepCopy(
         }
         const int32_t copyOffset = buffer.getSize();
         const char* pClassName = pKlass->getName();
-        {
-            // EXE-INLINED none: hkArray<Copy>::pushBack
-            hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-            if (copies.m_size == copies.getCapacity()) {
-                hkArrayUtil::_reserveMore(kHeap, &copies, sizeof(Copy));
-            }
-            // The record is constructed in place (placement new), which is tested for null.
-            Copy* pCopy = copies.m_data + copies.m_size;
-            if (pCopy) {
-                pCopy->copyOffset = copyOffset;
-                pCopy->original = pOriginal;
-                pCopy->className = pClassName;
-            }
-            ++copies.m_size;
-        }
+        copies.pushBack(Copy{copyOffset, pOriginal, pClassName});
         // Calls hkObjectCopier's own copyObject directly.
         copier.hkObjectCopier::copyObject(pOriginal, *pKlass, out.getStreamWriter(), *pKlass, reloc);
 
@@ -129,12 +110,8 @@ void* hkDeepCopier::deepCopy(
                 reloc.m_global.m_data[i].m_toAddress = pAlreadyCopied;
             }
             else if (!done.isValid(done.findKey(pTo))) {
-                // EXE-INLINED none: hkArray<hkVariant>::expandOne
-                hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-                if (todo.m_size == todo.getCapacity()) {
-                    hkArrayUtil::_reserveMore(kHeap, &todo, sizeof(hkVariant));
-                }
-                hkVariant& v = todo.m_data[todo.m_size++];
+                hkVariant& v = todo.expandOne();
+
                 v.m_object = pTo;
                 v.m_class = pToClass;
             }

@@ -153,14 +153,7 @@ void hkpMoppFindAllVirtualMachine::queryOnTree(
             addTerminal:
                 {
                     const uint32_t id = scaledQuery->m_primitiveOffset + terminal;
-                    hkArray<hkpMoppPrimitiveInfo>* primitives = m_primitives_out;
-                    // EXE-INLINED none: hkArray<hkpMoppPrimitiveInfo>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(primitives);
-                    if (primitives->m_size ==
-                        (primitives->m_capacityAndFlags & hkArrayBase<hkpMoppPrimitiveInfo>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(alloc, primitives, sizeof(hkpMoppPrimitiveInfo));
-                    }
-                    primitives->m_data[primitives->m_size++].ID = id;
+                    m_primitives_out->pushBack(hkpMoppPrimitiveInfo{id});
                     return;
                 }
             case 96:
@@ -329,14 +322,7 @@ void hkpMoppFindAllVirtualMachine::queryOnTreeLeft(
             addTerminal:
                 {
                     const uint32_t id = scaledQuery->m_primitiveOffset + terminal;
-                    hkArray<hkpMoppPrimitiveInfo>* primitives = m_primitives_out;
-                    // EXE-INLINED none: hkArray<hkpMoppPrimitiveInfo>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(primitives);
-                    if (primitives->m_size ==
-                        (primitives->m_capacityAndFlags & hkArrayBase<hkpMoppPrimitiveInfo>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(alloc, primitives, sizeof(hkpMoppPrimitiveInfo));
-                    }
-                    primitives->m_data[primitives->m_size++].ID = id;
+                    m_primitives_out->pushBack(hkpMoppPrimitiveInfo{id});
                     return;
                 }
             case 96:
@@ -506,14 +492,7 @@ void hkpMoppFindAllVirtualMachine::queryOnTreeRight(
             addTerminal:
                 {
                     const uint32_t id = scaledQuery->m_primitiveOffset + terminal;
-                    hkArray<hkpMoppPrimitiveInfo>* primitives = m_primitives_out;
-                    // EXE-INLINED none: hkArray<hkpMoppPrimitiveInfo>::pushBack
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(primitives);
-                    if (primitives->m_size ==
-                        (primitives->m_capacityAndFlags & hkArrayBase<hkpMoppPrimitiveInfo>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(alloc, primitives, sizeof(hkpMoppPrimitiveInfo));
-                    }
-                    primitives->m_data[primitives->m_size++].ID = id;
+                    m_primitives_out->pushBack(hkpMoppPrimitiveInfo{id});
                     return;
                 }
             case 96:

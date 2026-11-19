@@ -184,10 +184,7 @@ void Tile::Value::CalculateValue(bool abForceUpdate) {
             eType = NiFastFloatToInt(pAction->QFloat());
             fOperand = this->fValue;
             this->fValue = fSaved;
-            if (kStack.iSize != 0) {
-                // EXE-INLINED none: BSSimpleArray<float,1024> pop (an empty one-item destruct loop, then the count)
-                --kStack.iSize;
-            }
+            kStack.RemoveLast();
         }
         switch (eType) {
             case kTileValue_Copy:
@@ -846,12 +843,9 @@ void Tile::RecursiveColorUpdate(int32_t aiColorID, float afInheritedVal) {
     if (static_cast<double>(fColor) == static_cast<double>(aiColorID)) {
         this->AddNeedsUpdate(CHANGE_COLOR);
     }
-    // EXE-INLINED none: NiTPointerListBase<Tile*>::GetHeadPos / GetNext
-    NiTListItem<Tile*>* pPos = this->xChildren.m_pkHead;
+    NiTListItem<Tile*>* pPos = this->xChildren.GetHeadPos();
     while (pPos) {
-        Tile** ppChild = &pPos->m_element;
-        pPos = pPos->m_pkNext;
-        (*ppChild)->RecursiveColorUpdate(aiColorID, fColor);
+        this->xChildren.GetNext(pPos)->RecursiveColorUpdate(aiColorID, fColor);
     }
     Tile::Unlock();
 }
@@ -871,12 +865,9 @@ void Tile::RecursiveColorUpdate(BSSimpleList<int32_t>* pColorIDList, float afInh
     if (pIter) {
         this->AddNeedsUpdate(CHANGE_COLOR);
     }
-    // EXE-INLINED none: NiTPointerListBase<Tile*>::GetHeadPos / GetNext
-    NiTListItem<Tile*>* pPos = this->xChildren.m_pkHead;
+    NiTListItem<Tile*>* pPos = this->xChildren.GetHeadPos();
     while (pPos) {
-        Tile** ppChild = &pPos->m_element;
-        pPos = pPos->m_pkNext;
-        (*ppChild)->RecursiveColorUpdate(pColorIDList, fColor);
+        this->xChildren.GetNext(pPos)->RecursiveColorUpdate(pColorIDList, fColor);
     }
     Tile::Unlock();
 }

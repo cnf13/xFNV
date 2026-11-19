@@ -30,16 +30,7 @@ hkDisplayBox::~hkDisplayBox() {}
 // Fills lines with the box's 12 edges, two end points each: the 8 corners (half extents with the signs of the
 // corner index's bits, transformed), then each corner joined to every corner differing from it in one bit.
 void hkDisplayBox::getWireframeGeometry(hkArrayBase<hkVector4>& lines, hkMemoryAllocator& a) {
-    // EXE-INLINED none: hkArrayBase<hkVector4>::_setSize
-    int32_t capacity = static_cast<int32_t>(lines.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-    if (capacity < 24) {
-        int32_t newCapacity = capacity + capacity;
-        if (newCapacity <= 24) {
-            newCapacity = 24;
-        }
-        hkArrayUtil::_reserve(&a, &lines, newCapacity, sizeof(hkVector4));
-    }
-    lines.m_size = 24;
+    lines._setSize(a, 24);
 
     alignas(16) hkVector4 vertices[8];
     for (int32_t i = 0; i < 8; i++) {

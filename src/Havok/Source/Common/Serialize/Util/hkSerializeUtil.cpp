@@ -213,28 +213,14 @@ int32_t readStreamToBuffer(hkStreamReader* reader, hkArray<char, hkContainerTemp
     if (reader->seekTellSupported().m_bool) {
         reader->seek(0, hkStreamReader::STREAM_END);
         int32_t size = reader->tell();
-        // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::setSize
-        hkMemoryAllocator* temp = hkMemoryRouter::getInstance().m_temp;
-        int32_t capacity = buf->m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK;
-        if (capacity < size) {
-            int32_t doubled = 2 * capacity;
-            hkArrayUtil::_reserve(*temp, buf, size < doubled ? doubled : size, sizeof(char));
-        }
-        buf->m_size = size;
+        buf->setSize(size);
         reader->seek(0, hkStreamReader::STREAM_SET);
         return reader->read(buf->m_data, buf->m_size);
     }
     const int32_t chunkSize = 0x20000;
     int32_t numRead;
     do {
-        // EXE-INLINED none: hkArray<char, hkContainerTempAllocator>::reserve
-        int32_t wanted = buf->m_size + chunkSize;
-        hkMemoryAllocator* temp = hkMemoryRouter::getInstance().m_temp;
-        int32_t capacity = buf->m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK;
-        if (capacity < wanted) {
-            int32_t doubled = 2 * capacity;
-            hkArrayUtil::_reserve(*temp, buf, wanted < doubled ? doubled : wanted, sizeof(char));
-        }
+        buf->reserve(buf->m_size + chunkSize);
         numRead = reader->read(buf->m_data + buf->m_size, chunkSize);
         buf->m_size += numRead;
     }

@@ -242,7 +242,6 @@ void hkaSkeletonMapperUtils::computeMappingTransform(
     }
 }
 
-// A simple or chain mapping is copied into its array member by member, a chain mapping through ChainMapping::operator=.
 // The bone names are written with hkOstream::operator<<(const hkStringPtr&).
 void hkaSkeletonMapperUtils::createMapping(
     const hkaSkeletonMapperUtils::Params& originalParams,
@@ -260,38 +259,8 @@ void hkaSkeletonMapperUtils::createMapping(
         originalParams.m_skeletonA->m_bones.m_size > originalParams.m_skeletonB->m_bones.m_size) {
         params.m_skeletonA = originalParams.m_skeletonB;
         params.m_skeletonB = originalParams.m_skeletonA;
-        {
-            // EXE-INLINED none: hkArray<UserMapping>::operator=
-            hkArray<UserMapping>& kDst = params.m_userMappingsAtoB;
-            const hkArray<UserMapping>& kSrc = originalParams.m_userMappingsBtoA;
-            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kDst);
-            const int32_t iNewSize = kSrc.m_size;
-            const int32_t iCopied = iNewSize > kDst.m_size ? kDst.m_size : iNewSize;
-            kDst._reserve(alloc, iNewSize);
-            for (int32_t i = 0; i < iCopied; ++i) {
-                kDst.m_data[i] = kSrc.m_data[i];
-            }
-            for (int32_t i = iCopied; i < iNewSize; ++i) {
-                kDst.m_data[i] = kSrc.m_data[i];
-            }
-            kDst.m_size = iNewSize;
-        }
-        {
-            // EXE-INLINED none: hkArray<UserMapping>::operator=
-            hkArray<UserMapping>& kDst = params.m_userMappingsBtoA;
-            const hkArray<UserMapping>& kSrc = originalParams.m_userMappingsAtoB;
-            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kDst);
-            const int32_t iNewSize = kSrc.m_size;
-            const int32_t iCopied = iNewSize > kDst.m_size ? kDst.m_size : iNewSize;
-            kDst._reserve(alloc, iNewSize);
-            for (int32_t i = 0; i < iCopied; ++i) {
-                kDst.m_data[i] = kSrc.m_data[i];
-            }
-            for (int32_t i = iCopied; i < iNewSize; ++i) {
-                kDst.m_data[i] = kSrc.m_data[i];
-            }
-            kDst.m_size = iNewSize;
-        }
+        params.m_userMappingsAtoB = originalParams.m_userMappingsBtoA;
+        params.m_userMappingsBtoA = originalParams.m_userMappingsAtoB;
         pAToB = &originalBToA;
         pBToA = &originalAToB;
     }
@@ -414,24 +383,7 @@ void hkaSkeletonMapperUtils::createMapping(
                 type, poseA, boneA, poseB, boneB, kMapping.m_aFromBTransform, params.m_positionMatchTolerance,
                 params.m_rotationMatchTolerance
             );
-            {
-                // EXE-INLINED none: hkArray<SimpleMapping>::pushBack
-                hkArray<hkaSkeletonMapperData::SimpleMapping>& kMappings = pAToB->m_simpleMappings;
-                hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kMappings);
-                if (kMappings.m_size == kMappings.getCapacity()) {
-                    hkArrayUtil::_reserveMore(alloc, &kMappings, sizeof(hkaSkeletonMapperData::SimpleMapping));
-                }
-                hkaSkeletonMapperData::SimpleMapping* pNew = kMappings.m_data + kMappings.m_size;
-                if (pNew) {
-                    pNew->m_boneA = kMapping.m_boneA;
-                    pNew->m_boneB = kMapping.m_boneB;
-                    pNew->m_aFromBTransform.m_translation.m_quad = kMapping.m_aFromBTransform.m_translation.m_quad;
-                    pNew->m_aFromBTransform.m_rotation.m_vec.m_quad =
-                        kMapping.m_aFromBTransform.m_rotation.m_vec.m_quad;
-                    pNew->m_aFromBTransform.m_scale.m_quad = kMapping.m_aFromBTransform.m_scale.m_quad;
-                }
-                kMappings.m_size++;
-            }
+            pAToB->m_simpleMappings.pushBack(kMapping);
             bonesBMapped.m_data[boneB] = boneA;
         }
 
@@ -458,24 +410,7 @@ void hkaSkeletonMapperUtils::createMapping(
             kMapping.m_boneA = boneB;
             kMapping.m_boneB = boneA;
             computeMappingTransform(type, poseB, boneB, poseA, boneA, kMapping.m_aFromBTransform, 1e-05f, 1.0f);
-            {
-                // EXE-INLINED none: hkArray<SimpleMapping>::pushBack
-                hkArray<hkaSkeletonMapperData::SimpleMapping>& kMappings = pBToA->m_simpleMappings;
-                hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kMappings);
-                if (kMappings.m_size == kMappings.getCapacity()) {
-                    hkArrayUtil::_reserveMore(alloc, &kMappings, sizeof(hkaSkeletonMapperData::SimpleMapping));
-                }
-                hkaSkeletonMapperData::SimpleMapping* pNew = kMappings.m_data + kMappings.m_size;
-                if (pNew) {
-                    pNew->m_boneA = kMapping.m_boneA;
-                    pNew->m_boneB = kMapping.m_boneB;
-                    pNew->m_aFromBTransform.m_translation.m_quad = kMapping.m_aFromBTransform.m_translation.m_quad;
-                    pNew->m_aFromBTransform.m_rotation.m_vec.m_quad =
-                        kMapping.m_aFromBTransform.m_rotation.m_vec.m_quad;
-                    pNew->m_aFromBTransform.m_scale.m_quad = kMapping.m_aFromBTransform.m_scale.m_quad;
-                }
-                kMappings.m_size++;
-            }
+            pBToA->m_simpleMappings.pushBack(kMapping);
             bonesAMapped.m_data[boneA] = boneB;
         }
 
@@ -594,32 +529,8 @@ void hkaSkeletonMapperUtils::createMapping(
                         type, params.m_skeletonB, poseB, startB, endB, params.m_skeletonA, poseA, startA, endA,
                         kChainBToA
                     );
-                    {
-                        // EXE-INLINED none: hkArray<ChainMapping>::pushBack
-                        hkArray<hkaSkeletonMapperData::ChainMapping>& kChains = pBToA->m_chainMappings;
-                        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kChains);
-                        if (kChains.m_size == kChains.getCapacity()) {
-                            hkArrayUtil::_reserveMore(alloc, &kChains, sizeof(hkaSkeletonMapperData::ChainMapping));
-                        }
-                        hkaSkeletonMapperData::ChainMapping* pNew = kChains.m_data + kChains.m_size;
-                        if (pNew) {
-                            *pNew = kChainBToA;
-                        }
-                        kChains.m_size++;
-                    }
-                    {
-                        // EXE-INLINED none: hkArray<ChainMapping>::pushBack
-                        hkArray<hkaSkeletonMapperData::ChainMapping>& kChains = pAToB->m_chainMappings;
-                        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kChains);
-                        if (kChains.m_size == kChains.getCapacity()) {
-                            hkArrayUtil::_reserveMore(alloc, &kChains, sizeof(hkaSkeletonMapperData::ChainMapping));
-                        }
-                        hkaSkeletonMapperData::ChainMapping* pNew = kChains.m_data + kChains.m_size;
-                        if (pNew) {
-                            *pNew = kChainAToB;
-                        }
-                        kChains.m_size++;
-                    }
+                    pBToA->m_chainMappings.pushBack(kChainBToA);
+                    pAToB->m_chainMappings.pushBack(kChainAToB);
                     for (int32_t i = 0; i < chainA.m_size; ++i) {
                         bonesAMapped.m_data[chainA.m_data[i]] = -2;
                     }
@@ -732,19 +643,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     kChainMapping.m_startAFromBTransform.setMulInverseMul(
                         modelPoseA.m_data[startA], modelPoseB.m_data[startB]
                     );
-                    {
-                        // EXE-INLINED none: hkArray<ChainMapping>::pushBack
-                        hkArray<hkaSkeletonMapperData::ChainMapping>& kChains = pAToB->m_chainMappings;
-                        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kChains);
-                        if (kChains.m_size == kChains.getCapacity()) {
-                            hkArrayUtil::_reserveMore(alloc, &kChains, sizeof(hkaSkeletonMapperData::ChainMapping));
-                        }
-                        hkaSkeletonMapperData::ChainMapping* pNew = kChains.m_data + kChains.m_size;
-                        if (pNew) {
-                            *pNew = kChainMapping;
-                        }
-                        kChains.m_size++;
-                    }
+                    pAToB->m_chainMappings.pushBack(kChainMapping);
                     kChainMapping.m_startBoneA = startB;
                     kChainMapping.m_endBoneA = endB;
                     kChainMapping.m_startBoneB = startA;
@@ -755,19 +654,7 @@ void hkaSkeletonMapperUtils::createMapping(
                     kChainMapping.m_startAFromBTransform.setMulInverseMul(
                         modelPoseB.m_data[startB], modelPoseA.m_data[startA]
                     );
-                    {
-                        // EXE-INLINED none: hkArray<ChainMapping>::pushBack
-                        hkArray<hkaSkeletonMapperData::ChainMapping>& kChains = pBToA->m_chainMappings;
-                        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kChains);
-                        if (kChains.m_size == kChains.getCapacity()) {
-                            hkArrayUtil::_reserveMore(alloc, &kChains, sizeof(hkaSkeletonMapperData::ChainMapping));
-                        }
-                        hkaSkeletonMapperData::ChainMapping* pNew = kChains.m_data + kChains.m_size;
-                        if (pNew) {
-                            *pNew = kChainMapping;
-                        }
-                        kChains.m_size++;
-                    }
+                    pBToA->m_chainMappings.pushBack(kChainMapping);
                     for (int32_t i = 1; i < chainA.m_size - 1; ++i) {
                         bonesAMapped.m_data[chainA.m_data[i]] = -2;
                     }
@@ -803,14 +690,7 @@ void hkaSkeletonMapperUtils::createMapping(
                                 params.m_skeletonA->m_bones.m_data[a].m_name.cString(),
                                 params.m_skeletonB->m_bones.m_data[b].m_name.cString()
                             ) == 0) {
-                            // EXE-INLINED none: hkArray<BonePair>::pushBack
-                            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&pairs);
-                            if (pairs.m_size == pairs.getCapacity()) {
-                                hkArrayUtil::_reserveMore(alloc, &pairs, sizeof(BonePair));
-                            }
-                            BonePair& kPair = pairs.m_data[pairs.m_size++];
-                            kPair.m_boneA = a;
-                            kPair.m_boneB = b;
+                            pairs.pushBack(BonePair{a, b});
                         }
                     }
                 }
@@ -831,14 +711,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         }
                     }
                     if (fClosestDistSq < fToleranceSq) {
-                        // EXE-INLINED none: hkArray<BonePair>::pushBack
-                        hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&pairs);
-                        if (pairs.m_size == pairs.getCapacity()) {
-                            hkArrayUtil::_reserveMore(alloc, &pairs, sizeof(BonePair));
-                        }
-                        BonePair& kPair = pairs.m_data[pairs.m_size++];
-                        kPair.m_boneA = a;
-                        kPair.m_boneB = closest;
+                        pairs.pushBack(BonePair{a, closest});
                     }
                 }
             }
@@ -857,24 +730,7 @@ void hkaSkeletonMapperUtils::createMapping(
                 computeMappingTransform(
                     type, poseA, boneA, poseB, boneB, kMapping.m_aFromBTransform, params.m_positionMatchTolerance, 1.0f
                 );
-                {
-                    // EXE-INLINED none: hkArray<SimpleMapping>::pushBack
-                    hkArray<hkaSkeletonMapperData::SimpleMapping>& kMappings = pAToB->m_simpleMappings;
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kMappings);
-                    if (kMappings.m_size == kMappings.getCapacity()) {
-                        hkArrayUtil::_reserveMore(alloc, &kMappings, sizeof(hkaSkeletonMapperData::SimpleMapping));
-                    }
-                    hkaSkeletonMapperData::SimpleMapping* pNew = kMappings.m_data + kMappings.m_size;
-                    if (pNew) {
-                        pNew->m_boneA = kMapping.m_boneA;
-                        pNew->m_boneB = kMapping.m_boneB;
-                        pNew->m_aFromBTransform.m_translation.m_quad = kMapping.m_aFromBTransform.m_translation.m_quad;
-                        pNew->m_aFromBTransform.m_rotation.m_vec.m_quad =
-                            kMapping.m_aFromBTransform.m_rotation.m_vec.m_quad;
-                        pNew->m_aFromBTransform.m_scale.m_quad = kMapping.m_aFromBTransform.m_scale.m_quad;
-                    }
-                    kMappings.m_size++;
-                }
+                pAToB->m_simpleMappings.pushBack(kMapping);
                 kMapping.m_aFromBTransform.m_translation.setZero4();
                 kMapping.m_aFromBTransform.m_rotation.m_vec.m_quad = hkQuadReal0001;
                 kMapping.m_aFromBTransform.m_scale.setAll(1.0f);
@@ -883,24 +739,7 @@ void hkaSkeletonMapperUtils::createMapping(
                 computeMappingTransform(
                     type, poseB, boneB, poseA, boneA, kMapping.m_aFromBTransform, params.m_positionMatchTolerance, 1.0f
                 );
-                {
-                    // EXE-INLINED none: hkArray<SimpleMapping>::pushBack
-                    hkArray<hkaSkeletonMapperData::SimpleMapping>& kMappings = pBToA->m_simpleMappings;
-                    hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kMappings);
-                    if (kMappings.m_size == kMappings.getCapacity()) {
-                        hkArrayUtil::_reserveMore(alloc, &kMappings, sizeof(hkaSkeletonMapperData::SimpleMapping));
-                    }
-                    hkaSkeletonMapperData::SimpleMapping* pNew = kMappings.m_data + kMappings.m_size;
-                    if (pNew) {
-                        pNew->m_boneA = kMapping.m_boneA;
-                        pNew->m_boneB = kMapping.m_boneB;
-                        pNew->m_aFromBTransform.m_translation.m_quad = kMapping.m_aFromBTransform.m_translation.m_quad;
-                        pNew->m_aFromBTransform.m_rotation.m_vec.m_quad =
-                            kMapping.m_aFromBTransform.m_rotation.m_vec.m_quad;
-                        pNew->m_aFromBTransform.m_scale.m_quad = kMapping.m_aFromBTransform.m_scale.m_quad;
-                    }
-                    kMappings.m_size++;
-                }
+                pBToA->m_simpleMappings.pushBack(kMapping);
                 bonesAMapped.m_data[boneA] = boneB;
                 bonesBMapped.m_data[boneB] = boneA;
                 hkErrStream kStream(buf, 512);
@@ -969,19 +808,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         kChainMapping.m_startAFromBTransform.setMulInverseMul(
                             modelPoseA.m_data[parentA], modelPoseB.m_data[parentB]
                         );
-                        {
-                            // EXE-INLINED none: hkArray<ChainMapping>::pushBack
-                            hkArray<hkaSkeletonMapperData::ChainMapping>& kChains = pAToB->m_chainMappings;
-                            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kChains);
-                            if (kChains.m_size == kChains.getCapacity()) {
-                                hkArrayUtil::_reserveMore(alloc, &kChains, sizeof(hkaSkeletonMapperData::ChainMapping));
-                            }
-                            hkaSkeletonMapperData::ChainMapping* pNew = kChains.m_data + kChains.m_size;
-                            if (pNew) {
-                                *pNew = kChainMapping;
-                            }
-                            kChains.m_size++;
-                        }
+                        pAToB->m_chainMappings.pushBack(kChainMapping);
                         kChainMapping.~ChainMapping();
                         ::new (&kChainMapping) hkaSkeletonMapperData::ChainMapping;
                         kChainMapping.m_startBoneA = parentB;
@@ -992,19 +819,7 @@ void hkaSkeletonMapperUtils::createMapping(
                         kChainMapping.m_startAFromBTransform.setMulInverseMul(
                             modelPoseB.m_data[parentB], modelPoseA.m_data[parentA]
                         );
-                        {
-                            // EXE-INLINED none: hkArray<ChainMapping>::pushBack
-                            hkArray<hkaSkeletonMapperData::ChainMapping>& kChains = pBToA->m_chainMappings;
-                            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kChains);
-                            if (kChains.m_size == kChains.getCapacity()) {
-                                hkArrayUtil::_reserveMore(alloc, &kChains, sizeof(hkaSkeletonMapperData::ChainMapping));
-                            }
-                            hkaSkeletonMapperData::ChainMapping* pNew = kChains.m_data + kChains.m_size;
-                            if (pNew) {
-                                *pNew = kChainMapping;
-                            }
-                            kChains.m_size++;
-                        }
+                        pBToA->m_chainMappings.pushBack(kChainMapping);
                         for (int32_t i = 1; i < chainA.m_size - 1; ++i) {
                             bonesAMapped.m_data[chainA.m_data[i]] = -2;
                         }
@@ -1019,24 +834,12 @@ void hkaSkeletonMapperUtils::createMapping(
         // The bones left unmapped keep their local transforms.
         for (int32_t b = 0; b < numBonesB; ++b) {
             if (bonesBMapped.m_data[b] == -1) {
-                // EXE-INLINED none: hkArray<hkInt16>::pushBack
-                hkArray<uint16_t>& kUnmapped = pAToB->m_unmappedBones;
-                hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kUnmapped);
-                if (kUnmapped.m_size == kUnmapped.getCapacity()) {
-                    hkArrayUtil::_reserveMore(alloc, &kUnmapped, sizeof(uint16_t));
-                }
-                kUnmapped.m_data[kUnmapped.m_size++] = static_cast<uint16_t>(b);
+                pAToB->m_unmappedBones.pushBack(static_cast<uint16_t>(b));
             }
         }
         for (int32_t a = 0; a < numBonesA; ++a) {
             if (bonesAMapped.m_data[a] == -1) {
-                // EXE-INLINED none: hkArray<hkInt16>::pushBack
-                hkArray<uint16_t>& kUnmapped = pBToA->m_unmappedBones;
-                hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&kUnmapped);
-                if (kUnmapped.m_size == kUnmapped.getCapacity()) {
-                    hkArrayUtil::_reserveMore(alloc, &kUnmapped, sizeof(uint16_t));
-                }
-                kUnmapped.m_data[kUnmapped.m_size++] = static_cast<uint16_t>(a);
+                pBToA->m_unmappedBones.pushBack(static_cast<uint16_t>(a));
             }
         }
         pAToB->m_keepUnmappedLocal.m_bool = true;

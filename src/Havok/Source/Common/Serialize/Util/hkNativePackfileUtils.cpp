@@ -407,18 +407,7 @@ void hkNativePackfileUtils::unload(void* buffer, int32_t bufferSize) {
             ++it;
         }
     }
-    // EXE-INLINED none: hkArray<hkPackfileSectionHeader>::~hkArray
-    hkMemoryAllocator& rHeap = *hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCap = pHeader->m_sections.m_capacityAndFlags;
-    pHeader->m_sections.m_size = 0;
-    if (iCap >= 0) {
-        rHeap.bufFree(
-            pHeader->m_sections.m_data,
-            (iCap & hkArrayBase<hkPackfileSectionHeader>::CAPACITY_MASK) * sizeof(hkPackfileSectionHeader)
-        );
-    }
-    pHeader->m_sections.m_data = nullptr;
-    pHeader->m_sections.m_capacityAndFlags = hkArrayBase<hkPackfileSectionHeader>::DONT_DEALLOCATE_FLAG;
+    pHeader->m_sections.~hkArray();
     rMap.clearAndDeallocate(*hkMemoryRouter::getInstance().m_heap);
 }
 

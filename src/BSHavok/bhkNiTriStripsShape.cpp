@@ -98,16 +98,7 @@ void bhkNiTriStripsShape::LoadBinary(NiStream& arStream) {
         kCinfo.m_vertexStridingArray.clearAndDeallocate();
         kCinfo.m_numVerticesArray.clearAndDeallocate();
         kCinfo.m_index32BaseArray.clearAndDeallocate();
-        {
-            // EXE-INLINED 0x540AD0
-            hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-            kCinfo.m_stridingTypeArray.m_size = 0;
-            if ((kCinfo.m_stridingTypeArray.m_capacityAndFlags & hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG) == 0) {
-                rHeap._bufFree<uint8_t>(kCinfo.m_stridingTypeArray.m_data, kCinfo.m_stridingTypeArray.getCapacity());
-            }
-            kCinfo.m_stridingTypeArray.m_data = nullptr;
-            kCinfo.m_stridingTypeArray.m_capacityAndFlags = hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG;
-        }
+        kCinfo.m_stridingTypeArray.clearAndDeallocate();
         kCinfo.m_indexStridingArray.clearAndDeallocate();
         kCinfo.m_numTrianglesArray.clearAndDeallocate();
         kCinfo.m_materialIndexBaseArray.clearAndDeallocate();
@@ -312,12 +303,7 @@ void bhkNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) 
     pTLS->eMemContext = MEM_CONTEXT_HAVOK;
     bhkShapeCollection::GetViewerStrings(apStrings);
     char* pcHeading = NiGetViewerString(bhkNiTriStripsShape::ms_RTTI.GetName());
-    // EXE-INLINED 0x96A610
-    uint32_t uiIndex = apStrings->m_usSize;
-    if (uiIndex >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiIndex, pcHeading);
+    apStrings->Add(pcHeading);
     hkNiTriStripsShape* pShape;
     // EXE-INLINED none: bhkNiTriStripsShape::GetNumSubparts
     uint32_t uiSubparts = (this && (pShape = static_cast<hkNiTriStripsShape*>(this->phkObject)) != nullptr)
@@ -337,27 +323,7 @@ void bhkNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) 
     CFilter kFilter;
     for (uint32_t i = 0; i < uiFirst; ++i) {
         char* pcPart = NiGetViewerString("Part", i);
-        // EXE-INLINED 0x96A610
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= apStrings->m_usSize) {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcPart) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (pcPart) {
-            if (!apStrings->m_pBase[uiIndex]) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (apStrings->m_pBase[uiIndex]) {
-            --apStrings->m_usESize;
-        }
-        apStrings->m_pBase[uiIndex] = pcPart;
+        apStrings->Add(pcPart);
         hkNiTriStripsShape* pCurShape;
         // EXE-INLINED none: bhkNiTriStripsShape::GetSubpartAt
         hkNiTriStripsData* pSubpart =
@@ -366,54 +332,14 @@ void bhkNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) 
             : &EmptySubpart;
         int32_t iMaterial = pSubpart->spGeom.m_pObject ? (pSubpart->spGeom.m_pObject->m_usDataFlags >> 6) & 0x1F : 0;
         char* pcMaterial = NiGetViewerString("MATERIAL", iMaterial);
-        // EXE-INLINED 0x96A610
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= apStrings->m_usSize) {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcMaterial) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (pcMaterial) {
-            if (!apStrings->m_pBase[uiIndex]) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (apStrings->m_pBase[uiIndex]) {
-            --apStrings->m_usESize;
-        }
-        apStrings->m_pBase[uiIndex] = pcMaterial;
+        apStrings->Add(pcMaterial);
         kFilter.iFilter = pSubpart->iFilter;
         kFilter.GetViewerStrings(apStrings);
     }
     for (uint32_t j = 0; j < uiLast; ++j) {
         uint32_t uiPart = uiSubparts - j - 1;
         char* pcPart = NiGetViewerString("Part", uiPart);
-        // EXE-INLINED 0x96A610
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= apStrings->m_usSize) {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcPart) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (pcPart) {
-            if (!apStrings->m_pBase[uiIndex]) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (apStrings->m_pBase[uiIndex]) {
-            --apStrings->m_usESize;
-        }
-        apStrings->m_pBase[uiIndex] = pcPart;
+        apStrings->Add(pcPart);
         hkNiTriStripsShape* pCurShape;
         // EXE-INLINED none: bhkNiTriStripsShape::GetSubpartAt
         hkNiTriStripsData* pSubpart =
@@ -422,27 +348,7 @@ void bhkNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) 
             : &EmptySubpart;
         int32_t iMaterial = pSubpart->spGeom.m_pObject ? (pSubpart->spGeom.m_pObject->m_usDataFlags >> 6) & 0x1F : 0;
         char* pcMaterial = NiGetViewerString("MATERIAL", iMaterial);
-        // EXE-INLINED 0x96A610
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= apStrings->m_usSize) {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcMaterial) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (pcMaterial) {
-            if (!apStrings->m_pBase[uiIndex]) {
-                ++apStrings->m_usESize;
-            }
-        }
-        else if (apStrings->m_pBase[uiIndex]) {
-            --apStrings->m_usESize;
-        }
-        apStrings->m_pBase[uiIndex] = pcMaterial;
+        apStrings->Add(pcMaterial);
         kFilter.iFilter = pSubpart->iFilter;
         kFilter.GetViewerStrings(apStrings);
     }

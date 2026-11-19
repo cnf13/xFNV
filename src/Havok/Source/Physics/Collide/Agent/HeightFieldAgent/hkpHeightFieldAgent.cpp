@@ -2,6 +2,7 @@
 
 #include "BSCore/MemoryManager.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/LocalArray/hkLocalBuffer.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
@@ -110,102 +111,95 @@ void hkpHeightFieldAgent::processCollision(
     bTa.setMulInverseMul(*hfBody.m_motion.pMotion, *csBody.m_motion.pMotion);
 
     const int32_t nSpheres = m_contactPointId.m_size;
-    // EXE-INLINED none: hkLocalBuffer<hkSphere>'s constructor (hkAllocateStack, rounded up to 128 bytes)
-    const size_t bufferSize = (sizeof(hkSphere) * nSpheres + 127) & ~static_cast<size_t>(127);
-    hkStackMemory& sphereStack = hkMemoryRouter::getInstance().m_stack;
-    void* pSphereBuffer = sphereStack.m_next.m_storage;
-    sphereStack.m_next.m_storage = static_cast<char*>(pSphereBuffer) + bufferSize;
-    hkSphere* sphereBuffer = static_cast<hkSphere*>(pSphereBuffer);
-    uint16_t* cpId = m_contactPointId.m_data;
-    const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
+    {
+        hkLocalBuffer<hkSphere> kSphereBuffer(nSpheres, nullptr);
+        hkSphere* sphereBuffer = kSphereBuffer.begin();
+        uint16_t* cpId = m_contactPointId.m_data;
+        const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
 
-    // Each sphere's centre moved into the height field's space, its radius kept. The loop tests its counter only at the
-    // end, so it deliberately runs once with no spheres too, as the game does.
-    int32_t i = nSpheres - 1;
-    do {
-        const hkQuadReal s = spheres[i].m_pos.m_quad;
-        // EXE-INLINED 0xC7F640
-        const hkQuadReal p = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(s, s, 0x55), bTa.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(s, s, 0x00), bTa.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(s, s, 0xAA), bTa.m_rotation.m_col2.m_quad), bTa.m_translation.m_quad)
-        );
-        // x, y and z of the moved centre, w (the radius) of the sphere.
-        sphereBuffer[i].m_pos.m_quad = _mm_shuffle_ps(p, _mm_unpackhi_ps(p, s), 0xC4);
-    }
-    while (--i >= 0);
-
-    // EXE-INLINED none: hkLocalBuffer<hkpHeightFieldShape::SphereCollisionOutput>'s constructor
-    hkStackMemory& outputStack = hkMemoryRouter::getInstance().m_stack;
-    void* pOutputs = outputStack.m_next.m_storage;
-    outputStack.m_next.m_storage = static_cast<char*>(pOutputs) + bufferSize;
-    hkVector4* outputs = static_cast<hkVector4*>(pOutputs);
-    hkpHeightFieldShape::CollideSpheresInput in;
-    in.m_spheres = sphereBuffer;
-    in.m_numSpheres = nSpheres;
-    in.m_tolerance = input.m_tolerance;
-    hfShape->collideSpheres(in, outputs);
-
-    const float tolerance = input.m_tolerance;
-    const hkSphere* sphere = sphereBuffer;
-    const hkVector4* output = outputs;
-    for (int32_t j = nSpheres - 1; j >= 0; --j, ++sphere, ++output, ++cpId) {
-        if (tolerance < (*output)(3)) {
-            if (*cpId != 0xFFFF) {
-                m_contactMgr->removeContactPointImpl(*cpId, *result.m_constraintOwner.m_storage);
-                *cpId = 0xFFFF;
-            }
-            continue;
+        // Each sphere's centre moved into the height field's space, its radius kept. The loop tests its counter only at
+        // the end, so it deliberately runs once with no spheres too, as the game does.
+        int32_t i = nSpheres - 1;
+        do {
+            const hkQuadReal s = spheres[i].m_pos.m_quad;
+            // EXE-INLINED 0xC7F640
+            const hkQuadReal p = _mm_add_ps(
+                _mm_add_ps(
+                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0x55), bTa.m_rotation.m_col1.m_quad),
+                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0x00), bTa.m_rotation.m_col0.m_quad)
+                ),
+                _mm_add_ps(
+                    _mm_mul_ps(_mm_shuffle_ps(s, s, 0xAA), bTa.m_rotation.m_col2.m_quad), bTa.m_translation.m_quad
+                )
+            );
+            // x, y and z of the moved centre, w (the radius) of the sphere.
+            sphereBuffer[i].m_pos.m_quad = _mm_shuffle_ps(p, _mm_unpackhi_ps(p, s), 0xC4);
         }
-        hkpProcessCdPoint* point = result.m_firstFreeContactPoint.m_storage;
-        // The point on the sphere's surface nearest the height field, in world space.
-        const float negRadius = -sphere->m_pos(3);
-        const hkQuadReal r = _mm_set_ss(negRadius);
-        const hkQuadReal o = output->m_quad;
-        const hkQuadReal cpPos = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), o), sphere->m_pos.m_quad);
-        const hkTransform& hfTransform = hfBody.m_motion.pState->m_transform;
-        // EXE-INLINED 0xC7F640
-        point->m_contact.m_position.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0x55), hfTransform.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0x00), hfTransform.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0xAA), hfTransform.m_rotation.m_col2.m_quad),
-                hfTransform.m_translation.m_quad
-            )
-        );
-        // EXE-INLINED none: hkVector4::_setRotatedDir
-        const hkRotation& hfRotation = hfBody.m_motion.pState->m_transform.m_rotation;
-        const hkQuadReal n = output->m_quad;
-        point->m_contact.m_separatingNormal.m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), hfRotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), hfRotation.m_col0.m_quad)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), hfRotation.m_col2.m_quad)
-        );
-        // The distance.
-        point->m_contact.m_separatingNormal.m_quad[3] = (*output)(3);
-        if (*cpId == 0xFFFF) {
-            const uint16_t id =
-                m_contactMgr->addContactPointImpl(csBody, hfBody, input, result, nullptr, point->m_contact);
-            *cpId = id;
-            if (id != 0xFFFF) {
+        while (--i >= 0);
+
+        hkLocalBuffer<hkVector4> kOutputs(nSpheres, nullptr);
+        hkVector4* outputs = kOutputs.begin();
+        hkpHeightFieldShape::CollideSpheresInput in;
+        in.m_spheres = sphereBuffer;
+        in.m_numSpheres = nSpheres;
+        in.m_tolerance = input.m_tolerance;
+        hfShape->collideSpheres(in, outputs);
+
+        const float tolerance = input.m_tolerance;
+        const hkSphere* sphere = sphereBuffer;
+        const hkVector4* output = outputs;
+        for (int32_t j = nSpheres - 1; j >= 0; --j, ++sphere, ++output, ++cpId) {
+            if (tolerance < (*output)(3)) {
+                if (*cpId != 0xFFFF) {
+                    m_contactMgr->removeContactPointImpl(*cpId, *result.m_constraintOwner.m_storage);
+                    *cpId = 0xFFFF;
+                }
+                continue;
+            }
+            hkpProcessCdPoint* point = result.m_firstFreeContactPoint.m_storage;
+            // The point on the sphere's surface nearest the height field, in world space.
+            const float negRadius = -sphere->m_pos(3);
+            const hkQuadReal r = _mm_set_ss(negRadius);
+            const hkQuadReal o = output->m_quad;
+            const hkQuadReal cpPos = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), o), sphere->m_pos.m_quad);
+            const hkTransform& hfTransform = hfBody.m_motion.pState->m_transform;
+            // EXE-INLINED 0xC7F640
+            point->m_contact.m_position.m_quad = _mm_add_ps(
+                _mm_add_ps(
+                    _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0x55), hfTransform.m_rotation.m_col1.m_quad),
+                    _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0x00), hfTransform.m_rotation.m_col0.m_quad)
+                ),
+                _mm_add_ps(
+                    _mm_mul_ps(_mm_shuffle_ps(cpPos, cpPos, 0xAA), hfTransform.m_rotation.m_col2.m_quad),
+                    hfTransform.m_translation.m_quad
+                )
+            );
+            // EXE-INLINED none: hkVector4::_setRotatedDir
+            const hkRotation& hfRotation = hfBody.m_motion.pState->m_transform.m_rotation;
+            const hkQuadReal n = output->m_quad;
+            point->m_contact.m_separatingNormal.m_quad = _mm_add_ps(
+                _mm_add_ps(
+                    _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), hfRotation.m_col1.m_quad),
+                    _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), hfRotation.m_col0.m_quad)
+                ),
+                _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), hfRotation.m_col2.m_quad)
+            );
+            // The distance.
+            point->m_contact.m_separatingNormal.m_quad[3] = (*output)(3);
+            if (*cpId == 0xFFFF) {
+                const uint16_t id =
+                    m_contactMgr->addContactPointImpl(csBody, hfBody, input, result, nullptr, point->m_contact);
+                *cpId = id;
+                if (id != 0xFFFF) {
+                    ++result.m_firstFreeContactPoint.m_storage;
+                }
+            }
+            else {
                 ++result.m_firstFreeContactPoint.m_storage;
             }
+            point->m_contactPointId.m_storage = *cpId;
         }
-        else {
-            ++result.m_firstFreeContactPoint.m_storage;
-        }
-        point->m_contactPointId.m_storage = *cpId;
     }
-
-    // EXE-INLINED none: the hkLocalBuffer destructors (hkDeallocateStack), the outputs' first
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pOutputs);
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pSphereBuffer);
     HK_TIMER_END();
 }
 
@@ -237,63 +231,54 @@ void hkpHeightFieldAgent::staticGetPenetrations(
     bTa.setMulInverseMul(*hfBody.m_motion.pMotion, *csBody.m_motion.pMotion);
 
     const int32_t nSpheres = csShape->getNumCollisionSpheresImpl();
-    const size_t bufferSize = (sizeof(hkSphere) * nSpheres + 127) & ~static_cast<size_t>(127);
-    // EXE-INLINED none: hkLocalBuffer<hkSphere>'s constructor (hkAllocateStack, rounded up to 128 bytes)
-    hkStackMemory& sphereStack = hkMemoryRouter::getInstance().m_stack;
-    void* pSphereBuffer = sphereStack.m_next.m_storage;
-    sphereStack.m_next.m_storage = static_cast<char*>(pSphereBuffer) + bufferSize;
-    hkSphere* sphereBuffer = static_cast<hkSphere*>(pSphereBuffer);
-    const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
-
-    // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
     {
-        const hkQuadReal col0 = bTa.m_rotation.m_col0.m_quad;
-        const hkQuadReal col1 = bTa.m_rotation.m_col1.m_quad;
-        const hkQuadReal col2 = bTa.m_rotation.m_col2.m_quad;
-        const hkQuadReal translation = bTa.m_translation.m_quad;
-        int32_t i = nSpheres - 1;
-        do {
-            const hkQuadReal pos = spheres[i].m_pos.m_quad;
-            // EXE-INLINED 0xC7F640
-            hkVector4 v;
-            v.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1)), col1),
-                    _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0)), col0)
-                ),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
-            );
-            v.setW(spheres[i].m_pos);
-            sphereBuffer[i].m_pos = v;
+        hkLocalBuffer<hkSphere> kSphereBuffer(nSpheres, nullptr);
+        hkSphere* sphereBuffer = kSphereBuffer.begin();
+        const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
+
+        // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
+        {
+            const hkQuadReal col0 = bTa.m_rotation.m_col0.m_quad;
+            const hkQuadReal col1 = bTa.m_rotation.m_col1.m_quad;
+            const hkQuadReal col2 = bTa.m_rotation.m_col2.m_quad;
+            const hkQuadReal translation = bTa.m_translation.m_quad;
+            int32_t i = nSpheres - 1;
+            do {
+                const hkQuadReal pos = spheres[i].m_pos.m_quad;
+                // EXE-INLINED 0xC7F640
+                hkVector4 v;
+                v.m_quad = _mm_add_ps(
+                    _mm_add_ps(
+                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1)), col1),
+                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0)), col0)
+                    ),
+                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
+                );
+                v.setW(spheres[i].m_pos);
+                sphereBuffer[i].m_pos = v;
+            }
+            while (--i >= 0);
         }
-        while (--i >= 0);
-    }
 
-    HK_TIMER_SPLIT_LIST("Collide");
-    // EXE-INLINED none: hkLocalBuffer<hkpHeightFieldShape::SphereCollisionOutput>'s constructor (hkAllocateStack)
-    hkStackMemory& outputStack = hkMemoryRouter::getInstance().m_stack;
-    void* pOutputBuffer = outputStack.m_next.m_storage;
-    hkpHeightFieldShape::CollideSpheresInput collideInput;
-    collideInput.m_tolerance = input.m_tolerance;
-    outputStack.m_next.m_storage = static_cast<char*>(pOutputBuffer) + bufferSize;
-    collideInput.m_numSpheres = nSpheres;
-    collideInput.m_spheres = sphereBuffer;
-    hkVector4* outputBuffer = static_cast<hkVector4*>(pOutputBuffer);
-    hfShape->collideSpheres(collideInput, outputBuffer);
+        HK_TIMER_SPLIT_LIST("Collide");
+        hkpHeightFieldShape::CollideSpheresInput collideInput;
+        collideInput.m_tolerance = input.m_tolerance;
+        hkLocalBuffer<hkVector4> kOutputBuffer(nSpheres, nullptr);
+        collideInput.m_numSpheres = nSpheres;
+        collideInput.m_spheres = sphereBuffer;
+        hkVector4* outputBuffer = kOutputBuffer.begin();
+        hfShape->collideSpheres(collideInput, outputBuffer);
 
-    HK_TIMER_SPLIT_LIST("Examine");
-    const hkVector4* output = outputBuffer;
-    for (int32_t i = nSpheres - 1; i >= 0; --i) {
-        if ((*output)(3) < 0.0f) {
-            collector.addCdBodyPair(csBody, hfBody);
-            break;
+        HK_TIMER_SPLIT_LIST("Examine");
+        const hkVector4* output = outputBuffer;
+        for (int32_t i = nSpheres - 1; i >= 0; --i) {
+            if ((*output)(3) < 0.0f) {
+                collector.addCdBodyPair(csBody, hfBody);
+                break;
+            }
+            ++output;
         }
-        ++output;
     }
-
-    // EXE-INLINED none: the two hkLocalBuffers' destructors (hkDeallocateStack), the outputs first
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pOutputBuffer);
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pSphereBuffer);
     HK_TIMER_END_LIST();
 }
 
@@ -314,108 +299,104 @@ void hkpHeightFieldAgent::staticGetClosestPoints(
     bTa.setMulInverseMul(*hfBody.m_motion.pMotion, *csBody.m_motion.pMotion);
 
     const int32_t nSpheres = csShape->getNumCollisionSpheresImpl();
-    const size_t bufferSize = (sizeof(hkSphere) * nSpheres + 127) & ~static_cast<size_t>(127);
-    // EXE-INLINED none: hkLocalBuffer<hkSphere>'s constructor (hkAllocateStack, rounded up to 128 bytes)
-    hkStackMemory& sphereStack = hkMemoryRouter::getInstance().m_stack;
-    void* pSphereBuffer = sphereStack.m_next.m_storage;
-    sphereStack.m_next.m_storage = static_cast<char*>(pSphereBuffer) + bufferSize;
-    hkSphere* sphereBuffer = static_cast<hkSphere*>(pSphereBuffer);
-
-    HK_TIMER_SPLIT_LIST("getSpheres");
-    const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
-
-    HK_TIMER_SPLIT_LIST("transform");
-    // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
     {
-        const hkQuadReal col0 = bTa.m_rotation.m_col0.m_quad;
-        const hkQuadReal col1 = bTa.m_rotation.m_col1.m_quad;
-        const hkQuadReal col2 = bTa.m_rotation.m_col2.m_quad;
-        const hkQuadReal translation = bTa.m_translation.m_quad;
-        int32_t i = nSpheres - 1;
-        do {
-            const hkQuadReal pos = spheres[i].m_pos.m_quad;
-            // EXE-INLINED 0xC7F640
-            hkVector4 v;
-            v.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1)), col1),
-                    _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0)), col0)
-                ),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
-            );
-            v.setW(spheres[i].m_pos);
-            sphereBuffer[i].m_pos = v;
+        hkLocalBuffer<hkSphere> kSphereBuffer(nSpheres, nullptr);
+        hkSphere* sphereBuffer = kSphereBuffer.begin();
+
+        HK_TIMER_SPLIT_LIST("getSpheres");
+        const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
+
+        HK_TIMER_SPLIT_LIST("transform");
+        // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
+        {
+            const hkQuadReal col0 = bTa.m_rotation.m_col0.m_quad;
+            const hkQuadReal col1 = bTa.m_rotation.m_col1.m_quad;
+            const hkQuadReal col2 = bTa.m_rotation.m_col2.m_quad;
+            const hkQuadReal translation = bTa.m_translation.m_quad;
+            int32_t i = nSpheres - 1;
+            do {
+                const hkQuadReal pos = spheres[i].m_pos.m_quad;
+                // EXE-INLINED 0xC7F640
+                hkVector4 v;
+                v.m_quad = _mm_add_ps(
+                    _mm_add_ps(
+                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(1, 1, 1, 1)), col1),
+                        _mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(0, 0, 0, 0)), col0)
+                    ),
+                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(pos, pos, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
+                );
+                v.setW(spheres[i].m_pos);
+                sphereBuffer[i].m_pos = v;
+            }
+            while (--i >= 0);
         }
-        while (--i >= 0);
-    }
 
-    HK_TIMER_SPLIT_LIST("collide");
-    // EXE-INLINED none: hkLocalBuffer<hkpHeightFieldShape::SphereCollisionOutput>'s constructor (hkAllocateStack)
-    hkStackMemory& outputStack = hkMemoryRouter::getInstance().m_stack;
-    void* pOutputBuffer = outputStack.m_next.m_storage;
-    hkpHeightFieldShape::CollideSpheresInput collideInput;
-    collideInput.m_tolerance = input.m_tolerance;
-    outputStack.m_next.m_storage = static_cast<char*>(pOutputBuffer) + bufferSize;
-    collideInput.m_numSpheres = nSpheres;
-    collideInput.m_spheres = sphereBuffer;
-    hkVector4* outputBuffer = static_cast<hkVector4*>(pOutputBuffer);
-    hfShape->collideSpheres(collideInput, outputBuffer);
+        HK_TIMER_SPLIT_LIST("collide");
+        hkpHeightFieldShape::CollideSpheresInput collideInput;
+        collideInput.m_tolerance = input.m_tolerance;
+        hkLocalBuffer<hkVector4> kOutputBuffer(nSpheres, nullptr);
+        collideInput.m_numSpheres = nSpheres;
+        collideInput.m_spheres = sphereBuffer;
+        hkVector4* outputBuffer = kOutputBuffer.begin();
+        hfShape->collideSpheres(collideInput, outputBuffer);
 
-    HK_TIMER_SPLIT_LIST("examine");
-    const float tolerance = input.m_tolerance;
-    const hkVector4* output = outputBuffer;
-    const hkSphere* sphere = sphereBuffer;
-    for (int32_t i = nSpheres - 1; i >= 0; --i) {
-        if ((*output)(3) <= tolerance) {
-            // The contact point in bodyB's space: the sphere's centre moved along the output normal by minus its
-            // radius and distance.
-            const float scale = -sphere->m_pos(3) - (*output)(3);
-            const hkQuadReal normal = output->m_quad;
-            const hkQuadReal pointInB = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), normal), sphere->m_pos.m_quad);
+        HK_TIMER_SPLIT_LIST("examine");
+        const float tolerance = input.m_tolerance;
+        const hkVector4* output = outputBuffer;
+        const hkSphere* sphere = sphereBuffer;
+        for (int32_t i = nSpheres - 1; i >= 0; --i) {
+            if ((*output)(3) <= tolerance) {
+                // The contact point in bodyB's space: the sphere's centre moved along the output normal by minus its
+                // radius and distance.
+                const float scale = -sphere->m_pos(3) - (*output)(3);
+                const hkQuadReal normal = output->m_quad;
+                const hkQuadReal pointInB = _mm_add_ps(_mm_mul_ps(_mm_set1_ps(scale), normal), sphere->m_pos.m_quad);
 
-            hkpCdPoint event;
-            event.m_cdBodyA = &csBody;
-            event.m_cdBodyB = &hfBody;
-            const hkTransform& transformB = *hfBody.m_motion.pMotion;
-            // EXE-INLINED 0xC7F640
-            event.m_contact.m_position.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(1, 1, 1, 1)), transformB.m_rotation.m_col1.m_quad
+                hkpCdPoint event;
+                event.m_cdBodyA = &csBody;
+                event.m_cdBodyB = &hfBody;
+                const hkTransform& transformB = *hfBody.m_motion.pMotion;
+                // EXE-INLINED 0xC7F640
+                event.m_contact.m_position.m_quad = _mm_add_ps(
+                    _mm_add_ps(
+                        _mm_mul_ps(
+                            _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(1, 1, 1, 1)),
+                            transformB.m_rotation.m_col1.m_quad
+                        ),
+                        _mm_mul_ps(
+                            _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(0, 0, 0, 0)),
+                            transformB.m_rotation.m_col0.m_quad
+                        )
                     ),
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(0, 0, 0, 0)), transformB.m_rotation.m_col0.m_quad
+                    _mm_add_ps(
+                        _mm_mul_ps(
+                            _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(2, 2, 2, 2)),
+                            transformB.m_rotation.m_col2.m_quad
+                        ),
+                        transformB.m_translation.m_quad
                     )
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(pointInB, pointInB, _MM_SHUFFLE(2, 2, 2, 2)), transformB.m_rotation.m_col2.m_quad
-                    ),
-                    transformB.m_translation.m_quad
-                )
-            );
-            // EXE-INLINED 0xC7F700
-            event.m_contact.m_separatingNormal.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(1, 1, 1, 1)), transformB.m_rotation.m_col1.m_quad
+                );
+                // EXE-INLINED 0xC7F700
+                event.m_contact.m_separatingNormal.m_quad = _mm_add_ps(
+                    _mm_add_ps(
+                        _mm_mul_ps(
+                            _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(1, 1, 1, 1)), transformB.m_rotation.m_col1.m_quad
+                        ),
+                        _mm_mul_ps(
+                            _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(0, 0, 0, 0)), transformB.m_rotation.m_col0.m_quad
+                        )
                     ),
                     _mm_mul_ps(
-                        _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(0, 0, 0, 0)), transformB.m_rotation.m_col0.m_quad
+                        _mm_shuffle_ps(normal, normal, _MM_SHUFFLE(2, 2, 2, 2)), transformB.m_rotation.m_col2.m_quad
                     )
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(normal, normal, _MM_SHUFFLE(2, 2, 2, 2)), transformB.m_rotation.m_col2.m_quad)
-            );
-            event.m_contact.m_separatingNormal(3) = (*output)(3);
-            collector.addCdPoint(event);
+                );
+                event.m_contact.m_separatingNormal(3) = (*output)(3);
+                collector.addCdPoint(event);
+            }
+            ++output;
+            ++sphere;
         }
-        ++output;
-        ++sphere;
     }
-
-    // EXE-INLINED none: the two hkLocalBuffers' destructors (hkDeallocateStack), the outputs first
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pOutputBuffer);
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pSphereBuffer);
     HK_TIMER_END_LIST();
 }
 

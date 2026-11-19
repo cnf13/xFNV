@@ -65,22 +65,7 @@ void NiSequence::LoadBinary(NiStream& kStream) {
     for (uint32_t ui = 0; ui < uiCount; ++ui) {
         char* pcObjectName = nullptr;
         kStream.LoadCString(pcObjectName);
-        // EXE-INLINED 0x96AE90
-        if (ui >= m_kObjectName.m_usSize) {
-            m_kObjectName.m_usSize = static_cast<uint16_t>(ui + 1);
-            if (pcObjectName) {
-                ++m_kObjectName.m_usESize;
-            }
-        }
-        else if (pcObjectName) {
-            if (!m_kObjectName.m_pBase[ui]) {
-                ++m_kObjectName.m_usESize;
-            }
-        }
-        else if (m_kObjectName.m_pBase[ui]) {
-            --m_kObjectName.m_usESize;
-        }
-        m_kObjectName.m_pBase[ui] = pcObjectName;
+        m_kObjectName.SetAt(ui, pcObjectName);
         kStream.ReadLinkID();
     }
 }
@@ -141,11 +126,7 @@ uint32_t NiSequence::AddNameControllerPair(const char* pcName, NiTransformContro
     ++stLength;
     char* pcNameCopy = static_cast<char*>(_NiMalloc(stLength));
     strcpy_s(pcNameCopy, stLength, pcName);
-    // EXE-INLINED none: NiTArray<char*>::SetAtGrow
-    if (uiIndex >= m_kObjectName.m_usMaxSize) {
-        m_kObjectName.SetSize(uiIndex + m_kObjectName.m_usGrowBy);
-    }
-    m_kObjectName.SetAt(uiIndex, pcNameCopy);
+    m_kObjectName.SetAtGrow(uiIndex, pcNameCopy);
     NiPointer<NiTimeController> spController = pkController;
     // EXE-INLINED none: NiTArray<NiPointer<NiTimeController>>::SetAtGrow
     if (uiIndex >= m_kCtrl.m_usMaxSize) {

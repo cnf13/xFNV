@@ -85,24 +85,7 @@ void NiKeyframeManager::LoadBinary(NiStream& kStream) {
                     if (uiObjectAt >= kObjectName.m_usMaxSize) {
                         kObjectName.SetSize(uiObjectAt + kObjectName.m_usGrowBy);
                     }
-                    // EXE-INLINED 0x96AE90
-                    if (uiObjectAt < kObjectName.m_usSize) {
-                        if (pcObjectName) {
-                            if (!kObjectName.m_pBase[uiObjectAt]) {
-                                ++kObjectName.m_usESize;
-                            }
-                        }
-                        else if (kObjectName.m_pBase[uiObjectAt]) {
-                            --kObjectName.m_usESize;
-                        }
-                    }
-                    else {
-                        kObjectName.m_usSize = static_cast<uint16_t>(uiObjectAt + 1);
-                        if (pcObjectName) {
-                            ++kObjectName.m_usESize;
-                        }
-                    }
-                    kObjectName.m_pBase[uiObjectAt] = pcObjectName;
+                    kObjectName.SetAt(uiObjectAt, pcObjectName);
                     kStream.ReadLinkID();
                 }
             }
@@ -179,12 +162,7 @@ void NiKeyframeManager::LinkObject(NiStream& kStream) {
     }
 
     if (pkRecord) {
-        // EXE-INLINED none: NiKeyframeManager::LinkRecord::~LinkRecord, the four NiTArray destructors (inlined too) in
-        // reverse member order.
-        pkRecord->m_kObjectName.~NiTPrimitiveArray();
-        pkRecord->m_kNumSequenceKeys.~NiTPrimitiveArray();
-        pkRecord->m_kSequenceNames.~NiTPrimitiveArray();
-        pkRecord->m_kTextKeyReferences.~NiTPrimitiveArray();
+        pkRecord->~LinkRecord();
         MemoryManager_Singleton.Deallocate(pkRecord);
     }
     ms_pkLinkRecord = nullptr;

@@ -2,6 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 
 float NiPoint2::SqrLength() const {
@@ -13,21 +14,13 @@ bool NiPoint2::operator!=(const NiPoint2& pt) const {
 }
 
 void NiPoint2::LoadBinary(NiStream& arStream) {
-    // EXE-INLINED none: NiStreamLoadBinary
-    uint32_t uiSize = 4;
-    arStream.Istr()->BinaryRead(&x, sizeof(x), &uiSize, 1);
-    // EXE-INLINED none: NiStreamLoadBinary
-    uiSize = 4;
-    arStream.Istr()->BinaryRead(&y, sizeof(y), &uiSize, 1);
+    NiStreamLoadBinary(arStream, x);
+    NiStreamLoadBinary(arStream, y);
 }
 
 void NiPoint2::SaveBinary(NiStream& arStream) {
-    // EXE-INLINED none: NiStreamSaveBinary
-    uint32_t uiSize = 4;
-    arStream.Ostr()->BinaryWrite(&x, sizeof(x), &uiSize, 1);
-    // EXE-INLINED none: NiStreamSaveBinary
-    uiSize = 4;
-    arStream.Ostr()->BinaryWrite(&y, sizeof(y), &uiSize, 1);
+    NiStreamSaveBinary(arStream, x);
+    NiStreamSaveBinary(arStream, y);
 }
 
 float NiPoint2::Length() const {

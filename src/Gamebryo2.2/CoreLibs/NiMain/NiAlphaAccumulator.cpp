@@ -78,25 +78,7 @@ void NiAlphaAccumulator::RegisterObjectArray(NiVisibleArray& kArray) {
             pkGeometry->RenderImmediate(pkRenderer);
         }
         else {
-            // EXE-INLINED 0xB58570
-            // The node comes from the node pool (0x43A010), called with the list's count field as its `this`: the
-            // stateless allocator is folded into the list (NiTListBase.h), so the exe passes that field's address.
-            NiTListItem<NiGeometry*>* pkNode = static_cast<NiTListItem<NiGeometry*>*>(
-                reinterpret_cast<NiTPointerAllocator<uint32_t>&>(m_kItems.m_uiCount).Allocate()
-            );
-            pkNode->m_element = pkGeometry;
-            pkNode->m_pkNext = nullptr;
-            pkNode->m_pkPrev = m_kItems.m_pkTail;
-            if (m_kItems.m_pkTail) {
-                m_kItems.m_pkTail->m_pkNext = pkNode;
-                ++m_kItems.m_uiCount;
-                m_kItems.m_pkTail = pkNode;
-            }
-            else {
-                ++m_kItems.m_uiCount;
-                m_kItems.m_pkHead = pkNode;
-                m_kItems.m_pkTail = pkNode;
-            }
+            m_kItems.AddTail(pkGeometry);
         }
     }
 }

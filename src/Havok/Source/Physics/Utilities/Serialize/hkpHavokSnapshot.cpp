@@ -50,12 +50,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
         );
         pMemory->m_memSizeAndFlags = sizeof(hkpStorageMeshShape);
         hkpStorageMeshShape* pStorage = ::new (pMemory) hkpStorageMeshShape(mesh);
-        // EXE-INLINED none: hkArray<hkReferencedObject*>::pushBack
-        hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-        if (m_objects.m_size == (m_objects.m_capacityAndFlags & hkArrayBase<hkReferencedObject*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_objects, sizeof(hkReferencedObject*));
-        }
-        m_objects.m_data[m_objects.m_size++] = pStorage;
+        m_objects.pushBack(pStorage);
         p = pStorage;
         k = &hkpStorageMeshShapeClass;
     }
@@ -66,12 +61,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
         );
         pMemory->m_memSizeAndFlags = sizeof(hkpStorageExtendedMeshShape);
         hkpStorageExtendedMeshShape* pStorage = ::new (pMemory) hkpStorageExtendedMeshShape(mesh);
-        // EXE-INLINED none: hkArray<hkReferencedObject*>::pushBack
-        hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-        if (m_objects.m_size == (m_objects.m_capacityAndFlags & hkArrayBase<hkReferencedObject*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_objects, sizeof(hkReferencedObject*));
-        }
-        m_objects.m_data[m_objects.m_size++] = pStorage;
+        m_objects.pushBack(pStorage);
         p = pStorage;
         k = &hkpStorageExtendedMeshShapeClass;
         return;
@@ -84,12 +74,7 @@ void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const 
             );
             pMemory->m_memSizeAndFlags = sizeof(hkpStorageSampledHeightFieldShape);
             hkpStorageSampledHeightFieldShape* pStorage = ::new (pMemory) hkpStorageSampledHeightFieldShape(hf);
-            // EXE-INLINED none: hkArray<hkReferencedObject*>::pushBack
-            hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-            if (m_objects.m_size == (m_objects.m_capacityAndFlags & hkArrayBase<hkReferencedObject*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_objects, sizeof(hkReferencedObject*));
-            }
-            m_objects.m_data[m_objects.m_size++] = pStorage;
+            m_objects.pushBack(pStorage);
             p = pStorage;
             k = &hkpStorageSampledHeightFieldShapeClass;
         }

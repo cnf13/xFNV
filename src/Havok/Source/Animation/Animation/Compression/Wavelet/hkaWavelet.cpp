@@ -51,11 +51,7 @@ void hkUpdateReflect(float liftParam, float* scale, const float* detail, int32_t
 // The even samples of a1 to the first half of a2, the odd ones to the second half, through a copy on the thread's
 // stack.
 void hkSplitOddEven(float* a1, float* a2, int32_t a3) {
-    // EXE-INLINED none: hkAllocateStack<hkReal>
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    // The stack allocator hands out untyped bytes (the SDK's static_cast from void*).
-    float* pTemp = reinterpret_cast<float*>(kRouter.m_stack.m_next.m_storage);
-    kRouter.m_stack.m_next.m_storage += (a3 * static_cast<int32_t>(sizeof(float)) + 127) & ~127;
+    float* pTemp = hkAllocateStack<float>(a3, nullptr);
     hkString::memCpy4(pTemp, a1, a3);
     const int32_t iHalf = a3 >> 1;
     const float* pIn = pTemp;
@@ -63,26 +59,20 @@ void hkSplitOddEven(float* a1, float* a2, int32_t a3) {
         a2[i] = pIn[2 * i];
         a2[i + iHalf] = pIn[2 * i + 1];
     }
-    // EXE-INLINED 0x5E0B60
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pTemp);
+    hkDeallocateStack(pTemp);
 }
 
 // Interleaves the two halves of the a3 floats at a1 into a2 (even elements from the first half), through a copy
 // on the thread's stack allocator, so that a1 and a2 may be the same.
 void hkMergeOddEven(float* a1, float* a2, int32_t a3) {
-    // EXE-INLINED none: hkAllocateStack<hkReal>
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    // The stack allocator hands out untyped bytes (the SDK's static_cast from void*).
-    float* pTemp = reinterpret_cast<float*>(kRouter.m_stack.m_next.m_storage);
-    kRouter.m_stack.m_next.m_storage += (a3 * static_cast<int32_t>(sizeof(float)) + 127) & ~127;
+    float* pTemp = hkAllocateStack<float>(a3, nullptr);
     hkString::memCpy4(pTemp, a1, a3);
     int32_t iHalf = a3 >> 1;
     for (int32_t i = 0; i < iHalf; i++) {
         a2[2 * i] = pTemp[i];
         a2[2 * i + 1] = pTemp[i + iHalf];
     }
-    // EXE-INLINED 0x5E0B60
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pTemp);
+    hkDeallocateStack(pTemp);
 }
 
 // Each level from the finest: split into even and odd samples, predict the odd ones and update the even ones.

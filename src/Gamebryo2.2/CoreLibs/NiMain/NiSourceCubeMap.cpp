@@ -297,7 +297,6 @@ NiSourceCubeMap* NiSourceCubeMap::Create_(
     NiFixedString* pkFilename = &pkCubeMap->m_kFilename;
     if (pkCubeMap->m_kFilename.GetHandle() != kFilename->GetHandle()) {
         NiGlobalStringTable::AcquireHandle(pcHandle);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(pkFilename->GetHandle());
         pkFilename->m_kHandle = pcHandle;
     }
@@ -337,7 +336,6 @@ NiSourceCubeMap::CreateTexture(NiFixedString* a1, NiFile* a2, NiDX9Renderer* pkR
     NiFixedString* pkFilename = &pkCubeMap->m_kFilename;
     if (pkCubeMap->m_kFilename.GetHandle() != a1->GetHandle()) {
         NiGlobalStringTable::AcquireHandle(pcHandle);
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(pkFilename->GetHandle());
         pkFilename->m_kHandle = pcHandle;
     }

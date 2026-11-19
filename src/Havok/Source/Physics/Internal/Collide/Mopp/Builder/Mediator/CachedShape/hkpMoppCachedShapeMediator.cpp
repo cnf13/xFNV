@@ -138,11 +138,7 @@ void hkpMoppCachedShapeMediator::addConvexShape(
     int32_t a4
 ) {
     const int32_t iNumSpheres = a1->getNumCollisionSpheresImpl();
-    // The stack allocator hands out raw memory (the SDK's static_cast from void*).
-    // EXE-INLINED none: hkAllocateStack<hkSphere>
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    hkSphere* pSpheres = reinterpret_cast<hkSphere*>(pRouter->m_stack.m_next.m_storage);
-    pRouter->m_stack.m_next.m_storage += (iNumSpheres * static_cast<int32_t>(sizeof(hkSphere)) + 127) & ~127;
+    hkSphere* pSpheres = hkAllocateStack<hkSphere>(iNumSpheres, nullptr);
     a1->getCollisionSpheresImpl(pSpheres);
 
     // EXE-INLINED none: hkArray<hkpMoppCachedShapeMediator::hkpConvexShapeData>::expandOne
@@ -193,7 +189,5 @@ void hkpMoppCachedShapeMediator::addConvexShape(
         rData.m_extents[i].m_max = fAbsMax;
     }
 
-    // EXE-INLINED none: hkDeallocateStack<hkSphere>
-    // The allocator's next free byte is raw memory again.
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pSpheres);
+    hkDeallocateStack(pSpheres);
 }

@@ -377,14 +377,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
     const hkpShapeContainer* pContainerA = hkBvTreeAgent3::getShapeContainerFrom(input.m_bodyA, acContainerBufferA);
     const hkpShapeContainer* pContainerB = hkBvTreeAgent3::getShapeContainerFrom(input.m_bodyB, acContainerBufferB);
 
-    // EXE-INLINED none: hkAllocateStack<hkShapeKeyPair>
-    char* pHitStorage;
-    {
-        hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-        pHitStorage = rRouter.m_stack.m_next.m_storage;
-        rRouter.m_stack.m_next.m_storage += HK_MAX_NUM_HITS_PER_AABB_QUERY * sizeof(hkShapeKeyPair);
-    }
-    hkShapeKeyPair* pHitList = reinterpret_cast<hkShapeKeyPair*>(pHitStorage);
+    hkShapeKeyPair* pHitList = hkAllocateStack<hkShapeKeyPair>(HK_MAX_NUM_HITS_PER_AABB_QUERY, nullptr);
 
     // The body whose boxes are the first list, and the other body with its container.
     const hkpCdBody* pBody1;
@@ -403,13 +396,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
                 iNumChildren = rData.m_numChildShapeAabbs;
             }
         }
-        // EXE-INLINED none: hkAllocateStack<hk1AxisSweep::AabbInt>
-        {
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            pAabbs1 = reinterpret_cast<hk1AxisSweep::AabbInt*>(rRouter.m_stack.m_next.m_storage);
-            rRouter.m_stack.m_next.m_storage +=
-                ((iNumChildren + 4) * sizeof(hk1AxisSweep::AabbInt) + 127) & ~static_cast<size_t>(127);
-        }
+        pAabbs1 = hkAllocateStack<hk1AxisSweep::AabbInt>(iNumChildren + 4, nullptr);
         iNum1 = calcAabbsOfCollidable(
             static_cast<const hkpCollidable*>(input.m_bodyA), input.m_overrideBodyA, pContainerA, input.m_input, pAabbs1
         );
@@ -446,13 +433,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
             pBody2 = input.m_bodyB;
             pContainer2 = pContainerB;
         }
-        // EXE-INLINED none: hkAllocateStack<hk1AxisSweep::AabbInt>
-        {
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            pAabbs1 = reinterpret_cast<hk1AxisSweep::AabbInt*>(rRouter.m_stack.m_next.m_storage);
-            rRouter.m_stack.m_next.m_storage +=
-                ((iNum1 + 4) * sizeof(hk1AxisSweep::AabbInt) + 127) & ~static_cast<size_t>(127);
-        }
+        pAabbs1 = hkAllocateStack<hk1AxisSweep::AabbInt>(iNum1 + 4, nullptr);
 
         HK_TIMER_SPLIT_LIST("ConvertHitlist");
         const bool bContinuous = input.m_input->m_collisionQualityInfo->m_useContinuousPhysics.m_storage != 0;
@@ -495,23 +476,14 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
                 iNumChildren = rData.m_numChildShapeAabbs;
             }
         }
-        // EXE-INLINED none: hkAllocateStack<hk1AxisSweep::AabbInt>
-        {
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            pAabbs2 = reinterpret_cast<hk1AxisSweep::AabbInt*>(rRouter.m_stack.m_next.m_storage);
-            rRouter.m_stack.m_next.m_storage +=
-                ((iNumChildren + 4) * sizeof(hk1AxisSweep::AabbInt) + 127) & ~static_cast<size_t>(127);
-        }
+        pAabbs2 = hkAllocateStack<hk1AxisSweep::AabbInt>(iNumChildren + 4, nullptr);
         iNum2 = calcAabbsOfCollidable(
             static_cast<const hkpCollidable*>(pBody2), nullptr, pContainer2, input.m_input, pAabbs2
         );
     }
     else {
         iNum2 = 0;
-        // EXE-INLINED none: hkAllocateStack<hk1AxisSweep::AabbInt>
-        hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-        pAabbs2 = reinterpret_cast<hk1AxisSweep::AabbInt*>(rRouter.m_stack.m_next.m_storage);
-        rRouter.m_stack.m_next.m_storage += (4 * sizeof(hk1AxisSweep::AabbInt) + 127) & ~static_cast<size_t>(127);
+        pAabbs2 = hkAllocateStack<hk1AxisSweep::AabbInt>(4, nullptr);
     }
 
     // The end markers: four boxes past each list whose lowest x is the largest value.
@@ -533,7 +505,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
     hkPadSpu<int32_t> numPairsSkipped;
     numPairsSkipped = 0;
     // The pairs are written as hk1AxisSweep's key pairs into the same untyped stack block.
-    hkKeyPair* pPairsOut = reinterpret_cast<hkKeyPair*>(pHitStorage);
+    hkKeyPair* pPairsOut = reinterpret_cast<hkKeyPair*>(pHitList);
     int32_t iNumHits;
     if (pBody1 == input.m_bodyA) {
         iNumHits = hk1AxisSweep::collide(
@@ -545,10 +517,8 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
             pAabbs2, iNum2, pAabbs1, iNum1, pPairsOut, HK_MAX_NUM_HITS_PER_AABB_QUERY - 1, numPairsSkipped
         );
     }
-    // EXE-INLINED none: hkDeallocateStack<hk1AxisSweep::AabbInt>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pAabbs2);
-    // EXE-INLINED none: hkDeallocateStack<hk1AxisSweep::AabbInt>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pAabbs1);
+    hkDeallocateStack(pAabbs2);
+    hkDeallocateStack(pAabbs1);
 
     HK_TIMER_SPLIT_LIST("SortHits");
     HK_MONITOR_ADD_VALUE("NumHits", static_cast<float>(iNumHits), HK_MONITOR_TYPE_INT);
@@ -563,8 +533,8 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
     pHitList[iNumHits].m_shapeKeyB = HK_INVALID_SHAPE_KEY;
     // EXE-INLINED none: hkShrinkAllocatedStack<hkShapeKeyPair>
     if (iNumHits + 1 < HK_MAX_NUM_HITS_PER_AABB_QUERY) {
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-            pHitStorage + (((iNumHits + 1) * sizeof(hkShapeKeyPair) + 127) & ~static_cast<size_t>(127));
+        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(pHitList) +
+            (((iNumHits + 1) * sizeof(hkShapeKeyPair) + 127) & ~static_cast<size_t>(127));
     }
 
     HK_TIMER_SPLIT_LIST("Narrow");
@@ -574,13 +544,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
         );
     }
     else {
-        // EXE-INLINED none: hkAllocateStack<hkpShapeKey>
-        uint32_t* puiKeys;
-        {
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            puiKeys = reinterpret_cast<uint32_t*>(rRouter.m_stack.m_next.m_storage);
-            rRouter.m_stack.m_next.m_storage += ((iNumHits + 1) * sizeof(uint32_t) + 127) & ~static_cast<size_t>(127);
-        }
+        uint32_t* puiKeys = hkAllocateStack<uint32_t>(iNumHits + 1, nullptr);
         // B's keys, the end marker's included.
         for (int32_t i = 0; i <= iNumHits; ++i) {
             puiKeys[i] = pHitList[i].m_shapeKeyB;
@@ -589,11 +553,9 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
         kInput.m_bodyA = input.m_overrideBodyA;
         kInput.m_overrideBodyA = nullptr;
         hkAgent1nMachine_Process(*static_cast<hkpAgent1nTrack*>(agentData), kInput, pContainerB, puiKeys, output);
-        // EXE-INLINED none: hkDeallocateStack<hkpShapeKey>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(puiKeys);
+        hkDeallocateStack(puiKeys);
     }
-    // EXE-INLINED none: hkDeallocateStack<hkShapeKeyPair>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pHitStorage;
+    hkDeallocateStack(pHitList);
     HK_TIMER_END_LIST();
     return static_cast<char*>(agentData) + ((sizeof(hkpAgent1nTrack) + 15) & ~static_cast<size_t>(15));
 }

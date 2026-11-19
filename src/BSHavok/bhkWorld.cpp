@@ -1897,8 +1897,7 @@ void bhkWorld::DeactivateAllIslands() {
         GethkWorld();
         hkArray<hkpSimulationIsland*> kIslands;
         GethkWorld();
-        // EXE-INLINED none: hkArray<hkpSimulationIsland*>::operator=
-        kIslands.copyFromArray(hkMemoryRouter::getInstance().heap(), pWorld->m_activeSimulationIslands, hkTypeIsPod());
+        kIslands = pWorld->m_activeSimulationIslands;
         GethkWorld();
         for (int32_t i = 0; i < kIslands.m_size; ++i) {
             hkpSimulationIsland* pIsland = kIslands.m_data[i];

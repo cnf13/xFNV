@@ -144,12 +144,7 @@ void bhkPackedNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStr
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
     bhkShapeCollection::GetViewerStrings(apStrings);
     char* pcString = NiGetViewerString(bhkPackedNiTriStripsShape::ms_RTTI.GetName());
-    // EXE-INLINED none: NiTArray<char*>::Add
-    uint32_t uiIndex = apStrings->m_usSize;
-    if (uiIndex >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiIndex, pcString);
+    apStrings->Add(pcString);
     hkPackedNiTriStripsShape* phkShape = this ? static_cast<hkPackedNiTriStripsShape*>(phkObject) : nullptr;
     uint32_t uiParts = phkShape->spTriStripsData.m_pObject->usPartCount;
     pcString = NiGetViewerString("Subparts", uiParts);
@@ -159,58 +154,14 @@ void bhkPackedNiTriStripsShape::GetViewerStrings(NiTPrimitiveArray<char*>* apStr
     }
     for (uint32_t i = 0; i < uiParts; ++i) {
         pcString = NiGetViewerString("Part", i);
-        // EXE-INLINED none: NiTArray<char*>::Add
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex < apStrings->m_usSize) {
-            if (pcString) {
-                if (!apStrings->m_pBase[uiIndex]) {
-                    ++apStrings->m_usESize;
-                }
-            }
-            else if (apStrings->m_pBase[uiIndex]) {
-                --apStrings->m_usESize;
-            }
-        }
-        else {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcString) {
-                ++apStrings->m_usESize;
-            }
-        }
-        apStrings->m_pBase[uiIndex] = pcString;
+        apStrings->Add(pcString);
         CFilter kFilter;
         kFilter.iFilter = phkShape->spTriStripsData.m_pObject->paSubPartData[i].uiFilter;
         kFilter.GetViewerStrings(apStrings);
         pcString = NiGetViewerString(
             "MATERIAL", static_cast<int32_t>(phkShape->spTriStripsData.m_pObject->paSubPartData[i].uiMaterial)
         );
-        // EXE-INLINED none: NiTArray<char*>::Add
-        uiIndex = apStrings->m_usSize;
-        if (uiIndex >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiIndex + apStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex < apStrings->m_usSize) {
-            if (pcString) {
-                if (!apStrings->m_pBase[uiIndex]) {
-                    ++apStrings->m_usESize;
-                }
-            }
-            else if (apStrings->m_pBase[uiIndex]) {
-                --apStrings->m_usESize;
-            }
-        }
-        else {
-            apStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcString) {
-                ++apStrings->m_usESize;
-            }
-        }
-        apStrings->m_pBase[uiIndex] = pcString;
+        apStrings->Add(pcString);
     }
     pTLSData->eMemContext = eMemContext;
 }

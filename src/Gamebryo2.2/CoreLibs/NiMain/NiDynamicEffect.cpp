@@ -50,11 +50,8 @@ void NiDynamicEffect::LoadBinary(NiStream& kStream) {
     }
 }
 
-// From 10.0.1.14 on, the file lists the unaffected nodes; each non-null one is added at the head. A node is taken from
-// the shared pointer pool under its spin lock (refilled when empty), which hands out untyped memory the list uses as
-// its item.
+// From 10.0.1.14 on, the file lists the unaffected nodes; each non-null one is added at the head.
 void NiDynamicEffect::LinkObject(NiStream& kStream) {
-    using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
     NiAVObject::LinkObject(kStream);
     if (kStream.m_uiNifFileVersion < 0x0A00010E) {
         return;
@@ -67,31 +64,7 @@ void NiDynamicEffect::LinkObject(NiStream& kStream) {
         if (!pkNode) {
             continue;
         }
-        // EXE-INLINED 0x43A010
-        PoolAllocator::Lock();
-        PoolAllocator::AllocNode* pkNew = PoolAllocator::ms_pkFreeMem;
-        if (!pkNew) {
-            PoolAllocator::CreateFreeMem();
-            pkNew = PoolAllocator::ms_pkFreeMem;
-        }
-        PoolAllocator::ms_pkFreeMem = pkNew->m_pkNext;
-        pkNew->m_element = 0;
-        pkNew->m_pkNext = nullptr;
-        pkNew->m_pkData = nullptr;
-        PoolAllocator::Unlock();
-        // EXE-INLINED none: NiTPointerListBase<NiNode*>::AddHead
-        NiTListItem<NiNode*>* pkItem = reinterpret_cast<NiTListItem<NiNode*>*>(pkNew);
-        pkItem->m_element = pkNode;
-        pkItem->m_pkPrev = nullptr;
-        pkItem->m_pkNext = m_kUnaffectedNodeList.m_pkHead;
-        if (m_kUnaffectedNodeList.m_pkHead) {
-            m_kUnaffectedNodeList.m_pkHead->m_pkPrev = pkItem;
-        }
-        else {
-            m_kUnaffectedNodeList.m_pkTail = pkItem;
-        }
-        m_kUnaffectedNodeList.m_uiCount++;
-        m_kUnaffectedNodeList.m_pkHead = pkItem;
+        m_kUnaffectedNodeList.AddHead(pkNode);
     }
 }
 
@@ -252,29 +225,10 @@ void NiDynamicEffect::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
     }
 }
 
-// Empties the unaffected-node list from its head, returning each node to the shared pointer pool under the pool's spin
-// lock; the pool treats a freed list node as untyped memory, an AllocNode.
+// Empties the unaffected-node list from its head, returning each node to the shared pointer pool.
 void NiDynamicEffect::DetachAllUnaffectedNodes() {
-    using PoolAllocator = NiTAbstractPoolAllocator<uint32_t>;
     while (m_kUnaffectedNodeList.m_uiCount != 0) {
-        // EXE-INLINED none: NiTPointerListBase<NiNode*>::RemoveHead
-        NiTListItem<NiNode*>* pkNode = m_kUnaffectedNodeList.m_pkHead;
-        m_kUnaffectedNodeList.m_pkHead = pkNode->m_pkNext;
-        if (m_kUnaffectedNodeList.m_pkHead) {
-            m_kUnaffectedNodeList.m_pkHead->m_pkPrev = nullptr;
-        }
-        else {
-            m_kUnaffectedNodeList.m_pkTail = nullptr;
-        }
-        // EXE-INLINED none: NiTPointerListBase<NiNode*>::DeleteItem
-        pkNode->m_element = nullptr;
-        PoolAllocator::Lock();
-        PoolAllocator::AllocNode* pkFreed = reinterpret_cast<PoolAllocator::AllocNode*>(pkNode);
-        pkFreed->m_pkData = nullptr;
-        pkFreed->m_pkNext = PoolAllocator::ms_pkFreeMem;
-        PoolAllocator::ms_pkFreeMem = pkFreed;
-        PoolAllocator::Unlock();
-        m_kUnaffectedNodeList.m_uiCount--;
+        m_kUnaffectedNodeList.RemoveHead();
     }
 }
 

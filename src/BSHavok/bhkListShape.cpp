@@ -109,13 +109,7 @@ void bhkListShape::LinkObject(NiStream& arStream) {
             }
         }
         const hkpShape* phkShape = pShape ? static_cast<const hkpShape*>(pShape->phkObject) : nullptr;
-        // EXE-INLINED 0x629AD0
-        hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-        if (rShapes.m_size == (rShapes.m_capacityAndFlags & hkArrayBase<const hkpShape*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(rRouter.heap(), &rShapes, sizeof(const hkpShape*));
-        }
-        rShapes.m_data[rShapes.m_size] = phkShape;
-        ++rShapes.m_size;
+        rShapes.pushBack(phkShape);
     }
     if (arStream.m_BSStreamHeader.uiVersion < 17) {
         uint32_t uiNumShapes = static_cast<uint32_t>(rShapes.m_size);
@@ -175,13 +169,8 @@ void bhkListShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkListShapeCinfo& rInfo = static_cast<hkListShapeCinfo&>(CreateCinfo(bCreated));
     hkArray<const hkpShape*>& rShapes = rInfo.m_childShapes;
-    // EXE-INLINED none: hkArray<const hkpShape*>::swap with an empty local array
-    const hkpShape** ppShapes = rShapes.m_data;
-    rShapes.m_data = nullptr;
-    int32_t iNumShapes = rShapes.m_size;
-    rShapes.m_size = 0;
-    int32_t iShapesCapacityAndFlags = rShapes.m_capacityAndFlags;
-    rShapes.m_capacityAndFlags = hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG;
+    hkArray<const hkpShape*> kShapes;
+    kShapes.swap(rShapes);
     {
         hkArray<uint32_t> kFilterInfos;
         kFilterInfos.swap(rInfo.m_childShapeFilterInfo);
@@ -190,10 +179,10 @@ void bhkListShape::SaveBinary(NiStream& arStream) {
             bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rInfo.m_childShapeFilterInfo);
             bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rShapes);
         }
-        uint32_t uiNumShapes = static_cast<uint32_t>(iNumShapes);
+        uint32_t uiNumShapes = static_cast<uint32_t>(kShapes.getSize());
         NiStreamSaveBinary(arStream, uiNumShapes);
         for (uint32_t i = 0; i < uiNumShapes; ++i) {
-            const hkpShape* phkShape = ppShapes[i];
+            const hkpShape* phkShape = kShapes[i];
             arStream.SaveLinkID(phkShape ? phkShape->m_userData : nullptr);
         }
         bhkShape::SaveBinary(arStream);
@@ -203,13 +192,6 @@ void bhkListShape::SaveBinary(NiStream& arStream) {
             bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rInfo.m_childShapeFilterInfo);
             bhkStream::SwapHKArray(&rInfo, iCinfoSize, &rShapes);
         }
-    }
-    // EXE-INLINED none: hkArray<const hkpShape*>::~hkArray
-    hkMemoryAllocator& rShapesHeap = hkMemoryRouter::getInstance().heap();
-    if ((iShapesCapacityAndFlags & hkArrayBase<const hkpShape*>::DONT_DEALLOCATE_FLAG) == 0) {
-        rShapesHeap._bufFree<const hkpShape*>(
-            ppShapes, iShapesCapacityAndFlags & hkArrayBase<const hkpShape*>::CAPACITY_MASK
-        );
     }
 }
 

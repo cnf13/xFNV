@@ -166,8 +166,9 @@ void hkpCachingShapePhantom::removeOverlappingCollidable(hkpCollidable* collidab
     }
     --m_collisionDetails.m_size;
     if (m_collisionDetails.m_size != i) {
-        // EXE-INLINED 0x6267C0
-        m_collisionDetails.m_data[i] = m_collisionDetails.m_data[m_collisionDetails.m_size];
+        hkMemUtil::memCpyOneAligned<sizeof(hkpCollisionDetail), alignof(hkpCollisionDetail)>(
+            m_collisionDetails.m_data + i, m_collisionDetails.m_data + m_collisionDetails.m_size
+        );
     }
     m_orderDirty.m_bool = 1;
 }

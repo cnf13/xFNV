@@ -113,7 +113,6 @@ BSWArray* BSWArray::Find(NiObjectNET* apObject) {
 void BSWArray::KillSDM() {
     NiFixedString* Block = BSWArray::pTag;
     if (BSWArray::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSWArray::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

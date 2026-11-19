@@ -298,17 +298,8 @@ void* hkVersionUtil::copyObjects(
 ) {
     int32_t numObjects = objectsIn.m_size;
     hkArray<int32_t, hkContainerTempAllocator> indices;
-    // EXE-INLINED none: hkArray<int32_t, hkContainerTempAllocator>::setSize
-    hkMemoryAllocator& temp = hkMemoryRouter::getInstance().temp();
-    int32_t capacity = indices.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
-    if (capacity < numObjects) {
-        int32_t newCapacity = 2 * capacity;
-        if (numObjects >= newCapacity) {
-            newCapacity = numObjects;
-        }
-        hkArrayUtil::_reserve(temp, &indices, newCapacity, sizeof(int32_t));
-    }
-    indices.m_size = numObjects;
+    indices.setSize(numObjects);
+
     for (int32_t i = 0; i < objectsIn.m_size; ++i) {
         indices.m_data[i] = i;
     }

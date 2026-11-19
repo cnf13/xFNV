@@ -186,45 +186,15 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
                 }
                 if (pBody) {
                     // The new body's index is read before the push's router call.
-                    const int32_t iNewBody = rigidBodies.m_size;
-                    // EXE-INLINED none: hkArray<int>::pushBack
-                    hkMemoryRouter& rMapRouter = hkMemoryRouter::getInstance();
-                    if (boneToRigidBody.m_size ==
-                        (boneToRigidBody.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*rMapRouter.m_heap, &boneToRigidBody, sizeof(int32_t));
-                    }
-                    boneToRigidBody.m_data[boneToRigidBody.m_size] = iNewBody;
-                    boneToRigidBody.m_size += 1;
-                    // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-                    hkMemoryRouter& rBodyRouter = hkMemoryRouter::getInstance();
-                    if (rigidBodies.m_size ==
-                        (rigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*rBodyRouter.m_heap, &rigidBodies, sizeof(hkpRigidBody*));
-                    }
-                    rigidBodies.m_data[rigidBodies.m_size] = pBody;
-                    rigidBodies.m_size += 1;
+                    boneToRigidBody.pushBack(rigidBodies.getSize());
+                    rigidBodies.pushBack(pBody);
                     if (b != splitBone && b != 0) {
-                        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-                        hkMemoryRouter& rConstraintRouter = hkMemoryRouter::getInstance();
-                        if (constraints.m_size ==
-                            (constraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-                            hkArrayUtil::_reserveMore(
-                                *rConstraintRouter.m_heap, &constraints, sizeof(hkpConstraintInstance*)
-                            );
-                        }
-                        constraints.m_data[constraints.m_size] = pConstraint;
-                        constraints.m_size += 1;
+                        constraints.pushBack(pConstraint);
                     }
                     continue;
                 }
             }
-            // EXE-INLINED none: hkArray<int>::pushBack
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            if (boneToRigidBody.m_size == (boneToRigidBody.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouter.m_heap, &boneToRigidBody, sizeof(int32_t));
-            }
-            boneToRigidBody.m_data[boneToRigidBody.m_size] = -1;
-            boneToRigidBody.m_size += 1;
+            boneToRigidBody.pushBack(-1);
         }
         // EXE-INLINED 0x56D280
         void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkaRagdollInstance));
@@ -269,8 +239,8 @@ bool hkaRagdollUtils::isConstraintSupported(const hkpConstraintInstance* apConst
 // With one constraint fewer than rigid bodies, records for each body the constraint whose first entity it is and that
 // constraint's second body (its parent), failing where a body is missing or has a second such constraint; sorts the
 // bodies by their depth in that hierarchy (a selection sort, swapping the order with the depths) and rewrites both
-// arrays in that order, each body but the first followed by the constraint into it. The hkLocalArrays' setSize and the
-// hkArray copies are written out here.
+// arrays in that order, each body but the first followed by the constraint into it. The hkLocalArrays' setSize with a
+// fill value is written out here.
 hkResult hkaRagdollUtils::reorderForRagdoll(
     hkArray<hkpRigidBody*, hkContainerHeapAllocator>& rigidBodies,
     hkArray<hkpConstraintInstance*, hkContainerHeapAllocator>& constraints
@@ -328,23 +298,8 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         hkpConstraintInstance* pConstraint = constraints.m_data[i];
         hkpRigidBody* pChildBody = pConstraint->getRigidBodyA();
         hkpRigidBody* pParentBody = pConstraint->getRigidBodyB();
-        const int32_t iNumCandidates = rigidBodies.m_size;
-        // EXE-INLINED none: hkArray<hkpRigidBody*>::indexOf
-        int32_t iChild = -1;
-        for (int32_t j = 0; j < iNumCandidates; ++j) {
-            if (rigidBodies.m_data[j] == pChildBody) {
-                iChild = j;
-                break;
-            }
-        }
-        // EXE-INLINED none: hkArray<hkpRigidBody*>::indexOf
-        int32_t iParent = -1;
-        for (int32_t j = 0; j < iNumCandidates; ++j) {
-            if (rigidBodies.m_data[j] == pParentBody) {
-                iParent = j;
-                break;
-            }
-        }
+        const int32_t iChild = rigidBodies.indexOf(pChildBody);
+        const int32_t iParent = rigidBodies.indexOf(pParentBody);
         if (iChild < 0 || iParent < 0 || parent.m_data[iChild] != -1 || constraintOfBody.m_data[iChild] != 0) {
             bValid = false;
             break;
@@ -415,49 +370,8 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         }
     }
 
-    // EXE-INLINED none: hkArray<hkpRigidBody*>::operator=
-    hkMemoryAllocator* pBodyHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iBodiesCapacityAndFlags = rigidBodies.m_capacityAndFlags;
-    if (static_cast<int32_t>(iBodiesCapacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK) < numBodies) {
-        if (iBodiesCapacityAndFlags >= 0) {
-            pBodyHeap->bufFree(
-                rigidBodies.m_data,
-                static_cast<int32_t>(
-                    (iBodiesCapacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK) * sizeof(hkpRigidBody*)
-                )
-            );
-        }
-        int32_t iBytes = numBodies * static_cast<int32_t>(sizeof(hkpRigidBody*));
-        rigidBodies.m_data = static_cast<hkpRigidBody**>(pBodyHeap->bufAlloc(iBytes));
-        rigidBodies.m_capacityAndFlags = iBytes / static_cast<int32_t>(sizeof(hkpRigidBody*));
-    }
-    rigidBodies.m_size = numBodies;
-    for (int32_t i = 0; i < numBodies; ++i) {
-        rigidBodies.m_data[i] = newBodies.m_data[i];
-    }
-
-    // EXE-INLINED none: hkArray<hkpConstraintInstance*>::operator=
-    hkMemoryAllocator* pConstraintHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iConstraintsCapacityAndFlags = constraints.m_capacityAndFlags;
-    if (static_cast<int32_t>(iConstraintsCapacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK) <
-        numConstraints) {
-        if (iConstraintsCapacityAndFlags >= 0) {
-            pConstraintHeap->bufFree(
-                constraints.m_data,
-                static_cast<int32_t>(
-                    (iConstraintsCapacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK) *
-                    sizeof(hkpConstraintInstance*)
-                )
-            );
-        }
-        int32_t iBytes = numConstraints * static_cast<int32_t>(sizeof(hkpConstraintInstance*));
-        constraints.m_data = static_cast<hkpConstraintInstance**>(pConstraintHeap->bufAlloc(iBytes));
-        constraints.m_capacityAndFlags = iBytes / static_cast<int32_t>(sizeof(hkpConstraintInstance*));
-    }
-    constraints.m_size = numConstraints;
-    for (int32_t i = 0; i < numConstraints; ++i) {
-        constraints.m_data[i] = newConstraints.m_data[i];
-    }
+    rigidBodies = newBodies;
+    constraints = newConstraints;
 
     return HK_SUCCESS;
 }
@@ -523,34 +437,12 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
             }
         }
         if (!pBody) {
-            // EXE-INLINED none: hkArray<int>::pushBack
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            if (boneToRigidBody.m_size ==
-                static_cast<int32_t>(boneToRigidBody.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouter.m_heap, &boneToRigidBody, sizeof(int32_t));
-            }
-            boneToRigidBody.m_data[boneToRigidBody.m_size] = -1;
-            boneToRigidBody.m_size += 1;
+            boneToRigidBody.pushBack(-1);
             continue;
         }
         // The new body's index is read before the push's router call.
-        const int32_t iNewBody = rigidBodies.m_size;
-        // EXE-INLINED none: hkArray<int>::pushBack
-        hkMemoryRouter& rMapRouter = hkMemoryRouter::getInstance();
-        if (boneToRigidBody.m_size ==
-            static_cast<int32_t>(boneToRigidBody.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rMapRouter.m_heap, &boneToRigidBody, sizeof(int32_t));
-        }
-        boneToRigidBody.m_data[boneToRigidBody.m_size] = iNewBody;
-        boneToRigidBody.m_size += 1;
-        // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-        hkMemoryRouter& rBodyRouter = hkMemoryRouter::getInstance();
-        if (rigidBodies.m_size ==
-            static_cast<int32_t>(rigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rBodyRouter.m_heap, &rigidBodies, sizeof(hkpRigidBody*));
-        }
-        rigidBodies.m_data[rigidBodies.m_size] = pBody;
-        rigidBodies.m_size += 1;
+        boneToRigidBody.pushBack(rigidBodies.getSize());
+        rigidBodies.pushBack(pBody);
         if (parentBone == -1) {
             continue;
         }
@@ -584,14 +476,7 @@ hkaRagdollInstance* hkaRagdollUtils::createRagdollInstanceFromSkeleton(
             bFailed = true;
             break;
         }
-        // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-        hkMemoryRouter& rConstraintRouter = hkMemoryRouter::getInstance();
-        if (constraints.m_size ==
-            static_cast<int32_t>(constraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rConstraintRouter.m_heap, &constraints, sizeof(hkpConstraintInstance*));
-        }
-        constraints.m_data[constraints.m_size] = pConstraint;
-        constraints.m_size += 1;
+        constraints.pushBack(pConstraint);
     }
 
     hkaRagdollInstance* pInstance = nullptr;
@@ -662,28 +547,8 @@ hkaSkeleton* hkaRagdollUtils::constructSkeletonForRagdoll(
         while (apThis_8a);
     }
     v3->m_bones.m_size = m_size;
-    // EXE-INLINED none: hkArray<hkInt16>::setSize
-    hkMemoryAllocator* m_heap_1 = (&hkMemoryRouter::getInstance())->m_heap;
-    int32_t m_size_6 = v3->m_parentIndices.m_capacityAndFlags & hkArrayBase<int16_t>::CAPACITY_MASK;
-    if (m_size_6 < m_size) {
-        int32_t m_size_5 = 2 * m_size_6;
-        if (m_size >= m_size_5) {
-            m_size_5 = m_size;
-        }
-        hkArrayUtil::_reserve(*m_heap_1, &v3->m_parentIndices, m_size_5, sizeof(int16_t));
-    }
-    v3->m_parentIndices.m_size = m_size;
-    // EXE-INLINED none: hkArray<hkQsTransform>::setSize
-    hkMemoryAllocator* m_heap_2 = (&hkMemoryRouter::getInstance())->m_heap;
-    int32_t m_size_8 = v3->m_referencePose.m_capacityAndFlags & hkArrayBase<hkQsTransform>::CAPACITY_MASK;
-    if (m_size_8 < m_size) {
-        int32_t m_size_7 = 2 * m_size_8;
-        if (m_size >= m_size_7) {
-            m_size_7 = m_size;
-        }
-        hkArrayUtil::_reserve(*m_heap_2, &v3->m_referencePose, m_size_7, sizeof(hkQsTransform));
-    }
-    v3->m_referencePose.m_size = m_size;
+    v3->m_parentIndices.setSize(m_size);
+    v3->m_referencePose.setSize(m_size);
     int32_t m_size_9 = 0;
     if (m_size > 0) {
         int32_t apThis_8b = 0;

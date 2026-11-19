@@ -1178,10 +1178,6 @@ void BSBatchRenderer::RenderNextAlpha(
     do {
         while (true) {
             BSBatchRenderer* v17;
-            NiTListItem<BSBatchRenderer::GeometryGroup*>* pNode;
-            NiTListItem<BSBatchRenderer::GeometryGroup*>* pNext;
-            void* pItemMemory;
-            NiTAbstractPoolAllocator<uint32_t>::AllocNode* pFree;
             if (!m_element) {
                 goto LABEL_36;
             }
@@ -1207,27 +1203,7 @@ void BSBatchRenderer::RenderNextAlpha(
             m_element->usCount = 0;
             m_element->~GeometryGroup();
             MemoryManager_Singleton.Deallocate(m_element);
-            // EXE-INLINED none: NiTPointerListBase::RemoveHead
-            pNode = pList->m_pkHead;
-            pNext = pNode->m_pkNext;
-            pList->m_pkHead = pNext;
-            if (pNext) {
-                pNext->m_pkPrev = nullptr;
-            }
-            else {
-                pList->m_pkTail = nullptr;
-            }
-            pNode->m_element = 0;
-            // EXE-INLINED none: NiTAbstractPoolAllocator::Deallocate. As Gamebryo's DeleteItem, the node goes to the
-            // pool allocator as untyped memory (void*), which takes it as its own 12-byte AllocNode.
-            pItemMemory = pNode;
-            pFree = static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(pItemMemory);
-            NiTAbstractPoolAllocator<uint32_t>::Lock();
-            pFree->m_pkData = nullptr;
-            pFree->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
-            NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = pFree;
-            NiTAbstractPoolAllocator<uint32_t>::Unlock();
-            --pList->m_uiCount;
+            pList->RemoveHead();
             if (!pList->m_uiCount) {
                 v5 = aiIndex;
                 m_element = nullptr;

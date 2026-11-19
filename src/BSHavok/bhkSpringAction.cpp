@@ -4,6 +4,7 @@
 #include "BSHavok/bhkAction.h"
 #include "BSHavok/bhkBinaryAction.h"
 #include "BSHavok/bhkSerializable.h"
+#include "BSHavok/bhkStream.h"
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
@@ -55,18 +56,8 @@ void bhkSpringAction::LoadBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkSpringActionCinfo& rInfo = static_cast<hkSpringActionCinfo&>(CreateCinfo(bCreated));
-        // EXE-INLINED none: bhkStream::Endian
-        uint32_t* puiPivotA = reinterpret_cast<uint32_t*>(&rInfo.m_pivotA);
-        puiPivotA[0] = __builtin_bswap32(puiPivotA[0]);
-        puiPivotA[1] = __builtin_bswap32(puiPivotA[1]);
-        puiPivotA[2] = __builtin_bswap32(puiPivotA[2]);
-        puiPivotA[3] = __builtin_bswap32(puiPivotA[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        uint32_t* puiPivotB = reinterpret_cast<uint32_t*>(&rInfo.m_pivotB);
-        puiPivotB[0] = __builtin_bswap32(puiPivotB[0]);
-        puiPivotB[1] = __builtin_bswap32(puiPivotB[1]);
-        puiPivotB[2] = __builtin_bswap32(puiPivotB[2]);
-        puiPivotB[3] = __builtin_bswap32(puiPivotB[3]);
+        bhkStream::Endian(rInfo.m_pivotA);
+        bhkStream::Endian(rInfo.m_pivotB);
         // EXE-INLINED none: BSEndian
         uint32_t* puiRestLength = reinterpret_cast<uint32_t*>(&rInfo.m_restLength);
         *puiRestLength = __builtin_bswap32(*puiRestLength);
@@ -87,22 +78,12 @@ void bhkSpringAction::LoadBinary(NiStream& arStream) {
 void bhkSpringAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkSpringActionCinfo& rInfo = static_cast<hkSpringActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiPivotA = reinterpret_cast<uint32_t*>(&rInfo.m_pivotA);
-    uint32_t* puiPivotB = reinterpret_cast<uint32_t*>(&rInfo.m_pivotB);
     uint32_t* puiRestLength = reinterpret_cast<uint32_t*>(&rInfo.m_restLength);
     uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&rInfo.m_strength);
     uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&rInfo.m_damping);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiPivotA[0] = __builtin_bswap32(puiPivotA[0]);
-        puiPivotA[1] = __builtin_bswap32(puiPivotA[1]);
-        puiPivotA[2] = __builtin_bswap32(puiPivotA[2]);
-        puiPivotA[3] = __builtin_bswap32(puiPivotA[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiPivotB[0] = __builtin_bswap32(puiPivotB[0]);
-        puiPivotB[1] = __builtin_bswap32(puiPivotB[1]);
-        puiPivotB[2] = __builtin_bswap32(puiPivotB[2]);
-        puiPivotB[3] = __builtin_bswap32(puiPivotB[3]);
+        bhkStream::Endian(rInfo.m_pivotA);
+        bhkStream::Endian(rInfo.m_pivotB);
         // EXE-INLINED none: BSEndian
         *puiRestLength = __builtin_bswap32(*puiRestLength);
         // EXE-INLINED none: BSEndian
@@ -112,16 +93,8 @@ void bhkSpringAction::SaveBinary(NiStream& arStream) {
     }
     bhkBinaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiPivotA[0] = __builtin_bswap32(puiPivotA[0]);
-        puiPivotA[1] = __builtin_bswap32(puiPivotA[1]);
-        puiPivotA[2] = __builtin_bswap32(puiPivotA[2]);
-        puiPivotA[3] = __builtin_bswap32(puiPivotA[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiPivotB[0] = __builtin_bswap32(puiPivotB[0]);
-        puiPivotB[1] = __builtin_bswap32(puiPivotB[1]);
-        puiPivotB[2] = __builtin_bswap32(puiPivotB[2]);
-        puiPivotB[3] = __builtin_bswap32(puiPivotB[3]);
+        bhkStream::Endian(rInfo.m_pivotA);
+        bhkStream::Endian(rInfo.m_pivotB);
         // EXE-INLINED none: BSEndian
         *puiRestLength = __builtin_bswap32(*puiRestLength);
         // EXE-INLINED none: BSEndian

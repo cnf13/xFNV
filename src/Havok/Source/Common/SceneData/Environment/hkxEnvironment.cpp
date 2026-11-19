@@ -291,16 +291,7 @@ hkResult hkxEnvironment::setVariable(const char* name, const char* value) {
         if (index == -1) {
             return HK_FAILURE;
         }
-        // EXE-INLINED none: hkArrayBase<hkxEnvironment::Variable>::removeAt
-        Variable* pVariable = &m_variables.m_data[index];
-        pVariable->m_value.~hkStringPtr();
-        pVariable->m_name.~hkStringPtr();
-        --m_variables.m_size;
-        if (m_variables.m_size != index) {
-            hkString::memCpy4(
-                &m_variables.m_data[index], &m_variables.m_data[m_variables.m_size], sizeof(Variable) / 4
-            );
-        }
+        m_variables.removeAt(index);
         return HK_SUCCESS;
     }
     if (index != -1) {
@@ -309,22 +300,10 @@ hkResult hkxEnvironment::setVariable(const char* name, const char* value) {
     }
     {
         // The SDK's local Variable, its two strings built empty, then assigned.
-        hkStringPtr newName;
-        hkStringPtr newValue;
-        newName = name;
-        newValue = value;
-        // EXE-INLINED none: hkArray<hkxEnvironment::Variable>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (m_variables.m_size == (m_variables.m_capacityAndFlags & hkArrayBase<Variable>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &m_variables, sizeof(Variable));
-        }
-        Variable* pSlot = &m_variables.m_data[m_variables.m_size];
-        if (pSlot) {
-            // EXE-INLINED none: hkxEnvironment::Variable::Variable(const Variable&)
-            ::new (&pSlot->m_name) hkStringPtr(newName);
-            ::new (&pSlot->m_value) hkStringPtr(newValue);
-        }
-        ++m_variables.m_size;
+        Variable newVariable;
+        newVariable.m_name = name;
+        newVariable.m_value = value;
+        m_variables.pushBack(newVariable);
     }
     return HK_SUCCESS;
 }

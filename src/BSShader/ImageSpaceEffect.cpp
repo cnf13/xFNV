@@ -172,26 +172,7 @@ void ImageSpaceEffect::ApplyEffectTextures(int32_t aiEffectIndex) {
         }
     }
     ImageSpaceTexture* pOutput = pTextures.m_pBase[iOutput];
-    // EXE-INLINED 0xBA3AA0
-    if (pEffect->pTextures.m_usSize > 0) {
-        if (pOutput) {
-            if (!pEffect->pTextures.m_pBase[0]) {
-                ++pEffect->pTextures.m_usESize;
-            }
-        }
-        else {
-            if (pEffect->pTextures.m_pBase[0]) {
-                --pEffect->pTextures.m_usESize;
-            }
-        }
-    }
-    else {
-        pEffect->pTextures.m_usSize = 1;
-        if (pOutput) {
-            ++pEffect->pTextures.m_usESize;
-        }
-    }
-    pEffect->pTextures.m_pBase[0] = pOutput;
+    pEffect->pTextures.SetAt(0, pOutput);
     if (pOutput) {
         pOutput->SetFilterMode(NiTexturingProperty::FILTER_NEAREST);
     }

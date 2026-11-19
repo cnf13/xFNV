@@ -224,15 +224,7 @@ void hkpShapeCollectionAgent::updateShapeCollectionFilter(
         }
         else if (foundIndex != -1) {
             m_agents.m_data[foundIndex].m_agent->cleanup(constraintOwner);
-            // EXE-INLINED none: hkArrayBase<hkpShapeCollectionAgent::KeyAgentPair>::removeAt
-            const int32_t last = --m_agents.m_size;
-            if (last != foundIndex) {
-                // EXE-INLINED 0x6267C0
-                KeyAgentPair* pDst = &m_agents.m_data[foundIndex];
-                const KeyAgentPair* pSrc = &m_agents.m_data[last];
-                pDst->m_key = pSrc->m_key;
-                pDst->m_agent = pSrc->m_agent;
-            }
+            m_agents.removeAt(foundIndex);
         }
     }
 }

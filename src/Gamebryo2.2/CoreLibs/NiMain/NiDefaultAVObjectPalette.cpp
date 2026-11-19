@@ -217,12 +217,7 @@ bool NiDefaultAVObjectPalette::IsEqual(NiObject* pObject) {
 void NiDefaultAVObjectPalette::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
     NiAVObjectPalette::GetViewerStrings(pStrings);
     char* pcString = NiGetViewerString(ms_RTTI.GetName());
-    // EXE-INLINED none: NiTArray<char*>::Add
-    uint32_t uiIndex = pStrings->m_usSize;
-    if (uiIndex >= pStrings->m_usMaxSize) {
-        pStrings->SetSize(uiIndex + pStrings->m_usGrowBy);
-    }
-    pStrings->SetAt(uiIndex, pcString);
+    pStrings->Add(pcString);
 
     pcString = static_cast<char*>(MemoryManager_Singleton.Allocate(0x60));
     const char* pcSceneName = m_pkScene->m_kName;
@@ -243,27 +238,7 @@ void NiDefaultAVObjectPalette::GetViewerStrings(NiTPrimitiveArray<char*>* pStrin
         m_kHash.GetNext(pkPos, kName, pkObject);
         pcString = static_cast<char*>(MemoryManager_Singleton.Allocate(0x60));
         std::sprintf(pcString, "%s", static_cast<const char*>(kName));
-        // EXE-INLINED none: NiTArray<char*>::Add
-        uiIndex = pStrings->m_usSize;
-        if (uiIndex >= pStrings->m_usMaxSize) {
-            pStrings->SetSize(uiIndex + pStrings->m_usGrowBy);
-        }
-        // EXE-INLINED 0x96AE90
-        if (uiIndex >= pStrings->m_usSize) {
-            pStrings->m_usSize = static_cast<uint16_t>(uiIndex + 1);
-            if (pcString) {
-                ++pStrings->m_usESize;
-            }
-        }
-        else if (pcString) {
-            if (!pStrings->m_pBase[uiIndex]) {
-                ++pStrings->m_usESize;
-            }
-        }
-        else if (pStrings->m_pBase[uiIndex]) {
-            --pStrings->m_usESize;
-        }
-        pStrings->m_pBase[uiIndex] = pcString;
+        pStrings->Add(pcString);
         ReleaseName(kName);
     }
 }

@@ -91,11 +91,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
                     ".\\VisualDebugger\\Viewer\\Dynamics\\hkpSweptTransformDisplayViewer.cpp", 168
                 );
             }
-            // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::removeAt
-            displayGeometries.m_size--;
-            if (displayGeometries.m_size != i) {
-                displayGeometries.m_data[i] = displayGeometries.m_data[displayGeometries.m_size];
-            }
+            displayGeometries.removeAt(i);
         }
     }
 
@@ -103,15 +99,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         const hkSweptTransform& swept = entity->m_motion.m_motionState.m_sweptTransform;
         const hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable);
         hkArray<hkUlong>& created = data->entitiesCreated;
-        {
-            // EXE-INLINED none: hkArray<hkUlong>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (created.m_size == (created.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &created, sizeof(hkUlong));
-            }
-            created.m_data[created.m_size] = id + 1;
-            created.m_size++;
-        }
+        created.pushBack(id + 1);
 
         hkTransform trans0;
         // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
@@ -143,15 +131,7 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
 
         m_displayHandler->addGeometry(displayGeometries, trans0, id + 1, m_tag, 0);
         m_displayHandler->setGeometryColor(HK_DEFAULT_SWEPT_TRANSFORM_COLOR_T0, id + 1, m_tag);
-        {
-            // EXE-INLINED none: hkArray<hkUlong>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (created.m_size == (created.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &created, sizeof(hkUlong));
-            }
-            created.m_data[created.m_size] = id + 2;
-            created.m_size++;
-        }
+        created.pushBack(id + 2);
         m_displayHandler->addGeometry(displayGeometries, trans1, id + 2, m_tag, 0);
         m_displayHandler->setGeometryColor(HK_DEFAULT_SWEPT_TRANSFORM_COLOR_T1, id + 2, m_tag);
     }
@@ -179,20 +159,9 @@ void hkpSweptTransformDisplayViewer::entityRemovedCallback(hkpEntity* entity) {
     const hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable);
     for (uint32_t step = 1; step <= 2; step++) {
         m_displayHandler->removeGeometry(id + step, m_tag, 0);
-        // EXE-INLINED none: hkArrayBase<hkUlong>::indexOf
-        int32_t found = -1;
-        for (int32_t i = 0; i < created.m_size; i++) {
-            if (created.m_data[i] == id + step) {
-                found = i;
-                break;
-            }
-        }
+        const int32_t found = created.indexOf(id + step);
         if (found >= 0) {
-            // EXE-INLINED none: hkArrayBase<hkUlong>::removeAt
-            created.m_size--;
-            if (created.m_size != found) {
-                created.m_data[found] = created.m_data[created.m_size];
-            }
+            created.removeAt(found);
         }
     }
 }

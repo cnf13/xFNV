@@ -87,30 +87,8 @@ void bhkConvexVerticesShape::SaveBinary(NiStream& arStream) {
     hkConvexVerticesShapeCinfo* pCinfo = static_cast<hkConvexVerticesShapeCinfo*>(&CreateCinfo(bCreated));
     hkArray<hkVector4> kVertices;
     hkArray<hkVector4> kPlanes;
-    {
-        // EXE-INLINED 0xD9EC10: hkArray::swap
-        hkVector4* pData = kVertices.m_data;
-        kVertices.m_data = pCinfo->m_vertices.m_data;
-        pCinfo->m_vertices.m_data = pData;
-        int32_t iSize = kVertices.m_size;
-        kVertices.m_size = pCinfo->m_vertices.m_size;
-        pCinfo->m_vertices.m_size = iSize;
-        int32_t iCapacity = kVertices.m_capacityAndFlags;
-        kVertices.m_capacityAndFlags = pCinfo->m_vertices.m_capacityAndFlags;
-        pCinfo->m_vertices.m_capacityAndFlags = iCapacity;
-    }
-    {
-        // EXE-INLINED 0xD9EC10: hkArray::swap
-        hkVector4* pData = kPlanes.m_data;
-        kPlanes.m_data = pCinfo->m_planeEquations.m_data;
-        pCinfo->m_planeEquations.m_data = pData;
-        int32_t iSize = kPlanes.m_size;
-        kPlanes.m_size = pCinfo->m_planeEquations.m_size;
-        pCinfo->m_planeEquations.m_size = iSize;
-        int32_t iCapacity = kPlanes.m_capacityAndFlags;
-        kPlanes.m_capacityAndFlags = pCinfo->m_planeEquations.m_capacityAndFlags;
-        pCinfo->m_planeEquations.m_capacityAndFlags = iCapacity;
-    }
+    kVertices.swap(pCinfo->m_vertices);
+    kPlanes.swap(pCinfo->m_planeEquations);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         int32_t iSize = static_cast<int32_t>(QCinfoSize());
         bhkStream::SwapHKArray(pCinfo, iSize, &pCinfo->m_vertices);
@@ -233,9 +211,7 @@ void bhkConvexVerticesShape::BuildDisplayGeometry(NiNode* apNode, const NiColor&
     const hkpConvexVerticesShape* pShape = this ? static_cast<const hkpConvexVerticesShape*>(phkObject) : nullptr;
     int32_t iNumSpheres = pShape->getNumCollisionSpheresImpl();
     alignas(16) hkArray<hkSphere> kSphereBuffer;
-    // EXE-INLINED none: hkArray<hkSphere>::setSize (hkSphere's construct is empty)
-    kSphereBuffer.reserve(iNumSpheres);
-    kSphereBuffer.setSizeUnchecked(iNumSpheres);
+    kSphereBuffer.setSize(iNumSpheres);
     const hkSphere* pSpheres = pShape->getCollisionSpheresImpl(kSphereBuffer.m_data);
     hkArray<hkVector4> kVertices;
     kVertices.setSize(iNumSpheres);

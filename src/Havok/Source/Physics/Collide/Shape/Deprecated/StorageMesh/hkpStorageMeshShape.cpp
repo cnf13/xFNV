@@ -237,12 +237,7 @@ void hkpStorageMeshShape::addSubpart(const hkpMeshShape::Subpart& partIn) {
     );
     pNewStorage->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpStorageMeshShape::SubpartStorage));
     pNewStorage = ::new (pNewStorage) hkpStorageMeshShape::SubpartStorage;
-    // EXE-INLINED none: hkArray<hkpStorageMeshShape::SubpartStorage*>::pushBack
-    hkMemoryAllocator& storageAlloc = hkMemoryRouter::getInstance().heap();
-    if (m_storage.m_size == m_storage.getCapacity()) {
-        hkArrayUtil::_reserveMore(storageAlloc, &m_storage, sizeof(hkpStorageMeshShape::SubpartStorage*));
-    }
-    m_storage.m_data[m_storage.m_size++] = pNewStorage;
+    m_storage.pushBack(pNewStorage);
     hkpStorageMeshShape::SubpartStorage* pStorage = m_storage.m_data[m_storage.m_size - 1];
 
     // The vertices, packed as three floats each.
@@ -306,13 +301,7 @@ void hkpStorageMeshShape::addSubpart(const hkpMeshShape::Subpart& partIn) {
         if (partIn.m_materialIndexStridingType.m_storage == hkpMeshShape::MATERIAL_INDICES_INT8) {
             hkArray<uint8_t>& materialIndices = pStorage->m_materialIndices;
             if (partIn.m_materialIndexStriding == 0) {
-                // EXE-INLINED none: hkArray<uint8_t>::pushBack
-                hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-                if (materialIndices.m_size == materialIndices.getCapacity()) {
-                    hkArrayUtil::_reserveMore(alloc, &materialIndices, sizeof(uint8_t));
-                }
-                materialIndices.m_data[materialIndices.m_size] = *static_cast<const uint8_t*>(pMaterialIndexIn);
-                ++materialIndices.m_size;
+                materialIndices.pushBack(*static_cast<const uint8_t*>(pMaterialIndexIn));
                 part.m_materialIndexBase = &materialIndices.m_data[materialIndices.m_size - 1];
             }
             else {
@@ -328,13 +317,7 @@ void hkpStorageMeshShape::addSubpart(const hkpMeshShape::Subpart& partIn) {
         else {
             hkArray<uint16_t>& materialIndices = pStorage->m_materialIndices16;
             if (partIn.m_materialIndexStriding == 0) {
-                // EXE-INLINED none: hkArray<uint16_t>::pushBack
-                hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-                if (materialIndices.m_size == materialIndices.getCapacity()) {
-                    hkArrayUtil::_reserveMore(alloc, &materialIndices, sizeof(uint16_t));
-                }
-                materialIndices.m_data[materialIndices.m_size] = *static_cast<const uint16_t*>(pMaterialIndexIn);
-                ++materialIndices.m_size;
+                materialIndices.pushBack(*static_cast<const uint16_t*>(pMaterialIndexIn));
                 part.m_materialIndexBase = &materialIndices.m_data[materialIndices.m_size - 1];
             }
             else {
@@ -370,13 +353,7 @@ void hkpStorageMeshShape::addSubpart(const hkpMeshShape::Subpart& partIn) {
         hkArray<uint32_t>& materials = pStorage->m_materials;
         if (partIn.m_materialStriding == 0) {
             const hkpMeshMaterial* pMaterialIn = partIn.m_materialBase;
-            // EXE-INLINED none: hkArray<uint32_t>::pushBack
-            hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-            if (materials.m_size == materials.getCapacity()) {
-                hkArrayUtil::_reserveMore(alloc, &materials, sizeof(uint32_t));
-            }
-            materials.m_data[materials.m_size] = pMaterialIn->m_filterInfo;
-            materials.m_size += 1;
+            materials.pushBack(pMaterialIn->m_filterInfo);
             part.m_materialStriding = 0;
             part.m_numMaterials = 1;
         }

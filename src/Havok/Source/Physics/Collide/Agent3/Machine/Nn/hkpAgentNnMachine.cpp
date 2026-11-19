@@ -214,32 +214,12 @@ void hkAgentNnMachine_DestroyAgent(
         hkpLinkedCollidable* collidable = entry->m_collidable[i];
         int32_t index = entry->m_agentIndexOnCollidable[i];
         hkArray<hkpLinkedCollidable::CollisionEntry>& entries = collidable->m_collisionEntries;
-        // EXE-INLINED none: hkArrayBase<hkpLinkedCollidable::CollisionEntry>::removeAt
-        --entries.m_size;
-        if (entries.m_size != index) {
-            entries.m_data[index] = entries.m_data[entries.m_size];
-        }
+        entries.removeAt(index);
         if (index < entries.m_size) {
             hkpAgentNnEntry* moved = entries.m_data[index].m_agentEntry;
             moved->m_agentIndexOnCollidable[moved->m_collidable[0] != collidable] = static_cast<uint16_t>(index);
         }
-        // EXE-INLINED none: hkArray<hkpLinkedCollidable::CollisionEntry>::optimizeCapacity(4)
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        uint32_t uiCapacity = entries.m_size + 3;
-        uiCapacity |= uiCapacity >> 16;
-        uiCapacity |= uiCapacity >> 8;
-        uiCapacity |= uiCapacity >> 4;
-        uiCapacity |= uiCapacity >> 2;
-        uiCapacity |= uiCapacity >> 1;
-        int32_t newCapacity = static_cast<int32_t>(uiCapacity + 1);
-        if (newCapacity <
-            static_cast<int32_t>(
-                entries.m_capacityAndFlags & hkArrayBase<hkpLinkedCollidable::CollisionEntry>::CAPACITY_MASK
-            )) {
-            hkArrayUtil::_reduce(
-                *router.m_heap, &entries, sizeof(hkpLinkedCollidable::CollisionEntry), nullptr, newCapacity
-            );
-        }
+        entries.optimizeCapacity(4);
     }
     hkAgentNnMachine_InternalDeallocateEntry(track, entry);
 }
@@ -1248,11 +1228,7 @@ initVertexCollidePointsInput(const hkpAgent3ProcessInput* r_eax, hkp4dGskVertexC
     const int32_t iNumSpheres = pShapeA->getNumCollisionSpheresImpl();
     r_esi->m_allocatedNumVertices.m_storage = iNumSpheres;
     r_esi->m_numVertices.m_storage = iNumSpheres;
-    // EXE-INLINED none: hkAllocateStack<hkVector4>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((iNumSpheres * static_cast<int32_t>(sizeof(hkVector4)) + 127) & ~127);
+    void* pBlock = hkAllocateStack<hkVector4>(iNumSpheres, nullptr);
     r_esi->m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
     // The stack block is untyped memory the spheres are written to and read back as vectors.
     const hkSphere* pResult = pShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));

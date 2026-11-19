@@ -206,14 +206,8 @@ hkpPhantom* hkpAabbPhantom::clone() const {
     static_cast<hkpAabbPhantom*>(pMemory)->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpAabbPhantom));
     hkpAabbPhantom* pPhantom =
         ::new (pMemory) hkpAabbPhantom(m_aabb, m_collidable.m_broadPhaseHandle.m_collisionFilterInfo);
-    // EXE-INLINED none: hkArray<hkpPhantomOverlapListener*>::operator=
-    pPhantom->m_overlapListeners.copyFromArray(
-        hkContainerHeapAllocator().get(&pPhantom->m_overlapListeners), m_overlapListeners, hkTypeIsPod()
-    );
-    // EXE-INLINED none: hkArray<hkpPhantomListener*>::operator=
-    pPhantom->m_phantomListeners.copyFromArray(
-        hkContainerHeapAllocator().get(&pPhantom->m_phantomListeners), m_phantomListeners, hkTypeIsPod()
-    );
+    pPhantom->m_overlapListeners = m_overlapListeners;
+    pPhantom->m_phantomListeners = m_phantomListeners;
     pPhantom->copyProperties(this);
     return pPhantom;
 }

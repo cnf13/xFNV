@@ -466,12 +466,7 @@ void NiD3DShaderDeclaration::_SDMShutdown() {
         }
     }
 
-    // EXE-INLINED none: NiTArray<NiD3DShaderDeclaration::NiPackerEntry *>::RemoveAll
-    for (uint16_t i = 0; i < pkPackFunctions->m_usSize; i++) {
-        pkPackFunctions->m_pBase[i] = nullptr;
-    }
-    pkPackFunctions->m_usESize = 0;
-    pkPackFunctions->m_usSize = 0;
+    pkPackFunctions->RemoveAll();
 
     delete ms_pkPackFunctions;
 }
@@ -503,12 +498,7 @@ bool NiD3DShaderDeclaration::InitializePackingFunctions() {
             NiPackerEntry* pkEntry = pMemory ? ::new (pMemory) NiPackerEntry : nullptr;
             pkEntry->m_uiShaderParameterType = i;
             pkEntry->m_kPackFunctions.SetSize(0x26);
-            NiTPrimitiveArray<NiPackerEntry*>* pkPackFunctions = ms_pkPackFunctions;
-            // EXE-INLINED none: NiTArray::SetAtGrow
-            if (i >= pkPackFunctions->m_usMaxSize) {
-                pkPackFunctions->SetSize(i + pkPackFunctions->m_usGrowBy);
-            }
-            pkPackFunctions->SetAt(i, pkEntry);
+            ms_pkPackFunctions->SetAtGrow(i, pkEntry);
         }
         for (uint32_t eType = 0; eType < SPTYPE_COUNT; ++eType) {
             for (uint32_t uiAGDType = 0; uiAGDType < NiAdditionalGeometryData::AGD_NITYPE_COUNT; ++uiAGDType) {

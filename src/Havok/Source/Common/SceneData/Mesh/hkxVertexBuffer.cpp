@@ -176,20 +176,7 @@ void hkxVertexBuffer::setNumVertices(int32_t n, const hkxVertexDescription& form
     m_data.clear();
     for (int32_t i = 0; i < format.m_decls.m_size; ++i) {
         const hkxVertexDescription::ElementDecl& srcDecl = format.m_decls.m_data[i];
-        // EXE-INLINED none: hkArray<hkxVertexDescription::ElementDecl, hkContainerHeapAllocator>::expandOne
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (m_desc.m_decls.m_size ==
-            (m_desc.m_decls.m_capacityAndFlags & hkArrayBase<hkxVertexDescription::ElementDecl>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &m_desc.m_decls, sizeof(hkxVertexDescription::ElementDecl));
-        }
-        hkxVertexDescription::ElementDecl* pNew = &m_desc.m_decls.m_data[m_desc.m_decls.m_size];
-        if (pNew) {
-            pNew->m_byteOffset = 0;
-            pNew->m_type.m_storage = hkxVertexDescription::HKX_DT_NONE;
-            pNew->m_usage.m_storage = hkxVertexDescription::HKX_DU_NONE;
-            pNew->m_byteStride = 0;
-        }
-        hkxVertexDescription::ElementDecl& decl = m_desc.m_decls.m_data[m_desc.m_decls.m_size++];
+        hkxVertexDescription::ElementDecl& decl = m_desc.m_decls.expandOne();
         decl.m_type.m_storage = srcDecl.m_type.m_storage;
         decl.m_usage.m_storage = srcDecl.m_usage.m_storage;
         switch (srcDecl.m_type.m_storage) {

@@ -72,10 +72,7 @@ void hkpVehicleCastBatchingManager::stepVehiclesSynchronously(
     HK_TIMER_BEGIN("DoVehiclesSynchronously", nullptr);
     updateBeforeCollisionDetection();
     const int32_t bufferSize = getBufferSize(numJobs);
-    // EXE-INLINED none: hkAllocateStack<char>
-    hkMemoryRouter* router = &hkMemoryRouter::getInstance();
-    char* buffer = router->m_stack.m_next.m_storage;
-    router->m_stack.m_next.m_storage = buffer + ((bufferSize + 127) & ~127);
+    char* buffer = hkAllocateStack<char>(bufferSize, nullptr);
 
     // EXE-INLINED none: hkSemaphore's class operator new
     void* pMemory = hkMemoryRouter::alignedAlloc(*hkMemoryRouter::getInstance().m_heap, sizeof(hkSemaphore), 128);
@@ -96,8 +93,7 @@ void hkpVehicleCastBatchingManager::stepVehiclesSynchronously(
     hkMemoryRouter::alignedFree(*hkMemoryRouter::getInstance().m_heap, semaphore);
 
     stepVehiclesUsingCastResults(world->m_dynamicsStepInfo.m_stepInfo, numJobs, buffer);
-    // EXE-INLINED none: hkDeallocateStack<char>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = buffer;
+    hkDeallocateStack(buffer);
     HK_TIMER_END();
 }
 

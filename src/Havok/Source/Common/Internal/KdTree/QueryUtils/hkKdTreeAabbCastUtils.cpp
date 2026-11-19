@@ -49,13 +49,7 @@ hkBool hkKdTreeAabbCastUtils::castAabb(
     }
     const hkKdTreeNode* pNode = root->m_nodes.m_data;
 
-    // EXE-INLINED none: hkAllocateStack<hkKdTreeAabbCastUtils::NodeState>
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    // EXE-INLINED 0x458B50
-    char* pStackMemory = kRouter.m_stack.m_next.m_storage;
-    kRouter.m_stack.m_next.m_storage = pStackMemory + (((iStackSize << 4) + 0x7F) & ~0x7F);
-    // The stack allocator's bytes are untyped memory, used here as the node stack.
-    NodeState* const pStackBase = reinterpret_cast<NodeState*>(pStackMemory);
+    NodeState* const pStackBase = hkAllocateStack<NodeState>(iStackSize, nullptr);
     NodeState* pTop = pStackBase;
 
     alignas(16) float afFrom[4];
@@ -277,7 +271,6 @@ hkBool hkKdTreeAabbCastUtils::castAabb(
         }
     }
 
-    // EXE-INLINED none: hkDeallocateStack<hkKdTreeAabbCastUtils::NodeState>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pStackMemory;
+    hkDeallocateStack(pStackBase);
     return collector->hasHit();
 }

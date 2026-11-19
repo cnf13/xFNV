@@ -258,12 +258,7 @@ void hkpCollisionDispatcher::registerAlternateShapeType(hkpShapeType primaryType
     for (int32_t i = 0; i < m_shapeInheritance.m_size; ++i) {
         if (m_shapeInheritance.m_data[i].m_primaryType == primaryType &&
             m_shapeInheritance.m_data[i].m_alternateType == alternateType) {
-            // EXE-INLINED none: hkArrayBase<hkpCollisionDispatcher::ShapeInheritance>::removeAtAndCopy
-            m_shapeInheritance.m_size--;
-            hkMemUtil::memCpy<alignof(ShapeInheritance)>(
-                m_shapeInheritance.m_data + i, m_shapeInheritance.m_data + i + 1,
-                static_cast<int32_t>((m_shapeInheritance.m_size - i) * sizeof(ShapeInheritance))
-            );
+            m_shapeInheritance.removeAtAndCopy(i);
             i--;
         }
     }

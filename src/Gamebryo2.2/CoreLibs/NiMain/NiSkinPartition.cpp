@@ -1108,20 +1108,9 @@ bool NiSkinPartition::RemoveExcessInteractions(
                             continue;
                         }
 
-                        // EXE-INLINED 0xA311E0
                         if (kCoincidentVerts.m_uiUsed == kCoincidentVerts.m_uiAlloced) {
                             uint32_t uiNewSize = kCoincidentVerts.m_uiAlloced ? 2 * kCoincidentVerts.m_uiAlloced : 1;
-                            if (uiNewSize != kCoincidentVerts.m_uiAlloced) {
-                                uint32_t* puiNewBase = uiNewSize
-                                    ? static_cast<uint32_t*>(_NiMalloc(sizeof(uint32_t) * uiNewSize))
-                                    : nullptr;
-                                for (uint32_t i = 0; i < kCoincidentVerts.m_uiUsed; i++) {
-                                    puiNewBase[i] = kCoincidentVerts.m_pBase[i];
-                                }
-                                _NiFree(kCoincidentVerts.m_pBase);
-                                kCoincidentVerts.m_pBase = puiNewBase;
-                                kCoincidentVerts.m_uiAlloced = uiNewSize;
-                            }
+                            kCoincidentVerts.Realloc(uiNewSize);
                         }
                         kCoincidentVerts.m_pBase[kCoincidentVerts.m_uiUsed++] = uiCoincidentVert;
                     }
@@ -1146,20 +1135,9 @@ bool NiSkinPartition::RemoveExcessInteractions(
                             continue;
                         }
 
-                        // EXE-INLINED 0xA311E0
                         if (kCoincidentVerts.m_uiUsed == kCoincidentVerts.m_uiAlloced) {
                             uint32_t uiNewSize = kCoincidentVerts.m_uiAlloced ? 2 * kCoincidentVerts.m_uiAlloced : 1;
-                            if (uiNewSize != kCoincidentVerts.m_uiAlloced) {
-                                uint32_t* puiNewBase = uiNewSize
-                                    ? static_cast<uint32_t*>(_NiMalloc(sizeof(uint32_t) * uiNewSize))
-                                    : nullptr;
-                                for (uint32_t i = 0; i < kCoincidentVerts.m_uiUsed; i++) {
-                                    puiNewBase[i] = kCoincidentVerts.m_pBase[i];
-                                }
-                                _NiFree(kCoincidentVerts.m_pBase);
-                                kCoincidentVerts.m_pBase = puiNewBase;
-                                kCoincidentVerts.m_uiAlloced = uiNewSize;
-                            }
+                            kCoincidentVerts.Realloc(uiNewSize);
                         }
                         kCoincidentVerts.m_pBase[kCoincidentVerts.m_uiUsed++] = uiCoincidentVert;
                     }
@@ -1306,16 +1284,9 @@ bool NiSkinPartition::MakeBoneSets(
                 if (iWLarge > 100) {
                     iWSmall = iWLarge;
                 }
-                // EXE-INLINED 0xA53C30
-                NiTMapItem<int32_t, int32_t>* pkItem = kWMap.m_ppkHashTable[kWMap.KeyToHashIndex(iWSmall)];
-                while (pkItem) {
-                    if (kWMap.IsKeysEqual(iWSmall, pkItem->m_key)) {
-                        if (pkItem->m_val != -1) {
-                            puiTriangleToPartition[t] = static_cast<uint32_t>(pkItem->m_val);
-                        }
-                        break;
-                    }
-                    pkItem = pkItem->m_pkNext;
+                kWMap.GetAt_A53C30(iWSmall, iBoneSetW);
+                if (iBoneSetW != -1) {
+                    puiTriangleToPartition[t] = static_cast<uint32_t>(iBoneSetW);
                 }
             }
             int32_t iCheck1 = apWArray[ausTriangle[1]];
@@ -1685,21 +1656,7 @@ void NiSkinPartition::CreateInitialBoneSets(
                     if (!v40) {
                         v41 = 1;
                     }
-                    if (v41 != v40) {
-                        // EXE-INLINED 0xA311E0
-                        NiSkinPartition::BoneSet** ppkNewBase = nullptr;
-                        if (v41) {
-                            ppkNewBase = static_cast<NiSkinPartition::BoneSet**>(
-                                _NiMalloc(sizeof(NiSkinPartition::BoneSet*) * v41)
-                            );
-                            for (uint32_t m = 0; m < kBoneSets.m_uiUsed; ++m) {
-                                ppkNewBase[m] = kBoneSets.m_pBase[m];
-                            }
-                        }
-                        _NiFree(kBoneSets.m_pBase);
-                        kBoneSets.m_pBase = ppkNewBase;
-                        kBoneSets.m_uiAlloced = v41;
-                    }
+                    kBoneSets.Realloc(v41);
                 }
                 v7 = &kBoneSets;
                 kBoneSets.m_pBase[kBoneSets.m_uiUsed++] = v27;

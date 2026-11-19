@@ -37,16 +37,7 @@ hkJobQueue::JobStatus hkCpuMoppAabbQueryJob(hkJobQueue& jobQueue, hkJobQueue::Jo
         alignas(16) hkpMoppObbVirtualMachine machine;
         machine.queryAabb(&code, command->m_aabbInput, &results);
         // The terminator: an invalid shape key after the hits.
-        // EXE-INLINED none: hkArray<hkpMoppPrimitiveInfo>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (results.m_size == results.getCapacity()) {
-            hkArrayUtil::_reserveMore(router.heap(), &results, sizeof(hkpMoppPrimitiveInfo));
-        }
-        hkpMoppPrimitiveInfo* pTerminator = results.m_data + results.m_size;
-        if (pTerminator) {
-            pTerminator->ID = HK_INVALID_SHAPE_KEY;
-        }
-        results.m_size++;
+        results.pushBack(hkpMoppPrimitiveInfo{HK_INVALID_SHAPE_KEY});
     }
     HK_TIMER_END();
     return jobQueue.finishJobAndGetNextJob(&nextJobOut, nextJobOut, hkJobQueue::WAIT_FOR_NEXT_JOB);

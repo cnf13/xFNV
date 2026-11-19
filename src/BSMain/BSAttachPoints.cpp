@@ -170,7 +170,6 @@ NiObject* BSAttachPoints::CreateObject() {
 void BSAttachPoints::KillSDM() {
     NiFixedString* Block = BSAttachPoints::pTag;
     if (BSAttachPoints::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSAttachPoints::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

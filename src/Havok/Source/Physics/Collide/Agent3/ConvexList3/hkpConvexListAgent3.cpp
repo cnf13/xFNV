@@ -152,20 +152,13 @@ processStream:
     {
         separatingNormal->m_quad[3] = -1.70141e+38f;
         int32_t numChildren = cvxList->m_childShapes.m_size;
-        // EXE-INLINED none: hkAllocateStack<hkpShapeKey>(numChildren + 1), in 128-byte steps
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        char* hitListMemory = router.m_stack.m_next.m_storage;
-        router.m_stack.m_next.m_storage =
-            hitListMemory + ((sizeof(uint32_t) * (numChildren + 1) + 127) & ~static_cast<size_t>(127));
-        // The stack allocator's memory is untyped bytes; the hit list's shape keys are placed in it.
-        uint32_t* hitList = reinterpret_cast<uint32_t*>(hitListMemory);
+        uint32_t* hitList = hkAllocateStack<uint32_t>(numChildren + 1, nullptr);
         for (int32_t i = 0; i < numChildren; i++) {
             hitList[i] = static_cast<uint32_t>(i);
         }
         hitList[numChildren] = HK_INVALID_SHAPE_KEY;
         hkAgent1nMachine_Process(listData->m_agentTrack, input, cvxList, hitList, output);
-        // EXE-INLINED none: hkDeallocateStack
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = hitListMemory;
+        hkDeallocateStack(hitList);
         result = listData + 1;
     }
 

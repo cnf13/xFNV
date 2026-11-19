@@ -272,15 +272,10 @@ hkBool hkpConvexVerticesShape::castRayImpl(const hkpShapeRayCastInput& input, hk
                     const __m128 dot =
                         _mm_add_ss(_mm_shuffle_ps(d, d, 0xAA), _mm_add_ss(_mm_shuffle_ps(d, d, 0x55), d));
                     plane[3] = _mm_cvtss_f32(_mm_sub_ss(_mm_setzero_ps(), dot));
-                    // EXE-INLINED 0x66D9B0
-                    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-                    if (m_planeEquations.m_size ==
-                        (m_planeEquations.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_planeEquations, sizeof(hkVector4));
-                    }
+                    hkVector4 planeEquation;
+                    planeEquation.m_quad = plane;
+                    m_planeEquations.pushBack(planeEquation);
                     ++pFaceOffset;
-                    m_planeEquations.m_data[m_planeEquations.m_size].m_quad = plane;
-                    ++m_planeEquations.m_size;
                 }
                 while (--iNumFaces);
             }
@@ -530,21 +525,7 @@ void hkpConvexVerticesShape::setConnectivity(const hkpConvexVerticesConnectivity
 
 // The planes are copied in, then sorted when the shape has its connectivity.
 void hkpConvexVerticesShape::setPlaneEquations(const hkArray<hkVector4, hkContainerHeapAllocator>& planes) {
-    // EXE-INLINED none: hkArray<hkVector4>::operator=
-    hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-    if (m_planeEquations.getCapacity() < planes.getSize()) {
-        if ((m_planeEquations.m_capacityAndFlags & hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG) == 0) {
-            // EXE-INLINED 0x66DB70
-            alloc.bufFree(
-                m_planeEquations.m_data, m_planeEquations.getCapacity() * static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-        int32_t n = planes.getSize();
-        m_planeEquations.m_data = alloc._bufAlloc<hkVector4>(n);
-        m_planeEquations.m_capacityAndFlags = n;
-    }
-    m_planeEquations.m_size = planes.getSize();
-    hkArrayBase<hkVector4>::copy(m_planeEquations.m_data, planes.m_data, m_planeEquations.m_size);
+    m_planeEquations = planes;
     if (m_connectivity) {
         sortPlanes();
     }
@@ -607,8 +588,7 @@ void hkpConvexVerticesShape::getOriginalVertices(hkArray<hkVector4>& vertices) c
 void hkpConvexVerticesShape::sortPlanes() {
     hkArray<hkVector4> planes(m_planeEquations);
     const int32_t numVertices = m_numVertices;
-    // EXE-INLINED none: hkArray<hkVector4>::clear
-    m_planeEquations.m_size = 0;
+    m_planeEquations.clear();
     // The local is 16-aligned; getOriginalVertices gets its address.
     alignas(16) hkLocalArray<hkVector4> vertices(numVertices);
     getOriginalVertices(vertices);
@@ -665,11 +645,7 @@ void hkpConvexVerticesShape::sortPlanes() {
                     // EXE-INLINED none: hkArray<hkVector4>::pushBackUnchecked
                     m_planeEquations.m_data[m_planeEquations.m_size].m_quad = planes.m_data[best].m_quad;
                     ++m_planeEquations.m_size;
-                    // EXE-INLINED none: hkArray<hkVector4>::removeAt (the last plane moves into the hole)
-                    --planes.m_size;
-                    if (planes.m_size != best) {
-                        planes.m_data[best].m_quad = planes.m_data[planes.m_size].m_quad;
-                    }
+                    planes.removeAt(best);
                 }
             }
             ++face;

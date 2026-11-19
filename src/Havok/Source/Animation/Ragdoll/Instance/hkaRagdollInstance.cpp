@@ -144,32 +144,10 @@ hkaRagdollInstance* hkaRagdollInstance::clone(hkpConstraintInstance::CloningMode
     const int32_t numConstraints = m_constraints.m_size;
 
     hkLocalArray<hkpRigidBody*> newRigidBodies(numBodies);
-    // EXE-INLINED none: hkArray<hkpRigidBody*>::setSize
-    hkMemoryAllocator* pBodyHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t bodyCapacity =
-        static_cast<int32_t>(newRigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK);
-    if (bodyCapacity < numBodies) {
-        int32_t request = 2 * bodyCapacity;
-        if (numBodies >= request) {
-            request = numBodies;
-        }
-        hkArrayUtil::_reserve(pBodyHeap, &newRigidBodies, request, sizeof(hkpRigidBody*));
-    }
-    newRigidBodies.m_size = static_cast<uint32_t>(numBodies);
+    newRigidBodies.setSize(numBodies);
 
     hkLocalArray<hkpConstraintInstance*> newConstraints(numConstraints);
-    // EXE-INLINED none: hkArray<hkpConstraintInstance*>::setSize
-    hkMemoryAllocator* pConstraintHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t constraintCapacity =
-        static_cast<int32_t>(newConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK);
-    if (constraintCapacity < numConstraints) {
-        int32_t request = 2 * constraintCapacity;
-        if (numConstraints >= request) {
-            request = numConstraints;
-        }
-        hkArrayUtil::_reserve(pConstraintHeap, &newConstraints, request, sizeof(hkpConstraintInstance*));
-    }
-    newConstraints.m_size = static_cast<uint32_t>(numConstraints);
+    newConstraints.setSize(numConstraints);
 
     for (int32_t b = 0; b < numBodies; ++b) {
         const hkpRigidBody* pBody = m_rigidBodies.m_data[b];

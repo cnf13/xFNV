@@ -59,14 +59,8 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
     const int32_t numContexts = m_contexts.getSize();
     for (int32_t c = 0; c < numContexts; ++c) {
         if (m_contexts.m_data[c]->m_monitorStreamBegins.getSize() > 0) {
-            // EXE-INLINED none: hkArray<const char*>::operator=
-            startPtrs.copyFromArray(
-                hkContainerHeapAllocator().get(&startPtrs), m_contexts.m_data[c]->m_monitorStreamBegins, hkTypeIsPod()
-            );
-            // EXE-INLINED none: hkArray<const char*>::operator=
-            endPtrs.copyFromArray(
-                hkContainerHeapAllocator().get(&endPtrs), m_contexts.m_data[c]->m_monitorStreamEnds, hkTypeIsPod()
-            );
+            startPtrs = m_contexts.m_data[c]->m_monitorStreamBegins;
+            endPtrs = m_contexts.m_data[c]->m_monitorStreamEnds;
             break;
         }
     }
@@ -74,23 +68,11 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
         hkMonitorStream& stream = hkMonitorStream::getInstance();
         const char* start = stream.m_start;
         const char* end = stream.m_end;
-        // EXE-INLINED none: hkArray<const char*>::pushBack
-        hkMemoryAllocator& startAlloc = hkContainerHeapAllocator().get(&startPtrs);
-        if (startPtrs.getSize() == startPtrs.getCapacity()) {
-            hkArrayUtil::_reserveMore(startAlloc, &startPtrs, sizeof(const char*));
-        }
-        startPtrs.m_data[startPtrs.m_size++] = start;
-        // EXE-INLINED none: hkArray<const char*>::pushBack
-        hkMemoryAllocator& endAlloc = hkContainerHeapAllocator().get(&endPtrs);
-        if (endPtrs.getSize() == endPtrs.getCapacity()) {
-            hkArrayUtil::_reserveMore(endAlloc, &endPtrs, sizeof(const char*));
-        }
-        endPtrs.m_data[endPtrs.m_size++] = end;
+        startPtrs.pushBack(start);
+        endPtrs.pushBack(end);
     }
 
-    // EXE-INLINED none: hkArray<char>::setSize
-    m_strBuffer._reserve(hkContainerHeapAllocator().get(&m_strBuffer), 0);
-    m_strBuffer.m_size = 0;
+    m_strBuffer.setSize(0);
     int32_t totalMonLen = 0;
     {
         using map_t = hkPointerMap<const void*, const char*, hkContainerHeapAllocator>;
@@ -101,16 +83,7 @@ void hkStatisticsProcess::step(float frameTimeInMs) {
             totalMonLen += static_cast<int32_t>(endPtrs.m_data[si] - startPtrs.m_data[si]);
         }
         for (int32_t it = map.getIterator(); map.isValid(it); it = map.getNext(it)) {
-            // EXE-INLINED none: hkArray<hkMonitorStreamStringMap::StringMap>::expandOne
-            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&strMap.m_map);
-            if (strMap.m_map.getSize() == strMap.m_map.getCapacity()) {
-                hkArrayUtil::_reserveMore(alloc, &strMap.m_map, sizeof(hkMonitorStreamStringMap::StringMap));
-            }
-            hkMonitorStreamStringMap::StringMap* slot = &strMap.m_map.m_data[strMap.m_map.m_size];
-            if (slot) {
-                ::new (slot) hkMonitorStreamStringMap::StringMap;
-            }
-            hkMonitorStreamStringMap::StringMap& newEntry = strMap.m_map.m_data[strMap.m_map.m_size++];
+            hkMonitorStreamStringMap::StringMap& newEntry = strMap.m_map.expandOne();
             // The key's 32 bits are sign-extended into the 64-bit id.
             newEntry.m_id = static_cast<hkUint64>(static_cast<int32_t>(map.m_map.m_elem[it].key));
             newEntry.m_string = map.getValue(it);

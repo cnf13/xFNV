@@ -98,8 +98,7 @@ void hkpPhysicsSystemWithContacts::removeContact(int32_t a1) {
 // The base copy, then m_contacts copied as plain pointers (no references added).
 void hkpPhysicsSystemWithContacts::copy(const hkpPhysicsSystemWithContacts& toCopy) {
     hkpPhysicsSystem::copy(toCopy);
-    // EXE-INLINED none: hkArray<hkpSerializedAgentNnEntry*, hkContainerHeapAllocator>::operator=
-    m_contacts.copyFromArray(*hkMemoryRouter::getInstance().m_heap, toCopy.m_contacts, hkTypeIsPod());
+    m_contacts = toCopy.m_contacts;
 }
 
 const hkClass& hkpPhysicsSystemWithContacts::staticClass() {

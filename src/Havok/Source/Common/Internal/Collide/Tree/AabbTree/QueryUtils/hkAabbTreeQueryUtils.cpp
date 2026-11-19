@@ -43,13 +43,7 @@ void queryClosestPoint(
         a3->addLeaf(root);
     }
     else {
-        // EXE-INLINED none: hkArray<const Node*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (stack.m_size == stack.getCapacity()) {
-            hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(const Node*));
-        }
-        stack.m_data[stack.m_size] = root;
-        ++stack.m_size;
+        stack.pushBack(root);
         const Tree::NodeManager& nodeManager = a1->m_nodeManager;
         do {
             const Node* node = stack.m_data[--stack.m_size];
@@ -91,13 +85,7 @@ void queryClosestPoint(
                 }
             }
             for (int32_t i = 0; i < numPushed; ++i) {
-                // EXE-INLINED none: hkArray<const Node*>::pushBack
-                hkMemoryRouter& pushRouter = hkMemoryRouter::getInstance();
-                if (stack.m_size == stack.getCapacity()) {
-                    hkArrayUtil::_reserveMore(pushRouter.heap(), &stack, sizeof(const Node*));
-                }
-                stack.m_data[stack.m_size] = pushed[i];
-                ++stack.m_size;
+                stack.pushBack(pushed[i]);
             }
         }
         while (stack.m_size != 0);

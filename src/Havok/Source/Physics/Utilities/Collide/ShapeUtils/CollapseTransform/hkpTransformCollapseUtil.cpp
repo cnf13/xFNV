@@ -40,14 +40,7 @@ static void collectChildShapes(const hkpShape* apShape, hkArrayBase<const hkpSha
             const hkpShapeContainer* pContainer = pList;
             for (int32_t i = 0; i < pContainer->getNumChildShapes(); ++i) {
                 pChild = pList->m_childInfo.m_data[i].m_shape;
-                // EXE-INLINED none: hkArray<const hkpShape*>::pushBack
-                hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-                if (apChildren->m_size ==
-                    (apChildren->m_capacityAndFlags & hkArrayBase<const hkpShape*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*rRouter.m_heap, apChildren, sizeof(const hkpShape*));
-                }
-                apChildren->m_data[apChildren->m_size] = pChild;
-                apChildren->m_size++;
+                apChildren->_pushBack(hkContainerHeapAllocator().get(apChildren), pChild);
             }
             return;
         }
@@ -60,13 +53,7 @@ static void collectChildShapes(const hkpShape* apShape, hkArrayBase<const hkpSha
             break;
         default: return;
     }
-    // EXE-INLINED none: hkArray<const hkpShape*>::pushBack
-    hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-    if (apChildren->m_size == (apChildren->m_capacityAndFlags & hkArrayBase<const hkpShape*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rRouter.m_heap, apChildren, sizeof(const hkpShape*));
-    }
-    apChildren->m_data[apChildren->m_size] = pChild;
-    apChildren->m_size++;
+    apChildren->_pushBack(hkContainerHeapAllocator().get(apChildren), pChild);
 }
 
 hkpTransformCollapseUtil::Options::Options() : m_sharedShapeBehaviour(ALWAYS_COLLAPSE), m_sharedShapeThreshold(0) {
@@ -218,13 +205,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
             static_cast<hkpTransformShape*>(pMemory)->m_memSizeAndFlags = sizeof(hkpTransformShape);
             hkpTransformShape* pTransformed = ::new (pMemory) hkpTransformShape(pGrandchild, parentFromChild);
             const hkpShape* pCollapsed = collapseTransformShape(pTransformed, options, sharedShapeData, resultsOut);
-            // EXE-INLINED none: hkArray<const hkpShape*>::pushBack
-            hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-            if (newChildren.m_size == (newChildren.m_capacityAndFlags & hkArrayBase<const hkpShape*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouter.m_heap, &newChildren, sizeof(const hkpShape*));
-            }
-            newChildren.m_data[newChildren.m_size] = pCollapsed;
-            newChildren.m_size++;
+            newChildren.pushBack(pCollapsed);
             pTransformed->removeReference();
         }
         void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpListShape));
@@ -379,19 +360,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseTransformShape(
                 stridedVertices.m_striding = sizeof(hkVector4);
                 const hkArray<hkVector4>* pPlanes = getPlaneEquations(const_cast<hkpConvexVerticesShape*>(pVertices));
                 hkArray<hkVector4> planes;
-                {
-                    // EXE-INLINED none: hkArray<hkVector4>::setSize
-                    const int32_t numPlanes = pPlanes->m_size;
-                    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                    const int32_t capacity = planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-                    if (capacity < numPlanes) {
-                        const int32_t doubled = 2 * capacity;
-                        hkArrayUtil::_reserve(
-                            *pHeap, &planes, numPlanes < doubled ? doubled : numPlanes, sizeof(hkVector4)
-                        );
-                    }
-                    planes.m_size = numPlanes;
-                }
+                planes.setSize(pPlanes->m_size);
                 // Each plane moves with the transform: its offset by the dot product of its normal with the
                 // translation (SSE scalar sums, the offset an x87 difference stored as a float), its normal turned.
                 hkVector4 translationCopy;
@@ -499,14 +468,7 @@ const hkpShape* hkpTransformCollapseUtil::collapseShapesRecursively(
             for (int32_t i = 0; i < numChildren; ++i) {
                 const hkpShape* pChild = pList->m_childInfo.m_data[i].m_shape;
                 const hkpShape* pNewChild = collapseShapesRecursively(pChild, options, sharedShapeData, resultsOut);
-                // EXE-INLINED none: hkArray<const hkpShape*>::pushBack
-                hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-                if (newChildren.m_size ==
-                    (newChildren.m_capacityAndFlags & hkArrayBase<const hkpShape*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*rRouter.m_heap, &newChildren, sizeof(const hkpShape*));
-                }
-                newChildren.m_data[newChildren.m_size] = pNewChild;
-                newChildren.m_size++;
+                newChildren.pushBack(pNewChild);
                 if (pNewChild != pChild) {
                     allUnchanged = false;
                 }
@@ -615,15 +577,7 @@ hkResult hkpTransformCollapseUtil::collapseTransforms(
 hkResult
 hkpTransformCollapseUtil::collapseTransforms(hkpRigidBody* rigidBody, const Options& options, Results& resultsOut) {
     hkArray<hkpRigidBody*> rigidBodies;
-    {
-        // EXE-INLINED none: hkArray<hkpRigidBody*>::pushBack
-        hkMemoryRouter& rRouter = hkMemoryRouter::getInstance();
-        if (rigidBodies.m_size == (rigidBodies.m_capacityAndFlags & hkArrayBase<hkpRigidBody*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*rRouter.m_heap, &rigidBodies, sizeof(hkpRigidBody*));
-        }
-        rigidBodies.m_data[rigidBodies.m_size] = rigidBody;
-        rigidBodies.m_size++;
-    }
+    rigidBodies.pushBack(rigidBody);
     const hkResult result = collapseTransforms(rigidBodies, options, resultsOut);
     return result;
 }
@@ -837,11 +791,7 @@ void _SharedShapeData::removeSingleReferencedShapeData() {
             if (pReplacement) {
                 pReplacement->removeReference();
             }
-            // EXE-INLINED none: hkArray<_SharedShapeData::SharedShape>::removeAt
-            const int32_t iLast = (--m_sharedShapes.m_size);
-            if (iLast != i) {
-                m_sharedShapes.m_data[i] = m_sharedShapes.m_data[iLast];
-            }
+            m_sharedShapes.removeAt(i);
         }
     }
 }

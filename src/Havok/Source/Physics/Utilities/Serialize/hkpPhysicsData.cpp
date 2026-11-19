@@ -393,15 +393,7 @@ void hkpPhysicsData::splitPhysicsSystems(
         while (bSomethingAdded);
 
         if (currentSystem->m_constraints.m_size || currentSystem->m_actions.m_size) {
-            // EXE-INLINED none: hkArray<hkpPhysicsSystem*>::pushBack
-            hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-            if (output.m_constrainedSystems.m_size ==
-                (output.m_constrainedSystems.m_capacityAndFlags & hkArrayBase<hkpPhysicsSystem*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(
-                    *pRouter->m_heap, &output.m_constrainedSystems, static_cast<int32_t>(sizeof(hkpPhysicsSystem*))
-                );
-            }
-            output.m_constrainedSystems.m_data[output.m_constrainedSystems.m_size++] = currentSystem;
+            output.m_constrainedSystems.pushBack(currentSystem);
         }
         else {
             hkpRigidBody* rb = currentSystem->m_rigidBodies.m_data[0];

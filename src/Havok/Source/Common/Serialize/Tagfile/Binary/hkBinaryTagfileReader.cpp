@@ -71,17 +71,7 @@ void Reader::readBitfield(int32_t numMembers, hkLocalArray<uint8_t>& bout) {
     uint8_t bytes[64];
     const int32_t iPaddedBits = (numMembers + 7) & ~7;
     const int32_t iNumBytes = iPaddedBits / 8;
-    // EXE-INLINED none: hkArray<uint8_t>::setSize
-    hkMemoryAllocator& rHeap = *hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCap = bout.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
-    if (iCap < iPaddedBits) {
-        int32_t iReq = 2 * iCap;
-        if (iPaddedBits >= iReq) {
-            iReq = iPaddedBits;
-        }
-        hkArrayUtil::_reserve(rHeap, &bout, iReq, sizeof(uint8_t));
-    }
-    bout.m_size = iPaddedBits;
+    bout.setSize(iPaddedBits);
     m_ia.readArrayGeneric(bytes, 1, iNumBytes);
     for (int32_t i = 0; i < iNumBytes; ++i) {
         const uint32_t uiByte = bytes[i];
@@ -94,17 +84,7 @@ void Reader::readBitfield(int32_t numMembers, hkLocalArray<uint8_t>& bout) {
         bout.m_data[8 * i + 6] = (uiByte >> 6) & 1;
         bout.m_data[8 * i + 7] = (uiByte >> 7) & 1;
     }
-    // EXE-INLINED none: hkArray<uint8_t>::setSize
-    hkMemoryAllocator& rHeap2 = *hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCap2 = bout.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
-    if (iCap2 < numMembers) {
-        int32_t iReq = 2 * iCap2;
-        if (numMembers >= iReq) {
-            iReq = numMembers;
-        }
-        hkArrayUtil::_reserve(rHeap2, &bout, iReq, sizeof(uint8_t));
-    }
-    bout.m_size = numMembers;
+    bout.setSize(numMembers);
 }
 
 // Reads numItems elements of the array's type. Bytes and reals go through a temp-allocated buffer and setAll; a struct
@@ -114,16 +94,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
     switch (arr.getType()) {
         case hkDataObject::TYPE_BYTE: {
             hkArray<uint8_t, hkContainerTempAllocator> buf(nelem);
-            // EXE-INLINED none: hkArrayBase<hkUint8>::reserve
-            hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
-            const int32_t iCap = buf.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
-            if (iCap < nelem) {
-                int32_t iReq = 2 * iCap;
-                if (nelem >= iReq) {
-                    iReq = nelem;
-                }
-                hkArrayUtil::_reserve(*pTemp2, &buf, iReq, sizeof(uint8_t));
-            }
+            buf.reserve(nelem);
             m_ia.readArrayGeneric(buf.m_data, 1, nelem);
             arr.setAll(buf.m_data, nelem);
             return;
@@ -137,17 +108,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
         }
         case hkDataObject::TYPE_REAL: {
             hkArray<float, hkContainerTempAllocator> buf(nelem);
-            // EXE-INLINED none: hkArray<hkReal, hkContainerTempAllocator>::setSize
-            hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
-            const int32_t iCap = buf.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK;
-            if (iCap < nelem) {
-                int32_t iReq = 2 * iCap;
-                if (nelem >= iReq) {
-                    iReq = nelem;
-                }
-                hkArrayUtil::_reserve(*pTemp2, &buf, iReq, sizeof(float));
-            }
-            buf.m_size = nelem;
+            buf.setSize(nelem);
             m_ia.readArrayGeneric(buf.m_data, 4, nelem);
             arr.setAll(buf.m_data, buf.m_size);
             return;
@@ -330,17 +291,7 @@ hkDataObject Reader::readObject(int32_t aiType) {
     hkDataObject obj(m_world.newObject(klass));
     if (iType != 3) {
         if (iType == 4) {
-            hkDataObjectImpl* pImpl = obj.m_impl;
-            // EXE-INLINED none: hkArray<hkDataObjectImpl*>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (m_rememberedObjects.m_size ==
-                (m_rememberedObjects.m_capacityAndFlags & hkArrayBase<hkDataObjectImpl*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(
-                    *router.m_heap, &m_rememberedObjects, static_cast<int32_t>(sizeof(hkDataObjectImpl*))
-                );
-            }
-            m_rememberedObjects.m_data[m_rememberedObjects.m_size] = pImpl;
-            ++m_rememberedObjects.m_size;
+            m_rememberedObjects.pushBack(obj.m_impl);
         }
         else {
             char buf[512];
@@ -426,15 +377,7 @@ hkResult Reader::readClass() {
         }
     }
     hkDataClassImpl* klass = m_world.newClass(info);
-    {
-        // EXE-INLINED none: hkArray<hkDataClassImpl*>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (m_classes.m_size == (m_classes.m_capacityAndFlags & hkArrayBase<hkDataClassImpl*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &m_classes, static_cast<int32_t>(sizeof(hkDataClassImpl*)));
-        }
-        m_classes.m_data[m_classes.m_size] = klass;
-        ++m_classes.m_size;
-    }
+    m_classes.pushBack(klass);
     return HK_SUCCESS;
 }
 

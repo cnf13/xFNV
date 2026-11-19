@@ -136,13 +136,7 @@ void hkpBroadPhaseBorder::collidableAddedCallback(const hkpCollidableAddedEvent&
         hkpEntity* body = static_cast<hkpEntity*>(collidable->getOwner());
         if (body) {
             if (m_postponeAndSortCallbacks.m_bool) {
-                // EXE-INLINED none: hkArray<hkpEntity*>::pushBack
-                hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
-                if (m_entitiesExitingBroadPhase.m_size ==
-                    (m_entitiesExitingBroadPhase.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*Instance->m_heap, &m_entitiesExitingBroadPhase, sizeof(hkpEntity*));
-                }
-                m_entitiesExitingBroadPhase.m_data[m_entitiesExitingBroadPhase.m_size++] = body;
+                m_entitiesExitingBroadPhase.pushBack(body);
                 body->addReference();
             }
             else {

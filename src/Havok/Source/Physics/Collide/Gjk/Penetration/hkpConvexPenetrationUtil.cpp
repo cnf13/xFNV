@@ -413,12 +413,8 @@ hkResult hkCalcMultiPenetrationDepth(
     hkContactPoint** pointsOut
 ) {
     // The stack allocator hands out raw memory.
-    // EXE-INLINED none: hkAllocateStack<hkCalcMultiPenetrationDepthWork>
-    hkMemoryRouter* router = &hkMemoryRouter::getInstance();
-    char* const stackStart = router->m_stack.m_next.m_storage;
-    router->m_stack.m_next.m_storage +=
-        (static_cast<uint32_t>(numShapeBs) * sizeof(hkCalcMultiPenetrationDepthWork) + 127) & ~static_cast<size_t>(127);
-    hkCalcMultiPenetrationDepthWork* const workData = reinterpret_cast<hkCalcMultiPenetrationDepthWork*>(stackStart);
+    hkCalcMultiPenetrationDepthWork* const workData =
+        hkAllocateStack<hkCalcMultiPenetrationDepthWork>(numShapeBs, nullptr);
 
     hkpGskStatus gjkStatus[2];
     alignas(16) hkpGskOut output;
@@ -452,8 +448,7 @@ hkResult hkCalcMultiPenetrationDepth(
         numShapeBs = 2;
     }
     else if (numShapeBs < 2) {
-        // EXE-INLINED none: hkDeallocateStack<hkCalcMultiPenetrationDepthWork>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackStart;
+        hkDeallocateStack(workData);
         return HK_FAILURE;
     }
 
@@ -480,8 +475,7 @@ hkResult hkCalcMultiPenetrationDepth(
             if (current.m_util.tryToExpandPolytope(we, current.m_nearestTriangle, newVertex, gjkStatus[i]) ==
                 HK_FAILURE) {
                 if (gjkStatus[i] == HK_GSK_PD_DISTANCE_TOO_BIG) {
-                    // EXE-INLINED none: hkDeallocateStack<hkCalcMultiPenetrationDepthWork>
-                    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackStart;
+                    hkDeallocateStack(workData);
                     return HK_FAILURE;
                 }
             }
@@ -534,8 +528,7 @@ hkResult hkCalcMultiPenetrationDepth(
         }
         while (--remaining);
     }
-    // EXE-INLINED none: hkDeallocateStack<hkCalcMultiPenetrationDepthWork>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = stackStart;
+    hkDeallocateStack(workData);
     return HK_SUCCESS;
 }
 

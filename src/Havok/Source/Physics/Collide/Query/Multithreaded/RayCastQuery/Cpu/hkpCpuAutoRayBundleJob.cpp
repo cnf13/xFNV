@@ -48,17 +48,7 @@ void hkpAutoRayBundleJob_sortRaysByOctant(
     }
     for (int32_t j = 0; j < 8; ++j) {
         octantCountsOut[j] = 0;
-        // EXE-INLINED none: hkArray<int>::reserve
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t iCapacity =
-            static_cast<int32_t>(octantRaysOut[j].m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK);
-        if (iCapacity < numRays) {
-            int32_t iReserve = 2 * iCapacity;
-            if (numRays >= iReserve) {
-                iReserve = numRays;
-            }
-            hkArrayUtil::_reserve(pHeap, &octantRaysOut[j], iReserve, sizeof(int32_t));
-        }
+        octantRaysOut[j].reserve(numRays);
     }
     for (int32_t i = 0; i < numRays; ++i) {
         const int32_t iMask = _mm_movemask_ps(
@@ -97,11 +87,7 @@ void hkpAutoRayBundleJob_bundleIndexedRays(
     const float fMinCos = __builtin_fabsf(fCos);
     alignas(16) hkLocalArray<hkpAutoRayBundle> bundles;
     bundles.m_size = 0;
-    // EXE-INLINED none: hkAllocateStack<hkpAutoRayBundle>
-    hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-    char* pBlock = rStack.m_next.m_storage;
-    rStack.m_next.m_storage = pBlock + ((numIndices * static_cast<int32_t>(sizeof(hkpAutoRayBundle)) + 0x7F) & ~0x7F);
-    hkpAutoRayBundle* pLocal = static_cast<hkpAutoRayBundle*>(static_cast<void*>(pBlock));
+    hkpAutoRayBundle* pLocal = hkAllocateStack<hkpAutoRayBundle>(numIndices, nullptr);
     bundles.m_data = pLocal;
     bundles.m_capacityAndFlags =
         static_cast<uint32_t>(numIndices) | hkArrayBase<hkpAutoRayBundle>::DONT_DEALLOCATE_FLAG;
@@ -218,11 +204,7 @@ void hkpAutoRayBundleJob_bundleOctantRays(
     const float fMinCos = __builtin_fabsf(fCos);
     alignas(16) hkLocalArray<hkpAutoRayBundle> bundles;
     bundles.m_size = 0;
-    // EXE-INLINED none: hkAllocateStack<hkpAutoRayBundle>
-    hkStackMemory& rStack = hkMemoryRouter::getInstance().m_stack;
-    char* pBlock = rStack.m_next.m_storage;
-    rStack.m_next.m_storage = pBlock + ((numRays * static_cast<int32_t>(sizeof(hkpAutoRayBundle)) + 0x7F) & ~0x7F);
-    hkpAutoRayBundle* pLocal = static_cast<hkpAutoRayBundle*>(static_cast<void*>(pBlock));
+    hkpAutoRayBundle* pLocal = hkAllocateStack<hkpAutoRayBundle>(numRays, nullptr);
     bundles.m_data = pLocal;
     bundles.m_capacityAndFlags = static_cast<uint32_t>(numRays) | hkArrayBase<hkpAutoRayBundle>::DONT_DEALLOCATE_FLAG;
     bundles.m_localMemory = pLocal;

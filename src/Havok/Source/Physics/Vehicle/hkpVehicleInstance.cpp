@@ -789,20 +789,7 @@ void hkpVehicleInstance::init() {
     m_wheelsTimeSinceMaxPedalInput = 0.0f;
     m_mainSteeringAngle = 0.0f;
 
-    // EXE-INLINED none: hkArray<float>::setSize
-    numWheels = m_data->m_numWheels;
-    heap = hkMemoryRouter::getInstance().m_heap;
-    capacity = static_cast<int32_t>(m_wheelsSteeringAngle.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK);
-    if (capacity < numWheels) {
-        capacity *= 2;
-        if (numWheels >= capacity) {
-            capacity = numWheels;
-        }
-        hkArrayUtil::_reserve(
-            heap, reinterpret_cast<hkArrayBase<void>*>(&m_wheelsSteeringAngle), capacity, sizeof(float)
-        );
-    }
-    m_wheelsSteeringAngle.m_size = static_cast<uint32_t>(numWheels);
+    m_wheelsSteeringAngle.setSize(m_data->m_numWheels);
     for (int32_t i = 0; i < m_wheelsSteeringAngle.m_size; ++i) {
         m_wheelsSteeringAngle.m_data[i] = 0.0f;
     }
@@ -959,11 +946,6 @@ void hkpVehicleInstance::stepVehicleUsingWheelCollideOutput(
     updateComponents(stepInfo, cdInfo, aerodynamicsDragInfo, suspensionForceAtWheel, totalLinearForceAtWheel);
     simulateVehicle(stepInfo, aerodynamicsDragInfo, suspensionForceAtWheel, totalLinearForceAtWheel);
     HK_TIMER_END();
-
-    // EXE-INLINED none: hkInplaceArray<float, 16>::~hkInplaceArray
-    totalLinearForceAtWheel.clearAndDeallocate();
-    // EXE-INLINED none: hkInplaceArray<float, 16>::~hkInplaceArray
-    suspensionForceAtWheel.clearAndDeallocate();
 }
 
 // The steering output starts from the current angles: its wheel angle array (no storage, not ours) is sized and filled
@@ -975,19 +957,7 @@ void hkpVehicleInstance::updateSteering(
     const int32_t numWheels = m_wheelsSteeringAngle.m_size;
     hkpVehicleSteering::SteeringAnglesOutput steeringOutput;
     steeringOutput.m_mainSteeringAngle = m_mainSteeringAngle;
-    // EXE-INLINED none: hkArray<float>::setSize
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacity = static_cast<int32_t>(
-        steeringOutput.m_wheelsSteeringAngle.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK
-    );
-    if (capacity < numWheels) {
-        int32_t request = 2 * capacity;
-        if (numWheels >= request) {
-            request = numWheels;
-        }
-        hkArrayUtil::_reserve(pHeap, &steeringOutput.m_wheelsSteeringAngle, request, sizeof(float));
-    }
-    steeringOutput.m_wheelsSteeringAngle.m_size = static_cast<uint32_t>(numWheels);
+    steeringOutput.m_wheelsSteeringAngle.setSize(numWheels);
     for (int32_t i = 0; i < m_wheelsSteeringAngle.m_size; ++i) {
         steeringOutput.m_wheelsSteeringAngle.m_data[i] = m_wheelsSteeringAngle.m_data[i];
     }
@@ -1361,13 +1331,8 @@ void hkpVehicleInstance::updateComponents(
     hkpVehicleBrake::WheelBreakingOutput wheelBreakingInfo;
 
     const int32_t numWheels = m_data->m_numWheels;
-    // EXE-INLINED none: hkAllocateStack<float>
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    void* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage =
-        static_cast<char*>(pBlock) + ((numWheels * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
+    transmissionInfo.m_wheelsTransmittedTorque = hkAllocateStack<float>(numWheels, nullptr);
     float deltaTime = stepInfo.m_deltaTime;
-    transmissionInfo.m_wheelsTransmittedTorque = static_cast<float*>(pBlock);
 
     updateWheels(deltaTime, cdInfo);
     updateDriverInput(deltaTime, filteredDriverInputInfo);
@@ -1389,9 +1354,7 @@ void hkpVehicleInstance::updateComponents(
         linearForces[w_it] = totalTorque / wheelParams[w_it].m_radius;
     }
 
-    // EXE-INLINED none: hkDeallocateStack<float>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage =
-        static_cast<char*>(static_cast<void*>(transmissionInfo.m_wheelsTransmittedTorque));
+    hkDeallocateStack(transmissionInfo.m_wheelsTransmittedTorque);
     HK_TIMER_END();
 }
 
@@ -1418,24 +1381,7 @@ hkpVehicleInstance& hkpVehicleInstance::operator=(const hkpVehicleInstance& othe
     m_tyreMarks = other.m_tyreMarks;
     m_velocityDamper = other.m_velocityDamper;
 
-    // EXE-INLINED none: hkArray<hkpVehicleInstance::WheelInfo>::operator=
-    hkMemoryAllocator& wheelAlloc = hkContainerHeapAllocator().get(&m_wheelsInfo);
-    int32_t newSize = other.m_wheelsInfo.m_size;
-    int32_t oldSize = m_wheelsInfo.m_size;
-    int32_t copiedSize = newSize > oldSize ? oldSize : newSize;
-    m_wheelsInfo._reserve(wheelAlloc, newSize);
-    for (int32_t i = 0; i < copiedSize; ++i) {
-        m_wheelsInfo.m_data[i].operator=(other.m_wheelsInfo.m_data[i]);
-    }
-    // EXE-INLINED none: hkArrayUtil::constructWithArray<hkpVehicleInstance::WheelInfo>
-    for (int32_t i = copiedSize; i < newSize; ++i) {
-        WheelInfo* pDst = &m_wheelsInfo.m_data[i];
-        // Placement new's null test.
-        if (pDst) {
-            ::new (pDst) WheelInfo(other.m_wheelsInfo.m_data[i]);
-        }
-    }
-    m_wheelsInfo.m_size = newSize;
+    m_wheelsInfo = other.m_wheelsInfo;
 
     m_frictionStatus = other.m_frictionStatus;
     m_deviceStatus = other.m_deviceStatus;
@@ -1446,21 +1392,7 @@ hkpVehicleInstance& hkpVehicleInstance::operator=(const hkpVehicleInstance& othe
     m_rpm = other.m_rpm;
     m_mainSteeringAngle = other.m_mainSteeringAngle;
 
-    // EXE-INLINED none: hkArray<float>::operator=
-    hkMemoryAllocator& angleAlloc = hkContainerHeapAllocator().get(&m_wheelsSteeringAngle);
-    if (m_wheelsSteeringAngle.getCapacity() < other.m_wheelsSteeringAngle.getSize()) {
-        if ((m_wheelsSteeringAngle.m_capacityAndFlags & hkArrayBase<float>::DONT_DEALLOCATE_FLAG) == 0) {
-            angleAlloc._bufFree<float>(m_wheelsSteeringAngle.m_data, m_wheelsSteeringAngle.getCapacity());
-        }
-        int32_t n = other.m_wheelsSteeringAngle.getSize();
-        m_wheelsSteeringAngle.m_data = angleAlloc._bufAlloc<float>(n);
-        m_wheelsSteeringAngle.m_capacityAndFlags = n;
-    }
-    int32_t numAngles = other.m_wheelsSteeringAngle.m_size;
-    m_wheelsSteeringAngle.m_size = numAngles;
-    for (int32_t i = 0; i < numAngles; ++i) {
-        m_wheelsSteeringAngle.m_data[i] = other.m_wheelsSteeringAngle.m_data[i];
-    }
+    m_wheelsSteeringAngle = other.m_wheelsSteeringAngle;
 
     m_isReversing.m_bool = other.m_isReversing.m_bool;
     m_currentGear = other.m_currentGear;

@@ -580,27 +580,7 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
                     static_cast<uint16_t>(rTri.us3 - uiVertOffset),
                 };
                 for (uint16_t usIndex : ausIndex) {
-                    // EXE-INLINED none: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::Add
-                    uint32_t uiAt = kIndices.m_usSize;
-                    if (uiAt >= kIndices.m_usMaxSize) {
-                        kIndices.SetSize(uiAt + kIndices.m_usGrowBy);
-                    }
-                    // EXE-INLINED 0xA5B870: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::SetAt
-                    if (uiAt >= kIndices.m_usSize) {
-                        kIndices.m_usSize = static_cast<uint16_t>(uiAt + 1);
-                        if (usIndex) {
-                            ++kIndices.m_usESize;
-                        }
-                    }
-                    else if (usIndex) {
-                        if (!kIndices.m_pBase[uiAt]) {
-                            ++kIndices.m_usESize;
-                        }
-                    }
-                    else if (kIndices.m_pBase[uiAt]) {
-                        --kIndices.m_usESize;
-                    }
-                    kIndices.m_pBase[uiAt] = usIndex;
+                    kIndices.Add(usIndex);
                 }
                 ++uiTri;
                 ++uiNumTris;
@@ -651,13 +631,8 @@ void bhkExtendedMeshShape::Init(const hkPackedNiTriStripsShapeCinfo& arInfo) {
                 --pdata->uiNumSubParts;
             }
 
-            // EXE-INLINED none: NiTArray<unsigned short, NiTMallocInterface<unsigned short>>::RemoveAll
-            for (uint32_t i = 0; i < kIndices.m_usSize; ++i) {
-                kIndices.m_pBase[i] = 0;
-            }
+            kIndices.RemoveAll();
             uiVertOffset += uiNumVerts;
-            kIndices.m_usSize = 0;
-            kIndices.m_usESize = 0;
         }
 
         {

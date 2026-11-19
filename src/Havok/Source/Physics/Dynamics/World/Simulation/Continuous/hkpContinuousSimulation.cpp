@@ -397,12 +397,7 @@ void hkLs_toiCheckValidityOfConstraints(
                 continue;
             }
             entityState[entity->m_storageIndex] |= 4;
-            // EXE-INLINED none: hkArray<hkpEntity*>::pushBack (the router is fetched even when it fits)
-            hkMemoryRouter& pushRouter = hkMemoryRouter::getInstance();
-            if (toBeActivated.m_size == (toBeActivated.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*pushRouter.m_heap, &toBeActivated, sizeof(hkpEntity*));
-            }
-            toBeActivated.m_data[toBeActivated.m_size++] = entity;
+            toBeActivated.pushBack(entity);
         }
         // EXE-INLINED none: hkAlgorithm::swap<hkpConstraintSchemaInfo>
         const int32_t j = firstNonActiveConstraintStatus++;
@@ -499,21 +494,7 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
 ) {
     // The capacity is 0x800003E8 (1000 with the flag).
     const int32_t kNumLocalEntries = 1000;
-    alignas(16) hkLocalArray<hkpAgentNnEntry*> entriesOut;
-    {
-        // EXE-INLINED none: hkLocalArray<hkpAgentNnEntry*>::hkLocalArray(1000) (hkArray's empty constructor, then
-        // hkAllocateStack)
-        entriesOut.m_data = nullptr;
-        entriesOut.m_size = 0;
-        entriesOut.m_capacityAndFlags = hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((kNumLocalEntries * sizeof(hkpAgentNnEntry*) + 127) & ~size_t(127));
-        // The stack allocator hands out raw bytes.
-        entriesOut.m_data = reinterpret_cast<hkpAgentNnEntry**>(pBlock);
-        entriesOut.m_capacityAndFlags = kNumLocalEntries | hkArrayBase<hkpAgentNnEntry*>::DONT_DEALLOCATE_FLAG;
-        entriesOut.m_localMemory = entriesOut.m_data;
-    }
+    alignas(16) hkLocalArray<hkpAgentNnEntry*> entriesOut(kNumLocalEntries);
     for (int32_t i = 0; i < toBeActivated.m_size; ++i) {
         hkpEntity* entity = toBeActivated.m_data[i];
         if (entityState.m_data.m_storage[entity->m_storageIndex] == HK_TOI_ENTITY_STATE_ZERO) {
@@ -561,34 +542,14 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
                 continue;
             }
 
-            {
-                // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (newTouchedConstraints.m_size ==
-                    (newTouchedConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        router.heap(), &newTouchedConstraints, static_cast<int32_t>(sizeof(hkpConstraintInstance*))
-                    );
-                }
-                newTouchedConstraints.m_data[newTouchedConstraints.m_size++] = ci->m_constraint;
-            }
+            newTouchedConstraints.pushBack(ci->m_constraint);
             if (otherEntity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
                 continue;
             }
             if (entityState.m_data.m_storage[otherEntity->m_storageIndex] >= HK_TOI_ENTITY_STATE_TOUCHED) {
                 continue;
             }
-            {
-                // EXE-INLINED none: hkArray<hkpEntity*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (newTouchedEntities.m_size ==
-                    (newTouchedEntities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        router.heap(), &newTouchedEntities, static_cast<int32_t>(sizeof(hkpEntity*))
-                    );
-                }
-                newTouchedEntities.m_data[newTouchedEntities.m_size++] = otherEntity;
-            }
+            newTouchedEntities.pushBack(otherEntity);
             if (entityState.m_data.m_storage[otherEntity->m_storageIndex] == HK_TOI_ENTITY_STATE_ZERO) {
                 entityState.m_data.m_storage[otherEntity->m_storageIndex] = HK_TOI_ENTITY_STATE_TRANSFORM_UPDATED;
                 hkSweptTransformUtil::lerp2(
@@ -614,34 +575,14 @@ void hkLs_toiActivateEntitiesAndCheckConstraints(
                 continue;
             }
 
-            {
-                // EXE-INLINED none: hkArray<hkpConstraintInstance*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (newTouchedConstraints.m_size ==
-                    (newTouchedConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        router.heap(), &newTouchedConstraints, static_cast<int32_t>(sizeof(hkpConstraintInstance*))
-                    );
-                }
-                newTouchedConstraints.m_data[newTouchedConstraints.m_size++] = ci->m_constraint;
-            }
+            newTouchedConstraints.pushBack(ci->m_constraint);
             if (otherEntity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
                 continue;
             }
             if (entityState.m_data.m_storage[otherEntity->m_storageIndex] >= HK_TOI_ENTITY_STATE_TOUCHED) {
                 continue;
             }
-            {
-                // EXE-INLINED none: hkArray<hkpEntity*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (newTouchedEntities.m_size ==
-                    (newTouchedEntities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        router.heap(), &newTouchedEntities, static_cast<int32_t>(sizeof(hkpEntity*))
-                    );
-                }
-                newTouchedEntities.m_data[newTouchedEntities.m_size++] = otherEntity;
-            }
+            newTouchedEntities.pushBack(otherEntity);
             if (entityState.m_data.m_storage[otherEntity->m_storageIndex] == HK_TOI_ENTITY_STATE_ZERO) {
                 entityState.m_data.m_storage[otherEntity->m_storageIndex] = HK_TOI_ENTITY_STATE_TRANSFORM_UPDATED;
                 hkSweptTransformUtil::lerp2(
@@ -798,21 +739,7 @@ hkResult hkLs_localizedSolveToi(
         ? event.m_entities[1]->getSimulationIsland()
         : event.m_entities[0]->getSimulationIsland();
     const int32_t numIslandEntities = island->m_entities.m_size;
-    alignas(16) hkLocalArray<hkpEntity*> touchedEntities;
-    {
-        // EXE-INLINED none: hkLocalArray<hkpEntity*>::hkLocalArray(numIslandEntities) (hkArray's empty constructor,
-        // then hkAllocateStack)
-        touchedEntities.m_data = nullptr;
-        touchedEntities.m_size = 0;
-        touchedEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numIslandEntities * static_cast<int32_t>(sizeof(hkpEntity*)) + 127) & ~127);
-        touchedEntities.m_capacityAndFlags = numIslandEntities | hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
-        // The stack allocator hands out raw bytes.
-        touchedEntities.m_data = reinterpret_cast<hkpEntity**>(pBlock);
-        touchedEntities.m_localMemory = touchedEntities.m_data;
-    }
+    alignas(16) hkLocalArray<hkpEntity*> touchedEntities(numIslandEntities);
 
     if (event.m_entities[0]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
         // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
@@ -862,20 +789,6 @@ hkResult hkLs_localizedSolveToi(
                 _mm_mul_ps(_mm_shuffle_ps(local, local, _MM_SHUFFLE(2, 2, 2, 2)), transform.m_rotation.m_col2.m_quad)
             );
             transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift);
-        }
-        {
-            // EXE-INLINED none: hkInplaceArray<hkpEntity*,64>::~hkInplaceArray
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            toBeActivated.m_size = 0;
-            if (toBeActivated.m_capacityAndFlags >= 0) {
-                heap.bufFree(
-                    toBeActivated.m_data,
-                    (toBeActivated.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkpEntity*))
-                );
-            }
-            toBeActivated.m_data = nullptr;
-            toBeActivated.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
         }
         return HK_FAILURE;
     }
@@ -1080,48 +993,6 @@ hkResult hkLs_localizedSolveToi(
     }
 
 cleanup:
-    {
-        // EXE-INLINED none: hkInplaceArray<hkpConstraintInstance*,64>::~hkInplaceArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        newTouchedConstraints.m_size = 0;
-        if (newTouchedConstraints.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                newTouchedConstraints.m_data,
-                (newTouchedConstraints.m_capacityAndFlags & hkArrayBase<hkpConstraintInstance*>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkpConstraintInstance*))
-            );
-        }
-        newTouchedConstraints.m_data = nullptr;
-        newTouchedConstraints.m_capacityAndFlags = hkArrayBase<hkpConstraintInstance*>::DONT_DEALLOCATE_FLAG;
-    }
-    {
-        // EXE-INLINED none: hkInplaceArray<hkpEntity*,64>::~hkInplaceArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        newTouchedEntities.m_size = 0;
-        if (newTouchedEntities.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                newTouchedEntities.m_data,
-                (newTouchedEntities.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkpEntity*))
-            );
-        }
-        newTouchedEntities.m_data = nullptr;
-        newTouchedEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
-    }
-    {
-        // EXE-INLINED none: hkInplaceArray<hkpEntity*,64>::~hkInplaceArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        toBeActivated.m_size = 0;
-        if (toBeActivated.m_capacityAndFlags >= 0) {
-            heap.bufFree(
-                toBeActivated.m_data,
-                (toBeActivated.m_capacityAndFlags & hkArrayBase<hkpEntity*>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkpEntity*))
-            );
-        }
-        toBeActivated.m_data = nullptr;
-        toBeActivated.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
-    }
     return HK_SUCCESS;
 }
 
@@ -1493,12 +1364,7 @@ void hkpContinuousSimulation::collideEntitiesNeedingPsiCollisionDetectionNarrowP
             // Inserts the value 0, which getWithDefault above cannot tell from an absent key, as the game does.
             entriesSet.insert(entry, 0);
             {
-                // EXE-INLINED none: hkArray<EntryAndIsland>::expandOne
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (entriesAndIslands.m_size == entriesAndIslands.getCapacity()) {
-                    hkArrayUtil::_reserveMore(router.heap(), &entriesAndIslands, sizeof(EntryAndIsland));
-                }
-                EntryAndIsland& entryAndIsland = entriesAndIslands.m_data[entriesAndIslands.m_size++];
+                EntryAndIsland& entryAndIsland = entriesAndIslands.expandOne();
                 entryAndIsland.m_island = island;
                 entryAndIsland.m_entry = entry;
             }
@@ -1604,59 +1470,48 @@ void hkpContinuousSimulation::simulateToi(
     }
     hkpSimulationIsland* island = islandEntity->m_simulationIsland;
     const int32_t numEntitiesInIsland = island->m_entities.m_size;
-    hkLocalBuffer<uint8_t> entityState;
-    // EXE-INLINED none: hkLocalBuffer<hkUchar>::hkLocalBuffer(numEntitiesInIsland) (hkAllocateStack)
-    hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-    // Keeps its own copy of the block's address: it indexes the states through it after the solve and gives it back to
-    // the stack at the end, never reloading the buffer's field, which hkLs_localizedSolveToi gets by reference.
-    char* pBlock = stack.m_next.m_storage;
-    stack.m_next.m_storage = pBlock + ((numEntitiesInIsland + 127) & ~127);
-    // The stack allocator hands out raw bytes.
-    uint8_t* pStates = reinterpret_cast<uint8_t*>(pBlock);
-    entityState.m_data.m_storage = pStates;
-    hkString::memSet(pStates, 0, numEntitiesInIsland);
-    const hkResult result = hkLs_localizedSolveToi(
-        toiResources, solverResources, event, *m_toiResourceMgr, world, activeEntities, entityState, rotateNormal
-    );
-    hkpConstraintSolverSetup::shutdownSolver(solverResources);
+    {
+        hkLocalBuffer<uint8_t> entityState(numEntitiesInIsland, nullptr);
+        // Keeps its own copy of the block's address: it indexes the states through it after the solve, never reloading
+        // the buffer's field, which hkLs_localizedSolveToi gets by reference.
+        uint8_t* pStates = entityState.m_data.m_storage;
+        hkString::memSet(pStates, 0, numEntitiesInIsland);
+        const hkResult result = hkLs_localizedSolveToi(
+            toiResources, solverResources, event, *m_toiResourceMgr, world, activeEntities, entityState, rotateNormal
+        );
+        hkpConstraintSolverSetup::shutdownSolver(solverResources);
 
-    hkpEntity* owner = event.m_entities[0];
-    if (owner->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
-        owner = event.m_entities[1];
-    }
-    event.m_contactMgr->removeToi(*owner->m_simulationIsland, event.m_properties);
+        hkpEntity* owner = event.m_entities[0];
+        if (owner->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
+            owner = event.m_entities[1];
+        }
+        event.m_contactMgr->removeToi(*owner->m_simulationIsland, event.m_properties);
 
-    if (result == HK_SUCCESS) {
-        // Every other pending event with an entity of the island the solve made active goes (removeAt moves the last
-        // event into the hole).
-        for (int32_t i = m_toiEvents.m_size - 1; i >= 0; --i) {
-            hkpToiEvent& other = m_toiEvents.m_data[i];
-            hkpEntity* entity0 = other.m_entities[0];
-            hkpEntity* entity1;
-            if ((entity0->m_simulationIsland == island &&
-                 pStates[entity0->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE) ||
-                ((entity1 = other.m_entities[1])->m_simulationIsland == island &&
-                 pStates[entity1->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE)) {
-                hkpEntity* otherOwner = other.m_entities[0];
-                if (otherOwner->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
-                    otherOwner = other.m_entities[1];
-                }
-                other.m_contactMgr->removeToi(*otherOwner->m_simulationIsland, other.m_properties);
-                // EXE-INLINED none: hkArrayBase<hkpToiEvent>::removeAt
-                --m_toiEvents.m_size;
-                if (m_toiEvents.m_size != i) {
-                    m_toiEvents.m_data[i] = m_toiEvents.m_data[m_toiEvents.m_size];
+        if (result == HK_SUCCESS) {
+            // Every other pending event with an entity of the island the solve made active goes (removeAt moves the
+            // last event into the hole).
+            for (int32_t i = m_toiEvents.m_size - 1; i >= 0; --i) {
+                hkpToiEvent& other = m_toiEvents.m_data[i];
+                hkpEntity* entity0 = other.m_entities[0];
+                hkpEntity* entity1;
+                if ((entity0->m_simulationIsland == island &&
+                     pStates[entity0->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE) ||
+                    ((entity1 = other.m_entities[1])->m_simulationIsland == island &&
+                     pStates[entity1->m_storageIndex] == HK_TOI_ENTITY_STATE_ACTIVE)) {
+                    hkpEntity* otherOwner = other.m_entities[0];
+                    if (otherOwner->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
+                        otherOwner = other.m_entities[1];
+                    }
+                    other.m_contactMgr->removeToi(*otherOwner->m_simulationIsland, other.m_properties);
+                    m_toiEvents.removeAt(i);
                 }
             }
+            hkReferencedObject::addReferences(activeEntities.m_data, activeEntities.m_size);
         }
-        hkReferencedObject::addReferences(activeEntities.m_data, activeEntities.m_size);
+        else {
+            activeEntities.clear();
+        }
     }
-    else {
-        // EXE-INLINED none: hkArray<hkpEntity*>::clear
-        activeEntities.m_size = 0;
-    }
-    // EXE-INLINED none: hkLocalBuffer<hkUchar>::~hkLocalBuffer (hkDeallocateStack)
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBlock;
     m_toiResourceMgr->endToiAndFreeResources(event, m_toiEvents, toiResources);
 
     HK_TIMER_SPLIT_LIST("PendingOperations");
@@ -1667,11 +1522,7 @@ void hkpContinuousSimulation::simulateToi(
         for (int32_t i = activeEntities.m_size - 1; i >= 0; --i) {
             hkpEntity* entity = activeEntities.m_data[i];
             if (!entity->m_world) {
-                // EXE-INLINED none: hkArrayBase<hkpEntity*>::removeAt
-                --activeEntities.m_size;
-                if (activeEntities.m_size != i) {
-                    activeEntities.m_data[i] = activeEntities.m_data[activeEntities.m_size];
-                }
+                activeEntities.removeAt(i);
                 entity->removeReference();
             }
         }
@@ -1777,11 +1628,7 @@ void hkpContinuousSimulation::handleSimpleToi(
                     owner = other.m_entities[1];
                 }
                 other.m_contactMgr->removeToi(*owner->m_simulationIsland, other.m_properties);
-                // EXE-INLINED none: hkArrayBase<hkpToiEvent>::removeAt
-                --m_toiEvents.m_size;
-                if (m_toiEvents.m_size != i) {
-                    m_toiEvents.m_data[i] = m_toiEvents.m_data[m_toiEvents.m_size];
-                }
+                m_toiEvents.removeAt(i);
             }
         }
         // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
@@ -2227,18 +2074,10 @@ hkpStepResult hkpContinuousSimulation::handleAllToisTill(float minTime) {
             if (fireEarliestToiCallbacksAndCheckEnabled(m_toiEvents.m_data[earliestIndex], rotateNormal).m_bool) {
                 break;
             }
-            // EXE-INLINED none: hkArrayBase<hkpToiEvent>::removeAt
-            --m_toiEvents.m_size;
-            if (m_toiEvents.m_size != earliestIndex) {
-                m_toiEvents.m_data[earliestIndex] = m_toiEvents.m_data[m_toiEvents.m_size];
-            }
+            m_toiEvents.removeAt(earliestIndex);
         }
         alignas(16) hkpToiEvent event = m_toiEvents.m_data[earliestIndex];
-        // EXE-INLINED none: hkArrayBase<hkpToiEvent>::removeAt
-        --m_toiEvents.m_size;
-        if (m_toiEvents.m_size != earliestIndex) {
-            m_toiEvents.m_data[earliestIndex] = m_toiEvents.m_data[m_toiEvents.m_size];
-        }
+        m_toiEvents.removeAt(earliestIndex);
         const float eventTime = event.m_time;
         m_currentTime = eventTime;
         const float psiTime = m_currentPsiTime;

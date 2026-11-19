@@ -89,25 +89,7 @@ void hkpRigidBodyInertiaViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_BEGIN("hkpRigidBodyInertiaViewer", this);
     HK_TIMER_BEGIN("getProps", this);
 
-    {
-        // EXE-INLINED none: hkArrayBase<hkDisplayBox>::_setSize
-        const int32_t newSize = m_entitiesCreated.m_size;
-        m_displayBoxes.reserve(newSize);
-        hkDisplayBox* pDead = m_displayBoxes.m_data + newSize;
-        for (int32_t n = m_displayBoxes.m_size - newSize; n > 0; --n) {
-            pDead->~hkDisplayBox();
-            ++pDead;
-        }
-        hkDisplayBox* pNew = m_displayBoxes.m_data + m_displayBoxes.m_size;
-        for (int32_t n = newSize - m_displayBoxes.m_size; n > 0; --n) {
-            // Placement new's null test.
-            if (pNew) {
-                ::new (pNew) hkDisplayBox;
-            }
-            ++pNew;
-        }
-        m_displayBoxes.m_size = newSize;
-    }
+    m_displayBoxes.setSize(m_entitiesCreated.m_size);
 
     int32_t numBoxes = 0;
     for (int32_t i = 0; i < m_entitiesCreated.m_size; ++i) {
@@ -160,25 +142,7 @@ void hkpRigidBodyInertiaViewer::postSimulationCallback(hkpWorld* world) {
     HK_TIMER_END();
     HK_TIMER_BEGIN("sendProps", this);
 
-    {
-        // EXE-INLINED none: hkArrayBase<hkDisplayBox>::_setSize
-        const int32_t newSize = numBoxes;
-        m_displayBoxes.reserve(newSize);
-        hkDisplayBox* pDead = m_displayBoxes.m_data + newSize;
-        for (int32_t n = m_displayBoxes.m_size - newSize; n > 0; --n) {
-            pDead->~hkDisplayBox();
-            ++pDead;
-        }
-        hkDisplayBox* pNew = m_displayBoxes.m_data + m_displayBoxes.m_size;
-        for (int32_t n = newSize - m_displayBoxes.m_size; n > 0; --n) {
-            // Placement new's null test.
-            if (pNew) {
-                ::new (pNew) hkDisplayBox;
-            }
-            ++pNew;
-        }
-        m_displayBoxes.m_size = newSize;
-    }
+    m_displayBoxes.setSize(numBoxes);
 
     hkArray<hkDisplayGeometry*> displayGeometries;
     displayGeometries.setSize(m_displayBoxes.m_size);

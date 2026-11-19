@@ -7,6 +7,7 @@
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkSphereRepShape.h"
+#include "BSHavok/bhkStream.h"
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
@@ -56,73 +57,33 @@ NiObject* bhkTriangleShape::CreateClone(NiCloningProcess& arCloneData) {
 }
 
 // For a big-endian file, the creation info's three corners are byte-swapped in place after the base's read. The
-// stream's byte is compared with 1. Each float's four bytes are swapped as an untyped 32-bit word, hence the uint32_t
-// view.
+// stream's byte is compared with 1.
 void bhkTriangleShape::LoadBinary(NiStream& arStream) {
     bhkConvexShape::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkTriangleShapeCinfo& cinfo = static_cast<hkTriangleShapeCinfo&>(CreateCinfo(bCreated));
-        uint32_t* puiVertices = reinterpret_cast<uint32_t*>(&cinfo.m_vertexA);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[0] = __builtin_bswap32(puiVertices[0]);
-        puiVertices[1] = __builtin_bswap32(puiVertices[1]);
-        puiVertices[2] = __builtin_bswap32(puiVertices[2]);
-        puiVertices[3] = __builtin_bswap32(puiVertices[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[4] = __builtin_bswap32(puiVertices[4]);
-        puiVertices[5] = __builtin_bswap32(puiVertices[5]);
-        puiVertices[6] = __builtin_bswap32(puiVertices[6]);
-        puiVertices[7] = __builtin_bswap32(puiVertices[7]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[8] = __builtin_bswap32(puiVertices[8]);
-        puiVertices[9] = __builtin_bswap32(puiVertices[9]);
-        puiVertices[10] = __builtin_bswap32(puiVertices[10]);
-        puiVertices[11] = __builtin_bswap32(puiVertices[11]);
+        bhkStream::Endian(cinfo.m_vertexA);
+        bhkStream::Endian(cinfo.m_vertexB);
+        bhkStream::Endian(cinfo.m_vertexC);
     }
 }
 
 // For a big-endian save, the creation info's three corners are byte-swapped in place around the base's write and
-// swapped back after it. The stream's byte is compared with 1 and read again after the base call. Each float's four
-// bytes are swapped as an untyped 32-bit word, hence the uint32_t view.
+// swapped back after it. The stream's byte is compared with 1 and read again after the base call.
 void bhkTriangleShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkTriangleShapeCinfo& cinfo = static_cast<hkTriangleShapeCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiVertices = reinterpret_cast<uint32_t*>(&cinfo.m_vertexA);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[0] = __builtin_bswap32(puiVertices[0]);
-        puiVertices[1] = __builtin_bswap32(puiVertices[1]);
-        puiVertices[2] = __builtin_bswap32(puiVertices[2]);
-        puiVertices[3] = __builtin_bswap32(puiVertices[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[4] = __builtin_bswap32(puiVertices[4]);
-        puiVertices[5] = __builtin_bswap32(puiVertices[5]);
-        puiVertices[6] = __builtin_bswap32(puiVertices[6]);
-        puiVertices[7] = __builtin_bswap32(puiVertices[7]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[8] = __builtin_bswap32(puiVertices[8]);
-        puiVertices[9] = __builtin_bswap32(puiVertices[9]);
-        puiVertices[10] = __builtin_bswap32(puiVertices[10]);
-        puiVertices[11] = __builtin_bswap32(puiVertices[11]);
+        bhkStream::Endian(cinfo.m_vertexA);
+        bhkStream::Endian(cinfo.m_vertexB);
+        bhkStream::Endian(cinfo.m_vertexC);
     }
     bhkConvexShape::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[0] = __builtin_bswap32(puiVertices[0]);
-        puiVertices[1] = __builtin_bswap32(puiVertices[1]);
-        puiVertices[2] = __builtin_bswap32(puiVertices[2]);
-        puiVertices[3] = __builtin_bswap32(puiVertices[3]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[4] = __builtin_bswap32(puiVertices[4]);
-        puiVertices[5] = __builtin_bswap32(puiVertices[5]);
-        puiVertices[6] = __builtin_bswap32(puiVertices[6]);
-        puiVertices[7] = __builtin_bswap32(puiVertices[7]);
-        // EXE-INLINED none: bhkStream::Endian
-        puiVertices[8] = __builtin_bswap32(puiVertices[8]);
-        puiVertices[9] = __builtin_bswap32(puiVertices[9]);
-        puiVertices[10] = __builtin_bswap32(puiVertices[10]);
-        puiVertices[11] = __builtin_bswap32(puiVertices[11]);
+        bhkStream::Endian(cinfo.m_vertexA);
+        bhkStream::Endian(cinfo.m_vertexB);
+        bhkStream::Endian(cinfo.m_vertexC);
     }
 }
 

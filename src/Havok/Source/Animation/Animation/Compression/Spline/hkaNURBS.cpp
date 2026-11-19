@@ -1044,37 +1044,8 @@ int32_t hkaNURBS::RemoveCurveKnot(
         Pw.m_data[j] = Pw.m_data[k];
         ++j;
     }
-    // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::setSize
-    int32_t pointCount = Pw.m_size - num;
-    hkMemoryAllocator* pPointHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t pointCapacity = Pw.m_capacityAndFlags & hkArrayBase<hkaNURBS::Point>::CAPACITY_MASK;
-    if (pointCapacity < pointCount) {
-        int32_t newCapacity = 2 * pointCapacity;
-        if (pointCount >= newCapacity) {
-            newCapacity = pointCount;
-        }
-        hkArrayUtil::_reserve(*pPointHeap, &Pw, newCapacity, sizeof(hkaNURBS::Point));
-    }
-    hkaNURBS::Point* pNew = Pw.m_data + Pw.m_size;
-    for (int32_t iNew = pointCount - Pw.m_size; iNew > 0; --iNew) {
-        if (pNew) {
-            ::new (pNew) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
-        }
-        ++pNew;
-    }
-    Pw.m_size = pointCount;
-    // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::setSize
-    int32_t knotCount = U.m_size - num;
-    hkMemoryAllocator* pKnotHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t knotCapacity = U.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK;
-    if (knotCapacity < knotCount) {
-        int32_t newCapacity = 2 * knotCapacity;
-        if (knotCount >= newCapacity) {
-            newCapacity = knotCount;
-        }
-        hkArrayUtil::_reserve(*pKnotHeap, &U, newCapacity, sizeof(float));
-    }
-    U.m_size = knotCount;
+    Pw.setSize(Pw.m_size - num);
+    U.setSize(U.m_size - num);
     return t;
 }
 
@@ -1522,7 +1493,6 @@ void hkaNURBS::DegreeElevateCurve(
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& Pw,
     int32_t t
 ) {
-    const int32_t iPointSize = static_cast<int32_t>(sizeof(hkaNURBS::Point));
     int32_t nOld = n;
     int32_t m = nOld + p + 1;
     if (t == 0) {
@@ -1550,27 +1520,7 @@ void hkaNURBS::DegreeElevateCurve(
 
     hkArray<float, hkContainerHeapAllocator> Uh(nh + p + t + 2);
 
-    // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray(int)
-    hkArray<hkaNURBS::Point, hkContainerHeapAllocator> Qw;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iSize = nh + 1;
-    hkaNURBS::Point* pPoints = nullptr;
-    if (iSize != 0) {
-        int32_t iBytes = iSize * iPointSize;
-        pPoints = static_cast<hkaNURBS::Point*>(pHeap->bufAlloc(iBytes));
-        iSize = iBytes / iPointSize;
-    }
-    Qw.m_data = pPoints;
-    Qw.m_size = iSize;
-    Qw.m_capacityAndFlags = iSize;
-    if (iSize == 0) {
-        Qw.m_capacityAndFlags = hkArrayBase<hkaNURBS::Point>::DONT_DEALLOCATE_FLAG;
-    }
-    for (hkaNURBS::Point* pPoint = pPoints; iSize > 0; ++pPoint, --iSize) {
-        if (pPoint) {
-            ::new (pPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
-        }
-    }
+    hkArray<hkaNURBS::Point, hkContainerHeapAllocator> Qw(nh + 1);
 
     // The Bezier degree elevation coefficients.
     int32_t ph = t + p;
@@ -1965,27 +1915,7 @@ void approximateNURBSCurveImpl(
     int32_t* numPointsOut,
     hkVector4* pointsOut
 ) {
-    // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray(int)
-    hkArray<hkaNURBS::Point, hkContainerHeapAllocator> Q;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iSize = numSamples;
-    hkaNURBS::Point* pPoints = nullptr;
-    if (iSize != 0) {
-        int32_t iBytes = iSize * static_cast<int32_t>(sizeof(hkaNURBS::Point));
-        pPoints = static_cast<hkaNURBS::Point*>(pHeap->bufAlloc(iBytes));
-        iSize = iBytes / static_cast<int32_t>(sizeof(hkaNURBS::Point));
-    }
-    Q.m_data = pPoints;
-    Q.m_size = iSize;
-    Q.m_capacityAndFlags = iSize;
-    if (iSize == 0) {
-        Q.m_capacityAndFlags = hkArrayBase<hkaNURBS::Point>::DONT_DEALLOCATE_FLAG;
-    }
-    for (hkaNURBS::Point* pPoint = pPoints; iSize > 0; ++pPoint, --iSize) {
-        if (pPoint) {
-            ::new (pPoint) hkaNURBS::Point(0.0f, 0.0f, 0.0f, 0.0f);
-        }
-    }
+    hkArray<hkaNURBS::Point, hkContainerHeapAllocator> Q(numSamples);
 
     hkArray<float, hkContainerHeapAllocator> ub(numSamples);
 

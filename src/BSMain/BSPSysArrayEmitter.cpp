@@ -138,7 +138,6 @@ PArrayPoint* PArrayPoint::CreateInstance() {
 void PArrayPoint::KillSDM() {
     NiFixedString* Block = PArrayPoint::pTag;
     if (PArrayPoint::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(PArrayPoint::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

@@ -142,13 +142,7 @@ void hkpStorageExtendedMeshShape::addTrianglesSubpart(const TrianglesSubpart& pa
     pNewStorage->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(MeshSubpartStorage));
     pNewStorage = ::new (pNewStorage) MeshSubpartStorage;
 
-    // EXE-INLINED 0x629AD0
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    if (m_meshstorage.m_size == m_meshstorage.getCapacity()) {
-        hkArrayUtil::_reserveMore(router.heap(), &m_meshstorage, sizeof(MeshSubpartStorage*));
-    }
-    m_meshstorage.m_data[m_meshstorage.m_size] = pNewStorage;
-    m_meshstorage.m_size++;
+    m_meshstorage.pushBack(pNewStorage);
     MeshSubpartStorage* pStorage = m_meshstorage.m_data[m_meshstorage.m_size - 1];
 
     // The vertices, as vectors with w 0.
@@ -226,13 +220,7 @@ void hkpStorageExtendedMeshShape::addTrianglesSubpart(const TrianglesSubpart& pa
         if (partIn.m_materialIndexStridingType.m_storage == MATERIAL_INDICES_INT8) {
             hkArray<uint8_t>& indices = pStorage->m_materialIndices;
             if (partIn.m_materialIndexStriding == 0) {
-                // EXE-INLINED none: hkArray<hkUint8>::pushBack
-                hkMemoryRouter& indexRouter = hkMemoryRouter::getInstance();
-                if (indices.m_size == indices.getCapacity()) {
-                    hkArrayUtil::_reserveMore(indexRouter.heap(), &indices, sizeof(uint8_t));
-                }
-                indices.m_data[indices.m_size] = *static_cast<const uint8_t*>(pMaterialIndexBase);
-                indices.m_size++;
+                indices.pushBack(*static_cast<const uint8_t*>(pMaterialIndexBase));
                 pSubpart->m_materialIndexBase = &indices.m_data[indices.m_size - 1];
             }
             else {
@@ -248,13 +236,7 @@ void hkpStorageExtendedMeshShape::addTrianglesSubpart(const TrianglesSubpart& pa
         else {
             hkArray<uint16_t>& indices = pStorage->m_materialIndices16;
             if (partIn.m_materialIndexStriding == 0) {
-                // EXE-INLINED none: hkArray<hkUint16>::pushBack
-                hkMemoryRouter& indexRouter = hkMemoryRouter::getInstance();
-                if (indices.m_size == indices.getCapacity()) {
-                    hkArrayUtil::_reserveMore(indexRouter.heap(), &indices, sizeof(uint16_t));
-                }
-                indices.m_data[indices.m_size] = *static_cast<const uint16_t*>(pMaterialIndexBase);
-                indices.m_size++;
+                indices.pushBack(*static_cast<const uint16_t*>(pMaterialIndexBase));
                 pSubpart->m_materialIndexBase = &indices.m_data[indices.m_size - 1];
             }
             else {
@@ -386,14 +368,7 @@ int32_t hkpStorageExtendedMeshShape::addShapesSubpart(const hkpExtendedMeshShape
     pNewStorage->m_memSizeAndFlags = sizeof(ShapeSubpartStorage);
     ::new (pNewStorage) ShapeSubpartStorage;
 
-    // EXE-INLINED none: hkArray<hkpStorageExtendedMeshShape::ShapeSubpartStorage*>::pushBack
-    hkMemoryAllocator& storageHeap = hkMemoryRouter::getInstance().heap();
-    if (m_shapestorage.m_size ==
-        static_cast<int32_t>(m_shapestorage.m_capacityAndFlags & hkArrayBase<ShapeSubpartStorage*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(storageHeap, &m_shapestorage, sizeof(ShapeSubpartStorage*));
-    }
-    m_shapestorage.m_data[m_shapestorage.m_size] = pNewStorage;
-    m_shapestorage.m_size++;
+    m_shapestorage.pushBack(pNewStorage);
     ShapeSubpartStorage* storage = m_shapestorage.m_data[m_shapestorage.m_size - 1];
 
     *subpart = partIn;
@@ -404,14 +379,7 @@ int32_t hkpStorageExtendedMeshShape::addShapesSubpart(const hkpExtendedMeshShape
             hkArray<uint8_t>& indices = storage->m_materialIndices;
             if (partIn.m_materialIndexStriding == 0) {
                 // One index shared by every child shape.
-                // EXE-INLINED none: hkArray<uint8_t>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (indices.m_size ==
-                    static_cast<int32_t>(indices.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(heap, &indices, sizeof(uint8_t));
-                }
-                indices.m_data[indices.m_size] = *static_cast<const uint8_t*>(pIndexBase);
-                indices.m_size++;
+                indices.pushBack(*static_cast<const uint8_t*>(pIndexBase));
                 subpart->m_materialIndexBase = &indices.m_data[indices.m_size - 1];
             }
             else {
@@ -430,14 +398,7 @@ int32_t hkpStorageExtendedMeshShape::addShapesSubpart(const hkpExtendedMeshShape
             hkArray<uint16_t>& indices16 = storage->m_materialIndices16;
             if (partIn.m_materialIndexStriding == 0) {
                 // One index shared by every child shape.
-                // EXE-INLINED none: hkArray<uint16_t>::pushBack
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                if (indices16.m_size ==
-                    static_cast<int32_t>(indices16.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(heap, &indices16, sizeof(uint16_t));
-                }
-                indices16.m_data[indices16.m_size] = *static_cast<const uint16_t*>(pIndexBase);
-                indices16.m_size++;
+                indices16.pushBack(*static_cast<const uint16_t*>(pIndexBase));
                 subpart->m_materialIndexBase = &indices16.m_data[indices16.m_size - 1];
             }
             else {

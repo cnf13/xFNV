@@ -51,15 +51,7 @@ void hkRelocationInfo::addImport(int32_t off, const char* name) {
         pcName = reinterpret_cast<const char*>(pPool->m_map.getKey(it));
         pPool->m_map.setValue(it, 0);
     }
-    // EXE-INLINED none: hkArray<hkRelocationInfo::Import>::pushBack
-    hkMemoryRouter& kRouter = hkMemoryRouter::getInstance();
-    if (m_imports.m_size == (m_imports.m_capacityAndFlags & hkArrayBase<Import>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*kRouter.m_heap, &m_imports, sizeof(Import));
-    }
-    Import& rImport = m_imports.m_data[m_imports.m_size];
-    rImport.m_fromOffset = off;
-    rImport.m_identifier = pcName;
-    m_imports.m_size += 1;
+    m_imports.pushBack(Import{off, pcName});
 }
 
 // Each local fixup stores the buffer address of its target, each global one its target's address, at its offset in the

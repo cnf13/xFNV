@@ -347,9 +347,7 @@ bool NiStream::LoadHeader() {
     }
 
     m_pkIstr->SetEndianSwap(false);
-    // EXE-INLINED none: NiStreamLoadBinary
-    uint32_t uiSize = 4;
-    m_pkIstr->BinaryRead(&m_uiNifFileVersion, sizeof(m_uiNifFileVersion), &uiSize, 1);
+    NiStreamLoadBinary(*this, m_uiNifFileVersion);
     if (m_uiNifFileVersion < ms_uiNifMinVersion) {
         m_uiLastError = OLDER_VERSION;
         strcpy_s(m_acLastErrorMessage, sizeof(m_acLastErrorMessage), "NIF version is too old.");
@@ -555,25 +553,11 @@ bool NiStream::LoadStream() {
     }
     if (m_eBackgroundLoadStatus == NiStream::CANCELLING) {
     Cancelled:
-        // EXE-INLINED 0xA64CA0
-        ms_kCleanupCriticalSection.Lock();
-        m_kObjects.RemoveAll();
-        m_kLinkIDs.m_uiUsed = 0;
-        m_kLinkIDBlocks.m_uiUsed = 0;
-        m_uiLinkIndex = 0;
-        m_uiLinkBlockIndex = 0;
-        ms_kCleanupCriticalSection.Unlock();
+        FreeLoadData();
         return false;
     }
     SetSelectiveUpdateFlagsForOldVersions();
-    // EXE-INLINED 0xA64CA0
-    ms_kCleanupCriticalSection.Lock();
-    m_kObjects.RemoveAll();
-    m_kLinkIDs.m_uiUsed = 0;
-    m_kLinkIDBlocks.m_uiUsed = 0;
-    m_uiLinkIndex = 0;
-    m_uiLinkBlockIndex = 0;
-    ms_kCleanupCriticalSection.Unlock();
+    FreeLoadData();
     return true;
 }
 
@@ -789,7 +773,6 @@ void NiStream::LoadFixedString(NiFixedString& kString) {
         const char* v6 = m_kFixedStrings.m_pBase[uiStringID].GetHandle();
         if ((&kString)->GetHandle() != v6) {
             NiGlobalStringTable::AcquireHandle(v6);
-            // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
             NiGlobalStringTable::ReleaseHandle((&kString)->GetHandle());
             kString.m_kHandle = v6;
         }
@@ -1118,8 +1101,6 @@ void NiStream::SaveRTTI() {
     using RTTIMapBase = NiTMapBase<NiTPointerAllocator<size_t>, const char*, uint16_t>;
     using RTTIMap = NiTStringPointerMap<uint16_t>;
     RTTIMap kRTTIMap(37, false);
-    // The map's hash and key compare are called through its vtable.
-    const RTTIMapBase* pkMap = &kRTTIMap;
 
     for (uint32_t i = 0; i < m_kObjects.m_uiSize; ++i) {
         const char* pcName = m_kObjects.m_pBase[i].m_pObject->GetStreamableRTTI()->GetName();
@@ -1129,8 +1110,7 @@ void NiStream::SaveRTTI() {
         }
     }
 
-    // The count and each index are 2-byte values, held zero-extended in 32 bits, and only their low 16 bits are
-    // written.
+    // The count is a 2-byte value, held zero-extended in 32 bits, and only its low 16 bits are written.
     uint32_t uiNumRTTI = static_cast<uint16_t>(kRTTIMap.GetCount());
     const char** ppcRTTI = static_cast<const char**>(_NiMalloc(sizeof(const char*) * uiNumRTTI));
     NiTMapItem<const char*, uint16_t>* pkPos = kRTTIMap.GetFirstPos();
@@ -1149,18 +1129,11 @@ void NiStream::SaveRTTI() {
 
     // uiRTTI is shared by every object, so a name the map lacks (never the case, every name was added above) would
     // leave the previous object's index, as the game does.
-    uint32_t uiRTTI;
+    uint16_t uiRTTI;
     for (uint32_t i = 0; i < m_kObjects.m_uiSize; ++i) {
         NiObject* pkObject = m_kObjects.m_pBase[i].m_pObject;
         const char* pcName = pkObject->GetStreamableRTTI()->GetName();
-        // EXE-INLINED 0xC74990
-        for (NiTMapItem<const char*, uint16_t>* pkItem = kRTTIMap.m_ppkHashTable[pkMap->KeyToHashIndex(pcName)]; pkItem;
-             pkItem = pkItem->m_pkNext) {
-            if (pkMap->IsKeysEqual(pcName, pkItem->m_key)) {
-                uiRTTI = pkItem->m_val;
-                break;
-            }
-        }
+        kRTTIMap.GetAt(pcName, uiRTTI);
         if (pkObject->StreamCanSkip()) {
             uiRTTI |= 0x8000;
         }

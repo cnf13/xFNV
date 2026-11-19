@@ -830,39 +830,9 @@ void hkaPose::getModelSpaceAabb(__m128* a1) {
 // slots, the new ones 0.
 void hkaPose::init(hkaPose::PoseSpace space, const hkaSkeleton* skeleton, const hkArrayBase<hkQsTransform>& pose) {
     const int32_t numBones = m_skeleton->m_bones.m_size;
-    {
-        // EXE-INLINED none: hkArray<hkQsTransform>::setSize
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = m_modelPose.getCapacity();
-        if (capacity < numBones) {
-            hkArrayUtil::_reserve(
-                rHeap, &m_modelPose, numBones < 2 * capacity ? 2 * capacity : numBones, sizeof(hkQsTransform)
-            );
-        }
-        m_modelPose.m_size = numBones;
-    }
-    {
-        // EXE-INLINED none: hkArray<hkQsTransform>::setSize
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = m_localPose.getCapacity();
-        if (capacity < numBones) {
-            hkArrayUtil::_reserve(
-                rHeap, &m_localPose, numBones < 2 * capacity ? 2 * capacity : numBones, sizeof(hkQsTransform)
-            );
-        }
-        m_localPose.m_size = numBones;
-    }
-    {
-        // EXE-INLINED none: hkArray<hkUint32>::setSize
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = m_boneFlags.getCapacity();
-        if (capacity < numBones) {
-            hkArrayUtil::_reserve(
-                rHeap, &m_boneFlags, numBones < 2 * capacity ? 2 * capacity : numBones, sizeof(uint32_t)
-            );
-        }
-        m_boneFlags.m_size = numBones;
-    }
+    m_modelPose.setSize(numBones);
+    m_localPose.setSize(numBones);
+    m_boneFlags.setSize(numBones);
     if (space == LOCAL_SPACE) {
         setPoseLocalSpace(pose);
     }

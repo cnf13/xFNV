@@ -956,15 +956,6 @@ void hkgpDefaultTriangulatorType::flushConform() {
         const uint64_t l2 = static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(cx * cx + cy * cy)));
         return static_cast<int64_t>(0 - (l0 * d1 + l1 * d2 + l2 * d0)) < 0;
     };
-    // EXE-INLINED none: hkArray<Edge>::pushBack
-    const auto push = [this](const Edge& e) {
-        hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-        if (m_stack.m_size == m_stack.getCapacity()) {
-            hkArrayUtil::_reserveMore(alloc, &m_stack, sizeof(Edge));
-        }
-        m_stack.m_data[m_stack.m_size] = e;
-        m_stack.m_size++;
-    };
 
     do {
         // EXE-INLINED none: hkArray<Edge>::back, popBack
@@ -1017,10 +1008,10 @@ void hkgpDefaultTriangulatorType::flushConform() {
         if (c1) {
             setConstrained(makeEdge(edge.m_triangle, nextIndex(edge.m_index)));
         }
-        push(makeEdge(edge.m_triangle, nextIndex(edge.m_index)));
+        m_stack.pushBack(makeEdge(edge.m_triangle, nextIndex(edge.m_index)));
         // EXE-INLINED none: Edge::nextCw (the link's previous edge)
         const Edge l = linkOf(edge);
-        push(makeEdge(l.m_triangle, prevIndex(l.m_index)));
+        m_stack.pushBack(makeEdge(l.m_triangle, prevIndex(l.m_index)));
     }
     while (m_stack.m_size > 0);
 }
@@ -1746,37 +1737,15 @@ float getLoopSurfaceArea(const hkArray<hkgpMeshBase::Edge, hkContainerHeapAlloca
     }
     PointArray points;
     hkAabb aabb;
-    const int32_t numPoints = 2 * a1.m_size;
-    // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::reserve
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacity = points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-    if (capacity < numPoints) {
-        capacity = 2 * capacity;
-        if (numPoints >= capacity) {
-            capacity = numPoints;
-        }
-        hkArrayUtil::_reserve(*heap, &points, capacity, sizeof(hkVector4));
-    }
+    points.reserve(2 * a1.m_size);
     for (int32_t i = 0; i < a1.m_size; ++i) {
         const hkgpMeshBase::Edge& rEdge = a1.m_data[i];
         const hkVector4* pStart = &rEdge.m_triangle->m_vertices[rEdge.m_index]->m_position;
-        // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (points.m_size == (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &points, sizeof(hkVector4));
-        }
-        points.m_data[points.m_size].m_quad = pStart->m_quad;
-        ++points.m_size;
+        points.pushBack(*pStart);
         // The edge's end: the vertex after m_index ((9 >> 2 * index) & 3 is index + 1 modulo 3).
         const hkgpMeshBase::Edge& rNext = a1.m_data[i];
         const hkVector4* pEnd = &rNext.m_triangle->m_vertices[(9 >> (2 * rNext.m_index)) & 3]->m_position;
-        // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::pushBack
-        hkMemoryRouter& router2 = hkMemoryRouter::getInstance();
-        if (points.m_size == (points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router2.m_heap, &points, sizeof(hkVector4));
-        }
-        points.m_data[points.m_size].m_quad = pEnd->m_quad;
-        ++points.m_size;
+        points.pushBack(*pEnd);
     }
     hkAabbUtil::calcAabb(points.m_data, points.m_size, aabb);
     const __m128 extent = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
@@ -1843,17 +1812,7 @@ int32_t getStartingPoint(
         if (bestA == -1) {
             break;
         }
-        // EXE-INLINED none: hkArray<hkPlaneEquationUtil::hkpPlaneEqnIndexPair>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (tried.m_size == (tried.m_capacityAndFlags & hkArrayBase<Pair_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &tried, sizeof(Pair_t));
-        }
-        Pair_t* pPair = tried.m_data + tried.m_size;
-        if (pPair) {
-            pPair->m_first = bestA;
-            pPair->m_second = bestB;
-        }
-        ++tried.m_size;
+        tried.pushBack(Pair_t{bestA, bestB});
         const int32_t planeB = *planeBOut;
         const int32_t planeA = *planeAOut;
         hkVector4 dir;
@@ -2117,33 +2076,24 @@ int32_t hkgpMesh::Location::Region::hasCommonSuperset(const hkgpMesh::Location::
     using TriangleArray = hkLocalArray<hkgpMeshBase::Triangle*>;
     const uintptr_t kTriangleMask = ~static_cast<uintptr_t>(3);
     TriangleArray triangles(64);
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-    const auto pushBack = [&triangles](hkgpMeshBase::Triangle* pTriangle) __attribute__((always_inline)) {
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (triangles.m_size ==
-            static_cast<int32_t>(triangles.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &triangles, sizeof(hkgpMeshBase::Triangle*));
-        }
-        triangles.m_data[triangles.m_size++] = pTriangle;
-    };
     for (int32_t r = 0; r < a2; ++r) {
         const hkgpMesh::Location::Region* const pRegion = a1[r];
         hkgpMeshBase::Triangle* pTriangle = pRegion->m_feature.m_triangle;
         uintptr_t uiIndex = pRegion->m_feature.m_index;
         switch (pRegion->m_type) {
-            case TRIANGLE: pushBack(pTriangle); break;
+            case TRIANGLE: triangles.pushBack(pTriangle); break;
             case EDGE: {
-                pushBack(pTriangle);
+                triangles.pushBack(pTriangle);
                 hkgpMeshBase::Triangle* const pOpposite =
                     reinterpret_cast<hkgpMeshBase::Triangle*>(pTriangle->m_links[uiIndex] & kTriangleMask);
                 if (pOpposite) {
-                    pushBack(pOpposite);
+                    triangles.pushBack(pOpposite);
                 }
                 break;
             }
             case VERTEX:
                 do {
-                    pushBack(pTriangle);
+                    triangles.pushBack(pTriangle);
                     const uintptr_t uiLink = pTriangle->m_links[(18 >> (uiIndex * 2)) & 3];
                     uiIndex = uiLink & 3;
                     pTriangle = reinterpret_cast<hkgpMeshBase::Triangle*>(uiLink & kTriangleMask);
@@ -2157,15 +2107,7 @@ int32_t hkgpMesh::Location::Region::hasCommonSuperset(const hkgpMesh::Location::
     }
     int32_t result = 1;
     for (int32_t r = 0; r < a2; ++r) {
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::indexOf
-        int32_t index = -1;
-        for (int32_t k = 0; k < triangles.m_size; ++k) {
-            if (triangles.m_data[k] == a1[r]->m_feature.m_triangle) {
-                index = k;
-                break;
-            }
-        }
-        if (index == -1) {
+        if (triangles.indexOf(a1[r]->m_feature.m_triangle) == -1) {
             result = 0;
             break;
         }
@@ -2220,25 +2162,11 @@ void hkgpMesh::replaceVertex(hkgpMeshBase::Vertex* src, hkgpMeshBase::Vertex* ds
         for (int32_t i = 0; i < 3; ++i) {
             hkgpMeshBase::Vertex* pVertex = t->m_vertices[i];
             if (pVertex == src) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (toGlue.m_size ==
-                    (toGlue.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &toGlue, sizeof(hkgpMeshBase::Triangle*));
-                }
-                toGlue.m_data[toGlue.m_size] = t;
-                ++toGlue.m_size;
+                toGlue.pushBack(t);
                 t->m_vertices[i] = dst;
             }
             else if (pVertex == dst) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (toGlue.m_size ==
-                    (toGlue.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &toGlue, sizeof(hkgpMeshBase::Triangle*));
-                }
-                toGlue.m_data[toGlue.m_size] = t;
-                ++toGlue.m_size;
+                toGlue.pushBack(t);
             }
         }
     }
@@ -2289,17 +2217,7 @@ void hkgpMesh::replaceVertex(hkgpMeshBase::Vertex* src, hkgpMeshBase::Vertex* ds
 void hkgpMesh::fixBindings() {
     hkArray<hkgpMeshBase::Edge> nakedEdges;
     int32_t numFixed = 0;
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::reserve(1024)
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacity =
-        static_cast<int32_t>(nakedEdges.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK);
-    if (capacity < 1024) {
-        int32_t request = 2 * capacity;
-        if (request <= 1024) {
-            request = 1024;
-        }
-        hkArrayUtil::_reserve(pHeap, &nakedEdges, request, sizeof(hkgpMeshBase::Edge));
-    }
+    nakedEdges.reserve(1024);
 
     for (hkgpMeshBase::Triangle* t = static_cast<hkgpMeshBase::Triangle*>(m_triangles.m_used); t; t = t->m_next) {
         for (int32_t i = 0; i < 3; ++i) {
@@ -2355,12 +2273,7 @@ void hkgpMesh::fixBindings() {
         if (pB->m_triangle) {
             pB->m_triangle->m_links[pB->m_index] = pA->m_index + reinterpret_cast<uintptr_t>(pA->m_triangle);
         }
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::removeAt(j)
-        const int32_t last = nakedEdges.m_size - 1;
-        nakedEdges.m_size = static_cast<uint32_t>(last);
-        if (last != j) {
-            nakedEdges.m_data[j] = nakedEdges.m_data[last];
-        }
+        nakedEdges.removeAt(j);
         ++numFixed;
         --i;
     }
@@ -2751,27 +2664,8 @@ void hkgpMesh::rebuildTrianglesTree() {
         box.m_max.m_quad = _mm_add_ps(box.m_max.m_quad, marginQuad);
         box.m_min.m_quad = _mm_sub_ps(box.m_min.m_quad, marginQuad);
         ++numLeaves;
-        {
-            // EXE-INLINED none: hkArray<hkAabb, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (aabbs.m_size == (aabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &aabbs, sizeof(hkAabb));
-            }
-            hkAabb* pSlot = aabbs.m_data + aabbs.m_size;
-            if (pSlot) {
-                *pSlot = box;
-            }
-            ++aabbs.m_size;
-        }
-        {
-            // EXE-INLINED none: hkArray<void*, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (leaves.m_size == (leaves.m_capacityAndFlags & hkArrayBase<void*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &leaves, sizeof(void*));
-            }
-            leaves.m_data[leaves.m_size] = pTriangle;
-            ++leaves.m_size;
-        }
+        aabbs.pushBack(box);
+        leaves.pushBack(pTriangle);
     }
     IndexArray leafIdxOut;
     m_trianglesTree.build(aabbs.m_data, leaves.m_data, aabbs.m_size, leafIdxOut);
@@ -2870,44 +2764,17 @@ hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
             static_cast<hkgpMeshBase::Triangle*>(overlaps.m_data[i].m_a->m_leafData.m_userData);
         hkgpMeshBase::Triangle* pB =
             static_cast<hkgpMeshBase::Triangle*>(overlaps.m_data[i].m_b->m_leafData.m_userData);
-        // EXE-INLINED none: hkArray<Triangle*>::indexOf
-        int32_t iFound = -1;
-        for (int32_t j = 0; j < removed.m_size; ++j) {
-            if (removed.m_data[j] == pA) {
-                iFound = j;
-                break;
-            }
-        }
-        if (iFound != -1) {
+        if (removed.indexOf(pA) != -1) {
             continue;
         }
-        // EXE-INLINED none: hkArray<Triangle*>::indexOf
-        for (int32_t j = 0; j < removed.m_size; ++j) {
-            if (removed.m_data[j] == pB) {
-                iFound = j;
-                break;
-            }
-        }
-        if (iFound != -1) {
+        if (removed.indexOf(pB) != -1) {
             continue;
         }
         if (hasPosition(pA, pB->m_vertices[0]->m_position) && hasPosition(pA, pB->m_vertices[1]->m_position) &&
             hasPosition(pA, pB->m_vertices[2]->m_position) && hasPosition(pB, pA->m_vertices[0]->m_position) &&
             hasPosition(pB, pA->m_vertices[1]->m_position) && hasPosition(pB, pA->m_vertices[2]->m_position)) {
-            // EXE-INLINED none: hkArray<Triangle*>::pushBack
-            hkMemoryRouter& rRouterA = hkMemoryRouter::getInstance();
-            if (removed.m_size == (removed.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouterA.m_heap, &removed, sizeof(hkgpMeshBase::Triangle*));
-            }
-            removed.m_data[removed.m_size] = pA;
-            removed.m_size++;
-            // EXE-INLINED none: hkArray<Triangle*>::pushBack
-            hkMemoryRouter& rRouterB = hkMemoryRouter::getInstance();
-            if (removed.m_size == (removed.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*rRouterB.m_heap, &removed, sizeof(hkgpMeshBase::Triangle*));
-            }
-            removed.m_data[removed.m_size] = pB;
-            removed.m_size++;
+            removed.pushBack(pA);
+            removed.pushBack(pB);
             removeTriangle(pA);
             pMesh->removeTriangle(pB);
         }
@@ -3149,18 +3016,7 @@ float hkgpMesh::projectPointOnSurface(float maxDistance, hkVector4& point, int32
     bool inside = false;
     hkVector4 normal;
     SampleArray samples;
-    {
-        // EXE-INLINED none: hkArray<hkVector4, hkContainerHeapAllocator>::reserve
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = samples.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-        if (capacity < iterations) {
-            int32_t newCapacity = 2 * capacity;
-            if (iterations >= newCapacity) {
-                newCapacity = iterations;
-            }
-            hkArrayUtil::_reserve(heap, &samples, newCapacity, sizeof(hkVector4));
-        }
-    }
+    samples.reserve(iterations);
     float distance;
     for (int32_t i = iterations; i > 0; --i) {
         distance = std::sqrt(squaredDistanceToPoint(point, normal, &inside));
@@ -3208,13 +3064,7 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
             // Only a threshold below the distance keeps the sample.
             if (fThreshold < fDistance) {
                 kSample.m_quad[3] = __builtin_fabsf(fDistance);
-                // EXE-INLINED none: hkArray<hkVector4>::pushBack
-                hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-                if (samplesOut.m_size == (samplesOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(kHeap, &samplesOut, sizeof(hkVector4));
-                }
-                samplesOut.m_data[samplesOut.m_size].m_quad = kSample.m_quad;
-                ++samplesOut.m_size;
+                samplesOut.pushBack(kSample);
             }
         }
     }
@@ -3365,13 +3215,7 @@ void hkgpMesh::generateSurfaceSamples(const SurfaceSamplingConfig& config, hkArr
                 // Only a threshold above the change keeps the sample.
                 if (fThreshold > fAbsDelta) {
                     kSample.m_quad[3] = __builtin_fabsf(fDistance);
-                    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-                    hkMemoryAllocator& kHeap = hkMemoryRouter::getInstance().heap();
-                    if (samplesOut.m_size == (samplesOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(kHeap, &samplesOut, sizeof(hkVector4));
-                    }
-                    samplesOut.m_data[samplesOut.m_size].m_quad = kSample.m_quad;
-                    ++samplesOut.m_size;
+                    samplesOut.pushBack(kSample);
                 }
                 if (config.m_edgeCenterOnly.m_bool) {
                     break;
@@ -4049,17 +3893,7 @@ int32_t hkgpMesh::floodFillDetachedParts() {
         }
         stack.m_size = 0;
         for (uint32_t i = 0; i < 3; ++i) {
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (stack.m_size == (stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkgpMeshBase::Edge));
-            }
-            hkgpMeshBase::Edge* pSlot = stack.m_data + stack.m_size;
-            if (pSlot) {
-                pSlot->m_triangle = pTriangle;
-                pSlot->m_index = i;
-            }
-            ++stack.m_size;
+            stack.pushBack(hkgpMeshBase::Edge{{pTriangle, i}});
         }
         pTriangle->m_partId = numParts++;
         do {
@@ -4077,17 +3911,7 @@ int32_t hkgpMesh::floodFillDetachedParts() {
             // The other triangle's next and previous edges: (9 >> 2i) & 3 and (18 >> 2i) & 3.
             const uint32_t aNextIndices[2] = {(9u >> (2 * otherIndex)) & 3, (18u >> (2 * otherIndex)) & 3};
             for (uint32_t i = 0; i < 2; ++i) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (stack.m_size == (stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkgpMeshBase::Edge));
-                }
-                hkgpMeshBase::Edge* pSlot = stack.m_data + stack.m_size;
-                if (pSlot) {
-                    pSlot->m_triangle = pOther;
-                    pSlot->m_index = aNextIndices[i];
-                }
-                ++stack.m_size;
+                stack.pushBack(hkgpMeshBase::Edge{{pOther, aNextIndices[i]}});
             }
         }
         while (stack.m_size);
@@ -4113,11 +3937,7 @@ int32_t hkgpMesh::segregateVerticesBasedOnPartId() {
                 void* pMemory =
                     hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(sizeof(VertexArray)));
                 if (pMemory) {
-                    // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*, hkContainerHeapAllocator>::hkArray
-                    pCopies = static_cast<VertexArray*>(pMemory);
-                    pCopies->m_data = nullptr;
-                    pCopies->m_size = 0;
-                    pCopies->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Vertex*>::DONT_DEALLOCATE_FLAG;
+                    pCopies = ::new (pMemory) VertexArray();
                 }
                 // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*, hkContainerHeapAllocator>::setSize
                 hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
@@ -4186,18 +4006,7 @@ int32_t hkgpMesh::segregateVerticesBasedOnPartId() {
     for (int32_t it = map.getIterator(); map.isValid(it); it = map.getNext(it)) {
         VertexArray* pCopies = map.getValue(it);
         if (pCopies) {
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*, hkContainerHeapAllocator>::~hkArray
-            hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-            pCopies->m_size = 0;
-            if (pCopies->m_capacityAndFlags >= 0) {
-                heap->bufFree(
-                    pCopies->m_data,
-                    (pCopies->m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkgpMeshBase::Vertex*))
-                );
-            }
-            pCopies->m_data = nullptr;
-            pCopies->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Vertex*>::DONT_DEALLOCATE_FLAG;
+            pCopies->~VertexArray();
             // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*, hkContainerHeapAllocator>::operator delete
             hkMemoryRouter::getInstance().m_heap->blockFree(pCopies, static_cast<int32_t>(sizeof(VertexArray)));
         }
@@ -4220,17 +4029,7 @@ int32_t hkgpMesh::floodFillDetachedOrMaterialBoundariesParts() {
         }
         stack.m_size = 0;
         for (uint32_t i = 0; i < 3; ++i) {
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (stack.m_size == (stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkgpMeshBase::Edge));
-            }
-            hkgpMeshBase::Edge* pSlot = stack.m_data + stack.m_size;
-            if (pSlot) {
-                pSlot->m_triangle = pTriangle;
-                pSlot->m_index = i;
-            }
-            ++stack.m_size;
+            stack.pushBack(hkgpMeshBase::Edge{{pTriangle, i}});
         }
         pTriangle->m_partId = numParts++;
         do {
@@ -4256,17 +4055,7 @@ int32_t hkgpMesh::floodFillDetachedOrMaterialBoundariesParts() {
             // The other triangle's next and previous edges: (9 >> 2i) & 3 and (18 >> 2i) & 3.
             const uint32_t aNextIndices[2] = {(9u >> (2 * otherIndex)) & 3, (18u >> (2 * otherIndex)) & 3};
             for (uint32_t i = 0; i < 2; ++i) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (stack.m_size == (stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkgpMeshBase::Edge));
-                }
-                hkgpMeshBase::Edge* pSlot = stack.m_data + stack.m_size;
-                if (pSlot) {
-                    pSlot->m_triangle = pOther;
-                    pSlot->m_index = aNextIndices[i];
-                }
-                ++stack.m_size;
+                stack.pushBack(hkgpMeshBase::Edge{{pOther, aNextIndices[i]}});
             }
         }
         while (stack.m_size);
@@ -5037,18 +4826,7 @@ void hkgpMesh::generateEmptySpaceSamples(
     alignas(16) uint8_t boxStorage[sizeof(hkAabb)];
     hkAabb& box = *reinterpret_cast<hkAabb*>(boxStorage);
     const hkAabb* pBounds = getBoundingBox(box);
-    {
-        // EXE-INLINED none: hkArray<hkAabb>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (stack.m_size == (stack.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkAabb));
-        }
-        hkAabb* pSlot = stack.m_data + stack.m_size;
-        if (pSlot) {
-            *pSlot = *pBounds;
-        }
-        ++stack.m_size;
-    }
+    stack.pushBack(*pBounds);
     hkgpMakeAabbCubic(stack.m_data);
     // EXE-INLINED none: hkVector4::setInt24W
     stack.m_data[0].m_min.m_quad[3] = std::bit_cast<float>(0x3F000000u);
@@ -5076,25 +4854,13 @@ void hkgpMesh::generateEmptySpaceSamples(
                 hkVector4 sample = center;
                 const float fDistance = std::sqrt(fSquaredDistance);
                 sample.m_quad[3] = fDistance * scaling;
-                // EXE-INLINED none: hkArray<hkVector4>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (samplesOut.m_size == (samplesOut.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &samplesOut, sizeof(hkVector4));
-                }
-                samplesOut.m_data[samplesOut.m_size] = sample;
-                ++samplesOut.m_size;
+                samplesOut.pushBack(sample);
             }
         }
         else if (iDepth < maxOctreeDepth) {
             const float fChildW = std::bit_cast<float>(static_cast<uint32_t>(iDepth + 1) | 0x3F000000u);
             for (int32_t i = 0; i < 8; ++i) {
-                // EXE-INLINED none: hkArray<hkAabb>::expandOne
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (stack.m_size == (stack.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkAabb));
-                }
-                hkAabb* pChild = stack.m_data + stack.m_size;
-                ++stack.m_size;
+                hkAabb* pChild = &stack.expandOne();
                 // The corner (w 0.0f): x from max for octants 1, 2, 5, 6, y for 2, 3, 6, 7, z for 4 to 7.
                 __m128 kCorner;
                 switch (i) {
@@ -5340,22 +5106,7 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
             }
             if (!pEdge) {
                 ++edges.m_numItems;
-                // EXE-INLINED none: hkArray<hkgpMesh::SingleEdge>::expandOne (a zeroed placement element)
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (pBucket->m_size ==
-                    (pBucket->m_capacityAndFlags & hkArrayBase<hkgpMesh::SingleEdge>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), pBucket, sizeof(hkgpMesh::SingleEdge));
-                }
-                hkgpMesh::SingleEdge* const pSlot = pBucket->m_data + pBucket->m_size;
-                if (pSlot) {
-                    pSlot->m_a = nullptr;
-                    pSlot->m_b = nullptr;
-                    pSlot->m_e.m_triangle = nullptr;
-                    pSlot->m_e.m_index = 0;
-                    pSlot->m_refs = 0;
-                }
-                ++pBucket->m_size;
-                pEdge = pBucket->m_data + (pBucket->m_size - 1);
+                pEdge = &pBucket->expandOne();
                 pEdge->m_a = pA;
                 pEdge->m_b = pB;
                 pEdge->m_e.m_triangle = nullptr;
@@ -5399,14 +5150,7 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
     if (pTriangle) {
         for (; pTriangle; pTriangle = pTriangle->m_next) {
             if (!setPlane(pTriangle, position, 1) || !position.isNormalized3(0.0001f)) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (invalid.m_size ==
-                    (invalid.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &invalid, sizeof(hkgpMeshBase::Triangle*));
-                }
-                invalid.m_data[invalid.m_size] = pTriangle;
-                ++invalid.m_size;
+                invalid.pushBack(pTriangle);
             }
         }
         if (invalid.m_size) {
@@ -5941,41 +5685,7 @@ void hkgpMesh::retriangulateFromPlanes() {
     // The boundary edges per plane and the material per plane.
     EdgeArrays boundaries;
     hkArray<int32_t> materials;
-    // EXE-INLINED none: hkArray<EdgeArray>::setSize (numPlanes empty arrays)
-    {
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        int32_t iCapacity = boundaries.m_capacityAndFlags & hkArrayBase<EdgeArray>::CAPACITY_MASK;
-        if (iCapacity < numPlanes) {
-            iCapacity *= 2;
-            if (numPlanes >= iCapacity) {
-                iCapacity = numPlanes;
-            }
-            hkArrayUtil::_reserve(heap, &boundaries, iCapacity, static_cast<int32_t>(sizeof(EdgeArray)));
-        }
-        EdgeArray* pArray = &boundaries.m_data[numPlanes];
-        for (int32_t i = boundaries.m_size - numPlanes; i > 0; --i, ++pArray) {
-            hkMemoryAllocator& arrayHeap = hkMemoryRouter::getInstance().heap();
-            pArray->m_size = 0;
-            if (pArray->m_capacityAndFlags >= 0) {
-                arrayHeap.bufFree(
-                    pArray->m_data,
-                    (pArray->m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                        static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-                );
-            }
-            pArray->m_data = nullptr;
-            pArray->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-        }
-        pArray = &boundaries.m_data[boundaries.m_size];
-        for (int32_t i = numPlanes - boundaries.m_size; i > 0; --i, ++pArray) {
-            if (pArray) {
-                pArray->m_data = nullptr;
-                pArray->m_size = 0;
-                pArray->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
-            }
-        }
-        boundaries.m_size = numPlanes;
-    }
+    boundaries.setSize(numPlanes);
     // EXE-INLINED none: hkArray<int32_t>::setSize (m_planes.m_size materials of -1)
     {
         const int32_t iNumMaterials = m_planes.m_size;
@@ -6006,18 +5716,7 @@ void hkgpMesh::retriangulateFromPlanes() {
             if (pTwin && pTwin->m_planeId == planeId) {
                 continue;
             }
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::pushBack (its placement new tests the slot)
-            EdgeArray& boundary = boundaries.m_data[planeId];
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (boundary.m_size == (boundary.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &boundary, static_cast<int32_t>(sizeof(hkgpMeshBase::Edge)));
-            }
-            hkgpMeshBase::Edge* pEdge = &boundary.m_data[boundary.m_size];
-            if (pEdge) {
-                pEdge->m_triangle = pTriangle;
-                pEdge->m_index = i;
-            }
-            ++boundary.m_size;
+            boundaries.m_data[planeId].pushBack(hkgpMeshBase::Edge{{pTriangle, i}});
         }
     }
     // The triangulation's domain and the strided view of a plane's points (hoisted out of the plane loop).
@@ -6031,20 +5730,7 @@ void hkgpMesh::retriangulateFromPlanes() {
         EdgeArray& boundary = boundaries.m_data[plane];
         // The start of each boundary edge.
         hkArray<hkVector4> positions;
-        // EXE-INLINED none: hkArray<hkVector4>::setSize
-        {
-            const int32_t iNumEdges = boundary.m_size;
-            hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-            int32_t iCapacity = positions.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-            if (iCapacity < iNumEdges) {
-                iCapacity *= 2;
-                if (iNumEdges >= iCapacity) {
-                    iCapacity = iNumEdges;
-                }
-                hkArrayUtil::_reserve(heap, &positions, iCapacity, static_cast<int32_t>(sizeof(hkVector4)));
-            }
-            positions.m_size = iNumEdges;
-        }
+        positions.setSize(boundary.m_size);
         for (int32_t i = 0; i < boundary.m_size; ++i) {
             const hkgpMeshBase::Edge& edge = boundary.m_data[i];
             positions.m_data[i] = edge.m_triangle->m_vertices[edge.m_index]->m_position;
@@ -6118,14 +5804,8 @@ void hkgpMesh::retriangulateFromPlanes() {
                 }
             }
             EdgeData edgeData;
-            // EXE-INLINED none: hkArray<uint32_t>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (edgeData.m_tags.m_size == (edgeData.m_tags.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &edgeData.m_tags, static_cast<int32_t>(sizeof(hkUlong)));
-            }
             // Tags the edge with its address.
-            edgeData.m_tags.m_data[edgeData.m_tags.m_size] = reinterpret_cast<hkUlong>(&edge);
-            ++edgeData.m_tags.m_size;
+            edgeData.m_tags.pushBack(reinterpret_cast<hkUlong>(&edge));
             triangulator.insertEdge(xy[0][0], xy[0][1], xy[1][0], xy[1][1], true, &edgeData);
         }
         if (triangulator.partition() > 1) {
@@ -6291,41 +5971,8 @@ void hkgpMesh::appendToGeometry(hkGeometry& geometry, bool flip) {
         return;
     }
     const int32_t firstVertex = geometry.m_vertices.m_size;
-    hkVector4* pVertexOut;
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::expandBy
-        const int32_t numNew = m_vertices.m_numUsed;
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t oldSize = geometry.m_vertices.m_size;
-        int32_t required = oldSize + numNew;
-        const int32_t capacity = geometry.m_vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-        if (capacity < required) {
-            if (required < 2 * capacity) {
-                required = 2 * capacity;
-            }
-            hkArrayUtil::_reserve(heap, &geometry.m_vertices, required, sizeof(hkVector4));
-        }
-        geometry.m_vertices.m_size += numNew;
-        pVertexOut = geometry.m_vertices.m_data + oldSize;
-    }
-    hkGeometry::Triangle* pTriangleOut;
-    {
-        // EXE-INLINED none: hkArray<hkGeometry::Triangle>::expandBy
-        const int32_t numNew = m_triangles.m_numUsed;
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t oldSize = geometry.m_triangles.m_size;
-        int32_t required = oldSize + numNew;
-        const int32_t capacity =
-            geometry.m_triangles.m_capacityAndFlags & hkArrayBase<hkGeometry::Triangle>::CAPACITY_MASK;
-        if (capacity < required) {
-            if (required < 2 * capacity) {
-                required = 2 * capacity;
-            }
-            hkArrayUtil::_reserve(heap, &geometry.m_triangles, required, sizeof(hkGeometry::Triangle));
-        }
-        geometry.m_triangles.m_size += numNew;
-        pTriangleOut = geometry.m_triangles.m_data + oldSize;
-    }
+    hkVector4* pVertexOut = geometry.m_vertices.expandBy(m_vertices.m_numUsed);
+    hkGeometry::Triangle* pTriangleOut = geometry.m_triangles.expandBy(m_triangles.m_numUsed);
     VertexIndexMap vertexIndices;
     hkUlongMapBase& rMap = vertexIndices.m_map;
     rMap.reserve(hkMemoryRouter::getInstance().heap(), m_vertices.m_numUsed + 1);
@@ -6656,15 +6303,7 @@ void hkgpMesh::enumerateTriangleOverlaps(
         triangle[1] = collector.m_triangles.m_data[i]->m_vertices[1]->m_position;
         triangle[2] = collector.m_triangles.m_data[i]->m_vertices[2]->m_position;
         if (hkGeometryProcessing::checkTrianglesIntersection(vertices, triangle)) {
-            hkgpMeshBase::Triangle* const& rFound = collector.m_triangles.m_data[i];
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (triangles.m_size ==
-                (triangles.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &triangles, sizeof(hkgpMeshBase::Triangle*));
-            }
-            triangles.m_data[triangles.m_size] = rFound;
-            ++triangles.m_size;
+            triangles.pushBack(collector.m_triangles.m_data[i]);
         }
     }
 }
@@ -6790,18 +6429,6 @@ void hkgpMesh::collapseEdge(hkgpMeshBase::Edge a1, bool a2) {
 void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const hkTransform& x0, hkGeometry& x1) {
     using RawTriangle = hkgpMeshInternals::RawTriangle;
     using RawTriangleArray = hkArray<RawTriangle, hkContainerHeapAllocator>;
-    // EXE-INLINED none: hkArray<hkgpMeshInternals::RawTriangle>::pushBack (a null-tested placement copy, rep movsd)
-    auto pushBack = [](RawTriangleArray& rArray, const RawTriangle& rTriangle) {
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (rArray.m_size == (rArray.m_capacityAndFlags & hkArrayBase<RawTriangle>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &rArray, sizeof(RawTriangle));
-        }
-        RawTriangle* const pSlot = rArray.m_data + rArray.m_size;
-        if (pSlot) {
-            *pSlot = rTriangle;
-        }
-        ++rArray.m_size;
-    };
     const float fEpsilon = 1e-05f;
     RawTriangleArray cuts;
     RawTriangleArray pieces;
@@ -6813,7 +6440,7 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
         kSource.m_vertices[0].setTransformedPos(a1, a2.m_vertices.m_data[a2.m_triangles.m_data[iSource].m_a]);
         kSource.m_vertices[1].setTransformedPos(a1, a2.m_vertices.m_data[a2.m_triangles.m_data[iSource].m_b]);
         kSource.m_vertices[2].setTransformedPos(a1, a2.m_vertices.m_data[a2.m_triangles.m_data[iSource].m_c]);
-        pushBack(cuts, kSource);
+        cuts.pushBack(kSource);
         hkAabb aabb;
         hkAabbUtil::calcAabb(kSource.m_vertices, 3, aabb);
         // A tolerance of 0, broadcast: max + tolerance, min - tolerance.
@@ -6828,11 +6455,7 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
             found[1] = pFound->m_vertices[1]->m_position;
             found[2] = pFound->m_vertices[2]->m_position;
             if (!hkGeometryProcessing::checkTrianglesIntersection(kSource.m_vertices, found)) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::removeAt
-                const int32_t iLast = --collector.m_triangles.m_size;
-                if (iLast != i) {
-                    collector.m_triangles.m_data[i] = collector.m_triangles.m_data[iLast];
-                }
+                collector.m_triangles.removeAt(i);
                 --i;
             }
         }
@@ -6880,25 +6503,25 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                         kPiece.m_vertices[0] = cut[0];
                         kPiece.m_vertices[1] = kC;
                         kPiece.m_vertices[2] = kA;
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         pCut[0] = cut[0];
                         break;
                     case 2:
                         kPiece.m_vertices[0] = cut[1];
                         kPiece.m_vertices[1] = kA;
                         kPiece.m_vertices[2] = kB;
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         pCut[1] = cut[1];
                         break;
                     case 3:
                         kPiece.m_vertices[0] = cut[0];
                         kPiece.m_vertices[1] = cut[1];
                         kPiece.m_vertices[2] = kA;
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         kPiece.m_vertices[0] = cut[1];
                         kPiece.m_vertices[1] = pCut[2];
                         kPiece.m_vertices[2] = pCut[0];
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         pCut[0] = cut[0];
                         pCut[2] = cut[1];
                         break;
@@ -6906,18 +6529,18 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                         kPiece.m_vertices[0] = cut[2];
                         kPiece.m_vertices[1] = kB;
                         kPiece.m_vertices[2] = kC;
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         pCut[2] = cut[2];
                         break;
                     case 5:
                         kPiece.m_vertices[0] = cut[2];
                         kPiece.m_vertices[1] = cut[0];
                         kPiece.m_vertices[2] = kC;
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         kPiece.m_vertices[0] = cut[0];
                         kPiece.m_vertices[1] = pCut[1];
                         kPiece.m_vertices[2] = pCut[2];
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         pCut[1] = cut[0];
                         pCut[2] = cut[2];
                         break;
@@ -6925,11 +6548,11 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
                         kPiece.m_vertices[0] = cut[1];
                         kPiece.m_vertices[1] = cut[2];
                         kPiece.m_vertices[2] = kB;
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         kPiece.m_vertices[0] = cut[2];
                         kPiece.m_vertices[1] = pCut[0];
                         kPiece.m_vertices[2] = pCut[1];
-                        pushBack(pieces, kPiece);
+                        pieces.pushBack(kPiece);
                         pCut[0] = cut[2];
                         pCut[1] = cut[1];
                         break;
@@ -6939,53 +6562,15 @@ void hkgpMesh::splitGeometry(const hkTransform& a1, const hkGeometry& a2, const 
             cuts._append(hkMemoryRouter::getInstance().heap(), pieces.m_data, pieces.m_size);
             pieces.m_size = 0;
         }
-        // EXE-INLINED none: hkArray<hkVector4>::reserve
-        int32_t iNumVertices = 3 * cuts.m_size + x1.m_vertices.m_size;
-        hkMemoryAllocator& rVertexHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t iVertexCapacity = x1.m_vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-        if (iVertexCapacity < iNumVertices) {
-            if (iNumVertices < 2 * iVertexCapacity) {
-                iNumVertices = 2 * iVertexCapacity;
-            }
-            hkArrayUtil::_reserve(rVertexHeap, &x1.m_vertices, iNumVertices, sizeof(hkVector4));
-        }
-        // EXE-INLINED none: hkArray<hkGeometry::Triangle>::reserve
-        int32_t iNumTriangles = x1.m_triangles.m_size + cuts.m_size;
-        hkMemoryAllocator& rTriangleHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t iTriangleCapacity =
-            x1.m_triangles.m_capacityAndFlags & hkArrayBase<hkGeometry::Triangle>::CAPACITY_MASK;
-        if (iTriangleCapacity < iNumTriangles) {
-            if (iNumTriangles < 2 * iTriangleCapacity) {
-                iNumTriangles = 2 * iTriangleCapacity;
-            }
-            hkArrayUtil::_reserve(rTriangleHeap, &x1.m_triangles, iNumTriangles, sizeof(hkGeometry::Triangle));
-        }
+        x1.m_vertices.reserve(3 * cuts.m_size + x1.m_vertices.m_size);
+        x1.m_triangles.reserve(x1.m_triangles.m_size + cuts.m_size);
         for (int32_t iCut = 0; iCut < cuts.m_size; ++iCut) {
             const int32_t iBase = x1.m_vertices.m_size;
-            // EXE-INLINED none: hkArray<hkVector4>::expandBy
-            hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-            const int32_t iOldSize = x1.m_vertices.m_size;
-            int32_t iNewSize = iOldSize + 3;
-            const int32_t iCapacity = x1.m_vertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-            if (iCapacity < iNewSize) {
-                if (iNewSize < 2 * iCapacity) {
-                    iNewSize = 2 * iCapacity;
-                }
-                hkArrayUtil::_reserve(rHeap, &x1.m_vertices, iNewSize, sizeof(hkVector4));
-            }
-            x1.m_vertices.m_size += 3;
-            hkVector4* const pVertices = x1.m_vertices.m_data + iOldSize;
+            hkVector4* const pVertices = x1.m_vertices.expandBy(3);
             pVertices[0].setTransformedPos(x0, cuts.m_data[iCut].m_vertices[0]);
             pVertices[1].setTransformedPos(x0, cuts.m_data[iCut].m_vertices[1]);
             pVertices[2].setTransformedPos(x0, cuts.m_data[iCut].m_vertices[2]);
-            // EXE-INLINED none: hkArray<hkGeometry::Triangle>::expandOne
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (x1.m_triangles.m_size ==
-                (x1.m_triangles.m_capacityAndFlags & hkArrayBase<hkGeometry::Triangle>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &x1.m_triangles, sizeof(hkGeometry::Triangle));
-            }
-            hkGeometry::Triangle* const pTriangle = x1.m_triangles.m_data + x1.m_triangles.m_size;
-            ++x1.m_triangles.m_size;
+            hkGeometry::Triangle* const pTriangle = &x1.m_triangles.expandOne();
             pTriangle->m_a = iBase;
             pTriangle->m_b = iBase + 1;
             pTriangle->m_c = iBase + 2;
@@ -7017,30 +6602,10 @@ int32_t hkgpMesh::extractAllLoops(
             void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(sizeof(EdgeArray)));
             EdgeArray* pLoop = nullptr;
             if (pMemory) {
-                // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::hkArray
-                pLoop = static_cast<EdgeArray*>(pMemory);
-                pLoop->m_data = nullptr;
-                pLoop->m_size = 0;
-                pLoop->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+                pLoop = ::new (pMemory) EdgeArray();
             }
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (pLoop->m_size == (pLoop->m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, pLoop, sizeof(hkgpMeshBase::Edge));
-            }
-            hkgpMeshBase::Edge* pEdge = &pLoop->m_data[pLoop->m_size];
-            if (pEdge) {
-                pEdge->m_triangle = t;
-                pEdge->m_index = i;
-            }
-            ++pLoop->m_size;
-            // EXE-INLINED none: hkArray<EdgeArray*, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& router2 = hkMemoryRouter::getInstance();
-            if (loops.m_size == (loops.m_capacityAndFlags & hkArrayBase<EdgeArray*>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router2.m_heap, &loops, sizeof(EdgeArray*));
-            }
-            loops.m_data[loops.m_size] = pLoop;
-            ++loops.m_size;
+            pLoop->pushBack(hkgpMeshBase::Edge{{t, static_cast<uint32_t>(i)}});
+            loops.pushBack(pLoop);
         }
     }
     if (loops.m_size == 0) {
@@ -7087,26 +6652,11 @@ int32_t hkgpMesh::extractAllLoops(
                 // The merged-away loop at j is deleted and removed (the last loop moves into its slot).
                 EdgeArray* pDead = loops.m_data[j];
                 if (pDead) {
-                    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::~hkArray
-                    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-                    pDead->m_size = 0;
-                    if (pDead->m_capacityAndFlags >= 0) {
-                        heap->bufFree(
-                            pDead->m_data,
-                            (pDead->m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK) *
-                                static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-                        );
-                    }
-                    pDead->m_data = nullptr;
-                    pDead->m_capacityAndFlags = hkArrayBase<hkgpMeshBase::Edge>::DONT_DEALLOCATE_FLAG;
+                    pDead->~EdgeArray();
                     // EXE-INLINED none: hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>::operator delete
                     hkMemoryRouter::getInstance().m_heap->blockFree(pDead, static_cast<int32_t>(sizeof(EdgeArray)));
                 }
-                // EXE-INLINED none: hkArray<EdgeArray*, hkContainerHeapAllocator>::removeAt
-                --loops.m_size;
-                if (loops.m_size != j) {
-                    loops.m_data[j] = loops.m_data[loops.m_size];
-                }
+                loops.removeAt(j);
                 --j;
                 pass = -1;
             }
@@ -7297,7 +6847,6 @@ int32_t hkgpMesh::explodeParts(hkArray<hkgpMesh*, hkContainerHeapAllocator>& a1,
     using TrianglePool = hkgpMeshBaseAbstractMesh::TrianglePoolAllocator;
     using VertexMap = hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*, hkContainerHeapAllocator>;
     using EdgeMap = hkPointerMap<uintptr_t, uintptr_t, hkContainerHeapAllocator>;
-    using MapBase = hkUlongMapBase;
     using VertexMapArray = hkArray<VertexMap*, hkContainerHeapAllocator>;
     const int32_t numParts = const_cast<hkgpMesh*>(this)->countParts();
     if (numParts == 0) {
@@ -7306,45 +6855,16 @@ int32_t hkgpMesh::explodeParts(hkArray<hkgpMesh*, hkContainerHeapAllocator>& a1,
     VertexMapArray vertexMaps;
     EdgeMap edgeMap;
     hkUlongMapBase& rEdgeMap = edgeMap.m_map;
-    // EXE-INLINED none: hkArray<hkgpMesh*, hkContainerHeapAllocator>::expandBy
-    hkMemoryAllocator* pOutHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t firstPart = a1.m_size;
-    int32_t outCapacity = a1.m_capacityAndFlags & hkArrayBase<hkgpMesh*>::CAPACITY_MASK;
-    const int32_t outNeeded = firstPart + numParts;
-    if (outCapacity < outNeeded) {
-        outCapacity = 2 * outCapacity;
-        if (outNeeded >= outCapacity) {
-            outCapacity = outNeeded;
-        }
-        hkArrayUtil::_reserve(*pOutHeap, &a1, outCapacity, sizeof(hkgpMesh*));
-    }
-    a1.m_size += numParts;
-    hkgpMesh** parts = &a1.m_data[firstPart];
+    hkgpMesh** parts = a1.expandBy(numParts);
     rEdgeMap.reserve(hkMemoryRouter::getInstance().heap(), 3 * m_triangles.m_numUsed);
-    // EXE-INLINED none: hkArray<VertexMap*, hkContainerHeapAllocator>::setSize
-    hkMemoryAllocator* pMapsHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t mapsCapacity = vertexMaps.m_capacityAndFlags & hkArrayBase<VertexMap*>::CAPACITY_MASK;
-    if (mapsCapacity < numParts) {
-        mapsCapacity = 2 * mapsCapacity;
-        if (numParts >= mapsCapacity) {
-            mapsCapacity = numParts;
-        }
-        hkArrayUtil::_reserve(*pMapsHeap, &vertexMaps, mapsCapacity, sizeof(VertexMap*));
-    }
-    vertexMaps.m_size = numParts;
+    vertexMaps.setSize(numParts);
     for (int32_t i = 0; i < numParts; ++i) {
         parts[i] = nullptr;
         // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*>::operator new
         void* pMemory = hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(sizeof(VertexMap)));
         VertexMap* pMap = nullptr;
         if (pMemory) {
-            // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*>::hkPointerMap
-            pMap = static_cast<VertexMap*>(pMemory);
-            MapBase& rMap = pMap->m_map;
-            rMap.m_elem = nullptr;
-            rMap.m_numElems = 0;
-            rMap.m_hashMod = -1;
-            rMap.reserve(hkMemoryRouter::getInstance().heap(), 0);
+            pMap = ::new (pMemory) VertexMap();
         }
         vertexMaps.m_data[i] = pMap;
     }
@@ -7452,8 +6972,7 @@ int32_t hkgpMesh::explodeParts(hkArray<hkgpMesh*, hkContainerHeapAllocator>& a1,
     for (int32_t i = 0; i < numParts; ++i) {
         VertexMap* pMap = vertexMaps.m_data[i];
         if (pMap) {
-            // EXE-INLINED none: the vertex map's destructor (clearAndDeallocate, then the base's empty destructor)
-            pMap->m_map.clearAndDeallocate(hkMemoryRouter::getInstance().heap());
+            pMap->~VertexMap();
             // EXE-INLINED none: hkPointerMap<const hkgpMeshBase::Vertex*, hkgpMeshBase::Vertex*>::operator delete
             hkMemoryRouter::getInstance().m_heap->blockFree(pMap, static_cast<int32_t>(sizeof(VertexMap)));
         }
@@ -7633,14 +7152,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(
         }
         else {
             for (int32_t i = 0; i < newParts.m_size; ++i) {
-                // EXE-INLINED none: hkArray<hkgpMesh*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (parts.m_size ==
-                    static_cast<int32_t>(parts.m_capacityAndFlags & hkArrayBase<hkgpMesh*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(router.heap(), &parts, sizeof(hkgpMesh*));
-                }
-                parts.m_data[parts.m_size] = newParts.m_data[i];
-                parts.m_size++;
+                parts.pushBack(newParts.m_data[i]);
             }
         }
     }
@@ -7704,12 +7216,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
         uv.m_quad[1] = static_cast<float>(static_cast<double>(i) / 7.0);
         for (int32_t j = 0; j < 8; ++j) {
             uv.m_quad[0] = static_cast<float>(static_cast<double>(j) / 7.0);
-            // EXE-INLINED none: hkArray<hkVector4>::expandOne
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (normals.m_size == (normals.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &normals, static_cast<int32_t>(sizeof(hkVector4)));
-            }
-            hkVector4& rNormal = normals.m_data[normals.m_size++];
+            hkVector4& rNormal = normals.expandOne();
             hkGeometryProcessing::octahedronToNormal(uv, rNormal);
         }
     }
@@ -7734,36 +7241,12 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                 ringVertices.m_size = 0;
                 for (int32_t k = 0; k < pRing->m_segments.m_size; ++k) {
                     const Segment& segment = pRing->m_segments.m_data[k];
-                    hkgpMeshBase::Vertex* const* ppVertex =
-                        &segment.m_edge.m_triangle->m_vertices[segment.m_edge.m_index];
-                    // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::pushBack
-                    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                    if (ringVertices.m_size ==
-                        (ringVertices.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(
-                            router.heap(), &ringVertices, static_cast<int32_t>(sizeof(hkgpMeshBase::Vertex*))
-                        );
-                    }
-                    ringVertices.m_data[ringVertices.m_size] = *ppVertex;
-                    ++ringVertices.m_size;
+                    ringVertices.pushBack(segment.m_edge.m_triangle->m_vertices[segment.m_edge.m_index]);
                 }
                 hkgpConvexHull hull;
                 // The ring vertices' positions.
                 hkArray<hkVector4> points;
-                // EXE-INLINED none: hkArray<hkVector4>::setSize
-                {
-                    const int32_t iNumPoints = ringVertices.m_size;
-                    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                    int32_t iCapacity = points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-                    if (iCapacity < iNumPoints) {
-                        iCapacity *= 2;
-                        if (iNumPoints >= iCapacity) {
-                            iCapacity = iNumPoints;
-                        }
-                        hkArrayUtil::_reserve(heap, &points, iCapacity, static_cast<int32_t>(sizeof(hkVector4)));
-                    }
-                    points.m_size = iNumPoints;
-                }
+                points.setSize(ringVertices.m_size);
                 for (int32_t k = 0; k < ringVertices.m_size; ++k) {
                     points.m_data[k] = ringVertices.m_data[k]->m_position;
                 }
@@ -7847,33 +7330,10 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                                 const uint32_t uiIndex = iSide == 0
                                     ? segment.m_edge.m_index
                                     : (iSide == 1 ? next(segment.m_edge.m_index) : prev(segment.m_edge.m_index));
-                                // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::pushBack (its placement new tests the
-                                // slot)
-                                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                                if (edges.m_size ==
-                                    (edges.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                                    hkArrayUtil::_reserveMore(
-                                        router.heap(), &edges, static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-                                    );
-                                }
-                                hkgpMeshBase::Edge* pEdge = &edges.m_data[edges.m_size];
-                                if (pEdge) {
-                                    pEdge->m_triangle = pTriangle;
-                                    pEdge->m_index = uiIndex;
-                                }
-                                ++edges.m_size;
+                                edges.pushBack(hkgpMeshBase::Edge{{pTriangle, uiIndex}});
                             }
                             EdgeData edgeData;
-                            // EXE-INLINED none: hkArray<uint32_t>::pushBack
-                            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                            if (edgeData.m_tags.m_size ==
-                                (edgeData.m_tags.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                                hkArrayUtil::_reserveMore(
-                                    router.heap(), &edgeData.m_tags, static_cast<int32_t>(sizeof(hkUlong))
-                                );
-                            }
-                            edgeData.m_tags.m_data[edgeData.m_tags.m_size] = static_cast<hkUlong>(k);
-                            ++edgeData.m_tags.m_size;
+                            edgeData.m_tags.pushBack(static_cast<hkUlong>(k));
                             const Segment& segment = pRing->m_segments.m_data[k];
                             int32_t x1;
                             int32_t y1;
@@ -8053,35 +7513,10 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                                         }
                                     }
                                     else {
-                                        // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::pushBack
-                                        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                                        if (openEdges.m_size ==
-                                            (openEdges.m_capacityAndFlags &
-                                             hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-                                            hkArrayUtil::_reserveMore(
-                                                router.heap(), &openEdges,
-                                                static_cast<int32_t>(sizeof(hkgpMeshBase::Edge))
-                                            );
-                                        }
-                                        hkgpMeshBase::Edge* pEdge = &openEdges.m_data[openEdges.m_size];
-                                        if (pEdge) {
-                                            pEdge->m_triangle = pNew;
-                                            pEdge->m_index = k;
-                                        }
-                                        ++openEdges.m_size;
+                                        openEdges.pushBack(hkgpMeshBase::Edge{{pNew, k}});
                                     }
                                 }
-                                // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-                                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                                if (created.m_size ==
-                                    (created.m_capacityAndFlags &
-                                     hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK)) {
-                                    hkArrayUtil::_reserveMore(
-                                        router.heap(), &created, static_cast<int32_t>(sizeof(hkgpMeshBase::Triangle*))
-                                    );
-                                }
-                                created.m_data[created.m_size] = pNew;
-                                ++created.m_size;
+                                created.pushBack(pNew);
                             }
                             bindEdgeList(openEdges);
                             if (!openEdges.m_size) {
@@ -8110,21 +7545,7 @@ void hkgpMesh::fillHoles(const hkgpMesh::HoleFillingConfig& config) {
                                     m_vertices.m_numUsed += -1;
                                     m_vertices.m_allocator.release(pVertex);
                                 }
-                                // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::setSize
-                                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                                int32_t iCapacity =
-                                    ringVertices.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK;
-                                if (iCapacity < iFirstNew) {
-                                    iCapacity *= 2;
-                                    if (iFirstNew >= iCapacity) {
-                                        iCapacity = iFirstNew;
-                                    }
-                                    hkArrayUtil::_reserve(
-                                        heap, &ringVertices, iCapacity,
-                                        static_cast<int32_t>(sizeof(hkgpMeshBase::Vertex*))
-                                    );
-                                }
-                                ringVertices.m_size = iFirstNew;
+                                ringVertices.setSize(iFirstNew);
                             }
                         }
                         if (!bOk) {
@@ -8409,20 +7830,6 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
     hkArray<hkgpMeshBase::Triangle*> triangles;
     fetchAreaSortedTriangles(triangles, true);
     hkArray<hkgpMeshBase::Edge> stack;
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Edge>::pushBack (a null-tested placement copy)
-    const auto pushEdge = [&stack](hkgpMeshBase::Triangle* pTriangle, uint32_t index) __attribute__((always_inline)) {
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (stack.m_size ==
-            static_cast<int32_t>(stack.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Edge>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &stack, sizeof(hkgpMeshBase::Edge));
-        }
-        hkgpMeshBase::Edge* const pSlot = &stack.m_data[stack.m_size];
-        if (pSlot) {
-            pSlot->m_triangle = pTriangle;
-            pSlot->m_index = index;
-        }
-        stack.m_size++;
-    };
     for (int32_t i = 0; i < triangles.m_size; ++i) {
         hkgpMeshBase::Triangle* const pRoot = triangles.m_data[i];
         if (pRoot->m_planeId >= 0) {
@@ -8435,31 +7842,11 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
         plane.m_quad = pRoot->m_plane.m_quad;
         pRoot->m_planeId = m_planes.m_size;
         stack.m_size = 0;
-        pushEdge(pRoot, 0);
-        pushEdge(pRoot, 1);
-        pushEdge(pRoot, 2);
-        {
-            // EXE-INLINED none: hkArray<hkVector4>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (m_planes.m_size ==
-                static_cast<int32_t>(m_planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(router.heap(), &m_planes, sizeof(hkVector4));
-            }
-            m_planes.m_data[m_planes.m_size].m_quad = plane.m_quad;
-            m_planes.m_size++;
-        }
-        {
-            // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (m_planeRoots.m_size ==
-                static_cast<int32_t>(
-                    m_planeRoots.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Triangle*>::CAPACITY_MASK
-                )) {
-                hkArrayUtil::_reserveMore(router.heap(), &m_planeRoots, sizeof(hkgpMeshBase::Triangle*));
-            }
-            m_planeRoots.m_data[m_planeRoots.m_size] = pRoot;
-            m_planeRoots.m_size++;
-        }
+        stack.pushBack(hkgpMeshBase::Edge{{pRoot, 0}});
+        stack.pushBack(hkgpMeshBase::Edge{{pRoot, 1}});
+        stack.pushBack(hkgpMeshBase::Edge{{pRoot, 2}});
+        m_planes.pushBack(plane);
+        m_planeRoots.pushBack(pRoot);
         while (stack.m_size) {
             const hkgpMeshBase::Edge edge = stack.m_data[stack.m_size - 1];
             const uintptr_t link = edge.m_triangle->m_links[edge.m_index];
@@ -8488,8 +7875,8 @@ int32_t hkgpMesh::buildPlaneIndices(float minCosAngle, float minDistance, bool s
                 continue;
             }
             pOther->m_planeId = pRoot->m_planeId;
-            pushEdge(pOther, (9 >> (j * 2)) & 3);
-            pushEdge(pOther, (18 >> (j * 2)) & 3);
+            stack.pushBack(hkgpMeshBase::Edge{{pOther, static_cast<uint32_t>((9 >> (j * 2)) & 3)}});
+            stack.pushBack(hkgpMeshBase::Edge{{pOther, static_cast<uint32_t>((18 >> (j * 2)) & 3)}});
         }
     }
     const int32_t numPlanes = m_planes.m_size;
@@ -8525,14 +7912,8 @@ void hkgpMesh::bindEdgeList(hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator
                 other.m_triangle->m_links[other.m_index] =
                     reinterpret_cast<uintptr_t>(pData[i].m_triangle) + pData[i].m_index;
             }
-            // EXE-INLINED none: hkArrayBase<hkgpMeshBase::Edge>::removeAt
-            if (--a1.m_size != j) {
-                a1.m_data[j] = a1.m_data[a1.m_size];
-            }
-            // EXE-INLINED none: hkArrayBase<hkgpMeshBase::Edge>::removeAt
-            if (--a1.m_size != i) {
-                a1.m_data[i] = a1.m_data[a1.m_size];
-            }
+            a1.removeAt(j);
+            a1.removeAt(i);
             --i;
             --jStart;
             break;
@@ -8712,13 +8093,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                     seed.m_index = e;
                     Ring* pRing = hkgpMeshInternals::createRing(seed);
                     if (pRing) {
-                        // EXE-INLINED none: hkArray<hkgpMeshInternals::Ring*>::pushBack
-                        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                        if (rings.m_size == (rings.m_capacityAndFlags & hkArrayBase<Ring*>::CAPACITY_MASK)) {
-                            hkArrayUtil::_reserveMore(router.heap(), &rings, static_cast<int32_t>(sizeof(Ring*)));
-                        }
-                        rings.m_data[rings.m_size] = pRing;
-                        ++rings.m_size;
+                        rings.pushBack(pRing);
                     }
                 }
             }
@@ -8746,11 +8121,7 @@ hkgpMesh::sResult* hkgpMesh::cutAndCap(hkgpMesh::sResult* apResult, const hkVect
                 }
                 if (bDrop) {
                     deleteRing(pRing);
-                    // EXE-INLINED none: hkArray<hkgpMeshInternals::Ring*>::removeAt
-                    --rings.m_size;
-                    if (rings.m_size != k) {
-                        rings.m_data[k] = rings.m_data[rings.m_size];
-                    }
+                    rings.removeAt(k);
                     --k;
                 }
             }
@@ -9301,13 +8672,7 @@ float hkgpMeshInternals::SimpleCollector::addLeaf(
 ) {
     // The mesh's tree keeps each leaf's triangle in the leaf's user data.
     hkgpMeshBase::Triangle* triangle = static_cast<hkgpMeshBase::Triangle*>(a1->m_leafData.m_userData);
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBack
-    hkMemoryAllocator& alloc = hkMemoryRouter::getInstance().heap();
-    if (m_triangles.m_size == m_triangles.getCapacity()) {
-        hkArrayUtil::_reserveMore(alloc, &m_triangles, sizeof(hkgpMeshBase::Triangle*));
-    }
-    m_triangles.m_data[m_triangles.m_size] = triangle;
-    m_triangles.m_size++;
+    m_triangles.pushBack(triangle);
     return 1.0f;
 }
 
@@ -9370,9 +8735,7 @@ hkgpMeshInternals::Ring* hkgpMeshInternals::createRing(hkgpMeshBase::Edge edge) 
     Ring* pRing = nullptr;
     void* pMemory = hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(Ring));
     if (pMemory) {
-        // EXE-INLINED none: hkgpMeshInternals::Ring::Ring (hkArray's constructor: no storage, DONT_DEALLOCATE)
         pRing = ::new (pMemory) Ring;
-        pRing->m_segments.m_capacityAndFlags = hkArrayBase<Ring::Segment>::DONT_DEALLOCATE_FLAG;
     }
     hkArray<Ring::Segment, hkContainerHeapAllocator>& segments = pRing->m_segments;
     do {
@@ -9423,21 +8786,7 @@ hkgpMeshInternals::Ring* hkgpMeshInternals::createRing(hkgpMeshBase::Edge edge) 
             return pRing;
         }
     }
-    {
-        // EXE-INLINED none: hkArray<hkgpMeshInternals::Ring::Segment>::~hkArray
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacityAndFlags = segments.m_capacityAndFlags;
-        segments.m_size = 0;
-        if (capacityAndFlags >= 0) {
-            heap.bufFree(
-                segments.m_data,
-                (capacityAndFlags & hkArrayBase<Ring::Segment>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(Ring::Segment))
-            );
-        }
-        segments.m_data = nullptr;
-        segments.m_capacityAndFlags = hkArrayBase<Ring::Segment>::DONT_DEALLOCATE_FLAG;
-    }
+    pRing->~Ring();
     hkMemoryRouter::getInstance().heap().blockFree(pRing, sizeof(Ring));
     return nullptr;
 }

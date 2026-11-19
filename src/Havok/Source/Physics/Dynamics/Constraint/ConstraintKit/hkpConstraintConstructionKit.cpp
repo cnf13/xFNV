@@ -230,25 +230,11 @@ void hkpConstraintConstructionKit::end() {
 
 // The cone limit command and its axis go into the scheme's commands, then the angle's cosine, 100.0f and two zero lanes
 // into its data; the scheme is charged 0x30 schema bytes and one solver result and element temporary. Returns the data
-// index the vector was stored at, read before the append. m_scheme is reloaded before every append and the router is
-// fetched before each capacity test, and the axis index is truncated to a byte though the parameter is an int.
+// index the vector was stored at, read before the append. The axis index is truncated to a byte though the parameter is
+// an int.
 int32_t hkpConstraintConstructionKit::setConeLimit(int32_t axis, float angle) {
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rCommandRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rCommandRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = hkpGenericConstraintDataScheme::e_setConeLimit;
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(axis);
-    m_scheme->m_commands.m_size += 1;
+    m_scheme->m_commands.pushBack(hkpGenericConstraintDataScheme::e_setConeLimit);
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     // The CRT's cosine, rounded to float.
     const float fCos = std::cos(angle);
     const int32_t iDataIndex = m_scheme->m_data.m_size;
@@ -257,13 +243,7 @@ int32_t hkpConstraintConstructionKit::setConeLimit(int32_t axis, float angle) {
     kData.m_quad[1] = 100.0f;
     kData.m_quad[2] = 0.0f;
     kData.m_quad[3] = 0.0f;
-    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-    hkMemoryRouter& rDataRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_data.m_size == (m_scheme->m_data.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rDataRouter.m_heap, &m_scheme->m_data, sizeof(hkVector4));
-    }
-    m_scheme->m_data.m_data[m_scheme->m_data.m_size] = kData;
-    m_scheme->m_data.m_size += 1;
+    m_scheme->m_data.pushBack(kData);
     m_scheme->m_info.add(0x30, 1, 1);
     return iDataIndex;
 }
@@ -273,30 +253,9 @@ int32_t hkpConstraintConstructionKit::setConeLimit(int32_t axis, float angle) {
 // and element temporary. Returns the data index the vector was stored at, read before the append. As in setConeLimit,
 // each axis index is truncated to a byte.
 int32_t hkpConstraintConstructionKit::setTwistLimit(int32_t twistAxis, int32_t planeAxis, float min, float max) {
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rCommandRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rCommandRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = hkpGenericConstraintDataScheme::e_setTwistLimit;
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rTwistAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rTwistAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(twistAxis);
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rPlaneAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rPlaneAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(planeAxis);
-    m_scheme->m_commands.m_size += 1;
+    m_scheme->m_commands.pushBack(hkpGenericConstraintDataScheme::e_setTwistLimit);
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(twistAxis));
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(planeAxis));
     // The upper angle's sine is computed first; both come from the CRT's std::sin, rounded to float.
     const float fSinMax = std::sin(max);
     const float fSinMin = std::sin(min);
@@ -306,13 +265,7 @@ int32_t hkpConstraintConstructionKit::setTwistLimit(int32_t twistAxis, int32_t p
     kData.m_quad[1] = fSinMax;
     kData.m_quad[2] = 0.0f;
     kData.m_quad[3] = 0.0f;
-    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-    hkMemoryRouter& rDataRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_data.m_size == (m_scheme->m_data.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rDataRouter.m_heap, &m_scheme->m_data, sizeof(hkVector4));
-    }
-    m_scheme->m_data.m_data[m_scheme->m_data.m_size] = kData;
-    m_scheme->m_data.m_size += 1;
+    m_scheme->m_data.pushBack(kData);
     m_scheme->m_info.add(0x30, 1, 1);
     return iDataIndex;
 }
@@ -457,25 +410,11 @@ void hkpConstraintConstructionKit::constrainToAngularDof(int32_t axis) {
 
 // The linear limit command and its linear axis go into the scheme's commands, then the limit's minimum and maximum and
 // two zero lanes into its data; the scheme is charged 0x40 schema bytes and one solver result and element temporary.
-// Returns the data index the vector was stored at, read before the append. As in setConeLimit, m_scheme is reloaded
-// before each command append, the router is fetched before each capacity test and the axis is truncated to a byte.
+// Returns the data index the vector was stored at, read before the append. As in setConeLimit, the axis is truncated to
+// a byte.
 int32_t hkpConstraintConstructionKit::setLinearLimit(int32_t axis, float min, float max) {
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rCommandRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rCommandRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = hkpGenericConstraintDataScheme::e_setLinearLimit;
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(axis);
-    m_scheme->m_commands.m_size += 1;
+    m_scheme->m_commands.pushBack(hkpGenericConstraintDataScheme::e_setLinearLimit);
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     hkVector4 kData;
@@ -483,13 +422,7 @@ int32_t hkpConstraintConstructionKit::setLinearLimit(int32_t axis, float min, fl
     kData.m_quad[1] = max;
     kData.m_quad[2] = 0.0f;
     kData.m_quad[3] = 0.0f;
-    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-    hkMemoryRouter& rDataRouter = hkMemoryRouter::getInstance();
-    if (pScheme->m_data.m_size == (pScheme->m_data.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rDataRouter.m_heap, &pScheme->m_data, sizeof(hkVector4));
-    }
-    pScheme->m_data.m_data[pScheme->m_data.m_size] = kData;
-    pScheme->m_data.m_size += 1;
+    pScheme->m_data.pushBack(kData);
     hkpGenericConstraintDataScheme* pInfoScheme = m_scheme;
     pInfoScheme->m_info.m_sizeOfSchemas += 64;
     ++pInfoScheme->m_info.m_numSolverResults;
@@ -539,22 +472,8 @@ int32_t hkpConstraintConstructionKit::setAngularLimit(int32_t axis, float min, f
 // the motors; the scheme is charged 0x40 schema bytes, one solver result and three element temporaries. Returns the
 // data index the vector was stored at, read before the append. The axis is truncated to a byte.
 int32_t hkpConstraintConstructionKit::setAngularMotor(int32_t axis, hkpConstraintMotor* motor) {
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rCommandRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rCommandRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = hkpGenericConstraintDataScheme::e_setAngularMotor;
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(axis);
-    m_scheme->m_commands.m_size += 1;
+    m_scheme->m_commands.pushBack(hkpGenericConstraintDataScheme::e_setAngularMotor);
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     hkVector4 kData;
     kData.m_quad[0] = static_cast<float>(pScheme->m_motors.m_size);
@@ -563,21 +482,8 @@ int32_t hkpConstraintConstructionKit::setAngularMotor(int32_t axis, hkpConstrain
     kData.m_quad[3] = 0.0f;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     motor->addReference();
-    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-    hkMemoryRouter& rDataRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_data.m_size == (m_scheme->m_data.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rDataRouter.m_heap, &m_scheme->m_data, sizeof(hkVector4));
-    }
-    m_scheme->m_data.m_data[m_scheme->m_data.m_size] = kData;
-    m_scheme->m_data.m_size += 1;
-    // EXE-INLINED none: hkArray<hkpConstraintMotor*>::pushBack
-    hkMemoryRouter& rMotorRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_motors.m_size ==
-        (m_scheme->m_motors.m_capacityAndFlags & hkArrayBase<hkpConstraintMotor*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rMotorRouter.m_heap, &m_scheme->m_motors, sizeof(hkpConstraintMotor*));
-    }
-    m_scheme->m_motors.m_data[m_scheme->m_motors.m_size] = motor;
-    m_scheme->m_motors.m_size += 1;
+    m_scheme->m_data.pushBack(kData);
+    m_scheme->m_motors.pushBack(motor);
     hkpGenericConstraintDataScheme* pInfoScheme = m_scheme;
     ++pInfoScheme->m_info.m_numSolverResults;
     pInfoScheme->m_info.m_sizeOfSchemas += 64;
@@ -587,22 +493,8 @@ int32_t hkpConstraintConstructionKit::setAngularMotor(int32_t axis, hkpConstrain
 
 // The linear motor command, as setAngularMotor, charged 0x50 schema bytes.
 int32_t hkpConstraintConstructionKit::setLinearMotor(int32_t axis, hkpConstraintMotor* motor) {
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rCommandRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rCommandRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = hkpGenericConstraintDataScheme::e_setLinearMotor;
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(axis);
-    m_scheme->m_commands.m_size += 1;
+    m_scheme->m_commands.pushBack(hkpGenericConstraintDataScheme::e_setLinearMotor);
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     hkVector4 kData;
     kData.m_quad[0] = static_cast<float>(pScheme->m_motors.m_size);
@@ -611,21 +503,8 @@ int32_t hkpConstraintConstructionKit::setLinearMotor(int32_t axis, hkpConstraint
     kData.m_quad[3] = 0.0f;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     motor->addReference();
-    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-    hkMemoryRouter& rDataRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_data.m_size == (m_scheme->m_data.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rDataRouter.m_heap, &m_scheme->m_data, sizeof(hkVector4));
-    }
-    m_scheme->m_data.m_data[m_scheme->m_data.m_size] = kData;
-    m_scheme->m_data.m_size += 1;
-    // EXE-INLINED none: hkArray<hkpConstraintMotor*>::pushBack
-    hkMemoryRouter& rMotorRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_motors.m_size ==
-        (m_scheme->m_motors.m_capacityAndFlags & hkArrayBase<hkpConstraintMotor*>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rMotorRouter.m_heap, &m_scheme->m_motors, sizeof(hkpConstraintMotor*));
-    }
-    m_scheme->m_motors.m_data[m_scheme->m_motors.m_size] = motor;
-    m_scheme->m_motors.m_size += 1;
+    m_scheme->m_data.pushBack(kData);
+    m_scheme->m_motors.pushBack(motor);
     hkpGenericConstraintDataScheme* pInfoScheme = m_scheme;
     ++pInfoScheme->m_info.m_numSolverResults;
     pInfoScheme->m_info.m_sizeOfSchemas += 80;
@@ -637,22 +516,8 @@ int32_t hkpConstraintConstructionKit::setLinearMotor(int32_t axis, hkpConstraint
 // and three zero lanes into its data; the scheme is charged 0x30 schema bytes, one solver result and two element
 // temporaries. Returns the data index the vector was stored at, read before the append.
 int32_t hkpConstraintConstructionKit::setAngularFriction(int32_t axis, float maxImpulse) {
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rCommandRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rCommandRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = hkpGenericConstraintDataScheme::e_setAngularFriction;
-    m_scheme->m_commands.m_size += 1;
-    // EXE-INLINED none: hkArray<int32_t>::pushBack
-    hkMemoryRouter& rAxisRouter = hkMemoryRouter::getInstance();
-    if (m_scheme->m_commands.m_size ==
-        (m_scheme->m_commands.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rAxisRouter.m_heap, &m_scheme->m_commands, sizeof(int32_t));
-    }
-    m_scheme->m_commands.m_data[m_scheme->m_commands.m_size] = static_cast<uint8_t>(axis);
-    m_scheme->m_commands.m_size += 1;
+    m_scheme->m_commands.pushBack(hkpGenericConstraintDataScheme::e_setAngularFriction);
+    m_scheme->m_commands.pushBack(static_cast<uint8_t>(axis));
     hkpGenericConstraintDataScheme* pScheme = m_scheme;
     const int32_t iDataIndex = pScheme->m_data.m_size;
     hkVector4 kData;
@@ -660,13 +525,7 @@ int32_t hkpConstraintConstructionKit::setAngularFriction(int32_t axis, float max
     kData.m_quad[1] = 0.0f;
     kData.m_quad[2] = 0.0f;
     kData.m_quad[3] = 0.0f;
-    // EXE-INLINED none: hkArray<hkVector4>::pushBack
-    hkMemoryRouter& rDataRouter = hkMemoryRouter::getInstance();
-    if (pScheme->m_data.m_size == (pScheme->m_data.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*rDataRouter.m_heap, &pScheme->m_data, sizeof(hkVector4));
-    }
-    pScheme->m_data.m_data[pScheme->m_data.m_size] = kData;
-    pScheme->m_data.m_size += 1;
+    pScheme->m_data.pushBack(kData);
     hkpGenericConstraintDataScheme* pInfoScheme = m_scheme;
     pInfoScheme->m_info.m_sizeOfSchemas += 48;
     ++pInfoScheme->m_info.m_numSolverResults;

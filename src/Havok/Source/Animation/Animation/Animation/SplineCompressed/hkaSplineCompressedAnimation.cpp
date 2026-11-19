@@ -900,16 +900,7 @@ void hkaSplineCompressedAnimation::initialize(
     using FloatArrays = hkArray<float>[3];
     int32_t firstFrame = 0;
     for (int32_t block = 0; block < m_numBlocks; ++block) {
-        {
-            // EXE-INLINED none: hkArray<hkUint32>::pushBack
-            const uint32_t blockOffset = static_cast<uint32_t>(m_data.m_size);
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (m_blockOffsets.m_size == (m_blockOffsets.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &m_blockOffsets, static_cast<int32_t>(sizeof(uint32_t)));
-            }
-            m_blockOffsets.m_data[m_blockOffsets.m_size] = blockOffset;
-            ++m_blockOffsets.m_size;
-        }
+        m_blockOffsets.pushBack(static_cast<uint32_t>(m_data.m_size));
         int32_t numBlockFrames = m_maxFramesPerBlock;
         if (numBlockFrames >= m_numFrames - firstFrame) {
             numBlockFrames = m_numFrames - firstFrame;
@@ -923,29 +914,14 @@ void hkaSplineCompressedAnimation::initialize(
             const int32_t numTracks = trackType ? m_numberOfFloatTracks : m_numberOfTransformTracks;
             const int32_t numComponents = trackType == 0 ? 3 : 1;
             if (trackType == 1) {
-                // EXE-INLINED none: hkArray<hkUint32>::pushBack
                 const uint32_t offset = static_cast<uint32_t>(m_data.m_size) - m_blockOffsets.m_data[block];
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (m_floatBlockOffsets.m_size ==
-                    (m_floatBlockOffsets.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(
-                        *router.m_heap, &m_floatBlockOffsets, static_cast<int32_t>(sizeof(uint32_t))
-                    );
-                }
-                m_floatBlockOffsets.m_data[m_floatBlockOffsets.m_size] = offset;
-                ++m_floatBlockOffsets.m_size;
+                m_floatBlockOffsets.pushBack(offset);
             }
             for (int32_t track = 0; track < numTracks; ++track) {
                 if (enableSampleSingleTracks) {
-                    // EXE-INLINED none: hkArray<hkUint32>::pushBack
                     const uint32_t offset = static_cast<uint32_t>(m_data.m_size) - m_blockOffsets.m_data[block];
                     hkArray<uint32_t>& offsets = trackType == 0 ? m_transformOffsets : m_floatOffsets;
-                    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                    if (offsets.m_size == (offsets.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK)) {
-                        hkArrayUtil::_reserveMore(*router.m_heap, &offsets, static_cast<int32_t>(sizeof(uint32_t)));
-                    }
-                    offsets.m_data[offsets.m_size] = offset;
-                    ++offsets.m_size;
+                    offsets.pushBack(offset);
                 }
                 const int32_t* paletteIndices = trackType ? trackParams.m_floatTrackIndexToPaletteIndex.m_data
                                                           : trackParams.m_trackIndexToPaletteIndex.m_data;
@@ -956,34 +932,8 @@ void hkaSplineCompressedAnimation::initialize(
                 alignas(16) VectorArrays samples;
                 FloatArrays times;
                 for (int32_t k = 0; k < numComponents; ++k) {
-                    {
-                        // EXE-INLINED none: hkArray<hkVector4>::setSize
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        const int32_t capacity = samples[k].m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-                        if (capacity < numBlockFrames) {
-                            int32_t request = 2 * capacity;
-                            if (numBlockFrames >= request) {
-                                request = numBlockFrames;
-                            }
-                            hkArrayUtil::_reserve(
-                                *pHeap, &samples[k], request, static_cast<int32_t>(sizeof(hkVector4))
-                            );
-                        }
-                        samples[k].m_size = numBlockFrames;
-                    }
-                    {
-                        // EXE-INLINED none: hkArray<hkReal>::setSize
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        const int32_t capacity = times[k].m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK;
-                        if (capacity < numBlockFrames) {
-                            int32_t request = 2 * capacity;
-                            if (numBlockFrames >= request) {
-                                request = numBlockFrames;
-                            }
-                            hkArrayUtil::_reserve(*pHeap, &times[k], request, static_cast<int32_t>(sizeof(float)));
-                        }
-                        times[k].m_size = numBlockFrames;
-                    }
+                    samples[k].setSize(numBlockFrames);
+                    times[k].setSize(numBlockFrames);
                     hkaSplineCompressedAnimation::Linspace(m, times[k], 0.0f, blockTime);
                 }
 
@@ -1063,35 +1013,8 @@ void hkaSplineCompressedAnimation::initialize(
                             knots.m_data, &numPoints, points.m_data
                         );
                         for (int32_t pass = 0; pass < 2; ++pass) {
-                            {
-                                // EXE-INLINED none: hkArray<hkReal>::setSize
-                                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                                const int32_t capacity = knots.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK;
-                                if (capacity < numKnots) {
-                                    int32_t request = 2 * capacity;
-                                    if (numKnots >= request) {
-                                        request = numKnots;
-                                    }
-                                    hkArrayUtil::_reserve(*pHeap, &knots, request, static_cast<int32_t>(sizeof(float)));
-                                }
-                                knots.m_size = numKnots;
-                            }
-                            {
-                                // EXE-INLINED none: hkArray<hkVector4>::setSize
-                                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                                const int32_t capacity =
-                                    points.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK;
-                                if (capacity < numPoints) {
-                                    int32_t request = 2 * capacity;
-                                    if (numPoints >= request) {
-                                        request = numPoints;
-                                    }
-                                    hkArrayUtil::_reserve(
-                                        *pHeap, &points, request, static_cast<int32_t>(sizeof(hkVector4))
-                                    );
-                                }
-                                points.m_size = numPoints;
-                            }
+                            knots.setSize(numKnots);
+                            points.setSize(numPoints);
                             // More control points than samples: the fit again at degree 1.
                             if (pass == 1 || numPoints <= numBlockFrames) {
                                 break;

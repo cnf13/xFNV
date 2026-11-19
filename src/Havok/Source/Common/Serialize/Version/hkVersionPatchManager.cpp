@@ -70,22 +70,12 @@ static int32_t walkDependencies(
         return a4;
     }
     a2.m_data[a1] = -2;
-    // EXE-INLINED none: hkArray<int, hkContainerHeapAllocator>::pushBack
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    if (pending.m_size == (pending.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*router.m_heap, &pending, sizeof(int32_t));
-    }
-    pending.m_data[pending.m_size++] = a1;
+    pending.pushBack(a1);
     for (int32_t i = a3.find(a1); i != -1; i = a3.m_valueChain.m_data[i].next) {
         int32_t value = a3.m_valueChain.m_data[i].value;
         int32_t state = a2.m_data[value];
         if (state == -2) {
-            // EXE-INLINED none: hkArray<int, hkContainerHeapAllocator>::pushBack
-            hkMemoryRouter& cycleRouter = hkMemoryRouter::getInstance();
-            if (pending.m_size == (pending.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*cycleRouter.m_heap, &pending, sizeof(int32_t));
-            }
-            pending.m_data[pending.m_size++] = value;
+            pending.pushBack(value);
             hkStringBuf kMessage;
             --pending.m_size;
         }
@@ -274,16 +264,7 @@ void HeapArray<UidItem>::insert(const UidItem& e) {
             return;
         }
     }
-    hkMemoryRouter& router = hkMemoryRouter::getInstance();
-    // EXE-INLINED none: hkArrayBase<UidItem>::_pushBack
-    if (m_elems.m_size == (m_elems.m_capacityAndFlags & hkArrayBase<UidItem>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(router.heap(), &m_elems, sizeof(UidItem));
-    }
-    UidItem* pDst = m_elems.m_data + m_elems.m_size;
-    if (pDst) {
-        *pDst = e;
-    }
-    ++m_elems.m_size;
+    m_elems._pushBack(hkMemoryRouter::getInstance().heap(), e);
 }
 
 template <>
@@ -422,13 +403,7 @@ int32_t hkVersionPatchManager::findLastPatchIndexForUid(uint64_t uid, int32_t al
 // A valid patch is appended and the uid index, rebuilt by the next preparation, is emptied.
 void hkVersionPatchManager::addPatch(const hkVersionPatchManager::PatchInfo* p) {
     if (isValidPatch(p)) {
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        // EXE-INLINED none: hkArrayBase<const hkVersionPatchManager::PatchInfo*>::_pushBack
-        if (m_patchInfos.m_size == (m_patchInfos.m_capacityAndFlags & hkArrayBase<const PatchInfo*>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(router.heap(), &m_patchInfos, sizeof(const PatchInfo*));
-        }
-        m_patchInfos.m_data[m_patchInfos.m_size] = p;
-        ++m_patchInfos.m_size;
+        m_patchInfos._pushBack(hkMemoryRouter::getInstance().heap(), p);
         m_patchIndexFromUid.m_map.clear();
     }
 }
@@ -450,14 +425,7 @@ hkResult hkVersionPatchManager::preparePatches(
     worldToUpdate.findAllClasses(origClasses);
 
     VersionArray origVersions;
-    {
-        int32_t numClasses = origClasses.m_size;
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        // EXE-INLINED none: hkArray<ClassVersion, hkContainerHeapAllocator>::reserve
-        if ((origVersions.m_capacityAndFlags & hkArrayBase<ClassVersion>::CAPACITY_MASK) < numClasses) {
-            hkArrayUtil::_reserve(heap, &origVersions, numClasses, sizeof(ClassVersion));
-        }
-    }
+    origVersions.reserve(origClasses.getSize());
     for (int32_t i = 0; i < origClasses.m_size; ++i) {
         const char* name = origClasses.m_data[i]->getName();
         int32_t version = origClasses.m_data[i]->getVersion();
@@ -507,11 +475,7 @@ hkResult hkVersionPatchManager::preparePatches(
         }
         while (toDo.m_elems.m_size != 0) {
             UidItem item = toDo.m_elems.m_data[0];
-            // EXE-INLINED none: hkArrayBase<UidItem>::removeAtAndCopy
-            --toDo.m_elems.m_size;
-            for (int32_t k = 0; k < toDo.m_elems.m_size; ++k) {
-                toDo.m_elems.m_data[k] = toDo.m_elems.m_data[k + 1];
-            }
+            toDo.m_elems.removeAtAndCopy(0);
             int32_t patchIndex = item.patchIndex;
             if (patchIndex != -1 && m_patchInfos.m_data[patchIndex]->oldVersion == -1) {
                 uidState.insert(item.uid, 1);
@@ -521,15 +485,7 @@ hkResult hkVersionPatchManager::preparePatches(
             }
             if (patchIndex >= 0) {
                 const PatchInfo* p = m_patchInfos.m_data[patchIndex];
-                hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-                // EXE-INLINED none: hkArray<const hkVersionPatchManager::PatchInfo*,
-                // hkContainerHeapAllocator>::pushBack
-                if (patchInfosOut.m_size ==
-                    (patchInfosOut.m_capacityAndFlags & hkArrayBase<const PatchInfo*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(heap, &patchInfosOut, sizeof(const PatchInfo*));
-                }
-                patchInfosOut.m_data[patchInfosOut.m_size] = p;
-                ++patchInfosOut.m_size;
+                patchInfosOut.pushBack(p);
                 const PatchInfo* patch = m_patchInfos.m_data[patchIndex];
                 const char* name = patch->newName;
                 if (!name) {
@@ -852,19 +808,7 @@ hkResult hkVersionPatchManager::recomputePatchDependencies() const {
         index = walkDependencies(i, order, dependencies, index, done, patchInfos);
     }
     numPatches = patchInfos.m_size;
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        // EXE-INLINED none: hkArray<const hkVersionPatchManager::PatchInfo*, hkContainerHeapAllocator>::setSize
-        int32_t capacity = m_patchInfos.m_capacityAndFlags & hkArrayBase<const PatchInfo*>::CAPACITY_MASK;
-        if (capacity < numPatches) {
-            int32_t newCapacity = 2 * capacity;
-            if (numPatches >= newCapacity) {
-                newCapacity = numPatches;
-            }
-            hkArrayUtil::_reserve(heap, &m_patchInfos, newCapacity, sizeof(const PatchInfo*));
-        }
-        m_patchInfos.m_size = numPatches;
-    }
+    m_patchInfos.setSize(numPatches);
     for (int32_t i = 0; i < patchInfos.m_size; ++i) {
         int32_t position = order.m_data[i];
         if (position < 0) {

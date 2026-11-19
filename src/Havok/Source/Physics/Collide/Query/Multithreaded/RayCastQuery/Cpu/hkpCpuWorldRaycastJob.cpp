@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/LocalArray/hkLocalArray.h"
+#include "Havok/Source/Common/Base/Container/LocalArray/hkLocalBuffer.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -685,15 +686,9 @@ hkJobQueue::JobStatus hkCpuWorldRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
             // One collector per lane of a ray bundle; castRayFiltering steps through them.
             hkCpuWorldRayCastCollector collectors[4];
 
-            // EXE-INLINED none: hkLocalBuffer<hkpFixedBufferRayHitCollector>::hkLocalBuffer(4) (hkAllocateStack)
-            hkStackMemory& bufferStack = hkMemoryRouter::getInstance().m_stack;
-            // The fixed buffer collectors' storage is carved out of the stack allocator's untyped free bytes;
-            // castRayFiltering constructs each one it uses.
-            char* pBufferBlock = bufferStack.m_next.m_storage;
-            bufferStack.m_next.m_storage =
-                pBufferBlock + ((4 * static_cast<int32_t>(sizeof(hkpFixedBufferRayHitCollector)) + 127) & ~127);
-            hkpFixedBufferRayHitCollector* fixedBufferCollectors =
-                reinterpret_cast<hkpFixedBufferRayHitCollector*>(pBufferBlock);
+            // castRayFiltering constructs each fixed buffer collector it uses.
+            hkLocalBuffer<hkpFixedBufferRayHitCollector> kFixedBufferCollectors(4, nullptr);
+            hkpFixedBufferRayHitCollector* fixedBufferCollectors = kFixedBufferCollectors.begin();
 
             for (int32_t i = 0; i < numRays; i++) {
                 // EXE-INLINED none: hkAabbTreeData::Ray::setRay: the direction's zero lanes are 1 for the reciprocal
@@ -723,9 +718,6 @@ hkJobQueue::JobStatus hkCpuWorldRayCastJob(hkJobQueue& jobQueue, hkJobQueue::Job
             hkAabbTreeRayCastUtil<hkAabbTreeData::hkAabbTreeAabb16, uint16_t>::castRayFiltering(
                 job.m_aabbTreeInt16, rays.m_data, commands, filter, collectors, fixedBufferCollectors, numRays
             );
-
-            // EXE-INLINED none: hkLocalBuffer<hkpFixedBufferRayHitCollector>::~hkLocalBuffer (hkDeallocateStack)
-            hkMemoryRouter::getInstance().m_stack.m_next.m_storage = pBufferBlock;
         }
 
         const hkKdTree* kdTree = job.m_kdTree;

@@ -1262,13 +1262,7 @@ void hkp3AxisSweep::addObject(
                             reinterpret_cast<char*>(m_markers) + (handle & ~uintptr_t(1))
                         );
                         hkArray<uint16_t>& overlaps = pMarker->m_overlappingObjects;
-                        // EXE-INLINED none: hkArray<hkUint16>::pushBack
-                        hkMemoryRouter& markerRouter = hkMemoryRouter::getInstance();
-                        if (overlaps.m_size == (overlaps.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK)) {
-                            hkArrayUtil::_reserveMore(*markerRouter.m_heap, &overlaps, sizeof(uint16_t));
-                        }
-                        overlaps.m_data[overlaps.m_size] = static_cast<uint16_t>(nodeIndex);
-                        overlaps.m_size++;
+                        overlaps.pushBack(static_cast<uint16_t>(nodeIndex));
                     }
                     else {
                         // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::expandOne
@@ -1346,14 +1340,7 @@ void hkp3AxisSweep::removeObject(hkpBroadPhaseHandle* object, hkArray<hkpBroadPh
                     hkpBpMarker* pMarker =
                         reinterpret_cast<hkpBpMarker*>(reinterpret_cast<char*>(m_markers) + (handle & ~uintptr_t(1)));
                     hkArray<uint16_t>& overlaps = pMarker->m_overlappingObjects;
-                    // EXE-INLINED none: hkArray<hkUint16>::indexOf
-                    int32_t index = -1;
-                    for (int32_t i = 0; i < overlaps.m_size; i++) {
-                        if (overlaps.m_data[i] == static_cast<uint16_t>(nodeIndex)) {
-                            index = i;
-                            break;
-                        }
-                    }
+                    int32_t index = overlaps.indexOf(static_cast<uint16_t>(nodeIndex));
                     overlaps.removeAt(index);
                 }
                 else {
@@ -1421,32 +1408,14 @@ void hkp3AxisSweep::removeObject(hkpBroadPhaseHandle* object, hkArray<hkpBroadPh
             uint16_t oldIndex = static_cast<uint16_t>(numNodes - 1);
             for (int32_t m = startMarker; m <= endMarker; m++) {
                 hkArray<uint16_t>& overlaps = m_markers[m].m_overlappingObjects;
-                // EXE-INLINED none: hkArray<hkUint16>::indexOf
-                int32_t index = -1;
-                for (int32_t i = 0; i < overlaps.m_size; i++) {
-                    if (overlaps.m_data[i] == oldIndex) {
-                        index = i;
-                        break;
-                    }
-                }
+                int32_t index = overlaps.indexOf(oldIndex);
                 overlaps.m_data[index] = static_cast<uint16_t>(nodeIndex);
             }
         }
         _fixDeterministicOrderAfterNodeIdWasDecreased(static_cast<int32_t>(nodeIndex));
     }
 
-    // EXE-INLINED none: hkArray<hkp3AxisSweep::hkpBpNode>::setSize (shrinking: no constructor runs)
-    int32_t newSize = numNodes - 1;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t nodesCapacity = m_nodes.m_capacityAndFlags & hkArrayBase<hkpBpNode>::CAPACITY_MASK;
-    if (nodesCapacity < newSize) {
-        int32_t reqElem = 2 * nodesCapacity;
-        if (newSize >= reqElem) {
-            reqElem = newSize;
-        }
-        hkArrayUtil::_reserve(*pHeap, &m_nodes, reqElem, sizeof(hkpBpNode));
-    }
-    m_nodes.m_size = newSize;
+    m_nodes.setSize(numNodes - 1);
 }
 
 // The two open lists are hkInplaceArrays of 256 node indices. The overlap test in y and z reads each node's packed
@@ -1944,18 +1913,8 @@ void hkp3AxisSweep::querySingleAabbWithCollector(const hkAabb& aabbIn, hkpBroadP
 // querySingleAabb's search collecting the overlapping nodes themselves into a local array, reserved up
 // front for every node, which calcAabbCacheInternal turns into the cache.
 void hkp3AxisSweep::calcAabbCache(const hkAabb& aabb, hkpBroadPhaseAabbCache* AabbCacheOut) const {
-    // EXE-INLINED none: hkArray<const hkpBpNode*>::hkArray
-    hkArrayBase<const hkpBpNode*> overlaps;
-    overlaps.m_data = nullptr;
-    overlaps.m_size = 0;
-    overlaps.m_capacityAndFlags = hkArrayBase<const hkpBpNode*>::DONT_DEALLOCATE_FLAG;
-    int32_t numOverlapsMax = m_nodes.m_size;
-    // EXE-INLINED none: hkArray<const hkpBpNode*>::reserve
-    hkMemoryRouter& reserveRouter = hkMemoryRouter::getInstance();
-    if (static_cast<int32_t>(overlaps.m_capacityAndFlags & hkArrayBase<const hkpBpNode*>::CAPACITY_MASK) <
-        numOverlapsMax) {
-        hkArrayUtil::_reserve(reserveRouter.m_temp, &overlaps, numOverlapsMax, sizeof(const hkpBpNode*));
-    }
+    hkArray<const hkpBpNode*, hkContainerTempAllocator> overlaps;
+    overlaps.reserve(m_nodes.m_size);
 
     int32_t numNodes = m_nodes.m_size;
     int32_t numWords = (numNodes >> 5) + 8;
@@ -2095,17 +2054,6 @@ void hkp3AxisSweep::calcAabbCache(const hkAabb& aabb, hkpBroadPhaseAabbCache* Aa
     }
 
     calcAabbCacheInternal(overlaps, AabbCacheOut);
-
-    // EXE-INLINED none: hkArray<const hkpBpNode*>::~hkArray (the size is cleared before the capacity test)
-    hkMemoryAllocator* pArrayTemp = hkMemoryRouter::getInstance().m_temp;
-    overlaps.m_size = 0;
-    if (overlaps.m_capacityAndFlags >= 0) {
-        pArrayTemp->bufFree(
-            overlaps.m_data,
-            static_cast<int32_t>(overlaps.m_capacityAndFlags & hkArrayBase<const hkpBpNode*>::CAPACITY_MASK) *
-                sizeof(hkp3AxisSweep::hkpBpNode*)
-        );
-    }
 }
 
 // The overlapping collidables' nodes, in a local array on the thread's stack memory, go to calcAabbCacheInternal.
@@ -2154,76 +2102,63 @@ void hkp3AxisSweep::defragment() {
         sortedCapacity = static_cast<int32_t>(hkArrayBase<hkpBpEndPoint>::DONT_DEALLOCATE_FLAG);
     }
 
-    // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray(int)
-    hkMemoryAllocator& temp2 = hkMemoryRouter::getInstance().temp();
-    int32_t* newIndex = nullptr;
-    int32_t newIndexCapacity = 0;
-    if (numNodes) {
-        newIndexCapacity = numNodes;
-        newIndex = temp2._bufAlloc<int32_t>(newIndexCapacity);
-    }
-    if (!newIndexCapacity) {
-        newIndexCapacity = static_cast<int32_t>(hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
-    }
+    {
+        hkArray<int32_t, hkContainerTempAllocator> newIndex(numNodes);
 
-    for (int32_t i = 0; i < m_nodes.m_size; ++i) {
-        nodes[i] = m_nodes.m_data[i];
-        sortedEndPoints[i].m_value = m_nodes.m_data[i].min_x;
-        sortedEndPoints[i].m_nodeIndex = static_cast<uint16_t>(i);
-    }
-
-    // Node 0 keeps its place: the sort covers entries 1 to numNodes - 1.
-    uint32_t uiLess = 0;
-    if (numNodes - 1 > 1) {
-        quickSortRecursive(sortedEndPoints + 1, 0, numNodes - 2, uiLess);
-    }
-
-    for (int32_t i = 0; i < m_nodes.m_size; ++i) {
-        int32_t oldIndex = sortedEndPoints[i].m_nodeIndex;
-        newIndex[oldIndex] = i;
-        m_nodes.m_data[i] = nodes[oldIndex];
-    }
-
-    for (int32_t i = 1; i < m_nodes.m_size; ++i) {
-        hkpBpNode& node = m_nodes.m_data[i];
-        if (node.isMarker()) {
-            // EXE-INLINED none: hkp3AxisSweep::hkpBpNode::getMarker
-            // A marker node's handle field is no pointer: the exe treats its bits as its marker's byte offset in
-            // m_markers, tagged by the low bit.
-            hkpBpMarker* pMarker = reinterpret_cast<hkpBpMarker*>(
-                reinterpret_cast<uintptr_t>(m_markers) +
-                (reinterpret_cast<uintptr_t>(node.m_handle) & ~static_cast<uintptr_t>(1))
-            );
-            pMarker->m_nodeIndex = static_cast<uint16_t>(i);
+        for (int32_t i = 0; i < m_nodes.m_size; ++i) {
+            nodes[i] = m_nodes.m_data[i];
+            sortedEndPoints[i].m_value = m_nodes.m_data[i].min_x;
+            sortedEndPoints[i].m_nodeIndex = static_cast<uint16_t>(i);
         }
-        else {
-            node.m_handle->m_id = static_cast<uint32_t>(i);
+
+        // Node 0 keeps its place: the sort covers entries 1 to numNodes - 1.
+        uint32_t uiLess = 0;
+        if (numNodes - 1 > 1) {
+            quickSortRecursive(sortedEndPoints + 1, 0, numNodes - 2, uiLess);
         }
-    }
 
-    for (int32_t i = 0; i < m_numMarkers; ++i) {
-        hkpBpMarker& marker = m_markers[i];
-        for (int32_t j = marker.m_overlappingObjects.m_size - 1; j >= 0; --j) {
-            uint16_t* pObject = &marker.m_overlappingObjects.m_data[j];
-            *pObject = static_cast<uint16_t>(newIndex[*pObject]);
+        for (int32_t i = 0; i < m_nodes.m_size; ++i) {
+            int32_t oldIndex = sortedEndPoints[i].m_nodeIndex;
+            newIndex.m_data[oldIndex] = i;
+            m_nodes.m_data[i] = nodes[oldIndex];
         }
-    }
 
-    for (int32_t axis = 0; axis < 3; ++axis) {
-        hkArray<hkpBpEndPoint>& endPoints = m_axis[axis].m_endPoints;
-        for (int32_t i = 0; i < endPoints.m_size; ++i) {
-            endPoints.m_data[i].m_nodeIndex = static_cast<uint16_t>(newIndex[endPoints.m_data[i].m_nodeIndex]);
+        for (int32_t i = 1; i < m_nodes.m_size; ++i) {
+            hkpBpNode& node = m_nodes.m_data[i];
+            if (node.isMarker()) {
+                // EXE-INLINED none: hkp3AxisSweep::hkpBpNode::getMarker
+                // A marker node's handle field is no pointer: the exe treats its bits as its marker's byte offset in
+                // m_markers, tagged by the low bit.
+                hkpBpMarker* pMarker = reinterpret_cast<hkpBpMarker*>(
+                    reinterpret_cast<uintptr_t>(m_markers) +
+                    (reinterpret_cast<uintptr_t>(node.m_handle) & ~static_cast<uintptr_t>(1))
+                );
+                pMarker->m_nodeIndex = static_cast<uint16_t>(i);
+            }
+            else {
+                node.m_handle->m_id = static_cast<uint32_t>(i);
+            }
         }
-    }
 
-    for (int32_t i = 1; i < m_nodes.m_size; ++i) {
-        _fixDeterministicOrderAfterNodeIdWasDecreased(i);
-    }
+        for (int32_t i = 0; i < m_numMarkers; ++i) {
+            hkpBpMarker& marker = m_markers[i];
+            for (int32_t j = marker.m_overlappingObjects.m_size - 1; j >= 0; --j) {
+                uint16_t* pObject = &marker.m_overlappingObjects.m_data[j];
+                *pObject = static_cast<uint16_t>(newIndex.m_data[*pObject]);
+            }
+        }
 
-    // EXE-INLINED none: ~hkArray<int, hkContainerTempAllocator>
-    hkMemoryAllocator& temp3 = hkMemoryRouter::getInstance().temp();
-    if ((newIndexCapacity & hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG) == 0) {
-        temp3._bufFree<int32_t>(newIndex, newIndexCapacity & hkArrayBase<int32_t>::CAPACITY_MASK);
+        for (int32_t axis = 0; axis < 3; ++axis) {
+            hkArray<hkpBpEndPoint>& endPoints = m_axis[axis].m_endPoints;
+            for (int32_t i = 0; i < endPoints.m_size; ++i) {
+                endPoints.m_data[i].m_nodeIndex =
+                    static_cast<uint16_t>(newIndex.m_data[endPoints.m_data[i].m_nodeIndex]);
+            }
+        }
+
+        for (int32_t i = 1; i < m_nodes.m_size; ++i) {
+            _fixDeterministicOrderAfterNodeIdWasDecreased(i);
+        }
     }
     // EXE-INLINED none: ~hkArray<hkpBpEndPoint, hkContainerTempAllocator>
     hkMemoryAllocator& temp4 = hkMemoryRouter::getInstance().temp();
@@ -2342,12 +2277,7 @@ void hkp3AxisSweep::castRay(
         axisBits <<= 1;
     }
 
-    // EXE-INLINED none: hkAllocateStack<hkReal>
-    int32_t numCasts = rayInput.m_numCasts;
-    hkMemoryRouter& stackRouter = hkMemoryRouter::getInstance();
-    // The stack allocator hands out raw bytes.
-    float* hitFractions = reinterpret_cast<float*>(stackRouter.m_stack.m_next.m_storage);
-    stackRouter.m_stack.m_next.m_storage += (numCasts * static_cast<int32_t>(sizeof(float)) + 127) & ~127;
+    float* hitFractions = hkAllocateStack<float>(rayInput.m_numCasts, nullptr);
     for (int32_t i = 0; i < rayInput.m_numCasts; i++) {
         hitFractions[i] = 1.0f;
     }
@@ -2519,8 +2449,7 @@ void hkp3AxisSweep::castRay(
             reinterpret_cast<hkpBroadPhaseCastCollector*>(reinterpret_cast<char*>(pCollector) + collectorStriding);
     }
 
-    // EXE-INLINED none: hkDeallocateStack<hkReal>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = reinterpret_cast<char*>(hitFractions);
+    hkDeallocateStack(hitFractions);
     // EXE-INLINED none: hkLocalBuffer<hkUchar>::~hkLocalBuffer
     hkMemoryAllocator* pTempFree = hkMemoryRouter::getInstance().m_temp;
     if (capacity >= 0) {
@@ -3373,11 +3302,7 @@ void hkp3AxisSweep::addObjectBatch(
 
     // The old nodes overlapping the batch's total AABB.
     hkArray<const hkpBpNode*, hkContainerTempAllocator> overlaps;
-    // EXE-INLINED none: hkArray<const hkp3AxisSweep::hkpBpNode*, hkContainerTempAllocator>::reserve
-    hkMemoryRouter& overlapsRouter = hkMemoryRouter::getInstance();
-    if ((overlaps.m_capacityAndFlags & hkArrayBase<const hkpBpNode*>::CAPACITY_MASK) < oldNumNodes) {
-        hkArrayUtil::_reserve(overlapsRouter.m_temp, &overlaps, oldNumNodes, sizeof(const hkpBpNode*));
-    }
+    overlaps.reserve(oldNumNodes);
 
     // The new nodes take their handles; their end point indices come with the merge below.
     {
@@ -3952,14 +3877,7 @@ void hkp3AxisSweep::removeObjectBatch(
     // The kept nodes moved into a removed node's place, for the deterministic order fix at the end.
     using TempIntArray = hkArray<int32_t, hkContainerTempAllocator>;
     TempIntArray movedNodes;
-    {
-        const int32_t numReserved = m_numMarkers + numA;
-        // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::reserve
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (movedNodes.getCapacity() < numReserved) {
-            hkArrayUtil::_reserve(router.temp(), &movedNodes, numReserved, static_cast<int32_t>(sizeof(int32_t)));
-        }
-    }
+    movedNodes.reserve(m_numMarkers + numA);
 
     // Each old node's new index, -1 for a removed one.
     TempIntArray newIndices(numNodes);
@@ -4019,9 +3937,7 @@ void hkp3AxisSweep::removeObjectBatch(
         }
         i++;
     }
-    // EXE-INLINED none: hkArray<hkp3AxisSweep::hkpBpNode>::setSize (shrinking; the node needs no destruct)
-    m_nodes._reserve(hkMemoryRouter::getInstance().heap(), last + 1);
-    m_nodes.m_size = last + 1;
+    m_nodes.setSize(last + 1);
 
     // The collected nodes in min x order, a node of min x 0xFFFF after them.
     // EXE-INLINED none: hkArray<hkp3AxisSweep::hkpBpNode, hkContainerTempAllocator>::hkArray(int)
@@ -4080,9 +3996,7 @@ void hkp3AxisSweep::removeObjectBatch(
                     marker.m_overlappingObjects.m_data[numKept++] = static_cast<uint16_t>(objectIndex);
                 }
             }
-            // EXE-INLINED none: hkArray<hkUint16>::setSize
-            marker.m_overlappingObjects._reserve(hkMemoryRouter::getInstance().heap(), numKept);
-            marker.m_overlappingObjects.m_size = numKept;
+            marker.m_overlappingObjects.setSize(numKept);
         }
     }
 
@@ -4312,20 +4226,7 @@ void hkp3AxisSweep::endOverlapCheckMarker(
         hkpBpMarker* pMarker =
             reinterpret_cast<hkpBpMarker*>(reinterpret_cast<char*>(markers) + (handle & ~uintptr_t(1)));
         hkArray<uint16_t>& overlaps = pMarker->m_overlappingObjects;
-        // EXE-INLINED none: hkArrayBase<unsigned short>::indexOf
-        int32_t index = -1;
-        const int32_t size = overlaps.m_size;
-        for (int32_t i = 0; i < size; i++) {
-            if (overlaps.m_data[i] == static_cast<uint16_t>(nodeIndexA)) {
-                index = i;
-                break;
-            }
-        }
-        // EXE-INLINED none: hkArrayBase<unsigned short>::removeAt
-        overlaps.m_size--;
-        if (overlaps.m_size != index) {
-            overlaps.m_data[index] = overlaps.m_data[overlaps.m_size];
-        }
+        overlaps.removeAt(overlaps.indexOf(static_cast<uint16_t>(nodeIndexA)));
     }
     else {
         // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::expandOne
@@ -5105,17 +5006,7 @@ void hkp3AxisSweep::hkpBpAxis::removeBatch(hkpBpNode* nodes, const hkArrayBase<i
             ++numKept;
         }
     }
-    // EXE-INLINED none: hkArray<hkp3AxisSweep::hkpBpEndPoint>::setSize
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacity = m_endPoints.m_capacityAndFlags & hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::CAPACITY_MASK;
-    if (capacity < numKept) {
-        int32_t reqElem = 2 * capacity;
-        if (numKept >= reqElem) {
-            reqElem = numKept;
-        }
-        hkArrayUtil::_reserve(pHeap, &m_endPoints, reqElem, static_cast<int32_t>(sizeof(hkpBpEndPoint)));
-    }
-    m_endPoints.m_size = numKept;
+    m_endPoints.setSize(numKept);
 }
 template void hkp3AxisSweep::hkpBpAxis::removeBatch<0>(hkpBpNode* nodes, const hkArrayBase<int32_t>& newIndices);
 template void hkp3AxisSweep::hkpBpAxis::removeBatch<1>(hkpBpNode* nodes, const hkArrayBase<int32_t>& newIndices);
@@ -5356,13 +5247,7 @@ void hkp3AxisSweep::beginOverlapCheckMarker(
         hkpBpMarker* pMarker =
             reinterpret_cast<hkpBpMarker*>(reinterpret_cast<char*>(markers) + (handle & ~uintptr_t(1)));
         hkArray<uint16_t>& overlaps = pMarker->m_overlappingObjects;
-        // EXE-INLINED none: hkArray<hkUint16>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (overlaps.m_size == (overlaps.m_capacityAndFlags & hkArrayBase<uint16_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &overlaps, sizeof(uint16_t));
-        }
-        overlaps.m_data[overlaps.m_size] = static_cast<uint16_t>(nodeIndexA);
-        overlaps.m_size++;
+        overlaps.pushBack(static_cast<uint16_t>(nodeIndexA));
     }
     else {
         // EXE-INLINED none: hkArray<hkpBroadPhaseHandlePair>::expandOne

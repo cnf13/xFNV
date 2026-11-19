@@ -135,18 +135,12 @@ void writeUlongArray(hkOArchive& oa, int32_t elemsize, int32_t nelem, const hkUl
         oa.writeArrayGeneric(startAddress, elemsize, nelem);
     }
     else {
-        // EXE-INLINED none: hkAllocateStack<hkUint64>
-        hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-        void* pBlock = pRouter->m_stack.m_next.m_storage;
-        pRouter->m_stack.m_next.m_storage =
-            static_cast<char*>(pBlock) + ((static_cast<int32_t>(sizeof(hkUint64)) * nelem + 127) & ~127);
-        hkUint64* pBuffer = static_cast<hkUint64*>(pBlock);
+        hkUint64* pBuffer = hkAllocateStack<hkUint64>(nelem, nullptr);
         for (int32_t i = 0; i < nelem; ++i) {
             pBuffer[i] = startAddress[i];
         }
         oa.writeArrayGeneric(pBuffer, elemsize, nelem);
-        // EXE-INLINED none: hkDeallocateStack<hkUint64>
-        hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(pBlock);
+        hkDeallocateStack(pBuffer);
     }
 }
 
@@ -903,15 +897,9 @@ void finishLoadedObjecthkAlignSceneToNodeOptions(void* p, int32_t finishing) {
 }
 
 void hkRelocationInfo::addGlobal(int32_t fromOffset, void* toAddr, const hkClass* klass, int32_t related) {
-    // EXE-INLINED none: hkArray<hkRelocationInfo::Global, hkContainerHeapAllocator>::expandOne
-    hkMemoryRouter* pRouter = &hkMemoryRouter::getInstance();
-    if (m_global.m_size == (m_global.m_capacityAndFlags & hkArrayBase<Global>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(*pRouter->m_heap, &m_global, sizeof(Global));
-    }
-    Global* pGlobal = &m_global.m_data[m_global.m_size];
-    pGlobal->m_fromOffset = fromOffset;
-    pGlobal->m_toAddress = toAddr;
-    pGlobal->m_toClass = klass;
-    pGlobal->m_related = related;
-    ++m_global.m_size;
+    Global& global = m_global.expandOne();
+    global.m_fromOffset = fromOffset;
+    global.m_toAddress = toAddr;
+    global.m_toClass = klass;
+    global.m_related = related;
 }

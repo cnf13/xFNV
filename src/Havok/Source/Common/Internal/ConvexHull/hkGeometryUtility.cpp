@@ -740,24 +740,7 @@ void calcCovarianceOfTriangles(
     weightedSum.setZero4();
     hkArray<hkVector4> centroids;
     const int32_t numTriangles = numVertices / 3;
-    hkVector4* pCentroid;
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::expandBy
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t oldSize = centroids.m_size;
-        const int32_t newSize = oldSize + numTriangles;
-        const int32_t capacity =
-            static_cast<int32_t>(centroids.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-        if (capacity < newSize) {
-            int32_t request = 2 * capacity;
-            if (newSize >= request) {
-                request = newSize;
-            }
-            hkArrayUtil::_reserve(*pHeap, &centroids, request, static_cast<int32_t>(sizeof(hkVector4)));
-        }
-        centroids.m_size += numTriangles;
-        pCentroid = centroids.m_data + oldSize;
-    }
+    hkVector4* pCentroid = centroids.expandBy(numTriangles);
     covarianceOut.m_col0.m_quad = zero.m_quad;
     covarianceOut.m_col1.m_quad = zero.m_quad;
     covarianceOut.m_col2.m_quad = zero.m_quad;
@@ -856,8 +839,7 @@ void calcCovarianceOfTriangles(
 // rotated by its inverse, must each lie within 0.001 of their bounding box's faces on every axis. halfExtentsOut and
 // transformOut get that box; when each column of the inverted rotation is within tolerance of an axis, the box is
 // turned axis-aligned (half extents rotated and made positive, an identity rotation). Last, every vertex must lie
-// within 1.001 times the half extents in the box's frame. The 8-corner buffer is allocated from the heap without an
-// array around it (its size is never stored).
+// within 1.001 times the half extents in the box's frame.
 bool getIsBoxGeometry(
     const hkArray<hkVector4>& vertices,
     hkVector4& halfExtentsOut,
@@ -869,16 +851,8 @@ bool getIsBoxGeometry(
     stridedVerts.m_numVertices = vertices.m_size;
     stridedVerts.m_striding = static_cast<int32_t>(sizeof(hkVector4));
     const hkSphere sphere = hkGeometryUtility::createMinBoundingSphere(stridedVerts, 0.00001f);
-    // EXE-INLINED none: hkArray<hkVector4> storage for 8 elements (hkContainerHeapAllocator, bufAlloc)
-    hkMemoryRouter::getInstance();
-    hkMemoryRouter::getInstance();
-    int32_t numBytes = 8 * static_cast<int32_t>(sizeof(hkVector4));
-    hkVector4* pCorners = static_cast<hkVector4*>(hkMemoryRouter::getInstance().m_heap->bufAlloc(numBytes));
-    int32_t cornersCapacityAndFlags = numBytes / static_cast<int32_t>(sizeof(hkVector4));
-    if (cornersCapacityAndFlags == 0) {
-        cornersCapacityAndFlags = static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
-    }
     hkArray<hkVector4> onSphere;
+    hkArray<hkVector4> corners(8);
     const int32_t numVertices = vertices.m_size;
     for (int32_t i = 0; i < numVertices; ++i) {
         const hkVector4& vertex = vertices.m_data[i];
@@ -888,34 +862,27 @@ bool getIsBoxGeometry(
         float error = distance - sphere.m_pos(3);
         error = std::fabs(error);
         if (tolerance > error) {
-            // EXE-INLINED none: hkArray<hkVector4>::pushBack
-            hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-            if (onSphere.m_size ==
-                static_cast<int32_t>(onSphere.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*pHeap, &onSphere, static_cast<int32_t>(sizeof(hkVector4)));
-            }
-            onSphere.m_data[onSphere.m_size].m_quad = vertex.m_quad;
-            onSphere.m_size++;
+            onSphere.pushBack(vertex);
         }
     }
     bool isBox = false;
     if (onSphere.m_size == 8) {
-        pCorners[0].m_quad = onSphere.m_data[0].m_quad;
-        pCorners[1].m_quad = onSphere.m_data[1].m_quad;
-        pCorners[2].m_quad = onSphere.m_data[2].m_quad;
-        pCorners[3].m_quad = onSphere.m_data[3].m_quad;
-        pCorners[4].m_quad = onSphere.m_data[4].m_quad;
-        pCorners[5].m_quad = onSphere.m_data[5].m_quad;
-        pCorners[6].m_quad = onSphere.m_data[6].m_quad;
-        pCorners[7].m_quad = onSphere.m_data[7].m_quad;
+        corners[0].m_quad = onSphere.m_data[0].m_quad;
+        corners[1].m_quad = onSphere.m_data[1].m_quad;
+        corners[2].m_quad = onSphere.m_data[2].m_quad;
+        corners[3].m_quad = onSphere.m_data[3].m_quad;
+        corners[4].m_quad = onSphere.m_data[4].m_quad;
+        corners[5].m_quad = onSphere.m_data[5].m_quad;
+        corners[6].m_quad = onSphere.m_data[6].m_quad;
+        corners[7].m_quad = onSphere.m_data[7].m_quad;
         // The two shortest edges from the first corner.
         hkVector4 edge0;
-        edge0.setSub4(pCorners[0], pCorners[1]);
+        edge0.setSub4(corners[0], corners[1]);
         hkVector4 edge1;
-        edge1.setSub4(pCorners[0], pCorners[2]);
+        edge1.setSub4(corners[0], corners[2]);
         for (int32_t k = 3; k < 8; ++k) {
             hkVector4 edge;
-            edge.setSub4(pCorners[0], pCorners[k]);
+            edge.setSub4(corners[0], corners[k]);
             const float edgeLength2 = edge.lengthSquared3();
             const float edge0Length2 = edge0.lengthSquared3();
             if (edge0Length2 > edgeLength2) {
@@ -950,42 +917,42 @@ bool getIsBoxGeometry(
             rotation.m_col2.m_quad = edge2.m_quad;
             rotation.invert(0.01f);
             for (int32_t k = 0; k < 8; ++k) {
-                pCorners[k].setRotatedDir(rotation, pCorners[k]);
+                corners[k].setRotatedDir(rotation, corners[k]);
             }
-            float minX = pCorners[0](0);
-            float maxX = pCorners[0](0);
-            float minY = pCorners[0](1);
-            float maxY = pCorners[0](1);
-            float minZ = pCorners[0](2);
-            float maxZ = pCorners[0](2);
+            float minX = corners[0](0);
+            float maxX = corners[0](0);
+            float minY = corners[0](1);
+            float maxY = corners[0](1);
+            float minZ = corners[0](2);
+            float maxZ = corners[0](2);
             for (int32_t k = 1; k < 8; ++k) {
-                if (pCorners[k](0) < minX) {
-                    minX = pCorners[k](0);
+                if (corners[k](0) < minX) {
+                    minX = corners[k](0);
                 }
-                else if (pCorners[k](0) > maxX) {
-                    maxX = pCorners[k](0);
+                else if (corners[k](0) > maxX) {
+                    maxX = corners[k](0);
                 }
-                if (pCorners[k](1) < minY) {
-                    minY = pCorners[k](1);
+                if (corners[k](1) < minY) {
+                    minY = corners[k](1);
                 }
-                else if (pCorners[k](1) > maxY) {
-                    maxY = pCorners[k](1);
+                else if (corners[k](1) > maxY) {
+                    maxY = corners[k](1);
                 }
-                if (pCorners[k](2) < minZ) {
-                    minZ = pCorners[k](2);
+                if (corners[k](2) < minZ) {
+                    minZ = corners[k](2);
                 }
-                else if (pCorners[k](2) > maxZ) {
-                    maxZ = pCorners[k](2);
+                else if (corners[k](2) > maxZ) {
+                    maxZ = corners[k](2);
                 }
             }
             for (int32_t k = 0; k < 8; ++k) {
-                if (!isApproxEqual(&minX, 0.001f, &pCorners[k](0)) && !isApproxEqual(&maxX, 0.001f, &pCorners[k](0))) {
+                if (!isApproxEqual(&minX, 0.001f, &corners[k](0)) && !isApproxEqual(&maxX, 0.001f, &corners[k](0))) {
                     goto done;
                 }
-                if (!isApproxEqual(&minY, 0.001f, &pCorners[k](1)) && !isApproxEqual(&maxY, 0.001f, &pCorners[k](1))) {
+                if (!isApproxEqual(&minY, 0.001f, &corners[k](1)) && !isApproxEqual(&maxY, 0.001f, &corners[k](1))) {
                     goto done;
                 }
-                if (!isApproxEqual(&minZ, 0.001f, &pCorners[k](2)) && !isApproxEqual(&maxZ, 0.001f, &pCorners[k](2))) {
+                if (!isApproxEqual(&minZ, 0.001f, &corners[k](2)) && !isApproxEqual(&maxZ, 0.001f, &corners[k](2))) {
                     goto done;
                 }
             }
@@ -1035,17 +1002,6 @@ bool getIsBoxGeometry(
         }
     }
 done:
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::~hkArray (the corner buffer's free)
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        if (cornersCapacityAndFlags >= 0) {
-            pHeap->bufFree(
-                pCorners,
-                (cornersCapacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) *
-                    static_cast<int32_t>(sizeof(hkVector4))
-            );
-        }
-    }
     return isBox;
 }
 
@@ -1213,21 +1169,7 @@ void hkGeometryUtility::calcObb(
     hkGeometry geometry;
     hkGeometryUtility::createConvexGeometry(stridedVertsIn, geometry);
     hkLocalArray<hkVector4> corners(3 * geometry.m_triangles.m_size);
-    {
-        // EXE-INLINED none: hkArray<hkVector4>::setSize
-        const int32_t size = 3 * geometry.m_triangles.m_size;
-        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-        const int32_t capacity =
-            static_cast<int32_t>(corners.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-        if (capacity < size) {
-            int32_t request = 2 * capacity;
-            if (size >= request) {
-                request = size;
-            }
-            hkArrayUtil::_reserve(*pHeap, &corners, request, static_cast<int32_t>(sizeof(hkVector4)));
-        }
-        corners.m_size = size;
-    }
+    corners.setSize(3 * geometry.m_triangles.m_size);
     for (int32_t i = 0; i < geometry.m_triangles.m_size; ++i) {
         corners.m_data[3 * i].m_quad = geometry.m_vertices.m_data[geometry.m_triangles.m_data[i].m_a].m_quad;
         corners.m_data[3 * i + 1].m_quad = geometry.m_vertices.m_data[geometry.m_triangles.m_data[i].m_b].m_quad;

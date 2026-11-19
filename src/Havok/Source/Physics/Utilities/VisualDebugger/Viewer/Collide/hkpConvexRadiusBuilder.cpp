@@ -150,8 +150,7 @@ void hkpConvexRadiusBuilder::buildDisplayGeometries(
     transform.m_rotation.m_col2.m_quad[2] = 1.0f;
     _mm_store_ps(&reinterpret_cast<float*>(&transform.m_translation.m_quad)[0], kZero);
     resetCurrentRawGeometry();
-    // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::clear
-    displayGeometries.m_size = 0;
+    displayGeometries.clear();
     buildShapeDisplay(shape, transform, displayGeometries);
 }
 
@@ -206,14 +205,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
                 hkDisplayCylinder* display =
                     ::new (pMemory) hkDisplayCylinder(top, bottom, convexRadius + cylRadius, 9, 1);
                 display->m_transform.Assign(transform);
-                // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (displayGeometries.m_size ==
-                    (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-                }
-                displayGeometries.m_data[displayGeometries.m_size] = display;
-                displayGeometries.m_size++;
+                displayGeometries.pushBack(display);
             }
             break;
         }
@@ -250,18 +242,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             planes.m_size = numAllocated;
             planes.m_capacityAndFlags =
                 numAllocated ? numAllocated : static_cast<int32_t>(hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG);
-            // EXE-INLINED none: hkArray<hkVector4>::setSize
-            hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-            const int32_t capacity =
-                static_cast<int32_t>(planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-            if (capacity < 8) {
-                int32_t newCapacity = capacity * 2;
-                if (newCapacity <= 8) {
-                    newCapacity = 8;
-                }
-                hkArrayUtil::_reserve(heap, &planes, newCapacity, sizeof(hkVector4));
-            }
-            planes.m_size = 8;
+            planes.setSize(8);
 
             // The two faces, the three edges' outward planes, and the three corners' planes between those, each moved
             // out by the radius.
@@ -298,14 +279,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
 
             hkDisplayConvex* display = createConvexDisplayFromPoints(planes, transform);
             if (display) {
-                // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (displayGeometries.m_size ==
-                    (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-                }
-                displayGeometries.m_data[displayGeometries.m_size] = display;
-                displayGeometries.m_size++;
+                displayGeometries.pushBack(display);
             }
             break;
         }
@@ -321,14 +295,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
                 static_cast<hkReferencedObject*>(pMemory)->m_memSizeAndFlags = sizeof(hkDisplayBox);
                 hkDisplayBox* display = ::new (pMemory) hkDisplayBox(halfExtents);
                 display->m_transform.Assign(transform);
-                // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (displayGeometries.m_size ==
-                    (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-                }
-                displayGeometries.m_data[displayGeometries.m_size] = display;
-                displayGeometries.m_size++;
+                displayGeometries.pushBack(display);
             }
             break;
         }
@@ -344,28 +311,8 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
             const float maxDistance = static_cast<float>(_getPlaneToSurfaceDistance(shape));
 
             alignas(16) hkArray<hkVector4> planes;
-            // EXE-INLINED none: hkArray<hkVector4>::operator=
-            hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-            if (static_cast<int32_t>(planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) <
-                planeEquations->m_size) {
-                if (planes.m_capacityAndFlags >= 0) {
-                    heap->bufFree(
-                        planes.m_data,
-                        static_cast<int32_t>(
-                            (planes.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK) * sizeof(hkVector4)
-                        )
-                    );
-                }
-                int32_t capacity = planeEquations->m_size;
-                planes.m_data = heap->_bufAlloc<hkVector4>(capacity);
-                planes.m_capacityAndFlags = capacity;
-            }
-            const int32_t numPlanes = planeEquations->m_size;
-            planes.m_size = numPlanes;
-            const hkVector4* pSource = planeEquations->m_data;
-            for (int32_t i = 0; i < numPlanes; i++) {
-                planes.m_data[i] = pSource[i];
-            }
+            planes = *planeEquations;
+            const int32_t numPlanes = planes.getSize();
 
             // The planes move out by the radius unless the vertices already lie that far out. The radius is subtracted
             // from the double 0.005f and the result is compared as a float.
@@ -379,14 +326,7 @@ void hkpConvexRadiusBuilder::buildShapeDisplay(
 
             hkDisplayConvex* display = createConvexDisplayFromPoints(planes, transform);
             if (display) {
-                // EXE-INLINED none: hkArray<hkDisplayGeometry*>::pushBack
-                hkMemoryRouter& router = hkMemoryRouter::getInstance();
-                if (displayGeometries.m_size ==
-                    (displayGeometries.m_capacityAndFlags & hkArrayBase<hkDisplayGeometry*>::CAPACITY_MASK)) {
-                    hkArrayUtil::_reserveMore(*router.m_heap, &displayGeometries, sizeof(hkDisplayGeometry*));
-                }
-                displayGeometries.m_data[displayGeometries.m_size] = display;
-                displayGeometries.m_size++;
+                displayGeometries.pushBack(display);
             }
             break;
         }
@@ -521,18 +461,7 @@ hkpConvexRadiusBuilder::createConvexDisplayFromPoints(const hkArray<hkVector4>& 
     }
 
     hkArray<hkVector4> transformedVertices;
-    // EXE-INLINED none: hkArray<hkVector4>::setSize
-    hkMemoryAllocator* heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t capacity =
-        static_cast<int32_t>(transformedVertices.m_capacityAndFlags & hkArrayBase<hkVector4>::CAPACITY_MASK);
-    if (capacity < numVertices) {
-        int32_t newCapacity = capacity * 2;
-        if (numVertices >= newCapacity) {
-            newCapacity = numVertices;
-        }
-        hkArrayUtil::_reserve(heap, &transformedVertices, newCapacity, sizeof(hkVector4));
-    }
-    transformedVertices.m_size = static_cast<uint32_t>(numVertices);
+    transformedVertices.setSize(numVertices);
     for (int32_t i = 0; i < numVertices; i++) {
         transformedVertices.m_data[i].setTransformedPos(transform, hullVertices.m_data[i]);
     }
@@ -584,16 +513,5 @@ void hkpUserConvexRadiusBuilder::registerUserConvexRadiusDisplayBuilder(
             return;
         }
     }
-    // EXE-INLINED none: hkArray<hkpUserConvexRadiusBuilder::UserShapeBuilder>::pushBack
-    hkArray<UserShapeBuilder>& builders = m_userConvexRadiusBuilders;
-    hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-    if (builders.m_size == (builders.m_capacityAndFlags & hkArrayBase<UserShapeBuilder>::CAPACITY_MASK)) {
-        hkArrayUtil::_reserveMore(heap, &builders, sizeof(UserShapeBuilder));
-    }
-    UserShapeBuilder* pBuilder = &builders.m_data[builders.m_size];
-    if (pBuilder) {
-        pBuilder->f = f;
-        pBuilder->type = type;
-    }
-    ++builders.m_size;
+    m_userConvexRadiusBuilders.pushBack(UserShapeBuilder{f, type});
 }

@@ -217,7 +217,6 @@ NiObject* BSFurnitureMarker::CreateObject() {
 void BSFurnitureMarker::KillSDM() {
     NiFixedString* Block = BSFurnitureMarker::pTag;
     if (BSFurnitureMarker::pTag) {
-        // EXE-INLINED none: NiGlobalStringTable::ReleaseHandle
         NiGlobalStringTable::ReleaseHandle(BSFurnitureMarker::pTag->GetHandle());
         MemoryManager_Singleton.Deallocate(Block);
     }

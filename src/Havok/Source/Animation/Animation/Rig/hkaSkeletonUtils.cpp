@@ -243,26 +243,14 @@ void hkaSkeletonUtils::getDescendants(
     included.m_size = static_cast<uint32_t>(size);
 
     if (includeStart) {
-        // EXE-INLINED none: hkArray<hkInt16>::pushBack
-        hkMemoryRouter& router = hkMemoryRouter::getInstance();
-        if (bonesOut.m_size == (bonesOut.m_capacityAndFlags & hkArrayBase<int16_t>::CAPACITY_MASK)) {
-            hkArrayUtil::_reserveMore(*router.m_heap, &bonesOut, sizeof(int16_t));
-        }
-        bonesOut.m_data[bonesOut.m_size] = startBone;
-        bonesOut.m_size++;
+        bonesOut.pushBack(startBone);
     }
     included.m_data[startBone].m_bool = true;
     for (int16_t b = static_cast<int16_t>(startBone + 1); b < skeleton.m_bones.m_size; ++b) {
         const int16_t parent = skeleton.m_parentIndices.m_data[b];
         if (parent != -1 && included.m_data[parent].m_bool) {
             included.m_data[b].m_bool = true;
-            // EXE-INLINED none: hkArray<hkInt16>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (bonesOut.m_size == (bonesOut.m_capacityAndFlags & hkArrayBase<int16_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &bonesOut, sizeof(int16_t));
-            }
-            bonesOut.m_data[bonesOut.m_size] = b;
-            bonesOut.m_size++;
+            bonesOut.pushBack(b);
         }
     }
 }
@@ -298,13 +286,7 @@ void hkaSkeletonUtils::getLeaves(const hkaSkeleton& skeleton, hkArray<int16_t>& 
     }
     for (int16_t b = 0; b < skeleton.m_bones.m_size; ++b) {
         if (!isParent.m_data[b].m_bool) {
-            // EXE-INLINED none: hkArray<hkInt16>::pushBack
-            hkMemoryRouter& router = hkMemoryRouter::getInstance();
-            if (leavesOut.m_size == (leavesOut.m_capacityAndFlags & hkArrayBase<int16_t>::CAPACITY_MASK)) {
-                hkArrayUtil::_reserveMore(*router.m_heap, &leavesOut, sizeof(int16_t));
-            }
-            leavesOut.m_data[leavesOut.m_size] = b;
-            leavesOut.m_size++;
+            leavesOut.pushBack(b);
         }
     }
 }

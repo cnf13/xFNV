@@ -376,17 +376,7 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
     aabbs.m_data = pAabbMemory;
     aabbs.m_capacityAndFlags = iCapacityAndFlags;
     aabbs.m_localMemory = pAabbMemory;
-    // EXE-INLINED none: hkArray<hkAabb>::setSize
-    hkMemoryAllocator* pHeap0 = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCapacity0 = static_cast<int32_t>(aabbs.m_capacityAndFlags & hkArrayBase<hkAabb>::CAPACITY_MASK);
-    if (iCapacity0 < numCollidables) {
-        int32_t iRequest = 2 * iCapacity0;
-        if (numCollidables >= iRequest) {
-            iRequest = numCollidables;
-        }
-        hkArrayUtil::_reserve(*pHeap0, &aabbs, iRequest, sizeof(hkAabb));
-    }
-    aabbs.m_size = numCollidables;
+    aabbs.setSize(numCollidables);
 
     alignas(16) hkLocalArray<void*> userDatas;
     userDatas.m_data = nullptr;
@@ -398,17 +388,7 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
     userDatas.m_data = pUserDataMemory;
     userDatas.m_capacityAndFlags = iCapacityAndFlags;
     userDatas.m_localMemory = pUserDataMemory;
-    // EXE-INLINED none: hkArray<void*>::setSize
-    hkMemoryAllocator* pHeap1 = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCapacity1 = static_cast<int32_t>(userDatas.m_capacityAndFlags & hkArrayBase<void*>::CAPACITY_MASK);
-    if (iCapacity1 < numCollidables) {
-        int32_t iRequest = 2 * iCapacity1;
-        if (numCollidables >= iRequest) {
-            iRequest = numCollidables;
-        }
-        hkArrayUtil::_reserve(*pHeap1, &userDatas, iRequest, sizeof(void*));
-    }
-    userDatas.m_size = numCollidables;
+    userDatas.setSize(numCollidables);
 
     HK_TIMER_BEGIN("prepare", nullptr);
     const hkpCollisionInput::Aabb32Info& rAabb32Info = m_world->m_collisionInput->m_aabb32Info;

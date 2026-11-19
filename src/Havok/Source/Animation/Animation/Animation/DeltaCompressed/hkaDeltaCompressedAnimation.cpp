@@ -577,26 +577,8 @@ void hkaDeltaCompressedAnimation::samplePartialWithDataChunks(
 
     HK_TIMER_SPLIT_LIST("DecompressDChunk");
     const float oneMinusDelta = 1.0f - delta;
-    float* decompressed;
-    {
-        // EXE-INLINED none: hkAllocateStack<hkReal>(numD * m_blockSize)
-        const int32_t numDecompressed = anim->m_blockSize * static_cast<int32_t>(numD);
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage = pBlock + ((numDecompressed * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-        // The stack allocator's bytes are untyped memory; the buffer keeps its floats there.
-        decompressed = static_cast<float*>(static_cast<void*>(pBlock));
-    }
-    float* sampled;
-    {
-        // EXE-INLINED none: hkAllocateStack<hkReal>(numD)
-        hkStackMemory& stack = hkMemoryRouter::getInstance().m_stack;
-        char* pBlock = stack.m_next.m_storage;
-        stack.m_next.m_storage =
-            pBlock + ((static_cast<int32_t>(numD) * static_cast<int32_t>(sizeof(float)) + 127) & ~127);
-        // The stack allocator's bytes are untyped memory; the buffer keeps its floats there.
-        sampled = static_cast<float*>(static_cast<void*>(pBlock));
-    }
+    float* decompressed = hkAllocateStack<float>(anim->m_blockSize * static_cast<int32_t>(numD), nullptr);
+    float* sampled = hkAllocateStack<float>(static_cast<int32_t>(numD), nullptr);
 
     // The frame's block holds m_blockSize poses, the last block what is left of m_numberOfPoses.
     hkDeltaDecompressionParameters params;
@@ -663,10 +645,8 @@ void hkaDeltaCompressedAnimation::samplePartialWithDataChunks(
     input.m_dynamicDOFsFloat = sampled + anim->m_numDynamicTransformDOFs;
     input.m_staticMaskFloat = staticMaskT + anim->m_numberOfTransformTracks;
     hkaTrackAnalysis::recompose(input, transformTracksOut, floatTracksOut);
-    // EXE-INLINED none: hkDeallocateStack<hkReal>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(sampled));
-    // EXE-INLINED none: hkDeallocateStack<hkReal>
-    hkMemoryRouter::getInstance().m_stack.m_next.m_storage = static_cast<char*>(static_cast<void*>(decompressed));
+    hkDeallocateStack(sampled);
+    hkDeallocateStack(decompressed);
     HK_TIMER_END_LIST();
 }
 

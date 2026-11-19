@@ -294,15 +294,7 @@ void hkpBvTreeAgent::processCollision(
                         continue;
                     }
                     entry->m_collisionAgent->cleanup(*constraintOwner);
-                    // EXE-INLINED none: hkArrayBase<T>::removeAtAndCopy (its class-type element path, which
-                    // src's hkArrayUtil does not define for this type)
-                    hkpBvAgentEntryInfo* data = entries.m_data;
-                    --entries.m_size;
-                    const int32_t index = static_cast<int32_t>(entry - data);
-                    hkMemUtil::memCpy<alignof(hkpBvAgentEntryInfo)>(
-                        data + index, data + index + 1,
-                        static_cast<int32_t>((entries.m_size - index) * sizeof(hkpBvAgentEntryInfo))
-                    );
+                    entries.removeAtAndCopy(static_cast<int32_t>(entry - entries.m_data));
                     key = k;
                     --entry;
                     --entryEnd;
@@ -457,20 +449,7 @@ void hkpBvTreeAgent::processCollision(
                 out->m_key = *key;
             }
 
-            // EXE-INLINED none: hkArray<T>::operator= (its class-type element path: the elements past the old size
-            // are copy-constructed)
-            {
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                const int32_t newSize = newEntries.m_size;
-                const int32_t oldSize = entries.m_size;
-                const int32_t copiedSize = newSize > oldSize ? oldSize : newSize;
-                entries._reserve(heap, newSize);
-                hkArrayBase<hkpBvAgentEntryInfo>::copy(entries.m_data, newEntries.m_data, copiedSize);
-                for (int32_t i = copiedSize; i < newSize; ++i) {
-                    entries.m_data[i] = newEntries.m_data[i];
-                }
-                entries.m_size = newSize;
-            }
+            entries = newEntries;
         }
     }
 queryDone:
@@ -666,15 +645,7 @@ void hkpBvTreeAgent::prepareCollisionPartners(
                         continue;
                     }
                     entry->m_collisionAgent->cleanup(constraintOwner);
-                    // EXE-INLINED none: hkArrayBase<T>::removeAtAndCopy (its class-type element path, which
-                    // src's hkArrayUtil does not define for this type)
-                    hkpBvAgentEntryInfo* data = entries.m_data;
-                    --entries.m_size;
-                    const int32_t index = static_cast<int32_t>(entry - data);
-                    hkMemUtil::memCpy<alignof(hkpBvAgentEntryInfo)>(
-                        data + index, data + index + 1,
-                        static_cast<int32_t>((entries.m_size - index) * sizeof(hkpBvAgentEntryInfo))
-                    );
+                    entries.removeAtAndCopy(static_cast<int32_t>(entry - entries.m_data));
                     key = k;
                     --entry;
                     --entryEnd;
@@ -830,20 +801,7 @@ void hkpBvTreeAgent::prepareCollisionPartners(
                 out->m_key = *key;
             }
 
-            // EXE-INLINED none: hkArray<T>::operator= (its class-type element path: the elements past the old size
-            // are copy-constructed)
-            {
-                hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-                const int32_t newSize = newEntries.m_size;
-                const int32_t oldSize = entries.m_size;
-                const int32_t copiedSize = newSize > oldSize ? oldSize : newSize;
-                entries._reserve(heap, newSize);
-                hkArrayBase<hkpBvAgentEntryInfo>::copy(entries.m_data, newEntries.m_data, copiedSize);
-                for (int32_t i = copiedSize; i < newSize; ++i) {
-                    entries.m_data[i] = newEntries.m_data[i];
-                }
-                entries.m_size = newSize;
-            }
+            entries = newEntries;
         }
     }
 }
