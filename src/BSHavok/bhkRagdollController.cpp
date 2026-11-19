@@ -100,7 +100,6 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 #include <bit>

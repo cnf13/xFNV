@@ -1,6 +1,5 @@
 #include "SDK/FaceGen/algs.h"
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/StrContainers.h"
 #include "SDK/FaceGen/algs.hpp"
 #include "SDK/FaceGen/assert.hpp"

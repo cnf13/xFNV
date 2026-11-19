@@ -49,7 +49,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "Reconstruction.hpp"
 
 #include <cmath>
 #include <cstdint>

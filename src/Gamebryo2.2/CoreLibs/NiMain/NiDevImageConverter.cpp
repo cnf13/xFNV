@@ -23,7 +23,6 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFilename.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiPath.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>

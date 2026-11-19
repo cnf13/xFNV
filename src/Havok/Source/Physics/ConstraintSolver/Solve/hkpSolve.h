@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Reconstruction.hpp"
-
 #include <stdint.h>
 
 class hkpConstraintInstance;

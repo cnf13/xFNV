@@ -2,7 +2,6 @@
 
 #include "BSCore/MemoryManager.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 #include <new>

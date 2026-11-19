@@ -35,7 +35,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 

@@ -6,7 +6,6 @@
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkTypeInfo.h"
 #include "Havok/Source/Common/Base/Types/hkRefVariant.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

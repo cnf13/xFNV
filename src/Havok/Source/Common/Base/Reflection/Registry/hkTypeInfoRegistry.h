@@ -4,7 +4,6 @@
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
 #include "Havok/Source/Common/Base/Object/hkSingleton.h"
 #include "Havok/Source/Common/Serialize/Util/hkFinishLoadedObjectFlag.h"
-#include "Reconstruction.hpp"
 
 // Havok SDK signature (hkBase.lib, tied by bytes,data).
 hkReferencedObject* hkTypeInfoRegistrycreate();

@@ -6,7 +6,6 @@
 #include "Havok/Source/Common/Base/Thread/JobQueue/hkJob.h"
 #include "Havok/Source/Common/Base/Thread/Semaphore/hkSemaphoreBusyWait.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

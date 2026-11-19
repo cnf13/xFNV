@@ -30,7 +30,6 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysEmitter.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/stdlib.h"
 
 #include <bit>

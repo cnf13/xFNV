@@ -2,7 +2,6 @@
 
 #include "Havok/Source/Physics/Collide/BroadPhase/hkpBroadPhaseCastCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastInput.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

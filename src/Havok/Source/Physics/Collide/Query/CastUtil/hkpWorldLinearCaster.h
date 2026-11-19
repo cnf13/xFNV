@@ -4,7 +4,6 @@
 #include "Havok/Source/Physics/Collide/BroadPhase/hkpBroadPhase.h"
 #include "Havok/Source/Physics/Collide/BroadPhase/hkpBroadPhaseCastCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
-#include "Reconstruction.hpp"
 
 #include <xmmintrin.h>
 

@@ -166,8 +166,7 @@ public:
 
     // Packs four channels into an ARGB word, red in the high byte of the low word.
     static int32_t rgbFromChars(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
-    // Packs four float channels, each scaled to a byte, the same way. The four byte colour comes back in the result
-    // register, which the seam calls as the word it is.
+    // Packs four float channels, each scaled to a byte, the same way, returning the four-byte colour as a word.
     static int32_t rgbFromFloats(float red, float green, float blue, float alpha);
     // Packs four HSV channels into an ARGB word the same way, the colour channels converted first.
     static int32_t rgbFromHSV(float h, float s, float v, float alpha);

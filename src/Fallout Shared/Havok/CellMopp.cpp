@@ -32,7 +32,6 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Shape/HeightField/SampledHeightField/hkpSampledHeightFieldBaseCinfo.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 #include <xmmintrin.h>

@@ -21,8 +21,7 @@ endif ()
 # the DLLs' calling conventions; the OS layer tells it when the display is lost, which the mouse grab follows. It
 # reads SDL's own scancode table (scancodes_windows.h), whose one include dinput_sdl/sdl answers.
 add_library(xfnv_dinput_sdl OBJECT dinput_sdl/DInputSDL.cpp dinput_sdl/XInputSDL.cpp)
-target_include_directories(xfnv_dinput_sdl PRIVATE dinput_sdl/sdl "${CMAKE_SOURCE_DIR}/external/SDL3/src/events"
-        "${CMAKE_SOURCE_DIR}/src/xfnv/seam")
+target_include_directories(xfnv_dinput_sdl PRIVATE dinput_sdl/sdl "${CMAKE_SOURCE_DIR}/external/SDL3/src/events")
 target_link_libraries(xfnv_dinput_sdl PRIVATE SDL3::Headers xfnv_platform)
 
 # bink: a stub for binkw32.dll (no video).
@@ -53,7 +52,7 @@ endif ()
 if (XFNV_D3DX)
     add_library(xfnv_d3dx9 OBJECT d3dx9/D3DX9Math.cpp d3dx9/D3DX9Pixels.cpp d3dx9/D3DX9Shader.cpp
             d3dx9/D3DX9Texture.cpp)
-    target_include_directories(xfnv_d3dx9 PRIVATE "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/xfnv/seam")
+    target_include_directories(xfnv_d3dx9 PRIVATE "${CMAKE_SOURCE_DIR}/src")
     target_link_libraries(xfnv_d3dx9 PRIVATE xfnv_zlib)
     if (MSVC)
         # NiD3DDefines.h, whose prototypes it implements, declares the functions dllimport on Windows; the
@@ -67,7 +66,7 @@ if (XFNV_D3DX)
     if (WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
         add_executable(xfnv_d3dx9_compare EXCLUDE_FROM_ALL d3dx9/test/D3DX9Compare.cpp d3dx9/test/TestWindows.cpp)
         target_include_directories(xfnv_d3dx9_compare PRIVATE "${CMAKE_SOURCE_DIR}/src"
-                "${CMAKE_SOURCE_DIR}/src/xfnv/seam" d3dx9)
+                d3dx9)
         target_compile_options(xfnv_d3dx9_compare PRIVATE -Wno-inconsistent-dllimport)
         target_compile_definitions(xfnv_d3dx9_compare PRIVATE _CRT_SECURE_NO_WARNINGS)
         target_link_libraries(xfnv_d3dx9_compare PRIVATE xfnv_d3dx9 xfnv_zlib d3d9 user32)

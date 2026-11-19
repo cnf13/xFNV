@@ -7,7 +7,6 @@
 #include "Havok/Source/Common/Base/System/Io/Reader/Buffered/hkBufferedStreamReader.h"
 #include "Havok/Source/Common/Base/System/Io/Reader/Stdio/hkStdioStreamReader.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
-#include "Reconstruction.hpp"
 
 // The function the file system uses to turn a Havok path into the platform's form, called with the path and the buffer
 // it fills. Its callee is installed at startup.

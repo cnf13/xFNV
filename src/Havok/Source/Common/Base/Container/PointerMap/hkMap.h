@@ -2,7 +2,8 @@
 
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
-#include "Reconstruction.hpp"
+
+#include <type_traits>
 
 // The key operations a map hashes and compares its keys with (hash, invalidate, isValid and equal; an invalid key is
 // K(-1)). No data.

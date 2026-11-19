@@ -55,7 +55,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SpeedTree/SpeedTreeRT.h"
 

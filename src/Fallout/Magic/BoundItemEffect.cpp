@@ -44,7 +44,6 @@
 #include "Fallout/Magic/MagicModelHitEffect.h"
 #include "Fallout/Magic/MagicTarget.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 static char bBoundItemEffectInitialized =

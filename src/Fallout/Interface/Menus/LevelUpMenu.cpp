@@ -42,7 +42,6 @@
 #include "Fallout/Interface/Menus/StartMenu.h"
 #include "Fallout/Interface/Menus/StatsMenu.h"
 #include "Fallout/Interface/Menus/TraitMenu.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 

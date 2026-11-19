@@ -5,7 +5,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "Fallout Shared/FaceGen/FffTriFileDataS.h"
 #include "Fallout Shared/ModelLoader.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
 #include "SDK/FaceGen/lastError.hpp"
 #include "SDK/MSVC/crtdefs.h"

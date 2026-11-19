@@ -47,7 +47,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/EgtFileIO_Sdk.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/FaceGen/assert.hpp"

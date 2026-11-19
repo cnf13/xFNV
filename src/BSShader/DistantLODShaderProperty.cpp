@@ -57,7 +57,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsDynamicData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 

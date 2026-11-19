@@ -1,7 +1,6 @@
 #include "SpeedTree/BillboardLeaf.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SpeedTree/Camera.h"
 #include "SpeedTree/EFileToken.h"
 #include "SpeedTree/FileAccess.h"

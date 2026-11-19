@@ -31,7 +31,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStencilProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 #include <xmmintrin.h>

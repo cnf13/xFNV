@@ -141,7 +141,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehdata.h"
 #include "SDK/MSVC/iosfwd.h"
 #include "SDK/MSVC/rtti.h"

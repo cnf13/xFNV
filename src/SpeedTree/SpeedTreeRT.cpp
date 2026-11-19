@@ -5,7 +5,6 @@
 #include "BSSystem/Archive.h"
 #include "BSSystem/BSFile.h"
 #include "BSSystem/FileFinder.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/iosfwd.h"
 #include "SDK/MSVC/stdlib.h"

@@ -61,7 +61,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/RayCollector/hkpAllRayHitCollector.h"
-#include "Reconstruction.hpp"
 
 #include <cmath>
 #include <cstdint>

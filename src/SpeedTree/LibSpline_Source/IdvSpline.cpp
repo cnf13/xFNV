@@ -2,7 +2,6 @@
 
 #include "BSCore/MemoryManager.h"
 #include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/exception.h"
 #include "SDK/MSVC/iosfwd.h"

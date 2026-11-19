@@ -4,7 +4,7 @@
 # What a game file needs to compile here: the game's headers and its compile options, without the libraries
 # xfnv_game_options links (no file a test builds calls them).
 add_library(xfnv_test_options INTERFACE)
-target_include_directories(xfnv_test_options INTERFACE "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/xfnv/seam"
+target_include_directories(xfnv_test_options INTERFACE "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/external/doctest" "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(xfnv_test_options INTERFACE $<TARGET_PROPERTY:xfnv_game_options,INTERFACE_COMPILE_OPTIONS>)
 

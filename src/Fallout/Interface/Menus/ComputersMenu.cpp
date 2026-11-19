@@ -38,7 +38,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 

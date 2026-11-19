@@ -32,7 +32,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>

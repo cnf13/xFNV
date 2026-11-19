@@ -200,7 +200,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/exception.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"

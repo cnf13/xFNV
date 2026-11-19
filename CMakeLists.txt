@@ -4,7 +4,7 @@ project(FalloutNV LANGUAGES C CXX)
 
 # One program, FalloutNV, built from src/: the game's code in the original's folder layout, with src/platform (the
 # layer between the game and the OS, and stand-ins for the DLLs the original game imports) and src/xfnv (the
-# project's own utilities: the seam header, the crash log, the debug heap). external/ holds other people's libraries;
+# project's own utilities: the crash log, the debug heap). external/ holds other people's libraries;
 # tests/ holds the unit tests, each a program of a few of the game's files and fakes of what they call.
 # The toolchain file, when one is given, chooses the platform (cmake/i686-windows-clang-cl.cmake,
 # cmake/x86_64-windows-clang-cl.cmake, cmake/x86_64-linux-clang.cmake).
@@ -50,7 +50,7 @@ include(cmake/Ccache.cmake)
 
 # What everything compiled against the game's headers shares.
 add_library(xfnv_game_options INTERFACE)
-target_include_directories(xfnv_game_options INTERFACE src src/xfnv/seam)
+target_include_directories(xfnv_game_options INTERFACE src)
 # For their headers; static libraries, so the program links only what it calls.
 target_link_libraries(xfnv_game_options INTERFACE xfnv_zlib xfnv_vorbis xfnv_platform)
 # The game calls members on null pointers and the members test `this` (BSSimpleList walks start at `this`): clang
@@ -72,6 +72,14 @@ if(MSVC)
     endif()
 else()
     target_compile_options(xfnv_game_options INTERFACE -Wall -Wextra -Wno-invalid-offsetof -ffp-contract=off)
+endif()
+
+# A 64-bit target (the x64 program): for the few places where a pointer-sized value cannot keep the exe's 32-bit form
+# (code only that build needs). The 32-bit builds never see its side.
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    add_compile_definitions(XFNV_64BIT=1)
+else()
+    add_compile_definitions(XFNV_64BIT=0)
 endif()
 
 add_subdirectory(external)

@@ -41,7 +41,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 

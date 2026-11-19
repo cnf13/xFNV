@@ -4,7 +4,6 @@
 #include "Havok/Source/Physics/Dynamics/Constraint/hkConstraintInternal.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInfo.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
-#include "Reconstruction.hpp"
 
 // What owns constraints: an island or the world. It adds up the solver memory the owned constraints need. The four
 // virtual functions are empty in the base.

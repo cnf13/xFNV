@@ -54,7 +54,6 @@
 #include "Fallout/Magic/MagicTarget.h"
 #include "Fallout/Misc/Main.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 

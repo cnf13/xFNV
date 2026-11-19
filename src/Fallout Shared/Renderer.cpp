@@ -55,7 +55,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/ADL/adl_structures.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"

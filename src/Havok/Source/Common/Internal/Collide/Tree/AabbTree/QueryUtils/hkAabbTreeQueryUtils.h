@@ -5,7 +5,6 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Internal/Collide/Tree/AabbTree/hkAabbTree.h"
 #include "Havok/Source/Common/Internal/Collide/Tree/AabbTree/hkAabbTreeData.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

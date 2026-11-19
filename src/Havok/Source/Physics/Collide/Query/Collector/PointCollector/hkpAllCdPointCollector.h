@@ -2,7 +2,6 @@
 
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
-#include "Reconstruction.hpp"
 
 // A point collector that keeps every contact point it is given in an inline array of root contact points that grows
 // on the heap.

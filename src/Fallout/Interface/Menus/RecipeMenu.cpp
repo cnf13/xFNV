@@ -57,7 +57,6 @@
 #include "Fallout/Interface/Menus/QuantityMenu.h"
 #include "Fallout/Interface/Menus/SleepWaitMenu.h"
 #include "Fallout/Interface/Menus/TutorialMenu.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/tchar.h"
 

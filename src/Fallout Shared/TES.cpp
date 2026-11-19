@@ -261,7 +261,6 @@
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/FileSystem/hkFileSystem.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/stdlib.h"

@@ -127,7 +127,6 @@
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpSurfaceInfo.h"
 #include "Havok/Source/Physics/Utilities/Deprecated/DisableEntity/hkpDisableEntityCollisionFilter.h"
 #include "Havok/Source/Physics/Utilities/Serialize/hkpDisplayBindingData.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 
 #include <bit>

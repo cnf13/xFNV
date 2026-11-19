@@ -168,7 +168,6 @@
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantom.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"

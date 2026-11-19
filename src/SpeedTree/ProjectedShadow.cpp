@@ -1,6 +1,5 @@
 #include "SpeedTree/ProjectedShadow.h"
 
-#include "Reconstruction.hpp"
 #include "SpeedTree/CIdvFilename.h"
 #include "SpeedTree/FileAccess.h"
 #include "SpeedTree/FrondEngine.h"

@@ -8,7 +8,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
-#include "Reconstruction.hpp"
 
 #include <cmath>
 #include <cstdint>

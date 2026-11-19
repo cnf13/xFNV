@@ -25,7 +25,6 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Physics/Collide/Shape/Deprecated/MultiSphere/hkpMultiSphereShape.h"
-#include "Reconstruction.hpp"
 
 NiRTTI bhkMultiSphereShape::ms_RTTI("bhkMultiSphereShape", &bhkSphereRepShape::ms_RTTI);
 

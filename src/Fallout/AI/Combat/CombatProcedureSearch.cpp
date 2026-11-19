@@ -39,7 +39,6 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 CombatProcedureSearch::CombatProcedureSearch() : eState(SEARCH_STATE_INITIALIZING), pSearchDoor(nullptr) {}

@@ -100,7 +100,6 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSemaphore.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/FanCtlFile.h"
 #include "SDK/FaceGen/FutDensity.h"
 #include "SDK/FaceGen/TriFileIO.h"

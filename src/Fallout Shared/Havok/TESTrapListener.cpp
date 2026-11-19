@@ -39,7 +39,6 @@
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantomListener.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantomType.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpSimpleShapePhantom.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 #include <xmmintrin.h>

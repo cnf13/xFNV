@@ -1804,8 +1804,8 @@ hkVector4* hkgpConvexHull::D74ED0(hkgpConvexHull::Vertex* apVertex) {
 }
 
 // KEEP: unregistered. The exe's callers keep edx live across the call (the exe body leaves it intact), which a
-// clang body behind the seam does not guarantee. The public vertex is the base of the implementation's mesh vertex:
-// the SDK downcasts to read the list link.
+// clang body does not guarantee. The public vertex is the base of the implementation's mesh vertex: the SDK downcasts
+// to read the list link.
 hkgpConvexHull::Vertex* hkgpConvexHull::D75120(hkgpConvexHull::Vertex* apVertex) {
     return static_cast<hkgpConvexHullImpl::Vertex*>(apVertex)->m_next;
 }

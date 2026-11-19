@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Reconstruction.hpp"
-
 class hkpAgentNnEntry;
 
 // The SDK's sizes of an agent entry slot and of a sector (hkpAgentNnTrack.h): 128 and 512 for 4-byte pointers (the

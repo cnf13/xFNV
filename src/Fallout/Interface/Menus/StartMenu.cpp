@@ -96,7 +96,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdlib.h"
 #include "platform/Paths.h"

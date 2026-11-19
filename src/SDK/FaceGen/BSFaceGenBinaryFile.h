@@ -15,9 +15,6 @@ public:
     void close();
 
     using FutBinaryFileC::openForRead;
-    // The hybrid's implicit default constructor, for the INLINED_LOCAL sites that reconstruct the file: the
-    // reconstruct runs the destructor (close) first, so pFile and pLoadedFile start null.
-    BSFaceGenBinaryFile() : pFile(nullptr), pLoadedFile(nullptr) {}
     BSFaceGenBinaryFile(std::string apString);
     // Reads num items of size bytes of the file's header into data; whether it read them.
     bool readHeader(void* data, uint32_t size, uint32_t num);

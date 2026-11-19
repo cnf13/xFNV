@@ -3,7 +3,6 @@
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

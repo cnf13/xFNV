@@ -1,11 +1,12 @@
 #include "BSSystemUtilities/SteamAPICallbacks.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/Steam/CCallback.h"
 #include "SDK/Steam/isteamuser.h"
 #include "SDK/Steam/isteamuserstats.h"
 #include "SDK/Steam/isteamutils.h"
+
+#include <new>
 
 // Assumes CCallback's native constructor CCallback(T* apObj, func_t aFunc).
 SteamAPICallbacks::SteamAPICallbacks()

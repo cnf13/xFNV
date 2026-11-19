@@ -1,7 +1,6 @@
 #include "SpeedTree/LeafGeometry.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 #include "SpeedTree/BillboardLeaf.h"
 #include "SpeedTree/LeafInfo.h"

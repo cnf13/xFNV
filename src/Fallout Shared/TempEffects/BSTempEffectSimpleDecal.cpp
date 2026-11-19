@@ -57,7 +57,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "Reconstruction.hpp"
 
 NiPointer<QueuedFile> BSTempEffectSimpleDecal::spPreloadedDecalTextureSets;
 NiRTTI BSTempEffectSimpleDecal::ms_RTTI("BSTempEffectSimpleDecal", &BSTempEffect::ms_RTTI);

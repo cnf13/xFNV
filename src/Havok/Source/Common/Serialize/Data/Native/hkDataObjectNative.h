@@ -5,7 +5,6 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Serialize/Data/hkDataObjectImpl.h"
 #include "Havok/Source/Common/Serialize/Data/hkDataWorld.h"
-#include "Reconstruction.hpp"
 
 class hkClassNameRegistry;
 class hkDataClassNative;

@@ -29,7 +29,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
-#include "Reconstruction.hpp"
 
 #include <new>
 

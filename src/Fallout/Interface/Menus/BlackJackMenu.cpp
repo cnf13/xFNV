@@ -62,7 +62,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShadeProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"

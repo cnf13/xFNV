@@ -6,7 +6,6 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Serialize/Packfile/hkPackfileWriter.h"
 #include "Havok/Source/Common/Serialize/Util/hkStructureLayout.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

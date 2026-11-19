@@ -21,7 +21,6 @@
 #include "Fallout Shared/TESObjectWEAP.h"
 #include "Fallout Shared/TESScript.h"
 #include "Fallout/Interface/Interface.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 

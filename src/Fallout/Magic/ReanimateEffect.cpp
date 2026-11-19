@@ -45,7 +45,6 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 // Whether the reanimate archetype took ReanimateEffect::Instantiate; stores RegisterActiveEffect's whole return byte.

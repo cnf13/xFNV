@@ -13,7 +13,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/MSVC/crtdefs.h"
 

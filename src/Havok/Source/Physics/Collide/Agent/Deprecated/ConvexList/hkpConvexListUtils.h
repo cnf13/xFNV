@@ -3,7 +3,6 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Agent/ContactMgr/hkpContactMgr.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionOutput.h"
-#include "Reconstruction.hpp"
 
 class hkpCdBody;
 

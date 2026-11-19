@@ -42,9 +42,6 @@ public:
     std::FILE* fptr;
 
 public:
-    // The hybrid's implicit default constructor, for the INLINED_LOCAL sites that reconstruct the file: the
-    // reconstruct runs the destructor (close) first, so the strings start empty and fptr null.
-    FutBinaryFileC() : m_fname(), fileId(), fptr(nullptr) {}
     FutBinaryFileC(std::basic_string<char, std::char_traits<char>, std::allocator<char>> a_fileId);
     void changeFileId(const std::basic_string<char, std::char_traits<char>, std::allocator<char>>& newFileId);
     bool seek(int32_t offsetFromBeginning);

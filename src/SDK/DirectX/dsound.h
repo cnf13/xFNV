@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Reconstruction.hpp"
 #include "SDK/DirectX/d3d9.h"
 #include "SDK/Windows/objbase.h"
 #include "SDK/Windows/unknwn.h"

@@ -4,7 +4,6 @@
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeCastCollector.h"
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpLinearCastCollisionInput.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
-#include "Reconstruction.hpp"
 
 #include <xmmintrin.h>
 

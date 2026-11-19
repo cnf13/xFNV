@@ -10,7 +10,6 @@
 #include "Havok/Source/Common/Serialize/Data/hkDataArray.h"
 #include "Havok/Source/Common/Serialize/Data/hkDataObject.h"
 #include "Havok/Source/Common/Serialize/Tagfile/hkTagfileWriter.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

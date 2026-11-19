@@ -36,7 +36,6 @@
 #include "Fallout/Interface/Menus/StartMenu.h"
 #include "Fallout/Interface/Menus/StatsMenu.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
-#include "Reconstruction.hpp"
 
 #include <cctype>
 #include <cstdint>

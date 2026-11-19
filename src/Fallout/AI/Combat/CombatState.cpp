@@ -89,7 +89,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 
 #include <cmath>

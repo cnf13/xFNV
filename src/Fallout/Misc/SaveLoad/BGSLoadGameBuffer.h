@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Reconstruction.hpp"
+#include <cstddef>
+#include <cstdint>
 
 class Actor;
 class BGSSaveLoadFile;

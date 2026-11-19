@@ -1,6 +1,5 @@
 #include "SpeedTree/WindInfo.h"
 
-#include "Reconstruction.hpp"
 #include "SpeedTree/FileAccess.h"
 #include "SpeedTree/LibGlobals_Source/IdvGlobals.h"
 

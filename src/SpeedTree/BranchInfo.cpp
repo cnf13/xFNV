@@ -1,7 +1,6 @@
 #include "SpeedTree/BranchInfo.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SpeedTree/EFileToken.h"
 #include "SpeedTree/FileAccess.h"
 #include "SpeedTree/LibGlobals_Source/IdvGlobals.h"

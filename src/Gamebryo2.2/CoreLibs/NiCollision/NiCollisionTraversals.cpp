@@ -30,7 +30,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShapeData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
-#include "Reconstruction.hpp"
 
 #include <cmath>
 

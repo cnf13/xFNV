@@ -8,8 +8,7 @@
 #include "SDK/MSVC/iosfwd.h"
 
 // rt: runtime support the game relies on. Here the VC9 CRT's runtime_error (<stdexcept>, statically linked) with the
-// exe's layout: the base of SpeedTree's IdvFileError, built in place by XFNV_INLINED_LOCAL sites, which std's has
-// not (no default constructor). logic_error and the classes derived from it are std's.
+// exe's layout: the base of SpeedTree's IdvFileError. logic_error and the classes derived from it are std's.
 namespace rt {
 
     // The CRT's std::runtime_error (PDB: std::runtime_error; IDA: std::runtime_error): an exception holding its message
@@ -23,9 +22,6 @@ namespace rt {
         explicit runtime_error(const std::string& _Message);
         // The exception copy, runtime_error's vftable, then the string copy (thiscall, ret 4, 0xACA270).
         runtime_error(const runtime_error& _That);
-        // The native default constructor the INLINED_LOCAL sites need (they build the base parts by hand): the hybrid's
-        // storage is constructed by nothing.
-        runtime_error() = default;
         // runtime_error's vftable, the string freed, then ~exception. Inline (defined below the class): the exe has no
         // out-of-line copy of its own, it is inlined into ~IdvFileError (0xB09780) and the deleting destructors
         // (IdvFileError's 0xB09730), so an out-of-line src copy would be a call the exe does not make.

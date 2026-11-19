@@ -6,7 +6,6 @@
 #include "BSHavok/bhkSerialized.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
-#include "Reconstruction.hpp"
 
 class bhkShape;
 class CFilter;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdBodyPairCollector.h"
-#include "Reconstruction.hpp"
 
 // Stops collecting after the first colliding body pair.
 class hkpFlagCdBodyPairCollector : public hkpCdBodyPairCollector {

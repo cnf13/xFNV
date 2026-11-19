@@ -4,7 +4,6 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
-#include "Reconstruction.hpp"
 
 // A point collector that keeps the closest contact point it is given; m_hitPoint's m_rootCollidableA stays null until
 // there is one.

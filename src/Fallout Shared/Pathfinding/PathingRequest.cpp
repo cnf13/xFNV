@@ -36,7 +36,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 ActorLockData::ActorLockData(Actor* apActor)

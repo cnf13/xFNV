@@ -9,7 +9,6 @@
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
-#include "Reconstruction.hpp"
 
 class hkaChunkCache;
 class hkQsTransform;

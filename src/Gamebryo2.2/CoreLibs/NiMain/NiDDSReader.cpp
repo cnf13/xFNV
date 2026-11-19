@@ -10,7 +10,6 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiCriticalSection.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 

@@ -28,7 +28,6 @@
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpLinearCastInput.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpAllCdPointCollector.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 #include <xmmintrin.h>

@@ -1,5 +1,4 @@
-# The project's own utilities, which are not the game's code: the seam header src is still written through (seam/, an
-# include folder of its own), the crash log and the debug heap.
+# The project's own utilities, which are not the game's code: the crash log and the debug heap.
 
 if (WIN32)
     set(XFNV_PLATFORM Windows)

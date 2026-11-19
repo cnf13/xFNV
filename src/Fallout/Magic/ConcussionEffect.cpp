@@ -29,7 +29,6 @@
 #include "Fallout/Magic/CureEffect.h"
 #include "Fallout/Magic/MagicCaster.h"
 #include "Fallout/Magic/MagicTarget.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 #include <cstdint>

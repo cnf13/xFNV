@@ -41,7 +41,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
-#include "Reconstruction.hpp"
 
 SaveGameFormInfo::SaveGameFormInfo()
   : iFormIDMapOffset(0), iHistoryOffset(0), iInitialGlobalDataOffset(0), iFormDataOffset(0), iFinalGlobalDataOffset(0),

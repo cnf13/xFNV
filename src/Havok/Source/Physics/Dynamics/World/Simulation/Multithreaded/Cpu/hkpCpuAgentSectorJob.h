@@ -3,7 +3,6 @@
 #include "Havok/Source/Common/Base/Thread/JobQueue/hkJobQueue.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
 #include "Havok/Source/Physics/Dynamics/World/CommandQueue/hkpPhysicsCommandQueue.h"
-#include "Reconstruction.hpp"
 
 struct hkpMtThreadStructure;
 

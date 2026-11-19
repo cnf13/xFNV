@@ -1,7 +1,6 @@
 #include "SpeedTree/TreeEngine.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/iosfwd.h"
@@ -27,6 +26,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 using SIdvLeafTextureVector = std::vector<SIdvLeafTexture, std::allocator<SIdvLeafTexture>>;

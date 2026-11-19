@@ -36,7 +36,6 @@
 #include "Havok/Source/Physics/Collide/BroadPhase/hkpBroadPhase.h"
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/RayCollector/hkpClosestRayHitCollector.h"
-#include "Reconstruction.hpp"
 
 #include <cmath>
 #include <new>

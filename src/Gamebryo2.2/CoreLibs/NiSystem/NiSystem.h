@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/direct.h"
 #include "SDK/MSVC/ehvec.h"

@@ -2,7 +2,6 @@
 
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpRayHitCollector.h"
-#include "Reconstruction.hpp"
 
 // A ray hit collector that keeps only the nearest hit.
 class hkpClosestRayHitCollector : public hkpRayHitCollector {

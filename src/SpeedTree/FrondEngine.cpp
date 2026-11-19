@@ -1,7 +1,6 @@
 #include "SpeedTree/FrondEngine.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/exception.h"
 #include "SDK/MSVC/string.h"

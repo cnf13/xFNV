@@ -1,7 +1,6 @@
 #include "SDK/FaceGen/EgtFileIO_Sdk.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include <vector>

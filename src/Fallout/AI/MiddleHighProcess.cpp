@@ -154,7 +154,6 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/StateMachine/hkpCharacterStateManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>

@@ -7,7 +7,6 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiPosKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiStepPosKey.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>

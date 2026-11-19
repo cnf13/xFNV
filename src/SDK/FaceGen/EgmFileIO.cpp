@@ -2,7 +2,6 @@
 #include "BSCore/MemoryManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
-#include "Reconstruction.hpp"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/MSVC/crtdefs.h"

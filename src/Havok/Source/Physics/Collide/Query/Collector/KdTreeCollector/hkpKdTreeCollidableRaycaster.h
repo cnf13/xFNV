@@ -2,7 +2,6 @@
 
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeBundleCastCollector.h"
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeCastCollector.h"
-#include "Reconstruction.hpp"
 
 class hkpRayCollidableFilter;
 class hkpRayHitCollector;

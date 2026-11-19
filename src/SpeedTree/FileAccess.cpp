@@ -1,7 +1,6 @@
 #include "SpeedTree/FileAccess.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/crtdefs.h"
 
 #include <memory>

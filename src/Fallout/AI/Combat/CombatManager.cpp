@@ -50,7 +50,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
-#include "Reconstruction.hpp"
 
 // The game settings this file defines, with their IDs and values, in their initialization order.
 SettingT<INISettingCollection> bDebugCombatDetectionEvents("bDebugCombatDetectionEvents:Combat", false);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Reconstruction.hpp"
 #include "SDK/Windows/windef.h"
 
 // The Windows SDK v6.0A <winsock2.h> declarations the exe's code uses (WS2_32.dll), with the SDK's names and 32-bit

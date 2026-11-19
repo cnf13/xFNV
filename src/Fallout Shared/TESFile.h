@@ -7,7 +7,6 @@
 #include "Fallout Shared/TESLoadScreenType.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/stdlib.h"
 
 #include <cstring>

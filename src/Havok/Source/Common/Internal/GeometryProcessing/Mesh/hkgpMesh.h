@@ -7,7 +7,6 @@
 #include "Havok/Source/Common/Internal/Collide/Tree/AabbTree/hkAabbTreeData.h"
 #include "Havok/Source/Common/Internal/ConvexHull/hkPlaneEquationUtil.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/AbstractMesh/hkgpAbstractMesh.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 #include <xmmintrin.h>

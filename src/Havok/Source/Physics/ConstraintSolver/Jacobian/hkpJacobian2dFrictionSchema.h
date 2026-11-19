@@ -2,7 +2,6 @@
 
 #include "Havok/Source/Physics/ConstraintSolver/Jacobian/hkpJacobianElement.h"
 #include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolve.h"
-#include "Reconstruction.hpp"
 
 class hkpSolverResults;
 

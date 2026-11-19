@@ -156,7 +156,6 @@
 #include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpRootCdPoint.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>

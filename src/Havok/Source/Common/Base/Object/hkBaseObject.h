@@ -3,7 +3,6 @@
 // After the class: hkClass.h reaches hkReferencedObject.h (through hkArray.h), which derives from hkBaseObject.
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Serialize/Util/hkFinishLoadedObjectFlag.h"
-#include "Reconstruction.hpp"
 
 class hkTypeInfo;
 

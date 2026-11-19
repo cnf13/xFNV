@@ -9,7 +9,6 @@
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 

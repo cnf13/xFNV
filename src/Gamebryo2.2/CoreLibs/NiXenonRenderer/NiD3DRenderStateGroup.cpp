@@ -10,7 +10,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTSet.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgram.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DTextureStageGroup.h"
-#include "Reconstruction.hpp"
 
 #include <cstdint>
 #include <xmmintrin.h>

@@ -83,7 +83,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 #include <cstdint>

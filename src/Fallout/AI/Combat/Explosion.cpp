@@ -127,7 +127,6 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpSimpleShapePhantom.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>

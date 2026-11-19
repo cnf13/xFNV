@@ -18,7 +18,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>

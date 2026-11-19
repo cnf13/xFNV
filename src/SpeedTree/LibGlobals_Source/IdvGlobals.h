@@ -13,8 +13,6 @@ public:
     // text, + "]".
     using MessageStrings = std::string[4];
 
-    // The default constructor the INLINED_LOCAL sites need (ParseTreeInfo's unused error local): runtime_error's.
-    IdvFileError() = default;
     // Builds the runtime_error message from strDetails + " [" + the error text (strerror(errno) when
     // bAppendSystemError, else empty) + "]".
     IdvFileError(const std::string& strDetails, bool bAppendSystemError);

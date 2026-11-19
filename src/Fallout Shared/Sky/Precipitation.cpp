@@ -128,7 +128,6 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysRotationModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysSphereEmitter.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 

@@ -7,7 +7,6 @@
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInfo.h"
 #include "Havok/Source/Physics/Dynamics/World/CommandQueue/hkpPhysicsCommandQueue.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 

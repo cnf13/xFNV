@@ -39,7 +39,6 @@
 #include "Fallout Shared/TESWorldSpace.h"
 #include "Fallout/AI/PlayerCharacter.h"
 #include "Fallout/Interface/Interface.h"
-#include "Reconstruction.hpp"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 

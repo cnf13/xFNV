@@ -3,7 +3,6 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "Havok/Source/Common/Base/Types/hkTypeTraits.h"
-#include "Reconstruction.hpp"
 
 #include <cmath>
 #include <stdint.h>

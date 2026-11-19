@@ -7,7 +7,6 @@
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Stopwatch/hkStopwatch.h"
 #include "Havok/Source/Common/Internal/Collide/Tree/AabbTree/QueryUtils/hkAabbTreeQueryUtils.h"
-#include "Reconstruction.hpp"
 
 #include <stdint.h>
 #include <xmmintrin.h>

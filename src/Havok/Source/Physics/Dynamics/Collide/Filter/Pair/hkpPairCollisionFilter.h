@@ -2,7 +2,6 @@
 
 #include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
 #include "Havok/Source/Physics/Collide/Filter/hkpCollisionFilter.h"
-#include "Reconstruction.hpp"
 
 class hkpEntity;
 
