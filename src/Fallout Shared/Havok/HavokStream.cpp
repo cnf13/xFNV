@@ -51,8 +51,7 @@ void KillHavokSystem() {
 
 void hkDeallocateChars(void* apPtr) {
     hkMemoryRouter* instance = &hkMemoryRouter::getInstance();
-    void* thread = instance->GetHeap();
-    hkMemoryRouter::easyFree(*static_cast<hkMemoryAllocator*>(thread), apPtr);
+    hkMemoryRouter::easyFree(*static_cast<hkMemoryAllocator*>(instance->GetHeap()), apPtr);
 }
 
 void destructElements(int32_t a1, int32_t a2) {

@@ -1210,14 +1210,14 @@ void TESForm::SetFile(TESFile* apFile) {
 }
 
 uint32_t TESForm::GetDataSizeAdded() {
-    void* pUses = dynamic_cast<TESUsesForm*>(this);
-    void* pValue = dynamic_cast<TESValueForm*>(this);
-    void* pHealth = dynamic_cast<TESHealthForm*>(this);
-    void* pWeight = dynamic_cast<TESWeightForm*>(this);
-    void* pQuality = dynamic_cast<TESQualityForm*>(this);
-    void* pAttackDamage = dynamic_cast<TESAttackDamageForm*>(this);
+    TESUsesForm* pUses = dynamic_cast<TESUsesForm*>(this);
+    TESValueForm* pValue = dynamic_cast<TESValueForm*>(this);
+    TESHealthForm* pHealth = dynamic_cast<TESHealthForm*>(this);
+    TESWeightForm* pWeight = dynamic_cast<TESWeightForm*>(this);
+    TESQualityForm* pQuality = dynamic_cast<TESQualityForm*>(this);
+    TESAttackDamageForm* pAttackDamage = dynamic_cast<TESAttackDamageForm*>(this);
     TESAttributes* pAttributes = dynamic_cast<TESAttributes*>(this);
-    void* pClipRounds = dynamic_cast<BGSClipRoundsForm*>(this);
+    BGSClipRoundsForm* pClipRounds = dynamic_cast<BGSClipRoundsForm*>(this);
 
     uint32_t iSize = 0;
     if (pUses) {

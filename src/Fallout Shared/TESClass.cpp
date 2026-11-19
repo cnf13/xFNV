@@ -177,8 +177,8 @@ void TESClass::Copy(TESForm* apCopy) {
     TESClass* cl = dynamic_cast<TESClass*>(apCopy);
     if (cl) {
         CopyAllComponents(apCopy);
-        void* Extra = &cl->data;
-        ourMemcpy(&data, Extra, sizeof(data));
+        CLASS_DATA* pSourceData = &cl->data;
+        ourMemcpy(&data, pSourceData, sizeof(data));
     }
 }
 
@@ -190,8 +190,7 @@ bool TESClass::Compare(TESForm* apCompare) {
     if (CompareAllComponents(pComp)) {
         return true;
     }
-    void* Extra = &pComp->data;
-    return std::memcmp(&data, Extra, sizeof(data)) != 0;
+    return std::memcmp(&data, &pComp->data, sizeof(data)) != 0;
 }
 
 void TESClass::SetTrainingSkill(ActorValue::Index aeSkill) {

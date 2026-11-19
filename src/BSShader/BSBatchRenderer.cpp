@@ -1032,9 +1032,8 @@ void BSBatchRenderer::StartGroupingAlphas(
                     NiTAbstractPoolAllocator<uint32_t>::ms_kSpinLock.uiOwningThread = 0;
                 }
                 // The pool's node is the list's item (the same 12-byte node the allocator hands out).
-                void* pNodeMemory = pFree;
                 NiTListItem<BSBatchRenderer::GeometryGroup*>* pNode =
-                    static_cast<NiTListItem<BSBatchRenderer::GeometryGroup*>*>(pNodeMemory);
+                    reinterpret_cast<NiTListItem<BSBatchRenderer::GeometryGroup*>*>(pFree);
                 pNode->m_element = pGroup;
                 pNode->m_pkNext = pPos;
                 pNode->m_pkPrev = pPos->m_pkPrev;

@@ -18,10 +18,10 @@ class InterfacedClass {
 public:
     struct BaseInterface;
 
-    // The common part of the per-thread interfaces: the map that handed it out (a LockFreeMap of some
-    // instantiation, which is a template here).
+    // The common part of the per-thread interfaces: the map or queue that handed it out (a LockFreeMap or
+    // LockFreeQueue of some instantiation, which is a template here).
     struct BaseInterface {
-        void* pOwner;
+        InterfacedClass* pOwner;
     };
 
     InterfacedClass();

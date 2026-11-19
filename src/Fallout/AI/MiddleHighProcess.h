@@ -586,7 +586,7 @@ public:
     // 0x1AC arrows stuck in the actor
     BSSimpleList<ArrowProjectile*>* pAttachedArrowList;
     // 0x1B0 limbs waiting to be hidden
-    BSSimpleList<void*> DeferredHideLimbList;
+    BSSimpleList<DeferredHideLimb*> DeferredHideLimbList;
     // 0x1B8 the active magic effects
     BSSimpleList<ActiveEffect*>* pActiveEffectList;
     // 0x1BC the target of the spell the actor casts

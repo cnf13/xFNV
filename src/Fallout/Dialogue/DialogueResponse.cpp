@@ -128,8 +128,8 @@ void DialogueResponse::SaveGame_0() {
     pSaveLoadGameOLD->SaveGameDataOLD(&ctextLength, 1u);
     if (ctextLength) {
         uint32_t v3 = ctextLength;
-        void* v1 = cText.pString;
-        pSaveLoadGameOLD->SaveGameDataOLD(v1, v3);
+        char* pText = cText.pString;
+        pSaveLoadGameOLD->SaveGameDataOLD(pText, v3);
     }
     cvoiceLength = cVoice.ByteLength();
     pSaveLoadGameOLD->SaveGameDataOLD(&cvoiceLength, 1u);

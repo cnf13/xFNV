@@ -251,8 +251,7 @@ public:
     public:
         NiGeometryData* m_pkData;
         NiSkinInstance* m_pkSkin;
-        // NiSkinPartition::Partition
-        void* m_pkPartition;
+        NiSkinPartition::Partition* m_pkPartition;
         NiD3DShaderDeclaration* m_pkShaderDecl;
         uint32_t m_uiBonesPerPartition;
         uint32_t m_uiBonesPerVertex;
@@ -282,7 +281,7 @@ public:
         }
 
         NiGeometry* m_pkGeometry;
-        void* m_pkCurrPartition;
+        NiSkinPartition::Partition* m_pkCurrPartition;
         NiGeometryBufferData* m_pkBuffData;
         BatchedObject* m_pkNext;
 

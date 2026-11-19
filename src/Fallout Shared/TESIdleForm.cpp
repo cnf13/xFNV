@@ -193,7 +193,6 @@ TESForm* TESIdleForm::CreateDuplicateForm(bool abCreateEditorID, NiTPointerMap<T
     if (!apCopyMap->GetAt(pParentIdle, *a2) || !a2[0]) {
         a2[0] = pParentIdle;
     }
-    void* aeDifficulty = a2[0];
     pdupidle->SetParentIdle(static_cast<TESIdleForm*>(a2[0]));
     a2[0] = nullptr;
     if (!apCopyMap->GetAt(pPrevIdle, *a2) || !a2[0]) {

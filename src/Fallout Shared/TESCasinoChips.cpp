@@ -355,28 +355,28 @@ void TESCasino::Copy(TESForm* apCopy) {
     TESModelTextureSwap* nthModel;
     int32_t index;
     int32_t i;
-    void* v11 = dynamic_cast<TESCasino*>(apCopy);
-    if (v11) {
-        TESForm::CopyAllComponents(static_cast<TESForm*>(v11));
+    TESCasino* pCasino = dynamic_cast<TESCasino*>(apCopy);
+    if (pCasino) {
+        TESForm::CopyAllComponents(pCasino);
         for (i = 0; i < 10; ++i) {
-            nthModel = static_cast<TESCasino*>(v11)->GetModel(i);
+            nthModel = pCasino->GetModel(i);
             v2 = nthModel->GetModel();
             (&modelArrayList[i])->SetModel(v2);
         }
         for (index = 0; index < 11; ++index) {
-            nthSlotReel = static_cast<TESCasino*>(v11)->GetTexture(index);
+            nthSlotReel = pCasino->GetTexture(index);
             fullName_0 = nthSlotReel->TESTexture::GetTextureName();
             (&textureArrayList[index])->TESTexture::SetTextureName(fullName_0);
         }
-        if (static_cast<TESCasino*>(v11)->GetQuest()) {
-            winningsQuest = static_cast<TESCasino*>(v11)->GetQuest();
+        if (pCasino->GetQuest()) {
+            winningsQuest = pCasino->GetQuest();
             data.questID = winningsQuest->TESForm::GetFormID();
         }
         else {
             data.questID = (uint32_t)0;
         }
-        data = *static_cast<TESCasino*>(v11)->GetData();
-        formType = static_cast<TESCasino*>(v11)->GetFormType();
+        data = *pCasino->GetData();
+        formType = pCasino->GetFormType();
         TESForm::SetFormType(formType);
     }
 }

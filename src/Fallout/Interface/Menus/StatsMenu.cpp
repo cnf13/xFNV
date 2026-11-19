@@ -141,8 +141,7 @@ int32_t StatsMenu::StatusDataList::Flush() {
         if (static_cast<uint8_t>(result)) {
             break;
         }
-        void* Block = m_item;
-        ourFree(Block);
+        ourFree(m_item);
         RemoveHead();
     }
     return result;

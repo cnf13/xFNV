@@ -1212,9 +1212,8 @@ void bhkCharacterController::characterInteractionCallback(
     hkpCharacterProxy* apOtherProxy,
     const hkContactPoint& arContact
 ) {
-    bhkCharacterController* pcc = static_cast<bhkCharacterController*>(
-        static_cast<bhkCharacterProxy*>(static_cast<ahkpCharacterProxy*>(apOtherProxy)->m_userData)
-    );
+    bhkCharacterController* pcc =
+        static_cast<bhkCharacterController*>(static_cast<ahkpCharacterProxy*>(apOtherProxy)->m_userData);
     apOtherProxy->addReference();
     hkpCharacterProxy* pOldBumped = spBumpedCharProxy.val();
     if (pOldBumped) {
@@ -1452,9 +1451,7 @@ bhkCharacterController::~bhkCharacterController() {
 bhkCharacterController* bhkCharacterController::GetBumpedCharacterController() {
     hkpCharacterProxy* pProxy = spBumpedCharProxy.val();
     if (pProxy) {
-        return static_cast<bhkCharacterController*>(
-            static_cast<bhkCharacterProxy*>(static_cast<ahkpCharacterProxy*>(pProxy)->m_userData)
-        );
+        return static_cast<bhkCharacterController*>(static_cast<ahkpCharacterProxy*>(pProxy)->m_userData);
     }
 
     return nullptr;
@@ -1682,7 +1679,7 @@ void bhkCharacterController::SetWorld(bhkWorld* apWorld) {
     hkpShapePhantom* pShapePhantom = pProxy != nullptr ? pProxy->GetShapePhantom() : nullptr;
     // The Havok world the phantom is in, and the bhkWorld it belongs to, kept as ahkpWorld's user data at +0x350.
     ahkpWorld* pWorld = static_cast<ahkpWorld*>(pShapePhantom->m_world);
-    bhkWorld* pOldWorld = pWorld != nullptr ? static_cast<bhkWorld*>(pWorld->m_userData) : nullptr;
+    bhkWorld* pOldWorld = pWorld != nullptr ? pWorld->m_userData : nullptr;
     if (pOldWorld == apWorld) {
         return;
     }
@@ -2289,7 +2286,7 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     }
     ahkpWorld* m_world = static_cast<ahkpWorld*>(ShapePhantom->m_world);
     if (m_world) {
-        pw = static_cast<bhkWorld*>(m_world->m_userData);
+        pw = m_world->m_userData;
     }
     else {
         pw = nullptr;
@@ -2319,7 +2316,6 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
     NiPoint3 top;
     NiPoint3 bottom;
     hkListShapeCinfo lsi;
-    void* v125;
     float v129;
     NiPoint3 top2;
     alignas(16) NiPoint3 bottom2;
@@ -2496,7 +2492,6 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                                     bhkCapsuleShape* v74 = static_cast<bhkCapsuleShape*>(
                                         NiMemObject::operator new(sizeof(bhkCapsuleShape))
                                     );
-                                    v125 = (void*)v74;
                                     if (v74) {
                                         Convex = ::new (v74) bhkCapsuleShape(top, bottom, frad);
                                     }
@@ -2516,7 +2511,6 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                                     bhkCapsuleShape* v77 = static_cast<bhkCapsuleShape*>(
                                         NiMemObject::operator new(sizeof(bhkCapsuleShape))
                                     );
-                                    v125 = (void*)v77;
                                     if (v77) {
                                         v78 = ::new (v77) bhkCapsuleShape(top, bottom, frad);
                                     }
@@ -2577,7 +2571,6 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                         top2.z = v119 - 1.0;
                         bhkCapsuleShape* v47 =
                             static_cast<bhkCapsuleShape*>(NiMemObject::operator new(sizeof(bhkCapsuleShape)));
-                        v125 = (void*)v47;
                         if (v47) {
                             float v104 = v119 - 1.0;
                             pcs1 = (bhkShape*)::new (v47) bhkCapsuleShape(top, top2, v104);
@@ -2592,7 +2585,6 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                         bottom2.z = v119 - 1.0;
                         bhkCapsuleShape* v49 =
                             static_cast<bhkCapsuleShape*>(NiMemObject::operator new(sizeof(bhkCapsuleShape)));
-                        v125 = (void*)v49;
                         if (v49) {
                             float v105 = v119 - 1.0;
                             pcs2 = (bhkShape*)::new (v49) bhkCapsuleShape(bottom, bottom2, v105);
@@ -2656,7 +2648,6 @@ void bhkCharacterController::InitShapes(bhkCharacterControllerCinfo& arInfo) {
                         lsi.m_childShapeFilterInfo.m_data[lsi.m_childShapeFilterInfo.m_size++] = 0;
                         stSizeInBytes->eShapeType = bhkCharacterController::ST_CAPSULE;
                         bhkListShape* v61 = static_cast<bhkListShape*>(NiMemObject::operator new(sizeof(bhkListShape)));
-                        v125 = (void*)v61;
                         if (v61) {
                             v62 = ::new (v61) bhkListShape(lsi);
                         }
@@ -2811,7 +2802,6 @@ LABEL_108:;
         hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
         hkpSphereShape* v87 = static_cast<hkpSphereShape*>(Instance->m_heap->blockAlloc(sizeof(hkpSphereShape)));
         v87->m_memSizeAndFlags = sizeof(hkpSphereShape);
-        v125 = (void*)v87;
         float afRadius = v103 * fBS2HkScaleSC;
         hkpSphereShape* pshpere = ::new (v87) hkpSphereShape(afRadius);
         sspci.m_shape = (hkpShape*)pshpere;
@@ -2821,9 +2811,7 @@ LABEL_108:;
         const uint8_t ucPadding = static_cast<uint8_t>(0x10 - (reinterpret_cast<uintptr_t>(pMemory) & 0xF));
         pMemory += ucPadding;
         pMemory[-1] = ucPadding;
-        void* v91 = pMemory;
-        v125 = v91;
-        bhkWorldObject* v92 = (bhkWorldObject*)::new (v91) bhkCollisionBox(&sspci, v2);
+        bhkWorldObject* v92 = (bhkWorldObject*)::new (pMemory) bhkCollisionBox(&sspci, v2);
         bhkWorldObject* spCollisionBox = v2->spCollisionBox;
         if (spCollisionBox != v92) {
             if (spCollisionBox) {
@@ -3344,7 +3332,7 @@ bhkCharacterController* bhkCharacterController::Getbhk(hkpPhantom* apPhantom) {
                                                  hkpWorldObject::MULTI_THREADING_CHECKS_ENABLE
                                              )
                                              .getPtr());
-    return static_cast<bhkCharacterController*>(static_cast<bhkCharacterProxy*>(pProxy->m_userData));
+    return static_cast<bhkCharacterController*>(pProxy->m_userData);
 }
 
 // Takes the support surface's layer, velocity and material from the manifold's collidable B, unless the

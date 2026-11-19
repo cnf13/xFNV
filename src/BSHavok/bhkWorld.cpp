@@ -2782,9 +2782,7 @@ void bhkPhantomOverlapListener::KillInstance() {
     TLSData* pTLS = GetThreadTLSData();
     MEM_CONTEXT eMemContext = pTLS->eMemContext;
     pTLS->eMemContext = MEM_CONTEXT_HAVOK;
-    if (bhkPhantomOverlapListener::pListener) {
-        delete static_cast<hkpPhantomOverlapListener*>(bhkPhantomOverlapListener::pListener);
-    }
+    delete bhkPhantomOverlapListener::pListener;
     pTLS->eMemContext = eMemContext;
 }
 
@@ -3201,6 +3199,6 @@ void cleanupLoadedObjecthkpProjectileGun(void* p) {
 
 ahkpWorld::~ahkpWorld() {}
 
-void* ahkpWorld::getUserData() {
+bhkWorld* ahkpWorld::getUserData() {
     return m_userData;
 }

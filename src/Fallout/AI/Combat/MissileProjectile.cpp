@@ -894,8 +894,7 @@ void MissileProjectile::ProcessStick() {
                         // The list's address is tested for null, which it never is, as the game does.
                         BSSimpleList<void*>* plist = &ReferenceProcessLists.ProjectilePostProcessList;
                         if (plist) {
-                            void* item = this;
-                            plist->AddHead(item);
+                            plist->AddHead(this);
                         }
                     }
                     ptargetRB->SetFlags(256u, true);

@@ -34,11 +34,10 @@ void BGSRepairItemList::CopyComponent(BaseFormComponent* apCopyFC) {
 }
 
 bool BGSRepairItemList::CompareComponent(BaseFormComponent* apCompareFC) {
-    void* v5 = dynamic_cast<BGSRepairItemList*>(apCompareFC);
-    if (!v5) {
+    BGSRepairItemList* pCompare = dynamic_cast<BGSRepairItemList*>(apCompareFC);
+    if (!pCompare) {
         return true;
     }
-    BGSRepairItemList* pCompare = static_cast<BGSRepairItemList*>(v5);
     return pCompare->pListForm != pListForm;
 }
 

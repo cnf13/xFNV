@@ -486,7 +486,6 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
     else {
         ptextures = nullptr;
     }
-    void* v64 = ptextures;
     uint16_t* pvertOrder = static_cast<uint16_t*>(_NiMalloc(6 * sizeof(uint16_t)));
     NiPoint3* v5 = ::new (&dst) NiPoint3(0.0f, 0.01f, 0.0f);
     *pvertices = *v5;

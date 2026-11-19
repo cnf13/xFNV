@@ -143,8 +143,7 @@ public:
 
     uint32_t m_uiAdapter;
     D3DADAPTER_IDENTIFIER9 m_kAdapterIdentifier;
-    // The elements are ModeDesc pointers.
-    NiTPrimitiveArray<void*> m_kModeList;
+    NiTPrimitiveArray<ModeDesc*> m_kModeList;
     NiDX9DeviceDesc* m_pkHALDeviceDesc;
     NiDX9DeviceDesc* m_pkREFDeviceDesc;
 };

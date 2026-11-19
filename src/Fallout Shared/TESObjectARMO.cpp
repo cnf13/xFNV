@@ -491,10 +491,7 @@ void TESObjectARMO::Copy(TESForm* apCopy) {
                 ourFree(rpItem);
             }
             this->pFoleySoundList->RemoveAll();
-            void* pFoleySoundList = this->pFoleySoundList;
-            if (pFoleySoundList) {
-                delete static_cast<BSSimpleList<ActiveEffect*>*>(pFoleySoundList);
-            }
+            delete this->pFoleySoundList;
         }
 
         bIsFoleyBase = parmo->bIsFoleyBase;

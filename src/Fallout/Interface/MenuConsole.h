@@ -7,6 +7,7 @@
 #include <cstdarg>
 
 class NiSourceTexture;
+class ScriptCompiler;
 
 // The console: printed lines, input history and the batch recorder.
 class MenuConsole {
@@ -45,7 +46,7 @@ public:
     static void Free();
 
     // The script compiler, the printed lines, the input history and the console metrics.
-    void* pConsoleCompiler;
+    ScriptCompiler* pConsoleCompiler;
     NiTList<BSStringT<char>> xStrings;
     NiTList<BSStringT<char>> xInputs;
     int32_t iInputsPos;

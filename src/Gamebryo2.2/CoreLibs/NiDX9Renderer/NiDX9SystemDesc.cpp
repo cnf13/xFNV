@@ -381,7 +381,7 @@ NiDX9AdapterDesc::NiDX9AdapterDesc(IDirect3D9* pkD3D9, uint32_t uiAdapter, NiTPo
             // Every listed mode of this format and size gains the refresh rate.
             ModeDesc* pkFound = nullptr;
             for (uint32_t i = 0; i < m_kModeList.m_usSize; ++i) {
-                ModeDesc* pkMode = static_cast<ModeDesc*>(m_kModeList.m_pBase[i]);
+                ModeDesc* pkMode = m_kModeList.m_pBase[i];
                 if (pkMode && pkMode->m_eD3DFormat == eFormat && pkMode->m_uiWidth == kMode.Width &&
                     pkMode->m_uiHeight == kMode.Height) {
                     pkFound = pkMode;
@@ -411,7 +411,7 @@ NiDX9AdapterDesc::NiDX9AdapterDesc(IDirect3D9* pkD3D9, uint32_t uiAdapter, NiTPo
 
 NiDX9AdapterDesc::~NiDX9AdapterDesc() {
     for (uint32_t i = 0; i < m_kModeList.m_usSize; ++i) {
-        delete static_cast<ModeDesc*>(m_kModeList.m_pBase[i]);
+        delete m_kModeList.m_pBase[i];
     }
     delete m_pkHALDeviceDesc;
     delete m_pkREFDeviceDesc;
@@ -444,9 +444,9 @@ const NiDX9AdapterDesc::ModeDesc* NiDX9AdapterDesc::ValidateFullscreenMode(
     uint32_t v8 = 0;
     if (m_kModeList.m_usSize) {
         do {
-            NiDX9AdapterDesc::ModeDesc* v9 = static_cast<NiDX9AdapterDesc::ModeDesc*>(m_kModeList.m_pBase[v8]);
+            NiDX9AdapterDesc::ModeDesc* v9 = m_kModeList.m_pBase[v8];
             if ((v9) && (v9->m_eD3DFormat == aeFormat && v9->m_uiWidth == auiWidth && v9->m_uiHeight == auiHeight)) {
-                v7 = static_cast<NiDX9AdapterDesc::ModeDesc*>(m_kModeList.m_pBase[v8]);
+                v7 = m_kModeList.m_pBase[v8];
                 aruiRefreshRate = v9->GetClosestRefreshRate(aruiRefreshRate);
             }
 
@@ -467,7 +467,7 @@ uint32_t NiDX9AdapterDesc::GetModeCount() {
 }
 
 NiDX9AdapterDesc::ModeDesc* NiDX9AdapterDesc::GetMode(uint32_t aiIndex) {
-    return static_cast<ModeDesc*>(m_kModeList[aiIndex]);
+    return m_kModeList[aiIndex];
 }
 
 bool NiDX9AdapterDesc::CanDeviceRenderWindowed(D3DDEVTYPE aeDevType) {

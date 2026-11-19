@@ -4,6 +4,7 @@
 
 #include <xmmintrin.h>
 
+class bhkCharacterProxy;
 class bhkCharacterProxyCinfo;
 
 // Bethesda's subclass of the Havok character proxy: it adds the pointer to the bhkCharacterProxy that owns it.
@@ -16,5 +17,5 @@ public:
     hkpShapePhantom* GetShapePhantom();
     void RemoveEntityListeners();
 
-    void* m_userData;
+    bhkCharacterProxy* m_userData;
 };

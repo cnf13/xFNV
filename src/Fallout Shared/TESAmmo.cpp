@@ -331,8 +331,8 @@ void TESAmmo::Copy(TESForm* apCopy) {
     if (pCopy) {
         CopyAllComponents(apCopy);
         ourMemcpy(&data, &pCopy->data, sizeof(AMMO_DATA));
-        void* ThreatLocation = (void*)&pCopy->NVdata;
-        ourMemcpy(&NVdata, ThreatLocation, sizeof(AMMO_DATA_NV));
+        AMMO_DATA_NV* pSourceNVdata = &pCopy->NVdata;
+        ourMemcpy(&NVdata, pSourceNVdata, sizeof(AMMO_DATA_NV));
         cFormType = pCopy->GetFormType();
         cDesc.Set(pCopy->cDesc.pString, 0);
         cAbbrev.Set(pCopy->cAbbrev.pString, 0);

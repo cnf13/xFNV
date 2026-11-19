@@ -8031,7 +8031,7 @@ void ExtraDataList::InitItem(TESForm* apOwner) {
                      pNode = pNode->GetNext()) {
                     uint32_t iID = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pNode->GetItem()));
                     TESForm::AddCompileIndex(iID, pFile);
-                    void* pRef = dynamic_cast<TESObjectREFR*>(TESForm::GetFormByNumericID(iID));
+                    TESObjectREFR* pRef = dynamic_cast<TESObjectREFR*>(TESForm::GetFormByNumericID(iID));
                     if (iID && !pRef) {
                         Warning(
                             "MASTERFILE: Unable to find room linked reference %08X. Room linked reference data will "
@@ -8042,7 +8042,7 @@ void ExtraDataList::InitItem(TESForm* apOwner) {
                         break;
                     }
                     if (iID) {
-                        pNode->SetItem(static_cast<TESObjectREFR*>(pRef));
+                        pNode->SetItem(pRef);
                     }
                 }
                 break;
@@ -10546,7 +10546,6 @@ void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* a1) {
                     bool bremove = false;
                     if (pfactionRank_3) {
                         if (!pfactionRank_3->pFaction) {
-                            void* Block = (void*)pfactionRank_3;
                             ourFree(pfactionRank_3);
                             bremove = true;
                         }

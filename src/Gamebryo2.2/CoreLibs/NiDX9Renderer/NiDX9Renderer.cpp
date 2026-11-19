@@ -2602,8 +2602,7 @@ void NiDX9Renderer::PerformPrecache() {
             do {
                 PrePackObject* pkNext = pkObject->m_pkNext;
                 if (pkObject->m_uiStream == 0) {
-                    NiSkinPartition::Partition* pkPartition =
-                        static_cast<NiSkinPartition::Partition*>(pkObject->m_pkPartition);
+                    NiSkinPartition::Partition* pkPartition = pkObject->m_pkPartition;
                     if (pkPartition) {
                         PackSkinnedGeometryBuffer(
                             pkObject->m_pkBuffData, pkObject->m_pkData, pkObject->m_pkSkin, pkPartition,
@@ -2656,12 +2655,10 @@ void NiDX9Renderer::PerformPrecache() {
             NiD3DShaderDeclaration* pkShaderDecl = pkObject->m_pkShaderDecl;
             if (!pkShaderDecl ||
                 !pkShaderDecl->PackUntransformedVB(
-                    pkObject->m_pkData, pkObject->m_pkSkin,
-                    static_cast<NiSkinPartition::Partition*>(pkObject->m_pkPartition), 0xFFF, pkChip, uiStream, pucDest,
+                    pkObject->m_pkData, pkObject->m_pkSkin, pkObject->m_pkPartition, 0xFFF, pkChip, uiStream, pucDest,
                     nullptr, nullptr
                 )) {
-                NiSkinPartition::Partition* pkPartition =
-                    static_cast<NiSkinPartition::Partition*>(pkObject->m_pkPartition);
+                NiSkinPartition::Partition* pkPartition = pkObject->m_pkPartition;
                 if (pkPartition) {
                     m_pkVBManager->PackSkinnedVB(
                         pkObject->m_pkData, pkObject->m_pkSkin, pkPartition, 0xFFF, pkChip, pucDest
@@ -2717,9 +2714,7 @@ void NiDX9Renderer::PerformPrecache() {
             pkPacked->m_uiStream == 0) {
             // keeps the consistency bits, clears the revision flags
             pkData->m_usDirtyFlags &= 0xF000;
-            FreeGeometricData(
-                pkData, pkPacked->m_pkSkin, static_cast<NiSkinPartition::Partition*>(pkPacked->m_pkPartition)
-            );
+            FreeGeometricData(pkData, pkPacked->m_pkSkin, pkPacked->m_pkPartition);
         }
         delete pkPacked;
         pkPacked = pkNext;

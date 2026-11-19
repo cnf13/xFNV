@@ -122,11 +122,11 @@ void GrenadeProjectile::UpdateProjectile(float afDelta) {
             if ((GetProjectileBase()) && (GetProjectileBase()->Data.pActiveSoundLoop)) {
                 TESSound* WorldSpace = GetProjectileBase()->Data.pActiveSoundLoop;
                 if (!TESSound::ConvertLoopFlag(WorldSpace->GetData().iFlags)) {
-                    void* afDelta = GetProjectileBase()->Data.pActiveSoundLoop;
+                    TESSound* pSettingsContext = GetProjectileBase()->Data.pActiveSoundLoop;
                     TESSound* v5 = GetProjectileBase()->Data.pActiveSoundLoop;
                     const char* Filename = v5->GetFilename();
                     BSAudio* v6 = &BSAudio::QInstance();
-                    BSSoundHandle sndHandle = v6->GetSoundHandleByFilename(Filename, 258u, afDelta);
+                    BSSoundHandle sndHandle = v6->GetSoundHandleByFilename(Filename, 258u, pSettingsContext);
                     const NiPoint3* v7 = &GetLocationOnReference();
                     sndHandle.SetPosition(*v7);
                     sndHandle.Play(false);

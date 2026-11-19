@@ -216,7 +216,7 @@ bool bhkConstraint::Remove() {
     bhkWorld* pbw = nullptr;
     const hkpWorld* v5 = GethkWorld();
     if (v5) {
-        pbw = static_cast<bhkWorld*>(static_cast<const ahkpWorld*>(v5)->m_userData);
+        pbw = static_cast<const ahkpWorld*>(v5)->m_userData;
     }
     if (pbw) {
         // RemoveConstraint returns 0 or 1, which is returned as it is.

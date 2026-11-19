@@ -867,10 +867,10 @@ void TESFile::EndGroup() {
 }
 
 void TESFile::CloseGroup() {
-    void* groupListHead = GetCurrentGroup();
-    if (groupListHead) {
+    FORM_GROUP* pGroup = GetCurrentGroup();
+    if (pGroup) {
         (&m_grouplist)->RemoveHead();
-        ourFree(groupListHead);
+        ourFree(pGroup);
     }
 }
 

@@ -386,9 +386,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
                         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
                     }
                     case DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN_REPATH: {
-                        void* v13 = new PathingRequest;
-                        NiRefObject* v20 = static_cast<NiRefObject*>(v13);
-                        NiPointer<PathingRequest> spnewRequest(static_cast<PathingRequest*>(v13));
+                        NiPointer<PathingRequest> spnewRequest(new PathingRequest);
                         spRequest.m_pObject->PathingRequest::CopyTo(spnewRequest.m_pObject);
                         if (!spPath.m_pObject) {
                             eAvoidState = DetailedActorPathHandler::PATH_AVOID_WAITING;

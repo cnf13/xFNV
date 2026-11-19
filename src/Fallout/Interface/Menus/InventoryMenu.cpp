@@ -1436,8 +1436,7 @@ void InventoryMenu::DropCurrentItem(int32_t aiAmountChosen) {
     a4 = NiPoint3_ZERO;
     TESBoundObject* a3 = InventoryMenu::pCurrItem->pContainerObj;
     if (InventoryMenu::pCurrItem->pExtraObjectList) {
-        void* v1 = InventoryMenu::pCurrItem->pExtraObjectList;
-        v2 = *static_cast<ExtraDataList**>(v1);
+        v2 = InventoryMenu::pCurrItem->pExtraObjectList->m_item;
     }
     else {
         v2 = nullptr;

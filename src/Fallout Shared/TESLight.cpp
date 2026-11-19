@@ -439,8 +439,7 @@ bool TESObjectLIGH::Compare(TESForm* apCompare) {
     if (m_pSound != pComp->m_pSound) {
         return true;
     }
-    void* Children = &pComp->data;
-    if (std::memcmp(&data, Children, sizeof(data))) {
+    if (std::memcmp(&data, &pComp->data, sizeof(data))) {
         return true;
     }
     double LastFadePercent = fFade;

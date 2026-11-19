@@ -2033,7 +2033,6 @@ void QueuedTree::QueueModels() {
         eContext, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\ModelLoader.cpp", 2119
     );
     TESForm* apObj = pRef->GetObjectReference();
-    void* a3 = apObj;
     ENUM_LOD_MULT a7 = TES::GetLODMult(static_cast<TESObject*>(apObj));
     if ((pRef) && (pRef->GetVisibleDistant())) {
         a7 = LOD_MULT_DISTANTLOD;
@@ -2044,7 +2043,7 @@ void QueuedTree::QueueModels() {
     }
 
     IO_TASK_PRIORITY IOTaskPriority = GetIOTaskPriority();
-    pModelLoader->QueueTreeModel(pRef, static_cast<TESObjectTREE*>(a3), IOTaskPriority, this, a7);
+    pModelLoader->QueueTreeModel(pRef, static_cast<TESObjectTREE*>(apObj), IOTaskPriority, this, a7);
 }
 
 void QueuedTree::UseDistant3D() {

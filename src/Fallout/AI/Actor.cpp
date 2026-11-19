@@ -10110,9 +10110,9 @@ bool Actor::GetKnockedDownMovementDelta(NiPoint3& aMovementDelta) {
 
     bool bAlive = !IsDead(false);
     bhkUtilFunctions::GetKnockedDownMovementDelta(TESObjectREFR::Get3D(), &aMovementDelta, bAlive);
-    void* pCharController = GetCharController();
+    bhkCharacterController* pCharController = GetCharController();
     if (pCharController) {
-        static_cast<bhkCharacterController*>(pCharController)->SetFollowRagdoll(true);
+        pCharController->SetFollowRagdoll(true);
     }
     NiPoint3 kAngle = GetAngleOnReference();
     NiMatrix3 kRotation;
@@ -15888,24 +15888,16 @@ void Actor::QueueReplacementLocomotion(
                 pfileList = pModelLoader->BuildKFFileList(cPath, false, true, a5);
             }
         LABEL_23:;
-            void* pfileList_2 = (void*)pfileList;
             if (pfileList) {
                 if (apParent) {
                     IO_TASK_PRIORITY IOTaskPriority = apParent->GetIOTaskPriority();
-                    pModelLoader->QueueKFList(
-                        static_cast<BSSimpleList<const char*>*>(pfileList_2), IOTaskPriority, apParent, nullptr
-                    );
+                    pModelLoader->QueueKFList(pfileList, IOTaskPriority, apParent, nullptr);
                 }
                 else {
                     pModelLoader->CancelReplacementKFList(panim);
-                    pModelLoader->QueueReplacementKFList(
-                        static_cast<BSSimpleList<const char*>*>(pfileList_2), panim, IO_TASK_PRIORITY_VERY_LOW, nullptr,
-                        nullptr
-                    );
+                    pModelLoader->QueueReplacementKFList(pfileList, panim, IO_TASK_PRIORITY_VERY_LOW, nullptr, nullptr);
                 }
-                if (pfileList_2) {
-                    delete static_cast<BSSimpleList<ActiveEffect*>*>(pfileList_2);
-                }
+                delete pfileList;
                 if ((!abHurt) && (GetActorType())) {
                     if (IsChild(true)) {
                         BSstrcpy(pslash, 260 - (pslash - cPath), "\\Locomotion\\Child\\");
@@ -15919,21 +15911,19 @@ void Actor::QueueReplacementLocomotion(
                         }
                     }
                     BSstrcat(pslash, 260 - (pslash - cPath), "IdleAnims");
-                    void* pfileList_3 = (void*)pModelLoader->BuildKFFileList(cPath, false, false, AGW_NONE);
+                    BSSimpleList<const char*>* pfileList_3 =
+                        pModelLoader->BuildKFFileList(cPath, false, false, AGW_NONE);
                     if (pfileList_3) {
                         if (apParent) {
                             IO_TASK_PRIORITY v9 = apParent->GetIOTaskPriority();
-                            pModelLoader->QueueKFList(
-                                static_cast<BSSimpleList<const char*>*>(pfileList_3), v9, apParent, nullptr
-                            );
+                            pModelLoader->QueueKFList(pfileList_3, v9, apParent, nullptr);
                         }
                         else {
                             pModelLoader->QueueReplacementKFList(
-                                static_cast<BSSimpleList<const char*>*>(pfileList_3), panim, IO_TASK_PRIORITY_VERY_LOW,
-                                nullptr, nullptr
+                                pfileList_3, panim, IO_TASK_PRIORITY_VERY_LOW, nullptr, nullptr
                             );
                         }
-                        delete static_cast<BSSimpleList<ActiveEffect*>*>(pfileList_3);
+                        delete pfileList_3;
                     }
                 }
             }
@@ -24165,7 +24155,7 @@ bool MiddleHighProcess::GetDetectLifeDetected() {
 // afMaxHeight is below the height or either is NaN.
 bool MobileObject::IsNonAccumNearController(float afMaxHeight) {
     bool bResult = true;
-    void* pCharController = GetCharController();
+    bhkCharacterController* pCharController = GetCharController();
     if (!pCharController) {
         return bResult;
     }
@@ -24179,7 +24169,7 @@ bool MobileObject::IsNonAccumNearController(float afMaxHeight) {
     }
     NiPoint3 kNonAccum = pNonAccum->GetWorldTranslate();
     NiPoint3 kPosition;
-    static_cast<bhkCharacterController*>(pCharController)->GetPosition(kPosition);
+    pCharController->GetPosition(kPosition);
     float fHeight = kNonAccum.z - kPosition.z;
     bResult = afMaxHeight >= fHeight;
     return bResult;

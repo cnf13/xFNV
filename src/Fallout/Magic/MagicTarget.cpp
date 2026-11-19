@@ -1020,8 +1020,7 @@ void MagicTarget::QueueSpellDispel(MagicItem* apSpell, MagicCaster* apCaster, Ac
     pDispel->pSpell = apSpell;
     pDispel->pCaster = apCaster;
     pDispel->pActiveEffect = apActiveEffect;
-    void* pItem = pDispel;
-    PostUpdateDispelList.AddHead(pItem);
+    PostUpdateDispelList.AddHead(pDispel);
 }
 
 void MagicTarget::DispelQueuedSpells() {

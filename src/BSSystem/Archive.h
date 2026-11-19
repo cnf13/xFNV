@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 class ArchiveFile;
+struct z_stream_s;
 
 // The offset of the texture name inside a texture path.
 uint32_t FindTexturePathOffset(const char* apPath, bool abStripTexture);
@@ -222,7 +223,7 @@ public:
     static uint32_t
     RdNoSwap(NiBinaryStream* apThis, void* apBuffer, uint32_t aiBytes, uint32_t* apNothing1, uint32_t aiNothing2);
 
-    void* pZStream;
+    z_stream_s* pZStream;
     char* pUncompressedBuffer;
     uint32_t iUncompressedFileSize;
     uint32_t iUncompressedBufferSize;

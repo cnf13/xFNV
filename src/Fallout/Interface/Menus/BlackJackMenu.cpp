@@ -2419,14 +2419,14 @@ void BlackJackMenu::DrawScene() {
     SceneGraph* pSceneGraph = Main::GetWorldSceneGraph();
     BSCullingProcess* pCullingProcess = pSceneGraph->pCuller;
     pCullingProcess->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
-    void* pCamera = BlackJackMenu::spCamera.m_pObject;
-    NiCamera::HandleEyeFinityFOVScale(static_cast<NiCamera*>(pCamera), 0.15f);
+    NiCamera* pCamera = BlackJackMenu::spCamera.m_pObject;
+    NiCamera::HandleEyeFinityFOVScale(pCamera, 0.15f);
     InterfaceManager* v1 = InterfaceManager::Instance();
     NiPointer<NiRefObject> apMemory(static_cast<NiRefObject*>(v1->Get3dAccumulator()));
     NiAccumulator* afScale = static_cast<NiAccumulator*>(apMemory.m_pObject);
     pCullingProcess->SetAccumulator(afScale);
     if (pCamera) {
-        v6 = static_cast<NiCamera*>(pCamera);
+        v6 = pCamera;
     }
     else {
         v6 = pSceneGraph->GetCamera();

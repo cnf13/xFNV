@@ -29,9 +29,9 @@ BGSMusicType::~BGSMusicType() {
 
 void BGSMusicType::ClearData() {
     while (!pMusicFileList.IsEmpty()) {
-        void* v2 = pMusicFileList.m_item;
+        char* pFileName = pMusicFileList.m_item;
         pMusicFileList.RemoveHead();
-        ourFree(v2);
+        ourFree(pFileName);
     }
 }
 
@@ -156,8 +156,7 @@ void BGSMusicType::BuildFileList() {
         if (!static_cast<uint8_t>(FindDir.IsDirectory())) {
             // This address (&FindDir.FindData_.cFileName) is never null.
             char apExt[264];
-            void* MBRoomAccumList = &FindDir.FindData_.cFileName;
-            BSsplitpath(static_cast<char*>(MBRoomAccumList), nullptr, 0, nullptr, 0, nullptr, 0, apExt, 260);
+            BSsplitpath(FindDir.FindData_.cFileName, nullptr, 0, nullptr, 0, nullptr, 0, apExt, 260);
             if (!BSstricmp(apExt, TestExt)) {
                 BGSMusicType::MusicFileEntry* v2;
                 BSsprintf(apString1, 260, "%s%s", apDest, &FindDir.FindData_.cFileName);

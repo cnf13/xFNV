@@ -309,8 +309,7 @@ char* Archive::GetDirectoryString(uint32_t aiDirectoryIndex) {
     uint32_t v6 = m_pfnRead(this, &v17, 1, &v8, 1);
     m_uiAbsoluteCurrentPos += v6;
     if (this->pDirectoryStringArray) {
-        void* Block = (void*)this->pDirectoryStringArray;
-        MemoryManager_Singleton.Deallocate(Block);
+        MemoryManager_Singleton.Deallocate(this->pDirectoryStringArray);
         this->pDirectoryStringArray = nullptr;
     }
     char* v14 = static_cast<char*>(MemoryManager_Singleton.Allocate(v17));
@@ -707,14 +706,11 @@ void Archive::ReloadFilenamesAndIndices() {
                 if (i >= iDirectories) {
                     break;
                 }
-                void* Block = (void*)pFileNameStringOffsets[i];
-                MemoryManager_Singleton.Deallocate(Block);
+                MemoryManager_Singleton.Deallocate(pFileNameStringOffsets[i]);
             }
-            void* apMem = (void*)pFileNameStringOffsets;
-            MemoryManager_Singleton.Deallocate(apMem);
+            MemoryManager_Singleton.Deallocate(pFileNameStringOffsets);
         }
-        void* pFileNameStringArray = (void*)this->pFileNameStringArray;
-        MemoryManager_Singleton.Deallocate(pFileNameStringArray);
+        MemoryManager_Singleton.Deallocate(this->pFileNameStringArray);
         size_t Size = this->iFileNamesLength;
         char* v13 = static_cast<char*>(MemoryManager_Singleton.Allocate(Size));
         this->pFileNameStringArray = v13;
@@ -1200,8 +1196,7 @@ uint32_t ArchiveFile::ReadFromArchive(void* apReadBuffer, uint32_t aiByteCount, 
         else {
             uint32_t v7;
             Archive* m_pObject = spArchive.m_pObject;
-            void* pBuffer = (void*)m_pObject->m_pBuffer;
-            itrueBytesRead = m_pObject->DiskRead(pBuffer, aiByteCount);
+            itrueBytesRead = m_pObject->DiskRead(m_pObject->m_pBuffer, aiByteCount);
             spArchive.m_pObject->m_uiPos = itrueBytesRead;
             spArchive.m_pObject->m_uiBufferReadSize = itrueBytesRead;
             if (itrueBytesRead >= aiByteCount) {
@@ -1309,7 +1304,7 @@ void CompressedArchiveFile::Seek(int32_t aiByteCount, int32_t aiSeekFlags) {
 uint32_t CompressedArchiveFile::ReadF(void* apReadBuffer, uint32_t aiByteCount) {
     size_t uiBytesLeft = aiByteCount;
     uint32_t uiReadBytes = 0;
-    z_stream_s* pStream = static_cast<z_stream_s*>(pZStream);
+    z_stream_s* pStream = pZStream;
     size_t uiAvail = iUncompressedBufferReadSize - iUncompressedBufferPos;
     if (aiByteCount <= uiAvail) {
         if (apReadBuffer) {
@@ -1385,7 +1380,7 @@ uint32_t CompressedArchiveFile::WriteF(const void*, uint32_t /*aiBytes*/) {
 
 CompressedArchiveFile::~CompressedArchiveFile() {
     if (pZStream) {
-        z_stream_s* pStream = static_cast<z_stream_s*>(pZStream);
+        z_stream_s* pStream = pZStream;
         inflateEnd(pStream);
         MemoryManager_Singleton.Deallocate(pStream);
     }

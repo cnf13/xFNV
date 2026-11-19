@@ -3796,7 +3796,6 @@ BSSimpleList<Crime*>* ProcessLists::RemoveCrimesForYieldCheck(float afTime) {
             }
             Actor* pact = static_cast<Actor*>(pcrime->pcrimetarget);
             if ((pact) && (pact->IsActor())) {
-                void* v9 = (void*)pact;
                 BSSimpleList<Crime*>* pcrimelist = (&pact->m_Extra)->GetPlayerCrimeList();
                 if (pcrimelist) {
                     pcrimelist->Remove(pcrime);
@@ -4873,8 +4872,7 @@ void ProcessLists::SpawnReferenceMuzzleFlash(Projectile* apProjectile, TESObject
             }
             pcurrentFlash = pcurrentFlash_2;
             apParentRef->SetTargeted(true);
-            void* pFlashItem = pcurrentFlash;
-            ReferenceMuzzleFlashList.AddHead(pFlashItem);
+            ReferenceMuzzleFlashList.AddHead(pcurrentFlash);
         }
         if (pcurrentFlash) {
             pcurrentFlash->Enable();

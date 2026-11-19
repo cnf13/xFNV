@@ -468,8 +468,7 @@ bool TESNPC::Load(TESFile* apFile) {
                 TESForm::AddCompileIndex(itempint, apFile);
                 BGSHeadPart* pHeadPart = dynamic_cast<BGSHeadPart*>(TESForm::GetFormByNumericID(itempint));
                 if (pHeadPart) {
-                    void* pItem = pHeadPart;
-                    GetHeadParts()->AddHead(pItem);
+                    GetHeadParts()->AddHead(pHeadPart);
                 }
                 else {
                     uint32_t uiFormID = GetFormID();

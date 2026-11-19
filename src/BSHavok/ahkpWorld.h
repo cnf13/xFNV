@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+class bhkWorld;
+
 // Its own header, out of bhkWorld.h: hkpWorldObject::m_world is an ahkpWorld*, so src/Havok needs the class whole
 // without the rest of the game's world wrapper.
 // The Havok world as the game builds it: the SDK world plus a pointer back to the bhkWorld wrapping it.
@@ -13,8 +15,8 @@ public:
     ahkpWorld(const hkpWorldCinfo& arInfo, uint32_t aiVersion) : hkpWorld(arInfo, aiVersion), m_userData(nullptr) {}
     ~ahkpWorld() override;
 
-    void* getUserData();
-    void setUserData(void* apData) {
+    bhkWorld* getUserData();
+    void setUserData(bhkWorld* apData) {
         m_userData = apData;
     }
 
@@ -24,5 +26,5 @@ public:
         hkReferencedObject::deleteObject(apMemory);
     }
 
-    void* m_userData;
+    bhkWorld* m_userData;
 };

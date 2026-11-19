@@ -119,10 +119,7 @@ NiPoint3* ActorCause::FreeDetectionList() {
         ourFree(this->pWitnesses->m_item);
         this->pWitnesses->RemoveHead();
     }
-    void* pWitnesses = (void*)this->pWitnesses;
-    if (pWitnesses) {
-        delete static_cast<BSSimpleList<ActiveEffect*>*>(pWitnesses);
-    }
+    delete this->pWitnesses;
     this->pWitnesses = nullptr;
     kOrigin = NiPoint3_ZERO;
     return &kOrigin;

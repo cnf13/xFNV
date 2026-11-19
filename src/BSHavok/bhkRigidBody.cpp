@@ -1414,7 +1414,7 @@ void bhkRigidBody::Fix() {
     pTLSData->eMemContext = MEM_CONTEXT_HAVOK;
     if ((iFlags & FIXEDCONSTRAINTS) == 0) {
         const ahkpWorld* pHkWorld = static_cast<const ahkpWorld*>(bhkWorldObject::GethkWorld());
-        bhkWorld* pw = pHkWorld ? static_cast<bhkWorld*>(pHkWorld->m_userData) : nullptr;
+        bhkWorld* pw = pHkWorld ? pHkWorld->m_userData : nullptr;
         if (pw) {
             BSSimpleList<NiPointer<bhkSerializable>>* pNode = &kActionConstrants;
             if (pNode) {
@@ -1524,7 +1524,7 @@ void bhkRigidBody::UnFix(int32_t abAddRemainingConstraints) {
     if ((iFlags & FIXEDCONSTRAINTS) != 0) {
         const hkpWorld* pWorld = bhkWorldObject::GethkWorld();
         // EXE-INLINED 0x621480
-        bhkWorld* pw = pWorld ? static_cast<bhkWorld*>(static_cast<const ahkpWorld*>(pWorld)->m_userData) : nullptr;
+        bhkWorld* pw = pWorld ? static_cast<const ahkpWorld*>(pWorld)->m_userData : nullptr;
         if (pw) {
             BSSimpleList<NiPointer<bhkSerializable>>* pList = &kActionConstrants;
             if (pList) {

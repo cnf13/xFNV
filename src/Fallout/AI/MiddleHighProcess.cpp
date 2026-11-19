@@ -292,7 +292,7 @@ MiddleHighProcess::~MiddleHighProcess() {
     pCurrentFurniture = nullptr;
     ClearReservation();
     while (!DeferredHideLimbList.IsEmpty()) {
-        delete static_cast<DeferredHideLimb*>(DeferredHideLimbList.m_item);
+        delete DeferredHideLimbList.m_item;
         DeferredHideLimbList.RemoveHead();
     }
     if (pCreatureLipsynchAnim) {
@@ -5014,7 +5014,7 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         apLoadGameBuffer, static_cast<BSSimpleList<ActiveEffect*>*>(static_cast<void*>(pActiveEffectList))
     );
     while (!DeferredHideLimbList.IsEmpty()) {
-        DeferredHideLimb* pItem = static_cast<DeferredHideLimb*>(DeferredHideLimbList.GetItem());
+        DeferredHideLimb* pItem = DeferredHideLimbList.GetItem();
         if (pItem) {
             delete pItem;
         }
@@ -5562,7 +5562,7 @@ void MiddleHighProcess::DeferHideDismemberedLimb(
     plimb_2->eLimbIndex = aeLimbIndex;
     plimb_2->spDismemberedLimbRoot = apDismemberedLimbRoot;
     plimb_2->spReplacementLimb = static_cast<NiNode*>(apReplacementLimb);
-    DeferredHideLimbList.AddHead(*reinterpret_cast<void**>(&plimb_2));
+    DeferredHideLimbList.AddHead(plimb_2);
 }
 
 void MiddleHighProcess::UpdateDeferredHideDismemberedLimbs(Actor* apActor, float afDeltaTime) {
@@ -5573,10 +5573,10 @@ void MiddleHighProcess::UpdateDeferredHideDismemberedLimbs(Actor* apActor, float
     else {
         ftimer = fExplodeLimbRemovalDelay.Float();
     }
-    BSSimpleList<void*>* plist = &DeferredHideLimbList;
-    BSSimpleList<void*>* plastlist = nullptr;
+    BSSimpleList<MiddleHighProcess::DeferredHideLimb*>* plist = &DeferredHideLimbList;
+    BSSimpleList<MiddleHighProcess::DeferredHideLimb*>* plastlist = nullptr;
     while (plist && !plist->IsEmpty()) {
-        MiddleHighProcess::DeferredHideLimb* plimb = static_cast<MiddleHighProcess::DeferredHideLimb*>(plist->m_item);
+        MiddleHighProcess::DeferredHideLimb* plimb = plist->m_item;
         bool bremove = false;
         if (!plimb->spDismemberedLimbRoot.m_pObject ||
             (plimb->spDismemberedLimbRoot.m_pObject->m_uiRefCount <= 1 ||
@@ -5598,7 +5598,7 @@ void MiddleHighProcess::UpdateDeferredHideDismemberedLimbs(Actor* apActor, float
             }
             if (plastlist) {
                 // Remove is passed the limb local, which holds the freed item's pointer.
-                void* pItem = plimb;
+                MiddleHighProcess::DeferredHideLimb* pItem = plimb;
                 plastlist->Remove(pItem);
                 plist = plastlist->m_pkNext;
             }
@@ -9110,14 +9110,11 @@ bool QueuedItem::QueueFiles(Actor* apActor) {
                 }
                 spQueuedFiles = v12;
                 const char* Model_ = apActor->GetModel();
-                void* pfileList_2 = (void*)pModelLoader->BuildKFFileList(Model_, true, false, AGW_HAND_TO_HAND);
+                BSSimpleList<const char*>* pfileList_2 =
+                    pModelLoader->BuildKFFileList(Model_, true, false, AGW_HAND_TO_HAND);
                 QueuedFile* v10 = spQueuedFiles.m_pObject;
-                pModelLoader->QueueKFList(
-                    static_cast<BSSimpleList<const char*>*>(pfileList_2), IO_TASK_PRIORITY_VERY_HIGH, v10, nullptr
-                );
-                if (pfileList_2) {
-                    delete static_cast<BSSimpleList<ActiveEffect*>*>(pfileList_2);
-                }
+                pModelLoader->QueueKFList(pfileList_2, IO_TASK_PRIORITY_VERY_HIGH, v10, nullptr);
+                delete pfileList_2;
             }
         }
         return false;
@@ -9148,14 +9145,10 @@ bool QueuedItem::QueueFiles(Actor* apActor) {
                !panim->GroupLoaded(v5))))) {
             ANIM_GROUP_WEAPON_ENUM v11 = weaponToAnimGroupWeapon[pweapon->GetWeaponType()];
             const char* v6 = apActor->GetModel();
-            void* pfileList = (void*)pModelLoader->BuildKFFileList(v6, true, false, v11);
+            BSSimpleList<const char*>* pfileList = pModelLoader->BuildKFFileList(v6, true, false, v11);
             QueuedFile* v7 = spQueuedFiles.m_pObject;
-            pModelLoader->QueueKFList(
-                static_cast<BSSimpleList<const char*>*>(pfileList), IO_TASK_PRIORITY_VERY_HIGH, v7, nullptr
-            );
-            if (pfileList) {
-                delete static_cast<BSSimpleList<ActiveEffect*>*>(pfileList);
-            }
+            pModelLoader->QueueKFList(pfileList, IO_TASK_PRIORITY_VERY_HIGH, v7, nullptr);
+            delete pfileList;
         }
     }
     return true;

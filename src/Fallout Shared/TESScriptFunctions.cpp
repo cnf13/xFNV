@@ -14822,20 +14822,19 @@ bool Script::ToggleCharControllerShapeFunction(
     if (!v6) {
         return true;
     }
-    void* charController = v6->MobileObject::GetCharController();
-    if (!charController) {
+    bhkCharacterController* pCharController = v6->MobileObject::GetCharController();
+    if (!pCharController) {
         return true;
     }
-    int32_t shapeType = (int32_t)static_cast<bhkCharacterController*>(charController)->QShapeType();
+    int32_t shapeType = (int32_t)pCharController->QShapeType();
     if (shapeType == 0) {
-        static_cast<bhkCharacterController*>(charController)->SetShapeType(bhkCharacterController::ST_CONVEX);
+        pCharController->SetShapeType(bhkCharacterController::ST_CONVEX);
     }
     else {
         if (shapeType == 1) {
             shapeType = 0;
         }
-        static_cast<bhkCharacterController*>(charController)
-            ->SetShapeType(static_cast<bhkCharacterController::SHAPE_TYPES>(shapeType));
+        pCharController->SetShapeType(static_cast<bhkCharacterController::SHAPE_TYPES>(shapeType));
     }
     return true;
 }

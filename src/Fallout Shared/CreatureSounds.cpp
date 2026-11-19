@@ -22,10 +22,7 @@ void CreatureSounds::FreeCreatureSoundList(CREATURE_SOUND_TYPE aeType) {
          plist->RemoveHead()) {
         ourFree(plist->m_item);
     }
-    void* v3 = pSoundListArray[aeType];
-    if (v3) {
-        delete static_cast<BSSimpleList<ActiveEffect*>*>(v3);
-    }
+    delete pSoundListArray[aeType];
     pSoundListArray[aeType] = nullptr;
 }
 

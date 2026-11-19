@@ -27,11 +27,10 @@ void BGSPickupPutdownSounds::CopyComponent(BaseFormComponent* apCopyFC) {
 }
 
 bool BGSPickupPutdownSounds::CompareComponent(BaseFormComponent* apCompareFC) {
-    void* v6 = dynamic_cast<BGSPickupPutdownSounds*>(apCompareFC);
-    if (!v6) {
+    BGSPickupPutdownSounds* pCompare = dynamic_cast<BGSPickupPutdownSounds*>(apCompareFC);
+    if (!pCompare) {
         return true;
     }
-    BGSPickupPutdownSounds* pCompare = static_cast<BGSPickupPutdownSounds*>(v6);
     TESSound* pPickup = GetPickupSound();
     uint8_t result = 1;
     bool vCondition1;

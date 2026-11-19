@@ -2714,8 +2714,7 @@ void HighProcess::SetActorsDetectionEvent(
 ) {
     DetectionEvent* v7;
     if (pActorsGeneratedDetectionEvent) {
-        void* Block = pActorsGeneratedDetectionEvent;
-        ourFree(Block);
+        ourFree(pActorsGeneratedDetectionEvent);
     }
     void* apMemory = ourMalloc(sizeof(DetectionEvent));
     if (apMemory) {
@@ -7687,16 +7686,14 @@ void HighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     fDetectionModifer = 0.0f;
     fDetectionModifierTimer = 0.0f;
     for (BSSimpleList<DetectionState*>* ecx0 = pDetectedActorList; ecx0; ecx0 = ecx0->m_pkNext) {
-        void* v7 = ecx0->m_item;
-        if (v7) {
-            ourFree(v7);
+        if (ecx0->m_item) {
+            ourFree(ecx0->m_item);
         }
     }
     pDetectedActorList->RemoveAll();
     for (BSSimpleList<DetectionState*>* j = pActorsWhoDetectMeList; j; j = j->m_pkNext) {
-        void* v5 = j->m_item;
-        if (v5) {
-            ourFree(v5);
+        if (j->m_item) {
+            ourFree(j->m_item);
         }
     }
     pActorsWhoDetectMeList->RemoveAll();
@@ -8595,11 +8592,7 @@ void HighProcess::ProcessEscort(Actor* apActor) {
                         ObjectList.Remove(this->pAcquireObject);
                         SetTarget(this->pAcquireObject->pRef);
                         pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
-                        ObjectstoAcquire* pAcquireObject = this->pAcquireObject;
-                        void* v37 = pAcquireObject;
-                        if (pAcquireObject) {
-                            delete static_cast<Date*>(v37);
-                        }
+                        delete this->pAcquireObject;
                         this->pAcquireObject = nullptr;
                         if (pcont && pcont->HasContainer()) {
                             int32_t v9 = pPack->GetInitialTargetCount();
@@ -14501,10 +14494,7 @@ void HighProcess::FreeAvoidNodes() {
             ourFree(m_item);
         }
         this->pListOfAvoidAreas->RemoveAll();
-        void* pListOfAvoidAreas = this->pListOfAvoidAreas;
-        if (pListOfAvoidAreas) {
-            delete static_cast<BSSimpleList<ActiveEffect*>*>(pListOfAvoidAreas);
-        }
+        delete this->pListOfAvoidAreas;
         this->pListOfAvoidAreas = nullptr;
     }
 }
@@ -14645,11 +14635,7 @@ bool HighProcess::ProcessEscortOneHour(Actor* apActor, float afTimeDelta) {
                         ObjectList.Remove(this->pAcquireObject);
                         SetTarget(this->pAcquireObject->pRef);
                         pitem = apActor->GetInventoryItem(this->pAcquireObject->pObject, 0);
-                        ObjectstoAcquire* pAcquireObject = this->pAcquireObject;
-                        void* v37 = (void*)pAcquireObject;
-                        if (pAcquireObject) {
-                            delete static_cast<Date*>(v37);
-                        }
+                        delete this->pAcquireObject;
                         this->pAcquireObject = nullptr;
                         if (pcont && pcont->HasContainer()) {
                             int32_t v11 = pPack->GetInitialTargetCount();

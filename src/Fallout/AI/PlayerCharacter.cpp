@@ -2434,7 +2434,7 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         LoadNumericID(&itopicId, 4);
         TESForm* ptopicForm = TESForm::GetFormByNumericID(itopicId);
         // listTopics is a BSSimpleList<void*>; its items are the topics.
-        void* ptopic = dynamic_cast<TESTopic*>(ptopicForm);
+        TESTopic* ptopic = dynamic_cast<TESTopic*>(ptopicForm);
         if (ptopic) {
             listTopics.AddHead(ptopic);
         }
@@ -2456,7 +2456,7 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
             TESQuestStage* pstage = pquest->GetStage(cstageIndex);
             if (pstage) {
                 // listQuestLog is a BSSimpleList<void*>; its items are the stage items.
-                void* pstageItem = pstage->GetStageItem(cstageItemIndex);
+                TESQuestStageItem* pstageItem = pstage->GetStageItem(cstageItemIndex);
                 if (pstageItem) {
                     listQuestLog.AddTail(pstageItem);
                 }
@@ -2892,7 +2892,7 @@ void PlayerCharacter::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         if (pQuest) {
             TESQuestStage* pStage = pQuest->GetStage(ucStage);
             if (pStage) {
-                void* pItem = pStage->GetStageItem(ucItem);
+                TESQuestStageItem* pItem = pStage->GetStageItem(ucItem);
                 if (pItem) {
                     listQuestLog.AddTail(pItem);
                 }
@@ -3422,10 +3422,7 @@ void PlayerCharacter::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         ourFree(this->pListofActions->m_item);
         this->pListofActions->RemoveHead();
     }
-    void* pListofActions = (void*)this->pListofActions;
-    if (pListofActions) {
-        delete static_cast<BSSimpleList<ActiveEffect*>*>(pListofActions);
-    }
+    delete this->pListofActions;
     this->pListofActions = nullptr;
     for (pperkRankList = &Perks; pperkRankList; pperkRankList = pperkRankList->m_pkNext) {
         ourFree(pperkRankList->m_item);
@@ -11098,11 +11095,11 @@ bool PlayerCharacter::CanPassTime() {
 }
 
 bool PlayerCharacter::IsAlarmForPlayerCharactaer() {
-    void* plist = ReferenceProcessLists.IsActorTargetingREFinPackage(this, PACKAGE_TYPE_ALARM, false);
-    if (plist) {
-        delete static_cast<BSSimpleList<ActiveEffect*>*>(plist);
-    }
-    return plist != nullptr;
+    BSSimpleList<TESObjectREFR*>* plist =
+        ReferenceProcessLists.IsActorTargetingREFinPackage(this, PACKAGE_TYPE_ALARM, false);
+    bool bTargeting = plist != nullptr;
+    delete plist;
+    return bTargeting;
 }
 
 bool PlayerCharacter::GetCanWait() {
@@ -12352,9 +12349,9 @@ NiAVObject* PlayerCharacter::Get3D(bool abFirstPerson) {
 
 void PlayerCharacter::ResetShapeCasterInfo() {
     int32_t filterGroup;
-    void* charController = MobileObject::GetCharController();
-    if (charController) {
-        filterGroup = (int32_t)static_cast<bhkCharacterController*>(charController)->GetFilterGroup();
+    bhkCharacterController* pCharController = MobileObject::GetCharController();
+    if (pCharController) {
+        filterGroup = (int32_t)pCharController->GetFilterGroup();
         pCameraCaster->SetPlayerGroup(filterGroup);
     }
 }
@@ -12673,8 +12670,7 @@ bool PlayerCharacter::AddTopic(TESTopic* apNewTopic, bool abResort, bool abDispl
             return false;
         }
     }
-    void* pTopic = apNewTopic;
-    listTopics.AddHead(pTopic);
+    listTopics.AddHead(apNewTopic);
     if (abResort) {
         TESTopic::SortTopics(true, GetTopicList());
     }
@@ -14045,12 +14041,11 @@ bool PlayerCharacter::ToggleFlyCam(bool abFreezeTime) {
 Actor* PlayerCharacter::GetBumpedActor() {
     NiAVObject* niObject;
     int32_t v6 = 0;
-    void* charController = MobileObject::GetCharController();
-    if (!charController) {
+    bhkCharacterController* pCharController = MobileObject::GetCharController();
+    if (!pCharController) {
         return static_cast<Actor*>(reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(v6)));
     }
-    bhkCharacterController* bumpedCharacterController =
-        static_cast<bhkCharacterController*>(charController)->GetBumpedCharacterController();
+    bhkCharacterController* bumpedCharacterController = pCharController->GetBumpedCharacterController();
     if (bumpedCharacterController) {
         niObject = bumpedCharacterController->GetNiObject();
     }

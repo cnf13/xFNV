@@ -264,7 +264,7 @@ void bhkRagdollTemplateData::ReplaceRagdollData(NiAVObject* apObj, float afScale
     const hkpWorld* pHkWorld = pRigidBody->GethkWorld();
     bhkWorld* pWorld = nullptr;
     if (pHkWorld) {
-        pWorld = static_cast<bhkWorld*>(static_cast<const ahkpWorld*>(pHkWorld)->m_userData);
+        pWorld = static_cast<const ahkpWorld*>(pHkWorld)->m_userData;
     }
 
     for (uint32_t i = 0; i < ConstraintsA.iSize; ++i) {

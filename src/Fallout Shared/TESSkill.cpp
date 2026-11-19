@@ -122,8 +122,7 @@ bool TESSkill::Compare(TESForm* apCompare) {
     if (CompareAllComponents(pComp)) {
         return true;
     }
-    void* FrustumPlanes = &pComp->kData;
-    if (std::memcmp(&kData, FrustumPlanes, sizeof(kData))) {
+    if (std::memcmp(&kData, &pComp->kData, sizeof(kData))) {
         return true;
     }
     for (int32_t i = 0; i < 4; ++i) {

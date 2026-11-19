@@ -2136,7 +2136,6 @@ LABEL_27:;
                     pdelayList = pdelayList->m_pkNext;
                 }
                 replayDelayList.Remove(pdelay);
-                void* apMemory = (void*)pdelay;
                 ourFree(pdelay);
                 if (!pdelayList && !replayDelayList.IsEmpty()) {
                     pdelayList = &replayDelayList;

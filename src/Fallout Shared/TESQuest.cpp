@@ -310,7 +310,7 @@ void TESQuest::SaveGame(uint32_t aiFlags) {
                 for (TESQuestStageItem* pstageitem : *&pstage->listStageItems) {
                     if (pstageitem) {
                         cindex2 = pstageitem->ucIndex;
-                        void* pdate = (void*)pstageitem->m_pLogDate;
+                        Date* pdate = pstageitem->m_pLogDate;
                         SaveGameDataOLD(&cindex2, 1);
                         if (pdate) {
                             pSaveLoadGameOLD->SaveGameDataOLD(pdate, 4u);
@@ -683,16 +683,11 @@ void TESQuest::Revert(uint32_t aiFlags) {
             if (pstage) {
                 pstage->SetDone(0);
                 for (TESQuestStageItem* m_item : *&pstage->listStageItems) {
-                    void* LogDate;
                     if (m_item) {
-                        LogDate = m_item->m_pLogDate;
-                    }
-                    else {
-                        LogDate = nullptr;
-                    }
-                    if (LogDate) {
-                        m_item->SetLogDate(nullptr);
-                        delete static_cast<Date*>(LogDate);
+                        if (Date* pLogDate = m_item->m_pLogDate) {
+                            m_item->SetLogDate(nullptr);
+                            delete pLogDate;
+                        }
                     }
                 }
             }

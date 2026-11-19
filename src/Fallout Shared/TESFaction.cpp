@@ -351,8 +351,7 @@ bool TESFaction::Compare(TESForm* apCompare) {
     if (CompareAllComponents(pComp)) {
         return true;
     }
-    void* LocalTransform = &pComp->data;
-    if (std::memcmp(&data, LocalTransform, sizeof(data))) {
+    if (std::memcmp(&data, &pComp->data, sizeof(data))) {
         return true;
     }
     if (pReputation != pComp->pReputation) {

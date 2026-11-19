@@ -101,9 +101,8 @@ void TESGrass::Copy(TESForm* apCopy) {
     TESGrass* pcopy = dynamic_cast<TESGrass*>(apCopy);
     if (pcopy) {
         CopyAllComponents(pcopy);
-        void* HeadPartList = &pcopy->Data;
-        void* v2 = &Data;
-        ourMemcpy(v2, HeadPartList, 32u);
+        GRASS_DATA* pSourceData = &pcopy->Data;
+        ourMemcpy(&Data, pSourceData, 32u);
     }
 }
 

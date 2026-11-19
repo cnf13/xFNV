@@ -56,9 +56,7 @@ MenuConsole::MenuConsole()
 }
 
 MenuConsole::~MenuConsole() {
-    if (pConsoleCompiler) {
-        delete static_cast<Date*>(pConsoleCompiler);
-    }
+    delete pConsoleCompiler;
 }
 
 void MenuConsole::Init() {
@@ -355,10 +353,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                             Instance();
                                                                                                                     pScript
                                                                                                                         .CompileAndRun(
-                                                                                                                            static_cast<
-                                                                                                                                ScriptCompiler*>(
-                                                                                                                                pConsoleCompiler
-                                                                                                                            ),
+                                                                                                                            pConsoleCompiler,
                                                                                                                             SYSTEM_WINDOW_COMPILER,
                                                                                                                             v20->GetConsoleSelection()
                                                                                                                         );
@@ -705,10 +700,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                                                                                                                         Instance();
                                                                                                                                 xScript
                                                                                                                                     .CompileAndRun(
-                                                                                                                                        static_cast<
-                                                                                                                                            ScriptCompiler*>(
-                                                                                                                                            pConsoleCompiler
-                                                                                                                                        ),
+                                                                                                                                        pConsoleCompiler,
                                                                                                                                         SYSTEM_WINDOW_COMPILER,
                                                                                                                                         v18->GetConsoleSelection()
                                                                                                                                     );

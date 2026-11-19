@@ -1142,8 +1142,7 @@ void Projectile::Initialize() {
         // Tests the list's address for null, which it never is, as the game does.
         BSSimpleList<void*>* plist = &ReferenceProcessLists.ProjectilePostProcessList;
         if (plist) {
-            void* a2 = this;
-            plist->AddHead(a2);
+            plist->AddHead(this);
         }
     }
     fRange = GetProjectileBase()->Data.fRange;
@@ -1771,8 +1770,7 @@ Projectile::~Projectile() {
         pVATS.SetLastProjectile(nullptr);
     }
     if (IsFlagSet(Projectile::POST_PROCESS)) {
-        void* item = this;
-        ReferenceProcessLists.ProjectilePostProcessList.Remove(item);
+        ReferenceProcessLists.ProjectilePostProcessList.Remove(this);
     }
     if (IsFlagSet(Projectile::ACTIVE_IN_INVENTORY) && GetDesiredTarget()) {
         Actor* pActorTarget = static_cast<Actor*>(GetDesiredTarget());

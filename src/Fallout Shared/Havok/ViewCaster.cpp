@@ -118,12 +118,10 @@ void ViewCaster::Add(bhkWorld* apWorld) {
 
 void ViewCaster::SetShapeGroup(uint32_t aiGroup) {
     CFilter aiFilter;
-    void* v2 = GetObject();
-    static_cast<bhkWorldObject*>(v2)->GetCollisionFilter(&aiFilter);
+    static_cast<bhkWorldObject*>(GetObject())->GetCollisionFilter(&aiFilter);
     (&aiFilter)->SetGroup(aiGroup);
     iGroup = (int32_t)aiGroup;
-    void* v3 = GetObject();
-    static_cast<bhkWorldObject*>(v3)->SetCollisionFilter(aiFilter);
+    static_cast<bhkWorldObject*>(GetObject())->SetCollisionFilter(aiFilter);
 }
 
 TESObjectREFR* ViewCaster::FindActivateREFR(

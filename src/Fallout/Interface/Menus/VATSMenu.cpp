@@ -4147,8 +4147,7 @@ void VATSMenu::ClearTargetList() {
     while (VATSMenu::xTargetList.m_item) {
         VATSTarget* i;
         for (i = VATSMenu::xTargetList.m_item; i->kBodyParts.m_item; i->kBodyParts.RemoveHead()) {
-            void* Block = i->kBodyParts.m_item;
-            ourFree(Block);
+            ourFree(i->kBodyParts.m_item);
         }
         if (i) {
             delete i;

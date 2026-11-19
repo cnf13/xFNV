@@ -477,12 +477,9 @@ void BSTempEffectSimpleDecal::CleanUpMemory() {
         pTempIndexArray = nullptr;
         pOldToNewIndexArray = nullptr;
     }
-    for (int32_t i = 0; i < pNewIndexMap.iSize; ++i) {
-        void* apThis = pNewIndexMap.GetAt(i);
-        if (apThis) {
-            delete static_cast<Date*>(apThis);
-        }
-        pNewIndexMap.GetAt(i) = 0;
+    for (DecalVertex*& pDecalVertex : pNewIndexMap) {
+        delete pDecalVertex;
+        pDecalVertex = nullptr;
     }
     pNewIndexMap.Clear(true);
 }

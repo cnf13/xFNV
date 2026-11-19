@@ -563,6 +563,5 @@ bool TESCaravanDeck::Compare(TESForm* apCompare) {
             return true;
         }
     }
-    void* Extra = &pComp->data;
-    return std::memcmp(&data, Extra, sizeof(data)) != 0;
+    return std::memcmp(&data, &pComp->data, sizeof(data)) != 0;
 }

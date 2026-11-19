@@ -1849,7 +1849,6 @@ void HUDMainMenu::UpdateXPMeter() {
                     }
                     while ((&xXPUpdates)->m_item) {
                         HUDMainMenu::XPUpdate* pitem = (&xXPUpdates)->m_item;
-                        void* Block = (void*)pitem;
                         ourFree(pitem);
                         xXPUpdates.RemoveHead();
                     }
@@ -2348,7 +2347,6 @@ void HUDMainMenu::HideMessage() {
                 if (!BSstrcmp(item->strText, String)) {
                     HUDMainMenu::MessageData* nd = item;
                     xMessages.Remove(item);
-                    void* Block = nd;
                     ourFree(nd);
                     if (xMessages.IsEmpty()) {
                         HUDMainMenu::pme->pTiles[26]->AddFadeControl(

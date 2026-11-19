@@ -42,9 +42,8 @@ void TESCondition::Copy(TESCondition* apCopy, TESForm* apOwner) {
         else {
             pCondItem = nullptr;
         }
-        void* pNewItem = pCondItem;
         pCondItem->Copy(static_cast<TESConditionItem*>(pCopyList->m_item), apOwner);
-        pList->AddTail(pNewItem);
+        pList->AddTail(pCondItem);
         if (pList->m_pkNext) {
             pList = pList->m_pkNext;
         }
@@ -52,8 +51,7 @@ void TESCondition::Copy(TESCondition* apCopy, TESForm* apOwner) {
 }
 
 void TESCondition::AddItem(TESConditionItem* apConditionItem) {
-    void* pItem = apConditionItem;
-    AddTail(pItem);
+    AddTail(apConditionItem);
 }
 
 bool TESCondition::IsTrue(TESObjectREFR* apActionRef, TESObjectREFR* apTargetRef) {
