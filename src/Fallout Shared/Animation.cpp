@@ -3252,8 +3252,10 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
         if (n_2 >= CastingType) {
             break;
         }
+        // pname is passed by value while still null, so GetObjectNameAt returns at once and the lookup, warning and
+        // free below all see a null name, as the game does.
         char* pname = nullptr;
-        pagSeq->GetObjectNameAt(n_2, nullptr);
+        pagSeq->GetObjectNameAt(n_2, pname);
         NiNode* v13 = pAnimRoot.m_pObject;
         bool v19 = v13->GetObjectByName(pname) == nullptr;
         if (v19) {
