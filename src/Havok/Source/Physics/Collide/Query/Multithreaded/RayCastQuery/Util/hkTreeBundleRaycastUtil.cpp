@@ -81,91 +81,15 @@ void hkTreeBundleRayCastUtil::startWorldRayCastWithAutoBundleJobs(
     }
 
     HK_TIMER_BEGIN("CPUSplit", nullptr);
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
-    hkArray<hkVector4> directions;
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        if (numRays) {
-            int32_t numBytes = numRays * static_cast<int32_t>(sizeof(hkVector4));
-            directions.m_data = static_cast<hkVector4*>(heap.bufAlloc(numBytes));
-            directions.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(hkVector4));
-        }
-        else {
-            directions.m_data = nullptr;
-            directions.m_capacityAndFlags = 0;
-        }
-        if (!directions.m_capacityAndFlags) {
-            directions.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        }
-        directions.m_size = numRays;
-    }
-    // EXE-INLINED none: hkArray<hkVector4>::hkArray(int)
-    hkArray<hkVector4> lengthsSquared;
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        if (numRays) {
-            int32_t numBytes = numRays * static_cast<int32_t>(sizeof(hkVector4));
-            lengthsSquared.m_data = static_cast<hkVector4*>(heap.bufAlloc(numBytes));
-            lengthsSquared.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(hkVector4));
-        }
-        else {
-            lengthsSquared.m_data = nullptr;
-            lengthsSquared.m_capacityAndFlags = 0;
-        }
-        if (!lengthsSquared.m_capacityAndFlags) {
-            lengthsSquared.m_capacityAndFlags = hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-        }
-        lengthsSquared.m_size = numRays;
-    }
-    // EXE-INLINED none: hkArray<hkArray<int32_t>>::hkArray(int) (each element's constructor too)
-    hkArray<hkArray<int32_t>> octantRays;
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        int32_t numBytes = 8 * static_cast<int32_t>(sizeof(hkArray<int32_t>));
-        octantRays.m_data = static_cast<hkArray<int32_t>*>(heap.bufAlloc(numBytes));
-        const int32_t count = numBytes / static_cast<int32_t>(sizeof(hkArray<int32_t>));
-        octantRays.m_size = count;
-        octantRays.m_capacityAndFlags = count;
-        if (!count) {
-            octantRays.m_capacityAndFlags = hkArrayBase<hkArray<int32_t>>::DONT_DEALLOCATE_FLAG;
-        }
-        hkArray<int32_t>* element = octantRays.m_data;
-        for (int32_t n = count; n > 0; --n, ++element) {
-            if (element) {
-                element->m_data = nullptr;
-                element->m_size = 0;
-                element->m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-            }
-        }
-    }
+    hkArray<hkVector4> directions(numRays);
+    hkArray<hkVector4> lengthsSquared(numRays);
+    hkArray<hkArray<int32_t>> octantRays(8);
     alignas(16) int32_t octantCounts[8];
     hkpAutoRayBundleJob_sortRaysByOctant(
         rayFrom, rayTo, numRays, directions.m_data, lengthsSquared.m_data, octantRays.m_data, octantCounts
     );
-    // EXE-INLINED none: hkArray<int32_t>::hkArray(int)
-    hkArray<int32_t> unusedA;
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        int32_t numBytes = 8 * static_cast<int32_t>(sizeof(int32_t));
-        unusedA.m_data = static_cast<int32_t*>(heap.bufAlloc(numBytes));
-        unusedA.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(int32_t));
-        if (!unusedA.m_capacityAndFlags) {
-            unusedA.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        }
-        unusedA.m_size = 8;
-    }
-    // EXE-INLINED none: hkArray<int32_t>::hkArray(int)
-    hkArray<int32_t> unusedB;
-    {
-        hkMemoryAllocator& heap = *hkMemoryRouter::getInstance().m_heap;
-        int32_t numBytes = 8 * static_cast<int32_t>(sizeof(int32_t));
-        unusedB.m_data = static_cast<int32_t*>(heap.bufAlloc(numBytes));
-        unusedB.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(int32_t));
-        if (!unusedB.m_capacityAndFlags) {
-            unusedB.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        }
-        unusedB.m_size = 8;
-    }
+    hkArray<int32_t> unusedA(8);
+    hkArray<int32_t> unusedB(8);
 
     // The job holds the world job's const commands as non-const pointers.
     hkpWorldRayCastCommand* singleCommands = const_cast<hkpWorldRayCastCommand*>(worldRayCastJob->m_commandArray);

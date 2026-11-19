@@ -2433,18 +2433,7 @@ void hkpWorld::shiftBroadPhase(
         // Every island: the fixed one (when there is one), then the active and the inactive ones.
         hkpSimulationIsland* fixedIsland = getFixedIsland();
         const int32_t numIslands = m_inactiveSimulationIslands.m_size + m_activeSimulationIslands.m_size + 1;
-        // The SDK's hkArray(int): the array sized to numIslands, its storage allocated here.
-        hkArray<hkpSimulationIsland*> islands;
-        islands.m_size = numIslands;
-        hkMemoryAllocator& islandsHeap = hkMemoryRouter::getInstance().heap();
-        if (numIslands) {
-            int32_t numAllocated = numIslands;
-            islands.m_data = islandsHeap._bufAlloc<hkpSimulationIsland*>(numAllocated);
-            islands.m_size = numAllocated;
-            if (numAllocated) {
-                islands.m_capacityAndFlags = numAllocated;
-            }
-        }
+        hkArray<hkpSimulationIsland*> islands(numIslands);
         hkpSimulationIsland** dst = islands.m_data;
         if (fixedIsland) {
             *dst++ = fixedIsland;

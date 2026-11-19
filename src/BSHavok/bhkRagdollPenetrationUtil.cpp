@@ -941,22 +941,8 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
         }
     }
     pskeleton->m_bones.m_size = numBones;
-    // The leaves' parent bones, one per leaf: an hkArray(int n) of plain ints (no constructor runs). _bufAlloc may
-    // round the count up, and the array takes the rounded count as its size and capacity.
-    int32_t iNumLeaves = static_cast<int32_t>(arLeaves.iSize);
-    // EXE-INLINED none: hkArray<int, hkContainerHeapAllocator>::hkArray(int), the storage for its elements
-    hkMemoryAllocator* pLeafHeap = hkMemoryRouter::getInstance().m_heap;
-    hkArray<int32_t> leafIdxA;
-    if (iNumLeaves) {
-        leafIdxA.m_data = pLeafHeap->_bufAlloc<int32_t>(iNumLeaves);
-    }
-    leafIdxA.m_size = iNumLeaves;
-    if (iNumLeaves) {
-        leafIdxA.m_capacityAndFlags = iNumLeaves;
-    }
-    else {
-        leafIdxA.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-    }
+    // The leaves' parent bones, one per leaf.
+    hkArray<int32_t> leafIdxA(static_cast<int32_t>(arLeaves.iSize));
     int32_t b = 0;
     if (arRigidBodies.m_size > 0) {
         do {

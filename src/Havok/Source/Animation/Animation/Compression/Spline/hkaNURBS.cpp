@@ -366,22 +366,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
     hkArray<float, hkContainerHeapAllocator>& U,
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& P
 ) {
-    // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
-    hkaNURBSFloatArray ub;
-    int32_t iCount = m + 1;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    float* pData;
-    if (iCount) {
-        int32_t iBytes = iCount * static_cast<int32_t>(sizeof(float));
-        pData = static_cast<float*>(pHeap->bufAlloc(iBytes));
-        iCount = iBytes / static_cast<int32_t>(sizeof(float));
-    }
-    else {
-        pData = nullptr;
-    }
-    ub.m_capacityAndFlags = iCount ? iCount : static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
-    ub.m_size = iCount;
-    ub.m_data = pData;
+    hkaNURBSFloatArray ub(m + 1);
     ChordLengthParameterization(m, &Q, &ub);
     // bProject is p with only its low byte set to 1, so p's upper bytes are passed on with it, as the game does.
     const int32_t bProject = static_cast<int32_t>((static_cast<uint32_t>(p) & 0xFFFFFF00u) | 1u);
@@ -426,28 +411,7 @@ void hkaNURBS::GlobalCurveApproxErrBnd(
         P.m_data[i].operator=(Q.m_data[i]);
     }
 
-    // hkArray<hkReal> ek(m + 1, 0.0f).
-    hkaNURBSFloatArray ek;
-    int32_t iErrors = m + 1;
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    float* pErrors;
-    int32_t iCapacity;
-    if (iErrors) {
-        int32_t iBytes = iErrors * static_cast<int32_t>(sizeof(float));
-        pErrors = static_cast<float*>(pHeap->bufAlloc(iBytes));
-        iErrors = iBytes / static_cast<int32_t>(sizeof(float));
-        iCapacity = iErrors ? iErrors : static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
-    }
-    else {
-        pErrors = nullptr;
-        iCapacity = static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
-    }
-    ek.m_data = pErrors;
-    ek.m_size = iErrors;
-    ek.m_capacityAndFlags = iCapacity;
-    for (int32_t i = 0; i < iErrors; ++i) {
-        pErrors[i] = 0.0f;
-    }
+    hkaNURBSFloatArray ek(m + 1, 0.0f);
 
     // computeProjectionErrors only reads Q; its declaration takes a non-const base pointer.
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>* pQ =
@@ -1134,29 +1098,11 @@ int32_t hkaNURBS::RemoveKnotsBoundCurve(
     int32_t iBounds = mKnots + 1;
     int32_t iBytes;
 
-    // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
-    hkArray<float, hkContainerHeapAllocator> Br;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iSize = iBounds;
-    float* pBrData = nullptr;
-    if (iSize != 0) {
-        iBytes = iSize * iElemSize;
-        pBrData = static_cast<float*>(pHeap->bufAlloc(iBytes));
-        iSize = iBytes / iElemSize;
-    }
-    Br.m_data = pBrData;
-    Br.m_size = iSize;
-    Br.m_capacityAndFlags = iSize;
-    if (iSize == 0) {
-        Br.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-    }
-    for (int32_t i = 0; i < iSize; ++i) {
-        pBrData[i] = 3.40282e+38f;
-    }
+    hkArray<float, hkContainerHeapAllocator> Br(iBounds, 3.40282e+38f);
 
     // The error each removal adds at a parameter, cleared.
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    iSize = mb + 1;
+    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
+    int32_t iSize = mb + 1;
     float* pNewErr = nullptr;
     if (iSize != 0) {
         iBytes = iSize * iElemSize;
@@ -1576,7 +1522,6 @@ void hkaNURBS::DegreeElevateCurve(
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator>& Pw,
     int32_t t
 ) {
-    const int32_t iKnotSize = static_cast<int32_t>(sizeof(float));
     const int32_t iPointSize = static_cast<int32_t>(sizeof(hkaNURBS::Point));
     int32_t nOld = n;
     int32_t m = nOld + p + 1;
@@ -1603,27 +1548,12 @@ void hkaNURBS::DegreeElevateCurve(
     }
     int32_t nh = nOld + t * (UniqueKnotCount(U, m) - 1);
 
-    // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
-    hkArray<float, hkContainerHeapAllocator> Uh;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    int32_t iSize = nh + p + t + 2;
-    float* pKnots = nullptr;
-    if (iSize != 0) {
-        int32_t iBytes = iSize * iKnotSize;
-        pKnots = static_cast<float*>(pHeap->bufAlloc(iBytes));
-        iSize = iBytes / iKnotSize;
-    }
-    Uh.m_data = pKnots;
-    Uh.m_size = iSize;
-    Uh.m_capacityAndFlags = iSize;
-    if (iSize == 0) {
-        Uh.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-    }
+    hkArray<float, hkContainerHeapAllocator> Uh(nh + p + t + 2);
 
     // EXE-INLINED none: hkArray<hkaNURBS::Point, hkContainerHeapAllocator>::hkArray(int)
     hkArray<hkaNURBS::Point, hkContainerHeapAllocator> Qw;
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    iSize = nh + 1;
+    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
+    int32_t iSize = nh + 1;
     hkaNURBS::Point* pPoints = nullptr;
     if (iSize != 0) {
         int32_t iBytes = iSize * iPointSize;
@@ -2057,22 +1987,7 @@ void approximateNURBSCurveImpl(
         }
     }
 
-    // EXE-INLINED none: hkArray<float, hkContainerHeapAllocator>::hkArray(int)
-    hkArray<float, hkContainerHeapAllocator> ub;
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    iSize = numSamples;
-    float* pTimes = nullptr;
-    if (iSize != 0) {
-        int32_t iBytes = iSize * static_cast<int32_t>(sizeof(float));
-        pTimes = static_cast<float*>(pHeap->bufAlloc(iBytes));
-        iSize = iBytes / static_cast<int32_t>(sizeof(float));
-    }
-    ub.m_data = pTimes;
-    ub.m_size = iSize;
-    ub.m_capacityAndFlags = iSize;
-    if (iSize == 0) {
-        ub.m_capacityAndFlags = hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-    }
+    hkArray<float, hkContainerHeapAllocator> ub(numSamples);
 
     for (int32_t i = 0; i < numSamples; ++i) {
         ub.m_data[i] = sampleTimes[i];

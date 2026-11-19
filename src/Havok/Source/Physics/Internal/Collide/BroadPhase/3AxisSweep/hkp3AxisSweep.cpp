@@ -3962,15 +3962,8 @@ void hkp3AxisSweep::removeObjectBatch(
     }
 
     // Each old node's new index, -1 for a removed one.
-    // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray(int)
-    hkMemoryAllocator& tempIndices = hkMemoryRouter::getInstance().temp();
-    int32_t numIndices = numNodes;
-    int32_t* newIndex = numIndices ? tempIndices._bufAlloc<int32_t>(numIndices) : nullptr;
-    const int32_t newIndexCapacity = numIndices ? numIndices : kDontDeallocate;
-    TempIntArray newIndices;
-    newIndices.m_data = newIndex;
-    newIndices.m_size = numIndices;
-    newIndices.m_capacityAndFlags = newIndexCapacity;
+    TempIntArray newIndices(numNodes);
+    int32_t* newIndex = newIndices.m_data;
 
     // The kept nodes overlapping the total AABB, keyed by min x.
     int32_t numB = 0;

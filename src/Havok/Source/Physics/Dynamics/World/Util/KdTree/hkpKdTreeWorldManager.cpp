@@ -321,24 +321,10 @@ void hkpKdTreeWorldManager::buildTreeDistributed(
     );
     jobHeader->m_openJobs = 4;
 
-    // The SDK's hkArray<int, hkContainerTempAllocator>(4), twice: the branches' depths and the sub jobs' sizes.
-    // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray(int)
+    // The branches' depths and the sub jobs' sizes.
     using TempIntArray = hkArray<int32_t, hkContainerTempAllocator>;
-    TempIntArray branchDepths;
-    {
-        int32_t n = 4;
-        branchDepths.m_data = hkMemoryRouter::getInstance().temp()._bufAlloc<int32_t>(n);
-        branchDepths.m_size = 4;
-        branchDepths.m_capacityAndFlags = n ? n : static_cast<int32_t>(hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
-    }
-    // EXE-INLINED none: hkArray<int, hkContainerTempAllocator>::hkArray(int)
-    TempIntArray subJobSizes;
-    {
-        int32_t n = 4;
-        subJobSizes.m_data = hkMemoryRouter::getInstance().temp()._bufAlloc<int32_t>(n);
-        subJobSizes.m_size = 4;
-        subJobSizes.m_capacityAndFlags = n ? n : static_cast<int32_t>(hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG);
-    }
+    TempIntArray branchDepths(4);
+    TempIntArray subJobSizes(4);
 
     hkSemaphore* semaphore =
         static_cast<hkSemaphore*>(hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkSemaphore)));

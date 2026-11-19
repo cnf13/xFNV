@@ -1698,14 +1698,7 @@ void bhkRagdollController::UpdateDebugLines(bhkRagdollController::DEBUG_SKEL aeS
     hkaSkeleton* pskel =
         aeSkeleton == bhkRagdollController::SKEL_RAGDOLL ? pShareData->pLowSkel : pShareData->pHighSkel;
     int32_t inumBones = pskel->m_bones.m_size;
-    hkArray<hkQsTransform> posMSRag;
-    // EXE-INLINED none: hkArray<hkQsTransform>::hkArray(int), the allocation after hkArray()
-    int32_t iNumAlloc = inumBones;
-    hkMemoryAllocator& kHeap = *hkMemoryRouter::getInstance().m_heap;
-    posMSRag.m_data = iNumAlloc ? kHeap._bufAlloc<hkQsTransform>(iNumAlloc) : nullptr;
-    posMSRag.m_size = iNumAlloc;
-    posMSRag.m_capacityAndFlags =
-        iNumAlloc ? iNumAlloc : static_cast<int32_t>(hkArrayBase<hkQsTransform>::DONT_DEALLOCATE_FLAG);
+    hkArray<hkQsTransform> posMSRag(inumBones);
     pRagdollInstance->getPoseModelSpace(posMSRag.m_data, WorldFromModel);
     hkArray<hkQsTransform>* pposMS =
         aeSkeleton == bhkRagdollController::SKEL_RAGDOLL ? &posMSRag : &pSGPose->accessSyncedPoseModelSpace();

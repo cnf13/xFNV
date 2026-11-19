@@ -115,18 +115,7 @@ void Reader::readBitfield(int32_t numMembers, hkLocalArray<uint8_t>& bout) {
 void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
     switch (arr.getType()) {
         case hkDataObject::TYPE_BYTE: {
-            // EXE-INLINED none: hkArray<hkUint8, hkContainerTempAllocator>::hkArray(int)
-            hkArray<uint8_t, hkContainerTempAllocator> buf;
-            hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-            uint8_t* pData = nullptr;
-            int32_t iNumBytes = nelem;
-            if (nelem) {
-                pData = static_cast<uint8_t*>(pTemp->bufAlloc(iNumBytes));
-            }
-            buf.m_data = pData;
-            buf.m_size = iNumBytes;
-            buf.m_capacityAndFlags =
-                iNumBytes ? iNumBytes : static_cast<int32_t>(hkArrayBase<uint8_t>::DONT_DEALLOCATE_FLAG);
+            hkArray<uint8_t, hkContainerTempAllocator> buf(nelem);
             // EXE-INLINED none: hkArrayBase<hkUint8>::reserve
             hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
             const int32_t iCap = buf.m_capacityAndFlags & hkArrayBase<uint8_t>::CAPACITY_MASK;
@@ -150,19 +139,7 @@ void Reader::_readArrayItems(hkDataArray& arr, int32_t nelem) {
             return;
         }
         case hkDataObject::TYPE_REAL: {
-            // EXE-INLINED none: hkArray<hkReal, hkContainerTempAllocator>::hkArray(int)
-            hkArray<float, hkContainerTempAllocator> buf;
-            hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-            float* pData = nullptr;
-            int32_t iNum = nelem;
-            if (nelem) {
-                int32_t iNumBytes = nelem * static_cast<int32_t>(sizeof(float));
-                pData = static_cast<float*>(pTemp->bufAlloc(iNumBytes));
-                iNum = iNumBytes / static_cast<int32_t>(sizeof(float));
-            }
-            buf.m_data = pData;
-            buf.m_size = iNum;
-            buf.m_capacityAndFlags = iNum ? iNum : static_cast<int32_t>(hkArrayBase<float>::DONT_DEALLOCATE_FLAG);
+            hkArray<float, hkContainerTempAllocator> buf(nelem);
             // EXE-INLINED none: hkArray<hkReal, hkContainerTempAllocator>::setSize
             hkMemoryAllocator* pTemp2 = hkMemoryRouter::getInstance().m_temp;
             const int32_t iCap = buf.m_capacityAndFlags & hkArrayBase<float>::CAPACITY_MASK;

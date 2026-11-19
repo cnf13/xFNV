@@ -200,6 +200,26 @@ public:
     hkArray(T* buffer, int32_t size, int32_t capacity) : hkArrayBase<T>(buffer, size, capacity) {}
     // The SDK's finish constructor: a loaded array keeps what was loaded.
     hkArray(hkFinishLoadedObjectFlag flag) : hkArrayBase<T>(flag) {}
+    // The SDK's hkArray(int size): storage for size elements from the allocator policy, which may round the count up;
+    // the rounded count is the array's size and capacity, and the elements are default-constructed. With no elements
+    // there is no storage and the array is flagged DONT_DEALLOCATE.
+    explicit hkArray(int32_t size) : hkArrayBase<T>(nullptr, 0, 0) {
+        if (size) {
+            this->m_data = AllocatorType().get(this).template _bufAlloc<T>(size);
+        }
+        this->m_size = size;
+        this->m_capacityAndFlags = size ? size : static_cast<int32_t>(hkArrayBase<T>::DONT_DEALLOCATE_FLAG);
+        hkArrayUtil::construct(this->m_data, size, typename hkIsPodType<T>::type());
+    }
+    // The SDK's hkArray(int size, const T& fill): as hkArray(int), with each element a copy of fill.
+    hkArray(int32_t size, const T& fill) : hkArrayBase<T>(nullptr, 0, 0) {
+        if (size) {
+            this->m_data = AllocatorType().get(this).template _bufAlloc<T>(size);
+        }
+        this->m_size = size;
+        this->m_capacityAndFlags = size ? size : static_cast<int32_t>(hkArrayBase<T>::DONT_DEALLOCATE_FLAG);
+        hkArrayUtil::constructWithCopy(this->m_data, size, fill, typename hkIsPodType<T>::type());
+    }
     // The SDK's copy constructor and assignment (hkArray.inl): the elements copied into storage of this array's own.
     // The implicit ones would share a's buffer, and both arrays' destructors would free it.
     hkArray(const hkArray& a) : hkArrayBase<T>(nullptr, 0, 0) {

@@ -1053,26 +1053,8 @@ void hkaSplineCompressedAnimation::initialize(
                     }
 
                     // The fitted curve's knots and control points.
-                    alignas(16) hkArray<hkVector4> points;
-                    {
-                        // EXE-INLINED none: hkArray<hkVector4>::hkArray(int), the allocation after hkArray()
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        int32_t count = 3 * numBlockFrames;
-                        hkVector4* pData = count ? pHeap->_bufAlloc<hkVector4>(count) : nullptr;
-                        points.m_size = count;
-                        points.m_capacityAndFlags = count ? count : hkArrayBase<hkVector4>::DONT_DEALLOCATE_FLAG;
-                        points.m_data = pData;
-                    }
-                    alignas(16) hkArray<float> knots;
-                    {
-                        // EXE-INLINED none: hkArray<hkReal>::hkArray(int), the allocation after hkArray()
-                        hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                        int32_t count = 3 * numBlockFrames + 2;
-                        float* pData = count ? pHeap->_bufAlloc<float>(count) : nullptr;
-                        knots.m_data = pData;
-                        knots.m_size = count;
-                        knots.m_capacityAndFlags = count ? count : hkArrayBase<float>::DONT_DEALLOCATE_FLAG;
-                    }
+                    alignas(16) hkArray<hkVector4> points(3 * numBlockFrames);
+                    alignas(16) hkArray<float> knots(3 * numBlockFrames + 2);
                     const uint8_t dynamicBits = mask & 0xF0;
                     if (dynamicBits) {
                         int32_t numKnots;

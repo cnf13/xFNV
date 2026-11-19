@@ -573,25 +573,7 @@ void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
             int32_t numMembers = arr.getClass(&klass)->getNumMembers();
 
             using minfo_t = hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>;
-            alignas(8) minfo_t minfo;
-            // EXE-INLINED none: hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>::hkArray(int)
-            hkMemoryAllocator* pTemp = hkMemoryRouter::getInstance().m_temp;
-            int32_t numInfos = numMembers;
-            hkDataClass::MemberInfo* pInfos = numInfos ? pTemp->_bufAlloc<hkDataClass::MemberInfo>(numInfos) : nullptr;
-            minfo.m_data = pInfos;
-            minfo.m_size = numInfos;
-            minfo.m_capacityAndFlags = numInfos ? numInfos : hkArrayBase<hkDataClass::MemberInfo>::DONT_DEALLOCATE_FLAG;
-            // The SDK's MemberInfo constructor for each element, after placement new's null test.
-            for (int32_t i = 0; i < numInfos; ++i) {
-                hkDataClass::MemberInfo* pInfo = &pInfos[i];
-                if (pInfo != nullptr) {
-                    pInfo->m_name = nullptr;
-                    pInfo->m_owner = nullptr;
-                    pInfo->m_type = hkDataObject::TYPE_VOID;
-                    pInfo->m_class = nullptr;
-                    pInfo->m_tupleCount = 0;
-                }
-            }
+            alignas(8) minfo_t minfo(numMembers);
             hkDataClass klass2;
             arr.getClass(&klass2)->getAllMemberInfo(minfo);
 

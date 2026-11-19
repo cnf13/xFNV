@@ -187,22 +187,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             uint16_t numMembers;
             m_inStream->readArrayGeneric(&numMembers, 2, 1);
             const int32_t pathLength = numMembers;
-            hkArray<uint16_t> memberPath;
-            {
-                // EXE-INLINED none: hkArray<hkUint16>::hkArray(pathLength), the storage for pathLength elements
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                int32_t count = pathLength;
-                uint16_t* pData = nullptr;
-                if (count) {
-                    int32_t numBytes = count * static_cast<int32_t>(sizeof(uint16_t));
-                    pData = static_cast<uint16_t*>(pHeap->bufAlloc(numBytes));
-                    count = numBytes / static_cast<int32_t>(sizeof(uint16_t));
-                }
-                memberPath.m_data = pData;
-                memberPath.m_size = count;
-                memberPath.m_capacityAndFlags =
-                    count ? count : static_cast<int32_t>(hkArrayBase<uint16_t>::DONT_DEALLOCATE_FLAG);
-            }
+            hkArray<uint16_t> memberPath(pathLength);
             {
                 // EXE-INLINED none: hkArray<hkUint16>::setSize
                 hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
@@ -223,21 +208,7 @@ void hkInspectProcess::consumeCommand(uint8_t command) {
             }
             int32_t dataSize;
             m_inStream->readArrayGeneric(&dataSize, 4, 1);
-            hkArray<char> data;
-            {
-                // EXE-INLINED none: hkArray<char>::hkArray(dataSize), the storage for dataSize elements
-                hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-                int32_t count = dataSize;
-                char* pData = nullptr;
-                if (count) {
-                    int32_t numBytes = count;
-                    pData = static_cast<char*>(pHeap->bufAlloc(numBytes));
-                    count = numBytes;
-                }
-                data.m_data = pData;
-                data.m_size = count;
-                data.m_capacityAndFlags = count ? count : static_cast<int32_t>(hkArrayBase<char>::DONT_DEALLOCATE_FLAG);
-            }
+            hkArray<char> data(dataSize);
             {
                 // EXE-INLINED none: hkArray<char>::setSize
                 hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;

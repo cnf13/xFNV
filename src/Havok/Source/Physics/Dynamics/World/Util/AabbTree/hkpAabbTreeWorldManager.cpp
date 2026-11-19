@@ -533,8 +533,7 @@ void hkpAabbTreeWorldManager::pushBackToActiveList(const hkpCollidable* collidab
 // alignment padding), +0x44..+0x4F and +0x54..+0x5F (alignment padding after m_numAvailableEmptyNodes and
 // m_collidables), and the 0x20 frame bytes past the job (+0x60..+0x7F; the entry's tail in src).
 // From 32 collidables on, with a thread pool and a job queue, the tree is built by one coordinator job on the
-// queue; otherwise it is built here from a mediator over the collidables. The depth and sub-job-size arrays are
-// the SDK's hkArray<int>(4), their storage allocated inline.
+// queue; otherwise it is built here from a mediator over the collidables.
 void hkpAabbTreeWorldManager::buildKdTree(
     hkKdTree*& tree,
     hkArray<const hkpCollidable*, hkContainerHeapAllocator>& collidables,
@@ -558,28 +557,8 @@ void hkpAabbTreeWorldManager::buildKdTree(
         }
         m_kdTreeJobpHeader->m_openJobs = 4;
 
-        hkArray<int32_t> branchDepths;
-        // EXE-INLINED none: hkArray<int>::hkArray(int), the storage for its elements
-        int32_t numBranchDepths = 4;
-        branchDepths.m_data = hkMemoryRouter::getInstance().heap()._bufAlloc<int32_t>(numBranchDepths);
-        branchDepths.m_size = numBranchDepths;
-        if (numBranchDepths) {
-            branchDepths.m_capacityAndFlags = numBranchDepths;
-        }
-        else {
-            branchDepths.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        }
-        hkArray<int32_t> subJobSizes;
-        // EXE-INLINED none: hkArray<int>::hkArray(int), the storage for its elements
-        int32_t numSubJobSizes = 4;
-        subJobSizes.m_data = hkMemoryRouter::getInstance().heap()._bufAlloc<int32_t>(numSubJobSizes);
-        subJobSizes.m_size = numSubJobSizes;
-        if (numSubJobSizes) {
-            subJobSizes.m_capacityAndFlags = numSubJobSizes;
-        }
-        else {
-            subJobSizes.m_capacityAndFlags = hkArrayBase<int32_t>::DONT_DEALLOCATE_FLAG;
-        }
+        hkArray<int32_t> branchDepths(4);
+        hkArray<int32_t> subJobSizes(4);
 
         // The queue takes the job as a whole entry (addJob's JobQueueEntry& overload), so the job is written in place
         // in the entry, as hkCpuKdTreeBuildCoordinatorJob reads it back.

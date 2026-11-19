@@ -164,25 +164,7 @@ void hkaRagdollUtils::splitRagdollInstanceShallow(
 ) {
     hkaRagdollInstance** ppOut[2] = {&trunk, &branch};
     bool bValues[2] = {false, true};
-    const int32_t iNumBones = original->m_skeleton->m_bones.m_size;
-    hkArray<bool> descendants;
-    // EXE-INLINED none: hkArray<bool>::hkArray(int)
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    descendants.m_size = static_cast<uint32_t>(iNumBones);
-    if (iNumBones == 0) {
-        descendants.m_data = nullptr;
-        descendants.m_capacityAndFlags = hkArrayBase<bool>::DONT_DEALLOCATE_FLAG;
-    }
-    else {
-        int32_t iNumBytes = iNumBones;
-        descendants.m_data = static_cast<bool*>(pHeap->bufAlloc(iNumBytes));
-        if (iNumBytes == 0) {
-            descendants.m_capacityAndFlags = hkArrayBase<bool>::DONT_DEALLOCATE_FLAG;
-        }
-        else {
-            descendants.m_capacityAndFlags = static_cast<uint32_t>(iNumBytes);
-        }
-    }
+    hkArray<bool> descendants(original->m_skeleton->m_bones.m_size);
     hkaSkeletonUtils::markDescendants(original->m_skeleton, splitBone, descendants.m_data, true);
     for (int32_t i = 0; i < 2; ++i) {
         hkArray<hkpRigidBody*> rigidBodies;
