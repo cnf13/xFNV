@@ -422,23 +422,15 @@ void TESPackage::Save() {
 }
 
 void TESPackage::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
-    uint32_t v3;
     BGSChangeFlags* v4;
-    BGSChangeFlags* v5;
-    BGSChangeFlags v8;
     BGSChangeFlags v9;
-    uint32_t v2 = TESForm::GetFormID();
-    v3 = static_cast<uint32_t>((v3 & 0xffffff00u) | static_cast<uint32_t>((uint8_t)pDataHandler->IsFormIDCreated(v2)));
-    if (!((uint8_t)v3)) {
+    if (!pDataHandler->IsFormIDCreated(TESForm::GetFormID())) {
         v4 = &(v9 = apLoadGameBuffer->GetOldChangeFlags());
         if (v4->CheckFlags(0x80000000u)) {
             PackData.iPackFlags &= (~0x8000u);
         }
-        v5 = &(v8 = apLoadGameBuffer->GetOldChangeFlags());
-        v3 = static_cast<uint32_t>((v3 & 0xffffff00u) | static_cast<uint32_t>((uint8_t)v5->CheckFlags(0x40000000u)));
-        if ((uint8_t)v3) {
-            v3 = PackData.iPackFlags & 0xFFFEFFFFu;
-            PackData.iPackFlags = v3;
+        if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_PACKAGE_WAITING)) {
+            PackData.iPackFlags &= ~0x10000u;
         }
     }
 }

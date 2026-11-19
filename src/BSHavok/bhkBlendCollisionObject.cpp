@@ -471,9 +471,7 @@ void bhkBlendCollisionObject::UpdateAddedToWorld() {
             m_collisionFilterInfo = p_m_collidable->m_broadPhaseHandle.m_collisionFilterInfo;
         }
         else {
-            m_collisionFilterInfo = static_cast<uint32_t>(
-                (m_collisionFilterInfo & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(0)))
-            );
+            m_collisionFilterInfo = 0;
         }
         int32_t v6 = m_collisionFilterInfo & 127;
         if (v6 == 8 || v6 == 29) {

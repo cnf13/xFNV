@@ -618,12 +618,9 @@ void hkpMoppDefaultAssembler::checkAndAddProperties(
 }
 
 void hkpMoppDefaultAssembler::addSplit(int32_t a1, int32_t a2, HK_MOPP_SPLIT_DIRECTIONS a3, int32_t a4, int32_t rpos) {
-    int32_t m_pos;
+    int32_t rightPos = rpos;
     int32_t v10;
     uint8_t v13;
-    m_pos = static_cast<int32_t>(
-        (static_cast<uint32_t>(m_pos) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(rpos)))
-    );
     hkpMoppCodeGenerator* m_code = this->m_code;
     int32_t v9 = m_code->m_pos - rpos;
     if (a3 >= 3) {
@@ -643,11 +640,11 @@ void hkpMoppDefaultAssembler::addSplit(int32_t a1, int32_t a2, HK_MOPP_SPLIT_DIR
     if (a2 - a1 == 1) {
         if (v9 > 251) {
             addJump(rpos);
-            m_pos = this->m_code->m_pos;
+            rightPos = this->m_code->m_pos;
         }
         addJump(a4);
         hkpMoppCodeGenerator* v11 = this->m_code;
-        v11->m_code[v11->m_size - v11->m_pos++ - 1] = static_cast<uint8_t>(v11->m_pos) - m_pos;
+        v11->m_code[v11->m_size - v11->m_pos++ - 1] = static_cast<uint8_t>(v11->m_pos) - rightPos;
         if (v11->m_pos >= v11->m_size) {
             v11->resize();
         }
@@ -662,11 +659,11 @@ void hkpMoppDefaultAssembler::addSplit(int32_t a1, int32_t a2, HK_MOPP_SPLIT_DIR
     LABEL_15:;
         if (v9 > 251) {
             addJump(rpos);
-            m_pos = this->m_code->m_pos;
+            rightPos = this->m_code->m_pos;
         }
         addJump(a4);
         hkpMoppCodeGenerator* v14 = this->m_code;
-        v14->m_code[v14->m_size - v14->m_pos++ - 1] = static_cast<uint8_t>(v14->m_pos) - m_pos;
+        v14->m_code[v14->m_size - v14->m_pos++ - 1] = static_cast<uint8_t>(v14->m_pos) - rightPos;
         if (v14->m_pos >= v14->m_size) {
             v14->resize();
         }

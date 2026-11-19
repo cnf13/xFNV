@@ -63,7 +63,6 @@ HackingText* HackingText::init() {
 }
 
 char HackingText::Update() {
-    uint32_t v1;
     if (GetDisplayMode() && BSGetTickCount() >= uiNextDisplayTime && !bIsTextRemaining) {
         if ((pTileValueVisibility) && (!GetFlashMode())) {
             pTileValueVisibility->SetFloat(1.0f, true);
@@ -95,22 +94,24 @@ char HackingText::Update() {
         }
         uiNextDisplayTime = uiDisplayRate + BSGetTickCount();
     }
-    v1 = static_cast<uint32_t>((v1 & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(GetFlashMode()))));
-    if (static_cast<uint8_t>(v1)) {
-        v1 = BSGetTickCount();
-        if (v1 >= uiNextBlinkTime) {
+    // Callers ignore the result. The game leaves al as is: 0 (GetFlashMode's false) when the text does not flash,
+    // else the low byte of the last tick count or blink time.
+    uint32_t uiTime = 0;
+    if (GetFlashMode()) {
+        uiTime = BSGetTickCount();
+        if (uiTime >= uiNextBlinkTime) {
             if (pTileValueVisibility->fValue == 1.0) {
                 pTileValueVisibility->SetFloat(0.0f, true);
-                v1 = uiFlashOffDuration + BSGetTickCount();
+                uiTime = uiFlashOffDuration + BSGetTickCount();
             }
             else {
                 pTileValueVisibility->SetFloat(1.0f, true);
-                v1 = uiFlashOnDuration + BSGetTickCount();
+                uiTime = uiFlashOnDuration + BSGetTickCount();
             }
-            uiNextBlinkTime = v1;
+            uiNextBlinkTime = uiTime;
         }
     }
-    return v1;
+    return uiTime;
 }
 
 void HackingText::ForceFinish() {

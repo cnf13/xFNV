@@ -272,26 +272,16 @@ void hkpVehicleLinearCastWheelCollide::collideWheels(
     const hkpVehicleInstance* vehicle,
     hkpVehicleWheelCollide::CollisionDetectionWheelOutput* cdInfoOut
 ) {
-    int32_t v8;
-    uint8_t m_numWheels = vehicle->m_data->m_numWheels;
-    v8 = static_cast<int32_t>(
-        (static_cast<uint32_t>(v8) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(0)))
-    );
-    if (m_numWheels) {
-        do {
-            hkpRootCdPoint v9;
-            if (castSingleWheel(vehicle, v8, v9).m_bool) {
-                getCollisionOutputFromCastResult(vehicle, v8, v9, *cdInfoOut);
-            }
-            else {
-                getCollisionOutputWithoutHit(vehicle, v8, *cdInfoOut);
-            }
-            wheelCollideCallback(vehicle, v8, *cdInfoOut++);
-            v8 = static_cast<int32_t>(
-                (static_cast<uint32_t>(v8) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>((v8 + 1))))
-            );
+    const uint8_t numWheels = vehicle->m_data->m_numWheels;
+    for (uint8_t wheelNum = 0; wheelNum < numWheels; ++wheelNum) {
+        hkpRootCdPoint linearCastOutput;
+        if (castSingleWheel(vehicle, wheelNum, linearCastOutput).m_bool) {
+            getCollisionOutputFromCastResult(vehicle, wheelNum, linearCastOutput, *cdInfoOut);
         }
-        while (static_cast<uint8_t>(v8) < m_numWheels);
+        else {
+            getCollisionOutputWithoutHit(vehicle, wheelNum, *cdInfoOut);
+        }
+        wheelCollideCallback(vehicle, wheelNum, *cdInfoOut++);
     }
 }
 

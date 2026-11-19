@@ -834,17 +834,13 @@ void BSShaderProperty::AddPass_2X_EnvMap(
 }
 
 void BSShaderProperty::SelfIlluminationBlock(NiGeometry* a2, uint16_t* a3, int32_t a4, bool bSkinned) {
-    int16_t v5;
-    v5 = static_cast<int16_t>(
-        (static_cast<uint32_t>(v5) & 0xFFFF00FFu) | (static_cast<uint32_t>(static_cast<uint8_t>(0)) << 8)
-    );
     if (static_cast<uint8_t>(a4)) {
         BSShaderProperty::RenderPassArray* pSIBlockRenderPassArray = this->pSIBlockRenderPassList;
         if (pSIBlockRenderPassArray) {
-            v5 = static_cast<int16_t>(
-                (static_cast<uint32_t>(v5) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(bSkinned)))
+            pSIBlockRenderPassArray->Add(
+                a2, bSkinned ? BSShaderManager::BSSM_SELFILLUMALPHABLOCK_S : BSShaderManager::BSSM_SELFILLUMALPHABLOCK,
+                0, 0, nullptr, nullptr, nullptr, nullptr
             );
-            pSIBlockRenderPassArray->Add(a2, v5 + 20, 0, 0, nullptr, nullptr, nullptr, nullptr);
         }
     }
 }

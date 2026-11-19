@@ -720,50 +720,13 @@ void releaseFromCache(
 }
 
 double byteSwapFloat(float a1) {
-    float a1a;
-    a1a = std::bit_cast<float>(
-        (std::bit_cast<uint32_t>(a1a) & 0xFFFFFF00u) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(std::bit_cast<uint32_t>(a1) >> 24)))
-    );
-    a1a = std::bit_cast<float>(
-        (std::bit_cast<uint32_t>(a1a) & 0xFFFF00FFu) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(std::bit_cast<uint32_t>(a1) >> 16)) << 8)
-    );
-    a1a = std::bit_cast<float>(
-        (std::bit_cast<uint32_t>(a1a) & 0xFF00FFFFu) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(std::bit_cast<uint32_t>(a1) >> 8)) << 16)
-    );
-    a1a = std::bit_cast<float>(
-        (std::bit_cast<uint32_t>(a1a) & 0xFFFFFFu) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(std::bit_cast<uint32_t>(a1))) << 24)
-    );
-    return a1a;
+    return std::bit_cast<float>(std::byteswap(std::bit_cast<uint32_t>(a1)));
 }
 
 int32_t byteSwap32(int32_t r_eax) {
-    int32_t v2;
-    v2 = static_cast<int32_t>(
-        (static_cast<uint32_t>(v2) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(r_eax >> 24)))
-    );
-    v2 = static_cast<int32_t>(
-        (static_cast<uint32_t>(v2) & 0xFFFF00FFu) | (static_cast<uint32_t>(static_cast<uint8_t>(r_eax >> 16)) << 8)
-    );
-    v2 = static_cast<int32_t>(
-        (static_cast<uint32_t>(v2) & 0xFF00FFFFu) | (static_cast<uint32_t>(static_cast<uint8_t>(r_eax >> 8)) << 16)
-    );
-    v2 = static_cast<int32_t>(
-        (static_cast<uint32_t>(v2) & 0xFFFFFFu) | (static_cast<uint32_t>(static_cast<uint8_t>(r_eax)) << 24)
-    );
-    return v2;
+    return static_cast<int32_t>(std::byteswap(static_cast<uint32_t>(r_eax)));
 }
 
 int16_t byteSwap16(int32_t r_eax) {
-    int16_t v2;
-    v2 = static_cast<int16_t>(
-        (static_cast<uint32_t>(v2) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(r_eax >> 8)))
-    );
-    v2 = static_cast<int16_t>(
-        (static_cast<uint32_t>(v2) & 0xFFFF00FFu) | (static_cast<uint32_t>(static_cast<uint8_t>(r_eax)) << 8)
-    );
-    return v2;
+    return static_cast<int16_t>(std::byteswap(static_cast<uint16_t>(r_eax)));
 }

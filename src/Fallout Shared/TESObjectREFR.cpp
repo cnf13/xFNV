@@ -4249,17 +4249,11 @@ void TESObjectREFR::SaveHavokData(BGSSaveFormBuffer* apSaveGameBuffer) {
 }
 
 void TESObjectREFR::SaveHavokData(HavokSaveData* apHavokSaveData) {
-    int32_t sboneCount;
     NiAVObject* pobj3D = TESObjectREFR::Get3D();
     if (pobj3D) {
         bhkWorldNS::ObjectRecData recData;
         SaveGameDataOLD(apHavokSaveData, 1);
-        sboneCount = static_cast<int32_t>(
-            (static_cast<uint32_t>(sboneCount) & 0xFFFF0000u) |
-            (static_cast<uint32_t>(
-                static_cast<uint16_t>((apHavokSaveData->sInactiveBoneCount + apHavokSaveData->sActiveBoneCount))
-            ))
-        );
+        uint16_t sboneCount = apHavokSaveData->sActiveBoneCount + apHavokSaveData->sInactiveBoneCount;
         SaveGameDataOLD(&sboneCount, 2);
         recData.eAction = bhkWorldNS::OA_TOTAL;
         recData.bRecurse = true;

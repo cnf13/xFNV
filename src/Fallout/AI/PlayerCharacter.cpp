@@ -4173,9 +4173,7 @@ void PlayerCharacter::Update(float afDelta) {
     Animation* panim = this->GetAnimation(false);
     Animation* panim1st = this->GetAnimation(true);
     bool v302 = false;
-    smoveMode = static_cast<int32_t>(
-        (static_cast<uint32_t>(smoveMode) & 0xFFFF0000u) | (static_cast<uint32_t>(static_cast<uint16_t>(0)))
-    );
+    smoveMode = 0;
     BSSoundHandle hndl;
     this->fDropAngleMod = 0.0;
     this->fLastDropAngleMod = 0.0;

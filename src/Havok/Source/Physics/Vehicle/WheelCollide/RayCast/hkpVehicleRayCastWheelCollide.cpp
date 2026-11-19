@@ -238,19 +238,14 @@ int32_t hkpVehicleRayCastWheelCollide::buildRayCastCommands(
     hkpShapeRayCastCommand* commandStorage,
     hkpWorldRayCastOutput* outputStorage
 ) const {
-    int32_t result;
     m_phantom->ensureDeterministicOrder();
     int32_t m_size = m_phantom->m_overlappingCollidables.m_size;
     if (m_size <= 0) {
         return 0;
     }
-    result = static_cast<int32_t>(
-        (static_cast<uint32_t>(result) & 0xFFFFFF00u) |
-        (static_cast<uint32_t>(static_cast<uint8_t>(vehicle->m_data->m_numWheels)))
-    );
-    char v13 = result;
-    if (static_cast<char>(result) > 0) {
-        int32_t v14 = static_cast<uint8_t>(result);
+    const int8_t numWheels = vehicle->m_data->m_numWheels;
+    if (numWheels > 0) {
+        int32_t wheelsLeft = numWheels;
         int32_t v10 = 0;
         do {
             const hkpRayShapeCollectionFilter* v12;
@@ -277,14 +272,11 @@ int32_t hkpVehicleRayCastWheelCollide::buildRayCastCommands(
             ++v10;
             ++commandStorage;
             ++outputStorage;
-            --v14;
+            --wheelsLeft;
         }
-        while (v14);
-        result = static_cast<int32_t>(
-            (static_cast<uint32_t>(result) & 0xFFFFFF00u) | (static_cast<uint32_t>(static_cast<uint8_t>(v13)))
-        );
+        while (wheelsLeft);
     }
-    return static_cast<char>(result);
+    return numWheels;
 }
 
 void hkpVehicleRayCastWheelCollide::calcWheelsAABB(const hkpVehicleInstance* vehicle, hkAabb& aabbOut) const {

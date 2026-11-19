@@ -125,60 +125,52 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
         else {
             if (bHasVertexColors) {
                 if (bDisplacement) {
-                    int16_t v14;
-                    v14 = static_cast<int16_t>(
-                        (static_cast<uint32_t>(v14) & 0xFFFF00FFu) |
-                        (static_cast<uint32_t>(static_cast<uint8_t>(0)) << 8)
-                    );
                     if (WaterShader::bInterior) {
                         if (bReflections) {
-                            v14 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v14) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v14 + 675;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_Vc
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_DEPTH_Vc;
                             }
                             else {
-                                ambPass = 4 * v14 + 677;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_REFRACTIONS_Vc
+                                    : BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_DEPTH_NO_REFRACTIONS_Vc;
                             }
                         }
                         else {
-                            v14 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v14) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v14 + 676;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_REFLECTIONS_Vc
+                                    : BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_DEPTH_NO_REFLECTIONS_Vc;
                             }
                             else {
-                                ambPass = 4 * v14 + 678;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_REFLECTIONS_NO_REFRACTIONS_Vc
+                                    : BSShaderManager::
+                                          BSSM_WATER_INTERIOR_WADING_NO_DEPTH_NO_REFLECTIONS_NO_REFRACTIONS_Vc;
                             }
                         }
                     }
                     else {
                         if (bReflections) {
-                            v14 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v14) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v14 + 667;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_WADING_Vc
+                                                 : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_Vc;
                             }
                             else {
-                                ambPass = 4 * v14 + 669;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_WADING_NO_REFRACTIONS_Vc
+                                                 : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_NO_REFRACTIONS_Vc;
                             }
                         }
                         else {
-                            v14 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v14) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v14 + 668;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_WADING_NO_REFLECTIONS_Vc
+                                                 : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_NO_REFLECTIONS_Vc;
                             }
                             else {
-                                ambPass = 4 * v14 + 670;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_WADING_NO_REFLECTIONS_NO_REFRACTIONS_Vc
+                                    : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_NO_REFLECTIONS_NO_REFRACTIONS_Vc;
                             }
                         }
                     }
@@ -186,33 +178,25 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
                 }
                 if (!bLOD) {
                     if (WaterShader::bInterior) {
-                        int16_t v15;
-                        v15 = static_cast<int16_t>(
-                            (static_cast<uint32_t>(v15) & 0xFFFF00FFu) |
-                            (static_cast<uint32_t>(static_cast<uint8_t>(0)) << 8)
-                        );
                         if (bReflections) {
-                            v15 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v15) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 8 * v15 + 706;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_Vc
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_Vc;
                             }
                             else {
-                                ambPass = 8 * v15 + 708;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_NO_REFRACTIONS_Vc
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_NO_REFRACTIONS_Vc;
                             }
                         }
                         else {
-                            v15 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v15) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 8 * v15 + 709;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_NO_REFLECTIONS_Vc
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_NO_REFLECTIONS_Vc;
                             }
                             else {
-                                ambPass = 8 * v15 + 707;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_INTERIOR_NO_REFLECTIONS_NO_REFRACTIONS_Vc
+                                    : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_NO_REFLECTIONS_NO_REFRACTIONS_Vc;
                             }
                         }
                     }
@@ -241,60 +225,50 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
             }
             else {
                 if (bDisplacement) {
-                    int16_t v18;
-                    v18 = static_cast<int16_t>(
-                        (static_cast<uint32_t>(v18) & 0xFFFF00FFu) |
-                        (static_cast<uint32_t>(static_cast<uint8_t>(0)) << 8)
-                    );
                     if (WaterShader::bInterior) {
                         if (bReflections) {
-                            v18 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v18) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v18 + 658;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_WADING
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_DEPTH;
                             }
                             else {
-                                ambPass = 4 * v18 + 660;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_REFRACTIONS
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_DEPTH_NO_REFRACTIONS;
                             }
                         }
                         else {
-                            v18 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v18) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v18 + 661;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_REFLECTIONS
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_DEPTH_NO_REFLECTIONS;
                             }
                             else {
-                                ambPass = 4 * v18 + 659;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_INTERIOR_WADING_NO_REFLECTIONS_NO_REFRACTIONS
+                                    : BSShaderManager::
+                                          BSSM_WATER_INTERIOR_WADING_NO_DEPTH_NO_REFLECTIONS_NO_REFRACTIONS;
                             }
                         }
                     }
                     else {
                         if (bReflections) {
-                            v18 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v18) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v18 + 650;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_WADING
+                                                 : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH;
                             }
                             else {
-                                ambPass = 4 * v18 + 652;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_WADING_NO_REFRACTIONS
+                                                 : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_NO_REFRACTIONS;
                             }
                         }
                         else {
-                            v18 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v18) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 4 * v18 + 653;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_WADING_NO_REFLECTIONS
+                                                 : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_NO_REFLECTIONS;
                             }
                             else {
-                                ambPass = 4 * v18 + 651;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_WADING_NO_REFLECTIONS_NO_REFRACTIONS
+                                    : BSShaderManager::BSSM_WATER_WADING_NO_DEPTH_NO_REFLECTIONS_NO_REFRACTIONS;
                             }
                         }
                     }
@@ -302,33 +276,25 @@ BSShaderProperty::RenderPassArray* WaterShaderProperty::GetRenderPasses(
                 }
                 if (!bLOD) {
                     if (WaterShader::bInterior) {
-                        int16_t v19;
-                        v19 = static_cast<int16_t>(
-                            (static_cast<uint32_t>(v19) & 0xFFFF00FFu) |
-                            (static_cast<uint32_t>(static_cast<uint8_t>(0)) << 8)
-                        );
                         if (bReflections) {
-                            v19 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v19) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 8 * v19 + 688;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH;
                             }
                             else {
-                                ambPass = 8 * v19 + 690;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_NO_REFRACTIONS
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_NO_REFRACTIONS;
                             }
                         }
                         else {
-                            v19 = static_cast<int16_t>(
-                                (static_cast<uint32_t>(v19) & 0xFFFFFF00u) |
-                                (static_cast<uint32_t>(static_cast<uint8_t>((!this->bDepth))))
-                            );
                             if (bRefractions) {
-                                ambPass = 8 * v19 + 691;
+                                ambPass = bDepth ? BSShaderManager::BSSM_WATER_INTERIOR_NO_REFLECTIONS
+                                                 : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_NO_REFLECTIONS;
                             }
                             else {
-                                ambPass = 8 * v19 + 689;
+                                ambPass = bDepth
+                                    ? BSShaderManager::BSSM_WATER_INTERIOR_NO_REFLECTIONS_NO_REFRACTIONS
+                                    : BSShaderManager::BSSM_WATER_INTERIOR_NODEPTH_NO_REFLECTIONS_NO_REFRACTIONS;
                             }
                         }
                     }
