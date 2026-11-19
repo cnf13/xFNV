@@ -71,13 +71,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
         uint8_t* pbuffer = nullptr;
         if (aFormat.m_eFormat) {
             NiPixelData* ppixeldata_3;
-            NiPixelData* v41 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-            if (v41) {
-                ppixeldata_3 = ::new (v41) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGBA32, 1u, 1u);
-            }
-            else {
-                ppixeldata_3 = nullptr;
-            }
+            ppixeldata_3 = new NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGBA32, 1u, 1u);
             ppixeldata = ppixeldata_3;
             pbuffer = ppixeldata_3->GetPixels(0u, 0u);
             for (uint32_t i = 0; i < v64; ++i) {
@@ -159,13 +153,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
         }
         else {
             NiPixelData* ppixeldata_2;
-            NiPixelData* v62 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-            if (v62) {
-                ppixeldata_2 = ::new (v62) NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGB24, 1u, 1u);
-            }
-            else {
-                ppixeldata_2 = nullptr;
-            }
+            ppixeldata_2 = new NiPixelData(this->iWidth, this->iHeight, NiPixelFormat_RGB24, 1u, 1u);
             ppixeldata = ppixeldata_2;
             pbuffer = ppixeldata_2->GetPixels(0u, 0u);
             for (uint32_t j = 0; j < v64; ++j) {

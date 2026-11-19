@@ -86,9 +86,5 @@ void NiRollController::CopyMembers(NiRollController* pDest, NiCloningProcess& kC
 }
 
 NiObject* NiRollController::CreateObject() {
-    NiRollController* pkObject = static_cast<NiRollController*>(NiMemObject::operator new(sizeof(NiRollController)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiRollController;
+    return new NiRollController;
 }

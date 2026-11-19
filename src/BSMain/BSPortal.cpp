@@ -36,13 +36,7 @@ const NiRTTI* BSPortal::GetRTTI() const {
 
 NiObject* BSPortal::CreateClone(NiCloningProcess& arCloneData) {
     BSPortal* pobj;
-    BSPortal* apMemory = static_cast<BSPortal*>(NiMemObject::operator new(sizeof(BSPortal)));
-    if (apMemory) {
-        pobj = ::new (apMemory) BSPortal;
-    }
-    else {
-        pobj = nullptr;
-    }
+    pobj = new BSPortal;
     CopyMembers(pobj, arCloneData);
     return pobj;
 }
@@ -90,13 +84,7 @@ BSPortalSharedNode::BSPortalSharedNode(BSPortal* apPortal) : NiNode(0), pCompoun
 
 NiObject* BSPortalSharedNode::CreateClone(NiCloningProcess& arCloneData) {
     BSPortalSharedNode* v3;
-    void* apMemory = NiMemObject::operator new(sizeof(BSPortalSharedNode));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSPortalSharedNode(pPortal);
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSPortalSharedNode(pPortal);
     CopyMembers(v3, arCloneData);
     return v3;
 }

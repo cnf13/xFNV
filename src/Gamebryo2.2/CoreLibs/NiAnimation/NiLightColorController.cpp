@@ -32,11 +32,7 @@ const NiRTTI* NiLightColorController::GetRTTI() const {
 }
 
 NiObject* NiLightColorController::CreateClone(NiCloningProcess& kCloning) {
-    void* pkObject = NiMemObject::operator new(sizeof(NiLightColorController));
-    NiLightColorController* pkObject_2 = nullptr;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiLightColorController;
-    }
+    NiLightColorController* pkObject_2 = new NiLightColorController;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
     return pkObject_2;
@@ -66,14 +62,7 @@ void NiLightColorController::LinkObject(NiStream& kStream) {
         if (ObjectFromLinkID) {
             NiIncRefCount(ObjectFromLinkID);
         }
-        NiPoint3Interpolator* v4 =
-            static_cast<NiPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiPoint3Interpolator)));
-        if (v4) {
-            v5 = ::new (v4) NiPoint3Interpolator(ObjectFromLinkID);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiPoint3Interpolator(ObjectFromLinkID);
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
         if (ObjectFromLinkID) {
@@ -182,9 +171,5 @@ void NiLightColorController::GetTargetPoint3Value(NiPoint3& kValue) {
 }
 
 NiObject* NiLightColorController::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiLightColorController));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiLightColorController;
+    return new NiLightColorController;
 }

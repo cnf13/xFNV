@@ -391,9 +391,5 @@ void NiPSysData::SortVertices(int32_t a2, int32_t a3) {
 }
 
 NiObject* NiPSysData::CreateObject() {
-    NiPSysData* pkObject = static_cast<NiPSysData*>(NiMemObject::operator new(sizeof(NiPSysData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysData;
+    return new NiPSysData;
 }

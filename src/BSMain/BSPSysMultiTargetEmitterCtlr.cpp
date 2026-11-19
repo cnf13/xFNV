@@ -37,14 +37,7 @@ BSPSysMultiTargetEmitterCtlr::~BSPSysMultiTargetEmitterCtlr() {
 
 NiObject* BSPSysMultiTargetEmitterCtlr::CreateClone(NiCloningProcess& kCloning) {
     BSPSysMultiTargetEmitterCtlr* v3;
-    BSPSysMultiTargetEmitterCtlr* apMemory =
-        static_cast<BSPSysMultiTargetEmitterCtlr*>(NiMemObject::operator new(sizeof(BSPSysMultiTargetEmitterCtlr)));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSPSysMultiTargetEmitterCtlr;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSPSysMultiTargetEmitterCtlr;
     CopyMembers(v3, kCloning);
     return v3;
 }
@@ -291,11 +284,5 @@ void BSPSysMultiTargetEmitterCtlr::SetMaxParticlesPerEmitter(uint16_t asValue) {
 }
 
 NiObject* BSPSysMultiTargetEmitterCtlr::CreateObject() {
-    BSPSysMultiTargetEmitterCtlr* apMemory =
-        static_cast<BSPSysMultiTargetEmitterCtlr*>(NiMemObject::operator new(sizeof(BSPSysMultiTargetEmitterCtlr)));
-    if (apMemory) {
-        return ::new (apMemory) BSPSysMultiTargetEmitterCtlr;
-    }
-
-    return nullptr;
+    return new BSPSysMultiTargetEmitterCtlr;
 }

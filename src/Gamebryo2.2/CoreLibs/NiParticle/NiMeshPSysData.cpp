@@ -234,10 +234,5 @@ void NiMeshPSysData::CopyMembers(NiMeshPSysData* pkDest, NiCloningProcess& kClon
 }
 
 NiObject* NiMeshPSysData::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiMeshPSysData));
-    if (v0) {
-        return ::new (v0) NiMeshPSysData;
-    }
-
-    return nullptr;
+    return new NiMeshPSysData;
 }

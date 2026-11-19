@@ -45,14 +45,7 @@ NiObject* bhkHingeLimitsConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkHingeLimitsConstraint* pClone =
-        static_cast<bhkHingeLimitsConstraint*>(NiMemObject::operator new(sizeof(bhkHingeLimitsConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkHingeLimitsConstraint;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkHingeLimitsConstraint* pClone = new bhkHingeLimitsConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     riMemContext = iOldMemContext;
@@ -98,11 +91,7 @@ hkSerializableCinfo& bhkHingeLimitsConstraint::CreateCinfo(bool& arCreated) {
 
 // The factory the stream's type table holds: a new constraint in Gamebryo's heap, built by the default constructor.
 NiObject* bhkHingeLimitsConstraint::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkHingeLimitsConstraint));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) bhkHingeLimitsConstraint;
+    return new bhkHingeLimitsConstraint;
 }
 
 // hkConstraintCinfo's constructor sets no data, PSI priority and no entities.

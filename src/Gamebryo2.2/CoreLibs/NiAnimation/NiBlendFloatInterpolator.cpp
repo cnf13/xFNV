@@ -25,15 +25,7 @@ NiBlendFloatInterpolator::NiBlendFloatInterpolator(
 NiBlendFloatInterpolator::~NiBlendFloatInterpolator() {}
 
 NiObject* NiBlendFloatInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBlendFloatInterpolator* pkObject =
-        static_cast<NiBlendFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBlendFloatInterpolator)));
-    NiBlendFloatInterpolator* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBlendFloatInterpolator;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiBlendFloatInterpolator* pkObject_2 = new NiBlendFloatInterpolator;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fFloatValue = m_fFloatValue;
     return pkObject_2;
@@ -137,11 +129,5 @@ bool NiBlendFloatInterpolator::BlendValues(float fTime, NiObjectNET* pkInterpTar
 }
 
 NiObject* NiBlendFloatInterpolator::CreateObject() {
-    NiBlendFloatInterpolator* pkObject =
-        static_cast<NiBlendFloatInterpolator*>(NiMemObject::operator new(sizeof(NiBlendFloatInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    ::new (pkObject) NiBlendFloatInterpolator;
-    return pkObject;
+    return new NiBlendFloatInterpolator;
 }

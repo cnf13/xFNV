@@ -369,9 +369,5 @@ void NiTransformData::SetScaleAnim(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAni
 }
 
 NiObject* NiTransformData::CreateObject() {
-    NiTransformData* pkObject = static_cast<NiTransformData*>(NiMemObject::operator new(sizeof(NiTransformData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiTransformData;
+    return new NiTransformData;
 }

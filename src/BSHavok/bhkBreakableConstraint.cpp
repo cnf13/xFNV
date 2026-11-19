@@ -41,11 +41,7 @@ NiObject* bhkBreakableConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkBreakableConstraint* pClone =
-        static_cast<bhkBreakableConstraint*>(NiMemObject::operator new(sizeof(bhkBreakableConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkBreakableConstraint;
-    }
+    bhkBreakableConstraint* pClone = new bhkBreakableConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     GetThreadMemContext() = iOldMemContext;
@@ -108,11 +104,7 @@ hkSerializableCinfo& bhkBreakableConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkBreakableConstraint::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkBreakableConstraint));
-    if (pMemory == nullptr) {
-        return nullptr;
-    }
-    return ::new (pMemory) bhkBreakableConstraint;
+    return new bhkBreakableConstraint;
 }
 
 // hkConstraintCinfo's constructor clears the data and entities and sets the PSI priority; this class adds nothing.

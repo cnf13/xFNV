@@ -31,14 +31,7 @@ NiMeshParticleSystem::NiMeshParticleSystem() : m_fTime(0.0f), m_bUpdateControlle
 NiMeshParticleSystem::~NiMeshParticleSystem() {}
 
 NiObject* NiMeshParticleSystem::CreateClone(NiCloningProcess& kCloning) {
-    NiMeshParticleSystem* pkObject_2 =
-        static_cast<NiMeshParticleSystem*>(NiMemObject::operator new(sizeof(NiMeshParticleSystem)));
-    if (pkObject_2) {
-        ::new (pkObject_2) NiMeshParticleSystem;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiMeshParticleSystem* pkObject_2 = new NiMeshParticleSystem;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fTime = m_fTime;
     pkObject_2->m_bUpdateControllers = m_bUpdateControllers;
@@ -247,12 +240,7 @@ void NiMeshParticleSystem::SetModelData(NiGeometryData* pkModelData) {
 }
 
 NiObject* NiMeshParticleSystem::CreateObject() {
-    NiMeshParticleSystem* pkObject =
-        static_cast<NiMeshParticleSystem*>(NiMemObject::operator new(sizeof(NiMeshParticleSystem)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiMeshParticleSystem;
+    return new NiMeshParticleSystem;
 }
 
 void NiMeshPSysData::PurgeRendererDataForPools(NiRenderer* pkRenderer) {

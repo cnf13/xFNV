@@ -835,8 +835,7 @@ bool HUDMainMenu::IsWellFormedMenu() {
 }
 
 NiCamera* HUDMainMenu::Create3DCamera() {
-    void* pMemory = NiMemObject::operator new(sizeof(NiCamera));
-    NiCamera* pCamera = pMemory ? ::new (pMemory) NiCamera : nullptr;
+    NiCamera* pCamera = new NiCamera;
     // Builds the viewport with NiColorA's constructor, as the game does.
     NiRect<float> kPort;
     ::new (&kPort) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
@@ -4320,8 +4319,7 @@ Tile* HUDMainMenu::Create() {
     pme->pTiles[HMMT_COMPASS]->GetShaderProperty()->SetUseTexScroll(true);
 
     // The gun scope model: an empty node turned to face the scope camera, lit by the 3D menu scene's lights.
-    void* pNodeMemory = NiMemObject::operator new(sizeof(NiNode));
-    spScopeModel = pNodeMemory ? ::new (pNodeMemory) NiNode(0) : nullptr;
+    spScopeModel = new NiNode(0);
     NiMatrix3 kXRotation;
     kXRotation.~NiMatrix3();
     ::new (&kXRotation) NiMatrix3;

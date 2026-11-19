@@ -19,10 +19,7 @@ NiStringExtraData::~NiStringExtraData() {}
 // The new object's string starts as NULL_STRING; NiExtraData's CopyMembers runs, then the string is assigned. The
 // assignment is written out with the reference counts taken directly rather than through NiFixedString's operator=.
 NiObject* NiStringExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiStringExtraData* pkClone = static_cast<NiStringExtraData*>(NiMemObject::operator new(sizeof(NiStringExtraData)));
-    if (pkClone) {
-        ::new (pkClone) NiStringExtraData;
-    }
+    NiStringExtraData* pkClone = new NiStringExtraData;
     NiExtraData::CopyMembers(pkClone, kCloning);
     pkClone->m_kString = m_kString;
     return pkClone;
@@ -74,9 +71,5 @@ void NiStringExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 }
 
 NiObject* NiStringExtraData::CreateObject() {
-    NiStringExtraData* pkObject = static_cast<NiStringExtraData*>(NiMemObject::operator new(sizeof(NiStringExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiStringExtraData;
+    return new NiStringExtraData;
 }

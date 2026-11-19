@@ -3830,13 +3830,7 @@ uint32_t CaravanMenu::LoadNifs2() {
     pTableGeometry = (NiAVObject*)pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Table.NIF", LOD_MULT_NONE, true, false, false, false
     );
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v11 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v11 = nullptr;
-    }
+    v11 = new NiNode(0);
     NiRefObject* v17 = (NiRefObject*)v11;
     CaravanMenu::spModel = v11;
     NiNode* v10 = CaravanMenu::spModel.m_pObject;
@@ -3873,13 +3867,7 @@ NiCamera* CaravanMenu::Create3DCamera() {
     NiPoint3 v12;
     NiPoint3 dst;
     NiRect<float> a2;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        v10 = ::new (apMemory) NiCamera;
-    }
-    else {
-        v10 = nullptr;
-    }
+    v10 = new NiCamera;
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
     NiFrustum kFrustum(false);

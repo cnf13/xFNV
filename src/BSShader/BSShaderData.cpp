@@ -170,15 +170,7 @@ void BSShaderData::AddAlphaProperty(NiAVObject* apTarget) {
     if ((bAlphaBlend || bAlphaTest) && !bRefraction) {
         NiAlphaProperty* palphaprop_2;
         uint16_t v8;
-        NiObjectNET* v3 = static_cast<NiObjectNET*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-        NiAlphaProperty* palphaprop = static_cast<NiAlphaProperty*>(v3);
-        if (v3) {
-            ::new (v3) NiAlphaProperty;
-            palphaprop_2 = palphaprop;
-        }
-        else {
-            palphaprop_2 = nullptr;
-        }
+        palphaprop_2 = new NiAlphaProperty;
         if (bAlphaBlend) {
             palphaprop_2->m_uFlags |= 1u;
         }
@@ -207,13 +199,7 @@ void BSShaderData::AddAlphaProperty(NiAVObject* apTarget) {
 
 void BSShaderData::AddMaterialProperty(NiAVObject* apTarget) {
     NiMaterialProperty* v4;
-    NiMaterialProperty* v3 = static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-    if (v3) {
-        v4 = ::new (v3) NiMaterialProperty;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiMaterialProperty;
     v4->m_spec.r = SpecularColor.r;
     v4->m_spec.g = SpecularColor.g;
     float b = SpecularColor.b;
@@ -247,34 +233,17 @@ void BSShaderData::AddMaterialProperty(NiAVObject* apTarget) {
 }
 
 BSShaderProperty* BSShaderData::GetShaderProperty() {
-    void* pMemory;
     switch (eLightingShader) {
         case LS_STANDARD:
         case LS_SKIN:
-        case LS_HAIR:
-            pMemory = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty));
-            return pMemory ? ::new (pMemory) BSShaderPPLightingProperty : nullptr;
-        case LS_WATER:
-            pMemory = NiMemObject::operator new(sizeof(WaterShaderProperty));
-            return pMemory ? ::new (pMemory) WaterShaderProperty : nullptr;
-        case LS_NOLIGHTING:
-            pMemory = NiMemObject::operator new(sizeof(BSShaderNoLightingProperty));
-            return pMemory ? ::new (pMemory) BSShaderNoLightingProperty : nullptr;
-        case LS_VFOG:
-            pMemory = NiMemObject::operator new(sizeof(VolumetricFogShaderProperty));
-            return pMemory ? ::new (pMemory) VolumetricFogShaderProperty : nullptr;
-        case LS_SKY:
-            pMemory = NiMemObject::operator new(sizeof(SkyShaderProperty));
-            return pMemory ? ::new (pMemory) SkyShaderProperty : nullptr;
-        case LS_TALLGRASS:
-            pMemory = NiMemObject::operator new(sizeof(TallGrassShaderProperty));
-            return pMemory ? ::new (pMemory) TallGrassShaderProperty : nullptr;
-        case LS_TILE:
-            pMemory = NiMemObject::operator new(sizeof(TileShaderProperty));
-            return pMemory ? ::new (pMemory) TileShaderProperty(false) : nullptr;
-        case LS_NOFADER:
-            pMemory = NiMemObject::operator new(sizeof(NoFaderShaderProperty));
-            return pMemory ? ::new (pMemory) NoFaderShaderProperty : nullptr;
+        case LS_HAIR: return new BSShaderPPLightingProperty;
+        case LS_WATER: return new WaterShaderProperty;
+        case LS_NOLIGHTING: return new BSShaderNoLightingProperty;
+        case LS_VFOG: return new VolumetricFogShaderProperty;
+        case LS_SKY: return new SkyShaderProperty;
+        case LS_TALLGRASS: return new TallGrassShaderProperty;
+        case LS_TILE: return new TileShaderProperty(false);
+        case LS_NOFADER: return new NoFaderShaderProperty;
         default: return nullptr;
     }
 }

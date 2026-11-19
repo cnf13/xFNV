@@ -137,9 +137,5 @@ void NiColorData::ReplaceAnim(NiColorKey* pkKeys, uint32_t uiNumKeys, NiColorKey
 }
 
 NiObject* NiColorData::CreateObject() {
-    NiColorData* pkObject = static_cast<NiColorData*>(NiMemObject::operator new(sizeof(NiColorData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiColorData;
+    return new NiColorData;
 }

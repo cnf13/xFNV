@@ -661,14 +661,7 @@ void SpectatorPackage::RemoveActorAsThreatSourceOrTarget(Actor& aActor) {
 
 PathingAvoidNodeArray* SpectatorPackage::CreateAvoidNodeArray() {
     PathingAvoidNodeArray* pavoidNodeArray;
-    PathingAvoidNodeArray* apMemory =
-        static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-    if (apMemory) {
-        pavoidNodeArray = ::new (apMemory) PathingAvoidNodeArray;
-    }
-    else {
-        pavoidNodeArray = nullptr;
-    }
+    pavoidNodeArray = new PathingAvoidNodeArray;
     int32_t isize = kThreatInfos.iSize;
     for (int32_t i = 0; i < isize; ++i) {
         const SpectatorThreatInfo& scanInfo = kThreatInfos[i];

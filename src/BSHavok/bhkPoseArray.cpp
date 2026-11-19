@@ -223,9 +223,5 @@ void bhkPoseArray::CreatePoseForRagdoll(
 }
 
 NiObject* bhkPoseArray::CreateObject() {
-    bhkPoseArray* pObject = static_cast<bhkPoseArray*>(NiMemObject::operator new(sizeof(bhkPoseArray)));
-    if (pObject == nullptr) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkPoseArray;
+    return new bhkPoseArray;
 }

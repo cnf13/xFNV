@@ -23,13 +23,7 @@ BSWindModifier::~BSWindModifier() {}
 
 NiObject* BSWindModifier::CreateClone(NiCloningProcess& arCloneData) {
     BSWindModifier* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSWindModifier));
-    if (v5) {
-        v3 = ::new (v5) BSWindModifier;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSWindModifier;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -98,10 +92,5 @@ void BSWindModifier::SetWind(float afSpeed, float afAngle) {
 }
 
 NiObject* BSWindModifier::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSWindModifier));
-    if (apMemory) {
-        return ::new (apMemory) BSWindModifier;
-    }
-
-    return nullptr;
+    return new BSWindModifier;
 }

@@ -227,64 +227,27 @@ void BGSTerrainChunk::Attach() {
             BSMultiBoundAABB* pMB = static_cast<BSMultiBoundAABB*>(spNode.m_pObject->QMultiBound()->QShape());
             NiPoint3 c = *&pMB->Center;
             NiPoint3 he = *&pMB->HalfExtents;
-            BSMultiBoundAABB* apMemory =
-                static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-            if (apMemory) {
-                pwaterMB_2 = ::new (apMemory) BSMultiBoundAABB;
-            }
-            else {
-                pwaterMB_2 = nullptr;
-            }
+            pwaterMB_2 = new BSMultiBoundAABB;
             pwaterMB = pwaterMB_2;
             c.z = pNode->pManager->pWorld->GetDefaultWaterHeight();
             he.z = 0.0f;
             pwaterMB->SetCenter(c);
             pwaterMB->SetHalfExtents(he);
-            BSMultiBoundNode* v15 = static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
-            if (v15) {
-                v8 = ::new (v15) BSMultiBoundNode;
-            }
-            else {
-                v8 = nullptr;
-            }
+            v8 = new BSMultiBoundNode;
             spWaterNode = v8;
-            BSMultiBound* v14 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
-            if (v14) {
-                pbound_2 = ::new (v14) BSMultiBound;
-            }
-            else {
-                pbound_2 = nullptr;
-            }
+            pbound_2 = new BSMultiBound;
             BSMultiBound* pbound = pbound_2;
             pbound_2->SetShape(pwaterMB);
             spWaterNode.m_pObject->SetMultiBound(pbound);
-            BSMultiBoundAABB* v13 = static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-            if (v13) {
-                pwaterMB_3 = ::new (v13) BSMultiBoundAABB;
-            }
-            else {
-                pwaterMB_3 = nullptr;
-            }
+            pwaterMB_3 = new BSMultiBoundAABB;
             pwaterMB = pwaterMB_3;
             c.z = pNode->pManager->pWorld->GetDefaultWaterHeight();
             he.z = 0.0f;
             pwaterMB->SetCenter(c);
             pwaterMB->SetHalfExtents(he);
-            BSMultiBoundNode* v12 = static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
-            if (v12) {
-                v5 = ::new (v12) BSMultiBoundNode;
-            }
-            else {
-                v5 = nullptr;
-            }
+            v5 = new BSMultiBoundNode;
             spWaterReflNode = v5;
-            BSMultiBound* v11 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
-            if (v11) {
-                pbound_4 = ::new (v11) BSMultiBound;
-            }
-            else {
-                pbound_4 = nullptr;
-            }
+            pbound_4 = new BSMultiBound;
             pbound = pbound_4;
             pbound_4->SetShape(pwaterMB);
             spWaterReflNode.m_pObject->SetMultiBound(pbound);

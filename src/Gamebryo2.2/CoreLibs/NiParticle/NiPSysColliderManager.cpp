@@ -137,10 +137,5 @@ void NiPSysColliderManager::CopyMembers(NiPSysColliderManager* pkDest, NiCloning
 }
 
 NiObject* NiPSysColliderManager::CreateObject() {
-    NiPSysColliderManager* pkObject =
-        static_cast<NiPSysColliderManager*>(NiMemObject::operator new(sizeof(NiPSysColliderManager)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysColliderManager;
+    return new NiPSysColliderManager;
 }

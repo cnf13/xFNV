@@ -112,8 +112,7 @@ void bhkCharacterListenerSpell::contactPointAddedCallback(const hkpRootCdPoint& 
         hkpRootCdPoint kPoint(point);
         bhkShape* pShapeA = bhkShape::Getbhk(kPoint.m_rootCollidableA->m_shape);
         if (pShapeA) {
-            NiNode* pMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+            NiNode* pNode = new NiNode(0);
             alignas(16) NiColor kColor(1.0f, 1.0f, 1.0f);
             pShapeA->BuildDisplayGeometry(pNode, kColor);
             NiMatrix3 kRot;
@@ -125,8 +124,7 @@ void bhkCharacterListenerSpell::contactPointAddedCallback(const hkpRootCdPoint& 
         }
         bhkShape* pShapeB = bhkShape::Getbhk(kPoint.m_rootCollidableB->m_shape);
         if (pShapeB) {
-            NiNode* pMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+            NiNode* pNode = new NiNode(0);
             alignas(16) NiColor kColor(1.0f, 1.0f, 1.0f);
             pShapeB->BuildDisplayGeometry(pNode, kColor);
             NiMatrix3 kRot;

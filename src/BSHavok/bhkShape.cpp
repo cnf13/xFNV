@@ -245,12 +245,10 @@ void bhkShape::BuildDisplayFromhkGeometry(
                 pusTriList[3 * i + 1] = static_cast<uint16_t>(rTriangle.m_b);
                 pusTriList[3 * i + 2] = static_cast<uint16_t>(rTriangle.m_c);
             }
-            void* pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-            NiTriShape* pShape = pMemory ? ::new (pMemory) NiTriShape(
-                                               uiVertices, pVertices, nullptr, nullptr, nullptr, 0,
-                                               NiGeometryData::NBT_METHOD_NONE, uiTriangles, pusTriList
-                                           )
-                                         : nullptr;
+            NiTriShape* pShape = new NiTriShape(
+                uiVertices, pVertices, nullptr, nullptr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, uiTriangles,
+                pusTriList
+            );
             if (apName) {
                 NiFixedString kName(apName);
                 pShape->SetName(kName);

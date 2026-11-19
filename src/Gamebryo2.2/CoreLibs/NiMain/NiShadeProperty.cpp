@@ -18,13 +18,7 @@ NiShadeProperty::NiShadeProperty() : m_uFlags(1), iShaderPropertyType(-1) {}
 NiShadeProperty::~NiShadeProperty() {}
 
 NiObject* NiShadeProperty::CreateClone(NiCloningProcess& kCloning) {
-    NiShadeProperty* pkObject_2 = static_cast<NiShadeProperty*>(NiMemObject::operator new(sizeof(NiShadeProperty)));
-    if (pkObject_2) {
-        ::new (pkObject_2) NiShadeProperty;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiShadeProperty* pkObject_2 = new NiShadeProperty;
     NiProperty::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
     return pkObject_2;
@@ -85,10 +79,7 @@ int32_t NiShadeProperty::GetType() {
 
 // The default property: shader property type -1 (none) and the smooth-shading flag.
 void NiShadeProperty::_SDMInit() {
-    NiShadeProperty* pkDefault = static_cast<NiShadeProperty*>(NiMemObject::operator new(sizeof(NiShadeProperty)));
-    if (pkDefault) {
-        ::new (pkDefault) NiShadeProperty;
-    }
+    NiShadeProperty* pkDefault = new NiShadeProperty;
     // SWEEP-INLINE 0xA81552
     ms_spDefault = pkDefault;
 }
@@ -100,9 +91,5 @@ void NiShadeProperty::_SDMShutdown() {
 }
 
 NiObject* NiShadeProperty::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiShadeProperty));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiShadeProperty;
+    return new NiShadeProperty;
 }

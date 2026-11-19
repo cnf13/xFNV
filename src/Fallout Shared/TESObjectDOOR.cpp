@@ -544,15 +544,7 @@ NiAVObject* TESObjectDOOR::Clone3D(TESObjectREFR* apRequester) {
         else {
             if (!pcon) {
                 BSPlayerDistanceCheckController* pcontrol;
-                BSPlayerDistanceCheckController* v14 = static_cast<BSPlayerDistanceCheckController*>(
-                    NiMemObject::operator new(sizeof(BSPlayerDistanceCheckController))
-                );
-                if (v14) {
-                    pcontrol = ::new (v14) BSPlayerDistanceCheckController;
-                }
-                else {
-                    pcontrol = nullptr;
-                }
+                pcontrol = new BSPlayerDistanceCheckController;
                 pcontrol->SetCheckDistance(gs_fAutoDoorActivateDistance.Float());
                 pcontrol->SetCallback(&TESObjectDOOR::AutoDoorCallback);
                 pcontrol->SetTarget(p3D);
@@ -561,13 +553,7 @@ NiAVObject* TESObjectDOOR::Clone3D(TESObjectREFR* apRequester) {
             BSXFlags* pextra = static_cast<BSXFlags*>(p3D->GetExtraData(*v5));
             if (!pextra) {
                 BSXFlags* pextra_2;
-                BSXFlags* apMemory = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
-                if (apMemory) {
-                    pextra_2 = ::new (apMemory) BSXFlags;
-                }
-                else {
-                    pextra_2 = nullptr;
-                }
+                pextra_2 = new BSXFlags;
                 pextra = pextra_2;
                 const NiFixedString* v6 = &BSXFlags::Tag();
                 p3D->AddExtraData(*v6, pextra_2);

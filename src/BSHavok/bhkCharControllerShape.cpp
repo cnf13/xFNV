@@ -84,11 +84,7 @@ bhkCharControllerShape* bhkCharControllerShape::CreateFromHull(hkArray<hkVector4
         hkConvexVerticesShapeCinfo kInfo;
         if (arVerts.m_size != 0) {
             bhkGeometryUtil::ComputePlanesFromVertices(arVerts, kInfo.m_planeEquations, kInfo.m_vertices);
-            bhkCharControllerShape* pObject =
-                static_cast<bhkCharControllerShape*>(NiMemObject::operator new(sizeof(bhkCharControllerShape)));
-            if (pObject) {
-                pShape = ::new (pObject) bhkCharControllerShape(kInfo);
-            }
+            pShape = new bhkCharControllerShape(kInfo);
         }
     }
     GetThreadMemContext() = iOldMemContext;

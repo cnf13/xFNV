@@ -53,11 +53,7 @@ const NiRTTI* BoltShaderProperty::GetRTTI() const {
 
 // The clone is built in an engine block through the constructor, then the copy body fills it in.
 NiObject* BoltShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    BoltShaderProperty* pClone =
-        static_cast<BoltShaderProperty*>(NiMemObject::operator new(sizeof(BoltShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) BoltShaderProperty;
-    }
+    BoltShaderProperty* pClone = new BoltShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }

@@ -3083,14 +3083,7 @@ PathingAvoidNodeArray* HighProcess::CreateAvoidArray(Actor* apActor) {
         BSSimpleList<AvoidAreaStruct*>* plist = pListOfAvoidAreas;
         if ((plist) && (!plist->IsEmpty())) {
             PathingAvoidNodeArray* parray_2;
-            PathingAvoidNodeArray* apMemory =
-                static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-            if (apMemory) {
-                parray_2 = ::new (apMemory) PathingAvoidNodeArray;
-            }
-            else {
-                parray_2 = nullptr;
-            }
+            parray_2 = new PathingAvoidNodeArray;
             parray = parray_2;
             parray_2->Add(pListOfAvoidAreas->m_item->pAvoidNode);
         }
@@ -12951,13 +12944,7 @@ void HighProcess::SetupPhantom(Actor* apActor) {
             playerextents.y = v2;
             playerextents.x = playerextents.x * 0.5 * actorScale;
             playerextents.z = playerextents.z * actorScale;
-            bhkBoxShape* v18 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-            if (v18) {
-                pplayerShape = ::new (v18) bhkBoxShape(playerextents);
-            }
-            else {
-                pplayerShape = nullptr;
-            }
+            pplayerShape = new bhkBoxShape(playerextents);
             ifilter.iFilter = 0;
             ifilter.SetLayer(L_DOORDETECTION);
             bhkCharacterController* pcon = this->GetCharController();
@@ -12972,14 +12959,7 @@ void HighProcess::SetupPhantom(Actor* apActor) {
             const NiPoint3* v5 = &apActor->GetLocationOnReference();
             csi.m_transform.Trans.NI2HK(*v5);
             bhkSimpleShapePhantom* v9;
-            bhkSimpleShapePhantom* v10 =
-                static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-            if (v10) {
-                v9 = ::new (v10) bhkSimpleShapePhantom(csi);
-            }
-            else {
-                v9 = nullptr;
-            }
+            v9 = new bhkSimpleShapePhantom(csi);
             this->spShapePhantom = static_cast<bhkShapePhantom*>(v9);
             float fTime = fINIDetectDoorsForPathingTime.Float();
             this->fDetectDoorForPathingTimer = fTime;
@@ -13813,48 +13793,19 @@ bool HighProcess::ShouldWaitForEscortTarget(
         }
     }
     else {
-        PathingRequest* v44 = static_cast<PathingRequest*>(NiMemObject::operator new(sizeof(PathingRequest)));
-        PathingRequest* v26;
-        if (v44) {
-            v26 = ::new (v44) PathingRequest;
-        }
-        else {
-            v26 = nullptr;
-        }
+        PathingRequest* v26 = new PathingRequest;
         this->spMeToGoalRequest = v26;
         this->spMeToGoalRequest.m_pObject->Initialize(apActor);
         this->spMeToGoalRequest.m_pObject->SetDestination(goalLoc);
-        void* apMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
-        ActorPathingMessageQueue* v25;
-        if (apMemory) {
-            v25 = ::new (apMemory) ActorPathingMessageQueue;
-        }
-        else {
-            v25 = nullptr;
-        }
+        ActorPathingMessageQueue* v25 = new ActorPathingMessageQueue;
         this->spMeToGoalMessageQueue = v25;
         // Both smart pointers are passed by value and BuildPath releases them.
         PathManager::QInstance()->BuildPath(this->spMeToGoalRequest, this->spMeToGoalMessageQueue, true);
-        PathingRequest* v38 = static_cast<PathingRequest*>(NiMemObject::operator new(sizeof(PathingRequest)));
-        PathingRequest* v20;
-        if (v38) {
-            v20 = ::new (v38) PathingRequest;
-        }
-        else {
-            v20 = nullptr;
-        }
+        PathingRequest* v20 = new PathingRequest;
         this->spEscortedToGoalRequest = v20;
         this->spEscortedToGoalRequest.m_pObject->Initialize(apEscortedActor);
         this->spEscortedToGoalRequest.m_pObject->SetDestination(goalLoc);
-        ActorPathingMessageQueue* v36 =
-            static_cast<ActorPathingMessageQueue*>(NiMemObject::operator new(sizeof(ActorPathingMessageQueue)));
-        ActorPathingMessageQueue* v19;
-        if (v36) {
-            v19 = ::new (v36) ActorPathingMessageQueue;
-        }
-        else {
-            v19 = nullptr;
-        }
+        ActorPathingMessageQueue* v19 = new ActorPathingMessageQueue;
         this->spEscortedToGoalMessageQueue = v19;
         PathManager::QInstance()->BuildPath(this->spEscortedToGoalRequest, this->spEscortedToGoalMessageQueue, true);
     }

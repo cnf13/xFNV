@@ -74,10 +74,5 @@ void NiPSysEmitterDeclinationCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysEmitterDeclinationCtlr::CreateObject() {
-    NiPSysEmitterDeclinationCtlr* v0 =
-        static_cast<NiPSysEmitterDeclinationCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterDeclinationCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysEmitterDeclinationCtlr;
+    return new NiPSysEmitterDeclinationCtlr;
 }

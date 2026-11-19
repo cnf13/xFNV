@@ -25,14 +25,7 @@ NiPSysTurbulenceFieldModifier::NiPSysTurbulenceFieldModifier()
 NiPSysTurbulenceFieldModifier::~NiPSysTurbulenceFieldModifier() {}
 
 NiObject* NiPSysTurbulenceFieldModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysTurbulenceFieldModifier* pkObject =
-        static_cast<NiPSysTurbulenceFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysTurbulenceFieldModifier)));
-    if (pkObject) {
-        ::new (pkObject) NiPSysTurbulenceFieldModifier;
-    }
-    else {
-        pkObject = nullptr;
-    }
+    NiPSysTurbulenceFieldModifier* pkObject = new NiPSysTurbulenceFieldModifier;
     CopyMembers(pkObject, kCloning);
     float fFrequency = m_fFrequency;
     pkObject->m_fFrequency = fFrequency;
@@ -198,10 +191,5 @@ void NiPSysTurbulenceFieldModifier::UpateNoAttenuation(float, NiPSysData* pkData
 }
 
 NiObject* NiPSysTurbulenceFieldModifier::CreateObject() {
-    NiPSysTurbulenceFieldModifier* pkObject =
-        static_cast<NiPSysTurbulenceFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysTurbulenceFieldModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysTurbulenceFieldModifier;
+    return new NiPSysTurbulenceFieldModifier;
 }

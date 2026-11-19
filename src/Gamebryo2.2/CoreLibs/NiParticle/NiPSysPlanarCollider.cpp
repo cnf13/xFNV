@@ -67,14 +67,7 @@ NiPSysPlanarCollider::~NiPSysPlanarCollider() {}
 
 NiObject* NiPSysPlanarCollider::CreateClone(NiCloningProcess& kCloning) {
     NiPSysPlanarCollider* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysPlanarCollider));
-    if (v3) {
-        v4 = ::new (v3)
-            NiPSysPlanarCollider(1.0, false, false, nullptr, nullptr, 1.0, 1.0, NiPoint3_UNIT_X, NiPoint3_UNIT_Y);
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiPSysPlanarCollider(1.0, false, false, nullptr, nullptr, 1.0, 1.0, NiPoint3_UNIT_X, NiPoint3_UNIT_Y);
     CopyMembers(v4, kCloning);
     v4->m_fWidth = m_fWidth;
     v4->m_fHeight = m_fHeight;
@@ -338,11 +331,5 @@ void NiPSysPlanarCollider::SetResolveConstants() {
 }
 
 NiObject* NiPSysPlanarCollider::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiPSysPlanarCollider));
-    if (v0) {
-        return ::new (v0)
-            NiPSysPlanarCollider(1.0, false, false, nullptr, nullptr, 1.0, 1.0, NiPoint3_UNIT_X, NiPoint3_UNIT_Y);
-    }
-
-    return nullptr;
+    return new NiPSysPlanarCollider(1.0, false, false, nullptr, nullptr, 1.0, 1.0, NiPoint3_UNIT_X, NiPoint3_UNIT_Y);
 }

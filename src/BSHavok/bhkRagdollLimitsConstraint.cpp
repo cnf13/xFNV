@@ -204,11 +204,7 @@ const NiRTTI* bhkRagdollLimitsConstraint::GetRTTI() const {
 // constructor, then the creation info and entities copied over.
 NiObject* bhkRagdollLimitsConstraint::CreateClone(NiCloningProcess& arCloneData) {
     bhkSerializable::CloneCritLock();
-    bhkRagdollLimitsConstraint* pClone =
-        static_cast<bhkRagdollLimitsConstraint*>(NiMemObject::operator new(sizeof(bhkRagdollLimitsConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkRagdollLimitsConstraint;
-    }
+    bhkRagdollLimitsConstraint* pClone = new bhkRagdollLimitsConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     return pClone;
@@ -251,9 +247,5 @@ hkSerializableCinfo& bhkRagdollLimitsConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkRagdollLimitsConstraint::CreateObject() {
-    void* pMemory = NiMemObject::operator new(sizeof(bhkRagdollLimitsConstraint));
-    if (!pMemory) {
-        return nullptr;
-    }
-    return ::new (pMemory) bhkRagdollLimitsConstraint;
+    return new bhkRagdollLimitsConstraint;
 }

@@ -201,13 +201,7 @@ BSFurnitureMarker* BSFurnitureMarker::Find(NiObjectNET* apObject) {
 
 NiObject* BSFurnitureMarker::CreateObject() {
     BSFurnitureMarker* v1;
-    void* v2 = NiMemObject::operator new(sizeof(BSFurnitureMarker));
-    if (v2) {
-        v1 = ::new (v2) BSFurnitureMarker;
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new BSFurnitureMarker;
     v1->SetName(EmptyFS);
     return v1;
 }

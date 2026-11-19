@@ -101,14 +101,7 @@ NiObject* bhkFixedConstraint::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_HAVOK;
     bhkSerializable::CloneCritLock();
-    bhkFixedConstraint* pClone =
-        static_cast<bhkFixedConstraint*>(NiMemObject::operator new(sizeof(bhkFixedConstraint)));
-    if (pClone) {
-        ::new (pClone) bhkFixedConstraint;
-    }
-    else {
-        pClone = nullptr;
-    }
+    bhkFixedConstraint* pClone = new bhkFixedConstraint;
     CopyCloneMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     riMemContext = iOldMemContext;
@@ -139,12 +132,7 @@ hkSerializableCinfo& bhkFixedConstraint::CreateCinfo(bool& arCreated) {
 }
 
 NiObject* bhkFixedConstraint::CreateObject() {
-    bhkFixedConstraint* pkObject =
-        static_cast<bhkFixedConstraint*>(NiMemObject::operator new(sizeof(bhkFixedConstraint)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) bhkFixedConstraint;
+    return new bhkFixedConstraint;
 }
 
 bhkConstraint* bhkFixedConstraint::FixConstraint(bhkConstraint* apConstraint, float afStrength) {
@@ -184,12 +172,10 @@ bhkConstraint* bhkFixedConstraint::FixConstraint(bhkConstraint* apConstraint, fl
             kMalleableInfo.pEntityA = kFixedInfo.pEntityA;
             kMalleableInfo.pEntityB = kFixedInfo.pEntityB;
             kMalleableInfo.SetStrength(afStrength);
-            void* pMemory = NiMemObject::operator new(sizeof(bhkMalleableConstraint));
-            pConstraint = pMemory ? ::new (pMemory) bhkMalleableConstraint(kMalleableInfo) : nullptr;
+            pConstraint = new bhkMalleableConstraint(kMalleableInfo);
         }
         else {
-            void* pMemory = NiMemObject::operator new(sizeof(bhkFixedConstraint));
-            pConstraint = pMemory ? ::new (pMemory) bhkFixedConstraint(kFixedInfo) : nullptr;
+            pConstraint = new bhkFixedConstraint(kFixedInfo);
         }
     }
     riMemContext = iOldMemContext;

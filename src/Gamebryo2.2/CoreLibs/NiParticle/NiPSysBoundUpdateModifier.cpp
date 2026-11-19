@@ -27,14 +27,7 @@ NiPSysBoundUpdateModifier::~NiPSysBoundUpdateModifier() {
 
 // The clone starts with no skip bounds; SetUpdateSkip then allocates them for the original's skip.
 NiObject* NiPSysBoundUpdateModifier::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysBoundUpdateModifier* pkClone =
-        static_cast<NiPSysBoundUpdateModifier*>(NiMemObject::operator new(sizeof(NiPSysBoundUpdateModifier)));
-    if (pkClone) {
-        ::new (pkClone) NiPSysBoundUpdateModifier;
-    }
-    else {
-        pkClone = nullptr;
-    }
+    NiPSysBoundUpdateModifier* pkClone = new NiPSysBoundUpdateModifier;
     NiPSysModifier::CopyMembers(pkClone, kCloning);
     pkClone->SetUpdateSkip(static_cast<uint16_t>(m_sUpdateSkip));
     return pkClone;
@@ -349,10 +342,5 @@ void NiPSysBoundUpdateModifier::UpdateStripBounds(float fTime, BSStripPSysData* 
 }
 
 NiObject* NiPSysBoundUpdateModifier::CreateObject() {
-    NiPSysBoundUpdateModifier* pkObject =
-        static_cast<NiPSysBoundUpdateModifier*>(NiMemObject::operator new(sizeof(NiPSysBoundUpdateModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysBoundUpdateModifier;
+    return new NiPSysBoundUpdateModifier;
 }

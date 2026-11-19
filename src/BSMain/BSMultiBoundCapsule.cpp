@@ -19,14 +19,7 @@ BSMultiBoundCapsule::~BSMultiBoundCapsule() {}
 
 NiObject* BSMultiBoundCapsule::CreateClone(NiCloningProcess& arCloneData) {
     BSMultiBoundCapsule* v3;
-    BSMultiBoundCapsule* apMemory =
-        static_cast<BSMultiBoundCapsule*>(NiMemObject::operator new(sizeof(BSMultiBoundCapsule)));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSMultiBoundCapsule;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSMultiBoundCapsule;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -95,10 +88,5 @@ void BSMultiBoundCapsule::CopyMembers(BSMultiBoundCapsule* pDest, NiCloningProce
 }
 
 NiObject* BSMultiBoundCapsule::CreateObject() {
-    void* v2 = NiMemObject::operator new(sizeof(BSMultiBoundCapsule));
-    if (v2) {
-        return ::new (v2) BSMultiBoundCapsule;
-    }
-
-    return nullptr;
+    return new BSMultiBoundCapsule;
 }

@@ -53,11 +53,7 @@ HairShaderProperty::~HairShaderProperty() {
 // CopyMembers.
 NiObject* HairShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
     AutoMemContext memContext(MEM_CONTEXT_HAIRSHADER);
-    HairShaderProperty* pClone =
-        static_cast<HairShaderProperty*>(NiMemObject::operator new(sizeof(HairShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) HairShaderProperty;
-    }
+    HairShaderProperty* pClone = new HairShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -306,10 +302,5 @@ void HairShaderProperty::CopyMembers(HairShaderProperty* pDest, NiCloningProcess
 
 // The stream's factory: a property from a 0x180-byte engine block, or null when the block could not be had.
 NiObject* HairShaderProperty::CreateObject() {
-    HairShaderProperty* pProperty =
-        static_cast<HairShaderProperty*>(NiMemObject::operator new(sizeof(HairShaderProperty)));
-    if (pProperty) {
-        return ::new (pProperty) HairShaderProperty;
-    }
-    return nullptr;
+    return new HairShaderProperty;
 }

@@ -757,13 +757,7 @@ void NavMeshObstacleManager::ReallyAddObstaclesForReference(TESObjectREFR* apRef
     NiPointer<ReferenceObstacleArray> spArray(static_cast<ReferenceObstacleArray*>(nullptr));
     if (!FormIDMap.GetAt(apRef->iFormID, spArray)) {
         ReferenceObstacleArray* pArray;
-        void* pMemory = NiMemObject::operator new(sizeof(ReferenceObstacleArray));
-        if (pMemory) {
-            pArray = ::new (pMemory) ReferenceObstacleArray;
-        }
-        else {
-            pArray = nullptr;
-        }
+        pArray = new ReferenceObstacleArray;
         spArray = pArray;
         NavMeshObstacleManager::GetObstacleDataForReference(apRef, spArray);
         FormIDMap.SetAt(apRef->iFormID, spArray);
@@ -1072,13 +1066,7 @@ bool NavMeshObstacleManager::ProcessNewDoors() {
         pdoor = plist->m_item;
         if (pdoor->Get3D()) {
             ReferenceObstacleArray* pNewArray;
-            void* apMemory = NiMemObject::operator new(sizeof(ReferenceObstacleArray));
-            if (apMemory) {
-                pNewArray = ::new (apMemory) ReferenceObstacleArray;
-            }
-            else {
-                pNewArray = nullptr;
-            }
+            pNewArray = new ReferenceObstacleArray;
             NiPointer<ReferenceObstacleArray> spArray(pNewArray);
             if (NavMeshObstacleManager::GetObstacleDataForReference(pdoor, spArray)) {
                 for (uint32_t i = 0; i < spArray.m_pObject->Obstacles.iSize; ++i) {
@@ -1219,33 +1207,14 @@ void NavMeshObstacleManager::DrawObstacles(bool abDraw) {
             void* v6;
             void* v7;
             NiNode* v8;
-            void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-            if (apMemory) {
-                v8 = ::new (apMemory) NiNode(0);
-            }
-            else {
-                v8 = nullptr;
-            }
+            v8 = new NiNode(0);
             NiRefObject* v16 = (NiRefObject*)v8;
             spObstacleRootNode = v8;
-            NiAlphaProperty* v13 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (v13) {
-                v7 = (void*)::new (v13) NiAlphaProperty;
-            }
-            else {
-                v7 = nullptr;
-            }
+            v7 = (void*)new NiAlphaProperty;
             NiRefObject* v14 = static_cast<NiRefObject*>(v7);
             NiPointer<NiAlphaProperty> spAlphaProp(static_cast<NiAlphaProperty*>(v7));
             spAlphaProp.m_pObject->SetAlphaBlending(true);
-            NiMaterialProperty* v11 =
-                static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-            if (v11) {
-                v6 = (void*)::new (v11) NiMaterialProperty;
-            }
-            else {
-                v6 = nullptr;
-            }
+            v6 = (void*)new NiMaterialProperty;
             NiRefObject* v12 = static_cast<NiRefObject*>(v6);
             NiPointer<NiMaterialProperty> spmat(static_cast<NiMaterialProperty*>(v6));
             spmat.m_pObject->SetEmittance(NiColor(1.0f, 0.0f, 1.0f));
@@ -1422,8 +1391,7 @@ bool NavMeshObstacleManager::AddObstaclesFor3DRecursive(
             COL_LAYER eLayer = kFilter.GetLayer();
             if (eLayer == L_ANIMSTATIC || eLayer == L_CLUTTER || eLayer == L_PROPS || eLayer == L_DEBRIS_LARGE ||
                 eLayer == L_TRANSPARENT_SMALL_ANIM) {
-                void* pMemory = NiMemObject::operator new(sizeof(ObstacleData));
-                ObstacleData* pObstacle = pMemory ? ::new (pMemory) ObstacleData : nullptr;
+                ObstacleData* pObstacle = new ObstacleData;
                 NiPointer<ObstacleData> spObstacleData(pObstacle);
                 ReferenceObstacleArray* pParentArray = apRetObstacleArray.operator->();
                 spObstacleData->spParentArray = pParentArray;

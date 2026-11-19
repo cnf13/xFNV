@@ -28,18 +28,9 @@ const NiRTTI* NiBSplinePoint3Interpolator::GetRTTI() const {
 }
 
 NiObject* NiBSplinePoint3Interpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBSplinePoint3Interpolator* pkObject =
-        static_cast<NiBSplinePoint3Interpolator*>(NiMemObject::operator new(sizeof(NiBSplinePoint3Interpolator)));
-    NiBSplinePoint3Interpolator* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBSplinePoint3Interpolator(
-            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE,
-            static_cast<NiBSplineBasisData*>(nullptr)
-        );
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiBSplinePoint3Interpolator* pkObject_2 = new NiBSplinePoint3Interpolator(
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
+    );
     NiBSplineInterpolator::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_kPoint3Value = m_kPoint3Value;
     pkObject_2->m_kPoint3CPHandle = m_kPoint3CPHandle;
@@ -133,13 +124,7 @@ void NiBSplinePoint3Interpolator::CopyMembers(NiBSplinePoint3Interpolator* pkDes
 }
 
 NiObject* NiBSplinePoint3Interpolator::CreateObject() {
-    NiBSplinePoint3Interpolator* pkObject =
-        static_cast<NiBSplinePoint3Interpolator*>(NiMemObject::operator new(sizeof(NiBSplinePoint3Interpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    ::new (pkObject) NiBSplinePoint3Interpolator(
+    return new NiBSplinePoint3Interpolator(
         static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
-    return pkObject;
 }

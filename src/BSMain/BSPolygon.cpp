@@ -315,13 +315,7 @@ void BSPolygon2D::Triangulate() {
         NiNode* v1;
         NiTriShapeData* data = CreateTriData();
         sp3D = CreateTriShape(data);
-        NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (apMemory) {
-            v1 = ::new (apMemory) NiNode(0);
-        }
-        else {
-            v1 = nullptr;
-        }
+        v1 = new NiNode(0);
         spRootNode = v1;
         spRootNode.m_pObject->AttachChild(sp3D.m_pObject, 1);
         if (sp3D.m_pObject) {
@@ -357,12 +351,7 @@ bool BSPolygon2D::IsAnEar(int32_t aiIndex, int32_t aiPrev, int32_t aiNext) {
 }
 
 NiTriShape* BSPolygon2D::CreateTriShape(NiTriShapeData* data) {
-    NiTriShape* apMemory = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (apMemory) {
-        return ::new (apMemory) NiTriShape(data);
-    }
-
-    return nullptr;
+    return new NiTriShape(data);
 }
 
 // The four arrays are vector news, each followed by a constructor loop (empty for NiPoint3 and NiPoint2, NiColorA's
@@ -447,15 +436,10 @@ NiTriShapeData* BSPolygon2D::CreateTriData() {
         v3->b = 1.0f;
         v3->a = 1.0f;
     }
-    NiTriShapeData* apMemory = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-    if (apMemory) {
-        return ::new (apMemory) NiTriShapeData(
-            this->iVertexCount, pVertexArray, pNormalArray, pColorArray, this->pTexcoordArray, 1,
-            NiGeometryData::NBT_METHOD_NONE, iTriangleCount, pIndexArray
-        );
-    }
-
-    return nullptr;
+    return new NiTriShapeData(
+        this->iVertexCount, pVertexArray, pNormalArray, pColorArray, this->pTexcoordArray, 1,
+        NiGeometryData::NBT_METHOD_NONE, iTriangleCount, pIndexArray
+    );
 }
 
 int32_t BSPolygon2D::InternalAngle(NiPoint3 arCurr, NiPoint3 arPrev, NiPoint3 arNext) {

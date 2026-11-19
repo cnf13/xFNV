@@ -26,13 +26,7 @@ NiFogProperty::~NiFogProperty() {}
 NiObject* NiFogProperty::CreateClone(NiCloningProcess& kCloning) {
     if (m_spControllers) {
         NiFogProperty* v4;
-        NiFogProperty* v3 = static_cast<NiFogProperty*>(NiMemObject::operator new(sizeof(NiFogProperty)));
-        if (v3) {
-            v4 = ::new (v3) NiFogProperty;
-        }
-        else {
-            v4 = nullptr;
-        }
+        v4 = new NiFogProperty;
         CopyMembers(v4, kCloning);
         v4->m_uFlags = m_uFlags;
         v4->m_fDepth = m_fDepth;
@@ -135,13 +129,7 @@ char* NiFogProperty::GetViewerString(const char* pcPrefix, FogFunction eFunc) {
 
 // The engine's default fog property. The previous default is released and the new one takes a reference.
 void NiFogProperty::_SDMInit() {
-    NiFogProperty* pkDefault = static_cast<NiFogProperty*>(NiMemObject::operator new(sizeof(NiFogProperty)));
-    if (pkDefault) {
-        pkDefault = ::new (pkDefault) NiFogProperty;
-    }
-    else {
-        pkDefault = nullptr;
-    }
+    NiFogProperty* pkDefault = new NiFogProperty;
 
     ms_spDefault = pkDefault;
 }
@@ -153,9 +141,5 @@ void NiFogProperty::_SDMShutdown() {
 }
 
 NiObject* NiFogProperty::CreateObject() {
-    NiFogProperty* pkObject = static_cast<NiFogProperty*>(NiMemObject::operator new(sizeof(NiFogProperty)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiFogProperty;
+    return new NiFogProperty;
 }

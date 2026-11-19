@@ -41,13 +41,7 @@ const NiRTTI* BSOcclusionPlane::GetRTTI() const {
 
 NiObject* BSOcclusionPlane::CreateClone(NiCloningProcess& a1) {
     BSOcclusionPlane* pobj;
-    BSOcclusionPlane* apMemory = static_cast<BSOcclusionPlane*>(NiMemObject::operator new(sizeof(BSOcclusionPlane)));
-    if (apMemory) {
-        pobj = ::new (apMemory) BSOcclusionPlane;
-    }
-    else {
-        pobj = nullptr;
-    }
+    pobj = new BSOcclusionPlane;
     CopyMembers(pobj, a1);
     return pobj;
 }

@@ -2500,13 +2500,7 @@ BSShader* SkinShader::CreateShader() {
         7u, 15u, NiShaderDeclaration::SHADERPARAM_NI_BINORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0
     );
     pSkinnedShaderDecl->GetD3DDeclaration();
-    SkinShader* v2 = static_cast<SkinShader*>(NiMemObject::operator new(sizeof(SkinShader)));
-    if (v2) {
-        pshader = ::new (v2) SkinShader(spShaderDecl, pSkinnedShaderDecl);
-    }
-    else {
-        pshader = nullptr;
-    }
+    pshader = new SkinShader(spShaderDecl, pSkinnedShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

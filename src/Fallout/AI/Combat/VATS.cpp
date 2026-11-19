@@ -406,13 +406,7 @@ void VATS::SetMode(VATS::VATS_MODE_ENUM aeMode, bool bForce) {
                 VATSEffect->DisableScan();
                 if (!pVATS.GetVATSLight()) {
                     NiLight* pnewlight_2;
-                    NiPointLight* v18 = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-                    if (v18) {
-                        pnewlight_2 = ::new (v18) NiPointLight;
-                    }
-                    else {
-                        pnewlight_2 = nullptr;
-                    }
+                    pnewlight_2 = new NiPointLight;
                     pVATS.SetVATSLight(pnewlight_2, true);
                 }
                 break;
@@ -422,13 +416,7 @@ void VATS::SetMode(VATS::VATS_MODE_ENUM aeMode, bool bForce) {
                 pUnEquipExtra = nullptr;
                 if (!pVATS.GetVATSLight()) {
                     NiLight* pnewlight;
-                    void* apMemory = NiMemObject::operator new(sizeof(NiPointLight));
-                    if (apMemory) {
-                        pnewlight = ::new (apMemory) NiPointLight;
-                    }
-                    else {
-                        pnewlight = nullptr;
-                    }
+                    pnewlight = new NiPointLight;
                     pVATS.SetVATSLight(pnewlight, true);
                 }
                 break;

@@ -802,14 +802,7 @@ void CombatProcedureAttackMelee::MoveToFaceTargetLocation(NiPoint3& arFaceTarget
         (v2 = &ptarget->GetLocationOnReference(),
          CombatUtilities::CalculateLOS(apMemory_40, ptarget, arFaceTargetLocation, *v2, false, 30))) {
         PathingAvoidNodeArray* v16;
-        PathingAvoidNodeArray* v20 =
-            static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-        if (v20) {
-            v16 = ::new (v20) PathingAvoidNodeArray;
-        }
-        else {
-            v16 = nullptr;
-        }
+        v16 = new PathingAvoidNodeArray;
         NiPointer<PathingAvoidNodeArray> spavoidNodeArray(v16);
         float WeaponReacha = fMovementNearTargetAvoidCost.Float();
         float afRadius = fMovementNearTargetAvoidRadius.Float();

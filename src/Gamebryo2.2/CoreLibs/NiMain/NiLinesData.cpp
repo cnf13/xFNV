@@ -91,9 +91,5 @@ void NiLinesData::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 }
 
 NiObject* NiLinesData::CreateObject() {
-    NiLinesData* pkObject = static_cast<NiLinesData*>(NiMemObject::operator new(sizeof(NiLinesData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiLinesData;
+    return new NiLinesData;
 }

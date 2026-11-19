@@ -39,13 +39,7 @@ const NiRTTI* NiBSplineTransformInterpolator::GetRTTI() const {
 
 NiObject* NiBSplineTransformInterpolator::CreateClone(NiCloningProcess& kCloning) {
     NiBSplineTransformInterpolator* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiBSplineTransformInterpolator));
-    if (v3) {
-        v4 = ::new (v3) NiBSplineTransformInterpolator(nullptr, 0xFFFFu, 0xFFFFu, 0xFFFFu, nullptr);
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiBSplineTransformInterpolator(nullptr, 0xFFFFu, 0xFFFFu, 0xFFFFu, nullptr);
     NiBSplineInterpolator::CopyMembers(v4, kCloning);
     __builtin_memcpy(
         &v4->m_kTransformValue, &m_kTransformValue,
@@ -194,10 +188,5 @@ void NiBSplineTransformInterpolator::CopyMembers(NiBSplineTransformInterpolator*
 }
 
 NiObject* NiBSplineTransformInterpolator::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiBSplineTransformInterpolator));
-    if (v0) {
-        return ::new (v0) NiBSplineTransformInterpolator(nullptr, 0xFFFFu, 0xFFFFu, 0xFFFFu, nullptr);
-    }
-
-    return nullptr;
+    return new NiBSplineTransformInterpolator(nullptr, 0xFFFFu, 0xFFFFu, 0xFFFFu, nullptr);
 }

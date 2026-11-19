@@ -66,11 +66,7 @@ void BSReference::SetName(const char* apName) {
 }
 
 NiObject* BSReference::CreateObject() {
-    BSReference* v2 = static_cast<BSReference*>(NiMemObject::operator new(sizeof(BSReference)));
-    if (!v2) {
-        return nullptr;
-    }
-    return ::new (v2) BSReference;
+    return new BSReference;
 }
 
 // Empties the list; the array frees its block itself.
@@ -165,9 +161,5 @@ bool BSNodeReferences::AddParentRef(BSStream& arStream, NiObject* apObject) {
 }
 
 NiObject* BSNodeReferences::CreateObject() {
-    BSNodeReferences* v2 = static_cast<BSNodeReferences*>(NiMemObject::operator new(sizeof(BSNodeReferences)));
-    if (!v2) {
-        return nullptr;
-    }
-    return ::new (v2) BSNodeReferences;
+    return new BSNodeReferences;
 }

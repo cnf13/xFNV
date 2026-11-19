@@ -23,13 +23,7 @@ const NiRTTI* NiPointLight::GetRTTI() const {
 }
 
 NiObject* NiPointLight::CreateClone(NiCloningProcess& kCloning) {
-    NiPointLight* pkObject_2 = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-    if (pkObject_2) {
-        ::new (pkObject_2) NiPointLight;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiPointLight* pkObject_2 = new NiPointLight;
     NiLight::CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fAtten0 = m_fAtten0;
     pkObject_2->m_fAtten1 = m_fAtten1;
@@ -105,9 +99,5 @@ void NiPointLight::CopyMembers(NiPointLight* pDest, NiCloningProcess& kCloning) 
 }
 
 NiObject* NiPointLight::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiPointLight));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPointLight;
+    return new NiPointLight;
 }

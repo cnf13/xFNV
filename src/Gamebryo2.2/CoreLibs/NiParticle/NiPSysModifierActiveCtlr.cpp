@@ -76,10 +76,5 @@ void NiPSysModifierActiveCtlr::SetTargetBoolValue(bool bValue) {
 }
 
 NiObject* NiPSysModifierActiveCtlr::CreateObject() {
-    NiPSysModifierActiveCtlr* v0 =
-        static_cast<NiPSysModifierActiveCtlr*>(NiMemObject::operator new(sizeof(NiPSysModifierActiveCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysModifierActiveCtlr;
+    return new NiPSysModifierActiveCtlr;
 }

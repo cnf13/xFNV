@@ -307,20 +307,12 @@ void TileShader::SetupPassConstants(uint32_t auiCurrentPass) {
 // variable names are empty strings; AddEntry does not compare the address.
 void TileShader::CreateConstantMaps() {
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("tintcolor", 0x10000007, 0, 0, 1, "", 0x10, 4, &TintColor, false);
     }
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -495,13 +487,7 @@ BSShader* TileShader::CreateShader() {
     );
     spShaderDeclVC->SetEntry(2u, 0, NiShaderDeclaration::SHADERPARAM_NI_COLOR, NiShaderDeclaration::SPTYPE_FLOAT4, 0);
     spShaderDeclVC->GetD3DDeclaration();
-    TileShader* v2 = static_cast<TileShader*>(NiMemObject::operator new(sizeof(TileShader)));
-    if (v2) {
-        pshader = ::new (v2) TileShader(spShaderDecl, spShaderDeclVC);
-    }
-    else {
-        pshader = nullptr;
-    }
+    pshader = new TileShader(spShaderDecl, spShaderDeclVC);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

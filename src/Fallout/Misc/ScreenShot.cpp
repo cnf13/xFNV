@@ -95,14 +95,7 @@ NiPixelData* ScreenShot::TakeSaveGameScreenShot(int32_t& aiWidth, int32_t& aiHei
         pLocalSurf->LockRect(&kLockedRect, nullptr, D3DLOCK_NOSYSLOCK);
         const NiPixelFormat* kPixFmt = &NiPixelFormat_RGB24;
         aiHeight = inewHeight;
-        NiPixelData* apMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        if (apMemory) {
-            ppixelData = ::new (apMemory)
-                NiPixelData(static_cast<uint32_t>(aiWidth), static_cast<uint32_t>(aiHeight), *kPixFmt, 1u, 1u);
-        }
-        else {
-            ppixelData = nullptr;
-        }
+        ppixelData = new NiPixelData(static_cast<uint32_t>(aiWidth), static_cast<uint32_t>(aiHeight), *kPixFmt, 1u, 1u);
         uint8_t* pSrc = static_cast<uint8_t*>(kLockedRect.pBits);
         uint8_t* pdataOut = ppixelData->GetPixels(0u, 0u);
         int32_t offset = 0;

@@ -25,11 +25,7 @@ bhkSPCollisionObject::bhkSPCollisionObject(NiNode* apObject) : bhkPCollisionObje
 NiObject* bhkSPCollisionObject::CreateClone(NiCloningProcess& arCloneData) {
     int32_t iOldMemContext = GetThreadMemContext();
     GetThreadMemContext() = MEM_CONTEXT_HAVOK;
-    bhkSPCollisionObject* pClone =
-        static_cast<bhkSPCollisionObject*>(NiMemObject::operator new(sizeof(bhkSPCollisionObject)));
-    if (pClone) {
-        ::new (pClone) bhkSPCollisionObject;
-    }
+    bhkSPCollisionObject* pClone = new bhkSPCollisionObject;
     // Copies even into a null clone, as the game does.
     CopyMembers(pClone, arCloneData);
     GetThreadMemContext() = iOldMemContext;
@@ -106,10 +102,5 @@ void bhkSPCollisionObject::CopyMembers(bhkSPCollisionObject* apDest, NiCloningPr
 }
 
 NiObject* bhkSPCollisionObject::CreateObject() {
-    bhkSPCollisionObject* pObject =
-        static_cast<bhkSPCollisionObject*>(NiMemObject::operator new(sizeof(bhkSPCollisionObject)));
-    if (pObject) {
-        return ::new (pObject) bhkSPCollisionObject;
-    }
-    return nullptr;
+    return new bhkSPCollisionObject;
 }

@@ -62,13 +62,7 @@ NiRenderedTexture* NiRenderedTexture::Create(
         (apkRenderer->GetFlags() & NiRenderer::CAPS_NONPOW2_CONDITIONAL_TEXT) == 0) {
         return nullptr;
     }
-    NiRenderedTexture* v9 = static_cast<NiRenderedTexture*>(NiMemObject::operator new(sizeof(NiRenderedTexture)));
-    if (v9) {
-        pkThis = ::new (v9) NiRenderedTexture;
-    }
-    else {
-        pkThis = nullptr;
-    }
+    pkThis = new NiRenderedTexture;
     pkThis->m_kFormatPrefs = kPrefs;
     pkThis->pAliasTexture = apAliasTex;
     pkThis->uiAliasOffset = uiAliasOffset;

@@ -138,27 +138,11 @@ void ImageSpaceEffectWaterDisplacement::Render(
                 NiPoint2 tmp;
                 if (!spPartialScreenTriShape.m_pObject) {
                     NiUpdateData UpdateData;
-                    NiScreenElementsData* pDataMemory =
-                        static_cast<NiScreenElementsData*>(NiMemObject::operator new(sizeof(NiScreenElementsData)));
-                    NiScreenElementsData* pData;
-                    if (pDataMemory) {
-                        pData = ::new (pDataMemory) NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1);
-                    }
-                    else {
-                        pData = nullptr;
-                    }
+                    NiScreenElementsData* pData = new NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1);
                     if (pData) {
                         NiIncRefCount(pData);
                     }
-                    NiScreenElements* pElementsMemory =
-                        static_cast<NiScreenElements*>(NiMemObject::operator new(sizeof(NiScreenElements)));
-                    NiScreenElements* pElements;
-                    if (pElementsMemory) {
-                        pElements = ::new (pElementsMemory) NiScreenElements(pData);
-                    }
-                    else {
-                        pElements = nullptr;
-                    }
+                    NiScreenElements* pElements = new NiScreenElements(pData);
                     spPartialScreenTriShape = pElements;
                     static_cast<NiScreenElementsData*>(spPartialScreenTriShape.m_pObject->m_spModelData.m_pObject)
                         ->Insert(4, 0, nullptr);

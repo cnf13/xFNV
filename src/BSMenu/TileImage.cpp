@@ -93,12 +93,9 @@ NiNode* TileImage::MakeNode() {
         bIsScissor = 1;
     }
     else {
-        void* pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-        NiTriShape* pShape = pMemory
-            ? ::new (pMemory) NiTriShape(
-                  4, pkVertex, pkNormal, nullptr, pkTexture, 1, NiGeometryData::NBT_METHOD_NONE, 2, pusTriList
-              )
-            : nullptr;
+        NiTriShape* pShape = new NiTriShape(
+            4, pkVertex, pkNormal, nullptr, pkTexture, 1, NiGeometryData::NBT_METHOD_NONE, 2, pusTriList
+        );
         spShape = pShape;
         bIsScissor = 0;
     }
@@ -110,15 +107,13 @@ NiNode* TileImage::MakeNode() {
     }
     spShape->m_spModelData->SetConsistency(NiGeometryData::MUTABLE);
 
-    void* pMemory = NiMemObject::operator new(sizeof(TileShaderProperty));
-    spTSP = pMemory ? ::new (pMemory) TileShaderProperty(false) : nullptr;
+    spTSP = new TileShaderProperty(false);
     spShape->AttachProperty(spTSP);
     // The interface's tile shader.
     BSShader* pShader = BSShaderManager::GetShader(0x20);
     spShape->m_spShader = pShader;
 
-    pMemory = NiMemObject::operator new(sizeof(NiNode));
-    spModel = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+    spModel = new NiNode(0);
     spModel->AttachChild(spShape, true);
     if (!pParentModel) {
         pParentModel = Interface::GetInterfaceRoot();
@@ -133,8 +128,7 @@ NiNode* TileImage::MakeNode() {
     spModel->UpdateProperties();
     Interface::SetNeedToUpdate(true);
 
-    pMemory = NiMemObject::operator new(sizeof(Extra));
-    Extra* pExtra = pMemory ? ::new (pMemory) Extra(this, spModel) : nullptr;
+    Extra* pExtra = new Extra(this, spModel);
     spModel->AddExtraData(pExtra);
     FinalPostParse(kTileValue_Depth, GetFloat(kTileValue_Depth), nullptr);
     if (IsTrue(kTileValue_Clips)) {

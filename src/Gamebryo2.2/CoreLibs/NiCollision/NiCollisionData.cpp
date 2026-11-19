@@ -437,10 +437,5 @@ void NiCollisionData::CopyMembers(NiCollisionData* pkDest, NiCloningProcess& kCl
 }
 
 NiObject* NiCollisionData::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiCollisionData));
-    if (v0) {
-        return ::new (v0) NiCollisionData;
-    }
-
-    return nullptr;
+    return new NiCollisionData;
 }

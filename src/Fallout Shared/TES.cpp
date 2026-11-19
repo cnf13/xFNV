@@ -3699,13 +3699,7 @@ void TES::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
 void TES::AddTempDebugObject(NiAVObject* apObject, float afTime) {
     if (apObject) {
         BSTempNode* pNode;
-        BSTempNode* apMemory = static_cast<BSTempNode*>(NiMemObject::operator new(sizeof(BSTempNode)));
-        if (apMemory) {
-            pNode = ::new (apMemory) BSTempNode(afTime);
-        }
-        else {
-            pNode = nullptr;
-        }
+        pNode = new BSTempNode(afTime);
         pNode->AttachChild(apObject, 1);
         NiNode* TempNodeManager = pTempNodeManager;
         TempNodeManager->AttachChild(pNode, 1);

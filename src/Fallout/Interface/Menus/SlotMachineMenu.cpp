@@ -807,13 +807,7 @@ void SlotMachineMenu::Prepare3DElements() {
     NiMatrix3 mat;
     NiMatrix3 ecx0;
     NiControllerManager* v34[3];
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v18 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v18 = nullptr;
-    }
+    v18 = new NiNode(0);
     NiRefObject* v27 = (NiRefObject*)v18;
     SlotMachineMenu::spSlotModel = v18;
     NiNode* v17 = SlotMachineMenu::spSlotModel.m_pObject;
@@ -1246,13 +1240,7 @@ NiCamera* SlotMachineMenu::Create3DCamera() {
     NiPoint3 v12;
     NiPoint3 dst;
     NiRect<float> a2;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        v10 = ::new (apMemory) NiCamera;
-    }
-    else {
-        v10 = nullptr;
-    }
+    v10 = new NiCamera;
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     v10->SetViewPort(a2);
     NiFrustum kFrustum(false);

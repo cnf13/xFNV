@@ -454,13 +454,7 @@ bool MagicShaderHitEffect::Init() {
     else {
         if (spParticleNode == static_cast<NiNode*>(nullptr)) {
             NiNode* v29;
-            void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-            if (apMemory) {
-                v29 = ::new (apMemory) NiNode(0);
-            }
-            else {
-                v29 = nullptr;
-            }
+            v29 = new NiNode(0);
             spParticleNode = v29;
             spParticleNode.m_pObject->SetName("ParticleShader Geometry");
             spParticleNode.m_pObject->SetRotate(NiMatrix3_IDENTITY);

@@ -354,15 +354,11 @@ bool BSFaceGenModel::LoadModelMesh(
         pTriName->~basic_string();
         if (bLoaded) {
             if (aeHairPart != HAIR_PART_NONE) {
-                void* pHairMemory = NiMemObject::operator new(sizeof(BSFaceGenMorphDataHair));
-                BSFaceGenMorphDataHair* pHair =
-                    pHairMemory ? ::new (pHairMemory) BSFaceGenMorphDataHair(pTriData) : nullptr;
+                BSFaceGenMorphDataHair* pHair = new BSFaceGenMorphDataHair(pTriData);
                 pMeshData->spMorph = pHair;
             }
             else {
-                void* pHeadMemory = NiMemObject::operator new(sizeof(BSFaceGenMorphDataHead));
-                BSFaceGenMorphDataHead* pHead =
-                    pHeadMemory ? ::new (pHeadMemory) BSFaceGenMorphDataHead(pTriData) : nullptr;
+                BSFaceGenMorphDataHead* pHead = new BSFaceGenMorphDataHead(pTriData);
                 pMeshData->spMorph = pHead;
                 uint32_t uiTriVertices = pTriData->vtxListSize();
                 if (uiTriVertices > pMeshData->spModel->GetVertexCount()) {
@@ -441,28 +437,14 @@ bool BSFaceGenModel::CreateNewMesh(NiPointer<NiTriBasedGeom>& aspReturnMesh) {
             pskin->SetSkinPartition(v3);
         }
 
-        BSFaceGenBaseMorphExtraData* apMemory =
-            static_cast<BSFaceGenBaseMorphExtraData*>(NiMemObject::operator new(sizeof(BSFaceGenBaseMorphExtraData)));
-        if (apMemory) {
-            pmorphBase = ::new (apMemory) BSFaceGenBaseMorphExtraData(
-                aspReturnMesh.m_pObject, pMeshData->pAdditionalVertices, pMeshData->iAdditionalVerticesCount
-            );
-        }
-        else {
-            pmorphBase = nullptr;
-        }
+        pmorphBase = new BSFaceGenBaseMorphExtraData(
+            aspReturnMesh.m_pObject, pMeshData->pAdditionalVertices, pMeshData->iAdditionalVerticesCount
+        );
         NiExtraData* pkExtra = pmorphBase;
         if (pmorphBase) {
             aspReturnMesh.m_pObject->AddExtraData(pkExtra);
         }
-        BSFaceGenModelExtraData* v8 =
-            static_cast<BSFaceGenModelExtraData*>(NiMemObject::operator new(sizeof(BSFaceGenModelExtraData)));
-        if (v8) {
-            pmorphBase_2 = ::new (v8) BSFaceGenModelExtraData(this);
-        }
-        else {
-            pmorphBase_2 = nullptr;
-        }
+        pmorphBase_2 = new BSFaceGenModelExtraData(this);
         aspReturnMesh.m_pObject->AddExtraData(pmorphBase_2);
         return true;
     }
@@ -830,13 +812,7 @@ bool BSFaceGenModel::ApplyCoordinateTexturingToMesh(
     emtpyRGBA.pColor[2] = 0.0f;
     emtpyRGBA.pColor[1] = 0.0f;
     emtpyRGBA.pColor[0] = 0.0f;
-    void* pMemory = NiMemObject::operator new(sizeof(BSFaceGenImage));
-    if (pMemory) {
-        pImage = ::new (pMemory) BSFaceGenImage(static_cast<NiSourceTexture*>(nullptr));
-    }
-    else {
-        pImage = nullptr;
-    }
+    pImage = new BSFaceGenImage(static_cast<NiSourceTexture*>(nullptr));
     spimageOut = pImage;
     spimageOut.m_pObject->iWidth = ibasisHeight;
     spimageOut.m_pObject->iHeight = ibasisWidth;

@@ -20,14 +20,7 @@ const NiRTTI* NiBooleanExtraData::GetRTTI() const {
 }
 
 NiObject* NiBooleanExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiBooleanExtraData* pkObject_2 =
-        static_cast<NiBooleanExtraData*>(NiMemObject::operator new(sizeof(NiBooleanExtraData)));
-    if (pkObject_2) {
-        ::new (pkObject_2) NiBooleanExtraData;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiBooleanExtraData* pkObject_2 = new NiBooleanExtraData;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_bValue = m_bValue;
     return pkObject_2;
@@ -72,10 +65,5 @@ void NiBooleanExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 }
 
 NiObject* NiBooleanExtraData::CreateObject() {
-    NiBooleanExtraData* pkObject =
-        static_cast<NiBooleanExtraData*>(NiMemObject::operator new(sizeof(NiBooleanExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBooleanExtraData;
+    return new NiBooleanExtraData;
 }

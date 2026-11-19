@@ -107,8 +107,7 @@ const NiRTTI* BSNiNode::GetRTTI() const {
 }
 
 NiObject* BSNiNode::CreateClone(NiCloningProcess& arCloneData) {
-    void* pMemory = NiMemObject::operator new(sizeof(BSNiNode));
-    BSNiNode* pkClone = pMemory ? ::new (pMemory) BSNiNode : nullptr;
+    BSNiNode* pkClone = new BSNiNode;
     CopyMembers(pkClone, arCloneData);
     pkClone->UpdateWorldBound();
     return pkClone;

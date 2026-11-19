@@ -634,13 +634,7 @@ bool NavMeshPOVSearch::BuildPath(
             PathManager* v6 = PathManager::QInstance();
             v6->DrawPath(NavMeshPOVSearch::spRootDrawNode, false);
         }
-        void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-        if (apMemory) {
-            v33 = ::new (apMemory) NiNode(0);
-        }
-        else {
-            v33 = nullptr;
-        }
+        v33 = new NiNode(0);
         NiRefObject* v48 = (NiRefObject*)v33;
         NavMeshPOVSearch::spRootDrawNode = v33;
     }
@@ -670,14 +664,7 @@ bool NavMeshPOVSearch::BuildPath(
                 spnode.m_pObject->SetTranslate(
                     (&POVs.GetAt(static_cast<int32_t>(i)))->GetAt(static_cast<int32_t>(j))->Center
                 );
-                NiAlphaProperty* v45 =
-                    static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-                if (v45) {
-                    palpha = ::new (v45) NiAlphaProperty;
-                }
-                else {
-                    palpha = nullptr;
-                }
+                palpha = new NiAlphaProperty;
                 NiAlphaProperty* v46 = palpha;
                 NiAlphaProperty* a1 = palpha;
                 palpha->SetAlphaBlending(true);

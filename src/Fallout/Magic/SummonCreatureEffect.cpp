@@ -342,15 +342,7 @@ bool SummonCreatureEffect::CheckSummonLocation(Actor* apSummoned, NiPoint3& loca
     if (greatestDimension < 64.0) {
         greatestDimension = 64.0f;
     }
-    bhkSphereShape* pMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-    bhkSphereShape* pshape;
-    if (pMemory) {
-        float fRadius = greatestDimension * 0.5;
-        pshape = ::new (pMemory) bhkSphereShape(fRadius, true);
-    }
-    else {
-        pshape = nullptr;
-    }
+    bhkSphereShape* pshape = new bhkSphereShape(greatestDimension * 0.5, true);
     CFilter ifilter(L_PATHINGPICK, 0, P_OTHER);
     hkSimpleShapePhantomCinfo csi;
     csi.m_collisionFilterInfo = ifilter.iFilter;

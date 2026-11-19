@@ -999,8 +999,7 @@ void NiStream::LoadObjectGroups() {
     for (uint32_t i = 1; i < uiNumGroups; ++i) {
         uint32_t uiBytes;
         NiStreamLoadBinary(*m_pkIstr, uiBytes);
-        void* pvMemory = NiMemObject::operator new(sizeof(NiObjectGroup));
-        NiObjectGroup* pkGroup = pvMemory ? ::new (pvMemory) NiObjectGroup(uiBytes) : nullptr;
+        NiObjectGroup* pkGroup = new NiObjectGroup(uiBytes);
         m_kGroups.SetAt(i, pkGroup);
     }
 }

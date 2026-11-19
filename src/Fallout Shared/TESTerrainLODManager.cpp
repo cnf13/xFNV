@@ -99,13 +99,7 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
                 TESTerrainLODManager::pGrassNode = static_cast<NiNode*>(pgrassobj);
                 if (!pgrassobj) {
                     NiNode* v11;
-                    NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                    if (apMemory) {
-                        v11 = ::new (apMemory) NiNode(0);
-                    }
-                    else {
-                        v11 = nullptr;
-                    }
+                    v11 = new NiNode(0);
                     TESTerrainLODManager::pGrassNode = v11;
                     v11->SetName(FixedStrings::QGrass());
                     pbasenode->AttachChild(TESTerrainLODManager::pGrassNode, 1);
@@ -182,13 +176,7 @@ void TESTerrainLODManager::InitGrass() {
     }
     TESTerrainLODManager::fGrassRadius = fRadius;
     ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
-    NiNode* v3 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v3) {
-        v2 = ::new (v3) NiNode(0);
-    }
-    else {
-        v2 = nullptr;
-    }
+    v2 = new NiNode(0);
     TESTerrainLODManager::pGrassNode = v2;
     v2->SetName(FixedStrings::QGrass());
     ShadowSceneNode_->SetAt(6u, TESTerrainLODManager::pGrassNode);

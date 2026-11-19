@@ -53,13 +53,7 @@ NiBoneLODController::~NiBoneLODController() {
 
 NiObject* NiBoneLODController::CreateClone(NiCloningProcess& kCloning) {
     NiBoneLODController* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiBoneLODController));
-    if (v3) {
-        v4 = ::new (v3) NiBoneLODController;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiBoneLODController;
     NiTimeController::CopyMembers(v4, kCloning);
     v4->m_iLOD = m_iLOD;
     v4->m_uiNumLODs = m_uiNumLODs;
@@ -482,10 +476,5 @@ void NiBoneLODController::CleanUp() {
 }
 
 NiObject* NiBoneLODController::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiBoneLODController));
-    if (v0) {
-        return ::new (v0) NiBoneLODController;
-    }
-
-    return nullptr;
+    return new NiBoneLODController;
 }

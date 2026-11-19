@@ -184,35 +184,28 @@ void Sun::Initialize(NiNode* apSkyRoot) {
         sglareVertOrder[4] = 1;
         sglareVertOrder[5] = 3;
 
-        pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-        NiTriShape* pSunBase = pMemory ? ::new (pMemory) NiTriShape(
-                                             4, psunVertices, psunNormals, psunColors, psunTexture, 1,
-                                             NiGeometryData::NBT_METHOD_NONE, 2, ssunVertOrder
-                                         )
-                                       : nullptr;
+        NiTriShape* pSunBase = new NiTriShape(
+            4, psunVertices, psunNormals, psunColors, psunTexture, 1, NiGeometryData::NBT_METHOD_NONE, 2, ssunVertOrder
+        );
         spSunBase = pSunBase;
         spSunBase->SetSelectiveUpdate(true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
-        NiBillboardNode* pSunBaseNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
+        NiBillboardNode* pSunBaseNode = new NiBillboardNode;
         spSunBaseNode = pSunBaseNode;
         spSunBaseNode->SetSelectiveUpdate(true);
         spSunBaseNode->SetMode(NiBillboardNode::RIGID_FACE_CAMERA);
         NiNode* pParent = spSunBaseNode;
         pParent->AttachChild(spSunBase, true);
 
-        pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-        NiTriShape* pSunGlare = pMemory ? ::new (pMemory) NiTriShape(
-                                              4, pglareVertices, pglareNormals, pglareColors, pglareTexture, 1,
-                                              NiGeometryData::NBT_METHOD_NONE, 2, sglareVertOrder
-                                          )
-                                        : nullptr;
+        NiTriShape* pSunGlare = new NiTriShape(
+            4, pglareVertices, pglareNormals, pglareColors, pglareTexture, 1, NiGeometryData::NBT_METHOD_NONE, 2,
+            sglareVertOrder
+        );
         spSunGlare = pSunGlare;
         spSunGlare->SetSelectiveUpdate(true);
     }
 
-    pMemory = NiMemObject::operator new(sizeof(NiBillboardNode));
-    NiBillboardNode* pSunGlareNode = pMemory ? ::new (pMemory) NiBillboardNode : nullptr;
+    NiBillboardNode* pSunGlareNode = new NiBillboardNode;
     spSunGlareNode = pSunGlareNode;
     spSunGlareNode->SetSelectiveUpdate(true);
     spSunGlareNode->SetMode(NiBillboardNode::RIGID_FACE_CAMERA);
@@ -224,8 +217,7 @@ void Sun::Initialize(NiNode* apSkyRoot) {
     pParent = spRoot;
     pParent->AttachChild(spSunBaseNode, true);
 
-    pMemory = NiMemObject::operator new(sizeof(NiDirectionalLight));
-    NiDirectionalLight* pLight = pMemory ? ::new (pMemory) NiDirectionalLight : nullptr;
+    NiDirectionalLight* pLight = new NiDirectionalLight;
     spLight = pLight;
     spLight->SetDimmer(1.0f);
     spLight->SetAmbientColor(NiColor_WHITE);

@@ -121,10 +121,6 @@ void NiTriStripsDynamicData::GetStripData(
 }
 
 NiObject* NiTriStripsDynamicData::CreateObject() {
-    NiTriStripsDynamicData* pkObject =
-        static_cast<NiTriStripsDynamicData*>(NiMemObject::operator new(sizeof(NiTriStripsDynamicData)));
-    if (pkObject) {
-        ::new (pkObject) NiTriStripsDynamicData;
-    }
+    NiTriStripsDynamicData* pkObject = new NiTriStripsDynamicData;
     return pkObject;
 }

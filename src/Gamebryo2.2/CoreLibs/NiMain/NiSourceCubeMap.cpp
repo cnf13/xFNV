@@ -210,13 +210,10 @@ void NiSourceCubeMap::LoadFromPixelData(
     NiPixelData* pkPosZRaw,
     NiPixelData* pkNegZRaw
 ) {
-    NiPixelData* pkCubeData = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-    if (pkCubeData) {
-        pkCubeData = ::new (pkCubeData) NiPixelData(
-            *pkPosXRaw->m_puiWidth, *pkPosXRaw->m_puiHeight, pkPosXRaw->m_kPixelFormat, pkPosXRaw->m_uiMipmapLevels,
-            FACE_NUM
-        );
-    }
+    NiPixelData* pkCubeData = new NiPixelData(
+        *pkPosXRaw->m_puiWidth, *pkPosXRaw->m_puiHeight, pkPosXRaw->m_kPixelFormat, pkPosXRaw->m_uiMipmapLevels,
+        FACE_NUM
+    );
     m_spSrcPixelData = pkCubeData;
 
     NiPointer<NiPixelData> aspRaw[FACE_NUM];
@@ -254,13 +251,7 @@ NiSourceCubeMap* NiSourceCubeMap::Create(
     const NiFixedString& kName,
     NiTexture::FormatPrefs& kPrefs
 ) {
-    NiSourceCubeMap* pkTexture = static_cast<NiSourceCubeMap*>(NiMemObject::operator new(sizeof(NiSourceCubeMap)));
-    if (pkTexture) {
-        pkTexture = ::new (pkTexture) NiSourceCubeMap;
-    }
-    else {
-        pkTexture = nullptr;
-    }
+    NiSourceCubeMap* pkTexture = new NiSourceCubeMap;
     pkTexture->m_kFormatPrefs = kPrefs;
     alignas(4) uint8_t aucPath[sizeof(NiSearchPath)];
     NiSearchPath* pkPath = ::new (aucPath) NiSearchPath;
@@ -288,10 +279,7 @@ NiSourceCubeMap* NiSourceCubeMap::Create_(
     NiDX9Renderer* pkRenderer,
     const NiTexture::FormatPrefs* kPrefs
 ) {
-    NiSourceCubeMap* pkCubeMap = static_cast<NiSourceCubeMap*>(NiMemObject::operator new(sizeof(NiSourceCubeMap)));
-    if (pkCubeMap) {
-        ::new (pkCubeMap) NiSourceCubeMap;
-    }
+    NiSourceCubeMap* pkCubeMap = new NiSourceCubeMap;
     pkCubeMap->m_kFormatPrefs = *kPrefs;
     const char* pcHandle = kFilename->GetHandle();
     NiFixedString* pkFilename = &pkCubeMap->m_kFilename;
@@ -317,20 +305,13 @@ NiSourceCubeMap* NiSourceCubeMap::Create_(
 }
 
 NiObject* NiSourceCubeMap::CreateObject() {
-    NiSourceCubeMap* pkObject = static_cast<NiSourceCubeMap*>(NiMemObject::operator new(sizeof(NiSourceCubeMap)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSourceCubeMap;
+    return new NiSourceCubeMap;
 }
 
 // As Create_, from the already open file a2, whose pixel data is always read.
 NiSourceCubeMap*
 NiSourceCubeMap::CreateTexture(NiFixedString* a1, NiFile* a2, NiDX9Renderer* pkRenderer, NiTexture::FormatPrefs* a4) {
-    NiSourceCubeMap* pkCubeMap = static_cast<NiSourceCubeMap*>(NiMemObject::operator new(sizeof(NiSourceCubeMap)));
-    if (pkCubeMap) {
-        ::new (pkCubeMap) NiSourceCubeMap;
-    }
+    NiSourceCubeMap* pkCubeMap = new NiSourceCubeMap;
     pkCubeMap->m_kFormatPrefs = *a4;
     const char* pcHandle = a1->GetHandle();
     NiFixedString* pkFilename = &pkCubeMap->m_kFilename;

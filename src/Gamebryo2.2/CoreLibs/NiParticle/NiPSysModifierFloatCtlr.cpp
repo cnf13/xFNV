@@ -31,8 +31,7 @@ void NiPSysModifierFloatCtlr::LinkObject(NiStream& kStream) {
     NiPSysModifierCtlr::LinkObject(kStream);
     if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
         NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-        NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
+        NiFloatInterpolator* pkInterp = new NiFloatInterpolator(pkData);
         m_spInterpolator = pkInterp;
     }
 }
@@ -75,8 +74,7 @@ void NiPSysModifierFloatCtlr::Update(NiUpdateData& UpdateData) {
 NiInterpolator* NiPSysModifierFloatCtlr::CreatePoseInterpolator(uint16_t) {
     float fValue;
     GetTargetFloatValue(fValue);
-    void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-    return pvMem ? ::new (pvMem) NiFloatInterpolator(fValue) : nullptr;
+    return new NiFloatInterpolator(fValue);
 }
 
 // Sets the pose of apInterp, which must be a NiFloatInterpolator, to the target's current value.
@@ -97,8 +95,7 @@ NiBlendInterpolator* NiPSysModifierFloatCtlr::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
-    return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
+    return new NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiPSysModifierFloatCtlr::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {

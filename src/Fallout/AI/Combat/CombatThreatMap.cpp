@@ -477,13 +477,7 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
         if (*v5 < static_cast<double>(fthreatScore)) {
             if (!pavoidNodeArray) {
                 PathingAvoidNodeArray* pavoidNodeArray_2;
-                void* apMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
-                if (apMemory) {
-                    pavoidNodeArray_2 = ::new (apMemory) PathingAvoidNodeArray;
-                }
-                else {
-                    pavoidNodeArray_2 = nullptr;
-                }
+                pavoidNodeArray_2 = new PathingAvoidNodeArray;
                 PathingAvoidNodeArray* v16 = pavoidNodeArray_2;
                 pavoidNodeArray = pavoidNodeArray_2;
             }
@@ -494,14 +488,7 @@ PathingAvoidNodeArray* CombatThreatMap::CreateAvoidNodeArray(const NiPoint3& arL
     Lock.UnlockRead();
     if ((!pavoidNodeArray) && (pbestThreat)) {
         PathingAvoidNodeArray* pavoidNodeArray_3;
-        PathingAvoidNodeArray* v12 =
-            static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-        if (v12) {
-            pavoidNodeArray_3 = ::new (v12) PathingAvoidNodeArray;
-        }
-        else {
-            pavoidNodeArray_3 = nullptr;
-        }
+        pavoidNodeArray_3 = new PathingAvoidNodeArray;
         pavoidNodeArray = pavoidNodeArray_3;
         PathingAvoidNode* v7 = pbestThreat->GetAvoidNode(&v11, apActor);
         pavoidNodeArray->Add(*v7);

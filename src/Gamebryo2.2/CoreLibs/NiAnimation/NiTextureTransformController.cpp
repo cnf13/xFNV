@@ -76,13 +76,7 @@ const NiRTTI* NiTextureTransformController::GetRTTI() const {
 
 NiObject* NiTextureTransformController::CreateClone(NiCloningProcess& kCloning) {
     NiTextureTransformController* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiTextureTransformController));
-    if (v3) {
-        v4 = ::new (v3) NiTextureTransformController(nullptr, nullptr, TT_TRANSLATE_U);
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiTextureTransformController(nullptr, nullptr, TT_TRANSLATE_U);
     NiFloatInterpController::CopyMembers(v4, kCloning);
     v4->m_uiLastIdx = m_uiLastIdx;
     v4->m_bShaderMap = (bool)((uint8_t)m_bShaderMap);
@@ -117,8 +111,7 @@ void NiTextureTransformController::LinkObject(NiStream& kStream) {
     NiFloatInterpController::LinkObject(kStream);
     if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
         NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-        NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
+        NiFloatInterpolator* pkInterp = new NiFloatInterpolator(pkData);
         m_spInterpolator = pkInterp;
         m_spInterpolator->Collapse();
     }
@@ -292,10 +285,5 @@ bool NiTextureTransformController::SetInternalMap() {
 }
 
 NiObject* NiTextureTransformController::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiTextureTransformController));
-    if (v0) {
-        return ::new (v0) NiTextureTransformController(nullptr, nullptr, TT_TRANSLATE_U);
-    }
-
-    return nullptr;
+    return new NiTextureTransformController(nullptr, nullptr, TT_TRANSLATE_U);
 }

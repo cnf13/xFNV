@@ -70,11 +70,7 @@ BSDismemberSkinInstance::~BSDismemberSkinInstance() {
 
 // Unlike NiSkinInstance, always cloned. The clone keeps the original's root and bones where those are not cloned.
 NiObject* BSDismemberSkinInstance::CreateClone(NiCloningProcess& kCloning) {
-    BSDismemberSkinInstance* pkClone =
-        static_cast<BSDismemberSkinInstance*>(NiMemObject::operator new(sizeof(BSDismemberSkinInstance)));
-    if (pkClone) {
-        ::new (pkClone) BSDismemberSkinInstance;
-    }
+    BSDismemberSkinInstance* pkClone = new BSDismemberSkinInstance;
     CopyMembers(pkClone, kCloning);
 
     NiObject* pkClonedObject = nullptr;
@@ -224,9 +220,5 @@ void BSDismemberSkinInstance::CopyMembers(BSDismemberSkinInstance* pkDest, NiClo
 }
 
 NiObject* BSDismemberSkinInstance::CreateObject() {
-    void* pkMemory = NiMemObject::operator new(sizeof(BSDismemberSkinInstance));
-    if (!pkMemory) {
-        return nullptr;
-    }
-    return ::new (pkMemory) BSDismemberSkinInstance;
+    return new BSDismemberSkinInstance;
 }

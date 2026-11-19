@@ -48,11 +48,7 @@ void NiPoint3InterpController::GetViewerStrings(NiTPrimitiveArray<char*>* pkStri
 NiInterpolator* NiPoint3InterpController::CreatePoseInterpolator(uint16_t) {
     NiPoint3 kValue;
     GetTargetPoint3Value(kValue);
-    void* pvMemory = NiMemObject::operator new(sizeof(NiPoint3Interpolator));
-    if (!pvMemory) {
-        return nullptr;
-    }
-    return ::new (pvMemory) NiPoint3Interpolator(kValue);
+    return new NiPoint3Interpolator(kValue);
 }
 
 // Sets the pose of apInterp, which must be a NiPoint3Interpolator, to the target's current value.
@@ -74,11 +70,7 @@ NiBlendInterpolator* NiPoint3InterpController::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiBlendPoint3Interpolator));
-    if (!pvMemory) {
-        return nullptr;
-    }
-    return ::new (pvMemory) NiBlendPoint3Interpolator(bManagerControlled, fWeightThreshold, ucArraySize);
+    return new NiBlendPoint3Interpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiPoint3InterpController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {

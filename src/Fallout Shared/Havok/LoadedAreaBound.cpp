@@ -429,8 +429,7 @@ void LoadedAreaBound::Create(TESObjectCELL* apCell, const hkAabb& arboundAABB) {
         hkAabb_operator_assign(&ci.aabb, bound);
         uint32_t uiSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
         ci.m_collisionFilterInfo = CFilter(L_UNIDENTIFIED, uiSystemGroup, P_OTHER).iFilter;
-        void* pMemory = NiMemObject::operator new(sizeof(bhkAabbPhantom));
-        bhkAabbPhantom* pPhantom = pMemory ? ::new (pMemory) bhkAabbPhantom(ci) : nullptr;
+        bhkAabbPhantom* pPhantom = new bhkAabbPhantom(ci);
         this->spPhantomA[ui] = pPhantom;
         pworld->Add(this->spPhantomA[ui].m_pObject);
     }

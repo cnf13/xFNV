@@ -215,10 +215,5 @@ void NiPSysRotationModifier::CopyMembers(NiPSysRotationModifier* pkDest, NiCloni
 }
 
 NiObject* NiPSysRotationModifier::CreateObject() {
-    NiPSysRotationModifier* pkObject =
-        static_cast<NiPSysRotationModifier*>(NiMemObject::operator new(sizeof(NiPSysRotationModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysRotationModifier;
+    return new NiPSysRotationModifier;
 }

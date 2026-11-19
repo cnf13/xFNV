@@ -220,11 +220,7 @@ NiStaticGeometryGroup::~NiStaticGeometryGroup() {
 }
 
 NiGeometryGroup* NiStaticGeometryGroup::Create() {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiStaticGeometryGroup));
-    if (!pvMemory) {
-        return nullptr;
-    }
-    return ::new (pvMemory) NiStaticGeometryGroup;
+    return new NiStaticGeometryGroup;
 }
 
 // Tests the allocation result for null, as the game does.

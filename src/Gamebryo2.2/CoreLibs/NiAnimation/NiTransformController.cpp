@@ -59,14 +59,7 @@ void NiTransformController::LinkObject(NiStream& kStream) {
     if ((&kStream)->GetFileVersion() < 0xA010068) {
         NiTransformInterpolator* v5;
         NiTransformData* pkKeyframeData = static_cast<NiTransformData*>(kStream.GetObjectFromLinkID());
-        NiTransformInterpolator* v4 =
-            static_cast<NiTransformInterpolator*>(NiMemObject::operator new(sizeof(NiTransformInterpolator)));
-        if (v4) {
-            v5 = ::new (v4) NiTransformInterpolator(pkKeyframeData);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiTransformInterpolator(pkKeyframeData);
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -132,11 +125,7 @@ NiInterpolator* NiTransformController::CreatePoseInterpolator(uint16_t) {
     kPose.m_fScale = pkTarget->m_kLocal.m_fScale;
     kPose.m_kTranslate = pkTarget->m_kLocal.m_Translate;
     kPose.m_kRotate = kRotate;
-    void* pkMemory = NiMemObject::operator new(sizeof(NiTransformInterpolator));
-    if (!pkMemory) {
-        return nullptr;
-    }
-    return ::new (pkMemory) NiTransformInterpolator(kPose);
+    return new NiTransformInterpolator(kPose);
 }
 
 // The pose is the target's current local transform. apInterp must be a NiTransformInterpolator.
@@ -164,21 +153,9 @@ NiBlendInterpolator* NiTransformController::CreateBlendInterpolator(
     int32_t ucArraySize
 ) const {
     if (bAccumulateAnimations) {
-        NiBlendAccumTransformInterpolator* v6 = static_cast<NiBlendAccumTransformInterpolator*>(
-            NiMemObject::operator new(sizeof(NiBlendAccumTransformInterpolator))
-        );
-        if (v6) {
-            return ::new (v6) NiBlendAccumTransformInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
-        }
+        return new NiBlendAccumTransformInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
     }
-    else {
-        NiBlendTransformInterpolator* v8 =
-            static_cast<NiBlendTransformInterpolator*>(NiMemObject::operator new(sizeof(NiBlendTransformInterpolator)));
-        if (v8) {
-            return ::new (v8) NiBlendTransformInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
-        }
-    }
-    return nullptr;
+    return new NiBlendTransformInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiTransformController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
@@ -190,10 +167,5 @@ bool NiTransformController::InterpTargetIsCorrectType(NiObjectNET* pkTarget) con
 }
 
 NiObject* NiTransformController::CreateObject() {
-    NiTransformController* v0 =
-        static_cast<NiTransformController*>(NiMemObject::operator new(sizeof(NiTransformController)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiTransformController;
+    return new NiTransformController;
 }

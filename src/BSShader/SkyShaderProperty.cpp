@@ -44,10 +44,7 @@ SkyShaderProperty::~SkyShaderProperty() {
 
 // The clone comes from a 0x90-byte engine block and is filled in by CopyMembers; arCloning is passed through.
 NiObject* SkyShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    SkyShaderProperty* pClone = static_cast<SkyShaderProperty*>(NiMemObject::operator new(sizeof(SkyShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) SkyShaderProperty;
-    }
+    SkyShaderProperty* pClone = new SkyShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -237,10 +234,5 @@ void SkyShaderProperty::CopyMembers(SkyShaderProperty* pDest, NiCloningProcess& 
 
 // The stream's factory: a property from a 0x90-byte engine block, or null when the block could not be had.
 NiObject* SkyShaderProperty::CreateObject() {
-    SkyShaderProperty* pProperty =
-        static_cast<SkyShaderProperty*>(NiMemObject::operator new(sizeof(SkyShaderProperty)));
-    if (pProperty) {
-        return ::new (pProperty) SkyShaderProperty;
-    }
-    return nullptr;
+    return new SkyShaderProperty;
 }

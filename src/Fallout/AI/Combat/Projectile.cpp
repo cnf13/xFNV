@@ -652,15 +652,11 @@ void Projectile::InitHavok() {
             info.pObject = p3d;
             info.SetPosition(GetLocationOnReference());
             if (GetProjectileBase()->GetRotates()) {
-                bhkSphereShape* pMemory =
-                    static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-                bhkSphereShape* pShape = pMemory ? ::new (pMemory) bhkSphereShape(1.0f, true) : nullptr;
+                bhkSphereShape* pShape = new bhkSphereShape(1.0f, true);
                 info.SetShape(pShape);
             }
             else {
-                bhkSphereShape* pMemory =
-                    static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-                bhkSphereShape* pShape = pMemory ? ::new (pMemory) bhkSphereShape(0.1f, true) : nullptr;
+                bhkSphereShape* pShape = new bhkSphereShape(0.1f, true);
                 info.SetShape(pShape);
             }
             info.SetCollisionBox(false);

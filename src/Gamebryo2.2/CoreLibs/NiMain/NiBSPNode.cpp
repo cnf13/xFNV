@@ -31,13 +31,7 @@ const NiRTTI* NiBSPNode::GetRTTI() const {
 
 // Constructs the clone as CreateObject does, copies NiNode's members, then the model plane.
 NiObject* NiBSPNode::CreateClone(NiCloningProcess& kCloning) {
-    NiBSPNode* pkObject = static_cast<NiBSPNode*>(NiMemObject::operator new(sizeof(NiBSPNode)));
-    if (pkObject) {
-        ::new (pkObject) NiBSPNode;
-    }
-    else {
-        pkObject = nullptr;
-    }
+    NiBSPNode* pkObject = new NiBSPNode;
     NiNode::CopyMembers(pkObject, kCloning);
     pkObject->m_kModelPlane = m_kModelPlane;
     return pkObject;
@@ -211,9 +205,5 @@ void NiBSPNode::UpdateWorldPlane() {
 }
 
 NiObject* NiBSPNode::CreateObject() {
-    NiBSPNode* pkObject = static_cast<NiBSPNode*>(NiMemObject::operator new(sizeof(NiBSPNode)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBSPNode;
+    return new NiBSPNode;
 }

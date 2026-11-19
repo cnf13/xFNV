@@ -246,14 +246,7 @@ void PathingRequest::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     if (isaveGameCount) {
         PathingAvoidNodeArray* v2;
-        PathingAvoidNodeArray* apMemory =
-            static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-        if (apMemory) {
-            v2 = ::new (apMemory) PathingAvoidNodeArray;
-        }
-        else {
-            v2 = nullptr;
-        }
+        v2 = new PathingAvoidNodeArray;
         spAvoidNodeArray = v2;
         spAvoidNodeArray.m_pObject->SetSize(isaveGameCount, true);
         for (uint32_t i = 0; i < isaveGameCount; ++i) {
@@ -427,105 +420,49 @@ PathingRequest* PathingRequest::CreatePathingRequest(PATHING_REQUEST_TYPE aeType
     switch (aeType) {
         case PATHING_REQUEST_STANDARD: {
             PathingRequest* v9;
-            PathingRequest* v17 = static_cast<PathingRequest*>(NiMemObject::operator new(sizeof(PathingRequest)));
-            if (v17) {
-                v9 = ::new (v17) PathingRequest;
-            }
-            else {
-                v9 = nullptr;
-            }
+            v9 = new PathingRequest;
             result = v9;
             break;
         }
         case PATHING_REQUEST_COVER: {
             PathingRequestCover* v8;
-            PathingRequestCover* v16 =
-                static_cast<PathingRequestCover*>(NiMemObject::operator new(sizeof(PathingRequestCover)));
-            if (v16) {
-                v8 = ::new (v16) PathingRequestCover;
-            }
-            else {
-                v8 = nullptr;
-            }
+            v8 = new PathingRequestCover;
             result = v8;
             break;
         }
         case PATHING_REQUEST_CLOSE_POINT: {
             PathingRequestClosePoint* v7;
-            PathingRequestClosePoint* apMemory =
-                static_cast<PathingRequestClosePoint*>(NiMemObject::operator new(sizeof(PathingRequestClosePoint)));
-            if (apMemory) {
-                v7 = ::new (apMemory) PathingRequestClosePoint;
-            }
-            else {
-                v7 = nullptr;
-            }
+            v7 = new PathingRequestClosePoint;
             result = v7;
             break;
         }
         case PATHING_REQUEST_FLEE: {
             PathingRequestFlee* v6;
-            PathingRequestFlee* v14 =
-                static_cast<PathingRequestFlee*>(NiMemObject::operator new(sizeof(PathingRequestFlee)));
-            if (v14) {
-                v6 = ::new (v14) PathingRequestFlee;
-            }
-            else {
-                v6 = nullptr;
-            }
+            v6 = new PathingRequestFlee;
             result = v6;
             break;
         }
         case PATHING_REQUEST_HIDE: {
             PathingRequestHide* v5;
-            PathingRequestHide* v13 =
-                static_cast<PathingRequestHide*>(NiMemObject::operator new(sizeof(PathingRequestHide)));
-            if (v13) {
-                v5 = ::new (v13) PathingRequestHide;
-            }
-            else {
-                v5 = nullptr;
-            }
+            v5 = new PathingRequestHide;
             result = v5;
             break;
         }
         case PATHING_REQUEST_LOS: {
             PathingRequestLOS* v4;
-            PathingRequestLOS* v12 =
-                static_cast<PathingRequestLOS*>(NiMemObject::operator new(sizeof(PathingRequestLOS)));
-            if (v12) {
-                v4 = ::new (v12) PathingRequestLOS;
-            }
-            else {
-                v4 = nullptr;
-            }
+            v4 = new PathingRequestLOS;
             result = v4;
             break;
         }
         case PATHING_REQUEST_OPTIMAL_LOCATION: {
             PathingRequestOptimalLocation* v3;
-            PathingRequestOptimalLocation* v11 = static_cast<PathingRequestOptimalLocation*>(
-                NiMemObject::operator new(sizeof(PathingRequestOptimalLocation))
-            );
-            if (v11) {
-                v3 = ::new (v11) PathingRequestOptimalLocation;
-            }
-            else {
-                v3 = nullptr;
-            }
+            v3 = new PathingRequestOptimalLocation;
             result = v3;
             break;
         }
         case PATHING_REQUEST_COVERED_MOVE: {
             PathingRequestCoveredMove* v2;
-            PathingRequestCoveredMove* v10 =
-                static_cast<PathingRequestCoveredMove*>(NiMemObject::operator new(sizeof(PathingRequestCoveredMove)));
-            if (v10) {
-                v2 = ::new (v10) PathingRequestCoveredMove;
-            }
-            else {
-                v2 = nullptr;
-            }
+            v2 = new PathingRequestCoveredMove;
             result = v2;
             break;
         }

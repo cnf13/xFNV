@@ -58,14 +58,7 @@ NiObject* PrecipitationShaderProperty::CreateClone(NiCloningProcess& arCloneData
     int32_t& riMemContext = GetThreadMemContext();
     int32_t iOldMemContext = riMemContext;
     riMemContext = MEM_CONTEXT_PRECIPITATION;
-    PrecipitationShaderProperty* pClone =
-        static_cast<PrecipitationShaderProperty*>(NiMemObject::operator new(sizeof(PrecipitationShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) PrecipitationShaderProperty;
-    }
-    else {
-        pClone = nullptr;
-    }
+    PrecipitationShaderProperty* pClone = new PrecipitationShaderProperty;
     CopyMembers(pClone, arCloneData);
     riMemContext = iOldMemContext;
     return pClone;

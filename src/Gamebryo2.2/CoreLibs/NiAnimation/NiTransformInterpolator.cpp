@@ -516,10 +516,5 @@ void NiTransformInterpolator::CopyMembers(NiTransformInterpolator* pkDest, NiClo
 }
 
 NiObject* NiTransformInterpolator::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiTransformInterpolator));
-    if (v0) {
-        return ::new (v0) NiTransformInterpolator(nullptr);
-    }
-
-    return nullptr;
+    return new NiTransformInterpolator(nullptr);
 }

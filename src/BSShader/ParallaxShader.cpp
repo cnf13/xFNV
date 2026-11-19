@@ -1178,10 +1178,7 @@ BSShader* ParallaxShader::CreateShader() {
         5u, 15u, NiShaderDeclaration::SHADERPARAM_NI_BINORMAL, NiShaderDeclaration::SPTYPE_FLOAT3, 0
     );
     spShaderDecl->GetD3DDeclaration();
-    ParallaxShader* v2 = static_cast<ParallaxShader*>(NiMemObject::operator new(sizeof(ParallaxShader)));
-    if (v2) {
-        pshader = ::new (v2) ParallaxShader(spShaderDecl);
-    }
+    pshader = new ParallaxShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

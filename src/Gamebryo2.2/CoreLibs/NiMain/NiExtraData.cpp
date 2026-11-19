@@ -38,12 +38,9 @@ void NiExtraData::LoadBinary(NiStream& kStream) {
         if (uiSize > 0 && GetRTTI() == &NiExtraData::ms_RTTI) {
             char* pcData = static_cast<char*>(_NiMalloc(uiSize));
             NiStreamLoadBinary(kStream, pcData, uiSize);
-            void* pvMemory = NiMemObject::operator new(sizeof(NiBinaryExtraData));
-            if (pvMemory) {
-                NiBinaryExtraData* pkBinaryData = ::new (pvMemory) NiBinaryExtraData(uiSize, pcData);
-                if (pkBinaryData) {
-                    kStream.ChangeObject(pkBinaryData);
-                }
+            NiBinaryExtraData* pkBinaryData = new NiBinaryExtraData(uiSize, pcData);
+            if (pkBinaryData) {
+                kStream.ChangeObject(pkBinaryData);
             }
         }
     }
@@ -114,9 +111,5 @@ void NiExtraData::ClearName() {
 }
 
 NiObject* NiExtraData::CreateObject() {
-    NiExtraData* pkObject = static_cast<NiExtraData*>(NiMemObject::operator new(sizeof(NiExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiExtraData;
+    return new NiExtraData;
 }

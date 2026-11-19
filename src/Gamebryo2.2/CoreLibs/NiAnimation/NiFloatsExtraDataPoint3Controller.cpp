@@ -33,11 +33,7 @@ const NiRTTI* NiFloatsExtraDataPoint3Controller::GetRTTI() const {
 }
 
 NiObject* NiFloatsExtraDataPoint3Controller::CreateClone(NiCloningProcess& kCloning) {
-    void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataPoint3Controller));
-    NiFloatsExtraDataPoint3Controller* pkObject_2 = nullptr;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiFloatsExtraDataPoint3Controller;
-    }
+    NiFloatsExtraDataPoint3Controller* pkObject_2 = new NiFloatsExtraDataPoint3Controller;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_iFloatsExtraDataIndex = m_iFloatsExtraDataIndex;
     return pkObject_2;
@@ -131,11 +127,7 @@ NiInterpolator* NiFloatsExtraDataPoint3Controller::CreatePoseInterpolator(uint16
     kValue.x = pkData->GetValue(m_iFloatsExtraDataIndex);
     kValue.y = pkData->GetValue(m_iFloatsExtraDataIndex + 1);
     kValue.z = pkData->GetValue(m_iFloatsExtraDataIndex + 2);
-    void* pvMem = NiMemObject::operator new(sizeof(NiPoint3Interpolator));
-    if (!pvMem) {
-        return nullptr;
-    }
-    return ::new (pvMem) NiPoint3Interpolator(kValue);
+    return new NiPoint3Interpolator(kValue);
 }
 
 // apInterp must be a NiPoint3Interpolator; the extra data is not null-checked.
@@ -159,11 +151,7 @@ NiBlendInterpolator* NiFloatsExtraDataPoint3Controller::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiBlendPoint3Interpolator));
-    if (!pvMemory) {
-        return nullptr;
-    }
-    return ::new (pvMemory) NiBlendPoint3Interpolator(bManagerControlled, fWeightThreshold, ucArraySize);
+    return new NiBlendPoint3Interpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiFloatsExtraDataPoint3Controller::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
@@ -171,9 +159,5 @@ bool NiFloatsExtraDataPoint3Controller::InterpolatorIsCorrectType(NiInterpolator
 }
 
 NiObject* NiFloatsExtraDataPoint3Controller::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataPoint3Controller));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiFloatsExtraDataPoint3Controller;
+    return new NiFloatsExtraDataPoint3Controller;
 }

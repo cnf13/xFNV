@@ -132,10 +132,5 @@ void NiFloatsExtraData::CopyMembers(NiFloatsExtraData* pDest, NiCloningProcess& 
 }
 
 NiObject* NiFloatsExtraData::CreateObject() {
-    NiExtraData* pkObject = static_cast<NiExtraData*>(NiMemObject::operator new(sizeof(NiFloatsExtraData)));
-    NiFloatsExtraData* pkObject_2 = static_cast<NiFloatsExtraData*>(pkObject);
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiFloatsExtraData;
+    return new NiFloatsExtraData;
 }

@@ -357,23 +357,10 @@ NiLines* MakeLine(
     uint8_t* pbools = static_cast<uint8_t*>(ourMalloc(2u));
     *pbools = 1;
     pbools[1] = 0;
-    NiLines* v11 = static_cast<NiLines*>(NiMemObject::operator new(sizeof(NiLines)));
-    if (v11) {
-        plines = ::new (v11) NiLines(2, pverts_2, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, pbools);
-    }
-    else {
-        plines = nullptr;
-    }
+    plines = new NiLines(2, pverts_2, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, pbools);
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            pshprop = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            pshprop = nullptr;
-        }
+        pshprop = new BSShaderNoLightingProperty;
         plines->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(plines, 0, 0);
     }
@@ -452,24 +439,10 @@ NiTriShape* MakeTriPoint(float afDrawSize, const NiColorA& aColor, bool abWithNo
     ptrilist[21] = 4;
     ptrilist[22] = 1;
     ptrilist[23] = 5;
-    NiTriShape* v20 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v20) {
-        ptri = ::new (v20)
-            NiTriShape(6, pverts, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 8, ptrilist);
-    }
-    else {
-        ptri = nullptr;
-    }
+    ptri = new NiTriShape(6, pverts, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 8, ptrilist);
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            pshprop = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            pshprop = nullptr;
-        }
+        pshprop = new BSShaderNoLightingProperty;
         NiProperty* pkProperty = pshprop;
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
@@ -1327,14 +1300,7 @@ void RecursivelyRemoveAllDecals(NiAVObject* apRoot) {
 void AddNoLightingPropertyRecurse(NiAVObject* apObject) {
     if ((apObject->IsGeometry()) && (!apObject->GetProperty(3))) {
         BSShaderNoLightingProperty* v1;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            v1 = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            v1 = nullptr;
-        }
+        v1 = new BSShaderNoLightingProperty;
         apObject->AttachProperty(v1);
     }
 
@@ -1363,14 +1329,7 @@ void PrepareObjectWithNoLightingRecurse(NiAVObject* apObject) {
     }
     else {
         BSShaderNoLightingProperty* v1;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            v1 = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            v1 = nullptr;
-        }
+        v1 = new BSShaderNoLightingProperty;
         v1->SetFlag(48u, 1);
         apObject->AttachProperty(v1);
         apObject->UpdateProperties();
@@ -2032,24 +1991,10 @@ NiTriShape* MakeQuadBox(
     ptrilist[69] = 4;
     ptrilist[70] = 5;
     ptrilist[71] = 6;
-    NiTriShape* apMemory = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (apMemory) {
-        ptri = ::new (apMemory)
-            NiTriShape(8, pverts_2, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 24, ptrilist);
-    }
-    else {
-        ptri = nullptr;
-    }
+    ptri = new NiTriShape(8, pverts_2, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 24, ptrilist);
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
-        BSShaderNoLightingProperty* pShader =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (pShader) {
-            pshprop = ::new (pShader) BSShaderNoLightingProperty;
-        }
-        else {
-            pshprop = nullptr;
-        }
+        pshprop = new BSShaderNoLightingProperty;
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
     }
@@ -2090,24 +2035,10 @@ MakeTriangle(NiPoint3 aPt1, NiPoint3 aPt2, NiPoint3 aPt3, const NiColorA& aColor
     ptrilist[3] = 0;
     ptrilist[4] = 1;
     ptrilist[5] = 2;
-    NiTriShape* v11 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v11) {
-        ptri = ::new (v11)
-            NiTriShape(3, pverts_2, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 2, ptrilist);
-    }
-    else {
-        ptri = nullptr;
-    }
+    ptri = new NiTriShape(3, pverts_2, nullptr, pcolors_2, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, 2, ptrilist);
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            pshprop = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            pshprop = nullptr;
-        }
+        pshprop = new BSShaderNoLightingProperty;
         ptri->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(ptri, 0, 0);
     }
@@ -2252,13 +2183,7 @@ void TintScenegraph(NiAVObject* apRoot, NiColor& aColor, void* apTextureEffectDa
     );
     if (!apTextureEffectData) {
         BSShaderPPLightingProperty::TextureEffectData* v11;
-        void* apMemory = NiMemObject::operator new(sizeof(BSShaderPPLightingProperty::TextureEffectData));
-        if (apMemory) {
-            v11 = ::new (apMemory) BSShaderPPLightingProperty::TextureEffectData;
-        }
-        else {
-            v11 = nullptr;
-        }
+        v11 = new BSShaderPPLightingProperty::TextureEffectData;
         spdata = v11;
         apTextureEffectData = (void*)spdata.m_pObject;
         NiColorA v15(aColor.r, aColor.g, aColor.b, 0.5f);

@@ -368,37 +368,19 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
     sVertOrderShadow[3] = 2;
     sVertOrderShadow[4] = 1;
     sVertOrderShadow[5] = 3;
-    NiTriShape* v92 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v92) {
-        v72 = ::new (v92) NiTriShape(
-            4, pVerticesMoon, pNormalsMoon, pColorsMoon, pTexturesMoon, 1, NiGeometryData::NBT_METHOD_NONE, 2,
-            sVertOrderMoon
-        );
-    }
-    else {
-        v72 = nullptr;
-    }
+    v72 = new NiTriShape(
+        4, pVerticesMoon, pNormalsMoon, pColorsMoon, pTexturesMoon, 1, NiGeometryData::NBT_METHOD_NONE, 2,
+        sVertOrderMoon
+    );
     spMoonMesh = v72;
     spMoonMesh.m_pObject->SetSelectiveUpdate(true);
-    NiTriShape* v91 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v91) {
-        NiTriShape_ = ::new (v91) NiTriShape(
-            4, pVerticesShadow, pNormalsShadow, pColorsShadow, pTexturesShadow, 1, NiGeometryData::NBT_METHOD_NONE, 2,
-            sVertOrderShadow
-        );
-    }
-    else {
-        NiTriShape_ = nullptr;
-    }
+    NiTriShape_ = new NiTriShape(
+        4, pVerticesShadow, pNormalsShadow, pColorsShadow, pTexturesShadow, 1, NiGeometryData::NBT_METHOD_NONE, 2,
+        sVertOrderShadow
+    );
     spShadowMesh = NiTriShape_;
     spShadowMesh.m_pObject->SetSelectiveUpdate(true);
-    NiAlphaProperty* v90 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (v90) {
-        NiAlphaProperty_ = ::new (v90) NiAlphaProperty;
-    }
-    else {
-        NiAlphaProperty_ = nullptr;
-    }
+    NiAlphaProperty_ = new NiAlphaProperty;
     {
         NiPointer<NiAlphaProperty> spAlpha(NiAlphaProperty_);
         spAlpha.m_pObject->SetAlphaBlending(true);
@@ -426,21 +408,9 @@ void Moon::Initialize(NiNode* apSkyRoot, const char* apName) {
         spShadowMesh.m_pObject->SetDisplayObject(ptex != nullptr);
         eUpdateMoonTexture = Moon::US_INITIALIZE;
     }
-    NiNode* v89 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v89) {
-        v69 = ::new (v89) NiNode(0);
-    }
-    else {
-        v69 = nullptr;
-    }
+    v69 = new NiNode(0);
     spMoonNode = v69;
-    NiNode* v88 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v88) {
-        v68 = ::new (v88) NiNode(0);
-    }
-    else {
-        v68 = nullptr;
-    }
+    v68 = new NiNode(0);
     spShadowNode = v68;
     spMoonNode.m_pObject->SetSelectiveUpdate(true);
     spShadowNode.m_pObject->SetSelectiveUpdate(true);

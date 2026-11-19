@@ -46,12 +46,7 @@ void NiBoolInterpController::GetViewerStrings(NiTPrimitiveArray<char*>* pkString
 NiInterpolator* NiBoolInterpController::CreatePoseInterpolator(uint16_t) {
     bool bValue;
     GetTargetBoolValue(bValue);
-    NiBoolInterpolator* pkInterp =
-        static_cast<NiBoolInterpolator*>(NiMemObject::operator new(sizeof(NiBoolInterpolator)));
-    if (pkInterp) {
-        return ::new (pkInterp) NiBoolInterpolator(bValue);
-    }
-    return nullptr;
+    return new NiBoolInterpolator(bValue);
 }
 
 // Sets the pose of apInterp, which must be a NiBoolInterpolator, to the target's current value.
@@ -71,8 +66,7 @@ NiBlendInterpolator* NiBoolInterpController::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMem = NiMemObject::operator new(sizeof(NiBlendBoolInterpolator));
-    return pvMem ? ::new (pvMem) NiBlendBoolInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
+    return new NiBlendBoolInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiBoolInterpController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {

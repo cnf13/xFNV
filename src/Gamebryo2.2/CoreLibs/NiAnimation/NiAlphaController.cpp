@@ -46,19 +46,12 @@ void NiAlphaController::LoadBinary(NiStream& kStream) {
 
 void NiAlphaController::LinkObject(NiStream& kStream) {
     NiFloatData* objectFromLinkID;
-    void* v4;
     NiFloatInterpolator* v5;
     NiInterpolator* m_pObject;
     NiFloatInterpController::LinkObject(kStream);
     if ((&kStream)->m_uiNifFileVersion < 167837800) {
         objectFromLinkID = static_cast<NiFloatData*>((&kStream)->GetObjectFromLinkID());
-        v4 = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-        if (v4) {
-            v5 = ::new (v4) NiFloatInterpolator(objectFromLinkID);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiFloatInterpolator(objectFromLinkID);
         m_pObject = m_spInterpolator.m_pObject;
         if (static_cast<const void*>(m_pObject) != static_cast<const void*>(v5)) {
             if ((m_pObject) && (!InterlockedDecrementUInt32(&m_pObject->m_uiRefCount))) {
@@ -122,9 +115,5 @@ void NiAlphaController::GetTargetFloatValue(float& fValue) {
 }
 
 NiObject* NiAlphaController::CreateObject() {
-    NiAlphaController* v0 = static_cast<NiAlphaController*>(NiMemObject::operator new(sizeof(NiAlphaController)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiAlphaController;
+    return new NiAlphaController;
 }

@@ -117,14 +117,7 @@ Ni2DBuffer* Ni2DBuffer::Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::
     if (!pkData || !pkData->m_pkPixelFormat) {
         return nullptr;
     }
-    NiObject* pkBuffer = static_cast<NiObject*>(NiMemObject::operator new(sizeof(Ni2DBuffer)));
-    Ni2DBuffer* pkBuffer_2 = static_cast<Ni2DBuffer*>(pkBuffer);
-    if (pkBuffer) {
-        ::new (pkBuffer) Ni2DBuffer;
-    }
-    else {
-        pkBuffer_2 = nullptr;
-    }
+    Ni2DBuffer* pkBuffer_2 = new Ni2DBuffer;
     pkBuffer_2->m_uiHeight = uiHeight;
     pkBuffer_2->m_uiWidth = uiWidth;
     pkBuffer_2->m_spRendererData.SetNew(pkData);
@@ -134,10 +127,7 @@ Ni2DBuffer* Ni2DBuffer::Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::
 
 // Stores the dimensions through the result even when the allocation failed, as the game does.
 Ni2DBuffer* Ni2DBuffer::Create_(uint32_t uiWidth, uint32_t uiHeight) {
-    Ni2DBuffer* pkBuffer = static_cast<Ni2DBuffer*>(NiMemObject::operator new(sizeof(Ni2DBuffer)));
-    if (pkBuffer) {
-        ::new (pkBuffer) Ni2DBuffer;
-    }
+    Ni2DBuffer* pkBuffer = new Ni2DBuffer;
     pkBuffer->m_uiWidth = uiWidth;
     pkBuffer->m_uiHeight = uiHeight;
     return pkBuffer;

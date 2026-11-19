@@ -126,11 +126,7 @@ bool BGSIdleMarker::Compare(TESForm* apCompare) {
 
 NiAVObject* BGSIdleMarker::Clone3D(TESObjectREFR* apRequester) {
     NiFixedString kName;
-    void* pMemory = NiMemObject::operator new(sizeof(BSFadeNode));
-    BSFadeNode* pNode = nullptr;
-    if (pMemory) {
-        pNode = ::new (pMemory) BSFadeNode;
-    }
+    BSFadeNode* pNode = new BSFadeNode;
     const char* pEditorID = GetFormEditorID();
     NiFixedString* pName = ::new (static_cast<void*>(&kName)) NiFixedString(const_cast<char*>(pEditorID));
     pNode->SetName(*pName);

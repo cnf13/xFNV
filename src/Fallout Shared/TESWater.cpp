@@ -669,15 +669,9 @@ NiTriShapeData* TESWaterSystem::CreateQuadData(
                 float v30 = v28->y;
                 textures[3].x = v29;
                 textures[3].y = v30;
-                NiTriShapeData* v46 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-                if (v46) {
-                    data_2 = ::new (v46) NiTriShapeData(
-                        4, vertices, normals_2, pcolors_2, textures, 1, NiGeometryData::NBT_METHOD_NONE, 2, indices
-                    );
-                }
-                else {
-                    data_2 = nullptr;
-                }
+                data_2 = new NiTriShapeData(
+                    4, vertices, normals_2, pcolors_2, textures, 1, NiGeometryData::NBT_METHOD_NONE, 2, indices
+                );
                 if (!data_2) {
                     ourFree(vertices);
                     ourFree(normals_2);
@@ -2330,26 +2324,13 @@ void TESWaterSystem::MTSetupSelectiveReflectionTexture(
     if (!TESWaterSystem::GetUseWaterShader() || !apCamera) {
         return;
     }
-    NiCamera* pNewCamera = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-    if (pNewCamera) {
-        pNewCamera = ::new (pNewCamera) NiCamera;
-    }
-    else {
-        pNewCamera = nullptr;
-    }
+    NiCamera* pNewCamera = new NiCamera;
     apWaterGroup->spReflectionCamera = pNewCamera;
     BSUtilities::ReflectCameraAboutArbitraryPlane(
         apCamera, &apWaterGroup->ReflectWaterPlane, apWaterGroup->spReflectionCamera.m_pObject
     );
     if (!apWaterGroup->spGroupReflectionSorter.m_pObject) {
-        BSShaderAccumulator* pNewSorter =
-            static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-        if (pNewSorter) {
-            pNewSorter = ::new (pNewSorter) BSShaderAccumulator(99, 1u, 759u);
-        }
-        else {
-            pNewSorter = nullptr;
-        }
+        BSShaderAccumulator* pNewSorter = new BSShaderAccumulator(99, 1u, 759u);
         apWaterGroup->spGroupReflectionSorter = pNewSorter;
     }
     ShadowSceneNode* pSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
@@ -2518,13 +2499,7 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
     );
     if (TESWaterSystem::GetUseWaterShader() && apCamera) {
         NiCamera* camera;
-        NiCamera* pCameraMemory = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-        if (pCameraMemory) {
-            camera = ::new (pCameraMemory) NiCamera;
-        }
-        else {
-            camera = nullptr;
-        }
+        camera = new NiCamera;
         TESWaterSystem::spWaterHeightCamera = camera;
         NiPoint3 n(0.0f, 0.0f, 1.0f);
         float z = TES::pInstance->pWorldSpace->fLODWaterHeight;
@@ -2535,14 +2510,7 @@ void TESWaterSystem::MTSetupWorldReflectionTexture(NiCamera* apCamera) {
         );
         if (!TESWaterSystem::spWaterHeightShaderAccumulator.m_pObject) {
             BSShaderAccumulator* pAccumulator;
-            BSShaderAccumulator* pAccumulatorMemory =
-                static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-            if (pAccumulatorMemory) {
-                pAccumulator = ::new (pAccumulatorMemory) BSShaderAccumulator(99, 1u, 759u);
-            }
-            else {
-                pAccumulator = nullptr;
-            }
+            pAccumulator = new BSShaderAccumulator(99, 1u, 759u);
             TESWaterSystem::spWaterHeightShaderAccumulator = pAccumulator;
         }
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
@@ -2629,13 +2597,7 @@ void TESWaterSystem::MTSetupSkyReflectionTexture(NiCamera* apCamera) {
     );
     if (TESWaterSystem::GetUseWaterShader() && apCamera) {
         NiCamera* camera;
-        NiCamera* pCameraMemory = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-        if (pCameraMemory) {
-            camera = ::new (pCameraMemory) NiCamera;
-        }
-        else {
-            camera = nullptr;
-        }
+        camera = new NiCamera;
         PlaceableWaterGroup::spSkyReflectionCamera = camera;
         NiPoint3 n(0.0f, 0.0f, 1.0f);
         float z = TES::pInstance->pWorldSpace->fLODWaterHeight;
@@ -2646,14 +2608,7 @@ void TESWaterSystem::MTSetupSkyReflectionTexture(NiCamera* apCamera) {
         );
         if (!PlaceableWaterGroup::spSkyReflectionSorter.m_pObject) {
             BSShaderAccumulator* pAccumulator;
-            BSShaderAccumulator* pAccumulatorMemory =
-                static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-            if (pAccumulatorMemory) {
-                pAccumulator = ::new (pAccumulatorMemory) BSShaderAccumulator(99, 1u, 759u);
-            }
-            else {
-                pAccumulator = nullptr;
-            }
+            pAccumulator = new BSShaderAccumulator(99, 1u, 759u);
             PlaceableWaterGroup::spSkyReflectionSorter = pAccumulator;
         }
         ShadowSceneNode* ShadowSceneNode_ = BSShaderManager::GetShadowSceneNode(0);
@@ -2827,13 +2782,7 @@ void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableW
     if (!TESWaterSystem::GetUseWaterShader() || !apCamera) {
         return;
     }
-    NiCamera* pNewCamera = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-    if (pNewCamera) {
-        pNewCamera = ::new (pNewCamera) NiCamera;
-    }
-    else {
-        pNewCamera = nullptr;
-    }
+    NiCamera* pNewCamera = new NiCamera;
     apWaterGroup->spDepthCamera = pNewCamera;
     const NiPoint3* pCamPos = &apCamera->GetWorldTranslate();
     apWaterGroup->spDepthCamera.m_pObject->SetTranslate(*pCamPos);
@@ -2848,14 +2797,7 @@ void TESWaterSystem::MTSetupSelectiveDepthTexture(NiCamera* apCamera, PlaceableW
     NiUpdateData UpdateData(0.0f, false, false);
     apWaterGroup->spDepthCamera.m_pObject->Update(UpdateData);
     if (!apWaterGroup->spDepthSorter.m_pObject) {
-        BSShaderAccumulator* pNewSorter =
-            static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-        if (pNewSorter) {
-            pNewSorter = ::new (pNewSorter) BSShaderAccumulator(99, 1u, 759u);
-        }
-        else {
-            pNewSorter = nullptr;
-        }
+        BSShaderAccumulator* pNewSorter = new BSShaderAccumulator(99, 1u, 759u);
         apWaterGroup->spDepthSorter = pNewSorter;
     }
     ShadowSceneNode* pSceneNode = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_WORLD);
@@ -3429,14 +3371,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
     }
     pwaterRef_2 = pwaterRef;
     pwaterRef->SetTemporary();
-    WaterShaderProperty* v26 =
-        static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
-    if (v26) {
-        pwaterProp = ::new (v26) WaterShaderProperty;
-    }
-    else {
-        pwaterProp = nullptr;
-    }
+    pwaterProp = new WaterShaderProperty;
     pwaterProp->bLOD = true;
     if (abLODWaterHeight) {
         pwaterProp->bFullReflections = true;
@@ -3446,13 +3381,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
     apLODWater->AttachProperty(pwaterProp);
     apLODWater->UpdateProperties();
     BSShaderManager::PrepareObject(apLODWater, 0, 0);
-    NiStencilProperty* v24 = static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-    if (v24) {
-        pstencilprop = ::new (v24) NiStencilProperty;
-    }
-    else {
-        pstencilprop = nullptr;
-    }
+    pstencilprop = new NiStencilProperty;
     pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
     int32_t TagSkillCount = TESClass::GetTagSkillCount();
     apLODWater->RemoveProperty(TagSkillCount);
@@ -3460,13 +3389,7 @@ TESObjectREFR* TESWaterSystem::AddLODWater(
     TESWaterForm* LODWaterType = apWorldSpace->GetLODWaterType();
     BGSPlaceableWater* PlaceableLODWater = LODWaterType->GetPlaceableLODWater();
     pwaterRef_2->SetObjectReference(PlaceableLODWater);
-    BSFadeNode* v22 = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
-    if (v22) {
-        pfadenode = ::new (v22) BSFadeNode;
-    }
-    else {
-        pfadenode = nullptr;
-    }
+    pfadenode = new BSFadeNode;
     NiNode* pnode = pfadenode;
     if (apBound) {
         pnode = apBound;
@@ -3563,13 +3486,7 @@ NiTriShape* TESWaterSystem::CreateQuadShape(NiTriShapeData* data) {
     AutoMemContext apMemory(
         MEM_CONTEXT_WATER, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESWater.cpp", 2961
     );
-    NiTriShape* v4 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v4) {
-        v3 = ::new (v4) NiTriShape(data);
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new NiTriShape(data);
     return v3;
 }
 
@@ -3588,14 +3505,7 @@ TESWaterSystem::CreateWadingWaterGeometry(PlaceableWaterGroup* apGroup, NiNode* 
     }
     NiNode* waterLODNode = TESWaterSystem::GetWaterRoot();
     waterLODNode->AttachChild(pgeom, 1);
-    WaterShaderProperty* apMemory =
-        static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
-    if (apMemory) {
-        pkWadingWaterProp = ::new (apMemory) WaterShaderProperty;
-    }
-    else {
-        pkWadingWaterProp = nullptr;
-    }
+    pkWadingWaterProp = new WaterShaderProperty;
     pgeom->AttachProperty(pkWadingWaterProp);
     BSShaderManager::PrepareObject(pgeom, 0, 0);
     pkWadingWaterProp->fBlendNormalsAmount = 1.0f;

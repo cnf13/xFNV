@@ -48,8 +48,7 @@ void NiLODNode::LoadBinary(NiStream& kStream) {
         kStream.ReadLinkID();
         return;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(NiRangeLODData));
-    NiRangeLODData* pkLODData = pMemory ? ::new (pMemory) NiRangeLODData : nullptr;
+    NiRangeLODData* pkLODData = new NiRangeLODData;
     NiPoint3 kCenter;
     kCenter.LoadBinary(kStream);
     pkLODData->m_kCenter = kCenter;
@@ -193,9 +192,5 @@ void NiLODNode::CopyMembers(NiLODNode* pkDest, NiCloningProcess& kCloning) {
 }
 
 NiObject* NiLODNode::CreateObject() {
-    NiLODNode* pkObject = static_cast<NiLODNode*>(NiMemObject::operator new(sizeof(NiLODNode)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiLODNode;
+    return new NiLODNode;
 }

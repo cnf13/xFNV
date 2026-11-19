@@ -23,14 +23,7 @@ NiPSysVortexFieldModifier::NiPSysVortexFieldModifier() : NiPSysFieldModifier(), 
 NiPSysVortexFieldModifier::~NiPSysVortexFieldModifier() {}
 
 NiObject* NiPSysVortexFieldModifier::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysVortexFieldModifier));
-    NiPSysVortexFieldModifier* v4 = static_cast<NiPSysVortexFieldModifier*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysVortexFieldModifier;
-    }
-    else {
-        v4 = nullptr;
-    }
+    NiPSysVortexFieldModifier* v4 = new NiPSysVortexFieldModifier;
     NiPSysFieldModifier::CopyMembers(v4, kCloning);
     v4->m_kDirection.x = m_kDirection.x;
     v4->m_kDirection.y = m_kDirection.y;
@@ -246,12 +239,7 @@ void NiPSysVortexFieldModifier::UpdateNoAttenuationNoDist(float fTime, NiPSysDat
 }
 
 NiObject* NiPSysVortexFieldModifier::CreateObject() {
-    NiPSysVortexFieldModifier* pkObject =
-        static_cast<NiPSysVortexFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysVortexFieldModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysVortexFieldModifier;
+    return new NiPSysVortexFieldModifier;
 }
 
 NiPSysFieldModifier::~NiPSysFieldModifier() {}

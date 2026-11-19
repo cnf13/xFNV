@@ -59,11 +59,7 @@ bhkMultiSphereShape::~bhkMultiSphereShape() {
 // vtable.
 NiObject* bhkMultiSphereShape::CreateClone(NiCloningProcess& arCloneData) {
     bhkSerializable::CloneCritLock();
-    bhkMultiSphereShape* pClone =
-        static_cast<bhkMultiSphereShape*>(NiMemObject::operator new(sizeof(bhkMultiSphereShape)));
-    if (pClone) {
-        ::new (pClone) bhkMultiSphereShape;
-    }
+    bhkMultiSphereShape* pClone = new bhkMultiSphereShape;
     bhkShape* pThis = this;
     pThis->CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
@@ -299,12 +295,7 @@ void bhkMultiSphereShape::GetCinfo(hkMultiSphereShapeCinfo& arCinfo) {
 
 // The engine's factory for the class: a bare shape with no creation info yet, from the default constructor.
 NiObject* bhkMultiSphereShape::CreateObject() {
-    bhkMultiSphereShape* pObject =
-        static_cast<bhkMultiSphereShape*>(NiMemObject::operator new(sizeof(bhkMultiSphereShape)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) bhkMultiSphereShape;
+    return new bhkMultiSphereShape;
 }
 
 hkMultiSphereShapeCinfo::hkMultiSphereShapeCinfo() {}

@@ -237,13 +237,7 @@ void ScreenCustomSplatter::Activate(
             splatterData.fDuration = afDuration;
         }
         splatterData.uiCount = auiCount;
-        void* apMemory = NiMemObject::operator new(sizeof(BSCustomSplatterExtraData));
-        if (apMemory) {
-            ped = ::new (apMemory) BSCustomSplatterExtraData(&splatterData);
-        }
-        else {
-            ped = nullptr;
-        }
+        ped = new BSCustomSplatterExtraData(&splatterData);
         pnode->AddExtraData(ped);
         pnode->SetName("ScreenSplatterRoot");
         NiNode* pRootNode = ScreenCustomSplatter::spRoot.m_pObject;
@@ -269,13 +263,7 @@ void ScreenCustomSplatter::Init() {
         NiRenderer* prenderer = NiRenderer::GetRenderer();
         double ScreenWidth = static_cast<double>(prenderer->GetScreenWidth());
         float faspectratio = ScreenWidth / static_cast<double>(prenderer->GetScreenHeight());
-        NiCamera* v9 = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-        if (v9) {
-            NiCamera_ = ::new (v9) NiCamera;
-        }
-        else {
-            NiCamera_ = nullptr;
-        }
+        NiCamera_ = new NiCamera;
         NiRefObject* v10 = NiCamera_;
         ScreenCustomSplatter::spCamera = NiCamera_;
         NiPoint3* v0 = ::new (&dst) NiPoint3(0.0f, 0.0f, 1.00001f);
@@ -298,13 +286,7 @@ void ScreenCustomSplatter::Init() {
         ScreenCustomSplatter::fHRadius = frustum.m_fTop;
         fBloodSplatterFadeStart_0 = fBloodSplatterFadeStart.Float();
         ScreenCustomSplatter::bNoFade = false;
-        NiNode* v7 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-        if (v7) {
-            v4 = ::new (v7) NiNode(0);
-        }
-        else {
-            v4 = nullptr;
-        }
+        v4 = new NiNode(0);
         ScreenCustomSplatter::spRoot = v4;
         ScreenCustomSplatter::uiCount = 0;
         const char* v1 = sBloodSplatterAlpha01OPTFilename.String();
@@ -360,13 +342,7 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
     NiPoint3 v132;
     NiPoint3 v135;
     NiPoint3 v138;
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        pnode = ::new (apMemory) NiNode(0);
-    }
-    else {
-        pnode = nullptr;
-    }
+    pnode = new NiNode(0);
     int32_t numObjs = 4 * auiCount;
     void* ptr = ourMalloc(4 * auiCount <= SIZE_MAX / sizeof(NiPoint3) ? sizeof(NiPoint3) * (4 * auiCount) : SIZE_MAX);
     if (ptr) {
@@ -552,25 +528,11 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
             pflareIndicesA[uiindexBase + 5] = uibase + 3;
         }
     }
-    NiTriShape* v102 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v102) {
-        pgeom = ::new (v102) NiTriShape(
-            4 * auiCount, pverticesA, nullptr, nullptr, ptexcoordsA, 1, NiGeometryData::NBT_METHOD_NONE, 2 * auiCount,
-            v146
-        );
-    }
-    else {
-        pgeom = nullptr;
-    }
+    pgeom = new NiTriShape(
+        4 * auiCount, pverticesA, nullptr, nullptr, ptexcoordsA, 1, NiGeometryData::NBT_METHOD_NONE, 2 * auiCount, v146
+    );
     NiTriShape* pgeom_2 = pgeom;
-    BSShaderBloodSplatterProperty* v101 =
-        static_cast<BSShaderBloodSplatterProperty*>(NiMemObject::operator new(sizeof(BSShaderBloodSplatterProperty)));
-    if (v101) {
-        pshaderprop = ::new (v101) BSShaderBloodSplatterProperty;
-    }
-    else {
-        pshaderprop = nullptr;
-    }
+    pshaderprop = new BSShaderBloodSplatterProperty;
     BSShaderBloodSplatterProperty* pshaderprop_2 = pshaderprop;
     NiTexture* fBloodSplatterMaxSizec = ScreenCustomSplatter::spTextures[1].m_pObject;
     pshaderprop_2->SetTexture(0, fBloodSplatterMaxSizec);
@@ -582,26 +544,12 @@ NiNode* ScreenCustomSplatter::CreateGeometry(uint32_t auiCount, float fSplatScal
     if (BSShaderManager::bHDR) {
         BSShaderBloodSplatterProperty* pshaderprop_3;
         NiTriShape* pgeom_3;
-        NiTriShape* v100 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-        if (v100) {
-            pgeom_3 = ::new (v100) NiTriShape(
-                4 * auiCount, pflareVerticesA_2, nullptr, nullptr, pflareTexcoordsA_2, 1,
-                NiGeometryData::NBT_METHOD_NONE, 2 * auiCount, pflareIndicesA
-            );
-        }
-        else {
-            pgeom_3 = nullptr;
-        }
-        pgeom_2 = pgeom_3;
-        BSShaderBloodSplatterProperty* v99 = static_cast<BSShaderBloodSplatterProperty*>(
-            NiMemObject::operator new(sizeof(BSShaderBloodSplatterProperty))
+        pgeom_3 = new NiTriShape(
+            4 * auiCount, pflareVerticesA_2, nullptr, nullptr, pflareTexcoordsA_2, 1, NiGeometryData::NBT_METHOD_NONE,
+            2 * auiCount, pflareIndicesA
         );
-        if (v99) {
-            pshaderprop_3 = ::new (v99) BSShaderBloodSplatterProperty;
-        }
-        else {
-            pshaderprop_3 = nullptr;
-        }
+        pgeom_2 = pgeom_3;
+        pshaderprop_3 = new BSShaderBloodSplatterProperty;
         pshaderprop_2 = pshaderprop_3;
         NiTexture* fBloodSplatterMaxSizee = ScreenCustomSplatter::spTextures[2].m_pObject;
         pshaderprop_2->SetTexture(0, fBloodSplatterMaxSizee);

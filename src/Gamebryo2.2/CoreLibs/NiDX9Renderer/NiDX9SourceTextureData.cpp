@@ -439,11 +439,7 @@ NiDX9SourceTextureData* NiDX9SourceTextureData::Create(NiSourceTexture* apTextur
         return NiDX9SourceCubeMapData::Create(static_cast<NiSourceCubeMap*>(apTexture), apRenderer);
     }
     NiPixelFormat** ppkFormats = apRenderer->m_aapkTextureFormats[0];
-    NiDX9SourceTextureData* pkThis =
-        static_cast<NiDX9SourceTextureData*>(NiMemObject::operator new(sizeof(NiDX9SourceTextureData)));
-    if (pkThis) {
-        ::new (pkThis) NiDX9SourceTextureData(apTexture, apRenderer);
-    }
+    NiDX9SourceTextureData* pkThis = new NiDX9SourceTextureData(apTexture, apRenderer);
     NiPersistentSrcTextureRendererData* pkPersistent = apTexture->m_spPersistentSrcRendererData.m_pObject;
     NiTexture::FormatPrefs& kPrefs = apTexture->m_kFormatPrefs;
     NiPixelData* pkSrcPixels = nullptr;

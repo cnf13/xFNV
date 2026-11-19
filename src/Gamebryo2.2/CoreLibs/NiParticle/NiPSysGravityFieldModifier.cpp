@@ -29,14 +29,7 @@ NiPSysGravityFieldModifier::~NiPSysGravityFieldModifier() {}
 
 NiObject* NiPSysGravityFieldModifier::CreateClone(NiCloningProcess& kCloning) {
     NiPSysGravityFieldModifier* pkObject;
-    NiPSysGravityFieldModifier* v3 =
-        static_cast<NiPSysGravityFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysGravityFieldModifier)));
-    if (v3) {
-        pkObject = ::new (v3) NiPSysGravityFieldModifier;
-    }
-    else {
-        pkObject = nullptr;
-    }
+    pkObject = new NiPSysGravityFieldModifier;
     CopyMembers(pkObject, kCloning);
     pkObject->m_kDirection = m_kDirection;
     pkObject->m_kUnitDirection = m_kDirection;
@@ -177,11 +170,5 @@ void NiPSysGravityFieldModifier::UpdateNoAttenuationNoDist(float fTime, NiPSysDa
 }
 
 NiObject* NiPSysGravityFieldModifier::CreateObject() {
-    NiPSysGravityFieldModifier* v0 =
-        static_cast<NiPSysGravityFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysGravityFieldModifier)));
-    if (v0) {
-        return ::new (v0) NiPSysGravityFieldModifier;
-    }
-
-    return nullptr;
+    return new NiPSysGravityFieldModifier;
 }

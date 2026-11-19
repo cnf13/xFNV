@@ -551,13 +551,7 @@ void SPECIALBookMenu::InitBook() {
     ShadowSceneNode* pShadowSceneNode = BSShaderManager::GetShadowSceneNode(1);
     if (!pShadowSceneNode->AddAllLightsFromNode_Recurse(pBookNode, fLightRadius)) {
         NiPointLight* pLight;
-        NiPointLight* pLightMemory = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-        if (pLightMemory) {
-            pLight = ::new (pLightMemory) NiPointLight;
-        }
-        else {
-            pLight = nullptr;
-        }
+        pLight = new NiPointLight;
         NiPoint3 kTranslate;
         pLight->SetTranslate(*::new (&kTranslate) NiPoint3(0.0f, 0.0f, 0.0f));
         pLight->SetDiffuseColor(NiColor(0.85f, 0.85f, 0.85f));
@@ -1201,13 +1195,7 @@ NiCamera* SPECIALBookMenu::InitCamera() {
     NiPoint3 v12;
     NiPoint3 dst;
     NiRect<float> port;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        pcam = ::new (apMemory) NiCamera;
-    }
-    else {
-        pcam = nullptr;
-    }
+    pcam = new NiCamera;
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     if (BSShaderManager::bLetterbox) {
         port = BSShaderManager::kFramebufferViewport;

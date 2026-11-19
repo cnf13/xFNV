@@ -297,11 +297,5 @@ uint16_t BSMultiTargetTreadTransfController::AddInterpolatorTarget(
 }
 
 NiObject* BSMultiTargetTreadTransfController::CreateObject() {
-    BSMultiTargetTreadTransfController* pkObject = static_cast<BSMultiTargetTreadTransfController*>(
-        NiMemObject::operator new(sizeof(BSMultiTargetTreadTransfController))
-    );
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSMultiTargetTreadTransfController;
+    return new BSMultiTargetTreadTransfController;
 }

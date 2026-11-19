@@ -578,11 +578,9 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             hkTransformShapeCinfo* pTransformInfo = ::new (aTransformInfoStorage) hkTransformShapeCinfo;
             alignas(16) hkVector4 kTranslation(afPosition[0], afPosition[1], afPosition[2], 0.0f);
             pTransformInfo->m_transform.Trans = kTranslation;
-            void* pMemory = NiMemObject::operator new(sizeof(bhkSphereShape));
-            bhkSphereShape* pSphere = pMemory ? ::new (pMemory) bhkSphereShape(afDimensions[0], false) : nullptr;
+            bhkSphereShape* pSphere = new bhkSphereShape(afDimensions[0], false);
             pTransformInfo->m_childShape = **pSphere;
-            pMemory = NiMemObject::operator new(sizeof(bhkTransformShape));
-            bhkShape* pTransformShape = pMemory ? ::new (pMemory) bhkTransformShape(*pTransformInfo) : nullptr;
+            bhkShape* pTransformShape = new bhkTransformShape(*pTransformInfo);
             pPhantomInfo->m_shape = **pTransformShape;
         }
         else if (eType == CSpeedTreeRT::CO_CYLINDER) {
@@ -595,8 +593,7 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             );
             pCapsuleInfo->m_vertexB.set(afPosition[0], afPosition[1], fBottom, 0.0f);
             pCapsuleInfo->m_radius = afDimensions[0];
-            void* pMemory = NiMemObject::operator new(sizeof(bhkCapsuleShape));
-            bhkShape* pCapsule = pMemory ? ::new (pMemory) bhkCapsuleShape(*pCapsuleInfo) : nullptr;
+            bhkShape* pCapsule = new bhkCapsuleShape(*pCapsuleInfo);
             pPhantomInfo->m_shape = **pCapsule;
         }
         else if (eType == CSpeedTreeRT::CO_BOX) {
@@ -609,11 +606,9 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             alignas(16) hkVector4 kTranslation(afPosition[0], afPosition[1], fCenterZ, 0.0f);
             alignas(16) hkVector4 kHalfExtents(afDimensions[0], afDimensions[1], afDimensions[2], 0.0f);
             pTransformInfo->m_transform.Trans = kTranslation;
-            void* pMemory = NiMemObject::operator new(sizeof(bhkBoxShape));
-            bhkShape* pBox = pMemory ? ::new (pMemory) bhkBoxShape(kHalfExtents) : nullptr;
+            bhkShape* pBox = new bhkBoxShape(kHalfExtents);
             pTransformInfo->m_childShape = **pBox;
-            pMemory = NiMemObject::operator new(sizeof(bhkTransformShape));
-            bhkShape* pTransformShape = pMemory ? ::new (pMemory) bhkTransformShape(*pTransformInfo) : nullptr;
+            bhkShape* pTransformShape = new bhkTransformShape(*pTransformInfo);
             pPhantomInfo->m_shape = **pTransformShape;
         }
     }
@@ -636,8 +631,7 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
             alignas(16) hkVector4 kSphere(afPosition[0], afPosition[1], afPosition[2], afDimensions[0]);
             pMultiInfo->m_spheres.pushBack(kSphere);
         }
-        void* pMemory = NiMemObject::operator new(sizeof(bhkMultiSphereShape));
-        bhkShape* pMulti = pMemory ? ::new (pMemory) bhkMultiSphereShape(*pMultiInfo) : nullptr;
+        bhkShape* pMulti = new bhkMultiSphereShape(*pMultiInfo);
         pPhantomInfo->m_shape = **pMulti;
         pMultiInfo->~hkMultiSphereShapeCinfo();
     }
@@ -645,10 +639,8 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
     kFilter.~CFilter();
     ::new (&kFilter) CFilter(L_TREES, 4, P_OTHER);
     pPhantomInfo->m_collisionFilterInfo = kFilter;
-    void* pMemory = NiMemObject::operator new(sizeof(bhkSimpleShapePhantom));
-    bhkSimpleShapePhantom* pPhantom = pMemory ? ::new (pMemory) bhkSimpleShapePhantom(*pPhantomInfo) : nullptr;
-    pMemory = NiMemObject::operator new(sizeof(bhkSPCollisionObject));
-    bhkSPCollisionObject* pCollisionObject = pMemory ? ::new (pMemory) bhkSPCollisionObject(pLeafNode) : nullptr;
+    bhkSimpleShapePhantom* pPhantom = new bhkSimpleShapePhantom(*pPhantomInfo);
+    bhkSPCollisionObject* pCollisionObject = new bhkSPCollisionObject(pLeafNode);
     pCollisionObject->SetWorldObject(pPhantom);
     pPhantomInfo->~hkSimpleShapePhantomCinfo();
 }

@@ -55,10 +55,7 @@ const NiRTTI* NiTriStrips::GetRTTI() const {
 }
 
 NiObject* NiTriStrips::CreateClone(NiCloningProcess& kCloning) {
-    NiTriStrips* pkObject = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
-    if (pkObject) {
-        ::new (pkObject) NiTriStrips;
-    }
+    NiTriStrips* pkObject = new NiTriStrips;
     CopyMembers(pkObject, kCloning);
     return pkObject;
 }
@@ -128,9 +125,5 @@ void NiTriStrips::CopyMembers(NiTriStrips* pkDest, NiCloningProcess& kCloning) {
 }
 
 NiObject* NiTriStrips::CreateObject() {
-    NiTriStrips* pkObject = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiTriStrips;
+    return new NiTriStrips;
 }

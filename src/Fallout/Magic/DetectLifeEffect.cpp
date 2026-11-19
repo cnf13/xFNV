@@ -91,15 +91,7 @@ bool DetectLifeEffect::CheckActorDetected(Actor* apTarget, bool abCurrentlyDetec
     if (fdetectRange > (location - apTarget->GetLocationOnReference()).SqrLength() && !apTarget->IsDead(false) &&
         apTarget->GetCurrentAIProcess()->GetProcessLevel() == PROCESS_TYPE_HIGH && !apTarget->GetDestroyed()) {
         if (!abCurrentlyDetected) {
-            MagicShaderHitEffect* pMemory =
-                static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-            MagicHitEffect* peffect;
-            if (pMemory) {
-                peffect = ::new (pMemory) MagicShaderHitEffect(apTarget, pEffectData, -1.0f);
-            }
-            else {
-                peffect = nullptr;
-            }
+            MagicHitEffect* peffect = new MagicShaderHitEffect(apTarget, pEffectData, -1.0f);
             if (peffect->Init()) {
                 ReferenceProcessLists.AddTempEffect(peffect);
             }

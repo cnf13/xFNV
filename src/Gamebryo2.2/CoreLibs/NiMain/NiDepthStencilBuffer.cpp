@@ -22,9 +22,7 @@ NiDepthStencilBuffer* NiDepthStencilBuffer::Create(
     if (kFormat.m_eFormat != NiPixelFormat::FORMAT_DEPTH_STENCIL) {
         return nullptr;
     }
-    NiDepthStencilBuffer* pkBuffer =
-        static_cast<NiDepthStencilBuffer*>(NiMemObject::operator new(sizeof(NiDepthStencilBuffer)));
-    NiDepthStencilBuffer* pkBuffer_2 = pkBuffer ? ::new (pkBuffer) NiDepthStencilBuffer : nullptr;
+    NiDepthStencilBuffer* pkBuffer_2 = new NiDepthStencilBuffer;
     pkBuffer_2->m_uiWidth = uiWidth;
     pkBuffer_2->m_uiHeight = uiHeight;
     if (pkBuffer_2->CreateRendererData(kFormat, eMSAAPref)) {
@@ -51,9 +49,7 @@ NiDepthStencilBuffer* NiDepthStencilBuffer::CreateCompatible(Ni2DBuffer* pkBuffe
 
 NiDepthStencilBuffer*
 NiDepthStencilBuffer::Create(uint32_t uiWidth, uint32_t uiHeight, Ni2DBuffer::RendererData* pkData) {
-    NiDepthStencilBuffer* v3 =
-        static_cast<NiDepthStencilBuffer*>(NiMemObject::operator new(sizeof(NiDepthStencilBuffer)));
-    NiDepthStencilBuffer* v4 = v3 ? ::new (v3) NiDepthStencilBuffer : nullptr;
+    NiDepthStencilBuffer* v4 = new NiDepthStencilBuffer;
     v4->m_uiWidth = uiWidth;
     v4->m_uiHeight = uiHeight;
     v4->m_spRendererData = pkData;

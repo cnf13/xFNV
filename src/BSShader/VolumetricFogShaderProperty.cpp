@@ -19,11 +19,7 @@ VolumetricFogShaderProperty::~VolumetricFogShaderProperty() {}
 // CopyMembers still runs when the allocation failed, with a null destination, as the game does; the fog colour is
 // copied afterwards, so it dereferences null there too.
 NiObject* VolumetricFogShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    VolumetricFogShaderProperty* pClone =
-        static_cast<VolumetricFogShaderProperty*>(NiMemObject::operator new(sizeof(VolumetricFogShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) VolumetricFogShaderProperty;
-    }
+    VolumetricFogShaderProperty* pClone = new VolumetricFogShaderProperty;
     CopyMembers(pClone, arCloneData);
     pClone->FogProps.r = FogProps.r;
     pClone->FogProps.g = FogProps.g;
@@ -77,10 +73,5 @@ void VolumetricFogShaderProperty::CopyMembers(VolumetricFogShaderProperty* pDest
 }
 
 NiObject* VolumetricFogShaderProperty::CreateObject() {
-    VolumetricFogShaderProperty* pObject =
-        static_cast<VolumetricFogShaderProperty*>(NiMemObject::operator new(sizeof(VolumetricFogShaderProperty)));
-    if (pObject) {
-        return ::new (pObject) VolumetricFogShaderProperty;
-    }
-    return nullptr;
+    return new VolumetricFogShaderProperty;
 }

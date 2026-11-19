@@ -809,18 +809,7 @@ void* BSAnimGroupSequence::InitAnimGroup(BSAnimGroupSequence* apSequence, const 
                                                                 if (!result) {
                                                                     if (aeType == ANIM_GROUP_SPECIAL_IDLE) {
                                                                         TESAnimGroup* v38;
-                                                                        TESAnimGroup* apMemory =
-                                                                            static_cast<TESAnimGroup*>(
-                                                                                NiMemObject::operator new(
-                                                                                    sizeof(TESAnimGroup)
-                                                                                )
-                                                                            );
-                                                                        if (apMemory) {
-                                                                            v38 = ::new (apMemory) TESAnimGroup(aeType);
-                                                                        }
-                                                                        else {
-                                                                            v38 = nullptr;
-                                                                        }
+                                                                        v38 = new TESAnimGroup(aeType);
                                                                         result = v38;
                                                                     }
                                                                     else {
@@ -1013,14 +1002,7 @@ void BSAnimGroupSequence::CreateSequenceFromFile(
     BSAnimGroupSequence* v3;
     NiPointer<NiControllerSequence> spSequence;
     NiControllerSequence::CreateSequenceFromFile(kStream, uiIndex, spSequence);
-    BSAnimGroupSequence* apMemory =
-        static_cast<BSAnimGroupSequence*>(NiMemObject::operator new(sizeof(BSAnimGroupSequence)));
-    if (apMemory) {
-        v3 = ::new (apMemory) BSAnimGroupSequence(nullptr, spSequence.m_pObject);
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSAnimGroupSequence(nullptr, spSequence.m_pObject);
     aspControllerSequence = static_cast<NiControllerSequence*>(v3);
 }
 

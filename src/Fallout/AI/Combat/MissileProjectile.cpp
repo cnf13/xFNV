@@ -683,15 +683,7 @@ void MissileProjectile::ProcessImpale() {
                                 NiPoint3 hingePoint__offset = projectileWorld_2 * offset;
                                 NI2HK(fixPointWorld, hingePoint__offset);
                                 ci.SetInWorldSpace(fixPointa, fixPointb, fixPointWorld, axis);
-                                bhkHingeConstraint* v71 = static_cast<bhkHingeConstraint*>(
-                                    NiMemObject::operator new(sizeof(bhkHingeConstraint))
-                                );
-                                if (v71) {
-                                    ph = ::new (v71) bhkHingeConstraint(&ci);
-                                }
-                                else {
-                                    ph = nullptr;
-                                }
+                                ph = new bhkHingeConstraint(&ci);
                                 plimbRB->AddAction(ph);
                                 bhkWorld* v13 = this->GetParentCell()->GetbhkWorld();
                                 plimbRB->AddActConToWorld(v13);

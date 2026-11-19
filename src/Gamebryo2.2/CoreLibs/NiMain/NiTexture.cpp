@@ -72,13 +72,7 @@ NiPixelData* NiTexture::RendererData::MakeDataFromColors(
 ) {
     NiPixelData* pkData;
     uint32_t auiColors[2];
-    NiPixelData* v4 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-    if (v4) {
-        pkData = ::new (v4) NiPixelData(32u, 32u, kDesc, 1u, uiNumFaces);
-    }
-    else {
-        pkData = nullptr;
-    }
+    pkData = new NiPixelData(32u, 32u, kDesc, 1u, uiNumFaces);
     uint8_t Shift = kDesc.GetShift(NiPixelFormat::COMP_RED);
     uint32_t uiRed = static_cast<uint32_t>(static_cast<int64_t>(kTopLeftColor.r * 255.0));
     uint32_t v6 = uiRed << Shift & kDesc.GetMask(NiPixelFormat::COMP_RED);

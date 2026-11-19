@@ -1925,13 +1925,7 @@ void TESNPC::SwapEyes(TESEyes* apSwapToEyes) {
                     }
                 }
 
-                void* apMemory = NiMemObject::operator new(sizeof(NiTexturingProperty));
-                if (apMemory) {
-                    ptexprop = ::new (apMemory) NiTexturingProperty;
-                }
-                else {
-                    ptexprop = nullptr;
-                }
+                ptexprop = new NiTexturingProperty;
                 ptexprop->SetBaseTexture(sptexBase.m_pObject);
                 ptexprop->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
                 ptexprop->SetBaseFilterMode(NiTexturingProperty::FILTER_TRILERP);

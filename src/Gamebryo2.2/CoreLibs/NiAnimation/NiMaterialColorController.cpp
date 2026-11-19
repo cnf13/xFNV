@@ -32,15 +32,7 @@ const NiRTTI* NiMaterialColorController::GetRTTI() const {
 }
 
 NiObject* NiMaterialColorController::CreateClone(NiCloningProcess& kCloning) {
-    NiMaterialColorController* pkObject =
-        static_cast<NiMaterialColorController*>(NiMemObject::operator new(sizeof(NiMaterialColorController)));
-    NiMaterialColorController* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject_2) NiMaterialColorController;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiMaterialColorController* pkObject_2 = new NiMaterialColorController;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
     return pkObject_2;
@@ -67,14 +59,7 @@ void NiMaterialColorController::LinkObject(NiStream& kStream) {
     if ((&kStream)->GetFileVersion() < 0xA010068) {
         NiPoint3Interpolator* v5;
         NiPosData* pkPosData = static_cast<NiPosData*>(kStream.GetObjectFromLinkID());
-        NiPoint3Interpolator* v4 =
-            static_cast<NiPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiPoint3Interpolator)));
-        if (v4) {
-            v5 = ::new (v4) NiPoint3Interpolator(pkPosData);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiPoint3Interpolator(pkPosData);
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -195,10 +180,5 @@ void NiMaterialColorController::GetTargetPoint3Value(NiPoint3& kValue) {
 }
 
 NiObject* NiMaterialColorController::CreateObject() {
-    NiMaterialColorController* pkObject =
-        static_cast<NiMaterialColorController*>(NiMemObject::operator new(sizeof(NiMaterialColorController)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiMaterialColorController;
+    return new NiMaterialColorController;
 }

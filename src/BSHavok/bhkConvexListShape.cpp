@@ -54,11 +54,7 @@ NiObject* bhkConvexListShape::CreateClone(NiCloningProcess& arCloneData) {
     iContext = MEM_CONTEXT_HAVOK;
     bhkConvexListShape* pkClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkConvexListShape* pkMemory =
-        static_cast<bhkConvexListShape*>(NiMemObject::operator new(sizeof(bhkConvexListShape)));
-    if (pkMemory) {
-        pkClone = ::new (pkMemory) bhkConvexListShape;
-    }
+    pkClone = new bhkConvexListShape;
     CopyMembers(pkClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
     iContext = iSavedContext;
@@ -505,10 +501,5 @@ void bhkConvexListShape::RembhkShapeRef() {
 
 // Builds an empty convex list shape.
 NiObject* bhkConvexListShape::CreateObject() {
-    bhkConvexListShape* pkShape =
-        static_cast<bhkConvexListShape*>(NiMemObject::operator new(sizeof(bhkConvexListShape)));
-    if (pkShape) {
-        return ::new (pkShape) bhkConvexListShape;
-    }
-    return nullptr;
+    return new bhkConvexListShape;
 }

@@ -99,9 +99,5 @@ void NiLightDimmerController::GetTargetFloatValue(float& fValue) {
 }
 
 NiObject* NiLightDimmerController::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiLightDimmerController));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiLightDimmerController;
+    return new NiLightDimmerController;
 }

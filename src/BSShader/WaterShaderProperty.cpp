@@ -66,11 +66,7 @@ WaterShaderProperty::~WaterShaderProperty() {}
 
 // CopyMembers still runs when the allocation failed, with a null destination, as the game does.
 NiObject* WaterShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    WaterShaderProperty* pClone =
-        static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) WaterShaderProperty;
-    }
+    WaterShaderProperty* pClone = new WaterShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -507,10 +503,5 @@ void WaterShaderProperty::Copy(WaterShaderProperty* pDest) {
 }
 
 NiObject* WaterShaderProperty::CreateObject() {
-    WaterShaderProperty* pObject =
-        static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
-    if (pObject) {
-        return ::new (pObject) WaterShaderProperty;
-    }
-    return nullptr;
+    return new WaterShaderProperty;
 }

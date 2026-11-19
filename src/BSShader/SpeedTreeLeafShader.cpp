@@ -268,14 +268,7 @@ void SpeedTreeLeafShader::SetupPassConstants(uint32_t auiCurrentPass) {
 void SpeedTreeLeafShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
         NiD3DShaderConstantMap* v3;
-        NiD3DShaderConstantMap* v2 =
-            static_cast<NiD3DShaderConstantMap*>(NiMemObject::operator new(sizeof(NiD3DShaderConstantMap)));
-        if (v2) {
-            v3 = ::new (v2) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
-        else {
-            v3 = nullptr;
-        }
+        v3 = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = v3;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009u, 0, 0, 4u, nullptr, 0, 0, nullptr, false
@@ -766,10 +759,7 @@ BSShader* SpeedTreeLeafShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_BLENDINDICES, 0, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     spShaderDecl->GetD3DDeclaration();
-    SpeedTreeLeafShader* v2 = static_cast<SpeedTreeLeafShader*>(NiMemObject::operator new(sizeof(SpeedTreeLeafShader)));
-    if (v2) {
-        pshader = ::new (v2) SpeedTreeLeafShader;
-    }
+    pshader = new SpeedTreeLeafShader;
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

@@ -587,14 +587,7 @@ void TESObjectTREE::CreateBillboardGeomData(bool abZUp, NiPointer<NiTriShapeData
     ptrilist[3] = 0;
     ptrilist[4] = 3;
     ptrilist[5] = 2;
-    NiTriShapeData* v37 = static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-    if (v37) {
-        v31 =
-            ::new (v37) NiTriShapeData(4, pverts, pnorm_2, pcol, ptext, 1, NiGeometryData::NBT_METHOD_NDL, 2, ptrilist);
-    }
-    else {
-        v31 = nullptr;
-    }
+    v31 = new NiTriShapeData(4, pverts, pnorm_2, pcol, ptext, 1, NiGeometryData::NBT_METHOD_NDL, 2, ptrilist);
     NiPointer<NiTriShapeData> spgeomData(static_cast<NiTriShapeData*>(v31));
     aspTriShapeData = spgeomData;
 }
@@ -612,35 +605,15 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     );
     NiPointer<NiTriShapeData> spgeomData(nullptr);
     CreateBillboardGeomData(abZUp, spgeomData);
-    NiTriShape* v12 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v12) {
-        p3D = ::new (v12) NiTriShape(spgeomData.m_pObject);
-    }
-    else {
-        p3D = nullptr;
-    }
+    p3D = new NiTriShape(spgeomData.m_pObject);
     NiAlphaProperty* paprop = BSTreeManager::GetDistantBillboardAlphaProperty();
     if (paprop) {
         p3D->AttachProperty(paprop);
     }
-    SpeedTreeBillboardShaderProperty* v11 = static_cast<SpeedTreeBillboardShaderProperty*>(
-        NiMemObject::operator new(sizeof(SpeedTreeBillboardShaderProperty))
-    );
-    if (v11) {
-        pbillboardProp = ::new (v11) SpeedTreeBillboardShaderProperty;
-    }
-    else {
-        pbillboardProp = nullptr;
-    }
+    pbillboardProp = new SpeedTreeBillboardShaderProperty;
     p3D->AttachProperty(pbillboardProp);
     GetBillboardTextureFilename(a2);
-    BSShaderTextureSet* v10 = static_cast<BSShaderTextureSet*>(NiMemObject::operator new(sizeof(BSShaderTextureSet)));
-    if (v10) {
-        ptextureSet = ::new (v10) BSShaderTextureSet;
-    }
-    else {
-        ptextureSet = nullptr;
-    }
+    ptextureSet = new BSShaderTextureSet;
     ptextureSet->SetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE, a2);
     pbillboardProp->LoadTextureSet("STBB", ptextureSet);
     pbillboardProp->SetClampNI(NiTexturingProperty::CLAMP_S_CLAMP_T);
@@ -651,13 +624,7 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     }
 
     NiBillboardNode* pnode;
-    NiBillboardNode* v9 = static_cast<NiBillboardNode*>(NiMemObject::operator new(sizeof(NiBillboardNode)));
-    if (v9) {
-        pnode = ::new (v9) NiBillboardNode;
-    }
-    else {
-        pnode = nullptr;
-    }
+    pnode = new NiBillboardNode;
     pnode->SetMode(NiBillboardNode::BSROTATE_ABOUT_UP);
     pnode->AttachChild(p3D, 1);
     return pnode;

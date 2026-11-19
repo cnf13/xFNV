@@ -195,11 +195,7 @@ bool BGSTextureSet::Compare(TESForm* apCompare) {
 // A fade node named after the form's editor ID.
 NiAVObject* BGSTextureSet::Clone3D(TESObjectREFR* apRequester) {
     NiFixedString kName;
-    void* pMemory = NiMemObject::operator new(sizeof(BSFadeNode));
-    BSFadeNode* pNode = nullptr;
-    if (pMemory) {
-        pNode = ::new (pMemory) BSFadeNode;
-    }
+    BSFadeNode* pNode = new BSFadeNode;
     const char* pEditorID = GetFormEditorID();
     NiFixedString* pName = ::new (static_cast<void*>(&kName)) NiFixedString(const_cast<char*>(pEditorID));
     pNode->SetName(*pName);
@@ -287,14 +283,7 @@ void BGSTextureSet::QueueTextureSet(IO_TASK_PRIORITY aePriority, QueuedFile* apP
 
 BSShaderTextureSet* BGSTextureSet::CreateShaderTextureSet() {
     BSShaderTextureSet* ptexset;
-    BSShaderTextureSet* apMemory =
-        static_cast<BSShaderTextureSet*>(NiMemObject::operator new(sizeof(BSShaderTextureSet)));
-    if (apMemory) {
-        ptexset = ::new (apMemory) BSShaderTextureSet;
-    }
-    else {
-        ptexset = nullptr;
-    }
+    ptexset = new BSShaderTextureSet;
     for (BSShaderProperty::TextureTypeEnum i = BSShaderProperty::TEXTYPE_DIFFUSE;
          i < BSShaderProperty::TEXTYPE_SPECULAR; i = static_cast<BSShaderProperty::TextureTypeEnum>(i + 1)) {
         const char* pfilename = GetTextureFilename(i);
@@ -316,15 +305,8 @@ void BGSTextureSet::SetBGSTextureFilename(BGSTextureSet::TexType aeType, const c
 
 void BGSTextureSet::CreateNullTextureSet() {
     BGSTextureSet* v0;
-    void* v1;
     if (!BGSTextureSet::pNullTextureSet) {
-        v1 = NiMemObject::operator new(sizeof(BGSTextureSet));
-        if (v1) {
-            v0 = ::new (v1) BGSTextureSet;
-        }
-        else {
-            v0 = nullptr;
-        }
+        v0 = new BGSTextureSet;
         BGSTextureSet::pNullTextureSet = v0;
         v0->SetFormID(0x28u, true);
         BGSTextureSet::pNullTextureSet->SetFormEditorID("NullTextureSet");

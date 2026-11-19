@@ -37,12 +37,7 @@ BGSDecalNode::BGSDecalNode(NiNode* apNode, bool abSkinnedNode) : NiNode(0), bSki
 }
 
 NiObject* BGSDecalNode::CreateClone(NiCloningProcess& arCloneData) {
-    BGSDecalNode* v4 = static_cast<BGSDecalNode*>(NiMemObject::operator new(sizeof(BGSDecalNode)));
-    if (v4) {
-        return ::new (v4) BGSDecalNode;
-    }
-
-    return nullptr;
+    return new BGSDecalNode;
 }
 
 void BGSDecalNode::OnVisible(NiCullingProcess& arCuller) {

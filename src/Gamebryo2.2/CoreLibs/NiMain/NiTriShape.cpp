@@ -133,18 +133,9 @@ void NiTriShape::CopyMembers(NiTriShape* pkDest, NiCloningProcess& kCloning) {
 }
 
 NiTriShape* NiTriShape::Create(NiTriShapeData* a1) {
-    void* v3 = NiMemObject::operator new(sizeof(NiTriShape));
-    if (v3) {
-        return ::new (v3) NiTriShape(a1);
-    }
-
-    return nullptr;
+    return new NiTriShape(a1);
 }
 
 NiObject* NiTriShape::CreateObject() {
-    NiTriShape* pkObject = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiTriShape;
+    return new NiTriShape;
 }

@@ -23,15 +23,7 @@ NiPSysSphereEmitter::NiPSysSphereEmitter() : NiPSysVolumeEmitter(), m_fEmitterRa
 NiPSysSphereEmitter::~NiPSysSphereEmitter() {}
 
 NiObject* NiPSysSphereEmitter::CreateClone(NiCloningProcess& kCloning) {
-    NiPSysSphereEmitter* pkObject =
-        static_cast<NiPSysSphereEmitter*>(NiMemObject::operator new(sizeof(NiPSysSphereEmitter)));
-    NiPSysSphereEmitter* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiPSysSphereEmitter;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiPSysSphereEmitter* pkObject_2 = new NiPSysSphereEmitter;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_fEmitterRadius = m_fEmitterRadius;
     return pkObject_2;
@@ -106,10 +98,5 @@ void NiPSysSphereEmitter::ComputeVolumeInitialPositionAndVelocity(
 }
 
 NiObject* NiPSysSphereEmitter::CreateObject() {
-    NiPSysSphereEmitter* pkObject =
-        static_cast<NiPSysSphereEmitter*>(NiMemObject::operator new(sizeof(NiPSysSphereEmitter)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysSphereEmitter;
+    return new NiPSysSphereEmitter;
 }

@@ -1815,8 +1815,7 @@ TESImageSpaceModifier* TESImageSpaceModifier::GetExplosionInFace() {
 void NiColorInterpolator::ReplaceKeys(NiColorKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
     if (uiNumKeys) {
         if (!m_spColorData) {
-            void* pMemory = NiMemObject::operator new(sizeof(NiColorData));
-            NiColorData* pkColorData = pMemory ? ::new (pMemory) NiColorData : nullptr;
+            NiColorData* pkColorData = new NiColorData;
             m_spColorData = pkColorData;
         }
         m_spColorData->ReplaceAnim(pkKeys, uiNumKeys, eType);
@@ -1839,8 +1838,7 @@ NiFloatKey* NiFloatData::GetAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& e
 void NiFloatInterpolator::ReplaceKeys(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
     if (uiNumKeys) {
         if (!m_spFloatData) {
-            void* pMemory = NiMemObject::operator new(sizeof(NiFloatData));
-            NiFloatData* pkData = pMemory ? ::new (pMemory) NiFloatData : nullptr;
+            NiFloatData* pkData = new NiFloatData;
             m_spFloatData = pkData;
         }
         m_spFloatData->ReplaceAnim(pkKeys, uiNumKeys, eType);

@@ -147,14 +147,7 @@ SpeedTreeLeafShaderProperty* SpeedTreeLeafShaderProperty::CreateCopy() {
 // kept and sizes the block.
 NiAdditionalGeometryData* SpeedTreeLeafShaderProperty::CreateRendererSpecificProperty(NiGeometry* apGeometry) {
     uint32_t usVertexCount = GetVertexCount();
-    void* pMemory = NiMemObject::operator new(sizeof(NiAdditionalGeometryData));
-    NiAdditionalGeometryData* pData;
-    if (pMemory) {
-        pData = ::new (pMemory) NiAdditionalGeometryData(usVertexCount, 1);
-    }
-    else {
-        pData = nullptr;
-    }
+    NiAdditionalGeometryData* pData = new NiAdditionalGeometryData(usVertexCount, 1);
     pData->SetDataBlockCount(1);
     // The wind info is handed over as raw bytes.
     pData->SetDataBlock(0, reinterpret_cast<uint8_t*>(GetWindInfo()), usVertexCount << 4, false);

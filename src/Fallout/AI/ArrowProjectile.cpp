@@ -852,14 +852,7 @@ void ArrowProjectile::InitHavok(Actor* apShooter, float afPower) {
         pCinfo->SetPosition(GetLocationOnReference());
         pCinfo->SetWorld(pWorld);
         // NiNew bhkSphereShape: 0x14 bytes.
-        void* pShapeMemory = NiMemObject::operator new(sizeof(bhkSphereShape));
-        bhkSphereShape* pShape;
-        if (pShapeMemory) {
-            pShape = ::new (pShapeMemory) bhkSphereShape(0.1f, true);
-        }
-        else {
-            pShape = nullptr;
-        }
+        bhkSphereShape* pShape = new bhkSphereShape(0.1f, true);
         pCinfo->SetShape(pShape);
         pCinfo->SetAvoidBox(false);
         if (apShooter) {

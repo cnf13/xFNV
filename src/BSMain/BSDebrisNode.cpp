@@ -15,13 +15,7 @@ const NiRTTI* BSDebrisNode::GetRTTI() const {
 }
 
 NiObject* BSDebrisNode::CreateClone(NiCloningProcess& arCloneData) {
-    BSDebrisNode* pClone = static_cast<BSDebrisNode*>(NiMemObject::operator new(sizeof(BSDebrisNode)));
-    if (pClone) {
-        ::new (pClone) BSDebrisNode;
-    }
-    else {
-        pClone = nullptr;
-    }
+    BSDebrisNode* pClone = new BSDebrisNode;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -56,9 +50,5 @@ void BSDebrisNode::CopyMembers(BSDebrisNode* pDest, NiCloningProcess& arCloneDat
 }
 
 NiObject* BSDebrisNode::CreateObject() {
-    BSDebrisNode* v2 = static_cast<BSDebrisNode*>(NiMemObject::operator new(sizeof(BSDebrisNode)));
-    if (!v2) {
-        return nullptr;
-    }
-    return ::new (v2) BSDebrisNode;
+    return new BSDebrisNode;
 }

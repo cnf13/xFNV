@@ -19,14 +19,7 @@ NiVectorExtraData::NiVectorExtraData() : m_afVector{0.0f, 0.0f, 0.0f, 0.0f} {}
 NiVectorExtraData::~NiVectorExtraData() {}
 
 NiObject* NiVectorExtraData::CreateClone(NiCloningProcess& kCloning) {
-    NiVectorExtraData* pkObject = static_cast<NiVectorExtraData*>(NiMemObject::operator new(sizeof(NiVectorExtraData)));
-    NiVectorExtraData* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiVectorExtraData;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiVectorExtraData* pkObject_2 = new NiVectorExtraData;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_afVector[0] = m_afVector[0];
     pkObject_2->m_afVector[1] = m_afVector[1];
@@ -102,9 +95,6 @@ void NiVectorExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings) {
 }
 
 NiObject* NiVectorExtraData::CreateObject() {
-    NiVectorExtraData* pkObject = static_cast<NiVectorExtraData*>(NiMemObject::operator new(sizeof(NiVectorExtraData)));
-    if (pkObject) {
-        ::new (pkObject) NiVectorExtraData;
-    }
+    NiVectorExtraData* pkObject = new NiVectorExtraData;
     return pkObject;
 }

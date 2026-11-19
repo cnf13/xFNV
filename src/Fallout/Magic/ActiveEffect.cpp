@@ -252,27 +252,13 @@ void ActiveEffect::LoadGame(Actor* apActor) {
             phitEffect = nullptr;
             if (chitEffectType == 5) {
                 MagicHitEffect* phitEffect_2;
-                MagicModelHitEffect* apMemory =
-                    static_cast<MagicModelHitEffect*>(NiMemObject::operator new(sizeof(MagicModelHitEffect)));
-                if (apMemory) {
-                    phitEffect_2 = ::new (apMemory) MagicModelHitEffect;
-                }
-                else {
-                    phitEffect_2 = nullptr;
-                }
+                phitEffect_2 = new MagicModelHitEffect;
                 phitEffect = phitEffect_2;
             }
             else {
                 if (chitEffectType == 6) {
                     MagicHitEffect* phitEffect_3;
-                    MagicShaderHitEffect* v8 =
-                        static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-                    if (v8) {
-                        phitEffect_3 = ::new (v8) MagicShaderHitEffect;
-                    }
-                    else {
-                        phitEffect_3 = nullptr;
-                    }
+                    phitEffect_3 = new MagicShaderHitEffect;
                     phitEffect = phitEffect_3;
                 }
                 else {
@@ -334,27 +320,13 @@ void ActiveEffect::LoadGame(BGSLoadFormBuffer* apBuffer) {
         phitEffect = nullptr;
         if (chitEffectType == 5) {
             MagicHitEffect* phitEffect_2;
-            MagicModelHitEffect* apMemory =
-                static_cast<MagicModelHitEffect*>(NiMemObject::operator new(sizeof(MagicModelHitEffect)));
-            if (apMemory) {
-                phitEffect_2 = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect;
-            }
-            else {
-                phitEffect_2 = nullptr;
-            }
+            phitEffect_2 = (MagicHitEffect*)new MagicModelHitEffect;
             phitEffect = phitEffect_2;
         }
         else {
             if (chitEffectType == 6) {
                 MagicHitEffect* phitEffect_3;
-                MagicShaderHitEffect* v10 =
-                    static_cast<MagicShaderHitEffect*>(NiMemObject::operator new(sizeof(MagicShaderHitEffect)));
-                if (v10) {
-                    phitEffect_3 = (MagicHitEffect*)::new (v10) MagicShaderHitEffect;
-                }
-                else {
-                    phitEffect_3 = nullptr;
-                }
+                phitEffect_3 = (MagicHitEffect*)new MagicShaderHitEffect;
                 phitEffect = phitEffect_3;
             }
             else {

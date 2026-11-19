@@ -386,14 +386,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
                         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
                     }
                     case DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN_REPATH: {
-                        void* v13;
-                        void* apMemory = NiMemObject::operator new(sizeof(PathingRequest));
-                        if (apMemory) {
-                            v13 = (void*)::new (apMemory) PathingRequest;
-                        }
-                        else {
-                            v13 = nullptr;
-                        }
+                        void* v13 = new PathingRequest;
                         NiRefObject* v20 = static_cast<NiRefObject*>(v13);
                         NiPointer<PathingRequest> spnewRequest(static_cast<PathingRequest*>(v13));
                         spRequest.m_pObject->PathingRequest::CopyTo(spnewRequest.m_pObject);
@@ -1676,8 +1669,7 @@ DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::Upda
             else {
                 fActorAvoidanceTimer = fAvoidanceIgnoreTime.Float();
             }
-            void* pMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
-            PathingAvoidNodeArray* pAvoidNodes = pMemory ? ::new (pMemory) PathingAvoidNodeArray : nullptr;
+            PathingAvoidNodeArray* pAvoidNodes = new PathingAvoidNodeArray;
             uint32_t uiCount = kActors.GetSize();
             for (uint32_t j = 0; j < uiCount; ++j) {
                 ActorAvoidList.AddHead(kActors.GetAt(j));
@@ -2880,14 +2872,7 @@ void DetailedActorPathHandler::UpdateAvoidNodesForPath(
             PathingAvoidNodeArray* pavoidNodes = apRequest->GetAvoidNodeArray();
             if (!pavoidNodes) {
                 PathingAvoidNodeArray* pavoidNodes_2;
-                PathingAvoidNodeArray* v33 =
-                    static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-                if (v33) {
-                    pavoidNodes_2 = ::new (v33) PathingAvoidNodeArray;
-                }
-                else {
-                    pavoidNodes_2 = nullptr;
-                }
+                pavoidNodes_2 = new PathingAvoidNodeArray;
                 pavoidNodes = pavoidNodes_2;
                 apRequest->SetAvoidNodeArray(pavoidNodes_2);
             }

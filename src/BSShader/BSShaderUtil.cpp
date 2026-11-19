@@ -247,11 +247,7 @@ NiSourceTexture* BSShaderUtil::ConvertTexture(NiSourceTexture* apTex, const NiPi
         !pDestTexture) {
         return nullptr;
     }
-    NiPixelData* pData = nullptr;
-    NiPixelData* pMemory = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-    if (pMemory) {
-        pData = ::new (pMemory) NiPixelData(uiWidth, uiHeight, kFormat, uiLevels, 1u);
-    }
+    NiPixelData* pData = new NiPixelData(uiWidth, uiHeight, kFormat, uiLevels, 1u);
     for (uint32_t i = 0; i < uiLevels; ++i) {
         IDirect3DSurface9* pSrcSurface;
         IDirect3DSurface9* pDestSurface;

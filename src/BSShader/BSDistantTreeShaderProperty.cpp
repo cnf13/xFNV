@@ -33,11 +33,7 @@ BSDistantTreeShaderProperty::~BSDistantTreeShaderProperty() {
 }
 
 NiObject* BSDistantTreeShaderProperty::CreateClone(NiCloningProcess& arCloneData) {
-    BSDistantTreeShaderProperty* pClone =
-        static_cast<BSDistantTreeShaderProperty*>(NiMemObject::operator new(sizeof(BSDistantTreeShaderProperty)));
-    if (pClone) {
-        pClone = ::new (pClone) BSDistantTreeShaderProperty;
-    }
+    BSDistantTreeShaderProperty* pClone = new BSDistantTreeShaderProperty;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -130,10 +126,5 @@ void BSDistantTreeShaderProperty::CopyMembers(BSDistantTreeShaderProperty* pDest
 }
 
 NiObject* BSDistantTreeShaderProperty::CreateObject() {
-    BSDistantTreeShaderProperty* pObject =
-        static_cast<BSDistantTreeShaderProperty*>(NiMemObject::operator new(sizeof(BSDistantTreeShaderProperty)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) BSDistantTreeShaderProperty;
+    return new BSDistantTreeShaderProperty;
 }

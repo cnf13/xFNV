@@ -756,14 +756,7 @@ void BoundItemEffect::Finish() {
                 if (GetEffectSetting()->GetModelLength()) {
                     MagicHitEffect* peffect;
                     BSTempEffect* apEffect = nullptr;
-                    void* apMemory = NiMemObject::operator new(sizeof(MagicModelHitEffect));
-                    if (apMemory) {
-                        const char* v6 = pavEffect->GetModel();
-                        peffect = (MagicHitEffect*)::new (apMemory) MagicModelHitEffect(pactor, v6, -1.0f);
-                    }
-                    else {
-                        peffect = nullptr;
-                    }
+                    peffect = new MagicModelHitEffect(pactor, pavEffect->GetModel(), -1.0f);
                     if (peffect->Init()) {
                         ReferenceProcessLists.AddTempEffect(peffect);
                     }

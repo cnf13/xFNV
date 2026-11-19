@@ -25,13 +25,7 @@ BSPSysStripUpdateModifier::~BSPSysStripUpdateModifier() {}
 
 NiObject* BSPSysStripUpdateModifier::CreateClone(NiCloningProcess& kCloning) {
     BSPSysStripUpdateModifier* updated;
-    void* v5 = NiMemObject::operator new(sizeof(BSPSysStripUpdateModifier));
-    if (v5) {
-        updated = ::new (v5) BSPSysStripUpdateModifier;
-    }
-    else {
-        updated = nullptr;
-    }
+    updated = new BSPSysStripUpdateModifier;
     CopyMembers(updated, kCloning);
     return updated;
 }
@@ -98,10 +92,5 @@ void BSPSysStripUpdateModifier::CopyMembers(BSPSysStripUpdateModifier* pkDest, N
 }
 
 NiObject* BSPSysStripUpdateModifier::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSPSysStripUpdateModifier));
-    if (apMemory) {
-        return ::new (apMemory) BSPSysStripUpdateModifier;
-    }
-
-    return nullptr;
+    return new BSPSysStripUpdateModifier;
 }

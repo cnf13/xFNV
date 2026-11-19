@@ -22,14 +22,7 @@ const NiRTTI* BSGrabIKNote::GetRTTI() const {
 }
 
 NiObject* BSGrabIKNote::CreateClone(NiCloningProcess& arCloneData) {
-    BSGrabIKNote* pkCtlr = static_cast<BSGrabIKNote*>(NiMemObject::operator new(sizeof(BSGrabIKNote)));
-    BSGrabIKNote* pkCtlr_2 = pkCtlr;
-    if (pkCtlr) {
-        ::new (pkCtlr) BSGrabIKNote;
-    }
-    else {
-        pkCtlr_2 = nullptr;
-    }
+    BSGrabIKNote* pkCtlr_2 = new BSGrabIKNote;
     CopyMembers(pkCtlr_2, arCloneData);
     pkCtlr_2->eArm = eArm;
     pkCtlr_2->fGain = fGain;
@@ -130,9 +123,5 @@ bool BSGrabIKNote::ParseTextKey(const NiTextKey* apTextKey) {
 }
 
 NiObject* BSGrabIKNote::CreateObject() {
-    BSGrabIKNote* pkObject = static_cast<BSGrabIKNote*>(NiMemObject::operator new(sizeof(BSGrabIKNote)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) BSGrabIKNote;
+    return new BSGrabIKNote;
 }

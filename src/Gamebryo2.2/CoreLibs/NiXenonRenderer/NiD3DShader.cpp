@@ -454,10 +454,7 @@ void NiD3DShader::SetupSCMExtraData(NiD3DShader* pkD3DShader, NiGeometry* pkGeom
         return;
     }
 
-    void* pvMemory = NiMemObject::operator new(sizeof(NiSCMExtraData));
-    NiSCMExtraData* pkSCMExtraData = pvMemory
-        ? ::new (pvMemory) NiSCMExtraData(ms_kNDLShaderMapName, uiNumVertexEntries, uiNumPixelEntries)
-        : nullptr;
+    NiSCMExtraData* pkSCMExtraData = new NiSCMExtraData(ms_kNDLShaderMapName, uiNumVertexEntries, uiNumPixelEntries);
 
     NiD3DPass* pkCurrentPass = m_spCurrentPass;
     if (pkCurrentPass) {

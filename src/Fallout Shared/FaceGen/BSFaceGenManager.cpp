@@ -397,14 +397,7 @@ void BSFaceGenModelMap::SetAt(const char* apcKey, BSFaceGenModel* apModel) {
     BSFaceGenManager::LockFaceGenAccess();
     NiPointer<BSFaceGenModelMap::Entry> spEntry(static_cast<BSFaceGenModelMap::Entry*>(nullptr));
     if (apModel) {
-        void* pMemory = NiMemObject::operator new(sizeof(BSFaceGenModelMap::Entry));
-        BSFaceGenModelMap::Entry* pEntry;
-        if (pMemory) {
-            pEntry = ::new (pMemory) BSFaceGenModelMap::Entry;
-        }
-        else {
-            pEntry = nullptr;
-        }
+        BSFaceGenModelMap::Entry* pEntry = new BSFaceGenModelMap::Entry;
         spEntry = pEntry;
         spEntry->spModel = apModel;
         spEntry->uiTime = BSGetTickCount();
@@ -1898,13 +1891,7 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
     }
     if (abAllowCreate) {
         BSFaceGenModel* v17;
-        BSFaceGenModel* v20 = static_cast<BSFaceGenModel*>(NiMemObject::operator new(sizeof(BSFaceGenModel)));
-        if (v20) {
-            v17 = ::new (v20) BSFaceGenModel;
-        }
-        else {
-            v17 = nullptr;
-        }
+        v17 = new BSFaceGenModel;
         spnewModel = v17;
         if (spnewModel.m_pObject->LoadModel(
                 apEGMFilename, apNIFFilename, apTRIFilename, apEGTFilename, aeHairPart, abIsAccessory
@@ -2672,14 +2659,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
                     }
                     else {
                         NiMaterialProperty* pmatprop_2;
-                        NiMaterialProperty* v34 =
-                            static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-                        if (v34) {
-                            pmatprop_2 = ::new (v34) NiMaterialProperty;
-                        }
-                        else {
-                            pmatprop_2 = nullptr;
-                        }
+                        pmatprop_2 = new NiMaterialProperty;
                         NiMaterialProperty* v35 = pmatprop_2;
                         pmatprop = pmatprop_2;
                         pmatprop_2->SetName(*FixedStrings::QSkin());

@@ -604,14 +604,7 @@ AnimIdle* AnimIdle::LoadAnimIdle(Actor* apActor, Animation* apAnimation, float a
         }
         if (pidle) {
             AnimIdle* panimIdle_2;
-            AnimIdle* v16 = static_cast<AnimIdle*>(NiMemObject::operator new(sizeof(AnimIdle)));
-            if (v16) {
-                panimIdle_2 =
-                    ::new (v16) AnimIdle(pidle, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, apActor, true, nullptr);
-            }
-            else {
-                panimIdle_2 = nullptr;
-            }
+            panimIdle_2 = new AnimIdle(pidle, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, apActor, true, nullptr);
             panimIdle = panimIdle_2;
             panimIdle_2->LoadGameTES(afTime, apAnimation);
         }
@@ -867,11 +860,8 @@ void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
         }
         else {
             apBuffer->LoadVariableSizedValue();
-            void* pMemory = NiMemObject::operator new(sizeof(AnimIdle));
-            AnimIdle* pAnimIdle = pMemory
-                ? ::new (pMemory)
-                      AnimIdle(pIdleForm, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, pActor, true, nullptr)
-                : nullptr;
+            AnimIdle* pAnimIdle =
+                new AnimIdle(pIdleForm, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, pActor, true, nullptr);
             spAnimIdle = pAnimIdle;
             spAnimIdle->LoadGame(apBuffer, this);
         }
@@ -1153,8 +1143,7 @@ void Animation::SpecialIdleAuto(
     if (aeSection >= AGS_IDLE && (aeSection <= AGS_MOVEMENT || aeSection == AGS_WHOLE_BODY)) {
         iType = AnimIdle::PLAY_TYPE_AUTO_EXCLUSIVE;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(AnimIdle));
-    AnimIdle* pIdle = pMemory ? ::new (pMemory) AnimIdle(apIdleForm, aeSection, iType, apActor, false, this) : nullptr;
+    AnimIdle* pIdle = new AnimIdle(apIdleForm, aeSection, iType, apActor, false, this);
     spAnimIdleQueued = pIdle;
     BaseProcess* pProcess = apActor->GetCurrentAIProcess();
     pProcess->SetLastIdlePlayed(apIdleForm);
@@ -2986,17 +2975,11 @@ void Animation::SpecialIdleReplace(TESIdleForm* apIdleForm, Actor* apActor, ANIM
         MEM_CONTEXT_ANIMATION, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\Animation.cpp", 4797
     );
     if (!pSaveLoadGame->GetSaveGameLoading()) {
-        void* pMemory = NiMemObject::operator new(sizeof(AnimIdle));
-        AnimIdle* pIdle = pMemory
-            ? ::new (pMemory) AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_REPLACE, apActor, false, this)
-            : nullptr;
+        AnimIdle* pIdle = new AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_REPLACE, apActor, false, this);
         spAnimIdleQueued = pIdle;
     }
     else {
-        void* pMemory = NiMemObject::operator new(sizeof(AnimIdle));
-        AnimIdle* pIdle = pMemory
-            ? ::new (pMemory) AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_REPLACE, apActor, true, nullptr)
-            : nullptr;
+        AnimIdle* pIdle = new AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_REPLACE, apActor, true, nullptr);
         spAnimIdleQueued = pIdle;
     }
     SpecialIdleReplace();
@@ -3046,11 +3029,7 @@ bool Animation::Init(BSSimpleList<const char*>* apFileList, NiNode* apRoot, TESO
         }
     }
     pAnimRoot->SetSelectiveUpdate(false);
-    void* pMemory = NiMemObject::operator new(sizeof(NiControllerManager));
-    NiControllerManager* pManager = nullptr;
-    if (pMemory) {
-        pManager = ::new (pMemory) NiControllerManager(pAnimRoot, true);
-    }
+    NiControllerManager* pManager = new NiControllerManager(pAnimRoot, true);
     spManager = pManager;
     bool bDelaySequenceClone = ShouldQueueSequenceCloning();
     while (!apFileList->IsEmpty()) {
@@ -3251,14 +3230,7 @@ bool Animation::AddAnimation(KFModel* apKFModel, bool abDelaySequenceClone) {
     }
     else {
         BSAnimGroupSequence* pagSeq_2;
-        BSAnimGroupSequence* v20 =
-            static_cast<BSAnimGroupSequence*>(NiMemObject::operator new(sizeof(BSAnimGroupSequence)));
-        if (v20) {
-            pagSeq_2 = ::new (v20) BSAnimGroupSequence(apKFModel->GetAnimGroup(), pseq_2);
-        }
-        else {
-            pagSeq_2 = nullptr;
-        }
+        pagSeq_2 = new BSAnimGroupSequence(apKFModel->GetAnimGroup(), pseq_2);
         pagSeq = pagSeq_2;
     }
     panimSeq->SetSequence(pagSeq, true);
@@ -3848,14 +3820,7 @@ void Animation::SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeS
             spAnimIdle = static_cast<AnimIdle*>(nullptr);
         }
     }
-    AnimIdle* v7 = static_cast<AnimIdle*>(NiMemObject::operator new(sizeof(AnimIdle)));
-    if (v7) {
-        v4 = ::new (v7)
-            AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_QUEUE, static_cast<Actor*>(pActorRef), false, nullptr);
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new AnimIdle(apIdleForm, aeSection, AnimIdle::PLAY_TYPE_QUEUE, static_cast<Actor*>(pActorRef), false, nullptr);
     spAnimIdle = v4;
 }
 

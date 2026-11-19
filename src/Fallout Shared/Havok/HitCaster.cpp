@@ -104,14 +104,7 @@ void HitCaster::Add(bhkWorld* apWorld) {
 
 // Builds the pick phantom: a sphere of afRadius on layer LAYER_CUSTOMPICK1 in collision group aiGroup.
 void HitCaster::Init(float afRadius, uint32_t aiGroup) {
-    bhkSphereShape* pMemory = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-    bhkSphereShape* pshape;
-    if (pMemory) {
-        pshape = ::new (pMemory) bhkSphereShape(afRadius, true);
-    }
-    else {
-        pshape = nullptr;
-    }
+    bhkSphereShape* pshape = new bhkSphereShape(afRadius, true);
     hkSimpleShapePhantomCinfo csi;
     CFilter ifilter;
     ifilter.iFilter = 0;
@@ -121,15 +114,7 @@ void HitCaster::Init(float afRadius, uint32_t aiGroup) {
     csi.m_collisionFilterInfo = ifilter.iFilter;
     csi.m_shape = **pshape;
     csi.m_transform.setIdentity();
-    bhkSimpleShapePhantom* pPhantomMemory =
-        static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-    bhkSimpleShapePhantom* pPhantom;
-    if (pPhantomMemory) {
-        pPhantom = ::new (pPhantomMemory) bhkSimpleShapePhantom(csi);
-    }
-    else {
-        pPhantom = nullptr;
-    }
+    bhkSimpleShapePhantom* pPhantom = new bhkSimpleShapePhantom(csi);
     spShapePhantom = pPhantom;
     bInit = true;
 }

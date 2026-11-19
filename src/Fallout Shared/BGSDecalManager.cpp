@@ -473,14 +473,9 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                 if (BGSDecalManager::bDebugDecals.Bool()) {
                     Warning("DECAL: Non-Skinned decal count this frame: #%d", BGSDecalManager::iDecalsThisFrame);
                 }
-                void* apMemory = NiMemObject::operator new(sizeof(BSTempEffectSimpleDecal));
-                if (apMemory) {
-                    float afLifetime = BGSDecalManager::fDecalLifetime.operator float();
-                    pdecal = ::new (apMemory) BSTempEffectSimpleDecal(pdecalnode, afLifetime, arDecalData);
-                }
-                else {
-                    pdecal = nullptr;
-                }
+                pdecal = new BSTempEffectSimpleDecal(
+                    pdecalnode, BGSDecalManager::fDecalLifetime.operator float(), arDecalData
+                );
                 NiTriStrips* ptristrips = static_cast<NiTriStrips*>(arDecalData.pAVObj);
                 if (ptristrips->GetActiveTriangleCount() > 1000u && gs_bDecalOcclusionQuery_Decals.Bool() &&
                     arDecalData.bUseOcclusionQuery) {
@@ -595,8 +590,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                 }
             }
             if (!pDecalNode) {
-                void* pMemory = NiMemObject::operator new(sizeof(BGSDecalNode));
-                pDecalNode = pMemory ? ::new (pMemory) BGSDecalNode(pParent, true) : nullptr;
+                pDecalNode = new BGSDecalNode(pParent, true);
             }
             else if (pDecalNode->GetChildCount() >= iMaxSkinDecalPerActor.UInt()) {
                 // The compare is unsigned.
@@ -606,14 +600,10 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
             if (bDebugDecals.Bool()) {
                 Warning("DECAL: Skinned decal count this frame: #%d", iSkinnedDecalsThisFrame);
             }
-            void* pMemory = NiMemObject::operator new(sizeof(BSTempEffectGeometryDecal));
-            BSTempEffectGeometryDecal* pNewDecal = pMemory
-                ? ::new (pMemory) BSTempEffectGeometryDecal(
-                      arDecalData.pParentCell, fDecalLifetime.operator float(), &arDecalData, pGeometry,
-                      arDecalData.pOrigin, arDecalData.pDirection, arDecalData.fDecalWidth, arDecalData.fRotation,
-                      arDecalData.iBodyParts
-                  )
-                : nullptr;
+            BSTempEffectGeometryDecal* pNewDecal = new BSTempEffectGeometryDecal(
+                arDecalData.pParentCell, fDecalLifetime.operator float(), &arDecalData, pGeometry, arDecalData.pOrigin,
+                arDecalData.pDirection, arDecalData.fDecalWidth, arDecalData.fRotation, arDecalData.iBodyParts
+            );
             {
                 NiPointer<BSTempEffectGeometryDecal> spNewDecal(pNewDecal);
                 BSTempEffect* pEffect = spNewDecal;
@@ -623,8 +613,7 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                     return true;
                 }
                 if (!arDecalData.pSkinnedDecalNode) {
-                    void* pNodeMemory = NiMemObject::operator new(sizeof(NiNode));
-                    NiNode* pSkinnedNode = pNodeMemory ? ::new (pNodeMemory) NiNode(0) : nullptr;
+                    NiNode* pSkinnedNode = new NiNode(0);
                     arDecalData.pSkinnedDecalNode = pSkinnedNode;
                     arDecalData.pSkinnedDecalNode->SetName(FixedStrings::QSkinnedDecalNode());
                     pDecalNode->AttachChild(arDecalData.pSkinnedDecalNode, true);
@@ -679,14 +668,11 @@ bool BGSDecalManager::AddProjectedDecalRecurse(DECAL_CREATION_DATA& arDecalData)
                     if (BSSM_ShaderPropertyIsLighting(pShadeProperty) ? pShadeProperty : nullptr) {
                         NiPointer<BSTempEffectGeometryDecal> spCloneDecal(nullptr);
                         if (pGeometry->GetSkinInstance()) {
-                            void* pMemory = NiMemObject::operator new(sizeof(BSTempEffectGeometryDecal));
-                            BSTempEffectGeometryDecal* pNewDecal = pMemory
-                                ? ::new (pMemory) BSTempEffectGeometryDecal(
-                                      arDecalData.pParentCell, fDecalLifetime.operator float(), &arDecalData,
-                                      pCloneGeom, arDecalData.pOrigin, -arDecalData.pDirection, 1.0f,
-                                      arDecalData.fRotation, arDecalData.iBodyParts
-                                  )
-                                : nullptr;
+                            BSTempEffectGeometryDecal* pNewDecal = new BSTempEffectGeometryDecal(
+                                arDecalData.pParentCell, fDecalLifetime.operator float(), &arDecalData, pCloneGeom,
+                                arDecalData.pOrigin, -arDecalData.pDirection, 1.0f, arDecalData.fRotation,
+                                arDecalData.iBodyParts
+                            );
                             spCloneDecal = pNewDecal;
                             // Initialize is called through the raw pointer without a null check, as the game does.
                             BSTempEffect* pEffect = pNewDecal;

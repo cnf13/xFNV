@@ -460,14 +460,7 @@ void MagicBoltProjectile::InitHavok() {
         pCinfo->SetWorld(pWorld);
         pCinfo->SetGravity(0.0f);
         // NiNew bhkSphereShape: 0x14 bytes.
-        void* pShapeMemory = NiMemObject::operator new(sizeof(bhkSphereShape));
-        bhkSphereShape* pShape;
-        if (pShapeMemory) {
-            pShape = ::new (pShapeMemory) bhkSphereShape(1.0f, true);
-        }
-        else {
-            pShape = nullptr;
-        }
+        bhkSphereShape* pShape = new bhkSphereShape(1.0f, true);
         pCinfo->SetShape(pShape);
         pCinfo->SetAvoidBox(false);
         if (pSaveLoadGameOLD->GetLoading()) {
@@ -834,13 +827,7 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
         NiNode* pav;
         NiNode* pnode;
         NiPoint3 location;
-        void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-        if (apMemory) {
-            pnode = ::new (apMemory) NiNode(0);
-        }
-        else {
-            pnode = nullptr;
-        }
+        pnode = new NiNode(0);
         NiNode* pparentNode = static_cast<NiNode*>(GetParentCell()->GetDynamicNode());
         pparentNode->AttachChild(pnode, 1);
         BoltShaderProperty* pprop = BoltShader::Start(pnode, false);
@@ -1004,24 +991,12 @@ void MagicBoltProjectile::Init3D() {
     NiNode* v21;
     NiNode* v22;
     NiMatrix3 rot;
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        v22 = ::new (apMemory) NiNode(0);
-    }
-    else {
-        v22 = nullptr;
-    }
+    v22 = new NiNode(0);
     NiRefObject* v31 = (NiRefObject*)v22;
     spSoundNode = v22;
     const NiPoint3* v1 = &GetLocationOnReference();
     spSoundNode.m_pObject->SetWorldTranslate(*v1);
-    NiNode* v28 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v28) {
-        v21 = ::new (v28) NiNode(0);
-    }
-    else {
-        v21 = nullptr;
-    }
+    v21 = new NiNode(0);
     NiRefObject* v29 = (NiRefObject*)v21;
     spBoltNode = v21;
     const NiPoint3* v2 = &GetLocationOnReference();
@@ -1030,13 +1005,7 @@ void MagicBoltProjectile::Init3D() {
     BSXFlags* pextra = static_cast<BSXFlags*>(spBoltNode.m_pObject->GetExtraData(*v3));
     if (!pextra) {
         BSXFlags* pextra_2;
-        BSXFlags* v26 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
-        if (v26) {
-            pextra_2 = ::new (v26) BSXFlags;
-        }
-        else {
-            pextra_2 = nullptr;
-        }
+        pextra_2 = new BSXFlags;
         pextra = pextra_2;
         const NiFixedString* v4 = &BSXFlags::Tag();
         spBoltNode.m_pObject->AddExtraData(*v4, pextra_2);

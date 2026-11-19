@@ -150,12 +150,7 @@ bool hkPackedNiTriStripsData::IsEqual(NiObject* apObject) {
 
 // Creates an empty mesh.
 NiObject* hkPackedNiTriStripsData::CreateObject() {
-    hkPackedNiTriStripsData* pObject =
-        static_cast<hkPackedNiTriStripsData*>(NiMemObject::operator new(sizeof(hkPackedNiTriStripsData)));
-    if (pObject == nullptr) {
-        return nullptr;
-    }
-    return ::new (pObject) hkPackedNiTriStripsData;
+    return new hkPackedNiTriStripsData;
 }
 
 // The mesh pointer takes its reference through NiPointer.

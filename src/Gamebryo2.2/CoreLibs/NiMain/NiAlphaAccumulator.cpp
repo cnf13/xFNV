@@ -30,14 +30,7 @@ NiAlphaAccumulator::NiAlphaAccumulator()
 NiAlphaAccumulator::~NiAlphaAccumulator() {}
 
 NiObject* NiAlphaAccumulator::CreateClone(NiCloningProcess& kCloning) {
-    NiAlphaAccumulator* pkObject_2 =
-        static_cast<NiAlphaAccumulator*>(NiMemObject::operator new(sizeof(NiAlphaAccumulator)));
-    if (pkObject_2) {
-        ::new (pkObject_2) NiAlphaAccumulator;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiAlphaAccumulator* pkObject_2 = new NiAlphaAccumulator;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_bObserveNoSortHint = m_bObserveNoSortHint;
     pkObject_2->m_bSortByClosestPoint = m_bSortByClosestPoint;
@@ -161,10 +154,5 @@ void NiAlphaAccumulator::Sort() {
 }
 
 NiObject* NiAlphaAccumulator::CreateObject() {
-    NiAlphaAccumulator* pkObject =
-        static_cast<NiAlphaAccumulator*>(NiMemObject::operator new(sizeof(NiAlphaAccumulator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiAlphaAccumulator;
+    return new NiAlphaAccumulator;
 }

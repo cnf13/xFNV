@@ -395,13 +395,7 @@ void ShadowSceneLight::SetDynamicPosition(NiPoint3 abDynamicPosition) {
 void ShadowSceneLight::InsertUnusedFence() {
     if (!kGeomListFenceObject.m_pObject) {
         NiTriShape* pShape;
-        void* pMemory = NiMemObject::operator new(sizeof(NiTriShape));
-        if (pMemory) {
-            pShape = ::new (pMemory) NiTriShape(static_cast<NiTriShapeData*>(nullptr));
-        }
-        else {
-            pShape = nullptr;
-        }
+        pShape = new NiTriShape(static_cast<NiTriShapeData*>(nullptr));
         kGeomListFenceObject = pShape;
         // kName's destructor releases the string handle.
         NiFixedString kName;
@@ -1324,13 +1318,7 @@ void ShadowSceneLight::AccumulateGeometry(BSCullingProcess* a1, int32_t a2) {
             NiPointer<NiCamera>* p_spShadowCamera = &spShadowCamera;
             if (!spShadowCamera.m_pObject) {
                 NiCamera* v27;
-                NiCamera* v26 = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-                if (v26) {
-                    v27 = ::new (v26) NiCamera;
-                }
-                else {
-                    v27 = nullptr;
-                }
+                v27 = new NiCamera;
                 *p_spShadowCamera = v27;
             }
             NiCamera* v28 = p_spShadowCamera->m_pObject;

@@ -1378,10 +1378,8 @@ void Sky::UnloadAllTextures() {
 // the current game hour: the current and last weather each blend two times of day by the transition weight.
 void Sky::UpdateHDRValues() {
     if (!pCurrentWeatherImageSpaceMod) {
-        void* pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
-        pCurrentWeatherImageSpaceMod = pMemory ? ::new (pMemory) ImageSpaceModifierInstanceForm : nullptr;
-        pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
-        pLastWeatherImageSpaceMod = pMemory ? ::new (pMemory) ImageSpaceModifierInstanceForm : nullptr;
+        pCurrentWeatherImageSpaceMod = new ImageSpaceModifierInstanceForm;
+        pLastWeatherImageSpaceMod = new ImageSpaceModifierInstanceForm;
         {
             NiPointer<ImageSpaceModifierInstance> spMod(pLastWeatherImageSpaceMod);
             TES::pInstance->GetActiveImageSpaceModifiers()->AddHead(spMod);
@@ -1390,10 +1388,8 @@ void Sky::UpdateHDRValues() {
             NiPointer<ImageSpaceModifierInstance> spMod(pCurrentWeatherImageSpaceMod);
             TES::pInstance->GetActiveImageSpaceModifiers()->AddHead(spMod);
         }
-        pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
-        pCurrentWeatherImageSpaceMod2 = pMemory ? ::new (pMemory) ImageSpaceModifierInstanceForm : nullptr;
-        pMemory = NiMemObject::operator new(sizeof(ImageSpaceModifierInstanceForm));
-        pLastWeatherImageSpaceMod2 = pMemory ? ::new (pMemory) ImageSpaceModifierInstanceForm : nullptr;
+        pCurrentWeatherImageSpaceMod2 = new ImageSpaceModifierInstanceForm;
+        pLastWeatherImageSpaceMod2 = new ImageSpaceModifierInstanceForm;
         {
             NiPointer<ImageSpaceModifierInstance> spMod(pLastWeatherImageSpaceMod2);
             TES::pInstance->GetActiveImageSpaceModifiers()->AddHead(spMod);
@@ -1806,8 +1802,7 @@ void Sky::Initialize(BSMultiBoundNode* apRoot, BSFogProperty* apFog) {
         spRoot = apRoot;
     }
     else {
-        void* pMemory = NiMemObject::operator new(sizeof(BSMultiBoundNode));
-        BSMultiBoundNode* pNode = pMemory ? ::new (pMemory) BSMultiBoundNode : nullptr;
+        BSMultiBoundNode* pNode = new BSMultiBoundNode;
         spRoot = pNode;
         static_cast<BSMultiBoundNode*>(spRoot.operator->())->SetCullingMode(BSCullingProcess::BSCP_CULL_ALLPASS);
         spRoot->SetSelectiveUpdate(true);
@@ -1838,8 +1833,7 @@ void Sky::Initialize(BSMultiBoundNode* apRoot, BSFogProperty* apFog) {
     NiNode* pSunRoot = spRoot.operator->();
     pSun->Initialize(pSunRoot);
 
-    void* pMoonsMemory = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* pMoonsRoot = pMoonsMemory ? ::new (pMoonsMemory) NiNode(0) : nullptr;
+    NiNode* pMoonsRoot = new NiNode(0);
     spMoonsRoot = pMoonsRoot;
     NiNode* pRoot = spRoot.operator->();
     pRoot->AttachChild(spMoonsRoot.operator->(), true);
@@ -1865,8 +1859,7 @@ void Sky::Initialize(BSMultiBoundNode* apRoot, BSFogProperty* apFog) {
     NiNode* pCloudsRoot = spRoot.operator->();
     pClouds->Initialize(pCloudsRoot);
 
-    void* pAlphaMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-    NiAlphaProperty* pNewAlpha = pAlphaMemory ? ::new (pAlphaMemory) NiAlphaProperty : nullptr;
+    NiAlphaProperty* pNewAlpha = new NiAlphaProperty;
     {
         NiPointer<NiAlphaProperty> spAlpha(pNewAlpha);
         spAlpha->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);

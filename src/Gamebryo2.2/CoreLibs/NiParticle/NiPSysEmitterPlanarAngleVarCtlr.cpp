@@ -76,11 +76,5 @@ void NiPSysEmitterPlanarAngleVarCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysEmitterPlanarAngleVarCtlr::CreateObject() {
-    NiPSysEmitterPlanarAngleVarCtlr* v0 = static_cast<NiPSysEmitterPlanarAngleVarCtlr*>(
-        NiMemObject::operator new(sizeof(NiPSysEmitterPlanarAngleVarCtlr))
-    );
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysEmitterPlanarAngleVarCtlr;
+    return new NiPSysEmitterPlanarAngleVarCtlr;
 }

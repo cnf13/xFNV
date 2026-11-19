@@ -26,10 +26,7 @@ const NiRTTI* BSClearZNode::GetRTTI() const {
 }
 
 NiObject* BSClearZNode::CreateClone(NiCloningProcess& arCloneData) {
-    BSClearZNode* pClone = static_cast<BSClearZNode*>(NiMemObject::operator new(sizeof(BSClearZNode)));
-    if (pClone) {
-        ::new (pClone) BSClearZNode;
-    }
+    BSClearZNode* pClone = new BSClearZNode;
     NiNode::CopyMembers(pClone, arCloneData);
     return pClone;
 }

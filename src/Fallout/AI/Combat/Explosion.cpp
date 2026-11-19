@@ -455,14 +455,7 @@ void Explosion::InitHavok() {
         bhkSimpleShapePhantom* v6;
         bhkSphereShape* pshape;
         alignas(16) hkSimpleShapePhantomCinfo info;
-        bhkSphereShape* v12 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-        if (v12) {
-            float afRadius = this->fRadius;
-            pshape = ::new (v12) bhkSphereShape(afRadius, true);
-        }
-        else {
-            pshape = nullptr;
-        }
+        pshape = new bhkSphereShape(this->fRadius, true);
         info.m_shape = **pshape;
         uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
         info.m_collisionFilterInfo = CFilter(L_SPELLEXPLOSION, NewSystemGroup, P_OTHER).iFilter;
@@ -473,14 +466,7 @@ void Explosion::InitHavok() {
         else {
             info.m_transform.setIdentity();
         }
-        bhkSimpleShapePhantom* v7 =
-            static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-        if (v7) {
-            v6 = ::new (v7) bhkSimpleShapePhantom(info);
-        }
-        else {
-            v6 = nullptr;
-        }
+        v6 = new bhkSimpleShapePhantom(info);
         this->spPhantom = v6;
         bhkSimpleShapePhantom* v5 = this->spPhantom.m_pObject;
         bhkWorld* v3 = this->GetParentCell()->GetbhkWorld();
@@ -1219,13 +1205,7 @@ void Explosion::Init3D() {
                     break;
                 }
                 BSCloningProcess process(1.0f);
-                NiNode* v55 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-                if (v55) {
-                    pthing = ::new (v55) NiNode(0);
-                }
-                else {
-                    pthing = nullptr;
-                }
+                pthing = new NiNode(0);
                 NiNode* v53 = pthing;
                 NiNode* pthing_2 = pthing;
                 BSRandom* Singleton = BSRandom::GetSingleton();
@@ -1237,23 +1217,10 @@ void Explosion::Init3D() {
                 BSRandom* v6 = BSRandom::GetSingleton();
                 float v49 = v6->FloatNeg1To1() * 10.0;
                 pthing_2->SetTranslate(v49, v13, v14);
-                bhkCollisionObject* v48 =
-                    static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
-                if (v48) {
-                    pobj = ::new (v48) bhkCollisionObject(pthing_2);
-                }
-                else {
-                    pobj = nullptr;
-                }
+                pobj = new bhkCollisionObject(pthing_2);
                 bhkCollisionObject* v46 = pobj;
                 bhkCollisionObject* pobj_2 = pobj;
-                bhkSphereShape* v44 = static_cast<bhkSphereShape*>(NiMemObject::operator new(sizeof(bhkSphereShape)));
-                if (v44) {
-                    pshape = ::new (v44) bhkSphereShape(8.0f, true);
-                }
-                else {
-                    pshape = nullptr;
-                }
+                pshape = new bhkSphereShape(8.0f, true);
                 bhkSphereShape* v42 = pshape;
                 bhkSphereShape* pshape_2 = pshape;
                 cinfo.~bhkRigidBodyCinfo();
@@ -1265,24 +1232,12 @@ void Explosion::Init3D() {
                 uint32_t NewSystemGroup = bhkCollisionFilter::GetNewSystemGroup();
                 cinfo.SetCollisionFilter(CFilter(L_CLUTTER, NewSystemGroup, P_OTHER).iFilter);
                 cinfo.SetShape(pshape_2);
-                bhkRigidBody* v38 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-                if (v38) {
-                    pbody = ::new (v38) bhkRigidBody(cinfo);
-                }
-                else {
-                    pbody = nullptr;
-                }
+                pbody = new bhkRigidBody(cinfo);
                 bhkRigidBody* v36 = pbody;
                 bhkRigidBody* pbody_2 = pbody;
                 pobj_2->SetWorldObject(pbody);
                 pav->AttachChild(pthing_2, 1);
-                BSValueNode* v34 = static_cast<BSValueNode*>(NiMemObject::operator new(sizeof(BSValueNode)));
-                if (v34) {
-                    paddon = ::new (v34) BSValueNode;
-                }
-                else {
-                    paddon = nullptr;
-                }
+                paddon = new BSValueNode;
                 BSValueNode* v32 = paddon;
                 BSValueNode* paddon_2 = paddon;
                 paddon->iValue = 14;
@@ -1293,14 +1248,7 @@ void Explosion::Init3D() {
                 info.fStickStrength = f15_0_;
                 info.fNeighborDistance = f64_0;
                 info.fNeighborStrength = f15_0;
-                bhkLiquidAction* v29 =
-                    static_cast<bhkLiquidAction*>(NiMemObject::operator new(sizeof(bhkLiquidAction)));
-                if (v29) {
-                    pliquid = ::new (v29) bhkLiquidAction(info);
-                }
-                else {
-                    pliquid = nullptr;
-                }
+                pliquid = new bhkLiquidAction(info);
                 bhkLiquidAction* v27 = pliquid;
                 bhkLiquidAction* v26 = pliquid;
                 pbody_2->AddAction(pliquid);

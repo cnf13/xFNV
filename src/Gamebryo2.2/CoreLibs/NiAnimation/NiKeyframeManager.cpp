@@ -141,8 +141,7 @@ void NiKeyframeManager::LinkObject(NiStream& kStream) {
     uint32_t uiKey = 0;
     for (uint32_t ui = 0; ui < uiNumSequences; ui++) {
         char* pcName = pkRecord->m_kSequenceNames.m_pBase[ui];
-        NiSequence* pkMemory = static_cast<NiSequence*>(NiMemObject::operator new(sizeof(NiSequence)));
-        NiSequence* pkSequence = pkMemory ? ::new (pkMemory) NiSequence(pcName, 12, 12) : nullptr;
+        NiSequence* pkSequence = new NiSequence(pcName, 12, 12);
         _NiFree(pcName);
         pkSequence->m_uiTextKeyReference = ms_pkLinkRecord->m_kTextKeyReferences.m_pBase[ui];
         pkSequence->m_spTextKeys = kStream.GetObjectFromLinkID();
@@ -198,9 +197,5 @@ bool NiKeyframeManager::Add(const char* pcSequenceFile, const char* pcSequenceNa
 }
 
 NiObject* NiKeyframeManager::CreateObject() {
-    NiKeyframeManager* pkObject = static_cast<NiKeyframeManager*>(NiMemObject::operator new(sizeof(NiKeyframeManager)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiKeyframeManager;
+    return new NiKeyframeManager;
 }

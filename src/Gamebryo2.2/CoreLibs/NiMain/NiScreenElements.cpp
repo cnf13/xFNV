@@ -29,10 +29,7 @@ const NiRTTI* NiScreenElements::GetRTTI() const {
 // body only calls NiTriShape::CopyMembers. It is deliberately called with a null clone when the allocation fails, as
 // the game does.
 NiObject* NiScreenElements::CreateClone(NiCloningProcess& kCloning) {
-    NiScreenElements* pkClone = static_cast<NiScreenElements*>(NiMemObject::operator new(sizeof(NiScreenElements)));
-    if (pkClone) {
-        ::new (pkClone) NiScreenElements;
-    }
+    NiScreenElements* pkClone = new NiScreenElements;
     static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(this))
         ->CopyMembers(static_cast<BSResizableTriShape*>(static_cast<NiTriShape*>(pkClone)), kCloning);
     return pkClone;
@@ -85,9 +82,5 @@ void NiScreenElements::Draw(NiRenderer* pkRenderer) {
 }
 
 NiObject* NiScreenElements::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiScreenElements));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiScreenElements;
+    return new NiScreenElements;
 }

@@ -256,22 +256,11 @@ NiD3DShaderDeclaration* BSDistantTreeShader::GetShaderDecl(NiGeometry* apGeometr
 // The instance count is read once for both the register count and the data size.
 void BSDistantTreeShader::CreateConstantMaps() {
     if (!m_spPixelConstantMap) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
     }
     if (!m_spVertexConstantMap) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
-        else {
-            pMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap->AddEntry("WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false);
         m_spVertexConstantMap->AddEntry("fog", 0x10000009, 0, 4, 2, "", 0x20, 4, &kFogData, false);
@@ -459,10 +448,7 @@ BSShader* BSDistantTreeShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_TEXCOORD, 1u, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     pdecl->GetD3DDeclaration();
-    BSDistantTreeShader* v2 = static_cast<BSDistantTreeShader*>(NiMemObject::operator new(sizeof(BSDistantTreeShader)));
-    if (v2) {
-        pshader = ::new (v2) BSDistantTreeShader(pdecl);
-    }
+    pshader = new BSDistantTreeShader(pdecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->LoadStagesAndPasses();

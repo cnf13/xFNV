@@ -413,9 +413,5 @@ void NiScreenElementsData::UpdateBound() {
 }
 
 NiObject* NiScreenElementsData::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiScreenElementsData));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiScreenElementsData;
+    return new NiScreenElementsData;
 }

@@ -56,13 +56,7 @@ NiBSBoneLODController::~NiBSBoneLODController() {
 
 NiObject* NiBSBoneLODController::CreateClone(NiCloningProcess& arCloneData) {
     NiBSBoneLODController* v3;
-    void* v5 = NiMemObject::operator new(sizeof(NiBSBoneLODController));
-    if (v5) {
-        v3 = ::new (v5) NiBSBoneLODController;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new NiBSBoneLODController;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -451,12 +445,7 @@ bool NiBSBoneLODController::GetHasBones() {
 }
 
 NiObject* NiBSBoneLODController::CreateObject() {
-    void* v2 = NiMemObject::operator new(sizeof(NiBSBoneLODController));
-    if (v2) {
-        return ::new (v2) NiBSBoneLODController;
-    }
-
-    return nullptr;
+    return new NiBSBoneLODController;
 }
 
 bool NiBSBoneLODController::ProcessScene(NiNode* pkSceneRoot) {
@@ -466,14 +455,7 @@ bool NiBSBoneLODController::ProcessScene(NiNode* pkSceneRoot) {
         for (uint32_t stSizeInBytes = 0; stSizeInBytes < kBoneRootNodes.m_uiUsed; ++stSizeInBytes) {
             NiBSBoneLODController* pkCtlr;
             NiNode* pkBoneRoot = kBoneRootNodes.m_pBase[stSizeInBytes];
-            NiBSBoneLODController* apMemory =
-                static_cast<NiBSBoneLODController*>(NiMemObject::operator new(sizeof(NiBSBoneLODController)));
-            if (apMemory) {
-                pkCtlr = ::new (apMemory) NiBSBoneLODController;
-            }
-            else {
-                pkCtlr = nullptr;
-            }
+            pkCtlr = new NiBSBoneLODController;
             pkCtlr->SetTarget(pkBoneRoot);
             if (!pkCtlr->InitializeData(pkBoneRoot)) {
                 pkBoneRoot->RemoveController(pkCtlr);

@@ -135,10 +135,5 @@ void NiIntegersExtraData::CopyMembers(NiIntegersExtraData* pDest, NiCloningProce
 }
 
 NiObject* NiIntegersExtraData::CreateObject() {
-    NiIntegersExtraData* pkObject =
-        static_cast<NiIntegersExtraData*>(NiMemObject::operator new(sizeof(NiIntegersExtraData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiIntegersExtraData;
+    return new NiIntegersExtraData;
 }

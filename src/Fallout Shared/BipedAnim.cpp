@@ -995,8 +995,7 @@ NiAVObject* BipedAnim::AttachSkinnedObject(
     if (apParentNode && pNode->GetArrayCount() >= 2 && pNode->GetAt(1)) {
         NiAVObject* pSecond = pNode->GetAt(1);
         if (pSecond->IsGeometry()) {
-            void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-            NiNode* pNewNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+            NiNode* pNewNode = new NiNode(0);
             pParent = pNewNode;
             apParentNode->AttachChild(pParent, true);
             pResult = pParent;

@@ -44,15 +44,7 @@ BSDecalPlacementVectorExtraData::~BSDecalPlacementVectorExtraData() {
 
 NiObject* BSDecalPlacementVectorExtraData::CreateClone(NiCloningProcess& arCloneData) {
     BSDecalPlacementVectorExtraData* pobj;
-    BSDecalPlacementVectorExtraData* apMemory = static_cast<BSDecalPlacementVectorExtraData*>(
-        NiMemObject::operator new(sizeof(BSDecalPlacementVectorExtraData))
-    );
-    if (apMemory) {
-        pobj = ::new (apMemory) BSDecalPlacementVectorExtraData(0);
-    }
-    else {
-        pobj = nullptr;
-    }
+    pobj = new BSDecalPlacementVectorExtraData(0);
     CopyMembers(pobj, arCloneData);
     return pobj;
 }
@@ -180,15 +172,7 @@ bool BSDecalPlacementVectorExtraData::FindDecalPlacementVectorGroupRecurse(
     }
     if (!pextra) {
         BSDecalPlacementVectorExtraData* pextra_2;
-        BSDecalPlacementVectorExtraData* apMemory = static_cast<BSDecalPlacementVectorExtraData*>(
-            NiMemObject::operator new(sizeof(BSDecalPlacementVectorExtraData))
-        );
-        if (apMemory) {
-            pextra_2 = ::new (apMemory) BSDecalPlacementVectorExtraData(0);
-        }
-        else {
-            pextra_2 = nullptr;
-        }
+        pextra_2 = new BSDecalPlacementVectorExtraData(0);
         pextra = pextra_2;
         apRootObject->AddExtraData(*sDVPG, pextra_2);
     }
@@ -247,13 +231,7 @@ void BSDecalPlacementVectorExtraData::CreateDecalPlacementVectorExtraData(NiAVOb
 
 NiObject* BSDecalPlacementVectorExtraData::CreateObject() {
     BSDecalPlacementVectorExtraData* v1;
-    void* apMemory = NiMemObject::operator new(sizeof(BSDecalPlacementVectorExtraData));
-    if (apMemory) {
-        v1 = ::new (apMemory) BSDecalPlacementVectorExtraData(0);
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new BSDecalPlacementVectorExtraData(0);
     v1->SetName(EmptyFS);
     return v1;
 }

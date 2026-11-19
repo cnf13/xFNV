@@ -444,11 +444,5 @@ void NiLookAtInterpolator::CopyMembers(NiLookAtInterpolator* pkDest, NiCloningPr
 }
 
 NiObject* NiLookAtInterpolator::CreateObject() {
-    NiLookAtInterpolator* v0 =
-        static_cast<NiLookAtInterpolator*>(NiMemObject::operator new(sizeof(NiLookAtInterpolator)));
-    if (v0) {
-        return ::new (v0) NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
-    }
-
-    return nullptr;
+    return new NiLookAtInterpolator(nullptr, NiLookAtInterpolator::X, false);
 }

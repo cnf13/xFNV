@@ -142,13 +142,7 @@ int32_t BSXFlags::FindFlag(NiObjectNET* apObject, FLAGS aiFlags) {
 
 NiObject* BSXFlags::CreateObject() {
     BSXFlags* v1;
-    void* apMemory = NiMemObject::operator new(sizeof(BSXFlags));
-    if (apMemory) {
-        v1 = ::new (apMemory) BSXFlags;
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new BSXFlags;
     v1->SetName(EmptyFS);
     return v1;
 }

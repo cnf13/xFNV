@@ -202,13 +202,7 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
                 sprigid = bhkUtilFunctions::CreateCapsuleBody(afHeight, v16);
             }
         }
-        BSTreeNode* v21 = static_cast<BSTreeNode*>(NiMemObject::operator new(sizeof(BSTreeNode)));
-        if (v21) {
-            pretval = ::new (v21) BSTreeNode(this, sprigid.m_pObject);
-        }
-        else {
-            pretval = nullptr;
-        }
+        pretval = new BSTreeNode(this, sprigid.m_pObject);
         if ((pspBranchData) && (pspBranchShaderProperties)) {
             slevels = GetNumBranchLODLevels();
             pshader = (NiD3DShader*)BSShaderManager::GetShader(4);
@@ -216,13 +210,7 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
             for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
                 if (pspBranchData[slevel].m_pObject) {
                     NiTriBasedGeom* pgeom;
-                    NiTriStrips* v20 = static_cast<NiTriStrips*>(NiMemObject::operator new(sizeof(NiTriStrips)));
-                    if (v20) {
-                        pgeom = (NiTriBasedGeom*)::new (v20) NiTriStrips(pspBranchData[slevel].m_pObject);
-                    }
-                    else {
-                        pgeom = nullptr;
-                    }
+                    pgeom = (NiTriBasedGeom*)new NiTriStrips(pspBranchData[slevel].m_pObject);
                     pgeom_2 = pgeom;
                     ppropAlpha = BSTreeModel::CreateAlphaProperty();
                     if (ppropAlpha) {
@@ -270,13 +258,7 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
             for (slevel = 0; slevel < static_cast<int32_t>(slevels); ++slevel) {
                 if (pspLeafData[slevel].m_pObject) {
                     NiTriBasedGeom* pgeom_3;
-                    NiTriShape* v19 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-                    if (v19) {
-                        pgeom_3 = (NiTriBasedGeom*)::new (v19) NiTriShape(pspLeafData[slevel].m_pObject);
-                    }
-                    else {
-                        pgeom_3 = nullptr;
-                    }
+                    pgeom_3 = (NiTriBasedGeom*)new NiTriShape(pspLeafData[slevel].m_pObject);
                     pgeom_2 = pgeom_3;
                     ppropAlpha = BSTreeModel::CreateAlphaProperty();
                     if (ppropAlpha) {
@@ -362,14 +344,7 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
             Src[itemp - 2] = 100;
             Src[itemp - 1] = 115;
             BSShaderManager::GetModifiedTextureFilename(a1, Src, "_n", true);
-            BSShaderTextureSet* v9 =
-                static_cast<BSShaderTextureSet*>(NiMemObject::operator new(sizeof(BSShaderTextureSet)));
-            if (v9) {
-                v6 = ::new (v9) BSShaderTextureSet;
-            }
-            else {
-                v6 = nullptr;
-            }
+            v6 = new BSShaderTextureSet;
             spBranchTextureSet = v6;
             BSShaderTextureSet* v5 = spBranchTextureSet.m_pObject;
             v5->SetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE, Src);
@@ -387,14 +362,7 @@ void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
             BSShaderTextureSet* v3;
             char path[264];
             apTreeObj->GetBillboardTextureFilename(path);
-            BSShaderTextureSet* v8 =
-                static_cast<BSShaderTextureSet*>(NiMemObject::operator new(sizeof(BSShaderTextureSet)));
-            if (v8) {
-                v3 = ::new (v8) BSShaderTextureSet;
-            }
-            else {
-                v3 = nullptr;
-            }
+            v3 = new BSShaderTextureSet;
             spBillboardTextureSet = v3;
             BSShaderTextureSet* v2 = spBillboardTextureSet.m_pObject;
             v2->SetTextureFilename(BSShaderProperty::TEXTYPE_DIFFUSE, path);
@@ -702,13 +670,7 @@ void BSTreeModel::CreateBranchGeometry() {
                     // the vector.
                     pwindinfo[svert] = std::bit_cast<D3DXVECTOR4>(*pkWindInfo);
                 }
-                STSPData* v43 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
-                if (v43) {
-                    STSPData_ = ::new (v43) STSPData;
-                }
-                else {
-                    STSPData_ = nullptr;
-                }
+                STSPData_ = new STSPData;
                 NiPointer<STSPData> spshaderData(STSPData_);
                 uint16_t asVertexCount = vertsUsed.m_usSize;
                 spshaderData.m_pObject->SetData(pwindinfo, asVertexCount);
@@ -731,16 +693,7 @@ void BSTreeModel::CreateBranchGeometry() {
                 this->pspBranchData[slevel].m_pObject->SetConsistency(NiGeometryData::STATIC);
                 this->pspBranchData[slevel].m_pObject->m_ucKeepFlags = 17u;
                 this->pspBranchData[slevel].m_pObject->SetCompressFlags(1u);
-                SpeedTreeBranchShaderProperty* apMemory = static_cast<SpeedTreeBranchShaderProperty*>(
-                    NiMemObject::operator new(sizeof(SpeedTreeBranchShaderProperty))
-                );
-                if (apMemory) {
-                    SpeedTreeBranchShaderProperty_ =
-                        ::new (apMemory) SpeedTreeBranchShaderProperty(spshaderData.m_pObject);
-                }
-                else {
-                    SpeedTreeBranchShaderProperty_ = nullptr;
-                }
+                SpeedTreeBranchShaderProperty_ = new SpeedTreeBranchShaderProperty(spshaderData.m_pObject);
                 this->pspBranchShaderProperties[slevel] = SpeedTreeBranchShaderProperty_;
             }
         }
@@ -810,13 +763,7 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
                 this->pspLeafData[slevel] = static_cast<NiTriShapeData*>(nullptr);
                 this->pspLeafShaderProperties[slevel] = static_cast<SpeedTreeLeafShaderProperty*>(nullptr);
             }
-            STLSPData* v71 = static_cast<STLSPData*>(NiMemObject::operator new(sizeof(STLSPData)));
-            if (v71) {
-                STLSPData_ = ::new (v71) STLSPData;
-            }
-            else {
-                STLSPData_ = nullptr;
-            }
+            STLSPData_ = new STLSPData;
             spLeafShaderData = STLSPData_;
             spLeafShaderData.m_pObject->SetCurveScalar(fCurveScalar);
             if ((pSpeedTree) && (pSpeedTree->m_pWindEngine)) {
@@ -950,25 +897,12 @@ void BSTreeModel::CreateLeafGeometry(TESObjectTREE* apTreeObj) {
                         ptrilistMove[striStart + 4] = svertStart + 1;
                         ptrilistMove[striStart + 5] = svertStart + 3;
                     }
-                    NiTriShapeData* v55 =
-                        static_cast<NiTriShapeData*>(NiMemObject::operator new(sizeof(NiTriShapeData)));
-                    if (v55) {
-                        NiTriShapeData_ = ::new (v55) NiTriShapeData(
-                            sverts, pcoordsCopy, pnormalsCopy, nullptr, ptexCopy, 1, NiGeometryData::NBT_METHOD_NONE,
-                            2 * sleafs, ptrilistCopy
-                        );
-                    }
-                    else {
-                        NiTriShapeData_ = nullptr;
-                    }
+                    NiTriShapeData_ = new NiTriShapeData(
+                        sverts, pcoordsCopy, pnormalsCopy, nullptr, ptexCopy, 1, NiGeometryData::NBT_METHOD_NONE,
+                        2 * sleafs, ptrilistCopy
+                    );
                     this->pspLeafData[slevel] = NiTriShapeData_;
-                    STSPData* v54 = static_cast<STSPData*>(NiMemObject::operator new(sizeof(STSPData)));
-                    if (v54) {
-                        STSPData_ = ::new (v54) STSPData;
-                    }
-                    else {
-                        STSPData_ = nullptr;
-                    }
+                    STSPData_ = new STSPData;
                     spshaderData = STSPData_;
                     spshaderData.m_pObject->SetData(pwindinfo, sverts);
                     SpeedTreeLeafShaderProperty* v53 = static_cast<SpeedTreeLeafShaderProperty*>(
@@ -1027,27 +961,13 @@ void BSTreeModel::CreateBillboardGeometry(TESObjectTREE* apTreeObj) {
         spBillboardData.m_pObject->SetConsistency(NiGeometryData::STATIC);
         spBillboardData.m_pObject->m_ucKeepFlags = 17u;
         spBillboardData.m_pObject->SetCompressFlags(1u);
-        NiTriShape* apMemory = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-        if (apMemory) {
-            v10 = ::new (apMemory) NiTriShape(spBillboardData.m_pObject);
-        }
-        else {
-            v10 = nullptr;
-        }
+        v10 = new NiTriShape(spBillboardData.m_pObject);
         spBillboard = v10;
         NiPointer<NiAlphaProperty> ppropAlpha(BSTreeModel::CreateAlphaProperty());
         if (ppropAlpha.m_pObject) {
             spBillboard.m_pObject->AttachProperty(ppropAlpha.m_pObject);
         }
-        SpeedTreeBillboardShaderProperty* v12 = static_cast<SpeedTreeBillboardShaderProperty*>(
-            NiMemObject::operator new(sizeof(SpeedTreeBillboardShaderProperty))
-        );
-        if (v12) {
-            pbillboardProp = ::new (v12) SpeedTreeBillboardShaderProperty;
-        }
-        else {
-            pbillboardProp = nullptr;
-        }
+        pbillboardProp = new SpeedTreeBillboardShaderProperty;
         spBillboard.m_pObject->AttachProperty(pbillboardProp);
         BSShaderTextureSet* a2 = spBillboardTextureSet.m_pObject;
         pbillboardProp->LoadTextureSet("STBB", a2);
@@ -1284,13 +1204,7 @@ bool BSTreeModel::IsInstance() {
 
 NiAlphaProperty* BSTreeModel::CreateAlphaProperty() {
     NiAlphaProperty* v1;
-    void* v2 = NiMemObject::operator new(sizeof(NiAlphaProperty));
-    if (v2) {
-        v1 = ::new (v2) NiAlphaProperty;
-    }
-    else {
-        v1 = nullptr;
-    }
+    v1 = new NiAlphaProperty;
     v1->SetAlphaBlending(false);
     v1->SetAlphaTesting(true);
     v1->SetTestMode(NiAlphaProperty::TEST_GREATER);

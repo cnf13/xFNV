@@ -87,13 +87,7 @@ NiTexture* BGSSaveLoadHeader::LoadHeaderScreenshot(
     NiPixelFormat pixelFormat;
     apFile->SeekSet(static_cast<int32_t>(aiOffset));
     pixelFormat = NiPixelFormat_RGB24;
-    void* apMemory = NiMemObject::operator new(sizeof(NiPixelData));
-    if (apMemory) {
-        ppixelData = ::new (apMemory) NiPixelData(aiWidth, aiHeight, pixelFormat, 1u, 1u);
-    }
-    else {
-        ppixelData = nullptr;
-    }
+    ppixelData = new NiPixelData(aiWidth, aiHeight, pixelFormat, 1u, 1u);
     apFile->Read(ppixelData->GetPixels(0u, 0u), 3 * (aiHeight * aiWidth));
     NiTexture::FormatPrefs prefs;
     prefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;

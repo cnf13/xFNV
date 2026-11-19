@@ -18,15 +18,7 @@ NiSpecularProperty::NiSpecularProperty() : m_uFlags(0) {}
 NiSpecularProperty::~NiSpecularProperty() {}
 
 NiObject* NiSpecularProperty::CreateClone(NiCloningProcess& kCloning) {
-    NiSpecularProperty* pkObject =
-        static_cast<NiSpecularProperty*>(NiMemObject::operator new(sizeof(NiSpecularProperty)));
-    NiSpecularProperty* pkObject_2 = pkObject;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiSpecularProperty;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiSpecularProperty* pkObject_2 = new NiSpecularProperty;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
     return pkObject_2;
@@ -70,10 +62,5 @@ void NiSpecularProperty::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 }
 
 NiObject* NiSpecularProperty::CreateObject() {
-    NiSpecularProperty* pkObject =
-        static_cast<NiSpecularProperty*>(NiMemObject::operator new(sizeof(NiSpecularProperty)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSpecularProperty;
+    return new NiSpecularProperty;
 }

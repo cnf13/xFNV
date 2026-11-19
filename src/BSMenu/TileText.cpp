@@ -66,8 +66,7 @@ NiNode* TileText::MakeNode() {
     }
 
     if (bIsHTML || FontManager::pInstance->bUseNewFonts) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* pNode = new NiNode(0);
         spModel = pNode;
         alignas(FontManager::TextData) uint8_t aDataStorage[sizeof(FontManager::TextData)];
         FontManager::TextData& kData = *reinterpret_cast<FontManager::TextData*>(aDataStorage);
@@ -105,8 +104,7 @@ NiNode* TileText::MakeNode() {
     else {
         NiTriShape* pTextShape = nullptr;
         NiTriShape* pIconShape = nullptr;
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        NiNode* pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        NiNode* pNode = new NiNode(0);
         spModel = pNode;
         pFont->CreateText(
             *pText, iWrapWidth, iWrapLimit, 0, iWrapLines, iJustify, '\n', kColor, pTextShape, pIconShape
@@ -149,8 +147,7 @@ NiNode* TileText::MakeNode() {
     }
     spModel.m_pObject->UpdateProperties();
     Interface::SetNeedToUpdate(true);
-    void* pMemory = NiMemObject::operator new(sizeof(Extra));
-    Extra* pExtra = pMemory ? ::new (pMemory) Extra(this, spModel.m_pObject) : nullptr;
+    Extra* pExtra = new Extra(this, spModel.m_pObject);
     spModel.m_pObject->AddExtraData(pExtra);
     NiNode* pResult = spModel.m_pObject;
     pText->Set(nullptr, 0);

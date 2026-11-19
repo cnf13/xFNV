@@ -1099,10 +1099,5 @@ bool NiAdditionalGeometryData::RemoveDataBlock(uint32_t uiIndex, bool bRemoveAss
 
 // The constructor's own result is returned, so a failed allocation is the only null case.
 NiObject* NiAdditionalGeometryData::CreateObject() {
-    NiAdditionalGeometryData* pkObject =
-        static_cast<NiAdditionalGeometryData*>(NiMemObject::operator new(sizeof(NiAdditionalGeometryData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiAdditionalGeometryData;
+    return new NiAdditionalGeometryData;
 }

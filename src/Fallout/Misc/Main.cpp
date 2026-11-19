@@ -1481,22 +1481,10 @@ void Main::InitSceneGraph() {
     AutoMemContext tempMemContext(
         MEM_CONTEXT_WORLD_SG, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout\\Misc\\Main.cpp", 3916
     );
-    SceneGraph* v72 = static_cast<SceneGraph*>(NiMemObject::operator new(sizeof(SceneGraph)));
-    if (v72) {
-        pSceneGraph = ::new (v72) SceneGraph("World", false, nullptr);
-    }
-    else {
-        pSceneGraph = nullptr;
-    }
+    pSceneGraph = new SceneGraph("World", false, nullptr);
     NiRefObject* v73 = (NiRefObject*)pSceneGraph;
     Main::spWorldRoot = static_cast<BSSceneGraph*>(pSceneGraph);
-    ShadowSceneNode* v70 = static_cast<ShadowSceneNode*>(NiMemObject::operator new(sizeof(ShadowSceneNode)));
-    if (v70) {
-        pshadowSceneNode = ::new (v70) ShadowSceneNode;
-    }
-    else {
-        pshadowSceneNode = nullptr;
-    }
+    pshadowSceneNode = new ShadowSceneNode;
     NiDX9Renderer* NIRenderer = Renderer::GetNIRenderer();
     BSShaderManager::SetRenderer(NIRenderer);
     BSShaderManager::SetDefaultShaderPath("data\\shaders\\");
@@ -1532,25 +1520,13 @@ void Main::InitSceneGraph() {
     BSShaderManager::spMainCamera = Main::spWorldRoot.m_pObject->GetCamera();
     SceneGraph* v32 = static_cast<SceneGraph*>(Main::spWorldRoot.m_pObject);
     v32->AttachChild(pshadowSceneNode, 1);
-    BSFogProperty* v68 = static_cast<BSFogProperty*>(NiMemObject::operator new(sizeof(BSFogProperty)));
-    if (v68) {
-        pFogProp = ::new (v68) BSFogProperty;
-    }
-    else {
-        pFogProp = nullptr;
-    }
+    pFogProp = new BSFogProperty;
     NiRefObject* v69 = (NiRefObject*)pFogProp;
     Main::spFog = pFogProp;
     Main::spFog.m_pObject->SetFog(true);
     Main::spFog.m_pObject->SetDepth(1.0f);
     BSShaderManager::SetFogProperty(0, Main::spFog.m_pObject);
-    BSMultiBoundNode* v66 = static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
-    if (v66) {
-        Sky_ = ::new (v66) BSMultiBoundNode;
-    }
-    else {
-        Sky_ = nullptr;
-    }
+    Sky_ = new BSMultiBoundNode;
     NiRefObject* v67 = (NiRefObject*)Sky_;
     Main::spSkyRoot = static_cast<NiNode*>(Sky_);
     static_cast<BSMultiBoundNode*>(Main::spSkyRoot.m_pObject)
@@ -1559,13 +1535,7 @@ void Main::InitSceneGraph() {
     Main::spSkyRoot.m_pObject->SetName("Sky");
     NiNode* a4 = Main::spSkyRoot.m_pObject;
     pshadowSceneNode->SetAt(0, a4);
-    NiNode* v63 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v63) {
-        v28 = ::new (v63) NiNode(0);
-    }
-    else {
-        v28 = nullptr;
-    }
+    v28 = new NiNode(0);
     NiRefObject* v64 = (NiRefObject*)v28;
     Main::spWeatherRoot = v28;
     Main::spWeatherRoot.m_pObject->SetAlwaysDraw(true);
@@ -1575,86 +1545,43 @@ void Main::InitSceneGraph() {
     pshadowSceneNode->SetAt(1u, a4a);
     Main::CreateMenuRootNode();
     Main::CreateMenuRootNode3D();
-    BSClearZNode* v60 = static_cast<BSClearZNode*>(NiMemObject::operator new(sizeof(BSClearZNode)));
-    if (v60) {
-        BSClearZNode_ = ::new (v60) BSClearZNode;
-    }
-    else {
-        BSClearZNode_ = nullptr;
-    }
+    BSClearZNode_ = new BSClearZNode;
     Main::pLandLOD = (NiNode*)BSClearZNode_;
     Main::pLandLOD->SetName("LODRoot");
     pshadowSceneNode->SetAt(2u, Main::pLandLOD);
-    NiNode* v57 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v57) {
-        plodnode = ::new (v57) NiNode(0);
-    }
-    else {
-        plodnode = nullptr;
-    }
+    plodnode = new NiNode(0);
     NiNode* plodnode_3 = plodnode;
     plodnode->SetAlwaysDraw(true);
     plodnode_3->SetFixedBound(true);
     plodnode_3->SetName("LandLOD");
     Main::pLandLOD->AttachChild(plodnode_3, 1);
     BSShaderManager::fLODLandDrop = fLODLandDropAmount.Float();
-    NiNode* v54 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v54) {
-        plodnode_2 = ::new (v54) NiNode(0);
-    }
-    else {
-        plodnode_2 = nullptr;
-    }
+    plodnode_2 = new NiNode(0);
     plodnode_3 = plodnode_2;
     plodnode_2->SetAlwaysDraw(true);
     plodnode_3->SetFixedBound(true);
     plodnode_3->SetName("DistantRefLOD");
     Main::pLandLOD->AttachChild(plodnode_3, 1);
-    NiNode* v51 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v51) {
-        WaterLOD = ::new (v51) NiNode(0);
-    }
-    else {
-        WaterLOD = nullptr;
-    }
+    WaterLOD = new NiNode(0);
     Main::pWaterLOD = WaterLOD;
     WaterLOD->SetAlwaysDraw(true);
     Main::pWaterLOD->SetFixedBound(true);
     Main::pWaterLOD->SetName("WaterLOD");
     Main::pLandLOD->AttachChild(Main::pWaterLOD, 1);
-    NiNode* v48 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v48) {
-        plodtreenode = ::new (v48) NiNode(0);
-    }
-    else {
-        plodtreenode = nullptr;
-    }
+    plodtreenode = new NiNode(0);
     plodtreenode->SetAlwaysDraw(true);
     plodtreenode->SetFixedBound(true);
     plodtreenode->SetName("LOD Trees");
     plodnode_3->AttachChild(plodtreenode, 1);
     DistantLODShaderProperty::SetLODTreeParent(plodtreenode);
     BGSTerrainManager::SetTreeNode(plodtreenode);
-    NiNode* v45 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (v45) {
-        ObjectLODRoot = ::new (v45) NiNode(0);
-    }
-    else {
-        ObjectLODRoot = nullptr;
-    }
+    ObjectLODRoot = new NiNode(0);
     Main::pObjectLOD = ObjectLODRoot;
     ObjectLODRoot->SetAlwaysDraw(true);
     Main::pObjectLOD->SetFixedBound(true);
     Main::pObjectLOD->SetName("ObjectLODRoot");
     pshadowSceneNode->SetAt(3u, Main::pObjectLOD);
-    BSParticleSystemManager* v42 =
-        static_cast<BSParticleSystemManager*>(NiMemObject::operator new(sizeof(BSParticleSystemManager)));
-    if (v42) {
-        BSParticleSystemManager_ = ::new (v42) BSParticleSystemManager;
-    }
-    else {
-        BSParticleSystemManager_ = nullptr;
-    }
+    BSParticleSystemManager_ = new BSParticleSystemManager;
     NiRefObject* v43 = (NiRefObject*)BSParticleSystemManager_;
     Main::spParticleSystemManager = BSParticleSystemManager_;
     Main::spParticleSystemManager.m_pObject->SetName("Master Particle Systems");
@@ -1672,45 +1599,16 @@ void Main::InitSceneGraph() {
         NiTexturingProperty* ptexprop;
         NiMaterialProperty* pmatprop;
         NiScreenElements* pScreenElements;
-        NiScreenElements* v40 = static_cast<NiScreenElements*>(NiMemObject::operator new(sizeof(NiScreenElements)));
-        if (v40) {
-            NiScreenElementsData* NiScreenElementsData_;
-            NiScreenElementsData* v39 =
-                static_cast<NiScreenElementsData*>(NiMemObject::operator new(sizeof(NiScreenElementsData)));
-            if (v39) {
-                NiScreenElementsData_ = ::new (v39) NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1);
-            }
-            else {
-                NiScreenElementsData_ = nullptr;
-            }
-            pScreenElements = ::new (v40) NiScreenElements(NiScreenElementsData_);
-        }
-        else {
-            pScreenElements = nullptr;
-        }
+        pScreenElements = new NiScreenElements(new NiScreenElementsData(false, false, 1, 1, 1, 4, 1, 2, 1));
         Main::spMenuBGGeometry = pScreenElements;
         Main::spMenuBGGeometry.m_pObject->Insert(4, 0, nullptr);
         Main::spMenuBGGeometry.m_pObject->SetRectangle(0, 0.0f, 0.0f, 1.0f, 1.0f);
         Main::spMenuBGGeometry.m_pObject->UpdateBound();
         Main::spMenuBGGeometry.m_pObject->SetTextures(0, 0, 0.0f, 0.0f, 1.0f, 1.0f);
-        NiMaterialProperty* v38 =
-            static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-        if (v38) {
-            pmatprop = ::new (v38) NiMaterialProperty;
-        }
-        else {
-            pmatprop = nullptr;
-        }
+        pmatprop = new NiMaterialProperty;
         pmatprop->SetEmittance(NiColor_WHITE);
         Main::spMenuBGGeometry.m_pObject->AttachProperty(pmatprop);
-        NiTexturingProperty* v37 =
-            static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-        if (v37) {
-            ptexprop = ::new (v37) NiTexturingProperty;
-        }
-        else {
-            ptexprop = nullptr;
-        }
+        ptexprop = new NiTexturingProperty;
         NiRenderedTexture* Texture = Main::spMenuBGTexture.m_pObject->GetTexture(0);
         ptexprop->SetBaseTexture(Texture);
         ptexprop->SetBaseFilterMode(NiTexturingProperty::FILTER_NEAREST);
@@ -4100,14 +3998,7 @@ void Main::DrawWorld_MTRender1stPerson(
                 FORenderedMenu* v9 = Interface::GetCurrentRenderedMenu();
                 v9->GetScreenGeometry()->SetAppCulled(true);
             }
-            BSShaderAccumulator* v58 =
-                static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-            if (v58) {
-                pNewAccumulator = (void*)::new (v58) BSShaderAccumulator(99, 1u, 759u);
-            }
-            else {
-                pNewAccumulator = nullptr;
-            }
+            pNewAccumulator = new BSShaderAccumulator(99, 1u, 759u);
             NiRefObject* v59 = static_cast<NiRefObject*>(pNewAccumulator);
             NiPointer<BSShaderAccumulator> sptempaccum(static_cast<BSShaderAccumulator*>(pNewAccumulator));
             apCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
@@ -4602,14 +4493,12 @@ SceneGraph* Main::MenuRootNode3D() {
 }
 
 void Main::CreateMenuRootNode() {
-    void* pMemory = NiMemObject::operator new(sizeof(SceneGraph));
-    SceneGraph* pSceneGraph = pMemory ? ::new (pMemory) SceneGraph("Menu", true, nullptr) : nullptr;
+    SceneGraph* pSceneGraph = new SceneGraph("Menu", true, nullptr);
     spMenuRoot = pSceneGraph;
 }
 
 void Main::CreateMenuRootNode3D() {
-    void* pMemory = NiMemObject::operator new(sizeof(SceneGraph));
-    SceneGraph* pSceneGraph = pMemory ? ::new (pMemory) SceneGraph("3DMenu", false, nullptr) : nullptr;
+    SceneGraph* pSceneGraph = new SceneGraph("3DMenu", false, nullptr);
     sp3DMenuRoot = pSceneGraph;
 }
 
@@ -4631,8 +4520,7 @@ void Main::InitSky() {
     bool bSunbeams = bUseSunbeams.Bool();
     BSShaderManager::GetImageSpaceManager()->SetUseSunbeams(bSunbeams);
     if (bUseSunbeams.Bool()) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiStencilProperty));
-        NiStencilProperty* pStencil = pMemory ? ::new (pMemory) NiStencilProperty : nullptr;
+        NiStencilProperty* pStencil = new NiStencilProperty;
         pStencil->SetStencilOn(true);
         pStencil->SetStencilPassAction(NiStencilProperty::ACTION_REPLACE);
         pStencil->SetStencilReference(0xFF);

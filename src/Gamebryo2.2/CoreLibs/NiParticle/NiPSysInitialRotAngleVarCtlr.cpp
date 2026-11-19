@@ -73,10 +73,5 @@ void NiPSysInitialRotAngleVarCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysInitialRotAngleVarCtlr::CreateObject() {
-    NiPSysInitialRotAngleVarCtlr* v0 =
-        static_cast<NiPSysInitialRotAngleVarCtlr*>(NiMemObject::operator new(sizeof(NiPSysInitialRotAngleVarCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysInitialRotAngleVarCtlr;
+    return new NiPSysInitialRotAngleVarCtlr;
 }

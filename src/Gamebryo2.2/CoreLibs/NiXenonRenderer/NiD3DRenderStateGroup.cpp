@@ -332,8 +332,7 @@ void NiD3DRenderStateGroup::ReleaseRenderStateGroup(NiD3DRenderStateGroup* pkGro
             NiD3DRenderStateGroup::ms_pkRenderStateGroupPool->ReleaseObject(pkGroup);
         }
         else {
-            pkGroup->~NiD3DRenderStateGroup();
-            NiMemObject::operator delete(pkGroup, sizeof(NiD3DRenderStateGroup));
+            delete pkGroup;
         }
     }
 }

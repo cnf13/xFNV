@@ -476,9 +476,7 @@ NiD3DVertexShader* BSShader::CompileVertexShaderHLSL(
                 BSsprintf(acCreateError, 0x104, "SHADER ERROR : failed to create vertex shader : %s", acCacheFile);
                 return nullptr;
             }
-            void* pMemory = NiMemObject::operator new(sizeof(NiD3DVertexShader));
-            NiD3DVertexShader* pNew =
-                pMemory ? ::new (pMemory) NiD3DVertexShader(BSShaderManager::pRenderer.m_pObject) : nullptr;
+            NiD3DVertexShader* pNew = new NiD3DVertexShader(BSShaderManager::pRenderer.m_pObject);
             pVertexShader = pNew;
             pVertexShader->SetShaderHandle(pHandle);
         }
@@ -678,9 +676,7 @@ NiD3DPixelShader* BSShader::CompilePixelShaderHLSL(
                 BSsprintf(acCreateError, 0x104, "SHADER ERROR : failed to create pixel shader : %s", acCacheFile);
                 return nullptr;
             }
-            void* pMemory = NiMemObject::operator new(sizeof(NiD3DPixelShader));
-            NiD3DPixelShader* pNew =
-                pMemory ? ::new (pMemory) NiD3DPixelShader(BSShaderManager::pRenderer.m_pObject) : nullptr;
+            NiD3DPixelShader* pNew = new NiD3DPixelShader(BSShaderManager::pRenderer.m_pObject);
             pPixelShader = pNew;
             pPixelShader->SetShaderHandle(pHandle);
         }

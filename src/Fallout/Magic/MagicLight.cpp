@@ -90,13 +90,7 @@ void MagicLight::Init(uint32_t aiLightID, NiAVObject* apObj) {
     pLightObject = dynamic_cast<TESObjectLIGH*>(plightForm);
     if (pLightObject) {
         NiPointLight* v8;
-        NiPointLight* apMemory = static_cast<NiPointLight*>(NiMemObject::operator new(sizeof(NiPointLight)));
-        if (apMemory) {
-            v8 = ::new (apMemory) NiPointLight;
-        }
-        else {
-            v8 = nullptr;
-        }
+        v8 = new NiPointLight;
         LightData.spLight = static_cast<NiLight*>(v8);
         LightData.fWantDimmer = 1.0f;
         uint32_t ucolor = pLightObject->GetColor();

@@ -29,14 +29,7 @@ NiStencilProperty::NiStencilProperty() : m_uFlags(0), m_uiRef(0), m_uiMask(0xFFF
 // shared and only NiObject's members are copied onto itself.
 NiObject* NiStencilProperty::CreateClone(NiCloningProcess& kCloning) {
     if (m_spControllers) {
-        NiStencilProperty* pkClone =
-            static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-        if (pkClone) {
-            ::new (pkClone) NiStencilProperty;
-        }
-        else {
-            pkClone = nullptr;
-        }
+        NiStencilProperty* pkClone = new NiStencilProperty;
         NiProperty::CopyMembers(pkClone, kCloning);
         pkClone->m_uFlags = m_uFlags;
         pkClone->m_uiRef = m_uiRef;
@@ -221,14 +214,7 @@ char* NiStencilProperty::GetViewerString(const char* apcPrefix, DrawMode aeMode)
 
 // The engine's default stencil property. The previous default is released and the new one takes a reference.
 void NiStencilProperty::_SDMInit() {
-    NiStencilProperty* pkDefault =
-        static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-    if (pkDefault) {
-        ::new (pkDefault) NiStencilProperty;
-    }
-    else {
-        pkDefault = nullptr;
-    }
+    NiStencilProperty* pkDefault = new NiStencilProperty;
 
     ms_spDefault = pkDefault;
 }
@@ -240,9 +226,5 @@ void NiStencilProperty::_SDMShutdown() {
 }
 
 NiObject* NiStencilProperty::CreateObject() {
-    NiStencilProperty* pkObject = static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiStencilProperty;
+    return new NiStencilProperty;
 }

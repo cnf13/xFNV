@@ -72,10 +72,5 @@ void NiPSysEmitterInitialRadiusCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysEmitterInitialRadiusCtlr::CreateObject() {
-    NiPSysEmitterInitialRadiusCtlr* v0 =
-        static_cast<NiPSysEmitterInitialRadiusCtlr*>(NiMemObject::operator new(sizeof(NiPSysEmitterInitialRadiusCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysEmitterInitialRadiusCtlr;
+    return new NiPSysEmitterInitialRadiusCtlr;
 }

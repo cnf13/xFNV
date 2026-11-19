@@ -34,13 +34,7 @@ BSMultiBoundNode::~BSMultiBoundNode() {}
 
 NiObject* BSMultiBoundNode::CreateClone(NiCloningProcess& arCloneData) {
     BSMultiBoundNode* pobj;
-    BSMultiBoundNode* apMemory = static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
-    if (apMemory) {
-        pobj = ::new (apMemory) BSMultiBoundNode;
-    }
-    else {
-        pobj = nullptr;
-    }
+    pobj = new BSMultiBoundNode;
     CopyMembers(pobj, arCloneData);
     return pobj;
 }
@@ -253,12 +247,7 @@ bool BSMultiBoundNode::VisibleAgainstActiveOccluders(
 }
 
 NiObject* BSMultiBoundNode::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSMultiBoundNode));
-    if (apMemory) {
-        return ::new (apMemory) BSMultiBoundNode;
-    }
-
-    return nullptr;
+    return new BSMultiBoundNode;
 }
 
 BSMultiBoundNode* BSMultiBoundNode::FindMultiboundNode(NiAVObject* apObject) {

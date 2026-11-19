@@ -22,14 +22,7 @@ NiPSysColorModifier::NiPSysColorModifier()
 NiPSysColorModifier::~NiPSysColorModifier() {}
 
 NiObject* NiPSysColorModifier::CreateClone(NiCloningProcess& kCloning) {
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysColorModifier));
-    NiPSysColorModifier* v4 = static_cast<NiPSysColorModifier*>(v3);
-    if (v3) {
-        ::new (v3) NiPSysColorModifier;
-    }
-    else {
-        v4 = nullptr;
-    }
+    NiPSysColorModifier* v4 = new NiPSysColorModifier;
     NiPSysModifier::CopyMembers(v4, kCloning);
     v4->SetColorData(m_spColorData.m_pObject);
     return v4;
@@ -124,10 +117,5 @@ void NiPSysColorModifier::ResetKeyTimeExtrema() {
 }
 
 NiObject* NiPSysColorModifier::CreateObject() {
-    NiPSysColorModifier* pkObject =
-        static_cast<NiPSysColorModifier*>(NiMemObject::operator new(sizeof(NiPSysColorModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysColorModifier;
+    return new NiPSysColorModifier;
 }

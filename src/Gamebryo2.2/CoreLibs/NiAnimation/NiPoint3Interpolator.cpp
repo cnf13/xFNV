@@ -218,10 +218,5 @@ void NiPoint3Interpolator::CopyMembers(NiPoint3Interpolator* pkDest, NiCloningPr
 }
 
 NiObject* NiPoint3Interpolator::CreateObject() {
-    NiPoint3Interpolator* pkObject =
-        static_cast<NiPoint3Interpolator*>(NiMemObject::operator new(sizeof(NiPoint3Interpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
+    return new NiPoint3Interpolator(static_cast<NiPosData*>(nullptr));
 }

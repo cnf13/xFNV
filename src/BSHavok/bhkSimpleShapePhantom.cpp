@@ -48,11 +48,7 @@ NiObject* bhkSimpleShapePhantom::CreateClone(NiCloningProcess& arCloneData) {
 
     bhkSimpleShapePhantom* pClone = nullptr;
     bhkSerializable::CloneCritLock();
-    bhkSimpleShapePhantom* pObject =
-        static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-    if (pObject) {
-        pClone = ::new (pObject) bhkSimpleShapePhantom;
-    }
+    pClone = new bhkSimpleShapePhantom;
     bhkWorldObject::CopyMembers(pClone, arCloneData);
     bhkSerializable::CloneCritUnlock();
 
@@ -174,10 +170,5 @@ void bhkSimpleShapePhantom::GetFixedClosestPoints(hkpFixedBufferCdPointCollector
 // Creates the object a stream makes for this class: a 0x18-byte phantom from the default constructor, null when the
 // allocation fails.
 NiObject* bhkSimpleShapePhantom::CreateObject() {
-    bhkSimpleShapePhantom* pObject =
-        static_cast<bhkSimpleShapePhantom*>(NiMemObject::operator new(sizeof(bhkSimpleShapePhantom)));
-    if (pObject) {
-        return ::new (pObject) bhkSimpleShapePhantom;
-    }
-    return nullptr;
+    return new bhkSimpleShapePhantom;
 }

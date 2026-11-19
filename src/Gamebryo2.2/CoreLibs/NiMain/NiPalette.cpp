@@ -205,9 +205,5 @@ NiPalette& NiPalette::operator=(const NiPalette& kPal) {
 }
 
 NiObject* NiPalette::CreateObject() {
-    NiPalette* pkObject = static_cast<NiPalette*>(NiMemObject::operator new(sizeof(NiPalette)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPalette;
+    return new NiPalette;
 }

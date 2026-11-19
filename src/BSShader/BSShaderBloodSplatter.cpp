@@ -168,20 +168,12 @@ void BSShaderBloodSplatter::InitPass(uint32_t auiCurrentPass) {
 // and the flare offset scale) when they are missing.
 void BSShaderBloodSplatter::CreateConstantMaps() {
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("alpha", 0x10000007, 0, 0, 1, "", 0x10, 4, &Constant::Alpha, false);
     }
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -427,11 +419,7 @@ BSShader* BSShaderBloodSplatter::CreateShader() {
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->SetEntry(1u, 7u, NiShaderDeclaration::SHADERPARAM_NI_TEXCOORD0, NiShaderDeclaration::SPTYPE_FLOAT2, 0u);
     v1->GetD3DDeclaration();
-    BSShaderBloodSplatter* v2 =
-        static_cast<BSShaderBloodSplatter*>(NiMemObject::operator new(sizeof(BSShaderBloodSplatter)));
-    if (v2) {
-        v0 = ::new (v2) BSShaderBloodSplatter;
-    }
+    v0 = new BSShaderBloodSplatter;
     v0->Initialize();
     v0->LoadShaders();
     v0->LoadStagesAndPasses();

@@ -1770,13 +1770,7 @@ PathingAvoidNodeArray* CombatGroup::CreateMovementAvoidNodeArray(
             if (v29 > v10) {
                 if (!v26) {
                     PathingAvoidNodeArray* v15;
-                    void* apMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
-                    if (apMemory) {
-                        v15 = ::new (apMemory) PathingAvoidNodeArray;
-                    }
-                    else {
-                        v15 = nullptr;
-                    }
+                    v15 = new PathingAvoidNodeArray;
                     PathingAvoidNodeArray* v19 = v15;
                     v26 = v15;
                 }
@@ -1805,13 +1799,7 @@ CombatGroup::CreateFleeAvoidNodeArray(Actor* apActor, PathingAvoidNodeArray* apE
         if (v19 > DistanceSquared) {
             if (!v20) {
                 PathingAvoidNodeArray* v10;
-                void* apMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
-                if (apMemory) {
-                    v10 = ::new (apMemory) PathingAvoidNodeArray;
-                }
-                else {
-                    v10 = nullptr;
-                }
+                v10 = new PathingAvoidNodeArray;
                 PathingAvoidNodeArray* v14 = v10;
                 v20 = v10;
             }
@@ -2195,13 +2183,7 @@ PathingAvoidNodeArray* CombatGroup::CreateFlankingAvoidNodeArray(
     PathingAvoidNodeArray* pavoidNodeArray = apExistingAvoidNodeArray;
     if (!apExistingAvoidNodeArray) {
         PathingAvoidNodeArray* pavoidNodeArray_2;
-        void* apMemory = NiMemObject::operator new(sizeof(PathingAvoidNodeArray));
-        if (apMemory) {
-            pavoidNodeArray_2 = ::new (apMemory) PathingAvoidNodeArray;
-        }
-        else {
-            pavoidNodeArray_2 = nullptr;
-        }
+        pavoidNodeArray_2 = new PathingAvoidNodeArray;
         pavoidNodeArray = pavoidNodeArray_2;
     }
     float v7 = fMovementTargetAvoidCost.Float() * 4.0;
@@ -2361,15 +2343,7 @@ void CombatGroup::UpdateSearch() {
                             searchPathingCenter.SetLocationSimple(SearchCenter.Point);
                             if (!spPathingLOSGridMap.m_pObject) {
                                 PathingLOSGridMap* v8;
-                                PathingLOSGridMap* v13 = static_cast<PathingLOSGridMap*>(
-                                    NiMemObject::operator new(sizeof(PathingLOSGridMap))
-                                );
-                                if (v13) {
-                                    v8 = ::new (v13) PathingLOSGridMap;
-                                }
-                                else {
-                                    v8 = nullptr;
-                                }
+                                v8 = new PathingLOSGridMap;
                                 spPathingLOSGridMap = v8;
                             }
                             spPathingLOSGridMap.m_pObject->Initialize(searchPathingCenter, fSearchRadius);
@@ -2954,14 +2928,7 @@ void CombatGroup::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         apLoadGameBuffer->LoadData(&bhasPathingLOSGridMap, 1u);
         if (bhasPathingLOSGridMap) {
             PathingLOSGridMap* v6;
-            PathingLOSGridMap* v9 =
-                static_cast<PathingLOSGridMap*>(NiMemObject::operator new(sizeof(PathingLOSGridMap)));
-            if (v9) {
-                v6 = ::new (v9) PathingLOSGridMap;
-            }
-            else {
-                v6 = nullptr;
-            }
+            v6 = new PathingLOSGridMap;
             spPathingLOSGridMap = v6;
             spPathingLOSGridMap.m_pObject->LoadGame(apLoadGameBuffer);
         }
@@ -3059,13 +3026,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
             CombatGroupCluster* pCluster = ClusterArray[i];
             if (!spDebugGeometry.m_pObject) {
                 NiNode* pNode;
-                void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-                if (pMemory) {
-                    pNode = ::new (pMemory) NiNode(0);
-                }
-                else {
-                    pNode = nullptr;
-                }
+                pNode = new NiNode(0);
                 spDebugGeometry = pNode;
             }
             NiColorA kClusterColor(0.5f, 0.0f, 0.5f, 0.5f);
@@ -3101,13 +3062,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
     if (bDebugCombatGroups2.Bool()) {
         if (!spDebugGeometry.m_pObject) {
             NiNode* pNode;
-            NiNode* pMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            if (pMemory) {
-                pNode = ::new (pMemory) NiNode(0);
-            }
-            else {
-                pNode = nullptr;
-            }
+            pNode = new NiNode(0);
             spDebugGeometry = pNode;
         }
         uint32_t uiMemberCount = GetMemberCount();
@@ -3128,13 +3083,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
     if (bDebugCombatSearch.Bool() && pDebugActor) {
         if (!spDebugGeometry.m_pObject) {
             NiNode* pNode;
-            NiNode* pMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            if (pMemory) {
-                pNode = ::new (pMemory) NiNode(0);
-            }
-            else {
-                pNode = nullptr;
-            }
+            pNode = new NiNode(0);
             spDebugGeometry = pNode;
         }
         uint32_t uiNumSearchLocations = GetNumSearchLocations();
@@ -3198,13 +3147,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
     }
     if (spDebugGeometry.m_pObject) {
         NiAlphaProperty* pAlpha;
-        NiAlphaProperty* pMemory = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-        if (pMemory) {
-            pAlpha = ::new (pMemory) NiAlphaProperty;
-        }
-        else {
-            pAlpha = nullptr;
-        }
+        pAlpha = new NiAlphaProperty;
         pAlpha->SetAlphaBlending(true);
         spDebugGeometry.m_pObject->AttachProperty(pAlpha);
         AddNoLightingPropertyRecurse(spDebugGeometry.m_pObject);

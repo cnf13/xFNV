@@ -31,12 +31,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorHLSL::CreateVertexShaderFromFile(
     int32_t bSoftwareVP,
     int32_t bRecoverable
 ) {
-    NiD3DHLSLVertexShader* pkVertexShader =
-        static_cast<NiD3DHLSLVertexShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLVertexShader)));
+    NiD3DHLSLVertexShader* pkVertexShader = new NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkVertexShader) {
         return nullptr;
     }
-    ::new (pkVertexShader) NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     ID3DXConstantTable* pkConstantTable = nullptr;
@@ -87,12 +85,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorHLSL::CreateVertexShaderFromBuffer(
     int32_t bSoftwareVP,
     int32_t bRecoverable
 ) {
-    NiD3DHLSLVertexShader* pkVertexShader =
-        static_cast<NiD3DHLSLVertexShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLVertexShader)));
+    NiD3DHLSLVertexShader* pkVertexShader = new NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkVertexShader) {
         return nullptr;
     }
-    ::new (pkVertexShader) NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     ID3DXConstantTable* pkConstantTable = nullptr;
@@ -140,12 +136,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorHLSL::CreatePixelShaderFromFile(
     int32_t bRecoverable
 ) {
     IDirect3DPixelShader9* hShader;
-    NiD3DHLSLPixelShader* pkPixelShader =
-        static_cast<NiD3DHLSLPixelShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLPixelShader)));
+    NiD3DHLSLPixelShader* pkPixelShader = new NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkPixelShader) {
         return nullptr;
     }
-    ::new (pkPixelShader) NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uint32_t uiCodeSize = 0;
     void* pvCode = nullptr;
     ID3DXConstantTable* pkConstantTable = nullptr;
@@ -192,12 +186,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorHLSL::CreatePixelShaderFromBuffer(
     void* pvCode;
     ID3DXConstantTable* pkConstantTable;
     uint32_t uiCodeSize;
-    NiD3DHLSLPixelShader* pkPixelShader =
-        static_cast<NiD3DHLSLPixelShader*>(NiMemObject::operator new(sizeof(NiD3DHLSLPixelShader)));
+    NiD3DHLSLPixelShader* pkPixelShader = new NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     if (!pkPixelShader) {
         return nullptr;
     }
-    ::new (pkPixelShader) NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
     uiCodeSize = 0;
     pvCode = nullptr;
     pkConstantTable = nullptr;
@@ -309,12 +301,10 @@ NiD3DVertexShader* NiD3DShaderProgramCreatorHLSL::CreateVertexShaderFromD3DXBuff
     int32_t bSoftwareVP,
     int32_t bRecoverable
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiD3DHLSLVertexShader));
-    if (!pvMemory) {
+    NiD3DHLSLVertexShader* pkShader = new NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+    if (!pkShader) {
         return nullptr;
     }
-    NiD3DHLSLVertexShader* pkShader =
-        ::new (pvMemory) NiD3DHLSLVertexShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
 
     ID3DXConstantTable* pkConstantTable = nullptr;
     if (D3DXGetShaderConstantTable_Thunk(static_cast<const uint32_t*>(pkBuffer->GetBufferPointer()), &pkConstantTable) <
@@ -367,11 +357,10 @@ NiD3DPixelShader* NiD3DShaderProgramCreatorHLSL::CreatePixelShaderFromD3DXBuffer
     const char* pcShaderTarget,
     int32_t bRecoverable
 ) {
-    void* pvMemory = NiMemObject::operator new(sizeof(NiD3DHLSLPixelShader));
-    if (!pvMemory) {
+    NiD3DHLSLPixelShader* pkShader = new NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
+    if (!pkShader) {
         return nullptr;
     }
-    NiD3DHLSLPixelShader* pkShader = ::new (pvMemory) NiD3DHLSLPixelShader(NiD3DShaderProgramCreator::ms_pkD3DRenderer);
 
     ID3DXConstantTable* pkConstantTable = nullptr;
     if (D3DXGetShaderConstantTable_Thunk(static_cast<const uint32_t*>(pkBuffer->GetBufferPointer()), &pkConstantTable) <

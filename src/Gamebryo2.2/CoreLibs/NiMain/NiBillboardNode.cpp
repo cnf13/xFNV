@@ -31,14 +31,7 @@ const NiRTTI* NiBillboardNode::GetRTTI() const {
 }
 
 NiObject* NiBillboardNode::CreateClone(NiCloningProcess& kCloning) {
-    NiBillboardNode* pkObject = static_cast<NiBillboardNode*>(NiMemObject::operator new(sizeof(NiBillboardNode)));
-    NiBillboardNode* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBillboardNode;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiBillboardNode* pkObject_2 = new NiBillboardNode;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->NiBillboardNode::m_uFlags = NiBillboardNode::m_uFlags;
     return pkObject_2;
@@ -507,9 +500,5 @@ char* NiBillboardNode::GetViewerString(const char* pcPrefix, FaceMode eMode) {
 }
 
 NiObject* NiBillboardNode::CreateObject() {
-    NiBillboardNode* pkObject = static_cast<NiBillboardNode*>(NiMemObject::operator new(sizeof(NiBillboardNode)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBillboardNode;
+    return new NiBillboardNode;
 }

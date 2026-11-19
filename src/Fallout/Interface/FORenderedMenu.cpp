@@ -295,14 +295,7 @@ bool FORenderedMenu::Pick(bool abPressed, float* apX, float* apY) {
 
 void FORenderedMenu::Initialize() {
     BSShaderAccumulator* v2;
-    BSShaderAccumulator* apMemory =
-        static_cast<BSShaderAccumulator*>(NiMemObject::operator new(sizeof(BSShaderAccumulator)));
-    if (apMemory) {
-        v2 = ::new (apMemory) BSShaderAccumulator(100, 1u, 759u);
-    }
-    else {
-        v2 = nullptr;
-    }
+    v2 = new BSShaderAccumulator(100, 1u, 759u);
     spAccumulator = static_cast<NiRefObject*>(v2);
     static_cast<BSShaderAccumulator*>(spAccumulator.m_pObject)
         ->BSShaderAccumulator::SetRenderMode(BSShaderManager::BSSM_RENDER_INTERFACE);
@@ -570,8 +563,7 @@ void FORenderedMenu::PrepareGeometry(NiGeometry* apGeometry) {
     noLightingProperty->SetBaseMap(defaultTexture);
 
     if (!apGeometry->GetProperty(NiProperty::ALPHA)) {
-        void* memory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-        NiAlphaProperty* alphaProperty = memory ? ::new (memory) NiAlphaProperty : nullptr;
+        NiAlphaProperty* alphaProperty = new NiAlphaProperty;
         alphaProperty->SetAlphaBlending(false);
         alphaProperty->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
         alphaProperty->SetDestBlendMode(NiAlphaProperty::ALPHA_ONE);
@@ -670,13 +662,7 @@ bool FORenderedMenu::CreateMenuLight(const char* apLightNodeName, ShadowSceneNod
         }
         if (plightNode) {
             NiPointLight* v9;
-            void* apMemory = NiMemObject::operator new(sizeof(NiPointLight));
-            if (apMemory) {
-                v9 = ::new (apMemory) NiPointLight;
-            }
-            else {
-                v9 = nullptr;
-            }
+            v9 = new NiPointLight;
             spLight = static_cast<NiRefObject*>(v9);
             NiPoint3 lightpos = plightNode->GetTranslate();
             static_cast<NiAVObject*>(spLight.m_pObject)->NiAVObject::SetTranslate(lightpos);

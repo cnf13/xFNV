@@ -385,14 +385,7 @@ BSRenderedTexture* BSTextureManager::CreateRenderedTexture(
     if ((v17 & 16) != 0) {
         NiRenderedCubeMap* pcm = NiRenderedCubeMap::Create(uisafeWidth, BSShaderManager::pRenderer.m_pObject, pformat);
         if (pcm) {
-            BSRenderedTexture* v19 =
-                static_cast<BSRenderedTexture*>(NiMemObject::operator new(sizeof(BSRenderedTexture)));
-            if (v19) {
-                prenTexture = ::new (v19) BSRenderedTexture(pcm, 1, psharedDepthBuffer);
-            }
-            else {
-                prenTexture = nullptr;
-            }
+            prenTexture = new BSRenderedTexture(pcm, 1, psharedDepthBuffer);
         }
     }
     else {

@@ -63,23 +63,10 @@ NiGeometry* MakeRectangle(float afDrawSize, NiColorA* aColor, bool abWithNoLight
         plineclrs[i] = *aColor;
         plineconn[i] = 1;
     }
-    NiLines* v16 = static_cast<NiLines*>(NiMemObject::operator new(sizeof(NiLines)));
-    if (v16) {
-        plines = ::new (v16) NiLines(4, plineverts, plineclrs, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, plineconn);
-    }
-    else {
-        plines = nullptr;
-    }
+    plines = new NiLines(4, plineverts, plineclrs, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, plineconn);
     if (abWithNoLightingProp) {
         BSShaderNoLightingProperty* pshprop;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            pshprop = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            pshprop = nullptr;
-        }
+        pshprop = new BSShaderNoLightingProperty;
         NiProperty* pkProperty = pshprop;
         plines->AttachProperty(pshprop);
         BSShaderManager::PrepareObject(plines, 0, 0);

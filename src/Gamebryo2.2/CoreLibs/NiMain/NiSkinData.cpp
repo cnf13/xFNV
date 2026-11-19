@@ -257,9 +257,5 @@ void NiSkinData::ComputeBoneBounds(const NiPoint3* pkVerts) {
 
 // The default constructor: no bones, no partition; the bone count and root transform are left as allocated.
 NiObject* NiSkinData::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiSkinData));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSkinData;
+    return new NiSkinData;
 }

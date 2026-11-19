@@ -762,8 +762,7 @@ void LoveTesterMenu::InitMachine() {
     NiNode* pDynamicNode = pInstance->pDynamicGeometry->IsNode();
     ShadowSceneNode* pScene = BSShaderManager::GetShadowSceneNode(BSShaderManager::BSSM_SSN_MENU_OBJECT_3D);
     if (!pScene->AddAllLightsFromNode_Recurse(pDynamicNode, fRadius)) {
-        void* pLightMemory = NiMemObject::operator new(sizeof(NiPointLight));
-        NiPointLight* pLight = pLightMemory ? ::new (pLightMemory) NiPointLight : nullptr;
+        NiPointLight* pLight = new NiPointLight;
         NiPoint3 kTranslate;
         pLight->SetTranslate(*::new (&kTranslate) NiPoint3(0.0f, 0.0f, 0.0f));
         pLight->SetDiffuseColor(NiColor(0.85f, 0.85f, 0.85f));
@@ -1075,13 +1074,7 @@ NiCamera* LoveTesterMenu::SetupCamera() {
     NiPoint3 v12;
     NiPoint3 dst;
     NiRect<float> a2;
-    void* apMemory = NiMemObject::operator new(sizeof(NiCamera));
-    if (apMemory) {
-        v10 = ::new (apMemory) NiCamera;
-    }
-    else {
-        v10 = nullptr;
-    }
+    v10 = new NiCamera;
     ::new (&a2) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     if (BSShaderManager::bLetterbox) {
         a2 = BSShaderManager::kFramebufferViewport;

@@ -84,10 +84,5 @@ void NiPSysAirFieldAirFrictionCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysAirFieldAirFrictionCtlr::CreateObject() {
-    NiPSysAirFieldAirFrictionCtlr* v0 =
-        static_cast<NiPSysAirFieldAirFrictionCtlr*>(NiMemObject::operator new(sizeof(NiPSysAirFieldAirFrictionCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysAirFieldAirFrictionCtlr;
+    return new NiPSysAirFieldAirFrictionCtlr;
 }

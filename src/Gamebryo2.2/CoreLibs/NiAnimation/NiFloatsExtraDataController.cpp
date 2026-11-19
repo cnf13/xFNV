@@ -33,11 +33,7 @@ const NiRTTI* NiFloatsExtraDataController::GetRTTI() const {
 }
 
 NiObject* NiFloatsExtraDataController::CreateClone(NiCloningProcess& kCloning) {
-    void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
-    NiFloatsExtraDataController* pkObject_2 = nullptr;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiFloatsExtraDataController;
-    }
+    NiFloatsExtraDataController* pkObject_2 = new NiFloatsExtraDataController;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_iFloatsExtraDataIndex = m_iFloatsExtraDataIndex;
     return pkObject_2;
@@ -57,8 +53,7 @@ void NiFloatsExtraDataController::LinkObject(NiStream& kStream) {
     NiExtraDataController::LinkObject(kStream);
     if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
         NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        void* pvMem = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-        NiFloatInterpolator* pkInterp = pvMem ? ::new (pvMem) NiFloatInterpolator(pkData) : nullptr;
+        NiFloatInterpolator* pkInterp = new NiFloatInterpolator(pkData);
         m_spInterpolator = pkInterp;
         m_spInterpolator->Collapse();
     }
@@ -123,12 +118,9 @@ const char* NiFloatsExtraDataController::GetCtlrID() {
 }
 
 NiInterpolator* NiFloatsExtraDataController::CreatePoseInterpolator(uint16_t usIndex) {
-    void* v3 = NiMemObject::operator new(sizeof(NiFloatInterpolator));
-    if (!v3) {
-        return nullptr;
-    }
-    float v5 = static_cast<NiFloatsExtraData*>(m_spExtraData.m_pObject)->GetValue(m_iFloatsExtraDataIndex);
-    return ::new (v3) NiFloatInterpolator(v5);
+    return new NiFloatInterpolator(
+        static_cast<NiFloatsExtraData*>(m_spExtraData.m_pObject)->GetValue(m_iFloatsExtraDataIndex)
+    );
 }
 
 // apInterp must be a NiFloatInterpolator; the extra data is not null-checked.
@@ -149,8 +141,7 @@ NiBlendInterpolator* NiFloatsExtraDataController::CreateBlendInterpolator(
     float fWeightThreshold,
     int32_t ucArraySize
 ) const {
-    void* pvMem = NiMemObject::operator new(sizeof(NiBlendFloatInterpolator));
-    return pvMem ? ::new (pvMem) NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize) : nullptr;
+    return new NiBlendFloatInterpolator(bManagerControlled, fWeightThreshold, ucArraySize);
 }
 
 bool NiFloatsExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkInterpolator, uint16_t) const {
@@ -158,9 +149,5 @@ bool NiFloatsExtraDataController::InterpolatorIsCorrectType(NiInterpolator* pkIn
 }
 
 NiObject* NiFloatsExtraDataController::CreateObject() {
-    void* pkObject = NiMemObject::operator new(sizeof(NiFloatsExtraDataController));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiFloatsExtraDataController;
+    return new NiFloatsExtraDataController;
 }

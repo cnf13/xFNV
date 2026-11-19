@@ -97,8 +97,7 @@ uint32_t NiD3DShaderInterface::InitializeShaderSystem(NiDX9Renderer* pkD3DRender
 
     if (!NiD3DShaderProgramFactory::ms_pkFactory) {
         // 0x1C: the size of NiD3DShaderProgramFactory
-        void* pvMemory = NiMemObject::operator new(sizeof(NiD3DShaderProgramFactory));
-        NiD3DShaderProgramFactory::ms_pkFactory = pvMemory ? ::new (pvMemory) NiD3DShaderProgramFactory : nullptr;
+        NiD3DShaderProgramFactory::ms_pkFactory = new NiD3DShaderProgramFactory;
     }
     return 0;
 }

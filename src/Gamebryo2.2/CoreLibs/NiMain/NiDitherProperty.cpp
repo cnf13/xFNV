@@ -18,14 +18,7 @@ NiDitherProperty::NiDitherProperty() : m_uFlags(0) {}
 NiDitherProperty::~NiDitherProperty() {}
 
 NiObject* NiDitherProperty::CreateClone(NiCloningProcess& kCloning) {
-    NiDitherProperty* pkObject = static_cast<NiDitherProperty*>(NiMemObject::operator new(sizeof(NiDitherProperty)));
-    NiDitherProperty* pkObject_2 = pkObject;
-    if (pkObject) {
-        pkObject_2 = ::new (pkObject) NiDitherProperty;
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiDitherProperty* pkObject_2 = new NiDitherProperty;
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_uFlags = m_uFlags;
     return pkObject_2;
@@ -70,9 +63,5 @@ void NiDitherProperty::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 }
 
 NiObject* NiDitherProperty::CreateObject() {
-    NiDitherProperty* pkObject = static_cast<NiDitherProperty*>(NiMemObject::operator new(sizeof(NiDitherProperty)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiDitherProperty;
+    return new NiDitherProperty;
 }

@@ -27,13 +27,7 @@ NiPSysDragModifier::~NiPSysDragModifier() {}
 
 NiObject* NiPSysDragModifier::CreateClone(NiCloningProcess& kCloning) {
     NiPSysDragModifier* v4;
-    void* v3 = NiMemObject::operator new(sizeof(NiPSysDragModifier));
-    if (v3) {
-        v4 = ::new (v3) NiPSysDragModifier;
-    }
-    else {
-        v4 = nullptr;
-    }
+    v4 = new NiPSysDragModifier;
     NiPSysModifier::CopyMembers(v4, kCloning);
     v4->m_kDragAxis.x = m_kDragAxis.x;
     v4->m_kDragAxis.y = m_kDragAxis.y;
@@ -183,10 +177,5 @@ void NiPSysDragModifier::Update(float fTime, NiPSysData* pkData) {
 }
 
 NiObject* NiPSysDragModifier::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiPSysDragModifier));
-    if (v0) {
-        return ::new (v0) NiPSysDragModifier;
-    }
-
-    return nullptr;
+    return new NiPSysDragModifier;
 }

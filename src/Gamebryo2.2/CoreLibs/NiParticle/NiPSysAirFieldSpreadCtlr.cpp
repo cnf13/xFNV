@@ -80,10 +80,5 @@ void NiPSysAirFieldSpreadCtlr::SetTargetFloatValue(float fValue) {
 }
 
 NiObject* NiPSysAirFieldSpreadCtlr::CreateObject() {
-    NiPSysAirFieldSpreadCtlr* v0 =
-        static_cast<NiPSysAirFieldSpreadCtlr*>(NiMemObject::operator new(sizeof(NiPSysAirFieldSpreadCtlr)));
-    if (!v0) {
-        return nullptr;
-    }
-    return ::new (v0) NiPSysAirFieldSpreadCtlr;
+    return new NiPSysAirFieldSpreadCtlr;
 }

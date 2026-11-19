@@ -76,13 +76,7 @@ bool NiShaderFactory::RegisterGlobalShaderConstant(
         }
     }
 LABEL_6:;
-    NiGlobalConstantEntry* v6 =
-        static_cast<NiGlobalConstantEntry*>(NiMemObject::operator new(sizeof(NiGlobalConstantEntry)));
-    if (!v6) {
-        return false;
-    }
-    NiGlobalConstantEntry* pkEntry =
-        ::new (v6) NiGlobalConstantEntry(kKey.GetHandle(), eType, uiDataSize, pvInitialData);
+    NiGlobalConstantEntry* pkEntry = new NiGlobalConstantEntry(kKey.GetHandle(), eType, uiDataSize, pvInitialData);
     if (!pkEntry) {
         return false;
     }

@@ -33,13 +33,7 @@ BSTextureData::~BSTextureData() {}
 
 NiObject* BSTextureData::CreateClone(NiCloningProcess& kCloning) {
     BSTextureData* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSTextureData));
-    if (v5) {
-        v3 = ::new (v5) BSTextureData;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSTextureData;
     CopyMembers(v3, kCloning);
     return v3;
 }
@@ -124,12 +118,7 @@ void BSTextureData::InitSDM() {
 }
 
 NiObject* BSTextureData::CreateObject() {
-    void* v2 = NiMemObject::operator new(sizeof(BSTextureData));
-    if (v2) {
-        return ::new (v2) BSTextureData;
-    }
-
-    return nullptr;
+    return new BSTextureData;
 }
 
 void BSTextureData::KillSDM() {

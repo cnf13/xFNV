@@ -16,11 +16,7 @@ NiPointer<NiZBufferProperty> NiZBufferProperty::ms_spDefault;
 // the members through NiProperty::CopyMembers (which leaves the flags alone) and then takes this object's flags.
 NiObject* NiZBufferProperty::CreateClone(NiCloningProcess& kCloning) {
     if (m_spControllers) {
-        NiZBufferProperty* pkClone =
-            static_cast<NiZBufferProperty*>(NiMemObject::operator new(sizeof(NiZBufferProperty)));
-        if (pkClone) {
-            ::new (pkClone) NiZBufferProperty;
-        }
+        NiZBufferProperty* pkClone = new NiZBufferProperty;
         NiProperty::CopyMembers(pkClone, kCloning);
         pkClone->m_uFlags = m_uFlags;
         return pkClone;

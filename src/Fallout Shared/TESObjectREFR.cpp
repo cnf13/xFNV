@@ -5094,13 +5094,7 @@ void TESObjectREFR::SetActivateLine(bool abShow) {
                     );
                     if (!v29) {
                         NiNode* v5;
-                        void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-                        if (apMemory) {
-                            v5 = ::new (apMemory) NiNode(0);
-                        }
-                        else {
-                            v5 = nullptr;
-                        }
+                        v5 = new NiNode(0);
                         NiNode* v12 = v5;
                         v29 = v5;
                         v29->SetName("ActivateLine");
@@ -5801,14 +5795,7 @@ bool TESObjectREFR::UpdateMultiboundShapeTransformsRecursive(NiAVObject* apObjec
         if (brotated) {
             BSMultiBoundOBB* pobb_2;
             paabb = nullptr;
-            BSMultiBoundOBB* apMemory =
-                static_cast<BSMultiBoundOBB*>(NiMemObject::operator new(sizeof(BSMultiBoundOBB)));
-            if (apMemory) {
-                pobb_2 = ::new (apMemory) BSMultiBoundOBB;
-            }
-            else {
-                pobb_2 = nullptr;
-            }
+            pobb_2 = new BSMultiBoundOBB;
             pobb = pobb_2;
             const NiTransform* a1 = &pmbnode->GetWorldTransform();
             pobb->SetAxis(a1->m_Rotate);
@@ -8335,13 +8322,7 @@ void TESObjectREFR::UpdateAddonNodeSoundsRecursive(NiAVObject* apRoot, bool abDe
                     if (!spsoundHandleExtra.m_pObject) {
                         uint32_t isoundFlags;
                         BGSAddonNodeSoundHandleExtra* v13;
-                        void* apMemory = NiMemObject::operator new(sizeof(BGSAddonNodeSoundHandleExtra));
-                        if (apMemory) {
-                            v13 = ::new (apMemory) BGSAddonNodeSoundHandleExtra;
-                        }
-                        else {
-                            v13 = nullptr;
-                        }
+                        v13 = new BGSAddonNodeSoundHandleExtra;
                         spsoundHandleExtra = v13;
                         if (TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags)) {
                             isoundFlags = TESSound::ConvertLoopFlag(paddonNode->pSound->GetData().iFlags) |
@@ -9030,15 +9011,12 @@ void TESObjectREFR::InitHavokForPlaceableWater() {
         kInfo.SetPosition(kPosition);
         kInfo.SetRotation(kRotation);
         kInfo.m_collisionFilterInfo = 0x50000 | L_WATER;
-        pMemory = NiMemObject::operator new(sizeof(bhkRigidBody));
-        bhkRigidBody* pBody = pMemory ? ::new (pMemory) bhkRigidBody(kInfo) : nullptr;
-        pMemory = NiMemObject::operator new(sizeof(bhkCollisionObject));
-        bhkCollisionObject* pCollisionObject = pMemory ? ::new (pMemory) bhkCollisionObject(Get3D()) : nullptr;
+        bhkRigidBody* pBody = new bhkRigidBody(kInfo);
+        bhkCollisionObject* pCollisionObject = new bhkCollisionObject(Get3D());
         const NiFixedString* pTag = &BSXFlags::Tag();
         BSXFlags* pFlags = static_cast<BSXFlags*>(Get3D()->GetExtraData(*pTag));
         if (!pFlags) {
-            pMemory = NiMemObject::operator new(sizeof(BSXFlags));
-            pFlags = pMemory ? ::new (pMemory) BSXFlags : nullptr;
+            pFlags = new BSXFlags;
             Get3D()->AddExtraData(pFlags);
         }
         pFlags->SetFlags(BSXFlags::HAVOK, true);
@@ -9083,15 +9061,12 @@ void TESObjectREFR::InitHavokForPlaceableWater() {
     kInfo.SetPosition(kPosition);
     kInfo.SetRotation(kRotation);
     kInfo.m_collisionFilterInfo = 0x50000 | L_WATER;
-    pMemory = NiMemObject::operator new(sizeof(bhkRigidBody));
-    bhkRigidBody* pBody = pMemory ? ::new (pMemory) bhkRigidBody(kInfo) : nullptr;
-    pMemory = NiMemObject::operator new(sizeof(bhkCollisionObject));
-    bhkCollisionObject* pNewCollisionObject = pMemory ? ::new (pMemory) bhkCollisionObject(Get3D()) : nullptr;
+    bhkRigidBody* pBody = new bhkRigidBody(kInfo);
+    bhkCollisionObject* pNewCollisionObject = new bhkCollisionObject(Get3D());
     const NiFixedString* pTag = &BSXFlags::Tag();
     BSXFlags* pFlags = static_cast<BSXFlags*>(Get3D()->GetExtraData(*pTag));
     if (!pFlags) {
-        pMemory = NiMemObject::operator new(sizeof(BSXFlags));
-        pFlags = pMemory ? ::new (pMemory) BSXFlags : nullptr;
+        pFlags = new BSXFlags;
         Get3D()->AddExtraData(pFlags);
     }
     pFlags->SetFlags(BSXFlags::HAVOK, true);
@@ -9140,13 +9115,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                 bhkShape* pshape_3;
                 NiPoint3* Radii = ::new (&v36) NiPoint3(pprim->GetRadii());
                 NI2HK(hkvec, *Radii);
-                bhkBoxShape* v35 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-                if (v35) {
-                    pshape_3 = ::new (v35) bhkBoxShape(hkvec);
-                }
-                else {
-                    pshape_3 = nullptr;
-                }
+                pshape_3 = new bhkBoxShape(hkvec);
                 pshape = pshape_3;
                 break;
             }
@@ -9168,13 +9137,7 @@ void TESObjectREFR::InitHavokForCollisionObject() {
                 NiPoint3 halfextents = pprim->GetRadii();
                 halfextents.y = 0.01f;
                 NI2HK(hkvec, halfextents);
-                bhkBoxShape* v39 = static_cast<bhkBoxShape*>(NiMemObject::operator new(sizeof(bhkBoxShape)));
-                if (v39) {
-                    pshape_2 = ::new (v39) bhkBoxShape(hkvec);
-                }
-                else {
-                    pshape_2 = nullptr;
-                }
+                pshape_2 = new bhkBoxShape(hkvec);
                 pshape = pshape_2;
                 break;
             }
@@ -9192,23 +9155,11 @@ void TESObjectREFR::InitHavokForCollisionObject() {
         ifilterset |= elayer;
         info.SetCollisionFilter(ifilterset);
         info.SetMotionType(hkpMotion::MOTION_FIXED);
-        BSXFlags* v23 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
-        if (v23) {
-            pflags = ::new (v23) BSXFlags;
-        }
-        else {
-            pflags = nullptr;
-        }
+        pflags = new BSXFlags;
         pflags->SetFlags(2u, true);
         NiNode* v5 = this->Get3D();
         v5->AddExtraData(pflags);
-        bhkRigidBody* v19 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-        if (v19) {
-            prb = ::new (v19) bhkRigidBody(info);
-        }
-        else {
-            prb = nullptr;
-        }
+        prb = new bhkRigidBody(info);
         hkrot.~hkQuaternion();
         ::new (&hkrot) hkQuaternion;
         NiNode* v6 = this->Get3D();
@@ -9313,13 +9264,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
         info.SetPosition(v17);
         info.SetRotation(hkquat);
         info.m_collisionFilterInfo = 0x50015;
-        bhkRigidBody* v14 = static_cast<bhkRigidBody*>(NiMemObject::operator new(sizeof(bhkRigidBody)));
-        if (v14) {
-            rigidBody = ::new (v14) bhkRigidBody(info);
-        }
-        else {
-            rigidBody = nullptr;
-        }
+        rigidBody = new bhkRigidBody(info);
         bhkCollisionObject* v12 =
             static_cast<bhkCollisionObject*>(NiMemObject::operator new(sizeof(bhkCollisionObject)));
         if (v12) {
@@ -9329,13 +9274,7 @@ void TESObjectREFR::InitHavokForAcousticSpace() {
         else {
             pcollobj = nullptr;
         }
-        BSXFlags* v10 = static_cast<BSXFlags*>(NiMemObject::operator new(sizeof(BSXFlags)));
-        if (v10) {
-            pflags = ::new (v10) BSXFlags;
-        }
-        else {
-            pflags = nullptr;
-        }
+        pflags = new BSXFlags;
         pflags->SetFlags(2u, true);
         NiNode* v7 = this->Get3D();
         v7->AddExtraData(pflags);
@@ -9393,36 +9332,28 @@ void TESObjectREFR::InitHavokForPrimitiveTrigger() {
         kInfo.aabb.m_min = kHavokPoint;
         kInfo.m_broadPhaseType = hkpWorldObject::BROAD_PHASE_PHANTOM;
         kInfo.m_collisionFilterInfo = 0x50000 | eLayer;
-        void* pMemory = NiMemObject::operator new(sizeof(bhkAabbPhantom));
-        bhkAabbPhantom* pPhantom = pMemory ? ::new (pMemory) bhkAabbPhantom(kInfo) : nullptr;
+        bhkAabbPhantom* pPhantom = new bhkAabbPhantom(kInfo);
         pLoadedData->spPhantom = static_cast<bhkSimpleShapePhantom*>(static_cast<bhkPhantom*>(pPhantom));
         kInfo.~hkAabbPhantomCinfo();
     }
     else {
         if (pPrimitive->GetType() == BGSPrimitive::PRIMITIVE_BOX) {
             NI2HK(kExtents, pPrimitive->GetRadii());
-            void* pMemory = NiMemObject::operator new(sizeof(bhkBoxShape));
-            pShape = pMemory ? ::new (pMemory) bhkBoxShape(kExtents) : nullptr;
+            pShape = new bhkBoxShape(kExtents);
         }
         if (pPrimitive->GetType() == BGSPrimitive::PRIMITIVE_SPHERE) {
-            void* pMemory = NiMemObject::operator new(sizeof(bhkSphereShape));
-            pShape = pMemory ? ::new (pMemory) bhkSphereShape(NI2HK(pPrimitive->GetRadii().x), false) : nullptr;
+            pShape = new bhkSphereShape(NI2HK(pPrimitive->GetRadii().x), false);
         }
         hkSimpleShapePhantomCinfo kInfo;
         kInfo.m_shape = pShape->Gethk();
         kInfo.m_broadPhaseType = hkpWorldObject::BROAD_PHASE_PHANTOM;
         kInfo.m_collisionFilterInfo = 0x50000 | eLayer;
-        void* pMemory = NiMemObject::operator new(sizeof(bhkSimpleShapePhantom));
-        bhkSimpleShapePhantom* pPhantom = pMemory ? ::new (pMemory) bhkSimpleShapePhantom(kInfo) : nullptr;
+        bhkSimpleShapePhantom* pPhantom = new bhkSimpleShapePhantom(kInfo);
         pPhantom->SetTransform(kTransform);
         pLoadedData->spPhantom = pPhantom;
     }
-    void* pMemory = NiMemObject::operator new(sizeof(bhkCollisionObject));
-    if (pMemory) {
-        ::new (pMemory) bhkCollisionObject(Get3D());
-    }
-    pMemory = NiMemObject::operator new(sizeof(BSXFlags));
-    BSXFlags* pFlags = pMemory ? ::new (pMemory) BSXFlags : nullptr;
+    new bhkCollisionObject(Get3D());
+    BSXFlags* pFlags = new BSXFlags;
     pFlags->SetFlags(BSXFlags::HAVOK, true);
     Get3D()->AddExtraData(pFlags);
     NiNode* p3D = Get3D();
@@ -12138,14 +12069,7 @@ void TESObjectREFR::TransChangeCallback(bhkNiCollisionObject* apCollision, uint3
 void TESObjectREFR::DebugDisplayCallback(NiGeometry* ap3D, const NiColor& color) {
     if (ap3D) {
         BSShaderNoLightingProperty* v2;
-        BSShaderNoLightingProperty* apMemory =
-            static_cast<BSShaderNoLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderNoLightingProperty)));
-        if (apMemory) {
-            v2 = ::new (apMemory) BSShaderNoLightingProperty;
-        }
-        else {
-            v2 = nullptr;
-        }
+        v2 = new BSShaderNoLightingProperty;
         v2->SetFlag(48u, 1);
         ap3D->AttachProperty(v2);
         BSShaderManager::PrepareObject(ap3D, 0, 0);
@@ -12655,8 +12579,7 @@ void NiNode::DetachAllChildren() {
 // check DIFFs on it, checkbody 29d4f0babe86).
 void NiNode::SetWireframe(NiNode* apNode) {
     if (apNode) {
-        void* pMemory = NiMemObject::operator new(sizeof(BSShaderNoLightingProperty));
-        BSShaderNoLightingProperty* pProperty = pMemory ? ::new (pMemory) BSShaderNoLightingProperty : nullptr;
+        BSShaderNoLightingProperty* pProperty = new BSShaderNoLightingProperty;
         pProperty->SetFlag(BSShaderProperty::BSSP_FLAG_WIREFRAME, true);
         apNode->AttachProperty(pProperty);
         BSShaderManager::PrepareObject(apNode, false, false);

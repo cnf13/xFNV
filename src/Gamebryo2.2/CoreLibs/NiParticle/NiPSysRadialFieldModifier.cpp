@@ -161,10 +161,5 @@ void NiPSysRadialFieldModifier::UpdateNoAttenuationNoDirNoDist(float fTime, NiPS
 }
 
 NiObject* NiPSysRadialFieldModifier::CreateObject() {
-    NiPSysRadialFieldModifier* pkObject =
-        static_cast<NiPSysRadialFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysRadialFieldModifier)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiPSysRadialFieldModifier;
+    return new NiPSysRadialFieldModifier;
 }

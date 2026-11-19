@@ -34,13 +34,7 @@ BSParentVelocityModifier::~BSParentVelocityModifier() {}
 
 NiObject* BSParentVelocityModifier::CreateClone(NiCloningProcess& arCloneData) {
     BSParentVelocityModifier* v3;
-    void* v5 = NiMemObject::operator new(sizeof(BSParentVelocityModifier));
-    if (v5) {
-        v3 = ::new (v5) BSParentVelocityModifier;
-    }
-    else {
-        v3 = nullptr;
-    }
+    v3 = new BSParentVelocityModifier;
     CopyMembers(v3, arCloneData);
     return v3;
 }
@@ -145,10 +139,5 @@ void BSParentVelocityModifier::CopyMembers(BSParentVelocityModifier* apDest, NiC
 }
 
 NiObject* BSParentVelocityModifier::CreateObject() {
-    void* apMemory = NiMemObject::operator new(sizeof(BSParentVelocityModifier));
-    if (apMemory) {
-        return ::new (apMemory) BSParentVelocityModifier;
-    }
-
-    return nullptr;
+    return new BSParentVelocityModifier;
 }

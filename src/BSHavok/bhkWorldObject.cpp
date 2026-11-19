@@ -96,10 +96,7 @@ void bhkWorldObject::LinkObject(NiStream& arStream) {
         if ((this->DynamicCastMember(&bhkRigidBody::ms_RTTI)) &&
             (pkObject->DynamicCastMember(&bhkNiTriStripsShape::ms_RTTI) ||
              pkObject->DynamicCastMember(&bhkPackedNiTriStripsShape::ms_RTTI))) {
-            auto* pkMopp = static_cast<bhkMoppBvTreeShape*>(NiMemObject::operator new(sizeof(bhkMoppBvTreeShape)));
-            if (pkMopp) {
-                pkMopp = ::new (pkMopp) bhkMoppBvTreeShape(pkShape);
-            }
+            auto* pkMopp = new bhkMoppBvTreeShape(pkShape);
             if (pkMopp) {
                 pkCinfo->m_shape = static_cast<hkpShape*>(pkMopp->phkObject);
             }
@@ -291,8 +288,7 @@ NiAVObject* bhkWorldObject::CreateDisplayGeometry(NiNode* apNode) {
     }
     NiNode* pNode = apNode;
     if (!pNode) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiNode));
-        pNode = pMemory ? ::new (pMemory) NiNode(0) : nullptr;
+        pNode = new NiNode(0);
     }
     if (!pNode->m_kName.GetHandle()) {
         pNode->SetName(bhkWorldObject_Name);

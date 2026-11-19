@@ -359,10 +359,5 @@ char* NiTextureEffect::GetViewerString(const char* apPrefix, CoordGenType aeMode
 }
 
 NiObject* NiTextureEffect::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiTextureEffect));
-    if (v0) {
-        return ::new (v0) NiTextureEffect;
-    }
-
-    return nullptr;
+    return new NiTextureEffect;
 }

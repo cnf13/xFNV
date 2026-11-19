@@ -14,13 +14,7 @@ SkyObject::~SkyObject() {}
 // The engine's SkyObject::Initialize has SEH and creates the sky root object.
 void SkyObject::Initialize(NiNode* apSkyRoot) {
     NiNode* NiNode_;
-    NiNode* apMemory = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-    if (apMemory) {
-        NiNode_ = ::new (apMemory) NiNode(0);
-    }
-    else {
-        NiNode_ = nullptr;
-    }
+    NiNode_ = new NiNode(0);
     spRoot = NiNode_;
     spRoot.m_pObject->SetSelectiveUpdate(true);
     spRoot.m_pObject->SetDisplayObject(true);

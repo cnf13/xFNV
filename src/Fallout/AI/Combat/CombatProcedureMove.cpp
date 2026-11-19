@@ -623,14 +623,7 @@ bool CombatProcedureMove::CreatePath(NiPointer<PathingAvoidNodeArray>& arspAvoid
                 CurrentDestination.SetPoint(faceTargetLocation);
                 if (!arspAvoidNodeArray.m_pObject) {
                     PathingAvoidNodeArray* v17;
-                    PathingAvoidNodeArray* v21 =
-                        static_cast<PathingAvoidNodeArray*>(NiMemObject::operator new(sizeof(PathingAvoidNodeArray)));
-                    if (v21) {
-                        v17 = ::new (v21) PathingAvoidNodeArray;
-                    }
-                    else {
-                        v17 = nullptr;
-                    }
+                    v17 = new PathingAvoidNodeArray;
                     arspAvoidNodeArray = v17;
                 }
                 float a3a = fMovementNearTargetAvoidCost.Float();

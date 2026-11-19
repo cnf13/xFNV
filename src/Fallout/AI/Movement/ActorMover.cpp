@@ -437,13 +437,7 @@ void ActorMover::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     char v20 = 0;
     if ((v19 & 2) != 0) {
         PathingSolution* v10;
-        PathingSolution* v15 = static_cast<PathingSolution*>(NiMemObject::operator new(sizeof(PathingSolution)));
-        if (v15) {
-            v10 = ::new (v15) PathingSolution;
-        }
-        else {
-            v10 = nullptr;
-        }
+        v10 = new PathingSolution;
         spCurrentPath = v10;
         spCurrentPath.m_pObject->LoadGame(apLoadGameBuffer);
         for (uint32_t i = 0; i < spCurrentPath.m_pObject->GetVirtualNodeCount(); ++i) {
@@ -543,12 +537,7 @@ void ActorMover::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         }
     }
     if (!spMessageQueue) {
-        void* pMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
-        ActorPathingMessageQueue* pMessageQueue = nullptr;
-        if (pMemory) {
-            pMessageQueue = ::new (pMemory) ActorPathingMessageQueue;
-        }
-        spMessageQueue = pMessageQueue;
+        spMessageQueue = new ActorPathingMessageQueue;
     }
     if ((!bHideFailed) && (PathManager::QInstance()->BuildPath(spCurrentRequest, spMessageQueue, true)))
     // BuildPath takes both smart pointers by value and releases them.
@@ -563,14 +552,7 @@ void ActorMover::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 void ActorMover::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (bWaitingForPath) {
         ActorPathingMessageQueue* v2;
-        ActorPathingMessageQueue* apMemory =
-            static_cast<ActorPathingMessageQueue*>(NiMemObject::operator new(sizeof(ActorPathingMessageQueue)));
-        if (apMemory) {
-            v2 = ::new (apMemory) ActorPathingMessageQueue;
-        }
-        else {
-            v2 = nullptr;
-        }
+        v2 = new ActorPathingMessageQueue;
         spMessageQueue = v2;
     }
     eState = ACTOR_MOVER_STATE_INVALID;
@@ -673,12 +655,7 @@ void ActorMover::ClearCurrentData() {
         pCurrentPathHandler = nullptr;
     }
     if (bWaitingForPath) {
-        void* pMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
-        ActorPathingMessageQueue* pMessageQueue = nullptr;
-        if (pMemory) {
-            pMessageQueue = ::new (pMemory) ActorPathingMessageQueue;
-        }
-        spMessageQueue = pMessageQueue;
+        spMessageQueue = new ActorPathingMessageQueue;
         bWaitingForPath = false;
     }
     ActorMover* pMover = this;
@@ -756,14 +733,7 @@ void ActorMover::FinishMoving(bool abClearHandler) {
 
     if (bWaitingForPath) {
         ActorPathingMessageQueue* v2;
-        ActorPathingMessageQueue* apMemory =
-            static_cast<ActorPathingMessageQueue*>(NiMemObject::operator new(sizeof(ActorPathingMessageQueue)));
-        if (apMemory) {
-            v2 = ::new (apMemory) ActorPathingMessageQueue;
-        }
-        else {
-            v2 = nullptr;
-        }
+        v2 = new ActorPathingMessageQueue;
         spMessageQueue = v2;
         bWaitingForPath = 0;
     }
@@ -860,58 +830,40 @@ bool ActorMover::BackGroundBuildPath(const PathingRequest* apRequest) {
     // The request is copied as its own subclass, which GetType names.
     switch (apRequest->GetType()) {
         case PATHING_REQUEST_STANDARD: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequest));
-            PathingRequest* pRequest = pMemory ? ::new (pMemory) PathingRequest(*apRequest) : nullptr;
+            PathingRequest* pRequest = new PathingRequest(*apRequest);
             spCurrentRequest = pRequest;
             break;
         }
         case PATHING_REQUEST_FLEE: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequestFlee));
-            PathingRequestFlee* pRequest = pMemory
-                ? ::new (pMemory) PathingRequestFlee(*static_cast<const PathingRequestFlee*>(apRequest))
-                : nullptr;
+            PathingRequestFlee* pRequest = new PathingRequestFlee(*static_cast<const PathingRequestFlee*>(apRequest));
             spCurrentRequest = pRequest;
             break;
         }
         case PATHING_REQUEST_HIDE: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequestHide));
-            PathingRequestHide* pRequest = pMemory
-                ? ::new (pMemory) PathingRequestHide(*static_cast<const PathingRequestHide*>(apRequest))
-                : nullptr;
+            PathingRequestHide* pRequest = new PathingRequestHide(*static_cast<const PathingRequestHide*>(apRequest));
             spCurrentRequest = pRequest;
             break;
         }
         case PATHING_REQUEST_LOS: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequestLOS));
-            PathingRequestLOS* pRequest = pMemory
-                ? ::new (pMemory) PathingRequestLOS(*static_cast<const PathingRequestLOS*>(apRequest))
-                : nullptr;
+            PathingRequestLOS* pRequest = new PathingRequestLOS(*static_cast<const PathingRequestLOS*>(apRequest));
             spCurrentRequest = pRequest;
             break;
         }
         case PATHING_REQUEST_STRAIGHT_LINE: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequestSafeStraightLine));
-            PathingRequestSafeStraightLine* pRequest = pMemory
-                ? ::new (pMemory)
-                      PathingRequestSafeStraightLine(*static_cast<const PathingRequestSafeStraightLine*>(apRequest))
-                : nullptr;
+            PathingRequestSafeStraightLine* pRequest =
+                new PathingRequestSafeStraightLine(*static_cast<const PathingRequestSafeStraightLine*>(apRequest));
             spCurrentRequest = pRequest;
             break;
         }
         case PATHING_REQUEST_OPTIMAL_LOCATION: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequestOptimalLocation));
-            PathingRequestOptimalLocation* pRequest = pMemory
-                ? ::new (pMemory)
-                      PathingRequestOptimalLocation(*static_cast<const PathingRequestOptimalLocation*>(apRequest))
-                : nullptr;
+            PathingRequestOptimalLocation* pRequest =
+                new PathingRequestOptimalLocation(*static_cast<const PathingRequestOptimalLocation*>(apRequest));
             spCurrentRequest = pRequest;
             break;
         }
         case PATHING_REQUEST_COVERED_MOVE: {
-            void* pMemory = NiMemObject::operator new(sizeof(PathingRequestCoveredMove));
-            PathingRequestCoveredMove* pRequest = pMemory
-                ? ::new (pMemory) PathingRequestCoveredMove(*static_cast<const PathingRequestCoveredMove*>(apRequest))
-                : nullptr;
+            PathingRequestCoveredMove* pRequest =
+                new PathingRequestCoveredMove(*static_cast<const PathingRequestCoveredMove*>(apRequest));
             spCurrentRequest = pRequest;
             break;
         }
@@ -934,8 +886,7 @@ bool ActorMover::BackGroundBuildPath(const PathingRequest* apRequest) {
     }
     bool bPlayerWaiting = pPlayer->IsSleepingorResting();
     if (!spMessageQueue.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
-        ActorPathingMessageQueue* pQueue = pMemory ? ::new (pMemory) ActorPathingMessageQueue : nullptr;
+        ActorPathingMessageQueue* pQueue = new ActorPathingMessageQueue;
         spMessageQueue = pQueue;
     }
     // Both smart pointers go by value: their copy constructors fill the argument slots, BuildPath releases them.
@@ -1058,12 +1009,7 @@ void ActorMover::ClearDataForNewPathingRequest(bool abClearWaitingFlag) {
     pMover->ClearForcedMoveMode();
     spCurrentRequest = nullptr;
     if (bWaitingForPath) {
-        void* pMemory = NiMemObject::operator new(sizeof(ActorPathingMessageQueue));
-        ActorPathingMessageQueue* pMessageQueue = nullptr;
-        if (pMemory) {
-            pMessageQueue = ::new (pMemory) ActorPathingMessageQueue;
-        }
-        spMessageQueue = pMessageQueue;
+        spMessageQueue = new ActorPathingMessageQueue;
         if (abClearWaitingFlag) {
             bWaitingForPath = false;
         }

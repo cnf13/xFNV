@@ -40,19 +40,10 @@ const NiRTTI* NiBSplineCompTransformInterpolator::GetRTTI() const {
 }
 
 NiObject* NiBSplineCompTransformInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBSplineCompTransformInterpolator* pkObject = static_cast<NiBSplineCompTransformInterpolator*>(
-        NiMemObject::operator new(sizeof(NiBSplineCompTransformInterpolator))
+    NiBSplineCompTransformInterpolator* pkObject_2 = new NiBSplineCompTransformInterpolator(
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
+        NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
-    NiBSplineCompTransformInterpolator* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBSplineCompTransformInterpolator(
-            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
-            NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
-        );
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
     CopyMembers(pkObject_2, kCloning);
     pkObject_2->m_afCompScalars[0] = m_afCompScalars[0];
     pkObject_2->m_afCompScalars[1] = m_afCompScalars[1];
@@ -148,15 +139,8 @@ bool NiBSplineCompTransformInterpolator::Update(float fTime, NiObjectNET*, NiQua
 }
 
 NiObject* NiBSplineCompTransformInterpolator::CreateObject() {
-    NiBSplineCompTransformInterpolator* pkObject = static_cast<NiBSplineCompTransformInterpolator*>(
-        NiMemObject::operator new(sizeof(NiBSplineCompTransformInterpolator))
-    );
-    if (!pkObject) {
-        return nullptr;
-    }
-    ::new (pkObject) NiBSplineCompTransformInterpolator(
+    return new NiBSplineCompTransformInterpolator(
         static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, NiBSplineData::INVALID_HANDLE,
         NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
-    return pkObject;
 }

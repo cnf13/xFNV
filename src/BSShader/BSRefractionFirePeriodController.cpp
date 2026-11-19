@@ -26,12 +26,7 @@ const NiRTTI* BSRefractionFirePeriodController::GetRTTI() const {
 // The base copies the members and the cloning process records the clone (a failed allocation is passed through as
 // null).
 NiObject* BSRefractionFirePeriodController::CreateClone(NiCloningProcess& kCloning) {
-    BSRefractionFirePeriodController* pkClone = static_cast<BSRefractionFirePeriodController*>(
-        NiMemObject::operator new(sizeof(BSRefractionFirePeriodController))
-    );
-    if (pkClone) {
-        ::new (pkClone) BSRefractionFirePeriodController;
-    }
+    BSRefractionFirePeriodController* pkClone = new BSRefractionFirePeriodController;
     CopyMembers(pkClone, kCloning);
     return pkClone;
 }
@@ -49,11 +44,7 @@ void BSRefractionFirePeriodController::LinkObject(NiStream& kStream) {
     NiFloatInterpController::LinkObject(kStream);
     if (kStream.GetFileVersion() < NiStream::GetVersion(10, 1, 0, 104)) {
         NiFloatData* pkData = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        NiFloatInterpolator* pkInterpolator =
-            static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-        if (pkInterpolator) {
-            pkInterpolator = ::new (pkInterpolator) NiFloatInterpolator(pkData);
-        }
+        NiFloatInterpolator* pkInterpolator = new NiFloatInterpolator(pkData);
         m_spInterpolator = pkInterpolator;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -107,11 +98,6 @@ void BSRefractionFirePeriodController::GetTargetFloatValue(float& fValue) {
 
 // Stream factory for this class: returns a new controller, or null.
 NiObject* BSRefractionFirePeriodController::CreateObject() {
-    BSRefractionFirePeriodController* pkController = static_cast<BSRefractionFirePeriodController*>(
-        NiMemObject::operator new(sizeof(BSRefractionFirePeriodController))
-    );
-    if (pkController) {
-        ::new (pkController) BSRefractionFirePeriodController;
-    }
+    BSRefractionFirePeriodController* pkController = new BSRefractionFirePeriodController;
     return pkController;
 }

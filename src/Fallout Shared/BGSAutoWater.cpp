@@ -641,48 +641,21 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                     else {
                         pwaterRef = nullptr;
                     }
-                    WaterShaderProperty* v40 =
-                        static_cast<WaterShaderProperty*>(NiMemObject::operator new(sizeof(WaterShaderProperty)));
-                    if (v40) {
-                        pwatershadprop = ::new (v40) WaterShaderProperty;
-                    }
-                    else {
-                        pwatershadprop = nullptr;
-                    }
+                    pwatershadprop = new WaterShaderProperty;
                     ppoly->Get3D()->AttachProperty(pwatershadprop);
                     BSShaderManager::PrepareObject(ppoly->GetRootNode(), 0, 0);
-                    NiStencilProperty* v39 =
-                        static_cast<NiStencilProperty*>(NiMemObject::operator new(sizeof(NiStencilProperty)));
-                    if (v39) {
-                        pstencilprop = ::new (v39) NiStencilProperty;
-                    }
-                    else {
-                        pstencilprop = nullptr;
-                    }
+                    pstencilprop = new NiStencilProperty;
                     pstencilprop->SetDrawMode(NiStencilProperty::DRAW_BOTH);
                     ppoly->Get3D()->AttachProperty(pstencilprop);
                     TESWaterForm* WaterType = apCell->GetWaterType();
                     BGSPlaceableWater* PlaceableAutoWater = WaterType->GetPlaceableAutoWater();
                     pwaterRef->SetObjectReference(PlaceableAutoWater);
-                    BSFadeNode* v38 = static_cast<BSFadeNode*>(NiMemObject::operator new(sizeof(BSFadeNode)));
-                    if (v38) {
-                        pfadenode = ::new (v38) BSFadeNode;
-                    }
-                    else {
-                        pfadenode = nullptr;
-                    }
+                    pfadenode = new BSFadeNode;
                     pfadenode->SetIgnoreFade(true);
                     pwaterRef->Set3D(pfadenode, true);
                     pfadenode->SetTranslate(worldtranslate);
                     pwaterRef->SetLocationOnReferenceSimple(worldtranslate);
-                    BSMultiBoundAABB* v37 =
-                        static_cast<BSMultiBoundAABB*>(NiMemObject::operator new(sizeof(BSMultiBoundAABB)));
-                    if (v37) {
-                        pmbshape = ::new (v37) BSMultiBoundAABB;
-                    }
-                    else {
-                        pmbshape = nullptr;
-                    }
+                    pmbshape = new BSMultiBoundAABB;
                     float minx = 0.0f;
                     float miny = 0.0f;
                     float minz = 0.0f;
@@ -731,22 +704,9 @@ void BGSAutoWater::GeneratePlaceableWater(TESObjectCELL* apCell) {
                     center += worldtranslate;
                     pmbshape->SetCenter(center);
                     pmbshape->SetHalfExtents(halfextents);
-                    BSMultiBound* v36 = static_cast<BSMultiBound*>(NiMemObject::operator new(sizeof(BSMultiBound)));
-                    if (v36) {
-                        pmb = ::new (v36) BSMultiBound;
-                    }
-                    else {
-                        pmb = nullptr;
-                    }
+                    pmb = new BSMultiBound;
                     pmb->SetShape(pmbshape);
-                    BSMultiBoundNode* v35 =
-                        static_cast<BSMultiBoundNode*>(NiMemObject::operator new(sizeof(BSMultiBoundNode)));
-                    if (v35) {
-                        pmbnode = ::new (v35) BSMultiBoundNode;
-                    }
-                    else {
-                        pmbnode = nullptr;
-                    }
+                    pmbnode = new BSMultiBoundNode;
                     pmbnode->SetMultiBound(pmb);
                     pfadenode->AttachChild(pmbnode, 1);
                     pmbnode->AttachChild(ppoly->GetRootNode(), 1);

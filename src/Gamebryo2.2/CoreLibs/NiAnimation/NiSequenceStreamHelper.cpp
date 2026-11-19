@@ -36,10 +36,5 @@ bool NiSequenceStreamHelper::IsEqual(NiObject* pObject) {
 }
 
 NiObject* NiSequenceStreamHelper::CreateObject() {
-    NiSequenceStreamHelper* pkObject =
-        static_cast<NiSequenceStreamHelper*>(NiMemObject::operator new(sizeof(NiSequenceStreamHelper)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiSequenceStreamHelper;
+    return new NiSequenceStreamHelper;
 }

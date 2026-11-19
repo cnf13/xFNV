@@ -511,11 +511,7 @@ NiDX9SourceCubeMapData* NiDX9SourceCubeMapData::Create(NiSourceCubeMap* apCubeMa
         return nullptr;
     }
 
-    NiDX9SourceCubeMapData* pkThis =
-        static_cast<NiDX9SourceCubeMapData*>(NiMemObject::operator new(sizeof(NiDX9SourceCubeMapData)));
-    if (pkThis) {
-        ::new (pkThis) NiDX9SourceCubeMapData(apCubeMap, apRenderer);
-    }
+    NiDX9SourceCubeMapData* pkThis = new NiDX9SourceCubeMapData(apCubeMap, apRenderer);
 
     const NiTexture::FormatPrefs& kPrefs = apCubeMap->m_kFormatPrefs;
     NiPixelData* pkSrcPixels = nullptr;

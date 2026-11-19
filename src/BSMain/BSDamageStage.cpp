@@ -17,13 +17,7 @@ const NiRTTI* BSDamageStage::GetRTTI() const {
 }
 
 NiObject* BSDamageStage::CreateClone(NiCloningProcess& arCloneData) {
-    BSDamageStage* pClone = static_cast<BSDamageStage*>(NiMemObject::operator new(sizeof(BSDamageStage)));
-    if (pClone) {
-        ::new (pClone) BSDamageStage;
-    }
-    else {
-        pClone = nullptr;
-    }
+    BSDamageStage* pClone = new BSDamageStage;
     CopyMembers(pClone, arCloneData);
     return pClone;
 }
@@ -79,9 +73,5 @@ void BSDamageStage::CopyMembers(BSDamageStage* pDest, NiCloningProcess& arCloneD
 }
 
 NiObject* BSDamageStage::CreateObject() {
-    BSDamageStage* pObject = static_cast<BSDamageStage*>(NiMemObject::operator new(sizeof(BSDamageStage)));
-    if (!pObject) {
-        return nullptr;
-    }
-    return ::new (pObject) BSDamageStage;
+    return new BSDamageStage;
 }

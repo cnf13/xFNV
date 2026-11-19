@@ -1222,36 +1222,14 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                         }
                     }
                 }
-                NiLines* v25 = static_cast<NiLines*>(NiMemObject::operator new(sizeof(NiLines)));
-                if (v25) {
-                    pBorder = ::new (v25)
-                        NiLines(128, lineverts, lineclr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, lineflags);
-                }
-                else {
-                    pBorder = nullptr;
-                }
+                pBorder = new NiLines(128, lineverts, lineclr, nullptr, 0, NiGeometryData::NBT_METHOD_NONE, lineflags);
                 pLoadedData->spBorder = pBorder;
                 pLoadedData->spBorder.m_pObject->SetTranslate(worldshift);
-                NiTexturingProperty* v24 =
-                    static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-                if (v24) {
-                    deftext = ::new (v24) NiTexturingProperty;
-                }
-                else {
-                    deftext = nullptr;
-                }
+                deftext = new NiTexturingProperty;
                 deftext->SetBaseMap(nullptr);
                 deftext->SetDecalMap(0, nullptr);
                 pLoadedData->spBorder.m_pObject->AttachProperty(deftext);
-                BSShaderNoLightingProperty* apMemory = static_cast<BSShaderNoLightingProperty*>(
-                    NiMemObject::operator new(sizeof(BSShaderNoLightingProperty))
-                );
-                if (apMemory) {
-                    pshprop = ::new (apMemory) BSShaderNoLightingProperty;
-                }
-                else {
-                    pshprop = nullptr;
-                }
+                pshprop = new BSShaderNoLightingProperty;
                 pshprop->SetShader(33);
                 pLoadedData->spBorder.m_pObject->AttachProperty(pshprop);
                 BSShaderManager::PrepareObject(pLoadedData->spBorder.m_pObject, 0, 0);
@@ -2129,16 +2107,10 @@ NiTriStrips* TESObjectLAND::MakeLandTriStrips(uint8_t aiBlock) {
             pnormalcopy_2 = nullptr;
         }
         ourMemcpy(pnormalcopy_2, pLoadedData->ppNormals[aiBlock], sizeof(NiPoint3) * 289);
-        void* apMemory = NiMemObject::operator new(sizeof(NiTriStrips));
-        if (apMemory) {
-            ptrigeom_2 = ::new (apMemory) NiTriStrips(
-                289, pLoadedData->ppVertices[aiBlock], pnormalcopy_2, pLoadedData->ppColorsA[aiBlock], ptextures_2, 1,
-                0, *pstriplength - 2, 1, pstriplength, ptriplist
-            );
-        }
-        else {
-            ptrigeom_2 = nullptr;
-        }
+        ptrigeom_2 = new NiTriStrips(
+            289, pLoadedData->ppVertices[aiBlock], pnormalcopy_2, pLoadedData->ppColorsA[aiBlock], ptextures_2, 1, 0,
+            *pstriplength - 2, 1, pstriplength, ptriplist
+        );
         ptrigeom = ptrigeom_2;
         NiPoint3 blockcenter = GetWorldOffsetForBlock(aiBlock);
         ptrigeom->SetTranslate(blockcenter);
@@ -2176,27 +2148,13 @@ bool TESObjectLAND::InitLandscape() {
             BSShaderPPLightingProperty* pshprop;
             // The address &pLoadedData->ppPercentArrays is tested here, and it is never null.
             NiBinaryExtraData* ppercentED;
-            NiBinaryExtraData* v19 =
-                static_cast<NiBinaryExtraData*>(NiMemObject::operator new(sizeof(NiBinaryExtraData)));
-            if (v19) {
-                // The block's percent buffer, 289 vertices of 8 floats, which the extra data keeps as untyped bytes.
-                ppercentED = ::new (v19) NiBinaryExtraData(
-                    289 * 8 * sizeof(float), reinterpret_cast<char*>(*pLoadedData->ppPercentArrays[i])
-                );
-            }
-            else {
-                ppercentED = nullptr;
-            }
+            // The block's percent buffer, 289 vertices of 8 floats, which the extra data keeps as untyped bytes.
+            ppercentED = new NiBinaryExtraData(
+                289 * 8 * sizeof(float), reinterpret_cast<char*>(*pLoadedData->ppPercentArrays[i])
+            );
             NiFixedString* TexPercTag = BSShaderManager::TexPercTag();
             pLoadedData->ppMesh[i]->AddExtraData(*TexPercTag, ppercentED);
-            BSShaderPPLightingProperty* v18 =
-                static_cast<BSShaderPPLightingProperty*>(NiMemObject::operator new(sizeof(BSShaderPPLightingProperty)));
-            if (v18) {
-                pshprop = ::new (v18) BSShaderPPLightingProperty;
-            }
-            else {
-                pshprop = nullptr;
-            }
+            pshprop = new BSShaderPPLightingProperty;
             pshprop->SetShader(1);
             if (pshprop) {
                 uint8_t v9;
@@ -3884,13 +3842,7 @@ void TESObjectLAND::InitializeStatics() {
     AutoMemContext tempMemContext(
         MEM_CONTEXT_LAND, true, "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESLand.cpp", 198
     );
-    BGSTextureSet* v42 = static_cast<BGSTextureSet*>(NiMemObject::operator new(sizeof(BGSTextureSet)));
-    if (v42) {
-        v21 = ::new (v42) BGSTextureSet;
-    }
-    else {
-        v21 = nullptr;
-    }
+    v21 = new BGSTextureSet;
     TESObjectLAND::pDefTextTexSet = v21;
     BSsprintf(apDest, 260, "Landscape\\%s", gs_sDefaultLandDiffuseTexture_Landscape.String());
     TESObjectLAND::pDefTextTexSet->SetBGSTextureFilename(BGSTextureSet::TEXTYPE_BASE, apDest);
@@ -3915,14 +3867,7 @@ void TESObjectLAND::InitializeStatics() {
     else {
         pdefmap = nullptr;
     }
-    NiTexturingProperty* v36 =
-        static_cast<NiTexturingProperty*>(NiMemObject::operator new(sizeof(NiTexturingProperty)));
-    if (v36) {
-        NiTexturingProperty_ = ::new (v36) NiTexturingProperty;
-    }
-    else {
-        NiTexturingProperty_ = nullptr;
-    }
+    NiTexturingProperty_ = new NiTexturingProperty;
     TESObjectLAND::spTexturingProperty = NiTexturingProperty_;
     TESObjectLAND::spTexturingProperty.m_pObject->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
     TESObjectLAND::spTexturingProperty.m_pObject->SetBaseMap(pdefmap);
@@ -4085,13 +4030,7 @@ NiVBChip* NiVBChip::Create(
     uint32_t uiIndex
 ) {
     NiVBChip* pkChip;
-    NiVBChip* apMemory = static_cast<NiVBChip*>(NiMemObject::operator new(sizeof(NiVBChip)));
-    if (apMemory) {
-        pkChip = ::new (apMemory) NiVBChip;
-    }
-    else {
-        pkChip = nullptr;
-    }
+    pkChip = new NiVBChip;
     if (pkChip) {
         pkChip->m_uiIndex = uiIndex;
         pkChip->m_pkBlock = pkBlock;

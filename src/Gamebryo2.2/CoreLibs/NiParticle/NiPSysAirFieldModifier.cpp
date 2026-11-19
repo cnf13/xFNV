@@ -35,14 +35,7 @@ NiPSysAirFieldModifier::~NiPSysAirFieldModifier() {}
 
 NiObject* NiPSysAirFieldModifier::CreateClone(NiCloningProcess& kCloning) {
     NiPSysAirFieldModifier* pkObject;
-    NiPSysAirFieldModifier* v3 =
-        static_cast<NiPSysAirFieldModifier*>(NiMemObject::operator new(sizeof(NiPSysAirFieldModifier)));
-    if (v3) {
-        pkObject = ::new (v3) NiPSysAirFieldModifier;
-    }
-    else {
-        pkObject = nullptr;
-    }
+    pkObject = new NiPSysAirFieldModifier;
     CopyMembers(pkObject, kCloning);
     pkObject->SetDirection(m_kDirection);
     return pkObject;
@@ -392,10 +385,5 @@ void NiPSysAirFieldModifier::UpdateNoAttenuationNoInheritNoSpreadNoMaxDistance(f
 }
 
 NiObject* NiPSysAirFieldModifier::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiPSysAirFieldModifier));
-    if (v0) {
-        return ::new (v0) NiPSysAirFieldModifier;
-    }
-
-    return nullptr;
+    return new NiPSysAirFieldModifier;
 }

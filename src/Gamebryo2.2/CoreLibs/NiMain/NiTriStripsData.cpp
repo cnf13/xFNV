@@ -285,9 +285,5 @@ void NiTriStripsData::Replace(uint16_t usStrips, uint16_t* pusStripLengths, uint
 }
 
 NiObject* NiTriStripsData::CreateObject() {
-    NiTriStripsData* pkObject = static_cast<NiTriStripsData*>(NiMemObject::operator new(sizeof(NiTriStripsData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiTriStripsData;
+    return new NiTriStripsData;
 }

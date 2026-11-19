@@ -31,18 +31,9 @@ const NiRTTI* NiBSplineCompColorInterpolator::GetRTTI() const {
 }
 
 NiObject* NiBSplineCompColorInterpolator::CreateClone(NiCloningProcess& kCloning) {
-    NiBSplineCompColorInterpolator* pkObject =
-        static_cast<NiBSplineCompColorInterpolator*>(NiMemObject::operator new(sizeof(NiBSplineCompColorInterpolator)));
-    NiBSplineCompColorInterpolator* pkObject_2 = pkObject;
-    if (pkObject) {
-        ::new (pkObject) NiBSplineCompColorInterpolator(
-            static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE,
-            static_cast<NiBSplineBasisData*>(nullptr)
-        );
-    }
-    else {
-        pkObject_2 = nullptr;
-    }
+    NiBSplineCompColorInterpolator* pkObject_2 = new NiBSplineCompColorInterpolator(
+        static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
+    );
     CopyMembers(pkObject_2, kCloning);
     std::memcpy(pkObject_2->m_afCompScalars, m_afCompScalars, sizeof(pkObject_2->m_afCompScalars));
     return pkObject_2;
@@ -108,12 +99,7 @@ bool NiBSplineCompColorInterpolator::Update(float fTime, NiObjectNET*, NiColorA&
 }
 
 NiObject* NiBSplineCompColorInterpolator::CreateObject() {
-    NiBSplineCompColorInterpolator* pkObject =
-        static_cast<NiBSplineCompColorInterpolator*>(NiMemObject::operator new(sizeof(NiBSplineCompColorInterpolator)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBSplineCompColorInterpolator(
+    return new NiBSplineCompColorInterpolator(
         static_cast<NiBSplineData*>(nullptr), NiBSplineData::INVALID_HANDLE, static_cast<NiBSplineBasisData*>(nullptr)
     );
 }

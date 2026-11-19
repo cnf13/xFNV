@@ -290,8 +290,7 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
             kPos.y = static_cast<float>(fHalfSize * -1.0);
             kPos.x = kPos.y;
             kPos.z = 0.0f;
-            void* pRootMemory = NiMemObject::operator new(sizeof(NiNode));
-            spRoot = pRootMemory ? ::new (pRootMemory) NiNode(0) : nullptr;
+            spRoot = new NiNode(0);
 
             // The quad: four corners, all facing +Z, with texture coordinates over the whole mask.
             void* pVertexMemory = ourMalloc(4 * sizeof(NiPoint3));
@@ -339,12 +338,9 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
             pusStripLists[3] = 3;
             uint16_t* pusStripLengths = static_cast<uint16_t*>(_NiMalloc(sizeof(uint16_t)));
             pusStripLengths[0] = 4;
-            void* pStripsDataMemory = NiMemObject::operator new(sizeof(NiTriStripsData));
-            spStripsData = pStripsDataMemory
-                ? ::new (pStripsDataMemory) NiTriStripsData(
-                      4, pVertices, pNormals, nullptr, pTexCoords, 1, 0, 2, 1, pusStripLengths, pusStripLists
-                  )
-                : nullptr;
+            spStripsData = new NiTriStripsData(
+                4, pVertices, pNormals, nullptr, pTexCoords, 1, 0, 2, 1, pusStripLengths, pusStripLists
+            );
 
             // One quad per cell with a partial mask, textured with the cell's mask.
             for (uint32_t i = 0; i < uiDimension; ++i) {
@@ -364,8 +360,7 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                             pMaskRect->pBits = nullptr;
                         }
                         if (eState == ExtraCellCanopyShadowMask::CS_PARTIAL && pMaskTex) {
-                            void* pPropMemory = NiMemObject::operator new(sizeof(BSShaderNoLightingProperty));
-                            pMaskProp = pPropMemory ? ::new (pPropMemory) BSShaderNoLightingProperty : nullptr;
+                            pMaskProp = new BSShaderNoLightingProperty;
                             pMaskProp->SetBaseMap(pMaskTex);
                             pMaskProp->SetClampNI(NiTexturingProperty::CLAMP_S_CLAMP_T);
                             bNoMasks = false;
@@ -380,8 +375,7 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                         bUseFullMask = false;
                         continue;
                     }
-                    void* pStripsMemory = NiMemObject::operator new(sizeof(NiTriStrips));
-                    spStrips = pStripsMemory ? ::new (pStripsMemory) NiTriStrips(spStripsData) : nullptr;
+                    spStrips = new NiTriStrips(spStripsData);
                     spStrips->SetTranslate(kPos);
                     spStrips->AttachProperty(pMaskProp);
                     BSShaderManager::PrepareObject(spStrips, 0, 0);
@@ -403,10 +397,8 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
             }
             else {
                 // An orthographic camera one unit above the quads, looking down at them.
-                void* pCameraRootMemory = NiMemObject::operator new(sizeof(NiNode));
-                spCameraRoot = pCameraRootMemory ? ::new (pCameraRootMemory) NiNode(0) : nullptr;
-                void* pCameraMemory = NiMemObject::operator new(sizeof(NiCamera));
-                spCamera = pCameraMemory ? ::new (pCameraMemory) NiCamera : nullptr;
+                spCameraRoot = new NiNode(0);
+                spCamera = new NiCamera;
                 NiNode* pCameraRoot = spCameraRoot;
                 pCameraRoot->AttachChild(spCamera, true);
                 spCameraRoot->SetTranslate(0.0f, 0.0f, 1.0f);
@@ -433,19 +425,16 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                 spCamera->SetViewFrustum(kFrustum);
 
                 // A white light and material, drawing both faces.
-                void* pLightMemory = NiMemObject::operator new(sizeof(NiDirectionalLight));
-                spLight = pLightMemory ? ::new (pLightMemory) NiDirectionalLight : nullptr;
+                spLight = new NiDirectionalLight;
                 spLight->SetAmbientColor(NiColor_WHITE);
                 spLight->SetDiffuseColor(NiColor_WHITE);
                 spLight->AttachAffectedNode(spRoot);
-                void* pMaterialMemory = NiMemObject::operator new(sizeof(NiMaterialProperty));
-                NiMaterialProperty* pMaterial = pMaterialMemory ? ::new (pMaterialMemory) NiMaterialProperty : nullptr;
+                NiMaterialProperty* pMaterial = new NiMaterialProperty;
                 pMaterial->SetAmbientColor(NiColor_WHITE);
                 pMaterial->SetDiffuseColor(NiColor_WHITE);
                 pMaterial->SetEmittance(NiColor_WHITE);
                 spRoot->AttachProperty(pMaterial);
-                void* pStencilMemory = NiMemObject::operator new(sizeof(NiStencilProperty));
-                NiStencilProperty* pStencil = pStencilMemory ? ::new (pStencilMemory) NiStencilProperty : nullptr;
+                NiStencilProperty* pStencil = new NiStencilProperty;
                 pStencil->SetDrawMode(NiStencilProperty::DRAW_BOTH);
                 spRoot->AttachProperty(pStencil);
                 // SWEEP-INLINE 0x822510
@@ -479,9 +468,7 @@ void GridCellArray::RecreateCanopyShadowMaskTexture() {
                 // Draw the quads into the mask texture with a private accumulator.
                 alignas(BSCullingProcess) uint8_t aCullerStorage[sizeof(BSCullingProcess)];
                 BSCullingProcess* pCuller = ::new (aCullerStorage) BSCullingProcess(nullptr);
-                void* pAccumulatorMemory = NiMemObject::operator new(sizeof(BSShaderAccumulator));
-                BSShaderAccumulator* pCustomAccumulator =
-                    pAccumulatorMemory ? ::new (pAccumulatorMemory) BSShaderAccumulator(99, 1, 759) : nullptr;
+                BSShaderAccumulator* pCustomAccumulator = new BSShaderAccumulator(99, 1, 759);
                 alignas(NiPointer<BSShaderAccumulator>)
                     uint8_t aAccumulatorStorage[sizeof(NiPointer<BSShaderAccumulator>)];
                 NiPointer<BSShaderAccumulator>& spCustomAccumulator =

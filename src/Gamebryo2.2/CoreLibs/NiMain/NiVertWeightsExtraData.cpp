@@ -65,10 +65,6 @@ void NiVertWeightsExtraData::GetViewerStrings(NiTPrimitiveArray<char*>* pStrings
 }
 
 NiObject* NiVertWeightsExtraData::CreateObject() {
-    NiVertWeightsExtraData* pkObject =
-        static_cast<NiVertWeightsExtraData*>(NiMemObject::operator new(sizeof(NiVertWeightsExtraData)));
-    if (pkObject) {
-        ::new (pkObject) NiVertWeightsExtraData;
-    }
+    NiVertWeightsExtraData* pkObject = new NiVertWeightsExtraData;
     return pkObject;
 }

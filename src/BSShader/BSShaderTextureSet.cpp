@@ -86,10 +86,5 @@ void BSShaderTextureSet::SetTextureFilename(BSShaderProperty::TextureTypeEnum ai
 }
 
 NiObject* BSShaderTextureSet::CreateObject() {
-    BSShaderTextureSet* pObject =
-        static_cast<BSShaderTextureSet*>(NiMemObject::operator new(sizeof(BSShaderTextureSet)));
-    if (pObject) {
-        return ::new (pObject) BSShaderTextureSet;
-    }
-    return nullptr;
+    return new BSShaderTextureSet;
 }

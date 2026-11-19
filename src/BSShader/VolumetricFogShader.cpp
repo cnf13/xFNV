@@ -78,20 +78,12 @@ bool VolumetricFogShader::Initialize() {
 // missing. The variable names are empty strings; the entries do not compare the address.
 void VolumetricFogShader::CreateConstantMaps() {
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry("FogProps", 0x10000007, 0, 0, 1, "", 0x10, 4, &fFogProps, false);
     }
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddPredefinedEntry(
             "WorldViewProjTranspose", 0x20000009, 0, "", 0, 0, nullptr, false
@@ -322,10 +314,7 @@ BSShader* VolumetricFogShader::CreateShader() {
     NiDX9ShaderDeclaration* v1 = NiDX9ShaderDeclaration::Create(BSShaderManager::pRenderer.m_pObject, 2u, 1u);
     v1->SetEntry(0u, 0u, NiShaderDeclaration::SHADERPARAM_NI_POSITION, NiShaderDeclaration::SPTYPE_FLOAT3, 0u);
     v1->GetD3DDeclaration();
-    VolumetricFogShader* v2 = static_cast<VolumetricFogShader*>(NiMemObject::operator new(sizeof(VolumetricFogShader)));
-    if (v2) {
-        v0 = ::new (v2) VolumetricFogShader;
-    }
+    v0 = new VolumetricFogShader;
     v0->Initialize();
     v0->LoadShaders();
     v0->LoadStagesAndPasses();

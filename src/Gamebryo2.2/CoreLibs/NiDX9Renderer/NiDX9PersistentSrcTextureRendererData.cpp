@@ -18,11 +18,7 @@ NiRTTI NiDX9PersistentSrcTextureRendererData::ms_RTTI(
 );
 
 NiObject* NiDX9PersistentSrcTextureRendererData_CreateObject() {
-    void* pkMemory = NiMemObject::operator new(sizeof(NiDX9PersistentSrcTextureRendererData));
-    if (!pkMemory) {
-        return nullptr;
-    }
-    return ::new (pkMemory) NiDX9PersistentSrcTextureRendererData;
+    return new NiDX9PersistentSrcTextureRendererData;
 }
 
 NiDX9PersistentSrcTextureRendererData::NiDX9PersistentSrcTextureRendererData() : NiPersistentSrcTextureRendererData() {}

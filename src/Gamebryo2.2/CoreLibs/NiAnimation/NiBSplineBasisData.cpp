@@ -21,11 +21,7 @@ const NiRTTI* NiBSplineBasisData::GetRTTI() const {
 
 // The clone gets the whole basis, cached values included.
 NiObject* NiBSplineBasisData::CreateClone(NiCloningProcess& kCloning) {
-    NiBSplineBasisData* pkClone =
-        static_cast<NiBSplineBasisData*>(NiMemObject::operator new(sizeof(NiBSplineBasisData)));
-    if (pkClone) {
-        ::new (pkClone) NiBSplineBasisData;
-    }
+    NiBSplineBasisData* pkClone = new NiBSplineBasisData;
     NiObject::CopyMembers(pkClone, kCloning);
     pkClone->m_kBasisDegree3 = m_kBasisDegree3;
     return pkClone;
@@ -68,10 +64,5 @@ NiBSplineBasis<float, 3>& NiBSplineBasisData::GetDegree3Basis() {
 }
 
 NiObject* NiBSplineBasisData::CreateObject() {
-    NiBSplineBasisData* pkObject =
-        static_cast<NiBSplineBasisData*>(NiMemObject::operator new(sizeof(NiBSplineBasisData)));
-    if (!pkObject) {
-        return nullptr;
-    }
-    return ::new (pkObject) NiBSplineBasisData;
+    return new NiBSplineBasisData;
 }

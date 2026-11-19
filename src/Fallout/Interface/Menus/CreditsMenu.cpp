@@ -273,13 +273,7 @@ void CreditsMenu::InitCreditsRoot() {
         if (pFileToUse_2->NiBinaryStream::Read(pFileData, iFileSize - 1) == iFileSize - 1) {
             NiAlphaProperty* palpha_2;
             NiNode* v15;
-            NiNode* v24 = static_cast<NiNode*>(NiMemObject::operator new(sizeof(NiNode)));
-            if (v24) {
-                v15 = ::new (v24) NiNode(0);
-            }
-            else {
-                v15 = nullptr;
-            }
+            v15 = new NiNode(0);
             NiRefObject* v25 = (NiRefObject*)v15;
             spScrollRoot = v15;
             NiPoint3* v4 = ::new (&dst) NiPoint3(0.0f, 0.0f, -1020.0f);
@@ -288,13 +282,7 @@ void CreditsMenu::InitCreditsRoot() {
             NIRenderer->LockRenderer();
             NiNode* Model_ = pClickRect->GetModel();
             Model_->AttachChild(spScrollRoot.m_pObject, 1);
-            NiAlphaProperty* v21 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-            if (v21) {
-                palpha_2 = ::new (v21) NiAlphaProperty;
-            }
-            else {
-                palpha_2 = nullptr;
-            }
+            palpha_2 = new NiAlphaProperty;
             palpha_2->SetAlphaBlending(true);
             spScrollRoot.m_pObject->AttachProperty(palpha_2);
             Font* pfont = FontManager::Instance()->GetFont(static_cast<int32_t>(eFont));
@@ -534,13 +522,7 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
     pvertOrder[3] = 2;
     pvertOrder[4] = 1;
     pvertOrder[5] = 3;
-    void* apMemory = NiMemObject::operator new(sizeof(NiNode));
-    if (apMemory) {
-        pnode = ::new (apMemory) NiNode(0);
-    }
-    else {
-        pnode = nullptr;
-    }
+    pnode = new NiNode(0);
     int32_t ix = iX;
     if (iJustification == 2) {
         ix -= aiWidth / 2;
@@ -551,46 +533,21 @@ NiNode* CreditsMenu::CreateImage(BSStringT<char>* apImageFilename, int32_t aiWid
         }
     }
     pnode->SetTranslate(static_cast<float>(ix), 0.0f, static_cast<float>(iY));
-    NiAlphaProperty* v51 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (v51) {
-        palphaProp = ::new (v51) NiAlphaProperty;
-    }
-    else {
-        palphaProp = nullptr;
-    }
+    palphaProp = new NiAlphaProperty;
     palphaProp->SetAlphaBlending(true);
     pnode->AttachProperty(palphaProp);
-    NiTriShape* v49 = static_cast<NiTriShape*>(NiMemObject::operator new(sizeof(NiTriShape)));
-    if (v49) {
-        ptri = ::new (v49)
-            NiTriShape(4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvertOrder);
-    }
-    else {
-        ptri = nullptr;
-    }
+    ptri = new NiTriShape(4, pvertices, nullptr, nullptr, ptextures, 1, NiGeometryData::NBT_METHOD_NONE, 2, pvertOrder);
     pnode->AttachChild(ptri, 1);
     NiFixedString textureFilename;
     BSsprintf(apDest, 260, "Textures\\Interface\\Credits\\%s", apImageFilename->pString);
     ptri->SetName(static_cast<const char*>(apDest));
     NiSourceTexture* ptexture =
         NiSourceTexture::Create(static_cast<const char*>(apDest), NiSourceTexture::ms_kDefaultPrefs, true, false);
-    TileShaderProperty* v46 = static_cast<TileShaderProperty*>(NiMemObject::operator new(sizeof(TileShaderProperty)));
-    if (v46) {
-        ptprop = ::new (v46) TileShaderProperty(false);
-    }
-    else {
-        ptprop = nullptr;
-    }
+    ptprop = new TileShaderProperty(false);
     ptprop->SetTileTexture(ptexture);
     ptprop->SetTileAlpha(afAlpha);
     ptri->AttachProperty(ptprop);
-    NiMaterialProperty* v45 = static_cast<NiMaterialProperty*>(NiMemObject::operator new(sizeof(NiMaterialProperty)));
-    if (v45) {
-        pmaterial = ::new (v45) NiMaterialProperty;
-    }
-    else {
-        pmaterial = nullptr;
-    }
+    pmaterial = new NiMaterialProperty;
     pmaterial->SetEmittance(NiColor_WHITE);
     ptri->AttachProperty(pmaterial);
     NiBound* ModelBound = &ptri->GetModelBound();

@@ -7635,28 +7635,14 @@ void Actor::AddGunWobble() {
                     if ((pblendCol) &&
                         (!NiObject::DynamicCastStatic(&bhkBlendCollisionObjectAddRotation::ms_RTTI, pblendCol))) {
                         bhkBlendCollisionObjectAddRotation* pnewBlendCol_2;
-                        bhkBlendCollisionObjectAddRotation* v12 = static_cast<bhkBlendCollisionObjectAddRotation*>(
-                            NiMemObject::operator new(sizeof(bhkBlendCollisionObjectAddRotation))
-                        );
-                        if (v12) {
-                            pnewBlendCol_2 = ::new (v12) bhkBlendCollisionObjectAddRotation;
-                        }
-                        else {
-                            pnewBlendCol_2 = nullptr;
-                        }
+                        pnewBlendCol_2 = new bhkBlendCollisionObjectAddRotation;
                         pnewBlendCol_2->CopyFrom(pblendCol);
                         pwobbleObj->SetCollisionObject(pnewBlendCol_2);
                     }
                 }
                 else {
                     bhkBlendCollisionObjectAddRotation* pnewBlendCol;
-                    void* apMemory = NiMemObject::operator new(sizeof(bhkBlendCollisionObjectAddRotation));
-                    if (apMemory) {
-                        pnewBlendCol = ::new (apMemory) bhkBlendCollisionObjectAddRotation;
-                    }
-                    else {
-                        pnewBlendCol = nullptr;
-                    }
+                    pnewBlendCol = new bhkBlendCollisionObjectAddRotation;
                     pwobbleObj->SetCollisionObject(pnewBlendCol);
                 }
                 bhkBlendCollisionObjectAddRotation* pblendColObj =
@@ -17023,8 +17009,7 @@ void Actor::DismemberLimb(
     BGSBodyPartData* pbodyPartData = GetActorBase()->GetBodyPartData();
     BGSBodyPart* pbodyPart = pbodyPartData ? pbodyPartData->GetBodyPart(aeLimb) : nullptr;
     Actor::FillBoneArray(plimbRoot, false);
-    void* pnodeMemory = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* pclonedLimbRoot = pnodeMemory ? ::new (pnodeMemory) NiNode(0) : nullptr;
+    NiNode* pclonedLimbRoot = new NiNode(0);
     pclonedLimbRoot->SetName(pdismemberrootname);
     pactorRoot->AttachChild(pclonedLimbRoot, 1);
     NiUpdateData UpdateData(0.0f, false, false);
@@ -17098,8 +17083,7 @@ void Actor::DismemberLimb(
         }
     }
     if (!plimbReplacement) {
-        void* preplacementMemory = NiMemObject::operator new(sizeof(NiNode));
-        plimbReplacement = preplacementMemory ? ::new (preplacementMemory) NiNode(0) : nullptr;
+        plimbReplacement = new NiNode(0);
     }
     if (!abExplode) {
         pCurrentProcess->StoreDismemberedLimbNode(aeLimb, plimbReplacement->IsNode());

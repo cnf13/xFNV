@@ -31,12 +31,7 @@ const NiRTTI* BSMaterialEmittanceMultController::GetRTTI() const {
 // The base copies the members and the cloning process records the clone (a failed allocation is passed through as
 // null).
 NiObject* BSMaterialEmittanceMultController::CreateClone(NiCloningProcess& kCloning) {
-    BSMaterialEmittanceMultController* pkClone = static_cast<BSMaterialEmittanceMultController*>(
-        NiMemObject::operator new(sizeof(BSMaterialEmittanceMultController))
-    );
-    if (pkClone) {
-        ::new (pkClone) BSMaterialEmittanceMultController;
-    }
+    BSMaterialEmittanceMultController* pkClone = new BSMaterialEmittanceMultController;
     CopyMembers(pkClone, kCloning);
     return pkClone;
 }
@@ -50,14 +45,7 @@ void BSMaterialEmittanceMultController::LinkObject(NiStream& kStream) {
     if ((&kStream)->GetFileVersion() < 0xA010068) {
         NiFloatInterpolator* v5;
         NiFloatData* ObjectFromLinkID = static_cast<NiFloatData*>(kStream.GetObjectFromLinkID());
-        NiFloatInterpolator* v4 =
-            static_cast<NiFloatInterpolator*>(NiMemObject::operator new(sizeof(NiFloatInterpolator)));
-        if (v4) {
-            v5 = ::new (v4) NiFloatInterpolator(ObjectFromLinkID);
-        }
-        else {
-            v5 = nullptr;
-        }
+        v5 = new NiFloatInterpolator(ObjectFromLinkID);
         m_spInterpolator = v5;
         m_spInterpolator.m_pObject->Collapse();
     }
@@ -112,11 +100,6 @@ void BSMaterialEmittanceMultController::GetTargetFloatValue(float& fValue) {
 
 // Stream factory for this class: returns a new controller, or null.
 NiObject* BSMaterialEmittanceMultController::CreateObject() {
-    BSMaterialEmittanceMultController* pkController = static_cast<BSMaterialEmittanceMultController*>(
-        NiMemObject::operator new(sizeof(BSMaterialEmittanceMultController))
-    );
-    if (pkController) {
-        ::new (pkController) BSMaterialEmittanceMultController;
-    }
+    BSMaterialEmittanceMultController* pkController = new BSMaterialEmittanceMultController;
     return pkController;
 }

@@ -134,8 +134,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
     if (NavMeshCellMap.GetAt(apCell, spCellNode)) {
         return;
     }
-    void* pNodeMemory = NiMemObject::operator new(sizeof(NiNode));
-    NiNode* pNode = pNodeMemory ? ::new (pNodeMemory) NiNode(2 * uiNavMeshes) : nullptr;
+    NiNode* pNode = new NiNode(2 * uiNavMeshes);
     spCellNode = pNode;
     spRootDrawNode->AttachChild(spCellNode, 1);
     NavMeshCellMap.SetAt(apCell, spCellNode);
@@ -383,16 +382,12 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             ourMemcpy(pEdgeVerts, &edgeVertList.GetAt(0), sizeof(NiPoint3) * iEdgeCopy);
             ourMemcpy(pEdgeColors, &edgeColorList.GetAt(0), sizeof(NiColorA) * iEdgeCopy);
             ourMemcpy(pEdgeConnections, &edgeConnectionList.GetAt(0), iEdgeCopy);
-            void* pLinesMemory = NiMemObject::operator new(sizeof(NiLines));
-            NiLines* pLines = pLinesMemory ? ::new (pLinesMemory) NiLines(
-                                                 static_cast<uint16_t>(iEdgeCopy), pEdgeVerts, pEdgeColors, nullptr, 0,
-                                                 NiGeometryData::NBT_METHOD_NONE, pEdgeConnections
-                                             )
-                                           : nullptr;
+            NiLines* pLines = new NiLines(
+                static_cast<uint16_t>(iEdgeCopy), pEdgeVerts, pEdgeColors, nullptr, 0, NiGeometryData::NBT_METHOD_NONE,
+                pEdgeConnections
+            );
             NiPointer<NiLines> spLines(pLines);
-            void* pLinesShaderMemory = NiMemObject::operator new(sizeof(BSShaderNoLightingProperty));
-            BSShaderNoLightingProperty* pLinesShader =
-                pLinesShaderMemory ? ::new (pLinesShaderMemory) BSShaderNoLightingProperty : nullptr;
+            BSShaderNoLightingProperty* pLinesShader = new BSShaderNoLightingProperty;
             NiPointer<BSShaderNoLightingProperty> spLinesShaderProp(pLinesShader);
             spLinesShaderProp->SetFlag(BSShaderProperty::BSSP_FLAG_ZBUFFER_WRITE, 0);
             spLines->AttachProperty(spLinesShaderProp);
@@ -427,17 +422,12 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
                 ourMemcpy(pConVerts, &connectVertList.GetAt(0), sizeof(NiPoint3) * iConnectionCopy);
                 ourMemcpy(pConColors, &connectColorList.GetAt(0), sizeof(NiColorA) * iConnectionCopy);
                 ourMemcpy(pConConnections, &connectConnectionList.GetAt(0), iConnectionCopy);
-                void* pConLinesMemory = NiMemObject::operator new(sizeof(NiLines));
-                NiLines* pConLines = pConLinesMemory
-                    ? ::new (pConLinesMemory) NiLines(
-                          static_cast<uint16_t>(iConnectionCopy), pConVerts, pConColors, nullptr, 0,
-                          NiGeometryData::NBT_METHOD_NONE, pConConnections
-                      )
-                    : nullptr;
+                NiLines* pConLines = new NiLines(
+                    static_cast<uint16_t>(iConnectionCopy), pConVerts, pConColors, nullptr, 0,
+                    NiGeometryData::NBT_METHOD_NONE, pConConnections
+                );
                 spConnections = pConLines;
-                void* pConShaderMemory = NiMemObject::operator new(sizeof(BSShaderNoLightingProperty));
-                BSShaderNoLightingProperty* pConShader =
-                    pConShaderMemory ? ::new (pConShaderMemory) BSShaderNoLightingProperty : nullptr;
+                BSShaderNoLightingProperty* pConShader = new BSShaderNoLightingProperty;
                 spLinesShaderProp = pConShader;
                 spLinesShaderProp->SetFlag(BSShaderProperty::BSSP_FLAG_ZBUFFER_WRITE, 0);
                 spConnections->AttachProperty(spLinesShaderProp);
@@ -468,19 +458,14 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
             }
             ourMemcpy(pTriVerts, &triVertList.GetAt(0), sizeof(NiPoint3) * uiTotalSize);
             ourMemcpy(pTriColors, &triColorList.GetAt(0), sizeof(NiColorA) * uiTotalSize);
-            void* pShapeMemory = NiMemObject::operator new(sizeof(NiTriShape));
-            NiTriShape* pShape = pShapeMemory
-                ? ::new (pShapeMemory) NiTriShape(
-                      static_cast<uint16_t>(uiTotalSize), pTriVerts, nullptr, pTriColors, nullptr, 0,
-                      NiGeometryData::NBT_METHOD_NONE, static_cast<uint16_t>(uiTriSize), pusTriList
-                  )
-                : nullptr;
+            NiTriShape* pShape = new NiTriShape(
+                static_cast<uint16_t>(uiTotalSize), pTriVerts, nullptr, pTriColors, nullptr, 0,
+                NiGeometryData::NBT_METHOD_NONE, static_cast<uint16_t>(uiTriSize), pusTriList
+            );
             NiPointer<NiTriShape> spTriangles(pShape);
             NiFixedString kName("NavMesh Triangles");
             spTriangles->SetName(kName);
-            void* pShaderMemory = NiMemObject::operator new(sizeof(BSShaderNoLightingProperty));
-            BSShaderNoLightingProperty* pShader =
-                pShaderMemory ? ::new (pShaderMemory) BSShaderNoLightingProperty : nullptr;
+            BSShaderNoLightingProperty* pShader = new BSShaderNoLightingProperty;
             NiPointer<BSShaderNoLightingProperty> spShaderProp(pShader);
             spShaderProp->SetFlag(BSShaderProperty::BSSP_FLAG_ZBUFFER_WRITE, 0);
             spTriangles->AttachProperty(spTriangleMaterialArray[NAVMESH_RENDER_COLOR_TYPE_NORMAL]);
@@ -494,8 +479,7 @@ void NavMeshRender::AddDrawOnlyNavMeshes(TESObjectCELL* apCell, bool abUpdate) {
                 NiPointer<NiAVObject> spSphere(
                     BSTestObjects::CreateSphere(pAvoidNode->fRadius, 10, 10, &kLightDarkRed)
                 );
-                void* pAlphaMemory = NiMemObject::operator new(sizeof(NiAlphaProperty));
-                NiAlphaProperty* pAlpha = pAlphaMemory ? ::new (pAlphaMemory) NiAlphaProperty : nullptr;
+                NiAlphaProperty* pAlpha = new NiAlphaProperty;
                 NiPointer<NiAlphaProperty> spAlpha(pAlpha);
                 spAlpha->SetAlphaBlending(true);
                 spSphere->AttachProperty(spAlpha);

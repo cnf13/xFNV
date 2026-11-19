@@ -80,11 +80,7 @@ void DistantLODShader::RecreateRendererData() {
 // Each entry's variable name is an empty string.
 void DistantLODShader::CreateConstantMaps() {
     if (!m_spVertexConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap = nullptr;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_VERTEX);
         m_spVertexConstantMap = pMap;
         m_spVertexConstantMap.m_pObject->AddEntry(
             "WorldViewProjTranspose", 0x20000009, 0, 0, 4, nullptr, 0, 0, nullptr, false
@@ -119,14 +115,7 @@ void DistantLODShader::CreateConstantMaps() {
         pDistantLODInstanceDataEntry = m_spVertexConstantMap.m_pObject->GetEntry("instance data");
     }
     if (!m_spPixelConstantMap.m_pObject) {
-        void* pMemory = NiMemObject::operator new(sizeof(NiD3DShaderConstantMap));
-        NiD3DShaderConstantMap* pMap;
-        if (pMemory) {
-            pMap = ::new (pMemory) NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
-        }
-        else {
-            pMap = nullptr;
-        }
+        NiD3DShaderConstantMap* pMap = new NiD3DShaderConstantMap(m_pkD3DRenderer, NiGPUProgram::PROGRAM_PIXEL);
         m_spPixelConstantMap = pMap;
         m_spPixelConstantMap.m_pObject->AddEntry(
             "alpha test ref", 0x10000007, 0, 3, 1, "", 16, 4, &pfAlphaTestRef, false
@@ -285,10 +274,7 @@ BSShader* DistantLODShader::CreateShader() {
         NiShaderDeclaration::SPUSAGE_TEXCOORD, 1u, NiD3DShaderDeclaration::SPTESS_DEFAULT
     );
     spShaderDecl->GetD3DDeclaration();
-    DistantLODShader* v2 = static_cast<DistantLODShader*>(NiMemObject::operator new(sizeof(DistantLODShader)));
-    if (v2) {
-        pshader = ::new (v2) DistantLODShader(spShaderDecl);
-    }
+    pshader = new DistantLODShader(spShaderDecl);
     pshader->Initialize();
     pshader->LoadShaders();
     pshader->CreateConstantMaps();

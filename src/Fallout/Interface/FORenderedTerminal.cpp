@@ -219,13 +219,7 @@ void FORenderedTerminal::Initialize() {
     pgeom->SetTranslate(fzoom, *v5, fRenderedTerminalHPos);
     NiUpdateData UpdateData1(0.0f, false, false);
     pgeom->Update(UpdateData1);
-    NiCamera* apMemory = static_cast<NiCamera*>(NiMemObject::operator new(sizeof(NiCamera)));
-    if (apMemory) {
-        pcam = ::new (apMemory) NiCamera;
-    }
-    else {
-        pcam = nullptr;
-    }
+    pcam = new NiCamera;
     ::new (&port) NiColorA(0.0f, 1.0f, 1.0f, 0.0f);
     pcam->SetViewPort(port);
     rot.SetRow(0, 0.0f, 0.0f, 1.0f);
@@ -266,13 +260,7 @@ void FORenderedTerminal::Initialize() {
     SetScreenParent(pgeom);
     int32_t fRenderedTerminalHPosa = NiAlphaProperty::GetType();
     pscreen->RemoveProperty(fRenderedTerminalHPosa);
-    NiAlphaProperty* v27 = static_cast<NiAlphaProperty*>(NiMemObject::operator new(sizeof(NiAlphaProperty)));
-    if (v27) {
-        v17 = ::new (v27) NiAlphaProperty;
-    }
-    else {
-        v17 = nullptr;
-    }
+    v17 = new NiAlphaProperty;
     pscreen->AttachProperty(v17);
     SetCamera(pcam);
     FORenderedMenu::Initialize();

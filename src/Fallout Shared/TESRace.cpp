@@ -1503,33 +1503,14 @@ bool TESRace::CreateHead(
     );
     apOutNodeBiped = nullptr;
     apOutNodeSkinned = nullptr;
-    BSFaceGenAnimationData* v20 =
-        static_cast<BSFaceGenAnimationData*>(NiMemObject::operator new(sizeof(BSFaceGenAnimationData)));
-    if (v20) {
-        panimData = ::new (v20) BSFaceGenAnimationData;
-    }
-    else {
-        panimData = nullptr;
-    }
-    BSFaceGenNiNode* v18 = static_cast<BSFaceGenNiNode*>(NiMemObject::operator new(sizeof(BSFaceGenNiNode)));
-    if (v18) {
-        v11 = ::new (v18) BSFaceGenNiNode;
-    }
-    else {
-        v11 = nullptr;
-    }
+    panimData = new BSFaceGenAnimationData;
+    v11 = new BSFaceGenNiNode;
     apOutNodeBiped = v11;
     apOutNodeBiped->SetName("BSFaceGenNiNodeBiped");
     apOutNodeBiped->SetAnimationData(panimData);
     apOutNodeBiped->SetAnimationUpdate(true);
     apOutNodeBiped->SetApplyRotToParent(true);
-    BSFaceGenNiNode* v15 = static_cast<BSFaceGenNiNode*>(NiMemObject::operator new(sizeof(BSFaceGenNiNode)));
-    if (v15) {
-        v9 = ::new (v15) BSFaceGenNiNode;
-    }
-    else {
-        v9 = nullptr;
-    }
+    v9 = new BSFaceGenNiNode;
     apOutNodeSkinned = v9;
     apOutNodeSkinned->SetName("BSFaceGenNiNodeSkinned");
     apOutNodeSkinned->SetAnimationData(panimData);

@@ -619,12 +619,7 @@ void NiBlendAccumTransformInterpolator::CalculateSingleValue(float fTime, NiObje
 }
 
 NiObject* NiBlendAccumTransformInterpolator::CreateObject() {
-    void* v0 = NiMemObject::operator new(sizeof(NiBlendAccumTransformInterpolator));
-    if (v0) {
-        return ::new (v0) NiBlendAccumTransformInterpolator;
-    }
-
-    return nullptr;
+    return new NiBlendAccumTransformInterpolator;
 }
 
 // Each component times fScalar, rounded to float, set through SetValues.

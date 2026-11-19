@@ -198,13 +198,7 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
     }
     else {
         BSTreeModel* pmodel_2;
-        BSTreeModel* v13 = static_cast<BSTreeModel*>(NiMemObject::operator new(sizeof(BSTreeModel)));
-        if (v13) {
-            pmodel_2 = ::new (v13) BSTreeModel;
-        }
-        else {
-            pmodel_2 = nullptr;
-        }
+        pmodel_2 = new BSTreeModel;
         pmodel = pmodel_2;
         if (!pmodel_2->InitAsInstance(spbasemodel.m_pObject)) {
             if (pmodel) {
@@ -295,13 +289,7 @@ void BSTreeManager::GetModel(TESObjectTREE* apTree, uint32_t aiSeed, NiPointer<B
         if (!bfound || !sprettree.m_pObject) {
             if (iemptyslot >= 0) {
                 BSTreeModel* v4;
-                BSTreeModel* apMemory = static_cast<BSTreeModel*>(NiMemObject::operator new(sizeof(BSTreeModel)));
-                if (apMemory) {
-                    v4 = ::new (apMemory) BSTreeModel;
-                }
-                else {
-                    v4 = nullptr;
-                }
+                v4 = new BSTreeModel;
                 sprettree = v4;
                 pmodelarray[iemptyslot] = sprettree;
             }
@@ -511,13 +499,7 @@ NiTexture* BSTreeManager::GetCanopyShadow() {
     }
     if (!BSTreeManager::GetInstance(true)->spCanopyShadow.m_pObject) {
         NiPixelData* ppixeldata;
-        NiPixelData* v10 = static_cast<NiPixelData*>(NiMemObject::operator new(sizeof(NiPixelData)));
-        if (v10) {
-            ppixeldata = ::new (v10) NiPixelData(16u, 16u, NiPixelFormat_RGB24, 1u, 1u);
-        }
-        else {
-            ppixeldata = nullptr;
-        }
+        ppixeldata = new NiPixelData(16u, 16u, NiPixelFormat_RGB24, 1u, 1u);
         uint8_t* ppixels = ppixeldata->GetPixels(0u, 0u);
         for (uint32_t iy = 0; iy < 16; ++iy) {
             for (uint32_t ix = 0; ix < 16; ++ix) {
