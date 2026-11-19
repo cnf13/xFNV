@@ -225,17 +225,9 @@ static void updateBestSupportPair(
     shapeB->getSupportingVertexImpl(directionInB, vertexB);
     const __m128 b = vertexB.m_quad;
     const __m128 dir = direction->m_quad;
-    // EXE-INLINED none: hkVector4::_setTransformedPos
-    const __m128 bInA = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(b, b, 85), transform->m_rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(b, b, 0), transform->m_rotation.m_col0.m_quad)
-        ),
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(b, b, 170), transform->m_rotation.m_col2.m_quad), transform->m_translation.m_quad
-        )
-    );
-    const __m128 v14 = _mm_mul_ps(_mm_sub_ps(vertexA.m_quad, bInA), dir);
+    hkVector4 bInA;
+    bInA._setTransformedPos(*transform, vertexB);
+    const __m128 v14 = _mm_mul_ps(_mm_sub_ps(vertexA.m_quad, bInA.m_quad), dir);
     // Sums as (y + x) + z in the low lane.
     const float distance =
         _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(v14, v14, 170), _mm_add_ss(_mm_shuffle_ps(v14, v14, 85), v14)));
@@ -441,36 +433,15 @@ hkResult hkCalcMultiPenetrationDepth(
     const float radiusA = shapeA->m_radius;
     if (numShapeBs > 0) {
         const double distance = static_cast<double>(planeDistance) - radiusA;
-        const __m128 normalY = _mm_shuffle_ps(normal.m_quad, normal.m_quad, 0x55);
-        const __m128 normalX = _mm_shuffle_ps(normal.m_quad, normal.m_quad, 0x00);
-        const __m128 normalZ = _mm_shuffle_ps(normal.m_quad, normal.m_quad, 0xAA);
         hkCalcMultiPenetrationDepthWork* current = workData;
         int32_t remaining = numShapeBs;
         do {
             current->m_util.convertResultToFeature(current->m_wingedEdge, current->m_nearestTriangle, output);
-            // EXE-INLINED none: hkVector4::_setRotatedDir
-            current->m_pointOut->m_separatingNormal.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(normalY, transformA.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(transformA.m_rotation.m_col0.m_quad, normalX)
-                ),
-                _mm_mul_ps(normalZ, transformA.m_rotation.m_col2.m_quad)
-            );
+            current->m_pointOut->m_separatingNormal._setRotatedDir(transformA.m_rotation, normal);
             // x87 copy of m_shapeB->m_radius.
             const float radiusB = current->m_shapeB->m_radius;
             const float contactDistance = static_cast<float>(distance - radiusB);
-            const __m128 pointA = output.m_pointAinA.m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            current->m_pointOut->m_position.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(pointA, pointA, 0x55), transformA.m_rotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(pointA, pointA, 0x00), transformA.m_rotation.m_col0.m_quad)
-                ),
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(pointA, pointA, 0xAA), transformA.m_rotation.m_col2.m_quad),
-                    transformA.m_translation.m_quad
-                )
-            );
+            current->m_pointOut->m_position._setTransformedPos(transformA, output.m_pointAinA);
             current->m_pointOut->m_separatingNormal(3) = contactDistance;
             ++current;
         }
@@ -512,21 +483,9 @@ void hkpConvexPenetrationUtil::getPointForSimplex(const hkVector4& direction, hk
     alignas(16) hkVector4 negDirectionInB;
     negDirectionInB._setRotatedInverseDir(m_aTb.m_rotation, negDirection);
     m_shapeB.m_storage->getSupportingVertexImpl(negDirectionInB, result.m_pointBinB);
-    const __m128 pointB = result.m_pointBinB.m_quad;
-    // EXE-INLINED none: hkVector4::_setTransformedPos
-    result.m_position.m_quad = _mm_sub_ps(
-        result.m_pointAinA.m_quad,
-        _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pointB, pointB, 0x55), m_aTb.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(pointB, pointB, 0x00), m_aTb.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(pointB, pointB, 0xAA), m_aTb.m_rotation.m_col2.m_quad),
-                m_aTb.m_translation.m_quad
-            )
-        )
-    );
+    hkVector4 pointBinA;
+    pointBinA._setTransformedPos(m_aTb, result.m_pointBinB);
+    result.m_position.m_quad = _mm_sub_ps(result.m_pointAinA.m_quad, pointBinA.m_quad);
 }
 
 // getPointForSimplex writes only pA's m_position, m_pointAinA and m_pointBinB; pA.m_referee is never written, yet it is

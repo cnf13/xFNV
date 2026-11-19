@@ -239,13 +239,7 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
                 hkArray<hkConstraintInternalInfo, hkContainerTempAllocator>& priorityConstraints =
                     (ci->m_priority.m_storage < hkpConstraintInstance::PRIORITY_TOI_HIGHER) ? normalPriorityConstraints
                                                                                             : highPriorityConstraints;
-                // EXE-INLINED none: hkArray<hkConstraintInternalInfo>::pushBackUnchecked (its placement copy
-                // tests the slot)
-                hkConstraintInternalInfo* slot = priorityConstraints.m_data + priorityConstraints.m_size;
-                if (slot) {
-                    *slot = info;
-                }
-                ++priorityConstraints.m_size;
+                priorityConstraints.pushBackUnchecked(info);
             }
         }
         // EXE-INLINED none: hkMap<hkUlong, hkUlong>::~hkMap (clearAndDeallocate through the heap, then the base's
@@ -428,12 +422,7 @@ void createBuildJacobianAndSolveJacobianTaskCollection(
                     break;
                 }
                 if ((*groupA == 0 || *groupA == currentGroup) && (*groupB == 0 || *groupB == currentGroup)) {
-                    // EXE-INLINED none: hkLocalArray<hkConstraintInternalInfo>::pushBackUnchecked (its placement
-                    // copy tests the slot)
-                    hkConstraintInternalInfo* slot = constraintsForThisTask.expandByUnchecked(1);
-                    if (slot) {
-                        *slot = *info;
-                    }
+                    constraintsForThisTask.pushBackUnchecked(*info);
                     *groupA = currentGroup;
                     *groupB = currentGroup;
                 }

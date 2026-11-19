@@ -60,8 +60,8 @@ static void hkSolver_solveBallAndSocketChain(
 // zeroed). The one caller hkSolver_solvePoweredChain passes its hkpChainSolverInfo and its g buffer.
 static void hkPoweredChain_ForwardSubstitute(const hkpChainSolverInfo& info, hkVector8* g);
 
-// The constraint's two accumulators are info.m_accumsBase moved by the byte offsets of va[i] and va[i + 1] (raw memory
-// addressed by byte offset, hence the casts); m_scratch0 and m_scratch123's first column hold what the chain solver
+// The constraint's two accumulators are info.m_accumsBase moved by the byte offsets of va[i] and va[i + 1];
+// m_scratch0 and m_scratch123's first column hold what the chain solver
 // keeps there of each body's linear and angular parts.
 static int32_t hkPoweredChain_BuildVelocities(const hkpChainSolverInfo& info, hkVector8* velocities) {
     int32_t i = 0;
@@ -71,13 +71,8 @@ static int32_t hkPoweredChain_BuildVelocities(const hkpChainSolverInfo& info, hk
         hkVector8* velocity = velocities;
         do {
             const hkpVelocityAccumulatorOffset* va = info.m_va.m_storage;
-            const char* accumsBase = reinterpret_cast<const char*>(info.m_accumsBase.m_storage);
-            // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-            const hkpVelocityAccumulator* accA =
-                reinterpret_cast<const hkpVelocityAccumulator*>(accumsBase + va[i].m_offset);
-            // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-            const hkpVelocityAccumulator* accB =
-                reinterpret_cast<const hkpVelocityAccumulator*>(accumsBase + va[i + 1].m_offset);
+            const hkpVelocityAccumulator* accA = hkAddByteOffsetConst(info.m_accumsBase.m_storage, va[i].m_offset);
+            const hkpVelocityAccumulator* accB = hkAddByteOffsetConst(info.m_accumsBase.m_storage, va[i + 1].m_offset);
             const __m128 scratchA0 = accA->m_scratch0.m_quad;
             const __m128 scratchA1 = accA->m_scratch123.m_col0.m_quad;
             const __m128 scratchB1 = accB->m_scratch123.m_col0.m_quad;
@@ -158,11 +153,8 @@ static hkVector8* hkPoweredChain_computeMotorVelocity(
     hkVector8* velocities
 ) {
     const hkpVelocityAccumulatorOffset* va = &info.m_va.m_storage[constraintIndex];
-    const char* accumsBase = reinterpret_cast<const char*>(info.m_accumsBase.m_storage);
-    // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-    const hkpVelocityAccumulator* accA = reinterpret_cast<const hkpVelocityAccumulator*>(accumsBase + va[0].m_offset);
-    // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-    const hkpVelocityAccumulator* accB = reinterpret_cast<const hkpVelocityAccumulator*>(accumsBase + va[1].m_offset);
+    const hkpVelocityAccumulator* accA = hkAddByteOffsetConst(info.m_accumsBase.m_storage, va[0].m_offset);
+    const hkpVelocityAccumulator* accB = hkAddByteOffsetConst(info.m_accumsBase.m_storage, va[1].m_offset);
     const hkp1dMotorSolverInfo& motor = info.m_motorsState.m_storage[constraintIndex].m_motorInfos[motorIndex];
     const hkp2AngJacobian& jac = info.m_jAng.m_storage[3 * constraintIndex + motorIndex];
     const float motorTau = motor.m_tau;

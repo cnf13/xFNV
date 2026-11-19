@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -102,18 +103,10 @@ void hkpSweptTransformDisplayViewer::entityAddedCallback(hkpEntity* entity) {
         created.pushBack(id + 1);
 
         hkTransform trans0;
-        // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
-        trans0.m_rotation.set(swept.m_rotation0);
-        hkVector4 centerShift0;
-        centerShift0.setRotatedDir(trans0.m_rotation, swept.m_centerOfMassLocal);
-        trans0.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0.m_quad);
+        hkSweptTransformUtil::calcTransAtT0(swept, trans0);
 
         hkTransform trans1;
-        // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
-        trans1.m_rotation.set(swept.m_rotation1);
-        hkVector4 centerShift1;
-        centerShift1.setRotatedDir(trans1.m_rotation, swept.m_centerOfMassLocal);
-        trans1.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1.m_quad);
+        hkSweptTransformUtil::calcTransAtT1(swept, trans1);
 
         m_displayHandler->addGeometry(displayGeometries, trans0, id + 1, m_tag, 0);
         m_displayHandler->setGeometryColor(HK_DEFAULT_SWEPT_TRANSFORM_COLOR_T0, id + 1, m_tag);
@@ -165,18 +158,10 @@ void hkpSweptTransformDisplayViewer::postSimulationCallback(hkpWorld* world) {
             const hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable);
             hkTransform trans;
 
-            // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
-            trans.m_rotation.set(swept.m_rotation0);
-            hkVector4 centerShift0;
-            centerShift0.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
-            trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0.m_quad);
+            hkSweptTransformUtil::calcTransAtT0(swept, trans);
             m_displayHandler->updateGeometry(trans, id + 1, m_tag);
 
-            // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
-            trans.m_rotation.set(swept.m_rotation1);
-            hkVector4 centerShift1;
-            centerShift1.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
-            trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1.m_quad);
+            hkSweptTransformUtil::calcTransAtT1(swept, trans);
             m_displayHandler->updateGeometry(trans, id + 2, m_tag);
         }
     }
@@ -202,18 +187,10 @@ void hkpSweptTransformDisplayViewer::inactiveEntityMovedCallback(hkpEntity* enti
     const hkUlong id = reinterpret_cast<hkUlong>(&entity->m_collidable);
     hkTransform trans;
 
-    // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT0
-    trans.m_rotation.set(swept.m_rotation0);
-    hkVector4 centerShift0;
-    centerShift0.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
-    trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass0.m_quad, centerShift0.m_quad);
+    hkSweptTransformUtil::calcTransAtT0(swept, trans);
     m_displayHandler->updateGeometry(trans, id + 1, m_tag);
 
-    // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
-    trans.m_rotation.set(swept.m_rotation1);
-    hkVector4 centerShift1;
-    centerShift1.setRotatedDir(trans.m_rotation, swept.m_centerOfMassLocal);
-    trans.m_translation.m_quad = _mm_sub_ps(swept.m_centerOfMass1.m_quad, centerShift1.m_quad);
+    hkSweptTransformUtil::calcTransAtT1(swept, trans);
     m_displayHandler->updateGeometry(trans, id + 2, m_tag);
 }
 

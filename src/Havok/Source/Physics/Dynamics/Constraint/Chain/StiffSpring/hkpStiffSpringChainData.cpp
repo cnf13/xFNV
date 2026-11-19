@@ -174,10 +174,10 @@ void hkpStiffSpringChainData::buildJacobian(const hkpConstraintQueryIn& inNotVal
         // EXE-INLINED none: hkAddByteOffset<hkpVelocityAccumulator>
         in2.m_bodyB =
             reinterpret_cast<hkpVelocityAccumulator*>(reinterpret_cast<char*>(pAccumsBase) + pEntity->m_solverData);
-        // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::pushBackUnchecked
-        accumulators.m_data[0].m_offset =
+        hkpVelocityAccumulatorOffset offset;
+        offset.m_offset =
             static_cast<uint32_t>(reinterpret_cast<char*>(in2.m_bodyB) - reinterpret_cast<char*>(pAccumsBase));
-        accumulators.m_size = 1;
+        accumulators.pushBackUnchecked(offset);
         in2.m_virtMassFactor = 1.0f;
         in2.m_transformB = &pEntity->getMotion()->getTransform();
         in2.m_rhsFactor = in2.m_substepInvDeltaTime;

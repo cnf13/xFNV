@@ -60,6 +60,11 @@ public:
         int32_t insertCallStack(hkStackTracer& tracer);
         // The SDK's form: const, return addresses as hkUlong.
         int32_t getCallStack(int32_t id, hkUlong* addrs, int32_t maxAddrs) const;
+        // Frees the nodes through the tree's allocator and forgets the allocator.
+        void quit() {
+            m_nodes._clearAndDeallocate(*m_allocator);
+            m_allocator = nullptr;
+        }
 
         hkArrayBase<Node> m_nodes;
         hkMemoryAllocator* m_allocator;

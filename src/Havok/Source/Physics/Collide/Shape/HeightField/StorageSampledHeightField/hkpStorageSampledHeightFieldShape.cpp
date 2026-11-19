@@ -152,16 +152,10 @@ void hkpStorageSampledHeightFieldShape::collideSpheres(
         hkVector4 pos;
         pos.setMul4(spheres->m_pos, m_floatToIntScale);
 
-        // EXE-INLINED none: hkVector4Util::convertToUint16
-        // (position + offset) * scale plus the magic vector leaves each lane's 16-bit integer in bits 6 to 21.
-        const hkQuadReal converted = _mm_add_ps(
-            _mm_mul_ps(
-                _mm_add_ps(spheres->m_pos.m_quad, m_floatToIntOffsetFloorCorrected.m_quad), m_floatToIntScale.m_quad
-            ),
-            hkVector4Util_floatToUint16Magic
-        );
-        const int32_t x = static_cast<uint16_t>(std::bit_cast<uint32_t>(converted[0]) >> 6);
-        const int32_t z = static_cast<uint16_t>(std::bit_cast<uint32_t>(converted[2]) >> 6);
+        hkIntUnion64 converted;
+        hkVector4Util::convertToUint16(spheres->m_pos, m_floatToIntOffsetFloorCorrected, m_floatToIntScale, converted);
+        const int32_t x = converted.u16[0];
+        const int32_t z = converted.u16[2];
 
         if ((x >= (m_xRes - 1)) || (z >= (m_zRes - 1))) {
             continue;

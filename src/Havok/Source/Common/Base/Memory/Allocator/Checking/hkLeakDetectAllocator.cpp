@@ -238,17 +238,7 @@ void hkLeakDetectAllocator::quit() {
         );
         __builtin_debugtrap();
     }
-    // EXE-INLINED none: hkStackTracer::CallTree::quit (with hkArrayBase<Node>::_clearAndDeallocate)
-    m_callTree.m_nodes.m_size = 0;
-    if ((m_callTree.m_nodes.m_capacityAndFlags & hkArrayBase<hkStackTracer::CallTree::Node>::DONT_DEALLOCATE_FLAG) ==
-        0) {
-        m_callTree.m_allocator->_bufFree<hkStackTracer::CallTree::Node>(
-            m_callTree.m_nodes.m_data, m_callTree.m_nodes.getCapacity()
-        );
-    }
-    m_callTree.m_nodes.m_data = nullptr;
-    m_callTree.m_nodes.m_capacityAndFlags = hkArrayBase<hkStackTracer::CallTree::Node>::DONT_DEALLOCATE_FLAG;
-    m_callTree.m_allocator = nullptr;
+    m_callTree.quit();
     m_dynamic->m_activePointers.clearAndDeallocate(*m_debugAllocator);
     m_debugAllocator->blockFree(m_dynamic, sizeof(Dynamic));
     m_stackTracer->removeReference();

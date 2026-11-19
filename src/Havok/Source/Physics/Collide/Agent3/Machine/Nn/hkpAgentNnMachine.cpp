@@ -153,31 +153,7 @@ void hkAgentNnMachine_InternalDeallocateEntry(hkpAgentNnTrack& track, hkpAgentNn
         hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
         track.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
     }
-    // EXE-INLINED none: hkInplaceArray<hkpAgentNnSector*, 1>::optimizeCapacity(4)
-    if (track.m_sectors.m_capacityAndFlags >= 0) {
-        uint32_t uiCapacity = track.m_sectors.m_size + 3;
-        uiCapacity |= uiCapacity >> 16;
-        uiCapacity |= uiCapacity >> 8;
-        uiCapacity |= uiCapacity >> 4;
-        uiCapacity |= uiCapacity >> 2;
-        uiCapacity |= uiCapacity >> 1;
-        int32_t newCapacity = static_cast<int32_t>(uiCapacity + 1);
-        if (newCapacity < 1) {
-            // The SDK's cast: _reduce takes the inplace storage as raw bytes.
-            hkArrayUtil::_reduce(
-                *hkMemoryRouter::getInstance().m_heap, &track.m_sectors, sizeof(hkpAgentNnSector*),
-                reinterpret_cast<char*>(track.m_sectors.m_storage), 1
-            );
-        }
-        else if (
-            newCapacity <
-            static_cast<int32_t>(track.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgentNnSector*>::CAPACITY_MASK)
-        ) {
-            hkArrayUtil::_reduce(
-                *hkMemoryRouter::getInstance().m_heap, &track.m_sectors, sizeof(hkpAgentNnSector*), nullptr, newCapacity
-            );
-        }
-    }
+    track.m_sectors.optimizeCapacity(4);
 }
 
 // The agent's destroy function runs for the stream commands that call an agent (agent data after a 0x20-byte padded
@@ -281,33 +257,7 @@ const hkpCdBody* hkAgentMachine_processTransformedShapes(
             const hkMotionState* parent = cdBody->m_motion.pState;
             const hkTransform& t = transformShape->m_transform;
             hkMotionState* ms = newMotionStates;
-            const hkRotation& parentRotation = parent->m_transform.m_rotation;
-            __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&parentRotation.m_col0.m_quad)[0]);
-            __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&parentRotation.m_col1.m_quad)[0]);
-            __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&parentRotation.m_col2.m_quad)[0]);
-            // EXE-INLINED none: hkTransform::_setMul (the columns from the translation down to column 0, each
-            // y * c1 + x * c0, then + z * c2; the parent's translation is added afterwards)
-            const hkVector4* srcCols[4] = {
-                &t.m_rotation.m_col0, &t.m_rotation.m_col1, &t.m_rotation.m_col2, &t.m_translation
-            };
-            hkVector4* dstCols[4] = {
-                &ms->m_transform.m_rotation.m_col0, &ms->m_transform.m_rotation.m_col1,
-                &ms->m_transform.m_rotation.m_col2, &ms->m_transform.m_translation
-            };
-            for (int32_t i = 3; i >= 0; --i) {
-                __m128 s = _mm_load_ps(&reinterpret_cast<const float*>(&srcCols[i]->m_quad)[0]);
-                __m128 r =
-                    _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(s, s, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(s, s, 0x00), c0));
-                r = _mm_add_ps(r, _mm_mul_ps(_mm_shuffle_ps(s, s, 0xAA), c2));
-                _mm_store_ps(&reinterpret_cast<float*>(&dstCols[i]->m_quad)[0], r);
-            }
-            _mm_store_ps(
-                &reinterpret_cast<float*>(&ms->m_transform.m_translation.m_quad)[0],
-                _mm_add_ps(
-                    _mm_load_ps(&reinterpret_cast<const float*>(&parent->m_transform.m_translation.m_quad)[0]),
-                    _mm_load_ps(&reinterpret_cast<float*>(&ms->m_transform.m_translation.m_quad)[0])
-                )
-            );
+            ms->m_transform._setMul(parent->m_transform, t);
             ms->m_sweptTransform.m_centerOfMass0 = parent->m_sweptTransform.m_centerOfMass0;
             ms->m_sweptTransform.m_centerOfMass1 = parent->m_sweptTransform.m_centerOfMass1;
             ms->m_sweptTransform.m_rotation0.setMul(parent->m_sweptTransform.m_rotation0, transformShape->m_rotation);
@@ -556,27 +506,7 @@ void hkAgentNnMachine_ProcessAgent(
                 in3.m_input = &input;
                 const hkMotionState* msA = firstObject->m_motion.pState;
                 const hkMotionState* msB = secondObject->m_motion.pState;
-                // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-                const float fDeltaTime = input.m_stepInfo.m_deltaTime;
-                const float fScaleA = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * fDeltaTime;
-                const float fScaleB = fDeltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-                const __m128 kDiffA = _mm_mul_ps(
-                    _mm_sub_ps(
-                        msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad
-                    ),
-                    _mm_set1_ps(fScaleA)
-                );
-                in3.m_linearTimInfo.m_quad = _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_set1_ps(fScaleB),
-                        _mm_sub_ps(
-                            msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad
-                        )
-                    ),
-                    kDiffA
-                );
-                in3.m_linearTimInfo.m_quad[3] = msB->m_deltaAngle.m_quad[3] * fScaleB * msB->m_objectRadius +
-                    msA->m_deltaAngle.m_quad[3] * fScaleA * msA->m_objectRadius;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
                 in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
                 input.m_dispatcher->m_agent3Func[entry->m_agentType].m_processFunc(
                     in3, entry, static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1, nullptr, output
@@ -592,27 +522,7 @@ void hkAgentNnMachine_ProcessAgent(
                 in3.m_input = &input;
                 const hkMotionState* msA = firstObject->m_motion.pState;
                 const hkMotionState* msB = secondObject->m_motion.pState;
-                // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-                const float fDeltaTime = input.m_stepInfo.m_deltaTime;
-                const float fScaleA = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * fDeltaTime;
-                const float fScaleB = fDeltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-                const __m128 kDiffA = _mm_mul_ps(
-                    _mm_sub_ps(
-                        msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad
-                    ),
-                    _mm_set1_ps(fScaleA)
-                );
-                in3.m_linearTimInfo.m_quad = _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_set1_ps(fScaleB),
-                        _mm_sub_ps(
-                            msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad
-                        )
-                    ),
-                    kDiffA
-                );
-                in3.m_linearTimInfo.m_quad[3] = msA->m_deltaAngle.m_quad[3] * fScaleA * msA->m_objectRadius +
-                    msB->m_deltaAngle.m_quad[3] * fScaleB * msB->m_objectRadius;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
 
                 float distAtT1;
                 if (input.m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
@@ -718,33 +628,7 @@ void hkAgentNnMachine_AppendTrack(hkpAgentNnTrack& track, hkpAgentNnTrack& appen
             hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
             appendee.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
         }
-        // EXE-INLINED none: hkInplaceArray<hkpAgentNnSector*, 1>::optimizeCapacity(4)
-        if (appendee.m_sectors.m_capacityAndFlags >= 0) {
-            uint32_t uiCapacity = appendee.m_sectors.m_size + 3;
-            uiCapacity |= uiCapacity >> 16;
-            uiCapacity |= uiCapacity >> 8;
-            uiCapacity |= uiCapacity >> 4;
-            uiCapacity |= uiCapacity >> 2;
-            uiCapacity |= uiCapacity >> 1;
-            int32_t newCapacity = static_cast<int32_t>(uiCapacity + 1);
-            if (newCapacity < 1) {
-                // The SDK's cast: _reduce takes the inplace storage as raw bytes.
-                hkArrayUtil::_reduce(
-                    *hkMemoryRouter::getInstance().m_heap, &appendee.m_sectors, sizeof(hkpAgentNnSector*),
-                    reinterpret_cast<char*>(appendee.m_sectors.m_storage), 1
-                );
-            }
-            else if (
-                newCapacity < static_cast<int32_t>(
-                                  appendee.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgentNnSector*>::CAPACITY_MASK
-                              )
-            ) {
-                hkArrayUtil::_reduce(
-                    *hkMemoryRouter::getInstance().m_heap, &appendee.m_sectors, sizeof(hkpAgentNnSector*), nullptr,
-                    newCapacity
-                );
-            }
-        }
+        appendee.m_sectors.optimizeCapacity(4);
     }
     if (appendee.m_sectors.m_size) {
         track.m_sectors._insertAt(
@@ -837,19 +721,9 @@ void hkAgentNnMachine_ProcessTrack(
                         in3.m_contactMgr = entry->m_contactMgr;
                         const hkMotionState* msA = bodyA->m_motion.pState;
                         const hkMotionState* msB = bodyB->m_motion.pState;
-                        // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-                        const float deltaTime = input.m_stepInfo.m_deltaTime;
-                        const float f0 = deltaTime * msA->m_sweptTransform.m_centerOfMass1(3);
-                        const float f1 = deltaTime * msB->m_sweptTransform.m_centerOfMass1(3);
-                        hkVector4 diff0;
-                        diff0.setSub4(msA->m_sweptTransform.m_centerOfMass0, msA->m_sweptTransform.m_centerOfMass1);
-                        hkVector4 diff1;
-                        diff1.setSub4(msB->m_sweptTransform.m_centerOfMass1, msB->m_sweptTransform.m_centerOfMass0);
-                        in3.m_linearTimInfo.m_quad = _mm_add_ps(
-                            _mm_mul_ps(_mm_set_ps1(f1), diff1.m_quad), _mm_mul_ps(_mm_set_ps1(f0), diff0.m_quad)
+                        hkSweptTransformUtil::calcTimInfo(
+                            *msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo
                         );
-                        in3.m_linearTimInfo(3) = msA->m_deltaAngle(3) * f0 * msA->m_objectRadius +
-                            msB->m_deltaAngle(3) * f1 * msB->m_objectRadius;
                         if (streamCommand == hkAgent3::STREAM_CALL) {
                             in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
                             input.m_dispatcher->m_agent3Func[entry->m_agentType].m_processFunc(
@@ -986,31 +860,7 @@ void hkAgentNnMachine_DeallocateLastEntry(hkpAgentNnTrack& track) {
         hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
         track.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
     }
-    // EXE-INLINED none: hkInplaceArray<hkpAgentNnSector*, 1>::optimizeCapacity(4)
-    if (track.m_sectors.m_capacityAndFlags >= 0) {
-        uint32_t uiCapacity = track.m_sectors.m_size + 3;
-        uiCapacity |= uiCapacity >> 16;
-        uiCapacity |= uiCapacity >> 8;
-        uiCapacity |= uiCapacity >> 4;
-        uiCapacity |= uiCapacity >> 2;
-        uiCapacity |= uiCapacity >> 1;
-        int32_t newCapacity = static_cast<int32_t>(uiCapacity + 1);
-        if (newCapacity < 1) {
-            // The SDK's cast: _reduce takes the inplace storage as raw bytes.
-            hkArrayUtil::_reduce(
-                *hkMemoryRouter::getInstance().m_heap, &track.m_sectors, sizeof(hkpAgentNnSector*),
-                reinterpret_cast<char*>(track.m_sectors.m_storage), 1
-            );
-        }
-        else if (
-            newCapacity <
-            static_cast<int32_t>(track.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgentNnSector*>::CAPACITY_MASK)
-        ) {
-            hkArrayUtil::_reduce(
-                *hkMemoryRouter::getInstance().m_heap, &track.m_sectors, sizeof(hkpAgentNnSector*), nullptr, newCapacity
-            );
-        }
-    }
+    track.m_sectors.optimizeCapacity(4);
 }
 
 // Performs hkAgentNnMachine_ProcessAgent's steps, and a TIM entry whose agent is skipped counts in numTim. The contact
@@ -1041,27 +891,7 @@ void hkAgentNnMachine_InlineProcessAgent(
                 in3.m_input = &input;
                 const hkMotionState* msA = firstObject->m_motion.pState;
                 const hkMotionState* msB = secondObject->m_motion.pState;
-                // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-                const float fDeltaTime = input.m_stepInfo.m_deltaTime;
-                const float fScaleA = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * fDeltaTime;
-                const float fScaleB = fDeltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-                const __m128 kDiffA = _mm_mul_ps(
-                    _mm_sub_ps(
-                        msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad
-                    ),
-                    _mm_set1_ps(fScaleA)
-                );
-                in3.m_linearTimInfo.m_quad = _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_set1_ps(fScaleB),
-                        _mm_sub_ps(
-                            msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad
-                        )
-                    ),
-                    kDiffA
-                );
-                in3.m_linearTimInfo.m_quad[3] = msB->m_deltaAngle.m_quad[3] * fScaleB * msB->m_objectRadius +
-                    msA->m_deltaAngle.m_quad[3] * fScaleA * msA->m_objectRadius;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
                 in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
                 input.m_dispatcher->m_agent3Func[entry->m_agentType].m_processFunc(
                     in3, entry, static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1, nullptr, output
@@ -1077,27 +907,7 @@ void hkAgentNnMachine_InlineProcessAgent(
                 in3.m_input = &input;
                 const hkMotionState* msA = firstObject->m_motion.pState;
                 const hkMotionState* msB = secondObject->m_motion.pState;
-                // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-                const float fDeltaTime = input.m_stepInfo.m_deltaTime;
-                const float fScaleA = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * fDeltaTime;
-                const float fScaleB = fDeltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-                const __m128 kDiffA = _mm_mul_ps(
-                    _mm_sub_ps(
-                        msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad
-                    ),
-                    _mm_set1_ps(fScaleA)
-                );
-                in3.m_linearTimInfo.m_quad = _mm_add_ps(
-                    _mm_mul_ps(
-                        _mm_set1_ps(fScaleB),
-                        _mm_sub_ps(
-                            msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad
-                        )
-                    ),
-                    kDiffA
-                );
-                in3.m_linearTimInfo.m_quad[3] = msA->m_deltaAngle.m_quad[3] * fScaleA * msA->m_objectRadius +
-                    msB->m_deltaAngle.m_quad[3] * fScaleB * msB->m_objectRadius;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
 
                 float distAtT1;
                 if (input.m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {

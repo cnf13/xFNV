@@ -16,6 +16,16 @@ public:
     void initSweptTransform(const hkVector4& position, const hkQuaternion& rotation);
     void approxTransformAt(float time, hkTransform& transformOut);
 
+    // The inverse of the step's duration, kept in m_centerOfMass1's w.
+    float getInvDeltaTime() const {
+        return m_centerOfMass1(3);
+    }
+    // Where t lies in the step: (t - the start time in m_centerOfMass0's w) * getInvDeltaTime(), 0 at the start and 1
+    // at the end.
+    float getInterpolationValue(float t) const {
+        return (t - m_centerOfMass0(3)) * getInvDeltaTime();
+    }
+
     // Havok SDK signature (hkBase.lib, tied by target).
     static const hkClass& staticClass();
 

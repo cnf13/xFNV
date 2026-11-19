@@ -56,20 +56,7 @@ static void weldGeometryVertices(
     hkArray<int32_t> uniqueToOrdered;
     if (keepVertexOrder.m_bool) {
         const int32_t numUnique = uniqueVerts.m_size;
-        // EXE-INLINED none: hkArray<int>::setSize(numUnique, -1)
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = uniqueToOrdered.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
-        if (capacity < numUnique) {
-            int32_t newCapacity = 2 * capacity;
-            if (numUnique >= newCapacity) {
-                newCapacity = numUnique;
-            }
-            hkArrayUtil::_reserve(heap, &uniqueToOrdered, newCapacity, sizeof(int32_t));
-        }
-        for (int32_t i = uniqueToOrdered.m_size; i < numUnique; ++i) {
-            uniqueToOrdered.m_data[i] = -1;
-        }
-        uniqueToOrdered.m_size = numUnique;
+        uniqueToOrdered.setSize(numUnique, -1);
         for (int32_t i = 0; i < vertexRemapOut.m_size; ++i) {
             const int32_t unique = vertexRemapOut.m_data[i];
             int32_t ordered = uniqueToOrdered.m_data[unique];

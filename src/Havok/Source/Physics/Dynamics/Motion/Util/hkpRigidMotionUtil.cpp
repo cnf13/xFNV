@@ -212,8 +212,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
                 accumulatorsOut->m_invMasses = motion->m_inertiaAndMassInv;
                 accumulatorsOut->m_linearVel = motion->m_linearVelocity;
                 {
-                    // EXE-INLINED none: hkSweptTransform::getInterpolationValue
-                    float fT = (info.m_startTime - st.m_centerOfMass0(3)) * st.m_centerOfMass1(3);
+                    float fT = st.getInterpolationValue(info.m_startTime);
                     accumulatorsOut->m_scratch0.setInterpolate4(st.m_centerOfMass0, st.m_centerOfMass1, fT);
                 }
                 {
@@ -249,8 +248,7 @@ hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
 
                 accumulatorsOut->m_invMasses = motion->m_inertiaAndMassInv;
                 {
-                    // EXE-INLINED none: hkSweptTransform::getInterpolationValue
-                    float fT = (info.m_startTime - st.m_centerOfMass0(3)) * st.m_centerOfMass1(3);
+                    float fT = st.getInterpolationValue(info.m_startTime);
                     accumulatorsOut->m_scratch0.setInterpolate4(st.m_centerOfMass0, st.m_centerOfMass1, fT);
                 }
                 accumulatorsOut->m_angularVel = motion->m_angularVelocity;
@@ -354,92 +352,7 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
             angularMomentum.setRotatedDir(ms.m_transform.m_rotation, localAngVel);
         }
 
-        // EXE-INLINED none: hkSweptTransformUtil::_stepMotionState
-        // The SDK's validity test: x, y and z of both velocities ordered and of magnitude below 1e6. The exe resets
-        // both to the 16 bytes at 0x1268370, hkTransformIdentity's first column.
-        {
-            const hkQuadReal lin = motion->m_linearVelocity.m_quad;
-            const hkQuadReal ang = motion->m_angularVelocity.m_quad;
-            const int32_t iOk =
-                _mm_movemask_ps(_mm_cmplt_ps(
-                    _mm_and_ps(lin, hkVector4_setAbs4_absMask), hkSweptTransformUtil::_stepMotionStateMaxVelf
-                )) &
-                _mm_movemask_ps(_mm_cmplt_ps(
-                    _mm_and_ps(ang, hkVector4_setAbs4_absMask), hkSweptTransformUtil::_stepMotionStateMaxVelf
-                )) &
-                _mm_movemask_ps(_mm_cmpeq_ps(lin, lin)) & _mm_movemask_ps(_mm_cmpeq_ps(ang, ang));
-            if ((iOk & 7) != 7) {
-                motion->m_linearVelocity = hkTransformIdentity.m_rotation.m_col0;
-                motion->m_angularVelocity = hkTransformIdentity.m_rotation.m_col0;
-            }
-        }
-
-        st.m_centerOfMass0 = st.m_centerOfMass1;
-        st.m_centerOfMass0(3) = stepInfo.m_startTime;
-
-        // Clip the linear velocity: the squared length (summed z + (y + x)) against the squared maximum.
-        {
-            const hkVector4 linVel = motion->m_linearVelocity;
-            const float maxLinVel = hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-            const hkQuadReal sq = _mm_mul_ps(linVel.m_quad, linVel.m_quad);
-            const float linVelSqrd = sq[2] + static_cast<float>(sq[1] + sq[0]);
-            if (linVelSqrd > maxLinVel * maxLinVel) {
-                const float fRoot = std::sqrt(linVelSqrd);
-                const float fInvRoot = 1.0f / fRoot;
-                const float f = fInvRoot * hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-                motion->m_linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), linVel.m_quad);
-            }
-        }
-
-        const float fDeltaTime = stepInfo.m_deltaTime;
-        st.m_centerOfMass1.m_quad =
-            _mm_add_ps(_mm_mul_ps(_mm_set1_ps(fDeltaTime), motion->m_linearVelocity.m_quad), st.m_centerOfMass1.m_quad);
-        st.m_centerOfMass1(3) = stepInfo.m_invDeltaTime;
-
-        hkQuaternion rotation = st.m_rotation1;
-        st.m_rotation0 = rotation;
-
-        // The angular step dq = angVel * dt / 2; pre is its squared length times 4 / pi^2, the polynomial's argument
-        // for dq's w.
-        const hkVector4 angVel = motion->m_angularVelocity;
-        const float fHalfDeltaTime = stepInfo.m_deltaTime * 0.5;
-        hkQuaternion dq;
-        dq.m_vec.m_quad = _mm_mul_ps(_mm_set1_ps(fHalfDeltaTime), angVel.m_quad);
-        const hkQuadReal dqSq = _mm_mul_ps(dq.m_vec.m_quad, dq.m_vec.m_quad);
-        const float dqLenSqrd = dqSq[2] + static_cast<float>(dqSq[1] + dqSq[0]);
-        float pre = dqLenSqrd * 0.40528471201320165;
-        float maxAngle = hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value] * stepInfo.m_deltaTime;
-        if (maxAngle > 0.8999999761581421) {
-            maxAngle = 0.9f;
-        }
-        const float maxAngleSqrd = maxAngle * maxAngle;
-        // Taken also when pre is a NaN.
-        if (!(maxAngleSqrd >= pre)) {
-            const float fRoot = std::sqrt(pre);
-            const float fInvRoot = 1.0f / fRoot;
-            const float f = fInvRoot * maxAngle;
-            motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), angVel.m_quad);
-            dq.m_vec.m_quad = _mm_mul_ps(_mm_set1_ps(f), dq.m_vec.m_quad);
-            pre = maxAngleSqrd;
-        }
-        const float pre2 = pre * pre;
-        dq.m_vec(3) = 1.0 - 0.8229479789733887 * pre - 0.1305290013551712 * pre2 - pre2 * (pre * 0.04440800100564957);
-
-        rotation.setMul(dq, rotation);
-        rotation.normalize();
-        ms.m_deltaAngle.setAdd4(dq.m_vec, dq.m_vec);
-        const float fAngle = std::sqrt(pre);
-        ms.m_deltaAngle(3) = fAngle * 3.1415927410125732;
-        st.m_rotation1 = rotation;
-        ms.m_transform.m_rotation.set(st.m_rotation1);
-
-        // The translation is the centre of mass less the rotated local centre of mass, rotated as
-        // (y * col1 + x * col0) + z * col2.
-        {
-            hkVector4 shift;
-            shift.setRotatedDir(ms.m_transform.m_rotation, st.m_centerOfMassLocal);
-            ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift.m_quad);
-        }
+        hkSweptTransformUtil::_stepMotionState(stepInfo, motion->m_linearVelocity, motion->m_angularVelocity, ms);
 
         if (type == hkpMotion::MOTION_THIN_BOX_INERTIA) {
             // The angular velocity again from the kept momentum, under the new rotation.
@@ -448,36 +361,7 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
             localMomentum.m_quad = _mm_mul_ps(localMomentum.m_quad, motion->m_inertiaAndMassInv.m_quad);
             motion->m_angularVelocity.setRotatedDir(ms.m_transform.m_rotation, localMomentum);
 
-            // EXE-INLINED none: hkSweptTransformUtil::_clipVelocities
-            // Each velocity above its maximum, or a NaN, is scaled to the maximum; a NaN one is then reset to
-            // hkTransformIdentity's first column. The squared maxima are rounded to float.
-            const hkVector4 linVel = motion->m_linearVelocity;
-            const float maxAngular = hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value] *
-                hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value];
-            const hkQuadReal linSq = _mm_mul_ps(linVel.m_quad, linVel.m_quad);
-            const float linVelSqrd = linSq[2] + static_cast<float>(linSq[1] + linSq[0]);
-            const hkQuadReal angSq = _mm_mul_ps(motion->m_angularVelocity.m_quad, motion->m_angularVelocity.m_quad);
-            const float angVelSqrd = angSq[2] + static_cast<float>(angSq[1] + angSq[0]);
-            const float maxLinear = hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value] *
-                hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-            if (linVelSqrd > maxLinear || linVelSqrd != linVelSqrd) {
-                const float fRoot = std::sqrt(linVelSqrd);
-                const float fInvRoot = 1.0f / fRoot;
-                const float f = fInvRoot * hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-                motion->m_linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), linVel.m_quad);
-                if (linVelSqrd != linVelSqrd) {
-                    motion->m_linearVelocity = hkTransformIdentity.m_rotation.m_col0;
-                }
-            }
-            if (angVelSqrd > maxAngular || angVelSqrd != angVelSqrd) {
-                const float fRoot = std::sqrt(angVelSqrd);
-                const float fInvRoot = 1.0f / fRoot;
-                const float f = fInvRoot * hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value];
-                motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), motion->m_angularVelocity.m_quad);
-                if (angVelSqrd != angVelSqrd) {
-                    motion->m_angularVelocity = hkTransformIdentity.m_rotation.m_col0;
-                }
-            }
+            hkSweptTransformUtil::_clipVelocities(ms, motion->m_linearVelocity, motion->m_angularVelocity);
         }
 
         // The deactivation check, every fourth step: the counter's 16th step checks the slow reference (index 1)
@@ -519,14 +403,8 @@ int32_t hkRigidMotionUtilApplyForcesAndStep(
                 const float distSqrd = dSq[2] + static_cast<float>(dSq[1] + dSq[0]);
                 bool bReset = di.m_maxDistSqrd[j] < distSqrd;
                 if (!bReset) {
-                    // EXE-INLINED none: hkVector4Util::unpackInt32IntoQuaternion
-                    // Each byte of the packed orientation, less 128, times 1.1 / 128 (the exe's double constant).
-                    const uint32_t packed = motion->m_deactivationRefOrientation[j];
                     hkVector4 refRotation;
-                    refRotation(0) = (static_cast<int32_t>(packed & 0xFF) - 0x80) * 0.008593750186264515;
-                    refRotation(1) = (static_cast<int32_t>((packed >> 8) & 0xFF) - 0x80) * 0.008593750186264515;
-                    refRotation(2) = (static_cast<int32_t>((packed >> 16) & 0xFF) - 0x80) * 0.008593750186264515;
-                    refRotation(3) = (static_cast<int32_t>(packed >> 24) - 0x80) * 0.008593750186264515;
+                    hkVector4Util::unpackInt32IntoQuaternion(motion->m_deactivationRefOrientation[j], refRotation);
                     // The squared 4-lane distance to the current rotation, summed as hkVector4::horizontalAdd4.
                     const hkQuadReal r = _mm_sub_ps(refRotation.m_quad, st.m_rotation1.m_vec.m_quad);
                     const hkQuadReal rSq = _mm_mul_ps(r, r);
@@ -628,95 +506,7 @@ int32_t hkRigidMotionUtilApplyAccumulators(
         }
 
         if (bStep) {
-            // EXE-INLINED none: hkSweptTransformUtil::_stepMotionState
-            // The SDK's validity test: x, y and z of both velocities ordered and of magnitude below 1e6. The exe
-            // resets both to the 16 bytes at 0x1268370, hkTransformIdentity's first column.
-            {
-                const hkQuadReal lin = sumLinVel.m_quad;
-                const hkQuadReal ang = sumAngVel.m_quad;
-                const int32_t iOk =
-                    _mm_movemask_ps(_mm_cmplt_ps(
-                        _mm_and_ps(ang, hkVector4_setAbs4_absMask), hkSweptTransformUtil::_stepMotionStateMaxVelf
-                    )) &
-                    _mm_movemask_ps(_mm_cmplt_ps(
-                        _mm_and_ps(lin, hkVector4_setAbs4_absMask), hkSweptTransformUtil::_stepMotionStateMaxVelf
-                    )) &
-                    _mm_movemask_ps(_mm_cmpeq_ps(ang, ang)) & _mm_movemask_ps(_mm_cmpeq_ps(lin, lin));
-                if ((iOk & 7) != 7) {
-                    sumLinVel = hkTransformIdentity.m_rotation.m_col0;
-                    sumAngVel = hkTransformIdentity.m_rotation.m_col0;
-                }
-            }
-
-            st.m_centerOfMass0 = st.m_centerOfMass1;
-            st.m_centerOfMass0(3) = info.m_startTime;
-
-            // Clip the summed linear velocity: the squared length (z + (y + x)) against the squared maximum.
-            {
-                const float maxLinVel = hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-                const hkQuadReal sq = _mm_mul_ps(sumLinVel.m_quad, sumLinVel.m_quad);
-                const float linVelSqrd = _mm_cvtss_f32(
-                    _mm_add_ps(_mm_shuffle_ps(sq, sq, 0xaa), _mm_add_ps(_mm_shuffle_ps(sq, sq, 0x55), sq))
-                );
-                if (linVelSqrd > maxLinVel * maxLinVel) {
-                    float fRoot = std::sqrt(linVelSqrd);
-                    float fInvRoot = 1.0f / fRoot;
-                    float f = fInvRoot * hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-                    sumLinVel.m_quad = _mm_mul_ps(_mm_set1_ps(f), sumLinVel.m_quad);
-                }
-            }
-
-            st.m_centerOfMass1.m_quad =
-                _mm_add_ps(_mm_mul_ps(_mm_set1_ps(info.m_deltaTime), sumLinVel.m_quad), st.m_centerOfMass1.m_quad);
-            st.m_centerOfMass1(3) = info.m_invDeltaTime;
-
-            hkQuaternion rotation = st.m_rotation1;
-            st.m_rotation0 = rotation;
-
-            // The angular step dq = angVel * dt / 2; pre is its squared length times 4 / pi^2, the polynomial's
-            // argument for dq's w.
-            float fHalfDeltaTime = info.m_deltaTime * 0.5;
-            hkQuaternion dq;
-            dq.m_vec.m_quad = _mm_mul_ps(_mm_set1_ps(fHalfDeltaTime), sumAngVel.m_quad);
-            const hkQuadReal dqSq = _mm_mul_ps(dq.m_vec.m_quad, dq.m_vec.m_quad);
-            const float dqLenSqrd = _mm_cvtss_f32(
-                _mm_add_ps(_mm_shuffle_ps(dqSq, dqSq, 0xaa), _mm_add_ps(_mm_shuffle_ps(dqSq, dqSq, 0x55), dqSq))
-            );
-            float pre = dqLenSqrd * 0.40528471201320165;
-            float maxAngle = hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value] * info.m_deltaTime;
-            if (maxAngle > 0.8999999761581421) {
-                maxAngle = 0.9f;
-            }
-            float maxAngleSqrd = maxAngle * maxAngle;
-            // Taken also when pre is a NaN.
-            if (!(maxAngleSqrd >= pre)) {
-                float fRoot = std::sqrt(pre);
-                float fInvRoot = 1.0f / fRoot;
-                float f = fInvRoot * maxAngle;
-                pre = maxAngleSqrd;
-                sumAngVel.m_quad = _mm_mul_ps(_mm_set1_ps(f), sumAngVel.m_quad);
-                dq.m_vec.m_quad = _mm_mul_ps(_mm_set1_ps(f), dq.m_vec.m_quad);
-            }
-            const double dPre = pre;
-            float pre2 = dPre * dPre;
-            dq.m_vec(3) =
-                1.0 - 0.8229479789733887 * dPre - 0.1305290013551712 * pre2 - pre2 * (dPre * 0.04440800100564957);
-
-            rotation.setMul(dq, rotation);
-            rotation.normalize();
-            ms.m_deltaAngle.m_quad = _mm_add_ps(dq.m_vec.m_quad, dq.m_vec.m_quad);
-            float fAngle = std::sqrt(pre);
-            ms.m_deltaAngle(3) = fAngle * 3.1415927410125732;
-            st.m_rotation1 = rotation;
-            ms.m_transform.m_rotation.set(st.m_rotation1);
-
-            // The translation is the centre of mass less the rotated local centre of mass, rotated as
-            // (y * col1 + x * col0) + z * col2.
-            {
-                hkVector4 shift;
-                shift.setRotatedDir(ms.m_transform.m_rotation, st.m_centerOfMassLocal);
-                ms.m_transform.m_translation.m_quad = _mm_sub_ps(st.m_centerOfMass1.m_quad, shift.m_quad);
-            }
+            hkSweptTransformUtil::_stepMotionState(info, sumLinVel, sumAngVel, ms);
         }
 
         if (motion->getType() == hkpMotion::MOTION_THIN_BOX_INERTIA) {
@@ -728,42 +518,7 @@ int32_t hkRigidMotionUtilApplyAccumulators(
             motion->m_angularVelocity.setRotatedDir(ms.m_transform.m_rotation, localMomentum);
         }
 
-        // EXE-INLINED none: hkSweptTransformUtil::_clipVelocities
-        // Each velocity above its maximum, or a NaN, is scaled to the maximum; a NaN one is then reset to
-        // hkTransformIdentity's first column. The squared maxima are rounded to float.
-        {
-            const hkVector4 linVel = motion->m_linearVelocity;
-            float maxAngular = hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value] *
-                hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value];
-            const hkQuadReal linSq = _mm_mul_ps(linVel.m_quad, linVel.m_quad);
-            const float linVelSqrd = _mm_cvtss_f32(
-                _mm_add_ps(_mm_shuffle_ps(linSq, linSq, 0xaa), _mm_add_ps(_mm_shuffle_ps(linSq, linSq, 0x55), linSq))
-            );
-            const hkQuadReal angSq = _mm_mul_ps(motion->m_angularVelocity.m_quad, motion->m_angularVelocity.m_quad);
-            const float angVelSqrd = _mm_cvtss_f32(
-                _mm_add_ps(_mm_shuffle_ps(angSq, angSq, 0xaa), _mm_add_ps(_mm_shuffle_ps(angSq, angSq, 0x55), angSq))
-            );
-            float maxLinear = hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value] *
-                hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-            if (maxLinear < linVelSqrd || linVelSqrd != linVelSqrd) {
-                float fRoot = std::sqrt(linVelSqrd);
-                float fInvRoot = 1.0f / fRoot;
-                float f = fInvRoot * hkUFloat8_intToReal[ms.m_maxLinearVelocity.m_value];
-                motion->m_linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), linVel.m_quad);
-                if (linVelSqrd != linVelSqrd) {
-                    motion->m_linearVelocity = hkTransformIdentity.m_rotation.m_col0;
-                }
-            }
-            if (maxAngular < angVelSqrd || angVelSqrd != angVelSqrd) {
-                float fRoot = std::sqrt(angVelSqrd);
-                float fInvRoot = 1.0f / fRoot;
-                float f = fInvRoot * hkUFloat8_intToReal[ms.m_maxAngularVelocity.m_value];
-                motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(f), motion->m_angularVelocity.m_quad);
-                if (angVelSqrd != angVelSqrd) {
-                    motion->m_angularVelocity = hkTransformIdentity.m_rotation.m_col0;
-                }
-            }
-        }
+        hkSweptTransformUtil::_clipVelocities(ms, motion->m_linearVelocity, motion->m_angularVelocity);
 
         // The deactivation check, every fourth step: the counter's 16th step checks the slow reference (index 1)
         // and restarts the counter, the other checks the fast one (index 0); a counter that wraps stays at 0xFF.
@@ -817,14 +572,8 @@ int32_t hkRigidMotionUtilApplyAccumulators(
             );
             bool bReset = di.m_maxDistSqrd[j] < distSqrd;
             if (!bReset) {
-                // EXE-INLINED none: hkVector4Util::unpackInt32IntoQuaternion
-                // Each byte of the packed orientation, less 128, times 1.1 / 128 (the exe's double constant).
-                const uint32_t packed = motion->m_deactivationRefOrientation[j];
                 hkVector4 refRotation;
-                refRotation(0) = (static_cast<int32_t>(packed & 0xFF) - 0x80) * 0.008593750186264515;
-                refRotation(1) = (static_cast<int32_t>((packed >> 8) & 0xFF) - 0x80) * 0.008593750186264515;
-                refRotation(2) = (static_cast<int32_t>((packed >> 16) & 0xFF) - 0x80) * 0.008593750186264515;
-                refRotation(3) = (static_cast<int32_t>(packed >> 24) - 0x80) * 0.008593750186264515;
+                hkVector4Util::unpackInt32IntoQuaternion(motion->m_deactivationRefOrientation[j], refRotation);
                 // The squared 4-lane distance to the current rotation, summed as hkVector4::horizontalAdd4.
                 const hkQuadReal r = _mm_sub_ps(refRotation.m_quad, st.m_rotation1.m_vec.m_quad);
                 const hkQuadReal rSq = _mm_mul_ps(r, r);

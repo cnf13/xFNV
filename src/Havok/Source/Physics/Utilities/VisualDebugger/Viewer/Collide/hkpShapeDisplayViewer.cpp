@@ -269,9 +269,7 @@ void hkpShapeDisplayViewer::entityAddedCallback(hkpEntity* entity) {
             hkDisplayConvex* convex =
                 ::new (mem) hkDisplayConvex(noDeleteGeometry ? noDeleteGeometry : overrideGeometry);
             convex->m_transform.setIdentity();
-            // EXE-INLINED none: hkArrayBase<hkDisplayGeometry*>::pushBackUnchecked
-            displayGeometries.m_data[displayGeometries.m_size] = convex;
-            ++displayGeometries.m_size;
+            displayGeometries.pushBackUnchecked(convex);
         }
     }
     const hkUlong id = hkpShapeDisplayViewer::getId(entity);

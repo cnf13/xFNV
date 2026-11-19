@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkClassEnum.h"
@@ -296,39 +297,18 @@ void hkpHingeConstraintData::setInBodySpace(
     const hkVector4& axisA,
     const hkVector4& axisB
 ) {
-    // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-    // The lane of the smallest |x| is left zero; the other two are swapped, one negated.
-    auto setPerpendicular = [](hkVector4& arOut, const hkVector4& arIn) {
-        int32_t iMin = 0;
-        int32_t iOk1 = 1;
-        int32_t iOk2 = 2;
-        float fA0 = std::fabs(arIn(0));
-        const float fA1 = std::fabs(arIn(1));
-        const float fA2 = std::fabs(arIn(2));
-        if (fA0 > fA1) {
-            fA0 = fA1;
-            iOk1 = 0;
-            iMin = 1;
-        }
-        if (fA0 > fA2) {
-            iOk2 = iMin;
-        }
-        arOut.m_quad = _mm_setzero_ps();
-        arOut(iOk1) = arIn(iOk2);
-        arOut(iOk2) = -arIn(iOk1);
-    };
     m_atoms.m_transforms.m_transformA.m_translation.m_quad = pivotA.m_quad;
     m_atoms.m_transforms.m_transformB.m_translation.m_quad = pivotB.m_quad;
     hkRotation& rotationA = m_atoms.m_transforms.m_transformA.m_rotation;
     rotationA.m_col0 = axisA;
     rotationA.m_col0.normalize3();
-    setPerpendicular(rotationA.m_col1, rotationA.m_col0);
+    hkVector4Util::calculatePerpendicularVector(rotationA.m_col0, rotationA.m_col1);
     rotationA.m_col1.normalize3();
     rotationA.m_col2.setCross(rotationA.m_col0, rotationA.m_col1);
     hkRotation& rotationB = m_atoms.m_transforms.m_transformB.m_rotation;
     rotationB.m_col0 = axisB;
     rotationB.m_col0.normalize3();
-    setPerpendicular(rotationB.m_col1, rotationB.m_col0);
+    hkVector4Util::calculatePerpendicularVector(rotationB.m_col0, rotationB.m_col1);
     rotationB.m_col1.normalize3();
     rotationB.m_col2.setCross(rotationB.m_col0, rotationB.m_col1);
 }

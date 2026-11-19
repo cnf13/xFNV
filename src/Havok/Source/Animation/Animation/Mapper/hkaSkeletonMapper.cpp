@@ -45,42 +45,14 @@ void hkaSkeletonMapper::initializeBindingMaps(
     const hkaSkeleton* pSkeletonB = m_mapping.m_skeletonB;
 
     srcBoneToTrackIndicesOut.clear();
-    {
-        const int32_t numBones = pSkeletonA->m_bones.m_size;
-        // EXE-INLINED none: hkArray<hkInt16>::setSize(int, const hkInt16&)
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = srcBoneToTrackIndicesOut.getCapacity();
-        if (capacity < numBones) {
-            hkArrayUtil::_reserve(
-                rHeap, &srcBoneToTrackIndicesOut, numBones < 2 * capacity ? 2 * capacity : numBones, sizeof(int16_t)
-            );
-        }
-        for (int32_t i = srcBoneToTrackIndicesOut.m_size; i < numBones; ++i) {
-            srcBoneToTrackIndicesOut.m_data[i] = -1;
-        }
-        srcBoneToTrackIndicesOut.m_size = numBones;
-    }
+    srcBoneToTrackIndicesOut.setSize(pSkeletonA->m_bones.m_size, -1);
     for (int16_t t = 0; t < binding->m_transformTrackToBoneIndices.m_size; ++t) {
         srcBoneToTrackIndicesOut.m_data[binding->m_transformTrackToBoneIndices.m_data[t]] = t;
     }
 
     dstTrackToBoneIndicesOut.clear();
     dstBoneToTrackIndicesOut.clear();
-    {
-        const int32_t numBones = pSkeletonB->m_bones.m_size;
-        // EXE-INLINED none: hkArray<hkInt16>::setSize(int, const hkInt16&)
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = dstBoneToTrackIndicesOut.getCapacity();
-        if (capacity < numBones) {
-            hkArrayUtil::_reserve(
-                rHeap, &dstBoneToTrackIndicesOut, numBones < 2 * capacity ? 2 * capacity : numBones, sizeof(int16_t)
-            );
-        }
-        for (int32_t i = dstBoneToTrackIndicesOut.m_size; i < numBones; ++i) {
-            dstBoneToTrackIndicesOut.m_data[i] = -1;
-        }
-        dstBoneToTrackIndicesOut.m_size = numBones;
-    }
+    dstBoneToTrackIndicesOut.setSize(pSkeletonB->m_bones.m_size, -1);
 
     for (int16_t s = 0; s < m_mapping.m_simpleMappings.m_size; ++s) {
         const hkaSkeletonMapperData::SimpleMapping& rSimple = m_mapping.m_simpleMappings.m_data[s];
@@ -111,21 +83,7 @@ void hkaSkeletonMapper::initializeBindingMaps(
         }
     }
 
-    {
-        const int32_t numBones = pSkeletonB->m_bones.m_size;
-        // EXE-INLINED none: hkArray<hkInt16>::setSize(int, const hkInt16&)
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = dstBoneToTrackIndicesOut.getCapacity();
-        if (capacity < numBones) {
-            hkArrayUtil::_reserve(
-                rHeap, &dstBoneToTrackIndicesOut, numBones < 2 * capacity ? 2 * capacity : numBones, sizeof(int16_t)
-            );
-        }
-        for (int32_t i = dstBoneToTrackIndicesOut.m_size; i < numBones; ++i) {
-            dstBoneToTrackIndicesOut.m_data[i] = -1;
-        }
-        dstBoneToTrackIndicesOut.m_size = numBones;
-    }
+    dstBoneToTrackIndicesOut.setSize(pSkeletonB->m_bones.m_size, -1);
     for (int16_t t = 0; t < dstTrackToBoneIndicesOut.m_size; ++t) {
         dstBoneToTrackIndicesOut.m_data[dstTrackToBoneIndicesOut.m_data[t]] = t;
     }

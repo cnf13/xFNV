@@ -6,6 +6,8 @@
 #include "Fallout Shared/ImageSpaceModifierInstance.h"
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
+#include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 
 #include <stdint.h>
 
@@ -25,7 +27,6 @@ class NiDirectionalLight;
 class NiFogProperty;
 class NiGeometry;
 class NiPick;
-class NiQuaternion;
 class QueuedFile;
 class QueuedReference;
 class Sky;
@@ -70,6 +71,14 @@ hkRotation& NI2HK(hkRotation& arhkRot, const NiMatrix3& arNiRot);
 hkQsTransform& NI2HK(hkQsTransform& arhkQ, const NiTransform& arNiQ);
 // Converts the game-unit length afValue to Havok units.
 float NI2HK(float afValue);
+// Copies the game quaternion arNiQ into arhkQ, component by component, and returns arhkQ.
+inline hkQuaternion& NI2HK(hkQuaternion& arhkQ, const NiQuaternion& arNiQ) {
+    arhkQ.m_vec(0) = arNiQ.m_fX;
+    arhkQ.m_vec(1) = arNiQ.m_fY;
+    arhkQ.m_vec(2) = arNiQ.m_fZ;
+    arhkQ.m_vec(3) = arNiQ.m_fW;
+    return arhkQ;
+}
 // Converts the game rotation arNiQ to a Havok quaternion into arhkQ and returns it.
 hkQuaternion& NI2HKMIGRATION_QUATERNION(hkQuaternion& arhkQ, const NiQuaternion& arNiQ);
 void Init();

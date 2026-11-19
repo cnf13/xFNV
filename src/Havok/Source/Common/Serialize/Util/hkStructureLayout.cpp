@@ -224,11 +224,7 @@ void hkStructureLayout::computeClassMemberOffsetsInplace(
             // Calls the non-const getMember, as the game does.
             hkClassMember& member = klass.getMember(i);
             // EXE-INLINED none: hkClassMember::hasClass
-            if ((member.m_class) &&
-                (classesDone.m_map.findKey(hkPointerMap<const hkClass*, int32_t>::ToMapInt(&member.getStructClass())) >
-                 classesDone.m_map.m_hashMod))
-            // EXE-INLINED none: hkPointerMap::hasKey
-            {
+            if ((member.m_class) && !classesDone.hasKey(&member.getStructClass())) {
                 computeClassMemberOffsetsInplace(
                     const_cast<hkClass&>(member.getStructClass()), rules, classesDone, recurse
                 );

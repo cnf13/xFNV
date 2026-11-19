@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Container/String/hkString.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -252,22 +253,14 @@ void hkAgent1nMachine_Weld(
             if (point == rep) {
                 continue;
             }
-            const hkQuadReal pointNormal = point->m_contact.m_separatingNormal.m_quad;
-            const hkQuadReal repNormal = rep->m_contact.m_separatingNormal.m_quad;
+            const hkVector4& pointNormal = point->m_contact.m_separatingNormal;
+            const hkVector4& repNormal = rep->m_contact.m_separatingNormal;
             const hkpCollisionQualityInfo* qualityInfo = input.m_input->m_collisionQualityInfo;
-            const hkQuadReal diff = _mm_sub_ps(rep->m_contact.m_position.m_quad, point->m_contact.m_position.m_quad);
-            // EXE-INLINED none: hkVector4Util::dot3_3vs3
-            // The SDK's SSE dot3_3vs3(diff, pointNormal, repNormal, diff, repNormal, pointNormal): the three products
-            // transposed (HK_TRANSPOSE3) and summed, row 0 plus row 1, then row 2.
-            const hkQuadReal c0 = _mm_mul_ps(diff, pointNormal);
-            const hkQuadReal c1 = _mm_mul_ps(repNormal, diff);
-            const hkQuadReal c2 = _mm_mul_ps(repNormal, pointNormal);
-            const hkQuadReal lo = _mm_unpacklo_ps(c0, c1);
-            const hkQuadReal hi = _mm_unpackhi_ps(c0, c1);
-            const hkQuadReal row0 = _mm_movelh_ps(lo, c2);
-            const hkQuadReal row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), c2, _MM_SHUFFLE(3, 1, 1, 0));
-            const hkQuadReal row2 = _mm_shuffle_ps(hi, c2, _MM_SHUFFLE(3, 2, 1, 0));
-            const hkQuadReal dots = _mm_add_ps(row2, _mm_add_ps(row1, row0));
+            hkVector4 diff;
+            diff.m_quad = _mm_sub_ps(rep->m_contact.m_position.m_quad, point->m_contact.m_position.m_quad);
+            hkVector4 dotsOut;
+            hkVector4Util::dot3_3vs3(diff, pointNormal, repNormal, diff, repNormal, pointNormal, dotsOut);
+            const hkQuadReal dots = dotsOut.m_quad;
 
             const float cosAngle = dots[2];
             const double scaledRadius = (cosAngle - 1.0) * shapeA->m_radius;

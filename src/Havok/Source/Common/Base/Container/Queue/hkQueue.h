@@ -30,6 +30,14 @@ public:
     int32_t enqueue(const T& element);
     // Inserts element at the head, growing the storage when full; returns the capacity setCapacity left.
     int32_t enqueueInFront(const T& element);
+    // Takes the element at the head into data; the head wraps to 0 at the end.
+    void dequeue(T& data) {
+        data = m_data[m_head];
+        if (++m_head == m_capacity) {
+            m_head = 0;
+        }
+        --m_elementsInUse;
+    }
 
     T* m_data;
     int32_t m_capacity;

@@ -175,13 +175,8 @@ hkBool hkaTwoJointsIkSolver::solve(const Setup& setup, hkaPose& poseInOut) {
         // The twist bones' transforms relative to their joints, the identity without a twist bone.
         hkQsTransform firstTwistOffset;
         hkQsTransform secondTwistOffset;
-        // EXE-INLINED none: hkQsTransform::setIdentity
-        store(firstTwistOffset.m_translation, _mm_setzero_ps());
-        store(firstTwistOffset.m_rotation.m_vec, hkQuadReal0001);
-        store(firstTwistOffset.m_scale, _mm_set1_ps(1.0f));
-        store(secondTwistOffset.m_translation, _mm_setzero_ps());
-        store(secondTwistOffset.m_rotation.m_vec, hkQuadReal0001);
-        store(secondTwistOffset.m_scale, _mm_set1_ps(1.0f));
+        firstTwistOffset.setIdentity();
+        secondTwistOffset.setIdentity();
         if (setup.m_firstJointTwistIdx >= 0) {
             const hkQsTransform& firstTwistMS = getBoneModelSpace(setup.m_firstJointTwistIdx);
             const hkQsTransform& firstJointMS = getBoneModelSpace(setup.m_firstJointIdx);

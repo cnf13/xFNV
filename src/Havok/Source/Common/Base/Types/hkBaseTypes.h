@@ -140,6 +140,13 @@ template <typename T>
 T* hkAddByteOffset(T* base, int32_t offset) {
     return reinterpret_cast<T*>(reinterpret_cast<char*>(base) + offset);
 }
+
+// The SDK's inline: the const pointer base moved by offset bytes. The offset is the SDK's hkLong, a signed integer the
+// size of a pointer.
+template <typename T>
+inline const T* hkAddByteOffsetConst(const T* base, intptr_t offset) {
+    return reinterpret_cast<const T*>(reinterpret_cast<const char*>(base) + offset);
+}
 // An unsigned float packed into one byte.
 class hkUFloat8 {
 public:

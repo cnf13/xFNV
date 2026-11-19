@@ -86,15 +86,7 @@ hkCpuSolveConstraintsJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQu
              ~15u) >>
             4
         );
-        uint32_t* words = reinterpret_cast<uint32_t*>(temp);
-        // EXE-INLINED none: hkString::memClear16
-        for (int32_t i = 0; i < numVectors; ++i) {
-            words[0] = 0;
-            words[1] = 0;
-            words[2] = 0;
-            words[3] = 0;
-            words += 4;
-        }
+        hkString::memClear16(temp, numVectors);
     }
     hkSolveConstraints(tl.m_world->m_dynamicsStepInfo.m_solverInfo, schemas, accumulators, temp);
     {

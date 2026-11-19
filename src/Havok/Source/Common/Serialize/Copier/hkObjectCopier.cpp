@@ -106,21 +106,7 @@ void objectCopierPadUp(hkStreamWriter* w, int32_t pad) {
     const int32_t pos = w->tell();
     hkLocalArray<char> zeros(pad);
 
-    // EXE-INLINED none: hkArray<char>::setSize(aiAlign, 0)
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacity = static_cast<int32_t>(zeros.m_capacityAndFlags & hkArrayBase<char>::CAPACITY_MASK);
-    if (capacity < pad) {
-        int32_t request = 2 * capacity;
-        if (pad >= request) {
-            request = pad;
-        }
-        hkArrayUtil::_reserve(pHeap, &zeros, request, sizeof(char));
-    }
-    const int32_t numNew = pad - zeros.m_size;
-    if (numNew > 0) {
-        std::memset(zeros.m_data + zeros.m_size, 0, numNew);
-    }
-    zeros.m_size = static_cast<uint32_t>(pad);
+    zeros.setSize(pad, 0);
 
     const int32_t misalign = pos & (pad - 1);
     if (misalign != 0) {

@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -140,17 +141,7 @@ void hkpConvexListAgent::processCollision(
     {
         const hkMotionState* msA = bodyA.m_motion.pState;
         const hkMotionState* msB = bodyB.m_motion.pState;
-        // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-        float deltaTime = input.m_stepInfo.m_deltaTime;
-        float f0 = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * deltaTime;
-        float f1 = deltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-        __m128 diff0 =
-            _mm_sub_ps(msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad);
-        __m128 diff1 =
-            _mm_sub_ps(msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad);
-        timInfo.m_quad = _mm_add_ps(_mm_mul_ps(diff1, _mm_set1_ps(f1)), _mm_mul_ps(diff0, _mm_set1_ps(f0)));
-        timInfo.m_quad[3] = msA->m_deltaAngle.m_quad[3] * f0 * msA->m_objectRadius +
-            msB->m_deltaAngle.m_quad[3] * f1 * msB->m_objectRadius;
+        hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, timInfo);
     }
 
     hkpProcessCollisionOutputBackup resultBackup(result);

@@ -223,8 +223,7 @@ public:
     ) const {
         blockOut = static_cast<int32_t>(frame / static_cast<uint32_t>(m_maxFramesPerBlock - 1));
         blockOut = hkMath::max2(blockOut, 0);
-        // EXE-INLINED none: hkMath::min2<int>
-        blockOut = blockOut < m_numBlocks - 1 ? blockOut : m_numBlocks - 1;
+        blockOut = hkMath::min2(blockOut, m_numBlocks - 1);
         const uint32_t uiFirstFrameOfBlock = static_cast<uint32_t>(blockOut * (m_maxFramesPerBlock - 1));
         const float fRealFrame = static_cast<float>(frame - uiFirstFrameOfBlock) + delta;
         blockTimeOut = fRealFrame * m_frameDuration;

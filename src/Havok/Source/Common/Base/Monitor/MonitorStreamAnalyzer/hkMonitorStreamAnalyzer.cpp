@@ -2278,9 +2278,7 @@ void printStatisticsByType(hkOstream& outstream, hkMonitorStreamAnalyzer::Node* 
         hkBool valid;
         valid = nameToInfoMap.m_map.isValid(it);
         while (valid) {
-            // EXE-INLINED none: hkArray<hkMonitorStreamAnalyzerPrintByTypeInfo*>::pushBackUnchecked
-            sortedInfos.m_data[sortedInfos.m_size] = nameToInfoMap.getValue(it);
-            ++sortedInfos.m_size;
+            sortedInfos.pushBackUnchecked(nameToInfoMap.getValue(it));
             it = nameToInfoMap.m_map.getNext(it);
             valid = nameToInfoMap.m_map.isValid(it);
         }

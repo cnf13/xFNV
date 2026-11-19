@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/Triangle/hkpTriangleShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpCdVertex.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
@@ -76,19 +77,8 @@ void hkpGskCache::initTriangle(const hkpConvexShape* shapeA, const hkpTriangleSh
     m_vertices[2] = 1;
     m_vertices[3] = 2;
 
-    const hkQuadReal& rC0 = btoa.m_rotation.m_col0.m_quad;
-    const hkQuadReal& rC1 = btoa.m_rotation.m_col1.m_quad;
-    const hkQuadReal& rC2 = btoa.m_rotation.m_col2.m_quad;
-    const hkQuadReal& rT = btoa.m_translation.m_quad;
-    // EXE-INLINED none: hkVector4Util::transformPoints
     hkVector4 vertsInA[3];
-    for (int32_t i = 2; i >= 0; --i) {
-        const hkQuadReal& v = shapeB->getVertex(i).m_quad;
-        vertsInA[i].m_quad = _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), rC1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), rC0)),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), rC2), rT)
-        );
-    }
+    hkVector4Util::transformPoints(btoa, &shapeB->getVertex(0), 3, vertsInA);
     hkVector4 edge0;
     edge0.setSub4(vertsInA[1], vertsInA[0]);
     hkVector4 edge1;

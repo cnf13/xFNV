@@ -847,23 +847,5 @@ void hkaPose::init(hkaPose::PoseSpace space, const hkaSkeleton* skeleton, const 
             hkArrayUtil::_reserve(rHeap, &m_floatSlotValues, reserved, sizeof(float));
         }
     }
-    {
-        const int32_t numFloatSlots = m_skeleton->m_floatSlots.m_size;
-        // EXE-INLINED none: hkArray<float>::setSize(int, const float&)
-        hkMemoryAllocator& rHeap = hkMemoryRouter::getInstance().heap();
-        const int32_t capacity = m_floatSlotValues.getCapacity();
-        if (capacity < numFloatSlots) {
-            hkArrayUtil::_reserve(
-                rHeap, &m_floatSlotValues, numFloatSlots < 2 * capacity ? 2 * capacity : numFloatSlots, sizeof(float)
-            );
-        }
-        // Fills numFloatSlots - m_size slots (a 32-bit difference) when it is positive.
-        const int32_t numNew = static_cast<int32_t>(
-            static_cast<uint32_t>(numFloatSlots) - static_cast<uint32_t>(m_floatSlotValues.m_size)
-        );
-        for (int32_t i = 0; i < numNew; ++i) {
-            m_floatSlotValues.m_data[m_floatSlotValues.m_size + i] = 0.0f;
-        }
-        m_floatSlotValues.m_size = numFloatSlots;
-    }
+    m_floatSlotValues.setSize(m_skeleton->m_floatSlots.m_size, 0.0f);
 }

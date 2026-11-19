@@ -28,6 +28,13 @@ public:
         m_scale = s;
     }
 
+    // The SDK's inline: zero translation, the identity rotation and a scale of one.
+    void setIdentity() {
+        m_translation.setZero4();
+        m_rotation.setIdentity();
+        m_scale.setAll(1.0f);
+    }
+
     // Sets the translation and rotation from the transform; the scale becomes one.
     void setFromTransformNoScale(const hkTransform& transform);
     // Sets the translation, rotation and scale from the transform.

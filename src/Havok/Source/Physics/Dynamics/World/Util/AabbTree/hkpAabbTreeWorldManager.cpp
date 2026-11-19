@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Container/PointerMap/hkPointerMap.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
@@ -399,22 +400,10 @@ void hkpAabbTreeWorldManager::buildInactiveTree(
             pCollidable->m_shape->getAabb(*pCollidable->m_motion.pMotion, 0.0f, aabbs.m_data[i]);
         }
         else {
-            // EXE-INLINED none: hkVector4Util::convertAabbFromUint32
-            hkAabb& rAabb = aabbs.m_data[i];
-            rAabb.m_min.set(
-                static_cast<float>(rVolume.m_min[0]), static_cast<float>(rVolume.m_min[1]),
-                static_cast<float>(rVolume.m_min[2]), 0.0f
+            hkVector4Util::convertAabbFromUint32(
+                reinterpret_cast<const hkAabbUint32&>(rVolume), rAabb32Info.m_bitOffsetLow, rAabb32Info.m_bitScale,
+                aabbs.m_data[i]
             );
-            rAabb.m_max.set(
-                static_cast<float>(rVolume.m_max[0]), static_cast<float>(rVolume.m_max[1]),
-                static_cast<float>(rVolume.m_max[2]), 0.0f
-            );
-            hkVector4 invScale;
-            invScale.setReciprocal3(rAabb32Info.m_bitScale);
-            rAabb.m_min.mul4(invScale);
-            rAabb.m_max.mul4(invScale);
-            rAabb.m_min.sub4(rAabb32Info.m_bitOffsetLow);
-            rAabb.m_max.sub4(rAabb32Info.m_bitOffsetLow);
         }
         userDatas.m_data[i] = const_cast<hkpCollidable*>(collidables.m_data[i]);
     }
@@ -461,9 +450,7 @@ bool hkpAabbTreeWorldManager::scanActiveListAndGetInactivated(
             if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
                 hkpEntity* pEntity = static_cast<hkpEntity*>(pCollidable->getOwner());
                 if (pEntity && !pEntity->isActive().m_bool) {
-                    // EXE-INLINED none: hkArray::pushBackUnchecked
-                    inactivatedOut.m_data[inactivatedOut.m_size] = m_activeList.m_data[i];
-                    inactivatedOut.m_size++;
+                    inactivatedOut.pushBackUnchecked(m_activeList.m_data[i]);
                     m_activeList.removeAt(i);
                 }
             }
@@ -483,9 +470,7 @@ bool hkpAabbTreeWorldManager::scanActiveListAndGetInactivated(
         if (pCollidable->m_broadPhaseHandle.m_type == hkpWorldObject::BROAD_PHASE_ENTITY) {
             hkpEntity* pEntity = static_cast<hkpEntity*>(pCollidable->getOwner());
             if (pEntity && !pEntity->isActive().m_bool) {
-                // EXE-INLINED none: hkArray::pushBackUnchecked
-                inactivatedOut.m_data[inactivatedOut.m_size] = m_activeList.m_data[iIdx];
-                inactivatedOut.m_size++;
+                inactivatedOut.pushBackUnchecked(m_activeList.m_data[iIdx]);
                 m_activeList.removeAt(iIdx);
             }
         }

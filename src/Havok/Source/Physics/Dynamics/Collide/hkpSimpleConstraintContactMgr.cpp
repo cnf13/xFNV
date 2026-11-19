@@ -286,10 +286,7 @@ void hkpSimpleConstraintContactMgr::processContactImpl(
     if (!delay) {
         hkpEntity* entityA = static_cast<hkpEntity*>(a.getOwner());
         hkpEntity* entityB = static_cast<hkpEntity*>(b.getOwner());
-        // EXE-INLINED none: hkMath::min2
-        newDelay = entityA->getContactPointCallbackDelay() < entityB->getContactPointCallbackDelay()
-            ? entityA->getContactPointCallbackDelay()
-            : entityB->getContactPointCallbackDelay();
+        newDelay = hkMath::min2(entityA->getContactPointCallbackDelay(), entityB->getContactPointCallbackDelay());
         hkpContactProcessEvent event;
         event.m_collidableA = &a;
         event.m_collidableB = &b;

@@ -18,6 +18,7 @@
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransform.h"
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
@@ -1062,16 +1063,10 @@ void hkpWorldOperationUtil::updateEntityBP(hkpWorld* world, hkpEntity* entity) {
         }
         // The broad phase gets the box grown by its expansion; the box's expansion bytes are deliberately left
         // unwritten, as the game does.
-        // EXE-INLINED none: hkVector4Util::uncompressExpandedAabbUint32
-        const hkpCollidable::BoundingVolumeData& rData = pCollidable->m_boundingVolumeData;
-        const int32_t iShift = rData.m_expansionShift;
         hkAabbUint32 aabb;
-        aabb.m_min[0] = rData.m_min[0] - (rData.m_expansionMin[0] << iShift);
-        aabb.m_min[1] = rData.m_min[1] - (rData.m_expansionMin[1] << iShift);
-        aabb.m_min[2] = rData.m_min[2] - (rData.m_expansionMin[2] << iShift);
-        aabb.m_max[0] = rData.m_max[0] + (rData.m_expansionMax[0] << iShift);
-        aabb.m_max[1] = rData.m_max[1] + (rData.m_expansionMax[1] << iShift);
-        aabb.m_max[2] = rData.m_max[2] + (rData.m_expansionMax[2] << iShift);
+        hkVector4Util::uncompressExpandedAabbUint32(
+            reinterpret_cast<const hkAabbUint32&>(pCollidable->m_boundingVolumeData), aabb
+        );
         hkpBroadPhaseHandle* pHandle = pCollidable->getBroadPhaseHandle();
         world->getBroadPhase()->updateAabbsUint32(&pHandle, &aabb, 1, newPairs, delPairs);
         if (newPairs.m_size + delPairs.m_size > 0) {
@@ -1581,8 +1576,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                 hkpEntity* entity = oldEntities[e];
                 entity->m_simulationIsland = newIsland;
                 entity->m_storageIndex = static_cast<uint16_t>(newIsland->m_entities.m_size);
-                // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
-                newIsland->m_entities.m_data[newIsland->m_entities.m_size++] = entity;
+                newIsland->m_entities.pushBackUnchecked(entity);
                 if (currentIsland == newIsland) {
                     continue;
                 }
@@ -1700,33 +1694,7 @@ void hkpWorldOperationUtil::splitSimulationIsland(
                 }
             }
             world->unlockForIslandSplit(currentIsland);
-            // EXE-INLINED none: hkInplaceArray<hkpAgentNnSector*, 1>::optimizeCapacity(4)
-            if (track.m_sectors.m_capacityAndFlags >= 0) {
-                uint32_t uiCapacity = track.m_sectors.m_size + 3;
-                uiCapacity |= uiCapacity >> 16;
-                uiCapacity |= uiCapacity >> 8;
-                uiCapacity |= uiCapacity >> 4;
-                uiCapacity |= uiCapacity >> 2;
-                uiCapacity |= uiCapacity >> 1;
-                const int32_t newCapacity = static_cast<int32_t>(uiCapacity + 1);
-                if (newCapacity < 1) {
-                    // The SDK's cast: _reduce takes the inplace storage as raw bytes.
-                    hkArrayUtil::_reduce(
-                        *hkMemoryRouter::getInstance().m_heap, &track.m_sectors, sizeof(hkpAgentNnSector*),
-                        reinterpret_cast<char*>(track.m_sectors.m_storage), 1
-                    );
-                }
-                else if (
-                    newCapacity < static_cast<int32_t>(
-                                      track.m_sectors.m_capacityAndFlags & hkArrayBase<hkpAgentNnSector*>::CAPACITY_MASK
-                                  )
-                ) {
-                    hkArrayUtil::_reduce(
-                        *hkMemoryRouter::getInstance().m_heap, &track.m_sectors, sizeof(hkpAgentNnSector*), nullptr,
-                        newCapacity
-                    );
-                }
-            }
+            track.m_sectors.optimizeCapacity(4);
             for (int32_t g = 1; g < numGroups; ++g) {
                 islands[g]->m_splitCheckFrameCounter =
                     static_cast<uint8_t>(currentIsland->m_splitCheckFrameCounter + g);

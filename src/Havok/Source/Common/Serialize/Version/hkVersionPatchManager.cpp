@@ -429,13 +429,10 @@ hkResult hkVersionPatchManager::preparePatches(
     for (int32_t i = 0; i < origClasses.m_size; ++i) {
         const char* name = origClasses.m_data[i]->getName();
         int32_t version = origClasses.m_data[i]->getVersion();
-        // EXE-INLINED none: hkArray<ClassVersion, hkContainerHeapAllocator>::pushBackUnchecked
-        ClassVersion* pEntry = origVersions.m_data + origVersions.m_size;
-        if (pEntry) {
-            pEntry->name = name;
-            pEntry->version = version;
-        }
-        ++origVersions.m_size;
+        ClassVersion entry;
+        entry.name = name;
+        entry.version = version;
+        origVersions.pushBackUnchecked(entry);
     }
 
     hkDataWorldDict tempWorld;

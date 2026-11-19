@@ -1,5 +1,7 @@
 #include "Havok/Source/Common/Internal/ConvexHull/hkPlaneEquationUtil.h"
 
+#include "Havok/Source/Common/Base/Math/hkMath.h"
+
 #include <xmmintrin.h>
 
 // Cramer's rule: the cross products B x C, C x A and A x B, and the determinant A . (B x C) summed z + (y + x). Its
@@ -35,8 +37,7 @@ hkResult hkPlaneEquationUtil::findTriPlaneIntersectionPoint(
     const __m128 kDot = _mm_mul_ps(kA, kBC);
     const float fDet =
         _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(kDot, kDot, 0xAA), _mm_add_ss(_mm_shuffle_ps(kDot, kDot, 0x55), kDot)));
-    // EXE-INLINED none: fabs
-    const float fAbsDet = __builtin_fabsf(fDet);
+    const float fAbsDet = hkMath::fabs(fDet);
     if (fAbsDet < 1.1920929e-07f) {
         return HK_FAILURE;
     }

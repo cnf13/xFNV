@@ -9,6 +9,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -122,20 +123,8 @@ void hkpBvTreeAgent::processCollision(
         const hkMotionState* msA = bodyA.m_motion.pState;
         const hkMotionState* msB = bodyB.m_motion.pState;
 
-        // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
         alignas(16) hkVector4 linearTimInfo;
-        {
-            const float deltaTime = input.m_stepInfo.m_deltaTime;
-            const float dtA = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * deltaTime;
-            const float dtB = deltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-            const hkQuadReal diffA =
-                _mm_sub_ps(msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad);
-            const hkQuadReal diffB =
-                _mm_sub_ps(msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad);
-            linearTimInfo.m_quad = _mm_add_ps(_mm_mul_ps(diffA, _mm_set1_ps(dtA)), _mm_mul_ps(diffB, _mm_set1_ps(dtB)));
-            linearTimInfo.m_quad[3] = msB->m_deltaAngle.m_quad[3] * dtB * msB->m_objectRadius +
-                msA->m_deltaAngle.m_quad[3] * dtA * msA->m_objectRadius;
-        }
+        hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, linearTimInfo);
         hkAabb* cachedAabb = hkpBvTreeAgent::m_useAabbCaching ? &m_cachedAabb : nullptr;
 
         // The time info into bodyB's space; its w is overwritten with the rotated vector's, as the game does.

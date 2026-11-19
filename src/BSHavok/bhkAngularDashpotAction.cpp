@@ -4,6 +4,8 @@
 #include "BSHavok/bhkBinaryAction.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkSerializable.h"
+#include "BSHavok/bhkStream.h"
+#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -46,60 +48,34 @@ NiObject* bhkAngularDashpotAction::CreateClone(NiCloningProcess& arCloneData) {
 }
 
 // The base's fields, then, for a big-endian source, the creation info's rotation (bhkStream::Endian) and its strength
-// and damping (BSEndian) byte-swapped in place. The stream's byte is compared with 1: any other byte swaps, so it is
-// read as a byte rather than a bool tested. A cinfo built here is not killed. Each float's four bytes are swapped as an
-// untyped 32-bit word, hence the uint32_t views.
+// and damping (ENDIAN) byte-swapped in place. The stream's byte is compared with 1: any other byte swaps, so it is
+// read as a byte rather than a bool tested. A cinfo built here is not killed.
 void bhkAngularDashpotAction::LoadBinary(NiStream& arStream) {
     bhkBinaryAction::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkAngularDashpotActionCinfo& cinfo = static_cast<hkAngularDashpotActionCinfo&>(CreateCinfo(bCreated));
-        // EXE-INLINED none: bhkStream::Endian
-        uint32_t* puiRotation = reinterpret_cast<uint32_t*>(&cinfo.m_rotation);
-        puiRotation[0] = __builtin_bswap32(puiRotation[0]);
-        puiRotation[1] = __builtin_bswap32(puiRotation[1]);
-        puiRotation[2] = __builtin_bswap32(puiRotation[2]);
-        puiRotation[3] = __builtin_bswap32(puiRotation[3]);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.m_strength);
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.m_damping);
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        bhkStream::Endian(cinfo.m_rotation);
+        ENDIAN(cinfo.m_strength, false);
+        ENDIAN(cinfo.m_damping, false);
     }
 }
 
 // For a big-endian save, the creation info's rotation, strength and damping are byte-swapped in place around the base's
-// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call. Each
-// float's four bytes are swapped as an untyped 32-bit word, hence the uint32_t views.
+// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call.
 void bhkAngularDashpotAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkAngularDashpotActionCinfo& cinfo = static_cast<hkAngularDashpotActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiRotation = reinterpret_cast<uint32_t*>(&cinfo.m_rotation);
-    uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.m_strength);
-    uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.m_damping);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiRotation[0] = __builtin_bswap32(puiRotation[0]);
-        puiRotation[1] = __builtin_bswap32(puiRotation[1]);
-        puiRotation[2] = __builtin_bswap32(puiRotation[2]);
-        puiRotation[3] = __builtin_bswap32(puiRotation[3]);
-        // EXE-INLINED none: BSEndian
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        bhkStream::Endian(cinfo.m_rotation);
+        ENDIAN(cinfo.m_strength, false);
+        ENDIAN(cinfo.m_damping, false);
     }
     bhkBinaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
-        // EXE-INLINED none: bhkStream::Endian
-        puiRotation[0] = __builtin_bswap32(puiRotation[0]);
-        puiRotation[1] = __builtin_bswap32(puiRotation[1]);
-        puiRotation[2] = __builtin_bswap32(puiRotation[2]);
-        puiRotation[3] = __builtin_bswap32(puiRotation[3]);
-        // EXE-INLINED none: BSEndian
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        bhkStream::Endian(cinfo.m_rotation);
+        ENDIAN(cinfo.m_strength, false);
+        ENDIAN(cinfo.m_damping, false);
     }
 }
 
@@ -163,9 +139,7 @@ void bhkAngularDashpotAction::CopyCinfo(hkAngularDashpotActionCinfo& arInfo) {
     // EXE-INLINED none: bhkAngularDashpotAction::GetDamping
     float fDamping = (this && phkObject) ? static_cast<hkpAngularDashpotAction*>(phkObject)->m_damping : 0.0f;
     arInfo.m_damping = fDamping;
-    // EXE-INLINED none: bhkAngularDashpotAction::GethkRotation
-    const hkQuaternion* pRotation =
-        (this && phkObject) ? &static_cast<hkpAngularDashpotAction*>(phkObject)->m_rotation : &hkQuaternionIdentity;
+    const hkQuaternion* pRotation = &GethkRotation();
     // EXE-INLINED 0x4B4DB0
     arInfo.m_rotation.m_vec(0) = pRotation->m_vec(0);
     arInfo.m_rotation.m_vec(1) = pRotation->m_vec(1);

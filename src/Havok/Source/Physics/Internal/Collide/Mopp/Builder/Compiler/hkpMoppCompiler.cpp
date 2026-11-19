@@ -156,13 +156,7 @@ hkpMoppCode* hkpMoppCompiler::compile(hkpMoppMediator* mediator, char* buffer, i
         pCode->m_memSizeAndFlags = sizeof(hkpMoppCode);
         ::new (pCode) hkpMoppCode;
         pCode->m_data.reserveExactly(iTotalSize);
-        // EXE-INLINED none: hkArray<unsigned char>::setSize(int, const unsigned char&)
-        pCode->m_data.reserve(iTotalSize);
-        int32_t iOldSize = pCode->m_data.getSize();
-        if (iTotalSize - iOldSize > 0) {
-            std::memset(pCode->m_data.m_data + iOldSize, 0xCD, iTotalSize - iOldSize);
-        }
-        pCode->m_data.m_size = static_cast<uint32_t>(iTotalSize);
+        pCode->m_data.setSize(iTotalSize, 0xCD);
         // Joins the chunks' code, dropping each chunk's own code object and generator.
         for (int32_t i = 0; i < m_chunkInfo->m_chunks.getSize(); ++i) {
             uint8_t* pDest = pCode->m_data.m_data + chunkOffsets.m_data[i];

@@ -4,6 +4,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -66,23 +67,10 @@ void hkpSphereTriangleAgent::getClosestPoints(
     hkpCollideTriangleUtil::ClosestPointTriangleResult result;
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
         // The result passed to closestPointTriangle deliberately starts out with result.hitDirection holding the
         // transform's translation, as the game does.
-        _mm_store_ps(&reinterpret_cast<float*>(&result.hitDirection.m_quad)[0], c3);
-        const hkVector4* vertices = &triB->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        result.hitDirection.m_quad = t.m_translation.m_quad;
+        hkVector4Util::transformPoints(t, &triB->m_vertexA, 3, triVertices);
     }
 
     hkpCollideTriangleUtil::closestPointTriangle(
@@ -154,22 +142,10 @@ void hkpSphereTriangleAgent::processCollision(
     hkpCollideTriangleUtil::ClosestPointTriangleResult cpResult;
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
         // cpResult.hitDirection is set to the transform's translation, so the result passed to closestPointTriangle
         // starts out holding it, as the game does.
-        cpResult.hitDirection.m_quad = c3;
-        const hkVector4* vertices = &triB->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            triVertices[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-        }
+        cpResult.hitDirection.m_quad = t.m_translation.m_quad;
+        hkVector4Util::transformPoints(t, &triB->m_vertexA, 3, triVertices);
     }
 
     hkpFeatureOutput features;
@@ -336,23 +312,10 @@ void hkpSphereTriangleAgent::staticGetClosestPoints(
     hkpCollideTriangleUtil::ClosestPointTriangleResult result;
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
         // The result passed to closestPointTriangle deliberately starts out with result.hitDirection holding the
         // transform's translation, as the game does.
-        _mm_store_ps(&reinterpret_cast<float*>(&result.hitDirection.m_quad)[0], c3);
-        const hkVector4* vertices = &triB->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        result.hitDirection.m_quad = t.m_translation.m_quad;
+        hkVector4Util::transformPoints(t, &triB->m_vertexA, 3, triVertices);
     }
 
     hkpFeatureOutput features;
@@ -427,23 +390,10 @@ hkpSphereTriangleAgent::ClosestPointResult hkpSphereTriangleAgent::getClosestPoi
     hkpCollideTriangleUtil::ClosestPointTriangleResult result;
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
         // The result passed to closestPointTriangle deliberately starts out with result.hitDirection holding the
         // transform's translation, as the game does.
-        _mm_store_ps(&reinterpret_cast<float*>(&result.hitDirection.m_quad)[0], c3);
-        const hkVector4* vertices = &triB->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        result.hitDirection.m_quad = t.m_translation.m_quad;
+        hkVector4Util::transformPoints(t, &triB->m_vertexA, 3, triVertices);
     }
     hkpCollideTriangleUtil::ClosestPointTriangleStatus status =
         hkpCollideTriangleUtil::closestPointTriangle(sphereCentre, triVertices, cache, result, nullptr);

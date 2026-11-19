@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Collide/Agent/Deprecated/MultiSphereTriangle/hkpMultiSphereTriangleAgent.h"
 
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -55,38 +56,15 @@ void hkpMultiSphereTriangleAgent::getPenetrations(
     alignas(16) hkVector4 triVertices[3];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        const hkVector4* vertices = &triShape->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        hkVector4Util::transformPoints(t, &triShape->m_vertexA, 3, triVertices);
     }
 
     alignas(16) hkVector4 worldSpheres[hkpMultiSphereShape::MAX_SPHERES];
     const int32_t numSpheres = msShape->m_numSpheres;
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
         for (int32_t i = numSpheres - 1; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&msShape->m_spheres[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&worldSpheres[i].m_quad)[0], r);
+            worldSpheres[i]._setTransformedPos(t, msShape->m_spheres[i]);
         }
     }
 
@@ -118,38 +96,15 @@ void hkpMultiSphereTriangleAgent::getClosestPoints(
     alignas(16) hkVector4 triVertices[3];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        const hkVector4* vertices = &triShape->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos (the exe sums x*c0 + y*c1 here: the same lanes)
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        hkVector4Util::transformPoints(t, &triShape->m_vertexA, 3, triVertices);
     }
 
     alignas(16) hkVector4 worldSpheres[hkpMultiSphereShape::MAX_SPHERES];
     const int32_t numSpheres = msShape->m_numSpheres;
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
         for (int32_t i = numSpheres - 1; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&msShape->m_spheres[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&worldSpheres[i].m_quad)[0], r);
+            worldSpheres[i]._setTransformedPos(t, msShape->m_spheres[i]);
         }
     }
 
@@ -209,41 +164,14 @@ void hkpMultiSphereTriangleAgent::processCollision(
     alignas(16) hkVector4 triVertices[3];
     {
         const hkTransform& t = bodyB.m_motion.pState->m_transform;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &triShape->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            triVertices[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-        }
+        hkVector4Util::transformPoints(t, &triShape->m_vertexA, 3, triVertices);
     }
 
     alignas(16) hkVector4 worldSpheres[hkpMultiSphereShape::MAX_SPHERES];
     const int32_t numSpheres = msShape->m_numSpheres;
     {
         const hkTransform& t = bodyA.m_motion.pState->m_transform;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        // This is a do-while, like hkVector4Util::transformPoints: index numSpheres - 1 is transformed once even when
-        // the count is 0 or negative, as the game does.
-        int32_t i = numSpheres - 1;
-        do {
-            const __m128 p = msShape->m_spheres[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            worldSpheres[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-        }
-        while (--i >= 0);
+        hkVector4Util::transformPoints(t, msShape->m_spheres, numSpheres, worldSpheres);
     }
 
     const hkVector4* position = worldSpheres;
@@ -318,37 +246,15 @@ void hkpMultiSphereTriangleAgent::staticGetPenetrations(
     alignas(16) hkVector4 triVertices[3];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        hkVector4Util::transformPoints(t, vertices, 3, triVertices);
     }
 
     alignas(16) hkVector4 worldSpheres[hkpMultiSphereShape::MAX_SPHERES];
     const int32_t numSpheres = msShape->m_numSpheres;
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
         for (int32_t i = numSpheres - 1; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&msShape->m_spheres[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&worldSpheres[i].m_quad)[0], r);
+            worldSpheres[i]._setTransformedPos(t, msShape->m_spheres[i]);
         }
     }
 
@@ -382,43 +288,14 @@ void hkpMultiSphereTriangleAgent::staticGetClosestPoints(
     alignas(16) hkVector4 triVertices[3];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        const hkVector4* vertices = &triShape->m_vertexA;
-        for (int32_t i = 2; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&triVertices[i].m_quad)[0], r);
-        }
+        hkVector4Util::transformPoints(t, &triShape->m_vertexA, 3, triVertices);
     }
 
     alignas(16) hkVector4 worldSpheres[hkpMultiSphereShape::MAX_SPHERES];
     const int32_t numSpheres = msShape->m_numSpheres;
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        // hkVector4Util::transformPoints is a do-while, so index numSpheres - 1 is transformed once even when the count
-        // is 0 or negative, as the game does.
-        int32_t i = numSpheres - 1;
-        do {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&msShape->m_spheres[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&worldSpheres[i].m_quad)[0], r);
-        }
-        while (--i >= 0);
+        hkVector4Util::transformPoints(t, msShape->m_spheres, numSpheres, worldSpheres);
     }
 
     hkpCdPoint event;

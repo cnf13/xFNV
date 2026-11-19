@@ -3,6 +3,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Internal/Collide/Gsk/hkGsk.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/Mesh/hkGskShape.h"
 
@@ -30,18 +31,8 @@ static void hkCvxCvxDistByHeuristicSamplingPerformSample(
     hkVector4 vertexBinB;
     shapeB->getSupportingVertex(dirB, &vertexBinB);
 
-    // EXE-INLINED none: hkVector4::_setTransformedPos
     hkVector4 vertexBinA;
-    vertexBinA.m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(vertexBinB.m_quad, vertexBinB.m_quad, 0x55), aTb.m_rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(vertexBinB.m_quad, vertexBinB.m_quad, 0x00), aTb.m_rotation.m_col0.m_quad)
-        ),
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(vertexBinB.m_quad, vertexBinB.m_quad, 0xAA), aTb.m_rotation.m_col2.m_quad),
-            aTb.m_translation.m_quad
-        )
-    );
+    vertexBinA._setTransformedPos(aTb, vertexBinB);
 
     // The distance: z + (y + x) of (vertexAinA - vertexBinA) * dir.
     __m128 products = _mm_mul_ps(_mm_sub_ps(vertexAinA.m_quad, vertexBinA.m_quad), direction.m_quad);

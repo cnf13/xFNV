@@ -3,6 +3,7 @@
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -49,25 +50,8 @@ void hkToiContactPointViewer_displayArrow(
     hkVector4 to;
     to.m_quad = _mm_add_ps(from.m_quad, kDir);
 
-    // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-    float fMin = __builtin_fabsf(dir(0));
-    const float fAbsY = __builtin_fabsf(dir(1));
-    const float fAbsZ = __builtin_fabsf(dir(2));
-    int32_t iMin = 0;
-    int32_t iFirst = 1;
-    int32_t iSecond = 2;
-    if (fMin > fAbsY) {
-        fMin = fAbsY;
-        iFirst = 0;
-        iMin = 1;
-    }
-    if (fMin > fAbsZ) {
-        iSecond = iMin;
-    }
     hkVector4 ort;
-    ort.m_quad = _mm_setzero_ps();
-    ort(iFirst) = dir(iSecond);
-    ort(iSecond) = -dir(iFirst);
+    hkVector4Util::calculatePerpendicularVector(dir, ort);
 
     ort.normalize3();
     ort.mul4(dir.length3());

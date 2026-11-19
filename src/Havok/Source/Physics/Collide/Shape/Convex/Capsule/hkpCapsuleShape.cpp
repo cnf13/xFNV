@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkClassEnum.h"
@@ -193,27 +194,12 @@ int32_t hkpCapsuleShape::calcSizeForSpu(const CalcSizeForSpuInput& a1, int32_t a
     return 64;
 }
 
-// Both end points are transformed (vertex B first, then A, each (y * col1 + x * col0) + (z * col2 + translation)), and
-// their min and max are widened by the radius plus the tolerance.
+// Both end points are transformed, and their min and max are widened by the radius plus the tolerance.
 void hkpCapsuleShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
     float fRadius = m_radius + tolerance;
     const __m128 kTol4 = _mm_shuffle_ps(_mm_set_ss(fRadius), _mm_set_ss(fRadius), 0);
-    // EXE-INLINED none: hkVector4Util::transformPoints
     hkVector4 kObj[2];
-    const hkVector4* pVertices = &m_vertexA;
-    for (int32_t i = 1; i >= 0; --i) {
-        const __m128 kV = pVertices[i].m_quad;
-        kObj[i].m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0x55), localToWorld.m_rotation.m_col1.m_quad),
-                _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0x00), localToWorld.m_rotation.m_col0.m_quad)
-            ),
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kV, kV, 0xAA), localToWorld.m_rotation.m_col2.m_quad),
-                localToWorld.m_translation.m_quad
-            )
-        );
-    }
+    hkVector4Util::transformPoints(localToWorld, &m_vertexA, 2, kObj);
     const __m128 kMin = _mm_min_ps(kObj[0].m_quad, kObj[1].m_quad);
     out.m_max.m_quad = _mm_max_ps(kObj[0].m_quad, kObj[1].m_quad);
     out.m_min.m_quad = _mm_sub_ps(kMin, kTol4);
@@ -413,9 +399,8 @@ void hkpCapsuleShape::convertVertexIdsToVerticesImpl(
 ) const {
     for (int32_t i = numIds - 1; i >= 0; --i) {
         int32_t v7 = *ids;
-        // EXE-INLINED none: hkAddByteOffsetConst. The exe adds the id to &m_vertexA as a raw byte offset (the SDK's
-        // hkAddByteOffsetConst), so the vertex is read from untyped memory.
-        const hkVector4* pVertex = reinterpret_cast<const hkVector4*>(reinterpret_cast<const char*>(&m_vertexA) + v7);
+        // The id is a byte offset from m_vertexA.
+        const hkVector4* pVertex = hkAddByteOffsetConst(&m_vertexA, v7);
         verticesOut->m_quad = pVertex->m_quad;
         verticesOut->m_quad[3] = std::bit_cast<float>(static_cast<int32_t>((v7 | 0x3F000000)));
         ++verticesOut;

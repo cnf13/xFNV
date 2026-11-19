@@ -7,6 +7,7 @@
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
 #include "BSHavok/hkOrientHingedBodyAction.h"
+#include "Fallout Shared/TESFile.h"
 #include "Fallout/AI/Combat/CombatPlanner.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
@@ -49,8 +50,7 @@ NiObject* bhkOrientHingedBodyAction::CreateClone(NiCloningProcess& arCloneData) 
 
 // The base's fields, then, for a big-endian source, the creation info's two axes, strength and damping byte-swapped in
 // place. The stream's byte is compared with 1: any other byte swaps, so it is read as a byte rather than a bool tested.
-// A cinfo built here is not killed. The strength's and damping's four bytes are swapped as an untyped 32-bit value,
-// hence the uint32_t views.
+// A cinfo built here is not killed.
 void bhkOrientHingedBodyAction::LoadBinary(NiStream& arStream) {
     bhkUnaryAction::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
@@ -58,39 +58,28 @@ void bhkOrientHingedBodyAction::LoadBinary(NiStream& arStream) {
         hkOrientHingedBodyActionCinfo& cinfo = static_cast<hkOrientHingedBodyActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(cinfo.HingeAxisLS);
         bhkStream::Endian(cinfo.ForwardLS);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.fStrength);
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.fDamping);
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        ENDIAN(cinfo.fStrength, false);
+        ENDIAN(cinfo.fDamping, false);
     }
 }
 
 // For a big-endian save, the creation info's two axes, strength and damping are byte-swapped in place around the base's
-// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call. The
-// strength's and damping's four bytes are swapped as an untyped 32-bit value, hence the uint32_t views.
+// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call.
 void bhkOrientHingedBodyAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkOrientHingedBodyActionCinfo& cinfo = static_cast<hkOrientHingedBodyActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&cinfo.fStrength);
-    uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&cinfo.fDamping);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.HingeAxisLS);
         bhkStream::Endian(cinfo.ForwardLS);
-        // EXE-INLINED none: BSEndian
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        ENDIAN(cinfo.fStrength, false);
+        ENDIAN(cinfo.fDamping, false);
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.HingeAxisLS);
         bhkStream::Endian(cinfo.ForwardLS);
-        // EXE-INLINED none: BSEndian
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        ENDIAN(cinfo.fStrength, false);
+        ENDIAN(cinfo.fDamping, false);
     }
 }
 

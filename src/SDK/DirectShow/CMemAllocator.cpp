@@ -6,6 +6,7 @@
 #include "SDK/DirectShow/CMediaSample.h"
 #include "SDK/DirectShow/CMediaType.h"
 #include "SDK/DirectShow/CUnknown.h"
+#include "SDK/DirectShow/wxutil.h"
 #include "BSCore/BSSystemObjects.h"
 #include "platform/Memory.h"
 #include <stdint.h>
@@ -374,22 +375,13 @@ CBaseAllocator::CBaseAllocator(const char* pName, IUnknown* pUnk, HRESULT* phr, 
 CMemAllocator::CMemAllocator(const char* pName, IUnknown* pUnk, HRESULT* phr)
 	: CBaseAllocator(pName, pUnk, phr, 1, 1), m_pBuffer(nullptr) {}
 
-// The DirectShow base classes' CMemAllocator::Alloc (amfilter.cpp). Its CAutoLock is written out: the critical
-// section entered, and left before each return. The exe's cleanup-only C++ EH frame is left out.
+// The DirectShow base classes' CMemAllocator::Alloc (amfilter.cpp).
 // The exe passes the CAutoLock's slot (it holds the lock pointer) as phr: MSVC shares the slot with the SDK's hr,
 // whose value the exe keeps in a register. The CMediaSample constructor never touches *phr; src passes the SDK's hr.
 HRESULT CMemAllocator::Alloc() {
-	CCritSec* pLock;
-	if (this) {
-		pLock = &static_cast<CCritSec&>(static_cast<CBaseAllocator&>(*this));
-	} else {
-		pLock = 0;
-	}
-	// EXE-INLINED none: CAutoLock::CAutoLock
-	EnterCriticalSection(&pLock->m_CritSec);
+	CAutoLock lck(this);
 	HRESULT hr = CBaseAllocator::Alloc();
 	if (hr < 0) {
-		LeaveCriticalSection(&pLock->m_CritSec);
 		return hr;
 	}
 	if (hr != S_FALSE) {
@@ -411,18 +403,15 @@ HRESULT CMemAllocator::Alloc() {
 			m_pBuffer = nullptr;
 		}
 		if (!m_pBuffer) {
-			LeaveCriticalSection(&pLock->m_CritSec);
 			return E_OUTOFMEMORY;
 		}
 		for (uint8_t* pNext = m_pBuffer; m_lAllocated < m_lCount; pNext += lAlignedSize) {
 			CMediaSample* pMemory = static_cast<CMediaSample*>(ourMalloc(sizeof(CMediaSample)));
 			if (!pMemory) {
-				LeaveCriticalSection(&pLock->m_CritSec);
 				return E_OUTOFMEMORY;
 			}
 			CMediaSample* pSample = ::new (pMemory) CMediaSample(nullptr, this, &hr, &pNext[m_lPrefix], m_lSize);
 			if (!pSample) {
-				LeaveCriticalSection(&pLock->m_CritSec);
 				return E_OUTOFMEMORY;
 			}
 			pSample->m_pNext = m_lFree.m_List;
@@ -432,6 +421,5 @@ HRESULT CMemAllocator::Alloc() {
 		}
 		m_bChanged = 0;
 	}
-	LeaveCriticalSection(&pLock->m_CritSec);
 	return 0;
 }

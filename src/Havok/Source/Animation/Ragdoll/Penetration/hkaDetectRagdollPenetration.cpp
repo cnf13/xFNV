@@ -29,10 +29,7 @@ hkaDetectRagdollPenetration::Output::~Output() {}
 hkaDetectRagdollPenetration::hkaDetectRagdollPenetration(hkaDetectRagdollPenetration::Setup* a1)
   : m_setup(*a1), m_numBones(a1->m_ragdollSkeleton->m_bones.getSize()) {
     // Every bone starts out penetrating.
-    m_boneStates.setSize(m_numBones);
-    for (int32_t i = 0; i < m_numBones; ++i) {
-        m_boneStates[i] = HK_YESP;
-    }
+    m_boneStates.setSize(m_numBones, HK_YESP);
     m_ragdollIsOut.m_bool = false;
 }
 

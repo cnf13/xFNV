@@ -4,6 +4,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -114,29 +115,10 @@ void hkpGskfAgent::processCollision(
         goto PROCESS_AT_T1;
     }
     {
-        // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
         const hkMotionState* pStateA = bodyA.m_motion.pState;
         const hkMotionState* pStateB = bodyB.m_motion.pState;
-        const float fDeltaTime = input.m_stepInfo.m_deltaTime;
-        const float f0 = fDeltaTime * pStateA->m_sweptTransform.m_centerOfMass1(3);
-        const float f1 = fDeltaTime * pStateB->m_sweptTransform.m_centerOfMass1(3);
         alignas(16) hkVector4 timInfo;
-        timInfo.m_quad = _mm_add_ps(
-            _mm_mul_ps(
-                _mm_sub_ps(
-                    pStateA->m_sweptTransform.m_centerOfMass0.m_quad, pStateA->m_sweptTransform.m_centerOfMass1.m_quad
-                ),
-                _mm_set1_ps(f0)
-            ),
-            _mm_mul_ps(
-                _mm_sub_ps(
-                    pStateB->m_sweptTransform.m_centerOfMass1.m_quad, pStateB->m_sweptTransform.m_centerOfMass0.m_quad
-                ),
-                _mm_set1_ps(f1)
-            )
-        );
-        timInfo(3) = pStateA->m_deltaAngle(3) * f0 * pStateA->m_objectRadius +
-            pStateB->m_deltaAngle(3) * f1 * pStateB->m_objectRadius;
+        hkSweptTransformUtil::calcTimInfo(*pStateA, *pStateB, input.m_stepInfo.m_deltaTime, timInfo);
 
         if (m_separatingNormal(3) > input.m_tolerance) {
             // timInfo's xyz against the normal's, plus timInfo's w.

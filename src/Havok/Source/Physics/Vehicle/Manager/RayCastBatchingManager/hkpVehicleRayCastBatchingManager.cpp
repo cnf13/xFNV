@@ -126,8 +126,7 @@ int32_t hkpVehicleRayCastBatchingManager::buildAndAddCastJobs(
     }
     HK_TIMER_END();
 
-    // EXE-INLINED none: hkMath::min2<int>
-    numJobs = (numJobs < numCommands) ? numJobs : numCommands;
+    numJobs = hkMath::min2(numJobs, numCommands);
     const int32_t minCommandsPerJob = numCommands / numJobs;
     const int32_t extra = numCommands % numJobs;
     {

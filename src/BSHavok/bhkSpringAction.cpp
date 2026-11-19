@@ -7,6 +7,7 @@
 #include "BSHavok/bhkStream.h"
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -48,9 +49,8 @@ NiObject* bhkSpringAction::CreateClone(NiCloningProcess& arCloneData) {
 }
 
 // The base's fields, then, for a big-endian source, the creation info's pivots (bhkStream::Endian) and its rest length,
-// strength and damping (BSEndian) byte-swapped in place. The stream's byte is compared with 1: any other byte swaps, so
-// it is read as a byte rather than a bool tested. A cinfo built here is not killed. Each float's four bytes are swapped
-// as an untyped 32-bit value, hence the uint32_t views.
+// strength and damping (ENDIAN) byte-swapped in place. The stream's byte is compared with 1: any other byte swaps, so
+// it is read as a byte rather than a bool tested. A cinfo built here is not killed.
 void bhkSpringAction::LoadBinary(NiStream& arStream) {
     bhkBinaryAction::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
@@ -58,49 +58,33 @@ void bhkSpringAction::LoadBinary(NiStream& arStream) {
         hkSpringActionCinfo& rInfo = static_cast<hkSpringActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(rInfo.m_pivotA);
         bhkStream::Endian(rInfo.m_pivotB);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiRestLength = reinterpret_cast<uint32_t*>(&rInfo.m_restLength);
-        *puiRestLength = __builtin_bswap32(*puiRestLength);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&rInfo.m_strength);
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&rInfo.m_damping);
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        ENDIAN(rInfo.m_restLength, false);
+        ENDIAN(rInfo.m_strength, false);
+        ENDIAN(rInfo.m_damping, false);
     }
 }
 
 // For a big-endian save, the creation info's pivots, rest length, strength and damping are byte-swapped in place around
 // the base's write and swapped back after it. CreateCinfo is called virtually and the info it may make is deliberately
 // not killed, as the game does. The stream's byte is compared with 1 before and after the base's write: any other byte
-// swaps, so it is read as a byte rather than a bool tested. Each float's four bytes are swapped as an untyped 32-bit
-// word, hence the uint32_t views.
+// swaps, so it is read as a byte rather than a bool tested.
 void bhkSpringAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkSpringActionCinfo& rInfo = static_cast<hkSpringActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiRestLength = reinterpret_cast<uint32_t*>(&rInfo.m_restLength);
-    uint32_t* puiStrength = reinterpret_cast<uint32_t*>(&rInfo.m_strength);
-    uint32_t* puiDamping = reinterpret_cast<uint32_t*>(&rInfo.m_damping);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_pivotA);
         bhkStream::Endian(rInfo.m_pivotB);
-        // EXE-INLINED none: BSEndian
-        *puiRestLength = __builtin_bswap32(*puiRestLength);
-        // EXE-INLINED none: BSEndian
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        ENDIAN(rInfo.m_restLength, false);
+        ENDIAN(rInfo.m_strength, false);
+        ENDIAN(rInfo.m_damping, false);
     }
     bhkBinaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_pivotA);
         bhkStream::Endian(rInfo.m_pivotB);
-        // EXE-INLINED none: BSEndian
-        *puiRestLength = __builtin_bswap32(*puiRestLength);
-        // EXE-INLINED none: BSEndian
-        *puiStrength = __builtin_bswap32(*puiStrength);
-        // EXE-INLINED none: BSEndian
-        *puiDamping = __builtin_bswap32(*puiDamping);
+        ENDIAN(rInfo.m_restLength, false);
+        ENDIAN(rInfo.m_strength, false);
+        ENDIAN(rInfo.m_damping, false);
     }
 }
 

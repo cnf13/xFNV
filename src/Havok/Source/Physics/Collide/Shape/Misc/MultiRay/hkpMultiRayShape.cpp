@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
@@ -148,33 +149,10 @@ void hkpMultiRayShape::getAabbImpl(const hkTransform& localToWorld, float tolera
     // EXE-INLINED none: hkArray<hkpMultiRayShape::Ray>::setSize
     int32_t numRays = m_rays.m_size;
     worldRays._reserve(*hkMemoryRouter::getInstance().m_heap, numRays);
-    hkVector4 col0;
-    hkVector4 col1;
-    hkVector4 col2;
-    hkVector4 translation;
-    col0.m_quad = localToWorld.m_rotation.m_col0.m_quad;
-    col1.m_quad = localToWorld.m_rotation.m_col1.m_quad;
-    col2.m_quad = localToWorld.m_rotation.m_col2.m_quad;
-    translation.m_quad = localToWorld.m_translation.m_quad;
-    // m_size * 2 - 1 wraps, so it is computed unsigned so that no signed overflow is assumed away.
-    int32_t i = static_cast<int32_t>(static_cast<uint32_t>(m_rays.m_size) * 2u - 1u);
     worldRays.m_size = numRays;
-    // EXE-INLINED none: hkVector4Util::transformPoints
-    hkVector4* pDst = &worldRays.m_data[0].m_start + i;
-    const hkVector4* pSrc = &m_rays.m_data[0].m_start + i;
-    do {
-        const __m128 p = pSrc->m_quad;
-        pDst->m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(p, p, 0), col0.m_quad), _mm_mul_ps(_mm_shuffle_ps(p, p, 85), col1.m_quad)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 170), col2.m_quad), translation.m_quad)
-        );
-        --i;
-        --pSrc;
-        --pDst;
-    }
-    while (i >= 0);
+    hkVector4Util::transformPoints(
+        localToWorld, &m_rays.m_data[0].m_start, m_rays.m_size * 2, &worldRays.m_data[0].m_start
+    );
     int32_t count = worldRays.m_size;
     const Ray* pRay = worldRays.m_data;
     __m128 minimum = _mm_shuffle_ps(_mm_set_ss(rdata_104DA48), _mm_set_ss(rdata_104DA48), 0);

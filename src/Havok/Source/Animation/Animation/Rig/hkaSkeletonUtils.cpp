@@ -180,22 +180,7 @@ void hkaSkeletonUtils::getDescendants(
     const int32_t numBones = skeleton.m_bones.m_size;
     hkLocalArray<hkBool> included(numBones);
 
-    // EXE-INLINED none: hkArray<hkBool>::setSize(numBones, false)
-    const int32_t size = skeleton.m_bones.m_size;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacity = static_cast<int32_t>(included.m_capacityAndFlags & hkArrayBase<hkBool>::CAPACITY_MASK);
-    if (capacity < size) {
-        int32_t request = 2 * capacity;
-        if (size >= request) {
-            request = size;
-        }
-        hkArrayUtil::_reserve(pHeap, &included, request, sizeof(hkBool));
-    }
-    const int32_t numNew = size - included.m_size;
-    if (numNew > 0) {
-        std::memset(included.m_data + included.m_size, 0, numNew);
-    }
-    included.m_size = static_cast<uint32_t>(size);
+    included.setSize(skeleton.m_bones.m_size, false);
 
     if (includeStart) {
         bonesOut.pushBack(startBone);
@@ -216,22 +201,7 @@ void hkaSkeletonUtils::getLeaves(const hkaSkeleton& skeleton, hkArray<int16_t>& 
     const int32_t numBones = skeleton.m_bones.m_size;
     hkLocalArray<hkBool> isParent(numBones);
 
-    // EXE-INLINED none: hkArray<hkBool>::setSize(numBones, false)
-    const int32_t size = skeleton.m_bones.m_size;
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    const int32_t capacity = static_cast<int32_t>(isParent.m_capacityAndFlags & hkArrayBase<hkBool>::CAPACITY_MASK);
-    if (capacity < size) {
-        int32_t request = 2 * capacity;
-        if (size >= request) {
-            request = size;
-        }
-        hkArrayUtil::_reserve(pHeap, &isParent, request, sizeof(hkBool));
-    }
-    const int32_t numNew = size - isParent.m_size;
-    if (numNew > 0) {
-        std::memset(isParent.m_data + isParent.m_size, 0, numNew);
-    }
-    isParent.m_size = static_cast<uint32_t>(size);
+    isParent.setSize(skeleton.m_bones.m_size, false);
 
     for (int32_t i = 0; i < skeleton.m_parentIndices.m_size; ++i) {
         const int16_t parent = skeleton.m_parentIndices.m_data[i];

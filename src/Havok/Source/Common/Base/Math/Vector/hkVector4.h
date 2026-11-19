@@ -105,6 +105,9 @@ public:
 
     // The point v transformed by t: the rotated vector plus the translation.
     void setTransformedPos(const hkTransform& t, const hkVector4& v);
+    // The SDK's inline form of setTransformedPos, on whole quads: (y * col1 + x * col0) + (z * col2 + translation).
+    // Defined in hkTransform.h.
+    void _setTransformedPos(const hkTransform& t, const hkVector4& b);
     // The point v transformed by the quaternion-scale transform t: v scaled, rotated, then translated.
     void setTransformedPos(const hkQsTransform& t, const hkVector4& v);
 
@@ -169,6 +172,8 @@ public:
     }
     // The vector a multiplied by the matrix r.
     void setMul3(const hkMatrix3& r, const hkVector4& b);
+    // The SDK's inline form of setMul3, on whole quads: (y * col1 + x * col0) + z * col2. Defined in hkMatrix3.h.
+    void _setMul3(const hkMatrix3& r, const hkVector4& v);
     const hkQuadReal& getQuad() const {
         return m_quad;
     }
@@ -419,6 +424,8 @@ public:
 
     void setNeg4If(int32_t aiCondition);
     void setRotatedDir(const hkRotation& a, const hkVector4& b);
+    // The SDK's inline form of setRotatedDir: _setMul3. Defined in hkRotation.h.
+    void _setRotatedDir(const hkRotation& r, const hkVector4& b);
     void setTransformedInversePos(const hkTransform& a, const hkVector4& b);
     // The point b taken into the space of the quaternion-scale transform a.
     void setTransformedInversePos(const hkQsTransform& a, const hkVector4& b);
@@ -544,6 +551,13 @@ public:
 
     // The index of the component of xyz with the largest magnitude.
     int32_t getMajorAxis() const {
+        hkVector4 tmp;
+        tmp.setAbs4(*this);
+        return tmp(0) < tmp(1) ? (tmp(1) < tmp(2) ? 2 : 1) : (tmp(0) < tmp(2) ? 2 : 0);
+    }
+
+    // The SDK's inline: the index of the component of xyz with the largest magnitude.
+    int32_t getMajorAxis3() const {
         hkVector4 tmp;
         tmp.setAbs4(*this);
         return tmp(0) < tmp(1) ? (tmp(1) < tmp(2) ? 2 : 1) : (tmp(0) < tmp(2) ? 2 : 0);

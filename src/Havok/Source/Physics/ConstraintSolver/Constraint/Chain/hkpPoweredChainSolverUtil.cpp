@@ -348,13 +348,9 @@ void hkPoweredChain_BuildConstraintMatrixAndLuDecomposition(
         hkpConstraintChainMatrix6Triple& triple = triples[row];
         const hkp1Lin2AngJacobian* jac = &j[3 * row];
         const hkp2AngJacobian* jacAng = &jAng[3 * row];
-        // The accumulators are raw memory addressed by the byte offsets in accumulators, hence the casts.
-        const char* base = reinterpret_cast<const char*>(accumsBase);
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* accA = reinterpret_cast<const hkpVelocityAccumulator*>(base + va[row].m_offset);
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* accB =
-            reinterpret_cast<const hkpVelocityAccumulator*>(base + va[row + 1].m_offset);
+        // The accumulators are addressed by the byte offsets in va.
+        const hkpVelocityAccumulator* accA = hkAddByteOffsetConst(accumsBase, va[row].m_offset);
+        const hkpVelocityAccumulator* accB = hkAddByteOffsetConst(accumsBase, va[row + 1].m_offset);
         const __m128 invA = accA->m_invMasses.m_quad;
         const __m128 invB = accB->m_invMasses.m_quad;
         hkMatrix6& mtxDiag = triple.m_mtxDiag;

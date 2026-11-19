@@ -85,8 +85,7 @@ hkAabb* hkAabbUtil::calcAabb(const float* vertexArray, int32_t numVertices, int3
     hkQuadReal vMax = point.m_quad;
     const float* pVertex = vertexArray;
     for (int32_t i = 1; i < numVertices; i++) {
-        // EXE-INLINED none: hkAddByteOffsetConst (the points are raw bytes striding apart, as the exe steps them)
-        pVertex = reinterpret_cast<const float*>(reinterpret_cast<const char*>(pVertex) + striding);
+        pVertex = hkAddByteOffsetConst(pVertex, striding);
         point.set(pVertex[0], pVertex[1], pVertex[2], 0.0f);
         vMin = _mm_min_ps(vMin, point.m_quad);
         vMax = _mm_max_ps(vMax, point.m_quad);

@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
@@ -105,48 +106,10 @@ hkpAgentData* hkPredGskAgent3::process(
             work.m_radiusSumSqrd.m_storage = radiusSum * radiusSum;
             shapeA->convertVertexIdsToVerticesImpl(vertexIds, gskManifold.m_numVertsA, work.m_vertices);
             const int32_t numVertsA = gskManifold.m_numVertsA;
-            // EXE-INLINED none: hkVector4Util::transformPoints (each point's _setTransformedPos)
-            {
-                const hkTransform& rTransform = *bodyA->m_motion.pMotion;
-                const hkQuadReal col0 = rTransform.m_rotation.m_col0.m_quad;
-                const hkQuadReal col1 = rTransform.m_rotation.m_col1.m_quad;
-                const hkQuadReal col2 = rTransform.m_rotation.m_col2.m_quad;
-                const hkQuadReal translation = rTransform.m_translation.m_quad;
-                int32_t j = numVertsA - 1;
-                do {
-                    const hkQuadReal v = work.m_vertices[j].m_quad;
-                    work.m_vertices[j].m_quad = _mm_add_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1)), col1),
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0)), col0)
-                        ),
-                        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
-                    );
-                }
-                while (--j >= 0);
-            }
+            hkVector4Util::transformPoints(*bodyA->m_motion.pMotion, work.m_vertices, numVertsA, work.m_vertices);
             hkpCdVertex* verticesB = &work.m_vertices[numVertsA];
             shapeB->convertVertexIdsToVerticesImpl(vertexIds + numVertsA, gskManifold.m_numVertsB, verticesB);
-            // EXE-INLINED none: hkVector4Util::transformPoints (each point's _setTransformedPos)
-            {
-                const hkTransform& rTransform = *bodyB->m_motion.pMotion;
-                const hkQuadReal col0 = rTransform.m_rotation.m_col0.m_quad;
-                const hkQuadReal col1 = rTransform.m_rotation.m_col1.m_quad;
-                const hkQuadReal col2 = rTransform.m_rotation.m_col2.m_quad;
-                const hkQuadReal translation = rTransform.m_translation.m_quad;
-                int32_t j = gskManifold.m_numVertsB - 1;
-                do {
-                    const hkQuadReal v = verticesB[j].m_quad;
-                    verticesB[j].m_quad = _mm_add_ps(
-                        _mm_add_ps(
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1)), col1),
-                            _mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0)), col0)
-                        ),
-                        _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2)), col2), translation)
-                    );
-                }
-                while (--j >= 0);
-            }
+            hkVector4Util::transformPoints(*bodyB->m_motion.pMotion, verticesB, gskManifold.m_numVertsB, verticesB);
             hkGskManifold_verifyAndGetPoints(gskManifold, work, 0, result, input.m_contactMgr);
             const uint8_t numContactPoints = gskManifold.m_numContactPoints;
             if (numContactPoints) {

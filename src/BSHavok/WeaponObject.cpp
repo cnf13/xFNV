@@ -436,11 +436,7 @@ LABEL_6:;
         NiTransform weaponObjectTransform = parentTransform * parentToWeaponTransform;
         niq.FromRotation(weaponObjectTransform.m_Rotate);
         NI2HK(hkv, weaponObjectTransform.m_Translate);
-        // EXE-INLINED none: NI2HK(hkQuaternion&, const NiQuaternion&), each lane copied with fld/fstp.
-        hkr.m_vec.m_quad[0] = niq.m_fX;
-        hkr.m_vec.m_quad[1] = niq.m_fY;
-        hkr.m_vec.m_quad[2] = niq.m_fZ;
-        hkr.m_vec.m_quad[3] = niq.m_fW;
+        NI2HK(hkr, niq);
         hkr.normalize();
         bhkNiCollisionObject::kKeyframeLock.Lock(nullptr);
         pweapRB->SetPosRot(hkv, hkr);

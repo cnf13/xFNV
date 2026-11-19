@@ -38,6 +38,13 @@ public:
     // The SDK's CCritSec: the hybrid constructors and destructors of its users inline these.
     CCritSec();
     ~CCritSec();
+    // The SDK's inline Lock and Unlock: the critical section entered and left.
+    void Lock() {
+        EnterCriticalSection(&m_CritSec);
+    }
+    void Unlock() {
+        LeaveCriticalSection(&m_CritSec);
+    }
     _RTL_CRITICAL_SECTION m_CritSec;
 };
 

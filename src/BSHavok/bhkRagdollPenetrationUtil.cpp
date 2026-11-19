@@ -409,12 +409,7 @@ void bhkRagdollPenetrationUtil::Update() {
         // The float slots' storage rounded up to a multiple of four (HK_NEXT_MULTIPLE_OF), then the values zeroed.
         kPose.m_floatSlotValues.reserveExactly((kPose.m_skeleton->m_floatSlots.m_size + 3) & ~3);
         const int32_t iNumFloatSlots = kPose.m_skeleton->m_floatSlots.m_size;
-        // EXE-INLINED none: hkArray<float>::setSize(int, const float&)
-        kPose.m_floatSlotValues.reserve(iNumFloatSlots);
-        for (int32_t k = kPose.m_floatSlotValues.m_size; k < iNumFloatSlots; ++k) {
-            kPose.m_floatSlotValues.m_data[k] = 0.0f;
-        }
-        kPose.m_floatSlotValues.setSizeUnchecked(iNumFloatSlots);
+        kPose.m_floatSlotValues.setSize(iNumFloatSlots, 0.0f);
 
         hkArray<hkQsTransform>& rModelPose = kPose.accessUnsyncedPoseModelSpace();
         ActiveSystems.pBuffer[i]->pRagdollInstance->getPoseWorldSpace(rModelPose.m_data);
@@ -887,8 +882,6 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
             continue;
         }
         const uint32_t eShapeType = pshape->m_type.m_storage;
-        hkVector4 identityTranslation;
-        identityTranslation.setZero4();
         alignas(16) hkVector4 boneTranslation;
         boneTranslation.setZero4();
         if (eShapeType == HK_SHAPE_CAPSULE) {
@@ -938,10 +931,7 @@ hkaSkeleton* bhkRagdollPenetrationUtil::CreateSkeletonForRagdoll(
         pskeleton->m_bones.m_data[iskeletonBoneIdx].m_lockTranslation.m_bool = 1;
         pskeleton->m_parentIndices.m_data[iskeletonBoneIdx] = static_cast<int16_t>(inumbIdx);
         hkQsTransform* pNubPose = &pskeleton->m_referencePose.m_data[iskeletonBoneIdx];
-        // EXE-INLINED none: hkQsTransform::setIdentity
-        pNubPose->m_translation = identityTranslation;
-        pNubPose->m_rotation.setIdentity();
-        pNubPose->m_scale.setAll(1.0f);
+        pNubPose->setIdentity();
         pskeleton->m_referencePose.m_data[iskeletonBoneIdx].m_translation = boneTranslation;
     }
     if (pskeleton->m_bones.m_size == 0) {

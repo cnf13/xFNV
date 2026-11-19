@@ -52,6 +52,10 @@ inline void hkVector4::_setRotatedInverseDir(const hkRotation& r, const hkVector
     m_quad = _mm_add_ps(_mm_add_ps(r0, r1), r2);
 }
 
+inline void hkVector4::_setRotatedDir(const hkRotation& r, const hkVector4& b) {
+    _setMul3(r, b);
+}
+
 inline void hkVector4::setRotatedInverseDir(const hkRotation& t, const hkVector4& v) {
     _setRotatedInverseDir(t, v);
 }

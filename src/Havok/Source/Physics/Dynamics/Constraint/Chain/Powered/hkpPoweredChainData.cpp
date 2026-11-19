@@ -252,13 +252,9 @@ void hkpPoweredChainData::buildJacobian(const hkpConstraintQueryIn& inNotValid, 
 
     hkpEntity* firstEntity = instance->m_chainedEntities.m_data[0];
     in2.m_bodyB = reinterpret_cast<hkpVelocityAccumulator*>(accumsBase + firstEntity->m_solverData);
-    // EXE-INLINED none: hkArray<hkpVelocityAccumulatorOffset>::pushBackUnchecked
-    // The SDK's pushBackUnchecked, inlined: the placement store with its null test.
-    hkpVelocityAccumulatorOffset* pFirstSlot = accumulators.m_data + accumulators.m_size;
-    if (pFirstSlot) {
-        pFirstSlot->m_offset = static_cast<uint32_t>(reinterpret_cast<char*>(in2.m_bodyB) - accumsBase);
-    }
-    accumulators.m_size++;
+    hkpVelocityAccumulatorOffset firstOffset;
+    firstOffset.m_offset = static_cast<uint32_t>(reinterpret_cast<char*>(in2.m_bodyB) - accumsBase);
+    accumulators.pushBackUnchecked(firstOffset);
     in2.m_virtMassFactor = 1.0f;
     in2.m_transformB = &firstEntity->m_motion.m_motionState.m_transform;
     in2.m_rhsFactor = in2.m_substepInvDeltaTime;

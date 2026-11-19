@@ -625,12 +625,7 @@ hkJobQueue::JobStatus hkJobQueue::findJobInternal(
         hkJobQueue::Queue& queue = data->m_jobQueue[index];
         if (queue.m_elementsInUse) {
             hkJobQueue::JobQueueEntry job;
-            // EXE-INLINED none: hkQueue<hkJobQueue::JobQueueEntry>::dequeue
-            job = queue.m_data[queue.m_head];
-            if (++queue.m_head == queue.m_capacity) {
-                queue.m_head = 0;
-            }
-            --queue.m_elementsInUse;
+            queue.dequeue(job);
             if (m_popJobFunc(*this, data, job, jobOut) == hkJobQueue::DO_NOT_POP_QUEUE_ENTRY) {
                 queue.enqueueInFront(job);
                 checkQueueAndReleaseOneWaitingThread(index, data);

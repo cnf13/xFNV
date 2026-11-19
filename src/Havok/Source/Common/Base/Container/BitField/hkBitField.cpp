@@ -102,17 +102,7 @@ void hkBitField::setSize(int32_t numBits, int32_t fillValue) {
     }
     const uint32_t fill = fillValue ? 0xFFFFFFFFu : 0u;
     const int32_t numWords = (numBits + 31) >> 5;
-    // EXE-INLINED none: hkArray<uint32_t, hkContainerHeapAllocator>::setSize(int, const uint32_t&)
-    hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-    const int32_t capacity = m_words.m_capacityAndFlags & hkArrayBase<uint32_t>::CAPACITY_MASK;
-    if (capacity < numWords) {
-        const int32_t cap2 = 2 * capacity;
-        hkArrayUtil::_reserve(heap, &m_words, numWords < cap2 ? cap2 : numWords, sizeof(uint32_t));
-    }
-    for (int32_t i = m_words.m_size; i < numWords; ++i) {
-        m_words.m_data[i] = fill;
-    }
-    m_words.m_size = numWords;
+    m_words.setSize(numWords, fill);
     m_numBits = numBits;
 }
 

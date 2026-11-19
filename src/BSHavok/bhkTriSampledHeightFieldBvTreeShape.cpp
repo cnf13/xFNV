@@ -8,6 +8,7 @@
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/hkBSHeightFieldShape.h"
 #include "Fallout Shared/Havok/CellMopp.h"
+#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
@@ -69,7 +70,7 @@ NiObject* bhkTriSampledHeightFieldBvTreeShape::CreateClone(NiCloningProcess& arC
 
 // The base's fields, then, for a big-endian source, the creation info's scale, resolutions and height range
 // byte-swapped in place and its vertex array cleared. The stream's flag is compared with 1 as a byte. A cinfo built
-// here is not killed. The height floats are swapped as untyped 32-bit words, hence the uint32_t views.
+// here is not killed.
 void bhkTriSampledHeightFieldBvTreeShape::LoadBinary(NiStream& arStream) {
     bhkBvTreeShape::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
@@ -77,52 +78,36 @@ void bhkTriSampledHeightFieldBvTreeShape::LoadBinary(NiStream& arStream) {
         hkTriSampledHeightFieldBvTreeShapeCinfo& cinfo =
             static_cast<hkTriSampledHeightFieldBvTreeShapeCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(cinfo.m_scale);
-        // EXE-INLINED none: BSEndian
-        cinfo.m_xRes = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(cinfo.m_xRes)));
-        // EXE-INLINED none: BSEndian
-        cinfo.m_zRes = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(cinfo.m_zRes)));
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiMinHeight = reinterpret_cast<uint32_t*>(&cinfo.m_minHeight);
-        *puiMinHeight = __builtin_bswap32(*puiMinHeight);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiMaxHeight = reinterpret_cast<uint32_t*>(&cinfo.m_maxHeight);
-        *puiMaxHeight = __builtin_bswap32(*puiMaxHeight);
+        ENDIAN(cinfo.m_xRes, false);
+        ENDIAN(cinfo.m_zRes, false);
+        ENDIAN(cinfo.m_minHeight, false);
+        ENDIAN(cinfo.m_maxHeight, false);
         cinfo.pData = nullptr;
     }
 }
 
 // For a big-endian save, the creation info's scale, resolutions and height range are byte-swapped in place around the
 // base's write and swapped back after it; both times the vertex array is cleared. The stream's byte is compared with 1
-// and read again after the base call. Each float is swapped as an untyped 32-bit value, hence the uint32_t views.
+// and read again after the base call.
 void bhkTriSampledHeightFieldBvTreeShape::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkTriSampledHeightFieldBvTreeShapeCinfo& cinfo =
         static_cast<hkTriSampledHeightFieldBvTreeShapeCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiMinHeight = reinterpret_cast<uint32_t*>(&cinfo.m_minHeight);
-    uint32_t* puiMaxHeight = reinterpret_cast<uint32_t*>(&cinfo.m_maxHeight);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.m_scale);
-        // EXE-INLINED none: BSEndian
-        cinfo.m_xRes = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(cinfo.m_xRes)));
-        // EXE-INLINED none: BSEndian
-        cinfo.m_zRes = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(cinfo.m_zRes)));
-        // EXE-INLINED none: BSEndian
-        *puiMinHeight = __builtin_bswap32(*puiMinHeight);
-        // EXE-INLINED none: BSEndian
-        *puiMaxHeight = __builtin_bswap32(*puiMaxHeight);
+        ENDIAN(cinfo.m_xRes, false);
+        ENDIAN(cinfo.m_zRes, false);
+        ENDIAN(cinfo.m_minHeight, false);
+        ENDIAN(cinfo.m_maxHeight, false);
         cinfo.pData = nullptr;
     }
     bhkBvTreeShape::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.m_scale);
-        // EXE-INLINED none: BSEndian
-        cinfo.m_xRes = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(cinfo.m_xRes)));
-        // EXE-INLINED none: BSEndian
-        cinfo.m_zRes = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(cinfo.m_zRes)));
-        // EXE-INLINED none: BSEndian
-        *puiMinHeight = __builtin_bswap32(*puiMinHeight);
-        // EXE-INLINED none: BSEndian
-        *puiMaxHeight = __builtin_bswap32(*puiMaxHeight);
+        ENDIAN(cinfo.m_xRes, false);
+        ENDIAN(cinfo.m_zRes, false);
+        ENDIAN(cinfo.m_minHeight, false);
+        ENDIAN(cinfo.m_maxHeight, false);
         cinfo.pData = nullptr;
     }
 }
@@ -281,16 +266,10 @@ void hkBSHeightFieldShape::collideSpheres(
         hkVector4 pos;
         pos.setMul4(spheres->m_pos, m_floatToIntScale);
 
-        // EXE-INLINED none: hkVector4Util::convertToUint16
-        // (position + offset) * scale plus the magic vector leaves each lane's 16-bit integer in bits 6 to 21.
-        const hkQuadReal converted = _mm_add_ps(
-            _mm_mul_ps(
-                _mm_add_ps(spheres->m_pos.m_quad, m_floatToIntOffsetFloorCorrected.m_quad), m_floatToIntScale.m_quad
-            ),
-            hkVector4Util_floatToUint16Magic
-        );
-        const int32_t x = static_cast<uint16_t>(std::bit_cast<uint32_t>(converted[0]) >> 6);
-        const int32_t z = static_cast<uint16_t>(std::bit_cast<uint32_t>(converted[2]) >> 6);
+        hkIntUnion64 converted;
+        hkVector4Util::convertToUint16(spheres->m_pos, m_floatToIntOffsetFloorCorrected, m_floatToIntScale, converted);
+        const int32_t x = converted.u16[0];
+        const int32_t z = converted.u16[2];
 
         if ((x >= (m_xRes - 1)) || (z >= (m_zRes - 1))) {
             continue;

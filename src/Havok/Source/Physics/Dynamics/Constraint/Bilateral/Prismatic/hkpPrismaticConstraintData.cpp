@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Object/hkBaseObject.h"
@@ -267,31 +268,10 @@ void hkpPrismaticConstraintData::setInWorldSpace(
     const hkVector4& pivot,
     const hkVector4& axis
 ) {
-    // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-    // The lane of the smallest |x| is left zero; the other two are swapped, one negated.
-    auto setPerpendicular = [](hkVector4& arOut, const hkVector4& arIn) {
-        int32_t iMin = 0;
-        int32_t iOk1 = 1;
-        int32_t iOk2 = 2;
-        float fA0 = std::fabs(arIn(0));
-        const float fA1 = std::fabs(arIn(1));
-        const float fA2 = std::fabs(arIn(2));
-        if (fA0 > fA1) {
-            fA0 = fA1;
-            iOk1 = 0;
-            iMin = 1;
-        }
-        if (fA0 > fA2) {
-            iOk2 = iMin;
-        }
-        arOut.m_quad = _mm_setzero_ps();
-        arOut(iOk1) = arIn(iOk2);
-        arOut(iOk2) = -arIn(iOk1);
-    };
     hkRotation constraintBaseInW;
     constraintBaseInW.m_col0 = axis;
     constraintBaseInW.m_col0.normalize3();
-    setPerpendicular(constraintBaseInW.m_col1, constraintBaseInW.m_col0);
+    hkVector4Util::calculatePerpendicularVector(constraintBaseInW.m_col0, constraintBaseInW.m_col1);
     constraintBaseInW.m_col1.normalize3();
     constraintBaseInW.m_col2.setCross(constraintBaseInW.m_col0, constraintBaseInW.m_col1);
     m_atoms.m_transforms.m_transformA.m_rotation.setMulInverseMul(bodyATransform.m_rotation, constraintBaseInW);

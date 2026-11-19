@@ -197,13 +197,7 @@ hkResult hkpFirstPersonGun::sweepSphere(
     pMemory->m_memSizeAndFlags = static_cast<uint16_t>(sizeof(hkpSphereShape));
     hkpSphereShape* pSphere = ::new (pMemory) hkpSphereShape(radius);
     alignas(16) hkTransform kTransform;
-    // EXE-INLINED 0x577090
-    kTransform.m_rotation.m_col0.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
-    kTransform.m_rotation.m_col0.m_quad[0] = 1.0f;
-    kTransform.m_rotation.m_col1.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
-    kTransform.m_rotation.m_col1.m_quad[1] = 1.0f;
-    kTransform.m_rotation.m_col2.m_quad = {0.0f, 0.0f, 0.0f, 0.0f};
-    kTransform.m_rotation.m_col2.m_quad[2] = 1.0f;
+    kTransform.m_rotation.setIdentity();
     kTransform.m_translation.m_quad = sweepStart.m_quad;
     alignas(16) hkpCollidable kCaster(pSphere, &kTransform, 0);
     alignas(16) hkpLinearCastInput kInput;

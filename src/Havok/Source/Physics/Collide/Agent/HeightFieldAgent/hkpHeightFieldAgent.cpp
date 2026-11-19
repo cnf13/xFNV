@@ -157,16 +157,7 @@ void hkpHeightFieldAgent::processCollision(
             cpPos.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), o), sphere->m_pos.m_quad);
             const hkTransform& hfTransform = hfBody.m_motion.pState->m_transform;
             point->m_contact.m_position.setTransformedPos(hfTransform, cpPos);
-            // EXE-INLINED none: hkVector4::_setRotatedDir
-            const hkRotation& hfRotation = hfBody.m_motion.pState->m_transform.m_rotation;
-            const hkQuadReal n = output->m_quad;
-            point->m_contact.m_separatingNormal.m_quad = _mm_add_ps(
-                _mm_add_ps(
-                    _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), hfRotation.m_col1.m_quad),
-                    _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), hfRotation.m_col0.m_quad)
-                ),
-                _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), hfRotation.m_col2.m_quad)
-            );
+            point->m_contact.m_separatingNormal._setRotatedDir(hfBody.m_motion.pState->m_transform.m_rotation, *output);
             // The distance.
             point->m_contact.m_separatingNormal.m_quad[3] = (*output)(3);
             if (*cpId == 0xFFFF) {
@@ -219,17 +210,8 @@ void hkpHeightFieldAgent::staticGetPenetrations(
         hkSphere* sphereBuffer = kSphereBuffer.begin();
         const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
 
-        // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
-        {
-            int32_t i = nSpheres - 1;
-            do {
-                hkVector4 v;
-                v.setTransformedPos(bTa, spheres[i].m_pos);
-                v.setW(spheres[i].m_pos);
-                sphereBuffer[i].m_pos = v;
-            }
-            while (--i >= 0);
-        }
+        // The SDK's do-while: it runs once even for no spheres.
+        hkVector4Util::transformSpheres(bTa, &spheres->m_pos, nSpheres, &sphereBuffer->m_pos);
 
         HK_TIMER_SPLIT_LIST("Collide");
         hkpHeightFieldShape::CollideSpheresInput collideInput;
@@ -278,17 +260,8 @@ void hkpHeightFieldAgent::staticGetClosestPoints(
         const hkSphere* spheres = csShape->getCollisionSpheresImpl(sphereBuffer);
 
         HK_TIMER_SPLIT_LIST("transform");
-        // EXE-INLINED none: hkVector4Util::transformSpheres (the SDK's do-while: it runs once even for no spheres)
-        {
-            int32_t i = nSpheres - 1;
-            do {
-                hkVector4 v;
-                v.setTransformedPos(bTa, spheres[i].m_pos);
-                v.setW(spheres[i].m_pos);
-                sphereBuffer[i].m_pos = v;
-            }
-            while (--i >= 0);
-        }
+        // The SDK's do-while: it runs once even for no spheres.
+        hkVector4Util::transformSpheres(bTa, &spheres->m_pos, nSpheres, &sphereBuffer->m_pos);
 
         HK_TIMER_SPLIT_LIST("collide");
         hkpHeightFieldShape::CollideSpheresInput collideInput;
@@ -449,17 +422,8 @@ void hkHeightFieldRayForwardingCollector::addRayHit(
     const hkQuadReal pos =
         _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(fraction, fraction, 0), m_path.m_quad), m_currentFrom.m_quad);
     point.m_contact.m_position.m_quad = pos;
-    // EXE-INLINED none: hkVector4::_setRotatedDir
-    const hkRotation& rotation = cdBody.m_motion.pState->m_transform.m_rotation;
-    const hkQuadReal n = hitInfo.m_normal.m_quad;
-    const hkQuadReal normal = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0x55), rotation.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(n, n, 0x00), rotation.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(n, n, 0xAA), rotation.m_col2.m_quad)
-    );
-    point.m_contact.m_separatingNormal.m_quad = normal;
+    point.m_contact.m_separatingNormal._setRotatedDir(cdBody.m_motion.pState->m_transform.m_rotation, hitInfo.m_normal);
+    const hkQuadReal normal = point.m_contact.m_separatingNormal.m_quad;
     point.m_contact.m_separatingNormal.m_quad[3] = hitInfo.m_hitFraction;
     const hkQuadReal r = _mm_set_ss(negRadius);
     point.m_contact.m_position.m_quad = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(r, r, 0), normal), pos);

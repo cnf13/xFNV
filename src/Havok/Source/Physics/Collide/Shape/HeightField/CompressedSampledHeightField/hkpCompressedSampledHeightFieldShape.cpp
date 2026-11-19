@@ -96,13 +96,10 @@ void hkpCompressedSampledHeightFieldShape::collideSpheres(
         *output = defNormal;
         hkVector4 pos;
         pos.setMul4(spheres->m_pos, m_floatToIntScale);
-        // EXE-INLINED none: hkVector4Util::convertToUint16 (the exe reads only the x and z results)
-        hkVector4 converted;
-        converted.setAdd4(spheres->m_pos, m_floatToIntOffsetFloorCorrected);
-        converted.mul4(m_floatToIntScale);
-        converted.m_quad = _mm_add_ps(converted.m_quad, hkVector4Util_floatToUint16Magic);
-        const int32_t x = static_cast<uint16_t>(std::bit_cast<uint32_t>(converted(0)) >> 6);
-        const int32_t z = static_cast<uint16_t>(std::bit_cast<uint32_t>(converted(2)) >> 6);
+        hkIntUnion64 converted;
+        hkVector4Util::convertToUint16(spheres->m_pos, m_floatToIntOffsetFloorCorrected, m_floatToIntScale, converted);
+        const int32_t x = converted.u16[0];
+        const int32_t z = converted.u16[2];
         if (x >= m_xRes - 1 || z >= m_zRes - 1) {
             continue;
         }

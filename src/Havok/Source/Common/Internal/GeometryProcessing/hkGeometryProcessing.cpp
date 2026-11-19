@@ -1192,33 +1192,12 @@ void hkGeometryProcessing::buildTransposedArray(
 // of each (A's edges outer, B's inner, edge i running from vertex i to vertex i + 1) and the nine differences A[i] -
 // B[j] (i outer). The spans' bounds are compared as floats, so a NaN projection leaves the bounds as they are.
 int32_t hkGeometryProcessing::checkTrianglesIntersection(const hkVector4* triangleA, const hkVector4* triangleB) {
-    // EXE-INLINED none: hkGeometryProcessing::Span<hkSimdReal>::setFromVertices
-    auto setFromVertices = [](Span<hkSimdReal>& span, const hkVector4& direction, const hkVector4* vertices)
-                               __attribute__((always_inline)) {
-                                   span.m_bounds[0] = span.m_bounds[1] = direction.dot3(vertices[0]);
-                                   for (int32_t i = 1; i < 3; ++i) {
-                                       const hkSimdReal d = direction.dot3(vertices[i]);
-                                       if (static_cast<float>(d) < static_cast<float>(span.m_bounds[0])) {
-                                           span.m_bounds[0] = d;
-                                       }
-                                       else if (static_cast<float>(d) > static_cast<float>(span.m_bounds[1])) {
-                                           span.m_bounds[1] = d;
-                                       }
-                                   }
-                               };
-    // EXE-INLINED none: hkGeometryProcessing::Span<hkSimdReal>::intersect
     auto overlap = [&](const hkVector4& axis) __attribute__((always_inline)) {
         Span<hkSimdReal> spanA;
         Span<hkSimdReal> spanB;
-        setFromVertices(spanA, axis, triangleA);
-        setFromVertices(spanB, axis, triangleB);
-        if (static_cast<float>(spanA.m_bounds[0]) > static_cast<float>(spanB.m_bounds[1])) {
-            return false;
-        }
-        if (static_cast<float>(spanA.m_bounds[1]) < static_cast<float>(spanB.m_bounds[0])) {
-            return false;
-        }
-        return true;
+        spanA.setFromVertices(axis, triangleA, 3);
+        spanB.setFromVertices(axis, triangleB, 3);
+        return spanA.intersect(spanB);
     };
 
     hkVector4 edge0;

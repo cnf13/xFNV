@@ -294,25 +294,9 @@ void hkaSkeletonMapperUtils::createMapping(
             : modelPoseB.m_data;
         // Per bone, the bone of the other skeleton it is mapped to: -1 unmapped, -2 inside a chain.
         hkLocalArray<int16_t> bonesAMapped(numBonesA);
-        {
-            // EXE-INLINED none: hkArray<hkInt16>::setSize(numBonesA, -1)
-            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&bonesAMapped);
-            bonesAMapped._reserve(alloc, numBonesA);
-            for (int32_t i = bonesAMapped.m_size; i < numBonesA; ++i) {
-                bonesAMapped.m_data[i] = -1;
-            }
-            bonesAMapped.m_size = numBonesA;
-        }
+        bonesAMapped.setSize(numBonesA, -1);
         hkLocalArray<int16_t> bonesBMapped(numBonesB);
-        {
-            // EXE-INLINED none: hkArray<hkInt16>::setSize(numBonesB, -1)
-            hkMemoryAllocator& alloc = hkContainerHeapAllocator().get(&bonesBMapped);
-            bonesBMapped._reserve(alloc, numBonesB);
-            for (int32_t i = bonesBMapped.m_size; i < numBonesB; ++i) {
-                bonesBMapped.m_data[i] = -1;
-            }
-            bonesBMapped.m_size = numBonesB;
-        }
+        bonesBMapped.setSize(numBonesB, -1);
         pAToB->m_mappingType.m_storage = params.m_mappingType.m_storage;
         pBToA->m_mappingType.m_storage = params.m_mappingType.m_storage;
         // The SDK's hkRefPtr assignments: a reference on the new skeleton, then the old one's released.

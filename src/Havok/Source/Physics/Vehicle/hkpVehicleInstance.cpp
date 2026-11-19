@@ -729,14 +729,8 @@ void hkpVehicleInstance::init() {
     diagonal.addMul4(d->m_chassisUnitInertiaRoll, absCol1);
     diagonal.addMul4(d->m_chassisUnitInertiaPitch, absCol2);
     diagonal.mul4(m_entity->m_motion.getMass());
-    // EXE-INLINED none: hkMatrix3::setDiagonal
     hkMatrix3 inertia;
-    inertia.m_col0.m_quad = _mm_setzero_ps();
-    inertia.m_col0.m_quad[0] = diagonal.m_quad[0];
-    inertia.m_col1.m_quad = _mm_setzero_ps();
-    inertia.m_col1.m_quad[1] = diagonal.m_quad[1];
-    inertia.m_col2.m_quad = _mm_setzero_ps();
-    inertia.m_col2.m_quad[2] = diagonal.m_quad[2];
+    inertia.setDiagonal(diagonal(0), diagonal(1), diagonal(2));
     const float chassisMass = m_entity->m_motion.getMass();
     static_cast<hkpRigidBody*>(m_entity)->setMass(chassisMass);
     static_cast<hkpRigidBody*>(m_entity)->setInertiaLocal(inertia);

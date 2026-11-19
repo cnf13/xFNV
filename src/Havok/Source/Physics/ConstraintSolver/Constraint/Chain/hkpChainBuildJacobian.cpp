@@ -56,14 +56,8 @@ void hkBallSocketChainBuildJacobian(
     kPrevUpper.m_col2.m_quad = kZero;
 
     for (int32_t c = 0; c < numConstraints; ++c, ++pTriple) {
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccA = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumBase) + pOffsets[c].m_offset
-        );
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccB = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumBase) + pOffsets[c + 1].m_offset
-        );
+        const hkpVelocityAccumulator* pAccA = hkAddByteOffsetConst(accumBase, pOffsets[c].m_offset);
+        const hkpVelocityAccumulator* pAccB = hkAddByteOffsetConst(accumBase, pOffsets[c + 1].m_offset);
         const hkp1Lin2AngJacobian* pJac = &pJacobians[3 * c];
 
         // The symmetric diagonal block: J_i M^-1 J_j^T, plus cfm on the diagonal.
@@ -182,14 +176,8 @@ void hkStiffSpringChainBuildJacobian(
     float fPrevOffDiag = 0.0f;
     float fPrevRatio = 0.0f;
     for (int32_t c = 0; c < numConstraints; ++c, ++pTriple, ++pJac) {
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccB = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumBase) + pOffsets[c + 1].m_offset
-        );
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccA = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumBase) + pOffsets[c].m_offset
-        );
+        const hkpVelocityAccumulator* pAccB = hkAddByteOffsetConst(accumBase, pOffsets[c + 1].m_offset);
+        const hkpVelocityAccumulator* pAccA = hkAddByteOffsetConst(accumBase, pOffsets[c].m_offset);
         const __m128 invMassA = pAccA->m_invMasses.m_quad;
         const __m128 invMassB = pAccB->m_invMasses.m_quad;
 
@@ -262,14 +250,8 @@ void buildBlockTridiagonalLu(
     for (int32_t c = 0; c < numConstraints; ++c) {
         hkpConstraintChainMatrixTriple* pTriple = &triples[c];
         // The accumulator offsets are byte offsets into the untyped accumulator buffer.
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccA = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumsBase) + accumulators[c].m_offset
-        );
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccB = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumsBase) + accumulators[c + 1].m_offset
-        );
+        const hkpVelocityAccumulator* pAccA = hkAddByteOffsetConst(accumsBase, accumulators[c].m_offset);
+        const hkpVelocityAccumulator* pAccB = hkAddByteOffsetConst(accumsBase, accumulators[c + 1].m_offset);
         const hkp1Lin2AngJacobian* pJac = &jacobians[3 * c];
 
         // The symmetric diagonal block: J_i M^-1 J_j^T, plus cfm on the diagonal.
@@ -375,14 +357,8 @@ void buildTridiagonalLu(
         const hkp1Lin2AngJacobian* pJac = &jacobians[c];
         hkpConstraintChainTriple* pTriple = &triples[c];
         // The accumulator offsets are byte offsets into the untyped accumulator buffer.
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccB = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumsBase) + accumulators[c + 1].m_offset
-        );
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* pAccA = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const char*>(accumsBase) + accumulators[c].m_offset
-        );
+        const hkpVelocityAccumulator* pAccB = hkAddByteOffsetConst(accumsBase, accumulators[c + 1].m_offset);
+        const hkpVelocityAccumulator* pAccA = hkAddByteOffsetConst(accumsBase, accumulators[c].m_offset);
         const __m128 invMassA = pAccA->m_invMasses.m_quad;
         const __m128 invMassB = pAccB->m_invMasses.m_quad;
 

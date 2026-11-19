@@ -115,6 +115,21 @@ public:
         return p;
     }
 
+    // Adds one element at the end without growing the storage and returns it; the element is default-constructed.
+    template <typename U = T>
+    U& expandOneUnchecked();
+
+    // Appends a copy of e without growing the storage. A member template like _pushBack.
+    template <typename U = T>
+    void pushBackUnchecked(const U& e);
+
+    // The last element.
+    hkArrayElementReference<T>::Type back() {
+        return m_data[m_size - 1];
+    }
+    template <typename U = T>
+    const U& back() const;
+
     // Removes the element at index, moving the ones after it down.
     void removeAtAndCopy(int32_t index);
     // Removes numToRemove elements from index, moving the ones after them down.
@@ -134,8 +149,6 @@ public:
     void _optimizeCapacity(hkMemoryAllocator& alloc, int32_t numFreeElemsLeft, int32_t shrinkExact = 0);
     // Grows the storage to exactly n elements.
     void _reserveExactly(hkMemoryAllocator& alloc, int32_t n);
-    // The SDK's _setSize(alloc, n, fill) and hkArray::setSize(size, fill) are left out: registrations take the
-    // address of _setSize, which a second overload would make ambiguous.
     // Adds one element at the end and returns it.
     template <typename U = T>
     U& _expandOne(hkMemoryAllocator& alloc);
@@ -164,6 +177,9 @@ public:
     void _reserve(hkMemoryAllocator& alloc, int32_t n);
     // Resizes the array to n elements, growing the storage through alloc. The SDK's inline body is defined below.
     void _setSize(hkMemoryAllocator& alloc, int32_t n);
+    // The same, each new element a copy of fill. A member template like _pushBack.
+    template <typename U = T>
+    void _setSize(hkMemoryAllocator& alloc, int32_t n, const U& fill);
     // The element at index, without a bounds check. A member template like _pushBack so that hkArrayBase<void> stays
     // declarable.
     template <typename U = T>
@@ -258,7 +274,10 @@ public:
     void setSize(int32_t size) {
         hkArrayBase<T>::_setSize(AllocatorType().get(this), size);
     }
-    // (setSize with a fill value: see hkArrayBase::_setSize.)
+    template <typename U = T>
+    void setSize(int32_t size, const U& fill) {
+        hkArrayBase<T>::template _setSize<U>(AllocatorType().get(this), size, fill);
+    }
     template <typename U = T>
     U& expandOne();
     T* expandBy(int32_t n) {
@@ -327,6 +346,22 @@ public:
     // The flag word's DONT_DEALLOCATE bit: set while the array still uses the inline storage.
     int32_t stillInplaceUsingMask() const {
         return static_cast<int32_t>(this->m_capacityAndFlags & hkArrayBase<T>::DONT_DEALLOCATE_FLAG);
+    }
+
+    // Shrinks heap storage to the elements and numFreeElemsLeft more (rounded up to a power of two unless
+    // shrinkExact). Below N elements the array moves back into the inline storage.
+    void optimizeCapacity(int32_t numFreeElemsLeft, int32_t shrinkExact = 0) {
+        if (stillInplaceUsingMask() == 0) {
+            int32_t totalCapacity = shrinkExact
+                ? (this->m_size + numFreeElemsLeft)
+                : static_cast<int32_t>(hkNextPowerOf2(static_cast<uint32_t>(this->m_size + numFreeElemsLeft)));
+            if (totalCapacity < N) {
+                hkArrayUtil::_reduce(Allocator().get(this), this, sizeof(T), reinterpret_cast<char*>(m_storage), N);
+            }
+            else if (totalCapacity < this->getCapacity()) {
+                hkArrayUtil::_reduce(Allocator().get(this), this, sizeof(T), nullptr, totalCapacity);
+            }
+        }
     }
 
     T m_storage[N];
@@ -439,6 +474,15 @@ inline void hkArrayBase<T>::_setSize(hkMemoryAllocator& alloc, int32_t n) {
     _reserve(alloc, n);
     hkArrayUtil::destruct(m_data + n, m_size - n, typename hkIsPodType<T>::type());
     hkArrayUtil::construct(m_data + m_size, n - m_size, typename hkIsPodType<T>::type());
+    m_size = n;
+}
+
+template <typename T>
+template <typename U>
+inline void hkArrayBase<T>::_setSize(hkMemoryAllocator& alloc, int32_t n, const U& fill) {
+    _reserve(alloc, n);
+    hkArrayUtil::destruct(m_data + n, m_size - n, typename hkIsPodType<T>::type());
+    hkArrayUtil::constructWithCopy<T>(m_data + m_size, n - m_size, fill, typename hkIsPodType<T>::type());
     m_size = n;
 }
 
@@ -593,4 +637,24 @@ template <typename T, typename Allocator>
 template <typename U>
 inline U& hkArray<T, Allocator>::expandOne() {
     return hkArrayBase<T>::template _expandOne<U>(AllocatorType().get(this));
+}
+
+template <typename T>
+template <typename U>
+inline U& hkArrayBase<T>::expandOneUnchecked() {
+    hkArrayUtil::construct<T>(m_data + m_size, 1, typename hkIsPodType<T>::type());
+    return m_data[m_size++];
+}
+
+template <typename T>
+template <typename U>
+inline void hkArrayBase<T>::pushBackUnchecked(const U& e) {
+    hkArrayUtil::constructWithCopy<T>(m_data + m_size, 1, e, typename hkIsPodType<T>::type());
+    m_size++;
+}
+
+template <typename T>
+template <typename U>
+inline const U& hkArrayBase<T>::back() const {
+    return m_data[m_size - 1];
 }

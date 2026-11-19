@@ -177,6 +177,32 @@ struct hkGeometryProcessing {
     struct Span {
         using type = T;
 
+        // The bounds of the vertices' projections on direction (dot3), from the first: a projection below the lower
+        // bound lowers it, else one above the upper bound raises it, compared as floats.
+        void setFromVertices(const hkVector4& direction, const hkVector4* vertices, int32_t numVertices) {
+            m_bounds[0] = m_bounds[1] = direction.dot3(vertices[0]);
+            for (int32_t i = 1; i < numVertices; ++i) {
+                const T d = direction.dot3(vertices[i]);
+                if (static_cast<float>(d) < static_cast<float>(m_bounds[0])) {
+                    m_bounds[0] = d;
+                }
+                else if (static_cast<float>(d) > static_cast<float>(m_bounds[1])) {
+                    m_bounds[1] = d;
+                }
+            }
+        }
+
+        // Whether the two intervals overlap, the bounds compared as floats.
+        bool intersect(const Span& other) const {
+            if (static_cast<float>(m_bounds[0]) > static_cast<float>(other.m_bounds[1])) {
+                return false;
+            }
+            if (static_cast<float>(m_bounds[1]) < static_cast<float>(other.m_bounds[0])) {
+                return false;
+            }
+            return true;
+        }
+
         T m_bounds[2];
     };
 

@@ -3,6 +3,7 @@
 #include "BSHavok/bhkTransform.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 
 #include <bit>
@@ -50,6 +51,12 @@ public:
 
     // Swaps the byte order of each of the rotation's twelve words, column by column, and returns the rotation.
     static hkRotation& Endian(hkRotation& arRot);
+
+    // Swaps the byte order of each of the quaternion's four words and returns the quaternion.
+    static hkQuaternion& Endian(hkQuaternion& arQuat) {
+        Endian(arQuat.m_vec);
+        return arQuat;
+    }
 
     // Swaps the byte order of each of the vector's four words, x to w, and returns the vector.
     static bhkVector4& Endian(bhkVector4& arVector) {

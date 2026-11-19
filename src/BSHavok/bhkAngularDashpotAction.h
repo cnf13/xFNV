@@ -2,6 +2,7 @@
 
 #include "BSHavok/bhkBinaryAction.h"
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
+#include "Havok/Source/Physics/Utilities/Actions/AngularDashpot/hkpAngularDashpotAction.h"
 
 struct hkAngularDashpotActionCinfo;
 
@@ -22,6 +23,12 @@ public:
 
     // Fills apInfo from the wrapped hkpAngularDashpotAction.
     void CopyCinfo(hkAngularDashpotActionCinfo& arInfo);
+
+    // The wrapped action's rotation, or the identity quaternion when there is no action.
+    const hkQuaternion& GethkRotation() const {
+        return (this && phkObject) ? static_cast<hkpAngularDashpotAction*>(phkObject)->m_rotation
+                                   : hkQuaternionIdentity;
+    }
 
     // The class loader's factory: returns a new action.
     static NiObject* CreateObject();

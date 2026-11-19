@@ -1,5 +1,6 @@
 #include "Havok/Source/Common/Internal/KdTree/Build/hkKdTreeBuilder.h"
 
+#include "Havok/Source/Common/Base/Container/String/hkString.h"
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
 #include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
@@ -659,20 +660,8 @@ void hkKdTreeBuilder<const hkKdTreeProjectedEntry*, hkKdTreeProjectedEntry*, 0>:
 ) {
     alignas(128) int32_t bucketsMin[64][4];
     alignas(128) int32_t bucketsMax[64][4];
-    // EXE-INLINED none: hkString::memClear16
-    for (int32_t b = 0; b < 64; ++b) {
-        bucketsMin[b][0] = 0;
-        bucketsMin[b][1] = 0;
-        bucketsMin[b][2] = 0;
-        bucketsMin[b][3] = 0;
-    }
-    // EXE-INLINED none: hkString::memClear16
-    for (int32_t b = 0; b < 64; ++b) {
-        bucketsMax[b][0] = 0;
-        bucketsMax[b][1] = 0;
-        bucketsMax[b][2] = 0;
-        bucketsMax[b][3] = 0;
-    }
+    hkString::memClear16(bucketsMin, 64);
+    hkString::memClear16(bucketsMax, 64);
 
     int32_t stride = 1;
     if (numPrimitives > 10) {
@@ -896,8 +885,7 @@ void hkKdTreeBuilder<const hkKdTreeProjectedEntry*, hkKdTreeProjectedEntry*, 0>:
     // on from node 0 and node 2, 0x18 bytes on from node 3; node 1 is not written. The split words are the right
     // child's lower and the left child's upper bound.
     const uint16_t uiMax01 = hkMath::max2(childMax[1], childMax[0]);
-    // EXE-INLINED none: hkMath::min2
-    const uint16_t uiMin23 = (childMin[2] < childMin[3]) ? childMin[2] : childMin[3];
+    const uint16_t uiMin23 = hkMath::min2(childMin[2], childMin[3]);
     treeOut[0].m_data.m_node.m_splitMin = uiMin23;
     treeOut[0].m_data.m_node.m_splitMax = uiMax01;
     treeOut[0].m_data.m_node.m_type_left_axis = static_cast<int32_t>(0x80000010u | (bestAxis & 3));

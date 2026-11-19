@@ -2,7 +2,9 @@
 
 #include "Havok/Source/Common/Base/Math/Matrix/hkMatrix3.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
@@ -31,31 +33,19 @@ void hkpSimpleCollisionResponse::solveSingleContact(
 ) {
     hkpSimpleConstraintInfoInitInput inA;
     {
-        const hkSweptTransform& swept = bodyA->m_motionState.m_sweptTransform;
-        // EXE-INLINED none: hkSweptTransformUtil::calcCenterOfMassAt
-        const float t = (time - swept.m_centerOfMass0.m_quad[3]) * swept.m_centerOfMass1.m_quad[3];
-        const hkQuadReal tq = _mm_shuffle_ps(_mm_set_ss(t), _mm_set_ss(t), 0);
-        const hkQuadReal com = _mm_add_ps(
-            _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tq), swept.m_centerOfMass0.m_quad),
-            _mm_mul_ps(swept.m_centerOfMass1.m_quad, tq)
-        );
+        hkVector4 com;
+        hkSweptTransformUtil::calcCenterOfMassAt(bodyA->m_motionState, time, com);
         inA.m_invMasses = bodyA->m_inertiaAndMassInv;
-        inA.m_massRelPos.m_quad = _mm_sub_ps(cp.m_position.m_quad, com);
+        inA.m_massRelPos.m_quad = _mm_sub_ps(cp.m_position.m_quad, com.m_quad);
         bodyA->getInertiaInvWorld(inA.m_invInertia);
         inA.m_transform = &bodyA->getTransform();
     }
     hkpSimpleConstraintInfoInitInput inB;
     {
-        const hkSweptTransform& swept = bodyB->m_motionState.m_sweptTransform;
-        // EXE-INLINED none: hkSweptTransformUtil::calcCenterOfMassAt
-        const float t = (time - swept.m_centerOfMass0.m_quad[3]) * swept.m_centerOfMass1.m_quad[3];
-        const hkQuadReal tq = _mm_shuffle_ps(_mm_set_ss(t), _mm_set_ss(t), 0);
-        const hkQuadReal com = _mm_add_ps(
-            _mm_mul_ps(_mm_sub_ps(hkQuadReal1111_0, tq), swept.m_centerOfMass0.m_quad),
-            _mm_mul_ps(swept.m_centerOfMass1.m_quad, tq)
-        );
+        hkVector4 com;
+        hkSweptTransformUtil::calcCenterOfMassAt(bodyB->m_motionState, time, com);
         inB.m_invMasses = bodyB->m_inertiaAndMassInv;
-        inB.m_massRelPos.m_quad = _mm_sub_ps(cp.m_position.m_quad, com);
+        inB.m_massRelPos.m_quad = _mm_sub_ps(cp.m_position.m_quad, com.m_quad);
         bodyB->getInertiaInvWorld(inB.m_invInertia);
         inB.m_transform = &bodyB->getTransform();
     }
@@ -94,27 +84,7 @@ void hkpSimpleCollisionResponse::solveSingleContact(
     // and their cross product.
     hkMatrix3 directions;
     directions.m_col0 = cp.m_separatingNormal;
-    {
-        // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-        const hkQuadReal& n = cp.m_separatingNormal.m_quad;
-        int32_t min = 0;
-        int32_t ok1 = 1;
-        int32_t ok2 = 2;
-        float a0 = std::fabs(n[0]);
-        const float a1 = std::fabs(n[1]);
-        const float a2 = std::fabs(n[2]);
-        if (a1 < a0) {
-            ok1 = 0;
-            min = 1;
-            a0 = a1;
-        }
-        if (a2 < a0) {
-            ok2 = min;
-        }
-        directions.m_col1.m_quad = _mm_setzero_ps();
-        directions.m_col1.m_quad[ok1] = n[ok2];
-        directions.m_col1.m_quad[ok2] = -n[ok1];
-    }
+    { hkVector4Util::calculatePerpendicularVector(cp.m_separatingNormal, directions.m_col1); }
     directions.m_col1.normalize3();
     directions.m_col2.setCross(directions.m_col0, directions.m_col1);
 
@@ -184,28 +154,7 @@ void hkpSimpleCollisionResponse::solveSingleContact2(
 
     hkMatrix3 directions;
     directions.m_col0 = cp.m_separatingNormal;
-    {
-        // The SDK's perpendicular of the normal: the smallest component's lane zero, the other two swapped, one
-        // negated.
-        // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-        int32_t ok1 = 1;
-        int32_t ok2 = 2;
-        int32_t min = 0;
-        float a0 = std::fabs(cp.m_separatingNormal(0));
-        const float a1 = std::fabs(cp.m_separatingNormal(1));
-        const float a2 = std::fabs(cp.m_separatingNormal(2));
-        if (a1 < a0) {
-            ok1 = 0;
-            min = 1;
-            a0 = a1;
-        }
-        if (a2 < a0) {
-            ok2 = min;
-        }
-        directions.m_col1.m_quad = _mm_setzero_ps();
-        directions.m_col1(ok1) = cp.m_separatingNormal(ok2);
-        directions.m_col1(ok2) = -cp.m_separatingNormal(ok1);
-    }
+    { hkVector4Util::calculatePerpendicularVector(cp.m_separatingNormal, directions.m_col1); }
     directions.m_col1.normalize3();
     directions.m_col2.setCross(cp.m_separatingNormal, directions.m_col1);
 

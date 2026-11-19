@@ -14,6 +14,7 @@
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -856,25 +857,8 @@ char hkgpConvexHull::expandByPlanarMargin(float margin) {
             const hkVector4 p1 = points.m_data[1];
             hkVector4 direction;
             direction.setSub4(p1, p0);
-            // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-            int32_t iMin = 0;
-            int32_t iOk1 = 1;
-            int32_t iOk2 = 2;
-            float fA0 = std::fabs(direction.m_quad[0]);
-            const float fA1 = std::fabs(direction.m_quad[1]);
-            const float fA2 = std::fabs(direction.m_quad[2]);
-            if (fA1 < fA0) {
-                iOk1 = 0;
-                iMin = 1;
-                fA0 = fA1;
-            }
-            if (fA2 < fA0) {
-                iOk2 = iMin;
-            }
             hkVector4 perpendicular;
-            perpendicular.m_quad = _mm_setzero_ps();
-            perpendicular.m_quad[iOk1] = direction.m_quad[iOk2];
-            perpendicular.m_quad[iOk2] = -direction.m_quad[iOk1];
+            hkVector4Util::calculatePerpendicularVector(direction, perpendicular);
             hkVector4 cross;
             cross.setCross(direction, perpendicular);
             // Both normalized, then scaled to fHalf.
@@ -1130,9 +1114,7 @@ void hkgpConvexHull::generateGeometry(hkgpConvexHull::Inputs inputs, hkGeometry&
         hkGeometry::Triangle* pTriangle = geometry.m_triangles.expandBy(2 * m_data->m_mesh.m_vertices.m_numUsed - 4);
         indices.reserve(m_data->m_mesh.m_vertices.m_numUsed);
         for (hkgpConvexHullImpl::Vertex* v = m_data->m_mesh.m_vertices.m_used; v; v = v->m_next) {
-            // EXE-INLINED none: hkArray<int>::pushBackUnchecked
-            indices.m_data[indices.m_size] = vertexBase + indices.m_size;
-            ++indices.m_size;
+            indices.pushBackUnchecked(vertexBase + indices.m_size);
             if (inputs == hkgpConvexHull::SOURCE_VERTICES) {
                 *pVertex++ = v->m_source;
             }
@@ -2027,8 +2009,7 @@ hkgpConvexHull* hkgpConvexHull::volumeSimplify(const hkgpConvexHull* hull, float
             return pBest;
         }
         float fChange = static_cast<float>((static_cast<double>(pCandidate->getVolume()) - fVolume) / fVolume);
-        // EXE-INLINED none: fabs
-        fChange = __builtin_fabsf(fChange);
+        fChange = hkMath::fabs(fChange);
         if (threshold > fChange) {
             hkgpConvexHull* pOld = pBest;
             pBest = pCandidate;
@@ -3412,8 +3393,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
         triangles_t triangles;
         triangles.reserve(m_mesh.m_triangles.m_numUsed);
         for (Triangle* t = m_mesh.m_triangles.m_used; t; t = t->m_next) {
-            // EXE-INLINED none: hkArray<Triangle*, hkContainerHeapAllocator>::pushBackUnchecked
-            triangles.m_data[triangles.m_size++] = t;
+            triangles.pushBackUnchecked(t);
         }
         if (triangles.m_size > 1) {
             // The last argument is the comparator, an empty Triangle::SortByPlaneId.
@@ -3958,8 +3938,7 @@ void hkgpConvexHullImpl::buildIndices() {
         // The comparator's stack slot below: the bits of the last triangle's key.
         uint32_t uiLessSlot;
         for (Triangle* t = m_mesh.m_triangles.m_used; t; t = t->m_next) {
-            // EXE-INLINED none: hkArray<SortedTriangle, hkContainerTempAllocator>::expandOneUnchecked
-            SortedTriangle& st = sorted.m_data[sorted.m_size++];
+            SortedTriangle& st = sorted.expandOneUnchecked();
             st.m_data = t;
             const Vertex* v0 = t->m_vertices[0];
             const Vertex* v1 = t->m_vertices[1];

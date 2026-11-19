@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -160,23 +161,7 @@ void hkpBvTreeStreamAgent::processCollision(
     {
         const hkMotionState* msA = bodyA.m_motion.pState;
         const hkMotionState* msB = bodyB.m_motion.pState;
-        // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo
-        const float fDeltaTime = input.m_stepInfo.m_deltaTime;
-        const float fScaleA = msA->m_sweptTransform.m_centerOfMass1.m_quad[3] * fDeltaTime;
-        const float fScaleB = fDeltaTime * msB->m_sweptTransform.m_centerOfMass1.m_quad[3];
-        const __m128 kDiffA = _mm_mul_ps(
-            _mm_sub_ps(msA->m_sweptTransform.m_centerOfMass0.m_quad, msA->m_sweptTransform.m_centerOfMass1.m_quad),
-            _mm_set1_ps(fScaleA)
-        );
-        in3.m_linearTimInfo.m_quad = _mm_add_ps(
-            _mm_mul_ps(
-                _mm_set1_ps(fScaleB),
-                _mm_sub_ps(msB->m_sweptTransform.m_centerOfMass1.m_quad, msB->m_sweptTransform.m_centerOfMass0.m_quad)
-            ),
-            kDiffA
-        );
-        in3.m_linearTimInfo.m_quad[3] = msB->m_deltaAngle.m_quad[3] * fScaleB * msB->m_objectRadius +
-            msA->m_deltaAngle.m_quad[3] * fScaleA * msA->m_objectRadius;
+        hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
         in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
     }
 

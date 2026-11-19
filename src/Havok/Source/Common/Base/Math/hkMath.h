@@ -15,6 +15,11 @@ namespace hkMath {
     }
 
     float min2(float x, float y);
+    // The SDK's inline for other types: x when it is below y, else y.
+    template <typename T>
+    inline T min2(T x, T y) {
+        return x < y ? x : y;
+    }
 
     // The larger of x and y.
     template <typename T>
@@ -24,6 +29,11 @@ namespace hkMath {
     T max2(T x, T y) {
         return (y < x) ? x : y;
     }
+    // The absolute value of r.
+    inline float fabs(float r) {
+        return __builtin_fabsf(r);
+    }
+
     float acos(float r);
     // The arc sine of r; its callers read the result unrounded.
     double asin(float r);

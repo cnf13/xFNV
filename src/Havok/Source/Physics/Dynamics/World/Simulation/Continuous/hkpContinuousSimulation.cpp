@@ -168,16 +168,12 @@ void hkLs_doSimpleCollisionResponse(
             // EXE-INLINED 0xC761F0
             uint8_t ucTypeA = pEntityA->m_motion.m_type.m_storage;
             if (ucTypeA != hkpMotion::MOTION_FIXED && ucTypeA != hkpMotion::MOTION_KEYFRAMED) {
-                // EXE-INLINED none: hkArray::pushBackUnchecked
-                toBeActivated.m_data[toBeActivated.m_size] = pEntityA;
-                toBeActivated.m_size++;
+                toBeActivated.pushBackUnchecked(pEntityA);
             }
             // EXE-INLINED 0xC761F0
             uint8_t ucTypeB = pEntityB->m_motion.m_type.m_storage;
             if (ucTypeB != hkpMotion::MOTION_FIXED && ucTypeB != hkpMotion::MOTION_KEYFRAMED) {
-                // EXE-INLINED none: hkArray::pushBackUnchecked
-                toBeActivated.m_data[toBeActivated.m_size] = pEntityB;
-                toBeActivated.m_size++;
+                toBeActivated.pushBackUnchecked(pEntityB);
             }
             return;
         }
@@ -186,17 +182,13 @@ void hkLs_doSimpleCollisionResponse(
             uint8_t ucTypeA = pEntityA->m_motion.m_type.m_storage;
             hkpEntity* pActivate =
                 (ucTypeA == hkpMotion::MOTION_FIXED || ucTypeA == hkpMotion::MOTION_KEYFRAMED) ? pEntityB : pEntityA;
-            // EXE-INLINED none: hkArray::pushBackUnchecked
-            toBeActivated.m_data[toBeActivated.m_size] = pActivate;
-            toBeActivated.m_size++;
+            toBeActivated.pushBackUnchecked(pActivate);
             return;
         }
     }
     else if ((fVelocityA >= 0.0f) && (fVelocityB < 0.0f)) {
         hkpEntity* pActivate = pEntityB->isFixedOrKeyframed().m_bool ? pEntityA : pEntityB;
-        // EXE-INLINED none: hkArray::pushBackUnchecked
-        toBeActivated.m_data[toBeActivated.m_size] = pActivate;
-        toBeActivated.m_size++;
+        toBeActivated.pushBackUnchecked(pActivate);
         return;
     }
 
@@ -220,9 +212,7 @@ void hkLs_doSimpleCollisionResponse(
             pActivate = pEntityA;
         }
     }
-    // EXE-INLINED none: hkArray::pushBackUnchecked
-    toBeActivated.m_data[toBeActivated.m_size] = pActivate;
-    toBeActivated.m_size++;
+    toBeActivated.pushBackUnchecked(pActivate);
 }
 
 hkBool less_EntityPtr(const hkpEntity* a, const hkpEntity* b) {
@@ -368,14 +358,9 @@ void hkLs_toiCheckValidityOfConstraints(
         );
         savedVelocities[2 * i] = accumulator->m_linearVel;
         savedVelocities[2 * i + 1] = accumulator->m_angularVel;
-        // EXE-INLINED none: hkSweptTransformUtil::getVelocity
-        const hkMotionState& ms = entity->m_motion.m_motionState;
-        accumulator->m_linearVel.m_quad =
-            _mm_sub_ps(ms.m_sweptTransform.m_centerOfMass1.m_quad, ms.m_sweptTransform.m_centerOfMass0.m_quad);
-        accumulator->m_linearVel.m_quad =
-            _mm_mul_ps(_mm_set1_ps(ms.m_sweptTransform.m_centerOfMass1(3)), accumulator->m_linearVel.m_quad);
-        accumulator->m_angularVel.m_quad =
-            _mm_mul_ps(_mm_set1_ps(ms.m_sweptTransform.m_centerOfMass1(3)), ms.m_deltaAngle.m_quad);
+        hkSweptTransformUtil::getVelocity(
+            entity->m_motion.m_motionState, accumulator->m_linearVel, accumulator->m_angularVel
+        );
     }
     for (int32_t i = firstNonActiveConstraintStatus; i < constraintStatus.m_size; i++) {
         const hkpConstraintSchemaInfo& info = constraintStatus.m_data[i];
@@ -621,14 +606,10 @@ void hkLs_restoreTransformOnBodiesWithUpdatedTransform(
     for (int32_t i = 0; i < island->m_entities.m_size; i++) {
         const int32_t state = entityState[i];
         if (state == HK_TOI_ENTITY_STATE_TRANSFORM_UPDATED || state == HK_TOI_ENTITY_STATE_TOUCHED) {
-            // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
             hkMotionState* motionState = island->m_entities.m_data[i]->m_motion.getMotionState();
             const hkSweptTransform& sweptTransform = motionState->m_sweptTransform;
             hkTransform& transform = motionState->m_transform;
-            transform.m_rotation.set(sweptTransform.m_rotation1);
-            hkVector4 centerShift;
-            centerShift.setRotatedDir(transform.m_rotation, sweptTransform.m_centerOfMassLocal);
-            transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift.m_quad);
+            hkSweptTransformUtil::calcTransAtT1(sweptTransform, transform);
         }
         if (state == HK_TOI_ENTITY_STATE_MANIFOLD_UPDATED || state == HK_TOI_ENTITY_STATE_TOUCHED) {
             hkpEntity* entity = island->m_entities.m_data[i];
@@ -729,8 +710,7 @@ hkResult hkLs_localizedSolveToi(
     alignas(16) hkLocalArray<hkpEntity*> touchedEntities(numIslandEntities);
 
     if (event.m_entities[0]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
-        // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
-        touchedEntities.m_data[touchedEntities.m_size++] = event.m_entities[0];
+        touchedEntities.pushBackUnchecked(event.m_entities[0]);
         hkSweptTransformUtil::lerp2(
             event.m_entities[0]->m_motion.m_motionState.m_sweptTransform, event.m_time,
             event.m_entities[0]->m_motion.m_motionState.m_transform
@@ -738,8 +718,7 @@ hkResult hkLs_localizedSolveToi(
         entityState[event.m_entities[0]->m_storageIndex] = HK_TOI_ENTITY_STATE_TOUCHED;
     }
     if (event.m_entities[1]->m_motion.m_type.m_storage != hkpMotion::MOTION_FIXED) {
-        // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
-        touchedEntities.m_data[touchedEntities.m_size++] = event.m_entities[1];
+        touchedEntities.pushBackUnchecked(event.m_entities[1]);
         hkSweptTransformUtil::lerp2(
             event.m_entities[1]->m_motion.m_motionState.m_sweptTransform, event.m_time,
             event.m_entities[1]->m_motion.m_motionState.m_transform
@@ -758,13 +737,9 @@ hkResult hkLs_localizedSolveToi(
             if (entity->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {
                 continue;
             }
-            // EXE-INLINED none: hkSweptTransformUtil::calcTransAtT1
             const hkSweptTransform& sweptTransform = entity->m_motion.m_motionState.m_sweptTransform;
             hkTransform& transform = entity->m_motion.m_motionState.m_transform;
-            transform.m_rotation.set(sweptTransform.m_rotation1);
-            hkVector4 centerShift;
-            centerShift.setRotatedDir(transform.m_rotation, sweptTransform.m_centerOfMassLocal);
-            transform.m_translation.m_quad = _mm_sub_ps(sweptTransform.m_centerOfMass1.m_quad, centerShift.m_quad);
+            hkSweptTransformUtil::calcTransAtT1(sweptTransform, transform);
         }
         return HK_FAILURE;
     }
@@ -845,8 +820,7 @@ hkResult hkLs_localizedSolveToi(
                 for (int32_t i = 0; i < newTouchedEntities.m_size; i++) {
                     hkpEntity* entity = newTouchedEntities.m_data[i];
                     if (entity->m_motion.m_type.m_storage != hkpMotion::MOTION_KEYFRAMED) {
-                        // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
-                        touchedEntities.m_data[touchedEntities.m_size++] = entity;
+                        touchedEntities.pushBackUnchecked(entity);
                     }
                 }
                 hkLs_toiActivateConstraintsLinkingToFixedAndKeyframedEntities(
@@ -1293,8 +1267,7 @@ void hkpContinuousSimulation::collideEntitiesNeedingPsiCollisionDetectionNarrowP
             const hkpCollisionQualityInfo* quality = m_world->m_collisionDispatcher->getCollisionQualityInfo(
                 static_cast<hkpCollisionDispatcher::CollisionQualityIndex>(entry->m_collisionQualityIndex)
             );
-            // EXE-INLINED none: hkSweptTransform::getInvDeltaTime
-            const float invDeltaTime = entity->getMotion()->m_motionState.m_sweptTransform.m_centerOfMass1(3);
+            const float invDeltaTime = entity->getMotion()->m_motionState.m_sweptTransform.getInvDeltaTime();
             if (quality->m_useContinuousPhysics.m_storage &&
                 !(quality->m_useSimpleToiHandling.m_bool && 0.0f == invDeltaTime)) {
                 continue;
@@ -1557,8 +1530,7 @@ void hkpContinuousSimulation::handleSimpleToi(
                 m_toiEvents.removeAt(i);
             }
         }
-        // EXE-INLINED none: hkArray<hkpEntity*>::pushBackUnchecked
-        entitiesToRecollide.m_data[entitiesToRecollide.m_size++] = entity;
+        entitiesToRecollide.pushBackUnchecked(entity);
     }
     hkpEntity* owner = event.m_entities[0];
     if (owner->m_motion.m_type.m_storage == hkpMotion::MOTION_FIXED) {

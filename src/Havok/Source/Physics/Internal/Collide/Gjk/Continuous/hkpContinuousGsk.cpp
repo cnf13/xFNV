@@ -3,6 +3,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Sphere/hkSphere.h"
@@ -41,28 +42,7 @@ void hk4dGskCollideInitMatrices(const hkp4dGskVertexCollidePointsInput& input, f
     out.m_plane.m_quad[3] = -input.m_radiusSum.m_storage;
     out.m_massCenterAinA.m_quad = input.m_motionA.m_storage->m_sweptTransform.m_centerOfMassLocal.m_quad;
 
-    // hkVector4Util::rotateInversePoints on both delta angles: A's rotation transposed (HK_TRANSPOSE3), then x * row 0
-    // added to y * row 1, plus z * row 2.
-    // EXE-INLINED none: hkVector4Util::rotateInversePoints
-    const hkRotation& rWa = out.m_wTa.getRotation();
-    hkQuadReal c0 = rWa.m_col0.m_quad;
-    hkQuadReal c1 = rWa.m_col1.m_quad;
-    hkQuadReal c2 = rWa.m_col2.m_quad;
-    hkQuadReal lo = _mm_unpacklo_ps(c0, c1);
-    hkQuadReal hi = _mm_unpackhi_ps(c0, c1);
-    hkQuadReal row0 = _mm_movelh_ps(lo, c2);
-    hkQuadReal row1 = _mm_shuffle_ps(_mm_movehl_ps(row0, lo), c2, _MM_SHUFFLE(3, 1, 1, 0));
-    hkQuadReal row2 = _mm_shuffle_ps(hi, c2, _MM_SHUFFLE(3, 2, 1, 0));
-    for (int32_t i = 0; i < 2; ++i) {
-        hkQuadReal b = input.m_deltaAngles[i].m_quad;
-        out.m_angularVel[i].m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(b, b, _MM_SHUFFLE(1, 1, 1, 1)), row1),
-                _mm_mul_ps(_mm_shuffle_ps(b, b, _MM_SHUFFLE(0, 0, 0, 0)), row0)
-            ),
-            _mm_mul_ps(_mm_shuffle_ps(b, b, _MM_SHUFFLE(2, 2, 2, 2)), row2)
-        );
-    }
+    hkVector4Util::rotateInversePoints(out.m_wTa.getRotation(), input.m_deltaAngles, 2, out.m_angularVel);
 
     out.m_massCenterBinA.setTransformedPos(out.m_aTb, input.m_motionB.m_storage->m_sweptTransform.m_centerOfMassLocal);
     out.m_linearVel.setRotatedInverseDir(out.m_wTa.getRotation(), input.m_linearTimInfo);

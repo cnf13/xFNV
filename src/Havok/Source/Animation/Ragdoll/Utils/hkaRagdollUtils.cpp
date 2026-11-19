@@ -252,40 +252,13 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
         return HK_FAILURE;
     }
     hkLocalArray<int32_t> constraintOfBody(numBodies);
-    // EXE-INLINED none: hkArray<int>::setSize(numBodies, 0)
-    hkMemoryAllocator* pHeap0 = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCapacity0 =
-        static_cast<int32_t>(constraintOfBody.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK);
-    if (iCapacity0 < numBodies) {
-        int32_t iRequest = 2 * iCapacity0;
-        if (numBodies >= iRequest) {
-            iRequest = numBodies;
-        }
-        hkArrayUtil::_reserve(*pHeap0, &constraintOfBody, iRequest, sizeof(int32_t));
-    }
-    for (int32_t i = constraintOfBody.m_size; i < numBodies; ++i) {
-        constraintOfBody.m_data[i] = 0;
-    }
-    constraintOfBody.m_size = numBodies;
+    constraintOfBody.setSize(numBodies, 0);
 
     hkLocalArray<int32_t> order(numBodies);
     order.m_size = numBodies;
 
     hkLocalArray<int32_t> parent(numBodies);
-    // EXE-INLINED none: hkArray<int>::setSize(numBodies, -1)
-    hkMemoryAllocator* pHeap2 = hkMemoryRouter::getInstance().m_heap;
-    const int32_t iCapacity2 = static_cast<int32_t>(parent.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK);
-    if (iCapacity2 < numBodies) {
-        int32_t iRequest = 2 * iCapacity2;
-        if (numBodies >= iRequest) {
-            iRequest = numBodies;
-        }
-        hkArrayUtil::_reserve(*pHeap2, &parent, iRequest, sizeof(int32_t));
-    }
-    for (int32_t i = parent.m_size; i < numBodies; ++i) {
-        parent.m_data[i] = -1;
-    }
-    parent.m_size = numBodies;
+    parent.setSize(numBodies, -1);
 
     bool bValid = true;
     for (int32_t i = 0; i < numConstraints; ++i) {
@@ -307,20 +280,7 @@ hkResult hkaRagdollUtils::reorderForRagdoll(
 
     {
         hkLocalArray<int32_t> depth(numBodies);
-        // EXE-INLINED none: hkArray<int>::setSize(numBodies, 0)
-        hkMemoryAllocator* pHeap3 = hkMemoryRouter::getInstance().m_heap;
-        const int32_t iCapacity3 = static_cast<int32_t>(depth.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK);
-        if (iCapacity3 < numBodies) {
-            int32_t iRequest = 2 * iCapacity3;
-            if (numBodies >= iRequest) {
-                iRequest = numBodies;
-            }
-            hkArrayUtil::_reserve(*pHeap3, &depth, iRequest, sizeof(int32_t));
-        }
-        for (int32_t i = depth.m_size; i < numBodies; ++i) {
-            depth.m_data[i] = 0;
-        }
-        depth.m_size = numBodies;
+        depth.setSize(numBodies, 0);
 
         for (int32_t b = 0; b < numBodies; ++b) {
             for (int32_t p = parent.m_data[b]; p != -1; p = parent.m_data[p]) {

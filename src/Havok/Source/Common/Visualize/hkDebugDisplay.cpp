@@ -9,6 +9,7 @@
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Object/hkBaseObject.h"
@@ -102,26 +103,8 @@ void hkDebugDisplay::displayArrow(const hkVector4& from, const hkVector4& dir, i
         _mm_add_ps(_mm_load_ps(&reinterpret_cast<const float*>(&from.m_quad)[0]), kDir)
     );
 
-    // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-    const float* pDir = &reinterpret_cast<const float*>(&dir.m_quad)[0];
-    float fMin = __builtin_fabsf(pDir[0]);
-    const float fAbsY = __builtin_fabsf(pDir[1]);
-    const float fAbsZ = __builtin_fabsf(pDir[2]);
-    int32_t iMin = 0;
-    int32_t iFirst = 1;
-    int32_t iSecond = 2;
-    if (fMin > fAbsY) {
-        fMin = fAbsY;
-        iFirst = 0;
-        iMin = 1;
-    }
-    if (fMin > fAbsZ) {
-        iSecond = iMin;
-    }
     hkVector4 ort;
-    _mm_store_ps(&reinterpret_cast<float*>(&ort.m_quad)[0], _mm_setzero_ps());
-    (&reinterpret_cast<float*>(&ort.m_quad)[0])[iFirst] = pDir[iSecond];
-    (&reinterpret_cast<float*>(&ort.m_quad)[0])[iSecond] = -pDir[iFirst];
+    hkVector4Util::calculatePerpendicularVector(dir, ort);
 
     ort.normalize3();
     hkVector4 ort2;

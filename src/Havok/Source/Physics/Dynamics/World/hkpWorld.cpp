@@ -2593,8 +2593,7 @@ void hkpWorld::removeEntityBatch(hkpEntity* const* entityBatch, int32_t numEntit
         removeList.reserveExactly(numEntities);
         for (hkpEntity* const* pEntity = entityBatch; pEntity != entityBatchEnd; ++pEntity) {
             if ((*pEntity)->m_collidable.m_shape) {
-                // EXE-INLINED none: hkArray<hkpBroadPhaseHandle*>::pushBackUnchecked
-                removeList.m_data[removeList.m_size++] = (*pEntity)->m_collidable.getBroadPhaseHandle();
+                removeList.pushBackUnchecked((*pEntity)->m_collidable.getBroadPhaseHandle());
             }
         }
         if (removeList.m_size) {
@@ -2641,8 +2640,7 @@ void hkpWorld::removePhantomBatch(hkpPhantom* const* phantomBatch, int32_t numPh
     hkLocalArray<hkpBroadPhaseHandle*> removeObjectList(numPhantoms);
     for (int32_t i = 0; i < numPhantoms; ++i) {
         hkpPhantom* phantom = phantomBatch[i];
-        // EXE-INLINED none: hkArray<hkpBroadPhaseHandle*>::pushBackUnchecked
-        removeObjectList.m_data[removeObjectList.m_size++] = phantom->m_collidable.getBroadPhaseHandle();
+        removeObjectList.pushBackUnchecked(phantom->m_collidable.getBroadPhaseHandle());
         hkpWorldCallbackUtil::firePhantomRemoved(this, phantom);
         phantom->firePhantomRemoved();
     }

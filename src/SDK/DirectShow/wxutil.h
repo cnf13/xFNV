@@ -1,6 +1,25 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
+#include "SDK/DirectShow/CMemAllocator.h"
+
+// The DirectShow BaseClasses' scoped lock: the critical section is locked for the object's lifetime.
+class CAutoLock {
+    CAutoLock(const CAutoLock& refAutoLock);
+    CAutoLock& operator=(const CAutoLock& refAutoLock);
+
+protected:
+    CCritSec* m_pLock;
+
+public:
+    CAutoLock(CCritSec* plock) {
+        m_pLock = plock;
+        m_pLock->Lock();
+    }
+    ~CAutoLock() {
+        m_pLock->Unlock();
+    }
+};
 
 // The DirectShow BaseClasses' wide-string compare for builds without the Unicode API (wxutil.cpp; not in the PDB,
 // name from the BaseClasses source). Strings are WCHAR (2-byte) arrays. Returns the difference of the first

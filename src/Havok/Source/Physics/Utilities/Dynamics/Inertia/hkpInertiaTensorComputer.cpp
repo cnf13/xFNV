@@ -1198,8 +1198,7 @@ hkResult hkpInertiaTensorComputer::computeCapsuleVolumeMassProperties(
         alignas(16) hkVector4 canonicalZ;
         canonicalZ.set(0.0f, 0.0f, 1.0f, 0.0f);
         const float fDot = canonicalZ.dot3(axis);
-        // EXE-INLINED none: hkMath::fabs (the fabs instruction on the float; compared with a double constant)
-        if (__builtin_fabsf(fDot) < 0.9999899864196777) {
+        if (hkMath::fabs(fDot) < 0.9999899864196777) {
             bIdentity = false;
             alignas(16) hkVector4 rotAxis;
             rotAxis.setCross(canonicalZ, axis);
@@ -1384,8 +1383,7 @@ hkResult hkpInertiaTensorComputer::computeCylinderVolumeMassProperties(
     const hkVector4& canonicalZ = hkTransformIdentity.m_rotation.m_col2;
     const float fDot = canonicalZ.dot3(axis);
     alignas(16) hkRotation cylinderToLocal;
-    // EXE-INLINED none: hkMath::fabs (the fabs instruction on the float; compared with a double constant)
-    if (__builtin_fabsf(fDot) < 0.9999899864196777) {
+    if (hkMath::fabs(fDot) < 0.9999899864196777) {
         alignas(16) hkVector4 rotAxis;
         rotAxis.setCross(canonicalZ, axis);
         rotAxis.normalize3();
@@ -1788,13 +1786,7 @@ void hkpInertiaTensorComputer::simplifyInertiaTensorToOrientedParticle(hkMatrix3
     float fMax = (b < a) ? a : b;
     float c = inertia(2, 2);
     fMax = (c < fMax) ? fMax : c;
-    // EXE-INLINED none: hkMatrix3::setDiagonal
-    inertia.m_col0.m_quad = _mm_setzero_ps();
-    inertia.m_col1.m_quad = _mm_setzero_ps();
-    inertia.m_col2.m_quad = _mm_setzero_ps();
-    inertia(0, 0) = fMax;
-    inertia(1, 1) = fMax;
-    inertia(2, 2) = fMax;
+    inertia.setDiagonal(fMax, fMax, fMax);
 }
 
 // Each pass takes the largest below-diagonal element of inertia (row q, column p), stops once its square is below
@@ -2025,35 +2017,16 @@ void hkpInertiaTensorComputer::calculatePrincipalAxis(
         &converged, &tensor.m_col0.m_quad, &eigenVector0.m_quad, &eigenVector1.m_quad, &eigenVector2.m_quad
     );
     hkTransform aabbTransform;
-    // EXE-INLINED none: hkMatrix3::setRows
-    aabbTransform.m_rotation.m_col0.m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(eigenVector0(0)), _mm_set_ss(eigenVector2(0))),
-        _mm_unpacklo_ps(_mm_set_ss(eigenVector1(0)), _mm_set_ss(0.0f))
-    );
-    aabbTransform.m_rotation.m_col1.m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(eigenVector0(1)), _mm_set_ss(eigenVector2(1))),
-        _mm_unpacklo_ps(_mm_set_ss(eigenVector1(1)), _mm_set_ss(0.0f))
-    );
-    aabbTransform.m_rotation.m_col2.m_quad = _mm_unpacklo_ps(
-        _mm_unpacklo_ps(_mm_set_ss(eigenVector0(2)), _mm_set_ss(eigenVector2(2))),
-        _mm_unpacklo_ps(_mm_set_ss(eigenVector1(2)), _mm_set_ss(0.0f))
-    );
+    aabbTransform.m_rotation.setRows(eigenVector0, eigenVector1, eigenVector2);
     aabbTransform.m_translation.m_quad = _mm_setzero_ps();
     hkAabb aabb;
     // EXE-INLINED 0x6286A0
     pShape->getAabbImpl(aabbTransform, 0.0f, aabb);
     hkVector4 diff;
     diff.m_quad = _mm_sub_ps(aabb.m_max.m_quad, aabb.m_min.m_quad);
-    hkVector4 absDiff;
-    absDiff.setAbs4(diff);
-    // EXE-INLINED none: hkVector4::getMajorAxis3
-    const int32_t major =
-        (absDiff(1) > absDiff(0)) ? ((absDiff(2) > absDiff(1)) ? 2 : 1) : ((absDiff(2) > absDiff(0)) ? 2 : 0);
+    const int32_t major = diff.getMajorAxis3();
     diff(major) = 0.0f;
-    absDiff.setAbs4(diff);
-    // EXE-INLINED none: hkVector4::getMajorAxis3
-    const int32_t minor =
-        (absDiff(1) > absDiff(0)) ? ((absDiff(2) > absDiff(1)) ? 2 : 1) : ((absDiff(2) > absDiff(0)) ? 2 : 0);
+    const int32_t minor = diff.getMajorAxis3();
     majorAxis.m_quad = aabbTransform.m_rotation.getColumn(major).m_quad;
     minorAxis.m_quad = aabbTransform.m_rotation.getColumn(minor).m_quad;
 }
@@ -2118,8 +2091,7 @@ void hkpInertiaTensorComputer::optimizeInertiasOfConstraintTree(
 ) {
     hkLocalArray<const hkpConstraintInstance*> constrs(numConstraints);
     for (int32_t i = 0; i < numConstraints; ++i) {
-        // EXE-INLINED none: hkArray<const hkpConstraintInstance*>::pushBackUnchecked
-        constrs.m_data[constrs.m_size++] = constraints[i];
+        constrs.pushBackUnchecked(constraints[i]);
     }
     hkInertiaTensorComputer_optimizeInertiasOfConstraintTreeInt(constrs, rootBody, inertiaFactorHint);
 }

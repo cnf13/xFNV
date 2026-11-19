@@ -31,23 +31,9 @@ hkp1Lin2AngJacobian* hkp1dLinearBilateralConstraintInfo::buildJacobian(
     cross1.setCross(r_edi->m_constrainedDofW, r1);
     hkVector4 cross0;
     cross0.setCross(r0, r_edi->m_constrainedDofW);
-    // EXE-INLINED none: hkVector4::_setMul3 (each body's core-from-world rotation times the cross product)
-    const hkRotation& rotA = bodyA->m_scratch123;
-    r_eax->m_angular[0].m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(cross0.m_quad, cross0.m_quad, 0x55), rotA.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(cross0.m_quad, cross0.m_quad, 0x00), rotA.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(cross0.m_quad, cross0.m_quad, 0xAA), rotA.m_col2.m_quad)
-    );
-    const hkRotation& rotB = bodyB->m_scratch123;
-    r_eax->m_angular[1].m_quad = _mm_add_ps(
-        _mm_add_ps(
-            _mm_mul_ps(_mm_shuffle_ps(cross1.m_quad, cross1.m_quad, 0x55), rotB.m_col1.m_quad),
-            _mm_mul_ps(_mm_shuffle_ps(cross1.m_quad, cross1.m_quad, 0x00), rotB.m_col0.m_quad)
-        ),
-        _mm_mul_ps(_mm_shuffle_ps(cross1.m_quad, cross1.m_quad, 0xAA), rotB.m_col2.m_quad)
-    );
+    // Each body's core-from-world rotation times the cross product.
+    r_eax->m_angular[0]._setMul3(bodyA->m_scratch123, cross0);
+    r_eax->m_angular[1]._setMul3(bodyB->m_scratch123, cross1);
     // EXE-INLINED none: hkp1Lin2AngJacobian::getDiag (the angular terms times the inverse inertias, the inverse
     // masses' w lanes added)
     __m128 ang0 = r_eax->m_angular[0].m_quad;

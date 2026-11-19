@@ -4,6 +4,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -48,38 +49,12 @@ hkResult getClosestPointCapsuleCapsule(
     alignas(16) hkVector4 pointsA[2];
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsA->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsA[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsA->m_vertexA, 2, pointsA);
     }
     alignas(16) hkVector4 pointsB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsB[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, pointsB);
     }
 
     const float tolerance = input.m_tolerance;
@@ -104,38 +79,12 @@ getManifold(const hkpCdBody& bodyA, const hkpCdBody& bodyB, const hkpCollisionIn
     alignas(16) hkVector4 pointsA[2];
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsA->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsA[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsA->m_vertexA, 2, pointsA);
     }
     alignas(16) hkVector4 pointsB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsB[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, pointsB);
     }
 
     return hkCollideCapsuleUtilManifoldCapsVsCaps(pointsA, capsA->m_radius, pointsB, capsB->m_radius, points);
@@ -174,38 +123,12 @@ void hkpCapsuleCapsuleAgent::processCollision(
     alignas(16) hkVector4 pointsA[2];
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsA->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsA[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsA->m_vertexA, 2, pointsA);
     }
     alignas(16) hkVector4 pointsB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsB[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, pointsB);
     }
 
     hkCollideCapsuleUtilManifoldCapsVsCaps(pointsA, capsA->m_radius, pointsB, capsB->m_radius, contactPoints);
@@ -255,38 +178,12 @@ void hkpCapsuleCapsuleAgent::getClosestPoints(
     alignas(16) hkVector4 pointsA[2];
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsA->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsA[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsA->m_vertexA, 2, pointsA);
     }
     alignas(16) hkVector4 pointsB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsB[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, pointsB);
     }
 
     if (hkCollideCapsuleUtilClostestPointCapsVsCaps(
@@ -353,38 +250,12 @@ void hkpCapsuleCapsuleAgent::staticGetPenetrations(
     alignas(16) hkVector4 pointsA[2];
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        const hkVector4* vertices = &capsA->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&pointsA[i].m_quad)[0], r);
-        }
+        hkVector4Util::transformPoints(t, &capsA->m_vertexA, 2, pointsA);
     }
     alignas(16) hkVector4 pointsB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col0.m_quad)[0]);
-        const __m128 c1 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col1.m_quad)[0]);
-        const __m128 c2 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_rotation.m_col2.m_quad)[0]);
-        const __m128 c3 = _mm_load_ps(&reinterpret_cast<const float*>(&t.m_translation.m_quad)[0]);
-        const hkVector4* vertices = &capsB->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = _mm_load_ps(&reinterpret_cast<const float*>(&vertices[i].m_quad)[0]);
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            _mm_store_ps(&reinterpret_cast<float*>(&pointsB[i].m_quad)[0], r);
-        }
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, pointsB);
     }
 
     alignas(16) hkVector4 dA;
@@ -436,38 +307,12 @@ void hkpCapsuleCapsuleAgent::staticGetClosestPoints(
     alignas(16) hkVector4 pointsA[2];
     {
         const hkTransform& t = *bodyA.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsA->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsA[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsA->m_vertexA, 2, pointsA);
     }
     alignas(16) hkVector4 pointsB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        for (int32_t i = 1; i >= 0; i--) {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            const __m128 r = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-            pointsB[i].m_quad = r;
-        }
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, pointsB);
     }
 
     if (hkCollideCapsuleUtilClostestPointCapsVsCaps(

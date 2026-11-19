@@ -48,6 +48,10 @@ public:
     bool isValid(int32_t it) const {
         return it <= m_map.m_hashMod;
     }
+    // Whether key is in the map (the SDK's hkBool32).
+    int32_t hasKey(K key) const {
+        return isValid(findKey(key));
+    }
     // The SDK's inline remove(K key): the map's remove of the key as its storage integer; the hkResult as int32_t.
     int32_t remove(K key) {
         return m_map.remove(ToMapInt(key));

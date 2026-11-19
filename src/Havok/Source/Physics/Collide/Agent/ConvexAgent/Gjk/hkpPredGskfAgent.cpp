@@ -4,6 +4,7 @@
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransform.h"
 #include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -92,19 +93,8 @@ void hkpPredGskfAgent::processCollision(
     {
         const hkMotionState& msA = *bodyA.m_motion.pState;
         const hkMotionState& msB = *bodyB.m_motion.pState;
-        // EXE-INLINED none: hkSweptTransformUtil::calcTimInfo (the SDK's inline): the relative linear movement over
-        // the step in xyz, both bodies' worst-case angular movement in w. getInvDeltaTime is m_centerOfMass1's w.
-        float deltaTime = input.m_stepInfo.m_deltaTime;
-        float f0 = msA.m_sweptTransform.m_centerOfMass1(3) * deltaTime;
-        float f1 = deltaTime * msB.m_sweptTransform.m_centerOfMass1(3);
-        hkVector4 diff0;
-        diff0.setSub4(msA.m_sweptTransform.m_centerOfMass0, msA.m_sweptTransform.m_centerOfMass1);
-        hkVector4 diff1;
-        diff1.setSub4(msB.m_sweptTransform.m_centerOfMass1, msB.m_sweptTransform.m_centerOfMass0);
         hkVector4 timInfo;
-        timInfo.m_quad =
-            _mm_add_ps(_mm_mul_ps(_mm_set1_ps(f1), diff1.m_quad), _mm_mul_ps(diff0.m_quad, _mm_set1_ps(f0)));
-        timInfo(3) = f0 * msA.m_deltaAngle(3) * msA.m_objectRadius + f1 * msB.m_deltaAngle(3) * msB.m_objectRadius;
+        hkSweptTransformUtil::calcTimInfo(msA, msB, input.m_stepInfo.m_deltaTime, timInfo);
 
         const hkpCollisionQualityInfo& qi = *input.m_collisionQualityInfo;
         float timDot = timInfo.dot3(m_separatingNormal);
@@ -160,49 +150,14 @@ void hkpPredGskfAgent::processCollision(
             if (m_manifold.m_numContactPoints) {
                 const uint16_t* vertexIds = m_manifold.getVertexIds();
                 shapeA->convertVertexIdsToVerticesImpl(vertexIds, m_manifold.m_numVertsA, &work.m_vertices[0]);
-                // EXE-INLINED none: hkVector4Util::transformPoints (the SDK's inline): a copy of the transform, then
-                // each vertex from the last down, as hkVector4::_setTransformedPos.
-                {
-                    const hkTransform unaliased = *bodyA.m_motion.pMotion;
-                    int32_t i = m_manifold.m_numVertsA - 1;
-                    do {
-                        const hkQuadReal v = work.m_vertices[i].m_quad;
-                        work.m_vertices[i].m_quad = _mm_add_ps(
-                            _mm_add_ps(
-                                _mm_mul_ps(unaliased.m_rotation.m_col0.m_quad, _mm_shuffle_ps(v, v, 0x00)),
-                                _mm_mul_ps(unaliased.m_rotation.m_col1.m_quad, _mm_shuffle_ps(v, v, 0x55))
-                            ),
-                            _mm_add_ps(
-                                _mm_mul_ps(unaliased.m_rotation.m_col2.m_quad, _mm_shuffle_ps(v, v, 0xAA)),
-                                unaliased.m_translation.m_quad
-                            )
-                        );
-                    }
-                    while (--i >= 0);
-                }
+                hkVector4Util::transformPoints(
+                    *bodyA.m_motion.pMotion, work.m_vertices, m_manifold.m_numVertsA, work.m_vertices
+                );
                 hkpCdVertex* verticesB = &work.m_vertices[m_manifold.m_numVertsA];
                 shapeB->convertVertexIdsToVerticesImpl(
                     vertexIds + m_manifold.m_numVertsA, m_manifold.m_numVertsB, verticesB
                 );
-                // EXE-INLINED none: hkVector4Util::transformPoints
-                {
-                    const hkTransform unaliased = *bodyB.m_motion.pMotion;
-                    int32_t i = m_manifold.m_numVertsB - 1;
-                    do {
-                        const hkQuadReal v = verticesB[i].m_quad;
-                        verticesB[i].m_quad = _mm_add_ps(
-                            _mm_add_ps(
-                                _mm_mul_ps(unaliased.m_rotation.m_col0.m_quad, _mm_shuffle_ps(v, v, 0x00)),
-                                _mm_mul_ps(unaliased.m_rotation.m_col1.m_quad, _mm_shuffle_ps(v, v, 0x55))
-                            ),
-                            _mm_add_ps(
-                                _mm_mul_ps(unaliased.m_rotation.m_col2.m_quad, _mm_shuffle_ps(v, v, 0xAA)),
-                                unaliased.m_translation.m_quad
-                            )
-                        );
-                    }
-                    while (--i >= 0);
-                }
+                hkVector4Util::transformPoints(*bodyB.m_motion.pMotion, verticesB, m_manifold.m_numVertsB, verticesB);
             }
             hkGskManifold_verifyAndGetPoints(m_manifold, work, 0, result, m_contactMgr);
             goto END;

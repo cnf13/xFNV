@@ -958,9 +958,8 @@ void hkgpDefaultTriangulatorType::flushConform() {
     };
 
     do {
-        // EXE-INLINED none: hkArray<Edge>::back, popBack
-        Edge edge = m_stack.m_data[m_stack.m_size - 1];
-        m_stack.m_size--;
+        Edge edge = m_stack.back();
+        m_stack.popBack();
         Triangle* t = edge.m_triangle;
         const uint32_t i = edge.m_index;
         // EXE-INLINED none: TRIANGULATOR_TYP::isConform(const Edge&) (naked, constrained, or the link's apex outside)
@@ -1108,8 +1107,7 @@ void hkgpDefaultTriangulatorType::setDomainFromPlanarPoints(
     xyPlane.m_quad = _mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f);
     hkQuaternion rot;
     rot.setShortestRotation(planeNormal, xyPlane);
-    // EXE-INLINED none: hkTransform::getIdentity
-    hkTransform trs = hkTransformIdentity;
+    hkTransform trs = hkTransform::getIdentity();
     trs.m_rotation.set(rot);
     hkMatrix4 mat;
     mat.set(trs);
@@ -4890,19 +4888,7 @@ void hkgpMesh::appendFromGeometry(const hkGeometry& geom, const hkTransform& xfo
     hkAabbTreeAabbTree32 kTree;
     EdgeTable edges;
     const int32_t iNumVertices = geom.m_vertices.m_size;
-    // EXE-INLINED none: hkArray<hkgpMeshBase::Vertex*>::setSize (with the zero fill of the new elements)
-    hkMemoryAllocator& rMapHeap = hkMemoryRouter::getInstance().heap();
-    if ((vertexMap.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK) < iNumVertices) {
-        int32_t iCapacity = 2 * (vertexMap.m_capacityAndFlags & hkArrayBase<hkgpMeshBase::Vertex*>::CAPACITY_MASK);
-        if (iNumVertices >= iCapacity) {
-            iCapacity = iNumVertices;
-        }
-        hkArrayUtil::_reserve(rMapHeap, &vertexMap, iCapacity, sizeof(hkgpMeshBase::Vertex*));
-    }
-    for (int32_t i = vertexMap.m_size; i < iNumVertices; ++i) {
-        vertexMap.m_data[i] = nullptr;
-    }
-    vertexMap.m_size = iNumVertices;
+    vertexMap.setSize(iNumVertices, nullptr);
     // EXE-INLINED none: HashTable<SingleEdge>'s buckets setSize(0x2000) and clear
     edges.m_buckets.m_size = 0;
     edges.m_numItems = 0;
@@ -5646,23 +5632,7 @@ void hkgpMesh::retriangulateFromPlanes() {
     EdgeArrays boundaries;
     hkArray<int32_t> materials;
     boundaries.setSize(numPlanes);
-    // EXE-INLINED none: hkArray<int32_t>::setSize (m_planes.m_size materials of -1)
-    {
-        const int32_t iNumMaterials = m_planes.m_size;
-        hkMemoryAllocator& heap = hkMemoryRouter::getInstance().heap();
-        int32_t iCapacity = materials.m_capacityAndFlags & hkArrayBase<int32_t>::CAPACITY_MASK;
-        if (iCapacity < iNumMaterials) {
-            iCapacity *= 2;
-            if (iNumMaterials >= iCapacity) {
-                iCapacity = iNumMaterials;
-            }
-            hkArrayUtil::_reserve(heap, &materials, iCapacity, static_cast<int32_t>(sizeof(int32_t)));
-        }
-        for (int32_t i = materials.m_size; i < iNumMaterials; ++i) {
-            materials.m_data[i] = -1;
-        }
-        materials.m_size = iNumMaterials;
-    }
+    materials.setSize(m_planes.m_size, -1);
     for (hkgpMeshBase::Triangle* pTriangle = m_triangles.m_used; pTriangle; pTriangle = pTriangle->m_next) {
         const int32_t planeId = pTriangle->m_planeId;
         if (planeId < 0) {
@@ -7766,8 +7736,7 @@ void hkgpMesh::fetchAreaSortedTriangles(
         if (resetPlaneId) {
             pTriangle->m_planeId = -1;
         }
-        // EXE-INLINED none: hkArray<hkgpMeshBase::Triangle*>::pushBackUnchecked
-        triangles.m_data[triangles.m_size++] = pTriangle;
+        triangles.pushBackUnchecked(pTriangle);
     }
     const int32_t size = triangles.m_size;
     if (size > 1) {

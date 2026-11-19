@@ -102,6 +102,27 @@ public:
         (*this)(2, 2) = one;
     }
 
+    // The SDK's inline body: zero, then m00, m11 and m22 on the diagonal.
+    void setDiagonal(float m00, float m11, float m22) {
+        setZero();
+        (*this)(0, 0) = m00;
+        (*this)(1, 1) = m11;
+        (*this)(2, 2) = m22;
+    }
+
+    // The SDK's inline body: the matrix whose rows are the x, y and z of r0, r1 and r2.
+    void setRows(const hkVector4& r0, const hkVector4& r1, const hkVector4& r2) {
+        hkVector4 c0;
+        c0.set(r0(0), r1(0), r2(0), 0.0f);
+        hkVector4 c1;
+        c1.set(r0(1), r1(1), r2(1), 0.0f);
+        hkVector4 c2;
+        c2.set(r0(2), r1(2), r2(2), 0.0f);
+        m_col0 = c0;
+        m_col1 = c1;
+        m_col2 = c2;
+    }
+
     // The transform of an unrotated, unmoved object.
     static const hkMatrix3& getIdentity();
     // The Jacobi helpers that diagonalizeSymmetric calls. _frobeniusNorm returns the norm of the whole matrix.
@@ -117,6 +138,17 @@ public:
     hkVector4 m_col1;
     hkVector4 m_col2;
 };
+
+// v's x, y and z, each broadcast, scale the columns: (y * col1 + x * col0) + z * col2.
+inline void hkVector4::_setMul3(const hkMatrix3& r, const hkVector4& v) {
+    const hkQuadReal b1 = _mm_shuffle_ps(v.m_quad, v.m_quad, _MM_SHUFFLE(1, 1, 1, 1));
+    const hkQuadReal r1 = _mm_mul_ps(b1, r.getColumn(1).m_quad);
+    const hkQuadReal b0 = _mm_shuffle_ps(v.m_quad, v.m_quad, _MM_SHUFFLE(0, 0, 0, 0));
+    const hkQuadReal r0 = _mm_mul_ps(b0, r.getColumn(0).m_quad);
+    const hkQuadReal b2 = _mm_shuffle_ps(v.m_quad, v.m_quad, _MM_SHUFFLE(2, 2, 2, 2));
+    const hkQuadReal r2 = _mm_mul_ps(b2, r.getColumn(2).m_quad);
+    m_quad = _mm_add_ps(_mm_add_ps(r1, r0), r2);
+}
 
 // Writes the product apA * apB into apResult.
 void hkMatrix3_setMulMat3Mat3(hkMatrix3* apResult, const hkMatrix3* apA, const hkMatrix3* apB);

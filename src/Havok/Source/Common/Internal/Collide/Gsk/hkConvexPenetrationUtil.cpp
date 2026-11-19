@@ -2,6 +2,7 @@
 
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
 #include "Havok/Source/Common/Internal/Collide/Gsk/hkGsk.h"
@@ -255,27 +256,10 @@ triangle:
         }
         if (iStep >= 2) {
             // A degenerate triangle after an edge step: the answer is on the edge s0 s1, its normal any perpendicular.
-            // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
             hkVector4 edge;
             edge.m_quad = _mm_sub_ps(pSimplex[0].m_quad, pSimplex[1].m_quad);
-            int32_t iMin = 0;
-            int32_t iOk1 = 1;
-            int32_t iOk2 = 2;
-            float fA0 = std::fabs(edge(0));
-            const float fA1 = std::fabs(edge(1));
-            const float fA2 = std::fabs(edge(2));
-            if (fA1 < fA0) {
-                iOk1 = 0;
-                iMin = 1;
-                fA0 = fA1;
-            }
-            if (fA2 < fA0) {
-                iOk2 = iMin;
-            }
             hkVector4 perpendicular;
-            perpendicular.m_quad = _mm_setzero_ps();
-            perpendicular(iOk1) = edge(iOk2);
-            perpendicular(iOk2) = -edge(iOk1);
+            hkVector4Util::calculatePerpendicularVector(edge, perpendicular);
             perpendicular.normalize3();
             output.m_normalInA.m_quad = _mm_and_ps(perpendicular.m_quad, rdata_10C4C10);
             // The point on A at the ratio sum|s0| / (2 sum|s0| + FLT_EPSILON) from A's first point to its second.
@@ -387,25 +371,8 @@ expandEdge:
         hkVector4 edge;
         edge.m_quad = _mm_sub_ps(pSimplex[0].m_quad, pSimplex[1].m_quad);
         iStep = 2;
-        // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-        int32_t iMin = 0;
-        int32_t iOk1 = 1;
-        int32_t iOk2 = 2;
-        float fA0 = std::fabs(edge(0));
-        const float fA1 = std::fabs(edge(1));
-        const float fA2 = std::fabs(edge(2));
-        if (fA1 < fA0) {
-            iOk1 = 0;
-            iMin = 1;
-            fA0 = fA1;
-        }
-        if (fA2 < fA0) {
-            iOk2 = iMin;
-        }
         hkVector4 perpendicular;
-        perpendicular.m_quad = _mm_setzero_ps();
-        perpendicular(iOk1) = edge(iOk2);
-        perpendicular(iOk2) = -edge(iOk1);
+        hkVector4Util::calculatePerpendicularVector(edge, perpendicular);
         hkVector4 cross;
         cross.setCross(edge, perpendicular);
         perpendicular.normalize3();

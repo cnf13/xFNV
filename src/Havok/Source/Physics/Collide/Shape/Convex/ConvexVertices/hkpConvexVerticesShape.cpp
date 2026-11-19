@@ -525,8 +525,7 @@ void hkpConvexVerticesShape::copyVertexData(const float* vertexIn, int32_t byteS
         fourVectors.m_x(i & 3) = v[0];
         fourVectors.m_y(i & 3) = v[1];
         fourVectors.m_z(i & 3) = v[2];
-        // EXE-INLINED none: hkAddByteOffsetConst (the vertices are raw bytes byteStriding apart, as the exe steps them)
-        v = reinterpret_cast<const float*>(reinterpret_cast<const char*>(v) + byteStriding);
+        v = hkAddByteOffsetConst(v, byteStriding);
     }
     // The padding repeats the last vertex.
     v = reinterpret_cast<const float*>(reinterpret_cast<const char*>(v) - byteStriding);
@@ -594,9 +593,7 @@ void hkpConvexVerticesShape::sortPlanes() {
                     _mm_shuffle_ps(square, square, 0xAA), _mm_add_ss(_mm_shuffle_ps(square, square, 0x55), square)
                 ));
                 if (lengthSquared == 0.0f) {
-                    // EXE-INLINED none: hkArray<hkVector4>::pushBackUnchecked
-                    m_planeEquations.m_data[m_planeEquations.m_size].m_quad = planes.m_data[0].m_quad;
-                    ++m_planeEquations.m_size;
+                    m_planeEquations.pushBackUnchecked(planes.m_data[0]);
                 }
                 else {
                     const float fLength = std::sqrt(lengthSquared);
@@ -618,9 +615,7 @@ void hkpConvexVerticesShape::sortPlanes() {
                             best = j;
                         }
                     }
-                    // EXE-INLINED none: hkArray<hkVector4>::pushBackUnchecked
-                    m_planeEquations.m_data[m_planeEquations.m_size].m_quad = planes.m_data[best].m_quad;
-                    ++m_planeEquations.m_size;
+                    m_planeEquations.pushBackUnchecked(planes.m_data[best]);
                     planes.removeAt(best);
                 }
             }

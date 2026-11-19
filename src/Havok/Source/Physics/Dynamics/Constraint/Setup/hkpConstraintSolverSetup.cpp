@@ -600,10 +600,7 @@ void hkpConstraintSolverSetup::oneStepIntegrate(
         hkpEntity* entity = entities[i];
         hkpMotion* motion = entity->getMotion();
         // The accumulator buffer is raw memory: the entity's solver data is a byte offset from its start.
-        // EXE-INLINED none: hkAddByteOffsetConst<hkpVelocityAccumulator>
-        const hkpVelocityAccumulator* src = reinterpret_cast<const hkpVelocityAccumulator*>(
-            reinterpret_cast<const uint8_t*>(accumulatorsBase) + entity->m_solverData
-        );
+        const hkpVelocityAccumulator* src = hkAddByteOffsetConst(accumulatorsBase, entity->m_solverData);
         hkpVelocityAccumulator accu;
         accu.m_type.m_storage = src->m_type.m_storage;
         accu.m_deactivationClass = src->m_deactivationClass;

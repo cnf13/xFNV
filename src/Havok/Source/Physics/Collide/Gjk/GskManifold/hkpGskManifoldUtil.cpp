@@ -292,8 +292,6 @@ void hkGskManifold_verifyAndGetPoints(
     hkpGskManifold::ContactPoint* const pOldEnd = &manifold.m_contactPoints[numPoints];
     hkpGskManifold::ContactPoint* pLast = pOldEnd;
     hkpGskManifold::ContactPoint* cp = &manifold.m_contactPoints[index];
-    // EXE-INLINED none: hkAddByteOffsetConst
-    const char* pVertexBytes = reinterpret_cast<const char*>(work.m_vertices);
     do {
         hkQuadReal pointA = _mm_setzero_ps();
         hkQuadReal aMinusB = pointA;
@@ -311,8 +309,8 @@ void hkGskManifold_verifyAndGetPoints(
         switch (cp->m_dimB + 4 * cp->m_dimA) {
             case 5: {
                 // Vertex against vertex.
-                const hkQuadReal& rA0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[0]);
-                const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
+                const hkQuadReal& rA0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[0])->m_quad;
+                const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
                 const hkQuadReal diff = _mm_sub_ps(rA0, rB0);
                 const hkQuadReal diff2 = _mm_mul_ps(diff, diff);
                 const float fLen2 = (diff2[2] + static_cast<float>(diff2[1] + diff2[0]));
@@ -327,9 +325,9 @@ void hkGskManifold_verifyAndGetPoints(
             }
             case 6: {
                 // Vertex of A against an edge of B.
-                const hkQuadReal& rB1 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[2]);
-                const hkQuadReal& rA0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[0]);
-                const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
+                const hkQuadReal& rB1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[2])->m_quad;
+                const hkQuadReal& rA0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[0])->m_quad;
+                const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
                 pointA = rA0;
                 const hkQuadReal edge = _mm_sub_ps(rB1, rB0);
                 const hkQuadReal toA = _mm_sub_ps(rB1, pointA);
@@ -364,10 +362,10 @@ void hkGskManifold_verifyAndGetPoints(
             }
             case 7: {
                 // Vertex of A against a triangle of B.
-                const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
-                const hkQuadReal& rB1 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[2]);
-                const hkQuadReal& rA0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[0]);
-                const hkQuadReal& rB2 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[3]);
+                const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
+                const hkQuadReal& rB1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[2])->m_quad;
+                const hkQuadReal& rA0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[0])->m_quad;
+                const hkQuadReal& rB2 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[3])->m_quad;
                 pointA = rA0;
                 const hkQuadReal e12 = _mm_sub_ps(rB2, rB1);
                 const hkQuadReal e12Yzx = _mm_shuffle_ps(e12, e12, 201);
@@ -415,10 +413,10 @@ void hkGskManifold_verifyAndGetPoints(
             }
             case 9: {
                 // Edge of A against a vertex of B.
-                const hkQuadReal& rA1 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
-                const hkQuadReal& rA0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[0]);
+                const hkQuadReal& rA1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
+                const hkQuadReal& rA0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[0])->m_quad;
                 const hkQuadReal edge = _mm_sub_ps(rA1, rA0);
-                const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[2]);
+                const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[2])->m_quad;
                 const hkQuadReal toB = _mm_sub_ps(rA1, rB0);
                 const hkQuadReal cross = _mm_sub_ps(
                     _mm_mul_ps(_mm_shuffle_ps(toB, toB, 210), _mm_shuffle_ps(edge, edge, 201)),
@@ -452,10 +450,10 @@ void hkGskManifold_verifyAndGetPoints(
             }
             case 10: {
                 // Edge of A against an edge of B.
-                const hkQuadReal& rB1 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[3]);
-                const hkQuadReal& rA0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[0]);
-                const hkQuadReal& rA1 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
-                const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[2]);
+                const hkQuadReal& rB1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[3])->m_quad;
+                const hkQuadReal& rA0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[0])->m_quad;
+                const hkQuadReal& rA1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
+                const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[2])->m_quad;
                 const hkQuadReal edgeA = _mm_sub_ps(rA1, rA0);
                 const hkQuadReal a1MinusB1 = _mm_sub_ps(rA1, rB1);
                 const hkQuadReal edgeB = _mm_sub_ps(rB1, rB0);
@@ -504,10 +502,10 @@ void hkGskManifold_verifyAndGetPoints(
             }
             case 13: {
                 // Triangle of A against a vertex of B.
-                const hkQuadReal& rA2 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[2]);
-                const hkQuadReal& rA1 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[1]);
-                const hkQuadReal& rA0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[0]);
-                const hkQuadReal& rB0 = *reinterpret_cast<const hkQuadReal*>(pVertexBytes + cp->m_vert[3]);
+                const hkQuadReal& rA2 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[2])->m_quad;
+                const hkQuadReal& rA1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[1])->m_quad;
+                const hkQuadReal& rA0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[0])->m_quad;
+                const hkQuadReal& rB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, cp->m_vert[3])->m_quad;
                 const hkQuadReal e20 = _mm_sub_ps(rA0, rA2);
                 const hkQuadReal e12 = _mm_sub_ps(rA2, rA1);
                 const hkQuadReal e12Yzx = _mm_shuffle_ps(e12, e12, 201);
@@ -621,14 +619,12 @@ int32_t hkGskManifold_convertFeature(
     const hkpGskManifold::ContactPoint& feature
 ) {
     // The vertex ids are byte offsets into work.m_vertices, added to the array's address as raw memory.
-    // EXE-INLINED none: hkAddByteOffsetConst
-    const char* vertexBytes = reinterpret_cast<const char*>(work.m_vertices);
     switch (feature.m_dimB + 4 * feature.m_dimA) {
         case 5: {
             // EXE-INLINED 0xDAD6A0
-            const __m128 pA = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0])->m_quad;
+            const __m128 pA = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0])->m_quad;
             const __m128 aMinusB =
-                _mm_sub_ps(pA, reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1])->m_quad);
+                _mm_sub_ps(pA, hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1])->m_quad);
             const __m128 sq = _mm_mul_ps(aMinusB, aMinusB);
             const float distanceSq =
                 _mm_cvtss_f32(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq)));
@@ -642,9 +638,9 @@ int32_t hkGskManifold_convertFeature(
         }
         case 6: {
             // EXE-INLINED 0xDAD720
-            const hkVector4& a = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-            const hkVector4& b0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1]);
-            const hkVector4& b1 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2]);
+            const hkVector4& a = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+            const hkVector4& b0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1]);
+            const hkVector4& b1 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2]);
             out.m_pointOnA.m_quad = a.m_quad;
             out.m_normal.m_quad = work.m_masterNormal.m_quad;
             const __m128 pB0 = b0.m_quad;
@@ -682,13 +678,13 @@ int32_t hkGskManifold_convertFeature(
         }
         case 7: {
             // The point A against the triangle B0 B1 B2.
-            const __m128 pA = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0])->m_quad;
+            const __m128 pA = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0])->m_quad;
             out.m_pointOnA.m_quad = pA;
             out.m_AminusB.m_quad =
-                _mm_sub_ps(pA, reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1])->m_quad);
-            const __m128 pB2 = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[3])->m_quad;
-            const __m128 pB1 = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2])->m_quad;
-            const __m128 pB0 = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1])->m_quad;
+                _mm_sub_ps(pA, hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1])->m_quad);
+            const __m128 pB2 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[3])->m_quad;
+            const __m128 pB1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2])->m_quad;
+            const __m128 pB0 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1])->m_quad;
             const __m128 e20 = _mm_sub_ps(pB0, pB2);
             const __m128 e20Yzx = _mm_shuffle_ps(e20, e20, 201);
             const __m128 e12 = _mm_sub_ps(pB2, pB1);
@@ -743,9 +739,9 @@ int32_t hkGskManifold_convertFeature(
         }
         case 9: {
             // EXE-INLINED 0xDAD860
-            const hkVector4& a0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-            const hkVector4& a1 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1]);
-            const hkVector4& b = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2]);
+            const hkVector4& a0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+            const hkVector4& a1 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1]);
+            const hkVector4& b = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2]);
             out.m_normal.m_quad = work.m_masterNormal.m_quad;
             const __m128 pA1 = a1.m_quad;
             const __m128 pA0 = a0.m_quad;
@@ -784,10 +780,10 @@ int32_t hkGskManifold_convertFeature(
         case 10: {
             // The edge A0 A1 against the edge B0 B1: valid when each edge's ends lie on both sides of the other's plane
             // through the common normal (sign mask 3 or 12).
-            const hkVector4& a0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-            const hkVector4& a1 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1]);
-            const hkVector4& b0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2]);
-            const hkVector4& b1 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[3]);
+            const hkVector4& a0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+            const hkVector4& a1 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1]);
+            const hkVector4& b0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2]);
+            const hkVector4& b1 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[3]);
             const __m128 pA1 = a1.m_quad;
             const __m128 pB1 = b1.m_quad;
             const __m128 pA0 = a0.m_quad;
@@ -834,14 +830,14 @@ int32_t hkGskManifold_convertFeature(
         }
         case 13: {
             // The triangle A0 A1 A2 against the point B: the point on A is B moved onto the triangle's plane.
-            const __m128 pB = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[3])->m_quad;
+            const __m128 pB = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[3])->m_quad;
             out.m_pointOnA.m_quad = pB;
             const __m128 aMinusB =
-                _mm_sub_ps(reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0])->m_quad, pB);
+                _mm_sub_ps(hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0])->m_quad, pB);
             out.m_AminusB.m_quad = aMinusB;
-            const hkVector4& a0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-            const hkVector4& a2 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2]);
-            const __m128 pA1 = reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1])->m_quad;
+            const hkVector4& a0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+            const hkVector4& a2 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2]);
+            const __m128 pA1 = hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1])->m_quad;
             const __m128 e20 = _mm_sub_ps(a0.m_quad, a2.m_quad);
             const __m128 e12 = _mm_sub_ps(a2.m_quad, pA1);
             const __m128 e12Yzx = _mm_shuffle_ps(e12, e12, 201);
@@ -913,11 +909,9 @@ int32_t hkGskManifold_convertPointEdge(
     hkGskManifoldConvertOut& out
 ) {
     // The vertex ids are byte offsets into work.m_vertices, added to the array's address as raw memory.
-    // EXE-INLINED none: hkAddByteOffsetConst
-    const char* vertexBytes = reinterpret_cast<const char*>(work.m_vertices);
-    const hkVector4& a = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-    const hkVector4& b0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1]);
-    const hkVector4& b1 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2]);
+    const hkVector4& a = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+    const hkVector4& b0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1]);
+    const hkVector4& b1 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2]);
     out.m_pointOnA.m_quad = a.m_quad;
     out.m_normal.m_quad = work.m_masterNormal.m_quad;
     const __m128 pB0 = b0.m_quad;
@@ -960,11 +954,9 @@ int32_t hkGskManifold_convertEdgePoint(
     const hkpGskManifold::ContactPoint& feature,
     hkGskManifoldConvertOut& out
 ) {
-    // EXE-INLINED none: hkAddByteOffsetConst
-    const char* vertexBytes = reinterpret_cast<const char*>(work.m_vertices);
-    const hkVector4& a0 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-    const hkVector4& a1 = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1]);
-    const hkVector4& b = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[2]);
+    const hkVector4& a0 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+    const hkVector4& a1 = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1]);
+    const hkVector4& b = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[2]);
     out.m_normal.m_quad = work.m_masterNormal.m_quad;
     const __m128 pA1 = a1.m_quad;
     const __m128 pA0 = a0.m_quad;
@@ -1008,10 +1000,8 @@ int32_t hkGskManifold_convertPointPoint(
     const hkpGskManifold::ContactPoint& feature,
     hkGskManifoldConvertOut& out
 ) {
-    // EXE-INLINED none: hkAddByteOffsetConst
-    const char* vertexBytes = reinterpret_cast<const char*>(work.m_vertices);
-    const hkVector4& a = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[0]);
-    const hkVector4& b = *reinterpret_cast<const hkVector4*>(vertexBytes + feature.m_vert[1]);
+    const hkVector4& a = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[0]);
+    const hkVector4& b = *hkAddByteOffsetConst<hkVector4>(work.m_vertices, feature.m_vert[1]);
     const __m128 aMinusB = _mm_sub_ps(a.m_quad, b.m_quad);
     const __m128 sq = _mm_mul_ps(aMinusB, aMinusB);
     const float distanceSq =

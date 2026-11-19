@@ -6,6 +6,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Object/hkBaseObject.h"
@@ -208,25 +209,8 @@ void hkpPointToPathConstraintData::buildJacobian(const hkpConstraintQueryIn& in,
     hkVector4 tangentWs;
     tangentWs.setRotatedDir(pathTransformWs.m_rotation, pathSpaceVector);
 
-    // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-    float fMin = std::fabs(tangentWs(0));
-    const float fAbsY = std::fabs(tangentWs(1));
-    const float fAbsZ = std::fabs(tangentWs(2));
-    int32_t iMin = 0;
-    int32_t iFirst = 1;
-    int32_t iSecond = 2;
-    if (fMin > fAbsY) {
-        fMin = fAbsY;
-        iFirst = 0;
-        iMin = 1;
-    }
-    if (fMin > fAbsZ) {
-        iSecond = iMin;
-    }
     hkVector4 perpWs;
-    perpWs.m_quad = _mm_setzero_ps();
-    perpWs(iFirst) = tangentWs(iSecond);
-    perpWs(iSecond) = -tangentWs(iFirst);
+    hkVector4Util::calculatePerpendicularVector(tangentWs, perpWs);
 
     perpWs.normalize3();
 

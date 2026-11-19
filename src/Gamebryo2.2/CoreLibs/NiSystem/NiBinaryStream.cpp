@@ -75,10 +75,7 @@ void NiBinaryStream::DoByteSwap(
             uint32_t uiCompSize = puiComponentSizes[j];
             switch (uiCompSize) {
                 case 2u: {
-                    // EXE-INLINED none: NiEndian::Swap16
-                    char c = pcData[0];
-                    pcData[0] = pcData[1];
-                    pcData[1] = c;
+                    NiEndian::Swap16(pcData, 1);
                     break;
                 }
                 case 4u: {

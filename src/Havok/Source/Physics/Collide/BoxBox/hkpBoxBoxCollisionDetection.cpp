@@ -960,14 +960,8 @@ void hkpBoxBoxCollisionDetection::calcManifold(hkpBoxBoxManifold& manifold) cons
         updateManifoldNormal = true;
     }
     else {
-        // EXE-INLINED none: hkVector4Util::unpackInt32IntoQuaternion
-        // Each byte of the packed normal, less 128, times 1.1 / 128 (the exe's double constant).
-        const uint32_t packed = manifold.m_manifoldNormalB;
         hkVector4 normalInB;
-        normalInB(0) = (static_cast<int32_t>(packed & 0xFF) - 0x80) * 0.008593750186264515;
-        normalInB(1) = (static_cast<int32_t>((packed >> 8) & 0xFF) - 0x80) * 0.008593750186264515;
-        normalInB(2) = (static_cast<int32_t>((packed >> 16) & 0xFF) - 0x80) * 0.008593750186264515;
-        normalInB(3) = (static_cast<int32_t>(packed >> 24) - 0x80) * 0.008593750186264515;
+        hkVector4Util::unpackInt32IntoQuaternion(manifold.m_manifoldNormalB, normalInB);
         hkVector4 normalInA;
         normalInA.setRotatedDir(m_aTb.getRotation(), normalInB);
         const __m128 prod = _mm_mul_ps(normalInA.m_quad, manifold.m_manifoldNormalA.m_quad);

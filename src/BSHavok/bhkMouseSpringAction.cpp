@@ -11,6 +11,7 @@
 #include "BSHavok/bhkWorldObject.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
@@ -59,8 +60,7 @@ NiObject* bhkMouseSpringAction::CreateClone(NiCloningProcess& arCloneData) {
 }
 
 // The base's fields, then, for a big-endian source, the creation info's two positions and its four floats byte-swapped
-// in place. The stream's byte is compared with 1: any other byte swaps. A cinfo built here is not killed. Each float's
-// four bytes are swapped as an untyped 32-bit value, hence the uint32_t views.
+// in place. The stream's byte is compared with 1: any other byte swaps. A cinfo built here is not killed.
 void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
     bhkUnaryAction::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
@@ -68,55 +68,34 @@ void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
         hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(rInfo.m_positionInRbLocal);
         bhkStream::Endian(rInfo.m_mousePositionInWorld);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
-        *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
-        *puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
-        *puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
-        *puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
+        ENDIAN(rInfo.m_springDamping, false);
+        ENDIAN(rInfo.m_springElasticity, false);
+        ENDIAN(rInfo.m_maxRelativeForce, false);
+        ENDIAN(rInfo.m_objectDamping, false);
     }
 }
 
 // For a big-endian save, the creation info's two positions and four floats are byte-swapped in place around the base's
-// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call. Each
-// float's four bytes are swapped as an untyped 32-bit word, hence the uint32_t views.
+// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call.
 void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiSpringDamping = reinterpret_cast<uint32_t*>(&rInfo.m_springDamping);
-    uint32_t* puiSpringElasticity = reinterpret_cast<uint32_t*>(&rInfo.m_springElasticity);
-    uint32_t* puiMaxRelativeForce = reinterpret_cast<uint32_t*>(&rInfo.m_maxRelativeForce);
-    uint32_t* puiObjectDamping = reinterpret_cast<uint32_t*>(&rInfo.m_objectDamping);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_positionInRbLocal);
         bhkStream::Endian(rInfo.m_mousePositionInWorld);
-        // EXE-INLINED none: BSEndian
-        *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
-        // EXE-INLINED none: BSEndian
-        *puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
-        // EXE-INLINED none: BSEndian
-        *puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
-        // EXE-INLINED none: BSEndian
-        *puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
+        ENDIAN(rInfo.m_springDamping, false);
+        ENDIAN(rInfo.m_springElasticity, false);
+        ENDIAN(rInfo.m_maxRelativeForce, false);
+        ENDIAN(rInfo.m_objectDamping, false);
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_positionInRbLocal);
         bhkStream::Endian(rInfo.m_mousePositionInWorld);
-        // EXE-INLINED none: BSEndian
-        *puiSpringDamping = __builtin_bswap32(*puiSpringDamping);
-        // EXE-INLINED none: BSEndian
-        *puiSpringElasticity = __builtin_bswap32(*puiSpringElasticity);
-        // EXE-INLINED none: BSEndian
-        *puiMaxRelativeForce = __builtin_bswap32(*puiMaxRelativeForce);
-        // EXE-INLINED none: BSEndian
-        *puiObjectDamping = __builtin_bswap32(*puiObjectDamping);
+        ENDIAN(rInfo.m_springDamping, false);
+        ENDIAN(rInfo.m_springElasticity, false);
+        ENDIAN(rInfo.m_maxRelativeForce, false);
+        ENDIAN(rInfo.m_objectDamping, false);
     }
 }
 

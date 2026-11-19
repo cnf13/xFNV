@@ -71,6 +71,18 @@ public:
         }
     }
 
+    // The SDK's inline clear of numQuads 16-byte blocks as dwords (hkString.inl); none when numQuads is not positive.
+    static void memClear16(void* dst, int32_t numQuads) {
+        uint32_t* dst32 = static_cast<uint32_t*>(dst);
+        for (int32_t i = 0; i < numQuads; i++) {
+            dst32[0] = 0;
+            dst32[1] = 0;
+            dst32[2] = 0;
+            dst32[3] = 0;
+            dst32 += 4;
+        }
+    }
+
     // The SDK's inline copy of numQuads 16-byte blocks as dwords (hkString.inl); at least one block is copied.
     static void memCpy16NonEmpty(void* dst, const void* src, int32_t numQuads) {
         const uint32_t* src32 = static_cast<const uint32_t*>(src);

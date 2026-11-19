@@ -797,10 +797,7 @@ const hkpMeshMaterial* hkpCompressedMeshShape::getMaterial(uint32_t key) {
     }
     // m_meshMaterials is untyped memory of m_materialStriding-byte records (a game material class may be larger than
     // hkpMeshMaterial), so the byte offset is added to the base.
-    // EXE-INLINED none: hkAddByteOffsetConst
-    return reinterpret_cast<const hkpMeshMaterial*>(
-        reinterpret_cast<const char*>(pMaterials) + uiMaterial * m_materialStriding
-    );
+    return hkAddByteOffsetConst(pMaterials, uiMaterial * m_materialStriding);
 }
 
 // The AABB of apChunk in shape space: the quantized bounds of apChunk (of the chunk it references, when it has one),

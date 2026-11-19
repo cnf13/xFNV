@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkClassEnum.h"
@@ -244,27 +245,6 @@ void hkpWheelConstraintData::setInWorldSpace(
     const hkVector4& suspensionAxis,
     const hkVector4& steeringAxisTmp
 ) {
-    // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-    // The lane of the smallest |x| is left zero; the other two are swapped, one negated.
-    auto setPerpendicular = [](hkVector4& arOut, const hkVector4& arIn) {
-        int32_t iMin = 0;
-        int32_t iOk1 = 1;
-        int32_t iOk2 = 2;
-        float fA0 = std::fabs(arIn(0));
-        const float fA1 = std::fabs(arIn(1));
-        const float fA2 = std::fabs(arIn(2));
-        if (fA0 > fA1) {
-            fA0 = fA1;
-            iOk1 = 0;
-            iMin = 1;
-        }
-        if (fA0 > fA2) {
-            iOk2 = iMin;
-        }
-        arOut.m_quad = _mm_setzero_ps();
-        arOut(iOk1) = arIn(iOk2);
-        arOut(iOk2) = -arIn(iOk1);
-    };
     hkVector4 axle;
     axle.m_quad = axleTmp.m_quad;
     axle.normalize3();
@@ -286,7 +266,7 @@ void hkpWheelConstraintData::setInWorldSpace(
     suspensionA.m_rotation.m_col1(1) = 1.0f;
     suspensionA.m_rotation.m_col2(2) = 1.0f;
     suspensionB.m_rotation.m_col0.setRotatedInverseDir(bodyBTransform.m_rotation, suspensionAxis);
-    setPerpendicular(suspensionB.m_rotation.m_col1, suspensionB.m_rotation.m_col0);
+    hkVector4Util::calculatePerpendicularVector(suspensionB.m_rotation.m_col0, suspensionB.m_rotation.m_col1);
     suspensionB.m_rotation.m_col1.normalize3();
     suspensionB.m_rotation.m_col2.setCross(suspensionB.m_rotation.m_col0, suspensionB.m_rotation.m_col1);
     // The steering bases.

@@ -1316,9 +1316,8 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
     }
     hkVector4 hkpos;
     NI2HK(hkpos, arPos);
-    // EXE-INLINED none: NI2HK(hkQuaternion&, const NiQuaternion&), each lane copied with fld/fstp.
     hkQuaternion hkrot;
-    hkrot.m_vec.m_quad = hkQuadReal{arRot.m_fX, arRot.m_fY, arRot.m_fZ, arRot.m_fW};
+    NI2HK(hkrot, arRot);
     hkVector4 bodyTrans;
     GetPosition(bodyTrans);
     hkQuaternion bodyRot;
@@ -1375,9 +1374,8 @@ void bhkRigidBody::ApplyHardKeyframe(const NiPoint3& arPos, const NiQuaternion& 
     if (linVelSq > fmaxLinVel * fmaxLinVel) {
         hkVector4 hkpos2;
         NI2HK(hkpos2, arPos);
-        // EXE-INLINED none: NI2HK(hkQuaternion&, const NiQuaternion&), each lane copied with fld/fstp.
         hkQuaternion hkrot2;
-        hkrot2.m_vec.m_quad = hkQuadReal{arRot.m_fX, arRot.m_fY, arRot.m_fZ, arRot.m_fW};
+        NI2HK(hkrot2, arRot);
         SetPosRot(hkpos2, hkrot2);
         return;
     }

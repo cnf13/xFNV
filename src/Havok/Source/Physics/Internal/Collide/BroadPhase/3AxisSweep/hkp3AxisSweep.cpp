@@ -2037,9 +2037,7 @@ void hkp3AxisSweep::calcAabbCache(const hkAabb& aabb, hkpBroadPhaseAabbCache* Aa
                     if (reinterpret_cast<uintptr_t>(node.m_handle) & 1) {
                         continue;
                     }
-                    // EXE-INLINED none: hkArray<const hkpBpNode*>::pushBackUnchecked
-                    overlaps.m_data[overlaps.m_size] = &node;
-                    overlaps.m_size++;
+                    overlaps.pushBackUnchecked(&node);
                 }
             }
             bits >>= 4;
@@ -2064,9 +2062,7 @@ void hkp3AxisSweep::calcAabbCache(
     const int32_t numCollidables = overlappingCollidables.m_size;
     hkLocalArray<const hkpBpNode*> overlaps(numCollidables);
     for (int32_t i = 0; i < overlappingCollidables.m_size; i++) {
-        // EXE-INLINED none: hkArray<const hkpBpNode*>::pushBackUnchecked
-        overlaps.m_data[overlaps.m_size] = &m_nodes.m_data[overlappingCollidables.m_data[i]->m_broadPhaseHandle.m_id];
-        overlaps.m_size++;
+        overlaps.pushBackUnchecked(&m_nodes.m_data[overlappingCollidables.m_data[i]->m_broadPhaseHandle.m_id]);
     }
     calcAabbCacheInternal(overlaps, AabbCacheOut);
 }
@@ -2331,10 +2327,7 @@ void hkp3AxisSweep::castRay(
     for (int32_t castIndex = 0; castIndex < rayInput.m_numCasts; castIndex++) {
         const hkpBpEndPoint* ep[3] = {startEndPoints[0], startEndPoints[1], startEndPoints[2]};
         float hitFraction = hitFractions[castIndex];
-        // EXE-INLINED none: hkAddByteOffsetConst<hkVector4>
-        hkVector4 to = *reinterpret_cast<const hkVector4*>(
-            reinterpret_cast<const char*>(rayInput.m_toBase) + rayInput.m_toStriding * castIndex
-        );
+        hkVector4 to = *hkAddByteOffsetConst(rayInput.m_toBase, rayInput.m_toStriding * castIndex);
         hkVector4 dir;
         dir.m_quad = _mm_sub_ps(to.m_quad, rayInput.m_from.m_quad);
 
@@ -3485,9 +3478,7 @@ void hkp3AxisSweep::addObjectBatch(
                 for (int32_t k = 0; k < 4; k++) {
                     const hkpBpNode* pNode = &pNodes[k];
                     if ((bits & (1u << k)) && !pNode->yzDisjoint(queryNode) && !pNode->isMarker()) {
-                        // EXE-INLINED none: hkArrayBase<const hkp3AxisSweep::hkpBpNode*>::pushBackUnchecked
-                        overlaps.m_data[overlaps.m_size] = pNode;
-                        overlaps.m_size++;
+                        overlaps.pushBackUnchecked(pNode);
                     }
                 }
             }
@@ -3896,8 +3887,7 @@ void hkp3AxisSweep::removeObjectBatch(
             newIndex[last] = i;
             last--;
             newIndex[i] = -1;
-            // EXE-INLINED none: hkArrayBase<int>::pushBackUnchecked
-            movedNodes.m_data[movedNodes.m_size++] = i;
+            movedNodes.pushBackUnchecked(i);
             if (node.isMarker()) {
                 // EXE-INLINED none: hkp3AxisSweep::hkpBpNode::getMarker
                 // A marker node's handle field is no pointer: the exe treats its bits as its marker's byte offset in
@@ -4739,59 +4729,18 @@ void hkp3AxisSweep::calcAabbCacheInternal(
     start.m_value = AABB_MIN_VALUE;
     start.m_nodeIndex = 0;
     for (int32_t i = 0; i < 3; i++) {
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        hkpBpEndPoint* pDst = axis[i].m_endPoints.m_data + axis[i].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = start;
-        }
-        axis[i].m_endPoints.m_size++;
+        axis[i].m_endPoints.pushBackUnchecked(start);
     }
 
     // Each node's x, y and z end points, read from this sweep's axes.
     const hkpBpNode* const* ppNode = overlaps.m_data;
     for (int32_t n = overlaps.m_size - 1; n >= 0; n--) {
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        const hkpBpEndPoint* pSrc = &m_axis[0].m_endPoints.m_data[(*ppNode)->min_x];
-        hkpBpEndPoint* pDst = axis[0].m_endPoints.m_data + axis[0].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = *pSrc;
-        }
-        axis[0].m_endPoints.m_size++;
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        pSrc = &m_axis[0].m_endPoints.m_data[(*ppNode)->max_x];
-        pDst = axis[0].m_endPoints.m_data + axis[0].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = *pSrc;
-        }
-        axis[0].m_endPoints.m_size++;
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        pSrc = &m_axis[1].m_endPoints.m_data[(*ppNode)->min_y];
-        pDst = axis[1].m_endPoints.m_data + axis[1].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = *pSrc;
-        }
-        axis[1].m_endPoints.m_size++;
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        pSrc = &m_axis[1].m_endPoints.m_data[(*ppNode)->max_y];
-        pDst = axis[1].m_endPoints.m_data + axis[1].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = *pSrc;
-        }
-        axis[1].m_endPoints.m_size++;
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        pSrc = &m_axis[2].m_endPoints.m_data[(*ppNode)->min_z];
-        pDst = axis[2].m_endPoints.m_data + axis[2].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = *pSrc;
-        }
-        axis[2].m_endPoints.m_size++;
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        pSrc = &m_axis[2].m_endPoints.m_data[(*ppNode)->max_z];
-        pDst = axis[2].m_endPoints.m_data + axis[2].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = *pSrc;
-        }
-        axis[2].m_endPoints.m_size++;
+        axis[0].m_endPoints.pushBackUnchecked(m_axis[0].m_endPoints.m_data[(*ppNode)->min_x]);
+        axis[0].m_endPoints.pushBackUnchecked(m_axis[0].m_endPoints.m_data[(*ppNode)->max_x]);
+        axis[1].m_endPoints.pushBackUnchecked(m_axis[1].m_endPoints.m_data[(*ppNode)->min_y]);
+        axis[1].m_endPoints.pushBackUnchecked(m_axis[1].m_endPoints.m_data[(*ppNode)->max_y]);
+        axis[2].m_endPoints.pushBackUnchecked(m_axis[2].m_endPoints.m_data[(*ppNode)->min_z]);
+        axis[2].m_endPoints.pushBackUnchecked(m_axis[2].m_endPoints.m_data[(*ppNode)->max_z]);
         ppNode++;
     }
 
@@ -4810,12 +4759,7 @@ void hkp3AxisSweep::calcAabbCacheInternal(
     end.m_value = AABB_MAX_VALUE;
     end.m_nodeIndex = 0;
     for (int32_t i = 0; i < 3; i++) {
-        // EXE-INLINED none: hkArrayBase<hkp3AxisSweep::hkpBpEndPoint>::pushBackUnchecked
-        hkpBpEndPoint* pDst = axis[i].m_endPoints.m_data + axis[i].m_endPoints.m_size;
-        if (pDst) {
-            *pDst = end;
-        }
-        axis[i].m_endPoints.m_size++;
+        axis[i].m_endPoints.pushBackUnchecked(end);
     }
 }
 

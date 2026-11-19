@@ -7,6 +7,7 @@
 #include "Havok/Source/Common/Base/Container/PointerMap/hkPointerMap.h"
 #include "Havok/Source/Common/Base/Container/String/hkString.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -484,8 +485,7 @@ void hkpMultiThreadedSimulation::collideEntitiesNeedingPsiCollisionDetectionNarr
             const hkpCollisionQualityInfo* quality = m_world->m_collisionDispatcher->getCollisionQualityInfo(
                 static_cast<hkpCollisionDispatcher::CollisionQualityIndex>(entry->m_collisionQualityIndex)
             );
-            // EXE-INLINED none: hkSweptTransform::getInvDeltaTime
-            const float invDeltaTime = entity->getMotion()->m_motionState.m_sweptTransform.m_centerOfMass1(3);
+            const float invDeltaTime = entity->getMotion()->m_motionState.m_sweptTransform.getInvDeltaTime();
             if (quality->m_useContinuousPhysics.m_storage &&
                 !(quality->m_useSimpleToiHandling.m_bool && 0.0f == invDeltaTime)) {
                 continue;

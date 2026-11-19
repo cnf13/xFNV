@@ -25,6 +25,9 @@ public:
     hkBool isOk() const;
     // Writes the transform that first applies arB, then arA on top of it.
     void setMul(const hkTransform& aTb, const hkTransform& bTc);
+    // The SDK's inline form of setMul: bTc's four columns turned by aTb's rotation (_setMul3), from the translation
+    // down to column 0, then aTb's translation added. This must be neither aTb nor bTc. Defined below.
+    void _setMul(const hkTransform& aTb, const hkTransform& bTc);
     // Writes the transform that first applies the inverse of arA's rotation and translation,
     // then arB.
     void setMulInverseMul(const hkTransform& bTa, const hkTransform& bTc);
@@ -70,6 +73,9 @@ public:
         m_translation.setZero4();
     }
 
+    // The SDK's inline: hkTransformIdentity. Defined below.
+    static const hkTransform& getIdentity();
+
     void setInverse(const hkTransform& t);
     void setMulEq(const hkTransform& b);
     void setMulMulInverse(const hkTransform& wTa, const hkTransform& wTb);
@@ -101,3 +107,32 @@ extern hkTransform hkTransformIdentity;
 using hkTransformIdentity_storage_t = float[16];
 inline hkTransformIdentity_storage_t hkTransformIdentity_storage{1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
                                                                  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+inline const hkTransform& hkTransform::getIdentity() {
+    return hkTransformIdentity;
+}
+
+// b's x, y and z, each broadcast, scale t's columns: (y * col1 + x * col0) + (z * col2 + translation).
+inline void hkVector4::_setTransformedPos(const hkTransform& t, const hkVector4& b) {
+    const hkRotation& r = t.getRotation();
+    const hkQuadReal b1 = _mm_shuffle_ps(b.m_quad, b.m_quad, _MM_SHUFFLE(1, 1, 1, 1));
+    const hkQuadReal r1 = _mm_mul_ps(b1, r.getColumn(1).m_quad);
+    const hkQuadReal b0 = _mm_shuffle_ps(b.m_quad, b.m_quad, _MM_SHUFFLE(0, 0, 0, 0));
+    const hkQuadReal r0 = _mm_mul_ps(b0, r.getColumn(0).m_quad);
+    const hkQuadReal b2 = _mm_shuffle_ps(b.m_quad, b.m_quad, _MM_SHUFFLE(2, 2, 2, 2));
+    const hkQuadReal r2 = _mm_mul_ps(b2, r.getColumn(2).m_quad);
+    m_quad = _mm_add_ps(_mm_add_ps(r1, r0), _mm_add_ps(r2, t.getTranslation().m_quad));
+}
+
+// The SDK's hkVector4Util::rotatePoints of bTc's four columns: aTb's rotation is copied first, then each column from
+// the translation down is _setMul3 of it.
+inline void hkTransform::_setMul(const hkTransform& aTb, const hkTransform& bTc) {
+    hkMatrix3 unaliased;
+    unaliased = aTb.getRotation();
+    int32_t i = 3;
+    do {
+        getColumn(i)._setMul3(unaliased, bTc.getColumn(i));
+    }
+    while (--i >= 0);
+    m_translation.add4(aTb.m_translation);
+}

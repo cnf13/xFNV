@@ -27,17 +27,16 @@ hkBool hkaLookAtIkSolver::solve(
     // The cone's half angle, or with range limits the largest of the four (a NaN limit is taken).
     float fLimitAngle = setup.m_limitAngle;
     if (range) {
-        // EXE-INLINED none: fabs
-        fLimitAngle = __builtin_fabsf(range->m_limitAngleLeft);
-        const float fRight = __builtin_fabsf(range->m_limitAngleRight);
+        fLimitAngle = hkMath::fabs(range->m_limitAngleLeft);
+        const float fRight = hkMath::fabs(range->m_limitAngleRight);
         if (!(fRight < fLimitAngle)) {
             fLimitAngle = fRight;
         }
-        const float fUp = __builtin_fabsf(range->m_limitAngleUp);
+        const float fUp = hkMath::fabs(range->m_limitAngleUp);
         if (!(fUp < fLimitAngle)) {
             fLimitAngle = fUp;
         }
-        const float fDown = __builtin_fabsf(range->m_limitAngleDown);
+        const float fDown = hkMath::fabs(range->m_limitAngleDown);
         if (!(fDown < fLimitAngle)) {
             fLimitAngle = fDown;
         }

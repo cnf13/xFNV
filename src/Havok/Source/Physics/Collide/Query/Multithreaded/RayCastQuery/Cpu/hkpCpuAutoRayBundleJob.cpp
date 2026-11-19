@@ -83,8 +83,7 @@ void hkpAutoRayBundleJob_bundleIndexedRays(
     int32_t* numBundleCommandsOut
 ) {
     const float fCos = std::cos(maxAngle);
-    // EXE-INLINED none: fabs
-    const float fMinCos = __builtin_fabsf(fCos);
+    const float fMinCos = hkMath::fabs(fCos);
     alignas(16) hkLocalArray<hkpAutoRayBundle> bundles;
     bundles.m_size = 0;
     hkpAutoRayBundle* pLocal = hkAllocateStack<hkpAutoRayBundle>(numIndices, nullptr);
@@ -200,8 +199,7 @@ void hkpAutoRayBundleJob_bundleOctantRays(
     int32_t* numBundleCommandsOut
 ) {
     const float fCos = std::cos(maxAngle);
-    // EXE-INLINED none: fabs
-    const float fMinCos = __builtin_fabsf(fCos);
+    const float fMinCos = hkMath::fabs(fCos);
     alignas(16) hkLocalArray<hkpAutoRayBundle> bundles;
     bundles.m_size = 0;
     hkpAutoRayBundle* pLocal = hkAllocateStack<hkpAutoRayBundle>(numRays, nullptr);

@@ -4,6 +4,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
@@ -68,27 +69,9 @@ void hkpSphereCapsuleAgent::getClosestPoints(
     event.m_cdBodyA = &bodyA;
     event.m_cdBodyB = &bodyB;
 
-    // The capsule's two vertices in world space, the last first: (y * col1 + x * col0) + (z * col2 + translation).
-    // The SDK's getVertices() is &m_vertexA, m_vertexB right after it.
-    // EXE-INLINED none: hkVector4Util::transformPoints
+    // The capsule's two vertices in world space. The SDK's getVertices() is &m_vertexA, m_vertexB right after it.
     hkVector4 posB[2];
-    {
-        const hkTransform& transformB = *bodyB.m_motion.pMotion;
-        const __m128 col0 = transformB.m_rotation.m_col0.m_quad;
-        const __m128 col1 = transformB.m_rotation.m_col1.m_quad;
-        const __m128 col2 = transformB.m_rotation.m_col2.m_quad;
-        const __m128 translation = transformB.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        int32_t i = 1;
-        do {
-            const __m128 v = vertices[i].m_quad;
-            posB[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), col0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation)
-            );
-        }
-        while (--i >= 0);
-    }
+    hkVector4Util::transformPoints(*bodyB.m_motion.pMotion, &capsB->m_vertexA, 2, posB);
 
     hkLineSegmentUtil::ClosestPointLineSegResult result;
     hkLineSegmentUtil::closestPointLineSeg(posA, posB[0], posB[1], result);
@@ -113,26 +96,7 @@ void hkpSphereCapsuleAgent::getClosestPoints(
             dist = 0.0f;
             hkVector4 edge;
             edge.m_quad = _mm_sub_ps(posB[1].m_quad, posB[0].m_quad);
-            // The SDK's perpendicular of the edge: the smallest component's lane zero, the other two swapped, one
-            // negated.
-            // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-            int32_t min = 0;
-            int32_t ok1 = 1;
-            int32_t ok2 = 2;
-            float a0 = std::fabs(edge(0));
-            const float a1 = std::fabs(edge(1));
-            const float a2 = std::fabs(edge(2));
-            if (a1 < a0) {
-                ok1 = 0;
-                min = 1;
-                a0 = a1;
-            }
-            if (a2 < a0) {
-                ok2 = min;
-            }
-            aMinusB.m_quad = _mm_setzero_ps();
-            aMinusB(ok1) = edge(ok2);
-            aMinusB(ok2) = -edge(ok1);
+            hkVector4Util::calculatePerpendicularVector(edge, aMinusB);
         }
         // normalize3: the broadcast inverse length (approximate reciprocal square root, one Newton step, 0 for a zero
         // length) times the vector.
@@ -177,27 +141,9 @@ void hkpSphereCapsuleAgent::processCollision(
     const hkpCapsuleShape* capsB = static_cast<const hkpCapsuleShape*>(bodyB.m_shape);
     const hkVector4& posA = bodyA.m_motion.pState->m_transform.m_translation;
 
-    // The capsule's two vertices in world space, the last first: (y * col1 + x * col0) + (z * col2 + translation).
-    // The SDK's getVertices() is &m_vertexA, m_vertexB right after it.
-    // EXE-INLINED none: hkVector4Util::transformPoints
+    // The capsule's two vertices in world space. The SDK's getVertices() is &m_vertexA, m_vertexB right after it.
     hkVector4 posB[2];
-    {
-        const hkTransform& transformB = bodyB.m_motion.pState->m_transform;
-        const __m128 col0 = transformB.m_rotation.m_col0.m_quad;
-        const __m128 col1 = transformB.m_rotation.m_col1.m_quad;
-        const __m128 col2 = transformB.m_rotation.m_col2.m_quad;
-        const __m128 translation = transformB.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        int32_t i = 1;
-        do {
-            const __m128 v = vertices[i].m_quad;
-            posB[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), col0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation)
-            );
-        }
-        while (--i >= 0);
-    }
+    hkVector4Util::transformPoints(bodyB.m_motion.pState->m_transform, &capsB->m_vertexA, 2, posB);
 
     hkLineSegmentUtil::ClosestPointLineSegResult lineResult;
     hkLineSegmentUtil::closestPointLineSeg(posA, posB[0], posB[1], lineResult);
@@ -224,26 +170,7 @@ void hkpSphereCapsuleAgent::processCollision(
             dist = 0.0f;
             hkVector4 edge;
             edge.m_quad = _mm_sub_ps(posB[1].m_quad, posB[0].m_quad);
-            // The SDK's perpendicular of the edge: the smallest component's lane zero, the other two swapped, one
-            // negated.
-            // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-            int32_t min = 0;
-            int32_t ok1 = 1;
-            int32_t ok2 = 2;
-            float a0 = std::fabs(edge(0));
-            const float a1 = std::fabs(edge(1));
-            const float a2 = std::fabs(edge(2));
-            if (a1 < a0) {
-                ok1 = 0;
-                min = 1;
-                a0 = a1;
-            }
-            if (a2 < a0) {
-                ok2 = min;
-            }
-            normal.m_quad = _mm_setzero_ps();
-            normal(ok1) = edge(ok2);
-            normal(ok2) = -edge(ok1);
+            hkVector4Util::calculatePerpendicularVector(edge, normal);
         }
         // normalize3: the broadcast inverse length (approximate reciprocal square root, one Newton step, 0 for a zero
         // length) times the vector.
@@ -351,21 +278,7 @@ void hkpSphereCapsuleAgent::staticGetClosestPoints(
     alignas(16) hkVector4 posB[2];
     {
         const hkTransform& t = *bodyB.m_motion.pMotion;
-        const __m128 c0 = t.m_rotation.m_col0.m_quad;
-        const __m128 c1 = t.m_rotation.m_col1.m_quad;
-        const __m128 c2 = t.m_rotation.m_col2.m_quad;
-        const __m128 c3 = t.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        int32_t i = 1;
-        do {
-            const __m128 p = vertices[i].m_quad;
-            // EXE-INLINED none: hkVector4::_setTransformedPos
-            posB[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0x55), c1), _mm_mul_ps(_mm_shuffle_ps(p, p, 0x00), c0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(p, p, 0xAA), c2), c3)
-            );
-        }
-        while (--i >= 0);
+        hkVector4Util::transformPoints(t, &capsB->m_vertexA, 2, posB);
     }
 
     alignas(16) hkLineSegmentUtil::ClosestPointLineSegResult result;
@@ -392,26 +305,7 @@ void hkpSphereCapsuleAgent::staticGetClosestPoints(
             dist = 0.0f;
             alignas(16) hkVector4 edge;
             edge.m_quad = _mm_sub_ps(posB[1].m_quad, posB[0].m_quad);
-            // The SDK's perpendicular of the edge: the smallest component's lane zero, the other two swapped, one
-            // negated.
-            // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-            int32_t min = 0;
-            int32_t ok1 = 1;
-            int32_t ok2 = 2;
-            float a0 = std::fabs(edge(0));
-            const float a1 = std::fabs(edge(1));
-            const float a2 = std::fabs(edge(2));
-            if (a1 < a0) {
-                ok1 = 0;
-                min = 1;
-                a0 = a1;
-            }
-            if (a2 < a0) {
-                ok2 = min;
-            }
-            event.m_contact.m_separatingNormal.m_quad = _mm_setzero_ps();
-            event.m_contact.m_separatingNormal(ok1) = edge(ok2);
-            event.m_contact.m_separatingNormal(ok2) = -edge(ok1);
+            hkVector4Util::calculatePerpendicularVector(edge, event.m_contact.m_separatingNormal);
             normal = event.m_contact.m_separatingNormal;
         }
         normal.normalize3();
@@ -463,26 +357,9 @@ hkpSphereCapsuleAgent::ClosestPointResult hkpSphereCapsuleAgent::getClosestPoint
     const hkVector4& posA = bodyA.m_motion.pMotion->m_translation;
     const hkpCapsuleShape* capsB = static_cast<const hkpCapsuleShape*>(bodyB.m_shape);
 
-    // The capsule's two vertices in world space, the last first: (y * col1 + x * col0) + (z * col2 + translation).
-    // EXE-INLINED none: hkVector4Util::transformPoints
+    // The capsule's two vertices in world space.
     hkVector4 posB[2];
-    {
-        const hkTransform& transformB = *bodyB.m_motion.pMotion;
-        const __m128 col0 = transformB.m_rotation.m_col0.m_quad;
-        const __m128 col1 = transformB.m_rotation.m_col1.m_quad;
-        const __m128 col2 = transformB.m_rotation.m_col2.m_quad;
-        const __m128 translation = transformB.m_translation.m_quad;
-        const hkVector4* vertices = &capsB->m_vertexA;
-        int32_t i = 1;
-        do {
-            const __m128 v = vertices[i].m_quad;
-            posB[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), col0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation)
-            );
-        }
-        while (--i >= 0);
-    }
+    hkVector4Util::transformPoints(*bodyB.m_motion.pMotion, &capsB->m_vertexA, 2, posB);
 
     hkLineSegmentUtil::ClosestPointLineSegResult result;
     hkLineSegmentUtil::closestPointLineSeg(posA, posB[0], posB[1], result);
@@ -511,25 +388,7 @@ hkpSphereCapsuleAgent::ClosestPointResult hkpSphereCapsuleAgent::getClosestPoint
         dist = 0.0f;
         hkVector4 edge;
         edge.m_quad = _mm_sub_ps(posB[1].m_quad, posB[0].m_quad);
-        // The SDK's perpendicular of the edge: the smallest component's lane zero, the other two swapped, one negated.
-        // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-        int32_t min = 0;
-        int32_t ok1 = 1;
-        int32_t ok2 = 2;
-        float a0 = std::fabs(edge(0));
-        const float a1 = std::fabs(edge(1));
-        const float a2 = std::fabs(edge(2));
-        if (a1 < a0) {
-            ok1 = 0;
-            min = 1;
-            a0 = a1;
-        }
-        if (a2 < a0) {
-            ok2 = min;
-        }
-        cpoint.m_separatingNormal.m_quad = _mm_setzero_ps();
-        cpoint.m_separatingNormal(ok1) = edge(ok2);
-        cpoint.m_separatingNormal(ok2) = -edge(ok1);
+        hkVector4Util::calculatePerpendicularVector(edge, cpoint.m_separatingNormal);
     }
     // normalize3: the broadcast inverse length (approximate reciprocal square root, one Newton step, 0 for a zero
     // length) times the vector.

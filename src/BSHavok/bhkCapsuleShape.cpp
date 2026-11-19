@@ -20,6 +20,7 @@
 #include "Havok/Source/Common/Base/Algorithm/Collide/LineSegment/hkLineSegmentUtil.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Sphere/hkSphere.h"
@@ -267,26 +268,9 @@ bool bhkCapsuleShape::GetClosestPoints(const hkSphere& arSphere, const hkTransfo
     // EXE-INLINED 0x4AE750
     const hkpCapsuleShape* pCapsule = static_cast<const hkpCapsuleShape*>(this ? phkObject : nullptr);
 
-    // The capsule's two end points placed by arTrans, the last first: (y * col1 + x * col0) + (z * col2 +
-    // translation). The SDK's getVertices() is &m_vertexA, m_vertexB right after it.
-    // EXE-INLINED none: hkVector4Util::transformPoints
+    // The capsule's two end points placed by arTrans. The SDK's getVertices() is &m_vertexA, m_vertexB right after it.
     hkVector4 aVertices[2];
-    {
-        const __m128 col0 = arTrans.m_rotation.m_col0.m_quad;
-        const __m128 col1 = arTrans.m_rotation.m_col1.m_quad;
-        const __m128 col2 = arTrans.m_rotation.m_col2.m_quad;
-        const __m128 translation = arTrans.m_translation.m_quad;
-        const hkVector4* pVertices = &pCapsule->m_vertexA;
-        int32_t i = 1;
-        do {
-            const __m128 v = pVertices[i].m_quad;
-            aVertices[i].m_quad = _mm_add_ps(
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0x55), col1), _mm_mul_ps(_mm_shuffle_ps(v, v, 0x00), col0)),
-                _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(v, v, 0xAA), col2), translation)
-            );
-        }
-        while (--i >= 0);
-    }
+    hkVector4Util::transformPoints(arTrans, &pCapsule->m_vertexA, 2, aVertices);
 
     hkLineSegmentUtil::ClosestPointLineSegResult kLineResult;
     hkLineSegmentUtil::closestPointLineSeg(arSphere.m_pos, aVertices[0], aVertices[1], kLineResult);
@@ -315,26 +299,7 @@ bool bhkCapsuleShape::GetClosestPoints(const hkSphere& arSphere, const hkTransfo
         fDist = 0.0f;
         hkVector4 kEdge;
         kEdge.m_quad = _mm_sub_ps(aVertices[1].m_quad, aVertices[0].m_quad);
-        // The SDK's perpendicular of the axis: the smallest component's lane zero, the other two swapped, one
-        // negated.
-        // EXE-INLINED none: hkVector4Util::calculatePerpendicularVector
-        int32_t min = 0;
-        int32_t ok1 = 1;
-        int32_t ok2 = 2;
-        float a0 = std::fabs(kEdge(0));
-        const float a1 = std::fabs(kEdge(1));
-        const float a2 = std::fabs(kEdge(2));
-        if (a1 < a0) {
-            ok1 = 0;
-            min = 1;
-            a0 = a1;
-        }
-        if (a2 < a0) {
-            ok2 = min;
-        }
-        kNormal.m_quad = _mm_setzero_ps();
-        kNormal(ok1) = kEdge(ok2);
-        kNormal(ok2) = -kEdge(ok1);
+        hkVector4Util::calculatePerpendicularVector(kEdge, kNormal);
     }
     // normalize3: the broadcast inverse length (reciprocal square root estimate, one Newton step, 0 for a zero length)
     // times the vector.

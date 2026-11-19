@@ -5,6 +5,7 @@
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
@@ -90,26 +91,8 @@ int32_t hkpCylinderShape::calcSizeForSpu(const CalcSizeForSpuInput& a1, int32_t 
 // axis n, times the cylinder radius, plus the convex radius and the tolerance. The end points go to world space from
 // the last point down.
 void hkpCylinderShape::getAabbImpl(const hkTransform& localToWorld, float tolerance, hkAabb& out) const {
-    const __m128 kCol0 = localToWorld.m_rotation.m_col0.m_quad;
-    const __m128 kCol1 = localToWorld.m_rotation.m_col1.m_quad;
-    const __m128 kCol2 = localToWorld.m_rotation.m_col2.m_quad;
-    const __m128 kTranslation = localToWorld.m_translation.m_quad;
-    const hkVector4* pVertices = &m_vertexA;
     hkVector4 akWorld[2];
-    // EXE-INLINED none: hkVector4Util::transformPoints
-    int32_t i = 1;
-    do {
-        const __m128 kPoint = pVertices[i].m_quad;
-        akWorld[i].m_quad = _mm_add_ps(
-            _mm_add_ps(
-                _mm_mul_ps(_mm_shuffle_ps(kPoint, kPoint, 85), kCol1),
-                _mm_mul_ps(_mm_shuffle_ps(kPoint, kPoint, 0), kCol0)
-            ),
-            _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(kPoint, kPoint, 170), kCol2), kTranslation)
-        );
-        --i;
-    }
-    while (i >= 0);
+    hkVector4Util::transformPoints(localToWorld, &m_vertexA, 2, akWorld);
     const __m128 kDir = _mm_sub_ps(akWorld[1].m_quad, akWorld[0].m_quad);
     const __m128 kSquares = _mm_mul_ps(kDir, kDir);
     const __m128 kLength2 = _mm_add_ss(

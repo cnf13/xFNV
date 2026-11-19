@@ -7,6 +7,7 @@
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
 #include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -51,45 +52,33 @@ NiObject* bhkMotorAction::CreateClone(NiCloningProcess& arCloneData) {
 }
 
 // The base's fields, then, for a big-endian source, the creation info's axis, spin rate and gain byte-swapped in place.
-// The stream's byte is compared with 1: any other byte swaps. A cinfo built here is not killed. Each float's four bytes
-// are swapped as an untyped 32-bit value, hence the uint32_t views.
+// The stream's byte is compared with 1: any other byte swaps. A cinfo built here is not killed.
 void bhkMotorAction::LoadBinary(NiStream& arStream) {
     bhkUnaryAction::LoadBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
         bool bCreated;
         hkMotorActionCinfo& rInfo = static_cast<hkMotorActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(rInfo.m_axis);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiSpinRate = reinterpret_cast<uint32_t*>(&rInfo.m_spinRate);
-        *puiSpinRate = __builtin_bswap32(*puiSpinRate);
-        // EXE-INLINED none: BSEndian
-        uint32_t* puiGain = reinterpret_cast<uint32_t*>(&rInfo.m_gain);
-        *puiGain = __builtin_bswap32(*puiGain);
+        ENDIAN(rInfo.m_spinRate, false);
+        ENDIAN(rInfo.m_gain, false);
     }
 }
 
 // For a big-endian save, the creation info's axis, spin rate and gain are byte-swapped in place around the base's write
-// and swapped back after it. The stream's byte is compared with 1 and read again after the base call. Each float's four
-// bytes are swapped as an untyped 32-bit word, hence the uint32_t views.
+// and swapped back after it. The stream's byte is compared with 1 and read again after the base call.
 void bhkMotorAction::SaveBinary(NiStream& arStream) {
     bool bCreated;
     hkMotorActionCinfo& rInfo = static_cast<hkMotorActionCinfo&>(CreateCinfo(bCreated));
-    uint32_t* puiSpinRate = reinterpret_cast<uint32_t*>(&rInfo.m_spinRate);
-    uint32_t* puiGain = reinterpret_cast<uint32_t*>(&rInfo.m_gain);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_axis);
-        // EXE-INLINED none: BSEndian
-        *puiSpinRate = __builtin_bswap32(*puiSpinRate);
-        // EXE-INLINED none: BSEndian
-        *puiGain = __builtin_bswap32(*puiGain);
+        ENDIAN(rInfo.m_spinRate, false);
+        ENDIAN(rInfo.m_gain, false);
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_axis);
-        // EXE-INLINED none: BSEndian
-        *puiSpinRate = __builtin_bswap32(*puiSpinRate);
-        // EXE-INLINED none: BSEndian
-        *puiGain = __builtin_bswap32(*puiGain);
+        ENDIAN(rInfo.m_spinRate, false);
+        ENDIAN(rInfo.m_gain, false);
     }
 }
 
