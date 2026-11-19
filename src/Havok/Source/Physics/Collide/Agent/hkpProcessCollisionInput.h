@@ -12,10 +12,14 @@ class hkpCollisionQualityInfo;
 // configuration. hkPadSpu<T> members are plain T on PC. Not polymorphic.
 class hkpProcessCollisionInput : public hkpCollisionInput {
 public:
-    // The default constructor is the implicit one, as the world's constructor and the stack copies (filled by the copy
-    // constructor) use it.
+    // The default constructor is the implicit one, as the world's constructor uses it.
     hkpProcessCollisionInput() = default;
-    hkpProcessCollisionInput(const hkpProcessCollisionInput& a1);
+    // The base copied, no spare sector, then the assignment.
+    hkpProcessCollisionInput(const hkpProcessCollisionInput& other) : hkpCollisionInput(other) {
+        m_spareAgentSector = nullptr;
+        *this = other;
+    }
+    hkpProcessCollisionInput& operator=(const hkpProcessCollisionInput& a1);
 
     hkStepInfo m_stepInfo;
     // Mutable because hkpSimulation::processAgentCollideDiscrete sets it through its const input.

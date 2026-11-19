@@ -40,12 +40,7 @@ hkCpuAgentSectorJob(hkpMtThreadStructure& tl, hkJobQueue& jobQueue, hkJobQueue::
     // The queue entry holds the job: an hkJob whose bytes after the base are the dynamics job's.
     const hkpAgentBaseJob& job = static_cast<const hkpAgentBaseJob&>(static_cast<const hkJob&>(nextJobOut));
 
-    // Copies the input's hkpCollisionInput part, clears the spare sector and then runs hkpProcessCollisionInput's copy
-    // constructor over the same local, at a 16-byte boundary.
-    alignas(16) XFNV_INLINED_LOCAL(hkpProcessCollisionInput, input, std::nullopt, std::nullopt);
-    static_cast<hkpCollisionInput&>(input) = tl.m_collisionInput;
-    input.m_spareAgentSector = nullptr;
-    ::new (&input) hkpProcessCollisionInput(tl.m_collisionInput);
+    alignas(16) hkpProcessCollisionInput input(tl.m_collisionInput);
     input.m_stepInfo = job.m_stepInfo;
 
     hkpDeferredConstraintOwner constraintOwner;

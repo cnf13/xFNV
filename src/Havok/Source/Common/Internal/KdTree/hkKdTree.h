@@ -43,6 +43,10 @@ using hkHalfPointer = std::conditional_t<sizeof(void*) == 8, uint32_t, uint16_t>
 
 // A primitive's bounds quantised to 16 bits per axis, with its id split over the two spare words. It is 16-aligned.
 struct alignas(16) hkKdTreeProjectedEntry {
+    // Its arrays treat it as plain data (hkTypeTraits.h): an array's sized constructor leaves the entries unwritten, as
+    // the game's does.
+    HK_DECLARE_POD_TYPE();
+
     // The primitive id as one integer and as its two halves: m_halfPointer[0] is m_primIdHigh (the low half on the
     // little-endian PC), m_halfPointer[1] m_primIdLow (the SDK's getPrimitiveId and setPrimitiveId). The SDK's
     // hkUlong and 32-bit build's hkHalfPointer (hkinternal.pdb: sizeof 4).

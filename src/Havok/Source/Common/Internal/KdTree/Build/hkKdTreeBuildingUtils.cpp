@@ -74,38 +74,12 @@ void hkKdTreeBuildingUtils::buildTree(
 // KEEP: an uninitialised read, as buildTree's (0xD9D880): the exe writes only the six bound words of its bounds local
 // and hands it to splitTreeBuilding, whose sub-jobs carry the bounds (id words at +6 and +0xE unwritten) into each
 // input.m_bounds given to buildTreeRecursive, input's padding at +0x14 and +0x34 unwritten too. The two entry arrays
-// are the SDK's hkArray locals of numPrimitives entries, constructor and destructor inlined (their size is never
-// stored). The writer's destructor (0xDF3160) is an empty function: the exe's call of it is not written.
+// are the SDK's hkArray locals of numPrimitives entries. The writer's destructor (0xDF3160) is an empty function: the
+// exe's call of it is not written.
 void hkKdTreeBuildingUtils::buildTreeDistributed(hkKdTreeBuildInput::Mediator& mediator, hkKdTree* tree) {
     hkKdTreeNode* nodes = tree->m_nodes.m_data;
-    // EXE-INLINED none: hkArray<hkKdTreeProjectedEntry>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<hkKdTreeProjectedEntry>, entriesIn, std::nullopt, std::nullopt);
-    int32_t numPrimitives = mediator.getNumPrimitives();
-    hkMemoryAllocator* pHeap = hkMemoryRouter::getInstance().m_heap;
-    entriesIn.m_data = nullptr;
-    entriesIn.m_capacityAndFlags = 0;
-    if (numPrimitives) {
-        int32_t numBytes = numPrimitives * static_cast<int32_t>(sizeof(hkKdTreeProjectedEntry));
-        entriesIn.m_data = static_cast<hkKdTreeProjectedEntry*>(pHeap->bufAlloc(numBytes));
-        entriesIn.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(hkKdTreeProjectedEntry));
-    }
-    if (!entriesIn.m_capacityAndFlags) {
-        entriesIn.m_capacityAndFlags = hkArrayBase<hkKdTreeProjectedEntry>::DONT_DEALLOCATE_FLAG;
-    }
-    // EXE-INLINED none: hkArray<hkKdTreeProjectedEntry>::hkArray(int)
-    XFNV_INLINED_LOCAL(hkArray<hkKdTreeProjectedEntry>, entriesOut, std::nullopt, std::nullopt);
-    numPrimitives = mediator.getNumPrimitives();
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    entriesOut.m_data = nullptr;
-    entriesOut.m_capacityAndFlags = 0;
-    if (numPrimitives) {
-        int32_t numBytes = numPrimitives * static_cast<int32_t>(sizeof(hkKdTreeProjectedEntry));
-        entriesOut.m_data = static_cast<hkKdTreeProjectedEntry*>(pHeap->bufAlloc(numBytes));
-        entriesOut.m_capacityAndFlags = numBytes / static_cast<int32_t>(sizeof(hkKdTreeProjectedEntry));
-    }
-    if (!entriesOut.m_capacityAndFlags) {
-        entriesOut.m_capacityAndFlags = hkArrayBase<hkKdTreeProjectedEntry>::DONT_DEALLOCATE_FLAG;
-    }
+    hkArray<hkKdTreeProjectedEntry> entriesIn(mediator.getNumPrimitives());
+    hkArray<hkKdTreeProjectedEntry> entriesOut(mediator.getNumPrimitives());
 
     hkKdTreeBuildInput::WorkingSet set;
     set.m_entriesIn = entriesIn.m_data;
@@ -171,25 +145,6 @@ void hkKdTreeBuildingUtils::buildTreeDistributed(hkKdTreeBuildInput::Mediator& m
                 2;
         }
         completeDistributedBuild(tree, mediator.getNumPrimitives(), depths, subTreeSizes);
-    }
-
-    // EXE-INLINED none: hkArray<hkKdTreeProjectedEntry>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    if (entriesOut.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            entriesOut.m_data,
-            (entriesOut.m_capacityAndFlags & hkArrayBase<hkKdTreeProjectedEntry>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkKdTreeProjectedEntry))
-        );
-    }
-    // EXE-INLINED none: hkArray<hkKdTreeProjectedEntry>::~hkArray
-    pHeap = hkMemoryRouter::getInstance().m_heap;
-    if (entriesIn.m_capacityAndFlags >= 0) {
-        pHeap->bufFree(
-            entriesIn.m_data,
-            (entriesIn.m_capacityAndFlags & hkArrayBase<hkKdTreeProjectedEntry>::CAPACITY_MASK) *
-                static_cast<int32_t>(sizeof(hkKdTreeProjectedEntry))
-        );
     }
 }
 

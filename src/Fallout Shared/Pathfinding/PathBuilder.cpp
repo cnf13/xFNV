@@ -476,12 +476,8 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
     PathingLocation lastLoc;
     uint32_t icurrentNodeCount;
     using nodes_t = BSSimpleArray<NavMeshSearchNode, 1024>;
-    XFNV_INLINED_LOCAL(nodes_t, nodes, std::nullopt, std::nullopt);
-    // The nodes are read through the const GetAt.
-    const nodes_t& rconstNodes = nodes;
     PathingLocation smoothingGoalLocation;
     using BadNodes_t = BSSimpleArray<NavMeshSearchLink, 1024>;
-    XFNV_INLINED_LOCAL(BadNodes_t, links, std::nullopt, std::nullopt);
     PathingLocation smoothingStartLocation;
     int32_t pass;
     if (bUseStraightLineCheckFirst.Bool() &&
@@ -509,16 +505,13 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
             DetailedPathInfos.Add(a2);
         }
     }
-    for (pass = 0;; ++pass) {
+    for (pass = 0; pass < imaxPassCount; ++pass) {
         NavMeshInfo* NavMeshInfo_;
         uint16_t a1;
         NiPoint3* a1a;
         VirtualPathingNode* plastVirtualNode;
         float ftargetRadius;
         NavMeshSearchNode* lastNode;
-        if (pass >= imaxPassCount) {
-            goto LABEL_73;
-        }
         if (pass == 1) {
             using loadedNavmeshes_t = BSSimpleArray<NavMeshPtr, 1024>;
             loadedNavmeshes_t loadedNavmeshes;
@@ -539,152 +532,132 @@ PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT PathBuilder::AddNodesFromNavMesh(
                 }
             }
         }
-        ::new (&nodes) BSSimpleArray<NavMeshSearchNode, 1024>(32u, 0);
-        ::new (&links) BSSimpleArray<NavMeshSearchLink, 1024>(32u, 0);
+        nodes_t nodes(32u, 0);
+        // The nodes are read through the const GetAt.
+        const nodes_t& rconstNodes = nodes;
+        BadNodes_t links(32u, 0);
         smoothingStartLocation.~PathingLocation();
         ::new (&smoothingStartLocation) PathingLocation(aStartLocation);
         smoothingGoalLocation.~PathingLocation();
         ::new (&smoothingGoalLocation) PathingLocation(aGoalLocation);
-        if (RunNavMeshSearch_006CD670(
+        // A failed search may still have its partial path, up to its last node, smoothed; its other outcomes return or
+        // end the pass.
+        if (!RunNavMeshSearch_006CD670(
                 aStartLocation, aGoalLocation, &BadNodes, nodes, links, aiFirstVirtualNodeIndex, aiLastVirtualNodeIndex
             )) {
-            break;
-        }
-        if (nodes.IsEmpty() && pass >= 1) {
-            PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT v32 = PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
-            links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-            nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-            return v32;
-        }
-        if (nodes.IsEmpty()) {
-            goto LABEL_27;
-        }
-        lastNode = &nodes.GetLast();
-        a1 = lastNode->sTriangle;
-        NavMeshInfo_ = lastNode->pNavMesh->GetNavMeshInfo();
-        lastLoc = PathingLocation(lastNode->GetCenter(), NavMeshInfo_, a1);
-        if (pSolution.m_pObject->iLastLoadedVirtualNodeIndex != aiLastVirtualNodeIndex) {
-            goto LABEL_41;
-        }
-        plastVirtualNode = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
-        a1a = ::new (&result) NiPoint3((&plastVirtualNode->Location)->GetLocation());
-        ::new (&delta) NiPoint3(lastLoc.GetLocation() - *a1a);
-        if (plastVirtualNode->IsTransitionNode()) {
-            ftargetRadius = 80.0f;
-        }
-        else {
-            ftargetRadius = pRequest.m_pObject->fTargetRadius;
-        }
-        if (ftargetRadius * ftargetRadius > delta.SqrXYLength() && std::fabs(delta.z) < 180.0) {
-            if (!pRequest.m_pObject->bAllowIncompletePath) {
-                PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT v28 = PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
-                links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-                nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-                return v28;
+            if (nodes.IsEmpty() && pass >= 1) {
+                return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
             }
-            if (!plastVirtualNode->IsTransitionNode()) {
-                bAddNodesFromNavMeshIncomplete = true;
-                pSolution.m_pObject->SetIncomplete(true);
+            if (nodes.IsEmpty()) {
+                continue;
             }
-            goto LABEL_42;
-        }
-        if (pass) {
+            lastNode = &nodes.GetLast();
+            a1 = lastNode->sTriangle;
+            NavMeshInfo_ = lastNode->pNavMesh->GetNavMeshInfo();
+            lastLoc = PathingLocation(lastNode->GetCenter(), NavMeshInfo_, a1);
+            if (pSolution.m_pObject->iLastLoadedVirtualNodeIndex != aiLastVirtualNodeIndex) {
+                goto LABEL_41;
+            }
+            plastVirtualNode = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
+            a1a = ::new (&result) NiPoint3((&plastVirtualNode->Location)->GetLocation());
+            ::new (&delta) NiPoint3(lastLoc.GetLocation() - *a1a);
+            if (plastVirtualNode->IsTransitionNode()) {
+                ftargetRadius = 80.0f;
+            }
+            else {
+                ftargetRadius = pRequest.m_pObject->fTargetRadius;
+            }
+            if (ftargetRadius * ftargetRadius > delta.SqrXYLength() && std::fabs(delta.z) < 180.0) {
+                if (!pRequest.m_pObject->bAllowIncompletePath) {
+                    return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
+                }
+                if (!plastVirtualNode->IsTransitionNode()) {
+                    bAddNodesFromNavMeshIncomplete = true;
+                    pSolution.m_pObject->SetIncomplete(true);
+                }
+                goto LABEL_42;
+            }
+            if (!pass) {
+                continue;
+            }
         LABEL_41:;
             bAddNodesFromNavMeshIncomplete = true;
             pSolution.m_pObject->SetIncomplete(true);
         LABEL_42:;
             if (!pRequest.m_pObject->bAllowIncompletePath) {
-                PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT v27 = PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
-                links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-                nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-                return v27;
+                return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
             }
             smoothingGoalLocation.operator=(lastLoc);
+        }
+        icurrentNodeCount = pSolution.m_pObject->GetNodeCount();
+        if (RunPathSmoother(smoothingStartLocation, smoothingGoalLocation, BadNodes, nodes, links)) {
             break;
         }
-        links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-        nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-    LABEL_13:;
-        ;
-    }
-    icurrentNodeCount = pSolution.m_pObject->GetNodeCount();
-    if (RunPathSmoother(smoothingStartLocation, smoothingGoalLocation, BadNodes, nodes, links)) {
-        goto LABEL_72;
-    }
-    if (pass == imaxPassCount - 1 && pRequest.m_pObject->GetIgnoreSmoothingIfFails()) {
-        bAddNodesFromNavMeshIncomplete = true;
-        pSolution.m_pObject->SetIncomplete(true);
-        for (uint32_t i_3 = 0;; ++i_3) {
-            uint32_t v13 = nodes.iSize;
-            if (i_3 >= v13) {
+        if (pass == imaxPassCount - 1 && pRequest.m_pObject->GetIgnoreSmoothingIfFails()) {
+            bAddNodesFromNavMeshIncomplete = true;
+            pSolution.m_pObject->SetIncomplete(true);
+            for (uint32_t i_3 = 0;; ++i_3) {
+                uint32_t v13 = nodes.iSize;
+                if (i_3 >= v13) {
+                    break;
+                }
+                NavMeshInfo* a1b = rconstNodes.GetAt(static_cast<int32_t>(i_3)).pNavMesh->GetNavMeshInfo();
+                NiPoint3 v26 = rconstNodes.GetAt(static_cast<int32_t>(i_3)).GetCenter();
+                PathingLocation loc(&v26, a1b);
+                pSolution.m_pObject->AddPathingNode(loc, NiPoint3_ZERO);
+            }
+            break;
+        }
+        plastNode = pSolution.m_pObject->GetLastNode();
+        if ((plastNode) && (pSolution.m_pObject->iLastLoadedVirtualNodeIndex == aiLastVirtualNodeIndex)) {
+            float ftargetRadius_2;
+            VirtualPathingNode* plastVirtualNode_2 = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
+            NiPoint3* a1c = ::new (&v24) NiPoint3((&plastVirtualNode_2->Location)->GetLocation());
+            NiPoint3 delta_2 = (&plastNode->Location)->GetLocation() - *a1c;
+            if (plastVirtualNode_2->IsTransitionNode()) {
+                ftargetRadius_2 = 80.0f;
+            }
+            else {
+                ftargetRadius_2 = pRequest.m_pObject->fTargetRadius;
+            }
+            if (ftargetRadius_2 * ftargetRadius_2 > delta_2.SqrXYLength() && std::fabs(delta_2.z) < 180.0) {
                 break;
             }
-            NavMeshInfo* a1b = rconstNodes.GetAt(static_cast<int32_t>(i_3)).pNavMesh->GetNavMeshInfo();
-            NiPoint3 v26 = rconstNodes.GetAt(static_cast<int32_t>(i_3)).GetCenter();
-            PathingLocation loc(&v26, a1b);
-            pSolution.m_pObject->AddPathingNode(loc, NiPoint3_ZERO);
-        }
-    LABEL_72:;
-        links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-        nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-    LABEL_73:;
-        if (bAddNodesFromNavMeshIncomplete) {
-            return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE;
         }
 
-        return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_OK;
-    }
-    plastNode = pSolution.m_pObject->GetLastNode();
-    if ((plastNode) && (pSolution.m_pObject->iLastLoadedVirtualNodeIndex == aiLastVirtualNodeIndex)) {
-        float ftargetRadius_2;
-        VirtualPathingNode* plastVirtualNode_2 = pSolution.m_pObject->GetVirtualNode(aiLastVirtualNodeIndex);
-        NiPoint3* a1c = ::new (&v24) NiPoint3((&plastVirtualNode_2->Location)->GetLocation());
-        NiPoint3 delta_2 = (&plastNode->Location)->GetLocation() - *a1c;
-        if (plastVirtualNode_2->IsTransitionNode()) {
-            ftargetRadius_2 = 80.0f;
+        if (!BadNodes.IsEmpty() && pass != imaxPassCount - 1) {
+            if (pass < imaxPassCount - 1) {
+                while (true) {
+                    uint32_t NodeCount = pSolution.m_pObject->GetNodeCount();
+                    if (NodeCount == icurrentNodeCount) {
+                        break;
+                    }
+                    pSolution.m_pObject->RemoveLastNode();
+                }
+            }
+            continue;
         }
-        else {
-            ftargetRadius_2 = pRequest.m_pObject->fTargetRadius;
-        }
-        if (ftargetRadius_2 * ftargetRadius_2 > delta_2.SqrXYLength() && std::fabs(delta_2.z) < 180.0) {
-            goto LABEL_72;
-        }
-    }
-
-    if (!BadNodes.IsEmpty() && pass != imaxPassCount - 1) {
-        if (pass < imaxPassCount - 1) {
+        if (plastNode) {
+            bAddNodesFromNavMeshIncomplete = true;
+            pSolution.m_pObject->SetIncomplete(true);
+            if (pRequest.m_pObject->bAllowIncompletePath) {
+                return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE;
+            }
             while (true) {
-                uint32_t NodeCount = pSolution.m_pObject->GetNodeCount();
-                if (NodeCount == icurrentNodeCount) {
+                uint32_t v17 = pSolution.m_pObject->GetNodeCount();
+                if (v17 == icurrentNodeCount) {
                     break;
                 }
                 pSolution.m_pObject->RemoveLastNode();
             }
         }
-    LABEL_27:;
-        links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-        nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-        goto LABEL_13;
+        return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
     }
-    if (plastNode) {
-        bAddNodesFromNavMeshIncomplete = true;
-        pSolution.m_pObject->SetIncomplete(true);
-        if (pRequest.m_pObject->bAllowIncompletePath) {
-            links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-            nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-            return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE;
-        }
-        while (true) {
-            uint32_t v17 = pSolution.m_pObject->GetNodeCount();
-            if (v17 == icurrentNodeCount) {
-                break;
-            }
-            pSolution.m_pObject->RemoveLastNode();
-        }
+    if (bAddNodesFromNavMeshIncomplete) {
+        return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_INCOMPLETE;
     }
-    links.~BSSimpleArray<NavMeshSearchLink, 1024>();
-    nodes.~BSSimpleArray<NavMeshSearchNode, 1024>();
-    return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_FAILED;
+
+    return PathBuilder::ADD_NODES_FROM_NAVMESH_RESULT_OK;
 }
 
 // The setting's value is unused: Setting::Bool is called for a debug report that is compiled out, as the game does.

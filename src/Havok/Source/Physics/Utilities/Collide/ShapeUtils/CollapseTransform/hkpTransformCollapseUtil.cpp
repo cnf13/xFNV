@@ -607,15 +607,8 @@ hkResult hkpTransformCollapseUtil::collapseTransforms(
     hkpTransformCollapseUtil::Results& resultsOut,
     hkpShape** shapeOut
 ) {
-    XFNV_INLINED_LOCAL(_SharedShapeData, sharedShapes, std::nullopt, std::nullopt);
-    // EXE-INLINED none: _SharedShapeData::_SharedShapeData (an empty record)
-    sharedShapes.m_sharedShapes.m_data = nullptr;
-    sharedShapes.m_sharedShapes.m_size = 0;
-    sharedShapes.m_sharedShapes.m_capacityAndFlags = hkArrayBase<_SharedShapeData::SharedShape>::DONT_DEALLOCATE_FLAG;
-    sharedShapes.recursivelyParseShapeReferences(shape);
-    sharedShapes.removeSingleReferencedShapeData();
+    _SharedShapeData sharedShapes(shape);
     *shapeOut = const_cast<hkpShape*>(collapseTransformShape(shape, options, sharedShapes, resultsOut));
-    sharedShapes.~_SharedShapeData();
     return HK_SUCCESS;
 }
 
@@ -729,6 +722,11 @@ _SharedShapeData::_SharedShapeData(const hkArray<hkpRigidBody*, hkContainerHeapA
     for (int32_t i = 0; i < a1.m_size; ++i) {
         recursivelyParseShapeReferences(a1.m_data[i]->m_collidable.m_shape);
     }
+    removeSingleReferencedShapeData();
+}
+
+_SharedShapeData::_SharedShapeData(const hkpShape* shape) {
+    recursivelyParseShapeReferences(shape);
     removeSingleReferencedShapeData();
 }
 

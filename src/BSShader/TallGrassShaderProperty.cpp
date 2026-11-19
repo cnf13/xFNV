@@ -398,7 +398,8 @@ TallGrassShaderProperty::GetCachedGeometryMap() {
 
 // The cached geometry of apGrassParam's model, loading it on first use: one dynamic geometry holding as many copies of
 // the model's first geometry as one draw can index, with each copy's instance number per vertex. Null while the model's
-// background load runs. Smart-pointer locals are released before the thread's memory context is restored.
+// background load runs. Smart-pointer locals are released before the thread's memory context is restored:
+// spCachedGeom by a null assignment on each way out, so that its destructor finds nothing left to release.
 // KEEP: on a cache miss the exe copies SetAt's by-value NiPointer argument (InterlockedIncrement at 0xB61AA2) before
 // calling GetCachedGeometryMap (0xB61AB7); C++17 evaluates the object expression of the call first, so src cannot
 // express the exe's order.
@@ -410,8 +411,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         pTLSData->eMemContext = eMemContext;
         return nullptr;
     }
-    XFNV_INLINED_LOCAL(NiPointer<CachedGeometry>, spCachedGeom, std::nullopt, std::nullopt);
-    spCachedGeom.m_pObject = nullptr;
+    NiPointer<CachedGeometry> spCachedGeom;
     if (!GetCachedGeometryMap()->GetAt(apGrassParam->pcGeomFilename, spCachedGeom)) {
         void* pMemory = NiMemObject::operator new(sizeof(CachedGeometry));
         CachedGeometry* pNewGeom = pMemory ? ::new (pMemory) CachedGeometry : nullptr;
@@ -426,7 +426,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             GrassLoadTask* pTask = pMemory ? ::new (pMemory) GrassLoadTask(apGrassParam->pcGeomFilename) : nullptr;
             pCachedGeom->spGrassLoadTask = pTask;
             pIOManager->AddTask(pCachedGeom->spGrassLoadTask.m_pObject);
-            spCachedGeom.~NiPointer<CachedGeometry>();
+            spCachedGeom = nullptr;
             pTLSData->eMemContext = eMemContext;
             return nullptr;
         }
@@ -439,7 +439,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             GrassLoadTask* pTask = pMemory ? ::new (pMemory) GrassLoadTask(apGrassParam->pcGeomFilename) : nullptr;
             pCachedGeom->spGrassLoadTask = pTask;
             pIOManager->AddTask(pCachedGeom->spGrassLoadTask.m_pObject);
-            spCachedGeom.~NiPointer<CachedGeometry>();
+            spCachedGeom = nullptr;
             pTLSData->eMemContext = eMemContext;
             return nullptr;
         }
@@ -447,7 +447,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
         if (pTask) {
             // The background load has not finished yet.
             if (pTask->eState < BS_TASK_STATE_FINISHED) {
-                spCachedGeom.~NiPointer<CachedGeometry>();
+                spCachedGeom = nullptr;
                 pTLSData->eMemContext = eMemContext;
                 return nullptr;
             }
@@ -464,7 +464,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
             }
         }
         if (!spObject.m_pObject) {
-            spCachedGeom.~NiPointer<CachedGeometry>();
+            spCachedGeom = nullptr;
             pTLSData->eMemContext = eMemContext;
             return nullptr;
         }
@@ -753,7 +753,7 @@ TallGrassShaderProperty::CachedGeometry* TallGrassShaderProperty::GetCachedGeome
     }
     // The map holds a reference, so the geometry outlives the local's release.
     pCachedGeom = spCachedGeom.m_pObject;
-    NiDecRefCount(pCachedGeom);
+    spCachedGeom = nullptr;
     pTLSData->eMemContext = eMemContext;
     return pCachedGeom;
 }

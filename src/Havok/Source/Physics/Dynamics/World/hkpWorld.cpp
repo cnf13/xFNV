@@ -4593,10 +4593,16 @@ void enumerateAllEntitiesInWorld(const hkpWorld* world, hkpPhysicsSystem* sys) {
 }
 
 // Copies every member but m_spareAgentSector, which is left as it was.
-hkpProcessCollisionInput::hkpProcessCollisionInput(const hkpProcessCollisionInput& a1)
-  : hkpCollisionInput(a1), m_stepInfo(a1.m_stepInfo), m_collisionQualityInfo(a1.m_collisionQualityInfo),
-    m_dynamicsInfo(a1.m_dynamicsInfo), m_enableDeprecatedWelding(a1.m_enableDeprecatedWelding),
-    m_allowToSkipConfirmedCallbacks(a1.m_allowToSkipConfirmedCallbacks), m_config(a1.m_config) {}
+hkpProcessCollisionInput& hkpProcessCollisionInput::operator=(const hkpProcessCollisionInput& a1) {
+    hkpCollisionInput::operator=(a1);
+    m_stepInfo = a1.m_stepInfo;
+    m_collisionQualityInfo = a1.m_collisionQualityInfo;
+    m_dynamicsInfo = a1.m_dynamicsInfo;
+    m_enableDeprecatedWelding = a1.m_enableDeprecatedWelding;
+    m_allowToSkipConfirmedCallbacks = a1.m_allowToSkipConfirmedCallbacks;
+    m_config = a1.m_config;
+    return *this;
+}
 
 // Both indices are read before the first store, as the game does.
 hkpAgentNnEntry* updateCollidableEntryPointers(hkpAgentNnEntry* r_eax) {

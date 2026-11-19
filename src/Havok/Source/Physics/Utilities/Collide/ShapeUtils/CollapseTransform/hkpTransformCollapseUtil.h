@@ -96,6 +96,9 @@ public:
     // Adds each rigid body's collidable shape (recursivelyParseShapeReferences) to the empty
     // record, then prunes it (removeSingleReferencedShapeData).
     _SharedShapeData(const hkArray<hkpRigidBody*, hkContainerHeapAllocator>& a1);
+    // The SDK's: adds shape (recursivelyParseShapeReferences) to the empty record, then prunes it
+    // (removeSingleReferencedShapeData). The game inlines it.
+    _SharedShapeData(const hkpShape* shape);
     ~_SharedShapeData();
 
     // Counts one more reference of shape when it is recorded (by m_originalShape), else records it ({shape, null, 1},

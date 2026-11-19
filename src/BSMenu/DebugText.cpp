@@ -230,19 +230,19 @@ void DebugText::SetCurrentLine(DEBUGTEXT_LOCATION aeLoc, int32_t aiLine) {
     iHeight[(int32_t)aeLoc] = aiLine;
 }
 
-// The memory-context guard's fields are written directly here.
+// The memory-context guard is written as the game's statements: the thread's context saved, the interface context
+// set, and the saved one restored on each way out.
 void DebugText::HandleQueuedPrints() {
     for (uint32_t i = 0; i < xPrintData.iSize; ++i) {
         DebugText::DEBUG_TEXT_PRINT_TYPE eType = xPrintData.pBuffer[i]->eType;
         if (eType) {
             if (eType == DebugText::DTPT_SPECIFIED) {
                 size_t sLen;
-                XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
                 int32_t a_2;
-                tempMemContext.iOldMemContext = GetThreadTLSData()->eMemContext;
+                MEM_CONTEXT eOldMemContext = GetThreadTLSData()->eMemContext;
                 GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
                 if (!Interface::GetDebugTextRoot()) {
-                    GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+                    GetThreadTLSData()->eMemContext = eOldMemContext;
                     return;
                 }
                 bool btext_is_the_same_2 = false;
@@ -290,7 +290,7 @@ void DebugText::HandleQueuedPrints() {
                         }
                     }
                     if (a == ilen) {
-                        GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+                        GetThreadTLSData()->eMemContext = eOldMemContext;
                         return;
                     }
                     uint32_t b = 0;
@@ -320,7 +320,7 @@ void DebugText::HandleQueuedPrints() {
                     }
                     if (a_2 == 200) {
                         Warning("DEFAULT: Too many unique debug text items. \n");
-                        GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+                        GetThreadTLSData()->eMemContext = eOldMemContext;
                         return;
                     }
                 }
@@ -380,7 +380,7 @@ void DebugText::HandleQueuedPrints() {
                     }
                     DebugText::Unlock();
                 }
-                GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+                GetThreadTLSData()->eMemContext = eOldMemContext;
             }
         }
         else {
@@ -544,7 +544,8 @@ const char* DebugText::GetDebugText(float afX, float afY, int32_t aiJustify) {
     return nullptr;
 }
 
-// The memory-context guard's fields are written directly here.
+// The memory-context guard is written as the game's statements: the thread's context saved, the interface context
+// set, and the saved one restored on each way out.
 NiNode* DebugText::CreateDebugText(
     const char* apText,
     float afX,
@@ -554,8 +555,7 @@ NiNode* DebugText::CreateDebugText(
     const NiColorA* apColor
 ) {
     int32_t iwidth;
-    XFNV_INLINED_LOCAL(AutoMemContext, tempMemContext, std::nullopt, std::nullopt);
-    tempMemContext.iOldMemContext = GetThreadTLSData()->eMemContext;
+    MEM_CONTEXT eOldMemContext = GetThreadTLSData()->eMemContext;
     GetThreadTLSData()->eMemContext = MEM_CONTEXT_INTERFACE;
     if (*apText && (Interface::IsConsoleVisible() || Interface::IsDebugTextVisible())) {
         NiNode* pnode;
@@ -640,11 +640,11 @@ NiNode* DebugText::CreateDebugText(
         pnode->Update(UpdateData);
         DebugText::Unlock();
         string.Set(nullptr, 0);
-        GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+        GetThreadTLSData()->eMemContext = eOldMemContext;
         return pnode;
     }
 
-    GetThreadTLSData()->eMemContext = tempMemContext.iOldMemContext;
+    GetThreadTLSData()->eMemContext = eOldMemContext;
     return nullptr;
 }
 

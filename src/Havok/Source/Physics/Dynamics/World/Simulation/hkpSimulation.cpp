@@ -347,14 +347,8 @@ void hkpSimulation::collideEntitiesDiscrete(
     float m_deltaTime;
     float m_invDeltaTime;
     hkMemoryRouter* instance;
-    hkpProcessCollisionInput apMemory;
     m_collisionInput = world->m_collisionInput;
-    // Copies the hkpCollisionInput base's bytes before the copy constructor, as the game does; the base holds only
-    // plain pointers, scalars and vectors, so the copy is harmless.
-    __builtin_memcpy(static_cast<void*>(&apMemory), m_collisionInput, 0x50u);
-    apMemory.m_spareAgentSector = nullptr;
-    apMemory.~hkpProcessCollisionInput();
-    ::new (&apMemory) hkpProcessCollisionInput(*m_collisionInput);
+    hkpProcessCollisionInput apMemory(*m_collisionInput);
     m_endTime = (&stepInfo)->m_endTime;
     apMemory.m_stepInfo.m_startTime = (&stepInfo)->m_startTime;
     m_deltaTime = (&stepInfo)->m_deltaTime;

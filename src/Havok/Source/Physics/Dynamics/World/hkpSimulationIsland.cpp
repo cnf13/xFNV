@@ -325,12 +325,9 @@ void hkCpuSplitSimulationIslandJobImpl(
     hkArray<hkpSimulationIsland*, hkContainerHeapAllocator>& newSplitIslands
 ) {
     island->m_splitCheckRequested = 0;
-    // EXE-INLINED none: hkArray<hkpEntity*>::hkArray
     using oldEntities_t = hkArray<hkpEntity*, hkContainerHeapAllocator>;
-    XFNV_INLINED_LOCAL(oldEntities_t, oldEntities, std::nullopt, std::nullopt);
-    oldEntities.m_data = nullptr;
-    oldEntities.m_size = 0;
-    oldEntities.m_capacityAndFlags = hkArrayBase<hkpEntity*>::DONT_DEALLOCATE_FLAG;
+    alignas(oldEntities_t) uint8_t oldEntitiesStorage[sizeof(oldEntities_t)];
+    oldEntities_t& oldEntities = *::new (static_cast<void*>(oldEntitiesStorage)) oldEntities_t;
     island->markForWrite();
     hkpWorldOperationUtil::splitSimulationIsland(island, island->getWorld(), newSplitIslands, &oldEntities);
 }

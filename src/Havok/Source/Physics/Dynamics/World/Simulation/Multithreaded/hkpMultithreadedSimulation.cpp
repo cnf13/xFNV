@@ -823,7 +823,7 @@ hkpStepResult hkpMultiThreadedSimulation::stepBeginSt(hkJobQueue* jobQueue, floa
     m_world->m_violatedConstraintArray->m_nextFreeElement = 0;
     hkpMtThreadStructure* threadStructure = m_world->m_multithreadedSimulationJobData;
     threadStructure->m_dynamicsStepInfo = &m_world->m_dynamicsStepInfo;
-    ::new (&threadStructure->m_collisionInput) hkpProcessCollisionInput(*m_world->m_collisionInput);
+    threadStructure->m_collisionInput = *m_world->m_collisionInput;
     threadStructure->m_constraintQueryIn.set(
         m_world->m_dynamicsStepInfo.m_solverInfo, m_world->m_dynamicsStepInfo.m_stepInfo,
         m_world->m_violatedConstraintArray
@@ -1025,7 +1025,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntriesFromMultipleIslands(
             postCollideJob.m_header = job->m_header;
             tl.m_collisionInput.m_spareAgentSector = nullptr;
             tl.m_collisionInput.m_weldClosestPoints.m_storage = 0;
-            ::new (&tl.m_collisionInput) hkpProcessCollisionInput(*m_world->m_collisionInput);
+            tl.m_collisionInput = *m_world->m_collisionInput;
             tl.m_constraintQueryIn.set(
                 m_world->m_dynamicsStepInfo.m_solverInfo, m_world->m_dynamicsStepInfo.m_stepInfo,
                 m_world->m_violatedConstraintArray
@@ -1327,7 +1327,7 @@ void hkpMultiThreadedSimulation::processAgentNnEntries(
         tl.m_collisionInput.m_spareAgentSector = nullptr;
         tl.m_collisionInput.m_weldClosestPoints.m_storage = 0;
         tl.m_dynamicsStepInfo = &m_world->m_dynamicsStepInfo;
-        ::new (&tl.m_collisionInput) hkpProcessCollisionInput(*m_world->m_collisionInput);
+        tl.m_collisionInput = *m_world->m_collisionInput;
         tl.m_constraintQueryIn.set(
             m_world->m_dynamicsStepInfo.m_solverInfo, m_world->m_dynamicsStepInfo.m_stepInfo,
             m_world->m_violatedConstraintArray
